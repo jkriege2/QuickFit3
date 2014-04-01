@@ -923,7 +923,7 @@ void QFRDROverviewImageDisplay::replotSelection(bool replot) {
 
         double ovrAvg=0;
         double ovrVar=0;
-        ovrAvg=statisticsAverageVarianceMasked(ovrVar, plteOverviewSelectedData, (double*)image->get_data(), qMin(plteOverviewSize, image->get_Nx()*image->get_Ny()));
+        ovrAvg=statisticsAverageVarianceMasked(ovrVar, plteOverviewSelectedData, (double*)image->get_data(), qMin(plteOverviewSize, (int32_t)(image->get_Nx()*image->get_Ny())));
 
         plteSelected->set_width(w);
         plteSelected->set_height(h);

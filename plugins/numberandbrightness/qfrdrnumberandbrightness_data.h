@@ -89,11 +89,11 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDROvervie
         void maskSave(const QString& filename) const ;
         void maskClear();
         void maskSetAll();
-        void maskSet(uint16_t x, uint16_t y);
-        void maskUnset(uint16_t x, uint16_t y, bool value=true);
-        void maskToggle(uint16_t x, uint16_t y);
+        void maskSet(uint32_t x, uint32_t y);
+        void maskUnset(uint32_t x, uint32_t y, bool value=true);
+        void maskToggle(uint32_t x, uint32_t y);
         void maskInvert();
-        bool maskGet(uint16_t x, uint16_t y) const ;
+        bool maskGet(uint32_t x, uint32_t y) const ;
         bool* maskGet() const;
 
 

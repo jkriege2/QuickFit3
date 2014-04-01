@@ -28,12 +28,12 @@ class QFRDRImageToRunInterface {
          */
         virtual int getImageFromRunsChannelsAdvised() const=0;
 
-        /*! \brief return a pointer to a uint16_t image of size getDataImageWidth() * getDataImageHeight()
+        /*! \brief return a pointer to a double image of size getDataImageWidth() * getDataImageHeight()
 
             This image can be used to allow the user to select points in the image, or just as an overview. E.g. for
             imFCS-data this could simply be the averaged intensity of every pixel.
 
-            \return  a uint16_t image of size getDataImageWidth() * getDataImageHeight(), or NULL if no image is available
+            \return  a double image of size getDataImageWidth() * getDataImageHeight(), or NULL if no image is available
          */
         virtual double* getImageFromRunsPreview(int channel=0) const=0;
         /** \brief convert a pixel coordinate to a run index */

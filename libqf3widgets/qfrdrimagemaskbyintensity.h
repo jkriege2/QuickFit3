@@ -21,7 +21,7 @@ class QFRDRImageMaskByIntensity : public QDialog
         explicit QFRDRImageMaskByIntensity(QWidget *parent = 0);
         ~QFRDRImageMaskByIntensity();
 
-        void init(bool* mask, double* image, uint16_t width, uint16_t height);
+        void init(bool* mask, double* image, uint32_t width, uint32_t height);
 
         int getMaskMode() const;
 
@@ -35,8 +35,8 @@ class QFRDRImageMaskByIntensity : public QDialog
 
         bool* m_mask;
         double* m_image;
-        uint16_t m_width;
-        uint16_t m_height;
+        uint32_t m_width;
+        uint32_t m_height;
 
         double min;
         double max;

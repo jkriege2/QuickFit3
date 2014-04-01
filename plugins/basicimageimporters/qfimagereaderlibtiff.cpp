@@ -128,11 +128,11 @@ bool QFImageReaderLIBTIFF::nextFrame() {
     return TIFFReadDirectory(tif);
 }
 
-uint16_t QFImageReaderLIBTIFF::intFrameWidth() {
+uint32_t QFImageReaderLIBTIFF::intFrameWidth() {
     return width;
 }
 
-uint16_t QFImageReaderLIBTIFF::intFrameHeight() {
+uint32_t QFImageReaderLIBTIFF::intFrameHeight() {
     return height;
 }
 

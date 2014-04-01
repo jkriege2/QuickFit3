@@ -33,7 +33,7 @@ QFRDRImageMaskByIntensity::~QFRDRImageMaskByIntensity() {
     delete ui;
 }
 
-void QFRDRImageMaskByIntensity::init(bool *mask, double *image, uint16_t width, uint16_t height) {
+void QFRDRImageMaskByIntensity::init(bool *mask, double *image, uint32_t width, uint32_t height) {
     m_mask=mask;
     m_image=image;
     m_width=width;
@@ -74,32 +74,32 @@ void QFRDRImageMaskByIntensity::updateMask() {
     double levell=ui->edtLevel->value();
     double level=ui->edtLevel_2->value();
     if (ui->cmbMaskingMode->currentIndex()==0) { // in-range
-        for (uint16_t i=0; i<m_width*m_height; i++) {
+        for (uint32_t i=0; i<m_width*m_height; i++) {
             double l=level;
             double ll=levell;
             m_mask[i]=(m_image[i]>=ll)&&(m_image[i]<=l);
         }
     } else if (ui->cmbMaskingMode->currentIndex()==1) { // out-of-range
-        for (uint16_t i=0; i<m_width*m_height; i++) {
+        for (uint32_t i=0; i<m_width*m_height; i++) {
             double l=level;
             double ll=levell;
 
             m_mask[i]=!((m_image[i]>=ll)&&(m_image[i]<=l));
         }
     } else if (ui->cmbMaskingMode->currentIndex()==2) { // < threshold
-        for (uint16_t i=0; i<m_width*m_height; i++) {
+        for (uint32_t i=0; i<m_width*m_height; i++) {
             double l=levell;
 
             m_mask[i]=m_image[i]<=l;
         }
     } else if (ui->cmbMaskingMode->currentIndex()==3) { // > threshold
-        for (uint16_t i=0; i<m_width*m_height; i++) {
+        for (uint32_t i=0; i<m_width*m_height; i++) {
             double l=level;
 
             m_mask[i]=m_image[i]>=l;
         }
     } else {
-        for (uint16_t i=1; i<m_width*m_height; i++) {
+        for (uint32_t i=1; i<m_width*m_height; i++) {
             m_mask[i]=false;
         }
     }

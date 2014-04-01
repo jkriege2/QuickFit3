@@ -85,7 +85,7 @@ class QFRDROverviewImageDisplay : public QWidget
         /** \brief data in plteOverviewSelected */
         bool* plteOverviewSelectedData;
         /** \brief size of plteOverviewSelectedData */
-        int plteOverviewSize;
+        int32_t plteOverviewSize;
 
 
         QAction* actImagesZoom;

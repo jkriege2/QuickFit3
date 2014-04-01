@@ -544,8 +544,8 @@ void QFRDRImageMaskEditTools::maskBorder()
         ProgramOptions::setConfigValue(settingsPrefix+"QFRDRImageMaskEditTools_maskBorder_overwrite", chkOverwrite->isChecked());
 
         if (chkOverwrite->isChecked()) imagemask->maskClear();
-        for (uint16_t x=0; x<imagemask->maskGetWidth(); x++) {
-            for (uint16_t y=0; y<imagemask->maskGetHeight(); y++) {
+        for (uint32_t x=0; x<imagemask->maskGetWidth(); x++) {
+            for (uint32_t y=0; y<imagemask->maskGetHeight(); y++) {
                 if (!(   x>=spinLeft->value() && x<imagemask->maskGetWidth()-spinRight->value()
                     && y>=spinBot->value() && y<imagemask->maskGetHeight()-spinTop->value())) {
                     imagemask->maskSet(x,y);

@@ -14,7 +14,7 @@ QFImporterImageSeries::QFImporterImageSeries() {
     averageBinning=false;
 }
 
-uint16_t QFImporterImageSeries::frameWidth() {
+uint32_t QFImporterImageSeries::frameWidth() {
     if (binning<1) binning=1;
     int xx0=x0;
     int xx1=x1;
@@ -36,7 +36,7 @@ uint16_t QFImporterImageSeries::frameWidth() {
     return w;
 }
 
-uint16_t QFImporterImageSeries::frameHeight() {
+uint32_t QFImporterImageSeries::frameHeight() {
     if (binning<1) binning=1;
     int yy0=y0;
     int yy1=y1;
@@ -95,8 +95,8 @@ bool QFImporterImageSeries::readFrameFloat(float* data) {
     if (yy1>intFrameHeight()-1) yy1=intFrameHeight()-1;
     if (yy0>yy1) qSwap(yy0, yy1);
 
-    uint16_t w=frameWidth();
-    uint16_t h=frameHeight();
+    uint32_t w=frameWidth();
+    uint32_t h=frameHeight();
     int hh=abs(yy1-yy0)+1;
     int ww=abs(xx1-xx0)+1;
 
@@ -172,8 +172,8 @@ bool QFImporterImageSeries::readFrameDouble(double *data) {
     if (yy1>intFrameHeight()-1) yy1=intFrameHeight()-1;
     if (yy0>yy1) qSwap(yy0, yy1);
 
-    uint16_t w=frameWidth();
-    uint16_t h=frameHeight();
+    uint32_t w=frameWidth();
+    uint32_t h=frameHeight();
     int hh=abs(yy1-yy0)+1;
     int ww=abs(xx1-xx0)+1;
 
@@ -249,8 +249,8 @@ bool QFImporterImageSeries::readFrameUINT16(uint16_t* data) {
     if (yy1>intFrameHeight()-1) yy1=intFrameHeight()-1;
     if (yy0>yy1) qSwap(yy0, yy1);
 
-    uint16_t w=frameWidth();
-    uint16_t h=frameHeight();
+    uint32_t w=frameWidth();
+    uint32_t h=frameHeight();
     int hh=abs(yy1-yy0)+1;
     int ww=abs(xx1-xx0)+1;
 
@@ -261,7 +261,7 @@ bool QFImporterImageSeries::readFrameUINT16(uint16_t* data) {
     }
 
     for (register int i=0; i<w*h; i++) data[i]=0;
-    uint16_t binAvg=1.0;
+    uint32_t binAvg=1.0;
     if (averageBinning) binAvg=binning*binning;
 
     if (!interleavedBinning) {

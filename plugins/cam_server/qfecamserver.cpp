@@ -46,6 +46,7 @@ void QFECamServer::initExtension() {
         s.timeout_instruction=inifile.value("camera"+QString::number(i+1)+"/timeout_instruction", 5000).toInt();
         s.pixel_width=inifile.value("camera"+QString::number(i+1)+"/pixel_width", 24).toDouble();
         s.pixel_height=inifile.value("camera"+QString::number(i+1)+"/pixel_height", 24).toDouble();
+        s.hasSingleParameterGet=inifile.value("camera"+QString::number(i+1)+"/has_single_parameter_get", true).toBool();
         s.exposure=1;
 
         s.server=new QTcpSocket();
@@ -150,29 +151,57 @@ QVariant QFECamServer::getMeasurementDeviceValue(unsigned int measurementDevice,
             QMutex* mutex=sources[measurementDevice].mutex;
             QMutexLocker locker(mutex);
 
-            bool ok=false;
-            QList<QByteArray> bal=queryData(sources[measurementDevice], "PARAMETERS_GET\n\n", 1, "\n\n", &ok, true);
-            if (ok && bal.size()>0) {
-                bal=bal[0].split('\n');
-                for (int i=0; i<bal.size(); i++) {
-                    QList<QByteArray> a=bal[i].split(';');
-                    if (a.size()>2) {
-                        if (a[1]==sources[measurementDevice].params[value].id) {
-                            //qDebug()<<QString(bal[i]);
-                            //qDebug()<<value<<": "<<QString(a[1])<<" = "<<QString(a[2]);
-                            QVariant v=a[2];
-                            if (v.convert(sources[measurementDevice].params[value].type)) {
-                                //qDebug()<<"   -> "<<v;
-                                return v;
+            if (sources[measurementDevice].hasSingleParameterGet) {
+                bool ok=false;
+                QList<QByteArray> bal=queryData(sources[measurementDevice], QByteArray("PARAMETER_GET\n")+sources[measurementDevice].params[value].id.toAscii()+QByteArray("\n\n"), 1, "\n\n", &ok, true);
+                if (ok && bal.size()>0) {
+                    bal=bal[0].split('\n');
+                    for (int i=0; i<bal.size(); i++) {
+                        QList<QByteArray> a=bal[i].split(';');
+                        if (a.size()>2) {
+                            if (a[1]==sources[measurementDevice].params[value].id) {
+                                //qDebug()<<QString(bal[i]);
+                                //qDebug()<<value<<": "<<QString(a[1])<<" = "<<QString(a[2]);
+                                QVariant v=a[2];
+                                if (v.convert(sources[measurementDevice].params[value].type)) {
+                                    //qDebug()<<"   -> "<<v;
+                                    return v;
+                                }
+                                return a[2];
                             }
-                            return a[2];
                         }
                     }
+                    log_error(tr("error reading parameter '%2' (timeout: %1s): PARAMETER NOT AVAILABLE IN DEVICE\n\n").arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id));
+                } else  {
+                    log_error(tr("error reading parameter '%4' (timeout: %3s): ERROR DURING PARAMETER_GET\n%1     error description: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id));
                 }
-                log_error(tr("error reading parameter '%2' (timeout: %1s): PARAMETER NOT AVAILABLE IN DEVICE\n\n").arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id));
-            } else  {
-                log_error(tr("error reading parameter '%4' (timeout: %3s):\n%1     error description: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id));
+            } else {
+                bool ok=false;
+                QList<QByteArray> bal=queryData(sources[measurementDevice], "PARAMETERS_GET\n\n", 1, "\n\n", &ok, true);
+                if (ok && bal.size()>0) {
+                    bal=bal[0].split('\n');
+                    for (int i=0; i<bal.size(); i++) {
+                        QList<QByteArray> a=bal[i].split(';');
+                        if (a.size()>2) {
+                            if (a[1]==sources[measurementDevice].params[value].id) {
+                                //qDebug()<<QString(bal[i]);
+                                //qDebug()<<value<<": "<<QString(a[1])<<" = "<<QString(a[2]);
+                                QVariant v=a[2];
+                                if (v.convert(sources[measurementDevice].params[value].type)) {
+                                    //qDebug()<<"   -> "<<v;
+                                    return v;
+                                }
+                                return a[2];
+                            }
+                        }
+                    }
+                    log_error(tr("error reading parameter '%2' (timeout: %1s): PARAMETER NOT AVAILABLE IN DEVICE\n\n").arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id));
+                } else  {
+                    log_error(tr("error reading parameter '%4' (timeout: %3s):\n%1     error description: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id));
+                }
             }
+        } else {
+            log_error(tr("error reading parameter %2 (timeout: %1s): PARAMETER NOT AVAILABLE IN DEVICE\n\n").arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(value));
         }
     }
     return QVariant();
@@ -270,7 +299,7 @@ void QFECamServer::useCameraSettings(unsigned int camera, const QSettings& setti
     useCameraSettingsInt(camera, settings, true);
 }
 
-void QFECamServer::useCameraSettingsInt(unsigned int camera, const QSettings& settings, bool live_view) {
+void QFECamServer::useCameraSettingsInt(unsigned int camera, const QSettings& settings, bool live_view, bool waitToComplete) {
     /* set the camera settings to the values specified in settings parameter, called before acquire() */
     //qDebug()<<"useCameraSetings: "<<camera;
     //for (int i=0; i<settings.allKeys().size(); i++) {
@@ -292,7 +321,7 @@ void QFECamServer::useCameraSettingsInt(unsigned int camera, const QSettings& se
                 cnt++;
             }
         }
-        if (cnt>0)  {
+        if (cnt>0 && waitToComplete)  {
             if (logService) {
                 logService->log_text(QString("\n         -- useCameraSetings: %1: 2s DELAY\n").arg(camera));
             }
@@ -327,7 +356,7 @@ void QFECamServer::showCameraSettingsDialog(unsigned int camera, QSettings& sett
 
     if (camera<0 || camera>=getCameraCount() || !isMeasurementDeviceConnected(camera) ) return;
 
-    useCameraSettingsInt(camera, settings, false);
+    useCameraSettingsInt(camera, settings, false, false);
 
 	/////////////////////////////////////////////////////////////////////////////////
 	// if you want the settings dialog to be modal, you may uncomment the next lines
@@ -354,6 +383,11 @@ void QFECamServer::showCameraSettingsDialog(unsigned int camera, QSettings& sett
     connect(buttonBox, SIGNAL(accepted()), dlg, SLOT(accept()));
     connect(buttonBox, SIGNAL(rejected()), dlg, SLOT(reject()));
 
+    QElapsedTimer timer;
+    timer.start();
+    while (timer.elapsed()<2000) {
+        QApplication::processEvents();
+    }
     if ( dlg->exec()==QDialog::Accepted ) {
         //  read back values entered into the widgets and store in settings
         // settings.setValue(QString("device/name%1").arg(camera), widget->value() );

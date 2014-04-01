@@ -112,7 +112,7 @@ class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionC
         virtual void showCameraSettingsDialog(unsigned int camera, QSettings& settings, QWidget* parent=NULL);
         /** \copydoc QFExtensionCamera::useCameraSettings() */
         virtual void useCameraSettings(unsigned int camera, const QSettings& settings);
-        void useCameraSettingsInt(unsigned int camera, const QSettings& settings, bool live_view=false);
+        void useCameraSettingsInt(unsigned int camera, const QSettings& settings, bool live_view=false, bool waitToComplete=true);
         /** \copydoc QFExtensionCamera::getCameraImageWidth() */
         virtual int getCameraImageWidth(unsigned int camera);
         /** \copydoc QFExtensionCamera::getCameraImageHeight() */
@@ -221,6 +221,8 @@ class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionC
             int pixel_height;
             /** \brief current exposure time */
             double exposure;
+            /** \brief if true, the server supports an instruction to read a single parameter, otherwise the instruction to read all parameters is used for the parameter readout. */
+            bool hasSingleParameterGet;
 
             QByteArray last_filenameprefix;
             bool acquiring;

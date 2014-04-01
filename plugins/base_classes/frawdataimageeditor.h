@@ -101,10 +101,10 @@ class FRawDataImageEditor : public QFRawDataEditor {
 
 
         /** \brief create a parameter image with the given evalGroup and fitParam */
-        void readParameterImage(double* image, uint16_t width, uint16_t height, QString evalGroup, QString fitParam, ImageTransforms tranFitParam, bool thisRDR=true, const QString& otherRDRRole=QString(""), const QString& otherRDRevalGroup=QString(""));
+        void readParameterImage(double* image, uint32_t width, uint32_t height, QString evalGroup, QString fitParam, ImageTransforms tranFitParam, bool thisRDR=true, const QString& otherRDRRole=QString(""), const QString& otherRDRevalGroup=QString(""));
 
         /** \brief apply the given transformation to the image */
-        void transformImage(double *image, uint16_t width, uint16_t height, FRawDataImageEditor::ImageTransforms tranFitParam);
+        void transformImage(double *image, uint32_t width, uint32_t height, FRawDataImageEditor::ImageTransforms tranFitParam);
 
         /*! \brief evaluate the fit function (with parameters) as defined by the pair evalGroup and evaluation
 

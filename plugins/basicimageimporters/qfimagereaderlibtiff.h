@@ -41,16 +41,16 @@ class QFImageReaderLIBTIFF: public QFImporterImageSeries {
 
     protected:
         /** \brief return the width of the frames (valid after open() returned \c true */
-        virtual uint16_t intFrameWidth();
+        virtual uint32_t intFrameWidth();
         /** \brief return the height of the frames (valid after open() returned \c true */
-        virtual uint16_t intFrameHeight();
+        virtual uint32_t intFrameHeight();
         /** \brief read a new frame into the given array of floating point numbers */
         virtual bool intReadFrameFloat(float* data);
         /** \brief read a new frame into the given array of integers */
         virtual bool intReadFrameUINT16(uint16_t* data);
         virtual bool intReadFrameDouble(double* data);
-        uint16_t width;
-        uint16_t height;
+        uint32_t width;
+        uint32_t height;
         TIFF* tif;
         QString filename;
 

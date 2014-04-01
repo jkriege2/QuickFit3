@@ -1445,7 +1445,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         statistics_uncorrected.clear();
         dv_statistics_uncorrected[0].clear();
         dv_statistics_uncorrected[1].clear();
-        uint16_t video_frame_num=0;
+        uint32_t video_frame_num=0;
         float fframes_min=0;
         float fframes_max=0;
 
@@ -1453,7 +1453,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         //float sframe_min=0;
         //float sframe_max=0;
         float* frame_data=(float*)qfCalloc(frame_width*frame_height,sizeof(float));
-        for (register uint16 i=0; i<frame_width*frame_height; i++) {
+        for (register uint32_t i=0; i<frame_width*frame_height; i++) {
             frame_data[i]=0;
             firstFrames[i]=0;
             lastFrames[i]=0;
@@ -1479,7 +1479,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                     float frame_min=frame_data[0];
                     float frame_max=frame_data[0];
 
-                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                         register float v=frame_data[i];
                         image_series[frame*frame_width*frame_height+i] = v;
                         frame_min=(v<frame_min)?v:frame_min;
@@ -1493,11 +1493,11 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
                         frames_max=(frame_max>frames_max)?frame_max:frames_max;
                     }
                     if (frame<job.bleachAvgFrames) {
-                        for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                        for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                             firstFrames[i]=firstFrames[i]+(float)frame_data[i]/(float)job.bleachAvgFrames;
                         }
                     } else if (frame>frames-job.bleachAvgFrames) {
-                        for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                        for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                             lastFrames[i]=lastFrames[i]+(float)frame_data[i]/(float)job.bleachAvgFrames;
                         }
                     }
@@ -1654,7 +1654,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
         statistics.clear();
         dv_statistics[0].clear();
         dv_statistics[1].clear();
-        uint16_t video_frame_num=0;
+        uint32_t video_frame_num=0;
 
         //bool statFirst=true;
         for(register uint32_t frame=0; frame<frames; frame++) {
@@ -1747,9 +1747,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
 
 void QFRDRImagingFCSCorrelationJobThread::contribute_to_correlations(QList<MultiTauCorrelator<double, double>* >& ccfjk, QList<correlatorjb<double, double>* >& ccfjb, float* frame_data, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frame, uint64_t segment_frames, double *ccf_tau, double *ccf, double *ccf_std, uint64_t ccf_N) {
     if (job.correlator==CORRELATOR_MTAUALLMON) {
-        uint16_t i=0;
-        for (register uint16 y=0; y<frame_height; y++) {
-            for (register uint16 x=0; x<frame_width; x++) {
+        uint32_t i=0;
+        for (register uint32_t y=0; y<frame_height; y++) {
+            for (register uint32_t x=0; x<frame_width; x++) {
 
                 const int32_t p=y*frame_width+x;
                 const int32_t x1=x+shiftX;
@@ -1776,9 +1776,9 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_correlations(QList<Multi
             }
         }
     } else {
-        uint16_t i=0;
-        for (register uint16 y=0; y<frame_height; y++) {
-            for (register uint16 x=0; x<frame_width; x++) {
+        uint32_t i=0;
+        for (register uint32_t y=0; y<frame_height; y++) {
+            for (register uint32_t x=0; x<frame_width; x++) {
 
                 const int32_t p=y*frame_width+x;
                 const int32_t x1=x+shiftX;
@@ -1868,12 +1868,12 @@ void QFRDRImagingFCSCorrelationJobThread::prepare_ccfs(QList<MultiTauCorrelator<
 
 
 
-void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state &state, float *frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float **average_frame, float **sqrsum_frame, float **video, uint16_t &video_frame_num, float &frames_min, float &frames_max, QFRDRImagingFCSCorrelationJobThread::StatisticsDataset &statistics, bool isBackground)
+void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state &state, float *frame_data, uint32_t frame_width, uint32_t frame_height, uint32_t frame, uint32_t frames, float **average_frame, float **sqrsum_frame, float **video, uint32_t &video_frame_num, float &frames_min, float &frames_max, QFRDRImagingFCSCorrelationJobThread::StatisticsDataset &statistics, bool isBackground)
 {
 
     float frame_min=frame_data[0];
     float frame_max=frame_data[0];
-    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
         register float v=frame_data[i];
         if (QFFloatIsOK(v)) {
             frame_min=(v<frame_min)?v:frame_min;
@@ -1927,9 +1927,9 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics(QFRDRImagingF
     }
 }
 
-void QFRDRImagingFCSCorrelationJobThread::contribute_to_dv2_statistics(QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state &state1, QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state &state2, float *frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, QFRDRImagingFCSCorrelationJobThread::StatisticsDataset &statistics1, QFRDRImagingFCSCorrelationJobThread::StatisticsDataset &statistics2, bool isBackground)
+void QFRDRImagingFCSCorrelationJobThread::contribute_to_dv2_statistics(QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state &state1, QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state &state2, float *frame_data, uint32_t frame_width, uint32_t frame_height, uint32_t frame, uint32_t frames, QFRDRImagingFCSCorrelationJobThread::StatisticsDataset &statistics1, QFRDRImagingFCSCorrelationJobThread::StatisticsDataset &statistics2, bool isBackground)
 {
-    uint16_t dummyUI16;
+    uint32_t dummyUI32;
     float dummyF;
     int dv_width=frame_width;
     int dv_height=frame_height;
@@ -1948,22 +1948,22 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_dv2_statistics(QFRDRImag
     //qDebug()<<"contribute_to_dv2_statistics "<<dv_width<<"x"<<dv_height<<"   shift=("<<shiftX1<<","<<shiftY1<<")";
     float* frame_data1=(float*)qfMalloc(dv_width*dv_height*sizeof(float));
     // copy frame 1
-    for (uint16 y=0; y<dv_height; y++) {
-        for (uint16 x=0; x<dv_width; x++) {
+    for (uint32_t y=0; y<dv_height; y++) {
+        for (uint32_t x=0; x<dv_width; x++) {
             frame_data1[y*dv_width+x]=frame_data[y*frame_width+x];
         }
     }
     // calc frame 1 statistics
-    contribute_to_statistics(state1, frame_data1, dv_width, dv_height, frame, frames, NULL, NULL, NULL, dummyUI16, dummyF, dummyF, statistics1, isBackground);
+    contribute_to_statistics(state1, frame_data1, dv_width, dv_height, frame, frames, NULL, NULL, NULL, dummyUI32, dummyF, dummyF, statistics1, isBackground);
 
     // copy frame 2
-    for (uint16 y=0; y<dv_height; y++) {
-        for (uint16 x=0; x<dv_width; x++) {
+    for (uint32_t y=0; y<dv_height; y++) {
+        for (uint32_t x=0; x<dv_width; x++) {
             frame_data1[y*dv_width+x]=frame_data[(y+shiftY1)*frame_width+(x+shiftX1)];
         }
     }
     // calc frame 2 statistics
-    contribute_to_statistics(state2, frame_data1, dv_width, dv_height, frame, frames, NULL, NULL, NULL, dummyUI16, dummyF, dummyF, statistics2, isBackground);
+    contribute_to_statistics(state2, frame_data1, dv_width, dv_height, frame, frames, NULL, NULL, NULL, dummyUI32, dummyF, dummyF, statistics2, isBackground);
 
     qfFree(frame_data1);
 }
@@ -2151,7 +2151,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
         statistics_uncorrected.clear();
         dv_statistics_uncorrected[0].clear();
         dv_statistics_uncorrected[1].clear();
-        uint16_t video_frame_num=0;
+        uint32_t video_frame_num=0;
         float fframes_min=0;
         float fframes_max=0;
 
@@ -2175,7 +2175,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
 
                 float frame_min=frame_data[0];
                 float frame_max=frame_data[0];
-                for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                     register float v=frame_data[i];
                     frame_min=(v<frame_min)?v:frame_min;
                     frame_max=(v>frame_max)?v:frame_max;
@@ -2188,11 +2188,11 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     frames_max=(frame_max>frames_max)?frame_max:frames_max;
                 }
                 if (frame<job.bleachAvgFrames) {
-                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                         firstFrames[i]=firstFrames[i]+(float)frame_data[i]/(float)job.bleachAvgFrames;
                     }
                 } else if (frame>frames-job.bleachAvgFrames) {
-                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                         lastFrames[i]=lastFrames[i]+(float)frame_data[i]/(float)job.bleachAvgFrames;
                     }
                 }
@@ -2323,7 +2323,7 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
         }
         frame=0;
 
-        uint16_t video_frame_num=0;
+        uint32_t video_frame_num=0;
 
         QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state(frame_width*frame_height);
         QFRDRImagingFCSCorrelationJobThread::contribute_to_statistics_state stat_state_dv1(frame_width*frame_height);
@@ -2343,49 +2343,49 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
             } else {
                 // APPLY BACKGROUND CORRECTION TO FRAME
                 double avg=0;
-                for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                     frame_data[i]=frame_data[i]-baseline-backgroundImage[i];
                     avg=avg+frame_data[i]/ ((double)(frame_width*frame_height));
                 }
 
                 if (job.bleach==BLEACH_EXP || job.bleach==BLEACH_EXPREG) {
-                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                         if (bleachFitOK[i]!=0) {
                             frame_data[i]=bleachCorrectExp(frame_data[i], i, frame);
                         }
                     }
                 } else if (job.bleach==BLEACH_DBL_EXP) {
-                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                         if (bleachFitOK[i]!=0) {
                             frame_data[i]=bleachCorrectDblExp(frame_data[i], i, frame);
                         }
                     }
                 } else if (job.bleach==BLEACH_EXP_POLY2) {
-                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                         if (bleachFitOK[i]!=0) {
                             frame_data[i]=bleachCorrectExpPoly2(frame_data[i], i, frame);
                         }
                     }
                 } else if (job.bleach==BLEACH_EXP_POLY3) {
-                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                         if (bleachFitOK[i]!=0) {
                             frame_data[i]=bleachCorrectExpPoly3(frame_data[i], i, frame);
                         }
                     }
                 } else if (job.bleach==BLEACH_EXP_POLY4) {
-                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                         if (bleachFitOK[i]!=0) {
                             frame_data[i]=bleachCorrectExpPoly4(frame_data[i], i, frame);
                         }
                     }
                 } else if (job.bleach==BLEACH_EXP_POLY5) {
-                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                         if (bleachFitOK[i]!=0) {
                             frame_data[i]=bleachCorrectExpPoly5(frame_data[i], i, frame);
                         }
                     }
                 } else if (job.bleach==BLEACH_REMOVEAVG) {
-                    for (register uint16 i=0; i<frame_width*frame_height; i++) {
+                    for (register uint32_t i=0; i<frame_width*frame_height; i++) {
                         frame_data[i]=frame_data[i]*firstFrames[i]/avg;
                     }
                 }
@@ -3048,7 +3048,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
     backstatistics.clear();
     dv_backstatistics[0].clear();
     dv_backstatistics[1].clear();
-    uint16_t vidfnum=0;
+    uint32_t vidfnum=0;
     float bframes_min=0;
     float bframes_max=0;
 
@@ -3080,8 +3080,8 @@ void QFRDRImagingFCSCorrelationJobThread::calcBackgroundCorrection() {
                         reader->unsetCropping();
                     }
                     emit messageChanged(tr("reading frames in background file ..."));
-                    uint16_t bframe_width=reader->frameWidth();
-                    uint16_t bframe_height=reader->frameHeight();
+                    uint32_t bframe_width=reader->frameWidth();
+                    uint32_t bframe_height=reader->frameHeight();
                     uint32_t backFrames=reader->countFrames();
 
                     if ((bframe_width==frame_width)&&(bframe_height==frame_height))  {

@@ -120,12 +120,12 @@ QVariant QFImageReaderDiffusion4Binary::getFileProperty(const QString &name, con
     return QFImporterImageSeries::getFileProperty(name, defaultValue);
 }
 
-uint16_t QFImageReaderDiffusion4Binary::intFrameWidth() {
+uint32_t QFImageReaderDiffusion4Binary::intFrameWidth() {
     if ((input.isOpen() && input.isReadable())) return width;
     return 0;
 }
 
-uint16_t QFImageReaderDiffusion4Binary::intFrameHeight() {
+uint32_t QFImageReaderDiffusion4Binary::intFrameHeight() {
     if ((input.isOpen() && input.isReadable())) return height;
     return 0;
 }

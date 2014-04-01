@@ -123,11 +123,11 @@ void QFImageReaderRadhard::reset() {
     open(fn);
 }
 
-uint16_t QFImageReaderRadhard::intFrameWidth() {
+uint32_t QFImageReaderRadhard::intFrameWidth() {
     return width;
 }
 
-uint16_t QFImageReaderRadhard::intFrameHeight() {
+uint32_t QFImageReaderRadhard::intFrameHeight() {
     return height;
 }
 

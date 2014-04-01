@@ -177,12 +177,12 @@ QString FRawDataImageEditor::formatTransformAndParameter(QComboBox *cmbParameter
 }
 
 
-void FRawDataImageEditor::readParameterImage(double *image, uint16_t width, uint16_t height, QString evalGroupIn, QString fitParam, FRawDataImageEditor::ImageTransforms tranFitParam, bool thisRDR, const QString &otherRDRRole, const QString &otherRDRevalGroup)
+void FRawDataImageEditor::readParameterImage(double *image, uint32_t width, uint32_t height, QString evalGroupIn, QString fitParam, FRawDataImageEditor::ImageTransforms tranFitParam, bool thisRDR, const QString &otherRDRRole, const QString &otherRDRevalGroup)
 {
-    uint16_t arraysize=width*height;
+    uint32_t arraysize=width*height;
     //qDebug()<<"readParameterImage("<<image<<gof_image<<width<<height<<evalGroup;
     if (image) {
-        for (register uint16_t i=0; i<arraysize; i++) {
+        for (register uint32_t i=0; i<arraysize; i++) {
             image[i]=NAN;
         }
     }
@@ -234,7 +234,7 @@ void FRawDataImageEditor::readParameterImage(double *image, uint16_t width, uint
         if (!usedEval.isEmpty()) {
             readImage=true;
             QVector<double> dvec=rdr->resultsGetAsDoubleList(usedEval, fitParam);
-            for (uint32_t i=0; i<qMin(dvec.size(), width*height); i++) {
+            for (uint32_t i=0; i<qMin((uint32_t)dvec.size(), width*height); i++) {
                 int x=m->runToX(i);
                 int y=m->runToY(i);
                 image[y*width+x]=dvec[i];
@@ -262,7 +262,7 @@ void FRawDataImageEditor::readParameterImage(double *image, uint16_t width, uint
 #endif
 }
 
-void FRawDataImageEditor::transformImage(double *image, uint16_t width, uint16_t height, FRawDataImageEditor::ImageTransforms tranFitParam)
+void FRawDataImageEditor::transformImage(double *image, uint32_t width, uint32_t height, FRawDataImageEditor::ImageTransforms tranFitParam)
 {
     switch(tranFitParam) {
         case FRawDataImageEditor::itAbs: {

@@ -454,8 +454,8 @@ data                                                   size [bytes]             
 
         };
 
-        void contribute_to_statistics(contribute_to_statistics_state& state, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** sqrsum_frame, float** video, uint16_t& video_frame_num, float& frames_min, float& frames_max, StatisticsDataset& statistics, bool isBackground=false);
-        void contribute_to_dv2_statistics(contribute_to_statistics_state& state1, contribute_to_statistics_state& state2, float* frame_data, uint16_t frame_width, uint16_t frame_height, uint32_t frame, uint32_t frames, StatisticsDataset &statistics1, StatisticsDataset &statistics2, bool isBackground=false);
+        void contribute_to_statistics(contribute_to_statistics_state& state, float* frame_data, uint32_t frame_width, uint32_t frame_height, uint32_t frame, uint32_t frames, float** average_frame, float** sqrsum_frame, float** video, uint32_t& video_frame_num, float& frames_min, float& frames_max, StatisticsDataset& statistics, bool isBackground=false);
+        void contribute_to_dv2_statistics(contribute_to_statistics_state& state1, contribute_to_statistics_state& state2, float* frame_data, uint32_t frame_width, uint32_t frame_height, uint32_t frame, uint32_t frames, StatisticsDataset &statistics1, StatisticsDataset &statistics2, bool isBackground=false);
 
         bool saveStatistics(const QString& filename, const QString& filename_plot, const StatisticsDataset& statistics, const QString& title=QString("Statistics"), QString* error=NULL);
         bool SaveSDTIFF(const QString &filename, float *average_frame, float *sqrsum_frame, int frame_width, int frame_height, int frames, const QString& title=QString("Standard Deviation File"), QString* error=NULL);

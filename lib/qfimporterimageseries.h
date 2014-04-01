@@ -46,9 +46,9 @@ class QFLIB_EXPORT QFImporterImageSeries: public QFImporter {
         /** \brief move on to the next frame in the file. return \c false if no further image exists */
         virtual bool nextFrame()=0;
         /** \brief return the width of the frames (valid after open() returned \c true */
-        uint16_t frameWidth();
+        uint32_t frameWidth();
         /** \brief return the height of the frames (valid after open() returned \c true */
-        uint16_t frameHeight();
+        uint32_t frameHeight();
         /** \brief read a new frame into the given array of floating point numbers */
         bool readFrameFloat(float* data);
         /** \brief read a new frame into the given array of double-precision floating point numbers */
@@ -83,9 +83,9 @@ class QFLIB_EXPORT QFImporterImageSeries: public QFImporter {
         int getCropY1() const { return y1; }
     protected:
         /** \brief return the width of the frames (valid after open() returned \c true */
-        virtual uint16_t intFrameWidth()=0;
+        virtual uint32_t intFrameWidth()=0;
         /** \brief return the height of the frames (valid after open() returned \c true */
-        virtual uint16_t intFrameHeight()=0;
+        virtual uint32_t intFrameHeight()=0;
         /** \brief read a new frame into the given array of floating point numbers */
         virtual bool intReadFrameFloat(float* data)=0;
         /** \brief read a new frame into the given array of floating point numbers */

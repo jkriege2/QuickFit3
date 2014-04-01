@@ -1072,6 +1072,12 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actRecorrelate=new QAction("recorrelate file", this);
     connect(actRecorrelate, SIGNAL(triggered()), this, SLOT(recorrelate()));
 
+    actCopyMeanCFFromAll=new QAction("copy average CF from all files to table", this);
+    connect(actCopyMeanCFFromAll, SIGNAL(triggered()), this, SLOT(copyMeanCFFromAll()));
+
+    actCopyPixelCFFromAll=new QAction("copy selected CF from all files to table", this);
+    connect(actCopyPixelCFFromAll, SIGNAL(triggered()), this, SLOT(copySelCFFromAll()));
+
 
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -1253,6 +1259,11 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     m->addAction(plotter->get_plotter()->get_actCopyPixelImage());
     m->addAction(plotter->get_plotter()->get_actSavePlot());
     m->addAction(plotter->get_plotter()->get_actPrint());
+    menuData->addSeparator();
+    menuData->addAction(actCopyGroupACFsToTable);
+    menuData->addAction(actCopyMeanCFFromAll);
+    menuData->addAction(actCopyPixelCFFromAll);
+
 
     menuMask=propertyEditor->addMenu("&Mask", 0);
     correlationMaskTools->registerMaskToolsToMenu(menuMask);
@@ -1288,8 +1299,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuSelection->addAction(actSetBackgroundFromSelection);
 
     menuImagingFCSTools=propertyEditor->addOrFindMenu(tr("ImagingFCS Tools"));
-    menuImagingFCSTools->addAction(actCopyGroupACFsToTable);
     menuImagingFCSTools->addAction(actRecorrelate);
+    menuImagingFCSTools->addAction(actCopyGroupACFsToTable);
+    menuImagingFCSTools->addAction(actCopyMeanCFFromAll);
 
     setUpdatesEnabled(true);
 }
@@ -4025,7 +4037,7 @@ QString QFRDRImagingFCSImageEditor::formatTransformAndParameter(QComboBox *cmbPa
 }
 
 
-void QFRDRImagingFCSImageEditor::transformImage(double* image, uint16_t width, uint16_t height, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam) {
+void QFRDRImagingFCSImageEditor::transformImage(double* image, uint32_t width, uint32_t height, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam) {
     switch(tranFitParam) {
         case QFRDRImagingFCSImageEditor::itAbs: {
                 for (int32_t i=0; i<width*height; i++) {
@@ -4057,12 +4069,12 @@ void QFRDRImagingFCSImageEditor::transformImage(double* image, uint16_t width, u
 
 
 
-void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint16_t width, uint16_t height, QString evalGroupIn, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, bool thisRDR, const QString& otherRDRRole, const QString& otherRDRevalGroup)
+void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint32_t width, uint32_t height, QString evalGroupIn, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, bool thisRDR, const QString& otherRDRRole, const QString& otherRDRevalGroup)
 {
-    uint16_t arraysize=width*height;
+    uint32_t arraysize=width*height;
     //qDebug()<<"readParameterImage("<<image<<gof_image<<width<<height<<evalGroup;
     if (image) {
-        for (register uint16_t i=0; i<arraysize; i++) {
+        for (register uint32_t i=0; i<arraysize; i++) {
             image[i]=NAN;
         }
     }
@@ -4115,7 +4127,7 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint16_t widt
         if (!usedEval.isEmpty()) {
             readImage=true;
             QVector<double> dvec=m->resultsGetAsDoubleList(usedEval, fitParam);
-            for (uint32_t i=0; i<qMin(dvec.size(), width*height); i++) {
+            for (uint32_t i=0; i<qMin((uint32_t)dvec.size(), width*height); i++) {
                 int x=m->runToX(i);
                 int y=m->runToY(i);
                 image[y*width+x]=dvec[i];
@@ -5728,148 +5740,13 @@ void QFRDRImagingFCSImageEditor::invertMask() {
 
 void QFRDRImagingFCSImageEditor::copyGroupACFsToTable() {
     QList<QFRawDataRecord*> recs=current->getProject()->getRDRGroupMembers(current->getGroup());
-    QFRDRImagingFCSData* cm=qobject_cast<QFRDRImagingFCSData*>(current);
     QList<int> sel;
     if (plteOverviewSize>0 && plteOverviewSelectedData) {
         for (int i=0; i<plteOverviewSize; i++) {
             if (plteOverviewSelectedData[i] && !plteOverviewExcludedData[i]) sel<<i;
         }
     }
-    if (recs.size()>0) {
-        for (int i=recs.size()-1; i>=0; i--) {
-            bool use=false;
-            if (recs[i]->getType()==current->getType()) {
-                QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(recs[i]);
-                if (m) use=true;
-            }
-            if (!use) recs.removeAt(i);
-        }
-    }
-    if (recs.size()>0) {
-        QFPlotterCopyToTableDialog* dlg=new QFPlotterCopyToTableDialog(plotter);
-        dlg->setDescription(tr("adding average over %1 graphs to table <br><small>&nbsp;&nbsp;&nbsp;<i>selected: %2</i></small>").arg(sel.size()).arg(listToString(sel)));
-        //dlg->setDescription(tr("Select a table record into which to write the plot data."));
-        if (dlg->exec()) {
-            QString tabname="";
-            QFRDRTableInterface* tab=dlg->getTable();
-            QFRDRColumnGraphsInterface* cols=dlg->getGraph();
-            QFRawDataRecord* rdr=dlg->getRDR();
-            if (dlg->getNewTable(tabname)) {
-                if (tabname.isEmpty()) tabname=tr("NEW_TABLE");
-                rdr=QFPluginServices::getInstance()->getCurrentProject()->addRawData("table", tabname, "");
-                tab=dynamic_cast<QFRDRTableInterface*>(rdr);
-                cols=dynamic_cast<QFRDRColumnGraphsInterface*>(rdr);
-                if (rdr) {
-                    rdr->setFolder(current->getFolder());
-                    rdr->setGroup(current->getGroup());
-                }
-            }
-            int graph=-1;
-            if (cols && dlg->getAddGraphs()) {
-
-                graph=dlg->getGraphID();
-                QString graphtitle;
-                if (dlg->getNewGraph(graphtitle)) {
-                    if (graphtitle.isEmpty()) {
-                        graphtitle=tr("new graph");
-                    }
-                    graph=cols->colgraphGetPlotCount();
-                    cols->colgraphAddPlot(graphtitle, tr("lag time \\tau [s]"), tr("correlation function g(\\tau)"), true, false);
-                }
-            }
-
-            double ymin=0;
-            double ymax=0;
-            double xmin=0, xmax=0;
-            for (int i=0; i<recs.size(); i++) {
-                QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(recs[i]);
-                QString name=m->getRole();
-                if (name.isEmpty()) name=m->getName();
-
-                QList<QVariant> tau, cf, cstd;
-                double* t=m->getCorrelationT();
-                double* c=m->getCorrelation();
-
-                for (int n=0; n<m->getCorrelationN(); n++) {
-                    tau<<t[n];
-                    if (sel.size()<=0) {
-                        cf<<(m->getCorrelationMean())[n];
-                        cstd<<(m->getCorrelationStdDev())[n];
-                    } else if (sel.size()==1){
-                        cf<<(m->getCorrelationRun(sel[0]))[n];
-                        cstd<<(m->getCorrelationRunError(sel[0]))[n];
-                    } else {
-                        QVector<double> dat;
-                        for (int s=0; s<sel.size(); s++) {
-                            const double* cc=m->getCorrelationRun(sel[s]);
-                            dat<<cc[n];
-                        }
-                        double v=0;
-                        cf<<qfstatisticsAverageVariance(v, dat);
-                        cstd<<sqrt(v);
-                    }
-                    if (i==0 && n==0) {
-                        ymin=cf.last().toDouble()-cstd.last().toDouble();
-                        ymax=cf.last().toDouble()+cstd.last().toDouble();
-                    } else {
-                        if (ymin>cf.last().toDouble()-cstd.last().toDouble()) ymin=cf.last().toDouble()-cstd.last().toDouble();
-                        if (ymax<cf.last().toDouble()+cstd.last().toDouble()) ymax=cf.last().toDouble()+cstd.last().toDouble();
-                    }
-                }
-                if (i==0) {
-                    xmin=tau.first().toDouble();
-                    xmax=tau.last().toDouble();
-                } else {
-                    if (tau.first().toDouble()<xmin) xmin=tau.first().toDouble();
-                    if (tau.last().toDouble()<xmax) xmax=tau.last().toDouble();
-                }
-                int ctau=0;
-                if (tab) {
-                    int c=tab->tableGetColumnCount();
-                    ctau=c;
-                    tab->tableSetColumnTitle(c, name+tr(" - tau [s]"));
-                    tab->tableSetColumnData(c, tau);
-                    c++;
-                    tab->tableSetColumnTitle(c, name+tr(" - CF"));
-                    tab->tableSetColumnData(c, cf);
-                    c++;
-                    tab->tableSetColumnTitle(c, name+tr(" - Error"));
-                    tab->tableSetColumnData(c, cstd);
-                    c++;
-                }
-                if (cols && dlg->getAddGraphs()) {
-                    QColor color=QColor("green");
-                    if (i==1) color=QColor("red");
-                    if (i==2) color=QColor("blue");
-                    if (i==3) color=QColor("darkcyan");
-                    if (i==4) color=QColor("orange");
-                    if (i==5) color=QColor("magenta");
-
-                    int plot=cols->colgraphGetGraphCount(graph);
-                    cols->colgraphAddErrorGraph(graph, ctau, -1, ctau+1, ctau+2, QFRDRColumnGraphsInterface::cgtLines, name, QFRDRColumnGraphsInterface::egtPolygons);
-                    QColor colf=color.lighter();
-                    colf.setAlphaF(0.5);
-                    QColor cole=color.darker();
-                    cole.setAlphaF(0.5);
-                    cols->colgraphSetGraphColor(graph, plot, color, colf, cole);
-                }
-
-            }
-            if (cols && dlg->getAddGraphs()) {
-                cols->colgraphSetPlotXRange(graph, xmin, xmax);
-                cols->colgraphSetPlotYRange(graph, ymin, ymax);
-            }
-
-            if (rdr && dlg->getShowEditor()) {
-                QFRawDataPropertyEditor* editor=QFPluginServices::getInstance()->openRawDataEditor(rdr, false);
-                if (editor) {
-                    if (graph>=0) editor->sendEditorCommand("showPlot", graph);
-                    editor->showTab(2);
-                }
-            }
-
-        }
-    }
+    copyCFFromFilesToTable(recs, true, false, true, sel);
 }
 
 void QFRDRImagingFCSImageEditor::recorrelate()
@@ -6046,5 +5923,232 @@ void QFRDRImagingFCSImageEditor::aspectRatioChanged()
     replotMask();
     pltImage->setAspectRatio(chkKeepAspect->isChecked());
     pltParamImage2->setAspectRatio(chkKeepAspect->isChecked());
+}
+
+void QFRDRImagingFCSImageEditor::copyMeanCFFromAll()
+{
+    QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();//getRDRGroupMembers(current->getGroup());
+    copyCFFromFilesToTable(recs, true, false, false, QList<int>());
+}
+
+void QFRDRImagingFCSImageEditor::copySelCFFromAll()
+{
+    QList<QFRawDataRecord*> recs=current->getProject()->getRDRGroupMembers(current->getGroup());
+    QList<int> sel;
+    if (plteOverviewSize>0 && plteOverviewSelectedData) {
+        for (int i=0; i<plteOverviewSize; i++) {
+            if (plteOverviewSelectedData[i] && !plteOverviewExcludedData[i]) sel<<i;
+        }
+    }
+    copyCFFromFilesToTable(recs, false, true, false, sel);
+}
+
+void QFRDRImagingFCSImageEditor::copyCFFromFilesToTable(QList<QFRawDataRecord *> &recs, bool copyAvg, bool copySingle, bool roleIsName, QList<int> sel)
+{
+    QFRDRImagingFCSData* cm=qobject_cast<QFRDRImagingFCSData*>(current);
+
+    if (recs.size()>0) {
+        for (int i=recs.size()-1; i>=0; i--) {
+            bool use=false;
+            if (recs[i]->getType()==current->getType()) {
+                QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(recs[i]);
+                if (m) use=true;
+            }
+            if (!use) recs.removeAt(i);
+        }
+    }
+    if (recs.size()>0) {
+        QFPlotterCopyToTableDialog* dlg=new QFPlotterCopyToTableDialog(plotter);
+        dlg->setDescription(tr("adding average over %1 graphs to table <br><small>&nbsp;&nbsp;&nbsp;<i>selected: %2</i></small>").arg(sel.size()).arg(listToString(sel)));
+        //dlg->setDescription(tr("Select a table record into which to write the plot data."));
+        if (dlg->exec()) {
+            QString tabname="";
+            QFRDRTableInterface* tab=dlg->getTable();
+            QFRDRColumnGraphsInterface* cols=dlg->getGraph();
+            QFRawDataRecord* rdr=dlg->getRDR();
+            if (dlg->getNewTable(tabname)) {
+                if (tabname.isEmpty()) tabname=tr("NEW_TABLE");
+                rdr=QFPluginServices::getInstance()->getCurrentProject()->addRawData("table", tabname, "");
+                tab=dynamic_cast<QFRDRTableInterface*>(rdr);
+                cols=dynamic_cast<QFRDRColumnGraphsInterface*>(rdr);
+                if (rdr) {
+                    rdr->setFolder(current->getFolder());
+                    rdr->setGroup(current->getGroup());
+                }
+            }
+            int graph=-1;
+            if (cols && dlg->getAddGraphs()) {
+
+                graph=dlg->getGraphID();
+                QString graphtitle;
+                if (dlg->getNewGraph(graphtitle)) {
+                    if (graphtitle.isEmpty()) {
+                        graphtitle=tr("new graph");
+                    }
+                    graph=cols->colgraphGetPlotCount();
+                    cols->colgraphAddPlot(graphtitle, tr("lag time \\tau [s]"), tr("correlation function g(\\tau)"), true, false);
+                }
+            }
+
+            double ymin=0;
+            double ymax=0;
+            double xmin=0, xmax=0;
+            for (int i=0; i<recs.size(); i++) {
+                //QString fname=recs[i]->getName();
+                QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(recs[i]);
+                QString role=m->getRole();
+                QString name=role;
+                if (!roleIsName) name=m->getName()+" - "+role;
+                if (name.isEmpty()) name=m->getName();
+
+                QList<QVariant> tau, cf, cstd;
+                double* t=m->getCorrelationT();
+                double* c=m->getCorrelation();
+
+                if (copyAvg) {
+
+                    for (int n=0; n<m->getCorrelationN(); n++) {
+                        tau<<t[n];
+                        if (sel.size()<=0) {
+                            cf<<(m->getCorrelationMean())[n];
+                            cstd<<(m->getCorrelationStdDev())[n];
+                        } else if (sel.size()==1){
+                            cf<<(m->getCorrelationRun(sel[0]))[n];
+                            cstd<<(m->getCorrelationRunError(sel[0]))[n];
+                        } else {
+                            QVector<double> dat;
+                            for (int s=0; s<sel.size(); s++) {
+                                const double* cc=m->getCorrelationRun(sel[s]);
+                                dat<<cc[n];
+                            }
+                            double v=0;
+                            cf<<qfstatisticsAverageVariance(v, dat);
+                            cstd<<sqrt(v);
+                        }
+                        if (i==0 && n==0) {
+                            ymin=cf.last().toDouble()-cstd.last().toDouble();
+                            ymax=cf.last().toDouble()+cstd.last().toDouble();
+                        } else {
+                            if (ymin>cf.last().toDouble()-cstd.last().toDouble()) ymin=cf.last().toDouble()-cstd.last().toDouble();
+                            if (ymax<cf.last().toDouble()+cstd.last().toDouble()) ymax=cf.last().toDouble()+cstd.last().toDouble();
+                        }
+                    }
+                    if (i==0) {
+                        xmin=tau.first().toDouble();
+                        xmax=tau.last().toDouble();
+                    } else {
+                        if (tau.first().toDouble()<xmin) xmin=tau.first().toDouble();
+                        if (tau.last().toDouble()<xmax) xmax=tau.last().toDouble();
+                    }
+                    int ctau=0;
+                    if (tab) {
+                        int c=tab->tableGetColumnCount();
+                        ctau=c;
+                        tab->tableSetColumnTitle(c, name+tr(" - tau [s]"));
+                        tab->tableSetColumnData(c, tau);
+                        c++;
+                        tab->tableSetColumnTitle(c, name+tr(" - CF"));
+                        tab->tableSetColumnData(c, cf);
+                        c++;
+                        tab->tableSetColumnTitle(c, name+tr(" - Error"));
+                        tab->tableSetColumnData(c, cstd);
+                        c++;
+                    }
+                    if (cols && dlg->getAddGraphs()) {
+                        QColor color=QColor("green");
+                        if (i==1) color=QColor("red");
+                        if (i==2) color=QColor("blue");
+                        if (i==3) color=QColor("darkcyan");
+                        if (i==4) color=QColor("orange");
+                        if (i==5) color=QColor("magenta");
+
+                        int plot=cols->colgraphGetGraphCount(graph);
+                        cols->colgraphAddErrorGraph(graph, ctau, -1, ctau+1, ctau+2, QFRDRColumnGraphsInterface::cgtLines, name, QFRDRColumnGraphsInterface::egtPolygons);
+                        QColor colf=color.lighter();
+                        colf.setAlphaF(0.5);
+                        QColor cole=color.darker();
+                        cole.setAlphaF(0.5);
+                        cols->colgraphSetGraphColor(graph, plot, color, colf, cole);
+                    }
+                }
+
+                if (copySingle) {
+                    tau.clear();
+                    int ctau=0;
+                    for (int s=0; s<sel.size(); s++) {
+                        cf.clear();
+                        cstd.clear();
+                        for (int n=0; n<m->getCorrelationN(); n++) {
+                            if (s==0) tau<<t[n];
+                            const double* cc=m->getCorrelationRun(sel[s]);
+                            cf<<cc[n];
+                            const double* ce=m->getCorrelationRunError(sel[s]);
+                            cstd<<ce[n];
+                            if (i==0 && n==0) {
+                                ymin=cf.last().toDouble()-cstd.last().toDouble();
+                                ymax=cf.last().toDouble()+cstd.last().toDouble();
+                            } else {
+                                if (ymin>cf.last().toDouble()-cstd.last().toDouble()) ymin=cf.last().toDouble()-cstd.last().toDouble();
+                                if (ymax<cf.last().toDouble()+cstd.last().toDouble()) ymax=cf.last().toDouble()+cstd.last().toDouble();
+                            }
+                        }
+
+                        if (i==0) {
+                            xmin=tau.first().toDouble();
+                            xmax=tau.last().toDouble();
+                        } else {
+                            if (tau.first().toDouble()<xmin) xmin=tau.first().toDouble();
+                            if (tau.last().toDouble()<xmax) xmax=tau.last().toDouble();
+                        }
+                        if (tab) {
+                            int c=tab->tableGetColumnCount();
+                            if (s==0) {
+                                ctau=c;
+                                tab->tableSetColumnTitle(c, name+tr(" - tau %1 [s]").arg(sel[s]));
+                                tab->tableSetColumnData(c, tau);
+                                c++;
+                            }
+                            tab->tableSetColumnTitle(c, name+tr(" - CF %1").arg(sel[s]));
+                            tab->tableSetColumnData(c, cf);
+                            c++;
+                            tab->tableSetColumnTitle(c, name+tr(" - Error %1").arg(sel[s]));
+                            tab->tableSetColumnData(c, cstd);
+                            c++;
+                        }
+                        if (cols && dlg->getAddGraphs()) {
+                            QColor color=QColor("green");
+                            if (i==1) color=QColor("red");
+                            if (i==2) color=QColor("blue");
+                            if (i==3) color=QColor("darkcyan");
+                            if (i==4) color=QColor("orange");
+                            if (i==5) color=QColor("magenta");
+
+                            int plot=cols->colgraphGetGraphCount(graph);
+                            cols->colgraphAddErrorGraph(graph, ctau, -1, ctau+1, ctau+2, QFRDRColumnGraphsInterface::cgtLines, name, QFRDRColumnGraphsInterface::egtPolygons);
+                            QColor colf=color.lighter();
+                            colf.setAlphaF(0.5);
+                            QColor cole=color.darker();
+                            cole.setAlphaF(0.5);
+                            cols->colgraphSetGraphColor(graph, plot, color, colf, cole);
+                        }
+                    }
+                }
+
+            }
+            if (cols && dlg->getAddGraphs()) {
+                cols->colgraphSetPlotXRange(graph, xmin, xmax);
+                cols->colgraphSetPlotYRange(graph, ymin, ymax);
+            }
+
+            if (rdr && dlg->getShowEditor()) {
+                QFRawDataPropertyEditor* editor=QFPluginServices::getInstance()->openRawDataEditor(rdr, false);
+                if (editor) {
+                    if (graph>=0) editor->sendEditorCommand("showPlot", graph);
+                    editor->showTab(2);
+                }
+            }
+
+        }
+    }
 }
 

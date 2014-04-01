@@ -44,9 +44,9 @@ class QFImageReaderRadhard : public QFImporterImageSeries
 
     protected:
         /** \brief return the width of the frames (valid after open() returned \c true */
-        virtual uint16_t intFrameWidth();
+        virtual uint32_t intFrameWidth();
         /** \brief return the height of the frames (valid after open() returned \c true */
-        virtual uint16_t intFrameHeight();
+        virtual uint32_t intFrameHeight();
         /** \brief read a new frame into the given array of floating point numbers */
         virtual bool intReadFrameFloat(float* data);
         /** \brief read a new frame into the given array of integers */
@@ -54,8 +54,8 @@ class QFImageReaderRadhard : public QFImporterImageSeries
         virtual bool intReadFrameDouble(double* data);
 
 
-        uint16_t width;
-        uint16_t height;
+        uint32_t width;
+        uint32_t height;
         QString filename;
         unsigned int frameSize;
         QFile *file;

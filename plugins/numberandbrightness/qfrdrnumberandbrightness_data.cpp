@@ -517,8 +517,8 @@ void QFRDRNumberAndBrightnessData::maskSave(const QString &filename) const {
     QFile f(filename);
     if (f.open(QIODevice::WriteOnly)) {
         QTextStream str(&f);
-        for (uint16_t y=0; y<height; y++) {
-            for (uint16_t x=0; x<width; x++) {
+        for (uint32_t y=0; y<height; y++) {
+            for (uint32_t x=0; x<width; x++) {
                 if (leaveout[y*width+x]) {
                     str<<x<<", "<<y<<"\n";
                 }
@@ -531,14 +531,14 @@ void QFRDRNumberAndBrightnessData::maskSave(const QString &filename) const {
 
 void QFRDRNumberAndBrightnessData::maskClear() {
     if (!leaveout) return;
-    for (uint16_t i=0; i<width*height; i++) {
+    for (uint32_t i=0; i<width*height; i++) {
         leaveout[i]=false;
     }
 }
 
 void QFRDRNumberAndBrightnessData::maskSetAll() {
     if (!leaveout) return;
-    for (uint16_t i=0; i<width*height; i++) {
+    for (uint32_t i=0; i<width*height; i++) {
         leaveout[i]=true;
     }
 }
@@ -555,27 +555,27 @@ bool *QFRDRNumberAndBrightnessData::maskGet() const {
     return leaveout;
 }
 
-bool QFRDRNumberAndBrightnessData::maskGet(uint16_t x, uint16_t y) const {
+bool QFRDRNumberAndBrightnessData::maskGet(uint32_t x, uint32_t y) const {
     return leaveout[y*width+x];
 }
 
-void QFRDRNumberAndBrightnessData::maskUnset(uint16_t x, uint16_t y, bool value) {
+void QFRDRNumberAndBrightnessData::maskUnset(uint32_t x, uint32_t y, bool value) {
     if (!leaveout) return;
     leaveout[y*width+x]=value;
 }
 
-void QFRDRNumberAndBrightnessData::maskToggle(uint16_t x, uint16_t y) {
+void QFRDRNumberAndBrightnessData::maskToggle(uint32_t x, uint32_t y) {
     leaveout[y*width+x]=!leaveout[y*width+x];
 }
 
 void QFRDRNumberAndBrightnessData::maskInvert() {
     if (!leaveout) return;
-    for (uint16_t i=0; i<width*height; i++) {
+    for (uint32_t i=0; i<width*height; i++) {
         leaveout[i]=!leaveout[i];
     }
 }
 
-void QFRDRNumberAndBrightnessData::maskSet(uint16_t x, uint16_t y) {
+void QFRDRNumberAndBrightnessData::maskSet(uint32_t x, uint32_t y) {
     if (!leaveout) return;
     leaveout[y*width+x]=false;
 }

@@ -38,7 +38,7 @@ QFRDRImagingFCSMaskByIntensity::~QFRDRImagingFCSMaskByIntensity() {
     delete ui;
 }
 
-void QFRDRImagingFCSMaskByIntensity::init(bool *mask, double *image, uint16_t width, uint16_t height, int dualView) {
+void QFRDRImagingFCSMaskByIntensity::init(bool *mask, double *image, uint32_t width, uint32_t height, int dualView) {
     m_mask=mask;
     m_image=image;
     m_width=width;
@@ -82,7 +82,7 @@ void QFRDRImagingFCSMaskByIntensity::updateMask() {
     double level=ui->edtLevel_2->value();
     double level2=ui->edtLevel2_2->value();
     if (ui->cmbMaskingMode->currentIndex()==0) { // in-range
-        for (uint16_t i=0; i<m_width*m_height; i++) {
+        for (uint32_t i=0; i<m_width*m_height; i++) {
             double l=level;
             double ll=levell;
             if (ui->cmbDualView->currentIndex()==1) {
@@ -99,7 +99,7 @@ void QFRDRImagingFCSMaskByIntensity::updateMask() {
             m_mask[i]=(m_image[i]>=ll)&&(m_image[i]<=l);
         }
     } else if (ui->cmbMaskingMode->currentIndex()==1) { // out-of-range
-        for (uint16_t i=0; i<m_width*m_height; i++) {
+        for (uint32_t i=0; i<m_width*m_height; i++) {
             double l=level;
             double ll=levell;
             if (ui->cmbDualView->currentIndex()==1) {
@@ -117,7 +117,7 @@ void QFRDRImagingFCSMaskByIntensity::updateMask() {
             m_mask[i]=!((m_image[i]>=ll)&&(m_image[i]<=l));
         }
     } else if (ui->cmbMaskingMode->currentIndex()==2) { // < threshold
-        for (uint16_t i=0; i<m_width*m_height; i++) {
+        for (uint32_t i=0; i<m_width*m_height; i++) {
             double l=levell;
             if (ui->cmbDualView->currentIndex()==1) {
                 if (i%m_width>=m_width/2) {
@@ -132,7 +132,7 @@ void QFRDRImagingFCSMaskByIntensity::updateMask() {
             m_mask[i]=m_image[i]<=l;
         }
     } else if (ui->cmbMaskingMode->currentIndex()==3) { // > threshold
-        for (uint16_t i=0; i<m_width*m_height; i++) {
+        for (uint32_t i=0; i<m_width*m_height; i++) {
             double l=level;
             if (ui->cmbDualView->currentIndex()==1) {
                 if (i%m_width>=m_width/2) {
@@ -147,20 +147,20 @@ void QFRDRImagingFCSMaskByIntensity::updateMask() {
             m_mask[i]=m_image[i]>=l;
         }
     } else {
-        for (uint16_t i=1; i<m_width*m_height; i++) {
+        for (uint32_t i=1; i<m_width*m_height; i++) {
             m_mask[i]=false;
         }
     }
     if (ui->chkEqualChannels->isChecked()) {
         if (ui->cmbDualView->currentIndex()==1) {
-            for (uint16_t y=0; y<m_height; y++) {
-                for (uint16_t x=0; x<m_width/2; x++) {
+            for (uint32_t y=0; y<m_height; y++) {
+                for (uint32_t x=0; x<m_width/2; x++) {
                     m_mask[y*m_width+(x+m_width/2)]=m_mask[y*m_width+x];
                 }
             }
         } else if (ui->cmbDualView->currentIndex()==2) {
-            for (uint16_t y=0; y<m_height/2; y++) {
-                for (uint16_t x=0; x<m_width; x++) {
+            for (uint32_t y=0; y<m_height/2; y++) {
+                for (uint32_t x=0; x<m_width; x++) {
                     m_mask[(y+m_height/2)*m_width+x]=m_mask[y*m_width+x];
                 }
             }
@@ -223,7 +223,7 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
 
         if (ui->cmbDualView->currentIndex()==0) {
             bool first=true;
-            for (uint16_t i=1; i<m_width*m_height; i++) {
+            for (uint32_t i=1; i<m_width*m_height; i++) {
                 if (first) {
                     min=max=m_image[i];
                     first=false;
@@ -259,7 +259,7 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
 
         } else if (ui->cmbDualView->currentIndex()==1) {
             bool first=true, first2=true;
-            for (uint16_t i=1; i<m_width*m_height; i++) {
+            for (uint32_t i=1; i<m_width*m_height; i++) {
                 if (i%m_width<=m_width/2) {
                     if (first) {
                         min=max=m_image[i];
@@ -302,7 +302,7 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
 
         } else if (ui->cmbDualView->currentIndex()==2) {
             bool first=true, first2=true;
-            for (uint16_t i=1; i<m_width*m_height; i++) {
+            for (uint32_t i=1; i<m_width*m_height; i++) {
                 if (i/m_width<=m_height/2) {
                     if (first) {
                         min=max=m_image[i];

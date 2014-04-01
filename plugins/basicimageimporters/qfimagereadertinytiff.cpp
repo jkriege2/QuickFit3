@@ -113,12 +113,12 @@ bool QFImageReaderTinyTIFF::nextFrame() {
     return ok;
 }
 
-uint16_t QFImageReaderTinyTIFF::intFrameWidth() {
+uint32_t QFImageReaderTinyTIFF::intFrameWidth() {
     if (tif) return width;
     return 0;
 }
 
-uint16_t QFImageReaderTinyTIFF::intFrameHeight() {
+uint32_t QFImageReaderTinyTIFF::intFrameHeight() {
     if (tif) return height;
     return 0;
 }
