@@ -91,11 +91,13 @@ void QFRawDataEditor::saveReport()
         printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
         printer->setOrientation(QPrinter::Portrait);
         printer->setOutputFormat(QPrinter::PdfFormat);
+        printer->setColorMode(QPrinter::Color);
         QTextDocument* doc=new QTextDocument();
         doc->setTextWidth(printer->pageRect().size().width());
         createReportDoc(doc);
         if (fi.suffix().toLower()=="ps" || fi.suffix().toLower()=="pdf") {
             if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
+            printer->setColorMode(QPrinter::Color);
             printer->setOutputFileName(fn);
             doc->print(printer);
         } else if (fi.suffix().toLower()=="odf") {

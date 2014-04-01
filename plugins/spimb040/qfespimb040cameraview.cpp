@@ -2079,7 +2079,9 @@ void QFESPIMB040CameraView::saveReport() {
         printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
         printer->setOrientation(QPrinter::Portrait);
         printer->setOutputFormat(QPrinter::PdfFormat);
+        printer->setColorMode(QPrinter::Color);
         if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
+        printer->setColorMode(QPrinter::Color);
         printer->setOutputFileName(fn);
         QTextDocument* doc=new QTextDocument();
         doc->setTextWidth(printer->pageRect().size().width());
