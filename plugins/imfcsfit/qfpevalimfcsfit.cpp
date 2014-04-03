@@ -584,7 +584,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool4()
     double wxymean=0, wxyvar=0;
     QVector<double> pixwidths, pixshifts;
     double oldshift=0;
-    bool isshifted;
+    bool isshifted=false;
     for (int i=0; i<project->getEvaluationCount(); i++) {
         QFEvaluationItem* e=project->getEvaluationByNum(i);
         QFImFCSFitEvaluation* imFCS=qobject_cast<QFImFCSFitEvaluation*>(e);
