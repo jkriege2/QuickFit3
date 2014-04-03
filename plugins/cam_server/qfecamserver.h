@@ -222,7 +222,8 @@ class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionC
             /** \brief current exposure time */
             double exposure;
             /** \brief if true, the server supports an instruction to read a single parameter, otherwise the instruction to read all parameters is used for the parameter readout. */
-            bool hasSingleParameterGet;
+            bool hasInstSingleParameterGet;
+            bool hasInstProgress;
 
             QByteArray last_filenameprefix;
             bool acquiring;
@@ -252,7 +253,8 @@ class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionC
         /** \brief read the given number of bytes from server, if cleanresult=true, the returned string will NOT contain end_string */
         static QList<QByteArray> queryData(const DEVICE_CONFIG& device, const QByteArray& command, int line_to_read=1, const QByteArray &end_string=QByteArray("\n"), bool* ok=NULL, bool cleanResult=true);
 
-
+        static QVariant extractParameter(const QByteArray& input, const QByteArray& parameter_name);
+        static QVariant extractParameter(const QList<QByteArray>& input, const QByteArray& parameter_name);
 
 };
 
