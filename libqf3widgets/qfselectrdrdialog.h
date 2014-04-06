@@ -57,11 +57,15 @@ class QFWIDLIB_EXPORT QFSelectRDRDialog : public QDialog
         QPointer<QFRawDataRecord> getSelectedRDR() const;
         bool doCreateNew() const;
 
+        QList<QFRawDataRecord *> getSelectedRDRsp() const;
     public slots:
         /** \brief re-read the RDRs from the given project */
         void updateRdrList();
 
-
+    protected slots:
+        void on_btnAll_clicked();
+        void on_btnNone_clicked();
+        void on_lineEditFilter_textChanged(const QString & text );
     protected:
         Ui::QFSelectRDRDialog *ui;
         QFMatchRDRFunctor* matchFunctor;
@@ -70,5 +74,7 @@ class QFWIDLIB_EXPORT QFSelectRDRDialog : public QDialog
         QList<QPointer<QFRawDataRecord> > rdrList;
 
 };
+
+
 
 #endif // QFSELECTRDRDIALOG_H

@@ -271,6 +271,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         void copySelCFFromAll();
         void copySelAvgCFFromAll();
 
+        void postBin();
     protected:
         void copyCFFromFilesToTable(QList<QFRawDataRecord*>& recs, bool copyAvg=true, bool avgSelected=true, bool copySingle=false, bool nameFromRole=true, QList<int> sel=QList<int>());
 
@@ -412,6 +413,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QAction* actMaskBuilder;
         QAction* actSetBackgroundFromSelection;
         QAction* actSetBackgroundFromMasked;
+        QAction* actPostProcessBinning;
 
         /** \brief combobox to select a result group */
         QComboBox* cmbResultGroup;

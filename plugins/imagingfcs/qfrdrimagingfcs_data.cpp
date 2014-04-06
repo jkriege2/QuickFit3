@@ -11,6 +11,7 @@
 #include "qfimporter.h"
 #include "qfimportermanager.h"
 #include "yaid_rh.h"
+#include "imagetools.h"
 
 #undef DEBUG_SIZES
 //#define DEBUG_SIZES
@@ -739,6 +740,8 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
 
     if (!dataLoaded) {
         setError(tr("did not find a correlation data file (acf, ccf, dccf, ...) for record"));
+    } else {
+        loadPostProcess();
     }
 
     //qDebug()<<"loaded:   "<<width<<"x"<<height<<"  N="<<N<<"   correlations="<<correlations<<"    c[0]="<<correlations[0]<<"    c[N-1]="<<correlations[N-1];
@@ -2535,6 +2538,64 @@ QFRDRImagingFCSData *QFRDRImagingFCSData::getRoleFromThisGroup(const QString &ro
     QList<QFRDRImagingFCSData*> items=filterListForClass<QFRawDataRecord, QFRDRImagingFCSData>(getRecordsWithRoleFromGroup(role));
     if (items.size()>0) return items.first();
     return NULL;
+}
+
+template<class T>
+void QFRDRImagingFCSData_bincf(T* data, T* sigma, int width, int height, int N, int binning) {
+    if (width<=0 || height<=0 || N<=0 || !data) return;
+    if (binning<=1) return;
+    T* temp=duplicateArray(data, width*height*N);
+    const int64_t nw=width/binning;
+    const int64_t nh=height/binning;
+    for (int64_t i=0; i<width*height*N; i++) {
+        data[i]=0;
+        sigma[i]=0;
+    }
+    for (int64_t f=0; f<N; f++) {
+        for (int64_t y=0; y<height; y++) {
+            const int64_t ny=y/binning;
+            for (int64_t x=0; x<width; x++) {
+                const int64_t nx=x/binning;
+                data[y*nw*N+x*N+f]=data[y*nw*N+x*N+f]+temp[y*width*N+x*N+f];
+                sigma[y*nw*N+x*N+f]=sigma[y*nw*N+x*N+f]+qfSqr(temp[y*width*N+x*N+f]);
+            }
+        }
+    }
+    double norm=binning*binning;
+    for (int64_t i=0; i<width*height*N; i++) {
+        sigma[i]=sqrt((sigma[i]-data[i]*data[i]/norm)/(norm-1.0));
+        data[i]= data[i]/norm;
+    }
+    free(temp);
+}
+
+void QFRDRImagingFCSData::loadPostProcess()
+{
+    double bin=getProperty("POSTPROCESS_BINNING", 1).toInt();
+    if (bin>1 && correlations && sigmas && width>0 && height>0 && N>0) {
+        log_text(tr("calculating %2x binning imFCS record '%1' ...\n").arg(getName()).arg(bin));
+        if (overviewF) qfVideoBinInFrame(overviewF, widthOvr, heightOvr, 1, bin);
+        if (overviewF2) qfVideoBinInFrame(overviewF2, widthOvr, heightOvr, 1, bin);
+        if (overviewFSTD) qfVideoBinInFrame(overviewFSTD, widthOvr, heightOvr, 1, bin);
+        if (overviewF2STD) qfVideoBinInFrame(overviewF2STD, widthOvr, heightOvr, 1, bin);
+        widthOvr=widthOvr/bin;
+        heightOvr=heightOvr/bin;
+
+        if (video) qfVideoBinInFrame(video, video_width, video_height, video_frames, bin);
+        if (video2) qfVideoBinInFrame(video2, video_width, video_height, video_frames, bin);
+        video_width=video_width/bin;
+        video_height=video_height/bin;
+        if (videoUncorrected) qfVideoBinInFrame(videoUncorrected, videoUncorrected_width, videoUncorrected_height, videoUncorrected_frames, bin);
+        if (videoUncorrected2) qfVideoBinInFrame(videoUncorrected2, videoUncorrected_width, videoUncorrected_height, videoUncorrected_frames, bin);
+        videoUncorrected_width=videoUncorrected_width/bin;
+        videoUncorrected_height=videoUncorrected_height/bin;
+
+        QFRDRImagingFCSData_bincf(correlations, sigmas, width, height, N, bin);
+        width=width/bin;
+        height=height/bin;
+        log_text(tr("calculating %2x binning imFCS record '%1' ... DONE!\n").arg(getName()).arg(bin));
+        recalcCorrelations();
+    }
 }
 
 int QFRDRImagingFCSData::internalDualViewModeChannel() const

@@ -3,13 +3,14 @@
 #include "qfpluginservices.h"
 #include <QDebug>
 
-
+#include "qfstyledbutton.h"
 
 QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QFSelectRDRDialog)
 {
     ui->setupUi(this);
+    ui->lineEditFilter->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, ui->lineEditFilter, ui->lineEditFilter));
     this->matchFunctor=matchFunctor;
     this->project=project;
     functorPrivate=false;
@@ -24,6 +25,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, bool funct
     ui(new Ui::QFSelectRDRDialog)
 {
     ui->setupUi(this);
+    ui->lineEditFilter->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, ui->lineEditFilter, ui->lineEditFilter));
     this->matchFunctor=matchFunctor;
     this->project=project;
     this->functorPrivate=functorPrivate;
@@ -38,6 +40,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QWidget *parent):
     ui(new Ui::QFSelectRDRDialog)
 {
     ui->setupUi(this);
+    ui->lineEditFilter->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, ui->lineEditFilter, ui->lineEditFilter));
     this->matchFunctor=new QFMatchRDRFunctorSelectAll();
     functorPrivate=true;
     this->project=project;
@@ -127,6 +130,17 @@ QList<QPointer<QFRawDataRecord> > QFSelectRDRDialog::getSelectedRDRs() const
     return list;
 }
 
+QList<QFRawDataRecord* > QFSelectRDRDialog::getSelectedRDRsp() const
+{
+    QList<QFRawDataRecord* > list;
+    QList<QListWidgetItem *> l=ui->listWidget->selectedItems();
+    for (int i=0; i<l.size(); i++) {
+        QFRawDataRecord* r=rdrList.value(l[i]->data(Qt::UserRole).toInt(), NULL);
+        if (r) list<<r;
+    }
+    return list;
+}
+
 QPointer<QFRawDataRecord> QFSelectRDRDialog::getSelectedRDR() const
 {
     return rdrList.value(ui->listWidget->currentItem()->data(Qt::UserRole).toInt(), NULL);
@@ -149,12 +163,15 @@ void QFSelectRDRDialog::updateRdrList()
     if (ui->listWidget->currentItem()) ui->listWidget->currentItem()->text();
     int selI=0;
     ui->listWidget->clear();
+    QRegExp rx(ui->lineEditFilter->text(), Qt::CaseInsensitive, QRegExp::Wildcard);
     for (int i=0; i<rdrList.size(); i++) {
         if (rdrList[i]) {
-            QListWidgetItem* item=new QListWidgetItem(rdrList[i]->getSmallIcon(), rdrList[i]->getName(), ui->listWidget);
-            item->setData(Qt::UserRole, i);
-            ui->listWidget->addItem(item);
-            if (item->text()==sel) selI=ui->listWidget->count()-1;
+            if (rx.pattern().isEmpty() || rx.indexIn(rdrList[i]->getName())>=0) {
+                QListWidgetItem* item=new QListWidgetItem(rdrList[i]->getSmallIcon(), rdrList[i]->getName(), ui->listWidget);
+                item->setData(Qt::UserRole, i);
+                ui->listWidget->addItem(item);
+                if (item->text()==sel) selI=ui->listWidget->count()-1;
+            }
         }
     }
     ui->listWidget->setCurrentRow(selI);
@@ -164,5 +181,20 @@ void QFSelectRDRDialog::updateRdrList()
         ui->radSelect->setEnabled(false);
     }
 
+}
+
+void QFSelectRDRDialog::on_btnAll_clicked()
+{
+    ui->listWidget->selectAll();
+}
+
+void QFSelectRDRDialog::on_btnNone_clicked()
+{
+    ui->listWidget->clearSelection();
+}
+
+void QFSelectRDRDialog::on_lineEditFilter_textChanged(const QString &text)
+{
+    updateRdrList();
 }
 

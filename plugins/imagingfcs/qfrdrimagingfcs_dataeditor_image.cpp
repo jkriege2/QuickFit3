@@ -1066,19 +1066,22 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actImagesDrawPoints->setChecked(true);
     setImageEditMode();
 
-    actCopyGroupACFsToTable=new QAction("copy all CFs from group to table", this);
+    actCopyGroupACFsToTable=new QAction(tr("copy all CFs from group to table"), this);
     connect(actCopyGroupACFsToTable, SIGNAL(triggered()), this, SLOT(copyGroupACFsToTable()));
 
-    actRecorrelate=new QAction("recorrelate file", this);
+    actRecorrelate=new QAction(tr("recorrelate file"), this);
     connect(actRecorrelate, SIGNAL(triggered()), this, SLOT(recorrelate()));
 
-    actCopyMeanCFFromAll=new QAction("copy average CF from all files to table", this);
+    actPostProcessBinning=new QAction(tr("post processing: bin correlation functions"), this);
+    connect(actPostProcessBinning, SIGNAL(triggered()), this, SLOT(postBin()));
+
+    actCopyMeanCFFromAll=new QAction(tr("copy average CF from all files to table"), this);
     connect(actCopyMeanCFFromAll, SIGNAL(triggered()), this, SLOT(copyMeanCFFromAll()));
 
-    actCopyPixelCFFromAll=new QAction("copy selected CF from all files to table", this);
+    actCopyPixelCFFromAll=new QAction(tr("copy selected CF from all files to table"), this);
     connect(actCopyPixelCFFromAll, SIGNAL(triggered()), this, SLOT(copySelCFFromAll()));
 
-    actCopyPixelAvgCFFromAll=new QAction("copy selected pixels average CF from all files to table", this);
+    actCopyPixelAvgCFFromAll=new QAction(tr("copy selected pixels average CF from all files to table"), this);
     connect(actCopyPixelAvgCFFromAll, SIGNAL(triggered()), this, SLOT(copySelAvgCFFromAll()));
 
 
@@ -1303,6 +1306,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuSelection->addAction(actSetBackgroundFromSelection);
 
     menuImagingFCSTools=propertyEditor->addOrFindMenu(tr("ImagingFCS Tools"));
+    menuImagingFCSTools->addAction(actPostProcessBinning);
     menuImagingFCSTools->addAction(actRecorrelate);
     menuImagingFCSTools->addAction(actCopyGroupACFsToTable);
     menuImagingFCSTools->addAction(actCopyMeanCFFromAll);
@@ -5767,6 +5771,21 @@ void QFRDRImagingFCSImageEditor::recorrelate()
     }
 }
 
+void QFRDRImagingFCSImageEditor::postBin() {
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+    if (m) {
+        int bin=m->getProperty("POSTPROCESS_BINNING", 1).toInt();
+        bool ok=false;
+        bin=QInputDialog::getInt(this, tr("post processing: binning"), tr("bin N*N neighboring pixels into an averaged correlation function using post-processing."), bin, 1, qMin(m->getImageFromRunsWidth(), m->getImageFromRunsHeight()), 1, &ok );
+        if (ok) {
+            m->setQFProperty("POSTPROCESS_BINNING", bin, false, true);
+            if (QMessageBox::information(this, tr("post processing: binning"), tr("The project needs to be saved and reloaded for the binning to take effect!\nReload project now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+                QFPluginServices::getInstance()->reloadCurrentProject();
+            }
+        }
+    }
+}
+
 void QFRDRImagingFCSImageEditor::setBackgroundFromSelection()
 {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
@@ -5932,31 +5951,63 @@ void QFRDRImagingFCSImageEditor::aspectRatioChanged()
 void QFRDRImagingFCSImageEditor::copyMeanCFFromAll()
 {
     QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();//getRDRGroupMembers(current->getGroup());
-    copyCFFromFilesToTable(recs, true, false, false, false, QList<int>());
+    QFSelectRDRDialog* dlgsel=new QFSelectRDRDialog(new QFMatchRDRFunctorSelectType(current->getType()), true, this);
+    dlgsel->setAllowCreateNew(false);
+    dlgsel->setAllowMultiSelect(true);
+    dlgsel->setDescription(tr("select records from which to copy"));
+    if (dlgsel->exec()) {
+        recs=dlgsel->getSelectedRDRsp();
+        if (recs.size()>0) {
+            copyCFFromFilesToTable(recs, true, false, false, false, QList<int>());
+        }
+    }
+    delete dlgsel;
 }
 
 void QFRDRImagingFCSImageEditor::copySelCFFromAll()
 {
     QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();//getRDRGroupMembers(current->getGroup());
-    QList<int> sel;
-    if (plteOverviewSize>0 && plteOverviewSelectedData) {
-        for (int i=0; i<plteOverviewSize; i++) {
-            if (plteOverviewSelectedData[i] && !plteOverviewExcludedData[i]) sel<<i;
+    QFSelectRDRDialog* dlgsel=new QFSelectRDRDialog(new QFMatchRDRFunctorSelectType(current->getType()), true, this);
+    dlgsel->setAllowCreateNew(false);
+    dlgsel->setAllowMultiSelect(true);
+    dlgsel->setDescription(tr("select records from which to copy"));
+    if (dlgsel->exec()) {
+        recs=dlgsel->getSelectedRDRsp();
+        if (recs.size()>0) {
+            QList<int> sel;
+            if (plteOverviewSize>0 && plteOverviewSelectedData) {
+                for (int i=0; i<plteOverviewSize; i++) {
+                    if (plteOverviewSelectedData[i] && !plteOverviewExcludedData[i]) sel<<i;
+                }
+            }
+            copyCFFromFilesToTable(recs, false, true, true, false, sel);
         }
     }
-    copyCFFromFilesToTable(recs, false, true, true, false, sel);
+    delete dlgsel;
+
 }
 
 void QFRDRImagingFCSImageEditor::copySelAvgCFFromAll()
 {
     QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();//getRDRGroupMembers(current->getGroup());
-    QList<int> sel;
-    if (plteOverviewSize>0 && plteOverviewSelectedData) {
-        for (int i=0; i<plteOverviewSize; i++) {
-            if (plteOverviewSelectedData[i] && !plteOverviewExcludedData[i]) sel<<i;
+    QFSelectRDRDialog* dlgsel=new QFSelectRDRDialog(new QFMatchRDRFunctorSelectType(current->getType()), true, this);
+    dlgsel->setAllowCreateNew(false);
+    dlgsel->setAllowMultiSelect(true);
+    dlgsel->setDescription(tr("select records from which to copy"));
+    if (dlgsel->exec()) {
+        recs=dlgsel->getSelectedRDRsp();
+        if (recs.size()>0) {
+            QList<int> sel;
+            if (plteOverviewSize>0 && plteOverviewSelectedData) {
+                for (int i=0; i<plteOverviewSize; i++) {
+                    if (plteOverviewSelectedData[i] && !plteOverviewExcludedData[i]) sel<<i;
+                }
+            }
+            copyCFFromFilesToTable(recs, true, true, false, false, sel);
         }
     }
-    copyCFFromFilesToTable(recs, true, true, false, false, sel);
+    delete dlgsel;
+
 }
 
 void QFRDRImagingFCSImageEditor::copyCFFromFilesToTable(QList<QFRawDataRecord *> &recs, bool copyAvg, bool avgSelected, bool copySingle, bool roleIsName, QList<int> sel)

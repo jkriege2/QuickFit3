@@ -245,6 +245,11 @@ MainWindow::~MainWindow() {
     //std::cout<<"deleting MainWindow ... OK\n";
 }
 
+void MainWindow::reloadCurrentProject()
+{
+    reloadProject();
+}
+
 void MainWindow::searchAndRegisterPlugins() {
     // find plugins
     rawDataFactory->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips);

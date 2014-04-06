@@ -99,12 +99,25 @@
 	   <li>Also see the page "<a href="$$qf_ui_rdr_helpfile$$">$$qf_ui_rdr_helpfiletitle$$</a>" for futher information about UI elements common to all raw data records.
 	 </ul>
   
-                           <h3>Tab "Images, Videos, Timetrace"</h3>
-                           <ul>
-                           
-                              <li>This tab displays the overview images and videos stored together with the data. In the "image/video" combobox you can select the image or video, which is then displayed below. If a video is selected, control elements are accessible below. For each currently displayed image the according intensity histogram is available in the "Histogram" tab.</li>
-                              <li>Also the countrate statistics (averaged over the whole image frame) is displayed (rhs). </li>
-                           </ul>
+	   <h3>Tab "Images, Videos, Timetrace"</h3>
+	   <ul>
+	   
+		  <li>This tab displays the overview images and videos stored together with the data. In the "image/video" combobox you can select the image or video, which is then displayed below. If a video is selected, control elements are accessible below. For each currently displayed image the according intensity histogram is available in the "Histogram" tab.</li>
+		  <li>Also the countrate statistics (averaged over the whole image frame) is displayed (rhs). </li>
+	   </ul>
+	   
+	  <h3>General Tools</h3>
+	  <p>The tools mentioned in this section are available in the RDR editor in the menu <tt>imagingFCS Tools</tt>.</p>
+	  <ul>
+	    <li><b>recorrelate file</b>: open a correlation dialog with the same input file, as the current imagingFCS RDR.</li>
+		<li><b>post processing: bin correlation functions</b>: this option enables (or disables, if binning is set to 1) an option that bins the correlation functions of N*N neighboring pixels into a single ACF. It is comparable to binning in the correlator, but does not require recorrelating the data. It should only be used, when recorrelating is not possible, as the latter poses the better option. $$note:This option is dangerous, as the image size is reduced and old fit results cannot be used anymore (they are not altered though!)$$</li>
+		<li><b>copy all CFs from group to table</b>: copy all correlation functions as displayed in the parameter image editor to a table RDR</li>
+		<li><b>copy average CF from all files to table</b>: copy the average run correlation fucntion from all imFCS files in the project into a table RDR.</li>
+		<li><b>copy selected CF from all files to table</b>: copy the correlation functions from the currently selected pixels (in the parameter image RDR) and from these in all applicable imagingFCS record in the project, into a table RDR</li>
+		<li><b>copy selected pixels average CF from all files to table</b>: same as above, but does not copy the single correlation functions, but averages over all selected pixels in each file.</li>
+		<!--<li><b></b>:</li>-->
+	  </ul>
+
 	</body>
 </html>
 

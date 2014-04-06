@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>589</width>
-    <height>349</height>
+    <height>398</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -32,13 +32,72 @@
     </widget>
    </item>
    <item>
-    <widget class="QRadioButton" name="radSelect">
-     <property name="text">
-      <string>select record:</string>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QRadioButton" name="radSelect">
+       <property name="text">
+        <string>select record:</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnAll">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>select all</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnNone">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>select none</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QWidget" name="horizontalWidget" native="true">
+     <property name="enabled">
+      <bool>false</bool>
      </property>
-     <property name="checked">
-      <bool>true</bool>
-     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>filter:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFEnhancedLineEdit" name="lineEditFilter"/>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -74,6 +133,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFEnhancedLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfenhancedlineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
@@ -83,8 +149,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>478</x>
-     <y>484</y>
+     <x>487</x>
+     <y>388</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -99,8 +165,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>546</x>
-     <y>490</y>
+     <x>555</x>
+     <y>388</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -115,12 +181,60 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>131</x>
-     <y>53</y>
+     <x>140</x>
+     <y>44</y>
     </hint>
     <hint type="destinationlabel">
      <x>217</x>
      <y>128</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radNew</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnAll</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>132</x>
+     <y>37</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>490</x>
+     <y>70</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radNew</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnNone</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>299</x>
+     <y>39</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>553</x>
+     <y>67</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radNew</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>horizontalWidget</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>103</x>
+     <y>40</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>99</x>
+     <y>86</y>
     </hint>
    </hints>
   </connection>

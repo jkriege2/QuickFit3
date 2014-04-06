@@ -49,7 +49,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual ~MainWindow();
 
 
-
+        /** \copydoc QFPluginServices::reloadCurrentProject()  */
+        virtual void reloadCurrentProject();
         /** \copydoc QFPluginServices::log_text()  */
         virtual void log_text(QString message);
         /** \copydoc QFPluginServices::log_warning()  */

@@ -90,6 +90,8 @@ class QFLIB_EXPORT QFPluginServices {
         /** Default destructor */
         virtual ~QFPluginServices();
 
+        /** \brief reload the current project */
+        virtual void reloadCurrentProject()=0;
         /** \brief indent all following lines in the logging pane */
         virtual void log_indent()=0;
         /** \brief undo former log_indent() */

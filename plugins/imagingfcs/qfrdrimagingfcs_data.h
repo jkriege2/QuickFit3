@@ -208,7 +208,10 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
         QFRDRImagingFCSData* getRoleFromThisGroup(const QString& role);
 
+
     protected:
+
+        void loadPostProcess();
 
         /** \brief indicates whether the internal data representation is "dual view", this is independent of dualViewMode() and setDualViewMode() which only influences the data display! */
         DualViewMode internalDualViewMode() const;
