@@ -12,6 +12,7 @@
 #include "qffitalgorithmmanager.h"
 #include "qffitfunctionplottools.h"
 #include "qftablemodel.h"
+#include "datatools.h"
 
 class QFSPIMLightsheetEvaluationItem; // forward
 
@@ -96,6 +97,8 @@ class QFSPIMLightsheetEvaluationEditor : public QFEvaluationEditor {
 
         bool* getCurrentMask();
 
+        QAction* actSaveImageCutSeries;
+
     protected slots:
         /** \brief activated when the highlighted record changed */
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
@@ -112,6 +115,8 @@ class QFSPIMLightsheetEvaluationEditor : public QFEvaluationEditor {
         void paramChanged(int i);
 
         void updateFitResultRanges();
+
+        void saveImageCutSeries();
 
 
 

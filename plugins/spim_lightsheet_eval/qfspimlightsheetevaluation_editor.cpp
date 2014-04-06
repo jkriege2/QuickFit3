@@ -3,9 +3,10 @@
 #include "qfevaluationitem.h"
 #include "qfspimlightsheetevaluation_item.h"
 #include "ui_qfspimlightsheetevaluation_editor.h"
-
+#include "qfevaluationpropertyeditor.h"
 #include <QtGui>
 #include <QtCore>
+#include "qfespimlightsheetevaluationcopyconfigdialog.h"
 
 QFSPIMLightsheetEvaluationEditor::QFSPIMLightsheetEvaluationEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
     QFEvaluationEditor(services, propEditor, parent),
@@ -72,6 +73,12 @@ QFSPIMLightsheetEvaluationEditor::QFSPIMLightsheetEvaluationEditor(QFPluginServi
     // connect widgets 
     //connect(ui->btnEvaluateAll, SIGNAL(clicked()), this, SLOT(evaluateAll()));
     connect(ui->btnEvaluateCurrent, SIGNAL(clicked()), this, SLOT(evaluateCurrent()));
+
+    actSaveImageCutSeries=new QAction(tr("save image cut series"), this);
+    connect(actSaveImageCutSeries, SIGNAL(triggered()), this, SLOT(saveImageCutSeries()));
+    QMenu* menuTools=propEditor->addMenu("Tools", 0);
+    menuTools->addAction(actSaveImageCutSeries);
+
     
     updatingData=false;
 
@@ -847,6 +854,120 @@ void QFSPIMLightsheetEvaluationEditor::updateFitResultRanges()
         record->setQFProperty(eval->getEvaluationResultID(stack)+"_WIDTHRANGEMIN", ui->spinWidthRangeMin->value(), false, false);
         record->setQFProperty(eval->getEvaluationResultID(stack)+"_WIDTHRANGEMAX", ui->spinWidthRangeMax->value(), false, false);
     }
+}
+
+void QFSPIMLightsheetEvaluationEditor::saveImageCutSeries()
+{
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    int stack=ui->cmbStack->currentIndex();
+
+    if ((!record)||(!eval)||(!data)) return;
+
+    QList<QVector<double> > dataOut;
+    QStringList headers;
+    int w=data->getImageStackWidth(stack);
+    int h=data->getImageStackHeight(stack);
+
+
+    QFESPIMLightSheetEvaluationCopyConfigDialog* dlg=new QFESPIMLightSheetEvaluationCopyConfigDialog(this);
+    if (dlg->exec()) {
+
+
+        for (int z=0; z<data->getImageStackFrames(stack); z++) {
+            for (int c=0; c<data->getImageStackChannels(stack); c++) {
+                QString resultID=eval->getEvaluationResultID(stack, c);
+                double* img=data->getImageStack(stack, z, c);
+                int item=lastMousePreviewX;
+                if (ui->cmbOrientation->currentIndex()==0) {
+                    item=lastMousePreviewY;
+                }
+                QString param;
+                if (item>=0 && record->resultsExists(resultID, param=QString("fitok_frame%1").arg(z))) {
+                    bool fitOK=record->resultsGetInBooleanList(resultID, param, item, false);
+                    QString modelID=record->resultsGetAsString(resultID, param=QString("fit_model"));
+                    QFFitFunction* model=QFFitFunctionManager::getInstance()->createFunction(modelID, this);
+                    double position=0;
+                    double amplitude=1;
+                    QVector<double> params;
+                    if (fitOK && model) {
+                        QStringList paramIDs=model->getParameterIDs();
+                        for (int i=0; i<paramIDs.size(); i++) {
+                            QFFitFunction::ParameterDescription d=model->getDescription(paramIDs[i]);
+                            double v=record->resultsGetInNumberList(resultID, param=QString("%2_frame%1").arg(z).arg(paramIDs[i]), item, d.initialValue);
+                            double e=record->resultsGetErrorInNumberErrorList(resultID, param=QString("%2_frame%1").arg(z).arg(paramIDs[i]), item, 0);
+                            params.append(v);
+                            if (paramIDs[i].toUpper()=="POSITION") {
+                                position=v;
+                            }
+                            if (paramIDs[i].toUpper()=="AMPLITUDE") {
+                                amplitude=v;
+                            }
+                        }
+                    }
+                    double dx=ui->spinDeltaX->value()/1000.0;
+                    double dz=ui->spinDeltaZ->value()/1000.0;
+                    if (dlg->getUnits()==1) {
+                        dx=1;
+                        dz=1;
+                    }
+                    if (!dlg->getShiftCenter()) {
+                        position=0;
+                    }
+                    //qDebug()<<z<<c<<position<<amplitude;
+                    QVector<double> zz, xx, ff, ff1, fit, fit1;
+                    if (ui->cmbOrientation->currentIndex()==0) {
+                        // x=...
+                        for (int x=0; x<w; x++) {
+                            xx.append((double(x)-position)*dx);
+                            ff.append(img[item*w+x]);
+                            ff1.append(img[item*w+x]/amplitude);
+                            zz.append(z*dz);
+                        }
+                    } else {
+                        // y=...
+                        for (int y=0; y<h; y++) {
+                            xx.append((double(y)-position)*dx);
+                            ff.append(img[y*w+item]);
+                            ff1.append(img[y*w+item]/amplitude);
+                            zz.append(z*dz);
+                        }
+                    }
+                    if (model && params.size()>=model->paramCount()) {
+                        for (int i=0; i<xx.size(); i++) {
+                            fit.append(model->evaluate(xx[i]/dx+position, params.data()));
+                            fit1.append(fit.last()/amplitude);
+                        }
+                    }
+                    dataOut.append(zz);
+                    dataOut.append(xx);
+                    dataOut.append(ff);
+                    if (dlg->getSaveNormalized()) dataOut.append(ff1);
+                    if (dlg->getSaveFit() && model) {
+                        dataOut.append(fit);
+                        if (dlg->getSaveNormalized()) dataOut.append(fit1);
+                    }
+                    headers<<tr("z=%1, c=%2: Z").arg(z).arg(c);
+                    headers<<tr("z=%1, c=%2: X").arg(z).arg(c);
+                    headers<<tr("z=%1, c=%2: LS").arg(z).arg(c);
+                    if (dlg->getSaveNormalized()) headers<<tr("z=%1, c=%2: LS/amplitude").arg(z).arg(c);
+                    if (dlg->getSaveFit() && model) {
+                        headers<<tr("z=%1, c=%2: fit").arg(z).arg(c);
+                        if (dlg->getSaveNormalized()) headers<<tr("z=%1, c=%2: fit/amplitude").arg(z).arg(c);
+                    }
+                }
+            }
+        }
+
+        if (dlg->getOutput()==0) QFDataExportHandler::save(dataOut, headers);
+        else if (dlg->getOutput()==1) QFDataExportHandler::copyCSV(dataOut, headers);
+        else if (dlg->getOutput()==2) QFDataExportHandler::copyMatlab(dataOut);
+    }
+    delete dlg;
+
+    //QString filename=qfGetOpenFileName(this, tr("save image cut series ..."), "", "CSV file")
 }
 
 void QFSPIMLightsheetEvaluationEditor::displayPreview() {

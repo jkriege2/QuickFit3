@@ -15,13 +15,16 @@ include(../../libquickfitwidgets.pri)
 HEADERS += qfspimlightsheetevaluation.h \
            qfspimlightsheetevaluation_item.h \
            qfspimlightsheetevaluation_editor.h \
-    ../interfaces/qfrdrimagestackinterface.h
+    ../interfaces/qfrdrimagestackinterface.h \
+    qfespimlightsheetevaluationcopyconfigdialog.h
 
 SOURCES += qfspimlightsheetevaluation.cpp \
            qfspimlightsheetevaluation_item.cpp \
-           qfspimlightsheetevaluation_editor.cpp
+           qfspimlightsheetevaluation_editor.cpp \
+    qfespimlightsheetevaluationcopyconfigdialog.cpp
 
-FORMS = qfspimlightsheetevaluation_editor.ui   
+FORMS = qfspimlightsheetevaluation_editor.ui \   
+    qfespimlightsheetevaluationcopyconfigdialog.ui
 
 RESOURCES += qfspimlightsheetevaluation.qrc
 

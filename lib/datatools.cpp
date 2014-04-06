@@ -516,6 +516,11 @@ void QFDataExportHandler::copyCSV(const QList<QList<double> > &data, const QStri
     csvCopy(data, columnHeaders, rowHeaders);
 }
 
+void QFDataExportHandler::copyCSV(const QList<QVector<double> > &data, const QStringList &columnHeaders, const QStringList &rowHeaders)
+{
+    csvCopy(data, columnHeaders, rowHeaders);
+}
+
 void QFDataExportHandler::save(const QList<QList<QVariant> >& data, int format, const QString& filename, const QStringList& columnHeaders, const QStringList& rowHeaders) {
 
     if (format==0) { // CSV
@@ -571,6 +576,11 @@ void QFDataExportHandler::copyMatlab(const QList<QList<QVariant> > &data)
 }
 
 void QFDataExportHandler::copyMatlab(const QList<QList<double> > &data)
+{
+    matlabCopy(data);
+}
+
+void QFDataExportHandler::copyMatlab(const QList<QVector<double> > &data)
 {
     matlabCopy(data);
 }

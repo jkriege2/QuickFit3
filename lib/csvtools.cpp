@@ -418,7 +418,7 @@ QString toCSV(const QList<QVector<double> >& data, const QStringList& columnName
         }
         for (int c=0; c<cols; c++) {
             if (c>0 || rowNames.size()>0) res+=colSep;
-            if (c<data[c].size()) res+=doubleToQString(data[c].value(r, 0), precision, 'g', decimalSep);
+            if (r<data[c].size()) res+=doubleToQString(data[c].value(r, 0), precision, 'g', decimalSep);
         }
         res+="\n";
     }
@@ -452,7 +452,7 @@ QString toCSV(const QList<QList<QVariant> >& data, const QStringList& columnName
         }
         for (int c=0; c<cols; c++) {
             if (c>0 || rowNames.size()>0) res+=colSep;
-            if (c<data[c].size()) {
+            if (r<data[c].size()) {
                 const QVariant& v=data[c].value(r, 0);
                 switch(v.type()) {
                     case QVariant::Int:
