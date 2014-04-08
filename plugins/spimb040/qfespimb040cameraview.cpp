@@ -1719,6 +1719,29 @@ void QFESPIMB040CameraView::saveMulti() {
 
 void QFESPIMB040CameraView::saveMultiSeries()
 {
+    QString fileName = qfGetSaveFileName(this, tr("Save current image ..."),
+                            lastImagepath,
+                            "TIFF (*.tif)");
+
+    QFile file(fileName);
+    if (!file.open(QFile::WriteOnly | QFile::Text)) {
+        QMessageBox::warning(this, tr("QuickFit SPIM Control: Save current image ..."),
+                          tr("Cannot write file '%1':\nreason: %2.")
+                          .arg(fileName)
+                          .arg(file.errorString()));
+        return;
+    }
+    file.close();
+    file.remove();
+    lastImagepath=QFileInfo(fileName).absolutePath();
+    QApplication::setOverrideCursor(Qt::WaitCursor);
+
+
+    if (!fileName.isEmpty()) saveMultiSeries(spinSaveSeriesFrames->value(), fileName);
+}
+
+void QFESPIMB040CameraView::saveMultiSeries(int frames, const QString fileName)
+{
     if (m_stopresume) m_stopresume->stop();
     //saveJKImage(rawImage, tr("Save Raw Image ..."));
 
@@ -1727,32 +1750,15 @@ void QFESPIMB040CameraView::saveMultiSeries()
     int camID=opticsSetup->cameraComboBox(cameraID)->currentCameraID();
     int w=camExt->getCameraImageWidth(camID);
     int h=camExt->getCameraImageHeight(camID);
-    int frames=spinSaveSeriesFrames->value();
     QFESPIMB040AcquisitionTools* acqTools=opticsSetup->getAcquisitionTools();
     rawImage.resize(w, h);
 
 
-    QString fileName = qfGetSaveFileName(this, tr("Save current image ..."),
-                            lastImagepath,
-                            "TIFF (*.tif)");
 
     if (fileName.isEmpty()) {
         if (m_stopresume) m_stopresume->resume();
         return;
     }
-    QFile file(fileName);
-    if (!file.open(QFile::WriteOnly | QFile::Text)) {
-        QMessageBox::warning(this, tr("QuickFit SPIM Control: Save current image ..."),
-                          tr("Cannot write file '%1':\nreason: %2.")
-                          .arg(fileName)
-                          .arg(file.errorString()));
-        if (m_stopresume) m_stopresume->resume();
-        return;
-    }
-    file.close();
-    file.remove();
-    lastImagepath=QFileInfo(fileName).absolutePath();
-    QApplication::setOverrideCursor(Qt::WaitCursor);
 
 
     QProgressDialog progress(tr("Acquiring image series ..."), tr("&Cancel"), 0, frames, this);

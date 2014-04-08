@@ -718,6 +718,123 @@ bool QFESPIMB040MainWindow2::setMainIlluminationShutter(bool on_off, bool blocki
     return optSetup->setMainIlluminationShutter(on_off, blocking);
 }
 
+void QFESPIMB040MainWindow2::savePreviewMovie(int camera, int frames, const QString &fileName)
+{
+    //if (m_stopresume) m_stopresume->stop();
+    //saveJKImage(rawImage, tr("Save Raw Image ..."));
+    QFExtension* extension;
+    QFExtensionCamera* camExt;
+    int camID;
+    QString previewSettingsFilename;
+
+    if (optSetup->lockCamera(camera, &extension, &camExt, &camID, &previewSettingsFilename) && (QDir().mkpath(QFileInfo(fileName).absolutePath()))) {
+
+        JKImage<uint32_t> rawImage;
+        int w=camExt->getCameraImageWidth(camID);
+        int h=camExt->getCameraImageHeight(camID);
+        QFESPIMB040AcquisitionTools* acqTools=optSetup->getAcquisitionTools();
+        rawImage.resize(w, h);
+
+
+
+        QProgressDialog progress(tr("Acquiring image series ..."), tr("&Cancel"), 0, frames, this);
+        QSettings settingPrev(previewSettingsFilename, QSettings::IniFormat);
+        camExt->useCameraSettings(camID, settingPrev);
+
+        QFileInfo fi(fileName);
+        QString fn=fi.absolutePath()+"/"+fi.completeBaseName();
+        TIFF* tiff1=TIFFOpen(QString(fn+".tif").toAscii().data(), "w");
+        TIFF* tiff2=TIFFOpen(QString(fn+"_uint32.tif").toAscii().data(), "w");
+        TIFF* tiff3=TIFFOpen(QString(fn+"_float.tif").toAscii().data(), "w");
+        uint64_t timestamp=0;
+        QMap<QString, QVariant> camConfig;
+        QList<double> times;
+        QElapsedTimer timer;
+        timer.start();
+        if (tiff1&&tiff2&&tiff3) {
+            for (int i=0; i<frames; i++) {
+                if (camExt->acquireOnCamera(camID, rawImage.data(), &timestamp, &camConfig)) {
+                    times.append(double(timer.elapsed())/1000.0);
+                    TIFFTWriteUint16from32(tiff1, rawImage.data(), w, h, false);
+                    TIFFWriteDirectory(tiff1);
+                    TIFFTWriteUint32(tiff2, rawImage.data(), w, h);
+                    TIFFWriteDirectory(tiff2);
+                    TIFFTWriteFloatfrom32(tiff3, rawImage.data(), w, h);
+                    TIFFWriteDirectory(tiff3);
+                }
+                if (progress.wasCanceled()) break;
+                progress.setValue(i);
+                QApplication::processEvents();
+            }
+        }
+        QFile f(QString(fn+"_timepoints.dat"));
+        if (f.open(QFile::WriteOnly|QFile::Text)) {
+            QTextStream str(&f);
+            for (int i=0; i<times.size(); i++) {
+                str<<CDoubleToQString(times[i])<<"\n";
+            }
+            f.close();
+        }
+
+
+        QSettings setting(QString(fn+".configuration.ini"), QSettings::IniFormat);
+        //storeCameraConfig(setting);
+        storeCameaConfig(setting, camExt, camID);
+        QString acquisitionDescriptionPrefix="acquisition/";
+        setting.setValue(acquisitionDescriptionPrefix+"exposure", camExt->getCameraExposureTime(camID));
+        setting.setValue(acquisitionDescriptionPrefix+"image_width", rawImage.width());
+        setting.setValue(acquisitionDescriptionPrefix+"image_height", rawImage.height());
+        setting.setValue(acquisitionDescriptionPrefix+"image_frames", frames);
+
+        if (camConfig.size()>0) {
+            QMapIterator<QString, QVariant> it(camConfig);
+            while (it.hasNext()) {
+                it.next();
+                setting.setValue(acquisitionDescriptionPrefix+it.key(), it.value());
+            }
+        }
+
+        optSetup->releaseCamera(camera);
+    }
+}
+
+
+void QFESPIMB040MainWindow2::storeCameaConfig(QSettings& setting, QFExtensionCamera* cam, int camID) {
+    setting.setValue("acquisition/type", "preview");
+    setting.setValue("acquisition/start_time", QDateTime::currentDateTime().toString(Qt::ISODate));
+    setting.setValue("acquisition/pixel_width", cam->getCameraPixelWidth(camID)/optSetup->getCameraMagnification(camID));
+    setting.setValue("acquisition/pixel_height", cam->getCameraPixelHeight(camID)/optSetup->getCameraMagnification(camID));
+    if (optSetup) setting.setValue("acquisition/magnification", optSetup->getCameraMagnification(camID));
+    if (cam) setting.setValue("acquisition/camera_model", cam->getCameraSensorName(camID));
+    if (cam) setting.setValue("acquisition/sensor_model", cam->getCameraName(camID));
+
+
+    QMap<QString, QVariant> acqD;
+    QFESPIMB040OpticsSetup::measuredValues meas;
+    QString acquisitionDescriptionPrefix="setup/";
+    if (optSetup) {
+        acqD=optSetup->getSetup(camID);
+        meas=optSetup->getMeasuredValues();
+    }
+    if (acqD.size()>0) {
+        QMapIterator<QString, QVariant> it(acqD);
+        while (it.hasNext()) {
+            it.next();
+            setting.setValue(acquisitionDescriptionPrefix+it.key(), it.value());
+        }
+    }
+
+    if (meas.data.size()>0){
+        QMapIterator<QString, QVariant> it(meas.data);
+        acquisitionDescriptionPrefix="acquisition/measured_values/";
+        setting.setValue(acquisitionDescriptionPrefix+"time", meas.time.toString(Qt::ISODate));
+        while (it.hasNext()) {
+            it.next();
+            setting.setValue(acquisitionDescriptionPrefix+it.key(), it.value());
+        }
+    }
+}
+
 bool QFESPIMB040MainWindow2::prepareCamera(int num, int camera, QFExtensionCamera *ecamera, const QString& acquisitionSettingsFilename, int &width, int &height, uint32_t **buffer, const QString& acquisitionTitle) {
     width=0;
     height=0;

@@ -486,6 +486,15 @@ void QFESPIMB040ScriptedAcquisitionAcquisitionControl::doImageStack()
     mainWindow->doImageStack();
 }
 
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::acquirePreviewFrames(int camera, int N, const QString &filename)
+{
+    widAcquisition->updateReplaces();
+    const QString fn=widAcquisition->transformFilename(filename);
+    qDebug()<<filename;
+    qDebug()<<fn;
+    mainWindow->savePreviewMovie(camera, N, fn);
+}
+
 
 void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setAcquisitionCamera1Setting(const QString which, QVariant value)
 {

@@ -141,6 +141,10 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
 
         //acquisitionPrefix1+"_overview.tif"
     public:
+        void savePreviewMovie(int camera, int frames, const QString& filename);
+
+        void storeCameaConfig(QSettings& setting, QFExtensionCamera* cam, int camID);
+
         /*! \brief save an image from the given camera as a 16-bit TIFF image into \a filename
 
             \note This function configures the camera with the preview settings, acquires ONE frame and saves it to the given file.

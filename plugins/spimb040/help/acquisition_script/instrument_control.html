@@ -94,10 +94,16 @@
 		<b><tt><!-- template -->acquisition.doAcquisition()<!-- /template --></tt> - <i>perform an standard acquisition with the settings currently specified in the <a href="../ext_spimb040_acquisition.html">Acquisition tab</a>. </i>:</b><br>
 		<!-- /func:acquisition.doAcquisition -->
 		</li>
-		<li><a name="acquisition.doImageStack"/><!-- func:acquisition.doImageStack -->
-		<b><tt><!-- template -->acquisition.doImageStack()<!-- /template --></tt> - <i>perform an image stack acquisition with the settings currently specified in the <a href="../ext_spimb040_acquisition.html">Acquisition tab</a>. </i>:</b><br>
-		<!-- /func:acquisition.doImageStack -->
-		</li>
+                <li><a name="acquisition.doImageStack"/><!-- func:acquisition.doImageStack -->
+                <b><tt><!-- template -->acquisition.doImageStack()<!-- /template --></tt> - <i>perform an image stack acquisition with the settings currently specified in the <a href="../ext_spimb040_acquisition.html">Acquisition tab</a>. </i>:</b><br>
+                <!-- /func:acquisition.doImageStack -->
+                </li>
+
+                <li><a name="acquisition.acquirePreviewFrames"/><!-- func:acquisition.acquirePreviewFrames -->
+                <b><tt><!-- template -->acquisition.acquirePreviewFrames(<!--°-->camera<!--°-->, N, "filename")<!-- /template --></tt> - <i>acquire <i>N</i> frames on the given camera (0 or 1) and store them as TIFF files under the given <i>filename</i>. </i>:</b><br>
+                <!-- /func:acquisition.acquirePreviewFrames -->
+                </li>
+
                 <li><a name="acquisition.setAcquisitionCamera1Setting"/><!-- func:acquisition.setAcquisitionCamera1Setting -->
                 <b><tt><!-- template -->acquisition.setAcquisitionCamera1Setting("<!--°-->which<!--°-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 1 to the given value.
                 </i>:</b><br> Possible values for which are:$$include:acqwhich.inc$$

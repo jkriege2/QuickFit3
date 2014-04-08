@@ -76,6 +76,8 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief set size of pixels */
         void setPixelSize(double pixelWidth, double pixelHeight);
 
+        void saveMultiSeries(int frames, const QString filename);
+
     public slots:
         /** \brief display a new image in the widget, this does not gurantee an update of the statistics
 

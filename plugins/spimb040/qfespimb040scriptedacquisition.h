@@ -83,11 +83,11 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
         void setStatusProgress(double value);
         void incStatusProgress();
         void incStatusProgress(double value);
+        void updateReplaces();
 
     protected slots:
         void on_btnExecute_clicked();
         void on_btnCancel_clicked();
-        void updateReplaces();
         void on_btnNew_clicked();
         void on_btnOpen_clicked();
         void on_btnSave_clicked();

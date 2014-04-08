@@ -124,6 +124,7 @@ class QFESPIMB040ScriptedAcquisitionAcquisitionControl : public QObject, public 
     public slots:
         void doAcquisition();
         void doImageStack();
+        void acquirePreviewFrames(int camera, int N, const QString& filename);
         void clearAcquisitionCamera1Settings();
         void setAcquisitionCamera1Setting(const QString which, QVariant value);
         QVariant getAcquisitionCamera1Setting(const QString which);
