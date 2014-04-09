@@ -22,24 +22,24 @@
 -->
 
 <!--
-QuickFit3/fitfunction_spimfcs:
-  - 
 
-QuickFit3/fitfunction_tirfcs:
-  - all anomalous diffusion fit functions now calculate MSDs after a given timespan and the time to leave the focal effective area
-
-QuickFit3/imagingFCS:
-  - 
+  
 -->
-
 <!--
-		<li><a name="3070"><b>2014-02-05 (SVN: 3070)</b>-->
+		<li><a name="3147"><b>2014-02-05 (SVN: 3147)</b>-->
 		<ul>
+		  <li><b>new plugins:</b><ul>
+			<li><b>cam_server</b>:  added this plugin, which allows to use a custom camera server (for CHSPAD server)</li>
+			<li><b>meas_spadmeasurement</b>:  added plugin  to read the SPAD surveilance circuit</li>
+		  </ul></li>
 		  <li><b>QuickFit</b><ul>
 			<li>added display of internal result/evaluation names and groups [i.e. common information] to result tables tooltips in rdr and evaluation editors</li>
 			<li>bugfix: correlation view: regression parameters were not displayed correctly in plot key</li>
 			<li>bugfix: correlation view: show more digits in plot keys</li>
+			<li>bugfix: CSV export save at most quadratic tables!</li>
 			<li>improved copy data from a table functions: when interacting with table-RDR (column names were not copied appropriately)</li>
+			<li> bugfix: PDF/PS output on Linux was in greyscale, not in color mode</li>
+			<li>several parts are more stable now, if large images are processed (>65535 pixels)</li>
 		    <li>plotter widgets:<ul>
 				<li>boxplots plot only parts of the whole box if some columns are missing</li>
 				<li>added error boxes and error ellipses as additional error styles</li>
@@ -51,12 +51,15 @@ QuickFit3/imagingFCS:
 				<li>added function forsave() which is a save version of the for() construct (i.e. does not crash if any expressions evaluates to non-number)</li>
 				<li>added function filterfinit() which removoves all nan/inf values from a vector of numbers</li>
 			</ul></li>
+			<li>QFExtensionMeasurementAndControlDevice now support string parameters</li>
+			<li>added menu entry to directly open one of the contained example projects (like open, but starts in the directory containing the examples)</li>
 		  </ul></li>	
 		  <li><b>MaxEnt FCS Fit</b><ul>
 			<li>added camera SPIM-FCS 3D diffusion model</li>
 			<li>added camera TIR-FCS 2D diffusion model</li>
 			<li>added overview image tab (to the residuals statistics tabs at the bottom of screen) for imFCS records</li>
 			<li>added possibility to change the tau-axis with different modes (lin./log. range of times or diffusion coefficients)</li>
+			<li>added user-defined distribution time axes</li>
 		  </ul></li>	
 		  <li><b>MSD FCS Fit</b><ul>
 			<li>added camera SPIM-FCS 3D diffusion model</li>
@@ -66,13 +69,16 @@ QuickFit3/imagingFCS:
 		  <li><b>imFCCSFit</b><ul>
 			<li>added option to save ACF/CCF amplitudes when calculating crosstalk-corrected relative CCF-amplitudes</li>
 		  </ul></li>	
-                  <li><b>FCS fit functions</b><ul>
-                        <li>added model with exponential decays</li>
-                  </ul></li>    
-                  <li><b>SPIM-FCS fit functions</b><ul>
-                        <li>all anomalous diffusion fit functions now calculate MSDs after a given timespan and the time to leave the focal effective area</li>
-                        <li>some normal diffusion fit functions now calculate MSDs after a given timespan and the time to leave the focal effective area</li>
-                  </ul></li>    
+		  <li><b>FCS fit functions</b><ul>
+				<li>added model with exponential decays</li>
+				<li>added simple (double) exponential decay</li>
+				<li>added simple (double) ower law decay</li>
+				<li>added normal diffusion model with afterpulsing component (using gamma or wz for wz, D as parameter)</li>
+		  </ul></li>    
+		  <li><b>SPIM-FCS fit functions</b><ul>
+				<li>all anomalous diffusion fit functions now calculate MSDs after a given timespan and the time to leave the focal effective area</li>
+				<li>some normal diffusion fit functions now calculate MSDs after a given timespan and the time to leave the focal effective area</li>
+		  </ul></li>    
 		  <li><b>TIR-FCS fit functions</b><ul>
 			<li>all anomalous diffusion fit functions now calculate MSDs after a given timespan and the time to leave the focal effective area</li>
 			<li>some normal diffusion fit functions now calculate MSDs after a given timespan and the time to leave the focal effective area</li>
@@ -87,6 +93,11 @@ QuickFit3/imagingFCS:
 			<li>added mask and selection builder dialogs (+ menu entries in the imFCS RDR Editor, "Selection" and "Mask" menus), which allow to build a selection/mask from up to three conditions to parameter images/overview images (in-range/out-of-range/>=threshold/<=threshold)</li>
 			<li>"copy fit results to excel" allows now to also save the results and to copy results from several (selectable) files.</li>
 			<li>added option "Selection|set background from selection" and "Mask|set background from masked", which averages over the intensity of the selected/masked pixel and sets it as background intensity, which can be used for fitting -&gt; imFCS/imFCCS fit</li>
+			<li>added user background to countrate curve plot</li>
+			<li>overview image color may be scaled between 5% and 95% quantile now</li>
+			<li>added checkbox to RDR editors that allows to set, whether the image plots should keep an aspect ratio of 1 or not. In the latter case the image fills the available space, and pixels may be non-square shaped!</li>
+			<li>added two functions (to data menu in fit parameter image RDR) that allow to copy the average CorrelationFunction and the selected pixels correlation function to a table RDR</li>
+			<li>added function to bin correlation functions without recorrelation.</li>
 		  </ul></li>	
 		  <li><b>table</b><ul>
 			<li>bugfix: saved negative row/col numbers into QFTableXML-File, if the whole table was saved</li>
@@ -98,10 +109,20 @@ QuickFit3/imagingFCS:
 			<li>added math parser functions to get a column as string vector or boolean vector (columnstr(), columnbool())</li>
 			<li>in graph settings: added buttons to clear each data column selection</li>
 			<li>in graph settings: added buttons to automatically determine (by an educated guess ;-) data columns based on one selected column</li>
+			<li>bugfix: remove unneeded delete buttons</li>
+			<li>improved reading of table column header, when pasting to a table or loading from a file</li>
 		  </ul></li>	
 		  <li><b>B040SPIM</b><ul>
 			<li>added methods to access measurement devices with JavaScripts</li>
 			<li>added methods to create/write into text files from JavaScript</li>
+			<li>more instructions for scripted acquisition: <ul>
+			  <li>access to "acquisition description"</li>
+			  <li>bugfixed setLaserIntensity() and setBrightFieldIntensity()</li>
+			  <li></li>
+			  <li></li>
+			</ul></li>  
+			<li>added two MeasurementDevice tabs to optics setup</li>
+			
 		  </ul></li>	
 		  <li><b>FCS Fit</b><ul>
 			<li>bugfix: countrate was read from RDR for some fit models</li>
@@ -110,6 +131,7 @@ QuickFit3/imagingFCS:
 		  <li><b>imFCS Fit</b><ul>
 			<li>bugfix: countrate was read from RDR for some fit models</li>
 			<li>added spinbox to set number of repeated calls of the fit algorithm for each run/pixel</li>
+			<li>bugfix: sometime the imaging FCS fit "fit all runs" crashed</li>
 		  </ul></li>	
 		  <li><b>Diffusion coefficient calculator</b><ul>
 			<li>added "viscosity factor", which is multiplied to any solution viscosity (e.g. to estimate diffusion in cells with eta_cell=3*eta_buffer)</li>
@@ -117,6 +139,13 @@ QuickFit3/imagingFCS:
 		  </ul></li>	
 	      <li><b>picoquantimporters</b><ul>
 			<li>the import does not halt anymore, if a T3R file has a number of boards &gt;1</li>
+		  </ul></li>	
+	      <li><b>spectra viewer</b><ul>
+			<li>added "E2V: front-illuminated EMCCD sensor CCD97" detector spectrum</li>
+			<li>added Andor Clara CCD camera detector spectrum</li>
+		  </ul></li>	
+	      <li><b>light sheet analysis</b><ul>
+			<li>added function to save a cut through the lightsheet at different positions.</li>
 		  </ul></li>	
 
 		</ul></li>
