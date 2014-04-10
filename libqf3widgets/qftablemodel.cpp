@@ -1479,7 +1479,7 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
                             //int ildtn=oldt.toInt(&ok);
                             ok=((rxDefault1.indexIn(oldt)==0) || (rxDefault2.indexIn(oldt)==0));
                             //qDebug()<<oldt<<ok<<rxDefault1.indexIn(oldt)<<rxDefault2.indexIn(oldt)<<oldt.isEmpty();
-                            if (alsoReadHeaders==QFTableModel::rhmAskOverwrite && firstOverwrite && !oldt.isEmpty() && !ok) {
+                            if (alsoReadHeaders==QFTableModel::rhmAskOverwrite && firstOverwrite && !oldt.isEmpty() && oldt!=t && !ok) {
                                 //qDebug()<<oldt<<ok;
                                 firstOverwrite=false;
                                 overwriteHeader=QMessageBox::question(NULL, tr("Overwrite Headers?"), tr("Overwrite already existing table headers?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes;
@@ -1505,9 +1505,9 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
                                     if (clearTable || read_template_only || alsoReadHeaders==QFTableModel::rhmReadHeader) setColumnHeaderData(c, rxAtrD.cap(1).toInt(), md);
                                     else if (alsoReadHeaders==QFTableModel::rhmOverwriteNondefault || alsoReadHeaders==QFTableModel::rhmAskOverwrite) {
                                         QVariant hdold=getColumnHeaderData(c, rxAtrD.cap(1).toInt());
-                                        if (alsoReadHeaders==QFTableModel::rhmAskOverwrite && firstOverwrite && hdold.isValid() && !hdold.isNull()) {
+                                        if (alsoReadHeaders==QFTableModel::rhmAskOverwrite && firstOverwrite && hdold.isValid() && hdold!=md && !hdold.isNull()) {
                                             firstOverwrite=false;
-                                            overwriteHeader=QMessageBox::question(NULL, tr("Overwrite Headers?"), tr("Overwrite already existing table headers?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes;
+                                            overwriteHeader=QMessageBox::question(NULL, tr("Overwrite Headers?"), tr("Overwrite already existing table header properties?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes;
                                         }
                                         if (!hdold.isValid() || hdold.isNull() || overwriteHeader)  {
                                             setColumnHeaderData(c, rxAtrD.cap(1).toInt(), md);

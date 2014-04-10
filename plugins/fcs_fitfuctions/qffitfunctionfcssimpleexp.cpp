@@ -14,11 +14,11 @@ QFFitFunctionFCSSimpleExp::QFFitFunctionFCSSimpleExp() {
     #define FCSDiff_n_components 0
     addParameter(FloatNumber,  "pre1",                    "prefactor a1",                                           "a<sub>1</sub>",            "",        "",                          true,      true,         true,              QFFitFunction::DisplayError, false, 1.0,          0,        1e10  );
     #define FCSDiff_pre1 1
-    addParameter(FloatNumber,  "tau1",                    "decay time tau1",                                        "&tau;<sub>1</sub>",        "us",      "&mu;s",                     true,      true,         true,              QFFitFunction::DisplayError, false, 10.0,          1e10,        1e10,  1);
+    addParameter(FloatNumber,  "tau1",                    "decay time tau1",                                        "&tau;<sub>1</sub>",        "us",      "&mu;s",                     true,      true,         true,              QFFitFunction::DisplayError, false, 10.0,          1e-10,        1e10,  1);
     #define FCSDiff_tau1 2
     addParameter(FloatNumber,  "pre2",                    "prefactor a2",                                           "a<sub>2</sub>",            "",        "",                          true,      true,         true,              QFFitFunction::DisplayError, false, 1.0,          0,        1e10  );
     #define FCSDiff_pre2 3
-    addParameter(FloatNumber,  "tau2",                    "decay time tau2",                                        "&tau;<sub>2</sub>",        "us",      "&mu;s",                     true,      true,         true,              QFFitFunction::DisplayError, false, 1000.0,          1e10,        1e10,  1);
+    addParameter(FloatNumber,  "tau2",                    "decay time tau2",                                        "&tau;<sub>2</sub>",        "us",      "&mu;s",                     true,      true,         true,              QFFitFunction::DisplayError, false, 1000.0,          1e-10,        1e10,  1);
     #define FCSDiff_tau2 4
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
     #define FCSDiff_offset 5

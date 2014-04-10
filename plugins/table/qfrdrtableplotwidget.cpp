@@ -1345,10 +1345,46 @@ int QFRDRTablePlotWidget::getColumnWithStride(int column, const QFRDRTable::Grap
 {
     //qDebug()<<"getColumnWithStride  column="<<column<<"    strided: "<<g.isStrided<<" stride="<<g.stride<<" strideStart="<<g.strideStart;
     if (column>=0 && column<(long)ui->plotter->getDatastore()->getColumnCount()) {
-        if (g.isStrided) {
-            return ui->plotter->getDatastore()->copyColumn(column, g.strideStart-1, g.stride, tr("(%2,%3)-strided \"%1\"").arg(ui->plotter->getDatastore()->getColumnNames().at(column)).arg(g.strideStart).arg(g.stride));
+        QVector<double> data=ui->plotter->getDatastore()->getColumn(column).copyData();
+        if (g.isDataSelect && g.dataSelectColumn>=0 && g.dataSelectColumn<(long)ui->plotter->getDatastore()->getColumnCount()) {
+            QVector<double> dataS=ui->plotter->getDatastore()->getColumn(g.dataSelectColumn).copyData();
+            QVector<double> dataO;
+            int istart=0;
+            int iinc=1;
+            if (g.isStrided) {
+                istart=g.strideStart-1;
+                iinc=g.stride;
+            }
+            for (int i=istart; i< qMin(data.size(), dataS.size()); i=i+iinc) {
+                switch(g.dataSelectOperation) {
+                    case QFRDRTable::dsoEquals:
+                        if (dataS[i]==g.dataSelectCompareValue) dataO.append(data[i]);
+                        break;
+                    case QFRDRTable::dsoUnequal:
+                        if (dataS[i]!=g.dataSelectCompareValue) dataO.append(data[i]);
+                        break;
+                    case QFRDRTable::dsoGreaterOrEqual:
+                        if (dataS[i]>=g.dataSelectCompareValue) dataO.append(data[i]);
+                        break;
+                    case QFRDRTable::dsoSmallerOrEqual:
+                        if (dataS[i]<=g.dataSelectCompareValue) dataO.append(data[i]);
+                        break;
+                    case QFRDRTable::dsoGreater:
+                        if (dataS[i]>g.dataSelectCompareValue) dataO.append(data[i]);
+                        break;
+                    case QFRDRTable::dsoSmaller:
+                        if (dataS[i]<g.dataSelectCompareValue) dataO.append(data[i]);
+                        break;
+                }
+            }
+            if (dataO.size()>0) return ui->plotter->getDatastore()->addCopiedColumn(dataO.data(), dataO.size(), tr("(%2,%3)-strided, selected (%4 %5 %6) \"%1\"").arg(ui->plotter->getDatastore()->getColumnNames().at(column)).arg(g.strideStart).arg(g.stride).arg(ui->plotter->getDatastore()->getColumnNames().at(g.dataSelectColumn)).arg(QFRDRTable::DataSelectOperation2String(g.dataSelectOperation)).arg(g.dataSelectCompareValue));
+            else return -1;
         } else {
-            return column;
+            if (g.isStrided) {
+                return ui->plotter->getDatastore()->copyColumn(column, g.strideStart-1, g.stride, tr("(%2,%3)-strided \"%1\"").arg(ui->plotter->getDatastore()->getColumnNames().at(column)).arg(g.strideStart).arg(g.stride));
+            } else {
+                return column;
+            }
         }
     }
     return -1;

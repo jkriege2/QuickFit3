@@ -159,6 +159,38 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             return gtLines;
         }
 
+
+        enum DataSelectOperation {
+            dsoEquals=0,
+            dsoUnequal=1,
+            dsoGreaterOrEqual=2,
+            dsoSmallerOrEqual=3,
+            dsoGreater=4,
+            dsoSmaller=5
+        };
+
+        static QString DataSelectOperation2String(DataSelectOperation type) {
+            switch(type) {
+                case dsoUnequal: return QString("!=");
+                case dsoGreaterOrEqual: return QString(">=");
+                case dsoSmallerOrEqual: return QString("<=");
+                case dsoGreater: return QString(">");
+                case dsoSmaller: return QString("<");
+                default:
+                case dsoEquals: return QString("==");
+            }
+
+        }
+        static DataSelectOperation String2DataSelectOperation(QString type) {
+            if(type=="!=") return dsoUnequal;
+            if(type==">=") return dsoGreaterOrEqual;
+            if(type=="<=") return dsoSmallerOrEqual;
+            if(type==">") return dsoGreater;
+            if(type=="<") return dsoSmaller;
+            return dsoEquals;
+        }
+
+
         struct GraphInfo {
             GraphInfo();
             //void setBoxplotColumns(int position, int minC, int q25C, int medianC, int meanC, int q75C, int maxC);
@@ -196,6 +228,11 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             int stride;
             int strideStart;
             bool isStrided;
+
+            bool isDataSelect;
+            int dataSelectColumn;
+            DataSelectOperation dataSelectOperation;
+            double dataSelectCompareValue;
 
             int imageTicks;
             int imageModTicks;

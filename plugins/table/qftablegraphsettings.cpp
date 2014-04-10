@@ -53,6 +53,7 @@ QFTableGraphSettings::QFTableGraphSettings(QWidget *parent) :
     ui->edtImageX->setCheckBounds(true, false);
     ui->edtImageY->setCheckBounds(true, false);
     ui->cmbGraphType->setCurrentIndex(0);
+    ui->edtSelectDataValue->setCheckBounds(false, false);
 
 
 
@@ -137,6 +138,7 @@ void QFTableGraphSettings::updateComboboxes()
     reloadColumns(ui->cmbLinesMax);
     reloadColumns(ui->cmbLinesMean);
     reloadColumns(ui->cmbLinesQ75);
+    reloadColumns(ui->cmbSelectDataColumn);
 }
 
 void QFTableGraphSettings::fitFunctionChanged()
@@ -314,6 +316,11 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.strideStart=ui->spinStrideStart->value();
         graph.modifierMode=(JKQTPMathImage::ModifierMode)ui->cmbModifierMode->currentIndex();
 
+        graph.isDataSelect=ui->chkSelectData->isChecked();
+        graph.dataSelectColumn=qMax(-1, ui->cmbSelectDataColumn->currentIndex()-1);
+        graph.dataSelectOperation=(QFRDRTable::DataSelectOperation)ui->cmbSelectDataCompare->currentIndex();
+        graph.dataSelectCompareValue=ui->edtSelectDataValue->value();
+
         graph.functionType=(QFRDRTable::GTFunctionType)ui->cmbFunctionType->currentIndex();
         if (graph.functionType==QFRDRTable::gtfQFFunction) {
             graph.function=ui->cmbQFFitFunction->currentFitFunctionID();
@@ -414,6 +421,12 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->spinStrideStart->setValue(graph.strideStart);
     ui->cmbModifierMode->setCurrentIndex(graph.modifierMode);
 
+
+    ui->chkSelectData->setChecked(graph.isDataSelect);
+    ui->cmbSelectDataColumn->setCurrentIndex(graph.dataSelectColumn);
+    ui->cmbSelectDataCompare->setCurrentIndex(graph.dataSelectOperation);
+    ui->edtSelectDataValue->setValue(graph.dataSelectCompareValue);
+
     ui->cmbFunctionType->setCurrentIndex((int)graph.functionType);
     if (graph.functionType==QFRDRTable::gtfQFFunction) {
         ui->cmbQFFitFunction->setCurrentFitFunction(graph.function);
@@ -484,6 +497,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         ui->labFuction->setVisible(false);
         ui->chkSTrided->setVisible(true);
         ui->widStride->setVisible(true);
+        ui->chkSelectData->setVisible(true);
+        ui->widDataSelect->setVisible(true);
         ui->cmbWhiskerStyle->setVisible(false);
         ui->labWhisker->setVisible(false);
 
@@ -853,6 +868,10 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->btnClearLinesXError->setVisible(false);
                 ui->btnClearLinesYData->setVisible(true);
                 ui->btnClearLinesYError->setVisible(false);
+                ui->chkSelectData->setVisible(false);
+                ui->widDataSelect->setVisible(false);
+                ui->chkSTrided->setVisible(false);
+                ui->widStride->setVisible(false);
 
                 ui->labTransparencyFalse->setVisible(false);
                 ui->widFalseTransparency->setVisible(false);
@@ -898,6 +917,10 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labErrorX->setText(tr("G col.:"));
                 ui->labDataY->setText(tr("B col.:"));
                 ui->labErrorY->setText(tr("modifier col.:"));
+                ui->chkSelectData->setVisible(false);
+                ui->widDataSelect->setVisible(false);
+                ui->chkSTrided->setVisible(false);
+                ui->widStride->setVisible(false);
 
                 ui->labTransparencyFalse->setVisible(false);
                 ui->widFalseTransparency->setVisible(false);
@@ -935,6 +958,10 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->btnClearLinesXError->setVisible(false);
                 ui->btnClearLinesYData->setVisible(false);
                 ui->btnClearLinesYError->setVisible(false);
+                ui->chkSelectData->setVisible(false);
+                ui->widDataSelect->setVisible(false);
+                ui->chkSTrided->setVisible(false);
+                ui->widStride->setVisible(false);
 
                 ui->labErrorY->setVisible(false);
                 ui->labSymbol->setVisible(false);
@@ -991,6 +1018,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widImage->setVisible(false);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
+                ui->chkSelectData->setVisible(false);
+                ui->widDataSelect->setVisible(false);
                 ui->chkSTrided->setVisible(false);
                 ui->widStride->setVisible(false);
 
@@ -1056,6 +1085,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->cmbLinesYError->setVisible(false);
                 ui->widFunction->setVisible(false);
                 ui->labFuction->setVisible(false);
+                ui->chkSelectData->setVisible(false);
+                ui->widDataSelect->setVisible(false);
                 ui->chkSTrided->setVisible(false);
                 ui->widStride->setVisible(false);
                 ui->btnClearLinesXData->setVisible(false);
@@ -1142,6 +1173,10 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->chkSTrided, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->spinStride, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->spinStrideStart, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->chkSelectData, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    connect(ui->cmbSelectDataColumn, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbSelectDataCompare, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->edtSelectDataValue, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
     connect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
 
@@ -1229,6 +1264,10 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->chkSTrided, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     disconnect(ui->spinStride, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->spinStrideStart, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->chkSelectData, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbSelectDataColumn, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbSelectDataCompare, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->edtSelectDataValue, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 
     disconnect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
     disconnect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));

@@ -98,7 +98,10 @@ QFRDRTable::GraphInfo::GraphInfo() {
     fillColorAuto=true;
     centerColorAuto=true;
 
-
+    isDataSelect=false;
+    dataSelectColumn=-1;
+    dataSelectOperation=dsoEquals;
+    dataSelectCompareValue=0;
 }
 
 QFRDRTable::AxisInfo::AxisInfo()
@@ -1524,6 +1527,12 @@ void QFRDRTable::intReadData(QDomElement* e) {
                     graph.width=CQStringToDouble(ge.attribute("width", "0.9"));
                     graph.shift=CQStringToDouble(ge.attribute("shift", "0"));
 
+                    graph.isDataSelect=QStringToBool(ge.attribute("is_data_select", "false"));
+                    graph.dataSelectColumn=ge.attribute("data_select_column", "-1").toInt();;
+                    graph.dataSelectOperation=String2DataSelectOperation(ge.attribute("data_select_operation", "=="));
+                    graph.dataSelectCompareValue=CQStringToDouble(ge.attribute("data_select_value", "0.0"));
+
+
                     graph.imageTrueColor=QStringToQColor(ge.attribute("image_truecolor", "blue"));
                     graph.imageTrueTransparent=CQStringToDouble(ge.attribute("image_truecolor_trans", "0.5"));
                     graph.imageFalseColor=QStringToQColor(ge.attribute("image_falsecolor", "red"));
@@ -1796,6 +1805,12 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             w.writeAttribute("stride_start", QString::number(plots[i].graphs[g].strideStart));
             w.writeAttribute("is_strided", boolToQString(plots[i].graphs[g].isStrided));
             w.writeAttribute("modifier_mode", JKQTPMathImage::ModifierModeToString(plots[i].graphs[g].modifierMode));
+
+            w.writeAttribute("is_data_select", boolToQString(plots[i].graphs[g].isDataSelect));
+            w.writeAttribute("data_select_column", QString::number(plots[i].graphs[g].dataSelectColumn));
+            w.writeAttribute("data_select_operation", DataSelectOperation2String(plots[i].graphs[g].dataSelectOperation));
+            w.writeAttribute("data_select_value", CDoubleToQString(plots[i].graphs[g].dataSelectCompareValue));
+
 
 
             w.writeAttribute("error_width", CDoubleToQString(plots[i].graphs[g].errorWidth));

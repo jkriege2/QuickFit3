@@ -375,7 +375,7 @@
      </layout>
     </widget>
    </item>
-   <item row="17" column="0">
+   <item row="18" column="0">
     <widget class="QLabel" name="labColor">
      <property name="font">
       <font>
@@ -391,7 +391,7 @@
      </property>
     </widget>
    </item>
-   <item row="17" column="1">
+   <item row="18" column="1">
     <widget class="QWidget" name="widColor" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="1,0,0,0">
       <property name="margin">
@@ -484,7 +484,7 @@
      </layout>
     </widget>
    </item>
-   <item row="18" column="0">
+   <item row="19" column="0">
     <widget class="QLabel" name="labLinestyle">
      <property name="font">
       <font>
@@ -500,7 +500,7 @@
      </property>
     </widget>
    </item>
-   <item row="18" column="1">
+   <item row="19" column="1">
     <widget class="QWidget" name="widLineStyle" native="true">
      <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0,0,0,0,0">
       <property name="margin">
@@ -577,7 +577,7 @@
      </layout>
     </widget>
    </item>
-   <item row="19" column="0">
+   <item row="20" column="0">
     <widget class="QLabel" name="labFillColor">
      <property name="font">
       <font>
@@ -593,7 +593,7 @@
      </property>
     </widget>
    </item>
-   <item row="19" column="1">
+   <item row="20" column="1">
     <widget class="QWidget" name="widFillColor" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="0,0,0,0,0,0">
       <property name="margin">
@@ -701,7 +701,7 @@
      </layout>
     </widget>
    </item>
-   <item row="20" column="0">
+   <item row="21" column="0">
     <widget class="QLabel" name="labSymbol">
      <property name="font">
       <font>
@@ -717,7 +717,7 @@
      </property>
     </widget>
    </item>
-   <item row="20" column="1">
+   <item row="21" column="1">
     <widget class="QWidget" name="widSymbol" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_22" stretch="1,0,0">
       <property name="margin">
@@ -768,7 +768,7 @@
      </layout>
     </widget>
    </item>
-   <item row="22" column="0">
+   <item row="23" column="0">
     <widget class="QLabel" name="labErrorStyle">
      <property name="font">
       <font>
@@ -784,7 +784,7 @@
      </property>
     </widget>
    </item>
-   <item row="22" column="1">
+   <item row="23" column="1">
     <widget class="QWidget" name="widErrorStyle" native="true">
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
@@ -983,7 +983,7 @@
      </layout>
     </widget>
    </item>
-   <item row="24" column="0">
+   <item row="25" column="0">
     <widget class="QLabel" name="labImage">
      <property name="font">
       <font>
@@ -999,7 +999,7 @@
      </property>
     </widget>
    </item>
-   <item row="24" column="1">
+   <item row="25" column="1">
     <widget class="QWidget" name="widImage" native="true">
      <layout class="QGridLayout" name="gridLayout_5" rowminimumheight="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
       <property name="margin">
@@ -1704,7 +1704,7 @@
      </layout>
     </widget>
    </item>
-   <item row="27" column="1">
+   <item row="28" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -1840,7 +1840,7 @@
    <item row="14" column="1">
     <widget class="QEnhancedTableView" name="tabFunctionParameters"/>
    </item>
-   <item row="21" column="0">
+   <item row="22" column="0">
     <widget class="QLabel" name="labWidth">
      <property name="font">
       <font>
@@ -1856,7 +1856,7 @@
      </property>
     </widget>
    </item>
-   <item row="21" column="1">
+   <item row="22" column="1">
     <widget class="QWidget" name="widWidth" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="margin">
@@ -1961,7 +1961,7 @@
      </layout>
     </widget>
    </item>
-   <item row="16" column="0">
+   <item row="17" column="0">
     <widget class="QLabel" name="labRangeData">
      <property name="font">
       <font>
@@ -1977,7 +1977,7 @@
      </property>
     </widget>
    </item>
-   <item row="16" column="1">
+   <item row="17" column="1">
     <widget class="QWidget" name="widRangeData" native="true">
      <layout class="QGridLayout" name="gridLayout">
       <property name="margin">
@@ -1987,16 +1987,6 @@
        <widget class="QLabel" name="label">
         <property name="text">
          <string>start:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QFDoubleEdit" name="edtRangeStart">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
         </property>
        </widget>
       </item>
@@ -2034,10 +2024,20 @@
         </property>
        </widget>
       </item>
+      <item row="0" column="1">
+       <widget class="QFDoubleEdit" name="edtRangeStart">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
-   <item row="25" column="0">
+   <item row="26" column="0">
     <widget class="QLabel" name="labRangeStyle">
      <property name="font">
       <font>
@@ -2053,7 +2053,7 @@
      </property>
     </widget>
    </item>
-   <item row="25" column="1">
+   <item row="26" column="1">
     <widget class="QWidget" name="widRangeStyle" native="true">
      <layout class="QGridLayout" name="gridLayout_3">
       <property name="margin">
@@ -2549,6 +2549,88 @@
      </property>
     </widget>
    </item>
+   <item row="16" column="0">
+    <widget class="QCheckBox" name="chkSelectData">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>select data:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="16" column="1">
+    <widget class="QWidget" name="widDataSelect" native="true">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout_12">
+      <item>
+       <widget class="QComboBox" name="cmbSelectDataColumn">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="cmbSelectDataCompare">
+        <item>
+         <property name="text">
+          <string>==</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>!=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&gt;=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&lt;=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&gt;</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&lt;</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFDoubleEdit" name="edtSelectDataValue">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -2612,8 +2694,8 @@
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="qfrdrtable.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="qfrdrtable.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
@@ -2625,11 +2707,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>568</x>
-     <y>609</y>
+     <y>637</y>
     </hint>
     <hint type="destinationlabel">
      <x>596</x>
-     <y>610</y>
+     <y>638</y>
     </hint>
    </hints>
   </connection>
@@ -2641,11 +2723,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>454</x>
-     <y>655</y>
+     <y>683</y>
     </hint>
     <hint type="destinationlabel">
      <x>482</x>
-     <y>656</y>
+     <y>684</y>
     </hint>
    </hints>
   </connection>
@@ -2657,11 +2739,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>567</x>
-     <y>725</y>
+     <y>753</y>
     </hint>
     <hint type="destinationlabel">
      <x>595</x>
-     <y>726</y>
+     <y>754</y>
     </hint>
    </hints>
   </connection>
@@ -2689,11 +2771,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>192</x>
-     <y>960</y>
+     <y>988</y>
     </hint>
     <hint type="destinationlabel">
      <x>351</x>
-     <y>962</y>
+     <y>990</y>
     </hint>
    </hints>
   </connection>
@@ -2705,11 +2787,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>192</x>
-     <y>960</y>
+     <y>988</y>
     </hint>
     <hint type="destinationlabel">
      <x>431</x>
-     <y>962</y>
+     <y>990</y>
     </hint>
    </hints>
   </connection>
@@ -2721,11 +2803,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>192</x>
-     <y>960</y>
+     <y>988</y>
     </hint>
     <hint type="destinationlabel">
      <x>590</x>
-     <y>962</y>
+     <y>990</y>
     </hint>
    </hints>
   </connection>
@@ -2737,11 +2819,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>596</x>
-     <y>610</y>
+     <y>638</y>
     </hint>
     <hint type="destinationlabel">
      <x>568</x>
-     <y>609</y>
+     <y>637</y>
     </hint>
    </hints>
   </connection>
@@ -2753,11 +2835,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>482</x>
-     <y>656</y>
+     <y>684</y>
     </hint>
     <hint type="destinationlabel">
      <x>454</x>
-     <y>655</y>
+     <y>683</y>
     </hint>
    </hints>
   </connection>
@@ -2769,11 +2851,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>595</x>
-     <y>726</y>
+     <y>754</y>
     </hint>
     <hint type="destinationlabel">
      <x>567</x>
-     <y>725</y>
+     <y>753</y>
     </hint>
    </hints>
   </connection>
@@ -2785,11 +2867,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>568</x>
-     <y>869</y>
+     <y>897</y>
     </hint>
     <hint type="destinationlabel">
      <x>596</x>
-     <y>855</y>
+     <y>898</y>
     </hint>
    </hints>
   </connection>
@@ -2800,12 +2882,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>558</x>
-     <y>877</y>
+     <x>568</x>
+     <y>920</y>
     </hint>
     <hint type="destinationlabel">
      <x>596</x>
-     <y>882</y>
+     <y>921</y>
     </hint>
    </hints>
   </connection>
@@ -2817,11 +2899,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>596</x>
-     <y>855</y>
+     <y>898</y>
     </hint>
     <hint type="destinationlabel">
      <x>568</x>
-     <y>869</y>
+     <y>897</y>
     </hint>
    </hints>
   </connection>
@@ -2833,11 +2915,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>596</x>
-     <y>882</y>
+     <y>921</y>
     </hint>
     <hint type="destinationlabel">
-     <x>558</x>
-     <y>877</y>
+     <x>568</x>
+     <y>920</y>
     </hint>
    </hints>
   </connection>
@@ -2849,11 +2931,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>304</x>
-     <y>653</y>
+     <y>681</y>
     </hint>
     <hint type="destinationlabel">
      <x>260</x>
-     <y>656</y>
+     <y>684</y>
     </hint>
    </hints>
   </connection>
@@ -2865,11 +2947,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>477</x>
-     <y>1139</y>
+     <y>1167</y>
     </hint>
     <hint type="destinationlabel">
      <x>433</x>
-     <y>1142</y>
+     <y>1170</y>
     </hint>
    </hints>
   </connection>
@@ -2881,11 +2963,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>386</x>
-     <y>723</y>
+     <y>751</y>
     </hint>
     <hint type="destinationlabel">
      <x>342</x>
-     <y>726</y>
+     <y>754</y>
     </hint>
    </hints>
   </connection>
@@ -2897,11 +2979,27 @@
    <hints>
     <hint type="sourcelabel">
      <x>552</x>
-     <y>1197</y>
+     <y>1225</y>
     </hint>
     <hint type="destinationlabel">
      <x>59</x>
      <y>1214</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkSelectData</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>widDataSelect</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>56</x>
+     <y>558</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>235</x>
+     <y>563</y>
     </hint>
    </hints>
   </connection>
