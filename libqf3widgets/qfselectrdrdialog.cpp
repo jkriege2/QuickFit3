@@ -77,6 +77,7 @@ void QFSelectRDRDialog::setAllowCreateNew(bool allowNew)
         ui->radSelect->setEnabled(false);
         ui->radSelect->setChecked(true);
     }
+    ui->horizontalWidget->setEnabled(ui->radSelect->isChecked() || (!ui->radSelect->isEnabled() && !ui->radNew->isEnabled()));
 }
 
 void QFSelectRDRDialog::setAllowMultiSelect(bool allowMulti)

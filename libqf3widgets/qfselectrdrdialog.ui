@@ -238,5 +238,21 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>radSelect</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>horizontalWidget</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>28</x>
+     <y>63</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>46</x>
+     <y>87</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
 </ui>
