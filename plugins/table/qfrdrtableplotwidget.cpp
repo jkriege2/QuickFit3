@@ -48,6 +48,24 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     //ui->formLayout_3->removeWidget(ui->widSaveCoordSettings);
     //ui->tabWidget->setCornerWidget(ui->widSaveCoordSettings);
 
+    cmbMagnification=new QComboBox(this);
+    cmbMagnification->addItem(tr("10%"), 0.1);
+    cmbMagnification->addItem(tr("20%"), 0.2);
+    cmbMagnification->addItem(tr("25%"), 0.25);
+    cmbMagnification->addItem(tr("50%"), 0.5);
+    cmbMagnification->addItem(tr("75%"), 0.75);
+    cmbMagnification->addItem(tr("100%"), 1);
+    cmbMagnification->addItem(tr("125%"), 1.25);
+    cmbMagnification->addItem(tr("150%"), 1.5);
+    cmbMagnification->addItem(tr("175%"), 1.75);
+    cmbMagnification->addItem(tr("200%"), 2.0);
+    cmbMagnification->addItem(tr("250%"), 2.5);
+    cmbMagnification->addItem(tr("300%"), 3.0);
+    cmbMagnification->addItem(tr("400%"), 4.0);
+    cmbMagnification->addItem(tr("500%"), 5.0);
+    cmbMagnification->addItem(tr("600%"), 6.0);
+    connect(cmbMagnification, SIGNAL(currentIndexChanged(int)), this, SLOT(magnificationChanged(int)));
+
 
 
     ui->plotter->set_displayToolbar(false);
@@ -68,6 +86,8 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     toolbarPlot->addAction(ui->plotter->get_plotter()->get_actCopyData());
     toolbarPlot->addAction(ui->plotter->get_plotter()->get_actCopyMatlab());
     toolbarPlot->addSeparator();
+    toolbarPlot->addWidget(new QLabel(tr("zoom: ")));
+    toolbarPlot->addWidget(cmbMagnification);
     labPlotPosition=new QLabel("", this);
     toolbarPlot->addWidget(labPlotPosition);
     current=NULL;
@@ -114,6 +134,7 @@ void QFRDRTablePlotWidget::setRecord(QFRDRTable *record, int graph)
                 w->setIcon(QFRDRTable::GraphType2Icon(graphs.at(i).type));
                 ui->listGraphs->addItem(w);
             }
+            cmbMagnification->setCurrentIndex(cmbMagnification->findData(record->getProperty(QString("GRAPH%1_MAGNIFICATION").arg(graph), 1.0).toDouble()));
         } else {
             ui->tabSystem->setEnabled(false);
         }
@@ -330,14 +351,16 @@ void QFRDRTablePlotWidget::updateGraph() {
         ui->plotter->set_doDrawing(false);
         ui->plotter->set_emitSignals(false);
 
+        double m=getMagnification();
+
         if (p.graphAutosize) {
             ui->scrollArea->setWidgetResizable(true);
         } else {
             ui->scrollArea->setWidgetResizable(false);
-            ui->plotter->resize(ui->plotter->get_plotter()->mm2px(p.graphWidth, logicalDpiX()), ui->plotter->get_plotter()->mm2px(p.graphHeight, logicalDpiX()));
+            ui->plotter->resize(ui->plotter->get_plotter()->mm2px(p.graphWidth, logicalDpiX())*m, ui->plotter->get_plotter()->mm2px(p.graphHeight, logicalDpiX())*m);
         }
 
-
+        ui->plotter->setMagnification(m);
         ui->plotter->getXAxis()->set_axisLabel(p.xAxis.label);
         ui->plotter->getXAxis()->set_logAxis(p.xAxis.log);
         ui->plotter->getXAxis()->set_showZeroAxis(p.xAxis.axis0);
@@ -1341,6 +1364,25 @@ void QFRDRTablePlotWidget::disconnectWidgets()
     ui->widSystemSettings->disconnectWidgets();
 }
 
+double QFRDRTablePlotWidget::getMagnification() const
+{
+    int idx=cmbMagnification->currentIndex();
+    if (idx>=0 && idx<cmbMagnification->count()){
+        //if (current) current->setQFProperty(QString("GRAPH%1_MAGNIFICATION").arg(plot),cmbMagnification->itemData(idx).toDouble());
+        return(cmbMagnification->itemData(idx).toDouble());
+    } else {
+        return(1.0);
+        //if (current) current->setQFProperty(QString("GRAPH%1_MAGNIFICATION").arg(plot),1.0);
+    }
+}
+
+void QFRDRTablePlotWidget::magnificationChanged(int idx)
+{
+    double m=getMagnification();
+    if (current) current->setQFProperty(QString("GRAPH%1_MAGNIFICATION").arg(plot),m);
+    updateGraph();
+}
+
 int QFRDRTablePlotWidget::getColumnWithStride(int column, const QFRDRTable::GraphInfo& g)
 {
     //qDebug()<<"getColumnWithStride  column="<<column<<"    strided: "<<g.isStrided<<" stride="<<g.stride<<" strideStart="<<g.strideStart;
@@ -1403,6 +1445,7 @@ void QFRDRTablePlotWidget::autoColorGraph(QFRDRTable::GraphInfo &g, QColor color
     g.fillColor=g.color.lighter();
     g.errorColor=g.color.darker();
 }
+
 
 
 void QFRDRTablePlotWidget::on_btnMoveUp_clicked()

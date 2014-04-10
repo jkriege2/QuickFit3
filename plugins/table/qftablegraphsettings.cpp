@@ -423,7 +423,7 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
 
 
     ui->chkSelectData->setChecked(graph.isDataSelect);
-    ui->cmbSelectDataColumn->setCurrentIndex(graph.dataSelectColumn);
+    ui->cmbSelectDataColumn->setCurrentIndex(graph.dataSelectColumn+1);
     ui->cmbSelectDataCompare->setCurrentIndex(graph.dataSelectOperation);
     ui->edtSelectDataValue->setValue(graph.dataSelectCompareValue);
 

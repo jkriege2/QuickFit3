@@ -30,6 +30,9 @@ class QFRDRTablePlotWidget : public QWidget
         virtual void readSettings(QSettings& settings, const QString& prefix=QString(""));
         /** \brief write the settings */
         virtual void writeSettings(QSettings& settings, const QString& prefix=QString(""));
+
+
+        double getMagnification() const;
     signals:
         void plotTitleChanged(int plot, QString title);
     signals:
@@ -60,10 +63,12 @@ class QFRDRTablePlotWidget : public QWidget
 
         void connectWidgets();
         void disconnectWidgets();
+        void magnificationChanged(int idx);
     protected:
         int getColumnWithStride(int column, const QFRDRTable::GraphInfo &g);
         void autoColorGraph(QFRDRTable::GraphInfo& g, int autocolor=0);
         void autoColorGraph(QFRDRTable::GraphInfo& g, QColor color);
+
 
     private:
         Ui::QFRDRTablePlotWidget *ui;
@@ -74,6 +79,7 @@ class QFRDRTablePlotWidget : public QWidget
         int plot;
         bool updating;
         QList<QColor> autocolors;
+        QComboBox* cmbMagnification;
 };
 
 #endif // QFRDRTABLEPLOTWIDGET_H
