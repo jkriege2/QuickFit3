@@ -736,8 +736,8 @@ bool readEvalSettingsFile(const QString &evalFilename, bool isDCCF, QMap<QString
 
     // if this is an FCCS record, we don't want the DCCS_DELTAX/Y properties, as this the whift by half an image represents NO shift between the foci!
     if (role.toUpper().startsWith("FCCS")) {
-        initParams["FCCS_CORRELATIONCHIFTX"]=initParams.value("DCCF_DELTAX", 0);
-        initParams["FCCS_CORRELATIONCHIFTY"]=initParams.value("DCCF_DELTAY", 0);
+        initParams["FCCS_CORRELATIONSHIFTX"]=initParams.value("DCCF_DELTAX", 0);
+        initParams["FCCS_CORRELATIONSHIFTY"]=initParams.value("DCCF_DELTAY", 0);
         paramsReadonly<<"FCCS_CORRELATIONCHIFTX"<<"FCCS_CORRELATIONCHIFTY";
         initParams.remove("DCCF_DELTAX");
         initParams.remove("DCCF_DELTAY");

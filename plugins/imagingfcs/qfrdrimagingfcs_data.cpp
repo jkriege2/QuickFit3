@@ -458,6 +458,11 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
             }
         }
 
+        if (role.toUpper()=="FCCS") {
+            deleteProperty("DCCF_DELTAX");
+            deleteProperty("DCCF_DELTAY");
+        }
+
 
 
         // if in internal dualview mode, we have now loaded the full size data

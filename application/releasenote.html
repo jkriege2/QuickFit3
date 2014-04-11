@@ -26,7 +26,7 @@
   
 -->
 <!--
-		<li><a name="3147"><b>2014-02-05 (SVN: 3147)</b>-->
+                <li><a name="3152"><b>2014-02-11 (SVN: 3152)</b>-->
 		<ul>
 		  <li><b>new plugins:</b><ul>
 			<li><b>cam_server</b>:  added this plugin, which allows to use a custom camera server (for CHSPAD server)</li>
@@ -74,6 +74,7 @@
 				<li>added simple (double) exponential decay</li>
 				<li>added simple (double) ower law decay</li>
 				<li>added normal diffusion model with afterpulsing component (using gamma or wz for wz, D as parameter)</li>
+                                <li>bugfixed parameter range for exponential decay</li>
 		  </ul></li>    
 		  <li><b>SPIM-FCS fit functions</b><ul>
 				<li>all anomalous diffusion fit functions now calculate MSDs after a given timespan and the time to leave the focal effective area</li>
@@ -98,6 +99,7 @@
 			<li>added checkbox to RDR editors that allows to set, whether the image plots should keep an aspect ratio of 1 or not. In the latter case the image fills the available space, and pixels may be non-square shaped!</li>
 			<li>added two functions (to data menu in fit parameter image RDR) that allow to copy the average CorrelationFunction and the selected pixels correlation function to a table RDR</li>
 			<li>added function to bin correlation functions without recorrelation.</li>
+                        <li>bugfix: DCCF_DELTAX property was erronously set in FCCS records!</li>
 		  </ul></li>	
 		  <li><b>table</b><ul>
 			<li>bugfix: saved negative row/col numbers into QFTableXML-File, if the whole table was saved</li>
@@ -111,6 +113,9 @@
 			<li>in graph settings: added buttons to automatically determine (by an educated guess ;-) data columns based on one selected column</li>
 			<li>bugfix: remove unneeded delete buttons</li>
 			<li>improved reading of table column header, when pasting to a table or loading from a file</li>
+                        <li>added control to magnify the current plot widget</li>
+                        <li>removed unnecessary questions for overwriting a column header with the same valuee</li>
+                        <li>added option to select data for a plot, based on the value in another column</li>
 		  </ul></li>	
 		  <li><b>B040SPIM</b><ul>
 			<li>added methods to access measurement devices with JavaScripts</li>
@@ -118,8 +123,6 @@
 			<li>more instructions for scripted acquisition: <ul>
 			  <li>access to "acquisition description"</li>
 			  <li>bugfixed setLaserIntensity() and setBrightFieldIntensity()</li>
-			  <li></li>
-			  <li></li>
 			</ul></li>  
 			<li>added two MeasurementDevice tabs to optics setup</li>
 			
