@@ -1265,13 +1265,28 @@ void QFTableModel::copy(QModelIndexList selection, bool createXMLFragment, bool 
         //qDebug()<<"template:"<<xml;
         mime->setData("quickfit3/qfrdrtable_template", xml.toUtf8());
     } else {
+        QString tsv, csv;
+        {
+            QTextStream out(&tsv);
+            QLocale loc;
+            loc.setNumberOptions(QLocale::OmitGroupSeparator);
+            saveCSV(out, "\t", loc.decimalPoint().toLatin1(), QString(""), 'g', 6, true, selection);
+        }
+        {
+            QTextStream out(&csv);
+            QLocale loc;
+            loc.setNumberOptions(QLocale::OmitGroupSeparator);
+            saveCSV(out, ", ", '.', QString("#!"), 'g', 6, true, selection);
+        }
+
+        mime->setData("jkqtplotter/csv", csv.toUtf8());
+        mime->setData("application/vnd.ms-excel", tsv.toLocal8Bit());
+        mime->setData("quickfit/csv", csv.toUtf8());
+        mime->setData("text/csv", csv.toLocal8Bit());
+        mime->setData("text/comma-separated-values", csv.toLocal8Bit());
+
+        mime->setData("text/plain", csv.toLocal8Bit());
         mime->setData("quickfit3/qfrdrtable", xml.toUtf8());
-        QString csv;
-        QTextStream out(&csv);
-        QLocale loc;
-        loc.setNumberOptions(QLocale::OmitGroupSeparator);
-        saveCSV(out, "\t", loc.decimalPoint().toLatin1());
-        mime->setText(csv);
     }
     QApplication::clipboard()->setMimeData(mime);
 }
