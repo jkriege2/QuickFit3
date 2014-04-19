@@ -4802,12 +4802,12 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                     if (recs.size()>1) {
                         colNames.prepend(tr("RDR"));
                         r.prepend(data[d].file);
-                        result<<r;
                         if (d<data.size()-1) {
                             colNames.clear();
                         }
-                        r.clear();
                     }
+                    result<<r;
+                    r.clear();
                 }
 
 
