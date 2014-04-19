@@ -495,6 +495,25 @@ void QFESPIMB040ScriptedAcquisitionAcquisitionControl::acquirePreviewFrames(int 
     mainWindow->savePreviewMovie(camera, N, fn);
 }
 
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::acquirePreviewFramesWithParams(int camera, int N, const QString &filename)
+{
+    widAcquisition->updateReplaces();
+    const QString fn=widAcquisition->transformFilename(filename);
+    qDebug()<<filename;
+    qDebug()<<fn;
+    mainWindow->savePreviewMovie(camera, N, fn, preview_params);
+}
+
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::clearPreviewParams()
+{
+    preview_params.clear();
+}
+
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setPreviewParam(const QString &name, const QVariant &value)
+{
+    preview_params.insert(name, value);
+}
+
 
 void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setAcquisitionCamera1Setting(const QString which, QVariant value)
 {

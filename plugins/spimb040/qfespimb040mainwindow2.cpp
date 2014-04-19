@@ -720,6 +720,12 @@ bool QFESPIMB040MainWindow2::setMainIlluminationShutter(bool on_off, bool blocki
 
 void QFESPIMB040MainWindow2::savePreviewMovie(int camera, int frames, const QString &fileName)
 {
+   QMap<QString, QVariant> cam_params;
+   savePreviewMovie( camera,  frames,  fileName, cam_params);
+}
+
+void QFESPIMB040MainWindow2::savePreviewMovie(int camera, int frames, const QString &fileName, const QMap<QString, QVariant> &cam_params)
+{
     //if (m_stopresume) m_stopresume->stop();
     //saveJKImage(rawImage, tr("Save Raw Image ..."));
     QFExtension* extension;
@@ -738,7 +744,17 @@ void QFESPIMB040MainWindow2::savePreviewMovie(int camera, int frames, const QStr
 
 
         QProgressDialog progress(tr("Acquiring image series ..."), tr("&Cancel"), 0, frames, this);
-        QSettings settingPrev(previewSettingsFilename, QSettings::IniFormat);
+        QString tmpName1=QDir::temp().absoluteFilePath("qf3spimb040_preview_camtmpsettings.ini");
+        QTemporaryFile file1;
+        if (file1.open()) {
+             tmpName1=file1.fileName();
+        }
+        if (QFile::exists(tmpName1)) QFile::remove(tmpName1);
+
+        QFile::copy(previewSettingsFilename, tmpName1);
+
+        QSettings settingPrev(tmpName1, QSettings::IniFormat);
+        //QSettings settingPrev(previewSettingsFilename, QSettings::IniFormat);
         camExt->useCameraSettings(camID, settingPrev);
 
         QFileInfo fi(fileName);

@@ -125,6 +125,9 @@ class QFESPIMB040ScriptedAcquisitionAcquisitionControl : public QObject, public 
         void doAcquisition();
         void doImageStack();
         void acquirePreviewFrames(int camera, int N, const QString& filename);
+        void acquirePreviewFramesWithParams(int camera, int N, const QString& filename);
+        void clearPreviewParams();
+        void setPreviewParam(const QString& name, const QVariant& value);
         void clearAcquisitionCamera1Settings();
         void setAcquisitionCamera1Setting(const QString which, QVariant value);
         QVariant getAcquisitionCamera1Setting(const QString which);
@@ -148,6 +151,8 @@ class QFESPIMB040ScriptedAcquisitionAcquisitionControl : public QObject, public 
         QFESPIMB040AcquisitionTools* acqTools;
         QFESPIMB040MainWindow2* mainWindow;
         QFESPIMB040ScriptedAcquisition* widAcquisition;
+
+        QMap<QString, QVariant> preview_params;
 };
 
 #endif // QFESPIMB040SCRTIPTEDACQUISITIONTOOLS_H
