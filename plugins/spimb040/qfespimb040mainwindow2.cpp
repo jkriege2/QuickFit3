@@ -754,6 +754,11 @@ void QFESPIMB040MainWindow2::savePreviewMovie(int camera, int frames, const QStr
         QFile::copy(previewSettingsFilename, tmpName1);
 
         QSettings settingPrev(tmpName1, QSettings::IniFormat);
+        QMapIterator<QString, QVariant> it(cam_params);
+        while (it.hasNext()) {
+            it.next();
+            settingPrev.setValue(it.key(), it.value());
+        }
         //QSettings settingPrev(previewSettingsFilename, QSettings::IniFormat);
         camExt->useCameraSettings(camID, settingPrev);
 
