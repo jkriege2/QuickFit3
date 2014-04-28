@@ -934,6 +934,8 @@ bool QFTableModel::saveCSV(QTextStream &out, QString column_separator, char deci
             bool first=true;
             for (quint16 c=0; c<state.columns; c++) {
                 if (usedCols.contains(c) || saveCompleteTable) {
+                    if (!first) out<<column_separator;
+                    first=false;
                     quint32 a=xyAdressToUInt32(r, c);
                     if (state.dataMap.contains(a)) {
                         QVariant& v=state.dataMap[a];
@@ -958,9 +960,7 @@ bool QFTableModel::saveCSV(QTextStream &out, QString column_separator, char deci
                                 break;
                         }
                         //out<<num<<column_separator;
-                        if (!first) out<<column_separator;
                         out<<num;
-                        first=false;
                     }
                 }
             }
