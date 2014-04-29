@@ -141,7 +141,7 @@ QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_
 
 
 
-void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames, const QStringList& rowNames) {
+void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames, const QStringList& rowNames, bool copyAllVariant) {
 
     QString csv, csvLocale, excel;
     QLocale loc;
@@ -214,7 +214,11 @@ void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames,
 
     QClipboard *clipboard = QApplication::clipboard();
     QMimeData* mime=new QMimeData();
-    mime->setText(excel);
+    if (copyAllVariant) {
+        mime->setText(excel);
+    } else {
+        mime->setText(csv);
+    }
     mime->setData("jkqtplotter/csv", csv.toUtf8());
     mime->setData("application/vnd.ms-excel", excel.toLocal8Bit());
     mime->setData("quickfit/csv", csv.toUtf8());
@@ -224,7 +228,7 @@ void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames,
     clipboard->setMimeData(mime);
 }
 
-void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsNames, const QStringList& rowNames) {
+void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsNames, const QStringList& rowNames, bool copyAllVariant) {
 
     QString csv, csvLocale, excel;
     QString stringDelimiter="\"";
@@ -318,7 +322,11 @@ void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsName
 
     QClipboard *clipboard = QApplication::clipboard();
     QMimeData* mime=new QMimeData();
-    mime->setText(excel);
+    if (copyAllVariant) {
+        mime->setText(excel);
+    } else {
+        mime->setText(csv);
+    }
     mime->setData("jkqtplotter/csv", csv.toUtf8());
     mime->setData("application/vnd.ms-excel", excel.toLocal8Bit());
     mime->setData("quickfit/csv", csv.toUtf8());
@@ -328,12 +336,12 @@ void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsName
     clipboard->setMimeData(mime);
 }
 
-void csvCopy(const QList<QVector<double> >& data, const QStringList& columnsNames, const QStringList& rowNames) {
+void csvCopy(const QList<QVector<double> >& data, const QStringList& columnsNames, const QStringList& rowNames, bool copyAllVariant) {
     QList<QList<double> > d;
     for (int i=0; i<data.size(); i++) {
         d.append(data[i].toList());
     }
-    csvCopy(d, columnsNames, rowNames);
+    csvCopy(d, columnsNames, rowNames, copyAllVariant);
 }
 
 QList<QVector<double> > csvDataRotate(const QList<QVector<double> >& data) {

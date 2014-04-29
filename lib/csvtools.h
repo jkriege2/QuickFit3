@@ -21,7 +21,7 @@ QFLIB_EXPORT QVector<double> csvReadline(QTextStream& f, QChar separator_char=',
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList());
+QFLIB_EXPORT void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList(), bool copyAllVariant=true);
 
 
 /*! \brief copy the given data columns as CSV to the clipboard
@@ -29,14 +29,14 @@ QFLIB_EXPORT void csvCopy(const QList<QList<double> >& data, const QStringList& 
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList());
+QFLIB_EXPORT void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList(), bool copyAllVariant=true);
 
 /*! \brief copy the given data columns as CSV to the clipboard
     \ingroup qf3lib_tools
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT void csvCopy(const QList<QVector<double> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList());
+QFLIB_EXPORT void csvCopy(const QList<QVector<double> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList(), bool copyAllVariant=true);
 
 /*! \brief exchange rows and columns
     \ingroup qf3lib_tools

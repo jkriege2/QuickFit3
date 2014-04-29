@@ -38,6 +38,15 @@ QEnhancedTableView::QEnhancedTableView(QWidget* parent, bool noCopyShortcut):
     if (!noCopyShortcut) actCopyExcelNoHead->setShortcut(QKeySequence::Copy);
     connect(actCopyExcelNoHead, SIGNAL(triggered()), this, SLOT(copySelectionToExcelNoHead()));
     addAction(actCopyExcelNoHead);
+
+    actCopyCSV=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to Clipboard (CSV)"), this);
+    connect(actCopyCSV, SIGNAL(triggered()), this, SLOT(copySelectionToCSV()));
+    addAction(actCopyCSV);
+    actCopyCSVNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy Selection to clipboard (CSV) without header row/column"), this);
+    if (!noCopyShortcut) actCopyCSVNoHead->setShortcut(QKeySequence::Copy);
+    connect(actCopyCSVNoHead, SIGNAL(triggered()), this, SLOT(copySelectionToCSVNoHead()));
+    addAction(actCopyCSVNoHead);
+
     actCopyMatlab=new QAction(QIcon(":/lib/copy16_matlab.png"), tr("Copy Selection to clipboard (Matlab)"), this);
     connect(actCopyMatlab, SIGNAL(triggered()), this, SLOT(copySelectionToMatlabNoHead()));
     addAction(actCopyMatlab);
@@ -75,6 +84,10 @@ QEnhancedTableView::~QEnhancedTableView()
 
 void QEnhancedTableView::copySelectionToExcelNoHead(int copyrole) {
     copySelectionToExcel(copyrole, false);
+}
+
+void QEnhancedTableView::copySelectionToCSVNoHead(int copyrole) {
+    copySelectionToCSV(copyrole, false);
 }
 
 void QEnhancedTableView::copySelectionToMatlabNoHead(int copyrole, bool flipped)
@@ -200,6 +213,29 @@ void QEnhancedTableView::getVariantDataTable(int copyrole, QList<QList<QVariant>
 }
 
 void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead, bool flipped) {
+    if (!model()) return;
+    if (!selectionModel()) return;
+    QList<QList<QVariant> > csvData;
+    QStringList colnames;
+    QStringList rownames;
+    getVariantDataTable(copyrole, csvData, colnames, rownames);
+
+    //if (selectionModel()->selectedIndexes().size()==1) dataExpand(csvData, &colnames);
+    if (csvData.size()==1) dataExpand(csvData, &colnames);
+    else dataReduce(csvData, &colnames);
+
+    if (flipped)  {
+        csvData=dataRotate(csvData);
+        qSwap(colnames, rownames);
+    }
+    //qDebug()<<csvData.size()<<colnames.size();
+    if (storeHead) QFDataExportHandler::copyCSV(csvData, colnames, rownames);
+    else QFDataExportHandler::copyCSV(csvData);
+
+
+}
+
+void QEnhancedTableView::copySelectionToCSV(int copyrole, bool storeHead, bool flipped) {
     if (!model()) return;
     if (!selectionModel()) return;
     QList<QList<QVariant> > csvData;

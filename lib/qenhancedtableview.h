@@ -51,6 +51,8 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         void copyAsImage();
         void copySelectionToExcel(int copyrole=Qt::EditRole, bool storeHead=true, bool flipped=false);
         void copySelectionToExcelNoHead(int copyrole=Qt::EditRole);
+        void copySelectionToCSV(int copyrole=Qt::EditRole, bool storeHead=true, bool flipped=false);
+        void copySelectionToCSVNoHead(int copyrole=Qt::EditRole);
         void copySelectionToMatlabNoHead(int copyrole=Qt::EditRole, bool flipped=false);
 
         void copySelectionToExcelExpanded(int copyrole=Qt::EditRole, bool storeHead=true, bool flipped=false);
@@ -69,6 +71,8 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
     private:
         QAction* actCopyExcel;
         QAction* actCopyExcelNoHead;
+        QAction* actCopyCSV;
+        QAction* actCopyCSVNoHead;
         QAction* actCopyMatlab;
         QAction* actPrint;
         QAction* actCopyImage;
