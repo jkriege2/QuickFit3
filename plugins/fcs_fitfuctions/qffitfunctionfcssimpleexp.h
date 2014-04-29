@@ -31,6 +31,8 @@ class QFFitFunctionFCSSimpleExp: public QFFitFunction {
         /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
         virtual QString transformParametersForAdditionalPlot(int plot, double* params);
 
+        virtual void sortParameter(double* parameterValues, double* error=NULL, bool* fix=NULL) const;
+
 
 
 };

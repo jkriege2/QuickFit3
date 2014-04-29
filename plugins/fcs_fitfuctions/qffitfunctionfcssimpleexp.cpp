@@ -65,3 +65,16 @@ unsigned int QFFitFunctionFCSSimpleExp::getAdditionalPlotCount(const double* par
 QString QFFitFunctionFCSSimpleExp::transformParametersForAdditionalPlot(int plot, double* params) {
     return QString();
 }
+
+void QFFitFunctionFCSSimpleExp::sortParameter(double *data, double *error, bool *fix) const
+{
+    const double tau1=data[FCSDiff_tau1]*1e-6;
+    const double tau2=data[FCSDiff_tau2]*1e-6;
+    const int nonfl_comp=data[FCSDiff_n_components];
+    if (nonfl_comp==2 && tau1>tau2) {
+        qSwap(data[FCSDiff_tau1], data[FCSDiff_tau2]);
+        if (error) qSwap(error[FCSDiff_tau1], error[FCSDiff_tau2]);
+        if (fix) qSwap(fix[FCSDiff_tau1], fix[FCSDiff_tau2]);
+    }
+
+}
