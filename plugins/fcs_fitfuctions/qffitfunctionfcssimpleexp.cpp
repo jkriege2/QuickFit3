@@ -73,8 +73,15 @@ void QFFitFunctionFCSSimpleExp::sortParameter(double *data, double *error, bool 
     const int nonfl_comp=data[FCSDiff_n_components];
     if (nonfl_comp==2 && tau1>tau2) {
         qSwap(data[FCSDiff_tau1], data[FCSDiff_tau2]);
-        if (error) qSwap(error[FCSDiff_tau1], error[FCSDiff_tau2]);
-        if (fix) qSwap(fix[FCSDiff_tau1], fix[FCSDiff_tau2]);
+        qSwap(data[FCSDiff_pre1], data[FCSDiff_pre2]);
+        if (error) {
+            qSwap(error[FCSDiff_tau1], error[FCSDiff_tau2]);
+            qSwap(error[FCSDiff_pre1], error[FCSDiff_pre2]);
+        }
+        if (fix) {
+            qSwap(fix[FCSDiff_tau1], fix[FCSDiff_tau2]);
+            qSwap(fix[FCSDiff_pre1], fix[FCSDiff_pre2]);
+        }
     }
 
 }
