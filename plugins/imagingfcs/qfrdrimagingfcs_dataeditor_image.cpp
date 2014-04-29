@@ -5848,7 +5848,7 @@ void QFRDRImagingFCSImageEditor::setBackground(bool *msk, bool alsoSetOtherACF)
 
         double ovrAvg=0;
         double ovrVar=0;
-        bool *msk=(bool*)calloc(w*h, sizeof(bool));
+        //bool *msk=(bool*)calloc(w*h, sizeof(bool));
         int cnt=0;
         for (int i=0; i<w*h; i++) {
             if (msk[i]) cnt++;
