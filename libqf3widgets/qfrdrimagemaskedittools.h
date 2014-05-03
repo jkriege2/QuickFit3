@@ -40,6 +40,7 @@ class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
         QAction* get_actMaskBorder() const { return actMaskBorder; }
         QAction* get_actMaskSelected() const { return actMaskSelected; }
         QAction* get_actUnmaskSelected() const { return actUnmaskSelected; }
+        QAction* get_actCopyMaskToGroup() const { return actCopyMaskToGroup; }
 
         void registerPlotter(JKQtPlotter* plot);
         void unregisterPlotter(JKQtPlotter* plot);

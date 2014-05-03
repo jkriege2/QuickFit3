@@ -240,10 +240,10 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel->setRange(min-10.0, max+10.0);
             ui->edtLevel_2->setRange(min-10.0, max+10.0);
 
-            ui->edtLevel->setValue(min+0.2*(max-min));
+            ui->edtLevel->setValue(min+0.25*(max-min));
             ui->edtLevel_2->setValue(max);
-            ui->sldLevel->setValue(min+0.2*(max-min));
-            ui->sldLevel_2->setValue(max);
+            ui->sldLevel->setDValue(min+0.25*(max-min));
+            ui->sldLevel_2->setDValue(max);
 
 
             ui->sldLevel2->setDRange(min-10.0, max+10.0);
@@ -251,10 +251,10 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel2->setRange(min-10.0, max+10.0);
             ui->edtLevel2_2->setRange(min-10.0, max+10.0);
 
-            ui->edtLevel2->setValue(min+0.2*(max-min));
+            ui->edtLevel2->setValue(min+0.25*(max-min));
             ui->edtLevel2_2->setValue(max);
-            ui->sldLevel2->setValue(min+0.2*(max-min));
-            ui->sldLevel2_2->setValue(max);
+            ui->sldLevel2->setDValue(min+0.25*(max-min));
+            ui->sldLevel2_2->setDValue(max);
 
 
         } else if (ui->cmbDualView->currentIndex()==1) {
@@ -284,10 +284,10 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel->setRange(min-10.0, max+10.0);
             ui->edtLevel_2->setRange(min-10.0, max+10.0);
 
-            ui->edtLevel->setValue(min+0.2*(max-min));
+            ui->edtLevel->setValue(min+0.25*(max-min));
             ui->edtLevel_2->setValue(max);
-            ui->sldLevel->setValue(min+0.2*(max-min));
-            ui->sldLevel_2->setValue(max);
+            ui->sldLevel->setDValue(min+0.25*(max-min));
+            ui->sldLevel_2->setDValue(max);
 
 
             ui->sldLevel2->setDRange(min2-10.0, max2+10.0);
@@ -295,10 +295,10 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel2->setRange(min2-10.0, max2+10.0);
             ui->edtLevel2_2->setRange(min2-10.0, max2+10.0);
 
-            ui->edtLevel2->setValue(min2+0.2*(max2-min2));
+            ui->edtLevel2->setValue(min2+0.25*(max2-min2));
             ui->edtLevel2_2->setValue(max2);
-            ui->sldLevel2->setValue(min2+0.2*(max2-min2));
-            ui->sldLevel2_2->setValue(max2);
+            ui->sldLevel2->setDValue(min2+0.25*(max2-min2));
+            ui->sldLevel2_2->setDValue(max2);
 
         } else if (ui->cmbDualView->currentIndex()==2) {
             bool first=true, first2=true;
@@ -327,10 +327,10 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel->setRange(min-10.0, max+10.0);
             ui->edtLevel_2->setRange(min-10.0, max+10.0);
 
-            ui->edtLevel->setValue(min+0.2*(max-min));
+            ui->edtLevel->setValue(min+0.25*(max-min));
             ui->edtLevel_2->setValue(max);
-            ui->sldLevel->setValue(min+0.2*(max-min));
-            ui->sldLevel_2->setValue(max);
+            ui->sldLevel->setDValue(min+0.25*(max-min));
+            ui->sldLevel_2->setDValue(max);
 
 
             ui->sldLevel2->setDRange(min2-10.0, max2+10.0);
@@ -338,10 +338,10 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
             ui->edtLevel2->setRange(min2-10.0, max2+10.0);
             ui->edtLevel2_2->setRange(min2-10.0, max2+10.0);
 
-            ui->edtLevel2->setValue(min2+0.2*(max2-min2));
+            ui->edtLevel2->setValue(min2+0.25*(max2-min2));
             ui->edtLevel2_2->setValue(max2);
-            ui->sldLevel2->setValue(min2+0.2*(max2-min2));
-            ui->sldLevel2_2->setValue(max2);
+            ui->sldLevel2->setDValue(min2+0.25*(max2-min2));
+            ui->sldLevel2_2->setDValue(max2);
         }
     }
     updateMask();

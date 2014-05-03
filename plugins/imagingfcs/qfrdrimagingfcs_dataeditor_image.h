@@ -157,12 +157,16 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         void includeRuns();
         /** \brief exclude runs by intensity in the overview image */
         void excludeByIntensity();
+        /** \brief exclude runs by intensity in the overview image 2 */
+        void excludeByIntensity2();
         /** \brief exclude runs by intensity in the parameter image */
         void excludeByParamIntensity();
         /** \brief exclude runs by intensity in the parameter image 2 */
         void excludeByParan2Intensity();
         /** \brief select pixel by intensity in the overview image */
         void selectByIntensity();
+        /** \brief select pixel by intensity in the overview image */
+        void selectByIntensity2();
         /** \brief select pixel by intensity in the parameter image */
         void selectByParamIntensity();
         /** \brief select pixel by intensity in the parameter image 2 */
@@ -410,8 +414,10 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QComboBox* cmbMaskEditMode;
         QAction* actCopyMaskToAll;
         QAction* actSelectionBuilder;
+        QToolButton* btnSelectionBuilder;
         QAction* actMaskBuilder;
         QAction* actSetBackgroundFromSelection;
+        QToolButton* btnSetBackgroundFromSelection;
         QAction* actSetBackgroundFromMasked;
         QAction* actPostProcessBinning;
 
@@ -558,7 +564,9 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QToolButton* btnInvertMask;
         /** \brief button to mask pixels by intensity */
         QToolButton* btnMaskByIntensity;
-        /** \brief button to mask pixels by parameter image 2 */
+        /** \brief button to mask pixels by intensity */
+        QToolButton* btnMaskByIntensity2;
+         /** \brief button to mask pixels by parameter image 2 */
         QToolButton* btnMaskByParam2Intensity;
         /** \brief button to mask pixels by parameter image */
         QToolButton* btnMaskByParamIntensity;
@@ -567,6 +575,10 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QToolButton* btnLoadMask;
         QToolButton* btnSaveSelection;
         QToolButton* btnSaveMask;
+
+        QToolButton* btnSetBackgroundFromMasked;
+        QToolButton* btnCopyMaskToGroup;
+        QToolButton* btnCopyFitResults;
         /** \brief action to print a report */
         QToolButton* btnPrintReport;
 
@@ -595,12 +607,16 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QAction* actInvertMask;
         /** \brief button to mask pixels by intensity */
         QAction* actMaskByIntensity;
+        /** \brief button to mask pixels by intensity, channel 2 */
+        QAction* actMaskByIntensity2;
         /** \brief button to mask pixels by parameter image 2 */
         QAction* actMaskByParam2Intensity;
         /** \brief button to mask pixels by parameter image */
         QAction* actMaskByParamIntensity;
         /** \brief action to select pixels by intensity */
         QAction* actSelectionByIntensity;
+        /** \brief action to select pixels by intensity, channel 2 */
+        QAction* actSelectionByIntensity2;
         /** \brief action to select pixels by parameter image 2 */
         QAction* actSelectByParam2Intensity;
         /** \brief action to select pixels by parameter image */

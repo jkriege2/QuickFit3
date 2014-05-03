@@ -305,27 +305,52 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     glmask->addWidget(frame, mskgrpRow, 0, 1, 4);
 
     mskgrpRow++;
-    btnMaskByIntensity=createButtonAndActionShowText(actMaskByIntensity, tr("m. by &overview"), w);
-    actMaskByIntensity->setToolTip(tr("create a mask according to the <b>overview image</b>:\n"
+    btnMaskByIntensity=createButtonAndActionShowText(actMaskByIntensity, tr("mask by &overview"), w);
+    actMaskByIntensity->setIconText(tr("m. by &overview"));
+    actMaskByIntensity->setToolTip(tr("create a mask according to the <b>overview image, channel 1</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
     glmask->addWidget(btnMaskByIntensity, mskgrpRow, 0);
     connect(actMaskByIntensity, SIGNAL(triggered()), this, SLOT(excludeByIntensity()));
+
+
+    btnMaskByIntensity2=createButtonAndActionShowText(actMaskByIntensity2, tr("m. by overview &2"), w);
+    actMaskByIntensity2->setToolTip(tr("create a mask according to the <b>overview image, channel 2</b>:\n"
+                                      "A dialog will open up, which allows to mask some pixels\n"
+                                      "according to a given threshold. The mask created by this\n"
+                                      "is combined with the current mask using the set <i>mask edit mode</i>"));
+    glmask->addWidget(btnMaskByIntensity2, mskgrpRow, 1);
+    connect(actMaskByIntensity2, SIGNAL(triggered()), this, SLOT(excludeByIntensity2()));
     btnMaskByParam2Intensity=createButtonAndActionShowText(actMaskByParam2Intensity, tr("m. by param &2"), w);
     actMaskByParam2Intensity->setToolTip(tr("create a mask according to the <b>parameter image 2</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
-    glmask->addWidget(btnMaskByParam2Intensity, mskgrpRow, 1);
+    glmask->addWidget(btnMaskByParam2Intensity, mskgrpRow, 2);
     connect(actMaskByParam2Intensity, SIGNAL(triggered()), this, SLOT(excludeByParan2Intensity()));
     btnMaskByParamIntensity=createButtonAndActionShowText(actMaskByParamIntensity, tr("m. by &param"), w);
     actMaskByParamIntensity->setToolTip(tr("create a mask according to the <b>parameter image</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
-    glmask->addWidget(btnMaskByParamIntensity, mskgrpRow, 2);
+    glmask->addWidget(btnMaskByParamIntensity, mskgrpRow, 3);
     connect(actMaskByParamIntensity, SIGNAL(triggered()), this, SLOT(excludeByParamIntensity()));
+
+    mskgrpRow++;
+    frame=new QFrame(this);
+    frame->setFrameShape(QFrame::HLine);
+    glmask->addWidget(frame, mskgrpRow, 0, 1, 4);
+
+    mskgrpRow++;
+    btnSetBackgroundFromMasked=createButtonAndActionShowText(actSetBackgroundFromMasked, tr("set background from masked"), w);
+    actSetBackgroundFromMasked->setIconText( tr("background from mask"));
+    connect(actSetBackgroundFromMasked, SIGNAL(triggered()), this, SLOT(setBackgroundFromMasked()));
+    glmask->addWidget(btnSetBackgroundFromMasked, mskgrpRow,0 ,1,2);
+
+    btnCopyMaskToGroup=createButtonForActionShowText(correlationMaskTools->get_actCopyMaskToGroup(), w);//createButtonAndActionShowText(actSetBackgroundFromMasked, tr("set background from masked"), w);
+    correlationMaskTools->get_actCopyMaskToGroup()->setIconText(tr("copy mask to group"));
+    glmask->addWidget(btnCopyMaskToGroup, mskgrpRow, 2, 1,2);
 
     actCopyMaskToAll=new QAction(tr("copy mask to files"), this);
     connect(actCopyMaskToAll, SIGNAL(triggered()), this, SLOT(copyMaskToAll()));
@@ -369,11 +394,17 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     actSelectionByIntensity=new QAction( tr("select by &overview"), w);
-    actSelectionByIntensity->setToolTip(tr("create a selection according to the <b>overview image</b>:\n"
+    actSelectionByIntensity->setToolTip(tr("create a selection according to the <b>overview image, channel 1</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
                                       "according to a given threshold. The mask created by this\n"
                                       "is combined with the current mask using the set <i>mask edit mode</i>"));
     connect(actSelectionByIntensity, SIGNAL(triggered()), this, SLOT(selectByIntensity()));
+    actSelectionByIntensity2=new QAction( tr("select by &overview"), w);
+    actSelectionByIntensity2->setToolTip(tr("create a selection according to the <b>overview image, channel 2</b>:\n"
+                                      "A dialog will open up, which allows to mask some pixels\n"
+                                      "according to a given threshold. The mask created by this\n"
+                                      "is combined with the current mask using the set <i>mask edit mode</i>"));
+    connect(actSelectionByIntensity2, SIGNAL(triggered()), this, SLOT(selectByIntensity2()));
     actSelectByParam2Intensity=new QAction( tr("select by param &2"), w);
     actSelectByParam2Intensity->setToolTip(tr("create a selection according to the <b>parameter image 2</b>:\n"
                                       "A dialog will open up, which allows to mask some pixels\n"
@@ -392,15 +423,25 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     actSelectionBuilder=new QAction(tr("selection builder"), w);
     connect(actSelectionBuilder, SIGNAL(triggered()), this, SLOT(buildSelection()));
+    btnSelectionBuilder=createButtonForActionShowText(actSelectionBuilder, w);
 
     actMaskBuilder=new QAction(tr("mask builder"), w);
     connect(actMaskBuilder, SIGNAL(triggered()), this, SLOT(buildMask()));
 
     actSetBackgroundFromSelection=new QAction(tr("set background from selection"), w);
+    actSetBackgroundFromSelection->setIconText(tr("background from sel."));
     connect(actSetBackgroundFromSelection, SIGNAL(triggered()), this, SLOT(setBackgroundFromSelection()));
-    actSetBackgroundFromMasked=new QAction(tr("set background from masked"), w);
-    connect(actSetBackgroundFromMasked, SIGNAL(triggered()), this, SLOT(setBackgroundFromMasked()));
+    btnSetBackgroundFromSelection=createButtonForActionShowText(actSetBackgroundFromSelection,w);
 
+
+    selgrpRow++;
+    frame=new QFrame(this);
+    frame->setFrameShape(QFrame::HLine);
+    glsel->addWidget(frame, selgrpRow, 0, 1, 4);
+    selgrpRow++;
+    glsel->addWidget(btnSelectionBuilder, selgrpRow, 0,1,2);
+    glsel->addWidget(btnSetBackgroundFromSelection, selgrpRow, 2,1,2);
+    selgrpRow++;
 
     glsel->addWidget(new QLabel(tr("stored selections:")), selgrpRow, 0);
     QWidget* ssel=new QWidget(this);
@@ -938,6 +979,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(actCopyDataAsColumns, SIGNAL(triggered()), this, SLOT(copyDataAsColumns()));
 
     actCopyFitResultStatistics=new QAction(tr("copy fit result statistics for Excel/Origin..."), this);
+    actCopyFitResultStatistics->setIconText(tr("copy result stats."));
+    btnCopyFitResults=createButtonForActionShowText(actCopyFitResultStatistics, w);
     connect(actCopyFitResultStatistics, SIGNAL(triggered()), this, SLOT(copyFitResultStatistics()));
 
 
@@ -947,6 +990,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     grdTop->addWidget(btnCopyDataAsColumns, 2, 0);
     grdTop->addWidget(btnSaveReport, 0, 1);
     grdTop->addWidget(btnPrintReport, 1, 1);
+    grdTop->addWidget(btnCopyFitResults, 2, 1);
     grdTop->setColumnStretch(1,0);
     grdTop->setColumnStretch(0,0);
 
@@ -1282,6 +1326,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuMask->addAction(actClearMask);
     menuMask->addAction(actInvertMask);
     menuMask->addAction(actMaskByIntensity);
+    menuMask->addAction(actMaskByIntensity2);
     menuMask->addAction(actMaskByParam2Intensity);
     menuMask->addAction(actMaskByParamIntensity);
     menuMask->addAction(actMaskBuilder);
@@ -1298,6 +1343,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuSelection->addAction(actPasteSelection);
     menuSelection->addSeparator();
     menuSelection->addAction(actSelectionByIntensity);
+    menuSelection->addAction(actSelectionByIntensity2);
     menuSelection->addAction(actSelectByParam2Intensity);
     menuSelection->addAction(actSelectByParamIntensity);
     menuSelection->addAction(actDeselctMasked);
@@ -1639,6 +1685,21 @@ void QFRDRImagingFCSImageEditor::selectByIntensity()
     }
 }
 
+void QFRDRImagingFCSImageEditor::selectByIntensity2()
+{
+    if (!current) return;
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
+    if (m) {
+        if (m->getImageFromRunsChannels()>1) {
+            double* image=m->getImageFromRunsPreview(1);
+            selectByImage(image);
+        } else {
+            double* image=m->getImageFromRunsPreview(0);
+            selectByImage(image);
+        }
+    }
+}
+
 void QFRDRImagingFCSImageEditor::selectByParamIntensity() {
     selectByImage(pltImage->getData());
 }
@@ -1970,6 +2031,21 @@ void QFRDRImagingFCSImageEditor::excludeByIntensity() {
     }
 }
 
+void QFRDRImagingFCSImageEditor::excludeByIntensity2() {
+    if (!current) return;
+    QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
+    if (m) {
+        //QFRDRImagingFCSMaskByIntensity* dialog=new QFRDRImagingFCSMaskByIntensity(this);
+        if (m->getImageFromRunsChannels()>1) {
+            double* image=m->getImageFromRunsPreview(1);
+            excludeByImage(image);
+        } else {
+            double* image=m->getImageFromRunsPreview(0);
+            excludeByImage(image);
+
+        }
+    }
+}
 void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
     if (old) {
         //saveImageSettings();
@@ -2013,6 +2089,8 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         selected.clear();
         cmbDualView->setCurrentIndex(int(m->dualViewMode()));
         cmbDualView->setEnabled(m->dualViewModeUserEditable());
+        actSelectionByIntensity2->setEnabled(m->getImageFromRunsChannels()>1);
+        actMaskByIntensity2->setEnabled(m->getImageFromRunsChannels()>1);
         selectedInsert(0);
         selectionEdited();
         connect(current, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(resultsChanged(QString,QString,bool)));
@@ -5861,9 +5939,13 @@ void QFRDRImagingFCSImageEditor::setBackground(bool *msk, bool alsoSetOtherACF)
             }
             m->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
             m->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
+            m->setQFProperty(QString("BACKGROUND%1_DIRECT").arg(i+1), ovrAvg);
+            m->setQFProperty(QString("BACKGROUND_STD%1_DIRECT").arg(i+1), sqrt(ovrVar));
             if ((m->getRole().toLower()=="acf0" && i==0)||(m->getRole().toLower()=="acf1" && i==1)) {
                 m->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
                 m->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
+                m->setQFProperty(QString("BACKGROUND_DIRECT"), ovrAvg);
+                m->setQFProperty(QString("BACKGROUND_STD_DIRECT"), sqrt(ovrVar));
             }
             m->addImageSelection(msk, tr("automatic background"));
             if (alsoSetOtherACF) {
@@ -5875,9 +5957,13 @@ void QFRDRImagingFCSImageEditor::setBackground(bool *msk, bool alsoSetOtherACF)
                             if (i==0) mj->addImageSelection(msk, tr("automatic background"));
                             l[j]->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
                             l[j]->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
+                            l[j]->setQFProperty(QString("BACKGROUND%1_DIRECT").arg(i+1), ovrAvg);
+                            l[j]->setQFProperty(QString("BACKGROUND_STD%1_DIRECT").arg(i+1), sqrt(ovrVar));
                             if (i==0) {
                                 l[j]->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
                                 l[j]->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
+                                l[j]->setQFProperty(QString("BACKGROUND_DIRECT"), ovrAvg);
+                                l[j]->setQFProperty(QString("BACKGROUND_STD_DIRECT"), sqrt(ovrVar));
                             }
                         }
                     }
@@ -5888,9 +5974,13 @@ void QFRDRImagingFCSImageEditor::setBackground(bool *msk, bool alsoSetOtherACF)
                             if (i==0) mj->addImageSelection(msk, tr("automatic background"));
                             l[j]->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
                             l[j]->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
+                            l[j]->setQFProperty(QString("BACKGROUND%1_DIRECT").arg(i+1), ovrAvg);
+                            l[j]->setQFProperty(QString("BACKGROUND_STD%1_DIRECT").arg(i+1), sqrt(ovrVar));
                             if (i==1) {
                                 l[j]->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
                                 l[j]->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
+                                l[j]->setQFProperty(QString("BACKGROUND_DIRECT"), ovrAvg);
+                                l[j]->setQFProperty(QString("BACKGROUND_STD_DIRECT"), sqrt(ovrVar));
                             }
                         }
                     }
@@ -5903,9 +5993,13 @@ void QFRDRImagingFCSImageEditor::setBackground(bool *msk, bool alsoSetOtherACF)
                                 if (i==0) mj->addImageSelection(msk, tr("automatic background"));
                                 l[j]->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
                                 l[j]->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
+                                l[j]->setQFProperty(QString("BACKGROUND%1_DIRECT").arg(i+1), ovrAvg);
+                                l[j]->setQFProperty(QString("BACKGROUND_STD%1_DIRECT").arg(i+1), sqrt(ovrVar));
                                 if (i==0) {
                                     l[j]->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
                                     l[j]->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
+                                    l[j]->setQFProperty(QString("BACKGROUND_DIRECT"), ovrAvg);
+                                    l[j]->setQFProperty(QString("BACKGROUND_STD_DIRECT"), sqrt(ovrVar));
                                 }
                             }
                         }
@@ -5918,9 +6012,13 @@ void QFRDRImagingFCSImageEditor::setBackground(bool *msk, bool alsoSetOtherACF)
                                 if (i==0) mj->addImageSelection(msk, tr("automatic background"));
                                 l[j]->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
                                 l[j]->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
+                                l[j]->setQFProperty(QString("BACKGROUND%1_DIRECT").arg(i+1), ovrAvg);
+                                l[j]->setQFProperty(QString("BACKGROUND_STD%1_DIRECT").arg(i+1), sqrt(ovrVar));
                                 if (i==1) {
                                     l[j]->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
                                     l[j]->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
+                                    l[j]->setQFProperty(QString("BACKGROUND_DIRECT"), ovrAvg);
+                                    l[j]->setQFProperty(QString("BACKGROUND_STD_DIRECT"), sqrt(ovrVar));
                                 }
                             }
                         }
@@ -5932,6 +6030,8 @@ void QFRDRImagingFCSImageEditor::setBackground(bool *msk, bool alsoSetOtherACF)
                             if (i==0) mj->addImageSelection(msk, tr("automatic background"));
                             l[j]->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
                             l[j]->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
+                            l[j]->setQFProperty(QString("BACKGROUND%1_DIRECT").arg(i+1), ovrAvg);
+                            l[j]->setQFProperty(QString("BACKGROUND_STD%1_DIRECT").arg(i+1), sqrt(ovrVar));
                         }
                     }
                 }
