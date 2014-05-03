@@ -171,7 +171,7 @@ QFFitFunction* QFPFitFunctionsSPIMFCS::get(QString id, QObject* parent) const  {
 
 int QFPFitFunctionsSPIMFCS::getGlobalFitConfigCount() const
 {
-    return 10;
+    return 12;
 }
 
 QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS::getGlobalFitConfig(int i) const
@@ -334,6 +334,32 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
 
 
+
+    } else    if (i==c++) { // fccs_spim_fw_2cdiff2coloracfg, fccs_spim_fw_2cdiff2coloracfr, fccs_spim_fw_2cdiff2colorccf
+       res.groupLabel=spimfccslabel;
+       res.menuEntryLabel=tr("... 2-comp. normal diffusion, species A+B+AB, c/D1/D2 per species, D1A=D1B=D1AB, ...");
+       res.models<<"fccs_spim_fw_2cdiff2coloracfg"<<"fccs_spim_fw_2cdiff2coloracfr"<<"fccs_spim_fw_2cdiff2colorccf";
+       res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
+       res.globalParams << constructQListWithMultipleItems(constructQStringListFromItems("diff_coeff_a","diff_coeff_b","diff_coeff_ab"), 3);
+       res.globalParams << constructQListWithMultipleItems(constructQStringListFromItems("diff_coeff2_a","diff_coeff2_b","diff_coeff2_ab"), 3);
+       res.globalParams << constructQListWithMultipleItems(constructQStringListFromItems("diff_rho2_a","diff_rho2_b","diff_rho2_ab"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("crosstalk"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_x"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_y"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_distance_z"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_width1"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_width2"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_height1"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("focus_height2"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("pixel_width"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("count_rate1"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("count_rate2"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+       res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+
+
     } else    if (i==c++) { // fccs_spim_fw_2csepdiff2coloracfg, fccs_spim_fw_2csepdiff2coloracfr, fccs_spim_fw_2csepdiff2colorccf
        res.groupLabel=spimfccslabel;
        res.menuEntryLabel=tr("... 2-comp. normal diffusion, species A+B+AB, c per species, D1/D2 per channel");
@@ -430,6 +456,17 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
         res.globalParams << constructQListWithMultipleItems(QStringList("count_rate2"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
+
+    } else if (i==c++) { // fccs_spim_fw_adiff2coloracfg, fccs_spim_fw_adiff2coloracfr, fccs_spim_fw_adiff2colorccf
+        res.groupLabel=spimfccslabel;
+        res.menuEntryLabel=tr("... diffusion+flow, ACF + 4 neighbors");
+        res.models<<"fccs_spim_diffflow"<<"fccs_spim_diffflow"<<"fccs_spim_diffflow"<<"fccs_spim_diffflow"<<"fccs_spim_diffflow";
+        res.globalParams << constructQListWithMultipleItems(QStringList("n_particle"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff1"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("vflowx"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("vflowy"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width"), 5);
 
 
     }

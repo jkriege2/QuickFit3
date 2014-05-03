@@ -101,7 +101,8 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
             QComboBox* cmb=new QComboBox(parent);
             QStringList sl=imfccs->getAvailableFitFunctions();
             for (int i=0; i<sl.size(); i++) {
-                cmb->addItem(QIcon(":/lib/fitfunc_icon.png"), imfccs->getFitFunctionForID(sl[i])->name(), sl[i]);
+                QFFitFunction* fi=imfccs->getFitFunctionForID(sl[i]);
+                if (fi) cmb->addItem(QIcon(":/lib/fitfunc_icon.png"), fi->name(), sl[i]);
             }
 
             //qDebug()<<"   created ffcombo "<<t.elapsed()<<"ms";
