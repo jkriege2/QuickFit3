@@ -480,11 +480,12 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
             }
 
             QString evalName=QString("CalcRelCCFCrosstalkCorrected_ACF%1_ACF%2_CCF_ct%3_avg%4").arg(acf0->getID()).arg(acf1->getID()).arg(ui->spinCrosstalk->value()).arg(ui->spinAvg->value());
+            QString egroup=QString("CalcRelCCFCrosstalkCorrected_CCF_ct%1_avg%2").arg(ui->spinCrosstalk->value()).arg(ui->spinAvg->value());
             if (ui->cmbAmplitudeSource->currentIndex()==1) {
                 evalName=QString("CalcRelCCFCrosstalkCorrected_ACF%1_ACF%2_CCF_ct%3_g0").arg(acf0->getID()).arg(acf1->getID()).arg(ui->spinCrosstalk->value());
+                egroup=QString("CalcRelCCFCrosstalkCorrected__CCF_ct%1_g0").arg(ui->spinCrosstalk->value());
             }
             QString group="results";
-            QString egroup=evalName;
             QString acfName=acf->getRole();
             if (acfName.isEmpty()) acfName=acf->getName();
             QString ccfName=ccf->getRole();

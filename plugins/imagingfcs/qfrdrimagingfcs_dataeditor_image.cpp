@@ -4753,9 +4753,15 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                         resultID=evals[ev];
                                     }
                                 }
+                                if (!evalFound) {
+                                    if (curRec->resultsExists(evalGroup, names.first())) {
+                                        evalFound=true;
+                                        resultID=evalGroup;
+                                    }
+                                }
                             }
 
-                            //if (i<10) qDebug()<<resultID<<evalFound <<hasFitFunction<<names<<evals;
+                            if (d.Nfit==0) qDebug()<<recsi<<curRec->getName()<<"\n:"<<resultID<<evalFound <<hasFitFunction<<names<<evalGroup<<evals;
 
 
                             if (evaluateFitFunction(curRec, m->getCorrelationT(), corr1, m->getCorrelationN(), d.names, d.namelabels, values, errors, fix, d.units, d.unitlabels, resultID, i)) {
