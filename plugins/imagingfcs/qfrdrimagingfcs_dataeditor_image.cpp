@@ -4646,7 +4646,20 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
     QList<copyFitResultStatistics_data> data;
     QStringList labels, names;
 
+    bool hasFitFunction=true;
     getCurrentResultNamesAndLabels(names, labels);
+
+    if (names.size()<=0) {
+        hasFitFunction=false;
+        for (int i=0; i<cmbParameter->count(); i++) {
+            QString p=cmbParameter->itemData(i).toString();
+            QString n=cmbParameter->itemText(i);
+            if (!names.contains(p) || !labels.contains(n)) {
+                names.append(p);
+                labels.append(n);
+            }
+        }
+    }
 
 
     dlg->init(labels, names, (*settings), prefix+"selections/");
@@ -4733,6 +4746,17 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                 }
                             }
 
+                            if (!hasFitFunction && !evalFound && names.size()>0) {
+                                for (register int ev=0; ev<evals.size(); ev++) {
+                                    if (curRec->resultsExists(evals[ev], names.first())) {
+                                        evalFound=true;
+                                        resultID=evals[ev];
+                                    }
+                                }
+                            }
+
+                            //if (i<10) qDebug()<<resultID<<evalFound <<hasFitFunction<<names<<evals;
+
 
                             if (evaluateFitFunction(curRec, m->getCorrelationT(), corr1, m->getCorrelationN(), d.names, d.namelabels, values, errors, fix, d.units, d.unitlabels, resultID, i)) {
                                 if (d.Nfit==0) {
@@ -4755,6 +4779,33 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                 }
 
                                 d.Nfit++;
+                            } else if (evalFound && !hasFitFunction) {
+                                for (int jj=0; jj<names.size(); jj++) {
+                                    if (curRec->resultsExists(resultID, names[jj])) {
+                                        values.append(curRec->resultsGetInNumberList(resultID, names[jj], i));
+                                    } else {
+                                        values.append(0);
+                                    }
+                                }
+
+                                if (d.Nfit==0) {
+                                    for (int jj=0; jj<names.size(); jj++) {
+                                        d.gfix.append(Qt::Unchecked);
+                                    }
+                                    for (int jj=0; jj<names.size(); jj++) {
+                                        QList<double> v;
+                                        v.append(values[jj]);
+                                        d.gvalues.append(v);
+                                    }
+
+                                } else {
+                                    for (int jj=0; jj<names.size(); jj++) {
+                                        d.gvalues[jj].append(values[jj]);
+                                    }
+                                }
+
+                                d.Nfit++;
+
                             }
 
                             N++;
