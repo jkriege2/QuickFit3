@@ -680,12 +680,12 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
                         QString ffid= getFitParamFixID(pid);
                         record->resultsSetNumberError(evalID, fpid, params[i], errors[i], unit);
                         record->resultsSetGroup(evalID, fpid, tr("fit results"));
-                        record->resultsSetLabel(evalID, fpid, ffunc->getDescription(pid).name, ffunc->getDescription(pid).label);
+                        record->resultsSetLabel(evalID, fpid, pid+": "+ffunc->getDescription(pid).name, ffunc->getDescription(pid).label);
                         record->resultsSetSortPriority(evalID, fpid, true);
 
                         record->resultsSetBoolean(evalID, ffid, paramsFix[i]);
                         record->resultsSetGroup(evalID,ffid, tr("fit results"));
-                        record->resultsSetLabel(evalID, ffid, ffunc->getDescription(pid).name+tr(", fix"), ffunc->getDescription(pid).label+tr(", fix"));
+                        record->resultsSetLabel(evalID, ffid, "fix_"+pid+": "+ffunc->getDescription(pid).name+tr(", fix"), ffunc->getDescription(pid).label+tr(", fix"));
                         record->resultsSetSortPriority(evalID,  ffid, true);
                     }
                 }

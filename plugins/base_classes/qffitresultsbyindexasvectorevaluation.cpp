@@ -631,13 +631,13 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValuesVisibleWithGroupAn
                         r->resultsSetInBooleanList(tresultID, getParamNameLocalStore(fpid), index, true);
                         r->resultsSetInNumberErrorList(tresultID, fpid, index, values[i], errors[i], unit);
                         r->resultsSetGroup(tresultID, fpid, group);
-                        r->resultsSetLabel(tresultID, fpid, f->getDescription(pid).name, f->getDescription(pid).label);
+                        r->resultsSetLabel(tresultID, fpid, pid+": "+f->getDescription(pid).name, f->getDescription(pid).label);
                         r->resultsSetSortPriority(tresultID, fpid, sortPriority);
                         if (fix) {
                             r->resultsSetInBooleanList(tresultID, ffid, index, fix[i]);
                             r->resultsSetInBooleanList(tresultID, getParamNameLocalStore(ffid), index, true);
                             if (!fixGroup.isEmpty()) r->resultsSetGroup(tresultID, ffid, fixGroup);
-                            r->resultsSetLabel(tresultID, ffid, f->getDescription(pid).name+tr(", fix"), f->getDescription(pid).label+tr(", fix"));
+                            r->resultsSetLabel(tresultID, ffid, "fix_"+pid+": "+f->getDescription(pid).name+tr(", fix"), f->getDescription(pid).label+tr(", fix"));
                             r->resultsSetSortPriority(tresultID,  ffid, sortPriority);
                         }
                     }

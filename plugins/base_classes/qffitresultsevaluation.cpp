@@ -584,12 +584,12 @@ void QFFitResultsEvaluation::setFitResultValuesVisibleWithGroupAndLabel(QFRawDat
                     QString ffid= getFitParamFixID(pid);
                     r->resultsSetNumberError(transformResultID(resultID), fpid, values[i], errors[i], unit);
                     r->resultsSetGroup(transformResultID(resultID), fpid, group);
-                    r->resultsSetLabel(transformResultID(resultID), fpid, f->getDescription(pid).name, f->getDescription(pid).label);
+                    r->resultsSetLabel(transformResultID(resultID), fpid, pid+": "+f->getDescription(pid).name, f->getDescription(pid).label);
                     r->resultsSetSortPriority(transformResultID(resultID), fpid, sortPriority);
                     if (fix) {
                         r->resultsSetBoolean(transformResultID(resultID), ffid, fix[i]);
                         if (!fixGroup.isEmpty()) r->resultsSetGroup(transformResultID(resultID),ffid, fixGroup);
-                        r->resultsSetLabel(transformResultID(resultID), ffid, f->getDescription(pid).name+tr(", fix"), f->getDescription(pid).label+tr(", fix"));
+                        r->resultsSetLabel(transformResultID(resultID), ffid, "fix_"+pid+": "+f->getDescription(pid).name+tr(", fix"), f->getDescription(pid).label+tr(", fix"));
                         r->resultsSetSortPriority(transformResultID(resultID),  ffid, sortPriority);
                     }
                 }

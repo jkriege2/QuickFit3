@@ -897,13 +897,13 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
                         else {
                             record->resultsSetInNumberErrorListAndBool(evalID, fpid, run, params[i], errors[i], unit, getParamNameLocalStore(fpid), true);
                         }
-                        record->resultsSetGroupLabelsAndSortPriority(evalID, fpid, tr("fit results"), ffunc->getDescription(pid).name, ffunc->getDescription(pid).label, true);
+                        record->resultsSetGroupLabelsAndSortPriority(evalID, fpid, tr("fit results"), pid+": "+ffunc->getDescription(pid).name, ffunc->getDescription(pid).label, true);
 
                         if (run<0) record->resultsSetBoolean(evalID, ffid, paramsFix[i]);
                         else {
                             record->resultsSetInBooleanListAndBool(evalID, ffid, run, paramsFix[i], QString(""), getParamNameLocalStore(ffid), true);
                         }
-                        record->resultsSetGroupLabelsAndSortPriority(evalID,ffid, tr("fit results"), ffunc->getDescription(pid).name+tr(", fix"), ffunc->getDescription(pid).label+tr(", fix"), true);
+                        record->resultsSetGroupLabelsAndSortPriority(evalID,ffid, tr("fit results"), "fix_"+pid+": "+ffunc->getDescription(pid).name+tr(", fix"), ffunc->getDescription(pid).label+tr(", fix"), true);
                     }
                 }
                 if (!has_g0) {
