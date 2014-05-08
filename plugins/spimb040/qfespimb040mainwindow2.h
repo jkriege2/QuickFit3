@@ -18,6 +18,7 @@
 #include <QTime>
 #include <QTabWidget>
 #include <QGroupBox>
+#include "qfenhancedtabwidget.h"
 
 
 #include "programoptions.h"
@@ -84,7 +85,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
         QFESPIMB040ExperimentDescription* widExperimentDescription;
         QFPluginServices* m_pluginServices;
 
-        QTabWidget* tabAcquisition;
+        QFEnhancedTabWidget* tabAcquisition;
         QFESPIMB040AcquisitionConfigWidget2* widAcquisition;
         QFESPIMB040ImageStackConfigWidget2* widImageStack;
         QFESPIMB040CamParamStackConfigWidget2* widCamParamScan;
@@ -94,7 +95,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
         QFESPIMB040ConfigTabWidget* widConfig;
 
 
-        QTabWidget* tabMain;
+        QFEnhancedTabWidget* tabMain;
         QPushButton* btnHelp;
 
 

@@ -180,6 +180,8 @@ void QFRDRTablePlotWidget::listGraphs_currentRowChanged(int currentRow) {
         ui->widGraphSettings->setEnabled(true);
         QFRDRTable::GraphInfo graph=current->getPlot(this->plot).graphs.at(currentRow);
         ui->widGraphSettings->loadGraphData(graph);
+        ui->widGraphSettings->show();
+        ui->widGraphSettings->repaint();
 
         updatePlotWidgetVisibility();
     }

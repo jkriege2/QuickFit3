@@ -525,7 +525,7 @@ p, li { white-space: pre-wrap; }
    <item row="6" column="1">
     <layout class="QGridLayout" name="gridLayout_4">
      <item row="1" column="1">
-      <widget class="QTabWidget" name="tabWidget">
+      <widget class="QFEnhancedTabWidget" name="tabWidget">
        <property name="currentIndex">
         <number>0</number>
        </property>
@@ -1585,6 +1585,20 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QFEnhancedTabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>qfenhancedtabwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFESPIMB040ConfigComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qfespimb040configcombobox.h</header>
+   <slots>
+    <signal>currentConfigChanged(QString)</signal>
+   </slots>
+  </customwidget>
+  <customwidget>
    <class>QF3FilterCombobox</class>
    <extends>QWidget</extends>
    <header>filters.h</header>
@@ -1628,14 +1642,6 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
    <slots>
     <slot>setReadOnly(bool)</slot>
-   </slots>
-  </customwidget>
-  <customwidget>
-   <class>QFESPIMB040ConfigComboBox</class>
-   <extends>QComboBox</extends>
-   <header>qfespimb040configcombobox.h</header>
-   <slots>
-    <signal>currentConfigChanged(QString)</signal>
    </slots>
   </customwidget>
   <customwidget>

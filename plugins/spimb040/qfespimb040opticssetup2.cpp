@@ -6,7 +6,7 @@
 #include "jkiniparser2.h"
 #include "qfespimb040shortcutconfigdialog.h"
 #include "qfespimb040lightpathsavedialog.h"
-
+#include "qfenhancedtabwidget.h"
 
 
 
@@ -351,7 +351,7 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            ui_widgets[id]=w;
                            ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
                        } else if (type=="tabwidget") {
-                           QTabWidget* w=new QTabWidget(this);
+                           QFEnhancedTabWidget* w=new QFEnhancedTabWidget(this);
                            QGridLayout* wgl=new QGridLayout(w);
                            widNew=w;
                            ui_tabs[id]=w;

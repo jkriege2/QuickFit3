@@ -127,7 +127,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
     setLayout(mainl);
     splitter=new QVisibleHandleSplitter(Qt::Vertical, this);
     mainl->addWidget(splitter);
-    tabMain=new QTabWidget(this);
+    tabMain=new QFEnhancedTabWidget(this);
     QVBoxLayout* topl=new QVBoxLayout(this);
     QWidget* topW=new QWidget(this);
     topW->setLayout(topl);
@@ -180,7 +180,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create tab which groups different acquisition modes
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    //tabAcquisition=new QTabWidget(this);
+    //tabAcquisition=new QFEnhancedTabWidget(this);
     //tabMain->addTab(tabAcquisition, tr("Acquisition"));
 
         //------------------------------------------------------------------------------------------

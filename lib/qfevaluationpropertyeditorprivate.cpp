@@ -4,6 +4,7 @@
 #include "qfevaluationitemfactory.h"
 #include "qfversion.h"
 #include "qfproject.h"
+#include "qfenhancedtabwidget.h"
 
 QFEvaluationPropertyEditorPrivate::QFEvaluationPropertyEditorPrivate(QFEvaluationPropertyEditor *parent) :
     QObject(parent)
@@ -375,7 +376,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     menuResults=menuBar->addMenu("&Results");
     menuHelp=menuBar->addMenu("&Help");
 
-    tabMain=new QTabWidget(d);
+    tabMain=new QFEnhancedTabWidget(d);
     ml->addWidget(tabMain);
 
     QWidget* w=new QWidget(tabMain);

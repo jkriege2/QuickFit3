@@ -11,6 +11,7 @@
 #include <QItemSelectionModel>
 #include <QItemSelection>
 #include "qfparametercorrelationservice.h"
+#include "qfenhancedtabwidget.h"
 
 QFRawDataPropertyEditor_private::QFRawDataPropertyEditor_private(QFRawDataPropertyEditor *parent) :
     QObject(parent)
@@ -185,7 +186,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
 
     vl->addWidget(btnHelp);
 
-    tabMain=new QTabWidget(d);
+    tabMain=new QFEnhancedTabWidget(d);
     ml->addWidget(tabMain);
     connect(tabMain, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
 

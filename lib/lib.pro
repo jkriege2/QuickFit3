@@ -107,7 +107,8 @@ HEADERS += dlgnewproperty.h \
     qfmathparsertools.h \
     qfmathparserdefaultlib.h \
     qfevaluationpropertyeditorprivate.h \
-    imagetools.h
+    imagetools.h \
+    qfenhancedtabwidget.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -183,7 +184,8 @@ SOURCES += dlgnewproperty.cpp \
     qfmathparsertools.cpp \
     qfmathparserdefaultlib.cpp \
     qfevaluationpropertyeditorprivate.cpp \
-    imagetools.cpp
+    imagetools.cpp \
+    qfenhancedtabwidget.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

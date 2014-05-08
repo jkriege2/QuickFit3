@@ -77,6 +77,8 @@ void QFRDRTableEditor::createWidgets() {
     QVBoxLayout* l=new QVBoxLayout(this);
     setLayout(l);
 
+    tbMain=new QToolBar("tbtablemain", this);
+    l->addWidget(tbMain);
 
 
     tvMain=new QFRDRTableEnhancedTableView(this);
@@ -84,9 +86,23 @@ void QFRDRTableEditor::createWidgets() {
     connect(tvMain, SIGNAL(keyPressed(int,Qt::KeyboardModifiers,QString)), this, SLOT(tableKeyPressed(int,Qt::KeyboardModifiers,QString)));
     connect(tvMain, SIGNAL(delPressed()), this, SLOT(slDelete()));
     connect(tvMain, SIGNAL(copyPressed()), this, SLOT(slCopy()));
+    l->addWidget(tvMain, 2);
 
-    tbMain=new QToolBar("tbtablemain", this);
-    l->addWidget(tbMain);
+    tabQuick=new QFEnhancedTabWidget(this);
+    l->addWidget(tabQuick, 1);
+    tabQuick->setVisible(false);
+    tvQuickStat=new QEnhancedTableView(this);
+    tmQuickStat=new QFTableModel(this);
+    tvQuickStat->setModel(tmQuickStat);
+    tabQuick->addTab(tvQuickStat, tr("Quick Statistics"));
+    histQuick=new QFHistogramView(this);
+    histQuick->setAutorange(true);
+    histQuick->setNormalized(true);
+    histQuick->setBins(35);
+    tabQuick->addTab(histQuick, tr("Quick Histogram"));
+
+
+
 
     actLoadTable=new QAction(QIcon(":/table/table_open.png"), "load table", this);
     actLoadTable->setToolTip(tr("Load table ..."));
@@ -234,6 +250,19 @@ void QFRDRTableEditor::createWidgets() {
     actRedo=new QAction(QIcon(":/lib/redo.png"), "redo", this);
     actRedo->setShortcut(QKeySequence::Redo);
 
+    actQuickStat=new QAction(QIcon(":/table/quickstat.png"), "Quick Statistics", this);
+    actQuickStat->setCheckable(true);
+    actQuickStat->setChecked(false);
+    connect(actQuickStat, SIGNAL(toggled(bool)), this, SLOT(slQuickStat(bool)));
+    connect(this, SIGNAL(enableActions(bool)), actQuickStat, SLOT(setEnabled(bool)));
+
+    actQuickHistogram=new QAction(QIcon(":/table/quickhist.png"), "Quick Histogram", this);
+    actQuickHistogram->setCheckable(true);
+    actQuickHistogram->setChecked(false);
+    connect(actQuickHistogram, SIGNAL(toggled(bool)), this, SLOT(slQuickHistogram(bool)));
+    connect(this, SIGNAL(enableActions(bool)), actQuickHistogram, SLOT(setEnabled(bool)));
+
+
 
     tbMain->addAction(actLoadTable);
     tbMain->addAction(actSaveTable);
@@ -261,6 +290,9 @@ void QFRDRTableEditor::createWidgets() {
     tbMain->addAction(actClearExpression);
     tbMain->addAction(actRecalcAll);
     tbMain->addAction(actSort);
+    tbMain->addSeparator();
+    tbMain->addAction(actQuickStat);
+    tbMain->addAction(actQuickHistogram);
 
 
 
@@ -293,8 +325,6 @@ void QFRDRTableEditor::createWidgets() {
     tvMain->addAction(actHistogram);
     tvMain->addAction(actHistogram2D);
     tvMain->addAction(actSort);
-
-    l->addWidget(tvMain);
 
     propertyEditor->setMenuBarVisible(true);
     QMenu* menuFile=propertyEditor->addMenu("&File", 0);
@@ -349,6 +379,9 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addAction(actClear);
     menuTab->addAction(actResize);
 
+    QMenu* menuTools=propertyEditor->addMenu("T&ools", 0);
+    menuTools->addAction(actQuickStat);
+    menuTools->addAction(actQuickHistogram);
 
 }
 
@@ -362,9 +395,12 @@ void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord*
             disconnect(m->model(), SIGNAL(redoAvailable(bool)), actRedo, SLOT(setEnabled(bool)));
             disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), this, SLOT(setActionsEnabled(bool)));
             disconnect(tvMain->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(slEditColumnProperties(int)));
-
+            disconnect(tvMain->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged()));
 
         }
+        tmQuickStat->setReadonly(false);
+        tmQuickStat->clear();
+        tmQuickStat->setReadonly(true);
     }
     //std::cout<<"qobject_cast ... ";
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
@@ -378,6 +414,7 @@ void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord*
         connect(m->model(), SIGNAL(undoAvailable(bool)), actUndo, SLOT(setEnabled(bool)));
         connect(actRedo, SIGNAL(triggered()), m->model(), SLOT(redo()));
         connect(m->model(), SIGNAL(redoAvailable(bool)), actRedo, SLOT(setEnabled(bool)));
+        connect(tvMain->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged()));
         m->model()->setReadonly(m->model()->isReadonly());
         m->model()->emitUndoRedoSignals(true);
         setActionsEnabled(!m->model()->isReadonly());
@@ -1078,6 +1115,83 @@ void QFRDRTableEditor::tableKeyPressed(int key, Qt::KeyboardModifiers modifiers,
     }
 }
 
+void QFRDRTableEditor::selectionChanged()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            //////////////////////////////////////////////////////////////////////////////////////////////
+            // QUICK_STATISTICS!!!
+            //////////////////////////////////////////////////////////////////////////////////////////////
+            if (actQuickStat->isChecked() || actQuickHistogram->isChecked()) {
+                if (actQuickStat->isChecked()) {
+                    tmQuickStat->setReadonly(false);
+                    tmQuickStat->disableSignals();
+                    tmQuickStat->clear();
+                }
+                if (actQuickHistogram->isChecked()) {
+                    histQuick->clear();
+                }
+
+                QModelIndexList idxs=tvMain->selectionModel()->selectedIndexes();
+
+                QList<int> cols;
+                for (int i=0; i<idxs.size(); i++) {
+                    if (!cols.contains(idxs[i].column())) cols.append(idxs[i].column());
+                }
+                qSort(cols);
+
+                //qDebug()<<"quickstat: "<<idxs.size()<<cols;
+
+                for (int i=0; i<cols.size(); i++) {
+                    QVector<double> data;
+                    for (int j=0; j<idxs.size(); j++) {
+                        if (idxs[j].column()==cols[i]) {
+                            QVariant v=m->model()->cell(idxs[j].row(), idxs[j].column());
+                            if (v.canConvert(QVariant::Double)) data.append(v.toDouble());
+                        }
+                    }
+                    if (actQuickStat->isChecked() && data.size()>0) {
+                        int r=tmQuickStat->rowCount();
+                        tmQuickStat->setColumnTitleCreate(0, tr("column"));
+                        tmQuickStat->setColumnTitleCreate(1, tr("mean"));
+                        tmQuickStat->setColumnTitleCreate(2, tr("std. dev."));
+                        tmQuickStat->setColumnTitleCreate(3, tr("min"));
+                        tmQuickStat->setColumnTitleCreate(4, tr("q25"));
+                        tmQuickStat->setColumnTitleCreate(5, tr("median"));
+                        tmQuickStat->setColumnTitleCreate(6, tr("q75"));
+                        tmQuickStat->setColumnTitleCreate(7, tr("max"));
+                        tmQuickStat->setColumnTitleCreate(8, tr("# items"));
+                        tmQuickStat->setCellCreate(r, 0, m->model()->headerData(cols[i], Qt::Horizontal));
+                        tmQuickStat->setCellCreate(r, 1, qfstatisticsAverage(data));
+                        tmQuickStat->setCellCreate(r, 2, qfstatisticsStd(data));
+                        qSort(data);
+                        tmQuickStat->setCellCreate(r, 3, qfstatisticsSortedMin(data));
+                        tmQuickStat->setCellCreate(r, 4, qfstatisticsSortedQuantile(data, 0.25));
+                        tmQuickStat->setCellCreate(r, 5, qfstatisticsSortedMedian(data));
+                        tmQuickStat->setCellCreate(r, 6, qfstatisticsSortedQuantile(data, 0.75));
+                        tmQuickStat->setCellCreate(r, 7, qfstatisticsSortedMax(data));
+                        tmQuickStat->setCellCreate(r, 8, qfstatisticsCount(data));
+                    }
+                    if (actQuickHistogram->isChecked() && data.size()>0) {
+                        histQuick->addCopiedHistogram( m->model()->headerData(cols[i], Qt::Horizontal).toString(), data.data(), data.size());
+                    }
+
+                }
+
+                if (actQuickStat->isChecked()) {
+                    tmQuickStat->setReadonly(true);
+                    tmQuickStat->enableSignals(true);
+                    tvQuickStat->resizeColumnsToContents();
+                }
+                if (actQuickHistogram->isChecked()) {
+                    histQuick->updateHistogram(true);
+                }
+            }
+        }
+    }
+}
+
 void QFRDRTableEditor::slRecalcAll()
 {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
@@ -1526,6 +1640,32 @@ void QFRDRTableEditor::slHistogram2D()
             }
         }
     }
+}
+
+void QFRDRTableEditor::slQuickStat(bool enabled)
+{
+    setQuickTabVisible();
+    if (enabled) {
+        tabQuick->setCurrentWidget(tvQuickStat);
+        selectionChanged();
+    }
+}
+
+void QFRDRTableEditor::slQuickHistogram(bool enabled)
+{
+    setQuickTabVisible();
+    if (enabled) {
+        tabQuick->setCurrentWidget(histQuick);
+        selectionChanged();
+    }
+}
+void QFRDRTableEditor::setQuickTabVisible()
+{
+    tabQuick->setVisible(actQuickStat->isChecked() || actQuickHistogram->isChecked());
+    tvQuickStat->setVisible(actQuickStat->isChecked());
+    histQuick->setVisible(actQuickHistogram->isChecked());
+    show();
+    repaint();
 }
 
 void QFRDRTableEditor::setActionsEnabled(bool enabled) {

@@ -25,7 +25,7 @@ void QFRDRPlotEditor::createWidgets() {
     tbMain=new QToolBar("tbPlotMain", this);
     l->addWidget(tbMain);
 
-    tabPlots=new QTabWidget(this);
+    tabPlots=new QFEnhancedTabWidget(this);
     tabPlots->setTabsClosable(true);
     connect(tabPlots, SIGNAL(tabCloseRequested(int)), this, SLOT(deletePlot(int)));
     l->addWidget(tabPlots);

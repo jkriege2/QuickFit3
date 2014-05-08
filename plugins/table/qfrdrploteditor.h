@@ -16,6 +16,7 @@
 #include "qfrawdatapropertyeditor.h"
 #include "qfplotter.h"
 #include "qfrdrtableplotwidget.h"
+#include "qfenhancedtabwidget.h"
 
 
 class QFRDRTable; // forward
@@ -72,7 +73,7 @@ class QFRDRPlotEditor : public QFRawDataEditor {
     protected:
 
         QPointer<QFRDRTable> current;
-        QTabWidget* tabPlots;
+        QFEnhancedTabWidget* tabPlots;
         QAction* actAddPlot;
         QAction* actDeletePlot;
         QAction* actDuplicatePlot;

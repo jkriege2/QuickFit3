@@ -59,7 +59,7 @@
      <item>
       <widget class="QCheckBox" name="chkLogX">
        <property name="text">
-        <string>x log-scale</string>
+        <string>log-scale</string>
        </property>
       </widget>
      </item>
@@ -299,14 +299,14 @@
      <item>
       <widget class="QCheckBox" name="chkX0Axis">
        <property name="text">
-        <string>0-axis</string>
+        <string>show 0-axis</string>
        </property>
       </widget>
      </item>
      <item>
       <widget class="QCheckBox" name="chkXInverted">
        <property name="text">
-        <string>inverted</string>
+        <string>invert axis</string>
        </property>
       </widget>
      </item>

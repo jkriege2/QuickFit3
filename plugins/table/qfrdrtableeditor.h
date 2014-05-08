@@ -21,6 +21,8 @@
 #include "qfmathparser.h"
 #include "qfrdrtableformuladialog.h"
 #include "qfrdrtablehistogramdialog.h"
+#include "qfenhancedtabwidget.h"
+#include "qfhistogramview.h"
 
 /*! \brief editor class for tables
     \ingroup qf3rdrdp_table
@@ -78,12 +80,19 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slHistogram();
         void slHistogram2D();
 
+        void slQuickStat(bool enabled);
+
+        void setQuickTabVisible();
+
         void setActionsEnabled(bool enabled);
         void setActionsDisabled(bool disabled);
 
         void editExpression(const QModelIndex& index);
 
         void tableKeyPressed(int key, Qt::KeyboardModifiers modifiers, QString text);
+
+        void selectionChanged();
+        void slQuickHistogram(bool enabled);
     signals:
         void enableActions(bool enabled);
         void disableActions(bool enabled);
@@ -94,6 +103,11 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QFRDRTableFormulaDialog* dlgMathExpression;
 
         QString currentTableDir;
+
+        QFEnhancedTabWidget* tabQuick;
+        QEnhancedTableView* tvQuickStat;
+        QFTableModel* tmQuickStat;
+        QFHistogramView* histQuick;
 
 
         QAction* actSaveTable;
@@ -132,6 +146,8 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actUndo;
         QAction* actRedo;
 
+        QAction* actQuickStat;
+        QAction* actQuickHistogram;
 
         QToolBar* tbMain;
 

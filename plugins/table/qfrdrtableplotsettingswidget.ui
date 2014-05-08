@@ -62,9 +62,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QTabWidget" name="tabWidget_2">
+    <widget class="QFEnhancedTabWidget" name="tabWidget_2">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -322,7 +322,7 @@
         </layout>
        </item>
        <item>
-        <widget class="QTabWidget" name="tabWidget">
+        <widget class="QFEnhancedTabWidget" name="tabWidget">
          <property name="currentIndex">
           <number>0</number>
          </property>
@@ -752,6 +752,12 @@
    <class>QFRDRTableAxisSettingsWidget</class>
    <extends>QWidget</extends>
    <header>../qfrdrtableaxissettingswidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFEnhancedTabWidget</class>
+   <extends>QTabWidget</extends>
+   <header>qfenhancedtabwidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
