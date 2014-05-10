@@ -4729,7 +4729,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                     if (selections[is]!="all") {
                         for (int jss=0; jss<m->getImageSelectionCount(); jss++) {
                             if (m->getImageSelectionName(jss)==selections[is]) {
-                                copyArray(ma.data(), m->loadImageSelection(jss), qMin(ma.size(), m->getImageSelectionHeight()*m->getImageSelectionWidth()));
+                                if (m->loadImageSelection(jss)) copyArray(ma.data(), m->loadImageSelection(jss), qMin(ma.size(), m->getImageSelectionHeight()*m->getImageSelectionWidth()));
                                 break;
                             }
                         }
@@ -4759,7 +4759,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                 if (cmbDualView->currentIndex()>0)  avgs=2;
                 QList<copyFitResultStatistics_data> dataint;
                 for (int iss=0; iss<selections_b.size(); iss++) {
-                    QVector<bool> masel=selections_b[iss];
+                    const QVector<bool>& masel=selections_b[iss];
                     QString masel_name="";
                     if (iss<selections.size()) masel_name=selections[iss]+": ";
                     for (int avgIdx=0; avgIdx<avgs; avgIdx++) {
@@ -4866,19 +4866,19 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                     }
 
                                     if (d.Nfit==0) {
-                                        for (int jj=0; jj<singlenames.size(); jj++) {
+                                        for (int jj=0; jj<values.size(); jj++) {
                                             d.gfix.append(Qt::Unchecked);
                                             d.names.append(masel_name+singlenames[jj]);
                                             d.namelabels.append(masel_name+singlenames[jj]);
                                         }
-                                        for (int jj=0; jj<singlenames.size(); jj++) {
+                                        for (int jj=0; jj<values.size(); jj++) {
                                             QList<double> v;
                                             v.append(values[jj]);
                                             d.gvalues.append(v);
                                         }
 
                                     } else {
-                                        for (int jj=0; jj<singlenames.size(); jj++) {
+                                        for (int jj=0; jj<values.size(); jj++) {
                                             d.gvalues[jj].append(values[jj]);
                                         }
                                     }
@@ -4896,7 +4896,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                         free(cerr);
                         free(corr1);
                         dataint.append(d);
-                        if (avgIdx==0) {
+                        /*if (avgIdx==0) {
                             if (recs.size()>1) {
                                 for (int j=0; j<d.names.size(); j++) {
                                     //names.append(d.names);
@@ -4912,7 +4912,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                             }
 
                             //labels.append(d.namelabels);
-                        }
+                        }*/
                     }
                 }
                 if (dataint.size()>0) {
