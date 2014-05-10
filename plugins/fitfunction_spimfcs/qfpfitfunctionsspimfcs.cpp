@@ -38,6 +38,7 @@
 #include "qffitfunctionsspimfccsfw2csep2ddiffxz2coloracfg.h"
 #include "qffitfunctionsspimfccsfw2csep2ddiffxz2coloracfr.h"
 
+#include "qffitfunctionsspimfccsdiffflowce2_newVeff.h"
 #include "qftools.h"
 
 QStringList QFPFitFunctionsSPIMFCS::getIDs() const {
@@ -55,6 +56,7 @@ QStringList QFPFitFunctionsSPIMFCS::getIDs() const {
 
     res<<"fccs_spim_diff";
     res<<"fccs_spim_diffflow";
+    res<<"fccs_spim_diffflowce2";
     res<<"fccs_spim_diff2color";
 
     res<<"fccs_spim_fw_diff2colorccf";
@@ -112,6 +114,8 @@ QFFitFunction* QFPFitFunctionsSPIMFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionsSPIMFCCSDiff();
     } else if (id=="fccs_spim_diffflow") {
         return new QFFitFunctionsSPIMFCCSDiffFlow();
+    } else if (id=="fccs_spim_diffflowce2") {
+        return new QFFitFunctionsSPIMFCCSDiffFlowCENewVeff2();
     } else if (id=="fccs_spim_diff2color") {
         return new QFFitFunctionsSPIMFCCSDiff2Color();
     } else if (id=="fccs_spim_fw_diff2coloracfg") {
@@ -460,7 +464,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
     } else if (i==c++) { // fccs_spim_fw_adiff2coloracfg, fccs_spim_fw_adiff2coloracfr, fccs_spim_fw_adiff2colorccf
         res.groupLabel=spimfccslabel;
         res.menuEntryLabel=tr("... diffusion+flow, ACF + 4 neighbors");
-        res.models<<"fccs_spim_diffflow"<<"fccs_spim_diffflow"<<"fccs_spim_diffflow"<<"fccs_spim_diffflow"<<"fccs_spim_diffflow";
+        res.models<<"fccs_spim_diffflowce2"<<"fccs_spim_diffflowce2"<<"fccs_spim_diffflowce2"<<"fccs_spim_diffflowce2"<<"fccs_spim_diffflowce2";
         res.globalParams << constructQListWithMultipleItems(QStringList("n_particle"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff1"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("vflowx"), 5);

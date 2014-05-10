@@ -25,9 +25,9 @@ QFFitFunctionFCSMultiDiffusion::QFFitFunctionFCSMultiDiffusion() {
     #define FCSMULTI_nonfl_tau2 4
     addParameter(FloatNumber,  "nonfl_theta2",            "dark component 2 fraction",                             "&theta;<sub>dark,2</sub>", "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.2,          0,        0.99999,  0.1, 0,      1);
     #define FCSMULTI_nonfl_theta2 5
-    addParameter(FloatNumber,  "n_particle",              "Particle number N",                                     "N",                        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e5,      1,   0);
+    addParameter(FloatNumber,  "n_particle",              "particle number N",                                     "N",                        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e5,      1,   0);
     #define FCSMULTI_n_particle 6
-    addParameter(FloatNumber,  "1n_particle",             "1/Particle number N",                                   "1/N",                      "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, false, 0.1,          1e-10,    1e5,      0.1, 0);
+    addParameter(FloatNumber,  "1n_particle",             "1/particle number N",                                   "1/N",                      "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, false, 0.1,          1e-10,    1e5,      0.1, 0);
     #define FCSMULTI_1n_particle 7
 
     addParameter(IntCombo,     "diff_type1",              "type of diffusion (2D/3D...)",                          "type 1",                   "",            "",                      false,     true,         false,             QFFitFunction::NoError,      false, 0,            0,        2,        1,   0,      2,        types);

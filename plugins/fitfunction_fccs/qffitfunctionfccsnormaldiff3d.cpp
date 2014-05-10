@@ -17,7 +17,7 @@ QFFitFunctionFCCSNormalDiff3D::QFFitFunctionFCCSNormalDiff3D() {
     #define FCCS3DDiff_nonfl_tau1 1
     addParameter(FloatNumber,  "nonfl_theta1",            "triplet fraction",                                      "&theta;<sub>trip</sub>",   "",           "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.2,          0,        0.99999,  0.1, 0,      1);
     #define FCCS3DDiff_nonfl_theta1 2
-    addParameter(FloatNumber,  "n_particle_ab",           "Particle number N(ab)",                                 "N<sub>ab</sub>",           "",           "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 5,            1e-10,    1e5,      1,   0);
+    addParameter(FloatNumber,  "n_particle_ab",           "particle number N(ab)",                                 "N<sub>ab</sub>",           "",           "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 5,            1e-10,    1e5,      1,   0);
     #define FCCS3DDiff_n_particle10 3
     addParameter(FloatNumber,  "appn_particle_a",         "apparent particle number from green ACF",               "N<sub>a</sub>+N<sub>ab</sub>", "",       "",                      false,     true,        false,              QFFitFunction::EditError,    false, 10,           1e-10,    1e5,      1,   0);
     #define FCCS3DDiff_appn_particle0 4

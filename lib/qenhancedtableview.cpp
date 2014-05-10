@@ -152,6 +152,7 @@ void QEnhancedTableView::getVariantDataTable(int copyrole, QList<QList<QVariant>
     QModelIndexList sel=selectionModel()->selectedIndexes();
     QLocale loc=QLocale::system();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    //qDebug()<<sel.size();
     if (sel.size()==1) {
         QVariant vdata=sel[0].data(copyrole);
         csvData<<QList<QVariant>();
@@ -202,13 +203,12 @@ void QEnhancedTableView::getVariantDataTable(int copyrole, QList<QList<QVariant>
         for (int i=0; i<sel.size(); i++) {
             int r=rowlist.indexOf(sel[i].row());
             int c=collist.indexOf(sel[i].column());
-            int cc=collist.indexOf(c);
-            int rr=rowlist.indexOf(r);
             if (c>=0 && c<colcnt && r>=0 && r<rowcnt) {
                 csvData[c].operator[](r)=sel[i].data(copyrole);
-                //qDebug()<<"rc="<<r<<c<<"  rrcc="<<rr<<cc<<"  val="<<sel[i].data(copyrole);
+                //qDebug()<<r<<c<<"="<<sel[i].data(copyrole);
             }
         }
+        //qDebug()<<csvData.size();
     }
 }
 
@@ -221,13 +221,16 @@ void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead, bool
     getVariantDataTable(copyrole, csvData, colnames, rownames);
 
     //if (selectionModel()->selectedIndexes().size()==1) dataExpand(csvData, &colnames);
+    //qDebug()<<csvData.first().first();
     if (csvData.size()==1) dataExpand(csvData, &colnames);
     else dataReduce(csvData, &colnames);
+    //qDebug()<<csvData.first().first();
 
     if (flipped)  {
         csvData=dataRotate(csvData);
         qSwap(colnames, rownames);
     }
+    //qDebug()<<csvData.first().first();
     //qDebug()<<csvData.size()<<colnames.size();
     if (storeHead) QFDataExportHandler::copyCSV(csvData, colnames, rownames);
     else QFDataExportHandler::copyCSV(csvData);
@@ -242,6 +245,7 @@ void QEnhancedTableView::copySelectionToCSV(int copyrole, bool storeHead, bool f
     QStringList colnames;
     QStringList rownames;
     getVariantDataTable(copyrole, csvData, colnames, rownames);
+    //qDebug()<<"copy1: "<<csvData.size()<<colnames.size();
 
     //if (selectionModel()->selectedIndexes().size()==1) dataExpand(csvData, &colnames);
     if (csvData.size()==1) dataExpand(csvData, &colnames);
@@ -251,7 +255,7 @@ void QEnhancedTableView::copySelectionToCSV(int copyrole, bool storeHead, bool f
         csvData=dataRotate(csvData);
         qSwap(colnames, rownames);
     }
-    //qDebug()<<csvData.size()<<colnames.size();
+    //qDebug()<<"copy2: "<<csvData.size()<<colnames.size();
     if (storeHead) QFDataExportHandler::copyCSV(csvData, colnames, rownames);
     else QFDataExportHandler::copyCSV(csvData);
 

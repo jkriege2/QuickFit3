@@ -2887,6 +2887,7 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
         double w=m->getImageFromRunsWidth();
         double h=m->getImageFromRunsHeight();
         int channels=m->getImageFromRunsChannelsAdvised();
+        int channels_all=m->getImageFromRunsChannels();
         if ((w==0) || (h==0)) {
             w=h=1;
         }
@@ -2898,12 +2899,18 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
         pltOverview->get_plotter()->set_maintainAxisAspectRatio(chkKeepAspect->isChecked());
         pltOverview->get_plotter()->set_axisAspectRatio(1.0*w/h);
 
+        pltOverview->get_plotter()->getXAxis()->set_minTicks(3);
+        pltOverview->get_plotter()->getYAxis()->set_minTicks(3);
+        pltOverview->get_plotter()->getXAxis()->set_minorTicks(0);
+        pltOverview->get_plotter()->getYAxis()->set_minorTicks(0);
+        pltOverview->get_plotter()->getYAxis()->set_tickInsideLength(0);
+        pltOverview->get_plotter()->getYAxis()->set_tickInsideLength(0);
         if (w>3*h) {
             pltOverview->get_plotter()->getXAxis()->set_minTicks(3);
             plteOverview->get_colorBarRightAxis()->set_minTicks(3);
             plteOverview->get_colorBarTopAxis()->set_minTicks(5);
         } else {
-            pltOverview->get_plotter()->getXAxis()->set_minTicks(7);
+            pltOverview->get_plotter()->getXAxis()->set_minTicks(3);
             plteOverview->get_colorBarRightAxis()->set_minTicks(5);
             plteOverview->get_colorBarTopAxis()->set_minTicks(3);
         }

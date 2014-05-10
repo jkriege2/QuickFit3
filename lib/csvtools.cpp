@@ -141,7 +141,7 @@ QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_
 
 
 
-void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames, const QStringList& rowNames, bool copyAllVariant) {
+void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames, const QStringList& rowNames, bool copyWithLocalePriority) {
 
     QString csv, csvLocale, excel;
     QLocale loc;
@@ -214,7 +214,7 @@ void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames,
 
     QClipboard *clipboard = QApplication::clipboard();
     QMimeData* mime=new QMimeData();
-    if (copyAllVariant) {
+    if (copyWithLocalePriority) {
         mime->setText(excel);
     } else {
         mime->setText(csv);
@@ -228,7 +228,7 @@ void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames,
     clipboard->setMimeData(mime);
 }
 
-void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsNames, const QStringList& rowNames, bool copyAllVariant) {
+void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsNames, const QStringList& rowNames, bool copyWithLocalePriority) {
 
     QString csv, csvLocale, excel;
     QString stringDelimiter="\"";
@@ -266,6 +266,8 @@ void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsName
         csvLocale+="\n";
         excel+="\n";
     }
+
+    //qDebug()<<datas<<data.size();
     for (int r=0; r<datas; r++) {
         if (rowNames.size()>0) {
             QString strans=rowNames.value(r, "");
@@ -288,6 +290,8 @@ void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsName
             if (r<data[c].size()) {
                 const QVariant& v=data[c].at(r);
 
+                //qDebug()<<r<<c<<v;
+
                 switch(v.type()) {
                     case QVariant::Int:
                     case QVariant::UInt:
@@ -299,6 +303,7 @@ void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsName
                             csvLocale+=loc.toString(d);
                             csv+=CDoubleToQString(d);
                         } break;
+                    case QVariant::Invalid:  break;
                     default:
                         if (v.isValid()) {
                             QString h=v.toString();
@@ -322,7 +327,7 @@ void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsName
 
     QClipboard *clipboard = QApplication::clipboard();
     QMimeData* mime=new QMimeData();
-    if (copyAllVariant) {
+    if (copyWithLocalePriority) {
         mime->setText(excel);
     } else {
         mime->setText(csv);

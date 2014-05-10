@@ -114,12 +114,19 @@ void QFImagePlotter::updateImage()
         plteImage->get_colorBarTopAxis()->set_labelFontSize(8);
         plteImage->get_colorBarTopAxis()->set_axisLabel(plteImageLabel);
 
+        get_plotter()->getXAxis()->set_minTicks(3);
+        get_plotter()->getYAxis()->set_minTicks(3);
+        get_plotter()->getXAxis()->set_minorTicks(0);
+        get_plotter()->getYAxis()->set_minorTicks(0);
+        get_plotter()->getYAxis()->set_tickInsideLength(0);
+        get_plotter()->getYAxis()->set_tickInsideLength(0);
+
         if (w>3*h) {
             get_plotter()->getXAxis()->set_minTicks(3);
             plteImage->get_colorBarRightAxis()->set_minTicks(3);
             plteImage->get_colorBarTopAxis()->set_minTicks(5);
         } else {
-            get_plotter()->getXAxis()->set_minTicks(7);
+            get_plotter()->getXAxis()->set_minTicks(3);
             plteImage->get_colorBarRightAxis()->set_minTicks(5);
             plteImage->get_colorBarTopAxis()->set_minTicks(3);
         }

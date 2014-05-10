@@ -116,8 +116,8 @@ void dataExpand(QList<QList<QVariant> >& data, QStringList* columnsNames) {
         for (int i=0; i<cols; i++) {
             QList<QVariant> newcol;
             for (int r=0; r<data[c].size(); r++) {
-                QVariant vo=QVariant();
                 const QVariant& v=data[c].at(r);
+                QVariant vo=v;
                 switch(v.type()) {
                     case QVariant::Line:
                     case QVariant::LineF:
@@ -199,8 +199,8 @@ void dataReduce(QList<QList<QVariant> >& data, QStringList* columnsNames) {
         {
             QList<QVariant> newcol;
             for (int r=0; r<data[c].size(); r++) {
-                QVariant vo=QVariant();
                 const QVariant& v=data[c].at(r);
+                QVariant vo=v;
                 switch(v.type()) {
                     case QVariant::Line:
                     case QVariant::LineF:
@@ -567,7 +567,7 @@ void QFDataExportHandler::save(const QList<QList<QVariant> > &data, const QStrin
 
 void QFDataExportHandler::copyCSV(const QList<QList<QVariant> > &data, const QStringList &columnHeaders, const QStringList &rowHeaders)
 {
-    csvCopy(data, columnHeaders, rowHeaders);
+    csvCopy(data, columnHeaders, rowHeaders,false);
 }
 
 void QFDataExportHandler::copyMatlab(const QList<QList<QVariant> > &data)
