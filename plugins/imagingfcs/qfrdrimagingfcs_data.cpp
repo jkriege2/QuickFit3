@@ -847,6 +847,9 @@ bool QFRDRImagingFCSData::loadImage(const QString& filename, double** data, int*
 bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int* width, int* height, uint32_t* frames, double scaleFactor, double scaleOffset) {
     bool ok=false;
 
+    qDebug()<<filename<<data<<width<<height<<frames;
+    if (!data || !width || !height || !frames) return false;
+
     if (*data) free(*data);
     *data=NULL;
     *width=0;
@@ -867,17 +870,23 @@ bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int*
 
             *width=nx;
             *height=ny;
-            *data=(double*)malloc(nx*ny*(*frames)*sizeof(double));
-            uint32_t i=0;
-            do {
-                ok=ok & TIFFReadFrame<double>(tif, &((*data)[i*nx*ny]));
-                if (sampleformat == SAMPLEFORMAT_UINT && bitspersample==16 && (scaleFactor!=1.0 || scaleOffset!=0.0)) {
-                    for (int jj=0; jj<nx*ny; jj++) {
-                        (*data)[i*nx*ny+jj]=scaleOffset+(*data)[i*nx*ny+jj]*scaleFactor;
-                    }
+            if (*frames>0 && *width>0 && *height>0) {
+                *data=(double*)malloc(nx*ny*(*frames)*sizeof(double));
+                uint32_t i=0;
+                if (*data) {
+                    do {
+                        ok=ok & TIFFReadFrame<double>(tif, &((*data)[i*nx*ny]));
+                        if (sampleformat == SAMPLEFORMAT_UINT && bitspersample==16 && (scaleFactor!=1.0 || scaleOffset!=0.0)) {
+                            for (int jj=0; jj<nx*ny; jj++) {
+                                (*data)[i*nx*ny+jj]=scaleOffset+(*data)[i*nx*ny+jj]*scaleFactor;
+                            }
+                        }
+                        i++;
+                    } while (TIFFReadDirectory(tif) && i<=(*frames));
                 }
-                i++;
-            } while (TIFFReadDirectory(tif) && i<=(*frames));
+            } else {
+                log_warning(tr("WARNING: could not load overview image file '%1'\n").arg(filename));
+            }
             TIFFClose(tif);
             //qDebug()<<getID()<<"loading video "<<filename<<"   siez="<<*width<<"x"<<*height<<"   frames="<<*frames;
         } else {

@@ -4710,10 +4710,11 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
             progress.show();
             for (int recsi=0; recsi<recs.size(); recsi++){
 
-
                 QString evalGroup=currentEvalGroup();
                 QFRawDataRecord* curRec=recs[recsi];
                 QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(curRec);
+
+                qDebug()<<"recsi="<<recsi<<curRec<<m<<curRec->getName();
 
                 progress.setValue(recsi);
                 progress.setLabelText(tr("reading data from RDR:\n   '%1' ...").arg(curRec->getName()));
@@ -4742,6 +4743,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                         }
                     }
                 }
+                qDebug()<<"selections_b="<<selections_b.size();
 
                 if (selections_b.size()<=0) { // by default: sel all
                     QVector<bool> ma;
@@ -4753,16 +4755,18 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                     else selections[0]="all";
                 }
 
-                //qDebug()<<selections_b.size()<<selections;
+                qDebug()<<selections_b.size()<<selections;
 
                 int avgs=1;
                 if (cmbDualView->currentIndex()>0)  avgs=2;
                 QList<copyFitResultStatistics_data> dataint;
                 for (int iss=0; iss<selections_b.size(); iss++) {
-                    const QVector<bool>& masel=selections_b[iss];
+                    QVector<bool> masel=selections_b[iss];
                     QString masel_name="";
                     if (iss<selections.size()) masel_name=selections[iss]+": ";
+                    qDebug()<<"  iss="<<iss<<masel_name;
                     for (int avgIdx=0; avgIdx<avgs; avgIdx++) {
+                        qDebug()<<"    avgIdx="<<avgIdx;
                         double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
                         double* cerr=(double*)calloc(m->getCorrelationN(), sizeof(double));
                         double* corr1=(double*)calloc(m->getCorrelationN(), sizeof(double));
@@ -4846,6 +4850,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                             d.gvalues.append(v);
                                         }
 
+
                                     } else {
                                         for (int jj=0; jj<fix.size(); jj++) {
                                             if (d.gfix[jj]!=fix[jj]) d.gfix[jj]=Qt::PartiallyChecked;
@@ -4868,8 +4873,8 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                     if (d.Nfit==0) {
                                         for (int jj=0; jj<values.size(); jj++) {
                                             d.gfix.append(Qt::Unchecked);
-                                            d.names.append(masel_name+singlenames[jj]);
-                                            d.namelabels.append(masel_name+singlenames[jj]);
+                                            d.names.append(masel_name+singlenames.value(jj, ""));
+                                            d.namelabels.append(masel_name+singlenames.value(jj, ""));
                                         }
                                         for (int jj=0; jj<values.size(); jj++) {
                                             QList<double> v;
@@ -4915,6 +4920,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                         }*/
                     }
                 }
+                qDebug()<<"  adding "<<dataint.size();
                 if (dataint.size()>0) {
                     copyFitResultStatistics_data dd=dataint.first();
                     for (int ii=1; ii<dataint.size(); ii++) {
@@ -4930,8 +4936,8 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                 }
             }
 
-            //qDebug()<<data.size();
-            //qDebug()<<items;
+            qDebug()<<data.size();
+            qDebug()<<items;
 
             progress.setValue(progress.value()-1);
             progress.setLabelText(tr("calculating statistics and copying data ..."));
@@ -5006,7 +5012,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                 QList<QVariant> r;
                 r.clear();
                 for (int d=0; d<data.size(); d++) {
-                    //qDebug()<<d<<": "<<data[d].names;
+                    qDebug()<<d<<": "<<data[d].names;
                     for (int i=0; i<items.size(); i++) {
                         QList<double> gvalues, gvalues_s;
                         gvalues_s=gvalues=qfstatisticsFilter(data[d].gvalues.value(items[i], QList<double>()));
