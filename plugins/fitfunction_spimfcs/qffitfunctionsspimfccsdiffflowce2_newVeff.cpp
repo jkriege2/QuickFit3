@@ -69,7 +69,7 @@ double QFFitFunctionsSPIMFCCSDiffFlowCENewVeff2::evaluate(double t, const double
     if (fabs(cr)<1e-15 || fabs(background)<1e-10) backfactor=1;
 
 
-    double cfac=QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx-vx*t, dx-vx*t, 0, D1, t, wxy, wxy, wz, wz);
+    double cfac=QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx-vx*t, dy-vy*t, 0, D1, t, wxy, wxy, wz, wz);
 
     const double Veff=SPIMFCS_newAeff(a, wxy, wz);
     const double pre=1.0/sqr(a);

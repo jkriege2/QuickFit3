@@ -72,7 +72,7 @@ double QFFitFunctionsTIRFCCSDiffFlowE2::evaluate(double t, const double* data) c
 
 
 
-    double cfac=QFFitFunctionsTIRFCCSFWDiff2ColorCCF_corrfactor_2Dxy(a, dx-vx*t, dx-vx*t, D1, t, wxy, wxy);
+    double cfac=QFFitFunctionsTIRFCCSFWDiff2ColorCCF_corrfactor_2Dxy(a, dx-vx*t, dy-vy*t, D1, t, wxy, wxy);
 
     const double Veff=TIRFCS_newAeff(a, wxy);
     const double pre=1.0/sqr(a);
