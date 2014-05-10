@@ -140,6 +140,7 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("shuffle", QFMathParser_DefaultLib::fShuffle);
     p->addFunction("reverse", QFMathParser_DefaultLib::fReverse);
     p->addFunction("find", QFMathParser_DefaultLib::fFind);
+    p->addFunction("findfirst", QFMathParser_DefaultLib::fFindFirst);
     p->addFunction("select", QFMathParser_DefaultLib::fSelect);
     p->addFunction("concat", QFMathParser_DefaultLib::fConcat);
     p->addFunction("deg2rad", QFMathParser_DefaultLib::fDegToRad, NULL, qfDegToRad);
@@ -856,6 +857,107 @@ namespace QFMathParser_DefaultLib {
         return r;
     }
 
+
+    qfmpResult fFindFirst(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        qfmpResult r;
+        r.isValid=false;
+        if (n==2 && params[0].type==qfmpDoubleVector && params[1].type==qfmpDouble) {
+            const QVector<double>& dat=params[0].numVec;
+            r.type=qfmpDouble;
+            r.num=-1;
+            r.isValid=true;
+            for (int i=0; i<dat.size(); i++) {
+                if (dat[i]==params[1].num) {
+                    r.num=i;
+                    break;
+                }
+            }
+        } else if (n==2 && params[0].type==qfmpBoolVector && params[1].type==qfmpBool) {
+            const QVector<bool>& dat=params[0].boolVec;
+            r.type=qfmpDoubleVector;
+            r.type=qfmpDouble;
+            r.num=-1;
+            for (int i=0; i<dat.size(); i++) {
+                if (dat[i]==params[1].boolean) {
+                    r.num=i;
+                    break;
+                }
+            }
+        } else if (n==1 && params[0].type==qfmpBoolVector) {
+            const QVector<bool>& dat=params[0].boolVec;
+            r.type=qfmpDoubleVector;
+            r.type=qfmpDouble;
+            r.num=-1;
+            for (int i=0; i<dat.size(); i++) {
+                if (dat[i]) {
+                    r.num=i;
+                    break;
+                }
+            }
+        } else if (n==2 && params[0].type==qfmpStringVector && params[1].type==qfmpString) {
+            const QStringList& dat=params[0].strVec;
+            r.type=qfmpDoubleVector;
+            r.type=qfmpDouble;
+            r.num=-1;
+            for (int i=0; i<dat.size(); i++) {
+                if (dat[i]==params[1].str) {
+                    r.num=i;
+                    break;
+                }
+            }
+        } else  if (n==2 && params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector) {
+            const QVector<double>& dat=params[0].numVec;
+            r.type=qfmpDoubleVector;
+            r.numVec.clear();
+            r.isValid=true;
+            for (int j=0; j<params[1].numVec.size(); j++) {
+                int add=-1;
+                double v=params[1].numVec[j];
+                for (int i=0; i<dat.size(); i++) {
+                    if (dat[i]==v) {
+                        add=i;
+                        break;
+                    }
+                }
+                r.numVec.append(add);
+            }
+        } else  if (n==2 && params[0].type==qfmpStringVector && params[1].type==qfmpStringVector) {
+            const QStringList& dat=params[0].strVec;
+            r.type=qfmpDoubleVector;
+            r.numVec.clear();
+            r.isValid=true;
+            for (int j=0; j<params[1].strVec.size(); j++) {
+                int add=-1;
+                QString v=params[1].strVec[j];
+                for (int i=0; i<dat.size(); i++) {
+                    if (dat[i]==v) {
+                        add=i;
+                        break;
+                    }
+                }
+                r.numVec.append(add);
+            }
+        } else  if (n==2 && params[0].type==qfmpBoolVector && params[1].type==qfmpBoolVector) {
+            const QVector<bool>& dat=params[0].boolVec;
+            r.type=qfmpDoubleVector;
+            r.numVec.clear();
+            r.isValid=true;
+            for (int j=0; j<params[1].numVec.size(); j++) {
+                int add=-1;
+                bool v=params[1].boolVec[j];
+                for (int i=0; i<dat.size(); i++) {
+                    if (dat[i]==v) {
+                        add=i;
+                        break;
+                    }
+                }
+                r.numVec.append(add);
+            }
+        } else {
+            p->qfmpError(QObject::tr("findfirst(x, value=true) needs two arguments: one vector x and a corresponding element value (or vector), if only a boolean vector is given, the function uses value=true"));
+        }
+        return r;
+    }
 
     qfmpResult fSelect(const qfmpResult* params, unsigned int  n, QFMathParser* p){
         qfmpResult r;

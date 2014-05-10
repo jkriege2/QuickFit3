@@ -252,6 +252,7 @@ namespace QFMathParser_DefaultLib {
     qfmpResult fConcat(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fRemoveAll(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fFind(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    qfmpResult fFindFirst(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fFilterFinite(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fSelect(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fUnique(const qfmpResult* params, unsigned int  n, QFMathParser* p);

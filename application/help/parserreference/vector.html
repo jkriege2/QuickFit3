@@ -61,13 +61,20 @@
   
   <li><a name="find"/><!-- func:find -->
   <b><tt><!-- template -->find(x, v)<!-- /template -->, find(x)</tt> - <i>returns a list with the array indices of all occurences of <tt>v</tt> in the vector <tt>x</tt>. If <tt>v</tt> is omitted, the functions expects a boolean vector as <tt>x</tt> and finds all occurences of <tt>true</tt> </i>:</b><br>
-  This function can be used to select items from an array with a logic expression, e.g. <tt>find(x==4)</tt> will return the index list of all items in x that have the value 4. The result can be used in an array access, i.e. <tt>x[find(x>4)]</tt> will return a vector containing only those elements in x where the value is larger than 4 $$see:<a href="#select">select()</a>$$
+  This function can be used to select items from an array with a logic expression, e.g. <tt>find(x==4)</tt> will return the index list of all items in x that have the value 4. The result can be used in an array access, i.e. <tt>x[find(x>4)]</tt> will return a vector containing only those elements in x where the value is larger than 4. $$see:<a href="#select">select()</a>, <a href="#findfirst">findfirst()</a>$$
   <!-- /func:find -->
+  </li>
+  
+
+  <li><a name="findfirst"/><!-- func:findfirst -->
+  <b><tt><!-- template -->findfirst(x, v)<!-- /template -->, findfirst(x)</tt> - <i>returns the first array index of an occurences of <tt>v</tt> in the vector <tt>x</tt>. If <tt>v</tt> is omitted, the functions expects a boolean vector as <tt>x</tt> and finds the first occurence of <tt>true</tt> </i>:</b><br>
+  If both arguments are vectors, the occurence of every element in <tt>x</tt> is searched in <tt>v</tt>.
+  <!-- /func:findfirst -->
   </li>
   
   <li><a name="select"/><!-- func:select -->
   <b><tt><!-- template -->select(x, cond)<!-- /template --></tt> - <i>returns only those elements of a vector <tt>x</tt> where the boolean vector <tt>cond</tt> contains <tt>true</tt>. Both vectors have to have the same number of elements. </i>:</b><br>
-  This function can be used to filter vectors according to a boolean expression, e.g. <tt>select(x, x>4)</tt> will return a vector containing only those elements in x where the value is larger than 4. This can also be implemented using <tt>x[<a href="#find">find</a>(x>4)]</tt>. So this function is a more expressive short-form for that,. $$see:<a href="#find">find()</a>$$
+  This function can be used to filter vectors according to a boolean expression, e.g. <tt>select(x, x>4)</tt> will return a vector containing only those elements in x where the value is larger than 4. This can also be implemented using <tt>x[<a href="#find">find</a>(x>4)]</tt>. So this function is a more expressive short-form for that. $$see:<a href="#findfirst">findfirst()</a>, <a href="#find">find()</a>$$
   <!-- /func:select -->
   </li>
   
