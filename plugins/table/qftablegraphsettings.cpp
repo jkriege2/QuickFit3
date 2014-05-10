@@ -1430,7 +1430,7 @@ void QFTableGraphSettings::on_btnAutoY_clicked()
                             }
                         }
                         searchPhrases.clear();
-                        searchPhrases<<"quantile25"<<"q25"<<"0.25"<<"25";
+                        searchPhrases<<"quantile25"<<"quant25"<<"q25"<<"0.25"<<"25";
                         for (int j=0; j<searchPhrases.size(); j++) {
                             if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
                                 ui->cmbLinesYData->setCurrentIndex(i);
@@ -1438,7 +1438,7 @@ void QFTableGraphSettings::on_btnAutoY_clicked()
                             }
                         }
                         searchPhrases.clear();
-                        searchPhrases<<"median"<<"med"<<"quantile50"<<"q50";
+                        searchPhrases<<"median"<<"med"<<"quantile50"<<"quant50"<<"q50";
                         for (int j=0; j<searchPhrases.size(); j++) {
                             if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
                                 ui->cmbLinesYError->setCurrentIndex(i);
@@ -1446,7 +1446,7 @@ void QFTableGraphSettings::on_btnAutoY_clicked()
                             }
                         }
                         searchPhrases.clear();
-                        searchPhrases<<"quantile75"<<"q75"<<"0.75"<<"75";
+                        searchPhrases<<"quantile75"<<"quant75"<<"q75"<<"0.75"<<"75";
                         for (int j=0; j<searchPhrases.size(); j++) {
                             if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
                                 ui->cmbLinesQ75->setCurrentIndex(i);

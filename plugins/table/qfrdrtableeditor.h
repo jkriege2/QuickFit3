@@ -93,6 +93,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
 
         void selectionChanged();
         void slQuickHistogram(bool enabled);
+        void slAutoSetColumnWidth();
     signals:
         void enableActions(bool enabled);
         void disableActions(bool enabled);
@@ -125,6 +126,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actCopyResultsNoHead;
         QAction* actResize;
         QAction* actDelete;
+        QAction* actAutosetColumnWidth;
 
         QAction* actSetColumnValues;
         QAction* actCalculateColumn;

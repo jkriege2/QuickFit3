@@ -535,7 +535,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
                     not output data in fit. If the function is well defined it is evaluated for every given
                     tau. The result is saved in fit.
          */
-        bool evaluateFitFunction(QFRawDataRecord* current, const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation, int index);
+        bool evaluateFitFunction(QFRawDataRecord* current, const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation, int index, QStringList *ids=NULL);
 
         /*! \brief fill a QComboBox with the names (and IDs as data) of all plotable fit parameters */
         void fillParameterComboBox(QComboBox* cmbParameter, QFRDRImagingFCSData* m, const QString& egroup, const QStringList &param1Default, const QString& otherParameter=QString(), const QString& indexPropertyName=QString(""), const QString& parameterDefault=QString("fitparam_n_particle"), int idxDefault=0);

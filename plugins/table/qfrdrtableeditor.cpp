@@ -245,22 +245,26 @@ void QFRDRTableEditor::createWidgets() {
     connect(actSort, SIGNAL(triggered()), this, SLOT(slSort()));
     connect(this, SIGNAL(enableActions(bool)), actSort, SLOT(setEnabled(bool)));
 
-    actUndo=new QAction(QIcon(":/lib/undo.png"), "undo", this);
+    actUndo=new QAction(QIcon(":/lib/undo.png"), tr("undo"), this);
     actUndo->setShortcut(QKeySequence::Undo);
-    actRedo=new QAction(QIcon(":/lib/redo.png"), "redo", this);
+    actRedo=new QAction(QIcon(":/lib/redo.png"), tr("redo"), this);
     actRedo->setShortcut(QKeySequence::Redo);
 
-    actQuickStat=new QAction(QIcon(":/table/quickstat.png"), "Quick Statistics", this);
+    actQuickStat=new QAction(QIcon(":/table/quickstat.png"), tr("Quick Statistics"), this);
     actQuickStat->setCheckable(true);
     actQuickStat->setChecked(false);
     connect(actQuickStat, SIGNAL(toggled(bool)), this, SLOT(slQuickStat(bool)));
     connect(this, SIGNAL(enableActions(bool)), actQuickStat, SLOT(setEnabled(bool)));
 
-    actQuickHistogram=new QAction(QIcon(":/table/quickhist.png"), "Quick Histogram", this);
+    actQuickHistogram=new QAction(QIcon(":/table/quickhist.png"), tr("Quick Histogram"), this);
     actQuickHistogram->setCheckable(true);
     actQuickHistogram->setChecked(false);
     connect(actQuickHistogram, SIGNAL(toggled(bool)), this, SLOT(slQuickHistogram(bool)));
     connect(this, SIGNAL(enableActions(bool)), actQuickHistogram, SLOT(setEnabled(bool)));
+
+    actAutosetColumnWidth=new QAction(tr("Autoset column &width"), this);
+    connect(actAutosetColumnWidth, SIGNAL(triggered()), this, SLOT(slAutoSetColumnWidth()));
+    connect(this, SIGNAL(enableActions(bool)), actAutosetColumnWidth, SLOT(setEnabled(bool)));
 
 
 
@@ -378,6 +382,8 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addSeparator();
     menuTab->addAction(actClear);
     menuTab->addAction(actResize);
+    menuTab->addSeparator();
+    menuTab->addAction(actAutosetColumnWidth);
 
     QMenu* menuTools=propertyEditor->addMenu("T&ools", 0);
     menuTools->addAction(actQuickStat);
@@ -1659,6 +1665,12 @@ void QFRDRTableEditor::slQuickHistogram(bool enabled)
         selectionChanged();
     }
 }
+
+void QFRDRTableEditor::slAutoSetColumnWidth()
+{
+    tvMain->resizeColumnsToContents();
+}
+
 void QFRDRTableEditor::setQuickTabVisible()
 {
     tabQuick->setVisible(actQuickStat->isChecked() || actQuickHistogram->isChecked());

@@ -4249,7 +4249,7 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint32_t widt
 
 }
 
-bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation, int index) {
+bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, const double* tau, double* fit, uint32_t N, QStringList& names, QStringList& namelabels, QList<double>& values, QList<double>& errors, QList<bool>& fix, QStringList& units, QStringList& unitlabels, QString evaluation, int index, QStringList* ids) {
     QString fitfunc="";
     bool isMatrixResults=false;
     //qDebug()<<evaluation<<fitfunc<<m_fitFunctions.size();
@@ -4301,6 +4301,7 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, c
     fix.clear();
     units.clear();
     unitlabels.clear();
+    if (ids) ids->clear();
 
     QStringList pids;
     bool recheckedmatrix=false;
@@ -4343,6 +4344,7 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, c
             namelabels.append(ff->getDescription(id).label);
             unitlabels.append(ff->getDescription(id).unitLabel);
             names.append(ff->getDescription(id).name);
+            if (ids) ids->append(id);
             units.append(ff->getDescription(id).unit);
             values.append(params[i]);
             errors.append(errs[i]);
@@ -4610,8 +4612,14 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
     QComboBox* cmbSelection=new QComboBox(dlg);
     cmbSelection->addItem(tr("all non-masked pixels"));
     cmbSelection->addItem(tr("selected pixels"));
+    cmbSelection->addItem(tr("pixels from named selections"));
     cmbSelection->setCurrentIndex((selected.size()<=1)?0:1);
     dlg->addWidget(tr("pixel range:"), cmbSelection);
+
+    QLineEdit* edtSelections=new QLineEdit(dlg);
+    edtSelections->setText(settings->value(prefix+"edtSelections", "").toString());
+    edtSelections->setToolTip(tr("separate with ';', all by 'all'"));
+    dlg->addWidget(tr("named selections:"), edtSelections);
 
 
 
@@ -4651,28 +4659,38 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
     dlg->addWidget(tr("save result to file:"), chkSaveResultToFile);
 
     QList<copyFitResultStatistics_data> data;
-    QStringList labels, names;
+    QStringList singlelabels, singlenames;
 
     bool hasFitFunction=true;
-    getCurrentResultNamesAndLabels(names, labels);
+    getCurrentResultNamesAndLabels(singlenames, singlelabels);
 
-    if (names.size()<=0) {
+    if (singlenames.size()<=0) {
         hasFitFunction=false;
         for (int i=0; i<cmbParameter->count(); i++) {
             QString p=cmbParameter->itemData(i).toString();
             QString n=cmbParameter->itemText(i);
-            if (!names.contains(p) || !labels.contains(n)) {
-                names.append(p);
-                labels.append(n);
+            if (!singlenames.contains(p) || !singlelabels.contains(n)) {
+                singlenames.append(p);
+                singlelabels.append(n);
             }
         }
     }
 
 
-    dlg->init(labels, names, (*settings), prefix+"selections/");
+    dlg->init(singlelabels, singlenames, (*settings), prefix+"selections/");
 
     if (dlg->exec()) {
+        QList<int> items=dlg->getSelectedIndexes();
+
         QList<QPointer<QFRawDataRecord> > recs;
+        QStringList selections;
+        if (cmbSelection->currentIndex()==2) {
+            selections=edtSelections->text().split(";");
+            for (int i=selections.size()-1; i>=0; i--) {
+                selections[i]=selections[i].trimmed();
+                if (selections[i].isEmpty()) selections.removeAt(i);
+            }
+        }
 
         if (chkCopyAllFiles->isChecked()) {
             QFSelectRDRDialog* dlgsel=new QFSelectRDRDialog(new QFMatchRDRFunctorSelectType(current->getType()), true, this);
@@ -4689,6 +4707,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
 
         if (recs.size()>0) {
             QProgressDialog progress(tr("copying statistics ..."), "", 0, recs.size()+2, this);
+            progress.show();
             for (int recsi=0; recsi<recs.size(); recsi++){
 
 
@@ -4700,155 +4719,219 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                 progress.setLabelText(tr("reading data from RDR:\n   '%1' ...").arg(curRec->getName()));
                 QApplication::processEvents();
 
+                QList<QVector<bool> > selections_b;
+                int olditemscount=items.size();
+                for (int is=0; is<selections.size(); is++) {
+                    QVector<bool> ma;
+                    for (int iss=0; iss<m->getCorrelationRuns(); iss++) {
+                        ma.append(true);
+                    }
+                    if (selections[is]!="all") {
+                        for (int jss=0; jss<m->getImageSelectionCount(); jss++) {
+                            if (m->getImageSelectionName(jss)==selections[is]) {
+                                copyArray(ma.data(), m->loadImageSelection(jss), qMin(ma.size(), m->getImageSelectionHeight()*m->getImageSelectionWidth()));
+                                break;
+                            }
+                        }
+                    }
+
+                    selections_b.append(ma);
+                    if (is>0) {
+                        for (int ioi=0; ioi<olditemscount; ioi++) {
+                            items.append(is*singlenames.size()+items[ioi]);
+                        }
+                    }
+                }
+
+                if (selections_b.size()<=0) { // by default: sel all
+                    QVector<bool> ma;
+                    for (int iss=0; iss<m->getCorrelationRuns(); iss++) {
+                        ma.append(true);
+                    }
+                    selections_b.append(ma);
+                    if (selections.size()<=0) selections.append("all");
+                    else selections[0]="all";
+                }
+
+                //qDebug()<<selections_b.size()<<selections;
+
                 int avgs=1;
                 if (cmbDualView->currentIndex()>0)  avgs=2;
-                for (int avgIdx=0; avgIdx<avgs; avgIdx++) {
-                    double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
-                    double* cerr=(double*)calloc(m->getCorrelationN(), sizeof(double));
-                    double* corr1=(double*)calloc(m->getCorrelationN(), sizeof(double));
-                    copyFitResultStatistics_data d;
-                    d.file=curRec->getName();
-                    for (int i=0; i<m->getCorrelationN(); i++) { corr[i]=0; cerr[i]=0; }
-                    double N=0;
-                    d.Nfit=0;
-                    for (int i=0; i<m->getCorrelationRuns(); i++) {
-                        //qDebug()<<"r"<<i<<"  "<<indexIsDualView2(i);
-                        if ( ( ((cmbSelection->currentIndex()==1) && selected.contains(i)) || (cmbSelection->currentIndex()==0) )
-                             && !m->leaveoutRun(i)
-                             && ((avgs==1)||(avgIdx==0 && !indexIsDualView2(i)) || (avgIdx==1 && indexIsDualView2(i))))
-                        {
-                            double* tmp=m->getCorrelationRun(i);
-                            for (int jj=0; jj<m->getCorrelationN(); jj++) {
-                                corr[jj]=corr[jj]+tmp[jj];
-                                cerr[jj]=cerr[jj]+tmp[jj]*tmp[jj];
-                            }
-
-                            QList<double> values, errors;
-                            QList<bool> fix;
-
-                            QStringList evals=curRec->resultsCalcEvaluationsInGroup(evalGroup);
-                            bool evalFound=false;
-                            bool listEval=false;
-                            QString resultID="";
-
-
-                            for (register int ev=0; ev<evals.size(); ev++) {
-                                //en=evals[i];
-                                if (curRec->resultsGetEvaluationGroupIndex(evals[ev])==i) {
-                                    resultID=evals[ev];
-                                    evalFound=true;
-                                    break;
+                QList<copyFitResultStatistics_data> dataint;
+                for (int iss=0; iss<selections_b.size(); iss++) {
+                    QVector<bool> masel=selections_b[iss];
+                    QString masel_name="";
+                    if (iss<selections.size()) masel_name=selections[iss]+": ";
+                    for (int avgIdx=0; avgIdx<avgs; avgIdx++) {
+                        double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
+                        double* cerr=(double*)calloc(m->getCorrelationN(), sizeof(double));
+                        double* corr1=(double*)calloc(m->getCorrelationN(), sizeof(double));
+                        copyFitResultStatistics_data d;
+                        d.file=curRec->getName();
+                        for (int i=0; i<m->getCorrelationN(); i++) { corr[i]=0; cerr[i]=0; }
+                        double N=0;
+                        d.Nfit=0;
+                        for (int i=0; i<m->getCorrelationRuns(); i++) {
+                            //qDebug()<<"r"<<i<<"  "<<indexIsDualView2(i);
+                            if ( ( ((cmbSelection->currentIndex()==1) && selected.contains(i))
+                                      || (cmbSelection->currentIndex()==0)
+                                      || (cmbSelection->currentIndex()==2 && masel.value(i, false)) )
+                                 && !m->leaveoutRun(i)
+                                 && ((avgs==1)||(avgIdx==0 && !indexIsDualView2(i)) || (avgIdx==1 && indexIsDualView2(i))))
+                            {
+                                double* tmp=m->getCorrelationRun(i);
+                                for (int jj=0; jj<m->getCorrelationN(); jj++) {
+                                    corr[jj]=corr[jj]+tmp[jj];
+                                    cerr[jj]=cerr[jj]+tmp[jj]*tmp[jj];
                                 }
-                            }
 
-                            if (!evalFound) {
-                                if (evals.size()>0 && evals.size()<=2) {
-                                    for (register int ev=0; ev<evals.size(); ev++) {
-                                        if (curRec->resultsGetEvaluationGroupIndex(evals[ev])>=0) {
-                                            resultID=evals[ev];
-                                            listEval=true;
-                                            evalFound=true;
+                                QList<double> values, errors;
+                                QList<bool> fix;
+
+                                QStringList evals=curRec->resultsCalcEvaluationsInGroup(evalGroup);
+                                bool evalFound=false;
+                                bool listEval=false;
+                                QString resultID="";
+
+
+                                for (register int ev=0; ev<evals.size(); ev++) {
+                                    //en=evals[i];
+                                    if (curRec->resultsGetEvaluationGroupIndex(evals[ev])==i) {
+                                        resultID=evals[ev];
+                                        evalFound=true;
+                                        break;
+                                    }
+                                }
+
+                                if (!evalFound) {
+                                    if (evals.size()>0 && evals.size()<=2) {
+                                        for (register int ev=0; ev<evals.size(); ev++) {
+                                            if (curRec->resultsGetEvaluationGroupIndex(evals[ev])>=0) {
+                                                resultID=evals[ev];
+                                                listEval=true;
+                                                evalFound=true;
+                                            }
                                         }
                                     }
                                 }
-                            }
 
-                            if (!hasFitFunction && !evalFound && names.size()>0) {
-                                for (register int ev=0; ev<evals.size(); ev++) {
-                                    if (curRec->resultsExists(evals[ev], names.first())) {
-                                        evalFound=true;
-                                        resultID=evals[ev];
+                                if (!hasFitFunction && !evalFound && singlenames.size()>0) {
+                                    for (register int ev=0; ev<evals.size(); ev++) {
+                                        if (curRec->resultsExists(evals[ev], singlenames.first())) {
+                                            evalFound=true;
+                                            resultID=evals[ev];
+                                        }
                                     }
-                                }
-                                if (!evalFound) {
-                                    if (curRec->resultsExists(evalGroup, names.first())) {
-                                        evalFound=true;
-                                        resultID=evalGroup;
-                                    }
-                                }
-                            }
-
-                            if (d.Nfit==0) qDebug()<<recsi<<curRec->getName()<<"\n:"<<resultID<<evalFound <<hasFitFunction<<names<<evalGroup<<evals;
-
-
-                            if (evaluateFitFunction(curRec, m->getCorrelationT(), corr1, m->getCorrelationN(), d.names, d.namelabels, values, errors, fix, d.units, d.unitlabels, resultID, i)) {
-                                if (d.Nfit==0) {
-                                    for (int jj=0; jj<fix.size(); jj++) {
-                                        d.gfix.append(fix[jj]?Qt::Checked:Qt::Unchecked);
-                                    }
-                                    for (int jj=0; jj<values.size(); jj++) {
-                                        QList<double> v;
-                                        v.append(values[jj]);
-                                        d.gvalues.append(v);
-                                    }
-
-                                } else {
-                                    for (int jj=0; jj<fix.size(); jj++) {
-                                        if (d.gfix[jj]!=fix[jj]) d.gfix[jj]=Qt::PartiallyChecked;
-                                    }
-                                    for (int jj=0; jj<values.size(); jj++) {
-                                        d.gvalues[jj].append(values[jj]);
+                                    if (!evalFound) {
+                                        if (curRec->resultsExists(evalGroup, singlenames.first())) {
+                                            evalFound=true;
+                                            resultID=evalGroup;
+                                        }
                                     }
                                 }
 
-                                d.Nfit++;
-                            } else if (evalFound && !hasFitFunction) {
-                                for (int jj=0; jj<names.size(); jj++) {
-                                    if (curRec->resultsExists(resultID, names[jj])) {
-                                        values.append(curRec->resultsGetInNumberList(resultID, names[jj], i));
+                                //if (d.Nfit==0) qDebug()<<recsi<<curRec->getName()<<"\n:"<<resultID<<evalFound <<hasFitFunction<<names<<evalGroup<<evals;
+
+                                QStringList tmpn, tmpi;
+                                if (evaluateFitFunction(curRec, m->getCorrelationT(), corr1, m->getCorrelationN(), tmpn, d.namelabels, values, errors, fix, d.units, d.unitlabels, resultID, i, &tmpi)) {
+                                    if (d.Nfit==0) {
+                                        for (int jj=0; jj<fix.size(); jj++) {
+                                            d.gfix.append(fix[jj]?Qt::Checked:Qt::Unchecked);
+                                            d.names.append(masel_name+tmpi.value(jj, tmpn.value(jj, "")));
+                                            d.namelabels.append(d.names.last());
+                                        }
+                                        for (int jj=0; jj<values.size(); jj++) {
+                                            QList<double> v;
+                                            v.append(values[jj]);
+                                            d.gvalues.append(v);
+                                        }
+
                                     } else {
-                                        values.append(0);
+                                        for (int jj=0; jj<fix.size(); jj++) {
+                                            if (d.gfix[jj]!=fix[jj]) d.gfix[jj]=Qt::PartiallyChecked;
+                                        }
+                                        for (int jj=0; jj<values.size(); jj++) {
+                                            d.gvalues[jj].append(values[jj]);
+                                        }
                                     }
+
+                                    d.Nfit++;
+                                } else if (evalFound && !hasFitFunction) {
+                                    for (int jj=0; jj<singlenames.size(); jj++) {
+                                        if (curRec->resultsExists(resultID, singlenames[jj])) {
+                                            values.append(curRec->resultsGetInNumberList(resultID, singlenames[jj], i));
+                                        } else {
+                                            values.append(0);
+                                        }
+                                    }
+
+                                    if (d.Nfit==0) {
+                                        for (int jj=0; jj<singlenames.size(); jj++) {
+                                            d.gfix.append(Qt::Unchecked);
+                                            d.names.append(masel_name+singlenames[jj]);
+                                            d.namelabels.append(masel_name+singlenames[jj]);
+                                        }
+                                        for (int jj=0; jj<singlenames.size(); jj++) {
+                                            QList<double> v;
+                                            v.append(values[jj]);
+                                            d.gvalues.append(v);
+                                        }
+
+                                    } else {
+                                        for (int jj=0; jj<singlenames.size(); jj++) {
+                                            d.gvalues[jj].append(values[jj]);
+                                        }
+                                    }
+
+                                    d.Nfit++;
+
                                 }
 
-                                if (d.Nfit==0) {
-                                    for (int jj=0; jj<names.size(); jj++) {
-                                        d.gfix.append(Qt::Unchecked);
-                                    }
-                                    for (int jj=0; jj<names.size(); jj++) {
-                                        QList<double> v;
-                                        v.append(values[jj]);
-                                        d.gvalues.append(v);
-                                    }
-
-                                } else {
-                                    for (int jj=0; jj<names.size(); jj++) {
-                                        d.gvalues[jj].append(values[jj]);
-                                    }
-                                }
-
-                                d.Nfit++;
-
-                            }
-
-                            N++;
-                        }
-                    }
-
-
-                    free(corr);
-                    free(cerr);
-                    free(corr1);
-                    data.append(d);
-                    if (avgIdx==0) {
-                        if (recs.size()>1) {
-                            for (int j=0; j<d.names.size(); j++) {
-                                //names.append(d.names);
-                                names.append(curRec->getName()+": "+d.names[j]);
-                                labels.append(curRec->getName()+": "+d.namelabels.value(j, d.names[j]));
-                            }
-                        } else {
-                            for (int j=0; j<d.names.size(); j++) {
-                                //names.append(d.names);
-                                names.append(d.names[j]);
-                                labels.append(d.namelabels.value(j, d.names[j]));
+                                N++;
                             }
                         }
 
-                        //labels.append(d.namelabels);
+
+                        free(corr);
+                        free(cerr);
+                        free(corr1);
+                        dataint.append(d);
+                        if (avgIdx==0) {
+                            if (recs.size()>1) {
+                                for (int j=0; j<d.names.size(); j++) {
+                                    //names.append(d.names);
+                                    singlenames.append(curRec->getName()+": "+masel_name+d.names[j]);
+                                    singlelabels.append(curRec->getName()+": "+masel_name+d.namelabels.value(j, d.names[j]));
+                                }
+                            } else {
+                                for (int j=0; j<d.names.size(); j++) {
+                                    //names.append(d.names);
+                                    singlenames.append(masel_name+d.names[j]);
+                                    singlelabels.append(masel_name+d.namelabels.value(j, masel_name+d.names[j]));
+                                }
+                            }
+
+                            //labels.append(d.namelabels);
+                        }
                     }
                 }
+                if (dataint.size()>0) {
+                    copyFitResultStatistics_data dd=dataint.first();
+                    for (int ii=1; ii<dataint.size(); ii++) {
+                        dd.gvalues.append(dataint[ii].gvalues);
+                        dd.names.append(dataint[ii].names);
+                        dd.units.append(dataint[ii].units);
+                        dd.unitlabels.append(dataint[ii].unitlabels);
+                        dd.namelabels.append(dataint[ii].namelabels);
+                        dd.gfix.append(dataint[ii].gfix);
+
+                    }
+                    data.append(dd);
+                }
             }
+
+            //qDebug()<<data.size();
+            //qDebug()<<items;
 
             progress.setValue(progress.value()-1);
             progress.setLabelText(tr("calculating statistics and copying data ..."));
@@ -4868,15 +4951,16 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
             settings->setValue(prefix+"chkCopyNumber", chkCopyNumber->isChecked());
             settings->setValue(prefix+"chkCopyAllFiles", chkCopyAllFiles->isChecked());
             settings->setValue(prefix+"chkSaveResultToFile", chkSaveResultToFile->isChecked());
+            settings->setValue(prefix+"edtSelections", edtSelections->text());
 
             QList<QList<QVariant> > result;
-            QList<int> items=dlg->getSelectedIndexes();
             QStringList colNames, rowNames;
             if (cmbMode->currentIndex()<=1) {
                 for (int d=0; d<data.size(); d++) {
+                    //qDebug()<<d<<": "<<data[d].names;
                     for (int i=0; i<items.size(); i++) {
                         if (d==0) {
-                            rowNames.append(names.value(items[i], ""));
+                            rowNames.append(data[d].names.value(items[i], ""));
                         }
                         QList<QVariant> r;
                         r.clear();
@@ -4922,17 +5006,18 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                 QList<QVariant> r;
                 r.clear();
                 for (int d=0; d<data.size(); d++) {
+                    //qDebug()<<d<<": "<<data[d].names;
                     for (int i=0; i<items.size(); i++) {
                         QList<double> gvalues, gvalues_s;
                         gvalues_s=gvalues=qfstatisticsFilter(data[d].gvalues.value(items[i], QList<double>()));
                         qSort(gvalues_s);
-                        if (listMode->item(0)->checkState()==Qt::Checked) { r.append(qfstatisticsAverage(gvalues)); colNames<<tr("average(%1)").arg(names.value(items[i], "")); }
-                        if (listMode->item(1)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMedian(gvalues_s)); colNames<<tr("median(%1)").arg(names.value(items[i], "")); }
-                        if (listMode->item(2)->checkState()==Qt::Checked) { r.append(sqrt(qfstatisticsVariance(gvalues))); colNames<<tr("stdDev(%1)").arg(names.value(items[i], "")); }
-                        if (listMode->item(3)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.25));  colNames<<tr("quantile25(%1)").arg(names.value(items[i], "")); }
-                        if (listMode->item(4)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.75)); colNames<<tr("quantile75(%1)").arg(names.value(items[i], "")); }
-                        if (listMode->item(5)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMin(gvalues_s)); colNames<<tr("minimum(%1)").arg(names.value(items[i], "")); }
-                        if (listMode->item(6)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMax(gvalues_s)); colNames<<tr("maximum(%1)").arg(names.value(items[i], "")); }
+                        if (listMode->item(0)->checkState()==Qt::Checked) { r.append(qfstatisticsAverage(gvalues)); colNames<<tr("avg(%1)").arg(data[d].names.value(items[i], "")); }
+                        if (listMode->item(1)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMedian(gvalues_s)); colNames<<tr("median(%1)").arg(data[d].names.value(items[i], "")); }
+                        if (listMode->item(2)->checkState()==Qt::Checked) { r.append(sqrt(qfstatisticsVariance(gvalues))); colNames<<tr("std(%1)").arg(data[d].names.value(items[i], "")); }
+                        if (listMode->item(3)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.25));  colNames<<tr("quant25(%1)").arg(data[d].names.value(items[i], "")); }
+                        if (listMode->item(4)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedQuantile(gvalues_s, 0.75)); colNames<<tr("quant75(%1)").arg(data[d].names.value(items[i], "")); }
+                        if (listMode->item(5)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMin(gvalues_s)); colNames<<tr("min(%1)").arg(data[d].names.value(items[i], "")); }
+                        if (listMode->item(6)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMax(gvalues_s)); colNames<<tr("max(%1)").arg(data[d].names.value(items[i], "")); }
                         if (chkCopyNumber->isChecked()) {
                             if (i==items.size()-1) {
                                 r.append(qfstatisticsCount(gvalues_s));
