@@ -112,13 +112,13 @@ QFRDRTable::AxisInfo::AxisInfo()
     max=10;
     axisFontSize=8;
     axisLabelFontSize=10;
-    axis0=true;
+    axis0=false;
 
 
      labelPos=JKQTPlabelCenter;
      labelType=JKQTPCALTexponent;
      labelMode1=JKQTPCADMcomplete;
-     labelMode2=JKQTPCADMticks;
+     labelMode2=JKQTPCADMline;
      digits=3;
      minTicks=5;
      minorTicks=1;
@@ -140,8 +140,8 @@ QFRDRTable::AxisInfo::AxisInfo()
 QFRDRTable::PlotInfo::PlotInfo()
 {
     graphAutosize=true;
-    graphWidth=150;
-    graphHeight=150;
+    graphWidth=120;
+    graphHeight=70;
     title="";
     xAxis=AxisInfo();
     yAxis=AxisInfo();
@@ -171,7 +171,7 @@ QFRDRTable::PlotInfo::PlotInfo()
      backgroundColor=QColor("white");
      gridColor=QColor("darkgrey");
      gridStyle=Qt::DashLine;
-     gridWidth=1.5;
+     gridWidth=0.5;
 }
 
 

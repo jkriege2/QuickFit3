@@ -89,7 +89,7 @@ qfmpResult fQFRDRTableEditor_coltitle(const qfmpResult* params, unsigned int  n,
             if (n==1 && (params[0].type==qfmpDouble) ) {
                 QStringList colt;
                 for (int i=0; i<d->model->columnCount(); i++) colt.append(d->model->columnTitle(i));
-                res.setString(colt.value(params[0].toInteger()));
+                res.setString(colt.value(params[0].toInteger()-1, ""));
             } else {
                 p->qfmpError("columntitle(col) needs one integer arguments");
             }
@@ -107,7 +107,7 @@ qfmpResult fQFRDRTableEditor_colindexbytitle(const qfmpResult* params, unsigned 
             if (n==1 && (params[0].type==qfmpString) ) {
                 QStringList colt;
                 for (int i=0; i<d->model->columnCount(); i++) colt.append(d->model->columnTitle(i));
-                res.setDouble(colt.indexOf(params[0].str));
+                res.setDouble(colt.indexOf(params[0].str)+1);
             } else {
                 p->qfmpError("columnindexbytitle(col) needs one string arguments");
             }

@@ -822,8 +822,8 @@ void QFTableModel::setColumnTitle(quint16 column, QString name) {
     if (column<state.columnNames.size()) state.columnNames[column]=name;
     if (doEmitSignals) {
         emit headerDataChanged(Qt::Horizontal, column, column);
+        emit columnTitleChanged(column);
     }
-    emit columnTitleChanged(column);
 }
 
 void QFTableModel::setColumnTitleCreate(quint16 column, QString name) {
@@ -833,8 +833,10 @@ void QFTableModel::setColumnTitleCreate(quint16 column, QString name) {
     resize(state.rows, qMax(state.columns, quint16(column+1)));
     //qDebug()<<"setColumnTitleCreate("<<column<<", "<<name<<"):     state.columnNames.size()="<<state.columnNames.size();
     if (column<state.columnNames.size()) state.columnNames[column]=name;
-    if (doEmitSignals) emit headerDataChanged(Qt::Horizontal, column, column);
-    emit columnTitleChanged(column);
+    if (doEmitSignals) {
+        emit headerDataChanged(Qt::Horizontal, column, column);
+        emit columnTitleChanged(column);
+    }
     endMultiUndo();
 }
 

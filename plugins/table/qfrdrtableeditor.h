@@ -54,6 +54,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slAppendColumn();
         void slInsertRow();
         void slInsertColumn();
+        void slInsertIndexedStat();
         void slClear();
         void slDeleteRow();
         void slDeleteColumn();
@@ -127,6 +128,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actResize;
         QAction* actDelete;
         QAction* actAutosetColumnWidth;
+        QAction* actIndexedStat;
 
         QAction* actSetColumnValues;
         QAction* actCalculateColumn;

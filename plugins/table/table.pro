@@ -37,7 +37,8 @@ HEADERS += dlgcsvparameters.h \
     dlgcolorbarcoloring.h \
     qfrdrtable2dhistogramdialog.h \
     qfrdrtableplotsettingswidget.h \
-    qfrdrtableaxissettingswidget.h
+    qfrdrtableaxissettingswidget.h \
+    qfrdrtableindexedstatdialog.h
 
 SOURCES += dlgcsvparameters.cpp \
            qfrdrtable.cpp \
@@ -63,7 +64,8 @@ SOURCES += dlgcsvparameters.cpp \
     dlgcolorbarcoloring.cpp \
     qfrdrtable2dhistogramdialog.cpp \
     qfrdrtableplotsettingswidget.cpp \
-    qfrdrtableaxissettingswidget.cpp
+    qfrdrtableaxissettingswidget.cpp \
+    qfrdrtableindexedstatdialog.cpp
 
 FORMS = dlg_csvparameters.ui \
     tableresizedialog.ui \
@@ -79,7 +81,8 @@ FORMS = dlg_csvparameters.ui \
     dlgcolorbarcoloring.ui \
     qfrdrtable2dhistogramdialog.ui \
     qfrdrtableplotsettingswidget.ui \
-    qfrdrtableaxissettingswidget.ui
+    qfrdrtableaxissettingswidget.ui \
+    qfrdrtableindexedstatdialog.ui
 
 RESOURCES += qfrdrtable.qrc \
     ../../lib/lib.qrc
