@@ -330,7 +330,11 @@ void QFTableModel::insertColumn(quint16 c) {
     while (state.columnNames.size()<state.columns) state.columnNames.append("");
     if (c<state.columns-1) for (int i=state.columns-2; i>=c; i--) {
         state.columnNames[i+1]=state.columnNames[i];
-        if (state.headerDataMap.contains(i)) state.headerDataMap[i+1]=state.headerDataMap[i];
+        state.columnNames[i]="";
+        if (state.headerDataMap.contains(i)) {
+            state.headerDataMap[i+1]=state.headerDataMap[i];
+            state.headerDataMap.remove(i);
+        }
         for (int r=0; r<state.rows; r++) {
             copyCell(r, i+1, r, i);
         }

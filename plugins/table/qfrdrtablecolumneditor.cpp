@@ -55,8 +55,18 @@ QFRDRTableColumnEditor::QFRDRTableColumnEditor(QFTablePluginModel *model, int co
 
     //ui->edtFormula(QFEnhancedLineEdit)
     for (int i=0; i<model->columnCount(); i++) {
-        ui->edtFormula->addInsertContextMenuEntry(tr("insert 'column(###)';;&%1: %2").arg(i+1).arg(model->columnTitle(i)), QString("column(%1)").arg(i+1));
-        ui->edtFormula->addInsertContextMenuEntry(tr("insert column id;;&%1: %2").arg(i+1).arg(model->columnTitle(i)), QString("%1").arg(i+1));
+        int newcol=i+1;
+        int deltacol=col+1-newcol;
+        int deltacol_r=deltacol;
+        QString sign="-";
+        if (deltacol<0) {
+            sign="+";
+            deltacol=-deltacol;
+        }
+        ui->edtFormula->addInsertContextMenuEntry(tr("insert 'column(###)';;&%1: %2").arg(newcol).arg(model->columnTitle(i)), QString("column(%1)").arg(newcol));
+        ui->edtFormula->addInsertContextMenuEntry(tr("insert column id;;&%1: %2").arg(newcol).arg(model->columnTitle(i)), QString("%1").arg(newcol));
+        ui->edtFormula->addInsertContextMenuEntry(tr("insert rel. 'column(col-###)';;&%1: %2").arg(deltacol_r).arg(model->columnTitle(i)), QString("column(col%1%2)").arg(sign).arg(deltacol));
+        ui->edtFormula->addInsertContextMenuEntry(tr("insert rel. column 'col-id'';;&%1: %2").arg(deltacol_r).arg(model->columnTitle(i)), QString("col%1%2").arg(sign).arg(deltacol));
     }
 
     QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
