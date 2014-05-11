@@ -150,8 +150,9 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("allfalse", QFMathParser_DefaultLib::fAllFalse);
     p->addFunction("anytrue", QFMathParser_DefaultLib::fAnyTrue);
     p->addFunction("anyfalse", QFMathParser_DefaultLib::fAnyFalse);
-    p->addFunction("contains", QFMathParser_DefaultLib::fContains);
     p->addFunction("countoccurences", QFMathParser_DefaultLib::fCountOccurences);
+
+    p->addFunction("containssubstring", QFMathParser_DefaultLib::fContainsSubString);
 
     p->addFunction("isnan", QFMathParser_DefaultLib::fIsNan);
     p->addFunction("isinf", QFMathParser_DefaultLib::fIsInf);
@@ -385,24 +386,7 @@ namespace QFMathParser_DefaultLib {
         return;
     }
 
-    void fContains(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
-        if (n!=1) {
-            p->qfmpError(QObject::tr("%1(x, value) needs exacptly 2 arguments").arg("contains"));
-            r.setInvalid();
-            return;
-        }
-        if(params[0].type==qfmpDoubleVector && params[1].type==qfmpDouble) {
-            r.setBoolean(params[0].numVec.contains(params[1].num));
-        } else if(params[0].type==qfmpStringVector && params[1].type==qfmpString) {
-            r.setBoolean(params[0].strVec.contains(params[1].str));
-        } else if(params[0].type==qfmpBoolVector && params[1].type==qfmpBool) {
-            r.setBoolean(params[0].boolVec.contains(params[1].boolean));
-        } else {
-            p->qfmpError(QObject::tr("%1(x, value) argument 1 has to be a vector of numbers/booleans/strings and argument 2 the according item type number/string/boolean").arg("contains"));
-            r.setInvalid();
-        }
-        return;
-    }
+
     void fCountOccurences(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
         if (n!=1) {
             p->qfmpError(QObject::tr("%1(x, value) needs exacptly 2 arguments").arg("countoccurences"));
@@ -955,6 +939,84 @@ namespace QFMathParser_DefaultLib {
             }
         } else {
             p->qfmpError(QObject::tr("findfirst(x, value=true) needs two arguments: one vector x and a corresponding element value (or vector), if only a boolean vector is given, the function uses value=true"));
+        }
+        return r;
+    }
+
+
+    qfmpResult fContains(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        qfmpResult r;
+        r.isValid=false;
+        if (n==2 && params[0].type==qfmpDoubleVector && params[1].type==qfmpDouble) {
+            r.type=qfmpBool;
+            r.boolean=params[0].numVec.contains(params[1].num);
+            r.isValid=true;
+        } else if (n==2 && params[0].type==qfmpBoolVector && params[1].type==qfmpBool) {
+            r.type=qfmpBool;
+            r.boolean=params[0].boolVec.contains(params[1].boolean);
+            r.isValid=true;
+        } else if (n==2 && params[0].type==qfmpStringVector && params[1].type==qfmpString) {
+            r.type=qfmpBool;
+            r.boolean=params[0].strVec.contains(params[1].str);
+            r.isValid=true;
+        } else if (n==2 && params[0].type==qfmpString && params[1].type==qfmpString) {
+            const QString& dat=params[0].str;
+            r.type=qfmpBool;
+            r.boolean=dat.contains(params[1].str);
+        } else {
+            p->qfmpError(QObject::tr("contains(x, value) needs two arguments: one vector x and a corresponding element value (or vector)"));
+        }
+        return r;
+    }
+
+    qfmpResult fContainsSubString(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        qfmpResult r;
+        r.isValid=false;
+
+        if (n==2 && params[0].type==qfmpStringVector && params[1].type==qfmpString) {
+            const QStringList& dat=params[0].strVec;
+            r.type=qfmpBoolVector;
+            r.boolVec.clear();
+            for (int i=0; i<dat.size(); i++) {
+                bool f=false;
+                if (dat[i].contains(params[1].str)) {
+                    f=true;
+                    break;
+                }
+                r.boolVec.append(f);
+            }
+        } else if (n==2 && params[0].type==qfmpString && params[1].type==qfmpString) {
+            const QString& dat=params[0].str;
+            r.type=qfmpBool;
+            r.boolean=dat.contains(params[1].str);
+        } else  if (n==2 && params[0].type==qfmpStringVector && params[1].type==qfmpStringVector) {
+            const QStringList& dat=params[0].strVec;
+            r.type=qfmpDoubleVector;
+            r.numVec.clear();
+            r.isValid=true;
+            for (int i=0; i<dat.size(); i++) {
+                int add=-1;
+                for (int j=0; j<params[1].strVec.size(); j++) {
+                    QString v=params[1].strVec[j];
+                    if (dat[i].contains(v)) {
+                        add=j;
+                        break;
+                    }
+                }
+                r.numVec.append(add);
+            }
+        } else  if (n==2 && params[0].type==qfmpString && params[1].type==qfmpStringVector) {
+            r.type=qfmpDouble;
+            r.num=-1;
+            r.isValid=true;
+            for (int j=0; j<params[1].strVec.size(); j++) {
+                if (params[0].str.contains(params[1].strVec[j])) {
+                    r.num=j;
+                    break;
+                }
+            }
+        }  else {
+            p->qfmpError(QObject::tr("containssubstr(x, value) needs two arguments: stringVec/string, string/string or stringvec/string_vec"));
         }
         return r;
     }

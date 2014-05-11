@@ -59,6 +59,21 @@
   <!-- /func:remove -->
   </li>
   
+  
+<li><a name="contains"/><!-- func:contains -->
+  <b><tt><!-- template -->contains(x, v)<!-- /template --></tt> - <i>returns <tt>true</tt> if the element <tt>v</tt> is contained in the vector <tt>x</tt>.  If both elements are string, it returns true, if the substring <tt>v</tt> appears in <tt>x</tt>. </i>:</b><br>
+  
+  <!-- /func:contains -->
+  </li>
+  
+  <li><a name="containssubstring"/><!-- func:containssubstring -->
+  <b><tt><!-- template -->containssubstring(x, v)<!-- /template --></tt> - <i>returns <tt>true</tt> if the string <tt>v</tt> is contained in the string <tt>x</tt>. If <tt>x</tt> is a string vector, the function returns a vector of booleans. If <tt>v</tt> and <tt>x</tt> are string vector, the index of the first elemnt in <tt>v</tt> is returned, which is contained in each element of<tt>x</tt>.  </i>:</b><br>
+
+  <!-- /func:containssubstring -->
+  </li>
+  
+  
+  
   <li><a name="find"/><!-- func:find -->
   <b><tt><!-- template -->find(x, v)<!-- /template -->, find(x)</tt> - <i>returns a list with the array indices of all occurences of <tt>v</tt> in the vector <tt>x</tt>. If <tt>v</tt> is omitted, the functions expects a boolean vector as <tt>x</tt> and finds all occurences of <tt>true</tt> </i>:</b><br>
   This function can be used to select items from an array with a logic expression, e.g. <tt>find(x==4)</tt> will return the index list of all items in x that have the value 4. The result can be used in an array access, i.e. <tt>x[find(x>4)]</tt> will return a vector containing only those elements in x where the value is larger than 4. $$see:<a href="#select">select()</a>, <a href="#findfirst">findfirst()</a>$$
@@ -68,7 +83,7 @@
 
   <li><a name="findfirst"/><!-- func:findfirst -->
   <b><tt><!-- template -->findfirst(x, v)<!-- /template -->, findfirst(x)</tt> - <i>returns the first array index of an occurences of <tt>v</tt> in the vector <tt>x</tt>. If <tt>v</tt> is omitted, the functions expects a boolean vector as <tt>x</tt> and finds the first occurence of <tt>true</tt> </i>:</b><br>
-  If both arguments are vectors, the occurence of every element in <tt>x</tt> is searched in <tt>v</tt>.
+  If both arguments are vectors, the occurence of every element in <tt>x</tt> is searched in <tt>v</tt>. If an elemnt is not found, the index -1 is returned.
   <!-- /func:findfirst -->
   </li>
   
@@ -108,10 +123,6 @@
   <!-- /func:anyfalse-->
   </li>
   
-  <li><a name="contains"/><!-- func:contains -->
-  <b><tt><!-- template -->contains(x, value)<!-- /template --></tt> - <i>returns <tt>true</tt> if the vector <tt>x</tt> contains at least one element of value <tt>value</tt> </i>:</b><br>
-  <!-- /func:contains-->
-  </li>
   
   <li><a name="countoccurences"/><!-- func:countoccurences -->
   <b><tt><!-- template -->countoccurences(x, value)<!-- /template --></tt> - <i>returns the number of elements in the vector <tt>x</tt> that have value <tt>value</tt> </i>:</b><br>

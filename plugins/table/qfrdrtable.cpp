@@ -1882,6 +1882,7 @@ void QFRDRTable::columnsInserted(int start, int count, bool emitRebuild)
             g.meancolumn=QFRDRTableOffsetIfLarger(g.meancolumn, start, count);
             g.q75column=QFRDRTableOffsetIfLarger(g.q75column, start, count);
             g.maxcolumn=QFRDRTableOffsetIfLarger(g.maxcolumn, start, count);
+            g.dataSelectColumn=QFRDRTableOffsetIfLarger(g.dataSelectColumn, start, count);
         }
     }
 
