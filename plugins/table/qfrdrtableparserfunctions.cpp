@@ -69,7 +69,9 @@ qfmpResult fQFRDRTableEditor_coltitles(const qfmpResult* params, unsigned int  n
     if (d) {
         if (d->model) {
             if (n==0) {
-                res.setStringVec(d->model->getColumnTitles());
+                QStringList colt;
+                for (int i=0; i<d->model->columnCount(); i++) colt.append(d->model->columnTitle(i));
+                res.setStringVec(colt);
             } else {
                 p->qfmpError("columntitles() has no arguments");
             }
@@ -85,7 +87,9 @@ qfmpResult fQFRDRTableEditor_coltitle(const qfmpResult* params, unsigned int  n,
     if (d) {
         if (d->model) {
             if (n==1 && (params[0].type==qfmpDouble) ) {
-                res.setString(d->model->getColumnTitles().value(params[0].toInteger()));
+                QStringList colt;
+                for (int i=0; i<d->model->columnCount(); i++) colt.append(d->model->columnTitle(i));
+                res.setString(colt.value(params[0].toInteger()));
             } else {
                 p->qfmpError("columntitle(col) needs one integer arguments");
             }
@@ -101,7 +105,9 @@ qfmpResult fQFRDRTableEditor_colindexbytitle(const qfmpResult* params, unsigned 
     if (d) {
         if (d->model) {
             if (n==1 && (params[0].type==qfmpString) ) {
-                res.setDouble(d->model->getColumnTitles().indexOf(params[0].str));
+                QStringList colt;
+                for (int i=0; i<d->model->columnCount(); i++) colt.append(d->model->columnTitle(i));
+                res.setDouble(colt.indexOf(params[0].str));
             } else {
                 p->qfmpError("columnindexbytitle(col) needs one string arguments");
             }
