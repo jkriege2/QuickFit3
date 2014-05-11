@@ -62,6 +62,7 @@ class QFRDRTableColumnEditor : public QDialog
    protected slots:
         void on_edtFormula_textChanged(QString text);
         void on_btnHelp_clicked();
+        void on_btnOK2_clicked();
         void on_lstFunctions_doubleClicked(const QModelIndex& index);
         void on_lstFunctions_clicked(const QModelIndex& index);
 

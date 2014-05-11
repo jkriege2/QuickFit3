@@ -149,6 +149,11 @@ void QFRDRTableColumnEditor::on_btnHelp_clicked()
     QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("table")+"mathparser.html");
 }
 
+void QFRDRTableColumnEditor::on_btnOK2_clicked()
+{
+    done(10);
+}
+
 void QFRDRTableColumnEditor::on_lstFunctions_doubleClicked(const QModelIndex &index)
 {
     QString textOld=ui->edtFormula->text();

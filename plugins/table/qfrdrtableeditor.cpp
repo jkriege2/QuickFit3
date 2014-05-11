@@ -805,15 +805,15 @@ void QFRDRTableEditor::slEditColumnProperties(int col) {
                 edt->setComment(comment.toString());
                 edt->setImageWidth(imwid.toInt());
                 edt->setExpression(exp.isValid() && exp.canConvert(QVariant::String), exp.toString());
-
-                if (edt->exec()) {
+                int dres=edt->exec();
+                if (dres>0) {
                      QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                      m->model()->setColumnTitle(c, edt->getColumnTitle());
                      m->model()->setColumnHeaderData(c, QFRDRTable::ColumnCommentRole, edt->getComment());
                      m->model()->setColumnHeaderData(c, QFRDRTable::ColumnImageWidth, edt->getImageWidth());
                      if (edt->getExpressionEnabled()) {
                          m->model()->setColumnHeaderData(c, QFRDRTable::ColumnExpressionRole, edt->getExpression());
-                         slRecalcAll();
+                         if (dres==1) slRecalcAll();
                      } else {
                          m->model()->setColumnHeaderData(c, QFRDRTable::ColumnExpressionRole, QVariant());
                      }
