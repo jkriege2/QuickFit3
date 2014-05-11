@@ -230,6 +230,13 @@ namespace QFMathParser_DefaultLib {
     void fRandIntVec(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fRandNormVec(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fRandBoolVec(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRandVecSeed(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+
+
+    void fRandIntVecSeed(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRandNormVecSeed(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRandBoolVecSeed(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+
     void fRandBool(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
     static inline double fMin(double a,double b) {

@@ -94,10 +94,10 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("randintvec", QFMathParser_DefaultLib::fRandIntVec);
     p->addFunction("randnormvec", QFMathParser_DefaultLib::fRandNormVec);
     p->addFunction("randboolvec", QFMathParser_DefaultLib::fRandBoolVec);
-    p->addFunction("randvec_seed", QFMathParser_DefaultLib::fRandVec);
-    p->addFunction("randintvec_seed", QFMathParser_DefaultLib::fRandIntVec);
-    p->addFunction("randnormvec_seed", QFMathParser_DefaultLib::fRandNormVec);
-    p->addFunction("randboolvec_seed", QFMathParser_DefaultLib::fRandBoolVec);
+    p->addFunction("randvec_seed", QFMathParser_DefaultLib::fRandVecSeed);
+    p->addFunction("randintvec_seed", QFMathParser_DefaultLib::fRandIntVecSeed);
+    p->addFunction("randnormvec_seed", QFMathParser_DefaultLib::fRandNormVecSeed);
+    p->addFunction("randboolvec_seed", QFMathParser_DefaultLib::fRandBoolVecSeed);
     p->addFunction("srand", QFMathParser_DefaultLib::fSRand, NULL, QFMathParser_DefaultLib::fSRand);
     p->addFunction("ceil", QFMathParser_DefaultLib::fCeil, NULL, ceil);
     p->addFunction("floor", QFMathParser_DefaultLib::fFloor, NULL, floor);
