@@ -24,6 +24,9 @@ qfmpResult fQFRDRTableEditor_columnBool(const qfmpResult* params, unsigned int n
 qfmpResult fQFRDRTableEditor_row(const qfmpResult* params, unsigned int n, QFMathParser* p);
 qfmpResult fQFRDRTableEditor_rowStr(const qfmpResult* params, unsigned int n, QFMathParser* p);
 qfmpResult fQFRDRTableEditor_rowBool(const qfmpResult* params, unsigned int n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_coltitles(const qfmpResult* params, unsigned int n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_coltitle(const qfmpResult* params, unsigned int n, QFMathParser* p);
+qfmpResult fQFRDRTableEditor_colindexbytitle(const qfmpResult* params, unsigned int n, QFMathParser* p);
 
 qfmpResult fQFRDRTableEditor_columnUnique(const qfmpResult* params, unsigned int n, QFMathParser* p);
 qfmpResult fQFRDRTableEditor_indexedColAvg(const qfmpResult* params, unsigned int n, QFMathParser* p);

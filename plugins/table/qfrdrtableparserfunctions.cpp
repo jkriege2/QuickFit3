@@ -18,6 +18,9 @@ void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names, bool colum
     parser->addFunction("colimagewidth", fQFRDRTableEditor_colimagewidth);
     parser->addFunction("colimageheight", fQFRDRTableEditor_colimageheight);
     parser->addFunction("collength", fQFRDRTableEditor_collength);
+    parser->addFunction("columntitles", fQFRDRTableEditor_coltitles);
+    parser->addFunction("columntitle", fQFRDRTableEditor_coltitle);
+    parser->addFunction("columnindexbytitle", fQFRDRTableEditor_colindexbytitle);
     //if (columnMode) {
         parser->addFunction("column", fQFRDRTableEditor_column);
         parser->addFunction("uniquecolumn", fQFRDRTableEditor_columnUnique);
@@ -59,6 +62,53 @@ void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names, bool colum
     }
 }
 
+qfmpResult fQFRDRTableEditor_coltitles(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    qfmpResult res=qfmpResult::invalidResult();
+    res.num=NAN;
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n==0) {
+                res.setStringVec(d->model->getColumnTitles());
+            } else {
+                p->qfmpError("columntitles() has no arguments");
+            }
+        }
+    }
+    return res;
+}
+
+qfmpResult fQFRDRTableEditor_coltitle(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    qfmpResult res=qfmpResult::invalidResult();
+    res.num=NAN;
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n==1 && (params[0].type==qfmpDouble) ) {
+                res.setString(d->model->getColumnTitles().value(params[0].toInteger()));
+            } else {
+                p->qfmpError("columntitle(col) needs one integer arguments");
+            }
+        }
+    }
+    return res;
+}
+
+qfmpResult fQFRDRTableEditor_colindexbytitle(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+    qfmpResult res=qfmpResult::invalidResult();
+    res.num=NAN;
+    QFMathParserData* d=(QFMathParserData*)p->get_data();
+    if (d) {
+        if (d->model) {
+            if (n==1 && (params[0].type==qfmpString) ) {
+                res.setDouble(d->model->getColumnTitles().indexOf(params[0].str));
+            } else {
+                p->qfmpError("columnindexbytitle(col) needs one string arguments");
+            }
+        }
+    }
+    return res;
+}
 
 qfmpResult fQFRDRTableEditor_columnStr(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
     qfmpResult res=qfmpResult::invalidResult();
