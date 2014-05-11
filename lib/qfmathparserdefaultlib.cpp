@@ -94,6 +94,10 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("randintvec", QFMathParser_DefaultLib::fRandIntVec);
     p->addFunction("randnormvec", QFMathParser_DefaultLib::fRandNormVec);
     p->addFunction("randboolvec", QFMathParser_DefaultLib::fRandBoolVec);
+    p->addFunction("randvec_seed", QFMathParser_DefaultLib::fRandVec);
+    p->addFunction("randintvec_seed", QFMathParser_DefaultLib::fRandIntVec);
+    p->addFunction("randnormvec_seed", QFMathParser_DefaultLib::fRandNormVec);
+    p->addFunction("randboolvec_seed", QFMathParser_DefaultLib::fRandBoolVec);
     p->addFunction("srand", QFMathParser_DefaultLib::fSRand, NULL, QFMathParser_DefaultLib::fSRand);
     p->addFunction("ceil", QFMathParser_DefaultLib::fCeil, NULL, ceil);
     p->addFunction("floor", QFMathParser_DefaultLib::fFloor, NULL, floor);
@@ -573,6 +577,162 @@ namespace QFMathParser_DefaultLib {
       }
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+    void fRandVecSeed(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+      bool ok=true;
+      if (n>4 || n<=1) { ok=false; p->qfmpError(QObject::tr("randvec_seed accepts 2, 3 or 4 arguments")); }
+      if (n>0 && (params[0].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randvec_seed needs a double as first argument (if any)")); }
+      if (n>1 && (params[1].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randvec_seed needs a double as second argument (if any)")); }
+      if (n>2 && (params[2].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randvec_seed needs a double as third argument (if any)")); }
+      if (n>4 && (params[3].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randvec_seed needs a double as fourth argument (if any)")); }
+      int items=params[0].toInteger();
+      if (items<=0) { ok=false; p->qfmpError(QObject::tr("randvec_seed's first argument has to be a positive integer number")); }
+      if (ok) {
+          r.setDoubleVec(items, 0);
+
+          if (n==2) {
+              MTRand rng;
+              rng.seed(params[1].num);
+              for (int i=0; i<items; i++)
+                r.numVec[i]=rng.rand();
+          } else if (n==4) {
+              MTRand rng;
+              rng.seed(params[3].num);
+              for (int i=0; i<items; i++)
+                r.numVec[i]=rng.rand()*(params[2].num-params[1].num)+params[1].num;
+          } else if (n==3){
+              MTRand rng;
+              rng.seed(params[2].num);
+              for (int i=0; i<items; i++)
+                r.numVec[i]=rng.rand(params[1].num);
+          }
+      } else {
+        r.setInvalid();
+      }
+    }
+
+
+    void fRandIntVecSeed(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        bool ok=true;
+        if (n>4 || n<=1) { ok=false; p->qfmpError(QObject::tr("randintvec_seed accepts 2, 3 or 4 arguments")); }
+        if (n>0 && (params[0].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randintvec_seed needs a double as first argument (if any)")); }
+        if (n>1 && (params[1].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randintvec_seed needs a double as second argument (if any)")); }
+        if (n>2 && (params[2].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randintvec_seed needs a double as third argument (if any)")); }
+        if (n>4 && (params[3].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randintvec_seed needs a double as fourth argument (if any)")); }
+        int items=params[0].toInteger();
+        if (items<=0) { ok=false; p->qfmpError(QObject::tr("randintvec_seed's first argument has to be a positive integer number")); }
+        if (ok) {
+            r.setDoubleVec(items, 0);
+
+            if (n==2) {
+                MTRand rng;
+                rng.seed(params[1].num);
+                for (int i=0; i<items; i++)
+                  r.numVec[i]=rng.randInt();
+            } else if (n==4) {
+                MTRand rng;
+                rng.seed(params[3].num);
+                for (int i=0; i<items; i++)
+                  r.numVec[i]=rng.randInt()*((uint32_t)params[2].num-(uint32_t)params[1].num)+(uint32_t)params[1].num;
+            } else if (n==3){
+                MTRand rng;
+                rng.seed(params[2].num);
+                for (int i=0; i<items; i++)
+                  r.numVec[i]=rng.randInt((uint32_t)params[1].num);
+            }
+        } else {
+          r.setInvalid();
+        }
+    }
+
+    void fRandNormVecSeed(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        bool ok=true;
+        if (n>4 || n<=1) { ok=false; p->qfmpError(QObject::tr("randnormvec_seed accepts 2, 3 or 4 arguments")); }
+        if (n>0 && (params[0].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randnormvec_seed needs a double as first argument (if any)")); }
+        if (n>1 && (params[1].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randnormvec_seed needs a double as second argument (if any)")); }
+        if (n>2 && (params[2].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randnormvec_seed needs a double as third argument (if any)")); }
+        if (n>4 && (params[3].type!=qfmpDouble)) { ok=false;  p->qfmpError(QObject::tr("randnormvec_seed needs a double as fourth argument (if any)")); }
+        int items=params[0].toInteger();
+        if (items<=0) { ok=false; p->qfmpError(QObject::tr("randnormvec_seed's first argument has to be a positive integer number")); }
+        if (ok) {
+            MTRand rng;
+
+            r.setDoubleVec(items, 0);
+            double mean=0;
+            double var=1;
+            if (n==3) {
+                var=params[1].num;
+                rng.seed(params[2].num);
+            } else if (n==2) {
+                rng.seed(params[1].num);
+            } else if (n>3) {
+                mean=params[1].num;
+                var=params[2].num;
+                rng.seed(params[3].num);
+            }
+
+            for (int i=0; i<items; i++)
+              r.numVec[i]=rng.randNorm(mean, var);
+        } else {
+          r.setInvalid();
+        }
+
+}
+
+
+
+    void fRandBoolVecSeed(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        bool ok=true;
+      if (n>3 || n<=1) { ok=false; p->qfmpError(QObject::tr("randboolvec_seed accepts 2 or 3 arguments")); }
+      if (n>0 && (params[0].type!=qfmpDouble)) { ok=false; p->qfmpError(QObject::tr("randboolvec_seed needs a double as first argument (if any)")); }
+      if (n>1 && (params[1].type!=qfmpDouble)) { ok=false; p->qfmpError(QObject::tr("randboolvec_seed needs a double as second argument (if any)")); }
+      if (n>2 && (params[2].type!=qfmpDouble)) { ok=false; p->qfmpError(QObject::tr("randboolvec_seed needs a double as third argument (if any)")); }
+      int items=params[0].toInteger();
+      double pr=0.5;
+      double seed=params[1].num;
+      if (n>2) {
+          pr=params[1].num;
+          seed=params[2].num;
+      }
+      if (items<=0) { ok=false; p->qfmpError(QObject::tr("randboolvec_seed's first argument has to be a positive integer number")); }
+      if (pr<0 || pr>1) { ok=false; p->qfmpError(QObject::tr("randboolvec_seed's second argument has to be a number between 0 and 1")); }
+      if (ok) {
+          r.setBoolVec(items, false);
+          MTRand rng;
+          rng.seed(seed);
+          for (int i=0; i<items; i++)
+            r.boolVec[i]=(rng.rand()<=pr);
+      } else {
+          r.setInvalid();
+      }
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     void fRandBool(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
         bool ok=true;

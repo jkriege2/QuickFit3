@@ -64,6 +64,16 @@
   </ul>
   <!-- /func:randvec -->
   </li>
+  
+<li><a name="randvec_seed"/><!-- func:randvec_seed -->
+  <b><tt><!-- template -->randvec_seed(items, seed)<!-- /template --></tt> - <i>returns a vector (number of elements given in <tt>items</tt>) of random number between 0 and 1 (equally distributed). The RNG is seeded by <tt>seed</tt>. </i>:</b><br>
+  The function <tt>randvec_seed()</tt> accepts up to four arguments:<ul>
+    <li><tt>randvec_seed(items, N,seed)</tt> returns a random number vector with <tt>items</tt> elements between 0 and N</li>
+    <li><tt>randvec_seed(items, N1, N2,seed)</tt> returns a random number vector with <tt>items</tt> elements between N1 and N2</li>
+  </ul>
+  <!-- /func:randvec_seed -->
+  </li>
+
   <li><a name="randintvec"/><!-- func:randintvec -->
   <b><tt><!-- template -->randintvec(items)<!-- /template --></tt> - <i>returns a vector (number of elements given in <tt>items</tt>) of  integer valued random number between 0 and 2<sup>32</sup>-1 (equally distributed) </i>:</b><br>
   The function <tt>randintvec(items)</tt> accepts up to three arguments:<ul>
@@ -72,6 +82,14 @@
   </ul>
   <!-- /func:randintvec -->
   </li>
+  <li><a name="randintvec_seed"/><!-- func:randintvec_seed -->
+  <b><tt><!-- template -->randintvec_seed(items, seed)<!-- /template --></tt> - <i>returns a vector (number of elements given in <tt>items</tt>) of  integer valued random number between 0 and 2<sup>32</sup>-1 (equally distributed).  The RNG is seeded by <tt>seed</tt>.</i>:</b><br>
+  The function <tt>randintvec_seed(items)</tt> accepts up to three arguments:<ul>
+    <li><tt>randintvec_seed(items, N, seed)</tt> returns a random number vector with <tt>items</tt> elements between 0 and N</li>
+    <li><tt>randintvec_seed(items, N1, N2, seed)</tt> returns a random number vector with <tt>items</tt> elements between N1 and N2</li>
+  </ul>
+  <!-- /func:randintvec_seed -->
+  </li>
   <li><a name="randnormvec"/><!-- func:randnormvec -->
   <b><tt><!-- template -->randnormvec(items)<!-- /template --></tt> - <i>returns a vector (number of elements given in <tt>items</tt>) of normally distributed random number with mean 0 and variante 1 </i>:</b><br>
   The function <tt>randnormvec()</tt> accepts up to three arguments:<ul>
@@ -79,6 +97,14 @@
     <li><tt>randnormvec(items, MEAN, VAR)</tt> returns a random number vector with <tt>items</tt> elements normally distributed with mean <tt>MEAN</tt> and variance <tt>VAR</tt></li>
   </ul>
   <!-- /func:randnormvec -->
+  </li>
+  <li><a name="randnormvec_seed"/><!-- func:randnormvec_seed -->
+  <b><tt><!-- template -->randnormvec_seed(items, seed)<!-- /template --></tt> - <i>returns a vector (number of elements given in <tt>items</tt>) of normally distributed random number with mean 0 and variante 1.  The RNG is seeded by <tt>seed</tt>.</i>:</b><br>
+  The function <tt>randnormvec_seed()</tt> accepts up to four arguments:<ul>
+    <li><tt>randnormvec_seed(items, VAR, seed)</tt> returns a random number vector with <tt>items</tt> elements normally distributed with mean 0 and variance <tt>VAR</tt></li>
+    <li><tt>randnormvec_seed(items, MEAN, VAR, seed)</tt> returns a random number vector with <tt>items</tt> elements normally distributed with mean <tt>MEAN</tt> and variance <tt>VAR</tt></li>
+  </ul>
+  <!-- /func:randnormvec_seed -->
   </li>
   <li><a name="randboolvec"/><!-- func:randboolvec -->
   <b><tt><!-- template -->randboolvec(items)<!-- /template --></tt> - <i>returns a boolean vector (number of elements given in <tt>items</tt>) with elememts that are randomly choosen. the propability for <tt>true</tt> is 0.5 by default, but can also be given as a second parameter</i>:</b><br>
@@ -89,7 +115,14 @@
   <!-- /func:randboolvec -->
   </li>
   
-
+<li><a name="randboolvec_seed"/><!-- func:randboolvec_seed -->
+  <b><tt><!-- template -->randboolvec_seed(items, seed)<!-- /template --></tt> - <i>returns a boolean vector (number of elements given in <tt>items</tt>) with elememts that are randomly choosen. The propability for <tt>true</tt> is 0.5 by default, but can also be given as a second parameter. The RNG is seeded by <tt>seed</tt></i>:</b><br>
+  The function <tt>randboolvec_seed()</tt> accepts up to three arguments:<ul>
+    <li><tt>randboolvec_seed(10, 0.2, seed)</tt> returns a boolean vector with 10 elements and a propability of <tt>true</tt> of 0.2</li>
+    <li><tt>randboolvec_seed(10, seed)</tt> returns a boolean vector with 10 elements and a propability of <tt>true</tt> of 0.5</li>
+  </ul>
+  <!-- /func:randboolvec_seed -->
+  </li>
 
   </li>
   </ul>
