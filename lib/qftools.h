@@ -641,7 +641,7 @@ template <class T>
 T* duplicateArray(const T* input, long long N) {
     if (!input||N<=0) return NULL;
     T* out=(T*)malloc(N*sizeof(T));
-    if (input && N>=0) memcpy(out, input, N*sizeof(T));
+    if (out && input && N>=0) memcpy(out, input, N*sizeof(T));
     return out;
 }
 
