@@ -2712,46 +2712,50 @@ void QFRDRImagingFCSData::splitVideo(double *video, double *&video2, int &width,
     int oldWidth=width;
     int oldHeight=height;
     double* temp=duplicateArray(video, width*height*frames);
-    int shiftX1=0;
-    int shiftX2=0;
-    int shiftY1=0;
-    int shiftY2=0;
-    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal) {
-        width=width/2;
-        if (internalDualViewModeChannel()==0 || isFCCS()) {
-            shiftX1=0;
-            shiftX2=width;
-        }
-        if (internalDualViewModeChannel()==1 && !isFCCS()) {
-            shiftX1=width;
-            shiftX2=0;
-        }
-    } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical) {
-        height=height/2;
-        if (internalDualViewModeChannel()==0 || isFCCS()) {
-            shiftY1=0;
-            shiftY2=height;
-        }
-        if (internalDualViewModeChannel()==1 && !isFCCS()) {
-            shiftY1=height;
-            shiftY2=0;
-        }
-    }
-    video2=video+width*height*frames;
-
-    for (uint32_t f=0; f<frames; f++) {
-        for (int y=0; y<height; y++) {
-            for (int x=0; x<width; x++) {
-                const int idx=f*width*height+y*width+x;
-                const int idx1=f*oldWidth*oldHeight+(y+shiftY1)*oldWidth+x+shiftX1;
-                const int idx2=f*oldWidth*oldHeight+(y+shiftY2)*oldWidth+x+shiftX2;
-                video[idx]=temp[idx1];
-                video2[idx]=temp[idx2];
+    if (temp) {
+        int shiftX1=0;
+        int shiftX2=0;
+        int shiftY1=0;
+        int shiftY2=0;
+        if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal) {
+            width=width/2;
+            if (internalDualViewModeChannel()==0 || isFCCS()) {
+                shiftX1=0;
+                shiftX2=width;
+            }
+            if (internalDualViewModeChannel()==1 && !isFCCS()) {
+                shiftX1=width;
+                shiftX2=0;
+            }
+        } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical) {
+            height=height/2;
+            if (internalDualViewModeChannel()==0 || isFCCS()) {
+                shiftY1=0;
+                shiftY2=height;
+            }
+            if (internalDualViewModeChannel()==1 && !isFCCS()) {
+                shiftY1=height;
+                shiftY2=0;
             }
         }
-    }
+        video2=video+width*height*frames;
 
-    free(temp);
+        for (uint32_t f=0; f<frames; f++) {
+            for (int y=0; y<height; y++) {
+                for (int x=0; x<width; x++) {
+                    const int idx=f*width*height+y*width+x;
+                    const int idx1=f*oldWidth*oldHeight+(y+shiftY1)*oldWidth+x+shiftX1;
+                    const int idx2=f*oldWidth*oldHeight+(y+shiftY2)*oldWidth+x+shiftX2;
+                    video[idx]=temp[idx1];
+                    video2[idx]=temp[idx2];
+                }
+            }
+        }
+
+        free(temp);
+    } else {
+        log_warning(tr("WARNING could not split image in record '%1' (out of memory).\n").arg(getName()));
+    }
 }
 
 void QFRDRImagingFCSData::maskMaskChangedEvent()
