@@ -86,7 +86,7 @@ QFESpectraViewerDialog::QFESpectraViewerDialog(QFESpectraViewer *plugin, QWidget
     QAction* actFRET=new QAction(tr("&FRET Calculator"), this);
     connect(actFRET, SIGNAL(triggered()), this, SLOT(FRETCalculator()));
     mainToolbar->addAction(actFRET);
-    actFRET->setVisible(false);
+    actFRET->setVisible(true);
 
     /*mainToolbar->addSeparator();
     ui->plotter->populateToolbar(mainToolbar);*/

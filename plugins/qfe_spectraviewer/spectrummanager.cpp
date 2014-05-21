@@ -625,7 +625,7 @@ double SpectrumManager::Spectrum::getMulSpectrumIntegral(SpectrumManager::Spectr
             }
         }
 
-        gsl_interp_accel *accel= gsl_interp_accel_alloc();
+        /*gsl_interp_accel *accel= gsl_interp_accel_alloc();
         gsl_spline *spline=gsl_spline_alloc(spectral_interpolation_type,wl.size());
         gsl_spline_init(spline, wl.data(), sp.data(), wl.size());
         double res;
@@ -637,7 +637,20 @@ double SpectrumManager::Spectrum::getMulSpectrumIntegral(SpectrumManager::Spectr
         //qDebug()<<"    "<<arrayToString(sp.data(), sp.size());
 
         gsl_interp_accel_free(accel);
-        gsl_spline_free(spline);
+        gsl_spline_free(spline);*/
+
+        double res=0;
+        // Sehnentrapezformel
+        //qDebug()<<"integrating "<<wl.size()<<" points";
+        for (int i=0; i<wl.size()-1; i++) {
+            const double b=wl[i+1];
+            const double a=wl[i];
+            const double fb=sp[i+1];
+            const double fa=sp[i];
+            res=res+/*(b-a)**/(fa+fb)/2.0;
+        }
+        return res;
+
         return res;
     } catch (std::exception& E) {
         //qDebug()<<"ERROR: "<<E.what();
@@ -687,23 +700,30 @@ double SpectrumManager::Spectrum::getMulSpectrumIntegral(SpectrumManager::Spectr
 
 
         if (inBetweenThis>inBetweenOther) {
-            for (int i=thisStart; i<thisStart+inBetweenThis; i++) {
+            //qDebug()<<"inBetweenThis>inBetweenOther: "<<thisStart<<thisStart+inBetweenThis<<N;
+            for (int i=thisStart; i<thisStart+inBetweenThis-1; i++) {
                 wl<<wavelength[i]*wavelength_factctor;
                 sp<<spectrum[i]*multWith->getSpectrumAt(wavelength[i])*pow(wavelength[i]*wavelength_factctor, lambda_power)*spectrum_factor;
+                //qDebug()<<wl.last()<<spectrum[i]<<multWith->getSpectrumAt(wavelength[i])<<pow(wavelength[i]*wavelength_factctor, lambda_power)<<sp.last();
             }
         } else {
-            for (int i=otherStart; i<otherStart+inBetweenOther; i++) {
+            //qDebug()<<"inBetweenThis<=inBetweenOther: "<<otherStart<<otherStart+inBetweenOther<<multWith->N;
+            for (int i=otherStart; i<otherStart+inBetweenOther-1; i++) {
                 wl<<multWith->wavelength[i]*wavelength_factctor;
-                sp<<multWith->spectrum[i]*getSpectrumAt(multWith->wavelength[i])*pow(wavelength[i]*wavelength_factctor, lambda_power)*spectrum_factor;
+                sp<<multWith->spectrum[i]*getSpectrumAt(multWith->wavelength[i])*pow(multWith->wavelength[i]*wavelength_factctor, lambda_power)*spectrum_factor;
+                //qDebug()<<wl.last()<<multWith->spectrum[i]<<getSpectrumAt(multWith->wavelength[i])<<pow(multWith->wavelength[i]*wavelength_factctor, lambda_power)<<sp.last();
             }
         }
 
+
+        //qDebug()<<"nc    "<<arrayToString(wl.data(), wl.size());
+        //qDebug()<<"nc    "<<arrayToString(sp.data(), sp.size());
 
         for (int i=0; i<wl.size(); i++) {
             if (!QFFloatIsOK(sp[i])) sp[i]=0;
         }
 
-        gsl_interp_accel *accel= gsl_interp_accel_alloc();
+        /*gsl_interp_accel *accel= gsl_interp_accel_alloc();
         gsl_spline *spline=gsl_spline_alloc(spectral_interpolation_type,wl.size());
         gsl_spline_init(spline, wl.data(), sp.data(), wl.size());
         double res;
@@ -712,12 +732,23 @@ double SpectrumManager::Spectrum::getMulSpectrumIntegral(SpectrumManager::Spectr
         }
 
 
-        qDebug()<<"int "<<filename<<"*"<<multWith->filename<<"    "<<lambda_start<<" ... "<<lambda_end<<"   = "<<res;
-        qDebug()<<"    "<<arrayToString(wl.data(), wl.size());
-        qDebug()<<"    "<<arrayToString(sp.data(), sp.size());
 
         gsl_interp_accel_free(accel);
-        gsl_spline_free(spline);
+        gsl_spline_free(spline);*/
+
+        //qDebug()<<"int "<<filename<<"*"<<multWith->filename<<"    "<<lambda_start<<" ... "<<lambda_end;
+        //qDebug()<<"    "<<arrayToString(wl.data(), wl.size());
+        //qDebug()<<"    "<<arrayToString(sp.data(), sp.size());
+        double res=0;
+        // Sehnentrapezformel
+        //qDebug()<<"2integrating "<<wl.size()<<" points";
+        for (int i=0; i<wl.size()-1; i++) {
+            const double b=wl[i+1];
+            const double a=wl[i];
+            const double fb=sp[i+1];
+            const double fa=sp[i];
+            res=res+/*(b-a)**/(fa+fb)/2.0;
+        }
         return res;
     } catch (std::exception& E) {
         //qDebug()<<"ERROR: "<<E.what();

@@ -17,14 +17,8 @@
   </ul>
   And can perform some simple calculations on these spectra:
   <ul>
-    <li>The "spillover table" calculates how much of each fluorophore's fluorescence spectrum is detected in each of the filters.</li>
-	<li>The "FRET Calculator" estimates the Förtser radius (in Angstrom=0.1nm) between any two fluorophores. It uses the formulas:
-	$$bmath:{R_0}^6 = \frac{9000\cdot Q_0\cdot (\ln 10) \kappa^2 \cdot J}{128 \cdot \pi^5 \cdot n^4 \cdot N_A}$$
-	where $$math:Q_0$$ is the quantum efficiency of the donor without the acceptor, $$math:n$$ is the refractive index of the solvent and $$math:N_A$$ is Avogadros number. The factor $$math:\kappa^2$$ is the dipole orientation factor. The overlap integral
-	$$bmath:J=\int f_{\rm D}(\lambda) \, \epsilon_{\rm A}(\lambda) \, \lambda^4 \, d\lambda$$
-	is calculated from the normalized donor spectrum $$math:f_{\rm D}(\lambda)$$ and the absorption spectrum $$math:\epsilon_{\rm A}(\lambda)$$ of the acceptor.
-	   
-	</li>
+    <li>The <a href="#spillover">"spillover table"</a> calculates how much of each fluorophore's fluorescence spectrum is detected in each of the filters.</li>
+    <li>The <a href="#FRETCalc">"FRET Calculator"</a> estimates the Förtser radius (in Angstrom=0.1nm) between any two fluorophores. </li>
   </ul>
   </p>
   
@@ -59,7 +53,7 @@ selected spectrum (if available), e.g. fluorescence quantum yields, extinction c
   </li>
   <li>The spectra will be colored according to their maximum intensity wavelength (for fluorophores the maximum emission intensity, so EGFP will be green and mRFP1 red!). Lightsource spectra are shown in gray. All emission spectra are plotted as filled curves.</li>
 </ol></p>
-
+<h2><a name="spillover">Spillover table</h2>
 <p>
 The <b>Spillover table</b> can be accessed with the according button on the top left. A new window will appear:
 
@@ -84,7 +78,21 @@ It is assumed that both spectra are normalized, so $$math:\max(\epsilon(\lambda)
   
 </p>
 
+<h2><a name="FRETCalc">F&ouml;rster radius calculator</h2>
+<p>
+The <b>F&ouml;rster radius calculator</b> can be accessed with the according button on the top left. A new window will appear:
 
-
+<center>
+	<a name="qfe_spectraviewer_pic002"><img src="./pic/qfe_spectraviewer_pic002.png" border="1"><br/>
+<i>F&ouml;rster radius calculator window</i>
+</center>
+<p>This window calculates the F&ouml;rster radii between all pairs of currently selected fluorophores. Each row in the resulting table corresponds to one donor fluorophore. The columns encode the acceptors. </p>
+<p>The calculation is performed, by first estimating the overlap integral between the donor emission spectrum $$math:F_D(\lambda)$$ and the acceptor absorption spectrum $$math:\epsilon_A(\lambda)$$:
+$$bmath:J=\frac{\int F_D(\lambda) \, \epsilon_A(\lambda) \, \lambda^4 \, d\lambda}{\int F_D(\lambda)\,d\lambda}.$$
+Then the F&ouml;rster radius is given by:
+$$bmath:R_0=0.211\cdot\left(\frac{J\cdot Q_D\cdot \kappa^2}{n^4}\right)^{1/6},$$
+where $$math:Q_D$$ is the quantum efficiency of the donor without the acceptor and $$math:n$$ is the refractive index of the solvent. 
+The factor $$math:\kappa^2$$ is the dipole orientation factor, which is often chosen to be  $$math:\kappa^2=2/3\approx0.66667$$. 
+</p>
 </body>
 </html>
