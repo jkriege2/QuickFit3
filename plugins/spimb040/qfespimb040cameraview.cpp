@@ -1745,6 +1745,12 @@ void QFESPIMB040CameraView::saveMultiSeries(int frames, const QString fileName)
     if (m_stopresume) m_stopresume->stop();
     //saveJKImage(rawImage, tr("Save Raw Image ..."));
 
+    QFESPIMB040AcquisitionTools* acqTools=opticsSetup->getAcquisitionTools();
+
+    acqTools->savePreviewMovie(cameraID, frames, fileName);
+
+    /*
+
     JKImage<uint32_t> rawImage;
     QFExtensionCamera* camExt=opticsSetup->cameraComboBox(cameraID)->currentExtensionCamera();
     int camID=opticsSetup->cameraComboBox(cameraID)->currentCameraID();
@@ -1809,7 +1815,7 @@ void QFESPIMB040CameraView::saveMultiSeries(int frames, const QString fileName)
             setting.setValue(acquisitionDescriptionPrefix+it.key(), it.value());
         }
     }
-
+*/
 
     if (m_stopresume) m_stopresume->resume();
 }

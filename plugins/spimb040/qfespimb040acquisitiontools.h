@@ -77,6 +77,8 @@ class QFESPIMB040AcquisitionTools {
         virtual QString savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::CameraAcquititonFileDescription>& files, QDateTime startDateTime, const QString& lightpathPrefix=QString(""), const QString& prefix=QString(""))=0;
         virtual QString saveMeasuredData(const QString &filenamePrefix, const QList<QFESPIMB040OpticsSetupBase::measuredValues> &data)=0;
 
+    virtual void savePreviewMovie(int camera, int frames, const QString& filename)=0;
+    virtual void savePreviewMovie(int camera, int frames, const QString& filename, const QMap<QString, QVariant>& cam_params)=0;
 };
 
 Q_DECLARE_INTERFACE(QFESPIMB040AcquisitionTools,

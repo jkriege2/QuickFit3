@@ -27,6 +27,7 @@
 #include "jkqttools.h"
 #include "qvisiblehandlesplitter.h"
 #include "qfespimb040acquisitiontools.h"
+#include "datatools.h"
 
 
 #include "qtlogfile.h"
@@ -142,8 +143,8 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
 
         //acquisitionPrefix1+"_overview.tif"
     public:
-        void savePreviewMovie(int camera, int frames, const QString& filename);
-        void savePreviewMovie(int camera, int frames, const QString& filename, const QMap<QString, QVariant>& cam_params);
+        virtual void savePreviewMovie(int camera, int frames, const QString& filename);
+        virtual void savePreviewMovie(int camera, int frames, const QString& filename, const QMap<QString, QVariant>& cam_params);
 
         void storeCameaConfig(QSettings& setting, QFExtensionCamera* cam, int camID);
 

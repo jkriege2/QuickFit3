@@ -772,10 +772,18 @@ void QFESPIMB040MainWindow2::savePreviewMovie(int camera, int frames, const QStr
         QList<double> times;
         QElapsedTimer timer;
         timer.start();
+        QList<QFESPIMB040OpticsSetup::measuredValues> measvec;
+        QList<QList<QVariant> > measdat;
+        QStringList measdat_cols;
         if (tiff1&&tiff2&&tiff3) {
             for (int i=0; i<frames; i++) {
                 if (camExt->acquireOnCamera(camID, rawImage.data(), &timestamp, &camConfig)) {
                     times.append(double(timer.elapsed())/1000.0);
+                    QFESPIMB040OpticsSetup::measuredValues meas;
+                    if (optSetup) {
+                        meas=optSetup->getMeasuredValues();
+                    }
+                    measvec.append(meas);
                     TIFFTWriteUint16from32(tiff1, rawImage.data(), w, h, false);
                     TIFFWriteDirectory(tiff1);
                     TIFFTWriteUint32(tiff2, rawImage.data(), w, h);
@@ -788,15 +796,52 @@ void QFESPIMB040MainWindow2::savePreviewMovie(int camera, int frames, const QStr
                 QApplication::processEvents();
             }
         }
-        QFile f(QString(fn+"_timepoints.dat"));
-        if (f.open(QFile::WriteOnly|QFile::Text)) {
+        /*QFile f(QString(fn+"_measurements.dat"));
+        if (f.open(QFile::WriteOnly|QFile::Text)&&times.size()>0) {
             QTextStream str(&f);
+            str<<"timeindex [s], measurement_time [s]";
+            QMapIterator<QString, QVariant> it(measvec.first());
+            while (it.hasNext()) {
+                it.next();
+                str<<", "<<it.key();
+            }
+            str<<"\n";
+
             for (int i=0; i<times.size(); i++) {
-                str<<CDoubleToQString(times[i])<<"\n";
+                str<<CDoubleToQString(times[i])<<", "<<double(measvec.first().time.msecsTo(measvec[i].time))/1000.0;
+                QMapIterator<QString, QVariant> it(measvec[i]);
+                while (it.hasNext()) {
+                    it.next();
+                    str<<", "<< getQVariantData(it.value());
+
+                }
+                str<<"\n";
             }
             f.close();
-        }
+        }*/
 
+
+        if (times.size()>0) {
+            measdat_cols<<"timeindex [s]"<<"measurement_time [s]";
+            QMapIterator<QString, QVariant> it(measvec.first().data);
+            while (it.hasNext()) {
+                it.next();
+                measdat_cols<<it.key();
+            }
+
+
+            for (int i=0; i<times.size(); i++) {
+                QList<QVariant> d;
+                d<<times[i]<<double(measvec.first().time.msecsTo(measvec[i].time))/1000.0;
+                QMapIterator<QString, QVariant> it(measvec[i].data);
+                while (it.hasNext()) {
+                    it.next();
+                    d<<it.value();
+                }
+                measdat<<d;
+            }
+            QFDataExportHandler::save(dataRotate(measdat), 0, QString(fn+"_measurements.dat"), measdat_cols);
+        }
 
         QSettings setting(QString(fn+".configuration.ini"), QSettings::IniFormat);
         //storeCameraConfig(setting);
@@ -814,6 +859,22 @@ void QFESPIMB040MainWindow2::savePreviewMovie(int camera, int frames, const QStr
                 setting.setValue(acquisitionDescriptionPrefix+it.key(), it.value());
             }
         }
+
+        widExperimentDescription->storeSettings(setting, "experiment");
+
+        setting.setValue("files/count", 4);
+        setting.setValue("files/name0", QFileInfo(fn+".configuration.ini").absoluteDir().relativeFilePath(fn+".tif"));
+        setting.setValue("files/type0", "TIFF16");
+        setting.setValue("files/description0", "image stack");
+        setting.setValue("files/name1", QFileInfo(fn+".configuration.ini").absoluteDir().relativeFilePath(fn+"_uint32.tif"));
+        setting.setValue("files/type1", "TIFF32");
+        setting.setValue("files/description1", "image stack");
+        setting.setValue("files/name2", QFileInfo(fn+".configuration.ini").absoluteDir().relativeFilePath(fn+"_float.tif"));
+        setting.setValue("files/type2", "TIFF_FLOAT");
+        setting.setValue("files/description2", "image stack");
+        setting.setValue("files/name3", QFileInfo(fn+".configuration.ini").absoluteDir().relativeFilePath(fn+"_measurements.dat"));
+        setting.setValue("files/type3", "CSV");
+        setting.setValue("files/description3", "measureable properties of setup");
 
         optSetup->releaseCamera(camera);
     }
