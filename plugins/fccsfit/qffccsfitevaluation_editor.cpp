@@ -1439,7 +1439,7 @@ void QFFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         QPicture pic;
-        QPainter* painter=new QPainter(&pic);
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
         ui->pltData->get_plotter()->draw(*painter, QRect(0,0,ui->pltData->width(),ui->pltData->height()+ui->pltResiduals->height()));
         delete painter;
         double scale=0.9*document->textWidth()/double(pic.boundingRect().width());
@@ -1450,7 +1450,7 @@ void QFFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
         tabCursor=table->cellAt(1,0).firstCursorPosition();
         tabCursor.insertText(tr("\n"), fTextBoldSmall);
         QPicture picT;
-        painter=new QPainter(&picT);
+        painter=new JKQTPEnhancedPainter(&picT);
         ui->tableView->paint(*painter);
         delete painter;
         scale=0.95*document->textWidth()/double(picT.boundingRect().width());

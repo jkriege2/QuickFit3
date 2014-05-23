@@ -1537,7 +1537,7 @@ void QFFCSMaxEntEvaluationEditor::createReportDoc(QTextDocument* document) {
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         QPicture pic;
-        QPainter* painter=new QPainter(&pic);
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
         pltData->get_plotter()->draw(*painter, QRect(0,0,pltData->width(),pltData->width()));
         delete painter;
         double scale=document->textWidth()*0.45/pic.boundingRect().width(); //0.62
@@ -1550,7 +1550,7 @@ void QFFCSMaxEntEvaluationEditor::createReportDoc(QTextDocument* document) {
     {
         QTextCursor tabCursor=table->cellAt(0, 1).firstCursorPosition();
         QPicture pic;
-        QPainter* painter=new QPainter(&pic);
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
         pltDistribution->get_plotter()->draw(*painter, QRect(0,0,pltDistribution->width(),pltDistribution->width()));
         delete painter;
         double scale=document->textWidth()*0.45/pic.boundingRect().width(); //0.62
@@ -1564,7 +1564,7 @@ void QFFCSMaxEntEvaluationEditor::createReportDoc(QTextDocument* document) {
     {
         QTextCursor tabCursor=table->cellAt(1, 0).firstCursorPosition();
         QPicture pic;
-        QPainter* painter=new QPainter(&pic);
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
         pltResidualHistogram->get_plotter()->draw(*painter, QRect(0,0,pltResidualHistogram->width(),pltResidualHistogram->width()));
         delete painter;
         double scale=document->textWidth()*0.45/pic.boundingRect().width();//0.3
@@ -1576,7 +1576,7 @@ void QFFCSMaxEntEvaluationEditor::createReportDoc(QTextDocument* document) {
     {
         QTextCursor tabCursor=table->cellAt(1, 1).firstCursorPosition();
         QPicture pic;
-        QPainter* painter=new QPainter(&pic);
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
         pltResidualCorrelation->get_plotter()->draw(*painter, QRect(0,0,pltResidualCorrelation->width(),pltResidualCorrelation->width()));
         delete painter;
         double scale=document->textWidth()*0.45/pic.boundingRect().width();//0.3

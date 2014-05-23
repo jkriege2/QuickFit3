@@ -1417,7 +1417,7 @@ void QFImFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         QPicture pic;
-        QPainter* painter=new QPainter(&pic);
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
         ui->pltData->get_plotter()->draw(*painter, QRect(0,0,ui->pltData->width(),ui->pltData->height()+ui->pltResiduals->height()));
         delete painter;
         double scale=0.65*document->textWidth()/double(pic.boundingRect().width());
@@ -1427,7 +1427,7 @@ void QFImFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
 
         tabCursor=table->cellAt(0, 1).firstCursorPosition();
         QPicture picO;
-        painter=new QPainter(&picO);
+        painter=new JKQTPEnhancedPainter(&picO);
         ui->pltOverview->draw(painter, NULL);// QRect(0,0,ui->pltData->width(),ui->pltData->height()+ui->pltResiduals->height()));
         delete painter;
         scale=0.3*document->textWidth()/double(picO.boundingRect().width());
@@ -1438,7 +1438,7 @@ void QFImFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
         tabCursor=table->cellAt(1,0).firstCursorPosition();
         tabCursor.insertText(tr("\n"), fTextBoldSmall);
         QPicture picT;
-        painter=new QPainter(&picT);
+        painter=new JKQTPEnhancedPainter(&picT);
         ui->tableView->paint(*painter);
         delete painter;
         scale=0.95*document->textWidth()/double(picT.boundingRect().width());

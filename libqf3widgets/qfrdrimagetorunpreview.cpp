@@ -212,7 +212,7 @@ void QFRDRImageToRunPreview::setRunSelectWidgetActive(bool active)
 
 }
 
-void QFRDRImageToRunPreview::draw(QPainter *painter, QSize *size)
+void QFRDRImageToRunPreview::draw(JKQTPEnhancedPainter *painter, QSize *size)
 {
     painter->save();
     painter->drawText(0, double(spinRun->height())*0.7, tr("current run: %1 %2").arg(labRun->text()).arg(labInfo->text()));

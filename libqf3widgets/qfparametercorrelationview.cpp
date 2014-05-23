@@ -662,7 +662,7 @@ void QFParameterCorrelationView::writeReport(QTextCursor &cursor, QTextDocument 
         QTextCursor tabCursor=table->cellAt(0,1).firstCursorPosition();
         {
             QPicture pic;
-            QPainter* painter=new QPainter(&pic);
+            JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
             pltParamCorrelation->get_plotter()->draw(*painter, QRect(0,0,pltParamCorrelation->width(),pltParamCorrelation->height()));
             delete painter;
             scale=0.5*document->textWidth()/double(pic.boundingRect().width());
@@ -673,7 +673,7 @@ void QFParameterCorrelationView::writeReport(QTextCursor &cursor, QTextDocument 
         tabCursor=table->cellAt(0, 0).firstCursorPosition();
         {
             QPicture pic;
-            QPainter* painter=new QPainter(&pic);
+            JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
             pltParamHistogramY->get_plotter()->draw(*painter, QRect(0,0,pltParamCorrelation->width(),pltParamCorrelation->height()));
             delete painter;
             insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
@@ -681,7 +681,7 @@ void QFParameterCorrelationView::writeReport(QTextCursor &cursor, QTextDocument 
         tabCursor=table->cellAt(1, 1).firstCursorPosition();
         {
             QPicture pic;
-            QPainter* painter=new QPainter(&pic);
+            JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
             pltParamHistogramX->get_plotter()->draw(*painter, QRect(0,0,pltParamCorrelation->width(),pltParamCorrelation->height()));
             delete painter;
             insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);

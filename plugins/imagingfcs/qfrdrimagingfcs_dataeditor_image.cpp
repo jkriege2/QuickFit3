@@ -5501,7 +5501,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         QPicture pic;
-        QPainter* painter=new QPainter(&pic);
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
         pltImage->get_plotter()->draw(*painter, QRect(0,0,pltImage->width(),pltImage->height()));
         delete painter;
         double scale=document->textWidth()*w1/allwidth*0.9/pic.boundingRect().width();
@@ -5513,7 +5513,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     if (chkParamImage2Visible->isChecked()) {
         QTextCursor tabCursor=table->cellAt(0, 1).firstCursorPosition();
         QPicture pic;
-        QPainter* painter=new QPainter(&pic);
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
         pltParamImage2->get_plotter()->draw(*painter, QRect(0,0,pltParamImage2->width(),pltParamImage2->height()));
         delete painter;
         double scale=document->textWidth()*w2/allwidth*0.9/pic.boundingRect().width();
@@ -5525,7 +5525,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     if (chkMaskVisible->isChecked()){
         QTextCursor tabCursor=table->cellAt(0, 2).firstCursorPosition();
         QPicture pic;
-        QPainter* painter=new QPainter(&pic);
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
         pltMask->get_plotter()->draw(*painter, QRect(0,0,pltMask->width(),pltMask->height()));
         delete painter;
         double scale=document->textWidth()*w4/allwidth*0.9/pic.boundingRect().width();
@@ -5537,7 +5537,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     if (chkOverviewVisible->isChecked()){
         QTextCursor tabCursor=table->cellAt(0, 3).firstCursorPosition();
         QPicture pic;
-        QPainter* painter=new QPainter(&pic);
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
         pltOverview->get_plotter()->draw(*painter, QRect(0,0,pltOverview->width(),pltOverview->height()));
         delete painter;
         double scale=document->textWidth()*w3/allwidth*0.9/pic.boundingRect().width();
@@ -5552,7 +5552,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         QPicture pic;
-        QPainter* painter=new QPainter(&pic);
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
         plotter->get_plotter()->draw(*painter, QRect(0,0,plotter->width(),plotter->height()+plotterResid->height()));
         delete painter;
         double scale=0.65*document->textWidth()/double(pic.boundingRect().width());
@@ -5575,7 +5575,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         //qDebug()<<colcnt<<tfsize;
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><nobr><span style=\"font-size: %2pt;\">%1</span></nobr></center>").arg(htmltable).arg(tfsize)));*/
         QPicture picT;
-        painter=new QPainter(&picT);
+        painter=new JKQTPEnhancedPainter(&picT);
         tvParams->paint(*painter);
         delete painter;
         scale=0.3*document->textWidth()/double(picT.boundingRect().width());

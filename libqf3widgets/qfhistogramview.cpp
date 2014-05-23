@@ -21,6 +21,7 @@
 #include "programoptions.h"
 #include <QProgressDialog>
 #include "datatools.h"
+#include "jkqtptools.h"
 
 QFHistogramView::QFHistogramView(QWidget *parent) :
     QWidget(parent)
@@ -787,7 +788,7 @@ void QFHistogramView::writeReport(QTextCursor& cursor, QTextDocument* document) 
     {
         QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
         QPicture pic;
-        QPainter* painter=new QPainter(&pic);
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
         pltParamHistogram->get_plotter()->draw(*painter, QRect(0,0,pltParamHistogram->width(),pltParamHistogram->height()));
         delete painter;
         double scale=0.5*document->textWidth()/double(pic.boundingRect().width());
@@ -798,7 +799,7 @@ void QFHistogramView::writeReport(QTextCursor& cursor, QTextDocument* document) 
         tabCursor.insertText(tr("\n"), fTextBoldSmall);
         //tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><nobr><span style=\"font-size: 7pt;\">%1</span></nobr></center>").arg(tvHistogramParameters->toHtml(1,true))));
         QPicture picT;
-        painter=new QPainter(&picT);
+        painter=new JKQTPEnhancedPainter(&picT);
         tvHistogramParameters->paint(*painter);
         delete painter;
         scale=0.4*document->textWidth()/double(picT.boundingRect().width());
