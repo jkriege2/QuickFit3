@@ -413,8 +413,9 @@ QString QFHTMLHelpWindow::loadHTML(QString filename) {
     QStringList fonts=fontdb.families();
 
     JKQTmathText mathParser(this);
-    mathParser.set_fontSize(13);
+    mathParser.set_fontSize(ProgramOptions::getConfigValue("quickfit/math_pointsize", 14).toInt());
     mathParser.useXITS();
+    mathParser.set_fontSize(ProgramOptions::getConfigValue("quickfit/math_pointsize", 14).toInt());
 
 
     /*

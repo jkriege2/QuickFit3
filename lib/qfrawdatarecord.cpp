@@ -4,6 +4,7 @@
 #include "qtriple.h"
 #include "binarydatatools.h"
 #include "qfmathparser.h"
+#include "datatools.h"
 //#define DEBUG_THREAN
 
 class QFRawDataRecordPrivate {
@@ -3302,7 +3303,7 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 }
 
 bool QFRawDataRecord::resultsSaveToCSV(const QString& filename, bool vectorsToAvg, const QString& separator, QChar decimalPoint, QChar stringDelimiter) const {
-    QString sdel=stringDelimiter;
+    /*QString sdel=stringDelimiter;
     QString dp=decimalPoint;
     QList<QPair<QString,QString> > rownames=resultsCalcNamesAndLabels();
     QStringList header, data;
@@ -3420,13 +3421,6 @@ bool QFRawDataRecord::resultsSaveToCSV(const QString& filename, bool vectorsToAv
                 header[1]+=separator;
             }
             for (int r=0; r<rownames.size(); r++) {
-                /*QString dat="";
-                if (resultsExists(evalname, rownames[r].second)) {
-                    if (resultsGet(evalname, rownames[r].second).type==qfrdreNumberError) {
-                        dat=doubleToQString(resultsGetErrorAsDouble(evalname, rownames[r].second), 15, 'g', decimalPoint);
-                    }
-                }
-                data[r]+=separator+dat;*/
                 QStringList dat;
                 if (resultsExists(evalname, rownames[r].second)) {
                     switch(resultsGet(evalname, rownames[r].second).type) {
@@ -3465,12 +3459,211 @@ bool QFRawDataRecord::resultsSaveToCSV(const QString& filename, bool vectorsToAv
          for (int i=0; i<header.size(); i++) out<<header[i]<<"\n";
          for (int i=0; i<data.size(); i++) out<<data[i]<<"\n";
      } else { return false; }
-     return true;
+     return true;*/
+    QStringList colname, rownames;
+    QList<QList<QVariant> > data=resultsGetTable(vectorsToAvg, &colname, &rownames);
+    //QFDataExportHandler::save(data, colname, rownames, )
+    QString dat=toCSV(data, colname, rownames, decimalPoint, separator, true, stringDelimiter);
+    QFile of(filename);
+    if (of.open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream out(&of);
+        QTextCodec* c=QTextCodec::codecForName("ISO-8859-1");
+        if (c==NULL) c=QTextCodec::codecForCStrings();
+        if (c==NULL) c=QTextCodec::codecForLocale();
+        out.setCodec(c);
+        out<<dat;
+        of.close();
+        return true;
+    } else {
+        return false;
+    }
+
+}
+
+QList<QList<QVariant> > QFRawDataRecord::resultsGetTable(bool vectorsToAvg, QStringList *colNames, QStringList *rowNames) const
+{
+    QList<QPair<QString,QString> > rnames=resultsCalcNamesAndLabels();
+    QList<QList<QVariant> > data; // initially a list of rows of data
+    QList<QVariant> dempty; // empty column of data
+    QStringList colnames, rownames;
+
+    //data.append(dempty);
+    rownames.append("");
+    dempty.append(QVariant());
+    for (int i=0; i<rnames.size(); i++) {
+        rownames.append(rnames[i].first);
+        //data.append(dempty);
+        dempty.append(QVariant());
+    }
+
+    QMap<int, int> colCount;
+    for (int c=0; c<resultsGetEvaluationCount(); c++) {
+        QString evalname=resultsGetEvaluationName(c);
+        colCount[c]=1;
+        if (!vectorsToAvg) {
+            for (int r=0; r<rnames.size(); r++) {
+                if (resultsExists(evalname, rnames[r].second)) {
+                    QFRawDataRecord::evaluationResult res=resultsGet(evalname, rnames[r].second);
+                    switch(res.type) {
+                        case qfrdreInteger:
+                        case qfrdreBoolean:
+                        case qfrdreString:
+                        case qfrdreNumber:  break;
+                        case qfrdreNumberError:  break;
+                        case qfrdreStringVector:
+                        case qfrdreStringMatrix: colCount[c]=qMax(colCount[c], res.svec.size()); break;
+                        case qfrdreNumberVector:
+                        case qfrdreNumberMatrix:
+                        case qfrdreNumberErrorVector:
+                        case qfrdreNumberErrorMatrix: colCount[c]=qMax(colCount[c], res.dvec.size()); break;
+                        case qfrdreIntegerVector:
+                        case qfrdreIntegerMatrix: colCount[c]=qMax(colCount[c], res.ivec.size()); break;
+                        case qfrdreBooleanVector:
+                        case qfrdreBooleanMatrix:  colCount[c]=qMax(colCount[c], res.bvec.size()); break;
+                        default: break;
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+
+    int col=0;
+    for (int c=0; c<resultsGetEvaluationCount(); c++) {
+        QString evalname=resultsGetEvaluationName(c);
+        colnames.append(evalname);
+        data.append(dempty);
+        data.last().operator [](0)=QString("value");
+        //colnames[1] += separator+sdel+tr("value")+sdel;
+        for (int i=1; i<colCount[c]; i++) {
+            colnames.append("");
+            data.append(dempty);
+        }
+        bool hasError=false;
+        for (int r=0; r<rnames.size(); r++) {
+            QList<QVariant> dat;
+            if (resultsExists(evalname, rnames[r].second)) {
+                switch(resultsGet(evalname, rnames[r].second).type) {
+                    case qfrdreNumber: data[col].operator[](r)=resultsGetAsDouble(evalname, rnames[r].second); break;
+                    case qfrdreNumberError: data[col].operator[](r)=resultsGetAsDouble(evalname, rnames[r].second); hasError=true; break;
+                    case qfrdreInteger: data[col].operator[](r)=(qlonglong)resultsGetAsInteger(evalname, rnames[r].second); break;
+                    case qfrdreBoolean: data[col].operator[](r)=resultsGetAsBoolean(evalname, rnames[r].second); break;
+                    case qfrdreString: data[col].operator[](r)=resultsGetAsString(evalname, rnames[r].second); break;
+                    case qfrdreStringVector:
+                    case qfrdreStringMatrix: {
+                            QStringList sl=resultsGetAsStringList(evalname, rnames[r].second);
+                            if (!vectorsToAvg) {
+                                for (int i=0; i<sl.size(); i++) {
+                                    data[col+i].operator[](r)=sl[i];
+                                }
+                            } else {
+                                data[col].operator[](r)=QVariant();
+                            }
+                        } break;
+                    case qfrdreNumberVector:
+                    case qfrdreNumberMatrix:
+                    case qfrdreNumberErrorVector:
+                    case qfrdreNumberErrorMatrix: {
+                            QVector<double> sl=resultsGetAsDoubleList(evalname, rnames[r].second);
+                            if (!vectorsToAvg) {
+                                for (int i=0; i<sl.size(); i++) {
+                                    data[col+i].operator[](r)=sl[i];
+                                }
+                            } else {
+                                data[col].operator[](r)=qfstatisticsAverage(sl);
+                            }
+                        }break;
+                    case qfrdreIntegerVector:
+                    case qfrdreIntegerMatrix:
+                    case qfrdreBooleanVector:
+                    case qfrdreBooleanMatrix:  {
+                            QVector<qlonglong> sl=resultsGetAsIntegerList(evalname, rnames[r].second);
+                            if (!vectorsToAvg) {
+                                for (int i=0; i<sl.size(); i++) {
+                                    data[col+i].operator[](r)=sl[i];
+                                }
+                            } else {
+                                data[col].operator[](r)=qfstatisticsAverage(sl);
+                            }
+                        } break;
+                    default:  break;
+                }
+            }
+
+        }
+        col=col+colCount[c];
+        if (hasError) {
+            colnames.append(evalname);
+            data.append(dempty);
+            data.last().operator [](0)=QString("error");
+            for (int i=1; i<colCount[c]; i++) {
+                colnames.append("");
+                data.append(dempty);
+            }
+            for (int r=0; r<rnames.size(); r++) {
+
+                QList<QVariant> dat;
+                if (resultsExists(evalname, rnames[r].second)) {
+                    switch(resultsGet(evalname, rnames[r].second).type) {
+                        case qfrdreNumberError: data[col].operator[](r)=resultsGetErrorAsDouble(evalname, rnames[r].second); hasError=true; break;
+                        case qfrdreNumberErrorVector:
+                        case qfrdreNumberErrorMatrix: {
+                                QVector<double> sl=resultsGetErrorAsDoubleList(evalname, rnames[r].second);
+                                if (!vectorsToAvg) {
+                                    for (int i=0; i<sl.size(); i++) {
+                                        data[col+i].operator[](r)=sl[i];
+                                    }
+                                } else {
+                                    data[col].operator[](r)=qfstatisticsAverage(sl);
+                                }
+                            } break;
+                        default: break;
+                    }
+                }
+            }
+            col=col+colCount[c];
+        }
+    }
+
+
+     if (colNames) *colNames=colnames;
+     if (rowNames) *rowNames=rownames;
+     return data;
+
 }
 
 
 bool QFRawDataRecord::resultsSaveToSYLK(const QString& filename, bool vectorsToAvg, bool flipTable) const {
-    // try output SYLK file
+    QStringList colname, rownames;
+    QList<QList<QVariant> > data=resultsGetTable(vectorsToAvg, &colname, &rownames);
+    if (flipTable) {
+        data=dataRotate(data);
+        qSwap(colname, rownames);
+    }
+    //QFDataExportHandler::save(data, colname, rownames, )
+    QString dat=toSYLK(data, colname, rownames);
+    QFile of(filename);
+    if (of.open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream out(&of);
+        QTextCodec* c=QTextCodec::codecForName("ISO-8859-1");
+        if (c==NULL) c=QTextCodec::codecForCStrings();
+        if (c==NULL) c=QTextCodec::codecForLocale();
+        out.setCodec(c);
+        out<<dat;
+        of.close();
+        return true;
+    } else {
+        return false;
+    }
+
+
+
+
+
+    /*// try output SYLK file
     QFile file(filename);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) return false;
     QTextStream out(&file);
@@ -3640,6 +3833,19 @@ bool QFRawDataRecord::resultsSaveToSYLK(const QString& filename, bool vectorsToA
         out<<"F;R2;SDSB\n";
     }
     out<<"E\n";
+    return true;*/
+}
+
+bool QFRawDataRecord::resultsSave(const QString &filename, int format, bool vectorsToAvg, bool flipTable) const
+{
+    QStringList colname, rownames;
+    QList<QList<QVariant> > data=resultsGetTable(vectorsToAvg, &colname, &rownames);
+    if (flipTable) {
+        data=dataRotate(data);
+        qSwap(colname, rownames);
+    }
+
+    QFDataExportHandler::save(data, format, filename, colname, rownames);
     return true;
 }
 

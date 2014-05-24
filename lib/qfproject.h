@@ -334,6 +334,25 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         */
         bool rdrResultsSaveToCSV(const QString& evalFilter, QString filename, bool vectorsToAvg=false, QChar separator=',', QChar decimalPoint='.', QChar stringDelimiter='"', const QStringList &filteredFitParamIDs=QStringList(), const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords=QList<QPair<QPointer<QFRawDataRecord>, QString> >());
 
+        /*! \brief save the raw data record results stored in this project for a given evaluation to a CSV file
+
+
+
+            Saves a table of the results as Comma-Separated File \a filename. Not all result types may be exported,
+            as this format does not support every dataformat. Any data that may be save as a single item is stored directly
+            (qfrdreNumber, qfrdreInteger, qfrdreString, qfrdreBoolean). Numbers with errors (qfrdreNumberError) are also stored,
+            If numbers in a column have errors then a second column is added for the errors.
+
+            \param colNames for output of column names
+            \param rowNames for output of row names
+            \param evalFilter a wildcard filter for the evaluation name. Use \c "*" to select all evaluations.
+            \param vectorsToAvg if \c false vector/matrix results are expanded into several columns. Otherwise only the avg/stddev are stored in 2 columns
+            \param filteredFitParamIDs if this array is non-empty, only the resultID in the list will be exported
+            \param filtereRecords  if this array is non-empty, only the QFRawDataRecord, evalIDs pairs in the list will be exported
+            \return \c true on success
+        */
+        QList<QList<QVariant> > rdrResultsGetTable(QStringList *colNames, QStringList* rowNames, const QString& evalFilter, bool vectorsToAvg=false, const QStringList &filteredFitParamIDs=QStringList(), const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords=QList<QPair<QPointer<QFRawDataRecord>, QString> >());
+
         /*! \brief save the  raw data record results stored in this project for a given evaluation to a SYLK file
 
             saves a table of the results as Comma-Separated File \a filename. Not all result types may be exported,
@@ -350,6 +369,23 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
             \return \c true on success
         */
         bool rdrResultsSaveToSYLK(const QString& evalFilter, QString filename, bool vectorsToAvg=false, bool flipTable=false, const QStringList &filteredFitParamIDs=QStringList(), const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords=QList<QPair<QPointer<QFRawDataRecord>, QString> >());
+
+        /*! \brief save the  raw data record results stored in this project for a given evaluation to a SYLK file
+
+            saves a table of the results as Comma-Separated File \a filename. Not all result types may be exported,
+            as this format does not support every dataformat. Any data that may be save as a single item is stored directly
+            (qfrdreNumber, qfrdreInteger, qfrdreString, qfrdreBoolean). Numbers with errors (qfrdreNumberError) are also stored,
+            If numbers in a column have errors then a second column is added for the errors.
+
+            \param evalFilter a wildcard filter for the evaluation name. Use \c "*" to select all evaluations.
+            \param filename the file to create
+            \param vectorsToAvg if \c false vector/matrix results are expanded into several columns. Otherwise only the avg/stddev are stored in 2 columns
+            \param flipTable if set \c true, the output will exchange X and Y coordinates of the cells, effectively flipping the result table
+            \param filteredFitParamIDs if this array is non-empty, only the resultID in the list will be exported
+            \param filtereRecords  if this array is non-empty, only the QFRawDataRecord, evalIDs pairs in the list will be exported
+            \return \c true on success
+        */
+        bool rdrResultsSave(const QString& evalFilter, QString filename, int filter, bool vectorsToAvg=false, bool flipTable=false, const QStringList &filteredFitParamIDs=QStringList(), const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords=QList<QPair<QPointer<QFRawDataRecord>, QString> >());
 
         /** \brief returns a pointer to the projects RDR factory object */
         QFRawDataRecordFactory* getRawDataRecordFactory();

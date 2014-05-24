@@ -745,6 +745,20 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         */
         bool resultsSaveToCSV(const QString& filename, bool vectorsToAvg=false, const QString& separator=", ", QChar decimalPoint='.', QChar stringDelimiter='"') const;
 
+        /*! \brief save the results to a CSV file
+
+            saves a table of the results as Comma-Separated File \a filename. Not all result types may be exported,
+            as this format does not support every dataformat. Any data that may be save as a single item is stored directly
+            (qfrdreNumber, qfrdreInteger, qfrdreString, qfrdreBoolean). Numbers with errors (qfrdreNumberError) are also stored,
+            If numbers in a column have errors then a second column is added for the errors.
+
+            \param vectorsToAvg if \c false vector/matrix results are expanded into several columns. Otherwise only the avg/stddev are stored in 2 columns
+            \param colNames column names (output)
+            \param rownames row names (output)
+            \return a table of data
+        */
+        QList<QList<QVariant> > resultsGetTable(bool vectorsToAvg=false, QStringList* colNames=NULL, QStringList* rownames=NULL) const;
+
         /*! \brief save the results to a SYLK file
 
             saves a table of the results as Comma-Separated File \a filename. Not all result types may be exported,
@@ -758,6 +772,20 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             \return \c true on success
         */
         bool resultsSaveToSYLK(const QString& filename, bool vectorsToAvg=false, bool flipTable=false) const;
+
+        /*! \brief save the results to a SYLK file
+
+            saves a table of the results as Comma-Separated File \a filename. Not all result types may be exported,
+            as this format does not support every dataformat. Any data that may be save as a single item is stored directly
+            (qfrdreNumber, qfrdreInteger, qfrdreString, qfrdreBoolean). Numbers with errors (qfrdreNumberError) are also stored,
+            If numbers in a column have errors then a second column is added for the errors.
+
+            \param filename the file to create
+            \param vectorsToAvg if \c false vector/matrix results are expanded into several columns. Otherwise only the avg/stddev are stored in 2 columns
+            \param flipTable if set \c true, the output will exchange X and Y coordinates of the cells, effectively flipping the result table
+            \return \c true on success
+        */
+        bool resultsSave(const QString& filename, int format, bool vectorsToAvg=false, bool flipTable=false) const;
 
         /** \brief return a table model which may be used to display the results */
         QFRDRResultsModel* resultsGetModel() const;

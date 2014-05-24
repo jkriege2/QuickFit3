@@ -2609,8 +2609,9 @@ QString MainWindow::getPluginMaybeGlobalSettings(const QString &pluginID, const 
 
 QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced, const QF3HelpReplacesList& more_replaces, bool insertTooltips) {
     JKQTmathText mathParser(this);
-    mathParser.set_fontSize(13);
+    mathParser.set_fontSize(ProgramOptions::getConfigValue("quickfit/math_pointsize", 14).toInt());
     mathParser.useXITS();
+    mathParser.set_fontSize(ProgramOptions::getConfigValue("quickfit/math_pointsize", 14).toInt());
 
     QString result=removeHTMLComments(input_html);
     QString fileDir=QFileInfo(filename).absolutePath();

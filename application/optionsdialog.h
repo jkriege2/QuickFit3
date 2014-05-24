@@ -27,6 +27,7 @@ class OptionsDialog : public QDialog, public Ui::OptionsDlg {
         void on_cmbStyle_highlighted( const QString & text );
         void on_btnHelp_clicked();
         void on_listWidget_currentRowChanged(int currentRow );
+        void on_spinMath_valueChanged(int value);
 
     private:
         ProgramOptions* m_options;

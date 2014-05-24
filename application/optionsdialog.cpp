@@ -7,6 +7,7 @@ OptionsDialog::OptionsDialog(QWidget* parent):
     QDialog(parent)
 {
     setupUi(this);
+    //labMath->setText("g_\\text{gg}^\\text{A}(\\tau)=\\frac{1}{N}\\cdot\\left(1+\\frac{\\tau}{\\tau_D}\\right)^{-1}\cdot\\left(1+\\frac{\\tau}{\gamma^2\\tau_D}\\right)^{-1/2}");
     QFStyledButton* btn=new QFStyledButton(QFStyledButton::SelectDirectory, edtUserFitFunctions, edtUserFitFunctions);
     edtUserFitFunctions->addButton(btn);
 }
@@ -53,6 +54,14 @@ void OptionsDialog::on_listWidget_currentRowChanged(int currentRow)
     stackedWidget->setCurrentIndex(currentRow);
 }
 
+void OptionsDialog::on_spinMath_valueChanged(int value)
+{
+    /*labMath->getMathText()->set_fontSize(value);
+    labMath->getMathText()->useSTIX();
+    labMath->setMath("g_\\text{gg}^\\text{A}(\\tau)=\\frac{1}{N}\\cdot\\frac{1}{\\sqrt{1+\\frac{\\tau}{\\tau_D}}}");
+    */
+}
+
 
 void OptionsDialog::open(ProgramOptions* options) {
     spnMaxThreads->setRange(1,100);
@@ -88,6 +97,8 @@ void OptionsDialog::open(ProgramOptions* options) {
     cmbProxyType->setCurrentIndex(qBound(0,options->getProxyType(),2));
     chkUpdates->setChecked(options->getConfigValue("quickfit/checkupdates", true).toBool());
     edtUserFitFunctions->setText(options->getConfigValue("quickfit/user_fitfunctions", QFPluginServices::getInstance()->getConfigFileDirectory()+"/userfitfunctions/").toString());
+    spinMath->setValue(options->getConfigValue("quickfit/math_pointsize", 14).toInt());
+    on_spinMath_valueChanged(spinMath->value());
 
 
     // find all available stylesheets
@@ -121,6 +132,7 @@ void OptionsDialog::open(ProgramOptions* options) {
         options->setProxyType(cmbProxyType->currentIndex());
         options->setConfigValue("quickfit/checkupdates", chkUpdates->isChecked());
         options->setConfigValue("quickfit/user_fitfunctions", edtUserFitFunctions->text());
+        options->setConfigValue("quickfit/math_pointsize", spinMath->value());
         QDir dir(edtUserFitFunctions->text());
         if (!dir.exists()) dir.mkpath(dir.absolutePath());
         for (int i=0; i<m_plugins.size(); i++) {

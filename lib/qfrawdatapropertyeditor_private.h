@@ -203,6 +203,10 @@ class QFRawDataPropertyEditor_private : public QObject
         void nextPressed();
         /** \brief emitted when the "previous" button is pressed */
         void previousPressed();
+        /** \brief emitted when the "next of same role" button is pressed */
+        void nextOfRolePressed();
+        /** \brief emitted when the "previous of same role" button is pressed */
+        void previousOfRolePressed();
         /** \brief emitted when the raw data record data changes (i.e. ID, name, description, ...) */
         //void propsChanged(const QString &property=QString(""), bool visible=true);
         void basicPropsChanged();

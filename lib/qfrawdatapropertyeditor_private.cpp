@@ -12,6 +12,7 @@
 #include <QItemSelection>
 #include "qfparametercorrelationservice.h"
 #include "qfenhancedtabwidget.h"
+#include "datatools.h"
 
 QFRawDataPropertyEditor_private::QFRawDataPropertyEditor_private(QFRawDataPropertyEditor *parent) :
     QObject(parent)
@@ -895,7 +896,25 @@ void QFRawDataPropertyEditor_private::deleteSelectedResults() {
 
 void QFRawDataPropertyEditor_private::saveResults() {
     if (current) {
-        QString selectedFilter="";
+        QStringList f=QFDataExportHandler::getFormats();
+        QString lastDir=ProgramOptions::getConfigValue("QFRawDataPropertyEditor/lastDataDir", "").toString();
+        QString selFilter=ProgramOptions::getConfigValue("QFRawDataPropertyEditor/lastDataFilter", "").toString();
+        QString fn=qfGetSaveFileName(d, tr("Save results to file ..."), lastDir, f.join(";;"), &selFilter);
+        if (fn.size()>0) {
+            int flip=QMessageBox::question(d, tr("Save results to file ..."), tr("Flip table?"), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::No);
+            if (flip==QMessageBox::Yes || flip==QMessageBox::No) {
+                current->resultsSave(fn, f.indexOf(selFilter), false, flip==QMessageBox::Yes);
+                ProgramOptions::setConfigValue("QFRawDataPropertyEditor/lastDataDir", lastDir);
+                ProgramOptions::setConfigValue("QFRawDataPropertyEditor/lastDataFilter", selFilter);
+            }
+        }
+
+
+
+
+
+
+        /*QString selectedFilter="";
         QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;SYLK dataformat, flipped (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
         QString fileName = qfGetSaveFileName(d, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
         if ((!fileName.isEmpty())&&(!fileName.isNull())) {
@@ -914,14 +933,14 @@ void QFRawDataPropertyEditor_private::saveResults() {
             }
             currentSaveDir=QFileInfo(fileName).absolutePath();
             if (!ok) QMessageBox::critical(NULL, tr("QuickFit"), tr("Could not save file '%1'.").arg(fileName));
-        }
+        }*/
     }
 }
 
 void QFRawDataPropertyEditor_private::saveResultsAveraged()
 {
     if (current) {
-        QString selectedFilter="";
+        /*QString selectedFilter="";
         QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;SYLK dataformat, flipped (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv)");
         QString fileName = qfGetSaveFileName(d, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
         if ((!fileName.isEmpty())&&(!fileName.isNull())) {
@@ -940,6 +959,19 @@ void QFRawDataPropertyEditor_private::saveResultsAveraged()
             }
             currentSaveDir=QFileInfo(fileName).absolutePath();
             if (!ok) QMessageBox::critical(NULL, tr("QuickFit"), tr("Could not save file '%1'.").arg(fileName));
+        }*/
+
+        QStringList f=QFDataExportHandler::getFormats();
+        QString lastDir=ProgramOptions::getConfigValue("QFRawDataPropertyEditor/lastDataDir", "").toString();
+        QString selFilter=ProgramOptions::getConfigValue("QFRawDataPropertyEditor/lastDataFilter", "").toString();
+        QString fn=qfGetSaveFileName(d, tr("Save results to file ..."), lastDir, f.join(";;"), &selFilter);
+        if (fn.size()>0) {
+            int flip=QMessageBox::question(d, tr("Save results to file ..."), tr("Flip table?"), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::No);
+            if (flip==QMessageBox::Yes || flip==QMessageBox::No) {
+                current->resultsSave(fn, f.indexOf(selFilter), true, flip==QMessageBox::Yes);
+                ProgramOptions::setConfigValue("QFRawDataPropertyEditor/lastDataDir", lastDir);
+                ProgramOptions::setConfigValue("QFRawDataPropertyEditor/lastDataFilter", selFilter);
+            }
         }
     }
 }
@@ -1646,6 +1678,36 @@ void QFRawDataPropertyEditor_private::nextPressed() {
 void QFRawDataPropertyEditor_private::previousPressed() {
     if (current) {
         QFRawDataRecord* n=current->getPreviousOfSameType();
+        setCurrent(n);
+    }
+}
+
+void QFRawDataPropertyEditor_private::nextOfRolePressed()
+{
+    if (current) {
+        QString role=current->getRole();
+        int cnt=0;
+        QFRawDataRecord* n=current->getNextOfSameType();
+        int cntMax=current->getProject()->getRawDataCount();
+        while (n && n->getRole()!=role && current!=n && cnt<cntMax) {
+            n=n->getNextOfSameType();
+            cnt++;
+        }
+        setCurrent(n);
+    }
+}
+
+void QFRawDataPropertyEditor_private::previousOfRolePressed()
+{
+    if (current) {
+        QString role=current->getRole();
+        int cnt=0;
+        QFRawDataRecord* n=current->getPreviousOfSameType();
+        int cntMax=current->getProject()->getRawDataCount();
+        while (n && n->getRole()!=role && current!=n && cnt<cntMax) {
+            n=n->getPreviousOfSameType();
+            cnt++;
+        }
         setCurrent(n);
     }
 }
