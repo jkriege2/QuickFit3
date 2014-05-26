@@ -166,7 +166,10 @@ QFRDRTable::PlotInfo::PlotInfo()
     dataAspectRatio=1;
     axisAspectRatio=1;
 
-
+     keyBoxLineWidth=1;
+     keyBackgroundColor=QColor("white");
+     keyBox=true;
+     keyLineColor=QColor("black");;
 
      backgroundColor=QColor("white");
      gridColor=QColor("darkgrey");
@@ -1424,6 +1427,12 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 plot.keyTransparency=CQStringToDouble(te.attribute("keytransparency", "0.5"));
                 plot.keyPosition=String2JKQTPkeyPosition(te.attribute("keyposition", "inside_right"));
                 plot.keyLayout=String2JKQTPkeyLayout(te.attribute("keylayout", "one_column"));
+                plot.keyBoxLineWidth=CQStringToDouble(te.attribute("keyboxlinewidth", "1"));
+                plot.keyBox=QStringToBool( te.attribute("keybox"));
+                plot.keyBackgroundColor=QStringToQColor(te.attribute("keybackgroundcolor", "white"));
+                plot.keyLineColor=QStringToQColor(te.attribute("keyboxcolor", "black"));
+
+
 
                 plot.keepDataAspectRatio=QStringToBool( te.attribute("keep_dataaspect", "false"));
                 plot.axisAspectRatio=CQStringToDouble(te.attribute("dataaspect", "1"));
@@ -1676,6 +1685,13 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
         w.writeAttribute("dataaspect", CDoubleToQString(plots[i].axisAspectRatio));
         w.writeAttribute("keep_axisaspect", boolToQString(plots[i].keepAxisAspectRatio));
         w.writeAttribute("axisaspect", CDoubleToQString(plots[i].dataAspectRatio));
+
+        w.writeAttribute("keybox", boolToQString(plots[i].keyBox));
+        w.writeAttribute("keyboxlinewidth", CDoubleToQString(plots[i].keyBoxLineWidth));
+        w.writeAttribute("keybackgroundcolor", QColor2String(plots[i].keyBackgroundColor));
+        w.writeAttribute("keyboxcolor", QColor2String(plots[i].keyLineColor));
+
+
 
         w.writeAttribute("xlabel", plots[i].xAxis.label);
         w.writeAttribute("ylabel", plots[i].yAxis.label);

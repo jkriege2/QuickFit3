@@ -120,6 +120,8 @@ INCLUDEPATH += ../../lib/ \
 QT += gui xml svg opengl
 CONFIG += exceptions rtti stl
 
+#DEFINES += DEBUG_TIMIMNG JKQTBP_DEBUGTIMING
+
 
 ASSETS_TESTDATA.files = ./examples/imfcs_testdata/*.*
 ASSETS_TESTDATA.path = $${QFOUTPUT}/examples/$${TARGET}/imfcs_testdata/

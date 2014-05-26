@@ -21,6 +21,7 @@ include(../../../../LIB/trunk/qt/qfvisualize3dshaders.pri)
 
 QT += gui xml svg opengl
 
+#DEFINES += JKQTBP_AUTOTIMER JKQTBP_DEBUGTIMING
 
 
 DESTDIR = $$QFOUTPUT

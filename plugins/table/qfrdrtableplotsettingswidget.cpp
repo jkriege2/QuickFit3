@@ -90,6 +90,12 @@ void QFRDRTablePlotSettingsWidget::setRecord(QFRDRTable *record, int graph)
             ui->edtAxisAspect->setValue(g.axisAspectRatio);
             ui->edtDataAspect->setValue(g.dataAspectRatio);
 
+
+            ui->spinKeyBoxWidth->setValue(g.keyBoxLineWidth);
+            ui->cmbKeyBackground->setCurrentColor(g.keyBackgroundColor);
+            ui->cmbKeyBoxColor->setCurrentColor(g.keyLineColor);
+            ui->chkKeyBox->setChecked(g.keyBox);
+
             ui->cmbGridColor->setCurrentColor(g.gridColor);
             ui->cmbBackgroundColor->setCurrentColor(g.backgroundColor);
             ui->cmbGridLinestyle->setCurrentLineStyle(g.gridStyle);
@@ -213,6 +219,10 @@ void QFRDRTablePlotSettingsWidget::plotDataChanged() {
         p.axisAspectRatio=ui->edtAxisAspect->value();
         p.keepAxisAspectRatio=ui->chkKeepAxisAspect->isChecked();
         p.keepDataAspectRatio=ui->chkKeepDataAspect->isChecked();
+        p.keyBoxLineWidth=ui->spinKeyBoxWidth->value();
+        p.keyBackgroundColor=ui->cmbKeyBackground->currentColor();
+        p.keyLineColor=ui->cmbKeyBoxColor->currentColor();
+        p.keyBox=ui->chkKeyBox->isChecked();
 
         ui->axisX->storePlotData(p.xAxis);
         ui->axisY->storePlotData(p.yAxis);
@@ -262,6 +272,15 @@ void QFRDRTablePlotSettingsWidget::connectWidgets()
     connect(ui->cmbGridLinestyle, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     connect(ui->spinGridWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
 
+
+
+    connect(ui->cmbKeyBackground, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbKeyBoxColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->spinKeyBoxWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->chkKeyBox, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+
+
+
     connect(ui->chkPlotAutosize, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     connect(ui->spinHeight, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
     connect(ui->spinWidth, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
@@ -296,6 +315,10 @@ void QFRDRTablePlotSettingsWidget::disconnectWidgets()
     disconnect(ui->cmbBackgroundColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     disconnect(ui->cmbGridLinestyle, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinGridWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbKeyBackground, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbKeyBoxColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinKeyBoxWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkKeyBox, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
 
     disconnect(ui->chkPlotAutosize, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinHeight, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
@@ -347,6 +370,13 @@ void QFRDRTablePlotSettingsWidget::on_btnSaveSystem_clicked() {
             set.setValue("gridColor", QColor2String(ui->cmbGridColor->currentColor()));
             set.setValue("gridStyle", QPenStyle2String(ui->cmbGridLinestyle->currentLineStyle()));
             set.setValue("gridWidth", ui->spinGridWidth->value());
+
+
+            set.setValue("keyBackgroundColor", QColor2String(ui->cmbKeyBackground->currentColor()));
+            set.setValue("keyBoxColor", QColor2String(ui->cmbKeyBoxColor->currentColor()));
+            set.setValue("keyBox", ui->chkKeyBox->isChecked());
+            set.setValue("keyBoxWidth", ui->spinKeyBoxWidth->value());
+
         }
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRTablePlotSettingsWidget/lasttemplatedir", dir);
@@ -395,6 +425,13 @@ void QFRDRTablePlotSettingsWidget::on_btnLoadSystem_clicked() {
         ui->cmbBackgroundColor->setCurrentColor(QColor(set.value("backgroundColor", QColor2String(ui->cmbBackgroundColor->currentColor())).toString()));
         ui->cmbGridLinestyle->setCurrentLineStyle(String2QPenStyle(set.value("gridStyle", QPenStyle2String(ui->cmbGridLinestyle->currentLineStyle())).toString()));
         ui->spinGridWidth->setValue(set.value("gridWidth", ui->spinGridWidth->value()).toDouble());
+
+
+        ui->chkKeyBox->setChecked(set.value("keyBox", ui->chkKeyBox->isChecked()).toBool());
+        ui->cmbKeyBoxColor->setCurrentColor(QColor(set.value("keyBoxColor", QColor2String(ui->cmbKeyBoxColor->currentColor())).toString()));
+        ui->cmbKeyBackground->setCurrentColor(QColor(set.value("keyBackgroundColor", QColor2String(ui->cmbKeyBackground->currentColor())).toString()));
+        ui->spinKeyBoxWidth->setValue(set.value("keyBoxWidth", ui->spinKeyBoxWidth->value()).toDouble());
+
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRTablePlotSettingsWidget/lasttemplatedir", dir);
 }

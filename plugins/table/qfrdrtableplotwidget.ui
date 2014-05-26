@@ -207,15 +207,15 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFPlotter</class>
-   <extends>QWidget</extends>
-   <header>qfplotter.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QFEnhancedTabWidget</class>
    <extends>QTabWidget</extends>
    <header>qfenhancedtabwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFPlotter</class>
+   <extends>QWidget</extends>
+   <header>qfplotter.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -253,8 +253,8 @@
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections/>

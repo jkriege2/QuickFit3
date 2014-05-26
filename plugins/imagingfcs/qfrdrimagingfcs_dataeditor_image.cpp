@@ -22,7 +22,7 @@
 #define sqr(x) qfSqr(x)
 
 #define CLICK_UPDATE_TIMEOUT 500
-#define DEBUG_TIMIMNG
+//#define DEBUG_TIMIMNG
 //#undef DEBUG_TIMIMNG
 
 #define OverlayRectanglesAsImageOverlay true
@@ -639,8 +639,15 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     wclayout->addWidget(cmbCrosstalkMode,1,3);
     gl->addRow(tr("crosstalk:"), wcrosstalk);
 
+    gl->addRow(tr("ch.1: signal:"), labCnt1=new QLabel(this));
+    gl->addRow(tr("ch.1: background:"), labBackground1=new QLabel(this));
+    gl->addRow(tr("ch.2: signal:"), labCnt2=new QLabel(this));
+    gl->addRow(tr("ch.2: background:"), labBackground2=new QLabel(this));
 
-    gl->addRow(tr("rel. ccf amplitude:"), labRelCCF=new QLabel(wcrosstalk));
+    chkFCCSUseBackground=new QCheckBox(tr("mind background signal"), this);
+    chkFCCSUseBackground->setChecked(true);
+    gl->addRow(tr("rel. ccf amplitude:"), chkFCCSUseBackground);
+    gl->addRow(QString(), labRelCCF=new QLabel(this));
     labRelCCF->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
     connectImageWidgets(true);
@@ -1470,8 +1477,22 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
 
 
 void QFRDRImagingFCSImageEditor::updateOverlaySettings() {
-    pltImage->setDisplayOverlay(chkDisplayImageOverlay->isChecked()/*, cmbImageStyle->currentIndex()<cmbImageStyle->count()-1*/);
-    pltParamImage2->setDisplayOverlay(chkDisplayImageOverlay->isChecked()/*, cmbImageStyle->currentIndex()<cmbImageStyle->count()-1*/);
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"  updateOverlaySettings";
+    QElapsedTimer time;
+    time.start();
+#endif
+
+    pltImage->setDisplayOverlay(chkDisplayImageOverlay->isChecked());
+
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"  updateOverlaySettings ... 1 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
+    pltParamImage2->setDisplayOverlay(chkDisplayImageOverlay->isChecked());
+
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"  updateOverlaySettings ... 2 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
     if (!chkDisplayImageOverlay->isChecked()) {
         pltMask->deleteGraph(plteMaskSelected, false);
     } else {
@@ -1481,8 +1502,16 @@ void QFRDRImagingFCSImageEditor::updateOverlaySettings() {
     cmbSelectionStyle->setSelectedOverlayStyle(plteOverviewSelected);
     cmbSelectionStyle->setSelectedOverlayStyle(plteMaskSelected);
 
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"  updateOverlaySettings ... 3 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
+
 
     saveImageSettings();
+
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"  updateOverlaySettings ... 4 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
 
 }
 
@@ -2786,15 +2815,28 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
     pltMask->set_doDrawing(false);
 
     saveImageSettings();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotSelection ... -9 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
 
     updateSelectionArrays();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotSelection ... -8 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
 
     updateOverlaySettings();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotSelection ... -7 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
 
     double imgAvg=0;
     double imgVar=0;
     pltImage->updateOverlays(&imgAvg, &imgVar);
     pltParamImage2->updateOverlays();
+
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotSelection ... -6 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
 
     if (!m) {
         plteOverviewSelected->set_data(NULL, 1, 1);
@@ -2849,14 +2891,29 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
 
 
     }
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotSelection ... -5 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
 
     setCopyableData();
 
     pltOverview->set_doDrawing(true);
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotSelection ... -4 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
     pltMask->set_doDrawing(true);
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotSelection ... -3 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
     if (replot) {
         pltOverview->update_plot();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotSelection ... -2 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
         pltMask->update_plot();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotSelection ... -1 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
     }
     QApplication::restoreOverrideCursor();
 #ifdef DEBUG_TIMIMNG
@@ -3465,7 +3522,9 @@ void QFRDRImagingFCSImageEditor::replotData() {
         plotter->clearGraphs();
         plotterResid->clearGraphs();
         ds->clear();
-        //qDebug()<<"replotData ... done (!m) ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();;
+#ifdef DEBUG_TIMIMNG
+        qDebug()<<"replotData ... done (!m) ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();;
+#endif
         return;
     }
 
@@ -3483,6 +3542,10 @@ void QFRDRImagingFCSImageEditor::replotData() {
     ds->clear();
 
     labRelCCF->setText("");
+    labBackground1->setText("");
+    labBackground2->setText("");
+    labCnt1->setText("");
+    labCnt2->setText("");
 
 
     if (m->getCorrelationN()>0) {
@@ -3510,7 +3573,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
         QFRDRImagingFCSData* acf0=m->getRoleFromThisGroup("acf0");
         QFRDRImagingFCSData* acf1=m->getRoleFromThisGroup("acf1");
 
-        if (m->isFCCS() && cmbSeletionCorrDisplayMode->currentIndex()==2 ) {
+        if (m->isFCCS() && cmbSeletionCorrDisplayMode->currentIndex()==2 ) { // FCCS mode
             QVector<double> dataTauACF0, dataCorrACF0, dataCorrErrACF0;
             QVector<double> dataTauACF1, dataCorrACF1, dataCorrErrACF1;
             QVector<double> dataTauCCF,  dataCorrCCF,  dataCorrErrCCF;
@@ -3519,7 +3582,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
             int ctAvg=spinCrosstalkAvg->value();
             double crosstalk=spinCrosstalk->value()/100.0;
 
-            QList<double> IACF0, IACF1, CACF0, CACF1, CCCF;
+            QList<double> IACF0, IACF1, CACF0, CACF1, CCCF, b1, b2, c1, c2;
             for (int i=0; i<m->getCorrelationRuns(); i++) {
                 bool* mask=fccs->maskGet();
                 if (selected.contains(i) && (acf0&&i<acf0->getCorrelationRuns()) && (acf1&&i<acf1->getCorrelationRuns()) && (!mask || (mask && !mask[i])) ) {
@@ -3528,6 +3591,20 @@ void QFRDRImagingFCSImageEditor::replotData() {
                     if (acf0) CACF0<<statisticsAverage(acf0->getCorrelationRun(i), qMin(acf0->getCorrelationRuns(), ctAvg));
                     if (acf1) CACF1<<statisticsAverage(acf1->getCorrelationRun(i), qMin(acf1->getCorrelationRuns(), ctAvg));
                     CCCF<<statisticsAverage(fccs->getCorrelationRun(i), qMin(fccs->getCorrelationRuns(), ctAvg));
+                    double back1=0, back2=0, backe1=0, backe2=0;
+                    qfFCSHasSpecial(fccs, i, "background1", back1, backe1);
+                    qfFCSHasSpecial(fccs, i, "background2", back2, backe2);
+                    b1<<back1;
+                    b2<<back2;
+                    back1=0;
+                    back2=0;
+                    backe1=0;
+                    backe2=0;
+                    qfFCSHasSpecial(fccs, i, "count_rate1", back1, backe1);
+                    qfFCSHasSpecial(fccs, i, "count_rate2", back2, backe2);
+                    c1<<back1;
+                    c2<<back2;
+
                 }
             }
 
@@ -3536,10 +3613,37 @@ void QFRDRImagingFCSImageEditor::replotData() {
                 if (acf0) plotRun(acf0, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
                 if (acf1) plotRun(acf1, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
                 plotRun(fccs, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauCCF, &dataCorrCCF, &dataCorrErrCCF, QColor("blue"), tr("CCF"));
+                double back1=0, back2=0, backe1=0, backe2=0;
+                qfFCSHasSpecial(current, *(selected.begin()), "background1", back1, backe1);
+                qfFCSHasSpecial(current, *(selected.begin()), "background2", back2, backe2);
+                labBackground1->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back1/1000.0).arg(backe1/1000.0).arg(back1*m->getFrameTime()).arg(backe1*m->getFrameTime()));
+                labBackground2->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back2/1000.0).arg(backe2/1000.0).arg(back2*m->getFrameTime()).arg(backe2*m->getFrameTime()));
+                back1=0;
+                back2=0;
+                backe1=0;
+                backe2=0;
+                qfFCSHasSpecial(current, i, "count_rate1", back1, backe1);
+                qfFCSHasSpecial(current, i, "count_rate2", back2, backe2);
+                labCnt1->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back1/1000.0).arg(backe1/1000.0).arg(back1*m->getFrameTime()).arg(backe1*m->getFrameTime()));
+                labCnt2->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back2/1000.0).arg(backe2/1000.0).arg(back2*m->getFrameTime()).arg(backe2*m->getFrameTime()));
             } else {
                 if (acf0) plotRunsAvg(acf0, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
                 if (acf1) plotRunsAvg(acf1, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
                 plotRunsAvg(fccs, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauCCF, &dataCorrCCF, &dataCorrErrCCF, QColor("blue"), tr("CCF"));
+                double back1=0, back2=0, backe1=0, backe2=0;
+                back1=qfstatisticsAverage(b1);
+                backe1=qfstatisticsStd(b1);
+                back2=qfstatisticsAverage(b2);
+                backe2=qfstatisticsStd(b2);
+                labBackground1->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back1/1000.0).arg(backe1/1000.0).arg(back1*m->getFrameTime()).arg(backe1*m->getFrameTime()));
+                labBackground2->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back2/1000.0).arg(backe2/1000.0).arg(back2*m->getFrameTime()).arg(backe2*m->getFrameTime()));
+
+                back1=qfstatisticsAverage(c1);
+                backe1=qfstatisticsStd(c1);
+                back2=qfstatisticsAverage(c2);
+                backe2=qfstatisticsStd(c2);
+                labCnt1->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back1/1000.0).arg(backe1/1000.0).arg(back1*m->getFrameTime()).arg(backe1*m->getFrameTime()));
+                labCnt2->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back2/1000.0).arg(backe2/1000.0).arg(back2*m->getFrameTime()).arg(backe2*m->getFrameTime()));
             }
 
             if (acf0 && acf1 && cmbCrosstalkDirection->currentIndex()>=0 && cmbCrosstalkDirection->currentIndex()<=1) {
@@ -3639,6 +3743,10 @@ void QFRDRImagingFCSImageEditor::replotData() {
     plotter->update_plot();
     plotterResid->update_plot();
     QApplication::restoreOverrideCursor();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"replotData ... done ("<<time.nsecsElapsed()/1e6<<"ms) ...  cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();;
+#endif
+
 }
 
 
@@ -3658,7 +3766,7 @@ void QFRDRImagingFCSImageEditor::readSettings() {
     if (current && dynamic_cast<QFRDRImagingFCSData*>(current) && dynamic_cast<QFRDRImagingFCSData*>(current)->isFCCS()) defCDM=2;
     cmbSeletionCorrDisplayMode->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/corr_seldisplaymode"), defCDM).toInt());
     if (cmbSeletionCorrDisplayMode->currentIndex()<0) cmbSeletionCorrDisplayMode->setCurrentIndex(defCDM);
-    cmbCrosstalkDirection->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/crosstalk_direction"), 0).toInt());
+    chkFCCSUseBackground->setChecked(settings->getQSettings()->value(QString("imfcsimageeditor/fccs_use_background"), true).toBool());
     cmbCrosstalkMode->setCurrentIndex(settings->getQSettings()->value(QString("imfcsimageeditor/crosstalk_mode"), 0).toInt());
     spinCrosstalk->setValue(settings->getQSettings()->value(QString("imfcsimageeditor/crosstalk"), 0).toDouble());
     spinCrosstalkAvg->setValue(settings->getQSettings()->value(QString("imfcsimageeditor/crosstalk_avg"), 4).toInt());
@@ -3690,6 +3798,7 @@ void QFRDRImagingFCSImageEditor::writeSettings() {
     settings->getQSettings()->setValue(QString("imfcsimageeditor/last_save_path"), lastSavePath);
     settings->getQSettings()->setValue(QString("imfcsimageeditor/last_mask_path"), lastMaskDir);
     settings->getQSettings()->setValue(QString("imfcsimageeditor/corr_seldisplaymode"), cmbSeletionCorrDisplayMode->currentIndex());
+    settings->getQSettings()->setValue(QString("imfcsimageeditor/fccs_use_background"), chkFCCSUseBackground->isChecked());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/crosstalk_direction"), cmbCrosstalkDirection->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/crosstalk_mode"), cmbCrosstalkMode->currentIndex());
     settings->getQSettings()->setValue(QString("imfcsimageeditor/crosstalk"), spinCrosstalk->value());
@@ -3947,6 +4056,7 @@ void QFRDRImagingFCSImageEditor::connectImageWidgets(bool connectTo) {
             connect(chkLogTauAxis, SIGNAL(toggled(bool)), this, SLOT(replotData()));
             connect(chkDisplayResiduals, SIGNAL(toggled(bool)), this, SLOT(replotData()));
             connect(chkKeys, SIGNAL(toggled(bool)), this, SLOT(replotData()));
+            connect(chkFCCSUseBackground, SIGNAL(toggled(bool)), this, SLOT(replotData()));
             connect(cmbSeletionCorrDisplayMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
             connect(cmbCrosstalkDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
             connect(cmbCrosstalkMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
@@ -3965,6 +4075,7 @@ void QFRDRImagingFCSImageEditor::connectImageWidgets(bool connectTo) {
         disconnect(chkLogTauAxis, SIGNAL(toggled(bool)), this, SLOT(replotData()));
         disconnect(chkDisplayResiduals, SIGNAL(toggled(bool)), this, SLOT(replotData()));
         disconnect(chkKeys, SIGNAL(toggled(bool)), this, SLOT(replotData()));
+        disconnect(chkFCCSUseBackground, SIGNAL(toggled(bool)), this, SLOT(replotData()));
         disconnect(cmbSeletionCorrDisplayMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
         disconnect(cmbCrosstalkDirection, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
         disconnect(cmbCrosstalkMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
@@ -5457,13 +5568,16 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     QTextTable* table = cursor.insertTable(6, 2, tableFormat);
     table->mergeCells(0,0,1,2);
     {
-        QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
+        int line=0;
+        QTextCursor tabCursor=table->cellAt(line, 0).firstCursorPosition();
+        line++;
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>result set:</i> <b>%1</b></small>").arg(cmbResultGroup->currentText())));
-        tabCursor=table->cellAt(1, 0).firstCursorPosition();
+        tabCursor=table->cellAt(line, 0).firstCursorPosition();
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>parameter:</i> <b>%1</b></small>").arg(cmbParameter->currentText())));
-        tabCursor=table->cellAt(1, 1).firstCursorPosition();
+        tabCursor=table->cellAt(line, 1).firstCursorPosition();
+        line++;
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>transform:</i> <b>%1</b></small>").arg(cmbParameterTransform->currentText())));
-        tabCursor=table->cellAt(2, 0).firstCursorPosition();
+        tabCursor=table->cellAt(line, 0).firstCursorPosition();
         QString otherFileName="";
         if (chkOtherFileP2->isChecked()) {
             QFRDRImagingFCSData* mmo=getRDRForParameter2(cmbOtherFileRole->itemData(cmbOtherFileRole->currentIndex()).toString());
@@ -5473,22 +5587,39 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
 
         }
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>parameter 2:</i> <b>%1</b>%2</small>").arg(cmbParameter2->currentText()).arg(otherFileName)));
-        tabCursor=table->cellAt(2, 1).firstCursorPosition();
+        tabCursor=table->cellAt(line, 1).firstCursorPosition();
+        line ++;
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>transform:</i> <b>%1</b></small>").arg(cmbParameter2Transform->currentText())));
-        tabCursor=table->cellAt(3, 0).firstCursorPosition();
+        tabCursor=table->cellAt(line, 0).firstCursorPosition();
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>color palette:</i> <b>%1</b></small>").arg(grpImage->getColorbarName())));
-        tabCursor=table->cellAt(3, 1).firstCursorPosition();
+        tabCursor=table->cellAt(line, 1).firstCursorPosition();
+        line++;
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>image style:</i> <b>%1</b></small>").arg(grpImage->getImageStyleName())));
-        tabCursor=table->cellAt(4, 0).firstCursorPosition();
+        tabCursor=table->cellAt(line, 0).firstCursorPosition();
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>color range:</i> <b>%1 ... %2</b></small>").arg(grpImage->getColMin()).arg(grpImage->getColMax())));
-        tabCursor=table->cellAt(4, 1).firstCursorPosition();
+        tabCursor=table->cellAt(line, 1).firstCursorPosition();
+        line++;
         tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>out-of-range mode:</i> <b>%1</b></small>").arg(grpImage->getOutOfRangeName())));
-        if (cmbSeletionCorrDisplayMode->currentIndex()==2) {
-            tabCursor=table->cellAt(5, 0).firstCursorPosition();
-            tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>crosstalk:</i> <b>%1%%</b>, <i>crosstalk-dir:</i> <b>%2</b>, <i>avg:</i> <b>%3</b></small>").arg(spinCrosstalk->value()).arg(cmbCrosstalkMode->currentText()).arg(spinCrosstalkAvg->value())));
-            tabCursor=table->cellAt(5, 1).firstCursorPosition();
-            tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><b>%1</b></small>").arg(labRelCCF->text())));
 
+        tabCursor=table->cellAt(line, 0).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>signal ch.1:</i> <b>%1</b></small>").arg(labCnt1->text())));
+        tabCursor=table->cellAt(line, 1).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>signal ch.2:</i> <b>%1</b></small>").arg(labCnt2->text())));
+        line++;
+
+        tabCursor=table->cellAt(line, 0).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>background signal ch.1:</i> <b>%1</b></small>").arg(labBackground1->text())));
+        tabCursor=table->cellAt(line, 1).firstCursorPosition();
+        tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>background signal ch.2:</i> <b>%1</b></small>").arg(labBackground2->text())));
+        line++;
+
+
+        if (cmbSeletionCorrDisplayMode->currentIndex()==2) {
+            tabCursor=table->cellAt(line, 0).firstCursorPosition();
+            tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><i>crosstalk:</i> <b>%1%%</b>, <i>crosstalk-dir:</i> <b>%2</b>, <i>mind background-dir:</i> <b>%4</b>, <i>avg:</i> <b>%3</b></small>").arg(spinCrosstalk->value()).arg(cmbCrosstalkMode->currentText()).arg(spinCrosstalkAvg->value()).arg(chkFCCSUseBackground->isChecked())));
+            tabCursor=table->cellAt(line, 1).firstCursorPosition();
+            tabCursor.insertFragment(QTextDocumentFragment::fromHtml(tr("<small><b>%1</b></small>").arg(labRelCCF->text())));
+            line++;
         }
     }
     QApplication::processEvents();
@@ -6491,4 +6622,5 @@ void QFRDRImagingFCSImageEditor::copyCFFromFilesToTable(QList<QFRawDataRecord *>
         }
     }
 }
+
 

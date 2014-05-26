@@ -338,6 +338,10 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             double axisWidth;
             QString fontName;
             double keyFontSize;
+            double keyBoxLineWidth;
+            QColor keyBackgroundColor;
+            bool keyBox;
+            QColor keyLineColor;
             double labelFontSize;
             double axisFontSize;
             double axisLabelFontSize;

@@ -336,6 +336,11 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QCheckBox* chkKeys;
         /** \brief combobox to select selection display options for the correlation /table plot */
         QComboBox* cmbSeletionCorrDisplayMode;
+        QLabel* labBackground1;
+        QLabel* labBackground2;
+        QLabel* labCnt1;
+        QLabel* labCnt2;
+        QCheckBox* chkFCCSUseBackground;
         QComboBox* cmbCrosstalkDirection;
         QDoubleSpinBox* spinCrosstalk;
         QSpinBox* spinCrosstalkAvg;

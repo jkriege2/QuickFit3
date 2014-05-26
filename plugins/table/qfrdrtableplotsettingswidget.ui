@@ -548,6 +548,9 @@
        <string>Key</string>
       </attribute>
       <layout class="QFormLayout" name="formLayout_2">
+       <property name="fieldGrowthPolicy">
+        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+       </property>
        <item row="0" column="0">
         <widget class="QLabel" name="label_37">
          <property name="text">
@@ -693,6 +696,55 @@
          <property name="maximum">
           <double>256.000000000000000</double>
          </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>background color:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="1">
+        <widget class="ColorComboBox" name="cmbKeyBackground"/>
+       </item>
+       <item row="6" column="0">
+        <widget class="QCheckBox" name="chkKeyBox">
+         <property name="text">
+          <string>box:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QWidget" name="horizontalWidget" native="true">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0,0">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="ColorComboBox" name="cmbKeyBoxColor"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>     width:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="spinKeyBoxWidth">
+            <property name="prefix">
+             <string/>
+            </property>
+            <property name="suffix">
+             <string> pt</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
       </layout>
@@ -861,12 +913,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>84</x>
-     <y>91</y>
+     <x>140</x>
+     <y>98</y>
     </hint>
     <hint type="destinationlabel">
-     <x>93</x>
-     <y>91</y>
+     <x>524</x>
+     <y>98</y>
     </hint>
    </hints>
   </connection>
@@ -899,6 +951,22 @@
     <hint type="destinationlabel">
      <x>127</x>
      <y>236</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkKeyBox</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>horizontalWidget</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>30</x>
+     <y>221</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>407</x>
+     <y>217</y>
     </hint>
    </hints>
   </connection>

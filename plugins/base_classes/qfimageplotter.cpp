@@ -275,9 +275,19 @@ void QFImagePlotter::overlayStyleChanged()
 
 void QFImagePlotter::setDisplayOverlay(bool displayOverlay, double *avgOut, double *sdOut)
 {
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"     QFImagePlotter::setDisplayOverlay";
+    QElapsedTimer time;
+    time.start();
+#endif
+
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     bool draw=get_doDrawing();
     set_doDrawing(false);
+
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"     QFImagePlotter::setDisplayOverlay ... 1 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
 
     this->displayMask=true;
     if (paramGrp) displayMask=paramGrp->getImageStyleDisplayMask();
@@ -330,21 +340,38 @@ void QFImagePlotter::setDisplayOverlay(bool displayOverlay, double *avgOut, doub
         w=h=1;
     }
 
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"     QFImagePlotter::setDisplayOverlay ... 2 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
     plteImageSelected->set_width(w);
     plteImageSelected->set_height(h);
     plteImageSelected->set_data(plteOverviewSelectedData, plteImageWidth, plteImageHeight);
 
 
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"     QFImagePlotter::setDisplayOverlay ... 3 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
     plteImageExcluded->set_width(w);
     plteImageExcluded->set_height(h);
     plteImageExcluded->set_data(plteOverviewExcludedData, plteImageWidth, plteImageHeight);
 
     emit saveImageSettings();
 
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"     QFImagePlotter::setDisplayOverlay ... 4 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
     //updateImage();
 
     set_doDrawing(draw);
+
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"     QFImagePlotter::setDisplayOverlay ... 5 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
     if (draw) update_plot();
+
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"     QFImagePlotter::setDisplayOverlay ... 6 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
     QApplication::restoreOverrideCursor();
 
 }
