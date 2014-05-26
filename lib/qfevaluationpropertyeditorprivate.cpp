@@ -5,7 +5,7 @@
 #include "qfversion.h"
 #include "qfproject.h"
 #include "qfenhancedtabwidget.h"
-
+#include "datatools.h"
 QFEvaluationPropertyEditorPrivate::QFEvaluationPropertyEditorPrivate(QFEvaluationPropertyEditor *parent) :
     QObject(parent)
 {
@@ -896,6 +896,22 @@ void QFEvaluationPropertyEditorPrivate::saveResults() {
             }
         }
 
+
+        QString evalfilter=d->current->getResultsDisplayFilter();
+        QStringList f=QFDataExportHandler::getFormats();
+        QString lastDir=ProgramOptions::getConfigValue("QFEvaluationPropertyEditorPrivate/lastDataDir", "").toString();
+        QString selFilter=ProgramOptions::getConfigValue("QFEvaluationPropertyEditorPrivate/lastDataFilter", "").toString();
+        QString fn=qfGetSaveFileName(d, tr("Save results to file ..."), lastDir, f.join(";;"), &selFilter);
+        if (fn.size()>0) {
+            int flip=QMessageBox::question(d, tr("Save results to file ..."), tr("Flip table?"), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::No);
+            if (flip==QMessageBox::Yes || flip==QMessageBox::No) {
+                d->current->getProject()->rdrResultsSave(evalfilter, fn, f.indexOf(selFilter), false, flip==QMessageBox::Yes, evalIDs, records);
+                ProgramOptions::setConfigValue("QFEvaluationPropertyEditorPrivate/lastDataDir", lastDir);
+                ProgramOptions::setConfigValue("QFEvaluationPropertyEditorPrivate/lastDataFilter", selFilter);
+            }
+        }
+
+        /*
         QString evalfilter=d->current->getResultsDisplayFilter();
         QString selectedFilter="";
         QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;SYLK dataformat, flipped (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv);;Semicolon Separated Values (*.dat *.txt *.csv)");
@@ -918,7 +934,7 @@ void QFEvaluationPropertyEditorPrivate::saveResults() {
             }
             currentSaveDir=QFileInfo(fileName).absolutePath();
             if (!ok) QMessageBox::critical(NULL, tr("QuickFit"), tr("Could not save file '%1'.").arg(fileName));
-        }
+        }*/
     }
 }
 
@@ -961,7 +977,23 @@ void QFEvaluationPropertyEditorPrivate::saveResultsAveraged()
             }
         }
 
+
         QString evalfilter=d->current->getResultsDisplayFilter();
+        QStringList f=QFDataExportHandler::getFormats();
+        QString lastDir=ProgramOptions::getConfigValue("QFEvaluationPropertyEditorPrivate/lastDataDir", "").toString();
+        QString selFilter=ProgramOptions::getConfigValue("QFEvaluationPropertyEditorPrivate/lastDataFilter", "").toString();
+        QString fn=qfGetSaveFileName(d, tr("Save results to file ..."), lastDir, f.join(";;"), &selFilter);
+        if (fn.size()>0) {
+            int flip=QMessageBox::question(d, tr("Save results to file ..."), tr("Flip table?"), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::No);
+            if (flip==QMessageBox::Yes || flip==QMessageBox::No) {
+                d->current->getProject()->rdrResultsSave(evalfilter, fn, f.indexOf(selFilter), true, flip==QMessageBox::Yes, evalIDs, records);
+                ProgramOptions::setConfigValue("QFEvaluationPropertyEditorPrivate/lastDataDir", lastDir);
+                ProgramOptions::setConfigValue("QFEvaluationPropertyEditorPrivate/lastDataFilter", selFilter);
+            }
+        }
+
+
+        /*
         QString selectedFilter="";
         QString filter= tr("Comma Separated Values (*.csv *.dat);;Semicolon Separated Values [for german Excel] (*.dat *.txt *.csv);;SYLK dataformat (*.slk *.sylk);;SYLK dataformat, flipped (*.slk *.sylk);;Tab separated (*.dat *.txt *.tsv);;Semicolon Separated Values [for english Excel] (*.dat *.txt *.csv)");
         QString fileName = qfGetSaveFileName(d, tr("Save Results ..."), currentSaveDir, filter, &selectedFilter);
@@ -983,7 +1015,7 @@ void QFEvaluationPropertyEditorPrivate::saveResultsAveraged()
             }
             currentSaveDir=QFileInfo(fileName).absolutePath();
             if (!ok) QMessageBox::critical(NULL, tr("QuickFit"), tr("Could not save file '%1'.").arg(fileName));
-        }
+        }*/
     }
 }
 

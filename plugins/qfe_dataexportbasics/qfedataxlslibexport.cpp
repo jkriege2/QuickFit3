@@ -50,12 +50,12 @@ void QFEDataXlsLibExport::save(const QList<QList<QVariant> > &data_in, const QSt
 
     if (columnHeaders.size()>0) {
         for (int i=0; i<columnHeaders.size(); i++) {
-            sh->label(1, coffset+i, columnHeaders[i].toLocal8Bit().data());
+            sh->label(1, coffset+i, columnHeaders[i].toStdString());
         }
     }
     if (rowHeaders.size()>0) {
         for (int i=0; i<rowHeaders.size(); i++) {
-            sh->label(roffset+i, 1, rowHeaders[i].toLocal8Bit().data());
+            sh->label(roffset+i, 1, rowHeaders[i].toStdString());
         }
     }
 

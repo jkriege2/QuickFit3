@@ -449,6 +449,20 @@ p, li { white-space: pre-wrap; }
                </property>
               </spacer>
              </item>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_18">
+               <property name="text">
+                <string>example:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <widget class="JKQTMathTextLabel" name="labMath">
+               <property name="text">
+                <string>TextLabel</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </item>
           </layout>
@@ -608,6 +622,11 @@ p, li { white-space: pre-wrap; }
    <class>QFEnhancedLineEdit</class>
    <extends>QLineEdit</extends>
    <header>qfenhancedlineedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>JKQTMathTextLabel</class>
+   <extends>QLabel</extends>
+   <header>jkqtmathtext.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

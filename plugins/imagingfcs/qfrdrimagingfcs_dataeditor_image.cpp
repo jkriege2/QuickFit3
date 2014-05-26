@@ -22,8 +22,8 @@
 #define sqr(x) qfSqr(x)
 
 #define CLICK_UPDATE_TIMEOUT 500
-//#define DEBUG_TIMIMNG
-#undef DEBUG_TIMIMNG
+#define DEBUG_TIMIMNG
+//#undef DEBUG_TIMIMNG
 
 #define OverlayRectanglesAsImageOverlay true
 
@@ -2778,7 +2778,7 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 #ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotSelection";
+    qDebug()<<"replotSelection";
     QElapsedTimer time;
     time.start();
 #endif
@@ -2860,13 +2860,13 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
     }
     QApplication::restoreOverrideCursor();
 #ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotSelection ... DONE = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+    qDebug()<<"replotSelection ... DONE = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
 #endif
 }
 
 void QFRDRImagingFCSImageEditor::replotOverview() {
 #ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotOverview";
+    qDebug()<<"replotOverview";
     QElapsedTimer time;
     time.start();
 #endif
@@ -2950,13 +2950,13 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
     pltOverview->update_plot();
     QApplication::restoreOverrideCursor();
 #ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotOverview ... DONE = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+    qDebug()<<"replotOverview ... DONE = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
 #endif
 }
 
 void QFRDRImagingFCSImageEditor::replotMask() {
 #ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotMask";
+    qDebug()<<"replotMask";
     QElapsedTimer time;
     time.start();
 #endif
@@ -2993,7 +2993,7 @@ void QFRDRImagingFCSImageEditor::replotMask() {
     pltMask->update_plot();
     QApplication::restoreOverrideCursor();
 #ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotMask ... DONE = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+    qDebug()<<"replotMask ... DONE = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
 #endif
 }
 
@@ -3050,6 +3050,10 @@ void QFRDRImagingFCSImageEditor::plotAverage(QFRDRImagingFCSData* m, QFPlotter* 
 
 
 void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plotFit, QFPlotter *plotter, QFPlotter *plotterResid, QFTableModel* tabFitvals, int c_tau_in, QVector<double>* tau_out, QVector<double>* corr_out, QVector<double>* errcorr_out, QColor overrideColor, const QString& overrideTitle) {
+#ifdef DEBUG_TIMIMNG
+    QElapsedTimer t;
+    t.start();
+#endif
     JKQTPdatastore* ds=plotter->getDatastore();
     JKQTPerrorPlotstyle runerrorstyle=cmbRunErrorStyle->getErrorStyle();
     bool runLine=cmbRunStyle->getDrawLine();
@@ -3097,7 +3101,7 @@ void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plo
     plotter->addGraph(g);
 
 #ifdef DEBUG_TIMIMNG
-     //qDebug()<<"replotData   add graph "<<i<<": "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+     qDebug()<<"replotData   add graph "<<i<<": "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
 #endif
 
     double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
@@ -3143,7 +3147,7 @@ void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plo
     }
 
 #ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotData   search eval "<<i<<" (evals.size()="<<evals.size()<< "   resultsCalcEvaluationsInGroup="<<resultsCalcEvaluationsInGroupElapsed<<" nsecs): "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+    qDebug()<<"replotData   search eval "<<i<<" (evals.size()="<<evals.size()<< "   resultsCalcEvaluationsInGroup="<<resultsCalcEvaluationsInGroupElapsed<<" nsecs): "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
 #endif
 
     // try to evaluate the fit function. If it succeeds, add plots and store the parameters & description to the display model!
@@ -3171,7 +3175,7 @@ void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plo
         gfit->set_color(g->get_color());
         plotter->addGraph(gfit);
 #ifdef DEBUG_TIMIMNG
-        //qDebug()<<"replotData   add fit graph "<<i<<": " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+        qDebug()<<"replotData   add fit graph "<<i<<": " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
 #endif
         JKQTPxyLineGraph* gr=new JKQTPxyLineGraph();
         gr->set_lineWidth(1.5);
@@ -3190,7 +3194,7 @@ void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plo
         gr->set_color(g->get_color());
         plotterResid->addGraph(gr);
 #ifdef DEBUG_TIMIMNG
-        //qDebug()<<"replotData   add resid graph "<<i<<": " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+        qDebug()<<"replotData   add resid graph "<<i<<": " <<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
 #endif
 
         if (tabFitvals) {
@@ -3224,7 +3228,7 @@ void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plo
             }
         }
 #ifdef DEBUG_TIMIMNG
-        //qDebug()<<"replotData   set table cells "<<i<<": "<< t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
+        qDebug()<<"replotData   set table cells "<<i<<": "<< t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
 #endif
 
     }
@@ -3445,7 +3449,7 @@ void QFRDRImagingFCSImageEditor::plotRunsAvg(QFRDRImagingFCSData *m, QSet<int32_
 
 void QFRDRImagingFCSImageEditor::replotData() {
 #ifdef DEBUG_TIMIMNG
-    //qDebug()<<"replotData";
+    qDebug()<<"replotData";
     QElapsedTimer time;
     time.start();
 #endif

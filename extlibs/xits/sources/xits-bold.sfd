@@ -24,7 +24,7 @@ CreationTime: 1232396790
 PfmFamily: 81
 TTFWeight: 700
 TTFWidth: 5
-LineGap: 0
+LineGap: 510
 VLineGap: 0
 OS2TypoAscent: 750
 OS2TypoAOffset: 0
@@ -35,9 +35,9 @@ OS2WinAscent: 0
 OS2WinAOffset: 1
 OS2WinDescent: 0
 OS2WinDOffset: 1
-HheadAscent: 1055
+HheadAscent: 750
 HheadAOffset: 0
-HheadDescent: -455
+HheadDescent: -250
 HheadDOffset: 0
 OS2SubXSize: 500
 OS2SubYSize: 500
@@ -66,7 +66,7 @@ StemSnapH 31 [29 33 38 43 48 52 57 68 73 78]
 StemSnapV 31 [42 48 51 54 62 66 69 73 79 83]
 ExpansionFactor 4 0.06
 EndPrivate
-BeginChars: 1114123 1431
+BeginChars: 1114124 1432
 
 StartChar: space
 Encoding: 32 32 0
@@ -47093,6 +47093,15 @@ SplineSet
  317 70 340 79 350 82 c 1
  363 129 366 161 366 195 c 0
 EndSplineSet
+EndChar
+
+StartChar: i.TRK
+Encoding: 1114123 -1 1431
+Width: 278
+Flags: HW
+LayerCount: 2
+Fore
+Refer: 73 105 N 1 0 0 1 0 0 2
 EndChar
 EndChars
 EndSplineFont

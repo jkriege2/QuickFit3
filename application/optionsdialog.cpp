@@ -7,7 +7,7 @@ OptionsDialog::OptionsDialog(QWidget* parent):
     QDialog(parent)
 {
     setupUi(this);
-    //labMath->setText("g_\\text{gg}^\\text{A}(\\tau)=\\frac{1}{N}\\cdot\\left(1+\\frac{\\tau}{\\tau_D}\\right)^{-1}\cdot\\left(1+\\frac{\\tau}{\gamma^2\\tau_D}\\right)^{-1/2}");
+    labMath->setText("g_\\text{gg}^\\text{A}(\\tau)=\\frac{1}{N}\\cdot\\left(1+\\frac{\\tau}{\\tau_D}\\right)^{-1}\cdot\\left(1+\\frac{\\tau}{\gamma^2\\tau_D}\\right)^{-1/2}");
     QFStyledButton* btn=new QFStyledButton(QFStyledButton::SelectDirectory, edtUserFitFunctions, edtUserFitFunctions);
     edtUserFitFunctions->addButton(btn);
 }
@@ -56,10 +56,10 @@ void OptionsDialog::on_listWidget_currentRowChanged(int currentRow)
 
 void OptionsDialog::on_spinMath_valueChanged(int value)
 {
-    /*labMath->getMathText()->set_fontSize(value);
+    labMath->getMathText()->set_fontSize(value);
     labMath->getMathText()->useSTIX();
     labMath->setMath("g_\\text{gg}^\\text{A}(\\tau)=\\frac{1}{N}\\cdot\\frac{1}{\\sqrt{1+\\frac{\\tau}{\\tau_D}}}");
-    */
+
 }
 
 
