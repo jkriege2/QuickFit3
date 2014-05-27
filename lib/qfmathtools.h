@@ -333,6 +333,21 @@ double qfstatisticsAverageVariance(double& var, const T& value) {
 /*! \brief calculate the average and variance of a given array
     \ingroup qf3lib_mathtools
 
+    \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
+    \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot (v_i-\overline{v})^2}{\sum\limits_{i=0}^{N-1}w_i} \f]
+
+*/
+template <class T>
+double qfstatisticsAverageStd(double& std, const T& value) {
+    double var=0;
+    double avg=qfstatisticsAverageVariance(var, value);
+    var=sqrt(var);
+    return avg;
+}
+
+/*! \brief calculate the average and variance of a given array
+    \ingroup qf3lib_mathtools
+
     \f[ \overline{v}=\frac{1}{N}\cdot\sum\limits_{i=0}^{N-1} v_i \f]
 */
 template <class T>

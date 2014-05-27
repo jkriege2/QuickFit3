@@ -72,6 +72,7 @@ QFImFCCSRelativeCCFCrosstalkDialog::QFImFCCSRelativeCCFCrosstalkDialog(QWidget *
     ui->cmbCCFResultSet->setRDR(ui->cmbCCF->currentRDR());
     ui->spinCrosstalk->setValue(ProgramOptions::getConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/crosstalk", ui->spinCrosstalk->value()).toDouble());
     ui->chkStoreAmplitudes->setChecked(ProgramOptions::getConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/chkStoreAmplitudes", ui->chkStoreAmplitudes->isChecked()).toBool());
+    ui->chkBackground->setChecked(ProgramOptions::getConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/chkBackground", ui->chkBackground->isChecked()).toBool());
     ui->spinAvg->setValue(ProgramOptions::getConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/avg", ui->spinAvg->value()).toDouble());
     ui->cmbCrosstalkDirection->setCurrentIndex(ProgramOptions::getConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/crosstalk_dir", ui->cmbCrosstalkDirection->currentIndex()).toInt());
     ui->cmbAmplitudeSource->setCurrentIndex(ProgramOptions::getConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/amplitude_source", ui->cmbAmplitudeSource->currentIndex()).toInt());
@@ -83,6 +84,7 @@ QFImFCCSRelativeCCFCrosstalkDialog::QFImFCCSRelativeCCFCrosstalkDialog(QWidget *
     connect(ui->cmbACF0ResultSet, SIGNAL(currentIndexChanged(int)), this, SLOT(replotImages()));
     connect(ui->cmbACF1ResultSet, SIGNAL(currentIndexChanged(int)), this, SLOT(replotImages()));
     connect(ui->cmbCCFResultSet, SIGNAL(currentIndexChanged(int)), this, SLOT(replotImages()));
+    connect(ui->chkBackground, SIGNAL(toggled(bool)), this, SLOT(replotImages()));
     cmbCCF_currentIndexChanged(ui->cmbCCF->currentIndex());
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, QPoint(10,10), QSize(800,600), "QFImFCCSRelativeCCFCrosstalkDialog/size");
 
@@ -104,6 +106,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::closeEvent(QCloseEvent *event)
     ProgramOptions::setConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/crosstalk_dir", ui->cmbCrosstalkDirection->currentIndex());
     ProgramOptions::setConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/amplitude_source", ui->cmbAmplitudeSource->currentIndex());
     ProgramOptions::setConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/chkStoreAmplitudes", ui->chkStoreAmplitudes->isChecked());
+    ProgramOptions::setConfigValue("QFImFCCSRelativeCCFCrosstalkDialog/chkBackground", ui->chkBackground->isChecked());
     QWidget::closeEvent(event);
 }
 QFRawDataRecord *QFImFCCSRelativeCCFCrosstalkDialog::getACF0() const
@@ -121,7 +124,7 @@ QFRawDataRecord *QFImFCCSRelativeCCFCrosstalkDialog::getCCF() const
     return ui->cmbCCF->currentRDR();
 }
 
-bool QFImFCCSRelativeCCFCrosstalkDialog::calculateRelCCF(QFRawDataRecord *acf0, QFRawDataRecord *acf1, QFRawDataRecord *ccf, double **rel_out0, double **rel_error_out0, double **rel_out1, double **rel_error_out1, double **acf0Amplitude, double **acf0UCAmplitude, double **acf1Amplitude, double **acf1UCAmplitude, double **ccfAmplitude, double **ccfUCAmplitude, int &w, int &h, int avgCount, double crosstalk, int crosstalkDir, bool showErrorMessage, int source, const QString &resultGroupACF0, const QString &resultGroupACF1, const QString &resultGroupCCF, const QString &param)
+bool QFImFCCSRelativeCCFCrosstalkDialog::calculateRelCCF(QFRawDataRecord *acf0, QFRawDataRecord *acf1, QFRawDataRecord *ccf, double **rel_out0, double **rel_error_out0, double **rel_out1, double **rel_error_out1, double **acf0Amplitude, double **acf0UCAmplitude, double **acf1Amplitude, double **acf1UCAmplitude, double **ccfAmplitude, double **ccfUCAmplitude, int &w, int &h, int avgCount, double crosstalk, int crosstalkDir, bool showErrorMessage, int source, const QString &resultGroupACF0, const QString &resultGroupACF1, const QString &resultGroupCCF, const QString &param, bool subtractBackground)
 {
     //qDebug()<<acf0Amplitude<<acf0UCAmplitude<<acf1Amplitude<<acf1UCAmplitude<<ccfAmplitude<<ccfUCAmplitude;
     //JKAutoOutputTimer tim(QString("calculateRelCCF %1").arg((uint64_t)acf0Amplitude));
@@ -268,9 +271,21 @@ bool QFImFCCSRelativeCCFCrosstalkDialog::calculateRelCCF(QFRawDataRecord *acf0, 
                         double I0=ccfCnt->getSimpleCountrateAverage(i, 0, false);
                         double I1=ccfCnt->getSimpleCountrateAverage(i, 1, false);
 
-                        qfFCCSCrosstalkCorrection(A0, A1, D, I0, I1, crosstalk, crosstalkDir);
+                        if (subtractBackground) {
+                            double cnt1=0, cnt2=0, cnte1=0, cnte2=0;
+                            double back1=0, back2=0, backe1=0, backe2=0;
 
+                            qfFCSHasSpecial(ccf, i, "background1", back1, backe1);
+                            qfFCSHasSpecial(ccf, i, "background2", back2, backe2);
+                            qfFCSHasSpecial(ccf, i, "count_rate1", cnt1, cnte1);
+                            qfFCSHasSpecial(ccf, i, "count_rate2", cnt2, cnte2);
+                            I0=cnt1-back1;
+                            I1=cnt2-back2;
+                        }
+                        qfFCCSCrosstalkCorrection(A0, A1, D, I0, I1, crosstalk, crosstalkDir);
                     }
+
+
 
                     acf0_out[i]=A0;
                     acf1_out[i]=A1;
@@ -393,7 +408,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::replotImages()
     double* rel1_error=NULL;
     int w=0, h=0;
     ui->labError->setText("");
-    if (calculateRelCCF(ui->cmbACF0->currentRDR(), ui->cmbACF1->currentRDR(), ui->cmbCCF->currentRDR(), &rel0, &rel0_error, &rel1, &rel1_error,NULL,NULL,NULL,NULL,NULL,NULL, w, h, ui->spinAvg->value(), ui->spinCrosstalk->value()/100.0, ui->cmbCrosstalkDirection->currentIndex(), false, ui->cmbAmplitudeSource->currentIndex(), ui->cmbACF0ResultSet->currentEvaluationGroup(), ui->cmbACF1ResultSet->currentEvaluationGroup(), ui->cmbCCFResultSet->currentEvaluationGroup())) {
+    if (calculateRelCCF(ui->cmbACF0->currentRDR(), ui->cmbACF1->currentRDR(), ui->cmbCCF->currentRDR(), &rel0, &rel0_error, &rel1, &rel1_error,NULL,NULL,NULL,NULL,NULL,NULL, w, h, ui->spinAvg->value(), ui->spinCrosstalk->value()/100.0, ui->cmbCrosstalkDirection->currentIndex(), false, ui->cmbAmplitudeSource->currentIndex(), ui->cmbACF0ResultSet->currentEvaluationGroup(), ui->cmbACF1ResultSet->currentEvaluationGroup(), ui->cmbCCFResultSet->currentEvaluationGroup(), "fitparam_g0", ui->chkBackground->isChecked())) {
 
         for (int i=0; i<2; i++) {
             QFPlotter* pltData=ui->pltData0;
@@ -466,7 +481,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
     QFRawDataRecord* acf0=getACF0();
     QFRawDataRecord* acf1=getACF1();
     QFRawDataRecord* ccf=getCCF();
-    if (acf0&&acf1&&ccf&&calculateRelCCF(acf0, acf1, ccf, &rel0, &rel0_error, &rel1, &rel1_error, &acf0Amplitude, &acf0UCAmplitude, &acf1Amplitude, &acf1UCAmplitude, &ccfAmplitude, &ccfUCAmplitude, w, h, ui->spinAvg->value(), ui->spinCrosstalk->value()/100.0, ui->cmbCrosstalkDirection->currentIndex(), true, ui->cmbAmplitudeSource->currentIndex(), ui->cmbACF0ResultSet->currentEvaluationGroup(), ui->cmbACF1ResultSet->currentEvaluationGroup(), ui->cmbCCFResultSet->currentEvaluationGroup())) {
+    if (acf0&&acf1&&ccf&&calculateRelCCF(acf0, acf1, ccf, &rel0, &rel0_error, &rel1, &rel1_error, &acf0Amplitude, &acf0UCAmplitude, &acf1Amplitude, &acf1UCAmplitude, &ccfAmplitude, &ccfUCAmplitude, w, h, ui->spinAvg->value(), ui->spinCrosstalk->value()/100.0, ui->cmbCrosstalkDirection->currentIndex(), true, ui->cmbAmplitudeSource->currentIndex(), ui->cmbACF0ResultSet->currentEvaluationGroup(), ui->cmbACF1ResultSet->currentEvaluationGroup(), ui->cmbCCFResultSet->currentEvaluationGroup(), "fitparam_g0", ui->chkBackground->isChecked())) {
         qDebug()<<"store: "<<acf0Amplitude<<acf0UCAmplitude<<acf1Amplitude<<acf1UCAmplitude<<ccfAmplitude<<ccfUCAmplitude;
 
         for (int i=0; i<2; i++) {
@@ -479,21 +494,26 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
                 rel_error=rel1_error;
             }
 
-            QString evalName=QString("CalcRelCCFCrosstalkCorrected_ACF%1_ACF%2_CCF_ct%3_avg%4").arg(acf0->getID()).arg(acf1->getID()).arg(ui->spinCrosstalk->value()).arg(ui->spinAvg->value());
-            QString egroup=QString("CalcRelCCFCrosstalkCorrected_CCF_ct%1_avg%2").arg(ui->spinCrosstalk->value()).arg(ui->spinAvg->value());
+            QString BackMod="", BackModFull="";
+            if (ui->chkBackground->isChecked()) {
+                BackMod=QString("_backcorr");
+                BackModFull=tr(", background-corr.");
+            }
+            QString evalName=QString("CalcRelCCFCrosstalkCorrected%5_ACF%1_ACF%2_CCF_ct%3_avg%4").arg(acf0->getID()).arg(acf1->getID()).arg(ui->spinCrosstalk->value()).arg(ui->spinAvg->value()).arg(BackMod);
+            QString egroup=QString("CalcRelCCFCrosstalkCorrected%3_CCF_ct%1_avg%2").arg(ui->spinCrosstalk->value()).arg(ui->spinAvg->value()).arg(BackMod);
             if (ui->cmbAmplitudeSource->currentIndex()==1) {
-                evalName=QString("CalcRelCCFCrosstalkCorrected_ACF%1_ACF%2_CCF_ct%3_g0").arg(acf0->getID()).arg(acf1->getID()).arg(ui->spinCrosstalk->value());
-                egroup=QString("CalcRelCCFCrosstalkCorrected__CCF_ct%1_g0").arg(ui->spinCrosstalk->value());
+                evalName=QString("CalcRelCCFCrosstalkCorrected%4_ACF%1_ACF%2_CCF_ct%3_g0").arg(acf0->getID()).arg(acf1->getID()).arg(ui->spinCrosstalk->value()).arg(BackMod);
+                egroup=QString("CalcRelCCFCrosstalkCorrected%2__CCF_ct%1_g0").arg(ui->spinCrosstalk->value()).arg(BackMod);
             }
             QString group="results";
             QString acfName=acf->getRole();
             if (acfName.isEmpty()) acfName=acf->getName();
             QString ccfName=ccf->getRole();
             if (ccfName.isEmpty()) ccfName=ccf->getName();
-            QString egrouplabel=tr("rel. CCF amlitude (avg. %3 taus), %1%2 crosstalk corrected").arg(ui->spinCrosstalk->value()).arg("%").arg(ui->spinAvg->value());
+            QString egrouplabel=tr("rel. CCF amlitude (avg. %3 taus), %1%2 crosstalk corrected%4").arg(ui->spinCrosstalk->value()).arg("%").arg(ui->spinAvg->value()).arg(BackModFull);
             QString rnbase=QString("relative_ccf_acf%1").arg(i);
             if (ui->cmbAmplitudeSource->currentIndex()==1) {
-                egrouplabel=tr("rel. CCF g(0) amlitude, %1%2 crosstalk corrected").arg(ui->spinCrosstalk->value()).arg("%");
+                egrouplabel=tr("rel. CCF g(0) amlitude, %1%2 crosstalk corrected%3").arg(ui->spinCrosstalk->value()).arg("%").arg(BackModFull);
                 rnbase=QString("relative_ccf_acf%1").arg(i);
             }
             QString rn=rnbase+"_g0_amplitude";
@@ -573,6 +593,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
             ccf->resultsSetInteger(evalName, "ccf_file_id", ccf->getID());
             ccf->resultsSetString(evalName, "ccf_file_role", ccf->getRole());
             ccf->resultsSetString(evalName, "ccf_file_name", ccf->getName());
+            ccf->resultsSetBoolean(evalName, "background_correction", ui->chkBackground->isChecked());
             ccf->resultsSetString(evalName, "crosstalk_direction", ui->cmbCrosstalkDirection->currentText());
             ccf->resultsSetNumber(evalName, "crosstalk", ui->spinCrosstalk->value()/100.0);
             if (ui->cmbAmplitudeSource->currentIndex()==0) {

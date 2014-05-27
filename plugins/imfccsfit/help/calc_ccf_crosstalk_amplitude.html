@@ -9,17 +9,28 @@
      
 
 <h2>Function</h2>
-<p>This tool calculates the crosstalk-corrected relative crosscorrelation amplitudes:
+<p>This tool calculates the crosstalk-corrected relative crosscorrelation amplitudes for every pixel $$math:(x,y)$$ in the images:
 $$bmath:\mbox{RCCF}_{0}(x,y)=\frac{\hat{\mbox{CCF}}(x,y)}{\hat{\mbox{ACF0}}(x,y)}$$
 $$bmath:\mbox{RCCF}_{1}(x,y)=\frac{\hat{\mbox{CCF}}(x,y)}{\hat{\mbox{ACF1}}(x,y)}$$
-where $$math:\hat{\mbox{CCF}}(x,y)$$, $$math:\hat{\mbox{ACF0}}(x,y)$$ and $$math:\hat{\mbox{ACF1}}(x,y)$$ are the crosstlak-corrected crosscorrelation and autocorrelation (of channel 0 and 1) functions: $$ref:BACIA2012:Bacia, Kirsten, Zden�?k Petrášek, and Petra Schwille. "Correcting for Spectral Cross-Talk in Dual-Color Fluorescence Cross-Correlation Spectroscopy." ChemPhysChem 13(5) (2012): 1221-1231.$$
+where $$math:\hat{\mbox{CCF}}(x,y)$$, $$math:\hat{\mbox{ACF0}}(x,y)$$ and $$math:\hat{\mbox{ACF1}}(x,y)$$ are the crosstlak-corrected crosscorrelation and autocorrelation (of channel 0 and 1) functions: $$ref:BACIA2012:Bacia, Kirsten, Zden�?k Petrášek, and Petra Schwille. "Correcting for Spectral Cross-Talk in Dual-Color Fluorescence Cross-Correlation Spectroscopy." ChemPhysChem 13(5) (2012): 1221-1231.$$
 
 $$bmath:\hat{\mbox{ACF0}}(x,y)=\mbox{ACF0}(x,y)$$
 $$bmath:\hat{\mbox{ACF1}}(x,y)=\frac{\kappa^2I_0^2\cdot\mbox{ACF0}(x,y)+I_1^2\cdot\mbox{ACF1}(x,y)- 2\kappa I_0 I_1\cdot\mbox{CCF}(x,y)}{(I_1- \kappa I_0)^2}$$
 $$bmath:\hat{\mbox{CCF}}(x,y)=\frac{I_1\mbox{CCF}(x,y)-\kappa I_0\cdot\mbox{ACF0}(x,y)}{I_1- \kappa I_0}$$
-</p>	
-     
-     
+</p>
+<p>
+<ul>
+    <li>The crosstalk factor $$math:\kappa$$ is supplied by the user, as well as the direction of the crosstalk (from channel 0 to 1 or vice versa).</li>
+    <li>The correlation function amplitudes of the autocorrelation $$math:\mbox{ACF0}(x,y)$$, $$math:\mbox{ACF1}(x,y)$$ and of the cross-correlation $$math:\mbox{CCFF}(x,y)$$ can be estimated in two ways:
+      <ol>
+          <li><b>avg. from first correlation curve channel:</b> averages over the first $$math:N$$ lag times in the measured autocorrelation curves, where $$math:N$$ is given by the value in the input field <b>average channels</b>.</li>
+          <li><b>g(0) from fit:</b> uses the parameter <tt>fitparam_g0</tt>, which is automatically calculated by all FCS fits in QuickFit. It contains the value of the fittes autocorrelation model at $$math:\tau=0$$: $$math:g_\text{fit}(0)$$. If only a minor part of the correlation decay is captured in a measurement, this might be a better estimate, than the averaging option above. </li>
+      </ol></li>
+    <li>If the option <i>"subtract user-defined  background intensity"</i> is activated, the tool will correct the intensities $$math:I_0$$ and $$math:I_1$$ for the respective background signals (see ).</li>
+    <li>Usually this plugin stores only the two images $$math:\mbox{RCCF}_{0}(x,y)$$ and $$math:\mbox{RCCF}_{1}(x,y)$$ for each record. In some cases also the corrected and raw amplitudes of the single correlation curves are of interest. If so, the option <b>store amplitudes as fit results</b> can be checked, which will store all correlation amplitudes for every file.</li>
+</ul>
+</p>
+
 
 <h2>User Interface</h2>
 <p>The tool can be opened by clicking in the main window on the menu entry <tt>Tools|imFCCS|calculate relative CCF amplitude, crosstalk corrected</tt>.
@@ -30,9 +41,10 @@ If all files are selected, overview images of the files are displayed below. A s
 <ul>
     <li>"<b>store result</b>" will save the RCCF images in the CCF file.</li>
     <li>"<b>store all results</b>" will walk through all files (basically by clicking "next ACF" and stores the resulting RCCF map. If  for every measurement one CCF and two ACFs are present in the project, this will calculate two RCCFs (one for each ACF).</li>
+    <li>"<b>next </b>": will select the next CCF file in the list (and the fitting CCF file</li>
 </li>
     
-<li>"<b>next </b>": will select the next CCF file in the list (and the fitting CCF file</li>
+
 </p>
 
 <h2>References</h2>

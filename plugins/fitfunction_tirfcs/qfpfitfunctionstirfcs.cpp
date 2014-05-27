@@ -52,7 +52,7 @@ QFFitFunction* QFPFitFunctionsTIRFCS::get(QString id, QObject* parent) const  {
 
 int QFPFitFunctionsTIRFCS::getGlobalFitConfigCount() const
 {
-    return 4;
+    return 5;
 }
 
 QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsTIRFCS::getGlobalFitConfig(int i) const
@@ -147,6 +147,17 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsTIRFCS:
        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
 
+
+    } else if (i==c++) { // fccs_tir_diff_flowe2, fccs_tir_diff_flowe2, fccs_tir_diff_flowe2
+        res.groupLabel=tirfccslabel;
+        res.menuEntryLabel=tr("... diffusion+flow, ACF + 4 neighbors");
+        res.models<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2";
+        res.globalParams << constructQListWithMultipleItems(QStringList("n_particle"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff1"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("vflowx"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("vflowy"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width"), 5);
 
     }
     return res;

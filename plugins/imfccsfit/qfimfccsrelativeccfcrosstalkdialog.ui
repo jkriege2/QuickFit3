@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>984</width>
+    <width>1142</width>
     <height>765</height>
    </rect>
   </property>
@@ -62,7 +62,16 @@
         <bool>true</bool>
        </property>
        <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <property name="margin">
+        <property name="leftMargin">
+         <number>0</number>
+        </property>
+        <property name="topMargin">
+         <number>0</number>
+        </property>
+        <property name="rightMargin">
+         <number>0</number>
+        </property>
+        <property name="bottomMargin">
          <number>0</number>
         </property>
         <item>
@@ -292,7 +301,20 @@
      <item row="5" column="2">
       <widget class="QCheckBox" name="chkStoreAmplitudes">
        <property name="text">
-        <string>store mplitudes as fit results</string>
+        <string>store amplitudes as fit results</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="2">
+      <widget class="QCheckBox" name="chkBackground">
+       <property name="text">
+        <string>subtract user-defined  background intensity</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

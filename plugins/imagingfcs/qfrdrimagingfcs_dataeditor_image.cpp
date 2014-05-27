@@ -3573,6 +3573,51 @@ void QFRDRImagingFCSImageEditor::replotData() {
         QFRDRImagingFCSData* acf0=m->getRoleFromThisGroup("acf0");
         QFRDRImagingFCSData* acf1=m->getRoleFromThisGroup("acf1");
 
+        double cnt1=0, cnt2=0, cnte1=0, cnte2=0;
+        double back1=0, back2=0, backe1=0, backe2=0;
+
+        if (selected.size()==1) {
+
+
+
+            qfFCSHasSpecial(current, *(selected.begin()), "background1", back1, backe1);
+            qfFCSHasSpecial(current, *(selected.begin()), "background2", back2, backe2);
+            qfFCSHasSpecial(current, *(selected.begin()), "count_rate1", cnt1, cnte1);
+            qfFCSHasSpecial(current, *(selected.begin()), "count_rate2", cnt2, cnte2);
+
+        } else if (selected.size()>1) {
+            QList<double> b1, b2, c1, c2;
+            const bool* mask=m->maskGet();
+            for (int i=0; i<m->getCorrelationRuns(); i++) {
+                if (selected.contains(i) && (!mask || (mask && !mask[i])) ) {
+                    double back1=0, back2=0, backe1=0, backe2=0;
+                    qfFCSHasSpecial(m, i, "background1", back1, backe1);
+                    qfFCSHasSpecial(m, i, "background2", back2, backe2);
+                    b1<<back1;
+                    b2<<back2;
+                    back1=0;
+                    back2=0;
+                    backe1=0;
+                    backe2=0;
+                    qfFCSHasSpecial(m, i, "count_rate1", back1, backe1);
+                    qfFCSHasSpecial(m, i, "count_rate2", back2, backe2);
+                    c1<<back1;
+                    c2<<back2;
+
+                }
+            }
+            cnt1=qfstatisticsAverageStd(cnte1, c1);
+            cnt2=qfstatisticsAverageStd(cnte2, c2);
+            back1=qfstatisticsAverageStd(backe1, b1);
+            back2=qfstatisticsAverageStd(backe2, b2);
+        }
+
+
+        labCnt1->setText(tr("(%1+/-%2) kHz = (%3+/-%4) AU/&Delta;t<sub>frame</sub>").arg(cnt1/1000.0).arg(cnte1/1000.0).arg(cnt1*m->getFrameTime()).arg(cnte1*m->getFrameTime()));
+        labCnt2->setText(tr("(%1+/-%2) kHz = (%3+/-%4) AU/&Delta;t<sub>frame</sub>").arg(cnt2/1000.0).arg(cnte2/1000.0).arg(cnt2*m->getFrameTime()).arg(cnte2*m->getFrameTime()));
+        labBackground1->setText(tr("(%1+/-%2) kHz = (%3+/-%4) AU/&Delta;t<sub>frame</sub>").arg(back1/1000.0).arg(backe1/1000.0).arg(back1*m->getFrameTime()).arg(backe1*m->getFrameTime()));
+        labBackground2->setText(tr("(%1+/-%2) kHz = (%3+/-%4) AU/&Delta;t<sub>frame</sub>").arg(back2/1000.0).arg(backe2/1000.0).arg(back2*m->getFrameTime()).arg(backe2*m->getFrameTime()));
+
         if (m->isFCCS() && cmbSeletionCorrDisplayMode->currentIndex()==2 ) { // FCCS mode
             QVector<double> dataTauACF0, dataCorrACF0, dataCorrErrACF0;
             QVector<double> dataTauACF1, dataCorrACF1, dataCorrErrACF1;
@@ -3582,7 +3627,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
             int ctAvg=spinCrosstalkAvg->value();
             double crosstalk=spinCrosstalk->value()/100.0;
 
-            QList<double> IACF0, IACF1, CACF0, CACF1, CCCF, b1, b2, c1, c2;
+            QList<double> IACF0, IACF1, CACF0, CACF1, CCCF;
             for (int i=0; i<m->getCorrelationRuns(); i++) {
                 bool* mask=fccs->maskGet();
                 if (selected.contains(i) && (acf0&&i<acf0->getCorrelationRuns()) && (acf1&&i<acf1->getCorrelationRuns()) && (!mask || (mask && !mask[i])) ) {
@@ -3591,19 +3636,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
                     if (acf0) CACF0<<statisticsAverage(acf0->getCorrelationRun(i), qMin(acf0->getCorrelationRuns(), ctAvg));
                     if (acf1) CACF1<<statisticsAverage(acf1->getCorrelationRun(i), qMin(acf1->getCorrelationRuns(), ctAvg));
                     CCCF<<statisticsAverage(fccs->getCorrelationRun(i), qMin(fccs->getCorrelationRuns(), ctAvg));
-                    double back1=0, back2=0, backe1=0, backe2=0;
-                    qfFCSHasSpecial(fccs, i, "background1", back1, backe1);
-                    qfFCSHasSpecial(fccs, i, "background2", back2, backe2);
-                    b1<<back1;
-                    b2<<back2;
-                    back1=0;
-                    back2=0;
-                    backe1=0;
-                    backe2=0;
-                    qfFCSHasSpecial(fccs, i, "count_rate1", back1, backe1);
-                    qfFCSHasSpecial(fccs, i, "count_rate2", back2, backe2);
-                    c1<<back1;
-                    c2<<back2;
+
 
                 }
             }
@@ -3613,42 +3646,20 @@ void QFRDRImagingFCSImageEditor::replotData() {
                 if (acf0) plotRun(acf0, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
                 if (acf1) plotRun(acf1, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
                 plotRun(fccs, *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, &dataTauCCF, &dataCorrCCF, &dataCorrErrCCF, QColor("blue"), tr("CCF"));
-                double back1=0, back2=0, backe1=0, backe2=0;
-                qfFCSHasSpecial(current, *(selected.begin()), "background1", back1, backe1);
-                qfFCSHasSpecial(current, *(selected.begin()), "background2", back2, backe2);
-                labBackground1->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back1/1000.0).arg(backe1/1000.0).arg(back1*m->getFrameTime()).arg(backe1*m->getFrameTime()));
-                labBackground2->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back2/1000.0).arg(backe2/1000.0).arg(back2*m->getFrameTime()).arg(backe2*m->getFrameTime()));
-                back1=0;
-                back2=0;
-                backe1=0;
-                backe2=0;
-                qfFCSHasSpecial(current, i, "count_rate1", back1, backe1);
-                qfFCSHasSpecial(current, i, "count_rate2", back2, backe2);
-                labCnt1->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back1/1000.0).arg(backe1/1000.0).arg(back1*m->getFrameTime()).arg(backe1*m->getFrameTime()));
-                labCnt2->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back2/1000.0).arg(backe2/1000.0).arg(back2*m->getFrameTime()).arg(backe2*m->getFrameTime()));
             } else {
                 if (acf0) plotRunsAvg(acf0, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF0, &dataCorrACF0, &dataCorrErrACF0, QColor("green"), tr("ACF0"));
                 if (acf1) plotRunsAvg(acf1, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauACF1, &dataCorrACF1, &dataCorrErrACF1, QColor("red"), tr("ACF1"));
                 plotRunsAvg(fccs, selected, true, plotter, plotterResid, tabFitvals, c_tau, &dataTauCCF, &dataCorrCCF, &dataCorrErrCCF, QColor("blue"), tr("CCF"));
-                double back1=0, back2=0, backe1=0, backe2=0;
-                back1=qfstatisticsAverage(b1);
-                backe1=qfstatisticsStd(b1);
-                back2=qfstatisticsAverage(b2);
-                backe2=qfstatisticsStd(b2);
-                labBackground1->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back1/1000.0).arg(backe1/1000.0).arg(back1*m->getFrameTime()).arg(backe1*m->getFrameTime()));
-                labBackground2->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back2/1000.0).arg(backe2/1000.0).arg(back2*m->getFrameTime()).arg(backe2*m->getFrameTime()));
 
-                back1=qfstatisticsAverage(c1);
-                backe1=qfstatisticsStd(c1);
-                back2=qfstatisticsAverage(c2);
-                backe2=qfstatisticsStd(c2);
-                labCnt1->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back1/1000.0).arg(backe1/1000.0).arg(back1*m->getFrameTime()).arg(backe1*m->getFrameTime()));
-                labCnt2->setText(QString("(%1+/-%2) kHz = (%3+/-%4) AU").arg(back2/1000.0).arg(backe2/1000.0).arg(back2*m->getFrameTime()).arg(backe2*m->getFrameTime()));
             }
 
             if (acf0 && acf1 && cmbCrosstalkDirection->currentIndex()>=0 && cmbCrosstalkDirection->currentIndex()<=1) {
-                double I0=qfstatisticsAverage(IACF0);
-                double I1=qfstatisticsAverage(IACF1);
+                double I0=cnt1; //qfstatisticsAverage(IACF0);
+                double I1=cnt2; //qfstatisticsAverage(IACF1);
+                if (chkFCCSUseBackground->isChecked()) {
+                    I0=I0-back1;
+                    I1=I1-back2;
+                }
                 double C0=qfstatisticsAverage(CACF0);
                 double C1=qfstatisticsAverage(CACF1);
                 double CC=qfstatisticsAverage(CCCF);

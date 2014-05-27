@@ -41,12 +41,7 @@ void QFEDataXlsLibExport::save(const QList<QList<QVariant> > &data_in, const QSt
 
     int roffset=0;
     int coffset=0;
-    if (columnHeaders.size()>0) {
-        roffset+=1;
-    }
-    if (rowHeaders.size()>0) {
-        coffset+=1;
-    }
+
 
     if (columnHeaders.size()>0) {
         for (int i=0; i<columnHeaders.size(); i++) {
@@ -57,6 +52,13 @@ void QFEDataXlsLibExport::save(const QList<QList<QVariant> > &data_in, const QSt
         for (int i=0; i<rowHeaders.size(); i++) {
             sh->label(roffset+i, 1, rowHeaders[i].toStdString());
         }
+    }
+
+    if (columnHeaders.size()>0) {
+        roffset+=1;
+    }
+    if (rowHeaders.size()>0) {
+        coffset+=1;
     }
 
     for (int c=0; c<data.size(); c++) {
