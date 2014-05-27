@@ -49,5 +49,6 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
             delete it.value();
         }
     }
+    model()->sort(0);
     setUpdatesEnabled(upd);
 }

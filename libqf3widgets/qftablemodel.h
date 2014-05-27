@@ -321,6 +321,8 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         /** \brief read CSV from a QTextStream and write it into the table (may be resized) starting from ( \a start_row, \a start_col ) */
         bool readCSV(QTextStream& in, char column_separator=',', char decimal_separator='.', QString header_start=QString("#!"), char comment_start='#', int start_row=0, int start_col=0, bool clearTable=false);
 
+        QList<QList<QVariant> > getDataTable(QStringList& colNames, QStringList& rownames, QModelIndexList selection=QModelIndexList());
+
         /*! \brief saves the given selection (or all cells, if the selection is empty) as XML
 
             \param selection copy only these cells, or all if this is empty (default)

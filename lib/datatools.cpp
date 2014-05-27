@@ -290,7 +290,7 @@ QString toSYLK(const QList<QVector<double> >& data, const QStringList& columnNam
         for (int i=0; i<cols; i++) {
             QString h=columnNames.value(i, "");
             h=h.replace(',', "_").replace(';', "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_");
-            out+=QString("F;SDS;Y%1;X%2\nC;Y%1;X%2;K\"%3\"\n").arg(i+offset+1).arg(1).arg(h);
+            out+=QString("F;SDS;X%1;Y%2\nC;Y%1;X%2;K\"%3\"\n").arg(i+offset+1).arg(1).arg(h);
         }
     }
 
@@ -298,7 +298,7 @@ QString toSYLK(const QList<QVector<double> >& data, const QStringList& columnNam
         if (rowNames.size()>0) {
             QString h=rowNames.value(r, "");
             h=h.replace(',', "_").replace(';', "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_");
-            out+=QString("F;SDS;Y%1;X%2\nC;Y%1;X%2;K\"%3\"\n").arg(1).arg(r+roffset+1).arg(h);
+            out+=QString("F;SDS;X%1;Y%2\nC;Y%1;X%2;K\"%3\"\n").arg(1).arg(r+roffset+1).arg(h);
         }
         for (int c=0; c<cols; c++) {
             if (c<data[c].size()) out+=QString("C;X%1;Y%2;K%3\n").arg(c+offset+1).arg(r+roffset+1).arg(doubleToQString(data[c].value(r, 0), 16, 'g', '.'));
@@ -332,7 +332,7 @@ QString toSYLK(const QList<QList<QVariant> >& data, const QStringList& columnNam
         for (int i=0; i<cols; i++) {
             QString h=columnNames.value(i, "");
             h=h.replace(',', "_").replace(';', "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_");
-            out+=QString("F;SDS;Y%1;X%2\nC;Y%1;X%2;K\"%3\"\n").arg(i+offset+1).arg(1).arg(h);
+            out+=QString("F;SDS;X%1;Y%2\nC;Y%1;X%2;K\"%3\"\n").arg(i+offset+1).arg(1).arg(h);
         }
     }
 
@@ -340,7 +340,7 @@ QString toSYLK(const QList<QList<QVariant> >& data, const QStringList& columnNam
         if (rowNames.size()>0) {
             QString h=rowNames.value(r, "");
             h=h.replace(',', "_").replace(';', "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_");
-            out+=QString("F;SDS;Y%1;X%2\nC;Y%1;X%2;K\"%3\"\n").arg(1).arg(r+roffset+1).arg(h);
+            out+=QString("F;SDS;X%1;Y%2\nC;Y%1;X%2;K\"%3\"\n").arg(1).arg(r+roffset+1).arg(h);
         }
         for (int c=0; c<cols; c++) {
             if (c<data[c].size()) {

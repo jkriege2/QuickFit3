@@ -13,6 +13,7 @@
 #include "qfmathparser.h"
 #include <QPointer>
 #include <QMultiMap>
+#include "datatools.h"
 class QFRDRTableEditor; // forward
 
 /*! \brief this class is used to manage a table of values (strings/numbers)
@@ -482,15 +483,24 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportFiletypes() */
         QStringList getExportFiletypes() {
             QStringList sl;
-            sl << "CSV" << "SSV" << "GERMANEXCEL" << "SYLK" << "QFTABLEXML";
+            sl << "QFTABLEXML";
+            QStringList f=QFDataExportHandler::getFormats();
+            for (int i=0; i<f.size(); i++) sl<<QString("F%1").arg(i);
             return sl;
-        };
+
+        }
         /** \brief returns the title of the Export file dialog */
-        QString getExportDialogTitle() { return tr("Export Data Table ..."); };
+        QString getExportDialogTitle() { return tr("Export Data Table ..."); }
         /** \brief returns the filetype of the Export file dialog */
-        QString getExportDialogFiletypes() { return tr("Comma Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files (*.csv, *.txt);;Semicolon Separated Value Files [german Excel] (*.csv, *.txt);;SYLK File (*.sylk, *.slk);;Table XML file (*.qftxml)"); };
+        QString getExportDialogFiletypes() { return tr("Table XML file (*.qftxml)")+";;"+QFDataExportHandler::getFormats().join(";;"); }
 
         QVariant evaluateExpression(QFMathParser &mp, QFMathParser::qfmpNode *n, QModelIndex cell, bool *ok, const QString &expression, QString *error, bool columnMode=false);
+        void readAxisInfo(AxisInfo &plot, const QString &axisName, QDomElement te);
+        void readPlotInfo(PlotInfo &plot, QDomElement te);
+        void readGraphInfo(GraphInfo &graph, QDomElement te);
+        void writeAxisInfo(QXmlStreamWriter& w, const AxisInfo &plot, const QString &axisName) const;
+        void writePlotInfo(QXmlStreamWriter& w, const PlotInfo &plot, bool writeGraphs=true) const;
+        void writeGraphInfo(QXmlStreamWriter& w, const GraphInfo &graph) const;
     public slots:
         void emitRebuildPlotWidgets();
 
@@ -528,5 +538,6 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
     private:
 };
+
 
 #endif // QFRDRTABLE_H

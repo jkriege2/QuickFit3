@@ -1168,6 +1168,57 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
     return true;
 }
 
+QList<QList<QVariant> > QFTableModel::getDataTable(QStringList &colNames, QStringList &rowNames, QModelIndexList selection)
+{
+    QList<QList<QVariant> > data;
+    colNames.clear();
+    rowNames.clear();
+
+    QSet<int> usedCols, usedrows;
+    bool saveCompleteTable=selection.isEmpty();
+    for (int i=0; i<selection.size(); i++) {
+        usedCols.insert(selection[i].column());
+        usedrows.insert(selection[i].row());
+    }
+
+    QList<QVariant> dempty;
+    for (int r=0; r<usedrows.size(); r++) {
+        dempty<<QVariant();
+    }
+
+    // write column headers
+    int cc=0;
+    for (quint16 c=0; c<state.columns; c++) {
+        if (usedCols.contains(c) || saveCompleteTable) {
+            colNames<<state.columnNames[c];
+            cc++;
+            data<<dempty;
+        }
+    }
+
+
+    // write data
+    int ri=0;
+    for (quint16 r=0; r<state.rows; r++) {
+        if (usedrows.contains(r)||saveCompleteTable) {
+            bool first=true;
+            int ci=0;
+            for (quint16 c=0; c<state.columns; c++) {
+                if (usedCols.contains(c) || saveCompleteTable) {
+                    first=false;
+                    quint32 a=xyAdressToUInt32(r, c);
+                    if (state.dataMap.contains(a) && ci<data.size() && ri<dempty.size()) {
+                        data[ci].operator [](ri)=state.dataMap[a];
+                    }
+                    ci++;
+                }
+            }
+            ri++;
+        }
+    }
+    return data;
+}
+
 QString QFTableModel::saveXML(QModelIndexList selection, bool createXMLFragment, bool template_only)
 {
     QString xml;

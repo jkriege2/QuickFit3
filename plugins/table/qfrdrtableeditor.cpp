@@ -212,16 +212,16 @@ void QFRDRTableEditor::createWidgets() {
     connect(actSetColumnValues, SIGNAL(triggered()), this, SLOT(slSetColumnValues()));
     connect(this, SIGNAL(enableActions(bool)), actSetColumnValues, SLOT(setEnabled(bool)));
 
-    actCalculateColumn=new QAction(QIcon(":/table/formula.png"), tr("evaluate math expression"), this);
-    actCalculateColumn->setToolTip(tr("set the value of the selected columns by a freely defineable mathematical expression"));
-    actCalculateColumn->setShortcut(tr("="));
-    connect(actCalculateColumn, SIGNAL(triggered()), this, SLOT(slCalcCell()));
-    connect(this, SIGNAL(enableActions(bool)), actCalculateColumn, SLOT(setEnabled(bool)));
+    actCalcCell=new QAction(QIcon(":/table/formula.png"), tr("evaluate math expression"), this);
+    actCalcCell->setToolTip(tr("set the value of the selected columns by a freely defineable mathematical expression"));
+    actCalcCell->setShortcut(tr("="));
+    connect(actCalcCell, SIGNAL(triggered()), this, SLOT(slCalcCell()));
+    connect(this, SIGNAL(enableActions(bool)), actCalcCell, SLOT(setEnabled(bool)));
 
     actClearExpression=new QAction(QIcon(":/table/formulaclear.png"), tr("clear math expression"), this);
     actClearExpression->setToolTip(tr("clear any expressions from the selected cells"));
     connect(actClearExpression, SIGNAL(triggered()), this, SLOT(slClearExpression()));
-    connect(this, SIGNAL(enableActions(bool)), actCalculateColumn, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(enableActions(bool)), actCalcCell, SLOT(setEnabled(bool)));
 
     actRecalcAll=new QAction(QIcon(":/table/formularecalc.png"), tr("reevaluate all/selected math expression"), this);
     actRecalcAll->setToolTip(tr("reevaluate all math expressions ..."));
@@ -294,7 +294,7 @@ void QFRDRTableEditor::createWidgets() {
     tbMain->addAction(actSetDatatype);
     tbMain->addAction(actSetColumnTitle);
     tbMain->addSeparator();
-    tbMain->addAction(actCalculateColumn);
+    tbMain->addAction(actCalcCell);
     tbMain->addAction(actClearExpression);
     tbMain->addAction(actRecalcAll);
     tbMain->addAction(actSort);
@@ -327,7 +327,7 @@ void QFRDRTableEditor::createWidgets() {
     tvMain->addAction(actSetDatatype);
     tvMain->addAction(getSeparatorAction(this));
     tvMain->addAction(actSetColumnValues);
-    tvMain->addAction(actCalculateColumn);
+    tvMain->addAction(actCalcCell);
     tvMain->addAction(actClearExpression);
     tvMain->addAction(actRecalcAll);
     tvMain->addAction(actHistogram);
@@ -360,7 +360,7 @@ void QFRDRTableEditor::createWidgets() {
     menuEdit->addAction(actClearExpression);
     menuEdit->addSeparator();
     menuEdit->addAction(actSetDatatype);
-    menuEdit->addAction(actCalculateColumn);
+    menuEdit->addAction(actCalcCell);
 
     QMenu* menuTab=propertyEditor->addMenu("&Table", 0);
     menuTab->addAction(actCopyTemplate);
@@ -377,7 +377,7 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addAction(actSetDatatype);
     menuTab->addAction(actSetColumnTitle);
     menuTab->addAction(actSetColumnValues);
-    menuTab->addAction(actCalculateColumn);
+    menuTab->addAction(actCalcCell);
     menuTab->addAction(actClearExpression);
     menuTab->addAction(actRecalcAll);
     menuTab->addAction(actHistogram);
@@ -1084,8 +1084,27 @@ void QFRDRTableEditor::slClearExpression()
                 int answer = QMessageBox::question(this, tr("Clear Table Expressions"), tr("Are you sure that you want to clear all expressions from the selected table cells?"), QMessageBox::Yes | QMessageBox::No);
                 if (answer == QMessageBox::Yes) {
                     QModelIndexList idxs=smod->selectedIndexes();
+                    QMap<int, int> colcnt;
                     for (int i=0; i<idxs.size(); i++) {
                         m->model()->setCellUserRoleCreate(QFRDRTable::TableExpressionRole, idxs[i].row(), idxs[i].column(), QVariant());
+                        if (colcnt.contains(idxs[i].column())) colcnt[idxs[i].column()]=colcnt[idxs[i].column()]+1;
+                        else colcnt[idxs[i].column()]=1;
+                    }
+                    QMapIterator<int, int> it(colcnt);
+                    int clearCol=-1;
+                    while (it.hasNext()) {
+                        it.next();
+                        QString lexp=m->model()->getColumnHeaderData(it.key(), QFRDRTable::ColumnExpressionRole).toString();
+                        if (!lexp.isEmpty()) {
+                            if (it.value()>=m->model()->rowCount()) {
+                                if (clearCol=-1) {
+                                    clearCol= QMessageBox::question(this, tr("Clear Column Expressions"), tr("You selected a complete column. Do you want to remove the associated column expression?"), QMessageBox::Yes | QMessageBox::No);
+                                }
+                                if (clearCol==QMessageBox::Yes) {
+                                    m->model()->setColumnHeaderData(it.key(), QFRDRTable::ColumnExpressionRole, QVariant());
+                                }
+                            }
+                        }
                     }
                 }
             }

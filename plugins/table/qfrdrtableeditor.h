@@ -131,7 +131,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actIndexedStat;
 
         QAction* actSetColumnValues;
-        QAction* actCalculateColumn;
+        QAction* actCalcCell;
         QAction* actClearExpression;
         QAction* actRecalcAll;
         QAction* actSort;

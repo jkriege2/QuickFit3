@@ -330,20 +330,33 @@ void QFRDRTablePlotSettingsWidget::disconnectWidgets()
 
 
 void QFRDRTablePlotSettingsWidget::on_btnSaveSystem_clicked() {
-
+    if (!current) return;
     QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/table/graph_templates/");
     QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFRDRTablePlotSettingsWidget/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/table/graph_templates/").toString();
-    QString filename=qfGetSaveFileName(this, tr("save graph settings template ..."), dir, tr("graph settings template  (*.gst)"))    ;
+    QString filename=qfGetSaveFileName(this, tr("save plot settings template ..."), dir, tr("plot settings template  (*.gxt)"))    ;
     if (!filename.isEmpty()) {
         bool ok=true;
         if (QFile::exists(filename)) {
             ok=false;
-            if (QMessageBox::question(this, tr("save graph settings template ..."), tr("The file\n  '%1'\nalready exists. Overwrite?").arg(filename), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
+            if (QMessageBox::question(this, tr("save plot settings template ..."), tr("The file\n  '%1'\nalready exists. Overwrite?").arg(filename), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) {
                 ok=true;
             }
         }
         if (ok) {
-            QSettings set(filename, QSettings::IniFormat);
+            QFile f(filename);
+            if (f.open(QFile::WriteOnly)) {
+                QXmlStreamWriter stream(&f);
+                stream.setAutoFormatting(true);
+                stream.writeStartDocument();
+                stream.writeStartElement("graph_templates");
+                bool saveGraphs=QMessageBox::question(this, tr("save plot settings template ..."), tr("Should the graphs also be saved to the template?\n   [Yes]: Saves the graphs in this plot\n   [No]: Saves only the settings of the coordinate system").arg(filename), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes;
+                current->writePlotInfo(stream, current->getPlot(plot), saveGraphs);
+                stream.writeEndElement();
+                stream.writeEndDocument();
+                f.close();
+            }
+
+            /*QSettings set(filename, QSettings::IniFormat);
 
             ui->axisX->saveToSettings(set, "x");
             ui->axisY->saveToSettings(set, "y");
@@ -375,7 +388,7 @@ void QFRDRTablePlotSettingsWidget::on_btnSaveSystem_clicked() {
             set.setValue("keyBackgroundColor", QColor2String(ui->cmbKeyBackground->currentColor()));
             set.setValue("keyBoxColor", QColor2String(ui->cmbKeyBoxColor->currentColor()));
             set.setValue("keyBox", ui->chkKeyBox->isChecked());
-            set.setValue("keyBoxWidth", ui->spinKeyBoxWidth->value());
+            set.setValue("keyBoxWidth", ui->spinKeyBoxWidth->value());*/
 
         }
     }
@@ -395,42 +408,69 @@ void QFRDRTablePlotSettingsWidget::on_btnAutoscaleXY_clicked()
 void QFRDRTablePlotSettingsWidget::on_btnLoadSystem_clicked() {
     QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/table/graph_templates/");
     QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFRDRTablePlotSettingsWidget/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/table/graph_templates/").toString();
-    QString filename=qfGetOpenFileName(this, tr("open graph settings template ..."), dir, tr("graph settings template (*.gst)"))    ;
+    QString filename=qfGetOpenFileName(this, tr("open plot settings template ..."), dir, tr("plot settings template (*.gxt *.gst)"))    ;
     if (!filename.isEmpty()) {
-        QSettings set(filename, QSettings::IniFormat);
+        if (filename.toLower().endsWith(".gst")) {
+            QSettings set(filename, QSettings::IniFormat);
 
-        ui->axisX->loadFromSettings(set, "x");
-        ui->axisY->loadFromSettings(set, "y");
+            ui->axisX->loadFromSettings(set, "x");
+            ui->axisY->loadFromSettings(set, "y");
 
-        ui->chkPlotAutosize->setChecked(set.value("autosize",ui->chkPlotAutosize->isChecked()).toBool());
-        ui->spinWidth->setValue(set.value("plotwidth", ui->spinWidth->value()).toInt());
-        ui->spinHeight->setValue(set.value("plotheight", ui->spinHeight->value()).toInt());
+            ui->chkPlotAutosize->setChecked(set.value("autosize",ui->chkPlotAutosize->isChecked()).toBool());
+            ui->spinWidth->setValue(set.value("plotwidth", ui->spinWidth->value()).toInt());
+            ui->spinHeight->setValue(set.value("plotheight", ui->spinHeight->value()).toInt());
 
-        ui->edtTitle->setText(set.value("title", ui->edtTitle->text()).toString());
-        ui->chkGrid->setChecked(set.value("grid",ui->chkGrid->isChecked()).toBool());
-        ui->chkShowKey->setChecked(set.value("showkey",ui->chkShowKey->isChecked()).toBool());
-        ui->cmbFontname->setCurrentFont(QFont(set.value("fontname", ui->cmbFontname->currentFont().family()).toString()));
-        ui->spinAxisFontSize->setValue(set.value("axisfontsize", ui->spinAxisFontSize->value()).toDouble());
-        ui->spinAxisLabelFontSize->setValue(set.value("axislabelfontsize", ui->spinAxisLabelFontSize->value()).toDouble());
-        ui->spinKeyFontSize->setValue(set.value("keyfontsize", ui->spinKeyFontSize->value()).toDouble());
-        ui->spinTitleFontSize->setValue(set.value("titlefontsize", ui->spinTitleFontSize->value()).toDouble());
-        ui->sliderKeyTransparency->setValue(set.value("keytransparency", ui->sliderKeyTransparency->value()).toDouble());
-        ui->cmbKeyLayout->setCurrentIndex(set.value("keylayout", ui->cmbKeyLayout->currentIndex()).toInt());
-        ui->cmbKeyPosition->setCurrentIndex(set.value("keyposition", ui->cmbKeyPosition->currentIndex()).toInt());
-        ui->edtAxisAspect->setValue(set.value("axisaspect", ui->edtAxisAspect->value()).toDouble());
-        ui->edtDataAspect->setValue(set.value("dataaspect", ui->edtDataAspect->value()).toDouble());
-        ui->chkKeepAxisAspect->setChecked(set.value("keepaxisaspect", ui->chkKeepAxisAspect->isChecked()).toBool());
-        ui->chkKeepDataAspect->setChecked(set.value("keepdataaspect", ui->chkKeepDataAspect->isChecked()).toBool());
-        ui->cmbGridColor->setCurrentColor(QColor(set.value("gridColor", QColor2String(ui->cmbGridColor->currentColor())).toString()));
-        ui->cmbBackgroundColor->setCurrentColor(QColor(set.value("backgroundColor", QColor2String(ui->cmbBackgroundColor->currentColor())).toString()));
-        ui->cmbGridLinestyle->setCurrentLineStyle(String2QPenStyle(set.value("gridStyle", QPenStyle2String(ui->cmbGridLinestyle->currentLineStyle())).toString()));
-        ui->spinGridWidth->setValue(set.value("gridWidth", ui->spinGridWidth->value()).toDouble());
+            ui->edtTitle->setText(set.value("title", ui->edtTitle->text()).toString());
+            ui->chkGrid->setChecked(set.value("grid",ui->chkGrid->isChecked()).toBool());
+            ui->chkShowKey->setChecked(set.value("showkey",ui->chkShowKey->isChecked()).toBool());
+            ui->cmbFontname->setCurrentFont(QFont(set.value("fontname", ui->cmbFontname->currentFont().family()).toString()));
+            ui->spinAxisFontSize->setValue(set.value("axisfontsize", ui->spinAxisFontSize->value()).toDouble());
+            ui->spinAxisLabelFontSize->setValue(set.value("axislabelfontsize", ui->spinAxisLabelFontSize->value()).toDouble());
+            ui->spinKeyFontSize->setValue(set.value("keyfontsize", ui->spinKeyFontSize->value()).toDouble());
+            ui->spinTitleFontSize->setValue(set.value("titlefontsize", ui->spinTitleFontSize->value()).toDouble());
+            ui->sliderKeyTransparency->setValue(set.value("keytransparency", ui->sliderKeyTransparency->value()).toDouble());
+            ui->cmbKeyLayout->setCurrentIndex(set.value("keylayout", ui->cmbKeyLayout->currentIndex()).toInt());
+            ui->cmbKeyPosition->setCurrentIndex(set.value("keyposition", ui->cmbKeyPosition->currentIndex()).toInt());
+            ui->edtAxisAspect->setValue(set.value("axisaspect", ui->edtAxisAspect->value()).toDouble());
+            ui->edtDataAspect->setValue(set.value("dataaspect", ui->edtDataAspect->value()).toDouble());
+            ui->chkKeepAxisAspect->setChecked(set.value("keepaxisaspect", ui->chkKeepAxisAspect->isChecked()).toBool());
+            ui->chkKeepDataAspect->setChecked(set.value("keepdataaspect", ui->chkKeepDataAspect->isChecked()).toBool());
+            ui->cmbGridColor->setCurrentColor(QColor(set.value("gridColor", QColor2String(ui->cmbGridColor->currentColor())).toString()));
+            ui->cmbBackgroundColor->setCurrentColor(QColor(set.value("backgroundColor", QColor2String(ui->cmbBackgroundColor->currentColor())).toString()));
+            ui->cmbGridLinestyle->setCurrentLineStyle(String2QPenStyle(set.value("gridStyle", QPenStyle2String(ui->cmbGridLinestyle->currentLineStyle())).toString()));
+            ui->spinGridWidth->setValue(set.value("gridWidth", ui->spinGridWidth->value()).toDouble());
 
 
-        ui->chkKeyBox->setChecked(set.value("keyBox", ui->chkKeyBox->isChecked()).toBool());
-        ui->cmbKeyBoxColor->setCurrentColor(QColor(set.value("keyBoxColor", QColor2String(ui->cmbKeyBoxColor->currentColor())).toString()));
-        ui->cmbKeyBackground->setCurrentColor(QColor(set.value("keyBackgroundColor", QColor2String(ui->cmbKeyBackground->currentColor())).toString()));
-        ui->spinKeyBoxWidth->setValue(set.value("keyBoxWidth", ui->spinKeyBoxWidth->value()).toDouble());
+            ui->chkKeyBox->setChecked(set.value("keyBox", ui->chkKeyBox->isChecked()).toBool());
+            ui->cmbKeyBoxColor->setCurrentColor(QColor(set.value("keyBoxColor", QColor2String(ui->cmbKeyBoxColor->currentColor())).toString()));
+            ui->cmbKeyBackground->setCurrentColor(QColor(set.value("keyBackgroundColor", QColor2String(ui->cmbKeyBackground->currentColor())).toString()));
+            ui->spinKeyBoxWidth->setValue(set.value("keyBoxWidth", ui->spinKeyBoxWidth->value()).toDouble());
+            updateGraph();
+        } else {
+            QDomDocument doc("mydocument");
+             QFile file(filename);
+             if (!file.open(QIODevice::ReadOnly))
+                 return;
+             if (!doc.setContent(&file)) {
+                 file.close();
+                 return;
+             }
+             file.close();
+
+             // print out the element names of all elements that are direct children
+             // of the outermost element.
+             QDomElement docElem = doc.documentElement();
+             if (docElem.tagName().toLower()=="graph_templates") {
+                 QDomElement te=docElem.firstChildElement("plot");
+                 while(!te.isNull()) {
+                     QFRDRTable::PlotInfo pi=current->getPlot(plot);
+                     current->readPlotInfo(pi, te);
+                     current->setPlot(plot, pi);
+                     te = te.nextSiblingElement("plot");
+                 }
+             }
+             emit plotDataChanged();
+        }
 
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRTablePlotSettingsWidget/lasttemplatedir", dir);
