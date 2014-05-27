@@ -52,9 +52,10 @@
 
 		<li><a name="data"/><!-- func:data -->
 		<b><tt><!-- template -->data(row, column)<!-- /template --></tt> - <i>access a table cell (row, column)</i>:</b><br>
-		returns the value stored in table cell (row, column)
+		returns the value stored in table cell (row, column). If one of the arguments ia a vector of integers, the function returns the according vector of cell values.
 		<!-- /func:data -->
 		</li>
+
 		<li><a name="dataleft"/><!-- func:dataleft -->
 		<b><tt><!-- template -->dataleft(delta_column)<!-- /template --></tt> - <i>return the value of a cell, left of the current cell</i>:</b><br>
 		accesses the cell <tt>(row, column-delta_column)</tt>, where (row, columns) is the current cell. So if you want to calculate the sine of the column to the left of the current column, use the expression <tt>sin(dataleft(1))</tt>. Note that you do NOT need a -1 to access a cell on the left. Use negative numbers to access cells on the right!

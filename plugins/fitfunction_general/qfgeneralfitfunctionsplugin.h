@@ -41,7 +41,7 @@ class QFGeneralFitFunctionsPlugin : public QObject, public QFPluginFitFunction {
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("(c) 2013 by Jan W. Krieger");
+            return tr("(c) 2013-2014 by Jan W. Krieger");
         };
 
         /** \brief weblink for the plugin */
@@ -63,7 +63,7 @@ class QFGeneralFitFunctionsPlugin : public QObject, public QFPluginFitFunction {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         };
 
         /** \brief return list of plugin IDs */

@@ -11,6 +11,9 @@
 #include "qffitfunctiongeneralline.h"
 #include "qffitfunctiongeneralpolynom.h"
 #include "qffitfunctiongenerallognormal.h"
+#include "qffitfunctiongeneralmodhill5p.h"
+#include "qffitfunctiongeneralhill.h"
+
 
 
 QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
@@ -27,6 +30,8 @@ QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     res<<"gen_powerlaw";
     res<<"gen_line";
     res<<"gen_polynom";
+    res<<"gen_hill";
+    res<<"gen_modhill5p";
     return res;
 }
 
@@ -55,6 +60,10 @@ QFFitFunction* QFGeneralFitFunctionsPlugin::get(QString id, QObject* parent) con
         return new QFFitFunctionGeneralLine();
     } else if (id=="gen_polynom") {
         return new QFFitFunctionGeneralPolynom();
+    } else if (id=="gen_hill") {
+        return new QFFitFunctionGeneralHill();
+    } else if (id=="gen_modhill5p") {
+        return new QFFitFunctionGeneralModHill5P();
     }
     return NULL;
 }

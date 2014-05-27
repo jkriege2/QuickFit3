@@ -273,7 +273,7 @@ qfmpResult fQFRDRTableEditor_rowStr(const qfmpResult* params, unsigned int  n, Q
                     return res;
                 }
                 int r=floor(params[0].num-1);
-                if (r>=0 && r<d->model->columnCount()) {
+                if (r>=0 && r<d->model->rowCount()) {
                     QVariantList vl;
                     for (int i=0; i<d->model->columnCount(); i++) {
                         vl<<d->model->data(d->model->index(r, i), Qt::EditRole);
@@ -292,7 +292,7 @@ qfmpResult fQFRDRTableEditor_rowStr(const qfmpResult* params, unsigned int  n, Q
                 int r=floor(params[0].num-1);
                 QVector<int> cols=params[1].asIntVector();
                 for (int i=0; i<cols.size(); i++) cols[i]=cols[i]-1;
-                if (r>=0 && r<d->model->columnCount()) {
+                if (r>=0 && r<d->model->rowCount()) {
                     QStringList dat1;
                     for (int i=0; i<cols.size(); i++) {
                         if (cols[i]>=0 && cols[i]<d->model->columnCount()) {
@@ -322,7 +322,7 @@ qfmpResult fQFRDRTableEditor_rowBool(const qfmpResult* params, unsigned int  n, 
                     return res;
                 }
                 int r=floor(params[0].num-1);
-                if (r>=0 && r<d->model->columnCount()) {
+                if (r>=0 && r<d->model->rowCount()) {
                     QVariantList vl;
                     for (int i=0; i<d->model->columnCount(); i++) {
                         vl<<d->model->data(d->model->index(r, i), Qt::EditRole);
@@ -341,7 +341,7 @@ qfmpResult fQFRDRTableEditor_rowBool(const qfmpResult* params, unsigned int  n, 
                 int r=floor(params[0].num-1);
                 QVector<int> cols=params[1].asIntVector();
                 for (int i=0; i<cols.size(); i++) cols[i]=cols[i]-1;
-                if (r>=0 && r<d->model->columnCount()) {
+                if (r>=0 && r<d->model->rowCount()) {
                     QVector<bool> dat1;
                     for (int i=0; i<cols.size(); i++) {
                         if (cols[i]>=0 && cols[i]<d->model->columnCount()) {
@@ -370,7 +370,7 @@ qfmpResult fQFRDRTableEditor_row(const qfmpResult* params, unsigned int  n, QFMa
                     return res;
                 }
                 int r=floor(params[0].num-1);
-                if (r>=0 && r<d->model->columnCount()) {
+                if (r>=0 && r<d->model->rowCount()) {
                     QVariantList vl;
                     for (int i=0; i<d->model->columnCount(); i++) {
                         vl<<d->model->data(d->model->index(r, i), Qt::EditRole);
@@ -399,7 +399,7 @@ qfmpResult fQFRDRTableEditor_row(const qfmpResult* params, unsigned int  n, QFMa
                 int r=floor(params[0].num-1);
                 QVector<int> cols=params[1].asIntVector();
                 for (int i=0; i<cols.size(); i++) cols[i]=cols[i]-1;
-                if (r>=0 && r<d->model->columnCount()) {
+                if (r>=0 && r<d->model->rowCount()) {
                     QVector<double> dat1;
                     for (int i=0; i<cols.size(); i++) {
                         if (cols[i]>=0 && cols[i]<d->model->columnCount()) {
@@ -449,34 +449,96 @@ qfmpResult fQFRDRTableEditor_data(const qfmpResult* params, unsigned int  n, QFM
                 p->qfmpError("data(row, column) needs 2 argument");
                 return res;
             }
-            if ((params[0].type!=qfmpDouble)||(params[1].type!=qfmpDouble)) {
-                p->qfmpError("data(row, column) needs two integer arguments");
+            if ((!(params[0].type==qfmpDouble)&&(params[1].type==qfmpDouble)) && (!((params[0].type==qfmpDouble)&&params[1].convertsToIntVector())) && (!((params[1].type==qfmpDouble)&&params[0].convertsToIntVector()))) {
+                p->qfmpError("data(row, column) needs two integer/integer vector arguments");
                 return res;
             }
-            int r=floor(params[0].num-1);
-            int c=floor(params[1].num-1);
-            if (r>=0 && c>=0 && r<d->model->rowCount() && c<d->model->columnCount()) {
-                QVariant da= d->model->cell(r,c);
-                switch(da.type()) {
-                    case QVariant::LongLong :
-                    case QVariant::ULongLong :
-                    case QVariant::Int :
-                    case QVariant::UInt :
-                    case QVariant::Double: res.num=da.toDouble(); res.type=qfmpDouble; break;
-                    case QVariant::Date:
-                    case QVariant::DateTime: res.num=da.toDateTime().toMSecsSinceEpoch(); res.type=qfmpDouble; break;
-                    case QVariant::Time: res.num=QDateTime(QDate::currentDate(), da.toTime()).toMSecsSinceEpoch(); res.type=qfmpDouble; break;
-                    case QVariant::Bool: res.boolean=da.toBool(); res.type=qfmpBool; break;
-                    case QVariant::String:
-                        res.str=da.toString(); res.type=qfmpString; break;
-                    default:
-                        if (da.canConvert(QVariant::Double)) {
-                            res.num=da.toDouble(); res.type=qfmpDouble; break;
-                        } else {
+            if ((params[0].type==qfmpDouble)&&(params[1].type==qfmpDouble)) {
+                int r=floor(params[0].num-1);
+                int c=floor(params[1].num-1);
+                if (r>=0 && c>=0 && r<d->model->rowCount() && c<d->model->columnCount()) {
+                    QVariant da= d->model->cell(r,c);
+                    switch(da.type()) {
+                        case QVariant::LongLong :
+                        case QVariant::ULongLong :
+                        case QVariant::Int :
+                        case QVariant::UInt :
+                        case QVariant::Double: res.num=da.toDouble(); res.type=qfmpDouble; break;
+                        case QVariant::Date:
+                        case QVariant::DateTime: res.num=da.toDateTime().toMSecsSinceEpoch(); res.type=qfmpDouble; break;
+                        case QVariant::Time: res.num=QDateTime(QDate::currentDate(), da.toTime()).toMSecsSinceEpoch(); res.type=qfmpDouble; break;
+                        case QVariant::Bool: res.boolean=da.toBool(); res.type=qfmpBool; break;
+                        case QVariant::String:
                             res.str=da.toString(); res.type=qfmpString; break;
-                        }
-                        break;
+                        default:
+                            if (da.canConvert(QVariant::Double)) {
+                                res.num=da.toDouble(); res.type=qfmpDouble; break;
+                            } else {
+                                res.str=da.toString(); res.type=qfmpString; break;
+                            }
+                            break;
+                    }
                 }
+            } else if ((params[0].type==qfmpDouble)&&params[1].convertsToIntVector()) {
+                int r=params[0].toInteger()-1;
+                QVector<int> cols=params[1].asIntVector();
+                QVector<double> resv;
+                if (r>=0 && r<d->model->rowCount()) {
+                    for (int ci=0; ci<cols.size(); ci++) {
+                        int c=cols[ci]-1;
+                        if (c>=0 && c<d->model->columnCount()) {
+                            QVariant da= d->model->cell(r,c);
+                            switch(da.type()) {
+                                case QVariant::LongLong :
+                                case QVariant::ULongLong :
+                                case QVariant::Int :
+                                case QVariant::UInt :
+                                case QVariant::Double: resv.append(da.toDouble()); break;
+                                case QVariant::Date:
+                                case QVariant::DateTime: resv.append(da.toDateTime().toMSecsSinceEpoch()); break;
+                                case QVariant::Time: resv.append(QDateTime(QDate::currentDate(), da.toTime()).toMSecsSinceEpoch()); break;
+                                default:
+                                    if (da.canConvert(QVariant::Double)) {
+                                        resv.append(da.toDouble()); break;
+                                    } else {
+                                    }
+                                    break;
+                            }
+
+                        }
+                    }
+                }
+                res.setDoubleVec(resv);
+            } else if ((params[1].type==qfmpDouble)&&params[0].convertsToIntVector()) {
+                int c=params[1].toInteger()-1;
+                QVector<int> rows=params[0].asIntVector();
+                QVector<double> resv;
+                if (c>=0 && c<d->model->columnCount()) {
+                    for (int i=0; i<rows.size(); i++) {
+                        int r=rows[i]-1;
+                        if (r>=0 && r<d->model->rowCount()) {
+                            QVariant da= d->model->cell(r,c);
+                            switch(da.type()) {
+                                case QVariant::LongLong :
+                                case QVariant::ULongLong :
+                                case QVariant::Int :
+                                case QVariant::UInt :
+                                case QVariant::Double: resv.append(da.toDouble()); break;
+                                case QVariant::Date:
+                                case QVariant::DateTime: resv.append(da.toDateTime().toMSecsSinceEpoch()); break;
+                                case QVariant::Time: resv.append(QDateTime(QDate::currentDate(), da.toTime()).toMSecsSinceEpoch()); break;
+                                default:
+                                    if (da.canConvert(QVariant::Double)) {
+                                        resv.append(da.toDouble()); break;
+                                    } else {
+                                    }
+                                    break;
+                            }
+
+                        }
+                    }
+                }
+                res.setDoubleVec(resv);
             }
         }
     }

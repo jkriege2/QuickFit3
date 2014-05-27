@@ -39,8 +39,8 @@ void QFEDataXlsLibExport::save(const QList<QList<QVariant> > &data_in, const QSt
     xlslib_core::workbook wb;
     xlslib_core::worksheet* sh = wb.sheet("data");
 
-    int roffset=0;
-    int coffset=0;
+    int roffset=1;
+    int coffset=1;
 
 
     if (columnHeaders.size()>0) {

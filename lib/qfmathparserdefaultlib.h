@@ -128,7 +128,7 @@ namespace QFMathParser_DefaultLib {
     void fCountOccurences(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
 
-    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fMean, sum, qfstatisticsAverage)
+    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fMean, mean, qfstatisticsAverage)
 
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fSkewness, skewness, qfstatisticsSkewness)
     QFMATHPARSER_DEFINE_2PARAM1VEC_VECTONUM_FUNC(fCentralMoment, moment, qfstatisticsCentralMoment)
@@ -224,6 +224,7 @@ namespace QFMathParser_DefaultLib {
 
 
 
+    void fEvalFitFunc(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fRandVec(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
 
