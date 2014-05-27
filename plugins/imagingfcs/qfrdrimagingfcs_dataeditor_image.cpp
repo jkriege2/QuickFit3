@@ -44,20 +44,20 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     param1Default<<"fitparam_diff_alpha_b";
     param1Default<<"fitparam_diff_alpha_ab";
     param1Default<<"relative_ccf_acf0_g0_amplitude";
-    param1Default<<"relative_ccf_acf1_g0_amplitude";
+    param1Default<<"vflow";
 
     param2Default<<"fitparam_n_particle";
     param2Default<<"fitparam_concentration";
     param2Default<<"fitparam_concentration_a";
     param2Default<<"fitparam_concentration_b";
     param2Default<<"fitparam_concentration_ab";
-    param2Default<<"fitparam_1n_particle";
-    param2Default<<"fitparam_g0";
     param2Default<<"fitparam_diff_alpha_a";
     param2Default<<"fitparam_diff_alpha_b";
     param2Default<<"fitparam_diff_alpha_ab";
     param2Default<<"relative_ccf_acf1_g0_amplitude";
-    param2Default<<"relative_ccf_acf0_g0_amplitude";
+    param2Default<<"vflow_angle";
+    param2Default<<"fitparam_1n_particle";
+    param2Default<<"fitparam_g0";
 
 
     m_fitFunctions=QFPluginServices::getInstance()->getFitFunctionManager()->getModels("", this);
@@ -643,6 +643,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     gl->addRow(tr("ch.1: background:"), labBackground1=new QLabel(this));
     gl->addRow(tr("ch.2: signal:"), labCnt2=new QLabel(this));
     gl->addRow(tr("ch.2: background:"), labBackground2=new QLabel(this));
+    labCnt1->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    labBackground1->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    labCnt2->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    labBackground2->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
     chkFCCSUseBackground=new QCheckBox(tr("mind background signal"), this);
     chkFCCSUseBackground->setChecked(true);
@@ -3613,10 +3617,10 @@ void QFRDRImagingFCSImageEditor::replotData() {
         }
 
 
-        labCnt1->setText(tr("(%1+/-%2) kHz = (%3+/-%4) AU/&Delta;t<sub>frame</sub>").arg(cnt1/1000.0).arg(cnte1/1000.0).arg(cnt1*m->getFrameTime()).arg(cnte1*m->getFrameTime()));
-        labCnt2->setText(tr("(%1+/-%2) kHz = (%3+/-%4) AU/&Delta;t<sub>frame</sub>").arg(cnt2/1000.0).arg(cnte2/1000.0).arg(cnt2*m->getFrameTime()).arg(cnte2*m->getFrameTime()));
-        labBackground1->setText(tr("(%1+/-%2) kHz = (%3+/-%4) AU/&Delta;t<sub>frame</sub>").arg(back1/1000.0).arg(backe1/1000.0).arg(back1*m->getFrameTime()).arg(backe1*m->getFrameTime()));
-        labBackground2->setText(tr("(%1+/-%2) kHz = (%3+/-%4) AU/&Delta;t<sub>frame</sub>").arg(back2/1000.0).arg(backe2/1000.0).arg(back2*m->getFrameTime()).arg(backe2*m->getFrameTime()));
+        labCnt1->setText(tr("(%1+/-%2) kAU/s = (%3+/-%4) AU/&Delta;t<sub>frame</sub>").arg(cnt1/1000.0).arg(cnte1/1000.0).arg(cnt1*m->getFrameTime()).arg(cnte1*m->getFrameTime()));
+        labCnt2->setText(tr("(%1+/-%2) kAU/s = (%3+/-%4) AU/&Delta;t<sub>frame</sub>").arg(cnt2/1000.0).arg(cnte2/1000.0).arg(cnt2*m->getFrameTime()).arg(cnte2*m->getFrameTime()));
+        labBackground1->setText(tr("(%1+/-%2) kAU/s = (%3+/-%4) AU/&Delta;t<sub>frame</sub>").arg(back1/1000.0).arg(backe1/1000.0).arg(back1*m->getFrameTime()).arg(backe1*m->getFrameTime()));
+        labBackground2->setText(tr("(%1+/-%2) kAU/s = (%3+/-%4) AU/&Delta;t<sub>frame</sub>").arg(back2/1000.0).arg(backe2/1000.0).arg(back2*m->getFrameTime()).arg(backe2*m->getFrameTime()));
 
         if (m->isFCCS() && cmbSeletionCorrDisplayMode->currentIndex()==2 ) { // FCCS mode
             QVector<double> dataTauACF0, dataCorrACF0, dataCorrErrACF0;
