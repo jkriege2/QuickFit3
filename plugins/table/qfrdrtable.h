@@ -109,6 +109,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
                 case gtHorizontalRange: return QString("hrange");
                 case gtVerticalRange: return QString("vrange");
                 case gtParametrizedScatter: return QString("pscatter");
+                default: return QString("");
             }
             return QString("");
         }
@@ -133,9 +134,14 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
                 case gtHorizontalRange: return QIcon(":/table/icons/plot_hrange.png");
                 case gtVerticalRange: return QIcon(":/table/icons/plot_vrange.png");
                 case gtParametrizedScatter: return QIcon(":/table/icons/plot_pscatter.png");
+                default: return QIcon();
             }
             return QIcon();
         }
+
+
+
+
 
         static GraphType String2GraphType(QString type) {
             QString s=type.trimmed().toLower();
@@ -403,6 +409,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
 
 
+        virtual bool colgraphGetDoEmitSignals() const;
+        virtual void colgraphSetDoEmitSignals(bool doEmit);
 
         virtual void colgraphAddGraph(int plotid, int columnX, int columnY, ColumnGraphTypes type, const QString&  title);
         virtual void colgraphAddFunctionGraph(int plotid, const QString& expression, ColumnGraphTypes type, const QString&  title, int columnParam=-1);
@@ -535,6 +543,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         QFTablePluginModel* datamodel;
         QList<PlotInfo> plots;
         QList<QColor> autocolors;
+
+        bool emitColGraphChangedSignals;
 
     private:
 };

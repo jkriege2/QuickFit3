@@ -17,6 +17,7 @@ class QFRDRTableRegressionDialog : public QDialog
         
     public:
         explicit QFRDRTableRegressionDialog(QFRDRTable* table, int colX, int colY, int colW, QWidget *parent = 0, bool logX=false, bool logY=false, int resultColumn=-1, int addGraph=-1);
+        explicit QFRDRTableRegressionDialog(QFRDRTable* table, int plotid, int graphid, QWidget *parent = 0);
         ~QFRDRTableRegressionDialog();
 
     protected slots:
@@ -26,8 +27,10 @@ class QFRDRTableRegressionDialog : public QDialog
         void replotGraph();
         void showHelp();
         void methodChanged(int method);
+        void fillFitParams(int method);
     protected:
         void connectSignals(bool connectS=true);
+        void readDataFromTable();
     private:
         Ui::QFRDRTableRegressionDialog *ui;
         QFRDRTable* table;
@@ -40,6 +43,8 @@ class QFRDRTableRegressionDialog : public QDialog
         QString fitresult;
         int colX,  colY,  colW;
 
+        int overwriteGraph;
+        int overwritePlot;
 
         QFFitFunctionValueInputTable* parameterTable;
         QMap<QString, QFFitFunctionValueInputTableFitParamData> paramMap;
@@ -52,6 +57,13 @@ class QFRDRTableRegressionDialog : public QDialog
         bool getParamFix(const QString& param, bool defaultVal=false) const;
         double getParamMin(const QString& param, double defaultVal=-DBL_MAX) const;
         double getParamMax(const QString& param, double defaultVal=DBL_MAX) const;
+
+
+
+        void writeFitProperties(int pid, int gid, int saveToColumn);
+        void readFitProperties(int pid, int gid, int *resultColumn=NULL, int *addGraph=NULL);
+        void intInit(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph, bool propsAlreadySet=false);
 };
+
 
 #endif // QFRDRTableRegressionDialog_H

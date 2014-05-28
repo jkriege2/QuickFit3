@@ -30,7 +30,7 @@ QFTableGraphSettings::QFTableGraphSettings(QWidget *parent) :
 
     ui->setupUi(this);
 
-    ui->btnRefit->setVisible(false);
+    ui->btnRefit->setVisible(true);
 
     ui->tabFunctionParameters->setItemDelegate(new QFFitFunctionValueInputDelegate(ui->tabFunctionParameters));
     fitfuncValuesTable=new QFFitFunctionValueInputTable(this);
@@ -211,6 +211,7 @@ void QFTableGraphSettings::reloadColumns(QComboBox *combo)
 
 void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
 {
+    qDebug()<<"writeGraphData()";
     //qDebug()<<"QFTableGraphSettings::graphDataChanged    updating="<<updating;
     if (updating) return;
     if (current) {
@@ -352,11 +353,12 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
 
 void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
 {
+    qDebug()<<"loadGraphData()";
     updating=true;
     ui->edtGraphTitle->setText(graph.title);
 
     QString fit_type=graph.moreProperties.value("FIT_TYPE", "NONE").toString().toUpper().trimmed();
-    isFitResult=false; // ((fit_type=="LEAST_SQUARES")||(fit_type=="FIT"));
+    isFitResult=((fit_type=="LEAST_SQUARES")||(fit_type=="FIT")||(fit_type=="REGRESSION"));
 
     ui->cmbLinesXData->setCurrentIndex(graph.xcolumn+1);
     ui->cmbLinesXError->setCurrentIndex(graph.xerrorcolumn+1);

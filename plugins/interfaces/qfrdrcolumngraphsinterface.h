@@ -101,6 +101,8 @@ class QFRDRColumnGraphsInterface {
         };
 
 
+        virtual bool colgraphGetDoEmitSignals() const=0;
+        virtual void colgraphSetDoEmitSignals(bool doEmit)=0;
 
         /** \brief add a plot of  columnX against columnY to the given plot */
         virtual void colgraphAddGraph(int plot, int columnX, int columnY, ColumnGraphTypes type, const QString&  title)=0;

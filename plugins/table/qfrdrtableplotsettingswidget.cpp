@@ -469,7 +469,7 @@ void QFRDRTablePlotSettingsWidget::on_btnLoadSystem_clicked() {
                      te = te.nextSiblingElement("plot");
                  }
              }
-             emit plotDataChanged();
+             emit plotSettingsChanged();
         }
 
     }

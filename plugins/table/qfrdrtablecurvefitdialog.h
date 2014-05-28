@@ -46,6 +46,7 @@ class QFRDRTableCurveFitDialog : public QDialog
         QString fitresult;
         int colX,  colY,  colW;
         int overwriteGraph;
+        int overwritePlot;
 
 
         QFFitFunctionValueInputTable* parameterTable;

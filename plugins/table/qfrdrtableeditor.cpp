@@ -62,14 +62,16 @@ void QFRDRTableEditor::requestRefit(int plot, int graph)
 
             }
             delete dlg;
-            m->emitRebuildPlotWidgets();
-        }
-        //qDebug()<<"regression cX="<<xCol<<"  cY="<<yCol<<"  cW="<<sigmaCol<<"  plot="<<plot<<"  xlog="<<xlog<<"  ylog="<<ylog;
-        /*QFRDRTableRegressionDialog* dlg=new QFRDRTableRegressionDialog(m, xCol, yCol, sigmaCol, this, xlog, ylog, -1, plot);
-        if (dlg->exec()) {
+            m->colgraphSetDoEmitSignals(true);
+            //m->emitRebuildPlotWidgets();
+        } else if (type=="REGRESSION") {
+            QFRDRTableRegressionDialog* dlg=new QFRDRTableRegressionDialog(m, plot, graph, this);
+            if (dlg->exec()) {
 
+            }
+            delete dlg;
+            m->colgraphSetDoEmitSignals(true);
         }
-        delete dlg;*/
     }
 }
 
@@ -1097,7 +1099,7 @@ void QFRDRTableEditor::slClearExpression()
                         QString lexp=m->model()->getColumnHeaderData(it.key(), QFRDRTable::ColumnExpressionRole).toString();
                         if (!lexp.isEmpty()) {
                             if (it.value()>=m->model()->rowCount()) {
-                                if (clearCol=-1) {
+                                if (clearCol==-1) {
                                     clearCol= QMessageBox::question(this, tr("Clear Column Expressions"), tr("You selected a complete column. Do you want to remove the associated column expression?"), QMessageBox::Yes | QMessageBox::No);
                                 }
                                 if (clearCol==QMessageBox::Yes) {

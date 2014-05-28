@@ -8,160 +8,27 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int co
     QDialog(parent),
     ui(new Ui::QFRDRTableRegressionDialog)
 {
-    //qDebug()<<"QFRDRTableRegressionDialog colX="<<colX<<"  colY="<<colY<<"  colW="<<colW<<"  logX="<<logX<<"  logY="<<logY<<"  resultColumn="<<resultColumn<<"  addGraph="<<addGraph;
-    ui->setupUi(this);
-    this->table=table;
-    ui->chkLogX->setChecked(logX);
-    ui->chkLogY->setChecked(logY);
-
-
-    ui->cmbAddGraph->clear();
-    ui->cmbAddGraph->addItem(tr("--- no ---"));
-    ui->cmbAddGraph->addItem(tr("--- add new graph ---"));
-    for (int i=0; i<table->colgraphGetPlotCount(); i++) {
-        ui->cmbAddGraph->addItem(tr("add to: %1").arg(table->colgraphGetPlotTitle(i)));
-    }
-    ui->cmbSaveColumn->clear();
-    ui->cmbSaveColumn->addItem(tr("--- no ---"));
-    ui->cmbSaveColumn->addItem(tr("--- add new column ---"));
-    for (unsigned int i=0; i<table->colgraphGetPlotCount(); i++) {
-        ui->cmbSaveColumn->addItem(tr("add to column %1 [%2]").arg(i+1).arg(table->tableGetColumnTitle(i)));
-    }
-
-    ui->pltDistribution->getXAxis()->set_axisLabel(tr("x-data [%1: %2]").arg(colX+1).arg(table->tableGetColumnTitle(colX)));
-    ui->pltDistribution->getYAxis()->set_axisLabel(tr("y-data [%1: %2]").arg(colY+1).arg(table->tableGetColumnTitle(colY)));
-
-
-    if (addGraph<0) {
-        ui->cmbAddGraph->setCurrentIndex(0);
-    } else {
-        ui->cmbAddGraph->setCurrentIndex(addGraph+2);
-    }
-    if (resultColumn<0) {
-        ui->cmbSaveColumn->setCurrentIndex(1);
-    } else {
-        ui->cmbSaveColumn->setCurrentIndex(resultColumn+2);
-    }
-
-    dataX=table->tableGetColumnDataAsDouble(colX);
-    dataY=table->tableGetColumnDataAsDouble(colY);
-    //qDebug()<<"dataX.size="<<dataX.size();
-    //qDebug()<<"dataY.size="<<dataX.size();
-    datapoints=qMin(dataX.size(), dataY.size());
-    if (colW>=0) {
-        dataW=table->tableGetColumnDataAsDouble(colW);
-        //qDebug()<<"dataW.size="<<dataW.size();
-        if (dataW.size()>0 && dataW.size()<datapoints) datapoints=dataW.size();
-    } else {
-        dataW=QVector<double>(datapoints, 1);
-    }
-    if (dataX.size()>datapoints) dataX.remove(dataX.size()-(dataX.size()-datapoints), (dataX.size()-datapoints));
-    if (dataY.size()>datapoints) dataY.remove(dataY.size()-(dataY.size()-datapoints), (dataY.size()-datapoints));
-    if (dataW.size()>datapoints) dataW.remove(dataW.size()-(dataW.size()-datapoints), (dataW.size()-datapoints));
-
-    //qDebug()<<"datapoints="<<datapoints;
-    for (int i=datapoints-1; i>=0; i--) {
-        if (!QFFloatIsOK(dataX[i]) || !QFFloatIsOK(dataY[i]) || (dataW.size()==dataX.size() && !QFFloatIsOK(dataW[i]))) {
-            dataX.remove(i, 1);
-            dataY.remove(i, 1);
-            dataW.remove(i, 1);
-        }
-    }
-    datapoints=dataX.size();
-    weights.clear();
-    for (int i=0; i<dataW.size(); i++) weights<<1.0/qfSqr(dataW[i]);
-    //qDebug()<<"datapoints_after_clean="<<datapoints;
-
-    if (dataX.size()>0) {
-        double mi=qfstatisticsMin(dataX);
-        double ma=qfstatisticsMax(dataX);
-        ui->datacut->set_min(mi-(ma-mi)/2.0);
-        ui->datacut->set_max(ma+(ma-mi)/2.0);
-    }
-    ui->datacut->setLogScale(logX, 20);
-
-    paramMap["a"].value=0;
-    paramMap["a"].fix=false;
-    paramMap["b"].value=1;
-    paramMap["b"].fix=false;
-    paramMap["iterations"].value=100;
-    paramMap["irls_param"].value=1.1;
-    paramMap["R2"].value=0;
-    paramMap["R2"].editable=false;
-
-    ui->tabParams->setItemDelegate(new QFFitFunctionValueInputDelegate(ui->tabParams));
+    qDebug()<<"QFRDRTableRegressionDialog colX="<<colX<<"  colY="<<colY<<"  colW="<<colW<<"  logX="<<logX<<"  logY="<<logY<<"  resultColumn="<<resultColumn<<"  addGraph="<<addGraph;
     parameterTable=new QFFitFunctionValueInputTable(this);
+    ui->setupUi(this);
+    overwriteGraph=-1;
+    overwritePlot=-1;
+    intInit(table,  colX,  colY,  colW, parent,  logX,  logY,  resultColumn,  addGraph);
+}
 
-    ui->tabParams->setModel(parameterTable);
-
-    ui->cmbFitType->addItem(tr("linear regression"), 0);
-    if (dataW.size()==datapoints) ui->cmbFitType->addItem(tr("linear regression, weighted"), 1);
-    ui->cmbFitType->addItem(tr("linear regression, robust"), 2);
-    ui->cmbFitType->addItem(tr("power-law regression"), 3);
-    //if (dataW.size()==datapoints) ui->cmbFitType->addItem(tr("power-law regression, weighted"), 4);
-    ui->cmbFitType->addItem(tr("power-law regression, robust"), 4);
-
-    ui->cmbFitType->setCurrentIndex(0);
-
-
-
-
-
-
-    ui->pltResiduals->set_displayToolbar(false);
-    ui->pltResiduals->getXAxis()->set_axisLabel(tr("X"));
-    //ui->pltResiduals->getXAxis()->set_logAxis(true);
-    ui->pltResiduals->getYAxis()->set_axisLabel(tr("residuals"));
-    ui->pltDistribution->getXAxis()->set_axisLabel("");
-    ui->pltDistribution->getYAxis()->set_axisLabel(tr("Y"));
-    ui->pltDistribution->getXAxis()->set_drawMode1(JKQTPCADMticks);
-    ui->pltResiduals->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
-    ui->pltResiduals->get_plotter()->setBorder(1,1,1,1);
-    ui->pltDistribution->get_plotter()->setBorder(1,1,1,1);
-    ui->pltResiduals->synchronizeToMaster(ui->pltDistribution, true, false);
-    ui->pltDistribution->get_plotter()->set_useAntiAliasingForSystem(true);
-    ui->pltDistribution->get_plotter()->set_useAntiAliasingForGraphs(true);
-    ui->pltResiduals->get_plotter()->set_useAntiAliasingForSystem(true);
-    ui->pltResiduals->get_plotter()->set_useAntiAliasingForGraphs(true);
-    ui->pltResiduals->set_displayMousePosition(false);
-    ui->pltDistribution->set_displayMousePosition(false);
-    ui->pltDistribution->get_plotter()->set_keyFontSize(9);
-    ui->pltResiduals->get_plotter()->set_keyFontSize(9);
-    ui->pltResiduals->useExternalDatastore(ui->pltDistribution->getDatastore());
-    ui->pltResiduals->setMinimumHeight(75);
-    ui->pltResiduals->get_plotter()->set_showKey(false);
-    ui->pltDistribution->setMinimumHeight(75);
-    ui->pltDistribution->get_plotter()->setBorder(1,1,1,1);
-    ui->pltDistribution->get_plotter()->set_useAntiAliasingForSystem(true);
-    ui->pltDistribution->get_plotter()->set_useAntiAliasingForGraphs(true);
-    ui->pltDistribution->get_plotter()->set_keyFontSize(9);
-    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
-    QColor cb("white");
-    cb.setAlphaF(0.5);
-    ui->pltDistribution->get_plotter()->set_keyBackgroundColor(cb);
-    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
-
-    connect(ui->pltDistribution->get_plotter()->get_actZoomAll(), SIGNAL(triggered()), ui->pltResiduals, SLOT(zoomToFit()));
-    connect(ui->pltResiduals->get_plotter(), SIGNAL(zoomChangedLocally(double,double,double,double,JKQtBasePlotter*)), ui->pltDistribution, SLOT(pzoomChangedLocally(double,double,double,double,JKQtBasePlotter*)));
-    connect(ui->pltDistribution->get_plotter(), SIGNAL(zoomChangedLocally(double,double,double,double,JKQtBasePlotter*)), ui->pltResiduals, SLOT(pzoomChangedLocally(double,double,double,double,JKQtBasePlotter*)));
-
-
-
-
-    QSettings* set=ProgramOptions::getInstance()->getQSettings();
-    if (set) {
-        loadWidgetGeometry(*set, this, pos(), size(), "QFRDRTableRegressionDialog/windowsize");
-        ui->chkPlotErrors->setChecked(set->value("QFRDRTableRegressionDialog/ploterrors", ui->chkPlotErrors->isChecked()).toBool());
-        ui->chkWeightedResiduals->setChecked(set->value("QFRDRTableRegressionDialog/weightedresiduals", ui->chkWeightedResiduals->isChecked()).toBool());
-        ui->cmbFitType->setCurrentIndex(set->value("QFRDRTableRegressionDialog/method", ui->cmbFitType->currentIndex()).toInt());
-        loadSplitter(*set, ui->splitter, "QFRDRTableRegressionDialog/splitter/");
-    }
-
-
-
-    methodChanged(ui->cmbFitType->currentIndex());
-    connectSignals(true);
-    on_btnFit_clicked();
+QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int plotid, int graphid, QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::QFRDRTableRegressionDialog)
+{
+    parameterTable=new QFFitFunctionValueInputTable(this);
+    ui->setupUi(this);
+    int resultColumn=-1,  addGraph=-1;
+    this->table=table;
+    readFitProperties(plotid, graphid, &resultColumn, &addGraph);
+    overwriteGraph=graphid;
+    overwritePlot=plotid;
+    qDebug()<<"QFRDRTableRegressionDialog("<<plotid<<graphid<<"): "<<overwriteGraph<<colX<<colY;
+    intInit(table,  colX,  colY,  colW, parent,  ui->chkLogX->isChecked(),  ui->chkLogY->isChecked(),  resultColumn,  addGraph, true);
 }
 
 
@@ -185,6 +52,12 @@ void QFRDRTableRegressionDialog::saveResults()
     int method=ui->cmbFitType->itemData(ui->cmbFitType->currentIndex()).toInt();
     int saveCol=ui->cmbSaveColumn->currentIndex();
     int saveGraph=ui->cmbAddGraph->currentIndex();
+    QFRDRColumnGraphsInterface::ColumnGraphTypes graphType=QFRDRColumnGraphsInterface::cgtPolynomial;
+    if (method>=0 && method<=2) {
+        graphType=QFRDRColumnGraphsInterface::cgtPolynomial;
+    } else if (method>=3 && method<=4) {
+        graphType=QFRDRColumnGraphsInterface::cgtPowerLaw;
+    }
     if (lastResults.size()>0) {
         int savedTo=-1;
         if (saveCol==1) {
@@ -211,35 +84,29 @@ void QFRDRTableRegressionDialog::saveResults()
             table->colgraphAddPlot(tr("regression results"), ui->pltDistribution->getXAxis()->get_axisLabel(), ui->pltDistribution->getYAxis()->get_axisLabel(), ui->pltDistribution->getXAxis()->get_logAxis(), ui->pltDistribution->getYAxis()->get_logAxis());
             int g=table->colgraphGetPlotCount()-1;
             table->colgraphAddGraph(g, colX, colY, QFRDRColumnGraphsInterface::cgtPoints, tr("data"));
-            if (method>=0 && method<=2) {
-                if (savedTo>=0) {
-                    table->colgraphAddFunctionGraph(g, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, savedTo);
-                } else {
-                    table->colgraphAddFunctionGraph(g, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, lastResultD);
-                }
-            } else if (method>=3 && method<=4) {
-                if (savedTo>=0) {
-                    table->colgraphAddFunctionGraph(g, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, savedTo);
-                } else {
-                    table->colgraphAddFunctionGraph(g, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, lastResultD);
-                }
+            if (savedTo>=0) {
+                table->colgraphAddFunctionGraph(g, "",graphType, fitresult, savedTo);
+            } else {
+                table->colgraphAddFunctionGraph(g, "", graphType, fitresult, lastResultD);
             }
-            table->colgraphSetGraphTitle(g, table->colgraphGetGraphCount(g)-1,fitresult+", "+resultStat);
-        } else if (saveGraph>=2){
-            if (method>=0 && method<=2) {
+            table->colgraphSetGraphTitle(g, table->colgraphGetGraphCount(g)-1, fitresult+", "+resultStat);
+            writeFitProperties(g, table->colgraphGetGraphCount(g)-1, savedTo);
+        } else if (saveGraph>=2 && saveGraph<ui->cmbAddGraph->count()-1){
                 if (savedTo>=0) {
-                    table->colgraphAddFunctionGraph(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, savedTo);
+                    table->colgraphAddFunctionGraph(saveGraph-2, "", graphType, fitresult, savedTo);
                 } else {
-                    table->colgraphAddFunctionGraph(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPolynomial, fitresult, lastResultD);
+                    table->colgraphAddFunctionGraph(saveGraph-2, "", graphType, fitresult, lastResultD);
                 }
-            } else if (method>=3 && method<=4) {
-                if (savedTo>=0) {
-                    table->colgraphAddFunctionGraph(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, savedTo);
-                } else {
-                    table->colgraphAddFunctionGraph(saveGraph-2, "", QFRDRColumnGraphsInterface::cgtPowerLaw, fitresult, lastResultD);
-                }
-            }
             table->colgraphSetGraphTitle(saveGraph-2, table->colgraphGetGraphCount(saveGraph-2)-1, fitresult+", "+resultStat);
+            writeFitProperties(saveGraph-2, table->colgraphGetGraphCount(saveGraph-2)-1, savedTo);
+        } else if (saveGraph==ui->cmbAddGraph->count()-1) {
+            if (savedTo>=0) {
+                table->colgraphSetFunctionGraph(overwritePlot, overwriteGraph, "", graphType, fitresult, savedTo);
+            } else {
+                table->colgraphSetFunctionGraph(overwritePlot, overwriteGraph, "", graphType, fitresult, lastResultD);
+            }
+            table->colgraphSetGraphTitle(overwritePlot, overwriteGraph, fitresult+", "+resultStat);
+            writeFitProperties(overwritePlot, overwriteGraph, savedTo);
         }
     }
     accept();
@@ -566,6 +433,20 @@ void QFRDRTableRegressionDialog::methodChanged(int method)
     parameterTable->setEditErrors(false);
     parameterTable->setEditFix(true);
     parameterTable->setEditRanges(false);
+    fillFitParams(method);
+    if (method>=0 && method<=2) {
+        ui->labEquation->setText("f(x) = a + b\\cdot x");
+    } else if (method>=3 && method<=4) {
+        ui->labEquation->setText("f(x) = a \\cdot x^b");
+    } else {
+        ui->labEquation->setText("--- --- ---");
+    }
+    on_btnFit_clicked();
+    //replotGraph();
+}
+
+void QFRDRTableRegressionDialog::fillFitParams(int method)
+{
     parameterNames.clear();
     parameterLabels.clear();
     parameterNames<<"a";
@@ -578,19 +459,10 @@ void QFRDRTableRegressionDialog::methodChanged(int method)
         parameterNames<<"iterations";
         parameterLabels<<"IRLS iterations: ";
     }
-    if (method>=0 && method<=2) {
-        ui->labEquation->setText("f(x) = a + b\\cdot x");
-    } else if (method>=3 && method<=4) {
-        ui->labEquation->setText("f(x) = a \\cdot x^b");
-    } else {
-        ui->labEquation->setText("--- --- ---");
-    }
     parameterNames<<"R2";
     parameterLabels<<"R² = ";
     parameterTable->setWriteTo(&paramMap, parameterNames, parameterLabels);
     parameterTable->setDoRebuildModel(true);
-    on_btnFit_clicked();
-    //replotGraph();
 }
 
 void QFRDRTableRegressionDialog::connectSignals(bool connectS)
@@ -611,6 +483,46 @@ void QFRDRTableRegressionDialog::connectSignals(bool connectS)
         disconnect(ui->chkPlotErrors, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         disconnect(ui->chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         disconnect(ui->datacut, SIGNAL(slidersChanged(double,double,double,double)), this, SLOT(replotGraph()));
+    }
+}
+
+void QFRDRTableRegressionDialog::readDataFromTable()
+{
+
+    dataX=table->tableGetColumnDataAsDouble(colX);
+    dataY=table->tableGetColumnDataAsDouble(colY);
+    qDebug()<<colX<<"dataX.size="<<dataX.size();
+    qDebug()<<colX<<"dataY.size="<<dataX.size();
+    datapoints=qMin(dataX.size(), dataY.size());
+    if (colW>=0) {
+        dataW=table->tableGetColumnDataAsDouble(colW);
+        //qDebug()<<"dataW.size="<<dataW.size();
+        if (dataW.size()>0 && dataW.size()<datapoints) datapoints=dataW.size();
+    } else {
+        dataW=QVector<double>(datapoints, 1);
+    }
+    if (dataX.size()>datapoints) dataX.remove(dataX.size()-(dataX.size()-datapoints), (dataX.size()-datapoints));
+    if (dataY.size()>datapoints) dataY.remove(dataY.size()-(dataY.size()-datapoints), (dataY.size()-datapoints));
+    if (dataW.size()>datapoints) dataW.remove(dataW.size()-(dataW.size()-datapoints), (dataW.size()-datapoints));
+
+    //qDebug()<<"datapoints="<<datapoints;
+    for (int i=datapoints-1; i>=0; i--) {
+        if (!QFFloatIsOK(dataX[i]) || !QFFloatIsOK(dataY[i]) || (dataW.size()==dataX.size() && !QFFloatIsOK(dataW[i]))) {
+            dataX.remove(i, 1);
+            dataY.remove(i, 1);
+            dataW.remove(i, 1);
+        }
+    }
+    datapoints=dataX.size();
+    weights.clear();
+    for (int i=0; i<dataW.size(); i++) weights<<1.0/qfSqr(dataW[i]);
+    //qDebug()<<"datapoints_after_clean="<<datapoints;
+
+    if (dataX.size()>0) {
+        double mi=qfstatisticsMin(dataX);
+        double ma=qfstatisticsMax(dataX);
+        ui->datacut->set_min(mi-(ma-mi)/2.0);
+        ui->datacut->set_max(ma+(ma-mi)/2.0);
     }
 }
 
@@ -663,5 +575,214 @@ double QFRDRTableRegressionDialog::getParamMin(const QString &param, double defa
 double QFRDRTableRegressionDialog::getParamMax(const QString &param, double defaultVal) const
 {
     return paramMap.value(param, QFFitFunctionValueInputTableFitParamData(0,0,false,defaultVal)).max;
+}
+
+void QFRDRTableRegressionDialog::writeFitProperties(int pid, int gid, int saveToColumn)
+{
+    bool emits=table->colgraphGetDoEmitSignals();
+    table->colgraphSetDoEmitSignals(false);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_TYPE", "REGRESSION");
+    table->colgraphSetGraphProperty(pid, gid, "FIT_COLX", colX);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_COLY", colY);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_COLW", colW);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_METHOD", ui->cmbFitType->itemData(ui->cmbFitType->currentIndex()).toInt());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_CUTLOW", ui->datacut->get_userMin());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_CUTHIGH", ui->datacut->get_userMax());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_LOGX", ui->chkLogX->isChecked());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_LOGY", ui->chkLogY->isChecked());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_RESULTCOLUMN", ui->cmbSaveColumn->currentIndex());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_PLOT", pid);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_GRAPH", gid);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_SAVEDTOCOLUMN", saveToColumn);
+        QList<QVariant> fixparams, errparams;
+        for (int i=0; i<parameterNames.size(); i++) {
+            fixparams<<paramMap[parameterNames[i]].fix;
+            errparams<<paramMap[parameterNames[i]].error;
+        }
+        table->colgraphSetGraphProperty(pid, gid, "FIT_FIXEDPARAMS", fixparams);
+        table->colgraphSetGraphProperty(pid, gid, "FIT_ERRORPARAMS", errparams);
+
+    table->colgraphSetDoEmitSignals(emits);
+
+}
+
+void QFRDRTableRegressionDialog::readFitProperties(int pid, int gid, int *resultColumn, int *addGraph)
+{
+    colX=table->colgraphGetGraphProperty(pid, gid, "FIT_COLX", colX).toInt();
+    colY=table->colgraphGetGraphProperty(pid, gid, "FIT_COLY", colY).toInt();
+    colW=table->colgraphGetGraphProperty(pid, gid, "FIT_COLW", colW).toInt();
+    ui->cmbFitType->setCurrentIndex(ui->cmbFitType->findData(table->colgraphGetGraphProperty(pid, gid, "FIT_METHOD", ui->cmbFitType->itemData(ui->cmbFitType->currentIndex()).toInt()).toInt()));
+    ui->datacut->set_userMin(table->colgraphGetGraphProperty(pid, gid, "FIT_CUTLOW", ui->datacut->get_userMin()).toDouble());
+    ui->datacut->set_userMax(table->colgraphGetGraphProperty(pid, gid, "FIT_CUTHIGH", ui->datacut->get_userMax()).toDouble());
+    bool logX=false;
+    ui->chkLogX->setChecked(logX=table->colgraphGetGraphProperty(pid, gid, "FIT_LOGX", ui->chkLogX->isChecked()).toBool());
+    ui->chkLogY->setChecked(table->colgraphGetGraphProperty(pid, gid, "FIT_LOGY", ui->chkLogY->isChecked()).toBool());
+    ui->datacut->setLogScale(logX, 20);
+
+    int savedToColumn=table->colgraphGetGraphProperty(pid, gid, "FIT_SAVEDTOCOLUMN", -1).toInt();
+    QList<QVariant> fixparams=table->colgraphGetGraphProperty(pid, gid, "FIT_FIXEDPARAMS").toList();
+    QList<QVariant> errorparams=table->colgraphGetGraphProperty(pid, gid, "FIT_ERRORPARAMS").toList();
+
+    fillFitParams(ui->cmbFitType->itemData(ui->cmbFitType->currentIndex()).toInt());
+    if (savedToColumn>=0)  {
+        QList<QVariant> oldparams=table->tableGetColumnData(savedToColumn);
+        QList<QVariant> oldparams1;
+        if (savedToColumn+1<table->tableGetColumnCount()) oldparams1=table->tableGetColumnData(savedToColumn+1);
+        for (int i=0; i<parameterNames.size(); i++) {
+            paramMap[parameterNames[i]].value=oldparams.value(i, 0).toDouble();
+            paramMap[parameterNames[i]].error=oldparams1.value(i, 0).toDouble();
+            paramMap[parameterNames[i]].fix=fixparams.value(i, false).toBool();
+        }
+    } else {
+        if (pid>=0 && pid<table->getPlotCount()) {
+            const QFRDRTable::PlotInfo pi=table->getPlot(pid);
+            if (gid>=0 && gid<pi.graphs.size()) {
+                for (int i=0; i<parameterNames.size(); i++) {
+                    paramMap[parameterNames[i]].value=pi.graphs[gid].functionParameters.value(i, 0);
+                    paramMap[parameterNames[i]].error=errorparams.value(i, 0).toDouble();
+                    paramMap[parameterNames[i]].fix=fixparams.value(i, false).toBool();
+                }
+
+            }
+        }
+    }
+
+    if (addGraph) *addGraph=gid;
+    if (resultColumn) *resultColumn=savedToColumn;
+
+    readDataFromTable();
+}
+
+void QFRDRTableRegressionDialog::intInit(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph, bool propsAlreadySet)
+{
+    this->colX=colX;
+    this->colY=colY;
+    this->colW=colW;
+    this->table=table;
+    ui->chkLogX->setChecked(logX);
+    ui->chkLogY->setChecked(logY);
+
+
+    ui->cmbAddGraph->clear();
+    ui->cmbAddGraph->addItem(tr("--- no ---"));
+    ui->cmbAddGraph->addItem(tr("--- add new graph ---"));
+    for (int i=0; i<table->colgraphGetPlotCount(); i++) {
+        ui->cmbAddGraph->addItem(tr("add to: %1").arg(table->colgraphGetPlotTitle(i)));
+    }
+    ui->cmbAddGraph->addItem(tr("--- overwrite old graph ---"));
+    ui->cmbSaveColumn->clear();
+    ui->cmbSaveColumn->addItem(tr("--- no ---"));
+    ui->cmbSaveColumn->addItem(tr("--- add new column ---"));
+    for (unsigned int i=0; i<table->colgraphGetPlotCount(); i++) {
+        ui->cmbSaveColumn->addItem(tr("save to column %1 [%2]").arg(i+1).arg(table->tableGetColumnTitle(i)));
+    }
+
+    ui->pltDistribution->getXAxis()->set_axisLabel(tr("x-data [%1: %2]").arg(colX+1).arg(table->tableGetColumnTitle(colX)));
+    ui->pltDistribution->getYAxis()->set_axisLabel(tr("y-data [%1: %2]").arg(colY+1).arg(table->tableGetColumnTitle(colY)));
+
+
+    if (addGraph<0) {
+        ui->cmbAddGraph->setCurrentIndex(0);
+    } else {
+        ui->cmbAddGraph->setCurrentIndex(addGraph+2);
+    }
+    if (overwriteGraph>=0) {
+        ui->cmbAddGraph->setCurrentIndex(ui->cmbAddGraph->count()-1);
+        //qDebug()<<"cmbAddGraph: "<<ui->cmbAddGraph->currentIndex();
+    }
+
+    if (resultColumn<0) {
+        ui->cmbSaveColumn->setCurrentIndex(0);
+    } else {
+        ui->cmbSaveColumn->setCurrentIndex(resultColumn+2);
+    }
+
+    readDataFromTable();
+
+    ui->datacut->setLogScale(logX, 20);
+
+    paramMap["a"].value=0;
+    paramMap["a"].fix=false;
+    paramMap["b"].value=1;
+    paramMap["b"].fix=false;
+    paramMap["iterations"].value=100;
+    paramMap["irls_param"].value=1.1;
+    paramMap["R2"].value=0;
+    paramMap["R2"].editable=false;
+
+    ui->tabParams->setItemDelegate(new QFFitFunctionValueInputDelegate(ui->tabParams));
+
+    ui->tabParams->setModel(parameterTable);
+
+    ui->cmbFitType->addItem(tr("linear regression"), 0);
+    if (dataW.size()==datapoints) ui->cmbFitType->addItem(tr("linear regression, weighted"), 1);
+    ui->cmbFitType->addItem(tr("linear regression, robust"), 2);
+    ui->cmbFitType->addItem(tr("power-law regression"), 3);
+    //if (dataW.size()==datapoints) ui->cmbFitType->addItem(tr("power-law regression, weighted"), 4);
+    ui->cmbFitType->addItem(tr("power-law regression, robust"), 4);
+
+    if (!propsAlreadySet) {
+        ui->cmbFitType->setCurrentIndex(0);
+    }
+
+
+
+
+
+
+    ui->pltResiduals->set_displayToolbar(false);
+    ui->pltResiduals->getXAxis()->set_axisLabel(tr("X"));
+    //ui->pltResiduals->getXAxis()->set_logAxis(true);
+    ui->pltResiduals->getYAxis()->set_axisLabel(tr("residuals"));
+    ui->pltDistribution->getXAxis()->set_axisLabel("");
+    ui->pltDistribution->getYAxis()->set_axisLabel(tr("Y"));
+    ui->pltDistribution->getXAxis()->set_drawMode1(JKQTPCADMticks);
+    ui->pltResiduals->getXAxis()->set_drawMode1(JKQTPCADMcomplete);
+    ui->pltResiduals->get_plotter()->setBorder(1,1,1,1);
+    ui->pltDistribution->get_plotter()->setBorder(1,1,1,1);
+    ui->pltResiduals->synchronizeToMaster(ui->pltDistribution, true, false);
+    ui->pltDistribution->get_plotter()->set_useAntiAliasingForSystem(true);
+    ui->pltDistribution->get_plotter()->set_useAntiAliasingForGraphs(true);
+    ui->pltResiduals->get_plotter()->set_useAntiAliasingForSystem(true);
+    ui->pltResiduals->get_plotter()->set_useAntiAliasingForGraphs(true);
+    ui->pltResiduals->set_displayMousePosition(false);
+    ui->pltDistribution->set_displayMousePosition(false);
+    ui->pltDistribution->get_plotter()->set_keyFontSize(9);
+    ui->pltResiduals->get_plotter()->set_keyFontSize(9);
+    ui->pltResiduals->useExternalDatastore(ui->pltDistribution->getDatastore());
+    ui->pltResiduals->setMinimumHeight(75);
+    ui->pltResiduals->get_plotter()->set_showKey(false);
+    ui->pltDistribution->setMinimumHeight(75);
+    ui->pltDistribution->get_plotter()->setBorder(1,1,1,1);
+    ui->pltDistribution->get_plotter()->set_useAntiAliasingForSystem(true);
+    ui->pltDistribution->get_plotter()->set_useAntiAliasingForGraphs(true);
+    ui->pltDistribution->get_plotter()->set_keyFontSize(9);
+    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
+    QColor cb("white");
+    cb.setAlphaF(0.5);
+    ui->pltDistribution->get_plotter()->set_keyBackgroundColor(cb);
+    ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
+
+    connect(ui->pltDistribution->get_plotter()->get_actZoomAll(), SIGNAL(triggered()), ui->pltResiduals, SLOT(zoomToFit()));
+    connect(ui->pltResiduals->get_plotter(), SIGNAL(zoomChangedLocally(double,double,double,double,JKQtBasePlotter*)), ui->pltDistribution, SLOT(pzoomChangedLocally(double,double,double,double,JKQtBasePlotter*)));
+    connect(ui->pltDistribution->get_plotter(), SIGNAL(zoomChangedLocally(double,double,double,double,JKQtBasePlotter*)), ui->pltResiduals, SLOT(pzoomChangedLocally(double,double,double,double,JKQtBasePlotter*)));
+
+
+
+
+    QSettings* set=ProgramOptions::getInstance()->getQSettings();
+    if (set && !propsAlreadySet) {
+        loadWidgetGeometry(*set, this, pos(), size(), "QFRDRTableRegressionDialog/windowsize");
+        ui->chkPlotErrors->setChecked(set->value("QFRDRTableRegressionDialog/ploterrors", ui->chkPlotErrors->isChecked()).toBool());
+        ui->chkWeightedResiduals->setChecked(set->value("QFRDRTableRegressionDialog/weightedresiduals", ui->chkWeightedResiduals->isChecked()).toBool());
+        ui->cmbFitType->setCurrentIndex(set->value("QFRDRTableRegressionDialog/method", ui->cmbFitType->currentIndex()).toInt());
+        loadSplitter(*set, ui->splitter, "QFRDRTableRegressionDialog/splitter/");
+    }
+
+
+
+    methodChanged(ui->cmbFitType->currentIndex());
+    connectSignals(true);
+    on_btnFit_clicked();
 }
 

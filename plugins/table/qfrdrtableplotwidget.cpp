@@ -44,6 +44,7 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     connect(ui->widGraphSettings, SIGNAL(performRefit(int)), this, SLOT(doRefit(int)));
     connect(ui->widGraphSettings, SIGNAL(performFit(int,int,int,int,QString)), this, SLOT(doFit(int,int,int,int,QString)));
     connect(ui->widGraphSettings, SIGNAL(performRegression(int,int,int,int)), this, SLOT(doRegression(int,int,int,int)));
+    connect(ui->widSystemSettings, SIGNAL(plotSettingsChanged()), this, SLOT(updateGraph()));
 
     //ui->formLayout_3->removeWidget(ui->widSaveCoordSettings);
     //ui->tabWidget->setCornerWidget(ui->widSaveCoordSettings);

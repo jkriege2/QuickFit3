@@ -39,6 +39,7 @@ void QFFitAlgorithmComboBox::updateFitAlgorithms()
         else addItem(QIcon(":/lib/fitalg_icon.png"), a->name() , m_ids[i]);
         delete a;
     }
+    model()->sort(0);
     setUpdatesEnabled(upd);
 
 }

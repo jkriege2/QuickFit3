@@ -60,7 +60,7 @@ QFSimpleCurveFitDialog::QFSimpleCurveFitDialog(const QVector<double>& dataXin, c
 
 
 
-    ui->cmbFitAlgorithm->setCurrentIndex(0);
+    ui->cmbFitAlgorithm->setCurrentAlgorithm("fit_lmfit");
     ui->cmbFitFunction->setCurrentIndex(0);
 
 

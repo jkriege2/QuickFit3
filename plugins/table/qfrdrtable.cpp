@@ -186,6 +186,7 @@ QFRDRTable::PlotInfo::PlotInfo()
 QFRDRTable::QFRDRTable(QFProject* parent/*, QString name, QString inputFile*/):
     QFRawDataRecord(parent)//, name, QStringList(inputFile))
 {
+    emitColGraphChangedSignals=true;
     datamodel=NULL;
     autocolors.append(QColor("red"));
     autocolors.append(QColor("green"));
@@ -282,6 +283,17 @@ QVector<double> QFRDRTable::tableGetColumnDataAsDouble(quint16 column)
         return datamodel->getColumnDataAsNumbers(column);
     }
     return QVector<double>();
+}
+
+bool QFRDRTable::colgraphGetDoEmitSignals() const
+{
+    return emitColGraphChangedSignals;
+}
+
+void QFRDRTable::colgraphSetDoEmitSignals(bool doEmit)
+{
+    emitColGraphChangedSignals=doEmit;
+    if (doEmit) emitRebuildPlotWidgets();
 }
 
 
@@ -467,6 +479,9 @@ void QFRDRTable::colgraphToolsSetGraphtype(QFRDRTable::GraphInfo &g, QFRDRColumn
             break;
         case QFRDRColumnGraphsInterface::cgtHorizontalRange:
             g.type=gtHorizontalRange;
+            break;
+        case QFRDRColumnGraphsInterface::cgtVerticalRange:
+            g.type=gtVerticalRange;
             break;
         case QFRDRColumnGraphsInterface::cgtImage:
             g.type=gtImage;
@@ -1248,7 +1263,7 @@ QVariant QFRDRTable::evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode
 
 void QFRDRTable::emitRebuildPlotWidgets()
 {
-    if (!emittedRebuildPlotWidgets) emit rebuildPlotWidgets();
+    if (!emittedRebuildPlotWidgets && emitColGraphChangedSignals) emit rebuildPlotWidgets();
     //emittedRebuildPlotWidgets=true;
 }
 
@@ -1632,7 +1647,7 @@ void QFRDRTable::readPlotInfo(PlotInfo& plot, QDomElement te) {
     plot.keyPosition=String2JKQTPkeyPosition(te.attribute("keyposition", "inside_right"));
     plot.keyLayout=String2JKQTPkeyLayout(te.attribute("keylayout", "one_column"));
     plot.keyBoxLineWidth=CQStringToDouble(te.attribute("keyboxlinewidth", "1"));
-    plot.keyBox=QStringToBool( te.attribute("keybox"));
+    plot.keyBox=QStringToBool( te.attribute("keybox", "true"));
     plot.keyBackgroundColor=QStringToQColor(te.attribute("keybackgroundcolor", "white"));
     plot.keyLineColor=QStringToQColor(te.attribute("keyboxcolor", "black"));
 

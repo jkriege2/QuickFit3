@@ -10,7 +10,7 @@ QFFitFunctionGeneralDblExp::QFFitFunctionGeneralDblExp() {
     #define PARAM_OFFSET 0
     addParameter(FloatNumber,  "amplitude",                    "amplitude",                                                  "A<sub>1</sub>",                     "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
     #define PARAM_AMPLITUDE 1
-    addParameter(FloatNumber,  "position",                    "position",                                           "X<sub>0</sub>",                  "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       true, 0.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    addParameter(FloatNumber,  "position",                    "position",                                           "X<sub>0</sub>",                  "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 0.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
     #define PARAM_POSITION 2
     addParameter(FloatNumber,  "lifetime",                    "lifetime",                                           "&tau;<sub>1</sub>",                          "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1.0,          0, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
     #define PARAM_LIFETIME 3
