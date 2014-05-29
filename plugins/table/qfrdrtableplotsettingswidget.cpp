@@ -73,7 +73,9 @@ void QFRDRTablePlotSettingsWidget::setRecord(QFRDRTable *record, int graph)
             ui->spinWidth->setValue(g.graphWidth);
             ui->spinHeight->setValue(g.graphHeight);
 
+            ui->axisX->setRecord(record, graph);
             ui->axisX->loadPlotData(g.xAxis);
+            ui->axisY->setRecord(record, graph);
             ui->axisY->loadPlotData(g.yAxis);
 
             ui->chkGrid->setChecked(g.grid);

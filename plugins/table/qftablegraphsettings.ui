@@ -250,7 +250,16 @@
    <item row="3" column="1">
     <widget class="QWidget" name="widFunction" native="true">
      <layout class="QGridLayout" name="gridLayout_2">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <property name="spacing">
@@ -322,7 +331,16 @@
       <bool>false</bool>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_18">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -394,7 +412,16 @@
    <item row="18" column="1">
     <widget class="QWidget" name="widColor" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="1,0,0,0">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -503,7 +530,16 @@
    <item row="19" column="1">
     <widget class="QWidget" name="widLineStyle" native="true">
      <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0,0,0,0,0">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item row="0" column="0" colspan="2">
@@ -596,7 +632,16 @@
    <item row="20" column="1">
     <widget class="QWidget" name="widFillColor" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="0,0,0,0,0,0">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -720,7 +765,16 @@
    <item row="21" column="1">
     <widget class="QWidget" name="widSymbol" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_22" stretch="1,0,0">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -790,7 +844,16 @@
       <property name="spacing">
        <number>3</number>
       </property>
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -1002,7 +1065,16 @@
    <item row="25" column="1">
     <widget class="QWidget" name="widImage" native="true">
      <layout class="QGridLayout" name="gridLayout_5" rowminimumheight="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <property name="spacing">
@@ -1093,7 +1165,16 @@
       <item row="5" column="3" colspan="3">
        <widget class="QWidget" name="widFalseTransparency" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_19">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
@@ -1160,7 +1241,16 @@
       <item row="4" column="3" colspan="3">
        <widget class="QWidget" name="widTrueTransparency" native="true">
         <layout class="QHBoxLayout" name="horizontalLayout_20">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
@@ -1745,13 +1835,13 @@
         <string>&amp;Fit</string>
        </property>
        <property name="popupMode">
-        <enum>QToolButton::MenuButtonPopup</enum>
+        <enum>QToolButton::InstantPopup</enum>
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextBesideIcon</enum>
        </property>
        <property name="arrowType">
-        <enum>Qt::NoArrow</enum>
+        <enum>Qt::DownArrow</enum>
        </property>
       </widget>
      </item>
@@ -1859,7 +1949,16 @@
    <item row="22" column="1">
     <widget class="QWidget" name="widWidth" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -1980,7 +2079,16 @@
    <item row="17" column="1">
     <widget class="QWidget" name="widRangeData" native="true">
      <layout class="QGridLayout" name="gridLayout">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item row="0" column="0">
@@ -2056,7 +2164,16 @@
    <item row="26" column="1">
     <widget class="QWidget" name="widRangeStyle" native="true">
      <layout class="QGridLayout" name="gridLayout_3">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item row="1" column="1">
@@ -2211,7 +2328,7 @@
    <item row="5" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
-      <widget class="QComboBox" name="cmbLinesXData">
+      <widget class="QFEnhancedComboBox" name="cmbLinesXData">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -2256,7 +2373,7 @@
    <item row="8" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_6">
      <item>
-      <widget class="QComboBox" name="cmbLinesYData">
+      <widget class="QFEnhancedComboBox" name="cmbLinesYData">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -2317,7 +2434,7 @@
    <item row="6" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_7">
      <item>
-      <widget class="QComboBox" name="cmbLinesXError">
+      <widget class="QFEnhancedComboBox" name="cmbLinesXError">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -2364,7 +2481,7 @@
    <item row="9" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_8">
      <item>
-      <widget class="QComboBox" name="cmbLinesYError">
+      <widget class="QFEnhancedComboBox" name="cmbLinesYError">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -2411,7 +2528,7 @@
    <item row="10" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_11">
      <item>
-      <widget class="QComboBox" name="cmbLinesMean">
+      <widget class="QFEnhancedComboBox" name="cmbLinesMean">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -2474,7 +2591,7 @@
    <item row="11" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_9">
      <item>
-      <widget class="QComboBox" name="cmbLinesQ75">
+      <widget class="QFEnhancedComboBox" name="cmbLinesQ75">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -2505,7 +2622,7 @@
    <item row="12" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_10">
      <item>
-      <widget class="QComboBox" name="cmbLinesMax">
+      <widget class="QFEnhancedComboBox" name="cmbLinesMax">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -2568,11 +2685,20 @@
       <bool>false</bool>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="1,0,1">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
-       <widget class="QComboBox" name="cmbSelectDataColumn">
+       <widget class="QFEnhancedComboBox" name="cmbSelectDataColumn">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -2646,6 +2772,11 @@
    </slots>
   </customwidget>
   <customwidget>
+   <class>JKQTPCAlabelTypeComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
    <class>LineStyleComboBox</class>
    <extends>QComboBox</extends>
    <header>linestylecombobox.h</header>
@@ -2681,23 +2812,23 @@
    <header>fillstylecombobox.h</header>
   </customwidget>
   <customwidget>
-   <class>JKQTPCAlabelTypeComboBox</class>
-   <extends>QComboBox</extends>
-   <header>jkqtptools.h</header>
-  </customwidget>
-  <customwidget>
    <class>QEnhancedTableView</class>
    <extends>QTableView</extends>
    <header>qenhancedtableview.h</header>
   </customwidget>
+  <customwidget>
+   <class>QFEnhancedComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qfenhancedcombobox.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>

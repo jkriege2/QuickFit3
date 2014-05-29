@@ -11,15 +11,17 @@
 #include "qffitfunctiongeneralcosine.h"
 #include "qffitfunctiongeneralline.h"
 #include "qffitfunctiongeneralpolynom.h"
+#include "qffitfunctiongeneralpolynomcentered.h"
 #include "qffitfunctiongenerallognormal.h"
 #include "qffitfunctiongeneralmodhill5p.h"
 #include "qffitfunctiongeneralhill.h"
-
+#include "qffitfunctiongeneralgaussiandistvar.h"
 
 
 QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     QStringList res;
     res<<"gen_gaussian_sqrte";
+    res<<"gen_gaussiandist_sqrte";
     res<<"gen_2gaussian_sqrte";
     res<<"gen_3gaussian_sqrte";
     res<<"gen_lorentzian";
@@ -32,6 +34,7 @@ QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     res<<"gen_powerlaw";
     res<<"gen_line";
     res<<"gen_polynom";
+    res<<"gen_polynomcenter";
     res<<"gen_hill";
     res<<"gen_modhill5p";
     return res;
@@ -42,6 +45,8 @@ QFFitFunction* QFGeneralFitFunctionsPlugin::get(QString id, QObject* parent) con
         return new QFFitFunctionGeneralSigmoid();
     } else if (id=="gen_gaussian_sqrte") {
         return new QFFitFunctionGeneralGaussianVar();
+    } else if (id=="gen_gaussiandist_sqrte") {
+        return new QFFitFunctionGeneralGaussianDistVar();
     } else if (id=="gen_2gaussian_sqrte") {
         return new QFFitFunctionGeneral2GaussianVar();
     } else if (id=="gen_3gaussian_sqrte") {
@@ -64,6 +69,8 @@ QFFitFunction* QFGeneralFitFunctionsPlugin::get(QString id, QObject* parent) con
         return new QFFitFunctionGeneralLine();
     } else if (id=="gen_polynom") {
         return new QFFitFunctionGeneralPolynom();
+    } else if (id=="gen_polynomcenter") {
+        return new QFFitFunctionGeneralPolynomCentered();
     } else if (id=="gen_hill") {
         return new QFFitFunctionGeneralHill();
     } else if (id=="gen_modhill5p") {

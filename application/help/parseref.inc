@@ -10,6 +10,7 @@
 <li><b><a href="$$mainhelpdir$$/parserreference/string.html">string functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/vector.html">vector manipulation functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/statistics.html">statistics functions</a></b></li>
+<li><b><a href="$$mainhelpdir$$/parserreference/intdiff.html">integration/differentiation</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/unit.html">unit conversion functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/constants.html">common math/physics constants</a></b></li>
 <!--<li><b><a href="./parserreference/.html"></a></b></li>-->

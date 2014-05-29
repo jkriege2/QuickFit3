@@ -37,9 +37,9 @@
     \endverbatim
 
     data is internally stored as a 2D array of QVariant objects. The 2D array is implemented as follows:
-     - The row and column number are given as quint16, i.e. as 16-bit unsigned integers
-     - row and columns are combined to a quint32 by calculating: (row<<16) | column
-     - This quint32 is used as a QHash index. If a cell is empty either an invalid QVariant is stored, or
+     - The row and column number are given as quint32, i.e. as 16-bit unsigned integers
+     - row and columns are combined to a quint64 by calculating: (row<<16) | column
+     - This quint64 is used as a QHash index. If a cell is empty either an invalid QVariant is stored, or
        the QHash simply does not contain a QVariant for this cell.
      - row and column count are stored externally.
      - data is stored in a QFTableModel object which is also externally accessible for data access.
@@ -126,21 +126,21 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         Q_OBJECT
     protected:
         /** \brief converts a (row, column) adress into a QHash index: (row<<16) | column */
-        inline quint32 xyAdressToUInt32(quint16 row, quint16 column) const {
-            quint32 r=row;
-            quint32 c=column;
-            return c| (r<<16);
+        inline quint64 xyAdressToUInt64(quint32 row, quint32 column) const {
+            quint64 r=row;
+            quint64 c=column;
+            return c| (r<<32);
         }
 
         /** \brief extracts the row from a UInt32 adress */
-        inline quint16 UInt32ToRow(quint32 a) const {
-            quint32 as=a>>16;
-            return as & 0xFFFF;
+        inline quint32 UInt64ToRow(quint64 a) const {
+            quint64 as=a>>32;
+            return as & 0xFFFFFFFF;
         }
 
         /** \brief extracts the column from a UInt32 adress */
-        inline quint16 UInt32ToColumn(quint32 a) const  {
-            return a & 0xFFFF;
+        inline quint32 UInt64ToColumn(quint64 a) const  {
+            return a & 0xFFFFFFFF;
         }
 
         bool doEmitSignals;
@@ -149,21 +149,21 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
 
         struct TableState {
                 /** \brief the number of rows */
-                quint16 rows;
+                quint32 rows;
                 /** \brief the number of columns */
-                quint16 columns;
+                quint32 columns;
                 /** \brief this map is used to store tha data */
-                QHash<quint32, QVariant> dataMap;
+                QHash<quint64, QVariant> dataMap;
                 /** \brief this map is used to store tha data for the edit role (if this does not contain an entry, the data from dataMap is returned ... writing always occurs in dataMap except with setCellEditRole() ) */
-                QHash<quint32, QVariant> dataEditMap;
+                QHash<quint64, QVariant> dataEditMap;
                 /** \brief this map is used to store tha data for the background role (if this does not contain an entry, the data from dataMap is returned ... writing always occurs in dataMap except with setCellEditRole() ) */
-                QHash<quint32, QVariant> dataBackgroundMap;
+                QHash<quint64, QVariant> dataBackgroundMap;
                 /** \brief this map is used to store tha data for the background role (if this does not contain an entry, the data from dataMap is returned ... writing always occurs in dataMap except with setCellEditRole() ) */
-                QHash<quint32, QVariant> dataCheckedMap;
+                QHash<quint64, QVariant> dataCheckedMap;
                 /** \brief this map is used to store additional data for roles >=Qt::UserRole */
-                QHash<quint32, QHash<int, QVariant> > moreDataMap;
+                QHash<quint64, QHash<int, QVariant> > moreDataMap;
 
-                QHash<quint32, QHash<int, QVariant> > headerDataMap;
+                QHash<quint64, QHash<int, QVariant> > headerDataMap;
 
                 /** \brief string list that contains the column names */
                 QStringList columnNames;
@@ -227,69 +227,71 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         QVector<double> getColumnDataAsNumbers(int column, int role = Qt::DisplayRole) const;
 
         /** \brief swap the contents of two cells */
-        void swapCells(quint16 row1, quint16 column1, quint16 row2, quint16 column2);
+        void swapCells(quint32 row1, quint32 column1, quint32 row2, quint32 column2);
 
         /** \brief resize the internal table (cells that are out of range will be deleted) */
-        void resize(quint16 rows, quint16 columns);
+        void resize(quint32 rows, quint32 columns);
         /** \brief change datatype in cell
          *
          * The type conversion is done in any case. If the current value may not be converted, the cell
          * is set with a default value for the new datatype and \c false is returned, otherweise \c true.
          */
-        bool changeDatatype(quint16 row, quint16 column, QVariant::Type newType);
+        bool changeDatatype(quint32 row, quint32 column, QVariant::Type newType);
         /** \brief set the given cell to the supplied value */
-        void setCell(quint16 row, quint16 column, QVariant value);
+        void setCell(quint32 row, quint32 column, QVariant value);
         /** \brief sets a whole column */
-        void setColumn(quint16 column, const QList<QVariant> &value);
+        void setColumn(quint32 column, const QList<QVariant> &value);
         /** \brief sets a whole column */
-        void setColumn(quint16 column, const QVector<double> &value);
+        void setColumn(quint32 column, const QVector<double> &value);
         /** \brief sets a whole column */
-        void setColumn(quint16 column, const double* value, int N);
+        void setColumn(quint32 column, const double* value, int N);
         /** \brief sets a whole column */
-        void setColumnCreate(quint16 column, const QList<QVariant> &value);
+        void setColumnCreate(quint32 column, const QList<QVariant> &value);
         /** \brief sets a whole column */
-        void setColumnCreate(quint16 column, const QVector<double> &value);
+        void setColumnCreate(quint32 column, const QVector<double> &value);
         /** \brief sets a whole column */
-        void setColumnCreate(quint16 column, const double* value, int N);
+        void setColumnCreate(quint32 column, const double* value, int N);
         /** \brief copy the contents of cell (row_old, column_old) to cell (row, column) */
-        void copyCell(quint16 row, quint16 column, quint16 row_old, quint16 column_old);
+        void copyCell(quint32 row, quint32 column, quint32 row_old, quint32 column_old);
         /** \brief set the given cell to the supplied value, if the cell is outside the table size, the table is resized accordingly */
-        void setCellCreate(quint16 row, quint16 column, QVariant value);
+        void setCellCreate(quint32 row, quint32 column, QVariant value);
         /** \brief returns the value in the supplied cell */
-        QVariant cell(quint16 row, quint16 column) const;
+        QVariant cell(quint32 row, quint32 column) const;
+        /** \brief returns the value in the supplied cell, as a double */
+        double cellDouble(quint32 row, quint32 column) const;
         /** \brief set the given cell to the supplied value in a role>=Qt::UserRole */
-        void setCellUserRole(int role, quint16 row, quint16 column, QVariant value);
+        void setCellUserRole(int role, quint32 row, quint32 column, QVariant value);
         /** \brief set the given cell to the supplied value in a role>=Qt::UserRole */
-        void setCellUserRoleCreate(int role, quint16 row, quint16 column, QVariant value);
+        void setCellUserRoleCreate(int role, quint32 row, quint32 column, QVariant value);
         /** \brief set the given cell to the supplied value in EditRole */
-        void setCellEditRole(quint16 row, quint16 column, QVariant value);
+        void setCellEditRole(quint32 row, quint32 column, QVariant value);
         /** \brief set the given cell to the supplied value in EditRole */
-        void setCellEditRoleCreate(quint16 row, quint16 column, QVariant value);
+        void setCellEditRoleCreate(quint32 row, quint32 column, QVariant value);
         /** \brief set the given cell to the supplied value in Background */
-        void setCellBackgroundRole(quint16 row, quint16 column, QVariant value);
+        void setCellBackgroundRole(quint32 row, quint32 column, QVariant value);
         /** \brief set the given cell to the supplied value in Background */
-        void setCellBackgroundRoleCreate(quint16 row, quint16 column, QVariant value);
+        void setCellBackgroundRoleCreate(quint32 row, quint32 column, QVariant value);
         /** \brief set the given cell to the supplied value in Checked */
-        void setCellCheckedRole(quint16 row, quint16 column, QVariant value);
+        void setCellCheckedRole(quint32 row, quint32 column, QVariant value);
         /** \brief set the given cell to the supplied value in Checked */
-        void setCellCheckedRoleCreate(quint16 row, quint16 column, QVariant value);
+        void setCellCheckedRoleCreate(quint32 row, quint32 column, QVariant value);
         /** \brief returns the value in the supplied cell in EditRole */
-        QVariant cellEditRole(quint16 row, quint16 column) const;
+        QVariant cellEditRole(quint32 row, quint32 column) const;
         /** \brief returns the value in the supplied cell in a given role>=Qt::UserRole */
-        QVariant cellUserRole(int role, quint16 row, quint16 column) const;
+        QVariant cellUserRole(int role, quint32 row, quint32 column) const;
         /** \brief set the column title */
-        void setColumnTitle(quint16 column, QString name);
+        void setColumnTitle(quint32 column, QString name);
         /** \brief set the column title */
-        void setColumnTitleCreate(quint16 column, QString name);
+        void setColumnTitleCreate(quint32 column, QString name);
         /** \brief return the column title */
-        QString columnTitle(quint16 column) const;
+        QString columnTitle(quint32 column) const;
         /** \brief search for a row that contains the given value in the given column. Adds a row if it was not found and returns row number */
-        quint16 getAddRow(quint16 column, QVariant data);
+        quint32 getAddRow(quint32 column, QVariant data);
         /** \brief set data stored in the column header column title */
-        void setColumnHeaderData(quint16 column, int role, const QVariant &data);
-        QVariant getColumnHeaderData(quint16 column, int role) const;
-        bool hasColumnHeaderData(quint16 column, int role) const;
-        QList<quint32> getColumnHeaderDataRoles() const;
+        void setColumnHeaderData(quint32 column, int role, const QVariant &data);
+        QVariant getColumnHeaderData(quint32 column, int role) const;
+        bool hasColumnHeaderData(quint32 column, int role) const;
+        QList<quint64> getColumnHeaderDataRoles() const;
 
         /** \brief set the default QVariant value displayed in an editor, if the value does not yet exist */
         void setDefaultEditValue(QVariant defaultEditValue);
@@ -377,8 +379,8 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         bool getDoEmitSignals() const;
         void enableSignals(bool emitReset=true);
         void disableSignals();
-        /*void deleteRows(QList<quint16> rs);
-        void deleteColumns(QList<quint16> rs);*/
+        /*void deleteRows(QList<quint32> rs);
+        void deleteColumns(QList<quint32> rs);*/
 
 
 
@@ -401,17 +403,17 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         /** \brief empty the table and reset its size to (0,0) */
         void clear();
         /** \brief insert a new row before current row */
-        void insertRow(quint16 r=0);
+        void insertRow(quint32 r=0);
         /** \brief insert a new column before current column */
-        void insertColumn(quint16 c=0);
+        void insertColumn(quint32 c=0);
         /** \brief remove the given row */
-        void deleteRow(quint16 r);
+        void deleteRow(quint32 r);
         /** \brief remove the given column */
-        void deleteColumn(quint16 c);
+        void deleteColumn(quint32 c);
         /** \brief remove all data from given column, but do not remove the column (also does not delete it's header) */
-        void emptyColumn(quint16 c);
+        void emptyColumn(quint32 c);
         /** \brief delete all contents from the given cell */
-        void deleteCell(quint16 r, quint16 column);
+        void deleteCell(quint32 r, quint32 column);
         /** \brief delete all contents from the given cells */
         void deleteCells(QModelIndexList selection);
 
@@ -440,6 +442,7 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
     private:
 
 };
+
 
 class QFWIDLIB_EXPORT QFTableModelColumnHeaderModel : public QAbstractListModel {
         Q_OBJECT

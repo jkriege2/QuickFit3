@@ -618,7 +618,7 @@ void QFRDRTableEditor::slInsertRow() {
                 m->model()->insertRow(0);
             } else {
                 QModelIndexList l=sm->selectedIndexes();
-                quint16 i0=m->model()->rowCount();
+                int i0=m->model()->rowCount();
                 for (int i=0; i<l.size(); i++) {
                     if (l[i].row()<i0) i0=l[i].row();
                 }
@@ -642,7 +642,7 @@ void QFRDRTableEditor::slInsertColumn() {
                 m->columnsInserted(0, 1, false);
             } else {
                 QModelIndexList l=sm->selectedIndexes();
-                quint16 i0=m->model()->columnCount();
+                int i0=m->model()->columnCount();
                 for (int i=0; i<l.size(); i++) {
                     if (l[i].column()<i0) i0=l[i].column();
                 }
@@ -673,7 +673,7 @@ void QFRDRTableEditor::slDeleteRow() {
                 answer = QMessageBox::question(this, tr("Delete row(s) ..."), tr("Are you sure that you want to delete the selected rows?"), QMessageBox::Yes | QMessageBox::No);
                 if (answer == QMessageBox::Yes) {
                     QModelIndexList l=sm->selectedIndexes();
-                    QList<quint16> rl;
+                    QList<int> rl;
                     for (int i=0; i<l.size(); i++) {
                         if (!rl.contains(l[i].row())) rl.append(l[i].row());
                     }
@@ -704,7 +704,7 @@ void QFRDRTableEditor::slDeleteColumn() {
                 answer = QMessageBox::question(this, tr("Delete row(s) ..."), tr("Are you sure that you want to delete the selected rows?"), QMessageBox::Yes | QMessageBox::No);
                 if (answer == QMessageBox::Yes) {
                     QModelIndexList l=sm->selectedIndexes();
-                    QList<quint16> rl;
+                    QList<int> rl;
                     for (int i=0; i<l.size(); i++) {
                         if (!rl.contains(l[i].column())) rl.append(l[i].column());
                     }
@@ -804,7 +804,7 @@ void QFRDRTableEditor::slEditColumnProperties(int col) {
         if (m->model()) {
             QItemSelectionModel* sm=tvMain->selectionModel();
             if (sm->hasSelection()) {
-                quint16 c=sm->currentIndex().column();
+                int c=sm->currentIndex().column();
                 if (col>=0) c=col;
                 QString t=m->model()->columnTitle(c);
                 QVariant comment=m->model()->getColumnHeaderData(c, QFRDRTable::ColumnCommentRole);

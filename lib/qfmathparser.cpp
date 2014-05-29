@@ -788,7 +788,7 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                         }
                         cn->setElse(params.last());
                         res=cn;
-                    } else if (lvarname=="sum" || lvarname=="prod" || lvarname=="for" || lvarname=="savefor") {
+                    } else if (lvarname=="cumsum" || lvarname=="cumprod" || lvarname=="sum" || lvarname=="prod" || lvarname=="for" || lvarname=="savefor") {
                         if (params.size()==1) {
                             if (lvarname!="for"&&lvarname!="savefor") {
                                 res=new qfmpFunctionNode(varname, params, this, NULL);
@@ -3247,6 +3247,19 @@ qfmpResult QFMathParser::qfmpVectorOperationNode::evaluate()
         } else {
             return qfmpResult(qfstatisticsSum(numVec));
         }
+    } else if (operationName=="cumsum") {
+        if (resType==qfmpString) {
+            QStringList sl;
+            for (int i=0; i<strVec.size(); i++) {
+                if (i==0) sl.append(strVec[i]);
+                else if (i>0) sl.append(sl[i-1]+strVec[i]);
+            }
+            return qfmpResult(sl);
+        } else {
+            return qfmpResult(qfstatisticsCumSum(numVec));
+        }
+    } else if (operationName=="cumprod") {
+        return qfmpResult(qfstatisticsCumProd(numVec));
     } else if (operationName=="prod") {
         return qfmpResult(qfstatisticsProd(numVec));
     }

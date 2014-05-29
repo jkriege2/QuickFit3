@@ -110,13 +110,6 @@ void QFTableGraphSettings::setRecord(QFRDRTable *record, int plot)
     headerModel->setHasNone(true);
     headerModel->setModel(current->model());
 
-    /*ui->cmbLinesXData->setModel(headerModel);
-    ui->cmbLinesXError->setModel(headerModel);
-    ui->cmbLinesYData->setModel(headerModel);
-    ui->cmbLinesYError->setModel(headerModel);
-    ui->cmbLinesMax->setModel(headerModel);
-    ui->cmbLinesMean->setModel(headerModel);
-    ui->cmbLinesQ75->setModel(headerModel);*/
     if (current) {
         connect(current->model(), SIGNAL(modelReset()), this, SLOT(updateComboboxes()));
         connect(current->model(), SIGNAL(layoutChanged()), this, SLOT(updateComboboxes()));
@@ -184,34 +177,20 @@ void QFTableGraphSettings::reloadColumns(QComboBox *combo)
     bool updt=updating;
     updating=true;
     int idx=combo->currentIndex();
-    //disconnect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
-
     if (current) {
-        QFTablePluginModel* tab=current->model();
-        while (combo->count()-1>tab->columnCount() && combo->count()>1) {
-            combo->removeItem(combo->count()-1);
-        }
-        while (combo->count()-1<tab->columnCount() && tab->columnCount()>0) {
-            combo->addItem("");
-        }
-        combo->setItemText(0, tr("--- none ---"));
-        combo->setItemData(0, QVariant());
-        for (int i=0; i<tab->columnCount(); i++) {
-            combo->setItemText(i+1, tr("#%1: %2").arg(i+1).arg(tab->columnTitle(i)));
-            combo->setItemData(i+1, tab->columnTitle(i));
-        }
+        current->loadColumnToComboBox(combo);
     } else {
         combo->clear();
         combo->addItem(tr("--- none ---"));
+        idx=0;
     }
     updating=updt;
-    //connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     combo->setCurrentIndex(idx);
 }
 
 void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
 {
-    qDebug()<<"writeGraphData()";
+    //qDebug()<<"writeGraphData()";
     //qDebug()<<"QFTableGraphSettings::graphDataChanged    updating="<<updating;
     if (updating) return;
     if (current) {
@@ -226,13 +205,13 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
 
 
 
-        graph.xcolumn=qMax(-1, ui->cmbLinesXData->currentIndex()-1);
-        graph.xerrorcolumn=qMax(-1, ui->cmbLinesXError->currentIndex()-1);
-        graph.ycolumn=qMax(-1, ui->cmbLinesYData->currentIndex()-1);
-        graph.yerrorcolumn=qMax(-1, ui->cmbLinesYError->currentIndex()-1);
-        graph.meancolumn=qMax(-1, ui->cmbLinesMean->currentIndex()-1);
-        graph.maxcolumn=qMax(-1, ui->cmbLinesMax->currentIndex()-1);
-        graph.q75column=qMax(-1, ui->cmbLinesQ75->currentIndex()-1);
+        graph.xcolumn=qMax(-2, ui->cmbLinesXData->currentData().toInt());
+        graph.xerrorcolumn=qMax(-2, ui->cmbLinesXError->currentData().toInt());
+        graph.ycolumn=qMax(-2, ui->cmbLinesYData->currentData().toInt());
+        graph.yerrorcolumn=qMax(-2, ui->cmbLinesYError->currentData().toInt());
+        graph.meancolumn=qMax(-2, ui->cmbLinesMean->currentData().toInt());
+        graph.maxcolumn=qMax(-2, ui->cmbLinesMax->currentData().toInt());
+        graph.q75column=qMax(-2, ui->cmbLinesQ75->currentData().toInt());
 
         graph.width=ui->edtWidth->value()/100.0;
         graph.shift=ui->edtShift->value()/100.0;
@@ -318,7 +297,7 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.modifierMode=(JKQTPMathImage::ModifierMode)ui->cmbModifierMode->currentIndex();
 
         graph.isDataSelect=ui->chkSelectData->isChecked();
-        graph.dataSelectColumn=qMax(-1, ui->cmbSelectDataColumn->currentIndex()-1);
+        graph.dataSelectColumn=qMax(-2, ui->cmbSelectDataColumn->currentData().toInt());
         graph.dataSelectOperation=(QFRDRTable::DataSelectOperation)ui->cmbSelectDataCompare->currentIndex();
         graph.dataSelectCompareValue=ui->edtSelectDataValue->value();
 
@@ -360,13 +339,15 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     QString fit_type=graph.moreProperties.value("FIT_TYPE", "NONE").toString().toUpper().trimmed();
     isFitResult=((fit_type=="LEAST_SQUARES")||(fit_type=="FIT")||(fit_type=="REGRESSION"));
 
-    ui->cmbLinesXData->setCurrentIndex(graph.xcolumn+1);
-    ui->cmbLinesXError->setCurrentIndex(graph.xerrorcolumn+1);
-    ui->cmbLinesYData->setCurrentIndex(graph.ycolumn+1);
-    ui->cmbLinesYError->setCurrentIndex(graph.yerrorcolumn+1);
-    ui->cmbLinesMax->setCurrentIndex(graph.maxcolumn+1);
-    ui->cmbLinesMean->setCurrentIndex(graph.meancolumn+1);
-    ui->cmbLinesQ75->setCurrentIndex(graph.q75column+1);
+    ui->cmbLinesXData->setCurrentData(graph.xcolumn);
+    ui->cmbLinesXError->setCurrentData(graph.xerrorcolumn);
+    ui->cmbLinesYData->setCurrentData(graph.ycolumn);
+    ui->cmbLinesYError->setCurrentData(graph.yerrorcolumn);
+    ui->cmbLinesMax->setCurrentData(graph.maxcolumn);
+    ui->cmbLinesMean->setCurrentData(graph.meancolumn);
+    ui->cmbLinesQ75->setCurrentData(graph.q75column);
+
+
     ui->cmbGraphType->setCurrentIndex(ui->cmbGraphType->findData((int)graph.type));
 
     ui->edtWidth->setValue(graph.width*100.0);
@@ -425,7 +406,7 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
 
 
     ui->chkSelectData->setChecked(graph.isDataSelect);
-    ui->cmbSelectDataColumn->setCurrentIndex(graph.dataSelectColumn+1);
+    ui->cmbSelectDataColumn->setCurrentData(graph.dataSelectColumn);
     ui->cmbSelectDataCompare->setCurrentIndex(graph.dataSelectOperation);
     ui->edtSelectDataValue->setValue(graph.dataSelectCompareValue);
 
@@ -716,12 +697,12 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widImage->setVisible(false);
                 ui->cmbLinesXError->setVisible(false);
                 ui->labErrorX->setVisible(false);
-                ui->cmbLinesYError->setVisible(false);
-                ui->labErrorY->setVisible(false);
+                ui->cmbLinesYError->setVisible(true);
+                ui->labErrorY->setVisible(true);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
-                ui->widErrorStyle->setVisible(false);
-                ui->labErrorStyle->setVisible(false);
+                //ui->widErrorStyle->setVisible(false);
+                //ui->labErrorStyle->setVisible(false);
                 ui->chkDrawLine->setVisible(false);
                 ui->labWidth->setVisible(true);
                 ui->labShift->setVisible(true);
@@ -744,14 +725,14 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 //graph.type=QFRDRTable::gtbarsHorizontal;
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
-                ui->cmbLinesXError->setVisible(false);
-                ui->labErrorX->setVisible(false);
+                ui->cmbLinesXError->setVisible(true);
+                ui->labErrorX->setVisible(true);
                 ui->cmbLinesYError->setVisible(false);
                 ui->labErrorY->setVisible(false);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
-                ui->widErrorStyle->setVisible(false);
-                ui->labErrorStyle->setVisible(false);
+                //ui->widErrorStyle->setVisible(false);
+                //ui->labErrorStyle->setVisible(false);
                 ui->chkDrawLine->setVisible(false);
                 ui->btnFit->setVisible(false);
                 ui->labWidth->setVisible(true);
@@ -1299,7 +1280,7 @@ void QFTableGraphSettings::disconnectWidgets()
 
 void QFTableGraphSettings::doFit()
 {
-    emit performFit(ui->cmbLinesXData->currentIndex()-1, ui->cmbLinesYData->currentIndex()-1, ui->cmbLinesYError->currentIndex()-1, plot, QString(""));
+    emit performFit(ui->cmbLinesXData->currentData().toInt(), ui->cmbLinesYData->currentData().toInt(), ui->cmbLinesYError->currentData().toInt(), plot, QString(""));
 }
 
 void QFTableGraphSettings::doRefit()
@@ -1309,7 +1290,7 @@ void QFTableGraphSettings::doRefit()
 
 void QFTableGraphSettings::doRegression()
 {
-    emit performRegression(ui->cmbLinesXData->currentIndex()-1, ui->cmbLinesYData->currentIndex()-1, ui->cmbLinesYError->currentIndex()-1, plot);
+    emit performRegression(ui->cmbLinesXData->currentData().toInt(), ui->cmbLinesYData->currentData().toInt(), ui->cmbLinesYError->currentData().toInt(), plot);
 }
 
 
@@ -1362,6 +1343,7 @@ void QFTableGraphSettings::on_btnAutoX_clicked()
                     if (en!=name) {
                         bool found=(rxID.indexIn(name)>=0);
                         bool exactmatch=(rxID.cap(3)==id);
+                        qDebug()<<step<<i<<en<<found<<exactmatch<<rxID.cap(1)<<rxID.cap(2)<<rxID.cap(3);
                         if ((exactmatch && step==0)||(found && step==1)) {
                             for (int j=0; j<searchPhrases.size(); j++) {
                                 if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
@@ -1494,37 +1476,37 @@ void QFTableGraphSettings::on_btnAutoY_clicked()
 
 void QFTableGraphSettings::on_btnClearLinesXData_clicked()
 {
-    ui->cmbLinesXData->setCurrentIndex(0);
+    ui->cmbLinesXData->setCurrentData(-1);
 }
 
 void QFTableGraphSettings::on_btnClearLinesXError_clicked()
 {
-    ui->cmbLinesXError->setCurrentIndex(0);
+    ui->cmbLinesXError->setCurrentData(-1);
 }
 
 void QFTableGraphSettings::on_btnClearLinesYData_clicked()
 {
-    ui->cmbLinesYData->setCurrentIndex(0);
+    ui->cmbLinesYData->setCurrentData(-1);
 }
 
 void QFTableGraphSettings::on_btnClearLinesYError_clicked()
 {
-    ui->cmbLinesYError->setCurrentIndex(0);
+    ui->cmbLinesYError->setCurrentData(-1);
 }
 
 void QFTableGraphSettings::on_btnClearLinesMax_clicked()
 {
-    ui->cmbLinesMax->setCurrentIndex(0);
+    ui->cmbLinesMax->setCurrentData(-1);
 }
 
 void QFTableGraphSettings::on_btnClearLinesMean_clicked()
 {
-    ui->cmbLinesMean->setCurrentIndex(0);
+    ui->cmbLinesMean->setCurrentData(-1);
 }
 
 void QFTableGraphSettings::on_btnClearLinesQ75_clicked()
 {
-    ui->cmbLinesQ75->setCurrentIndex(0);
+    ui->cmbLinesQ75->setCurrentData(-1);
 }
 
 void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
@@ -1580,11 +1562,11 @@ void QFTableGraphSettings::on_btnAutoImageSizes_clicked()
 {
 
     if (ui->cmbGraphType->currentIndex()==11 || ui->cmbGraphType->currentIndex()==12 || ui->cmbGraphType->currentIndex()==13) {
-        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImagePixWidth)) ui->spinImageWidth->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImagePixWidth).toInt());
-        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageWidth)) ui->edtImageWidth->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageWidth).toDouble());
-        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageHeight)) ui->edtImageHeight->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageHeight).toDouble());
-        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageX)) ui->edtImageX->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageX).toDouble());
-        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageY)) ui->edtImageY->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentIndex()-1, QFRDRTable::ColumnImageY).toDouble());
+        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentData().toInt(), QFRDRTable::ColumnImagePixWidth)) ui->spinImageWidth->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentData().toInt(), QFRDRTable::ColumnImagePixWidth).toInt());
+        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentData().toInt(), QFRDRTable::ColumnImageWidth)) ui->edtImageWidth->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentData().toInt(), QFRDRTable::ColumnImageWidth).toDouble());
+        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentData().toInt(), QFRDRTable::ColumnImageHeight)) ui->edtImageHeight->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentData().toInt(), QFRDRTable::ColumnImageHeight).toDouble());
+        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentData().toInt(), QFRDRTable::ColumnImageX)) ui->edtImageX->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentData().toInt(), QFRDRTable::ColumnImageX).toDouble());
+        if (current->model()->hasColumnHeaderData(ui->cmbLinesXData->currentData().toInt(), QFRDRTable::ColumnImageY)) ui->edtImageY->setValue(current->model()->getColumnHeaderData(ui->cmbLinesXData->currentData().toInt(), QFRDRTable::ColumnImageY).toDouble());
 
     }
 }

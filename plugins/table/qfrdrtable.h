@@ -326,6 +326,9 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             double MinorTickInsideLength;
             double MinorTickOutsideLength;
 
+            int columnNamedTickNames;
+            int columnNamedTickValues;
+
         };
 
 
@@ -383,27 +386,27 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         /** \brief returns the used datamodel */
         QFTablePluginModel* model() ;
         /** \brief returns the table contents at the given position */
-        QVariant getModelData(quint16 row, quint16 column);
+        QVariant getModelData(quint32 row, quint32 column);
 
 
-        virtual QVariant tableGetData(quint16 row, quint16 column) const;
-        virtual void tableSetData(quint16 row, quint16 column, const QVariant& data);
-        virtual void tableSetColumnTitle( quint16 column, const QString& data);
-        virtual QString tableGetColumnTitle(quint16 column) const;
+        virtual QVariant tableGetData(quint32 row, quint32 column) const;
+        virtual void tableSetData(quint32 row, quint32 column, const QVariant& data);
+        virtual void tableSetColumnTitle( quint32 column, const QString& data);
+        virtual QString tableGetColumnTitle(quint32 column) const;
         virtual bool tableSupportsExpressions() const;
-        virtual void tableSetExpression(quint16 row, quint16 column, const QString& expression=QString(""));
-        virtual void tableSetColumnExpression(quint16 column, const QString& expression=QString(""));
-        virtual void tableSetColumnComment(quint16 column, const QString& comment=QString(""));
-        virtual void tableSetComment(quint16 row, quint16 column, const QString& comment=QString(""));
-        virtual QString tableGetExpression(quint16 row, quint16 column) const;
+        virtual void tableSetExpression(quint32 row, quint32 column, const QString& expression=QString(""));
+        virtual void tableSetColumnExpression(quint32 column, const QString& expression=QString(""));
+        virtual void tableSetColumnComment(quint32 column, const QString& comment=QString(""));
+        virtual void tableSetComment(quint32 row, quint32 column, const QString& comment=QString(""));
+        virtual QString tableGetExpression(quint32 row, quint32 column) const;
         virtual void tableReevaluateExpressions();
         virtual int tableGetColumnCount() const;
         virtual int tableGetRowCount() const;
         virtual bool tableIsReadonly() const;
-        virtual void tableSetColumnData(quint16 column, const QList<QVariant>& data);
-        virtual QList<QVariant> tableGetColumnData(quint16 column);
-        virtual void tableSetColumnDataAsDouble(quint16 column, const QVector<double>& data);
-        virtual QVector<double> tableGetColumnDataAsDouble(quint16 column);
+        virtual void tableSetColumnData(quint32 column, const QList<QVariant>& data);
+        virtual QList<QVariant> tableGetColumnData(quint32 column);
+        virtual void tableSetColumnDataAsDouble(quint32 column, const QVector<double>& data);
+        virtual QVector<double> tableGetColumnDataAsDouble(int column);
 
 
 
@@ -509,6 +512,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         void writeAxisInfo(QXmlStreamWriter& w, const AxisInfo &plot, const QString &axisName) const;
         void writePlotInfo(QXmlStreamWriter& w, const PlotInfo &plot, bool writeGraphs=true) const;
         void writeGraphInfo(QXmlStreamWriter& w, const GraphInfo &graph) const;
+        void loadColumnToComboBox(QComboBox *combo);
     public slots:
         void emitRebuildPlotWidgets();
 

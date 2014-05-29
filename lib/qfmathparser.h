@@ -1106,7 +1106,7 @@ class QFLIB_EXPORT QFMathParser
         };
 
         /**
-         * \brief This class represents a cases or if construction
+         * \brief This class represents a for, savefor, sum, prod construct
          */
         class QFLIB_EXPORT qfmpVectorOperationNode: public qfmpNode {
           private:

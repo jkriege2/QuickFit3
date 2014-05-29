@@ -22,7 +22,7 @@ QFTableModel::QFTableModel(QObject * parent):
     actRedo=new QAction(QIcon(":/lib/redo.png"), tr("Redo"), this);
     actRedo->setShortcut(QKeySequence::Redo);
     setUndoEnabled(false);
-    //quint32 a=xyAdressToUInt32(5, 5);
+    //quint64 a=xyAdressToUInt32(5, 5);
     //std::cout<<"adress test: "<<a<<" => row="<<UInt32ToRow(a)<<", column="<<UInt32ToColumn(a)<<"\n";
 }
 
@@ -43,7 +43,7 @@ int QFTableModel::columnCount(const QModelIndex &parent) const {
 
 QVariant QFTableModel::data(const QModelIndex &index, int role) const {
     if (index.isValid()) {
-        quint32 a=xyAdressToUInt32(index.row(), index.column());
+        quint64 a=xyAdressToUInt64(index.row(), index.column());
         //std::cout<<"QFTableModel::data("<<a<<")"<<std::endl;
         if (role == Qt::DisplayRole) {
             if (state.dataMap.contains(a)) return state.dataMap[a];
@@ -96,7 +96,7 @@ bool QFTableModel::setData(const QModelIndex &index, const QVariant &value, int 
     //qDebug()<<index<<"("<<role<<" chk="<<Qt::CheckStateRole<<")"<<value;
     if (index.isValid() && role == Qt::EditRole && !readonly) {
         addUndoStep();
-        quint32 a=xyAdressToUInt32(index.row(), index.column());
+        quint64 a=xyAdressToUInt64(index.row(), index.column());
         QVariant old=QVariant();
         if (state.dataMap.contains(a)) old=state.dataMap[a];
         state.dataMap[a]=value;
@@ -107,7 +107,7 @@ bool QFTableModel::setData(const QModelIndex &index, const QVariant &value, int 
         return true;
     } else if (index.isValid() && role == Qt::CheckStateRole && (!readonly || readonlyButStillCheckable)) {
         addUndoStep();
-        quint32 a=xyAdressToUInt32(index.row(), index.column());
+        quint64 a=xyAdressToUInt64(index.row(), index.column());
         QVariant old=QVariant();
         if (state.dataCheckedMap.contains(a)) old=state.dataCheckedMap[a];
         state.dataCheckedMap[a]=value;
@@ -117,7 +117,7 @@ bool QFTableModel::setData(const QModelIndex &index, const QVariant &value, int 
         return true;
     } else if (index.isValid() && role >= Qt::UserRole && !readonly) {
         addUndoStep();
-        quint32 a=xyAdressToUInt32(index.row(), index.column());
+        quint64 a=xyAdressToUInt64(index.row(), index.column());
         QVariant old=QVariant();
         if (state.moreDataMap.contains(a)) old=state.moreDataMap[a].value(role, QVariant());
         state.moreDataMap[a].insert(role, value);
@@ -137,6 +137,10 @@ QVariantList QFTableModel::getColumnData(int column, int role) const
         for (int r=0; r<state.rows; r++) {
             vl<<cell(r, column);
         }
+    } else if (column==-2) {
+        for (int r=0; r<state.rows-1; r++) {
+            vl.append(r+1);
+        }
     }
     return vl;
 }
@@ -152,21 +156,27 @@ QVector<double> QFTableModel::getColumnDataAsNumbers(int column, int role) const
             double dd=d.toDouble(&ok);
             if (d.isValid() && (d.type()==QVariant::Double || d.type()==QVariant::Int || d.type()==QVariant::UInt || d.type()==QVariant::Bool || d.type()==QVariant::LongLong || d.type()==QVariant::ULongLong) && ok) {
                 vl.push_front(dd);
+            } else if (d.isValid() && (d.type()==QVariant::Date || d.type()==QVariant::DateTime || d.type()==QVariant::Time) && ok) {
+                vl.push_front(d.toDateTime().toMSecsSinceEpoch());
             } else if (vl.size()>0) {
                 vl.push_front(NAN);
             }
+        }
+    } else if (column==-2) {
+        for (int r=0; r<state.rows-1; r++) {
+            vl.append(r+1);
         }
     }
     return vl;
 }
 
-void QFTableModel::swapCells(quint16 row1, quint16 column1, quint16 row2, quint16 column2) {
+void QFTableModel::swapCells(quint32 row1, quint32 column1, quint32 row2, quint32 column2) {
     if (readonly) return;
 
     addUndoStep();
 
-    quint32 adr1=xyAdressToUInt32(row1, column1);
-    quint32 adr2=xyAdressToUInt32(row2, column2);
+    quint64 adr1=xyAdressToUInt64(row1, column1);
+    quint64 adr2=xyAdressToUInt64(row2, column2);
     QVariant d1, d2;
 
     d1=state.dataMap.value(adr1, QVariant());
@@ -211,13 +221,13 @@ void QFTableModel::swapCells(quint16 row1, quint16 column1, quint16 row2, quint1
     }
 }
 
-void QFTableModel::resize(quint16 rows, quint16 columns) {
+void QFTableModel::resize(quint32 rows, quint32 columns) {
     if (readonly) return;
 
     startMultiUndo();
 
     //std::cout<<"  resize("<<state.rows<<", "<<state.columns<<"): 1\n";
-    //quint16 oldrows=this->state.rows;
+    //quint32 oldrows=this->state.rows;
     int oldcolumns=this->state.columns;
     int oldrows=this->state.rows;
 
@@ -245,12 +255,12 @@ void QFTableModel::resize(quint16 rows, quint16 columns) {
     this->state.rows=rows;
     this->state.columns=columns;
 
-    QList<quint32> idx=state.dataMap.keys();
-    QList<quint32> didx;
+    QList<quint64> idx=state.dataMap.keys();
+    QList<quint64> didx;
     //std::cout<<"  resize("<<state.rows<<", "<<state.columns<<"): 3\n";
     if (idx.size()>0) for (int i = idx.size()-1; i>=0; i--) {
-        quint16 r=UInt32ToRow(idx[i]);
-        quint16 c=UInt32ToColumn(idx[i]);
+        quint32 r=UInt64ToRow(idx[i]);
+        quint32 c=UInt64ToColumn(idx[i]);
         if ((r>=rows) || (c>=columns)) {
             didx.append(idx[i]);
         }
@@ -293,7 +303,7 @@ void QFTableModel::resize(quint16 rows, quint16 columns) {
     //std::cout<<"  resize("<<state.rows<<", "<<state.columns<<"): 6\n";
 }
 
-void QFTableModel::insertRow(quint16 r) {
+void QFTableModel::insertRow(quint32 r) {
     startMultiUndo();
 
     bool oldEmit=doEmitSignals;
@@ -306,7 +316,7 @@ void QFTableModel::insertRow(quint16 r) {
     }
     for (int c=0; c<state.columns; c++) {
         setCell(r, c, defaultEditValue);
-        quint32 a=xyAdressToUInt32(r, c);
+        quint64 a=xyAdressToUInt64(r, c);
         state.dataEditMap.remove(a);
         state.dataBackgroundMap.remove(a);
         state.dataCheckedMap.remove(a);
@@ -321,7 +331,7 @@ void QFTableModel::insertRow(quint16 r) {
     endMultiUndo();
 }
 
-void QFTableModel::insertColumn(quint16 c) {
+void QFTableModel::insertColumn(quint32 c) {
     //std::cout<<"  insertColumn("<<c<<")\n";
     startMultiUndo();
     bool oldEmit=doEmitSignals;
@@ -341,7 +351,7 @@ void QFTableModel::insertColumn(quint16 c) {
     }
     for (int r=0; r<state.rows; r++) {
         setCell(r, c, defaultEditValue);
-        quint32 a=xyAdressToUInt32(r, c);
+        quint64 a=xyAdressToUInt64(r, c);
         state.dataEditMap.remove(a);
         state.dataBackgroundMap.remove(a);
         state.dataCheckedMap.remove(a);
@@ -358,7 +368,7 @@ void QFTableModel::insertColumn(quint16 c) {
     //std::cout<<"  insertColumn("<<c<<") ... DONE\n";
 }
 
-void QFTableModel::deleteRow(quint16 r) {
+void QFTableModel::deleteRow(quint32 r) {
     bool oldEmit=doEmitSignals;
     doEmitSignals=false;
     if (r>=state.rows ) return;
@@ -379,7 +389,7 @@ void QFTableModel::deleteRow(quint16 r) {
 }
 
 
-void QFTableModel::deleteColumn(quint16 c) {
+void QFTableModel::deleteColumn(quint32 c) {
     bool oldEmit=doEmitSignals;
     doEmitSignals=false;
     if (c>=state.columns) return;
@@ -402,7 +412,7 @@ void QFTableModel::deleteColumn(quint16 c) {
     endMultiUndo();
 }
 
-void QFTableModel::emptyColumn(quint16 c)
+void QFTableModel::emptyColumn(quint32 c)
 {
     bool oldEmit=doEmitSignals;
     doEmitSignals=false;
@@ -421,12 +431,12 @@ void QFTableModel::emptyColumn(quint16 c)
     endMultiUndo();
 }
 
-void QFTableModel::deleteCell(quint16 row, quint16 column) {
+void QFTableModel::deleteCell(quint32 row, quint32 column) {
     if (readonly) return;
 
     addUndoStep();
 
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     state.dataMap.remove(a);
     state.dataEditMap.remove(a);
     state.dataBackgroundMap.remove(a);
@@ -482,10 +492,10 @@ void QFTableModel::clear() {
     if (doEmitSignals) reset();
 }
 
-bool QFTableModel::changeDatatype(quint16 row, quint16 column, QVariant::Type newType) {
+bool QFTableModel::changeDatatype(quint32 row, quint32 column, QVariant::Type newType) {
     if (readonly || (row>=state.rows) || (column>=state.columns)) return false;
     addUndoStep();
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     if (state.dataMap.contains(a)) {
         if (state.dataEditMap[a].canConvert(newType)) {
             state.dataEditMap[a].convert(newType);
@@ -509,24 +519,24 @@ bool QFTableModel::changeDatatype(quint16 row, quint16 column, QVariant::Type ne
     if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
-void QFTableModel::setCell(quint16 row, quint16 column, QVariant value) {
+void QFTableModel::setCell(quint32 row, quint32 column, QVariant value) {
     //std::cout<<"setCell("<<row<<", "<<column<<", '"<<value.toString().toStdString()<<"' ["<<value.typeName()<<"])\n";
     if (readonly || (row>=state.rows) || (column>=state.columns)) return;
     addUndoStep();
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     state.dataMap[a]=value;
     if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
-void QFTableModel::setColumn(quint16 column, const QList<QVariant>& value)
+void QFTableModel::setColumn(quint32 column, const QList<QVariant>& value)
 {
     //std::cout<<"setCell("<<row<<", "<<column<<", '"<<value.toString().toStdString()<<"' ["<<value.typeName()<<"])\n";
     if (readonly || (column>=state.columns)) return;
     addUndoStep();
-    quint16 row=0;
+    quint32 row=0;
     for (int i=0; i<value.size(); i++) {
         if (row<state.rows) {
-            quint32 a=xyAdressToUInt32(row, column);
+            quint64 a=xyAdressToUInt64(row, column);
             state.dataMap[a]=value[i];
         }
         row++;
@@ -534,15 +544,15 @@ void QFTableModel::setColumn(quint16 column, const QList<QVariant>& value)
     if (doEmitSignals) emit dataChanged(index(0, column), index(row-1, column));
 }
 
-void QFTableModel::setColumn(quint16 column, const QVector<double> &value)
+void QFTableModel::setColumn(quint32 column, const QVector<double> &value)
 {
     //std::cout<<"setCell("<<row<<", "<<column<<", '"<<value.toString().toStdString()<<"' ["<<value.typeName()<<"])\n";
     if (readonly || (column>=state.columns)) return;
     addUndoStep();
-    quint16 row=0;
+    quint32 row=0;
     for (int i=0; i<value.size(); i++) {
         if (row<state.rows) {
-            quint32 a=xyAdressToUInt32(row, column);
+            quint64 a=xyAdressToUInt64(row, column);
             state.dataMap[a]=value[i];
         }
         row++;
@@ -550,15 +560,15 @@ void QFTableModel::setColumn(quint16 column, const QVector<double> &value)
     if (doEmitSignals) emit dataChanged(index(0, column), index(row-1, column));
 }
 
-void QFTableModel::setColumn(quint16 column, const double *value, int N)
+void QFTableModel::setColumn(quint32 column, const double *value, int N)
 {
     //std::cout<<"setCell("<<row<<", "<<column<<", '"<<value.toString().toStdString()<<"' ["<<value.typeName()<<"])\n";
     if (readonly || (column>=state.columns)) return;
     addUndoStep();
-    quint16 row=0;
+    quint32 row=0;
     for (int i=0; i<N; i++) {
         if (row<state.rows) {
-            quint32 a=xyAdressToUInt32(row, column);
+            quint64 a=xyAdressToUInt64(row, column);
             state.dataMap[a]=value[i];
         }
         row++;
@@ -567,14 +577,14 @@ void QFTableModel::setColumn(quint16 column, const double *value, int N)
 }
 
 
-void QFTableModel::copyCell(quint16 row, quint16 column, quint16 row_old, quint16 column_old)
+void QFTableModel::copyCell(quint32 row, quint32 column, quint32 row_old, quint32 column_old)
 {
     if (readonly || (row>=state.rows) || (column>=state.columns) || (row_old>=state.rows) || (column_old>=state.columns)) return;
 
     addUndoStep();
 
-    quint32 a=xyAdressToUInt32(row, column);
-    quint32 a_old=xyAdressToUInt32(row_old, column_old);
+    quint64 a=xyAdressToUInt64(row, column);
+    quint64 a_old=xyAdressToUInt64(row_old, column_old);
 
     QVariant d;
     d=state.dataMap.value(a_old, QVariant());
@@ -599,24 +609,24 @@ void QFTableModel::copyCell(quint16 row, quint16 column, quint16 row_old, quint1
     if (hd.size()>0) state.moreDataMap[a]=hd;
 }
 
-void QFTableModel::setCellCreate(quint16 row, quint16 column, QVariant value) {
+void QFTableModel::setCellCreate(quint32 row, quint32 column, QVariant value) {
     if (readonly) return;
     startMultiUndo();
     if ((row>=state.rows) || (column>=state.columns)) {
-        resize(qMax(state.rows, quint16(row+1)), qMax(state.columns, quint16(column+1)));
+        resize(qMax(state.rows, quint32(row+1)), qMax(state.columns, quint32(column+1)));
     }
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     state.dataMap[a]=value;
     if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
     endMultiUndo();
 }
 
-void QFTableModel::setColumnCreate(quint16 column, const QList<QVariant>& value)
+void QFTableModel::setColumnCreate(quint32 column, const QList<QVariant>& value)
 {
     if (readonly) return;
     startMultiUndo();
     if ((value.size()>state.rows) || (column>=state.columns)) {
-        resize(qMax(state.rows, quint16(value.size())), qMax(state.columns, quint16(column+1)));
+        resize(qMax(state.rows, quint32(value.size())), qMax(state.columns, quint32(column+1)));
     }
 
     setColumn(column, value);
@@ -624,93 +634,93 @@ void QFTableModel::setColumnCreate(quint16 column, const QList<QVariant>& value)
 
 }
 
-void QFTableModel::setColumnCreate(quint16 column, const QVector<double> &value)
+void QFTableModel::setColumnCreate(quint32 column, const QVector<double> &value)
 {
     if (readonly) return;
     startMultiUndo();
     if ((value.size()>state.rows) || (column>=state.columns)) {
-        resize(qMax(state.rows, quint16(value.size())), qMax(state.columns, quint16(column+1)));
+        resize(qMax(state.rows, quint32(value.size())), qMax(state.columns, quint32(column+1)));
     }
 
     setColumn(column, value);
     endMultiUndo();
 }
 
-void QFTableModel::setColumnCreate(quint16 column, const double *value, int N)
+void QFTableModel::setColumnCreate(quint32 column, const double *value, int N)
 {
     if (readonly) return;
     startMultiUndo();
     if ((N>state.rows) || (column>=state.columns)) {
-        resize(qMax(state.rows, quint16(N)), qMax(state.columns, quint16(column+1)));
+        resize(qMax(state.rows, quint32(N)), qMax(state.columns, quint32(column+1)));
     }
 
     setColumn(column, value, N);
     endMultiUndo();
 }
 
-void QFTableModel::setCellEditRole(quint16 row, quint16 column, QVariant value) {
+void QFTableModel::setCellEditRole(quint32 row, quint32 column, QVariant value) {
     //std::cout<<"setCell("<<row<<", "<<column<<", '"<<value.toString().toStdString()<<"' ["<<value.typeName()<<"])\n";
     if (readonly || (row>=state.rows) || (column>=state.columns)) return;
     addUndoStep();
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     state.dataEditMap[a]=value;
     if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
-void QFTableModel::setCellEditRoleCreate(quint16 row, quint16 column, QVariant value) {
+void QFTableModel::setCellEditRoleCreate(quint32 row, quint32 column, QVariant value) {
     if (readonly) return;
     startMultiUndo();
     if ((row>=state.rows) || (column>=state.columns)) {
-        resize(qMax(state.rows, quint16(row+1)), qMax(state.columns, quint16(column+1)));
+        resize(qMax(state.rows, quint32(row+1)), qMax(state.columns, quint32(column+1)));
     }
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     state.dataEditMap[a]=value;
     endMultiUndo();
     if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
-void QFTableModel::setCellBackgroundRole(quint16 row, quint16 column, QVariant value) {
+void QFTableModel::setCellBackgroundRole(quint32 row, quint32 column, QVariant value) {
     if (readonly || (row>=state.rows) || (column>=state.columns)) return;
     addUndoStep();
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     state.dataBackgroundMap[a]=value;
     if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
-void QFTableModel::setCellBackgroundRoleCreate(quint16 row, quint16 column, QVariant value) {
+void QFTableModel::setCellBackgroundRoleCreate(quint32 row, quint32 column, QVariant value) {
     if (readonly) return;
     startMultiUndo();
     if ((row>=state.rows) || (column>=state.columns)) {
-        resize(qMax(state.rows, quint16(row+1)), qMax(state.columns, quint16(column+1)));
+        resize(qMax(state.rows, quint32(row+1)), qMax(state.columns, quint32(column+1)));
     }
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     state.dataBackgroundMap[a]=value;
     if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
     endMultiUndo();
 }
 
-void QFTableModel::setCellCheckedRole(quint16 row, quint16 column, QVariant value) {
+void QFTableModel::setCellCheckedRole(quint32 row, quint32 column, QVariant value) {
     if (readonly || (row>=state.rows) || (column>=state.columns)) return;
     addUndoStep();
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     state.dataCheckedMap[a]=value;
     if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
 }
 
-void QFTableModel::setCellCheckedRoleCreate(quint16 row, quint16 column, QVariant value) {
+void QFTableModel::setCellCheckedRoleCreate(quint32 row, quint32 column, QVariant value) {
     if (readonly) return;
     startMultiUndo();
     if ((row>=state.rows) || (column>=state.columns)) {
-        resize(qMax(state.rows, quint16(row+1)), qMax(state.columns, quint16(column+1)));
+        resize(qMax(state.rows, quint32(row+1)), qMax(state.columns, quint32(column+1)));
     }
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     state.dataCheckedMap[a]=value;
     if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
     endMultiUndo();
 }
 
 
-quint16 QFTableModel::getAddRow(quint16 column, QVariant data) {
+quint32 QFTableModel::getAddRow(quint32 column, QVariant data) {
     if (readonly || (column>=state.columns)) return 0;
     if (state.rows<=0) {
         startMultiUndo();
@@ -719,8 +729,8 @@ quint16 QFTableModel::getAddRow(quint16 column, QVariant data) {
         endMultiUndo();
         return 0;
     }
-    //quint16 row=0;
-    for (quint16 r=0; r<state.rows; r++) {
+    //quint32 row=0;
+    for (quint32 r=0; r<state.rows; r++) {
         if (cell(r, column)==data) return r;
     }
     startMultiUndo();
@@ -730,25 +740,25 @@ quint16 QFTableModel::getAddRow(quint16 column, QVariant data) {
     return state.rows-1;
 }
 
-void QFTableModel::setColumnHeaderData(quint16 column, int role, const QVariant &data)
+void QFTableModel::setColumnHeaderData(quint32 column, int role, const QVariant &data)
 {
     addUndoStep();
     state.headerDataMap[column].insert(role, data);
 }
 
-QVariant QFTableModel::getColumnHeaderData(quint16 column, int role) const
+QVariant QFTableModel::getColumnHeaderData(quint32 column, int role) const
 {
     if (state.headerDataMap.contains(column)) return state.headerDataMap[column].value(role, QVariant());
     return QVariant();
 }
 
-bool QFTableModel::hasColumnHeaderData(quint16 column, int role) const
+bool QFTableModel::hasColumnHeaderData(quint32 column, int role) const
 {
     if (state.headerDataMap.contains(column)) return state.headerDataMap[column].contains(role);
     return false;
 }
 
-QList<quint32> QFTableModel::getColumnHeaderDataRoles() const
+QList<quint64> QFTableModel::getColumnHeaderDataRoles() const
 {
     return state.headerDataMap.keys();
 }
@@ -767,54 +777,72 @@ QStringList QFTableModel::getColumnTitles() const
     return sl;
 }
 
-QVariant QFTableModel::cell(quint16 row, quint16 column) const {
+QVariant QFTableModel::cell(quint32 row, quint32 column) const {
     if ((row>=state.rows) || (column>=state.columns)) return QVariant();
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     if (state.dataMap.contains(a)) return state.dataMap[a];
     return QVariant();
 }
 
-void QFTableModel::setCellUserRole(int role, quint16 row, quint16 column, QVariant value) {
+double QFTableModel::cellDouble(quint32 row, quint32 column) const
+{
+    if ((row>=state.rows) || (column>=state.columns)) return NAN;
+    quint64 a=xyAdressToUInt64(row, column);
+    if (state.dataMap.contains(a)) {
+        const QVariant& v=state.dataMap[a];
+        if (v.canConvert(QVariant::Double)) {
+            bool ok=false;
+            double d=v.toDouble(&ok);
+            if (ok) return d;
+        } else if (v.type()==QVariant::Date || v.type()==QVariant::DateTime || v.type()==QVariant::Time) {
+            return v.toDateTime().toMSecsSinceEpoch();
+        }
+    }
+    return NAN;
+
+}
+
+void QFTableModel::setCellUserRole(int role, quint32 row, quint32 column, QVariant value) {
     if (readonly) return;
     startMultiUndo();
     if ((row>=state.rows) || (column>=state.columns)) {
-        resize(qMax(state.rows, quint16(row+1)), qMax(state.columns, quint16(column+1)));
+        resize(qMax(state.rows, quint32(row+1)), qMax(state.columns, quint32(column+1)));
     }
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     state.moreDataMap[a].insert(role, value);
     if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
     endMultiUndo();
 }
 
-void QFTableModel::setCellUserRoleCreate(int role, quint16 row, quint16 column, QVariant value)
+void QFTableModel::setCellUserRoleCreate(int role, quint32 row, quint32 column, QVariant value)
 {
     if (readonly) return;
     startMultiUndo();
     if ((row>=state.rows) || (column>=state.columns)) {
-        resize(qMax(state.rows, quint16(row+1)), qMax(state.columns, quint16(column+1)));
+        resize(qMax(state.rows, quint32(row+1)), qMax(state.columns, quint32(column+1)));
     }
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     state.moreDataMap[a].insert(role, value);
     if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
     endMultiUndo();
 }
 
-QVariant QFTableModel::cellEditRole(quint16 row, quint16 column) const {
+QVariant QFTableModel::cellEditRole(quint32 row, quint32 column) const {
     if ((row>=state.rows) || (column>=state.columns)) return QVariant();
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     if (state.dataEditMap.contains(a)) return state.dataEditMap[a];
     return QVariant();
 }
 
-QVariant QFTableModel::cellUserRole(int role, quint16 row, quint16 column) const
+QVariant QFTableModel::cellUserRole(int role, quint32 row, quint32 column) const
 {
     if ((row>=state.rows) || (column>=state.columns)) return QVariant();
-    quint32 a=xyAdressToUInt32(row, column);
+    quint64 a=xyAdressToUInt64(row, column);
     if (state.moreDataMap.contains(a)) return state.moreDataMap[a].value(role, QVariant());
     return QVariant();
 }
 
-void QFTableModel::setColumnTitle(quint16 column, QString name) {
+void QFTableModel::setColumnTitle(quint32 column, QString name) {
     //std::cout<<"setColumnTitle("<<column<<", '"<<name.toStdString()<<")\n";
     if (readonly || (column>=state.columns)) return;
     addUndoStep();
@@ -826,11 +854,11 @@ void QFTableModel::setColumnTitle(quint16 column, QString name) {
     }
 }
 
-void QFTableModel::setColumnTitleCreate(quint16 column, QString name) {
+void QFTableModel::setColumnTitleCreate(quint32 column, QString name) {
     //std::cout<<"setColumnTitle("<<column<<", '"<<name.toStdString()<<")\n";
     if (readonly) return;
     startMultiUndo();
-    resize(state.rows, qMax(state.columns, quint16(column+1)));
+    resize(state.rows, qMax(state.columns, quint32(column+1)));
     //qDebug()<<"setColumnTitleCreate("<<column<<", "<<name<<"):     state.columnNames.size()="<<state.columnNames.size();
     if (column<state.columnNames.size()) state.columnNames[column]=name;
     if (doEmitSignals) {
@@ -840,7 +868,7 @@ void QFTableModel::setColumnTitleCreate(quint16 column, QString name) {
     endMultiUndo();
 }
 
-QString QFTableModel::columnTitle(quint16 column) const {
+QString QFTableModel::columnTitle(quint32 column) const {
     if (column>=state.columns) return QString("");
     if (column<state.columnNames.size()) return state.columnNames[column];
     return "";
@@ -861,15 +889,15 @@ bool QFTableModel::saveSYLK(const QString& filename, char format, int precision)
     out<<"ID;P\n";
 
     // write column headers
-    for (quint16 c=0; c<state.columns; c++) {
+    for (quint32 c=0; c<state.columns; c++) {
         if (c<state.columnNames.size()) out<<QString("C;Y1;X%2;K\"%1\"\n").arg(state.columnNames[c]).arg(c+1);
         out<<QString("F;Y1;X%2;SDB\n").arg(c+1);
     }
 
     // write data
-    for (quint16 r=0; r<state.rows; r++) {
-        for (quint16 c=0; c<state.columns; c++) {
-            quint32 a=xyAdressToUInt32(r, c);
+    for (quint32 r=0; r<state.rows; r++) {
+        for (quint32 c=0; c<state.columns; c++) {
+            quint64 a=xyAdressToUInt64(r, c);
             if (state.dataMap.contains(a)) {
                 QVariant& v=state.dataMap[a];
                 QString num="";
@@ -924,7 +952,7 @@ bool QFTableModel::saveCSV(QTextStream &out, QString column_separator, char deci
     // write column headers
     out<<header_start<<" ";
     int cc=0;
-    for (quint16 c=0; c<state.columns; c++) {
+    for (quint32 c=0; c<state.columns; c++) {
         if (usedCols.contains(c) || saveCompleteTable) {
             if (cc>0) out<<column_separator;
             if (c<state.columnNames.size()) out<<QString("\"%1\"").arg(state.columnNames[c]).arg(c+1);
@@ -935,14 +963,14 @@ bool QFTableModel::saveCSV(QTextStream &out, QString column_separator, char deci
 
 
     // write data
-    for (quint16 r=0; r<state.rows; r++) {
+    for (quint32 r=0; r<state.rows; r++) {
         if (usedrows.contains(r)||saveCompleteTable) {
             bool first=true;
-            for (quint16 c=0; c<state.columns; c++) {
+            for (quint32 c=0; c<state.columns; c++) {
                 if (usedCols.contains(c) || saveCompleteTable) {
                     if (!first) out<<column_separator;
                     first=false;
-                    quint32 a=xyAdressToUInt32(r, c);
+                    quint64 a=xyAdressToUInt64(r, c);
                     if (state.dataMap.contains(a)) {
                         QVariant& v=state.dataMap[a];
                         QString num="";
@@ -997,7 +1025,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
     //std::cout<<"      opening '"<<filename.toStdString()<<"'\n";
     QString line=in.readLine();
     bool header_read=false;
-    quint16 row=0, rows=0, column=0, columns=0;
+    quint32 row=0, rows=0, column=0, columns=0;
     QLocale loc=QLocale::c();
     loc.setNumberOptions(QLocale::OmitGroupSeparator);
     bool hasTitle=false;
@@ -1149,7 +1177,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
 
     //qDebug()<<hasTitle<<specialHeader.size()<<state.columns<<specialHeader;
 
-    if (!hasTitle && specialHeader.size()>0 && specialHeader.size()>=qMax(0,state.columns/10)) {
+    if (!hasTitle && specialHeader.size()>0 && specialHeader.size()>=qMax(quint32(0),state.columns/10)) {
         QMapIterator<int,QString> it(specialHeader);
         while (it.hasNext()) {
             it.next();
@@ -1188,7 +1216,7 @@ QList<QList<QVariant> > QFTableModel::getDataTable(QStringList &colNames, QStrin
 
     // write column headers
     int cc=0;
-    for (quint16 c=0; c<state.columns; c++) {
+    for (quint32 c=0; c<state.columns; c++) {
         if (usedCols.contains(c) || saveCompleteTable) {
             colNames<<state.columnNames[c];
             cc++;
@@ -1199,14 +1227,14 @@ QList<QList<QVariant> > QFTableModel::getDataTable(QStringList &colNames, QStrin
 
     // write data
     int ri=0;
-    for (quint16 r=0; r<state.rows; r++) {
+    for (quint32 r=0; r<state.rows; r++) {
         if (usedrows.contains(r)||saveCompleteTable) {
             bool first=true;
             int ci=0;
-            for (quint16 c=0; c<state.columns; c++) {
+            for (quint32 c=0; c<state.columns; c++) {
                 if (usedCols.contains(c) || saveCompleteTable) {
                     first=false;
-                    quint32 a=xyAdressToUInt32(r, c);
+                    quint64 a=xyAdressToUInt64(r, c);
                     if (state.dataMap.contains(a) && ci<data.size() && ri<dempty.size()) {
                         data[ci].operator [](ri)=state.dataMap[a];
                     }
@@ -1278,7 +1306,7 @@ QString QFTableModel::saveXML(QModelIndexList selection, bool createXMLFragment,
                         QVariant check=data(index(r, c), Qt::CheckStateRole);
                         if (check.isValid()) w.writeAttribute("check", QString::number(check.toInt()));
                         QVariant d=cell(r,c);
-                        quint32 a=xyAdressToUInt32(r,c);
+                        quint64 a=xyAdressToUInt64(r,c);
                         w.writeAttribute("type", getQVariantType(d));
                         if (state.dataCheckedMap.contains(a)) w.writeAttribute("checked", QString::number(state.dataCheckedMap[a].toInt()));
                         if (state.moreDataMap.contains(a)) {

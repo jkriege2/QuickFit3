@@ -60,6 +60,8 @@ void QFRDRTableRegressionDialog::saveResults()
     }
     if (lastResults.size()>0) {
         int savedTo=-1;
+        bool emits=table->colgraphGetDoEmitSignals();
+        table->colgraphSetDoEmitSignals(false);
         if (saveCol==1) {
             savedTo=table->tableGetColumnCount();
             table->tableSetColumnData(savedTo, lastResults);
@@ -108,6 +110,7 @@ void QFRDRTableRegressionDialog::saveResults()
             table->colgraphSetGraphTitle(overwritePlot, overwriteGraph, fitresult+", "+resultStat);
             writeFitProperties(overwritePlot, overwriteGraph, savedTo);
         }
+        table->colgraphSetDoEmitSignals(emits);
     }
     accept();
 }
@@ -494,7 +497,7 @@ void QFRDRTableRegressionDialog::readDataFromTable()
     qDebug()<<colX<<"dataX.size="<<dataX.size();
     qDebug()<<colX<<"dataY.size="<<dataX.size();
     datapoints=qMin(dataX.size(), dataY.size());
-    if (colW>=0) {
+    if (colW!=-1) {
         dataW=table->tableGetColumnDataAsDouble(colW);
         //qDebug()<<"dataW.size="<<dataW.size();
         if (dataW.size()>0 && dataW.size()<datapoints) datapoints=dataW.size();

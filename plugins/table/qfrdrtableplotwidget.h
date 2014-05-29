@@ -70,6 +70,7 @@ class QFRDRTablePlotWidget : public QWidget
         void autoColorGraph(QFRDRTable::GraphInfo& g, QColor color);
 
 
+        void setAxisProps(JKQTPcoordinateAxis *axis, const QFRDRTable::AxisInfo &axisData, const QFRDRTable::PlotInfo &p);
     private:
         Ui::QFRDRTablePlotWidget *ui;
         QToolBar* toolbarPlot;

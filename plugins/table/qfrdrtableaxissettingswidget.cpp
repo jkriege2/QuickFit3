@@ -16,7 +16,8 @@ QFRDRTableAxisSettingsWidget::QFRDRTableAxisSettingsWidget(QWidget *parent) :
     ui(new Ui::QFRDRTableAxisSettingsWidget)
 {
 
-
+    current=NULL;
+    plot=-1;
 
     updating=true;
     ui->setupUi(this);
@@ -79,6 +80,9 @@ void QFRDRTableAxisSettingsWidget::loadPlotData(const QFRDRTable::AxisInfo& g)
     ui->chkXInverted->setChecked(g.AxisInverted);
     ui->chkXAutoTicks->setChecked(g.AutoTicks);
 
+    ui->cmbNamedTicksNames->setCurrentData(g.columnNamedTickNames);
+    ui->cmbNamedTicksValues->setCurrentData(g.columnNamedTickValues);
+
     updating=false;
     connectWidgets();
     doUpdateGraph();
@@ -108,6 +112,9 @@ void QFRDRTableAxisSettingsWidget::storePlotData(QFRDRTable::AxisInfo &g)
     g.AxisMinorTickWidth=ui->spinXTickMinWidth->value();
     g.AxisInverted=ui->chkXInverted->isChecked();
     g.AutoTicks=ui->chkXAutoTicks->isChecked();
+
+    g.columnNamedTickNames=qMax(-2, ui->cmbNamedTicksNames->currentData().toInt());
+    g.columnNamedTickValues=qMax(-2, ui->cmbNamedTicksValues->currentData().toInt());
 
 }
 
@@ -190,6 +197,32 @@ QString QFRDRTableAxisSettingsWidget::getlabel() const
     return ui->edtXLabel->text();
 }
 
+void QFRDRTableAxisSettingsWidget::setRecord(QFRDRTable *record, int graph)
+{
+    if (current) {
+        disconnect(current->model(), SIGNAL(modelReset()), this, SLOT(updateComboboxes()));
+        disconnect(current->model(), SIGNAL(layoutChanged()), this, SLOT(updateComboboxes()));
+        disconnect(current->model(), SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(updateComboboxes()));
+    }
+    current=record;
+    this->plot=plot;
+    updating=true;
+    disconnectWidgets();
+
+
+    //headerModel->setHasNone(true);
+    //headerModel->setModel(current->model());
+
+    if (current) {
+        connect(current->model(), SIGNAL(modelReset()), this, SLOT(updateComboboxes()));
+        connect(current->model(), SIGNAL(layoutChanged()), this, SLOT(updateComboboxes()));
+        connect(current->model(), SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(updateComboboxes()));
+    }
+    updateComboboxes();
+    updating=false;
+    connectWidgets();
+}
+
 
 
 void QFRDRTableAxisSettingsWidget::setXRange(double xmin, double xmax)
@@ -217,7 +250,29 @@ void QFRDRTableAxisSettingsWidget::on_btnAutoscaleX_clicked()
 
 
 void QFRDRTableAxisSettingsWidget::plotDataChanged() {
-   if (!updating) emit dataChanged();
+    if (!updating) emit dataChanged();
+}
+
+void QFRDRTableAxisSettingsWidget::updateComboboxes()
+{
+    reloadColumns(ui->cmbNamedTicksNames);
+    reloadColumns(ui->cmbNamedTicksValues);
+}
+
+void QFRDRTableAxisSettingsWidget::reloadColumns(QComboBox *combo)
+{
+    bool updt=updating;
+    updating=true;
+    int idx=combo->currentIndex();
+    if (current) {
+        current->loadColumnToComboBox(combo);
+    } else {
+        combo->clear();
+        combo->addItem(tr("--- none ---"));
+        idx=0;
+    }
+    updating=updt;
+    combo->setCurrentIndex(idx);
 }
 
 void QFRDRTableAxisSettingsWidget::doUpdateGraph() {
@@ -242,6 +297,8 @@ void QFRDRTableAxisSettingsWidget::connectWidgets()
     connect(ui->cmbXLabel, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     connect(ui->cmbXMode1, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     connect(ui->cmbXMode2, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbNamedTicksNames, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbNamedTicksValues, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
 
 
     connect(ui->chkXAutoTicks, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
@@ -271,6 +328,8 @@ void QFRDRTableAxisSettingsWidget::disconnectWidgets()
     disconnect(ui->cmbXLabel, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     disconnect(ui->cmbXMode1, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     disconnect(ui->cmbXMode2, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbNamedTicksNames, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbNamedTicksValues, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
 
     disconnect(ui->chkXAutoTicks, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     disconnect(ui->chkXInverted, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));

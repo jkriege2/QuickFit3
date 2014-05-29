@@ -1,0 +1,58 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Column Statistics Functions</title>
+  </head>
+  <body> 
+    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	<a name="colstat"/><h2>Simple Column Statistics Functions</h2>
+	<ul>
+		<li><a name="colsavg"/><!-- func:colsavg -->
+		<b><tt><!-- template -->colsavg(cols)<!-- /template --></tt> - <i>average for each row, calculated over the given range of columns</i></b><br>
+		calculates $$bmath:\overline{data}_r=\frac{1}{N_R}\cdot\sum_{c\in\mbox{cols}}\mboc{data}(c, r)$$
+		<!-- /func:colsavg -->
+		</li>
+		<li><a name="colssum"/><!-- func:colssum -->
+		<b><tt><!-- template -->colssum(cols)<!-- /template --></tt> - <i>sum for each row, calculated over the given range of columns</i></b><br>
+		calculates $$bmath:\overline{data}_r=\sum_{c\in\mbox{cols}}\mboc{data}(c, r)$$
+		<!-- /func:colssum -->
+		</li>
+		<li><a name="colssum2"/><!-- func:colssum2 -->
+		<b><tt><!-- template -->colssum2(cols)<!-- /template --></tt> - <i>sum of squares for each row, calculated over the given range of columns</i></b><br>
+		calculates $$bmath:\overline{data}_r=\sum_{c\in\mbox{cols}}\mboc{data}(c, r)^2$$
+		<!-- /func:colssum2 -->
+		</li>		
+		<li><a name="colscount"/><!-- func:colscount -->
+		<b><tt><!-- template -->colscount(cols)<!-- /template --></tt> - <i>snumber of usable data (!=NAN) for each row, calculated over the given range of columns</i></b><br>
+		<!-- /func:colscount -->
+		</li>
+		<li><a name="colsstd"/><!-- func:colsstd -->
+		<b><tt><!-- template -->colsstd(cols)<!-- /template --></tt> - <i>standard deviation for each row, calculated over the given range of columns</i></b><br>
+		<!-- /func:colsstd -->
+		</li>
+		<li><a name="colsvar"/><!-- func:colsvar -->
+		<b><tt><!-- template -->colsvar(cols)<!-- /template --></tt> - <i>variance for each row, calculated over the given range of columns</i></b><br>
+		<!-- /func:colsvar -->
+		</li>
+		<li><a name="colsmin"/><!-- func:colsmin -->
+		<b><tt><!-- template -->colsmin(cols)<!-- /template --></tt> - <i>minimum for each row, calculated over the given range of columns</i></b><br>
+		<!-- /func:colsmin -->
+		</li>
+		<li><a name="colsmax"/><!-- func:colsmax -->
+		<b><tt><!-- template -->colsmax(cols)<!-- /template --></tt> - <i>maximum for each row, calculated over the given range of columns</i></b><br>
+		<!-- /func:colsmax -->
+		</li>
+		<li><a name="colsmedian"/><!-- func:colsmedian -->
+		<b><tt><!-- template -->colsmedian(cols)<!-- /template --></tt> - <i>median for each row, calculated over the given range of columns</i></b><br>
+		<!-- /func:colsmedian -->
+		</li>
+		<li><a name="colsquantile"/><!-- func:colsquantile -->
+		<b><tt><!-- template -->colsquantile(cols, quantile)<!-- /template --></tt> - <i>quantile for each row, calculated over the given range of columns</i></b><br>
+		<!-- /func:colsquantile -->
+		</li>
+
+	</ul>
+	
+  </body>
+</html>

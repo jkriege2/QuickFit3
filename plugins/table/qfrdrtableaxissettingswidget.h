@@ -35,6 +35,7 @@ class QFRDRTableAxisSettingsWidget : public QWidget
         void saveToSettings(QSettings& settings, const QString& axis) const;
         void loadFromSettings(QSettings& settings, const QString& axis);
         QString getlabel() const;
+        void setRecord(QFRDRTable *record, int graph);
 
     public slots:
         void setXRange(double xmin, double xmax);
@@ -51,12 +52,15 @@ class QFRDRTableAxisSettingsWidget : public QWidget
     protected slots:
         void on_btnAutoscaleX_clicked();
         void plotDataChanged();
+        void updateComboboxes();
 
     protected:
 
+        void reloadColumns(QComboBox *combo);
     private:
         Ui::QFRDRTableAxisSettingsWidget *ui;
-
+        QFRDRTable* current;
+        int plot;
         bool updating;
 };
 

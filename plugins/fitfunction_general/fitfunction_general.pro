@@ -25,7 +25,9 @@ HEADERS += qfgeneralfitfunctionsplugin.h \
     qffitfunctiongeneral2gaussianvar.h \
     qffitfunctiongeneralmodhill5p.h \
     qffitfunctiongeneralhill.h \
-    qffitfunctiongeneralcosine.h
+    qffitfunctiongeneralcosine.h \
+    qffitfunctiongeneralpolynomcentered.h \
+    qffitfunctiongeneralgaussiandistvar.h
 
 SOURCES += qfgeneralfitfunctionsplugin.cpp\
            qffitfunctiongeneralsigmoid.cpp \
@@ -44,7 +46,9 @@ SOURCES += qfgeneralfitfunctionsplugin.cpp\
     qffitfunctiongeneral2gaussianvar.cpp \
     qffitfunctiongeneralmodhill5p.cpp \
     qffitfunctiongeneralhill.cpp \
-    qffitfunctiongeneralcosine.cpp
+    qffitfunctiongeneralcosine.cpp \
+    qffitfunctiongeneralpolynomcentered.cpp \
+    qffitfunctiongeneralgaussiandistvar.cpp
 
 FORMS =
 

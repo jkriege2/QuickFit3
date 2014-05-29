@@ -54,19 +54,30 @@
      
   <li><a name="savefor"/><!-- func:savefor -->
   <b><tt><!-- template -->savefor(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>savefor(VAR, start, end, expression)</tt> or <tt>savefor(VAR, value_vector, expression)</tt> - <i>returns a vector of <tt>expression</tt>, evaluated one time for every value in the vector <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration (save versioN!)</i>:</b> <br>example: <code>savefor(i,1,2,5,i^2)</code> will return <code>[1^2, 3^2, 5^2]=[1,9,25]</code>
-  $$note:This is a save version of the command <<t>>fo(---)</tt>, if the expression does not evaluate to a number or number vector, it is simply ignored and no error is caused!$$
+  $$note:This is a save version of the command <tt>for(---)</tt>, if the expression does not evaluate to a number or number vector, it is simply ignored and no error is caused!$$
   <!-- /func:savefor -->  
   </li>
     
   <li><a name="sum"/><!-- func:sum -->
-  <b><tt><!-- template -->sum(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>sum(VAR, start, end, expression)</tt> or <tt>sum(VAR, value_vector, expression)</tt> - <i>returns the sum of <tt>expression</tt>, evaluated one time for every value in the vector <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration</i>:</b> <br>example: <code>sum(i,1,2,5,i^2)</code> will return <code>1^2+3^2+5^2=35</code>
+  <b><tt><!-- template -->sum(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>sum(VAR, start, end, expression)</tt> or <tt>sum(VAR, value_vector, expression)</tt> or <tt>sum(data_vector)</tt> - <i>returns the sum of <tt>expression</tt>, evaluated one time for every value in the vector <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration</i>:</b> <br>example: <code>sum(i,1,2,5,i^2)</code> will return <code>1^2+3^2+5^2=35</code><br>If only one vector is given as parameter, the  sum of this vector is returned.
   <!-- /func:sum -->  
   </li>
     
   <li><a name="prod"/><!-- func:prod -->
-  <b><tt><!-- template -->prod(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>prod(VAR, start, end, expression)</tt> or <tt>prod(VAR, value_vector, expression)</tt> - <i>returns the product of <tt>expression</tt>, evaluated one time for every value in the vector <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration</i>:</b> <br>example: <code>prod(i,1,2,5,i^2)</code> will return <code>1^2*3^2*5^2=225</code>
+  <b><tt><!-- template -->prod(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>prod(VAR, start, end, expression)</tt> or <tt>prod(VAR, value_vector, expression)</tt> or <tt>prod(data_vector)</tt> - <i>returns the product of <tt>expression</tt>, evaluated one time for every value in the vector <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration</i>:</b> <br>example: <code>prod(i,1,2,5,i^2)</code> will return <code>1^2*3^2*5^2=225</code><br>If only one vector is given as parameter, the  product of this vector is returned.
   <!-- /func:prod -->  
   </li>
+    
+  <li><a name="cumsum"/><!-- func:cumsum -->
+  <b><tt><!-- template -->cumsum(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>cumsum(VAR, start, end, expression)</tt> or <tt>cumsum(VAR, value_vector, expression)</tt> or <tt>cumsum(data_vector)</tt> - <i>returns the cummulative sum of <tt>expression</tt>, evaluated one time for every value in the vector <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration</i>:</b><br>If only one vector is given as parameter, the cummulative sum of this vector is returned.
+  <!-- /func:cumsum -->  
+  </li>
+    
+  <li><a name="cumprod"/><!-- func:cumprod -->
+  <b><tt><!-- template -->cumprod(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>cumprod(VAR, start, end, expression)</tt> or <tt>cumprod(VAR, value_vector, expression)</tt> or <tt>cumprod(data_vector)</tt> - <i>returns the product of <tt>expression</tt>, evaluated one time for every value in the vector <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration</i>:</b><br>If only one vector is given as parameter, the cummulative product of this vector is returned.
+  <!-- /func:cumprod -->  
+  </li>
+
 
   </ul>
 

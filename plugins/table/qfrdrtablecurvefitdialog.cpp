@@ -173,6 +173,8 @@ void QFRDRTableCurveFitDialog::saveResults()
     int saveGraph=ui->cmbAddGraph->currentIndex();
     qDebug()<<"QFRDRTableCurveFitDialog::saveResults(): "<<saveCol<<saveGraph;
     if (model && lastResults.size()>0) {
+        bool emits=table->colgraphGetDoEmitSignals();
+        table->colgraphSetDoEmitSignals(false);
         int savedTo=-1;
         if (saveCol==1) {
             savedTo=table->tableGetColumnCount();
@@ -225,6 +227,7 @@ void QFRDRTableCurveFitDialog::saveResults()
             writeFitProperties(overwritePlot, overwriteGraph, savedTo);
         }
         delete model;
+        table->colgraphSetDoEmitSignals(emits);
     }
     accept();
 }
@@ -787,7 +790,7 @@ void QFRDRTableCurveFitDialog::readDataFromTable()
     //qDebug()<<"dataX.size="<<dataX.size();
     //qDebug()<<"dataY.size="<<dataX.size();
     datapoints=qMin(dataX.size(), dataY.size());
-    if (colW>=0) {
+    if (colW!=-1) {
         dataW=table->tableGetColumnDataAsDouble(colW);
         //qDebug()<<"dataW.size="<<dataW.size();
         if (dataW.size()>0 && dataW.size()<datapoints) datapoints=dataW.size();

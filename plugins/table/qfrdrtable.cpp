@@ -113,6 +113,8 @@ QFRDRTable::AxisInfo::AxisInfo()
     axisFontSize=8;
     axisLabelFontSize=10;
     axis0=false;
+    columnNamedTickNames=-1;
+    columnNamedTickValues=-2;
 
 
      labelPos=JKQTPlabelCenter;
@@ -228,7 +230,7 @@ QFTablePluginModel* QFRDRTable::model() {
     return datamodel;
 };
 
-QVariant QFRDRTable::getModelData(quint16 row, quint16 column) {
+QVariant QFRDRTable::getModelData(quint32 row, quint32 column) {
     if (!datamodel) {
         datamodel=new QFTablePluginModel(this);
         datamodel->setUndoEnabled(true);
@@ -242,27 +244,27 @@ QVariant QFRDRTable::getModelData(quint16 row, quint16 column) {
 
 
 
-QVariant QFRDRTable::tableGetData(quint16 row, quint16 column) const
+QVariant QFRDRTable::tableGetData(quint32 row, quint32 column) const
 {
     if (datamodel) return datamodel->cell(row, column);
     else return QVariant();
 }
 
-void QFRDRTable::tableSetData(quint16 row, quint16 column, const QVariant &data) {
+void QFRDRTable::tableSetData(quint32 row, quint32 column, const QVariant &data) {
     //qDebug()<<"tableSetData("<<row<<", "<<column<<",    "<<data<<")";
     if (datamodel)  {
         datamodel->setCellCreate(row, column, data);        
     }
 }
 
-void QFRDRTable::tableSetColumnData(quint16 column, const QList<QVariant> &data)
+void QFRDRTable::tableSetColumnData(quint32 column, const QList<QVariant> &data)
 {
     if (datamodel)  {
         datamodel->setColumnCreate(column, data);
     }
 }
 
-QList<QVariant> QFRDRTable::tableGetColumnData(quint16 column)
+QList<QVariant> QFRDRTable::tableGetColumnData(quint32 column)
 {
     if (datamodel)  {
         return datamodel->getColumnData(column);
@@ -270,14 +272,14 @@ QList<QVariant> QFRDRTable::tableGetColumnData(quint16 column)
     return QList<QVariant>();
 }
 
-void QFRDRTable::tableSetColumnDataAsDouble(quint16 column, const QVector<double> &data)
+void QFRDRTable::tableSetColumnDataAsDouble(quint32 column, const QVector<double> &data)
 {
     if (datamodel)  {
         datamodel->setColumnCreate(column, data);
     }
 }
 
-QVector<double> QFRDRTable::tableGetColumnDataAsDouble(quint16 column)
+QVector<double> QFRDRTable::tableGetColumnDataAsDouble(int column)
 {
     if (datamodel)  {
         return datamodel->getColumnDataAsNumbers(column);
@@ -298,7 +300,7 @@ void QFRDRTable::colgraphSetDoEmitSignals(bool doEmit)
 
 
 
-void QFRDRTable::tableSetColumnTitle(quint16 column, const QString &data)
+void QFRDRTable::tableSetColumnTitle(quint32 column, const QString &data)
 {
     //qDebug()<<"tableSetColumnTitle("<<column<<",    "<<data<<")   datamodel<<"<<datamodel;
     if (datamodel)  {
@@ -308,7 +310,7 @@ void QFRDRTable::tableSetColumnTitle(quint16 column, const QString &data)
 
 }
 
-QString QFRDRTable::tableGetColumnTitle(quint16 column) const
+QString QFRDRTable::tableGetColumnTitle(quint32 column) const
 {
     if (datamodel) return datamodel->getColumnTitles().value(column, "");
     else return QString("");
@@ -319,7 +321,7 @@ bool QFRDRTable::tableSupportsExpressions() const
     return true;
 }
 
-void QFRDRTable::tableSetExpression(quint16 row, quint16 column, const QString &expression)
+void QFRDRTable::tableSetExpression(quint32 row, quint32 column, const QString &expression)
 {
     if (datamodel)  {
         datamodel->setData(datamodel->index(row, column), expression, QFRDRTable::TableExpressionRole);
@@ -327,28 +329,28 @@ void QFRDRTable::tableSetExpression(quint16 row, quint16 column, const QString &
 
 }
 
-void QFRDRTable::tableSetColumnExpression(quint16 column, const QString &expression)
+void QFRDRTable::tableSetColumnExpression(quint32 column, const QString &expression)
 {
     if (datamodel)  {
         datamodel->setColumnHeaderData(column, QFRDRTable::ColumnExpressionRole, expression);
     }
 }
 
-void QFRDRTable::tableSetColumnComment(quint16 column, const QString &comment)
+void QFRDRTable::tableSetColumnComment(quint32 column, const QString &comment)
 {
     if (datamodel)  {
         datamodel->setColumnHeaderData(column, QFRDRTable::ColumnCommentRole, comment);
     }
 }
 
-void QFRDRTable::tableSetComment(quint16 row, quint16 column, const QString &comment)
+void QFRDRTable::tableSetComment(quint32 row, quint32 column, const QString &comment)
 {
     if (datamodel)  {
         datamodel->setData(datamodel->index(row, column), comment, QFRDRTable::TableCommentRole);
     }
 }
 
-QString QFRDRTable::tableGetExpression(quint16 row, quint16 column) const
+QString QFRDRTable::tableGetExpression(quint32 row, quint32 column) const
 {
     if (datamodel) return datamodel->data(datamodel->index(row, column), QFRDRTable::TableExpressionRole).toString();
     else return QString("");
@@ -1458,6 +1460,8 @@ void QFRDRTable::writeAxisInfo(QXmlStreamWriter &w, const QFRDRTable::AxisInfo &
     w.writeAttribute(axisName+"mintickilength", CDoubleToQString(plot.MinorTickInsideLength));
     w.writeAttribute(axisName+"mintickolength", CDoubleToQString(plot.MinorTickOutsideLength));
 
+    w.writeAttribute(axisName+"namedticks_namecol", QString::number(plot.columnNamedTickNames));
+    w.writeAttribute(axisName+"namedticks_valcol", QString::number(plot.columnNamedTickValues));
 
 
 }
@@ -1707,6 +1711,9 @@ void QFRDRTable::readAxisInfo(AxisInfo& plot, const QString& axisName, QDomEleme
     plot.TickOutsideLength=CQStringToDouble(te.attribute(axisName+"tickolength", "3"));
     plot.MinorTickInsideLength=CQStringToDouble(te.attribute(axisName+"mintickilength", "2"));
     plot.MinorTickOutsideLength=CQStringToDouble(te.attribute(axisName+"mintickolength", "2"));
+
+    plot.columnNamedTickNames=te.attribute(axisName+"namedticks_namecol", "-1").toInt();
+    plot.columnNamedTickValues=te.attribute(axisName+"namedticks_valcol", "-2").toInt();
 }
 
 
@@ -1743,7 +1750,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
         //qDebug()<<datamodel->getColumnTitles();
     } else if (e) {
         QDomElement te=e->firstChildElement("column");
-        quint16 rows=0, columns=0;
+        quint32 rows=0, columns=0;
         datamodel->setReadonly(false);
         if (!te.isNull()) {
             while (!te.isNull()) {
@@ -1752,7 +1759,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 QString hexp=te.attribute("expression", te.attribute("column_expression"));
                 QString hc=te.attribute("comment", te.attribute("column_comment"));
                 QDomElement re=te.firstChildElement("row");
-                quint16 r=0;
+                quint32 r=0;
                 //std::cout<<"resize("<<rows<<", "<<columns<<")\n";
                 datamodel->resize(rows, columns);
                 datamodel->setColumnTitle(columns-1, n);
@@ -1834,7 +1841,7 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
     if (files.size()>0) {
         if (datamodel->hasChanged()) datamodel->saveCSV(files[0]);
     } else {
-        for (quint16 c=0; c<datamodel->columnCount(); c++) {
+        for (quint32 c=0; c<datamodel->columnCount(); c++) {
             w.writeStartElement("column");
             w.writeAttribute("title", datamodel->columnTitle(c));
             if (datamodel->hasColumnHeaderData(c, ColumnExpressionRole)) {
@@ -1843,7 +1850,7 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
             if (datamodel->hasColumnHeaderData(c, ColumnCommentRole)) {
                 w.writeAttribute("comment", datamodel->getColumnHeaderData(c, ColumnCommentRole).toString());
             }
-            QList<quint32> coldroles=datamodel->getColumnHeaderDataRoles();
+            QList<quint64> coldroles=datamodel->getColumnHeaderDataRoles();
             for (int i=0; i<coldroles.size(); i++) {
                 if (coldroles[i]!=ColumnExpressionRole && coldroles[i]!=ColumnCommentRole) {
                     w.writeAttribute(QString("colpar%1").arg(coldroles[i]), getQVariantData(datamodel->getColumnHeaderData(c, coldroles[i])));
@@ -1851,7 +1858,7 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
 
                 }
             }
-            for (quint16 r=0; r<datamodel->rowCount(); r++) {
+            for (quint32 r=0; r<datamodel->rowCount(); r++) {
                 w.writeStartElement("row");
                 w.writeAttribute("type", getQVariantType(datamodel->cell(r, c)));
                 if (datamodel->cell(r, c).isValid()) {
@@ -1902,6 +1909,10 @@ void QFRDRTable::columnsInserted(int start, int count, bool emitRebuild)
             g.maxcolumn=QFRDRTableOffsetIfLarger(g.maxcolumn, start, count);
             g.dataSelectColumn=QFRDRTableOffsetIfLarger(g.dataSelectColumn, start, count);
         }
+        p.xAxis.columnNamedTickNames=QFRDRTableOffsetIfLarger(p.xAxis.columnNamedTickNames, start, count);
+        p.xAxis.columnNamedTickValues=QFRDRTableOffsetIfLarger(p.xAxis.columnNamedTickValues, start, count);
+        p.yAxis.columnNamedTickNames=QFRDRTableOffsetIfLarger(p.yAxis.columnNamedTickNames, start, count);
+        p.yAxis.columnNamedTickValues=QFRDRTableOffsetIfLarger(p.yAxis.columnNamedTickValues, start, count);
     }
 
     if (emitRebuild&&datamodel->getDoEmitSignals()) emitRebuildPlotWidgets();
@@ -1931,7 +1942,12 @@ void QFRDRTable::columnsRemoved(int start, int count, bool emitRebuild)
             g.meancolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.meancolumn, start, count);
             g.q75column=QFRDRTableOffsetIfLargerM1IfInRange(g.q75column, start, count);
             g.maxcolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.maxcolumn, start, count);
+            g.dataSelectColumn=QFRDRTableOffsetIfLargerM1IfInRange(g.dataSelectColumn, start, count);
         }
+        p.xAxis.columnNamedTickNames=QFRDRTableOffsetIfLargerM1IfInRange(p.xAxis.columnNamedTickNames, start, count);
+        p.xAxis.columnNamedTickValues=QFRDRTableOffsetIfLargerM1IfInRange(p.xAxis.columnNamedTickValues, start, count);
+        p.yAxis.columnNamedTickNames=QFRDRTableOffsetIfLargerM1IfInRange(p.yAxis.columnNamedTickNames, start, count);
+        p.yAxis.columnNamedTickValues=QFRDRTableOffsetIfLargerM1IfInRange(p.yAxis.columnNamedTickValues, start, count);
     }
 
     if (emitRebuild&&datamodel->getDoEmitSignals()) emitRebuildPlotWidgets();
@@ -1939,3 +1955,27 @@ void QFRDRTable::columnsRemoved(int start, int count, bool emitRebuild)
 
 
 
+
+void QFRDRTable::loadColumnToComboBox(QComboBox *combo)
+{
+    int idx=combo->currentIndex();
+    //disconnect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+
+        int addcolumns=2;
+        QFTablePluginModel* tab=model();
+        while (combo->count()-addcolumns>tab->columnCount() && combo->count()>addcolumns) {
+            combo->removeItem(combo->count()-1);
+        }
+        while (combo->count()-addcolumns<tab->columnCount() && tab->columnCount()>0) {
+            combo->addItem("");
+        }
+        combo->setItemText(0, tr("--- none ---"));
+        combo->setItemData(0, -1);
+        combo->setItemText(1, tr("--- special: 1,2,3... ---"));
+        combo->setItemData(1, -2);
+        for (int i=0; i<tab->columnCount(); i++) {
+            combo->setItemText(i+2, tr("#%1: %2").arg(i+1).arg(tab->columnTitle(i)));
+            combo->setItemData(i+2, i);//tab->columnTitle(i));
+        }
+    combo->setCurrentIndex(idx);
+}

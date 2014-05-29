@@ -555,7 +555,7 @@ typename T::value_type qfstatisticsMax(const T& value) {
 template <class T>
 T qfstatisticsFilter(const T& value) {
     long long N=value.size();
-    if (N<=1) return T();
+    if (N<1) return T();
     T res;
     for (register long long i=0; i<N; i++) {
         if (QFFloatIsOK(value[i])) {
@@ -573,7 +573,7 @@ T qfstatisticsFilter(const T& value) {
 template <class T>
 double qfstatisticsSum(const T& value) {
     long long N=value.size();
-    if (N<=1) return 0;
+    if (N<1) return 0;
     register double sum=0;
     for (register long long i=0; i<N; i++) {
         if (QFFloatIsOK(value[i])) {
@@ -581,6 +581,132 @@ double qfstatisticsSum(const T& value) {
         }
     }
     return sum;
+}
+
+
+/*! \brief calculate the cumulative sum of data
+    \ingroup qf3lib_mathtools
+
+    \f[ X_n=\sum\limits_{i=0}^{n-1} v_i \f]
+*/
+template <class T>
+T qfstatisticsCumSum(const T& value) {
+    long long N=value.size();
+    if (N<1) return T();
+    register double sum=0;
+    T res;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i])) {
+            sum=sum+(double)(value[i]);
+
+        }
+        res.append(sum);
+    }
+    return res;
+}
+
+
+/*! \brief calculate the differences o the vector of numbers
+    \ingroup qf3lib_mathtools
+
+    \f[ X_n=v_n-v_{n-1} \f]
+    The returned vector has one item less than the input vector
+*/
+template <class T>
+T qfstatisticsDiff(const T& value) {
+    long long N=value.size();
+    if (N<=1) return T();
+    T res;
+    if (N>1) {
+        for (register long long i=1; i<N; i++) {
+            if (QFFloatIsOK(value[i]) && QFFloatIsOK(value[i-1])) {
+                res.append(value[i]-value[i-1]);
+
+            } else {
+                res.append(NAN);
+            }
+
+        }
+    }
+    return res;
+}
+
+
+
+
+
+/*! \brief calculate the trapezoidal numerical integration
+    \ingroup qf3lib_mathtools
+
+    \f[ \int f(x)\mathrm{d}x=\frac{1}{2}\cdot\sum\limits_{n=1}^{N-1}\left(f(x_n)+f(x_n+1)\right) \f]
+
+*/
+template <class T>
+double qfstatisticsTrapz(const T& value_in) {
+    T value=qfstatisticsFilter(value_in);
+    long long N=value.size();
+    if (N<=1) return 0;
+    double res=0;
+    if (N>1) {
+        for (register long long i=0; i<N-1; i++) {
+            res=res+(value[i]+value[i+1]);
+        }
+    }
+    return res/2.0;
+}
+
+
+/*! \brief calculate the trapezoidal numerical integration
+    \ingroup qf3lib_mathtools
+
+    \f[ \int f(x)\mathrm{d}x=\frac{1}{2}\cdot\sum\limits_{n=1}^{N-1}(x_{n+1}-x_n)\cdot\left[f(x_n)+f(x_n+1)\right] \f]
+
+*/
+template <class T>
+double qfstatisticsTrapzXY(const T& valueX, const T& valueY) {
+    T X,Y;
+
+    long long N=qMin(valueX.size(), valueY.size());
+    if (N<=1) return 0;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(valueX[i]) && QFFloatIsOK(valueY[i])) {
+            X<<(double)(valueX[i]);
+            Y<<(double)(valueY[i]);
+        }
+    }
+
+    N=qMin(X.size(), Y.size());
+    if (N<=1) return 0;
+    double res=0;
+    if (N>1) {
+        for (register long long i=0; i<N-1; i++) {
+            res=res+(Y[i]+Y[i+1])*(X[i+1]-X[i]);
+        }
+    }
+    return res/2.0;
+}
+
+
+
+/*! \brief calculate the cumulative sum of data
+    \ingroup qf3lib_mathtools
+
+    \f[ X_n=\prod\limits_{i=0}^{n-1} v_i \f]
+*/
+template <class T>
+T qfstatisticsCumProd(const T& value) {
+    long long N=value.size();
+    if (N<1) return T();
+    register double prod=1;
+    T res;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i])) {
+            prod=prod*(double)(value[i]);
+
+        }
+        res.append(prod);
+    }
+    return res;
 }
 
 /*! \brief calculate the product of data
@@ -591,7 +717,7 @@ double qfstatisticsSum(const T& value) {
 template <class T>
 double qfstatisticsProd(const T& value) {
     long long N=value.size();
-    if (N<=1) return 0;
+    if (N<1) return 0;
     register double prod=1;
     for (register long long i=0; i<N; i++) {
         if (QFFloatIsOK(value[i])) {
@@ -608,7 +734,7 @@ double qfstatisticsProd(const T& value) {
 template <class T>
 double qfstatisticsSum2(const T& value) {
     long long N=value.size();
-    if (N<=1) return 0;
+    if (N<1) return 0;
     register double sum=0;
     for (register long long i=0; i<N; i++) {
         if (QFFloatIsOK(value[i])) {
@@ -757,13 +883,19 @@ typename T::value_type qfstatisticsSortedNMAD(const T& value, typename T::value_
 
 */
 template <typename T>
-typename T::value_type qfstatisticsMAD(const T& value, typename T::value_type* median=NULL) {
+typename T::value_type qfstatisticsMAD(const T& value, typename T::value_type* median) {
     long long N=value.size();
     if (N<=1) return 0;
     T sorted=value;
     qSort(sorted);
     register typename T::value_type res=qfstatisticsSortedMAD(sorted, median);
     return res;
+}
+
+template <typename T>
+typename T::value_type qfstatisticsMADS(const T& value) {
+    typename T::value_type median;
+    return  qfstatisticsMAD(value, &median);
 }
 
 /*! \brief calculates the normalized median absolute deviation about the median (NMAD), a robust measure of sample deviation, the data has to be a sorted array!
@@ -776,10 +908,15 @@ typename T::value_type qfstatisticsMAD(const T& value, typename T::value_type* m
 
 */
 template <typename T>
-double qfstatisticsNMAD(const T& value, typename T::value_type* median=NULL) {
+double qfstatisticsNMAD(const T& value, typename T::value_type* median) {
     return double(qfstatisticsMAD(value, median))/0.6745;
 }
 
+template <typename T>
+double qfstatisticsNMADS(const T& value) {
+    typename T::value_type median;
+    return  qfstatisticsNMAD(value, &median);
+}
 
 
 /*! \brief return the given quantile from a sorted array

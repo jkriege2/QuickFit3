@@ -302,6 +302,27 @@
   </li>
   
   
+  
+  
+  <li><a name="indexedmad"/><!-- func:indexedmad -->
+  <b><tt><!-- template -->indexedmad(x, idx)<!-- /template --></tt> - <i>returns  the median absolute deviation about the median (MAD), a robust measure of sample deviation of vector <tt>x</tt>,  of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  $$bmath:\mbox{MAD}(\vec{x})=\mbox{Med}\left\{|\vec{x}-\mbox{Med}(\vec{x})|\right\}$$
+  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$see:Ricardo A. Maronna, R. Douglas Martin, Victor J. Yohai: "Robust Statistics: Theory and Methods", Wiley, 2006, ISBN: 978-0-470-01092-1$$
+  
+  <!-- /func:indexedmad -->
+  </li>
+  <li><a name="indexednmad"/><!-- func:indexednmad -->
+  <b><tt><!-- template -->indexednmad(x, idx)<!-- /template --></tt> - <i>returns  the  normalized median absolute deviation about the median (NMAD), a robust measure of sample deviation of vector <tt>x</tt>,  of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
+  $$bmath:\mbox{NMAD}(\vec{x})=\frac{\mbox{MAD}(\vec{x})}{0.6745}=\frac{\mbox{Med}\left\{|\vec{x}-\mbox{Med}(\vec{x})|\right\}}{0.6745}$$
+  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$see:Ricardo A. Maronna, R. Douglas Martin, Victor J. Yohai: "Robust Statistics: Theory and Methods", Wiley, 2006, ISBN: 978-0-470-01092-1$$
+  
+  <!-- /func:indexednmad -->
+  </li>
+  
+  
+  
   <li><a name="indexedcorrcoeff"/><!-- func:indexedcorrcoeff -->
   <b><tt><!-- template -->indexedcorrcoeff(x, idx, order)<!-- /template --></tt> - <i>returns a vector of the <tt>order</tt>-th non-central central moments of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b><br>
   The order is the order of first appearance of each index in <tt>idx</tt> and the same order, as returned by <tt><a href="vector.html#unique">unique(idx)</a></tt>.<br>

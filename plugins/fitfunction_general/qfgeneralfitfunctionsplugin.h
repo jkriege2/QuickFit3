@@ -26,7 +26,7 @@ class QFGeneralFitFunctionsPlugin : public QObject, public QFPluginFitFunction {
 
         /** \brief name for the plugin */
         virtual QString getName() const {
-            return tr("General FIt Functions Plugin");
+            return tr("General Fit Functions Plugin");
         };
 
         /** \brief short description for the plugin */

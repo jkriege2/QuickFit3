@@ -129,6 +129,9 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("dsort", QFMathParser_DefaultLib::fDSort);
     p->addFunction("count", QFMathParser_DefaultLib::fCount);
     p->addFunction("sum", QFMathParser_DefaultLib::fSum);
+    p->addFunction("diff", QFMathParser_DefaultLib::fDiff);
+    p->addFunction("cumsum", QFMathParser_DefaultLib::fCumSum);
+    p->addFunction("cumprod", QFMathParser_DefaultLib::fCumProd);
     p->addFunction("sum2", QFMathParser_DefaultLib::fSum2);
     p->addFunction("mean", QFMathParser_DefaultLib::fMean);
     p->addFunction("corrcoeff", QFMathParser_DefaultLib::fCorrcoeff);
@@ -155,6 +158,10 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("anytrue", QFMathParser_DefaultLib::fAnyTrue);
     p->addFunction("anyfalse", QFMathParser_DefaultLib::fAnyFalse);
     p->addFunction("countoccurences", QFMathParser_DefaultLib::fCountOccurences);
+    p->addFunction("mad", QFMathParser_DefaultLib::fMAD);
+    p->addFunction("nmad", QFMathParser_DefaultLib::fNMAD);
+    p->addFunction("trapz", QFMathParser_DefaultLib::fTrapz);
+    p->addFunction("trapez", QFMathParser_DefaultLib::fTrapz);
 
     p->addFunction("containssubstring", QFMathParser_DefaultLib::fContainsSubString);
 
@@ -173,6 +180,8 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("indexedsum", QFMathParser_DefaultLib::fIndexedSum);
     p->addFunction("indexedsum2", QFMathParser_DefaultLib::fIndexedSum2);
     p->addFunction("indexedquantile", QFMathParser_DefaultLib::fIndexedQuantile);
+    p->addFunction("indexedmad", QFMathParser_DefaultLib::fIndexedMAD);
+    p->addFunction("indexednmad", QFMathParser_DefaultLib::fIndexedNMAD);
 
     p->addFunction("indexedskewness", QFMathParser_DefaultLib::fIndexedSkewness);
     p->addFunction("indexedprod", QFMathParser_DefaultLib::fIndexedProd);
@@ -1448,6 +1457,55 @@ namespace QFMathParser_DefaultLib {
         return res;
     }
 
+
+
+    qfmpResult fIndexedMAD(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=2) p->qfmpError("indexedmad(data, index) needs 2 argument");
+        else if (((params[0].type==qfmpDoubleVector)||(params[0].type==qfmpDouble)) && params[0].length()==params[1].length()) {
+            QVector<double> d=params[0].asVector();
+
+            if (params[1].type==qfmpDouble || params[1].type==qfmpDoubleVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asVector(), qfstatisticsMADS<QVector<double> >));
+            }
+            if (params[1].type==qfmpBool || params[1].type==qfmpBoolVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asBoolVector(), qfstatisticsMADS<QVector<double> >));
+            }
+            if (params[1].type==qfmpString || params[1].type==qfmpStringVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asStrVector(), qfstatisticsMADS<QVector<double> >));
+            }
+        } else {
+            p->qfmpError("indexedmad(data, index) needs a number vector as data argument and an equal sized index array of any type");
+        }
+
+        return res;
+    }
+
+    qfmpResult fIndexedNMAD(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=2) p->qfmpError("indexedmad(data, index) needs 2 argument");
+        else if (((params[0].type==qfmpDoubleVector)||(params[0].type==qfmpDouble)) && params[0].length()==params[1].length()) {
+            QVector<double> d=params[0].asVector();
+
+            if (params[1].type==qfmpDouble || params[1].type==qfmpDoubleVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asVector(), qfstatisticsNMADS<QVector<double> >));
+            }
+            if (params[1].type==qfmpBool || params[1].type==qfmpBoolVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asBoolVector(), qfstatisticsNMADS<QVector<double> >));
+            }
+            if (params[1].type==qfmpString || params[1].type==qfmpStringVector) {
+                return qfmpResult(qfUniqueApplyFunction(d, params[1].asStrVector(), qfstatisticsNMADS<QVector<double> >));
+            }
+        } else {
+            p->qfmpError("indexedmad(data, index) needs a number vector as data argument and an equal sized index array of any type");
+        }
+
+        return res;
+    }
+
+
     qfmpResult fIndexedMin(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
         qfmpResult res=qfmpResult::invalidResult();
 
@@ -2013,5 +2071,28 @@ namespace QFMathParser_DefaultLib {
         }\
         return; \
     }
+
+
+    void fTrapz(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        res.setInvalid();
+
+        if (n==1) {
+            if (params[0].type==qfmpDoubleVector) {
+                res.setDouble(qfstatisticsTrapz(params[0].numVec));
+            } else {
+                p->qfmpError("trapz(Y) needs 1 vector of numbers");
+            }
+
+        } else if (n==2) {
+            if (params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector) {
+                res.setDouble(qfstatisticsTrapzXY(params[0].numVec, params[1].numVec));
+            } else {
+                p->qfmpError("trapz(X,Y) needs 2 vectors of numbers");
+            }
+        } else {
+            p->qfmpError("trapz(Y)/trapz(X,Y) needs 1 or 2 argument");
+        }
+    }
+
 
 }

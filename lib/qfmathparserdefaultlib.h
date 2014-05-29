@@ -135,6 +135,7 @@ namespace QFMathParser_DefaultLib {
     QFMATHPARSER_DEFINE_2PARAM1VEC_VECTONUM_FUNC(fNonCentralMoment, ncmoment, qfstatisticsMoment)
     QFMATHPARSER_DEFINE_2PARAM2VEC_VECTONUM_FUNC(fCorrcoeff, corrcoeff, qfstatisticsCorrCoeff)
 
+    QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(fDiff, diff, qfstatisticsDiff)
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fSum, sum, qfstatisticsSum)
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fCount, count, qfstatisticsCount)
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fProd, prod, qfstatisticsProd)
@@ -142,10 +143,12 @@ namespace QFMathParser_DefaultLib {
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fVar, var, qfstatisticsVariance)
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fStd, std, qfstatisticsStd)
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fMedian, median, qfstatisticsMedian)
-    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fMAD, mad, qfstatisticsMAD)
-    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fNMAD, nmad, qfstatisticsNMAD)
+    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fMAD, mad, qfstatisticsMADS)
+    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fNMAD, nmad, qfstatisticsNMADS)
     QFMATHPARSER_DEFINE_2PARAM1VEC_VECTONUM_FUNC(fQuantile, quantile, qfstatisticsQuantile)
 
+    QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(fCumSum, cumsum, qfstatisticsCumSum)
+    QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(fCumProd, cumprod, qfstatisticsCumProd)
 
     QFMATHPARSER_DEFINE_2PARAM2VEC_NUMERIC_FUNC_SIMPLE(fYn, yn)
     QFMATHPARSER_DEFINE_2PARAM2VEC_NUMERIC_FUNC_SIMPLE(fJn, jn)
@@ -281,12 +284,15 @@ namespace QFMathParser_DefaultLib {
     qfmpResult fIndexedMoment(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fIndexedNonCentralMoment(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fIndexedCorrCoeff(const qfmpResult* params, unsigned int  n, QFMathParser* p) ;
+    qfmpResult fIndexedMAD(const qfmpResult* params, unsigned int  n, QFMathParser* p) ;
+    qfmpResult fIndexedNMAD(const qfmpResult* params, unsigned int  n, QFMathParser* p) ;
     qfmpResult fReturnLast(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fReturnFirst(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fLast(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fFirst(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fItem(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fRunningAverage(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fTrapz(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
     void fRegExpCapture(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p, bool minimal, Qt::CaseSensitivity casesens);
 

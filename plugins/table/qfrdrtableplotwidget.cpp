@@ -341,6 +341,52 @@ void QFRDRTablePlotWidget::plotDataChanged() {
     updateGraph();
 }
 
+
+void QFRDRTablePlotWidget::setAxisProps(JKQTPcoordinateAxis* axis, const QFRDRTable::AxisInfo& axisData, const QFRDRTable::PlotInfo& p) {
+    axis->clearAxisTickLabels();
+    axis->set_axisLabel(axisData.label);
+    axis->set_logAxis(axisData.log);
+    axis->set_showZeroAxis(axisData.axis0);
+    axis->set_labelFont(p.fontName);
+    axis->set_labelFontSize(p.axisLabelFontSize);
+    axis->set_tickLabelFont(p.fontName);
+    axis->set_tickLabelFontSize(p.axisFontSize);
+    axis->set_gridWidth(p.gridWidth);
+    axis->set_gridStyle(p.gridStyle);
+    axis->set_gridColor(p.gridColor);
+    axis->set_minTicks(axisData.minTicks);
+    axis->set_minorTicks(axisData.minorTicks);
+    axis->set_labelPosition(axisData.labelPos);
+    axis->set_labelType(axisData.labelType);
+    axis->set_autoLabelDigits(false);
+    axis->set_labelDigits(axisData.digits);
+    axis->set_drawMode1(axisData.labelMode1);
+    axis->set_drawMode2(axisData.labelMode2);
+
+
+    axis->set_userTickSpacing(axisData.TickSpacing);
+    axis->set_autoAxisSpacing(axisData.AutoTicks);
+    axis->set_tickSpacing(axisData.TickSpacing);
+    axis->set_userTickSpacing(axisData.TickSpacing);
+    axis->set_tickWidth(axisData.AxisTickWidth);
+    axis->set_minorTickWidth(axisData.AxisMinorTickWidth);
+    axis->set_inverted(axisData.AxisInverted);
+    axis->set_tickInsideLength(axisData.TickInsideLength);
+    axis->set_tickOutsideLength(axisData.TickOutsideLength);
+    axis->set_minorTickOutsideLength(axisData.MinorTickOutsideLength);
+    axis->set_minorTickInsideLength(axisData.MinorTickInsideLength);
+
+    if (axisData.columnNamedTickNames!=-1 && axisData.columnNamedTickValues!=-1 && current && current->model()) {
+        QVector<double> nums=current->model()->getColumnDataAsNumbers(axisData.columnNamedTickValues);
+        QVariantList labels=current->model()->getColumnData(axisData.columnNamedTickNames);
+        int cnt=qMax(nums.size(), labels.size());
+        for (int i=0; i<cnt; i++) {
+            axis->addAxisTickLabel(nums[i], labels[i].toString());
+        }
+    }
+
+}
+
 void QFRDRTablePlotWidget::updateGraph() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     if (current) {
@@ -364,68 +410,11 @@ void QFRDRTablePlotWidget::updateGraph() {
         }
 
         ui->plotter->setMagnification(m);
-        ui->plotter->getXAxis()->set_axisLabel(p.xAxis.label);
-        ui->plotter->getXAxis()->set_logAxis(p.xAxis.log);
-        ui->plotter->getXAxis()->set_showZeroAxis(p.xAxis.axis0);
-        ui->plotter->getYAxis()->set_showZeroAxis(p.yAxis.axis0);
-        ui->plotter->getXAxis()->set_labelFont(p.fontName);
-        ui->plotter->getXAxis()->set_labelFontSize(p.axisLabelFontSize);
-        ui->plotter->getXAxis()->set_tickLabelFont(p.fontName);
-        ui->plotter->getXAxis()->set_tickLabelFontSize(p.axisFontSize);
-        ui->plotter->getXAxis()->set_gridWidth(p.gridWidth);
-        ui->plotter->getYAxis()->set_gridWidth(p.gridWidth);
-        ui->plotter->getXAxis()->set_gridStyle(p.gridStyle);
-        ui->plotter->getYAxis()->set_gridStyle(p.gridStyle);
-        ui->plotter->getXAxis()->set_gridColor(p.gridColor);
-        ui->plotter->getYAxis()->set_gridColor(p.gridColor);
-        ui->plotter->getXAxis()->set_minTicks(p.xAxis.minTicks);
-        ui->plotter->getYAxis()->set_minTicks(p.yAxis.minTicks);
-        ui->plotter->getXAxis()->set_minorTicks(p.xAxis.minorTicks);
-        ui->plotter->getYAxis()->set_minorTicks(p.yAxis.minorTicks);
-        ui->plotter->getXAxis()->set_labelPosition(p.xAxis.labelPos);
-        ui->plotter->getYAxis()->set_labelPosition(p.yAxis.labelPos);
-        ui->plotter->getXAxis()->set_labelType(p.xAxis.labelType);
-        ui->plotter->getYAxis()->set_labelType(p.yAxis.labelType);
-        ui->plotter->getXAxis()->set_autoLabelDigits(false);
-        ui->plotter->getYAxis()->set_autoLabelDigits(false);
-        ui->plotter->getXAxis()->set_labelDigits(p.xAxis.digits);
-        ui->plotter->getYAxis()->set_labelDigits(p.yAxis.digits);
-        ui->plotter->getXAxis()->set_drawMode1(p.xAxis.labelMode1);
-        ui->plotter->getXAxis()->set_drawMode2(p.xAxis.labelMode2);
-        ui->plotter->getYAxis()->set_drawMode1(p.yAxis.labelMode1);
-        ui->plotter->getYAxis()->set_drawMode2(p.yAxis.labelMode2);
+
+        setAxisProps( ui->plotter->getXAxis(), p.xAxis, p);
+        setAxisProps( ui->plotter->getYAxis(), p.yAxis, p);
 
 
-        ui->plotter->getXAxis()->set_userTickSpacing(p.xAxis.TickSpacing);
-        ui->plotter->getXAxis()->set_autoAxisSpacing(p.xAxis.AutoTicks);
-        ui->plotter->getXAxis()->set_tickSpacing(p.xAxis.TickSpacing);
-        ui->plotter->getXAxis()->set_userTickSpacing(p.xAxis.TickSpacing);
-        ui->plotter->getXAxis()->set_tickWidth(p.xAxis.AxisTickWidth);
-        ui->plotter->getXAxis()->set_minorTickWidth(p.xAxis.AxisMinorTickWidth);
-        ui->plotter->getXAxis()->set_inverted(p.xAxis.AxisInverted);
-        ui->plotter->getXAxis()->set_tickInsideLength(p.xAxis.TickInsideLength);
-        ui->plotter->getXAxis()->set_tickOutsideLength(p.xAxis.TickOutsideLength);
-        ui->plotter->getXAxis()->set_minorTickOutsideLength(p.xAxis.MinorTickOutsideLength);
-        ui->plotter->getXAxis()->set_minorTickInsideLength(p.xAxis.MinorTickInsideLength);
-
-        ui->plotter->getYAxis()->set_userTickSpacing(p.yAxis.TickSpacing);
-        ui->plotter->getYAxis()->set_autoAxisSpacing(p.yAxis.AutoTicks);
-        ui->plotter->getYAxis()->set_tickSpacing(p.yAxis.TickSpacing);
-        ui->plotter->getYAxis()->set_userTickSpacing(p.yAxis.TickSpacing);
-        ui->plotter->getYAxis()->set_tickWidth(p.yAxis.AxisTickWidth);
-        ui->plotter->getYAxis()->set_minorTickWidth(p.yAxis.AxisMinorTickWidth);
-        ui->plotter->getYAxis()->set_inverted(p.yAxis.AxisInverted);
-        ui->plotter->getYAxis()->set_tickInsideLength(p.yAxis.TickInsideLength);
-        ui->plotter->getYAxis()->set_tickOutsideLength(p.yAxis.TickOutsideLength);
-        ui->plotter->getYAxis()->set_minorTickOutsideLength(p.yAxis.MinorTickOutsideLength);
-        ui->plotter->getYAxis()->set_minorTickInsideLength(p.yAxis.MinorTickInsideLength);
-
-        ui->plotter->getYAxis()->set_axisLabel(p.yAxis.label);
-        ui->plotter->getYAxis()->set_logAxis(p.yAxis.log);
-        ui->plotter->getYAxis()->set_labelFont(p.fontName);
-        ui->plotter->getYAxis()->set_labelFontSize(p.axisLabelFontSize);
-        ui->plotter->getYAxis()->set_tickLabelFont(p.fontName);
-        ui->plotter->getYAxis()->set_tickLabelFontSize(p.axisFontSize);
         ui->plotter->get_plotter()->set_plotLabelFontname(p.fontName);
         ui->plotter->get_plotter()->set_plotLabelFontSize(p.labelFontSize);
         ui->plotter->get_plotter()->set_plotLabel(p.title);
@@ -543,12 +532,14 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_width(g.width);
                 pg->set_shift(g.shift);
-                /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
+                pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
+                pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
-                }*/
+                }
+                pg->set_yErrorStyle(JKQTPnoError);
                 /*pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
                 if (pg->get_yErrorColumn()>=0) {
                     pg->set_yErrorStyle(g.errorStyle);
@@ -583,6 +574,8 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_title(g.title);
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
+                pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
                 pg->set_width(g.width);
                 pg->set_shift(g.shift);
                 /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
@@ -591,12 +584,13 @@ void QFRDRTablePlotWidget::updateGraph() {
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
                 }*/
-                /*pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
                 if (pg->get_yErrorColumn()>=0) {
                     pg->set_yErrorStyle(g.errorStyle);
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
-                }*/
+                }
+                pg->set_xErrorStyle(JKQTPnoError);
                 //pg->set_drawLine(g.drawLine);
                 //pg->set_symbol(g.symbol);
                 //pg->set_symbolSize(g.symbolSize);
@@ -1310,8 +1304,13 @@ void QFRDRTablePlotWidget::updateData() {
             for (int r=0; r<current->model()->rowCount(); r++) {
                 data[r]=NAN;
                 bool ok=false;
-                double d=current->model()->cell(r, c).toDouble(&ok);
-                if (ok) data[r]=d;
+                QVariant v=current->model()->cell(r, c);
+                if (v.type()==QVariant::Date || v.type()==QVariant::DateTime || v.type()==QVariant::Time) {
+                    data[r]=v.toDateTime().toMSecsSinceEpoch();
+                } else if (v.canConvert(QVariant::Double)) {
+                    double d=v.toDouble(&ok);
+                    if (ok) data[r]=d;
+                }
             }
             int items=current->model()->rowCount();
             int i=current->model()->rowCount()-1;
@@ -1326,6 +1325,7 @@ void QFRDRTablePlotWidget::updateData() {
             else  ds->addCopiedColumn(&dummy, 1, current->model()->columnTitle(c));
             free(data);
         }
+        ds->addLinearColumn(current->model()->rowCount(), 1, current->model()->rowCount(), QString("rowNumColSpecial"));
     }
 
     if (update) {
@@ -1392,6 +1392,7 @@ void QFRDRTablePlotWidget::magnificationChanged(int idx)
 int QFRDRTablePlotWidget::getColumnWithStride(int column, const QFRDRTable::GraphInfo& g)
 {
     //qDebug()<<"getColumnWithStride  column="<<column<<"    strided: "<<g.isStrided<<" stride="<<g.stride<<" strideStart="<<g.strideStart;
+    if (column==-2) return ui->plotter->getDatastore()->ensureColumnNum(QString("rowNumColSpecial"));
     if (column>=0 && column<(long)ui->plotter->getDatastore()->getColumnCount()) {
         QVector<double> data=ui->plotter->getDatastore()->getColumn(column).copyData();
         if (g.isDataSelect && g.dataSelectColumn>=0 && g.dataSelectColumn<(long)ui->plotter->getDatastore()->getColumnCount()) {
