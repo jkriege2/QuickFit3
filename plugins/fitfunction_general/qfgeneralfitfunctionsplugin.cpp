@@ -8,6 +8,7 @@
 #include "qffitfunctiongeneraldblexp.h"
 #include "qffitfunctiongeneralpowerlaw.h"
 #include "qffitfunctiongeneralsine.h"
+#include "qffitfunctiongeneralcosine.h"
 #include "qffitfunctiongeneralline.h"
 #include "qffitfunctiongeneralpolynom.h"
 #include "qffitfunctiongenerallognormal.h"
@@ -24,6 +25,7 @@ QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     res<<"gen_lorentzian";
     res<<"gen_lognormal";
     res<<"gen_sine";
+    res<<"gen_cos";
     res<<"gen_sigmoid";
     res<<"gen_exp";
     res<<"gen_dblexp";
@@ -54,6 +56,8 @@ QFFitFunction* QFGeneralFitFunctionsPlugin::get(QString id, QObject* parent) con
         return new QFFitFunctionGeneralPowerLaw();
     } else if (id=="gen_sine") {
         return new QFFitFunctionGeneralSine();
+    } else if (id=="gen_cos") {
+        return new QFFitFunctionGeneralCosine();
     } else if (id=="gen_lognormal") {
         return new QFFitFunctionGeneralLogNormal();
     } else if (id=="gen_line") {

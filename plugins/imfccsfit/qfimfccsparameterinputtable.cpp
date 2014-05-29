@@ -132,13 +132,13 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
                             if (desc.type==QFFitFunction::IntCombo) return wtValueComboBox;
                         }
                         if (role==Qt::BackgroundRole && !desc.userEditable) return QBrush(QApplication::palette().color(QPalette::Window));
-                    } if (coli==1) {
+                    } else if (coli==1) {
                         if ((role==Qt::DisplayRole || role==Qt::EditRole)  && desc.displayError!=QFFitFunction::NoError) return roundError(item->getFitError(fp.id, rdr));
                         if (role==widgetTypeRole) {
                             if (desc.displayError==QFFitFunction::EditError) return wtErrorEdit;
                         }
                         if (role==Qt::BackgroundRole && desc.displayError!=QFFitFunction::EditError) return QBrush(QApplication::palette().color(QPalette::Window));
-                    } if (editRanges && coli==2) {
+                    } else if (editRanges && coli==2) {
                         if (role==Qt::DisplayRole || role==Qt::EditRole) {
                             return item->getFitMin(fp.id, rdr);
                         }
@@ -146,7 +146,7 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
                             if (desc.type==QFFitFunction::FloatNumber) return wtRangeEditMin;
                         }
                         if (role==Qt::BackgroundRole && !desc.userEditable) return QBrush(QApplication::palette().color(QPalette::Window));
-                    } if (editRanges && coli==3) {
+                    } else if (editRanges && coli==3) {
                         if (role==Qt::DisplayRole || role==Qt::EditRole) {
                             return item->getFitMax(fp.id, rdr);
                         }
@@ -154,14 +154,14 @@ QVariant QFImFCCSParameterInputTable::data(const QModelIndex &index, int role) c
                             if (desc.type==QFFitFunction::FloatNumber) return wtRangeEditMax;
                         }
                         if (role==Qt::BackgroundRole && !desc.userEditable) return QBrush(QApplication::palette().color(QPalette::Window));
-                    } if (coli==getColsPerRDR()-3) {
+                    } else if (coli==getColsPerRDR()-3) {
                         if (role==Qt::DisplayRole || role==Qt::EditRole) return desc.unitLabel;
-                    } if (coli==getColsPerRDR()-2) {
+                    } else if (coli==getColsPerRDR()-2) {
                         if (role==Qt::CheckStateRole && desc.fit) {
                             if (item->getFitFix(fp.id, rdr)) return Qt::Checked;
                             return Qt::Unchecked;
                         }
-                    } if (coli==getColsPerRDR()-1) {
+                    } else if (coli==getColsPerRDR()-1) {
                         if (role==Qt::DisplayRole && desc.fit) {
                             int g=item->getLinkParameter(cols, fp.id);
                             if (g>=0) return tr("global #%1").arg(g);

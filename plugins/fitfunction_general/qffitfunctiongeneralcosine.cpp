@@ -1,10 +1,10 @@
-#include "qffitfunctiongeneralsine.h"
+#include "qffitfunctiongeneralcosine.h"
 #include "qfmathtools.h"
 #include "statistics_tools.h"
 #include <cmath>
 
 
-QFFitFunctionGeneralSine::QFFitFunctionGeneralSine() {
+QFFitFunctionGeneralCosine::QFFitFunctionGeneralCosine() {
     //           type,         id,                        name,                                                    label (HTML),                      unit,          unitlabel (HTML),        fit,       userEditable, userRangeEditable, displayError, initialFix,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(FloatNumber,  "offset",                    "offset",                                                  "Y<sub>0</sub>",                   "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 0.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
     #define PARAM_OFFSET 0
@@ -19,39 +19,39 @@ QFFitFunctionGeneralSine::QFFitFunctionGeneralSine() {
 
 }
 
-double QFFitFunctionGeneralSine::evaluate(double t, const double* data) const {
-    return data[PARAM_OFFSET]+data[PARAM_AMPLITUDE]*sin(2.0*M_PI*(data[PARAM_FREQUENCY]*t+data[PARAM_PHASE]));
+double QFFitFunctionGeneralCosine::evaluate(double t, const double* data) const {
+    return data[PARAM_OFFSET]+data[PARAM_AMPLITUDE]*cos(2.0*M_PI*(data[PARAM_FREQUENCY]*t+data[PARAM_PHASE]));
 
 }
 
 
-void QFFitFunctionGeneralSine::calcParameter(double* data, double* error) const {
+void QFFitFunctionGeneralCosine::calcParameter(double* data, double* error) const {
     if (data) {
         data[PARAM_PERIOD]=1.0/data[PARAM_FREQUENCY];
         if (error) error[PARAM_PERIOD]=qfErrorDiv(1,0,data[PARAM_FREQUENCY],error[PARAM_FREQUENCY]);
     }
 }
 
-bool QFFitFunctionGeneralSine::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionGeneralCosine::isParameterVisible(int parameter, const double* data) const {
     return true;
 }
-unsigned int QFFitFunctionGeneralSine::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionGeneralCosine::getAdditionalPlotCount(const double* params) {
     return 0;
 }
 
-QString QFFitFunctionGeneralSine::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionGeneralCosine::transformParametersForAdditionalPlot(int plot, double* params) {
     return "";
 }
 
-bool QFFitFunctionGeneralSine::get_implementsDerivatives()
+bool QFFitFunctionGeneralCosine::get_implementsDerivatives()
 {
     return false;
 }
 
-void QFFitFunctionGeneralSine::evaluateDerivatives(double* derivatives, double t, const double* data) const {
+void QFFitFunctionGeneralCosine::evaluateDerivatives(double* derivatives, double t, const double* data) const {
 }
 
-bool QFFitFunctionGeneralSine::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
+bool QFFitFunctionGeneralCosine::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 
