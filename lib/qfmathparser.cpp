@@ -42,6 +42,9 @@ void QFMathParser::addStandardFunctions(){
     for (int i=0; i<externalGlobalFunctionsRR.size(); i++) {
         addFunction(externalGlobalFunctionsRR[i].first, externalGlobalFunctionsRR[i].second);
     }
+    for (int i=0; i<externalGlobalFunctionsFN.size(); i++) {
+        addFunction(externalGlobalFunctionsFN[i].first, externalGlobalFunctionsFN[i].second);
+    }
 }
 
 
@@ -203,6 +206,7 @@ bool QFMathParser::hasErrorOccured() const
 
 QList<QPair<QString, QFMathParser::qfmpEvaluateFunc> > QFMathParser::externalGlobalFunctions= QList<QPair<QString, QFMathParser::qfmpEvaluateFunc> >() ;
 QList<QPair<QString, QFMathParser::qfmpEvaluateFuncRefReturn> > QFMathParser::externalGlobalFunctionsRR= QList<QPair<QString, QFMathParser::qfmpEvaluateFuncRefReturn> >() ;
+QList<QPair<QString, QFMathParser::qfmpEvaluateFromNodesFuncRefReturn> > QFMathParser::externalGlobalFunctionsFN= QList<QPair<QString, QFMathParser::qfmpEvaluateFromNodesFuncRefReturn> >() ;
 QList<QPair<QString, qfmpResult> > QFMathParser::externalGlobalVariables= QList<QPair<QString, qfmpResult> >();
 
 
@@ -214,6 +218,12 @@ void QFMathParser::addGlobalFunction(const QString &name, QFMathParser::qfmpEval
 void QFMathParser::addGlobalFunction(const QString &name, QFMathParser::qfmpEvaluateFuncRefReturn function)
 {
     externalGlobalFunctionsRR.append(qMakePair(name, function));
+}
+
+void QFMathParser::addGlobalFunction(const QString &name, QFMathParser::qfmpEvaluateFromNodesFuncRefReturn function)
+{
+    externalGlobalFunctionsFN.append(qMakePair(name, function));
+
 }
 
 void QFMathParser::addGlobalVariable(const QString &name, double value)
@@ -359,6 +369,16 @@ void QFMathParser::addFunction(const QString &name, QFMathParser::qfmpEvaluateFu
     if (f2) f.simpleFuncPointer[102]=(void*)f2;
     if (f3) f.simpleFuncPointer[103]=(void*)f3;
     environment.setFunction(name, f);
+}
+
+void QFMathParser::addFunction(const QString &name, QFMathParser::qfmpEvaluateFromNodesFuncRefReturn function)
+{
+    qfmpFunctionDescriptor f;
+    f.functionFN=function;
+    f.name=name;
+    f.type=QFMathParser::functionFromNode;
+    environment.setFunction(name, f);
+
 }
 
 
@@ -1238,7 +1258,7 @@ QString QFMathParser::readDelim(QChar delimiter){
 
 
 /******************************************************************************************
- * Klassenhierarchie, um Ausdrücke darzustellen
+ * Klassenhierarchie, um Ausdrï¿½cke darzustellen
  ******************************************************************************************/
 QFMathParser::qfmpUnaryNode::qfmpUnaryNode(char op, QFMathParser::qfmpNode* c, QFMathParser* p, QFMathParser::qfmpNode* par):
     qfmpNode(p, par)
@@ -2077,25 +2097,23 @@ QFMathParser::qfmpFunctionNode::qfmpFunctionNode(QString name, QVector<qfmpNode 
 }
 
 qfmpResult QFMathParser::qfmpFunctionNode::evaluate() {
-    QVector<qfmpResult> data(child.size(), QFMathParser::getInvalidResult());
-  //QString dbg=fun+"(";
+    /*QVector<qfmpResult> data(child.size(), QFMathParser::getInvalidResult());
     for (int i=0; i<child.size(); i++) {
         if (child[i]) data[i]=child[i]->evaluate();
-        //if (i>0) dbg+=", ";
-        //dbg+=data.last().toString();
     }
-    //dbg+=")";
-    //if (fun=="fib") //qDebug()<<dbg;
-    return parser->evaluateFunction(fun, data);
+    return parser->evaluateFunction(fun, data);*/
+    qfmpResult r;
+    evaluate(r);
+    return r;
 }
 
 void QFMathParser::qfmpFunctionNode::evaluate(qfmpResult &result)
 {
-    QVector<qfmpResult> data(child.size(), QFMathParser::getInvalidResult());
+    /*QVector<qfmpResult> data(child.size(), QFMathParser::getInvalidResult());
     for (int i=0; i<child.size(); i++) {
         if (child[i]) child[i]->evaluate(data[i]);
-    }
-    result=parser->evaluateFunction(fun, data);
+    }*/
+    result=parser->evaluateFunction(fun, child);
 }
 
 QFMathParser::qfmpNode *QFMathParser::qfmpFunctionNode::copy(QFMathParser::qfmpNode *par)
@@ -2147,6 +2165,11 @@ bool QFMathParser::qfmpFunctionNode::createByteCode(QFMathParser::ByteCodeProgra
             int level=getParser()->environment.getFunctionLevel(fun);
             if (level>0) {
                 getParser()->qfmpError(QObject::tr("only top-level functions allowed in byte-coded expressionen (function '%1', level %2)").arg(fun).arg(level));
+                return false;
+            }
+            qfmpFunctiontype ft=getParser()->environment.getFunctionType(fun);
+            if (ft==functionFromNode || ft==functionInvalid) {
+                getParser()->qfmpError(QObject::tr("only simple functions allowed in byte-coded expressionen (function '%1')").arg(fun));
                 return false;
             }
             if ((!def.simpleFuncPointer.contains(params) && !def.simpleFuncPointer.contains(100+params)) || (!def.simpleFuncPointer[params] && !def.simpleFuncPointer[100+params])) {
@@ -2444,12 +2467,28 @@ void QFMathParser::qfmpFunctionDescriptor::evaluate(qfmpResult &r, const QVector
 
 }
 
+void QFMathParser::qfmpFunctionDescriptor::evaluate(qfmpResult &r,  QVector<qfmpNode *> parameters, QFMathParser *parent) const
+{
+    if (type==QFMathParser::functionFromNode) {
+        functionFN(r, parameters.data(), parameters.size(), parent);
+    } else {
+        QVector<qfmpResult> res;
+        res.resize(parameters.size());
+        for (int i=0; i<parameters.size(); i++) {
+            parameters[i]->evaluate(res[i]);
+        }
+        evaluate(r, res, parent);
+    }
+}
+
 QString QFMathParser::qfmpFunctionDescriptor::toDefString() const
 {
     QString res="";
     if (type==QFMathParser::functionNode) res=QString("%1(%2): node").arg(name).arg(parameterNames.join(", "));
     else if (type==QFMathParser::functionC) res=QString("%1(?): C function (copy-return)").arg(name);
     else if (type==QFMathParser::functionCRefReturn) res=QString("%1(?): C function (return-by-reference)").arg(name);
+    else if (type==QFMathParser::functionFromNode) res=QString("%1(?): C function of nodes (return-by-reference)").arg(name);
+    else if (type==QFMathParser::functionInvalid) res=QString("%1(?): invalid function").arg(name);
     return res;
 }
 

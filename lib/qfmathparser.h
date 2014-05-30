@@ -906,11 +906,17 @@ class QFLIB_EXPORT QFMathParser
          */
         typedef void (*qfmpEvaluateFuncRefReturn)(qfmpResult&, const qfmpResult*, unsigned int, QFMathParser*);
 
+        /** \brief This is a function prototype like qfmpEvaluateFunc but returns its result with call by reference. the parameters are not evaluated qfmpResults, but pointers to qfmpNode
+         */
+        typedef void (*qfmpEvaluateFromNodesFuncRefReturn)(qfmpResult&, qfmpNode**, unsigned int, QFMathParser*);
+
         /** \brief types of functions */
         enum qfmpFunctiontype {
             functionC,
             functionCRefReturn,
-            functionNode
+            functionNode,
+            functionFromNode,
+            functionInvalid
         };
 
         /** \brief description of a user registered function */
@@ -920,6 +926,7 @@ class QFLIB_EXPORT QFMathParser
             QFLIB_EXPORT void clearMemory();
             qfmpEvaluateFunc function;    /*!< \brief a pointer to the function implementation */
             qfmpEvaluateFuncRefReturn functionRR;    /*!< \brief a pointer to the function implementation */
+            qfmpEvaluateFromNodesFuncRefReturn functionFN;    /*!< \brief a pointer to the function implementation */
             QString name;             /*!< \brief name of the function */
             qfmpFunctiontype type;  /*!< \brief type of the function */
             qfmpNode* functionNode;   /*!< \brief points to the node definig the function */
@@ -928,6 +935,7 @@ class QFLIB_EXPORT QFMathParser
             QMap<int, void*> simpleFuncPointer; /*!<  \brief points to the simple implementation of the function, e.g. of type qfmpEvaluateFuncSimple0Param or qfmpEvaluateFuncSimple0ParamMP, the integer-key indexes the function as its number of parameters for a simple call to simpleFuncPointer ... values >100 indicate the use of a MP-variant, i.e. 102 means a call to qfmpEvaluateFuncSimple2ParamMP whereas 1 means a call to  qfmpEvaluateFuncSimple1Param */
 
             QFLIB_EXPORT void evaluate(qfmpResult& res, const QVector<qfmpResult> &parameters, QFMathParser *parent) const;
+            QFLIB_EXPORT void evaluate(qfmpResult& res, QVector<qfmpNode *> parameters, QFMathParser *parent) const;
             QFLIB_EXPORT QString toDefString() const;
         };
 
@@ -1243,6 +1251,35 @@ class QFLIB_EXPORT QFMathParser
                     return res;
                 }
 
+                inline void evaluateFunction(qfmpResult& res, const QString& name, const QVector<qfmpResult> &parameters) const{
+                    if (functions.contains(name) && functions[name].size()>0) {
+                        functions[name].last().second.evaluate(res, parameters, parent);
+                    } else {
+                        if (parent) parent->qfmpError(QObject::tr("the function '%1' does not exist").arg(name));
+                        res.setInvalid();
+                    }
+                }
+
+                inline qfmpResult evaluateFunction(const QString& name, QVector<qfmpNode*> parameters) const{
+                    qfmpResult res;
+                    if (functions.contains(name) && functions[name].size()>0) {
+                        functions[name].last().second.evaluate(res, parameters, parent);
+                    } else {
+                        if (parent) parent->qfmpError(QObject::tr("the function '%1' does not exist").arg(name));
+                        res.setInvalid();
+                    }
+                    return res;
+                }
+
+                inline void evaluateFunction(qfmpResult& res, const QString& name, QVector<qfmpNode*> parameters) const{
+                    if (functions.contains(name) && functions[name].size()>0) {
+                        functions[name].last().second.evaluate(res, parameters, parent);
+                    } else {
+                        if (parent) parent->qfmpError(QObject::tr("the function '%1' does not exist").arg(name));
+                        res.setInvalid();
+                    }
+                }
+
                 inline bool getFunctionDef(const QString& name, qfmpFunctionDescriptor& vardef) const {
                     if (functions.contains(name) && functions[name].size()>0) {
                         vardef=functions[name].last().second;
@@ -1250,6 +1287,14 @@ class QFLIB_EXPORT QFMathParser
                     }
                     if (parent) parent->qfmpError(QObject::tr("the function '%1' does not exist").arg(name));
                     return false;
+                }
+
+                inline qfmpFunctiontype getFunctionType(const QString& name) const {
+                    if (functions.contains(name) && functions[name].size()>0) {
+                         return functions[name].last().second.type;
+                    }
+                    if (parent) parent->qfmpError(QObject::tr("the function '%1' does not exist").arg(name));
+                    return functionInvalid;
                 }
 
                 inline int getFunctionLevel(const QString& name) const {
@@ -1268,15 +1313,6 @@ class QFLIB_EXPORT QFMathParser
                         res.setInvalid();
                     }
                     //qDebug()<<"getVariable(res, "<<name<<", "<<res.toTypeString()<<")";
-                }
-
-                inline void evaluateFunction(qfmpResult& res, const QString& name, const QVector<qfmpResult> &parameters) const{
-                    if (functions.contains(name) && functions[name].size()>0) {
-                        functions[name].last().second.evaluate(res, parameters, parent);
-                    } else {
-                        if (parent) parent->qfmpError(QObject::tr("the function '%1' does not exist").arg(name));
-                        res.setInvalid();
-                    }
                 }
 
                 inline void addVariable(const QString& name, const qfmpResult& result){
@@ -1472,6 +1508,7 @@ class QFLIB_EXPORT QFMathParser
         void addFunction(const QString &name, qfmpEvaluateFuncRefReturn function);
         void addFunction(const QString &name, qfmpEvaluateFuncRefReturn function, qfmpEvaluateFuncSimple0Param f0, qfmpEvaluateFuncSimple1Param f1=NULL, qfmpEvaluateFuncSimple2Param f2=NULL, qfmpEvaluateFuncSimple3Param f3=NULL);
         void addFunction(const QString &name, qfmpEvaluateFuncRefReturn function, qfmpEvaluateFuncSimple0ParamMP f0, qfmpEvaluateFuncSimple1ParamMP f1=NULL, qfmpEvaluateFuncSimple2ParamMP f2=NULL, qfmpEvaluateFuncSimple3ParamMP f3=NULL);
+        void addFunction(const QString &name, qfmpEvaluateFromNodesFuncRefReturn function);
 
         inline void addFunction(const QString& name, const QStringList& parameterNames, qfmpNode* function){
             environment.addFunction(name, parameterNames, function);
@@ -1573,6 +1610,14 @@ class QFLIB_EXPORT QFMathParser
             environment.evaluateFunction(r, name, params);
         }
 
+        /** \brief  evaluates a registered function
+         * \param name name of the (registered function) to be evaluated
+         * \param params array of the input parameters
+         */
+        inline void evaluateFunction(qfmpResult& r, const QString &name,  QVector<qfmpNode*> params) {
+            environment.evaluateFunction(r, name, params);
+        }
+
 
 
         /** \brief  returns the value of the given variable */
@@ -1594,6 +1639,16 @@ class QFLIB_EXPORT QFMathParser
          * \param params array of the input parameters
          */
         inline qfmpResult evaluateFunction(const QString &name, const QVector<qfmpResult>& params) {
+            return environment.evaluateFunction(name, params);
+        }
+
+
+
+        /** \brief  evaluates a registered function
+         * \param name name of the (registered function) to be evaluated
+         * \param params array of the input parameters
+         */
+        inline qfmpResult evaluateFunction(const QString &name,  QVector<qfmpNode*> params) {
             return environment.evaluateFunction(name, params);
         }
 
@@ -1664,12 +1719,15 @@ class QFLIB_EXPORT QFMathParser
     protected:
         static QList<QPair<QString, qfmpEvaluateFunc> > externalGlobalFunctions;
         static QList<QPair<QString, qfmpEvaluateFuncRefReturn> > externalGlobalFunctionsRR;
+        static QList<QPair<QString, qfmpEvaluateFromNodesFuncRefReturn> > externalGlobalFunctionsFN;
         static QList<QPair<QString, qfmpResult> > externalGlobalVariables;
     public:
         /** \brief  add a function to the list of global functions that are defined by a call to addStandardFunctions() (or the constructor) */
         static void addGlobalFunction(const QString& name, qfmpEvaluateFunc function);
         /** \brief  add a function to the list of global functions that are defined by a call to addStandardFunctions() (or the constructor) */
         static void addGlobalFunction(const QString& name, qfmpEvaluateFuncRefReturn function);
+        /** \brief  add a function to the list of global functions that are defined by a call to addStandardFunctions() (or the constructor) */
+        static void addGlobalFunction(const QString& name, qfmpEvaluateFromNodesFuncRefReturn function);
         /** \brief  add a variablen to the list of global variables that are defined by a call to addStandardVariables() (or the constructor) */
         static void addGlobalVariable(const QString& name, double value);
         /** \brief  add a variablen to the list of global variables that are defined by a call to addStandardVariables() (or the constructor) */

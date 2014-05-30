@@ -1,6 +1,10 @@
 #include "qfmathparser.h"
+#include <typeinfo>
 
 #include "qfmathparserdefaultlib.h"
+#include <QDateTime>
+#include <QDate>
+#include <QTime>
 
 bool QFMathParser_DefaultLib::hasDefaultVariables(QFMathParser* p)
 {
@@ -224,8 +228,35 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("str2bool", QFMathParser_DefaultLib::fStringToBool);
     p->addFunction("str2num", QFMathParser_DefaultLib::fStringToNum);
     p->addFunction("cstr2num", QFMathParser_DefaultLib::fCStringToNum);
-}
 
+
+
+    p->addFunction("now", QFMathParser_DefaultLib::fNow);
+    p->addFunction("datenum", QFMathParser_DefaultLib::fDateNum);
+    p->addFunction("datetimenum", QFMathParser_DefaultLib::fDateTimeNum);
+    p->addFunction("date2str", QFMathParser_DefaultLib::fDate2Str);
+    p->addFunction("datetime2str", QFMathParser_DefaultLib::fDateTime2Str);
+    p->addFunction("datediff2secs", QFMathParser_DefaultLib::fDatediff2Secs);
+    p->addFunction("datediff2mins", QFMathParser_DefaultLib::fDatediff2Mins);
+    p->addFunction("datediff2hours", QFMathParser_DefaultLib::fDatediff2Hours);
+    p->addFunction("datediff2days", QFMathParser_DefaultLib::fDatediff2Days);
+
+
+
+    p->addFunction("dateday", QFMathParser_DefaultLib::fDateDay);
+    p->addFunction("datemonth", QFMathParser_DefaultLib::fDateMonth);
+    p->addFunction("dateyear", QFMathParser_DefaultLib::fDateYear);
+    p->addFunction("datehour", QFMathParser_DefaultLib::fDateHour);
+    p->addFunction("datemin", QFMathParser_DefaultLib::fDateMin);
+    p->addFunction("datesec", QFMathParser_DefaultLib::fDateSec);
+
+    p->addFunction("varname", QFMathParser_DefaultLib::fVarname);
+
+
+
+
+
+}
 
 
 
@@ -2093,6 +2124,461 @@ namespace QFMathParser_DefaultLib {
             p->qfmpError("trapz(Y)/trapz(X,Y) needs 1 or 2 argument");
         }
     }
+
+
+
+
+
+    void fDateNum(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="datenum";
+        r.setInvalid();
+        if (n<1||n>2) {
+            p->qfmpError(QObject::tr("%1(date[, formatstring]) needs 1 or 2 arguments").arg(iname));
+            return;
+        }
+        if (n>=1) {
+            QString format="yyyy-MM-dd";
+            if (n==2 && params[1].type==qfmpString) {
+                format=params[1].str;
+            } else if (n==2) {
+                p->qfmpError(QObject::tr("%1(x, formatstring) 2nd argument has to be a string").arg(iname));
+                return;
+            }
+
+            if(params[0].type==qfmpString) {
+                r.setDouble(QDateTime::fromString(params[0].str, format).toMSecsSinceEpoch());
+                return;
+            } else if(params[0].type==qfmpStringVector) {
+                r.setDoubleVec(params[0].strVec.size());
+                for (int i=0; i<params[0].strVec.size(); i++) {
+                    r.numVec[i]=QDateTime::fromString(params[0].strVec[i], format).toMSecsSinceEpoch();
+                }
+                return;
+            } else {
+                p->qfmpError(QObject::tr("%1(x) argument has to be a string or string vector").arg(iname));
+                return;
+            }
+            return;
+        }
+        return;
+    }
+
+    void fDateTimeNum(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="datetimenum";
+        r.setInvalid();
+        if (n<1||n>2) {
+            p->qfmpError(QObject::tr("%1(date[, formatstring]) needs 1 or 2 arguments").arg(iname));
+            return;
+        }
+        if (n>=1) {
+            QDateTime dat;
+            QString format="yyyy-MM-ddTHH:mm:ss";
+            if (n==2 && params[1].type==qfmpString) {
+                format=params[1].str;
+                return;
+            } else if (n==2) {
+                p->qfmpError(QObject::tr("%1(x, formatstring) 2nd argument has to be a string").arg(iname));
+                return;
+            }
+
+            if(params[0].type==qfmpString) {
+                //qDebug()<<params[0].str<<QDateTime::fromString(params[0].str, format)<<format;
+                r.setDouble(QDateTime::fromString(params[0].str, format).toMSecsSinceEpoch());
+                return;
+            } else if(params[0].type==qfmpStringVector) {
+                r.setDoubleVec(params[0].strVec.size());
+                for (int i=0; i<params[0].strVec.size(); i++) {
+                    r.numVec[i]=QDateTime::fromString(params[0].strVec[i], format).toMSecsSinceEpoch();
+                }
+                return;
+            } else {
+                p->qfmpError(QObject::tr("%1(x) argument has to be a string or string vector").arg(iname));
+                return;
+            }
+            return;
+        }
+        return;
+    }
+
+
+    void fDate2Str(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="date2str";
+        r.setInvalid();
+        if (n<1||n>2) {
+            p->qfmpError(QObject::tr("%1(date[, formatstring]) needs 1 or 2 arguments").arg(iname));
+            return;
+        }
+        if (n>=1) {
+            QDateTime dat;
+            QString format="yyyy-MM-dd";
+            if (n==2 && params[1].type==qfmpString) {
+                format=params[1].str;
+            } else if (n==2) {
+                p->qfmpError(QObject::tr("%1(x, formatstring) 2nd argument has to be a string").arg(iname));
+                return;
+            }
+
+            if(params[0].type==qfmpDouble) {
+                r.setString(QDateTime::fromMSecsSinceEpoch(params[0].num).toString(format));
+                return ;
+            } else if(params[0].type==qfmpDoubleVector) {
+                r.setStringVec(params[0].numVec.size());
+                for (int i=0; i<params[0].numVec.size(); i++) {
+                    r.strVec[i]=QDateTime::fromMSecsSinceEpoch(params[0].numVec[i]).toString(format);
+                }
+                return;
+            } else {
+                p->qfmpError(QObject::tr("%1(x) argument has to be a double or double vector").arg(iname));
+                return;
+            }
+            return;
+        }
+        return;
+    }
+
+
+    void fDateTime2Str(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="date2str";
+        r.setInvalid();
+        if (n<1||n>2) {
+            p->qfmpError(QObject::tr("%1(date[, formatstring]) needs 1 or 2 arguments").arg(iname));
+            return;
+        }
+        if (n>=1) {
+            QDateTime dat;
+            QString format="yyyy-MM-ddTHH:mm:ss";
+            if (n==2 && params[1].type==qfmpString) {
+                format=params[1].str;
+            } else if (n==2) {
+                p->qfmpError(QObject::tr("%1(x, formatstring) 2nd argument has to be a string").arg(iname));
+                return;
+            }
+
+            if(params[0].type==qfmpDouble) {
+                r.setString(QDateTime::fromMSecsSinceEpoch(params[0].num).toString(format));
+                return ;
+            } else if(params[0].type==qfmpDoubleVector) {
+                r.setStringVec(params[0].numVec.size());
+                for (int i=0; i<params[0].numVec.size(); i++) {
+                    r.strVec[i]=QDateTime::fromMSecsSinceEpoch(params[0].numVec[i]).toString(format);
+                }
+                return;
+            } else {
+                p->qfmpError(QObject::tr("%1(x) argument has to be a double or double vector").arg(iname));
+                return;
+            }
+            return;
+        }
+        return;
+    }
+
+    void fDatediff2Secs(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="datediff2secs";
+        r.setInvalid();
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(date) needs 1 argument").arg(iname));
+            return;
+        }
+        if (n>=1) {
+
+            if(params[0].type==qfmpDouble) {
+                r.setDouble(params[0].num/1e3);
+                return ;
+            } else if(params[0].type==qfmpDoubleVector) {
+                r.setDoubleVec(params[0].numVec.size());
+                for (int i=0; i<params[0].numVec.size(); i++) {
+                    r.numVec[i]=params[0].numVec[i]/1e3;
+                }
+                return;
+            } else {
+                p->qfmpError(QObject::tr("%1(x) argument has to be a double or double vector").arg(iname));
+                return;
+            }
+            return;
+        }
+        return;
+    }
+
+    void fDatediff2Mins(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="datediff2mins";
+        r.setInvalid();
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(date) needs 1 argument").arg(iname));
+            return;
+        }
+        if (n>=1) {
+
+            if(params[0].type==qfmpDouble) {
+                r.setDouble(params[0].num/1e3/60.0);
+                return ;
+            } else if(params[0].type==qfmpDoubleVector) {
+                r.setDoubleVec(params[0].numVec.size());
+                for (int i=0; i<params[0].numVec.size(); i++) {
+                    r.numVec[i]=params[0].numVec[i]/1e3/60.0;
+                }
+                return;
+            } else {
+                p->qfmpError(QObject::tr("%1(x) argument has to be a double or double vector").arg(iname));
+                return;
+            }
+            return;
+        }
+        return;
+    }
+
+    void fDatediff2Hours(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="datediff2hours";
+        r.setInvalid();
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(date) needs 1 argument").arg(iname));
+            return;
+        }
+        if (n>=1) {
+
+            if(params[0].type==qfmpDouble) {
+                r.setDouble(params[0].num/1e3/60.0/60.0);
+                return ;
+            } else if(params[0].type==qfmpDoubleVector) {
+                r.setDoubleVec(params[0].numVec.size());
+                for (int i=0; i<params[0].numVec.size(); i++) {
+                    r.numVec[i]=params[0].numVec[i]/1e3/60.0/60.0;
+                }
+                return;
+            } else {
+                p->qfmpError(QObject::tr("%1(x) argument has to be a double or double vector").arg(iname));
+                return;
+            }
+            return;
+        }
+        return;
+    }
+
+    void fDatediff2Days(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="datediff2hours";
+        r.setInvalid();
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(date) needs 1 argument").arg(iname));
+            return;
+        }
+        if (n>=1) {
+
+            if(params[0].type==qfmpDouble) {
+                r.setDouble(params[0].num/1e3/60.0/60.0/24.0);
+                return ;
+            } else if(params[0].type==qfmpDoubleVector) {
+                r.setDoubleVec(params[0].numVec.size());
+                for (int i=0; i<params[0].numVec.size(); i++) {
+                    r.numVec[i]=params[0].numVec[i]/1e3/60.0/60.0/24.0;
+                }
+                return;
+            } else {
+                p->qfmpError(QObject::tr("%1(x) argument has to be a double or double vector").arg(iname));
+                return;
+            }
+            return;
+        }
+        return;
+    }
+
+    void fNow(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="now";
+        r.setInvalid();
+        if (n!=0) {
+            p->qfmpError(QObject::tr("%1() needs no arguments").arg(iname));
+            return;
+        }
+        r.setDouble(QDateTime::currentDateTime().toMSecsSinceEpoch());
+    }
+
+
+    void fDateDay(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="dateday";
+        r.setInvalid();
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(date) needs 1 argument").arg(iname));
+            return;
+        }
+        if (n>=1) {
+
+            if(params[0].type==qfmpDouble) {
+                r.setDouble(QDateTime::fromMSecsSinceEpoch(params[0].num).date().day());
+                return ;
+            } else if(params[0].type==qfmpDoubleVector) {
+                r.setDoubleVec(params[0].numVec.size());
+                for (int i=0; i<params[0].numVec.size(); i++) {
+                    r.numVec[i]=QDateTime::fromMSecsSinceEpoch(params[0].numVec[i]).date().day();
+                }
+                return;
+            } else {
+                p->qfmpError(QObject::tr("%1(x) argument has to be a double or double vector").arg(iname));
+                return;
+            }
+            return;
+        }
+        return;
+    }
+
+    void fDateMonth(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="datemonth";
+        r.setInvalid();
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(date) needs 1 argument").arg(iname));
+            return;
+        }
+        if (n>=1) {
+
+            if(params[0].type==qfmpDouble) {
+                r.setDouble(QDateTime::fromMSecsSinceEpoch(params[0].num).date().month());
+                return ;
+            } else if(params[0].type==qfmpDoubleVector) {
+                r.setDoubleVec(params[0].numVec.size());
+                for (int i=0; i<params[0].numVec.size(); i++) {
+                    r.numVec[i]=QDateTime::fromMSecsSinceEpoch(params[0].numVec[i]).date().month();
+                }
+                return;
+            } else {
+                p->qfmpError(QObject::tr("%1(x) argument has to be a double or double vector").arg(iname));
+                return;
+            }
+            return;
+        }
+        return;
+    }
+
+    void fDateYear(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="dateyear";
+        r.setInvalid();
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(date) needs 1 argument").arg(iname));
+            return;
+        }
+        if (n>=1) {
+
+            if(params[0].type==qfmpDouble) {
+                r.setDouble(QDateTime::fromMSecsSinceEpoch(params[0].num).date().year());
+                return ;
+            } else if(params[0].type==qfmpDoubleVector) {
+                r.setDoubleVec(params[0].numVec.size());
+                for (int i=0; i<params[0].numVec.size(); i++) {
+                    r.numVec[i]=QDateTime::fromMSecsSinceEpoch(params[0].numVec[i]).date().year();
+                }
+                return;
+            } else {
+                p->qfmpError(QObject::tr("%1(x) argument has to be a double or double vector").arg(iname));
+                return;
+            }
+            return;
+        }
+        return;
+    }
+
+    void fDateHour(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="datehour";
+        r.setInvalid();
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(date) needs 1 argument").arg(iname));
+            return;
+        }
+        if (n>=1) {
+
+            if(params[0].type==qfmpDouble) {
+                r.setDouble(QDateTime::fromMSecsSinceEpoch(params[0].num).time().hour());
+                return ;
+            } else if(params[0].type==qfmpDoubleVector) {
+                r.setDoubleVec(params[0].numVec.size());
+                for (int i=0; i<params[0].numVec.size(); i++) {
+                    r.numVec[i]=QDateTime::fromMSecsSinceEpoch(params[0].numVec[i]).time().hour();
+                }
+                return;
+            } else {
+                p->qfmpError(QObject::tr("%1(x) argument has to be a double or double vector").arg(iname));
+                return;
+            }
+            return;
+        }
+        return;
+    }
+    void fDateMin(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="datemin";
+        r.setInvalid();
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(date) needs 1 argument").arg(iname));
+            return;
+        }
+        if (n>=1) {
+
+            if(params[0].type==qfmpDouble) {
+                r.setDouble(QDateTime::fromMSecsSinceEpoch(params[0].num).time().minute());
+                return ;
+            } else if(params[0].type==qfmpDoubleVector) {
+                r.setDoubleVec(params[0].numVec.size());
+                for (int i=0; i<params[0].numVec.size(); i++) {
+                    r.numVec[i]=QDateTime::fromMSecsSinceEpoch(params[0].numVec[i]).time().minute();
+                }
+                return;
+            } else {
+                p->qfmpError(QObject::tr("%1(x) argument has to be a double or double vector").arg(iname));
+                return;
+            }
+            return;
+        }
+        return;
+    }
+
+
+    void fDateSec(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        QString iname="datesec";
+        r.setInvalid();
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(date) needs 1 argument").arg(iname));
+            return;
+        }
+        if (n>=1) {
+
+            if(params[0].type==qfmpDouble) {
+                r.setDouble(QDateTime::fromMSecsSinceEpoch(params[0].num).time().second());
+                return ;
+            } else if(params[0].type==qfmpDoubleVector) {
+                r.setDoubleVec(params[0].numVec.size());
+                for (int i=0; i<params[0].numVec.size(); i++) {
+                    r.numVec[i]=QDateTime::fromMSecsSinceEpoch(params[0].numVec[i]).time().second();
+                }
+                return;
+            } else {
+                p->qfmpError(QObject::tr("%1(x) argument has to be a double or double vector").arg(iname));
+                return;
+            }
+            return;
+        }
+        return;
+    }
+
+
+    void fVarname(qfmpResult& r,  QFMathParser::qfmpNode** nodes, unsigned int n, QFMathParser* p) {
+        //qDebug()<<"fVarname "<<nodes<<n<<p;
+        QString iname="varname";
+        r.setInvalid();
+        if (n<=0) {
+            p->qfmpError(QObject::tr("%1(...) needs at least 1 argument").arg(iname));
+            return;
+        }
+        if (n>=1) {
+            r.setStringVec(n, "");
+            for (unsigned int i=0; i<n; i++) {
+                QFMathParser::qfmpVariableNode* vn=dynamic_cast<QFMathParser::qfmpVariableNode*>(nodes[i]);
+                if (vn) {
+                    r.strVec[i]=vn->getName();
+                } else {
+                    r.setInvalid();
+                    p->qfmpError(QObject::tr("%1(...) needs variable names as input arguments, %2-th argument is of different type (%3)").arg(iname).arg(i+1).arg(typeid(*nodes[i]).name()));
+                    return;
+                }
+            }
+            return;
+        }
+        return;
+    }
+
 
 
 }

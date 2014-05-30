@@ -340,7 +340,24 @@ namespace QFMathParser_DefaultLib {
         fRegExpIndexIn(r, params, n, p, false, Qt::CaseInsensitive);
     }
 
+    void fDateNum(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDateTimeNum(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDate2Str(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDateTime2Str(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
+    void fDatediff2Secs(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDatediff2Mins(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDatediff2Hours(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDatediff2Days(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fNow(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDateDay(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDateMonth(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDateYear(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDateHour(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDateMin(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDateSec(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+
+    void fVarname(qfmpResult& res, QFMathParser::qfmpNode **nodes, unsigned int n, QFMathParser* p);
 
     void addDefaultFunctions(QFMathParser *p);
     bool hasDefaultFunctions(QFMathParser* p);

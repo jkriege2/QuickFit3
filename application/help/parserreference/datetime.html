@@ -1,0 +1,146 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Date/time functions</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+  <h2>Concepts</h2>
+  <p>Dates are represented as a number, interpreted as "milliseconds since epoch (1970-01-01T00:00:00)". Therefore, differences between times can directly be computed and the result is given in milliseconds.
+  </p>
+  
+  <h2>Date/Time String conversion functions</h2>
+  <ul>
+   
+  <li><a name="datenum"/><!-- func:datenum -->
+  <b><tt><!-- template -->datenum(datestr)<!-- /template --></tt> / <tt><!-- template -->datenum(datestr, format)<!-- /template --></tt> - <i>returns the number of "milliseconds since epoch (1970-01-01T00:00:00)", calculated from the given date in <tt>datastr</tt></i>:</b><br>  
+  The function accepts a single string (then returns a single number) or a vector of strings (returns a vector of numbers).
+  The default format string for the interpretation of <tt>datastr</tt> is <tt>"YYYY-MM-DD"</tt>. An arbitrary format string can be given as a second parameter.
+  Possible format strings are:
+  <center>$$insert:datetimeformat.inc$$</center>
+  <!-- /func:datenum -->  
+  </li>
+  
+
+  <li><a name="datetimenum"/><!-- func:datetimenum -->
+  <b><tt><!-- template -->datetimenum(datestr)<!-- /template --></tt> / <tt><!-- template -->datetimenum(datestr, format)<!-- /template --></tt> - <i>returns the number of "milliseconds since epoch (1970-01-01T00:00:00)", calculated from the given date in <tt>datastr</tt></i>:</b><br>  
+  The function accepts a single string (then returns a single number) or a vector of strings (returns a vector of numbers).
+  The default format string for the interpretation of <tt>datastr</tt> is <tt>"YYYY-MM-DDTHH:mm:ss"</tt>. An arbitrary format string can be given as a second parameter.
+  Possible format strings are:
+  <center>$$insert:datetimeformat.inc$$</center>
+  <!-- /func:datetimenum -->  
+  </li>
+  
+  <li><a name="date2str"/><!-- func:date2str -->
+  <b><tt><!-- template -->date2str(date)<!-- /template --></tt> / <tt><!-- template -->date2str(date, format)<!-- /template --></tt> - <i>returns a formated string, representing the <tt>date</tt>, which is the number of "milliseconds since epoch (1970-01-01T00:00:00)"</i>:</b><br>  
+  The function accepts a single bnumber (then returns a single string) or a vector of numbers (returns a vector of strings).
+  The default format string for the interpretation of <tt>datastr</tt> is <tt>"YYYY-MM-DD"</tt>. An arbitrary format string can be given as a second parameter.
+  Possible format strings are:
+  <center>$$insert:datetimeformat.inc$$</center>
+  <!-- /func:date2str -->  
+  </li>
+  
+  <li><a name="datetime2str"/><!-- func:datetime2str -->
+  <b><tt><!-- template -->datetime2str(date)<!-- /template --></tt> / <tt><!-- template -->datetime2str(date, format)<!-- /template --></tt> - <i>returns a formated string, representing the <tt>date</tt>, which is the number of "milliseconds since epoch (1970-01-01T00:00:00)"</i>:</b><br>  
+  The function accepts a single bnumber (then returns a single string) or a vector of numbers (returns a vector of strings).
+  The default format string for the interpretation of <tt>datastr</tt> is <tt>"YYYY-MM-DDTHH:mm:ss"</tt>. An arbitrary format string can be given as a second parameter.
+  Possible format strings are:
+  <center>$$insert:datetimeformat.inc$$</center>
+  <!-- /func:datetime2str -->  
+  </li>
+  
+  </ul>
+  
+  
+  
+  
+  
+  
+  
+  
+  <h2>Date/Time Difference functions</h2>
+  <ul>
+   
+  <li><a name="datediff2secs"/><!-- func:datediff2secs -->
+  <b><tt><!-- template -->datediff2secs(date_diff)<!-- /template --></tt> - <i>converts a date/time difference <tt>data_diff</tt> (e.g. <tt>datetimenum("2014-05-01T10:00:00")-datetimenum("2014-05-01T8:00:00")</tt>) to number of milliseconds</i>:</b><br>    
+  The function accepts a single number or a vector of numbers.
+  <!-- /func:datediff2secs -->  
+  </li>
+ 
+  <li><a name="datediff2mins"/><!-- func:datediff2mins -->
+  <b><tt><!-- template -->datediff2mins(date_diff)<!-- /template --></tt> - <i>converts a date/time difference <tt>data_diff</tt> (e.g. <tt>datetimenum("2014-05-01T10:00:00")-datetimenum("2014-05-01T8:00:00")</tt>) to number of minutes</i>:</b><br>    
+  The function accepts a single number or a vector of numbers.
+  <!-- /func:datediff2mins -->  
+  </li>
+  
+  <li><a name="datediff2hours"/><!-- func:datediff2hours -->
+  <b><tt><!-- template -->datediff2hours(date_diff)<!-- /template --></tt> - <i>converts a date/time difference <tt>data_diff</tt> (e.g. <tt>datetimenum("2014-05-01T10:00:00")-datetimenum("2014-05-01T8:00:00")</tt>) to number of hours</i>:</b><br>    
+  The function accepts a single number or a vector of numbers.
+  <!-- /func:datediff2hours -->  
+  </li>
+  
+
+  <li><a name="datediff2days"/><!-- func:datediff2days -->
+  <b><tt><!-- template -->datediff2days(date_diff)<!-- /template --></tt> - <i>converts a date/time difference <tt>data_diff</tt> (e.g. <tt>datetimenum("2014-05-01T10:00:00")-datetimenum("2014-05-01T8:00:00")</tt>) to number of days</i>:</b><br>    
+  The function accepts a single number or a vector of numbers.
+  <!-- /func:datediff2days -->  
+  </li>
+  
+
+  
+  </ul>
+  
+  
+
+  
+  <h2>Date/Time Auxiliary functions</h2>
+  <ul>
+   
+  <li><a name="now"/><!-- func:now -->
+  <b><tt><!-- template -->now()<!-- /template --></tt> - <i>returns the current date/time</i>:</b><br>    
+  <!-- /func:now -->  
+  </li>
+   
+  <li><a name="dateday"/><!-- func:dateday -->
+  <b><tt><!-- template -->dateday(date)<!-- /template --></tt> - <i>returns the day of a date/time</i>:</b><br>    
+  The function accepts a single number or a vector of numbers.
+  <!-- /func:dateday -->  
+  </li>
+
+  <li><a name="datemonth"/><!-- func:datemonth -->
+  <b><tt><!-- template -->datemonth(date)<!-- /template --></tt> - <i>returns the month of a date/time</i>:</b><br>    
+  The function accepts a single number or a vector of numbers.
+  <!-- /func:datemonth -->  
+  </li>
+
+  <li><a name="dateyear"/><!-- func:dateyear -->
+  <b><tt><!-- template -->dateyear(date)<!-- /template --></tt> - <i>returns the year of a date/time</i>:</b><br>    
+  The function accepts a single number or a vector of numbers.
+  <!-- /func:dateyear -->  
+  </li>
+  
+  <li><a name="datehour"/><!-- func:datehour -->
+  <b><tt><!-- template -->datehour(date)<!-- /template --></tt> - <i>returns the hour of a date/time</i>:</b><br>    
+  The function accepts a single number or a vector of numbers.
+  <!-- /func:datehour -->  
+  </li>
+
+  <li><a name="datemin"/><!-- func:datemin -->
+  <b><tt><!-- template -->datemin(date)<!-- /template --></tt> - <i>returns the minute of a date/time</i>:</b><br>    
+  The function accepts a single number or a vector of numbers.
+  <!-- /func:datemin -->  
+  </li>
+
+  <li><a name="datesec"/><!-- func:datesec -->
+  <b><tt><!-- template -->datesec(date)<!-- /template --></tt> - <i>returns the second of a date/time</i>:</b><br>    
+  The function accepts a single number or a vector of numbers.
+  <!-- /func:datesec -->  
+  </li>
+  </ul>
+  
+  
+  </body>
+  </html>
+  

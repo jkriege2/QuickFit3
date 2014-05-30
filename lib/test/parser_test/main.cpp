@@ -515,8 +515,30 @@ int main(int argc, char *argv[])
     TEST("polyval(0,p)");
     TEST("polyval([0,1,2],p)");
     TEST("polyder(p)");
+
+
+    TEST("cumsum(i,1,5,i)");
+    TEST("cumsum(i,1:5,i)");
+    TEST("cumsum(i,1,2,5,i)");
+    TEST("cumsum(i,1:2:5,i)");
+
+    TEST("cumprod(i,1,5,i)");
+    TEST("cumprod(i,1:5,i)");
+    TEST("cumprod(i,1,2,5,i)");
+    TEST("cumprod(i,1:2:5,i)");
+
+    TEST("date2str(now())");
+    TEST("datetime2str(now())");
+    TEST("datetimenum(\"2014-05-01T10:00:00\")");
+    TEST("datetimenum(\"2014-05-01T08:00:00\")");
+    TEST("datetimenum(\"2014-05-01T10:00:00\")-datetimenum(\"2014-05-01T08:00:00\")");
+    TEST("datediff2secs(datetimenum(\"2014-05-01T10:00:00\")-datetimenum(\"2014-05-01T08:00:00\"))");
+    TEST("datediff2mins(datetimenum(\"2014-05-01T10:00:00\")-datetimenum(\"2014-05-01T08:00:00\"))");
+    TEST("datediff2hours(datetimenum(\"2014-05-03T10:00:00\")-datetimenum(\"2014-05-01T08:00:00\"))");
+    TEST("datediff2days(datetimenum(\"2014-05-03T10:00:00\")-datetimenum(\"2014-05-01T08:00:00\"))");
     //speed_test(doByteCode, showBytecode);
 
+    TEST("varname(pi, p, i, not_existent)");
     return 0;
 }
 
