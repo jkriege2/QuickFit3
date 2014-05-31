@@ -263,6 +263,8 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         void setCellUserRole(int role, quint32 row, quint32 column, QVariant value);
         /** \brief set the given cell to the supplied value in a role>=Qt::UserRole */
         void setCellUserRoleCreate(int role, quint32 row, quint32 column, QVariant value);
+        /** \brief set the given cell to the supplied value in a role>=Qt::UserRole */
+        void setCellsUserRoleCreate(int role, quint32 row0, quint32 row1, quint32 column0, quint32 column1, QVariant value);
         /** \brief set the given cell to the supplied value in EditRole */
         void setCellEditRole(quint32 row, quint32 column, QVariant value);
         /** \brief set the given cell to the supplied value in EditRole */

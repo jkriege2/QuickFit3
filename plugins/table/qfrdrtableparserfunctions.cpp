@@ -1132,9 +1132,9 @@ void fQFRDRTableEditor_indexedColAvg(qfmpResult& res, const qfmpResult* params, 
                 if (isNumber) {
                     QMap<double, QList<double> > datasets;
                     QVector<double> dvu;
-                    for (int i=0; i<idxdv.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxdv.size()); i++) {
                         if (!dvu.contains(idxdv[i])) dvu<<idxdv[i];
-                        datasets[idxdv[i]].append(data[i]);
+                        datasets[idxdv[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<dvu.size(); i++) {
                         //qDebug()<<"number col:"<<qfstatisticsAverage(datasets[dvu[i]])<<datasets[dvu[i]];
@@ -1143,9 +1143,9 @@ void fQFRDRTableEditor_indexedColAvg(qfmpResult& res, const qfmpResult* params, 
                 } else {
                     QMap<QString, QList<double> > datasets;
                     QStringList slu;
-                    for (int i=0; i<idxsl.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxsl.size()); i++) {
                         if (!slu.contains(idxsl[i])) slu<<idxsl[i];
-                        datasets[idxsl[i]].append(data[i]);
+                        datasets[idxsl[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<slu.size(); i++) {
                         resvec<<qfstatisticsAverage(datasets[slu[i]]);
@@ -1196,9 +1196,9 @@ void fQFRDRTableEditor_indexedColSum(qfmpResult& res, const qfmpResult* params, 
                 if (isNumber) {
                     QMap<double, QList<double> > datasets;
                     QVector<double> dvu;
-                    for (int i=0; i<idxdv.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxdv.size()); i++) {
                         if (!dvu.contains(idxdv[i])) dvu<<idxdv[i];
-                        datasets[idxdv[i]].append(data[i]);
+                        datasets[idxdv[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<dvu.size(); i++) {
                         //qDebug()<<"number col:"<<qfstatisticsSum(datasets[dvu[i]])<<datasets[dvu[i]];
@@ -1207,9 +1207,9 @@ void fQFRDRTableEditor_indexedColSum(qfmpResult& res, const qfmpResult* params, 
                 } else {
                     QMap<QString, QList<double> > datasets;
                     QStringList slu;
-                    for (int i=0; i<idxsl.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxsl.size()); i++) {
                         if (!slu.contains(idxsl[i])) slu<<idxsl[i];
-                        datasets[idxsl[i]].append(data[i]);
+                        datasets[idxsl[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<slu.size(); i++) {
                         resvec<<qfstatisticsSum(datasets[slu[i]]);
@@ -1260,9 +1260,9 @@ void fQFRDRTableEditor_indexedColSum2(qfmpResult& res, const qfmpResult* params,
                 if (isNumber) {
                     QMap<double, QList<double> > datasets;
                     QVector<double> dvu;
-                    for (int i=0; i<idxdv.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxdv.size()); i++) {
                         if (!dvu.contains(idxdv[i])) dvu<<idxdv[i];
-                        datasets[idxdv[i]].append(data[i]);
+                        datasets[idxdv[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<dvu.size(); i++) {
                         //qDebug()<<"number col:"<<qfstatisticsSum(datasets[dvu[i]])<<datasets[dvu[i]];
@@ -1271,9 +1271,9 @@ void fQFRDRTableEditor_indexedColSum2(qfmpResult& res, const qfmpResult* params,
                 } else {
                     QMap<QString, QList<double> > datasets;
                     QStringList slu;
-                    for (int i=0; i<idxsl.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxsl.size()); i++) {
                         if (!slu.contains(idxsl[i])) slu<<idxsl[i];
-                        datasets[idxsl[i]].append(data[i]);
+                        datasets[idxsl[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<slu.size(); i++) {
                         resvec<<qfstatisticsSum2(datasets[slu[i]]);
@@ -1326,9 +1326,9 @@ void fQFRDRTableEditor_indexedColStd(qfmpResult& res, const qfmpResult* params, 
                 if (isNumber) {
                     QMap<double, QList<double> > datasets;
                     QVector<double> dvu;
-                    for (int i=0; i<idxdv.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxdv.size()); i++) {
                         if (!dvu.contains(idxdv[i])) dvu<<idxdv[i];
-                        if (i<data.size()) datasets[idxdv[i]].append(data[i]);
+                        if (i<data.size()) datasets[idxdv[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<dvu.size(); i++) {
                         resvec<<qfstatisticsStd(datasets[dvu[i]]);
@@ -1336,9 +1336,9 @@ void fQFRDRTableEditor_indexedColStd(qfmpResult& res, const qfmpResult* params, 
                 } else {
                     QMap<QString, QList<double> > datasets;
                     QStringList slu;
-                    for (int i=0; i<idxsl.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxsl.size()); i++) {
                         if (!slu.contains(idxsl[i])) slu<<idxsl[i];
-                        if (i<data.size()) datasets[idxsl[i]].append(data[i]);
+                        if (i<data.size()) datasets[idxsl[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<slu.size(); i++) {
                         resvec<<qfstatisticsStd(datasets[slu[i]]);
@@ -1391,9 +1391,9 @@ void fQFRDRTableEditor_indexedColVar(qfmpResult& res, const qfmpResult* params, 
                 if (isNumber) {
                     QMap<double, QList<double> > datasets;
                     QVector<double> dvu;
-                    for (int i=0; i<idxdv.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxdv.size()); i++) {
                         if (!dvu.contains(idxdv[i])) dvu<<idxdv[i];
-                        datasets[idxdv[i]].append(data[i]);
+                        datasets[idxdv[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<dvu.size(); i++) {
                         resvec<<qfstatisticsVariance(datasets[dvu[i]]);
@@ -1401,9 +1401,9 @@ void fQFRDRTableEditor_indexedColVar(qfmpResult& res, const qfmpResult* params, 
                 } else {
                     QMap<QString, QList<double> > datasets;
                     QStringList slu;
-                    for (int i=0; i<idxsl.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxsl.size()); i++) {
                         if (!slu.contains(idxsl[i])) slu<<idxsl[i];
-                        datasets[idxsl[i]].append(data[i]);
+                        datasets[idxsl[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<slu.size(); i++) {
                         resvec<<qfstatisticsVariance(datasets[slu[i]]);
@@ -1455,9 +1455,9 @@ void fQFRDRTableEditor_indexedColMin(qfmpResult& res, const qfmpResult* params, 
                 if (isNumber) {
                     QMap<double, QList<double> > datasets;
                     QVector<double> dvu;
-                    for (int i=0; i<idxdv.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxdv.size()); i++) {
                         if (!dvu.contains(idxdv[i])) dvu<<idxdv[i];
-                        datasets[idxdv[i]].append(data[i]);
+                        datasets[idxdv[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<dvu.size(); i++) {
                         resvec<<qfstatisticsMin(datasets[dvu[i]]);
@@ -1465,9 +1465,9 @@ void fQFRDRTableEditor_indexedColMin(qfmpResult& res, const qfmpResult* params, 
                 } else {
                     QMap<QString, QList<double> > datasets;
                     QStringList slu;
-                    for (int i=0; i<idxsl.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxsl.size()); i++) {
                         if (!slu.contains(idxsl[i])) slu<<idxsl[i];
-                        datasets[idxsl[i]].append(data[i]);
+                        datasets[idxsl[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<slu.size(); i++) {
                         resvec<<qfstatisticsMin(datasets[slu[i]]);
@@ -1518,9 +1518,9 @@ void fQFRDRTableEditor_indexedColMax(qfmpResult& res, const qfmpResult* params, 
                 if (isNumber) {
                     QMap<double, QList<double> > datasets;
                     QVector<double> dvu;
-                    for (int i=0; i<idxdv.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxdv.size()); i++) {
                         if (!dvu.contains(idxdv[i])) dvu<<idxdv[i];
-                        datasets[idxdv[i]].append(data[i]);
+                        datasets[idxdv[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<dvu.size(); i++) {
                         resvec<<qfstatisticsMax(datasets[dvu[i]]);
@@ -1528,9 +1528,9 @@ void fQFRDRTableEditor_indexedColMax(qfmpResult& res, const qfmpResult* params, 
                 } else {
                     QMap<QString, QList<double> > datasets;
                     QStringList slu;
-                    for (int i=0; i<idxsl.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxsl.size()); i++) {
                         if (!slu.contains(idxsl[i])) slu<<idxsl[i];
-                        datasets[idxsl[i]].append(data[i]);
+                        datasets[idxsl[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<slu.size(); i++) {
                         resvec<<qfstatisticsMax(datasets[slu[i]]);
@@ -1581,9 +1581,9 @@ void fQFRDRTableEditor_indexedColMedian(qfmpResult& res, const qfmpResult* param
                 if (isNumber) {
                     QMap<double, QList<double> > datasets;
                     QVector<double> dvu;
-                    for (int i=0; i<idxdv.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxdv.size()); i++) {
                         if (!dvu.contains(idxdv[i])) dvu<<idxdv[i];
-                        datasets[idxdv[i]].append(data[i]);
+                        datasets[idxdv[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<dvu.size(); i++) {
                         resvec<<qfstatisticsMedian(datasets[dvu[i]]);
@@ -1591,9 +1591,9 @@ void fQFRDRTableEditor_indexedColMedian(qfmpResult& res, const qfmpResult* param
                 } else {
                     QMap<QString, QList<double> > datasets;
                     QStringList slu;
-                    for (int i=0; i<idxsl.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxsl.size()); i++) {
                         if (!slu.contains(idxsl[i])) slu<<idxsl[i];
-                        datasets[idxsl[i]].append(data[i]);
+                        datasets[idxsl[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<slu.size(); i++) {
                         resvec<<qfstatisticsMedian(datasets[slu[i]]);
@@ -1646,9 +1646,9 @@ void fQFRDRTableEditor_indexedColQuantile(qfmpResult& res, const qfmpResult* par
                 if (isNumber) {
                     QMap<double, QList<double> > datasets;
                     QVector<double> dvu;
-                    for (int i=0; i<idxdv.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxdv.size()); i++) {
                         if (!dvu.contains(idxdv[i])) dvu<<idxdv[i];
-                        datasets[idxdv[i]].append(data[i]);
+                        datasets[idxdv[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<dvu.size(); i++) {
                         resvec<<qfstatisticsQuantile(datasets[dvu[i]], q);
@@ -1656,9 +1656,9 @@ void fQFRDRTableEditor_indexedColQuantile(qfmpResult& res, const qfmpResult* par
                 } else {
                     QMap<QString, QList<double> > datasets;
                     QStringList slu;
-                    for (int i=0; i<idxsl.size(); i++) {
+                    for (int i=0; i<qMin(data.size(), idxsl.size()); i++) {
                         if (!slu.contains(idxsl[i])) slu<<idxsl[i];
-                        datasets[idxsl[i]].append(data[i]);
+                        datasets[idxsl[i]].append(data.value(i, NAN));
                     }
                     for (int i=0; i<slu.size(); i++) {
                         resvec<<qfstatisticsQuantile(datasets[slu[i]], q);

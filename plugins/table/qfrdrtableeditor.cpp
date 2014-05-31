@@ -1239,10 +1239,22 @@ void QFRDRTableEditor::slRecalcAll()
             if (!smod->hasSelection()) {
                 tvMain->selectAll();
             }
-            QModelIndexList idxs=smod->selectedIndexes();
+            QModelIndexList idxs;//=smod->selectedIndexes();
+            QStringList exprs;
+            for (int c=0; c<m->model()->columnCount(); c++) {
+                for (int r=0; r<m->model()->rowCount(); r++) {
+                    QModelIndex idx=m->model()->index(r, c);
+                    QString lexp=m->model()->cellUserRole(QFRDRTable::TableExpressionRole, r, c).toString();
+                    if (!lexp.isEmpty()) {
+                        idxs.append(idx);
+                        exprs.append(lexp);
+                    }
+                }
+            }
 
             QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
             m->model()->disableSignals();
+            m->model()->startMultiUndo();
             QProgressDialog dialog(this);
             dialog.setLabelText(tr("evaluating expressions"));
 
@@ -1271,9 +1283,20 @@ void QFRDRTableEditor::slRecalcAll()
             while (iterations<maxIterations && changes>0 && !dialog.wasCanceled()) {
                 changes=0;
                 dialog.setValue(iterations);
-
+                QApplication::processEvents();
                 // evaluate column expressions
-                for (int i=0; i<m->model()->columnCount(); i++) {
+                int i=0;
+                int delta=1;
+                int itend=m->model()->columnCount()-1;
+                if (iterations%2==1) {
+                    i=m->model()->columnCount()-1;
+                    delta=-1;
+                    itend=0;
+                }
+
+
+                //for (int i=0; i<m->model()->columnCount(); i++) {
+                if (m->model()->columnCount()>0) while (i!=itend) {
                     QString lexp=m->model()->getColumnHeaderData(i, QFRDRTable::ColumnExpressionRole).toString();
                     if (!lexp.isEmpty()) {
                         QVariantList ov=m->model()->getColumnData(i, Qt::DisplayRole);
@@ -1324,10 +1347,12 @@ void QFRDRTableEditor::slRecalcAll()
                                 //qDebug()<<ok<<ov.size()<<nv.size()<<equalWithVariant;
                                 if (ok && !equalWithVariant) {
                                     changes++;
-                                    for (int r=0; r<qMax(nv.size(), m->model()->rowCount()); r++) {
+                                    m->model()->setColumn(i, nv);
+                                    m->model()->setCellsUserRoleCreate(QFRDRTable::TableExpressionRole, 0, qMax(nv.size()-1, m->model()->rowCount()-1), i, i, QVariant());
+                                    /*for (int r=0; r<qMax(nv.size(), m->model()->rowCount()); r++) {
                                         m->model()->setCellCreate(r, i, nv.value(r, QVariant()));
                                         m->model()->setCellUserRoleCreate(QFRDRTable::TableExpressionRole, r, i, QVariant());
-                                    }
+                                    }*/
                                 }
                             }
                             //qDebug()<<"     reeval6 col"<<i<<ok;
@@ -1339,11 +1364,12 @@ void QFRDRTableEditor::slRecalcAll()
                         QApplication::processEvents();
                         if (dialog.wasCanceled()) break;
                     }
+                    i+=delta;
                 }
 
                 // evaluate cell expressions
                 for (int i=0; i<idxs.size(); i++) {
-                    QString lexp=m->model()->cellUserRole(QFRDRTable::TableExpressionRole, idxs[i].row(), idxs[i].column()).toString();
+                    QString lexp=exprs.value(i, "");//m->model()->cellUserRole(QFRDRTable::TableExpressionRole, idxs[i].row(), idxs[i].column()).toString();
                     if (!lexp.isEmpty()) {
                         QVariant ov=m->model()->cell(idxs[i].row(), idxs[i].column());
                         //qDebug()<<"     reeval "<<idxs[i].row()<<idxs[i].column()<<lexp;
@@ -1393,6 +1419,7 @@ void QFRDRTableEditor::slRecalcAll()
             }
             nodes.clear();
 
+            m->model()->endMultiUndo();
             m->model()->enableSignals(true);
             tvMain->selectionModel()->select(sel, QItemSelectionModel::Select);
             tvMain->selectionModel()->setCurrentIndex(cur, QItemSelectionModel::Current);

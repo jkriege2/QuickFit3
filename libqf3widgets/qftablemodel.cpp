@@ -534,11 +534,11 @@ void QFTableModel::setColumn(quint32 column, const QList<QVariant>& value)
     if (readonly || (column>=state.columns)) return;
     addUndoStep();
     quint32 row=0;
-    for (int i=0; i<value.size(); i++) {
-        if (row<state.rows) {
-            quint64 a=xyAdressToUInt64(row, column);
+    for (int i=0; i<qMin(state.rows, (quint32)value.size()); i++) {
+        //if (row<state.rows) {
+            const quint64 a=xyAdressToUInt64(row, column);
             state.dataMap[a]=value[i];
-        }
+        //}
         row++;
     }
     if (doEmitSignals) emit dataChanged(index(0, column), index(row-1, column));
@@ -824,6 +824,28 @@ void QFTableModel::setCellUserRoleCreate(int role, quint32 row, quint32 column, 
     quint64 a=xyAdressToUInt64(row, column);
     state.moreDataMap[a].insert(role, value);
     if (doEmitSignals) emit dataChanged(index(row, column), index(row, column));
+    endMultiUndo();
+}
+
+void QFTableModel::setCellsUserRoleCreate(int role, quint32 row0, quint32 row1, quint32 column0, quint32 column1, QVariant value)
+{
+    if (readonly) return;
+    startMultiUndo();
+    quint32 maxRow=qMax(row0, row1);
+    quint32 maxCol=qMax(column0, column1);
+    quint32 minRow=qMin(row0, row1);
+    quint32 minCol=qMin(column0, column1);
+    if ((maxRow>=state.rows) || (maxCol>=state.columns)) {
+        resize(qMax(state.rows, quint32(maxRow+1)), qMax(state.columns, quint32(maxCol+1)));
+    }
+    for (quint32 r=minRow; r<=maxRow; r++) {
+        for (quint32 c=minCol; c<=maxCol; c++) {
+            const quint64 a=xyAdressToUInt64(r, c);
+            state.moreDataMap[a].insert(role, value);
+        }
+
+    }
+    if (doEmitSignals) emit dataChanged(index(minRow, minCol), index(maxRow, maxCol));
     endMultiUndo();
 }
 
@@ -1536,7 +1558,10 @@ bool QFTableModel::getDoEmitSignals() const
 void QFTableModel::enableSignals(bool emitReset)
 {
     doEmitSignals=true;
-    if (emitReset) reset();
+    if (emitReset) {
+        emitUndoRedoSignals(true);
+        reset();
+    }
 }
 
 void QFTableModel::disableSignals()
@@ -1790,7 +1815,7 @@ void QFTableModel::undo()
         //qDebug()<<"undone ... calling reset";
         reset();
     }
-    emitUndoRedoSignals();
+    if (doEmitSignals) emitUndoRedoSignals();
     //qDebug()<<"undone ... DONE ...      (undoCurrentPosition="<<undoCurrentPosition<<" list.size="<<undoList.size()<<")   l="<<undoListT;
 }
 
@@ -1804,7 +1829,7 @@ void QFTableModel::redo()
         //qDebug()<<"redone ... calling reset";
         reset();
     }
-    emitUndoRedoSignals();
+    if (doEmitSignals) emitUndoRedoSignals();
     //qDebug()<<"redone ... DONE ...      (undoCurrentPosition="<<undoCurrentPosition<<" list.size="<<undoList.size()<<")   l="<<undoListT;
 }
 
@@ -1818,7 +1843,7 @@ void QFTableModel::clearUndo()
     rdlID=0;
     undoIsMultiStep=0;
     undoCurrentPosition=-1;
-    emitUndoRedoSignals();
+    if (doEmitSignals) emitUndoRedoSignals();
 }
 
 void QFTableModel::startMultiUndo()
@@ -1831,7 +1856,7 @@ void QFTableModel::startMultiUndo()
     }
     undoIsMultiStep++;
 
-    //emitUndoRedoSignals();
+    //if (doEmitSignals) emitUndoRedoSignals();();
 }
 
 void QFTableModel::endMultiUndo()
@@ -1839,7 +1864,7 @@ void QFTableModel::endMultiUndo()
     if (!undoEnabled) return;
     undoIsMultiStep--;
 
-    //emitUndoRedoSignals();
+    //if (doEmitSignals) emitUndoRedoSignals();();
 }
 
 void QFTableModel::clearMultiUndo()
@@ -1847,7 +1872,7 @@ void QFTableModel::clearMultiUndo()
     if (!undoEnabled) return;
     undoIsMultiStep=0;
     addUndoStep();
-    emitUndoRedoSignals();
+    if (doEmitSignals) emitUndoRedoSignals();
 }
 
 void QFTableModel::setUndoEnabled(bool enabled)
@@ -1860,7 +1885,7 @@ void QFTableModel::setUndoEnabled(bool enabled)
         undoIsMultiStep=0;
         undoCurrentPosition=-1;
     }
-    emitUndoRedoSignals();
+    if (doEmitSignals) emitUndoRedoSignals();
 }
 
 QAction *QFTableModel::getUndoAction() const
@@ -1895,7 +1920,7 @@ void QFTableModel::addUndoStep()
     }
 
     //qDebug()<<this<<" addUndoStep: cur="<<undoCurrentPosition<<"  list.size="<<undoList.size()<< "   l="<<undoListT;
-    emitUndoRedoSignals();
+    if (doEmitSignals) emitUndoRedoSignals();
 
 }
 
