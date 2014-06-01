@@ -23,12 +23,13 @@ class QFWIDLIB_EXPORT DataCutSliders : public QWidget
 
     public:
         /** \brief class constructor */
-        DataCutSliders(QWidget* parent=0);
+        explicit DataCutSliders(QWidget* parent=0);
+        virtual ~DataCutSliders();
 
-        GetSetMacroI(int, min, update())
-        GetSetMacroI(int, max, update())
-        GetSetMacroI(int, userMin, update())
-        GetSetMacroI(int, userMax, update())
+        GetSetMacroI(int, min, updateSliderWidgets())
+        GetSetMacroI(int, max, updateSliderWidgets())
+        GetSetMacroI(int, userMin, updateSliderWidgets())
+        GetSetMacroI(int, userMax, updateSliderWidgets())
         GetSetMacro(bool, allowCopyToAll)
         GetSetMacro(QString, runsName)
         GetSetMacro(QString, filesName)
@@ -109,9 +110,15 @@ class QFWIDLIB_EXPORT DataCutSliders : public QWidget
         void setValues(int userMin, int userMax, int min, int max);
 
         void setCentralLabel(const QString& label);
+    protected:
+        void connectWidgets(bool connect=true);
+        void disconnectWidgets() {
+            connectWidgets(false);
+        }
+
     private:
         /** \brief update the widgets with the values in the private data members */
-        void update();
+        void updateSliderWidgets();
 
         /** \brief indicates whether to emit the signalChanged() signal, wen the values change
          *
