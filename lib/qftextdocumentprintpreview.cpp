@@ -50,7 +50,7 @@ QFTextDocumentPrintPreview::QFTextDocumentPrintPreview(QPrinter * printer, QText
 
     this->printer=printer;
     this->txt=txt;
-    mainLayout=new QVBoxLayout(this);
+    mainLayout=new QVBoxLayout();
     setLayout(mainLayout);
     if (hasFontSizeEdit) {
         QToolBar* toolbar1=new QToolBar("tb1", this);

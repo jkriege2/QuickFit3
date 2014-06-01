@@ -19,7 +19,7 @@ QFRDRPlotEditor::~QFRDRPlotEditor()
 }
 
 void QFRDRPlotEditor::createWidgets() {
-    QVBoxLayout* l=new QVBoxLayout(this);
+    QVBoxLayout* l=new QVBoxLayout();
     setLayout(l);
 
     tbMain=new QToolBar("tbPlotMain", this);

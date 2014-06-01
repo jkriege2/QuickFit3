@@ -833,7 +833,7 @@ void QFParameterCorrelationView::createWidgets()
     // HISTOGRAM SETTINGS/////////////////////////////////////////////////////////////////////
     QHBoxLayout* coll;
     grpHistogramSettings=new QGroupBox(tr("plot style"), this);
-    flHistSet=new QFormLayout(grpHistogramSettings);
+    flHistSet=new QFormLayout();
     grpHistogramSettings->setLayout(flHistSet);
 
 
@@ -896,8 +896,8 @@ void QFParameterCorrelationView::createWidgets()
     coll->addStretch();
     coll->setContentsMargins(0,0,0,0);
     flHistSet->addRow(tr("density bins:"), coll);
-    connect(cmb2DHistogram, SIGNAL(currentIndexChanged(int)), spin2DHistogramBins1, SLOT(setEnabled(bool)));
-    connect(cmb2DHistogram, SIGNAL(currentIndexChanged(int)), spin2DHistogramBins2, SLOT(setEnabled(bool)));
+    connect(cmb2DHistogram, SIGNAL(currentIndexChanged(int)), this, SLOT(histTypeChanged(int)));
+    histTypeChanged(cmb2DHistogram->currentIndex());
 
 
     flHistSet->addRow(tr("<b>symbol:</b>"), cmbSymbol);
@@ -969,7 +969,7 @@ void QFParameterCorrelationView::createWidgets()
     // HISTOGRAM PLOTS ///////////////////////////////////////////////////////////////////////
     splitterHistogram=new QVisibleHandleSplitter(this);
     QWidget* widPlotter=new QWidget(this);
-    QGridLayout* layPlots=new QGridLayout(this);
+    QGridLayout* layPlots=new QGridLayout();
     widPlotter->setLayout(layPlots);
 
     labPlotPos=new QLabel(this);
@@ -1067,7 +1067,7 @@ void QFParameterCorrelationView::createWidgets()
 
 
     QWidget* widHTab=new QWidget(this);
-    laySplitterTable=new QVBoxLayout(widHTab);
+    laySplitterTable=new QVBoxLayout();
     laySplitterTable->setContentsMargins(0,0,0,0);
     widHTab->setLayout(laySplitterTable);
     laySplitterTable->addWidget(tvHistogramParameters);
@@ -1084,6 +1084,12 @@ void QFParameterCorrelationView::createWidgets()
     //connectParameterWidgets(true);
 
     setSpaceSavingMode(true);
+}
+
+void QFParameterCorrelationView::histTypeChanged(int index)
+{
+    spin2DHistogramBins1->setEnabled(index>0);
+    spin2DHistogramBins2->setEnabled(index>0);
 }
 
 

@@ -884,7 +884,7 @@ void MainWindow::aboutPlugins() {
 
 void MainWindow::createWidgets() {
     QWidget* widgetMain=new QWidget(this);
-    QVBoxLayout* layMain=new QVBoxLayout(widgetMain);
+    QVBoxLayout* layMain=new QVBoxLayout();
     widgetMain->setLayout(layMain);
     layMain->setContentsMargins(2,2,2,2);
     labUpgrade=new QLabel("", this);
@@ -911,7 +911,7 @@ void MainWindow::createWidgets() {
     setCentralWidget(widgetMain);
 
     QWidget* w=new QWidget(spCenter);
-    QFormLayout* fl=new QFormLayout(w);
+    QFormLayout* fl=new QFormLayout();
     w->setLayout(fl);
     spCenter->addWidget(w);
     spMain->addWidget(spCenter);

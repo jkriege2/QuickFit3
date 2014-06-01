@@ -213,7 +213,7 @@ void QFESPIMB040SimpleCameraConfig::createWidgets() {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main layout
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    QFormLayout* camlayout=new QFormLayout(this);
+    QFormLayout* camlayout=new QFormLayout();
     setLayout(camlayout);
 
 
@@ -231,7 +231,7 @@ void QFESPIMB040SimpleCameraConfig::createWidgets() {
     cmbAcquisitionDevice=new QFCameraComboBox(this);
     cmbAcquisitionDevice->setSizeAdjustPolicy(QComboBox::AdjustToContents);
 
-    QHBoxLayout* hbl=new QHBoxLayout(this);
+    QHBoxLayout* hbl=new QHBoxLayout();
     hbl->setContentsMargins(0,0,0,0);
     hbl->addWidget(cmbAcquisitionDevice);
     btnConnect=new QToolButton(this);
@@ -251,7 +251,7 @@ void QFESPIMB040SimpleCameraConfig::createWidgets() {
     connect(cmbPreviewConfiguration, SIGNAL(currentIndexChanged(int)), this, SLOT(previewCurrentIndexChanged(int)));
     cmbPreviewConfiguration->setStopResume(this);
 
-    hbl=new QHBoxLayout(this);
+    hbl=new QHBoxLayout();
     hbl->setContentsMargins(0,0,0,0);
     spinAcquisitionDelay=new QDoubleSpinBox(this);
     spinAcquisitionDelay->setMinimum(2);

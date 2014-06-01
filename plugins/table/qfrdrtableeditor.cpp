@@ -76,7 +76,7 @@ void QFRDRTableEditor::requestRefit(int plot, int graph)
 }
 
 void QFRDRTableEditor::createWidgets() {
-    QVBoxLayout* l=new QVBoxLayout(this);
+    QVBoxLayout* l=new QVBoxLayout();
     setLayout(l);
 
     tbMain=new QToolBar("tbtablemain", this);

@@ -461,7 +461,7 @@ void QConfigComboboxWidget::deleteConfig(const QString &id)
 
 void QConfigComboboxWidget::createWidgets()
 {
-    QHBoxLayout* hbl=new QHBoxLayout(this);
+    QHBoxLayout* hbl=new QHBoxLayout();
     setLayout(hbl);
     combobox=new QComboBox(this);
     connect(combobox, SIGNAL(currentIndexChanged(int)), this, SLOT(currentConfigChanged(int)));

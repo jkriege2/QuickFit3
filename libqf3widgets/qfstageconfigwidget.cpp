@@ -159,7 +159,7 @@ void QFStageConfigWidget::createWidgets() {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main layout
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    QFormLayout* stagelayout=new QFormLayout(this);
+    QFormLayout* stagelayout=new QFormLayout();
     stagelayout->setHorizontalSpacing(2);
     setLayout(stagelayout);
 
@@ -172,7 +172,7 @@ void QFStageConfigWidget::createWidgets() {
     btnConfigSteps=new QToolButton(this);
 
     cmbStageX=new QFStageComboBox(this);
-    QHBoxLayout* hbl=new QHBoxLayout(this);
+    QHBoxLayout* hbl=new QHBoxLayout();
     hbl->setContentsMargins(0,0,0,0);
     hbl->setSpacing(1);
     hbl->addWidget(cmbStageX);
@@ -188,7 +188,7 @@ void QFStageConfigWidget::createWidgets() {
 
 
 
-    hbl=new QHBoxLayout(this);
+    hbl=new QHBoxLayout();
     hbl->setContentsMargins(0,0,0,0);
     chkJoystick=new QCheckBox(tr("joystick:"), this);
     QFont fb=chkJoystick->font();
@@ -231,7 +231,7 @@ void QFStageConfigWidget::createWidgets() {
     hbl->addStretch();
     stagelayout->addRow(chkJoystick, hbl);
 
-    QGridLayout* gl=new QGridLayout(this);
+    QGridLayout* gl=new QGridLayout();
     spinMoveX=new QDoubleSpinBox(this);
     spinMoveX->setRange(-1e6,1e6);
     spinMoveX->setSingleStep(1);

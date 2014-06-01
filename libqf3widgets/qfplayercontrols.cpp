@@ -100,7 +100,7 @@ void QFPLayerControls::playPauseTriggered(bool checked) {
 }
 
 void QFPLayerControls::createWidgets() {
-    QGridLayout* lay=new QGridLayout(this);
+    QGridLayout* lay=new QGridLayout();
     setLayout(lay);
     QToolButton* btn=new QToolButton(this);
     btn->setDefaultAction(actRewind);

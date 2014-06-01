@@ -160,7 +160,7 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
 
 
     widFindInAll=new QWidget(this);
-    QGridLayout* layFindAll=new QGridLayout(widFindInAll);
+    QGridLayout* layFindAll=new QGridLayout();
     layFindAll->setContentsMargins(0,0,0,0);
     widFindInAll->setLayout(layFindAll);
     layFindAll->addWidget(new QLabel(tr("phrase: ")),0,0);
@@ -173,7 +173,7 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     connect(edtFindInAll, SIGNAL(returnPressed()), this, SLOT(searchInAll()));
     layFindAll->addWidget(edtFindInAll,0,1);
 
-    QHBoxLayout* layTemp=new QHBoxLayout(widFindInAll);
+    QHBoxLayout* layTemp=new QHBoxLayout();
     layFindAll->addLayout(layTemp,1,1,1,2);
     chkCaseSensitiveInAll=new QCheckBox(tr("case-sensitive"), widFindInAll);
     chkCaseSensitiveInAll->setChecked(false);

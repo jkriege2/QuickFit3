@@ -36,7 +36,7 @@ void QFRDRImagingFCSOverviewRateEditor::writeSettings() {
 void QFRDRImagingFCSOverviewRateEditor::createWidgets() {
 
 
-    QHBoxLayout* mainLay=new QHBoxLayout(this);
+    QHBoxLayout* mainLay=new QHBoxLayout();
     setLayout(mainLay);
 
     mainSplitter=new QVisibleHandleSplitter(Qt::Horizontal, this);

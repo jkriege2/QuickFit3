@@ -66,34 +66,11 @@ void QFRawDataPropertyEditor_private::descriptionChanged() {
 }
 
 
-#define ADDTOGRID(layout, counter, label, widget) {\
-    QWidget* lparent=NULL; \
-    QWidget* bwidget=NULL; \
-      lparent=widget; \
-      bwidget=widget; \
-      layout->addWidget(widget, counter, 1); \
-    QLabel* l=new QLabel(label, lparent); \
-    l->setBuddy(bwidget); \
-    layout->addWidget(l, counter, 0); \
-    counter++; \
-}
 
-#define ADDTOGRIDLAY(layout, counter, label, widget) {\
-    QWidget* lparent=NULL; \
-    QWidget* bwidget=NULL; \
-    bwidget=new QWidget(widget->parentWidget()); \
-    bwidget->setLayout(widget); \
-    lparent=bwidget; \
-    layout->addWidget(bwidget, counter, 1); \
-    QLabel* l=new QLabel(label, lparent); \
-    l->setBuddy(bwidget); \
-    layout->addWidget(l, counter, 0); \
-    counter++; \
-}
 
 void QFRawDataPropertyEditor_private::createWidgets() {
     QLabel* l;
-    QVBoxLayout* ml=new QVBoxLayout(d);
+    QVBoxLayout* ml=new QVBoxLayout();
     d->setLayout(ml);
 
     menuBar=new QMenuBar(d);
@@ -104,7 +81,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     menuHelp=menuBar->addMenu("&Help");
 
     ml->setContentsMargins(2,2,2,2);
-    QHBoxLayout* vl=new QHBoxLayout(d);
+    QHBoxLayout* vl=new QHBoxLayout();
     ml->addLayout(vl);
     actPrevious=new QAction(QIcon(":/lib/prop_previous.png"), tr("&previous"), d);
     actPrevious->setToolTip(tr("move to previous record"));
@@ -192,7 +169,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     connect(tabMain, SIGNAL(currentChanged(int)), this, SLOT(currentTabChanged(int)));
 
     QWidget* w=new QWidget(tabMain);
-    QGridLayout* fl=new QGridLayout(w);
+    QGridLayout* fl=new QGridLayout();
     //int flcounter=0;
     //fl->setFieldGrowthPolicy(QFormLayout::ExpandingFieldsGrow);
     w->setLayout(fl);
@@ -208,7 +185,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     labTypeIcon=new QLabel(w);
     labType->setSizePolicy(labType->sizePolicy().verticalPolicy(),QSizePolicy::Fixed);
     labTypeIcon->setSizePolicy(labTypeIcon->sizePolicy().verticalPolicy(),QSizePolicy::Fixed);
-    QHBoxLayout* ptl=new QHBoxLayout(d);
+    QHBoxLayout* ptl=new QHBoxLayout();
     ptl->setContentsMargins(0,0,0,0);
     ptl->addWidget(labTypeIcon);
     ptl->addWidget(labType);
@@ -223,7 +200,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     fl->addWidget((l=new QLabel(tr("&Name:"), w)), 2, 0);
     l->setAlignment(Qt::AlignLeft|Qt::AlignTop);
     l->setBuddy(edtName);
-    QHBoxLayout* ntl=new QHBoxLayout(d);
+    QHBoxLayout* ntl=new QHBoxLayout();
     ntl->setContentsMargins(0,0,0,0);
     ntl->addWidget(edtName, 1);
     ntl->addStretch();
@@ -340,12 +317,12 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     tvProperties->setModel(NULL);
 
     QWidget* widProperties=new QWidget(d);
-    QHBoxLayout* pl1=new QHBoxLayout(d);
+    QHBoxLayout* pl1=new QHBoxLayout();
     widProperties->setLayout(pl1);
     widProperties->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     pl1->setContentsMargins(0,0,0,0);
     pl1->addWidget(tvProperties);
-    QVBoxLayout* pl2=new QVBoxLayout(d);
+    QVBoxLayout* pl2=new QVBoxLayout();
     pl1->addLayout(pl2);
     btnNewProperty=createButtonAndActionShowText(actNewProperty, QIcon(":/lib/prop_add.png"), tr("In&sert Property"), d);
     connect(actNewProperty, SIGNAL(triggered()), this, SLOT(newPropClicked()));
@@ -389,7 +366,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
 
 
     widResults=new QWidget(d);
-    QVBoxLayout* rwvlayout=new QVBoxLayout(d);
+    QVBoxLayout* rwvlayout=new QVBoxLayout();
     widResults->setLayout(rwvlayout);
     tvResults=new QEnhancedTableView(widResults);
     tvResults->setAlternatingRowColors(true);

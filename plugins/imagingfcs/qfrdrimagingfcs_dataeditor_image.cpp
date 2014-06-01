@@ -97,7 +97,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     QLabel* l;
-    QGridLayout* lb=new QGridLayout(this);
+    QGridLayout* lb=new QGridLayout();
     setLayout(lb);
 
 
@@ -116,7 +116,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     QGroupBox* grpTop=new QGroupBox(tr(" Parameter Image Plot Settings "), this);
     grpTop->setFlat(true);
-    QGridLayout* topgrid=new QGridLayout(this);
+    QGridLayout* topgrid=new QGridLayout();
     grpTop->setLayout(topgrid);
 
     int row=0;
@@ -144,7 +144,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     topgrid->addWidget(cmbParameterTransform, row, 6);
 
     row++;
-    QHBoxLayout* hblp2=new QHBoxLayout(this);
+    QHBoxLayout* hblp2=new QHBoxLayout();
     topgrid->addLayout(hblp2, row, 3, 1, 4);
     chkOtherFileP2=new QCheckBox(tr("other RDR for parameter 2, role:"), this);
     hblp2->addWidget(chkOtherFileP2);
@@ -215,7 +215,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
                     "  subcontrol-position: top left; "
                     "  padding: 0 8px;"
                     //"  border: 1px solid gray;"
-                    "}").arg(palette().color(QPalette::Window).name()).arg(palette().color(QPalette::Window).lighter(120).name());
+                    "}");//.arg(palette().color(QPalette::Window).name()).arg(palette().color(QPalette::Window).lighter(120).name());
     w->setStyleSheet(w->styleSheet()+QString("\n\n")+stylesheetGroupBox);
 
 
@@ -229,7 +229,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     ///////////////////////////////////////////////////////////////
     QGroupBox* grpVisiblePlots=new QGroupBox(tr(" general options "), this);
     grpVisiblePlots->setFlat(true);
-    QGridLayout* glVisPlots=new QGridLayout(this);
+    QGridLayout* glVisPlots=new QGridLayout();
     grpVisiblePlots->setLayout(glVisPlots);
     chkOverviewVisible=new QCheckBox(tr("overview"), grpVisiblePlots);
     chkOverviewVisible->setChecked(true);
@@ -263,7 +263,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     wmask->setFlat(true);
     //wmask->setStyleSheet(wmask->styleSheet()+QString("\n\n")+ stylesheetGroupBox);
     vbl->addWidget(wmask);
-    QGridLayout* glmask=new QGridLayout(this);
+    QGridLayout* glmask=new QGridLayout();
     glmask->setHorizontalSpacing(2);
     glmask->setVerticalSpacing(2);
     wmask->setLayout(glmask);
@@ -360,7 +360,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     wsel->setFlat(true);
     //wsel->setStyleSheet(wsel->styleSheet()+QString("\n\n")+ stylesheetGroupBox);
     vbl->addWidget(wsel);
-    QGridLayout* glsel=new QGridLayout(this);
+    QGridLayout* glsel=new QGridLayout();
     glsel->setHorizontalSpacing(2);
     glsel->setVerticalSpacing(2);
     wsel->setLayout(glsel);
@@ -445,7 +445,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     glsel->addWidget(new QLabel(tr("stored selections:")), selgrpRow, 0);
     QWidget* ssel=new QWidget(this);
-    QHBoxLayout* ssell=new QHBoxLayout(this);
+    QHBoxLayout* ssell=new QHBoxLayout();
     ssell->setContentsMargins(0,0,0,0);
     ssel->setLayout(ssell);
     glsel->addWidget(ssel, selgrpRow, 1,1,3);
@@ -480,7 +480,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     QGroupBox* wsels=new QGroupBox(tr(" selection style "), this);
-    gli=new QFormLayout(this);
+    gli=new QFormLayout();
     wsels->setLayout(gli);
     chkDisplayImageOverlay=new QCheckBox(wsels);
     gli->addRow(tr("&enabled:"), chkDisplayImageOverlay);
@@ -504,7 +504,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QGroupBox* wovr=new QGroupBox(tr(" overview image style "), this);
     wovr->setFlat(true);
     vbl->addWidget(wovr);
-    gli=new QFormLayout(this);
+    gli=new QFormLayout();
     wovr->setLayout(gli);
 
     cmbColorbarOverview=new JKQTPMathImageColorPaletteComboBox(wovr);
@@ -546,12 +546,12 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     wcp->setFlat(true);
     //wcp->setStyleSheet(wcp->styleSheet()+QString("\n\n")+ stylesheetGroupBox);
     vbl->addWidget(wcp);
-    QFormLayout* gl=new QFormLayout(this);
+    QFormLayout* gl=new QFormLayout();
     gl->setSpacing(2);
 
     wcp->setLayout(gl);
 
-    QHBoxLayout* cpsHBox=new QHBoxLayout(this);
+    QHBoxLayout* cpsHBox=new QHBoxLayout();
     cpsHBox->setContentsMargins(0,0,0,0);
     chkLogTauAxis=new QCheckBox("log tau-axis", w);
 
@@ -568,7 +568,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbAverageStyle=new JKQTPLinePlotStyleComboBox(w);
 
     cmbAverageErrorStyle=new JKQTPerrorPlotstyleComboBox(w);
-    cpsHBox=new QHBoxLayout(this);
+    cpsHBox=new QHBoxLayout();
     cpsHBox->setContentsMargins(0,0,0,0);
     cpsHBox->addWidget(cmbAverageStyle);
     cpsHBox->addWidget(cmbAverageErrorStyle);
@@ -581,7 +581,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbRunStyle=new JKQTPLinePlotStyleComboBox(w);
 
     cmbRunErrorStyle=new JKQTPerrorPlotstyleComboBox(w);
-    cpsHBox=new QHBoxLayout(this);
+    cpsHBox=new QHBoxLayout();
     cpsHBox->setContentsMargins(0,0,0,0);
     cpsHBox->addWidget(cmbRunStyle);
     cpsHBox->addWidget(cmbRunErrorStyle);
@@ -589,7 +589,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     labRunOptions->setBuddy(cmbRunStyle);
 
 
-    cpsHBox=new QHBoxLayout(this);
+    cpsHBox=new QHBoxLayout();
     cpsHBox->setContentsMargins(0,0,0,0);
     chkDisplayResiduals=new QCheckBox(w);
     chkDisplayResiduals->setChecked(true);
@@ -611,7 +611,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     gl->addRow(tr("selection display:"), cmbSeletionCorrDisplayMode);
 
     QWidget* wcrosstalk=new QWidget(this);
-    QGridLayout* wclayout=new QGridLayout(wcrosstalk);
+    QGridLayout* wclayout=new QGridLayout();
     wcrosstalk->setLayout(wclayout);
     wclayout->setContentsMargins(0,0,0,0);
     spinCrosstalk=new QDoubleSpinBox(wcrosstalk);
@@ -906,14 +906,14 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
 
-    QWidget* wp=new QWidget(this);
-    QVBoxLayout* lp=new QVBoxLayout(this);
+    /*QWidget* wp=new QWidget(this);
+    QVBoxLayout* lp=new QVBoxLayout();
     lp->setContentsMargins(0,0,0,0);
     wp->setLayout(lp);
-    lp->addWidget(plotterResid,1);
+    lp->addWidget(plotterResid,1);*/
     sliders=new DataCutSliders(this);
     connect(sliders, SIGNAL(slidersChanged(int , int , int, int)), this, SLOT(slidersChanged(int, int, int, int)));
-    lp->addWidget(sliders);
+    //lp->addWidget(sliders);
 
 
     tvParams=new QEnhancedTableView();
@@ -933,12 +933,14 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     splitterTop->addWidget(wpltMask);
     splitterTop->addWidget(wpltOverview);
     splitterTopBot->addWidget(splitterTop);
-    QVBoxLayout* layPlotsBot=new QVBoxLayout(this);
+    QVBoxLayout* layPlotsBot=new QVBoxLayout();
     QWidget* wPlotsBot=new QWidget(this);
     wPlotsBot->setLayout(layPlotsBot);
     layPlotsBot->setContentsMargins(0,0,0,0);
     layPlotsBot->addWidget(plotter,3);
-    layPlotsBot->addWidget(wp,2);
+    layPlotsBot->addWidget(plotterResid,2);
+    layPlotsBot->addWidget(sliders,0);
+    //layPlotsBot->addWidget(wp,2);
     splitterBot=new QVisibleHandleSplitter(Qt::Horizontal, this);
     //splitterBot->addWidget(splitterBotPlots);
     splitterBot->addWidget(wPlotsBot);
@@ -958,7 +960,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     // GROUPBOX: buttons for data/report saving
     ///////////////////////////////////////////////////////////////
 
-    QGridLayout* grdTop=new QGridLayout(this);
+    QGridLayout* grdTop=new QGridLayout();
     btnPrintReport = createButtonForActionShowText(actPrintReport/*, QIcon(":/imaging_fcs/report_print.png"), tr("&Print report")*/, this);
     actPrintReport->setToolTip(tr("print a report which contains all data on the current screen:<br><ul>"
                                   "<li>all images (parameter, mask, parameter 2, overview</li>"
@@ -1172,7 +1174,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     histogram_2->setVisible(false);
 
     QWidget* widHist=new QWidget(this); //=histogram;
-    histLay=new QGridLayout(this);
+    histLay=new QGridLayout();
     widHist->setLayout(histLay);
     histLay->addWidget(histogram,0,0);
     histLay->addWidget(histogram_2,0,1);
@@ -1226,8 +1228,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     spinCorrelationChannel->setValue(0);
 
     QWidget* widCorr=new QWidget(this);
-    QVBoxLayout* corrLay=new QVBoxLayout(this);
-    QHBoxLayout* layCorrCombo=new QHBoxLayout(this);
+    QVBoxLayout* corrLay=new QVBoxLayout();
+    QHBoxLayout* layCorrCombo=new QHBoxLayout();
     corrLay->addLayout(layCorrCombo);
     layCorrCombo->addStretch();
     layCorrCombo->addWidget(new QLabel(tr("correlation plot mode:"), this));

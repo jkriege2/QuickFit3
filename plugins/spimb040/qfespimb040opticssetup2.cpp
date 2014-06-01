@@ -294,7 +294,7 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                        qDebug()<<"create "<<type<<"-element '"<<id<<"' in "<<ingroupLayout->parent()->objectName()<<"   (x,y)="<<x<<y<<"   (ingroupW, ingroupH)="<<ingroupLayout->columnCount()<<ingroupLayout->rowCount();
                        if (type=="group") {
                            QGroupBox* w=new QGroupBox(this);
-                           QGridLayout* wgl=new QGridLayout(w);
+                           QGridLayout* wgl=new QGridLayout();
                            wgl->setContentsMargins(margin,margin,margin,margin);
                            wgl->setSpacing(spacing);
                            QStringList stretch=QString(settings.getAsString("colstretch", "").c_str()).split(",");
@@ -317,7 +317,7 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
                        } else if (type=="frame" || type=="hline" || type=="vline") {
                            QFrame* w=new QFrame(this);
-                           QGridLayout* wgl=new QGridLayout(w);
+                           QGridLayout* wgl=new QGridLayout();
                            wgl->setContentsMargins(margin,margin,margin,margin);
                            wgl->setSpacing(spacing);
                            widNew=w;
@@ -352,7 +352,7 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
                        } else if (type=="tabwidget") {
                            QFEnhancedTabWidget* w=new QFEnhancedTabWidget(this);
-                           QGridLayout* wgl=new QGridLayout(w);
+                           QGridLayout* wgl=new QGridLayout();
                            widNew=w;
                            ui_tabs[id]=w;
                            ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
@@ -365,7 +365,7 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            } else {
 
                                QWidget* w=new QWidget(this);
-                               QGridLayout* wgl=new QGridLayout(w);
+                               QGridLayout* wgl=new QGridLayout();
                                wgl->setContentsMargins(margin,margin,margin,margin);
                                wgl->setSpacing(spacing);
                                widNew=w;

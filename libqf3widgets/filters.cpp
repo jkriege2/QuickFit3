@@ -65,7 +65,7 @@ QF3FilterCombobox::QF3FilterCombobox(QWidget* parent):
     globalfilters="";
     localfilters="";
 
-    hbl=new QHBoxLayout(this);
+    hbl=new QHBoxLayout();
     setLayout(hbl);
     hbl->setContentsMargins(0,0,0,0);
     hbl->setSpacing(1);
@@ -435,7 +435,7 @@ void QF3DualViewWidget::saveSettings(QFManyFilesSettings &settings, QString prop
 QF3DualViewWidget::QF3DualViewWidget(QWidget *parent):
     QWidget(parent)
 {
-    lay=new QGridLayout(this);
+    lay=new QGridLayout();
     setLayout(lay);
     QLabel* l=NULL;
     cmbDirection=new QComboBox(this);

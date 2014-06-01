@@ -49,11 +49,11 @@ QFFCSMSDEvaluationEditor::~QFFCSMSDEvaluationEditor()
 
 QWidget* QFFCSMSDEvaluationEditor::createSlopeWidgets(int i) {
     QWidget* w1=new QWidget(this);
-    QHBoxLayout* lay1=new QHBoxLayout(w1);
+    QHBoxLayout* lay1=new QHBoxLayout();
     lay1->setContentsMargins(0,0,0,0);
     w1->setLayout(lay1);
     QWidget* w=new QWidget(this);
-    QHBoxLayout* lay=new QHBoxLayout(w);
+    QHBoxLayout* lay=new QHBoxLayout();
     lay->setContentsMargins(0,0,0,0);
     w->setLayout(lay);
     numPre[i]=new QFDoubleEdit(this);
@@ -283,7 +283,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
 
     splitterDist=new QVisibleHandleSplitter(Qt::Vertical, this);
     QWidget* w=new QWidget(this);
-    QVBoxLayout* lay=new QVBoxLayout(w);
+    QVBoxLayout* lay=new QVBoxLayout();
     lay->setContentsMargins(0,0,0,0);
     w->setLayout(lay);
     lay->addWidget(tbPlotDistribution);
@@ -291,7 +291,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     splitterDist->addWidget(w);
 
     w=new QWidget(this);
-    lay=new QVBoxLayout(w);
+    lay=new QVBoxLayout();
     lay->setContentsMargins(0,0,0,0);
     w->setLayout(lay);
     lay->addWidget(tbPlotDistResults);
@@ -300,7 +300,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     splitterDist->addWidget(w);
 
     QWidget* wPltDist=new QWidget(this);
-    QVBoxLayout* layPltDist=new QVBoxLayout(this);
+    QVBoxLayout* layPltDist=new QVBoxLayout();
     wPltDist->setLayout(layPltDist);
     layPltDist->setContentsMargins(0,0,0,0);
     layPltDist->addWidget(splitterDist);

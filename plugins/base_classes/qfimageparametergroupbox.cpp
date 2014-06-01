@@ -284,7 +284,7 @@ void QFImageParameterGroupBox::initGrp()
 {
     setFlat(true);
 
-    QFormLayout* gli=new QFormLayout(this);
+    QFormLayout* gli=new QFormLayout();
     gli->setSpacing(2);
     setLayout(gli);
 

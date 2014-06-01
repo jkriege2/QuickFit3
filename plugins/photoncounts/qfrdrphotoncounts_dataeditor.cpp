@@ -73,10 +73,10 @@ QFRDRPhotonCountsDataEditor::~QFRDRPhotonCountsDataEditor()
 }
 
 void QFRDRPhotonCountsDataEditor::createWidgets() {
-    QVBoxLayout* l=new QVBoxLayout(this);
+    QVBoxLayout* l=new QVBoxLayout();
     setLayout(l);
 
-    /*QHBoxLayout* hl=new QHBoxLayout(this);
+    /*QHBoxLayout* hl=new QHBoxLayout();
     hl->addWidget(new QLabel(tr("display mode:")));
     hl->addWidget(cmbRateDisplay);
     l->addLayout(hl);*/
@@ -85,7 +85,7 @@ void QFRDRPhotonCountsDataEditor::createWidgets() {
     l->addWidget(splitter);
 
     QWidget* widOptionsRHS=new QWidget(this);
-    QGridLayout* glOptionsRHS=new QGridLayout(this);
+    QGridLayout* glOptionsRHS=new QGridLayout();
     int glRowCount=0;
     widOptionsRHS->setLayout(glOptionsRHS);
 
@@ -149,7 +149,7 @@ void QFRDRPhotonCountsDataEditor::createWidgets() {
 
     glRowCount++;
     grpInfo=new QGroupBox(tr("Info"), widOptionsRHS);
-    QGridLayout* ggl=new QGridLayout(grpInfo);
+    QGridLayout* ggl=new QGridLayout();
     grpInfo->setLayout(ggl);
     ggl->addWidget(new QLabel(tr("# Runs = ")), 0, 0);
     labRuns=new QLabel(grpInfo);
@@ -172,14 +172,14 @@ void QFRDRPhotonCountsDataEditor::createWidgets() {
     plotterBinned->get_plotter()->addOverlayElement(ovlRange);
 
     QWidget* widPlotterDetail=new QWidget(this);
-    QVBoxLayout* vbPlotterDetail=new QVBoxLayout(this);
+    QVBoxLayout* vbPlotterDetail=new QVBoxLayout();
     widPlotterDetail->setLayout(vbPlotterDetail);
     spinDetailWidth=new QDoubleSpinBox(this);
     spinDetailWidth->setRange(0.001,1e9);
     spinDetailWidth->setDecimals(3);
     spinDetailWidth->setValue(10);
     spinDetailWidth->setSuffix(tr(" ms"));
-    QHBoxLayout* hbPlotterDetailControl=new QHBoxLayout(this);
+    QHBoxLayout* hbPlotterDetailControl=new QHBoxLayout();
     hbPlotterDetailControl->addWidget(new QLabel(tr("detail width: "), this));
     hbPlotterDetailControl->addWidget(spinDetailWidth);
     hbPlotterDetailControl->addWidget(new QLabel(tr("     detail position: "), this));

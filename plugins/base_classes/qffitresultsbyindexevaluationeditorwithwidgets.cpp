@@ -42,20 +42,20 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     dlgFitProgressReporter=new dlgQFFitAlgorithmProgressDialogReporter(dlgFitProgress);
 
 
-    QVBoxLayout* mainLayout=new QVBoxLayout(this);
+    QVBoxLayout* mainLayout=new QVBoxLayout();
     mainLayout->setContentsMargins(5,5,5,5);
     setLayout(mainLayout);
 
 
     QWidget* topWidget=new QWidget(this);
-    QVBoxLayout* vbl=new QVBoxLayout(topWidget);
+    QVBoxLayout* vbl=new QVBoxLayout();
     vbl->setContentsMargins(0,0,0,0);
     topWidget->setLayout(vbl);
 
-    QFormLayout* fl;//=new QFormLayout(this);
+    QFormLayout* fl;//=new QFormLayout();
     QLabel* l;
     QHBoxLayout* hbl=NULL;
-    layAlgorithm=new QHBoxLayout(this);
+    layAlgorithm=new QHBoxLayout();
     layAlgorithm->setContentsMargins(0,0,0,0);
     cmbAlgorithm=new QComboBox(this);
     l=new QLabel(tr("Fit &Algorithm: "), this);
@@ -76,7 +76,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     vbl->addLayout(layAlgorithm);
 
 
-    layModel=new QHBoxLayout(this);
+    layModel=new QHBoxLayout();
     layModel->setContentsMargins(0,0,0,0);
     cmbModel=new QComboBox(this);
     l=new QLabel(tr("Fit &Model:"), this);
@@ -163,7 +163,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
 
     QWidget* widgetResiduals=new QWidget(this);
-    vbl=new QVBoxLayout(widgetResiduals);
+    vbl=new QVBoxLayout();
     vbl->setContentsMargins(0,0,0,0);
     vbl->setSpacing(1);
     widgetResiduals->setLayout(vbl);
@@ -222,7 +222,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     tabResidulas->setTabShape(QTabWidget::Triangular);
     tabResidulas->setDocumentMode(true);
     splitFitStatistics->addWidget(tabResidulas);
-    //QHBoxLayout* layFitStat=new QHBoxLayout(this);
+    //QHBoxLayout* layFitStat=new QHBoxLayout();
     //layFitStat->setContentsMargins(0,0,0,0);
     //layFitStat->setMargin(0);
     //QWidget* wFitStat=new QWidget(this);
@@ -277,7 +277,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     pltResidualCorrelation->useExternalDatastore(pltData->getDatastore());
     tabResidulas->addTab(pltResidualCorrelation, tr("Correlation"));
 
-    layResidualAnalysis=new QFormLayout(this);
+    layResidualAnalysis=new QFormLayout();
     layResidualAnalysis->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
     QWidget* widResidualParameters=new QWidget(this);
     widResidualParameters->setLayout(layResidualAnalysis);
@@ -295,10 +295,10 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
 
     QWidget* modelWidget=new QWidget(this);
-    QVBoxLayout* layModel=new QVBoxLayout(this);
+    QVBoxLayout* layModel=new QVBoxLayout();
     modelWidget->setLayout(layModel);
 
-    fl=new QFormLayout(this);
+    fl=new QFormLayout();
     fl->setContentsMargins(9,0,0,0);
     fl->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
     spinRun=new QSpinBox(this);
@@ -319,7 +319,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     /*btnEditRanges=createButtonAndActionShowText(, tr("Edit &Ranges"), this);
     btnEditRanges->setCheckable(true);
     btnEditRanges->setChecked(false);
-    QHBoxLayout* hblfp=new QHBoxLayout(this);
+    QHBoxLayout* hblfp=new QHBoxLayout();
     hblfp->addWidget(labFitParameters);
     hblfp->addStretch();
     hblfp->addWidget(btnEditRanges);
@@ -330,7 +330,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     tbEditRanges->setShape(QTabBar::TriangularNorth);
     tbEditRanges->setDrawBase(false);
     tbEditRanges->setCurrentIndex(0);
-    QVBoxLayout* hblfp=new QVBoxLayout(this);
+    QVBoxLayout* hblfp=new QVBoxLayout();
     hblfp->addWidget(labFitParameters);
     hblfp->addWidget(tbEditRanges);
     layModel->addLayout(hblfp);
@@ -342,7 +342,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     widParameters=new QWidget(this);
     scrollParameters->setWidget(widParameters);
     scrollParameters->setWidgetResizable(true);
-    layParameters=new QGridLayout(this);
+    layParameters=new QGridLayout();
     layParameters->setSpacing(2);
     layParameters->setVerticalSpacing(1);
     layParameters->setHorizontalSpacing(0);
@@ -350,7 +350,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     widParameters->setLayout(layParameters);
 
 
-    layButtons=new QGridLayout(this);
+    layButtons=new QGridLayout();
     layButtons->setContentsMargins(0,0,0,0);
     btnFitCurrent=createButtonAndActionShowText(actFitCurrent, QIcon(":/fcsfit/fit_fitcurrent.png"), tr("&Fit Current"), this);
     actFitCurrent->setToolTip(tr("perform a fit for the currently displayed file and run"));

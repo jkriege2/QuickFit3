@@ -57,13 +57,13 @@ void QFRDRImagingFCSDataEditorCountrate::createWidgets() {
 
     int row=0;
     QLabel* l;
-    QVBoxLayout* lb=new QVBoxLayout(this);
+    QVBoxLayout* lb=new QVBoxLayout();
     setLayout(lb);
     splitter=new QVisibleHandleSplitter(Qt::Horizontal, this);
     lb->addWidget(splitter);
 
     QWidget* w=new QWidget(this);
-    QGridLayout* gl=new QGridLayout(this);
+    QGridLayout* gl=new QGridLayout();
     w->setLayout(gl);
     cmbVideo=new QComboBox(w);
 
@@ -169,7 +169,7 @@ void QFRDRImagingFCSDataEditorCountrate::createWidgets() {
 
 
     grpInfo=new QGroupBox(tr("Info"), w);
-    QGridLayout* ggl=new QGridLayout(grpInfo);
+    QGridLayout* ggl=new QGridLayout();
     grpInfo->setLayout(ggl);
     ggl->addWidget(new QLabel(tr("# Pixels = ")), 0, 0);
     labRuns=new QLabel(grpInfo);
@@ -186,7 +186,7 @@ void QFRDRImagingFCSDataEditorCountrate::createWidgets() {
     gl->addWidget(grpInfo, row,0,1,3);
 
     QWidget* wp=new QWidget(this);
-    QVBoxLayout* lp=new QVBoxLayout(this);
+    QVBoxLayout* lp=new QVBoxLayout();
     wp->setLayout(lp);
     plotter = new QFPlotter(true, this);
     plotter->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());

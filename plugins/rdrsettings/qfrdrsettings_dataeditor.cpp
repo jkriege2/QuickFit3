@@ -14,7 +14,7 @@ QFRDRSettingsDataEditor::~QFRDRSettingsDataEditor()
 
 void QFRDRSettingsDataEditor::createWidgets() {
     /* create you widgets here */
-    QGridLayout* l=new QGridLayout(this);
+    QGridLayout* l=new QGridLayout();
     setLayout(l);
 
     labFilename=new QLabel(this);

@@ -6,7 +6,7 @@ QFRDRRunSelector::QFRDRRunSelector(QWidget *parent) :
 
     spinRun=0;
     labRun=0;
-    gl=new QHBoxLayout(this);
+    gl=new QHBoxLayout();
     setLayout(gl);
     gl->setContentsMargins(0,0,0,0);
     gl->setSpacing(2);

@@ -64,7 +64,7 @@ QF3ObjectiveCombobox::QF3ObjectiveCombobox(QWidget* parent):
     globalobjectives="";
     localobjectives="";
 
-    hbl=new QHBoxLayout(this);
+    hbl=new QHBoxLayout();
     setLayout(hbl);
     hbl->setContentsMargins(0,0,0,0);
     hbl->setSpacing(1);

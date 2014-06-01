@@ -68,7 +68,7 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     flAlgorithmParams->addRow(tr("dist. type:"), cmbTauMode);
 
     wrange=new QWidget(this);
-    lrange=new QHBoxLayout(wrange);
+    lrange=new QHBoxLayout();
     wrange->setLayout(lrange);
     lrange->setContentsMargins(0,0,0,0);
     edtTauMin=new QFDoubleEdit(wrange);
@@ -93,7 +93,7 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     flAlgorithmParams->addRow(tr("MaxEnt: <i>&Iterations/Step = </i>"), edtNumIter);
 
     wrange=new QWidget(this);
-    lrange=new QHBoxLayout(wrange);
+    lrange=new QHBoxLayout();
     wrange->setLayout(lrange);
     lrange->setContentsMargins(0,0,0,0);
     edtRange1Min=new QFDoubleEdit(wrange);
@@ -114,7 +114,7 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     labRange1->setTextInteractionFlags(Qt::TextSelectableByMouse|Qt::TextSelectableByKeyboard);
 
     wrange=new QWidget(this);
-    lrange=new QHBoxLayout(wrange);
+    lrange=new QHBoxLayout();
     wrange->setLayout(lrange);
     lrange->setContentsMargins(0,0,0,0);
     edtRange2Min=new QFDoubleEdit(wrange);
@@ -218,7 +218,7 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     tbPlotDistribution->addWidget(chkShowRanges);
 
     QWidget* wPltDist=new QWidget(this);
-    QVBoxLayout* layPltDist=new QVBoxLayout(this);
+    QVBoxLayout* layPltDist=new QVBoxLayout();
     wPltDist->setLayout(layPltDist);
     layPltDist->setContentsMargins(0,0,0,0);
     layPltDist->addWidget(tbPlotDistribution);

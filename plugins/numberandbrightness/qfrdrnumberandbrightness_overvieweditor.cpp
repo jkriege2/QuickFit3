@@ -15,7 +15,7 @@ QFRDRNumberAndBrightnessOverviewEditor::~QFRDRNumberAndBrightnessOverviewEditor(
 
 void QFRDRNumberAndBrightnessOverviewEditor::createWidgets() {
     display=new QFRDROverviewImageDisplay(this);
-    QVBoxLayout* l=new QVBoxLayout(this);
+    QVBoxLayout* l=new QVBoxLayout();
     setLayout(l);
     l->setContentsMargins(0,0,0,0);
     l->addWidget(display);

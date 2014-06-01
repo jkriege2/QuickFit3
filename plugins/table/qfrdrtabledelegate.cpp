@@ -66,7 +66,7 @@ QWidget *QFRDRTableDelegate::createEditor(QWidget *parent, const QStyleOptionVie
         QWidget* widExpression=new QWidget(parent);
         widExpression->setFocusPolicy(Qt::StrongFocus);
         widExpression->setAutoFillBackground(true);
-        QHBoxLayout* layout=new QHBoxLayout(widExpression);
+        QHBoxLayout* layout=new QHBoxLayout();
         layout->setContentsMargins(0,0,0,0);
         layout->setSpacing(1);
         widExpression->setLayout(layout);

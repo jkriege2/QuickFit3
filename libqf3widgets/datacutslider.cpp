@@ -14,9 +14,14 @@ DataCutSliders::DataCutSliders(QWidget* parent):
     sliderSignals=true;
     allowCopyToAll=true;
     min=0;
-    max=100;
+    max=1000;
     userMin=0;
-    userMax=100;
+    userMax=1000;
+
+
+    QHBoxLayout* layout=new QHBoxLayout();
+    layout->setContentsMargins(0,0,0,0);
+    setLayout(layout);
 
     editLow=new QSpinBox(this);
     editHigh=new QSpinBox(this);
@@ -26,35 +31,27 @@ DataCutSliders::DataCutSliders(QWidget* parent):
     editHigh->setContextMenuPolicy(Qt::NoContextMenu);
 
 
-    QGridLayout* layout=new QGridLayout(this);
-    layout->setContentsMargins(0,0,0,0);
-
-    /*QLabel* lab1=new QLabel(tr("<b>lower cut-off</b>"), this);
-    QLabel* lab2=new QLabel(tr("<b>upper cut-off</b>"), this);
-    lab2->setAlignment(Qt::AlignRight);
-    layout->addWidget(lab1, 0, 0, Qt::AlignLeft|Qt::AlignBottom);
-    layout->addWidget(lab2, 0, 3, Qt::AlignRight|Qt::AlignBottom);
-    layout->addWidget(editLow,  1, 0, Qt::AlignLeft|Qt::AlignTop);
-    layout->addWidget(editHigh, 1, 3, Qt::AlignRight|Qt::AlignTop);*/
 
     QLabel* lab1=new QLabel(tr("<b>lower & upper cut-off</b>"), this);
     lab1->setAlignment(Qt::AlignHCenter|Qt::AlignVCenter);
     labCentral=lab1;
-    layout->addWidget(editLow,  0, 0, Qt::AlignLeft|Qt::AlignTop);
+    /*layout->addWidget(editLow,  0, 0, Qt::AlignLeft|Qt::AlignTop);
     layout->addWidget(lab1, 0, 1, Qt::AlignRight|Qt::AlignBottom);
     layout->addWidget(editHigh, 0, 2, Qt::AlignRight|Qt::AlignTop);
     layout->setColumnStretch(0,1);
-    layout->setColumnStretch(2,1);
+    layout->setColumnStretch(2,1);*/
+    layout->addWidget(editLow,  0, Qt::AlignLeft|Qt::AlignTop);
+    layout->addWidget(lab1,  1, Qt::AlignRight|Qt::AlignBottom);
+    layout->addWidget(editHigh,  0, Qt::AlignRight|Qt::AlignTop);
     contextMenu=NULL;
-    setLayout(layout);
 
-    connect(editLow, SIGNAL(valueChanged(int)), this, SLOT(sliderLowValueChanged(int)));
-    connect(editHigh, SIGNAL(valueChanged(int)), this, SLOT(sliderHighValueChanged(int)));
+    connectWidgets(true);
+    updateSliderWidgets();
+}
 
-    connect(editLow, SIGNAL(editingFinished()), this, SLOT(sliderLowEditingFinished()));
-    connect(editHigh, SIGNAL(editingFinished()), this, SLOT(sliderHighEditingFinished()));
+DataCutSliders::~DataCutSliders()
+{
 
-    update();
 }
 
 void DataCutSliders::contextMenuEvent(QContextMenuEvent *event) {
@@ -110,20 +107,20 @@ void DataCutSliders::sliderLowEditingFinished(){
     if (userMin>userMax) {
         userMax=userMin+1;
     }
-    update();
+    updateSliderWidgets();
 }
 
 void DataCutSliders::sliderHighEditingFinished() {
     userMax=editHigh->value();
-    update();
+    updateSliderWidgets();
 }
 
 void DataCutSliders::setValues(int userMin, int userMax, int min, int max) {
-    this->userMin=userMin;
-    this->userMax=userMax;
     this->min=min;
     this->max=max;
-    update();
+    this->userMin=userMin;
+    this->userMax=userMax;
+    updateSliderWidgets();
 }
 
 void DataCutSliders::setCentralLabel(const QString &label)
@@ -131,21 +128,49 @@ void DataCutSliders::setCentralLabel(const QString &label)
     labCentral->setText(label);
 }
 
-void DataCutSliders::update() {
+void DataCutSliders::connectWidgets(bool conn)
+{
+    if (conn) {
+        connect(editLow, SIGNAL(valueChanged(int)), this, SLOT(sliderLowValueChanged(int)));
+        connect(editHigh, SIGNAL(valueChanged(int)), this, SLOT(sliderHighValueChanged(int)));
+
+        connect(editLow, SIGNAL(editingFinished()), this, SLOT(sliderLowEditingFinished()));
+        connect(editHigh, SIGNAL(editingFinished()), this, SLOT(sliderHighEditingFinished()));
+    } else {
+        disconnect(editLow, SIGNAL(valueChanged(int)), this, SLOT(sliderLowValueChanged(int)));
+        disconnect(editHigh, SIGNAL(valueChanged(int)), this, SLOT(sliderHighValueChanged(int)));
+
+        disconnect(editLow, SIGNAL(editingFinished()), this, SLOT(sliderLowEditingFinished()));
+        disconnect(editHigh, SIGNAL(editingFinished()), this, SLOT(sliderHighEditingFinished()));
+    }
+}
+
+void DataCutSliders::updateSliderWidgets() {
     if (userMin>=userMax) {
         userMax=userMin+1;
     }
     bool h=sliderSignals;
     sliderSignals=false;
-    bool upd=updatesEnabled();
-    setUpdatesEnabled(false);
-    editLow->setRange(min, qMin(userMax, max));
-    editHigh->setRange(qMax(userMin, min), max);
-    editLow->setValue(userMin);
-    editLow->setSuffix(tr("/%1").arg(max));
-    editHigh->setValue(userMax);
-    editHigh->setSuffix(tr("/%1").arg(max));
-    setUpdatesEnabled(upd);
+    //bool upd=updatesEnabled();
+    //setUpdatesEnabled(false);
+    int mi=min;
+    int ma=max;
+    int umi=userMin;
+    int uma=userMax;
+    disconnectWidgets();
+    //qDebug()<<mi<<umi<<uma<<ma;
+    editLow->setRange(mi, qMin(uma, ma));
+    editHigh->setRange(qMax(umi, mi), ma);
+    editLow->setValue(umi);
+    editLow->setSuffix(tr("/%1").arg(ma));
+    editHigh->setValue(uma);
+    editHigh->setSuffix(tr("/%1").arg(ma));
+    connectWidgets();
+    //setUpdatesEnabled(upd);
+    //if (upd) {
+        if (layout()) layout()->invalidate();
+        QWidget::update();
+    //}
     sliderSignals=h;
     if (sliderSignals) {
         emit slidersChanged(userMin, userMax, min, max);

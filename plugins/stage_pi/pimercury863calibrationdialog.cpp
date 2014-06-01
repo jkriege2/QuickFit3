@@ -15,10 +15,10 @@ PIMercury863CalibrationDialog::PIMercury863CalibrationDialog(QWidget* parent, QF
         calX[i]=i;//(int)round(((double)i/255.0-0.5)*255.0);
     }
 
-    QVBoxLayout* vbl=new QVBoxLayout(this);
+    QVBoxLayout* vbl=new QVBoxLayout();
     vbl->addWidget(new QLabel(tr("calibration of axis %1<br><ol><li>press RESET CAL.</li><li>move joystick to center position and press CENTERED.</li><li>move joystick to maximum positions and press CALIBRATE.</li><li>accept calibration with OK or reject with CANCEL.</li></ol>").arg(axis), this));
 
-    QGridLayout* grid=new QGridLayout(this);
+    QGridLayout* grid=new QGridLayout();
 
     prgX=new QProgressBar(this);
     prgX->setRange(0,255);
@@ -39,7 +39,7 @@ PIMercury863CalibrationDialog::PIMercury863CalibrationDialog(QWidget* parent, QF
     chkInvert->setChecked(false);
     vbl->addWidget(chkInvert);
 
-    QHBoxLayout* hbl=new QHBoxLayout(this);
+    QHBoxLayout* hbl=new QHBoxLayout();
 
     btnResetCal=new QPushButton(tr("&Reset Calibration"), this);;
     connect(btnResetCal, SIGNAL(clicked()), this, SLOT(resetCal()));

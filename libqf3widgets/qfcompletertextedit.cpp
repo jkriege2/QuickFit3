@@ -810,7 +810,7 @@ QFCompleterTextEdit::QFCompleterTextEdit(QWidget* parent):
     editor->setFrameStyle(QFrame::NoFrame);
 
     numbers = new QFCompleterTextEditNumberBar(editor, this);
-    layout = new QHBoxLayout(this);
+    layout = new QHBoxLayout();
     layout->setMargin(0);
     layout->setSpacing(0);
     setLayout(layout);

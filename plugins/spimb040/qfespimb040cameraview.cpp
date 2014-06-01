@@ -161,7 +161,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     ///////////////////////////////////////////////////////////////
     // create main layout, toolbar and Splitters
     ///////////////////////////////////////////////////////////////
-    QVBoxLayout* vbl=new QVBoxLayout(this);
+    QVBoxLayout* vbl=new QVBoxLayout();
     setLayout(vbl);
     vbl->setContentsMargins(0,0,0,0);
     toolbar=new QToolBar(tr("camera_toolbar"), this);
@@ -177,7 +177,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
 
 
     QWidget* wPltMain=new QWidget(this);
-    vbl=new QVBoxLayout(wPltMain);
+    vbl=new QVBoxLayout();
     vbl->setContentsMargins(0,0,0,0);
     vbl->setSpacing(0);
 
@@ -193,7 +193,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     ///////////////////////////////////////////////////////////////
     // create main plotter
     ///////////////////////////////////////////////////////////////
-    QGridLayout* layPlt=new QGridLayout(wPltMain);
+    QGridLayout* layPlt=new QGridLayout();
     layPlt->setContentsMargins(0,0,0,0);
     pltMain=new JKQTFastPlotter(wPltMain);
     pltMain->set_maintainAspectRatio(true);
@@ -280,10 +280,10 @@ void QFESPIMB040CameraView::createMainWidgets() {
     // image statistics/histogram
     /////////////////////////////////////////////////////////////////////
     QWidget* w=new QWidget(this);
-    vbl=new QVBoxLayout(w);
+    vbl=new QVBoxLayout();
     w->setLayout(vbl);
 
-    QHBoxLayout* stathbl=new QHBoxLayout(w);
+    QHBoxLayout* stathbl=new QHBoxLayout();
     vbl->addLayout(stathbl);
     stathbl->setContentsMargins(0,0,0,0);
     chkImageStatisticsHistogram=new QCheckBox(tr("image histogram"), w);
@@ -305,7 +305,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     vbl->addWidget(pltCountsHistogram);
     QHBoxLayout* hbl;
 
-    QGridLayout* gl=new QGridLayout(w);
+    QGridLayout* gl=new QGridLayout();
     spinCountsLower=new QDoubleSpinBox(w);
     spinCountsLower->setMaximum(0xEFFFFF);
     spinCountsLower->setMinimum(-0xEFFFFF);
@@ -337,7 +337,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     connect(chkCountsRangeAutoHigh, SIGNAL(clicked(bool)), this, SLOT(setCountsAutoscale(bool)));
 
 
-    hbl=new QHBoxLayout(w);
+    hbl=new QHBoxLayout();
     spinHistogramBins=new QSpinBox(w);
     spinHistogramBins->setMinimum(1);
     spinHistogramBins->setMaximum(0xEFFFFF);
@@ -383,7 +383,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     // image graph pane
     /////////////////////////////////////////////////////////////////////
     w=new QWidget(this);
-    QGridLayout* gvbl=new QGridLayout(w);
+    QGridLayout* gvbl=new QGridLayout();
     w->setLayout(gvbl);
     chkGraph=new QCheckBox(tr("enable graph display"), w);
     chkGraph->setChecked(false);
@@ -406,7 +406,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
 
     QWidget* wgplot=new QWidget(w);
     gsplitter->addWidget(wgplot);
-    QVBoxLayout* ggl=new QVBoxLayout(wgplot);
+    QVBoxLayout* ggl=new QVBoxLayout();
     wgplot->setLayout(ggl);
 
     ggl->addWidget(pltGraph,1);
@@ -419,7 +419,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
 
     QWidget* wgset=new QWidget(w);
     gsplitter->addWidget(wgset);
-    QFormLayout* fl=new QFormLayout(w);
+    QFormLayout* fl=new QFormLayout();
     wgset->setLayout(fl);
 
     cmbGraphParameter=new QComboBox(w);
@@ -452,7 +452,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     // image settings pane
     /////////////////////////////////////////////////////////////////////
     w=new QWidget(this);
-    fl=new QFormLayout(w);
+    fl=new QFormLayout();
     w->setLayout(fl);
     cmbColorscale=new QComboBox(w);
     cmbColorscale->setMaximumWidth(200);
@@ -483,7 +483,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     cmbImageMode->addItem(tr("left-right half"));
     fl->addRow(tr("frame &transform:"), cmbImageMode);
 
-    QHBoxLayout* glay=new QHBoxLayout(w);
+    QHBoxLayout* glay=new QHBoxLayout();
     glay->setContentsMargins(0,0,0,0);
     chkGrid=new QCheckBox(w);
     chkGrid->setChecked(false);

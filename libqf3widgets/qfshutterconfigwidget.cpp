@@ -95,7 +95,7 @@ void QFShutterConfigWidget::createWidgets() {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main layout
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    QGridLayout* widgetLayout=new QGridLayout(this);
+    QGridLayout* widgetLayout=new QGridLayout();
     setLayout(widgetLayout);
     widgetLayout->setContentsMargins(0,0,0,0);
     widgetLayout->setHorizontalSpacing(2);

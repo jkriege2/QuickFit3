@@ -11,7 +11,7 @@ QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
     int row=0;
     spinRun=0;
     labRun=0;
-    gl=new QGridLayout(this);
+    gl=new QGridLayout();
     gl->setContentsMargins(2,2,2,2);
     gl->setHorizontalSpacing(2);
     gl->setVerticalSpacing(2);

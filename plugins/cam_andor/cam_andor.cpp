@@ -233,7 +233,7 @@ void QFExtensionCameraAndor::initExtension() {
     // + a menu item to display it.
     dlgGlobalSettings=new QWidget(NULL, Qt::Tool|Qt::WindowTitleHint|Qt::WindowCloseButtonHint|Qt::WindowStaysOnTopHint);
     dlgGlobalSettings->hide();
-    dlgGlobalSettings_layout=new FlowLayout(dlgGlobalSettings);
+    dlgGlobalSettings_layout=new FlowLayout();
     dlgGlobalSettings->setLayout(dlgGlobalSettings_layout);
     dlgGlobalSettings->setWindowTitle(tr("Andor: Global Settings"));
 

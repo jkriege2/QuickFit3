@@ -192,10 +192,10 @@ void QFExtensionShutterShuterArduino::showShutterSettingsDialog(unsigned int shu
 
         QDialog* dlg=new QDialog(parent);
 
-        QVBoxLayout* lay=new QVBoxLayout(dlg);
+        QVBoxLayout* lay=new QVBoxLayout();
         dlg->setLayout(lay);
 
-        QFormLayout* formlayout=new QFormLayout(dlg);
+        QFormLayout* formlayout=new QFormLayout();
 
 
         formlayout->addRow("", new QLabel(tr("<b>All settings marked with * will be<br>used when connecting the next time!</b>"), dlg));

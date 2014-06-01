@@ -88,10 +88,10 @@ QFRDRFCSRateEditor::~QFRDRFCSRateEditor()
 void QFRDRFCSRateEditor::createWidgets() {
 
 
-    QVBoxLayout* l=new QVBoxLayout(this);
+    QVBoxLayout* l=new QVBoxLayout();
     setLayout(l);
 
-    /*QHBoxLayout* hl=new QHBoxLayout(this);
+    /*QHBoxLayout* hl=new QHBoxLayout();
     hl->addWidget(new QLabel(tr("display mode:")));
     hl->addWidget(cmbRateDisplay);
     l->addLayout(hl);*/
@@ -100,7 +100,7 @@ void QFRDRFCSRateEditor::createWidgets() {
     l->addWidget(splitter);
 
     QWidget* w=new QWidget(this);
-    QGridLayout* gl=new QGridLayout(this);
+    QGridLayout* gl=new QGridLayout();
     w->setLayout(gl);
 
     cmbRateDisplay=new QComboBox(this);
@@ -160,7 +160,7 @@ void QFRDRFCSRateEditor::createWidgets() {
 
 
     grpInfo=new QGroupBox(tr("Info"), w);
-    QGridLayout* ggl=new QGridLayout(grpInfo);
+    QGridLayout* ggl=new QGridLayout();
     grpInfo->setLayout(ggl);
     ggl->addWidget(new QLabel(tr("# Runs = ")), 0, 0);
     labRuns=new QLabel(grpInfo);
@@ -171,7 +171,7 @@ void QFRDRFCSRateEditor::createWidgets() {
     gl->addWidget(grpInfo, 13,0,1,2);
 
     QWidget* wp=new QWidget(this);
-    QVBoxLayout* lp=new QVBoxLayout(this);
+    QVBoxLayout* lp=new QVBoxLayout();
     wp->setLayout(lp);
     plotter = new QFPlotter(true, this);
     plotter->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());

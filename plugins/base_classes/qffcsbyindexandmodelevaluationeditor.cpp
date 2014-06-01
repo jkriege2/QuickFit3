@@ -68,20 +68,20 @@ void QFFCSByIndexAndModelEvaluationEditor::writeSettings() {
 
 void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
 
-    QVBoxLayout* mainLayout=new QVBoxLayout(this);
+    QVBoxLayout* mainLayout=new QVBoxLayout();
     mainLayout->setContentsMargins(5,5,5,5);
     setLayout(mainLayout);
 
 
     QWidget* topWidget=new QWidget(this);
-    QVBoxLayout* vbl=new QVBoxLayout(topWidget);
+    QVBoxLayout* vbl=new QVBoxLayout();
     vbl->setContentsMargins(0,0,0,0);
     topWidget->setLayout(vbl);
 
-    QFormLayout* fl;//=new QFormLayout(this);
+    QFormLayout* fl;//=new QFormLayout();
     QLabel* l;
     QHBoxLayout* hbl;
-    hblModel=new QHBoxLayout(this);
+    hblModel=new QHBoxLayout();
     hblModel->setContentsMargins(0,0,0,0);
     cmbModel=new QComboBox(this);
     l=new QLabel(tr("&Physical Model:"), this);
@@ -161,7 +161,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     pltData=new QFPlotter(true, this);
     pltData->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     pltData->resize(300,200);
-    plotLayout=new QVBoxLayout(this);
+    plotLayout=new QVBoxLayout();
     wPlot=new QWidget(this);
     wPlot->setLayout(plotLayout);
     plotLayout->setContentsMargins(0,0,0,0);
@@ -173,7 +173,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
 
 
     QWidget* widgetResiduals=new QWidget(this);
-    vbl=new QVBoxLayout(widgetResiduals);
+    vbl=new QVBoxLayout();
     vbl->setContentsMargins(0,0,0,0);
     vbl->setSpacing(1);
     widgetResiduals->setLayout(vbl);
@@ -279,7 +279,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     pltResidualCorrelation->useExternalDatastore(pltData->getDatastore());
     tabResidulas->addTab(pltResidualCorrelation, tr("Correlation"));
 
-    layResidualAnalysis=new QFormLayout(this);
+    layResidualAnalysis=new QFormLayout();
     layResidualAnalysis->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
     QWidget* widResidualParameters=new QWidget(this);
     widResidualParameters->setLayout(layResidualAnalysis);
@@ -297,10 +297,10 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
 
 
     QWidget* modelWidget=new QWidget(this);
-    QVBoxLayout* layModel=new QVBoxLayout(this);
+    QVBoxLayout* layModel=new QVBoxLayout();
     modelWidget->setLayout(layModel);
 
-    flAlgorithmParams=new QFormLayout(this);
+    flAlgorithmParams=new QFormLayout();
     flAlgorithmParams->setContentsMargins(9,0,0,0);
     flAlgorithmParams->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
     spinRun=new QSpinBox(this);
@@ -326,7 +326,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     scrollParameters->setWidgetResizable(true);
     layModel->addWidget(scrollParameters, 1);
 
-    QGridLayout* layBtn=new QGridLayout(this);
+    QGridLayout* layBtn=new QGridLayout();
     layBtn->setContentsMargins(0,0,0,0);
     btnFitCurrent=createButtonAndActionShowText(actFitCurrent, QIcon(":/fcs_maxent/fit_fitcurrent.png"), tr("&Fit Current"), this);
     actFitCurrent->setToolTip(tr("perform a fit for the currently displayed file and run"));

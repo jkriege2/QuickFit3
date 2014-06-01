@@ -18,10 +18,10 @@ QFRDROverviewImageDisplay::QFRDROverviewImageDisplay(QWidget *parent) :
 }
 
 void QFRDROverviewImageDisplay::createWidgets() {
-    QVBoxLayout* majorLay=new QVBoxLayout(this);
+    QVBoxLayout* majorLay=new QVBoxLayout();
     setLayout(majorLay);
 
-    QHBoxLayout* layTop=new QHBoxLayout(this);
+    QHBoxLayout* layTop=new QHBoxLayout();
     majorLay->addLayout(layTop);
     layTop->addWidget(new QLabel(tr("<b>image/video:</b>")));
     cmbImage=new QComboBox(this);
@@ -31,7 +31,7 @@ void QFRDROverviewImageDisplay::createWidgets() {
     tabMain=new QTabWidget(this);
     majorLay->addWidget(tabMain, 1);
     QWidget* wtabImag=new QWidget(tabMain);
-    QVBoxLayout* mainLay=new QVBoxLayout(this);
+    QVBoxLayout* mainLay=new QVBoxLayout();
     wtabImag->setLayout(mainLay);
     toolbar=new QToolBar("", this);
     mainLay->addWidget(toolbar);

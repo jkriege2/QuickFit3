@@ -122,13 +122,13 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main tab and help button as corner widget of the QTabWidget
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    QVBoxLayout* mainl=new QVBoxLayout(this);
+    QVBoxLayout* mainl=new QVBoxLayout();
     mainl->setContentsMargins(0,0,0,0);
     setLayout(mainl);
     splitter=new QVisibleHandleSplitter(Qt::Vertical, this);
     mainl->addWidget(splitter);
     tabMain=new QFEnhancedTabWidget(this);
-    QVBoxLayout* topl=new QVBoxLayout(this);
+    QVBoxLayout* topl=new QVBoxLayout();
     QWidget* topW=new QWidget(this);
     topW->setLayout(topl);
     topl->addWidget(tabMain,1);
@@ -145,7 +145,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create log pane
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    QVBoxLayout* loglayout=new QVBoxLayout(this);
+    QVBoxLayout* loglayout=new QVBoxLayout();
     QWidget* w=new QWidget(this);
     w->setLayout(loglayout);
     splitter->addWidget(w);

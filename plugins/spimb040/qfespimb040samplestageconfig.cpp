@@ -216,7 +216,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main layout
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    QFormLayout* stagelayout=new QFormLayout(this);
+    QFormLayout* stagelayout=new QFormLayout();
     stagelayout->setHorizontalSpacing(2);
     setLayout(stagelayout);
 
@@ -229,7 +229,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     btnConfigSteps=new QToolButton(this);
 
     cmbStageX=new QFStageComboBox(this);
-    QHBoxLayout* hbl=new QHBoxLayout(this);
+    QHBoxLayout* hbl=new QHBoxLayout();
     hbl->setContentsMargins(0,0,0,0);
     hbl->setSpacing(1);
     hbl->addWidget(cmbStageX);
@@ -243,7 +243,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     cmbStageX->setEnabled(false);
 
     cmbStageY=new QFStageComboBox(this);
-    hbl=new QHBoxLayout(this);
+    hbl=new QHBoxLayout();
     hbl->setContentsMargins(0,0,0,0);
     hbl->setSpacing(1);
     hbl->addWidget(cmbStageY);
@@ -256,7 +256,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     cmbStageY->setEnabled(false);
 
     cmbStageZ=new QFStageComboBox(this);
-    hbl=new QHBoxLayout(this);
+    hbl=new QHBoxLayout();
     hbl->setContentsMargins(0,0,0,0);
     hbl->setSpacing(1);
     hbl->addWidget(cmbStageZ);
@@ -271,7 +271,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
 
 
 
-    hbl=new QHBoxLayout(this);
+    hbl=new QHBoxLayout();
     hbl->setContentsMargins(0,0,0,0);
     chkJoystick=new QCheckBox(tr("joystick:"), this);
     QFont fb=chkJoystick->font();
@@ -314,7 +314,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     hbl->addStretch();
     stagelayout->addRow(chkJoystick, hbl);
 
-    QGridLayout* gl=new QGridLayout(this);
+    QGridLayout* gl=new QGridLayout();
     gl->addWidget(new QLabel("<b>x [&mu;m]:</b>", this), 0, 0);
     gl->addWidget(new QLabel("<b>y [&mu;m]:</b>", this), 0, 1);
     gl->addWidget(new QLabel("<b>z [&mu;m]:</b>", this), 0, 2);
@@ -351,7 +351,7 @@ void QFESPIMB040SampleStageConfig::createWidgets() {
     stagelayout->addRow(tr("<b>move:</b>"), gl);
 
 
-    gl=new QGridLayout(this);
+    gl=new QGridLayout();
     l=new QLabel(tr("<b><i>x</i>-axis</b>"));
     l->setStyleSheet("background-color: darkgrey;");
     l->setAlignment(Qt::AlignHCenter|Qt::AlignBottom);

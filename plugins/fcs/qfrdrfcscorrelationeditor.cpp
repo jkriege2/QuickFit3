@@ -97,13 +97,13 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     correlationMaskTools=new QFCorrelationMaskTools(this);
     connect(correlationMaskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChangedRecalc()));
 
-    QVBoxLayout* l=new QVBoxLayout(this);
+    QVBoxLayout* l=new QVBoxLayout();
     setLayout(l);
     splitter=new QVisibleHandleSplitter(Qt::Horizontal, this);
     l->addWidget(splitter);
 
     QWidget* w=new QWidget(this);
-    QGridLayout* gl=new QGridLayout(this);
+    QGridLayout* gl=new QGridLayout();
     w->setLayout(gl);
     cmbAverageErrors=new QComboBox(w);
     gl->addWidget(new QLabel(tr("display average:")), 0, 0);
@@ -161,7 +161,7 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     connect(chkLogTauAxis, SIGNAL(toggled(bool)), this, SLOT(replotData()));
 
     grpInfo=new QGroupBox(tr("Info"), w);
-    QGridLayout* ggl=new QGridLayout(grpInfo);
+    QGridLayout* ggl=new QGridLayout();
     grpInfo->setLayout(ggl);
     ggl->addWidget(new QLabel(tr("# Runs = ")), 0, 0);
     labRuns=new QLabel(grpInfo);
@@ -172,7 +172,7 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     gl->addWidget(grpInfo, 10,0,1,2);
 
     QWidget* wp=new QWidget(this);
-    QVBoxLayout* lp=new QVBoxLayout(this);
+    QVBoxLayout* lp=new QVBoxLayout();
     wp->setLayout(lp);
     plotter = new QFPlotter(true, this);
     plotter->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());

@@ -713,7 +713,7 @@ void QEnhancedTableView::print()
     if (tablePrinter) {
         QDialog* dlg=new QDialog(this);
         dlg->setWindowTitle(tr("Table print options ..."));
-        QGridLayout* lay=new QGridLayout(dlg);
+        QGridLayout* lay=new QGridLayout();
         dlg->setLayout(lay);
         lay->addWidget(new QLabel(tr("<b>scaling:</b>")), 0,0);
         QCheckBox* chk1Wide=new QCheckBox(tr("one page wide"), dlg);

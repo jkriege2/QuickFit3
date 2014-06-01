@@ -44,7 +44,7 @@ QFRDRFCSFitFunctionSimulator::QFRDRFCSFitFunctionSimulator(QFPluginServices* ser
     QWidget* widParameters=new QWidget(this);
     scrollParameters->setWidget(widParameters);
     scrollParameters->setWidgetResizable(true);
-    layParameters=new QGridLayout(this);
+    layParameters=new QGridLayout();
     layParameters->setSpacing(2);
     layParameters->setVerticalSpacing(1);
     layParameters->setHorizontalSpacing(0);

@@ -28,7 +28,7 @@ DoubleDataCutSliders::DoubleDataCutSliders(QWidget* parent):
     editHigh->setContextMenuPolicy(Qt::NoContextMenu);
 
 
-    QGridLayout* layout=new QGridLayout(this);
+    QGridLayout* layout=new QGridLayout();
     layout->setContentsMargins(0,0,0,0);
 
     /*QLabel* lab1=new QLabel(tr("<b>lower cut-off</b>"), this);

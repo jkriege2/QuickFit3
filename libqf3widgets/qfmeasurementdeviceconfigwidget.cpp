@@ -124,7 +124,7 @@ void QFMeasurementDeviceConfigWidget::createWidgets() {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main layout
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    widgetLayout=new QGridLayout(this);
+    widgetLayout=new QGridLayout();
     setLayout(widgetLayout);
     widgetLayout->setContentsMargins(4,4,4,4);
     widgetLayout->setHorizontalSpacing(2);
@@ -145,7 +145,7 @@ void QFMeasurementDeviceConfigWidget::createWidgets() {
     widgetLayout->addWidget(btnConfigure,0,2);
 
     linesLayoutWidget=new QWidget(this);
-    linesLayout=new QGridLayout(this);
+    linesLayout=new QGridLayout();
     linesLayoutWidget->setLayout(linesLayout);
     linesLayout->setContentsMargins(0,0,0,0);
     linesLayout->setHorizontalSpacing(2);

@@ -149,7 +149,7 @@ void QFFilterChangerConfigWidget::createWidgets() {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main layout
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    QGridLayout* widgetLayout=new QGridLayout(this);
+    QGridLayout* widgetLayout=new QGridLayout();
     setLayout(widgetLayout);
     widgetLayout->setContentsMargins(0,0,0,0);
     widgetLayout->setHorizontalSpacing(2);
@@ -275,10 +275,10 @@ void QFFilterChangerConfigWidget::selectFilters() {
 
     QDialog* dlg=new QDialog(this);
 
-    QVBoxLayout* lay=new QVBoxLayout(dlg);
+    QVBoxLayout* lay=new QVBoxLayout();
     dlg->setLayout(lay);
 
-    QFormLayout* formlayout=new QFormLayout(dlg);
+    QFormLayout* formlayout=new QFormLayout();
 
     QList<QF3FilterCombobox*> combos;
     for (unsigned int i=0; i<FilterChanger->getFilterChangerFilterCount(FilterChangerID); i++) {

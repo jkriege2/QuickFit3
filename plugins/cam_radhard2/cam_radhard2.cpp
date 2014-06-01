@@ -152,10 +152,10 @@ void QFExtensionCameraRadhard2::showCameraSettingsDialog(unsigned int camera, QS
 	*/
     QDialog* dlg=new QDialog(parent);
 
-    QVBoxLayout* lay=new QVBoxLayout(dlg);
+    QVBoxLayout* lay=new QVBoxLayout();
     dlg->setLayout(lay);
 
-    QFormLayout* formlayout=new QFormLayout(dlg);
+    QFormLayout* formlayout=new QFormLayout();
 
 
 

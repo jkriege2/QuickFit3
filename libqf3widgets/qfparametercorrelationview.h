@@ -171,6 +171,8 @@ protected:
     QAction* actCopyData;
     QAction* actCopyDataMatlab;
     QAction* actSaveData;
+    protected slots:
+    void histTypeChanged(int index);
 };
 
 #endif // QFPARAMETERCORRELATIONVIEW_H

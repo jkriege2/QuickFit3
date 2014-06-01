@@ -94,12 +94,12 @@ void QFRDRNumberAndBrightnessDataEditor::reallocMem(int size) {
 
 void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
     tabMain=new QTabWidget(this);
-    QHBoxLayout* layMain=new QHBoxLayout(this);
+    QHBoxLayout* layMain=new QHBoxLayout();
     layMain->setContentsMargins(3,3,3,3);
     setLayout(layMain);
     layMain->addWidget(tabMain);
 
-    QGridLayout* layPlots=new QGridLayout(this);
+    QGridLayout* layPlots=new QGridLayout();
     QWidget* widPlots=new QWidget(this);
     widPlots->setLayout(layPlots);
     tabMain->addTab(widPlots, tr("image plots"));
@@ -145,7 +145,7 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
 
 
 
-    QVBoxLayout* layHistogram=new QVBoxLayout(this);
+    QVBoxLayout* layHistogram=new QVBoxLayout();
     QWidget* widHistograms=new QWidget(this);
     widHistograms->setLayout(layHistogram);
     tabMain->addTab(widHistograms, tr("histograms"));

@@ -50,7 +50,7 @@ void QFHistogramView::createWidgets() {
     // HISTOGRAM SETTINGS/////////////////////////////////////////////////////////////////////
     QHBoxLayout* coll;
     grpHistogramSettings=new QGroupBox(tr("histogram style"), this);
-    flHistSet=new QFormLayout(grpHistogramSettings);
+    flHistSet=new QFormLayout();
     grpHistogramSettings->setLayout(flHistSet);
     spinHistogramBins=new QSpinBox(this);
     spinHistogramBins->setRange(5,99999);
@@ -139,7 +139,7 @@ void QFHistogramView::createWidgets() {
 
 
     QWidget* widHTab=new QWidget(this);
-    laySplitterTable=new QVBoxLayout(widHTab);
+    laySplitterTable=new QVBoxLayout();
     laySplitterTable->setContentsMargins(0,0,0,0);
     widHTab->setLayout(laySplitterTable);
     laySplitterTable->addWidget(tvHistogramParameters);

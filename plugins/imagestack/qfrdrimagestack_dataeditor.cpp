@@ -26,10 +26,10 @@ QFRDRImageStackDataEditor::~QFRDRImageStackDataEditor()
 }
 
 void QFRDRImageStackDataEditor::createWidgets() {
-    QVBoxLayout* mainLay=new QVBoxLayout(this);
+    QVBoxLayout* mainLay=new QVBoxLayout();
     setLayout(mainLay);
 
-    QHBoxLayout* layTop=new QHBoxLayout(this);
+    QHBoxLayout* layTop=new QHBoxLayout();
     mainLay->addLayout(layTop);
     layTop->addWidget(new QLabel(tr("<b>image stack:</b>")));
     cmbImageStack=new QComboBox(this);
@@ -43,7 +43,7 @@ void QFRDRImageStackDataEditor::createWidgets() {
     layTop->addWidget(spinBins);
 
 
-    layTop=new QHBoxLayout(this);
+    layTop=new QHBoxLayout();
     mainLay->addLayout(layTop);
     layTop->addWidget(new QLabel(tr("<b>channel mode:</b>")));
     cmbChannelMode=new QComboBox(this);
@@ -140,7 +140,7 @@ void QFRDRImageStackDataEditor::createWidgets() {
     sizes<<round(splitter->width()/2.0)<<round(splitter->width()/2.0);
     splitter->setSizes(sizes);
 
-    QGridLayout* layLabels=new QGridLayout(this);
+    QGridLayout* layLabels=new QGridLayout();
 
     labSelectiondata=new QLabel(this);
     layLabels->addWidget(labSelectiondata, 0, 1, 3,1);

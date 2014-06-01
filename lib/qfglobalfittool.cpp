@@ -3,7 +3,7 @@
 #include "qfmathtools.h"
 
 #undef DEBUG_GLOBALFIT
-//#define DEBUG_GLOBALFIT
+#define DEBUG_GLOBALFIT
 
 
 
@@ -378,29 +378,31 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
     double* pmin=(double*)calloc(ppcount,sizeof(double));
     double* pmax=(double*)calloc(ppcount,sizeof(double));
     bool* fix=(bool*)calloc(ppcount,sizeof(bool));
+    for (int i=0; i<ppcount; i++) fix[i]=true;
     bool minmax=true;
 
     // fill parameter vector
     for (int i=0; i<functor->getSubFunctorCount(); i++) {
         QFFitAlgorithm::FitQFFitFunctionFunctor* f=functor->getSubFunctor(i);
-#ifdef DEBUG_GLOBALFIT
-        qDebug()<<"\n\n\n\n\n\n\n\n\n\n\n\n\n";
-        qDebug()<<"F"<<i<<": "<<f->getModel()->name()<<":\n   "<<listToString( f->getModel()->getParameterIDs(), true)<<"\n   "<<arrayToString(paramsOut[i], f->getModel()->paramCount());
-#endif
         int pcount=f->get_paramcount();
         double* pi=paramsOut[i];
         double* err=paramErrorsOut[i];
         double* mi=functor->getParamsMin(i);
         double* ma=functor->getParamsMax(i);
         bool* fi=functor->getParamsFix(i);
+#ifdef DEBUG_GLOBALFIT
+        qDebug()<<"\n\n\n\n\n\n\n\n\n\n\n\n\n";
+        qDebug()<<"F"<<i<<": "<<f->getModel()->name()<<":\n   "<<listToString( f->getModel()->getParameterIDs(), true)<<"\n   "<<arrayToString(paramsOut[i], f->getModel()->paramCount());
+        if (fi) qDebug()<<"\n   "<<arrayToString(fi, f->getModel()->paramCount());
+#endif
         //double* po=paramsOut[i];
         for (int p=0; p<pcount; p++) {
             int modelIdx=f->mapFromFunctorToModel(p);
             int idx=functor->mapSubFunctorToGlobal(i, p);
 #ifdef DEBUG_GLOBALFIT
             qDebug()<<"<-F"<<i<<":   idx="<<idx<<"/"<<ppcount<<"     modelIdx="<<modelIdx<<"/"<<f->getModelParamsCount()<<"  pi="<<pi<<"   err="<<err;
-            if (idx>=0 && idx<ppcount) {
 #endif
+            if (idx>=0 && idx<ppcount) {
                 params[idx]=pi[modelIdx];
                 errors[idx]=err[modelIdx];
                 minmax=minmax&&(mi&&ma);
@@ -414,8 +416,8 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
 #ifdef DEBUG_GLOBALFIT
             } else {
                 qDebug()<<"ERROR: invalid idx="<<idx<<"   max="<<ppcount;
-            }
 #endif
+            }
         }
     }
 #ifdef DEBUG_GLOBALFIT

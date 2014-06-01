@@ -129,11 +129,11 @@ void QFECamTestCamera::showCameraSettingsDialog(unsigned int camera, QSettings& 
     QDialog* dlg=new QDialog(parent);
     dlg->setWindowTitle(tr("Configuration for Testcamera #%1").arg(camera));
 
-    QVBoxLayout* lay=new QVBoxLayout(dlg);
+    QVBoxLayout* lay=new QVBoxLayout();
     dlg->setLayout(lay);
 
     QWidget* r=new QWidget(dlg);
-    QFormLayout* fl=new QFormLayout(r);
+    QFormLayout* fl=new QFormLayout();
     r->setLayout(fl);
     QComboBox* cmbPattern=new QComboBox(r);
     cmbPattern->addItem(tr("many moving rings"));

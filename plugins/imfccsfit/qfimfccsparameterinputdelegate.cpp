@@ -148,6 +148,7 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
         }
         if (imfccs && fpID.isValid() && widgetType.toInt()==QFImFCCSParameterInputTable::wtErrorEdit) {
             QFDoubleEdit* edt=new QFDoubleEdit(parent);
+            edt->setCheckBounds(false, false);
             //qDebug()<<"   created erroredit "<<t.elapsed()<<"ms";
             return edt;
         }
@@ -215,7 +216,7 @@ void QFImFCCSParameterInputDelegate::setEditorData(QWidget *editor, const QModel
             QComboBox* cmb=qobject_cast<QComboBox*>(editor);
             if (cmb) {
                 bool ok=false;
-                int idx=index.data(QFImFCCSParameterInputTable::globalParamRole).toInt(&ok);
+                int idx=index.data(QFImFCCSParameterInputTable::globalParamRole).toInt(&ok)+1;
                 if (!ok || idx<-1) idx=-1;
                 cmb->setCurrentIndex(idx);
                 return;

@@ -359,16 +359,10 @@ void QFEvaluationPropertyEditorPrivate::propsChanged(const QString& property, bo
 
 
 void QFEvaluationPropertyEditorPrivate::createWidgets() {
-    QVBoxLayout* ml=new QVBoxLayout(d);
+    QVBoxLayout* ml=new QVBoxLayout();
     d->setLayout(ml);
     ml->setContentsMargins(2,2,2,2);
-    /*QHBoxLayout* vl=new QHBoxLayout(this);
-    ml->addLayout(vl);
-    labTopIcon=new QLabel(this);
-    vl->addWidget(labTopIcon);
-    labTop=new QLabel(this);
-    vl->addWidget(labTop);
-    vl->addStretch();*/
+
 
     menuBar=new QMenuBar(d);
     menuBar->setVisible(true);
@@ -380,14 +374,14 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     ml->addWidget(tabMain);
 
     QWidget* w=new QWidget(tabMain);
-    QFormLayout* fl=new QFormLayout(w);
+    QFormLayout* fl=new QFormLayout();
     w->setLayout(fl);
     tabMain->addTab(w, tr("&Properties"));
     labID=new QLabel(w);
     fl->addRow(tr("ID:"), labID);
     labType=new QLabel(w);
     labTypeIcon=new QLabel(w);
-    QHBoxLayout* ptl=new QHBoxLayout(d);
+    QHBoxLayout* ptl=new QHBoxLayout();
     ptl->setContentsMargins(0,0,0,0);
     ptl->addWidget(labTypeIcon);
     ptl->addWidget(labType);
@@ -401,18 +395,18 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     splitMain=new QVisibleHandleSplitter(tabMain);
     lstRawData=new QListView(splitMain);
     //tabEditors=new QTabWidget(splitMain);
-    layWidgets=new QHBoxLayout(d);
+    layWidgets=new QHBoxLayout();
     QWidget* wl=new QWidget(d);
     wl->setLayout(layWidgets);
     //splitMain->addWidget(tabEditors);
     splitMain->addWidget(wl);
     //splitMain->addWidget(lstRawData);
-    QVBoxLayout* lstvbl=new QVBoxLayout(splitMain);
+    QVBoxLayout* lstvbl=new QVBoxLayout();
     widRDRList=new QWidget(splitMain);
     widRDRList->setLayout(lstvbl);
 
     widFilterRecords=new QWidget(d);
-    QHBoxLayout* lFilterRecords=new QHBoxLayout(d);
+    QHBoxLayout* lFilterRecords=new QHBoxLayout();
     widFilterRecords->setLayout(lFilterRecords);
     lFilterRecords->addWidget(new QLabel("filter: "));
     edtFilterRecords=new QFEnhancedLineEdit(d);
@@ -475,7 +469,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
 
 
     widResults=new QWidget(d);
-    QVBoxLayout* rwvlayout=new QVBoxLayout(d);
+    QVBoxLayout* rwvlayout=new QVBoxLayout();
     widResults->setLayout(rwvlayout);
 
     tvResults=new QEnhancedTableView(widResults);

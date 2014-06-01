@@ -142,7 +142,7 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
     agImageSelectionActions->addAction(actImagesDrawLine);
     agImageSelectionActions->addAction(actImagesDrawCircle);
     agImageSelectionActions->addAction(actImagesDrawEllipse);
-    connect(agImageSelectionActions, SIGNAL(selected(QAction*)), this, SLOT(setImageEditMode()));
+    connect(agImageSelectionActions, SIGNAL(triggered(QAction*)), this, SLOT(setImageEditMode()));
 
     actImagesZoom->setChecked(true);
 
@@ -479,7 +479,7 @@ void QFRDRImageMaskEditTools::maskBorder()
 {
     if (!imagemask) return;
     QDialog* dlg=new QDialog(parentWidget);
-    QGridLayout* grid=new QGridLayout(dlg);
+    QGridLayout* grid=new QGridLayout();
     dlg->setLayout(grid);
 
     QSpinBox* spinTop=new QSpinBox(dlg);

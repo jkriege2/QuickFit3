@@ -6,11 +6,11 @@ SimannealConfigDialog::SimannealConfigDialog(QWidget *parent):
 {
     // setup widgets
 
-    QVBoxLayout* main=new QVBoxLayout(this);
+    QVBoxLayout* main=new QVBoxLayout();
     setLayout(main);
 
 
-    QGridLayout* grid=new QGridLayout(this);
+    QGridLayout* grid=new QGridLayout();
     QLabel* l;
 
     l=new QLabel(tr("Maximum Iterations:"), this);

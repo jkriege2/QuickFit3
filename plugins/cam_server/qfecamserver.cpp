@@ -365,7 +365,7 @@ void QFECamServer::showCameraSettingsDialog(unsigned int camera, QSettings& sett
 	QDialog* dlg=new QDialog(parent);
     dlg->setWindowTitle(tr("camera settings for %1 (sensor: %2)").arg(getCameraName(camera)).arg(getCameraSensorName(camera)));
 
-    QVBoxLayout* lay=new QVBoxLayout(dlg);
+    QVBoxLayout* lay=new QVBoxLayout();
     dlg->setLayout(lay);
 
 

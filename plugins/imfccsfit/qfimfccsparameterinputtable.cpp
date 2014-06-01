@@ -281,6 +281,7 @@ bool QFImFCCSParameterInputTable::setData(const QModelIndex &index, const QVaria
                     return true;
                 }
                 if (coli==1) {
+                    //qDebug()<<"set fit error "<<pid.id<<value;
                     item->setFitError(pid.id, value.toDouble(), rdr);
                     // also set all other linked parameters to this new value!
                     QList<QPair<int, QString> > linked=item->getLinkedParameterList(cols, pid.id);
