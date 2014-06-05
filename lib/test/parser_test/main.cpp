@@ -206,9 +206,36 @@ void speed_test(bool doBytecode, bool showBytecode) {
 }
 #pragma GCC pop_options
 
+class qfmpCustomResultTest: public qfmpCustomResult {
+    public:
+        virtual QString toString(int precision=10) const {
+            return "testString";
+        }
+        virtual qfmpCustomResult* copy() const { return new qfmpCustomResultTest(); }
+};
+
+class qfmpCustomResultTest2: public qfmpCustomResult {
+    public:
+        virtual QString toString(int precision=10) const {
+            return "testString2";
+        }
+        virtual qfmpCustomResult* copy() const { return new qfmpCustomResultTest2(); }
+};
+
 int main(int argc, char *argv[])
 {
-    
+    qfmpCustomResultTest ctest;
+    qfmpCustomResultTest2 ctest2;
+    qfmpResult result, result2, result3;
+    result.setCustomCopy(&ctest);
+    result2.setCustomCopy(&ctest2);
+
+    qDebug()<<"set ctest.toString(): "<<ctest.toString()<<"          result.toString(): "<<result.toTypeString();
+    result.setCustomCopy(&ctest2);
+    qDebug()<<"set ctest2.toString(): "<<ctest2.toString()<<"          result.toString(): "<<result.toTypeString();
+    qDebug()<<"set ctest2.toString(): "<<ctest2.toString()<<"          result2.toString(): "<<result2.toTypeString();
+    result.setCustomCopy(&ctest);
+
     QFMathParser parser;
     bool doByteCode=false;
     bool showBytecode=false;
@@ -539,6 +566,14 @@ int main(int argc, char *argv[])
     //speed_test(doByteCode, showBytecode);
 
     TEST("varname(pi, p, i, not_existent)");
+    parser.addVariable("res1", result);
+    parser.addVariable("res2", result2);
+    qDebug()<<"\n\n"<<parser.printVariables()<<"\n\n";
+    TEST("res1");
+    TEST("res2");
+    TEST("res1+res2");
+    TEST("res3=res1");
+    qDebug()<<"\n\n"<<parser.printVariables()<<"\n\n";
     return 0;
 }
 

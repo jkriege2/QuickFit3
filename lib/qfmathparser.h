@@ -466,6 +466,7 @@ class QFLIB_EXPORT QFMathParser
                 qfmpVariable(QVector<double>* ref);
                 qfmpVariable(QVector<bool>* ref);
                 qfmpVariable(QStringList* ref);
+                qfmpVariable(qfmpCustomResult* ref);
                 //~qfmpVariable();
                 QFLIB_EXPORT void clearMemory();
                 QFLIB_EXPORT qfmpResult toResult() const;
@@ -490,6 +491,7 @@ class QFLIB_EXPORT QFMathParser
                 QVector<double>* numVec; /*!< \brief this points to the variable data if \c type==qfmpDoubleVector */
                 QVector<bool>* boolVec; /*!< \brief this points to the variable data if \c type==qfmpBoolVector */
                 QStringList* strVec; /*!< \brief this points to the variable data if \c type==qfmpStringVector */
+                qfmpCustomResult* custom;
         };
 
 

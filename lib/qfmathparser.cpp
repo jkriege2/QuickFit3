@@ -80,6 +80,7 @@ QString QFMathParser::resultTypeToString(qfmpResultType type)
         case qfmpBool: return QObject::tr("bool");
         case qfmpString: return QObject::tr("string");
         case qfmpVoid: return QObject::tr("void");
+        case qfmpCustom: return QObject::tr("custom");
     }
     return QObject::tr("invalid");
 }
@@ -1407,34 +1408,9 @@ QFMathParser::qfmpBinaryArithmeticNode::~qfmpBinaryArithmeticNode()
 }
 
 qfmpResult QFMathParser::qfmpBinaryArithmeticNode::evaluate(){
-  qfmpResult l;
-  if (left) l=left->evaluate();
-  qfmpResult r;
-  if (right) r=right->evaluate();
-  qfmpResult res;
-
-  switch(operation) {
-      case '+':
-            return qfmpResult::add(l, r, getParser());
-      case '-':
-            return qfmpResult::sub(l, r, getParser());
-      case '*':
-            return qfmpResult::mul(l, r, getParser());
-      case '/':
-            return qfmpResult::div(l, r, getParser());
-      case '%':
-            return qfmpResult::mod(l, r, getParser());
-      case '^':
-          return qfmpResult::power(l, r, getParser());
-      case '&':
-          return qfmpResult::bitwiseand(l, r, getParser());
-      case '|':
-          return qfmpResult::bitwiseor(l, r, getParser());
-
-      default: parser->qfmpError(QObject::tr("unknown arithmetic operation"));
-  }
+  qfmpResult res;  
   res.setInvalid();
-  res.isValid=false;
+  evaluate(res);
   return res;
 }
 
@@ -2214,6 +2190,7 @@ QFMathParser::qfmpVariable::qfmpVariable()
     numVec=NULL;
     boolVec=NULL;
     strVec=NULL;
+    custom=NULL;
 }
 
 QFMathParser::qfmpVariable::qfmpVariable(double *ref)
@@ -2226,6 +2203,8 @@ QFMathParser::qfmpVariable::qfmpVariable(double *ref)
     numVec=NULL;
     boolVec=NULL;
     strVec=NULL;
+    custom=NULL;
+
 }
 
 QFMathParser::qfmpVariable::qfmpVariable(QString *ref)
@@ -2238,6 +2217,8 @@ QFMathParser::qfmpVariable::qfmpVariable(QString *ref)
     numVec=NULL;
     boolVec=NULL;
     strVec=NULL;
+    custom=NULL;
+
 }
 
 QFMathParser::qfmpVariable::qfmpVariable(bool *ref)
@@ -2250,6 +2231,7 @@ QFMathParser::qfmpVariable::qfmpVariable(bool *ref)
     numVec=NULL;
     boolVec=NULL;
     strVec=NULL;
+    custom=NULL;
 }
 
 QFMathParser::qfmpVariable::qfmpVariable(QVector<double> *ref)
@@ -2262,6 +2244,7 @@ QFMathParser::qfmpVariable::qfmpVariable(QVector<double> *ref)
     numVec=ref;
     boolVec=NULL;
     strVec=NULL;
+    custom=NULL;
 }
 
 QFMathParser::qfmpVariable::qfmpVariable(QVector<bool> *ref)
@@ -2274,6 +2257,7 @@ QFMathParser::qfmpVariable::qfmpVariable(QVector<bool> *ref)
     numVec=NULL;
     boolVec=ref;
     strVec=NULL;
+    custom=NULL;
 }
 
 QFMathParser::qfmpVariable::qfmpVariable(QStringList *ref)
@@ -2286,6 +2270,21 @@ QFMathParser::qfmpVariable::qfmpVariable(QStringList *ref)
     numVec=NULL;
     boolVec=NULL;
     strVec=ref;
+    custom=NULL;
+    custom=NULL;
+}
+
+QFMathParser::qfmpVariable::qfmpVariable(qfmpCustomResult *ref)
+{
+    type=qfmpCustom;     /*!< \brief type of the variable */
+    internal=false;           /*!< \brief this is an internal variable */
+    str=NULL;        /*!< \brief this points to the variable data if \c type==qfmpString */
+    num=NULL;             /*!< \brief this points to the variable data if \c type==qfmpDouble */
+    boolean=NULL;
+    numVec=NULL;
+    boolVec=NULL;
+    strVec=NULL;
+    this->custom=ref;
 }
 
 void QFMathParser::qfmpVariable::clearMemory()
@@ -2297,12 +2296,14 @@ void QFMathParser::qfmpVariable::clearMemory()
         if (type==qfmpDoubleVector && numVec) delete (numVec);
         if (type==qfmpBoolVector && boolVec) delete (boolVec);
         if (type==qfmpStringVector && strVec) delete (strVec);
+        if (type==qfmpCustom && custom) delete (custom);
         num=NULL;
         boolean=NULL;
         str=NULL;
         numVec=NULL;
         boolVec=NULL;
         strVec=NULL;
+        custom=NULL;
     }
     internal=false;
 }
@@ -2310,23 +2311,7 @@ void QFMathParser::qfmpVariable::clearMemory()
 qfmpResult QFMathParser::qfmpVariable::toResult() const
 {
     qfmpResult r;
-    r.type=type;
-    r.isValid=true;
-    if (type==qfmpDouble && num) {
-        r.num=*(num);
-    } else if (type==qfmpString && str) {
-        r.str=*(str);
-    } else if (type==qfmpBool && boolean) {
-        r.boolean=*(boolean);
-    } else if (type==qfmpDoubleVector && numVec) {
-        r.numVec=*(numVec);
-    } else if (type==qfmpBoolVector && boolVec) {
-        r.boolVec=*(boolVec);
-    } else if (type==qfmpStringVector && strVec) {
-        r.strVec=*(strVec);
-    } else {
-        r.isValid=false;
-    }
+    toResult(r);
     return r;
 }
 
@@ -2346,6 +2331,8 @@ void QFMathParser::qfmpVariable::toResult(qfmpResult &r) const
         r.boolVec=*(boolVec);
     } else if (type==qfmpStringVector && strVec) {
         r.strVec=*(strVec);
+    } else if (type==qfmpCustom && custom) {
+        r.setCustomCopy(custom);
     } else {
         r.isValid=false;
     }
@@ -2367,6 +2354,15 @@ void QFMathParser::qfmpVariable::set(const qfmpResult &result)
             case qfmpBoolVector:  if (!boolVec){ boolVec=new QVector<bool>; internal=true; } *boolVec=result.boolVec; break;
             case qfmpString:  if (!str) {str=new QString; internal=true; } *str=result.str; break;
             case qfmpBool:  if (!boolean) {boolean=new bool; internal=true; } *boolean=result.boolean; break;
+            case qfmpCustom:  if (custom && custom->typeName()==result.custom()->typeName()) {
+                    *custom=*result.custom();
+                } else {
+                    if (result.custom()) {
+                        if (custom&&internal) delete custom;
+                        internal=true;
+                        custom=result.custom()->copy();
+                    }
+                }  break;
             case qfmpVoid: break;
         }
     } else {
@@ -2380,6 +2376,15 @@ void QFMathParser::qfmpVariable::set(const qfmpResult &result)
             case qfmpBoolVector: boolVec=new QVector<bool>; *boolVec=result.boolVec; break;
             case qfmpString: str=new QString; *str=result.str; break;
             case qfmpBool: boolean=new bool; *boolean=result.boolean; break;
+            case qfmpCustom:  if (custom && custom->typeName()==result.custom()->typeName()) {
+                    *custom=*result.custom();
+                } else {
+                    if (result.custom()) {
+                        if (custom&&internal) delete custom;
+                        internal=true;
+                        custom=result.custom()->copy();
+                    }
+                }  break;
             case qfmpVoid: break;
         }
     }
@@ -2745,6 +2750,13 @@ void QFMathParser::executionEnvironment::addFunction(const QString &name, const 
 
 void QFMathParser::executionEnvironment::clearVariables()
 {
+    QStringList keys=variables.keys();
+    for (int j=0; j<keys.size(); j++) {
+        for (int i=0; i<variables[keys[j]].size(); i++) {
+            variables[keys[j]].operator[](i).second.clearMemory();
+        }
+    }
+
     variables.clear();
 }
 

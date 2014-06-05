@@ -27,7 +27,7 @@ class QFMathParser; // forward
  */
 /*@{*/
 
-#define QFMATHPARSER_VERSION "0.3"
+#define QFMATHPARSER_VERSION "0.4"
 
 
 /** possible result types
@@ -43,13 +43,80 @@ enum qfmpResultType {qfmpDouble=0x01,  /*!< \brief a floating-point number with 
                      qfmpDoubleVector=0x08,  /*!< \brief a vector of floating point numbers */
                      qfmpStringVector=0x10, /*!< \brief a vector of strings */
                      qfmpBoolVector=0x20, /*!< \brief a vector of booleans */
-                     qfmpVoid=0x40  /*!< \brief a vector of floating point numbers */
+                     qfmpVoid=0x40,  /*!< \brief a void/non-evaluatable result */
+                     qfmpCustom=0x8000  /*!< \brief a custom datatype (qfmpCustomResult) */
                      };
+
+struct  qfmpResult; // forward
+
+
+/** \brief result of any expression  */
+class QFLIB_EXPORT qfmpCustomResult {
+    public:
+        qfmpCustomResult();
+        virtual ~qfmpCustomResult();
+
+        /** \brief convert the value this struct representens into a QString */
+        QFLIB_EXPORT virtual QString toString(int precision=10) const=0;
+        /** \brief returns the name of the datatype */
+        QFLIB_EXPORT virtual QString typeName() const;
+        /** \brief convert the value this struct representens into a QString and adds the name of the datatype in \c [...] */
+        QFLIB_EXPORT virtual QString toTypeString(int precision=10) const;
+        /** \brief convert the value this struct representens into a QString and adds the name of the datatype in \c [...] */
+        QFLIB_EXPORT virtual int length() const;
+        /** \brief clear all contained data */
+        QFLIB_EXPORT virtual void clear();
+
+        QFLIB_EXPORT QVariantList asVariantList() const;
+
+
+        /** \brief return a new version of this as pointer */
+        QFLIB_EXPORT virtual qfmpCustomResult* copy() const=0;
+
+        /** \brief returns \c true, if a conversion to the given datatype is possible */
+        QFLIB_EXPORT virtual bool convertsTo(qfmpResultType type) const;
+
+        /** \brief convert the current custom result to the given datatype */
+        QFLIB_EXPORT virtual void convertTo(qfmpResult& res, qfmpResultType type) const;
+
+
+        QFLIB_EXPORT virtual void add(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void sub(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void mul(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void div(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void mod(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void power(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void bitwiseand(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void bitwiseor(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void logicand(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void logicor(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void logicnot(qfmpResult& result, const qfmpResult& l, QFMathParser *p) const;
+        QFLIB_EXPORT virtual void logicnand(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void logicnor(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void logicxor(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void neg(qfmpResult& result, const qfmpResult& l, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void bitwisenot(qfmpResult& result, const qfmpResult& l, QFMathParser* p) const;
+
+
+        QFLIB_EXPORT virtual void compareequal(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void comparenotequal(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void comparegreater(qfmpResult& res, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void comparegreaterequal(qfmpResult& res, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void comparesmaller(qfmpResult& res, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+        QFLIB_EXPORT virtual void comparesmallerequal(qfmpResult& res, const qfmpResult& l, const qfmpResult& r, QFMathParser* p) const;
+
+    private:
+        static int counter;
+};
+
+
+
 
 /** \brief result of any expression  */
 struct QFLIB_EXPORT qfmpResult {
     public:
         qfmpResult();
+        ~qfmpResult();
         qfmpResult(double value);
         qfmpResult(int value);
         qfmpResult(QString value);
@@ -59,8 +126,6 @@ struct QFLIB_EXPORT qfmpResult {
         qfmpResult(const QStringList &value);
 
         qfmpResult(const qfmpResult &value);
-        //qfmpResult(qfmpResult &value);
-        //explicit qfmpResult(qfmpResult value);
         qfmpResult& operator=(const qfmpResult &value);
 
         QFLIB_EXPORT void setInvalid();
@@ -81,7 +146,11 @@ struct QFLIB_EXPORT qfmpResult {
         QFLIB_EXPORT bool isUInt() const;
         /** \brief returns the size of the result (number of characters for string, numbers of entries in vectors, 0 for void and 1 else) */
         QFLIB_EXPORT int length() const;
+        /** \brief is this a custom result type */
+        QFLIB_EXPORT bool isCustom() const;
 
+        QFLIB_EXPORT void setCustomCopy(const qfmpCustomResult *val);
+        QFLIB_EXPORT void setCustom( qfmpCustomResult* val);
         QFLIB_EXPORT void setDouble(double val);
         QFLIB_EXPORT void setBoolean(bool val);
         QFLIB_EXPORT void setString(const QString& val);
@@ -132,19 +201,7 @@ struct QFLIB_EXPORT qfmpResult {
         /** \brief returns an void result */
         QFLIB_EXPORT static qfmpResult voidResult();
 
-        QFLIB_EXPORT static qfmpResult add(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static qfmpResult sub(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static qfmpResult mul(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static qfmpResult div(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static qfmpResult mod(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static qfmpResult power(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static qfmpResult bitwiseand(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static qfmpResult bitwiseor(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static qfmpResult logicand(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static qfmpResult logicor(const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static qfmpResult logicnot(const qfmpResult& l, QFMathParser *p);
-        QFLIB_EXPORT static qfmpResult neg(const qfmpResult& l, QFMathParser* p);
-        QFLIB_EXPORT static qfmpResult bitwisenot(const qfmpResult& l, QFMathParser* p);
+
 
         QFLIB_EXPORT static void add(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
         QFLIB_EXPORT static void sub(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
@@ -163,22 +220,7 @@ struct QFLIB_EXPORT qfmpResult {
         QFLIB_EXPORT static void neg(qfmpResult& result, const qfmpResult& l, QFMathParser* p);
         QFLIB_EXPORT static void bitwisenot(qfmpResult& result, const qfmpResult& l, QFMathParser* p);
 
-        QFLIB_EXPORT static void la_add(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        /*QFLIB_EXPORT static void la_sub(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static void la_mul(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static void la_div(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static void la_mod(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static void la_power(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static void la_bitwiseand(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static void la_bitwiseor(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static void la_logicand(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static void la_logicor(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static void la_logicnot(qfmpResult& l, QFMathParser *p);
-        QFLIB_EXPORT static void la_logicnand(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static void la_logicnor(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static void la_logicxor(qfmpResult& l, const qfmpResult& r, QFMathParser* p);
-        QFLIB_EXPORT static void la_neg(qfmpResult& l, QFMathParser* p);
-        QFLIB_EXPORT static void la_bitwisenot(qfmpResult& l, QFMathParser* p);*/
+
 
         QFLIB_EXPORT bool operator==(const qfmpResult& other) const;
         QFLIB_EXPORT bool operator!=(const qfmpResult& other) const;
@@ -199,7 +241,15 @@ struct QFLIB_EXPORT qfmpResult {
         QStringList strVec;
         QVector<bool> boolVec;
 
+
+        /*!< \brief clear the current qfmpCustomResult object */
+        QFLIB_EXPORT void clearCustom();
+        /*!< \brief returns a pointer to the current qfmpCustomResult object */
+        QFLIB_EXPORT qfmpCustomResult* custom() const { return m_custom; }
+    private:
+        qfmpCustomResult* m_custom;
 };
+
 
 
 

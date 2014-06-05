@@ -1,6 +1,6 @@
 #include "qfmathparsertools.h"
 #include "qfmathparser.h"
-
+#include <typeinfo>
 
 
 
@@ -15,6 +15,13 @@ qfmpResult::qfmpResult()
     numVec.clear();
     boolVec.clear();
     strVec.clear();
+    m_custom=NULL;
+}
+
+qfmpResult::~qfmpResult()
+{
+    if (m_custom) delete m_custom;
+    m_custom=NULL;
 }
 
 qfmpResult::qfmpResult(double value)
@@ -27,6 +34,7 @@ qfmpResult::qfmpResult(double value)
     numVec.clear();
     boolVec.clear();
     strVec.clear();
+    m_custom=NULL;
 }
 
 qfmpResult::qfmpResult(int value)
@@ -39,6 +47,7 @@ qfmpResult::qfmpResult(int value)
     numVec.clear();
     boolVec.clear();
     strVec.clear();
+    m_custom=NULL;
 }
 
 qfmpResult::qfmpResult(QString value)
@@ -51,6 +60,7 @@ qfmpResult::qfmpResult(QString value)
     numVec.clear();
     boolVec.clear();
     strVec.clear();
+    m_custom=NULL;
 }
 
 qfmpResult::qfmpResult(bool value)
@@ -63,6 +73,7 @@ qfmpResult::qfmpResult(bool value)
     numVec.clear();
     boolVec.clear();
     strVec.clear();
+    m_custom=NULL;
 }
 
 qfmpResult::qfmpResult(const QVector<double>& value)
@@ -75,6 +86,7 @@ qfmpResult::qfmpResult(const QVector<double>& value)
     numVec=value;
     boolVec.clear();
     strVec.clear();
+    m_custom=NULL;
 }
 
 qfmpResult::qfmpResult(const QVector<bool> &value)
@@ -87,6 +99,7 @@ qfmpResult::qfmpResult(const QVector<bool> &value)
     numVec.clear();
     boolVec=value;
     strVec.clear();
+    m_custom=NULL;
 }
 
 qfmpResult::qfmpResult(const QStringList &value)
@@ -99,18 +112,21 @@ qfmpResult::qfmpResult(const QStringList &value)
     numVec.clear();
     boolVec.clear();
     strVec=value;
+    m_custom=NULL;
 }
 
 qfmpResult::qfmpResult(const qfmpResult &value):
     isValid(value.isValid),
     type(value.type),
     num(value.num),
-    boolean(value.boolean)
+    boolean(value.boolean),
+    m_custom(NULL)
 {
     if (type==qfmpString) this->str=value.str;
     else if (type==qfmpDoubleVector) this->numVec=value.numVec;
     else if (type==qfmpStringVector) this->strVec=value.strVec;
     else if (type==qfmpBoolVector) this->boolVec=value.boolVec;
+    else if (type==qfmpCustom) this->setCustomCopy(value.custom());
 }
 
 
@@ -125,6 +141,7 @@ qfmpResult &qfmpResult::operator=(const qfmpResult &value)
     else if (type==qfmpDoubleVector) this->numVec=value.numVec;
     else if (type==qfmpStringVector) this->strVec=value.strVec;
     else if (type==qfmpBoolVector) this->boolVec=value.boolVec;
+    else if (type==qfmpCustom) this->setCustomCopy(value.custom());
     return *this;
 }
 
@@ -135,6 +152,7 @@ void qfmpResult::setInvalid()
     boolVec.clear();
     strVec.clear();
     str.clear();
+    clearCustom();
     type=qfmpVoid;
 }
 
@@ -145,6 +163,7 @@ void qfmpResult::setVoid()
     boolVec.clear();
     strVec.clear();
     str.clear();
+    clearCustom();
     type=qfmpVoid;
 }
 
@@ -157,6 +176,7 @@ QString qfmpResult::toString(int precision) const
         case qfmpBoolVector: return QString("[ ")+boolvectorToQString(boolVec)+QString(" ]");
         case qfmpString: return str;
         case qfmpBool: return boolToQString(boolean);
+        case qfmpCustom: if (m_custom) return m_custom->toString(precision);
         case qfmpVoid: break;
     }
     return "";
@@ -173,7 +193,8 @@ QString qfmpResult::toTypeString(int precision) const
         case qfmpBoolVector: return QString("[ ")+boolvectorToQString(boolVec)+QObject::tr(" ] [boolean vector]");
         case qfmpString: return str+QObject::tr(" [string]");
         case qfmpBool: return boolToQString(boolean)+QObject::tr(" [bool]");
-        case qfmpVoid: return boolToQString(boolean)+QObject::tr(" [void]");
+        case qfmpVoid: return QObject::tr(" [void]");
+        case qfmpCustom: if (m_custom) return m_custom->toTypeString(precision);
     }
     return QFMathParser::resultTypeToString(type);
 
@@ -214,8 +235,40 @@ int qfmpResult::length() const
         case qfmpString: return str.size();
         case qfmpBool: return 1;
         case qfmpVoid: return 0;
+        case qfmpCustom: if (m_custom) return m_custom->length();
     }
     return 0;
+}
+
+bool qfmpResult::isCustom() const
+{
+    return type==qfmpCustom;
+}
+
+void qfmpResult::setCustomCopy(const qfmpCustomResult *val)
+{
+    type=qfmpCustom;
+    num=0;
+    numVec.clear();
+    boolVec.clear();
+    strVec.clear();
+    str.clear();
+    isValid=true;
+    clearCustom();
+    m_custom=val->copy();
+}
+
+void qfmpResult::setCustom(qfmpCustomResult *val)
+{
+    type=qfmpCustom;
+    num=0;
+    numVec.clear();
+    boolVec.clear();
+    strVec.clear();
+    str.clear();
+    isValid=true;
+    clearCustom();
+    m_custom=val;
 }
 
 void qfmpResult::setDouble(double val)
@@ -227,6 +280,7 @@ void qfmpResult::setDouble(double val)
     strVec.clear();
     str.clear();
     isValid=true;
+    clearCustom();
 }
 
 void qfmpResult::setBoolean(bool val)
@@ -237,6 +291,7 @@ void qfmpResult::setBoolean(bool val)
     boolVec.clear();
     strVec.clear();
     str.clear();
+    clearCustom();;
     isValid=true;
 }
 
@@ -247,6 +302,7 @@ void qfmpResult::setString(const QString &val)
     boolVec.clear();
     strVec.clear();
     numVec.clear();
+    clearCustom();;
     isValid=true;
 }
 
@@ -257,6 +313,7 @@ void qfmpResult::setDoubleVec(const QVector<double> &val)
     boolVec.clear();
     strVec.clear();
     numVec=val;
+    clearCustom();;
     str.clear();
 }
 
@@ -266,6 +323,7 @@ void qfmpResult::setDoubleVec(int size, double defaultVal)
     type=qfmpDoubleVector;
     boolVec.clear();
     strVec.clear();
+    clearCustom();;
     if (size>0) {
         numVec.resize(size);
         for (int i=0; i<size; i++) numVec[i]=defaultVal;
@@ -283,7 +341,7 @@ void qfmpResult::setBoolVec(const QVector<bool> &val)
     strVec.clear();
     boolVec=val;
     str.clear();
-
+    clearCustom();;
 }
 
 void qfmpResult::setBoolVec(int size, bool defaultVal)
@@ -292,6 +350,7 @@ void qfmpResult::setBoolVec(int size, bool defaultVal)
     type=qfmpBoolVector;
     numVec.clear();
     strVec.clear();
+    clearCustom();;
     if (size>0) {
         boolVec.resize(size);
         for (int i=0; i<size; i++) boolVec[i]=defaultVal;
@@ -308,6 +367,7 @@ void qfmpResult::setStringVec(const QStringList &val)
     numVec.clear();
     strVec=val;
     boolVec.clear();
+    clearCustom();;
     str.clear();
 }
 
@@ -355,8 +415,10 @@ QVariantList qfmpResult::asVariantList() const
         for (int i=0; i<boolVec.size(); i++) {
             vl<<boolVec[i];
         }
+    } else if (type==qfmpCustom && m_custom) {
+        return m_custom->asVariantList();
     }
-    return vl;
+     return vl;
 }
 
 QStringList qfmpResult::asStrVector() const
@@ -473,31 +535,40 @@ bool qfmpResult::operator!=(const qfmpResult &other) const
 bool qfmpResult::operator==(const qfmpResult &r) const
 {
     if (!isValid && !r.isValid) return true;
-    switch((uint16_t(type)<<8)+uint16_t(r.type)) {
-        case (qfmpVoid<<8)+qfmpVoid:
+    switch((uint32_t(type)<<16)+uint32_t(r.type)) {
+        case (qfmpVoid<<16)+qfmpVoid:
             return  true;
             break;
-        case (qfmpDouble<<8)+qfmpDouble:
+        case (qfmpDouble<<16)+qfmpDouble:
             return(num==r.num);
             break;
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector:
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector:
             return(numVec==r.numVec);
             break;
-        case (qfmpString<<8)+qfmpString:
+        case (qfmpString<<16)+qfmpString:
             return(str==r.str);
             break;
-        case (qfmpBool<<8)+qfmpBool:
+        case (qfmpBool<<16)+qfmpBool:
             return(boolean==r.boolean);
             break;
-        case (qfmpBoolVector<<8)+qfmpBoolVector:
+        case (qfmpBoolVector<<16)+qfmpBoolVector:
             return(boolVec==r.boolVec);
             break;
-        case (qfmpStringVector<<8)+qfmpStringVector:
+        case (qfmpStringVector<<16)+qfmpStringVector:
             return(strVec==r.strVec);
+            break;
+        case (qfmpCustom<<16)+qfmpCustom: {
+                if (custom() && r.custom()) {
+                    qfmpResult res;
+                    custom()->compareequal(res, *this, r, NULL);
+                    return (res.asBool());
+                }
+            }
             break;
         default:
             return false;
     }
+    return false;
 }
 
 
@@ -507,33 +578,33 @@ bool qfmpResult::operator==(const qfmpResult &r) const
 
 void qfmpResult::add(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, QFMathParser* p)
 {
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
+    uint32_t lt=l.type;
+    uint32_t rt=r.type;
+    uint32_t tt=(lt<<16)+rt;
     /*qDebug()<<QString::number(tt, 16);
-    //qDebug()<<QString::number((uint16_t(qfmpDouble)<<8)+qfmpDouble, 16);
-    //qDebug()<<QString::number((uint16_t(qfmpDouble)<<8)+qfmpDoubleVector, 16);
-    //qDebug()<<QString::number((uint16_t(qfmpDoubleVector<<8))+qfmpDoubleVector, 16);
-    //qDebug()<<QString::number((uint16_t(qfmpString)<<8)+qfmpString, 16);*/
+    //qDebug()<<QString::number((uint32_t(qfmpDouble)<<16)+qfmpDouble, 16);
+    //qDebug()<<QString::number((uint32_t(qfmpDouble)<<16)+qfmpDoubleVector, 16);
+    //qDebug()<<QString::number((uint32_t(qfmpDoubleVector<<16))+qfmpDoubleVector, 16);
+    //qDebug()<<QString::number((uint32_t(qfmpString)<<16)+qfmpString, 16);*/
     switch(tt) {
-        case (uint16_t(qfmpDouble)<<8)+qfmpDouble:
+        case (uint32_t(qfmpDouble)<<16)+qfmpDouble:
             re.setDouble(l.num+r.num);
             break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
+        case (qfmpDoubleVector<<16)+qfmpDouble: {
             re.setDoubleVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=l.numVec[i]+r.num;
             }
             break;
         }
-        case (uint16_t(qfmpDouble)<<8)+qfmpDoubleVector: {
+        case (uint32_t(qfmpDouble)<<16)+qfmpDoubleVector: {
             re.setDoubleVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=l.num+r.numVec[i];
             }
             break;
         }
-        case (uint16_t(qfmpDoubleVector<<8))+qfmpDoubleVector: {
+        case (uint32_t(qfmpDoubleVector<<16))+qfmpDoubleVector: {
             if (l.length()!=r.length()) {
                 if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
                 re.setInvalid();
@@ -545,86 +616,48 @@ void qfmpResult::add(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, Q
             }
             break;
         }
-        case (uint16_t(qfmpString)<<8)+qfmpString:
+        case (uint32_t(qfmpString)<<16)+qfmpString:
             re.setString(l.str+r.str);
             break;
         default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be added").arg(l.typeName()).arg(r.typeName()));
-            re.setInvalid();
+            if (l.type==qfmpCustom && l.custom()) l.custom()->add(re, l, r, p);
+            else if (r.type==qfmpCustom && r.custom()) r.custom()->add(re, l, r, p);
+            else {
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be added").arg(l.typeName()).arg(r.typeName()));
+                re.setInvalid();
+            }
             break;
     }
 }
 
 
-void qfmpResult::la_add(qfmpResult &l, const qfmpResult &r, QFMathParser* p)
-{
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
-    switch(tt) {
-        case (uint16_t(qfmpDouble)<<8)+qfmpDouble:
-            l.setDouble(l.num+r.num);
-            break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
-            for (int i=0; i<l.numVec.size(); i++) {
-                l.numVec[i]=l.numVec[i]+r.num;
-            }
-            break;
-        }
-        case (uint16_t(qfmpDouble)<<8)+qfmpDoubleVector: {
-            l.type=qfmpDoubleVector;
-            l.numVec.resize(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                l.numVec[i]=l.num+r.numVec[i];
-            }
-            break;
-        }
-        case (uint16_t(qfmpDoubleVector<<8))+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                l.setInvalid();
-                return;
-            }
-            for (int i=0; i<r.numVec.size(); i++) {
-                l.numVec[i]=l.numVec[i]+r.numVec[i];
-            }
-            break;
-        }
-        case (uint16_t(qfmpString)<<8)+qfmpString:
-            l.setString(l.str+r.str);
-            break;
-        default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be added").arg(l.typeName()).arg(r.typeName()));
-            l.setInvalid();
-            break;
-    }
-}
+
 
 void qfmpResult::sub(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
+    uint32_t lt=l.type;
+    uint32_t rt=r.type;
+    uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpDouble<<8)+qfmpDouble:
+        case (qfmpDouble<<16)+qfmpDouble:
             re.setDouble(l.num-r.num);
             break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
+        case (qfmpDoubleVector<<16)+qfmpDouble: {
             re.setDoubleVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=l.numVec[i]-r.num;
             }
             break;
         }
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
+        case (qfmpDouble<<16)+qfmpDoubleVector: {
             re.setDoubleVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=l.num-r.numVec[i];
             }
             break;
         }
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
             if (l.length()!=r.length()) {
                 if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
                 re.setInvalid();
@@ -637,37 +670,41 @@ void qfmpResult::sub(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, Q
             break;
         }
         default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be subtracted").arg(l.typeName()).arg(r.typeName()));
-            re.setInvalid();
+            if (l.type==qfmpCustom && l.custom()) l.custom()->sub(re, l, r, p);
+            else if (r.type==qfmpCustom && r.custom()) r.custom()->sub(re, l, r, p);
+            else {
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be subtracted").arg(l.typeName()).arg(r.typeName()));
+                re.setInvalid();
+            }
             break;
     }
 }
 
 void qfmpResult::mul(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
+    uint32_t lt=l.type;
+    uint32_t rt=r.type;
+    uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpDouble<<8)+qfmpDouble:
+        case (qfmpDouble<<16)+qfmpDouble:
             re.setDouble(l.num*r.num);
             break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
+        case (qfmpDoubleVector<<16)+qfmpDouble: {
             re.setDoubleVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=l.numVec[i]*r.num;
             }
             break;
         }
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
+        case (qfmpDouble<<16)+qfmpDoubleVector: {
             re.setDoubleVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=l.num*r.numVec[i];
             }
             break;
         }
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
             if (l.length()!=r.length()) {
                 if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
                 re.setInvalid();
@@ -680,37 +717,41 @@ void qfmpResult::mul(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, Q
             break;
         }
         default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be multiplied").arg(l.typeName()).arg(r.typeName()));
-            re.setInvalid();
+            if (l.type==qfmpCustom && l.custom()) l.custom()->mul(re, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->mul(re, l, r, p);
+            else {
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be multiplied").arg(l.typeName()).arg(r.typeName()));
+                re.setInvalid();
+            }
             break;
     }
 }
 
 void qfmpResult::div(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
+    uint32_t lt=l.type;
+    uint32_t rt=r.type;
+    uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpDouble<<8)+qfmpDouble:
+        case (qfmpDouble<<16)+qfmpDouble:
             re.setDouble(l.num/r.num);
             break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
+        case (qfmpDoubleVector<<16)+qfmpDouble: {
             re.setDoubleVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=l.numVec[i]/r.num;
             }
             break;
         }
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
+        case (qfmpDouble<<16)+qfmpDoubleVector: {
             re.setDoubleVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=l.num/r.numVec[i];
             }
             break;
         }
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
             if (l.length()!=r.length()) {
                 if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
                 re.setInvalid();
@@ -723,37 +764,41 @@ void qfmpResult::div(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, Q
             break;
         }
         default:
-            re.setInvalid();
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be divided").arg(l.typeName()).arg(r.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->div(re, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->div(re, l, r, p);
+            else {
+                re.setInvalid();
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be divided").arg(l.typeName()).arg(r.typeName()));
+            }
             break;
     }
 }
 
 void qfmpResult::mod(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
+    uint32_t lt=l.type;
+    uint32_t rt=r.type;
+    uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpDouble<<8)+qfmpDouble:
+        case (qfmpDouble<<16)+qfmpDouble:
             re.setDouble(double(l.toInteger()%r.toInteger()));
             break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
+        case (qfmpDoubleVector<<16)+qfmpDouble: {
             re.setDoubleVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=int32_t(l.numVec[i])%r.toInteger();
             }
             break;
         }
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
+        case (qfmpDouble<<16)+qfmpDoubleVector: {
             re.setDoubleVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=l.toInteger()%int32_t(r.numVec[i]);
             }
             break;
         }
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
             if (l.length()!=r.length()) {
                 if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
                 re.setInvalid();
@@ -766,37 +811,41 @@ void qfmpResult::mod(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, Q
             break;
         }
         default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in mod operation").arg(l.typeName()).arg(r.typeName()));
-            re.setInvalid();
+            if (l.type==qfmpCustom && l.custom()) l.custom()->mod(re, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->mod(re, l, r, p);
+            else {
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in mod operation").arg(l.typeName()).arg(r.typeName()));
+                re.setInvalid();
+            }
             break;
     }
 }
 
 void qfmpResult::power(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
+    uint32_t lt=l.type;
+    uint32_t rt=r.type;
+    uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpDouble<<8)+qfmpDouble:
+        case (qfmpDouble<<16)+qfmpDouble:
             re.setDouble(pow(l.num,r.num));
             break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
+        case (qfmpDoubleVector<<16)+qfmpDouble: {
             re.setDoubleVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=pow(l.numVec[i],r.num);
             }
             break;
         }
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
+        case (qfmpDouble<<16)+qfmpDoubleVector: {
             re.setDoubleVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=pow(l.num,r.numVec[i]);
             }
             break;
         }
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
             if (l.length()!=r.length()) {
                 if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
                 re.setInvalid();
@@ -809,37 +858,41 @@ void qfmpResult::power(qfmpResult& re, const qfmpResult &l, const qfmpResult &r,
             break;
         }
         default:
-            re.setInvalid();
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in power operation").arg(l.typeName()).arg(r.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->power(re, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->power(re, l, r, p);
+            else {
+                re.setInvalid();
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in power operation").arg(l.typeName()).arg(r.typeName()));
+            }
             break;
     }
 }
 
 void qfmpResult::bitwiseand(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
+    uint32_t lt=l.type;
+    uint32_t rt=r.type;
+    uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpDouble<<8)+qfmpDouble:
+        case (qfmpDouble<<16)+qfmpDouble:
             re.setDouble(double(l.toInteger()&r.toInteger()));
             break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
+        case (qfmpDoubleVector<<16)+qfmpDouble: {
             re.setDoubleVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=int32_t(l.numVec[i])&r.toInteger();
             }
             break;
         }
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
+        case (qfmpDouble<<16)+qfmpDoubleVector: {
             re.setDoubleVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=l.toInteger()&int32_t(r.numVec[i]);
             }
             break;
         }
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
             if (l.length()!=r.length()) {
                 if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
                 re.setInvalid();
@@ -852,37 +905,41 @@ void qfmpResult::bitwiseand(qfmpResult& re, const qfmpResult &l, const qfmpResul
             break;
         }
         default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in bitwise and operation").arg(l.typeName()).arg(r.typeName()));
-            re.setInvalid();
+            if (l.type==qfmpCustom && l.custom()) l.custom()->bitwiseand(re, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->bitwiseand(re, l, r, p);
+            else {
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in bitwise and operation").arg(l.typeName()).arg(r.typeName()));
+                re.setInvalid();
+            }
             break;
     }
 }
 
 void qfmpResult::bitwiseor(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
+    uint32_t lt=l.type;
+    uint32_t rt=r.type;
+    uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpDouble<<8)+qfmpDouble:
+        case (qfmpDouble<<16)+qfmpDouble:
             re.setDouble(double(l.toInteger()|r.toInteger()));
             break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
+        case (qfmpDoubleVector<<16)+qfmpDouble: {
             re.setDoubleVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
                 re.numVec[i]=int32_t(l.numVec[i])|r.toInteger();
             }
             break;
         }
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
+        case (qfmpDouble<<16)+qfmpDoubleVector: {
             re.setDoubleVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
                 re.numVec[i]=l.toInteger()|int32_t(r.numVec[i]);
             }
             break;
         }
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
             if (l.length()!=r.length()) {
                 if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
                 re.setInvalid();
@@ -895,23 +952,27 @@ void qfmpResult::bitwiseor(qfmpResult& re, const qfmpResult &l, const qfmpResult
             break;
         }
         default:
-            re.setInvalid();
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in bitwise or operation").arg(l.typeName()).arg(r.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->bitwiseor(re, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->bitwiseor(re, l, r, p);
+            else {
+                re.setInvalid();
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in bitwise or operation").arg(l.typeName()).arg(r.typeName()));
+            }
             break;
     }
 }
 
 void qfmpResult::logicand(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
+    uint32_t lt=l.type;
+    uint32_t rt=r.type;
+    uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpBool<<8)+qfmpBool:
+        case (qfmpBool<<16)+qfmpBool:
             re.setBoolean(l.boolean&&r.boolean);
             break;
-        case (qfmpBoolVector<<8)+qfmpBoolVector: {
+        case (qfmpBoolVector<<16)+qfmpBoolVector: {
             if (l.length()!=r.length()) {
                 if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
                 re.setInvalid();
@@ -923,7 +984,7 @@ void qfmpResult::logicand(qfmpResult& re, const qfmpResult &l, const qfmpResult 
             }
             break;
         }
-        case (qfmpBoolVector<<8)+qfmpBool: {
+        case (qfmpBoolVector<<16)+qfmpBool: {
             re.setBoolVec(l.boolVec.size());
             for (int i=0; i<l.boolVec.size(); i++) {
                 re.boolVec[i]=l.boolVec[i]&&r.boolean;
@@ -932,23 +993,27 @@ void qfmpResult::logicand(qfmpResult& re, const qfmpResult &l, const qfmpResult 
         }
 
         default:
-            re.setInvalid();
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in logic and operation").arg(l.typeName()).arg(r.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->logicand(re, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->logicand(re, l, r, p);
+            else {
+                re.setInvalid();
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in logic and operation").arg(l.typeName()).arg(r.typeName()));
+            }
             break;
     }
 }
 
 void qfmpResult::logicor(qfmpResult& re, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
+    uint32_t lt=l.type;
+    uint32_t rt=r.type;
+    uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpBool<<8)+qfmpBool:
+        case (qfmpBool<<16)+qfmpBool:
             re.setBoolean(l.boolean||r.boolean);
             break;
-        case (qfmpBoolVector<<8)+qfmpBoolVector: {
+        case (qfmpBoolVector<<16)+qfmpBoolVector: {
             if (l.length()!=r.length()) {
                 if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
                 re.setInvalid();
@@ -960,7 +1025,7 @@ void qfmpResult::logicor(qfmpResult& re, const qfmpResult &l, const qfmpResult &
             }
             break;
         }
-        case (qfmpBoolVector<<8)+qfmpBool: {
+        case (qfmpBoolVector<<16)+qfmpBool: {
             re.setBoolVec(l.boolVec.size());
             for (int i=0; i<l.boolVec.size(); i++) {
                 re.boolVec[i]=l.boolVec[i]||r.boolean;
@@ -968,8 +1033,12 @@ void qfmpResult::logicor(qfmpResult& re, const qfmpResult &l, const qfmpResult &
             break;
         }
         default:
-            re.setInvalid();
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in logic or operation").arg(l.typeName()).arg(r.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->logicor(re, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->logicor(re, l, r, p);
+            else {
+                re.setInvalid();
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in logic or operation").arg(l.typeName()).arg(r.typeName()));
+            }
             break;
     }
 }
@@ -986,8 +1055,11 @@ void qfmpResult::logicnot(qfmpResult& re, const qfmpResult &l, QFMathParser *p)
             break;
         }
         default:
-            re.setInvalid();
-            if (p) p->qfmpError(QObject::tr("argument of type %1 may not be used in logic not operation").arg(l.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->logicnot(re, l, p);
+            else {
+                re.setInvalid();
+                if (p) p->qfmpError(QObject::tr("argument of type %1 may not be used in logic not operation").arg(l.typeName()));
+            }
             break;
 
     }
@@ -996,15 +1068,15 @@ void qfmpResult::logicnot(qfmpResult& re, const qfmpResult &l, QFMathParser *p)
 
 void qfmpResult::logicnand(qfmpResult &re, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
+    uint32_t lt=l.type;
+    uint32_t rt=r.type;
+    uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpBool<<8)+qfmpBool:
+        case (qfmpBool<<16)+qfmpBool:
             re.setBoolean(!(l.boolean&&r.boolean));
             break;
-        case (qfmpBoolVector<<8)+qfmpBoolVector: {
+        case (qfmpBoolVector<<16)+qfmpBoolVector: {
             if (l.length()!=r.length()) {
                 if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
                 re.setInvalid();
@@ -1016,7 +1088,7 @@ void qfmpResult::logicnand(qfmpResult &re, const qfmpResult &l, const qfmpResult
             }
             break;
         }
-        case (qfmpBoolVector<<8)+qfmpBool: {
+        case (qfmpBoolVector<<16)+qfmpBool: {
             re.setBoolVec(l.boolVec.size());
             for (int i=0; i<l.boolVec.size(); i++) {
                 re.boolVec[i]=!(l.boolVec[i]&&r.boolean);
@@ -1024,23 +1096,27 @@ void qfmpResult::logicnand(qfmpResult &re, const qfmpResult &l, const qfmpResult
             break;
         }
         default:
-            re.setInvalid();
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in logic nand operation").arg(l.typeName()).arg(r.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->logicand(re, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->logicand(re, l, r, p);
+            else {
+                re.setInvalid();
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in logic nand operation").arg(l.typeName()).arg(r.typeName()));
+            }
             break;
     }
 }
 
 void qfmpResult::logicnor(qfmpResult &re, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
+    uint32_t lt=l.type;
+    uint32_t rt=r.type;
+    uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpBool<<8)+qfmpBool:
+        case (qfmpBool<<16)+qfmpBool:
             re.setBoolean(!(l.boolean||r.boolean));
             break;
-        case (qfmpBoolVector<<8)+qfmpBoolVector: {
+        case (qfmpBoolVector<<16)+qfmpBoolVector: {
             if (l.length()!=r.length()) {
                 if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
                 re.setInvalid();
@@ -1052,7 +1128,7 @@ void qfmpResult::logicnor(qfmpResult &re, const qfmpResult &l, const qfmpResult 
             }
             break;
         }
-        case (qfmpBoolVector<<8)+qfmpBool: {
+        case (qfmpBoolVector<<16)+qfmpBool: {
             re.setBoolVec(l.boolVec.size());
             for (int i=0; i<l.boolVec.size(); i++) {
                 re.boolVec[i]=!(l.boolVec[i]||r.boolean);
@@ -1060,23 +1136,27 @@ void qfmpResult::logicnor(qfmpResult &re, const qfmpResult &l, const qfmpResult 
             break;
         }
         default:
-            re.setInvalid();
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in logic nor operation").arg(l.typeName()).arg(r.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->logicnor(re, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->logicnor(re, l, r, p);
+            else {
+                re.setInvalid();
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in logic nor operation").arg(l.typeName()).arg(r.typeName()));
+            }
             break;
     }
 }
 
 void qfmpResult::logicxor(qfmpResult &re, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
+    uint32_t lt=l.type;
+    uint32_t rt=r.type;
+    uint32_t tt=(lt<<16)+rt;
     //qDebug()<<QString::number(tt, 16);
     switch(tt) {
-        case (qfmpBool<<8)+qfmpBool:
+        case (qfmpBool<<16)+qfmpBool:
             re.setBoolean((l.boolean&&!r.boolean)||(!l.boolean&&r.boolean));
             break;
-        case (qfmpBoolVector<<8)+qfmpBoolVector: {
+        case (qfmpBoolVector<<16)+qfmpBoolVector: {
             if (l.length()!=r.length()) {
                 if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
                 re.setInvalid();
@@ -1088,7 +1168,7 @@ void qfmpResult::logicxor(qfmpResult &re, const qfmpResult &l, const qfmpResult 
             }
             break;
         }
-        case (qfmpBoolVector<<8)+qfmpBool: {
+        case (qfmpBoolVector<<16)+qfmpBool: {
             re.setBoolVec(l.boolVec.size());
             for (int i=0; i<l.boolVec.size(); i++) {
                 re.boolVec[i]=(!l.boolVec[i]&&r.boolean)||(l.boolVec[i]&&!r.boolean);
@@ -1096,8 +1176,12 @@ void qfmpResult::logicxor(qfmpResult &re, const qfmpResult &l, const qfmpResult 
             break;
         }
         default:
-            re.setInvalid();
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in logic xor operation").arg(l.typeName()).arg(r.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->logicxor(re, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->logicxor(re, l, r, p);
+            else {
+                re.setInvalid();
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in logic xor operation").arg(l.typeName()).arg(r.typeName()));
+            }
             break;
     }
 }
@@ -1114,8 +1198,11 @@ void qfmpResult::neg(qfmpResult& re, const qfmpResult &l, QFMathParser *p)
             break;
         }
         default:
-            re.setInvalid();
-            if (p) p->qfmpError(QObject::tr("argument of type %1 may not be used in negation operation").arg(l.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->neg(re, l, p);
+            else {
+                re.setInvalid();
+                if (p) p->qfmpError(QObject::tr("argument of type %1 may not be used in negation operation").arg(l.typeName()));
+            }
             break;
 
     }
@@ -1133,8 +1220,11 @@ void qfmpResult::bitwisenot(qfmpResult& re, const qfmpResult &l, QFMathParser *p
             break;
         }
         default:
-            re.setInvalid();
-            if (p) p->qfmpError(QObject::tr("argument of type %1 may not be used in bitwise not operation").arg(l.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->bitwisenot(re, l, p);
+            else {
+                re.setInvalid();
+                if (p) p->qfmpError(QObject::tr("argument of type %1 may not be used in bitwise not operation").arg(l.typeName()));
+            }
             break;
 
     }
@@ -1143,11 +1233,11 @@ void qfmpResult::bitwisenot(qfmpResult& re, const qfmpResult &l, QFMathParser *p
 
 void qfmpResult::compareequal(qfmpResult& res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    switch((uint16_t(l.type)<<8)+uint16_t(r.type)) {
-        case (qfmpDouble<<8)+qfmpDouble:
+    switch((uint32_t(l.type)<<16)+uint32_t(r.type)) {
+        case (qfmpDouble<<16)+qfmpDouble:
             res.setBoolean(l.num==r.num);
             break;
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
             if (l.numVec.size()!=r.numVec.size()) {
                 res.setInvalid();
                 if (p) p->qfmpError(QObject::tr("vectors in comparison '==' have different length"));
@@ -1158,23 +1248,23 @@ void qfmpResult::compareequal(qfmpResult& res, const qfmpResult &l, const qfmpRe
                 res.boolVec[i]=(l.numVec[i]==r.numVec[i]);
             }
             } break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
+        case (qfmpDoubleVector<<16)+qfmpDouble: {
             res.setBoolVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
                 res.boolVec[i]=(l.numVec[i]==r.num);
             }
             } break;
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
+        case (qfmpDouble<<16)+qfmpDoubleVector: {
             res.setBoolVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
                 res.boolVec[i]=(r.numVec[i]==l.num);
             }
             } break;
 
-        case (qfmpString<<8)+qfmpString:
+        case (qfmpString<<16)+qfmpString:
             res.setBoolean(l.str==r.str);
             break;
-        case (qfmpStringVector<<8)+qfmpStringVector: {
+        case (qfmpStringVector<<16)+qfmpStringVector: {
             if (l.strVec.size()!=r.strVec.size()) {
                 res.setInvalid();
                 if (p) p->qfmpError(QObject::tr("vectors in comparison '==' have different length"));
@@ -1185,13 +1275,13 @@ void qfmpResult::compareequal(qfmpResult& res, const qfmpResult &l, const qfmpRe
                 res.boolVec[i]=(l.strVec[i]==r.strVec[i]);
             }
             } break;
-        case (qfmpStringVector<<8)+qfmpString: {
+        case (qfmpStringVector<<16)+qfmpString: {
             res.setBoolVec(l.strVec.size());
             for (int i=0; i<l.strVec.size(); i++) {
                 res.boolVec[i]=(l.strVec[i]==r.str);
             }
             } break;
-        case (qfmpString<<8)+qfmpStringVector: {
+        case (qfmpString<<16)+qfmpStringVector: {
             res.setBoolVec(r.strVec.size());
             for (int i=0; i<r.strVec.size(); i++) {
                 res.boolVec[i]=(r.strVec[i]==l.str);
@@ -1199,10 +1289,10 @@ void qfmpResult::compareequal(qfmpResult& res, const qfmpResult &l, const qfmpRe
             } break;
 
 
-        case (qfmpBool<<8)+qfmpBool:
+        case (qfmpBool<<16)+qfmpBool:
             res.setBoolean(l.boolean==r.boolean);
             break;
-        case (qfmpBoolVector<<8)+qfmpBoolVector: {
+        case (qfmpBoolVector<<16)+qfmpBoolVector: {
             if (l.boolVec.size()!=r.boolVec.size()) {
                 res.setInvalid();
                 if (p) p->qfmpError(QObject::tr("vectors in comparison '==' have different length"));
@@ -1213,32 +1303,36 @@ void qfmpResult::compareequal(qfmpResult& res, const qfmpResult &l, const qfmpRe
                 res.boolVec[i]=(l.boolVec[i]==r.boolVec[i]);
             }
             } break;
-        case (qfmpBoolVector<<8)+qfmpBool: {
+        case (qfmpBoolVector<<16)+qfmpBool: {
             res.setBoolVec(l.boolVec.size());
             for (int i=0; i<l.boolVec.size(); i++) {
                 res.boolVec[i]=(l.boolVec[i]==r.boolean);
             }
             } break;
-        case (qfmpBool<<8)+qfmpBoolVector: {
+        case (qfmpBool<<16)+qfmpBoolVector: {
             res.setBoolVec(r.boolVec.size());
             for (int i=0; i<r.boolVec.size(); i++) {
                 res.boolVec[i]=(r.boolVec[i]==l.boolean);
             }
             } break;
         default:
-            res.setInvalid();
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '=='").arg(l.typeName()).arg(r.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->compareequal(res, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->compareequal(res, l, r, p);
+            else {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '=='").arg(l.typeName()).arg(r.typeName()));
+            }
             break;
     }
 }
 
 void qfmpResult::comparenotequal(qfmpResult& res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    switch((uint16_t(l.type)<<8)+uint16_t(r.type)) {
-        case (qfmpDouble<<8)+qfmpDouble:
+    switch((uint32_t(l.type)<<16)+uint32_t(r.type)) {
+        case (qfmpDouble<<16)+qfmpDouble:
             res.setBoolean(l.num!=r.num);
             break;
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
             if (l.numVec.size()!=r.numVec.size()) {
                 res.setInvalid();
                 if (p) p->qfmpError(QObject::tr("vectors in comparison '!=' have different length"));
@@ -1249,23 +1343,23 @@ void qfmpResult::comparenotequal(qfmpResult& res, const qfmpResult &l, const qfm
                 res.boolVec[i]=(l.numVec[i]!=r.numVec[i]);
             }
             } break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
+        case (qfmpDoubleVector<<16)+qfmpDouble: {
             res.setBoolVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
                 res.boolVec[i]=(l.numVec[i]!=r.num);
             }
             } break;
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
+        case (qfmpDouble<<16)+qfmpDoubleVector: {
             res.setBoolVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
                 res.boolVec[i]=(r.numVec[i]!=l.num);
             }
             } break;
 
-        case (qfmpString<<8)+qfmpString:
+        case (qfmpString<<16)+qfmpString:
             res.setBoolean(l.str!=r.str);
             break;
-        case (qfmpStringVector<<8)+qfmpStringVector: {
+        case (qfmpStringVector<<16)+qfmpStringVector: {
             if (l.strVec.size()!=r.strVec.size()) {
                 res.setInvalid();
                 if (p) p->qfmpError(QObject::tr("vectors in comparison '!=' have different length"));
@@ -1276,13 +1370,13 @@ void qfmpResult::comparenotequal(qfmpResult& res, const qfmpResult &l, const qfm
                 res.boolVec[i]=(l.strVec[i]!=r.strVec[i]);
             }
             } break;
-        case (qfmpStringVector<<8)+qfmpString: {
+        case (qfmpStringVector<<16)+qfmpString: {
             res.setBoolVec(l.strVec.size());
             for (int i=0; i<l.strVec.size(); i++) {
                 res.boolVec[i]=(l.strVec[i]!=r.str);
             }
             } break;
-        case (qfmpString<<8)+qfmpStringVector: {
+        case (qfmpString<<16)+qfmpStringVector: {
             res.setBoolVec(r.strVec.size());
             for (int i=0; i<r.strVec.size(); i++) {
                 res.boolVec[i]=(r.strVec[i]!=l.str);
@@ -1290,10 +1384,10 @@ void qfmpResult::comparenotequal(qfmpResult& res, const qfmpResult &l, const qfm
             } break;
 
 
-        case (qfmpBool<<8)+qfmpBool:
+        case (qfmpBool<<16)+qfmpBool:
             res.setBoolean(l.boolean!=r.boolean);
             break;
-        case (qfmpBoolVector<<8)+qfmpBoolVector: {
+        case (qfmpBoolVector<<16)+qfmpBoolVector: {
             if (l.boolVec.size()!=r.boolVec.size()) {
                 res.setInvalid();
                 if (p) p->qfmpError(QObject::tr("vectors in comparison '!=' have different length"));
@@ -1304,21 +1398,25 @@ void qfmpResult::comparenotequal(qfmpResult& res, const qfmpResult &l, const qfm
                 res.boolVec[i]=(l.boolVec[i]!=r.boolVec[i]);
             }
             } break;
-        case (qfmpBoolVector<<8)+qfmpBool: {
+        case (qfmpBoolVector<<16)+qfmpBool: {
             res.setBoolVec(l.boolVec.size());
             for (int i=0; i<l.boolVec.size(); i++) {
                 res.boolVec[i]=(l.boolVec[i]!=r.boolean);
             }
             } break;
-        case (qfmpBool<<8)+qfmpBoolVector: {
+        case (qfmpBool<<16)+qfmpBoolVector: {
             res.setBoolVec(r.boolVec.size());
             for (int i=0; i<r.boolVec.size(); i++) {
                 res.boolVec[i]=(r.boolVec[i]!=l.boolean);
             }
             } break;
         default:
-            res.setInvalid();
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '!='").arg(l.typeName()).arg(r.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->comparenotequal(res, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->comparenotequal(res, l, r, p);
+            else {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '!='").arg(l.typeName()).arg(r.typeName()));
+            }
             break;
     }
 }
@@ -1326,11 +1424,11 @@ void qfmpResult::comparenotequal(qfmpResult& res, const qfmpResult &l, const qfm
 
 void qfmpResult::comparegreater(qfmpResult& res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    switch((uint16_t(l.type)<<8)+uint16_t(r.type)) {
-        case (qfmpDouble<<8)+qfmpDouble:
+    switch((uint32_t(l.type)<<16)+uint32_t(r.type)) {
+        case (qfmpDouble<<16)+qfmpDouble:
             res.setBoolean(l.num>r.num);
             break;
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
             if (l.numVec.size()!=r.numVec.size()) {
                 res.setInvalid();
                 if (p) p->qfmpError(QObject::tr("vectors in comparison '>' have different length"));
@@ -1341,23 +1439,23 @@ void qfmpResult::comparegreater(qfmpResult& res, const qfmpResult &l, const qfmp
                 res.boolVec[i]=(l.numVec[i]>r.numVec[i]);
             }
             } break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
+        case (qfmpDoubleVector<<16)+qfmpDouble: {
             res.setBoolVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
                 res.boolVec[i]=(l.numVec[i]>r.num);
             }
             } break;
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
+        case (qfmpDouble<<16)+qfmpDoubleVector: {
             res.setBoolVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
                 res.boolVec[i]=(l.num>r.numVec[i]);
             }
             } break;
 
-        case (qfmpString<<8)+qfmpString:
+        case (qfmpString<<16)+qfmpString:
             res.setBoolean(l.str>r.str);
             break;
-        case (qfmpStringVector<<8)+qfmpStringVector: {
+        case (qfmpStringVector<<16)+qfmpStringVector: {
             if (l.strVec.size()!=r.strVec.size()) {
                 res.setInvalid();
                 if (p) p->qfmpError(QObject::tr("vectors in comparison '>' have different length"));
@@ -1368,13 +1466,13 @@ void qfmpResult::comparegreater(qfmpResult& res, const qfmpResult &l, const qfmp
                 res.boolVec[i]=(l.strVec[i]>r.strVec[i]);
             }
             } break;
-        case (qfmpStringVector<<8)+qfmpString: {
+        case (qfmpStringVector<<16)+qfmpString: {
             res.setBoolVec(l.strVec.size());
             for (int i=0; i<l.strVec.size(); i++) {
                 res.boolVec[i]=(l.strVec[i]>r.str);
             }
             } break;
-        case (qfmpString<<8)+qfmpStringVector: {
+        case (qfmpString<<16)+qfmpStringVector: {
             res.setBoolVec(r.strVec.size());
             for (int i=0; i<r.strVec.size(); i++) {
                 res.boolVec[i]=(l.str>r.strVec[i]);
@@ -1383,8 +1481,12 @@ void qfmpResult::comparegreater(qfmpResult& res, const qfmpResult &l, const qfmp
 
 
         default:
-            res.setInvalid();
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '>'").arg(l.typeName()).arg(r.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->comparegreater(res, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->comparegreater(res, l, r, p);
+            else {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '>'").arg(l.typeName()).arg(r.typeName()));
+            }
             break;
     }
 }
@@ -1393,11 +1495,11 @@ void qfmpResult::comparegreater(qfmpResult& res, const qfmpResult &l, const qfmp
 
 void qfmpResult::comparegreaterequal(qfmpResult& res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    switch((uint16_t(l.type)<<8)+uint16_t(r.type)) {
-        case (qfmpDouble<<8)+qfmpDouble:
+    switch((uint32_t(l.type)<<16)+uint32_t(r.type)) {
+        case (qfmpDouble<<16)+qfmpDouble:
             res.setBoolean(l.num>=r.num);
             break;
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
             if (l.numVec.size()!=r.numVec.size()) {
                 res.setInvalid();
                 if (p) p->qfmpError(QObject::tr("vectors in comparison '>=' have different length"));
@@ -1408,23 +1510,23 @@ void qfmpResult::comparegreaterequal(qfmpResult& res, const qfmpResult &l, const
                 res.boolVec[i]=(l.numVec[i]>=r.numVec[i]);
             }
             } break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
+        case (qfmpDoubleVector<<16)+qfmpDouble: {
             res.setBoolVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
                 res.boolVec[i]=(l.numVec[i]>=r.num);
             }
             } break;
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
+        case (qfmpDouble<<16)+qfmpDoubleVector: {
             res.setBoolVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
                 res.boolVec[i]=(l.num>=r.numVec[i]);
             }
             } break;
 
-        case (qfmpString<<8)+qfmpString:
+        case (qfmpString<<16)+qfmpString:
             res.setBoolean(l.str>=r.str);
             break;
-        case (qfmpStringVector<<8)+qfmpStringVector: {
+        case (qfmpStringVector<<16)+qfmpStringVector: {
             if (l.strVec.size()!=r.strVec.size()) {
                 res.setInvalid();
                 if (p) p->qfmpError(QObject::tr("vectors in comparison '>=' have different length"));
@@ -1435,13 +1537,13 @@ void qfmpResult::comparegreaterequal(qfmpResult& res, const qfmpResult &l, const
                 res.boolVec[i]=(l.strVec[i]>=r.strVec[i]);
             }
             } break;
-        case (qfmpStringVector<<8)+qfmpString: {
+        case (qfmpStringVector<<16)+qfmpString: {
             res.setBoolVec(l.strVec.size());
             for (int i=0; i<l.strVec.size(); i++) {
                 res.boolVec[i]=(l.strVec[i]>=r.str);
             }
             } break;
-        case (qfmpString<<8)+qfmpStringVector: {
+        case (qfmpString<<16)+qfmpStringVector: {
             res.setBoolVec(r.strVec.size());
             for (int i=0; i<r.strVec.size(); i++) {
                 res.boolVec[i]=(l.str>=r.strVec[i]);
@@ -1450,8 +1552,12 @@ void qfmpResult::comparegreaterequal(qfmpResult& res, const qfmpResult &l, const
 
 
         default:
-            res.setInvalid();
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '>='").arg(l.typeName()).arg(r.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->comparegreaterequal(res, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->comparegreaterequal(res, l, r, p);
+            else {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '>='").arg(l.typeName()).arg(r.typeName()));
+            }
             break;
     }
 }
@@ -1462,11 +1568,11 @@ void qfmpResult::comparegreaterequal(qfmpResult& res, const qfmpResult &l, const
 
 void qfmpResult::comparesmaller(qfmpResult& res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    switch((uint16_t(l.type)<<8)+uint16_t(r.type)) {
-        case (qfmpDouble<<8)+qfmpDouble:
+    switch((uint32_t(l.type)<<16)+uint32_t(r.type)) {
+        case (qfmpDouble<<16)+qfmpDouble:
             res.setBoolean(l.num<r.num);
             break;
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
             if (l.numVec.size()!=r.numVec.size()) {
                 res.setInvalid();
                 if (p) p->qfmpError(QObject::tr("vectors in comparison '<' have different length"));
@@ -1477,23 +1583,23 @@ void qfmpResult::comparesmaller(qfmpResult& res, const qfmpResult &l, const qfmp
                 res.boolVec[i]=(l.numVec[i]<r.numVec[i]);
             }
             } break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
+        case (qfmpDoubleVector<<16)+qfmpDouble: {
             res.setBoolVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
                 res.boolVec[i]=(l.numVec[i]<r.num);
             }
             } break;
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
+        case (qfmpDouble<<16)+qfmpDoubleVector: {
             res.setBoolVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
                 res.boolVec[i]=(l.num<r.numVec[i]);
             }
             } break;
 
-        case (qfmpString<<8)+qfmpString:
+        case (qfmpString<<16)+qfmpString:
             res.setBoolean(l.str<r.str);
             break;
-        case (qfmpStringVector<<8)+qfmpStringVector: {
+        case (qfmpStringVector<<16)+qfmpStringVector: {
             if (l.strVec.size()!=r.strVec.size()) {
                 res.setInvalid();
                 if (p) p->qfmpError(QObject::tr("vectors in comparison '<' have different length"));
@@ -1504,13 +1610,13 @@ void qfmpResult::comparesmaller(qfmpResult& res, const qfmpResult &l, const qfmp
                 res.boolVec[i]=(l.strVec[i]<r.strVec[i]);
             }
             } break;
-        case (qfmpStringVector<<8)+qfmpString: {
+        case (qfmpStringVector<<16)+qfmpString: {
             res.setBoolVec(l.strVec.size());
             for (int i=0; i<l.strVec.size(); i++) {
                 res.boolVec[i]=(l.strVec[i]<r.str);
             }
             } break;
-        case (qfmpString<<8)+qfmpStringVector: {
+        case (qfmpString<<16)+qfmpStringVector: {
             res.setBoolVec(r.strVec.size());
             for (int i=0; i<r.strVec.size(); i++) {
                 res.boolVec[i]=(l.str<r.strVec[i]);
@@ -1519,20 +1625,24 @@ void qfmpResult::comparesmaller(qfmpResult& res, const qfmpResult &l, const qfmp
 
 
         default:
-            res.setInvalid();
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '<'").arg(l.typeName()).arg(r.typeName()));
-            break;
+            if (l.type==qfmpCustom && l.custom()) l.custom()->comparesmaller(res, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->comparesmaller(res, l, r, p);
+            else {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '<'").arg(l.typeName()).arg(r.typeName()));
+                break;            }
+
     }
 }
 
 
 void qfmpResult::comparesmallerequal(qfmpResult& res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
 {
-    switch((uint16_t(l.type)<<8)+uint16_t(r.type)) {
-        case (qfmpDouble<<8)+qfmpDouble:
+    switch((uint32_t(l.type)<<16)+uint32_t(r.type)) {
+        case (qfmpDouble<<16)+qfmpDouble:
             res.setBoolean(l.num<=r.num);
             break;
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
+        case (qfmpDoubleVector<<16)+qfmpDoubleVector: {
             if (l.numVec.size()!=r.numVec.size()) {
                 res.setInvalid();
                 if (p) p->qfmpError(QObject::tr("vectors in comparison '<=' have different length"));
@@ -1543,23 +1653,23 @@ void qfmpResult::comparesmallerequal(qfmpResult& res, const qfmpResult &l, const
                 res.boolVec[i]=(l.numVec[i]<=r.numVec[i]);
             }
             } break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
+        case (qfmpDoubleVector<<16)+qfmpDouble: {
             res.setBoolVec(l.numVec.size());
             for (int i=0; i<l.numVec.size(); i++) {
                 res.boolVec[i]=(l.numVec[i]<=r.num);
             }
             } break;
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
+        case (qfmpDouble<<16)+qfmpDoubleVector: {
             res.setBoolVec(r.numVec.size());
             for (int i=0; i<r.numVec.size(); i++) {
                 res.boolVec[i]=(l.num<=r.numVec[i]);
             }
             } break;
 
-        case (qfmpString<<8)+qfmpString:
+        case (qfmpString<<16)+qfmpString:
             res.setBoolean(l.str<=r.str);
             break;
-        case (qfmpStringVector<<8)+qfmpStringVector: {
+        case (qfmpStringVector<<16)+qfmpStringVector: {
             if (l.strVec.size()!=r.strVec.size()) {
                 res.setInvalid();
                 if (p) p->qfmpError(QObject::tr("vectors in comparison '<=' have different length"));
@@ -1570,13 +1680,13 @@ void qfmpResult::comparesmallerequal(qfmpResult& res, const qfmpResult &l, const
                 res.boolVec[i]=(l.strVec[i]<=r.strVec[i]);
             }
             } break;
-        case (qfmpStringVector<<8)+qfmpString: {
+        case (qfmpStringVector<<16)+qfmpString: {
             res.setBoolVec(l.strVec.size());
             for (int i=0; i<l.strVec.size(); i++) {
                 res.boolVec[i]=(l.strVec[i]<=r.str);
             }
             } break;
-        case (qfmpString<<8)+qfmpStringVector: {
+        case (qfmpString<<16)+qfmpStringVector: {
             res.setBoolVec(r.strVec.size());
             for (int i=0; i<r.strVec.size(); i++) {
                 res.boolVec[i]=(l.str<=r.strVec[i]);
@@ -1585,10 +1695,20 @@ void qfmpResult::comparesmallerequal(qfmpResult& res, const qfmpResult &l, const
 
 
         default:
-            res.setInvalid();
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '<='").arg(l.typeName()).arg(r.typeName()));
+            if (l.type==qfmpCustom && l.custom()) l.custom()->comparesmallerequal(res, l, r, p);
+            else if (l.type==qfmpCustom && r.custom()) r.custom()->comparesmallerequal(res, l, r, p);
+            else {
+                res.setInvalid();
+                if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '<='").arg(l.typeName()).arg(r.typeName()));
+            }
             break;
     }
+}
+
+void qfmpResult::clearCustom()
+{
+    if (m_custom) delete m_custom;
+    m_custom=NULL;
 }
 
 
@@ -1606,487 +1726,7 @@ void qfmpResult::comparesmallerequal(qfmpResult& res, const qfmpResult &l, const
 
 //================================================================================================================
 
-qfmpResult qfmpResult::add(const qfmpResult &l, const qfmpResult &r, QFMathParser* p)
-{
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
-    /*qDebug()<<QString::number(tt, 16);
-    //qDebug()<<QString::number((uint16_t(qfmpDouble)<<8)+qfmpDouble, 16);
-    //qDebug()<<QString::number((uint16_t(qfmpDouble)<<8)+qfmpDoubleVector, 16);
-    //qDebug()<<QString::number((uint16_t(qfmpDoubleVector<<8))+qfmpDoubleVector, 16);
-    //qDebug()<<QString::number((uint16_t(qfmpString)<<8)+qfmpString, 16);*/
-    switch(tt) {
-        case (uint16_t(qfmpDouble)<<8)+qfmpDouble:
-            return qfmpResult(l.num+r.num);
-            break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
-            qfmpResult re;
-            re.setDoubleVec(l.numVec.size());
-            for (int i=0; i<l.numVec.size(); i++) {
-                re.numVec[i]=l.numVec[i]+r.num;
-            }
-            return re;
-            break;
-        }
-        case (uint16_t(qfmpDouble)<<8)+qfmpDoubleVector: {
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.num+r.numVec[i];
-            }
-            return re;
-            break;
-        }
-        case (uint16_t(qfmpDoubleVector<<8))+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                return invalidResult();
-            }
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.numVec[i]+r.numVec[i];
-            }
-            return re;
-            break;
-        }
-        case (uint16_t(qfmpString)<<8)+qfmpString:
-            return qfmpResult(l.str+r.str);
-            break;
-        default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be added").arg(l.typeName()).arg(r.typeName()));
-            break;
-    }
-    return invalidResult();
-}
 
-qfmpResult qfmpResult::sub(const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
-{
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
-    //qDebug()<<QString::number(tt, 16);
-    switch(tt) {
-        case (qfmpDouble<<8)+qfmpDouble:
-            return qfmpResult(l.num-r.num);
-            break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
-            qfmpResult re;
-            re.setDoubleVec(l.numVec.size());
-            for (int i=0; i<l.numVec.size(); i++) {
-                re.numVec[i]=l.numVec[i]-r.num;
-            }
-            return re;
-            break;
-        }
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.num-r.numVec[i];
-            }
-            return re;
-            break;
-        }
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                return invalidResult();
-            }
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.numVec[i]-r.numVec[i];
-            }
-            return re;
-            break;
-        }
-        default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be subtracted").arg(l.typeName()).arg(r.typeName()));
-            break;
-    }
-    return invalidResult();
-}
-
-qfmpResult qfmpResult::mul(const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
-{
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
-    //qDebug()<<QString::number(tt, 16);
-    switch(tt) {
-        case (qfmpDouble<<8)+qfmpDouble:
-            return qfmpResult(l.num*r.num);
-            break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
-            qfmpResult re;
-            re.setDoubleVec(l.numVec.size());
-            for (int i=0; i<l.numVec.size(); i++) {
-                re.numVec[i]=l.numVec[i]*r.num;
-            }
-            return re;
-            break;
-        }
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.num*r.numVec[i];
-            }
-            return re;
-            break;
-        }
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                return invalidResult();
-            }
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.numVec[i]*r.numVec[i];
-            }
-            return re;
-            break;
-        }
-        default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be multiplied").arg(l.typeName()).arg(r.typeName()));
-            break;
-    }
-    return invalidResult();
-}
-
-qfmpResult qfmpResult::div(const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
-{
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
-    //qDebug()<<QString::number(tt, 16);
-    switch(tt) {
-        case (qfmpDouble<<8)+qfmpDouble:
-            return qfmpResult(l.num/r.num);
-            break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
-            qfmpResult re;
-            re.setDoubleVec(l.numVec.size());
-            for (int i=0; i<l.numVec.size(); i++) {
-                re.numVec[i]=l.numVec[i]/r.num;
-            }
-            return re;
-            break;
-        }
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.num/r.numVec[i];
-            }
-            return re;
-            break;
-        }
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                return invalidResult();
-            }
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.numVec[i]/r.numVec[i];
-            }
-            return re;
-            break;
-        }
-        default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be divided").arg(l.typeName()).arg(r.typeName()));
-            break;
-    }
-    return invalidResult();
-}
-
-qfmpResult qfmpResult::mod(const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
-{
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
-    //qDebug()<<QString::number(tt, 16);
-    switch(tt) {
-        case (qfmpDouble<<8)+qfmpDouble:
-            return qfmpResult(double(l.toInteger()%r.toInteger()));
-            break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
-            qfmpResult re;
-            re.setDoubleVec(l.numVec.size());
-            for (int i=0; i<l.numVec.size(); i++) {
-                re.numVec[i]=int32_t(l.numVec[i])%r.toInteger();
-            }
-            return re;
-            break;
-        }
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.toInteger()%int32_t(r.numVec[i]);
-            }
-            return re;
-            break;
-        }
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                return invalidResult();
-            }
-            qfmpResult re;
-            re.setDoubleVec(l.numVec.size());
-            for (int i=0; i<l.numVec.size(); i++) {
-                re.numVec[i]=int32_t(l.numVec[i])%int32_t(r.numVec[i]);
-            }
-            return re;
-            break;
-        }
-        default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in mod operation").arg(l.typeName()).arg(r.typeName()));
-            break;
-    }
-    return invalidResult();
-}
-
-qfmpResult qfmpResult::power(const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
-{
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
-    //qDebug()<<QString::number(tt, 16);
-    switch(tt) {
-        case (qfmpDouble<<8)+qfmpDouble:
-            return qfmpResult(pow(l.num,r.num));
-            break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
-            qfmpResult re;
-            re.setDoubleVec(l.numVec.size());
-            for (int i=0; i<l.numVec.size(); i++) {
-                re.numVec[i]=pow(l.numVec[i],r.num);
-            }
-            return re;
-            break;
-        }
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=pow(l.num,r.numVec[i]);
-            }
-            return re;
-            break;
-        }
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                return invalidResult();
-            }
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=pow(l.numVec[i],r.numVec[i]);
-            }
-            return re;
-            break;
-        }
-        default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in power operation").arg(l.typeName()).arg(r.typeName()));
-            break;
-    }
-    return invalidResult();
-}
-
-qfmpResult qfmpResult::bitwiseand(const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
-{
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
-    //qDebug()<<QString::number(tt, 16);
-    switch(tt) {
-        case (qfmpDouble<<8)+qfmpDouble:
-            return qfmpResult(double(l.toInteger()&r.toInteger()));
-            break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
-            qfmpResult re;
-            re.setDoubleVec(l.numVec.size());
-            for (int i=0; i<l.numVec.size(); i++) {
-                re.numVec[i]=int32_t(l.numVec[i])&r.toInteger();
-            }
-            return re;
-            break;
-        }
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.toInteger()&int32_t(r.numVec[i]);
-            }
-            return re;
-            break;
-        }
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                return invalidResult();
-            }
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=int32_t(l.numVec[i])&int32_t(r.numVec[i]);
-            }
-            return re;
-            break;
-        }
-        default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in bitwise and operation").arg(l.typeName()).arg(r.typeName()));
-            break;
-    }
-    return invalidResult();
-}
-
-qfmpResult qfmpResult::bitwiseor(const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
-{
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
-    //qDebug()<<QString::number(tt, 16);
-    switch(tt) {
-        case (qfmpDouble<<8)+qfmpDouble:
-            return qfmpResult(double(l.toInteger()|r.toInteger()));
-            break;
-        case (qfmpDoubleVector<<8)+qfmpDouble: {
-            qfmpResult re;
-            re.setDoubleVec(l.numVec.size());
-            for (int i=0; i<l.numVec.size(); i++) {
-                re.numVec[i]=int32_t(l.numVec[i])|r.toInteger();
-            }
-            return re;
-            break;
-        }
-        case (qfmpDouble<<8)+qfmpDoubleVector: {
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=l.toInteger()|int32_t(r.numVec[i]);
-            }
-            return re;
-            break;
-        }
-        case (qfmpDoubleVector<<8)+qfmpDoubleVector: {
-            if (l.length()!=r.length()) {
-                if (p) p->qfmpError(QObject::tr("arguments have to have the same length, but lengthes were left=%1, right=%2").arg(l.length()).arg(r.length()));
-                return invalidResult();
-            }
-            qfmpResult re;
-            re.setDoubleVec(r.numVec.size());
-            for (int i=0; i<r.numVec.size(); i++) {
-                re.numVec[i]=int32_t(l.numVec[i])|int32_t(r.numVec[i]);
-            }
-            return re;
-            break;
-        }
-        default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in bitwise or operation").arg(l.typeName()).arg(r.typeName()));
-            break;
-    }
-    return invalidResult();
-}
-
-qfmpResult qfmpResult::logicand(const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
-{
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
-    //qDebug()<<QString::number(tt, 16);
-    switch(tt) {
-        case (qfmpBool<<8)+qfmpBool:
-            return qfmpResult(l.boolean&&r.boolean);
-            break;
-
-        default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in logic and operation").arg(l.typeName()).arg(r.typeName()));
-            break;
-    }
-    return invalidResult();
-}
-
-qfmpResult qfmpResult::logicor(const qfmpResult &l, const qfmpResult &r, QFMathParser *p)
-{
-    uint16_t lt=l.type;
-    uint16_t rt=r.type;
-    uint16_t tt=(lt<<8)+rt;
-    //qDebug()<<QString::number(tt, 16);
-    switch(tt) {
-        case (qfmpBool<<8)+qfmpBool:
-            return qfmpResult(l.boolean||r.boolean);
-            break;
-
-        default:
-            if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be used in logic or operation").arg(l.typeName()).arg(r.typeName()));
-            break;
-    }
-    return invalidResult();
-}
-
-qfmpResult qfmpResult::logicnot(const qfmpResult &l, QFMathParser *p)
-{
-    switch(l.type) {
-        case qfmpBool: return qfmpResult(!l.boolean);
-        default:
-            if (p) p->qfmpError(QObject::tr("argument of type %1 may not be used in logic not operation").arg(l.typeName()));
-            break;
-
-    }
-
-    return invalidResult();
-}
-
-qfmpResult qfmpResult::neg(const qfmpResult &l, QFMathParser *p)
-{
-    switch(l.type) {
-        case qfmpDouble: return qfmpResult(-l.num);
-        case qfmpDoubleVector: {
-            qfmpResult re=l;
-            for (int i=0; i<l.numVec.size(); i++) {
-                re.numVec[i]=l.numVec[i];
-            }
-            return re;
-            break;
-        }
-        default:
-            if (p) p->qfmpError(QObject::tr("argument of type %1 may not be used in negation operation").arg(l.typeName()));
-            break;
-
-    }
-
-    return invalidResult();
-}
-
-qfmpResult qfmpResult::bitwisenot(const qfmpResult &l, QFMathParser *p)
-{
-    switch(l.type) {
-        case qfmpDouble: return qfmpResult(double(~l.toInteger()));
-        case qfmpDoubleVector: {
-            qfmpResult re=l;
-            for (int i=0; i<l.numVec.size(); i++) {
-                re.numVec[i]=~int32_t(l.numVec[i]);
-            }
-            return re;
-            break;
-        }
-        default:
-            if (p) p->qfmpError(QObject::tr("argument of type %1 may not be used in bitwise not operation").arg(l.typeName()));
-            break;
-
-    }
-
-    return invalidResult();
-}
 
 QString qfmpResult::typeName() const
 {
@@ -2125,3 +1765,208 @@ QVector<int> qfmpResult::asIntVector() const
 
 
 
+
+
+qfmpCustomResult::qfmpCustomResult()
+{
+    counter++;
+    qDebug()<<"qfmpCustomResult::counter="<<counter;
+}
+
+qfmpCustomResult::~qfmpCustomResult()
+{
+    counter--;
+    qDebug()<<"qfmpCustomResult::counter="<<counter;
+}
+
+
+QString qfmpCustomResult::typeName() const
+{
+    return typeid(*this).name();
+}
+
+QString qfmpCustomResult::toTypeString(int precision) const
+{
+    return this->toString(precision)+QString(" [")+typeName()+QString("]");
+}
+
+int qfmpCustomResult::length() const
+{
+    return 1;
+}
+
+void qfmpCustomResult::clear()
+{
+
+}
+
+QVariantList qfmpCustomResult::asVariantList() const
+{
+    return QVariantList();
+}
+
+
+
+bool qfmpCustomResult::convertsTo(qfmpResultType type) const
+{
+    return false;
+}
+
+void qfmpCustomResult::convertTo(qfmpResult &res, qfmpResultType type) const
+{
+    res.setInvalid();
+}
+
+void qfmpCustomResult::add(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation '+' not defined for arguments of type %1 (l) and %2 (r)").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::sub(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation '-' not defined for arguments of type %1 (l) and %2 (r)").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::mul(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation '*' not defined for arguments of type %1 (l) and %2 (r)").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::div(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation '/' not defined for arguments of type %1 (l) and %2 (r)").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::mod(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation 'mod' not defined for arguments of type %1 (l) and %2 (r)").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::power(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation 'power' not defined for arguments of type %1 (l) and %2 (r)").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::bitwiseand(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation '&' not defined for arguments of type %1 (l) and %2 (r)").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::bitwiseor(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation '|' not defined for arguments of type %1 (l) and %2 (r)").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::logicand(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation '&&' not defined for arguments of type %1 (l) and %2 (r)").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::logicor(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation '||' not defined for arguments of type %1 (l) and %2 (r)").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::logicnot(qfmpResult &result, const qfmpResult &l, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation '!' not defined for arguments of type %1").arg(l.typeName()));
+
+}
+
+void qfmpCustomResult::logicnand(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation 'NAND' not defined for arguments of type %1 (l) and %2 (r)").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::logicnor(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation 'NOR' not defined for arguments of type %1 (l) and %2 (r)").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::logicxor(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation 'XOR' not defined for arguments of type %1 (l) and %2 (r)").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::neg(qfmpResult &result, const qfmpResult &l, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation 'neg' not defined for arguments of type %1").arg(l.typeName()));
+
+}
+
+void qfmpCustomResult::bitwisenot(qfmpResult &result, const qfmpResult &l, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("operation '~' not defined for arguments of type %1").arg(l.typeName()));
+
+}
+
+
+void qfmpCustomResult::compareequal(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '=='").arg(l.typeName()).arg(r.typeName()));
+}
+
+void qfmpCustomResult::comparenotequal(qfmpResult &result, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    result.setInvalid();
+    if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '!='").arg(l.typeName()).arg(r.typeName()));
+}
+
+void qfmpCustomResult::comparegreater(qfmpResult &res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    res.setInvalid();
+    if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '>'").arg(l.typeName()).arg(r.typeName()));
+}
+
+void qfmpCustomResult::comparegreaterequal(qfmpResult &res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    res.setInvalid();
+    if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '>='").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::comparesmaller(qfmpResult &res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    res.setInvalid();
+    if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '<'").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+void qfmpCustomResult::comparesmallerequal(qfmpResult &res, const qfmpResult &l, const qfmpResult &r, QFMathParser *p) const
+{
+    res.setInvalid();
+    if (p) p->qfmpError(QObject::tr("arguments of type %1 and %2 may not be compared '<='").arg(l.typeName()).arg(r.typeName()));
+
+}
+
+int qfmpCustomResult::counter=0;
