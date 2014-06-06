@@ -245,7 +245,7 @@ struct QFLIB_EXPORT qfmpResult {
         /*!< \brief clear the current qfmpCustomResult object */
         QFLIB_EXPORT void clearCustom();
         /*!< \brief returns a pointer to the current qfmpCustomResult object */
-        QFLIB_EXPORT qfmpCustomResult* custom() const { return m_custom; }
+        inline qfmpCustomResult* custom() const { return m_custom; }
     private:
         qfmpCustomResult* m_custom;
 };
