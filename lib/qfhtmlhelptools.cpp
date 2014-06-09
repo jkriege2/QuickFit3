@@ -15,7 +15,7 @@ QString removeHTMLComments(const QString& data) {
      return data1;
 }
 
-QString transformQF3HelpHTMLFile(const QString& filename, const QString& defaultText, bool removeNonReplaced, const QFHelpReplacesList& more_replaces, bool insertTooltips) {
+QString transformQF3HelpHTMLFile(const QString& filename, const QString& defaultText, bool removeNonReplaced, const QFHelpReplacesList& more_replaces, bool insertTooltips, bool dontCreatePics) {
     QFile f(filename);
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
         QTextStream in(&f);
@@ -25,6 +25,6 @@ QString transformQF3HelpHTMLFile(const QString& filename, const QString& default
     }
 }
 
-QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced, const QList<QPair<QString, QString> >& more_replaces, bool insertTooltips) {
-    return QFPluginServices::getInstance()->transformQF3HelpHTML(input_html, filename, removeNonReplaced, more_replaces, insertTooltips);
+QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced, const QList<QPair<QString, QString> >& more_replaces, bool insertTooltips, bool dontCreatePics) {
+    return QFPluginServices::getInstance()->transformQF3HelpHTML(input_html, filename, removeNonReplaced, more_replaces, insertTooltips,  dontCreatePics);
 }

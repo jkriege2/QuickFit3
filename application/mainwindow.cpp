@@ -2607,7 +2607,7 @@ QString MainWindow::getPluginMaybeGlobalSettings(const QString &pluginID, const 
     return ini;
 }
 
-QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced, const QF3HelpReplacesList& more_replaces, bool insertTooltips) {
+QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced, const QF3HelpReplacesList& more_replaces, bool insertTooltips, bool dontCreatePics) {
     JKQTmathText mathParser(this);
     mathParser.set_fontSize(ProgramOptions::getConfigValue("quickfit/math_pointsize", 14).toInt());
     mathParser.useXITS();
@@ -2939,40 +2939,50 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 QString latex="$"+rxLaTeX.cap(2).trimmed()+"$";
 
                 if (command=="math" || command=="bmath" || command=="mathb") {
-                    QImage pix(300,100,QImage::Format_ARGB32_Premultiplied);
-                    QPainter p(&pix);
-                    p.setRenderHint(QPainter::Antialiasing);
-                    p.setRenderHint(QPainter::HighQualityAntialiasing);
-                    p.setRenderHint(QPainter::TextAntialiasing);
-                    mathParser.parse(latex);
-                    bool ok=false;
-                    QString ht=mathParser.toHtml(&ok);
-                    if (ok) {
+                    if (dontCreatePics)  {
                         if (command=="bmath" || command=="mathb") {
-                            result=result.replace(rxLaTeX.cap(0), QString("<blockquote><font size=\"+2\" face=\"%2\"><i>%1</i></font></blockquote>").arg(ht).arg(mathParser.get_fontRoman()));
+                            result=result.replace(rxLaTeX.cap(0), QString("<blockquote><font size=\"+2\"><tt><i>%1</i></tt></font></blockquote>").arg(Qt::escape(latex)));
                         } else {
-                            result=result.replace(rxLaTeX.cap(0), QString("<font face=\"%2\"><i>%1</i></font>").arg(ht).arg(mathParser.get_fontRoman()));
+                            result=result.replace(rxLaTeX.cap(0), QString("<tt><i>%1</i></tt>").arg(Qt::escape(latex)));
                         }
+
                     } else {
-                        QSizeF size=mathParser.getSize(p);
-                        p.end();
-                        pix=QImage(size.width()*1.2, size.height()*1.1, QImage::Format_ARGB32_Premultiplied);
-                        pix.fill(Qt::transparent);
-                        p.begin(&pix);
+                        QImage pix(300,100,QImage::Format_ARGB32_Premultiplied);
+                        QPainter p(&pix);
                         p.setRenderHint(QPainter::Antialiasing);
                         p.setRenderHint(QPainter::HighQualityAntialiasing);
                         p.setRenderHint(QPainter::TextAntialiasing);
-                        mathParser.draw(p,Qt::AlignTop | Qt::AlignLeft, QRectF(QPointF(0,0), size));
-                        p.end();
-                        QString texfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+"_tex"+QString::number(count)+".png";
-                        //qDebug()<<"latex-render: "<<latex<<"\n    size = "<<size<<"  output = "<<texfilename;
-                        pix.save(texfilename);
-
-                        if (command=="bmath" || command=="mathb") {
-                            result=result.replace(rxLaTeX.cap(0), QString("<blockquote><img style=\"vertical-align: middle;\" alt=\"%1\" src=\"%2\"></blockquote>").arg(latex).arg(texfilename));
+                        mathParser.parse(latex);
+                        bool ok=false;
+                        QString ht=mathParser.toHtml(&ok);
+                        if (ok) {
+                            if (command=="bmath" || command=="mathb") {
+                                result=result.replace(rxLaTeX.cap(0), QString("<blockquote><font size=\"+2\" face=\"%2\"><i>%1</i></font></blockquote>").arg(ht).arg(mathParser.get_fontRoman()));
+                            } else {
+                                result=result.replace(rxLaTeX.cap(0), QString("<font face=\"%2\"><i>%1</i></font>").arg(ht).arg(mathParser.get_fontRoman()));
+                            }
                         } else {
-                            result=result.replace(rxLaTeX.cap(0), QString("<img style=\"vertical-align: middle;\" alt=\"%1\" src=\"%2\">").arg(latex).arg(texfilename));
-                        }                    }
+                            QSizeF size=mathParser.getSize(p);
+                            p.end();
+                            pix=QImage(size.width()*1.2, size.height()*1.1, QImage::Format_ARGB32_Premultiplied);
+                            pix.fill(Qt::transparent);
+                            p.begin(&pix);
+                            p.setRenderHint(QPainter::Antialiasing);
+                            p.setRenderHint(QPainter::HighQualityAntialiasing);
+                            p.setRenderHint(QPainter::TextAntialiasing);
+                            mathParser.draw(p,Qt::AlignTop | Qt::AlignLeft, QRectF(QPointF(0,0), size));
+                            p.end();
+                            QString texfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+"_tex"+QString::number(count)+".png";
+                            //qDebug()<<"latex-render: "<<latex<<"\n    size = "<<size<<"  output = "<<texfilename;
+                            pix.save(texfilename);
+
+                            if (command=="bmath" || command=="mathb") {
+                                result=result.replace(rxLaTeX.cap(0), QString("<blockquote><img style=\"vertical-align: middle;\" alt=\"%1\" src=\"%2\"></blockquote>").arg(latex).arg(texfilename));
+                            } else {
+                                result=result.replace(rxLaTeX.cap(0), QString("<img style=\"vertical-align: middle;\" alt=\"%1\" src=\"%2\">").arg(latex).arg(texfilename));
+                            }
+                        }
+                    }
 
                 }
 

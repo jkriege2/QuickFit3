@@ -22,6 +22,7 @@
 #include <QToolButton>
 #include <QMenuBar>
 #include "qvisiblehandlesplitter.h"
+#include "qfhtmlhelptools.h"
 
 /*! \brief this is a window that displays information from a given HTML file
     \ingroup qf3lib_widgets
@@ -99,7 +100,7 @@ class QFHTMLHelpWindow : public QWidget {
 
         QList<QPair<QString, QString> > fromHTML_replaces;
 
-        QString loadHTML(QString filename);
+        QString loadHTML(QString filename, bool noPics=false);
 
         /** \brief a label for the model name */
         QLabel* labelTitle;
