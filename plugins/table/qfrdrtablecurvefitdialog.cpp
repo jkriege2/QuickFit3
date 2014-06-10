@@ -4,6 +4,8 @@
 #include "qffitalgorithmthreaddedfit.h"
 #include "programoptions.h"
 #include "qftools.h"
+#include "qffitfunctionmanager.h"
+#include "qffitalgorithmmanager.h"
 
 QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph) :
     QDialog(parent),
@@ -33,11 +35,16 @@ QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int plotid
 
 void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph, bool propsAlreadySet)
 {
+    ui->btnHelpAlgorithm->setDefaultAction(ui->cmbFitAlgorithm->getHelpAction());
+    ui->btnHelpModel->setDefaultAction(ui->cmbFitFunction->getHelpAction());
+    ui->btnModelSelect->setDefaultAction(ui->cmbFitFunction->getSelectAction());
     parameterTable->setEditRanges(true);
     parameterTable->setEditErrors(true);
     this->colX=colX;
     this->colY=colY;
     this->colW=colW;
+    ui->chkWeighted->setChecked(colW!=-1);
+    ui->chkWeighted->setEnabled(colW!=-1);
     this->table=table;
     ui->chkLogX->setChecked(logX);
     ui->chkLogY->setChecked(logY);
@@ -133,8 +140,8 @@ void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, in
     ui->pltDistribution->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
 
     connect(ui->pltDistribution->get_plotter()->get_actZoomAll(), SIGNAL(triggered()), ui->pltResiduals, SLOT(zoomToFit()));
-    connect(ui->pltResiduals->get_plotter(), SIGNAL(zoomChangedLocally(double,double,double,double,JKQtBasePlotter*)), ui->pltDistribution, SLOT(pzoomChangedLocally(double,double,double,double,JKQtBasePlotter*)));
-    connect(ui->pltDistribution->get_plotter(), SIGNAL(zoomChangedLocally(double,double,double,double,JKQtBasePlotter*)), ui->pltResiduals, SLOT(pzoomChangedLocally(double,double,double,double,JKQtBasePlotter*)));
+    connect(ui->pltResiduals, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), ui->pltDistribution, SLOT(synchronizeXAxis(double,double,double,double,JKQtPlotter*)));//SLOT(pzoomChangedLocally(double,double,double,double,JKQtBasePlotter*)));
+    connect(ui->pltDistribution, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), ui->pltResiduals, SLOT(synchronizeXAxis(double,double,double,double,JKQtPlotter*)));
 
 
     QSettings* set=ProgramOptions::getInstance()->getQSettings();
@@ -266,6 +273,7 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
     double* dx=datX.data();
     double* dy=datY.data();
     double* dw=datW.data();
+    if (!ui->chkWeighted->isChecked()) dw=NULL;
     int items=datX.size();
 
     qDebug()<<"datapoints="<<datapoints<<"   items="<<items;
@@ -373,6 +381,7 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
 
         lastResultD.clear();
         resultComment="";
+        resultCommentLong="";
         resultPars="";
         if (ok && res.fitOK) {
             for (int i=0; i<ids.size(); i++) {
@@ -390,7 +399,10 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
                 parameterLabels<<model->getDescription(i).name;
 
             }
-            resultComment=tr("fit: %1").arg(model->shortName());
+            resultComment=tr("model: %1").arg(model->shortName());
+            resultCommentLong=tr("<b>model:</b> %1").arg(model->shortName());
+            resultCommentLong+=tr("<br><b>algorithm:</b> %1").arg(algorithm->shortName());
+            resultCommentLong+=tr("<br><b>message:</b> %1").arg(res.messageSimple);
             ok=true;
         } else {
             error=tr("Fit failed.\n  Reason: %1.").arg(res.messageSimple);
@@ -489,6 +501,7 @@ void QFRDRTableCurveFitDialog::on_btnGuess_clicked()
 
         lastResultD.clear();
         resultComment="";
+        resultCommentLong="";
 
         bool replaceFixed=true;
         if (hasFixed) {
@@ -529,6 +542,7 @@ void QFRDRTableCurveFitDialog::on_btnGuess_clicked()
                 resultPars+=QString("%1=%2").arg(ids[i]).arg(doubleToLatexQString(fitParamsInit[i]));
             }
             resultComment=tr("guess: %1").arg(model->shortName());
+            resultCommentLong=tr("<b>guess:</b> %1").arg(model->shortName());
             ok=true;
         } else {
             error=tr("Guess failed.");
@@ -626,9 +640,11 @@ void QFRDRTableCurveFitDialog::replotGraph()
     g_res->set_drawLine(true);
     g_res->set_xColumn(c_X);
     if (ui->chkWeightedResiduals->isChecked()) {
+        //qDebug()<<"weighted";
         g_res->set_title(tr("weighted residuals"));
         g_res->set_yColumn(c_ResYW);
     } else {
+        //qDebug()<<"non-weighted";
         g_res->set_title(tr("residuals"));
         g_res->set_yColumn(c_ResY);
     }
@@ -638,14 +654,20 @@ void QFRDRTableCurveFitDialog::replotGraph()
     ui->pltResiduals->addGraph(g_res);
 
 
+    //qDebug()<<"----"<<ui->pltResiduals->getYMin()<<ui->pltResiduals->getYMax();
+    ui->pltResiduals->zoomToFit(false,true);
+    //qDebug()<<ui->pltResiduals->getYMin()<<ui->pltResiduals->getYMax();
     ui->pltResiduals->set_doDrawing(true);
     ui->pltResiduals->set_emitSignals(true);
-    ui->pltResiduals->zoomToFit();
     ui->pltResiduals->update_plot();
+    //qDebug()<<ui->pltResiduals->getYMin()<<ui->pltResiduals->getYMax();
     ui->pltDistribution->set_doDrawing(true);
     ui->pltDistribution->set_emitSignals(true);
+    //qDebug()<<ui->pltResiduals->getYMin()<<ui->pltResiduals->getYMax();
     ui->pltDistribution->zoomToFit();
+    //qDebug()<<ui->pltResiduals->getYMin()<<ui->pltResiduals->getYMax();
     ui->pltDistribution->update_plot();
+    //qDebug()<<ui->pltResiduals->getYMin()<<ui->pltResiduals->getYMax()<<"----";
     QApplication::restoreOverrideCursor();
 }
 void QFRDRTableCurveFitDialog::showHelp()
@@ -705,9 +727,13 @@ void QFRDRTableCurveFitDialog::updateFitStatistics()
     if (model) {
         QStringList ids=model->getParameterIDs();
         QVector<double> vecP;
+        int params=0;
         for (int i=0; i<ids.size(); i++) {
             QFFitFunction::ParameterDescription d=model->getDescription(ids[i]);
             vecP<<getParamValue(ids[i], d.initialValue);
+            if (d.fit &&  !getParamFix(ids[i], d.initialFix)){
+                params++;
+            }
         }
         residualsY.clear();
         residualsYW.clear();
@@ -728,6 +754,7 @@ void QFRDRTableCurveFitDialog::updateFitStatistics()
 
         // estimate goodness-of-fit
         resultStat="";
+        resultStatLong="";
         if (residualsY.size()>0) {
             double chi2=0;
             double chi2w=0;
@@ -748,21 +775,27 @@ void QFRDRTableCurveFitDialog::updateFitStatistics()
             paramMap["chi2"].fix=false;
             paramMap["chi2"].editable=false;
             resultStat+=tr("\\chi^2=%1").arg(chi2);
+            resultStatLong+=tr("&chi;<sup>2</sup>=%1").arg(chi2);
             paramMap["R2"].value=R2;
             paramMap["R2"].error=0;
             paramMap["R2"].fix=false;
             paramMap["R2"].editable=false;
             resultStat+=tr(", R^2=%1").arg(R2);
+            resultStatLong+=tr(", R<sup>2</sup>=%1").arg(R2);
+            resultStatLong+=tr("<br>parameters: %1").arg(params);
+            resultStatLong+=tr("<br>data points: %1").arg(dataX.size());
 
         }
 
-        ui->labFitResult->setText(resultStat);
+        ui->labFitResult->setHtml(resultCommentLong+"<br><b>statistics:</b><blockquote>"+resultStatLong+"</blockquote>");
 
 
         delete model;
     }
 
 }
+
+
 
 void QFRDRTableCurveFitDialog::connectSignals(bool connectS)
 {
@@ -774,6 +807,7 @@ void QFRDRTableCurveFitDialog::connectSignals(bool connectS)
         connect(ui->chkPlotErrors, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         connect(ui->datacut, SIGNAL(slidersChanged(double,double,double,double)), this, SLOT(replotGraph()));
         connect(ui->chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
+        connect(ui->chkWeighted, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
     } else {
         disconnect(parameterTable, SIGNAL(fitParamChanged()), this, SLOT(replotGraph()));
         disconnect(ui->cmbFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(methodChanged(int)));
@@ -782,6 +816,7 @@ void QFRDRTableCurveFitDialog::connectSignals(bool connectS)
         disconnect(ui->chkPlotErrors, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
         disconnect(ui->datacut, SIGNAL(slidersChanged(double,double,double,double)), this, SLOT(replotGraph()));
         disconnect(ui->chkWeightedResiduals, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
+        disconnect(ui->chkWeighted, SIGNAL(toggled(bool)), this, SLOT(replotGraph()));
     }
 }
 
@@ -821,10 +856,12 @@ void QFRDRTableCurveFitDialog::readDataFromTable()
         double mif=0.1*mi;
         if (fabs(mif)<1e-15) mif=1;
         ui->datacut->set_min(mi-mif);
+        ui->datacut->set_userMin(mi-mif);
         double ma=qfstatisticsMax(dataX);
         double maf=0.1*ma;
         if (fabs(maf)<1e-15) maf=1;
         ui->datacut->set_max(ma+maf);
+        ui->datacut->set_userMax(ma+maf);
     }
 
 }
@@ -905,6 +942,7 @@ void QFRDRTableCurveFitDialog::writeFitProperties(int pid, int gid, int saveToCo
     table->colgraphSetGraphProperty(pid, gid, "FIT_MODEL", ui->cmbFitFunction->currentFitFunctionID());
     table->colgraphSetGraphProperty(pid, gid, "FIT_CUTLOW", ui->datacut->get_userMin());
     table->colgraphSetGraphProperty(pid, gid, "FIT_CUTHIGH", ui->datacut->get_userMax());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_WEIGHTED", ui->chkWeighted->isChecked());
     table->colgraphSetGraphProperty(pid, gid, "FIT_LOGX", ui->chkLogX->isChecked());
     table->colgraphSetGraphProperty(pid, gid, "FIT_LOGY", ui->chkLogY->isChecked());
     table->colgraphSetGraphProperty(pid, gid, "FIT_RESULTCOLUMN", ui->cmbSaveColumn->currentIndex());
@@ -937,6 +975,7 @@ void QFRDRTableCurveFitDialog::readFitProperties(int pid, int gid, int* resultCo
     ui->datacut->set_userMin(table->colgraphGetGraphProperty(pid, gid, "FIT_CUTLOW", ui->datacut->get_userMin()).toDouble());
     ui->datacut->set_userMax(table->colgraphGetGraphProperty(pid, gid, "FIT_CUTHIGH", ui->datacut->get_userMax()).toDouble());
     bool logX=false;
+    ui->chkWeighted->setChecked(logX=table->colgraphGetGraphProperty(pid, gid, "FIT_WEIGHTED", ui->chkWeighted->isChecked()).toBool());
     ui->chkLogX->setChecked(logX=table->colgraphGetGraphProperty(pid, gid, "FIT_LOGX", ui->chkLogX->isChecked()).toBool());
     ui->chkLogY->setChecked(table->colgraphGetGraphProperty(pid, gid, "FIT_LOGY", ui->chkLogY->isChecked()).toBool());
     ui->datacut->setLogScale(logX, 20);

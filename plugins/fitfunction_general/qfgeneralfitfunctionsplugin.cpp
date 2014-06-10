@@ -16,6 +16,8 @@
 #include "qffitfunctiongeneralmodhill5p.h"
 #include "qffitfunctiongeneralhill.h"
 #include "qffitfunctiongeneralgaussiandistvar.h"
+#include "qffitfunctiongeneral2lognormal.h"
+
 
 
 QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
@@ -26,6 +28,7 @@ QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     res<<"gen_3gaussian_sqrte";
     res<<"gen_lorentzian";
     res<<"gen_lognormal";
+    res<<"gen_2lognormal";
     res<<"gen_sine";
     res<<"gen_cos";
     res<<"gen_sigmoid";
@@ -65,6 +68,8 @@ QFFitFunction* QFGeneralFitFunctionsPlugin::get(QString id, QObject* parent) con
         return new QFFitFunctionGeneralCosine();
     } else if (id=="gen_lognormal") {
         return new QFFitFunctionGeneralLogNormal();
+    } else if (id=="gen_2lognormal") {
+        return new QFFitFunctionGeneral2LogNormal();
     } else if (id=="gen_line") {
         return new QFFitFunctionGeneralLine();
     } else if (id=="gen_polynom") {

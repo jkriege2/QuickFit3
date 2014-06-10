@@ -22,25 +22,20 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,1,0">
    <item>
-    <layout class="QFormLayout" name="formLayout_2">
+    <layout class="QGridLayout" name="gridLayout" columnstretch="0,1,0,0">
      <property name="topMargin">
       <number>6</number>
      </property>
-     <item row="0" column="0">
-      <widget class="QLabel" name="label_7">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
+     <item row="0" column="3">
+      <widget class="QToolButton" name="btnHelpAlgorithm">
        <property name="text">
-        <string>algorithm:</string>
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
        </property>
       </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QFFitAlgorithmComboBox" name="cmbFitAlgorithm"/>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label">
@@ -55,8 +50,46 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="1">
+      <widget class="QFFitAlgorithmComboBox" name="cmbFitAlgorithm"/>
+     </item>
+     <item row="1" column="3">
+      <widget class="QToolButton" name="btnHelpModel">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QLabel" name="label_7">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>algorithm:</string>
+       </property>
+      </widget>
+     </item>
      <item row="1" column="1">
       <widget class="QFFitFunctionComboBox" name="cmbFitFunction"/>
+     </item>
+     <item row="1" column="2">
+      <widget class="QToolButton" name="btnModelSelect">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -135,7 +168,7 @@
       <property name="title">
        <string> Curve Fit Configuration </string>
       </property>
-      <layout class="QVBoxLayout" name="verticalLayout_3">
+      <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,2,0,1,0,0,0,0">
        <property name="leftMargin">
         <number>9</number>
        </property>
@@ -163,6 +196,13 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item>
+          <widget class="QCheckBox" name="chkWeighted">
+           <property name="text">
+            <string>weighted</string>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QPushButton" name="btnFit">
            <property name="font">
@@ -239,11 +279,7 @@
         </widget>
        </item>
        <item>
-        <widget class="JKQTMathTextLabel" name="labFitResult">
-         <property name="text">
-          <string/>
-         </property>
-        </widget>
+        <widget class="QTextBrowser" name="labFitResult"/>
        </item>
        <item>
         <widget class="QLabel" name="label_4">
@@ -353,11 +389,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>JKQTMathTextLabel</class>
-   <extends>QLabel</extends>
-   <header>jkqtmathtext.h</header>
-  </customwidget>
-  <customwidget>
    <class>QFFitAlgorithmComboBox</class>
    <extends>QComboBox</extends>
    <header>qffitalgorithmcombobox.h</header>
@@ -366,12 +397,12 @@
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../fcsmsdevaluation/fcsmsdevaluation.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>

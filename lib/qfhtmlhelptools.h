@@ -34,7 +34,7 @@ QFLIB_EXPORT QString transformQF3HelpHTML(const QString& input_html, const QStri
     \ingroup qf3lib_tools
 
  */
-QFLIB_EXPORT QString transformQF3HelpHTMLFile(const QString& filename, const QString& defaultText=QString(""), bool removeNonReplaced=true, const QFHelpReplacesList& more_replaces=QFHelpReplacesList(), bool insertTooltips=false, bool dontCreatePics=false);
+QFLIB_EXPORT QString transformQF3HelpHTMLFile(const QString& filename, const QString& defaultText=QString("<center>No help available ...</center>"), bool removeNonReplaced=true, const QFHelpReplacesList& more_replaces=QFHelpReplacesList(), bool insertTooltips=false, bool dontCreatePics=false);
 
 
 #endif // QFHTMLHELPTOOLS_H

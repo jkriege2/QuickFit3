@@ -12,11 +12,15 @@ class QFWIDLIB_EXPORT QFFitAlgorithmComboBox : public QComboBox
         explicit QFFitAlgorithmComboBox(QWidget *parent = 0);
         QString currentFitAlgorithmID() const;
         QFFitAlgorithm* createCurrentInstance(QObject *parent=NULL) const;
+        QAction* getHelpAction() const { return actHelp; }
     signals:
 
     public slots:
         void updateFitAlgorithms();
         void setCurrentAlgorithm(const QString& id);
+        void showHelpCurrent();
+    protected:
+        QAction* actHelp;
 
 };
 

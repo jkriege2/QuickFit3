@@ -132,7 +132,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/ticktock.h \
     ../../../../LIB/trunk/qt/qfvisualize3dglwidget.h \
     ../../../../LIB/trunk/qt/qfvisualize3dgleditor.h \
-    qconfigcomboboxwidget.h
+    qconfigcomboboxwidget.h \
+    qffitfunctionselectdialog.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -225,7 +226,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     ../../../../LIB/trunk/highrestimer.cpp \
     ../../../../LIB/trunk/qt/qfvisualize3dglwidget.cpp \
     ../../../../LIB/trunk/qt/qfvisualize3dgleditor.cpp \
-    qconfigcomboboxwidget.cpp
+    qconfigcomboboxwidget.cpp \
+    qffitfunctionselectdialog.cpp
 
 
 FORMS += qfdlg_csvparameters.ui \
@@ -236,7 +238,8 @@ FORMS += qfdlg_csvparameters.ui \
     qfplottercopytotabledialog.ui \
     qfsimplecurvefitdialog.ui \
     qfrdrimagemaskbyintensity.ui \
-    ../../../../LIB/trunk/qt/qfvisualize3dgleditor.ui
+    ../../../../LIB/trunk/qt/qfvisualize3dgleditor.ui \
+    qffitfunctionselectdialog.ui
 
 
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \

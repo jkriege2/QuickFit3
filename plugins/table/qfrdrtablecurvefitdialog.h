@@ -28,7 +28,7 @@ class QFRDRTableCurveFitDialog : public QDialog
         void showHelp();
         void methodChanged(int method);
         void updateFitStatistics();
-    protected:
+     protected:
         void connectSignals(bool connectS=true);
 
         void readDataFromTable();
@@ -40,7 +40,9 @@ class QFRDRTableCurveFitDialog : public QDialog
         QList<QVariant> lastResults, lastResultsErrors;
         QVector<double> lastResultD;
         QString resultComment;
+        QString resultCommentLong;
         QString resultStat;
+        QString resultStatLong;
         QString resultPars;
         int datapoints;
         QString fitresult;

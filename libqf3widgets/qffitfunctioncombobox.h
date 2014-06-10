@@ -12,15 +12,22 @@ class QFWIDLIB_EXPORT QFFitFunctionComboBox : public QComboBox
         explicit QFFitFunctionComboBox(QWidget *parent = 0);
         QString currentFitFunctionID() const;
         QFFitFunction* createCurrentInstance(QObject *parent=NULL) const;
+        QAction* getHelpAction() const { return actHelp; }
+        QAction* getSelectAction() const { return actSelectModel; }
+
     signals:
         
     public slots:
         void updateFitFunctions(const QString& filter=QString(""));
         void setCurrentFitFunction(const QString& id);
+        void showHelpCurrent();
+        void selectModelDialog();
     protected slots:
         void reloadFitFunctions();
     protected:
         QString m_filter;
+        QAction* actHelp;
+        QAction* actSelectModel;
 
 };
 
