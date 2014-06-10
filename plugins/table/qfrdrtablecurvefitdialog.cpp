@@ -156,6 +156,7 @@ void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, in
 
     methodChanged(ui->cmbFitFunction->currentIndex());
     connectSignals(true);
+    on_btnGuess_clicked();
     on_btnFit_clicked();
 }
 
