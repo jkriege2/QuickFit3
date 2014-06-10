@@ -151,7 +151,7 @@ Qt::ItemFlags QFFitFunctionValueInputTable::flags(const QModelIndex &index) cons
             f=f|Qt::ItemIsEditable;
         } else if (fitfunction && editRanges && (coli==rangeIdx || coli==rangeIdx+1)) {
             FitParam fp=fitparamids.value(row, FitParam());
-            if (fp.isValid() && fitfunction->hasParameter(fp.id) && fitfunction->getDescription(fp.id).displayError==QFFitFunction::EditError) {
+            if (fp.isValid() && fitfunction->hasParameter(fp.id)) {
                 f=f|Qt::ItemIsEditable;
             }
         } else if (editRanges && (coli==rangeIdx || coli==rangeIdx+1)) {

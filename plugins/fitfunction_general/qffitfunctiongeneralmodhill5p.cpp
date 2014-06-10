@@ -14,7 +14,7 @@ QFFitFunctionGeneralModHill5P::QFFitFunctionGeneralModHill5P() {
     #define PARAM_POSITION 2
     addParameter(FloatNumber,  "rate",                   "rate",                                                    "m",                               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
     #define PARAM_RATE 3
-    addParameter(FloatNumber,  "asymmetry",              "asymmetry",                                               "S",                               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    addParameter(FloatNumber,  "asymmetry",              "asymmetry",                                               "S",                               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1.0,          1e-10, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
     #define PARAM_ASYMMETRY 4
     addParameter(FloatNumber,  "inflection",             "inflection",                                              "X<sub>I</sub>",                   "",            "",                      false,      false,         false,           QFFitFunction::DisplayError,       false, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
     #define PARAM_INFLECTION 5
@@ -24,7 +24,7 @@ QFFitFunctionGeneralModHill5P::QFFitFunctionGeneralModHill5P() {
 }
 
 double QFFitFunctionGeneralModHill5P::evaluate(double t, const double* data) const {
-    const double XB=data[PARAM_POSITION]+log10(pow(2,1.0/data[PARAM_ASYMMETRY])-1)/data[PARAM_RATE];
+    const double XB=data[PARAM_POSITION]+log10(pow(2,1.0/data[PARAM_ASYMMETRY])-1.0)/data[PARAM_RATE];
     return data[PARAM_BASE]+(data[PARAM_MAX]-data[PARAM_BASE])/pow(1.0+pow(10, (XB-t)*data[PARAM_RATE]), data[PARAM_ASYMMETRY]);//exp((data[PARAM_POSITION]-t)/data[PARAM_RATE]));
 
 }
@@ -72,15 +72,16 @@ bool QFFitFunctionGeneralModHill5P::estimateInitial(double *params, const double
         statisticsMinMax(dY.data(), N, mi, ma);
 
         double p=statisticsXatY50Sorted(dX.data(), dY.data(), N);
-        double range=(dX[N-1]-dX[0])/5.0;
-        if (dY[N-1]-dY[0]<0) {
-            range=range*-1.0;
-        }
 
+        double rate=(ma-mi)/(dX[N-1]-dX[0]);
+        rate=rate/log(10)*4.0/(ma-mi);
+        if (dY[N-1]-dY[0]<0) {
+            rate=rate*(-1.0);
+        }
         params[PARAM_BASE]=mi;
         params[PARAM_MAX]=ma;
         params[PARAM_POSITION]=p;
-        params[PARAM_RATE]=range/5.0;
+        params[PARAM_RATE]=rate;
         params[PARAM_ASYMMETRY]=1;
 
 

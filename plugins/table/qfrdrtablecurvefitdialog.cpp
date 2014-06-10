@@ -33,6 +33,8 @@ QFRDRTableCurveFitDialog::QFRDRTableCurveFitDialog(QFRDRTable *table, int plotid
 
 void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph, bool propsAlreadySet)
 {
+    parameterTable->setEditRanges(true);
+    parameterTable->setEditErrors(true);
     this->colX=colX;
     this->colY=colY;
     this->colW=colW;
