@@ -14,6 +14,7 @@
 #include <QPointer>
 #include <QMultiMap>
 #include "datatools.h"
+#include "qffitalgorithmparameterstorage.h"
 class QFRDRTableEditor; // forward
 
 /*! \brief this class is used to manage a table of values (strings/numbers)
@@ -22,7 +23,7 @@ class QFRDRTableEditor; // forward
     The data is stored in a QFTablePluginModel object which is also externally accessible for data access.
  */
 
-class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QFRDRColumnGraphsInterface {
+class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QFRDRColumnGraphsInterface, public QFFitAlgorithmParameterStorage {
         Q_OBJECT
         Q_INTERFACES(QFRDRTableInterface QFRDRColumnGraphsInterface)
     public:

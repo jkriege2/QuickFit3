@@ -6,6 +6,7 @@
 QFFitFunctionComboBox::QFFitFunctionComboBox(QWidget *parent) :
     QComboBox(parent)
 {
+    setContextMenuPolicy(Qt::ActionsContextMenu);
     updateFitFunctions("");
     connect(QFFitFunctionManager::getInstance(), SIGNAL(fitFunctionsChanged()), this, SLOT(reloadFitFunctions()));
     actHelp=new QAction(QIcon(":/lib/help/help.png"), tr("Fit model help ..."), this);

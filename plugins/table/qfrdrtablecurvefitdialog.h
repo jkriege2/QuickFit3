@@ -24,6 +24,7 @@ class QFRDRTableCurveFitDialog : public QDialog
         void saveResults();
         void on_btnFit_clicked();
         void on_btnGuess_clicked();
+        void on_btnConfigAlgorithm_clicked();
         void replotGraph();
         void showHelp();
         void methodChanged(int method);

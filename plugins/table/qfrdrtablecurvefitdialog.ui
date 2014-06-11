@@ -91,6 +91,17 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="2">
+      <widget class="QToolButton" name="btnConfigAlgorithm">
+       <property name="text">
+        <string>...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../application/quickfit3.qrc">
+         <normaloff>:/configure.png</normaloff>:/configure.png</iconset>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item>
@@ -395,11 +406,12 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
+  <include location="../../application/quickfit3.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../fcsmsdevaluation/fcsmsdevaluation.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
   <include location="../../lib/lib.qrc"/>

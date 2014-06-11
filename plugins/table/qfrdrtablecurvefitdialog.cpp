@@ -251,6 +251,7 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
 
     QFFitFunction* model=ui->cmbFitFunction->createCurrentInstance(this);
     QFFitAlgorithm* algorithm=ui->cmbFitAlgorithm->createCurrentInstance(this);
+    table->restoreQFFitAlgorithmParameters(algorithm);
 
     int rmin=getRangeMin();
     int rmax=getRangeMax();
@@ -293,7 +294,7 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
             fitParamsMin<<getParamMin(ids[i], d.minValue);
             fitParamsMax<<getParamMax(ids[i], d.maxValue);
             fitFix<<getParamFix(ids[i], d.initialFix);
-            fitParamsErrOut<<0.0;
+            fitParamsErrOut<<getParamError(ids[i], 0.0);
             //qDebug()<<"in:  "<<ids[i]<<" = "<<fitParamsIn.last()<<fitFix.last();
         }
         fitParamsOut=fitParamsIn;
@@ -567,6 +568,15 @@ void QFRDRTableCurveFitDialog::on_btnGuess_clicked()
 
     connectSignals(true);
     if (model) delete model;
+}
+
+void QFRDRTableCurveFitDialog::on_btnConfigAlgorithm_clicked()
+{
+    QFFitAlgorithm* algorithm=ui->cmbFitAlgorithm->createCurrentInstance(this);
+    if (algorithm) {
+        table->restoreQFFitAlgorithmParameters(algorithm);
+        table->configFitAlgorithm(algorithm);
+    }
 }
 
 

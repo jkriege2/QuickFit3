@@ -8,7 +8,7 @@
 
 
 QFFitResultsEvaluation::QFFitResultsEvaluation(const QString& fitFunctionPrefix, QFProject* parent, bool showRDRList, bool useSelection) :
-    QFEvaluationItem(parent, showRDRList, useSelection)
+    QFEvaluationItem(parent, showRDRList, useSelection), QFFitAlgorithmParameterStorage(parent)
 {
     // open ini-file to superseede fit parameter defaults from QFFitFunction
     QString inifn=parent->getServices()->getOptions()->getConfigFileDirectory()+QString("/fitparams_%1.ini").arg(getType());
@@ -36,7 +36,7 @@ QFFitResultsEvaluation::QFFitResultsEvaluation(const QString& fitFunctionPrefix,
     if (m_fitFunctions.size()>0) m_fitFunction=m_fitFunctions.keys().at(0);
 
     // get list of available fit algorithms and store their parameters in the internal algorithm_parameterstore
-    algorithm_parameterstore.clear();
+    clearQFFitAlgorithmParameters();
     QStringList fita=parent->getServices()->getFitAlgorithmManager()->getIDList();
     for (int i=0; i<fita.size(); i++) {
         QFFitAlgorithm* falg=parent->getServices()->getFitAlgorithmManager()->createAlgorithm(fita[i], this);
@@ -164,7 +164,7 @@ void QFFitResultsEvaluation::setFitFunction(QString fitFunction) {
         project->setDataChanged();
     }
 }
-
+/*
 void QFFitResultsEvaluation::storeQFFitAlgorithmParameters(QFFitAlgorithm* algorithm) {
     QString aid=algorithm->id();
     QStringList params=algorithm->getParameterIDs();
@@ -183,7 +183,7 @@ void QFFitResultsEvaluation::restoreQFFitAlgorithmParameters(QFFitAlgorithm* alg
         QString pid=params[i];
         algorithm->setParameter(pid, algorithm_parameterstore[aid].value(pid, algorithm->getParameter(pid)));
     }
-}
+}*/
 
 
 void QFFitResultsEvaluation::intWriteData(QXmlStreamWriter& w) {
@@ -191,7 +191,7 @@ void QFFitResultsEvaluation::intWriteData(QXmlStreamWriter& w) {
     w.writeAttribute("current", m_fitAlgorithm);
     intWriteDataAlgorithm(w);
 
-    QHashIterator<QString, QHash<QString, QVariant> > fapit(algorithm_parameterstore);
+    /*QHashIterator<QString, QHash<QString, QVariant> > fapit(algorithm_parameterstore);
     while (fapit.hasNext()) {
         fapit.next();
         w.writeStartElement("algorithm");
@@ -206,7 +206,8 @@ void QFFitResultsEvaluation::intWriteData(QXmlStreamWriter& w) {
             w.writeEndElement();
         }
         w.writeEndElement();
-    }
+    }*/
+    writeQFFitAlgorithmParameters(w);
 
     w.writeEndElement();
     w.writeStartElement("functions");
@@ -259,7 +260,7 @@ void QFFitResultsEvaluation::intReadData(QDomElement* e) {
         if (a=="runerror") m_weighting=RunErrorWeighting;
     }*/
     QDomElement elt=e1.firstChildElement("algorithm");
-    algorithm_parameterstore.clear();
+    /*algorithm_parameterstore.clear();
     for (; !elt.isNull(); elt = elt.nextSiblingElement("algorithm")) {
         if (elt.hasAttribute("id")) {
             QString id=elt.attribute("id");
@@ -277,7 +278,15 @@ void QFFitResultsEvaluation::intReadData(QDomElement* e) {
 
             if (m_fitAlgorithms.contains(id)) restoreQFFitAlgorithmParameters(m_fitAlgorithms[id]);
         }
+    }*/
+    readQFFitAlgorithmParameters(elt);
+    QHashIterator<QString, QHash<QString, QVariant> > apit(algorithm_parameterstore);
+    while (apit.hasNext()) {
+        apit.next();
+        const QString id=apit.key();
+        if (m_fitAlgorithms.contains(id)) restoreQFFitAlgorithmParameters(m_fitAlgorithms[id]);
     }
+
 
 
 

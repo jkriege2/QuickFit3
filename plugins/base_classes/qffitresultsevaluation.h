@@ -11,6 +11,7 @@
 #include "qffitalgorithm.h"
 #include "qffitparameterbasicinterface.h"
 #include "qffitalgorithmthreaddedfit.h"
+#include "qffitalgorithmparameterstorage.h"
 
 /*! \brief evaluation item base class for data fits using QFFitAlgorithm and QFFitFunction
     \ingroup qf3evaluationplugins
@@ -58,7 +59,7 @@ param_fix=<initial_fix>
     .
 
 */
-class QFFitResultsEvaluation : public QFEvaluationItem, public QFFitParameterBasicInterface {
+class QFFitResultsEvaluation : public QFEvaluationItem, public QFFitParameterBasicInterface, public QFFitAlgorithmParameterStorage {
     Q_OBJECT
     Q_INTERFACES(QFFitParameterBasicInterface)
 public:
@@ -704,10 +705,10 @@ public:
 
     /*! \brief save all parameters of a given QFFitAlgorithm to the internal fit algorithm parameter store algorithm_parameterstore
     */
-    virtual void storeQFFitAlgorithmParameters(QFFitAlgorithm* algorithm);
+    //virtual void storeQFFitAlgorithmParameters(QFFitAlgorithm* algorithm);
     /*! \brief load all parameters of a given QFFitAlgorithm from the internal fit algorithm parameter store algorithm_parameterstore
     */
-    virtual void restoreQFFitAlgorithmParameters(QFFitAlgorithm* algorithm) const;
+    //virtual void restoreQFFitAlgorithmParameters(QFFitAlgorithm* algorithm) const;
 
 
 
@@ -776,7 +777,7 @@ protected:
     This map effectively has two strings as key. the first is the fit algorithm ID and the second the parameter name
     The value stored for each key is a QVariant.
     */
-    QHash<QString, QHash<QString, QVariant> > algorithm_parameterstore;
+    //QHash<QString, QHash<QString, QVariant> > algorithm_parameterstore;
 
 
     /** \brief the current fitting function */

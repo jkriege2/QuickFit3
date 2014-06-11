@@ -109,7 +109,8 @@ HEADERS += dlgnewproperty.h \
     qfevaluationpropertyeditorprivate.h \
     imagetools.h \
     qfenhancedtabwidget.h \
-    qfenhancedcombobox.h
+    qfenhancedcombobox.h \
+    qffitalgorithmparameterstorage.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -187,7 +188,8 @@ SOURCES += dlgnewproperty.cpp \
     qfevaluationpropertyeditorprivate.cpp \
     imagetools.cpp \
     qfenhancedtabwidget.cpp \
-    qfenhancedcombobox.cpp
+    qfenhancedcombobox.cpp \
+    qffitalgorithmparameterstorage.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

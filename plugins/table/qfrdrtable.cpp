@@ -186,7 +186,7 @@ QFRDRTable::PlotInfo::PlotInfo()
 
 
 QFRDRTable::QFRDRTable(QFProject* parent/*, QString name, QString inputFile*/):
-    QFRawDataRecord(parent)//, name, QStringList(inputFile))
+    QFRawDataRecord(parent), QFFitAlgorithmParameterStorage(parent)//, name, QStringList(inputFile))
 {
     emitColGraphChangedSignals=true;
     datamodel=NULL;
@@ -1827,6 +1827,11 @@ void QFRDRTable::intReadData(QDomElement* e) {
             }
         }
     }
+    if (e) {
+
+        QDomElement te=e->firstChildElement("fit_algorithms").firstChildElement("algorithm");
+       readQFFitAlgorithmParameters(te);
+    }
 }
 
 void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
@@ -1878,6 +1883,9 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
     for (int i=0; i<plots.size(); i++) {
         writePlotInfo(w, plots[i]);
     }
+    w.writeEndElement();
+    w.writeStartElement("fit_algorithms");
+    writeQFFitAlgorithmParameters(w);
     w.writeEndElement();
 }
 
