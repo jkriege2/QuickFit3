@@ -251,6 +251,7 @@ QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {
         unsigned long rateN=m->getRateN();
         unsigned int rateRuns=m->getRateRuns();
         unsigned int rateChannels=m->getRateChannels();
+        //qDebug()<<channel<<rateT<<rate<<rateN<<rateRuns<<rateChannels;
         QString binned="";
         QString channelName="";
         if (rateChannels>1) channelName=tr(" channel %1").arg(channel);

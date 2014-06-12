@@ -97,6 +97,7 @@ QFRDRFCSData::QFRDRFCSData(QFProject* parent):
     rateN=0;
     rateT=NULL;
     rate=NULL;
+    rateChannels=0;
 
     autoCalcRateN=200;
     binnedRateN=0;
@@ -164,7 +165,7 @@ void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
 }
 
 void QFRDRFCSData::resizeRates(long long N, int runs, int channels) {
-    //qDebug()<<"resizeRates( N="<<N<<",  runs="<<runs<<",  channels="<<channels<<")";
+    qDebug()<<"resizeRates( N="<<N<<",  runs="<<runs<<",  channels="<<channels<<")";
     if (rateT) free(rateT);
     if (rate) free(rate);
     rateRuns=0;
@@ -174,10 +175,14 @@ void QFRDRFCSData::resizeRates(long long N, int runs, int channels) {
     rateN=N;
     rateRuns=runs;
     rateChannels=channels;
-    rateT=(double*)calloc(rateN, sizeof(double));
-    rate=(double*)calloc(rateChannels*rateN*rateRuns, sizeof(double));
-    if (!rateT || !rate)
-        setError(tr("Error while allocating memory for count rate data!"));
+    if (N>0) {
+        rateT=(double*)calloc(rateN, sizeof(double));
+        if (runs>0 && channels>0) {
+            rate=(double*)calloc(rateChannels*rateN*rateRuns, sizeof(double));
+        }
+        if (!rateT || !rate)
+            setError(tr("Error while allocating memory for count rate data!"));
+    }
     emitRawDataChanged();
     rateMean.clear();
     rateStdDev.clear();
@@ -186,7 +191,7 @@ void QFRDRFCSData::resizeRates(long long N, int runs, int channels) {
 }
 
 void QFRDRFCSData::resizeBinnedRates(long long N) {
-    //qDebug()<<"resizeBinnedRates( N="<<N<<"),  rateChannels="<<rateChannels<<",  rateRuns="<<rateRuns;
+    qDebug()<<"resizeBinnedRates( N="<<N<<"),  rateChannels="<<rateChannels<<",  rateRuns="<<rateRuns;
     if (binnedRateT) free(binnedRateT);
     if (binnedRate) free(binnedRate);
     binnedRateN=0;
@@ -494,6 +499,7 @@ struct CSVDATA {
 };
 
 bool QFRDRFCSData::loadCountRatesFromCSV(QStringList filenames, int rateChannels) {
+    //qDebug()<<"loadCountRatesFromCSV"<<filenames<<rateChannels;
     QList<CSVDATA> data;
     char separatorchar=',';
     char commentchar='#';
