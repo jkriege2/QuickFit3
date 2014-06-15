@@ -380,6 +380,8 @@ void QFRDRTablePlotWidget::setAxisProps(JKQTPcoordinateAxis* axis, const QFRDRTa
         QVector<double> nums=current->model()->getColumnDataAsNumbers(axisData.columnNamedTickValues);
         QVariantList labels=current->model()->getColumnData(axisData.columnNamedTickNames);
         int cnt=qMax(nums.size(), labels.size());
+        qDebug()<<nums<<labels<<cnt;
+        axis->clearAxisTickLabels();
         for (int i=0; i<cnt; i++) {
             axis->addAxisTickLabel(nums[i], labels[i].toString());
         }
