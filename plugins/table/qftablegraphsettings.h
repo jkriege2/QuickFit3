@@ -53,8 +53,10 @@ class QFTableGraphSettings : public QWidget
 
         void on_btnClearLinesXData_clicked();
         void on_btnClearLinesXError_clicked();
+        void on_btnClearLinesXError2_clicked();
         void on_btnClearLinesYData_clicked();
         void on_btnClearLinesYError_clicked();
+        void on_btnClearLinesYError2_clicked();
         void on_btnClearLinesMax_clicked();
         void on_btnClearLinesMean_clicked();
         void on_btnClearLinesQ75_clicked();

@@ -199,6 +199,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         }
 
 
+
         struct GraphInfo {
             GraphInfo();
             //void setBoxplotColumns(int position, int minC, int q25C, int medianC, int meanC, int q75C, int maxC);
@@ -231,6 +232,13 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             double errorWidth;
             Qt::PenStyle errorLineStyle;
             double errorBarSize;
+
+            double offset;
+            int xerrorcolumnlower;
+            int yerrorcolumnlower;
+            bool xerrorsymmetric;
+            bool yerrorsymmetric;
+
 
 
             int stride;

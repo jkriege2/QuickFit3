@@ -60,5 +60,8 @@
         <file>icons/plot_vrange.png</file>
         <file>icons/plot_pscatter.png</file>
         <file alias="wizard.png">icons/wizard.png</file>
+        <file alias="plot_errordir_both.png">icons/plot_errordir_both.png</file>
+        <file alias="plot_errordir_down.png">icons/plot_errordir_down.png</file>
+        <file alias="plot_errordir_up.png">icons/plot_errordir_up.png</file>
     </qresource>
 </RCC>

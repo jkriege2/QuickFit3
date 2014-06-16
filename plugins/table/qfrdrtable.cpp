@@ -44,6 +44,10 @@ QFRDRTable::GraphInfo::GraphInfo() {
     errorLineStyle=Qt::SolidLine;
     errorBarSize=7;
 
+    xerrorsymmetric=true;
+    yerrorsymmetric=true;
+
+
     colorTransparent=1;
     errorColorTransparent=1;
     fillColorTransparent=0.3;
@@ -102,6 +106,10 @@ QFRDRTable::GraphInfo::GraphInfo() {
     dataSelectColumn=-1;
     dataSelectOperation=dsoEquals;
     dataSelectCompareValue=0;
+
+    offset=0;
+    xerrorcolumnlower=-1;
+    yerrorcolumnlower=-1;
 }
 
 QFRDRTable::AxisInfo::AxisInfo()
@@ -1419,6 +1427,14 @@ void QFRDRTable::readGraphInfo(GraphInfo& graph, QDomElement ge) {
     graph.fillColorAuto=QStringToBool(ge.attribute("fill_color_auto", "true"));
     graph.centerColorAuto=QStringToBool(ge.attribute("center_color_auto", "true"));
 
+    graph.offset=CQStringToDouble(ge.attribute("offset", "0"));
+    graph.xerrorcolumnlower=ge.attribute("xerrorcolumnlower", "-1").toInt();
+    graph.yerrorcolumnlower=ge.attribute("yerrorcolumnlower", "-1").toInt();
+
+    graph.xerrorsymmetric=QStringToBool(ge.attribute("xerrorsymmetric", "true"));
+    graph.yerrorsymmetric=QStringToBool(ge.attribute("yerrorsymmetric", "true"));
+
+
     graph.moreProperties.clear();
     QDomElement gmp=ge.firstChildElement("property");
     while (!gmp.isNull()) {
@@ -1619,6 +1635,12 @@ void QFRDRTable::writeGraphInfo(QXmlStreamWriter &w, const QFRDRTable::GraphInfo
     w.writeAttribute("fill_color_auto", boolToQString( graph.fillColorAuto));
     w.writeAttribute("center_color_auto", boolToQString( graph.centerColorAuto));
 
+    w.writeAttribute("offset", CDoubleToQString(graph.offset));
+    w.writeAttribute("xerrorcolumnlower", QString::number(graph.xerrorcolumnlower));
+    w.writeAttribute("yerrorcolumnlower", QString::number(graph.yerrorcolumnlower));
+
+    w.writeAttribute("xerrorsymmetric", boolToQString( graph.xerrorsymmetric));
+    w.writeAttribute("yerrorsymmetric", boolToQString( graph.yerrorsymmetric));
 
 
     QMapIterator<QString, QVariant> mit(graph.moreProperties);
@@ -1912,6 +1934,8 @@ void QFRDRTable::columnsInserted(int start, int count, bool emitRebuild)
             g.ycolumn=QFRDRTableOffsetIfLarger(g.ycolumn, start, count);
             g.xerrorcolumn=QFRDRTableOffsetIfLarger(g.xerrorcolumn, start, count);
             g.yerrorcolumn=QFRDRTableOffsetIfLarger(g.yerrorcolumn, start, count);
+            g.xerrorcolumnlower=QFRDRTableOffsetIfLarger(g.xerrorcolumnlower, start, count);
+            g.yerrorcolumnlower=QFRDRTableOffsetIfLarger(g.yerrorcolumnlower, start, count);
             g.meancolumn=QFRDRTableOffsetIfLarger(g.meancolumn, start, count);
             g.q75column=QFRDRTableOffsetIfLarger(g.q75column, start, count);
             g.maxcolumn=QFRDRTableOffsetIfLarger(g.maxcolumn, start, count);
@@ -1947,6 +1971,8 @@ void QFRDRTable::columnsRemoved(int start, int count, bool emitRebuild)
             g.ycolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.ycolumn, start, count);
             g.xerrorcolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.xerrorcolumn, start, count);
             g.yerrorcolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.yerrorcolumn, start, count);
+            g.xerrorcolumnlower=QFRDRTableOffsetIfLargerM1IfInRange(g.xerrorcolumnlower, start, count);
+            g.yerrorcolumnlower=QFRDRTableOffsetIfLargerM1IfInRange(g.yerrorcolumnlower, start, count);
             g.meancolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.meancolumn, start, count);
             g.q75column=QFRDRTableOffsetIfLargerM1IfInRange(g.q75column, start, count);
             g.maxcolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.maxcolumn, start, count);

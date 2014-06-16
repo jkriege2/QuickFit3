@@ -380,7 +380,7 @@ void QFRDRTablePlotWidget::setAxisProps(JKQTPcoordinateAxis* axis, const QFRDRTa
         QVector<double> nums=current->model()->getColumnDataAsNumbers(axisData.columnNamedTickValues);
         QVariantList labels=current->model()->getColumnData(axisData.columnNamedTickNames);
         int cnt=qMax(nums.size(), labels.size());
-        qDebug()<<nums<<labels<<cnt;
+        //qDebug()<<nums<<labels<<cnt;
         axis->clearAxisTickLabels();
         for (int i=0; i<cnt; i++) {
             axis->addAxisTickLabel(nums[i], labels[i].toString());
@@ -451,6 +451,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_title(g.title);
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                pg->set_baseline(g.offset);
                 /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
@@ -463,6 +464,13 @@ void QFRDRTablePlotWidget::updateGraph() {
                     pg->set_yErrorStyle(g.errorStyle);
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
+                }
+                if (!g.yerrorsymmetric) {
+                    pg->set_yErrorSymmetric(false);
+                    pg->set_yErrorColumnLower(getColumnWithStride(g.yerrorcolumnlower, g));
+                    if (pg->get_yErrorColumn()>=0 || pg->get_yErrorColumnLower()>=0 ) {
+                        pg->set_yErrorStyle(g.errorStyle);
+                    }
                 }
                 //pg->set_drawLine(g.drawLine);
                 //pg->set_symbol(g.symbol);
@@ -494,10 +502,18 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_xErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                pg->set_baseline(g.offset);
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
+                }
+                if (!g.xerrorsymmetric) {
+                    pg->set_xErrorSymmetric(false);
+                    pg->set_xErrorColumnLower(getColumnWithStride(g.xerrorcolumnlower, g));
+                    if (pg->get_xErrorColumn()>=0 || pg->get_xErrorColumnLower()>=0 ) {
+                        pg->set_xErrorStyle(g.errorStyle);
+                    }
                 }
                 /*pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
                 if (pg->get_yErrorColumn()>=0) {
@@ -534,12 +550,21 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_width(g.width);
                 pg->set_shift(g.shift);
+                pg->set_baseline(g.offset);
+                pg->set_baseline(g.offset);
                 pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
-                pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                //pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
+                }
+                if (!g.xerrorsymmetric) {
+                    pg->set_xErrorSymmetric(false);
+                    pg->set_xErrorColumnLower(getColumnWithStride(g.xerrorcolumnlower, g));
+                    if (pg->get_xErrorColumn()>=0 || pg->get_xErrorColumnLower()>=0 ) {
+                        pg->set_xErrorStyle(g.errorStyle);
+                    }
                 }
                 pg->set_yErrorStyle(JKQTPnoError);
                 /*pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
@@ -557,13 +582,13 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_color(c);
                 QColor ec=g.errorColor;
                 ec.setAlphaF(g.errorColorTransparent);
-                //pg->set_errorColor(ec);
+                pg->set_errorColor(ec);
                 QColor efc=g.errorColor;
                 efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
-                //pg->set_errorFillColor(efc);
-//                pg->set_errorWidth(g.errorWidth);
-//                pg->set_errorStyle(g.errorLineStyle);
-//                pg->set_errorbarSize(g.errorbarSize);
+                pg->set_errorFillColor(efc);
+                pg->set_errorWidth(g.errorWidth);
+                pg->set_errorStyle(g.errorLineStyle);
+                pg->set_errorbarSize(g.errorBarSize);
 
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
@@ -576,7 +601,8 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_title(g.title);
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
-                pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
+                pg->set_baseline(g.offset);
+                //pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
                 pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
                 pg->set_width(g.width);
                 pg->set_shift(g.shift);
@@ -592,6 +618,13 @@ void QFRDRTablePlotWidget::updateGraph() {
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
                 }
+                if (!g.yerrorsymmetric) {
+                    pg->set_yErrorSymmetric(false);
+                    pg->set_yErrorColumnLower(getColumnWithStride(g.yerrorcolumnlower, g));
+                    if (pg->get_yErrorColumn()>=0 || pg->get_yErrorColumnLower()>=0 ) {
+                        pg->set_yErrorStyle(g.errorStyle);
+                    }
+                }
                 pg->set_xErrorStyle(JKQTPnoError);
                 //pg->set_drawLine(g.drawLine);
                 //pg->set_symbol(g.symbol);
@@ -602,13 +635,13 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_color(c);
                 QColor ec=g.errorColor;
                 ec.setAlphaF(g.errorColorTransparent);
-                //pg->set_errorColor(ec);
+                pg->set_errorColor(ec);
                 QColor efc=g.errorColor;
                 efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
-                //pg->set_errorFillColor(efc);
-//                pg->set_errorWidth(g.errorWidth);
-//                pg->set_errorStyle(g.errorLineStyle);
-//                pg->set_errorbarSize(g.errorbarSize);
+                pg->set_errorFillColor(efc);
+                pg->set_errorWidth(g.errorWidth);
+                pg->set_errorStyle(g.errorLineStyle);
+                pg->set_errorbarSize(g.errorBarSize);
 
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
@@ -621,6 +654,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_title(g.title);
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                pg->set_baseline(g.offset);
                 /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
@@ -632,6 +666,13 @@ void QFRDRTablePlotWidget::updateGraph() {
                     pg->set_yErrorStyle(g.errorStyle);
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
+                }
+                if (!g.yerrorsymmetric) {
+                    pg->set_yErrorSymmetric(false);
+                    pg->set_yErrorColumnLower(getColumnWithStride(g.yerrorcolumnlower, g));
+                    if (pg->get_yErrorColumn()>=0 || pg->get_yErrorColumnLower()>=0 ) {
+                        pg->set_yErrorStyle(g.errorStyle);
+                    }
                 }
                 pg->set_drawLine(g.drawLine);
                 //pg->set_symbol(g.symbol);
@@ -662,10 +703,18 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_xErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
+                pg->set_baseline(g.offset);
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
+                }
+                if (!g.xerrorsymmetric) {
+                    pg->set_xErrorSymmetric(false);
+                    pg->set_xErrorColumnLower(getColumnWithStride(g.xerrorcolumnlower, g));
+                    if (pg->get_xErrorColumn()>=0 || pg->get_xErrorColumnLower()>=0 ) {
+                        pg->set_xErrorStyle(g.errorStyle);
+                    }
                 }
 
                 pg->set_drawLine(g.drawLine);
@@ -783,11 +832,25 @@ void QFRDRTablePlotWidget::updateGraph() {
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
                 }
+                if (!g.xerrorsymmetric) {
+                    pg->set_xErrorSymmetric(false);
+                    pg->set_xErrorColumnLower(getColumnWithStride(g.xerrorcolumnlower, g));
+                    if (pg->get_xErrorColumn()>=0 || pg->get_xErrorColumnLower()>=0 ) {
+                        pg->set_xErrorStyle(g.errorStyle);
+                    }
+                }
                 pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
                 if (pg->get_yErrorColumn()>=0) {
                     pg->set_yErrorStyle(g.errorStyle);
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
+                }
+                if (!g.yerrorsymmetric) {
+                    pg->set_yErrorSymmetric(false);
+                    pg->set_yErrorColumnLower(getColumnWithStride(g.yerrorcolumnlower, g));
+                    if (pg->get_yErrorColumn()>=0 || pg->get_yErrorColumnLower()>=0 ) {
+                        pg->set_yErrorStyle(g.errorStyle);
+                    }
                 }
                 pg->set_errorWidth(g.errorWidth);
                 pg->set_errorStyle(g.errorLineStyle);
@@ -1254,20 +1317,35 @@ void QFRDRTablePlotWidget::updateGraph() {
                 } else {
                     pg->set_xErrorStyle(JKQTPnoError);
                 }
+                if (!g.xerrorsymmetric) {
+                    pg->set_xErrorSymmetric(false);
+                    pg->set_xErrorColumnLower(getColumnWithStride(g.xerrorcolumnlower, g));
+                    if (pg->get_xErrorColumn()>=0 || pg->get_xErrorColumnLower()>=0 ) {
+                        pg->set_xErrorStyle(g.errorStyle);
+                    }
+                }
                 pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
                 if (pg->get_yErrorColumn()>=0) {
                     pg->set_yErrorStyle(g.errorStyle);
                 } else {
                     pg->set_yErrorStyle(JKQTPnoError);
                 }
-                pg->set_errorWidth(g.errorWidth);
-                pg->set_errorStyle(g.errorLineStyle);
-                pg->set_errorbarSize(g.errorBarSize);
+                if (!g.yerrorsymmetric) {
+                    pg->set_yErrorSymmetric(false);
+                    pg->set_yErrorColumnLower(getColumnWithStride(g.yerrorcolumnlower, g));
+                    if (pg->get_yErrorColumn()>=0 || pg->get_yErrorColumnLower()>=0 ) {
+                        pg->set_yErrorStyle(g.errorStyle);
+                    }
+                }
+
 
                 //qDebug()<<g.title<<pg->get_xColumn()<<pg->get_yColumn();
                 pg->set_drawLine(g.drawLine);
                 pg->set_symbol(g.symbol);
                 pg->set_symbolSize(g.symbolSize);
+                pg->set_style(g.style);
+
+
                 pg->set_lineWidth(g.linewidth);
                 QColor c=g.color;
                 c.setAlphaF(g.colorTransparent);
@@ -1281,7 +1359,10 @@ void QFRDRTablePlotWidget::updateGraph() {
                 QColor fc=g.fillColor;
                 fc.setAlphaF(g.fillColorTransparent);
                 pg->set_fillColor(fc);
-                pg->set_style(g.style);
+                pg->set_errorWidth(g.errorWidth);
+                pg->set_errorStyle(g.errorLineStyle);
+                pg->set_errorbarSize(g.errorBarSize);
+
                 ui->plotter->addGraph(pg);
              }
         }

@@ -126,8 +126,10 @@ void QFTableGraphSettings::updateComboboxes()
 {
     reloadColumns(ui->cmbLinesXData);
     reloadColumns(ui->cmbLinesXError);
+    reloadColumns(ui->cmbLinesXError2);
     reloadColumns(ui->cmbLinesYData);
     reloadColumns(ui->cmbLinesYError);
+    reloadColumns(ui->cmbLinesYError2);
     reloadColumns(ui->cmbLinesMax);
     reloadColumns(ui->cmbLinesMean);
     reloadColumns(ui->cmbLinesQ75);
@@ -207,11 +209,16 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
 
         graph.xcolumn=qMax(-2, ui->cmbLinesXData->currentData().toInt());
         graph.xerrorcolumn=qMax(-2, ui->cmbLinesXError->currentData().toInt());
+        graph.xerrorcolumnlower=qMax(-2, ui->cmbLinesXError2->currentData().toInt());
         graph.ycolumn=qMax(-2, ui->cmbLinesYData->currentData().toInt());
         graph.yerrorcolumn=qMax(-2, ui->cmbLinesYError->currentData().toInt());
+        graph.yerrorcolumnlower=qMax(-2, ui->cmbLinesYError2->currentData().toInt());
         graph.meancolumn=qMax(-2, ui->cmbLinesMean->currentData().toInt());
         graph.maxcolumn=qMax(-2, ui->cmbLinesMax->currentData().toInt());
         graph.q75column=qMax(-2, ui->cmbLinesQ75->currentData().toInt());
+
+        graph.xerrorsymmetric=ui->chkXErrSym->isChecked();
+        graph.yerrorsymmetric=ui->chkYErrSym->isChecked();
 
         graph.width=ui->edtWidth->value()/100.0;
         graph.shift=ui->edtShift->value()/100.0;
@@ -300,6 +307,7 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.dataSelectColumn=qMax(-2, ui->cmbSelectDataColumn->currentData().toInt());
         graph.dataSelectOperation=(QFRDRTable::DataSelectOperation)ui->cmbSelectDataCompare->currentIndex();
         graph.dataSelectCompareValue=ui->edtSelectDataValue->value();
+        graph.offset=ui->edtOffset->value();
 
         graph.functionType=(QFRDRTable::GTFunctionType)ui->cmbFunctionType->currentIndex();
         if (graph.functionType==QFRDRTable::gtfQFFunction) {
@@ -332,7 +340,7 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
 
 void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
 {
-    qDebug()<<"loadGraphData()";
+    //qDebug()<<"loadGraphData()";
     updating=true;
     ui->edtGraphTitle->setText(graph.title);
 
@@ -341,17 +349,22 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
 
     ui->cmbLinesXData->setCurrentData(graph.xcolumn);
     ui->cmbLinesXError->setCurrentData(graph.xerrorcolumn);
+    ui->cmbLinesXError2->setCurrentData(graph.xerrorcolumnlower);
     ui->cmbLinesYData->setCurrentData(graph.ycolumn);
     ui->cmbLinesYError->setCurrentData(graph.yerrorcolumn);
+    ui->cmbLinesYError2->setCurrentData(graph.yerrorcolumnlower);
     ui->cmbLinesMax->setCurrentData(graph.maxcolumn);
     ui->cmbLinesMean->setCurrentData(graph.meancolumn);
     ui->cmbLinesQ75->setCurrentData(graph.q75column);
 
+    ui->chkXErrSym->setChecked(graph.xerrorsymmetric);
+    ui->chkYErrSym->setChecked(graph.yerrorsymmetric);
 
     ui->cmbGraphType->setCurrentIndex(ui->cmbGraphType->findData((int)graph.type));
 
     ui->edtWidth->setValue(graph.width*100.0);
     ui->edtShift->setValue(graph.shift*100.0);
+    ui->edtOffset->setValue(graph.offset);
 
 
     ui->cmbErrorColor->setCurrentColor(graph.errorColor);
@@ -472,10 +485,12 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         ui->cmbLineStyle->setVisible(true);
         ui->cmbLinesXData->setVisible(true);
         ui->btnAutoX->setVisible(true);
-        ui->cmbLinesXError->setVisible(true);
+        ui->widErrorX->setVisible(true);
+        ui->widErrorX2->setVisible(true);
         ui->cmbLinesYData->setVisible(true);
         ui->btnAutoY->setVisible(true);
-        ui->cmbLinesYError->setVisible(true);
+        ui->widErrorY->setVisible(true);
+        ui->widErrorY2->setVisible(true);
         ui->widFunction->setVisible(false);
         ui->labFuction->setVisible(false);
         ui->chkSTrided->setVisible(true);
@@ -486,9 +501,9 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         ui->labWhisker->setVisible(false);
 
         ui->btnClearLinesXData->setVisible(true);
-        ui->btnClearLinesXError->setVisible(true);
+        ui->widErrorX->setVisible(true);
         ui->btnClearLinesYData->setVisible(true);
-        ui->btnClearLinesYError->setVisible(true);
+        ui->widErrorY->setVisible(true);
         ui->btnClearLinesMax->setVisible(false);
         ui->btnClearLinesMean->setVisible(false);
         ui->btnClearLinesQ75->setVisible(false);
@@ -561,102 +576,84 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         ui->widRangeData->setVisible(false);
         ui->widRangeStyle->setVisible(false);
         ui->btnRefit->setVisible(false);
+        ui->labOffset->setVisible(false);
+        ui->edtOffset->setVisible(false);
 
         switch(ui->cmbGraphType->itemData(ui->cmbGraphType->currentIndex()).toInt()) {
 
 
             case QFRDRTable::gtImpulsesVertical:
                 //graph.type=QFRDRTable::gtImpulsesVertical;
-                ui->cmbLinesXError->setVisible(false);
+                ui->widErrorX->setVisible(false);
                 ui->labErrorX->setVisible(false);
                 ui->chkDrawLine->setVisible(false);
                 ui->cmbLineStyle->setVisible(false);
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
-                ui->btnClearLinesXError->setVisible(false);
+                ui->widErrorX2->setVisible(false);
+                ui->labOffset->setVisible(true);
+                ui->edtOffset->setVisible(true);
 
-                /*ui->widLineStyle->setVisible(false);
-                ui->cmbLinesXError->setVisible(false);
-                ui->chkDrawLine->setVisible(false);
-                ui->cmbLineStyle->setVisible(false);*/
                 break;
             case QFRDRTable::gtImpulsesHorizontal:
                 //graph.type=QFRDRTable::gtImpulsesHorizontal;
-                ui->cmbLinesXError->setVisible(false);
+                ui->widErrorX->setVisible(false);
                 ui->labErrorX->setVisible(false);
                 ui->chkDrawLine->setVisible(false);
                 ui->cmbLineStyle->setVisible(false);
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
                 ui->btnFit->setVisible(false);
-                ui->btnClearLinesXError->setVisible(false);
+                ui->widErrorX2->setVisible(false);
+                ui->labOffset->setVisible(true);
+                ui->edtOffset->setVisible(true);
 
-                /*ui->cmbErrorColor->setVisible(true);
-                ui->cmbErrorStyle->setVisible(true);
-                ui->cmbLinesXError->setVisible(false);
-                ui->cmbLinesYError->setVisible(true);
-                ui->chkDrawLine->setVisible(false);
-                ui->cmbSymbol->setVisible(true);
-                ui->spinSymbolSize->setVisible(true);
-                ui->cmbFillColor->setVisible(true);
-                ui->cmbLineStyle->setVisible(false);                */
+
 
                 break;
             case QFRDRTable::gtFilledCurveX:
                 //graph.type=QFRDRTable::gtFilledCurveX;
-                ui->cmbLinesXError->setVisible(false);
+                ui->widErrorX->setVisible(false);
                 ui->labErrorX->setVisible(false);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
-                ui->btnClearLinesXError->setVisible(false);
+                ui->widErrorX2->setVisible(false);
+                ui->labOffset->setVisible(true);
+                ui->edtOffset->setVisible(true);
 
-                /*ui->cmbErrorColor->setVisible(true);
-                ui->cmbErrorStyle->setVisible(true);
-                ui->cmbLinesXError->setVisible(false);
-                ui->cmbLinesYError->setVisible(true);
-                ui->chkDrawLine->setVisible(false);
-                ui->cmbSymbol->setVisible(false);
-                ui->spinSymbolSize->setVisible(false);
-                ui->cmbFillColor->setVisible(true);
-                ui->cmbLineStyle->setVisible(true);*/
+
                 break;
             case QFRDRTable::gtFilledCurveY:
                 //graph.type=QFRDRTable::gtFilledCurveY;
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
-                ui->cmbLinesXError->setVisible(false);
+                ui->widErrorX->setVisible(false);
                 ui->labErrorX->setVisible(false);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
                 ui->btnFit->setVisible(false);
-                ui->btnClearLinesXError->setVisible(false);
+                ui->widErrorX2->setVisible(false);
+                ui->labOffset->setVisible(true);
+                ui->edtOffset->setVisible(true);
 
-                /*ui->cmbErrorColor->setVisible(true);
-                ui->cmbErrorStyle->setVisible(true);
-                ui->cmbLinesXError->setVisible(false);
-                ui->cmbLinesYError->setVisible(true);
-                ui->chkDrawLine->setVisible(false);
-                ui->cmbSymbol->setVisible(false);
-                ui->spinSymbolSize->setVisible(false);
-                ui->cmbFillColor->setVisible(true);
-                ui->cmbLineStyle->setVisible(true);*/
+
                 break;
             case QFRDRTable::gtStepsVertical:
                 //graph.type=QFRDRTable::gtStepsVertical;
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
-                ui->cmbLinesXError->setVisible(false);
+                ui->widErrorX->setVisible(false);
                 ui->labErrorX->setVisible(false);
-                ui->cmbLinesYError->setVisible(false);
+                ui->widErrorY->setVisible(false);
                 ui->labErrorY->setVisible(false);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
                 ui->widErrorStyle->setVisible(false);
                 ui->labErrorStyle->setVisible(false);
-                ui->btnClearLinesXError->setVisible(false);
-                ui->btnClearLinesYError->setVisible(false);
+                ui->widErrorX2->setVisible(false);
+                ui->widErrorY2->setVisible(false);
 
                 /*ui->cmbErrorColor->setVisible(false);
                 ui->cmbErrorStyle->setVisible(false);
@@ -672,17 +669,17 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widImage->setVisible(false);
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
-                ui->cmbLinesXError->setVisible(false);
+                ui->widErrorX->setVisible(false);
                 ui->labErrorX->setVisible(false);
-                ui->cmbLinesYError->setVisible(false);
+                ui->widErrorY->setVisible(false);
                 ui->labErrorY->setVisible(false);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
                 ui->widErrorStyle->setVisible(false);
                 ui->labErrorStyle->setVisible(false);
                 ui->btnFit->setVisible(false);
-                ui->btnClearLinesXError->setVisible(false);
-                ui->btnClearLinesYError->setVisible(false);
+                ui->widErrorX2->setVisible(false);
+                ui->widErrorY2->setVisible(false);
 /*                    ui->cmbErrorColor->setVisible(false);
                 ui->cmbErrorStyle->setVisible(false);
                 ui->cmbLinesXError->setVisible(false);
@@ -695,9 +692,9 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 //graph.type=QFRDRTable::gtbarsVertical;
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
-                ui->cmbLinesXError->setVisible(false);
+                ui->widErrorX->setVisible(false);
                 ui->labErrorX->setVisible(false);
-                ui->cmbLinesYError->setVisible(true);
+                ui->widErrorY->setVisible(true);
                 ui->labErrorY->setVisible(true);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
@@ -709,8 +706,10 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->edtWidth->setVisible(true);
                 ui->edtShift->setVisible(true);
                 ui->widWidth->setVisible(true);
-                ui->btnClearLinesXError->setVisible(false);
-                ui->btnClearLinesYError->setVisible(false);
+                ui->widErrorX2->setVisible(true);
+                ui->widErrorY2->setVisible(true);
+                ui->labOffset->setVisible(true);
+                ui->edtOffset->setVisible(true);
 
 /*                    ui->cmbErrorColor->setVisible(false);
                 ui->cmbErrorStyle->setVisible(false);
@@ -725,9 +724,9 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 //graph.type=QFRDRTable::gtbarsHorizontal;
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
-                ui->cmbLinesXError->setVisible(true);
+                ui->widErrorX->setVisible(true);
                 ui->labErrorX->setVisible(true);
-                ui->cmbLinesYError->setVisible(false);
+                ui->widErrorY->setVisible(false);
                 ui->labErrorY->setVisible(false);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
@@ -740,8 +739,10 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->edtWidth->setVisible(true);
                 ui->edtShift->setVisible(true);
                 ui->widWidth->setVisible(true);
-                ui->btnClearLinesXError->setVisible(false);
-                ui->btnClearLinesYError->setVisible(false);
+                ui->widErrorX2->setVisible(true);
+                ui->widErrorY2->setVisible(true);
+                ui->labOffset->setVisible(true);
+                ui->edtOffset->setVisible(true);
                 break;
             case QFRDRTable::gtParametrizedScatter:
                 ui->labImage->setVisible(true);
@@ -805,6 +806,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->cmbLinesMax->setVisible(true);
                 ui->cmbLinesMean->setVisible(true);
                 ui->cmbLinesQ75->setVisible(true);
+                ui->widErrorY->setVisible(false);
+                ui->widErrorX->setVisible(false);
 
                 ui->btnClearLinesMax->setVisible(true);
                 ui->btnClearLinesMean->setVisible(true);
@@ -830,11 +833,11 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
             case QFRDRTable::gtImage:
                 //graph.type=QFRDRTable::gtImage;
                 ui->btnFit->setVisible(false);
-                ui->cmbLinesXError->setVisible(false);
+                ui->widErrorX->setVisible(false);
                 ui->labErrorX->setVisible(false);
                 ui->cmbLinesYData->setVisible(true);
                 ui->labDataY->setVisible(true);
-                ui->cmbLinesYError->setVisible(false);
+                ui->widErrorY->setVisible(false);
                 ui->labErrorY->setVisible(false);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
@@ -848,9 +851,9 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labLinestyle->setVisible(false);
                 ui->labDataX->setText(tr("image col.:"));
                 ui->labDataY->setText(tr("modifier col.:"));
-                ui->btnClearLinesXError->setVisible(false);
+                ui->widErrorX2->setVisible(false);
                 ui->btnClearLinesYData->setVisible(true);
-                ui->btnClearLinesYError->setVisible(false);
+                ui->widErrorY2->setVisible(false);
                 ui->chkSelectData->setVisible(false);
                 ui->widDataSelect->setVisible(false);
                 ui->chkSTrided->setVisible(false);
@@ -877,14 +880,14 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
             case QFRDRTable::gtRGBImage:
                 //graph.type=QFRDRTable::gtRGBImage;
                 ui->btnFit->setVisible(false);
-                ui->cmbLinesXError->setVisible(true);
+                ui->widErrorX->setVisible(true);
                 ui->labErrorX->setVisible(true);
                 ui->cmbLinesYData->setVisible(true);
                 ui->labDataY->setVisible(true);
-                ui->cmbLinesYError->setVisible(true);
-                ui->btnClearLinesXError->setVisible(true);
+                ui->widErrorY2->setVisible(false);
+                ui->widErrorX2->setVisible(false);
                 ui->btnClearLinesYData->setVisible(true);
-                ui->btnClearLinesYError->setVisible(true);
+                ui->widErrorY->setVisible(true);
                 ui->labErrorY->setVisible(true);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
@@ -932,15 +935,15 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 //graph.type=QFRDRTable::gtMaskImage;
                 ui->btnFit->setVisible(false);
                 ui->labDataX->setText(tr("mask col.:"));
-                ui->cmbLinesXError->setVisible(false);
+                ui->widErrorX->setVisible(false);
                 ui->labErrorX->setVisible(false);
                 ui->cmbLinesYData->setVisible(false);
                 ui->btnAutoY->setVisible(false);
                 ui->labDataY->setVisible(false);
-                ui->cmbLinesYError->setVisible(false);
-                ui->btnClearLinesXError->setVisible(false);
+                ui->widErrorY2->setVisible(false);
+                ui->widErrorX2->setVisible(false);
                 ui->btnClearLinesYData->setVisible(false);
-                ui->btnClearLinesYError->setVisible(false);
+                ui->widErrorY->setVisible(false);
                 ui->chkSelectData->setVisible(false);
                 ui->widDataSelect->setVisible(false);
                 ui->chkSTrided->setVisible(false);
@@ -984,15 +987,17 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labDataY->setText(tr("func. param. col."));
                 ui->labImage->setVisible(false);
                 ui->widImage->setVisible(false);
-                ui->cmbLinesXError->setVisible(false);
+                ui->widErrorX->setVisible(false);
+                ui->widErrorY->setVisible(false);
                 ui->labErrorX->setVisible(false);
+                ui->labErrorY->setVisible(false);
                 ui->cmbLinesXData->setVisible(false);
                 ui->btnAutoX->setVisible(false);
                 ui->labDataX->setVisible(false);
-                ui->cmbLinesYError->setVisible(false);
-                ui->btnClearLinesXError->setVisible(false);
+                ui->widErrorY2->setVisible(false);
+                ui->widErrorX2->setVisible(false);
                 ui->btnClearLinesYData->setVisible(false);
-                ui->btnClearLinesYError->setVisible(false);
+                ui->widErrorY->setVisible(false);
                 ui->btnClearLinesQ75->setVisible(false);
                 ui->btnClearLinesMean->setVisible(false);
                 ui->btnClearLinesMax->setVisible(false);
@@ -1036,8 +1041,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widRangeData->setVisible(true);
                 ui->widRangeStyle->setVisible(true);
 
-                ui->cmbLinesXError->setVisible(false);
-                ui->cmbLinesXError->setVisible(false);
+                ui->widErrorX->setVisible(false);
+                ui->widErrorX2->setVisible(false);
                 ui->labErrorX->setVisible(false);
                 ui->labSymbol->setVisible(false);
                 ui->widSymbol->setVisible(false);
@@ -1062,10 +1067,10 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->cmbLineStyle->setVisible(true);
                 ui->cmbLinesXData->setVisible(false);
                 ui->btnAutoX->setVisible(false);
-                ui->cmbLinesXError->setVisible(false);
+                ui->widErrorX->setVisible(false);
                 ui->cmbLinesYData->setVisible(false);
                 ui->btnAutoY->setVisible(false);
-                ui->cmbLinesYError->setVisible(false);
+                ui->widErrorY->setVisible(false);
                 ui->widFunction->setVisible(false);
                 ui->labFuction->setVisible(false);
                 ui->chkSelectData->setVisible(false);
@@ -1073,9 +1078,9 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->chkSTrided->setVisible(false);
                 ui->widStride->setVisible(false);
                 ui->btnClearLinesXData->setVisible(false);
-                ui->btnClearLinesXError->setVisible(false);
+                ui->widErrorX->setVisible(false);
                 ui->btnClearLinesYData->setVisible(false);
-                ui->btnClearLinesYError->setVisible(false);
+                ui->widErrorY2->setVisible(false);
                 ui->btnClearLinesMax->setVisible(false);
                 ui->btnClearLinesMean->setVisible(false);
                 ui->btnClearLinesQ75->setVisible(false);
@@ -1108,15 +1113,19 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->cmbGraphType, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLinesXData, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLinesXError, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbLinesXError2, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->chkXErrSym, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    connect(ui->chkYErrSym, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->cmbLinesYData, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLinesYError, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
 
     connect(ui->cmbLinesMax, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLinesMean, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
-    connect(ui->cmbLinesYError, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbLinesYError2, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLinesQ75, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->edtWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->edtShift, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtOffset, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 
     connect(ui->cmbFillColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbErrorColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
@@ -1197,6 +1206,7 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->edtWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->edtShift, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 
+    disconnect(ui->edtOffset, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 
     disconnect(ui->cmbLinesQ75, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->edtFunction, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
@@ -1204,11 +1214,14 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->cmbGraphType, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbLinesXData, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbLinesXError, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbLinesXError2, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->chkXErrSym, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
+    disconnect(ui->chkYErrSym, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbLinesYData, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbLinesYError, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbLinesMax, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbLinesMean, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
-    disconnect(ui->cmbLinesYError, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbLinesYError2, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbErrorColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbFillColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbErrorStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
@@ -1343,7 +1356,7 @@ void QFTableGraphSettings::on_btnAutoX_clicked()
                     if (en!=name) {
                         bool found=(rxID.indexIn(name)>=0);
                         bool exactmatch=(rxID.cap(3)==id);
-                        qDebug()<<step<<i<<en<<found<<exactmatch<<rxID.cap(1)<<rxID.cap(2)<<rxID.cap(3);
+                        //qDebug()<<step<<i<<en<<found<<exactmatch<<rxID.cap(1)<<rxID.cap(2)<<rxID.cap(3);
                         if ((exactmatch && step==0)||(found && step==1)) {
                             for (int j=0; j<searchPhrases.size(); j++) {
                                 if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
@@ -1484,6 +1497,11 @@ void QFTableGraphSettings::on_btnClearLinesXError_clicked()
     ui->cmbLinesXError->setCurrentData(-1);
 }
 
+void QFTableGraphSettings::on_btnClearLinesXError2_clicked()
+{
+    ui->cmbLinesXError2->setCurrentData(-1);
+}
+
 void QFTableGraphSettings::on_btnClearLinesYData_clicked()
 {
     ui->cmbLinesYData->setCurrentData(-1);
@@ -1492,6 +1510,11 @@ void QFTableGraphSettings::on_btnClearLinesYData_clicked()
 void QFTableGraphSettings::on_btnClearLinesYError_clicked()
 {
     ui->cmbLinesYError->setCurrentData(-1);
+}
+
+void QFTableGraphSettings::on_btnClearLinesYError2_clicked()
+{
+    ui->cmbLinesYError2->setCurrentData(-1);
 }
 
 void QFTableGraphSettings::on_btnClearLinesMax_clicked()
