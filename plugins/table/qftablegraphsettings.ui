@@ -2791,11 +2791,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFFitFunctionComboBox</class>
-   <extends>QComboBox</extends>
-   <header>qffitfunctioncombobox.h</header>
-  </customwidget>
-  <customwidget>
    <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
    <header>qfdoubleedit.h</header>
@@ -2812,6 +2807,11 @@
    <class>ColorComboBox</class>
    <extends>QComboBox</extends>
    <header>colorcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QFFitFunctionComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qffitfunctioncombobox.h</header>
   </customwidget>
   <customwidget>
    <class>JKQTPCAlabelTypeComboBox</class>
@@ -2868,11 +2868,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>567</x>
-     <y>612</y>
+     <y>646</y>
     </hint>
     <hint type="destinationlabel">
      <x>595</x>
-     <y>613</y>
+     <y>647</y>
     </hint>
    </hints>
   </connection>
@@ -2884,11 +2884,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>453</x>
-     <y>658</y>
+     <y>692</y>
     </hint>
     <hint type="destinationlabel">
      <x>481</x>
-     <y>659</y>
+     <y>693</y>
     </hint>
    </hints>
   </connection>
@@ -2900,11 +2900,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>566</x>
-     <y>753</y>
+     <y>787</y>
     </hint>
     <hint type="destinationlabel">
      <x>594</x>
-     <y>754</y>
+     <y>788</y>
     </hint>
    </hints>
   </connection>
@@ -2916,11 +2916,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>74</x>
-     <y>515</y>
+     <y>549</y>
     </hint>
     <hint type="destinationlabel">
      <x>595</x>
-     <y>518</y>
+     <y>552</y>
     </hint>
    </hints>
   </connection>
@@ -2932,11 +2932,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>192</x>
-     <y>988</y>
+     <y>1022</y>
     </hint>
     <hint type="destinationlabel">
      <x>351</x>
-     <y>990</y>
+     <y>1024</y>
     </hint>
    </hints>
   </connection>
@@ -2948,11 +2948,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>192</x>
-     <y>988</y>
+     <y>1022</y>
     </hint>
     <hint type="destinationlabel">
      <x>431</x>
-     <y>990</y>
+     <y>1024</y>
     </hint>
    </hints>
   </connection>
@@ -2964,11 +2964,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>192</x>
-     <y>988</y>
+     <y>1022</y>
     </hint>
     <hint type="destinationlabel">
      <x>589</x>
-     <y>990</y>
+     <y>1024</y>
     </hint>
    </hints>
   </connection>
@@ -2980,11 +2980,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>595</x>
-     <y>613</y>
+     <y>647</y>
     </hint>
     <hint type="destinationlabel">
      <x>567</x>
-     <y>612</y>
+     <y>646</y>
     </hint>
    </hints>
   </connection>
@@ -2996,11 +2996,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>481</x>
-     <y>659</y>
+     <y>693</y>
     </hint>
     <hint type="destinationlabel">
      <x>453</x>
-     <y>658</y>
+     <y>692</y>
     </hint>
    </hints>
   </connection>
@@ -3012,11 +3012,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>594</x>
-     <y>754</y>
+     <y>788</y>
     </hint>
     <hint type="destinationlabel">
      <x>566</x>
-     <y>753</y>
+     <y>787</y>
     </hint>
    </hints>
   </connection>
@@ -3028,11 +3028,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>567</x>
-     <y>897</y>
+     <y>931</y>
     </hint>
     <hint type="destinationlabel">
      <x>595</x>
-     <y>898</y>
+     <y>932</y>
     </hint>
    </hints>
   </connection>
@@ -3044,11 +3044,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>567</x>
-     <y>920</y>
+     <y>954</y>
     </hint>
     <hint type="destinationlabel">
      <x>595</x>
-     <y>921</y>
+     <y>955</y>
     </hint>
    </hints>
   </connection>
@@ -3060,11 +3060,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>595</x>
-     <y>898</y>
+     <y>932</y>
     </hint>
     <hint type="destinationlabel">
      <x>567</x>
-     <y>897</y>
+     <y>931</y>
     </hint>
    </hints>
   </connection>
@@ -3076,11 +3076,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>595</x>
-     <y>921</y>
+     <y>955</y>
     </hint>
     <hint type="destinationlabel">
      <x>567</x>
-     <y>920</y>
+     <y>954</y>
     </hint>
    </hints>
   </connection>
@@ -3092,11 +3092,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>303</x>
-     <y>656</y>
+     <y>690</y>
     </hint>
     <hint type="destinationlabel">
      <x>259</x>
-     <y>659</y>
+     <y>693</y>
     </hint>
    </hints>
   </connection>
@@ -3108,11 +3108,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>476</x>
-     <y>1167</y>
+     <y>1201</y>
     </hint>
     <hint type="destinationlabel">
      <x>432</x>
-     <y>1170</y>
+     <y>1204</y>
     </hint>
    </hints>
   </connection>
@@ -3124,11 +3124,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>385</x>
-     <y>751</y>
+     <y>785</y>
     </hint>
     <hint type="destinationlabel">
      <x>341</x>
-     <y>754</y>
+     <y>788</y>
     </hint>
    </hints>
   </connection>
@@ -3140,7 +3140,7 @@
    <hints>
     <hint type="sourcelabel">
      <x>543</x>
-     <y>1225</y>
+     <y>1259</y>
     </hint>
     <hint type="destinationlabel">
      <x>59</x>
@@ -3155,12 +3155,76 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>65</x>
-     <y>538</y>
+     <x>74</x>
+     <y>572</y>
     </hint>
     <hint type="destinationlabel">
-     <x>351</x>
-     <y>541</y>
+     <x>467</x>
+     <y>575</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkXErrSym</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbLinesXError2</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>161</x>
+     <y>207</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>272</x>
+     <y>211</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkXErrSym</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnClearLinesXError2</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>129</x>
+     <y>212</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>580</x>
+     <y>212</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkYErrSym</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbLinesYError2</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>227</x>
+     <y>288</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>263</x>
+     <y>288</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkYErrSym</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnClearLinesYError2</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>138</x>
+     <y>289</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>585</x>
+     <y>293</y>
     </hint>
    </hints>
   </connection>

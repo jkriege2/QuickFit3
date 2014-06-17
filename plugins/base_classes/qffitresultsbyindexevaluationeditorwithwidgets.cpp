@@ -78,13 +78,17 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
     layModel=new QHBoxLayout();
     layModel->setContentsMargins(0,0,0,0);
-    cmbModel=new QComboBox(this);
+    cmbModel=new QFFitFunctionComboBox(this);
     l=new QLabel(tr("Fit &Model:"), this);
     l->setBuddy(cmbModel);
     layModel->addWidget(l);
     cmbModel->setEditable(false);
     layModel->addWidget(cmbModel);
-    btnModelHelp=createButtonAndActionShowText(actModelHelp, QIcon(":/fcsfit/fit_help.png"), tr("Model H&elp"), this);
+    btnModelSelector=createButtonForActionShowText(actModelSelector=cmbModel->getSelectAction(), this);
+    btnModelSelector->setMaximumWidth(250);
+    layModel->addWidget(btnModelSelector);
+    btnModelHelp=createButtonForActionShowText(actModelHelp=cmbModel->getHelpAction(), this);
+    //btnModelHelp=createButtonAndActionShowText(actModelHelp, QIcon(":/fcsfit/fit_help.png"), tr("Model H&elp"), this);
     btnModelHelp->setMaximumWidth(250);
     layModel->addWidget(btnModelHelp);
     layModel->addStretch();
@@ -462,7 +466,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
     connect(actAlgorithmHelp, SIGNAL(triggered()), this, SLOT(displayFitAlgorithmHelp()));
     connect(actConfigAlgorithm, SIGNAL(triggered()), this, SLOT(configFitAlgorithm()));
-    connect(actModelHelp, SIGNAL(triggered()), this, SLOT(displayFitFunctionHelp()));
+    //connect(actModelHelp, SIGNAL(triggered()), this, SLOT(displayFitFunctionHelp()));
     connect(pltData, SIGNAL(zoomChangedLocally(double, double, double, double, JKQtPlotter*)), this, SLOT(zoomChangedLocally(double, double, double, double, JKQtPlotter*)));
     connect(pltData, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
     connect(pltResiduals, SIGNAL(plotMouseMove(double, double)), this, SLOT(plotMouseMove(double, double)));
@@ -598,13 +602,14 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEva
         chkWeightedResiduals->setChecked(current->getProperty("weighted_residuals", false).toBool());
         spinResidualHistogramBins->setValue(current->getProperty("plot_residualshistogrambins", 25).toInt());
 
-        QStringList ff=fcs->getAvailableFitFunctions();
+        /*QStringList ff=fcs->getAvailableFitFunctions();
         for (int i=0; i<ff.size(); i++) {
             QString id=ff[i];
             if (fcs->getFitFunction(id)) cmbModel->addItem(QIcon(":/lib/fitfunc_icon.png"), fcs->getFitFunction(id)->name(), id);
             else  cmbModel->addItem(QIcon(":/lib/fitfunc_icon.png"), tr("unknown fit function"), id);
-        }
-        ff=fcs->getAvailableFitAlgorithms();
+        }*/
+        cmbModel->updateFitFunctions(fcs->getAvailableFitFunctions());
+        QStringList ff=fcs->getAvailableFitAlgorithms();
         for (int i=0; i<ff.size(); i++) {
             QString id=ff[i];
             if (fcs->getFitAlgorithm(id)->isThreadSafe()) cmbAlgorithm->addItem(QIcon(":/lib/fitalg_icon_mt.png"), fcs->getFitAlgorithm(id)->name(), id);
@@ -613,9 +618,9 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEva
 
 
         if (fcs->getFitFunction()!=NULL) {
-            cmbModel->setCurrentIndex(cmbModel->findData(fcs->getFitFunction()->id()));
+            cmbModel->setCurrentFitFunction(fcs->getFitFunction()->id());
         } else {
-            cmbModel->setCurrentIndex(cmbModel->findData(-1));
+            cmbModel->setCurrentIndex(-1);
         }
         if (fcs->getFitAlgorithm()!=NULL) {
             cmbAlgorithm->setCurrentIndex(cmbAlgorithm->findData(fcs->getFitAlgorithm()->id()));
@@ -795,9 +800,12 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::highlightingChanged(QFRawDa
         spinRun->setValue(eval->getCurrentIndex());//currentRecord->getProperty(resultID+"_selected_run", -1).toInt());
         //if (data->getCorrelationRuns()>1)
         spinRun->setSuffix(QString(" / %2..%1").arg(eval->getIndexMax(currentRecord)).arg(eval->getIndexMin(currentRecord)));
-        int newidx=cmbModel->findData(eval->getFitFunction()->id());
+        QString oldID=cmbModel->currentFitFunctionID();
+        cmbModel->setCurrentFitFunction(eval->getFitFunction()->id());
+        if (cmbModel->currentFitFunctionID()!=oldID) modelChanged=true;
+        /*int newidx=cmbModel->findData(eval->getFitFunction()->id());
         if (newidx!=cmbModel->currentIndex()) modelChanged=true;
-        cmbModel->setCurrentIndex(newidx);
+        cmbModel->setCurrentIndex(newidx);*/
         dataEventsEnabled=true;
 
     }
@@ -959,29 +967,6 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::zoomChangedLocally(double n
     }
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::displayFitFunctionHelp()
-{
-    //hlpFunction->clear();
-    if (!current) return;
-    QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    //QStringList sl;
-    //sl<<":/";
-    QString pid=cmbModel->itemData(cmbModel->currentIndex()).toString();
-    int ppid=services->getFitFunctionManager()->getPluginForID(pid);
-    //QString dll=services->getFitFunctionManager()->getPluginFilename(pid);
-    //if (data->getFitFunction(ppid)->helpFile().isEmpty()) hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+data->getFitFunction(ppid)->id()+".html");
-    //else hlpFunction->updateHelp(data->getFitFunction(ppid)->name(), services->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(dll).baseName()+QString("/")+data->getFitFunction(ppid)->helpFile());
-    //hlpFunction->show();
-    QFFitFunction* function=data->getFitFunction(pid);
-    QString help=services->getFitFunctionManager()->getPluginHelp(ppid, pid);
-    if (QFile::exists(help) && function) {
-        QFPluginServices::getInstance()->displayHelpWindow(help);
-        //hlpFunction->updateHelp(help);
-        //hlpFunction->show();
-    } else {
-        QMessageBox::information(this, tr("FCS Fit"), tr("No Online-Help for this fit function available."));
-    }
-}
 
 void QFFitResultsByIndexEvaluationEditorWithWidgets::displayFitAlgorithmHelp()
 {
@@ -1079,7 +1064,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::modelChanged(int model)
     if (!current->getHighlightedRecord()) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFFitResultsByIndexEvaluation* data=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    QString ff=cmbModel->itemData(cmbModel->currentIndex()).toString();
+    QString ff=cmbModel->currentFitFunctionID(); //cmbModel->itemData(cmbModel->currentIndex()).toString();
     data->setFitFunction(ff);
     displayModel(true);
     replotData();

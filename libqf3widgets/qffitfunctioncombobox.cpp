@@ -50,7 +50,8 @@ void QFFitFunctionComboBox::showHelpCurrent()
 void QFFitFunctionComboBox::selectModelDialog()
 {
     QFFitFunctionSelectDialog* dlg=new QFFitFunctionSelectDialog(this);
-    dlg->init(m_filter, currentFitFunctionID());
+    if (m_availableFuncs.size()>0) dlg->init(m_availableFuncs, currentFitFunctionID());
+    else dlg->init(m_filter, currentFitFunctionID());
     if (dlg->exec()) {
         setCurrentFitFunction(dlg->getSelected());
     }
@@ -67,11 +68,26 @@ void QFFitFunctionComboBox::reloadFitFunctions()
 void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
 {
     m_filter=filter;
+    m_availableFuncs.clear();
     QFFitFunctionManager* manager=QFFitFunctionManager::getInstance();
     bool upd=updatesEnabled();
     setUpdatesEnabled(false);
     clear();
-    QMap<QString, QFFitFunction*> m_fitFunctions=manager->getModels(filter, this);
+    QMap<QString, QFFitFunction*> m_fitFunctions;
+    if (filter.contains(",")) {
+        QStringList fl=filter.split(",");
+        for (int i=0; i<fl.size(); i++) {
+            QMap<QString, QFFitFunction*> ff=manager->getModels(fl[i], this);
+            QMapIterator<QString, QFFitFunction*> itf(ff);
+            while (itf.hasNext()) {
+                itf.next();
+                if (!m_fitFunctions.contains(itf.key()))  m_fitFunctions[itf.key()]=itf.value();
+                else delete itf.value();
+            }
+        }
+    } else {
+        m_fitFunctions=manager->getModels(filter, this);
+    }
     QMapIterator<QString, QFFitFunction*> it(m_fitFunctions);
     while (it.hasNext())  {
         it.next();
@@ -82,4 +98,26 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
     }
     model()->sort(0);
     setUpdatesEnabled(upd);
+}
+
+void QFFitFunctionComboBox::updateFitFunctions(const QStringList &availableFF)
+{
+    m_filter="";
+    m_availableFuncs=availableFF;
+    if (m_availableFuncs.size()<=0) updateFitFunctions("");
+    else {
+        QFFitFunctionManager* manager=QFFitFunctionManager::getInstance();
+        bool upd=updatesEnabled();
+        setUpdatesEnabled(false);
+        clear();
+        for (int i=0; i<m_availableFuncs.size(); i++)  {
+            QFFitFunction* ff=manager->createFunction(m_availableFuncs[i], this);
+            if (ff) {
+                addItem(QIcon(":/lib/fitfunc_icon.png"), ff->shortName(), m_availableFuncs[i]);
+                delete ff;
+            }
+        }
+        model()->sort(0);
+        setUpdatesEnabled(upd);
+    }
 }

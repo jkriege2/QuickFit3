@@ -149,6 +149,7 @@ QFRDRTable::AxisInfo::AxisInfo()
 
 QFRDRTable::PlotInfo::PlotInfo()
 {
+    showTitle=true;
     graphAutosize=true;
     graphWidth=120;
     graphHeight=70;
@@ -185,6 +186,15 @@ QFRDRTable::PlotInfo::PlotInfo()
      gridColor=QColor("darkgrey");
      gridStyle=Qt::DashLine;
      gridWidth=0.5;
+
+
+     keyXMargin=0.5;
+     keyYMargin=0.25;
+     keyXOffset=0.5;
+     keyYOffset=0.5;
+     keyXSeparation=0.75;
+     keyYSeparation=0.2;
+     key_line_length=3;
 }
 
 
@@ -1491,6 +1501,7 @@ void QFRDRTable::writePlotInfo(QXmlStreamWriter &w, const QFRDRTable::PlotInfo &
     w.writeAttribute("gheight", QString::number(plot.graphHeight));
 
     w.writeAttribute("showkey", boolToQString(plot.showKey));
+    w.writeAttribute("showtitle", boolToQString(plot.showTitle));
     w.writeAttribute("grid", boolToQString(plot.grid));
 
     w.writeAttribute("keyfontsize", CDoubleToQString(plot.keyFontSize));
@@ -1510,6 +1521,14 @@ void QFRDRTable::writePlotInfo(QXmlStreamWriter &w, const QFRDRTable::PlotInfo &
     w.writeAttribute("keyboxlinewidth", CDoubleToQString(plot.keyBoxLineWidth));
     w.writeAttribute("keybackgroundcolor", QColor2String(plot.keyBackgroundColor));
     w.writeAttribute("keyboxcolor", QColor2String(plot.keyLineColor));
+
+    w.writeAttribute("meyxmargin", CDoubleToQString(plot.keyXMargin));
+    w.writeAttribute("keyymargin", CDoubleToQString(plot.keyYMargin));
+    w.writeAttribute("keyxoffset", CDoubleToQString(plot.keyXOffset));
+    w.writeAttribute("keyyoffset", CDoubleToQString(plot.keyYOffset));
+    w.writeAttribute("keyxseparation", CDoubleToQString(plot.keyXSeparation));
+    w.writeAttribute("keyyseparation", CDoubleToQString(plot.keyYSeparation));
+    w.writeAttribute("key_line_length", CDoubleToQString(plot.key_line_length));
 
 
     w.writeAttribute("grid_width", CDoubleToQString(plot.gridWidth));
@@ -1662,7 +1681,8 @@ void QFRDRTable::readPlotInfo(PlotInfo& plot, QDomElement te) {
     plot.graphWidth=te.attribute("gwidth", "150").toInt();
     plot.graphHeight=te.attribute("gheight", "150").toInt();
     plot.grid=QStringToBool( te.attribute("grid", "true"));
-    plot.showKey=QStringToBool( te.attribute("showkey"));
+    plot.showKey=QStringToBool( te.attribute("showkey", "true"));
+    plot.showTitle=QStringToBool( te.attribute("showtitle", "true"));
     plot.fontName=te.attribute("fontname", "Arial");
     plot.keyFontSize=CQStringToDouble(te.attribute("keyfontsize", "12"));
     plot.axisFontSize=CQStringToDouble(te.attribute("axisfontsize", "10"));
@@ -1690,6 +1710,13 @@ void QFRDRTable::readPlotInfo(PlotInfo& plot, QDomElement te) {
     plot.gridWidth=CQStringToDouble(te.attribute("grid_width", "1"));
 
 
+    plot.keyXMargin=CQStringToDouble(te.attribute("meyxmargin", "0.5"));
+    plot.keyYMargin=CQStringToDouble(te.attribute("keyymargin", "0.25"));
+    plot.keyXOffset=CQStringToDouble(te.attribute("keyxoffset", "0.5"));
+    plot.keyYOffset=CQStringToDouble(te.attribute("keyyoffset", "0.5"));
+    plot.keyXSeparation=CQStringToDouble(te.attribute("keyxseparation", "0.75"));
+    plot.keyYSeparation=CQStringToDouble(te.attribute("keyyseparation", "0.2"));
+    plot.key_line_length=CQStringToDouble(te.attribute("key_line_length", "3"));
 
     readAxisInfo(plot.xAxis, "x", te);
     readAxisInfo(plot.yAxis, "y", te);

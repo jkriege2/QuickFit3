@@ -43,6 +43,7 @@
 #include "qfevaluationpropertyeditor.h"
 #include "qffitresultsbyindexevaluationfitthread.h"
 #include "qfrdrrunselection.h"
+#include "qffitfunctioncombobox.h"
 
 /*! \brief evaluation item editor base class for data fits using QFFitAlgorithm and QFFitFunction where the
            QFRawDataRecord is a dataset with different runs (we can fit to each run). The QFEvaluationItem for
@@ -79,7 +80,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief combobox to select a fitting algorithm */
         QComboBox* cmbAlgorithm;
         /** \brief combobox to select a model */
-        QComboBox* cmbModel;
+        QFFitFunctionComboBox* cmbModel;
 
         QHBoxLayout* layAlgorithm;
         QHBoxLayout* layModel;
@@ -175,6 +176,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QAction* actAlgorithmHelp;
         /** \brief pushbutton to show help on Fitting Algorithm */
         QAction* actModelHelp;
+        QAction* actModelSelector;
         QAction* actFitAllFilesThreaded;
         QAction* actFitAllThreaded;
         QAction* actFitAllRunsThreaded;
@@ -247,8 +249,10 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QToolButton* btnConfigAlgorithm;
         /** \brief pushbutton to show help on Fitting Algorithm */
         QToolButton* btnAlgorithmHelp;
-        /** \brief pushbutton to show help on Fitting Algorithm */
+        /** \brief pushbutton to show help on Fitting Model */
         QToolButton* btnModelHelp;
+        /** \brief pushbutton to select a Fitting Model */
+        QToolButton* btnModelSelector;
         /** \brief button to save current parameter set */
         QToolButton* btnSaveParameters;
         /** \brief button to load current parameter set */
@@ -278,8 +282,6 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief emitted when the pltData rezooms */
         void zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender);
 
-        /** \brief display fit function help */
-        void displayFitFunctionHelp();
         /** \brief display fit algorithm help */
         void displayFitAlgorithmHelp();
         /** \brief configure the fitting algorithm */

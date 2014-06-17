@@ -20,6 +20,7 @@ class QFWIDLIB_EXPORT QFFitFunctionSelectDialog : public QDialog
 
         QString getSelected() const;
         void init(const QString& filter, const QString& current);
+        void init(const QStringList& availableFF, const QString& current);
 
     protected slots:
         void currentRowChanged(const QModelIndex &current, const QModelIndex &previous);

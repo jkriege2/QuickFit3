@@ -347,6 +347,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             QString title;
             bool grid;
             bool showKey;
+            bool showTitle;
 
             bool keepAxisAspectRatio;
             bool keepDataAspectRatio;
@@ -359,8 +360,17 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             double keyFontSize;
             double keyBoxLineWidth;
             QColor keyBackgroundColor;
-            bool keyBox;
+            bool keyBox;            
             QColor keyLineColor;
+
+            double keyXMargin;
+            double keyYMargin;
+            double keyXOffset;
+            double keyYOffset;
+            double keyXSeparation;
+            double keyYSeparation;
+            double key_line_length;
+
             double labelFontSize;
             double axisFontSize;
             double axisLabelFontSize;

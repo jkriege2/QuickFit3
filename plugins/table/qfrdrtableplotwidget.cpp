@@ -419,7 +419,8 @@ void QFRDRTablePlotWidget::updateGraph() {
 
         ui->plotter->get_plotter()->set_plotLabelFontname(p.fontName);
         ui->plotter->get_plotter()->set_plotLabelFontSize(p.labelFontSize);
-        ui->plotter->get_plotter()->set_plotLabel(p.title);
+        if (p.showTitle) ui->plotter->get_plotter()->set_plotLabel(p.title);
+        else ui->plotter->get_plotter()->set_plotLabel("");
         ui->plotter->get_plotter()->set_keyFont(p.fontName);
         ui->plotter->get_plotter()->set_keyFontSize(p.keyFontSize);
         ui->plotter->get_plotter()->set_maintainAspectRatio(p.keepDataAspectRatio);
@@ -442,6 +443,16 @@ void QFRDRTablePlotWidget::updateGraph() {
         ui->plotter->get_plotter()->set_keyPosition(p.keyPosition);
         ui->plotter->get_plotter()->set_showKey(p.showKey);
         ui->plotter->setXY(p.xAxis.min, p.xAxis.max, p.yAxis.min, p.yAxis.max);
+
+        ui->plotter->get_plotter()->set_keyXMargin(p.keyXMargin);
+        ui->plotter->get_plotter()->set_keyYMargin(p.keyYMargin);
+        ui->plotter->get_plotter()->set_keyXOffset(p.keyXOffset);
+        ui->plotter->get_plotter()->set_keyYOffset(p.keyYOffset);
+        ui->plotter->get_plotter()->set_keyXSeparation(p.keyXSeparation);
+        ui->plotter->get_plotter()->set_keyYSeparation(p.keyYSeparation);
+        ui->plotter->get_plotter()->set_key_line_length(p.key_line_length);
+
+
         ui->plotter->clearGraphs(true);
         updateData();
         for (int i=0; i<p.graphs.size(); i++) {

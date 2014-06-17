@@ -19,6 +19,7 @@ class QFWIDLIB_EXPORT QFFitFunctionComboBox : public QComboBox
         
     public slots:
         void updateFitFunctions(const QString& filter=QString(""));
+        void updateFitFunctions(const QStringList& availableFF);
         void setCurrentFitFunction(const QString& id);
         void showHelpCurrent();
         void selectModelDialog();
@@ -26,6 +27,7 @@ class QFWIDLIB_EXPORT QFFitFunctionComboBox : public QComboBox
         void reloadFitFunctions();
     protected:
         QString m_filter;
+        QStringList m_availableFuncs;
         QAction* actHelp;
         QAction* actSelectModel;
 

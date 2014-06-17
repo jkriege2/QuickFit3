@@ -105,6 +105,15 @@ void QFRDRTablePlotSettingsWidget::setRecord(QFRDRTable *record, int graph)
             ui->sliderKeyTransparency->setValue(g.keyTransparency*255.0);
             ui->cmbKeyLayout->setCurrentIndex(g.keyLayout);
 
+            ui->chkShowTitle->setChecked(g.showTitle);
+            ui->spinKeyXMargin->setValue(g.keyXMargin);
+            ui->spinKeyYMargin->setValue(g.keyYMargin);
+            ui->spinKeyXOffset->setValue(g.keyXOffset);
+            ui->spinKeyYOffset->setValue(g.keyYOffset);
+            ui->spinKeyXSeparation->setValue(g.keyXSeparation);
+            ui->spinKeyYSeparation->setValue(g.keyYSeparation);
+            ui->spinKeyLineLength->setValue(g.key_line_length);
+
         } else {
             setEnabled(false);
         }
@@ -226,6 +235,18 @@ void QFRDRTablePlotSettingsWidget::plotDataChanged() {
         p.keyLineColor=ui->cmbKeyBoxColor->currentColor();
         p.keyBox=ui->chkKeyBox->isChecked();
 
+
+        p.showTitle=ui->chkShowTitle->isChecked();
+        p.keyXMargin=ui->spinKeyXMargin->value();
+        p.keyYMargin=ui->spinKeyYMargin->value();
+        p.keyXOffset=ui->spinKeyXOffset->value();
+        p.keyYOffset=ui->spinKeyYOffset->value();
+        p.keyXSeparation=ui->spinKeyXSeparation->value();
+        p.keyYSeparation=ui->spinKeyYSeparation->value();
+        p.key_line_length=ui->spinKeyLineLength->value();
+
+
+
         ui->axisX->storePlotData(p.xAxis);
         ui->axisY->storePlotData(p.yAxis);
 
@@ -282,6 +303,16 @@ void QFRDRTablePlotSettingsWidget::connectWidgets()
     connect(ui->chkKeyBox, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
 
 
+    connect(ui->spinKeyXMargin, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->spinKeyYMargin, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->spinKeyXOffset, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->spinKeyYOffset, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->spinKeyXSeparation, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->spinKeyYSeparation, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->spinKeyLineLength, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->chkShowTitle, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+
+
 
     connect(ui->chkPlotAutosize, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     connect(ui->spinHeight, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));
@@ -321,6 +352,14 @@ void QFRDRTablePlotSettingsWidget::disconnectWidgets()
     disconnect(ui->cmbKeyBoxColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinKeyBoxWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->chkKeyBox, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinKeyXMargin, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinKeyYMargin, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinKeyXOffset, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinKeyYOffset, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinKeyXSeparation, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinKeyYSeparation, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinKeyLineLength, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkShowTitle, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
 
     disconnect(ui->chkPlotAutosize, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinHeight, SIGNAL(valueChanged(int)), this, SLOT(plotDataChanged()));

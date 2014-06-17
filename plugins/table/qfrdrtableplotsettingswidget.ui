@@ -64,7 +64,7 @@
    <item>
     <widget class="QFEnhancedTabWidget" name="tabWidget_2">
      <property name="currentIndex">
-      <number>0</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -80,9 +80,6 @@
           <cstring>edtTitle</cstring>
          </property>
         </widget>
-       </item>
-       <item row="0" column="1">
-        <widget class="QLineEdit" name="edtTitle"/>
        </item>
        <item row="2" column="0">
         <widget class="QLabel" name="label_25">
@@ -283,6 +280,20 @@
              </spacer>
             </item>
            </layout>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="0" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QLineEdit" name="edtTitle"/>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkShowTitle">
+           <property name="text">
+            <string>show</string>
+           </property>
           </widget>
          </item>
         </layout>
@@ -568,7 +579,98 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="6" column="0">
+        <widget class="QLabel" name="label_36">
+         <property name="text">
+          <string>layout:</string>
+         </property>
+         <property name="buddy">
+          <cstring>cmbKeyLayout</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="JKQTPkeyLayoutComboBox" name="cmbKeyLayout"/>
+       </item>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_30">
+         <property name="text">
+          <string>font sizes:</string>
+         </property>
+         <property name="buddy">
+          <cstring>spinKeyFontSize</cstring>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
+        <widget class="QDoubleSpinBox" name="spinKeyFontSize">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="decimals">
+          <number>1</number>
+         </property>
+         <property name="minimum">
+          <double>1.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>256.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="text">
+          <string>background color:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <widget class="ColorComboBox" name="cmbKeyBackground"/>
+       </item>
+       <item row="4" column="0">
+        <widget class="QCheckBox" name="chkKeyBox">
+         <property name="text">
+          <string>box:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QWidget" name="horizontalWidget" native="true">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="ColorComboBox" name="cmbKeyBoxColor"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_4">
+            <property name="text">
+             <string>     width:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="spinKeyBoxWidth">
+            <property name="prefix">
+             <string/>
+            </property>
+            <property name="suffix">
+             <string> pt</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item row="3" column="0">
         <widget class="QLabel" name="label_38">
          <property name="text">
           <string>transparency:</string>
@@ -578,7 +680,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="3" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_6" stretch="1,0">
          <item>
           <widget class="QSlider" name="sliderKeyTransparency">
@@ -643,7 +745,14 @@
          </item>
         </layout>
        </item>
-       <item row="2" column="0">
+       <item row="11" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>offset:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
         <widget class="QLabel" name="label_33">
          <property name="text">
           <string>position:</string>
@@ -653,99 +762,183 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="10" column="1">
         <widget class="JKQTPkeyPositionComboBox" name="cmbKeyPosition"/>
        </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_36">
-         <property name="text">
-          <string>layout:</string>
-         </property>
-         <property name="buddy">
-          <cstring>cmbKeyLayout</cstring>
-         </property>
-        </widget>
+       <item row="11" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0,1">
+         <item>
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>X:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="spinKeyXOffset">
+           <property name="prefix">
+            <string/>
+           </property>
+           <property name="suffix">
+            <string> chars</string>
+           </property>
+           <property name="minimum">
+            <double>-10000000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>10000000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>   Y:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="spinKeyYOffset">
+           <property name="prefix">
+            <string/>
+           </property>
+           <property name="suffix">
+            <string> chars</string>
+           </property>
+           <property name="minimum">
+            <double>-10000000.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>10000000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
-       <item row="3" column="1">
-        <widget class="JKQTPkeyLayoutComboBox" name="cmbKeyLayout"/>
-       </item>
-       <item row="4" column="0">
-        <widget class="QLabel" name="label_30">
+       <item row="13" column="0">
+        <widget class="QLabel" name="label_31">
          <property name="text">
-          <string>font sizes:</string>
+          <string>symbol with:</string>
          </property>
          <property name="buddy">
           <cstring>spinKeyFontSize</cstring>
          </property>
         </widget>
        </item>
-       <item row="4" column="1">
-        <widget class="QDoubleSpinBox" name="spinKeyFontSize">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+       <item row="13" column="1">
+        <widget class="QDoubleSpinBox" name="spinKeyLineLength">
+         <property name="prefix">
+          <string/>
          </property>
-         <property name="decimals">
-          <number>1</number>
-         </property>
-         <property name="minimum">
-          <double>1.000000000000000</double>
+         <property name="suffix">
+          <string> chars</string>
          </property>
          <property name="maximum">
-          <double>256.000000000000000</double>
+          <double>10000.000000000000000</double>
          </property>
         </widget>
        </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_3">
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_8">
          <property name="text">
-          <string>background color:</string>
+          <string>margin:</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
-        <widget class="ColorComboBox" name="cmbKeyBackground"/>
+       <item row="8" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_7" stretch="0,1,0,1">
+         <item>
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>X:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="spinKeyXMargin">
+           <property name="prefix">
+            <string/>
+           </property>
+           <property name="suffix">
+            <string> chars</string>
+           </property>
+           <property name="maximum">
+            <double>1000000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>   Y:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="spinKeyYMargin">
+           <property name="prefix">
+            <string/>
+           </property>
+           <property name="suffix">
+            <string> chars</string>
+           </property>
+           <property name="maximum">
+            <double>1000000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
-       <item row="6" column="0">
-        <widget class="QCheckBox" name="chkKeyBox">
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_12">
          <property name="text">
-          <string>box:</string>
+          <string>separation:</string>
          </property>
         </widget>
        </item>
-       <item row="6" column="1">
-        <widget class="QWidget" name="horizontalWidget" native="true">
-         <property name="enabled">
-          <bool>false</bool>
-         </property>
-         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="1,0,0">
-          <property name="margin">
-           <number>0</number>
-          </property>
-          <item>
-           <widget class="ColorComboBox" name="cmbKeyBoxColor"/>
-          </item>
-          <item>
-           <widget class="QLabel" name="label_4">
-            <property name="text">
-             <string>     width:</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QDoubleSpinBox" name="spinKeyBoxWidth">
-            <property name="prefix">
-             <string/>
-            </property>
-            <property name="suffix">
-             <string> pt</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </widget>
+       <item row="9" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="0,1,0,1">
+         <item>
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>X:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="spinKeyXSeparation">
+           <property name="prefix">
+            <string/>
+           </property>
+           <property name="suffix">
+            <string> chars</string>
+           </property>
+           <property name="maximum">
+            <double>1000000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_14">
+           <property name="text">
+            <string>   Y:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QDoubleSpinBox" name="spinKeyYSeparation">
+           <property name="prefix">
+            <string/>
+           </property>
+           <property name="suffix">
+            <string> chars</string>
+           </property>
+           <property name="maximum">
+            <double>1000000.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
       </layout>
      </widget>
@@ -819,7 +1012,6 @@
   <tabstop>chkShowKey</tabstop>
   <tabstop>sliderKeyTransparency</tabstop>
   <tabstop>spinBox_4</tabstop>
-  <tabstop>cmbKeyPosition</tabstop>
   <tabstop>cmbKeyLayout</tabstop>
  </tabstops>
  <resources>
@@ -961,12 +1153,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>30</x>
-     <y>221</y>
+     <x>32</x>
+     <y>148</y>
     </hint>
     <hint type="destinationlabel">
-     <x>407</x>
-     <y>217</y>
+     <x>462</x>
+     <y>151</y>
     </hint>
    </hints>
   </connection>

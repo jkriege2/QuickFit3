@@ -145,13 +145,15 @@ void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, in
 
 
     QSettings* set=ProgramOptions::getInstance()->getQSettings();
-    if (set && !propsAlreadySet) {
+    if (set) {
         loadWidgetGeometry(*set, this, pos(), size(), "QFRDRTableCurveFitDialog/windowsize");
-        ui->chkPlotErrors->setChecked(set->value("QFRDRTableCurveFitDialog/ploterrors", ui->chkPlotErrors->isChecked()).toBool());
-        ui->chkWeightedResiduals->setChecked(set->value("QFRDRTableCurveFitDialog/weightedresiduals", ui->chkWeightedResiduals->isChecked()).toBool());
-        ui->cmbFitAlgorithm->setCurrentAlgorithm(set->value("QFRDRTableCurveFitDialog/algorithm", ui->cmbFitAlgorithm->currentFitAlgorithmID()).toString());
-        ui->cmbFitFunction->setCurrentFitFunction(set->value("QFRDRTableCurveFitDialog/model", ui->cmbFitFunction->currentFitFunctionID()).toString());
         loadSplitter(*set, ui->splitter, "QFRDRTableCurveFitDialog/splitter/");
+        if (!propsAlreadySet) {
+            ui->chkPlotErrors->setChecked(set->value("QFRDRTableCurveFitDialog/ploterrors", ui->chkPlotErrors->isChecked()).toBool());
+            ui->chkWeightedResiduals->setChecked(set->value("QFRDRTableCurveFitDialog/weightedresiduals", ui->chkWeightedResiduals->isChecked()).toBool());
+            ui->cmbFitAlgorithm->setCurrentAlgorithm(set->value("QFRDRTableCurveFitDialog/algorithm", ui->cmbFitAlgorithm->currentFitAlgorithmID()).toString());
+            ui->cmbFitFunction->setCurrentFitFunction(set->value("QFRDRTableCurveFitDialog/model", ui->cmbFitFunction->currentFitFunctionID()).toString());
+        }
     }
 
     methodChanged(ui->cmbFitFunction->currentIndex());
