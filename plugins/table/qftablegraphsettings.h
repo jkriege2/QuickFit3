@@ -41,6 +41,7 @@ class QFTableGraphSettings : public QWidget
         void performFit(int xCol, int yCol, int sigmaCol, int plot, QString function);
         void performRegression(int xCol, int yCol, int sigmaCol, int  plot);
         void performRefit(int plot);
+        void reloadGraph();
     public slots:
         void initFocus();
 
@@ -49,6 +50,8 @@ class QFTableGraphSettings : public QWidget
         void on_edtFunction_textChanged(const QString &text);
         void on_btnAutoX_clicked();
         void on_btnAutoY_clicked();
+
+        void on_btnShiftAuto_clicked();
 
 
         void on_btnClearLinesXData_clicked();

@@ -606,7 +606,7 @@ void QFRDRTable::colgraphSetFunctionGraph(int plotid, int graphid, const QString
         if (graphid>=0 && graphid<plt.graphs.size()) {
             QFRDRTable::GraphInfo& g=plt.graphs[graphid];
             g.ycolumn=columnParam;
-            g.color=autocolors.value((plt.graphs.size()-1)%autocolors.size(), QColor("red"));
+            //g.color=autocolors.value((plt.graphs.size()-1)%autocolors.size(), QColor("red"));
             g.errorColor=g.color.darker();
             g.fillColor=g.color.lighter();
             colgraphToolsSetGraphtype(g, type);
@@ -637,7 +637,7 @@ void QFRDRTable::colgraphSetFunctionGraph(int plotid, int graphid, const QString
         if (graphid>=0 && graphid<plt.graphs.size()) {
             QFRDRTable::GraphInfo& g=plt.graphs[graphid];
             g.ycolumn=-1;
-            g.color=autocolors.value((plt.graphs.size()-1)%autocolors.size(), QColor("red"));
+            //g.color=autocolors.value((plt.graphs.size()-1)%autocolors.size(), QColor("red"));
             g.errorColor=g.color.darker();
             g.fillColor=g.color.lighter();
             colgraphToolsSetGraphtype(g, type);
@@ -1315,8 +1315,8 @@ QFRawDataEditor *QFRDRTable::createEditor(QFPluginServices *services, QFRawDataP
                 QFRDRTableEditor* tabEdt=qobject_cast<QFRDRTableEditor*>(propEditor->getEditorList().value(j, NULL));
                 if (tabEdt) {
                     connect(edt, SIGNAL(performRefit(int,int)), tabEdt, SLOT(requestRefit(int,int)));
-                    connect(edt, SIGNAL(performFit(int,int,int,int,QString,bool,bool)), tabEdt, SLOT(requestFit(int,int,int,int,QString,bool,bool)));
-                    connect(edt, SIGNAL(performRegression(int,int,int,int,bool,bool)), tabEdt, SLOT(requestRegression(int,int,int,int,bool,bool)));
+                    connect(edt, SIGNAL(performFit(int,int,int,int,int,QString,bool,bool)), tabEdt, SLOT(requestFit(int,int,int,int,int,QString,bool,bool)));
+                    connect(edt, SIGNAL(performRegression(int,int,int,int,int,bool,bool)), tabEdt, SLOT(requestRegression(int,int,int,int,int,bool,bool)));
                 }
             }
         }

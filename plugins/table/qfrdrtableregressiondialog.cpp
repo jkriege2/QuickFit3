@@ -4,15 +4,16 @@
 #include "statistics_tools.h"
 #include "float.h"
 
-QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph) :
+QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph, int sourcegraph) :
     QDialog(parent),
     ui(new Ui::QFRDRTableRegressionDialog)
 {
-    qDebug()<<"QFRDRTableRegressionDialog colX="<<colX<<"  colY="<<colY<<"  colW="<<colW<<"  logX="<<logX<<"  logY="<<logY<<"  resultColumn="<<resultColumn<<"  addGraph="<<addGraph;
+    //qDebug()<<"QFRDRTableRegressionDialog colX="<<colX<<"  colY="<<colY<<"  colW="<<colW<<"  logX="<<logX<<"  logY="<<logY<<"  resultColumn="<<resultColumn<<"  addGraph="<<addGraph;
     parameterTable=new QFFitFunctionValueInputTable(this);
     ui->setupUi(this);
     overwriteGraph=-1;
     overwritePlot=-1;
+    this->sourceGraph=sourceGraph;
     intInit(table,  colX,  colY,  colW, parent,  logX,  logY,  resultColumn,  addGraph);
 }
 
@@ -27,7 +28,8 @@ QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int pl
     readFitProperties(plotid, graphid, &resultColumn, &addGraph);
     overwriteGraph=graphid;
     overwritePlot=plotid;
-    qDebug()<<"QFRDRTableRegressionDialog("<<plotid<<graphid<<"): "<<overwriteGraph<<colX<<colY;
+    this->sourceGraph=-1;
+    //qDebug()<<"QFRDRTableRegressionDialog("<<plotid<<graphid<<"): "<<overwriteGraph<<colX<<colY;
     intInit(table,  colX,  colY,  colW, parent,  ui->chkLogX->isChecked(),  ui->chkLogY->isChecked(),  resultColumn,  addGraph, true);
 }
 
@@ -84,22 +86,32 @@ void QFRDRTableRegressionDialog::saveResults()
             }        }
         if (saveGraph==1) {
             table->colgraphAddPlot(tr("regression results"), ui->pltDistribution->getXAxis()->get_axisLabel(), ui->pltDistribution->getYAxis()->get_axisLabel(), ui->pltDistribution->getXAxis()->get_logAxis(), ui->pltDistribution->getYAxis()->get_logAxis());
-            int g=table->colgraphGetPlotCount()-1;
-            table->colgraphAddGraph(g, colX, colY, QFRDRColumnGraphsInterface::cgtPoints, tr("data"));
+            int plotID=table->colgraphGetPlotCount()-1;
+            table->colgraphAddGraph(plotID, colX, colY, QFRDRColumnGraphsInterface::cgtPoints, tr("data"));
+            int gid=table->colgraphGetGraphCount(plotID);
             if (savedTo>=0) {
-                table->colgraphAddFunctionGraph(g, "",graphType, fitresult, savedTo);
+                table->colgraphAddFunctionGraph(plotID, "",graphType, fitresult, savedTo);
             } else {
-                table->colgraphAddFunctionGraph(g, "", graphType, fitresult, lastResultD);
+                table->colgraphAddFunctionGraph(plotID, "", graphType, fitresult, lastResultD);
             }
-            table->colgraphSetGraphTitle(g, table->colgraphGetGraphCount(g)-1, fitresult+", "+resultStat);
-            writeFitProperties(g, table->colgraphGetGraphCount(g)-1, savedTo);
+            table->colgraphSetGraphTitle(plotID,gid, fitresult+", "+resultStat);
+            if (sourceGraph>=0 && sourceGraph<table->colgraphGetGraphCount(plotID)) {
+                table->colgraphSetGraphColor(plotID, gid, table->getPlot(plotID).graphs[sourceGraph].color.darker());
+                table->colgraphSetGraphLineWidth(plotID, gid, 1.0);
+            }
+            writeFitProperties(plotID, table->colgraphGetGraphCount(plotID)-1, savedTo);
         } else if (saveGraph>=2 && saveGraph<ui->cmbAddGraph->count()-1){
-                if (savedTo>=0) {
-                    table->colgraphAddFunctionGraph(saveGraph-2, "", graphType, fitresult, savedTo);
-                } else {
-                    table->colgraphAddFunctionGraph(saveGraph-2, "", graphType, fitresult, lastResultD);
-                }
-            table->colgraphSetGraphTitle(saveGraph-2, table->colgraphGetGraphCount(saveGraph-2)-1, fitresult+", "+resultStat);
+            if (savedTo>=0) {
+                table->colgraphAddFunctionGraph(saveGraph-2, "", graphType, fitresult, savedTo);
+            } else {
+                table->colgraphAddFunctionGraph(saveGraph-2, "", graphType, fitresult, lastResultD);
+            }
+            int gid=table->colgraphGetGraphCount(saveGraph-2)-1;
+            table->colgraphSetGraphTitle(saveGraph-2, gid, fitresult+", "+resultStat);
+            if (sourceGraph>=0 && sourceGraph<table->colgraphGetGraphCount(saveGraph-2)) {
+                table->colgraphSetGraphColor(saveGraph-2, gid, table->getPlot(saveGraph-2).graphs[sourceGraph].color.darker());
+                table->colgraphSetGraphLineWidth(saveGraph-2, gid, 1.0);
+            }
             writeFitProperties(saveGraph-2, table->colgraphGetGraphCount(saveGraph-2)-1, savedTo);
         } else if (saveGraph==ui->cmbAddGraph->count()-1) {
             if (savedTo>=0) {
@@ -494,8 +506,8 @@ void QFRDRTableRegressionDialog::readDataFromTable()
 
     dataX=table->tableGetColumnDataAsDouble(colX);
     dataY=table->tableGetColumnDataAsDouble(colY);
-    qDebug()<<colX<<"dataX.size="<<dataX.size();
-    qDebug()<<colX<<"dataY.size="<<dataX.size();
+    //qDebug()<<colX<<"dataX.size="<<dataX.size();
+    //qDebug()<<colX<<"dataY.size="<<dataX.size();
     datapoints=qMin(dataX.size(), dataY.size());
     if (colW!=-1) {
         dataW=table->tableGetColumnDataAsDouble(colW);

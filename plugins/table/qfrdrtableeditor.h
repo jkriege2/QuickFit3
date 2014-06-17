@@ -35,8 +35,8 @@ class QFRDRTableEditor : public QFRawDataEditor {
         /** Default destructor */
         virtual ~QFRDRTableEditor();
     public slots:
-        void requestFit(int xCol, int yCol, int sigmaCol, int plot, QString function, bool xlog=false, bool ylog=false);
-        void requestRegression(int xCol, int yCol, int sigmaCol, int plot, bool xlog=false, bool ylog=false);
+        void requestFit(int xCol, int yCol, int sigmaCol, int plot, int graph, QString function, bool xlog=false, bool ylog=false);
+        void requestRegression(int xCol, int yCol, int sigmaCol, int plot, int graph, bool xlog=false, bool ylog=false);
         void requestRefit(int plot, int graph);
     protected slots:
         /** \brief create widgets on object creation */

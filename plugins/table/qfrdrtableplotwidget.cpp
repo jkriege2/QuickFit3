@@ -45,6 +45,7 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     connect(ui->widGraphSettings, SIGNAL(performFit(int,int,int,int,QString)), this, SLOT(doFit(int,int,int,int,QString)));
     connect(ui->widGraphSettings, SIGNAL(performRegression(int,int,int,int)), this, SLOT(doRegression(int,int,int,int)));
     connect(ui->widSystemSettings, SIGNAL(plotSettingsChanged()), this, SLOT(updateGraph()));
+    connect(ui->widGraphSettings, SIGNAL(reloadGraph()), this, SLOT(reloadGraphData()));
 
     //ui->formLayout_3->removeWidget(ui->widSaveCoordSettings);
     //ui->tabWidget->setCornerWidget(ui->widSaveCoordSettings);
@@ -1641,17 +1642,22 @@ void QFRDRTablePlotWidget::on_btnColorByPalette_clicked()
     ui->widGraphSettings->initFocus();
 }
 
+void QFRDRTablePlotWidget::reloadGraphData()
+{
+    listGraphs_currentRowChanged(ui->listGraphs->currentRow());
+}
+
 
 
 
 void QFRDRTablePlotWidget::doFit(int xCol, int yCol, int sigmaCol, int plot, QString function)
 {
-    emit performFit(xCol, yCol, sigmaCol, plot, function, ui->widSystemSettings->getLogX(), ui->widSystemSettings->getLogY());
+    emit performFit(xCol, yCol, sigmaCol, plot, ui->listGraphs->currentRow(), function, ui->widSystemSettings->getLogX(), ui->widSystemSettings->getLogY());
 }
 
 void QFRDRTablePlotWidget::doRegression(int xCol, int yCol, int sigmaCol, int plot)
 {
-    emit performRegression(xCol, yCol, sigmaCol, plot, ui->widSystemSettings->getLogX(), ui->widSystemSettings->getLogY());
+    emit performRegression(xCol, yCol, sigmaCol, plot, ui->listGraphs->currentRow(), ui->widSystemSettings->getLogX(), ui->widSystemSettings->getLogY());
 }
 
 void QFRDRTablePlotWidget::doRefit(int plot)

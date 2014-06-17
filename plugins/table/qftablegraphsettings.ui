@@ -1921,6 +1921,26 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="btnShiftAuto">
+        <property name="text">
+         <string>auto</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
        <widget class="QLabel" name="labWhisker">
         <property name="font">
          <font>
@@ -1929,7 +1949,7 @@
          </font>
         </property>
         <property name="text">
-         <string>whisker:</string>
+         <string> whisker:</string>
         </property>
        </widget>
       </item>
@@ -1948,19 +1968,6 @@
          </size>
         </property>
        </widget>
-      </item>
-      <item>
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Horizontal</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>40</width>
-          <height>20</height>
-         </size>
-        </property>
-       </spacer>
       </item>
      </layout>
     </widget>

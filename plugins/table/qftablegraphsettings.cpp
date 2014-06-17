@@ -1487,6 +1487,51 @@ void QFTableGraphSettings::on_btnAutoY_clicked()
     }
 }
 
+void QFTableGraphSettings::on_btnShiftAuto_clicked()
+{
+    if (!current) return;
+    QFRDRTable::PlotInfo p=current->getPlot(plot);
+    double cntH=0;
+    double cntV=0;
+    for (int i=0; i<p.graphs.size(); i++) {
+        QFRDRTable::GraphType gt=p.graphs[i].type;
+        if (gt==QFRDRTable::gtBarsHorizontal) cntH++;
+        if (gt==QFRDRTable::gtBarsVertical) cntV++;
+    }
+
+    double widthH=1.0/cntH*0.7;
+    double widthV=1.0/cntV*0.7;
+    double dH=0.8/(cntH);
+    double dV=0.8/(cntV);
+    double h=0.1+dH/2.0;
+    double v=0.1+dV/2.0;
+    for (int i=0; i<p.graphs.size(); i++) {
+        QFRDRTable::GraphType gt=p.graphs[i].type;
+        if (gt==QFRDRTable::gtBarsHorizontal) {
+            if (cntH>1) {
+                p.graphs[i].width=widthH;
+                p.graphs[i].shift=h-0.5;
+                h=h+dH;
+            } else {
+                p.graphs[i].width=0.9;
+                p.graphs[i].shift=0.0;
+            }
+        }
+        if (gt==QFRDRTable::gtBarsVertical) {
+            if (cntV>1) {
+                p.graphs[i].width=widthV;
+                p.graphs[i].shift=v-0.5;
+                v=v+dV;
+            } else {
+                p.graphs[i].width=0.9;
+                p.graphs[i].shift=0.0;
+            }
+        }
+    }
+    current->setPlot(plot, p);
+    emit reloadGraph();
+}
+
 void QFTableGraphSettings::on_btnClearLinesXData_clicked()
 {
     ui->cmbLinesXData->setCurrentData(-1);

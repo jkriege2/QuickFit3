@@ -36,8 +36,8 @@ class QFRDRTablePlotWidget : public QWidget
     signals:
         void plotTitleChanged(int plot, QString title);
     signals:
-        void performFit(int xCol, int yCol, int sigmaCol, int plot, QString function,bool xlog,bool ylog);
-        void performRegression(int xCol, int yCol, int sigmaCol, int plot,bool xlog,bool ylog);
+        void performFit(int xCol, int yCol, int sigmaCol, int plot, int graph, QString function,bool xlog,bool ylog);
+        void performRegression(int xCol, int yCol, int sigmaCol, int plot,int graph,bool xlog,bool ylog);
         void performRefit(int plot, int graph);
     protected slots:
         void doFit(int xCol, int yCol, int sigmaCol, int plot, QString function);
@@ -54,6 +54,7 @@ class QFRDRTablePlotWidget : public QWidget
         void on_btnMoveDown_clicked();
         void on_btnResetColoring_clicked();
         void on_btnColorByPalette_clicked();
+        void reloadGraphData();
 
         void graphDataChanged();
         void plotDataChanged();

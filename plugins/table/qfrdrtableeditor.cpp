@@ -24,12 +24,12 @@ QFRDRTableEditor::~QFRDRTableEditor()
     writeSettings();
 }
 
-void QFRDRTableEditor::requestFit(int xCol, int yCol, int sigmaCol, int plot, QString function, bool xlog, bool ylog)
+void QFRDRTableEditor::requestFit(int xCol, int yCol, int sigmaCol, int plot, int graph, QString function, bool xlog, bool ylog)
 {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
         //qDebug()<<"regression cX="<<xCol<<"  cY="<<yCol<<"  cW="<<sigmaCol<<"  plot="<<plot<<"  xlog="<<xlog<<"  ylog="<<ylog;
-        QFRDRTableCurveFitDialog* dlg=new QFRDRTableCurveFitDialog(m, xCol, yCol, sigmaCol, this, xlog, ylog, -1, plot);
+        QFRDRTableCurveFitDialog* dlg=new QFRDRTableCurveFitDialog(m, xCol, yCol, sigmaCol, this, xlog, ylog, -1, plot, graph);
         if (dlg->exec()) {
 
         }
@@ -38,12 +38,12 @@ void QFRDRTableEditor::requestFit(int xCol, int yCol, int sigmaCol, int plot, QS
 
 }
 
-void QFRDRTableEditor::requestRegression(int xCol, int yCol, int sigmaCol, int plot, bool xlog, bool ylog)
+void QFRDRTableEditor::requestRegression(int xCol, int yCol, int sigmaCol, int plot, int graph, bool xlog, bool ylog)
 {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     if (m) {
         //qDebug()<<"regression cX="<<xCol<<"  cY="<<yCol<<"  cW="<<sigmaCol<<"  plot="<<plot<<"  xlog="<<xlog<<"  ylog="<<ylog;
-        QFRDRTableRegressionDialog* dlg=new QFRDRTableRegressionDialog(m, xCol, yCol, sigmaCol, this, xlog, ylog, -1, plot);
+        QFRDRTableRegressionDialog* dlg=new QFRDRTableRegressionDialog(m, xCol, yCol, sigmaCol, this, xlog, ylog, -1, plot, graph);
         if (dlg->exec()) {
 
         }
