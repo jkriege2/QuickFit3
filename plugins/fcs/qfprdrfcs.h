@@ -41,17 +41,17 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         virtual QString getDescription() const  { return tr("manages Fluorescence Correlations Spectroscopy (FCS) and Dynamic Light Scattering (DLS) correlation curve data."); };
 
         /** \brief author the plugin */
-        virtual QString getAuthor() const  { return tr("Jan Krieger, Benedikt Häusele"); };
+        virtual QString getAuthor() const  { return tr("Jan Krieger, Benedikt Häusele (ALV6000 import)"); };
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2010-2013 by Jan Krieger, Benedikt Häusele"); };
+        virtual QString getCopyright() const  { return tr("(c) 2010-2014 by Jan Krieger, Benedikt Häusele (ALV6000 import)"); };
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const  { return tr(""); };
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=4;
+            minor=5;
         };
 
         /** \brief icon for the plugin */
@@ -108,6 +108,13 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
             \param paramReadonly names of initial parameters that should be declared readonly
         */
         void insertConfocor3File(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
+        /*! \brief add a correlator.com .SIN file to the current project
+
+            \param filename filename of the Confocor3 file
+            \param paramValues values for parameters in paramNames
+            \param paramReadonly names of initial parameters that should be declared readonly
+        */
+        void insertFLEX_SINFile(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
     private:
 };
 

@@ -167,6 +167,7 @@ class QFESPIMB040OpticsSetup : public QFESPIMB040OpticsSetupBase {
         bool isStageConnected(QFExtensionLinearStage* stage, int id, bool& found);
 
         QFCameraComboBox* cameraComboBox(int camera) const;
+        QFESPIMB040SimpleCameraConfig* cameraConfig(int camera) const;
 
         QFCameraConfigComboBoxStartResume* getStopRelease(int camera) const;
 

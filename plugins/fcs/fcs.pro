@@ -34,7 +34,8 @@ HEADERS += dlgcsvparameters.h \
             ../interfaces/qfrdrimageselectioninterface.h \
             ../interfaces/qfrdrrunselection.h \
     ../base_classes/qfrdrrunselectiontools.h \
-    confocor3tools.h
+    confocor3tools.h \
+    flex_sin_tools.h
 
 
 
@@ -54,7 +55,8 @@ SOURCES += dlgcsvparameters.cpp \
     ../base_classes/qffinderroneouscorrelationdlg.cpp \
     ../base_classes/qffcstools.cpp \
     ../base_classes/qfrdrrunselectiontools.cpp \
-    confocor3tools.cpp
+    confocor3tools.cpp \
+    flex_sin_tools.cpp
 
 
 

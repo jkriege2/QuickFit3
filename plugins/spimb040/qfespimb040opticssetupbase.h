@@ -14,7 +14,7 @@
 #include "qfextensioncamera.h"
 #include "qfcameraconfigcombobox.h"
 #include "qfcameracombobox.h"
-
+class QFESPIMB040SimpleCameraConfig; //forward
 class QFESPIMB040AcquisitionTools;//forward
 
 typedef QList<QTriple<QIcon, QString, QString> > QFESPIMB040OpticsSetupItems;
@@ -203,7 +203,7 @@ class QFESPIMB040OpticsSetupBase: public QWidget {
         virtual int getStageCount() const=0;
 
         virtual QFCameraComboBox* cameraComboBox(int camera) const=0;
-
+        virtual QFESPIMB040SimpleCameraConfig* cameraConfig(int camera) const=0;
         virtual QFCameraConfigComboBoxStartResume* getStopRelease(int camera) const=0;
 
 

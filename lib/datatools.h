@@ -11,10 +11,23 @@
 #include <QStringList>
 #include "lib_imexport.h"
 
+/*! \brief exchange rows and columns
+    \ingroup qf3lib_tools
+*/
+QFLIB_EXPORT int dataGetRows(const QList<QVector<double> >& data);
+/*! \brief exchange rows and columns
+    \ingroup qf3lib_tools
+*/
+QFLIB_EXPORT int dataGetRows(const QList<QList<double> >& data);
+
+/*! \brief exchange rows and columns
+    \ingroup qf3lib_tools
+*/
+QFLIB_EXPORT int dataGetRows(const QList<QList<QVariant> >& data);
 
 
 /*! \brief exchange rows and columns
-    \ingroup qf3lib_tools    
+    \ingroup qf3lib_tools
 */
 QFLIB_EXPORT QList<QVector<double> > dataRotate(const QList<QVector<double> >& data);
 /*! \brief exchange rows and columns

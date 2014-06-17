@@ -41,6 +41,7 @@
 #include "qfstageconfigwidget.h"
 #include "qffilterchangerconfigwidget.h"
 #include "qfmeasurementdeviceconfigwidget.h"
+#include "qfespimb040simplecameraconfig.h"
 
 #include <qalgorithms.h>
 
@@ -194,7 +195,7 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         bool isStageConnected(QFExtensionLinearStage* stage, int id, bool& found);
 
         QFCameraComboBox* cameraComboBox(int camera) const;
-
+        QFESPIMB040SimpleCameraConfig* cameraConfig(int camera) const;
         QFCameraConfigComboBoxStartResume* getStopRelease(int camera) const;
 
 

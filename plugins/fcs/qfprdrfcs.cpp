@@ -3,6 +3,7 @@
 #include "qfrdrfcsdata.h"
 #include "dlgcsvparameters.h"
 #include <QtXml>
+#include "flex_sin_tools.h"
 
 QFPRDRFCS::QFPRDRFCS(QObject* parent):
     QObject(parent)
@@ -177,10 +178,54 @@ void QFPRDRFCS::insertConfocor3File(const QStringList &filename, const QMap<QStr
     }*/
 }
 
+void QFPRDRFCS::insertFLEX_SINFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly)
+{
+    /*unsigned int cc=1;
+    QString mode="";
+    unsigned int runCount=0;
+    bool crossCorrelation=false;
+    bool autoCorrelation=false;
+    try {
+        FLEX_analyze(filename.value(0, ""), mode, cc, runCount, crossCorrelation, autoCorrelation);
+    } catch (std::exception& E) {
+        cc=0;
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing CORRELATOR.COM .SIN file '%1':\n%2").arg(filename.value(0, "")).arg(E.what()));
+        services->log_error(tr("Error while importing CORRELATOR.COM .SIN file '%1':\n    %2\n").arg(filename.value(0, "")).arg(E.what()));
+
+    }
+    for (unsigned int i=0; i<cc; i++) {
+        QStringList roles;
+        if (autoCorrelation && crossCorrelation) {
+           roles<<
+        } else if (crossCorrelation) {
+
+
+            if (crossCorrelation) e->setRole(QString("FCCS").arg(i));
+        } else {
+            e->setRole(QString("ACF%1").arg(i));
+        }
+
+        for (int j=0; j<roles.size(); j++){
+           QMap<QString, QVariant> p=paramValues;
+           p["CHANNEL"]=i;
+           QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - CH%2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(i), filename, p, paramReadonly);
+           e->setRole(roles[j]);
+           if (cc>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
+
+           if (e->error()) {
+               QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing CORRELATOR.COM .SIN file '%1' (channel %3/%4):\n%2").arg(filename.value(0, "")).arg(e->errorDescription()).arg(i+1).arg(cc));
+               services->log_error(tr("Error while importing CORRELATOR.COM .SIN file '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
+               project->deleteRawData(e->getID());
+           }
+       }
+    }*/
+}
+
 void QFPRDRFCS::insertFCS() {
     if (project) {
         QString alvf=tr("ALV-5000 file (*.asc)");
         QString alvf6=tr("ALV-6000 file (*.asc)");
+        QString flexf=tr("correlator.com files (*.sin)");
         QString asciif=tr("ASCII Data Files (*.txt *.dat *.csv)");
         QString albaf=tr("ISS Alba Files (*.csv)");
         QString diff4f=tr("diffusion4 correlation (*corr.dat)");
@@ -189,7 +234,7 @@ void QFPRDRFCS::insertFCS() {
         QStringList files = qfGetOpenFileNames(parentWidget,
                               tr("Select FCS Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              alvf+";;"+alvf6+";;"+asciif+";;"+albaf+";;"+diff4f+";;"+olegf, &currentFCSFileFormatFilter);
+                              alvf+";;"+alvf6+";;"+flexf+";;"+asciif+";;"+albaf+";;"+diff4f+";;"+olegf, &currentFCSFileFormatFilter);
         //std::cout<<"filter: "<<currentFCSFileFormatFilter.toStdString()<<std::endl;
         if (files.size()>0) {
             settings->getQSettings()->setValue("fcs/current_fcs_format_filter", currentFCSFileFormatFilter);
@@ -199,6 +244,10 @@ void QFPRDRFCS::insertFCS() {
                 p["CHANNEL"]=0;
             } else if (currentFCSFileFormatFilter==alvf6){
                p["FILETYPE"]="ALV6000";
+               p["CHANNEL"]=0;
+               //qDebug() << "test 3";
+            } else if (currentFCSFileFormatFilter==flexf){
+               p["FILETYPE"]="CORRELATOR.COM_SIN";
                p["CHANNEL"]=0;
                //qDebug() << "test 3";
             } else if (currentFCSFileFormatFilter==olegf){
@@ -272,6 +321,8 @@ void QFPRDRFCS::insertFCS() {
                         insertALBAFile(QStringList(*it), p, paramsReadonly);
                     } else if (currentFCSFileFormatFilter==diff4f) {
                         insertDiffusion4File(QStringList(*it), p, paramsReadonly);
+                    } else if (currentFCSFileFormatFilter==flexf) {
+                        insertDiffusion4File(QStringList(*it), p, paramsReadonly);
                     } else {
                         insertCSVFile(QStringList(*it), p, paramsReadonly);
                     }
@@ -296,6 +347,7 @@ void QFPRDRFCS::insertMultiFileFCS()
     if (project) {
         QString alvf=tr("ALV-5000 file (*.asc)");
         QString alvf6=tr("ALV-6000 file (*.asc)");
+        QString flexf=tr("correlator.com files (*.sin)");
         QString asciif=tr("ASCII Data Files (*.txt *.dat *.csv)");
         QString albaf=tr("ISS Alba Files (*.csv)");
         QString diff4f=tr("diffusion4 correlation (*corr.dat)");
@@ -304,7 +356,7 @@ void QFPRDRFCS::insertMultiFileFCS()
         QStringList files = qfGetOpenFileNames(parentWidget,
                               tr("Select FCS Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              alvf+";;"+alvf6+";;"+asciif+";;"+albaf+";;"+diff4f+";;"+olegf, &currentFCSFileFormatFilter);
+                              alvf+";;"+alvf6+";;"+flexf+";;"+asciif+";;"+albaf+";;"+diff4f+";;"+olegf, &currentFCSFileFormatFilter);
         //std::cout<<"filter: "<<currentFCSFileFormatFilter.toStdString()<<std::endl;
         if (files.size()>0) {
             settings->getQSettings()->setValue("fcs/current_fcs_format_filter", currentFCSFileFormatFilter);
@@ -318,6 +370,9 @@ void QFPRDRFCS::insertMultiFileFCS()
                p["CHANNEL"]=0;
             } else if (currentFCSFileFormatFilter==olegf){
                p["FILETYPE"]="OLEGKRIECHEVSKYBINARY";
+               p["CHANNEL"]=0;
+            } else if (currentFCSFileFormatFilter==flexf){
+               p["FILETYPE"]="CORRELATOR.COM_SIN";
                p["CHANNEL"]=0;
             } else if (currentFCSFileFormatFilter==asciif) {
                 p["FILETYPE"]="CSV_CORR";
@@ -381,6 +436,8 @@ void QFPRDRFCS::insertMultiFileFCS()
                 insertALBAFile(files, p, paramsReadonly);
             } else if (currentFCSFileFormatFilter==diff4f) {
                 insertDiffusion4File(files, p, paramsReadonly);
+            } else if (currentFCSFileFormatFilter==flexf) {
+                insertFLEX_SINFile(files, p, paramsReadonly);
             } else {
                 insertCSVFile(files, p, paramsReadonly);
             }

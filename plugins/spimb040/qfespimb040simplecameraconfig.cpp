@@ -202,6 +202,28 @@ void QFESPIMB040SimpleCameraConfig::storeSettings(QFManyFilesSettings &settings,
     cmbAcquisitionDevice->storeSettings(settings, prefix+"device/");
 }
 
+void QFESPIMB040SimpleCameraConfig::setCurrentPreview(int id)
+{
+    QStringList sl=getPreviewConfigs();
+    if (id>=0 && id<sl.size()) {
+        cmbPreviewConfiguration->setCurrentConfig(sl[id]);
+        QApplication::processEvents();
+        QApplication::processEvents();
+    }
+}
+
+void QFESPIMB040SimpleCameraConfig::setCurrentPreview(const QString &id)
+{
+    cmbPreviewConfiguration->setCurrentConfig(id);
+    QApplication::processEvents();
+    QApplication::processEvents();
+}
+
+QStringList QFESPIMB040SimpleCameraConfig::getPreviewConfigs() const
+{
+    return cmbPreviewConfiguration->getConfigs();
+}
+
 
 
 void QFESPIMB040SimpleCameraConfig::createWidgets() {

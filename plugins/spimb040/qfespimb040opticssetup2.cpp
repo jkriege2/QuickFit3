@@ -1539,6 +1539,11 @@ QFCameraComboBox* QFESPIMB040OpticsSetup2::cameraComboBox(int camera) const {
     return NULL;
 }
 
+QFESPIMB040SimpleCameraConfig *QFESPIMB040OpticsSetup2::cameraConfig(int camera) const
+{
+    return NULL;
+}
+
 QFCameraConfigComboBoxStartResume* QFESPIMB040OpticsSetup2::getStopRelease(int camera) const {
     /*if (camera==0) return ui->camConfig1;
     if (camera==1) return ui->camConfig2;*/

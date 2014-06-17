@@ -149,6 +149,8 @@ class QFWIDLIB_EXPORT QFCameraConfigEditorWidget : public QWidget {
 
         void setSetCurrentDefaultEnabled(bool enabled);
 
+        QStringList getConfigs() const;
+
     public slots:
         /*! \brief may be used to connect this widget to a QFCameraComboBox
 

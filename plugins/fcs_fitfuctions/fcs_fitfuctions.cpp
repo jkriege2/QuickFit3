@@ -4,6 +4,7 @@
 #include "qffitfunctionfcsmultidiffusion.h"
 #include "qffitfunctionfcsadiff.h"
 #include "qffitfunctionfcsdiff.h"
+#include "qffitfunctionfcsdiff_relbright.h"
 #include "qffitfunctionfcsexp.h"
 #include "qffitfunctionfcssimplediff.h"
 #include "qffitfunctionfcsflow.h"
@@ -24,7 +25,7 @@
 
 QStringList QFPFitFunctionFCS::getIDs() const {
     QStringList res;
-    res<<"fcs_diff"<<"fcs_diff_d"<<"fcs_diff_d_afterpulse"<<"fcs_diff_d_wz"<<"fcs_diff_d_wz_afterpulse"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff"<<"fcs_diffflow"<<"fcs_diffflowv"<<"fcs_diffrot"<<"fcs_oscillation"<<"fcs_cs_diff_d"<<"fcs_diff_cs_d_wz"<<"fcs_simpleexp"<<"fcs_exp"<<"fcs_powerlaw";
+    res<<"fcs_diff"<<"fcs_diff_diffbright"<<"fcs_diff_d"<<"fcs_diff_d_afterpulse"<<"fcs_diff_d_wz"<<"fcs_diff_d_wz_afterpulse"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff"<<"fcs_diffflow"<<"fcs_diffflowv"<<"fcs_diffrot"<<"fcs_oscillation"<<"fcs_cs_diff_d"<<"fcs_diff_cs_d_wz"<<"fcs_simpleexp"<<"fcs_exp"<<"fcs_powerlaw";
     return res;
 }
 
@@ -63,6 +64,8 @@ QFFitFunction* QFPFitFunctionFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionFCSDiffDAfterPulse(true);
     } else if (id=="fcs_diff_d_wz_afterpulse") {
         return new QFFitFunctionFCSDiffDAfterPulse(false);
+    } else if (id=="fcs_diff_diffbright") {
+        return new QFFitFunctionFCSDiffDifferentBrightness();
     }
     return NULL;
 }

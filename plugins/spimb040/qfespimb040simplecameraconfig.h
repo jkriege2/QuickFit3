@@ -67,6 +67,10 @@ class QFESPIMB040SimpleCameraConfig : public QGroupBox, public QFCameraConfigCom
         void storeSettings(QSettings& settings, QString prefix);
         void storeSettings(QFManyFilesSettings& settings, QString prefix);
 
+        void setCurrentPreview(int id);
+        void setCurrentPreview(const QString& id);
+        QStringList getPreviewConfigs() const;
+
         /*! \brief returns a pointer to the QFExtensionCamera and ensures exclusive access to one camera therein.
 
             This method first stops any preview or use of the <QFExtensionCamera, camera> pair managed by this class.

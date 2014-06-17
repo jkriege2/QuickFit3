@@ -675,3 +675,28 @@ void QFDataExportHandler::DataWriter::save(const QList<QList<QVariant> > &data, 
     save(dataExpandToDouble(data), filename, columnHeaders, rowHeaders);
 }
 
+
+int dataGetRows(const QList<QVector<double> >& data) {
+    int r=0;
+    for (int i=0; i<data.size(); i++) {
+        r=qMax(r, data[i].size());
+    }
+    return r;
+}
+
+int dataGetRows(const QList<QList<double> >& data) {
+    int r=0;
+    for (int i=0; i<data.size(); i++) {
+        r=qMax(r, data[i].size());
+    }
+    return r;
+}
+
+
+int dataGetRows(const QList<QList<QVariant> >& data) {
+    int r=0;
+    for (int i=0; i<data.size(); i++) {
+        r=qMax(r, data[i].size());
+    }
+    return r;
+}

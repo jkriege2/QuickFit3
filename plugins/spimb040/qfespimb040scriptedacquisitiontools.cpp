@@ -504,6 +504,47 @@ void QFESPIMB040ScriptedAcquisitionAcquisitionControl::acquirePreviewFramesWithP
     mainWindow->savePreviewMovie(camera, N, fn, preview_params);
 }
 
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setPreviewConfig(int camera, int id)
+{
+    if (opticsSetup->cameraConfig(camera)) {
+        opticsSetup->cameraConfig(camera)->setCurrentPreview(id);
+    }
+}
+
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setPreviewConfig(int camera, const QString &id)
+{
+    if (opticsSetup->cameraConfig(camera)) {
+        opticsSetup->cameraConfig(camera)->setCurrentPreview(id);
+    }
+}
+
+QStringList QFESPIMB040ScriptedAcquisitionAcquisitionControl::getPreviewConfigs(int camera)
+{
+    if (opticsSetup->cameraConfig(camera)) {
+        QStringList sl=opticsSetup->cameraConfig(camera)->getPreviewConfigs();
+        return sl;
+    }
+    return QStringList();
+}
+
+int QFESPIMB040ScriptedAcquisitionAcquisitionControl::getPreviewConfigsCount(int camera)
+{
+    if (opticsSetup->cameraConfig(camera)) {
+        QStringList sl=opticsSetup->cameraConfig(camera)->getPreviewConfigs();
+        return sl.size();
+    }
+    return 0;
+}
+
+QString QFESPIMB040ScriptedAcquisitionAcquisitionControl::getPreviewConfig(int camera, int id)
+{
+    if (opticsSetup->cameraConfig(camera)) {
+        QStringList sl=opticsSetup->cameraConfig(camera)->getPreviewConfigs();
+        return sl.value(id, "");
+    }
+    return QString();
+}
+
 void QFESPIMB040ScriptedAcquisitionAcquisitionControl::clearPreviewParams()
 {
     preview_params.clear();

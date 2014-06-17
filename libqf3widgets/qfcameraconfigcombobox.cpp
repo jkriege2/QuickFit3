@@ -391,6 +391,15 @@ void QFCameraConfigEditorWidget::setSetCurrentDefaultEnabled(bool enabled)
     actSetDefault->setVisible(enabled);
 }
 
+QStringList QFCameraConfigEditorWidget::getConfigs() const
+{
+    QStringList sl;
+    for (int i=0; i<combobox->count(); i++) {
+        sl.append(combobox->itemText(i));
+    }
+    return sl;
+}
+
 void QFCameraConfigEditorWidget::setDefaultAsCurrentConfig()
 {
     if (!combobox->getDefaultConfig().isEmpty()) {
