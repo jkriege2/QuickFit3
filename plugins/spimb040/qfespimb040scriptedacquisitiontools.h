@@ -50,7 +50,7 @@ class QFESPIMB040ScriptedAcquisitionTools : public QObject, public QFESPIMB040Sc
         void sleepMS(int duration);
         void createTextFile(const QString& filename);
         void appendTextFile(const QString& filename, const QString& data);
-
+        void showMessageBox(const QString& text);
     private:
         QFPluginServices* m_pluginServices;
         QFESPIMB040OpticsSetupBase* opticsSetup;

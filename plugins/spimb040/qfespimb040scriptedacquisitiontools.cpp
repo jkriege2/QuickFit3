@@ -81,6 +81,11 @@ void QFESPIMB040ScriptedAcquisitionTools::appendTextFile(const QString &filename
     }
 }
 
+void QFESPIMB040ScriptedAcquisitionTools::showMessageBox(const QString &text)
+{
+    QMessageBox::information(widAcquisition, tr("JavaScript Message Box"), text);
+}
+
 
 
 
