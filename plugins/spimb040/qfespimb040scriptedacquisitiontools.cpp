@@ -504,7 +504,7 @@ void QFESPIMB040ScriptedAcquisitionAcquisitionControl::acquirePreviewFramesWithP
     mainWindow->savePreviewMovie(camera, N, fn, preview_params);
 }
 
-void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setPreviewConfig(int camera, int id)
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setPreviewConfigIndex(int camera, int id)
 {
     if (opticsSetup->cameraConfig(camera)) {
         opticsSetup->cameraConfig(camera)->setCurrentPreview(id);
