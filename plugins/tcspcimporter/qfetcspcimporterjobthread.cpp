@@ -5,11 +5,13 @@
 #include <stdint.h>
 #include "qfimportermanager.h"
 #include "binarydatatools.h"
+#include "qftools.h"
 
 QMutex* QFETCSPCImporterJobThread::mutexFilename=NULL;
 
 // this number has to be dividable by 8192
-#define FCS_CHANNELBUFFER_ITEMS (8192*64)
+#define FCS_SHIFT_BLOCKSIZE 8192
+#define FCS_CHANNELBUFFER_ITEMS (FCS_SHIFT_BLOCKSIZE*64)
 
 QFETCSPCImporterJobThread::QFETCSPCImporterJobThread(QFPluginServices *services, QObject *parent) :
     QThread(parent)
@@ -496,10 +498,10 @@ void QFETCSPCImporterJobThread::run() {
 
 void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrateFile) {
     double nextcrInterval=job.countrate_binning;
-    uint16_t* countrate=(uint16_t*)calloc(channels, sizeof(uint16_t));
+    uint16_t* countrate=(uint16_t*)qfCalloc(channels, sizeof(uint16_t));
     uint16_t* fcs_countrate=NULL;
-    if (job.doFCS) fcs_countrate=(uint16_t*)calloc(channels*FCS_CHANNELBUFFER_ITEMS, sizeof(uint16_t));
-    uint16_t* fcs_storecountrate=(uint16_t*)calloc(channels, sizeof(uint16_t));
+    if (job.doFCS) fcs_countrate=(uint16_t*)qfCalloc(channels*FCS_CHANNELBUFFER_ITEMS, sizeof(uint16_t));
+    uint16_t* fcs_storecountrate=(uint16_t*)qfCalloc(channels, sizeof(uint16_t));
     uint64_t crCounter=0;
     uint32_t fcs_countrate_counter=0;
     double pos=0;
@@ -555,26 +557,7 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                         memset(fcs_countrate, 0, channels*FCS_CHANNELBUFFER_ITEMS*sizeof(uint16_t));
                         fcs_countrate_counter=fcs_countrate_counter-FCS_CHANNELBUFFER_ITEMS;
                     }
-                    //qDebug()<<emptyrecords;
-/*                    for (register uint64_t r=0; r<emptyrecords+1; r++) {
-                        //if (job.countrate_channels.contains(c)) binfileWriteUint16(*countrateFile, countrate[c]);
-                        if (job.fcs_correlator==CORRELATOR_MTAUALLMON) {
-                            for (QSet<QPair<int, int> >::iterator i = job.fcs_correlate.begin(); i != job.fcs_correlate.end(); ++i) {
-                                 QPair<int, int> ccf=*i;
-                                 uint32_t id=xyAdressToUInt32(ccf.first, ccf.second);
-                                 corrjk[id]->crosscorrelate_step(double(fcs_countrate[ccf.first]), double(fcs_countrate[ccf.second]));
-                            }
 
-                        } else if (job.fcs_correlator==CORRELATOR_MTAUONEMON) {
-                            for (QSet<QPair<int, int> >::iterator i = job.fcs_correlate.begin(); i != job.fcs_correlate.end(); ++i) {
-                                 QPair<int, int> ccf=*i;
-                                 uint32_t id=xyAdressToUInt32(ccf.first, ccf.second);
-                                 corrjb[id]->run(fcs_countrate[ccf.first], fcs_countrate[ccf.second]);
-                            }
-
-                        }
-                        for (register int cc=0; cc<channels; cc++) fcs_countrate[cc]=0;
-                    }*/
 
                     fcs_countrate[fcs_countrate_counter+c*FCS_CHANNELBUFFER_ITEMS]++;
                     fcsNextInterval=fcsNextInterval+emptyrecords*job.fcs_taumin;
@@ -633,10 +616,10 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
             copyCorrelatorIntermediateResults(fcs_segment);
             fcs_segment++;
         }
-        free(fcs_storecountrate);
+        qfFree(fcs_storecountrate);
     }
-    free(countrate);
-    free(fcs_countrate);
+    qfFree(countrate);
+    qfFree(fcs_countrate);
 }
 
 void QFETCSPCImporterJobThread::clearCorrelators() {
@@ -741,8 +724,8 @@ void QFETCSPCImporterJobThread::shiftIntoCorrelators(uint16_t* fcs_countrate, ui
              QPair<int, int> ccf=*i;
              uint32_t id=xyAdressToUInt32(ccf.first, ccf.second);
              corrjk_type* corr=corrjk[id];
-             for (uint32_t ci=0; ci<count; ci+=8192) {
-                 corr->crosscorrelate_series(&(fcs_countrate[ccf.first*FCS_CHANNELBUFFER_ITEMS+ci]), &(fcs_countrate[ccf.second*FCS_CHANNELBUFFER_ITEMS+ci]), 8192);
+             for (uint32_t ci=0; ci<count; ci+=FCS_SHIFT_BLOCKSIZE) {
+                 corr->crosscorrelate_series(&(fcs_countrate[ccf.first*FCS_CHANNELBUFFER_ITEMS+ci]), &(fcs_countrate[ccf.second*FCS_CHANNELBUFFER_ITEMS+ci]), FCS_SHIFT_BLOCKSIZE);
                  if (was_canceled) break;
              }
         }

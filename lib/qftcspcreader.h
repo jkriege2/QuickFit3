@@ -32,9 +32,11 @@ struct QFLIB_EXPORT QFTCSPCRecord {
     /** \brief is \a isPhoton \c == \c false then the record is a marker record. The type(e.g. ID) of the marker is given by this */
     uint8_t marker_type;
 
-    double absoluteTime() const ;
+    inline double absoluteTime() const {
+        return macrotime;//+(microtime_offset+double(microtime_channel)*microtime_deltaT)*1e-9;
+    }
 
-    QFTCSPCRecord(uint16_t input_channel=0, double macrotime=0.0, int16_t microtime_channel=0, double microtime_offset=0.0, double microtime_deltaT=1e-9, bool isPhoton=true, uint8_t marker_type=0) ;
+    explicit QFTCSPCRecord(uint16_t input_channel=0, double macrotime=0.0, int16_t microtime_channel=0, double microtime_offset=0.0, double microtime_deltaT=1e-9, bool isPhoton=true, uint8_t marker_type=0) ;
 };
 
 /*! \brief interface for TCSPC reader classes

@@ -109,10 +109,10 @@ QFRDRImagingFCSData::~QFRDRImagingFCSData() {
      allocateStatistics(backStat2, 0);
      clearOvrImages();
      clearSelections();
-     if (video) free(video);
+     if (video) qfFree(video);
      video=NULL;
      video_width=video_height=video_frames=0;
-     if (videoUncorrected) free(videoUncorrected);
+     if (videoUncorrected) qfFree(videoUncorrected);
      videoUncorrected=NULL;
      videoUncorrected_width=videoUncorrected_height=videoUncorrected_frames=0;
 }
@@ -486,10 +486,10 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
         }
 
         if (overviewTemp.size()==width*height) {
-            double* tmp=(double*)malloc(width*height*sizeof(double));
+            double* tmp=(double*)qfMalloc(width*height*sizeof(double));
             for (int i=0; i<width*height; i++) tmp[i]=overviewTemp.value(i, 0)/tau[0]/1.0e3;
             splitImage(overviewF, overviewF2, tmp, width, height);
-            free(tmp);
+            qfFree(tmp);
         }
 
 
@@ -720,7 +720,7 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                 QString l=te.attribute("list", "");
                 int selSize=getImageSelectionWidth()*getImageSelectionHeight();
                 QFRDRImagingFCSData::ImageSelection sel;
-                sel.selection=(bool*)calloc(selSize, sizeof(bool));
+                sel.selection=(bool*)qfCalloc(selSize, sizeof(bool));
                 for (int i=0; i<selSize; i++) sel.selection[i]=false;
                 sel.name=n;
 
@@ -764,7 +764,7 @@ bool QFRDRImagingFCSData::loadOverview(double* overviewF, double* overviewF2, co
             uint32 nx,ny;
             TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
             TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
-            double* tmp=(double*)malloc(nx*ny*sizeof(double));
+            double* tmp=(double*)qfMalloc(nx*ny*sizeof(double));
             ok=TIFFReadFrame<double>(tif, tmp);
             TIFFClose(tif);
 
@@ -772,7 +772,7 @@ bool QFRDRImagingFCSData::loadOverview(double* overviewF, double* overviewF2, co
 
                 splitImage(overviewF, overviewF2, tmp, nx, ny);
             }
-            free(tmp);
+            qfFree(tmp);
         } else {
             log_warning(tr("WARNING: could not load overview image file '%1'\n").arg(filename));
         }
@@ -811,7 +811,7 @@ bool QFRDRImagingFCSData::loadOverview(double* overviewF, double* overviewF2, co
 bool QFRDRImagingFCSData::loadImage(const QString& filename, double** data, int* width, int* height) {
     bool ok=false;
 
-    if (*data) free(*data);
+    if (*data) qfFree(*data);
     *data=NULL;
     *width=0;
     *height=0;
@@ -824,7 +824,7 @@ bool QFRDRImagingFCSData::loadImage(const QString& filename, double** data, int*
             TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
             *width=nx;
             *height=ny;
-            *data=(double*)malloc(nx*ny*sizeof(double));
+            *data=(double*)qfMalloc(nx*ny*sizeof(double));
             ok=TIFFReadFrame<double>(tif, *data);
             TIFFClose(tif);
         } else {
@@ -850,7 +850,7 @@ bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int*
     qDebug()<<filename<<data<<width<<height<<frames;
     if (!data || !width || !height || !frames) return false;
 
-    if (*data) free(*data);
+    if (*data) qfFree(*data);
     *data=NULL;
     *width=0;
     *height=0;
@@ -871,7 +871,7 @@ bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int*
             *width=nx;
             *height=ny;
             if (*frames>0 && *width>0 && *height>0) {
-                *data=(double*)malloc(nx*ny*(*frames)*sizeof(double));
+                *data=(double*)qfMalloc(nx*ny*(*frames)*sizeof(double));
                 uint32_t i=0;
                 if (*data) {
                     do {
@@ -1167,7 +1167,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
                         correlations[p]=sigmas[p]=0;
                     }
 
-                    double* dummy=(double*)calloc(N, sizeof(double));
+                    double* dummy=(double*)qfCalloc(N, sizeof(double));
 
                     for (long long p=0; p<width*height; p++) {
                         double count=0;
@@ -1219,7 +1219,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
                         QApplication::processEvents();
                     }
 
-                    free(dummy);
+                    qfFree(dummy);
 
                 }
             }
@@ -1287,16 +1287,16 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename, bool loadOve
         recalcCorrelations();
         QApplication::processEvents();
     } else {
-        double* tmp=(double*)malloc(width*height*sizeof(double));
-        double* tmpStd=(double*)malloc(width*height*sizeof(double));
+        double* tmp=(double*)qfMalloc(width*height*sizeof(double));
+        double* tmpStd=(double*)qfMalloc(width*height*sizeof(double));
         for(int i=0; i<width*height; i++) {
             tmp[i]=cfr->getRaw(i,0)/(double(steps)*tau[0])/1.0e3;
             tmpStd[i]=0;
         }
         splitImage(overviewF, overviewF2, tmp, width, height);
         splitImage(overviewFSTD, overviewF2STD, tmpStd, width, height);
-        free(tmp);
-        free(tmpStd);
+        qfFree(tmp);
+        qfFree(tmpStd);
     }
     delete cfr;
 
@@ -1424,11 +1424,11 @@ bool QFRDRImagingFCSData::isCorrelationRunVisible(int run) const {
 
 void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
     if (x==width && y==height && N==this->N) return;
-    if (correlations) free(correlations);
-    if (correlationMean) free(correlationMean);
-    if (correlationStdDev) free(correlationStdDev);
-    if (sigmas) free(sigmas);
-    if (tau) free(tau);
+    if (correlations) qfFree(correlations);
+    if (correlationMean) qfFree(correlationMean);
+    if (correlationStdDev) qfFree(correlationStdDev);
+    if (sigmas) qfFree(sigmas);
+    if (tau) qfFree(tau);
     maskDelete();
 
     correlations=NULL;
@@ -1439,13 +1439,13 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
     //qDebug()<<getID()<<"allocateContents "<<x<<"*"<<y<<"  *"<<N;
     if ((x>0) && (y>0) && (N>0)) {
         maskInit(x,y);
-        correlations=(double*)calloc(x*y*N,sizeof(double));
-        sigmas=(double*)calloc(x*y*N,sizeof(double));
-        correlationMean=(double*)calloc(N,sizeof(double));
-        correlationStdDev=(double*)calloc(N,sizeof(double));
+        correlations=(double*)qfCalloc(x*y*N,sizeof(double));
+        sigmas=(double*)qfCalloc(x*y*N,sizeof(double));
+        correlationMean=(double*)qfCalloc(N,sizeof(double));
+        correlationStdDev=(double*)qfCalloc(N,sizeof(double));
         width=x;
         height=y;
-        tau=(double*)calloc(N,sizeof(double));
+        tau=(double*)qfCalloc(N,sizeof(double));
         this->N=N;
         setQFProperty("WIDTH", x, false, true);
         setQFProperty("HEIGHT", y, false, true);
@@ -1457,10 +1457,10 @@ void QFRDRImagingFCSData::allocateContents(int x, int y, int N) {
 
 void QFRDRImagingFCSData::allocateOverviews(int x, int y) {
     if (x==widthOvr && y==heightOvr) return;
-    if (overviewF) free(overviewF);
-    if (overviewFSTD) free(overviewFSTD);
-    if (overviewF2) free(overviewF2);
-    if (overviewF2STD) free(overviewF2STD);
+    if (overviewF) qfFree(overviewF);
+    if (overviewFSTD) qfFree(overviewFSTD);
+    if (overviewF2) qfFree(overviewF2);
+    if (overviewF2STD) qfFree(overviewF2STD);
     overviewF=NULL;
     overviewF2=NULL;
     overviewFSTD=NULL;
@@ -1474,22 +1474,22 @@ void QFRDRImagingFCSData::allocateOverviews(int x, int y) {
         heightOvr=y;
 
 
-        overviewF=(double*)calloc(x*y,sizeof(double));
-        overviewFSTD=(double*)calloc(x*y,sizeof(double));
+        overviewF=(double*)qfCalloc(x*y,sizeof(double));
+        overviewFSTD=(double*)qfCalloc(x*y,sizeof(double));
         if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone /*&& !getRole().toLower().startsWith("acf")*/) {
-            overviewF2=(double*)calloc(x*y,sizeof(double));
-            overviewF2STD=(double*)calloc(x*y,sizeof(double));
+            overviewF2=(double*)qfCalloc(x*y,sizeof(double));
+            overviewF2STD=(double*)qfCalloc(x*y,sizeof(double));
         }
     }
 }
 
 void QFRDRImagingFCSData::allocateStatistics(QFRDRImagingFCSData::statisticsData &stat, uint32_t N)
 {
-    if (stat.Avg) free(stat.Avg);
-    if (stat.StdDev) free(stat.StdDev);
-    if (stat.T) free(stat.T);
-    if (stat.Min) free(stat.Min);
-    if (stat.Max) free(stat.Max);
+    if (stat.Avg) qfFree(stat.Avg);
+    if (stat.StdDev) qfFree(stat.StdDev);
+    if (stat.T) qfFree(stat.T);
+    if (stat.Min) qfFree(stat.Min);
+    if (stat.Max) qfFree(stat.Max);
     stat.N=N;
     stat.Avg=NULL;
     stat.T=NULL;
@@ -1499,11 +1499,11 @@ void QFRDRImagingFCSData::allocateStatistics(QFRDRImagingFCSData::statisticsData
     stat.avgCnt=0;
     stat.sigmaCnt=0;
     if (stat.N>0) {
-        stat.Avg=(double*)calloc(N, sizeof(double));
-        stat.StdDev=(double*)calloc(N, sizeof(double));
-        stat.Min=(double*)calloc(N, sizeof(double));
-        stat.Max=(double*)calloc(N, sizeof(double));
-        stat.T=(double*)calloc(N, sizeof(double));
+        stat.Avg=(double*)qfCalloc(N, sizeof(double));
+        stat.StdDev=(double*)qfCalloc(N, sizeof(double));
+        stat.Min=(double*)qfCalloc(N, sizeof(double));
+        stat.Max=(double*)qfCalloc(N, sizeof(double));
+        stat.T=(double*)qfCalloc(N, sizeof(double));
     }
 #ifdef DEBUG_SIZES
     qDebug()<<getID()<<"allocateStatistics( N="<<N<<"):  "<<bytestostr(statN*5*sizeof(double)).c_str();
@@ -1814,7 +1814,7 @@ double QFRDRImagingFCSData::getTauMin() const {
 
 void QFRDRImagingFCSData::clearOvrImages() {
     for (int i=0; i<ovrImages.size(); i++) {
-        free(ovrImages[i].image);
+        qfFree(ovrImages[i].image);
     }
     ovrImages.clear();
 }
@@ -2498,7 +2498,7 @@ void QFRDRImagingFCSData::addImageSelection(bool *selection, const QString &name
 {
     QFRDRImagingFCSData::ImageSelection s;
     s.name=name;
-    s.selection=(bool*)calloc(getImageSelectionHeight()*getImageSelectionWidth(), sizeof(bool));
+    s.selection=(bool*)qfCalloc(getImageSelectionHeight()*getImageSelectionWidth(), sizeof(bool));
     memcpy(s.selection, selection, getImageSelectionHeight()*getImageSelectionWidth()*sizeof(bool));
     selections.append(s);
 }
@@ -2580,7 +2580,7 @@ void QFRDRImagingFCSData_bincf(T* data, T* sigma, int width, int height, int N, 
         sigma[i]=sqrt((sigma[i]-data[i]*data[i]/norm)/(norm-1.0));
         data[i]= data[i]/norm;
     }
-    free(temp);
+    qfFree(temp);
 }
 
 void QFRDRImagingFCSData::loadPostProcess()
@@ -2694,10 +2694,10 @@ void QFRDRImagingFCSData::splitCFsForDualView() {
     memcpy(tau, oldTau, N*sizeof(double));
     setQFProperty("WIDTH", width, false, true);
     setQFProperty("HEIGHT", height, false, true);
-    free(oldC);
-    free(oldS);
-    free(oldL);
-    free(oldTau);
+    qfFree(oldC);
+    qfFree(oldS);
+    qfFree(oldL);
+    qfFree(oldTau);
     recalcCorrelations();
 }
 
@@ -2752,7 +2752,7 @@ void QFRDRImagingFCSData::splitVideo(double *video, double *&video2, int &width,
             }
         }
 
-        free(temp);
+        qfFree(temp);
     } else {
         log_warning(tr("WARNING could not split image in record '%1' (out of memory).\n").arg(getName()));
     }
