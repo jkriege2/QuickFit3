@@ -1,5 +1,5 @@
 #include "qfpfitfunctionstirfcs.h"
-
+#include "qffitfunctionstirfcsdiffe2_relbright.h"
 #include "qffitfunctionstirfcsdiffe2.h"
 #include "qffitfunctionstirfcsadiffe2.h"
 #include "qffitfunctionstirfccsdiffflowe2.h"

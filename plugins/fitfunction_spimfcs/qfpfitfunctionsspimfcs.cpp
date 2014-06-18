@@ -8,6 +8,7 @@
 #include "qffitfunctionsspimfcsdiffc.h"
 #include "qffitfunctionsspimfcsdiffce2.h"
 #include "qffitfunctionsspimfcsdiffe2_newveff.h"
+#include "qffitfunctionsspimfcsdiffe2_newveff_relbright.h"
 #include "qffitfunctionsspimfcsadiffe2.h"
 #include "qffitfunctionsspimfcsadiffce2.h"
 #include "qffitfunctionsspimfccsfwdiff2colorccf.h"
@@ -49,6 +50,7 @@ QStringList QFPFitFunctionsSPIMFCS::getIDs() const {
 
     res<<"fcs_spim_diffe2";
     res<<"fcs_spim_diffe2_newveff";
+    res<<"fcs_spim_diffe2_newveff_diffbright";
 
     res<<"fcs_spim_diffce2";
     res<<"fcs_spim_adiffe2";
@@ -104,6 +106,8 @@ QFFitFunction* QFPFitFunctionsSPIMFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionsSPIMFCSDiffE2();
     } else if (id=="fcs_spim_diffe2_newveff") {
         return new QFFitFunctionsSPIMFCSDiffE2NewVeff();
+    } else if (id=="fcs_spim_diffe2_newveff_diffbright") {
+        return new QFFitFunctionsSPIMFCSDiffE2NewVeffDiffBright();
     } else if (id=="fcs_spim_adiff") {
         return new QFFitFunctionsSPIMFCSADiff();
     } else if (id=="fcs_spim_adiffe2") {

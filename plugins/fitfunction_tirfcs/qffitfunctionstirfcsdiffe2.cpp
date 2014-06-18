@@ -99,7 +99,7 @@ double QFFitFunctionsTIRFCSDiffE2::evaluate(double t, const double* data) const 
     }
 
     if (comp>2) {
-        cfac=cfac+rho2*QFFitFunctionsTIRFCCSFWDiff2ColorCCF_corrfactor_2Dxy(a, 0, 0, D3, t, wxy, wxy);
+        cfac=cfac+rho3*QFFitFunctionsTIRFCCSFWDiff2ColorCCF_corrfactor_2Dxy(a, 0, 0, D3, t, wxy, wxy);
     }
 
     const double Veff=TIRFCS_newAeff(a, wxy);

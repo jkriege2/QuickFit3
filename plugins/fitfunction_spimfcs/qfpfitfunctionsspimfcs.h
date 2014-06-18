@@ -44,7 +44,7 @@ class QFPFitFunctionsSPIMFCS : public QObject, public QFPluginFitFunction, publi
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("(c) 2011-2013 by Jan W. Krieger");
+            return tr("(c) 2011-2014 by Jan W. Krieger");
         };
 
         /** \brief weblink for the plugin */
@@ -66,7 +66,7 @@ class QFPFitFunctionsSPIMFCS : public QObject, public QFPluginFitFunction, publi
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=5;
+            minor=6;
         };
 
         /** \brief return list of plugin IDs */

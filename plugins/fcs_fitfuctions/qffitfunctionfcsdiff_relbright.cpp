@@ -1,5 +1,6 @@
 #include "qffitfunctionfcsdiff_relbright.h"
-
+#include "qftools.h"
+#include <QDebug>
 
 #define sqr(x) ((x)*(x))
 #define cube(x) ((x)*(x)*(x))
@@ -32,13 +33,13 @@ QFFitFunctionFCSDiffDifferentBrightness::QFFitFunctionFCSDiffDifferentBrightness
     #define FCSDiff_diff_tau1 9
     addParameter(FloatNumber,  "diff_rho2",               "fraction of second component",                          "&rho;<sub>2</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1  );
     #define FCSDiff_diff_rho2 10
-    addParameter(FloatNumber,  "rel_brightness2",         "relative brightness of second component",               "q<sub>2</sub>",            "",            "",                      false,     true,         false,             QFFitFunction::EditError, false, 1,            0,        1e10,  0.1, 0,      1  );
+    addParameter(FloatNumber,  "rel_brightness2",         "relative brightness of second component",               "q<sub>2</sub>",            "",            "",                      true,     true,         true,               QFFitFunction::EditError,     true, 1,            0,        1e10,  0.1);
     #define FCSDiff_REL_BRIGHTNESS2 11
     addParameter(FloatNumber,  "diff_tau2",               "diffusion time of second component",                    "&tau;<sub>D,2</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, false, 300,          1,        1e8,      1,   0    );
     #define FCSDiff_diff_tau2 12
     addParameter(FloatNumber,  "diff_rho3",               "fraction of third component",                           "&rho;<sub>3</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.5,          0,        0.99999,  0.1, 0,      1  );
     #define FCSDiff_diff_rho3 13
-    addParameter(FloatNumber,  "rel_brightness3",         "relative brightness of third component",                "q<sub>3</sub>",            "",            "",                      false,     true,         false,             QFFitFunction::EditError, false, 1,            0,        1e10,  0.1, 0,      1  );
+    addParameter(FloatNumber,  "rel_brightness3",         "relative brightness of third component",                "q<sub>3</sub>",            "",            "",                      true,     true,         true,               QFFitFunction::EditError,     true, 1,            0,        1e10,  0.1);
     #define FCSDiff_REL_BRIGHTNESS3 14
     addParameter(FloatNumber,  "diff_tau3",               "diffusion time of third component",                     "&tau;<sub>D,3</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, false, 300,          1,        1e8,      1    );
     #define FCSDiff_diff_tau3 15
@@ -64,6 +65,7 @@ QFFitFunctionFCSDiffDifferentBrightness::QFFitFunctionFCSDiffDifferentBrightness
     #define FCSDiff_background 25
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
     #define FCSDiff_cpm 26
+
 }
 
 double QFFitFunctionFCSDiffDifferentBrightness::evaluate(double t, const double* data) const {
@@ -97,17 +99,20 @@ double QFFitFunctionFCSDiffDifferentBrightness::evaluate(double t, const double*
     double d1=1.0/(1.0+reltau1)/sqrt(1.0+reltau1/gamma2);
     double d2=0;
     double d3=0;
+    double rhonorm=rho1;
     if (comp>1) {
         double reltau2=0;
         if (tauD2!=0) reltau2=t/tauD2;
         d2=rho2*q2*q2/(1.0+reltau2)/sqrt(1.0+reltau2/gamma2);
         rho1=1.0-rho2;
+        rhonorm=rho1+rho2*q2;
     }
     if (comp>2) {
         double reltau3=0;
         if (tauD3!=0) reltau3=t/tauD3;
         d3=rho3*q3*q3/(1.0+reltau3)/sqrt(1.0+reltau3/gamma2);
         rho1=1.0-rho2-rho3;
+        rhonorm=rho1+rho2*q2+rho3*q3;
     }
     double pre=1.0;
     if (nonfl_comp==1) {
@@ -115,7 +120,7 @@ double QFFitFunctionFCSDiffDifferentBrightness::evaluate(double t, const double*
     } else if (nonfl_comp==2) {
         pre=(1.0-nf_theta1+nf_theta1*exp(-t/nf_tau1)-nf_theta2+nf_theta2*exp(-t/nf_tau2))/(1.0-nf_theta1-nf_theta2);
     }
-    return offset+pre/(N*qfSqr(rho1+rho2*q2+rho3*q3))*(rho1*d1+d2+d3)*backfactor;
+    return offset+pre/(N*qfSqr(rhonorm))*(rho1*d1+d2+d3)*backfactor;
 }
 
 
@@ -325,6 +330,14 @@ unsigned int QFFitFunctionFCSDiffDifferentBrightness::getAdditionalPlotCount(con
 }
 
 QString QFFitFunctionFCSDiffDifferentBrightness::transformParametersForAdditionalPlot(int plot, double* params) {
-    params[FCSDiff_n_nonfluorescent]=0;
-    return "without non-fluorescent";
+    //double* dat=duplicateArray(params, paramCount());
+    if (plot==0) {
+        params[FCSDiff_n_nonfluorescent]=0;
+        return "without non-fluorescent";
+    }
+    /*for (int i=0; i<paramCount(); i++) {
+        qDebug()<<dat[i]<<" -> "<<params[i];
+    }
+    free(dat);*/
+    return "";
 }

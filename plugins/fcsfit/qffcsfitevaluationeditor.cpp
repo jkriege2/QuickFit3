@@ -297,6 +297,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 for (int i=0; i<(int)ffunc->getAdditionalPlotCount(fullParams); i++) {
                     double* params=eval->allocFillParameters();
                     QString name=ffunc->transformParametersForAdditionalPlot(i, params);
+                    //qDebug()<<arrayToString(params, ffunc->paramCount());
                     double* afitfunc=(double*)malloc(N*sizeof(double));
                     for (int j=0; j<N; j++) {
                         afitfunc[j]=ffunc->evaluate(tauvals[j], params);

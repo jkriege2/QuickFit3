@@ -48,7 +48,7 @@ class QFFitFunctionFCSDiffDifferentBrightness: public QFFitFunction {
         QFFitFunctionFCSDiffDifferentBrightness();
         virtual ~QFFitFunctionFCSDiffDifferentBrightness() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: Normal Diffusion 3D, different brightnesses"); };
+        virtual QString name() const { return QString("FCS: Normal Diffusion 3D, different molecular brightnesses"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_diff_diffbright"); };
 
