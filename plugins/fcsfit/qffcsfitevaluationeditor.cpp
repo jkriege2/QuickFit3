@@ -24,9 +24,11 @@
 
 
 QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget* parent):
-    QFFitResultsByIndexEvaluationEditorWithWidgets("fcsfitevaleditor/", propEditor, services, parent, true, true)
+    QFFitResultsByIndexEvaluationEditorWithWidgets("fcsfitevaleditor/", propEditor, services, parent, true, true, tr("run"))
 {
     createWidgets();
+    btnFirstRun->setText(tr("avg."));
+
 }
 
 QFFCSFitEvaluationEditor::~QFFCSFitEvaluationEditor()

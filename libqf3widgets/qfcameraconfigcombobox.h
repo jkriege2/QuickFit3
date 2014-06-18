@@ -136,6 +136,8 @@ class QFWIDLIB_EXPORT QFCameraConfigEditorWidget : public QWidget {
         QString currentConfigName() const { return combobox->currentText(); };
         /** \brief select a given camera configuration */
         void setCurrentConfig(const QString& name) { combobox->setCurrentConfig(name); }
+        /** \brief select a given camera configuration */
+        void setCurrentConfig(int id) { combobox->setCurrentIndex(id); }
         /** \brief select a given camera configuration file */
         void setCurrentConfigFile(const QString& filename) { combobox->setCurrentConfigFilename(filename); }
         /** \brief this QAction triggers the configuration of the currently selected camera settings, provided for convenience, if you need this functionality at additional buttons in your GUI */

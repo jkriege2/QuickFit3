@@ -83,7 +83,15 @@ QVariant QFTableModel::headerData(int section, Qt::Orientation orientation, int 
              return state.headerDataMap[section].value(role, QVariant());
          }
      } else if (orientation == Qt::Vertical && role == Qt::DisplayRole) {
-         if (verticalHeaderShowRowNumbers) return QString::number(section+1);
+         if (role==Qt::DisplayRole) {
+             QString name="";
+             if (verticalHeaderShowRowNumbers) name=QString::number(section+1);
+             if (section<state.rowNames.size()) {
+                 if (!name.isEmpty()) name+=QString(": ");
+                 name+=state.rowNames[section];
+             }
+             if (!name.isEmpty()) return name;
+         }
      }
 
      return QVariant();
@@ -249,6 +257,25 @@ void QFTableModel::resize(quint32 rows, quint32 columns) {
             emit columnRemoved(i);
         }
     }
+
+    j=0;
+    while (state.rowNames.size()<oldrows) {state.rowNames.append(""); j++;}
+
+   if (rows>oldrows) {
+       for (int i=oldrows; i<=rows; i++) {
+           int j=state.rowNames.size();
+           while (i>=state.rowNames.size()) {
+               state.rowNames.append(QString::number(j));
+               j++;
+           }
+           emit rowAdded(i);
+       }
+   } else if (rows<oldrows) {
+       for (int i=oldrows-1; i>=rows; i--) {
+           if (!state.rowNames.isEmpty()) state.rowNames.removeLast();
+           emit rowRemoved(i);
+       }
+   }
 
 
     //std::cout<<"  resize("<<state.rows<<", "<<state.columns<<"): 2\n";
@@ -777,6 +804,15 @@ QStringList QFTableModel::getColumnTitles() const
     return sl;
 }
 
+QStringList QFTableModel::getRowTitles() const
+{
+    QStringList sl;
+    for (int i=0; i<rowCount(); i++) {
+        sl.append(headerData(i, Qt::Vertical).toString());
+    }
+    return sl;
+}
+
 QVariant QFTableModel::cell(quint32 row, quint32 column) const {
     if ((row>=state.rows) || (column>=state.columns)) return QVariant();
     quint64 a=xyAdressToUInt64(row, column);
@@ -876,6 +912,18 @@ void QFTableModel::setColumnTitle(quint32 column, QString name) {
     }
 }
 
+void QFTableModel::setRowTitle(quint32 row, QString name)
+{
+    if (readonly || (row>=state.rows)) return;
+    addUndoStep();
+    for (int c=state.rowNames.size(); c<state.rows; c++) state.rowNames.append(QString::number(c));
+    if (row<state.rowNames.size()) state.rowNames[row]=name;
+    if (doEmitSignals) {
+        emit headerDataChanged(Qt::Vertical, row, row);
+        emit rowTitleChanged(row);
+    }
+}
+
 void QFTableModel::setColumnTitleCreate(quint32 column, QString name) {
     //std::cout<<"setColumnTitle("<<column<<", '"<<name.toStdString()<<")\n";
     if (readonly) return;
@@ -890,10 +938,31 @@ void QFTableModel::setColumnTitleCreate(quint32 column, QString name) {
     endMultiUndo();
 }
 
+void QFTableModel::setRowTitleCreate(quint32 row, QString name)
+{
+    if (readonly) return;
+    startMultiUndo();
+    resize(qMax(state.rows, quint32(row+1)), state.columns);
+    if (row<state.rowNames.size()) state.rowNames[row]=name;
+    if (doEmitSignals) {
+        emit headerDataChanged(Qt::Vertical, row, row);
+        emit rowTitleChanged(row);
+    }
+    endMultiUndo();
+}
+
 QString QFTableModel::columnTitle(quint32 column) const {
     if (column>=state.columns) return QString("");
     if (column<state.columnNames.size()) return state.columnNames[column];
     return "";
+}
+
+QString QFTableModel::rowTitle(quint32 row) const
+{
+    if (row>=state.rows) return QString("");
+    if (row<state.rowNames.size()) return state.rowNames[row];
+    return "";
+
 }
 
 bool QFTableModel::saveSYLK(const QString& filename, char format, int precision) {

@@ -25,12 +25,11 @@
 
 
 QFImFCSFitEvaluationEditor::QFImFCSFitEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent):
-    QFFitResultsByIndexEvaluationEditorWithWidgets("imfcsfitevaleditor/", propEditor, services, parent, true, true)
+    QFFitResultsByIndexEvaluationEditorWithWidgets("imfcsfitevaleditor/", propEditor, services, parent, true, true, tr("pixel"))
 {
     menuTools=propEditor->addMenu("Tools", 0);
     createWidgets();
-
-
+    btnFirstRun->setText(tr("avg."));
 }
 
 QFImFCSFitEvaluationEditor::~QFImFCSFitEvaluationEditor()
@@ -737,6 +736,11 @@ void QFImFCSFitEvaluationEditor::repeatsChanged(int r)
 void QFImFCSFitEvaluationEditor::overviewRunChanged(int run)
 {
     spinRun->setValue(run);
+}
+
+void QFImFCSFitEvaluationEditor::setFitResultImage()
+{
+
 }
 
 

@@ -69,6 +69,8 @@ class QFRawDataPropertyEditor_private : public QObject
         QEnhancedTableView* tvProperties;
         /** \brief button to switch to next record */
         QToolButton* btnNext;
+        /** \brief button to switch to next record */
+        QToolButton* btnNextSameRole;
         /** \brief button to insert a new property */
         QToolButton* btnNewProperty;
         QAction* actNewProperty;
@@ -109,6 +111,8 @@ class QFRawDataPropertyEditor_private : public QObject
         QAction* actNext;
         QAction* actDelete;
         QAction* actClose;
+        QAction* actPreviousSameRole;
+        QAction* actNextSameRole;
 
         QAction* actAddFile;
         QAction* actRemoveFile;

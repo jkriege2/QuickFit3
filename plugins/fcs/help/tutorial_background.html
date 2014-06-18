@@ -1,0 +1,65 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>$$local_plugin_name$$: Tutorial: Set background intensities</title>
+</head>
+<body>
+  $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+  
+  
+  <h2>Introduction</h2>
+  <p>
+  In FCS, constant background intensities lower the measured correlation amplitude:
+  $$bmath:g_{\text{measured},gr}(\tau)=\underbrace{\frac{(F_{\text{meas},g}-B_g)\cdot(F_{\text{meas},r}-B_r)}{F_{\text{meas},g}\cdot F_{\text{meas},r}}}{<1}\cdot g_\text{true}(\tau),$$
+  where $$math:F_{\text{meas},g}$$ and  $$math:F_{\text{meas},r}$$ are the measured (average) fluorescence intensities in the color channels g and r. $$math:B_g, B_r$$ ate the background intensities in these channels and $$math:g_\text{true}(\tau)$$ is the true correlation function, that we want to regain.</p>
+  <p>If the background intensities are known, most FCS fit models in QuickFit can take thos into account in Order to measure the true particle number, instead of the artificially increased number. The following figure shows the impact of the relative background intensitiy on the measure autocorrelation function amplitude:
+  <center>
+	<a name="tutorial_background_pic002"><img src="./pic/tutorial_background_pic002.png" border="1">
+</center>
+  Therefore this correction is especially important if the background and overall intensities are comparable, i.e. for dim samples and low concentrations.
+</p>
+
+  <h2>Basic Storage</h2>
+  <p>Most of the FCS data evaluation plugins in QuickFit support to take background intensities into account on one or the other way. 
+  For FCS data, the background intensities are saved as (user-editable) <a href="$$qf_ui_rdr_helpfile$$">properties</a> in each RDR:
+  
+  <ul>
+      <li><tt>BACKGROUND_INTENSITY1</tt>: average background intensity (in Hz) in the first channel (g)</li>
+      <li><tt>BACKGROUND_INTENSITY_STD1</tt>: std. deviation of the background intensity (in Hz) in the first channel (g)</li>
+      <li><tt>BACKGROUND_INTENSITY2</tt>: background intensity (in Hz) in the second channel (r)</li>
+      <li><tt>BACKGROUND_INTENSITY_STD2</tt>: std. deviation of the background intensity (in Hz) in the second channel (g)</li>
+  </ul>
+  The following pcture shows an example:
+  <center>
+	<a name="tutorial_background_pic000"><img src="./pic/tutorial_background_pic000.png" border="1">
+  </center>
+  So in principle you can add these records to each FCS RDR, where they apply by hand, using the "Insert Property" button in the image above. A more convenient way is shown in the next two sections.
+  </p>
+  
+  <h2>Setting background countrates in several RDRs</h2>
+  <p>The properties mentioned above can be set in several FCS RDRs at the same time:
+  
+  <ol>
+    <li>In the main window of QuickFit 3.0, click on "Tools|FCS/DLS Tools|set background intensity in FCS/DLS datasets". A new window will pop open:
+    <center>
+	<a name="tutorial_background_pic001"><img src="./pic/tutorial_background_pic001.png" border="1">
+    </center>
+    </li>    
+    <li>In the upper part of the dialog, you may select the records, in which you want to set the backrgound intensities. You can select multiple records, by clicking them, while the CTRL key is pressed. It is also possible to filter the list of possible RDRs by entering a filter-phrase in the line edit "filter" above the list. THen only those records are displayed, where the given text appears in the name.</li>
+    <li>Below the list of RDRs, the background intensity and its std.dev. can be entered into the table for each channel (row) separately. If you don't want to set values in a certain channel, you can uncheck it in the third column ("set this channel").</li>
+    <li>Click on "OK" and the background intensities will be set according to the given values in all selected FCS RDRs. </li>    
+  </ol>
+  $$note:Note however, that the background intensities are only set in records, that are selected and currently part of the project. If you add new RDRs later, you will have to repeat the steps above.$$
+  </p>
+  
+  <h2>Setting background countrates based in a darkcount measurement</h2>
+  <p>Often a measurement of the background rate is performed before the actual experiments, by measuring the buffer without fluorophores. If such a measurmeent is available, it is possible to use it as basis for the background countrates:
+  <ol>
+    <li>Load the background measurement as FCS record and double-click on the according RDR in the project.</li>
+    <li>Open the tab "Photon Counts".</li>
+    <li>If the displayed countrates are OK, click on the menu entry "FCS Tools|set background from this records ...".</li>
+    <li>The same window, as above pops up (see tutorial above), but with the count rates of the current record preset.</li>
+  </ol>
+  </p>
+</body></html>

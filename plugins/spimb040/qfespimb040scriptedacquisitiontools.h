@@ -126,6 +126,13 @@ class QFESPIMB040ScriptedAcquisitionAcquisitionControl : public QObject, public 
         void doImageStack();
         void acquirePreviewFrames(int camera, int N, const QString& filename);
         void acquirePreviewFramesWithParams(int camera, int N, const QString& filename);
+
+        void setAcquisitionConfigIndex(int camera, int id);
+        void setAcquisitionConfig(int camera, const QString& id);
+        void setAcquisitionOverviewConfigIndex(int camera, int overview, int id);
+        void setAcquisitionOverviewConfig(int camera, int overview, const QString& id);
+
+
         void setPreviewConfigIndex(int camera, int id);
         void setPreviewConfig(int camera, const QString& id);
         QStringList getPreviewConfigs(int camera);

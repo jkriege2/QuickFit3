@@ -167,6 +167,8 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
 
                 /** \brief string list that contains the column names */
                 QStringList columnNames;
+                /** \brief string list that contains the column names */
+                QStringList rowNames;
         };
 
         TableState state;
@@ -283,10 +285,16 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         QVariant cellUserRole(int role, quint32 row, quint32 column) const;
         /** \brief set the column title */
         void setColumnTitle(quint32 column, QString name);
+        /** \brief set the row title */
+        void setRowTitle(quint32 row, QString name);
         /** \brief set the column title */
         void setColumnTitleCreate(quint32 column, QString name);
+        /** \brief set the row title */
+        void setRowTitleCreate(quint32 row, QString name);
         /** \brief return the column title */
         QString columnTitle(quint32 column) const;
+        /** \brief return the column title */
+        QString rowTitle(quint32 row) const;
         /** \brief search for a row that contains the given value in the given column. Adds a row if it was not found and returns row number */
         quint32 getAddRow(quint32 column, QVariant data);
         /** \brief set data stored in the column header column title */
@@ -300,6 +308,8 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
 
         /** \brief return a list of all column titles */
         QStringList getColumnTitles() const;
+        /** \brief return a list of all row titles */
+        QStringList getRowTitles() const;
 
 
         /** \brief save the contents in a <a href="http://en.wikipedia.org/wiki/SYmbolic_LinK_(SYLK)">SYLK file (SYmbolic LinK)</a>
@@ -437,6 +447,9 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         void columnRemoved(int i);
         void columnAdded(int i);
         void columnTitleChanged(int i);
+        void rowRemoved(int i);
+        void rowAdded(int i);
+        void rowTitleChanged(int i);
 
         void undoAvailable(bool available);
         void redoAvailable(bool available);

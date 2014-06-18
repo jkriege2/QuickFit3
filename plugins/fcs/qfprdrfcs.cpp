@@ -4,6 +4,10 @@
 #include "dlgcsvparameters.h"
 #include <QtXml>
 #include "flex_sin_tools.h"
+#include "qfselectrdrdialog.h"
+#include "qftablemodel.h"
+#include "qenhancedtableview.h"
+#include "qftabledelegate.h"
 
 QFPRDRFCS::QFPRDRFCS(QObject* parent):
     QObject(parent)
@@ -39,6 +43,61 @@ void QFPRDRFCS::registerToMenu(QMenu* menu) {
     QAction* actFCSSim=new QAction(QIcon(":/fcs_simulate.png"), tr("FCS/DLS data from fit function"), parentWidget);
     connect(actFCSSim, SIGNAL(triggered()), this, SLOT(openSimulator()));
     smenu->addAction(actFCSSim);
+}
+
+void QFPRDRFCS::init()
+{
+    QMenu* tmenu=services->getMenu("tools")->addMenu(QIcon(getIconFilename()), tr("FCS/DLS tools"));
+    QAction* actBackground=new QAction(tr("set background intensity in FCS/DLS datasets"), parentWidget);
+    connect(actBackground, SIGNAL(triggered()), this, SLOT(setBackgroundInFCS()));
+    tmenu->addAction(actBackground);
+}
+
+void QFPRDRFCS::setBackgroundInFCS(const QVector<double> &backgrounds, const QVector<double> &background_sds, const QVector<bool> &background_set)
+{
+    QFMatchRDRFunctorSelectType* sel=new QFMatchRDRFunctorSelectType("fcs");
+    QFSelectRDRDialog* dlg=new QFSelectRDRDialog(sel,true, parentWidget);
+    dlg->setWindowTitle(tr("set background intensities in FCS records ..."));
+    dlg->setAllowMultiSelect(true);
+    dlg->setAllowCreateNew(false);
+    dlg->setOnlineHelp(services->getPluginHelpDirectory("fcs")+"/tutorial_background.html");
+
+    QFTableModel* tab=new QFTableModel(dlg);
+    tab->setReadonly(false);
+    tab->clear();
+    tab->setUndoEnabled(false);
+    for (unsigned int i=0; i<qMax(2, backgrounds.size()); i++) {
+        tab->setCellCreate(i, 0, backgrounds.value(i, 0.0));
+        tab->setCellCreate(i, 1, background_sds.value(i, 0.0));
+        tab->setCellCheckedRoleCreate(i, 2, background_set.value(i, true)?(Qt::Checked):(Qt::Unchecked));
+        tab->setRowTitleCreate(i, tr("channel %1").arg(i+1));
+    }
+    tab->setColumnTitleCreate(0, tr("average"));
+    tab->setColumnTitleCreate(1, tr("std. dev."));
+    tab->setColumnTitleCreate(2, tr("set this channel"));
+
+    QEnhancedTableView* tv=new QEnhancedTableView(dlg, true);
+    tv->setItemDelegate(new QFTableDelegate(tv));
+    tv->setModel(tab);
+    dlg->addWidget(tr("backrgound intensities [Hz]:"), tv);
+
+    if (dlg->exec()) {
+        QList<QPointer<QFRawDataRecord> > sel=dlg->getSelectedRDRs();
+        for (int i=0; i<sel.size(); i++) {
+            QFRDRFCSData* fcs=qobject_cast<QFRDRFCSData*>(sel[i]);
+            if (fcs) {
+                for (int c=0; c<tab->rowCount(); c++) {
+                    double cnt=tab->cell(c,0).toDouble();
+                    double cnte=tab->cell(c, 1).toDouble();
+                    if (tab->data(tab->index(c, 2), Qt::CheckStateRole).toInt()!=Qt::Unchecked) {
+                        fcs->setQFProperty(QString("BACKGROUND_INTENSITY%1").arg(c+1), cnt, true, true);
+                        fcs->setQFProperty(QString("BACKGROUND_INTENSITY_STD%1").arg(c+1), cnte, true, true);
+                    }
+                }
+            }
+        }
+    }
+
 }
 
 
@@ -180,7 +239,7 @@ void QFPRDRFCS::insertConfocor3File(const QStringList &filename, const QMap<QStr
 
 void QFPRDRFCS::insertFLEX_SINFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly)
 {
-    /*unsigned int cc=1;
+    unsigned int cc=1;
     QString mode="";
     unsigned int runCount=0;
     bool crossCorrelation=false;
@@ -195,20 +254,27 @@ void QFPRDRFCS::insertFLEX_SINFile(const QStringList &filename, const QMap<QStri
     }
     for (unsigned int i=0; i<cc; i++) {
         QStringList roles;
-        if (autoCorrelation && crossCorrelation) {
-           roles<<
-        } else if (crossCorrelation) {
-
-
-            if (crossCorrelation) e->setRole(QString("FCCS").arg(i));
-        } else {
-            e->setRole(QString("ACF%1").arg(i));
+        QList<int> col;
+        if (autoCorrelation) {
+           roles<<QString("ACF%1").arg(i);
+           col<<i;
+        }
+        if (crossCorrelation) {
+            if (i==0) roles<<QString("FCCS01");
+            else roles<<QString("FCCS%10").arg(i);
+            if (!autoCorrelation) col<<i;
+            else {
+                col<<i+cc;
+            }
         }
 
         for (int j=0; j<roles.size(); j++){
            QMap<QString, QVariant> p=paramValues;
            p["CHANNEL"]=i;
-           QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - CH%2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(i), filename, p, paramReadonly);
+           p["FLEX_CF_COLUMN"]=col[j];
+           QStringList rop=paramReadonly;
+           rop<<"FLEX_CF_COLUMN";
+           QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - %2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(roles[j]), filename, p, rop);
            e->setRole(roles[j]);
            if (cc>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
 
@@ -218,7 +284,7 @@ void QFPRDRFCS::insertFLEX_SINFile(const QStringList &filename, const QMap<QStri
                project->deleteRawData(e->getID());
            }
        }
-    }*/
+    }
 }
 
 void QFPRDRFCS::insertFCS() {
@@ -226,6 +292,7 @@ void QFPRDRFCS::insertFCS() {
         QString alvf=tr("ALV-5000 file (*.asc)");
         QString alvf6=tr("ALV-6000 file (*.asc)");
         QString flexf=tr("correlator.com files (*.sin)");
+        QString zeisscf3=tr("Zeiss Confocor3 files (*.fcs)");
         QString asciif=tr("ASCII Data Files (*.txt *.dat *.csv)");
         QString albaf=tr("ISS Alba Files (*.csv)");
         QString diff4f=tr("diffusion4 correlation (*corr.dat)");
@@ -234,7 +301,7 @@ void QFPRDRFCS::insertFCS() {
         QStringList files = qfGetOpenFileNames(parentWidget,
                               tr("Select FCS Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              alvf+";;"+alvf6+";;"+flexf+";;"+asciif+";;"+albaf+";;"+diff4f+";;"+olegf, &currentFCSFileFormatFilter);
+                              alvf+";;"+alvf6+";;"+flexf+";;"+zeisscf3+";;"+asciif+";;"+albaf+";;"+diff4f+";;"+olegf, &currentFCSFileFormatFilter);
         //std::cout<<"filter: "<<currentFCSFileFormatFilter.toStdString()<<std::endl;
         if (files.size()>0) {
             settings->getQSettings()->setValue("fcs/current_fcs_format_filter", currentFCSFileFormatFilter);
@@ -248,6 +315,10 @@ void QFPRDRFCS::insertFCS() {
                //qDebug() << "test 3";
             } else if (currentFCSFileFormatFilter==flexf){
                p["FILETYPE"]="CORRELATOR.COM_SIN";
+               p["CHANNEL"]=0;
+               //qDebug() << "test 3";
+            } else if (currentFCSFileFormatFilter==zeisscf3){
+               p["FILETYPE"]="CONFOCOR3";
                p["CHANNEL"]=0;
                //qDebug() << "test 3";
             } else if (currentFCSFileFormatFilter==olegf){
@@ -322,7 +393,9 @@ void QFPRDRFCS::insertFCS() {
                     } else if (currentFCSFileFormatFilter==diff4f) {
                         insertDiffusion4File(QStringList(*it), p, paramsReadonly);
                     } else if (currentFCSFileFormatFilter==flexf) {
-                        insertDiffusion4File(QStringList(*it), p, paramsReadonly);
+                        insertFLEX_SINFile(QStringList(*it), p, paramsReadonly);
+                    } else if (currentFCSFileFormatFilter==zeisscf3) {
+                        insertConfocor3File(QStringList(*it), p, paramsReadonly);
                     } else {
                         insertCSVFile(QStringList(*it), p, paramsReadonly);
                     }
@@ -348,6 +421,7 @@ void QFPRDRFCS::insertMultiFileFCS()
         QString alvf=tr("ALV-5000 file (*.asc)");
         QString alvf6=tr("ALV-6000 file (*.asc)");
         QString flexf=tr("correlator.com files (*.sin)");
+        QString zeisscf3=tr("Zeiss Confocor3 files (*.fcs)");
         QString asciif=tr("ASCII Data Files (*.txt *.dat *.csv)");
         QString albaf=tr("ISS Alba Files (*.csv)");
         QString diff4f=tr("diffusion4 correlation (*corr.dat)");
@@ -356,7 +430,7 @@ void QFPRDRFCS::insertMultiFileFCS()
         QStringList files = qfGetOpenFileNames(parentWidget,
                               tr("Select FCS Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              alvf+";;"+alvf6+";;"+flexf+";;"+asciif+";;"+albaf+";;"+diff4f+";;"+olegf, &currentFCSFileFormatFilter);
+                              alvf+";;"+alvf6+";;"+flexf+";;"+zeisscf3+";;"+asciif+";;"+albaf+";;"+diff4f+";;"+olegf, &currentFCSFileFormatFilter);
         //std::cout<<"filter: "<<currentFCSFileFormatFilter.toStdString()<<std::endl;
         if (files.size()>0) {
             settings->getQSettings()->setValue("fcs/current_fcs_format_filter", currentFCSFileFormatFilter);
@@ -373,6 +447,9 @@ void QFPRDRFCS::insertMultiFileFCS()
                p["CHANNEL"]=0;
             } else if (currentFCSFileFormatFilter==flexf){
                p["FILETYPE"]="CORRELATOR.COM_SIN";
+               p["CHANNEL"]=0;
+            } else if (currentFCSFileFormatFilter==zeisscf3){
+               p["FILETYPE"]="CONFOCOR3";
                p["CHANNEL"]=0;
             } else if (currentFCSFileFormatFilter==asciif) {
                 p["FILETYPE"]="CSV_CORR";
@@ -438,6 +515,8 @@ void QFPRDRFCS::insertMultiFileFCS()
                 insertDiffusion4File(files, p, paramsReadonly);
             } else if (currentFCSFileFormatFilter==flexf) {
                 insertFLEX_SINFile(files, p, paramsReadonly);
+            } else if (currentFCSFileFormatFilter==zeisscf3) {
+                insertConfocor3File(files, p, paramsReadonly);
             } else {
                 insertCSVFile(files, p, paramsReadonly);
             }

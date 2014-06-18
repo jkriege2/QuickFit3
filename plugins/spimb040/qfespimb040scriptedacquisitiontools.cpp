@@ -509,6 +509,26 @@ void QFESPIMB040ScriptedAcquisitionAcquisitionControl::acquirePreviewFramesWithP
     mainWindow->savePreviewMovie(camera, N, fn, preview_params);
 }
 
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setAcquisitionConfigIndex(int camera, int id)
+{
+    mainWindow->getWidAcquisition()->setCameraConfigAcq(camera, id);
+}
+
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setAcquisitionConfig(int camera, const QString &id)
+{
+    mainWindow->getWidAcquisition()->setCameraConfigAcq(camera, id);
+}
+
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setAcquisitionOverviewConfigIndex(int camera, int overview, int id)
+{
+    mainWindow->getWidAcquisition()->setCameraConfigOverview(camera, overview, id);
+}
+
+void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setAcquisitionOverviewConfig(int camera, int overview, const QString &id)
+{
+    mainWindow->getWidAcquisition()->setCameraConfigOverview(camera, overview, id);
+}
+
 void QFESPIMB040ScriptedAcquisitionAcquisitionControl::setPreviewConfigIndex(int camera, int id)
 {
     if (opticsSetup->cameraConfig(camera)) {

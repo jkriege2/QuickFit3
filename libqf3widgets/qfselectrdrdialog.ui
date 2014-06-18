@@ -122,14 +122,29 @@
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QPushButton" name="btnHelp">
+       <property name="text">
+        <string>&amp;Help</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../lib/lib.qrc">
+         <normaloff>:/lib/help/help.png</normaloff>:/lib/help/help.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
@@ -140,7 +155,15 @@
    <header>qfenhancedlineedit.h</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>

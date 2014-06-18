@@ -42,6 +42,10 @@ class QFRDRFCSRateEditor : public QFRawDataEditor {
         QFRDRFCSRateEditor(QFPluginServices* services, QFRawDataPropertyEditor* propEditor, QWidget* parent);
         /** Default destructor */
         virtual ~QFRDRFCSRateEditor();
+
+
+    public slots:
+        void setBackrgoundFromThisRDR();
     protected slots:
         /** \brief connected to the rawDataChanged() signal of the current record */
         virtual void rawDataChanged();

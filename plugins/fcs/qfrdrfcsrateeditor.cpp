@@ -1,6 +1,7 @@
 #include "qfrdrfcsrateeditor.h"
 #include "qfrdrfcsdata.h"
 #include "qfrawdatapropertyeditor.h"
+#include "qfprdrfcs.h"
 
 QFRDRFCSRateEditor::runsModel::runsModel(QObject* parent):
     QAbstractTableModel(parent)
@@ -84,6 +85,7 @@ QFRDRFCSRateEditor::~QFRDRFCSRateEditor()
 {
     //dtor
 }
+
 
 void QFRDRFCSRateEditor::createWidgets() {
 
@@ -190,6 +192,10 @@ void QFRDRFCSRateEditor::createWidgets() {
     splitter->setStretchFactor(0,5);
     splitter->setStretchFactor(1,1);
 
+    QMenu* menuFCSTools=propertyEditor->addOrFindMenu(tr("FCS Tools"));
+    QAction* actSetBackground=new QAction(tr("set background from this record ..."), this);
+    connect(actSetBackground, SIGNAL(triggered()), this, SLOT(setBackrgoundFromThisRDR()));
+    menuFCSTools->addAction(actSetBackground);
 
 };
 
@@ -237,6 +243,24 @@ void QFRDRFCSRateEditor::rawDataChangedRecalc()
 
 void QFRDRFCSRateEditor::slidersChanged(int userMin, int userMax, int min, int max) {
     replotData();
+}
+
+
+void QFRDRFCSRateEditor::setBackrgoundFromThisRDR()
+{
+    QVector<double> cnt, cnt_sd;
+    QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
+    if (m) {
+        unsigned int rateChannels=m->getRateChannels();
+        for (int channel=0; channel<rateChannels; channel++) {
+            cnt<<m->getSimpleCountrateAverage(-1, channel, false)*1000.0;
+            cnt_sd<<m->getSimpleCountrateStdDev(-1, channel, false)*1000.0;
+        }
+        QFPRDRFCS* plug=dynamic_cast<QFPRDRFCS*>(services->getRawDataRecordFactory()->getPlugin("fcs"));
+        if (plug) {
+            plug->setBackgroundInFCS(cnt, cnt_sd);
+        }
+    }
 }
 
 QString QFRDRFCSRateEditor::plotItem(QFRDRFCSData* m) {

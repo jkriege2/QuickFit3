@@ -390,6 +390,34 @@ void QFFitResultsByIndexEvaluationEditorBase::copyToAllCurrentRun() {
     QApplication::restoreOverrideCursor();
 }
 
+void QFFitResultsByIndexEvaluationEditorBase::setParamAllIndexes(QFRawDataRecord *rec, const QString &parameter, const QVector<double> &data, const QVector<double> &dataerror)
+{
+    if (!current) return;
+    QFFitResultsByIndexEvaluation* eval=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
+    if (!eval) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    bool doEmit=rec->isEmitResultsChangedEnabled();
+    rec->disableEmitResultsChanged();
+    bool thisEmit=eval->get_doEmitResultsChanged();
+    eval->set_doEmitResultsChanged(false);
+    for (int i=0; i<data.size(); i++) {
+        eval->setFitResultValue(rec, i, parameter, data.value(i, 0), dataerror.value(i, 0));
+    }
+    if (doEmit) rec->enableEmitResultsChanged(true);
+    eval->set_doEmitResultsChanged(thisEmit);
+    eval->emitResultsChanged(rec);
+    displayModel(false);
+    replotData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFitResultsByIndexEvaluationEditorBase::setParamAllIndexesInCurrent(const QString &parameter, const QVector<double> &data)
+{
+    if (!current) return;
+    setParamAllIndexes(current->getHighlightedRecord(), parameter, data);
+}
+
+
 void QFFitResultsByIndexEvaluationEditorBase::log_text(QString message)
 {
     QFPluginLogTools::log_text(message);

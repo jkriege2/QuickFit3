@@ -330,7 +330,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         /** \brief values of the count rate curve.
          *         This is a 2D array of size rateRuns * rateN
          *
-         * access this as \code rate[run*rateN + n] \endcode
+         * access this as \code rate[channel*rateRuns*rateN + run*rateN + n] \endcode
          */
         double* rate;
 
@@ -358,6 +358,12 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
 
         /** \brief load private data format of Oleg Kriechevsky's group */
         bool loadOlegData(QString filenames);
+
+        /** \brief load  data format of correlator.com (*.sin) */
+        bool loadCorrelatorComSIN(QString filename);
+
+        /** \brief load  data format of Zeiss COnfocor3 (*.fcs) */
+        bool loadConfocor3(QString filenames);
 
         /** \brief load a CSV file containing a count rate curve */
         bool loadCountRatesFromCSV(QStringList filenames, int rateChannels=1);

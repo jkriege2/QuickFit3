@@ -94,6 +94,7 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
 
 
 
+
         /** \brief create a report in a given QTextDocument object
          *
          *  For correct sizing of the plots: set the textWidth of the document before calling this function!
@@ -126,6 +127,8 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         void repeatsChanged(int r);
 
         void overviewRunChanged(int run);
+
+        void setFitResultImage();
 
 
     private:

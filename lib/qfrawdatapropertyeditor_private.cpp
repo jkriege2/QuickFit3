@@ -85,6 +85,8 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     ml->addLayout(vl);
     actPrevious=new QAction(QIcon(":/lib/prop_previous.png"), tr("&previous"), d);
     actPrevious->setToolTip(tr("move to previous record"));
+    actPreviousSameRole=new QAction(QIcon(":/lib/prop_previous.png"), tr("&previous, same role"), d);
+    actPreviousSameRole->setToolTip(tr("move to previous record of same role"));
 
     btnPrevious=new QToolButton(d);
     btnPrevious->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -92,6 +94,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     btnPrevious->setDefaultAction(actPrevious);
     vl->addWidget(btnPrevious);
     connect(actPrevious, SIGNAL(triggered()), this, SLOT(previousPressed()));
+    connect(actPreviousSameRole, SIGNAL(triggered()), this, SLOT(previousOfRolePressed()));
 
     btnSelectFromTree=new QPushButton(tr("select RDR"), d);
     btnSelectFromTree->setToolTip(tr("click this to select the next record to display from a tree of all records in the current project which are of the semae type"));
@@ -100,14 +103,23 @@ void QFRawDataPropertyEditor_private::createWidgets() {
 
     actNext=new QAction(QIcon(":/lib/prop_next.png"), tr("&next"), d);
     actNext->setToolTip(tr("move to next record"));
+    actNextSameRole=new QAction(QIcon(":/lib/prop_next.png"), tr("&next, same role"), d);
+    actNextSameRole->setToolTip(tr("move to next record of same role"));
 
     btnNext=new QToolButton(d);
     btnNext->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     btnNext->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     btnNext->setDefaultAction(actNext);
 
+    btnNextSameRole=new QToolButton(d);
+    btnNextSameRole->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    btnNextSameRole->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    btnNextSameRole->setDefaultAction(actNextSameRole);
+
     connect(actNext, SIGNAL(triggered()), this, SLOT(nextPressed()));
+    connect(actNextSameRole, SIGNAL(triggered()), this, SLOT(nextOfRolePressed()));
     vl->addWidget(btnNext);
+    vl->addWidget(btnNextSameRole);
     labTopIcon=new QLabel(d);
     vl->addWidget(labTopIcon);
     labTop=new QLabel(d);
@@ -125,8 +137,10 @@ void QFRawDataPropertyEditor_private::createWidgets() {
 
     actClose=new QAction(QIcon(":/lib/exit.png"), tr("&Close Window"), d);
     connect(actClose, SIGNAL(triggered()), d, SLOT(close()));
+    menuRDR->addAction(actPreviousSameRole);
     menuRDR->addAction(actPrevious);
     menuRDR->addAction(actNext);
+    menuRDR->addAction(actNextSameRole);
     menuRDR->addSeparator();
     menuRDR->addAction(actDelete);
     menuRDR->addSeparator();

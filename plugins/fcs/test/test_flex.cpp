@@ -20,9 +20,9 @@ int main(int argc, char *argv[])
         qDebug()<<"== READ ==================================================================";
         FLEX_DATA data;
         FLEX_readFile(fn, data);
-        qDebug()<<"   tau: "<<data.corr_tau;
-        qDebug()<<"   counts_timeaxis: "<<data.counts_time;
-        qDebug()<<"   properties: "<<data.properties;
+        //qDebug()<<"   tau: "<<data.corr_tau;
+        //qDebug()<<"   counts_timeaxis: "<<data.counts_time;
+        //qDebug()<<"   properties: "<<data.properties;
     } catch (std::exception& E) {
         qDebug()<<fn<<": \n   ERROR: "<<E.what();
     }
@@ -35,9 +35,9 @@ int main(int argc, char *argv[])
         qDebug()<<"== READ ==================================================================";
         FLEX_DATA data;
         FLEX_readFile(fn, data);
-        qDebug()<<"   tau: "<<data.corr_tau;
-        qDebug()<<"   counts_timeaxis: "<<data.counts_time;
-        qDebug()<<"   properties: "<<data.properties;
+        //qDebug()<<"   tau: "<<data.corr_tau;
+        //qDebug()<<"   counts_timeaxis: "<<data.counts_time;
+        //qDebug()<<"   properties: "<<data.properties;
     } catch (std::exception& E) {
         qDebug()<<fn<<": \n   ERROR: "<<E.what();
     }

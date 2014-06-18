@@ -3,6 +3,7 @@
 #include <QtXml>
 #include "jkiniparser2.h"
 #include "binarydatatools.h"
+#include "flex_sin_tools.h"
 
 
 
@@ -265,6 +266,8 @@ bool QFRDRFCSData::selectNewFiles(QStringList &files, QStringList &types, QStrin
     if (filetype=="CSV_CORR") filter=tr("ASCII Data Files (*.txt *.dat *.csv)");
     if (filetype=="ISS_ALBA") filter=tr("ISS Alba Files (*.csv)");
     if (filetype=="DIFFUSION4_SIMRESULTS") filter=tr("Diffusion4 simulation results (*corr.dat *bts.dat)");
+    if (filetype=="CORRELATOR.COM_SIN") filter=tr("correlator.com files (*.sin)");
+    if (filetype=="CONFOCOR3") filter=tr("Zeiss Confocor3 files (*.fcs)");
 
 
     if (filetype!="INTERNAL") {
@@ -1743,6 +1746,30 @@ bool QFRDRFCSData::reloadFromFiles() {
           return false;
        }
        return loadFromALV6000Files(files);
+    } else if (filetype.toUpper()=="CORRELATOR.COM_SIN") {
+        bool res=false;
+       if (files.size()<=0) {
+          setError(tr("there are no files in the FCS record!"));
+          return false;
+       }
+       if (files.size()==1) {
+           res=loadCorrelatorComSIN(files[0]);
+       } else if (files.size()>1) {
+           loadSeveral(res, files, loadCorrelatorComSIN);
+       }
+       return res;
+    } else if (filetype.toUpper()=="CONFOCOR3") {
+        bool res=false;
+       if (files.size()<=0) {
+          setError(tr("there are no files in the FCS record!"));
+          return false;
+       }
+       if (files.size()==1) {
+           res=loadConfocor3(files[0]);
+       } else if (files.size()>1) {
+           loadSeveral(res, files, loadConfocor3);
+       }
+       return res;
     } else if (filetype.toUpper()=="OLEGKRIECHEVSKYBINARY") {
        if (files.size()<=0) {
           setError(tr("there are no files in the FCS record!"));
@@ -1875,7 +1902,7 @@ bool QFRDRFCSData::reloadFromFiles() {
 QStringList QFRDRFCSData::getAvailableRoles() const
 {
     QStringList sl;
-    sl<<"ACF0"<<"ACF1"<<"ACF2"<<"ACF3"<<"FCCS";
+    sl<<"ACF0"<<"ACF1"<<"ACF2"<<"ACF3"<<"FCCS"<<"FCCS0"<<"FCCS1"<<"FCCS01"<<"FCCS10"<<"ACF";
     /*sl<<"correlation";
     sl<<"acf";
     sl<<"ccf";
@@ -2120,6 +2147,65 @@ bool QFRDRFCSData::loadOlegData(QString filename)
     emitRawDataChanged();
 
     return ok;
+}
+
+bool QFRDRFCSData::loadCorrelatorComSIN(QString filename)
+{
+    bool ok=true;
+
+    try {
+        FLEX_DATA data;
+        FLEX_readFile(filename, data);
+
+        int channel=getProperty("CHANNEL", 0).toInt();
+        int col=getProperty("FLEX_CF_COLUMN", channel).toInt();
+        resizeCorrelations(data.corr_tau.size(),data.runCount);
+        for (int t=0; t<correlationN; t++) {
+            correlationT[t]=data.corr_tau.value(t, 0);
+        }
+        long nn=0;
+        for (uint32_t r=0; r<data.runCount; r++) {
+            for (int t=0; t<correlationN; t++) {
+                correlation[nn]=data.corrs[col].value(t, 0)-1.0;
+                nn++;
+            }
+        }
+        resizeRates(data.counts_time.size(), data.runCount, data.channelCount);
+        for (int t=0; t<rateN; t++) {
+            rateT[t]=data.counts_time.value(t, 0);
+        }
+        nn=0;
+        for (uint32_t c=0; c<rateChannels; c++) {
+            for (uint32_t r=0; r<rateRuns; r++) {
+                for (int t=0; t<rateN; t++) {
+                    rate[nn]=data.counts[c].value(t, 0)/1000.0;
+                    nn++;
+                }
+            }
+        }
+
+        QMapIterator<QString, QVariant> it(data.properties);
+        while (it.hasNext()) {
+            it.next();
+            setQFProperty(it.key(), it.value(), false, true);
+        }
+    } catch (std::exception& E) {
+        setError(tr("Error while reading correlation functions from Correlator.com SIN file '%1': %2").arg(filename).arg(QString(E.what())));
+        ok=false;
+        return ok;
+    }
+
+    recalculateCorrelations();
+    emitRawDataChanged();
+
+    return ok;
+}
+
+bool QFRDRFCSData::loadConfocor3(QString filenames)
+{
+    recalculateCorrelations();
+    emitRawDataChanged();
+    return false;
 }
 
 

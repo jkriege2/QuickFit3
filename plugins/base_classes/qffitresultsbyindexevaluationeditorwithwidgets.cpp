@@ -18,9 +18,10 @@
 #include "qffitresultsbyindexevaluationfittools.h"
 #include "qffcsfitchi2landscapedialog.h"
 
-QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent, bool hasMultiThreaded, bool multiThreadPriority) :
+QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent, bool hasMultiThreaded, bool multiThreadPriority, const QString &runName) :
     QFFitResultsByIndexEvaluationEditorBase(iniPrefix, propEditor, services, parent)
 {
+    m_runName=runName;
     cmbModel=NULL;
     dataEventsEnabled=true;
     m_parameterWidgetWidth=75;
@@ -314,8 +315,14 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     QHBoxLayout* hblRun=new QHBoxLayout();
     hblRun->setContentsMargins(0,0,0,0);
     hblRun->addWidget(spinRun, 1);
+    btnFirstRun=new QToolButton(this);
+    btnFirstRun->setText(tr("first"));
+    btnFirstRun->setToolTip(tr("switch to first %1").arg(m_runName));
+    connect(btnFirstRun, SIGNAL(clicked()), this, SLOT(gotoFirstRun()));
+    hblRun->addWidget(btnFirstRun, 0);
+
     hblRun->addWidget(labRun, 2);
-    fl->addRow(tr("run: "), hblRun);
+    fl->addRow(tr("%1: ").arg(m_runName), hblRun);
     layModel->addLayout(fl, 0);
 
     labFitParameters=new QLabel(this);
@@ -357,39 +364,39 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     layButtons=new QGridLayout();
     layButtons->setContentsMargins(0,0,0,0);
     btnFitCurrent=createButtonAndActionShowText(actFitCurrent, QIcon(":/fcsfit/fit_fitcurrent.png"), tr("&Fit Current"), this);
-    actFitCurrent->setToolTip(tr("perform a fit for the currently displayed file and run"));
+    actFitCurrent->setToolTip(tr("perform a fit for the currently displayed file and %1").arg(m_runName));
     layButtons->addWidget(btnFitCurrent, 0, 0);
-    btnFitRunsCurrent=createButtonAndActionShowText(actFitRunsCurrent, QIcon(":/fcsfit/fit_fitallruns.png"), tr("Fit All &Runs"), this);
-    actFitRunsCurrent->setToolTip(tr("perform a fit for all runs in the currently selected file "));
+    btnFitRunsCurrent=createButtonAndActionShowText(actFitRunsCurrent, QIcon(":/fcsfit/fit_fitallruns.png"), tr("Fit All &%1s").arg(m_runName), this);
+    actFitRunsCurrent->setToolTip(tr("perform a fit for all %1s in the currently selected file ").arg(m_runName));
     layButtons->addWidget(btnFitRunsCurrent, 0, 1);
-    btnFitAll=createButtonAndActionShowText(actFitAll, QIcon(":/fcsfit/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files (Current Run)"), this);
-    actFitAll->setToolTip(tr("perform a fit for all files, but fit in each file only the currently displayed run"));
+    btnFitAll=createButtonAndActionShowText(actFitAll, QIcon(":/fcsfit/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files (Current %1)").arg(m_runName), this);
+    actFitAll->setToolTip(tr("perform a fit for all files, but fit in each file only the currently displayed %1").arg(m_runName));
     layButtons->addWidget(btnFitAll, 1, 0);
     btnFitRunsAll=createButtonAndActionShowText(actFitRunsAll, QIcon(":/fcsfit/fit_fitall.png"), tr("Fit &Everything"), this);
-    actFitRunsAll->setToolTip(tr("perform a fit for all runs in all files"));
+    actFitRunsAll->setToolTip(tr("perform a fit for all %1s in all files").arg(m_runName));
     layButtons->addWidget(btnFitRunsAll, 1, 1);
     btnResetCurrent=createButtonAndActionShowText(actResetCurrent, tr("&Reset Current"), this);
-    actResetCurrent->setToolTip(tr("reset the currently displayed file (and run) to the initial parameters\nThis deletes all fit results stored for the current file."));
+    actResetCurrent->setToolTip(tr("reset the currently displayed file (and %1) to the initial parameters\nThis deletes all fit results stored for the current file.").arg(m_runName));
     layButtons->addWidget(btnResetCurrent, 2, 0);
     btnResetAll=createButtonAndActionShowText(actResetAll, tr("&Reset All"), this);
     actResetAll->setToolTip(tr("reset all loaded files to the initial parameters.\nThis deletes all fit results stored for all files file."));
     layButtons->addWidget(btnResetAll, 3, 1);
 
-    btnResetAllRuns=createButtonAndActionShowText(actResetAllRuns, tr("&Reset All Runs"), this);
-    actResetAllRuns->setToolTip(tr("reset all runs to the initial parameters in the current file.\nThis deletes all fit results stored for all runs in the current file."));
+    btnResetAllRuns=createButtonAndActionShowText(actResetAllRuns, tr("&Reset All %1s").arg(m_runName), this);
+    actResetAllRuns->setToolTip(tr("reset all %1s to the initial parameters in the current file.\nThis deletes all fit results stored for all %1s in the current file.").arg(m_runName));
     layButtons->addWidget(btnResetAllRuns, 2, 1);
 
     btnCopyToInitial=createButtonAndActionShowText(actCopyToInitial, tr("Copy to &Initial"), this);
-    actCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\n so they are used by files/runs that were not fit yet."));
+    actCopyToInitial->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters,\n so they are used by files/%1s that were not fit yet.").arg(m_runName));
     layButtons->addWidget(btnCopyToInitial, 4, 0);
-    btnCopyToAllRuns=createButtonAndActionShowText(actCopyToAllRuns, tr("&Copy to All Runs"), this);
-    actCopyToAllRuns->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters\n and also to all runs in the current file."));
+    btnCopyToAllRuns=createButtonAndActionShowText(actCopyToAllRuns, tr("&Copy to All %1s").arg(m_runName), this);
+    actCopyToAllRuns->setToolTip(tr("copy the currently displayed fit parameters to the set of initial parameters\n and also to all %1s in the current file.").arg(m_runName));
     layButtons->addWidget(btnCopyToAllRuns, 4, 1);
     btnCopyToAll=createButtonAndActionShowText(actCopyToAll, tr("&Copy to All"), this);
     actCopyToAll->setToolTip(tr("copy the currently displayed fit parameters to the set\n of initial parameters and also to all files."));
     layButtons->addWidget(btnCopyToAll, 5, 1);
-    btnCopyToAllCurrentRun=createButtonAndActionShowText(actCopyToAllCurrentRun, tr("&Copy to All (Current Run)"), this);
-    actCopyToAllCurrentRun->setToolTip(tr("copy the currently displayed fit parameters to the set of\n initial parameters and also to all files, but only to the current run therein."));
+    btnCopyToAllCurrentRun=createButtonAndActionShowText(actCopyToAllCurrentRun, tr("&Copy to All (Current %1)").arg(m_runName), this);
+    actCopyToAllCurrentRun->setToolTip(tr("copy the currently displayed fit parameters to the set of\n initial parameters and also to all files, but only to the current %1 therein.").arg(m_runName));
     layButtons->addWidget(btnCopyToAllCurrentRun, 5, 0);
 
     actChi2Landscape=new QAction(tr("&Plot &Chi2 Landscape"), this);
@@ -544,16 +551,16 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
 
 
-    actFitAllFilesThreaded=new QAction(QIcon(":/fcsfit/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files (this run, MT)"), this);
-    actFitAllFilesThreaded->setToolTip(tr("multi-threaded: perform a fit for all files, but fit in each file only the currently displayed run"));
+    actFitAllFilesThreaded=new QAction(QIcon(":/fcsfit/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files (this %1, MT)").arg(m_runName), this);
+    actFitAllFilesThreaded->setToolTip(tr("multi-threaded: perform a fit for all files, but fit in each file only the currently displayed %1").arg(m_runName));
     connect (actFitAllFilesThreaded, SIGNAL(triggered()), this, SLOT(fitAllFilesThreaded()));
 
     actFitAllThreaded=new QAction(QIcon(":/imfcsfit/fit_fitall.png"), tr("Fit Everything (MT)"), this);
-    actFitAllThreaded->setToolTip(tr("multi-threaded: perform a fit for all files, and all runs therein (everything)"));
+    actFitAllThreaded->setToolTip(tr("multi-threaded: perform a fit for all files, and all %1s therein (everything)").arg(m_runName));
     connect (actFitAllThreaded, SIGNAL(triggered()), this, SLOT(fitEverythingThreaded()));
 
-    actFitAllRunsThreaded=new QAction(QIcon(":/imfcsfit/fit_fitallruns.png"), tr("Fit All Runs (MT)"), this);
-    actFitAllRunsThreaded->setToolTip(tr("multi-threaded: perform a fit for all runs, in the current file"));
+    actFitAllRunsThreaded=new QAction(QIcon(":/imfcsfit/fit_fitallruns.png"), tr("Fit All %1s (MT)").arg(m_runName), this);
+    actFitAllRunsThreaded->setToolTip(tr("multi-threaded: perform a fit for all %1s, in the current file").arg(m_runName));
     connect (actFitAllRunsThreaded, SIGNAL(triggered()), this, SLOT(fitAllRunsThreaded()));
 
     if (hasMultiThreaded) {
@@ -1349,7 +1356,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAll() {
                 double timeperfit=runtime/double(jobsDone);
                 double estimatedRuntime=double(items)*timeperfit;
                 double remaining=estimatedRuntime-runtime;
-                dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(uint(int(runtime)%60)),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
+                dlgFitProgress->reportSuperStatus(QString(tr("fit '%1', ")+m_runName+tr(" %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec")).arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(uint(int(runtime)%60)),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
 
                 //doFit(record, run);
                 feval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
@@ -1388,7 +1395,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsAll() {
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
     if ((!ffunc)||(!falg)) return;
 
-    dlgFitProgress->reportSuperStatus(tr("fit all files and all runs therein<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()));
+    dlgFitProgress->reportSuperStatus(tr("fit all files and all %3s therein<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()).arg(m_runName));
     dlgFitProgress->reportStatus("");
     dlgFitProgress->setProgressMax(100);
     dlgFitProgress->setSuperProgressMax(10);
@@ -1437,7 +1444,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitRunsAll() {
                     double timeperfit=runtime/double(jobsDone);
                     double estimatedRuntime=double(items)*timeperfit;
                     double remaining=estimatedRuntime-runtime;
-                    dlgFitProgress->reportSuperStatus(tr("fit '%1', run %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
+                    dlgFitProgress->reportSuperStatus(QString("fit '%1', "+m_runName+" %3<br>using model '%2'<br>and algorithm '%4' \nruntime: %5:%6       remaining: %7:%8 [min:secs]       %9 fits/sec").arg(record->getName()).arg(ffunc->name()).arg(runname).arg(falg->name()).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
 
                     //doFit(record, run);
                     feval->doFit(record, run, getUserMin(record, run, datacut->get_userMin()), getUserMax(record, run, datacut->get_userMax()), dlgFitProgressReporter, ProgramOptions::getConfigValue(eval->getType()+"/log", false).toBool());
@@ -1489,7 +1496,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitEverythingThreaded() {
     if ((!ffunc)||(!falg)) return;
 
     dlgQFProgressDialog* dlgTFitProgress=new dlgQFProgressDialog(this);
-    dlgTFitProgress->reportTask(tr("fit all files and all runs therein<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()));
+    dlgTFitProgress->reportTask(tr("fit all files and all %3s therein<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()).arg(m_runName));
     dlgTFitProgress->setProgressMax(100);
     dlgTFitProgress->setProgress(0);
     dlgTFitProgress->setAllowCancel(true);
@@ -1624,7 +1631,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllRunsThreaded() {
     if ((!ffunc)||(!falg)) return;
 
     dlgQFProgressDialog* dlgTFitProgress=new dlgQFProgressDialog(this);
-    dlgTFitProgress->reportTask(tr("fit all runs in the current file<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()));
+    dlgTFitProgress->reportTask(tr("fit all %3s in the current file<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()).arg(m_runName));
     dlgTFitProgress->setProgressMax(100);
     dlgTFitProgress->setProgress(0);
     dlgTFitProgress->setAllowCancel(true);
@@ -1755,7 +1762,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllFilesThreaded()
     if ((!ffunc)||(!falg)) return;
 
     dlgQFProgressDialog* dlgTFitProgress=new dlgQFProgressDialog(this);
-    dlgTFitProgress->reportTask(tr("fit the current run in all files<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()));
+    dlgTFitProgress->reportTask(tr("fit the current %3 in all files<br>using model '%1'<br>and algorithm '%2' \n").arg(ffunc->name()).arg(falg->name()).arg(m_runName));
     dlgTFitProgress->setProgressMax(100);
     dlgTFitProgress->setProgress(0);
     dlgTFitProgress->setAllowCancel(true);
@@ -1875,4 +1882,9 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::plotChi2Landscape()
     dlgChi2->exec();
 
     delete dlgChi2;
+}
+
+void QFFitResultsByIndexEvaluationEditorWithWidgets::gotoFirstRun()
+{
+    spinRun->setValue(spinRun->minimum());
 }

@@ -42,8 +42,8 @@ INCLUDEPATH += ../../lib/ \
 ASSETSe_FILES.files = ./assets/examples/*.*
 ASSETSe_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/examples
 
-ASSETSt_FILES.files = ./assets/tutorials/*.*
-ASSETSt_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/tutorials
+ASSETSt_FILES.files = ./assets/templates/*.*
+ASSETSt_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/templates
 
 INSTALLS += ASSETSe_FILES ASSETSt_FILES
 

@@ -14,6 +14,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, QWidget *p
     this->matchFunctor=matchFunctor;
     this->project=project;
     functorPrivate=false;
+    ui->btnHelp->setVisible(false);
     setAllowCreateNew(true);
     setAllowMultiSelect(false);
     setDescription("");
@@ -29,6 +30,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, bool funct
     this->matchFunctor=matchFunctor;
     this->project=project;
     this->functorPrivate=functorPrivate;
+    ui->btnHelp->setVisible(false);
     setAllowCreateNew(true);
     setAllowMultiSelect(false);
     setDescription("");
@@ -44,6 +46,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QWidget *parent):
     this->matchFunctor=new QFMatchRDRFunctorSelectAll();
     functorPrivate=true;
     this->project=project;
+    ui->btnHelp->setVisible(false);
     setAllowCreateNew(true);
     setAllowMultiSelect(false);
     setDescription("");
@@ -152,6 +155,12 @@ bool QFSelectRDRDialog::doCreateNew() const
     return ui->radNew->isChecked();
 }
 
+void QFSelectRDRDialog::setOnlineHelp(const QString &helpfile)
+{
+    this->helpfile=helpfile;
+    ui->btnHelp->setVisible(!helpfile.isEmpty());
+}
+
 void QFSelectRDRDialog::updateRdrList()
 {
     QFProject* project=this->project;
@@ -197,5 +206,10 @@ void QFSelectRDRDialog::on_btnNone_clicked()
 void QFSelectRDRDialog::on_lineEditFilter_textChanged(const QString &text)
 {
     updateRdrList();
+}
+
+void QFSelectRDRDialog::on_btnHelp_clicked()
+{
+    QFPluginServices::getInstance()->displayHelpWindow(helpfile);
 }
 

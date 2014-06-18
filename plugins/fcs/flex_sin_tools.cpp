@@ -304,12 +304,45 @@ void FLEX_readFile(QString filename, FLEX_DATA &data)
                 QList<QVector<double> > cdata;
                 FLEX_readNumberMatrix(FLEX_file, &cdata, false, token);
                 cdata=dataRotate(cdata);
+
+
+                for (int r=dataGetRows(cdata)-1; r>=0; r--) {
+                    bool allzero=true;
+                    for (int c=1; c<cdata.size(); c++) {
+                        allzero=allzero&&(cdata[c].value(r, 0.0)<=0.0);
+                    }
+                    //qDebug()<<"E"<<r<<allzero<<cdata[0].value(r, -1);
+                    if (allzero) {
+                        for (int c=0; c<cdata.size(); c++) {
+                            cdata[c].remove(r);
+                        }
+                    } else break;
+                }
+                int allzeroCnt=-1;
+                for (int r=0; r<dataGetRows(cdata); r++) {
+                    bool allzero=true;
+                    for (int c=1; c<cdata.size(); c++) {
+                        allzero=allzero&&(cdata[c].value(r, 0)<=0.0);
+                    }
+                    //qDebug()<<"S"<<r<<allzero;
+                    if (allzero) {
+                        allzeroCnt=r;
+                    } else break;
+                }
+                //qDebug()<<"allzeroCnt="<<allzeroCnt;
+                if (allzeroCnt>=0) {
+                    for (int c=0; c<cdata.size(); c++) {
+                        cdata[c].remove(0, allzeroCnt+1);
+                    }
+                }
+
                 if (cdata.size()>0) {
                     data.corr_tau=cdata.first();
                     for (int i=1; i<cdata.size(); i++) {
                         data.corrs.append(cdata[i]);
                     }
                 }
+
                 currentGroup="";
                 //qDebug()<<"     correlation columns:"<< cdata.size()<<"X"<<dataGetRows(cdata);
             } else if (currentGroup=="intensityhistory") {

@@ -276,6 +276,48 @@ QMap<QString, QVariant> QFESPIMB040AcquisitionConfigWidget2::getCameraSettingsSt
     return camsetstr2;
 }
 
+void QFESPIMB040AcquisitionConfigWidget2::setCameraConfigAcq(int camera, const QString &id)
+{
+    if (camera==0) ui->cmbAcquisitionSettings1->setCurrentConfig(id);
+    else if (camera==1) ui->cmbAcquisitionSettings2->setCurrentConfig(id);
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::setCameraConfigAcq(int camera, int id)
+{
+    if (camera==0) ui->cmbAcquisitionSettings1->setCurrentConfig(id);
+    else if (camera==1) ui->cmbAcquisitionSettings2->setCurrentConfig(id);
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::setCameraConfigOverview(int camera, int preview, const QString &id)
+{
+    if (camera==0) {
+        if (preview==0) ui->cmbPreviewSettings1_1->setCurrentConfig(id);
+        else if (preview==1) ui->cmbPreviewSettings1_2->setCurrentConfig(id);
+        else if (preview==2) ui->cmbPreviewSettings1_3->setCurrentConfig(id);
+        else if (preview==3) ui->cmbPreviewSettings1_4->setCurrentConfig(id);
+    } else if (camera==1) {
+        if (preview==0) ui->cmbPreviewSettings2_1->setCurrentConfig(id);
+        else if (preview==1) ui->cmbPreviewSettings2_2->setCurrentConfig(id);
+        else if (preview==2) ui->cmbPreviewSettings2_3->setCurrentConfig(id);
+        else if (preview==3) ui->cmbPreviewSettings2_4->setCurrentConfig(id);
+    }
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::setCameraConfigOverview(int camera, int preview, int id)
+{
+    if (camera==0) {
+        if (preview==0) ui->cmbPreviewSettings1_1->setCurrentConfig(id);
+        else if (preview==1) ui->cmbPreviewSettings1_2->setCurrentConfig(id);
+        else if (preview==2) ui->cmbPreviewSettings1_3->setCurrentConfig(id);
+        else if (preview==3) ui->cmbPreviewSettings1_4->setCurrentConfig(id);
+    } else if (camera==1) {
+        if (preview==0) ui->cmbPreviewSettings2_1->setCurrentConfig(id);
+        else if (preview==1) ui->cmbPreviewSettings2_2->setCurrentConfig(id);
+        else if (preview==2) ui->cmbPreviewSettings2_3->setCurrentConfig(id);
+        else if (preview==3) ui->cmbPreviewSettings2_4->setCurrentConfig(id);
+    }
+}
+
 void QFESPIMB040AcquisitionConfigWidget2::clearCameraSettings2()
 {
     camset2.clear();
@@ -1210,3 +1252,4 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
     log->log_text(tr("image series acquisition DONE!\n"));
     opticsSetup->ensureLightpath();
 }
+

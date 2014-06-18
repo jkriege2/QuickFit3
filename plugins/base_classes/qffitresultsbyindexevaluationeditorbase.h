@@ -70,10 +70,16 @@ class QFFitResultsByIndexEvaluationEditorBase : public QFFitResultsEvaluationEdi
         /** \brief copy to all files, but only current run */
         virtual void copyToAllCurrentRun();
 
+        /** \brief store a parameter image (user setable) as fit results */
+        virtual void setParamAllIndexes(QFRawDataRecord* rec, const QString& parameter, const QVector<double>& datar, const QVector<double> &dataerror=QVector<double>());
+        /** \brief store a parameter image (user setable) as fit results */
+        virtual void setParamAllIndexesInCurrent(const QString& parameter, const QVector<double>& data);
+
 
         void log_text(QString message);
         void log_warning(QString message);
         void log_error(QString message);
+
 
     public:
 

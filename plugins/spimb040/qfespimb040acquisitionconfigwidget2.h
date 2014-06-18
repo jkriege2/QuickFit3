@@ -70,6 +70,11 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         QMap<QString, QVariant> getCameraSettingsStr1() const;
         QMap<QString, QVariant> getCameraSettingsStr2() const;
 
+        void setCameraConfigAcq(int camera, const QString& id);
+        void setCameraConfigAcq(int camera, int id);
+        void setCameraConfigOverview(int camera, int preview, const QString& id);
+        void setCameraConfigOverview(int camera, int preview, int id);
+
     protected:
 
         QString prefix1() ;

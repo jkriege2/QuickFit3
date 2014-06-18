@@ -56,7 +56,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 {
         Q_OBJECT
     public:
-        explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0, bool hasMultiThreaded=false, bool multiThreadPriority=false);
+        explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0, bool hasMultiThreaded=false, bool multiThreadPriority=false, const QString& runName=QString("run"));
         
     protected slots:
         /** \brief connect widgets to current data record */
@@ -75,6 +75,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
 
     protected:
+        QString m_runName;
         /** \brief label displaying the current record */
         QLabel* labRecord;
         /** \brief combobox to select a fitting algorithm */
@@ -258,6 +259,8 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief button to load current parameter set */
         QToolButton* btnLoadParameters;
 
+        QToolButton* btnFirstRun;
+
     protected slots:
         /** \brief executed when the mouse position over the plot changes */
         void plotMouseMove(double x, double y);
@@ -317,6 +320,8 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         void parameterRangeChanged();
 
         void plotChi2Landscape();
+
+        void gotoFirstRun();
 
 
     public slots:

@@ -31,6 +31,8 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         */
         virtual void registerToMenu(QMenu* menu);
 
+        virtual void init();
+
         /** \brief short ID for the plugin */
         virtual QString getID() const  { return tr("fcs"); };
 
@@ -56,6 +58,15 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
 
         /** \brief icon for the plugin */
         virtual QString getIconFilename() const  { return QString(":/fcs_logo.png"); };
+
+    public slots:
+        /** \brief start a dialog, which allows to set the background intensity for records
+         *
+         * If  the lists backgrounds and background_sds are non-empty, the given countrates (in Hz) are used as initial values ...
+         * still a dialog is displayed, which allows the user to change these values.
+         **/
+        void setBackgroundInFCS(const QVector<double>& backgrounds=QVector<double>(), const QVector<double>& background_sds=QVector<double>(), const QVector<bool>& background_set=QVector<bool>());
+
     protected slots:
         /** \brief insert FCS data from (multiple) file(s) into (multiple) RDRs*/
         void insertFCS();
