@@ -834,6 +834,7 @@ void QEnhancedTableView::copyAsImage()
     }
 
     QPixmap pix(totalWidth, totalHeight);
+    pix.fill(Qt::white);
 
     {
         QPainter painter(&pix);

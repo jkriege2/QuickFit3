@@ -9,8 +9,8 @@
 #include <QTemporaryFile>
 #include "qftools.h"
 #include "pasteimagedlg.h"
-
-
+#include "selectresourceimage.h"
+#include "pluginlinkdialog.h"
 
 
 
@@ -51,76 +51,80 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
 
     cutAct = new QAction(QIcon(":/qfe_helpeditor/script_cut.png"), tr("Cu&t"), this);
     cutAct->setShortcut(tr("Ctrl+X"));
-    cutAct->setStatusTip(tr("Cut the current selection's contents to the "
+    cutAct->setToolTip(tr("Cut the current selection's contents to the "
                             "clipboard"));
     connect(cutAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(cut()));
 
     copyAct = new QAction(QIcon(":/qfe_helpeditor/script_copy.png"), tr("&Copy"), this);
     copyAct->setShortcut(tr("Ctrl+C"));
-    copyAct->setStatusTip(tr("Copy the current selection's contents to the "
+    copyAct->setToolTip(tr("Copy the current selection's contents to the "
                              "clipboard"));
     connect(copyAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(copy()));
 
     pasteAct = new QAction(QIcon(":/qfe_helpeditor/script_paste.png"), tr("&Paste"), this);
     pasteAct->setShortcut(tr("Ctrl+V"));
-    pasteAct->setStatusTip(tr("Paste the clipboard's contents into the current "
+    pasteAct->setToolTip(tr("Paste the clipboard's contents into the current "
                               "selection"));
     connect(pasteAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(paste()));
 
     undoAct = new QAction(QIcon(":/qfe_helpeditor/script_undo.png"), tr("&Undo"), this);
     undoAct->setShortcut(tr("Ctrl+Z"));
-    undoAct->setStatusTip(tr("Undo the last change "));
+    undoAct->setToolTip(tr("Undo the last change "));
     connect(undoAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(undo()));
 
     redoAct = new QAction(QIcon(":/qfe_helpeditor/script_redo.png"), tr("&Redo"), this);
     redoAct->setShortcut(tr("Ctrl+Shift+Z"));
-    redoAct->setStatusTip(tr("Redo the last undone change "));
+    redoAct->setToolTip(tr("Redo the last undone change "));
     connect(redoAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(redo()));
 
     findAct = new QAction(QIcon(":/qfe_helpeditor/script_find.png"), tr("&Find ..."), this);
     findAct->setShortcut(tr("Ctrl+F"));
-    findAct->setStatusTip(tr("Find a string in sequence "));
+    findAct->setToolTip(tr("Find a string in sequence "));
     connect(findAct, SIGNAL(triggered()), this, SLOT(findFirst()));
 
     findNextAct = new QAction(QIcon(":/qfe_helpeditor/script_find_next.png"), tr("Find &next"), this);
     findNextAct->setShortcut(tr("F3"));
-    findNextAct->setStatusTip(tr("Find the next occurence "));
+    findNextAct->setToolTip(tr("Find the next occurence "));
     connect(findNextAct, SIGNAL(triggered()), this, SLOT(findNext()));
     findNextAct->setEnabled(false);
 
     replaceAct = new QAction(QIcon(":/qfe_helpeditor/script_find_replace.png"), tr("Find && &replace ..."), this);
     replaceAct->setShortcut(tr("Ctrl+R"));
-    replaceAct->setStatusTip(tr("Find a string in sequence and replace it with another string "));
+    replaceAct->setToolTip(tr("Find a string in sequence and replace it with another string "));
     connect(replaceAct, SIGNAL(triggered()), this, SLOT(replaceFirst()));
 
     commentAct = new QAction(tr("&Comment text"), this);
     commentAct->setShortcut(tr("Ctrl+B"));
-    commentAct->setStatusTip(tr("add (single line) comment at the beginning of each line "));
+    commentAct->setToolTip(tr("add (single line) comment at the beginning of each line "));
     connect(commentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(comment()));
 
     unCommentAct = new QAction(tr("&Uncomment text"), this);
     unCommentAct->setShortcut(tr("Ctrl+Shift+B"));
-    unCommentAct->setStatusTip(tr("remove (single line) comment at the beginning of each line "));
+    unCommentAct->setToolTip(tr("remove (single line) comment at the beginning of each line "));
     connect(unCommentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(uncomment()));
 
     indentAct = new QAction(QIcon(":/qfe_helpeditor/script_indent.png"), tr("&Increase indention"), this);
     commentAct->setShortcut(tr("Ctrl+I"));
-    indentAct->setStatusTip(tr("increase indention "));
+    indentAct->setToolTip(tr("increase indention "));
     connect(indentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(indentInc()));
 
     unindentAct = new QAction(QIcon(":/qfe_helpeditor/script_unindent.png"), tr("&Decrease indention"), this);
     unindentAct->setShortcut(tr("Ctrl+Shift+I"));
-    unindentAct->setStatusTip(tr("decrease indention "));
+    unindentAct->setToolTip(tr("decrease indention "));
     connect(unindentAct, SIGNAL(triggered()), ui->edtScript->getEditor(), SLOT(indentDec()));
 
     gotoLineAct = new QAction(tr("&Goto line ..."), this);
     gotoLineAct->setShortcut(tr("Alt+G"));
-    gotoLineAct->setStatusTip(tr("goto a line in the opened file "));
+    gotoLineAct->setToolTip(tr("goto a line in the opened file "));
     connect(gotoLineAct, SIGNAL(triggered()), this, SLOT(gotoLine()));
 
     printAct = new QAction(QIcon(":/qfe_helpeditor/script_print.png"), tr("&Print ..."), this);
-    printAct->setStatusTip(tr("print the current SDFF file "));
+    printAct->setToolTip(tr("print the current SDFF file "));
     connect(printAct, SIGNAL(triggered()), this, SLOT(print()));
+
+    actInsertIcon = new QAction(QIcon(":/qfe_helpeditor/insert_image.png"), tr("&Insert icon ..."), this);
+    actInsertIcon->setToolTip(tr("print the current SDFF file "));
+    connect(actInsertIcon, SIGNAL(triggered()), this, SLOT(insertIcon()));
 
     cutAct->setEnabled(false);
     copyAct->setEnabled(false);
@@ -138,6 +142,8 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     menuMore->addAction(unindentAct);
     menuMore->addAction(commentAct);
     menuMore->addAction(unCommentAct);
+    menuMore->addSeparator();
+    menuMore->addAction(actInsertIcon);
     menuMore->addSeparator();
     menuMore->addAction(gotoLineAct);
     menuMore->addAction(findAct);
@@ -183,12 +189,31 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
 
     menu=new QMenu(tr("general help links"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, tr("Link: RDR general help"), "<a href=\"$qf_ui_rdr_helpfile$$\">$$qf_ui_rdr_helpfiletitle$$</a>" );
+    addInsertAction(menu, tr("Link: Evaluation general help"), "<a href=\"$$qf_ui_eval_helpfile$$\">$$qf_ui_eval_helpfiletitle$$</a>" );
+    addInsertAction(menu, tr("Link: Plotter Widget general help"), "<a href=\"$$qf_ui_jkqtplotter_helpfile$$\">$$qf_ui_jkqtplotter_helpfiletitle$$</a>" );
+    addInsertAction(menu, tr("Link: LaTeX parser general help"), "<a href=\"$$qf_ui_latex_helpfile$$\">$$qf_ui_latex_helpfiletitle$$</a>" );
+    addInsertAction(menu, tr("Link: Expression parser help"), "<a href=\"$$qf_mathparser_helpfile$$\">$$qf_mathparser_helpfiletitle$$</a>" );
+    //addInsertAction(menu, tr("Link:  help"), "<a href=\"$$aa$$\">$$aa$$</a>" );
+    //addInsertAction(menu, tr("Link:  help"), QString("<a href=\"$$mainhelpdir$$aa\">aa</a>") );
+    addInsertAction(menu, tr("Link: Color paletes help"), QString("<a href=\"$$mainhelpdir$$colorpalettes.html\">color paletes</a>") );
+    addInsertAction(menu, tr("Link: Regular Expressions"), QString("<a href=\"$$mainhelpdir$$qf3_qtregexp.html\">regular expressions</a>") );
+    addInsertAction(menu, tr("Link: Fit Functions"), QString("<a href=\"$$mainhelpdir$$qf3_fitfunc.html\">fit functions</a>") );
+    addInsertAction(menu, tr("Link: Fit Algorithms"), QString("<a href=\"$$mainhelpdir$$qf3_fitalg.html\">fit algorithms</a>") );
+    addInsertAction(menu, tr("Link: File Formats"), QString("<a href=\"$$mainhelpdir$$qf3_fileformats.html\">file formats</a>") );
+    addInsertAction(menu, tr("Link: GPL 3.0"), QString("<a href=\"$$mainhelpdir$$gpl3_0.html\">GPL 3.0</a>") );
+
+    menu->addSeparator();
     addInsertAction(menu, "$$qf_ui_rdr_helpfile$$");
     addInsertAction(menu, "$$qf_ui_rdr_helpfiletitle$$");
     addInsertAction(menu, "$$qf_ui_eval_helpfile$$");
     addInsertAction(menu, "$$qf_ui_eval_helpfiletitle$$");
     addInsertAction(menu, "$$qf_ui_jkqtplotter_helpfile$$");
     addInsertAction(menu, "$$qf_ui_jkqtplotter_helpfiletitle$$");
+    addInsertAction(menu, "$$qf_ui_latex_helpfile$$");
+    addInsertAction(menu, "$$qf_ui_latex_helpfiletitle$$");
+    addInsertAction(menu, "$$qf_mathparser_helpfile$$");
+    addInsertAction(menu, "$$qf_mathparser_helpfiletitle$$");
 
 
     menu=new QMenu(tr("page header/footer"), this);
@@ -574,7 +599,7 @@ void QFEHelpEditorWidget::openScript(QString dir, bool saveDir, const QString &f
         if (QFile::exists(filename)) {
             QFile f(filename);
             if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
-                ui->edtScript->getEditor()->setPlainText(QString::fromUtf8(f.readAll()));
+                ui->edtScript->getEditor()->setPlainText(QString::fromUtf8(f.readAll().replace("\t", "    ")));
                 setScriptFilename(filename);
                 f.close();
                 lastScript=ui->edtScript->getEditor()->toPlainText();
@@ -711,11 +736,26 @@ void QFEHelpEditorWidget::on_btnInsertListItem_clicked()
 
 void QFEHelpEditorWidget::on_btnPasteImage_clicked()
 {
-    PasteImageDlg* dlg=new PasteImageDlg(QFileInfo(currentScript).absolutePath(), this, QString("./pic/%1").arg(QFileInfo(currentScript).baseName())+QString("_pic%1.png") );
+    PasteImageDlg* dlg=new PasteImageDlg(QFileInfo(currentScript).absolutePath(), this, QString(), QString("./pic/%1").arg(QFileInfo(currentScript).baseName())+QString("_pic%1.png") );
     if (dlg->exec()) {
         insertAroundOld(dlg->saveImage()+"%1");
     }
     delete dlg;
+}
+
+void QFEHelpEditorWidget::on_btnInsertAndCopyImage_clicked()
+{
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastImageDir", ProgramOptions::getInstance()->getMainHelpDirectory()).toString();
+    QString filename=qfGetOpenFileName(this, tr("select image file ..."), dir, tr("Image Files (*.png *.jpg *.bmp)") );
+    if (!filename.isEmpty()) {
+        dir=QFileInfo(filename).absolutePath();
+        ProgramOptions::getInstance()->getQSettings()->setValue("QFEHelpEditorWidget/lastImageDir", dir);
+        PasteImageDlg* dlg=new PasteImageDlg(QFileInfo(currentScript).absolutePath(), this, filename, QString("./pic/%1").arg(QFileInfo(currentScript).baseName())+QString("_pic%1.png") );
+        if (dlg->exec()) {
+            insertAroundOld("\n"+dlg->saveImage()+"%1");
+        }
+        delete dlg;
+    }
 }
 
 void QFEHelpEditorWidget::on_btnInsertCode_clicked()
@@ -731,6 +771,14 @@ void QFEHelpEditorWidget::on_btnInsertMath_clicked()
 void QFEHelpEditorWidget::on_btnInsertBMath_clicked()
 {
     insertAroundOld("$$bmath:°$$%1");
+}
+
+void QFEHelpEditorWidget::on_btnInsertPluginLink_clicked()
+{
+    PluginLinkDialog* dlg=new PluginLinkDialog(this);
+    if (dlg->exec()) {
+        insertAroundOld(dlg->insertText());
+    }
 }
 
 
@@ -859,13 +907,33 @@ void QFEHelpEditorWidget::insertActionClicked()
     }
 }
 
+void QFEHelpEditorWidget::insertIcon()
+{
+    SelectResourceImage* dlg=new SelectResourceImage(this);
+    if (dlg->exec()) {
+        insertAroundOld(QString("<img src=\"%1\">°").arg(dlg->getSelectFile()));
+    }
+}
+
 void QFEHelpEditorWidget::insertAroundOld(const QString &newText)
 {
     QString txt=newText.arg(ui->edtScript->getEditor()->getSelection());
     if (!txt.isEmpty()) {
+        QTextCursor cur=ui->edtScript->getEditor()->textCursor();
+        cur.select(QTextCursor::LineUnderCursor);
+        QString line=cur.selectedText();
+        int wsc=0, i=0;
+        while (i<line.size() && (line[i]==' ' || line[i]=='\t')) {
+            if (line[i]==' ') wsc++;
+            if (line[i]=='\t') wsc+=4;
+            i++;
+        }
+        txt=txt.replace('\n', "\n"+QString(wsc, QChar(' ')));
+
         int pos=txt.indexOf('°');
         if (pos>=0) txt=txt.remove('°');
         int textpos=ui->edtScript->getEditor()->textCursor().position();
+
         ui->edtScript->getEditor()->insertPlainText(txt);
         if (pos>=0) {
             for (int i=0; i<txt.length()-pos; i++) {

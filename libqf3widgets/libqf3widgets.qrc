@@ -104,5 +104,6 @@
         <file alias="stage_disconnected.png">icons/stage_disconnected.png</file>
         <file alias="stage_joystick.png">icons/joystick.png</file>
         <file alias="stage_nojoystick.png">icons/nojoystick.png</file>
+        <file alias="plugin.png">icons/plugin.png</file>
     </qresource>
 </RCC>

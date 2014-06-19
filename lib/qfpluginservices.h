@@ -215,7 +215,7 @@ class QFLIB_EXPORT QFPluginServices {
               -
             .
          */
-        virtual QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced=true, const QF3HelpReplacesList& more_replaces=QF3HelpReplacesList(), bool insertTooltips=false, bool dontCreatePics=false)=0;
+        virtual QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced=true, const QF3HelpReplacesList& more_replaces=QF3HelpReplacesList(), bool insertTooltips=false, bool dontCreatePics=false, bool isMainHelp=false)=0;
 
 
         /** \brief returns a global configuration value. This can be used to implement an application wide communication/exchange

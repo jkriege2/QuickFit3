@@ -410,7 +410,7 @@ QString QFHTMLHelpWindow::loadHTML(QString filename, bool noPics) {
 
     const QString defaultTxt=tr("<html><header><title>Error: Help page does not exist</title></header><body>$$qf_commondoc_header.start$$ $$qf_commondoc_header.simplest$$ $$qf_commondoc_header.end$$<center>The Quickfit online-help page you are trying to access does not exist!<br><br>File was: <i>%1</i></center></body></html>").arg(filename);
 
-    return transformQF3HelpHTMLFile(filename, defaultTxt, true, QFHelpReplacesList(), true, noPics);
+    return transformQF3HelpHTMLFile(filename, defaultTxt, true, QFHelpReplacesList(), true, noPics, true);
 
 }
 

@@ -180,8 +180,17 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual QVariant getGlobalConfigValue(const QString& key);
         /** \copydoc QFPluginServices::setGlobalConfigValue() */
         virtual void setGlobalConfigValue(const QString& key, const QVariant& value);
+
+        struct ContentsEntry {
+            QList<int> num;
+            QString header;
+            QString id;
+            QString prefix;
+            ContentsEntry();
+        };
+
         /** \copydoc QFPluginServices::transformQF3HelpHTML() */
-        virtual QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced=true, const QF3HelpReplacesList& more_replaces=QF3HelpReplacesList(), bool insertTooltips=false, bool dontCreatePics=false);
+        virtual QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced=true, const QF3HelpReplacesList& more_replaces=QF3HelpReplacesList(), bool insertTooltips=false, bool dontCreatePics=false, bool isMainHelp=false);
 
         /** \brief return the assets directory  of the online help for the given plugin ID */
         virtual QString getPluginAssetsDirectory(const QString& pluginID);

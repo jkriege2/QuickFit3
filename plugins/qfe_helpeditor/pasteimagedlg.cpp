@@ -3,7 +3,7 @@
 #include "programoptions.h"
 #include <QClipboard>
 
-PasteImageDlg::PasteImageDlg(QString directory, QWidget *parent, QString filenameTemplate) :
+PasteImageDlg::PasteImageDlg(const QString &directory, QWidget *parent, const QString &inputImageFile, const QString &filenameTemplate) :
     QDialog(parent),
     ui(new Ui::PasteImageDlg)
 {
@@ -21,9 +21,15 @@ PasteImageDlg::PasteImageDlg(QString directory, QWidget *parent, QString filenam
     ui->edtCaption->setText("");
 
     ui->chkCentered->setChecked(ProgramOptions::getConfigValue("qfe_helpeditor/PasteImageDlg/centered", false).toBool());
-    QClipboard *clipboard = QApplication::clipboard();
-    connect(clipboard, SIGNAL(dataChanged()), this, SLOT(clipboardChanged()));
-    clipboardChanged();
+
+    if (!inputImageFile.isEmpty() && QFile::exists(inputImageFile)) {
+        originalImage.load(inputImageFile);
+        updateImage();
+    } else {
+        QClipboard *clipboard = QApplication::clipboard();
+        connect(clipboard, SIGNAL(dataChanged()), this, SLOT(clipboardChanged()));
+        clipboardChanged();
+    }
 }
 
 PasteImageDlg::~PasteImageDlg()
@@ -35,13 +41,17 @@ PasteImageDlg::~PasteImageDlg()
 QString PasteImageDlg::saveImage() const
 {
     QDir d(directory);
+    if (!d.exists()) {
+        QDir dd;
+        dd.mkpath(d.absolutePath());
+    }
     ui->labImage->pixmap()->save(d.absoluteFilePath(ui->edtFilename->text()));
     QString result;
     result=QString("<img src=\"%1\" border=\"1\">").arg(ui->edtFilename->text());
     if (!ui->edtAnchor->text().isEmpty()) result=QString("<a name=\"%2\">%1").arg(result).arg(ui->edtAnchor->text());
     if (!ui->edtCaption->text().isEmpty()) result=QString("%1<br/>\n<i>%2</i>").arg(result).arg(ui->edtCaption->text());
     if (ui->chkCentered->isChecked()) {
-        return QString("<center>\n\t%1\n</center>").arg(result);
+        return QString("\n<center>%1\n</center>\n").arg(result);
     }
     return result;
 }
@@ -49,8 +59,21 @@ QString PasteImageDlg::saveImage() const
 void PasteImageDlg::clipboardChanged()
 {
     QClipboard *clipboard = QApplication::clipboard();
-    QPixmap pix=clipboard->pixmap();
-    if (!pix.isNull()) {
+    originalImage=clipboard->pixmap();
+    updateImage();
+}
+
+void PasteImageDlg::updateImage()
+{
+    int x=ui->spinCutLeft->value();
+    int y=ui->spinCutTop->value();
+    int w=originalImage.width()-x-ui->spinCutRight->value();
+    int h=originalImage.height()-y-ui->spinCutBottom->value();
+    double s=ui->spinScale->value()/100.0;
+    //qDebug()<<x<<y<<w<<h<<s;
+    if (w>0 && h>0) {
+        QPixmap pix=originalImage.copy(x, y, w, h).scaled(w*s, h*s, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
         ui->labImage->setPixmap(pix);
     }
 }

@@ -166,7 +166,7 @@
            <item row="5" column="1">
             <layout class="QGridLayout" name="gridLayout">
              <item row="0" column="0" rowspan="5">
-              <widget class="QTableView" name="tvParams"/>
+              <widget class="QEnhancedTableView" name="tvParams"/>
              </item>
              <item row="0" column="1">
               <widget class="QPushButton" name="btnAdd">
@@ -291,6 +291,11 @@
    <extends>QSplitter</extends>
    <header>qvisiblehandlesplitter.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QEnhancedTableView</class>
+   <extends>QTableView</extends>
+   <header>qenhancedtableview.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

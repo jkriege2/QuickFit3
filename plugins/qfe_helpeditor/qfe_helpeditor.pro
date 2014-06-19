@@ -17,18 +17,24 @@ HEADERS += qfehelpeditor.h \
            qfehelpeditorwidget.h \
     replacedialog.h \
     finddialog.h \
-    pasteimagedlg.h
+    pasteimagedlg.h \
+    selectresourceimage.h \
+    pluginlinkdialog.h
 
 SOURCES += qfehelpeditor.cpp \
            qfehelpeditorwidget.cpp \
     replacedialog.cpp \
     finddialog.cpp \
-    pasteimagedlg.cpp
+    pasteimagedlg.cpp \
+    selectresourceimage.cpp \
+    pluginlinkdialog.cpp
 
 FORMS =    qfehelpeditorwidget.ui \
     replacedialog.ui \
     finddialog.ui \
-    pasteimagedlg.ui
+    pasteimagedlg.ui \
+    selectresourceimage.ui \
+    pluginlinkdialog.ui
 
 RESOURCES += qfehelpeditor.qrc
 

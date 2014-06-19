@@ -58,5 +58,6 @@
         <file alias="script_saveas.png">icons/script_saveas.png</file>
         <file>icons/openexample.png</file>
         <file>icons/opentemplate.png</file>
+        <file>icons/copyimage.png</file>
     </qresource>
 </RCC>

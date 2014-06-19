@@ -272,9 +272,6 @@
      </property>
      <item>
       <widget class="QToolButton" name="btnBold">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>bold</string>
        </property>
@@ -286,9 +283,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnItalic">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>itailc</string>
        </property>
@@ -300,9 +294,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnUnderline">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>underline</string>
        </property>
@@ -314,9 +305,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnImage">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>insert image</string>
        </property>
@@ -327,10 +315,21 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnPasteImage">
+      <widget class="QToolButton" name="btnInsertAndCopyImage">
        <property name="toolTip">
-        <string>start new script</string>
+        <string>select an image file to copy to the help directory and insetr into the document</string>
        </property>
+       <property name="text">
+        <string>copy and insert image file</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/copyimage.png</normaloff>:/qfe_helpeditor/icons/copyimage.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnPasteImage">
        <property name="text">
         <string>insert image</string>
        </property>
@@ -342,9 +341,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnAnchor">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>insert anchor</string>
        </property>
@@ -356,9 +352,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnLink">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>insert link</string>
        </property>
@@ -369,10 +362,18 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnBlockquote">
-       <property name="toolTip">
-        <string>start new script</string>
+      <widget class="QToolButton" name="btnInsertPluginLink">
+       <property name="text">
+        <string>insert plugin link ...</string>
        </property>
+       <property name="icon">
+        <iconset resource="../../libqf3widgets/libqf3widgets.qrc">
+         <normaloff>:/libqf3widgets/plugin.png</normaloff>:/libqf3widgets/plugin.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnBlockquote">
        <property name="text">
         <string>insert blockquote</string>
        </property>
@@ -384,9 +385,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnNumberedList">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>insert numbered list</string>
        </property>
@@ -398,9 +396,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnBulletList">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>insert bullet list</string>
        </property>
@@ -412,9 +407,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnInsertListItem">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>insert new list item</string>
        </property>
@@ -426,9 +418,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnInsertH1">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>insert header, level 1</string>
        </property>
@@ -440,9 +429,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnInsertH2">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>insert header, level 2</string>
        </property>
@@ -454,9 +440,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnInsertH3">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>insert header, level 3</string>
        </property>
@@ -468,9 +451,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnInsertH4">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>insert header, level 4</string>
        </property>
@@ -482,9 +462,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnInsertParagraph">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>insert new paragraph</string>
        </property>
@@ -496,9 +473,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnInsertCode">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>insert &lt;code&gt;...&lt;/code&gt;</string>
        </property>
@@ -510,9 +484,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnInsertMath">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>insert equation</string>
        </property>
@@ -524,9 +495,6 @@
      </item>
      <item>
       <widget class="QToolButton" name="btnInsertBMath">
-       <property name="toolTip">
-        <string>start new script</string>
-       </property>
        <property name="text">
         <string>insert equation block</string>
        </property>
@@ -656,12 +624,13 @@
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
+  <include location="../../libqf3widgets/libqf3widgets.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="qfehelpeditor.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections/>
