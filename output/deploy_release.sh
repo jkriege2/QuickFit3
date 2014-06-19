@@ -207,22 +207,29 @@ if [ "${create_deploy}" != "0" ]; then
 
 	mkdir ../deployspim
 	mkdir ../deployspim/plugins
+	mkdir ../deployspim/fitfunctionplugins
 	mkdir ../deployspim/globalconfig_templates
 	mkdir ../deployspim/source
 	mkdir ../deployspim/assets
+	mkdir ../deployspim/sdk
+	mkdir ../deployspim/sdk/fitfunctions/
 	mkdir ../deployspim/examples
 	mkdir ../deployspim/assets/plugins
 	mkdir ../deployspim/assets/plugins/help
 
 	mkdir ../deployspecial
 	mkdir ../deployspecial/plugins
+	mkdir ../deployspecial/fitfunctionplugins
 	mkdir ../deployspecial/globalconfig_templates
 	mkdir ../deployspecial/source
 	mkdir ../deployspecial/assets
 	mkdir ../deployspecial/examples
 	mkdir ../deployspecial/assets/plugins
 	mkdir ../deployspecial/assets/plugins/help
+	mkdir ../deployspecial/sdk/fitfunctions/
 
+	cp -rf ./sdk/fitfunctions/* ../deployspim/sdk/fitfunctions
+	cp -rf ./sdk/fitfunctions/* ../deployspecial/sdk/fitfunctions
 	cp -rf ./globalconfig_templates/* ../deployspim/globalconfig_templates
 	cp -rf ./globalconfig_templates/* ../deployspecial/globalconfig_templates
 	for f in $SPIMONLYQTMODULES

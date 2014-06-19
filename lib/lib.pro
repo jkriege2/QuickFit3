@@ -111,7 +111,8 @@ HEADERS += dlgnewproperty.h \
     qfenhancedtabwidget.h \
     qfenhancedcombobox.h \
     qffitalgorithmparameterstorage.h \
-    qftabledelegate.h
+    qftabledelegate.h \
+    qfcfitfunction.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -208,6 +209,15 @@ CONFIG += dll lib_bundle exceptions rtti stl create_prl
 
 DEFINES += QFLIB_LIBRARY
 
+
+
+FITFUNCTIONSSDKM.files = qfcfitfunction.h
+FITFUNCTIONSSDKM.path = $${QFOUTPUT}/sdk/sdk_fitfunctions/lib/
+
+FITFUNCTIONSSDK.files = ./sdk_fitfunctions/*
+FITFUNCTIONSSDK.path = $${QFOUTPUT}/sdk/sdk_fitfunctions/lib/
+
+INSTALLS += FITFUNCTIONSSDKM FITFUNCTIONSSDK
 
 
 SRC_DISTRIBUTED.files = ../extlibs/MersenneTwister.h
