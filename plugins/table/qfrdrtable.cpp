@@ -1,5 +1,5 @@
 #include "qfrdrtable.h"
-#include "dlgcsvparameters.h"
+#include "qfdlgcsvparameters.h"
 #include <QtXml>
 #include "qfrdrtableeditor.h"
 #include "qfrdrploteditor.h"

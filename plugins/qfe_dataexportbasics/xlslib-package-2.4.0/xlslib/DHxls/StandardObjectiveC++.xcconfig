@@ -1,7 +1,7 @@
 //
-// $Revision: 1.1 $
+// $Revision$
 // $Author: dhoerl $ 
-// $Date: 2008/10/25 18:44:32 $
+// $Date$
 
 GCC_GENERATE_DEBUGGING_SYMBOLS = YES
 GCC_MODEL_TUNING = G5
