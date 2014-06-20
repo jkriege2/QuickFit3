@@ -23,10 +23,235 @@
 
 <!--
 
+
   
 -->
 <!--
-                <li><a name="3152"><b>2014-02-11 (SVN: 3152)</b>-->
+		<li><a name="3256"><b>2014-06-20 (SVN: 3256)</b>-->
+		<ul>
+		  <!--<li><b>new plugins:</b><ul>
+			<li><b>cam_server</b>:  added this plugin, which allows to use a custom camera server (for CHSPAD server)</li>
+		  </ul></li>-->
+		  <li><b>QuickFit</b><ul>
+		    <li>plotter widgets:<ul>
+				<li>data table in plotter now has context menu entry to copy data as CSV</li>
+				<li>changed appearance (default width of grid lines)</li>
+				<li>improved speed of JKQtPlotter</li>
+				<li>added rel. shift to error bars, as this allows to have shifted errorbars on bar charts</li>
+				<li>added example for barcharts</li>
+				<li>added asymmetric errorbars (different lengths to upper and lower bar.</li>
+				<li>impulse-plots and filled_curve-plots now support a baseline-parameter</li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+			</ul></li>
+		    <li>expression parser:<ul>
+				<li>added function findfirst()</li>
+				<li>added function randvec_seed(), randintvec_seed(), randnormvec_seed(), randboolvec_seed()</li>
+				<li>added functions cumsum(), cumprod(), diff(), mad(), nmad(), indexedmad(), indexednmad(), trapez()/trapz()</li>
+				<li>added functions for date/time handling: now(), datenum(), datetimenum(), date2str(), datetime2str(), datediff2secs(), datediff2mins(), datediff2hours(), datediff2days()</li>
+				<li>parser now supports user-defined functions, that have qfmpNode*'s as parameters, rather than qfmpResult's (this allows for constructs, like "for()" in user-defined functions</li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+				<li></li>
+			</ul></li>
+			<li>added context menu entry to tables, that allows to explicitly copy the table as "CSV", or to copy the table in a format suitable for "Excel", which depends on the current locale (e.g. for decimal separators)</li>
+			<li>bugfixed "copy to Excel/CSV" in table view, which did not copy any data (regression?)</li>
+			<li>improved LaTeX rendering</li>
+			<li>improved rendering of math in online-help and plotter widgets</li>
+			<li>results table export in RDR and evaluation now supports more file formats (via data export plugins)</li>
+			<li>added newer version of the XITS fonts</li>
+			<li>improved speed in JKQtPlotter, especially during resize (delayed plot)</li>
+			<li>updated to Qt 4.8.6</li>
+			<li>limited LOG-filesize to 50MB</li>
+			<li>improved speed of search in online-help</li>
+			<li>a right-click on any fit model selection combobox opens a context-menu with links to the model help and the model selector dialog</li>
+			<li>added button "next of same role" and menu-entries to all RDR editors</li>
+			<li>increased font size in online-help</li>
+			<li>improved online-help</li>
+			<li>bugfix in "copy table as image" (available in the context-menu of most tables in QuickFit3), the image now does not have a black background anymore (is no longer unreadable)</li>
+			<li>bugfix of regression: online-help didn't display table of contents properly</li>
+			<li>started adding a simple SDK for C fit functions</li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		  </ul></li>	
+	
+		  <li><b>imFCCSFit</b><ul>
+			<li>fixed a possible crash when selecting a new fit function by hand</li>
+			<li>fit parameter names are more expressive now</li>
+			<li>the tool to calculate the crosstalk-corrected rel. FCCS amplitude now supports background-correction</li>
+			<li>replaced "run" by "pixel" to clear up the function</li>
+			<li>added button "go to average pixel"</li>
+			<li></li>
+			<li></li>
+		  </ul></li>	
+		  <li><b>FCCSFit</b><ul>
+			<li>fit parameter names are more expressive now</li>
+			<li>bugfix: fixed possible crash, when trying to select anew fit model</li>
+			<li></li>
+			<li></li>
+		  </ul></li>	
+		  <li><b>General fit functions</b><ul>
+			<li>bugfix: some parameters in exp/dblexp were fixed initially</li>
+			<li>"Waveforms: Sine" now also calculates the period=1/frequency</li>
+			<li>added Cosine waveform</li>
+			<li>added centered polynomial</li>
+			<li>added Gaussian distribution function</li>
+			<li>improved/bugfixed parameter estimation for Hill function and mod. Hill function</li>
+			<li>added double log-normal function</li>
+			<li></li>
+			<li></li>
+		  </ul></li>	
+		  <li><b>dataexport_basics</b><ul>
+			<li>bugfix: the plugin did not export the headers properly</li>
+		  </ul></li>	
+		  <li><b>FCS fit functions</b><ul>
+			<li>simple_exp: parameters are sorted by decay times now!</li>
+			<li>added function for normal diffusion fit with different relative brightnesses of the species, which also supports up to four blinking components</li>
+			<li></li>
+			<li></li>
+		  </ul></li>    
+		  <li><b>SPIM-FCS fit functions</b><ul>
+			<li>added presets to imfccsfit, which allows to perform a flow measurement with 4 neighboring pixels</li>
+			<li>flow FCCS fit functions also calculate the angle of the flow now</li>
+			<li>added FCCS fit function with flow and 1/e^2-width and new Veff</li>
+			<li>added model of multi-component normal diffusion with different relative molecular brightnesses per species</li>
+		  </ul></li>    
+		  <li><b>TIR-FCS fit functions</b><ul>
+			<li>flow FCCS fit functions also calculate the angle of the flow now</li>
+			<li>added model of multi-component normal diffusion with different relative molecular brightnesses per species</li>
+			<li>bugfix: some models did not calculate the third component properly</li>
+			<li></li>
+		  </ul></li>	
+		  <li><b>imagingFCS</b><ul>
+			<li>bugfix: set background from selected pixels function didn't work correctly</li>
+			<li>bugfix in "mask by image" dialog: sliders should be properly initialized now</li>
+			<li>added additional button to GUI, that allow to access several functions from the menu quickly (copy mask to group, mask builder, copy fit result statistics, ...)</li>
+			<li>added menu entries/buttons to mask by the overview image, channel 2 (so far only masking by channel 1 was possible)</li>
+			<li>"set background from ..." functions stored the background divided by the frame time in the properties BACKGROUND and BACKGROUND_STD. Now the additional properties BACKGROUND_DIRECT and BACKGROUND_STD_DIRECT contain the same data, but without dividing by the frame time.</li>
+			<li>bugfix "copy fit results statistics..." did not copy the results of the "relative imFCCS amplitude" evaluation tool</li>
+			<li>simplified display of images (less ticks...)</li>
+			<li>"copy fit results to table": added possibility to copy from named selections</li>
+			<li>displays average and background intensity for the selected pixels in the parameter image tab (near the bottom in the controll list on the rhs)</li>
+			<li>bugfix: data-cut-sliders below correlation curve display in image editor tab do not disappear anymore</li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		  </ul></li>	
+		  <li><b>table</b><ul>
+			<li>added "QuickStatistics" and "QuickHistogram" tools, which show the statistics and histograms of the current selection (column-wise)</li>
+			<li>added function to autoset column width ("Table" menu)</li>
+			<li>added function to internal function parser: columntitle(), columntitles(), columnindexbytitle()</li>
+			<li>in "column property editor" dialog: added context menu entries for relative column references to expression editor</li>
+			<li>"edit column properties" dialog: added button that saves properties, but does not recalculate the expressions in the sheet</li>
+			<li>added options to set key line width, line color, background color, ...)</li>
+			<li>bugfix: several data access methods in function parser did not work properly for row>columnCount</li>
+			<li>added more table export formats</li>
+			<li>new format (XML) for graph settings templates</li>
+			<li>added "Refit" option to fit and regression results (only works for fits/regressions calculated in QF3 version starting from this!)</li>
+			<li>added special column with increasing number (1,2,3,...)</li>
+			<li>axis labels can be set from table columns</li>
+			<li>bar-charts now support errors</li>
+			<li>date/time/date-time axis labels work properly now</li>
+			<li>added parser functions colsavg(), colsstd(), colsmedian(), ..., which calculate a column of averages for each row in a set of columns</li>
+			<li>massive speed improvement, when evaluating expressions in the table (column and/or cells)</li>
+			<li>bugfix: in fit dialog the parameter ranges are editable now!</li>
+			<li>table fit dialog now has a button for help on fit models and algorithms</li>
+			<li>table fit dialog now has a button that opens a fit model selector</li>
+			<li>table fit dialog allows to select weighted/non-weighted fit</li>
+			<li>added button to configure fit algorithm parameters to table fit dialog</li>
+			<li>bugfix: labels from column on plot axes were not displayed correctly (first label doubled!)</li>
+			<li>added offset/baseline to barcharts, impulses, filled curves</li>
+			<li>errorbars may be asymmetic now</li>
+			<li>added checkbox do show/don't show the plot title</li>
+			<li>added widgets for several parameters to format the key (offset, separation, margin, symbol length)</li>
+			<li>added button to automatically set width/shift of bar charts</li>
+			<li>when doing fit/regression, graph colors are set properly (either they are not changed, or set, as in the source graph, but darker!)</li>
+			<li>bugfix: autocolumn 1,2,3,... is now truly 1,2,3,...</li>
+			<li>plot magnification property is hidden now!</li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		  </ul></li>	
+		  <li><b>B040SPIM</b><ul>
+			<li>added JavaScript functions to set preview acquisition camera parameters</li>
+			<li>saving a movie now also saves measured values</li>
+			<li>added JavaSCript functions to set current preview settings</li>
+			<li>added JavaScript functions to set acquisition camera settings</li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		  </ul></li>	
+		  <li><b>FCS Fit</b><ul>
+			<li>fit parameter names are more expressive now</li>
+			<li>added button to start model selector + some code refactoring (using QFFitFunctionComboBox now)</li>
+			<li>added button "go to average run"</li>
+			<li></li>
+			<li></li>
+		  </ul></li>	
+		  <li><b>FCS</b><ul>
+			<li>fixed a possible freeze of QF3, if ACF-data is imported from CSV files and no countrate-trace is provided!</li>
+			<li>import functions for correlator.com .SIN files</li>
+			<li>added tool to set background countrates in several RDRs</li>
+			<li>added tool (RDR editor menu "Tools"!) to set background rates from the rates in the current RDR</li>
+			<li>added tutorial for the background tools</li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+			<li></li>
+		  </ul></li>	
+		  <li><b>imagingFCS Fit</b><ul>
+			<li>fit parameter names are more expressive now</li>
+			<li>added button to start model selector + some code refactoring (using QFFitFunctionComboBox now)</li>
+			<li>added button "go to average run"</li>
+			<li>imporved dialog to set fit result from other RDR/file/...</li>
+		  </ul></li>	
+		  <li><b>Online-Help editor</b><ul>
+			<li>added several buttons for advanced insert/editing functions</li>
+			<li>improved past image dialog (now allows scaling and cropping of the image</li>
+			<li></li>
+		  </ul></li>	
+	      <li><b>picoquantimporters</b><ul>
+			<li></li>
+			<li></li>
+		  </ul></li>	
+	      <li><b>spectra viewer</b><ul>
+			<li>added FRET Förster radius calculator</li>
+			<li></li>
+		  </ul></li>	
+		</ul></li>
+		
+		
+		<li><a name="3152"><b>2014-02-11 (SVN: 3152)</b>
 		<ul>
 		  <li><b>new plugins:</b><ul>
 			<li><b>cam_server</b>:  added this plugin, which allows to use a custom camera server (for CHSPAD server)</li>
@@ -57,14 +282,14 @@
 		  <li><b>MaxEnt FCS Fit</b><ul>
 			<li>added camera SPIM-FCS 3D diffusion model</li>
 			<li>added camera TIR-FCS 2D diffusion model</li>
-			<li>added overview image tab (to the residuals statistics tabs at the bottom of screen) for imFCS records</li>
+			<li>added overview image tab (to the residuals statistics tabs at the bottom of screen) for imagingFCS records</li>
 			<li>added possibility to change the tau-axis with different modes (lin./log. range of times or diffusion coefficients)</li>
 			<li>added user-defined distribution time axes</li>
 		  </ul></li>	
 		  <li><b>MSD FCS Fit</b><ul>
 			<li>added camera SPIM-FCS 3D diffusion model</li>
 			<li>added camera TIR-FCS 2D diffusion model</li>
-			<li>added overview image tab (to the residuals statistics tabs at the bottom of screen) for imFCS records</li>
+			<li>added overview image tab (to the residuals statistics tabs at the bottom of screen) for imagingFCS records</li>
 		  </ul></li>	
 		  <li><b>imFCCSFit</b><ul>
 			<li>added option to save ACF/CCF amplitudes when calculating crosstalk-corrected relative CCF-amplitudes</li>
@@ -84,16 +309,16 @@
 			<li>all anomalous diffusion fit functions now calculate MSDs after a given timespan and the time to leave the focal effective area</li>
 			<li>some normal diffusion fit functions now calculate MSDs after a given timespan and the time to leave the focal effective area</li>
 		  </ul></li>	
-		  <li><b>imFCS</b><ul>
+		  <li><b>imagingFCS</b><ul>
 			<li>parameter image RDR editor: added Selection-menu entries:<ul>
 			<li>deselect all masked pixels</li>
 			<li>select pixels by parameter images/overview image </li></ul></li>
 			<li>image editor: improved "copy fit result statistics" when interacting with table-RDR (column names were not copied appropriately)</li>
 			<li>bugfix: in "copy fit results to table", the pixel count column was contained several times</li>
 			<li>correlation dialog has a button with some preset croppings</li>
-			<li>added mask and selection builder dialogs (+ menu entries in the imFCS RDR Editor, "Selection" and "Mask" menus), which allow to build a selection/mask from up to three conditions to parameter images/overview images (in-range/out-of-range/>=threshold/<=threshold)</li>
+			<li>added mask and selection builder dialogs (+ menu entries in the imagingFCS RDR Editor, "Selection" and "Mask" menus), which allow to build a selection/mask from up to three conditions to parameter images/overview images (in-range/out-of-range/>=threshold/<=threshold)</li>
 			<li>"copy fit results to excel" allows now to also save the results and to copy results from several (selectable) files.</li>
-			<li>added option "Selection|set background from selection" and "Mask|set background from masked", which averages over the intensity of the selected/masked pixel and sets it as background intensity, which can be used for fitting -&gt; imFCS/imFCCS fit</li>
+			<li>added option "Selection|set background from selection" and "Mask|set background from masked", which averages over the intensity of the selected/masked pixel and sets it as background intensity, which can be used for fitting -&gt; imagingFCS/imFCCS fit</li>
 			<li>added user background to countrate curve plot</li>
 			<li>overview image color may be scaled between 5% and 95% quantile now</li>
 			<li>added checkbox to RDR editors that allows to set, whether the image plots should keep an aspect ratio of 1 or not. In the latter case the image fills the available space, and pixels may be non-square shaped!</li>
@@ -131,7 +356,7 @@
 			<li>bugfix: countrate was read from RDR for some fit models</li>
 			<li>added spinbox to set number of repeated calls of the fit algorithm for each run/pixel</li>
 		  </ul></li>	
-		  <li><b>imFCS Fit</b><ul>
+		  <li><b>imagingFCS Fit</b><ul>
 			<li>bugfix: countrate was read from RDR for some fit models</li>
 			<li>added spinbox to set number of repeated calls of the fit algorithm for each run/pixel</li>
 			<li>bugfix: sometime the imaging FCS fit "fit all runs" crashed</li>
@@ -190,8 +415,8 @@
 		    <li>bugfix: could not select per-run-error</li>
 		    <li>bugfix: added spinbox to enter the displayed run</li>
 		  </ul></li>	
-		  <li><b>imFCS</b><ul>
-		    <li>bugfix: didn't save report PDF in imFCS RDR editor</li>
+		  <li><b>imagingFCS</b><ul>
+		    <li>bugfix: didn't save report PDF in imagingFCS RDR editor</li>
 		    <li>added correlation plot against correlation amplitude</li>
 		    <li>swapped axes in correlation plot</li>
 			<li>bugfix: corrected FCCS amplitude (dashed line in FCCS correlation function plot) now minds the masked pixels</li>
@@ -339,7 +564,7 @@
 			<li>added mask by image option to preview widget</li>
 			<li>bugfix: guessed file sets didn't show up in some cases</li>
 		  </ul></li>	
-		  <li><b>imFCSFit</b><ul>
+		  <li><b>imagingFCSFit</b><ul>
 		    <li>fixed possible crash</li>
 		  </ul></li>	
 		  <li><b>spim_lighsheet_analysis</b><ul>
@@ -486,7 +711,7 @@
 			<li>bugfix: fixed possible crash in residuals dialog</li>
 			<li>the fill style may be set now</li>
 		  </ul></li>	
-		  <li><b>imFCS Fit</b><ul>
+		  <li><b>imagingFCS Fit</b><ul>
 		    <li> added tool to plot chi2 landscapes</li>
 		    <li>bugfix: "reset current" does not reset all pixels now!</li>
 		    <li>"calibration wizard" now also supports calibration by shifting two foci with respect to each other</li>		  
@@ -594,7 +819,7 @@
 		    <li>improved speed of fits?</li>
 		    <li>improved reports</li>
 		    <li>bugfix: now countrates are no longer swapped in the red-channel model</li>
-		    <li>added D(bin*a) graphs to imFCS calibration wizard</li>
+		    <li>added D(bin*a) graphs to imagingFCS calibration wizard</li>
 		    <li>minds parameter ranges now when fitting</li>
 		    <li>added button to activate additional columns to edit the parameter ranges</li>
 		    <li>added tutorial on imFCCS (fitting, relative amplitude ...) + data for tutorial (as QFP-project) in plugin's assets</li>
@@ -623,7 +848,7 @@
 			<li>bugfixed visibility of Median/Q75/max comboboxes in table editor for boxplots</li>
 		  </ul></li>
 		  
-		  <li><b>imFCS:</b><ul>
+		  <li><b>imagingFCS:</b><ul>
 		    <li>bugfixes, crash when no overview image is returned</li>
 		    <li>bugfix: didn't read 4e6 frames due to integer overflow</li>
 		    <li>now reads also 80s Radhard correlation runs</li>
@@ -635,7 +860,7 @@
 		    <li>added simulator for 2D diffusion (including DualView to simulate imFCCS)</li>
 		    <li>added buttons to correlator window that allow to load a file without counting the frames in it (e.g. for a larger set of measurements, where the number of frames is always the same) ... this makes selecting a file much faster!</li>
 		    <li>prepared for two-channel overview image</li>
-		    <li>continued preparations to load only one half of a full imageDV2-correlations into an imFCS RDR</li>
+		    <li>continued preparations to load only one half of a full imageDV2-correlations into an imagingFCS RDR</li>
 		    <li>FCCS correlation works properly now</li>
 		    <li>added overview widget</li>
 		    <li>added too (menu entry in editor) to set a fit parameter from another file.</li>
@@ -649,14 +874,14 @@
 		    <li>added mask tool that allows to create a masked border around the </li>
 		    <li>made sure that the ACF from an FCCS dataset has two overview images and allows to read the countrate from both channels, although it's only ACF_g or ACF_r</li>
 		    <li>added "copy mask to files in group" menu entry</li>
-			<li>imFCS simulation does no longer report its background offset back, as a background file is created that corrects for the background!</li>
+			<li>imagingFCS simulation does no longer report its background offset back, as a background file is created that corrects for the background!</li>
 			<li>"mask|mask outlier CFs": now giving lower and upper percentage (e.g. 5% & 5% leaves only 5%..95%)</li>
 			<li>"mask|copy mask to group" now updates the average run properly!</li>
-			<li>corrected bug in imFCS calibration: preset wz was not used in fits!   the default value 620 was used instead (always!!!)</li>
+			<li>corrected bug in imagingFCS calibration: preset wz was not used in fits!   the default value 620 was used instead (always!!!)</li>
 			<li>added checkbox to "copy result statistics" tool to switch off copying of the headers</li>
 		  </ul></li>
 		  
-		  <li><b>imFCSFit:</b><ul>
+		  <li><b>imagingFCSFit:</b><ul>
 		    <li>added wizard for calibration + documentation</li>
 		    <li>added method to automatically execute the D-fits in calibration</li>
 		  </ul></li>
@@ -742,7 +967,7 @@
 		    <li>moved calculation of D of sphere from its own tab to the "spheroid" tab (where also cylinders and ellipsoids are calculated)</li>
 		  </ul></li>
 
-		  <li><b>fitfunction_spimfcs:</b><ul>
+		  <li><b>fitfunction_spimagingFCS:</b><ul>
 		    <li>added fit function for anomalous diffusion (+demo project +documentation)</li>
 		    <li>started fit function for 2-color SPIM-FCCS</li>
 		    <li>updated documentation to show background correction factor</li>
@@ -815,7 +1040,7 @@
 		    <li>improved online-help</li>
 
 		  </ul></li>
-		  <li><b>fitfunction_spimfcs</b><ul>
+		  <li><b>fitfunction_spimagingFCS</b><ul>
 		    <li>added SPIM-crosscorrelation fit function with flow</li>
 		    <li>fixed some bugs in online-help (confusion on definition ot &sigma;<sub>xy</sub>, &sigma;<sub>z</sub>, w<sub>xy</sub> and w<sub>z</sub>, but: Models were not changed and the model names (1/e² or 1/&radic;e were correct!!!)</li>
 
@@ -975,7 +1200,7 @@
 <li><a name="1823"><b>2012-09-25 (SVN: 1823)</b>
 		<ul>
 
-		  <li><b>imFCS:</b><ul>
+		  <li><b>imagingFCS:</b><ul>
 		    <li>added pixel-by-pixel "countrate" display which displays the timeseries from "videos". For the uncorrected video also the background level and (if available) the bleach fit is displayed</li>
 			<li>several bugfixes</li>
 			<li>now creates and displays "uncorrected" video</li>
@@ -1035,7 +1260,7 @@
 		      <li>added multi-threaded fits (used as default!)</li>
 			  <li>added configuration widget to the main settings dialog</li>
 			</ul></li>
-		  <li><b>imFCS: </b>
+		  <li><b>imagingFCS: </b>
 		    <ul>
 			  <li>added option to do interleaved binning</li>
 			  <li>implemented averaging cropping</li>
@@ -1067,7 +1292,7 @@
 			  <li>correlator outputs image that shows whether the 1-exp fit in the bleach correction actually worked (1) or not (0)!</li>
 			  <li>added "add series job" button</li>
 		  </ul></li>
-		  <li><b>imFCS fit:</b><ul>
+		  <li><b>imagingFCS fit:</b><ul>
 		  	  <li>now the pixel size is initially guessed from the pixel size saved with the acquisition and the binning saved as a property by the correlation dialog</li>
 			  <li>added online-help</li>
 		      <li>now has an option to only fit the non-masked pixels</li>
@@ -1150,7 +1375,7 @@
 			<li>if the mouse hover over a table cell a tooltip is displayed with the cells mean and standard deviation (if the cell conatins a vector for which mean/SD make sense)</li>
 			</ul></li>
 		  <li>added help button on mainwindow toolbar</li>
-		  <li>imFCSFit: evaluation group name now uses the user supplied name of the evaluation object</li>
+		  <li>imagingFCSFit: evaluation group name now uses the user supplied name of the evaluation object</li>
 		  </ul>
 		</li> 
 	  
@@ -1166,12 +1391,12 @@
 		  <li>improvement of online-help (also LaTeX rendering in it)</li>
 		  <li>MaxEnt: new Models implemented</li>
 		  <li>fcs_fitfunctions: added oscillatory FCS autocorrelation model function</li>
-		  <li>imFCSFit: now is faster when resetting </li>
-		  <li>imFCS: implemented new exponential bleach correction as shown in Ries/Chiantia /Schwille (2009): BiophysJ 96(5),1999-2008</li>
-		  <li>imFCS: improved documentation</li>
-		  <li>imFCS fit: bugfix: now all runs are fitted (before the last one was skipped)</li>
-		  <li>imFCS: corrected an error in the binning code of the correlator: frame was read into a uint16 => there were overflows for high binnings</li>
-		  <li>imFCS: Radhard2 code now omits first channel</li>
+		  <li>imagingFCSFit: now is faster when resetting </li>
+		  <li>imagingFCS: implemented new exponential bleach correction as shown in Ries/Chiantia /Schwille (2009): BiophysJ 96(5),1999-2008</li>
+		  <li>imagingFCS: improved documentation</li>
+		  <li>imagingFCS fit: bugfix: now all runs are fitted (before the last one was skipped)</li>
+		  <li>imagingFCS: corrected an error in the binning code of the correlator: frame was read into a uint16 => there were overflows for high binnings</li>
+		  <li>imagingFCS: Radhard2 code now omits first channel</li>
 		  </ul>
 		</li> 
 	  
@@ -1194,9 +1419,9 @@
 		  <li>new plugin: photon count raw data record</li>
 		  <li>new plugin: TCSPC correlator</li>
 		  <li>new plugin: Picoquant importer</li>
-		  <li>new plugin: imFCS Fit</li>
+		  <li>new plugin: imagingFCS Fit</li>
 		  <li>pushed extlib CImg to 1.4.9</li>
-		  <li>imFCS: correlation dialog is no longer modal</li>
+		  <li>imagingFCS: correlation dialog is no longer modal</li>
 		  <li>improved online help</li>
 		  <li>64-bit Windows version</li>
 		  <li>folders in project to organize raw data records</li>
@@ -1208,20 +1433,20 @@
 		<ul>
 		  <li>many bugfixes</li>
 		  <li>now uses Qt 4.8.0</li>
-		  <li>major speed improvement mainly for imFCS</li>
+		  <li>major speed improvement mainly for imagingFCS</li>
 		  <li>added "Copy To Matlab"/"Save to Matlab" functionality in many places (allows to save data of a plot as a Matlab script which defines a variable for every column)</li>
 		  <li>plots may be copied as an image to the clipboard</li>
 		  <li>added possibility to group QFRawDataRecords into folders (folder input field in raw data record windows, on the first tab)</li>
 		  <li>SPIM-FCS model: diffusion coefficients are now sorted in descending order</li>
 		  <li>FCS Fit Functions: added background correction factor to most models</li>
-		  <li>imFCS: selection/masking by rectangle, scribble, line, circle and ellipse are now possible</li>
-		  <li>imFCS: added "Copy To Matlab" functionality for images</li>
-		  <li>imFCS: updated PDF/PS/Printer-Report code so the fit parameter table is scaled with its size</li>
-		  <li>imFCS: added dialog to mask pixels by their value in param image, gof image and overview image</li>
-          <li>imFCS: added more options to edit the masl (invert, clear, ...)</li>
-		  <li>imFCS: implemented bleach correction (normalize to frame average and normalize to exponential decay </li>
-		  <li>imFCS: implemented data explorer, which allows to have a look at the data before the correlation</li>
-		  <li>imFCS: added multi-tau correlator with implicit averaging (ACF is effectively convolved with a triangular kernel!!!)</li>
+		  <li>imagingFCS: selection/masking by rectangle, scribble, line, circle and ellipse are now possible</li>
+		  <li>imagingFCS: added "Copy To Matlab" functionality for images</li>
+		  <li>imagingFCS: updated PDF/PS/Printer-Report code so the fit parameter table is scaled with its size</li>
+		  <li>imagingFCS: added dialog to mask pixels by their value in param image, gof image and overview image</li>
+          <li>imagingFCS: added more options to edit the masl (invert, clear, ...)</li>
+		  <li>imagingFCS: implemented bleach correction (normalize to frame average and normalize to exponential decay </li>
+		  <li>imagingFCS: implemented data explorer, which allows to have a look at the data before the correlation</li>
+		  <li>imagingFCS: added multi-tau correlator with implicit averaging (ACF is effectively convolved with a triangular kernel!!!)</li>
 
 		</ul>
 		</li> 
@@ -1229,17 +1454,17 @@
 		<ul>
 		  <li>reworked part of the icons/artwork</li>
 		  <li>added copy data to clipboard action to plot toolbars and also to the FCS fit dialog</li>
-		  <li>imFCS: more information is saved in the project</li>
-		  <li>imFCS: correlator saves GnuPlot file to plot (and fit 1-exp) the statistics data file</li>
+		  <li>imagingFCS: more information is saved in the project</li>
+		  <li>imagingFCS: correlator saves GnuPlot file to plot (and fit 1-exp) the statistics data file</li>
 		  <li>SPIM-FCS fit functions: extended diffusion model to <=3 components</li>
-		  <li>imFCS: added mask and selection display</li>
-		  <li>imFCS: use target symbol to display selected pixel</li>
-		  <li>imFCS: allow to edit mask in parameter image tab</li>
-		  <li>imFCS: added checkboxes to switch single image plots on and off</li>
-		  <li>imFCS: no more crashes when clicking on parameter images</li>
+		  <li>imagingFCS: added mask and selection display</li>
+		  <li>imagingFCS: use target symbol to display selected pixel</li>
+		  <li>imagingFCS: allow to edit mask in parameter image tab</li>
+		  <li>imagingFCS: added checkboxes to switch single image plots on and off</li>
+		  <li>imagingFCS: no more crashes when clicking on parameter images</li>
 		  <li>improved plot speed of images, when zooming in</li>
-		  <li>imFCS: added distance CCF, which allows 2color-FCCS</li>
-		  <li>imFCS: added method to read Radhard2 correlation yaid files into plugin</li>
+		  <li>imagingFCS: added distance CCF, which allows 2color-FCCS</li>
+		  <li>imagingFCS: added method to read Radhard2 correlation yaid files into plugin</li>
 		  <li>correction in QFFitFunction lists in online-help system</li>
 		  <li>improved speed/stability</li>
 		  <li>mFCS: added binning (tested, still some problems at the borders -> recheck) and cropping to image readers/correlation dialog</li>
@@ -1250,7 +1475,7 @@
 		  <li>improved datacut sliders</li>
 		  <li>massive update of online-help and tutorial</li>
 		  <li>FCSfit: added buttons to copy to/reset all runs</li>
-		  <li>imFCS: video correlator now supports background image removal and calculates statistics after removal</li>
+		  <li>imagingFCS: video correlator now supports background image removal and calculates statistics after removal</li>
 		  <li>SPIM-FCS diffusion model: correction of mistake when calculating focal volume (factor 1000)</li>
 		</ul>
 		</li>         
@@ -1264,20 +1489,20 @@
           <li>corrected display error of graph axis labels (sometimes 10^{-3} was drawn as 0)</li>
           <li>slight speed improvements, no more console window in release mode</li>
           <li>added SPIM-FCS fit model for 1-component pure-diffusion</li>
-          <li>imFCS: parameter image editor supports saving of data and reports</li>
-          <li>imFCS: added correlator for image series (reads TIFF and Radhard2 raw file format)</li>
-          <li>imFCS: added parameter histogram</li>
+          <li>imagingFCS: parameter image editor supports saving of data and reports</li>
+          <li>imagingFCS: added correlator for image series (reads TIFF and Radhard2 raw file format)</li>
+          <li>imagingFCS: added parameter histogram</li>
           <li>FCSFit: residual correlation is now normalized by residual variance</li>
           <li>FCSFit: added more possibilities to copy a fit parameter to other files/runs</li>
-          <li>imFCS: implemented fit parameter table (with colored byackground to indicate curve)</li>
-          <li>imFCS: implemented goodness of fit plot</li>
-          <li>imFCS: goodness of fit and image plot support set of transformations when reading data</li>
-          <li>massive speed improvement of FCS fit and imFCS</li>
+          <li>imagingFCS: implemented fit parameter table (with colored byackground to indicate curve)</li>
+          <li>imagingFCS: implemented goodness of fit plot</li>
+          <li>imagingFCS: goodness of fit and image plot support set of transformations when reading data</li>
+          <li>massive speed improvement of FCS fit and imagingFCS</li>
           <li>put some efforts into unifying double-to-string conversion for project using a QLocal::c() with disabled group separator!</li>
 		  <li>FCSFit: improved plotting speed for many ACFs (switch off anti-aliasing when plotting graphs)</li>
 		  <li>Lib: improved fit results table (now supports nicer formating of results)</li>
-		  <li>imFCS/FCS: selected graphs are plotted on top now</li>
-		  <li>imFCS/FCS: splitters are save to ini now correctly!</li>
+		  <li>imagingFCS/FCS: selected graphs are plotted on top now</li>
+		  <li>imagingFCS/FCS: splitters are save to ini now correctly!</li>
 		  <li>minor error correction: (lag-time axis in seconds, not µs at different positions</li>
 		  <li>new splash screen and icon (multiple sizes ;-) design</li>
 		  <li>lmfit: added lmfit (fast Levenberg Marquardt implementation) as fit algorithm plugin</li>
@@ -1307,7 +1532,7 @@
 		  <li>added global configuration directory</li>
 		  <li>modified autoversioning -> Version reset to 3.0, now to distinguish releases: use SVN version!)</li>
 		  <li>error corrections when editing properties (possibly wrong property selected when deleting)</li>
-		  <li>now FCS &amp; imFCS has an error series for every run (if available!), updated FCS Fit plugin to support this (shoose between stddev/avg from all runs, per-run-stddev), imFCS will really use it to have a stddev for every pixel/run</li>
+		  <li>now FCS &amp; imagingFCS has an error series for every run (if available!), updated FCS Fit plugin to support this (shoose between stddev/avg from all runs, per-run-stddev), imagingFCS will really use it to have a stddev for every pixel/run</li>
 		  <li>added units to report of FCS fit plugin</li>
 		</ul>
 		</li>        
@@ -1326,12 +1551,12 @@
 		<ul>
           <li>added recent projects menu</li>
 		  <li>fixed problem reading settings</li>
-		  <li>imFCS plugin now reads data correctly</li>
-		  <li>imFCS plugin now has a display for correlation functions (basically copied from standard FCS plugin)</li>
-		  <li>imFCS plugin now import auto- and crosscorrelation from video_correlator</li>
+		  <li>imagingFCS plugin now reads data correctly</li>
+		  <li>imagingFCS plugin now has a display for correlation functions (basically copied from standard FCS plugin)</li>
+		  <li>imagingFCS plugin now import auto- and crosscorrelation from video_correlator</li>
 		  <li>LIB/qt/JKQtPlotter: fixed problem with number of digits in axis labels</li>
 		  <li>improved FCS Fit reports</li>
-		  <li>improved imFCS plugin (can now read imFCS files from video_correlator)</li>
+		  <li>improved imagingFCS plugin (can now read imagingFCS files from video_correlator)</li>
 		</ul>
 		</li>	  
         <li><b>2011-06-24 (SVN: 751)</b>
