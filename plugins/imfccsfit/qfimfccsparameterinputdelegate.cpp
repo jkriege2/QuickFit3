@@ -7,6 +7,7 @@
 #include "qfimfccsfitevaluation_item.h"
 #include "qfdoubleedit.h"
 #include "qfautooutputtimer.h"
+#include "qffitfunctioncombobox.h"
 
 QFImFCCSParameterInputDelegate::QFImFCCSParameterInputDelegate(QObject *parent) :
     QFHTMLDelegate(parent)
@@ -98,12 +99,9 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
             return cmb;
         }
         if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtFitFunctionCombobox) {
-            QComboBox* cmb=new QComboBox(parent);
+            QFFitFunctionComboBox* cmb=new QFFitFunctionComboBox(parent);
             QStringList sl=imfccs->getAvailableFitFunctions();
-            for (int i=0; i<sl.size(); i++) {
-                QFFitFunction* fi=imfccs->getFitFunctionForID(sl[i]);
-                if (fi) cmb->addItem(QIcon(":/lib/fitfunc_icon.png"), fi->name(), sl[i]);
-            }
+            cmb->updateFitFunctions(sl);
 
             //qDebug()<<"   created ffcombo "<<t.elapsed()<<"ms";
             cmb->view()->setMinimumWidth(450);
@@ -206,6 +204,11 @@ void QFImFCCSParameterInputDelegate::setEditorData(QWidget *editor, const QModel
             }
         }
         if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtFitFunctionCombobox) {
+            QFFitFunctionComboBox* cmbff=qobject_cast<QFFitFunctionComboBox*>(editor);
+            if (cmbff) {
+                if (ffID.isValid()) cmbff->setCurrentFitFunction(ffID.toString());
+                return;
+            }
             QComboBox* cmb=qobject_cast<QComboBox*>(editor);
             if (cmb) {
                 if (ffID.isValid()) cmb->setCurrentIndex(cmb->findData(ffID.toString()));
@@ -302,6 +305,12 @@ void QFImFCCSParameterInputDelegate::setModelData(QWidget *editor, QAbstractItem
             }
         }
         if (imfccs && widgetType.toInt()==QFImFCCSParameterInputTable::wtFitFunctionCombobox) {
+            QFFitFunctionComboBox* cmbff=qobject_cast<QFFitFunctionComboBox*>(editor);
+            if (cmbff) {
+                model->setData(index, cmbff->currentFitFunctionID());
+                //imfccs->setFitFunction(fileID.toInt(), project->getRawDataByID(cmb->itemData(cmb->currentIndex()).toString()));
+                return;
+            }
             QComboBox* cmb=qobject_cast<QComboBox*>(editor);
             if (cmb) {
                 model->setData(index, cmb->itemData(cmb->currentIndex()).toString());
