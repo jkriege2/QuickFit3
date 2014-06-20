@@ -52,7 +52,6 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
            qehtreeview.h \
            datacutslider.h \
            qffitparameterwidget.h \
-           qfdlgcsvparameters.h \
     qfstagecombobox.h \
     qfcameraconfigcombobox.h \
     qfcameracombobox.h \
@@ -160,7 +159,6 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
            qehtreeview.cpp \
            datacutslider.cpp \
            qffitparameterwidget.cpp \
-           qfdlgcsvparameters.cpp \
     qfstagecombobox.cpp \
     qfcameraconfigcombobox.cpp \
     qfcameracombobox.cpp \
@@ -230,8 +228,7 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qffitfunctionselectdialog.cpp
 
 
-FORMS += qfdlg_csvparameters.ui \
-    qf3objectiveeditor.ui \
+FORMS += qf3objectiveeditor.ui \
     qf3filtereditor.ui \
     qfselectionlistdialog.ui \
     qfselectrdrdialog.ui \

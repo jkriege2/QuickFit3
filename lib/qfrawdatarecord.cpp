@@ -4634,8 +4634,54 @@ void QFRawDataRecord::evaluationResult::setFromMathParserResult(const qfmpResult
                 type=QFRawDataRecord::qfrdreStringVector;
                 svec=result.strVec;
                 break;
+            default:
             case qfmpVoid:
                 type=QFRawDataRecord::qfrdreInvalid;
+                QVariantList vl=result.asVariantList();
+                if (vl.size()>1) {
+                    switch (vl.first().type()) {
+                        case QVariant::Double:
+                        case QVariant::Int:
+                        case QVariant::LongLong:
+                        case QVariant::UInt:
+                        case QVariant::ULongLong:
+                            type=QFRawDataRecord::qfrdreNumberVector;
+                            dvec.clear();
+                            for (int i=0; i<vl.size(); i++) dvec.append(vl[i].toDouble());
+                            break;
+                        case QVariant::Bool:
+                            type=QFRawDataRecord::qfrdreBooleanVector;
+                            bvec.clear();
+                            for (int i=0; i<vl.size(); i++) bvec.append(vl[i].toBool());
+                            break;
+                        case QVariant::String:
+                            type=QFRawDataRecord::qfrdreStringVector;
+                            svec.clear();
+                            for (int i=0; i<vl.size(); i++) svec.append(vl[i].toString());
+                            break;
+                        default: break;
+                    }
+                } else if (vl.size()==1) {
+                    switch (vl.first().type()) {
+                        case QVariant::Double:
+                        case QVariant::Int:
+                        case QVariant::LongLong:
+                        case QVariant::UInt:
+                        case QVariant::ULongLong:
+                            type=QFRawDataRecord::qfrdreNumber;
+                            dvalue=vl.first().toDouble();
+                            break;
+                        case QVariant::Bool:
+                            type=QFRawDataRecord::qfrdreBoolean;
+                            bvalue=vl.first().toBool();
+                            break;
+                        case QVariant::String:
+                            type=QFRawDataRecord::qfrdreString;
+                            svalue=vl.first().toString();
+                            break;
+                        default: break;
+                    }
+                }
                 break;
         }
     } else {

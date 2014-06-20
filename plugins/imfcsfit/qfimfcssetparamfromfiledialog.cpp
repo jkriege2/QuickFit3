@@ -1,13 +1,16 @@
 #include "qfimfcssetparamfromfiledialog.h"
 #include "ui_qfimfcssetparamfromfiledialog.h"
 #include "qfrdrimagetoruninterface.h"
+#include "qftools.h"
+#include "csvtools.h"
 
-
-QFImFCSSetParamFromFileDialog::QFImFCSSetParamFromFileDialog(QFImFCSFitEvaluation* eval, QStringList parameters, QStringList parameterIDs, QWidget *parent) :
+QFImFCSSetParamFromFileDialog::QFImFCSSetParamFromFileDialog(int width, int height, QFImFCSFitEvaluation* eval, QStringList parameters, QStringList parameterIDs, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QFImFCSSetParamFromFileDialog)
 {
     this->parameterIDs=parameterIDs;
+    this->datawidth=width;
+    this->dataheight=height;
     plt=NULL;
     ui->setupUi(this);
     ui->cmbRDR->init(eval->getProject(), eval->getMatchFunctor());
@@ -17,18 +20,35 @@ QFImFCSSetParamFromFileDialog::QFImFCSSetParamFromFileDialog(QFImFCSFitEvaluatio
     ui->cmbParameter->clear();
     ui->cmbParameter->addItems(parameters);
     ui->cmbParameter->setCurrentIndex(0);
-    connect(ui->cmbRDR, SIGNAL(currentRDRChanged(QFRawDataRecord*)), ui->cmbResultGroup, SLOT(setRDR(QFRawDataRecord*)));
-    connect(ui->cmbRDR, SIGNAL(currentRDRChanged(QFRawDataRecord*)), ui->cmbResult, SLOT(setRDR(QFRawDataRecord*)));
-    connect(ui->cmbResultGroup, SIGNAL(currentEvaluationGroupChanged(QString)), ui->cmbResult, SLOT(setEvaluationGroup(QString)));
     QStringList filt;
     filt<<"fit results"<<"results"<<"evaluation results";
     ui->cmbResult->setResultGroupFilters(filt);
     ui->cmbRDR->setCurrentIndex(0);
+
+    loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "QFImFCSSetParamFromFileDialog");
+    ui->cmbParameter->setCurrentIndex(parameterIDs.indexOf(ProgramOptions::getConfigValue("QFImFCSSetParamFromFileDialog/param", parameterIDs.value(0, "")).toString()));
+    ui->cmbRDR->setCurrentIndex(ProgramOptions::getConfigValue("QFImFCSSetParamFromFileDialog/rdr",0).toInt());
+    ui->cmbResultGroup->setCurrentEvaluationGroup(ProgramOptions::getConfigValue("QFImFCSSetParamFromFileDialog/resultgroup",ui->cmbResultGroup->currentEvaluationGroup()).toString());
+    ui->cmbResult->setCurrentResult(ProgramOptions::getConfigValue("QFImFCSSetParamFromFileDialog/result",ui->cmbResult->currentResult()).toString());
+    ui->radRDR->setChecked(ProgramOptions::getConfigValue("QFImFCSSetParamFromFileDialog/radRDR", true).toBool());
+
+
+    connect(ui->cmbRDR, SIGNAL(currentRDRChanged(QFRawDataRecord*)), ui->cmbResultGroup, SLOT(setRDR(QFRawDataRecord*)));
+    connect(ui->cmbRDR, SIGNAL(currentRDRChanged(QFRawDataRecord*)), ui->cmbResult, SLOT(setRDR(QFRawDataRecord*)));
+    connect(ui->cmbResultGroup, SIGNAL(currentEvaluationGroupChanged(QString)), ui->cmbResult, SLOT(setEvaluationGroup(QString)));
+    updateDataFromRDR();
+
 }
 
 
 QFImFCSSetParamFromFileDialog::~QFImFCSSetParamFromFileDialog()
 {
+    saveWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "QFImFCSSetParamFromFileDialog");
+    ProgramOptions::setConfigValue("QFImFCSSetParamFromFileDialog/param", parameterIDs.value(ui->cmbParameter->currentIndex(), ""));
+    ProgramOptions::setConfigValue("QFImFCSSetParamFromFileDialog/rdr",ui->cmbRDR->currentIndex());
+    ProgramOptions::setConfigValue("QFImFCSSetParamFromFileDialog/resultgroup",ui->cmbResultGroup->currentEvaluationGroup());
+    ProgramOptions::setConfigValue("QFImFCSSetParamFromFileDialog/result",ui->cmbResult->currentResult());
+    ProgramOptions::setConfigValue("QFImFCSSetParamFromFileDialog/radRDR", ui->radRDR->isChecked());
     delete ui;
 }
 
@@ -54,12 +74,8 @@ QString QFImFCSSetParamFromFileDialog::getParameter() const
 
 QVector<double> QFImFCSSetParamFromFileDialog::getData(bool *ok) const
 {
-    QFRawDataRecord* rdr=getRDR();
-    if (rdr) return rdr->resultsGetAsDoubleList(getEvalID(), getResultID(), ok);
-    else {
-        if (ok) *ok=false;
-        return QVector<double>();
-    }
+    if (ok) *ok=(data.size()>=datawidth*dataheight);
+    return data;
 }
 
 void QFImFCSSetParamFromFileDialog::replotOvr()
@@ -72,16 +88,18 @@ void QFImFCSSetParamFromFileDialog::replotOvr()
     ds->clear();
 
     QFRawDataRecord* rdr=getRDR();
-    QFRDRImageToRunInterface* dataImg=dynamic_cast<QFRDRImageToRunInterface*>(rdr);
+    //QFRDRImageToRunInterface* dataImg=dynamic_cast<QFRDRImageToRunInterface*>(rdr);
 
-    if (dataImg) {
-        int w=dataImg->getImageFromRunsWidth();
-        int h=dataImg->getImageFromRunsHeight();
+    //if (dataImg) {
+        int w=datawidth;//dataImg->getImageFromRunsWidth();
+        int h=dataheight;//dataImg->getImageFromRunsHeight();
 
         bool ok=false;
-        QVector<double> d=rdr->resultsGetAsDoubleList(getEvalID(), getResultID(), &ok);
+        QVector<double> d=getData(&ok);
 
-        if (ok) {
+        ui->labInfo->setText(tr("input image size: %1 x %2 = %3         data size: %4").arg(datawidth).arg(dataheight).arg(datawidth*dataheight).arg(d.size()));
+
+        //if (ok) {
             size_t col=ds->addCopiedColumn(d.data(), d.size(), getResultID());
 
             plt=new JKQTPColumnMathImage(ui->pltData->get_plotter());
@@ -94,9 +112,7 @@ void QFImFCSSetParamFromFileDialog::replotOvr()
             plt->set_width(w);
             plt->set_height(h);
             plt->set_showColorBar(true);
-            plt->set_autoImageRange(false);
-            plt->set_imageMin(0);
-            plt->set_imageMax(1);
+            plt->set_autoImageRange(true);
             bool showTop=w>h;
             plt->set_colorBarTopVisible(showTop);
             plt->set_colorBarRightVisible(!showTop);
@@ -109,8 +125,8 @@ void QFImFCSSetParamFromFileDialog::replotOvr()
             ui->pltData->addGraph(plt);
             ui->pltData->setAbsoluteXY(0,w,0,h);
             ui->pltData->setXY(0,w,0,h);
-        }
-    }
+        //}
+    //}
 
     //ui->pltData->zoomToFit();
     ui->pltData->set_doDrawing(true);
@@ -120,8 +136,73 @@ void QFImFCSSetParamFromFileDialog::replotOvr()
 
 void QFImFCSSetParamFromFileDialog::on_cmbParamter_currentIndexChanged(int index)
 {
-    ui->cmbResult->setCurrentResult(QString("fitparam_")+parameterIDs.value(index, ""));
-    if (ui->cmbResult->currentIndex()<0) ui->cmbResult->setCurrentResult(parameterIDs.value(index, ""));
+    /*ui->cmbResult->setCurrentResult(QString("fitparam_")+parameterIDs.value(index, ""));
+    if (ui->cmbResult->currentIndex()<0) ui->cmbResult->setCurrentResult(parameterIDs.value(index, ""));*/
+}
+
+void QFImFCSSetParamFromFileDialog::updateDataFromRDR()
+{
+    if (ui->radRDR->isChecked()) {
+        QFRawDataRecord* rdr=getRDR();
+        if (rdr) data=rdr->resultsGetAsDoubleList(getEvalID(), getResultID());
+        else data=QVector<double>();
+    }
+    replotOvr();
+}
+
+void QFImFCSSetParamFromFileDialog::on_btnHelp_clicked()
+{
+    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("fcs_fit")+"/setparamfromfile.html");
+}
+
+void QFImFCSSetParamFromFileDialog::on_btnLoadFile_clicked()
+{
+    QString lastDir=ProgramOptions::getConfigValue("QFImFCSSetParamFromFileDialog/lastdir", "").toString();
+    QStringList filters;
+    filters<<tr("image (*.tif)")<<tr("Column from Commma-separated values (*.dat *.csv *.txt)");
+    QString selFilter=ProgramOptions::getConfigValue("QFImFCSSetParamFromFileDialog/lastfilter", filters.first()).toString();
+    QString filename= qfGetOpenFileName(this, tr("select image ..."), lastDir, filters.join(";;"), &selFilter);
+    if (QFile::exists(filename)) {
+
+        int idx=filters.indexOf(selFilter);
+
+        QVector<double> newData;
+
+        if (idx==0) {
+
+        } else if (idx==1) {
+            QStringList csvCols;
+            QList<QVector<double> > csv=importCSVAskUser(filename, "QFImFCSSetParamFromFileDialog/csv/", &csvCols);
+            if (csv.size()==1) {
+                newData=csv[0];
+            } else if (csv.size()>0) {
+                QStringList items;
+                for (int i=0; i<csv.size(); i++) {
+                    items<<tr("column %1").arg(i+1);
+                    if (i<csvCols.size() && !csvCols[i].isEmpty()) items.last().append(" '"+csvCols[i]+"'");
+                }
+                bool ok=true;
+                int col=items.indexOf(QInputDialog::getItem(this, tr("load data from CSV file"), tr("Please selectthe column to import:"), items, 0, false, &ok));
+                if (ok && col>=0 && col<csv.size()) {
+                    newData=csv[col];
+                }
+            } else {
+                QMessageBox::critical(this, tr("load file"), tr("Could not read any data from CSV file '%1'!").arg(filename));
+            }
+        }
+        if (newData.size()>0) {
+            if (newData.size()<datawidth*dataheight) {
+                if (QMessageBox::question(this, tr("load file"), tr("The size of read data is smaller than the required data size (new data size: %4,  required size: %1x%2 = %3).\n  Import data nevertheless?").arg(datawidth).arg(dataheight).arg(datawidth*dataheight).arg(newData.size()), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+                    data=newData;
+                }
+            } else {
+                data=newData;
+            }
+            replotOvr();
+        }
+        ProgramOptions::setConfigValue("QFImFCSSetParamFromFileDialog/lastdir", lastDir);
+        ProgramOptions::setConfigValue("QFImFCSSetParamFromFileDialog/lastfilter", selFilter);
+    }
 }
 
 

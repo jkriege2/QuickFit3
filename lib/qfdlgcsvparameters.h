@@ -3,7 +3,7 @@
 
 #include <QDialog>
 #include <QMessageBox>
-#include "libwid_imexport.h"
+#include "lib_imexport.h"
 
 namespace Ui {
     class QFDlgCSVParameters; // forward
@@ -20,7 +20,7 @@ namespace Ui {
     If you set any of the parameter in the constructor to an empty char or string, the according widget will be disabled.
 
  */
-class QFWIDLIB_EXPORT QFDlgCSVParameters : public QDialog
+class QFLIB_EXPORT QFDlgCSVParameters : public QDialog
 {
         Q_OBJECT
     public:
@@ -28,14 +28,19 @@ class QFWIDLIB_EXPORT QFDlgCSVParameters : public QDialog
         QFDlgCSVParameters(QWidget* parent=NULL, QString columnSeparator=QString(","), QString decimalSeparator=QString("."), QString commentStart=QString("#"), QString headerStart=QString("#!"));
         /** Default destructor */
         virtual ~QFDlgCSVParameters();
-        char get_column_separator() { return column_separator; };
-        char get_decimal_separator() { return decimal_separator; };
-        char get_comment_start() { return comment_start; };
-        QString get_header_start() { return header_start; };
+        char get_column_separator() { return column_separator; }
+        char get_decimal_separator() { return decimal_separator; }
+        char get_comment_start() { return comment_start; }
+        QString get_header_start() { return header_start; }
+        void set_column_separator(char data) {  column_separator=data; }
+        void set_decimal_separator(char data) {  decimal_separator=data; }
+        void set_comment_start(char data) {  comment_start=data; }
+        void set_header_start(const QString& data) {  header_start=data; }
         /** \brief display a preview of the file */
         void setFileContents(const QString& filename);
-    protected:
-    private slots:
+    public slots:
+        void guessParameters();
+    protected slots:
         void checkValues();
     private:
         char column_separator;

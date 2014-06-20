@@ -6,65 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>571</width>
-    <height>473</height>
+    <width>702</width>
+    <height>566</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>imFCS: set parameter from file</string>
+   <string>imFCS: set parameter from RDR/file/...</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,1,0">
    <item>
-    <layout class="QFormLayout" name="formLayout">
-     <property name="fieldGrowthPolicy">
-      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-     </property>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>file:</string>
-       </property>
-       <property name="buddy">
-        <cstring>cmbRDR</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QFRDRComboBox" name="cmbRDR"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>result group:</string>
-       </property>
-       <property name="buddy">
-        <cstring>cmbResultGroup</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QFResultsGroupComboBox" name="cmbResultGroup"/>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>parameter:</string>
-       </property>
-       <property name="buddy">
-        <cstring>cmbResult</cstring>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QFRawDataResultsComboBox" name="cmbResult"/>
-     </item>
+    <layout class="QFormLayout" name="formLayout_2">
      <item row="0" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
         <string>parameter to update:</string>
-       </property>
-       <property name="buddy">
-        <cstring>cmbParameter</cstring>
        </property>
       </widget>
      </item>
@@ -72,6 +27,92 @@
       <widget class="QComboBox" name="cmbParameter"/>
      </item>
     </layout>
+   </item>
+   <item>
+    <layout class="QGridLayout" name="gridLayout" columnstretch="1,0">
+     <property name="topMargin">
+      <number>5</number>
+     </property>
+     <item row="1" column="0">
+      <widget class="QWidget" name="widget" native="true">
+       <layout class="QFormLayout" name="formLayout">
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        </property>
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>RDR:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QFRDRComboBox" name="cmbRDR"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>result group:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QFResultsGroupComboBox" name="cmbResultGroup"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>parameter:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QFRawDataResultsComboBox" name="cmbResult"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <widget class="QRadioButton" name="radRDR">
+       <property name="text">
+        <string>from other fit result</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QRadioButton" name="radOtherSource">
+       <property name="text">
+        <string>from other source</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QWidget" name="verticalWidget" native="true">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QPushButton" name="btnLoadFile">
+          <property name="text">
+           <string>load from file</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QLabel" name="labInfo">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QFPlotter" name="pltData" native="true">
@@ -84,14 +125,29 @@
     </widget>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="btnHelp">
+       <property name="text">
+        <string>&amp;Help</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/help/help.png</normaloff>:/lib/help/help.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
@@ -119,13 +175,19 @@
   </customwidget>
  </customwidgets>
  <tabstops>
-  <tabstop>cmbParameter</tabstop>
   <tabstop>cmbRDR</tabstop>
   <tabstop>cmbResultGroup</tabstop>
   <tabstop>cmbResult</tabstop>
-  <tabstop>buttonBox</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>buttonBox</sender>
@@ -134,8 +196,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>257</x>
-     <y>463</y>
+     <x>348</x>
+     <y>554</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -150,8 +212,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>463</y>
+     <x>416</x>
+     <y>554</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -160,23 +222,104 @@
    </hints>
   </connection>
   <connection>
+   <sender>radOtherSource</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>verticalWidget</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>691</x>
+     <y>58</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>691</x>
+     <y>113</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radRDR</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFImFCSSetParamFromFileDialog</receiver>
+   <slot>updateDataFromRDR()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>58</x>
+     <y>58</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>6</x>
+     <y>151</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radRDR</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>widget</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>152</x>
+     <y>54</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>153</x>
+     <y>72</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbRDR</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFImFCSSetParamFromFileDialog</receiver>
+   <slot>updateDataFromRDR()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>537</x>
+     <y>85</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>539</x>
+     <y>161</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbResultGroup</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFImFCSSetParamFromFileDialog</receiver>
+   <slot>updateDataFromRDR()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>500</x>
+     <y>114</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>508</x>
+     <y>159</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
    <sender>cmbResult</sender>
    <signal>currentIndexChanged(int)</signal>
    <receiver>QFImFCSSetParamFromFileDialog</receiver>
-   <slot>replotOvr()</slot>
+   <slot>updateDataFromRDR()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>485</x>
-     <y>99</y>
+     <x>462</x>
+     <y>139</y>
     </hint>
     <hint type="destinationlabel">
-     <x>527</x>
-     <y>110</y>
+     <x>484</x>
+     <y>157</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
   <slot>replotOvr()</slot>
+  <slot>updateDataFromRDR()</slot>
  </slots>
 </ui>

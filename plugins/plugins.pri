@@ -114,6 +114,12 @@ CONFIG += link_prl
 
 include(../libquickfit.pri)
 
+HEADERS += \
+    ../base_classes/qfimagetransform.h
+
+SOURCES += \
+    ../base_classes/qfimagetransform.cpp
+
 
 
 

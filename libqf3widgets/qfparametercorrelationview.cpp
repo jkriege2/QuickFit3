@@ -1119,7 +1119,7 @@ void QFParameterCorrelationView::saveData()
     QStringList f=QFDataExportHandler::getFormats();
     QString lastDir=ProgramOptions::getConfigValue("QFParameterCorrelationView/lastDataDir", "").toString();
     QString selFilter=ProgramOptions::getConfigValue("QFParameterCorrelationView/lastDataFilter", "").toString();
-    QString fn=qfGetOpenFileName(this, tr("Save data to file"), lastDir, f.join(";;"), &selFilter);
+    QString fn=qfGetSaveFileName(this, tr("Save data to file"), lastDir, f.join(";;"), &selFilter);
     if (fn.size()>0) {
         QFDataExportHandler::save(data, f.indexOf(selFilter), fn, headers, QStringList());
         ProgramOptions::setConfigValue("QFParameterCorrelationView/lastDataDir", lastDir);

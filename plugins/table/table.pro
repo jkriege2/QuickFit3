@@ -11,8 +11,7 @@ DESTDIR = $$QFOUTPUT/plugins
 include(../../libquickfitwidgets.pri)
 
 # Input
-HEADERS += dlgcsvparameters.h \
-           qfrdrtable.h \
+HEADERS += qfrdrtable.h \
            qfrdrtableeditor.h \
            qfprdrtable.h \
     tableresizedialog.h \
@@ -40,8 +39,7 @@ HEADERS += dlgcsvparameters.h \
     qfrdrtableaxissettingswidget.h \
     qfrdrtableindexedstatdialog.h
 
-SOURCES += dlgcsvparameters.cpp \
-           qfrdrtable.cpp \
+SOURCES += qfrdrtable.cpp \
            qfrdrtableeditor.cpp \
            qfprdrtable.cpp \
     tableresizedialog.cpp \
@@ -67,8 +65,7 @@ SOURCES += dlgcsvparameters.cpp \
     qfrdrtableaxissettingswidget.cpp \
     qfrdrtableindexedstatdialog.cpp
 
-FORMS = dlg_csvparameters.ui \
-    tableresizedialog.ui \
+FORMS = tableresizedialog.ui \
     qfrdrtableplotwidget.ui \
     qfrdrtablecolumnvaluesdialog.ui \
     qfrdrtableformuladialog.ui \

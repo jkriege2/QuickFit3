@@ -8,6 +8,55 @@
 #include <QMimeData>
 #include <QClipboard>
 #include "datatools.h"
+#include "qfdlgcsvparameters.h"
+#include "programoptions.h"
+#include <QVariant>
+
+QList<QVector<double> > importCSVAskUser(const QString& filename, const QString& configprefix, QStringList* colNames) {
+    QFDlgCSVParameters* csvDlg=new QFDlgCSVParameters(NULL, ProgramOptions::getConfigValue(configprefix+"column_separator_save", ",").toString(),
+                                                  ProgramOptions::getConfigValue(configprefix+"decimal_separator_save", ".").toString(),
+                                                  ProgramOptions::getConfigValue(configprefix+"comment_start_save", "#").toString(),
+                                                  ProgramOptions::getConfigValue(configprefix+"header_start_save", "#!").toString());
+
+    csvDlg->setFileContents(filename);
+    QList<QVector<double> > res;
+    if (csvDlg->exec()==QDialog::Accepted) {
+        ProgramOptions::setConfigValue(configprefix+"column_separator_save", QString(csvDlg->get_column_separator()));
+        ProgramOptions::setConfigValue(configprefix+"decimal_separator_save", QString(csvDlg->get_decimal_separator()));
+        ProgramOptions::setConfigValue(configprefix+"comment_start_save", QString(csvDlg->get_comment_start()));
+        ProgramOptions::setConfigValue(configprefix+"header_start_save", QString(csvDlg->get_header_start()));
+
+        QFile file(filename);
+        if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QTextStream in(&file);
+            res=readCSV(in, csvDlg->get_column_separator(), csvDlg->get_decimal_separator(), csvDlg->get_comment_start(), csvDlg->get_header_start(), NAN, QString("\n"), QString("\r"), colNames);
+            file.close();
+        }
+    }
+    delete csvDlg;
+    return res;
+}
+
+QList<QVector<double> > readCSV(QTextStream& f, QChar separator_char, QChar decimalsep_char, QChar comment_char, const QString& headerComment, double non_value, const QString& eolChars, const QString& ignoreChars, QStringList* colNames) {
+    QList<QVector<double> > res;
+    while (!f.atEnd())  {
+        QVector<double> d=csvReadline(f,separator_char, comment_char, non_value, eolChars, ignoreChars);
+        if (d.size()>0) res.append(d);
+    }
+    int rows=0;
+    for (int i=0; i<res.size(); i++) {
+        rows=qMax(rows, res[i].size());
+    }
+    for (int i=0; i<res.size(); i++) {
+        while (res[i].size()<rows) res[i].append(non_value);
+    }
+    if (colNames) {
+        for (int i=0; i<rows; i++) {
+            (*colNames)<<QString("col %1").arg(i+1);
+        }
+    }
+    return dataRotate(res);
+}
 
 QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_char, double non_value, const QString& eolChars, const QString& ignoreChars) {
     //const QString line=f.readLine();

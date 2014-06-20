@@ -76,3 +76,8 @@ void QFDlgCSVParameters::checkValues() {
         accept();
     }
 }
+
+void QFDlgCSVParameters::guessParameters()
+{
+
+}

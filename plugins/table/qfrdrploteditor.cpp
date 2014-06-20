@@ -1,6 +1,6 @@
 #include "qfrdrploteditor.h"
 #include "qfrdrtable.h"
-#include "dlgcsvparameters.h"
+#include "qfdlgcsvparameters.h"
 
 
 QFRDRPlotEditor::QFRDRPlotEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):

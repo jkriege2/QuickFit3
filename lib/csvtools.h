@@ -15,6 +15,17 @@
  */
 QFLIB_EXPORT QVector<double> csvReadline(QTextStream& f, QChar separator_char=',', QChar comment_char='#', double non_value=0, const QString& eolChars=QString("\n"), const QString& ignoreChars=QString("\r"));
 
+/*! \brief Reads a CSV file
+    \ingroup qf3lib_tools
+
+ */
+QFLIB_EXPORT QList<QVector<double> > readCSV(QTextStream& f, QChar separator_char=',', QChar decimalsep_char='.', QChar comment_char='#', const QString& headerComment=QString("#!"), double non_value=0, const QString& eolChars=QString("\n"), const QString& ignoreChars=QString("\r"), QStringList* colNames=NULL);
+
+/*! \brief Reads a CSV file and ask user to give file parameters
+    \ingroup qf3lib_tools
+
+ */
+QFLIB_EXPORT QList<QVector<double> > importCSVAskUser(const QString& filename, const QString& configprefix=QString("import_csv/"), QStringList* colNames=NULL);
 
 /*! \brief copy the given data columns as CSV to the clipboard
     \ingroup qf3lib_tools

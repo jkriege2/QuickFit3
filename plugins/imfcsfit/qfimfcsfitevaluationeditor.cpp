@@ -1044,9 +1044,11 @@ void QFImFCSFitEvaluationEditor::setFitParameterFromFile()
     if (!current->getHighlightedRecord()) return;
 
     QFImFCSFitEvaluation* data=qobject_cast<QFImFCSFitEvaluation*>(current);
-    if (data) {
+    QFRawDataRecord* record=data->getHighlightedRecord();
+    QFRDRImageToRunInterface* dataImg=qobject_cast<QFRDRImageToRunInterface*>(record);
+    if (data && dataImg) {
         QFFitFunction* ff=data->getFitFunction();
-        double* d=data->allocFillParameters(data->getHighlightedRecord(), data->getCurrentIndex(), ff);
+        double* d=data->allocFillParameters(record, data->getCurrentIndex(), ff);
         if (ff) {
             QStringList params;
             QStringList paramIDs;
@@ -1057,16 +1059,27 @@ void QFImFCSFitEvaluationEditor::setFitParameterFromFile()
                     paramIDs<<sl[i];
                 }
             }
-            QFImFCSSetParamFromFileDialog* dlg=new QFImFCSSetParamFromFileDialog(data, params, paramIDs, this);
+
+            int w=dataImg->getImageFromRunsWidth();
+            int h=dataImg->getImageFromRunsHeight();
+            QFImFCSSetParamFromFileDialog* dlg=new QFImFCSSetParamFromFileDialog(w, h, data, params, paramIDs, this);
             if (dlg->exec()) {
                 bool ok=false;
                 QVector<double> d=dlg->getData(&ok);
+                if (d.size()>w*h) {
+                    int tooMany=d.size()-w*h;
+                    //d.remove(s.size()-tooMany, tooMany);
+                    d.resize(w*h);
+                }
                 double avg=qfstatisticsAverage(d);
                 QString param=dlg->getParameter();
+                if (ok && d.size()<w*h) {
+                    ok=(QMessageBox::question(this, tr("set fit result from RDR/file/..."), tr("The size of read data is smaller than the required data size (new data size: %4,  required size: %1x%2 = %3).\n  Import data nevertheless?").arg(w).arg(h).arg(w*h).arg(d.size()), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes);
+                }
                 //qDebug()<<ok<<param<<avg<<d.size()-1<<data->getIndexMax(current->getHighlightedRecord())<<d.value(0,0);
-                if (ok && d.size()-1==data->getIndexMax(current->getHighlightedRecord())) {
-                    data->setFitResultValue(data->getHighlightedRecord(),data->getEvaluationResultID(0, data->getHighlightedRecord()), param, d);
-                    data->setFitResultValue(data->getHighlightedRecord(),data->getEvaluationResultID(-1, data->getHighlightedRecord()), param, avg);
+                if (ok) {// && d.size()-1==data->getIndexMax(current->getHighlightedRecord())) {
+                    data->setFitResultValue(record,data->getEvaluationResultID(0, record), param, d);
+                    data->setFitResultValue(record,data->getEvaluationResultID(-1, record), param, avg);
                 }
             }
             delete dlg;

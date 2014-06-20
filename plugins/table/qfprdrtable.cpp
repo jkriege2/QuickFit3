@@ -1,7 +1,7 @@
 #include "qfprdrtable.h"
 #include <QtGui>
 #include "qfrdrtable.h"
-#include "dlgcsvparameters.h"
+#include "qfdlgcsvparameters.h"
 
 QFPRDRTable::QFPRDRTable(QObject* parent):
     QObject(parent)
@@ -53,21 +53,21 @@ void QFPRDRTable::insertTableFile() {
         QStringList list = files;
         if (list.size()>0) {
 
-            dlgCSVParameters* csvDlg=new dlgCSVParameters(parentWidget, settings->getQSettings()->value("table/column_separator", ",").toString(),
+            QFDlgCSVParameters* csvDlg=new QFDlgCSVParameters(parentWidget, settings->getQSettings()->value("table/column_separator", ",").toString(),
                                                                   settings->getQSettings()->value("table/decimal_separator", ".").toString(),
                                                           settings->getQSettings()->value("table/comment_start", "#").toString(),
                                                           settings->getQSettings()->value("table/header_start", "#!").toString());
             csvDlg->setFileContents(list[0]);
             if (csvDlg->exec()==QDialog::Accepted) {
                 QMap<QString, QVariant> p;
-                p["column_separator"]=QString(csvDlg->column_separator);
-                p["decimal_separator"]=QString(csvDlg->decimal_separator);
-                p["comment_start"]=QString(csvDlg->comment_start);
-                p["header_start"]=QString(csvDlg->header_start);
-                settings->getQSettings()->setValue("table/column_separator", QString(csvDlg->column_separator));
-                settings->getQSettings()->setValue("table/decimal_separator", QString(csvDlg->decimal_separator));
-                settings->getQSettings()->setValue("table/comment_start", QString(csvDlg->comment_start));
-                settings->getQSettings()->setValue("table/header_start", QString(csvDlg->header_start));
+                p["column_separator"]=QString(csvDlg->get_column_separator());
+                p["decimal_separator"]=QString(csvDlg->get_decimal_separator());
+                p["comment_start"]=QString(csvDlg->get_comment_start());
+                p["header_start"]=QString(csvDlg->get_header_start());
+                settings->getQSettings()->setValue("table/column_separator", QString(csvDlg->get_column_separator()));
+                settings->getQSettings()->setValue("table/decimal_separator", QString(csvDlg->get_decimal_separator()));
+                settings->getQSettings()->setValue("table/comment_start", QString(csvDlg->get_comment_start()));
+                settings->getQSettings()->setValue("table/header_start", QString(csvDlg->get_header_start()));
 
                 QStringList roParams;
                 roParams<<"column_separator"<<"decimal_separator"<<"comment_start"<<"header_start";
@@ -77,7 +77,7 @@ void QFPRDRTable::insertTableFile() {
                 int i=0;
                 while(it != list.end()) {
                     i++;
-                    services->log_text(tr("importing CSV file '%1' using (column_separator='%2', decimal_separator='%3', comment_start='%4', header_start='%5')\n").arg(*it).arg(QString(csvDlg->column_separator)).arg(QString(csvDlg->decimal_separator)).arg(QString(csvDlg->comment_start)).arg(QString(csvDlg->header_start)));
+                    services->log_text(tr("importing CSV file '%1' using (column_separator='%2', decimal_separator='%3', comment_start='%4', header_start='%5')\n").arg(*it).arg(QString(csvDlg->get_column_separator())).arg(QString(csvDlg->get_decimal_separator())).arg(QString(csvDlg->get_comment_start())).arg(QString(csvDlg->get_header_start())));
                     QFRawDataRecord* e=project->addRawData("table", QFileInfo(*it).fileName(), QStringList(*it), p, roParams);
                     if (e->error()) {
                         project->deleteRawData(e->getID());

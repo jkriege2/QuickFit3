@@ -1,7 +1,7 @@
 #include "qfrdrtableeditor.h"
 #include "qfrdrtablecolumnvaluesdialog.h"
 #include "qfrdrtable.h"
-#include "dlgcsvparameters.h"
+#include "qfdlgcsvparameters.h"
 #include "qfrdrtablesortdialog.h"
 #include <QtAlgorithms>
 #include "qfrdrtableparserfunctions.h"
@@ -491,34 +491,34 @@ void QFRDRTableEditor::slLoadTable() {
                     m->model()->readXMLFile(fileName, 0, 0, false);
                 } else {
 
-                    dlgCSVParameters* csvDlg=new dlgCSVParameters(this, settings->getQSettings()->value("table/column_separator_save", ",").toString(),
+                    QFDlgCSVParameters* csvDlg=new QFDlgCSVParameters(this, settings->getQSettings()->value("table/column_separator_save", ",").toString(),
                                                                   settings->getQSettings()->value("table/decimal_separator_save", ".").toString(),
                                                                   settings->getQSettings()->value("table/comment_start_save", "#").toString(),
                                                                   settings->getQSettings()->value("table/header_start_save", "#!").toString());
                     if (f==0) {
-                        csvDlg->column_separator=',';
-                        csvDlg->decimal_separator='.';
-                        csvDlg->comment_start='#';
-                        csvDlg->header_start="#!";
+                        csvDlg->set_column_separator(',');
+                        csvDlg->set_decimal_separator('.');
+                        csvDlg->set_comment_start('#');
+                        csvDlg->set_header_start("#!");
                     } else if (f==1) {
-                        csvDlg->column_separator=';';
-                        csvDlg->decimal_separator='.';
-                        csvDlg->comment_start='#';
-                        csvDlg->header_start="#!";
+                        csvDlg->set_column_separator(';');
+                        csvDlg->set_decimal_separator('.');
+                        csvDlg->set_comment_start('#');
+                        csvDlg->set_header_start("#!");
                     } else if (f==2) {
-                        csvDlg->column_separator=';';
-                        csvDlg->decimal_separator=',';
-                        csvDlg->comment_start='#';
-                        csvDlg->header_start="#!";
+                        csvDlg->set_column_separator(';');
+                        csvDlg->set_decimal_separator(',');
+                        csvDlg->set_comment_start('#');
+                        csvDlg->set_header_start("#!");
                     }
                     csvDlg->setFileContents(fileName);
                     if (csvDlg->exec()==QDialog::Accepted) {
                         QMap<QString, QVariant> p;
-                        settings->getQSettings()->setValue("table/column_separator_save", QString(csvDlg->column_separator));
-                        settings->getQSettings()->setValue("table/decimal_separator_save", QString(csvDlg->decimal_separator));
-                        settings->getQSettings()->setValue("table/comment_start_save", QString(csvDlg->comment_start));
-                        settings->getQSettings()->setValue("table/header_start_save", QString(csvDlg->header_start));
-                        m->model()->readCSV(fileName, csvDlg->column_separator, csvDlg->decimal_separator, csvDlg->header_start, csvDlg->comment_start);
+                        settings->getQSettings()->setValue("table/column_separator_save", QString(csvDlg->get_column_separator()));
+                        settings->getQSettings()->setValue("table/decimal_separator_save", QString(csvDlg->get_decimal_separator()));
+                        settings->getQSettings()->setValue("table/comment_start_save", QString(csvDlg->get_comment_start()));
+                        settings->getQSettings()->setValue("table/header_start_save", QString(csvDlg->get_header_start()));
+                        m->model()->readCSV(fileName, csvDlg->get_column_separator(), csvDlg->get_decimal_separator(), csvDlg->get_header_start(), csvDlg->get_comment_start());
                     }
                 }
                 QApplication::restoreOverrideCursor();

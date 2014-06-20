@@ -1,0 +1,31 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>imFCS Fit: Set Fit parameter from RDR/File/...</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	 <h2>Basics</h2>
+	 <p>
+     This function allows to set a fit parameter in all pixels. The data is taken from:
+     <ul>
+	   <li>another fit result from another RDR</li>
+	   <li>loaded from a file (TIFF image or CSV file). If data is imported from a CSV file, the data has to be stored in a single column in row-major format!</li>
+     </ul>
+	 $$note:The size of the loaded data has to be at least as large as the number of pixels in the current RDR. Otherwise it is still possible to import the data, but maybe not all pixels are assigned a value (they keep their old value or the initial value). If the data size is larger, the additional pixels are simply discarded.$$
+	 </p>
+	 
+	 
+	 <h2>User-Interface</h2>
+	 <p>
+	 <ul>
+	   <li>At the top of the dialog you can select the fit parameter to set with the data.</li>
+	   <li>At the bottom, the data is displayed as an image. The required image size and the size of the currently selected image are displayed above the image. (note again: if the data size is too small, not all pixels will be set and if it is too large, some pixels from the data will be discarded!)</li>
+	   <li>If the data should be taken from another fit parameter in another RDR, you can select the radio-button <b>from other fit result</b>. Then select the <b>RDR</b>, <b>result group</b> and <b>parameter</b> therein (drop-down boxes below). The selected parameter image will be displayed below.</li>
+	   <li>You can also load data from a file or take it from other sources. To do so, activate the radio-button <b>from other source</b> and use the buttons below, which are activated just now to load the data. $$note:If you reselect the radio-button "from other fit result", the loaded data will be discarded!$$</li>
+	   <li></li>
+	 </ul>
+	 </p>
+  </body>
+</html>

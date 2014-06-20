@@ -112,7 +112,8 @@ HEADERS += dlgnewproperty.h \
     qfenhancedcombobox.h \
     qffitalgorithmparameterstorage.h \
     qftabledelegate.h \
-    qfcfitfunction.h
+    qfcfitfunction.h \
+    qfdlgcsvparameters.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -192,12 +193,14 @@ SOURCES += dlgnewproperty.cpp \
     qfenhancedtabwidget.cpp \
     qfenhancedcombobox.cpp \
     qffitalgorithmparameterstorage.cpp \
-    qftabledelegate.cpp
+    qftabledelegate.cpp \
+    qfdlgcsvparameters.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \
     dlg_qfprogress.ui \
-    dlg_qffileeditdialog.ui
+    dlg_qffileeditdialog.ui \
+    qfdlg_csvparameters.ui
 
 RESOURCES += lib.qrc
 
