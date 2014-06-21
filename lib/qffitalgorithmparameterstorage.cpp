@@ -91,14 +91,14 @@ void QFFitAlgorithmParameterStorage::readQFFitAlgorithmParameters(const QDomElem
     while ( !elt.isNull() ) {
         if (elt.hasAttribute("id")) {
             QString id=elt.attribute("id");
-            std::cout<<"  fit algorithm "<<id.toStdString()<<std::endl;
+            //qDebug()<<"  fit algorithm "<<id.toStdString()<<std::endl;
             QDomElement eltt=elt.firstChildElement("parameter");
             for (; !eltt.isNull(); eltt = eltt.nextSiblingElement("parameter")) {
                 if (eltt.hasAttribute("id") && eltt.hasAttribute("type") && eltt.hasAttribute("data")) {
                     QString pid=eltt.attribute("id");
                     QString ptype=eltt.attribute("type");
                     QString pdata=eltt.attribute("data");
-                    std::cout<<"    param "<<pid.toStdString()<<" type="<<ptype.toStdString()<<" data="<<pdata.toStdString()<<std::endl;
+                    //qDebug()<<"    param "<<pid.toStdString()<<" type="<<ptype.toStdString()<<" data="<<pdata.toStdString()<<std::endl;
                     algorithm_parameterstore[id].insert(pid, getQVariantFromString(ptype, pdata));
                 }
             }
