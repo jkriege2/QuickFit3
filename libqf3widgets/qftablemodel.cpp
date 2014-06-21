@@ -236,14 +236,14 @@ void QFTableModel::resize(quint32 rows, quint32 columns) {
 
     //std::cout<<"  resize("<<state.rows<<", "<<state.columns<<"): 1\n";
     //quint32 oldrows=this->state.rows;
-    int oldcolumns=this->state.columns;
-    int oldrows=this->state.rows;
+    quint32 oldcolumns=this->state.columns;
+    quint32 oldrows=this->state.rows;
 
     int j=0;
     while (state.columnNames.size()<oldcolumns) {state.columnNames.append(QString::number(j)); j++;}
 
-    if (columns>oldcolumns) {
-        for (int i=oldcolumns; i<=columns; i++) {
+    if (int64_t(columns)>oldcolumns) {
+        for (int i=oldcolumns; i<=int64_t(columns); i++) {
             int j=state.columnNames.size();
             while (i>=state.columnNames.size()) {
                 state.columnNames.append(QString::number(j));
@@ -251,8 +251,8 @@ void QFTableModel::resize(quint32 rows, quint32 columns) {
             }
             emit columnAdded(i);
         }
-    } else if (columns<oldcolumns) {
-        for (int i=oldcolumns-1; i>=columns; i--) {
+    } else if (int64_t(columns)<oldcolumns) {
+        for (int i=oldcolumns-1; i>=int64_t(columns); i--) {
             if (!state.columnNames.isEmpty()) state.columnNames.removeLast();
             emit columnRemoved(i);
         }
@@ -261,17 +261,17 @@ void QFTableModel::resize(quint32 rows, quint32 columns) {
     j=0;
     while (state.rowNames.size()<oldrows) {state.rowNames.append(""); j++;}
 
-   if (rows>oldrows) {
-       for (int i=oldrows; i<=rows; i++) {
+   if (int64_t(rows)>oldrows) {
+       for (int i=oldrows; i<=int64_t(rows); i++) {
            int j=state.rowNames.size();
            while (i>=state.rowNames.size()) {
-               state.rowNames.append(QString::number(j));
+               state.rowNames.append("");
                j++;
            }
            emit rowAdded(i);
        }
-   } else if (rows<oldrows) {
-       for (int i=oldrows-1; i>=rows; i--) {
+   } else if (int64_t(rows)<oldrows) {
+       for (int i=oldrows-1; i>=int64_t(rows); i--) {
            if (!state.rowNames.isEmpty()) state.rowNames.removeLast();
            emit rowRemoved(i);
        }
