@@ -49,8 +49,6 @@ QFRDRTableRegressionDialog::~QFRDRTableRegressionDialog()
 
 void QFRDRTableRegressionDialog::saveResults()
 {
-
-
     int method=ui->cmbFitType->itemData(ui->cmbFitType->currentIndex()).toInt();
     int saveCol=ui->cmbSaveColumn->currentIndex();
     int saveGraph=ui->cmbAddGraph->currentIndex();

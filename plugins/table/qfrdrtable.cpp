@@ -1876,7 +1876,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 QString hc=te.attribute("comment", te.attribute("column_comment"));
                 QDomElement re=te.firstChildElement("row");
                 quint32 r=0;
-                qDebug()<<"resize("<<rows<<", "<<columns<<")\n";
+                //qDebug()<<"resize("<<rows<<", "<<columns<<")\n";
                 datamodel->resize(rows, columns);
                 datamodel->setColumnTitle(columns-1, n);
                 if (!hexp.isEmpty()) datamodel->setColumnHeaderData(columns-1, ColumnExpressionRole, hexp);
@@ -1884,7 +1884,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 QDomNamedNodeMap sl=te.attributes();
                 for (int i=0; i<sl.size(); i++) {
                     QString a=sl.item(i).nodeName();
-                    qDebug()<<"found attribute "<<a;
+                    //qDebug()<<"found attribute "<<a;
                     QRegExp rx("colpar(\\w+)(\\d+)");
                     if (  rx.indexIn(a)>=0) {
                         bool ok=false;
@@ -1895,19 +1895,19 @@ void QFRDRTable::intReadData(QDomElement* e) {
                         }
                     }
                 }
-                qDebug()<<"resize("<<rows<<", "<<columns<<") DONE\n";
+                //qDebug()<<"resize("<<rows<<", "<<columns<<") DONE\n";
                 while (!re.isNull()) {
                     QString t=re.attribute("type").toLower();
                     QString ex=re.attribute("expression");
                     QString comment=re.attribute("comment");
                     if (r+1>rows) {
                         rows=r+1;
-                        qDebug()<<"resize("<<rows<<", "<<columns<<")\n";
+                        //qDebug()<<"resize("<<rows<<", "<<columns<<")\n";
                         datamodel->resize(rows, columns);
-                        qDebug()<<"resize("<<rows<<", "<<columns<<") DONE\n";
+                        //qDebug()<<"resize("<<rows<<", "<<columns<<") DONE\n";
                     }
                     QVariant v=getQVariantFromString(t, re.attribute("value"));
-                    qDebug()<<"setCell("<<r<<", "<<columns-1<<", '"<<v<<"' ["<<v.typeName()<<"])\n";
+                    //qDebug()<<"setCell("<<r<<", "<<columns-1<<", '"<<v<<"' ["<<v.typeName()<<"])\n";
                     datamodel->setCell(r, columns-1, v);
                     if (!ex.isEmpty()) datamodel->setCellUserRole(QFRDRTable::TableExpressionRole, r, columns-1, ex);
                     if (!comment.isEmpty()) datamodel->setCellUserRole(QFRDRTable::TableCommentRole, r, columns-1, comment);
@@ -1930,12 +1930,12 @@ void QFRDRTable::intReadData(QDomElement* e) {
     //datamodel->addUndoStep();
 
     if (e) {
-        qDebug()<<"read plots ...";
+        //qDebug()<<"read plots ...";
         QDomElement te=e->firstChildElement("plots");
         plots.clear();
         if (!te.isNull()) {
             te=te.firstChildElement("plot");
-            qDebug()<<"  found plot ...";
+            //qDebug()<<"  found plot ...";
             while (!te.isNull()) {
                 PlotInfo plot;
                 readPlotInfo(plot, te);
@@ -1946,7 +1946,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
         }
     }
     if (e) {
-       qDebug()<<"read fit algorithms ...";
+       //qDebug()<<"read fit algorithms ...";
 
        QDomElement te=e->firstChildElement("fit_algorithms").firstChildElement("algorithm");
        readQFFitAlgorithmParameters(te);
