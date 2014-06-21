@@ -1781,7 +1781,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
     datamodel->clear();
     datamodel->setReadonly(false);
     if (files.size()>0) {
-        //std::cout<<"    reading CSV\n";
+        //qDebug()<<"    reading CSV\n";
         QString s=getProperty("column_separator", ",").toString();
         char column_separator=(s.size()>0)?s[0].toAscii():',';
         s=getProperty("decimal_separator", ".").toString();
@@ -1791,7 +1791,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
         s=getProperty("coment_start", "#").toString();
         char comment_start=(s.size()>0)?s[0].toAscii():'#';
 
-        //std::cout<<"column_separator="<<column_separator<<"  decimal_separator="<<decimal_separator<<"   header_start="<<header_start.toStdString()<<"   comment_start="<<comment_start<<std::endl;
+        //qDebug()<<"column_separator="<<column_separator<<"  decimal_separator="<<decimal_separator<<"   header_start="<<header_start.toStdString()<<"   comment_start="<<comment_start<<std::endl;
 
         datamodel->readCSV(files[0], column_separator, decimal_separator, header_start, comment_start);
         datamodel->setReadonly(true);
@@ -1809,7 +1809,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 QString hc=te.attribute("comment", te.attribute("column_comment"));
                 QDomElement re=te.firstChildElement("row");
                 quint32 r=0;
-                //std::cout<<"resize("<<rows<<", "<<columns<<")\n";
+                qDebug()<<"resize("<<rows<<", "<<columns<<")\n";
                 datamodel->resize(rows, columns);
                 datamodel->setColumnTitle(columns-1, n);
                 if (!hexp.isEmpty()) datamodel->setColumnHeaderData(columns-1, ColumnExpressionRole, hexp);
@@ -1817,7 +1817,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
                 QDomNamedNodeMap sl=te.attributes();
                 for (int i=0; i<sl.size(); i++) {
                     QString a=sl.item(i).nodeName();
-                    //qDebug()<<"found attribute "<<a;
+                    qDebug()<<"found attribute "<<a;
                     QRegExp rx("colpar(\\w+)(\\d+)");
                     if (  rx.indexIn(a)>=0) {
                         bool ok=false;
@@ -1828,19 +1828,19 @@ void QFRDRTable::intReadData(QDomElement* e) {
                         }
                     }
                 }
-                //std::cout<<"resize("<<rows<<", "<<columns<<") DONE\n";
+                qDebug()<<"resize("<<rows<<", "<<columns<<") DONE\n";
                 while (!re.isNull()) {
                     QString t=re.attribute("type").toLower();
                     QString ex=re.attribute("expression");
                     QString comment=re.attribute("comment");
                     if (r+1>rows) {
                         rows=r+1;
-                        //std::cout<<"resize("<<rows<<", "<<columns<<")\n";
+                        qDebug()<<"resize("<<rows<<", "<<columns<<")\n";
                         datamodel->resize(rows, columns);
-                        //std::cout<<"resize("<<rows<<", "<<columns<<") DONE\n";
+                        qDebug()<<"resize("<<rows<<", "<<columns<<") DONE\n";
                     }
                     QVariant v=getQVariantFromString(t, re.attribute("value"));
-                    //std::cout<<"setCell("<<r<<", "<<columns-1<<", '"<<v.toString().toStdString()<<"' ["<<v.typeName()<<"])\n";
+                    qDebug()<<"setCell("<<r<<", "<<columns-1<<", '"<<v<<"' ["<<v.typeName()<<"])\n";
                     datamodel->setCell(r, columns-1, v);
                     if (!ex.isEmpty()) datamodel->setCellUserRole(QFRDRTable::TableExpressionRole, r, columns-1, ex);
                     if (!comment.isEmpty()) datamodel->setCellUserRole(QFRDRTable::TableCommentRole, r, columns-1, comment);
@@ -1863,10 +1863,12 @@ void QFRDRTable::intReadData(QDomElement* e) {
     //datamodel->addUndoStep();
 
     if (e) {
+        qDebug()<<"read plots ...";
         QDomElement te=e->firstChildElement("plots");
         plots.clear();
         if (!te.isNull()) {
             te=te.firstChildElement("plot");
+            qDebug()<<"  found plot ...";
             while (!te.isNull()) {
                 PlotInfo plot;
                 readPlotInfo(plot, te);
@@ -1877,8 +1879,9 @@ void QFRDRTable::intReadData(QDomElement* e) {
         }
     }
     if (e) {
+       qDebug()<<"read fit algorithms ...";
 
-        QDomElement te=e->firstChildElement("fit_algorithms").firstChildElement("algorithm");
+       QDomElement te=e->firstChildElement("fit_algorithms").firstChildElement("algorithm");
        readQFFitAlgorithmParameters(te);
     }
 }

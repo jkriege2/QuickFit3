@@ -8,6 +8,10 @@ QFRDRTableHistogramDialog::QFRDRTableHistogramDialog(QWidget *parent) :
 {
     selected=-1;
     ui->setupUi(this);
+    ui->edtBandwidth->setCheckBounds(false, false);
+    ui->edtRangeMin->setCheckBounds(false, false);
+    ui->edtRangeMax->setCheckBounds(false, false);
+    ui->edtBinWidth->setCheckBounds(false, false);
 }
 
 QFRDRTableHistogramDialog::~QFRDRTableHistogramDialog()

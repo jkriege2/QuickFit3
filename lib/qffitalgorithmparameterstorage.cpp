@@ -84,24 +84,27 @@ void QFFitAlgorithmParameterStorage::writeQFFitAlgorithmParameters(QXmlStreamWri
     }
 }
 
-void QFFitAlgorithmParameterStorage::readQFFitAlgorithmParameters(QDomElement elt, const QString& tagName)
+void QFFitAlgorithmParameterStorage::readQFFitAlgorithmParameters(const QDomElement& eltin, const QString& tagName)
 {
-    for (; !elt.isNull(); elt = elt.nextSiblingElement(tagName)) {
+    if (eltin.isNull()) return;
+    QDomElement elt=eltin;
+    while ( !elt.isNull() ) {
         if (elt.hasAttribute("id")) {
             QString id=elt.attribute("id");
-            //std::cout<<"  fit algorithm "<<id.toStdString()<<std::endl;
+            std::cout<<"  fit algorithm "<<id.toStdString()<<std::endl;
             QDomElement eltt=elt.firstChildElement("parameter");
             for (; !eltt.isNull(); eltt = eltt.nextSiblingElement("parameter")) {
                 if (eltt.hasAttribute("id") && eltt.hasAttribute("type") && eltt.hasAttribute("data")) {
                     QString pid=eltt.attribute("id");
                     QString ptype=eltt.attribute("type");
                     QString pdata=eltt.attribute("data");
-                    //std::cout<<"    param "<<pid.toStdString()<<" type="<<ptype.toStdString()<<" data="<<pdata.toStdString()<<std::endl;
+                    std::cout<<"    param "<<pid.toStdString()<<" type="<<ptype.toStdString()<<" data="<<pdata.toStdString()<<std::endl;
                     algorithm_parameterstore[id].insert(pid, getQVariantFromString(ptype, pdata));
                 }
             }
 
             //if (m_fitAlgorithms.contains(id)) restoreQFFitAlgorithmParameters(m_fitAlgorithms[id]);
+            elt = elt.nextSiblingElement(tagName);
         }
     }
 }

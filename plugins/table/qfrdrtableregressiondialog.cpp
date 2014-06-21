@@ -797,7 +797,13 @@ void QFRDRTableRegressionDialog::intInit(QFRDRTable *table, int colX, int colY, 
 
 
     methodChanged(ui->cmbFitType->currentIndex());
+    //connectSignals(true);
+    //on_btnFit_clicked();
+
+    updateFitStatistics();
+
+    parameterTable->rebuildModel();
+    replotGraph();
     connectSignals(true);
-    on_btnFit_clicked();
 }
 

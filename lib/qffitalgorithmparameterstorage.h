@@ -62,7 +62,7 @@ class QFLIB_EXPORT QFFitAlgorithmParameterStorage
         QPointer<QFProject> algparam_project;
 
         virtual void writeQFFitAlgorithmParameters(QXmlStreamWriter& w, const QString &tagName=QString("algorithm")) const;
-        virtual void readQFFitAlgorithmParameters(QDomElement elt, const QString &tagName=QString("algorithm"));
+        virtual void readQFFitAlgorithmParameters(const QDomElement &eltin, const QString &tagName=QString("algorithm"));
         virtual void setQFFitAlgorithmParametersProject(QFProject* project);
 };
 

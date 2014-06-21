@@ -37,9 +37,9 @@ QFDoubleEdit::QFDoubleEdit(QWidget* parent):
     m_logscale=false;
     m_logbase=10;
     m_Integer=false;
-    m_checkMaximum=true;
+    m_checkMaximum=false;
     m_maximum=100;
-    m_checkMinimum=true;
+    m_checkMinimum=false;
     m_minimum=-100;
     m_decimals=6;
     m_increment=1;
