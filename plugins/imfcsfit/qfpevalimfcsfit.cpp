@@ -459,6 +459,9 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
             graph->colgraphAddGraph("title");
             i++;
         }*/
+        bool emitSigG=graph->colgraphGetDoEmitSignals();
+        graph->colgraphSetDoEmitSignals(false);
+
         graph->colgraphAddPlot("title");
         gr=graph->colgraphGetPlotCount()-1;
 
@@ -479,7 +482,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
             graph->colgraphAddGraph(gr, 0, 1+i*2, QFRDRColumnGraphsInterface::cgtLinesPoints, tr("w_{xy}=%1nm").arg(focus_widths[i]));
         }
         graph->colgraphSetPlotYRange(gr, ymin, ymax);
-
+        graph->colgraphSetDoEmitSignals(emitSigG);
 
     }
 
@@ -691,6 +694,8 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool4()
                     tab->tableSetData(rcounter-1, cols+3, qfstatisticsAverage(wxyvec));
                     tab->tableSetData(rcounter-1, cols+4, sqrt(qfstatisticsVariance(wxyvec)));
                     if (graph) {
+                        bool emitSigG=graph->colgraphGetDoEmitSignals();
+                        graph->colgraphSetDoEmitSignals(false);
                         int ggraph=e->getProperty("IMFCS_CALIBRATION_GRAPHS", -1).toInt();
                         if (ggraph<0) {
                             if (!isshifted) {
@@ -717,6 +722,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool4()
                         graph->colgraphSetPlotXRange(ggraph, xmin, xmax);
                         graph->colgraphSetPlotYRange(ggraph, ymin, ymax);
                         gr=ggraph;
+                        graph->colgraphSetDoEmitSignals(emitSigG);
 
                     }
                 }

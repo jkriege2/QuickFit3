@@ -426,14 +426,15 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual QList<QVariant> tableGetColumnData(quint32 column);
         virtual void tableSetColumnDataAsDouble(quint32 column, const QVector<double>& data);
         virtual QVector<double> tableGetColumnDataAsDouble(int column);
-
+        virtual bool tablesGetDoEmitSignals() const;
+        virtual void tablesSetDoEmitSignals(bool doEmit);
 
 
 
 
         virtual bool colgraphGetDoEmitSignals() const;
         virtual void colgraphSetDoEmitSignals(bool doEmit);
-
+        virtual void colgraphAddBoxPlot(int plotid, Orientation orientation, int columnX, int columnMin, int columnQ25, int columnMedian, int columnMean, int columnQ75, int columnMax, const QString&  title);
         virtual void colgraphAddGraph(int plotid, int columnX, int columnY, ColumnGraphTypes type, const QString&  title);
         virtual void colgraphAddFunctionGraph(int plotid, const QString& expression, ColumnGraphTypes type, const QString&  title, int columnParam=-1);
         virtual void colgraphAddFunctionGraph(int plotid, const QString& expression, ColumnGraphTypes type, const QString&  title, const QVector<double>& params);
@@ -458,6 +459,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual void colgraphSetGraphLineStyle(int plotid,  int graphid,  Qt::PenStyle  style);
         virtual void colgraphSetGraphLineWidth(int plotid,  int graphid,  double width);
         virtual void colgraphSetGraphFillStyle(int plotid,  int graphid,  Qt::BrushStyle  style);
+        virtual void colgraphSetGraphWidth(int plot,  int graph,  double width);
+        virtual void colgraphSetGraphShift(int plot,  int graph,  double shift);
 
 
         virtual void colgraphSetGraphColor(int plotid,  int graphid, QColor color);

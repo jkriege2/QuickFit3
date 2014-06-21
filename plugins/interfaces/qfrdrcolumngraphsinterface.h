@@ -30,7 +30,8 @@ class QFRDRColumnGraphsInterface {
             cgtRGBImage,
             cgtMaskImage,
             cgtHorizontalRange,
-            cgtVerticalRange
+            cgtVerticalRange,
+            cgtBoxPlot
         };
 
         enum Orientation {
@@ -101,11 +102,24 @@ class QFRDRColumnGraphsInterface {
         };
 
 
+        /** \brief returns, whether setting a graph property currently causes an immediate repaint */
         virtual bool colgraphGetDoEmitSignals() const=0;
+        /** \brief enable/disable immediate repaints, when chaning graph properties.
+         *
+         * You can use this function to ensure that a block of colgraph...() methods are executet, with only a single repaint at the end (doEmit=true causes a repaint!)
+         * \begincode
+          bool en=tab.colgraphGetDoEmitSignals();
+          tab.colgraphSetDoEmitSignals(false);
+           ... // your colgraph... code
+          tab.colgraphSetDoEmitSignals(en);
+          \endcode
+         */
         virtual void colgraphSetDoEmitSignals(bool doEmit)=0;
 
         /** \brief add a plot of  columnX against columnY to the given plot */
         virtual void colgraphAddGraph(int plot, int columnX, int columnY, ColumnGraphTypes type, const QString&  title)=0;
+        /** \brief add a boxplot */
+        virtual void colgraphAddBoxPlot(int plot, Orientation orientation, int columnX, int columnMin, int columnQ25, int columnMedian, int columnMean, int columnQ75, int columnMax, const QString&  title)=0;
         /** \brief add a plot of  columnX against columnY to the given plot */
         virtual void colgraphAddErrorGraph(int plot, int columnX, int columnXError, int columnY, int columnYError, ColumnGraphTypes type, const QString&  title, ErrorGraphTypes errorStyle=egtBars)=0;
         /** \brief add a new plot */
@@ -154,6 +168,10 @@ class QFRDRColumnGraphsInterface {
         virtual void colgraphSetGraphErrorStyle(int plot,  int graph,  ErrorGraphTypes errorType)=0;
         /** \brief set the plot symbol of the graph */
         virtual void colgraphSetGraphSymbol(int plot,  int graph,  ColumnGraphSymbols symbol, double symbolSize=10.0)=0;
+        /** \brief set the width property of a graph */
+        virtual void colgraphSetGraphWidth(int plot,  int graph,  double width)=0;
+        /** \brief set the shift property of a graph */
+        virtual void colgraphSetGraphShift(int plot,  int graph,  double shift)=0;
 
         /** \brief set a plot's x-axis properties */
         virtual void colgraphSetPlotXAxisProps(int plot, const QString& xLabel=QString("x"), bool logX=false)=0;
@@ -223,6 +241,7 @@ class QFRDRColumnGraphsInterface {
         /** \brief get a named property in the given graph
          */
         virtual QVariant colgraphGetGraphProperty(int plot, int graph, const QString& name, const QVariant& defaultValue=QVariant())=0;
+
 
 };
 

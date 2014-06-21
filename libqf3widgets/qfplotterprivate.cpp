@@ -53,6 +53,9 @@ void QFPlotterPrivate::copyToTable()
         bool ok=true;
         QMap<int, int> columns;
         if (tab) {
+            bool emitSigT=tab->tablesGetDoEmitSignals();
+            tab->tablesSetDoEmitSignals(false);
+
             JKQTPdatastore* ds=plotter->getDatastore();
             JKQtBasePlotter* p=plotter->get_plotter();
             int idx=tab->tableGetColumnCount();
@@ -86,6 +89,7 @@ void QFPlotterPrivate::copyToTable()
                     idx++;
                 }
             }
+            tab->tablesSetDoEmitSignals(emitSigT);
         } else {
             QMessageBox::critical(plotter, tr("Add data to table"), tr("No table selected or could not create table!\nCould not add data!"));
             ok=false;
@@ -93,6 +97,8 @@ void QFPlotterPrivate::copyToTable()
         int plotid=-1;
         if (ok && dlg->getAddGraphs()) {
             if (cols) {
+                bool emitSigG=cols->colgraphGetDoEmitSignals();
+                cols->colgraphSetDoEmitSignals(false);
                 plotid=dlg->getGraphID();
                 QString graphtitle;
                 JKQtBasePlotter* p=plotter->get_plotter();
@@ -125,6 +131,8 @@ void QFPlotterPrivate::copyToTable()
                         JKQTPverticalRange* vrange=dynamic_cast<JKQTPverticalRange*>(g);
                         QFRDRColumnGraphsInterface::ColumnGraphTypes type=QFRDRColumnGraphsInterface::cgtLinesPoints;
                         QFRDRColumnGraphsInterface::ColumnGraphSymbols symbol=QFRDRColumnGraphsInterface::cgsFilledCircle;
+                        JKQTPboxplotVerticalGraph* boxV=dynamic_cast<JKQTPboxplotVerticalGraph*>(g);
+                        JKQTPboxplotHorizontalGraph* boxH=dynamic_cast<JKQTPboxplotHorizontalGraph*>(g);
 
                         JKQTPMathImage* ig=dynamic_cast<JKQTPMathImage*>(g);
                         JKQTPRGBMathImage* rgbg=dynamic_cast<JKQTPRGBMathImage*>(g);
@@ -192,6 +200,15 @@ void QFPlotterPrivate::copyToTable()
                             }
                             cols->colgraphSetGraphSymbol(plotid, cols->colgraphGetGraphCount(plotid)-1, symbol, symbolSize);
                             cols->colgraphSetGraphFillStyle(plotid, cols->colgraphGetGraphCount(plotid)-1, fillstyle);
+
+                            if (dynamic_cast<JKQTPbarHorizontalGraph*>(g) || dynamic_cast<JKQTPbarVerticalGraph*>(g)) {
+                                type=QFRDRColumnGraphsInterface::cgtBars;
+                                JKQTPbarHorizontalGraph* bar=dynamic_cast<JKQTPbarHorizontalGraph*>(g);
+                                cols->colgraphSetGraphWidth(plotid, cols->colgraphGetGraphCount(plotid)-1, bar->get_width());
+                                cols->colgraphSetGraphShift(plotid, cols->colgraphGetGraphCount(plotid)-1, bar->get_shift());
+
+                            }
+
 
                         } else if (colig) {
                             cols->colgraphAddImageGraph(plotid, columns.value(colig->get_imageColumn(),-1), QFRDRColumnGraphsInterface::ImageColorPalette((int)colig->get_palette()), colig->get_x(), colig->get_y(), colig->get_width(), colig->get_height(), colig->get_Nx(), colig->get_title());
@@ -290,7 +307,70 @@ void QFPlotterPrivate::copyToTable()
                             }
                             fillstyle=qfffg->get_fillStyle();
                             cols->colgraphSetGraphFillStyle(plotid, cols->colgraphGetGraphCount(plotid)-1, fillstyle);
+                        } else if(boxH) {
+                            QColor color=QColor("red");
+                            QColor fillColor=color.lighter();
+                            QColor errorColor=color.darker();
+                            type=QFRDRColumnGraphsInterface::cgtBoxPlot;
+                            color=boxH->get_color();
+                            fillColor=boxH->get_fillColor();
 
+                            int pcol=columns.value(boxH->get_posColumn(), -1);
+                            int mincol=columns.value(boxH->get_minColumn(), -1);
+                            int q25col=columns.value(boxH->get_percentile25Column(), -1);
+                            int medcol=columns.value(boxH->get_medianColumn(), -1);
+                            int meancol=columns.value(boxH->get_meanColumn(), -1);
+                            int q75col=columns.value(boxH->get_percentile75Column(), -1);
+                            int maxcol=columns.value(boxH->get_maxColumn(), -1);
+                            QFRDRColumnGraphsInterface::Orientation orient=QFRDRColumnGraphsInterface::cgoHorizontal;
+                            double width=boxH->get_boxWidth();
+
+                            cols->colgraphAddBoxPlot(plotid, orient, pcol, mincol, q25col, medcol, meancol, q75col, maxcol, name);
+
+                            if (color!=QColor("red")) {
+                                cols->colgraphSetGraphColor(plotid, cols->colgraphGetGraphCount(plotid)-1, color);
+                            }
+                            if (fillColor!=QColor("red").lighter()) {
+                                cols->colgraphSetGraphFillColor(plotid, cols->colgraphGetGraphCount(plotid)-1, fillColor);
+                            }
+                            if (errorColor!=QColor("red").darker()) {
+                                cols->colgraphSetGraphErrorColor(plotid, cols->colgraphGetGraphCount(plotid)-1, errorColor);
+                            }
+                            fillstyle=qfffg->get_fillStyle();
+                            cols->colgraphSetGraphFillStyle(plotid, cols->colgraphGetGraphCount(plotid)-1, fillstyle);
+                            cols->colgraphSetGraphWidth(plotid, cols->colgraphGetGraphCount(plotid)-1, width);
+                        } else if(boxV) {
+                            QColor color=QColor("red");
+                            QColor fillColor=color.lighter();
+                            QColor errorColor=color.darker();
+                            type=QFRDRColumnGraphsInterface::cgtBoxPlot;
+                            color=boxV->get_color();
+                            fillColor=boxV->get_fillColor();
+
+                            int pcol=columns.value(boxV->get_posColumn(), -1);
+                            int mincol=columns.value(boxV->get_minColumn(), -1);
+                            int q25col=columns.value(boxV->get_percentile25Column(), -1);
+                            int medcol=columns.value(boxV->get_medianColumn(), -1);
+                            int meancol=columns.value(boxV->get_meanColumn(), -1);
+                            int q75col=columns.value(boxV->get_percentile75Column(), -1);
+                            int maxcol=columns.value(boxV->get_maxColumn(), -1);
+                            QFRDRColumnGraphsInterface::Orientation orient=QFRDRColumnGraphsInterface::cgoHorizontal;
+                            double width=boxV->get_boxWidth();
+
+                            cols->colgraphAddBoxPlot(plotid, orient, pcol, mincol, q25col, medcol, meancol, q75col, maxcol, name);
+
+                            if (color!=QColor("red")) {
+                                cols->colgraphSetGraphColor(plotid, cols->colgraphGetGraphCount(plotid)-1, color);
+                            }
+                            if (fillColor!=QColor("red").lighter()) {
+                                cols->colgraphSetGraphFillColor(plotid, cols->colgraphGetGraphCount(plotid)-1, fillColor);
+                            }
+                            if (errorColor!=QColor("red").darker()) {
+                                cols->colgraphSetGraphErrorColor(plotid, cols->colgraphGetGraphCount(plotid)-1, errorColor);
+                            }
+                            fillstyle=qfffg->get_fillStyle();
+                            cols->colgraphSetGraphFillStyle(plotid, cols->colgraphGetGraphCount(plotid)-1, fillstyle);
+                            cols->colgraphSetGraphWidth(plotid, cols->colgraphGetGraphCount(plotid)-1, width);
                         } else if(qfmpg) {
                             QColor color=QColor("red");
                             QColor fillColor=color.lighter();
@@ -341,6 +421,7 @@ void QFPlotterPrivate::copyToTable()
                         }
                     }
                 }
+                cols->colgraphSetDoEmitSignals(emitSigG);
             } else {
                 QMessageBox::critical(plotter, tr("Add graphs to table"), tr("Could not add plots, as this is not supported by the selected table record!"));
                 ok=false;
