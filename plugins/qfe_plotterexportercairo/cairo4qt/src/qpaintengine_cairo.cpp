@@ -29,17 +29,17 @@
 #include "qt_x11_p.h"
 #include <QtGui/qx11info_x11.h>
 #include <X11/Xutil.h>
-#include <cairo-xlib.h>
+#include <cairo/cairo-xlib.h>
 
 extern Drawable qt_x11Handle(const QPaintDevice *pd); // in qpaintdevice_x11.cpp
 extern const QX11Info *qt_x11Info(const QPaintDevice *pd);
 
 #endif
 
-#include <cairo.h>
-#include <cairo-pdf.h>
-#include <cairo-ps.h>
-#include <cairo-svg.h>
+#include <cairo/cairo.h>
+#include <cairo/cairo-pdf.h>
+#include <cairo/cairo-ps.h>
+#include <cairo/cairo-svg.h>
 
 #include "brushpattern.cpp"
 
