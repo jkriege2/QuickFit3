@@ -1,0 +1,29 @@
+cairo4qt, just like the name, implements a cairo based paint engine for Qt4's Arthur paint system.
+
+
+Requirement:
+Qt >= 4.2.0 (tested with 4.2.3)
+cairo >= 1.4.0
+
+
+Current Status:
+1) support most cairo based paintengine features except ConicalGradientFill
+2) not implement cairo based text draw functions, text display is slower
+3) only support cairo's xlib/xlib-render backend, so just QWidget/QPixmap can use cairo4qt on linux system
+
+
+Install:
+1) add to Qt lib
+   patch patch/qt-x11-opensource-src-4.2.3.patch to Qt 4.2.3 source, then rebuild Qt lib.
+   
+2) add to your app project
+   add source file in src/ directory to project, modify QWidget based classes which you want to use cairo4qt
+just like example/widget.h and example/widget.cpp
+
+
+How to run:
+   Normally, apps use Qt4's X11 paintengine. In order to use cairo4qt, run export QT_USE_CAIRO=1, then run qt apps.
+
+Note:
+   if cairo4qt is installed like 2), and want to compare the performance of cairo4qt with Qt4's X11 paintengine,
+you shoud first run export QT_ONSCREEN_PAINT=1, to disable double buffer.
