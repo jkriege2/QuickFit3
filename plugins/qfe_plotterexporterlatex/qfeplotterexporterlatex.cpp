@@ -44,7 +44,7 @@ void QFEPlotterExporterLatex::initExtension() {
     JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, true, QTeXPaintDevice::Pgf));
     JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, false, QTeXPaintDevice::Pgf));
 #ifdef HAS_EMF_ENGINE
-    //JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPEMFEngineAdapter());
+    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPEMFEngineAdapter());
 #endif
 }
 
