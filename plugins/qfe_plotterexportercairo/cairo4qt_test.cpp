@@ -3,10 +3,11 @@
 #include "cairo4qt/src/qcairopaintdevice.h"
 #include <QPainter>
 #include <QImage>
+#include <QDebug>
 
 void paint(QPaintDevice* pd) {
-    QPainter p;
-    p.begin(pd);
+    QPainter p(pd);
+    //p.begin(pd);
     p.drawLine(QPointF(0,0),QPointF(100.0,100.0));
     p.setPen(Qt::red);
     p.drawLine(QPointF(0,0),QPointF(50.0,25.0));
@@ -28,10 +29,12 @@ void paint(QPaintDevice* pd) {
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
-
+    qDebug()<<"create PDF:";
     {
         QCairoPaintDevice * cairoPDF=new QCairoPaintDevice(QSize(200,100), "test.pdf", QCairoPaintDevice::cftPDF);
+        qDebug()<<"  paint PDF";
         paint(cairoPDF);
+        qDebug()<<"  delete PDF";
         delete cairoPDF;
     }
 

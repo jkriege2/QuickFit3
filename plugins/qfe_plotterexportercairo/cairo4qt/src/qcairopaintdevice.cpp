@@ -1,10 +1,11 @@
 #include "qcairopaintdevice.h"
 #include "qpaintengine_cairo_p.h"
-
+#include <QDebug>
 
 QCairoPaintDevice::QCairoPaintDevice(const QSizeF &size, const QString &fileName, CairoFileType filetype):
     QPaintDevice()
 {
+    qDebug()<<"QCairoPaintDevice::QCairoPaintDevice"<<engine;
     m_fileName=fileName;
     m_size=size;
     m_filetype=filetype;
@@ -13,7 +14,7 @@ QCairoPaintDevice::QCairoPaintDevice(const QSizeF &size, const QString &fileName
 
 QCairoPaintDevice::~QCairoPaintDevice()
 {
-    delete engine;
+    //delete engine;
 }
 
 QPaintEngine *QCairoPaintDevice::paintEngine() const

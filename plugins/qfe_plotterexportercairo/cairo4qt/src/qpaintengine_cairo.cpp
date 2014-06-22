@@ -127,29 +127,37 @@ static cairo_surface_t* qtPaintDeviceToCairoSurface(const QPaintDevice &pd)
       QCairoPaintDevice::CairoFileType ft=cpd->getFileType();
       QSizeF s=cpd->getFileSizeMM();
       if (ft==QCairoPaintDevice::cftPDF14) {
+          qDebug()<<  "Cairo-PDF1.4";
           surface = cairo_pdf_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
           cairo_pdf_surface_restrict_to_version(surface, CAIRO_PDF_VERSION_1_4);
       } else if (ft==QCairoPaintDevice::cftPDF15) {
+          qDebug()<<  "Cairo-PDF1.5";
           surface = cairo_pdf_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
           cairo_pdf_surface_restrict_to_version(surface, CAIRO_PDF_VERSION_1_5);
       } else if (ft==QCairoPaintDevice::cftPS2) {
+          qDebug()<<  "Cairo-PS2";
           surface = cairo_ps_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
           cairo_ps_surface_restrict_to_level(surface, CAIRO_PS_LEVEL_2);
       } else if (ft==QCairoPaintDevice::cftPS3) {
+          qDebug()<<  "Cairo-PS3";
           surface = cairo_ps_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
           cairo_ps_surface_restrict_to_level(surface, CAIRO_PS_LEVEL_2);
       } else if (ft==QCairoPaintDevice::cftEPS2) {
+          qDebug()<<  "Cairo-EPS2";
           surface = cairo_ps_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
           cairo_ps_surface_restrict_to_level(surface, CAIRO_PS_LEVEL_2);
           cairo_ps_surface_set_eps(surface, 1);
       } else if (ft==QCairoPaintDevice::cftEPS3) {
+          qDebug()<<  "Cairo-EPS3";
           surface = cairo_ps_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
           cairo_ps_surface_restrict_to_level(surface, CAIRO_PS_LEVEL_2);
           cairo_ps_surface_set_eps(surface, 1);
       } else if (ft==QCairoPaintDevice::cftSVG11) {
+          qDebug()<<  "Cairo-SVG11";
           surface = cairo_svg_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
           cairo_svg_surface_restrict_to_version(surface, CAIRO_SVG_VERSION_1_1);
       } else if (ft==QCairoPaintDevice::cftSVG12) {
+          qDebug()<<  "Cairo-SVG12";
           surface = cairo_svg_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
           cairo_svg_surface_restrict_to_version(surface, CAIRO_SVG_VERSION_1_2);
       }
@@ -226,6 +234,7 @@ static cairo_surface_t* qtPaintDeviceToCairoSurface(const QPaintDevice &pd)
 
 static void releasePattern(cairo_pattern_t *pat)
 {
+    qDebug()<<"releasePattern";
   if (!pat)
     return;
 
@@ -265,15 +274,18 @@ static QPaintEngine::PaintEngineFeatures cairo_features()
 QCairoPaintEngine::QCairoPaintEngine()
   :QPaintEngine(*(new QCairoPaintEnginePrivate), cairo_features())
 {
+    qDebug()<<"QCairoPaintEngine::QCairoPaintEngine()";
 }
 
 QCairoPaintEngine::QCairoPaintEngine(QCairoPaintEnginePrivate &dptr)
   :QPaintEngine(dptr, cairo_features())
 {
+    qDebug()<<"QCairoPaintEngine::QCairoPaintEngine(dptr)";
 }
 
 QCairoPaintEngine::~QCairoPaintEngine()
 {
+    qDebug()<<"QCairoPaintEngine::~QCairoPaintEngine()";
 }
 
 QPaintEngine::Type QCairoPaintEngine::type() const
@@ -283,6 +295,7 @@ QPaintEngine::Type QCairoPaintEngine::type() const
 
 bool QCairoPaintEngine::begin(QPaintDevice *pdev)
 {
+   qDebug()<<"QCairoPaintEngine::begin";
   Q_D(QCairoPaintEngine);
 
   cairo_surface_t *surface = qtPaintDeviceToCairoSurface(*pdev);
@@ -305,18 +318,24 @@ bool QCairoPaintEngine::begin(QPaintDevice *pdev)
     return false;
   }
 
+  qDebug()<<"QCairoPaintEngine::begin: OK";
+
   return true;
 }
 
 bool QCairoPaintEngine::end()
 {
+    qDebug()<<"QCairoPaintEngine::end";
   Q_D(QCairoPaintEngine);
   d->end();
+  qDebug()<<"QCairoPaintEngine::end: OK";
+
   return true;
 }
 
 void QCairoPaintEngine::drawPoints(const QPointF *points, int pointCount)
 {
+    qDebug()<<"QCairoPaintEngine::drawPoints";
   Q_D(QCairoPaintEngine);
 
   QPainterPath path;
@@ -337,6 +356,7 @@ void QCairoPaintEngine::drawPoints(const QPointF *points, int pointCount)
 
 void QCairoPaintEngine::drawPolygon(const QPointF *points, int pointCount, PolygonDrawMode mode)
 {
+    qDebug()<<"QCairoPaintEngine::drawPolygon";
   Q_D(QCairoPaintEngine);
 
   QPolygonF pol;
@@ -355,51 +375,60 @@ void QCairoPaintEngine::drawPolygon(const QPointF *points, int pointCount, Polyg
 
 void QCairoPaintEngine::drawPath(const QPainterPath &path)
 {
+    qDebug()<<"QCairoPaintEngine::drawPath";
   Q_D(QCairoPaintEngine);
   d->drawPath(path, true);
 }
 
 void QCairoPaintEngine::drawTextItem(const QPointF &p, const QTextItem &textItem)
 {
+    qDebug()<<"QCairoPaintEngine::drawTextItem";
   QPaintEngine::drawTextItem(p, textItem);
 }
 
 void QCairoPaintEngine::drawPixmap(const QRectF &r, const QPixmap &pm, const QRectF &sr)
 {
+    qDebug()<<"QCairoPaintEngine::drawPixmap";
   Q_D(QCairoPaintEngine);
   d->drawPicture(pm, r, sr);
 }
 
 void QCairoPaintEngine::drawTiledPixmap(const QRectF &r, const QPixmap &pm, const QPointF &s)
 {
+    qDebug()<<"QCairoPaintEngine::drawTiledPixmap";
   Q_D(QCairoPaintEngine);
   d->drawPicture(pm, r, QRectF(s, QSizeF()));
 }
 
 void QCairoPaintEngine::drawImage(const QRectF &r, const QImage &img, const QRectF &sr, Qt::ImageConversionFlags)
 {
+    qDebug()<<"QCairoPaintEngine::drawImage";
   Q_D(QCairoPaintEngine);
   d->drawPicture(adjustImage(img), r, sr);
 }
 
 void QCairoPaintEngine::updateState(const QPaintEngineState &state)
 {
+    qDebug()<<"QCairoPaintEngine::updateState";
   Q_D(QCairoPaintEngine);
   d->dirtyFlags |= state.state();
 }
 
 QCairoPaintEnginePrivate::QCairoPaintEnginePrivate()
 {
+    qDebug()<<"QCairoPaintEnginePrivate::QCairoPaintEnginePrivate()";
   init();
 }
 
 QCairoPaintEnginePrivate::~QCairoPaintEnginePrivate()
 {
+    qDebug()<<"QCairoPaintEnginePrivate::~QCairoPaintEnginePrivate()";
   end();
 }
 
 void QCairoPaintEnginePrivate::init()
 {
+    qDebug()<<"QCairoPaintEnginePrivate::init";
   cr = NULL;
   penPattern = penMask = NULL;
   brushPattern = brushMask = NULL;
@@ -409,6 +438,7 @@ void QCairoPaintEnginePrivate::init()
 
 void QCairoPaintEnginePrivate::end()
 {
+    qDebug()<<"QCairoPaintEnginePrivate::end";
   releasePattern(penPattern);
   releasePattern(penMask);
   releasePattern(brushPattern);
@@ -427,6 +457,7 @@ void QCairoPaintEnginePrivate::end()
 
 void QCairoPaintEnginePrivate::updateComposition()
 {
+    qDebug()<<"QCairoPaintEnginePrivate::updateComposition()";
   if (!(dirtyFlags & QPaintEngine::DirtyCompositionMode))
     return;
 
@@ -457,6 +488,7 @@ void QCairoPaintEnginePrivate::updateComposition()
 
 void QCairoPaintEnginePrivate::updateMatrix()
 {
+    qDebug()<<" QCairoPaintEnginePrivate::updateMatrix()";
   if (!(dirtyFlags & QPaintEngine::DirtyTransform))
     return;
 
@@ -476,6 +508,7 @@ void QCairoPaintEnginePrivate::updateMatrix()
 
 void QCairoPaintEnginePrivate::updateClip()
 {
+    qDebug()<<"QCairoPaintEnginePrivate::updateClip()";
   if (!(dirtyFlags & (QPaintEngine::DirtyClipEnabled | QPaintEngine::DirtyClipPath | QPaintEngine::DirtyClipRegion)))
     return;
 
@@ -514,7 +547,9 @@ void QCairoPaintEnginePrivate::updateClip()
 
 void QCairoPaintEnginePrivate::updatePen()
 {
-  if (!(dirtyFlags & QPaintEngine::DirtyPen))
+    qDebug()<<"updatePen()";
+
+    if (!(dirtyFlags & QPaintEngine::DirtyPen))
     return;
 
   dirtyFlags &= ~QPaintEngine::DirtyPen;
@@ -574,6 +609,7 @@ void QCairoPaintEnginePrivate::updatePen()
 
 void QCairoPaintEnginePrivate::updatePenWidth()
 {
+    qDebug()<<"updatePenWidth()";
   if (!(dirtyFlags & DirtyPenWidth))
     return;
 
@@ -602,7 +638,9 @@ void QCairoPaintEnginePrivate::updatePenWidth()
 
 void QCairoPaintEnginePrivate::updateBrush()
 {
-  if (!(dirtyFlags & QPaintEngine::DirtyBrush))
+    qDebug()<<"updateBrush()";
+
+    if (!(dirtyFlags & QPaintEngine::DirtyBrush))
     return;
 
   dirtyFlags &= ~QPaintEngine::DirtyBrush;
@@ -614,6 +652,7 @@ void QCairoPaintEnginePrivate::updateBrush()
 
 void QCairoPaintEnginePrivate::updateBrushInternal(const QBrush &brush, bool pen)
 {
+    qDebug()<<"updateBrushInternal()";
   cairo_pattern_t *pat, *mask;
   pat = mask = NULL;
 
@@ -718,6 +757,7 @@ void QCairoPaintEnginePrivate::updateBrushInternal(const QBrush &brush, bool pen
 
 void QCairoPaintEnginePrivate::updateBrushOrigin()
 {
+    qDebug()<<"updateBrushOrigin()";
   if (!(dirtyFlags & QPaintEngine::DirtyBrushOrigin))
     return;
 
@@ -738,6 +778,7 @@ void QCairoPaintEnginePrivate::updateBrushOrigin()
 
 void QCairoPaintEnginePrivate::updatePath(const QPainterPath &path)
 {
+    qDebug()<<"updatePath()";
   cairo_new_path(cr);
 
   int start = -1, elmCount = path.elementCount();
@@ -782,6 +823,7 @@ void QCairoPaintEnginePrivate::updatePath(const QPainterPath &path)
 
 void QCairoPaintEnginePrivate::drawPath(const QPainterPath &path, bool fill)
 {
+    qDebug()<<"drawPath()";
   Q_Q(QCairoPaintEngine);
 
   bool antialias = q->painter()->renderHints() & QPainter::Antialiasing;
@@ -790,6 +832,7 @@ void QCairoPaintEnginePrivate::drawPath(const QPainterPath &path, bool fill)
 
 void QCairoPaintEnginePrivate::drawPicture(const QPaintDevice &pd, const QRectF &r, const QRectF &sr)
 {
+    qDebug()<<"drawPicture()";
   cairo_pattern_t *pat = cairo_pattern_create_for_surface(qtPaintDeviceToCairoSurface(pd));
   if (!pat)
     return;
@@ -851,6 +894,7 @@ void QCairoPaintEnginePrivate::drawPicture(const QPaintDevice &pd, const QRectF 
 
 void QCairoPaintEnginePrivate::drawInternal(const DrawItem &item, bool adjustMatrix)
 {
+    qDebug()<<"drawInternal()";
   updateMatrix();
   updateClip();
   updateComposition();
@@ -951,6 +995,7 @@ void QCairoPaintEnginePrivate::drawInternal(const DrawItem &item, bool adjustMat
 
 void QCairoPaintEnginePrivate::drawPathInternal(const PathDrawItem &item)
 {
+    qDebug()<<"drawPathInternal()";
   updatePath(item.path);
 
   if (item.fill && brushPattern)

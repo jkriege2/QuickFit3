@@ -5,8 +5,8 @@ include(../../extlibs/cairo.pri)
 QT       += core gui
 
 TARGET = cairo4qt_test
-CONFIG   += console
-CONFIG   -= app_bundle
+#CONFIG   += console
+#CONFIG   -= app_bundle
 
 TEMPLATE = app
 
