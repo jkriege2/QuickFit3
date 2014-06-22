@@ -1,7 +1,7 @@
 //
-// $Revision$
+// $Revision: 3261 $
 // $Author: hoerld $ 
-// $Date$
+// $Date: 2014-06-20 17:01:45 +0200 (Fr, 20 Jun 2014) $
 
 GCC_FAST_OBJC_DISPATCH = YES
 GCC_GENERATE_DEBUGGING_SYMBOLS = YES

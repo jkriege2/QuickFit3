@@ -1,9 +1,7 @@
 /*
-    Copyright (c) 2008-2014 Jan W. Krieger, German Cancer Research Center
+    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
 
     last modification: $LastChangedDate$  (revision $Rev$)
-
-    This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
     This software is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,6 +16,9 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
+
+
 
 #ifndef QFRDRCOUNTRATESINTERFACE_H
 #define QFRDRCOUNTRATESINTERFACE_H

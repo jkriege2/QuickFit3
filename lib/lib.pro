@@ -1,5 +1,5 @@
 
-#    Copyright (c) 2008-2014 Jan W. Krieger, German Cancer Research Center
+#    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
 #
 #	last modification: $LastChangedDate$  (revision $Rev$)
 #
