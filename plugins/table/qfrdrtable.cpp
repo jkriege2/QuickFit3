@@ -719,6 +719,81 @@ void QFRDRTable::colgraphAddErrorGraph(int plotid, int columnX, int columnXError
 
 }
 
+void QFRDRTable::colgraphSetErrorGraphProperties(int plotid, int graphid, int columnXError, int columnYError, QFRDRColumnGraphsInterface::ErrorGraphTypes errorStyle)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].xerrorcolumn=columnXError;
+            plt.graphs[graphid].yerrorcolumn=columnYError;
+            plt.graphs[graphid].errorStyle=(JKQTPerrorPlotstyle)errorStyle;
+        }
+        setPlot(plotid, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetErrorGraphErrorColumnX(int plotid, int graphid, int columnXError)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].xerrorcolumn=columnXError;
+        }
+        setPlot(plotid, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetErrorGraphErrorColumnY(int plotid, int graphid, int columnYError)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].yerrorcolumn=columnYError;
+        }
+        setPlot(plotid, plt);
+        emitRebuildPlotWidgets();
+    }}
+
+void QFRDRTable::colgraphSetErrorGraphStyle(int plotid, int graphid, QFRDRColumnGraphsInterface::ErrorGraphTypes errorStyle)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].errorStyle=(JKQTPerrorPlotstyle)errorStyle;
+        }
+        setPlot(plotid, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetErrorGraphErrorColumnXAsymmetric(int plotid, int graphid, bool xErrorAsyymetric, int columnXErrorAsymmetric)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].xerrorcolumnlower=columnXErrorAsymmetric;
+            plt.graphs[graphid].xerrorsymmetric=!xErrorAsyymetric;
+        }
+        setPlot(plotid, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetErrorGraphErrorColumnYAsymmetric(int plotid, int graphid, bool yErrorAsyymetric, int columnYErrorAsymmetric)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].yerrorcolumnlower=columnYErrorAsymmetric;
+            plt.graphs[graphid].yerrorsymmetric=!yErrorAsyymetric;
+        }
+        setPlot(plotid, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
 void QFRDRTable::colgraphAddImageGraph(int plotid, int imageColumn, QFRDRColumnGraphsInterface::ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString &title)
 {
     if (plotid>=0 && plotid<plots.size()) {
@@ -908,6 +983,18 @@ void QFRDRTable::colgraphRemoveGraph(int plotid, int graphid)
     if (plotid>=0 && plotid<plots.size()) {
         QFRDRTable::PlotInfo plt=getPlot(plotid);
         plt.graphs.removeAt(graphid);
+        setPlot(plotid, plt);
+        emitRebuildPlotWidgets();
+    }
+}
+
+void QFRDRTable::colgraphSetGraphWhiskerLineStyle(int plotid, int graphid, Qt::PenStyle style)
+{
+    if (plotid>=0 && plotid<plots.size()) {
+        QFRDRTable::PlotInfo plt=getPlot(plotid);
+        if (graphid>=0 && graphid<plt.graphs.size()) {
+            plt.graphs[graphid].whiskerStyle=style;
+        }
         setPlot(plotid, plt);
         emitRebuildPlotWidgets();
     }

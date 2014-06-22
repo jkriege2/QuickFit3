@@ -24,6 +24,8 @@
 #include <QObject>
 #include <QAction>
 class QFPlotter; // forward
+class QFRDRColumnGraphsInterface;
+class JKQTPgraph;
 
 class QFPlotterPrivate : public QObject
 {
@@ -42,7 +44,9 @@ class QFPlotterPrivate : public QObject
         QAction* actCopyToTable;
         QAction* actHelp;
         QFPlotter* plotter;
-        
+    private:
+        void setErrorProps(int plotid, int graphid, QFRDRColumnGraphsInterface *cols, JKQTPgraph *g, QColor color, QMap<int, int> &columns);
+
 };
 
 #endif // QFPLOTTERPRIVATE_H

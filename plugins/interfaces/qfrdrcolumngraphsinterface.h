@@ -1,3 +1,24 @@
+/*
+    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
+
+    last modification: $LastChangedDate$  (revision $Rev$)
+
+    This software is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+
 #ifndef QFRDRCOLUMNGRAPHINTERFACE_H
 #define QFRDRCOLUMNGRAPHINTERFACE_H
 
@@ -39,13 +60,19 @@ class QFRDRColumnGraphsInterface {
             cgoVertical
         };
 
+
         enum ErrorGraphTypes {
             egtNone=0,
             egtBars=4,
             egtLines=5,
             egtPolygons=3,
             egtLinesBars=2,
-            egtPolygonsBars=1
+            egtPolygonsBars=1,
+            egtSimpleBars=6,
+            egtSimpleBarsLines=7,
+            egtSimpleBarsPolygons=8,
+            egtBoxes=9,
+            egtEllipses=10
 
         };
         enum ImageModifierMode {
@@ -122,6 +149,20 @@ class QFRDRColumnGraphsInterface {
         virtual void colgraphAddBoxPlot(int plot, Orientation orientation, int columnX, int columnMin, int columnQ25, int columnMedian, int columnMean, int columnQ75, int columnMax, const QString&  title)=0;
         /** \brief add a plot of  columnX against columnY to the given plot */
         virtual void colgraphAddErrorGraph(int plot, int columnX, int columnXError, int columnY, int columnYError, ColumnGraphTypes type, const QString&  title, ErrorGraphTypes errorStyle=egtBars)=0;
+        /** \brief set the errorbar properties of a graph */
+        virtual void colgraphSetErrorGraphProperties(int plot, int graph, int columnXError, int columnYError, ErrorGraphTypes errorStyle=egtBars)=0;
+        /** \brief set the x-error column of a graph */
+        virtual void colgraphSetErrorGraphErrorColumnX(int plot, int graphid, int columnXError)=0;
+        /** \brief set the y-error column of a graph */
+        virtual void colgraphSetErrorGraphErrorColumnY(int plot, int graphid, int columnYError)=0;
+
+        /** \brief set asymmetric x-error column of a graph */
+        virtual void colgraphSetErrorGraphErrorColumnXAsymmetric(int plot, int graphid, bool xErrorAsyymetric, int columnXErrorAsymmetric=-1)=0;
+        /** \brief set asymmetric y-error column of a graph */
+        virtual void colgraphSetErrorGraphErrorColumnYAsymmetric(int plot, int graphid, bool yErrorAsyymetric, int columnYErrorAsymmetric=-1)=0;
+
+        /** \brief set the errorbar type of a graph */
+        virtual void colgraphSetErrorGraphStyle(int plot, int graphid, ErrorGraphTypes errorStyle)=0;
         /** \brief add a new plot */
         virtual void colgraphAddPlot(const QString&  title, const QString& xLabel=QString("x"), const QString& yLabel=QString("y"), bool logX=false, bool logY=false)=0;
         /** \brief returns number of graphs in a plot */
@@ -139,6 +180,8 @@ class QFRDRColumnGraphsInterface {
 
         /** \brief set the line style of the graph */
         virtual void colgraphSetGraphLineStyle(int plot,  int graph,  Qt::PenStyle  style)=0;
+        /** \brief set the line style of whiskers in the graph */
+        virtual void colgraphSetGraphWhiskerLineStyle(int plot,  int graph,  Qt::PenStyle  style)=0;
         /** \brief set the line width of the graph */
         virtual void colgraphSetGraphLineWidth(int plot,  int graph,  double width)=0;
         /** \brief set the line style of the graph */

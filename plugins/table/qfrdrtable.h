@@ -441,6 +441,13 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual void colgraphSetFunctionGraph(int plotid, int graphid, const QString& expression, ColumnGraphTypes type, const QString&  title, int columnParam=-1);
         virtual void colgraphSetFunctionGraph(int plotid, int graphid, const QString& expression, ColumnGraphTypes type, const QString&  title, const QVector<double>& params);
         virtual void colgraphAddErrorGraph(int plotid, int columnX, int columnXError, int columnY, int columnYError, ColumnGraphTypes type, const QString&  title, ErrorGraphTypes errorStyle=egtBars);
+        virtual void colgraphSetErrorGraphProperties(int plot, int graphid, int columnXError, int columnYError, ErrorGraphTypes errorStyle=egtBars);
+        virtual void colgraphSetErrorGraphErrorColumnX(int plot, int graphid, int columnXError);
+        virtual void colgraphSetErrorGraphErrorColumnY(int plot, int graphid, int columnYError);
+        virtual void colgraphSetErrorGraphStyle(int plot, int graphid, ErrorGraphTypes errorStyle);
+        virtual void colgraphSetErrorGraphErrorColumnXAsymmetric(int plot, int graphid, bool xErrorAsyymetric, int columnXErrorAsymmetric=-1);
+        virtual void colgraphSetErrorGraphErrorColumnYAsymmetric(int plot, int graphid, bool yErrorAsyymetric, int columnYErrorAsymmetric=-1);
+
         virtual void colgraphAddImageGraph(int plotid, int imageColumn, ImageColorPalette palette, double x, double y, double width, double height, int Nx, const QString& title);
         virtual void colgraphAddImageMaskGraph(int plotid, int imageColumn, double x, double y, double width, double height, int Nx, const QString& title, QColor trueColor=QColor("black"), QColor falseColor=QColor("transparent"));
         virtual void colgraphAddRGBImageGrph(int plotid, int imageRColumn, int imageGColumn, int imageBColumn, double x, double y, double width, double height, int Nx, const QString& title);
@@ -456,6 +463,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual void colgraphRemovePlot(int plotid) ;
         virtual void colgraphRemoveGraph(int plotid, int graphid);
 
+        virtual void colgraphSetGraphWhiskerLineStyle(int plot,  int graph,  Qt::PenStyle  style);
         virtual void colgraphSetGraphLineStyle(int plotid,  int graphid,  Qt::PenStyle  style);
         virtual void colgraphSetGraphLineWidth(int plotid,  int graphid,  double width);
         virtual void colgraphSetGraphFillStyle(int plotid,  int graphid,  Qt::BrushStyle  style);

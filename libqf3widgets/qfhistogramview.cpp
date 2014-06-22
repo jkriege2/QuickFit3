@@ -587,6 +587,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 plteParamHistogramBoxplot->set_posColumn(pltcPHBarY);
                 //plteParamHistogramBoxplot->set_color(QColor("blue"));
                 plteParamHistogramBoxplot->set_title(tr("boxplot (%1)").arg(hist.name));
+                plteParamHistogramBoxplot->set_lineWidth(1);
                 pltParamHistogram->addGraph(plteParamHistogramBoxplot);
 
                 JKQTPbarHorizontalGraph* plteParamHistogram=new JKQTPbarHorizontalGraph(pltParamHistogram->get_plotter());
