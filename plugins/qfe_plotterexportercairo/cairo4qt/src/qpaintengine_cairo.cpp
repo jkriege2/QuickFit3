@@ -860,8 +860,8 @@ void QCairoPaintEnginePrivate::drawPicture(const QPaintDevice &pd, const QRectF 
   cairo_matrix_t cm;
   cairo_matrix_init_identity(&cm);
   cairo_matrix_translate(&cm, r.x(), r.y());
-  if (sr.isValid())
-    cairo_matrix_scale(&cm, r.width() / sr.width(), r.height() / sr.height());
+  if (sr.isValid()) cairo_matrix_scale(&cm, sr.width()/r.width(),sr.height()/ r.height());
+  qDebug()<<r.width() / sr.width()<< r.height() / sr.height();
   cairo_matrix_translate(&cm, -sr.x(), -sr.y());
   cairo_matrix_invert(&cm);
 

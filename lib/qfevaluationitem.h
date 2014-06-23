@@ -309,7 +309,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
 
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
-        virtual bool isApplicable(QFRawDataRecord* record) { return true; };
+        virtual bool isApplicable(const QFRawDataRecord* record) { return true; };
 
 
         /** \brief ID of the raw data record */
@@ -378,6 +378,8 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
 
         /** \brief points to the currently highlighted record */
         QPointer<QFRawDataRecord> highlightedRecord;
+
+        friend class QFMatchRDRFunctorSelectApplicable;
 
 };
 

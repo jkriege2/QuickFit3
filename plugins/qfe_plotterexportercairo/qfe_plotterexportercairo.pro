@@ -14,17 +14,13 @@ DESTDIR = $${QFOUTPUT}/plugins/
 
 # Input
 HEADERS += qfe_plotterexportercairo.h \
-    jkqtcairoengineadapter.h \ 
-    cairo4qt/src/qpaintengine_cairo_p.h \
-    cairo4qt/src/qpaintengine_p.h \
-    cairo4qt/src/qt_x11_p.h \
-    cairo4qt/src/qcairopaintdevice.h
-
+    jkqtcairoengineadapter.h \
+    qcairopaintdevice.h \
+    qcairopaintengine.h
 SOURCES += qfe_plotterexportercairo.cpp \
-    jkqtcairoengineadapter.cpp \ 
-    cairo4qt/src/brushpattern.cpp \
-    cairo4qt/src/qpaintengine_cairo.cpp \
-    cairo4qt/src/qcairopaintdevice.cpp
+    jkqtcairoengineadapter.cpp \
+    qcairopaintdevice.cpp \
+    qcairopaintengine.cpp
 
 
 
@@ -50,5 +46,4 @@ SRC_DISTRIBUTED.files = $$HEADERS \
                         $$FORMS \
                         $$RESOURCES \
                         $$TRANSLATIONS \
-                        $$GPL3LICENSE \
-                        cairo4qt-0.9.1.tar.gz
+                        $$GPL3LICENSE

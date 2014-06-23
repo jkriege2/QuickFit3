@@ -408,7 +408,7 @@ void QFFCCSFitEvaluationItem::intReadData(QDomElement *e)
 
 
 
-bool QFFCCSFitEvaluationItem::isApplicable(QFRawDataRecord *record)
+bool QFFCCSFitEvaluationItem::isApplicable(const QFRawDataRecord *record)
 {
     //return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
     return matchFunctor->matches(record);

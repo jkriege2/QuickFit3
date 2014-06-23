@@ -77,6 +77,9 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         /** Default destructor */
         virtual ~QFImFCSFitEvaluationEditor();
 
+        virtual bool getPlotData(QFRawDataRecord* rec, int index, QList<evalPlotData>& data, bool checkAvailable=false);
+
+
         /** \brief get the lower datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int,int) with a viable choice for \a defaultMin */
         virtual int getUserMin(QFRawDataRecord* rec, int index);
         /** \brief get the upper datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int,int) with a viable choice for \a defaultMax */
@@ -109,7 +112,6 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
 
         QFRDRImageToRunPreview* pltOverview;
 
-        QMenu* menuTools;
         QAction* actSetParameterFromFile;
 
 

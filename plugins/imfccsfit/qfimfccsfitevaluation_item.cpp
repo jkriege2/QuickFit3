@@ -414,7 +414,7 @@ void QFImFCCSFitEvaluationItem::intReadData(QDomElement *e)
 
 
 
-bool QFImFCCSFitEvaluationItem::isApplicable(QFRawDataRecord *record)
+bool QFImFCCSFitEvaluationItem::isApplicable(const QFRawDataRecord *record)
 {
     //return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
     return matchFunctor->matches(record);

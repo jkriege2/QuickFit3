@@ -48,7 +48,7 @@
 QFImFCSFitEvaluationEditor::QFImFCSFitEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent):
     QFFitResultsByIndexEvaluationEditorWithWidgets("imfcsfitevaleditor/", propEditor, services, parent, true, true, tr("pixel"))
 {
-    menuTools=propEditor->addMenu("Tools", 0);
+    //menuTools=propEditor->addMenu("Tools", 0);
     createWidgets();
     btnFirstRun->setText(tr("avg."));
 }
@@ -56,6 +56,27 @@ QFImFCSFitEvaluationEditor::QFImFCSFitEvaluationEditor(QFPluginServices *service
 QFImFCSFitEvaluationEditor::~QFImFCSFitEvaluationEditor()
 {
     //dtor
+}
+
+
+bool QFImFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::evalPlotData> &plots, bool checkAvailable)
+{
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(rec);
+    QFImFCSFitEvaluation* eval=qobject_cast<QFImFCSFitEvaluation*>(current);
+    if (!checkAvailable&&data&&eval) {
+        QFFitResultsByIndexEvaluationEditorWithWidgets::evalPlotData item;
+        item.x=arrayToVector(data->getCorrelationT(), data->getCorrelationN());
+        item.y=arrayToVector(data->getCorrelationRun(index), data->getCorrelationN());
+        bool ok=true;
+        double* w=eval->allocWeights(&ok, rec, index);
+        if (ok && w) {
+            item.yerrors=arrayToVector(w, data->getCorrelationN());
+        }
+        if (w) free(w);
+        item.name=rec->getName()+": "+data->getCorrelationRunName(index);
+        plots.append(item);
+    }
+    return true;
 }
 
 int QFImFCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int index) {

@@ -36,7 +36,7 @@ QFEvaluationEditor* QFSPIMLightsheetEvaluationItem::createEditor(QFPluginService
     return new QFSPIMLightsheetEvaluationEditor(services, propEditor, parent);
 }
 
-bool QFSPIMLightsheetEvaluationItem::isApplicable(QFRawDataRecord* record) {
+bool QFSPIMLightsheetEvaluationItem::isApplicable(const QFRawDataRecord *record) {
     /* CHECK WHETHER A GIVEN RECORD MAY BE USED TOGETHER WITH THE EVALUATION */
     return qobject_cast<QFRDRImageStackInterface*>(record);
 }
@@ -97,7 +97,7 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
         int hi=h;
         //qDebug()<<useMask<<dataM<<maskD;
         if (orientation==QFSPIMLightsheetEvaluationItem::fitColumns) {
-            // rotate image by 90°
+            // rotate image by 90ï¿½
             double* m=data->getImageStack(stack, stack_pos, channel);
             for (int x=0; x<w; x++) {
                 for (int y=0; y<h; y++) {

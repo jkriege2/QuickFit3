@@ -68,7 +68,7 @@ QFEvaluationEditor* QFImFCSFitEvaluation::createEditor(QFPluginServices* service
     return new QFImFCSFitEvaluationEditor(services, propEditor, parent);
 };
 
-bool QFImFCSFitEvaluation::isApplicable(QFRawDataRecord* record) {
+bool QFImFCSFitEvaluation::isApplicable(const QFRawDataRecord *record) {
     //return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
     return matchFunctor->matches(record);
 }

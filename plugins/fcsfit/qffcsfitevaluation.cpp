@@ -52,7 +52,7 @@ QFEvaluationEditor* QFFCSFitEvaluation::createEditor(QFPluginServices* services,
     return new QFFCSFitEvaluationEditor(services, propEditor, parent);
 };
 
-bool QFFCSFitEvaluation::isApplicable(QFRawDataRecord* record) {
+bool QFFCSFitEvaluation::isApplicable(const QFRawDataRecord *record) {
     return record->inherits("QFRDRFCSDataInterface");
 }
 

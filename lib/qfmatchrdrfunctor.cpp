@@ -78,3 +78,24 @@ void QFMatchRDRFunctorSelectType::setType(const QString &type)
 {
     this->type=type;
 }
+
+
+QFMatchRDRFunctorSelectApplicable::QFMatchRDRFunctorSelectApplicable(QFEvaluationItem *item)
+{
+    this->item=item;
+}
+
+bool QFMatchRDRFunctorSelectApplicable::matches(const QFRawDataRecord *record) const
+{
+    return item && item->isApplicable(record);
+}
+
+QFEvaluationItem *QFMatchRDRFunctorSelectApplicable::getItem() const
+{
+    return item;
+}
+
+void QFMatchRDRFunctorSelectApplicable::setItem(QFEvaluationItem *item)
+{
+    this->item=item;
+}

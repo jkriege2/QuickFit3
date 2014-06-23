@@ -614,6 +614,26 @@ int QFFCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord *rec, int index) {
     return 0;
 }
 
+bool QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::evalPlotData> &plots, bool checkAvailable)
+{
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(rec);
+    QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+    if (!checkAvailable&&data&&eval) {
+        QFFitResultsByIndexEvaluationEditorWithWidgets::evalPlotData item;
+        item.x=arrayToVector(data->getCorrelationT(), data->getCorrelationN());
+        item.y=arrayToVector(data->getCorrelationRun(index), data->getCorrelationN());
+        bool ok=true;
+        double* w=eval->allocWeights(&ok, rec, index);
+        if (ok && w) {
+            item.yerrors=arrayToVector(w, data->getCorrelationN());
+        }
+        if (w) free(w);
+        item.name=rec->getName()+": "+data->getCorrelationRunName(index);
+        plots.append(item);
+    }
+    return true;
+}
+
 
 void QFFCSFitEvaluationEditor::replotData() {
 

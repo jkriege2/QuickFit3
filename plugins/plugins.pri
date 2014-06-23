@@ -119,4 +119,3 @@ include(../libquickfit.pri)
 
 
 
-

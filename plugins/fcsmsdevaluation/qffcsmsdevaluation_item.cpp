@@ -49,7 +49,7 @@ QFEvaluationEditor* QFFCSMSDEvaluationItem::createEditor(QFPluginServices* servi
     return new QFFCSMSDEvaluationEditor(services, propEditor, parent);
 }
 
-bool QFFCSMSDEvaluationItem::isApplicable(QFRawDataRecord* record) {
+bool QFFCSMSDEvaluationItem::isApplicable(const QFRawDataRecord *record) {
     return record->inherits("QFRDRFCSDataInterface");
 }
 
@@ -896,7 +896,7 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
 
     /* IMPLEMENT THIS
 
-      Ergebnisse können einfach mit einer der setFitResult... Methoden gespeichert werden:
+      Ergebnisse kï¿½nnen einfach mit einer der setFitResult... Methoden gespeichert werden:
 
         //                                          PARAMETERNAME           WERT
         setFitResultValueBool(record, index, model, "evaluation_completed", true);
@@ -1136,14 +1136,14 @@ QString QFFCSMSDEvaluationItem::getParameterName(int model, int id, bool html) c
             if (id==0) return (html)?tr("particle number N"):tr("particle number");
             if (id==1) return (html)?tr("focus size w<sub>xy</sub> [nm]"):tr("focus size [nm]");
             if (id==2) return (html)?tr("triplet fraction &theta;<sub>T</sub>"):tr("triplet fraction");
-            if (id==3) return (html)?tr("triplet time &tau;<sub>T</sub> [µs]"):tr("triplet time [µs]");
+            if (id==3) return (html)?tr("triplet time &tau;<sub>T</sub> [ï¿½s]"):tr("triplet time [ï¿½s]");
             break;
         case 3: // simple 3D model, triplet corrected
             if (id==0) return (html)?tr("particle number N"):tr("particle number");
             if (id==1) return (html)?tr("focus size w<sub>xy</sub> [nm]"):tr("focus size [nm]");
             if (id==2) return (html)?tr("axial ratio &gamma;"):tr("axial ratio");
             if (id==3) return (html)?tr("triplet fraction &theta;<sub>T</sub>"):tr("triplet fraction");
-            if (id==4) return (html)?tr("triplet time &tau;<sub>T</sub> [µs]"):tr("triplet time [µs]");
+            if (id==4) return (html)?tr("triplet time &tau;<sub>T</sub> [ï¿½s]"):tr("triplet time [ï¿½s]");
             break;
         case 4: // SPIM-FCS 3D model
             if (id==0) return (html)?tr("particle number N"):tr("particle number");
@@ -1181,14 +1181,14 @@ QString QFFCSMSDEvaluationItem::getParameterUnit(int model, int id, bool html) c
             if (id==0) return QString("");
             if (id==1) return tr("nm");
             if (id==2) return QString("");
-            if (id==3) return tr("µs");
+            if (id==3) return tr("ï¿½s");
             break;
         case 3:
             if (id==0) return QString("");
             if (id==1) return tr("nm");
             if (id==2) return QString("");
             if (id==3) return QString("");
-            if (id==4) return tr("µs");
+            if (id==4) return tr("ï¿½s");
             break;
         case 4:
             if (id==0) return QString("");

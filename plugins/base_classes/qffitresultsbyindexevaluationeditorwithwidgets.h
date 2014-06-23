@@ -78,7 +78,21 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         Q_OBJECT
     public:
         explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0, bool hasMultiThreaded=false, bool multiThreadPriority=false, const QString& runName=QString("run"));
-        
+        struct evalPlotData {
+            QVector<double> x;
+            QVector<double> xerrors;
+            QVector<double> y;
+            QVector<double> yerrors;
+            QString name;
+        };
+        /** \brief returns a list of major plot data, that may be used for an overview plot
+         *
+         * \return \c true, if the feature is available and the data in data if (checkAvailable == \c true, no data is returned, this can be sued to check whether the feature is actually available.
+          */
+        virtual bool getPlotData(QFRawDataRecord* rec, int index, QList<evalPlotData>& data, bool checkAvailable=false);
+        virtual bool getPlotData(QList<evalPlotData>& data, bool checkAvailable=false);
+        virtual bool getPlotData(int index, QList<evalPlotData>& data, bool checkAvailable=false);
+        virtual bool getPlotData(QFRawDataRecord* rec, QList<evalPlotData>& data, bool checkAvailable=false);
     protected slots:
         /** \brief connect widgets to current data record */
         virtual void connectDefaultWidgets(QFEvaluationItem* current, QFEvaluationItem* old, bool updatePlots);
@@ -203,10 +217,12 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QAction* actFitAllThreaded;
         QAction* actFitAllRunsThreaded;
         QAction* actChi2Landscape;
+        QAction* actOverlayPlot;
 
         QMenu* menuFit;
         QMenu* menuParameters;
         QMenu* menuResults;
+        QMenu* menuTools;
 
 
 
@@ -343,6 +359,8 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         void plotChi2Landscape();
 
         void gotoFirstRun();
+
+        void createOverlayPlot();
 
 
     public slots:

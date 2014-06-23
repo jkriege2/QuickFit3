@@ -31,7 +31,8 @@ HEADERS +=  qfpevalfcsfit.h \
     ../base_classes/qffitresultsbyindexevaluationfittools.h \
     ../base_classes/qffcstools.h \
     ../base_classes/qffcsfitchi2landscapedialog.h \
-    ../base_classes/qffitresultsbyindexevaluationfittools.h
+    ../base_classes/qffitresultsbyindexevaluationfittools.h \
+    ../base_classes/qfoverlayplotdialog.h
 
 
 SOURCES +=  qfpevalfcsfit.cpp \
@@ -48,12 +49,14 @@ SOURCES +=  qfpevalfcsfit.cpp \
     ../base_classes/qffcsweightingtools.cpp \
     ../base_classes/qffcstools.cpp \
     ../base_classes/qffcsfitchi2landscapedialog.cpp \
-    ../base_classes/qffitresultsbyindexevaluationfittools.cpp
+    ../base_classes/qffitresultsbyindexevaluationfittools.cpp \
+    ../base_classes/qfoverlayplotdialog.cpp
 
 
 FORMS =    estimatefocalvolumedlg.ui \
     optionswidget.ui \
-    ../base_classes/qffcsfitchi2landscapedialog.ui
+    ../base_classes/qffcsfitchi2landscapedialog.ui \
+    ../base_classes/qfoverlayplotdialog.ui
 
 RESOURCES += qfevalfcsfit.qrc \
     ../base_classes/qffitresultsevaluationeditorbase.qrc

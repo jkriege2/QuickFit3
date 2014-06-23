@@ -197,7 +197,7 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
     correlationMaskTools->registerCorrelationToolsToMenu(menuMask);
 
     menuData=propertyEditor->addOrFindMenu(tr("&Data"), -1);
-    menuData->addAction(actCopyNormalizedACF);
+    //menuData->addAction(actCopyNormalizedACF);
 
 
 };
@@ -259,7 +259,10 @@ void QFRDRFCSCorrelationEditor::slidersChanged(int userMin, int userMax, int min
 
 void QFRDRFCSCorrelationEditor::copyNormalizedACFs()
 {
+
 }
+
+
 
 void QFRDRFCSCorrelationEditor::replotData(int dummy) {
     //std::cout<<"repainting ...";

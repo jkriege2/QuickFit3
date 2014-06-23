@@ -78,6 +78,7 @@
 class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWithWidgets {
         Q_OBJECT
     public:
+
         /** Default constructor */
         QFFCSFitEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget* parent=NULL);
         /** Default destructor */
@@ -95,6 +96,8 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWithW
 
         virtual int getUserRangeMax(QFRawDataRecord* rec, int index);
         virtual int getUserRangeMin(QFRawDataRecord* rec, int index);
+
+        virtual bool getPlotData(QFRawDataRecord* rec, int index, QList<evalPlotData>& data, bool checkAvailable=false);
 
     protected slots:
         /** \brief connect widgets to current data record */

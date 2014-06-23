@@ -25,6 +25,7 @@
 #include "lib_imexport.h"
 #include "qfrawdatarecord.h"
 #include "qfproject.h"
+#include "qfevaluationitem.h"
 #include <QList>
 #include <QPointer>
 
@@ -72,6 +73,21 @@ class QFLIB_EXPORT QFMatchRDRFunctorSelectType: public QFMatchRDRFunctor {
         void setType(const QString& type);
     protected:
         QString type;
+};
+/*! \brief QFMatchRDRFunctor that select all records to which a certain evaluation is applicable
+    \ingroup qf3lib_tools
+
+  */
+class QFLIB_EXPORT QFMatchRDRFunctorSelectApplicable: public QFMatchRDRFunctor {
+    public:
+        explicit QFMatchRDRFunctorSelectApplicable(QFEvaluationItem* item);
+        /** \brief reimplement this function to check whether a QFRawDataRecord* is contained in a QFSelectRDRDialog. the default implementation always returns \c true . */
+        virtual bool matches(const QFRawDataRecord* record) const ;
+
+        QFEvaluationItem* getItem() const;
+        void setItem(QFEvaluationItem* item);
+    protected:
+        QPointer<QFEvaluationItem> item;
 };
 
 #endif // QFMATCHRDRFUNCTOR_H

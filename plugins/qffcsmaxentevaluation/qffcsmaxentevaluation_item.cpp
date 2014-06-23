@@ -48,7 +48,7 @@ QFEvaluationEditor* QFFCSMaxEntEvaluationItem::createEditor(QFPluginServices* se
     return new QFFCSMaxEntEvaluationEditor(services, propEditor, parent);
 }
 
-bool QFFCSMaxEntEvaluationItem::isApplicable(QFRawDataRecord* record) {
+bool QFFCSMaxEntEvaluationItem::isApplicable(const QFRawDataRecord *record) {
     return record->inherits("QFRDRFCSDataInterface");
 }
 
@@ -542,7 +542,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
 
     /* IMPLEMENT THIS
 
-      Ergebnisse können einfach mit einer der setFitResult... Methoden gespeichert werden:
+      Ergebnisse kï¿½nnen einfach mit einer der setFitResult... Methoden gespeichert werden:
 
         //                                          PARAMETERNAME           WERT
         setFitResultValueBool(record, index, model, "evaluation_completed", true);
