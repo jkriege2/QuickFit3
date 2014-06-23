@@ -1271,6 +1271,7 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename, bool loadOve
     int64_t height=getExpectedFileHeight();
     int64_t width=getExpectedFileWidth();
     int64_t steps=getProperty("STEPS", 0).toInt();
+    double corroffset=getProperty("CORR_OFFSET", 0).toDouble();
 
     if (!propertyExists("IS_OVERVIEW_SCALED")) setQFProperty("IS_OVERVIEW_SCALED", false, false, true);
 
@@ -1289,7 +1290,7 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename, bool loadOve
         for(int i=0; i<width*height; i++) {
             for (int j=1; j<cfr->getTotalLagCount(); j++) {
                 tau[j-1]=cfr->getTau(i,j)*1e-6;
-                correlations[i*(cfr->getTotalLagCount()-1)+j-1]=cfr->getVal(i,j);
+                correlations[i*(cfr->getTotalLagCount()-1)+j-1]=cfr->getVal(i,j)-corroffset;
                 sigmas[i*(cfr->getTotalLagCount()-1)+j-1]=0;
             }
             bool allZero=true;

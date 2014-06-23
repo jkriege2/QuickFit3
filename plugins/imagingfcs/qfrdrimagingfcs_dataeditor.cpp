@@ -275,6 +275,13 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
     menuMask->addSeparator();
     correlationMaskTools->registerCorrelationToolsToMenu(menuMask);
 
+    actCorrectOffset=new QAction(tr("correct CFs for offset"), this);
+    connect(actCorrectOffset, SIGNAL(triggered()), this, SLOT(correctOffset()));
+    menuTools=propertyEditor->addOrFindMenu(tr("ImagingFCS Tools"), -1);
+    //menuData->addAction(actCopyNormalizedACF);
+    menuTools->addAction(actCorrectOffset);
+
+
 }
 
 void QFRDRImagingFCSDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
@@ -325,6 +332,21 @@ void QFRDRImagingFCSDataEditor::previewClicked(double x, double y, Qt::KeyboardM
         lstRunsSelect->selectionModel()->setCurrentIndex(runs.index(idx+1, 0), QItemSelectionModel::ClearAndSelect|QItemSelectionModel::Current);
     }
     replotOverview();
+}
+
+void QFRDRImagingFCSDataEditor::correctOffset()
+{
+    if (!current) return;
+    bool ok=false;
+    double offset=QInputDialog::getDouble(this, tr("imagingFCS Offset correction"), tr("enter the offset, which should be subtracted (NOTE: A reload of the project will be required!)"), current->getProperty("CORR_OFFSET", 0.0).toDouble(),-2147483647,2147483647,5, &ok);
+    if (ok)  {
+        current->setQFProperty("CORR_OFFSET", offset, true, true);
+        if (QMessageBox::information(this, tr("corect correlation offset"), tr("The project needs to be saved and reloaded for the offset correction to take effect!\nReload project now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+            QFPluginServices::getInstance()->reloadCurrentProject();
+        }
+
+    }
+
 }
 
 void QFRDRImagingFCSDataEditor::runsModeChanged(int c) {

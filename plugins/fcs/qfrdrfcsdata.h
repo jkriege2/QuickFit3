@@ -197,6 +197,8 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         virtual void getRateMinMax(int run, double& min, double& max, int channel=0) const ;
         /** \brief recalculate correlation curve mean and standard deviation */
         virtual void recalculateCorrelations();
+        /** \brief allows to perform an offset correction of the correlation curves, when loading the data */
+        virtual void correctCorrelations();
 
         /** \brief set the number of datapoints in every binned count rate run.
          *

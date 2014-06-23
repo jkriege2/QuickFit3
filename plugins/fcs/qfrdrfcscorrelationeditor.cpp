@@ -190,6 +190,8 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
 
     actCopyNormalizedACF=new QAction(tr("copy normalized CFs to table"), this);
     connect(actCopyNormalizedACF, SIGNAL(triggered()), this, SLOT(copyNormalizedACFs()));
+    actCorrectOffset=new QAction(tr("correct CFs for offset"), this);
+    connect(actCorrectOffset, SIGNAL(triggered()), this, SLOT(correctOffset()));
 
     menuMask=propertyEditor->addMenu("&Selection/Mask", 0);
     correlationMaskTools->registerMaskToolsToMenu(menuMask);
@@ -198,6 +200,7 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
 
     menuData=propertyEditor->addOrFindMenu(tr("&Data"), -1);
     //menuData->addAction(actCopyNormalizedACF);
+    menuData->addAction(actCorrectOffset);
 
 
 };
@@ -260,6 +263,20 @@ void QFRDRFCSCorrelationEditor::slidersChanged(int userMin, int userMax, int min
 void QFRDRFCSCorrelationEditor::copyNormalizedACFs()
 {
 
+}
+
+void QFRDRFCSCorrelationEditor::correctOffset()
+{
+    if (!current) return;
+    bool ok=false;
+    double offset=QInputDialog::getDouble(this, tr("FCS Offset correction"), tr("enter the offset, which should be subtracted (NOTE: A reload of the project will be required!)"), current->getProperty("CORR_OFFSET", 0.0).toDouble(),-2147483647,2147483647,5, &ok);
+    if (ok)  {
+        current->setQFProperty("CF_CORRECT_OFFSET", offset, true, true);
+        if (QMessageBox::information(this, tr("corect correlation offset"), tr("The project needs to be saved and reloaded for the offset correction to take effect!\nReload project now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+            QFPluginServices::getInstance()->reloadCurrentProject();
+        }
+
+    }
 }
 
 

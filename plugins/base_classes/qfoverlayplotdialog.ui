@@ -13,7 +13,47 @@
   <property name="windowTitle">
    <string>Overlay Plot</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="topMargin">
+      <number>5</number>
+     </property>
+     <item>
+      <widget class="QCheckBox" name="chkKey">
+       <property name="text">
+        <string>show key</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkErrors">
+       <property name="text">
+        <string>show errors</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
    <item>
     <widget class="QFPlotter" name="plot" native="true"/>
    </item>
@@ -108,9 +148,42 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>chkKey</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFOverlayPlotDialog</receiver>
+   <slot>updatePlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>17</x>
+     <y>23</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>1</x>
+     <y>38</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkErrors</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFOverlayPlotDialog</receiver>
+   <slot>updatePlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>96</x>
+     <y>23</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>48</x>
+     <y>36</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>showHelp()</slot>
   <slot>closeClicked()</slot>
+  <slot>updatePlot()</slot>
  </slots>
 </ui>

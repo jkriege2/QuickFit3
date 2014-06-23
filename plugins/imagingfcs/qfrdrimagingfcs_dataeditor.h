@@ -65,6 +65,7 @@ class QFRDRImagingFCSDataEditor : public QFRawDataEditor {
         void runsModeChanged(int c);
         void slidersChanged(int userMin, int userMax, int min, int max);
         void previewClicked(double x, double y, Qt::KeyboardModifiers modifiers);
+        void correctOffset();
     protected:
 
         /** \brief plotter widget for the correlation curve */
@@ -125,7 +126,10 @@ class QFRDRImagingFCSDataEditor : public QFRawDataEditor {
         int plteOverviewSelectedSize;
 
         QMenu* menuMask;
+        QMenu* menuTools;
         QFCorrelationMaskTools* correlationMaskTools;
+
+        QAction* actCorrectOffset;
 };
 
 #endif // QFRDRIMAGINGFCSEDITOR_H

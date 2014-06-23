@@ -67,6 +67,8 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
          **/
         void setBackgroundInFCS(const QVector<double>& backgrounds=QVector<double>(), const QVector<double>& background_sds=QVector<double>(), const QVector<bool>& background_set=QVector<bool>());
 
+        void correctOffset();
+
     protected slots:
         /** \brief insert FCS data from (multiple) file(s) into (multiple) RDRs*/
         void insertFCS();

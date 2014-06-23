@@ -95,3 +95,23 @@ void QFOverlayPlotDialog::closeClicked()
     accept();
     deleteLater();
 }
+
+void QFOverlayPlotDialog::updatePlot()
+{
+    startAddingPlots();
+    ui->plot->get_plotter()->set_showKey(ui->chkKey->isChecked());
+    for (size_t i=0; i<ui->plot->get_plotter()->getGraphCount(); i++) {
+        JKQTPgraph* g=ui->plot->get_plotter()->getGraph(i);
+        JKQTPxyGraphErrors* eg=dynamic_cast<JKQTPxyGraphErrors*>(g);
+        if (eg) {
+            if (ui->chkErrors->isChecked()) {
+                eg->set_yErrorStyle(JKQTPerrorSimpleBars);
+                eg->set_xErrorStyle(JKQTPerrorSimpleBars);
+            } else {
+                eg->set_yErrorStyle(JKQTPnoError);
+                eg->set_xErrorStyle(JKQTPnoError);
+            }
+        }
+    }
+    endAddingPlots();
+}

@@ -46,6 +46,15 @@ QFRDRImagingFCSPlugin::~QFRDRImagingFCSPlugin()
 void QFRDRImagingFCSPlugin::deinit() {
 }
 
+void QFRDRImagingFCSPlugin::init()
+{
+    QMenu* tmenu=services->getMenu("tools")->addMenu(QIcon(getIconFilename()), tr("imaging FCS tools"));
+    QAction* actOffset=new QAction(tr("subtract &offset of correlation functions"), parentWidget);
+    connect(actOffset, SIGNAL(triggered()), this, SLOT(correctOffset()));
+    tmenu->addAction(actOffset);
+
+}
+
 void QFRDRImagingFCSPlugin::imfcsCorrRemoteUserSelectFile()
 {
     correlateAndInsert();
@@ -179,6 +188,37 @@ void QFRDRImagingFCSPlugin::importCorrelationsFromSimulation()
         dlgCorrelate->openFile(dlgSimulate->getSimulationFilename());
         dlgSimulate->deleteLater();
         dlgSimulate=NULL;
+    }
+}
+
+void QFRDRImagingFCSPlugin::correctOffset()
+{
+
+    QFMatchRDRFunctorSelectType* sel=new QFMatchRDRFunctorSelectType("imaging_fcs");
+    QFSelectRDRDialog* dlg=new QFSelectRDRDialog(sel,true, parentWidget);
+    dlg->setWindowTitle(tr("correct offset in FCS records ..."));
+    dlg->setAllowMultiSelect(true);
+    dlg->setAllowCreateNew(false);
+    dlg->setOnlineHelp(services->getPluginHelpDirectory("imaging_fcs")+"/tutorial_offset.html");
+
+    QFDoubleEdit* edtOffset=new QFDoubleEdit(dlg);
+    edtOffset->setValue(0);
+    edtOffset->setCheckBounds(false, false);
+    dlg->addWidget(tr("offset:"), edtOffset);
+
+
+    if (dlg->exec()) {
+        QList<QPointer<QFRawDataRecord> > sel=dlg->getSelectedRDRs();
+        for (int i=0; i<sel.size(); i++) {
+            QFRDRImagingFCSData* fcs=qobject_cast<QFRDRImagingFCSData*>(sel[i]);
+            if (fcs) {
+                fcs->setQFProperty(QString("CORR_OFFSET"), edtOffset->value(), true, true);
+            }
+        }
+        if (QMessageBox::information(parentWidget, tr("corect correlation offset"), tr("The project needs to be saved and reloaded for the offset correction to take effect!\nReload project now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+            QFPluginServices::getInstance()->reloadCurrentProject();
+        }
+
     }
 }
 

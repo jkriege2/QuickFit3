@@ -38,6 +38,8 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase, 
         /** \copydoc QFPluginRawDataRecord::deinit() */
         virtual void deinit();
 
+        virtual void init();
+
         /** \brief short ID for the plugin */
         virtual QString getID() const  { return tr("imaging_fcs"); };
 
@@ -81,6 +83,8 @@ class QFRDRImagingFCSPlugin : public QObject, public QFPluginRawDataRecordBase, 
         void simulateForCorrelation();
 
         void importCorrelationsFromSimulation();
+
+        void correctOffset();
     protected:
         /*! \brief add correlations from a video_correlator file to the current project
 

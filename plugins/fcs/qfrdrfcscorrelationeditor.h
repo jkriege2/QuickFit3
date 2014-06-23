@@ -67,6 +67,7 @@ class QFRDRFCSCorrelationEditor : public QFRawDataEditor {
         void slidersChanged(int userMin, int userMax, int min, int max);
 
         void copyNormalizedACFs();
+        void correctOffset();
     protected:
         /** \brief create widgets on object creation */
         void createWidgets();
@@ -110,6 +111,7 @@ class QFRDRFCSCorrelationEditor : public QFRawDataEditor {
         QFCorrelationMaskTools* correlationMaskTools;
 
         QAction* actCopyNormalizedACF;
+        QAction* actCorrectOffset;
 
     private:
 };

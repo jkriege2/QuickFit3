@@ -309,6 +309,18 @@ void QFRDRFCSData::recalculateCorrelations() {
     emitRawDataChanged();
 }
 
+void QFRDRFCSData::correctCorrelations()
+{
+    bool ok=false;
+    double offset=getProperty("CF_CORRECT_OFFSET", 0.0).toDouble(&ok);
+    if (ok && !qFuzzyIsNull(offset) && correlation) {
+        for (int r=0; r<correlationN*correlationRuns; r++) {
+            correlation[r]=correlation[r]-offset;
+        }
+        recalculateCorrelations();
+    }
+}
+
 double QFRDRFCSData::calcRateMean(int run, int channel) const {
     if (rateN<=0 || !rate) {
        // std::cout<<"error at start of recalculateCorrelations()\n";
@@ -490,6 +502,7 @@ void QFRDRFCSData::intReadData(QDomElement* e) {
     } else {
         reloadFromFiles();
     }
+    correctCorrelations();
 
 
 
@@ -1640,11 +1653,12 @@ bool QFRDRFCSData::getRateChannelsSwapped() const
 
 void QFRDRFCSData::saveInternal(QXmlStreamWriter& w) const {
     w.writeStartElement("internal_correlations");
+    double offset=getProperty("CF_CORRECT_OFFSET", 0.0).toDouble();
     QString csv;
     for (int i=0; i<correlationN; i++) {
         csv=csv+CDoubleToQString(correlationT[i]);
         for (int j=0; j<correlationRuns; j++) {
-            csv=csv+", "+CDoubleToQString(correlation[j*correlationN+i]);
+            csv=csv+", "+CDoubleToQString(correlation[j*correlationN+i]+offset);
         }
         csv=csv+"\n";
     }

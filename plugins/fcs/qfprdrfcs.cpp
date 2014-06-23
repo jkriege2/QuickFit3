@@ -8,7 +8,7 @@
 #include "qftablemodel.h"
 #include "qenhancedtableview.h"
 #include "qftabledelegate.h"
-
+#include "qfdoubleedit.h"
 QFPRDRFCS::QFPRDRFCS(QObject* parent):
     QObject(parent)
 {
@@ -48,9 +48,12 @@ void QFPRDRFCS::registerToMenu(QMenu* menu) {
 void QFPRDRFCS::init()
 {
     QMenu* tmenu=services->getMenu("tools")->addMenu(QIcon(getIconFilename()), tr("FCS/DLS tools"));
-    QAction* actBackground=new QAction(tr("set background intensity in FCS/DLS datasets"), parentWidget);
+    QAction* actBackground=new QAction(tr("set &background intensity in FCS/DLS datasets"), parentWidget);
     connect(actBackground, SIGNAL(triggered()), this, SLOT(setBackgroundInFCS()));
     tmenu->addAction(actBackground);
+    QAction* actOffset=new QAction(tr("subtract &offset of correlation functions"), parentWidget);
+    connect(actOffset, SIGNAL(triggered()), this, SLOT(correctOffset()));
+    tmenu->addAction(actOffset);
 }
 
 void QFPRDRFCS::setBackgroundInFCS(const QVector<double> &backgrounds, const QVector<double> &background_sds, const QVector<bool> &background_set)
@@ -98,6 +101,36 @@ void QFPRDRFCS::setBackgroundInFCS(const QVector<double> &backgrounds, const QVe
         }
     }
 
+}
+
+void QFPRDRFCS::correctOffset()
+{
+    QFMatchRDRFunctorSelectType* sel=new QFMatchRDRFunctorSelectType("fcs");
+    QFSelectRDRDialog* dlg=new QFSelectRDRDialog(sel,true, parentWidget);
+    dlg->setWindowTitle(tr("correct offset in FCS records ..."));
+    dlg->setAllowMultiSelect(true);
+    dlg->setAllowCreateNew(false);
+    dlg->setOnlineHelp(services->getPluginHelpDirectory("fcs")+"/tutorial_offset.html");
+
+    QFDoubleEdit* edtOffset=new QFDoubleEdit(dlg);
+    edtOffset->setValue(0);
+    edtOffset->setCheckBounds(false, false);
+    dlg->addWidget(tr("offset:"), edtOffset);
+
+
+    if (dlg->exec()) {
+        QList<QPointer<QFRawDataRecord> > sel=dlg->getSelectedRDRs();
+        for (int i=0; i<sel.size(); i++) {
+            QFRDRFCSData* fcs=qobject_cast<QFRDRFCSData*>(sel[i]);
+            if (fcs) {
+                fcs->setQFProperty(QString("CF_CORRECT_OFFSET"), edtOffset->value(), true, true);
+            }
+        }
+        if (QMessageBox::information(parentWidget, tr("corect correlation offset"), tr("The project needs to be saved and reloaded for the offset correction to take effect!\nReload project now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+            QFPluginServices::getInstance()->reloadCurrentProject();
+        }
+
+    }
 }
 
 

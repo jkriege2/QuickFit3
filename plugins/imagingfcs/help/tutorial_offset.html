@@ -1,0 +1,44 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+  <title>$$local_plugin_name$$: Tutorial: Correct correlation offset</title>
+</head>
+<body>
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  <p>
+  There are two standard version of the FCS correlation funcition:
+  $$bmath:G(\tau)=\frac{\langle I(t)\cdot I(t+\tau)\rangle}{\langle I\rangle^2}$$
+  and
+  $$bmath:g(\tau)=\frac{\langle\delta I(t)\cdot\delta I(t+\tau)\rangle}{\langle I\rangle^2}\equiv G(\tau)-1$$
+  Here $$math:I(t)$$ is the absolute fluorescence intensity and $$math:\delta I(t)=I(t)-\langle I\rangle$$ are the fluorescence fluctuations around the average value $$math:\langle I\rangle$$ only.
+  As shown in the second expression, they only differ by an offset of 1. For large lag-times, they decay to $$\lim_{\tau\rightarrow\infty}g(\tau)=0$$ and $$\lim_{\tau\rightarrow\infty}G(\tau)=1$$.
+  Most FCS fit models in QuickFit can cope with this offset, by their parameter $$math:G_\infty$$, which can be set to 1 for $$math:G(\tau)$$ and 0 for $$math:g(\tau)$$.
+  </p>
+  <p>Still, in some cases one may want to correct for this offset before the data evaluation. There are two simple function, which can do that:  
+  <ol>
+      <li>In order to correct a single imagingFCS RDR, do the following:      
+      <ol>
+          <li>open the RDR editor of the imagingFCS record, by double-clicking it in the main window of QuickFit.</li>
+          <li>click on the menu entry <tt>ImagingFCS Tools|correct CFs for offset.</tt></li>
+          <li>A new dialog will pop up, where you can set the offset, you want to subtract (e.g. set it to 1 for $$math:G(\tau)$$-data):
+          <center><a name="tutorial_offset_pic000"><img src="./pic/tutorial_offset_pic000.png" border="1">
+          </center>
+          </li>
+          <li>Now you will have to reload the project (in QuickFit's main window, click on the menu entry <tt>File|Reload Project</tt> and save the project, when asked), for the offset correction to take effect.$$note:This correction is applied, when the data files are loaded. The input data files are NEVER touched.$$</li>
+      </ol></li>
+      <li>In order to correct a several imagingFCS RDRs, do the following:      
+      <ol>
+          <li>In QuickFit's main window, click on the menu entry <tt>Tools|imaging FCS tools</tt>.</li>
+          <li>A new dialog will pop up, where you can set the offset, you want to subtract (e.g. set it to 1 for $$math:G(\tau)$$-data) and select the imagingFCS RDRs, to which you want to apply the correction:
+          
+          <center><a name="tutorial_offset_pic001"><img src="./pic/tutorial_offset_pic001.png" border="1">
+          </center>
+          
+          </li>
+          <li>Now you will have to reload the project (in QuickFit's main window, click on the menu entry <tt>File|Reload Project</tt> and save the project, when asked), for the offset correction to take effect.$$note:This correction is applied, when the data files are loaded. The input data files are NEVER touched.$$</li>
+      </ol></li>
+  </ol></p>
+  
+</body></html>

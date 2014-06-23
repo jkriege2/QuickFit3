@@ -27,6 +27,7 @@ class QFOverlayPlotDialog : public QDialog
     protected slots:
         void showHelp();
         void closeClicked();
+        void updatePlot();
     private:
         Ui::QFOverlayPlotDialog *ui;
 };
