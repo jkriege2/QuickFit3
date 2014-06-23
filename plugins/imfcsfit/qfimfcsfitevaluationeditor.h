@@ -77,7 +77,8 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         /** Default destructor */
         virtual ~QFImFCSFitEvaluationEditor();
 
-        virtual bool getPlotData(QFRawDataRecord* rec, int index, QList<evalPlotData>& data, bool checkAvailable=false);
+        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<evalPlotData>& data, int option);
+        virtual bool getPlotDataSpecs(QStringList* optionNames=NULL);
 
 
         /** \brief get the lower datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int,int) with a viable choice for \a defaultMin */

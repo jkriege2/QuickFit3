@@ -614,13 +614,98 @@ int QFFCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord *rec, int index) {
     return 0;
 }
 
-bool QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::evalPlotData> &plots, bool checkAvailable)
+void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::evalPlotData> &plots, int option)
 {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(rec);
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
-    if (!checkAvailable&&data&&eval) {
+    if (data&&eval) {
+        double norm=1;
+        QVector<double> acftau, acf;
+        acftau=arrayToVector(data->getCorrelationT(), data->getCorrelationN());;
+        QFFitFunction* ffunc=eval->getFitFunction(rec);
+        int datacut_min=datacut->get_min();
+        int datacut_max=datacut->get_max();
+
+        try {
+            if (data->getCorrelationN()>0) {
+
+                long N=data->getCorrelationN();
+                int runAvgWidth=11;
+                double* tauvals=data->getCorrelationT();
+                double* corrdata=NULL;
+
+                if (eval->getCurrentIndex()<0) {
+                    corrdata=data->getCorrelationMean();
+                } else {
+                    if (eval->getCurrentIndex()<(int)data->getCorrelationRuns()) {
+                        corrdata=data->getCorrelationRun(eval->getCurrentIndex());
+                    } else {
+                        corrdata=data->getCorrelationMean();
+                    }
+                }
+                double* weights=eval->allocWeights(NULL, rec, eval->getCurrentIndex(), datacut_min, datacut_max);
+
+
+                /////////////////////////////////////////////////////////////////////////////////
+                // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
+                // we are working with a complete set of parameters
+                /////////////////////////////////////////////////////////////////////////////////
+                double* fullParams=eval->allocFillParameters(rec, index, ffunc);
+                double* errors=eval->allocFillParameterErrors(rec, index, ffunc);
+                ffunc->calcParameter(fullParams, errors);
+
+                for (int i=0; i<acftau.size(); i++) {
+                    acf<<ffunc->evaluate(acftau[i], fullParams);
+                }
+
+                /////////////////////////////////////////////////////////////////////////////////
+                // try and find particle number for normalized CF
+                /////////////////////////////////////////////////////////////////////////////////
+                bool hasN=false;
+                bool has1N=false;
+                double pN=0, peN=0;
+                double p1N, pe1N=0;
+                for (int i=0;i<ffunc->paramCount(); i++) {
+                    QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+                    if (ffunc->isParameterVisible(i, fullParams)) {
+                        if (d.id=="n_particle") {
+                            hasN=true;
+                            pN=fullParams[i];
+                            if (errors) peN=errors[i];
+                            break;
+                        } else if (d.id=="1n_particle") {
+                            has1N=true;
+                            p1N=fullParams[i];
+                            if (errors) pe1N=errors[i];
+                        }
+                    }
+                }
+
+                if (!hasN && has1N) {
+                    pN=1.0/p1N;
+                    peN=qfErrorDiv(1, 0, p1N, pe1N);
+                    hasN=true;
+                }
+                if (hasN && corrdata) {
+                    norm=pN;
+                }
+
+                /////////////////////////////////////////////////////////////////////////////////
+                // clean memory
+                /////////////////////////////////////////////////////////////////////////////////
+                free(fullParams);
+                free(errors);
+                free(weights);
+            }
+        } catch(std::exception& E) {
+            services->log_error(tr("error during plotting, error message: %1\n").arg(E.what()));
+        }
+
+
+
+
         QFFitResultsByIndexEvaluationEditorWithWidgets::evalPlotData item;
-        item.x=arrayToVector(data->getCorrelationT(), data->getCorrelationN());
+        item.x=acftau;
         item.y=arrayToVector(data->getCorrelationRun(index), data->getCorrelationN());
         bool ok=true;
         double* w=eval->allocWeights(&ok, rec, index);
@@ -629,7 +714,46 @@ bool QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
         }
         if (w) free(w);
         item.name=rec->getName()+": "+data->getCorrelationRunName(index);
+        if (option==2 || option==3) {
+            item.name+=tr(", normalized");
+
+            for (int i=0; i<item.y.size(); i++) {
+                item.y[i]=item.y[i]*norm;
+            }
+            for (int i=0; i<item.yerrors.size(); i++) {
+                item.yerrors[i]=item.yerrors[i]*norm;
+            }
+
+        }
         plots.append(item);
+
+        if (option==1 || option==3) {
+            item.xerrors.clear();
+            item.yerrors.clear();
+            item.y=acf;
+            item.name=rec->getName()+": "+data->getCorrelationRunName(index)+tr(": fit");
+            if (option==3) {
+                item.name=rec->getName()+": "+data->getCorrelationRunName(index)+tr(": normalized fit");
+                for (int i=0; i<item.y.size(); i++) {
+                    item.y[i]=item.y[i]*norm;
+                }
+                for (int i=0; i<item.yerrors.size(); i++) {
+                    item.yerrors[i]=item.yerrors[i]*norm;
+                }
+            }
+            plots.append(item);
+        }
+
+    }
+}
+
+bool QFFCSFitEvaluationEditor::getPlotDataSpecs(QStringList *optionNames)
+{
+    if (optionNames) {
+        *optionNames<<tr("data");
+        *optionNames<<tr("data + fits");
+        *optionNames<<tr("normalized data");
+        *optionNames<<tr("normalized data + fits");
     }
     return true;
 }
@@ -942,7 +1066,7 @@ void QFFCSFitEvaluationEditor::calibrateFocalVolume() {
 
                         double factor=1;
                         if (d.unit=="micron") { factor=1000; }
-                        if (d.unit=="µm") { factor=1000; }
+                        if (d.unit=="ï¿½m") { factor=1000; }
                         if (d.unit=="um") { factor=1000; }
                         if (d.unit=="microns") { factor=1000; }
                         if (d.unit=="m") { factor=1000000; }
@@ -975,7 +1099,7 @@ void QFFCSFitEvaluationEditor::calibrateFocalVolume() {
 
                     double factor=1;
                     if (d.unit=="micron") { factor=1000; }
-                    if (d.unit=="µm") { factor=1000; }
+                    if (d.unit=="ï¿½m") { factor=1000; }
                     if (d.unit=="um") { factor=1000; }
                     if (d.unit=="microns") { factor=1000; }
                     if (d.unit=="m") { factor=1000000; }

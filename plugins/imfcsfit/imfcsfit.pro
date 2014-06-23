@@ -56,7 +56,8 @@ HEADERS += qfpevalimfcsfit.h \
     imfcscalibrationwizard.h \
     ../interfaces/qfrdrimfcscorrelatorremote.h \
     ../base_classes/qffcsfitchi2landscapedialog.h\
-    ../base_classes/qfimagetransform.h
+    ../base_classes/qfimagetransform.h \
+    ../base_classes/qfoverlayplotdialog.h
 
 
 SOURCES += qfpevalimfcsfit.cpp \
@@ -77,7 +78,8 @@ SOURCES += qfpevalimfcsfit.cpp \
     qfimfcssetparamfromfiledialog.cpp \
     imfcscalibrationwizard.cpp \
     ../base_classes/qffcsfitchi2landscapedialog.cpp\
-    ../base_classes/qfimagetransform.cpp
+    ../base_classes/qfimagetransform.cpp \
+    ../base_classes/qfoverlayplotdialog.cpp
 
 
 
@@ -86,7 +88,8 @@ FORMS = \
     optionswidget.ui \
     qfimfcssetparamfromfiledialog.ui \
     imfcscalibrationwizard.ui \
-    ../base_classes/qffcsfitchi2landscapedialog.ui
+    ../base_classes/qffcsfitchi2landscapedialog.ui \
+    ../base_classes/qfoverlayplotdialog.ui
 
 RESOURCES += qfevalimfcsfit.qrc \
     ../base_classes/qffitresultsevaluationeditorbase.qrc

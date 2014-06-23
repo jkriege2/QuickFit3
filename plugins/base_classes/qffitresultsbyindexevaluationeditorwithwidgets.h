@@ -85,14 +85,15 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
             QVector<double> yerrors;
             QString name;
         };
-        /** \brief returns a list of major plot data, that may be used for an overview plot
+        /** \brief appends a list of major plot data, that may be used for an overview plot, to the given list data
          *
-         * \return \c true, if the feature is available and the data in data if (checkAvailable == \c true, no data is returned, this can be sued to check whether the feature is actually available.
           */
-        virtual bool getPlotData(QFRawDataRecord* rec, int index, QList<evalPlotData>& data, bool checkAvailable=false);
-        virtual bool getPlotData(QList<evalPlotData>& data, bool checkAvailable=false);
-        virtual bool getPlotData(int index, QList<evalPlotData>& data, bool checkAvailable=false);
-        virtual bool getPlotData(QFRawDataRecord* rec, QList<evalPlotData>& data, bool checkAvailable=false);
+        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<evalPlotData>& data, int option);
+        virtual void getPlotData(QList<evalPlotData>& data, int option);
+        virtual void getPlotData(int index, QList<evalPlotData>& data, int option);
+        virtual void getPlotData(QFRawDataRecord* rec, QList<evalPlotData>& data, int option);
+        /** \brief returns \c true, if the getPlotData Feature is available and (if lists are supplied) a list of optionNames. */
+        virtual bool getPlotDataSpecs(QStringList* optionNames=NULL);
     protected slots:
         /** \brief connect widgets to current data record */
         virtual void connectDefaultWidgets(QFEvaluationItem* current, QFEvaluationItem* old, bool updatePlots);
@@ -356,11 +357,11 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief executed when a parameter range is changed by the user */
         void parameterRangeChanged();
 
-        void plotChi2Landscape();
+        virtual void plotChi2Landscape();
 
-        void gotoFirstRun();
+        virtual void gotoFirstRun();
 
-        void createOverlayPlot();
+        virtual void createOverlayPlot();
 
 
     public slots:
