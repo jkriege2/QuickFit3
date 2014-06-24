@@ -27,12 +27,27 @@
 #include "qffitalgorithmmanager.h"
 #include "qffitfunctionmanager.h"
 
+QString HTMLGetTitle(const QString& data) {
+    QRegExp rxTitle("<title>(.*)</title>", Qt::CaseInsensitive);
+    if (rxTitle.indexIn(data) != -1) return rxTitle.cap(1);
+    return "";
+}
 
 QString removeHTMLComments(const QString& data) {
      QRegExp rxComments("<!--(.*)-->", Qt::CaseInsensitive);
      rxComments.setMinimal(true);
      QString data1=data;
      data1.remove(rxComments);
+     return data1;
+}
+
+QString removeHTML(const QString& data) {
+    QRegExp rxMarkup("<[^>]*>", Qt::CaseInsensitive);
+    QRegExp rxBR("<\\s*br\\s*[\\/]\\s*>", Qt::CaseInsensitive);
+     rxMarkup.setMinimal(true);
+     QString data1=data;
+     data1=data1.replace(rxBR, "\n");
+     data1=data1.remove(rxMarkup);
      return data1;
 }
 

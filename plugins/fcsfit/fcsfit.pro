@@ -32,7 +32,8 @@ HEADERS +=  qfpevalfcsfit.h \
     ../base_classes/qffcstools.h \
     ../base_classes/qffcsfitchi2landscapedialog.h \
     ../base_classes/qffitresultsbyindexevaluationfittools.h \
-    ../base_classes/qfoverlayplotdialog.h
+    ../base_classes/qfoverlayplotdialog.h \
+    ../interfaces/qfgetplotdatainterface.h
 
 
 SOURCES +=  qfpevalfcsfit.cpp \

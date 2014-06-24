@@ -429,7 +429,15 @@ bool touchFile(const QString& filename) {
     return false;
 }
 
-
+QString readFile(const QString& filename) {
+    if (!QFile::exists(filename)) return QString();
+    QFile f(filename);
+    if (f.open(QIODevice::ReadOnly)) {
+        return f.readAll();
+        f.close();
+    }
+    return QString();
+}
 
 
 

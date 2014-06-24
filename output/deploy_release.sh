@@ -182,7 +182,11 @@ if [ "${create_deploy}" != "0" ]; then
 	rm ./qtplugins/q*d4.dll
 	rm ./Qt*d4.dll
 	rm ./Qt*d.dll
-	rm
+	rm ./test*.*
+	rm ./temp*.*
+	rm ./*temp*.*
+	rm ./untitled*.*
+	rm ./*.a
 
 	for f in $SPIMONLYQTMODULES
 	do

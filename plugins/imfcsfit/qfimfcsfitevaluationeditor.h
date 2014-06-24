@@ -77,7 +77,7 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         /** Default destructor */
         virtual ~QFImFCSFitEvaluationEditor();
 
-        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<evalPlotData>& data, int option);
+        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<GetPlotDataItem>& data, int option);
         virtual bool getPlotDataSpecs(QStringList* optionNames=NULL);
 
 

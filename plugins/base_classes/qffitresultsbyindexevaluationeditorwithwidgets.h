@@ -65,7 +65,7 @@
 #include "qffitresultsbyindexevaluationfitthread.h"
 #include "qfrdrrunselection.h"
 #include "qffitfunctioncombobox.h"
-
+#include "qfgetplotdatainterface.h"
 /*! \brief evaluation item editor base class for data fits using QFFitAlgorithm and QFFitFunction where the
            QFRawDataRecord is a dataset with different runs (we can fit to each run). The QFEvaluationItem for
            this editor mus cast to QFFitResultsByIndexEvaluation.
@@ -73,25 +73,20 @@
 
 
 */
-class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByIndexEvaluationEditorBase
+class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByIndexEvaluationEditorBase, public QFGetPlotdataInterface
 {
         Q_OBJECT
+        Q_INTERFACES(QFGetPlotdataInterface)
     public:
         explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0, bool hasMultiThreaded=false, bool multiThreadPriority=false, const QString& runName=QString("run"));
-        struct evalPlotData {
-            QVector<double> x;
-            QVector<double> xerrors;
-            QVector<double> y;
-            QVector<double> yerrors;
-            QString name;
-        };
+
         /** \brief appends a list of major plot data, that may be used for an overview plot, to the given list data
          *
           */
-        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<evalPlotData>& data, int option);
-        virtual void getPlotData(QList<evalPlotData>& data, int option);
-        virtual void getPlotData(int index, QList<evalPlotData>& data, int option);
-        virtual void getPlotData(QFRawDataRecord* rec, QList<evalPlotData>& data, int option);
+        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<GetPlotDataItem>& data, int option);
+        virtual void getPlotData(QList<GetPlotDataItem>& data, int option);
+        virtual void getPlotData(int index, QList<GetPlotDataItem>& data, int option);
+        virtual void getPlotData(QFRawDataRecord* rec, QList<GetPlotDataItem>& data, int option);
         /** \brief returns \c true, if the getPlotData Feature is available and (if lists are supplied) a list of optionNames. */
         virtual bool getPlotDataSpecs(QStringList* optionNames=NULL);
     protected slots:

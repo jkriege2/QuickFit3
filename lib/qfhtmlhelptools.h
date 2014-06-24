@@ -46,6 +46,16 @@
 */
 QFLIB_EXPORT QString removeHTMLComments(const QString& data);
 
+/*! \brief remove all HTML markup from a string
+    \ingroup qf3lib_tools
+*/
+QFLIB_EXPORT QString removeHTML(const QString& data);
+
+/*! \brief extract the title of a HTML file
+    \ingroup qf3lib_tools
+*/
+QFLIB_EXPORT QString HTMLGetTitle(const QString& data);
+
 typedef QList<QPair<QString, QString> > QFHelpReplacesList;
 /*! \copydoc QFPluginServices::transformQF3HelpHTML()
     \ingroup qf3lib_tools

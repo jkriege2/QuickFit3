@@ -4,6 +4,7 @@
 #include <QPainter>
 #include <QImage>
 #include <QDebug>
+#include <cmath>
 
 void paint(QPaintDevice* pd) {
     QPainter p;
@@ -55,6 +56,19 @@ void paint(QPaintDevice* pd) {
     p.setBrush(b);
     p.drawEllipse(QRectF(130,40,50,30));
     //p.drawRect(QRectF(130,40,50,30));
+    QPolygonF poly;
+    for (int phi=0; phi<60; phi++) {
+        double p=double(phi)/20.0*M_PI;
+        poly<<QPointF(50.0+cos(p)*35.0*double(phi)/60.0, 50.0-sin(p)*35.0*double(phi)/60.0);
+    }
+    pe.setWidthF(1);
+    p.setPen(pe);
+    p.drawPolygon(poly);
+    pe.setColor("red");
+    pe.setStyle(Qt::DashDotDotLine);
+    p.setPen(pe);
+    p.drawPolyline(poly);
+
 
     p.end();
 }

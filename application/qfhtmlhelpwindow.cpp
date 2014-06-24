@@ -87,7 +87,7 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     btnPrint->setDefaultAction(actPrint);
     layButtons->addWidget(btnPrint);
 
-    actFind=menuPage->addAction(tr("&Find in current page"));
+    actFind=menuPage->addAction(tr("&Search in current page"));
     actFind->setCheckable(true);
     actFind->setShortcut(QKeySequence::Find);
     actFind->setChecked(false);
@@ -97,7 +97,7 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     btnFind->setDefaultAction(actFind);
     layButtons->addWidget(btnFind);
 
-    actFindInAll=menuPage->addAction(tr("&Find in all help pages"));
+    actFindInAll=menuPage->addAction(tr("&Search in all help pages"));
     actFindInAll->setCheckable(true);
     actFindInAll->setShortcut(QKeySequence("Ctrl+Shift+F"));
     actFindInAll->setChecked(false);
@@ -507,9 +507,14 @@ void QFHTMLHelpWindow::searchInAll() {
     QApplication::processEvents();
 
     QString phrase=edtFindInAll->text();
+    Qt::CaseSensitivity flagstxt=Qt::CaseInsensitive;
     int flags=0;
-    if (chkCaseSensitiveInAll->isChecked()) flags|=QTextDocument::FindCaseSensitively;
-    if (chkFindWholeWordInAll->isChecked()) flags|=QTextDocument::FindWholeWords;
+    bool findWhole=chkFindWholeWordInAll->isChecked();
+    if (chkCaseSensitiveInAll->isChecked()) {
+        flags|=QTextDocument::FindCaseSensitively;
+        flagstxt=Qt::CaseSensitive;
+    }
+    if (findWhole) flags|=QTextDocument::FindWholeWords;
 
     QDir dir(ProgramOptions::getInstance()->getAssetsDirectory());
     dir.cd("help");
@@ -537,7 +542,8 @@ void QFHTMLHelpWindow::searchInAll() {
             QApplication::processEvents();
             if (progress.wasCanceled()) break;
             if (QFile::exists(files[i])) {
-                QTextDocument doc;
+
+                /*QTextDocument doc;
                 doc.setHtml(loadHTML(files[i], true));
                 QTextCursor pos=doc.find(phrase, 0, QTextDocument::FindFlags(flags));
                 if (!pos.isNull()) {
@@ -546,6 +552,44 @@ void QFHTMLHelpWindow::searchInAll() {
                     it->setData(Qt::UserRole, files[i]);
                     it->setData(Qt::UserRole+1, pos.selectionStart());
                     it->setData(Qt::UserRole+2, pos.selectionEnd());
+                    it->setData(Qt::UserRole+3, phrase);
+                    it->setData(Qt::UserRole+4, flags);
+                    listFindInAll->addItem(it);
+                }*/
+                QString html=readFile(files[i]);
+                QString txt=removeHTML(html);
+                //qDebug()<<files[i]<<"\n  "<<txt.size();
+                bool found=false;
+                int start=0;
+                int idx=txt.indexOf(phrase, start, flagstxt);
+                while (idx>=start && start<txt.size()) {
+                    //qDebug()<<"   "<<idx<<start;
+                    if (idx>=0) {
+                        QChar l='\0';
+                        QChar r='\0';
+                        if (idx>0) l=txt[idx-1];
+                        if (idx+phrase.size()<txt.size()) r=txt[idx+phrase.size()];
+                        found=true;
+                        if (findWhole) {
+                            //qDebug()<<"   "<<l<<l.isLetterOrNumber()<<r<<r.isLetterOrNumber();
+                            if (l!='\0' && l.isLetterOrNumber()) found=false;
+                            if (r!='\0' && r.isLetterOrNumber()) found=false;
+                        }
+                        start=idx+1;
+                    }
+                    if (found) break;
+                    idx=txt.indexOf(phrase, start, flagstxt);
+                }
+
+                //qDebug()<<"  "<<found;
+                if (found) {
+                    QListWidgetItem* it=new QListWidgetItem(listFindInAll);
+                    it->setText(HTMLGetTitle(html));
+                    it->setData(Qt::UserRole, files[i]);
+                    it->setData(Qt::UserRole+1, -1);
+                    it->setData(Qt::UserRole+2, -1);
+                    it->setData(Qt::UserRole+3, phrase);
+                    it->setData(Qt::UserRole+4, flags);
                     listFindInAll->addItem(it);
                 }
             }
@@ -617,11 +661,17 @@ void QFHTMLHelpWindow::searchAllItemDoubleClicked(QListWidgetItem *item) {
     QString file=item->data(Qt::UserRole).toString();
     int selStart=item->data(Qt::UserRole+1).toInt();
     int selEnd=item->data(Qt::UserRole+2).toInt();
+    int flags=item->data(Qt::UserRole+4).toInt();
+    QString phrase=item->data(Qt::UserRole+3).toString();
     anchorClicked(QUrl(file));
-    QTextCursor cur=QTextCursor(descriptionBrowser->document());
-    cur.setPosition(selStart);
-    cur.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, selEnd-selStart);
-    descriptionBrowser->setTextCursor(cur);
+    if (selStart>=0 && selEnd>selStart) {
+        QTextCursor cur=QTextCursor(descriptionBrowser->document());
+        cur.setPosition(selStart);
+        cur.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, selEnd-selStart);
+        descriptionBrowser->setTextCursor(cur);
+    } else {
+        descriptionBrowser->find(phrase, (QTextDocument::FindFlags)flags);
+    }
 }
 
 QFHTMLHelpWindow::ContentsEntry::ContentsEntry()

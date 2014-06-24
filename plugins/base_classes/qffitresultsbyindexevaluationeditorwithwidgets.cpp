@@ -63,25 +63,25 @@ bool QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotDataSpecs(QStringLis
     return false;
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotData(QFRawDataRecord *rec, int index, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::evalPlotData> &data, int option)
+void QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotData(QFRawDataRecord *rec, int index, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::GetPlotDataItem> &data, int option)
 {
     return ;
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotData(QList<QFFitResultsByIndexEvaluationEditorWithWidgets::evalPlotData> &data, int option)
+void QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotData(QList<QFFitResultsByIndexEvaluationEditorWithWidgets::GetPlotDataItem> &data, int option)
 {
     QFFitResultsByIndexEvaluation* fcs=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     if (fcs) getPlotData(fcs->getHighlightedRecord(), fcs->getCurrentIndex(), data, option);
 }
 
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotData(int index, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::evalPlotData> &data, int option)
+void QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotData(int index, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::GetPlotDataItem> &data, int option)
 {
     QFFitResultsByIndexEvaluation* fcs=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     if (fcs) getPlotData(fcs->getHighlightedRecord(), index, data, option);
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotData(QFRawDataRecord *rec, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::evalPlotData> &data, int option)
+void QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotData(QFRawDataRecord *rec, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::GetPlotDataItem> &data, int option)
 {
     QFFitResultsByIndexEvaluation* fcs=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
     if (fcs) getPlotData(rec, fcs->getCurrentIndex(), data, option);
@@ -1969,7 +1969,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createOverlayPlot()
     dlg->addWidget(tr("which plots:"), cmbOptions);
     if (dlg->exec()) {
         QList<QPointer<QFRawDataRecord> > rdr=dlg->getSelectedRDRs();
-        QList<evalPlotData> data;
+        QList<GetPlotDataItem> data;
         for (int i=0; i<rdr.size(); i++) {
             if (rdr[i]) {
                 getPlotData(rdr[i], data, cmbOptions->currentIndex());

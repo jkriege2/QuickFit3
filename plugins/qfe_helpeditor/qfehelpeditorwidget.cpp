@@ -167,6 +167,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     menu=new QMenu(tr("directories"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
     addInsertAction(menu, "$$mainhelpdir$$");
+    addInsertAction(menu, "$$mainhelppicdir$$");
     addInsertAction(menu, "$$assetsdir$$");
     addInsertAction(menu, "$$examplesdir$$");
     addInsertAction(menu, "$$configdir$$");

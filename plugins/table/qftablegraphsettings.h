@@ -52,6 +52,7 @@ class QFTableGraphSettings : public QWidget
         void on_btnAutoY_clicked();
 
         void on_btnShiftAuto_clicked();
+        void on_cmbSelectDataCompare_currentIndexChanged(int index);
 
 
         void on_btnClearLinesXData_clicked();

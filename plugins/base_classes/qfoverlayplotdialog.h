@@ -2,6 +2,7 @@
 #define QFOVERLAYPLOTDIALOG_H
 
 #include <QDialog>
+#include "qfgetplotdatainterface.h"
 
 class QFPlotter; // forward
 
@@ -21,6 +22,7 @@ class QFOverlayPlotDialog : public QDialog
         void clearPlots();
         void startAddingPlots();
         void addPlot(const QVector<double>& x, const QVector<double>& y, const QString& name, const QVector<double>& xerror=QVector<double>(), const QVector<double>& yerror=QVector<double>());
+        void addPlot(const QFGetPlotdataInterface::GetPlotDataItem& plotData);
         void endAddingPlots();
         void setLog(bool logX=false, bool logY=false);
         void setAxisLabel(const QString& labX, const QString& labY);

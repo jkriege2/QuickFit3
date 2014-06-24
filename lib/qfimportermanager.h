@@ -77,7 +77,9 @@ class QFLIB_EXPORT QFImporterManager : public QObject {
         /** \brief returns the plugins main help file (html) for a specified  ID. */
         QString getPluginHelp(int ID);
         /** \brief returns the plugins tutorial file (html) for a specified  ID. */
-        QString getPluginTutorial(int ID);
+        QString getPluginTutorialMain(int ID);
+        /** \brief returns lists of titles (names) and links to all tutorials for for a specified plugin ID. */
+        void getPluginTutorials(int ID, QStringList& names, QStringList& files);
         /** \brief returns the plugins tutorial file (html) for a specified  ID. */
         QString getPluginSettings(int ID);
         /** \brief returns the plugins copyright file (html) for a specified  ID. */

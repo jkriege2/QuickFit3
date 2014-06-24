@@ -15,6 +15,7 @@
 QFRDRTable::GraphInfo::GraphInfo() {
     moreProperties.clear();
     title="";
+    titleShow=true;
     isStrided=false;
     stride=1;
     strideStart=1;
@@ -106,6 +107,7 @@ QFRDRTable::GraphInfo::GraphInfo() {
     dataSelectColumn=-1;
     dataSelectOperation=dsoEquals;
     dataSelectCompareValue=0;
+    dataSelectCompareValue2=1;
 
     offset=0;
     xerrorcolumnlower=-1;
@@ -1498,6 +1500,7 @@ void QFRDRTable::exportData(const QString& format, const QString& filename)const
 void QFRDRTable::readGraphInfo(GraphInfo& graph, QDomElement ge) {
     graph.type=String2GraphType(ge.attribute("type"));
     graph.title=ge.attribute("title");
+    graph.titleShow= QStringToBool(ge.attribute("showtitle", "true"));
     graph.drawLine= QStringToBool(ge.attribute("drawline", "true"));
     graph.xcolumn=ge.attribute("xcolumn", "-1").toInt();
     graph.ycolumn=ge.attribute("ycolumn", "-1").toInt();
@@ -1539,6 +1542,7 @@ void QFRDRTable::readGraphInfo(GraphInfo& graph, QDomElement ge) {
     graph.dataSelectColumn=ge.attribute("data_select_column", "-1").toInt();;
     graph.dataSelectOperation=String2DataSelectOperation(ge.attribute("data_select_operation", "=="));
     graph.dataSelectCompareValue=CQStringToDouble(ge.attribute("data_select_value", "0.0"));
+    graph.dataSelectCompareValue2=CQStringToDouble(ge.attribute("data_select_value2", "1.0"));
 
 
     graph.imageTrueColor=QStringToQColor(ge.attribute("image_truecolor", "blue"));
@@ -1709,6 +1713,7 @@ void QFRDRTable::writeGraphInfo(QXmlStreamWriter &w, const QFRDRTable::GraphInfo
     w.writeStartElement("graph");
     w.writeAttribute("type", GraphType2String(graph.type));
     w.writeAttribute("title", graph.title);
+    w.writeAttribute("showtitle", boolToQString(graph.titleShow));
     w.writeAttribute("drawline", boolToQString( graph.drawLine));
     w.writeAttribute("xcolumn", QString::number(graph.xcolumn));
     w.writeAttribute("ycolumn", QString::number(graph.ycolumn));
@@ -1781,6 +1786,7 @@ void QFRDRTable::writeGraphInfo(QXmlStreamWriter &w, const QFRDRTable::GraphInfo
     w.writeAttribute("data_select_column", QString::number(graph.dataSelectColumn));
     w.writeAttribute("data_select_operation", DataSelectOperation2String(graph.dataSelectOperation));
     w.writeAttribute("data_select_value", CDoubleToQString(graph.dataSelectCompareValue));
+    w.writeAttribute("data_select_value2", CDoubleToQString(graph.dataSelectCompareValue2));
 
 
 

@@ -100,7 +100,9 @@ class QFLIB_EXPORT QFExtensionManager : public QObject {
         /** \brief returns the plugins main help file (html) for a specified QFExtension ID. */
         QString getPluginHelp(QString ID);
         /** \brief returns the plugins tutorial file (html) for a specified QFExtension ID. */
-        QString getPluginTutorial(QString ID);
+        QString getPluginTutorialMain(QString ID);
+        /** \brief returns lists of titles (names) and links to all tutorials for for a specified plugin ID. */
+        void getPluginTutorials(const QString& ID, QStringList& names, QStringList& files);
         /** \brief returns the plugins settings file (html) for a specified QFExtension ID. */
         QString getPluginSettings(QString ID);
         /** \brief returns the plugins copyright file (html) for a specified QFExtension ID. */

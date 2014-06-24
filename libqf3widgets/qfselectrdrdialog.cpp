@@ -41,6 +41,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, QWidget *p
     setAllowMultiSelect(false);
     setDescription("");
     setProject(NULL);
+    setOnlineHelp(QFPluginServices::getInstance()->getMainHelpDirectory()+"qfselectrdrdialog.html");
 }
 
 QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, bool functorPrivate, QWidget *parent) :
@@ -57,6 +58,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, bool funct
     setAllowMultiSelect(false);
     setDescription("");
     setProject(NULL);
+    setOnlineHelp(QFPluginServices::getInstance()->getMainHelpDirectory()+"qfselectrdrdialog.html");
 }
 
 QFSelectRDRDialog::QFSelectRDRDialog(QWidget *parent):
@@ -73,6 +75,7 @@ QFSelectRDRDialog::QFSelectRDRDialog(QWidget *parent):
     setAllowMultiSelect(false);
     setDescription("");
     setProject(NULL);
+    setOnlineHelp(QFPluginServices::getInstance()->getMainHelpDirectory()+"qfselectrdrdialog.html");
 }
 
 QFSelectRDRDialog::~QFSelectRDRDialog()

@@ -1596,7 +1596,7 @@ void QFRawDataPropertyEditor_private::displayHelpPlugin() {
 }
 
 void QFRawDataPropertyEditor_private::displayHelpPluginTutorial() {
-    QString dll=current->getProject()->getRawDataRecordFactory()->getPluginTutorial(current->getType());
+    QString dll=current->getProject()->getRawDataRecordFactory()->getPluginTutorialMain(current->getType());
     services->displayHelpWindow(dll);
 }
 
@@ -1671,7 +1671,7 @@ void QFRawDataPropertyEditor_private::checkHelpAvailable() {
     } else {
         QString dll=current->getProject()->getRawDataRecordFactory()->getPluginHelp(current->getType());
         actHelpPlugin->setVisible(QFile::exists(dll));
-        dll=current->getProject()->getRawDataRecordFactory()->getPluginTutorial(current->getType());
+        dll=current->getProject()->getRawDataRecordFactory()->getPluginTutorialMain(current->getType());
         actHelpPluginTutorial->setVisible(QFile::exists(dll));
         dll=current->getProject()->getRawDataRecordFactory()->getPluginCopyrightFile(current->getType());
         actHelpPluginCopyright->setVisible(QFile::exists(dll));

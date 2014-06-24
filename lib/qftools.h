@@ -336,6 +336,11 @@ QFLIB_EXPORT QString boolToQString(bool data);
 
 */
 QFLIB_EXPORT bool touchFile(const QString& filename);
+/*! \brief reads the contenst of a file
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString readFile(const QString& filename);
 /*! \brief convert a QChar \a data to a human-readable string
     \ingroup qf3lib_tools
 

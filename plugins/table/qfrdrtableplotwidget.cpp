@@ -460,7 +460,7 @@ void QFRDRTablePlotWidget::updateGraph() {
             QFRDRTable::GraphInfo g=p.graphs.at(i);
             if (g.type==QFRDRTable::gtImpulsesVertical) {
                 JKQTPimpulsesVerticalErrorGraph* pg=new JKQTPimpulsesVerticalErrorGraph(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_baseline(g.offset);
@@ -510,7 +510,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtImpulsesHorizontal) {
                 JKQTPimpulsesHorizontalErrorGraph* pg=new JKQTPimpulsesHorizontalErrorGraph(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_xErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
@@ -557,7 +557,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtBarsHorizontal) {
                 JKQTPbarVerticalGraph* pg=new JKQTPbarVerticalGraph(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_width(g.width);
@@ -610,7 +610,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtBarsVertical) {
                 JKQTPbarHorizontalGraph* pg=new JKQTPbarHorizontalGraph(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_baseline(g.offset);
@@ -663,7 +663,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtFilledCurveX) {
                 JKQTPfilledCurveXErrorGraph* pg=new JKQTPfilledCurveXErrorGraph(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_baseline(g.offset);
@@ -711,7 +711,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtFilledCurveY) {
                 JKQTPfilledCurveYErrorGraph* pg=new JKQTPfilledCurveYErrorGraph(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_xErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
@@ -755,7 +755,7 @@ void QFRDRTablePlotWidget::updateGraph() {
             } else if (g.type==QFRDRTable::gtStepsHorizontal) {
                 JKQTPstepHorizontalGraph* pg=new JKQTPstepHorizontalGraph(ui->plotter->get_plotter());
                 pg->set_fillCurve(true);
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
@@ -795,7 +795,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtStepsVertical) {
                 JKQTPstepVerticalGraph* pg=new JKQTPstepVerticalGraph(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
@@ -833,7 +833,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtParametrizedScatter) { // gtLines etc.
                 JKQTPxyParametrizedErrorScatterGraph* pg=new JKQTPxyParametrizedErrorScatterGraph(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_colorColumn(getColumnWithStride(g.meancolumn, g));
@@ -930,7 +930,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtImage) {
                 JKQTPColumnMathImage* pg=new JKQTPColumnMathImage(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
 
                 if (g.xcolumn>=0 && g.xcolumn<(long)ui->plotter->getDatastore()->getColumnCount())  pg->set_imageColumn(g.xcolumn);
                 if (g.ycolumn>=0 && g.ycolumn<(long)ui->plotter->getDatastore()->getColumnCount())  pg->set_modifierColumn(g.ycolumn);
@@ -1015,7 +1015,7 @@ void QFRDRTablePlotWidget::updateGraph() {
 
             } else if (g.type==QFRDRTable::gtRGBImage) {
                 JKQTPColumnRGBMathImage* pg=new JKQTPColumnRGBMathImage(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
 
                 if (g.xcolumn>=0 && g.xcolumn<(long)ui->plotter->getDatastore()->getColumnCount())  pg->set_imageRColumn(g.xcolumn);
                 if (g.xerrorcolumn>=0 && g.xerrorcolumn<(long)ui->plotter->getDatastore()->getColumnCount())  pg->set_imageGColumn(g.xerrorcolumn);
@@ -1123,7 +1123,7 @@ void QFRDRTablePlotWidget::updateGraph() {
 
             } else if (g.type==QFRDRTable::gtMaskImage) {
                 JKQTPColumnOverlayImageEnhanced* pg=new JKQTPColumnOverlayImageEnhanced(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
 
                 if (g.xcolumn>=0 && g.xcolumn<(long)ui->plotter->getDatastore()->getColumnCount())  pg->set_imageColumn(g.xcolumn);
                 pg->set_x(g.imageX);
@@ -1179,7 +1179,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                     } else {
                         pg->set_params(g.functionParameters);
                     }
-                    pg->set_title(g.title);
+                    if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                     //qDebug()<<"adding function plot "<<g.function;
                     pg->set_drawLine(true);
                     pg->set_lineWidth(g.linewidth);
@@ -1205,7 +1205,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 }
             } else if (g.type==QFRDRTable::gtBoxplotX) {
                 JKQTPboxplotVerticalGraph* pg=new JKQTPboxplotVerticalGraph(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_posColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_minColumn(getColumnWithStride(g.xerrorcolumn, g));
                 pg->set_percentile25Column(getColumnWithStride(g.ycolumn, g));
@@ -1235,7 +1235,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtHorizontalRange) {
                 JKQTPhorizontalRange* pg=new JKQTPhorizontalRange(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_lineWidth(g.linewidth);
                 QColor c=g.color;
                 c.setAlphaF(g.colorTransparent);
@@ -1264,7 +1264,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtVerticalRange) {
                 JKQTPverticalRange* pg=new JKQTPverticalRange(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_lineWidth(g.linewidth);
                 QColor c=g.color;
                 c.setAlphaF(g.colorTransparent);
@@ -1294,7 +1294,7 @@ void QFRDRTablePlotWidget::updateGraph() {
 
             } else if (g.type==QFRDRTable::gtBoxplotY) {
                 JKQTPboxplotHorizontalGraph* pg=new JKQTPboxplotHorizontalGraph(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_posColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_minColumn(getColumnWithStride(g.xerrorcolumn, g));
                 pg->set_percentile25Column(getColumnWithStride(g.ycolumn, g));
@@ -1320,7 +1320,7 @@ void QFRDRTablePlotWidget::updateGraph() {
 
             } else { // gtLines etc.
                 JKQTPxyLineErrorGraph* pg=new JKQTPxyLineErrorGraph(ui->plotter->get_plotter());
-                pg->set_title(g.title);
+                if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
@@ -1518,6 +1518,12 @@ int QFRDRTablePlotWidget::getColumnWithStride(int column, const QFRDRTable::Grap
                         break;
                     case QFRDRTable::dsoSmaller:
                         if (dataS[i]<g.dataSelectCompareValue) dataO.append(data[i]);
+                        break;
+                    case QFRDRTable::dsoInRange:
+                        if (dataS[i]>=g.dataSelectCompareValue && dataS[i]<=g.dataSelectCompareValue2) dataO.append(data[i]);
+                        break;
+                    case QFRDRTable::dsoOutOfRange:
+                        if (!(dataS[i]>=g.dataSelectCompareValue && dataS[i]<=g.dataSelectCompareValue2)) dataO.append(data[i]);
                         break;
                 }
             }

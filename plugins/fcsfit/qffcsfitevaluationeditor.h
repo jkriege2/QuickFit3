@@ -97,7 +97,7 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWithW
         virtual int getUserRangeMax(QFRawDataRecord* rec, int index);
         virtual int getUserRangeMin(QFRawDataRecord* rec, int index);
 
-        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<evalPlotData>& data, int option);
+        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<GetPlotDataItem>& data, int option);
         virtual bool getPlotDataSpecs(QStringList* optionNames=NULL);
 
     protected slots:

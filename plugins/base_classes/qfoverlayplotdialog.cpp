@@ -67,6 +67,11 @@ void QFOverlayPlotDialog::addPlot(const QVector<double> &x, const QVector<double
     }
 }
 
+void QFOverlayPlotDialog::addPlot(const QFGetPlotdataInterface::GetPlotDataItem &plotData)
+{
+    addPlot(plotData.x, plotData.y, plotData.name, plotData.xerrors, plotData.yerrors);
+}
+
 void QFOverlayPlotDialog::endAddingPlots()
 {
     ui->plot->set_doDrawing(true);

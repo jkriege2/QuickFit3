@@ -89,39 +89,39 @@ bool QCairoPaintEngine::begin(QPaintDevice *pd)
     if (cpd) {
         QCairoPaintDevice::CairoFileType ft=cpd->getFileType();
         QSizeF s=cpd->getFileSizeMM();
-        qDebug()<<ft;
+        //qDebug()<<ft;
         if (ft==QCairoPaintDevice::cftPDF14) {
-            qDebug()<<  "Cairo-PDF1.4";
+            //qDebug()<<  "Cairo-PDF1.4";
             surface = cairo_pdf_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
             cairo_pdf_surface_restrict_to_version(surface, CAIRO_PDF_VERSION_1_4);
         } else if (ft==QCairoPaintDevice::cftPDF15) {
-            qDebug()<<  "Cairo-PDF1.5";
+           //qDebug()<<  "Cairo-PDF1.5";
             surface = cairo_pdf_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
             cairo_pdf_surface_restrict_to_version(surface, CAIRO_PDF_VERSION_1_5);
         } else if (ft==QCairoPaintDevice::cftPS2) {
-            qDebug()<<  "Cairo-PS2";
+           //qDebug()<<  "Cairo-PS2";
             surface = cairo_ps_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
             cairo_ps_surface_restrict_to_level(surface, CAIRO_PS_LEVEL_2);
         } else if (ft==QCairoPaintDevice::cftPS3) {
-            qDebug()<<  "Cairo-PS3";
+           //qDebug()<<  "Cairo-PS3";
             surface = cairo_ps_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
             cairo_ps_surface_restrict_to_level(surface, CAIRO_PS_LEVEL_2);
         } else if (ft==QCairoPaintDevice::cftEPS2) {
-            qDebug()<<  "Cairo-EPS2";
+           //qDebug()<<  "Cairo-EPS2";
             surface = cairo_ps_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
             cairo_ps_surface_restrict_to_level(surface, CAIRO_PS_LEVEL_2);
             cairo_ps_surface_set_eps(surface, 1);
         } else if (ft==QCairoPaintDevice::cftEPS3) {
-            qDebug()<<  "Cairo-EPS3";
+           //qDebug()<<  "Cairo-EPS3";
             surface = cairo_ps_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
             cairo_ps_surface_restrict_to_level(surface, CAIRO_PS_LEVEL_2);
             cairo_ps_surface_set_eps(surface, 1);
         } else if (ft==QCairoPaintDevice::cftSVG11) {
-            qDebug()<<  "Cairo-SVG11";
+           //qDebug()<<  "Cairo-SVG11";
             surface = cairo_svg_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
             cairo_svg_surface_restrict_to_version(surface, CAIRO_SVG_VERSION_1_1);
         } else if (ft==QCairoPaintDevice::cftSVG12) {
-            qDebug()<<  "Cairo-SVG12";
+           //qDebug()<<  "Cairo-SVG12";
             surface = cairo_svg_surface_create (cpd->getFileName().toLocal8Bit().data(), s.width()/25.4*72.0, s.height()/25.4*72.0);
             cairo_svg_surface_restrict_to_version(surface, CAIRO_SVG_VERSION_1_2);
         }
@@ -190,9 +190,49 @@ void QCairoPaintEngine::drawPixmap(const QRectF &r, const QPixmap &pm, const QRe
     drawImage(r, pm.toImage(), sr);
 }
 
+void QCairoPaintEngine::drawTiledPixmap(const QRectF &r, const QPixmap &pixmap, const QPointF &s)
+{
+    double w, h;
+    cairo_surface_t *image;
+    QImage img=pixmap.toImage().convertToFormat(QImage::Format_ARGB32);
+
+
+    if (!img.isNull()) {
+        cairo_format_t imgformat=CAIRO_FORMAT_ARGB32;
+
+        updateMatrix();
+
+        image = cairo_image_surface_create_for_data(img.bits(), imgformat, img.width(), img.height(), img.bytesPerLine());
+        w = img.width();
+        h = img.height();
+
+        cairo_matrix_t cm;
+        cairo_matrix_init_identity(&cm);
+        cairo_matrix_translate (&cm, s.x(), s.y());
+        cairo_matrix_invert(&cm);
+
+        cairo_pattern_t* brush=cairo_pattern_create_for_surface(image);
+        cairo_pattern_set_matrix(brush, &cm);
+        cairo_pattern_set_extend(brush, CAIRO_EXTEND_REPEAT);
+
+        cairo_rectangle(cr, r.x(), r.y(), r.width(), r.height());
+        cairo_set_source(cr, brush);
+        cairo_fill_preserve(cr);
+        cairo_set_source_rgba(cr, 0,0,0,0);
+        cairo_set_line_width(cr, 0.0);
+        cairo_stroke(cr);
+        //cairo_fill(cr);
+
+        //cairo_set_source_surface (cr, image, 0, 0);
+        //cairo_paint(cr);
+        releasePattern(brush);
+        updateMatrix();
+    }
+}
+
 void QCairoPaintEngine::drawImage(const QRectF &r, const QImage &pm, const QRectF &sr, Qt::ImageConversionFlags flags)
 {
-    qDebug()<<"drawImage r="<<r<<" sr="<<sr;
+   //qDebug()<<"drawImage r="<<r<<" sr="<<sr;
     double              w, h;
     cairo_surface_t *image;
     QImage img;
@@ -288,6 +328,7 @@ void QCairoPaintEngine::updateState(const QPaintEngineState &state)
     updateFont();*/
 }
 
+
 void QCairoPaintEngine::updateMatrix()
 {
     //qDebug()<<" QCairoPaintEnginePrivate::updateMatrix() "<<cdirtyflags;
@@ -380,11 +421,12 @@ void QCairoPaintEngine::updateBrush()
         cairo_pattern_t *pat=NULL;
         switch (cbrush.style())
         {
-          case Qt::SolidPattern:
-          {
-            pat = cairo_pattern_create_rgba(cbrush.color().redF(), cbrush.color().greenF(), cbrush.color().blueF(), cbrush.color().alphaF());
-            break;
-          }
+            default:
+            case Qt::SolidPattern:
+                pat = cairo_pattern_create_rgba(cbrush.color().redF(), cbrush.color().greenF(), cbrush.color().blueF(), cbrush.color().alphaF());
+                break;
+            case Qt::NoBrush:
+                break;
         }
 
         if (brushpattern) {
@@ -452,6 +494,7 @@ void QCairoPaintEngine::drawLines(const QLineF *lines, int lineCount)
     updatePen();
     cairo_stroke(cr);
 }
+
 
 void QCairoPaintEngine::drawPath(const QPainterPath &path)
 {
@@ -536,4 +579,93 @@ void QCairoPaintEngine::drawPath(const QPainterPath &path)
 
 
 }
+
+void QCairoPaintEngine::drawPoints(const QPointF *points, int pointCount)
+{
+
+
+    if (!cr || !surface) {
+        qDebug()<<"Cairo Error [QCairoPaintEngine::drawPoints]: no cairo or no surface!";
+        return;
+    }
+    if (cpen.style()==Qt::NoPen) {
+        qDebug()<<"Cairo Error [QCairoPaintEngine::drawPoints]: no pen set!";
+        return;
+    }
+    updatePen();
+    for (int i=0; i<pointCount; i++) {
+        cairo_new_path(cr);
+        cairo_move_to (cr, points[i].x(), points[i].y());
+        cairo_close_path (cr);
+    }
+    //cairo_close_path(cr);
+    updatePen();
+    cairo_stroke(cr);
+
+}
+
+void QCairoPaintEngine::drawPolygon(const QPointF *points, int pointCount, QPaintEngine::PolygonDrawMode mode)
+{
+    if (!cr || !surface) {
+        qDebug()<<"Cairo Error [QCairoPaintEngine::drawPolygon]: no cairo or no surface!";
+        return;
+    }
+    if (cpen.style()==Qt::NoPen) {
+        qDebug()<<"Cairo Error [QCairoPaintEngine::drawPolygon]: no pen set!";
+        return;
+    }
+    if (mode!=QPaintEngine::PolylineMode && cbrush.style()==Qt::NoBrush && cpen.style()==Qt::NoPen) {
+        qDebug()<<"Cairo Error [QCairoPaintEngine::drawPolygon]: no pen and no brush set!";
+        return;
+    }
+    //updatePen();
+
+    //qDebug()<<"drawPolygon n="<<pointCount;
+    if (pointCount>1) {
+        cairo_new_path(cr);
+        cairo_move_to(cr, points[0].x(), points[0].y());
+        for (int i=1; i<pointCount; i++) {
+            cairo_line_to(cr, points[i].x(), points[i].y());
+        }
+        if (points[0].x()==points[pointCount-1].x() && points[0].y()==points[pointCount-1].y()){
+            cairo_close_path(cr);
+        } else if (mode!=QPaintEngine::PolylineMode) {
+            cairo_close_path(cr);
+        }
+        if (mode==QPaintEngine::PolylineMode) {
+            updatePen();
+            cairo_stroke(cr);
+        } else {
+            switch (mode) {
+                case QPaintEngine::WindingMode:
+                    cairo_set_fill_rule(cr, CAIRO_FILL_RULE_WINDING);
+                    break;
+                default:
+                case QPaintEngine::OddEvenMode:
+                    cairo_set_fill_rule(cr, CAIRO_FILL_RULE_EVEN_ODD);
+                    break;
+            }
+
+
+            updateBrush();
+            if (cpen.style()!=Qt::NoPen) {
+                cairo_fill_preserve(cr);
+                updatePen();
+                cairo_stroke(cr);
+            } else cairo_fill(cr);
+        }
+    }
+
+}
+
+void QCairoPaintEngine::drawPolygon(const QPoint *points, int pointCount, QPaintEngine::PolygonDrawMode mode)
+{
+    QVector<QPointF> l(pointCount);
+    for (int i=0; i<pointCount; i++) {
+        l[i]=QPointF(points[i]);
+    }
+    drawPolygon(l.data(), l.size(), mode);
+
+}
+
 

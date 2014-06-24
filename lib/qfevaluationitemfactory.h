@@ -107,7 +107,9 @@ class QFLIB_EXPORT QFEvaluationItemFactory : public QObject {
         /** \brief returns the plugins main help file (html) for a specified QFEvaluationItem ID. */
         QString getPluginHelp(QString ID);
         /** \brief returns the plugins tutorial file (html) for a specified QFEvaluationItem ID. */
-        QString getPluginTutorial(QString ID);
+        QString getPluginTutorialMain(QString ID);
+        /** \brief returns lists of titles (names) and links to all tutorials for for a specified QFEvaluationItem ID. */
+        void getPluginTutorials(const QString& ID, QStringList& names, QStringList& files);
         /** \brief returns the plugins settings file (html) for a specified QFEvaluationItem ID. */
         QString getPluginSettings(QString ID);
         /** \brief returns the plugins copyright file (html) for a specified QFEvaluationItem ID. */

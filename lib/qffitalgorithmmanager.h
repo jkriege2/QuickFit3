@@ -95,11 +95,13 @@ class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
         /** \brief returns the plugins main help file (html) for a specified plugin \a ID. */
         QString getPluginHelp(int ID);
         /** \brief returns the plugins tutorial file (html) for a specified plugin \a ID. */
-        QString getPluginTutorial(int ID);
+        QString getPluginTutorialMain(int ID);
         /** \brief returns the plugins tutorial file (html) for a specified plugin \a ID. */
         QString getPluginSettings(int ID);
         /** \brief returns the plugins copyright file (html) for a specified plugin \a ID. */
         QString getPluginCopyrightFile(int ID);
+        /** \brief returns lists of titles (names) and links to all tutorials for for a specified plugin ID. */
+        void getPluginTutorials(int ID, QStringList& names, QStringList& files);
 
         /** \brief returns a fit algorthms \a faID main help file (html) for a specified plugin \a ID. */
         QString getPluginHelp(int ID, QString faID);

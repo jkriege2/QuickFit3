@@ -150,6 +150,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("pluginsettings_list"), createPluginDocSettings()));
     htmlReplaceList.append(qMakePair(QString("plugincopyright_list"), createPluginDocCopyrights()));
     htmlReplaceList.append(qMakePair(QString("mainhelpdir"), settings->getMainHelpDirectory()));
+    htmlReplaceList.append(qMakePair(QString("mainhelppicdir"), settings->getMainHelpDirectory()+"pic/"));
     htmlReplaceList.append(qMakePair(QString("assetsdir"), settings->getAssetsDirectory()));
     htmlReplaceList.append(qMakePair(QString("examplesdir"), settings->getExamplesDirectory()));
     htmlReplaceList.append(qMakePair(QString("configdir"), settings->getConfigFileDirectory()));
@@ -697,13 +698,25 @@ QString MainWindow::createPluginDocCopyrights(QString mainitem_before, QString m
 
 
 QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString mainitem_after) {
-    QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+    QString subitem_template=QString("<li><a href=\"%2\">%1</a></li>");
+    QString sub_template=QString("<ol>%1</ol>");
+    QString mainitem_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a>%4</li>");
     QString text=mainitem_before.arg(tr("Raw Data Record"));
     // gather information about plugins
     for (int i=0; i<getRawDataRecordFactory()->getIDList().size(); i++) {
         QString id=getRawDataRecordFactory()->getIDList().at(i);
-        QString dir=getRawDataRecordFactory()->getPluginTutorial(id);
-        if (QFile::exists(dir)) text+=item_template.arg(getRawDataRecordFactory()->getIconFilename(id)).arg(getRawDataRecordFactory()->getName(id)).arg(dir);
+        QString dir=getRawDataRecordFactory()->getPluginTutorialMain(id);
+        QStringList names, links;
+        getRawDataRecordFactory()->getPluginTutorials(id, names, links);
+        int subCnt=qMax(names.size(), links.size());
+        QString subTxt="";
+        if (subCnt>0) {
+            for (int i=0; i<subCnt; i++) {
+                if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(getRawDataRecordFactory()->getName(id)))).arg(links.value(i, ""));
+            }
+            if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
+        }
+        if (QFile::exists(dir)) text+=mainitem_template.arg(getRawDataRecordFactory()->getIconFilename(id)).arg(getRawDataRecordFactory()->getName(id)).arg(dir).arg(subTxt);
     }
     text+=mainitem_after;
 
@@ -711,8 +724,18 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<getEvaluationItemFactory()->getIDList().size(); i++) {
         QString id=getEvaluationItemFactory()->getIDList().at(i);
-        QString dir=getEvaluationItemFactory()->getPluginTutorial(id);
-        if (QFile::exists(dir)) text+=item_template.arg(getEvaluationItemFactory()->getIconFilename(id)).arg(getEvaluationItemFactory()->getName(id)).arg(dir);
+        QString dir=getEvaluationItemFactory()->getPluginTutorialMain(id);
+        QStringList names, links;
+        getEvaluationItemFactory()->getPluginTutorials(id, names, links);
+        int subCnt=qMax(names.size(), links.size());
+        QString subTxt="";
+        if (subCnt>0) {
+            for (int i=0; i<subCnt; i++) {
+                if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(getEvaluationItemFactory()->getName(id)))).arg(links.value(i, ""));
+            }
+            if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
+        }
+        if (QFile::exists(dir)) text+=mainitem_template.arg(getEvaluationItemFactory()->getIconFilename(id)).arg(getEvaluationItemFactory()->getName(id)).arg(dir).arg(subTxt);
     }
     text+=mainitem_after;
 
@@ -720,16 +743,36 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<fitAlgorithmManager->pluginCount(); i++) {
         int id=i;
-        QString dir=fitAlgorithmManager->getPluginTutorial(id);
-        if (QFile::exists(dir)) text+=item_template.arg(fitAlgorithmManager->getIconFilename(id)).arg(fitAlgorithmManager->getName(id)).arg(dir);
+        QString dir=fitAlgorithmManager->getPluginTutorialMain(id);
+        QStringList names, links;
+        fitAlgorithmManager->getPluginTutorials(id, names, links);
+        int subCnt=qMax(names.size(), links.size());
+        QString subTxt="";
+        if (subCnt>0) {
+            for (int i=0; i<subCnt; i++) {
+                if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(fitAlgorithmManager->getName(id)))).arg(links.value(i, ""));
+            }
+            if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
+        }
+        if (QFile::exists(dir)) text+=mainitem_template.arg(fitAlgorithmManager->getIconFilename(id)).arg(fitAlgorithmManager->getName(id)).arg(dir).arg(subTxt);
     }
     text+=mainitem_after;
     text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_fitfunc.html\">Fit Function</a>"));
     // gather information about plugins
     for (int i=0; i<fitFunctionManager->pluginCount(); i++) {
         int id=i;
-        QString dir=fitFunctionManager->getPluginTutorial(id);
-        if (QFile::exists(dir)) text+=item_template.arg(fitFunctionManager->getIconFilename(id)).arg(fitFunctionManager->getName(id)).arg(dir);
+        QString dir=fitFunctionManager->getPluginTutorialMain(id);
+        QStringList names, links;
+        fitFunctionManager->getPluginTutorials(id, names, links);
+        int subCnt=qMax(names.size(), links.size());
+        QString subTxt="";
+        if (subCnt>0) {
+            for (int i=0; i<subCnt; i++) {
+                if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(fitFunctionManager->getName(id)))).arg(links.value(i, ""));
+            }
+            if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
+        }
+        if (QFile::exists(dir)) text+=mainitem_template.arg(fitFunctionManager->getIconFilename(id)).arg(fitFunctionManager->getName(id)).arg(dir).arg(subTxt);
     }
     text+=mainitem_after;
 
@@ -737,8 +780,18 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<importerManager->pluginCount(); i++) {
         int id=i;
-        QString dir=importerManager->getPluginTutorial(id);
-        if (QFile::exists(dir)) text+=item_template.arg(importerManager->getIconFilename(id)).arg(importerManager->getName(id)).arg(dir);
+        QString dir=importerManager->getPluginTutorialMain(id);
+        QStringList names, links;
+        importerManager->getPluginTutorials(id, names, links);
+        int subCnt=qMax(names.size(), links.size());
+        QString subTxt="";
+        if (subCnt>0) {
+            for (int i=0; i<subCnt; i++) {
+                if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(importerManager->getName(id)))).arg(links.value(i, ""));
+            }
+            if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
+        }
+        if (QFile::exists(dir)) text+=mainitem_template.arg(importerManager->getIconFilename(id)).arg(importerManager->getName(id)).arg(dir).arg(subTxt);
     }
     text+=mainitem_after;
 
@@ -746,8 +799,18 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
         QString id=getExtensionManager()->getIDList().at(i);
-        QString dir=getExtensionManager()->getPluginTutorial(id);
-        if (QFile::exists(dir)) text+=item_template.arg(getExtensionManager()->getIconFilename(id)).arg(getExtensionManager()->getName(id)).arg(dir);
+        QString dir=getExtensionManager()->getPluginTutorialMain(id);
+        QStringList names, links;
+        getExtensionManager()->getPluginTutorials(id, names, links);
+        int subCnt=qMax(names.size(), links.size());
+        QString subTxt="";
+        if (subCnt>0) {
+            for (int i=0; i<subCnt; i++) {
+                if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(getExtensionManager()->getName(id)))).arg(links.value(i, ""));
+            }
+            if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
+        }
+        if (QFile::exists(dir)) text+=mainitem_template.arg(getExtensionManager()->getIconFilename(id)).arg(getExtensionManager()->getName(id)).arg(dir).arg(subTxt);
     }
     text+=mainitem_after;
 
@@ -2081,12 +2144,12 @@ QString MainWindow::getPluginHelp(const QString& pluginID) {
 }
 
 QString MainWindow::getPluginTutorial(const QString& pluginID) {
-    if (evaluationFactory->contains(pluginID)) return evaluationFactory->getPluginTutorial(pluginID);
-    if (rawDataFactory->contains(pluginID)) return rawDataFactory->getPluginTutorial(pluginID);
-    if (extensionManager->contains(pluginID)) return extensionManager->getPluginTutorial(pluginID);
-    if (fitFunctionManager->contains(pluginID)) return fitFunctionManager->getPluginTutorial( fitFunctionManager->getPluginForID(pluginID));
-    if (fitAlgorithmManager->contains(pluginID)) return fitAlgorithmManager->getPluginTutorial(fitAlgorithmManager->getPluginForID(pluginID));
-    if (importerManager->contains(pluginID)) return importerManager->getPluginTutorial(importerManager->getPluginForID(pluginID));
+    if (evaluationFactory->contains(pluginID)) return evaluationFactory->getPluginTutorialMain(pluginID);
+    if (rawDataFactory->contains(pluginID)) return rawDataFactory->getPluginTutorialMain(pluginID);
+    if (extensionManager->contains(pluginID)) return extensionManager->getPluginTutorialMain(pluginID);
+    if (fitFunctionManager->contains(pluginID)) return fitFunctionManager->getPluginTutorialMain( fitFunctionManager->getPluginForID(pluginID));
+    if (fitAlgorithmManager->contains(pluginID)) return fitAlgorithmManager->getPluginTutorialMain(fitAlgorithmManager->getPluginForID(pluginID));
+    if (importerManager->contains(pluginID)) return importerManager->getPluginTutorialMain(importerManager->getPluginForID(pluginID));
     return "";
 }
 

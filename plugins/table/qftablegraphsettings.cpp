@@ -54,6 +54,7 @@ QFTableGraphSettings::QFTableGraphSettings(QWidget *parent) :
     ui->edtImageY->setCheckBounds(true, false);
     ui->cmbGraphType->setCurrentIndex(0);
     ui->edtSelectDataValue->setCheckBounds(false, false);
+    ui->edtSelectDataValue2->setCheckBounds(false, false);
 
 
 
@@ -200,6 +201,7 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
 
         graph.title=ui->edtGraphTitle->text();
+        graph.titleShow=ui->chkShowTitle->isChecked();
 
         graph.type=(QFRDRTable::GraphType)ui->cmbGraphType->itemData(ui->cmbGraphType->currentIndex()).toInt();
 
@@ -307,6 +309,7 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.dataSelectColumn=qMax(-2, ui->cmbSelectDataColumn->currentData().toInt());
         graph.dataSelectOperation=(QFRDRTable::DataSelectOperation)ui->cmbSelectDataCompare->currentIndex();
         graph.dataSelectCompareValue=ui->edtSelectDataValue->value();
+        graph.dataSelectCompareValue2=ui->edtSelectDataValue2->value();
         graph.offset=ui->edtOffset->value();
 
         graph.functionType=(QFRDRTable::GTFunctionType)ui->cmbFunctionType->currentIndex();
@@ -343,6 +346,7 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     //qDebug()<<"loadGraphData()";
     updating=true;
     ui->edtGraphTitle->setText(graph.title);
+    ui->chkShowTitle->setChecked(graph.titleShow);
 
     QString fit_type=graph.moreProperties.value("FIT_TYPE", "NONE").toString().toUpper().trimmed();
     isFitResult=((fit_type=="LEAST_SQUARES")||(fit_type=="FIT")||(fit_type=="REGRESSION"));
@@ -422,6 +426,7 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->cmbSelectDataColumn->setCurrentData(graph.dataSelectColumn);
     ui->cmbSelectDataCompare->setCurrentIndex(graph.dataSelectOperation);
     ui->edtSelectDataValue->setValue(graph.dataSelectCompareValue);
+    ui->edtSelectDataValue2->setValue(graph.dataSelectCompareValue2);
 
     ui->cmbFunctionType->setCurrentIndex((int)graph.functionType);
     if (graph.functionType==QFRDRTable::gtfQFFunction) {
@@ -1114,6 +1119,7 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->cmbLinesXData, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLinesXError, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbLinesXError2, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->chkShowTitle, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->chkXErrSym, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->chkYErrSym, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->cmbLinesYData, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
@@ -1169,6 +1175,7 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->cmbSelectDataColumn, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbSelectDataCompare, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->edtSelectDataValue, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtSelectDataValue2, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
     connect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
 
@@ -1211,6 +1218,7 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->cmbLinesQ75, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->edtFunction, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->edtGraphTitle, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->chkShowTitle, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbGraphType, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbLinesXData, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbLinesXError, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
@@ -1264,6 +1272,7 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->cmbSelectDataColumn, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->cmbSelectDataCompare, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->edtSelectDataValue, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtSelectDataValue2, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 
     disconnect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
     disconnect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
@@ -1530,6 +1539,11 @@ void QFTableGraphSettings::on_btnShiftAuto_clicked()
     }
     current->setPlot(plot, p);
     emit reloadGraph();
+}
+
+void QFTableGraphSettings::on_cmbSelectDataCompare_currentIndexChanged(int index)
+{
+    ui->edtSelectDataValue2->setVisible(index==QFRDRTable::dsoInRange || index==QFRDRTable::dsoOutOfRange);
 }
 
 void QFTableGraphSettings::on_btnClearLinesXData_clicked()

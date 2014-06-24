@@ -85,7 +85,7 @@ void QFEvaluationPropertyEditorPrivate::displayHelpPlugin()
 
 void QFEvaluationPropertyEditorPrivate::displayHelpPluginTutorial()
 {
-    QString dll=d->current->getProject()->getEvaluationItemFactory()->getPluginTutorial(d->current->getType());
+    QString dll=d->current->getProject()->getEvaluationItemFactory()->getPluginTutorialMain(d->current->getType());
     services->displayHelpWindow(dll);
 }
 
@@ -168,7 +168,7 @@ void QFEvaluationPropertyEditorPrivate::checkHelpAvailable()
     } else {
         QString dll=d->current->getProject()->getEvaluationItemFactory()->getPluginHelp(d->current->getType());
         actHelpPlugin->setVisible(QFile::exists(dll));
-        dll=d->current->getProject()->getEvaluationItemFactory()->getPluginTutorial(d->current->getType());
+        dll=d->current->getProject()->getEvaluationItemFactory()->getPluginTutorialMain(d->current->getType());
         actHelpPluginTutorial->setVisible(QFile::exists(dll));
         dll=d->current->getProject()->getEvaluationItemFactory()->getPluginCopyrightFile(d->current->getType());
         actHelpPluginCopyright->setVisible(QFile::exists(dll));

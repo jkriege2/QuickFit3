@@ -614,7 +614,7 @@ int QFFCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord *rec, int index) {
     return 0;
 }
 
-void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::evalPlotData> &plots, int option)
+void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::GetPlotDataItem> &plots, int option)
 {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(rec);
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
@@ -704,7 +704,7 @@ void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
 
 
 
-        QFFitResultsByIndexEvaluationEditorWithWidgets::evalPlotData item;
+        QFFitResultsByIndexEvaluationEditorWithWidgets::GetPlotDataItem item;
         item.x=acftau;
         item.y=arrayToVector(data->getCorrelationRun(index), data->getCorrelationN());
         bool ok=true;
@@ -725,6 +725,7 @@ void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
             }
 
         }
+        item.name=QString("\\verb{%1}").arg(item.name);
         plots.append(item);
 
         if (option==1 || option==3) {
@@ -741,6 +742,7 @@ void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
                     item.yerrors[i]=item.yerrors[i]*norm;
                 }
             }
+            item.name=QString("\\verb{%1}").arg(item.name);
             plots.append(item);
         }
 

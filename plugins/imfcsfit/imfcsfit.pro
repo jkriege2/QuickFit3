@@ -57,7 +57,8 @@ HEADERS += qfpevalimfcsfit.h \
     ../interfaces/qfrdrimfcscorrelatorremote.h \
     ../base_classes/qffcsfitchi2landscapedialog.h\
     ../base_classes/qfimagetransform.h \
-    ../base_classes/qfoverlayplotdialog.h
+    ../base_classes/qfoverlayplotdialog.h \
+    ../interfaces/qfgetplotdatainterface.h
 
 
 SOURCES += qfpevalimfcsfit.cpp \

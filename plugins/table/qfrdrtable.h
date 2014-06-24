@@ -174,7 +174,9 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             dsoGreaterOrEqual=2,
             dsoSmallerOrEqual=3,
             dsoGreater=4,
-            dsoSmaller=5
+            dsoSmaller=5,
+            dsoInRange=6,
+            dsoOutOfRange=7,
         };
 
         static QString DataSelectOperation2String(DataSelectOperation type) {
@@ -184,6 +186,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
                 case dsoSmallerOrEqual: return QString("<=");
                 case dsoGreater: return QString(">");
                 case dsoSmaller: return QString("<");
+                case dsoInRange: return QString("inrange");
+                case dsoOutOfRange: return QString("outrange");
                 default:
                 case dsoEquals: return QString("==");
             }
@@ -195,6 +199,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             if(type=="<=") return dsoSmallerOrEqual;
             if(type==">") return dsoGreater;
             if(type=="<") return dsoSmaller;
+            if(type=="inrange") return dsoInRange;
+            if(type=="outrange") return dsoOutOfRange;
             return dsoEquals;
         }
 
@@ -205,6 +211,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             //void setBoxplotColumns(int position, int minC, int q25C, int medianC, int meanC, int q75C, int maxC);
             GraphType type;
             QString title;
+            bool titleShow;
             int xcolumn;
             int ycolumn;
             int xerrorcolumn;
@@ -249,6 +256,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             int dataSelectColumn;
             DataSelectOperation dataSelectOperation;
             double dataSelectCompareValue;
+            double dataSelectCompareValue2;
 
             int imageTicks;
             int imageModTicks;

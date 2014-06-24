@@ -2,7 +2,7 @@
 
 function replace_in_all {
 	echo "replace: " $1 
-	for i in ./$FNAME/*.cpp ./$FNAME/*.h ./$FNAME/*.pro ./$FNAME/*.qrc ./$FNAME/help/*.html; do 
+	for i in ./$FNAME/*.cpp ./$FNAME/*.h ./$FNAME/*.pro ./$FNAME/*.qrc ./$FNAME/help/*.html ./$FNAME/help/*.ini; do 
 	  echo "  -> " $i
 	  sed $1 < $i > $i.temp 
 	  mv $i.temp $i
@@ -80,6 +80,7 @@ mkdir -p $FNAME/help/pic
 cp ftarget.html $FNAME/help/${TARGETNAME}.html
 cp f1.html $FNAME/help/${FITFUNCNAME}.html
 cp tutorial.html $FNAME/help/tutorial.html
+cp tutorials.ini $FNAME/help/tutorials.ini
 
 
 replace_in_all 's/QFFitAlgorithmInst_F1/'$FITFUNCCLASSNAME'/g'

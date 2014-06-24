@@ -2,7 +2,7 @@
 
 function replace_in_all {
 	echo "replace: " $1 
-	for i in ./$DIRNAME/*.cpp ./$DIRNAME/*.h ./$DIRNAME/*.pro ./$DIRNAME/*.qrc ./$DIRNAME/*.ui ./$DIRNAME/help/*.html; do 
+	for i in ./$DIRNAME/*.cpp ./$DIRNAME/*.h ./$DIRNAME/*.pro ./$DIRNAME/*.qrc ./$DIRNAME/*.ui ./$DIRNAME/help/*.html ./$FNAME/help/*.ini; do 
 	  echo "  -> " $i
 	  sed $1 $i > $i.temp 
 	  mv $i.temp $i
@@ -81,7 +81,7 @@ mkdir -p $DIRNAME/help/pic
 cp ftarget.html $DIRNAME/help/${TARGETNAME}.html
 cp f1.html $DIRNAME/help/${FITALGCNAME}.html
 cp tutorial.html $DIRNAME/help/tutorial.html
-
+cp tutorials.ini $DIRNAME/help/tutorials.ini
 
 
 
