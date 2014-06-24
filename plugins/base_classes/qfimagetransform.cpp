@@ -20,12 +20,21 @@
 */
 
 #include "qfimagetransform.h"
+#include "CImg.h"
 
 
-
-QFImageTransformWidget::QFImageTransformWidget(QWidget *parent)
+QFImageTransformWidget::QFImageTransformWidget(const QString &title, QWidget *parent):
+    QWidget(parent)
 {
-
+    layForm=new QFormLayout();
+    setLayout(layForm);
+    labHeader=new QLabel("", this);
+    layForm->addRow(labHeader);
+    QFont f=labHeader->font();
+    f.setPointSizeF(f.pointSizeF()*1.5);
+    f.setBold(true);
+    labHeader->setFont(f);
+    labHeader->setText(title);
 }
 
 QFImageTransformWidget::~QFImageTransformWidget()
@@ -39,4 +48,79 @@ bool QFImageTransformWidget::transform(const QVector<double> &input, int width, 
     width_out=width;
     height_out=height;
     return false;
+}
+
+
+void QFImageTransformWidget::readSettings(QSettings &settings, const QString &prefix)
+{
+
+}
+
+void QFImageTransformWidget::writeSettings(QSettings &settings, const QString &prefix) const
+{
+
+}
+
+
+QList<QFImageTransformWidget*> QFImageTransformWidget::loadSettings(const QString &filename, QWidget* parent)
+{
+    QSettings set(filename, QSettings::IniFormat);
+    int count=set.value("count", 0).toInt();
+    QList<QFImageTransformWidget*> l;
+    for (int i=0; i<count; i++) {
+        set.beginGroup(QString("widget%1").arg(i));
+        QString type=set.value("type", "").toString();
+        QFImageTransformWidget* nw=NULL;
+        if (type=="blur") {
+            nw=new QFITWBlur(parent);
+        }
+        if (nw) {
+            nw->readSettings(set, "");
+            l.append(nw);
+        }
+        set.endGroup();
+    }
+    return l;
+}
+
+void QFImageTransformWidget::saveSettings(const QString &filename, const QList<QFImageTransformWidget *> &widgets)
+{
+    QSettings set(filename, QSettings::IniFormat);
+    set.setValue("count", widgets.size());
+    for (int i=0; i<widgets.size(); i++) {
+        set.beginGroup(QString("widget%1").arg(i));
+        widgets[i]->writeSettings(set, "");
+        set.endGroup();
+    }
+}
+
+
+QFITWBlur::QFITWBlur(QWidget *parent):
+    QFImageTransformWidget(QObject::tr("Blur"), parent)
+{
+
+}
+
+QFITWBlur::~QFITWBlur()
+{
+
+}
+
+void QFITWBlur::readSettings(QSettings &settings, const QString &prefix)
+{
+
+}
+
+void QFITWBlur::writeSettings(QSettings &settings, const QString &prefix) const
+{
+    settings.setValue(prefix+"type", "blur");
+}
+
+bool QFITWBlur::transform(const QVector<double> &input, int width, int height, QVector<double> &output, int &width_out, int &height_out)
+{
+    output=input;
+    width_out=width;
+    height_out=height;
+    return true;
+
 }

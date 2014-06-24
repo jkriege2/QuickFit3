@@ -26,6 +26,7 @@
 QFFCSFitEvaluationEditor::QFFCSFitEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget* parent):
     QFFitResultsByIndexEvaluationEditorWithWidgets("fcsfitevaleditor/", propEditor, services, parent, true, true, tr("run"))
 {
+
     createWidgets();
     btnFirstRun->setText(tr("avg."));
 
@@ -70,6 +71,8 @@ void QFFCSFitEvaluationEditor::createWidgets() {
 
     menuFit->addSeparator();
     menuFit->addAction(actCalibrateFocalVolume);
+    menuTools=propertyEditor->addOrFindMenu("&Tools", 0);
+    //menuTools->addAction(actOverlayPlot);
 }
 
 
@@ -614,7 +617,7 @@ int QFFCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord *rec, int index) {
     return 0;
 }
 
-void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::GetPlotDataItem> &plots, int option)
+void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plots, int option)
 {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(rec);
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
@@ -704,7 +707,7 @@ void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
 
 
 
-        QFFitResultsByIndexEvaluationEditorWithWidgets::GetPlotDataItem item;
+        QFGetPlotdataInterface::GetPlotDataItem item;
         item.x=acftau;
         item.y=arrayToVector(data->getCorrelationRun(index), data->getCorrelationN());
         bool ok=true;
@@ -749,13 +752,19 @@ void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
     }
 }
 
-bool QFFCSFitEvaluationEditor::getPlotDataSpecs(QStringList *optionNames)
+bool QFFCSFitEvaluationEditor::getPlotDataSpecs(QStringList *optionNames, QList<QFGetPlotdataInterface::GetPlotPlotOptions> *listPlotOptions)
 {
     if (optionNames) {
         *optionNames<<tr("data");
         *optionNames<<tr("data + fits");
         *optionNames<<tr("normalized data");
         *optionNames<<tr("normalized data + fits");
+    }
+    if (listPlotOptions) {
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("correlation curve $g(\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("correlation curve $g(\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("norm. correlation curve $N\\cdot g(\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("norm. correlation curve $N\\cdot g(\\tau)$"), true, false);
     }
     return true;
 }

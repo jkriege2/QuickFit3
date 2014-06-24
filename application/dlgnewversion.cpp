@@ -12,7 +12,7 @@ DlgNewVersion::DlgNewVersion(QWidget *parent) :
     ui->labCite->setText(tr("JW. Krieger, J. Langowski (2011): <b>QuickFit %1 (compiled: %2, SVN: %3): A data evaluation application for biophysics</b>, <i>[web page] <a href=\"%4\">%4 [Accessed on %5]</a></i><br>\n"
                             "<br><code><br>\n"
                             "@misc{quickfit3,<br>\n"
-                            "&nbsp;&nbsp;author={Jan Wolfgang Krieger and Jörg Langowski},<br>\n"
+                            "&nbsp;&nbsp;author={Jan Wolfgang Krieger and J&ouml;rg Langowski},<br>\n"
                             "&nbsp;&nbsp;title={QuickFit %1 (compiled: %2, SVN: %3): A data evaluation application for biophysics},<br>\n"
                             "&nbsp;&nbsp;howpublished={[web page] \\verb+%4+},<br>\n"
                             "&nbsp;&nbsp;year={%2},<br>\n"

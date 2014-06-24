@@ -1,24 +1,34 @@
 #ifndef QFUSESRESULTSBYINDEXEVALUATIONEDITOR_H
 #define QFUSESRESULTSBYINDEXEVALUATIONEDITOR_H
 #include "qfusesresultsbyindexevaluation.h"
-
+#include "qfgetplotdatainterface.h"
 #include "qfevaluationeditor.h"
 
-class QFUsesResultsByIndexEvaluationEditor : public QFEvaluationEditor {
+class QFUsesResultsByIndexEvaluationEditor : public QFEvaluationEditor, public QFEvaluationGetPlotdataInterface {
         Q_OBJECT
+        Q_INTERFACES(QFEvaluationGetPlotdataInterface)
     public:
         explicit QFUsesResultsByIndexEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor* propEditor, QWidget *parent = 0, const QString& iniPrefix=QString("QFUsesResultsByIndexEvaluationEditor/"));
         /** \brief read the settings */
         virtual void readSettings();
         /** \brief write the settings */
         virtual void writeSettings();
-
+        /** \brief returns plot data (appends to the list \a data ) from the given record and index therein. \a option specifies, which data to return. */
+        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem>& data, int option);
+        virtual void getPlotData(QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option);
+        virtual void getPlotData(int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option);
+        virtual void getPlotData(QFRawDataRecord *rec, QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option);
+        /** \brief returns \c true, if the getPlotData Feature is available and (if lists are supplied) a list of optionNames. */
+        virtual bool getPlotDataSpecs(QStringList* optionNames=NULL, QList<QFGetPlotdataInterface::GetPlotPlotOptions>* listPlotOptions=NULL);
         virtual int getUserMin(QFRawDataRecord *rec, int index, int defaultMin);
         virtual int getUserMax(QFRawDataRecord *rec, int index, int defaultMax);
         virtual int getUserMin(QFRawDataRecord *rec);
         virtual int getUserMax(QFRawDataRecord *rec);
         virtual int getUserMax(QFRawDataRecord *rec, int index);
         virtual int getUserMin(QFRawDataRecord *rec, int index);
+
+        virtual void connectDefaultWidgets(QFEvaluationItem *current, QFEvaluationItem *old);
+
 
     public slots:
         virtual void setUserMin(int userMin);
@@ -30,8 +40,11 @@ class QFUsesResultsByIndexEvaluationEditor : public QFEvaluationEditor {
         virtual void copyUserMinToAllRuns(int userMin);
         virtual void copyUserMaxToAllRuns(int userMax);
         virtual void copyUserMinMaxToAllRuns(int userMin, int userMax);
-    signals:
-        
+        virtual void createOverlayPlot();
+    protected:
+        QAction* actOverlayPlot;
+
+
     protected:
         virtual int getUserMinAbsMax(QFRawDataRecord *rec, int index);
 

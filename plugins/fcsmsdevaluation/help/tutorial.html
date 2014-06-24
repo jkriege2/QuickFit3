@@ -2,34 +2,15 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-  <title>FCS MSD Tutorial</title>
+  <title>FCS MSD Tutorials</title>
   </head>
   <body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
 		
-		The theory used to extract the MSD from a given measured FCS correlation curve is described in the <a href="fcs_msd.html">plugin documentation</a>. This page contains a short tutorial on how to extract the MSD from a measured ACF. We will use the example files provided in the directory <tt>$$local_plugin_assets$$/testdata/</tt>. 
-		<ol>
-		  <li>load the FCS measurement <tt>DNA_2nM_Al488_0ul_1.ASC</tt> which contains the measurement of a DNA fragment.</li>
-		  <li>create a <b>FCS Curve Fitting</b> evaluation and perform a 2-component fit there which also includes one triplet component. The parameter $$math:\gamma=6$$ and $$math:w_{xy}=270$$ were determined separately. The results should look like this:
-		  <center><img src="./pic/tut0.png"></center>
-		  </li>
-		  <li>create a <b>MSD evaluation</b></li>
-		  <li>select the <b>"FCS: simple 3D model"</b>, as the data was extracted from a confocal microscope where diffusion of the molecules was not restricted in any direction. Supply the particle number $$math:N=1.18$$ as extracted from the fit in step #2. also enter the parameter $$math:\gamma=6$$ and $$math:w_{xy}=270$$. The plot of the measured ACF should look like this:
-		  <center><img src="./pic/tut1.png"></center>
-		  The orange line marks $$math:1/N$$. The first channels  (above $$math:1/N$$) mostly contain the triplet and from the last channels where the ACF has already decayed to 0, nothing can be extracted, so we cut the ACF to this region (channels 17..128):
-		  <center><img src="./pic/tut2.png"></center>
-		  </li>
-		  <li>Now press "Fit Current". The extracted MSD should look like this:
-		  <center><img src="./pic/tut3.png"></center>
-		  </li>
-		  <li>Still for small ($$math:\tau<10^{-5}$$) and large ($$math:\tau>0.01$$) lag times we get deviations which are especially visible in the local &alpha;. To remove them from the plots we can further decrease the <i>displayed</i> part of the MSD with the cut-off below the "local ..." plot. So finally we get:</li>
-		  <center><img src="./pic/tut4.png"></center>
-		  From these plots we can extract the diffusion coefficient of arounf 20&mu;m2/s for the whole molecule and an anomaliyt of around &alpha;=0.8 for the internal motion.
-		  <li></li>
-		  <li></li>
-		  <li></li>
-		  <li></li>
-		  <li></li>
-		</ol>
+		<p>Several tutorials are available:<ul>
+		  <li><a href="tutorial_msd.html">FCS MSD evaluation</a></li>
+		  <li><a href="tutorial_overlayplot.html">Overlay plots</a></li>
+		</ul>
+		</p>
   </body>
 </html>

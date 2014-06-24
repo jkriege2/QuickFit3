@@ -78,6 +78,9 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         virtual ~QFFCSMSDEvaluationEditor();
 
 
+        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem>& plotdata, int option);
+        virtual bool getPlotDataSpecs(QStringList* optionNames=NULL, QList<QFGetPlotdataInterface::GetPlotPlotOptions>* listPlotOptions=NULL);
+
 
     protected slots:
         void fitWidthChanged(int width);

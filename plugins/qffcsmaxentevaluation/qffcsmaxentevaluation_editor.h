@@ -77,6 +77,10 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         virtual ~QFFCSMaxEntEvaluationEditor();
 
 
+        virtual void getPlotData(QFRawDataRecord* record, int index, QList<QFGetPlotdataInterface::GetPlotDataItem>& plotdata, int option);
+        virtual bool getPlotDataSpecs(QStringList* optionNames=NULL, QList<QFGetPlotdataInterface::GetPlotPlotOptions>* listPlotOptions=NULL);
+
+
 
     protected slots:
         void alphaChanged(double alpha);
@@ -152,6 +156,8 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         QComboBox* cmbXAxisType;
         QCheckBox* chkShowRanges;
         QFRDRImageToRunPreview* pltOverview;
+
+        QMenu* menuTools;
 
     private:
         void createWidgets();

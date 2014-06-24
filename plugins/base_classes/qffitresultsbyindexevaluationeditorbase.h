@@ -35,11 +35,23 @@
 
 
 */
-class QFFitResultsByIndexEvaluationEditorBase : public QFFitResultsEvaluationEditorBase {
+class QFFitResultsByIndexEvaluationEditorBase : public QFFitResultsEvaluationEditorBase, public QFEvaluationGetPlotdataInterface {
         Q_OBJECT
+        Q_INTERFACES(QFEvaluationGetPlotdataInterface)
     public:
         /** \brief class constructor */
         explicit QFFitResultsByIndexEvaluationEditorBase(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0);
+
+        /** \brief returns plot data (appends to the list \a data ) from the given record and index therein. \a option specifies, which data to return. */
+        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem>& data, int option);
+        virtual void getPlotData(QList<QFGetPlotdataInterface::GetPlotDataItem>& data, int option);
+        virtual void getPlotData(int index, QList<QFGetPlotdataInterface::GetPlotDataItem>& data, int option);
+        virtual void getPlotData(QFRawDataRecord* rec, QList<QFGetPlotdataInterface::GetPlotDataItem>& data, int option);
+        /** \brief returns \c true, if the getPlotData Feature is available and (if lists are supplied) a list of optionNames. */
+        virtual bool getPlotDataSpecs(QStringList* optionNames=NULL, QList<QFGetPlotdataInterface::GetPlotPlotOptions>* listPlotOptions=NULL);
+
+        /** \brief connect widgets to current data record */
+        virtual void connectDefaultWidgets(QFEvaluationItem* current, QFEvaluationItem* old, bool updatePlots);
 
 
         /** \brief get the lower datacut for the current record, reimplement this by calling getUserMin(QFRawDataRecord*,int,int) with a viable choice for \a defaultMin */
@@ -101,8 +113,10 @@ class QFFitResultsByIndexEvaluationEditorBase : public QFFitResultsEvaluationEdi
         void log_warning(QString message);
         void log_error(QString message);
 
-
-    public:
+        virtual void createOverlayPlot();
+    protected:
+        QAction* actOverlayPlot;
+     public:
 
         /* explicitly make some functions visible again, as the C++ compiler hides function definitions
            from a base class that are also declared in the derived class, but with different parameter sets!

@@ -91,6 +91,7 @@ void QFFitResultsEvaluationEditorBase::setCurrentSaveDirectory(QString d) {
 
 
 
+
 /////////////////////////////////////////////////////////////////////
 // SETTINGS STORAGE
 /////////////////////////////////////////////////////////////////////
@@ -471,6 +472,11 @@ int QFFitResultsEvaluationEditorBase::getUserMax(QFRawDataRecord* rec, int defau
     int defaultM=rec->getProperty(QString(resultID+"_datacut_max").replace(QString("_")+data->getFitFunction()->id()+QString("_run"), "_r").replace(data->getType()+"_", data->getType()), defaultMax).toInt();
 
     return rec->getProperty(resultID+"_datacut_max", defaultM).toInt();
+}
+
+void QFFitResultsEvaluationEditorBase::connectDefaultWidgets(QFEvaluationItem *current, QFEvaluationItem *old, bool updatePlots)
+{
+
 }
 
 int QFFitResultsEvaluationEditorBase::getUserMin(int defaultMin) {

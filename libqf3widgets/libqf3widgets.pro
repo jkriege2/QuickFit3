@@ -132,7 +132,11 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/qt/qfvisualize3dglwidget.h \
     ../../../../LIB/trunk/qt/qfvisualize3dgleditor.h \
     qconfigcomboboxwidget.h \
-    qffitfunctionselectdialog.h
+    qffitfunctionselectdialog.h \
+    qfgetplotdatainterface.h \
+    ../plugins/interfaces/qfoverlayplotdialog.h \
+    qfoverlayplotdialog.h \
+    ../plugins/interfaces/qfgetplotdatainterface.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -225,7 +229,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     ../../../../LIB/trunk/qt/qfvisualize3dglwidget.cpp \
     ../../../../LIB/trunk/qt/qfvisualize3dgleditor.cpp \
     qconfigcomboboxwidget.cpp \
-    qffitfunctionselectdialog.cpp
+    qffitfunctionselectdialog.cpp \
+    qfoverlayplotdialog.cpp
 
 
 FORMS += qf3objectiveeditor.ui \
@@ -236,7 +241,8 @@ FORMS += qf3objectiveeditor.ui \
     qfsimplecurvefitdialog.ui \
     qfrdrimagemaskbyintensity.ui \
     ../../../../LIB/trunk/qt/qfvisualize3dgleditor.ui \
-    qffitfunctionselectdialog.ui
+    qffitfunctionselectdialog.ui \
+    qfoverlayplotdialog.ui
 
 
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \

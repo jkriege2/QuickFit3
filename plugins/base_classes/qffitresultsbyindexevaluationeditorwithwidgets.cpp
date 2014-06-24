@@ -58,35 +58,6 @@ QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEdi
 
 }
 
-bool QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotDataSpecs(QStringList *optionNames)
-{
-    return false;
-}
-
-void QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotData(QFRawDataRecord *rec, int index, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::GetPlotDataItem> &data, int option)
-{
-    return ;
-}
-
-void QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotData(QList<QFFitResultsByIndexEvaluationEditorWithWidgets::GetPlotDataItem> &data, int option)
-{
-    QFFitResultsByIndexEvaluation* fcs=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    if (fcs) getPlotData(fcs->getHighlightedRecord(), fcs->getCurrentIndex(), data, option);
-}
-
-
-void QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotData(int index, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::GetPlotDataItem> &data, int option)
-{
-    QFFitResultsByIndexEvaluation* fcs=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    if (fcs) getPlotData(fcs->getHighlightedRecord(), index, data, option);
-}
-
-void QFFitResultsByIndexEvaluationEditorWithWidgets::getPlotData(QFRawDataRecord *rec, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::GetPlotDataItem> &data, int option)
-{
-    QFFitResultsByIndexEvaluation* fcs=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    if (fcs) getPlotData(rec, fcs->getCurrentIndex(), data, option);
-
-}
 
 
 void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMultiThreaded, bool multiThreadPriority) {
@@ -456,8 +427,6 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     actChi2Landscape=new QAction(tr("&Plot &Chi2 Landscape"), this);
     connect(actChi2Landscape, SIGNAL(triggered()), this, SLOT(plotChi2Landscape()));
 
-    actOverlayPlot=new QAction(tr("&Overlay plot"), this);
-    connect(actOverlayPlot, SIGNAL(triggered()), this, SLOT(createOverlayPlot()));
 
     btnLoadParameters=createButtonAndActionShowText(actLoadParameters, QIcon(":/fcsfit/param_load.png"), tr("&Load Parameters"), this);
     actLoadParameters->setToolTip(tr("load a FCS fit parameter set from a file.\nThe parameter set files can be created using \"Save Parameters\""));
@@ -601,7 +570,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     menuResults->addAction(actSaveReport);
     menuResults->addAction(actPrintReport);
 
-    menuTools=propertyEditor->addMenu("&Tools", 0);
+    menuTools=propertyEditor->addOrFindMenu("&Tools", 0);
     menuTools->addAction(actOverlayPlot);
 
 
@@ -634,6 +603,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 }
 
 void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEvaluationItem *current, QFEvaluationItem *old, bool updatePlots) {
+    QFFitResultsByIndexEvaluationEditorBase::connectDefaultWidgets(current, old, updatePlots);
+
     QFFitResultsByIndexEvaluation* fcs=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
 
     if (old!=NULL) {
@@ -870,14 +841,14 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::highlightingChanged(QFRawDa
         cmbModel->setCurrentFitFunction(eval->getFitFunction()->id());
         if (cmbModel->currentFitFunctionID()!=oldID) modelChanged=true;
 
-        actOverlayPlot->setEnabled(this->getPlotDataSpecs());
+
         /*int newidx=cmbModel->findData(eval->getFitFunction()->id());
         if (newidx!=cmbModel->currentIndex()) modelChanged=true;
         cmbModel->setCurrentIndex(newidx);*/
         dataEventsEnabled=true;
 
     } else {
-        actOverlayPlot->setEnabled(false);
+
     }
     displayModel(modelChanged);
     replotData();
@@ -1952,44 +1923,3 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::gotoFirstRun()
     spinRun->setValue(spinRun->minimum());
 }
 
-void QFFitResultsByIndexEvaluationEditorWithWidgets::createOverlayPlot()
-{
-    QFMatchRDRFunctorSelectApplicable* functor=new QFMatchRDRFunctorSelectApplicable(current);
-    QFSelectRDRDialog* dlg=new QFSelectRDRDialog(functor, true, this);
-    dlg->setAllowCreateNew(false);
-    dlg->setAllowMultiSelect(true);
-    QComboBox* cmbOptions=new QComboBox(dlg);
-    QStringList optionNames;
-    getPlotDataSpecs(&optionNames);
-    if (optionNames.size()>0) {
-        cmbOptions->addItems(optionNames);
-    } else {
-        cmbOptions->addItem(tr("all data"));
-    }
-    dlg->addWidget(tr("which plots:"), cmbOptions);
-    if (dlg->exec()) {
-        QList<QPointer<QFRawDataRecord> > rdr=dlg->getSelectedRDRs();
-        QList<GetPlotDataItem> data;
-        for (int i=0; i<rdr.size(); i++) {
-            if (rdr[i]) {
-                getPlotData(rdr[i], data, cmbOptions->currentIndex());
-            }
-        }
-        if (data.size()>0) {
-            //qDebug()<<"plot data"<<data.size();
-            QFOverlayPlotDialog* dlgOvl=new QFOverlayPlotDialog(this);
-            dlgOvl->startAddingPlots();
-            dlgOvl->setLog(true, false);
-            dlgOvl->setAxisLabel(tr("lag time $\\tau$ [s]"), tr("correlation function $g(\\tau)$"));
-            for (int i=0; i<data.size(); i++) {
-                dlgOvl->addPlot(data[i].x, data[i].y, data[i].name, data[i].xerrors, data[i].yerrors);
-            }
-            dlgOvl->endAddingPlots();
-            dlgOvl->show();
-
-        } else {
-            QMessageBox::information(this, tr("Overlay Plot"), tr("No plot data available!"));
-        }
-        delete dlg;
-    }
-}

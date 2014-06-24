@@ -25,13 +25,34 @@
 #include <QObject>
 #include <QVector>
 #include <QWidget>
+#include <QSettings>
+#include <QFormLayout>
+#include <QLabel>
 
-class QFImageTransformWidget: public QWidget
-{
+class QFImageTransformWidget: public QWidget {
         Q_OBJECT
     public:
-        explicit QFImageTransformWidget(QWidget* parent);
+        explicit QFImageTransformWidget(const QString& title, QWidget* parent=NULL);
         virtual ~QFImageTransformWidget();
+        virtual void readSettings(QSettings& settings, const QString& prefix);
+        virtual void writeSettings(QSettings& settings, const QString& prefix) const;
+        virtual bool transform(const QVector<double>& input, int width, int height, QVector<double>& output, int& width_out, int& height_out);
+
+        static QList<QFImageTransformWidget*> loadSettings(const QString& filename, QWidget *parent=NULL);
+        static void saveSettings(const QString& filename, const QList<QFImageTransformWidget*>& widgets);
+    protected:
+        QFormLayout* layForm;
+        QLabel* labHeader;
+};
+
+
+class QFITWBlur: public QFImageTransformWidget {
+        Q_OBJECT
+    public:
+        explicit QFITWBlur(QWidget* parent=NULL);
+        virtual ~QFITWBlur();
+        virtual void readSettings(QSettings& settings, const QString& prefix);
+        virtual void writeSettings(QSettings& settings, const QString& prefix) const;
         virtual bool transform(const QVector<double>& input, int width, int height, QVector<double>& output, int& width_out, int& height_out);
 };
 

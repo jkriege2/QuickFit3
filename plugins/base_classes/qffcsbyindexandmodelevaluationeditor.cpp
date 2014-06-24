@@ -66,6 +66,11 @@ void QFFCSByIndexAndModelEvaluationEditor::writeSettings() {
     }
 }
 
+void QFFCSByIndexAndModelEvaluationEditor::connectDefaultWidgets(QFEvaluationItem *current, QFEvaluationItem *old)
+{
+    QFUsesResultsByIndexEvaluationEditor::connectDefaultWidgets(current, old);
+}
+
 void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
 
     QVBoxLayout* mainLayout=new QVBoxLayout();
@@ -489,6 +494,9 @@ int QFFCSByIndexAndModelEvaluationEditor::getUserMinAbsMax(QFRawDataRecord *rec,
 
 
 void QFFCSByIndexAndModelEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old) {
+
+    connectDefaultWidgets(current, old);
+
     // called when this widget should be connected to a new QFEvaluationItem
 
     QFUsesResultsByIndexAndModelEvaluation* item=qobject_cast<QFUsesResultsByIndexAndModelEvaluation*>(current);

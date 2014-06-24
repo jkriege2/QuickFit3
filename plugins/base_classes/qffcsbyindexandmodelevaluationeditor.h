@@ -57,6 +57,8 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
         virtual void readSettings();
         /** \brief write the settings */
         virtual void writeSettings();
+
+        virtual void connectDefaultWidgets(QFEvaluationItem *current, QFEvaluationItem *old);
     public slots:
 
 
@@ -217,6 +219,7 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
         QMenu* menuParameters;
         QMenu* menuFit;
         QMenu* menuResults;
+        QMenu* menuTools;
 
 
         /** \brief when \c false the events that read the data from the widgets and write it to the QFEvaluationItem current are disabled */

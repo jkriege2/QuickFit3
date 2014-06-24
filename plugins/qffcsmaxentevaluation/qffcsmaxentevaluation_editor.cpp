@@ -38,6 +38,117 @@ QFFCSMaxEntEvaluationEditor::~QFFCSMaxEntEvaluationEditor()
 {
 }
 
+void QFFCSMaxEntEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plotdata, int option)
+{
+    if (!current) return;
+    if (!cmbModel) return;
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSMaxEntEvaluationItem* eval=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    int model=eval->getCurrentModel();
+
+    if ((!eval)||(!data)) {
+        return;
+    }
+
+
+    int datacut_min=datacut->get_userMin();
+    int datacut_max=datacut->get_userMax();
+
+
+    try {
+
+        if (data->getCorrelationN()>0) {
+
+            /////////////////////////////////////////////////////////////////////////////////
+            // retrieve data and tau-values from rawdata record
+            /////////////////////////////////////////////////////////////////////////////////
+            long N=data->getCorrelationN();
+            double* tauvals=data->getCorrelationT();
+            double* corrdata=NULL;
+
+            if (index<0) {
+                corrdata=data->getCorrelationMean();
+            } else {
+                if (index<(int)data->getCorrelationRuns()) {
+                    corrdata=data->getCorrelationRun(index);
+                } else {
+                    corrdata=data->getCorrelationMean();
+                }
+            }
+
+            double* weights=eval->allocWeights(NULL, record, index, datacut_min, datacut_max);
+
+
+            /////////////////////////////////////////////////////////////////////////////////
+            // calculate fit statistics
+            /////////////////////////////////////////////////////////////////////////////////
+            double* modelVals=(double*)malloc(N*sizeof(double));
+            QVector<double> dist=eval->getDistribution(record, index, model);
+            QVector<double> distTau=eval->getDistributionTaus(record, index, model);
+
+            eval->evaluateModel(record, index, model, tauvals, modelVals, N, distTau.data(), dist.data(), dist.size());
+
+
+            /////////////////////////////////////////////////////////////////////////////////
+            // plot distribution
+            /////////////////////////////////////////////////////////////////////////////////
+            QVector<double> mem_tau=eval->getDistributionTaus(record, index, model);
+            QVector<double> mem_D=eval->getDistributionDs(record, index, model);
+            QVector<double> mem_dist=eval->getDistribution(record, index, model);
+
+            mem_D=mem_tau;
+            double wxy=eval->getFitValue(record, index, model, "maxent_wxy");
+            for (int i=0; i<mem_tau.size(); i++) {
+                mem_D[i]=wxy*wxy/1000000.0/4.0/mem_tau[i];
+            }
+
+
+            if (option==0) {
+                QFGetPlotdataInterface::GetPlotDataItem item;
+                item.x=mem_tau;
+                item.y=mem_dist;
+                item.name=QString("\\verb{%1: p(\\tau_D})").arg(record->getName());
+                plotdata.append(item);
+            } else if (option==1) {
+                QFGetPlotdataInterface::GetPlotDataItem item;
+                item.x=mem_D;
+                item.y=mem_dist;
+                item.name=QString("\\verb{%1: p(D)}").arg(record->getName());
+                plotdata.append(item);
+            } else if (option==2) {
+                QFGetPlotdataInterface::GetPlotDataItem item;
+                item.x=arrayToVector(tauvals, N);
+                item.y=arrayToVector(corrdata, N);
+                item.yerrors=arrayToVector(weights, N);
+                item.name=QString("\\verb{%1: ACF}").arg(record->getName());
+                plotdata.append(item);
+            }
+
+            free(weights);
+
+        }
+    } catch(std::exception& E) {
+        services->log_error(tr("error during plotting, error message: %1\n").arg(E.what()));
+    }
+}
+
+bool QFFCSMaxEntEvaluationEditor::getPlotDataSpecs(QStringList *optionNames, QList<QFGetPlotdataInterface::GetPlotPlotOptions> *listPlotOptions)
+{
+    if (optionNames) {
+        *optionNames<<tr("MaxEnt tauD-distribution");
+        *optionNames<<tr("MaxEnt D-distribution");
+        *optionNames<<tr("autocorrelation data");
+        *optionNames<<tr("autocorrelation curves + fit");
+    }
+    if (listPlotOptions) {
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("diffusion time \\tau_D [\\mu s]"), tr("MaxEnt distribution $p(\\tau_D)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("diffusion coefficient D [\\mu m^2/s]"), tr("MaxEnt distribution $p(D)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("correlation curve $g(\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("correlation curve $g(\\tau)$"), true, false);
+    }
+    return true;
+}
+
 
 void QFFCSMaxEntEvaluationEditor::createWidgets() {
     QWidget* wrange;
@@ -232,7 +343,8 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     pltOverview->setSelectionEditable(true);
     tabResidulas->addTab(pltOverview, tr("Overview Image"));
 
-
+    menuTools=propertyEditor->addOrFindMenu("&Tools", 0);
+    menuTools->addAction(actOverlayPlot);
     /////
     connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
     connect(cmbXAxisType, SIGNAL(currentIndexChanged(int)), this, SLOT(chkShowDChanged()));
@@ -863,7 +975,7 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 g_dist->set_title("MaxEnt distribution");
                 if (cmbXAxisType->currentIndex()==1) {
                     g_dist->set_xColumn(c_distD);
-                    pltDistribution->getXAxis()->set_axisLabel(tr("diffusion coefficient $D$ [µm²/s]"));
+                    pltDistribution->getXAxis()->set_axisLabel(tr("diffusion coefficient $D$ [ï¿½mï¿½/s]"));
                 } else {
                     g_dist->set_xColumn(c_disttau);
                     pltDistribution->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));

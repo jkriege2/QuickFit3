@@ -47,6 +47,116 @@ QFFCSMSDEvaluationEditor::~QFFCSMSDEvaluationEditor()
 {
 }
 
+void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plotdata, int option)
+{
+    if (!current) return;
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    QFFCSMSDEvaluationItem* eval=qobject_cast<QFFCSMSDEvaluationItem*>(current);
+    int model=eval->getCurrentModel();
+
+    if ((!eval)||(!data)) {
+        return;
+    }
+
+    int datacut_min=datacut->get_userMin();
+    int datacut_max=datacut->get_userMax();
+
+    try {
+
+        if (data->getCorrelationN()>0) {
+            QVector<double> acftau=arrayToVector(data->getCorrelationT(), data->getCorrelationN());
+
+
+            long N=data->getCorrelationN();
+            double* tauvals=data->getCorrelationT();
+            double* corrdata=NULL;
+
+            if (index<0) {
+                corrdata=data->getCorrelationMean();
+            } else {
+                if (index<(int)data->getCorrelationRuns()) {
+                    corrdata=data->getCorrelationRun(index);
+                } else {
+                    corrdata=data->getCorrelationMean();
+                }
+            }
+            QVector<double> acf;
+            if (corrdata) acf=arrayToVector(corrdata, N);
+
+            double* weights=eval->allocWeights(NULL, record, index, datacut_min, datacut_max);
+
+
+            /////////////////////////////////////////////////////////////////////////////////
+            // calculate fit statistics
+            /////////////////////////////////////////////////////////////////////////////////
+
+            double* modelVals=(double*)malloc(N*sizeof(double));
+            QVector<double> dist=eval->getMSD(record, index, model);
+            QVector<double> distTau=eval->getMSDTaus(record, index, model);
+
+            eval->evaluateModel(record, index, model, tauvals, modelVals, N, distTau.data(), dist.data(), dist.size());
+
+
+
+
+            double N_particle=eval->getFitValue(record, index, model, "n_particle");
+            if (N_particle<=0) {
+                N_particle=1;
+            }
+
+
+            if (option==0) {
+                QFGetPlotdataInterface::GetPlotDataItem item;
+                item.x=distTau;
+                item.y=dist;
+                item.name=QString("\\verb{%1: MSD}").arg(record->getName());
+                plotdata.append(item);
+            } else if (option==1) {
+                QFGetPlotdataInterface::GetPlotDataItem item;
+                item.x=acftau;
+                item.y=acf;
+                item.yerrors=arrayToVector(weights, N);
+                item.name=QString("\\verb{%1: ACF}").arg(record->getName());
+                plotdata.append(item);
+            } else if (option==2) {
+                QFGetPlotdataInterface::GetPlotDataItem item;
+                item.x=acftau;
+                item.y=acf;
+                item.yerrors=arrayToVector(weights, N);
+                for (int i=0; i<item.y.size(); i++) {
+                    item.y[i]=item.y[i]*N_particle;
+                }
+                for (int i=0; i<item.yerrors.size(); i++) {
+                    item.yerrors[i]=item.yerrors[i]*N_particle;
+                }
+                item.name=QString("\\verb{%1: norm. ACF}").arg(record->getName());
+                plotdata.append(item);
+            }
+
+            free(weights);
+            //fit_stat.free();
+
+        }
+    } catch(std::exception& E) {
+        services->log_error(tr("error during plotting, error message: %1\n").arg(E.what()));
+    }
+}
+
+bool QFFCSMSDEvaluationEditor::getPlotDataSpecs(QStringList *optionNames, QList<QFGetPlotdataInterface::GetPlotPlotOptions> *listPlotOptions)
+{
+    if (optionNames) {
+        *optionNames<<tr("mean squared displacements (MSDs)");
+        *optionNames<<tr("autocorrelation data");
+        *optionNames<<tr("normalized autocorrelation data");
+    }
+    if (listPlotOptions) {
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("mean squared displacements $\\langle r^2\\rangle(\\tau)$"), true, true);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("correlation curve $g(\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("norm. correlation curve $N\\cdot g(\\tau)$"), true, false);
+    }
+    return true;
+}
+
 QWidget* QFFCSMSDEvaluationEditor::createSlopeWidgets(int i) {
     QWidget* w1=new QWidget(this);
     QHBoxLayout* lay1=new QHBoxLayout();
@@ -337,6 +447,9 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     pltOverview->setMaskEditable(true);
     pltOverview->setSelectionEditable(true);
     tabResidulas->addTab(pltOverview, tr("Overview Image"));
+
+    menuTools=propertyEditor->addOrFindMenu("&Tools", 0);
+    menuTools->addAction(actOverlayPlot);
 
     /////
     connect(pltDistribution, SIGNAL(plotMouseMove(double,double)), this, SLOT(plotMouseMove(double,double)));
@@ -1604,7 +1717,7 @@ void QFFCSMSDEvaluationEditor::copyAverageData() {
         if (errorMessage.isEmpty() && !progress.wasCanceled()) {
             QList<QList<double> > data;
             QStringList colNames;
-            colNames<<tr("tau [s]")<<tr("avg(msd) [µm²]")<<tr("SD(msd) [µm²]");
+            colNames<<tr("tau [s]")<<tr("avg(msd) [ï¿½mï¿½]")<<tr("SD(msd) [ï¿½mï¿½]");
             data.append(tau);
             for (int i=0; i<sum.size(); i++) {
                 double s=sum[i];
@@ -1620,7 +1733,7 @@ void QFFCSMSDEvaluationEditor::copyAverageData() {
                 for (int i=0; i<sel.size(); i++) {
                     int run=sel[i].toInt();
                     QVector<double> d=eval->getMSD(record, run, eval->getCurrentModel());
-                    colNames<<tr("msd_run%1 [µm²]").arg(run);
+                    colNames<<tr("msd_run%1 [ï¿½mï¿½]").arg(run);
                     data.append(d.toList());
                 }
             }
@@ -1630,7 +1743,7 @@ void QFFCSMSDEvaluationEditor::copyAverageData() {
                 data.append(fitTau);
             }
             if (chkCopyDofTau->isChecked()) {
-                colNames<<tr("avg(D(tauDA)) [µm²/s]")<<tr("SD(D(tauDA)) [µm²/s]");
+                colNames<<tr("avg(D(tauDA)) [ï¿½mï¿½/s]")<<tr("SD(D(tauDA)) [ï¿½mï¿½/s]");
                 for (int i=0; i<Dsum.size(); i++) {
                     double s=Dsum[i];
                     double s2=Dsum2[i];
@@ -1643,7 +1756,7 @@ void QFFCSMSDEvaluationEditor::copyAverageData() {
                 if (chkCopyRaw->isChecked()) {
                     for (int i=0; i<sel.size(); i++) {
                         int run=sel[i].toInt();
-                        colNames<<tr("D_run%1 [µm²/s]").arg(run);
+                        colNames<<tr("D_run%1 [ï¿½mï¿½/s]").arg(run);
                         data.append(DD[i].toList());
                     }
                 }
@@ -2216,7 +2329,7 @@ void QFFCSMSDEvaluationEditor::updateDistribution() {
 
             JKQTPxFunctionLineGraph* g_dist=new JKQTPxFunctionLineGraph(pltDistribution->get_plotter());
             g_dist->set_drawLine(true);
-            g_dist->set_title(tr("MSD %1, D=%2µm²/s, \\alpha=%3").arg(i+1).arg(numD[i]->value()).arg(numAlpha[i]->value()));
+            g_dist->set_title(tr("MSD %1, D=%2ï¿½mï¿½/s, \\alpha=%3").arg(i+1).arg(numD[i]->value()).arg(numAlpha[i]->value()));
             g_dist->setSpecialFunction(JKQTPxFunctionLineGraph::PowerLaw);
             QVector<double> vecP;
             vecP<<D<<a;

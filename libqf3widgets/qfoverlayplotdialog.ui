@@ -32,12 +32,18 @@
      <item>
       <widget class="QCheckBox" name="chkErrors">
        <property name="text">
-        <string>show errors</string>
+        <string>show errors:</string>
        </property>
        <property name="checked">
         <bool>true</bool>
        </property>
       </widget>
+     </item>
+     <item>
+      <widget class="JKQTPerrorPlotstyleComboBox" name="cmbErrorStyleX"/>
+     </item>
+     <item>
+      <widget class="JKQTPerrorPlotstyleComboBox" name="cmbErrorStyleY"/>
      </item>
      <item>
       <spacer name="horizontalSpacer_2">
@@ -65,7 +71,7 @@
         <string>&amp;Help</string>
        </property>
        <property name="icon">
-        <iconset resource="../../lib/lib.qrc">
+        <iconset resource="../lib/lib.qrc">
          <normaloff>:/lib/help/help.png</normaloff>:/lib/help/help.png</iconset>
        </property>
       </widget>
@@ -89,7 +95,7 @@
         <string>&amp;Close</string>
        </property>
        <property name="icon">
-        <iconset resource="../../lib/lib.qrc">
+        <iconset resource="../lib/lib.qrc">
          <normaloff>:/lib/exit.png</normaloff>:/lib/exit.png</iconset>
        </property>
       </widget>
@@ -105,15 +111,20 @@
    <header>qfplotter.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>JKQTPerrorPlotstyleComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -177,6 +188,70 @@
     <hint type="destinationlabel">
      <x>48</x>
      <y>36</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbErrorStyleX</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFOverlayPlotDialog</receiver>
+   <slot>updatePlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>194</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>154</x>
+     <y>38</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbErrorStyleY</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFOverlayPlotDialog</receiver>
+   <slot>updatePlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>299</x>
+     <y>24</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>268</x>
+     <y>35</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkErrors</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbErrorStyleX</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>135</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>185</x>
+     <y>22</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkErrors</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbErrorStyleY</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>85</x>
+     <y>25</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>280</x>
+     <y>20</y>
     </hint>
    </hints>
   </connection>

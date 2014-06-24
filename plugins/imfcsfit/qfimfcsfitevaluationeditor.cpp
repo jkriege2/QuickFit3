@@ -49,6 +49,7 @@ QFImFCSFitEvaluationEditor::QFImFCSFitEvaluationEditor(QFPluginServices *service
     QFFitResultsByIndexEvaluationEditorWithWidgets("imfcsfitevaleditor/", propEditor, services, parent, true, true, tr("pixel"))
 {
     //menuTools=propEditor->addMenu("Tools", 0);
+
     createWidgets();
     btnFirstRun->setText(tr("avg."));
 }
@@ -59,7 +60,7 @@ QFImFCSFitEvaluationEditor::~QFImFCSFitEvaluationEditor()
 }
 
 
-void QFImFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFFitResultsByIndexEvaluationEditorWithWidgets::GetPlotDataItem> &plots, int option)
+void QFImFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plots, int option)
 {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(rec);
     QFImFCSFitEvaluation* eval=qobject_cast<QFImFCSFitEvaluation*>(current);
@@ -149,7 +150,7 @@ void QFImFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QL
 
 
 
-        QFFitResultsByIndexEvaluationEditorWithWidgets::GetPlotDataItem item;
+        QFGetPlotdataInterface::GetPlotDataItem item;
         item.x=acftau;
         item.y=arrayToVector(data->getCorrelationRun(index), data->getCorrelationN());
         bool ok=true;
@@ -194,13 +195,19 @@ void QFImFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QL
     }
 }
 
-bool QFImFCSFitEvaluationEditor::getPlotDataSpecs(QStringList *optionNames)
+bool QFImFCSFitEvaluationEditor::getPlotDataSpecs(QStringList *optionNames, QList<QFGetPlotdataInterface::GetPlotPlotOptions> *listPlotOptions)
 {
     if (optionNames) {
         *optionNames<<tr("data");
         *optionNames<<tr("data + fits");
         *optionNames<<tr("normalized data");
         *optionNames<<tr("normalized data + fits");
+    }
+    if (listPlotOptions) {
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("correlation curve $g(\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("correlation curve $g(\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("norm. correlation curve $N\\cdot g(\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("norm. correlation curve $N\\cdot g(\\tau)$"), true, false);
     }
     return true;
 }
@@ -265,6 +272,7 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
     actSetParameterFromFile=new QAction(tr("set fit parameter from file ..."), this)    ;
     connect(actSetParameterFromFile, SIGNAL(triggered()), this, SLOT(setFitParameterFromFile()));
     menuTools->addAction(actSetParameterFromFile);
+    menuTools->addAction(actOverlayPlot);
 }
 
 

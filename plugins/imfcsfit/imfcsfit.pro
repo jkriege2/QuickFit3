@@ -26,6 +26,9 @@ TARGET = imfcsfit
 DEPENDPATH += ./
 
 include(../plugins.pri)
+include(../../extlibs/zlib.pri)
+include(../../extlibs/tiff.pri)
+include(../../extlibs/cimg.pri)
 
 DESTDIR = $$QFOUTPUT/plugins
 
@@ -57,8 +60,7 @@ HEADERS += qfpevalimfcsfit.h \
     ../interfaces/qfrdrimfcscorrelatorremote.h \
     ../base_classes/qffcsfitchi2landscapedialog.h\
     ../base_classes/qfimagetransform.h \
-    ../base_classes/qfoverlayplotdialog.h \
-    ../interfaces/qfgetplotdatainterface.h
+    ../../../../../LIB/trunk/libtiff_tools.h
 
 
 SOURCES += qfpevalimfcsfit.cpp \
@@ -80,7 +82,7 @@ SOURCES += qfpevalimfcsfit.cpp \
     imfcscalibrationwizard.cpp \
     ../base_classes/qffcsfitchi2landscapedialog.cpp\
     ../base_classes/qfimagetransform.cpp \
-    ../base_classes/qfoverlayplotdialog.cpp
+    ../../../../../LIB/trunk/libtiff_tools.cpp
 
 
 
@@ -89,8 +91,7 @@ FORMS = \
     optionswidget.ui \
     qfimfcssetparamfromfiledialog.ui \
     imfcscalibrationwizard.ui \
-    ../base_classes/qffcsfitchi2landscapedialog.ui \
-    ../base_classes/qfoverlayplotdialog.ui
+    ../base_classes/qffcsfitchi2landscapedialog.ui
 
 RESOURCES += qfevalimfcsfit.qrc \
     ../base_classes/qffitresultsevaluationeditorbase.qrc

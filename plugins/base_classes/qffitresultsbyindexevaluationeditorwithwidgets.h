@@ -73,22 +73,13 @@
 
 
 */
-class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByIndexEvaluationEditorBase, public QFGetPlotdataInterface
+class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByIndexEvaluationEditorBase
 {
         Q_OBJECT
-        Q_INTERFACES(QFGetPlotdataInterface)
     public:
         explicit QFFitResultsByIndexEvaluationEditorWithWidgets(QString iniPrefix, QFEvaluationPropertyEditor* propEditor, QFPluginServices* services, QWidget *parent = 0, bool hasMultiThreaded=false, bool multiThreadPriority=false, const QString& runName=QString("run"));
 
-        /** \brief appends a list of major plot data, that may be used for an overview plot, to the given list data
-         *
-          */
-        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<GetPlotDataItem>& data, int option);
-        virtual void getPlotData(QList<GetPlotDataItem>& data, int option);
-        virtual void getPlotData(int index, QList<GetPlotDataItem>& data, int option);
-        virtual void getPlotData(QFRawDataRecord* rec, QList<GetPlotDataItem>& data, int option);
-        /** \brief returns \c true, if the getPlotData Feature is available and (if lists are supplied) a list of optionNames. */
-        virtual bool getPlotDataSpecs(QStringList* optionNames=NULL);
+
     protected slots:
         /** \brief connect widgets to current data record */
         virtual void connectDefaultWidgets(QFEvaluationItem* current, QFEvaluationItem* old, bool updatePlots);
@@ -213,7 +204,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QAction* actFitAllThreaded;
         QAction* actFitAllRunsThreaded;
         QAction* actChi2Landscape;
-        QAction* actOverlayPlot;
+        //QAction* actOverlayPlot;
 
         QMenu* menuFit;
         QMenu* menuParameters;
@@ -356,7 +347,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
         virtual void gotoFirstRun();
 
-        virtual void createOverlayPlot();
+
 
 
     public slots:

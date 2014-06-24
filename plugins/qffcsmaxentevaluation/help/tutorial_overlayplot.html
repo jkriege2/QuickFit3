@@ -1,0 +1,30 @@
+
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>FCS Fit: Tutorial: Overlay Plots</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+     <p>Often it is desireable to overlay the correlation functions from several RDRs in a single plot (e.g. to find outliers, or for a comparison plot in a paper). This can easily be done, using the "overlay tool" provided by the FCS fit:     
+     <ol>
+         <li>If you didn't add an FCS Fit to your project yet, do so now (click in <tt>Data Items|Insert Evaluation|FCS Curve Fitting)</tt>
+         <li>Open an FCS MaxEnt window (double-click the FCS: MaxEnt Fit evaluation (<img src=":fcs_maxent/qffcsmaxentevaluation_small.png">) in the project tree in QuickFit's main window).</li>
+         <li>The Fit editor pops up. In the "Evaluation" tab, click on the menu entry <code>Tools|Overlay plot</code></li>
+         <li>A new window will open up, where you can select (in the list) the RDRs, that you want to compare. You can also select, which data to show in the overlay plot (data or data+fit and whether it should be normalized by the particle number of the current fit or not):         
+         <center><a name="tutorial_overlayplot_pic000"><img src="./pic/tutorial_overlayplot_pic000.png" border="1">
+         </center>
+		 For further general information on how to interact with this dialog, see <a href="$$mainhelpdir$$qfselectrdrdialog.html">the basic RDR selection dialog documentation</a>.
+         </li>
+         <li>After a click on "OK", you get a new window with the desired plot:
+         <center><a name="tutorial_overlayplot_pic001"><img src="./pic/tutorial_overlayplot_pic001.png" border="1">
+         </center>
+         $$info:The plot will contain the currently displayed run from all selected files. You can also select to display the MaxEnt distributions as function of the diffusion time p(&tau;<sub>D</sub>), or the diffusion coefficient p(D).$$
+         </li>
+         <li>See the help on the generally used <a href="$$qf_ui_jkqtplotter_helpfile$$">plotter widget</a> for more information on the interaction with the plot! You can especially use the function "copy plot to table RDR" (right-click on the plot) to convert the plot into an editable table RDR object in the project. Then you can edit all data and all plot properties in the plot!</li>
+         
+     </ol>
+     </p>
+  </body>
+</html>

@@ -97,8 +97,8 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWithW
         virtual int getUserRangeMax(QFRawDataRecord* rec, int index);
         virtual int getUserRangeMin(QFRawDataRecord* rec, int index);
 
-        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<GetPlotDataItem>& data, int option);
-        virtual bool getPlotDataSpecs(QStringList* optionNames=NULL);
+        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem>& data, int option);
+        virtual bool getPlotDataSpecs(QStringList* optionNames=NULL, QList<QFGetPlotdataInterface::GetPlotPlotOptions>* listPlotOptions=NULL);
 
     protected slots:
         /** \brief connect widgets to current data record */

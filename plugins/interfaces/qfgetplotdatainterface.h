@@ -46,24 +46,59 @@ class QFGetPlotdataInterface
 {
     public:
         struct GetPlotDataItem {
+            bool majorPlot;
             QVector<double> x;
             QVector<double> xerrors;
             QVector<double> y;
             QVector<double> yerrors;
             QString name;
+
+
+            GetPlotDataItem() {
+                majorPlot=true;
+                name=QString();
+            }
         };
 
-        virtual ~QFGetPlotdataInterface() {};
+        struct GetPlotPlotOptions {
+            bool logX;
+            bool logY;
+            QString xLabel;
+            QString yLabel;
+            GetPlotPlotOptions(const QString& xLabel=QString("X"), const QString& yLabel=QString("Y"), bool logX=false, bool logY=false) {
+                this->logX=logX;
+                this->logY=logY;
+                this->xLabel=xLabel;
+                this->yLabel=yLabel;
+            }
+        };
+
+        virtual ~QFGetPlotdataInterface() {}
         /** \brief returns plot data (appends to the list \a data ) from the given record and index therein. \a option specifies, which data to return. */
-        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<GetPlotDataItem>& data, int option)=0;
+        virtual void getPlotData(QList<GetPlotDataItem>& data, int option)=0;
         /** \brief returns \c true, if the getPlotData Feature is available and (if lists are supplied) a list of optionNames. */
-        virtual bool getPlotDataSpecs(QStringList* optionNames=NULL)=0;
+        virtual bool getPlotDataSpecs(QStringList* optionNames=NULL, QList<GetPlotPlotOptions>* listPlotOptions=NULL)=0;
+};
+
+
+class QFEvaluationGetPlotdataInterface
+{
+    public:
+
+        virtual ~QFEvaluationGetPlotdataInterface() {}
+        /** \brief returns plot data (appends to the list \a data ) from the given record and index therein. \a option specifies, which data to return. */
+        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem>& data, int option)=0;
+        /** \brief returns \c true, if the getPlotData Feature is available and (if lists are supplied) a list of optionNames. */
+        virtual bool getPlotDataSpecs(QStringList* optionNames=NULL, QList<QFGetPlotdataInterface::GetPlotPlotOptions>* listPlotOptions=NULL)=0;
 };
 
 
 Q_DECLARE_INTERFACE( QFGetPlotdataInterface,
                      "www.dkfz.de.b040.quickfit3.QFGetPlotdataInterface/1.0")
 
+
+Q_DECLARE_INTERFACE( QFEvaluationGetPlotdataInterface,
+                     "www.dkfz.de.b040.quickfit3.QFEvaluationGetPlotdataInterface/1.0")
 
 
 #endif // QFGETPLOTDATAINTERFACE_H

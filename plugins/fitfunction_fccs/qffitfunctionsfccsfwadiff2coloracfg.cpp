@@ -38,7 +38,7 @@ QFFitFunctionsFCCSFWADiff2ColorACFG::QFFitFunctionsFCCSFWADiff2ColorACFG() {
     #define FCCSDiff_focus_distancez 14
     addParameter(FloatNumber,  "focus_struct_fac1",        "green PSF: structure factor",                        "&gamma;<sub>g</sub>",      "",         "",                     true,      true,         true,              QFFitFunction::EditError,    true, 6,         1e-5,     1e5,      1  );
     #define FCCSDiff_focus_structfac1 15
-    addParameter(FloatNumber,  "focus_width1",             "green PSF: lateral radius (1/e² radius)",             "w<sub>g</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 250,          0,        1e4,      10    );
+    addParameter(FloatNumber,  "focus_width1",             "green PSF: lateral radius (1/e^2 radius)",             "w<sub>g</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 250,          0,        1e4,      10    );
     #define FCCSDiff_focus_width1 16
     addParameter(FloatNumber,  "focus_volume1",            "green focus: effective colume",                               "V<sub>eff,g</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
     #define FCSSDiff_focus_volume 17
@@ -53,8 +53,8 @@ QFFitFunctionsFCCSFWADiff2ColorACFG::QFFitFunctionsFCCSFWADiff2ColorACFG() {
 
 
 double QFFitFunctionsFCCSFWADiff2ColorACFG::evaluate(double t, const double* data) const {
-    const double cab=data[FCCSDiff_concentrationab]*6.022e-1; // FCCSDiff_concentrationab given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
-    const double ca=data[FCCSDiff_concentrationa]*6.022e-1; // FCCSDiff_concentrationa given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
+    const double cab=data[FCCSDiff_concentrationab]*6.022e-1; // FCCSDiff_concentrationab given in 1e-9*6.022e23 particles/litre but c should be in particles per ï¿½mï¿½= particles/10^{-15}litres=1e15 particles/litre
+    const double ca=data[FCCSDiff_concentrationa]*6.022e-1; // FCCSDiff_concentrationa given in 1e-9*6.022e23 particles/litre but c should be in particles per ï¿½mï¿½= particles/10^{-15}litres=1e15 particles/litre
     const double Da=data[FCCSDiff_diff_acoeffa];
     const double Dab=data[FCCSDiff_diff_acoeffab];
     const double alphaa=data[FCCSDiff_diff_alphaa];
@@ -103,11 +103,11 @@ double QFFitFunctionsFCCSFWADiff2ColorACFG::evaluate(double t, const double* dat
 }
 
 void QFFitFunctionsFCCSFWADiff2ColorACFG::calcParameter(double* data, double* error) const {
-    const double cab=data[FCCSDiff_concentrationab]*6.022e-1; // FCCSDiff_concentrationab given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
+    const double cab=data[FCCSDiff_concentrationab]*6.022e-1; // FCCSDiff_concentrationab given in 1e-9*6.022e23 particles/litre but c should be in particles per ï¿½mï¿½= particles/10^{-15}litres=1e15 particles/litre
     double ecab=0;
-    const double ca=data[FCCSDiff_concentrationa]*6.022e-1; // FCCSDiff_concentrationa given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
+    const double ca=data[FCCSDiff_concentrationa]*6.022e-1; // FCCSDiff_concentrationa given in 1e-9*6.022e23 particles/litre but c should be in particles per ï¿½mï¿½= particles/10^{-15}litres=1e15 particles/litre
     double eca=0;
-//    const double cb=data[FCCSDiff_concentrationb]*6.022e-1; // FCCSDiff_concentrationb given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
+//    const double cb=data[FCCSDiff_concentrationb]*6.022e-1; // FCCSDiff_concentrationb given in 1e-9*6.022e23 particles/litre but c should be in particles per ï¿½mï¿½= particles/10^{-15}litres=1e15 particles/litre
 //    double ecb=0;
 //    const double Da=data[FCCSDiff_diff_coeffa];
 //    double eDa=0;
@@ -151,9 +151,9 @@ void QFFitFunctionsFCCSFWADiff2ColorACFG::calcParameter(double* data, double* er
 //    const double cr2=data[FCCSDiff_count_rate2];
 //    double ecr2=0;
     if (error) {
-        ecab=error[FCCSDiff_concentrationab]*6.022e-1; // FCCSDiff_concentrationab given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
-        eca=error[FCCSDiff_concentrationa]*6.022e-1; // FCCSDiff_concentrationa given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
-//        ecb=error[FCCSDiff_concentrationb]*6.022e-1; // FCCSDiff_concentrationb given in 1e-9*6.022e23 particles/litre but c should be in particles per µm³= particles/10^{-15}litres=1e15 particles/litre
+        ecab=error[FCCSDiff_concentrationab]*6.022e-1; // FCCSDiff_concentrationab given in 1e-9*6.022e23 particles/litre but c should be in particles per ï¿½mï¿½= particles/10^{-15}litres=1e15 particles/litre
+        eca=error[FCCSDiff_concentrationa]*6.022e-1; // FCCSDiff_concentrationa given in 1e-9*6.022e23 particles/litre but c should be in particles per ï¿½mï¿½= particles/10^{-15}litres=1e15 particles/litre
+//        ecb=error[FCCSDiff_concentrationb]*6.022e-1; // FCCSDiff_concentrationb given in 1e-9*6.022e23 particles/litre but c should be in particles per ï¿½mï¿½= particles/10^{-15}litres=1e15 particles/litre
 //        eDa=error[FCCSDiff_diff_coeffa];
 //        eDb=error[FCCSDiff_diff_coeffb];
 //        eDab=error[FCCSDiff_diff_coeffab];

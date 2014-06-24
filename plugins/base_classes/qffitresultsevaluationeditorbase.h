@@ -50,7 +50,7 @@
 #include "qffitparameterwidget.h"
 #include "jkverticalscrollarea.h"
 #include "qvisiblehandlesplitter.h"
-
+#include "qfgetplotdatainterface.h"
 
 /*! \brief evaluation item editor base class for data fits using QFFitAlgorithm and QFFitFunction
     \ingroup qf3evaluationplugins
@@ -144,6 +144,10 @@ class QFFitResultsEvaluationEditorBase : public QFEvaluationEditor {
         virtual int getUserMin(QFRawDataRecord* rec, int defaultMin);
         /** \brief get the upper datacut for the current record, the \a defaultMax should be read from editors current data cut widget */
         virtual int getUserMax(QFRawDataRecord* rec, int defaultMax);
+
+        /** \brief connect widgets to current data record */
+        virtual void connectDefaultWidgets(QFEvaluationItem* current, QFEvaluationItem* old, bool updatePlots);
+
     signals:
 
     public slots:

@@ -46,30 +46,44 @@ void QFOverlayPlotDialog::startAddingPlots()
 
 void QFOverlayPlotDialog::addPlot(const QVector<double> &x, const QVector<double> &y, const QString &name, const QVector<double> &xerror, const QVector<double> &yerror)
 {
+    QFGetPlotdataInterface::GetPlotDataItem item;
+    item.x=x;
+    item.y=y;
+    item.name=name;
+    item.xerrors=xerror;
+    item.yerrors=yerror;
+    addPlot(item);
+}
+
+void QFOverlayPlotDialog::addPlot(const QFGetPlotdataInterface::GetPlotDataItem &plotData)
+{
     JKQtBasePlotter* plt=ui->plot->get_plotter();
     JKQTPdatastore* ds=plt->getDatastore();
-    if (x.size()>0 && y.size()>0) {
+    if (plotData.x.size()>0 && plotData.y.size()>0) {
         JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plt);
-        g->set_title(name);
-        g->set_xColumn(ds->addCopiedColumn(x.data(), x.size(), name+": X"));
-        g->set_yColumn(ds->addCopiedColumn(y.data(), y.size(), name+": Y"));
+        g->set_title(plotData.name);
+        g->set_xColumn(ds->addCopiedColumn(plotData.x.data(), plotData.x.size(), plotData.name+": X"));
+        g->set_yColumn(ds->addCopiedColumn(plotData.y.data(), plotData.y.size(), plotData.name+": Y"));
         g->set_symbol(JKQTPnoSymbol);
         g->set_drawLine(true);
-        if (xerror.size()>0) {
-            g->set_xErrorColumn(ds->addCopiedColumn(xerror.data(), xerror.size(), name+": XErr"));
-            g->set_xErrorStyle(JKQTPerrorSimpleBars);
+        if (plotData.majorPlot) g->set_lineWidth(2);
+        else g->set_lineWidth(1);
+        if (plotData.xerrors.size()>0) {
+            g->set_xErrorColumn(ds->addCopiedColumn(plotData.xerrors.data(), plotData.xerrors.size(), plotData.name+": XErr"));
+            g->set_xErrorStyle(ui->cmbErrorStyleX->getErrorStyle());
         }
-        if (yerror.size()>0) {
-            g->set_yErrorColumn(ds->addCopiedColumn(yerror.data(), yerror.size(), name+": YErr"));
-            g->set_yErrorStyle(JKQTPerrorSimpleBars);
+        if (plotData.yerrors.size()>0) {
+            g->set_yErrorColumn(ds->addCopiedColumn(plotData.yerrors.data(), plotData.yerrors.size(), plotData.name+": YErr"));
+            g->set_yErrorStyle(ui->cmbErrorStyleY->getErrorStyle());
         }
         plt->addGraph(g);
     }
 }
 
-void QFOverlayPlotDialog::addPlot(const QFGetPlotdataInterface::GetPlotDataItem &plotData)
+void QFOverlayPlotDialog::setPlotOptions(const QFGetPlotdataInterface::GetPlotPlotOptions &options)
 {
-    addPlot(plotData.x, plotData.y, plotData.name, plotData.xerrors, plotData.yerrors);
+    setLog(options.logX, options.logY);
+    setAxisLabel(options.xLabel, options.yLabel);
 }
 
 void QFOverlayPlotDialog::endAddingPlots()
@@ -88,6 +102,11 @@ void QFOverlayPlotDialog::setAxisLabel(const QString &labX, const QString &labY)
 {
     ui->plot->getXAxis()->set_axisLabel(labX);
     ui->plot->getYAxis()->set_axisLabel(labY);
+}
+
+QFOverlayPlotDialog *QFOverlayPlotDialog::collectOverlayPlot(QFMatchRDRFunctor *matchFunctor)
+{
+    return NULL;
 }
 
 void QFOverlayPlotDialog::showHelp()
@@ -110,8 +129,8 @@ void QFOverlayPlotDialog::updatePlot()
         JKQTPxyGraphErrors* eg=dynamic_cast<JKQTPxyGraphErrors*>(g);
         if (eg) {
             if (ui->chkErrors->isChecked()) {
-                eg->set_yErrorStyle(JKQTPerrorSimpleBars);
-                eg->set_xErrorStyle(JKQTPerrorSimpleBars);
+                eg->set_yErrorStyle(ui->cmbErrorStyleX->getErrorStyle());
+                eg->set_xErrorStyle(ui->cmbErrorStyleY->getErrorStyle());
             } else {
                 eg->set_yErrorStyle(JKQTPnoError);
                 eg->set_xErrorStyle(JKQTPnoError);

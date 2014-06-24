@@ -18,7 +18,7 @@
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+#include "libtiff_tools.h"
 #include "qfimfcssetparamfromfiledialog.h"
 #include "ui_qfimfcssetparamfromfiledialog.h"
 #include "qfrdrimagetoruninterface.h"
@@ -180,7 +180,7 @@ void QFImFCSSetParamFromFileDialog::on_btnLoadFile_clicked()
 {
     QString lastDir=ProgramOptions::getConfigValue("QFImFCSSetParamFromFileDialog/lastdir", "").toString();
     QStringList filters;
-    filters<<tr("image (*.tif)")<<tr("Column from Commma-separated values (*.dat *.csv *.txt)");
+    filters<<tr("TIFF image (*.tif)")<<tr("Column from Commma-separated values (*.dat *.csv *.txt)");
     QString selFilter=ProgramOptions::getConfigValue("QFImFCSSetParamFromFileDialog/lastfilter", filters.first()).toString();
     QString filename= qfGetOpenFileName(this, tr("select image ..."), lastDir, filters.join(";;"), &selFilter);
     if (QFile::exists(filename)) {
@@ -190,7 +190,14 @@ void QFImFCSSetParamFromFileDialog::on_btnLoadFile_clicked()
         QVector<double> newData;
 
         if (idx==0) {
-
+            double* data=NULL;
+            int width, height;
+            if (TIFFReadFrame<double>(filename.toLocal8Bit().data(), &data, &width, &height)) {
+                if (data && width>0 && height>0) {
+                    newData=arrayToVector(data, width*height);
+                    free(data);
+                }
+            }
         } else if (idx==1) {
             QStringList csvCols;
             QList<QVector<double> > csv=importCSVAskUser(filename, "QFImFCSSetParamFromFileDialog/csv/", &csvCols);
