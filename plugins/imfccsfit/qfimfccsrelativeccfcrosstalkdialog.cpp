@@ -481,9 +481,16 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
     QFRawDataRecord* acf0=getACF0();
     QFRawDataRecord* acf1=getACF1();
     QFRawDataRecord* ccf=getCCF();
+    QVector<double> acf10, acf01;
     if (acf0&&acf1&&ccf&&calculateRelCCF(acf0, acf1, ccf, &rel0, &rel0_error, &rel1, &rel1_error, &acf0Amplitude, &acf0UCAmplitude, &acf1Amplitude, &acf1UCAmplitude, &ccfAmplitude, &ccfUCAmplitude, w, h, ui->spinAvg->value(), ui->spinCrosstalk->value()/100.0, ui->cmbCrosstalkDirection->currentIndex(), true, ui->cmbAmplitudeSource->currentIndex(), ui->cmbACF0ResultSet->currentEvaluationGroup(), ui->cmbACF1ResultSet->currentEvaluationGroup(), ui->cmbCCFResultSet->currentEvaluationGroup(), "fitparam_g0", ui->chkBackground->isChecked())) {
-        qDebug()<<"store: "<<acf0Amplitude<<acf0UCAmplitude<<acf1Amplitude<<acf1UCAmplitude<<ccfAmplitude<<ccfUCAmplitude;
-
+        //qDebug()<<"store: "<<acf0Amplitude<<acf0UCAmplitude<<acf1Amplitude<<acf1UCAmplitude<<ccfAmplitude<<ccfUCAmplitude;
+        acf01=acf10=QVector<double>(w*h, 0.0);
+        if (acf0Amplitude && acf1Amplitude) {
+            for (int i=0; i<w*h; i++) {
+                acf01[i]=acf0Amplitude[i]/acf1Amplitude[i];
+                acf10[i]=acf1Amplitude[i]/acf0Amplitude[i];
+            }
+        }
         for (int i=0; i<2; i++) {
             QFRawDataRecord* acf=acf0;
             double* rel=rel0;
@@ -525,6 +532,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
             ccf->resultsSetNumberErrorList(evalName, rn, rel, rel_error, w*h);
             ccf->resultsSetLabel(evalName, rn, tr("relative amplitude: CCF/%1").arg(acfName));
             ccf->resultsSetGroup(evalName, rn, group);
+
 
             if (ui->chkStoreAmplitudes->isChecked()) {
                 QString rn;
@@ -581,6 +589,14 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
                     ccf->resultsSetLabel(evalName, rn, tr("CCF amplitude, uncorrected"));
                     ccf->resultsSetGroup(evalName, rn, group);
                 }
+                rn="relative_ccf__acf1divacf0";
+                ccf->resultsSetNumberList(evalName, rn, acf10.data(), acf10.size());
+                ccf->resultsSetLabel(evalName, rn, tr("ACF1/ACF0 amplitude, corrected"));
+                ccf->resultsSetGroup(evalName, rn, group);
+                rn="relative_ccf__acf0divacf1";
+                ccf->resultsSetNumberList(evalName, rn, acf01.data(), acf01.size());
+                ccf->resultsSetLabel(evalName, rn, tr("ACF0/ACF1 amplitude, corrected"));
+                ccf->resultsSetGroup(evalName, rn, group);
             }
 
 
