@@ -428,6 +428,22 @@ QFLIB_EXPORT QStringList deescapifyList(const QString& text);
 
 
 
+/*! \brief like QFileDialog::getOpenFileName(), but uses the system dialog on windows and a custom dialog on Linux, uses ProgramOptions to save the last filter and directory
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QString qfGetOpenFileNameSet (const QString& setPrefix,  QWidget * parent = 0, const QString & caption = QString(), const QString & dir = QString(), const QString & filter = QString(), QString * selectedFilter = 0, QFileDialog::Options options = 0 );
+/*! \brief like QFileDialog::getOpenFileNames(), but uses the system dialog on windows and a custom dialog on Linux, uses ProgramOptions to save the last filter and directory
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QStringList qfGetOpenFileNamesSet (const QString& setPrefix,  QWidget * parent = 0, const QString & caption = QString(), const QString & dir = QString(), const QString & filter = QString(), QString * selectedFilter = 0, QFileDialog::Options options = 0 );
+/*! \brief like QFileDialog::getSaveFileName(), but uses the system dialog on windows and a custom dialog on Linux, uses ProgramOptions to save the last filter and directory
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT QString qfGetSaveFileNameSet (const QString& setPrefix,  QWidget * parent = 0, const QString & caption = QString(), const QString & dir = QString(), const QString & filter = QString(), QString * selectedFilter = 0, QFileDialog::Options options = 0 );
+
+
+
+
 /*! \brief like QFileDialog::getOpenFileName(), but uses the system dialog on windows and a custom dialog on Linux
     \ingroup qf3lib_tools
  */

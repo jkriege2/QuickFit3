@@ -30,8 +30,8 @@ QFImFCSSetParamFromFileDialog::QFImFCSSetParamFromFileDialog(int width, int heig
     ui(new Ui::QFImFCSSetParamFromFileDialog)
 {
     this->parameterIDs=parameterIDs;
-    this->datawidth=width;
-    this->dataheight=height;
+    this->desiredwidth=width;
+    this->desiredheight=height;
     plt=NULL;
     ui->setupUi(this);
     ui->cmbRDR->init(eval->getProject(), eval->getMatchFunctor());
@@ -47,6 +47,7 @@ QFImFCSSetParamFromFileDialog::QFImFCSSetParamFromFileDialog(int width, int heig
     ui->cmbRDR->setCurrentIndex(0);
 
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "QFImFCSSetParamFromFileDialog");
+    loadSplitter(*(ProgramOptions::getInstance()->getQSettings()), ui->splitter, "QFImFCSSetParamFromFileDialog/splitter");
     ui->cmbParameter->setCurrentIndex(parameterIDs.indexOf(ProgramOptions::getConfigValue("QFImFCSSetParamFromFileDialog/param", parameterIDs.value(0, "")).toString()));
     ui->cmbRDR->setCurrentIndex(ProgramOptions::getConfigValue("QFImFCSSetParamFromFileDialog/rdr",0).toInt());
     ui->cmbResultGroup->setCurrentEvaluationGroup(ProgramOptions::getConfigValue("QFImFCSSetParamFromFileDialog/resultgroup",ui->cmbResultGroup->currentEvaluationGroup()).toString());
@@ -57,6 +58,7 @@ QFImFCSSetParamFromFileDialog::QFImFCSSetParamFromFileDialog(int width, int heig
     connect(ui->cmbRDR, SIGNAL(currentRDRChanged(QFRawDataRecord*)), ui->cmbResultGroup, SLOT(setRDR(QFRawDataRecord*)));
     connect(ui->cmbRDR, SIGNAL(currentRDRChanged(QFRawDataRecord*)), ui->cmbResult, SLOT(setRDR(QFRawDataRecord*)));
     connect(ui->cmbResultGroup, SIGNAL(currentEvaluationGroupChanged(QString)), ui->cmbResult, SLOT(setEvaluationGroup(QString)));
+    connect(ui->imageTransfrom, SIGNAL(propertiesChanged()), this, SLOT(replotOvr()));
     updateDataFromRDR();
 
 }
@@ -65,6 +67,7 @@ QFImFCSSetParamFromFileDialog::QFImFCSSetParamFromFileDialog(int width, int heig
 QFImFCSSetParamFromFileDialog::~QFImFCSSetParamFromFileDialog()
 {
     saveWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "QFImFCSSetParamFromFileDialog");
+    saveSplitter(*(ProgramOptions::getInstance()->getQSettings()), ui->splitter, "QFImFCSSetParamFromFileDialog/splitter");
     ProgramOptions::setConfigValue("QFImFCSSetParamFromFileDialog/param", parameterIDs.value(ui->cmbParameter->currentIndex(), ""));
     ProgramOptions::setConfigValue("QFImFCSSetParamFromFileDialog/rdr",ui->cmbRDR->currentIndex());
     ProgramOptions::setConfigValue("QFImFCSSetParamFromFileDialog/resultgroup",ui->cmbResultGroup->currentEvaluationGroup());
@@ -93,10 +96,24 @@ QString QFImFCSSetParamFromFileDialog::getParameter() const
     return parameterIDs.value(ui->cmbParameter->currentIndex(), "");
 }
 
-QVector<double> QFImFCSSetParamFromFileDialog::getData(bool *ok) const
+QVector<double> QFImFCSSetParamFromFileDialog::getData(bool *ok, int *width, int *height)
 {
-    if (ok) *ok=(data.size()>=datawidth*dataheight);
-    return data;
+    QVector<double> d=data;
+    if (ok) *ok=(data.size()>=desiredwidth*desiredheight);
+    if (ui->chkImageTransform->isChecked()) {
+        QVector<double> dat(datawidth*dataheight, 0.0);
+        for (int i=0; i<datawidth*dataheight; i++) {
+            dat[i]=data.value(i);
+        }
+        int idatawidth=datawidth;
+        int idataheight=dataheight;
+        int w=idatawidth,h=idataheight;
+        bool o=ui->imageTransfrom->transform(dat, idatawidth, idataheight, d, w, h);
+        if (width) *width=w;
+        if (height) *height=h;
+        if (ok) *ok=(*ok) && o && (d.size()>=desiredwidth*desiredheight);
+    }
+    return d;
 }
 
 void QFImFCSSetParamFromFileDialog::replotOvr()
@@ -112,16 +129,35 @@ void QFImFCSSetParamFromFileDialog::replotOvr()
     //QFRDRImageToRunInterface* dataImg=dynamic_cast<QFRDRImageToRunInterface*>(rdr);
 
     //if (dataImg) {
-        int w=datawidth;//dataImg->getImageFromRunsWidth();
-        int h=dataheight;//dataImg->getImageFromRunsHeight();
 
         bool ok=false;
-        QVector<double> d=getData(&ok);
+        int w=datawidth;
+        int h=dataheight;
+        QVector<double> d=getData(&ok, &w, &h);
+        int dcopysize=d.size();
 
-        ui->labInfo->setText(tr("input image size: %1 x %2 = %3         data size: %4").arg(datawidth).arg(dataheight).arg(datawidth*dataheight).arg(d.size()));
+        ui->labInfo->setText(tr("desired image size: %1 x %2 = %3         output data size: %4 (%5x%6)").arg(desiredwidth).arg(desiredheight).arg(desiredwidth*desiredheight).arg(dcopysize).arg(w).arg(h));
+
+        qDebug()<<w<<h<<d.size()<<dcopysize;
+        if (ui->chkMapDesired->isChecked()) {
+            w=desiredwidth;
+            h=desiredheight;
+            if (d.size()>desiredwidth*desiredheight) {
+                dcopysize=desiredwidth*desiredheight;
+            }
+            if (d.size()<desiredwidth*desiredheight) {
+                while (d.size()<desiredwidth*desiredheight) d.append(0.0);
+                dcopysize=desiredwidth*desiredheight;
+            }
+        }
+        qDebug()<<w<<h<<d.size()<<dcopysize;
+
+        qDebug()<<"PLOT!!!";
+        //while (d.size()<w*h) d.append(0);
+
 
         //if (ok) {
-            size_t col=ds->addCopiedColumn(d.data(), d.size(), getResultID());
+            size_t col=ds->addCopiedColumn(d.data(), dcopysize, getResultID());
 
             plt=new JKQTPColumnMathImage(ui->pltData->get_plotter());
             plt->set_palette(JKQTPMathImageMATLAB);
@@ -165,15 +201,33 @@ void QFImFCSSetParamFromFileDialog::updateDataFromRDR()
 {
     if (ui->radRDR->isChecked()) {
         QFRawDataRecord* rdr=getRDR();
-        if (rdr) data=rdr->resultsGetAsDoubleList(getEvalID(), getResultID());
-        else data=QVector<double>();
+        if (rdr) {
+            data=rdr->resultsGetAsDoubleList(getEvalID(), getResultID());
+            datawidth=desiredwidth;
+            dataheight=desiredheight;
+            QFRDRImageToRunInterface* runs=dynamic_cast<QFRDRImageToRunInterface*>(rdr);
+            if (runs) {
+                datawidth=runs->getImageFromRunsWidth();
+                dataheight=runs->getImageFromRunsHeight();
+            }
+        } else data=QVector<double>();
+    } else if (ui->radOverview->isChecked()) {
+        QFRawDataRecord* rdr=getRDR();
+        if (rdr) {
+            QFRDRImageToRunInterface* runs=dynamic_cast<QFRDRImageToRunInterface*>(rdr);
+            if (runs) {
+                datawidth=runs->getImageFromRunsWidth();
+                dataheight=runs->getImageFromRunsHeight();
+                data=arrayToVector(runs->getImageFromRunsPreview(), datawidth*dataheight);
+            } else data=QVector<double>();
+        } else data=QVector<double>();
     }
     replotOvr();
 }
 
 void QFImFCSSetParamFromFileDialog::on_btnHelp_clicked()
 {
-    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("fcs_fit")+"/setparamfromfile.html");
+    QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("imfcs_fit")+"/setparamfromfile.html");
 }
 
 void QFImFCSSetParamFromFileDialog::on_btnLoadFile_clicked()
@@ -196,6 +250,8 @@ void QFImFCSSetParamFromFileDialog::on_btnLoadFile_clicked()
                 if (data && width>0 && height>0) {
                     newData=arrayToVector(data, width*height);
                     free(data);
+                    datawidth=width;
+                    dataheight=height;
                 }
             }
         } else if (idx==1) {
@@ -219,9 +275,11 @@ void QFImFCSSetParamFromFileDialog::on_btnLoadFile_clicked()
             }
         }
         if (newData.size()>0) {
-            if (newData.size()<datawidth*dataheight) {
-                if (QMessageBox::question(this, tr("load file"), tr("The size of read data is smaller than the required data size (new data size: %4,  required size: %1x%2 = %3).\n  Import data nevertheless?").arg(datawidth).arg(dataheight).arg(datawidth*dataheight).arg(newData.size()), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+            if (newData.size()<desiredwidth*desiredheight) {
+                if (QMessageBox::question(this, tr("load file"), tr("The size of read data is smaller than the required data size (new data size: %4,  required size: %1x%2 = %3).\n  Import data nevertheless?").arg(desiredwidth).arg(desiredheight).arg(desiredwidth*desiredheight).arg(newData.size()), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
                     data=newData;
+                    datawidth=desiredwidth;
+                    dataheight=desiredheight;
                 }
             } else {
                 data=newData;

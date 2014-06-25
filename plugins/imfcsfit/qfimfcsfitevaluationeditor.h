@@ -152,8 +152,6 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
 
         void overviewRunChanged(int run);
 
-        void setFitResultImage();
-
 
     private:
         /** \brief create all widgets on the form */

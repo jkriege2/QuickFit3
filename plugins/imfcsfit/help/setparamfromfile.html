@@ -6,26 +6,49 @@
   </head>
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-	 <h2>Basics</h2>
-	 <p>
+     <h2>Basics</h2>
+     <p>
      This function allows to set a fit parameter in all pixels. The data is taken from:
      <ul>
-	   <li>another fit result from another RDR</li>
-	   <li>loaded from a file (TIFF image or CSV file). If data is imported from a CSV file, the data has to be stored in a single column in row-major format!</li>
+       <li>another fit result from another RDR</li>
+       <li>loaded from a file (TIFF image or CSV file). If data is imported from a CSV file, the data has to be stored in a single column in row-major format!</li>
      </ul>
-	 $$note:The size of the loaded data has to be at least as large as the number of pixels in the current RDR. Otherwise it is still possible to import the data, but maybe not all pixels are assigned a value (they keep their old value or the initial value). If the data size is larger, the additional pixels are simply discarded.$$
-	 </p>
-	 
-	 
-	 <h2>User-Interface</h2>
-	 <p>
-	 <ul>
-	   <li>At the top of the dialog you can select the fit parameter to set with the data.</li>
-	   <li>At the bottom, the data is displayed as an image. The required image size and the size of the currently selected image are displayed above the image. (note again: if the data size is too small, not all pixels will be set and if it is too large, some pixels from the data will be discarded!)</li>
-	   <li>If the data should be taken from another fit parameter in another RDR, you can select the radio-button <b>from other fit result</b>. Then select the <b>RDR</b>, <b>result group</b> and <b>parameter</b> therein (drop-down boxes below). The selected parameter image will be displayed below.</li>
-	   <li>You can also load data from a file or take it from other sources. To do so, activate the radio-button <b>from other source</b> and use the buttons below, which are activated just now to load the data. $$note:If you reselect the radio-button "from other fit result", the loaded data will be discarded!$$</li>
-	   <li></li>
-	 </ul>
-	 </p>
+     $$note:The size of the loaded data has to be at least as large as the number of pixels in the current RDR. Otherwise it is still possible to import the data, but maybe not all pixels are assigned a value (they keep their old value or the initial value). If the data size is larger, the additional pixels are simply discarded.$$
+     </p>
+     
+     
+     <h2>User-Interface</h2>
+     <p>
+     <ul>
+       <li>At the top of the dialog you can select the fit parameter to set with the data.</li>
+       <li>At the bottom, the data is displayed as an image. The required image size and the size of the currently selected image are displayed above the image. (note again: if the data size is too small, not all pixels will be set and if it is too large, some pixels from the data will be discarded!)</li>
+       <li>If the data should be taken from another fit parameter in another RDR, you can select the radio-button <b>from other fit result</b>. Then select the <b>RDR</b>, <b>result group</b> and <b>parameter</b> therein (drop-down boxes below). The selected parameter image will be displayed below.</li>
+       <li>You can also load data from a file or take it from other sources. To do so, activate the radio-button <b>from other source</b> and use the buttons below, which are activated just now to load the data. $$note:If you reselect the radio-button "from other fit result", the loaded data will be discarded!$$</li>
+       <li>Checking the radio-button "<b>from overview</b>", causes the fit parameter to be taken from the overview image of the current imFCS RDR.</li>
+       <li>You can process the image to be set, using <b>image transfrom</b>s. To do so, check the "image transform" checkbox. The dialog supports a limited set of image processing operations on the image. they are organized as a list, which is displayed below "image transform".If the list is empty, no transformation is done. Using the button <img src=":lib/add.png">, you can add additional processing stages. The button <img src=":lib/exit.png"> removes all currently added stages. With <img src=":lib/save16.png"> and <img src=":lib/file_open.png"> you can save and load a list of processing steps to a configuration file. Each stage shows its name at the top and a set of buttons, that allow to move the item up/down in the list, or delete the item. In addition, widgets are displayed, that allow to change the properties of the processing stage. These stages are available:
+       <ul>
+           <li><b>blur:</b> a Gaussian bluring with given sigma (size)</li>
+           <li><b>median_blur:</b> a median filter with given size.</li>
+           <li><b>resize:</b> resizes the image to a given new size. Different interpolation methods are possible.</li>
+           <li><b>average_x:</b> averages along the X-axis and reduces the width of the output image to 1.</li>
+           <li><b>average_y:</b> averages along the Y-axis and reduces the height of the output image to 1.</li>
+           <li><b>homogenize_x:</b> averages along the X-axis. The image size stays the same and all pixels in a row are set to the average along that row.</li>
+           <li><b>homogenize_y:</b> averages along the Y-axis. The image size stays the same and all pixels in a column are set to the average along that column.</li>
+           <li><b>expression:</b> applies a given expression to all pixels of the image (size stays the same). For the evaluation of the expression, the <a href="$$qf_mathparser_helpfile$$">internal expression parser</a> is used and all functions defined there may be used. The expression has to evaluate to a single number! In addition to the standard variables, the following variables are defined:
+           <ul>
+               <li><tt>x</tt> - current x-coordinate</li>
+               <li><tt>y</tt> - current y-coordinate</li>
+               <li><tt>width</tt> - image width</li>
+               <li><tt>height</tt> - image height</li>
+               <li><tt>Ixy</tt> - input image value at the current coordinate</li>
+               <li><tt>I</tt> - complete input image as a number-vector</li>
+           </ul> </li>
+           <li><b></b></li>
+       </ul>
+       $$note:The fit requires a certain size of the parameter image, which is displayed as "desired image size" above the image plot (lhs). If the image format is different after a set of image transforms, the image is still forces to the output size. To view, how this forced output size is set, you can check the checkbox <b>show image mapped to desired</b>. Therefore it may be needed to add a <i>resize</i> stage as last stage, which changes the size again. The current image size is displayed as <b>output data size</b>.$$
+       </li>
+       <li></li>
+     </ul>
+     </p>
   </body>
 </html>

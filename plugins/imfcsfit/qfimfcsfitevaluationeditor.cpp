@@ -914,10 +914,6 @@ void QFImFCSFitEvaluationEditor::overviewRunChanged(int run)
     spinRun->setValue(run);
 }
 
-void QFImFCSFitEvaluationEditor::setFitResultImage()
-{
-
-}
 
 
 
@@ -1256,6 +1252,9 @@ void QFImFCSFitEvaluationEditor::setFitParameterFromFile()
                 if (ok) {// && d.size()-1==data->getIndexMax(current->getHighlightedRecord())) {
                     data->setFitResultValue(record,data->getEvaluationResultID(0, record), param, d);
                     data->setFitResultValue(record,data->getEvaluationResultID(-1, record), param, avg);
+                    parameterValueChanged();
+                }  else {
+                    QMessageBox::information(this, tr("set fit result from RDR/file/..."), tr("An internal error occured, fit parameter value could not be set."));
                 }
             }
             delete dlg;

@@ -1605,6 +1605,27 @@ class QFLIB_EXPORT QFMathParser
             environment.setVariable(name, result);
         }
 
+        inline void setVariableDouble(const QString& name, double result) {
+            environment.setVariableDouble(name, result);
+        }
+
+        inline void setVariableDoubleVec(const QString& name, const QVector<double>& result) {
+            environment.setVariableDoubleVec(name, result);
+        }
+        inline void setVariableStringVec(const QString& name, const QStringList& result) {
+            environment.setVariableStringVec(name, result);
+        }
+        inline void setVariableBoolVec(const QString& name, const QVector<bool>& result) {
+            environment.setVariableBoolVec(name, result);
+        }
+        inline void setVariableString(const QString& name, const QString& result) {
+            environment.setVariableString(name, result);
+        }
+        inline void setVariableBoolean(const QString& name, bool result) {
+            environment.setVariableBoolean(name, result);
+        }
+
+
         inline void deleteVariable(const QString& name) {
             environment.deleteVariable(name);
         }

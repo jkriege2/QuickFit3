@@ -45,7 +45,7 @@ class QFImFCSSetParamFromFileDialog : public QDialog
         QString getEvalID() const;
         QString getResultID() const;
         QString getParameter() const;
-        QVector<double> getData(bool *ok=NULL) const;
+        QVector<double> getData(bool *ok=NULL, int* width=NULL, int* height=NULL);
     protected slots:
         void replotOvr();
         void on_cmbParamter_currentIndexChanged(int index);
@@ -56,6 +56,8 @@ class QFImFCSSetParamFromFileDialog : public QDialog
         Ui::QFImFCSSetParamFromFileDialog *ui;
         QStringList parameterIDs;
         JKQTPColumnMathImage* plt;
+        int desiredwidth;
+        int desiredheight;
         int datawidth;
         int dataheight;
         QVector<double> data;

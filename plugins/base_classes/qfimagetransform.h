@@ -28,25 +28,82 @@
 #include <QSettings>
 #include <QFormLayout>
 #include <QLabel>
+#include <QGroupBox>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QScrollArea>
+#include <QGridLayout>
+#include <QVBoxLayout>
+#include <QComboBox>
+
+class QFImageTransformItemWidget; // forward
 
 class QFImageTransformWidget: public QWidget {
         Q_OBJECT
     public:
-        explicit QFImageTransformWidget(const QString& title, QWidget* parent=NULL);
+        explicit QFImageTransformWidget(QWidget* parent=NULL);
         virtual ~QFImageTransformWidget();
+
+        bool transform(const QVector<double>& input, int width, int height, QVector<double>& output, int& width_out, int& height_out);
+    public slots:
+        void clear();
+        void load(const QString& filename=QString());
+        void save(const QString& filename=QString());
+    signals:
+        void propertiesChanged();
+    protected slots:
+        void emitPropsChanged(QFImageTransformItemWidget* widget);
+        void deleteWidget(QFImageTransformItemWidget* widget);
+        void moveWidgetsUp(QFImageTransformItemWidget* widget);
+        void moveWidgetsDown(QFImageTransformItemWidget* widget);
+        void addWidget();
+    protected:
+        void connectWidget(QFImageTransformItemWidget* widget, bool conn=true);
+        QList<QFImageTransformItemWidget*> items;
+        QAction* actAdd;
+        QAction* actClear;
+        QAction* actLoad;
+        QAction* actSave;
+        QScrollArea* area;
+        QVBoxLayout* layItems;
+        QWidget* widMain;
+};
+
+
+class QFImageTransformItemWidget: public QGroupBox {
+        Q_OBJECT
+    public:
+        explicit QFImageTransformItemWidget(const QString& title, QWidget* parent=NULL);
+        virtual ~QFImageTransformItemWidget();
         virtual void readSettings(QSettings& settings, const QString& prefix);
         virtual void writeSettings(QSettings& settings, const QString& prefix) const;
         virtual bool transform(const QVector<double>& input, int width, int height, QVector<double>& output, int& width_out, int& height_out);
 
-        static QList<QFImageTransformWidget*> loadSettings(const QString& filename, QWidget *parent=NULL);
-        static void saveSettings(const QString& filename, const QList<QFImageTransformWidget*>& widgets);
+        static QList<QFImageTransformItemWidget*> loadSettings(const QString& filename, QWidget *parent=NULL);
+        static void saveSettings(const QString& filename, const QList<QFImageTransformItemWidget*>& widgets);
+        static QStringList getItemIDs();
+        static QFImageTransformItemWidget* createItem(const QString& id,  QWidget *parent);
     protected:
         QFormLayout* layForm;
-        QLabel* labHeader;
+        //QLabel* labHeader;
+        QAction* actMoveUp;
+        QAction* actMoveDown;
+        QAction* actDelete;
+        bool doEmit;
+    protected slots:
+        void upClicked();
+        void downClicked();
+        void deleteClicked();
+        void emitPropChange();
+    signals:
+        void deleteWidget(QFImageTransformItemWidget* widget);
+        void moveWidgetsUp(QFImageTransformItemWidget* widget);
+        void moveWidgetsDown(QFImageTransformItemWidget* widget);
+        void propertiesChanged(QFImageTransformItemWidget* widget);
 };
 
 
-class QFITWBlur: public QFImageTransformWidget {
+class QFITWBlur: public QFImageTransformItemWidget {
         Q_OBJECT
     public:
         explicit QFITWBlur(QWidget* parent=NULL);
@@ -54,6 +111,62 @@ class QFITWBlur: public QFImageTransformWidget {
         virtual void readSettings(QSettings& settings, const QString& prefix);
         virtual void writeSettings(QSettings& settings, const QString& prefix) const;
         virtual bool transform(const QVector<double>& input, int width, int height, QVector<double>& output, int& width_out, int& height_out);
+    protected:
+        QDoubleSpinBox* spinSigma;
 };
+
+
+
+class QFITWMedianFilter: public QFImageTransformItemWidget {
+        Q_OBJECT
+    public:
+        explicit QFITWMedianFilter(QWidget* parent=NULL);
+        virtual void readSettings(QSettings& settings, const QString& prefix);
+        virtual void writeSettings(QSettings& settings, const QString& prefix) const;
+        virtual bool transform(const QVector<double>& input, int width, int height, QVector<double>& output, int& width_out, int& height_out);
+    protected:
+        QSpinBox* spinSigma;
+};
+
+
+class QFITWResize: public QFImageTransformItemWidget {
+        Q_OBJECT
+    public:
+        explicit QFITWResize(QWidget* parent=NULL);
+        virtual void readSettings(QSettings& settings, const QString& prefix);
+        virtual void writeSettings(QSettings& settings, const QString& prefix) const;
+        virtual bool transform(const QVector<double>& input, int width, int height, QVector<double>& output, int& width_out, int& height_out);
+    protected:
+        QSpinBox* spinWidth;
+        QSpinBox* spinHeight;
+        QComboBox* cmbInterpolation;
+};
+
+class QFITWAverageDir: public QFImageTransformItemWidget {
+        Q_OBJECT
+    public:
+        explicit QFITWAverageDir(int dir, bool samesize, QWidget* parent=NULL);
+        virtual void readSettings(QSettings& settings, const QString& prefix);
+        virtual void writeSettings(QSettings& settings, const QString& prefix) const;
+        virtual bool transform(const QVector<double>& input, int width, int height, QVector<double>& output, int& width_out, int& height_out);
+    protected:
+        int dir;
+        bool samesize;
+};
+
+class QFITWExpression: public QFImageTransformItemWidget {
+        Q_OBJECT
+    public:
+        explicit QFITWExpression(QWidget* parent=NULL);
+        virtual void readSettings(QSettings& settings, const QString& prefix);
+        virtual void writeSettings(QSettings& settings, const QString& prefix) const;
+        virtual bool transform(const QVector<double>& input, int width, int height, QVector<double>& output, int& width_out, int& height_out);
+    protected:
+        QLineEdit* edtExpression;
+};
+
+
+
+
 
 #endif // QFIMAGETRANSFORM_H
