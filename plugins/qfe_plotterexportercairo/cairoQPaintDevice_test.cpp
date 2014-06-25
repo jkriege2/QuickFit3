@@ -61,12 +61,16 @@ void paint(QPaintDevice* pd) {
         double p=double(phi)/20.0*M_PI;
         poly<<QPointF(50.0+cos(p)*35.0*double(phi)/60.0, 50.0-sin(p)*35.0*double(phi)/60.0);
     }
+
+    p.setClipRect(0,0,200,50);
+
     pe.setWidthF(1);
     p.setPen(pe);
     p.drawPolygon(poly);
     pe.setColor("red");
     pe.setStyle(Qt::DashDotDotLine);
     p.setPen(pe);
+    p.setClipping(false);
     p.drawPolyline(poly);
 
 

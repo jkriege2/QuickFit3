@@ -68,11 +68,16 @@ class QCairoPaintEngine : public QPaintEngine
         QMatrix cmatrix;
         QFont cfont;
         QPaintEngine::DirtyFlags cdirtyflags;
+        QPainterPath cclippath;
+        QRegion cclipregion;
+        bool cclipenabled;
 
         void updateMatrix();
         void updatePen();
         void updateBrush();
         void updateFont();
+        void updateClip();
+        void updatePath(const QPainterPath &path, bool &fill);
 };
 
 #endif // QCAIROPAINTENGINE_H

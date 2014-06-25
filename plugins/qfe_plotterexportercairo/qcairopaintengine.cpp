@@ -317,11 +317,21 @@ void QCairoPaintEngine::updateState(const QPaintEngineState &state)
         cfont=state.font();
         cdirtyflags=cdirtyflags&(~QPaintEngine::DirtyFont);
     }
-    /*if (((state.state()&QPaintEngine::DirtyClipRegion)==QPaintEngine::DirtyClipRegion)) {
-        clipregion=state.clipRegion();
+    if (((state.state()&QPaintEngine::DirtyClipRegion)==QPaintEngine::DirtyClipRegion)) {
+        cclipregion=state.clipRegion();
+        updateClip();
         cdirtyflags=cdirtyflags&(~QPaintEngine::DirtyClipRegion);
-    }*/
-
+    }
+    if (((state.state()&QPaintEngine::DirtyClipPath)==QPaintEngine::DirtyClipPath)) {
+        cclippath=state.clipPath();
+        updateClip();
+        cdirtyflags=cdirtyflags&(~QPaintEngine::DirtyClipPath);
+    }
+    if (((state.state()&QPaintEngine::DirtyClipEnabled)==QPaintEngine::DirtyClipEnabled)) {
+        cclipenabled=state.isClipEnabled();
+        updateClip();
+        cdirtyflags=cdirtyflags&(~QPaintEngine::DirtyClipEnabled);
+    }
     updateMatrix();
     /*updateBrush();
     updatePen();
@@ -462,8 +472,69 @@ void QCairoPaintEngine::updateFont()
 
         //cdirtyflags=cdirtyflags&(~QPaintEngine::DirtyFont);
 
-    //}
+       //}
 }
+
+void QCairoPaintEngine::updateClip()
+{
+    cairo_reset_clip(cr);
+    if (cclipenabled) {
+        cairo_matrix_t cm, cmBak;
+        cairo_get_matrix(cr, &cmBak);
+        cairo_matrix_init_identity(&cm);
+        cairo_set_matrix(cr, &cm);
+
+        bool fill=false;
+        QPainterPath path=cclippath;
+        path.addRegion(cclipregion);
+        updatePath(path, fill);
+        cairo_clip(cr);
+
+        cairo_set_matrix(cr, &cmBak);
+    }
+}
+
+void QCairoPaintEngine::updatePath(const QPainterPath &path, bool& fill)
+{
+    cairo_new_path(cr);
+
+    int start = -1, elmCount = path.elementCount();
+    for (int index = 0; index < elmCount; index++)
+    {
+      const QPainterPath::Element elm = path.elementAt(index);
+      switch (elm.type)
+      {
+        case QPainterPath::MoveToElement:
+          cairo_move_to(cr, elm.x, elm.y);
+          start = index;
+          break;
+
+        case QPainterPath::LineToElement:
+          cairo_line_to(cr, elm.x, elm.y);
+          break;
+
+        case QPainterPath::CurveToElement:
+          cairo_curve_to(cr, elm.x, elm.y,
+              path.elementAt(index + 1).x, path.elementAt(index + 1).y,
+              path.elementAt(index + 2).x, path.elementAt(index + 2).y);
+          index += 2;
+          break;
+
+        default:
+          break;
+      }
+    }
+
+    fill=false;
+    if (start != -1 && start != elmCount - 1
+          && path.elementAt(start).x == path.elementAt(elmCount - 1).x
+            && path.elementAt(start).y == path.elementAt(elmCount - 1).y){
+        cairo_close_path(cr);
+        //qDebug()<<"closing path";
+        fill=true;
+    }
+}
+
 void QCairoPaintEngine::drawLines(const QLine *lines, int lineCount)
 {
     QVector<QLineF> l;
@@ -496,6 +567,7 @@ void QCairoPaintEngine::drawLines(const QLineF *lines, int lineCount)
 }
 
 
+
 void QCairoPaintEngine::drawPath(const QPainterPath &path)
 {
     if (!cr || !surface) {
@@ -508,7 +580,9 @@ void QCairoPaintEngine::drawPath(const QPainterPath &path)
     }
     //qDebug()<<"drawPath n="<<path;
 
-    cairo_new_path(cr);
+    bool fill;
+    updatePath(path, fill);
+    /*cairo_new_path(cr);
 
     int start = -1, elmCount = path.elementCount();
     for (int index = 0; index < elmCount; index++)
@@ -544,16 +618,10 @@ void QCairoPaintEngine::drawPath(const QPainterPath &path)
         cairo_close_path(cr);
         //qDebug()<<"closing path";
         fill=cbrush.style()!=Qt::NoBrush;
-    }
-    //cairo_close_path(cr);
+    }*/
+    if (fill) fill=cbrush.style()!=Qt::NoBrush;
 
 
-    /*static const cairo_fill_rule_t qtFillRuleToCairoFillRule[Qt::WindingFill + 1] =
-    {
-      CAIRO_FILL_RULE_EVEN_ODD,
-      CAIRO_FILL_RULE_WINDING,
-    };
-    cairo_set_fill_rule(cr, qtFillRuleToCairoFillRule[path.fillRule()]);*/
     if (fill) {
         switch (path.fillRule()) {
             case Qt::WindingFill:
