@@ -21,7 +21,7 @@
 
 #ifndef QFPROJECT_H
 #define QFPROJECT_H
-
+#include <QTextStream>
 #include "lib_imexport.h"
 #include <map>
 #include <QObject>

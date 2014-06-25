@@ -26,7 +26,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <cairo/cairo-ps.h>
 #include <cairo/cairo-svg.h>
 #include "qcairopaintdevice.h"
-#include <qDebug>
+#include <QDebug>
 
 
 static QPaintEngine::PaintEngineFeatures cairo_features()

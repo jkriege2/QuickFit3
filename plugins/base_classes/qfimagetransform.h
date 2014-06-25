@@ -21,7 +21,7 @@
 
 #ifndef QFIMAGETRANSFORM_H
 #define QFIMAGETRANSFORM_H
-
+#include <QTextStream>
 #include <QObject>
 #include <QVector>
 #include <QWidget>

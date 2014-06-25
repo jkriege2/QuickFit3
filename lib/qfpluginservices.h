@@ -21,7 +21,7 @@
 
 #ifndef QFPLUGINSERVICES_H
 #define QFPLUGINSERVICES_H
-
+#include <QTextStream>
 #include "lib_imexport.h"
 #include <QString>
 #include <QSettings>

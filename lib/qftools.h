@@ -21,7 +21,7 @@
 
 #ifndef QFTOOLS_H
 #define QFTOOLS_H
-
+#include <QTextStream>
 #include "qfmathtools.h"
 
 #include <cmath>
@@ -40,7 +40,7 @@
 #include <QIcon>
 #include <QListWidget>
 #include "qtriple.h"
-#include <QTextStream>
+
 #include <QBitArray>
 
 /*! \brief QuickFit's internal malloc replacement (on some systems, this does a boundary-aligned malloc)
