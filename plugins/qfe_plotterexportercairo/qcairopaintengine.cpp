@@ -478,13 +478,15 @@ void QCairoPaintEngine::updateFont()
 void QCairoPaintEngine::updateClip()
 {
     cairo_reset_clip(cr);
-    if (cclipenabled) {
+    qDebug()<<cclipenabled<<cclippath<<cclipregion<<(!cclipregion.boundingRect().size().isEmpty() || cclippath.elementCount()>0);
+    if (cclipenabled && (!cclipregion.boundingRect().size().isEmpty() || cclippath.elementCount()>0)) {
         cairo_matrix_t cm, cmBak;
         cairo_get_matrix(cr, &cmBak);
         cairo_matrix_init_identity(&cm);
         cairo_set_matrix(cr, &cm);
 
         bool fill=false;
+
         QPainterPath path=cclippath;
         path.addRegion(cclipregion);
         updatePath(path, fill);
