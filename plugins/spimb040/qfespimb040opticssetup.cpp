@@ -25,6 +25,10 @@ QFESPIMB040OpticsSetup::QFESPIMB040OpticsSetup(QWidget* pluginMainWidget, QWidge
     ui->camConfig2->setLog(m_log);
     ui->stageSetup->init(m_log, m_pluginServices);
     ui->filtTransmission->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
+    ui->filtLaser11->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
+    ui->filtLaser12->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
+    ui->filtLaser21->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
+    ui->filtLaser22->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
     ui->filtDetection->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
     ui->filtSplitter->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
     ui->filtDetection11->setFilterINI(m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_filters.ini", m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini");
@@ -159,6 +163,10 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
     ui->filtDetection21->loadSettings(settings, prefix+"filters/detection21");
     ui->filtSplitter->loadSettings(settings, prefix+"filters/detection_splitter");
     ui->filtTransmission->loadSettings(settings, prefix+"filters/illumination_transmission");
+    ui->filtLaser11->loadSettings(settings, prefix+"filters/laser11");
+    ui->filtLaser12->loadSettings(settings, prefix+"filters/laser12");
+    ui->filtLaser21->loadSettings(settings, prefix+"filters/laser21");
+    ui->filtLaser22->loadSettings(settings, prefix+"filters/laser22");
     ui->filtDetection->loadSettings(settings, prefix+"filters/detection");
 
     ui->filtDualView1Long->loadSettings(settings, prefix+"filters/dv1_long");
@@ -204,6 +212,10 @@ void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) 
     ui->filtDetection21->saveSettings(settings, prefix+"filters/detection21");
     ui->filtSplitter->saveSettings(settings, prefix+"filters/detection_splitter");
     ui->filtTransmission->saveSettings(settings, prefix+"filters/illumination_transmission");
+    ui->filtLaser11->saveSettings(settings, prefix+"filters/laser11");
+    ui->filtLaser12->saveSettings(settings, prefix+"filters/laser12");
+    ui->filtLaser21->saveSettings(settings, prefix+"filters/laser21");
+    ui->filtLaser22->saveSettings(settings, prefix+"filters/laser22");
     ui->filtDetection->saveSettings(settings, prefix+"filters/detection");
     ui->objDetection->saveSettings(settings, prefix+"objectives/detection");
     ui->objProjection->saveSettings(settings, prefix+"objectives/projection");
@@ -424,6 +436,33 @@ QMap<QString, QVariant> QFESPIMB040OpticsSetup::getSetup(int setup_cam) const {
         setup["filters/illumination_transmission/name"]=filter.name;
         setup["filters/illumination_transmission/type"]=filter.type;
         setup["filters/illumination_transmission/manufacturer"]=filter.manufacturer;
+    }
+
+
+
+    filter=ui->filtLaser11->filter();
+    if (filter.isValid) {
+        setup["filters/illumination_laser11/name"]=filter.name;
+        setup["filters/illumination_laser11/type"]=filter.type;
+        setup["filters/illumination_laser11/manufacturer"]=filter.manufacturer;
+    }
+    filter=ui->filtLaser12->filter();
+    if (filter.isValid) {
+        setup["filters/illumination_laser12/name"]=filter.name;
+        setup["filters/illumination_laser12/type"]=filter.type;
+        setup["filters/illumination_laser12/manufacturer"]=filter.manufacturer;
+    }
+    filter=ui->filtLaser21->filter();
+    if (filter.isValid) {
+        setup["filters/illumination_laser21/name"]=filter.name;
+        setup["filters/illumination_laser21/type"]=filter.type;
+        setup["filters/illumination_laser21/manufacturer"]=filter.manufacturer;
+    }
+    filter=ui->filtLaser22->filter();
+    if (filter.isValid) {
+        setup["filters/illumination_laser22/name"]=filter.name;
+        setup["filters/illumination_laser22/type"]=filter.type;
+        setup["filters/illumination_laser22/manufacturer"]=filter.manufacturer;
     }
 
     ObjectiveDescription objective=ui->objDetection->objective();

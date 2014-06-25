@@ -289,6 +289,55 @@ p, li { white-space: pre-wrap; }
             </property>
            </widget>
           </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_30">
+            <property name="text">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:600; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400;&quot;&gt;filter:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QF3FilterCombobox" name="filtLaser11" native="true">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>5</width>
+              <height>5</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QF3FilterCombobox" name="filtLaser12" native="true">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>5</width>
+              <height>5</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
          </layout>
         </widget>
        </item>
@@ -376,6 +425,55 @@ p, li { white-space: pre-wrap; }
           </item>
           <item row="0" column="1">
            <widget class="QFLightSourceConfigWidget" name="lsLaser2" native="true">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>5</width>
+              <height>5</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QLabel" name="label_11">
+            <property name="text">
+             <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'Sans Serif'; font-size:9pt; font-weight:600; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-family:'MS Shell Dlg 2'; font-size:8pt; font-weight:400;&quot;&gt;filter:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QF3FilterCombobox" name="filtLaser21" native="true">
+            <property name="enabled">
+             <bool>true</bool>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>5</width>
+              <height>5</height>
+             </size>
+            </property>
+            <property name="font">
+             <font>
+              <weight>50</weight>
+              <bold>false</bold>
+             </font>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QF3FilterCombobox" name="filtLaser22" native="true">
             <property name="enabled">
              <bool>true</bool>
             </property>
@@ -1836,8 +1934,8 @@ p, li { white-space: pre-wrap; }
      <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>375</x>
-     <y>305</y>
+     <x>421</x>
+     <y>408</y>
     </hint>
    </hints>
   </connection>
@@ -1884,8 +1982,8 @@ p, li { white-space: pre-wrap; }
      <y>539</y>
     </hint>
     <hint type="destinationlabel">
-     <x>852</x>
-     <y>556</y>
+     <x>961</x>
+     <y>566</y>
     </hint>
    </hints>
   </connection>
@@ -1916,8 +2014,8 @@ p, li { white-space: pre-wrap; }
      <y>539</y>
     </hint>
     <hint type="destinationlabel">
-     <x>827</x>
-     <y>571</y>
+     <x>936</x>
+     <y>580</y>
     </hint>
    </hints>
   </connection>
@@ -1948,8 +2046,8 @@ p, li { white-space: pre-wrap; }
      <y>306</y>
     </hint>
     <hint type="destinationlabel">
-     <x>852</x>
-     <y>323</y>
+     <x>961</x>
+     <y>332</y>
     </hint>
    </hints>
   </connection>
@@ -1980,8 +2078,8 @@ p, li { white-space: pre-wrap; }
      <y>306</y>
     </hint>
     <hint type="destinationlabel">
-     <x>827</x>
-     <y>338</y>
+     <x>936</x>
+     <y>346</y>
     </hint>
    </hints>
   </connection>
@@ -2012,8 +2110,8 @@ p, li { white-space: pre-wrap; }
      <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>532</x>
-     <y>754</y>
+     <x>842</x>
+     <y>749</y>
     </hint>
    </hints>
   </connection>
@@ -2060,8 +2158,8 @@ p, li { white-space: pre-wrap; }
      <y>38</y>
     </hint>
     <hint type="destinationlabel">
-     <x>375</x>
-     <y>279</y>
+     <x>421</x>
+     <y>382</y>
     </hint>
    </hints>
   </connection>
@@ -2120,12 +2218,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>795</x>
-     <y>103</y>
+     <x>962</x>
+     <y>116</y>
     </hint>
     <hint type="destinationlabel">
-     <x>878</x>
-     <y>109</y>
+     <x>1141</x>
+     <y>116</y>
     </hint>
    </hints>
   </connection>
@@ -2140,8 +2238,8 @@ p, li { white-space: pre-wrap; }
      <y>27</y>
     </hint>
     <hint type="destinationlabel">
-     <x>956</x>
-     <y>105</y>
+     <x>1141</x>
+     <y>116</y>
     </hint>
    </hints>
   </connection>
@@ -2172,8 +2270,8 @@ p, li { white-space: pre-wrap; }
      <y>26</y>
     </hint>
     <hint type="destinationlabel">
-     <x>280</x>
-     <y>238</y>
+     <x>356</x>
+     <y>291</y>
     </hint>
    </hints>
   </connection>
@@ -2236,8 +2334,8 @@ p, li { white-space: pre-wrap; }
      <y>19</y>
     </hint>
     <hint type="destinationlabel">
-     <x>375</x>
-     <y>224</y>
+     <x>421</x>
+     <y>277</y>
     </hint>
    </hints>
   </connection>
@@ -2248,12 +2346,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>822</x>
-     <y>587</y>
+     <x>952</x>
+     <y>599</y>
     </hint>
     <hint type="destinationlabel">
-     <x>880</x>
-     <y>591</y>
+     <x>1141</x>
+     <y>647</y>
     </hint>
    </hints>
   </connection>
@@ -2264,12 +2362,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>805</x>
-     <y>352</y>
+     <x>952</x>
+     <y>365</y>
     </hint>
     <hint type="destinationlabel">
-     <x>879</x>
-     <y>351</y>
+     <x>1141</x>
+     <y>413</y>
     </hint>
    </hints>
   </connection>
@@ -2284,8 +2382,8 @@ p, li { white-space: pre-wrap; }
      <y>24</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1009</x>
-     <y>378</y>
+     <x>1141</x>
+     <y>387</y>
     </hint>
    </hints>
   </connection>
@@ -2300,7 +2398,7 @@ p, li { white-space: pre-wrap; }
      <y>32</y>
     </hint>
     <hint type="destinationlabel">
-     <x>989</x>
+     <x>1141</x>
      <y>400</y>
     </hint>
    </hints>
@@ -2316,8 +2414,8 @@ p, li { white-space: pre-wrap; }
      <y>22</y>
     </hint>
     <hint type="destinationlabel">
-     <x>986</x>
-     <y>410</y>
+     <x>1141</x>
+     <y>413</y>
     </hint>
    </hints>
   </connection>
@@ -2332,8 +2430,8 @@ p, li { white-space: pre-wrap; }
      <y>27</y>
     </hint>
     <hint type="destinationlabel">
-     <x>982</x>
-     <y>612</y>
+     <x>1141</x>
+     <y>621</y>
     </hint>
    </hints>
   </connection>
@@ -2364,8 +2462,8 @@ p, li { white-space: pre-wrap; }
      <y>20</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1118</x>
-     <y>648</y>
+     <x>1141</x>
+     <y>647</y>
     </hint>
    </hints>
   </connection>
@@ -2382,6 +2480,70 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>409</x>
      <y>48</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLockFiltersEtc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>filtLaser11</receiver>
+   <slot>setReadOnly(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1134</x>
+     <y>16</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>218</x>
+     <y>192</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLockFiltersEtc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>filtLaser12</receiver>
+   <slot>setReadOnly(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1135</x>
+     <y>24</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>225</x>
+     <y>202</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLockFiltersEtc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>filtLaser21</receiver>
+   <slot>setReadOnly(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1128</x>
+     <y>23</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>148</x>
+     <y>300</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnLockFiltersEtc</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>filtLaser22</receiver>
+   <slot>setReadOnly(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1130</x>
+     <y>20</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>110</x>
+     <y>313</y>
     </hint>
    </hints>
   </connection>
