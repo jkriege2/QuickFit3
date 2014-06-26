@@ -32,7 +32,8 @@ void QFEnhancedTabWidget::repaintWidget(int i)
 {
     if (widget(i)) {
         if (widget(i)->layout()) {
-            widget(i)->layout()->invalidate();
+            widget(i)->layout()->activate();
+            widget(i)->layout()->update();
         }
         widget(i)->show();
         widget(i)->repaint();
