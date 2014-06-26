@@ -2858,8 +2858,10 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
 
     double imgAvg=0;
     double imgVar=0;
+    double imgAvg2=0;
+    double imgVar2=0;
     pltImage->updateOverlays(&imgAvg, &imgVar);
-    pltParamImage2->updateOverlays();
+    pltParamImage2->updateOverlays(&imgAvg2, &imgVar2);
 
 #ifdef DEBUG_TIMIMNG
     qDebug()<<"replotSelection ... -6 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
@@ -2880,16 +2882,30 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
 
         double ovrAvg=0;
         double ovrVar=0;
+        double ovrAvg2=0;
+        double ovrVar2=0;
         bool *msk=(bool*)calloc(w*h, sizeof(bool));
         int cnt=0;
         for (int i=0; i<w*h; i++) {
             msk[i]=plteOverviewSelectedData[i]&&(!plteOverviewExcludedData[i]);
             if (msk[i]) cnt++;
         }
-        if (cnt>1){
-            ovrAvg=statisticsAverageVarianceMasked(ovrVar, msk, m->getImageFromRunsPreview(), w*h);
+
+
+        if (m->isFCCS()) {
+            if (cnt>1){
+                ovrAvg=statisticsAverageVarianceMasked(ovrVar, msk, m->getImageFromRunsPreview(0), w*h);
+                ovrAvg2=statisticsAverageVarianceMasked(ovrVar, msk, m->getImageFromRunsPreview(1), w*h);
+            } else {
+                ovrAvg=statisticsAverageVarianceMasked(ovrVar, plteOverviewExcludedData, m->getImageFromRunsPreview(0), w*h, false);
+                ovrAvg2=statisticsAverageVarianceMasked(ovrVar, plteOverviewExcludedData, m->getImageFromRunsPreview(1), w*h, false);
+            }
         } else {
-            ovrAvg=statisticsAverageVarianceMasked(ovrVar, plteOverviewExcludedData, m->getImageFromRunsPreview(), w*h, false);
+            if (cnt>1){
+                ovrAvg=statisticsAverageVarianceMasked(ovrVar, msk, m->getImageFromRunsPreview(), w*h);
+            } else {
+                ovrAvg=statisticsAverageVarianceMasked(ovrVar, plteOverviewExcludedData, m->getImageFromRunsPreview(), w*h, false);
+            }
         }
 
         plteOverviewSelected->set_width(w);
@@ -2914,7 +2930,11 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
 
 
         labImageAvg->setTextFormat(Qt::RichText);
-        labImageAvg->setText(tr("avg&plusmn;SD(param img) = %1 &plusmn; %2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;avg&plusmn;SD(overview) = %3 &plusmn; %4").arg(imgAvg).arg(imgVar).arg(ovrAvg).arg(sqrt(ovrVar)));
+        if (m->isFCCS()) {
+            labImageAvg->setText(tr("avg&plusmn;SD(param 1) = %1 &plusmn; %2&nbsp;&nbsp;avg&plusmn;SD(param 2) = %3 &plusmn; %4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;avg&plusmn;SD(overview0) = %5 &plusmn; %6&nbsp;&nbsp;avg&plusmn;SD(overview1) = %7 &plusmn; %8").arg(imgAvg).arg(imgVar).arg(imgAvg2).arg(imgVar2).arg(ovrAvg).arg(sqrt(ovrVar)).arg(ovrAvg2).arg(sqrt(ovrVar2)));
+        } else {
+            labImageAvg->setText(tr("avg&plusmn;SD(param 1) = %1 &plusmn; %2&nbsp;&nbsp;avg&plusmn;SD(param 2) = %3 &plusmn; %4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;avg&plusmn;SD(overview) = %5 &plusmn; %6").arg(imgAvg).arg(imgVar).arg(imgAvg2).arg(imgVar2).arg(ovrAvg).arg(sqrt(ovrVar)));
+        }
 
 
     }
@@ -4012,11 +4032,13 @@ void QFRDRImagingFCSImageEditor::transformChanged() {
     current->setQFProperty(QString("imfcs_imed_paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter->currentIndex()), cmbParameterTransform->currentIndex(), false, false);
     connectParameterWidgets(false);
     loadImageSettings();
-    replotOverview();
+    replotOverview();    
     replotImage();
+    replotSelection();
     updateOverlaySettings();
     connectParameterWidgets(true);
     updateHistogram();
+
 }
 
 
