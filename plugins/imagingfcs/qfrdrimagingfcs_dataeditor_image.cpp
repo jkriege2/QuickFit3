@@ -4829,11 +4829,19 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
         }
     }
 
+    int channels=m->getImageFromRunsChannels();
+    for (int c=0; c<channels; c++) {
+        singlelabels.append(tr("overview image intensity, ch.%1").arg(c));
+        singlenames.append(QString("overview_image_ch%1").arg(c));
+    }
+    //qDebug()<<singlenames<<singlenames.size()<<singlelabels.size();
+
 
     dlg->init(singlelabels, singlenames, (*settings), prefix+"selections/");
 
     if (dlg->exec()) {
         QList<int> items=dlg->getSelectedIndexes();
+        //qDebug()items;
 
 
         QList<QPointer<QFRawDataRecord> > recs;
@@ -5017,6 +5025,16 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                             d.gvalues.append(v);
                                         }
 
+                                        for (int c=0; c<channels; c++) {
+                                            const double* img=m->getImageFromRunsPreview(c);
+                                            d.gfix.append(Qt::Checked);
+                                            d.names.append(QString("OVERVIEW_IMAGE_CH%1").arg(c));
+                                            d.namelabels.append(QString("OVERVIEW IMAGE CH%1").arg(c));
+                                            QList<double> v;
+                                            v.append(img[i]);
+                                            d.gvalues.append(v);
+                                        }
+
 
                                     } else {
                                         for (int jj=0; jj<fix.size(); jj++) {
@@ -5025,11 +5043,18 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                         for (int jj=0; jj<values.size(); jj++) {
                                             d.gvalues[jj].append(values[jj]);
                                         }
+
+                                        for (int c=0; c<channels; c++) {
+                                            const double* img=m->getImageFromRunsPreview(c);
+                                            //qDebug()i<<c<<img[i]<<values.size()<<d.gvalues.size()<<d.gvalues.size()-1-(channels-1-c)<<c;
+                                            if (img) d.gvalues[d.gvalues.size()-1-(channels-1-c)].append(img[i]);
+                                            else  d.gvalues[d.gvalues.size()-1-(channels-1-c)].append(0);
+                                        }
                                     }
 
                                     d.Nfit++;
                                 } else if (evalFound && !hasFitFunction) {
-                                    for (int jj=0; jj<singlenames.size(); jj++) {
+                                    for (int jj=0; jj<singlenames.size()-channels; jj++) {
                                         if (curRec->resultsExists(resultID, singlenames[jj])) {
                                             values.append(curRec->resultsGetInNumberList(resultID, singlenames[jj], i));
                                         } else {
@@ -5049,9 +5074,27 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                             d.gvalues.append(v);
                                         }
 
+
+                                        for (int c=0; c<channels; c++) {
+                                            const double* img=m->getImageFromRunsPreview(c);
+                                            d.gfix.append(Qt::Checked);
+                                            d.names.append(QString("OVERVIEW_IMAGE_CH%1").arg(c));
+                                            d.namelabels.append(QString("OVERVIEW IMAGE CH%1").arg(c));
+                                            QList<double> v;
+                                            v.append(img[i]);
+                                            d.gvalues.append(v);
+                                        }
+
                                     } else {
                                         for (int jj=0; jj<values.size(); jj++) {
                                             d.gvalues[jj].append(values[jj]);
+                                        }
+
+                                        for (int c=0; c<channels; c++) {
+                                            const double* img=m->getImageFromRunsPreview(c);
+                                            //qDebug()i<<c<<img[i]<<values.size()<<d.gvalues.size()<<d.gvalues.size()-1-(channels-1-c)<<c;
+                                            if (img) d.gvalues[d.gvalues.size()-1-(channels-1-c)].append(img[i]);
+                                            else  d.gvalues[d.gvalues.size()-1-(channels-1-c)].append(0);
                                         }
                                     }
 
@@ -5068,23 +5111,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                         free(cerr);
                         free(corr1);
                         dataint.append(d);
-                        /*if (avgIdx==0) {
-                            if (recs.size()>1) {
-                                for (int j=0; j<d.names.size(); j++) {
-                                    //names.append(d.names);
-                                    singlenames.append(curRec->getName()+": "+masel_name+d.names[j]);
-                                    singlelabels.append(curRec->getName()+": "+masel_name+d.namelabels.value(j, d.names[j]));
-                                }
-                            } else {
-                                for (int j=0; j<d.names.size(); j++) {
-                                    //names.append(d.names);
-                                    singlenames.append(masel_name+d.names[j]);
-                                    singlelabels.append(masel_name+d.namelabels.value(j, masel_name+d.names[j]));
-                                }
-                            }
 
-                            //labels.append(d.namelabels);
-                        }*/
                     }
                 }
                 //qDebug()<<"  adding "<<dataint.size();
@@ -5137,7 +5164,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                         }
                         QList<QVariant> r;
                         r.clear();
-                        QList<double> gvalues, gvalues_s;
+                        QList<double> gvalues, gvalues_s;                        
                         gvalues_s=gvalues=qfstatisticsFilter(data[d].gvalues.value(items[i], QList<double>()));
                         qSort(gvalues_s);
                         if (listMode->item(0)->checkState()==Qt::Checked) { r.append(qfstatisticsAverage(gvalues)); if (i==0) colNames<<tr("average"); }
@@ -5179,11 +5206,13 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                 QList<QVariant> r;
                 r.clear();
                 for (int d=0; d<data.size(); d++) {
-                    //qDebug()<<d<<": "<<data[d].names;
+                    //qDebug()d<<": "<<data[d].names;
                     for (int i=0; i<items.size(); i++) {
                         QList<double> gvalues, gvalues_s;
                         gvalues_s=gvalues=qfstatisticsFilter(data[d].gvalues.value(items[i], QList<double>()));
                         qSort(gvalues_s);
+                        //qDebug()"222: "<<gvalues;
+                        //qDebug()"222: "<<items[i]<<data[d].names.value(items[i], "")<<data[d].gvalues.size()<<gvalues.size()<<qfstatisticsAverage(gvalues)<<qfstatisticsAverage(data[d].gvalues.value(items[i], QList<double>()));
                         if (listMode->item(0)->checkState()==Qt::Checked) { r.append(qfstatisticsAverage(gvalues)); colNames<<tr("avg(%1)").arg(data[d].names.value(items[i], "")); }
                         if (listMode->item(1)->checkState()==Qt::Checked) { r.append(qfstatisticsSortedMedian(gvalues_s)); colNames<<tr("median(%1)").arg(data[d].names.value(items[i], "")); }
                         if (listMode->item(2)->checkState()==Qt::Checked) { r.append(sqrt(qfstatisticsVariance(gvalues))); colNames<<tr("std(%1)").arg(data[d].names.value(items[i], "")); }

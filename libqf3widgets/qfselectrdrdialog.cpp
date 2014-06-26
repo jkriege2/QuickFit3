@@ -24,7 +24,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "ui_qfselectrdrdialog.h"
 #include "qfpluginservices.h"
 #include <QDebug>
-
+#include "qfcompleterfromfile.h"
 #include "qfstyledbutton.h"
 
 QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, QWidget *parent) :
@@ -33,6 +33,11 @@ QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, QWidget *p
 {
     ui->setupUi(this);
     ui->lineEditFilter->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, ui->lineEditFilter, ui->lineEditFilter));
+    ui->lineEditFilter->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->lineEditFilter, ui->lineEditFilter));
+    QFCompleterFromFile* cc=new QFCompleterFromFile(ui->lineEditFilter);
+    cc->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"completers/qfselectrdrdialog_filters.txt");
+    ui->lineEditFilter->setCompleter(cc);
+
     this->matchFunctor=matchFunctor;
     this->project=project;
     functorPrivate=false;
@@ -50,6 +55,11 @@ QFSelectRDRDialog::QFSelectRDRDialog(QFMatchRDRFunctor *matchFunctor, bool funct
 {
     ui->setupUi(this);
     ui->lineEditFilter->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, ui->lineEditFilter, ui->lineEditFilter));
+    ui->lineEditFilter->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->lineEditFilter, ui->lineEditFilter));
+    QFCompleterFromFile* cc=new QFCompleterFromFile(ui->lineEditFilter);
+    cc->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"completers/qfselectrdrdialog_filters.txt");
+    ui->lineEditFilter->setCompleter(cc);
+
     this->matchFunctor=matchFunctor;
     this->project=project;
     this->functorPrivate=functorPrivate;
@@ -67,6 +77,11 @@ QFSelectRDRDialog::QFSelectRDRDialog(QWidget *parent):
 {
     ui->setupUi(this);
     ui->lineEditFilter->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, ui->lineEditFilter, ui->lineEditFilter));
+    ui->lineEditFilter->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, ui->lineEditFilter, ui->lineEditFilter));
+    QFCompleterFromFile* cc=new QFCompleterFromFile(ui->lineEditFilter);
+    cc->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"completers/qfselectrdrdialog_filters.txt");
+    ui->lineEditFilter->setCompleter(cc);
+
     this->matchFunctor=new QFMatchRDRFunctorSelectAll();
     functorPrivate=true;
     this->project=project;

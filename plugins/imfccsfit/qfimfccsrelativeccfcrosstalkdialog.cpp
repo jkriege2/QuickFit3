@@ -491,6 +491,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
                 acf10[i]=acf1Amplitude[i]/acf0Amplitude[i];
             }
         }
+        bool cleared=false;
         for (int i=0; i<2; i++) {
             QFRawDataRecord* acf=acf0;
             double* rel=rel0;
@@ -519,11 +520,17 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
             if (ccfName.isEmpty()) ccfName=ccf->getName();
             QString egrouplabel=tr("rel. CCF amlitude (avg. %3 taus), %1%2 crosstalk corrected%4").arg(ui->spinCrosstalk->value()).arg("%").arg(ui->spinAvg->value()).arg(BackModFull);
             QString rnbase=QString("relative_ccf_acf%1").arg(i);
+            QString rnbase_simple=QString("");
             if (ui->cmbAmplitudeSource->currentIndex()==1) {
                 egrouplabel=tr("rel. CCF g(0) amlitude, %1%2 crosstalk corrected%3").arg(ui->spinCrosstalk->value()).arg("%").arg(BackModFull);
                 rnbase=QString("relative_ccf_acf%1").arg(i);
             }
             QString rn=rnbase+"_g0_amplitude";
+
+            if (!cleared) {
+                ccf->resultsClear(evalName);
+                cleared=true;
+            }
 
             ccf->resultsSetEvaluationGroup(evalName, egroup);
             ccf->resultsSetEvaluationGroupLabel(egroup, egrouplabel);
@@ -536,7 +543,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
 
             if (ui->chkStoreAmplitudes->isChecked()) {
                 QString rn;
-                rn=rnbase+"_acf0_amplitude";
+                rn=rnbase_simple+"acf0_amplitude";
                 //qDebug()<<rn<<acf0Amplitude;
                 if (acf0Amplitude){
 
@@ -545,7 +552,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
                     ccf->resultsSetGroup(evalName, rn, group);
 
                 }
-                rn=rnbase+"_acf0_amplitude_uncorrected";
+                rn=rnbase_simple+"acf0_amplitude_uncorrected";
                 //qDebug()<<rn<<acf0UCAmplitude;
 
                 if (acf0UCAmplitude) {
@@ -554,7 +561,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
                     ccf->resultsSetGroup(evalName, rn, group);
 
                 }
-                rn=rnbase+"_acf1_amplitude";
+                rn=rnbase_simple+"acf1_amplitude";
                 //qDebug()<<rn<<acf1Amplitude;
 
                 if (acf1Amplitude) {
@@ -563,7 +570,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
                     ccf->resultsSetGroup(evalName, rn, group);
 
                 }
-                rn=rnbase+"_acf1_amplitude_uncorrected";
+                rn=rnbase_simple+"acf1_amplitude_uncorrected";
                 //qDebug()<<rn<<acf1UCAmplitude;
 
                 if (acf1UCAmplitude) {
@@ -572,7 +579,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
                     ccf->resultsSetGroup(evalName, rn, group);
 
                 }
-                rn=rnbase+"_ccf_amplitude";
+                rn=rnbase_simple+"ccf_amplitude";
                 //qDebug()<<rn<<ccfAmplitude;
 
                 if (ccfAmplitude) {
@@ -581,7 +588,7 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
                     ccf->resultsSetGroup(evalName, rn, group);
 
                 }
-                rn=rnbase+"_ccf_amplitude_uncorrected";
+                rn=rnbase_simple+"ccf_amplitude_uncorrected";
                 //qDebug()<<rn<<ccfUCAmplitude;
 
                 if (ccfUCAmplitude) {
@@ -589,11 +596,11 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
                     ccf->resultsSetLabel(evalName, rn, tr("CCF amplitude, uncorrected"));
                     ccf->resultsSetGroup(evalName, rn, group);
                 }
-                rn="relative_ccf__acf1divacf0";
+                rn=rnbase_simple+"acf1_div_acf0";
                 ccf->resultsSetNumberList(evalName, rn, acf10.data(), acf10.size());
                 ccf->resultsSetLabel(evalName, rn, tr("ACF1/ACF0 amplitude, corrected"));
                 ccf->resultsSetGroup(evalName, rn, group);
-                rn="relative_ccf__acf0divacf1";
+                rn=rnbase_simple+"acf0_div_acf1";
                 ccf->resultsSetNumberList(evalName, rn, acf01.data(), acf01.size());
                 ccf->resultsSetLabel(evalName, rn, tr("ACF0/ACF1 amplitude, corrected"));
                 ccf->resultsSetGroup(evalName, rn, group);
