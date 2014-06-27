@@ -1652,7 +1652,7 @@ bool QFRDRFCSData::getRateChannelsSwapped() const
 }
 
 void QFRDRFCSData::saveInternal(QXmlStreamWriter& w) const {
-    w.writeStartElement("internal_correlations");
+    /*w.writeStartElement("internal_correlations");
     double offset=getProperty("CF_CORRECT_OFFSET", 0.0).toDouble();
     QString csv;
     for (int i=0; i<correlationN; i++) {
@@ -1679,7 +1679,46 @@ void QFRDRFCSData::saveInternal(QXmlStreamWriter& w) const {
         csv=csv+"\n";
     }
     w.writeCDATA(csv);
+    w.writeEndElement();*/
+
+
+
+    double offset=getProperty("CF_CORRECT_OFFSET", 0.0).toDouble();
+    w.writeStartElement("internal_correlations_bin");
+    w.writeAttribute("correlationN", QString::number(correlationN));
+    w.writeAttribute("correlationRuns", QString::number(correlationRuns));
+    w.writeAttribute("encoding", "base64");
+        w.writeStartElement("tau");
+        QVector<double> tmp=arrayToVector(correlationT, correlationN);
+        w.writeCDATA(doubleArrayToString_base64(tmp));
+        w.writeEndElement();
+        w.writeStartElement("correlations");
+        tmp=arrayToVector(correlation, correlationN*correlationRuns);
+        for (int i=0; i<tmp.size(); i++) tmp[i]=tmp[i]+offset;
+        w.writeCDATA(doubleArrayToString_base64(tmp));
+        w.writeEndElement();
+        w.writeStartElement("correlation_errors");
+        tmp=arrayToVector(correlationErrors, correlationN*correlationRuns);
+        w.writeCDATA(doubleArrayToString_base64(tmp));
+        w.writeEndElement();
     w.writeEndElement();
+
+    w.writeStartElement("internal_countrate_bin");
+    w.writeAttribute("encoding", "base64");
+    w.writeAttribute("rateRuns", QString::number(rateRuns));
+    w.writeAttribute("rateChannels", QString::number(rateChannels));
+    w.writeAttribute("rateN", QString::number(rateN));
+        w.writeStartElement("time");
+        tmp=arrayToVector(rateT, rateN);
+        w.writeCDATA(doubleArrayToString_base64(tmp));
+        w.writeEndElement();
+        w.writeStartElement("counts");
+        tmp=arrayToVector(rate, rateRuns*rateChannels*rateN);
+        for (int i=0; i<tmp.size(); i++) tmp[i]=tmp[i]+offset;
+        w.writeCDATA(doubleArrayToString_base64(tmp));
+        w.writeEndElement();
+    w.writeEndElement();
+
 
 }
 
@@ -1786,6 +1825,62 @@ bool QFRDRFCSData::loadInternal(QDomElement* e) {
         calcBinnedRate();
         okR= true;
     }
+
+    if (!okC) {
+        if (e) {
+            QDomElement de=e->firstChildElement("internal_correlations_bin");
+            if (!de.isNull()) {
+                int N=de.attribute("correlationN", "0").toInt();
+                int R=de.attribute("correlationRuns", "0").toInt();
+                resizeCorrelations(N, R);
+                QDomElement det=de.firstChildElement("tau");
+                QDomElement dec=de.firstChildElement("correlations");
+                QDomElement dee=de.firstChildElement("correlation_errors");
+                QVector<double> tmp;
+                if (!det.isNull()) {
+                    tmp=stringToDoubleArray_base64(det.text());
+                    for (int i=0; i<qMin((long long)tmp.size(), correlationN); i++) correlationT[i]=tmp.value(i, 0.0);
+                }
+                if (!dec.isNull()) {
+                    tmp=stringToDoubleArray_base64(dec.text());
+                    for (int i=0; i<qMin((long long)tmp.size(), correlationN*correlationRuns); i++) correlation[i]=tmp.value(i, 0.0);
+                }
+                if (!dee.isNull()) {
+                    tmp=stringToDoubleArray_base64(dee.text());
+                    for (int i=0; i<qMin((long long)tmp.size(), correlationN*correlationRuns); i++) correlationErrors[i]=tmp.value(i, 0.0);
+                }
+                recalculateCorrelations();
+                okC= true;
+            }
+        }
+    }
+
+    if (!okR) {
+        if (e) {
+
+            QDomElement de=e->firstChildElement("internal_countrate_bin");
+            if (!de.isNull()) {
+                int C=de.attribute("rateChannels", "0").toInt();
+                int N=de.attribute("rateN", "0").toInt();
+                int R=de.attribute("rateRuns", "0").toInt();
+                resizeRates(N, R, C);
+                QDomElement det=de.firstChildElement("time");
+                QDomElement dec=de.firstChildElement("counts");
+                QVector<double> tmp;
+                if (!det.isNull()) {
+                    tmp=stringToDoubleArray_base64(det.text());
+                    for (int i=0; i<qMin((long long)tmp.size(), rateN); i++) rateT[i]=tmp.value(i, 0.0);
+                }
+                if (!dec.isNull()) {
+                    tmp=stringToDoubleArray_base64(dec.text());
+                    for (int i=0; i<qMin((long long)tmp.size(), rateN*rateChannels*rateRuns); i++) rate[i]=tmp.value(i, 0.0);
+                }
+                calcBinnedRate();
+                okR= true;
+            }
+        }
+    }
+
     return okC;
 }
 

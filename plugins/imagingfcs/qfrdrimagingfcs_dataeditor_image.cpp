@@ -40,6 +40,7 @@
 #include "qffcstools.h"
 #include "qfrdrimagingfcs.h"
 #include "qfrdrimagingfcsmaskbuilder.h"
+#include "qfrdrimagingfcscopycorrasrdrdialog.h"
 #define sqr(x) qfSqr(x)
 
 #define CLICK_UPDATE_TIMEOUT 500
@@ -4679,120 +4680,147 @@ void QFRDRImagingFCSImageEditor::insertSelectedCorrelationsAsFCSRDR() {
     QFRDRImagingFCSData* mc=qobject_cast<QFRDRImagingFCSData*>(current);
     if (mc) recs.append(mc);
 
-    if (mc->isFCCS()) {
-        int answer=QMessageBox::question(this, tr("Insert selected ACFs as FCS RDR"), tr("This is an FCCS record. Do you want to also insetr the ACFs as FCS RDRs?"), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Yes);
-        if (answer==QMessageBox::Cancel) return;
-        if (answer==QMessageBox::Yes) {
-            recs.clear();
-            QList<QFRawDataRecord*> l;
-            l=mc->getRecordsWithRoleFromGroup("acf0");
-            for (int i=0; i<l.size(); i++) {
-                QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(l[i]);
-                if (m) recs.append(m);;
-            }
-            l=mc->getRecordsWithRoleFromGroup("acf1");
-            for (int i=0; i<l.size(); i++) {
-                QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(l[i]);
-                if (m) recs.append(m);;
-            }
-            recs.append(mc);
-        }
-    }
+    QFRDRImagingFCSCopyCorrAsRDRDialog* dlg=new QFRDRImagingFCSCopyCorrAsRDRDialog(mc->isFCCS(), this);
+    //TODO: Implement: copy only AVerage!!!
+    if (dlg->exec()) {
 
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-    for (int i=0; i<recs.size(); i++) {
-        QFRDRImagingFCSData* m=recs[i];
-        if (m) {
-            QStringList CSV;
-            QStringList CSVCNT;
-            QString runs="";
-            double* tau=m->getCorrelationT();
-            long long N=m->getCorrelationN();
-            for (long long i=0; i<N; i++) {
-                CSV.append(CDoubleToQString(tau[i]));
-            }
-            for (int i=0; i<m->getCorrelationRuns(); i++) {
-                if (selected.contains(i)) {
-                    double* c=m->getCorrelationRun(i);
-                    double* ce=m->getCorrelationRunError(i);
-                    for (int j=0; j<N; j++) {
-                        CSV[j]=CSV[j]+", "+CDoubleToQString(c[j])+", "+CDoubleToQString(ce[j]);
-                    }
-                    if (!runs.isEmpty()) runs+=", ";
-                    runs+=QString::number(i);
+        if (mc->isFCCS()) {
+            /*int answer=QMessageBox::question(this, tr("Insert selected ACFs as FCS RDR"), tr("This is an FCCS record. Do you want to also insetr the ACFs as FCS RDRs?"), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Yes);
+            if (answer==QMessageBox::Cancel) return;
+            if (answer==QMessageBox::Yes) {
+                recs.clear();
+                QList<QFRawDataRecord*> l;
+                l=mc->getRecordsWithRoleFromGroup("acf0");
+                for (int i=0; i<l.size(); i++) {
+                    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(l[i]);
+                    if (m) recs.append(m);;
                 }
+                l=mc->getRecordsWithRoleFromGroup("acf1");
+                for (int i=0; i<l.size(); i++) {
+                    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(l[i]);
+                    if (m) recs.append(m);;
+                }
+                recs.append(mc);
+            }*/
+            if (dlg->getCopyACF()) {
+                recs.clear();
+                QList<QFRawDataRecord*> l;
+                l=mc->getRecordsWithRoleFromGroup("acf0");
+                for (int i=0; i<l.size(); i++) {
+                    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(l[i]);
+                    if (m) recs.append(m);;
+                }
+                l=mc->getRecordsWithRoleFromGroup("acf1");
+                for (int i=0; i<l.size(); i++) {
+                    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(l[i]);
+                    if (m) recs.append(m);;
+                }
+                recs.append(mc);
             }
+        }
 
-            //int vidW=m->getImageStackWidth(0);
-            //int vidH=m->getImageStackHeight(0);
-            int frames=m->getImageStackFrames(0);
-            int channels=m->getImageStackChannels(0);
-            //double duration=m->getMeasurementDuration();
-            //double exposure=m->getFrameTime();
-            //int segments=m->getProperty("SEGMENTS", 0).toInt();
-            //int sumframes=m->getProperty("VIDEO_AVGFRAMES", 0).toInt();
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
-            double dt=m->getImageStackTUnitFactor(0);
-            double t=0;
-            for (int ti=0; ti<frames; ti++) {
-                QString line=CDoubleToQString(t);
-                for (int c=0; c<channels; c++) {
-                    for (int i=0; i<m->getCorrelationRuns(); i++) {
-                        if (selected.contains(i)) {
-                            double* d=m->getImageStack(0,ti, c);
-                            line+=QString(", ")+CDoubleToQString(d[i]);
+        for (int i=0; i<recs.size(); i++) {
+            QFRDRImagingFCSData* m=recs[i];
+            if (m) {
+                if (dlg->getCreateSelection())  {
+                    QVector<bool> sel(mc->getImageSelectionWidth()*mc->getImageSelectionHeight(), false);
+                    for (int i=0; i<mc->getImageSelectionWidth()*mc->getImageSelectionHeight(); i++) {
+                        sel[i]=selected.contains(i);
+                    }
+                    m->addImageSelection(sel.data(), dlg->getSelectionName());
+                }
+                QStringList CSV;
+                QStringList CSVCNT;
+                QString runs="";
+                double* tau=m->getCorrelationT();
+                long long N=m->getCorrelationN();
+                for (long long i=0; i<N; i++) {
+                    CSV.append(CDoubleToQString(tau[i]));
+                }
+                for (int i=0; i<m->getCorrelationRuns(); i++) {
+                    if (selected.contains(i)) {
+                        double* c=m->getCorrelationRun(i);
+                        double* ce=m->getCorrelationRunError(i);
+                        for (int j=0; j<N; j++) {
+                            CSV[j]=CSV[j]+", "+CDoubleToQString(c[j])+", "+CDoubleToQString(ce[j]);
+                        }
+                        if (!runs.isEmpty()) runs+=", ";
+                        runs+=QString::number(i);
+                    }
+                }
+
+                //int vidW=m->getImageStackWidth(0);
+                //int vidH=m->getImageStackHeight(0);
+                int frames=m->getImageStackFrames(0);
+                int channels=m->getImageStackChannels(0);
+                //double duration=m->getMeasurementDuration();
+                //double exposure=m->getFrameTime();
+                //int segments=m->getProperty("SEGMENTS", 0).toInt();
+                //int sumframes=m->getProperty("VIDEO_AVGFRAMES", 0).toInt();
+
+                double dt=m->getImageStackTUnitFactor(0);
+                double t=0;
+                for (int ti=0; ti<frames; ti++) {
+                    QString line=CDoubleToQString(t);
+                    for (int c=0; c<channels; c++) {
+                        for (int i=0; i<m->getCorrelationRuns(); i++) {
+                            if (selected.contains(i)) {
+                                double* d=m->getImageStack(0,ti, c);
+                                line+=QString(", ")+CDoubleToQString(d[i]);
+                            }
                         }
                     }
-                }
-                t=t+dt;
-                //qDebug()<<t;
-                CSVCNT.append(line);
-            }
-
-
-
-
-
-            QMap<QString, QVariant> p;
-            QStringList paramsReadonly;
-            for (int pi=0; pi<m->getPropertyCount(); pi++) {
-                QString n=m->getPropertyName(pi);
-                if (m->isPropertyVisible(n)) {
-                    p[n]=m->getProperty(n);
-                    if (!m->isPropertyUserEditable(n)) paramsReadonly<<n;
+                    t=t+dt;
+                    //qDebug()<<t;
+                    CSVCNT.append(line);
                 }
 
+
+
+
+
+                QMap<QString, QVariant> p;
+                QStringList paramsReadonly;
+                for (int pi=0; pi<m->getPropertyCount(); pi++) {
+                    QString n=m->getPropertyName(pi);
+                    if (m->isPropertyVisible(n)) {
+                        p[n]=m->getProperty(n);
+                        if (!m->isPropertyUserEditable(n)) paramsReadonly<<n;
+                    }
+
+                }
+
+                p["FILETYPE"]="INTERNAL";
+                p["INTERNAL_CSV"]=CSV.join("\n");
+                p["INTERNAL_CSVMODE"]="tcecece";
+                p["INTERNAL_CSV_CNT"]=CSVCNT.join("\n");
+                p["INTERNAL_CSV_CNT_CHANNELS"]=m->getImageFromRunsChannels();
+                p["CHANNEL"]=m->getImageFromRunsChannelsAdvised();
+                p["FCS_RATE_RUN_DISPLAY"]=3;
+                p["FCS_RUN_DISPLAY"]=4;
+                p["INTERNAL_CSV_CNT_CHANNEL_ADVISED"]=m->getImageFromRunsChannelsAdvised();
+
+                paramsReadonly<<"FILETYPE"<<"INTERNAL_CSV"<<"INTERNAL_CSVMODE"<<"INTERNAL_CSV_CNT"<<"INTERNAL_CSV_CNT_CHANNELS"<<"CHANNEL"<<"FCS_RATE_RUN_DISPLAY"<<"INTERNAL_CSV_CNT_CHANNEL_ADVISED"<<"FCS_RUN_DISPLAY";
+
+
+                QFRawDataRecord* e=m->getProject()->addRawData("fcs", tr("subplot of '%1'").arg(m->getName()), QStringList(), p, paramsReadonly);
+                if (e->error()) {
+                    QMessageBox::critical(NULL, tr("QuickFit 3.0"), tr("Error while creating FCS record from imagingFCS selection:\n%1").arg(e->errorDescription()));
+                    services->log_error(tr("Error while creating FCS record from imagingFCS selection:\n    %1\n").arg(e->errorDescription()));
+                    m->getProject()->deleteRawData(e->getID());
+                } else {
+                    e->setFolder(m->getFolder());
+                    e->setDescription(m->getDescription());
+                    e->setRole(m->getRole());
+                    e->setGroup(m->getGroup());
+                }
+
             }
-
-            p["FILETYPE"]="INTERNAL";
-            p["INTERNAL_CSV"]=CSV.join("\n");
-            p["INTERNAL_CSVMODE"]="tcecece";
-            p["INTERNAL_CSV_CNT"]=CSVCNT.join("\n");
-            p["INTERNAL_CSV_CNT_CHANNELS"]=m->getImageFromRunsChannels();
-            p["CHANNEL"]=m->getImageFromRunsChannelsAdvised();
-            p["FCS_RATE_RUN_DISPLAY"]=3;
-            p["FCS_RUN_DISPLAY"]=4;
-            p["INTERNAL_CSV_CNT_CHANNEL_ADVISED"]=m->getImageFromRunsChannelsAdvised();
-
-            paramsReadonly<<"FILETYPE"<<"INTERNAL_CSV"<<"INTERNAL_CSVMODE"<<"INTERNAL_CSV_CNT"<<"INTERNAL_CSV_CNT_CHANNELS"<<"CHANNEL"<<"FCS_RATE_RUN_DISPLAY"<<"INTERNAL_CSV_CNT_CHANNEL_ADVISED"<<"FCS_RUN_DISPLAY";
-
-
-            QFRawDataRecord* e=m->getProject()->addRawData("fcs", tr("subplot of '%1'").arg(m->getName()), QStringList(), p, paramsReadonly);
-            if (e->error()) {
-                QMessageBox::critical(NULL, tr("QuickFit 3.0"), tr("Error while creating FCS record from imagingFCS selection:\n%1").arg(e->errorDescription()));
-                services->log_error(tr("Error while creating FCS record from imagingFCS selection:\n    %1\n").arg(e->errorDescription()));
-                m->getProject()->deleteRawData(e->getID());
-            } else {
-                e->setFolder(m->getFolder());
-                e->setDescription(m->getDescription());
-                e->setRole(m->getRole());
-                e->setGroup(m->getGroup());
-            }
-
         }
+        QApplication::restoreOverrideCursor();
     }
-    QApplication::restoreOverrideCursor();
 }
 
 
