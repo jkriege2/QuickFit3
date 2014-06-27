@@ -9,6 +9,10 @@
 #include "qenhancedtableview.h"
 #include "qftabledelegate.h"
 #include "qfdoubleedit.h"
+#include "alv5000tools.h"
+#include "alv6000tools.h"
+#include "alv7000tools.h"
+
 QFPRDRFCS::QFPRDRFCS(QObject* parent):
     QObject(parent)
 {
@@ -199,6 +203,40 @@ void QFPRDRFCS::insertALV6000File(const QStringList& filename, const QMap<QStrin
 }
 
 
+void QFPRDRFCS::insertALV7000File(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
+    unsigned int cc=1;
+    QString mode="";
+    unsigned int runCount=0;
+    int inputchannels=2;
+    bool crossCorrelation=false;
+    try {
+        ALV7_analyze(filename.value(0, ""), mode, cc, runCount, crossCorrelation, inputchannels);
+    } catch (std::exception& E) {
+        cc=0;
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV700X file '%1':\n%2").arg(filename.value(0, "")).arg(E.what()));
+        services->log_error(tr("Error while importing ALV700X file '%1':\n    %2\n").arg(filename.value(0, "")).arg(E.what()));
+
+    }
+    for (unsigned int i=0; i<cc; i++) {
+        QMap<QString, QVariant> p=paramValues;
+        p["CHANNEL"]=i;
+        QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - CH%2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(i), filename, p, paramReadonly);
+        if (crossCorrelation) {
+            e->setRole(QString("ACF%1").arg(i));
+        }else  {
+            e->setRole(QString("FCCS").arg(i));
+        }
+        if (cc>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
+
+        if (e->error()) {
+            QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV700X file '%1' (channel %3/%4):\n%2").arg(filename.value(0, "")).arg(e->errorDescription()).arg(i+1).arg(cc));
+            services->log_error(tr("Error while importing ALV700X file '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
+            project->deleteRawData(e->getID());
+        }
+    }
+}
+
+
 void QFPRDRFCS::insertCSVFile(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
     QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename.value(0, "")).fileName(), filename, paramValues, paramReadonly);
     if (e->error()) {
@@ -324,6 +362,7 @@ void QFPRDRFCS::insertFCS() {
     if (project) {
         QString alvf=tr("ALV-5000 file (*.asc)");
         QString alvf6=tr("ALV-6000 file (*.asc)");
+        QString alvf7=tr("ALV-7000 file (*.asc)");
         QString flexf=tr("correlator.com files (*.sin)");
         QString zeisscf3=tr("Zeiss Confocor3 files (*.fcs)");
         QString asciif=tr("ASCII Data Files (*.txt *.dat *.csv)");
@@ -334,7 +373,7 @@ void QFPRDRFCS::insertFCS() {
         QStringList files = qfGetOpenFileNames(parentWidget,
                               tr("Select FCS Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              alvf+";;"+alvf6+";;"+flexf+";;"+zeisscf3+";;"+asciif+";;"+albaf+";;"+diff4f+";;"+olegf, &currentFCSFileFormatFilter);
+                              alvf+";;"+alvf6+";;"+alvf7+";;"+flexf+";;"+zeisscf3+";;"+asciif+";;"+albaf+";;"+diff4f+";;"+olegf, &currentFCSFileFormatFilter);
         //std::cout<<"filter: "<<currentFCSFileFormatFilter.toStdString()<<std::endl;
         if (files.size()>0) {
             settings->getQSettings()->setValue("fcs/current_fcs_format_filter", currentFCSFileFormatFilter);
@@ -344,6 +383,10 @@ void QFPRDRFCS::insertFCS() {
                 p["CHANNEL"]=0;
             } else if (currentFCSFileFormatFilter==alvf6){
                p["FILETYPE"]="ALV6000";
+               p["CHANNEL"]=0;
+               //qDebug() << "test 3";
+            } else if (currentFCSFileFormatFilter==alvf7){
+               p["FILETYPE"]="ALV7000";
                p["CHANNEL"]=0;
                //qDebug() << "test 3";
             } else if (currentFCSFileFormatFilter==flexf){
@@ -419,6 +462,8 @@ void QFPRDRFCS::insertFCS() {
                         insertALV5000File(QStringList(*it), p, paramsReadonly);
                     } else if (currentFCSFileFormatFilter==alvf6) {
                        insertALV6000File(QStringList(*it), p, paramsReadonly);
+                    } else if (currentFCSFileFormatFilter==alvf7) {
+                       insertALV7000File(QStringList(*it), p, paramsReadonly);
                     } else if (currentFCSFileFormatFilter==olegf) {
                        insertOlegFile(QStringList(*it), p, paramsReadonly);
                     } else if (currentFCSFileFormatFilter==albaf) {
@@ -453,6 +498,7 @@ void QFPRDRFCS::insertMultiFileFCS()
     if (project) {
         QString alvf=tr("ALV-5000 file (*.asc)");
         QString alvf6=tr("ALV-6000 file (*.asc)");
+        QString alvf7=tr("ALV-7000 file (*.asc)");
         QString flexf=tr("correlator.com files (*.sin)");
         QString zeisscf3=tr("Zeiss Confocor3 files (*.fcs)");
         QString asciif=tr("ASCII Data Files (*.txt *.dat *.csv)");
@@ -474,6 +520,10 @@ void QFPRDRFCS::insertMultiFileFCS()
             } else if (currentFCSFileFormatFilter==alvf6){
                //qDebug() << "test 1";
                p["FILETYPE"]="ALV6000";
+               p["CHANNEL"]=0;
+            } else if (currentFCSFileFormatFilter==alvf7){
+               //qDebug() << "test 1";
+               p["FILETYPE"]="ALV7000";
                p["CHANNEL"]=0;
             } else if (currentFCSFileFormatFilter==olegf){
                p["FILETYPE"]="OLEGKRIECHEVSKYBINARY";
@@ -539,6 +589,8 @@ void QFPRDRFCS::insertMultiFileFCS()
                 insertALV5000File(files, p, paramsReadonly);
             } else if (currentFCSFileFormatFilter==alvf6) {
                 insertALV6000File(files, p, paramsReadonly);
+            } else if (currentFCSFileFormatFilter==alvf7) {
+                insertALV7000File(files, p, paramsReadonly);
             } else if (currentFCSFileFormatFilter==olegf) {
                 insertOlegFile(files, p, paramsReadonly);
                 //qDebug() << "test 2";

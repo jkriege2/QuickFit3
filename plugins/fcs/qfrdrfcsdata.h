@@ -16,8 +16,6 @@
 #include "qfrdrfcsrateeditor.h"
 #include "datatable2.h"
 #include "tools.h"
-#include "alv5000tools.h"
-#include "alv6000tools.h"
 #include "qfrawdatarecordfactory.h"
 #include "../interfaces/qfrdrfcsdatainterface.h"
 #include "../interfaces/qfrdrcountratesinterface.h"
@@ -393,6 +391,16 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
          * omitted for DATE, TIME etc.
          */
         bool loadFromALV6000Files(QStringList filenames);
+        /** \brief read in an ALV7000 data file (created by ALV correlator software)
+         *
+         * If multiple channels are present in the file, this method looks for an integer property CHANNEL
+         * and imports that channel. If this property is not present, the first channel (CH0) will be loaded.
+         *
+         * This functions loads all files in the QStringList \a filenames into this single record. The parameters are read from the first
+         * file and a warning is printed for most of the parameters in the subsequent files, if they do not match the first file. This is
+         * omitted for DATE, TIME etc.
+         */
+        bool loadFromALV7000Files(QStringList filenames);
 
         /** \brief initialisez the data from the project file
          */

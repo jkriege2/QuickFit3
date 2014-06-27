@@ -90,11 +90,19 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
 
         /*! \brief add a ALV6000 file to the current project
 
-            \param filename filename of the ALV5000 file
+            \param filename filename of the ALV6000 file
             \param paramValues values for parameters in paramNames
             \param paramReadonly names of initial parameters that should be declared readonly
         */
         void insertALV6000File(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
+
+        /*! \brief add a ALV7000 file to the current project
+
+            \param filename filename of the ALV700 file
+            \param paramValues values for parameters in paramNames
+            \param paramReadonly names of initial parameters that should be declared readonly
+        */
+        void insertALV7000File(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
 
         /*! \brief add a CSV file to the current project
 

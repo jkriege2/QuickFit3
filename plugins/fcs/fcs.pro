@@ -35,7 +35,8 @@ HEADERS += dlgcsvparameters.h \
             ../interfaces/qfrdrrunselection.h \
     ../base_classes/qfrdrrunselectiontools.h \
     confocor3tools.h \
-    flex_sin_tools.h
+    flex_sin_tools.h \
+    alv7000tools.h
 
 
 
@@ -56,7 +57,8 @@ SOURCES += dlgcsvparameters.cpp \
     ../base_classes/qffcstools.cpp \
     ../base_classes/qfrdrrunselectiontools.cpp \
     confocor3tools.cpp \
-    flex_sin_tools.cpp
+    flex_sin_tools.cpp \
+    alv7000tools.cpp
 
 
 

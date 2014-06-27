@@ -86,12 +86,12 @@ bool JKQTPCairoEngineAdapter::getSetAbsolutePaperSize() const
 
 double JKQTPCairoEngineAdapter::getPrintSizeXInMM() const
 {
-    return 210;
+    return -1;
 }
 
 double JKQTPCairoEngineAdapter::getPrintSizeYInMM() const
 {
-    return 297;
+    return -1;
 }
 
 bool JKQTPCairoEngineAdapter::isPrinter() const
