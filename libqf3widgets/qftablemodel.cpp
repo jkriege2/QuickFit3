@@ -163,12 +163,12 @@ bool QFTableModel::setData(const QModelIndex &index, const QVariant &value, int 
 QVariantList QFTableModel::getColumnData(int column, int role) const
 {
     QVariantList vl;
-    if (column>=0 && column<state.columns) {
-        for (int r=0; r<state.rows; r++) {
+    if (column>=0 && column<int64_t(state.columns)) {
+        for (int r=0; r<int64_t(state.rows); r++) {
             vl<<cell(r, column);
         }
     } else if (column==-2) {
-        for (int r=0; r<state.rows-1; r++) {
+        for (int r=0; r<int64_t(state.rows)-1; r++) {
             vl.append(r+1);
         }
     }
@@ -178,7 +178,7 @@ QVariantList QFTableModel::getColumnData(int column, int role) const
 QVector<double> QFTableModel::getColumnDataAsNumbers(int column, int role) const
 {
     QVector<double> vl;
-    if (column>=0 && column<state.columns) {
+    if (column>=0 && column<int64_t(state.columns)) {
         for (int r=state.rows-1; r>=0; r--) {
             QVariant d=cell(r, column);
             //qDebug()<<column<<","<<r<<": "<<d;
@@ -193,7 +193,7 @@ QVector<double> QFTableModel::getColumnDataAsNumbers(int column, int role) const
             }
         }
     } else if (column==-2) {
-        for (int r=0; r<state.rows-1; r++) {
+        for (int r=0; r<int64_t(state.rows)-1; r++) {
             vl.append(r+1);
         }
     }
@@ -258,8 +258,8 @@ void QFTableModel::resize(quint32 rows, quint32 columns) {
 
     //std::cout<<"  resize("<<state.rows<<", "<<state.columns<<"): 1\n";
     //quint32 oldrows=this->state.rows;
-    quint32 oldcolumns=this->state.columns;
-    quint32 oldrows=this->state.rows;
+    int64_t oldcolumns=this->state.columns;
+    int64_t oldrows=this->state.rows;
 
     int j=0;
     while (state.columnNames.size()<oldcolumns) {state.columnNames.append(QString::number(j)); j++;}
@@ -358,13 +358,17 @@ void QFTableModel::insertRow(quint32 r) {
     bool oldEmit=doEmitSignals;
     doEmitSignals=false;
     appendRow();
-    if (r<state.rows-1) for (int i=state.rows-2; i>=r; i--) {
-        for (int c=0; c<state.columns; c++) {
-            copyCell(i+1, c, i, c);
+    if (r<state.rows-1) {
+        int i=state.rows-2;
+        while ( i>=int64_t(r)) {
+            for (int c=0; c<int64_t(state.columns); c++) {
+                copyCell(i+1, c, i, c);
+            }
+            i--;
         }
     }
-    for (int c=0; c<state.columns; c++) {
-        setCell(r, c, defaultEditValue);
+    for (int c=0; c<int64_t(state.columns); c++) {
+        setCell(r, c, QVariant());
         quint64 a=xyAdressToUInt64(r, c);
         state.dataEditMap.remove(a);
         state.dataBackgroundMap.remove(a);
@@ -386,20 +390,24 @@ void QFTableModel::insertColumn(quint32 c) {
     bool oldEmit=doEmitSignals;
     doEmitSignals=false;
     appendColumn();
-    while (state.columnNames.size()<state.columns) state.columnNames.append("");
-    if (c<state.columns-1) for (int i=state.columns-2; i>=c; i--) {
-        state.columnNames[i+1]=state.columnNames[i];
-        state.columnNames[i]="";
-        if (state.headerDataMap.contains(i)) {
-            state.headerDataMap[i+1]=state.headerDataMap[i];
-            state.headerDataMap.remove(i);
-        }
-        for (int r=0; r<state.rows; r++) {
-            copyCell(r, i+1, r, i);
+    while (state.columnNames.size()<int64_t(state.columns)) state.columnNames.append("");
+    if (c<state.columns-1) {
+        int i=state.columns-2;
+        while (i>=0 && i>=int64_t(c)) {
+            state.columnNames[i+1]=state.columnNames.value(i, "");
+            state.columnNames[i]="";
+            if (state.headerDataMap.contains(i)) {
+                state.headerDataMap[i+1]=state.headerDataMap[i];
+                state.headerDataMap.remove(i);
+            }
+            for (int r=0; r<int64_t(state.rows); r++) {
+                copyCell(r, i+1, r, i);
+            }
+            i--;
         }
     }
-    for (int r=0; r<state.rows; r++) {
-        setCell(r, c, defaultEditValue);
+    for (int r=0; r<int64_t(state.rows); r++) {
+        setCell(r, c, QVariant());
         quint64 a=xyAdressToUInt64(r, c);
         state.dataEditMap.remove(a);
         state.dataBackgroundMap.remove(a);
@@ -422,8 +430,8 @@ void QFTableModel::deleteRow(quint32 r) {
     doEmitSignals=false;
     if (r>=state.rows ) return;
     startMultiUndo();
-    for (int i=r; i<state.rows-1; i++) {
-        for (int c=0; c<state.columns; c++) {
+    for (int i=r; i<int64_t(state.rows)-1; i++) {
+        for (int c=0; c<int64_t(state.columns); c++) {
             copyCell(i, c, i+1, c);
         }
     }
@@ -443,8 +451,8 @@ void QFTableModel::deleteColumn(quint32 c) {
     doEmitSignals=false;
     if (c>=state.columns) return;
     startMultiUndo();
-    for (int i=c; i<state.columns-1; i++) {
-        for (int r=0; r<state.rows; r++) {
+    for (int i=c; i<int64_t(state.columns)-1; i++) {
+        for (int r=0; r<int64_t(state.rows); r++) {
             copyCell(r, i, r, i+1);
         }
         if (i+1<state.columnNames.size()) state.columnNames[i]=state.columnNames[i+1];
@@ -469,7 +477,7 @@ void QFTableModel::emptyColumn(quint32 c)
 
     startMultiUndo();
 
-    for (int r=0; r<state.rows; r++) {
+    for (int r=0; r<int64_t(state.rows); r++) {
         deleteCell(r, c);
     }
     doEmitSignals=oldEmit;
@@ -583,7 +591,7 @@ void QFTableModel::setColumn(quint32 column, const QList<QVariant>& value)
     if (readonly || (column>=state.columns)) return;
     addUndoStep();
     quint32 row=0;
-    for (int i=0; i<qMin(state.rows, (quint32)value.size()); i++) {
+    for (int i=0; i<qMin(int64_t(state.rows), (int64_t)value.size()); i++) {
         //if (row<state.rows) {
             const quint64 a=xyAdressToUInt64(row, column);
             state.dataMap[a]=value[i];
@@ -674,7 +682,7 @@ void QFTableModel::setColumnCreate(quint32 column, const QList<QVariant>& value)
 {
     if (readonly) return;
     startMultiUndo();
-    if ((value.size()>state.rows) || (column>=state.columns)) {
+    if ((value.size()>int64_t(state.rows)) || (column>=state.columns)) {
         resize(qMax(state.rows, quint32(value.size())), qMax(state.columns, quint32(column+1)));
     }
 
@@ -687,7 +695,7 @@ void QFTableModel::setColumnCreate(quint32 column, const QVector<double> &value)
 {
     if (readonly) return;
     startMultiUndo();
-    if ((value.size()>state.rows) || (column>=state.columns)) {
+    if ((value.size()>int64_t(state.rows)) || (column>=state.columns)) {
         resize(qMax(state.rows, quint32(value.size())), qMax(state.columns, quint32(column+1)));
     }
 
@@ -699,7 +707,7 @@ void QFTableModel::setColumnCreate(quint32 column, const double *value, int N)
 {
     if (readonly) return;
     startMultiUndo();
-    if ((N>state.rows) || (column>=state.columns)) {
+    if ((N>int64_t(state.rows)) || (column>=state.columns)) {
         resize(qMax(state.rows, quint32(N)), qMax(state.columns, quint32(column+1)));
     }
 
@@ -926,8 +934,8 @@ void QFTableModel::setColumnTitle(quint32 column, QString name) {
     //std::cout<<"setColumnTitle("<<column<<", '"<<name.toStdString()<<")\n";
     if (readonly || (column>=state.columns)) return;
     addUndoStep();
-    for (int c=state.columnNames.size(); c<state.columns; c++) state.columnNames.append(QString::number(c));
-    if (column<state.columnNames.size()) state.columnNames[column]=name;
+    for (int c=state.columnNames.size(); c<int64_t(state.columns); c++) state.columnNames.append(QString::number(c));
+    if (int64_t(column)<state.columnNames.size()) state.columnNames[column]=name;
     if (doEmitSignals) {
         emit headerDataChanged(Qt::Horizontal, column, column);
         emit columnTitleChanged(column);
@@ -938,8 +946,8 @@ void QFTableModel::setRowTitle(quint32 row, QString name)
 {
     if (readonly || (row>=state.rows)) return;
     addUndoStep();
-    for (int c=state.rowNames.size(); c<state.rows; c++) state.rowNames.append(QString::number(c));
-    if (row<state.rowNames.size()) state.rowNames[row]=name;
+    for (int c=state.rowNames.size(); c<int64_t(state.rows); c++) state.rowNames.append(QString::number(c));
+    if (int64_t(row)<state.rowNames.size()) state.rowNames[row]=name;
     if (doEmitSignals) {
         emit headerDataChanged(Qt::Vertical, row, row);
         emit rowTitleChanged(row);
@@ -952,7 +960,7 @@ void QFTableModel::setColumnTitleCreate(quint32 column, QString name) {
     startMultiUndo();
     resize(state.rows, qMax(state.columns, quint32(column+1)));
     //qDebug()<<"setColumnTitleCreate("<<column<<", "<<name<<"):     state.columnNames.size()="<<state.columnNames.size();
-    if (column<state.columnNames.size()) state.columnNames[column]=name;
+    if (int64_t(column)<state.columnNames.size()) state.columnNames[column]=name;
     if (doEmitSignals) {
         emit headerDataChanged(Qt::Horizontal, column, column);
         emit columnTitleChanged(column);
@@ -965,7 +973,7 @@ void QFTableModel::setRowTitleCreate(quint32 row, QString name)
     if (readonly) return;
     startMultiUndo();
     resize(qMax(state.rows, quint32(row+1)), state.columns);
-    if (row<state.rowNames.size()) state.rowNames[row]=name;
+    if (int64_t(row)<state.rowNames.size()) state.rowNames[row]=name;
     if (doEmitSignals) {
         emit headerDataChanged(Qt::Vertical, row, row);
         emit rowTitleChanged(row);
@@ -975,14 +983,14 @@ void QFTableModel::setRowTitleCreate(quint32 row, QString name)
 
 QString QFTableModel::columnTitle(quint32 column) const {
     if (column>=state.columns) return QString("");
-    if (column<state.columnNames.size()) return state.columnNames[column];
+    if (int64_t(column)<state.columnNames.size()) return state.columnNames[column];
     return "";
 }
 
 QString QFTableModel::rowTitle(quint32 row) const
 {
     if (row>=state.rows) return QString("");
-    if (row<state.rowNames.size()) return state.rowNames[row];
+    if (int64_t(row)<state.rowNames.size()) return state.rowNames[row];
     return "";
 
 }
@@ -1003,7 +1011,7 @@ bool QFTableModel::saveSYLK(const QString& filename, char format, int precision)
 
     // write column headers
     for (quint32 c=0; c<state.columns; c++) {
-        if (c<state.columnNames.size()) out<<QString("C;Y1;X%2;K\"%1\"\n").arg(state.columnNames[c]).arg(c+1);
+        if (int64_t(c)<state.columnNames.size()) out<<QString("C;Y1;X%2;K\"%1\"\n").arg(state.columnNames[c]).arg(c+1);
         out<<QString("F;Y1;X%2;SDB\n").arg(c+1);
     }
 
@@ -1068,7 +1076,7 @@ bool QFTableModel::saveCSV(QTextStream &out, QString column_separator, char deci
     for (quint32 c=0; c<state.columns; c++) {
         if (usedCols.contains(c) || saveCompleteTable) {
             if (cc>0) out<<column_separator;
-            if (c<state.columnNames.size()) out<<QString("\"%1\"").arg(state.columnNames[c]).arg(c+1);
+            if (int64_t(c)<state.columnNames.size()) out<<QString("\"%1\"").arg(state.columnNames[c]).arg(c+1);
             cc++;
         }
     }
@@ -1153,7 +1161,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
                 header_read=true;
                 line=line.right(line.size()-header_start.size());
                 QStringList sl=line.split(QString(column_separator));
-                state.columns=(state.columns>sl.size())?state.columns:sl.size();
+                state.columns=(int64_t(state.columns)>sl.size())?state.columns:sl.size();
                 for (int i=0; i<sl.size(); i++) {
                     int c=start_col+i;
                     QString n=sl[i].trimmed();
@@ -1168,7 +1176,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
                 header_read=true;
                 line=line.right(line.size()-1);
                 QStringList sl=line.split(QString(column_separator));
-                state.columns=(state.columns>sl.size())?state.columns:sl.size();
+                state.columns=(int64_t(state.columns)>sl.size())?state.columns:sl.size();
 
                 for (int i=0; i<sl.size(); i++) {
                     int c=start_col+i;
@@ -1290,7 +1298,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
 
     //qDebug()<<hasTitle<<specialHeader.size()<<state.columns<<specialHeader;
 
-    if (!hasTitle && specialHeader.size()>0 && specialHeader.size()>=qMax(quint32(0),state.columns/10)) {
+    if (!hasTitle && specialHeader.size()>0 && specialHeader.size()>=qMax(int64_t(0),int64_t(state.columns)/10)) {
         QMapIterator<int,QString> it(specialHeader);
         while (it.hasNext()) {
             it.next();
