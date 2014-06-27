@@ -9,7 +9,7 @@
 		
 		<p>This plugin uses the <a href="http://cairographics.org/">Cairo graphics library</a> to create PDF, EPS, PS and SVG files from any plot in QuickFit.</p>
 		<p>This plugin currently has some limitations:<ul>
-		  <li>text is not rendered as editable text, but as paths. So if you look at a created file, the display is good, but if you loadit in a vector graphics program, you won't be able to change the text.</li>
+		  <li>There are two options for text rendering: The exporters with the name addition <i>"[editable text]"</i> export text in a way, that it is editable in graphics software afterwards. the exporters without this addition render text as polygons/paths, so the text is no longer editable in a vector graphics editing program, but the rendering can be more accurate!</li>
 		  <li>no fill patterns are supported at the moment</li>		  
 		</ul>		
 		</p>

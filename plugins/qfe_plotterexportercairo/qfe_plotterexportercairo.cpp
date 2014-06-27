@@ -54,10 +54,14 @@ void QFEPlotterExporterCairo::projectChanged(QFProject* oldProject, QFProject* p
 void QFEPlotterExporterCairo::initExtension() {
     /* do initializations here but do not yet connect to the camera! */
     
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPDF));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPS));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatEPS));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatSVG));
+    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPDF, true));
+    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPDF, false));
+    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPS, true));
+    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPS, false));
+    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatEPS, true));
+    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatEPS, false));
+    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatSVG, true));
+    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatSVG, false));
 
 }
 

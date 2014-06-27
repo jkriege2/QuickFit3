@@ -24,7 +24,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qcairopaintengine.h"
 #include <QDebug>
 
-QCairoPaintDevice::QCairoPaintDevice(const QSizeF &size, const QString &fileName, CairoFileType filetype):
+QCairoPaintDevice::QCairoPaintDevice(const QSizeF &size, const QString &fileName, CairoFileType filetype, bool exportText):
     QPaintDevice()
 {
     //qDebug()<<"QCairoPaintDevice::QCairoPaintDevice"<<engine;
@@ -32,6 +32,7 @@ QCairoPaintDevice::QCairoPaintDevice(const QSizeF &size, const QString &fileName
     m_size=size;
     m_filetype=filetype;
     engine = new QCairoPaintEngine();
+    m_exportText=exportText;
 }
 
 QCairoPaintDevice::~QCairoPaintDevice()
@@ -62,6 +63,11 @@ QSizeF QCairoPaintDevice::getFileSize() const
 QSizeF QCairoPaintDevice::getFileSizeMM() const
 {
     return QSizeF(metric(QPaintDevice::PdmWidthMM), metric(QPaintDevice::PdmHeightMM));
+}
+
+bool QCairoPaintDevice::getExportText() const
+{
+    return m_exportText;
 }
 
 int QCairoPaintDevice::metric(QPaintDevice::PaintDeviceMetric metric) const

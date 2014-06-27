@@ -210,6 +210,7 @@ void QFRDRFCSCorrelationEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
     correlationMaskTools->setRDR(current);
     if (m) {
+        cmbRunDisplay->setCurrentIndex(m->getProperty("FCS_RUN_DISPLAY", 2).toInt());
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         runs.setCurrent(current);
         sliders->disableSliderSignals();
@@ -218,6 +219,7 @@ void QFRDRFCSCorrelationEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
         sliders->set_userMin(current->getProperty("fcscorreditor_datacut_min", 0).toInt());
         sliders->set_userMax(current->getProperty("fcscorreditor_datacut_max", m->getCorrelationN()).toInt());
         sliders->enableSliderSignals();
+
     } else {
 //        runs.setCurrent(current);
     }

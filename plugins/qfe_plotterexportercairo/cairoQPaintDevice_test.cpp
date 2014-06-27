@@ -1,6 +1,5 @@
 #include <QApplication>
-#include "cairo4qt/src/qpaintengine_cairo_p.h"
-#include "cairo4qt/src/qcairopaintdevice.h"
+#include "qcairopaintdevice.h"
 #include <QPainter>
 #include <QImage>
 #include <QDebug>
@@ -37,12 +36,20 @@ void paint(QPaintDevice* pd) {
     p.drawImage(QRectF(225,50,100,100), img, QRect(5,5,12,12));
     p.drawRect(QRectF(125,50,15,10));
     pe.setWidthF(2);
+    pe.setColor("red");
     p.setPen(pe);
-    f.setFamily("Times new Roman");
+    f.setFamily("Times New Roman");
     f.setPointSizeF(10);
     p.setFont(f);
     p.drawText(50,30, QString("Hello World!"));
     p.drawLine(50,30,55,35);
+
+    f.setFamily("Arial");
+    f.setPointSizeF(16);
+    p.setFont(f);
+    p.drawText(250,30, QString("Unicode-test: ")+QChar(0x2190)+QChar(0x2591)+QChar(0x2665)+QChar(0x039B)+QChar(0x03B6));
+    p.drawLine(250,30,255,35);
+
     pe.setWidthF(1);
     p.setPen(pe);
     QBrush b(QColor("salmon"));
@@ -87,6 +94,15 @@ int main(int argc, char *argv[])
         qDebug()<<"  paint PDF";
         paint(cairoPDF);
         qDebug()<<"  delete PDF";
+        delete cairoPDF;
+    }
+
+    qDebug()<<"create PDF+text:";
+    {
+        QCairoPaintDevice * cairoPDF=new QCairoPaintDevice(QSize(200,100), "testtxt.pdf", QCairoPaintDevice::cftPDF, true);
+        qDebug()<<"  paint PDF+text";
+        paint(cairoPDF);
+        qDebug()<<"  delete PDF+text";
         delete cairoPDF;
     }
 

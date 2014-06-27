@@ -75,6 +75,7 @@ QCairoPaintEngine::QCairoPaintEngine():
     cr=NULL;
     brushpattern=NULL;
     penpattern=NULL;
+    exportText=false;
     end();
 }
 
@@ -87,6 +88,7 @@ bool QCairoPaintEngine::begin(QPaintDevice *pd)
     const QCairoPaintDevice* cpd=dynamic_cast<const QCairoPaintDevice*>(pd);
     surface = NULL;
     if (cpd) {
+        exportText=cpd->getExportText();
         QCairoPaintDevice::CairoFileType ft=cpd->getFileType();
         QSizeF s=cpd->getFileSizeMM();
         //qDebug()<<ft;
@@ -188,6 +190,27 @@ QPaintEngine::Type QCairoPaintEngine::type() const
 void QCairoPaintEngine::drawPixmap(const QRectF &r, const QPixmap &pm, const QRectF &sr)
 {
     drawImage(r, pm.toImage(), sr);
+}
+
+void QCairoPaintEngine::drawTextItem(const QPointF &p, const QTextItem &textItem)
+{
+    if (!exportText) {
+        QPaintEngine::drawTextItem(p, textItem);
+    } else {
+        //cairo_matrix_t cm, cmBak;
+        //cairo_get_matrix(cr, &cmBak);
+        //cairo_translate(cr, p.x(), p.y());
+        QFont oldF=cfont;
+        cfont=textItem.font();
+        updateFont();
+        updatePen();
+
+        cairo_move_to (cr, p.x(), p.y());
+        cairo_show_text(cr, textItem.text().toUtf8().data());
+
+        cfont=oldF;
+        //cairo_set_matrix(cr, &cmBak);
+    }
 }
 
 void QCairoPaintEngine::drawTiledPixmap(const QRectF &r, const QPixmap &pixmap, const QPointF &s)
@@ -478,7 +501,7 @@ void QCairoPaintEngine::updateFont()
 void QCairoPaintEngine::updateClip()
 {
     cairo_reset_clip(cr);
-    qDebug()<<cclipenabled<<cclippath<<cclipregion<<(!cclipregion.boundingRect().size().isEmpty() || cclippath.elementCount()>0);
+    //qDebug()<<cclipenabled<<cclippath<<cclipregion<<(!cclipregion.boundingRect().size().isEmpty() || cclippath.elementCount()>0);
     if (cclipenabled && (!cclipregion.boundingRect().size().isEmpty() || cclippath.elementCount()>0)) {
         cairo_matrix_t cm, cmBak;
         cairo_get_matrix(cr, &cmBak);

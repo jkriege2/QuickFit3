@@ -182,7 +182,7 @@ void QFRDRFCSData::resizeRates(long long N, int runs, int channels) {
             rate=(double*)calloc(rateChannels*rateN*rateRuns, sizeof(double));
         }
         if (!rateT || !rate)
-            setError(tr("Error while allocating memory for count rate data!"));
+            setError(tr("Error while allocating memory for count rate data (N=%1, runs=%2, channels=%3)!").arg(N).arg(runs).arg(channels));
     }
     emitRawDataChanged();
     rateMean.clear();
@@ -1666,11 +1666,30 @@ void QFRDRFCSData::saveInternal(QXmlStreamWriter& w) const {
     w.writeCDATA(csv);
     w.writeEndElement();
 
+    w.writeStartElement("internal_countrate");
+    csv="";
+    for (int t=0; t<rateN; t++) {
+        csv=csv+CDoubleToQString(rateT[t]);
+        for (int c=0; c<rateChannels; c++) {
+            for (int r=0; r<rateRuns; r++) {
+                double* rat=getRateRun(r, c);
+                csv=csv+", "+CDoubleToQString(rat[t]);
+            }
+        }
+        csv=csv+"\n";
+    }
+    w.writeCDATA(csv);
+    w.writeEndElement();
+
 }
 
 bool QFRDRFCSData::loadInternal(QDomElement* e) {
+    bool okC=false;
+    bool okR=false;
     QString csv=getProperty("INTERNAL_CSV", "").toString();
+    QString csvCnt=getProperty("INTERNAL_CSV_CNT", "").toString();
     QString mode=getProperty("INTERNAL_CSVMODE", "tccc").toString().toLower();
+    int channelsCnt=getProperty("INTERNAL_CSV_CNT_CHANNELS", "1").toInt();
     //qDebug()<<csv;
     deleteProperty("INTERNAL_CSV");
     if (e && csv.isEmpty()) {
@@ -1678,6 +1697,13 @@ bool QFRDRFCSData::loadInternal(QDomElement* e) {
         if (!de.isNull()) {
             mode=de.attribute("mode", mode).toLower();
             csv=de.text();
+        }
+    }
+    deleteProperty("INTERNAL_CSV_CNT");
+    if (e && csvCnt.isEmpty()) {
+        QDomElement de=e->firstChildElement("internal_countrate");
+        if (!de.isNull()) {
+            csvCnt=de.text();
         }
     }
     //qDebug()<<csv;
@@ -1722,9 +1748,45 @@ bool QFRDRFCSData::loadInternal(QDomElement* e) {
             }
         }
         recalculateCorrelations();
-        return true;
+        okC= true;
     }
-    return false;
+
+    //qDebug()<<channelsCnt<<csvCnt;
+    if (!csvCnt.isEmpty()) {
+        //qDebug()<<"parsing csv: "<<csvCnt;
+
+        QTextStream f(&csvCnt);
+        QList<QVector<double> > datalist;
+        QVector<double> data;
+        do {
+            data=csvReadline(f, ',', '#', 0);
+            //qDebug()<<"        "<<data;
+            if (data.size()>0) datalist.append(data);
+        } while (data.size()>0);
+        int runs=0;
+        int channels=channelsCnt;
+        if (datalist.size()>0) {
+                runs=(datalist[0].size()-1)/channels;
+        }
+        //qDebug()<<"  -> "<<datalist.size()<<runs<<channels;
+        //qDebug()<<"  -> "<<datalist;
+        resizeRates(datalist.size(), runs, channels);
+        for (int i=0; i<datalist.size(); i++) {
+            rateT[i]=datalist[i].value(0,0.0);
+            for (int c=0; c<channels; c++) {
+                for (int j=0; j<runs; j++) {
+                    double* rat=getRateRun(j, c);
+                    const int jidx=1+c*runs+j;
+                    if (jidx<datalist[i].size()) {
+                        rat[i]=datalist[i].value(jidx,0.0);
+                    }
+                }
+            }
+        }
+        calcBinnedRate();
+        okR= true;
+    }
+    return okC;
 }
 
 bool QFRDRFCSData::mayDeleteFiles(QStringList &files, QStringList &types, QStringList &descriptions) const

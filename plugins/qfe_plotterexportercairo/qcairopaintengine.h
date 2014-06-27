@@ -53,7 +53,7 @@ class QCairoPaintEngine : public QPaintEngine
         virtual void drawPolygon(const QPoint *points, int pointCount, PolygonDrawMode mode);
 
         virtual void drawPixmap(const QRectF& r, const QPixmap& pm, const QRectF& sr );
-        //virtual void drawTextItem(const QPointF &p, const QTextItem &textItem);
+        virtual void drawTextItem(const QPointF &p, const QTextItem &textItem);
         virtual void drawTiledPixmap(const QRectF &r, const QPixmap &pixmap, const QPointF &s);
         virtual void drawImage(const QRectF &r, const QImage &pm, const QRectF &sr,  Qt::ImageConversionFlags flags = Qt::AutoColor);
 
@@ -71,6 +71,7 @@ class QCairoPaintEngine : public QPaintEngine
         QPainterPath cclippath;
         QRegion cclipregion;
         bool cclipenabled;
+        bool exportText;
 
         void updateMatrix();
         void updatePen();

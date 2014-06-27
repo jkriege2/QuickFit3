@@ -47,7 +47,7 @@ class QCairoPaintDevice : public QPaintDevice
             cftSVG=cftSVG12,
         };
 
-        explicit QCairoPaintDevice(const QSizeF& s, const QString& fileName, CairoFileType filetype);
+        explicit QCairoPaintDevice(const QSizeF& s, const QString& fileName, CairoFileType filetype, bool exportText=false);
         virtual ~QCairoPaintDevice();
 
         virtual QPaintEngine * paintEngine () const;
@@ -56,6 +56,7 @@ class QCairoPaintDevice : public QPaintDevice
         QString getFileName() const;
         QSizeF getFileSize() const;
         QSizeF getFileSizeMM() const;
+        bool getExportText() const;
 
     protected:
         virtual int metric (PaintDeviceMetric metric) const;
@@ -65,6 +66,7 @@ class QCairoPaintDevice : public QPaintDevice
         CairoFileType m_filetype;
         QSizeF m_size;
         QCairoPaintEngine* engine;
+        bool m_exportText;
 };
 
 

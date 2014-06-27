@@ -37,7 +37,7 @@ class JKQTPCairoEngineAdapter : public JKQtBasePlotter::JKQTPPaintDeviceAdapter
             formatSVG
         };
 
-        JKQTPCairoEngineAdapter(Format format);
+        JKQTPCairoEngineAdapter(Format format, bool exportText);
 
         virtual QString getFilter() const;
         virtual QString getFormatName() const;
@@ -51,6 +51,7 @@ class JKQTPCairoEngineAdapter : public JKQtBasePlotter::JKQTPPaintDeviceAdapter
 
     protected:
          Format format;
+         bool exportText;
 
 };
 
