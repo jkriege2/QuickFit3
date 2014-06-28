@@ -18,25 +18,70 @@
 class Confocor3Tools
 {
     public:
+        enum FCSDatasetType {
+            fdtACF=0,
+            fdtCCF=1,
+            fdtUnkown=-1
+        };
+
         struct FCSDataSet {
+
+            /** \brief correlation function - lag time axis */
             QVector<double> tau;
+            /** \brief correlation function - correlation data */
             QList<QVector<double> > corr;
+            /** \brief count rates - time axis */
             QVector<double> time;
+            /** \brief count rates - data */
             QList<QVector<double> > rate;
+            /** \brief PCH - x-axis */
             QVector<double> pch_photons;
+            /** \brief PCH - <-axis */
             QList<QVector<double> > pch;
+            /** \brief position index */
             int position;
+            /** \brief kinetic index */
             int kinetic;
+            /** \brief repetition number (interpreted as run/index in QF3) */
             int repetition;
+            /** \brief chanel name as in FCS file */
             QString channel;
+            /** \brief raw data file */
             QString rawdata;
+            /** \brief acquisition timestamp */
             QString acqtime;
+            /** \brief all additionally extracted properties */
             QMap<QString, QVariant> props;
+            /** \brief the ID after the BEGIN (ignore!) */
+            QString id;
+
+            /** \brief channel number (in ACF, or channel No. 1 in FCCS) */
+            int channelNo;
+            /** \brief channel Number 2 in FCCS */
+            int channelNo2;
+            /** \brief data in the record */
+            FCSDatasetType type;
+            /** \brief the group, used by QF3 */
+            QString group;
+            /** \brief the role, used by QF3 */
+            QString role;
+            /** \brief points to a record, which contains the countrates for channel 1 */
+            int recCnt1;
+            /** \brief points to a record, which contains the countrates for channel 1 */
+            int recCnt2;
+            /** \brief indicates whether this is the reverse FCS */
+            bool reverseFCCS;
 
             FCSDataSet() {
+                reverseFCCS=false;
                 position=-1;
                 kinetic=-1;
                 repetition=-1;
+                channelNo=-1;
+                channelNo2=-1;
+                type=fdtUnkown;
+                recCnt1=-1;
+                recCnt2=-1;
             }
         };
 
@@ -45,30 +90,17 @@ class Confocor3Tools
             QString name;
             QString comment;
             QString sortorder;
-            QList<int> positions;
-            QList<int> kinetics;
-            QList<int> repetitions;
-            QList<int> channels;
             QList<FCSDataSet> fcsdatasets;
-            bool hasPCH;
-            bool hasFCS;
-            bool hasCountrate;
-            QStringList channelNames;
-            /** \brief all data columns available in the file */
-            QList<QVector<double> > datacolumns;
-            /** \brief lists of indexes used for a given combination of position, kinetic, ... The ID can be obtained from getID() */
-            QMap<QString, QList<int> > datacolumnid;
-
-            enum DataType {
-                dtFCS=0,
-                dtPCH=1,
-                dtCountrate=2
-            };
-            static QString getID(int position, int kinetic, int repetition, int channel, DataType type);
+            QStringList getGroups() const;
+            QStringList getRoles() const;
+            QList<QVector<int> > getRepetitions() const;
+            QList<int> getPositions() const;
+            QList<int> getKinetics() const;
             void clear();
             ConfocorDataset() {
                 clear();
             }
+
         };
 
 
@@ -93,6 +125,7 @@ class Confocor3Tools
         ConfocorDataset data;
         bool loadFile(ConfocorDataset& data, const QString& filename);
         void readBlock(int level, ConfocorDataset& data, QFile& f, bool readNewLine=true, const QString lastLine=QString(), Confocor3Tools::FCSDataSet *fcsds=NULL);
+        QString readArray(QFile& f, int lines, int cols, bool &readNextLine, QList<QVector<double> >& dataout);
         static QList<ConfocorDataset> oldData;
 
         QStringList lastErrors;

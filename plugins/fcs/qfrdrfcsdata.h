@@ -363,7 +363,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         bool loadCorrelatorComSIN(QString filename);
 
         /** \brief load  data format of Zeiss COnfocor3 (*.fcs) */
-        bool loadConfocor3(QString filenames);
+        bool loadConfocor3(QString filename);
 
         /** \brief load a CSV file containing a count rate curve */
         bool loadCountRatesFromCSV(QStringList filenames, int rateChannels=1);

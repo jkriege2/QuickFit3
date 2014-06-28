@@ -7,7 +7,7 @@
 #include "alv5000tools.h"
 #include "alv6000tools.h"
 #include "alv7000tools.h"
-
+#include "confocor3tools.h"
 
 
 #define loadSeveral(res, filenames, loadFunction) {\
@@ -142,7 +142,7 @@ QFRDRFCSData::~QFRDRFCSData()
 }
 
 void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
-    //qDebug()<<"resizeCorrelations( N="<<N<<",  runs="<<runs<<")";
+    qDebug()<<"resizeCorrelations( N="<<N<<",  runs="<<runs<<")";
     if (correlationT) free(correlationT);
     if (correlation) free(correlation);
     if (correlationMean) free(correlationMean);
@@ -1682,7 +1682,7 @@ bool QFRDRFCSData::loadFromALV7000Files(QStringList filenames) {
             while (data[i].token.type!=ALV7_EOF && data[i].readingHeader) {
                 if (data[i].findIdentifier) {
                     if (data[i].token.type==ALV7_NAME) {
-                        qDebug()<<"finID: "<<data[i].token.value;
+                        //qDebug()<<"finID: "<<data[i].token.value;
                         if (data[i].token.value.contains("ALV-700", Qt::CaseInsensitive)) {
                             setQFProperty("ALV_TYPE", data[i].token.value, false, true);
                             data[i].findIdentifier=false;
@@ -1774,16 +1774,17 @@ bool QFRDRFCSData::loadFromALV7000Files(QStringList filenames) {
                                 if (i==0) setQFProperty(propN, propVS, false, true);
                                 else if (propVS!=getProperty(propN).toString()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propVS).arg(propN));
 
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////
-            // TODO: PARSE Mode properly!!!
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////
+                                unsigned int ccount=0;
+                                int inch=0;
+                                bool cross=false;
+                                ALV7_analyzeMode(propVS, ccount, cross, inch);
                                 propN="CROSS_CORRELATION";
-                                bool propV=(bool)value.contains("CROSS", Qt::CaseInsensitive);
+                                bool propV=cross;
                                 if (i==0) setQFProperty(propN, propV, false, true);
                                 else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
 
                                 propN="DUAL_CHANNEL";
-                                propV=value.contains("DUAL", Qt::CaseInsensitive);
+                                propV=ccount>1;
                                 data[i].isDual=propV;
                                 if (i==0) setQFProperty(propN, propV, false, true);
                                 else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
@@ -1816,8 +1817,9 @@ bool QFRDRFCSData::loadFromALV7000Files(QStringList filenames) {
 
 
             if (!error) {
-                while (data[i].token.type!=ALV7_EOF && !gotCorr && !gotRate) {
+                while (data[i].token.type!=ALV7_EOF && (!gotCorr || !gotRate)) {
                     bool getNew=true;
+                    //qDebug()<<data[i].token.value;
                     if (data[i].token.type==ALV7_QUOTED && data[i].token.value.contains("correlation", Qt::CaseInsensitive)) {
                         getNew=false;
                         QVector<QVector<double> > dat;
@@ -1825,6 +1827,7 @@ bool QFRDRFCSData::loadFromALV7000Files(QStringList filenames) {
                         data[i].dat_corr=dat;
                         gotCorr=true;
                         //qDebug()<<"  parsing correlation section ... "<<data[i].dat_corr.size()<<data[i].dat_corr[0].size()<<"\n";
+                        getNew=false;
                     }
                     if (data[i].token.type==ALV7_QUOTED && data[i].token.value.contains("count", Qt::CaseInsensitive)) {
                         getNew=false;
@@ -1833,7 +1836,7 @@ bool QFRDRFCSData::loadFromALV7000Files(QStringList filenames) {
                         data[i].dat_rate=dat;
                         gotRate=true;
                         //qDebug()<<"  parsing rate section ... "<<data[i].dat_rate.size()<<data[i].dat_rate[0].size()<<"\n";
-
+                        getNew=false;
                     }
                     if (getNew) data[i].token=ALV7_getToken(data[i].alv_file, false);
                 }
@@ -2069,6 +2072,7 @@ double *QFRDRFCSData::getRateRun(int run, int channel) const
 bool QFRDRFCSData::getRateChannelsSwapped() const
 {
     int channel=0;
+    if (propertyExists("CHANNELS_SWAPPED")) return getProperty("CHANNELS_SWAPPED", false).toBool();
     if (propertyExists("CHANNEL")) channel=getProperty("CHANNEL", 0).toInt();
     //qDebug()<<"channelsSwapped(): "<<getName()<<channel<<rateChannels;
     if (rateChannels==2 && channel==1) return true;
@@ -2503,20 +2507,7 @@ bool QFRDRFCSData::reloadFromFiles() {
 QStringList QFRDRFCSData::getAvailableRoles() const
 {
     QStringList sl;
-    sl<<"ACF0"<<"ACF1"<<"ACF2"<<"ACF3"<<"FCCS"<<"FCCS0"<<"FCCS1"<<"FCCS01"<<"FCCS10"<<"ACF";
-    /*sl<<"correlation";
-    sl<<"acf";
-    sl<<"ccf";
-    sl<<"dccf";
-    sl<<"fcs_red";
-    sl<<"fcs_green";
-    sl<<"fcs0";
-    sl<<"fcs1";
-    sl<<"fccs";
-    sl<<"ccf(-1,0)";
-    sl<<"ccf(1,0)";
-    sl<<"ccf(0,-1)";
-    sl<<"ccf(0,1)";*/
+    sl<<"ACF"<<"ACF0"<<"ACF1"<<"ACF2"<<"ACF3"<<"FCCS"<<"FCCS0"<<"FCCS1"<<"FCCS01"<<"FCCS02"<<"FCCS03"<<"FCCS10"<<"FCCS12"<<"FCCS13"<<"FCCS20"<<"FCCS21"<<"FCCS23"<<"FCCS30"<<"FCCS31"<<"FCCS32";
     return sl;
 }
 
@@ -2802,11 +2793,166 @@ bool QFRDRFCSData::loadCorrelatorComSIN(QString filename)
     return ok;
 }
 
-bool QFRDRFCSData::loadConfocor3(QString filenames)
+struct QFRDRFCSData_confocor3Data {
+    int cntRec1;
+    int cntRec2;
+    int index;
+    QFRDRFCSData_confocor3Data() {
+        cntRec1=-1;
+        cntRec2=-1;
+        index=-1;
+    }
+};
+
+bool QFRDRFCSData::loadConfocor3(QString filename)
 {
+    bool ok=true;
+    Confocor3Tools reader;
+    reader.loadFile(filename);
+    if (reader.wasError()) {
+        ok=false;
+        setError(tr("Error while importing ConfoCor3 file '%1':\n    %2\n").arg(filename).arg(reader.getLastErrors().join("\n")));
+        return ok;
+    } else {
+        const Confocor3Tools::ConfocorDataset& d=reader.getData();
+        QStringList items_str=getProperty("CONFOCOR3_ITEMS", "").toString().split(',');
+        QList<int> items;
+        for (int i=0; i<items_str.size(); i++) {
+            bool ok=false;
+            int jj=items_str[i].trimmed().simplified().toInt(&ok);
+            if (ok && jj>=0 && jj<d.fcsdatasets.size()); items.append(jj);
+        }
+        QString role=getProperty("CONFOCOR3_ROLE", "").toString();
+        QString group=getProperty("CONFOCOR3_GROUP", "").toString();
+
+        int64_t Nc=INT_MAX, Nr=INT_MAX, runs=0, channels=1;
+        QList<QFRDRFCSData_confocor3Data> importData;
+        bool chSwap=false;
+        if (items.size()>0) {
+            for (int i=0; i<items.size(); i++) {
+                const Confocor3Tools::FCSDataSet& f=d.fcsdatasets[items[i]];
+                if (f.role==role && f.group==group) {
+                    if (f.tau.size()>0) Nc=qMin(Nc, (int64_t)f.tau.size());
+                    int cntRec1=-1;
+                    int cntRec2=-1;
+                    if (f.type==Confocor3Tools::fdtCCF) {
+                        if (f.recCnt1>=0) {
+                            cntRec1=f.recCnt1;
+                        }
+                        if (f.recCnt2>=0) {
+                            cntRec2=f.recCnt2;
+                        }
+                    } else if (f.type==Confocor3Tools::fdtACF) {
+                        cntRec1=items[i];
+                        if (f.recCnt1>=0) {
+                            cntRec1=f.recCnt1;
+                            cntRec2=items[i];
+                        } else if (f.recCnt2>=0) {
+                            cntRec1=items[i];
+                            cntRec2=f.recCnt2;
+                        }
+                    }
+                    if (f.tau.size()>0 && f.corr.size()>0 && f.corr.first().size()>0) {
+                        if (cntRec1>=0 && cntRec1<d.fcsdatasets.size() && d.fcsdatasets[cntRec1].time.size()>0) Nr=qMin(Nr, (int64_t)d.fcsdatasets[cntRec1].time.size());
+                        if (cntRec2>=0 && cntRec2<d.fcsdatasets.size() && d.fcsdatasets[cntRec2].time.size()>0) Nr=qMin(Nr, (int64_t)d.fcsdatasets[cntRec2].time.size());
+                        if (cntRec1>=0 && cntRec2>=0) channels=2;
+                        runs++;
+                        QFRDRFCSData_confocor3Data dat;
+                        dat.cntRec1=cntRec1;
+                        dat.cntRec2=cntRec2;
+                        dat.index=items[i];
+                        importData.append(dat);
+                        chSwap=chSwap||f.reverseFCCS;
+                    }
+                }
+            }
+            resizeCorrelations(Nc, runs);
+            resizeRates(Nc, runs, channels);
+            setQFProperty("CHANNELS_SWAPPED", chSwap, false, true);
+            if (importData.size()>0) {
+                for (int r=0; r<importData.size(); r++) {
+                    const Confocor3Tools::FCSDataSet& f=d.fcsdatasets[importData[r].index];
+                    setQFProperty("CHANNEL_NAME", f.channel, false, true);
+                    setQFProperty("POSITION", f.position, false, true);
+                    setQFProperty("KINETIC", f.kinetic, false, true);
+                    setQFProperty("ACQUISITION_TIME", f.acqtime, false, true);
+                    setQFProperty("RAWDATA_FILE", f.rawdata, false, true);
+                    QMapIterator<QString, QVariant> it(f.props);
+                    while (it.hasNext()) {
+                        it.next();
+                        setQFProperty(it.key().toUpper(), it.value(), false, true);
+                    }
+
+                    if (r==0) {
+                        for (int i=0; i<qMin(correlationN, Nc); i++) correlationT[i]=f.tau.value(i, 0.0);
+                    } else {
+                        bool okT=true;
+                        for (int i=0; i<qMin(correlationN, Nc); i++) {if (correlationT[i]!=f.tau.value(i, 0.0)) {okT=false; break;}}
+                        if (!okT) {
+                            ok=false;
+                            setError(tr("Error while importing ConfoCor3 file '%1':\n    lag-time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
+                            return ok;
+                        }
+                    }
+                    double* corr=getCorrelationRun(r);
+                    if (f.corr.size()>0 && f.corr.first().size()>=Nc) {
+                        for (int i=0; i<qMin(correlationN, Nc); i++) {
+                            corr[i]=f.corr.first().value(i, 0.0)-1.0;
+                        }
+                    } else {
+                        ok=false;
+                        setError(tr("Error while importing ConfoCor3 file '%1':\n    no correlation data found in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
+                        return ok;
+
+                    }
+
+                    if (r==0) {
+                        for (int i=0; i<qMin(rateN, Nr); i++) rateT[i]=f.time.value(i, 0.0);
+                    } else {
+                        bool okT=true;
+                        for (int i=0; i<qMin(rateN, Nr); i++) {if (rateT[i]!=f.time.value(i, 0.0)) {okT=false; break;}}
+                        if (!okT) {
+                            ok=false;
+                            setError(tr("Error while importing ConfoCor3 file '%1':\n    time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
+                            return ok;
+                        }
+                    }
+                    if (importData[r].cntRec1>=0) {
+                        double* rat0=getRateRun(r,0);
+                        const Confocor3Tools::FCSDataSet& fr1=d.fcsdatasets[importData[r].cntRec1];
+                        if (fr1.rate.size()>0 && Nr<=fr1.rate.first().size()){
+                            for (int i=0; i<qMin(rateN, Nr); i++) {
+                                rat0[i]=fr1.rate.first().value(i, 0)/1000.0;
+                            }
+                        }
+                    }
+                    if (channels>1 && importData[r].cntRec2>=0) {
+                        double* rat1=getRateRun(r, 1);
+                        const Confocor3Tools::FCSDataSet& fr1=d.fcsdatasets[importData[r].cntRec2];
+                        if (fr1.rate.size()>0 && Nr<=fr1.rate.first().size()){
+                            for (int i=0; i<qMin(rateN, Nr); i++) {
+                                rat1[i]=fr1.rate.first().value(i, 0)/1000.0;
+                            }
+                        }
+                    }
+
+
+                }
+            } else {
+                ok=false;
+                setError(tr("Error while importing ConfoCor3 file '%1':\n    no items selected to import (group=%1, role=%2).\n").arg(filename).arg(group).arg(role));
+                return ok;
+            }
+        } else {
+            ok=false;
+            setError(tr("Error while importing ConfoCor3 file '%1':\n    no items selected to import.\n").arg(filename));
+            return ok;
+        }
+    }
+
     recalculateCorrelations();
     emitRawDataChanged();
-    return false;
+    return ok;
 }
 
 

@@ -731,7 +731,7 @@ T* copyArrayOrDefault(T* out, const T* input, long long N, T defaultValue) {
 
 */
 template <class T>
-QString arrayToString(const T* input, long long N) {
+QString arrayToString(const T* input, long long N, bool withBrackets=true) {
     QString res;
     {
         QTextStream txt(&res, QIODevice::WriteOnly);
@@ -744,7 +744,8 @@ QString arrayToString(const T* input, long long N) {
             first=false;
         }
     }
-    return QString("[ %1 ]").arg(res);
+    if (withBrackets) return QString("[ %1 ]").arg(res);
+    return res;
 }
 
 /*! \brief builds a string out of a given container (with size() and operator[]). If \a withIDs is \c true, the index will be output in front of each value.
@@ -752,7 +753,7 @@ QString arrayToString(const T* input, long long N) {
 
 */
 template <class T>
-QString listToString(const T& input, bool withIDs=false) {
+QString listToString(const T& input, bool withIDs=false, bool withBrackets=true) {
     QString res;
     {
         QTextStream txt(&res, QIODevice::WriteOnly);
@@ -768,7 +769,8 @@ QString listToString(const T& input, bool withIDs=false) {
             first=false;
         }
     }
-    return QString("[ %1 ]").arg(res);
+    if (withBrackets) return QString("[ %1 ]").arg(res);
+    return res;
 }
 
 /*! \brief builds a string out of a given container (with size() and operator[]). If \a withIDs is \c true, the index will be output in front of each value.

@@ -12,6 +12,7 @@
 #include "alv5000tools.h"
 #include "alv6000tools.h"
 #include "alv7000tools.h"
+#include "confocor3tools.h"
 
 QFPRDRFCS::QFPRDRFCS(QObject* parent):
     QObject(parent)
@@ -154,12 +155,16 @@ void QFPRDRFCS::insertALV5000File(const QStringList& filename, const QMap<QStrin
     for (unsigned int i=0; i<cc; i++) {
         QMap<QString, QVariant> p=paramValues;
         p["CHANNEL"]=i;
-        QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - CH%2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(i), filename, p, paramReadonly);
+        QString role="ACF";
         if (!crossCorrelation) {
-            e->setRole(QString("ACF%1").arg(i));
-        }else  {
-            e->setRole(QString("FCCS").arg(i));
+            role=(QString("ACF%1").arg(i));
+        } else  {
+            role=(QString("FCCS"));
+            if (i>0) role=(QString("FCCS%10").arg(i));
         }
+
+        QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - %2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(role), filename, p, paramReadonly);
+        e->setRole(role);
         if (cc>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
 
         if (e->error()) {
@@ -186,12 +191,16 @@ void QFPRDRFCS::insertALV6000File(const QStringList& filename, const QMap<QStrin
     for (unsigned int i=0; i<cc; i++) {
         QMap<QString, QVariant> p=paramValues;
         p["CHANNEL"]=i;
-        QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - CH%2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(i), filename, p, paramReadonly);
-        if (crossCorrelation) {
-            e->setRole(QString("ACF%1").arg(i));
-        }else  {
-            e->setRole(QString("FCCS").arg(i));
+        QString role="ACF";
+        if (!crossCorrelation) {
+            role=(QString("ACF%1").arg(i));
+        } else  {
+            role=(QString("FCCS"));
+            if (i>0) role=(QString("FCCS%10").arg(i));
         }
+
+        QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - %2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(role), filename, p, paramReadonly);
+        e->setRole(role);
         if (cc>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
 
         if (e->error()) {
@@ -220,12 +229,15 @@ void QFPRDRFCS::insertALV7000File(const QStringList& filename, const QMap<QStrin
     for (unsigned int i=0; i<cc; i++) {
         QMap<QString, QVariant> p=paramValues;
         p["CHANNEL"]=i;
-        QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - CH%2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(i), filename, p, paramReadonly);
-        if (crossCorrelation) {
-            e->setRole(QString("ACF%1").arg(i));
-        }else  {
-            e->setRole(QString("FCCS").arg(i));
+        QString role="ACF";
+        if (!crossCorrelation) {
+            role=(QString("ACF%1").arg(i));
+        } else  {
+            role=(QString("FCCS"));
+            if (i>0) role=(QString("FCCS%10").arg(i));
         }
+        QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - %2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(role), filename, p, paramReadonly);
+        e->setRole(role);
         if (cc>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
 
         if (e->error()) {
@@ -277,35 +289,50 @@ void QFPRDRFCS::insertOlegFile(const QStringList &filename, const QMap<QString, 
 
 void QFPRDRFCS::insertConfocor3File(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly)
 {
-    /*unsigned int cc=1;
-    QString mode="";
-    unsigned int runCount=0;
-    bool crossCorrelation=false;
-    try {
-        ALV6_analyze(filename.value(0, ""), mode, cc, runCount, crossCorrelation);
-    } catch (std::exception& E) {
+    unsigned int cc=1;
+
+    Confocor3Tools reader;
+    reader.loadFile(filename.value(0, ""));
+    if (reader.wasError()) {
         cc=0;
-        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV6000 file '%1':\n%2").arg(filename.value(0, "")).arg(E.what()));
-        services->log_error(tr("Error while importing ALV6000 file '%1':\n    %2\n").arg(filename.value(0, "")).arg(E.what()));
-
-    }
-    for (unsigned int i=0; i<cc; i++) {
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ConfoCor3 file '%1':\n%2").arg(filename.value(0, "")).arg(reader.getLastErrors().join("\n")));
+        services->log_error(tr("Error while importing ConfoCor3 file '%1':\n    %2\n").arg(filename.value(0, "")).arg(reader.getLastErrors().join("\n")));
+    } else {
+        const Confocor3Tools::ConfocorDataset& d=reader.getData();
         QMap<QString, QVariant> p=paramValues;
-        p["CHANNEL"]=i;
-        QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - CH%2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(i), filename, p, paramReadonly);
-        if (crossCorrelation) {
-            e->setRole(QString("ACF%1").arg(i));
-        }else  {
-            e->setRole(QString("FCCS").arg(i));
+        //QStringList roles=d.getRoles();
+        QStringList groups=d.getGroups();
+        QList<int> kinetics=d.getKinetics();
+        QList<int> positions=d.getPositions();
+        QList<QVector<int> > reps=d.getRepetitions();
+        QString name=QFileInfo(filename.value(0, "")).fileName();
+        if (!d.name.isEmpty()) name=d.name;
+        for (int r=0; r<reps.size(); r++) {
+            if (reps[r].size()>0) {
+                QStringList roles;
+                for (int i=0; i<reps[r].size(); i++) {
+                    QString rol=d.fcsdatasets[reps[r].value(i)].role;
+                    if (!roles.contains(rol)) roles.append(rol);
+                }
+                for (int i=0; i<roles.size(); i++) {
+                    QMap<QString, QVariant> p=paramValues;
+                    QStringList pro=paramReadonly;
+                    p["CONFOCOR3_ITEMS"]=listToString(reps[r], false, false);
+                    p["CONFOCOR3_ROLE"]=roles[i];
+                    p["CONFOCOR3_GROUP"]=groups.value(r, "");
+                    pro<<"CONFOCOR3_ITEMS"<<"CONFOCOR3_ROLE"<<"CONFOCOR3_GROUP";
+                    QFRawDataRecord* e=project->addRawData(getID(), tr("%1 (Pos=%3, Kin=%4) - %2").arg(name).arg(roles[i]).arg(positions.value(r, 0)).arg(kinetics.value(r, 0)), filename, p, pro);
+                    e->setRole(roles[i]);
+                    e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()+"_"+groups.value(r, "")));
+                    if (e->error()) {
+                        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ConfoCor3 file '%1' (role: %3, group: %4):\n%2").arg(filename.value(0, "")).arg(e->errorDescription()).arg(roles[i]).arg(groups.value(r, "")));
+                        services->log_error(tr("Error while importing ConfoCor3 file '%1' (role: %3, group: %4):\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()).arg(roles[i]).arg(groups.value(r, "")));
+                        project->deleteRawData(e->getID());
+                    }
+                }
+            }
         }
-        if (cc>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
-
-        if (e->error()) {
-            QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV6000 file '%1' (channel %3/%4):\n%2").arg(filename.value(0, "")).arg(e->errorDescription()).arg(i+1).arg(cc));
-            services->log_error(tr("Error while importing ALV6000 file '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
-            project->deleteRawData(e->getID());
-        }
-    }*/
+    }
 }
 
 void QFPRDRFCS::insertFLEX_SINFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly)
@@ -331,7 +358,7 @@ void QFPRDRFCS::insertFLEX_SINFile(const QStringList &filename, const QMap<QStri
            col<<i;
         }
         if (crossCorrelation) {
-            if (i==0) roles<<QString("FCCS01");
+            if (i==0) roles<<QString("FCCS");
             else roles<<QString("FCCS%10").arg(i);
             if (!autoCorrelation) col<<i;
             else {

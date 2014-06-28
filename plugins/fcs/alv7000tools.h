@@ -128,6 +128,7 @@ ALV7_TOKEN ALV7_readNumberMatrix(FILE* alv_file, QVector<QVector<double> >* datm
  */
 void ALV7_analyze(QString filename, QString& mode, unsigned int& channelCount, unsigned int& runCount, bool& crossCorrelation, int &inputchannels);
 
+void ALV7_analyzeMode(const QString& mode,  unsigned int &channelCount, bool& crossCorrelation, int &inputchannels);
 
 
 

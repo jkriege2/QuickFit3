@@ -54,14 +54,7 @@ void ALV7_analyze(QString filename, QString& mode, unsigned int& channelCount, u
                         //std::cout<<"runs found "<<item1->runs<<std::endl;
                     } else if (name.compare("Mode",  Qt::CaseInsensitive)==0) {
                         mode=token.value;
-                        if (mode.toUpper()=="C-CH0/1+1/0") {
-                            crossCorrelation=true;
-                            channelCount=2;
-                        } else  {
-                            crossCorrelation=token.value.startsWith("C-", Qt::CaseInsensitive);
-                            channelCount=1;
-                            if (token.value.contains("DUAL", Qt::CaseInsensitive)) channelCount=2;
-                        }
+                        ALV7_analyzeMode(mode, channelCount, crossCorrelation, inputchannels);
                     }
                 }
             } else if (token.type==ALV7_QUOTED) {
@@ -204,7 +197,7 @@ ALV7_TOKEN ALV7_getToken(FILE* alv_file, bool readingHeader) {
         ungetc(ch, alv_file);
         if (ferror(alv_file)) throw ALV7_exception(format("error during file access operation:\n  %s", strerror(errno)));
         t.value=t.value.trimmed();
-        qDebug()<<"AVL7_NAME: "<<t.value;
+        //qDebug()<<"AVL7_NAME: "<<t.value;
         return t;
     }
     // the parser has found an unknown token. an exception will be thrown
@@ -212,3 +205,17 @@ ALV7_TOKEN ALV7_getToken(FILE* alv_file, bool readingHeader) {
 }
 
 
+
+
+void ALV7_analyzeMode(const QString &mode, unsigned int &channelCount, bool &crossCorrelation, int &inputchannels)
+{
+    if (mode.toUpper()=="C-CH0/1+1/0") {
+        crossCorrelation=true;
+        channelCount=2;
+        inputchannels=2;
+    } else  {
+        crossCorrelation=mode.toUpper().startsWith("C-", Qt::CaseInsensitive);
+        channelCount=1;
+        inputchannels=1;
+    }
+}
