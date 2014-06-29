@@ -124,8 +124,8 @@ class Confocor3Tools
 
         ConfocorDataset data;
         bool loadFile(ConfocorDataset& data, const QString& filename);
-        void readBlock(int level, ConfocorDataset& data, QFile& f, bool readNewLine=true, const QString lastLine=QString(), Confocor3Tools::FCSDataSet *fcsds=NULL);
-        QString readArray(QFile& f, int lines, int cols, bool &readNextLine, QList<QVector<double> >& dataout);
+        void readBlock(int level, ConfocorDataset& data, QIODevice &f, bool readNewLine=true, const QString lastLine=QString(), Confocor3Tools::FCSDataSet *fcsds=NULL);
+        QString readArray(QIODevice& f, int lines, int cols, bool &readNextLine, QList<QVector<double> >& dataout);
         static QList<ConfocorDataset> oldData;
 
         QStringList lastErrors;

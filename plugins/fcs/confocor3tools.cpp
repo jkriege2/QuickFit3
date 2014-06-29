@@ -143,7 +143,7 @@ bool Confocor3Tools::loadFile(Confocor3Tools::ConfocorDataset &data, const QStri
     return false;
 }
 
-void Confocor3Tools::readBlock(int level, Confocor3Tools::ConfocorDataset &data, QFile &f, bool readNewLine, const QString lastLine, Confocor3Tools::FCSDataSet* fcsds)
+void Confocor3Tools::readBlock(int level, Confocor3Tools::ConfocorDataset &data, QIODevice &f, bool readNewLine, const QString lastLine, Confocor3Tools::FCSDataSet* fcsds)
 {
     QString ll=lastLine.trimmed().simplified();
     if (readNewLine) ll=f.readLine().trimmed().simplified();
@@ -279,7 +279,7 @@ void Confocor3Tools::readBlock(int level, Confocor3Tools::ConfocorDataset &data,
     }
 }
 
-QString Confocor3Tools::readArray(QFile &f, int lines, int cols, bool &readNextLine, QList<QVector<double> > &dataout)
+QString Confocor3Tools::readArray(QIODevice &f, int lines, int cols, bool &readNextLine, QList<QVector<double> > &dataout)
 {
     int l=0;
     bool done=false;

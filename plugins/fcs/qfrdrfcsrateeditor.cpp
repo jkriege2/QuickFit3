@@ -204,7 +204,7 @@ void QFRDRFCSRateEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecor
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
 
     if (m) {
-        cmbRunDisplay->setCurrentIndex(m->getProperty("FCS_RATE_RUN_DISPLAY", 2).toInt());
+        cmbRunDisplay->setCurrentIndex(m->getProperty("FCS_RATE_RUN_DISPLAY", 0).toInt());
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         runs.setCurrent(current);
     } else {
@@ -253,7 +253,7 @@ void QFRDRFCSRateEditor::setBackrgoundFromThisRDR()
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
     if (m) {
         unsigned int rateChannels=m->getRateChannels();
-        for (int channel=0; channel<rateChannels; channel++) {
+        for (unsigned int channel=0; channel<rateChannels; channel++) {
             cnt<<m->getSimpleCountrateAverage(-1, channel, false)*1000.0;
             cnt_sd<<m->getSimpleCountrateStdDev(-1, channel, false)*1000.0;
         }

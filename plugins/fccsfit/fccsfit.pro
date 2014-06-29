@@ -29,7 +29,8 @@ HEADERS += qffccsfitevaluation.h \
     qffccsparameterinputdelegate.h \
     qffccsfilesetsmodel.h \
     ../base_classes/qfrdrrunselector.h \
-    dlgfccsfitallconfiguration.h
+    dlgfccsfitallconfiguration.h \
+    qffccsrelativeccfcrosstalkdialog.h
 
 SOURCES += qffccsfitevaluation.cpp \
            qffccsfitevaluation_item.cpp \
@@ -45,11 +46,13 @@ SOURCES += qffccsfitevaluation.cpp \
     qffccsparameterinputdelegate.cpp \
     qffccsfilesetsmodel.cpp \
     ../base_classes/qfrdrrunselector.cpp \
-    dlgfccsfitallconfiguration.cpp
+    dlgfccsfitallconfiguration.cpp \
+    qffccsrelativeccfcrosstalkdialog.cpp
 
 FORMS = qffccsfitevaluation_editor.ui \   
     optionswidget.ui \
-    dlgfccsfitallconfiguration.ui
+    dlgfccsfitallconfiguration.ui \
+    qffccsrelativeccfcrosstalkdialog.ui
 
 RESOURCES += qffccsfitevaluation.qrc
 

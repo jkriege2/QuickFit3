@@ -4309,18 +4309,18 @@ QString QFRDRImagingFCSImageEditor::formatTransformAndParameter(QComboBox *cmbPa
 void QFRDRImagingFCSImageEditor::transformImage(double* image, uint32_t width, uint32_t height, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam) {
     switch(tranFitParam) {
         case QFRDRImagingFCSImageEditor::itAbs: {
-                for (int32_t i=0; i<width*height; i++) {
+                for (uint64_t i=0; i<width*height; i++) {
                     image[i]=fabs(image[i]);
                 }
             } break;
         case QFRDRImagingFCSImageEditor::itLog: {
-                for (int32_t i=0; i<width*height; i++) {
+                for (uint64_t i=0; i<width*height; i++) {
                     if (image[i]>0) image[i]=log(image[i])/log(10.0);
                     else  image[i]=NAN;
                 }
             } break;
         case QFRDRImagingFCSImageEditor::itReciprocal: {
-                for (int32_t i=0; i<width*height; i++) {
+                for (uint64_t i=0; i<width*height; i++) {
                     if (image[i]!=0) image[i]=1.0/image[i];
                     else  image[i]=NAN;
                 }
@@ -4411,7 +4411,7 @@ void QFRDRImagingFCSImageEditor::readParameterImage(double *image, uint32_t widt
             int grpIdx=m->resultsGetEvaluationGroupIndex(en);
             int x=m->runToX(grpIdx);
             int y=m->runToY(grpIdx);
-            if (x>=0 && x<width && y>=0 && y<height) {
+            if (x>=0 && x<(int64_t)width && y>=0 && y<(int64_t)height) {
                 if (m->resultsExists(en, fitParam)) {
                     image[y*width+x]=m->resultsGetAsDouble(en, fitParam);
                 }
@@ -4733,21 +4733,36 @@ void QFRDRImagingFCSImageEditor::insertSelectedCorrelationsAsFCSRDR() {
                 }
                 QStringList CSV;
                 QStringList CSVCNT;
-                QString runs="";
+                //QString runs="";
                 double* tau=m->getCorrelationT();
                 long long N=m->getCorrelationN();
                 for (long long i=0; i<N; i++) {
                     CSV.append(CDoubleToQString(tau[i]));
                 }
-                for (int i=0; i<m->getCorrelationRuns(); i++) {
-                    if (selected.contains(i)) {
-                        double* c=m->getCorrelationRun(i);
-                        double* ce=m->getCorrelationRunError(i);
-                        for (int j=0; j<N; j++) {
-                            CSV[j]=CSV[j]+", "+CDoubleToQString(c[j])+", "+CDoubleToQString(ce[j]);
+                if (dlg->getCopyAllRuns()) {
+                    for (int i=0; i<m->getCorrelationRuns(); i++) {
+                        if (selected.contains(i)) {
+                            double* c=m->getCorrelationRun(i);
+                            double* ce=m->getCorrelationRunError(i);
+                            for (int j=0; j<N; j++) {
+                                CSV[j]=CSV[j]+", "+CDoubleToQString(c[j])+", "+CDoubleToQString(ce[j]);
+                            }
+                            //if (!runs.isEmpty()) runs+=", ";
+                            //runs+=QString::number(i);
                         }
-                        if (!runs.isEmpty()) runs+=", ";
-                        runs+=QString::number(i);
+                    }
+                } else {
+                    QVector<double> dat;
+                    for (int j=0; j<N; j++) {
+                        for (int i=0; i<m->getCorrelationRuns(); i++) {
+                            if (selected.contains(i)) {
+                                double* c=m->getCorrelationRun(i);
+                                dat<<c[j];
+                            }
+                        }
+                        double var=0;
+                        double avg=qfstatisticsAverageStd(var, dat);
+                        CSV[j]=CSV[j]+", "+CDoubleToQString(avg)+", "+CDoubleToQString(var);
                     }
                 }
 
@@ -4783,7 +4798,7 @@ void QFRDRImagingFCSImageEditor::insertSelectedCorrelationsAsFCSRDR() {
 
                 QMap<QString, QVariant> p;
                 QStringList paramsReadonly;
-                for (int pi=0; pi<m->getPropertyCount(); pi++) {
+                for (unsigned int pi=0; pi<m->getPropertyCount(); pi++) {
                     QString n=m->getPropertyName(pi);
                     if (m->isPropertyVisible(n)) {
                         p[n]=m->getProperty(n);

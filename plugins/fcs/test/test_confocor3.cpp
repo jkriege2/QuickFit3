@@ -1,6 +1,7 @@
 #include "qftools.h"
 #include "../confocor3tools.h"
 #include <QDebug>
+#include <QElapsedTimer>
 
 int main(int argc, char *argv[])
 {
@@ -14,7 +15,10 @@ int main(int argc, char *argv[])
         qDebug()<<fn;
         qDebug()<<"== READ ==================================================================";
         Confocor3Tools conf;
+        QElapsedTimer timer;
+        timer.start();
         qDebug()<<"  -> "<<conf.loadFile(fn);
+        qDebug()<<"  ->    duration="<<timer.nsecsElapsed()/1e6<<"ms";
         if (conf.wasError()) {
             qDebug()<<"ERROR WHILE READING:"<<conf.getLastErrors();
         }
@@ -61,7 +65,10 @@ int main(int argc, char *argv[])
         qDebug()<<fn;
         qDebug()<<"== READ ==================================================================";
         Confocor3Tools conf;
+        QElapsedTimer timer;
+        timer.start();
         qDebug()<<"  -> "<<conf.loadFile(fn);
+        qDebug()<<"  ->    duration="<<timer.nsecsElapsed()/1e6<<"ms";
         if (conf.wasError()) {
             qDebug()<<"ERROR WHILE READING:"<<conf.getLastErrors();
         }
