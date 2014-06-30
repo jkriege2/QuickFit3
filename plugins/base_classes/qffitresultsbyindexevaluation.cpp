@@ -47,7 +47,7 @@ int QFFitResultsByIndexEvaluation::getIndexFromEvaluationResultID(const QString 
     if (resultID.size()<=0) return -1;
     if (resultID.endsWith("runavg")) return -1;
     int l=0;
-    while (l>=resultID.size()-1 && resultID[resultID.size()-1-l].isDigit()) {
+    while (l<resultID.size() && resultID[resultID.size()-1-l].isDigit()) {
         l++;
     }
 
