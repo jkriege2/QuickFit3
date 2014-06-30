@@ -156,7 +156,12 @@ void QF3ObjectiveCombobox::loadObjectives() {
         o.magnification=inifile.value(g+"/magnification", inifileg.value(g+"/magnification", 1)).toDouble();
         o.NA=inifile.value(g+"/na", 1).toDouble();
         objectives.append(o);
-        cmbObjective->addItem(QIcon(":/libqf3widgets/objective.png"), o.name);
+
+    }
+
+    qSort(objectives);
+    for (int i=0; i<objectives.size(); i++) {
+        cmbObjective->addItem(QIcon(":/libqf3widgets/objective.png"), objectives[i].name);
     }
 
     int i=cmbObjective->findText(currentO);
@@ -271,6 +276,7 @@ void QF3ObjectiveCombobox::loadSettings(QSettings& settings, QString property) {
             d.NA=settings.value(property+"/na", 1).toDouble();
             d.magnification=settings.value(property+"/magnification", 1).toDouble();
             objectives.append(d);
+            qSort(objectives);
             storeObjectives();
             loadObjectives();
         }
@@ -293,6 +299,7 @@ void QF3ObjectiveCombobox::loadSettings(QFManyFilesSettings &settings, QString p
              d.NA=settings.value(property+"/na", 1).toDouble();
              d.magnification=settings.value(property+"/magnification", 1).toDouble();
              objectives.append(d);
+             qSort(objectives);
              storeObjectives();
              loadObjectives();
          }

@@ -49,6 +49,10 @@ struct QFWIDLIB_EXPORT FilterDescription {
     bool isValid;
 
     FilterDescription();
+    bool operator<(const FilterDescription& other) const {
+        return name<other.name;
+    }
+
 };
 
 

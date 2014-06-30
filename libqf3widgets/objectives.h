@@ -47,6 +47,9 @@ struct QFWIDLIB_EXPORT ObjectiveDescription {
     double magnification;
     double NA;
     ObjectiveDescription();
+    bool operator<(const ObjectiveDescription& other) const {
+        return name<other.name;
+    }
 };
 
 

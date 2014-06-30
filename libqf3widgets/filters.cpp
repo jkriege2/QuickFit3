@@ -175,6 +175,8 @@ QList<FilterDescription> QF3FilterCombobox::getFilterList(QString globalfilters,
         filterList.append(o);
     }
 
+    qSort(filterList);
+
     return filterList;
 }
 
@@ -278,6 +280,7 @@ void QF3FilterCombobox::addFilter() {
         }
         //qDebug()<<d.name;
         filters.append(d);
+        qSort(filters);
     }
     storeFilters();
     loadFilters();
