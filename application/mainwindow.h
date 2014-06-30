@@ -232,6 +232,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QString projectFileFilter;
         QString projectSaveFileFilter;
 
+    protected slots:
+        void displayHelpCiting();
     private slots:
         /** \brief create a new project */
         void newProject();
@@ -403,6 +405,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QAction *aboutQtAct;
         QAction *aboutPluginsAct;
         QAction* helpAct;
+        QAction* helpCitingAct;
         QList<QAction*> helpActList;
 
         QAction* helpCopyrightAct;

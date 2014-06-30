@@ -1099,6 +1099,8 @@ void MainWindow::createActions() {
     connect(helpCopyrightAct, SIGNAL(triggered()), this, SLOT(displayHelpCopyright()));
     helpPluginCopyrightAct=new QAction(QIcon(":/lib/help/help_copyright.png"), tr("Plugin C&opyright"), this);
     connect(helpPluginCopyrightAct, SIGNAL(triggered()), this, SLOT(displayHelpPluginCopyright()));
+    helpCitingAct=new QAction(QIcon(":/help_copyright.png"), tr("Citing QuickFit ..."), this);
+    connect(helpCitingAct, SIGNAL(triggered()), this, SLOT(displayHelpCiting()));
     helpTutorialsAct=new QAction(QIcon(":/lib/help/help_tutorial.png"), tr("Plugin &Tutorials"), this);
     connect(helpTutorialsAct, SIGNAL(triggered()), this, SLOT(displayHelpTutorials()));
     helpPluginAct=new QAction(QIcon(":/lib/help/help_contents.png"), tr("&Plugin Help"), this);
@@ -1115,6 +1117,7 @@ void MainWindow::createActions() {
     helpActList.append(helpAct);
     helpActList.append(helpCopyrightAct);
     helpActList.append(helpPluginAct);
+    helpActList.append(helpCitingAct);
     helpActList.append(helpTutorialsAct);
     helpActList.append(helpPluginCopyrightAct);
 
@@ -1233,6 +1236,7 @@ void MainWindow::createMenus() {
     helpMenu = menuBar()->addMenu(tr("&Help"));
     helpMenu->addAction(helpAct);
     helpMenu->addAction(helpCopyrightAct);
+    helpMenu->addAction(helpCitingAct);
     helpMenu->addSeparator();
     helpMenu->addAction(helpPluginAct);
     helpMenu->addAction(helpTutorialsAct);
@@ -2204,6 +2208,10 @@ void MainWindow::displayHelpTutorials()
     displayHelpWindow(settings->getAssetsDirectory()+QString("/help/plugin_tutorials.html"));
 }
 
+void MainWindow::displayHelpCiting()
+{
+    displayHelpWindow(settings->getAssetsDirectory()+QString("/help/citing.html"));
+}
 void MainWindow::displayPluginHelp()
 {
     displayHelpWindow(settings->getAssetsDirectory()+QString("/help/plugin_help.html"));

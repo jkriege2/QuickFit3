@@ -55,16 +55,20 @@ win32 {
     contains(HAS_WINDOWS_DATE, FALSE) {
         !isEmpty(QMAKE_SH) {
             DATESTR = $$system(date +%Y/%m/%d)
+            DATESTRYEAR = $$system(date +%Y)
         }
     } else {
         DATESTR = $$system(date /T)
+        DATESTRYEAR = $$system(date /T)
     }
 } else {
     # on UNIX we just call the date command!
     DATESTR = $$system(date +%Y/%m/%d)
+    DATESTRYEAR = $$system(date +%Y)
 }
 isEmpty(DATESTR) {
     DATESTR = ---
+    DATESTRYEAR = 2014
 }
 message("COMPILE MODE: SVNVERSION is: $$SVNVERSION")
 message("COMPILE MODE: build date is: $$DATESTR")
@@ -81,7 +85,7 @@ win32 {
     system(echo $$LITERAL_HASH define COMPILER \"$$COMPILERVERSION\"  > compiler.h )
 } else {
     system(echo \'$$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"\'  > svnversion.h )
-    system(echo \'$$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"\'  > compiledate.h )
+    system(echo \'$$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"  > compiledate.h )
     system(echo \'$$LITERAL_HASH define COMPILER \"$$COMPILERVERSION\"\'  > compiler.h )
 }
 
