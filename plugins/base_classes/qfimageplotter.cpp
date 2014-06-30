@@ -153,6 +153,7 @@ void QFImagePlotter::updateImage()
         }
         setXY(0, w, 0, h);
 
+        qDebug()<<plteImageData<<plteImageWidth<<plteImageHeight;
 
         plteImage->set_data(plteImageData, plteImageWidth, plteImageHeight, JKQTPMathImageBase::DoubleArray);
         plteImage->set_width(w);

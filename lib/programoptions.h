@@ -60,7 +60,7 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         inline QString getStyle() { return style; }
 
         /** \brief return a pointer to a QSettings object that may be used to save config data throughout the application */
-        inline QSettings* getQSettings() { settings->sync(); return settings; }
+        inline QSettings* getQSettings() { /*settings->sync();*/ return settings; }
 
         /** \brief return the maximum number of threds */
         int getMaxThreads() { return maxThreads; }

@@ -81,6 +81,8 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     param2Default<<"fitparam_1n_particle";
     param2Default<<"fitparam_g0";
 
+    reactOnRedrawCalls=true;
+
 
     m_fitFunctions=QFPluginServices::getInstance()->getFitFunctionManager()->getModels("", this);
     plteOverviewSelectedData=NULL;
@@ -2104,6 +2106,12 @@ void QFRDRImagingFCSImageEditor::excludeByIntensity2() {
     }
 }
 void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"connectWidgets";
+    QElapsedTimer time;
+    time.start();
+#endif
+    reactOnRedrawCalls=false;
     if (old) {
         //saveImageSettings();
         disconnect(old, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(resultsChanged(QString,QString,bool)));
@@ -2114,6 +2122,7 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
 
+        connectParameterWidgets(false);
         cmbOtherFileRole->clear();
         QList<QFRawDataRecord*> ing=current->getGroupMembers();
         QStringList roles;
@@ -2150,6 +2159,7 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         actMaskByIntensity2->setEnabled(m->getImageFromRunsChannels()>1);
         selectedInsert(0);
         selectionEdited();
+        connectParameterWidgets(true);
         connect(current, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(resultsChanged(QString,QString,bool)));
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         connect(cmbDualView, SIGNAL(currentIndexChanged(int)), this, SLOT(dualviewChanged(int)));
@@ -2159,6 +2169,11 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
     updateSelectionCombobox();
     loadImageSettings();
     fillParameterSet();
+    reactOnRedrawCalls=true;
+    rawDataChanged();
+#ifdef DEBUG_TIMIMNG
+    qDebug()<<"connectWidgets ... -9 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;
+#endif
 }
 
 
@@ -2609,6 +2624,7 @@ void QFRDRImagingFCSImageEditor::updateAfterClick() {
 }
 
 void QFRDRImagingFCSImageEditor::rawDataChanged() {
+    if (!reactOnRedrawCalls) return;
     //qDebug()<<"QFRDRImagingFCSImageEditor::rawDataChanged()";
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     updateSelectionCombobox();
@@ -2711,6 +2727,7 @@ void QFRDRImagingFCSImageEditor::slidersChanged(int userMin, int userMax, int mi
 }
 
 void QFRDRImagingFCSImageEditor::replotImage() {
+    if (!reactOnRedrawCalls) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRImageToRunInterface* m=qobject_cast<QFRDRImageToRunInterface*>(current);
 
@@ -2832,6 +2849,7 @@ void QFRDRImagingFCSImageEditor::selectedRemove(int idx)
 }
 
 void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
+    if (!reactOnRedrawCalls) return;
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 #ifdef DEBUG_TIMIMNG
@@ -2970,6 +2988,7 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
 }
 
 void QFRDRImagingFCSImageEditor::replotOverview() {
+    if (!reactOnRedrawCalls) return;
 #ifdef DEBUG_TIMIMNG
     qDebug()<<"replotOverview";
     QElapsedTimer time;
@@ -3060,6 +3079,7 @@ void QFRDRImagingFCSImageEditor::replotOverview() {
 }
 
 void QFRDRImagingFCSImageEditor::replotMask() {
+    if (!reactOnRedrawCalls) return;
 #ifdef DEBUG_TIMIMNG
     qDebug()<<"replotMask";
     QElapsedTimer time;
@@ -3553,6 +3573,7 @@ void QFRDRImagingFCSImageEditor::plotRunsAvg(QFRDRImagingFCSData *m, QSet<int32_
 
 
 void QFRDRImagingFCSImageEditor::replotData() {
+    if (!reactOnRedrawCalls) return;
 #ifdef DEBUG_TIMIMNG
     qDebug()<<"replotData";
     QElapsedTimer time;
@@ -3955,7 +3976,7 @@ QFRDRImagingFCSData* QFRDRImagingFCSImageEditor::getRDRForParameter2(const QStri
     return m;
 }
 
-void QFRDRImagingFCSImageEditor::parameterSetChanged() {
+void QFRDRImagingFCSImageEditor::parameterSetChanged(bool replot) {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     int grp=cmbResultGroup->currentIndex();
     if ((!m)||(grp<0)) {
@@ -4006,13 +4027,13 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged() {
 
     }
     //qDebug()<<"parameterSetChanged ... done   cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
-    parameterChanged();
-    replotData();
+    parameterChanged(replot);
+    if (replot) replotData();
     //updateHistogram();
     //qDebug()<<"parameterSetChanged ... done   cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
 }
 
-void QFRDRImagingFCSImageEditor::parameterChanged() {
+void QFRDRImagingFCSImageEditor::parameterChanged(bool replot) {
     if (!current) return;
     QString egroup=currentEvalGroup();
 
@@ -4024,18 +4045,20 @@ void QFRDRImagingFCSImageEditor::parameterChanged() {
     current->setQFProperty(QString("imfcs_imed_image2param_%1").arg(filenameize(egroup)), cmbParameter2->itemData(cmbParameter2->currentIndex()).toString(), false, false);
     connectParameterWidgets(true);
 
-    transformChanged();
+    transformChanged(replot);
 }
 
-void QFRDRImagingFCSImageEditor::transformChanged() {
+void QFRDRImagingFCSImageEditor::transformChanged(bool replot) {
     QString egroup=currentEvalGroup();
     current->setQFProperty(QString("imfcs_imed_image2paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter2->currentIndex()), cmbParameter2Transform->currentIndex(), false, false);
     current->setQFProperty(QString("imfcs_imed_paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter->currentIndex()), cmbParameterTransform->currentIndex(), false, false);
     connectParameterWidgets(false);
     loadImageSettings();
-    replotOverview();    
-    replotImage();
-    replotSelection();
+    if (replot) {
+        replotOverview();
+        replotImage();
+        replotSelection();
+    }
     updateOverlaySettings();
     connectParameterWidgets(true);
     updateHistogram();
@@ -4049,7 +4072,7 @@ void QFRDRImagingFCSImageEditor::clearImage() {
     pltParamImage2->clearImage();
 }
 
-void QFRDRImagingFCSImageEditor::fillParameterSet() {
+void QFRDRImagingFCSImageEditor::fillParameterSet(bool replot) {
     //qDebug()<<"fillParameterSet";
 
 
@@ -4094,7 +4117,7 @@ void QFRDRImagingFCSImageEditor::fillParameterSet() {
 
     }
     // update the list of available fit parameters
-    parameterSetChanged(); // this also replots !!!
+    parameterSetChanged(replot); // this also replots !!!
     //qDebug()<<"fillParameterSet ... done   cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();;
 
 }
@@ -4146,9 +4169,11 @@ void QFRDRImagingFCSImageEditor::connectImageWidgets(bool connectTo) {
 }
 
 void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
+
     if (connectTo) {
         connectParameterWidgetsCounter--;
         if (connectParameterWidgetsCounter<=0) {
+            //qDebug()<<"CONNECTPARAMETRWIDGETS";
             connectParameterWidgetsCounter=0;
             grpImage->connectWidgets(true);
             grpImage2->connectWidgets(true);
@@ -4192,6 +4217,7 @@ void QFRDRImagingFCSImageEditor::connectParameterWidgets(bool connectTo) {
 
         }
     } else {
+        //qDebug()<<"DISCONNECTPARAMETRWIDGETS";
         connectParameterWidgetsCounter++;
         grpImage->connectWidgets(false);
         grpImage2->connectWidgets(false);
@@ -4561,6 +4587,7 @@ void QFRDRImagingFCSImageEditor::setCopyableData()
 
 void QFRDRImagingFCSImageEditor::updateSelectionCombobox()
 {
+    //qDebug()<<"updateSelectionCombobox";
     bool en=cmbStoredSelections->updatesEnabled();
     QString idx=cmbStoredSelections->currentText();
     cmbStoredSelections->setUpdatesEnabled(false);

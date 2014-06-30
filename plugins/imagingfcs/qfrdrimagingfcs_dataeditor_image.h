@@ -203,15 +203,15 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
 
 
         /** \brief activated when the user selects a new parameter set/evaluation group,  fills cmbParameters with all available parameters in the selected result group */
-        void parameterSetChanged();
+        void parameterSetChanged(bool replot=true);
         /** \brief activated when the user selects a new parameter*/
-        void parameterChanged();
+        void parameterChanged(bool replot=true);
         /** \brief called when the user selects a new transformation */
-        void transformChanged();
+        void transformChanged(bool replot=true);
         /** \brief clear the parameter image */
         void clearImage();
         /** \brief fills cmbResultGroup with all available result groups */
-        void fillParameterSet();
+        void fillParameterSet(bool replot=true);
         /** \brief connect/disconnect cmbResultGroups, cmbParameters, ... to their slots */
         void connectParameterWidgets(bool connectTo=true);
         /** \brief connect/disconnect widgets for image settings to their slots */
@@ -284,6 +284,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
 
         int connectParameterWidgetsCounter;
         int connectImageWidgetsCounter;
+        bool reactOnRedrawCalls;
 
         /** \brief indicates whether the overview plot is visible */
         QCheckBox* chkOverviewVisible;
