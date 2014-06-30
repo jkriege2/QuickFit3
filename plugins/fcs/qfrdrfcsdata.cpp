@@ -2884,10 +2884,10 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
                     }
 
                     if (r==0) {
-                        for (int i=0; i<qMin(correlationN, Nc); i++) correlationT[i]=f.tau.value(i, 0.0);
+                        for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) correlationT[i]=f.tau.value(i, 0.0);
                     } else {
                         bool okT=true;
-                        for (int i=0; i<qMin(correlationN, Nc); i++) {if (correlationT[i]!=f.tau.value(i, 0.0)) {okT=false; break;}}
+                        for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) {if (correlationT[i]!=f.tau.value(i, 0.0)) {okT=false; break;}}
                         if (!okT) {
                             ok=false;
                             setError(tr("Error while importing ConfoCor3 file '%1':\n    lag-time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
@@ -2896,7 +2896,7 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
                     }
                     double* corr=getCorrelationRun(r);
                     if (f.corr.size()>0 && f.corr.first().size()>=Nc) {
-                        for (int i=0; i<qMin(correlationN, Nc); i++) {
+                        for (int i=0; i<qMin((int64_t)correlationN, Nc); i++) {
                             corr[i]=f.corr.first().value(i, 0.0)-1.0;
                         }
                     } else {
@@ -2907,10 +2907,10 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
                     }
 
                     if (r==0) {
-                        for (int i=0; i<qMin(rateN, Nr); i++) rateT[i]=f.time.value(i, 0.0);
+                        for (int i=0; i<qMin((int64_t)rateN, Nr); i++) rateT[i]=f.time.value(i, 0.0);
                     } else {
                         bool okT=true;
-                        for (int i=0; i<qMin(rateN, Nr); i++) {if (rateT[i]!=f.time.value(i, 0.0)) {okT=false; break;}}
+                        for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {if (rateT[i]!=f.time.value(i, 0.0)) {okT=false; break;}}
                         if (!okT) {
                             ok=false;
                             setError(tr("Error while importing ConfoCor3 file '%1':\n    time-axis in different runs is unequal in record %2 (group=%3, role=%4)!.\n").arg(filename).arg(importData[r].index).arg(group).arg(role));
@@ -2921,7 +2921,7 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
                         double* rat0=getRateRun(r,0);
                         const Confocor3Tools::FCSDataSet& fr1=d.fcsdatasets[importData[r].cntRec1];
                         if (fr1.rate.size()>0 && Nr<=fr1.rate.first().size()){
-                            for (int i=0; i<qMin(rateN, Nr); i++) {
+                            for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {
                                 rat0[i]=fr1.rate.first().value(i, 0)/1000.0;
                             }
                         }
@@ -2930,7 +2930,7 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
                         double* rat1=getRateRun(r, 1);
                         const Confocor3Tools::FCSDataSet& fr1=d.fcsdatasets[importData[r].cntRec2];
                         if (fr1.rate.size()>0 && Nr<=fr1.rate.first().size()){
-                            for (int i=0; i<qMin(rateN, Nr); i++) {
+                            for (int i=0; i<qMin((int64_t)rateN, Nr); i++) {
                                 rat1[i]=fr1.rate.first().value(i, 0)/1000.0;
                             }
                         }
