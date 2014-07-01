@@ -5,6 +5,7 @@
 QFRDRImageStackDataEditor::QFRDRImageStackDataEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent):
     QFRawDataEditor(services, propEditor, parent)
 {
+    updateImage=true;
     dataMode=QFRDRImageStackDataEditor::dmFullHistogram;
     maskTools=new QFRDRImageMaskEditTools(this, QString("imagestackeditor/"));
     selection=NULL;
@@ -211,6 +212,7 @@ void QFRDRImageStackDataEditor::createWidgets() {
 };
 
 void QFRDRImageStackDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
+    updateImage=false;
     disconnect(cmbImageStack, SIGNAL(currentIndexChanged(int)), this, SLOT(stackChanged()));
     disconnect(player, SIGNAL(showFrame(int)), this, SLOT(showFrame(int)));
     disconnect(cmbChannelMode, SIGNAL(currentIndexChanged(int)), this, SLOT(channelModeChanged()));
@@ -246,6 +248,7 @@ void QFRDRImageStackDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
     connect(cmbChannelMode, SIGNAL(currentIndexChanged(int)), this, SLOT(channelModeChanged()));
     //connect(pltImage, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this, SLOT(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)));
     channelModeChanged();
+    updateImage=true;
     stackChanged();
     if (viewer3D) {
         viewer3D->init(m, cmbImageStack->currentIndex());
@@ -343,6 +346,7 @@ void QFRDRImageStackDataEditor::disconnectWidgets()
 
 
 void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
+    if (!updateImage) return;
     //qDebug()<<"showFrame("<<frame<<startPlayer<<")";
     bool dd=pltImage->get_doDrawing();
     pltImage->set_doDrawing(false);
@@ -570,6 +574,7 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
 }
 
 void QFRDRImageStackDataEditor::displayImage() {
+    if (!updateImage) return;
     if (!image) return;
     //qDebug()<<"displayImage()";
     player->pause();

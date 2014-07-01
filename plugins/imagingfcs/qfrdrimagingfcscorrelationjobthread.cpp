@@ -844,7 +844,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 text<<"frame count                 : "<<outLocale.toString(frames) << "\n";
                                 text<<"first frame                 : "<<outLocale.toString(first_frame) << "\n";
                                 text<<"last frame                  : "<<outLocale.toString(first_frame+frames-1) << "\n";
-                                text<<"correlation segments        : "<<outLocale.toString(job.segments) << "\n";
+                                text<<"correlation segments        : "<<outLocale.toString(double(frames)/double(job.segments)*job.frameTime) << "\n";
+                                text<<"segments length (s)         : "<<outLocale.toString(job.segments) << "\n";
                                 text<<"correlator S                : "<<outLocale.toString(job.S) << "\n";
                                 text<<"correlator m                : "<<outLocale.toString(job.m) << "\n";
                                 text<<"correlator P                : "<<outLocale.toString(job.P) << "\n";
@@ -985,11 +986,11 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                             double* ccfsegments[1]={acf_segments};
                             QString error;
                             //qDebug()<<"acf = "<<acf<<"  acf_std = "<<acf_std;
-                            if (!saveCorrelationCSV(localFilename, acf_tau, ccf, ccferr, 1, acf_N, frame_width, frame_height, input_length, error,125)) {
+                            if (!saveCorrelationCSV(localFilename, acf_tau, ccf, ccferr, 1, acf_N, frame_width, frame_height, input_length, error,125, double(frames)/double(job.segments)*job.frameTime)) {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create autocorrelation file '%1': %2!").arg(localFilename).arg(error));
                             }
-                            if (!saveCorrelationBIN(localFilename1, acf_tau, ccf, ccferr, 1, acf_N, frame_width, frame_height, ccfsegments, error,125)) {
+                            if (!saveCorrelationBIN(localFilename1, acf_tau, ccf, ccferr, 1, acf_N, frame_width, frame_height, ccfsegments, error,125, double(frames)/double(job.segments)*job.frameTime)) {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create binary autocorrelation file '%1': %2!").arg(localFilename1).arg(error));
                             }
@@ -1024,11 +1025,11 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     double* ccferr[1]={dccf[id].dccf_std};
                                     double* ccfsegments[1]={dccf[id].dccf_segments};
                                     QString error;
-                                    if (!saveCorrelationCSV(localFilename, dccf[id].dccf_tau, ccf, ccferr, 1, dccf[id].dccf_N, frame_width, frame_height, input_length, error,125)) {
+                                    if (!saveCorrelationCSV(localFilename, dccf[id].dccf_tau, ccf, ccferr, 1, dccf[id].dccf_N, frame_width, frame_height, input_length, error,125, double(frames)/double(job.segments)*job.frameTime)) {
                                         m_status=-1; emit statusChanged(m_status);
                                         emit messageChanged(tr("could not create distance crosscorrelation file '%1': %2!").arg(localFilename).arg(error));
                                     }
-                                    if (!saveCorrelationBIN(localFilename1, dccf[id].dccf_tau, ccf, ccferr, 1, dccf[id].dccf_N, frame_width, frame_height, ccfsegments, error,125)) {
+                                    if (!saveCorrelationBIN(localFilename1, dccf[id].dccf_tau, ccf, ccferr, 1, dccf[id].dccf_N, frame_width, frame_height, ccfsegments, error,125, double(frames)/double(job.segments)*job.frameTime)) {
                                         m_status=-1; emit statusChanged(m_status);
                                         emit messageChanged(tr("could not create binary distance crosscorrelation file '%1': %2!").arg(localFilename1).arg(error));
                                     }
@@ -1056,11 +1057,11 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                             double* ccferr[4]={ccf1_std, ccf2_std, ccf3_std, ccf4_std};
                             double* ccfsegments[4]={ccf1_segments, ccf2_segments, ccf3_segments, ccf4_segments};
                             QString error;
-                            if (!saveCorrelationCSV(localFilename, ccf_tau, ccf, ccferr, 4, ccf_N, frame_width, frame_height, input_length, error)) {
+                            if (!saveCorrelationCSV(localFilename, ccf_tau, ccf, ccferr, 4, ccf_N, frame_width, frame_height, input_length, error, 0, double(frames)/double(job.segments)*job.frameTime)) {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create crosscorrelation file '%1': %2!").arg(localFilename).arg(error));
                             }
-                            if (!saveCorrelationBIN(localFilename1, ccf_tau, ccf, ccferr, 4, ccf_N, frame_width, frame_height, ccfsegments, error)) {
+                            if (!saveCorrelationBIN(localFilename1, ccf_tau, ccf, ccferr, 4, ccf_N, frame_width, frame_height, ccfsegments, error, 0, double(frames)/double(job.segments)*job.frameTime)) {
                                 m_status=-1; emit statusChanged(m_status);
                                 emit messageChanged(tr("could not create binary crosscorrelation file '%1': %2!").arg(localFilename1).arg(error));
                             }
@@ -1166,11 +1167,19 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
 }
 
 
-bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationCSV(const QString &filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double input_length, QString& error, int progress_steps) {
+bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationCSV(const QString &filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N_in, uint32_t width, uint32_t height, double input_length, QString& error, int progress_steps, double segmentLengthSeconds) {
    /* qDebug()<<corrTau<<corrs<<correrrs<<corrN<<N<<width<<height<<input_length;
     for (uint32_t j=0; j<corrN; j++) {
         qDebug()<<"corrs["<<j<<"] = "<<corrs[j];
     }*/
+
+    uint32_t N=N_in;
+    if (corrTau && segmentLengthSeconds>0.0) {
+        for (int i=N_in-1; i>=0; i--) {
+            if (corrTau[i]>segmentLengthSeconds) N--;
+        }
+        if (N<=5) corrN=N_in;
+    }
     QFile f(filename);
     error="";
     int dataToWrite=width*height;
@@ -1188,11 +1197,11 @@ bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationCSV(const QString &file
                 if (corrTau[i]<input_length)  {
                     text<<corrTau[i];
                     for (uint32_t j=0; j<corrN; j++) {
-                       text<<", "<<(corrs[j])[p*N+i]-1.0;
+                       text<<", "<<(corrs[j])[p*N_in+i]-1.0;
                     }
                     if (correrrs && correrrs[0]) {
                         for (uint32_t j=0; j<corrN; j++) {
-                           text<<", "<<(correrrs[j])[p*N+i]-1.0;
+                           text<<", "<<(correrrs[j])[p*N_in+i]-1.0;
                         }
                     }
                     text<<"\n";
@@ -1212,9 +1221,16 @@ bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationCSV(const QString &file
     return ok;
 }
 
-bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double **corrSegments, QString& error, int progress_steps) {
+bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N_in, uint32_t width, uint32_t height, double **corrSegments, QString& error, int progress_steps, double segmentLengthSeconds) {
     QFile f(filename);
 
+    uint32_t N=N_in;
+    if (corrTau && segmentLengthSeconds>0.0) {
+        for (int i=N_in-1; i>=0; i--) {
+            if (corrTau[i]>segmentLengthSeconds) N--;
+        }
+        if (N<=5) corrN=N_in;
+    }
     int dataToWrite=width*height*(job.segments+1);
     int progressEvery=0;
     if (progress_steps>0) progressEvery=dataToWrite/progress_steps;
@@ -1234,17 +1250,13 @@ bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &file
 
         for (register uint32_t p=0; p<width*height; p++) {
             for (uint32_t j=0; j<corrN; j++) {
-                binfileWriteDoubleArrayMinus1(f, &((corrs[j])[p*N]), N);
-                /*for (register uint32_t i=0; i<N; i++) {
-                    const double d=qToLittleEndian((corrs[j])[p*N+i]-1.0);  f.write((char*)(&d), sizeof(d));
-                }*/
+                binfileWriteDoubleArrayMinus1(f, &((corrs[j])[p*N_in]), N);
+
             }
             if (sets>1) {
                 for (uint32_t j=0; j<corrN; j++) {
-                    binfileWriteDoubleArray(f, &((correrrs[j])[p*N]), N);
-                    /*for (register uint32_t i=0; i<N; i++) {
-                        const double d=qToLittleEndian((correrrs[j])[p*N+i]-1.0);  f.write((char*)(&d), sizeof(d));
-                    }*/
+                    binfileWriteDoubleArray(f, &((correrrs[j])[p*N_in]), N);
+
                 }
             }
 
@@ -1257,10 +1269,8 @@ bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &file
             for (register uint32_t p=0; p<width*height; p++) {
                 for (int seg=0; seg<job.segments; seg++) {
                     for (uint32_t j=0; j<corrN; j++) {
-                        binfileWriteDoubleArrayMinus1(f, &((corrSegments[j])[seg*width*height*N+p*N]), N);
-                        /*for (register uint32_t i=0; i<N; i++) {
-                            const double d=qToLittleEndian((corrSegments[j])[seg*corrN*N+p*N+i]-1.0);  f.write((char*)(&d), sizeof(d));
-                        }*/
+                        binfileWriteDoubleArrayMinus1(f, &((corrSegments[j])[seg*width*height*N_in+p*N_in]), N);
+
                     }
                     progress++;
                     if (progressEvery>0 && progress%progressEvery==0) {progem++; emit progressIncrement(1); }

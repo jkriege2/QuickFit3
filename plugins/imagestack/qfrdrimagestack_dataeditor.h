@@ -107,6 +107,8 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         int selectionWidth;
         int selectionHeight;
 
+        bool updateImage;
+
         QFRDRImageMaskEditTools* maskTools;
 
         /** \brief create widgets on object creation */

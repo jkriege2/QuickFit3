@@ -304,7 +304,7 @@ class QFRDRImagingFCSCorrelationJobThread : public QThread {
         void prepare_ccfs(QList<MultiTauCorrelator<double, double> *> &acfjk, QList<correlatorjb<double, double> *> &acfjb, double **acf, double **acf_std, double** acf_t, uint32_t& acf_N, uint32_t frame_width, uint32_t frame_height, uint32_t segments);
 
         /*! \brief store a set of correlation functions as a CSV file */
-        bool saveCorrelationCSV(const QString& filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double input_length, QString& error, int progress_steps=0) ;
+        bool saveCorrelationCSV(const QString& filename, double *corrTau, double **corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double input_length, QString& error, int progress_steps=0, double segmentLengthSeconds=-1) ;
         /*! \brief store a set of correlation functions as a binary file
 
             Format description:
@@ -428,7 +428,7 @@ data                                                   size [bytes]             
             \note There was a bug in older QuickFit 3 versions so the second part of the file is scrambled. This is ONLY the case
                   for file version \c "QF3.0imFCS" files with the version tag \c "QF3.1imFCS" can be read completely!
         */
-        bool saveCorrelationBIN(const QString& filename, double *corrTau, double** corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double **corrSegments, QString& error, int progress_steps=0) ;
+        bool saveCorrelationBIN(const QString& filename, double *corrTau, double** corrs, double** correrrs, uint32_t corrN, uint32_t N, uint32_t width, uint32_t height, double **corrSegments, QString& error, int progress_steps=0, double segmentLengthSeconds=-1) ;
 
         struct StatisticsDataset {
                 QVector<float> time;
