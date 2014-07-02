@@ -9,7 +9,7 @@
 #include "flowlayout.h"
 #include <cmath>
 #include "andorsettingsdialog.h"
-
+#include <QElapsedTimer>
 // if defined: enables some timing measurements
 //#define DEBUG_TIMING
 
@@ -45,6 +45,10 @@
 #define LOG_PREFIX "[Andor]:  "
 #define GLOBAL_INI services->getConfigFileDirectory()+QString("/cam_andor.ini")
 
+
+//QElapsedTimer __timer; \
+//__timer.start(); \
+//qDebug()<<"ANDOR_INSTRUCTION  \""<<#s<<"\":  duration: "<<__timer.nsecsElapsed()/1e6<<" msecs"; \
 
 #define CHECK(s, msg) \
 { \

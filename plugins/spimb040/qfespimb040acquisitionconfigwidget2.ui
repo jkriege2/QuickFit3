@@ -1619,12 +1619,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>656</x>
-     <y>648</y>
+     <x>422</x>
+     <y>660</y>
     </hint>
     <hint type="destinationlabel">
-     <x>787</x>
-     <y>654</y>
+     <x>503</x>
+     <y>664</y>
     </hint>
    </hints>
   </connection>
@@ -1635,12 +1635,44 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>661</x>
-     <y>682</y>
+     <x>422</x>
+     <y>692</y>
     </hint>
     <hint type="destinationlabel">
-     <x>736</x>
-     <y>683</y>
+     <x>503</x>
+     <y>696</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkLightpathPreview5</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFESPIMB040AcquisitionConfigWidget2</receiver>
+   <slot>updateBackgroundWidgets()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>309</x>
+     <y>652</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>256</x>
+     <y>579</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkLightpathPreview6</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFESPIMB040AcquisitionConfigWidget2</receiver>
+   <slot>updateBackgroundWidgets()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>350</x>
+     <y>685</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>382</x>
+     <y>581</y>
     </hint>
    </hints>
   </connection>
