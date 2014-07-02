@@ -415,12 +415,7 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
                 for (int f=0; f<frames; f++) {
                     QTime time=QTime::currentTime();
                     if (ecamera->acquireOnCamera(camera, buffer, NULL, &acqD)) {
-                        //////////////////////////////////////////////////////////////////////////////////////
-                        // Close Main shutter
-                        //////////////////////////////////////////////////////////////////////////////////////
-                        if (mainShutterOpenOnlyForAcquisition && optSetup->isMainIlluminationShutterAvailable()) {
-                            optSetup->setMainIlluminationShutter(false, true);
-                        }
+
                         if (acquisitionDescription) {
                             if (f==0) {
                                 QMapIterator<QString, QVariant> it(acqD);
@@ -460,6 +455,12 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
                         ok=false;
                     }
                     if (!ok) break;
+                }
+                //////////////////////////////////////////////////////////////////////////////////////
+                // Close Main shutter
+                //////////////////////////////////////////////////////////////////////////////////////
+                if (mainShutterOpenOnlyForAcquisition && optSetup->isMainIlluminationShutterAvailable()) {
+                    optSetup->setMainIlluminationShutter(false, true);
                 }
                 TIFFClose(tiff);
             } else {
