@@ -134,7 +134,12 @@ HEADERS += dlgnewproperty.h \
     qffitalgorithmparameterstorage.h \
     qftabledelegate.h \
     qfcfitfunction.h \
-    qfdlgcsvparameters.h
+    qfdlgcsvparameters.h \
+    sdk_fitfunctions/quickfit-model-tools.h \
+    sdk_fitfunctions/quickfit-model-header2.h \
+    sdk_fitfunctions/quickfit-model-header.h \
+    sdk_fitfunctions/quickfit-model-functions.h \
+    sdk_fitfunctions/quickfit-model-basefunctions.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \

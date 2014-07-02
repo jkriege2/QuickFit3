@@ -53,7 +53,8 @@ HEADERS += spimb040.h \
     qfespimb040opticssetupbase.h \
     qfespimb040opticssetup2.h \
     ../../../../../LIB/trunk/jkmathparser.h \
-    ../../../../../LIB/trunk/jkiniparser2.h
+    ../../../../../LIB/trunk/jkiniparser2.h \
+    qfespimb040overviewacquisitionconfigwidget.h
 
 SOURCES += spimb040.cpp \
            qfespimb040cameraview.cpp \
@@ -86,7 +87,8 @@ SOURCES += spimb040.cpp \
     qfespimb040opticssetupbase.cpp \
     qfespimb040opticssetup2.cpp \
     ../../../../../LIB/trunk/jkmathparser.cpp \
-    ../../../../../LIB/trunk/jkiniparser2.cpp
+    ../../../../../LIB/trunk/jkiniparser2.cpp \
+    qfespimb040overviewacquisitionconfigwidget.cpp
 FORMS = \
     qfespimb040opticssetup.ui \
     qfespimb00histogrammaskdialog.ui \
@@ -103,7 +105,8 @@ FORMS = \
     replacedialog.ui \
     finddialog.ui \
     qfespimb040configtabwidget.ui \
-    qfespimb040opticssetup2.ui
+    qfespimb040opticssetup2.ui \
+    qfespimb040overviewacquisitionconfigwidget.ui
 
 RESOURCES += spimb040.qrc
 

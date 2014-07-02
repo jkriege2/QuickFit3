@@ -21,6 +21,7 @@ QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(QFPluginServices* pluginServices,
     widDeviceParamScan=NULL;
     widExperimentDescription=NULL;
     widAcquisition=NULL;
+    widOverview=NULL;
     widConfig=NULL;
     optSetup=NULL;
     optSetup2=NULL;
@@ -46,6 +47,7 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     if (widScriptedAcquisition) widScriptedAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acqscripted/");
     if (widImageStack) widImageStack->loadSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
+    if (widOverview) widOverview->loadSettings((*settings->getQSettings()), "plugin_spim_b040/overviewacquisition/");
     if (widCamParamScan) widCamParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
     if (widDeviceParamScan) widDeviceParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/deviceparamscan/");
     if (widConfig) widConfig->loadSettings((*settings->getQSettings()), "plugin_spim_b040/config/");
@@ -89,6 +91,7 @@ void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
     if (widScriptedAcquisition) widScriptedAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acqscripted/");
     if (widImageStack) widImageStack->storeSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
     if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
+    if (widOverview) widOverview->storeSettings((*settings->getQSettings()), "plugin_spim_b040/overviewacquisition/");
     if (widCamParamScan) widCamParamScan->storeSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
     if (widDeviceParamScan) widDeviceParamScan->storeSettings((*settings->getQSettings()), "plugin_spim_b040/deviceparamscan/");
     if (widConfig) widConfig->storeSettings((*settings->getQSettings()), "plugin_spim_b040/config/");
@@ -202,6 +205,13 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         connect(optSetup, SIGNAL(lightpathesChanged(QFESPIMB040OpticsSetupItems)), widImageStack, SLOT(lightpathesChanged(QFESPIMB040OpticsSetupItems)));
 
         //------------------------------------------------------------------------------------------
+        // create tab for overview image series acquisition
+        //------------------------------------------------------------------------------------------
+        widOverview=new QFESPIMB040OverviewAcquisitionConfigWidget(this, this, this, m_pluginServices, optSetup, widAcquisitionDescription, widExperimentDescription, m_pluginServices->getConfigFileDirectory());
+        tabMain->addTab(widOverview, tr("Acquisition: Overview Images"));
+        connect(optSetup, SIGNAL(lightpathesChanged(QFESPIMB040OpticsSetupItems)), widOverview, SLOT(lightpathesChanged(QFESPIMB040OpticsSetupItems)));
+
+        //------------------------------------------------------------------------------------------
         // create tab for cam parameter image series acquisition
         //------------------------------------------------------------------------------------------
         widCamParamScan=new QFESPIMB040CamParamStackConfigWidget2(this, this, this, m_pluginServices, optSetup, widAcquisitionDescription, widExperimentDescription, m_pluginServices->getConfigFileDirectory());
@@ -289,7 +299,7 @@ void QFESPIMB040MainWindow2::doDeviceParameterStack()
 
 
 
-bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32, QMap<QString, QVariant>* acquisitionDescription, const QString& acquisitionDescriptionPrefix, bool mainShutterOpenOnlyForAcquisition) {
+bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32, QMap<QString, QVariant>* acquisitionDescription, const QString& acquisitionDescriptionPrefix, bool mainShutterOpenOnlyForAcquisition, int frames) {
     //////////////////////////////////////////////////////////////////////////////////////
     // INIT variables
     //////////////////////////////////////////////////////////////////////////////////////
@@ -340,59 +350,123 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
     //////////////////////////////////////////////////////////////////////////////////////
     if (ok) {
         QMap<QString, QVariant> acqD;
-        QTime time=QTime::currentTime();
-        if (ecamera->acquireOnCamera(camera, buffer, NULL, &acqD)) {
-            //////////////////////////////////////////////////////////////////////////////////////
-            // Close Main shutter
-            //////////////////////////////////////////////////////////////////////////////////////
-            if (mainShutterOpenOnlyForAcquisition && optSetup->isMainIlluminationShutterAvailable()) {
-                optSetup->setMainIlluminationShutter(false, true);
-            }
-            if (acquisitionDescription) {
-                QMapIterator<QString, QVariant> it(acqD);
-                while (it.hasNext()) {
-                    it.next();
-                    (*acquisitionDescription)[acquisitionDescriptionPrefix+it.key()]=it.value();
-                }
-                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/dualview_mode"]=optSetup->dualViewMode(ecamera, camera);
-                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/image_width"]=width;
-                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/image_height"]=height;
-                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/exposure_time"]=ecamera->getCameraExposureTime(camera);
-                optSetup->saveLightpathConfig((*acquisitionDescription), optSetup->getCurrentLightpath(), acquisitionDescriptionPrefix+"/lightpath/", QList<bool>(), true);
-                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/timestamp"]=time;
-                getAdditionalCameraSettings(ecamera, camera, acquisitionDescriptionPrefix, (*acquisitionDescription));
+        if (frames<=1) {
 
-            }
-            QDir().mkpath(QFileInfo(TIFFFIlename.toAscii().data()).absolutePath());
-            tiff=TIFFOpen(TIFFFIlename.toAscii().data(), "w");
-            if (!tiff) {
-                ok=false;
-            } else {
-                TIFFTWriteUint16from32(tiff, buffer, width, height, false);
-                TIFFClose(tiff);
-            }
-            bool is32bit=false;
-            for (int i=0; i<width*height; i++) {
-                if ((buffer[i]&0xFFFF0000) != 0) {
-                    is32bit=true;
-                    break;
+            QTime time=QTime::currentTime();
+            if (ecamera->acquireOnCamera(camera, buffer, NULL, &acqD)) {
+                //////////////////////////////////////////////////////////////////////////////////////
+                // Close Main shutter
+                //////////////////////////////////////////////////////////////////////////////////////
+                if (mainShutterOpenOnlyForAcquisition && optSetup->isMainIlluminationShutterAvailable()) {
+                    optSetup->setMainIlluminationShutter(false, true);
                 }
-            }
-            if (ok && is32bit) {
-                tiff=TIFFOpen(TIFFFIlename32.toAscii().data(), "w");
+                if (acquisitionDescription) {
+                    QMapIterator<QString, QVariant> it(acqD);
+                    while (it.hasNext()) {
+                        it.next();
+                        (*acquisitionDescription)[acquisitionDescriptionPrefix+it.key()]=it.value();
+                    }
+                    (*acquisitionDescription)[acquisitionDescriptionPrefix+"/dualview_mode"]=optSetup->dualViewMode(ecamera, camera);
+                    (*acquisitionDescription)[acquisitionDescriptionPrefix+"/image_width"]=width;
+                    (*acquisitionDescription)[acquisitionDescriptionPrefix+"/image_height"]=height;
+                    (*acquisitionDescription)[acquisitionDescriptionPrefix+"/exposure_time"]=ecamera->getCameraExposureTime(camera);
+                    optSetup->saveLightpathConfig((*acquisitionDescription), optSetup->getCurrentLightpath(), acquisitionDescriptionPrefix+"/lightpath/", QList<bool>(), true);
+                    (*acquisitionDescription)[acquisitionDescriptionPrefix+"/timestamp"]=time;
+                    getAdditionalCameraSettings(ecamera, camera, acquisitionDescriptionPrefix, (*acquisitionDescription));
+
+                }
+                QDir().mkpath(QFileInfo(TIFFFIlename.toAscii().data()).absolutePath());
+                tiff=TIFFOpen(TIFFFIlename.toAscii().data(), "w");
                 if (!tiff) {
                     ok=false;
                 } else {
-                    if (filename32) {
-                        *filename32=TIFFFIlename32;
-                    }
-                    TIFFTWriteUint32(tiff, buffer, width, height);
+                    TIFFTWriteUint16from32(tiff, buffer, width, height, false);
                     TIFFClose(tiff);
                 }
+                bool is32bit=false;
+                for (int i=0; i<width*height; i++) {
+                    if ((buffer[i]&0xFFFF0000) != 0) {
+                        is32bit=true;
+                        break;
+                    }
+                }
+                if (ok && is32bit) {
+                    tiff=TIFFOpen(TIFFFIlename32.toAscii().data(), "w");
+                    if (!tiff) {
+                        ok=false;
+                    } else {
+                        if (filename32) {
+                            *filename32=TIFFFIlename32;
+                        }
+                        TIFFTWriteUint32(tiff, buffer, width, height);
+                        TIFFClose(tiff);
+                    }
+                }
+            } else {
+                ok=false;
             }
-        } else {
-            ok=false;
+        } else if (frames>=2) {
+
+            QDir().mkpath(QFileInfo(TIFFFIlename.toAscii().data()).absolutePath());
+            tiff=TIFFOpen(TIFFFIlename.toAscii().data(), "w");
+            if (tiff) {
+                ok=true;
+                bool is32bit=false;
+                for (int f=0; f<frames; f++) {
+                    QTime time=QTime::currentTime();
+                    if (ecamera->acquireOnCamera(camera, buffer, NULL, &acqD)) {
+                        //////////////////////////////////////////////////////////////////////////////////////
+                        // Close Main shutter
+                        //////////////////////////////////////////////////////////////////////////////////////
+                        if (mainShutterOpenOnlyForAcquisition && optSetup->isMainIlluminationShutterAvailable()) {
+                            optSetup->setMainIlluminationShutter(false, true);
+                        }
+                        if (acquisitionDescription) {
+                            if (f==0) {
+                                QMapIterator<QString, QVariant> it(acqD);
+                                while (it.hasNext()) {
+                                    it.next();
+                                    (*acquisitionDescription)[acquisitionDescriptionPrefix+it.key()]=it.value();
+                                }
+                                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/dualview_mode"]=optSetup->dualViewMode(ecamera, camera);
+                                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/image_width"]=width;
+                                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/image_height"]=height;
+                                (*acquisitionDescription)[acquisitionDescriptionPrefix+"/exposure_time"]=ecamera->getCameraExposureTime(camera);
+                                optSetup->saveLightpathConfig((*acquisitionDescription), optSetup->getCurrentLightpath(), acquisitionDescriptionPrefix+"/lightpath/", QList<bool>(), true);
+                                getAdditionalCameraSettings(ecamera, camera, acquisitionDescriptionPrefix, (*acquisitionDescription));
+                            }
+                            (*acquisitionDescription)[acquisitionDescriptionPrefix+QString("/timestamp%1").arg(f+1)]=time;
+
+                        }
+                        if (f==0) {
+                            for (int i=0; i<width*height; i++) {
+                                if ((buffer[i]&0xFFFF0000) != 0) {
+                                    is32bit=true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (!tiff) {
+                            ok=false;
+                        } else {
+                            if (ok && is32bit) {
+                                TIFFTWriteUint32(tiff, buffer, width, height);
+                            } else if (ok) {
+                                TIFFTWriteUint16from32(tiff, buffer, width, height, false);
+                            }
+                            TIFFWriteDirectory(tiff);
+                        }
+                    } else {
+                        ok=false;
+                    }
+                    if (!ok) break;
+                }
+                TIFFClose(tiff);
+            } else {
+                ok=false;
+            }
         }
+
         if (buffer) free(buffer);
     }
 
@@ -962,7 +1036,7 @@ bool QFESPIMB040MainWindow2::connectStageForAcquisition(QFExtensionLinearStage* 
     return ok;
 }
 
-bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathFilename, const QString& lightpathName, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& previewSettingsFilename1, const QString& outputFilename, const QString& imageID, const QString& imageDescription, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, QMap<QString, QVariant>& acquisitionDescription1, bool mainShutterOpenOnlyForAcquisition) {
+bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathFilename, const QString& lightpathName, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& previewSettingsFilename1, const QString& outputFilename, const QString& imageID, const QString& imageDescription, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, QMap<QString, QVariant>& acquisitionDescription1, bool mainShutterOpenOnlyForAcquisition, int frames) {
 
 
     bool oldShutterState=false;
@@ -990,7 +1064,7 @@ bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathF
 
     QDateTime time=QDateTime::currentDateTime();
     QString filename32="";
-    bool ok=savePreview(extension1, ecamera1, camera1, previewSettingsFilename1, outputFilename, &filename32, &acquisitionDescription1, imageID+"/", mainShutterOpenOnlyForAcquisition);
+    bool ok=savePreview(extension1, ecamera1, camera1, previewSettingsFilename1, outputFilename, &filename32, &acquisitionDescription1, imageID+"/", mainShutterOpenOnlyForAcquisition, frames);
     if (ok) {
         log_text(tr("  - acquired %1!\n").arg(imageDescription));
         acquisitionDescription1[imageID+"/image_width"]=ecamera1->getCameraImageWidth(camera1);
