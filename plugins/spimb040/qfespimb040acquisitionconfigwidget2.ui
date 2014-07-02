@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1158</width>
-    <height>818</height>
+    <height>824</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,6 +18,43 @@
     <layout class="QHBoxLayout" name="horizontalLayout_5">
      <item>
       <widget class="QComboBox" name="cmbLightpathPreview3">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToContents</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_25">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkLightpathPreview6">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>preview 6 lightpath:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cmbLightpathPreview6">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -148,6 +185,36 @@ p, li { white-space: pre-wrap; }
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="labPreview2_6">
+          <property name="text">
+           <string>Previe&amp;w Settings 6:</string>
+          </property>
+          <property name="buddy">
+           <cstring>cmbPreviewSettings2_1</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings2_6" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAcq2TestPreview6">
+          <property name="text">
+           <string>&amp;Test</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -295,6 +362,36 @@ p, li { white-space: pre-wrap; }
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="labPreview2_5">
+          <property name="text">
+           <string>Previe&amp;w Settings 5:</string>
+          </property>
+          <property name="buddy">
+           <cstring>cmbPreviewSettings2_1</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings2_5" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAcq2TestPreview5">
+          <property name="text">
+           <string>&amp;Test</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -857,6 +954,36 @@ p, li { white-space: pre-wrap; }
           </property>
          </spacer>
         </item>
+        <item>
+         <widget class="QLabel" name="labPreview1_6">
+          <property name="text">
+           <string>&amp;Preview Settings 6:</string>
+          </property>
+          <property name="buddy">
+           <cstring>cmbPreviewSettings1_1</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_6" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAcq1TestPreview6">
+          <property name="text">
+           <string>&amp;Test</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </item>
       <item row="2" column="0">
@@ -913,6 +1040,36 @@ p, li { white-space: pre-wrap; }
            </size>
           </property>
          </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="labPreview1_5">
+          <property name="text">
+           <string>&amp;Preview Settings 5:</string>
+          </property>
+          <property name="buddy">
+           <cstring>cmbPreviewSettings1_1</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QFCameraConfigEditorWidget" name="cmbPreviewSettings1_5" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>150</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="focusPolicy">
+           <enum>Qt::TabFocus</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnAcq1TestPreview5">
+          <property name="text">
+           <string>&amp;Test</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>
@@ -996,6 +1153,19 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
+      <spacer name="horizontalSpacer_26">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_16">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -1034,20 +1204,6 @@ p, li { white-space: pre-wrap; }
      </property>
      <property name="buddy">
       <cstring>spinRepeat</cstring>
-     </property>
-    </widget>
-   </item>
-   <item row="11" column="0">
-    <widget class="QCheckBox" name="chkLightpathPreview3">
-     <property name="font">
-      <font>
-       <pointsize>8</pointsize>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>preview 3 lightpath:</string>
      </property>
     </widget>
    </item>
@@ -1260,6 +1416,43 @@ p, li { white-space: pre-wrap; }
       </widget>
      </item>
      <item>
+      <spacer name="horizontalSpacer_24">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkLightpathPreview5">
+       <property name="font">
+        <font>
+         <pointsize>8</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>preview 5 lightpath:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="cmbLightpathPreview5">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="sizeAdjustPolicy">
+        <enum>QComboBox::AdjustToContents</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_4">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -1273,6 +1466,20 @@ p, li { white-space: pre-wrap; }
       </spacer>
      </item>
     </layout>
+   </item>
+   <item row="11" column="0">
+    <widget class="QCheckBox" name="chkLightpathPreview3">
+     <property name="font">
+      <font>
+       <pointsize>8</pointsize>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>preview 3 lightpath:</string>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
@@ -1409,6 +1616,38 @@ p, li { white-space: pre-wrap; }
     <hint type="destinationlabel">
      <x>489</x>
      <y>513</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkLightpathPreview5</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbLightpathPreview5</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>656</x>
+     <y>648</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>787</x>
+     <y>654</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkLightpathPreview6</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbLightpathPreview6</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>661</x>
+     <y>682</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>736</x>
+     <y>683</y>
     </hint>
    </hints>
   </connection>

@@ -99,6 +99,10 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         bool lightpathActivatedPreview(int preview=0);
         int previewCount();
 
+        QString lightpathPreview6() const;
+        QString lightpathFilenamePreview6() const;
+        QString lightpathPreview5() const;
+        QString lightpathFilenamePreview5() const;
         QString lightpathPreview4() const;
         QString lightpathFilenamePreview4() const;
         QString lightpathPreview3() const;
@@ -109,6 +113,8 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         bool lightpathActivatedPreview2() const;
         bool lightpathActivatedPreview3() const;
         bool lightpathActivatedPreview4() const;
+        bool lightpathActivatedPreview5() const;
+        bool lightpathActivatedPreview6() const;
     protected slots:
         void on_btnSaveTemplate_clicked();
         void on_btnLoadTemplate_clicked();
@@ -134,6 +140,10 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         void on_btnAcq1TestPreview3_released();
         void on_btnAcq1TestPreview4_pressed();
         void on_btnAcq1TestPreview4_released();
+        void on_btnAcq1TestPreview5_pressed();
+        void on_btnAcq1TestPreview5_released();
+        void on_btnAcq1TestPreview6_pressed();
+        void on_btnAcq1TestPreview6_released();
 
         void on_btnAcq2Test_pressed();
         void on_btnAcq2Test_released();
@@ -145,6 +155,10 @@ class QFESPIMB040AcquisitionConfigWidget2 : public QWidget, public QFESPIMB040Fi
         void on_btnAcq2TestPreview3_released();
         void on_btnAcq2TestPreview4_pressed();
         void on_btnAcq2TestPreview4_released();
+        void on_btnAcq2TestPreview5_pressed();
+        void on_btnAcq2TestPreview5_released();
+        void on_btnAcq2TestPreview6_pressed();
+        void on_btnAcq2TestPreview6_released();
 
     private:
         QFPluginServices* m_pluginServices;

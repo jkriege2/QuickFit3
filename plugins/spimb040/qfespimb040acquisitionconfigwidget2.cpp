@@ -50,6 +50,12 @@ QFESPIMB040AcquisitionConfigWidget2::QFESPIMB040AcquisitionConfigWidget2(QFESPIM
         ui->cmbPreviewSettings1_4->init(configDirectory);
         ui->cmbPreviewSettings1_4->setStopResume(opticsSetup->getStopRelease(0));
         ui->cmbPreviewSettings1_4->connectTo(opticsSetup->cameraComboBox(0));
+        ui->cmbPreviewSettings1_5->init(configDirectory);
+        ui->cmbPreviewSettings1_5->setStopResume(opticsSetup->getStopRelease(0));
+        ui->cmbPreviewSettings1_5->connectTo(opticsSetup->cameraComboBox(0));
+        ui->cmbPreviewSettings1_6->init(configDirectory);
+        ui->cmbPreviewSettings1_6->setStopResume(opticsSetup->getStopRelease(0));
+        ui->cmbPreviewSettings1_6->connectTo(opticsSetup->cameraComboBox(0));
 
         ui->cmbAcquisitionSettings2->init(configDirectory);
         ui->cmbAcquisitionSettings2->setStopResume(opticsSetup->getStopRelease(1));
@@ -66,6 +72,12 @@ QFESPIMB040AcquisitionConfigWidget2::QFESPIMB040AcquisitionConfigWidget2(QFESPIM
         ui->cmbPreviewSettings2_4->init(configDirectory);
         ui->cmbPreviewSettings2_4->setStopResume(opticsSetup->getStopRelease(1));
         ui->cmbPreviewSettings2_4->connectTo(opticsSetup->cameraComboBox(1));
+        ui->cmbPreviewSettings2_5->init(configDirectory);
+        ui->cmbPreviewSettings2_5->setStopResume(opticsSetup->getStopRelease(1));
+        ui->cmbPreviewSettings2_5->connectTo(opticsSetup->cameraComboBox(1));
+        ui->cmbPreviewSettings2_6->init(configDirectory);
+        ui->cmbPreviewSettings2_6->setStopResume(opticsSetup->getStopRelease(1));
+        ui->cmbPreviewSettings2_6->connectTo(opticsSetup->cameraComboBox(1));
     }
 
     updateReplaces();
@@ -101,6 +113,10 @@ void QFESPIMB040AcquisitionConfigWidget2::loadSettings(QSettings& settings, QStr
     ui->cmbPreviewSettings2_3->setCurrentConfig(settings.value(prefix+"prevsettings23", "default").toString());
     ui->cmbPreviewSettings1_4->setCurrentConfig(settings.value(prefix+"prevsettings14", "default").toString());
     ui->cmbPreviewSettings2_4->setCurrentConfig(settings.value(prefix+"prevsettings24", "default").toString());
+    ui->cmbPreviewSettings1_5->setCurrentConfig(settings.value(prefix+"prevsettings15", "default").toString());
+    ui->cmbPreviewSettings2_5->setCurrentConfig(settings.value(prefix+"prevsettings25", "default").toString());
+    ui->cmbPreviewSettings1_6->setCurrentConfig(settings.value(prefix+"prevsettings16", "default").toString());
+    ui->cmbPreviewSettings2_6->setCurrentConfig(settings.value(prefix+"prevsettings26", "default").toString());
 
     //ui->chkLightpath->setChecked(settings.value(prefix+"lightpath", false).toBool());
     ui->cmbLightpath->setCurrentIndex(settings.value(prefix+"lightpathidx", -1).toInt());
@@ -111,6 +127,10 @@ void QFESPIMB040AcquisitionConfigWidget2::loadSettings(QSettings& settings, QStr
     ui->cmbLightpathPreview3->setCurrentIndex(settings.value(prefix+"lightpathidx_preview3", -1).toInt());
     ui->chkLightpathPreview4->setChecked(settings.value(prefix+"lightpath_preview4", false).toBool());
     ui->cmbLightpathPreview4->setCurrentIndex(settings.value(prefix+"lightpathidx_preview4", -1).toInt());
+    ui->chkLightpathPreview5->setChecked(settings.value(prefix+"lightpath_preview5", false).toBool());
+    ui->cmbLightpathPreview5->setCurrentIndex(settings.value(prefix+"lightpathidx_preview5", -1).toInt());
+    ui->chkLightpathPreview6->setChecked(settings.value(prefix+"lightpath_preview6", false).toBool());
+    ui->cmbLightpathPreview6->setCurrentIndex(settings.value(prefix+"lightpathidx_preview6", -1).toInt());
     ui->chkNoBackground1->setChecked(settings.value(prefix+"chkNoBackground1", false).toBool());
     ui->chkNoPreview1->setChecked(settings.value(prefix+"chkNoPreview1", false).toBool());
     ui->chkNoBackground2->setChecked(settings.value(prefix+"chkNoBackground2", false).toBool());
@@ -144,6 +164,10 @@ void QFESPIMB040AcquisitionConfigWidget2::storeSettings(QSettings& settings, QSt
     settings.setValue(prefix+"prevsettings23", ui->cmbPreviewSettings2_3->currentConfigName());
     settings.setValue(prefix+"prevsettings14", ui->cmbPreviewSettings1_4->currentConfigName());
     settings.setValue(prefix+"prevsettings24", ui->cmbPreviewSettings2_4->currentConfigName());
+    settings.setValue(prefix+"prevsettings15", ui->cmbPreviewSettings1_5->currentConfigName());
+    settings.setValue(prefix+"prevsettings25", ui->cmbPreviewSettings2_5->currentConfigName());
+    settings.setValue(prefix+"prevsettings16", ui->cmbPreviewSettings1_6->currentConfigName());
+    settings.setValue(prefix+"prevsettings26", ui->cmbPreviewSettings2_6->currentConfigName());
 
     settings.setValue(prefix+"lightpathidx", ui->cmbLightpath->currentIndex());
     //settings.setValue(prefix+"lightpath", ui->chkLightpath->isChecked());
@@ -153,6 +177,10 @@ void QFESPIMB040AcquisitionConfigWidget2::storeSettings(QSettings& settings, QSt
     settings.setValue(prefix+"lightpath_preview3", ui->chkLightpathPreview3->isChecked());
     settings.setValue(prefix+"lightpathidx_preview4", ui->cmbLightpathPreview4->currentIndex());
     settings.setValue(prefix+"lightpath_preview4", ui->chkLightpathPreview4->isChecked());
+    settings.setValue(prefix+"lightpathidx_preview5", ui->cmbLightpathPreview5->currentIndex());
+    settings.setValue(prefix+"lightpath_preview5", ui->chkLightpathPreview5->isChecked());
+    settings.setValue(prefix+"lightpathidx_preview6", ui->cmbLightpathPreview6->currentIndex());
+    settings.setValue(prefix+"lightpath_preview6", ui->chkLightpathPreview6->isChecked());
     settings.setValue(prefix+"chkNoBackground1", ui->chkNoBackground1->isChecked());
     settings.setValue(prefix+"chkNoPreview1", ui->chkNoPreview1->isChecked());
     settings.setValue(prefix+"chkNoBackground2", ui->chkNoBackground2->isChecked());
@@ -295,11 +323,15 @@ void QFESPIMB040AcquisitionConfigWidget2::setCameraConfigOverview(int camera, in
         else if (preview==1) ui->cmbPreviewSettings1_2->setCurrentConfig(id);
         else if (preview==2) ui->cmbPreviewSettings1_3->setCurrentConfig(id);
         else if (preview==3) ui->cmbPreviewSettings1_4->setCurrentConfig(id);
+        else if (preview==4) ui->cmbPreviewSettings1_5->setCurrentConfig(id);
+        else if (preview==5) ui->cmbPreviewSettings1_6->setCurrentConfig(id);
     } else if (camera==1) {
         if (preview==0) ui->cmbPreviewSettings2_1->setCurrentConfig(id);
         else if (preview==1) ui->cmbPreviewSettings2_2->setCurrentConfig(id);
         else if (preview==2) ui->cmbPreviewSettings2_3->setCurrentConfig(id);
         else if (preview==3) ui->cmbPreviewSettings2_4->setCurrentConfig(id);
+        else if (preview==4) ui->cmbPreviewSettings2_5->setCurrentConfig(id);
+        else if (preview==5) ui->cmbPreviewSettings2_6->setCurrentConfig(id);
     }
 }
 
@@ -310,11 +342,15 @@ void QFESPIMB040AcquisitionConfigWidget2::setCameraConfigOverview(int camera, in
         else if (preview==1) ui->cmbPreviewSettings1_2->setCurrentConfig(id);
         else if (preview==2) ui->cmbPreviewSettings1_3->setCurrentConfig(id);
         else if (preview==3) ui->cmbPreviewSettings1_4->setCurrentConfig(id);
+        else if (preview==4) ui->cmbPreviewSettings1_5->setCurrentConfig(id);
+        else if (preview==5) ui->cmbPreviewSettings1_6->setCurrentConfig(id);
     } else if (camera==1) {
         if (preview==0) ui->cmbPreviewSettings2_1->setCurrentConfig(id);
         else if (preview==1) ui->cmbPreviewSettings2_2->setCurrentConfig(id);
         else if (preview==2) ui->cmbPreviewSettings2_3->setCurrentConfig(id);
         else if (preview==3) ui->cmbPreviewSettings2_4->setCurrentConfig(id);
+        else if (preview==4) ui->cmbPreviewSettings2_5->setCurrentConfig(id);
+        else if (preview==5) ui->cmbPreviewSettings2_6->setCurrentConfig(id);
     }
 }
 
@@ -343,6 +379,13 @@ bool QFESPIMB040AcquisitionConfigWidget2::lightpathActivatedPreview4() const {
     return ui->chkLightpathPreview4->isChecked();
 }
 
+bool QFESPIMB040AcquisitionConfigWidget2::lightpathActivatedPreview5() const {
+    return ui->chkLightpathPreview5->isChecked();
+}
+
+bool QFESPIMB040AcquisitionConfigWidget2::lightpathActivatedPreview6() const {
+    return ui->chkLightpathPreview6->isChecked();
+}
 QString QFESPIMB040AcquisitionConfigWidget2::lightpathFilename() const {
     return ui->cmbLightpath->itemData(ui->cmbLightpath->currentIndex()).toString();
 }
@@ -366,12 +409,24 @@ QString QFESPIMB040AcquisitionConfigWidget2::lightpathFilenamePreview3() const {
 QString QFESPIMB040AcquisitionConfigWidget2::lightpathFilenamePreview4() const {
     return ui->cmbLightpathPreview4->itemData(ui->cmbLightpathPreview4->currentIndex()).toString();
 }
+QString QFESPIMB040AcquisitionConfigWidget2::lightpathFilenamePreview5() const {
+    return ui->cmbLightpathPreview5->itemData(ui->cmbLightpathPreview5->currentIndex()).toString();
+}
+QString QFESPIMB040AcquisitionConfigWidget2::lightpathFilenamePreview6() const {
+    return ui->cmbLightpathPreview6->itemData(ui->cmbLightpathPreview6->currentIndex()).toString();
+}
 
 QString QFESPIMB040AcquisitionConfigWidget2::lightpathPreview3() const {
     return ui->cmbLightpathPreview3->currentText();
 }
 QString QFESPIMB040AcquisitionConfigWidget2::lightpathPreview4() const {
     return ui->cmbLightpathPreview4->currentText();
+}
+QString QFESPIMB040AcquisitionConfigWidget2::lightpathPreview5() const {
+    return ui->cmbLightpathPreview5->currentText();
+}
+QString QFESPIMB040AcquisitionConfigWidget2::lightpathPreview6() const {
+    return ui->cmbLightpathPreview6->currentText();
 }
 void QFESPIMB040AcquisitionConfigWidget2::on_btnAcquire_clicked() {
 
@@ -419,6 +474,10 @@ void QFESPIMB040AcquisitionConfigWidget2::updateBackgroundWidgets() {
     ui->cmbPreviewSettings2_3->setEnabled(ui->chkLightpathPreview3->isChecked());
     ui->cmbPreviewSettings1_4->setEnabled(ui->chkLightpathPreview4->isChecked());
     ui->cmbPreviewSettings2_4->setEnabled(ui->chkLightpathPreview4->isChecked());
+    ui->cmbPreviewSettings1_5->setEnabled(ui->chkLightpathPreview5->isChecked());
+    ui->cmbPreviewSettings2_5->setEnabled(ui->chkLightpathPreview5->isChecked());
+    ui->cmbPreviewSettings1_6->setEnabled(ui->chkLightpathPreview6->isChecked());
+    ui->cmbPreviewSettings2_6->setEnabled(ui->chkLightpathPreview6->isChecked());
     ui->spinBackgroundFrames1->setEnabled(ui->chkBackground->isChecked());
     ui->spinBackgroundFrames2->setEnabled(ui->chkBackground->isChecked());
     ui->labPreviewFrames1->setEnabled(ui->chkBackground->isChecked());
@@ -460,6 +519,14 @@ QString QFESPIMB040AcquisitionConfigWidget2::currentPreviewConfigFilename(int ca
         if (camera==0) return ui->cmbPreviewSettings1_4->currentConfigFilename();
         if (camera==1) return ui->cmbPreviewSettings2_4->currentConfigFilename();
     }
+    if (preview==4) {
+        if (camera==0) return ui->cmbPreviewSettings1_5->currentConfigFilename();
+        if (camera==1) return ui->cmbPreviewSettings2_5->currentConfigFilename();
+    }
+    if (preview==5) {
+        if (camera==0) return ui->cmbPreviewSettings1_6->currentConfigFilename();
+        if (camera==1) return ui->cmbPreviewSettings2_6->currentConfigFilename();
+    }
     return "";
 }
 
@@ -480,6 +547,14 @@ QString QFESPIMB040AcquisitionConfigWidget2::currentPreviewConfigName(int camera
         if (camera==0) return ui->cmbPreviewSettings1_4->currentConfigName();
         if (camera==1) return ui->cmbPreviewSettings2_4->currentConfigName();
     }
+    if (preview==5) {
+        if (camera==0) return ui->cmbPreviewSettings1_5->currentConfigName();
+        if (camera==1) return ui->cmbPreviewSettings2_5->currentConfigName();
+    }
+    if (preview==6) {
+        if (camera==0) return ui->cmbPreviewSettings1_6->currentConfigName();
+        if (camera==1) return ui->cmbPreviewSettings2_6->currentConfigName();
+    }
     return "";
 }
 
@@ -498,21 +573,29 @@ void QFESPIMB040AcquisitionConfigWidget2::lightpathesChanged(QFESPIMB040OpticsSe
     QString idx2=ui->cmbLightpathPreview2->currentText();
     QString idx3=ui->cmbLightpathPreview3->currentText();
     QString idx4=ui->cmbLightpathPreview4->currentText();
+    QString idx5=ui->cmbLightpathPreview5->currentText();
+    QString idx6=ui->cmbLightpathPreview6->currentText();
     ui->cmbLightpath->clear();
     ui->cmbLightpathPreview2->clear();
     ui->cmbLightpathPreview3->clear();
     ui->cmbLightpathPreview4->clear();
+    ui->cmbLightpathPreview5->clear();
+    ui->cmbLightpathPreview6->clear();
     for (int i=0; i<lightpathes.size(); i++) {
         QTriple<QIcon, QString, QString> p=lightpathes[i];
         ui->cmbLightpath->addItem(p.first, p.second, p.third);
         ui->cmbLightpathPreview2->addItem(p.first, p.second, p.third);
         ui->cmbLightpathPreview3->addItem(p.first, p.second, p.third);
         ui->cmbLightpathPreview4->addItem(p.first, p.second, p.third);
+        ui->cmbLightpathPreview5->addItem(p.first, p.second, p.third);
+        ui->cmbLightpathPreview6->addItem(p.first, p.second, p.third);
     }
     ui->cmbLightpath->setCurrentIndex(qMax(0, ui->cmbLightpath->findText(idx)));
     ui->cmbLightpathPreview2->setCurrentIndex(qMax(0, ui->cmbLightpathPreview2->findText(idx2)));
     ui->cmbLightpathPreview3->setCurrentIndex(qMax(0, ui->cmbLightpathPreview3->findText(idx3)));
-    ui->cmbLightpathPreview4->setCurrentIndex(qMax(0, ui->cmbLightpathPreview4->findText(idx3)));
+    ui->cmbLightpathPreview4->setCurrentIndex(qMax(0, ui->cmbLightpathPreview4->findText(idx4)));
+    ui->cmbLightpathPreview5->setCurrentIndex(qMax(0, ui->cmbLightpathPreview5->findText(idx5)));
+    ui->cmbLightpathPreview6->setCurrentIndex(qMax(0, ui->cmbLightpathPreview6->findText(idx6)));
 }
 
 
@@ -583,6 +666,28 @@ void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1TestPreview4_released()
     opticsSetup->resetCameraPreview(0);
 }
 
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1TestPreview5_pressed()
+{
+    opticsSetup->overrideCameraPreview(0, ui->cmbPreviewSettings1_5->currentConfigFilename(), lightpathFilenamePreview(4));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1TestPreview5_released()
+{
+    opticsSetup->resetCameraPreview(0);
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1TestPreview6_pressed()
+{
+    opticsSetup->overrideCameraPreview(0, ui->cmbPreviewSettings1_6->currentConfigFilename(), lightpathFilenamePreview(5));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq1TestPreview6_released()
+{
+    opticsSetup->resetCameraPreview(0);
+}
+
+
+
 
 
 
@@ -636,6 +741,26 @@ void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2TestPreview4_released()
     opticsSetup->resetCameraPreview(1);
 }
 
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2TestPreview5_pressed()
+{
+    opticsSetup->overrideCameraPreview(1, ui->cmbPreviewSettings2_5->currentConfigFilename(), lightpathFilenamePreview(4));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2TestPreview5_released()
+{
+    opticsSetup->resetCameraPreview(1);
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2TestPreview6_pressed()
+{
+    opticsSetup->overrideCameraPreview(1, ui->cmbPreviewSettings2_6->currentConfigFilename(), lightpathFilenamePreview(5));
+}
+
+void QFESPIMB040AcquisitionConfigWidget2::on_btnAcq2TestPreview6_released()
+{
+    opticsSetup->resetCameraPreview(1);
+}
+
 
 
 
@@ -653,6 +778,10 @@ QString QFESPIMB040AcquisitionConfigWidget2::lightpathPreview(int preview) {
         return lightpathPreview3();
     } else if (preview==3) {
         return lightpathPreview4();
+    } else if (preview==4) {
+        return lightpathPreview5();
+    } else if (preview==5) {
+        return lightpathPreview6();
     }
     return "";
 }
@@ -666,6 +795,10 @@ QString QFESPIMB040AcquisitionConfigWidget2::lightpathFilenamePreview(int previe
         return lightpathFilenamePreview3();
     } else if (preview==3) {
         return lightpathFilenamePreview4();
+    } else if (preview==4) {
+        return lightpathFilenamePreview5();
+    } else if (preview==5) {
+        return lightpathFilenamePreview6();
     }
     return "";
 }
@@ -680,13 +813,17 @@ bool QFESPIMB040AcquisitionConfigWidget2::lightpathActivatedPreview(int preview)
         return lightpathActivatedPreview3();
     } else if (preview==3) {
         return lightpathActivatedPreview4();
+    } else if (preview==4) {
+        return lightpathActivatedPreview5();
+    } else if (preview==5) {
+        return lightpathActivatedPreview6();
     }
     return false;
 }
 
 int QFESPIMB040AcquisitionConfigWidget2::previewCount()
 {
-    return 4;
+    return 6;
 }
 
 void QFESPIMB040AcquisitionConfigWidget2::on_btnSaveTemplate_clicked()

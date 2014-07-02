@@ -207,7 +207,7 @@
 			<li>added JavaScript functions to set acquisition camera settings</li>
 			<li>added two filters for each of the two laser boxes</li>
 			<li>filters/objectives are sorted by name now!</li>
-			<li></li>
+                        <li>added two additional preview configs to the acquisition tab</li>
 			<li></li>
 			<li></li>
 			<li></li>
@@ -248,7 +248,7 @@
 			<li></li>
 		  </ul></li>	
 	      <li><b>spectra viewer</b><ul>
-			<li>added FRET Förster radius calculator</li>
+			<li>added FRET FÃ¶rster radius calculator</li>
 			<li></li>
 		  </ul></li>	
 	      <li><b>FCS MaxEnt evaluation</b><ul>
@@ -966,7 +966,7 @@
 		  <li><b>fcs:</b><ul>
 		    <li>added property to allow to use one countrate (e.g. when only one is available in an ALV file) for all runs</li>
 		    <li>plugin can load correlation output from the diffusion4 FCS simulation tool</li>
-		    <li>Added and integrated parser for ALV-6000 files by cloning and modding the existing ALV-5000 parser sparsely (thanks to Benedikt Häusele)</li>
+		    <li>Added and integrated parser for ALV-6000 files by cloning and modding the existing ALV-5000 parser sparsely (thanks to Benedikt HÃ¤usele)</li>
 		    <liIf an FCS record displays an autocorrelation measurement, but both color channels were acquired, the countrates for both channels are loaded and displayed. Still the countrate of the loaded ACF channel is returned as countrate channel 1 and the other one as 2, son in the red ACF record, the countrates are swapped</li>
 		  </ul></li>
 		  
@@ -986,8 +986,8 @@
 		    <li>anomalous diffusion model and diffusion model with c and D as parameters now work properly</li>
 		    <li>implemented simple 2-color-FCCS model</li>
 		    <li>corrected sorting behaviour (rhos and fixes are sorted now too)</li>
-		    <li>added functions with new Veff and c,D as parameters with 1/e²-widths</li>
-		    <li>added anomalous diffusion with e² radii and with c as fit parameter and e² radii</li>
+		    <li>added functions with new Veff and c,D as parameters with 1/eÂ²-widths</li>
+		    <li>added anomalous diffusion with eÂ² radii and with c as fit parameter and eÂ² radii</li>
 		    <li>added fit functions for 2-color FCCS anomalous diffusion</li>
 			<li>corrected description of equilibrium constants ... now dissociation constants and unit is correct!</li>
 			<li>added display fields for the molar brightnesses of fluorophores a and b</li>
@@ -1054,7 +1054,7 @@
 		  </ul></li>
 		  <li><b>fitfunction_spimagingFCS</b><ul>
 		    <li>added SPIM-crosscorrelation fit function with flow</li>
-		    <li>fixed some bugs in online-help (confusion on definition ot &sigma;<sub>xy</sub>, &sigma;<sub>z</sub>, w<sub>xy</sub> and w<sub>z</sub>, but: Models were not changed and the model names (1/e² or 1/&radic;e were correct!!!)</li>
+		    <li>fixed some bugs in online-help (confusion on definition ot &sigma;<sub>xy</sub>, &sigma;<sub>z</sub>, w<sub>xy</sub> and w<sub>z</sub>, but: Models were not changed and the model names (1/eÂ² or 1/&radic;e were correct!!!)</li>
 
 		  </ul></li>
 		  <li><b>fitfunction_fcs</b><ul>
@@ -1201,7 +1201,7 @@
 
 		  <li><b>DLS fit functions:</b><ul>
 		    <li>bugfix that caused crash due to new DLS fit function</li>
-		    <li>corrected unit of scattering vector q^2 from 1/nm to 1/nm²</li>
+		    <li>corrected unit of scattering vector q^2 from 1/nm to 1/nmÂ²</li>
 		    <li>added fit models expressed in terms of D and not tau</li>
 		  </ul></li>
 
@@ -1241,7 +1241,7 @@
 		  <li>new plugins:<ol>
 		    <li><b>fcs_msd:</b> extracts mean squared displacement from FCS measurements</li>
 		    <li><b>calc_diffcoeff:</b> calculates diffusion coefficients in a given solution and at a given temperature</li>
-			<li><b>spim_lightsheet_eval:</b> evaluate SPIM lightsheet properties from a x-stack (taken with a 45° mirror in a SPIM)</li>
+			<li><b>spim_lightsheet_eval:</b> evaluate SPIM lightsheet properties from a x-stack (taken with a 45Â° mirror in a SPIM)</li>
 			<li><b>fitfunctions_lightsheet:</b> fit functions (gaussian, slit function) for lightsheet cuts (see spim_lightsheet_eval)</li>
 			<li><b>number_and_brightness:</b> performs simple number and brightness analysis</li>
 			<li><a href="qf3spim_release_notes.html">more new plugins can be found in the separate SPIM plugins release!</a>
@@ -1515,7 +1515,7 @@
 		  <li>Lib: improved fit results table (now supports nicer formating of results)</li>
 		  <li>imagingFCS/FCS: selected graphs are plotted on top now</li>
 		  <li>imagingFCS/FCS: splitters are save to ini now correctly!</li>
-		  <li>minor error correction: (lag-time axis in seconds, not µs at different positions</li>
+		  <li>minor error correction: (lag-time axis in seconds, not Âµs at different positions</li>
 		  <li>new splash screen and icon (multiple sizes ;-) design</li>
 		  <li>lmfit: added lmfit (fast Levenberg Marquardt implementation) as fit algorithm plugin</li>
 		  <li>added special copyright.html files to online-help</li>
