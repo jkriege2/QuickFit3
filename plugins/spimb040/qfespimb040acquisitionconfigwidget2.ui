@@ -15,7 +15,7 @@
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="11" column="2" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,1,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0,0,0,1">
      <item>
       <widget class="QComboBox" name="cmbLightpathPreview3">
        <property name="enabled">
@@ -30,6 +30,9 @@
       <spacer name="horizontalSpacer_25">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -62,6 +65,19 @@
         <enum>QComboBox::AdjustToContents</enum>
        </property>
       </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -1378,7 +1394,7 @@ p, li { white-space: pre-wrap; }
     </widget>
    </item>
    <item row="10" column="2" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,1,0,0">
+    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0,0,0,1">
      <item>
       <widget class="QComboBox" name="cmbLightpathPreview2">
        <property name="enabled">
@@ -1393,6 +1409,9 @@ p, li { white-space: pre-wrap; }
       <spacer name="horizontalSpacer_24">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeType">
+        <enum>QSizePolicy::Fixed</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
@@ -1425,6 +1444,19 @@ p, li { white-space: pre-wrap; }
         <enum>QComboBox::AdjustToContents</enum>
        </property>
       </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
