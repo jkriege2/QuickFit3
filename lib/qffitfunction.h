@@ -21,7 +21,7 @@
 
 #ifndef QFFITFUNCTION_H
 #define QFFITFUNCTION_H
-
+#include <stdint.h>
 #include <QString>
 #include <QList>
 #include <QStringList>

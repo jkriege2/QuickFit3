@@ -1,5 +1,5 @@
-#ifndef QFSHAREDFITFUNCTION_H
-#define QFSHAREDFITFUNCTION_H
+#ifndef QFLibraryFitFunction_H
+#define QFLibraryFitFunction_H
 
 #include "qffitfunction.h"
 #include <QString>
@@ -10,16 +10,20 @@
 #include "qfmathtools.h"
 #include "lib_imexport.h"
 #include <QLibrary>
-#include "./sdk_fitfunctions/quickfit-model-tools.h"
 
-class QFLIB_EXPORT QFSharedFitFunction : public QFFitFunction
+class QFLibraryFitFunction_private;
+
+class QFLIB_EXPORT QFLibraryFitFunction : public QFFitFunction
 {
     public:
-        explicit QFSharedFitFunction(QLibrary* library);
+        explicit QFLibraryFitFunction(QLibrary* library);
+        virtual ~QFLibraryFitFunction();
 
         QString helpFile() const ;
 
         bool isValid() const;
+
+        QString lastError() const;
 
         /*! \copydoc QFFitFunction::()  */
         virtual QString name() const;
@@ -59,19 +63,9 @@ class QFLIB_EXPORT QFSharedFitFunction : public QFFitFunction
         virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N, const bool *fix=NULL);
 
 
-    protected:
-        QLibrary* library;
-        QString m_id;
-        QString m_name;
-        QString m_shortName;
-        QString m_help;
-        bool libOK;
+    private:
+        QFLibraryFitFunction_private* d;
 
-        QF3SimpleFFGetNameFunc lib_getName;
-        QF3SimpleFFMultiEvaluateFunc lib_evalMulti;
-        QF3SimpleFFGetParameterDescriptionFunc lib_getParams;
-        QF3SimpleFFGetParameterCountFunc lib_getParamCount;
-        QF3SimpleFFEvaluateFunc lib_eval;
 };
 
-#endif // QFSHAREDFITFUNCTION_H
+#endif // QFLibraryFitFunction_H

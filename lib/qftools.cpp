@@ -1084,3 +1084,30 @@ void saveStringToFile(const QString& filename, const QString& text, const QStrin
         out << text;
     }
 }
+
+static QStringList qfDirListFilesRecursive_private(QDir& base, const QDir& dir, const QStringList& filters) {
+    QStringList sl;
+
+    QStringList d=dir.entryList(QDir::Dirs|QDir::NoDotAndDotDot);
+    for (int i=0; i<d.size(); i++) {
+        QDir ddir=dir;
+        ddir.cd(d[i]);
+        sl<<qfDirListFilesRecursive_private(base, ddir, filters);
+    }
+
+    QStringList l;
+    if (!filters.isEmpty()) l=dir.entryList(filters, QDir::Files);
+    else l=dir.entryList(QDir::Files);
+    if (l.size()>0) {
+        for (int i=0; i<l.size(); i++) {
+            sl<<base.relativeFilePath(dir.absoluteFilePath(l[i]));
+        }
+    }
+    return sl;
+}
+
+QStringList qfDirListFilesRecursive(QDir& dir, const QStringList& filters) {
+    QStringList sl;
+    sl=qfDirListFilesRecursive_private(dir, dir, filters);
+    return sl;
+}

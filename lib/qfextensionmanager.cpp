@@ -28,7 +28,7 @@
 #include "qfpluginservices.h"
 #include "qfevaluationitemfactory.h"
 #include "qfrawdatarecordfactory.h"
-
+#include "qftools.h"
 QFExtensionManager::QFExtensionManager(ProgramOptions* options, QObject* parent):
     QObject(parent)
 {
@@ -44,7 +44,7 @@ QFExtensionManager::~QFExtensionManager()
 
 void QFExtensionManager::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData>& tooltips) {
     QDir pluginsDir = QDir(directory);
-    foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+    foreach (QString fileName, qfDirListFilesRecursive(pluginsDir)) {//pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = loader.instance();
         if (QApplication::arguments().contains("--verboseplugin")) {

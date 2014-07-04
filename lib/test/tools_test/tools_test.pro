@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core
+QT       += core network
 QT += gui
 
 DEFINES += QFLIB_LIBRARY
@@ -17,9 +17,24 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp \
-    ../../qftools.cpp
+    ../../qftools.cpp \
+    ../../programoptions.cpp \
+    ../../matlabtools.cpp \
+    ../../datatools.cpp \
+    ../../csvtools.cpp \
+    ../../binarydatatools.cpp \
+    ../../qfdlgcsvparameters.cpp
 
 HEADERS += \
     ../../qftools.h \
     ../../qfpreprocessormagic_private.h \
-    ../../qfpreprocessormagic.h
+    ../../qfpreprocessormagic.h \
+    ../../programoptions.h \
+    ../../matlabtools.h \
+    ../../datatools.h \
+    ../../csvtools.h \
+    ../../binarydatatools.h \
+    ../../qfdlgcsvparameters.h
+
+FORMS += \
+    ../../qfdlg_csvparameters.ui

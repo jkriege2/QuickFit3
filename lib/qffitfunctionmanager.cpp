@@ -25,6 +25,8 @@
 #include <QtPlugin>
 #include <QPluginLoader>
 #include "qffitfunctionparsed.h"
+#include "qflibraryfitfunction.h"
+#include "qftools.h"
 
 QFFitFunctionManager::QFFitFunctionManager(ProgramOptions* options, QObject* parent):
     QObject(parent)
@@ -32,10 +34,12 @@ QFFitFunctionManager::QFFitFunctionManager(ProgramOptions* options, QObject* par
     m_options=options;
     mutex=new QMutex();
     reloadUserFitFunctions();
+    reloadLibraryFitFunctions();
 }
 
 QFFitFunctionManager::~QFFitFunctionManager()
 {
+    freeLibraryFitFunctions();
     delete mutex;
 }
 
@@ -52,7 +56,7 @@ void QFFitFunctionManager::reloadUserFitFunctions()
         QDir dir(userffDir);
         emit showLongMessage(tr("searching in directory '%1' for user fit functions:").arg(userffDir));
         if (dir.exists()) {
-            QStringList ff=dir.entryList(QStringList("*.qff"), QDir::Files);
+            QStringList ff=qfDirListFilesRecursive(dir, QStringList("*.qff"));
             for (int i=0; i<ff.size(); i++) {
                 QString fn=dir.absoluteFilePath(ff[i]);
                 QSettings set(fn, QSettings::IniFormat);
@@ -86,9 +90,79 @@ void QFFitFunctionManager::reloadUserFitFunctions()
     emit fitFunctionsChanged();
 }
 
+void QFFitFunctionManager::reloadLibraryFitFunctions()
+{
+    //QMutexLocker locker(mutex);
+
+    QMap<QString, QLibrary*> userFF;
+    QDir bd(QApplication::applicationDirPath());
+    freeLibraryFitFunctions();
+
+    for (int d=0; d<3; d++ ) {
+        QString userffDir;
+        if (d==0) userffDir=bd.absolutePath()+"/sdk/sdk_fitfunctions";
+        if (d==1) userffDir=bd.absolutePath()+"/sdk_fitfunctions";
+        if (d==2) userffDir=QFPluginServices::getInstance()->getAssetsDirectory()+"/sdk_fitfunctions/";
+        QDir dir(userffDir);
+        emit showLongMessage(tr("searching in directory '%1' for fit functions in shared libraries:").arg(userffDir));
+        if (dir.exists()) {
+            QStringList ff=qfDirListFilesRecursive(dir);
+            //qDebug()<<ff.join("\n");
+            for (int i=0; i<ff.size(); i++) {
+                QString isOK=tr("OK");
+                QString fn=dir.absoluteFilePath(ff[i]);
+                //qDebug()<<"checking "<<fn;
+                if (QLibrary::isLibrary(fn)) {
+                    //qDebug()<<"  isLIB "<<fn;
+                    QLibrary* lib=new QLibrary(fn);
+                    if (lib) {
+                        //qDebug()<<"  LIB_OK "<<fn;
+                        QFLibraryFitFunction* libff=new QFLibraryFitFunction(lib);
+                        if (libff && libff->isValid()) {
+                            //qDebug()<<"  isLIBFF "<<fn;
+                            userFF[libff->id()]=lib;
+                            emit showLongMessage(tr("    * adding function %1 from '%2' ... %3").arg(libff->id()).arg(fn).arg(isOK));
+                            if (libff) delete libff;
+                        } else {
+                            isOK=tr("ERROR: NOT A VALID FIT FUNCTION LIBRARY, ERROR: %1").arg(libff->lastError());
+                            delete lib;
+                            if (libff) delete libff;
+                        }
+                    } else {
+                        isOK=tr("ERROR: COULD NOT LOAD LIBRARY");
+                    }
+                    //qDebug()<<"  "<<isOK<<fn;
+                    if (isOK!=tr("OK")) {
+                        emit showLongMessage(tr("    * no fit function added from '%1': %2").arg(fn).arg(isOK));
+                    }
+                }
+            }
+        }
+    }
+
+    libraryFitFunctions=userFF;
+}
+
+void QFFitFunctionManager::freeLibraryFitFunctions()
+{
+    //QMutexLocker locker(mutex);
+
+    QMapIterator<QString, QLibrary*> it(libraryFitFunctions);
+    while (it.hasNext()) {
+        it.next();
+        if (it.value()) {
+            it.value()->unload();
+            delete it.value();
+        }
+    }
+
+    libraryFitFunctions.clear();
+    emit fitFunctionsChanged();
+}
+
 void QFFitFunctionManager::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData>& tooltips) {
     QDir pluginsDir = QDir(directory);
-    foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+    foreach (QString fileName, qfDirListFilesRecursive(pluginsDir)) {//pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = loader.instance();
         if (QApplication::arguments().contains("--verboseplugin")) {
@@ -141,6 +215,7 @@ void QFFitFunctionManager::searchPlugins(QString directory, QList<QFPluginServic
     }
 
     reloadUserFitFunctions();
+    reloadLibraryFitFunctions();
 
 }
 
@@ -158,12 +233,26 @@ QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start, 
         }
     }
 
-    QMap<QString, QString>::const_iterator it;
-    for (it=userFitFunctions.begin(); it!=userFitFunctions.end(); ++it) {
-        if (id_start.isEmpty() || it.key().startsWith(id_start)) {
-            QFFitFunctionParsed* f=new QFFitFunctionParsed(it.value());
-            if ( f && f->isValid() && !res.contains(it.key())) res[it.key()]=f;
-            else if (f) delete f;
+    {
+        QMap<QString, QString>::const_iterator it;
+        for (it=userFitFunctions.begin(); it!=userFitFunctions.end(); ++it) {
+            if (id_start.isEmpty() || it.key().startsWith(id_start)) {
+                QFFitFunctionParsed* f=new QFFitFunctionParsed(it.value());
+                if ( f && f->isValid() && !res.contains(it.key())) res[it.key()]=f;
+                else if (f) delete f;
+            }
+        }
+    }
+
+
+    {
+        QMap<QString, QLibrary*>::const_iterator it;
+        for (it=libraryFitFunctions.begin(); it!=libraryFitFunctions.end(); ++it) {
+            if (id_start.isEmpty() || it.key().startsWith(id_start)) {
+                QFLibraryFitFunction* f=new QFLibraryFitFunction(it.value());
+                if ( f && f->isValid() && !res.contains(it.key())) res[it.key()]=f;
+                else if (f) delete f;
+            }
         }
     }
 
@@ -181,6 +270,13 @@ QFFitFunction *QFFitFunctionManager::createFunction(QString ID, QObject *parent)
 
     if (userFitFunctions.contains(ID)) {
         QFFitFunctionParsed* f=new QFFitFunctionParsed(userFitFunctions[ID]);
+        if (f->isValid()) return f;
+        delete f;
+        return NULL;
+    }
+
+    if (libraryFitFunctions.contains(ID)) {
+        QFLibraryFitFunction* f=new QFLibraryFitFunction(libraryFitFunctions[ID]);
         if (f->isValid()) return f;
         delete f;
         return NULL;
@@ -232,7 +328,7 @@ bool QFFitFunctionManager::contains(const QString &ID)
 {
     for (int i=0; i<fitPlugins.size(); i++)
         if (fitPlugins[i]->getID()==ID) return true;
-    return userFitFunctions.contains(ID);
+    return userFitFunctions.contains(ID) || libraryFitFunctions.contains(ID);
 }
 
 QObject *QFFitFunctionManager::getPluginObject(int i) const
@@ -245,6 +341,8 @@ int QFFitFunctionManager::getPluginForID(QString id) const {
          QStringList ids=fitPlugins[i]->getIDs();
          if (ids.contains(id)) return i;
    }
+    if (userFitFunctions.contains(id)) return -2;
+    if (libraryFitFunctions.contains(id)) return -3;
    return -1;
 }
 
@@ -276,6 +374,16 @@ QStringList QFFitFunctionManager::getUserFitFunctionIDs() const
 QString QFFitFunctionManager::getUserFitFunctionFile(const QString &id) const
 {
     return userFitFunctions.value(id, "");
+}
+
+QStringList QFFitFunctionManager::getLibraryFitFunctionIDs() const
+{
+    return libraryFitFunctions.keys();
+}
+
+QLibrary *QFFitFunctionManager::getLibraryFitFunctionLibrary(const QString &id) const
+{
+    return libraryFitFunctions.value(id, NULL);
 }
 
 QString QFFitFunctionManager::getIconFilename(int i) const {
@@ -399,6 +507,16 @@ QString QFFitFunctionManager::getPluginHelp(int ID, QString faID) {
         if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
     #endif
         return m_options->getAssetsDirectory()+QString("/plugins/help/%1/%2.html").arg(basename).arg(faID);
+    }
+    if (ID==-3 && libraryFitFunctions.contains(faID)) {
+        QFFitFunction* ff=createFunction(faID, NULL);
+        QFLibraryFitFunction* lff=dynamic_cast<QFLibraryFitFunction*>(ff);
+        QString h;
+        if (lff) {
+            h=lff->helpFile();
+        }
+        if (ff) delete ff;
+        return h;
     }
     return "";
 }

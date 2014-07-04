@@ -26,7 +26,7 @@
 #include <QDir>
 #include "qfpluginfitalgorithm.h"
 #include "qffitalgorithm.h"
-
+#include "qftools.h"
 
 QFFitAlgorithmManager::QFFitAlgorithmManager(ProgramOptions* options, QObject* parent):
     QObject(parent)
@@ -49,7 +49,7 @@ bool QFFitAlgorithmManager::contains(const QString &ID)
 
 void QFFitAlgorithmManager::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData>& tooltips) {
     QDir pluginsDir = QDir(directory);
-    foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+    foreach (QString fileName, qfDirListFilesRecursive(pluginsDir)) {//pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = loader.instance();
         if (QApplication::arguments().contains("--verboseplugin")) {

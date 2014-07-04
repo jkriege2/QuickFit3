@@ -252,6 +252,10 @@ INSTALLS += FITFUNCTIONSSDKM FITFUNCTIONSSDK
 
 SRC_DISTRIBUTED.files = ../extlibs/MersenneTwister.h
 
+OTHER_FILES += \
+    sdk_fitfunctions/readme.txt \
+    sdk_fitfunctions/Makefile
+
 
 
 

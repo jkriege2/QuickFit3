@@ -62,7 +62,8 @@
 /*@}*/
 
 
-
+#define QF3SFF_TRUE (1==1)
+#define QF3SFF_FALSE (1==0)
 
 #pragma pack(push,1)
 /** \brief this struct contains the properties of one model parameter
@@ -72,15 +73,15 @@ typedef struct {
     /** \brief type of the parameter */
     int32_t type;
     /** \brief short unique id for the parameter, e.g. "n" */
-    char* id;
+    const char* id;
     /** \brief description of the parameter, e.g. "particle number N" */
-    char* name;
+    const char* name;
     /** \brief a label for the parameter, e.g. "<i>N</i>". You may use HTML markup for this */
-    char* label;
+    const char* label;
     /** \brief unit of the parameter, e.g. "usec", "g"  */
-    char* unit;
+    const char* unit;
     /** \brief unit label of the parameter, e.g. "&mu;s", "g". You may use HTML markup for this  */
-    char* unitLabel;
+    const char* unitLabel;
     /** \brief is this a fitting parameter, if \c false the user may supply a value, but the value will never be changed by the fitting
      *         algorithm. Use this e.g. to configure a model (number of components, ...) */
     int8_t fit;
@@ -109,20 +110,6 @@ typedef struct {
 } QF3SimpleFFParameter;
 #pragma pack(pop)
 
-
-/** \brief allocates a new memory block as long as the supplied string. Then it copies the string into the new memory
- * \ingroup quickfit3_models
- *
- * If you call this as:
- * \code char* a=qf2m_strcpy("Hello!"); \endcode
- * This will call malloc() to get memory for a copy of the string and then return a pointer to this copy. This is any
- * easy way to get malloc'ed string (of the right length) from string constants!
- */
-inline char* qf3sff_strcpy(const char* st) {
-    char* a=(char*)malloc(strlen(st)*sizeof(char)+2);
-    strcpy(a, st);
-    return a;
-}
 
 
 
@@ -157,3 +144,4 @@ typedef const char* (*QF3SimpleFFGetNameFunc)(int16_t);
 
 
 #endif //QUICKFITMODELTOOLS_H
+

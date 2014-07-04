@@ -1284,6 +1284,8 @@ QVector<T> qfUniqueApplyFunction2I(const QVector<T>& input, const QVector<T>& in
 
  */
 QFLIB_EXPORT void saveStringToFile(const QString& filename, const QString& text, const QString& codec=QString("ISO-8859-1"));
+
+QFLIB_EXPORT QStringList qfDirListFilesRecursive(QDir& dir, const QStringList& filters=QStringList());
 #endif // QFTOOLS_H
 
 

@@ -26,7 +26,7 @@
 #include "qfrawdatarecordfactory.h"
 #include "qfevaluationitemfactory.h"
 #include "qfhtmlhelptools.h"
-
+#include "qftools.h"
 QFEvaluationItemFactory::QFEvaluationItemFactory(ProgramOptions* options, QObject* parent):
     QObject(parent)
 {
@@ -41,7 +41,7 @@ QFEvaluationItemFactory::~QFEvaluationItemFactory()
 
 void QFEvaluationItemFactory::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData>& tooltips) {
     QDir pluginsDir = QDir(directory);
-    foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+    foreach (QString fileName, qfDirListFilesRecursive(pluginsDir)) {//pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
         QObject *plugin = loader.instance();
         if (QApplication::arguments().contains("--verboseplugin")) {

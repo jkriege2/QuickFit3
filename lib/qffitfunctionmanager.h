@@ -48,7 +48,6 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         /** Default destructor */
         virtual ~QFFitFunctionManager();
 
-        void reloadUserFitFunctions();
 
         /** \brief return a list of all implemented IDs */
         QStringList getIDList(int i) const ;
@@ -131,6 +130,15 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         QStringList getUserFitFunctionIDs() const;
         QString getUserFitFunctionFile(const QString& id) const;
 
+        QStringList getLibraryFitFunctionIDs() const;
+        QLibrary* getLibraryFitFunctionLibrary(const QString& id) const;
+
+    public slots:
+        void reloadUserFitFunctions();
+
+    protected:
+        void reloadLibraryFitFunctions();
+        void freeLibraryFitFunctions();
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);
@@ -140,6 +148,7 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         void fitFunctionsChanged();
 
     private:
+        QMap<QString, QLibrary*> libraryFitFunctions;
         QMap<QString, QString> userFitFunctions;
         QList<QFPluginFitFunction*> fitPlugins;
         QList<QObject*> fitPluginObjects;

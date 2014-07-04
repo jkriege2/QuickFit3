@@ -120,8 +120,6 @@ class QFESPIMB040OverviewAcquisitionConfigWidget : public QWidget, public QFESPI
 
 
 
-        void on_btnAcq1Test_pressed();
-        void on_btnAcq1Test_released();
         void on_btnAcq1TestPreview1_pressed();
         void on_btnAcq1TestPreview1_released();
         void on_btnAcq1TestPreview2_pressed();
@@ -135,8 +133,6 @@ class QFESPIMB040OverviewAcquisitionConfigWidget : public QWidget, public QFESPI
         void on_btnAcq1TestPreview6_pressed();
         void on_btnAcq1TestPreview6_released();
 
-        void on_btnAcq2Test_pressed();
-        void on_btnAcq2Test_released();
         void on_btnAcq2TestPreview1_pressed();
         void on_btnAcq2TestPreview1_released();
         void on_btnAcq2TestPreview2_pressed();

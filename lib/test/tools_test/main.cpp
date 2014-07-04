@@ -36,5 +36,9 @@ int main(int argc, char *argv[])
     #define PARAMCNT2 QFPPM_INC(PARAMCNT1)
     qDebug()<<PARAMCNT2;
 
+
+    QDir d("../../");
+    qDebug()<<qfDirListFilesRecursive(d).join("\n");
+
     return 0;
 }

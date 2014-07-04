@@ -24,7 +24,7 @@
 #include <QtCore>
 #include <QDir>
 #include <QNetworkProxy>
-
+#include "qftools.h"
 #ifndef __WINDOWS__
 # if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
 #  define __WINDOWS__
@@ -172,7 +172,7 @@ void ProgramOptions::readSettings() {
         QDir d(assetsDir+"/translations");
         QStringList filters;
         filters << "*.qm";
-        QStringList sl=d.entryList(filters, QDir::Files);
+        QStringList sl=qfDirListFilesRecursive(d, filters);//d.entryList(filters, QDir::Files);
         for (int i=0; i<sl.size(); i++) {
             QString s=sl[i];
             if (s.startsWith(languageID+".")) {

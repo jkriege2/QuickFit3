@@ -2,6 +2,7 @@
 #include "qfpluginservices.h"
 #include <iostream>
 #include "qfstyledbutton.h"
+#include "qftools.h"
 
 OptionsDialog::OptionsDialog(QWidget* parent):
     QDialog(parent)
@@ -75,7 +76,7 @@ void OptionsDialog::open(ProgramOptions* options) {
     filters << "*.qm";
     cmbLanguage->clear();
     cmbLanguage->addItem("en");
-    QStringList sl=dir.entryList(filters, QDir::Files);
+    QStringList sl=qfDirListFilesRecursive(dir, filters);//dir.entryList(filters, QDir::Files);
     for (int i=0; i<sl.size(); i++) {
         QString s=sl[i];
         int idx=s.indexOf(".");
@@ -106,7 +107,7 @@ void OptionsDialog::open(ProgramOptions* options) {
     filters.clear();
     filters << "*.qss";
     cmbStylesheet->clear();
-    sl=dir.entryList(filters, QDir::Files);
+    sl=qfDirListFilesRecursive(dir, filters);//dir.entryList(filters, QDir::Files);
     for (int i=0; i<sl.size(); i++) {
         cmbStylesheet->addItem(sl[i].remove(".qss", Qt::CaseInsensitive));
     }
