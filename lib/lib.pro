@@ -136,10 +136,10 @@ HEADERS += dlgnewproperty.h \
     qfcfitfunction.h \
     qfdlgcsvparameters.h \
     sdk_fitfunctions/quickfit-model-tools.h \
-    sdk_fitfunctions/quickfit-model-header2.h \
     sdk_fitfunctions/quickfit-model-header.h \
     sdk_fitfunctions/quickfit-model-functions.h \
-    sdk_fitfunctions/quickfit-model-basefunctions.h
+    sdk_fitfunctions/quickfit-model-basefunctions.h \
+    qflibraryfitfunction.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -220,7 +220,8 @@ SOURCES += dlgnewproperty.cpp \
     qfenhancedcombobox.cpp \
     qffitalgorithmparameterstorage.cpp \
     qftabledelegate.cpp \
-    qfdlgcsvparameters.cpp
+    qfdlgcsvparameters.cpp \
+    qflibraryfitfunction.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

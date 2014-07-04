@@ -175,6 +175,22 @@ class QFLIB_EXPORT QFFitFunction {
          */
         virtual double evaluate(double x, const double* parameters) const =0;
 
+
+        /*! \brief evaluate the fitting function \f$ f(x_i, \vec{p}) \f$ at the positions \f$ x_i \f$ with the given parameter vector \f$ \vec{p} \f$
+            \param x vector of positions \f$ \vec{x}=(x_i) \f$ where to evaluate the fit function
+            \param parameters parameter vector \f$ \vec{p}\in\mathbb{R}^N \f$
+            \return the fitting function \f$ y_i=f(x_i, \vec{p}) \f$ at the positions \f$ x_i \f$ with the given parameter vector \f$ \vec{p} \f$
+         */
+        QVector<double> multiEvaluate(const QVector<double>& x, const double* parameters) const;
+
+        /*! \brief evaluate the fitting function \f$ f(x_i, \vec{p}) \f$ at the positions \f$ x_i \f$ with the given parameter vector \f$ \vec{p} \f$
+            \param y the fitting function \f$ y_i=f(x_i, \vec{p}) \f$ at the positions \f$ x_i \f$ with the given parameter vector \f$ \vec{p} \f$
+            \param x vector of positions \f$ \vec{x}=(x_i) \f$ where to evaluate the fit function
+            \param N items in x and y
+            \param parameters parameter vector \f$ \vec{p}\in\mathbb{R}^N \f$
+         */
+        virtual void multiEvaluate(double* y, const double* x, uint64_t N,  const double* parameters) const;
+
         /*! \brief evaluate the fitting function derivatives  \f$ J_n=\frac{\partial f}{\partial p_n}(x, \vec{p}) \f$ at the position
                    \f$ x \f$ with the given parameter vector \f$ \vec{p} \f$
             \param[out] derivatives as a vector \f$ \left[\frac{\partial f}{\partial p_1}, \frac{\partial f}{\partial p_2}, ..., \frac{\partial f}{\partial p_N}\right] \f$ .

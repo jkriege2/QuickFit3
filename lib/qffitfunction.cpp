@@ -25,6 +25,20 @@
 #include <cmath>
 #include"qftools.h"
 
+QVector<double> QFFitFunction::multiEvaluate(const QVector<double> &x, const double *parameters) const
+{
+    QVector<double> y(x.size(), NAN);
+    multiEvaluate(y.data(), x.constData(), x.size(), parameters);
+    return y;
+}
+
+void QFFitFunction::multiEvaluate(double *y, const double *x, uint64_t N, const double *parameters) const
+{
+    for (int i=0; i<N; i++) {
+        y[i]=evaluate(x[i], parameters);
+    }
+}
+
 bool QFFitFunction::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
 {
     return false;

@@ -64,7 +64,7 @@
 
 
 
-
+#pragma pack(push,1)
 /** \brief this struct contains the properties of one model parameter
  * \ingroup quickfit3_models
  */
@@ -107,7 +107,7 @@ typedef struct {
     double absMaxValue;
 
 } QF3SimpleFFParameter;
-
+#pragma pack(pop)
 
 
 /** \brief allocates a new memory block as long as the supplied string. Then it copies the string into the new memory
@@ -130,29 +130,29 @@ inline char* qf3sff_strcpy(const char* st) {
 /** \brief type of the evaluate() function of a model (in the DLL)
   * \ingroup quickfit3_models
   */
-typedef double (*QF3SimpleFFEvaluateFunc)(double, double*);
+typedef double (*QF3SimpleFFEvaluateFunc)(double, const double*);
 
 /** \brief type of the multiEvaluate() function of a model (in the DLL)
   * \ingroup quickfit3_models
   */
-typedef void (*QF3SimpleFFMultiEvaluateFunc)(double* , double* , unsigned int, double* );
+typedef void (*QF3SimpleFFMultiEvaluateFunc)(double* , const double* , uint64_t, const double* );
 
 /** \brief type of the getParameterCount() function of a model (in the DLL)
   * \ingroup quickfit3_models
   */
-typedef unsigned int16_t (*QF3SimpleFFGetParameterCountFunc)();
+typedef uint16_t (*QF3SimpleFFGetParameterCountFunc)();
 
 
 /** \brief type of the getParameterCount() function of a model (in the DLL)
   * \ingroup quickfit3_models
   */
-typedef void (*QF3SimpleFFGetParameterDescriptionFunc)(QF3SimpleFFParameter*);
+typedef const QF3SimpleFFParameter* (*QF3SimpleFFGetParameterDescriptionFunc)();
 
 
 /** \brief type of the getModelName() function of a model (in the DLL)
   * \ingroup quickfit3_models
   */
-typedef void (*QF3SimpleFFGetNameFunc)(char*, int);
+typedef const char* (*QF3SimpleFFGetNameFunc)(int16_t);
 
 
 
