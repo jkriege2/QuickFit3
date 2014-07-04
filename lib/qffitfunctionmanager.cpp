@@ -110,6 +110,7 @@ void QFFitFunctionManager::reloadLibraryFitFunctions()
             //qDebug()<<ff.join("\n");
             for (int i=0; i<ff.size(); i++) {
                 QString isOK=tr("OK");
+                QString feat="";
                 QString fn=dir.absoluteFilePath(ff[i]);
                 //qDebug()<<"checking "<<fn;
                 if (QLibrary::isLibrary(fn)) {
@@ -121,6 +122,7 @@ void QFFitFunctionManager::reloadLibraryFitFunctions()
                         if (libff && libff->isValid()) {
                             //qDebug()<<"  isLIBFF "<<fn;
                             userFF[libff->id()]=lib;
+                            feat=libff->features();
                             emit showLongMessage(tr("    * adding function %1 from '%2' ... %3").arg(libff->id()).arg(fn).arg(isOK));
                             if (libff) delete libff;
                         } else {
@@ -133,7 +135,7 @@ void QFFitFunctionManager::reloadLibraryFitFunctions()
                     }
                     //qDebug()<<"  "<<isOK<<fn;
                     if (isOK!=tr("OK")) {
-                        emit showLongMessage(tr("    * no fit function added from '%1': %2").arg(fn).arg(isOK));
+                        emit showLongMessage(tr("    * no fit function added from '%1': %2 [additional features: %3]").arg(fn).arg(isOK).arg(feat));
                     }
                 }
             }

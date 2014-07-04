@@ -25,6 +25,8 @@ class QFLIB_EXPORT QFLibraryFitFunction : public QFFitFunction
 
         QString lastError() const;
 
+        QString features() const;
+
         /*! \copydoc QFFitFunction::()  */
         virtual QString name() const;
         /*! \copydoc QFFitFunction::()  */

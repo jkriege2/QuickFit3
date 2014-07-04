@@ -27,6 +27,7 @@ class QFLibraryFitFunction_private {
         QString m_name;
         QString m_shortName;
         QString m_help;
+        QString m_features;
         bool libOK;
         QString last_error;
 
@@ -75,6 +76,20 @@ QFLibraryFitFunction::QFLibraryFitFunction(QLibrary *library)
 
         d->libOK=((d->lib_getName!=NULL)&&(d->lib_getParams!=NULL)&&(d->lib_getParamCount!=NULL)&&(d->lib_eval!=NULL));
         if (!d->libOK) d->last_error=QString("not all symbols resolved: lib_getName=%1 lib_getParams=%2 lib_getParamCount=%3 lib_eval=%4 lib_evalMulti=%5").arg((int64_t)(d->lib_getName)).arg((int64_t)(d->lib_getParams)).arg((int64_t)(d->lib_getParamCount)).arg((int64_t)(d->lib_eval)).arg((int64_t)(d->lib_evalMulti));
+        else {
+            QStringList additional;
+            if (d->lib_evalMulti) additional<<QString("multiEvaluate()");
+            if (d->lib_calcParams) additional<<QString("calculateParameters()");
+            if (d->lib_isParamVisible) additional<<QString("isParamVisible()");
+            if (d->lib_sortParams) additional<<QString("sortParams()");
+            if (d->lib_evalDerivative) additional<<QString("evalDerivative()");
+            if (d->lib_estimateInitial) additional<<QString("estimateInitial()");
+            if (d->lib_getAdditionalPlots) additional<<QString("getAdditionalPlots()");
+            if (d->lib_transformAdditionalPlot) additional<<QString("transformAdditionalPlot()");
+            d->m_features="";
+            if (additional.size()>0) d->m_features=additional.join(", ");
+
+        }
     } else {
         d->last_error="NO LIBRARY GIVEN";
     }
@@ -138,6 +153,11 @@ bool QFLibraryFitFunction::isValid() const
 QString QFLibraryFitFunction::lastError() const
 {
     return d->last_error;
+}
+
+QString QFLibraryFitFunction::features() const
+{
+    return d->m_features;
 }
 
 QString QFLibraryFitFunction::name() const
@@ -230,8 +250,7 @@ bool QFLibraryFitFunction::estimateInitial(double *params, const double *dataX, 
             for (int i=0; i<pc; i++) {
                 if (fix[i]) f[i]=QF3SFF_TRUE;
             }
-            bool ret=(d->lib_estimateInitial(params, dataX, dataY, N, f.data())!=QF3SFF_FALSE);
-            return ret;
+            return (d->lib_estimateInitial(params, dataX, dataY, N, f.data())!=QF3SFF_FALSE);
         } else {
             return d->lib_estimateInitial(params, dataX, dataY, N, NULL);
         }

@@ -22,7 +22,7 @@ char QF3SFF_HELP[]="example.html";
 // description of the parameters of the fit model:
 // each parameter is described in one line of this array. For each parameter, these properties can be set (in order of appearance):
 //    type = [QF3SFF_WIDGET_FLOAT | QF3SFF_WIDGET_LOGFLOAT | QF3SFF_WIDGET_INT | QF3SFF_WIDGET_INT_COMBO ]: the type of input widget, that should be used [floating-point input, optimized for linearly scaling and log-scaling parameters | integer input widget | drop-down-box for the integer values within the parameter range]
-//    id = [STRING] internal parameter ID (you should use characters, digits and underscores '_' only)
+//    id = [STRING] internal parameter ID (you should use characters, digits and underscores '_' only) Some often used parameter names are:
 //    name = [STRING] name of the fit-parameter (human-readable ... you can use any characters)
 //    label = [STRING] the same as name, but an alternative form, in which you can use HTML-markup
 //    unit = [STRING] name of the unit of the fit parameter (e.g. "m", "micron", "km/h", ...)
