@@ -137,8 +137,6 @@ HEADERS += dlgnewproperty.h \
     qfdlgcsvparameters.h \
     sdk_fitfunctions/quickfit-model-tools.h \
     sdk_fitfunctions/quickfit-model-header.h \
-    sdk_fitfunctions/quickfit-model-functions.h \
-    sdk_fitfunctions/quickfit-model-basefunctions.h \
     qflibraryfitfunction.h
 
 SOURCES += dlgnewproperty.cpp \

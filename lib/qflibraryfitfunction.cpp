@@ -13,6 +13,13 @@ class QFLibraryFitFunction_private {
             lib_getParams=NULL;
             lib_getParamCount=NULL;
             lib_eval=NULL;
+            lib_calcParams=NULL;
+            lib_isParamVisible=NULL;
+            lib_sortParams=NULL;
+            lib_evalDerivative=NULL;
+            lib_estimateInitial=NULL;
+            lib_getAdditionalPlots=NULL;
+            lib_transformAdditionalPlot=NULL;
         }
 
         QLibrary* library;
@@ -28,6 +35,13 @@ class QFLibraryFitFunction_private {
         QF3SimpleFFGetParameterDescriptionFunc lib_getParams;
         QF3SimpleFFGetParameterCountFunc lib_getParamCount;
         QF3SimpleFFEvaluateFunc lib_eval;
+        QF3SimpleFFCalculateParameters lib_calcParams;
+        QF3SimpleFFIsParameterVisible lib_isParamVisible;
+        QF3SimpleFFSortParameters lib_sortParams;
+        QF3SimpleFFEvaluateDerivatives lib_evalDerivative;
+        QF3SimpleFFIsEstimateInitial lib_estimateInitial;
+        QF3SimpleFFGetAdditionalPlotCount lib_getAdditionalPlots;
+        QF3SimpleFFTransformParametersForAdditionalPlot lib_transformAdditionalPlot;
 
         friend class QFLibraryFitFunction;
 };
@@ -50,6 +64,15 @@ QFLibraryFitFunction::QFLibraryFitFunction(QLibrary *library)
         d->lib_getParamCount = (QF3SimpleFFGetParameterCountFunc) d->library->resolve("getParameterCount");
         d->lib_eval = (QF3SimpleFFEvaluateFunc) d->library->resolve("evaluate");
         d->lib_evalMulti = (QF3SimpleFFMultiEvaluateFunc) d->library->resolve("multiEvaluate");
+
+        d->lib_calcParams=(QF3SimpleFFCalculateParameters) d->library->resolve("calulateParameters");
+        d->lib_isParamVisible=(QF3SimpleFFIsParameterVisible) d->library->resolve("isParameterVisible");
+        d->lib_sortParams=(QF3SimpleFFSortParameters) d->library->resolve("sortParameters");
+        d->lib_evalDerivative=(QF3SimpleFFEvaluateDerivatives) d->library->resolve("evaluateDerivatives");
+        d->lib_estimateInitial=(QF3SimpleFFIsEstimateInitial) d->library->resolve("estimateInitial");
+        d->lib_getAdditionalPlots=(QF3SimpleFFGetAdditionalPlotCount) d->library->resolve("getAdditionalPlotCount");
+        d->lib_transformAdditionalPlot=(QF3SimpleFFTransformParametersForAdditionalPlot) d->library->resolve("transformParametersForAdditionalPlot");
+
         d->libOK=((d->lib_getName!=NULL)&&(d->lib_getParams!=NULL)&&(d->lib_getParamCount!=NULL)&&(d->lib_eval!=NULL));
         if (!d->libOK) d->last_error=QString("not all symbols resolved: lib_getName=%1 lib_getParams=%2 lib_getParamCount=%3 lib_eval=%4 lib_evalMulti=%5").arg((int64_t)(d->lib_getName)).arg((int64_t)(d->lib_getParams)).arg((int64_t)(d->lib_getParamCount)).arg((int64_t)(d->lib_eval)).arg((int64_t)(d->lib_evalMulti));
     } else {
@@ -146,39 +169,71 @@ void QFLibraryFitFunction::multiEvaluate(double *y, const double *x, uint64_t N,
 
 void QFLibraryFitFunction::evaluateDerivatives(double *derivatives, double x, const double *parameters) const
 {
-    QFFitFunction::evaluateDerivatives(derivatives, x, parameters);
+    if (d->lib_evalDerivative) d->lib_evalDerivative(derivatives,x,parameters);
+    else QFFitFunction::evaluateDerivatives(derivatives, x, parameters);
 }
 
 bool QFLibraryFitFunction::get_implementsDerivatives()
 {
+    if (d->lib_evalDerivative) return true;
     return QFFitFunction::get_implementsDerivatives();
 }
 
 void QFLibraryFitFunction::calcParameter(double *parameterValues, double *error) const
 {
-    QFFitFunction::calcParameter(parameterValues, error);
+    if (d->lib_calcParams) d->lib_calcParams(parameterValues,error);
+    else QFFitFunction::calcParameter(parameterValues, error);
 }
 
 void QFLibraryFitFunction::sortParameter(double *parameterValues, double *error, bool *fix) const
 {
-    QFFitFunction::sortParameter(parameterValues, error, fix);
+    if (d->lib_sortParams) {
+        if (fix) {
+            const int pc=paramCount();
+            QVector<int8_t> f(pc, QF3SFF_FALSE);
+            for (int i=0; i<pc; i++) {
+                if (fix[i]) f[i]=QF3SFF_TRUE;
+            }
+            d->lib_sortParams(parameterValues,error,f.data());
+            for (int i=0; i<pc; i++) {
+                fix[i]=(f[i]!=QF3SFF_FALSE);
+            }
+        } else {
+            d->lib_sortParams(parameterValues,error,NULL);
+        }
+    } else QFFitFunction::sortParameter(parameterValues, error, fix);
 }
 
 bool QFLibraryFitFunction::isParameterVisible(int parameter, const double *parameterValues) const
 {
-    return QFFitFunction::isParameterVisible(parameter, parameterValues);
+    if (d->lib_isParamVisible) return d->lib_isParamVisible(parameter, parameterValues);
+    else return QFFitFunction::isParameterVisible(parameter, parameterValues);
 }
 
 unsigned int QFLibraryFitFunction::getAdditionalPlotCount(const double *params) {
-    return QFFitFunction::getAdditionalPlotCount(params);
+    if (d->lib_getAdditionalPlots) return d->lib_getAdditionalPlots(params);
+    else return QFFitFunction::getAdditionalPlotCount(params);
 }
 
 QString QFLibraryFitFunction::transformParametersForAdditionalPlot(int plot, double *params)
 {
-    return QFFitFunction::transformParametersForAdditionalPlot(plot, params);
+    if (d->lib_transformAdditionalPlot) return d->lib_transformAdditionalPlot(plot, params);
+    else return QFFitFunction::transformParametersForAdditionalPlot(plot, params);
 }
 
 bool QFLibraryFitFunction::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
 {
-    return QFFitFunction::estimateInitial(params, dataX, dataY, N, fix);
+    if (d->lib_estimateInitial) {
+        if (fix) {
+            const int pc=paramCount();
+            QVector<int8_t> f(pc, QF3SFF_FALSE);
+            for (int i=0; i<pc; i++) {
+                if (fix[i]) f[i]=QF3SFF_TRUE;
+            }
+            bool ret=(d->lib_estimateInitial(params, dataX, dataY, N, f.data())!=QF3SFF_FALSE);
+            return ret;
+        } else {
+            return d->lib_estimateInitial(params, dataX, dataY, N, NULL);
+        }
+    } else return QFFitFunction::estimateInitial(params, dataX, dataY, N, fix);
 }

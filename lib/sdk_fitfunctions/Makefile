@@ -34,7 +34,7 @@ Debug:CC_OPTS = -g -Wall $(CC_DEFINES)
 all: $(TARGET)
 
 
-%$(SO_SUFFIX): %.cpp
+%$(SO_SUFFIX): %.cpp quickfit-model-header.h quickfit-model-tools.h
 	$(CC) $(CC_OPTS) $(SHARED_OPTS) -o $@ $<
 
 clean:
