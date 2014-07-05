@@ -1,8 +1,30 @@
+/*
+Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
+	
+	last modification: $LastChangedDate$  (revision $Rev$)
+
+    This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
+
+    This software is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
 /*!
     \file quickfit-model-tools.h
     \ingroup quickfit3_models
 
-    This file defines general tools and data types used by QuickFit2 model DLLs.
+    This file defines general tools and data types used to write simple fitting model
+	DLLs/SOs for QuickFit 3.
 
  */
 
@@ -62,8 +84,27 @@
 /*@}*/
 
 
+inline void QF3SFF_swap(double& a, double&b) {
+  double t=a;
+  a=b;
+  b=t;
+}
+
+inline void QF3SFF_swap(int8_t& a, int8_t&b) {
+  double t=a;
+  a=b;
+  b=t;
+}
+
 #define QF3SFF_TRUE 1
 #define QF3SFF_FALSE 0
+
+
+#define QF3SFF_API_VERSION_MAJOR 1
+#define QF3SFF_API_VERSION_MINOR 0
+
+#define QF3SFF_CALLCONVENTION __cdecl
+
 
 #pragma pack(push,1)
 /** \brief this struct contains the properties of one model parameter
@@ -147,6 +188,13 @@ typedef uint16_t (*QF3SimpleFFGetParameterCountFunc)();
   */
 typedef const QF3SimpleFFParameter* (*QF3SimpleFFGetParameterDescriptionFunc)();
 
+
+/** \brief type of the getVersion() function of a model (in the DLL), which returns the API version of the plugin
+  * \ingroup quickfit3_models
+  *
+  *  The API version of the plugin is written into the call-by-reference parameter major and minor
+  */
+typedef void (*QF3SimpleFFGetVersionFunc)(uint16_t* major, uint16_t*minor);
 
 /** \brief type of the getModelName() function of a model (in the DLL)
   * \ingroup quickfit3_models

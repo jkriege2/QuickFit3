@@ -1,7 +1,7 @@
 #include "qflibraryfitfunction.h"
 #include <stdint.h>
 #include "./sdk_fitfunctions/quickfit-model-tools.h"
-
+#include "qftools.h"
 
 class QFLibraryFitFunction_private {
     public:
@@ -20,6 +20,7 @@ class QFLibraryFitFunction_private {
             lib_estimateInitial=NULL;
             lib_getAdditionalPlots=NULL;
             lib_transformAdditionalPlot=NULL;
+            lib_getVersion=NULL;
         }
 
         QLibrary* library;
@@ -43,6 +44,7 @@ class QFLibraryFitFunction_private {
         QF3SimpleFFIsEstimateInitial lib_estimateInitial;
         QF3SimpleFFGetAdditionalPlotCount lib_getAdditionalPlots;
         QF3SimpleFFTransformParametersForAdditionalPlot lib_transformAdditionalPlot;
+        QF3SimpleFFGetVersionFunc lib_getVersion;
 
         friend class QFLibraryFitFunction;
 };
@@ -60,6 +62,7 @@ QFLibraryFitFunction::QFLibraryFitFunction(QLibrary *library)
     d->libOK=false;
     // resolve library symbols
     if (library) {
+        d->lib_getVersion = (QF3SimpleFFGetVersionFunc) d->library->resolve("getVersion");
         d->lib_getName = (QF3SimpleFFGetNameFunc) d->library->resolve("getModelName");
         d->lib_getParams = (QF3SimpleFFGetParameterDescriptionFunc) d->library->resolve("getParameterProperties");
         d->lib_getParamCount = (QF3SimpleFFGetParameterCountFunc) d->library->resolve("getParameterCount");
@@ -74,10 +77,13 @@ QFLibraryFitFunction::QFLibraryFitFunction(QLibrary *library)
         d->lib_getAdditionalPlots=(QF3SimpleFFGetAdditionalPlotCount) d->library->resolve("getAdditionalPlotCount");
         d->lib_transformAdditionalPlot=(QF3SimpleFFTransformParametersForAdditionalPlot) d->library->resolve("transformParametersForAdditionalPlot");
 
-        d->libOK=((d->lib_getName!=NULL)&&(d->lib_getParams!=NULL)&&(d->lib_getParamCount!=NULL)&&(d->lib_eval!=NULL));
-        if (!d->libOK) d->last_error=QString("not all symbols resolved: lib_getName=%1 lib_getParams=%2 lib_getParamCount=%3 lib_eval=%4 lib_evalMulti=%5").arg((int64_t)(d->lib_getName)).arg((int64_t)(d->lib_getParams)).arg((int64_t)(d->lib_getParamCount)).arg((int64_t)(d->lib_eval)).arg((int64_t)(d->lib_evalMulti));
+        d->libOK=((d->lib_getName!=NULL)&&(d->lib_getParams!=NULL)&&(d->lib_getParamCount!=NULL)&&(d->lib_eval!=NULL)&&(d->lib_getVersion!=NULL));
+        if (!d->libOK) d->last_error=QString("not all symbols resolved: lib_getVersion=%6 lib_getName=%1 lib_getParams=%2 lib_getParamCount=%3 lib_eval=%4 lib_evalMulti=%5").arg(QString("0x")+pntToHexQString((void*)d->lib_getName)).arg(QString("0x")+pntToHexQString((void*)d->lib_getParams)).arg(QString("0x")+pntToHexQString((void*)d->lib_getParamCount)).arg(QString("0x")+pntToHexQString((void*)d->lib_eval)).arg(QString("0x")+pntToHexQString((void*)d->lib_evalMulti)).arg(QString("0x")+pntToHexQString((void*)d->lib_getVersion));
         else {
             QStringList additional;
+            uint16_t vmajor=0, vminor=0;
+            d->lib_getVersion(&vmajor, &vminor);
+            additional<<QObject::tr("QF3SFF_API v.%1.%2").arg(vmajor).arg(vminor);
             if (d->lib_evalMulti) additional<<QString("multiEvaluate()");
             if (d->lib_calcParams) additional<<QString("calculateParameters()");
             if (d->lib_isParamVisible) additional<<QString("isParamVisible()");

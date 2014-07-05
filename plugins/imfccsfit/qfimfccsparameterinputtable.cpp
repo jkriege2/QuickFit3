@@ -427,11 +427,11 @@ bool QFImFCCSParameterInputTable::recalculateFitParameters(bool emitFitParamSign
                     }
                     if (p_old[fi]!=p[fi]) {
                         changed=true;
-                        emit dataChanged(idx, idx);
+                        if (dataChangedSignals) emit dataChanged(idx, idx);
                     }
                     if (e_old[fi]!=e[fi]) {
                         changed=true;
-                        emit dataChanged(eidx, eidx);
+                        if (dataChangedSignals) emit dataChanged(eidx, eidx);
                     }
                 }
             }

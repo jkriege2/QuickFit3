@@ -1038,6 +1038,11 @@ QString intToHexQString(int64_t value)
     return QString::number(value, 16);
 }
 
+QString pntToHexQString(const void* value)
+{
+    return QString::number((int64_t)value, 16);
+}
+
 QString intToOctQString(int64_t value)
 {
     return QString::number(value, 8);

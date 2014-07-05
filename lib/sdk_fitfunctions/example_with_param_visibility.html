@@ -1,0 +1,22 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>Example fit function from shared library</title>
+</head>
+<body>
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+<p>This is an example of a fit function from a shared library!!!</p>
+<p>It implements a simple sum of sines function:
+  $$bmath:f(x,\vec{p})=p_0+p_1\cdot\sin(2\pi\cdot\p_2\cdot x)+p_4\cdot\sin(2\pi\cdot\p_5\cdot x)$$
+  where the first parameter $$math:p_0$$ is an offset, $$math:p_1$$/$$math:p_4$$ are the amplitudes and $$math:p_2$$/$$math:p_5$$ are the frequencies of oscillations.
+</p>
+<p>In addition two parameter are added, which are calculated from the other parameters:
+$$bmath:p_3=2\pi\cdot p_2$$
+$$bmath:p_6=2\pi\cdot p_5$$
+These parameters represent the angular frequencies of the oscillations. They cannot be edited by the user, but are shown to him.</p>
+<p>In this model, the user can also select, how many terms he wants in the sum of sines (0,1,2). Depending on the given number, only some summands in the equation are used. the unused parameters are also hidden from the user.</p>
+<p>This model also sorts its parameters by increasing frequency, if none of the parameters are fixed by the user!</p> 
+</body>
+</html>

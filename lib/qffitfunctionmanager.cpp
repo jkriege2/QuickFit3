@@ -123,7 +123,7 @@ void QFFitFunctionManager::reloadLibraryFitFunctions()
                             //qDebug()<<"  isLIBFF "<<fn;
                             userFF[libff->id()]=lib;
                             feat=libff->features();
-                            emit showLongMessage(tr("    * adding function %1 from '%2' ... %3").arg(libff->id()).arg(fn).arg(isOK));
+                            emit showLongMessage(tr("    * adding function %1 from '%2' ... %3 [additional features: %4]").arg(libff->id()).arg(fn).arg(isOK).arg(feat));
                             if (libff) delete libff;
                         } else {
                             isOK=tr("ERROR: NOT A VALID FIT FUNCTION LIBRARY, ERROR: %1").arg(libff->lastError());
@@ -135,7 +135,7 @@ void QFFitFunctionManager::reloadLibraryFitFunctions()
                     }
                     //qDebug()<<"  "<<isOK<<fn;
                     if (isOK!=tr("OK")) {
-                        emit showLongMessage(tr("    * no fit function added from '%1': %2 [additional features: %3]").arg(fn).arg(isOK).arg(feat));
+                        emit showLongMessage(tr("    * no fit function added from '%1': %2").arg(fn).arg(isOK));
                     }
                 }
             }

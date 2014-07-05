@@ -426,6 +426,7 @@ void QFFitFunctionValueInputTable::rebuildModel()
 
 bool QFFitFunctionValueInputTable::recalculateFitParameters(bool emitFitParamSignals, bool dataChangedSignals)
 {
+    //qDebug()<<"QFFitFunctionValueInputTable::recalculateFitParameters(emitFitParamSignals="<<emitFitParamSignals<<", dataChangedSignals="<<dataChangedSignals<<")   fitfunction="<<fitfunction;
     bool changed=false;
 
     if (fitfunction) {
@@ -455,13 +456,14 @@ bool QFFitFunctionValueInputTable::recalculateFitParameters(bool emitFitParamSig
                     idx=index(row, 1);
                     eidx=index(row, errorIdx);
                 }
+                setParameterValueError(row, p[fi], e[fi], false);
                 if (p_old[fi]!=p[fi]) {
                     changed=true;
-                    emit dataChanged(idx, idx);
+                    if (dataChangedSignals) emit dataChanged(idx, idx);
                 }
                 if (e_old[fi]!=e[fi]) {
                     changed=true;
-                    emit dataChanged(eidx, eidx);
+                    if (dataChangedSignals) emit dataChanged(eidx, eidx);
                 }
             }
         }
@@ -510,6 +512,7 @@ bool QFFitFunctionValueInputTable::checkRebuildModel(bool alwaysreset)
     rangeIdx=-1;
     fixIdx=-1;
     int colcnt=1;
+    bool changed=false;
     if (editerrors) {
         colNames.append(tr("error"));
         colWidth.append(colbasicWidth*2/3);
@@ -558,6 +561,8 @@ bool QFFitFunctionValueInputTable::checkRebuildModel(bool alwaysreset)
             }
         }
         free(p);
+
+
     } else {
         for (int fi=0; fi<rownames.size(); fi++) {
             FitParam fprec;
@@ -573,12 +578,19 @@ bool QFFitFunctionValueInputTable::checkRebuildModel(bool alwaysreset)
     }
 
 
-    if (fitparamids_new!=fitparamids) {
+    if (fitparamids_new!=fitparamids ) {
         fitparamids=fitparamids_new;
         emit modelRebuilt();
         ok=true;
     }
-    if (ok || alwaysreset) reset();
+    if (ok || alwaysreset) {
+        recalculateFitParameters(false, false);
+        reset();
+    } else {
+        recalculateFitParameters(true, true);
+    }
+
+
     //qDebug()<<"QFFitFunctionValueInputTable::checkRebuildModel() "<<rebuildCount<<": done "<<t.elapsed()<<"ms    =>"<<ok;
 
     return ok;
@@ -835,6 +847,43 @@ void QFFitFunctionValueInputTable::setParameterError(int row, double value)
         recalculateFitParameters(false);
     }
     emit fitParamChanged();
+}
+
+void QFFitFunctionValueInputTable::setParameterValueError(int row, double value, double error, bool emitSignals)
+{
+    FitParam fp=fitparamids.value(row, FitParam());
+    if (item && fp.isValid()) {
+        item->setFitValue(fp.id, value);
+    } else {
+        if (datavector) {
+            if (fp.num>=datavector->size()) datavector->resize(fp.num+1);
+            (*datavector)[fp.num]=value;
+        }
+        if (datamap && fp.isValid() && datamap->contains(fp.id)) {
+            (*datamap)[fp.id].value=value;
+        }
+    }
+
+    if (item && fp.isValid()) {
+        item->setFitError(fp.id, error);
+    } else {
+        if (errorvector) {
+            if (fp.num>=errorvector->size()) errorvector->resize(fp.num+1);
+            (*errorvector)[fp.num]=error;
+        }
+        if (datamap && fp.isValid() && datamap->contains(fp.id)) {
+            (*datamap)[fp.id].error=error;
+        }
+    }
+
+    if (emitSignals) {
+        emit dataChanged(index(row, 1), index(row, 1));
+        if (errorIdx>=0) emit dataChanged(index(row, errorIdx), index(row, errorIdx));
+        if (!checkRebuildModel(false)) {
+            recalculateFitParameters(false);
+        }
+        emit fitParamChanged();
+    }
 }
 
 void QFFitFunctionValueInputTable::setParameterFix(int row, bool value)

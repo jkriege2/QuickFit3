@@ -1,17 +1,61 @@
-Several examples are given in the .cpp files in this directory. Each file implements one fit function, which can be compiled into a shared library, which QuickFit 3 will find the the sdk_fitfunctions subdirectories.
+Several examples are given in the .cpp files in this directory. Each file
+implements one fit function, which can be compiled into a shared library, 
+which QuickFit 3 will find the the sdk_fitfunctions subdirectories.
+
+These examples are provided:
+  - example_evaluate_only.cpp - a very simple example, only implementing the evaluate function
+  - example.cpp - a more sofisticated example, also implementing a calcualted parameter
+
 
 COMPILE a fit function by hand:
-
   - MinGW (windows):  
-       g++ -static -lstdc++ -lgcc -shared -DBUILD_DLL -I.. -fPIC -o example.dll example.cpp -O3 -s
+       g++ -static -lstdc++ -lgcc -shared -DQF3SFF_BUILD_DLL -I.. -fPIC -o example.dll example.cpp -O3 -s
   -Linux:       
-      g++ -shared -DBUILD_DLL -fPIC -o example.so example.cpp
-  
-  
+       g++ -shared -DQF3SFF_BUILD_DLL -fPIC -o example.so example.cpp
+   
   
 COMPILE using Makefile:
-  The makefile has tagets Release [default], Debug and clean and compiles all *.cpp files in the same directory into a library. The makefile works with MinGW on windows and on Linux!
+  The makefile has tagets Release [default], Debug and clean and compiles all 
+  *.cpp files in the same directory into a library. The makefile works with 
+  MinGW on windows and on Linux!
+
+
+WHICH COMPILER TO USE?
+  - on Linux you should use the GCC, which is installed on your system and which 
+    you also used for compiling QF3
+  - on Windows you can use MinGW, e.g. from http://sourceforge.net/projects/mingwbuilds/
+    Make sure to use a 64-bit version, if your QF3 is 64-bit and a 32-bit version
+    if QF3 is 32-bit. Generally a version of GCC/MinGW >=4.5 is advisable (We use
+	gcc >4.7 for compiling QF3), but in principle any version should work. The 
+	Makefile described above should work with MinGW on Windows as well as on
+	Linux! In principle the plugins are plain vanilla C, so you should be able to 
+	use any C/C++ compiler, that can generate DLLs.
   
+ONLINE-HELP for the fit function:
+  With each plugin, you can provide an HTML file, describing it. The file should 
+  have the same name as the plugin, but with the ending .html. It is read by QF3's
+  internal online help system, so you can use its features (e.g. $$math:LATEX$$
+  to render equations given in LaTeX) and it is advisable to use  QuickFit's 
+  online-help editor (Tools-menu of QuickFit 3) to edi these files. They have to
+  reside in the same directory as the DLL. their name has to be made known to the
+  plugin, by setting the global variable char QF3SFF_HELP[] in the plugin's main
+  C/C++ file!
+  
+INSTALL plugins:
+  After compiling your plugin, copy it (and possibly a help file with the same 
+  name, but the ending .html, e.g. example.dll and example.html) into the
+  sub-directory ./sdk_fitfunctions/ of the QuickFit3 installation.
+  
+  Then restart QuickFit and you plugin should be loaded. To check for success, 
+  you can look into QuickFit's main log at the bottom of the main window and 
+  search (CTRL+F!!!) for your DLL name. A line should appear and tell you, whether
+  the library has been loaded successfully (then also the feature of your fit
+  function are displayed), or whether an error occured.
+  QuickFit also lists all directories, that are searched for such plugins with 
+  line in theis log, reading:
+      "searching in directory 'DIR_NAME' for fit functions in shared libraries"
+  This can be used to detect wrongly placed libraries, as the containing directory
+  is simply not searched!  
   
 
 Here is a list of often used fit parameter IDs:
@@ -136,3 +180,5 @@ Here is a list of often used fit parameter IDs:
     - factor9, prefactor 9, a<sub>9</sub>
     - factor10, prefactor 10
 	- power, power of power-law
+	
+	

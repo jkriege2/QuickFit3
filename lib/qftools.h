@@ -253,6 +253,11 @@ QFLIB_EXPORT QString intToBinaryQString(int64_t value);
 
 */
 QFLIB_EXPORT QString intToHexQString(int64_t value);
+/*! \brief convert a pointer to a QString in hexadecimal representation
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString pntToHexQString(const void* value);
 /*! \brief convert an integer to a QString in octal representation
     \ingroup qf3lib_tools
 

@@ -164,6 +164,7 @@ class QFLIB_EXPORT QFFitFunctionValueInputTable : public QAbstractTableModel
         void setParameterMax(int row, double value);
         void setParameterValue(int row, double value);
         void setParameterError(int row, double value);
+        void setParameterValueError(int row, double value, double error, bool emitSignals=true);
         void setParameterFix(int row, bool value);
 
 };

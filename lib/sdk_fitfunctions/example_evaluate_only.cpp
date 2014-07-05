@@ -25,19 +25,19 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 // model ID (internally used by QUickFit3). Since this should be unique, you should add a part, which identifies you or your organization!)
 // The prefix defines the use of the model, e.g. fcs_ for FCS fit models, dls_ for DLS fit models, gen_ for general fit models etc.
-char QF3SFF_ID[]="gen_dkfzB040_example";
+char QF3SFF_ID[]="gen_dkfzB040_example_evalonly";
 
 // human readable name
-char QF3SFF_NAME[]="EXAMPLE: fit function from shared lib";
+char QF3SFF_NAME[]="EXAMPLE: fit function from shared lib, evaluate only";
 
 // human readable name
-char QF3SFF_SHORTNAME[]="EXAMPLE: shared lib FitFunc";
+char QF3SFF_SHORTNAME[]="EXAMPLE: shared lib FitFunc, evaluate only";
 
 // link to a help file, relative to the library
-char QF3SFF_HELP[]="example.html";
+char QF3SFF_HELP[]="example_evaluate_only.html";
 
 // number of parameters of the fit model
-#define QF3SFF_PARAMETER_COUNT 4
+#define QF3SFF_PARAMETER_COUNT 3
 
 // description of the parameters of the fit model:
 // each parameter is described in one line of this array. For each parameter, these properties can be set (in order of appearance):
@@ -63,7 +63,6 @@ QF3SimpleFFParameter QF3SFF_PARAMETERS[QF3SFF_PARAMETER_COUNT] = { \
   {   QF3SFF_WIDGET_FLOAT,     "offset",               "Offset A0",                                "Offset A<sub>0</sub>",                     "",                 "",                QF3SFF_TRUE,   QF3SFF_TRUE,       QF3SFF_ERROR_DISPLAY,   QF3SFF_TRUE,          0.0,            QF3SFF_FALSE,    -10.0,         10.0,          0.1,        -DBL_MAX,         DBL_MAX            },
   {   QF3SFF_WIDGET_FLOAT,     "amplitude",            "Amplitude",                                "Amplitude",                                "",                 "",                QF3SFF_TRUE,   QF3SFF_TRUE,       QF3SFF_ERROR_DISPLAY,   QF3SFF_TRUE,          1.0,            QF3SFF_FALSE,    -DBL_MAX,      DBL_MAX,       0.1,        -DBL_MAX,         DBL_MAX            },
   {   QF3SFF_WIDGET_FLOAT,     "frequency",            "Frequency",                                "Frequency &nu;",                           "Hz",               "Hz",              QF3SFF_TRUE,   QF3SFF_TRUE,       QF3SFF_ERROR_DISPLAY,   QF3SFF_TRUE,          10.0,           QF3SFF_FALSE,    -DBL_MAX,      DBL_MAX,       1,          -DBL_MAX,         DBL_MAX            },
-  {   QF3SFF_WIDGET_FLOAT,     "angular_frequency",    "angul. Frequency",                         "angular Frequency &omega;=2&pi;&nu;",      "Hz",               "Hz",              QF3SFF_FALSE,  QF3SFF_FALSE,      QF3SFF_ERROR_DISPLAY,   QF3SFF_FALSE,         10.0,           QF3SFF_FALSE,    -DBL_MAX,      DBL_MAX,       1,          -DBL_MAX,         DBL_MAX            },
 };
 
 // this macro is required here (before any function def)
@@ -76,15 +75,6 @@ QF3SFF_EXTERN_START
     return p[0]+p[1]*sin(2.0*M_PI*p[2]*t);
 }
 
-
-// implementation of the calulateParameters() function
-//    calculate additional model parameters, which are not fit parameters
- void QF3SFF_DLL_EXPORT calulateParameters(double* p, double* e) {
-    p[3]=2.0*M_PI*p[2];
-	if (e) {
-		e[3]=2.0*M_PI*e[2];
-	}
-}
 
 
 // this macro is required here /////////////////////////
