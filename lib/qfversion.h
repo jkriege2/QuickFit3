@@ -42,5 +42,7 @@ QFLIB_EXPORT QString qfInfoCompiler();
 QFLIB_EXPORT QString qfInfoCompileDate();
 QFLIB_EXPORT bool qfIsSpecialVersion();
 QFLIB_EXPORT QUrl qfUpdateXMLURL();
+QFLIB_EXPORT QString qfInfoCitationHTML();
+QFLIB_EXPORT QString qfInfoCitationBiBTeX();
 
 #endif //QFVERSION_H

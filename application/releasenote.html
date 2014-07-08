@@ -85,9 +85,11 @@
 			<li>improved search speed in online-help search!</li>
 			<li>select RDR dialog now has a completer for the filter string</li>
 			<li>added Help-menu entry for citing QuickFit (this was a bit hidden in the copyright-help page before!</li>
-                        <li>QuickFit now also searches for plugins in sub-directories</li>
-                        <li>QuickFit now searches for simple fit-function plugins in the sub-directlry sdk_fitfunctions and sdk/sdk_fitfunctions</li>
-		  </ul></li>	
+            <li>added support for user-definable fit function in external shared libraries. This allows to write fit functions in C/Pascal/... or any other language, that can produce shared libraries. They will show much better performance, than user-defined fit functions using the internal expression parser. QuickFit now searches for these plugins in the sub-directory sdk_fitfunctions and sdk/sdk_fitfunctions.</li>
+            <li>QuickFit now also searches for plugins in sub-directories</li>
+            <li>Added citing tab to About QuickFit dialog, improved citing page in online-help</li>
+            <li>fit algorithms should use the multiEvaluate() function of QFFitFunction now.</li>
+          </ul></li>
 	
 		  <li><b>imFCCSFit</b><ul>
 			<li>fixed a possible crash when selecting a new fit function by hand</li>
@@ -245,8 +247,9 @@
 		  <li><b>Online-Help editor</b><ul>
 			<li>added several buttons for advanced insert/editing functions</li>
 			<li>improved past image dialog (now allows scaling and cropping of the image</li>
-			<li></li>
-		  </ul></li>	
+            <li>editor now uses line-wrapping</li>
+            <li>improved selection of links (also shows files from current directory now)</li>
+          </ul></li>
 	      <li><b>spectra viewer</b><ul>
 			<li>added FRET Förster radius calculator</li>
 			<li></li>

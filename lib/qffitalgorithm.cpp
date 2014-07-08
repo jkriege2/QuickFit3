@@ -255,11 +255,14 @@ void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluate(double* evalout, const do
     std::cout<<" )\n";*/
     register double v;
     register int ecount=get_evalout();
+    QVector<double> evals(ecount, 0.0);
+    m_model->multiEvaluate(evals.data(), m_dataX, ecount, m_modelParams);
     for (register int i=0; i<ecount; i++) {
-        v = ( m_dataY[i] - m_model->evaluate(m_dataX[i], m_modelParams) ) / m_dataWeight[i];
+        v = ( m_dataY[i] - /*m_model->evaluate(m_dataX[i], m_modelParams)*/ evals[i] ) / m_dataWeight[i];
         if (!QFFloatIsOK(v)) {
-            if (i>0) v=evalout[i-1];
-            else v=0;
+            /*if (i>0) v=evalout[i-1];
+            else v=0;*/
+            v=0;
         }
         evalout[i]=v;
     }

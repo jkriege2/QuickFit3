@@ -140,6 +140,8 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("copyright"), QString(qfInfoCopyright())));
     htmlReplaceList.append(qMakePair(QString("author"), QString(qfInfoAuthor())));
     htmlReplaceList.append(qMakePair(QString("email"), QString(qfInfoEmail())));
+    htmlReplaceList.append(qMakePair(QString("qfcitation"), QString(qfInfoCitationHTML())));
+    htmlReplaceList.append(qMakePair(QString("qfcitation_bibtex"), QString(qfInfoCitationBiBTeX())));
     htmlReplaceList.append(qMakePair(QString("maillist"), QString(qfInfoMaillist())));
     htmlReplaceList.append(qMakePair(QString("maillistrequest"), QString(qfInfoMaillistRequest())));
     htmlReplaceList.append(qMakePair(QString("weblink"), QString(qfInfoWeblink())));
@@ -538,6 +540,7 @@ void MainWindow::about() {
     ui.setupUi(widget);
     QTextBrowser* ui_textEdit = qFindChild<QTextBrowser*>(widget, "edtInfo");
     QTextBrowser* ui_releasenotes = qFindChild<QTextBrowser*>(widget, "edtReleaseNotes");
+    QTextBrowser* ui_citing = qFindChild<QTextBrowser*>(widget, "edtCiting");
     QLabel* ui_label = qFindChild<QLabel*>(widget, "labSplash");
     QLabel* ui_labelLic = qFindChild<QLabel*>(widget, "labLicense");
     ui_label->setPixmap(splashPix);
@@ -548,8 +551,13 @@ void MainWindow::about() {
                             "<b>QuickFit version:</b><blockquote>version %10 (%11) %14-bit, SVN: %12, qfInfoCompileDate(): %13</blockquote>"
                             "<b>libraries, used by QuickFit:</b><ul><li>QuickFit library v%4.%5</li><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul>"
                             "<b>compiler used for this version:</b><blockquote>%7</blockquote>"
-                            "<b>operating system:</b><blockquote>%15</blockquote>").arg(QT_VERSION_STR).arg(qfInfoThanksTo()).arg(qfInfoCopyright()).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(qfInfoEmail()).arg(Qt::escape(qfInfoCompiler())).arg(qfInfoMaillist()).arg(qfInfoMaillistRequest()).arg(qfInfoVersion()).arg(qfInfoVersionStatus()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()).arg(getApplicationBitDepth()).arg(getOSName()));
+                            "<b>operating system:</b><blockquote>%15</blockquote><br><br>").arg(QT_VERSION_STR).arg(qfInfoThanksTo()).arg(qfInfoCopyright()).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(qfInfoEmail()).arg(Qt::escape(qfInfoCompiler())).arg(qfInfoMaillist()).arg(qfInfoMaillistRequest()).arg(qfInfoVersion()).arg(qfInfoVersionStatus()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()).arg(getApplicationBitDepth()).arg(getOSName()));
     ui_labelLic->setText(qfInfoLicense());
+    ui_citing->setText(tr("If you used QuickFit for your data evaluation, please cite it in your publication. You can use a citation like this:"
+                          "<blockquote>%1</blockquote>"
+                          "<br><br>"
+                          "... or the BiBTeX record provided here:"
+                          "<blockquote><code><pre>%2</pre></code></blockquote><br><br>").arg(qfInfoCitationHTML()).arg(qfInfoCitationBiBTeX()));
     QFile f(":/quickfit3/releasenotes.html");
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
         QString text=f.readAll();

@@ -1,0 +1,34 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>QuickFit $$version$$ Online-Help: Install MinGW C/C++ compiler on Windows</title>
+</head>
+<body>
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+<h2>Introduction</h2>
+<p>If you need a C/C++ compiler on Microsoft Windows, which can be used to create plugins for QuickFit $$version$$ (e.g. for <a href="userfitfunctions_library.html">user-defined fit functions</a>), you can use the free <a href="http://www.mingw.org">MinGW</a>/<a href="https://sourceforge.net/projects/mingw-w64">MinGW-W64</a> version of the <a href="http://gcc-gnu.org">GNU Compiler Collection (GCC)</a>. A project, which distributes pre-compiled packages of this compiler, together with the needed libraries is <a href="http://sourceforge.net/projects/mingwbuilds/">MinGW-builds</a>. This is also the compiler, that is used to build the windows binary releases of QuickFit $$version$$. </p>
+$$note:QuickFit is available in two flavors: a 32-bit and a 64-bit version and if you write plugins, the compiler has to produce binaries, which match the bit-depth of your QuickFit copy. The bit-depth is displayed at the bottom of the QuickFit-welcome screen/splash window, which you can view in the about-dialog (main-window, menu entry: <code>Help | About</code>). It is also listed under "QuickFit bit-depth" in the "Info"-tab of that about-dialog$$
+$$note:If you need to know the exact name/version of the compiler, used to build you QuickFit version, you can look into the about-dialog (main-window, menu entry: <code>Help | About</code>). There the compiler is listed in the "Info" tab, if you scroll down to the entry "compiler used for this version:".$$
+
+<h2>How-to install</h2>
+
+<ol>
+    <li>Find out the bit-depth of your QuickFit version (see above).</li>    
+    <li>Go to the webpage <a href="http://sourceforge.net/projects/mingwbuilds/">http://sourceforge.net/projects/mingwbuilds/</a> and download the installer there.</li>
+    <li>Execute the installer. select the version you want (generally >4.4 is fine, or select the version that your QuickFit was compiled with, see above). Here are two example-configurations of the installer for 32-bit and 64-bit and MinGW 4.8.1:
+      <center><a name="install_mingwbuilds_pic000"><img src="./pic/install_mingwbuilds_pic000.png" border="1"> <a name="install_mingwbuilds_pic001"><img src="./pic/install_mingwbuilds_pic001.png" border="1">
+      </center>
+    </li>
+    <li>Now you have the compiler and all basic C/C++ libraries (stdlib/STL) installed. The installer created a start-menu entry, which opens a console, in which you can use the compiler:    
+    <center><a name="install_mingwbuilds_pic002"><img src="./pic/install_mingwbuilds_pic002.png" border="1">
+    </center>
+    </li>
+</ol>
+
+
+
+</body>
+</html>
+ 

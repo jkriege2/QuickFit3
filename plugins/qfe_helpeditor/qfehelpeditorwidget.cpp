@@ -25,6 +25,8 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     modified=false;
     ui->setupUi(this);
 
+    ui->edtScript->getEditor()->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
+    ui->edtScript->getEditor()->setLineWrapMode(QTextEdit::WidgetWidth);
     connect(ui->edtScript->getEditor()->document(), SIGNAL(contentsChanged()), this, SLOT(documentWasModified()));
 
     findDlg=new FindDialog(this);
@@ -187,6 +189,9 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$license$$");
     addInsertAction(menu, "$$maillist$$");
     addInsertAction(menu, "$$maillistrequest$$");
+    menu->addSeparator();
+    addInsertAction(menu, "$$qfcitation$$");
+    addInsertAction(menu, "$$qfcitation_bibtex$$");
 
     menu=new QMenu(tr("general help links"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
@@ -659,7 +664,7 @@ void QFEHelpEditorWidget::on_btnLink_clicked()
     QStringList links;
     links<<"http://";
     QString txt=ui->edtScript->getEditor()->toPlainText();
-    QRegExp rxLink("<a\\s*[^>]*name\\s*=\\s*\"\\#([^\"']*)\"[^>]*>", Qt::CaseInsensitive);
+    QRegExp rxLink("<a\\s*[^>]*name\\s*=\\s*\"\\#([^\"]*)\"[^>]*>", Qt::CaseInsensitive);
     rxLink.setMinimal(false);
     int count = 0;
     int pos = 0;
@@ -680,6 +685,11 @@ void QFEHelpEditorWidget::on_btnLink_clicked()
     links<<"mailto:$$maillist$$";
     links<<"$$weblink$$";
     //links<<"";
+
+    QDir d=QFileInfo(currentScript).absoluteDir();
+    QStringList filters;
+    filters<<"*.html"<<"*.htm";
+    links<<d.entryList(filters, QDir::Files);
 
 
 

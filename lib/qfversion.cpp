@@ -23,6 +23,8 @@
 #include <QSettings>
 #include "../version.h"
 #include "qftools.h"
+#include <QString>
+#include <QDate>
 
 QString qfInfoVersion() {
     return QString(QF_VERSION);
@@ -90,3 +92,19 @@ bool qfIsSpecialVersion() {
     QSettings settings("HKEY_LOCAL_MACHINE\\Software\\QuickFit3_"+QString::number(getApplicationBitDepth()), QSettings::NativeFormat);
     return settings.value("SpecialVersion", "std").toString().toLower().trimmed()=="special";
 }
+
+QString qfInfoCitationHTML() {
+    return QString(QF_CITATION_HTML);
+}
+
+QString qfInfoCitationBiBTeX() {
+    return QString(QF_CITATION_BIBTEX);
+}
+
+
+
+
+
+
+
+

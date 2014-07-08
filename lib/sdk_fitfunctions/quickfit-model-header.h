@@ -27,9 +27,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #ifndef QUICKFITMODELHEADER_H
 #define QUICKFITMODELHEADER_H
 
-//#include <windows.h>
+#include <string.h>
 #include "quickfit-model-tools.h"
-
 
 
 #ifdef __cplusplus
@@ -48,6 +47,14 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 
+inline static const char* QF3SFF_getStringDefault(const char* str, const char* strdef) {
+    if (strlen(str)>0) return str;
+    else return strdef;
+}
+
+
+
+
 #define QF3SFF_FINALIZE_NOMULTI    \
     QF3SFF_EXTERN_START\
      const char* QF3SFF_DLL_EXPORT getModelName(int16_t type) {\
@@ -55,9 +62,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
             case 1:  \
                 return QF3SFF_ID;\
             case 2:  \
-                return QF3SFF_SHORTNAME; \
+                return QF3SFF_getStringDefault(QF3SFF_SHORTNAME, QF3SFF_NAME); \
             case 3:  \
-                return QF3SFF_HELP; \
+                return QF3SFF_HELP;  \
             case 0:  \
                 return QF3SFF_NAME;\
             default:\
