@@ -41,7 +41,7 @@ class QFLibraryFitFunction_private {
         QF3SimpleFFIsParameterVisible lib_isParamVisible;
         QF3SimpleFFSortParameters lib_sortParams;
         QF3SimpleFFEvaluateDerivatives lib_evalDerivative;
-        QF3SimpleFFIsEstimateInitial lib_estimateInitial;
+        QF3SimpleFFEstimateInitial lib_estimateInitial;
         QF3SimpleFFGetAdditionalPlotCount lib_getAdditionalPlots;
         QF3SimpleFFTransformParametersForAdditionalPlot lib_transformAdditionalPlot;
         QF3SimpleFFGetVersionFunc lib_getVersion;
@@ -73,7 +73,7 @@ QFLibraryFitFunction::QFLibraryFitFunction(QLibrary *library)
         d->lib_isParamVisible=(QF3SimpleFFIsParameterVisible) d->library->resolve("isParameterVisible");
         d->lib_sortParams=(QF3SimpleFFSortParameters) d->library->resolve("sortParameters");
         d->lib_evalDerivative=(QF3SimpleFFEvaluateDerivatives) d->library->resolve("evaluateDerivatives");
-        d->lib_estimateInitial=(QF3SimpleFFIsEstimateInitial) d->library->resolve("estimateInitial");
+        d->lib_estimateInitial=(QF3SimpleFFEstimateInitial) d->library->resolve("estimateInitial");
         d->lib_getAdditionalPlots=(QF3SimpleFFGetAdditionalPlotCount) d->library->resolve("getAdditionalPlotCount");
         d->lib_transformAdditionalPlot=(QF3SimpleFFTransformParametersForAdditionalPlot) d->library->resolve("transformParametersForAdditionalPlot");
 

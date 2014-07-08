@@ -8,22 +8,202 @@
 $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 <h2>Introduction</h2>
 <p>
-QuickFit $$version$$ uses fit functions of the form $$math:f(x;\vec{p})$$ at several places. Most commonly in data evaluation plugins, such as <a href="$$plugin_info:help:fcs_fit$$">FCS fitting</a>. It supports three different ways to define these functions:
+QuickFit $$version$$ uses fit functions of the form $$math:f(x;\vec{p})$$ at several places. Most commonly in data evaluation plugins, such as <a href="$$plugin_info:help:fcs_fit$$">FCS fitting</a>.  QuickFit $$version$$ supports different ways to define these functions:
 <ol>
     <li>in full QuickFit plugins (fast, complicated)</li>
     <li>as <a href="userfitfunctions_parsed.html">parsed user-defined fit functions</a> (slow, simple)</li>
-    <li>as simplified plugins (shared libraries) (fast, semi-simple)</li>
+    <li>as simplified plugins (shared libraries) (fast, semi-simple): Here you can write the fit function as a simple C-method, which is compiled into a dynamically linked <a href="https://en.wikipedia.org/wiki/Shared_library">shared library</a> (<code>.dll</code> on windows/<code>.so</code> on linux/<code>.dynlib</code> on MacOS X), which is then loaded by QuickFit <u>on startup</u>.</li>
 </ol>
 The last option is described on this page. To follow this page, you will need:
-
 <ul>
     <li>basic understanding/knowledge of the <a href="http://en.wikipedia.org/wiki/C_%28programming_language%29">programming language C</a></li>
     <li>a C-compiler (on Linux you can use the GCC, provided with you distribution, on Windows you can use <a href="install_mingwbuilds.html">MinGW-builds</a>).</li>
 </ul>
 </p> 
+<p>An SDK with all equired headers, a Makefile (which will compile all plugins in its directory) and some examples is given in the sub-directory <code>./sdk/sdk_fitfunctions/</code> of your QuickFit installation.</p>
 
 
-<h2>Defining Fit Functions</h2>
+<h2>Fit functions in QuickFit 3.0</h2>
+
+
+<h3>Mathematical description/Example</h3>
+
+<p>As noted above, fit function are general function of the form  $$bmath:f(x;\vec{p}),$$ where $$math:x$$ is the running variable and $$math:\vec{p}$$ is a parameter parameter vector. The parameters are optimized in a fit, to best describe a given dataset $$math:(x_i,f_i)_{i=1,...,N}$$, i.e. typically by minimizing the sum of squared deviations: $$bmath:\chi^2(\vec{p})=\sum_i\left[f_i-f(x_i,\vec{p})\right]^2.$$ A simple example is a single sine function with offset $$bmath:f(x,A_0,A_1,\nu)=A_0+A_1\cdot\sin(2\pi\cdot\nu t).$$
+In this case the parameter vector is $$math:\vec{p}=\left(A_0,A_1,\nu\right)$$.
+</p>
+<p>Internally a fit function is represented as an object, which implements all the functionality. The following sub-sections describe its contents/functions.
+
+
+<h3>Evaluate function</h3>
+<p>a function, which can calculate $$math:f(x;\vec{p})$$ for a given value of $$math:x$$ and of the parameters $$math:\vec{p}$$. This we will represent as a C-function like this: <pre>double evaluate(double x, double* params) {
+    return params[0] + params[1] * sin(2.0*M_PI * params[2]*x);
+}</pre></p>
+
+
+
+<h3>Parameter properties</h3>
+<p>A list of properties, describing the fit parameters. The data in this list is used to show apropriate input controls for each fit parameter. For each parameter, it contains this information:
+    <ul>
+        <li>an <b>ID of the parameter</b> <i>[string]</i>, i.e. an internal name. This name should only use letters <code>A-Z,a-z</code>, digits <code>0-9</code> and underscores '<code>_</code>'. It is used internally (e.g. to store the fit result in the results-table of an RDR. $$example:In the example above, the IDs could be: <code>"A0", "A1", "frequency"</code>$$</li>
+        <li>a <b>name</b> <i>[string]</i> (description) for the fit parameter. This information is usually used as tooltip for the fit parameter. therefore you can also give a slightly longer explanation here (no HTML markup!!!). $$example:For the example above, the names could be <code>"offset A0", "amplitude A1", "frequency of the sine"</code>$$</li>
+        <li>a <b>label</b> <i>[string]</i>, i.e. a shorter name for the fit parameter, often only the mathematical symbol (you can use HTML markup here). This information is usually used as label next to the input widget for the fit parameter. $$example:Again for the example you could use <code>"A&lt;sub&gt;0&lt;/sub&gt;=", "A&lt;sub&gt;1&lt;/sub&gt;=", "&amp;nu;="</code>$$</li>
+        <li>a name for the (physical) <b>unit</b> <i>[string]</i> of the parameter. Actually there are two verson of this parameter: <b>unit</b> and <b>unitLabel</b>. They both should contain the same information, but once without and once with HTML markup. For the example above, $$math:A_0, A_1$$ do not have a unit, but frequency coud have $$math:[\nu]=1\mathrm{s^{-1}}=1\mathrm{Hz}$$. Therefore you could use $$bqcode:unit=<code>"", "", "1/s"</code>$$ and $$bqcode:unitLabel=<code>"", "", "s&lt;sup&gt;-1&lt;/sup&gt;"</code>$$</li>
+        <li><b>initialValue</b> <i>[double]</i> is the initial value of the fit parameter. $$example:this could be <code>0.0, 1.0, 10.0</code> for the function above$$</li>
+        <li><b>initialFix</b> <i>[boolean: QF3SFF_TRUE | QF3SFF_FALSE]</i> indicates, whether the parameter is initially fixed</li>
+        <li><b>minValue</b>...<b>maxValue</b> <i>[double]</i> gives the initial range of allowed values for the parameter. $$note:If you want to NOT limit the parameter range, use <code>-DBL_MAX</code> and <code>DBL_MAX</code> for these parameters.$$</li>
+        <li><b>userRangeEditable</b> <i>[boolean: QF3SFF_TRUE | QF3SFF_FALSE]</i> indicates, whether the parameter range may be changed by the user.</li>
+        <li><b>absMinValue</b>...<b>absMaxValue</b> <i>[double]</i> gives the absolute range of allowed values for the parameter. Even if the user is allowed to change the parameter range, it can never exceed the limits given by these parameters. $$note:If you want to NOT limit the parameter range, use <code>-DBL_MAX</code> and <code>DBL_MAX</code> for these parameters.$$</li>
+        <li><b>inc</b> <i>[double]</i> is an increment, used by the parameter input widgets, when the user edits the parameter. Usually the parameter is incremented/decremented by this amount, if the user presses the arrow buttons of the parameter input widget, or turns the mouse wheel:
+<center><a name="userfitfunctions_library_pic000"><img src="./pic/userfitfunctions_library_pic000.png" border="1">
+</center></li>
+        <li><b>type</b> indicates the type of input widget, that should be used for this parameter. These options are available: 
+        <ul>
+            <li><i>QF3SFF_WIDGET_FLOAT</i>: This is a simple number-editing widget and the default choice, suitable for nearly all parameters: <center><a name="userfitfunctions_library_pic001"><img src="./pic/userfitfunctions_library_pic001.png" border="1">  <img src="./pic/userfitfunctions_library_pic000.png" border="1"></center></li>
+            <li><i>QF3SFF_WIDGET_LOGFLOAT</i>: Same as above, but optimized for parameters, that may change over several orders of magnitude (basically the increment is logarithmically spaced)</li>
+            <li><i>QQF3SFF_WIDGET_INT</i>: a widget, that only allows to input integer numbers (looks like the two widgets above)</li>
+            <li><i>QQF3SFF_WIDGET_INT_COMBO</i>: a drop-down box, where the user can select values between <b>minValue</b>...<b>maxValue</b>.
+            <center><a name="userfitfunctions_library_pic002"><img src="./pic/userfitfunctions_library_pic002.png" border="1">
+            </center>
+            </li>
+        </ul></li>
+    </ul>
+</p>
+<p>These parameters can be used to configure the name and appearance of all fit parameters. In addition QuickFit allows for two other types of parameters:
+<ol>
+    <li><i>calculated parameters</i> are calculated (after the fit) from the other fit parameters. An example could be the angular frequency $$math:\omega=2\pi\cdot\nu$$, which can be calculated from the fit parameter $$math:\nu$$. Such a parameter cannot be used as a fit parameter and should not be editable by the user.<center><a name="userfitfunctions_library_pic003"><img src="./pic/userfitfunctions_library_pic003.png" border="1">
+</center></li>
+    <li><i>configuration parameters</i> can be used to set other parameters of the model, which also cannot be used as fit parameters. The example above could be expanded with several sine components:
+      $$bmath:f(x,A_0,A_1,\nu_1,A_2,\nu_2,A_3,\nu_3,C)=A_0+\sum_{i=0}^{C}A_i\cdot\sin(2\pi\cdot\nu_i t).$$
+      Here $$math:C\in\{0,1,2,3\}$$ is the number of components. This is a parameter, which can be changed by the user, but cannot be used as a fit parameter. Also entering an error does not make any sense here. A typical configuration parameter could be displayed as a drop-down list, like this: <center><a name="userfitfunctions_library_pic002"><img src="./pic/userfitfunctions_library_pic002.png" border="1">
+            </center></li>
+      <li>A final class of parameters are auxiliary parameters, such as the speed of sound $$math:c$$ in the example above (if we assume, that $$math:\nu$$ is the frequency of a sound wave). If this parameter is given by the user, it can be used to calculate the wavelength $$bmath:\lambda=c/\nu$$ from the fit parameter frequency $$math:\nu$$ and this user-supplied parameter.
+<center><a name="userfitfunctions_library_pic004"><img src="./pic/userfitfunctions_library_pic004.png" border="1"></center>    </li>
+</ol>
+In order to encode such parameters, additional properties are available, that extend the list above: 
+<ul>
+    <li><b>fit</b> <i>[boolean: QF3SFF_TRUE | QF3SFF_FALSE]</i> indicates, whether the parameter is a fit parameter (i.e. <code>true</code> for all the three parameters in the example above).</li>
+    <li><b>userEditable</b> <i>[boolean: QF3SFF_TRUE | QF3SFF_FALSE]</i> indicates, whether the parameter can be edited by the user (configuration/auxiliary parameter) or not (calculated parameter).</li>
+    <li><b>userRangeEditable</b> <i>[boolean: QF3SFF_TRUE | QF3SFF_FALSE]</i> indicates, whether the parameter ranges can be changed by the user (within the limits of <b>absMinValue</b>...<b>absMaxValue</b>).</li>
+    <li><b>displayError</b> <i>[enum]</i> configures, how the (fit) error of the parameter is displayed: 
+    <ul>
+        <li>no error display (<code>QF3SFF_ERROR_NONE</code>)</li>
+        <li>read-only error display (<code>QF3SFF_ERROR_DISPLAY</code>): <img src="./pic/userfitfunctions_library_pic003.png" border="1"></li>
+        <li>user-editable error display (<code>QF3SFF_ERROR_EDIT</code>): <img src="./pic/userfitfunctions_library_pic004.png" border="1"></li>
+    </ul></li>
+    <li></li>
+</ul>
+</p>
+
+
+<h3>General fit function  properties</h3>
+<p>In addition to the fit function and the fit parameter properties, the function also has some general properties, that need to be set:
+<ul>
+    <li><b>ID</b> (<code>QF3SFF_ID</code> <i>[string]</i>) an ID for the fit function. This ID is used internally by QuickFit and HAS to be unique. Therefor you should add the name of yourself or your organization to this name. Also you should use letters <code>a-z</code>, digits <code>0-9</code> and underscores <code>_</code> only for this ID. $$note:The prefix (begin) of this parameter defines the use of the model, e.g. <code>fcs_</code> for FCS fit models, <code>dls_</code> for DLS fit models, <code>gen_</code> for general fit models etc. The best is to check the naming-conventions of the models implemented in other plugins, supplied with QuickFit. These are listed as "implemented ids:" for each fit function pligin, when you click on the menu entry  "Help | About Plugins" in the main window.$$</li>
+    <li><b>name</b> (<code>QF3SFF_NAME</code> <i>[string]</i>) a name of the fit function</li>
+    <li><b>short name</b> (<code>QF3SFF_SHORTNAME</code> <i>[string]</i>) a shortened name of the fit function (1-5 words)</li>
+    <li><b>help file</b> (<code>QF3SFF_HELP</code> <i>[string]</i>) is the path/name of a HTML-help file, describing the fit function. The path needs to be relative to the position of the fit function shared library. Usually you would create a library <code>example.dll</code> or <code>example.so</code> and in addition a help file <code>example.html</code> in the same directory. the this parameter is simply <code>"example.html"</code>. This help-file will be displaye din QuickFit's internal help system. So you can sue simple HTML to format the help file. In addition some special markup (e.g. for equations) is possible and you should use the <a href="$$plugin_info:help:qfe_helpeditor$$">help file editor</a> (QuickFit main window, menu-entry: "Tools | Online-help Editor").</li>
+</ul></p>
+
+
+
+<h2>First example in C</h2>
+
+
+<h3>Compiling</h3>
+<p>The example described above can be coded in, as shown in the file <code>./sdk/sdk_fitfunctions/example.cpp</code>. You can compile this file by calling $$example:<code>make</code> (or for mingw <code>mingw-make32</code>)$$ in its directory, or by the command line $$example:<b>Windows:</b>    <code>g++ -static -lstdc++ -lgcc -shared -DQF3SFF_BUILD_DLL -I.. -fPIC -o example.dll example.cpp -O3 -s</code><br><b>Linux:</b>    <code>g++ -shared -DQF3SFF_BUILD_DLL -fPIC -o example.so example.cpp -O3 -s</code>$$  </p>
+The complete source of the fit function example is:
+
+
+<h3>Header/parameter definition</h3>
+$$example:<pre>
+// example.cpp:
+#include <math.h>
+#include <float.h>
+#include "quickfit-model-header.h"
+</pre>$$
+These include libraries are mandatory! Now all general fit function properties are defined:
+$$example:<pre>
+// model ID (internally used by QuickFit3). Since this should be unique, you should add a part, which identifies you or your organization!)
+// The prefix defines the use of the model, e.g. fcs_ for FCS fit models, dls_ for DLS fit models, gen_ for general fit models etc.
+char QF3SFF_ID[]="gen_dkfzB040_example";
+
+// human readable name
+char QF3SFF_NAME[]="EXAMPLE: fit function from shared lib";
+
+// human readable name
+char QF3SFF_SHORTNAME[]="EXAMPLE: shared lib FitFunc";
+
+// link to a help file, relative to the library
+char QF3SFF_HELP[]="example.html";
+</pre>$$
+Now the parameter properties are defined (dirst their number as <code>QF3SFF_PARAMETER_COUNT</code> and then their properties in the array <code>QF3SimpleFFParameter</code>.
+$$example:<pre>
+// number of parameters of the fit model
+#define QF3SFF_PARAMETER_COUNT 4
+
+// description of the parameters of the fit model:
+QF3SimpleFFParameter QF3SFF_PARAMETERS[QF3SFF_PARAMETER_COUNT] = { \
+   // type,                    id,                     description,                                       label,                                      unit,               unitLabel,         fit,           userEditable,      displayError,           userRangeEditable,    initialValue,   initialFix,      minValue,      maxValue,      inc,        absMinValue,      absMaxValue
+  {   QF3SFF_WIDGET_FLOAT,     "offset",               "Offset A0",                                       "Offset A&lt;sub&gt;0&lt;/sub&gt;",                     "",                 "",                QF3SFF_TRUE,   QF3SFF_TRUE,       QF3SFF_ERROR_DISPLAY,   QF3SFF_TRUE,          0.0,            QF3SFF_FALSE,    -10.0,         10.0,          0.1,        -DBL_MAX,         DBL_MAX            },
+  {   QF3SFF_WIDGET_FLOAT,     "amplitude",            "Amplitude",                                       "Amplitude",                                "",                 "",                QF3SFF_TRUE,   QF3SFF_TRUE,       QF3SFF_ERROR_DISPLAY,   QF3SFF_TRUE,          1.0,            QF3SFF_FALSE,    -DBL_MAX,      DBL_MAX,       0.1,        -DBL_MAX,         DBL_MAX            },
+  {   QF3SFF_WIDGET_FLOAT,     "frequency",            "Frequency",                                       "Frequency &amp;nu;",                           "Hz",               "Hz",              QF3SFF_TRUE,   QF3SFF_TRUE,       QF3SFF_ERROR_DISPLAY,   QF3SFF_TRUE,          10.0,           QF3SFF_FALSE,    -DBL_MAX,      DBL_MAX,       1,          -DBL_MAX,         DBL_MAX            },
+  {   QF3SFF_WIDGET_FLOAT,     "angular_frequency",    "angul. Frequency",                                "angular Frequency &amp;omega;=2&amp;pi;&amp;nu;",      "Hz",               "Hz",              QF3SFF_FALSE,  QF3SFF_FALSE,      QF3SFF_ERROR_DISPLAY,   QF3SFF_FALSE,         10.0,           QF3SFF_FALSE,    -DBL_MAX,      DBL_MAX,       1,          -DBL_MAX,         DBL_MAX            },
+};
+</pre>$$
+the next line is also mandatory before you start the implementation fo your functions:
+$$example:<pre>
+// this macro is required here (before any function def)
+QF3SFF_EXTERN_START
+////////////////////////////////////////////////////////
+</pre>$$
+Now we implement the fit function itself (compare the C-code above). This function is the only mandatory function!
+$$example:<pre>
+// implementation of the evaluate() function
+//    evaluate the function at position t and with the parameters given by p. The size of p is at least QF3SFF_PARAMETER_COUNT
+ double QF3SFF_DLL_EXPORT evaluate(double t, const double* p) {
+    return p[0]+p[1]*sin(2.0*M_PI*p[2]*t);
+}
+</pre>$$
+Calculated parameters (here the angular frequency omega) are calculated in the following (optional!) function:
+$$example:<pre>
+// implementation of the calulateParameters() function
+//    calculate additional model parameters, which are not fit parameters
+ void QF3SFF_DLL_EXPORT calulateParameters(double* p, double* e) {
+    p[3]=2.0*M_PI*p[2];
+	if (e) {
+		e[3]=2.0*M_PI*e[2];
+	}
+}
+</pre>$$
+Finally, we have to finalize the fit function definition by these two mandator macros:
+$$example:<pre>
+// this macro is required here /////////////////////////
+QF3SFF_EXTERN_END
+////////////////////////////////////////////////////////
+
+
+// this macro is required here and finalizes the library
+QF3SFF_FINALIZE
+////////////////////////////////////////////////////////
+</pre>$$
+
+
+
+<h2>Additional features</h2>
+<p>In addition to the evaluate function, you can implement more features in additional functions. Here is a reference of all fucntion, you can implement in a fit function shared library:
+
+<ul>
+    <li><b>evaluate $$math:f(x, \vec{p})$$</b> <i>[MANDATORY]</i>: $$example:<code>double QF3SFF_DLL_EXPORT evaluate(double x, const double* params)</code>$$</li>
+    <li><b>calculate calculated parameters</b> <i>[OPTIONAL]</i>:$$example:<code>void QF3SFF_DLL_EXPORT calulateParameters(double* p, double* e)</code>$$</li>
+    <li><b>parameter visibility</b> <i>[OPTIONAL]</i>:$$example:<code>int8_t isParameterVisible(int16_t parameter_number, const double* params)</code>$$</li>
+    <li><b>sort fit parameters (and erros and fixes)</b> <i>[OPTIONAL]</i>:$$example:<code>void sortParameters(double* params, double* errors=NULL, int8_t* fix=NULL)</code>$$</li>
+    <li><b>evaluate function derivatives $$math:\partial f(x;\vec{p})/\partial p_i$$</b> <i>[OPTIONAL]</i>:$$example:<code>void evaluateDerivatives(double* derivatives, double x, const double* params)</code>$$</li>
+    <li><b>estimate inital values for $$math:\vec{p}$$</b> <i>[OPTIONAL]</i>:$$example:<code>int8_t estimateInitial(double* params, const double* dataX, const double* dataY, int64_t Nxy, const int8_t* fix)</code>$$</li>
+    <li><b>return the number of additional function plots for a given parameter vector</b> <i>[OPTIONAL]</i>:$$example:<code>int32_t getAdditionalPlotCount(const double* params)</code>$$</li>
+    <li><b>transform the parameter vector for a specific additional plot and retuns it's name/label</b> <i>[OPTIONAL]</i>:$$example:<code>const char* transformParametersForAdditionalPlot(int32_t plot_id, double* params)</code>$$</li>
+</ul>
+</p>
+
 </body>
 </html>
  

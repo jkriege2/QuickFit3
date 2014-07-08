@@ -275,7 +275,7 @@ typedef void (*QF3SimpleFFEvaluateDerivatives)(double* ,double, const double*);
  * \param[in] fix if provided (!=NULL), indicates, which parameters are fixed by the suer. these should not be changed.
  * \return QF3SFF_TRUE on success
   */
-typedef int8_t (*QF3SimpleFFIsEstimateInitial)(double*,const double*,const double*,int64_t, const int8_t* );
+typedef int8_t (*QF3SimpleFFEstimateInitial)(double*,const double*,const double*,int64_t, const int8_t* );
 
 
 
@@ -299,7 +299,7 @@ typedef int32_t (*QF3SimpleFFGetAdditionalPlotCount)(const double* );
  * \param params the current parameter vector. The size of this vector is at least as large as the number of parameters.
  * \return a name for the plot
   */
-typedef const char* (*QF3SimpleFFTransformParametersForAdditionalPlot)(int32_t,const double* );
+typedef const char* (*QF3SimpleFFTransformParametersForAdditionalPlot)(int32_t,double* );
 
 
 #endif //QUICKFITMODELTOOLS_H
