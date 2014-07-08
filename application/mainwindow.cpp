@@ -548,7 +548,8 @@ void MainWindow::about() {
                             "<b>many thanks to:</b><blockquote>%2</blockquote>"
                             "<b>contact the authors:</b><blockquote><a href=\"mailto:%6\">%6</a></blockquote>"
                             "<b>mailing list:</b><blockquote><a href=\"mailto:%8\">%8</a> (<a href=\"%9\">subscribe</a>)</blockquote>"
-                            "<b>QuickFit version:</b><blockquote>version %10 (%11) %14-bit, SVN: %12, qfInfoCompileDate(): %13</blockquote>"
+                            "<b>QuickFit version:</b><blockquote>version %10 (%11) %14-bit, SVN: %12, compiledate: %13</blockquote>"
+                            "<b>QuickFit bit-depth:</b><blockquote>%14-bit</blockquote>"
                             "<b>libraries, used by QuickFit:</b><ul><li>QuickFit library v%4.%5</li><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul>"
                             "<b>compiler used for this version:</b><blockquote>%7</blockquote>"
                             "<b>operating system:</b><blockquote>%15</blockquote><br><br>").arg(QT_VERSION_STR).arg(qfInfoThanksTo()).arg(qfInfoCopyright()).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(qfInfoEmail()).arg(Qt::escape(qfInfoCompiler())).arg(qfInfoMaillist()).arg(qfInfoMaillistRequest()).arg(qfInfoVersion()).arg(qfInfoVersionStatus()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()).arg(getApplicationBitDepth()).arg(getOSName()));
