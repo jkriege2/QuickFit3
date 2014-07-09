@@ -15,5 +15,10 @@ $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$
 <p>In addition a fourth parameter is added, which is calculated from the other parameters:
 $$bmath:p_3=2\pi\cdot p_2$$
 This parameter represents the angular frequency of the oscillation. It cannot be edited by the suer, but is shown to him.</p>
+<p>In addition, this function also implements the analytical derivatives of the function, i.e.:
+$$bmath:\frac{\partial f(x,\vec{p})}{\partial p_0}=1$$
+$$bmath:\frac{\partial f(x,\vec{p})}{\partial p_1}=\sin(2\pi\cdot p_2\cdot x)$$
+$$bmath:\frac{\partial f(x,\vec{p})}{\partial p_2}=p_1\cdot\cos(2\pi\cdot p_2\cdot x)\cdot 2\pi\cdot x$$
+</p>
 </body>
 </html>

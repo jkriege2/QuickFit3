@@ -111,8 +111,10 @@ In order to encode such parameters, additional properties are available, that ex
 
 
 <h3>Compiling</h3>
-<p>The example described above can be coded in, as shown in the file <code>./sdk/sdk_fitfunctions/example.cpp</code>. You can compile this file by calling $$example:<code>make</code> (or for mingw <code>mingw-make32</code>)$$ in its directory, or by the command line $$example:<b>Windows:</b>    <code>g++ -static -lstdc++ -lgcc -shared -DQF3SFF_BUILD_DLL -I.. -fPIC -o example.dll example.cpp -O3 -s</code><br><b>Linux:</b>    <code>g++ -shared -DQF3SFF_BUILD_DLL -fPIC -o example.so example.cpp -O3 -s</code>$$  </p>
-The complete source of the fit function example is:
+<p>The example described above can be coded in, as shown in the file <a href="openfile://$$maindir$$/sdk/sdk_fitfunctions/example.cpp"><code>./sdk/sdk_fitfunctions/example.cpp</code></a>. You can compile this file by calling $$example:<code>make</code> (or for mingw <code>mingw-make32</code>)$$ in its directory, or by the command line $$example:<b>Windows:</b>    <code>g++ -static -lstdc++ -lgcc -shared -DQF3SFF_BUILD_DLL -I.. -fPIC -o example.dll example.cpp -O3 -s</code><br><b>Linux:</b>    <code>g++ -shared -DQF3SFF_BUILD_DLL -fPIC -o example.so example.cpp -O3 -s</code>$$  
+$$note:that you have to restart QuickFit, so a new version of the shared library is loaded and used$$
+</p>
+<p>The complete source of the fit function example is given below.</p>
 
 
 <h3>Header/parameter definition</h3>
@@ -190,19 +192,128 @@ QF3SFF_FINALIZE
 
 
 
-<h2>Additional features</h2>
-<p>In addition to the evaluate function, you can implement more features in additional functions. Here is a reference of all fucntion, you can implement in a fit function shared library:
+<h2>Reference of implementable C-functions</h2>
+<p>In addition to the evaluate function, you can implement more features in additional functions. Here is a reference of all function, that you can implement in a fit function shared library:
 
+$$startbox_info$$
+<b>evaluate $$math:f(x, \vec{p})$$</b> <i>[MANDATORY]</i>: $$example:<code>double QF3SFF_DLL_EXPORT evaluate(double x, const double* params)</code>$$
+Parameters:
 <ul>
-    <li><b>evaluate $$math:f(x, \vec{p})$$</b> <i>[MANDATORY]</i>: $$example:<code>double QF3SFF_DLL_EXPORT evaluate(double x, const double* params)</code>$$</li>
-    <li><b>calculate calculated parameters</b> <i>[OPTIONAL]</i>:$$example:<code>void QF3SFF_DLL_EXPORT calulateParameters(double* p, double* e)</code>$$</li>
-    <li><b>parameter visibility</b> <i>[OPTIONAL]</i>:$$example:<code>int8_t isParameterVisible(int16_t parameter_number, const double* params)</code>$$</li>
-    <li><b>sort fit parameters (and erros and fixes)</b> <i>[OPTIONAL]</i>:$$example:<code>void sortParameters(double* params, double* errors=NULL, int8_t* fix=NULL)</code>$$</li>
-    <li><b>evaluate function derivatives $$math:\partial f(x;\vec{p})/\partial p_i$$</b> <i>[OPTIONAL]</i>:$$example:<code>void evaluateDerivatives(double* derivatives, double x, const double* params)</code>$$</li>
-    <li><b>estimate inital values for $$math:\vec{p}$$</b> <i>[OPTIONAL]</i>:$$example:<code>int8_t estimateInitial(double* params, const double* dataX, const double* dataY, int64_t Nxy, const int8_t* fix)</code>$$</li>
-    <li><b>return the number of additional function plots for a given parameter vector</b> <i>[OPTIONAL]</i>:$$example:<code>int32_t getAdditionalPlotCount(const double* params)</code>$$</li>
-    <li><b>transform the parameter vector for a specific additional plot and retuns it's name/label</b> <i>[OPTIONAL]</i>:$$example:<code>const char* transformParametersForAdditionalPlot(int32_t plot_id, double* params)</code>$$</li>
+    <li><i><code>x</code></i>: the value of $$math:x$$, where to evaluate the model</li>
+    <li><i><code>params</code></i>: an array with the model parameters $$math:\vec{p}$$ to use during evaluation. The array has one entry for every fit function parameter (also for calculated params etc.). The order is the same as given in the array <code>QF3SFF_PARAMETERS</code>.</li>
 </ul>
+Returns:
+<ul>
+    <li>returns the value of $$math:f(x, \vec{p})$$ evaluated at the given value of <code>x</code> and for the given parameters <code>params</code></li>
+</ul>
+See <a href="openfile://$$maindir$$/sdk/sdk_fitfunctions/example.cpp"><code>./sdk/sdk_fitfunctions/example.cpp</code></a> for an example.
+$$endbox$$
+
+
+$$startbox_info$$
+<b>calculate calculated parameters</b> <i>[OPTIONAL]</i>:$$example:<code>void QF3SFF_DLL_EXPORT calulateParameters(double* p, double* e)</code>$$
+This function can be implemented in order to calculate "calculated parameters" (see above). Also their errors can be calculated, using gaussian error propagation.
+<br>Parameters:
+<ul>
+    <li><i><code>params</code></i>:  the current parameter vector $$math:\vec{p}$$. Also the results are written here. All fit parameters have their final values and should not be changed! The size of this vector is at least as large as the number of parameters.</li>
+    <li><i><code>errors</code></i>:  the current parameter error vector (i.e. the errors for each fit parameter, as returned by the fit algorithm). Also the results are written here. All fit parameters have their final values and should not be changed! The size of this vector is at least as large as the number of parameters. This parameter might be NULL, the errors should not be calculated (CHECK!!!)</li>
+</ul>
+See <a href="openfile://$$maindir$$/sdk/sdk_fitfunctions/example.cpp"><code>./sdk/sdk_fitfunctions/example.cpp</code></a> for an example.
+$$endbox$$
+
+
+$$startbox_info$$
+<b>parameter visibility</b> <i>[OPTIONAL]</i>:$$example:<code>int8_t isParameterVisible(int16_t parameter_number, const double* params)</code>$$
+Each parameter can be visible or invisble, i.e. the user sees an input widget or not. This feature can be used e.g. in a model with several components, where the user can select the number of components. The the parameter input widgets for the unused parameters are hidden, if this function returns <code>QF3SFF_FALSE</code> for these parameters.
+<br>Parameters:
+<ul>
+    <li><i><code>parameter_number</code></i>: the parameter, for which the visibility is returned (index in the array <code>QF3SFF_PARAMETERS</code>)</li>
+    <li><i><code>params</code></i>: an array with the model parameters $$math:\vec{p}$$. The array has one entry for every fit function parameter (also for calculated params etc.). The order is the same as given in the array <code>QF3SFF_PARAMETERS</code>.</li>
+</ul>
+Returns:
+<ul>
+    <li><code>QF3SFF_TRUE</code> if the parameter should be visible to the user and <code>QF3SFF_FALSE</code> of not.</li>
+</ul>
+See <a href="openfile://$$maindir$$/sdk/sdk_fitfunctions/example_with_param_visibility.cpp"><code>./sdk/sdk_fitfunctions/example_with_param_visibility.cpp</code></a> for an example.
+$$endbox$$
+
+
+$$startbox_info$$
+<b>sort fit parameters (and erros and fixes)</b> <i>[OPTIONAL]</i>:$$example:<code>void sortParameters(double* params, double* errors=NULL, int8_t* fix=NULL)</code>$$
+In some cases it might be desireable to reorder/sort the fit parameters (e.g. when in a multi-exponential model, you want to ensure, that the first decay-time is always the fastest time). This can be realized, by implementing this function. Usually it is not enough to only sort the parameter vector, but you may also have to sort the vector of parameter errors and the vector of parameter fixes. When implementing, you can base the new sort order on the values in <code>params</code>. Then sort the contents of <code>errors</code> and <code>fix</code> using the same permutation.
+<br>Parameters:
+<ul>
+    <li><i><code>params</code></i>: the current parameter vector $$math:\vec{p}$$. Also the results are written here. All fit parameters have their final values and should not be changed! The size of this vector is at least as large as the number of parameters.</li>
+    <li><i><code>errors</code></i>: the current parameter error vector. Also the results are written here. All fit parameters have their final values and should not be changed! The size of this vector is at least as large as the number of parameters. This parameter might be NULL, the errors should not be calculated (CHECK!!!)</li>
+    <li><i><code>fix</code></i>: the current parameter fix state vector. Also the results are written here. All fit parameters have their final values and should not be changed! The size of this vector is at least as large as the number of parameters. This parameter might be NULL, the errors should not be calculated (CHECK!!!)</li>
+</ul>
+
+See <a href="openfile://$$maindir$$/sdk/sdk_fitfunctions/example_with_param_visibility.cpp"><code>./sdk/sdk_fitfunctions/example_with_param_visibility.cpp</code></a> for an example.
+$$endbox$$
+
+
+$$startbox_info$$
+<b>evaluate function derivatives $$math:\partial f(x;\vec{p})/\partial p_i$$</b> <i>[OPTIONAL]</i>:$$example:<code>void evaluateDerivatives(double* derivatives, double x, const double* params)</code>$$
+Many fit algorithms use the gradient of the fit function (with respect to the parameters), i.e. $$math:\vec{\nabla}_{\vec{p}}f=\left(\frac{\partial f}{\partial p_0}, \frac{\partial f}{\partial p_1}, ...\right)^t$$, evaluated for a given $$math:x$$ and $$math:\vec{p}$$. By default these dericatives are calculated numerically (some fit algorithms, such as a simplex minimizer do not use them at all). In order to improve the accuracy of these derivatives and thus also the accuracy/speed of the fit algorithm, you can implement this function, if analytical derivatives of the fit function can be given. This may also improve the speed of the fit, as several function evaluations are necessary for a numerical derivative, which might be slower, than giving the full analytical form. 
+<br>Parameters:
+<ul>
+    <li><i><code>deriatives</code></i>: write the vector of partial derivates $$math: \partial f(x,\vec{p})/\partial p_i $$ with respect to the parameters into this array. This vector is at least as long as the number of parameters. Note, that you only have to evaluate derivatives for actual FIT parameters. All other values can be left unchanged.</li>
+    <li><i><code>x</code></i>: the value of $$math:x$$, where to evaluate the model derivatives</li>
+    <li><i><code>params</code></i>: an array with the model parameters $$math:\vec{p}$$ to use during evaluation. The array has one entry for every fit function parameter (also for calculated params etc.). The order is the same as given in the array <code>QF3SFF_PARAMETERS</code>.</li>
+</ul>
+
+See <a href="openfile://$$maindir$$/sdk/sdk_fitfunctions/example_with_derivatives.cpp"><code>./sdk/sdk_fitfunctions/example_with_derivatives.cpp</code></a> for an example.
+$$endbox$$
+
+
+$$startbox_info$$
+<b>estimate inital values for $$math:\vec{p}$$</b> <i>[OPTIONAL]</i>:$$example:<code>int8_t estimateInitial(double* params, const double* dataX, const double* dataY, int64_t Nxy, const int8_t* fix)</code>$$
+Some fits in QuickFit can guess the initial values for $$math:\vec{p}$$, used by a fit algorithm. This guessing is implemented in this function, which returns the guessed parameters in <code>params</code> for a given dataset in <code>dataX, dataY</code> with <code>Nxy</code> entries.
+<br>Parameters:
+<ul>
+    <li><i><code>params</code></i>:the estimated fit parameters $$math:\vec{p}$$ </li>
+    <li><i><code>dataX</code></i>: x-values of the input dataset, for which to estimate the parameters</li>
+    <li><i><code>dataY</code></i>: y-values of the input dataset, for which to estimate the parameters</li>
+    <li><i><code>Nxy</code></i>: number of entries in dataX and dataY</li>
+    <li><i><code>fix</code></i>: if provided (!=NULL), indicates, which parameters are fixed by the suer. these should not be changed.</li>
+</ul>
+Returns:
+<ul>
+    <li><code>QF3SFF_TRUE</code> on success and <code>QF3SFF_FALSE</code> else (in the latter case, no parameters ought to be returned).</li>
+</ul>
+For example, if you want to fit a line, you could perform a <a href="https://en.wikipedia.org/wiki/Simple_linear_regression">simple linear regression</a> here and return the output of the regression as parameters for the line.
+$$endbox$$
+
+
+$$startbox_info$$
+<b>return the number of additional function plots for a given parameter vector</b> <i>[OPTIONAL]</i>:$$example:<code>int32_t getAdditionalPlotCount(const double* params)</code>$$
+Some fits in QuickFit cannot only display the fitted function (i.e. $$math:f(x,\vec{p})$$), but also additional graphs. These are plotted by evaluating $$math:f(x,\vec{p}')$$ for a transformed fit parameter vector $$math:\vec{p}'$$. An example is a FCS fit with triplet blinking, where the full model contains diffusion and blinking. In addition a second graph could show the diffusion or the triplet blinking part only. This function works together with the function <code>transformParametersForAdditionalPlot()</code> (see below), which implements the actual transformation. This function returns only the number of plots, that are available.
+<br>Parameters:
+<ul>
+    <li><i><code>params</code></i>: an array with the model parameters $$math:\vec{p}$$ to use during evaluation. The array has one entry for every fit function parameter (also for calculated params etc.). The order is the same as given in the array <code>QF3SFF_PARAMETERS</code>.</li>
+</ul>
+Returns:
+<ul>
+    <li>number of additional plots</li>
+</ul>
+$$endbox$$
+
+
+$$startbox_info$$
+<b>transform the parameter vector for a specific additional plot and retuns it's name/label</b> <i>[OPTIONAL]</i>:$$example:<code>const char* transformParametersForAdditionalPlot(int32_t plot_id, double* params)</code>$$
+Some fits in QuickFit cannot only display the fitted function (i.e. $$math:f(x,\vec{p})$$), but also additional graphs. These are plotted by evaluating $$math:f(x,\vec{p}')$$ for a transformed fit parameter vector $$math:\vec{p}'$$. An example is a FCS fit with triplet blinking, where the full model contains diffusion and blinking. In addition a second graph could show the diffusion or the triplet blinking part only. This function works together with the function <code>getAdditionalPlotCount()</code> (see below), which returns the number of available transformations. This function implements the actual transformation and returns a label for the graph (which may use <a href="$$qf_ui_latex_helpfile$$">LaTeX markup</a>!).
+<br>Parameters:
+<ul>
+    <li><i><code>plot_id</code></i>:the plot for which to transporm (between 0 and <code>getAdditionalPlotCount()-1</code>)</li>
+    <li><i><code>params</code></i>: an array with the model parameters $$math:\vec{p}$$ to use during evaluation. The array has one entry for every fit function parameter (also for calculated params etc.). The order is the same as given in the array <code>QF3SFF_PARAMETERS</code>.</li>
+</ul>
+Returns:
+<ul>
+    <li>a label string for the plot (which may use <a href="$$qf_ui_latex_helpfile$$">LaTeX markup</a>). Note that this function returns a <code>const char*</code>, so it is advisable to store the string in a global static <code>char[]</code> variable and return the pointer to the first character (0-terminated C-string).</li>
+</ul>
+$$endbox$$
+
+
 </p>
 
 </body>

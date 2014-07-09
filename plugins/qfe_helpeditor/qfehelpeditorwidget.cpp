@@ -315,8 +315,19 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$note:Text$$");
     addInsertAction(menu, "$$info:Text$$");
     addInsertAction(menu, "$$warning:Text$$");
+    addInsertAction(menu, "$$example:Text$$");
+    addInsertAction(menu, "$$codeexample:Text$$");
     addInsertAction(menu, "$$bqtt:Text$$");
     addInsertAction(menu, "$$bqcode:Text$$");
+    menu->addSeparator();
+    addInsertAction(menu, "$$startbox$$");
+    addInsertAction(menu, "$$startbox_info$$");
+    addInsertAction(menu, "$$startbox_note$$");
+    addInsertAction(menu, "$$startbox_warning$$");
+    addInsertAction(menu, "$$startbox_example$$");
+    addInsertAction(menu, "$$startbox:backgroundcolor:bordercolor$$");
+    addInsertAction(menu, "$$startbox:lightgrey:midnightblue$$");
+    addInsertAction(menu, "$$endbox$$");
 
 
     menu=new QMenu(tr("insert other markups"), this);

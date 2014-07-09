@@ -2718,6 +2718,26 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
     QList<QPair<QString, QString> > fromHTML_replaces;
     QList<QPair<QString, QString> >* replaces=QFPluginServices::getInstance()->getHTMLReplacementList();
     QList<QFPluginServices::HelpDirectoryInfo>* pluginList=QFPluginServices::getInstance()->getPluginHelpList();
+    QF3HelpReplacesList localreplaces;
+    localreplaces<<qMakePair<QString, QString>("startbox", "<blockquote>"
+                                               "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: white ;  border-color: midnightblue\" >"
+                                               "<tr><td align=\"left\">");
+    localreplaces<<qMakePair<QString, QString>("startbox_info", "<blockquote>"
+                                               "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" >"
+                                               "<tr><td align=\"left\">");
+    localreplaces<<qMakePair<QString, QString>("startbox_note", "<blockquote>"
+                                               "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" >"
+                                               "<tr><td align=\"left\">");
+    localreplaces<<qMakePair<QString, QString>("startbox_warning", "<blockquote>"
+                                               "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: navajowhite ;  border-color: orangered\" >"
+                                               "<tr><td align=\"left\">");
+    localreplaces<<qMakePair<QString, QString>("startbox_example", "<blockquote>"
+                                               "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightgrey ;  border-color: midnightblue\" >"
+                                               "<tr><td align=\"left\">");
+    localreplaces<<qMakePair<QString, QString>("endbox", "</td></tr></table></blockquote>");
+
+
+
 
     // find special information in file
     QRegExp rxTitle("<title>(.*)</title>", Qt::CaseInsensitive);
@@ -2859,6 +2879,10 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 if (result.contains(QString("$$")+more_replaces[i].first+QString("$$"))) replaced=true;
                 result=result.replace(QString("$$")+more_replaces[i].first+QString("$$"), more_replaces[i].second);
             }
+            for (int i=0; i<localreplaces.size(); i++) {
+                if (result.contains(QString("$$")+localreplaces[i].first+QString("$$"))) replaced=true;
+                result=result.replace(QString("$$")+localreplaces[i].first+QString("$$"), localreplaces[i].second);
+            }
 
 
             // interpret $$list:<list_name>:<filter>$$ items
@@ -2954,7 +2978,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$insert:<filename>$$ and $$insertglobal:<filename>$$ items
-            QRegExp rxInsert("\\$\\$(insert|insertglobal|see|note|info|warning|example|codeexample|cexample|tt|code|bqtt|bqcode)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxInsert("\\$\\$(insert|insertglobal|see|note|info|warning|example|codeexample|cexample|tt|code|bqtt|bqcode|startbox)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxInsert.setMinimal(true);
             count = 0;
             pos = 0;
@@ -3100,8 +3124,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
 
-            // interpret $$plugin_info:<name>:<id>$$, $$fig:file:caption$$,  $$figure:file:caption$$ items
-            QRegExp rxPluginInfo("\\$\\$(plugin_info|fig|figure)\\:([^\\$]*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            // interpret $$plugin_info:<name>:<id>$$, $$fig:file:caption$$,  $$figure:file:caption$$ items, etc.
+            QRegExp rxPluginInfo("\\$\\$(plugin_info|fig|figure|startbox)\\:([^\\$]*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxPluginInfo.setMinimal(true);
             count = 0;
             pos = 0;
@@ -3122,7 +3146,12 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                      "<img src=\"%1\"><br><i>%2</i><br>"
                                    "</center>").arg(param1).arg(param2);
                     result=result.replace(rxInsert.cap(0), rep);
+                } else if (command=="startbox") {
+                    QString rep=tr("<blockquote>"
+                                     "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: %1 ;  border-color: %2\" >"
+                                   "<tr><td align=\"left\">").arg(param1).arg(param2);
 
+                    result=result.replace(rxInsert.cap(0), rep);
                 }
 
                 ++count;
