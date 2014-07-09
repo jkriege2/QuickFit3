@@ -173,6 +173,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$assetsdir$$");
     addInsertAction(menu, "$$examplesdir$$");
     addInsertAction(menu, "$$configdir$$");
+    addInsertAction(menu, "$$maindir$$");
 
     menu=new QMenu(tr("version/copyright info"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
@@ -663,6 +664,8 @@ void QFEHelpEditorWidget::on_btnLink_clicked()
     bool ok=false;
     QStringList links;
     links<<"http://";
+    links<<"opendir://";
+    links<<"openfile://";
     QString txt=ui->edtScript->getEditor()->toPlainText();
     QRegExp rxLink("<a\\s*[^>]*name\\s*=\\s*\"\\#([^\"]*)\"[^>]*>", Qt::CaseInsensitive);
     rxLink.setMinimal(false);
@@ -676,6 +679,9 @@ void QFEHelpEditorWidget::on_btnLink_clicked()
         pos += rxLink.matchedLength();
     }
 
+    links<<"opendir://$$maindir$$";
+    links<<"opendir://$$assetsdir$$";
+    links<<"opendir://$$examplesdir$$";
     links<<"$$mainhelpdir$$/";
     links<<"$$assetsdir$$/";
     links<<"$$examplesdir$$/";

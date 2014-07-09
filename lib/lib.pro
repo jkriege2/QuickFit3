@@ -239,13 +239,11 @@ DEFINES += QFLIB_LIBRARY
 
 
 
-FITFUNCTIONSSDKM.files = qfcfitfunction.h
-FITFUNCTIONSSDKM.path = $${QFOUTPUT}/sdk/sdk_fitfunctions/lib/
 
 FITFUNCTIONSSDK.files = ./sdk_fitfunctions/*
-FITFUNCTIONSSDK.path = $${QFOUTPUT}/sdk/sdk_fitfunctions/lib/
+FITFUNCTIONSSDK.path = $${QFOUTPUT}/sdk/sdk_fitfunctions/
 
-INSTALLS += FITFUNCTIONSSDKM FITFUNCTIONSSDK
+INSTALLS += FITFUNCTIONSSDK
 
 
 SRC_DISTRIBUTED.files = ../extlibs/MersenneTwister.h

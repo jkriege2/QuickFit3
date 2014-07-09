@@ -151,6 +151,9 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("plugintutorials_list"), createPluginDocTutorials()));
     htmlReplaceList.append(qMakePair(QString("pluginsettings_list"), createPluginDocSettings()));
     htmlReplaceList.append(qMakePair(QString("plugincopyright_list"), createPluginDocCopyrights()));
+    htmlReplaceList.append(qMakePair(QString("maindir"), settings->getApplicationDirectory()));
+    htmlReplaceList.append(qMakePair(QString("qf3dir"), settings->getApplicationDirectory()));
+    htmlReplaceList.append(qMakePair(QString("applicationdir"), settings->getApplicationDirectory()));
     htmlReplaceList.append(qMakePair(QString("mainhelpdir"), settings->getMainHelpDirectory()));
     htmlReplaceList.append(qMakePair(QString("mainhelppicdir"), settings->getMainHelpDirectory()+"pic/"));
     htmlReplaceList.append(qMakePair(QString("assetsdir"), settings->getAssetsDirectory()));

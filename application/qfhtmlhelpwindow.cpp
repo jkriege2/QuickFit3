@@ -17,6 +17,8 @@
 #include "programoptions.h"
 #include "qmodernprogresswidget.h"
 #include "qfhtmlhelptools.h"
+#include <QRegExp>
+#include <QtGlobal>
 
 
 QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
@@ -316,6 +318,25 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
             }
             //qDebug()<<"show tooltip: "<<tooltip<<tooltips.value(tooltip);
             QToolTip::showText(descriptionBrowser->mapFromGlobal(QCursor::pos()), transformQF3HelpHTML(tooltipstr, tooltipfn), descriptionBrowser, QRect());
+        } else if ((scheme=="open") || (scheme=="opendir") || (scheme=="openfile") || (scheme=="file")){
+            //QDir spd(searchPath);
+            //QString filenamen=link.toString(QUrl::RemoveScheme|QUrl::StripTrailingSlash);
+            //QString filename=QFileInfo(QUrl("file:"+filenamen).toLocalFile()).absoluteFilePath();
+            //QString cl=spd.cleanPath(spd.absoluteFilePath(filename));
+            //qDebug()<<scheme<<link<<filenamen<<QUrl("file:"+filenamen)<<filename<<cl<<spd;
+            QUrl url=link;
+            url.setScheme("file");
+#ifdef Q_WS_WIN
+            //qDebug()<<url.toString();
+            QRegExp rx("file://([a-zA-Z])/");
+            if (rx.indexIn(url.toString())>=0) {
+                //qDebug()<<rx.cap(1)<<QString("file:///%1:/").arg(rx.cap(1));
+                //qDebug()<<url.toString()<<url.toString().replace(rx, QString("file:///%1:/").arg(rx.cap(1)));
+                url=QUrl(url.toString().replace(rx, QString("file:///%1:/").arg(rx.cap(1))), QUrl::TolerantMode);
+            }
+#endif
+            qDebug()<<"open linked file: "<<url;
+            qDebug()<<QDesktopServices::openUrl(url);
         } else {
             QDir spd(searchPath);
             QString filename=link.toString(QUrl::RemoveFragment);
