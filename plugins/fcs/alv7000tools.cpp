@@ -7,7 +7,7 @@
 /**************************************************************************************************************************
  * methods and functions, that are not part of a class
  **************************************************************************************************************************/
-void ALV7_analyze(QString filename, QString& mode, unsigned int& channelCount, unsigned int& runCount, bool& crossCorrelation, int& inputchannels) {
+void ALV7_analyze(QString filename, QString& mode, unsigned int& channelCount, unsigned int& runCount, bool& crossCorrelation, bool& autoCorrelation, int& inputchannels, int& firstchannel) {
     FILE* alv_file=fopen(filename.toAscii().data(), "r");
     if (ferror(alv_file)) throw ALV7_exception(format("error while opening file '%s':\n  %s", filename.toAscii().data(), strerror(errno)));
     bool readingHeader=true;
@@ -54,7 +54,7 @@ void ALV7_analyze(QString filename, QString& mode, unsigned int& channelCount, u
                         //std::cout<<"runs found "<<item1->runs<<std::endl;
                     } else if (name.compare("Mode",  Qt::CaseInsensitive)==0) {
                         mode=token.value;
-                        ALV7_analyzeMode(mode, channelCount, crossCorrelation, inputchannels);
+                        ALV7_analyzeMode(mode, channelCount, crossCorrelation, autoCorrelation, inputchannels, firstchannel);
                     }
                 }
             } else if (token.type==ALV7_QUOTED) {
@@ -207,14 +207,102 @@ ALV7_TOKEN ALV7_getToken(FILE* alv_file, bool readingHeader) {
 
 
 
-void ALV7_analyzeMode(const QString &mode, unsigned int &channelCount, bool &crossCorrelation, int &inputchannels)
+void ALV7_analyzeMode(const QString &mode, unsigned int &channelCount, bool &crossCorrelation, bool& autoCorrelation, int &inputchannels, int& firstchannel)
 {
-    if (mode.toUpper()=="C-CH0/1+1/0") {
+    QString m=mode.toUpper().trimmed().simplified();
+    if (m=="C-CH0/1+1/0" || m=="C-CH0/1a1/0") {
+        autoCorrelation=false;
         crossCorrelation=true;
         channelCount=2;
         inputchannels=2;
+        firstchannel=0;
+    } else if (m=="C-CH0/1") {
+        autoCorrelation=false;
+        crossCorrelation=true;
+        channelCount=1;
+        inputchannels=2;
+        firstchannel=0;
+    } else if (m=="C-CH1/0") {
+        autoCorrelation=false;
+        crossCorrelation=true;
+        channelCount=1;
+        inputchannels=2;
+        firstchannel=1;
+    } else if (m=="C-CH2/3") {
+        autoCorrelation=false;
+        crossCorrelation=true;
+        channelCount=1;
+        inputchannels=2;
+        firstchannel=2;
+    } else if (m=="C-CH3/2") {
+        autoCorrelation=false;
+        crossCorrelation=true;
+        channelCount=1;
+        inputchannels=2;
+        firstchannel=3;
+    } else if (m=="A-CH0" || m=="A-(CH0+1)") {
+        autoCorrelation=true;
+        crossCorrelation=false;
+        channelCount=1;
+        inputchannels=1;
+        firstchannel=0;
+    } else if (m=="A-CH1") {
+        autoCorrelation=true;
+        crossCorrelation=false;
+        channelCount=1;
+        inputchannels=1;
+        firstchannel=1;
+    } else if (m=="A-CH2") {
+        autoCorrelation=true;
+        crossCorrelation=false;
+        channelCount=1;
+        inputchannels=1;
+        firstchannel=2;
+    } else if (m=="A-CH3") {
+        autoCorrelation=true;
+        crossCorrelation=false;
+        channelCount=1;
+        inputchannels=1;
+        firstchannel=3;
+    } else if (m=="A-CH0+1") {
+        autoCorrelation=true;
+        crossCorrelation=false;
+        channelCount=2;
+        inputchannels=2;
+        firstchannel=0;
+    } else if (m=="A-CH2+3") {
+        autoCorrelation=true;
+        crossCorrelation=false;
+        channelCount=2;
+        inputchannels=2;
+        firstchannel=2;
+    } else if (m=="A-CH0+1 A-CH2+3") {
+        autoCorrelation=true;
+        crossCorrelation=false;
+        channelCount=4;
+        inputchannels=4;
+        firstchannel=0;
+    } else if (m=="A-CH0+1 C-CH0/1+1/0" || m=="A-CH0+1 C-CH0/1a1/0") {
+        crossCorrelation=true;
+        autoCorrelation=true;
+        channelCount=2;
+        inputchannels=2;
+        firstchannel=0;
+    } else if (m=="A-CH0+1 C-CH2/3+3/2") {
+        crossCorrelation=true;
+        autoCorrelation=true;
+        channelCount=2;
+        inputchannels=4;
+        firstchannel=0;
+    } else if (m=="A-CH2+3 C-CH2/3+3/2") {
+        crossCorrelation=true;
+        autoCorrelation=true;
+        channelCount=2;
+        inputchannels=4;
+        firstchannel=2;
     } else  {
-        crossCorrelation=mode.toUpper().startsWith("C-", Qt::CaseInsensitive);
+        autoCorrelation=mode.toUpper().contains("A-", Qt::CaseInsensitive);
+        crossCorrelation=mode.toUpper().contains("C-", Qt::CaseInsensitive);
         channelCount=1;
         inputchannels=1;
     }

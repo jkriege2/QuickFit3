@@ -1644,7 +1644,9 @@ struct ALV7FILEDATA  {
 };
 
 bool QFRDRFCSData::loadFromALV7000Files(QStringList filenames) {
-    try {
+    return false;
+    /*
+     * try {
         double timefactor=getProperty("ALV_TIMEFACTOR", 1.0).toDouble();
         ALV7FILEDATA init;
         init.runs=0;
@@ -1776,15 +1778,35 @@ bool QFRDRFCSData::loadFromALV7000Files(QStringList filenames) {
 
                                 unsigned int ccount=0;
                                 int inch=0;
+                                int channel=0;
                                 bool cross=false;
-                                ALV7_analyzeMode(propVS, ccount, cross, inch);
+                                bool autoc=false;
+                                ALV7_analyzeMode(propVS, ccount, cross, autoc, inch, channel);
                                 propN="CROSS_CORRELATION";
                                 bool propV=cross;
                                 if (i==0) setQFProperty(propN, propV, false, true);
                                 else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
 
+                                propN="AUTO_CORRELATION";
+                                propV=autoc;
+                                if (i==0) setQFProperty(propN, propV, false, true);
+                                else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
+
                                 propN="DUAL_CHANNEL";
                                 propV=ccount>1;
+                                data[i].isDual=propV;
+                                if (i==0) setQFProperty(propN, propV, false, true);
+                                else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
+
+
+                                propN="INPUT_CHANNELS";
+                                propV=inch;
+                                data[i].isDual=propV;
+                                if (i==0) setQFProperty(propN, propV, false, true);
+                                else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
+
+                                propN="CHANNELS";
+                                propV=ccount;
                                 data[i].isDual=propV;
                                 if (i==0) setQFProperty(propN, propV, false, true);
                                 else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
@@ -1846,6 +1868,7 @@ bool QFRDRFCSData::loadFromALV7000Files(QStringList filenames) {
 
 
         if (!error) {
+            QList<int> columns=stringToIntList(getProperty("COLUMNS", "").toString());
             int runs=0;
             int ccorrN=0;
             int rrateN=0;
@@ -1854,10 +1877,11 @@ bool QFRDRFCSData::loadFromALV7000Files(QStringList filenames) {
                 if (data[i].dat_corr.size()>ccorrN) ccorrN=data[i].dat_corr.size();
                 if (data[i].dat_rate.size()>rrateN) rrateN=data[i].dat_rate.size();
             }
+            ccorrN=columns.size()*data.size();
 
             resizeCorrelations(ccorrN, runs);
-            if (getProperty("CROSS_CORRELATION", false).toBool()||getProperty("DUAL_CHANNEL", false).toBool()) resizeRates(rrateN, runs, 2);
-            else resizeRates(rrateN, runs, 1);
+
+            resizeRates(rrateN, runs, qBound(1, getProperty("INPUT_CHANNELS", 1).toInt(), 1000));
             int run0=0;
             for (int ii=0; ii<data.size(); ii++) {
                 //qDebug()<<ii<<data[ii].dat_corr.size();
@@ -1881,7 +1905,6 @@ bool QFRDRFCSData::loadFromALV7000Files(QStringList filenames) {
                         }
                     }
                     //qDebug()<<correlationT[i];
-
 
 
 
@@ -1954,11 +1977,7 @@ bool QFRDRFCSData::loadFromALV7000Files(QStringList filenames) {
                                 error=true;
                                 break;
                             }
-                            /*if (data[ii].isDual && channel==1) {
-                                for (int c=0; c<rateChannels; c++) {
-                                    rate[c*rateN*rateRuns+run0*rateN+i]=d[1+rateChannels-1-c];
-                                }
-                            } else {*/
+
                                 for (int c=0; c<rateChannels; c++) {
                                     rate[c*rateN*rateRuns+run0*rateN+i]=d[1+c];
                                 }
@@ -1974,15 +1993,11 @@ bool QFRDRFCSData::loadFromALV7000Files(QStringList filenames) {
                                 error=true;
                                 break;
                             }
-                            /*if (data[ii].isDual) {
-                                for (int c=0; c<rateChannels; c++) {
-                                    rate[c*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]=d[1+rateChannels-1-c];
-                                }
-                            } else {*/
+
                                 for (int c=0; c<rateChannels; c++) {
                                     rate[c*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]=d[1+c];
                                 }
-                            //}
+
                             if (getRateChannelsSwapped()) {
                                 //qDebug()<<"swapping in "<<getName();
                                 qSwap(rate[0*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i], rate[1*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]);
@@ -1992,31 +2007,7 @@ bool QFRDRFCSData::loadFromALV7000Files(QStringList filenames) {
 
 
 
-                    /*if (rateChannels<=1) {
-                        // multiple runs -> average is in file -> ignore average column
-                        if (d.size()<=1+channel) {
-                            setError(tr("too few columns in line %1 of rate block in file '%2'.").arg(i).arg(data[ii].filename));
-                            error=true;
-                            break;
-                        }
-                        rate[(run0+runs-1)*rateN+i]=d[1+channel];
-                    } else {
-                        // multiple runs -> average is in file -> ignore average column
-                        if (d.size()<=1+channel) {
-                            setError(tr("too few columns in line %1 of rate block.").arg(i));
-                            error=true;
-                            break;
-                        }
-                        if (data[ii].isDual) {
-                            for (int c=0; c<rateChannels; c++) {
-                                rate[c*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]=d[1+rateChannels-1-c];
-                            }
-                        } else {
-                            for (int c=0; c<rateChannels; c++) {
-                                rate[c*rateN*rateRuns+(run0+data[ii].runs-1)*rateN+i]=d[1+c];
-                            }
-                        }
-                    }*/
+
                 }
                 if (error) break;
                 run0=run0+data[ii].runs;
@@ -2048,7 +2039,254 @@ bool QFRDRFCSData::loadFromALV7000Files(QStringList filenames) {
         setError(tr("error while reading file '1':\n   %2").arg(filenames.value(0, "???")).arg(e.what()));
         return false;
     }
+     * */
+}
 
+bool QFRDRFCSData::loadFromALV7000File(QString &filename)
+{
+    try {
+        double timefactor=getProperty("ALV_TIMEFACTOR", 1.0).toDouble();
+        ALV7FILEDATA data;
+        data.runs=0;
+        data.alv_file=NULL;
+        data.filename="";
+        data.isDual=false;
+        data.readingHeader=true;
+        data.findIdentifier=true;
+        bool error=false;
+        int channel=0;
+        bool gotCorr=false, gotRate=false;
+        data.filename=filename;
+        data.alv_file=fopen(data.filename.toAscii().data(), "r");
+
+        if (!data.alv_file) {
+            setError(tr("could not open file '%1'").arg(data.filename));
+            error=true;
+            return false;
+        }
+        if (ferror(data.alv_file)) {
+            setError(tr("%2").arg(data.filename).arg(strerror(errno)));
+            error=true;
+            fclose(data.alv_file);
+            return false;
+        }
+        data.token=ALV7_getToken(data.alv_file, data.readingHeader);
+        //if (error) break;
+
+
+        // first we parse the header (until we find the first quoted string)
+        // the data from the header is interpeted and the resulting quickfitDataStoreItem are
+        // beeing created.
+        while (data.token.type!=ALV7_EOF && data.readingHeader) {
+            if (data.findIdentifier) {
+                if (data.token.type==ALV7_NAME) {
+                    //qDebug()<<"finID: "<<data.token.value;
+                    if (data.token.value.contains("ALV-700", Qt::CaseInsensitive)) {
+                        setQFProperty("ALV_TYPE", data.token.value, false, true);
+                        data.findIdentifier=false;
+                    } else if (data.token.type!=ALV7_LINEBREAK && data.token.type!=ALV7_EOF) {
+                        setError(tr("did not find file header").arg(data.filename));
+                        error =true;
+                        break;
+                    }
+                }
+            } else {
+                if (data.token.type==ALV7_NAME) { // here we parse "<name> : <value>"
+                    QString name=data.token.value; // store <name>
+                    QString value;
+                    // get next token which has to be a colon':'
+                    data.token=ALV7_getToken(data.alv_file, data.readingHeader);
+                    if (data.token.type!=ALV7_COLON) {
+                        if (name.toLower().startsWith("alv") && name.toLower().endsWith("data")) {
+                            int pnum=1;
+                            while (propertyExists(QString("ALV7_TYPE%1").arg(pnum))) pnum++;
+                            setQFProperty(QString("ALV7_TYPE%1").arg(pnum), data.token.value, false, true);
+                        } else {
+                            setError(tr("colon ':' expected, but found '%2'").arg(data.filename).arg(data.token.value));
+                            error=true;
+                            break;
+                        }
+                    } else {
+                        // get next token which has to be a value or a quoted string or a linebreak
+                        data.token=ALV7_getToken(data.alv_file, data.readingHeader);
+                        if (data.token.type==ALV7_QUOTED) {
+                            value=data.token.value;
+                        } else if (data.token.type==ALV7_VALUE) {
+                            value=data.token.value;
+                        } else if (data.token.type!=ALV7_LINEBREAK) {
+                            setError(tr("linebreak, number or quoted string expected").arg(data.filename));
+                            error=true;
+                            break;
+                        }
+                        // here we check whether this is an interpreted data field (i.e. it is stored in a separate field of item1
+                        if (name.compare("Date",  Qt::CaseInsensitive)==0) {
+                            QDate date=ALV7_toDate(value);
+                            if (date.year()<1950) date.setDate(date.year()+100, date.month(), date.day());
+                            setQFProperty("DATE", date, false, true);
+                        } else if (name.compare("Time",  Qt::CaseInsensitive)==0) {
+                            QTime date=ALV7_toTime(value);
+                            setQFProperty("TIME", date, false, true);
+                        } else if (name.contains("Duration",  Qt::CaseInsensitive)) {
+                            QString propN="DURATION [s]";
+                            double propV=data.token.doubleValue;
+                            setQFProperty(propN, propV, false, true);
+                        } else if (name.compare("Runs",  Qt::CaseInsensitive)==0) {
+                            data.runs=(int)round(data.token.doubleValue);
+                        } else if (name.contains("Temperature",  Qt::CaseInsensitive)) {
+                            QString propN="TEMPERATURE [K]";
+                            double propV=data.token.doubleValue;
+                            setQFPropertyIfNotUserEditable(propN, propV, false, true);
+                        } else if (name.contains("Viscosity",  Qt::CaseInsensitive)) {
+                            QString propN="VISCOSITY [cp]";
+                            double propV=data.token.doubleValue;
+                            setQFPropertyIfNotUserEditable(propN, propV, false, true);
+                        } else if (name.contains("Refractive Index",  Qt::CaseInsensitive)) {
+                            QString propN="REFRACTIVE_INDEX";
+                            double propV=data.token.doubleValue;
+                            setQFPropertyIfNotUserEditable(propN, propV, false, true);
+                        } else if (name.contains("Wavelength",  Qt::CaseInsensitive)) {
+                            QString propN="WAVELENGTH [nm]";
+                            double propV=data.token.doubleValue;
+                            setQFPropertyIfNotUserEditable(propN, propV, false, true);
+                        } else if (name.contains("Angle",  Qt::CaseInsensitive)) {
+                            QString propN="ANGLE [°]";
+                            double propV=data.token.doubleValue;
+                            setQFPropertyIfNotUserEditable(propN, propV, false, true);
+                        } else if (name.contains("MeanCR",  Qt::CaseInsensitive)) {
+                            // ignore this property, as it is calculated by this class
+                        } else if (name.contains("SampMemo",  Qt::CaseInsensitive)) {
+                            QString text=getProperty("SAMPLE_MEMO", "").toString();
+                            setQFProperty("SAMPLE_MEMO", text, false, true);
+                        } else if (name.compare("Mode",  Qt::CaseInsensitive)==0) {
+                            QString propN="MODE";
+                            QString propVS=value;
+                            setQFProperty(propN, propVS, false, true);
+
+                            unsigned int ccount=0;
+                            int inch=0;
+                            int channel=0;
+                            bool cross=false;
+                            bool autoc=false;
+                            ALV7_analyzeMode(propVS, ccount, cross, autoc, inch, channel);
+
+
+                            setQFProperty("CROSS_CORRELATION", cross, false, true);
+
+
+                            setQFProperty("AUTO_CORRELATION", autoc, false, true);
+
+                            data.isDual=ccount>1;
+                            setQFProperty("DUAL_CHANNEL", ccount>1, false, true);
+
+                            setQFProperty("INPUT_CHANNELS", inch, false, true);
+
+                            setQFProperty("CHANNELS", ccount, false, true);
+
+
+                        } else {
+                            setQFProperty(name, value, false, true);
+                        }
+                    }
+
+                } else if (data.token.type==ALV7_QUOTED) {
+                    // we stop reading the header when we meet the first quoted string token
+                    // this is possible as every line of the header begins with an unquoted name
+                    // token followed by a colon and number/quoted or alineabreak (identifier line!)
+                    data.readingHeader=false;
+                }
+            }
+            if (data.readingHeader) data.token=ALV7_getToken(data.alv_file, data.readingHeader);
+        }
+
+
+        channel=getProperty("CHANNEL", 0).toInt();
+
+
+
+        if (!error) {
+            while (data.token.type!=ALV7_EOF && (!gotCorr || !gotRate)) {
+                bool getNew=true;
+                //qDebug()<<data.token.value;
+                if (data.token.type==ALV7_QUOTED && data.token.value.contains("correlation", Qt::CaseInsensitive)) {
+                    getNew=false;
+                    QVector<QVector<double> > dat;
+                    data.token=ALV7_readNumberMatrix(data.alv_file, &(dat));
+                    data.dat_corr=dat;
+                    gotCorr=true;
+                    //qDebug()<<"  parsing correlation section ... "<<data.dat_corr.size()<<data.dat_corr[0].size()<<"\n";
+                    getNew=false;
+                }
+                if (data.token.type==ALV7_QUOTED && data.token.value.contains("count", Qt::CaseInsensitive)) {
+                    getNew=false;
+                    QVector<QVector<double> > dat;
+                    data.token=ALV7_readNumberMatrix(data.alv_file, &(dat));
+                    data.dat_rate=dat;
+                    gotRate=true;
+                    //qDebug()<<"  parsing rate section ... "<<data.dat_rate.size()<<data.dat_rate[0].size()<<"\n";
+                    getNew=false;
+                }
+                if (getNew) data.token=ALV7_getToken(data.alv_file, false);
+            }
+        }
+
+
+
+        if (!error) {
+            QList<int> columns=stringToIntList(getProperty("COLUMNS", "").toString());
+            int runs=columns.size();//data.runs;
+            int ccorrN=data.dat_corr.size();
+            int rrateN=data.dat_rate.size();
+
+            resizeCorrelations(ccorrN, runs);
+
+            for (long long  i=0; i<correlationN; i++) {
+                QVector<double> d=data.dat_corr.value(i, QVector<double>());
+                correlationT[i]=d.value(0, 0.0)*timefactor/1000.0;
+                for (int run=0; run<correlationRuns; run++) {
+                    int col=columns.value(run, -1);
+                    if (col>=0) {
+                        correlation[run*correlationN+i]=d[col];
+                        // TODO: CHECK how the layout is for several runs in one file!!!
+                    }
+                }
+            }
+
+            resizeRates(rrateN, runs, qBound(1, getProperty("INPUT_CHANNELS", 1).toInt(), 1000));
+
+            for (long long  i=0; i<rateN; i++) {
+                QVector<double> d=data.dat_rate.value(i, QVector<double>());
+                rateT[i]=d.value(0, 0.0);
+                for (int r=0; r<rateRuns; r++) {
+                    for (int cha=0; cha<rateChannels; cha++) {
+                        rate[cha*rateN*rateRuns+r*rateN+i]=d[1+cha];
+                        // TODO: CHECK how the layout is for several runs in one file!!!
+                    }
+                }
+            }
+        }
+
+
+
+        //std::cout<<"parsing data section ... runs="<<runs<<"  channel="<<channel<<std::endl;
+        if (data.alv_file) fclose(data.alv_file);
+        data.alv_file=NULL;
+
+       // std::cout<<"recalc correlations ..."<<std::endl;
+        if (!error) {
+            recalculateCorrelations();
+           // std::cout<<"calc binned rates ..."<<std::endl;
+            autoCalcRateN=rateN;
+            calcBinnedRate();
+            //std::cout<<"DONE !!!"<<std::endl;
+            emitRawDataChanged();
+            return true;
+        } else {
+            return false;
+        }
+    } catch (std::exception& e) {
+        setError(tr("error while reading file '1':\n   %2").arg(filename).arg(e.what()));
+        return false;
+    }
 }
 
 
@@ -2346,11 +2584,18 @@ bool QFRDRFCSData::reloadFromFiles() {
        }
        return loadFromALV6000Files(files);
     } else if (filetype.toUpper()=="ALV7000") {
+        bool res=false;
        if (files.size()<=0) {
           setError(tr("there are no files in the FCS record!"));
           return false;
        }
-       return loadFromALV7000Files(files);
+       //return loadFromALV7000Files(files);
+       if (files.size()==1) {
+           res=loadFromALV7000File(files[0]);
+       } else if (files.size()>1) {
+           loadSeveral(res, files, loadFromALV7000File);
+       }
+       return res;
     } else if (filetype.toUpper()=="CORRELATOR.COM_SIN") {
         bool res=false;
        if (files.size()<=0) {

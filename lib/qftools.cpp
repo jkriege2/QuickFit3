@@ -1117,3 +1117,14 @@ QStringList qfDirListFilesRecursive(QDir& dir, const QStringList& filters) {
     return sl;
 }
 
+
+QList<int> stringToIntList(const QString& data) {
+    QList<int> res;
+    QStringList sl=data.trimmed().split(',');
+    for (int i=0; i<sl.size(); i++) {
+        bool ok=false;
+        int val=sl[i].toInt(&ok);
+        if (ok) res<<val;
+    }
+    return res;
+}

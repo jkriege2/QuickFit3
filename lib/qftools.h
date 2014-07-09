@@ -753,6 +753,14 @@ QString arrayToString(const T* input, long long N, bool withBrackets=true) {
     return res;
 }
 
+
+/*! \brief takes an array of integer number created with arrayToString() or listToString(), e.g. "0,2,3,4" and returns it as a QList<int>
+    \ingroup qf3lib_tools
+
+*/
+
+QFLIB_EXPORT QList<int> stringToIntList(const QString& data);
+
 /*! \brief builds a string out of a given container (with size() and operator[]). If \a withIDs is \c true, the index will be output in front of each value.
     \ingroup qf3lib_tools
 
