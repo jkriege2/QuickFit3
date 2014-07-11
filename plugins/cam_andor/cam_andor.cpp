@@ -728,7 +728,7 @@ void QFExtensionCameraAndor::changeCameraSetting(QSettings& settings, QFExtensio
     if (which==QFExtensionCamera::CamSetNumberFrames) settings.setValue(prefix+"kinetic_cycles", value);
     if (which==QFExtensionCamera::CamSetEMGAIN) {
         settings.setValue(prefix+"emgain", value);
-        settings.setValue(prefix+"emgain_enabled", true);
+        settings.setValue(prefix+"emgain_enabled", value>0);
     }
     if (which==QFExtensionCamera::CamSetGain) settings.setValue(prefix+"preamp_gain", value);
     if (which==QFExtensionCamera::CamSetFrametime) settings.setValue(prefix+"kinetic_cycle_time", value);
@@ -1103,7 +1103,7 @@ bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndo
         CHECK(SetImageFlip(0,0), tr("error while switching image flipping off"));
         CHECK(SetEMGainMode(2), tr("error while setting linear EM gain mode"));
         CHECK(SetEMAdvanced((info.advancedEMGain)?1:0), tr("error while setting advanced EM gain mode"));
-        if (info.emgain_enabled) {
+        if (info.emgain_enabled && info.emgain>0) {
             //qDebug()<<"setting EMGain: "<<info.emgain;
             CHECK(SetEMCCDGain(info.emgain), tr("error while setting EM gain %1").arg(info.emgain));
         } else {
