@@ -39,10 +39,14 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #  define QF3SFF_EXTERN_END
 #endif
 
-#ifdef QF3SFF_BUILD_DLL
-    #define QF3SFF_DLL_EXPORT __declspec(dllexport)  QF3SFF_CALLCONVENTION
+#ifdef __WINDOWS__
+#  ifdef QF3SFF_BUILD_DLL
+#    define QF3SFF_DLL_EXPORT __declspec(dllexport)  QF3SFF_CALLCONVENTION
+#  else
+#    define QF3SFF_DLL_EXPORT __declspec(dllimport)  QF3SFF_CALLCONVENTION
+#  endif
 #else
-    #define QF3SFF_DLL_EXPORT __declspec(dllimport)  QF3SFF_CALLCONVENTION
+#  define QF3SFF_DLL_EXPORT
 #endif
 
 

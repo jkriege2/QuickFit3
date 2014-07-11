@@ -35,6 +35,19 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <stdlib.h>
 #include <stdio.h>
 
+
+#ifndef __WINDOWS__
+# if defined(WIN32) || defined(WIN64) || defined(_MSC_VER) || defined(_WIN32)
+#  define __WINDOWS__
+# endif
+#endif
+
+#ifndef __LINUX__
+# if defined(linux)
+#  define __LINUX__
+# endif
+#endif
+
 /**
  * \defgroup quickfit3_models_widgettypes Widget Type Constants
  * \ingroup quickfit3_models
