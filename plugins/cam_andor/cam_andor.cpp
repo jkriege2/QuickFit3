@@ -727,8 +727,8 @@ void QFExtensionCameraAndor::changeCameraSetting(QSettings& settings, QFExtensio
     if (which==QFExtensionCamera::CamSetExposureTime) settings.setValue(prefix+"exposure_time", value);
     if (which==QFExtensionCamera::CamSetNumberFrames) settings.setValue(prefix+"kinetic_cycles", value);
     if (which==QFExtensionCamera::CamSetEMGAIN) {
-        settings.setValue(prefix+"emgain", value);
-        settings.setValue(prefix+"emgain_enabled", value>0);
+        settings.setValue(prefix+"emgain", value.toDouble());
+        settings.setValue(prefix+"emgain_enabled", value.toDouble()>0);
     }
     if (which==QFExtensionCamera::CamSetGain) settings.setValue(prefix+"preamp_gain", value);
     if (which==QFExtensionCamera::CamSetFrametime) settings.setValue(prefix+"kinetic_cycle_time", value);
