@@ -387,6 +387,10 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QMenu *dataMenu;
         QMenu *evaluationMenu;
         QMenu *helpMenu;
+        QMenu* wizardsMenu;
+        QMenu* projectWizardsMenu;
+        QMenu* rdrWizardsMenu;
+        QMenu* evalWizardsMenu;
         QMenu* insertItemMenu;
         QMenu* extensionMenu;
         QToolBar *fileToolBar;

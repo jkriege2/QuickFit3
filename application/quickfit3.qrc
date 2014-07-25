@@ -25,6 +25,11 @@
         <file alias="evaluation_insert.png">../images/22x22/eval_add.png</file>
         <file alias="qf3fileicon.png">../images/22x22/qf3fileicon.png</file>
         <file alias="reload_project.png">../images/16x16/reload.png</file>
+
+        <file alias="wizard.png">../images/22x22/wizard2.png</file>
+        <file alias="project_wizard.png">../images/22x22/project_wizard.png</file>
+        <file alias="rdr_wizard.png">../images/22x22/rdr_wizard.png</file>
+        <file alias="eval_wizard.png">../images/22x22/eval_wizard.png</file>
     </qresource>
     <qresource prefix="/quickfit3">
         <file>optionsdlg_icons/advancedsettings.png</file>

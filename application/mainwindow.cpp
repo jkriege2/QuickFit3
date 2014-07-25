@@ -1206,6 +1206,7 @@ void MainWindow::createMenus() {
     projectSpecialMenu->addAction(openProjectSubsetAct);
     projectSpecialMenu->addAction(openExampleAct);
 
+    fileMenu->addSeparator();
     fileMenu->addAction(saveProjectAct);
     fileMenu->addAction(saveProjectAsAct);
     fileMenu->addSeparator();
@@ -1227,7 +1228,7 @@ void MainWindow::createMenus() {
     extensionMenu=menuBar()->addMenu(tr("&Extensions"));
     toolsMenu=menuBar()->addMenu(tr("&Tools"));
     toolsMenu->addAction(actUserFitfunctionsEditor);
-    projectToolsMenu=toolsMenu->addMenu(tr("project tools"));
+    projectToolsMenu=toolsMenu->addMenu(tr("&Project Tools"));
     projectToolsMenu->addSeparator();
     projectToolsMenu->addAction(actRDRReplace);
     projectToolsMenu->addAction(actRDRUndoReplace);
@@ -1239,8 +1240,23 @@ void MainWindow::createMenus() {
     projectToolsMenu->addAction(actSetRDRPropertyByRegExp);
     projectToolsMenu->addSeparator();
     projectToolsMenu->addAction(actFixFilesPathes);
-    debugToolsMenu=toolsMenu->addMenu(tr("debug tools"));
+    debugToolsMenu=toolsMenu->addMenu(tr("&Debug Tools"));
     debugToolsMenu->addAction(actPerformanceTest);
+    toolsMenu->addSeparator();
+    wizardsMenu=toolsMenu->addMenu(tr("&Wizards"));
+    wizardsMenu->setIcon(QIcon(":/wizard.png"));
+    projectWizardsMenu=wizardsMenu->addMenu(tr("&Projects Wizards"));
+    projectWizardsMenu->setIcon(QIcon(":/project_wizard.png"));
+    rdrWizardsMenu=wizardsMenu->addMenu(tr("&Raw Data Wizards"));
+    rdrWizardsMenu->setIcon(QIcon(":/rdr_wizard.png"));
+    evalWizardsMenu=wizardsMenu->addMenu(tr("&Evaluation Wizards"));
+    evalWizardsMenu->setIcon(QIcon(":/eval_wizard.png"));
+    dataMenu->addSeparator();
+    dataMenu->addMenu(rdrWizardsMenu);
+    dataMenu->addMenu(evalWizardsMenu);
+    fileMenu->insertAction(openProjectAct, projectWizardsMenu->menuAction());
+    fileMenu->insertSeparator(openProjectAct);
+    wizardsMenu->addSeparator();
     toolsMenu->addSeparator();
 
     menuBar()->addSeparator();
@@ -1274,6 +1290,14 @@ void MainWindow::createMenus() {
     menus["tools"]=toolsMenu;
     menus["tools/project"]=projectToolsMenu;
     menus["tools/debug"]=debugToolsMenu;
+    menus["tools/wizards"]=wizardsMenu;
+    menus["tools/project_wizards"]=projectWizardsMenu;
+    menus["tools/rdr_wizards"]=rdrWizardsMenu;
+    menus["tools/eval_wizards"]=evalWizardsMenu;
+    menus["wizards"]=wizardsMenu;
+    menus["project_wizards"]=projectWizardsMenu;
+    menus["rdr_wizards"]=rdrWizardsMenu;
+    menus["eval_wizards"]=evalWizardsMenu;
 
     tvMain->addAction(insertItemMenu->menuAction());
     tvMain->addAction(evaluationMenu->menuAction());
