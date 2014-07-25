@@ -46,6 +46,7 @@ QFParameterCorrelationView::QFParameterCorrelationView(QWidget *parent) :
     connectParameterWidgetsCounter=0;
     histLabelX="";
     histLabelY="";
+    histLabelColor="";
     createWidgets();
 }
 
@@ -99,6 +100,14 @@ void QFParameterCorrelationView::writeQFProperties(QFProperties *current, const 
         current->setQFProperty(prefix+QString("rmax2_%1_%2").arg(egroup).arg(param), edtHistogramMax2->value(), false, false);
     }
 
+    current->setQFProperty(prefix+QString("colorscale_%1_%2").arg(egroup).arg(param), cmbColorScale->currentIndex(), false, false);
+    current->setQFProperty(prefix+QString("colrauto_%1_%2").arg(egroup).arg(param), chkColorRangeAuto->isChecked(), false, false);
+    if (!chkColorRangeAuto->isChecked()) {
+        current->setQFProperty(prefix+QString("colrmin_%1_%2").arg(egroup).arg(param), edtColorMin->value(), false, false);
+        current->setQFProperty(prefix+QString("colrmax_%1_%2").arg(egroup).arg(param), edtColorMax->value(), false, false);
+    }
+
+
 }
 
 void QFParameterCorrelationView::readQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
@@ -127,6 +136,16 @@ void QFParameterCorrelationView::readQFProperties(QFProperties *current, const Q
         edtHistogramMin2->setValue(current->getProperty(prefix+QString("rmin2_%1_%2").arg(egroup).arg(param), 0).toDouble());
         edtHistogramMax2->setValue(current->getProperty(prefix+QString("rmax2_%1_%2").arg(egroup).arg(param), 10).toDouble());
     }
+
+
+
+
+    cmbColorScale->setCurrentIndex(current->getProperty(prefix+QString("colorscale_%1_%2").arg(egroup).arg(param), JKQTPMathImageMATLAB).toInt());
+    chkColorRangeAuto->setChecked(current->getProperty(prefix+QString("colrauto_%1_%2").arg(egroup).arg(param), true).toBool());
+    if (!chkColorRangeAuto->isChecked()) {
+        edtColorMin->setValue(current->getProperty(prefix+QString("colrmin_%1_%2").arg(egroup).arg(param), 0).toDouble());
+        edtColorMax->setValue(current->getProperty(prefix+QString("colrmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
+    }
 }
 
 void QFParameterCorrelationView::connectParameterWidgets(bool connectTo)
@@ -144,6 +163,12 @@ void QFParameterCorrelationView::connectParameterWidgets(bool connectTo)
         connect(chkHistogramRangeAuto2, SIGNAL(toggled(bool)), this, SLOT(dataSettingsChanged()));
         connect(edtHistogramMin2, SIGNAL(valueChanged(double)), this, SLOT(dataSettingsChanged()));
         connect(edtHistogramMax2, SIGNAL(valueChanged(double)), this, SLOT(dataSettingsChanged()));
+
+
+        connect(cmbColorScale, SIGNAL(currentIndexChanged(int)), this, SLOT(dataSettingsChanged()));
+        connect(chkColorRangeAuto, SIGNAL(toggled(bool)), this, SLOT(dataSettingsChanged()));
+        connect(edtColorMin, SIGNAL(valueChanged(double)), this, SLOT(dataSettingsChanged()));
+        connect(edtColorMax, SIGNAL(valueChanged(double)), this, SLOT(dataSettingsChanged()));
 
 
         connect(spin2DHistogramBins1, SIGNAL(valueChanged(int)), this, SLOT(dataSettingsChanged()));
@@ -171,6 +196,11 @@ void QFParameterCorrelationView::connectParameterWidgets(bool connectTo)
         disconnect(chkScatterPlot, SIGNAL(toggled(bool)), this, SLOT(dataSettingsChanged()));
         disconnect(chkKey, SIGNAL(toggled(bool)), this, SLOT(dataSettingsChanged()));
         disconnect(cmb2DHistogram, SIGNAL(currentIndexChanged(int)), this, SLOT(dataSettingsChanged()));
+        disconnect(cmbColorScale, SIGNAL(currentIndexChanged(int)), this, SLOT(dataSettingsChanged()));
+        disconnect(chkColorRangeAuto, SIGNAL(toggled(bool)), this, SLOT(dataSettingsChanged()));
+        disconnect(edtColorMin, SIGNAL(valueChanged(double)), this, SLOT(dataSettingsChanged()));
+        disconnect(edtColorMax, SIGNAL(valueChanged(double)), this, SLOT(dataSettingsChanged()));
+
     }
 }
 
@@ -202,6 +232,11 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
     edtHistogramMax1->setEnabled(!chkHistogramRangeAuto1->isChecked());
     edtHistogramMin2->setEnabled(!chkHistogramRangeAuto2->isChecked());
     edtHistogramMax2->setEnabled(!chkHistogramRangeAuto2->isChecked());
+    edtColorMin->setEnabled(!chkColorRangeAuto->isChecked());
+    edtColorMax->setEnabled(!chkColorRangeAuto->isChecked());
+
+
+
 
     pltParamCorrelation->set_doDrawing(false);
     pltParamHistogramX->set_doDrawing(false);
@@ -261,6 +296,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
 
                 double* d1=duplicateArray(hist.data1, hist.size);
                 double* d2=duplicateArray(hist.data1, hist.size);
+                double* d3=duplicateArray(hist.data1, hist.size);
 
                 int imageSize=hist.size;
                 int32_t datasize=0;
@@ -275,6 +311,8 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 for (register int32_t i=0; i<imageSize; i++) {
                     const double v1=hist.data1[i];
                     const double v2=hist.data2[i];
+                    double v3=0;
+                    if(hist.data3!=NULL) v3=hist.data3[i];
                     if (statisticsFloatIsOK(v1)&&statisticsFloatIsOK(v2)&&(chkHistogramRangeAuto1->isChecked() || (v1>=mmin1 && v1<=mmax1))
                                                                         &&(chkHistogramRangeAuto2->isChecked() || (v2>=mmin2 && v2<=mmax2))) {
                         //qDebug()<<i<<": "<<v1<<mmin1<<mmax1<<chkHistogramRangeAuto1->isChecked()<<(v1>=mmin1)<<(v1<=mmax1);
@@ -282,12 +320,14 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                         //qDebug()<<datasize;
                         d1[datasize]=v1;
                         d2[datasize]=v2;
+                        d3[datasize]=v3;
                         datasize++;
                     }
                 }
 
                 double* d1r=duplicateArray(d1, datasize);
                 double* d2r=duplicateArray(d2, datasize);
+                double* d3r=duplicateArray(d3, datasize);
 
                 int col=0;
                 tabHistogramParameters->setCellCreate(col++, hh+1, statisticsCorrelationCoefficient(d1r, d2r, datasize)*100.0);
@@ -423,7 +463,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 if (hh%5==4) scatterColor=QColor("purple");
 
                 if (chkScatterPlot->isChecked()) {
-                    JKQTPxyLineGraph* g=new JKQTPxyLineGraph(pltParamCorrelation->get_plotter());
+                    JKQTPxyParametrizedScatterGraph* g=new JKQTPxyParametrizedScatterGraph(pltParamCorrelation->get_plotter());
                     int g_x=pltParamCorrelation->getDatastore()->addCopiedColumn(d1r, datasize, tr("corr%1_X").arg(hh));
                     int g_y=pltParamCorrelation->getDatastore()->addCopiedColumn(d2r, datasize, tr("corr%1_Y").arg(hh));
                     g->set_title(tr("scatter: %1").arg(hist.name));
@@ -434,6 +474,20 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                     g->set_drawLine(false);
                     g->set_color(scatterColor);
                     g->set_fillColor(scatterColor.lighter());
+
+                    if (hist.data3) {
+                        int g_c=pltParamCorrelation->getDatastore()->addCopiedColumn(d3r, datasize, tr("corr%1_C").arg(hh));
+                        g->set_colorColumnContainsRGB(false);
+                        g->set_colorColumn(g_c);
+                        g->set_autoImageRange(chkColorRangeAuto->isChecked());
+                        g->set_imageMin(edtColorMin->value());
+                        g->set_imageMax(edtColorMax->value());
+                        g->set_palette(cmbColorScale->currentIndex());
+                        g->get_colorBarRightAxis()->set_axisLabel(histLabelColor);
+                        g->get_colorBarTopAxis()->set_axisLabel(histLabelColor);
+
+                    }
+
                     pltParamCorrelation->addGraph(g);
                     graphs_scatter<<g;
                 }
@@ -507,8 +561,10 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
 
                 free(d1);
                 free(d2);
+                free(d3);
                 free(d1r);
                 free(d2r);
+                free(d3r);
 
 
 
@@ -567,6 +623,24 @@ int QFParameterCorrelationView::addCorrelation(QString name, double *data1, doub
     return histograms.size()-1;
 }
 
+int QFParameterCorrelationView::addCorrelation(QString name, double *data1, double *data2, double *data3, int32_t size, bool external){
+    QFParameterCorrelationView::CorrelationItem h;
+    h.data1=data1;
+    h.data2=data2;
+    h.data3=data3;
+    if (!external) {
+        h.data1=duplicateArray(data1, size);
+        h.data2=duplicateArray(data2, size);
+        h.data3=duplicateArray(data3, size);
+    }
+    h.name=name;
+    h.size=size;
+    h.external=external;
+    histograms.append(h);
+
+    return histograms.size()-1;
+}
+
 
 int QFParameterCorrelationView::addCopiedCorrelation(QString name, const double *data1, const double *data2, int32_t size)
 {
@@ -591,6 +665,27 @@ void QFParameterCorrelationView::setCorrelation(int i, QString name, double *dat
     if (!external) {
         h.data1=duplicateArray(data1, size);
         h.data2=duplicateArray(data2, size);
+    }
+    h.name=name;
+    h.size=size;
+    h.external=external;
+    histograms[i]=h;
+}
+
+void QFParameterCorrelationView::setCorrelation(int i, QString name, double *data1, double *data2, double *data3, int32_t size, bool external)
+{
+    if (i<0 || i>=histograms.size()) return;
+    QFParameterCorrelationView::CorrelationItem h=histograms[i];
+    if (h.data1 && !h.external) free(h.data1);
+    if (h.data2 && !h.external) free(h.data2);
+    if (h.data3 && !h.external) free(h.data3);
+    h.data1=data1;
+    h.data2=data2;
+    h.data3=data3;
+    if (!external) {
+        h.data1=duplicateArray(data1, size);
+        h.data2=duplicateArray(data2, size);
+        h.data3=duplicateArray(data3, size);
     }
     h.name=name;
     h.size=size;
@@ -634,6 +729,12 @@ void QFParameterCorrelationView::setCorrelation1Label(const QString label, bool 
 void QFParameterCorrelationView::setCorrelation2Label(const QString label, bool update)
 {
     histLabelY=label;
+    if (update) replotCorrelation();
+}
+
+void QFParameterCorrelationView::setCorrelationColorLabel(const QString label, bool update)
+{
+    histLabelColor=label;
     if (update) replotCorrelation();
 }
 
@@ -988,6 +1089,32 @@ void QFParameterCorrelationView::createWidgets()
 
 
 
+
+    flHistSet->addRow(tr("<b>Data Color:</b>"), new QWidget(this));
+    cmbColorScale=new JKQTPMathImageColorPaletteComboBox(this);
+    cmbColorScale->setCurrentIndex(JKQTPMathImageMATLAB);
+    coll=new QHBoxLayout();
+    coll->addWidget(cmbColorScale);
+    coll->addStretch();
+    flHistSet->addRow(tr("  color palette:"), coll);
+    chkColorRangeAuto=new QCheckBox("auto", grpHistogramSettings);
+    flHistSet->addRow(tr("  range:"), chkColorRangeAuto);
+    edtColorMin=new QFDoubleEdit(this);
+    edtColorMin->setCheckBounds(false, false);
+    edtColorMin->setValue(0);
+    edtColorMax=new QFDoubleEdit(this);
+    edtColorMax->setCheckBounds(false, false);
+    edtColorMax->setValue(10);
+    coll=new QHBoxLayout();
+    coll->addWidget(edtColorMin,1);
+    coll->addWidget(new QLabel(" ... "));
+    coll->addWidget(edtColorMax,1);
+    coll->addStretch();
+    coll->setContentsMargins(0,0,0,0);
+    flHistSet->addRow(QString(""), coll);
+
+
+
     // HISTOGRAM PLOTS ///////////////////////////////////////////////////////////////////////
     splitterHistogram=new QVisibleHandleSplitter(this);
     QWidget* widPlotter=new QWidget(this);
@@ -1164,7 +1291,15 @@ void QFParameterCorrelationView::fillDataArray(QList<QVector<double> > &data, QS
             memcpy(d.data(), histograms[i].data2, histograms[i].size*sizeof(double));
             data.append(d);
         }
+        if (histograms[i].data3){
+            QVector<double> d(histograms[i].size, 0.0);
+            memcpy(d.data(), histograms[i].data3, histograms[i].size*sizeof(double));
+            data.append(d);
+        }
         headers.append(histLabelX+" ("+histograms[i].name+")");
         headers.append(histLabelY+" ("+histograms[i].name+")");
+        if (histograms[i].data3){
+            headers.append(histLabelColor+" ("+histograms[i].name+")");
+        }
     }
 }

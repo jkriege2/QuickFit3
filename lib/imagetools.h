@@ -42,7 +42,7 @@ inline void qfVideoBinInFrame(T* data, int width, int height, int frames, int bi
             const int64_t ny=y/binning;
             for (int64_t x=0; x<width; x++) {
                 const int64_t nx=x/binning;
-                data[f*nw*nh+ny*nh+nx]=data[f*nw*nh+ny*nh+nx]+temp[f*width*height+y*width+x];
+                data[f*nw*nh+ny*nw+nx]=data[f*nw*nh+ny*nw+nx]+temp[f*width*height+y*width+x];
             }
         }
     }

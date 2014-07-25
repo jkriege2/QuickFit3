@@ -119,7 +119,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         /** \brief fill the given histogram widget with data */
         void updateHistogram(QFHistogramView *histogram, QFRDRImagingFCSData *m, double *plteImageData, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram);
         /** \brief fill the given correlation widget with data */
-        void updateCorrelation(QFParameterCorrelationView *corrView, QFRDRImagingFCSData *m, double *data1, double *data2, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram, int mode, int channel=0, const QString& label1=QString(), const QString label2=QString(), int width=0, int height=0);
+        void updateCorrelation(QFParameterCorrelationView *corrView, QFRDRImagingFCSData *m, double *data1, double *data2, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram, int mode, int colormode, int channel=0, const QString& label1=QString(), const QString label2=QString(), int width=0, int height=0);
 
 
         /** \brief recalculate histogram over selected pixels */
@@ -476,6 +476,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QCheckBox* chkExcludeExcludedRunsFromHistogram2_2;
 
         QComboBox* cmbCorrelationDisplayMode;
+        QComboBox* cmbCorrelationDisplayColorMode;
         QSpinBox* spinCorrelationChannel;
         QFParameterCorrelationView* corrView;
 

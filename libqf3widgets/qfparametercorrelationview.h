@@ -64,6 +64,7 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
             CorrelationItem() {
                 data1=NULL;
                 data2=NULL;
+                data3=NULL;
                 external=true;
                 size=0;
                 name="";
@@ -72,6 +73,7 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
             QString name;
             double* data1;
             double* data2;
+            double* data3;//color channel
             int32_t size;
             bool external;
         };
@@ -106,16 +108,19 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
         void clear();
         /** \brief add a histogram for the given dataset, copies the data to this widget, if \c external=false */
         int addCorrelation(QString name, double* data1, double* data2, int32_t size, bool external);
+        int addCorrelation(QString name, double* data1, double* data2, double* data3, int32_t size, bool external);
         /** \brief add a histogram for the given dataset, copies the data to this widget */
         int addCopiedCorrelation(QString name, const double* data1, const double* data2, int32_t size);
         /** \brief set the given dataset in the given histogram \a i, copies the data to this widget, if \c external=false */
         void setCorrelation(int i, QString name, double* data1, double* data2, int32_t size, bool external);
+        void setCorrelation(int i, QString name, double* data1, double* data2, double* data3, int32_t size, bool external);
         void setCopiedCorrelation(int i, QString name, const double* data1, const double* data2, int32_t size);
         void removeCorrelation(int i);
         int CorrelationCount() const;
 
         void setCorrelation1Label(const QString label, bool update=false);
         void setCorrelation2Label(const QString label, bool update=false);
+        void setCorrelationColorLabel(const QString label, bool update=false);
 
         void writeReport(QTextCursor& cursor, QTextDocument* document);
 
@@ -177,11 +182,18 @@ protected:
     JKQTPSymbolComboBox* cmbSymbol;
     QSpinBox* spinSymbolSize;
 
+    JKQTPMathImageColorPaletteComboBox* cmbColorScale;
+    QCheckBox* chkColorRangeAuto;
+    QFDoubleEdit* edtColorMin;
+    QFDoubleEdit* edtColorMax;
+
+
 
 
     QFormLayout* flHistSet;
     QString histLabelX;
     QString histLabelY;
+    QString histLabelColor;
     QVBoxLayout* laySplitterTable;
     QGridLayout* layHist;
 

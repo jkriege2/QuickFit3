@@ -858,9 +858,9 @@ void FRawDataImageEditor::updateCorrelation(QFParameterCorrelationView *corrView
         if (selHistogram) {
             if (datasize>2) {
                 if (corrView->CorrelationCount()>1) {
-                    corrView->setCorrelation(1, tr("selection"), cd1, cd2, datasize, false);
+                    corrView->setCorrelation(1, tr("selection"), cd1, cd2, dataX, datasize, false);
                 } else {
-                    corrView->addCorrelation(tr("selection"), cd1, cd2, datasize, false);
+                    corrView->addCorrelation(tr("selection"), cd1, cd2, dataX, datasize, false);
                 }
             } else {
                 while (corrView->CorrelationCount()>1) {
@@ -870,7 +870,7 @@ void FRawDataImageEditor::updateCorrelation(QFParameterCorrelationView *corrView
             }
         } else {
             corrView->clear();
-            corrView->addCorrelation(tr("complete"), cd1, cd2, datasize, false);
+            corrView->addCorrelation(tr("complete"), cd1, cd2, dataX, datasize, false);
         }
 
     } else {
