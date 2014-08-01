@@ -133,7 +133,7 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
         JKVerticalScrollArea* scrollParameters;
         QGridLayout* layParameters;
         QFPluginServices *services;
-        QMap<QString, QFFitFunction*> m_fitFunctions;
+        //QMap<QString, QFFitFunction*> m_fitFunctions;
         QList<QPointer<QFFitParameterWidgetWrapper> > m_fitParameters;
         QFFitFunction* getFitFunction(QFRawDataRecord* r) const;
         struct paramvalue {
@@ -169,7 +169,7 @@ class QFRDRFCSFitFunctionSimulator : public QDialog, public QFFitParameterBasicI
         void on_cmbNoiseModel_currentIndexChanged(int index);
         void updateNoiseEnabled();
         void showHelp();
-        void on_btnModelHelp_clicked();
+        //void on_btnModelHelp_clicked();
         void on_btnAddRecord_clicked();
 };
 

@@ -82,12 +82,12 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     newProjectTimer.stop();
     connect(&newProjectTimer, SIGNAL(timeout()), this, SLOT(saveProjectFirstTime()));
 
-    rawDataFactory=new QFRawDataRecordFactory(settings, this);
-    evaluationFactory=new QFEvaluationItemFactory(settings, this);
-    fitFunctionManager=new QFFitFunctionManager(settings, this);
-    fitAlgorithmManager=new QFFitAlgorithmManager(settings, this);
-    extensionManager=new QFExtensionManager(settings, this);
-    importerManager=new QFImporterManager(settings, this);
+    rawDataFactory=new QFRawDataRecordFactory(settings, QApplication::instance());
+    evaluationFactory=new QFEvaluationItemFactory(settings, QApplication::instance());
+    fitFunctionManager=new QFFitFunctionManager(settings, QApplication::instance());
+    fitAlgorithmManager=new QFFitAlgorithmManager(settings, QApplication::instance());
+    extensionManager=new QFExtensionManager(settings, QApplication::instance());
+    importerManager=new QFImporterManager(settings, QApplication::instance());
 
     //settings=NULL;
     project=NULL;

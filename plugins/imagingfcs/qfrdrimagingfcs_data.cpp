@@ -721,6 +721,13 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
 
     }
 
+
+    if (!dataLoaded) {
+        setError(tr("did not find a correlation data file (acf, ccf, dccf, ...) for record"));
+    } else {
+        loadPostProcess();
+    }
+
     if (e) {
         QDomElement te=e->firstChildElement("leaveout");
         QString l=te.attribute("list");
@@ -764,11 +771,6 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
 
     }
 
-    if (!dataLoaded) {
-        setError(tr("did not find a correlation data file (acf, ccf, dccf, ...) for record"));
-    } else {
-        loadPostProcess();
-    }
 
     //qDebug()<<"loaded:   "<<width<<"x"<<height<<"  N="<<N<<"   correlations="<<correlations<<"    c[0]="<<correlations[0]<<"    c[N-1]="<<correlations[N-1];
 }

@@ -1,6 +1,8 @@
 #include "qfrdrfcsfitfunctionsimulator.h"
 #include "ui_qfrdrfcsfitfunctionsimulator.h"
 #include "qfrdrfcsdata.h"
+#include "qffitfunctioncombobox.h"
+#include<QScopedPointer>
 
 QFRDRFCSFitFunctionSimulator::QFRDRFCSFitFunctionSimulator(QFPluginServices* services, QWidget *parent) :
     QDialog(parent),
@@ -52,7 +54,8 @@ QFRDRFCSFitFunctionSimulator::QFRDRFCSFitFunctionSimulator(QFPluginServices* ser
     widParameters->setLayout(layParameters);
 
 
-    m_fitFunctions=services->getFitFunctionManager()->getModels("", this);
+    ui->cmbFunction->updateFitFunctions();
+    /*m_fitFunctions=services->getFitFunctionManager()->getModels("", this);
     QStringList ff=m_fitFunctions.keys();
 
 
@@ -66,7 +69,10 @@ QFRDRFCSFitFunctionSimulator::QFRDRFCSFitFunctionSimulator(QFPluginServices* ser
         ui->cmbFunction->setCurrentIndex(idx);
     } else {
         ui->cmbFunction->setCurrentIndex(0);
-    }
+    }*/
+    ui->cmbFunction->setCurrentFitFunction("fcs_diff");
+    ui->btnModelHelp->setDefaultAction(ui->cmbFunction->getHelpAction());
+    ui->btnModelSelector->setDefaultAction(ui->cmbFunction->getSelectAction());
 
     modelChanged(ui->cmbFunction->currentIndex());
     updateFitFunction();
@@ -87,12 +93,12 @@ QFRDRFCSFitFunctionSimulator::QFRDRFCSFitFunctionSimulator(QFPluginServices* ser
 QFRDRFCSFitFunctionSimulator::~QFRDRFCSFitFunctionSimulator()
 {
     delete ui;
-    QMapIterator<QString, QFFitFunction*> i(m_fitFunctions);
+    /*QMapIterator<QString, QFFitFunction*> i(m_fitFunctions);
     while (i.hasNext()) {
         i.next();
         delete i.value();
     }
-    m_fitFunctions.clear();
+    m_fitFunctions.clear();*/
     if (tau) free(tau);
     if (corr) free(corr);
 }
@@ -110,7 +116,7 @@ void QFRDRFCSFitFunctionSimulator::setFitValue(const QString &id, double value, 
 
 double QFRDRFCSFitFunctionSimulator::getFitValue(const QString &id, QFRawDataRecord* r) const
 {
-    QFFitFunction* ffunc=getFitFunction(r);
+    QScopedPointer<QFFitFunction> ffunc(getFitFunction(r));
 
     if (ffunc) {
         for (int p=0; p<ffunc->paramCount(); p++) {
@@ -131,7 +137,7 @@ double QFRDRFCSFitFunctionSimulator::getFitValue(const QString &id, QFRawDataRec
 
 double QFRDRFCSFitFunctionSimulator::getFitError(const QString &id, QFRawDataRecord *r) const
 {
-    QFFitFunction* ffunc=getFitFunction(r);
+    QScopedPointer<QFFitFunction> ffunc(getFitFunction(r));
 
     if (ffunc) {
         for (int p=0; p<ffunc->paramCount(); p++) {
@@ -173,7 +179,7 @@ void QFRDRFCSFitFunctionSimulator::resetDefaultFitFix(const QString &id)
 }
 
 double QFRDRFCSFitFunctionSimulator::getDefaultFitValue(const QString &id, QFRawDataRecord *r) const {
-    QFFitFunction* ffunc=getFitFunction(r);
+    QScopedPointer<QFFitFunction> ffunc(getFitFunction(r));
 
     if (ffunc) {
         for (int p=0; p<ffunc->paramCount(); p++) {
@@ -195,7 +201,8 @@ bool QFRDRFCSFitFunctionSimulator::getDefaultFitFix(const QString &id, QFRawData
 }
 
 QFFitFunction *QFRDRFCSFitFunctionSimulator::getFitFunction(QFRawDataRecord *r) const {
-    return m_fitFunctions.value(ui->cmbFunction->itemData(ui->cmbFunction->currentIndex()).toString(), NULL);
+    //return m_fitFunctions.value(ui->cmbFunction->itemData(ui->cmbFunction->currentIndex()).toString(), NULL);
+    return ui->cmbFunction->createCurrentInstance();
 }
 
 void QFRDRFCSFitFunctionSimulator::updateTau() {
@@ -229,7 +236,7 @@ void QFRDRFCSFitFunctionSimulator::updateTau() {
 
 
 void QFRDRFCSFitFunctionSimulator::displayModel(bool newWidget){
-    QFFitFunction* ffunc=getFitFunction(NULL);
+    QScopedPointer<QFFitFunction> ffunc(getFitFunction(NULL));
 
 
     if (!ffunc) {
@@ -345,7 +352,7 @@ void QFRDRFCSFitFunctionSimulator::updateFitFunction() {
 }
 
 void QFRDRFCSFitFunctionSimulator::updateParameterValues() {
-    QFFitFunction* ffunc=getFitFunction(NULL);
+    QScopedPointer<QFFitFunction> ffunc(getFitFunction(NULL));
 
     if (!ffunc) return;
 
@@ -396,7 +403,7 @@ void QFRDRFCSFitFunctionSimulator::modelChanged(int index) {
 
 double QFRDRFCSFitFunctionSimulator::getFitMax(const QString &id, QFRawDataRecord* r) const
 {
-    QFFitFunction* ffunc=getFitFunction(r);
+    QScopedPointer<QFFitFunction> ffunc(getFitFunction(r));
 
     if (ffunc) {
         for (int p=0; p<ffunc->paramCount(); p++) {
@@ -414,7 +421,7 @@ double QFRDRFCSFitFunctionSimulator::getFitMax(const QString &id, QFRawDataRecor
 
 double QFRDRFCSFitFunctionSimulator::getFitMin(const QString &id, QFRawDataRecord *r) const
 {
-    QFFitFunction* ffunc=getFitFunction(r);
+    QScopedPointer<QFFitFunction> ffunc(getFitFunction(r));
 
     if (ffunc) {
         for (int p=0; p<ffunc->paramCount(); p++) {
@@ -445,7 +452,7 @@ void QFRDRFCSFitFunctionSimulator::setFitMin(const QString &id, double min, QFRa
 
 void QFRDRFCSFitFunctionSimulator::replotFitFunction() {
     JKQTPdatastore* ds=ui->pltFunction->getDatastore();
-    QFFitFunction* ffunc=getFitFunction(NULL);
+    QScopedPointer<QFFitFunction> ffunc(getFitFunction(NULL));
 
     if (!ffunc) return;
 
@@ -625,7 +632,7 @@ void QFRDRFCSFitFunctionSimulator::showHelp()
     QFPluginServices::getInstance()->displayHelpWindow(QFPluginServices::getInstance()->getPluginHelpDirectory("fcs")+"/fcs_simulator.html");
 }
 
-void QFRDRFCSFitFunctionSimulator::on_btnModelHelp_clicked()
+/*void QFRDRFCSFitFunctionSimulator::on_btnModelHelp_clicked()
 {
     QFFitFunction* ffunc=getFitFunction(NULL);
     int id=services->getFitFunctionManager()->getPluginForID(ffunc->id());
@@ -638,7 +645,7 @@ void QFRDRFCSFitFunctionSimulator::on_btnModelHelp_clicked()
     } else {
         QMessageBox::information(this, tr("FCS Simulator"), tr("No Online-Help for this fit function available."));
     }
-}
+}*/
 
 
 

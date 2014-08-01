@@ -47,7 +47,8 @@ QString QFFitFunctionComboBox::currentFitFunctionID() const
 QFFitFunction *QFFitFunctionComboBox::createCurrentInstance(QObject* parent) const
 {
     QFFitFunctionManager* manager=QFFitFunctionManager::getInstance();
-    return manager->createFunction(currentFitFunctionID(), parent);
+    if (manager) return manager->createFunction(currentFitFunctionID(), parent);
+    return NULL;
 }
 
 void QFFitFunctionComboBox::setCurrentFitFunction(const QString &id)

@@ -39,7 +39,7 @@ QFFitFunctionManager::QFFitFunctionManager(ProgramOptions* options, QObject* par
 
 QFFitFunctionManager::~QFFitFunctionManager()
 {
-    freeLibraryFitFunctions();
+    freeLibraryFitFunctions(false);
     delete mutex;
 }
 
@@ -145,7 +145,7 @@ void QFFitFunctionManager::reloadLibraryFitFunctions()
     libraryFitFunctions=userFF;
 }
 
-void QFFitFunctionManager::freeLibraryFitFunctions()
+void QFFitFunctionManager::freeLibraryFitFunctions(bool emitSignals)
 {
     //QMutexLocker locker(mutex);
 
@@ -159,7 +159,7 @@ void QFFitFunctionManager::freeLibraryFitFunctions()
     }
 
     libraryFitFunctions.clear();
-    emit fitFunctionsChanged();
+    if (emitSignals) emit fitFunctionsChanged();
 }
 
 void QFFitFunctionManager::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData>& tooltips) {

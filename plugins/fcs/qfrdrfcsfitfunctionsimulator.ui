@@ -131,7 +131,16 @@
           <bool>false</bool>
          </property>
          <layout class="QFormLayout" name="formLayout">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
            <number>0</number>
           </property>
           <item row="0" column="0">
@@ -361,10 +370,21 @@
        <item row="3" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_6">
          <item>
-          <widget class="QComboBox" name="cmbFunction"/>
+          <widget class="QFFitFunctionComboBox" name="cmbFunction"/>
          </item>
          <item>
           <widget class="QToolButton" name="btnModelHelp">
+           <property name="text">
+            <string>show fit model help</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../../lib/lib.qrc">
+             <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QToolButton" name="btnModelSelector">
            <property name="text">
             <string>show fit model help</string>
            </property>
@@ -473,10 +493,20 @@
    <header>qvisiblehandlesplitter.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QFFitFunctionComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qffitfunctioncombobox.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="qfrdrfcs.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>

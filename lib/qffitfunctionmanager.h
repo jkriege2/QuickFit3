@@ -138,7 +138,7 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
 
     protected:
         void reloadLibraryFitFunctions();
-        void freeLibraryFitFunctions();
+        void freeLibraryFitFunctions(bool emitSignals=true);
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);
