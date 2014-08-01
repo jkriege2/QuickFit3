@@ -60,7 +60,8 @@ HEADERS += qfrdrimagingfcs.h \
     ../base_classes/qfimageplotter.h \
     ../base_classes/qfimageparametergroupbox.h \
     qfrdrimagingfcsmaskbuilder.h \
-    qfrdrimagingfcscopycorrasrdrdialog.h
+    qfrdrimagingfcscopycorrasrdrdialog.h \
+    qfrdrimagingfcspostprocessbinningdialog.h
 
 
 
@@ -96,7 +97,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     ../base_classes/qfimageplotter.cpp \
     ../base_classes/qfimageparametergroupbox.cpp \
     qfrdrimagingfcsmaskbuilder.cpp \
-    qfrdrimagingfcscopycorrasrdrdialog.cpp
+    qfrdrimagingfcscopycorrasrdrdialog.cpp \
+    qfrdrimagingfcspostprocessbinningdialog.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \
@@ -109,7 +111,8 @@ FORMS = \
     qfrdrimagingfcssimulator.ui \
     ../base_classes/qfrdrimagecopydataselectdialog.ui \
     qfrdrimagingfcsmaskbuilder.ui \
-    qfrdrimagingfcscopycorrasrdrdialog.ui
+    qfrdrimagingfcscopycorrasrdrdialog.ui \
+    qfrdrimagingfcspostprocessbinningdialog.ui
 
 RESOURCES += qfrdrimagingfcs.qrc
 

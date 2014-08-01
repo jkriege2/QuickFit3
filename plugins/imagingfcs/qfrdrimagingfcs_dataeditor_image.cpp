@@ -41,6 +41,7 @@
 #include "qfrdrimagingfcs.h"
 #include "qfrdrimagingfcsmaskbuilder.h"
 #include "qfrdrimagingfcscopycorrasrdrdialog.h"
+#include "qfrdrimagingfcspostprocessbinningdialog.h"
 #define sqr(x) qfSqr(x)
 
 #define CLICK_UPDATE_TIMEOUT 500
@@ -6440,15 +6441,55 @@ void QFRDRImagingFCSImageEditor::recorrelate()
 void QFRDRImagingFCSImageEditor::postBin() {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
-        int bin=m->getProperty("POSTPROCESS_BINNING", 1).toInt();
-        bool ok=false;
+        double bin=m->getProperty("POSTPROCESS_BINNING", 1).toInt();
+        bool interleave=m->getProperty("POSTPROCESS_BINNING_INTERLEAVED", false).toBool();
+
+        if (!interleave && m->propertyExists("POSTPROCESS_BINNING_AVG")) {
+            bin=m->getProperty("POSTPROCESS_BINNING_AVG", 1).toInt();
+            interleave=true;
+        }
+
+        QFRDRImagingFCSPostProcessBinningDialog* dlg=new QFRDRImagingFCSPostProcessBinningDialog(this);
+        dlg->init(bin, interleave);
+        if (dlg->exec()) {
+            m->setQFProperty("POSTPROCESS_BINNING", dlg->getBin(), false, true);
+            m->setQFProperty("POSTPROCESS_BINNING_INTERLEAVED", dlg->getInterleaved(), false, true);
+            m->deleteProperty("POSTPROCESS_BINNING_AVG");
+
+            if (dlg->getOtherRDR()) {
+                QList<QFRawDataRecord*> recs=current->getProject()->getRawDataList();//getRDRGroupMembers(current->getGroup());
+                QFSelectRDRDialog* dlgsel=new QFSelectRDRDialog(new QFMatchRDRFunctorSelectType(current->getType()), true, this);
+                dlgsel->setAllowCreateNew(false);
+                dlgsel->setAllowMultiSelect(true);
+                dlgsel->setDescription(tr("select those records to which the post-processing binning should be applied"));
+                if (dlgsel->exec()) {
+                    recs=dlgsel->getSelectedRDRsp();
+                    if (recs.size()>0) {
+                        for (int i=0; i<recs.size(); i++) {
+                            recs[i]->setQFProperty("POSTPROCESS_BINNING", dlg->getBin(), false, true);
+                            recs[i]->setQFProperty("POSTPROCESS_BINNING_INTERLEAVED", dlg->getInterleaved(), false, true);
+                            recs[i]->deleteProperty("POSTPROCESS_BINNING_AVG");
+                        }
+                    }
+                }
+                delete dlgsel;
+            }
+
+            if (QMessageBox::information(this, tr("post processing: binning"), tr("The project needs to be saved and reloaded for the binning to take effect!\nReload project now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
+                QFPluginServices::getInstance()->reloadCurrentProject();
+            }
+        }
+
+        /*bool ok=false;
         bin=QInputDialog::getInt(this, tr("post processing: binning"), tr("bin N*N neighboring pixels into an averaged correlation function using post-processing."), bin, 1, qMin(m->getImageFromRunsWidth(), m->getImageFromRunsHeight()), 1, &ok );
         if (ok) {
             m->setQFProperty("POSTPROCESS_BINNING", bin, false, true);
             if (QMessageBox::information(this, tr("post processing: binning"), tr("The project needs to be saved and reloaded for the binning to take effect!\nReload project now?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes) {
                 QFPluginServices::getInstance()->reloadCurrentProject();
             }
-        }
+        }*/
+
+        delete dlg;
     }
 }
 

@@ -2578,6 +2578,7 @@ QFRDRImagingFCSData *QFRDRImagingFCSData::getRoleFromThisGroup(const QString &ro
     return NULL;
 }
 
+
 template<class T>
 void QFRDRImagingFCSData_bincf(T* data, T* sigma, int width, int height, int N, int binning) {
     if (width<=0 || height<=0 || N<=0 || !data) return;
@@ -2589,16 +2590,19 @@ void QFRDRImagingFCSData_bincf(T* data, T* sigma, int width, int height, int N, 
         data[i]=0;
         sigma[i]=0;
     }
+    //working implementation
     for (int64_t f=0; f<N; f++) {
         for (int64_t y=0; y<height; y++) {
             const int64_t ny=y/binning;
             for (int64_t x=0; x<width; x++) {
                 const int64_t nx=x/binning;
-                data[y*nw*N+x*N+f]=data[y*nw*N+x*N+f]+temp[y*width*N+x*N+f];
-                sigma[y*nw*N+x*N+f]=sigma[y*nw*N+x*N+f]+qfSqr(temp[y*width*N+x*N+f]);
+                data[ny*nw*N+nx*N+f]=data[ny*nw*N+nx*N+f]+temp[y*width*N+x*N+f]*(1.0/(binning*binning));
+                sigma[ny*nw*N+nx*N+f]=sigma[ny*nw*N+nx*N+f]+qfSqr(temp[y*width*N+x*N+f]);
             }
         }
     }
+
+
     double norm=binning*binning;
     for (int64_t i=0; i<width*height*N; i++) {
         sigma[i]=sqrt((sigma[i]-data[i]*data[i]/norm)/(norm-1.0));
@@ -2607,32 +2611,89 @@ void QFRDRImagingFCSData_bincf(T* data, T* sigma, int width, int height, int N, 
     qfFree(temp);
 }
 
+template<class T>
+void QFRDRImagingFCSData_avgcf(T* data, T* sigma, int width, int height, int N, int binning) {
+    if (width<=0 || height<=0 || N<=0 || !data) return;
+    if (binning<=1) return;
+    T* temp=duplicateArray(data, width*height*N);
+    for (int64_t i=0; i<width*height*N; i++) {
+        data[i]=0;
+        sigma[i]=0;
+    }
+    //working implementation
+    for (int64_t n=0; n<N; n++) {
+        for (int64_t y=0; y<height; y++) {
+            for(int64_t x=0; x<width; x++) {
+                unsigned int count=0;
+                for(int64_t y1=0; y1<binning; y1++){
+                    for(int64_t x1=0; x1<binning; x1++){
+                        const int64_t x2= x+x1-((binning-1)/2);
+                        const int64_t y2= y+y1-((binning-1)/2);
+                        if((x2>=0)&&(x2<width)&&(y2>=0)&&(y2<height)){
+                             data[y*width*N+x*N+n]= data[y*width*N+x*N+n]+      temp[y2*width*N+x2*N+n];
+                            sigma[y*width*N+x*N+n]=sigma[y*width*N+x*N+n]+qfSqr(temp[y2*width*N+x2*N+n]);
+                            count++;
+                        }
+                    }
+                }
+                data[y*width*N+x*N+n]/=count;
+            }
+        }
+    }
+
+
+    double norm=binning*binning;
+    for (int64_t i=0; i<width*height*N; i++) {
+        sigma[i]=sqrt((sigma[i]-data[i]*data[i]/norm)/(norm-1.0));
+        data[i]= data[i]/norm;
+    }
+    qfFree(temp);
+}
+
+
+
 void QFRDRImagingFCSData::loadPostProcess()
 {
     double bin=getProperty("POSTPROCESS_BINNING", 1).toInt();
+    bool interleave=getProperty("POSTPROCESS_BINNING_INTERLEAVED", false).toBool();
+
+    if (!interleave && propertyExists("POSTPROCESS_BINNING_AVG")) {
+        bin=getProperty("POSTPROCESS_BINNING_AVG", 1).toInt();
+        interleave=true;
+    }
+
     if (bin>1 && correlations && sigmas && width>0 && height>0 && N>0) {
-        log_text(tr("calculating %2x binning imFCS record '%1' ...\n").arg(getName()).arg(bin));
-        if (overviewF) qfVideoBinInFrame(overviewF, widthOvr, heightOvr, 1, bin);
-        if (overviewF2) qfVideoBinInFrame(overviewF2, widthOvr, heightOvr, 1, bin);
-        if (overviewFSTD) qfVideoBinInFrame(overviewFSTD, widthOvr, heightOvr, 1, bin);
-        if (overviewF2STD) qfVideoBinInFrame(overviewF2STD, widthOvr, heightOvr, 1, bin);
-        widthOvr=widthOvr/bin;
-        heightOvr=heightOvr/bin;
+        if (interleave) {
+            log_text(tr("calculating %2x binning with avaraging imFCS record '%1' ...\n").arg(getName()).arg(bin));
+            QFRDRImagingFCSData_avgcf(correlations, sigmas, width, height, N, bin);
+            log_text(tr("calculating %2x binning with avaraging imFCS record '%1' ... DONE!\n").arg(getName()).arg(bin));
+            recalcCorrelations();
 
-        if (video) qfVideoBinInFrame(video, video_width, video_height, video_frames, bin);
-        if (video2) qfVideoBinInFrame(video2, video_width, video_height, video_frames, bin);
-        video_width=video_width/bin;
-        video_height=video_height/bin;
-        if (videoUncorrected) qfVideoBinInFrame(videoUncorrected, videoUncorrected_width, videoUncorrected_height, videoUncorrected_frames, bin);
-        if (videoUncorrected2) qfVideoBinInFrame(videoUncorrected2, videoUncorrected_width, videoUncorrected_height, videoUncorrected_frames, bin);
-        videoUncorrected_width=videoUncorrected_width/bin;
-        videoUncorrected_height=videoUncorrected_height/bin;
+        } else {
+            log_text(tr("calculating %2x binning imFCS record '%1' ...\n").arg(getName()).arg(bin));
+            if (overviewF) qfVideoBinInFrame(overviewF, widthOvr, heightOvr, 1, bin);
+            if (overviewF2) qfVideoBinInFrame(overviewF2, widthOvr, heightOvr, 1, bin);
+            if (overviewFSTD) qfVideoBinInFrame(overviewFSTD, widthOvr, heightOvr, 1, bin);
+            if (overviewF2STD) qfVideoBinInFrame(overviewF2STD, widthOvr, heightOvr, 1, bin);
+            widthOvr=widthOvr/bin;
+            heightOvr=heightOvr/bin;
 
-        QFRDRImagingFCSData_bincf(correlations, sigmas, width, height, N, bin);
-        width=width/bin;
-        height=height/bin;
-        log_text(tr("calculating %2x binning imFCS record '%1' ... DONE!\n").arg(getName()).arg(bin));
-        recalcCorrelations();
+            if (video) qfVideoBinInFrame(video, video_width, video_height, video_frames, bin);
+            if (video2) qfVideoBinInFrame(video2, video_width, video_height, video_frames, bin);
+            video_width=video_width/bin;
+            video_height=video_height/bin;
+            if (videoUncorrected) qfVideoBinInFrame(videoUncorrected, videoUncorrected_width, videoUncorrected_height, videoUncorrected_frames, bin);
+            if (videoUncorrected2) qfVideoBinInFrame(videoUncorrected2, videoUncorrected_width, videoUncorrected_height, videoUncorrected_frames, bin);
+            videoUncorrected_width=videoUncorrected_width/bin;
+            videoUncorrected_height=videoUncorrected_height/bin;
+
+            QFRDRImagingFCSData_bincf(correlations, sigmas, width, height, N, bin);
+            width=width/bin;
+            height=height/bin;
+            maskInit(width, height);
+            log_text(tr("calculating %2x binning imFCS record '%1' ... DONE!\n").arg(getName()).arg(bin));
+            recalcCorrelations();
+        }
     }
 }
 
