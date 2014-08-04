@@ -38,7 +38,7 @@ QStringList QFSelectFilesListWidget::files() const
 {
     QStringList sl;
     for (int i=0; i<ui->files->count(); i++) {
-        ui->files->item(i)->data(Qt::UserRole+1).toString();
+        sl<<ui->files->item(i)->data(Qt::UserRole+1).toString();
     }
     return sl;
 }
@@ -47,7 +47,7 @@ QStringList QFSelectFilesListWidget::fileFilters() const
 {
     QStringList sl;
     for (int i=0; i<ui->files->count(); i++) {
-        ui->files->item(i)->data(Qt::UserRole+2).toString();
+        sl<<ui->files->item(i)->data(Qt::UserRole+2).toString();
     }
     return sl;
 }
@@ -108,7 +108,7 @@ void QFSelectFilesListWidget::on_btnDown_clicked()
 QFSelectFilesWizardPage::QFSelectFilesWizardPage(const QString &title, QWidget *parent):
     QFWizardPage(title, parent)
 {
-    QFSelectFilesListWidget *sel = new QFSelectFilesListWidget(this);
+    sel = new QFSelectFilesListWidget(this);
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(sel);

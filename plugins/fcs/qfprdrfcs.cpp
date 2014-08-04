@@ -669,12 +669,23 @@ void QFPRDRFCS::startFCSProjectWizard()
     wiz->addPage(selfiles=new QFSelectFilesWizardPage(tr("select FCS/DLS data files ...")));
     selfiles->setFilters(getFCSFilters());
     selfiles->setSettingsIDs("fcs/last_fcswizard_dir", "fcs/current_fcs_format_filter");
+
+    QFComboBoxWizardPage* meastype;
+    wiz->addPage(meastype=new QFComboBoxWizardPage(tr("select type of instrument")));
+    QStringList measurementTypes;
+    measurementTypes<<tr("confocal FCS (single-spot)");
+    measurementTypes<<tr("TIR FCS (single-spot)");
+    measurementTypes<<tr("dynamic light scattering (DLS)");
+    measurementTypes<<tr("SPIM-FCS (camera)");
+    measurementTypes<<tr("TIR-FCS (camera)");
+    meastype->setItems(measurementTypes);
+    meastype->setLabel(tr("instrument type:"));
     if (wiz->exec()) {
-        qDebug()<<"OK";
 
         QStringList files=selfiles->files();
         QStringList filters=selfiles->fileFilters();
 
+        //qDebug()<<"OK"<<files<<filters;
         if (files.size()>0) {
 
 
