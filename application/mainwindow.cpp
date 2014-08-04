@@ -2277,6 +2277,24 @@ void MainWindow::insertToolBar(QString toolbarname, QToolBar* newToolbar) {
     addToolBar(newToolbar);
 }
 
+void MainWindow::registerWizard(const QString &menu, QAction *action)
+{
+    menus[menu.toLower()]->addAction(action);
+}
+
+void MainWindow::registerWizard(const QString &menu, const QString& title, const QObject *receiver, const char *method, QAction **actOut)
+{
+    registerWizard(menu, title, QIcon(), receiver, method, actOut);
+}
+
+void MainWindow::registerWizard(const QString &menu, const QString &title, QIcon icon, const QObject *receiver, const char *method, QAction **actOut)
+{
+    QAction* actW=new QAction(icon, title, this);
+    connect(actW, SIGNAL(triggered()), receiver, method);
+    registerWizard(menu, actW);
+    if (actOut) *actOut=actW;
+}
+
 QFExtensionManager* MainWindow::getExtensionManager() const {
     return extensionManager;
 }

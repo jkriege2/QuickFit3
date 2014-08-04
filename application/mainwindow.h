@@ -127,6 +127,15 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         /** \copydoc QFPluginServices::insertToolBar() */
         virtual void insertToolBar(QString toolbarname, QToolBar* newToolbar);
 
+        /** \copydoc QFPluginServices::registerWizard() */
+        virtual void registerWizard(const QString& menu, QAction* action);
+
+        /** \copydoc QFPluginServices::registerWizard() */
+        virtual void registerWizard(const QString& menu, const QString &title, const QObject * receiver, const char * method, QAction** actOut=NULL);
+        /** \copydoc QFPluginServices::registerWizard() */
+        virtual void registerWizard(const QString& menu, const QString &title, QIcon icon, const QObject * receiver, const char * method, QAction** actOut=NULL);
+
+
         /** \copydoc QFPluginServices::getExtensionManager() */
         virtual QFExtensionManager* getExtensionManager() const;
 

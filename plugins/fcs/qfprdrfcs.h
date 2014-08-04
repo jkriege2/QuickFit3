@@ -77,7 +77,13 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
 
         void openSimulator();
         void insertSimulated();
+
+        void startFCSProjectWizard();
     protected:
+        QStringList getFCSFilters() const;
+        void setFCSFilterProperties(QMap<QString, QVariant>& p, const QString& filter, const QString &filename);
+        void loadFCSFilterFiles(const QStringList& files,  const QString& filter, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
+
         QFRDRFCSFitFunctionSimulator* dlgSimulator;
 
         /*! \brief add a ALV5000 file to the current project

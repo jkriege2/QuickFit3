@@ -357,6 +357,13 @@ class QFLIB_EXPORT QFPluginServices {
         /** \brief disables all project editing capabilities for the QuickFit main window ... may be used if QF3 is used to control instruments to prevent the user from using projects! */
         virtual void setProjectMode(bool projectModeEnabled=true, const QString& nonProjectTitle=QString("non-project mode"))=0;
 
+        /** \brief register a wizard */
+        virtual void registerWizard(const QString& menu, QAction* action)=0;
+
+        /** \brief register a wizard */
+        virtual void registerWizard(const QString& menu, const QString &title, const QObject * receiver, const char * method, QAction** actOut=NULL)=0;
+        /** \brief register a wizard */
+        virtual void registerWizard(const QString& menu, const QString &title, QIcon icon, const QObject * receiver, const char * method, QAction** actOut=NULL)=0;
     private:
         static QFPluginServices* inst;
 };

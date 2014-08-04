@@ -13,6 +13,8 @@
 #include "alv6000tools.h"
 #include "alv7000tools.h"
 #include "confocor3tools.h"
+#include "qfwizard.h"
+#include "qfselectfileslistwidget.h"
 
 QFPRDRFCS::QFPRDRFCS(QObject* parent):
     QObject(parent)
@@ -59,6 +61,7 @@ void QFPRDRFCS::init()
     QAction* actOffset=new QAction(tr("subtract &offset of correlation functions"), parentWidget);
     connect(actOffset, SIGNAL(triggered()), this, SLOT(correctOffset()));
     tmenu->addAction(actOffset);
+    services->registerWizard("project_wizards", tr("FCS Wizard"), QIcon(getIconFilename()), this, SLOT(startFCSProjectWizard()));
 }
 
 void QFPRDRFCS::setBackgroundInFCS(const QVector<double> &backgrounds, const QVector<double> &background_sds, const QVector<bool> &background_set)
@@ -420,94 +423,131 @@ void QFPRDRFCS::insertFLEX_SINFile(const QStringList &filename, const QMap<QStri
     }
 }
 
+const QString QFPRDRFCS_alvf=QObject::tr("ALV-5000 file (*.asc)");
+const QString QFPRDRFCS_alvf6=QObject::tr("ALV-6000 file (*.asc)");
+const QString QFPRDRFCS_alvf7=QObject::tr("ALV-7000 file (*.asc)");
+const QString QFPRDRFCS_flexf=QObject::tr("correlator.com files (*.sin)");
+const QString QFPRDRFCS_zeisscf3=QObject::tr("Zeiss Confocor3 files (*.fcs)");
+const QString QFPRDRFCS_asciif=QObject::tr("ASCII Data Files (*.txt *.dat *.csv)");
+const QString QFPRDRFCS_albaf=QObject::tr("ISS Alba Files (*.csv)");
+const QString QFPRDRFCS_diff4f=QObject::tr("diffusion4 correlation (*corr.dat)");
+const QString QFPRDRFCS_olegf=QObject::tr("Oleg Kriechevsky's Binary format(*. *.dat)");
+
+QStringList QFPRDRFCS::getFCSFilters() const
+{
+
+    QStringList sl;
+    sl<<QFPRDRFCS_alvf<<QFPRDRFCS_alvf6<<QFPRDRFCS_alvf7<<QFPRDRFCS_flexf<<QFPRDRFCS_zeisscf3<<QFPRDRFCS_asciif<<QFPRDRFCS_albaf<<QFPRDRFCS_diff4f<<QFPRDRFCS_olegf;
+    return sl;
+}
+
+void QFPRDRFCS::setFCSFilterProperties(QMap<QString, QVariant> &p, const QString &currentFCSFileFormatFilter, const QString &filename)
+{
+    if (currentFCSFileFormatFilter==QFPRDRFCS_alvf) {
+        p["FILETYPE"]="ALV5000";
+        p["CHANNEL"]=0;
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_alvf6){
+       p["FILETYPE"]="ALV6000";
+       p["CHANNEL"]=0;
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_alvf7){
+       p["FILETYPE"]="ALV7000";
+       p["CHANNEL"]=0;
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_flexf){
+       p["FILETYPE"]="CORRELATOR.COM_SIN";
+       p["CHANNEL"]=0;
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_zeisscf3){
+       p["FILETYPE"]="CONFOCOR3";
+       p["CHANNEL"]=0;
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_olegf){
+       p["FILETYPE"]="OLEGKRIECHEVSKYBINARY";
+       p["CHANNEL"]=0;
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_asciif) {
+        p["FILETYPE"]="CSV_CORR";
+        p["CSV_SEPARATOR"]=QString(",");
+        p["CSV_COMMENT"]=QString("#");
+        p["CSV_STARTSWITH"]=QString("");
+        p["CSV_ENDSWITH"]=QString("");
+        p["CSV_TIMEFACTOR"]=1.0;
+        p["CSV_FIRSTLINE"]=1;
+        p["CSV_MODE"]=0;
+
+        dlgCSVParameters* csvDlg=new dlgCSVParameters(parentWidget, settings->getQSettings()->value("fcs/csv_mode", 0).toInt(),
+                                                      settings->getQSettings()->value("fcs/csv_startswith", "").toString(),
+                                                      settings->getQSettings()->value("fcs/csv_endswith", "").toString(),
+                                                      settings->getQSettings()->value("fcs/csv_separator", ",").toString(),
+                                                      settings->getQSettings()->value("fcs/csv_comment", "#").toString(),
+                                                      settings->getQSettings()->value("fcs/csv_timefactor", 1.0).toDouble(),
+                                                      settings->getQSettings()->value("fcs/csv_firstline", 1).toInt());
+        loadWidgetGeometry(*settings->getQSettings(), csvDlg, QPoint(50,50), csvDlg->size(), QString("fcs/csv_dialog."));
+        if (!filename.isEmpty() && QFile::exists(filename)) csvDlg->setFileContents(filename);
+        if (csvDlg->exec()==QDialog::Accepted) {
+            p["CSV_SEPARATOR"]=QString(csvDlg->get_column_separator());
+            p["CSV_COMMENT"]=QString(csvDlg->get_comment_start());
+            p["CSV_STARTSWITH"]=csvDlg->get_startswith();
+            p["CSV_ENDSWITH"]=csvDlg->get_endswith();
+            p["CSV_TIMEFACTOR"]=csvDlg->get_timefactor();
+            p["CSV_FIRSTLINE"]=csvDlg->get_firstLine();
+            p["CSV_MODE"]=csvDlg->get_mode();
+            settings->getQSettings()->setValue("fcs/csv_separator", QString(csvDlg->get_column_separator()));
+            settings->getQSettings()->setValue("fcs/csv_comment", QString(csvDlg->get_comment_start()));
+            settings->getQSettings()->setValue("fcs/csv_startswith", QString(csvDlg->get_startswith()));
+            settings->getQSettings()->setValue("fcs/csv_endswith", QString(csvDlg->get_endswith()));
+            settings->getQSettings()->setValue("fcs/csv_timefactor", csvDlg->get_timefactor());
+            settings->getQSettings()->setValue("fcs/csv_firstline", csvDlg->get_firstLine());
+            settings->getQSettings()->setValue("fcs/csv_mode", csvDlg->get_mode());
+            saveWidgetGeometry(*settings->getQSettings(), csvDlg, "fcs/csv_dialog.");
+        } else {
+            services->setProgress(0);
+            return;
+        }
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_albaf) {
+        p["FILETYPE"]="ISS_ALBA";
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_diff4f) {
+        p["FILETYPE"]="DIFFUSION4_SIMRESULTS";
+        p["CSV_SEPARATOR"]=",";
+        p["CSV_COMMENT"]="#";
+    }
+}
+
+void QFPRDRFCS::loadFCSFilterFiles(const QStringList &files, const QString &currentFCSFileFormatFilter, const QMap<QString, QVariant> &p, const QStringList &paramsReadonly)
+{
+    if (currentFCSFileFormatFilter==QFPRDRFCS_alvf) {
+        insertALV5000File(files, p, paramsReadonly);
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_alvf6) {
+        insertALV6000File(files, p, paramsReadonly);
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_alvf7) {
+        insertALV7000File(files, p, paramsReadonly);
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_olegf) {
+        insertOlegFile(files, p, paramsReadonly);
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_albaf) {
+        insertALBAFile(files, p, paramsReadonly);
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_diff4f) {
+        insertDiffusion4File(files, p, paramsReadonly);
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_flexf) {
+        insertFLEX_SINFile(files, p, paramsReadonly);
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_zeisscf3) {
+        insertConfocor3File(files, p, paramsReadonly);
+    } else {
+        insertCSVFile(files, p, paramsReadonly);
+    }
+}
+
+
+
 void QFPRDRFCS::insertFCS() {
     if (project) {
-        QString alvf=tr("ALV-5000 file (*.asc)");
-        QString alvf6=tr("ALV-6000 file (*.asc)");
-        QString alvf7=tr("ALV-7000 file (*.asc)");
-        QString flexf=tr("correlator.com files (*.sin)");
-        QString zeisscf3=tr("Zeiss Confocor3 files (*.fcs)");
-        QString asciif=tr("ASCII Data Files (*.txt *.dat *.csv)");
-        QString albaf=tr("ISS Alba Files (*.csv)");
-        QString diff4f=tr("diffusion4 correlation (*corr.dat)");
-        QString olegf=tr("Oleg Kriechevsky's Binary format(*. *.dat)");
-        QString currentFCSFileFormatFilter=settings->getQSettings()->value("fcs/current_fcs_format_filter", alvf).toString();
+
+        QString currentFCSFileFormatFilter=settings->getQSettings()->value("fcs/current_fcs_format_filter", getFCSFilters().value(0)).toString();
         QStringList files = qfGetOpenFileNames(parentWidget,
                               tr("Select FCS Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              alvf+";;"+alvf6+";;"+alvf7+";;"+flexf+";;"+zeisscf3+";;"+asciif+";;"+albaf+";;"+diff4f+";;"+olegf, &currentFCSFileFormatFilter);
-        //std::cout<<"filter: "<<currentFCSFileFormatFilter.toStdString()<<std::endl;
+                              getFCSFilters().join(";;"), &currentFCSFileFormatFilter);
         if (files.size()>0) {
             settings->getQSettings()->setValue("fcs/current_fcs_format_filter", currentFCSFileFormatFilter);
             QMap<QString, QVariant> p;
-            if (currentFCSFileFormatFilter==alvf) {
-                p["FILETYPE"]="ALV5000";
-                p["CHANNEL"]=0;
-            } else if (currentFCSFileFormatFilter==alvf6){
-               p["FILETYPE"]="ALV6000";
-               p["CHANNEL"]=0;
-               //qDebug() << "test 3";
-            } else if (currentFCSFileFormatFilter==alvf7){
-               p["FILETYPE"]="ALV7000";
-               p["CHANNEL"]=0;
-               //qDebug() << "test 3";
-            } else if (currentFCSFileFormatFilter==flexf){
-               p["FILETYPE"]="CORRELATOR.COM_SIN";
-               p["CHANNEL"]=0;
-               //qDebug() << "test 3";
-            } else if (currentFCSFileFormatFilter==zeisscf3){
-               p["FILETYPE"]="CONFOCOR3";
-               p["CHANNEL"]=0;
-               //qDebug() << "test 3";
-            } else if (currentFCSFileFormatFilter==olegf){
-               p["FILETYPE"]="OLEGKRIECHEVSKYBINARY";
-               p["CHANNEL"]=0;
-            } else if (currentFCSFileFormatFilter==asciif) {
-                p["FILETYPE"]="CSV_CORR";
-                p["CSV_SEPARATOR"]=QString(",");
-                p["CSV_COMMENT"]=QString("#");
-                p["CSV_STARTSWITH"]=QString("");
-                p["CSV_ENDSWITH"]=QString("");
-                p["CSV_TIMEFACTOR"]=1.0;
-                p["CSV_FIRSTLINE"]=1;
-                p["CSV_MODE"]=0;
+            setFCSFilterProperties(p, currentFCSFileFormatFilter, files.value(0));
 
-                dlgCSVParameters* csvDlg=new dlgCSVParameters(parentWidget, settings->getQSettings()->value("fcs/csv_mode", 0).toInt(),
-                                                              settings->getQSettings()->value("fcs/csv_startswith", "").toString(),
-                                                              settings->getQSettings()->value("fcs/csv_endswith", "").toString(),
-                                                              settings->getQSettings()->value("fcs/csv_separator", ",").toString(),
-                                                              settings->getQSettings()->value("fcs/csv_comment", "#").toString(),
-                                                              settings->getQSettings()->value("fcs/csv_timefactor", 1.0).toDouble(),
-                                                              settings->getQSettings()->value("fcs/csv_firstline", 1).toInt());
-                loadWidgetGeometry(*settings->getQSettings(), csvDlg, QPoint(50,50), csvDlg->size(), QString("fcs/csv_dialog."));
-                if (files.size()>0) csvDlg->setFileContents(files[0]);
-                if (csvDlg->exec()==QDialog::Accepted) {
-                    p["CSV_SEPARATOR"]=QString(csvDlg->get_column_separator());
-                    p["CSV_COMMENT"]=QString(csvDlg->get_comment_start());
-                    p["CSV_STARTSWITH"]=csvDlg->get_startswith();
-                    p["CSV_ENDSWITH"]=csvDlg->get_endswith();
-                    p["CSV_TIMEFACTOR"]=csvDlg->get_timefactor();
-                    p["CSV_FIRSTLINE"]=csvDlg->get_firstLine();
-                    p["CSV_MODE"]=csvDlg->get_mode();
-                    settings->getQSettings()->setValue("fcs/csv_separator", QString(csvDlg->get_column_separator()));
-                    settings->getQSettings()->setValue("fcs/csv_comment", QString(csvDlg->get_comment_start()));
-                    settings->getQSettings()->setValue("fcs/csv_startswith", QString(csvDlg->get_startswith()));
-                    settings->getQSettings()->setValue("fcs/csv_endswith", QString(csvDlg->get_endswith()));
-                    settings->getQSettings()->setValue("fcs/csv_timefactor", csvDlg->get_timefactor());
-                    settings->getQSettings()->setValue("fcs/csv_firstline", csvDlg->get_firstLine());
-                    settings->getQSettings()->setValue("fcs/csv_mode", csvDlg->get_mode());
-                    saveWidgetGeometry(*settings->getQSettings(), csvDlg, "fcs/csv_dialog.");
-                } else {
-                    services->setProgress(0);
-                    return;
-                }
-            } else if (currentFCSFileFormatFilter==albaf) {
-                p["FILETYPE"]="ISS_ALBA";
-            } else if (currentFCSFileFormatFilter==diff4f) {
-                p["FILETYPE"]="DIFFUSION4_SIMRESULTS";
-                p["CSV_SEPARATOR"]=",";
-                p["CSV_COMMENT"]="#";
-            }
+
             QStringList paramsReadonly;
             paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT"<<"CSV_STARTSWITH"<<"CSV_MODE"<<"CSV_FIRSTLINE"<<"CSV_ENDSWITH"<<"CSV_TIMEFACTOR";
             QStringList list = files;
@@ -520,25 +560,8 @@ void QFPRDRFCS::insertFCS() {
                 if (QFile::exists(*it)) {
                     //std::cout<<"loading "<<(*it).toStdString()<<std::endl;
                     services->log_text(tr("loading [%2] '%1' ...\n").arg(*it).arg(currentFCSFileFormatFilter));
-                    if (currentFCSFileFormatFilter==alvf) {
-                        insertALV5000File(QStringList(*it), p, paramsReadonly);
-                    } else if (currentFCSFileFormatFilter==alvf6) {
-                       insertALV6000File(QStringList(*it), p, paramsReadonly);
-                    } else if (currentFCSFileFormatFilter==alvf7) {
-                       insertALV7000File(QStringList(*it), p, paramsReadonly);
-                    } else if (currentFCSFileFormatFilter==olegf) {
-                       insertOlegFile(QStringList(*it), p, paramsReadonly);
-                    } else if (currentFCSFileFormatFilter==albaf) {
-                        insertALBAFile(QStringList(*it), p, paramsReadonly);
-                    } else if (currentFCSFileFormatFilter==diff4f) {
-                        insertDiffusion4File(QStringList(*it), p, paramsReadonly);
-                    } else if (currentFCSFileFormatFilter==flexf) {
-                        insertFLEX_SINFile(QStringList(*it), p, paramsReadonly);
-                    } else if (currentFCSFileFormatFilter==zeisscf3) {
-                        insertConfocor3File(QStringList(*it), p, paramsReadonly);
-                    } else {
-                        insertCSVFile(QStringList(*it), p, paramsReadonly);
-                    }
+                    loadFCSFilterFiles(QStringList(*it), currentFCSFileFormatFilter, p, paramsReadonly);
+
                     //std::cout<<"loading "<<(*it).toStdString()<<" ... done!\n";
                     settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
                     //std::cout<<"loading "<<(*it).toStdString()<<" ... done ... done!\n";
@@ -558,115 +581,24 @@ void QFPRDRFCS::insertFCS() {
 void QFPRDRFCS::insertMultiFileFCS()
 {
     if (project) {
-        QString alvf=tr("ALV-5000 file (*.asc)");
-        QString alvf6=tr("ALV-6000 file (*.asc)");
-        QString alvf7=tr("ALV-7000 file (*.asc)");
-        QString flexf=tr("correlator.com files (*.sin)");
-        QString zeisscf3=tr("Zeiss Confocor3 files (*.fcs)");
-        QString asciif=tr("ASCII Data Files (*.txt *.dat *.csv)");
-        QString albaf=tr("ISS Alba Files (*.csv)");
-        QString diff4f=tr("diffusion4 correlation (*corr.dat)");
-        QString olegf=tr("Oleg Kriechevsky's Binary format(*. *.dat)");
-        QString currentFCSFileFormatFilter=settings->getQSettings()->value("fcs/current_fcs_format_filter", alvf).toString();
+
+        QString currentFCSFileFormatFilter=settings->getQSettings()->value("fcs/current_fcs_format_filter", getFCSFilters().value(0)).toString();
         QStringList files = qfGetOpenFileNames(parentWidget,
                               tr("Select FCS Data File(s) to Import ..."),
                               settings->getCurrentRawDataDir(),
-                              alvf+";;"+alvf6+";;"+alvf7+";;"+flexf+";;"+zeisscf3+";;"+asciif+";;"+albaf+";;"+diff4f+";;"+olegf, &currentFCSFileFormatFilter);
+                              getFCSFilters().join(";;"), &currentFCSFileFormatFilter);
         //std::cout<<"filter: "<<currentFCSFileFormatFilter.toStdString()<<std::endl;
         if (files.size()>0) {
             settings->getQSettings()->setValue("fcs/current_fcs_format_filter", currentFCSFileFormatFilter);
             QMap<QString, QVariant> p;
-            if (currentFCSFileFormatFilter==alvf) {
-                p["FILETYPE"]="ALV5000";
-                p["CHANNEL"]=0;
-            } else if (currentFCSFileFormatFilter==alvf6){
-               //qDebug() << "test 1";
-               p["FILETYPE"]="ALV6000";
-               p["CHANNEL"]=0;
-            } else if (currentFCSFileFormatFilter==alvf7){
-               //qDebug() << "test 1";
-               p["FILETYPE"]="ALV7000";
-               p["CHANNEL"]=0;
-            } else if (currentFCSFileFormatFilter==olegf){
-               p["FILETYPE"]="OLEGKRIECHEVSKYBINARY";
-               p["CHANNEL"]=0;
-            } else if (currentFCSFileFormatFilter==flexf){
-               p["FILETYPE"]="CORRELATOR.COM_SIN";
-               p["CHANNEL"]=0;
-            } else if (currentFCSFileFormatFilter==zeisscf3){
-               p["FILETYPE"]="CONFOCOR3";
-               p["CHANNEL"]=0;
-            } else if (currentFCSFileFormatFilter==asciif) {
-                p["FILETYPE"]="CSV_CORR";
-                p["CSV_SEPARATOR"]=QString(",");
-                p["CSV_COMMENT"]=QString("#");
-                p["CSV_STARTSWITH"]=QString("");
-                p["CSV_ENDSWITH"]=QString("");
-                p["CSV_TIMEFACTOR"]=1.0;
-                p["CSV_FIRSTLINE"]=1;
-                p["CSV_MODE"]=0;
+            setFCSFilterProperties(p, currentFCSFileFormatFilter, files.value(0));
 
-                dlgCSVParameters* csvDlg=new dlgCSVParameters(parentWidget, settings->getQSettings()->value("fcs/csv_mode", 0).toInt(),
-                                                              settings->getQSettings()->value("fcs/csv_startswith", "").toString(),
-                                                              settings->getQSettings()->value("fcs/csv_endswith", "").toString(),
-                                                              settings->getQSettings()->value("fcs/csv_separator", ",").toString(),
-                                                              settings->getQSettings()->value("fcs/csv_comment", "#").toString(),
-                                                              settings->getQSettings()->value("fcs/csv_timefactor", 1.0).toDouble(),
-                                                              settings->getQSettings()->value("fcs/csv_firstline", 1).toInt());
-                loadWidgetGeometry(*settings->getQSettings(), csvDlg, QPoint(50,50), csvDlg->size(), QString("fcs/csv_dialog."));
-                if (files.size()>0) csvDlg->setFileContents(files[0]);
-                if (csvDlg->exec()==QDialog::Accepted) {
-                    p["CSV_SEPARATOR"]=QString(csvDlg->get_column_separator());
-                    p["CSV_COMMENT"]=QString(csvDlg->get_comment_start());
-                    p["CSV_STARTSWITH"]=csvDlg->get_startswith();
-                    p["CSV_ENDSWITH"]=csvDlg->get_endswith();
-                    p["CSV_TIMEFACTOR"]=csvDlg->get_timefactor();
-                    p["CSV_FIRSTLINE"]=csvDlg->get_firstLine();
-                    p["CSV_MODE"]=csvDlg->get_mode();
-                    settings->getQSettings()->setValue("fcs/csv_separator", QString(csvDlg->get_column_separator()));
-                    settings->getQSettings()->setValue("fcs/csv_comment", QString(csvDlg->get_comment_start()));
-                    settings->getQSettings()->setValue("fcs/csv_startswith", QString(csvDlg->get_startswith()));
-                    settings->getQSettings()->setValue("fcs/csv_endswith", QString(csvDlg->get_startswith()));
-                    settings->getQSettings()->setValue("fcs/csv_timefactor", csvDlg->get_timefactor());
-                    settings->getQSettings()->setValue("fcs/csv_firstline", csvDlg->get_firstLine());
-                    settings->getQSettings()->setValue("fcs/csv_mode", csvDlg->get_mode());
-                    saveWidgetGeometry(*settings->getQSettings(), csvDlg, "fcs/csv_dialog.");
-                } else {
-                    services->setProgress(0);
-                    return;
-                }
-            } else if (currentFCSFileFormatFilter==albaf) {
-                p["FILETYPE"]="ISS_ALBA";
-            } else if (currentFCSFileFormatFilter==diff4f) {
-                p["FILETYPE"]="DIFFUSION4_SIMRESULTS";
-                p["CSV_SEPARATOR"]=",";
-                p["CSV_COMMENT"]="#";
-
-            }
             QStringList paramsReadonly;
             paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT"<<"CSV_STARTSWITH"<<"CSV_MODE"<<"CSV_FIRSTLINE"<<"CSV_ENDSWITH"<<"CSV_TIMEFACTOR";
             services->log_text(tr("loading %1 [%2] files ...\n").arg(files.size()).arg(currentFCSFileFormatFilter));
 
-            if (currentFCSFileFormatFilter==alvf) {
-                insertALV5000File(files, p, paramsReadonly);
-            } else if (currentFCSFileFormatFilter==alvf6) {
-                insertALV6000File(files, p, paramsReadonly);
-            } else if (currentFCSFileFormatFilter==alvf7) {
-                insertALV7000File(files, p, paramsReadonly);
-            } else if (currentFCSFileFormatFilter==olegf) {
-                insertOlegFile(files, p, paramsReadonly);
-                //qDebug() << "test 2";
-            } else if (currentFCSFileFormatFilter==albaf) {
-                insertALBAFile(files, p, paramsReadonly);
-            } else if (currentFCSFileFormatFilter==diff4f) {
-                insertDiffusion4File(files, p, paramsReadonly);
-            } else if (currentFCSFileFormatFilter==flexf) {
-                insertFLEX_SINFile(files, p, paramsReadonly);
-            } else if (currentFCSFileFormatFilter==zeisscf3) {
-                insertConfocor3File(files, p, paramsReadonly);
-            } else {
-                insertCSVFile(files, p, paramsReadonly);
-            }
+            loadFCSFilterFiles(files, currentFCSFileFormatFilter, p, paramsReadonly);
+
             //std::cout<<"loading "<<(*it).toStdString()<<" ... done!\n";
             settings->setCurrentRawDataDir(QFileInfo(files.value(0, "")).absolutePath());
             services->setProgress(0);
@@ -723,5 +655,65 @@ void QFPRDRFCS::insertSimulated() {
         }
     }
 }
+
+
+
+void QFPRDRFCS::startFCSProjectWizard()
+{
+    QFWizard* wiz=new QFWizard(parentWidget);
+    wiz->setWindowTitle(tr("FCS Project Wizard"));
+    wiz->addPage(new QFTextWizardPage(tr("Introduction"),
+                                      tr("This wizard will help you to load a set of FCS or DLS correlation curves from files and select the appropriate mode of data evaluation. It will finally set up a complete QuickFit 3.0 project with all the data you entered."),
+                                      wiz));
+    QFSelectFilesWizardPage* selfiles;
+    wiz->addPage(selfiles=new QFSelectFilesWizardPage(tr("select FCS/DLS data files ...")));
+    selfiles->setFilters(getFCSFilters());
+    selfiles->setSettingsIDs("fcs/last_fcswizard_dir", "fcs/current_fcs_format_filter");
+    if (wiz->exec()) {
+        qDebug()<<"OK";
+
+        QStringList files=selfiles->files();
+        QStringList filters=selfiles->fileFilters();
+
+        if (files.size()>0) {
+
+
+            QStringList paramsReadonly;
+            paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT"<<"CSV_STARTSWITH"<<"CSV_MODE"<<"CSV_FIRSTLINE"<<"CSV_ENDSWITH"<<"CSV_TIMEFACTOR";
+            QStringList list = files;
+            QStringList::Iterator it = list.begin();
+            services->setProgressRange(0, list.size());
+            services->setProgress(0);
+            int i=0;
+            QMap<QString, QMap<QString, QVariant> > ps;
+
+            while(it != list.end()) {
+                i++;
+                if (QFile::exists(*it)) {
+                    QMap<QString, QVariant> p;
+                    if (ps.contains( filters.value(i))) p=ps[filters.value(i)];
+                    else setFCSFilterProperties(p, filters.value(i), files.value(i));
+                    ps[filters.value(i)]=p;
+                    //std::cout<<"loading "<<(*it).toStdString()<<std::endl;
+                    services->log_text(tr("loading [%2] '%1' ...\n").arg(*it).arg(filters.value(i)));
+                    loadFCSFilterFiles(QStringList(*it), filters.value(i), p, paramsReadonly);
+
+                    //std::cout<<"loading "<<(*it).toStdString()<<" ... done!\n";
+                    settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
+                    //std::cout<<"loading "<<(*it).toStdString()<<" ... done ... done!\n";
+                    ++it;
+                }
+                services->setProgress(i);
+                QApplication::processEvents(QEventLoop::AllEvents, 50);
+            }
+            services->setProgress(0);
+            //std::cout<<"loading done ...\n";
+            //tvMain->expandToDepth(2);
+        }
+
+    }
+    delete wiz;
+}
+
 
 Q_EXPORT_PLUGIN2(qfrdrfcs, QFPRDRFCS)
