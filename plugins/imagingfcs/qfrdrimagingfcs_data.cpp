@@ -2636,17 +2636,20 @@ void QFRDRImagingFCSData_avgcf(T* data, T* sigma, int width, int height, int N, 
                         }
                     }
                 }
-                data[y*width*N+x*N+n]/=count;
+                const double norm=count;
+                sigma[y*width*N+x*N+n]=sqrt((sigma[y*width*N+x*N+n]-data[y*width*N+x*N+n]*data[y*width*N+x*N+n]/norm)/(norm-1.0));
+                data[y*width*N+x*N+n]/=norm;
+
             }
         }
     }
 
 
-    double norm=binning*binning;
+    /*double norm=binning*binning;
     for (int64_t i=0; i<width*height*N; i++) {
-        sigma[i]=sqrt((sigma[i]-data[i]*data[i]/norm)/(norm-1.0));
-        data[i]= data[i]/norm;
-    }
+        sigma[i]=sqrt((sigma[i]-data[i]*data[i]*norm)/(norm-1.0));
+        //data[i]= data[i]/norm;
+    }*/
     qfFree(temp);
 }
 
