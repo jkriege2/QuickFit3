@@ -666,12 +666,16 @@ void QFPRDRFCS::startFCSProjectWizard()
                                       tr("This wizard will help you to load a set of FCS or DLS correlation curves from files and select the appropriate mode of data evaluation. It will finally set up a complete QuickFit 3.0 project with all the data you entered."),
                                       wiz));
     QFSelectFilesWizardPage* selfiles;
-    wiz->addPage(selfiles=new QFSelectFilesWizardPage(tr("select FCS/DLS data files ...")));
+    wiz->addPage(selfiles=new QFSelectFilesWizardPage(tr("FCS/DLS data files ...")));
+    selfiles->setSubTitle(tr("Select one or more FCS/DLS data files, that you want to add to the project. You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
     selfiles->setFilters(getFCSFilters());
     selfiles->setSettingsIDs("fcs/last_fcswizard_dir", "fcs/current_fcs_format_filter");
+    selfiles->setAddOnStartup(false);
+
 
     QFComboBoxWizardPage* meastype;
-    wiz->addPage(meastype=new QFComboBoxWizardPage(tr("select type of instrument")));
+    wiz->addPage(meastype=new QFComboBoxWizardPage(tr("Instrument used for measurmeent")));
+    meastype->setSubTitle(tr("Select the type of instrument, you used for the data acquisition."));
     QStringList measurementTypes;
     measurementTypes<<tr("confocal FCS (single-spot)");
     measurementTypes<<tr("TIR FCS (single-spot)");
@@ -680,6 +684,37 @@ void QFPRDRFCS::startFCSProjectWizard()
     measurementTypes<<tr("TIR-FCS (camera)");
     meastype->setItems(measurementTypes);
     meastype->setLabel(tr("instrument type:"));
+
+    QFCheckboxListWizardPage* evals;
+    wiz->addPage(evals=new QFCheckboxListWizardPage(tr("Evaluations")));
+    evals->setUserPreviousPage(meastype);
+    evals->setEnableable(true);
+    evals->setEnableCheckbox(tr("also add evaluation objects?"), true);
+    evals->addItem("FCS/DLS fit");
+    evals->addItem("FCS/DLS Maximum Entropy (MaxEnt) Distribution analysis");
+    evals->addItem("FCS Mean Squared Displacement (MSD) evaluation");
+
+
+    QFFormWizardPage* evalprops;
+    wiz->addPage(evalprops=new QFFormWizardPage(tr("Evaluation Properties")));
+    QDoubleSpinBox* spinWxy=new QDoubleSpinBox(evalprops);
+    spinWxy->setSuffix(" nm");
+    spinWxy->setRange(0,10000);
+    spinWxy->setValue(250);
+    spinWxy->setDecimals(1);
+    evalprops->addRow("wxy", spinWxy);
+
+
+    QFTextWizardPage* last;
+    wiz->addPage(last=new QFTextWizardPage(tr("Finalize"),
+                                           tr("You completed this wizard and all selected files, as well as all selected evaluations will be added to the project.\n\nThe data files will be added as \"raw data records (RDR)\" in the upper partof the project and the evaluations as additional items below that. By double-clicking on any project item, you can open a new window, which displays the data, or allows you to perform the desired evaluation."),
+                                      wiz));
+    last->setFinalPage(true);
+    evals->setNextPageIfAllDisabled(last);
+    evals->setNextPageIfDisabled(last);
+    meastype->setUserOnValidateArgument(evalprops);
+    connect(meastype, SIGNAL(onValidate(QWizardPage*,QWizardPage*)), this, SLOT(FCSProjectWizardValidateIntrument(QWizardPage*,QWizardPage*)));
+
     if (wiz->exec()) {
 
         QStringList files=selfiles->files();
@@ -726,5 +761,11 @@ void QFPRDRFCS::startFCSProjectWizard()
     delete wiz;
 }
 
+void QFPRDRFCS::FCSProjectWizardValidateIntrument(QWizardPage *page, QWizardPage *fitprops)
+{
+    qDebug()<<"FCSProjectWizardValidateIntrument"<<page<<fitprops;
+}
+
 
 Q_EXPORT_PLUGIN2(qfrdrfcs, QFPRDRFCS)
+

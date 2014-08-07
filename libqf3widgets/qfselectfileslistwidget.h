@@ -23,6 +23,9 @@ class QFWIDLIB_EXPORT QFSelectFilesListWidget : public QWidget
         QStringList files() const;
         QStringList fileFilters() const;
 
+    public slots:
+        void addFiles();
+
     protected slots:
         void on_btnAdd_clicked();
         void on_btnRemove_clicked();
@@ -51,11 +54,15 @@ class QFWIDLIB_EXPORT QFSelectFilesWizardPage : public QFWizardPage
         int filesCount() const;
         QStringList files() const;
         QStringList fileFilters() const;
+        void setAddOnStartup(bool add);
+
+        virtual void initializePage();
     signals:
 
     public slots:
     protected:
         QFSelectFilesListWidget *sel;
+        bool m_addStartup;
 
 };
 

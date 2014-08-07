@@ -4,19 +4,47 @@
 QFWizard::QFWizard(QWidget *parent) :
     QWizard(parent)
 {
+    setWizardStyle(QWizard::ModernStyle);
 }
 
 
 QFWizardPage::QFWizardPage(QWidget *parent):
     QWizardPage(parent)
 {
-
+    m_userLast=NULL;
+    m_userValidateArgument=NULL;
 }
 
 QFWizardPage::QFWizardPage(const QString &title, QWidget *parent):
     QWizardPage(parent)
 {
+    m_userLast=NULL;
+    m_userValidateArgument=NULL;
     setTitle(title);
+}
+
+void QFWizardPage::initializePage()
+{
+    QWizardPage::initializePage();
+    emit onInitialize(this);
+    emit onInitialize(this, m_userLast);
+}
+
+bool QFWizardPage::validatePage()
+{
+    emit onValidate(this);
+    emit onValidate(this, m_userValidateArgument);
+    return QWizardPage::validatePage();
+}
+
+void QFWizardPage::setUserPreviousPage(QWizardPage *page)
+{
+    m_userLast=page;
+}
+
+void QFWizardPage::setUserOnValidateArgument(QWizardPage *page)
+{
+    m_userValidateArgument=page;
 }
 
 
@@ -34,8 +62,9 @@ QFTextWizardPage::QFTextWizardPage(const QString& title, const QString &text, QW
 
 
 QFComboBoxWizardPage::QFComboBoxWizardPage(const QString &title, QWidget *parent):
-    QFFormWizardPage(title, parent)
+    QFEnableableFormWizardPage(title, parent)
 {
+    setEnableable(false);
     label = new QLabel(this);
     combo=new QFEnhancedComboBox(this);
     addRow(label, combo);
@@ -124,4 +153,159 @@ void QFFormWizardPage::addRow(QWidget *widget)
 void QFFormWizardPage::addRow(QLayout *layout)
 {
     m_layout->addRow(layout);
+}
+
+
+QFEnableableFormWizardPage::QFEnableableFormWizardPage(QWidget *parent):
+    QFFormWizardPage(parent)
+{
+    nextIfDisabled=NULL;
+    createWidgets();
+}
+
+QFEnableableFormWizardPage::QFEnableableFormWizardPage(const QString &title, QWidget *parent):
+    QFFormWizardPage(title, parent)
+{
+    nextIfDisabled=NULL;
+    createWidgets();
+}
+
+void QFEnableableFormWizardPage::setEnableCheckbox(const QString &name, bool enabled)
+{
+    chkMain->setText(name);
+    chkMain->setEnabled(enabled);
+}
+
+void QFEnableableFormWizardPage::setEnableable(bool enableable)
+{
+    if (enableable) {
+        chkMain->setVisible(true);
+        connect(chkMain, SIGNAL(toggled(bool)), widMain, SLOT(setEnabled(bool)));
+        widMain->setEnabled(chkMain->isChecked());
+    } else {
+        chkMain->setVisible(false);
+        disconnect(chkMain, SIGNAL(toggled(bool)), widMain, SLOT(setEnabled(bool)));
+        widMain->setEnabled(true);
+    }
+}
+
+void QFEnableableFormWizardPage::setNextPageIfDisabled(QWizardPage *nextIfDisabled)
+{
+    this->nextIfDisabled=nextIfDisabled;
+}
+
+int QFEnableableFormWizardPage::nextId() const
+{
+    if (nextIfDisabled && !widMain->isEnabled() && wizard()) {
+        QList<int>	ids=wizard()->pageIds();
+        for (int i=0; i<ids.size(); i++) {
+            if (wizard()->page(ids[i])==nextIfDisabled) return ids[i];
+        }
+    }
+    return QFFormWizardPage::nextId();
+}
+
+void QFEnableableFormWizardPage::createWidgets()
+{
+    QVBoxLayout* lay=new QVBoxLayout();
+    setLayout(NULL);
+    widMain=new QWidget(this);
+    widMain->setLayout(m_layout);
+    chkMain=new QCheckBox(tr("enable"), this);
+    lay->addWidget(chkMain);
+    chkMain->setChecked(false);
+    widMain->setEnabled(false);
+    lay->addWidget(widMain);
+    setLayout(lay);
+    setEnableable(true);
+}
+
+
+QFCheckboxListWizardPage::QFCheckboxListWizardPage(const QString &title, QWidget *parent):
+    QFEnableableFormWizardPage(title, parent)
+{
+    setEnableable(false);
+}
+
+void QFCheckboxListWizardPage::setItems(const QStringList &items)
+{
+    clear();
+    for (int i=0; i<items.size(); i++)  {
+        addItem(items[i]);
+    }
+}
+
+void QFCheckboxListWizardPage::clear()
+{
+    for (int i=0; i<boxes.size(); i++) {
+        m_layout->removeWidget(boxes[i]);
+        delete boxes[i];
+    }
+}
+
+void QFCheckboxListWizardPage::addItem(const QString &item)
+{
+    QCheckBox* chk=new QCheckBox(item, this);
+    boxes.append(chk);
+    addRow("", chk);
+}
+
+void QFCheckboxListWizardPage::setChecked(const QList<bool> &checked)
+{
+    for (int i=0; i<boxes.size(); i++) {
+        if (i<checked.size()) boxes[i]->setChecked(checked[i]);
+    }
+}
+
+void QFCheckboxListWizardPage::setChecked(int id, bool checked)
+{
+    if (id<boxes.size() && id>=0) boxes[id]->setChecked(checked);
+}
+
+bool QFCheckboxListWizardPage::getChecked(int id) const
+{
+    if (id<boxes.size() && id>=0) return boxes[id]->isChecked();
+    return false;
+}
+
+QList<bool> QFCheckboxListWizardPage::getChecked() const
+{
+    QList<bool> ch;
+    for (int i=0; i<boxes.size(); i++) {
+        ch<<boxes[i]->isChecked();
+    }
+    return ch;
+}
+
+int QFCheckboxListWizardPage::count() const
+{
+    return boxes.size();
+}
+
+void QFCheckboxListWizardPage::setNextPageIfAllDisabled(QWizardPage *nextIfDisabled)
+{
+    this->nextIfAllDisabled=nextIfDisabled;
+}
+
+int QFCheckboxListWizardPage::nextId() const
+{
+    QList<int>	ids=wizard()->pageIds();
+    qDebug()<<"QFCheckboxListWizardPage::nextId() "<<nextIfAllDisabled << widMain->isEnabled() << wizard();
+    if (nextIfAllDisabled && widMain->isEnabled() && wizard()) {
+        bool allDisabled=true;
+        for (int i=0; i<count(); i++) {
+            if (getChecked(i)) {
+                allDisabled=false;
+                break;
+            }
+        }
+        qDebug()<<"  allDisabled="<<allDisabled;
+        if (allDisabled) {
+            for (int i=0; i<ids.size(); i++) {
+                if (wizard()->page(ids[i])==nextIfAllDisabled) return ids[i];
+            }
+        }
+    }
+    return QFEnableableFormWizardPage::nextId();
+
 }

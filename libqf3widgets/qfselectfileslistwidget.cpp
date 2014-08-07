@@ -52,6 +52,11 @@ QStringList QFSelectFilesListWidget::fileFilters() const
     return sl;
 }
 
+void QFSelectFilesListWidget::addFiles()
+{
+    on_btnAdd_clicked();
+}
+
 void QFSelectFilesListWidget::on_btnAdd_clicked()
 {
     QString currentFCSFileFormatFilter=ProgramOptions::getConfigValue(lastFilterID, filters.value(0)).toString();
@@ -108,6 +113,7 @@ void QFSelectFilesListWidget::on_btnDown_clicked()
 QFSelectFilesWizardPage::QFSelectFilesWizardPage(const QString &title, QWidget *parent):
     QFWizardPage(title, parent)
 {
+    m_addStartup=false;
     sel = new QFSelectFilesListWidget(this);
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -139,4 +145,15 @@ QStringList QFSelectFilesWizardPage::files() const
 QStringList QFSelectFilesWizardPage::fileFilters() const
 {
     return sel->fileFilters();
+}
+
+void QFSelectFilesWizardPage::setAddOnStartup(bool add)
+{
+    m_addStartup=add;
+}
+
+void QFSelectFilesWizardPage::initializePage()
+{
+    QFWizardPage::initializePage();
+    if (m_addStartup) sel->addFiles();
 }
