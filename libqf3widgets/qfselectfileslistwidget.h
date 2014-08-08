@@ -55,14 +55,17 @@ class QFWIDLIB_EXPORT QFSelectFilesWizardPage : public QFWizardPage
         QStringList files() const;
         QStringList fileFilters() const;
         void setAddOnStartup(bool add);
+        void setFilesRequired(bool add);
 
         virtual void initializePage();
+        virtual bool validatePage();
     signals:
 
     public slots:
     protected:
         QFSelectFilesListWidget *sel;
         bool m_addStartup;
+        bool m_needsfiles;
 
 };
 

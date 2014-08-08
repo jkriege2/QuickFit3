@@ -114,6 +114,7 @@ QFSelectFilesWizardPage::QFSelectFilesWizardPage(const QString &title, QWidget *
     QFWizardPage(title, parent)
 {
     m_addStartup=false;
+    m_needsfiles=true;
     sel = new QFSelectFilesListWidget(this);
 
     QVBoxLayout *layout = new QVBoxLayout;
@@ -152,8 +153,22 @@ void QFSelectFilesWizardPage::setAddOnStartup(bool add)
     m_addStartup=add;
 }
 
+void QFSelectFilesWizardPage::setFilesRequired(bool add)
+{
+    m_needsfiles=add;
+}
+
 void QFSelectFilesWizardPage::initializePage()
 {
     QFWizardPage::initializePage();
     if (m_addStartup) sel->addFiles();
+}
+
+bool QFSelectFilesWizardPage::validatePage()
+{
+    if (m_needsfiles && sel->filesCount()<=0) {
+        QMessageBox::critical(this, title(), tr("You have to add files to the list!"), QMessageBox::Ok, QMessageBox::Ok);
+        return false;
+    }
+    return QFWizardPage::validatePage();
 }

@@ -80,7 +80,7 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
 
         void startFCSProjectWizard();
 
-        void FCSProjectWizardValidateIntrument(QWizardPage* page, QWizardPage* fitprops);
+        void FCSProjectWizardValidateIntrument(QWizardPage* page, void* fitprops);
     protected:
         QStringList getFCSFilters() const;
         void setFCSFilterProperties(QMap<QString, QVariant>& p, const QString& filter, const QString &filename);

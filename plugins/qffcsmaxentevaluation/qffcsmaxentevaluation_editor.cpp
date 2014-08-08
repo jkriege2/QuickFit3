@@ -427,6 +427,12 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         sumRangesChanged();
 
         dataEventsEnabled=true;
+
+
+        if (item->propertyExists("PRESET_MODEL")) {
+            cmbModel->setCurrentIndex(item->getProperty("PRESET_MODEL", cmbModel->currentIndex()).toInt());
+            item->deleteProperty("PRESET_MODEL");
+        }
     }
 
     /*

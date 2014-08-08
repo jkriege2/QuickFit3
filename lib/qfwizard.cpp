@@ -12,14 +12,18 @@ QFWizardPage::QFWizardPage(QWidget *parent):
     QWizardPage(parent)
 {
     m_userLast=NULL;
-    m_userValidateArgument=NULL;
+    m_userValidatePage=NULL;
+    m_userLastArg=NULL;
+    m_userValidateArg=NULL;
 }
 
 QFWizardPage::QFWizardPage(const QString &title, QWidget *parent):
     QWizardPage(parent)
 {
     m_userLast=NULL;
-    m_userValidateArgument=NULL;
+    m_userValidatePage=NULL;
+    m_userLastArg=NULL;
+    m_userValidateArg=NULL;
     setTitle(title);
 }
 
@@ -28,12 +32,14 @@ void QFWizardPage::initializePage()
     QWizardPage::initializePage();
     emit onInitialize(this);
     emit onInitialize(this, m_userLast);
+    emit onInitializeA(this, m_userLastArg);
 }
 
 bool QFWizardPage::validatePage()
 {
     emit onValidate(this);
-    emit onValidate(this, m_userValidateArgument);
+    emit onValidate(this, m_userValidatePage);
+    emit onValidateA(this, m_userValidateArg);
     return QWizardPage::validatePage();
 }
 
@@ -42,9 +48,19 @@ void QFWizardPage::setUserPreviousPage(QWizardPage *page)
     m_userLast=page;
 }
 
-void QFWizardPage::setUserOnValidateArgument(QWizardPage *page)
+void QFWizardPage::setUserOnValidatePage(QWizardPage *page)
 {
-    m_userValidateArgument=page;
+    m_userValidatePage=page;
+}
+
+void QFWizardPage::setUserPreviousArgument(void *page)
+{
+    m_userLastArg=page;
+}
+
+void QFWizardPage::setUserOnValidateArgument(void *page)
+{
+    m_userValidateArg=page;
 }
 
 
@@ -114,15 +130,13 @@ void QFComboBoxWizardPage::setCurrentData(const QVariant &data, int role)
 QFFormWizardPage::QFFormWizardPage(QWidget *parent):
     QFWizardPage(parent)
 {
-    m_layout = new QFormLayout;
-    setLayout(m_layout);
+    createWidgets();
 }
 
 QFFormWizardPage::QFFormWizardPage(const QString &title, QWidget *parent):
     QFWizardPage(title, parent)
 {
-    m_layout = new QFormLayout;
-    setLayout(m_layout);
+    createWidgets();
 }
 
 void QFFormWizardPage::addRow(QWidget *label, QWidget *field)
@@ -155,6 +169,51 @@ void QFFormWizardPage::addRow(QLayout *layout)
     m_layout->addRow(layout);
 }
 
+void QFFormWizardPage::setRowEnabled(int row, bool enabled)
+{
+    if (row>=0 && row<m_layout->rowCount() && m_layout->itemAt(row, QFormLayout::FieldRole)) setWidgetEnabled(m_layout->itemAt(row, QFormLayout::FieldRole)->widget(), enabled);
+}
+
+void QFFormWizardPage::setWidgetEnabled(QWidget *wid, bool enabled)
+{
+    if (wid) {
+        wid->setEnabled(enabled);
+        QWidget* w2=m_layout->labelForField(wid);
+        if (w2) {
+            w2->setEnabled(enabled);
+        }
+    }
+}
+
+void QFFormWizardPage::setRowVisible(int row, bool enabled)
+{
+    if (row>=0 && row<m_layout->rowCount() && m_layout->itemAt(row, QFormLayout::FieldRole)) setWidgetVisible(m_layout->itemAt(row, QFormLayout::FieldRole)->widget(), enabled);
+}
+
+void QFFormWizardPage::setWidgetVisible(QWidget *wid, bool enabled)
+{
+    if (wid) {
+        wid->setVisible(enabled);
+        QWidget* w2=m_layout->labelForField(wid);
+        if (w2) {
+            w2->setVisible(enabled);
+        }
+    }
+}
+
+
+void QFFormWizardPage::createWidgets()
+{
+    m_layout = new QFormLayout;
+    widMain=new QWidget(this);
+    m_mainlay=new QVBoxLayout();
+
+    widMain->setLayout(m_layout);
+    widMain->setEnabled(true);
+    m_mainlay->addWidget(widMain);
+    setLayout(m_mainlay);
+}
+
 
 QFEnableableFormWizardPage::QFEnableableFormWizardPage(QWidget *parent):
     QFFormWizardPage(parent)
@@ -173,7 +232,8 @@ QFEnableableFormWizardPage::QFEnableableFormWizardPage(const QString &title, QWi
 void QFEnableableFormWizardPage::setEnableCheckbox(const QString &name, bool enabled)
 {
     chkMain->setText(name);
-    chkMain->setEnabled(enabled);
+    chkMain->setChecked(enabled);
+    widMain->setEnabled(enabled);
 }
 
 void QFEnableableFormWizardPage::setEnableable(bool enableable)
@@ -207,16 +267,10 @@ int QFEnableableFormWizardPage::nextId() const
 
 void QFEnableableFormWizardPage::createWidgets()
 {
-    QVBoxLayout* lay=new QVBoxLayout();
-    setLayout(NULL);
-    widMain=new QWidget(this);
-    widMain->setLayout(m_layout);
     chkMain=new QCheckBox(tr("enable"), this);
-    lay->addWidget(chkMain);
+    m_mainlay->insertWidget(0, chkMain);
     chkMain->setChecked(false);
     widMain->setEnabled(false);
-    lay->addWidget(widMain);
-    setLayout(lay);
     setEnableable(true);
 }
 
@@ -290,7 +344,7 @@ void QFCheckboxListWizardPage::setNextPageIfAllDisabled(QWizardPage *nextIfDisab
 int QFCheckboxListWizardPage::nextId() const
 {
     QList<int>	ids=wizard()->pageIds();
-    qDebug()<<"QFCheckboxListWizardPage::nextId() "<<nextIfAllDisabled << widMain->isEnabled() << wizard();
+    //qDebug()<<"QFCheckboxListWizardPage::nextId() "<<nextIfAllDisabled << widMain->isEnabled() << wizard();
     if (nextIfAllDisabled && widMain->isEnabled() && wizard()) {
         bool allDisabled=true;
         for (int i=0; i<count(); i++) {
@@ -299,7 +353,7 @@ int QFCheckboxListWizardPage::nextId() const
                 break;
             }
         }
-        qDebug()<<"  allDisabled="<<allDisabled;
+        //qDebug()<<"  allDisabled="<<allDisabled;
         if (allDisabled) {
             for (int i=0; i<ids.size(); i++) {
                 if (wizard()->page(ids[i])==nextIfAllDisabled) return ids[i];

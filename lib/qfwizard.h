@@ -37,19 +37,25 @@ class QFLIB_EXPORT QFWizardPage : public QWizardPage
         virtual bool validatePage();
 
         void setUserPreviousPage(QWizardPage* page);
-        void setUserOnValidateArgument(QWizardPage* page);
+        void setUserOnValidatePage(QWizardPage* page);
+        void setUserPreviousArgument(void* page);
+        void setUserOnValidateArgument(void* page);
     signals:
         void onInitialize(QWizardPage* page);
         void onInitialize(QWizardPage* page, QWizardPage* userPreviousPage);
+        void onInitializeA(QWizardPage* page, void* userArg);
         void onValidate(QWizardPage* page);
         void onValidate(QWizardPage* page, QWizardPage* userPage);
+        void onValidateA(QWizardPage* page, void* userArg);
 
 
 
     public slots:
     protected:
         QWizardPage* m_userLast;
-        QWizardPage* m_userValidateArgument;
+        QWizardPage* m_userValidatePage;
+        void* m_userLastArg;
+        void* m_userValidateArg;
 
 };
 
@@ -63,6 +69,12 @@ class QFLIB_EXPORT QFFormWizardPage : public QFWizardPage
         QFormLayout* getFormLayout() const {
             return m_layout;
         }
+        QVBoxLayout* getMainLayout() const {
+            return m_mainlay;
+        }
+        QWidget* getFormLayoutWidget() const {
+            return widMain;
+        }
 
         void addRow(QWidget *label, QWidget *field);
         void addRow(QWidget *label, QLayout *field);
@@ -70,12 +82,20 @@ class QFLIB_EXPORT QFFormWizardPage : public QFWizardPage
         void addRow(const QString &labelText, QLayout *field);
         void addRow(QWidget *widget);
         void addRow(QLayout *layout);
+        void setRowEnabled(int row, bool enabled=true);
+        void setWidgetEnabled(QWidget* wid, bool enabled=true);
+        void setRowVisible(int row, bool enabled=true);
+        void setWidgetVisible(QWidget* wid, bool enabled=true);
 
     signals:
 
     public slots:
     protected:
         QFormLayout* m_layout;
+        QVBoxLayout* m_mainlay;
+        QWidget* widMain;
+    private:
+        void createWidgets();
 
 };
 
@@ -97,7 +117,6 @@ class QFLIB_EXPORT QFEnableableFormWizardPage : public QFFormWizardPage
     public slots:
     protected:
         QCheckBox* chkMain;
-        QWidget* widMain;
         QWizardPage* nextIfDisabled;
 
     private:

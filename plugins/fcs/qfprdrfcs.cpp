@@ -15,6 +15,7 @@
 #include "confocor3tools.h"
 #include "qfwizard.h"
 #include "qfselectfileslistwidget.h"
+#include "qffitfunctioncombobox.h"
 
 QFPRDRFCS::QFPRDRFCS(QObject* parent):
     QObject(parent)
@@ -656,6 +657,20 @@ void QFPRDRFCS::insertSimulated() {
     }
 }
 
+struct FCSProjectWizardEvalSettingsData {
+    QFFormWizardPage* evalprops;
+    QFComboBoxWizardPage* meastype;
+    QFCheckboxListWizardPage* evals;
+    QFFitFunctionComboBox* cmbFitFunc;
+    QDoubleSpinBox* spinWxy;
+    QDoubleSpinBox* spinWz;
+    QDoubleSpinBox* spinGamma;
+    QDoubleSpinBox* spinA;
+    QDoubleSpinBox* spinDLSAngle;
+    QDoubleSpinBox* spinDLSN;
+    QDoubleSpinBox* spinDLSLambda;
+
+};
 
 
 void QFPRDRFCS::startFCSProjectWizard()
@@ -693,16 +708,59 @@ void QFPRDRFCS::startFCSProjectWizard()
     evals->addItem("FCS/DLS fit");
     evals->addItem("FCS/DLS Maximum Entropy (MaxEnt) Distribution analysis");
     evals->addItem("FCS Mean Squared Displacement (MSD) evaluation");
+    evals->setChecked(0,true);
 
 
+    FCSProjectWizardEvalSettingsData evsetData;
     QFFormWizardPage* evalprops;
     wiz->addPage(evalprops=new QFFormWizardPage(tr("Evaluation Properties")));
-    QDoubleSpinBox* spinWxy=new QDoubleSpinBox(evalprops);
-    spinWxy->setSuffix(" nm");
-    spinWxy->setRange(0,10000);
-    spinWxy->setValue(250);
-    spinWxy->setDecimals(1);
-    evalprops->addRow("wxy", spinWxy);
+    evsetData.evalprops=evalprops;
+    evsetData.meastype=meastype;
+    evsetData.evals=evals;
+    evsetData.cmbFitFunc=new QFFitFunctionComboBox(evalprops);
+    evalprops->addRow("<i>fit function</i> ", evsetData.cmbFitFunc);
+    evsetData.spinWxy=new QDoubleSpinBox(evalprops);
+    evsetData.spinWxy->setSuffix(" nm");
+    evsetData.spinWxy->setRange(0,100000);
+    evsetData.spinWxy->setValue(250);
+    evsetData.spinWxy->setDecimals(1);
+    evalprops->addRow("<i>1/e<sup>2</sup> focus width w<sub>xy</sub></i> = ", evsetData.spinWxy);
+    evsetData.spinWz=new QDoubleSpinBox(evalprops);
+    evsetData.spinWz->setSuffix(" nm");
+    evsetData.spinWz->setRange(0,100000);
+    evsetData.spinWz->setValue(1200);
+    evsetData.spinWz->setDecimals(1);
+    evalprops->addRow("<i>1/e<sup>2</sup> focus height w<sub>z</sub></i> = ", evsetData.spinWz);
+    evsetData.spinGamma=new QDoubleSpinBox(evalprops);
+    evsetData.spinGamma->setSuffix("");
+    evsetData.spinGamma->setRange(0.01,100000);
+    evsetData.spinGamma->setValue(8);
+    evsetData.spinGamma->setDecimals(2);
+    evalprops->addRow("<i>axial ratio &gamma;</i> = ", evsetData.spinGamma);
+    evsetData.spinA=new QDoubleSpinBox(evalprops);
+    evsetData.spinA->setSuffix(" nm");
+    evsetData.spinA->setRange(0,100000);
+    evsetData.spinA->setValue(400);
+    evsetData.spinA->setDecimals(1);
+    evalprops->addRow("<i>pixel size a = ", evsetData.spinA);
+    evsetData.spinDLSAngle=new QDoubleSpinBox(evalprops);
+    evsetData.spinDLSAngle->setSuffix(" °");
+    evsetData.spinDLSAngle->setRange(0,100000);
+    evsetData.spinDLSAngle->setValue(90);
+    evsetData.spinDLSAngle->setDecimals(1);
+    evalprops->addRow("<i>scattering angle = ", evsetData.spinDLSAngle);
+    evsetData.spinDLSN=new QDoubleSpinBox(evalprops);
+    evsetData.spinDLSN->setSuffix("");
+    evsetData.spinDLSN->setRange(0,100000);
+    evsetData.spinDLSN->setValue(1.33);
+    evsetData.spinDLSN->setDecimals(4);
+    evalprops->addRow("<i>refractive index = ", evsetData.spinDLSN);
+    evsetData.spinDLSLambda=new QDoubleSpinBox(evalprops);
+    evsetData.spinDLSLambda->setSuffix(" nm");
+    evsetData.spinDLSLambda->setRange(0,100000);
+    evsetData.spinDLSLambda->setValue(488);
+    evsetData.spinDLSLambda->setDecimals(1);
+    evalprops->addRow("<i>wavelength = ", evsetData.spinDLSLambda);
 
 
     QFTextWizardPage* last;
@@ -712,8 +770,10 @@ void QFPRDRFCS::startFCSProjectWizard()
     last->setFinalPage(true);
     evals->setNextPageIfAllDisabled(last);
     evals->setNextPageIfDisabled(last);
-    meastype->setUserOnValidateArgument(evalprops);
-    connect(meastype, SIGNAL(onValidate(QWizardPage*,QWizardPage*)), this, SLOT(FCSProjectWizardValidateIntrument(QWizardPage*,QWizardPage*)));
+
+
+    meastype->setUserOnValidateArgument(&evsetData);
+    connect(meastype, SIGNAL(onValidateA(QWizardPage*,void*)), this, SLOT(FCSProjectWizardValidateIntrument(QWizardPage*,void*)));
 
     if (wiz->exec()) {
 
@@ -734,7 +794,6 @@ void QFPRDRFCS::startFCSProjectWizard()
             QMap<QString, QMap<QString, QVariant> > ps;
 
             while(it != list.end()) {
-                i++;
                 if (QFile::exists(*it)) {
                     QMap<QString, QVariant> p;
                     if (ps.contains( filters.value(i))) p=ps[filters.value(i)];
@@ -747,8 +806,9 @@ void QFPRDRFCS::startFCSProjectWizard()
                     //std::cout<<"loading "<<(*it).toStdString()<<" ... done!\n";
                     settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
                     //std::cout<<"loading "<<(*it).toStdString()<<" ... done ... done!\n";
-                    ++it;
                 }
+                ++it;
+                i++;
                 services->setProgress(i);
                 QApplication::processEvents(QEventLoop::AllEvents, 50);
             }
@@ -756,15 +816,137 @@ void QFPRDRFCS::startFCSProjectWizard()
             //std::cout<<"loading done ...\n";
             //tvMain->expandToDepth(2);
         }
-
+        for (int i=0; i<3; i++) {
+            if (evals->getChecked(i)) {
+                QFEvaluationItem* ev=NULL;
+                if (i==0) ev=project->addEvaluation("fcs_fit", "FCS Fit");
+                else if (i==1) ev=project->addEvaluation("fcs_maxent", "FCS MaxEnt Evaluation");
+                else if (i==2 && meastype->currentItem()!=2) ev=project->addEvaluation("fcs_msd", "FCS MSD Evaluation");
+                if (ev) {
+                    if (i==0) ev->setQFProperty("PRESET_FIT_MODEL", evsetData.cmbFitFunc->currentFitFunctionID());
+                    else if (i==1) {
+                        ev->setQFProperty("PRESET_MODEL", 0);
+                        if (meastype->currentItem()==1) ev->setQFProperty("PRESET_MODEL", 2);
+                        else if (meastype->currentItem()==2) ev->setQFProperty("PRESET_MODEL", 3);
+                        else if (meastype->currentItem()==3) ev->setQFProperty("PRESET_MODEL", 5);
+                        else if (meastype->currentItem()==4) ev->setQFProperty("PRESET_MODEL", 6);
+                    } else if (i==2) {
+                        ev->setQFProperty("PRESET_MODEL", 1);
+                        if (meastype->currentItem()==1) ev->setQFProperty("PRESET_MODEL", 0);
+                        else if (meastype->currentItem()==3) ev->setQFProperty("PRESET_MODEL", 4);
+                        else if (meastype->currentItem()==4) ev->setQFProperty("PRESET_MODEL", 5);
+                    }
+                    if (meastype->currentItem()==2) {
+                        if (i==0) ev->setName("DLS Fit");
+                        else if (i==1) ev->setName("DLS MaxEnt Fit");
+                        ev->setQFProperty("PRESET_DLS_ANGLE", evsetData.spinDLSAngle->value());
+                        ev->setQFProperty("PRESET_REFRACTIVE_INDEX", evsetData.spinDLSN->value());
+                        ev->setQFProperty("PRESET_WAVELENGTH", evsetData.spinDLSLambda->value());
+                    } else if (meastype->currentItem()==1) {
+                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
+                    } else if (meastype->currentItem()==3) {
+                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
+                        ev->setQFProperty("PRESET_PIXEL_WIDTH", evsetData.spinA->value());
+                        ev->setQFProperty("PRESET_FOCUS_HEIGHT", evsetData.spinWz->value());
+                    } else if (meastype->currentItem()==4) {
+                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
+                        ev->setQFProperty("PRESET_PIXEL_WIDTH", evsetData.spinA->value());
+                    } else {
+                        ev->setQFProperty("PRESET_FOCUS_STRUCT_FAC", evsetData.spinGamma->value());
+                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
+                    }
+                }
+            }
+        }
     }
     delete wiz;
 }
 
-void QFPRDRFCS::FCSProjectWizardValidateIntrument(QWizardPage *page, QWizardPage *fitprops)
+void QFPRDRFCS::FCSProjectWizardValidateIntrument(QWizardPage *page, void *fitprops)
 {
-    qDebug()<<"FCSProjectWizardValidateIntrument"<<page<<fitprops;
+    //qDebug()<<"FCSProjectWizardValidateIntrument"<<page<<fitprops;
+    FCSProjectWizardEvalSettingsData* fp=(FCSProjectWizardEvalSettingsData*)fitprops;
+    if (fp) {
+        switch (fp->meastype->currentItem()) {
+            default:
+            case 0: // confocal
+                fp->evalprops->setWidgetVisible(fp->cmbFitFunc, fp->evals->getChecked(0));
+                fp->cmbFitFunc->updateFitFunctions("fcs_");
+                fp->cmbFitFunc->setCurrentFitFunction("fcs_diff");
+                fp->evalprops->setWidgetVisible(fp->spinWxy, true);
+                fp->spinWxy->setValue(250);
+                fp->evalprops->setWidgetVisible(fp->spinWz, false);
+                fp->evalprops->setWidgetVisible(fp->spinGamma, true);
+                fp->evalprops->setWidgetVisible(fp->spinA, false);
+                fp->evalprops->setWidgetVisible(fp->spinDLSAngle, false);
+                fp->evalprops->setWidgetVisible(fp->spinDLSN, false);
+                fp->evalprops->setWidgetVisible(fp->spinDLSLambda, false);
+                break;
+
+
+            case 1: // TIR
+                fp->evalprops->setWidgetVisible(fp->cmbFitFunc, fp->evals->getChecked(0));
+                fp->cmbFitFunc->updateFitFunctions("fcs_");
+                fp->cmbFitFunc->setCurrentFitFunction("fcs_tir_diffe2_diffbright");
+                fp->spinWxy->setValue(600);
+                fp->spinA->setValue(400);
+                fp->evalprops->setWidgetVisible(fp->spinWxy, true);
+                fp->evalprops->setWidgetVisible(fp->spinWz, false);
+                fp->evalprops->setWidgetVisible(fp->spinGamma, false);
+                fp->evalprops->setWidgetVisible(fp->spinA, false);
+                fp->evalprops->setWidgetVisible(fp->spinDLSAngle, false);
+                fp->evalprops->setWidgetVisible(fp->spinDLSN, false);
+                fp->evalprops->setWidgetVisible(fp->spinDLSLambda, false);
+                break;
+
+            case 2: // DLS
+                fp->evalprops->setWidgetVisible(fp->cmbFitFunc, fp->evals->getChecked(0));
+                fp->cmbFitFunc->updateFitFunctions("dls_");
+                fp->cmbFitFunc->setCurrentFitFunction("dls_g2");
+                fp->evalprops->setWidgetVisible(fp->spinWxy, false);
+                fp->evalprops->setWidgetVisible(fp->spinWz, false);
+                fp->evalprops->setWidgetVisible(fp->spinGamma, false);
+                fp->evalprops->setWidgetVisible(fp->spinA, false);
+                fp->evalprops->setWidgetVisible(fp->spinDLSAngle, true);
+                fp->evalprops->setWidgetVisible(fp->spinDLSN, true);
+                fp->evalprops->setWidgetVisible(fp->spinDLSLambda, true);
+                break;
+
+            case 3: // SPIM
+                fp->evalprops->setWidgetVisible(fp->cmbFitFunc, fp->evals->getChecked(0));
+                fp->cmbFitFunc->updateFitFunctions("fcs_");
+                fp->cmbFitFunc->setCurrentFitFunction("fcs_spim_diffe2_newveff");
+                fp->spinWxy->setValue(600);
+                fp->spinWz->setValue(1200);
+                fp->spinA->setValue(400);
+                fp->evalprops->setWidgetVisible(fp->spinWxy, true);
+                fp->evalprops->setWidgetVisible(fp->spinWz, true);
+                fp->evalprops->setWidgetVisible(fp->spinGamma, false);
+                fp->evalprops->setWidgetVisible(fp->spinA, true);
+                fp->evalprops->setWidgetVisible(fp->spinDLSAngle, false);
+                fp->evalprops->setWidgetVisible(fp->spinDLSN, false);
+                fp->evalprops->setWidgetVisible(fp->spinDLSLambda, false);
+                break;
+
+            case 4: // TIR
+                fp->evalprops->setWidgetVisible(fp->cmbFitFunc, fp->evals->getChecked(0));
+                fp->cmbFitFunc->updateFitFunctions("fcs_");
+                fp->cmbFitFunc->setCurrentFitFunction("fcs_tir_diffe2_diffbright");
+                fp->spinWxy->setValue(600);
+                fp->spinA->setValue(400);
+                fp->evalprops->setWidgetVisible(fp->spinWxy, true);
+                fp->evalprops->setWidgetVisible(fp->spinWz, false);
+                fp->evalprops->setWidgetVisible(fp->spinGamma, false);
+                fp->evalprops->setWidgetVisible(fp->spinA, true);
+                fp->evalprops->setWidgetVisible(fp->spinDLSAngle, false);
+                fp->evalprops->setWidgetVisible(fp->spinDLSN, false);
+                fp->evalprops->setWidgetVisible(fp->spinDLSLambda, false);
+                break;
+
+        }
+    }
 }
+
 
 
 Q_EXPORT_PLUGIN2(qfrdrfcs, QFPRDRFCS)

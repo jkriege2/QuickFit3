@@ -93,6 +93,10 @@ void QFFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
         cmbWeights->setCurrentIndex(current->getProperty("weights", 0).toInt());
         spinRepeats->setValue(current->getProperty("FIT_REPEATS", 1).toInt());
         dataEventsEnabled=true;
+        if (current->propertyExists("PRESET_FIT_MODEL")) {
+            cmbModel->setCurrentFitFunction(current->getProperty("PRESET_FIT_MODEL", fcs->getFitFunctionID()).toString());
+            current->deleteProperty("PRESET_FIT_MODEL");
+        }
     }
 
     connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
