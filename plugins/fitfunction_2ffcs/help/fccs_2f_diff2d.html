@@ -14,7 +14,7 @@
         </ul>
         
         The model function is:
-          $$bmath:g(\tau)= \frac{1}{N}\cdot\left(\frac{I_1-B_1}{I_1}\right)\cdot\left(\frac{I_2-B_2}{I_2}\right)\cdot\left[(1-\rho_2-\rho_3)\cdot g_1(\tau)+\rho_2\cdot g_2(\tau)+\rho_3\cdot g_3(\tau)\right]+G_\infty     \text{with}     g_i(\tau)=\left(1+\frac{4D_i\tau}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{4D_i\tau}{w_{z}^2}\right)^{-1/2}\cdot\exp\left(-\frac{d_{xy}^2}{w_{xy}^2+4D\tau}\right)$$
+          $$bmath:g(\tau)= \frac{1}{N}\cdot\left(\frac{I_1-B_1}{I_1}\right)\cdot\left(\frac{I_2-B_2}{I_2}\right)\cdot\left[(1-\rho_2-\rho_3)\cdot g_1(\tau)+\rho_2\cdot g_2(\tau)+\rho_3\cdot g_3(\tau)\right]+G_\infty     \text{with}     g_i(\tau)=\left(1+\frac{4D_i\tau}{w_{xy}^2}\right)^{-1}\cdot\exp\left(-\frac{d_{xy}^2}{w_{xy}^2+4D\tau}\right)$$
           
           
         Here the parameters are defined as follows:
@@ -22,8 +22,6 @@
             <li>$$math:N$$: apparent particle number in the sample</li>
             <li>$$math:D_{i}$$: diffusion coefficient of species <i>i</i></li>
             <li>$$math:w_{xy}$$: lateral $$math:1/e^2$$-radius (i.e. half-width) of the PSFs</li>
-            <li>$$math:w_{z}$$: longitudinal $$math:1/e^2$$-radius (i.e. half-width) of the PSFs</li>
-            <li>$$\gamma:=\frac{w_{z}}{w_{xy}}$$: axial ration of the PSFs</li>
             <li>$$math:d_{xy}$$: lateral displacement of the two foci</li>
             <li>$$math:I_1, I_2$$: count rates, as measured in two foci (including background contribution!)</li>
             <li>$$math:B_1, B_2$$: background count rates in the two foci</li>
@@ -34,8 +32,8 @@
         
 This model also calculates the diffusion time (retention time in the focus), if the width $$math:w_{y}$$ of the laser focus (xy plane) is known, as: 
 $$bmath:\tau_D=\frac{w_{xy}^2}{4D}$$
-where $$math:D$$ is the diffusion coefficient. Also the effective focal volume $$math:V_{eff}$$ is calculated: </p>
-$$bmath:V_{eff}=\pi^{3/2}\cdot\gamma\cdot w_{xy}^3$$
+where $$math:D$$ is the diffusion coefficient. Also the effective focal area $$math:A_{eff}$$ is calculated: </p>
+$$bmath:A_{eff}=\pi\cdot w_{xy}^2$$
 
 Given this focal volume, the plugin may also calculate the particle concentration in the sample: </p>
 $$bmath:C=\frac{N}{V_{eff}}$$
@@ -46,8 +44,7 @@ The plugin also calculates some parameter errors:
 <blockquote>
         $$bmath:\Delta \left(\frac{1}{N}\right)=\left|\frac{\Delta N}{N^2}\right|$$
         $$bmath:\Delta\tau_D=\sqrt{\left(\Delta w_{xy}\cdot\frac{w_{xy}}{2D}\right)^2+\left(\Delta D\cdot\frac{w_{xy}^2}{4D^2}\right)^2}$$
-        $$bmath:\Delta V_{eff}=\sqrt{\left(\Delta\gamma\cdot\pi^{3/2}\cdot w_{xy}^3\right)^2+\left(\Delta w_{xy}\cdot 3\pi^{3/2}\cdot \gamma\cdot w_{xy}^2\right)^2}$$
-        $$bmath:\Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2}$$
+        $$bmath:\Delta A_{eff}=\sqrt{\left(\Delta\gamma\cdot2\pi\cdot w_{xy}right)^2}$$
         $$bmath:\Delta\text{cpm}=\sqrt{\left(\Delta I_1\cdot\frac{1}{2N}\right)^2+ \left(\Delta I_2\cdot\frac{1}{2N}\right)^2 +\left(\Delta B_1\cdot\frac{1}{2N}\right)^2 +\left(\Delta B_1\cdot\frac{1}{2N}\right)^2 + \left(\Delta N\cdot\frac{I_1+I_2-(B_1+B_2)}{2N^2}\right)^2}$$
 </blockquote>
         

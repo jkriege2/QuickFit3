@@ -1,21 +1,24 @@
-#ifndef QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorCCF_H
-#define QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorCCF_H
+#ifndef QFFitFunctionFCCSNormalDiff2D2Focus_H
+#define QFFitFunctionFCCSNormalDiff2D2Focus_H
 #include "qfpluginfitfunction.h"
 
 
 
 
-/*! \brief QFFitFunction class for a TIRF-FCCS fit model with pure diffusion for 2-color crosscorrelation and 1/e^2 lateral width
-    \ingroup qf3fitfunp_fitfunctions_TIRFfcs
+/*! \brief QFFitFunction class for fit function
+    \ingroup qf3fitfunp_fitfunctions_2ffcs
+
 */
-class QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorCCF: public QFFitFunction {
+class QFFitFunctionFCCSNormalDiff2D2Focus: public QFFitFunction {
     public:
-        QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorCCF();
-        virtual ~QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorCCF() {}
-        /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("TIR-FCCS: 1-comp. 2D diffusion (xy), species A+B+AB, c/D per species, CCF (1/e² radii)"); }
+        QFFitFunctionFCCSNormalDiff2D2Focus();
+        virtual ~QFFitFunctionFCCSNormalDiff2D2Focus() {}
+
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("fccs_tir_fw_2ddiffxy2colorccf"); }
+        virtual QString id() const;
+
+        /*! \copydoc QFFitFunction::name()   */
+        virtual QString name() const;
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
@@ -33,7 +36,6 @@ class QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorCCF: public QFFitFunction {
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
         virtual bool get_implementsDerivatives() { return false; }
-        void sortParameter(double *parameterValues, double *error, bool *fix) const;
 };
 
-#endif // QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorCCF_H
+#endif // QFFitFunctionFCCSNormalDiff2D2Focus_H

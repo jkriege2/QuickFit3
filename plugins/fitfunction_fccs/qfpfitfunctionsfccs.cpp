@@ -19,7 +19,7 @@
 QStringList QFPFitFunctionsFCCS::getIDs() const {
     QStringList res;
     res<<"fccs_diff3d";
-    res<<"fccs_fw_diff2colorccf";
+    res<<"fccs_fw_diff2colorccf";        // OK
     res<<"fccs_fw_diff2coloracfg";
     res<<"fccs_fw_diff2coloracfr";
 
@@ -27,13 +27,15 @@ QStringList QFPFitFunctionsFCCS::getIDs() const {
     res<<"fccs_fw_diff2colorsepacfg";
     res<<"fccs_fw_diff2colorsepacfr";
 
-    res<<"fccs_fw_diff2colortcccf";
+    res<<"fccs_fw_diff2colortcccf";      // OK
     res<<"fccs_fw_diff2colortcacfg";
     res<<"fccs_fw_diff2colortcacfr";
+
     res<<"fccs_fw_diff2colortcsepccf";
     res<<"fccs_fw_diff2colortcsepacfg";
     res<<"fccs_fw_diff2colortcsepacfr";
-    res<<"fccs_fw_adiff2colorccf";
+
+    res<<"fccs_fw_adiff2colorccf";         // OK
     res<<"fccs_fw_adiff2coloracfg";
     res<<"fccs_fw_adiff2coloracfr";
     return res;

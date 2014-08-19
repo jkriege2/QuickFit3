@@ -26,7 +26,7 @@ class QFPFitFunctions2FFCS : public QObject, public QFPluginFitFunction {
 
         /** \brief name for the plugin */
         virtual QString getName() const {
-            return tr("2-Focus-FCS (2f-FCS) Fit Functions");
+            return tr("2-Focus-FCCS (2f-FCCS) Fit Functions");
         };
 
         /** \brief short description for the plugin */
@@ -41,7 +41,7 @@ class QFPFitFunctions2FFCS : public QObject, public QFPluginFitFunction {
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("(c) 2012 by Jan Krieger");
+            return tr("(c) 2012-2014 by Jan Krieger");
         };
 
         /** \brief weblink for the plugin */
@@ -63,7 +63,7 @@ class QFPFitFunctions2FFCS : public QObject, public QFPluginFitFunction {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=1;
+            minor=2;
         };
 
         /** \brief return list of plugin IDs */

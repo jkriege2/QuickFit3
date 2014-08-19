@@ -138,7 +138,8 @@ HEADERS += dlgnewproperty.h \
     sdk_fitfunctions/quickfit-model-tools.h \
     sdk_fitfunctions/quickfit-model-header.h \
     qflibraryfitfunction.h \
-    qfwizard.h
+    qfwizard.h \
+    qfhelptoolbutton.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -221,7 +222,8 @@ SOURCES += dlgnewproperty.cpp \
     qftabledelegate.cpp \
     qfdlgcsvparameters.cpp \
     qflibraryfitfunction.cpp \
-    qfwizard.cpp
+    qfwizard.cpp \
+    qfhelptoolbutton.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \
