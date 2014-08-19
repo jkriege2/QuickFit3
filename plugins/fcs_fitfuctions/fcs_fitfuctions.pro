@@ -28,7 +28,8 @@ HEADERS += fcs_fitfuctions.h \
     qffitfunctionfcspowerlaw.h \
     qffitfunctionfcsdiffDAfterpulse.h \
     qffitfunctionfcsdiff_relbright.h \
-    qffitfunctionfcsadiff_relbright.h
+    qffitfunctionfcsadiff_relbright.h \
+    qffitfunctionfcsdiff2d_relbright.h
 
 SOURCES += fcs_fitfuctions.cpp\
            qffitfunctionfcsmultidiffusion.cpp \
@@ -46,7 +47,8 @@ SOURCES += fcs_fitfuctions.cpp\
     qffitfunctionfcspowerlaw.cpp \
     qffitfunctionfcsdiffDAfterpulse.cpp \
     qffitfunctionfcsdiff_relbright.cpp \
-    qffitfunctionfcsadiff_relbright.cpp
+    qffitfunctionfcsadiff_relbright.cpp \
+    qffitfunctionfcsdiff2d_relbright.cpp
 
 FORMS +=
 
