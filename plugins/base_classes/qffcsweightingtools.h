@@ -40,11 +40,12 @@ class QFFCSWeightingTools
             EqualWeighting=0,
             StdDevWeighting=1,
             RunErrorWeighting=2,
-            RunningAverage3Weight=3,
-            RunningAverage5Weight=4,
-            RunningAverage11Weight=5,
+            RunningStdDev3Weight=3,
+            RunningStdDev5Weight=4,
+            RunningStdDev7Weight=5,
+            RunningStdDev11Weight=6,
 
-            DataWeightingMax=5
+            DataWeightingMax=6
         };
 
         QFFCSWeightingTools();
@@ -58,6 +59,7 @@ class QFFCSWeightingTools
         virtual DataWeight getFitDataWeighting() const ;
 
         static QString dataWeightToString(DataWeight weight);
+        static QString dataWeightToName(DataWeight weight, const QString& runname=QString("run"));
         static DataWeight stringToDataWeight(QString weight);
 
         /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill

@@ -39,11 +39,11 @@ QFFCSFitEvaluationEditor::~QFFCSFitEvaluationEditor()
 
 
 void QFFCSFitEvaluationEditor::createWidgets() {
-    cmbWeights=new QComboBox(this);
-    cmbWeights->setEditable(false);
+    cmbWeights=new QFFCSWeightingCombobox(this);
+    /*cmbWeights->setEditable(false);
     cmbWeights->addItem(tr("equal weights"));
     cmbWeights->addItem(tr("standard deviation"));
-    cmbWeights->addItem(tr("per run errors"));
+    cmbWeights->addItem(tr("per run errors"));*/
     cmbWeights->setMaximumWidth(150);
     cmbWeights->setMinimumWidth(150);
     QLabel* l=new QLabel(tr("&Weight Model: "), this);
@@ -121,7 +121,7 @@ void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(currentRecord);
     if (eval) {
         dataEventsEnabled=false;
-        cmbWeights->setCurrentIndex(eval->getFitDataWeighting());
+        cmbWeights->setCurrentWeight(eval->getFitDataWeighting());
         dataEventsEnabled=true;
     }
 }
@@ -550,10 +550,11 @@ void QFFCSFitEvaluationEditor::weightsChanged(int model) {
     current->setQFProperty("weights", cmbWeights->currentIndex(), false, false);
     QFFCSFitEvaluation* data=qobject_cast<QFFCSFitEvaluation*>(current);
     if (data) {
-        if (cmbWeights->currentIndex()==0) data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);
+        /*if (cmbWeights->currentIndex()==0) data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);
         else if (cmbWeights->currentIndex()==1) data->setFitDataWeighting(QFFCSFitEvaluation::StdDevWeighting);
         else if (cmbWeights->currentIndex()==2) data->setFitDataWeighting(QFFCSFitEvaluation::RunErrorWeighting);
-        else data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);
+        else data->setFitDataWeighting(QFFCSFitEvaluation::EqualWeighting);*/
+        data->setFitDataWeighting(cmbWeights->currentWeight());
     }
     displayModel(true);
     replotData();
@@ -782,6 +783,7 @@ void QFFCSFitEvaluationEditor::replotData() {
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
+    QFFCSWeightingTools* wdata=dynamic_cast<QFFCSWeightingTools*>(current.data());
     JKQTPdatastore* ds=pltData->getDatastore();
     JKQTPdatastore* dsres=pltResiduals->getDatastore();
     JKQTPdatastore* dsresh=pltResidualHistogram->getDatastore();
@@ -853,30 +855,40 @@ void QFFCSFitEvaluationEditor::replotData() {
         //////////////////////////////////////////////////////////////////////////////////
         size_t c_mean=0;
         QString graphName="";
-        size_t c_std=0;
+        int c_std=-1;
         QString errorName="";
         if (eval->getCurrentIndex()<0) {
             c_mean=ds->addColumn(data->getCorrelationMean(), data->getCorrelationN(), "cmean");
             graphName=tr("\\verb{%1} average").arg(record->getName());
-            c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
-            errorName=tr("stddev");
+            //c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
+            //errorName=tr("stddev");
         } else {
             if (eval->getCurrentIndex()<(int)data->getCorrelationRuns()) {
                 c_mean=ds->addColumn(data->getCorrelationRun(eval->getCurrentIndex()), data->getCorrelationN(), QString("run"+QString::number(eval->getCurrentIndex())));
                 graphName=tr("\\verb{%1} %2").arg(record->getName()).arg(data->getCorrelationRunName(eval->getCurrentIndex()));
-                if (eval->getFitDataWeighting()==QFFCSFitEvaluation::RunErrorWeighting) {
+                /*if (eval->getFitDataWeighting()==QFFCSFitEvaluation::RunErrorWeighting) {
                     c_std=ds->addColumn(data->getCorrelationRunError(eval->getCurrentIndex()), data->getCorrelationN(), "cperpixelerror");
                     errorName=tr("per pixel");
                 } else {
                     c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
                     errorName=tr("stddev");
-                }
+                }*/
             } else {
                 c_mean=ds->addColumn(data->getCorrelationMean(), data->getCorrelationN(), "cmean");
                 graphName=tr("\\verb{%1} average").arg(record->getName());
-                c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
-                errorName=tr("stddev");
+                //c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
+                //errorName=tr("stddev");
             }
+        }
+        if (wdata) {
+            bool wok=false;
+            double* weigm=wdata->allocWeights(&wok, record, eval->getCurrentIndex());
+            if (wok && weigm) {
+                errorName=wdata->dataWeightToName(eval->getFitDataWeighting(), m_runName);
+                c_std=ds->addCopiedColumn(weigm, data->getCorrelationN(), QString("cerr_")+wdata->dataWeightToString(eval->getFitDataWeighting()));
+                free(weigm);
+            }
+            qDebug()<<wok<<weigm<<c_std<<errorName;
         }
         JKQTPerrorPlotstyle styl=JKQTPnoError;
         switch (errorStyle) {

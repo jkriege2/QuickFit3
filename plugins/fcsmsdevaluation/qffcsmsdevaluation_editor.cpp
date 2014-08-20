@@ -756,7 +756,7 @@ void QFFCSMSDEvaluationEditor::displayData() {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
     QFFCSMSDEvaluationItem* eval=qobject_cast<QFFCSMSDEvaluationItem*>(current);
-
+    QFFCSWeightingTools* wdata=dynamic_cast<QFFCSWeightingTools*>(current.data());
     JKQTPdatastore* ds=pltData->getDatastore();
     JKQTPdatastore* dsres=pltResiduals->getDatastore();
     JKQTPdatastore* dsresh=pltResidualHistogram->getDatastore();
@@ -851,29 +851,38 @@ void QFFCSMSDEvaluationEditor::displayData() {
             //////////////////////////////////////////////////////////////////////////////////
             size_t c_mean=0;
             QString graphName="";
-            size_t c_std=0;
+            int c_std=-1;
             QString errorName="";
             if (eval->getCurrentIndex()<0) {
                 c_mean=ds->addColumn(data->getCorrelationMean(), data->getCorrelationN(), "cmean");
                 graphName=tr("\\verb{%1} average").arg(record->getName());
-                c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
-                errorName=tr("stddev");
+                //c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
+                //errorName=tr("stddev");
             } else {
                 if (eval->getCurrentIndex()<(int)data->getCorrelationRuns()) {
                     c_mean=ds->addColumn(data->getCorrelationRun(eval->getCurrentIndex()), data->getCorrelationN(), QString("run"+QString::number(eval->getCurrentIndex())));
                     graphName=tr("\\verb{%1} %2").arg(record->getName()).arg(data->getCorrelationRunName(eval->getCurrentIndex()));
-                    if (eval->getFitDataWeighting()==QFFCSWeightingTools::RunErrorWeighting) {
+                    /*if (eval->getFitDataWeighting()==QFFCSWeightingTools::RunErrorWeighting) {
                         c_std=ds->addColumn(data->getCorrelationRunError(eval->getCurrentIndex()), data->getCorrelationN(), "cperrunerror");
                         errorName=tr("per run");
                     } else {
                         c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
                         errorName=tr("stddev");
-                    }
+                    }*/
                 } else {
                     c_mean=ds->addColumn(data->getCorrelationMean(), data->getCorrelationN(), "cmean");
                     graphName=tr("\\verb{%1} average").arg(record->getName());
-                    c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
-                    errorName=tr("stddev");
+                    //c_std=ds->addColumn(data->getCorrelationStdDev(), data->getCorrelationN(), "cstddev");
+                    //errorName=tr("stddev");
+                }
+            }
+            if (wdata) {
+                bool wok=false;
+                double* weigm=wdata->allocWeights(&wok, record, eval->getCurrentIndex());
+                if (wok && weigm) {
+                    errorName=wdata->dataWeightToName(eval->getFitDataWeighting(), tr("run"));
+                    c_std=ds->addCopiedColumn(weigm, data->getCorrelationN(), QString("cerr_")+wdata->dataWeightToString(eval->getFitDataWeighting()));
+                    free(weigm);
                 }
             }
             JKQTPerrorPlotstyle styl=JKQTPnoError;

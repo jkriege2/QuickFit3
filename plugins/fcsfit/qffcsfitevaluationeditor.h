@@ -38,6 +38,7 @@
 #include "../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h"
 #include "qftools.h"
 #include "statistics_tools.h"
+#include "qffcsweightingtools.h"
 
 /*! \brief editor class for FCS least-square fits
     \ingroup qf3evalp_fcsfit
@@ -111,7 +112,7 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWithW
 
     protected:
         /** \brief combobox to select a model for the weighting */
-        QComboBox* cmbWeights;
+        QFFCSWeightingCombobox* cmbWeights;
         /** \brief button used to calculate the focal volume */
         QAction* actCalibrateFocalVolume;
         /** \brief button used to calculate the focal volume */
