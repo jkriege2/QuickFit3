@@ -275,7 +275,7 @@ bool QFRDRFCSData::selectNewFiles(QStringList &files, QStringList &types, QStrin
 
 
     if (filetype!="INTERNAL") {
-        files = qfGetOpenFileNames(NULL,
+        files = qfGetOpenFileNamesSet("fcs/new_files/", NULL,
                               tr("Select FCS Data File(s) to Import ..."),
                               ProgramOptions::getInstance()->getCurrentRawDataDir(),
                               filter);

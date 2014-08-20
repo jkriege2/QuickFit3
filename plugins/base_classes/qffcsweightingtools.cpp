@@ -51,6 +51,9 @@ QString QFFCSWeightingTools::dataWeightToString(QFFCSWeightingTools::DataWeight 
 {
     if (weight==StdDevWeighting) return "stddev";
     if (weight==RunErrorWeighting) return "runerror";
+    if (weight==RunningAverage3Weight) return "runsd3";
+    if (weight==RunningAverage5Weight) return "runsd5";
+    if (weight==RunningAverage11Weight) return "runsd11";
     return "equal";
 }
 
@@ -59,6 +62,9 @@ QFFCSWeightingTools::DataWeight QFFCSWeightingTools::stringToDataWeight(QString 
     QString w=weight.toLower().trimmed();
     if (w=="1" || w=="stddev") return StdDevWeighting;
     if (w=="2" || w=="runerror") return RunErrorWeighting;
+    if (w=="3" || w=="runsd3") return RunningAverage3Weight;
+    if (w=="4" || w=="runsd5") return RunningAverage5Weight;
+    if (w=="5" || w=="runsd11") return RunningAverage11Weight;
     return EqualWeighting;
 }
 
@@ -127,7 +133,18 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *rec
         }
     }
     if (!weightsOK && weights) {
-        for (int i=0; i<N; i++) weights[i]=1.0;
+        double ww=1.0/double(N);
+        /*double* crun=data->getCorrelationRun(run_in);
+        if (crun) {
+            ww=0;
+            double cnt=0;
+            for (int i=0; i<qMin(N,10); i++) {
+                ww+=crun[i];
+                cnt++;
+            }
+            ww=0.1*ww/cnt;
+        }*/
+        for (int i=0; i<N; i++) weights[i]=ww;
         if (weighting==QFFCSWeightingTools::EqualWeighting) weightsOK=true;
     }
     //qDebug()<<"allocWeights weightsOK="<<weightsOK<<weights;
@@ -166,6 +183,9 @@ QFFCSWeightingCombobox::QFFCSWeightingCombobox(QWidget *parent):
     addItem(tr("equal weights"));
     addItem(tr("standard deviation"));
     addItem(tr("per run error"));
+    addItem(tr("running SD, 3"));
+    addItem(tr("running SD, 5"));
+    addItem(tr("running SD, 11"));
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIdxChanged(int)));
 }
 

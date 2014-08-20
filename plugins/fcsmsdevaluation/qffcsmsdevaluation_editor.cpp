@@ -2335,7 +2335,7 @@ void QFFCSMSDEvaluationEditor::updateDistribution() {
 
             JKQTPxFunctionLineGraph* g_dist=new JKQTPxFunctionLineGraph(pltDistribution->get_plotter());
             g_dist->set_drawLine(true);
-            g_dist->set_title(tr("MSD %1, D=%2�m�/s, \\alpha=%3").arg(i+1).arg(numD[i]->value()).arg(numAlpha[i]->value()));
+            g_dist->set_title(tr("MSD %1, D=%2\\mu m^2/s, \\alpha=%3").arg(i+1).arg(numD[i]->value()).arg(numAlpha[i]->value()));
             g_dist->setSpecialFunction(JKQTPxFunctionLineGraph::PowerLaw);
             QVector<double> vecP;
             vecP<<D<<a;

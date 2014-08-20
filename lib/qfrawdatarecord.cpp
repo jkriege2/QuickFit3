@@ -1321,7 +1321,7 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
-    return dstore->results.contains(evalName);
+    return dstore->results.contains(evalName) && dstore->results[evalName] && (dstore->results[evalName]->results.size()>0) ;
 }
 
 void QFRawDataRecord::resultsSetNumberList(const QString& evaluationName, const QString& resultName, const QVector<double>& value, const QString& unit) {

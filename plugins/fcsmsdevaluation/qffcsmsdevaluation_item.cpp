@@ -381,7 +381,7 @@ void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<doub
 
 
 QFFitStatistics QFFCSMSDEvaluationItem::calcFitStatistics(QFRawDataRecord *record, int index, int model, double *taus, double* modelValsIn, uint32_t N, uint32_t MaxEntParams, int datacut_min, int datacut_max, int runAvgWidth, int residualHistogramBins) {
-    qDebug()<<"calcFitStatistics model="<<model;
+    //qDebug()<<"calcFitStatistics model="<<model;
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     if (data) {
 
@@ -483,7 +483,7 @@ QFFitStatistics QFFCSMSDEvaluationItem::calcFitStatistics(QFRawDataRecord *recor
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, int model, double *taus, double *modelEval, uint32_t N, double* msdTaus, double* msd, uint32_t Nmsd) const {
     if (!taus || !modelEval) return;
-    qDebug()<<"evalModel(model="<<model<<")";
+    //qDebug()<<"evalModel(model="<<model<<")";
 
     bool ok=false;
     int first=-1, last=-1;
@@ -506,7 +506,7 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
             }
         }
         //qDebug()<<"" <<first<<" ... "<<last;
-        if (first>0 && last>0) {
+        if (first>=0 && last>0) {
             int k=0;
             for (int i=first; i<=last; i++) {
                 if (taus[i]!=msdTaus[k]) {

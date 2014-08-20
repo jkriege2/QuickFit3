@@ -161,7 +161,7 @@
        <item row="4" column="0">
         <widget class="QLabel" name="label_8">
          <property name="text">
-          <string>Start read in line &amp;line:</string>
+          <string>Start read in &amp;line:</string>
          </property>
          <property name="buddy">
           <cstring>spinStartInLine</cstring>
@@ -256,7 +256,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="label_10">
          <property name="text">
-          <string>&amp;Mode:</string>
+          <string>Correlation &amp;Mode:</string>
          </property>
          <property name="buddy">
           <cstring>cmbMode</cstring>
@@ -320,6 +320,11 @@
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="qfrdrfcs.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>

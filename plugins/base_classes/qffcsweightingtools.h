@@ -40,8 +40,11 @@ class QFFCSWeightingTools
             EqualWeighting=0,
             StdDevWeighting=1,
             RunErrorWeighting=2,
+            RunningAverage3Weight=3,
+            RunningAverage5Weight=4,
+            RunningAverage11Weight=5,
 
-            DataWeightingMax=2
+            DataWeightingMax=5
         };
 
         QFFCSWeightingTools();
