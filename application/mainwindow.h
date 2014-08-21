@@ -357,6 +357,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         bool maybeSave();
         //void updateRecentFileActions();
         QString createPluginDoc(bool docLinks=false);
+        QString createFAQ();
         QString createPluginDocTutorials(QString mainitem_before=QObject::tr("<h2>%1 Tutorials:</h2><ul>"), QString mainitem_after=QString("</ul>"));
         QString createPluginDocSettings(QString mainitem_before=QObject::tr("<h2>%1 Settings:</h2><ul>"), QString mainitem_after=QString("</ul>"));
         QString createPluginDocCopyrights(QString mainitem_before=QObject::tr("<h2>%1 Copyrights:</h2><ul>"), QString mainitem_after=QString("</ul>"));

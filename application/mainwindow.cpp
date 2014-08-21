@@ -149,6 +149,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("plugin_list"), createPluginDoc(true)));
     htmlReplaceList.append(qMakePair(QString("pluginhelp_list"), createPluginDocHelp()));
     htmlReplaceList.append(qMakePair(QString("plugintutorials_list"), createPluginDocTutorials()));
+    htmlReplaceList.append(qMakePair(QString("faq_list"), createFAQ()));
     htmlReplaceList.append(qMakePair(QString("pluginsettings_list"), createPluginDocSettings()));
     htmlReplaceList.append(qMakePair(QString("plugincopyright_list"), createPluginDocCopyrights()));
     htmlReplaceList.append(qMakePair(QString("maindir"), settings->getApplicationDirectory()));
@@ -629,6 +630,11 @@ QString MainWindow::createPluginDoc(bool docLinks) {
     text+="</table></center>";
 
     return text;
+}
+
+QString MainWindow::createFAQ()
+{
+    return "";
 }
 
 QString MainWindow::createPluginDocItem(bool docLink, QString id, QString name, QString description, QString iconfilename, QString author, QString copyright, QString weblink, QString file, int verMajor, int verMinor, QStringList additional) {
@@ -3138,7 +3144,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         } else {
                             QSizeF size=mathParser.getSize(p);
                             p.end();
-                            pix=QImage(size.width()*1.2, size.height()*1.1, QImage::Format_ARGB32_Premultiplied);
+                            pix=QImage(size.width()*1.2, size.height()*1.2, QImage::Format_ARGB32_Premultiplied);
                             pix.fill(Qt::transparent);
                             p.begin(&pix);
                             p.setRenderHint(QPainter::Antialiasing);
