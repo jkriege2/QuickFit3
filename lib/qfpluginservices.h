@@ -86,6 +86,14 @@ struct QFToolTipsData{
     QString tooltipfile;
 };
 
+struct FAQEntry {
+        QString question;
+        QString answer;
+        QString link;
+};
+
+typedef QList<FAQEntry> QFFAQData;
+
 /*! \brief wrapper class that allows plugins to access basic services of the QuickFit application
     \ingroup qf3plugintools
 
@@ -100,6 +108,7 @@ class QFLIB_EXPORT QFPluginServices {
             QString tutorial;
             QString settings;
             QString mainhelp;
+            QString faq;
             QString plugintypehelp;
             QString plugintypename;
             QString pluginDLLbasename;
@@ -218,6 +227,12 @@ class QFLIB_EXPORT QFPluginServices {
 
         /** \brief return the tutorial for the given plugin ID */
         virtual QString getPluginTutorial(const QString& pluginID)=0;
+
+        /** \brief return the FAQ for the given plugin ID */
+        virtual QString getPluginFAQ(const QString& pluginID)=0;
+
+        /** \brief return the name for the given plugin ID */
+        virtual QString getPluginName(const QString& pluginID)=0;
 
         /** \brief return the settings for the given plugin ID */
         virtual QString getPluginHelpSettings(const QString& pluginID)=0;

@@ -78,6 +78,8 @@ class QFLIB_EXPORT QFImporterManager : public QObject {
         QString getPluginHelp(int ID);
         /** \brief returns the plugins tutorial file (html) for a specified  ID. */
         QString getPluginTutorialMain(int ID);
+        /** \brief returns the plugins FAQ file (html) for a specified  ID. */
+        QString getPluginFAQ(int ID);
         /** \brief returns lists of titles (names) and links to all tutorials for for a specified plugin ID. */
         void getPluginTutorials(int ID, QStringList& names, QStringList& files);
         /** \brief returns the plugins tutorial file (html) for a specified  ID. */
@@ -87,7 +89,7 @@ class QFLIB_EXPORT QFImporterManager : public QObject {
         /** \brief returns a fit algorthms \a faID main help file (html) for a specified plugin \a ID. */
         QString getPluginHelp(int ID, QString faID);
         /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData> &tooltips);
+        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData> &tooltips, QMap<QString, QFFAQData> &faqs);
 
         QFImporter* createImporter(const QString& id) const;
 
@@ -147,5 +149,8 @@ class QFLIB_EXPORT QFImporterManager : public QObject {
         ProgramOptions* m_options;
 
 };
+
+
+
 
 #endif // QFIMPORTERMANAGER_H

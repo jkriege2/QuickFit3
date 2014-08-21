@@ -127,6 +127,8 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     logFileMainWidget->inc_indent();
     searchAndRegisterPlugins();
 
+    parseFAQ(settings->getMainHelpDirectory()+"/faq.html", "quickfit", faqs);
+
     logFileMainWidget->dec_indent();
 
     splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()+importerManager->pluginCount()));
@@ -176,7 +178,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end"), tr("$$qf_commondoc_header.end_notitle$$ <font size=\"+1\"><h1>$$title$$</h1>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.separator"), QString(" | ")));
 
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.default_links"), tr("<a href=\"%1quickfit.html\">QuickFit</a> $$local_plugin_typehelp_link$$ $$local_plugin_mainhelp_link$$ $$local_plugin_tutorial_link$$").arg(settings->getMainHelpDirectory())));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.default_links"), tr("<a href=\"%1quickfit.html\">QuickFit</a> $$local_plugin_typehelp_link$$ $$local_plugin_mainhelp_link$$ $$local_plugin_tutorial_link$$ $$local_plugin_faq_link$$").arg(settings->getMainHelpDirectory())));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.simplest"), tr("back: <a href=\"%1quickfit.html\">QuickFit Basics</a>").arg(settings->getMainHelpDirectory())));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.rdr"), tr("$$qf_commondoc_header.separator$$ <a href=\"$$qf_ui_rdr_helpfil$$\">$$qf_ui_rdr_helpfiletitle$$</a>")));
     htmlReplaceList.append(qMakePair(QString("qf_ui_rdr_helpfile"), tr("%1qf3_rdrscreen.html").arg(settings->getMainHelpDirectory())));
@@ -185,6 +187,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_ui_eval_helpfile"), tr("%1qf3_evalscreen.html").arg(settings->getMainHelpDirectory())));
     htmlReplaceList.append(qMakePair(QString("qf_ui_eval_helpfiletitle"), tr("Basic Evaluation Dialog Help")));
     htmlReplaceList.append(qMakePair(QString("qf_ui_jkqtplotter_helpfile"), tr("%1jkqtplotter.html").arg(settings->getMainHelpDirectory())));
+    htmlReplaceList.append(qMakePair(QString("qf_faqfile"), tr("%1qf3_faq.html").arg(settings->getMainHelpDirectory())));
     htmlReplaceList.append(qMakePair(QString("qf_ui_jkqtplotter_helpfiletitle"), tr("Plotter/Graphing Component Help")));
     htmlReplaceList.append(qMakePair(QString("qf_ui_latex_helpfile"), tr("%1jkqtmathtext.html").arg(settings->getMainHelpDirectory())));
     htmlReplaceList.append(qMakePair(QString("qf_ui_latex_helpfiletitle"), tr("Latex Parser Help")));
@@ -263,12 +266,12 @@ void MainWindow::reloadCurrentProject()
 
 void MainWindow::searchAndRegisterPlugins() {
     // find plugins
-    rawDataFactory->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips);
-    evaluationFactory->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips);
-    fitFunctionManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips);
-    fitAlgorithmManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips);
-    importerManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips);
-    extensionManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips);
+    rawDataFactory->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips, faqs);
+    evaluationFactory->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips, faqs);
+    fitFunctionManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips, faqs);
+    fitAlgorithmManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips, faqs);
+    importerManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips, faqs);
+    extensionManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips, faqs);
 
 
     // distribute application hooks
@@ -634,7 +637,36 @@ QString MainWindow::createPluginDoc(bool docLinks) {
 
 QString MainWindow::createFAQ()
 {
-    return "";
+    QString text="";
+    QString textd="";
+    int cnt=0;
+    QMapIterator<QString, QFFAQData> it(faqs);
+    while (it.hasNext()) {
+        it.next();
+        QString faq="";
+        QString faqdir="";
+        QString faql="";
+        for (int i=0; i<it.value().size(); i++) {
+            QString q=it.value().at(i).question;
+            //QString a=it.value().at(i).answer;
+            QString l=it.value().at(i).link;
+            if (!q.isEmpty() && !l.isEmpty()) {
+                faql+=tr("<li><a href=\"%2\"><i>%1</i></a></li>").arg(q).arg(l);
+                //faqdir+=tr("<li><a href=\"#faq%2\"><i>%1</i></a></li>").arg(q).arg(cnt);
+                //faq+=tr("<li><a name=\"faq%3\"><i>%1</i><clockquote>%2</blockquote></li>").arg(q).arg(a).arg(cnt);
+                cnt++;
+            }
+        }
+        if (faq=="quickfit") {
+            text+=tr("<li><b>QuickFit $$version$$:</b><ul>%1</ul></li>").arg(faql);
+            //textd+=tr("<li><b>%1:</b><ul>%2</ul></li>").arg(getPluginName(it.key())).arg(faqdir);
+        } else if (!faq.isEmpty()) {
+            text+=tr("<li><b>%1:</b><ul>%2</ul></li>").arg(getPluginName(it.key())).arg(faql);
+            //textd+=tr("<li><b>%1:</b><ul>%2</ul></li>").arg(getPluginName(it.key())).arg(faqdir);
+        }
+    }
+    //return textd+tr("\n\n<hr>\n\n")+text;
+    return text;
 }
 
 QString MainWindow::createPluginDocItem(bool docLink, QString id, QString name, QString description, QString iconfilename, QString author, QString copyright, QString weblink, QString file, int verMajor, int verMinor, QStringList additional) {
@@ -2199,6 +2231,28 @@ QString MainWindow::getPluginTutorial(const QString& pluginID) {
     return "";
 }
 
+QString MainWindow::getPluginFAQ(const QString &pluginID)
+{
+    if (evaluationFactory->contains(pluginID)) return evaluationFactory->getPluginFAQ(pluginID);
+    if (rawDataFactory->contains(pluginID)) return rawDataFactory->getPluginFAQ(pluginID);
+    if (extensionManager->contains(pluginID)) return extensionManager->getPluginFAQ(pluginID);
+    if (fitFunctionManager->contains(pluginID)) return fitFunctionManager->getPluginFAQ( fitFunctionManager->getPluginForID(pluginID));
+    if (fitAlgorithmManager->contains(pluginID)) return fitAlgorithmManager->getPluginFAQ(fitAlgorithmManager->getPluginForID(pluginID));
+    if (importerManager->contains(pluginID)) return importerManager->getPluginFAQ(importerManager->getPluginForID(pluginID));
+    return "";
+}
+
+QString MainWindow::getPluginName(const QString &pluginID)
+{
+    if (evaluationFactory->contains(pluginID)) return evaluationFactory->getName(pluginID);
+    if (rawDataFactory->contains(pluginID)) return rawDataFactory->getName(pluginID);
+    if (extensionManager->contains(pluginID)) return extensionManager->getName(pluginID);
+    if (fitFunctionManager->contains(pluginID)) return fitFunctionManager->getName(fitFunctionManager->getPluginForID(pluginID));
+    if (fitAlgorithmManager->contains(pluginID)) return fitAlgorithmManager->getName(fitAlgorithmManager->getPluginForID(pluginID));
+    if (importerManager->contains(pluginID)) return importerManager->getName(importerManager->getPluginForID(pluginID));
+    return "";
+}
+
 QString MainWindow::getPluginHelpSettings(const QString& pluginID) {
     if (evaluationFactory->contains(pluginID)) return evaluationFactory->getPluginSettings(pluginID);
     if (rawDataFactory->contains(pluginID)) return rawDataFactory->getPluginSettings(pluginID);
@@ -2394,16 +2448,43 @@ void MainWindow::rdrSetProperty()
             QList<QPointer<QFRawDataRecord> > rdrs=dlg->getSelectedRDRs();
             QStringList propNames=dlg->getNewPropNames();
             QList<QVariant> propValues=dlg->getNewPropValues();
-
+            QString p0str=propValues.value(0, "").toString();
             for (int i=0; i<rdrs.size(); i++) {
                 rdrs[i]->disableEmitPropertiesChanged();
-                for (int j=0; j<propNames.size(); j++) {
-                    //qDebug()<<rdrs[i]->getName()<<"\n   set "<<propNames[j]<<" = "<<propValues.value(j, QVariant(QString("")));
-                    if (!propNames.value(j, "").isEmpty()) {
-                        bool ex=rdrs[i]->propertyExists(propNames.value(j));
-                        if ((ex && dlg->doOverwrite()) || (!ex && dlg->doCreateNew())) rdrs[i]->setQFProperty(propNames[j], propValues.value(j, QVariant(QString(""))), true, true);
-                    }
+
+                switch (dlg->whichToSet()) {
+                    case 0: {
+                            for (int j=0; j<propNames.size(); j++) {
+                                //qDebug()<<rdrs[i]->getName()<<"\n   set "<<propNames[j]<<" = "<<propValues.value(j, QVariant(QString("")));
+                                if (!propNames.value(j, "").isEmpty()) {
+                                    bool ex=rdrs[i]->propertyExists(propNames.value(j));
+                                    if ((ex && dlg->doOverwrite()) || (!ex && dlg->doCreateNew())) rdrs[i]->setQFProperty(propNames[j], propValues.value(j, QVariant(QString(""))), true, true);
+                                }
+                            }
+                        } break;
+                    case 1: {
+                            if (!p0str.isEmpty()) {
+                                rdrs[i]->setName(p0str);
+                            }
+                        } break;
+                    case 2: {
+                            if (!p0str.isEmpty()) {
+                                rdrs[i]->setFolder(p0str);
+                            }
+                        } break;
+                    case 3: {
+                            if (!p0str.isEmpty()) {
+                                rdrs[i]->setGroup(rdrs[i]->getProject()->addOrFindRDRGroup(p0str));
+                            }
+                        } break;
+                    case 4: {
+                            if (!p0str.isEmpty()) {
+                                rdrs[i]->setRole(p0str);
+                            }
+                        } break;
                 }
+
+
                 rdrs[i]->enableEmitPropertiesChanged(true);
             }
         }
@@ -2865,6 +2946,10 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_tutorial_file"), pluginList->at(i).tutorial));
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_tutorial_link"), QObject::tr("$$qf_commondoc_header.separator$$  <a href=\"%1\"><b>Plugin Tutorial</b></a>").arg(pluginList->at(i).tutorial)));
                 }
+                if (!pluginList->at(i).faq.isEmpty()) {
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_faq_file"), pluginList->at(i).faq));
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_faq_link"), QObject::tr("$$qf_commondoc_header.separator$$  <a href=\"%1\"><b>Plugin FAQ</b></a>").arg(pluginList->at(i).faq)));
+                }
                 if (!pluginList->at(i).mainhelp.isEmpty()) {
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_mainhelp_file"), pluginList->at(i).mainhelp));
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_mainhelp_link"), QObject::tr("$$qf_commondoc_header.separator$$  <a href=\"%1\"><b>Plugin Help</b></a>").arg(pluginList->at(i).mainhelp)));
@@ -3185,6 +3270,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 if (QFPluginServices::getInstance() && command=="plugin_info") {
                     if (param1=="help") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginHelp(param2));
                     if (param1=="tutorial") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginTutorial(param2));
+                    if (param1=="faq") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginFAQ(param2));
                     if (param1=="helpdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginHelpDirectory(param2));
                     if (param1=="assetsdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginAssetsDirectory(param2));
                     if (param1=="configdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginConfigDirectory(param2));

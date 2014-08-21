@@ -81,7 +81,7 @@ class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
         virtual QString getWeblink(int i) const;
 
         /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData> &tooltips);
+        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData> &tooltips, QMap<QString, QFFAQData> &faqs);
 
         /** \brief return the plugin index for a given fit function id */
         int getPluginForID(QString id) const;
@@ -96,6 +96,9 @@ class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
         QString getPluginHelp(int ID);
         /** \brief returns the plugins tutorial file (html) for a specified plugin \a ID. */
         QString getPluginTutorialMain(int ID);
+        /** \brief returns the plugins FAQ file (html) for a specified  ID. */
+        QString getPluginFAQ(int ID);
+
         /** \brief returns the plugins tutorial file (html) for a specified plugin \a ID. */
         QString getPluginSettings(int ID);
         /** \brief returns the plugins copyright file (html) for a specified plugin \a ID. */

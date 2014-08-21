@@ -47,7 +47,7 @@ bool QFFitAlgorithmManager::contains(const QString &ID)
     return false;
 }
 
-void QFFitAlgorithmManager::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData>& tooltips) {
+void QFFitAlgorithmManager::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData>& tooltips, QMap<QString, QFFAQData> &faqs) {
     QDir pluginsDir = QDir(directory);
     foreach (QString fileName, qfDirListFilesRecursive(pluginsDir)) {//pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
@@ -78,9 +78,12 @@ void QFFitAlgorithmManager::searchPlugins(QString directory, QList<QFPluginServi
                     info.mainhelp=info.directory+iRecord->getID()+QString(".html");
                     info.tutorial=info.directory+QString("tutorial.html");
                     info.settings=info.directory+QString("settings.html");
+                    info.faq=info.directory+QString("faq.html");
                     if (!QFile::exists(info.mainhelp)) info.mainhelp="";
                     if (!QFile::exists(info.tutorial)) info.tutorial="";
                     if (!QFile::exists(info.settings)) info.settings="";
+                    if (!QFile::exists(info.faq)) info.faq="";
+                    if (!info.faq.isEmpty()) parseFAQ(info.faq, iRecord->getID(), faqs);
                     info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_fitalg.html");
                     info.plugintypename=tr("Fit Algorithm Plugins");
                     info.pluginDLLbasename=QFileInfo(fileName).baseName();
@@ -217,6 +220,19 @@ QString QFFitAlgorithmManager::getPluginTutorialMain(int ID) {
         return m_options->getAssetsDirectory()+QString("/plugins/help/%1/tutorial.html").arg(basename);
     }
     return "";
+}
+
+QString QFFitAlgorithmManager::getPluginFAQ(int ID)
+{
+    if ((ID>=0) && (ID<fitPlugins.size())) {
+        QString basename=QFileInfo(getPluginFilename(ID)).baseName();
+    #ifndef Q_OS_WIN32
+        if (basename.startsWith("lib")) basename=basename.right(basename.size()-3);
+    #endif
+        return m_options->getAssetsDirectory()+QString("/plugins/help/%1/faq.html").arg(basename);
+    }
+    return "";
+
 }
 
 QString QFFitAlgorithmManager::getPluginSettings(int ID) {

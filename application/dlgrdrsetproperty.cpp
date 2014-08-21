@@ -15,6 +15,7 @@ dlgRDRSetProperty::~dlgRDRSetProperty() {
     settings->setValue(prefix+"name", ui->edtName->text());
     settings->setValue(prefix+"value", ui->edtValue->text());
     settings->setValue(prefix+"type", ui->cmbType->currentIndex());
+    settings->setValue(prefix+"which", ui->cmbWhich->currentIndex());
     settings->setValue(prefix+"overwrite", ui->chkOverwrite->isChecked());
     settings->setValue(prefix+"create", ui->chkCreate->isChecked());
 
@@ -42,8 +43,11 @@ void dlgRDRSetProperty::init(QFProject *project)
     ui->edtName->setText(settings->value(prefix+"name", QString("new_property_name")).toString());
     ui->edtValue->setText(settings->value(prefix+"value", QString("")).toString());
     ui->cmbType->setCurrentIndex(settings->value(prefix+"type", 0).toInt());
+    ui->cmbWhich->setCurrentIndex(settings->value(prefix+"which", 0).toInt());
     ui->chkCreate->setChecked(settings->value(prefix+"create", true).toBool());
     ui->chkOverwrite->setChecked(settings->value(prefix+"overwrite", true).toBool());
+
+    on_cmbWhich_currentIndexChanged(ui->cmbWhich->currentIndex());
 }
 
 bool dlgRDRSetProperty::doOverwrite() const
@@ -54,6 +58,11 @@ bool dlgRDRSetProperty::doOverwrite() const
 bool dlgRDRSetProperty::doCreateNew() const
 {
     return ui->chkCreate->isChecked();
+}
+
+int dlgRDRSetProperty::whichToSet() const
+{
+    return ui->cmbWhich->currentIndex();
 }
 
 QList<QPointer<QFRawDataRecord> > dlgRDRSetProperty::getSelectedRDRs() const
@@ -84,6 +93,11 @@ void dlgRDRSetProperty::on_btnSelectAll_clicked()
 void dlgRDRSetProperty::showHelp()
 {
     QFPluginServices::getInstance()->displayMainHelpWindow("dlgrdrsetproperty.html");
+}
+
+void dlgRDRSetProperty::on_cmbWhich_currentIndexChanged(int idx)
+{
+    ui->widProp->setEnabled(idx==0);
 }
 
 

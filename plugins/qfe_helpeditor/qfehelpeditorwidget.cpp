@@ -209,6 +209,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, tr("Link: Fit Algorithms"), QString("<a href=\"$$mainhelpdir$$qf3_fitalg.html\">fit algorithms</a>") );
     addInsertAction(menu, tr("Link: File Formats"), QString("<a href=\"$$mainhelpdir$$qf3_fileformats.html\">file formats</a>") );
     addInsertAction(menu, tr("Link: GPL 3.0"), QString("<a href=\"$$mainhelpdir$$gpl3_0.html\">GPL 3.0</a>") );
+    addInsertAction(menu, tr("Link: FAQs"), QString("<a href=\"$$qf_faqfile$$\">Frequently asked questions</a>") );
 
     menu->addSeparator();
     addInsertAction(menu, "$$qf_ui_rdr_helpfile$$");
@@ -221,6 +222,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$qf_ui_latex_helpfiletitle$$");
     addInsertAction(menu, "$$qf_mathparser_helpfile$$");
     addInsertAction(menu, "$$qf_mathparser_helpfiletitle$$");
+    addInsertAction(menu, "$$qf_faqfile$$");
 
 
     menu=new QMenu(tr("page header/footer"), this);
@@ -328,6 +330,11 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$startbox:backgroundcolor:bordercolor$$");
     addInsertAction(menu, "$$startbox:lightgrey:midnightblue$$");
     addInsertAction(menu, "$$endbox$$");
+
+
+    menu=new QMenu(tr("FAQs"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "</blockquote>\n  <!-- faq --><a name=\"FAQ1\"><b>Question?</b><!-- /faq -->\n<blockquote>\n    Answer ...\n  </blockquote>\n</blockquote>");
 
 
     menu=new QMenu(tr("insert other markups"), this);

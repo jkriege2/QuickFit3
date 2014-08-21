@@ -67,7 +67,7 @@ class QFLIB_EXPORT QFEvaluationItemFactory : public QObject {
 
 
         /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData> &tooltips);
+        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData> &tooltips, QMap<QString, QFFAQData> &faqs);
 
         /** \brief distribute objects to plugins that allow interaction with the main application */
         void distribute(QFProject* project, ProgramOptions* settings, QFPluginServices* services, QWidget* parent);
@@ -108,6 +108,9 @@ class QFLIB_EXPORT QFEvaluationItemFactory : public QObject {
         QString getPluginHelp(QString ID);
         /** \brief returns the plugins tutorial file (html) for a specified QFEvaluationItem ID. */
         QString getPluginTutorialMain(QString ID);
+        /** \brief returns the plugins FAQ file (html) for a specified  ID. */
+        QString getPluginFAQ(QString ID);
+
         /** \brief returns lists of titles (names) and links to all tutorials for for a specified QFEvaluationItem ID. */
         void getPluginTutorials(const QString& ID, QStringList& names, QStringList& files);
         /** \brief returns the plugins settings file (html) for a specified QFEvaluationItem ID. */

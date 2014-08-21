@@ -40,6 +40,7 @@
 #include <QIcon>
 #include <QListWidget>
 #include "qtriple.h"
+#include "qfpluginservices.h"
 
 #include <QBitArray>
 
@@ -1299,6 +1300,14 @@ QVector<T> qfUniqueApplyFunction2I(const QVector<T>& input, const QVector<T>& in
 QFLIB_EXPORT void saveStringToFile(const QString& filename, const QString& text, const QString& codec=QString("ISO-8859-1"));
 
 QFLIB_EXPORT QStringList qfDirListFilesRecursive(QDir& dir, const QStringList& filters=QStringList());
+
+/*! \brief extract FAQs from a faq.html file
+    \ingroup qf3lib_tools
+
+
+ */
+QFLIB_EXPORT void parseFAQ(const QString& filename, const QString& pluginID, QMap<QString, QFFAQData> &faqs);
+
 #endif // QFTOOLS_H
 
 

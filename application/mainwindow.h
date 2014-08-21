@@ -159,6 +159,10 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         /** \brief QFPluginServices::getPluginTutorial() */
         virtual QString getPluginTutorial(const QString& pluginID);
+        /** \brief QFPluginServices::getPluginFAQ() */
+        virtual QString getPluginFAQ(const QString& pluginID);
+        /** \brief QFPluginServices::getPluginName() */
+        virtual QString getPluginName(const QString& pluginID);
 
         /** \brief QFPluginServices::getPluginSettings() */
         virtual QString getPluginHelpSettings(const QString& pluginID);
@@ -378,6 +382,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QList<QPair<QString, QString> > htmlReplaceList;
         QList<QFPluginServices::HelpDirectoryInfo> pluginHelpList;
         QMap<QString, QFToolTipsData> tooltips;
+        QMap<QString, QFFAQData> faqs;
+
 
         QList<QFPluginOptionsDialogInterface*> pluginOptionDialogs;
         QMap<QString, QFHistogramView*> histograms;

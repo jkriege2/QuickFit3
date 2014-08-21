@@ -35,6 +35,7 @@
 #include <QTextStream>
 #include <QTextCodec>
 #include "programoptions.h"
+#include "qfpluginservices.h"
 #ifndef __LINUX__
 # if defined(linux)
 #  define __LINUX__
@@ -1127,4 +1128,36 @@ QList<int> stringToIntList(const QString& data) {
         if (ok) res<<val;
     }
     return res;
+}
+
+void parseFAQ(const QString& filename, const QString& pluginID, QMap<QString, QFFAQData> &faqs) {
+    QFile f(filename);
+    if (f.open(QFile::ReadOnly)) {
+        //qDebug()<<"parse FAQ "<<filename;
+        QString fc=f.readAll();
+        f.close();
+        QRegExp rxFAQ;
+        rxFAQ=QRegExp("<!--\\s*faq\\s*-->\\s*<\\s*a\\s*name\\s*\\=\\s*\\\"[\\#]*(.*)\\\"\\s*>\\s*(.*)<!--\\s*/faq\\s*-->");
+        rxFAQ.setMinimal(true);
+        int count = 0;
+        int pos = 0;
+        while ((pos = rxFAQ.indexIn(fc, pos)) != -1) {
+            ++count;
+            FAQEntry e;
+            e.question=rxFAQ.cap(2);
+            if (e.question.startsWith("<b>")) {
+                e.question.remove(0,3);
+                if (e.question.endsWith("</b>")) e.question=e.question.left(e.question.length()-4);
+            }
+            e.link=QFileInfo(filename).absoluteFilePath()+"#"+rxFAQ.cap(1);
+            //qDebug()<<"   adding "<<e.question<<e.link;
+            //qDebug()<<"          1: "<<rxFAQ.cap(1);
+            //qDebug()<<"          2: "<<rxFAQ.cap(2);
+            //qDebug()<<"          3: "<<rxFAQ.cap(3);
+            //qDebug()<<"          4: "<<rxFAQ.cap(4);
+            //qDebug()<<"          5: "<<rxFAQ.cap(5);
+            faqs[pluginID].append(e);
+            pos += rxFAQ.matchedLength();
+        }
+    }
 }

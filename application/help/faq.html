@@ -1,0 +1,93 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+<meta name="qrichtext" content="1" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>QuickFit $$version$$ Frequently asked questions (FAQ)</title>
+</head>
+<body>
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+
+<blockquote>
+	<!-- faq --><a name="FAQ_USERFITFUNC"><b>How to define your own fit-functions?</b><!-- /faq -->
+	<blockquote>
+	  You can define fit functions via the internal math expression parser (simple), or via simple fit function plugins (faster). A detailed description can be found under <a href="userfitfunctions.html">user-defined fit functions</a>.
+	</blockquote>
+</blockquote>
+
+
+<blockquote>
+	<!-- faq --><a name="FAQ_SAVEPLOT"><b>How to save a plot as an image/PDF/LaTeX?</b><!-- /faq -->
+	<blockquote>
+	  You can save most plots in QuickFit by right-clicking on the plot and then choosing <img src=":/images/jkqtp_saveplot.png"> Save Plot. A detailed description can be found under <a href="$$qf_ui_jkqtplotter_helpfile$$">$$qf_ui_jkqtplotter_helpfiletitle$$</a>.
+	</blockquote>
+</blockquote>
+
+
+<blockquote>
+	<!-- faq --><a name="FAQ_PRINTPLOT"><b>How to print a plot?</b><!-- /faq -->
+	<blockquote>
+	  You can print most plots in QuickFit by right-clicking on the plot and then choosing <img src=":/images/jkqtp_print.png"> Print Plot. A detailed description can be found under <a href="$$qf_ui_jkqtplotter_helpfile$$">$$qf_ui_jkqtplotter_helpfiletitle$$</a>.
+	</blockquote>
+</blockquote>
+
+<blockquote>
+	<!-- faq --><a name="FAQ_PlotTableRDR"><b>How to save a plot as an editable table-RDR in a project?</b><!-- /faq -->
+	<blockquote>
+	  Most plots in QuickFit can be stored as a <a href="$$plugin_info:help:table$$">table raw data record</a> in the current project. QuickFit then creates a new (or appends to an existing) table RDR in the current project, adds all data columns, that are necessary for the plot to that table and creates a plot in it, which resembles the plot you want to save. This way, the plot can be altered and formatted (e.g. for a publication). ALso the data can be procesed further (fits, statistics etc.).<br>
+	  To copy a plot in this way,<ol>
+	  <li>right-click the plot</li>
+	  <li>choose <img src=":/libqf3widgets/qfplotter_copytotable.png"> <b>copy plot data to table RDR</b> </li>
+	  <li>set all properties in the following dialog as required (e.g. give a new name for the table-RDR, or select an existing one and give a new name for the plot in the table (or select an existing one).</li>
+	  <li>now you can edit the plot (and its data), by double-clicking the new table RDR in the project tree.</li>
+	  </ol>
+	  A detailed description can be found under <a href="$$qf_ui_jkqtplotter_helpfile$$#tablerdr">$$qf_ui_jkqtplotter_helpfiletitle$$</a>.
+	</blockquote>
+</blockquote>
+
+
+<blockquote>
+	<!-- faq --><a name="FAQ_CITE"><b>How can I cite QuickFit in my publication?</b><!-- /faq -->
+	<blockquote>
+	  If you use QuickFit $$version$$ for a publication, please cite the program. A detailed reference example (and BiBTeX-record) is given in <a href="citing.html">citing QuickFit $$version$$</a>.
+	</blockquote>
+</blockquote>
+
+<blockquote>
+	<!-- faq --><a name="FAQ_FIXFILES"><b>QuickFit does not find some of the data files, when loading a project (orange warnings). What can I do?</b><!-- /faq -->
+	<blockquote>
+	  If the files have been moved, or the paths are scrambled in the project file (this sometimes happens), you can use the function <a href="dlgfixfilepaths.html">Tools | Project Tools | Fix Filepaths</a>:</b>
+	</blockquote>
+</blockquote>
+
+<blockquote>
+	<!-- faq --><a name="FAQ_RENAMEGROUP"><b>How do I rename RDR groups for several RDRs?</b><!-- /faq -->
+	<blockquote>
+	  You can rename RDR groups, by using the menu entry <a href="dlgrenamegroups.html">Tools | Project Tools | Rename RDR groups</a>.
+	</blockquote>
+</blockquote>
+
+<blockquote>
+	<!-- faq --><a name="FAQ_RDRPROP"><b>How can I set the name/folder/group/role/properties of several RDRs all at once?</b><!-- /faq -->
+	<blockquote>
+	  There are several functions, which allow this (with different feature sets):<ul>
+	    <li><a href="dlgsetrdrpropertybyregexp.html">Tools | Project Tools | set RDR properties with a regular expression</a></li>
+	    <li><a href="dlgrdrsetproperty.html">Tools | Project Tools | set property in multiple RDRs</a></li>
+		<li><a href="dlgrdrreplace.html">Tools | Project Tools | find/replace in raw data record name/folder</a></li>
+	  </ul>
+	  <i>These functions can all be found in the main menu of QuickFit.</i>
+	</blockquote>
+</blockquote>
+
+<blockquote>
+	<!-- faq --><a name="FAQ_CONTACT"><b>How can I contact the authors?</b><!-- /faq -->
+	<blockquote>
+	  See the help entry <a href="qf3_contact.html">Contact the Authors/Mailinglist</a>.
+	</blockquote>
+</blockquote>
+
+
+</body>
+</html>
+

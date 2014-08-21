@@ -30,51 +30,122 @@
    </item>
    <item row="1" column="0">
     <layout class="QFormLayout" name="formLayout">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+     </property>
      <item row="0" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>property name:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLineEdit" name="edtName"/>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_4">
+      <widget class="QLabel" name="label_6">
        <property name="text">
         <string>property type:</string>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="cmbType">
+     <item row="0" column="1">
+      <widget class="QComboBox" name="cmbWhich">
        <item>
         <property name="text">
-         <string>string</string>
+         <string>RDR property</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>number</string>
+         <string>name</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>integer</string>
+         <string>folder</string>
         </property>
        </item>
        <item>
         <property name="text">
-         <string>boolean</string>
+         <string>group</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>role</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="0" colspan="2">
+      <widget class="QWidget" name="widProp" native="true">
+       <layout class="QFormLayout" name="formLayout_2">
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        </property>
+        <property name="margin">
+         <number>0</number>
+        </property>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>property name:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="edtName"/>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_4">
+          <property name="text">
+           <string>property data-type:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QComboBox" name="cmbType">
+          <item>
+           <property name="text">
+            <string>string</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>number</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>integer</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>boolean</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QCheckBox" name="chkCreate">
+          <property name="text">
+           <string>create new property</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QCheckBox" name="chkOverwrite">
+          <property name="text">
+           <string>overwrite existing properties</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
      <item row="2" column="0">
       <widget class="QLabel" name="label_5">
        <property name="text">
-        <string>property value:</string>
+        <string>new value:</string>
        </property>
       </widget>
      </item>
@@ -82,39 +153,6 @@
       <widget class="QLineEdit" name="edtValue"/>
      </item>
      <item row="3" column="1">
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="4" column="1">
-      <widget class="QCheckBox" name="chkCreate">
-       <property name="text">
-        <string>create new property</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QCheckBox" name="chkOverwrite">
-       <property name="text">
-        <string>overwrite existing properties</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
       <spacer name="verticalSpacer_3">
        <property name="orientation">
         <enum>Qt::Vertical</enum>

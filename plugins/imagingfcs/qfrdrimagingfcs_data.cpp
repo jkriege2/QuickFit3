@@ -378,17 +378,23 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                         if (filetype.toUpper()=="VIDEO_CORRELATOR_BIN") {
                             mainDataFile=files[i];
                             loadVideoCorrelatorFileBin(files[i]);
+                            setQFProperty("DATAFILE_DATE", QFileInfo(files[i]).created(), false, true);
+                            setQFProperty("DATAFILE_ABSOLUTE_PATH", QFileInfo(files[i]).absolutePath(), false, true);
                             dataLoaded=true;
                             //qDebug()<<getID()<<"loaded vidcorbin "<<width<<"x"<<height<<" x "<<N;
                         } else if (filetype.toUpper()=="VIDEO_CORRELATOR") {
                             mainDataFile=files[i];
                             loadVideoCorrelatorFile(files[i]);
+                            setQFProperty("DATAFILE_DATE", QFileInfo(files[i]).created(), false, true);
+                            setQFProperty("DATAFILE_ABSOLUTE_PATH", QFileInfo(files[i]).absolutePath(), false, true);
                             dataLoaded=true;
                             //qDebug()<<getID()<<"loaded vidcorn "<<width<<"x"<<height<<" x "<<N;
                         } else if (filetype.toUpper()=="RADHARD2") {
                             mainDataFile=files[i];
                             loadRadhard2File(files[i], false);
                             loadRH2Overview=files[i];
+                            setQFProperty("DATAFILE_DATE", QFileInfo(files[i]).created(), false, true);
+                            setQFProperty("DATAFILE_ABSOLUTE_PATH", QFileInfo(files[i]).absolutePath(), false, true);
                             dataLoaded=true;
                         } else {
                           setError(tr("filetype '%1' is unknown for Imaging FCS data files (file is '%2')").arg(filetype).arg(files[i]));
