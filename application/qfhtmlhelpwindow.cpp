@@ -335,8 +335,9 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
                 url=QUrl(url.toString().replace(rx, QString("file:///%1:/").arg(rx.cap(1))), QUrl::TolerantMode);
             }
 #endif
-            qDebug()<<"open linked file: "<<url;
-            qDebug()<<QDesktopServices::openUrl(url);
+            //qDebug()<<"open linked file: "<<url;
+            //qDebug()<<
+            QDesktopServices::openUrl(url);
         } else {
             QDir spd(searchPath);
             QString filename=link.toString(QUrl::RemoveFragment);
@@ -354,6 +355,7 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
             updateButtons();
             if (link.hasFragment()) {
                 descriptionBrowser->scrollToAnchor(QString("#")+fragment);
+                descriptionBrowser->scrollToAnchor(fragment);
             }
         }
     } else {

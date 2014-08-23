@@ -1,0 +1,28 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>FCS/DLS raw data record frequently asked questions</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	 
+	 
+$$faq_start$$
+  <a name="FAQ_OFFSET"><b>How can I perform an offset correction for FCS/DLS data?</b>
+$$faq_answer$$
+  Often a constant intensity offset is present in FCS measurements (e.g. by detector dark counts), which changes the amplitude (i.e. particle number/concentration) of the autocorrelation curve. This effect can be compensated in two ways:<ol>
+	<li>Most fit models allow to enter the measured intensity (usually read from the input data file) and the background intensity. Then they are accounted for by the fit and the corrected particle number/concentration is returned. The <a href="tutorial_background.html">Tutorial:Set background intensities</a> explains, how a background measurement can be used to set the background intensity for several RDRs in the project. </li>
+	<li>The raw data itself can be corrected, as described in the <a href="tutorial_offset.html">Tutorial: Correct correlation offset</a>. </li>
+  </ol>
+$$faq_end$$
+	  
+	 
+$$faq_start$$
+  <a name="FAQ_SIM"><b>Is it possible to generate FCS/DLS data from one of the available fit models?</b>
+$$faq_answer$$
+  Yes, the <a href="fcs_simulator.html">FCS/DLS Curve Simulator</a> (to be found in the menu entry <tt>Data Items|Insert Raw Data|FCS/DLS data|FCS/DLS Data from fit function</tt>) allows to generate an FCS/DLS raw data record from a given fit model with user-defineable parameters. It also allows to add different types of noise to the data. This function can be used to e.g. test evaluations, or to get a feel for the properties of a fit model and the influence of its parameters on the shape of the correlation function.
+$$faq_end$$
+	 
+  </body>
+</html>

@@ -319,7 +319,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         void displayHelpPluginCopyright();
         /** \brief display tutorials */
         void displayHelpTutorials();
-        /** \brief display tutorials */
+        /** \brief display FAQs */
+        void displayHelpFAQ();
+        /** \brief display help index for plugins */
         void displayPluginHelp();
 
         /** \brief whenever a new project is created this is called every 500ms, until the project has been save at least once. This function asks the suer to save the project when he adds the first items */
@@ -431,6 +433,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QAction* helpCopyrightAct;
         QAction* helpPluginCopyrightAct;
         QAction* helpTutorialsAct;
+        QAction* helpFAQAct;
         QAction* helpPluginAct;
         QAction* helpContactAuthors;
         QAction* helpContactMaillinglist;

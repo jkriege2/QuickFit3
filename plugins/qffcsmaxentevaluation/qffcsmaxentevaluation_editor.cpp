@@ -455,7 +455,6 @@ void QFFCSMaxEntEvaluationEditor::writeSettings() {
 
 
 void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
-    QFFCSByIndexAndModelEvaluationEditor::highlightingChanged(formerRecord, currentRecord);
 
     QFFCSMaxEntEvaluationItem* eval=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     //QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
@@ -496,6 +495,7 @@ void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRec
         sumRangesChanged();
         dataEventsEnabled=oldde;
     }
+    QFFCSByIndexAndModelEvaluationEditor::highlightingChanged(formerRecord, currentRecord);
 
 }
 

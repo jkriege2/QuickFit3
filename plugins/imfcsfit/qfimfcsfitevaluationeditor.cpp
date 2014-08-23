@@ -319,7 +319,6 @@ void QFImFCSFitEvaluationEditor::writeSettings() {
 }
 
 void QFImFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
-    QFFitResultsByIndexEvaluationEditorWithWidgets::highlightingChanged(formerRecord, currentRecord);
     QFImFCSFitEvaluation* eval=qobject_cast<QFImFCSFitEvaluation*>(current);
     disconnect(pltOverview, SIGNAL(currentRunChanged(int)), this, SLOT(overviewRunChanged(int)));
     disconnect(spinRun, SIGNAL(valueChanged(int)), pltOverview, SLOT(setCurrentRun(int)));
@@ -335,6 +334,7 @@ void QFImFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerReco
 
         dataEventsEnabled=true;
     }
+    QFFitResultsByIndexEvaluationEditorWithWidgets::highlightingChanged(formerRecord, currentRecord);
 }
 
 void QFImFCSFitEvaluationEditor::displayModel(bool newWidget) {

@@ -22,6 +22,7 @@
 #include "qffcsweightingtools.h"
 #include "qfrawdatarecord.h"
 #include "qfrdrfcsdatainterface.h"
+#include "statistics_tools.h"
 
 QFFCSWeightingTools::QFFCSWeightingTools()
 {
@@ -55,6 +56,9 @@ QString QFFCSWeightingTools::dataWeightToString(QFFCSWeightingTools::DataWeight 
     if (weight==RunningStdDev5Weight) return "runsd5";
     if (weight==RunningStdDev7Weight) return "runsd7";
     if (weight==RunningStdDev11Weight) return "runsd11";
+    if (weight==Poly2Weight) return "poly2";
+    if (weight==Poly3Weight) return "poly3";
+    if (weight==Poly5Weight) return "poly5";
     return "equal";
 }
 
@@ -66,6 +70,9 @@ QString QFFCSWeightingTools::dataWeightToName(QFFCSWeightingTools::DataWeight we
     if (weight==RunningStdDev5Weight) return QString("SD 5-")+runname+QString("s");;
     if (weight==RunningStdDev7Weight) return QString("SD 7-")+runname+QString("s");;
     if (weight==RunningStdDev11Weight) return QString("SD 11-")+runname+QString("s");;
+    if (weight==Poly2Weight) return QString("dev. from poly(2)");
+    if (weight==Poly3Weight) return QString("dev. from poly(3)");
+    if (weight==Poly5Weight) return QString("dev. from poly(5)");
     return "equal";
 }
 
@@ -78,6 +85,9 @@ QFFCSWeightingTools::DataWeight QFFCSWeightingTools::stringToDataWeight(QString 
     if (w=="4" || w=="runsd5") return RunningStdDev5Weight;
     if (w=="5" || w=="runsd7") return RunningStdDev5Weight;
     if (w=="6" || w=="runsd11") return RunningStdDev11Weight;
+    if (w=="7" || w=="poly2") return Poly2Weight;
+    if (w=="8" || w=="poly3") return Poly3Weight;
+    if (w=="9" || w=="poly5") return Poly5Weight;
     return EqualWeighting;
 }
 
@@ -117,6 +127,35 @@ QFFCSWeightingTools::DataWeight QFFCSWeightingTools::stringToDataWeight(QString 
             weights[i]=sqrt((s2-s*s/double(avg))/double(avg-1)); \
         } \
     }
+
+#define POLY_WEIGHT(P) { \
+    int avg=P+5; \
+    for (int i=0; i<N; i++) { \
+        QVector<double> x,y; \
+        weights[i]=0; \
+        int jstart=0; \
+        int jend=avg; \
+        while (i+jend>=N) { \
+            jstart--; \
+            jend--; \
+        } \
+        if (i+jstart>=0 && i+jend<=N) { \
+            double s=0, s2=0; \
+            const double lx=log(taudat[i]); \
+            for (int j=jstart; j<jend; j++) { \
+                x<<log(taudat[i+j]); \
+                y<<corrdat[i+j]; \
+            } \
+            QVector<double> p(P+1,0.0); \
+            if (statisticsPolyFit<double>(x.data(), y.data(), x.size(), P, p.data())) { \
+                qDebug()<<taudat[i]<<corrdat[i]<<lx<<statisticsPolyEval<double>(lx, p.data(), P)<<p<<x<<y; \
+                weights[i]=fabs(corrdat[i]-statisticsPolyEval<double>(lx, p.data(), P)); \
+            } else { \
+                weights[i] = 0; \
+            } \
+        } \
+    } \
+}
 
 double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *record_in, int run_in, int data_start, int data_end) const
 {
@@ -198,6 +237,39 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *rec
             CHECK_WEIGHT
         }
     }
+    if (data&&weights&&!weightsOK&& weighting==QFFCSWeightingTools::Poly2Weight) {
+        double* taudat=data->getCorrelationT();
+        double* corrdat=NULL;
+        if (run>=0) corrdat=data->getCorrelationRun(run);
+        else if (run==-1) corrdat=data->getCorrelationMean();
+        if (corrdat) {
+            weightsOK=true;
+            POLY_WEIGHT(2)
+            CHECK_WEIGHT
+        }
+    }
+    if (data&&weights&&!weightsOK&& weighting==QFFCSWeightingTools::Poly3Weight) {
+        double* taudat=data->getCorrelationT();
+        double* corrdat=NULL;
+        if (run>=0) corrdat=data->getCorrelationRun(run);
+        else if (run==-1) corrdat=data->getCorrelationMean();
+        if (corrdat) {
+            weightsOK=true;
+            POLY_WEIGHT(3)
+            CHECK_WEIGHT
+        }
+    }
+    if (data&&weights&&!weightsOK&& weighting==QFFCSWeightingTools::Poly5Weight) {
+        double* taudat=data->getCorrelationT();
+        double* corrdat=NULL;
+        if (run>=0) corrdat=data->getCorrelationRun(run);
+        else if (run==-1) corrdat=data->getCorrelationMean();
+        if (corrdat) {
+            weightsOK=true;
+            POLY_WEIGHT(5)
+            CHECK_WEIGHT
+        }
+    }
     if (!weightsOK && weights) {
         double ww=1.0/double(N);
         /*double* crun=data->getCorrelationRun(run_in);
@@ -253,6 +325,9 @@ QFFCSWeightingCombobox::QFFCSWeightingCombobox(QWidget *parent):
     addItem(tr("running SD, 5"));
     addItem(tr("running SD, 7"));
     addItem(tr("running SD, 11"));
+    addItem(tr("deviation from poly(2)"));
+    addItem(tr("deviation from poly(3)"));
+    addItem(tr("deviation from poly(5)"));
     connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIdxChanged(int)));
 }
 

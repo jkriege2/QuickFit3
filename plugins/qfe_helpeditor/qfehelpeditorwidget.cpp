@@ -302,6 +302,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     menu=new QMenu(tr("insert Literature References"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
     addInsertAction(menu, "$$ref:<ID>:Text$$");
+    addInsertAction(menu, "$$ref:<ID>:$$");
     addInsertAction(menu, "$$invisibleref:<ID>:Text$$");
     addInsertAction(menu, "$$references$$");
 
@@ -334,7 +335,11 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
 
     menu=new QMenu(tr("FAQs"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
-    addInsertAction(menu, "</blockquote>\n  <!-- faq --><a name=\"FAQ1\"><b>Question?</b><!-- /faq -->\n<blockquote>\n    Answer ...\n  </blockquote>\n</blockquote>");
+    addInsertAction(menu, "$$faq_start\n  <a name=\"FAQ1\"><b>Question?</b>\n$$faq_answer$$\n  Answer ...\n$$faq_end$$");
+    menu->addSeparator();
+    addInsertAction(menu, "$$faq_start");
+    addInsertAction(menu, "$$faq_answer");
+    addInsertAction(menu, "$$faq_end");
 
 
     menu=new QMenu(tr("insert other markups"), this);

@@ -44,8 +44,11 @@ class QFFCSWeightingTools
             RunningStdDev5Weight=4,
             RunningStdDev7Weight=5,
             RunningStdDev11Weight=6,
+            Poly2Weight=7,
+            Poly3Weight=8,
+            Poly5Weight=9,
 
-            DataWeightingMax=6
+            DataWeightingMax=9
         };
 
         QFFCSWeightingTools();

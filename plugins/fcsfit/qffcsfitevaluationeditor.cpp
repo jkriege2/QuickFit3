@@ -117,13 +117,14 @@ void QFFCSFitEvaluationEditor::writeSettings() {
 }
 
 void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
-    QFFitResultsByIndexEvaluationEditorWithWidgets::highlightingChanged(formerRecord, currentRecord);
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(currentRecord);
     if (eval) {
         dataEventsEnabled=false;
+        qDebug()<<"highlightingChanged "<<eval->getFitDataWeighting();
         cmbWeights->setCurrentWeight(eval->getFitDataWeighting());
         dataEventsEnabled=true;
     }
+    QFFitResultsByIndexEvaluationEditorWithWidgets::highlightingChanged(formerRecord, currentRecord);
 }
 
 

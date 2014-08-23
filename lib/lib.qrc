@@ -39,6 +39,7 @@
         <file alias="print.png">../images/16x16/document_print.png</file>
         <file alias="help_help.png">icons/help_help.png</file>
         <file alias="www.png">icons/www.png</file>
+        <file alias="help_faq.png">icons/help_faq.png</file>
     </qresource>
     <qresource prefix="/lib">
         <file alias="edit_fitfunction.png">icons/edit_fitfunction.png</file>
@@ -69,6 +70,7 @@
         <file alias="help_find.png">icons/help_find.png</file>
         <file alias="help_findnext.png">icons/help_findnext.png</file>
         <file alias="help_findprev.png">icons/help_findprev.png</file>
+        <file alias="help_faq.png">icons/help_faq.png</file>
         <file alias="btn_down.png">icons/btn_down.png</file>
         <file alias="btn_up.png">icons/btn_up.png</file>
         <file alias="help_findinall.png">icons/help_findinall.png</file>

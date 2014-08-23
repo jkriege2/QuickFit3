@@ -126,12 +126,14 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     logFileMainWidget->log_header(tr("searching for plugins ..."));
     logFileMainWidget->inc_indent();
     searchAndRegisterPlugins();
-
-    parseFAQ(settings->getMainHelpDirectory()+"/faq.html", "quickfit", faqs);
-
     logFileMainWidget->dec_indent();
 
-    splash->showMessage(tr("%1 Plugins loaded successfully").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()+importerManager->pluginCount()));
+    splash->showMessage(tr("%1 Plugins loaded successfully ... prepring online-help").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()+importerManager->pluginCount()));
+
+    logFileMainWidget->log_header(tr("preparing online-help ..."));
+    logFileMainWidget->inc_indent();
+    parseFAQ(settings->getMainHelpDirectory()+"/faq.html", "quickfit", faqs);
+
 
     htmlReplaceList.append(qMakePair(QString("version.svnrevision"), QString(qfInfoSVNVersion()).trimmed()));
     htmlReplaceList.append(qMakePair(QString("version.status"), QString(qfInfoVersionStatus())));
@@ -222,6 +224,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     helpWindow->setTooltips(tooltips);
 
 
+    logFileMainWidget->dec_indent();
 
     logFileMainWidget->log_text(tr("QuickFit started succesfully!\n"));
 
@@ -650,6 +653,7 @@ QString MainWindow::createFAQ()
             QString q=it.value().at(i).question;
             //QString a=it.value().at(i).answer;
             QString l=it.value().at(i).link;
+            //qDebug()<<q<<l;
             if (!q.isEmpty() && !l.isEmpty()) {
                 faql+=tr("<li><a href=\"%2\"><i>%1</i></a></li>").arg(q).arg(l);
                 //faqdir+=tr("<li><a href=\"#faq%2\"><i>%1</i></a></li>").arg(q).arg(cnt);
@@ -657,11 +661,11 @@ QString MainWindow::createFAQ()
                 cnt++;
             }
         }
-        if (faq=="quickfit") {
-            text+=tr("<li><b>QuickFit $$version$$:</b><ul>%1</ul></li>").arg(faql);
+        if (it.key()=="quickfit") {
+            if (!faql.isEmpty()) text+=tr("<li><b>QuickFit $$version$$:</b><ul>%1</ul></li>").arg(faql);
             //textd+=tr("<li><b>%1:</b><ul>%2</ul></li>").arg(getPluginName(it.key())).arg(faqdir);
-        } else if (!faq.isEmpty()) {
-            text+=tr("<li><b>%1:</b><ul>%2</ul></li>").arg(getPluginName(it.key())).arg(faql);
+        } else {
+            if (!faql.isEmpty()) text+=tr("<li><b>%1:</b><ul>%2</ul></li>").arg(getPluginName(it.key())).arg(faql);
             //textd+=tr("<li><b>%1:</b><ul>%2</ul></li>").arg(getPluginName(it.key())).arg(faqdir);
         }
     }
@@ -1151,6 +1155,8 @@ void MainWindow::createActions() {
     connect(helpPluginCopyrightAct, SIGNAL(triggered()), this, SLOT(displayHelpPluginCopyright()));
     helpCitingAct=new QAction(QIcon(":/help_copyright.png"), tr("Citing QuickFit ..."), this);
     connect(helpCitingAct, SIGNAL(triggered()), this, SLOT(displayHelpCiting()));
+    helpFAQAct=new QAction(QIcon(":/lib/help/help_faq.png"), tr("&Frequently asked questions (FAQs)"), this);
+    connect(helpFAQAct, SIGNAL(triggered()), this, SLOT(displayHelpFAQ()));
     helpTutorialsAct=new QAction(QIcon(":/lib/help/help_tutorial.png"), tr("Plugin &Tutorials"), this);
     connect(helpTutorialsAct, SIGNAL(triggered()), this, SLOT(displayHelpTutorials()));
     helpPluginAct=new QAction(QIcon(":/lib/help/help_contents.png"), tr("&Plugin Help"), this);
@@ -1168,6 +1174,7 @@ void MainWindow::createActions() {
     helpActList.append(helpCopyrightAct);
     helpActList.append(helpPluginAct);
     helpActList.append(helpCitingAct);
+    helpActList.append(helpFAQAct);
     helpActList.append(helpTutorialsAct);
     helpActList.append(helpPluginCopyrightAct);
 
@@ -1303,6 +1310,8 @@ void MainWindow::createMenus() {
     helpMenu->addAction(helpAct);
     helpMenu->addAction(helpCopyrightAct);
     helpMenu->addAction(helpCitingAct);
+    helpMenu->addSeparator();
+    helpMenu->addAction(helpFAQAct);
     helpMenu->addSeparator();
     helpMenu->addAction(helpPluginAct);
     helpMenu->addAction(helpTutorialsAct);
@@ -2304,6 +2313,11 @@ void MainWindow::displayHelpTutorials()
     displayHelpWindow(settings->getAssetsDirectory()+QString("/help/plugin_tutorials.html"));
 }
 
+void MainWindow::displayHelpFAQ()
+{
+    displayHelpWindow(settings->getAssetsDirectory()+QString("/help/qf3_faq.html"));
+}
+
 void MainWindow::displayHelpCiting()
 {
     displayHelpWindow(settings->getAssetsDirectory()+QString("/help/citing.html"));
@@ -2864,6 +2878,11 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                                "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightgrey ;  border-color: midnightblue\" >"
                                                "<tr><td align=\"left\">");
     localreplaces<<qMakePair<QString, QString>("endbox", "</td></tr></table></blockquote>");
+    localreplaces<<qMakePair<QString, QString>("faq_start", "<blockquote>"
+                                               "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: white ;  border-color: midnightblue\" >"
+                                               "<tr><td align=\"left\"  style=\"background-color: lightgrey\">");
+    localreplaces<<qMakePair<QString, QString>("faq_answer", "</td></tr><tr><td>");
+    localreplaces<<qMakePair<QString, QString>("faq_end", "</td></tr></table></blockquote>");
 
 
 

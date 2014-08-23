@@ -6,6 +6,19 @@
 	</head>
 	<body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-		This extension allows to edit (with preview) QuickFit 3 online-help pages.
+		This extension allows to edit (with preview) QuickFit 3 online-help pages. 
+		<ul>
+		  <li>You can load an existing help page, or create a new one, also based on predefined templates.</li>
+		  <li>The QuickFit online-help is based on HTML documents, that are enriched with special "tags", which are interpreted by QuickFit. These tags are enclosed in <tt>&#36;&#36;...&#36;&#36;</tt> and can represent different features:
+		  <ul>
+		    <li><tt>&#36;&#36;math:LATEX&#36;&#36;</tt> and <tt>&#36;&#36;bmath:LATEX&#36;&#36;</tt> will render the enclosed LaTeX expression as an image and include it. This can be used for easy expression rendering</li>
+		    <li><tt>&#36;&#36;note:TEXT&#36;&#36;</tt> will create a box with TEXT contained</li>
+		    <li><tt>&#36;&#36;ref:ID:text&#36;&#36;</tt> defines a literature reference, which can be reused later using <tt>&#36;&#36;ref:ID:&#36;&#36;</tt>. All references will be summarized in a list at the end of the page, where <tt>&#36;&#36;references&#36;&#36;</tt> is inserted into the document.</li>
+		    <li>Several short forms for different types of information are provided ...</li>
+		  </ul><br>
+		  All these markups can be inserted with the buttons provided above the edit widget for the help file, or via the context-menu (activated by a right-click) of the edit widget.</li>
+		  <li>A click on <b>Preview</b> at the bottom of the window will open a preview of the current help page.</li>
+		  <li>You can insert images, or even paste them from the clipboard, using <img src=":/qfe_helpeditor/icons/paste_image.png">.</li>
+		</ul>  
 	</body>
 </html>

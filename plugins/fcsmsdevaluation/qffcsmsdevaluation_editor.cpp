@@ -704,7 +704,6 @@ void QFFCSMSDEvaluationEditor::plotDistMouseMoved(double x, double y)
 
 
 void QFFCSMSDEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
-    QFFCSByIndexAndModelEvaluationEditor::highlightingChanged(formerRecord, currentRecord);
 
     QFFCSMSDEvaluationItem* eval=qobject_cast<QFFCSMSDEvaluationItem*>(current);
     //QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
@@ -746,6 +745,7 @@ void QFFCSMSDEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
 
         dataEventsEnabled=oldde;
     }
+    QFFCSByIndexAndModelEvaluationEditor::highlightingChanged(formerRecord, currentRecord);
 
 }
 

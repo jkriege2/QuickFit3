@@ -137,7 +137,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../plugins/interfaces/qfoverlayplotdialog.h \
     qfoverlayplotdialog.h \
     ../plugins/interfaces/qfgetplotdatainterface.h \
-    qfselectfileslistwidget.h
+    qfselectfileslistwidget.h \
+    ../../../../LIB/trunk/mathtools.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -232,7 +233,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qconfigcomboboxwidget.cpp \
     qffitfunctionselectdialog.cpp \
     qfoverlayplotdialog.cpp \
-    qfselectfileslistwidget.cpp
+    qfselectfileslistwidget.cpp \
+    ../../../../LIB/trunk/mathtools.cpp
 
 
 FORMS += qf3objectiveeditor.ui \
