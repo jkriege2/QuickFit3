@@ -93,6 +93,10 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         double getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0);
         /** \brief returns the diffusion coefficient in m^2/s */
         double getShapeDCoeff(int solution, double rotation_axis_or_length_meter, double second_axis_or_diameter_meter, SpheroidType type, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0, double* Dsphere=NULL, double* volume=NULL);
+        /** \brief returns the hydrodynamic radius in m^2 */
+        double getHydrodynRadius_from_D(double D, int solution, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0);
+        /** \brief returns the hydrodynamic radius in m^2 */
+        double getHydrodynRadius_from_DEtaT(double D, double viscosity, double at_temperature_K);
 
         virtual QAction* getToolStartAction();
         virtual void startTool();

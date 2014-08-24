@@ -250,6 +250,21 @@ double QFEDiffusionCoefficientCalculator::getShapeDCoeff(int solution, double ro
     return K_BOLTZ*at_temperature_K/fperrin;
 }
 
+double QFEDiffusionCoefficientCalculator::getHydrodynRadius_from_D(double D, int solution, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components, double viscosity_factor)
+{
+    const double eta=getSolutionViscosity(solution, at_temperature_K, components)*viscosity_factor;
+    return getHydrodynRadius_from_DEtaT(D, eta, at_temperature_K);
+
+}
+
+double QFEDiffusionCoefficientCalculator::getHydrodynRadius_from_DEtaT(double D, double viscosity, double at_temperature_K)
+{
+    const double res= K_BOLTZ*at_temperature_K/(6.0*M_PI*viscosity*D);
+    //qDebug()<<D<<at_temperature_K<<eta<<res;
+    return res;
+}
+
+
 QAction *QFEDiffusionCoefficientCalculator::getToolStartAction()
 {
     return actStartPlugin;

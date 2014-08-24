@@ -29,7 +29,7 @@
      <item row="0" column="0" rowspan="2">
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>2</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tabStdSample">
         <attribute name="title">
@@ -51,27 +51,13 @@
            <item>
             <widget class="QComboBox" name="cmbGivenDName">
              <property name="editable">
-              <bool>true</bool>
+              <bool>false</bool>
              </property>
              <property name="insertPolicy">
               <enum>QComboBox::NoInsert</enum>
              </property>
              <property name="duplicatesEnabled">
               <bool>true</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QToolButton" name="btnSaveGivenD">
-             <property name="toolTip">
-              <string>save the current sample under the name given in name</string>
-             </property>
-             <property name="text">
-              <string>...</string>
-             </property>
-             <property name="icon">
-              <iconset resource="qfediffusioncoefficientcalculator.qrc">
-               <normaloff>:/calc_diffcoeff/filesave.png</normaloff>:/calc_diffcoeff/filesave.png</iconset>
              </property>
             </widget>
            </item>
@@ -89,7 +75,99 @@
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QToolButton" name="btnEditGivenD">
+             <property name="toolTip">
+              <string>if enabled, you can edit the data for the diffusion coefficient ...</string>
+             </property>
+             <property name="text">
+              <string>make the &quot;Given D&quot; data editable</string>
+             </property>
+             <property name="icon">
+              <iconset resource="../../lib/lib.qrc">
+               <normaloff>:/lib/file_edit.png</normaloff>:/lib/file_edit.png</iconset>
+             </property>
+             <property name="checkable">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QToolButton" name="btnSaveGivenD">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="toolTip">
+              <string>save the current sample under the name given in name</string>
+             </property>
+             <property name="text">
+              <string>...</string>
+             </property>
+             <property name="icon">
+              <iconset resource="qfediffusioncoefficientcalculator.qrc">
+               <normaloff>:/calc_diffcoeff/filesave.png</normaloff>:/calc_diffcoeff/filesave.png</iconset>
+             </property>
+            </widget>
+           </item>
           </layout>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>D [µm²/s] = </string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QFDoubleEdit" name="edtGivenD">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="readOnly">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_33">
+             <property name="text">
+              <string>&amp;plusmn;</string>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::RichText</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFDoubleEdit" name="edtGivenDError">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="readOnly">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_31">
+           <property name="text">
+            <string>buffer:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QLineEdit" name="edtBuffer">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="readOnly">
+            <bool>false</bool>
+           </property>
+          </widget>
          </item>
          <item row="4" column="0">
           <widget class="QLabel" name="label_8">
@@ -99,7 +177,14 @@
           </widget>
          </item>
          <item row="4" column="1">
-          <widget class="QFDoubleEdit" name="edtGivenDVisc"/>
+          <widget class="QFDoubleEdit" name="edtGivenDVisc">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="readOnly">
+            <bool>false</bool>
+           </property>
+          </widget>
          </item>
          <item row="5" column="0">
           <widget class="QLabel" name="label_9">
@@ -110,6 +195,9 @@
          </item>
          <item row="5" column="1">
           <widget class="QDoubleSpinBox" name="spinGivenDT">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="suffix">
             <string> °C</string>
            </property>
@@ -127,17 +215,30 @@
            </property>
           </widget>
          </item>
-         <item row="6" column="0">
-          <widget class="QLabel" name="label_11">
-           <property name="text">
-            <string>=&gt; D20,W [μm²/s] = </string>
-           </property>
-          </widget>
-         </item>
          <item row="6" column="1">
           <widget class="QLabel" name="labGivenDD20W">
            <property name="text">
             <string>TextLabel</string>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="0">
+          <widget class="QLabel" name="label_32">
+           <property name="text">
+            <string>method:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QLineEdit" name="edtMethod">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="readOnly">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -149,7 +250,14 @@
           </widget>
          </item>
          <item row="9" column="1">
-          <widget class="QLineEdit" name="edtReference"/>
+          <widget class="QLineEdit" name="edtReference">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="readOnly">
+            <bool>false</bool>
+           </property>
+          </widget>
          </item>
          <item row="10" column="1">
           <widget class="QPushButton" name="btnSendEmailGivenD">
@@ -162,52 +270,15 @@
            </property>
           </widget>
          </item>
-         <item row="8" column="0">
-          <widget class="QLabel" name="label_32">
+         <item row="7" column="1">
+          <widget class="QLabel" name="labGivenDRH">
            <property name="text">
-            <string>method:</string>
+            <string>TextLabel</string>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
            </property>
           </widget>
-         </item>
-         <item row="8" column="1">
-          <widget class="QLineEdit" name="edtMethod"/>
-         </item>
-         <item row="2" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
-           <item>
-            <widget class="QFDoubleEdit" name="edtGivenD"/>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_33">
-             <property name="text">
-              <string>&amp;plusmn;</string>
-             </property>
-             <property name="textFormat">
-              <enum>Qt::RichText</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QFDoubleEdit" name="edtGivenDError"/>
-           </item>
-          </layout>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>D [µm²/s] = </string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_31">
-           <property name="text">
-            <string>buffer:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QLineEdit" name="edtBuffer"/>
          </item>
         </layout>
        </widget>
@@ -233,6 +304,20 @@
            </property>
           </widget>
          </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_43">
+           <property name="text">
+            <string>hydrodyn. radius R&lt;sub&gt;H&lt;/sub&gt; [nm]:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QLabel" name="labGivenD20WRH">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
        <widget class="QWidget" name="tabGeometry">
@@ -240,6 +325,9 @@
          <string>geometry</string>
         </attribute>
         <layout class="QFormLayout" name="formLayout_5">
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="label_22">
            <property name="text">
@@ -393,20 +481,7 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
-          <spacer name="verticalSpacer">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
-             <height>40</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="7" column="1">
+         <item row="9" column="1">
           <spacer name="verticalSpacer_2">
            <property name="orientation">
             <enum>Qt::Vertical</enum>
@@ -419,13 +494,54 @@
            </property>
           </spacer>
          </item>
-         <item row="6" column="0" colspan="2">
+         <item row="8" column="0" colspan="2">
           <widget class="QLabel" name="label_34">
            <property name="text">
             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;This will renormalize the given diffusion coefficeint D to a different temperature. It is assumed that D was measured in the solution, specified on the right.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
            </property>
            <property name="wordWrap">
             <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_40">
+           <property name="text">
+            <string>D&lt;sub&gt;20,W&lt;/sub&gt; [µm²/s]:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLabel" name="labGivenDInSolutionD20W">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QLabel" name="label_41">
+           <property name="text">
+            <string>hydrodyn. radius R&lt;sub&gt;H&lt;/sub&gt; [nm]:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QLabel" name="labGivenDInSolutionRH">
+           <property name="text">
+            <string>TextLabel</string>
            </property>
           </widget>
          </item>
@@ -928,6 +1044,38 @@
              </property>
             </widget>
            </item>
+           <item>
+            <widget class="QLabel" name="label_38">
+             <property name="font">
+              <font>
+               <italic>true</italic>
+              </font>
+             </property>
+             <property name="text">
+              <string>hydrodynamic radius:</string>
+             </property>
+             <property name="indent">
+              <number>16</number>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFDoubleEdit" name="edtExperimentRHyd">
+             <property name="enabled">
+              <bool>true</bool>
+             </property>
+             <property name="readOnly">
+              <bool>true</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_39">
+             <property name="text">
+              <string>nm</string>
+             </property>
+            </widget>
+           </item>
           </layout>
          </item>
          <item row="2" column="1">
@@ -1110,8 +1258,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>126</x>
-     <y>72</y>
+     <x>244</x>
+     <y>97</y>
     </hint>
     <hint type="destinationlabel">
      <x>0</x>
@@ -1126,8 +1274,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>102</x>
-     <y>47</y>
+     <x>219</x>
+     <y>150</y>
     </hint>
     <hint type="destinationlabel">
      <x>2</x>
@@ -1142,8 +1290,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>102</x>
-     <y>50</y>
+     <x>219</x>
+     <y>176</y>
     </hint>
     <hint type="destinationlabel">
      <x>2</x>
@@ -1174,8 +1322,8 @@
    <slot>updateGivenD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>95</x>
-     <y>60</y>
+     <x>213</x>
+     <y>68</y>
     </hint>
     <hint type="destinationlabel">
      <x>3</x>
@@ -1206,7 +1354,7 @@
    <slot>updatePlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>675</x>
+     <x>667</x>
      <y>283</y>
     </hint>
     <hint type="destinationlabel">
@@ -1222,7 +1370,7 @@
    <slot>updatePlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>787</x>
+     <x>783</x>
      <y>283</y>
     </hint>
     <hint type="destinationlabel">
@@ -1446,7 +1594,7 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>695</x>
+     <x>689</x>
      <y>191</y>
     </hint>
     <hint type="destinationlabel">
@@ -1462,7 +1610,7 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>695</x>
+     <x>689</x>
      <y>219</y>
     </hint>
     <hint type="destinationlabel">
@@ -1510,8 +1658,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>102</x>
-     <y>41</y>
+     <x>201</x>
+     <y>66</y>
     </hint>
     <hint type="destinationlabel">
      <x>4</x>
@@ -1526,8 +1674,8 @@
    <slot>updateD()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>102</x>
-     <y>44</y>
+     <x>201</x>
+     <y>92</y>
     </hint>
     <hint type="destinationlabel">
      <x>6</x>
@@ -1548,6 +1696,134 @@
     <hint type="destinationlabel">
      <x>480</x>
      <y>114</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnEditGivenD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnSaveGivenD</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>413</x>
+     <y>63</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>436</x>
+     <y>63</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnEditGivenD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtGivenDError</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>411</x>
+     <y>52</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>409</x>
+     <y>83</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnEditGivenD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtGivenD</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>403</x>
+     <y>51</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>271</x>
+     <y>85</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnEditGivenD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtBuffer</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>413</x>
+     <y>58</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>323</x>
+     <y>119</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnEditGivenD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtGivenDVisc</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>69</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>143</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnEditGivenD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spinGivenDT</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>417</x>
+     <y>67</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>360</x>
+     <y>176</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnEditGivenD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtMethod</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>418</x>
+     <y>63</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>296</x>
+     <y>218</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnEditGivenD</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtReference</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>48</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>242</y>
     </hint>
    </hints>
   </connection>

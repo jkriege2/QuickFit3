@@ -335,7 +335,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
 
     menu=new QMenu(tr("FAQs"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
-    addInsertAction(menu, "$$faq_start\n  <a name=\"FAQ1\"><b>Question?</b>\n$$faq_answer$$\n  Answer ...\n$$faq_end$$");
+    addInsertAction(menu, "$$faq_start$$\n  <a name=\"FAQ1\"><b>Question?</b>\n$$faq_answer$$\n  Answer ...\n$$faq_end$$");
     menu->addSeparator();
     addInsertAction(menu, "$$faq_start");
     addInsertAction(menu, "$$faq_answer");

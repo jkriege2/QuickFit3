@@ -42,6 +42,7 @@ class DlgCalcDiffCoeff : public QDialog
         void on_btnCHelp3_clicked();
         void on_btnCHelp4_clicked();
         void on_btnCHelp5_clicked();
+        void on_btnEditGivenD_toggled(bool checked);
         void on_cmbShapeType_currentIndexChanged(int index);
         void showHelp();
         void on_btnSendEmailGivenD_clicked();

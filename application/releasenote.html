@@ -85,13 +85,13 @@
 			<li>improved search speed in online-help search!</li>
 			<li>select RDR dialog now has a completer for the filter string</li>
 			<li>added Help-menu entry for citing QuickFit (this was a bit hidden in the copyright-help page before!</li>
-                        <li>added support for user-definable fit function in external shared libraries. This allows to write fit functions in C/Pascal/... or any other language, that can produce shared libraries. They will show much better performance, than user-defined fit functions using the internal expression parser. QuickFit now searches for these plugins in the sub-directory sdk_fitfunctions and sdk/sdk_fitfunctions.</li>
-                        <li>QuickFit now also searches for plugins in sub-directories</li>
-                        <li>Added citing tab to About QuickFit dialog, improved citing page in online-help</li>
-                        <li>fit algorithms should use the multiEvaluate() function of QFFitFunction now.</li>
+            <li>added support for user-definable fit function in external shared libraries. This allows to write fit functions in C/Pascal/... or any other language, that can produce shared libraries. They will show much better performance, than user-defined fit functions using the internal expression parser. QuickFit now searches for these plugins in the sub-directory sdk_fitfunctions and sdk/sdk_fitfunctions.</li>
+            <li>QuickFit now also searches for plugins in sub-directories</li>
+            <li>Added citing tab to About QuickFit dialog, improved citing page in online-help</li>
+            <li>fit algorithms should use the multiEvaluate() function of QFFitFunction now.</li>
 			<li>prepared main window for (different) wizards</li>
-                        <li>online-help now supports a list of FAQs for QuickFit and for plugins</li>
-                        <li>Tools | Project Tools | set property in multiple RDRs: now can also set the name/rolw/folder/group of RDRs.</li>
+            <li>online-help now supports a list of FAQs for QuickFit and for plugins</li>
+            <li>Tools | Project Tools | set property in multiple RDRs: now can also set the name/rolw/folder/group of RDRs.</li>
           </ul></li>
 	
 		  <li><b>imFCCSFit</b><ul>
@@ -100,15 +100,14 @@
 			<li>the tool to calculate the crosstalk-corrected rel. FCCS amplitude now supports background-correction</li>
 			<li>replaced "run" by "pixel" to clear up the function</li>
 			<li>added button "go to average pixel"</li>
-                        <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
-                        <li></li>
+            <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
+            <li></li>
 			<li></li>
 		  </ul></li>	
 		  <li><b>FCCSFit</b><ul>
 			<li>fit parameter names are more expressive now</li>
 			<li>bugfix: fixed possible crash, when trying to select anew fit model</li>
             <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
-            <li>bugfix: weights combo-box is correctly initialized, when starting the editor</li>
 			<li></li>
 		  </ul></li>	
 		  <li><b>General fit functions</b><ul>
@@ -162,14 +161,14 @@
 			<li>"copy fit result statistics to table" now also copies the overview image intensities</li>
 			<li>the average+/-SD of both parameter images and possibly of both overview color channels is displayed in the text line above the images now + values should be updated now, when the fit parameter is reselected</li>
 			<li>The function "Data|Insert Correlation Curves as new RDR into Project" now also creates two ACF+FCCS records from an FCCS imagingFCS record and can be configured more deeply!</li>
-                        <li>improved speed, when changing from one RDR to another</li>
-                        <li>imageingFCS correlator now only save lag times, that are smaller than the segment length (there is no data for larger lags anyways ;-)</li>
-                        <li>parameter correlation tab now has the possibility to color the scatter plot symbols according to a parameter image, coordinates etc.</li>
-                        <li>post-processing binning now supports a mode for overlapping/interleaved binning (i.e. no reduction of image size)</li>
-                        <li>masks now work when using post-processing binning</li>
-                        <li></li>
-                        <li></li>
-                  </ul></li>
+            <li>improved speed, when changing from one RDR to another</li>
+            <li>imageingFCS correlator now only save lag times, that are smaller than the segment length (there is no data for larger lags anyways ;-)</li>
+            <li>parameter correlation tab now has the possibility to color the scatter plot symbols according to a parameter image, coordinates etc.</li>
+            <li>post-processing binning now supports a mode for overlapping/interleaved binning (i.e. no reduction of image size)</li>
+            <li>masks now work when using post-processing binning</li>
+            <li></li>
+            <li></li>
+          </ul></li>
 		  <li><b>table</b><ul>
 			<li>added "QuickStatistics" and "QuickHistogram" tools, which show the statistics and histograms of the current selection (column-wise)</li>
 			<li>added function to autoset column width ("Table" menu)</li>
@@ -221,8 +220,8 @@
 			<li>added JavaScript functions to set acquisition camera settings</li>
 			<li>added two filters for each of the two laser boxes</li>
 			<li>filters/objectives are sorted by name now!</li>
-                        <li>added two additional preview configs to the acquisition tab</li>
-                        <li>added "overview series" acquisition, which allows to acquire a set of overview images with different camera settings and light pathes.</li>
+            <li>added two additional preview configs to the acquisition tab</li>
+            <li>added "overview series" acquisition, which allows to acquire a set of overview images with different camera settings and light pathes.</li>
 			<li></li>
 			<li></li>
 		  </ul></li>	
@@ -231,9 +230,9 @@
 			<li>added button to start model selector + some code refactoring (using QFFitFunctionComboBox now)</li>
 			<li>added button "go to average run"</li>
 			<li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
-                        <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
-			<li></li>
-		  </ul></li>	
+            <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
+            <li>bugfix: weights combo-box is correctly initialized, when starting the editor</li>
+          </ul></li>
 		  <li><b>FCS</b><ul>
 			<li>fixed a possible freeze of QF3, if ACF-data is imported from CSV files and no countrate-trace is provided!</li>
 			<li>import functions for correlator.com .SIN files</li>
@@ -255,7 +254,8 @@
 			<li>improved dialog to set fit result from other RDR/file/...</li>
 			<li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
 			<li>"set fit result from RDR/file/..." now supports image transfroms to perform a limited set of image processing operations (bluring, ...)</li>
-		  </ul></li>	
+            <li>bugfix: weights combo-box is correctly initialized, when starting the editor</li>
+          </ul></li>
 		  <li><b>Online-Help editor</b><ul>
 			<li>added several buttons for advanced insert/editing functions</li>
 			<li>improved past image dialog (now allows scaling and cropping of the image</li>
@@ -263,20 +263,23 @@
             <li>improved selection of links (also shows files from current directory now)</li>
           </ul></li>
 	      <li><b>spectra viewer</b><ul>
-                        <li>added FRET Foerster radius calculator</li>
+            <li>added FRET Foerster radius calculator</li>
 			<li></li>
 		  </ul></li>	
 	      <li><b>FCS MaxEnt evaluation</b><ul>
 			<li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
-                        <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
-                        <li></li>
+            <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
+            <li></li>
 		  </ul></li>	
 		  <li><b>FCS MSD evaluation</b><ul>
 			<li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
-                        <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
-                        <li></li>
+            <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
+            <li></li>
 		  </ul></li>    
-		</ul></li>
+          <li><b>Diffusion coefficient calculator</b><ul>
+            <li>now also calculates the hydrodynamic radius of the particle from the diffusion coefficient at the experiment conditions.</li>
+          </ul></li>
+        </ul></li>
 		
 		
 		<li><a name="3152"><b>2014-02-11 (SVN: 3152)</b>

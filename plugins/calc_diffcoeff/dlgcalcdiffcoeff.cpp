@@ -33,6 +33,7 @@ DlgCalcDiffCoeff::DlgCalcDiffCoeff(QFEDiffusionCoefficientCalculator *plg, QWidg
     ui->plotter->getYAxis()->set_minTicks(5);
     ui->plotter->get_plotter()->set_userSettigsFilename(ProgramOptions::getInstance()->getIniFilename());
     ui->edtExperimentD->setRange(0,1e10);
+    ui->edtExperimentRHyd->setRange(0,1e10);
     ui->edtExperimentVisc->setRange(0,1e10);
     QList<int> s;
     s<<ui->splitter->width()/2<<ui->splitter->width()/2;
@@ -210,27 +211,35 @@ void DlgCalcDiffCoeff::updateD() {
     double T=ui->spinExperimentTemperature->value();
     if (ui->tabWidget->currentWidget()==ui->tabStdSample) {
         ui->labGivenDD20W->setText(tr("D<sub>20,W</sub> = %1 &mu;m<sup>2</sup>/s").arg(plugin->getDCoeff_from_D(0, ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 293.15)*1e12));
+        ui->labGivenDRH->setText(tr("R<sub>H</sub> = %1 nm").arg(plugin->getHydrodynRadius_from_DEtaT(ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15)*1e9));
         DD=plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->edtGivenD->value()/1e12, ui->edtGivenDVisc->value()/1000.0, ui->spinGivenDT->value()+273.15, 273.15+T, comps, ui->spinViscosityFactor->value())*1e12;
     } else if (ui->tabWidget->currentWidget()==ui->givenD) {
         double lvisc=plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+ui->spinGivenDInSolutionT->value(), comps)*ui->spinViscosityFactor->value();
         ui->labGivenDInSolutionVisc->setText(QString::number(lvisc*1000.0));
         DD=plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->spinGivenDInSolution->value()/1e12,
                                           lvisc, ui->spinGivenDInSolutionT->value()+273.15, 273.15+T, comps, ui->spinViscosityFactor->value())*1e12;
+        ui->labGivenDInSolutionD20W->setText(QString::number(plugin->getDCoeff_from_D(ui->cmbSolutionName->currentIndex(), ui->spinGivenDInSolution->value()/1e12,
+                                                                                      lvisc, ui->spinGivenDInSolutionT->value()+273.15, 293.15, comps, ui->spinViscosityFactor->value())*1e12));
+        ui->labGivenDInSolutionRH->setText(QString::number(plugin->getHydrodynRadius_from_DEtaT(ui->spinGivenDInSolution->value()/1e12, lvisc, ui->spinGivenDInSolutionT->value()+273.15)*1e9));
     } else if (ui->tabWidget->currentWidget()==ui->givenD20W) {
         DD=plugin->getDCoeff_from_D20W(ui->cmbSolutionName->currentIndex(), ui->spinGivenD20W->value()/1e12, 273.15+T, comps, ui->spinViscosityFactor->value())*1e12;
+        ui->labGivenD20WRH->setText(QString::number(plugin->getHydrodynRadius_from_DEtaT(ui->spinGivenD20W->value()/1e12, plugin->getSolutionViscosity(0, 293.15), 293.15)*1e9));
     } else if (ui->tabWidget->currentWidget()==ui->tabGeometry) {
         DD=plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, comps, ui->spinViscosityFactor->value())*1e12;
         double D20Wsphere=0;
         double volume=0;
         double D20W=plugin->getShapeDCoeff(0, ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+20.0, QList<QFEDiffusionCoefficientCalculator::Component>(), 1, &D20Wsphere, &volume)*1e12;
+        double etaW20=plugin->getSolutionViscosity(0, 293.15);
         D20Wsphere*=1e12;
         volume=volume*1e27;
         double dsphere=2.0*pow(volume/4.0*3.0/M_PI, 1.0/3.0);
-        ui->labShapeD->setText(tr("D<sub>20,W</sub> = %1 &mu;m<sup>2</sup>/s&nbsp;&nbsp;&nbsp;&nbsp;D<sub>20,W</sub>(sphere) = %2 &mu;m<sup>2</sup>/s&nbsp;&nbsp;&nbsp;&nbsp;V = %3 nm<sup>3</sup>&nbsp;&nbsp;&nbsp;&nbsp;d<sub>sphere</sub> = %4 nm").arg(D20W).arg(D20Wsphere).arg(volume).arg(dsphere));
+        double RH=plugin->getHydrodynRadius_from_DEtaT(D20W/1e12, etaW20, 293.15)*1e9;
+        ui->labShapeD->setText(tr("D<sub>20,W</sub> = %1 &mu;m<sup>2</sup>/s&nbsp;&nbsp;&nbsp;&nbsp;R<sub>H</sub> = %5 nm&nbsp;&nbsp;&nbsp;&nbsp;D<sub>20,W</sub>(sphere) = %2 &mu;m<sup>2</sup>/s&nbsp;&nbsp;&nbsp;&nbsp;V = %3 nm<sup>3</sup>&nbsp;&nbsp;&nbsp;&nbsp;d<sub>sphere</sub> = %4 nm").arg(D20W).arg(D20Wsphere).arg(volume).arg(dsphere).arg(RH));
     } else  {
         DD=0;
     }
     ui->edtExperimentD->setValue(DD);
+    ui->edtExperimentRHyd->setValue(plugin->getHydrodynRadius_from_D(DD/1e12,ui->cmbSolutionName->currentIndex(), 273.15+ui->spinExperimentTemperature->value(), comps, ui->spinViscosityFactor->value())*1e9);
     ui->edtExperimentVisc->setValue(plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+ui->spinExperimentTemperature->value(), comps)*ui->spinViscosityFactor->value()*1000.0);
     tab->setReadonly(true);
     redoPlot();
@@ -689,6 +698,12 @@ void DlgCalcDiffCoeff::on_btnCHelp5_clicked()
         dlgInfo->show();
         dlgInfo->raise();
     }
+}
+
+void DlgCalcDiffCoeff::on_btnEditGivenD_toggled(bool checked)
+{
+    ui->cmbGivenDName->setEditable(checked);
+
 }
 
 void DlgCalcDiffCoeff::on_cmbShapeType_currentIndexChanged(int index) {
