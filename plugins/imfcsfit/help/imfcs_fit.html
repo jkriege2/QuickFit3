@@ -6,27 +6,35 @@
   </head>
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$  
-	 <p>
-	 This plugin allows to perform fits for imaging FCS data. It shares most functionality with the <a href="$$plugin_info:help:fcs_fit$$">FCS Curve Fitting Plugin</a>. There is only one major difference between these two plugins: The FCS fit plugin stores the fit results for each run in a separate column/row/set of fit results, whereas this plugin creates one set for the average run and one set for all other runs. The fit results are then stored as vectors/matrices inside this set. This saves a considerable amount of memory in the project file and while QuickFit is running. Also it improves the speed of execution of the <a href="$$plugin_info:help:imaging_fcs$$">imFCS raw data record Plugin</a>. <br>
-	 This plugin allows to perform fits on several processor cores in parallel (multi-threaded). Set the maximum number of processors to use in the <a href="$$mainhelpdir$$qf3_settings.html">general settings dialog</a>.
-	 <ol>
-	   <li><a href="./ui.html">imFCS Curve Fit User Interface</a></li>
-	   <li><a href="./fit_statistics.html">Explanation of Fit Statistics</a></li>
-	   <li><a href="./calibration.html">Performing an imFCS calibration</a></li>
-	   <li><a href="./configuration.html">Configuration (global fit parameter presets ...)</a></li>
-	   <li><a href="./options.html">Configuration options in the mains ettings dialog</a></li>
-	   <li><a href="./programmers_help.html"><small>Hints for fit model programmers</small></a></li>
-	 </ol>
-	 </p>
-	 <p>
-	 This plugin uses any of the available <a href="$$mainhelpdir$$qf3_fitalg.html">Fit Algorithm Plugins</a> to execute the model fit:
-	 $$list:fitalg:$$ 
-	 </p>
-	 <p>
-	 Models have to be implemented as <a href="$$mainhelpdir$$qf3_fitfunc.html">Fit Function Plugins</a>. Models that may be used with this plugin are:
-	 $$list:fitfunc:fcs_$$
-	 $$list:fitfunc:fccs_$$
-	 $$list:fitfunc:dls_$$
-	 </p>
+     <p>
+     This plugin allows to perform fits for imaging FCS data. It shares most functionality with the <a href="$$plugin_info:help:fcs_fit$$">FCS Curve Fitting Plugin</a>. 
+
+Both plugins determine the best-fit parameters of a given theoretical FCS model function $$math:f(\tau;\vec{p})$$ from a measured correlation curve $$math:(\tau_i\hat{g}_i)_{i\in\mathbb{N}}$$. In order to perform this task, they solve a least-squares optimization problem:
+$$bmath:\vec{p}^\ast=\argmin_{\vec{p}}\ \sum_{i=1}^N\left(\frac{f(\tau_i;\vec{p})-\hat{g}_i}{\sigma_i}\right)^2\ \ \equiv\ \ \argmin_{\vec{p}}\ \sum_{i=1}^N\ \left[\hat{E}_i^\mathrm{(W)}\right]^2.$$
+Here $$math:\sigma_i$$ are weighting factors (see <a href="$$mainhelpdir$$/fcsfit_weighting.html">Fit Weighting</a>)
+           </p><p>
+The major difference to thze standard FCS fit plugin is only is: The FCS fit plugin stores the fit results for each run in a separate column/row/set of fit results, whereas this plugin creates one set for the average run and one set for all other runs. The fit results are then stored as vectors/matrices inside this set. This saves a considerable amount of memory in the project file and while QuickFit is running. Also it improves the speed of execution of the <a href="$$plugin_info:help:imaging_fcs$$">imFCS raw data record Plugin</a>. <br>
+     This plugin allows to perform fits on several processor cores in parallel (multi-threaded). Set the maximum number of processors to use in the <a href="$$mainhelpdir$$qf3_settings.html">general settings dialog</a>.
+     <ol>
+       <li><a href="./ui.html">imFCS Curve Fit User Interface</a></li>
+       <li><a href="./fit_statistics.html">Explanation of Fit Statistics</a></li>
+       <li><a href="$$mainhelpdir$$/fcsfit_weighting.html">Fit Weighting</a></li>
+       <li><a href="./calibration.html">Performing an imFCS calibration</a></li>
+       <li><a href="./configuration.html">Configuration (global fit parameter presets ...)</a></li>
+       <li><a href="./options.html">Configuration options in the mains ettings dialog</a></li>       
+       <li><a href="tutorial.html"><b>Tutorials</b></a></li>
+       <li><a href="./programmers_help.html"><small>Hints for fit model programmers</small></a></li>
+     </ol>
+     </p>
+     <p>
+     This plugin uses any of the available <a href="$$mainhelpdir$$qf3_fitalg.html">Fit Algorithm Plugins</a> to execute the model fit:
+     $$list:fitalg:$$ 
+     </p>
+     <p>
+     Models have to be implemented as <a href="$$mainhelpdir$$qf3_fitfunc.html">Fit Function Plugins</a>. Models that may be used with this plugin are:
+     $$list:fitfunc:fcs_$$
+     $$list:fitfunc:fccs_$$
+     $$list:fitfunc:dls_$$
+     </p>
   </body>
 </html>

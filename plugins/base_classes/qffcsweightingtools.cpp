@@ -112,15 +112,19 @@ QFFCSWeightingTools::DataWeight QFFCSWeightingTools::stringToDataWeight(QString 
 #define RUN_AVG(avg) \
     for (int i=0; i<N; i++) { \
         weights[i]=0; \
-        int jstart=0; \
-        int jend=avg; \
+        int jstart=-avg/2; \
+        int jend=avg/2; \
         while (i+jend>=N) { \
             jstart--; \
             jend--; \
         } \
+        while (i+jstart<0) { \
+            jstart++; \
+            jend++; \
+        } \
         if (i+jstart>=0 && i+jend<=N) { \
-            double s=0, s2=0; \
-            for (int j=jstart; j<jend; j++) { \
+            register double s=0, s2=0; \
+            for (register int j=jstart; j<jend; j++) { \
                 s=s+corrdat[i+j]; \
                 s2=s2+corrdat[i+j]*corrdat[i+j]; \
             } \
@@ -133,29 +137,40 @@ QFFCSWeightingTools::DataWeight QFFCSWeightingTools::stringToDataWeight(QString 
     for (int i=0; i<N; i++) { \
         QVector<double> x,y; \
         weights[i]=0; \
-        int jstart=0; \
-        int jend=avg; \
+        int jstart=-avg/2; \
+        int jend=avg/2; \
         while (i+jend>=N) { \
             jstart--; \
             jend--; \
         } \
+        while (i+jstart<0) { \
+            jstart++; \
+            jend++; \
+        } \
         if (i+jstart>=0 && i+jend<=N) { \
             double s=0, s2=0; \
-            const double lx=log(taudat[i]); \
             for (int j=jstart; j<jend; j++) { \
                 x<<log(taudat[i+j]); \
                 y<<corrdat[i+j]; \
             } \
             QVector<double> p(P+1,0.0); \
             if (statisticsPolyFit<double>(x.data(), y.data(), x.size(), P, p.data())) { \
-                qDebug()<<taudat[i]<<corrdat[i]<<lx<<statisticsPolyEval<double>(lx, p.data(), P)<<p<<x<<y; \
-                weights[i]=fabs(corrdat[i]-statisticsPolyEval<double>(lx, p.data(), P)); \
+                register double cn=0, s2=0; \
+                for (register int j=jstart; j<jend; j++) { \
+                    const double ee=corrdat[i+j]-statisticsPolyEval<double>(log(taudat[i]), p.data(), P); \
+                    cn=cn+1.0; \
+                    s2=s2+ee*ee; \
+                } \
+                weights[i]=sqrt(s2/cn); \
             } else { \
                 weights[i] = 0; \
             } \
         } \
     } \
 }
+
+//                const double lx=log(taudat[i]);
+//                weights[i]=fabs(corrdat[i]-statisticsPolyEval<double>(lx, p.data(), P));
 
 double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *record_in, int run_in, int data_start, int data_end) const
 {
@@ -271,7 +286,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *rec
         }
     }
     if (!weightsOK && weights) {
-        double ww=1.0/double(N);
+        double ww=1.0;
         /*double* crun=data->getCorrelationRun(run_in);
         if (crun) {
             ww=0;

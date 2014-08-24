@@ -117,11 +117,7 @@ void QFFCSByIndexAndModelEvaluationEditor::createWidgets() {
     lPS->setBuddy(cmbPlotStyle);
     QLabel* lES=new QLabel(tr("   &Errors: "), toolbar);
     lES->setFont(boldfont);
-    cmbErrorStyle=new QComboBox(toolbar);
-    cmbErrorStyle->addItem(QIcon(":/libqf3widgets/plot_enone.png"), tr("none"));
-    cmbErrorStyle->addItem(QIcon(":/libqf3widgets/plot_elines.png"), tr("lines"));
-    cmbErrorStyle->addItem(QIcon(":/libqf3widgets/plot_ebars.png"), tr("bars"));
-    cmbErrorStyle->addItem(QIcon(":/libqf3widgets/plot_elinesbars.png"), tr("bars + lines"));
+    cmbErrorStyle=new JKQTPerrorPlotstyleComboBox(toolbar);
     lES->setBuddy(cmbErrorStyle);
 
     QLabel* lRS=new QLabel(tr("   &Residuals: "), toolbar);

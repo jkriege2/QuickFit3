@@ -146,13 +146,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     lPS->setBuddy(cmbPlotStyle);
     QLabel* lES=new QLabel(tr("   &Errors: "), toolbar);
     lES->setFont(boldfont);
-    cmbErrorStyle=new QComboBox(toolbar);
-    cmbErrorStyle->addItem(QIcon(":/fcsfit/plot_enone.png"), tr("none"));
-    cmbErrorStyle->addItem(QIcon(":/fcsfit/plot_elines.png"), tr("lines"));
-    cmbErrorStyle->addItem(QIcon(":/fcsfit/plot_ebars.png"), tr("bars"));
-    cmbErrorStyle->addItem(QIcon(":/fcsfit/plot_elinesbars.png"), tr("bars + lines"));
-    cmbErrorStyle->addItem(QIcon(":/libqf3widgets/plot_epoly.png"), tr("polygons"));
-    cmbErrorStyle->addItem(QIcon(":/libqf3widgets/plot_epolybars.png"), tr("polygons + bars"));
+    cmbErrorStyle=new JKQTPerrorPlotstyleComboBox(toolbar);
+
     lES->setBuddy(cmbErrorStyle);
 
     QLabel* lRS=new QLabel(tr("   &Residuals: "), toolbar);

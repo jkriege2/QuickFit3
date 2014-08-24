@@ -1,0 +1,51 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>imaging FCS fit frequently asked questions</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+     
+     
+$$faq_start$$
+  <a name="FAQ_WEIGHTING"><b>What do the fit weighting optins mean?</b>
+$$faq_answer$$
+  See the help-page <a href="$$mainhelpdir$$/fcsfit_weighting.html">Fit Weighting</a> for detailed information on the weighting of fits. Basically these allow to use an error estimate for each measured point on the correlation curve, which determines how much the data point should influence the final result.
+$$faq_end$$
+     
+     
+$$faq_start$$
+ <a name="FAQ_FITSTAT"><b>What do the fit statistics mean, that this plugin calculates?</b>
+$$faq_answer$$
+ See <a href="./fit_statistics.html">Explanation of Fit Statistics</a> for a detailed explanation
+$$faq_end$$
+
+$$faq_start$$
+  <a name="FAQ_CALIBRATION"><b>How can I perform an imagingFCS focal volume calibration?</b>
+$$faq_answer$$
+  See <a href="./calibration.html">Performing an imFCS calibration</a> for a detailed description.
+$$faq_end$$
+
+$$faq_start$$
+  <a name="FAQ_FCSTUTORIAL"><b>How do I fit an imaging FCS measurement with QuickFit?</b>
+$$faq_answer$$
+  See <a href="$$plugin_info:helpdir:imaging_fcs$$/tutorial_solution.html">imFCS analysis of beads in solution</a> and <a href="$$plugin_info:helpdir:imaging_fcs$$/tutorial_cell.html">imFCS analysis in a cell</a> for detailed tutorials on these tasks.
+$$faq_end$$
+
+$$faq_start$$
+  <a name="FAQ_OVERLAY"><b>How can I create an overlay plot of several measured correlation cures?</b>
+$$faq_answer$$
+  See the <a href="tutorial_overlayplot.html">Tutorial on overlay plots</a> for a step-by-step description.
+$$faq_end$$
+
+$$faq_start$$
+  <a name="FAQ_FILTER"><b>How can I filter the list of raw data records, displayed in the plugin screen?</b>
+$$faq_answer$$
+  Above the list (rhs of the evaluation window), there are two fields, that allow to filter the displayed RDRs 
+<center><a name="faq_pic000"><img src="./pic/faq_pic000.png" border="1">
+</center>
+You can enter a simple filter expression there. then only those files will be displayed, which contain the given expression. As an example, if your project contains a full FCCS measurement with three RDRs per measurement (ACF0,ACF1 and FCCS), but you only want to fit ACF0-RDRs with this evaluation, simply enter ACF0 into the left field. the rhs filter-field allows to exclude all records, that do NOT contain the specified filter string. In addition you can use <a href="$$mainhelpdir$$qf3_qtregexp.html">regular expressions</a> for the filter strings.
+$$faq_end$$
+  </body>
+</html>

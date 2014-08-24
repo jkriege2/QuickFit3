@@ -432,7 +432,7 @@ void QFImFCSFitEvaluationEditor::replotData() {
     //qDebug()<<"   b "<<t.elapsed()<<" ms";
     t.start();
 
-    int errorStyle=cmbErrorStyle->currentIndex();
+    //int errorStyle=cmbErrorStyle->currentIndex();
     int plotStyle=cmbPlotStyle->currentIndex();
     //int residualStyle=cmbResidualStyle->currentIndex();
 
@@ -473,20 +473,14 @@ void QFImFCSFitEvaluationEditor::replotData() {
         if (wdata) {
             bool wok=false;
             double* weigm=wdata->allocWeights(&wok, record, eval->getCurrentIndex());
-            if (wok && weigm) {
+            if (wok && weigm && eval->getFitDataWeighting()!=QFFCSWeightingTools::EqualWeighting) {
                 errorName=wdata->dataWeightToName(eval->getFitDataWeighting(), m_runName);
                 c_std=ds->addCopiedColumn(weigm, data->getCorrelationN(), QString("cerr_")+wdata->dataWeightToString(eval->getFitDataWeighting()));
                 free(weigm);
             }
         }
-        JKQTPerrorPlotstyle styl=JKQTPnoError;
-        switch (errorStyle) {
-            case 1: styl=JKQTPerrorLines; break;
-            case 2: styl=JKQTPerrorBars; break;
-            case 3: styl=JKQTPerrorBarsLines; break;
-            case 4: styl=JKQTPerrorPolygons; break;
-            case 5: styl=JKQTPerrorBarsPolygons; break;
-        }
+        JKQTPerrorPlotstyle styl=cmbErrorStyle->getErrorStyle();
+
         //qDebug()<<"   c "<<t.elapsed()<<" ms";
         t.start();
 

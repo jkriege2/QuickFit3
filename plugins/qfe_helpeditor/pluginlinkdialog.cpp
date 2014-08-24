@@ -42,20 +42,22 @@ PluginLinkDialog::~PluginLinkDialog()
 
 QString PluginLinkDialog::insertText() const
 {
-    QString id=ui->cmbType->itemData(ui->cmbType->currentIndex()).toString();
+    QString id=ui->cmbPlugin->itemData(ui->cmbPlugin->currentIndex()).toString();
     switch (ui->cmbType->currentIndex()) {
         case 0:
-            return QString("<a href=\"$$plugin_info:help:%1$$\">%1 Help</a>").arg(id);
+            return QString("<a href=\"$$plugin_info:help:")+id+QString("$$\">")+id+QString(" Help</a>");
         case 1:
-            return QString("<a href=\"$$plugin_info:tutorial:%1$$\">%1 Tutorial</a>").arg(id);
+            return QString("<a href=\"$$plugin_info:tutorial:")+id+QString("$$\">")+id+QString(" Tutorial</a>");
         case 2:
-            return QString("$$plugin_info:helpdir:%1$$").arg(id);
+            return QString("$$plugin_info:helpdir:")+id+QString("$$");
         case 3:
-            return QString("$$plugin_info:assetsdir:%1$$").arg(id);
+            return QString("$$plugin_info:assetsdir:")+id+QString("$$");
         case 4:
-            return QString("$$plugin_info:examplesdir:%1$$").arg(id);
+            return QString("$$plugin_info:examplesdir:")+id+QString("$$");
         case 5:
-            return QString("$$plugin_info:configdir:%1$$").arg(id);
+            return QString("$$plugin_info:configdir:")+id+QString("$$");
+        case 6:
+            return QString("$$plugin_info:faq:")+id+QString("$$");
         default:
             return id;
     }

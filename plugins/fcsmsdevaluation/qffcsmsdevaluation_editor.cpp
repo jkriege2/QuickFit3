@@ -682,7 +682,7 @@ void QFFCSMSDEvaluationEditor::plotDistMouseMoved(double x, double y)
                     double pre=6;
                     JKQTPcolumn colD=pltDistResults->getDatastore()->getColumn(colDI);
                     JKQTPcolumn colA=pltDistResults->getDatastore()->getColumn(colAI);
-                    if (colD.isValid()&&colA.isValid()&&idx<=colD.getRows() && idx<=colA.getRows()) {
+                    if (colD.isValid()&&colA.isValid()&&idx<=(long long)colD.getRows() && idx<=(long long)colA.getRows()) {
                         double D=colD.getValue(idx)*pre;
                         double alpha=colA.getValue(idx);
                         double r1=D*pow(tauS[idx], alpha);
@@ -838,7 +838,7 @@ void QFFCSMSDEvaluationEditor::displayData() {
         //qDebug()<<"   b "<<t.elapsed()<<" ms";
         t.start();
 
-        int errorStyle=cmbErrorStyle->currentIndex();
+        //int errorStyle=cmbErrorStyle->currentIndex();
         int plotStyle=cmbPlotStyle->currentIndex();
         //int residualStyle=cmbResidualStyle->currentIndex();
 
@@ -879,18 +879,14 @@ void QFFCSMSDEvaluationEditor::displayData() {
             if (wdata) {
                 bool wok=false;
                 double* weigm=wdata->allocWeights(&wok, record, eval->getCurrentIndex());
-                if (wok && weigm) {
+                if (wok && weigm && eval->getFitDataWeighting()!=QFFCSWeightingTools::EqualWeighting) {
                     errorName=wdata->dataWeightToName(eval->getFitDataWeighting(), tr("run"));
                     c_std=ds->addCopiedColumn(weigm, data->getCorrelationN(), QString("cerr_")+wdata->dataWeightToString(eval->getFitDataWeighting()));
                     free(weigm);
                 }
             }
-            JKQTPerrorPlotstyle styl=JKQTPnoError;
-            switch (errorStyle) {
-                case 1: styl=JKQTPerrorLines; break;
-                case 2: styl=JKQTPerrorBars; break;
-                case 3: styl=JKQTPerrorBarsLines; break;
-            }
+            JKQTPerrorPlotstyle styl=cmbErrorStyle->getErrorStyle();
+
             //qDebug()<<"   c "<<t.elapsed()<<" ms";
             t.start();
 

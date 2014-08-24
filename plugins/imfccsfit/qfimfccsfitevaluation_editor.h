@@ -147,7 +147,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
     protected slots:
 
-        /** ßbrief ensures that the parameter table model is displayed properly */
+        /** \brief ensures that the parameter table model is displayed properly */
         void ensureCorrectParamaterModelDisplay();
 
         void fileChanged(int num, QFRawDataRecord* file);

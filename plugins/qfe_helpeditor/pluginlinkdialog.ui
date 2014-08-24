@@ -67,6 +67,11 @@
        </item>
        <item>
         <property name="text">
+         <string>FAQ link</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
          <string>ID only</string>
         </property>
        </item>

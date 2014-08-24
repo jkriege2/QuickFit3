@@ -130,7 +130,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         /** \brief combobox to select a plotting style */
         QComboBox* cmbPlotStyle;
         /** \brief combobox to select a plotting style for the data errors */
-        QComboBox* cmbErrorStyle;
+        JKQTPerrorPlotstyleComboBox* cmbErrorStyle;
         /** \brief combobox to select a plotting style for the residulas */
         QComboBox* cmbResidualStyle;
         /** \brief combobox to select a type for the residulas */

@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>FCS Fit: Weighting</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+     <h2>Introduction</h2>
+     <p>FCS Fit plugins fit one (or more) model functions $$math:f(\tau;\vec{p})$$ to a measured correlation curve $$math:(\tau_i\hat{g}_i)_{i\in\mathbb{N}}$$. In order to perform this task, they solve a least-squares optimization problem:
+$$bmath:\vec{p}^\ast=\argmin_{\vec{p}}\ \sum_{i=1}^N\left(\frac{f(\tau_i;\vec{p})-\hat{g}_i}{\sigma_i}\right)^2\ \ \equiv\ \ \argmin_{\vec{p}}\ \sum_{i=1}^N\ \left[\hat{E}_i^\mathrm{(W)}\right]^2.$$
+Here $$math:\sigma_i$$ are weighting factors, which can be used to give different data points on the curve different weights, i.e. influence on the final result. They can also be interpreted as the measurement error of each datapoint on the curve. QuickFit allows to use different possibilities for these values</p>
+
+
+<h2>Implemented Weight models</h2>
+
+
+<h3>Equal Weights</h3>
+<p>In this setting, $$bmath:\sigma_i=1$$ and all data points are weighted equally. In this settings, the error is usually NOT displayed. A typical plot looks like this:
+<center><a name="fcsfit_weighting_pic001"><img src="./pic/fcsfit_weighting_pic001.png" border="1">
+</center>
+Note the structure of the residuals in this plot, as compared to the next plots/options. As the errors are all equal, the weighted residuals $$math:\hat{E}_i^\mathrm{(W)}=\left(f(\tau_i;\vec{p})-\hat{g}_i\right)/\sigma_i$$ equal the non-weighted residuals $$math:\hat{E}_i=\left(f(\tau_i;\vec{p})-\hat{g}_i\right)/\sigma_i$$ 
+</p>
+
+
+
+<h3>Standard Deviation</h3>
+<p>In this setting, the $$math:\sigma_i$$ are estimated as the standard deviation over several measurement runs for each time lag $$math:\tau_i$$. Such errors typically look like this for a measurement of Alexa-488:
+
+<center><a name="fcsfit_weighting_pic000"><img src="./pic/fcsfit_weighting_pic000.png" border="1">
+</center>
+For imaging FCS data, this error estimate is the average over all pixels.
+</p>
+
+
+<h3>per run/pixel error</h3>
+<p>This setting can be used, if the input data already conatins error estimates for each data point. This is e.g. the case for <a href="$$plugin_info:help:imaging_fcs$$">imagingFCS</a> data, where the internal correlator calculates an average (and standard deviation) over several segments of the input data. For the average run, this setting equals the setting <b>standard deviation</b>.</p>
+
+
+
+<h3>running SD, <i>N</i></h3>
+<p>For this setting, the $$math:\sigma_i$$ are calculated as a "running standard deviation (SD)" over <i>N</i> adjacent estimates $$math:(\tau_j\hat{g}_j)_{j=-N/2...N/2}$$:
+$$bmath:\sigma_i=\sqrt{\left\langle \left[ \hat{g}_j-\left\langle \hat{g}_j\right\rangle\right]^2\right\rangle}\ =\ \sqrt{\frac{1}{N-1}\cdot\left[\sum_{j=i-N/2}^{i+N/2}\hat{g}_j^2-\frac{1}{N}\cdot\left[\sum_{j=i-N/2}^{i+N/2}\hat{g}_j\right]^2\right]}$$
+This expression calculates the average deviation of the data from a locally constant estimate of the correlation function.
+The following plot shows an example for $$math:N=7$$ and the same data as in the examples above:
+<center><a name="fcsfit_weighting_pic003"><img src="./pic/fcsfit_weighting_pic003.png" border="1">
+</center>
+</p>
+
+
+
+
+<h3>deviation from poly(<i>N</i>)</h3>
+<p>This is a more sofisticated version of the <b>running SD</b> setting. It first fits a polynomial $$math:p(\tau_i)$$ of degree <i>N</i> to a local environment of $$math:N+5$$ data points and then calculates the standard deviation from this estimate:
+$$bmath:\sigma_i=\sqrt{\left\langle \left[ \hat{g}_j-p(\tau_j)\right]^2\right\rangle}$$
+The following plot shows an example for $$math:N=3$$ and the same data as in the examples above:
+
+<center><a name="fcsfit_weighting_pic002"><img src="./pic/fcsfit_weighting_pic002.png" border="1">
+</center>
+
+</p>
+
+
+     
+	 
+  </body>
+</html>
+

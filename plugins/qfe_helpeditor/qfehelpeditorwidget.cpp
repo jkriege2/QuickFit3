@@ -345,7 +345,37 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     menu=new QMenu(tr("insert other markups"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
     addInsertAction(menu, "$$tt:Text$$");
-    addInsertAction(menu, "$$code:Text$$");
+
+
+    menu=new QMenu(tr("LaTeX"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "\\left(%1°\right)");
+    addInsertAction(menu, "\\left[%1°\\right]");
+    addInsertAction(menu, "\\left\\{%1°\\right\\}");
+    addInsertAction(menu, "\\left\\langle%1°\\right\\rangle");
+    menu->addSeparator();
+    addInsertAction(menu, "\\sqrt{%1°}");
+    menu->addSeparator();
+    addInsertAction(menu, "\\sum_{°}^{}%1");
+    addInsertAction(menu, "\\prod_{°}^{}%1");
+    addInsertAction(menu, "\\int_{°}^{}%1\\;\\mathrm{d}x");
+    addInsertAction(menu, "\\iint_{°}^{}%1\\;\\mathrm{d}^2x");
+    addInsertAction(menu, "\\iiint_{°}^{}%1\\;\\mathrm{d}^3x");
+    addInsertAction(menu, "\\oint_{°}^{}%1\\;\\mathrm{d}x");
+    addInsertAction(menu, "\\lim_{%1°}");
+    addInsertAction(menu, "\\argmin_{%1°}");
+    addInsertAction(menu, "\\argmax_{%1°}");
+    menu->addSeparator();
+    addInsertAction(menu, "\\vec{%1°}");
+    addInsertAction(menu, "\\hat{%1°}");
+    addInsertAction(menu, "\\tilde{%1°}");
+    addInsertAction(menu, "\\mathbf{%1°}");
+    addInsertAction(menu, "\\mathrm{%1°}");
+    addInsertAction(menu, "\\mathit{%1°}");
+    addInsertAction(menu, "\\mathsf{%1°}");
+    addInsertAction(menu, "\\mathbb{%1°}");
+    addInsertAction(menu, "\\mathscript{%1°}");
+    addInsertAction(menu, "\\underline{%1°}");
     //addInsertAction(menu, "$$$$");
 
 }
@@ -817,7 +847,7 @@ void QFEHelpEditorWidget::on_btnInsertPluginLink_clicked()
 {
     PluginLinkDialog* dlg=new PluginLinkDialog(this);
     if (dlg->exec()) {
-        insertAroundOld(dlg->insertText());
+        insertAroundOld(dlg->insertText()+"%1°");
     }
 }
 
@@ -942,7 +972,8 @@ void QFEHelpEditorWidget::insertActionClicked()
     if (act) {
         QString txt=insertmap.value(act, "");
         if (!txt.isEmpty()) {
-            ui->edtScript->getEditor()->insertPlainText(txt);
+            //ui->edtScript->getEditor()->insertPlainText(txt);
+            insertAroundOld(txt);
         }
     }
 }
@@ -957,7 +988,8 @@ void QFEHelpEditorWidget::insertIcon()
 
 void QFEHelpEditorWidget::insertAroundOld(const QString &newText)
 {
-    QString txt=newText.arg(ui->edtScript->getEditor()->getSelection());
+    QString txt=ui->edtScript->getEditor()->getSelection()+newText;
+    if (newText.contains("%1")) txt=newText.arg(ui->edtScript->getEditor()->getSelection());
     if (!txt.isEmpty()) {
         QTextCursor cur=ui->edtScript->getEditor()->textCursor();
         cur.select(QTextCursor::LineUnderCursor);

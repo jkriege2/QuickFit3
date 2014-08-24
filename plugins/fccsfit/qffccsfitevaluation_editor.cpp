@@ -675,7 +675,7 @@ void QFFCCSFitEvaluationEditor::displayData() {
             double* tau=fcs->getCorrelationT();
             bool wOK=false;
             double* sigma=eval->allocWeights(&wOK, rec, eval->getCurrentIndex(), ui->datacut->get_userMin(), ui->datacut->get_userMax());//fcs->getCorrelationRunError(eval->getCurrentIndex());
-            if (!wOK && sigma) {
+            if ((!wOK  || eval->getFitDataWeighting()==QFFCSWeightingTools::EqualWeighting) && sigma) {
                 free(sigma);
                 sigma=NULL;
             }

@@ -6,9 +6,14 @@
   </head>
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$  
-	 <p>
+	 <p>The FCS Fit plugin determines the best-fit parameters of a given theoretical FCS model function $$math:f(\tau;\vec{p})$$ from a measured correlation curve $$math:(\tau_i\hat{g}_i)_{i\in\mathbb{N}}$$. In order to perform this task, they solve a least-squares optimization problem:
+$$bmath:\vec{p}^\ast=\argmin_{\vec{p}}\ \sum_{i=1}^N\left(\frac{f(\tau_i;\vec{p})-\hat{g}_i}{\sigma_i}\right)^2\ \ \equiv\ \ \argmin_{\vec{p}}\ \sum_{i=1}^N\ \left[\hat{E}_i^\mathrm{(W)}\right]^2.$$
+Here $$math:\sigma_i$$ are weighting factors (see <a href="$$mainhelpdir$$/fcsfit_weighting.html">Fit Weighting</a>)
+           </p><p>
+           Further help can be found on one of the following pages:
 	 <ol>
 	   <li><a href="./ui.html">FCS Curve Fit User Interface</a></li>
+	   <li><a href="$$mainhelpdir$$/fcsfit_weighting.html">Fit Weighting</a></li>
 	   <li><a href="./fit_statistics.html">Explanation of Fit Statistics</a></li>
 	   <li><a href="./estimate_focus.html">Estime focus parameter <i>w</i><sub>xy</sub> from fit results</a></li>
 	   <li><a href="./configuration.html">Configuration (global fit parameter presets ...)</a></li>
