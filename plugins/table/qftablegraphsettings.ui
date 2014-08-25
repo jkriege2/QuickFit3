@@ -2994,6 +2994,16 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>JKQTPerrorPlotstyleComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QEnhancedTableView</class>
+   <extends>QTableView</extends>
+   <header>qenhancedtableview.h</header>
+  </customwidget>
+  <customwidget>
    <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
    <header>qfdoubleedit.h</header>
@@ -3022,11 +3032,6 @@
    <header>jkqtptools.h</header>
   </customwidget>
   <customwidget>
-   <class>JKQTPerrorPlotstyleComboBox</class>
-   <extends>QComboBox</extends>
-   <header>jkqtptools.h</header>
-  </customwidget>
-  <customwidget>
    <class>JKQTPSymbolComboBox</class>
    <extends>QComboBox</extends>
    <header>jkqtptools.h</header>
@@ -3042,24 +3047,130 @@
    <header>fillstylecombobox.h</header>
   </customwidget>
   <customwidget>
-   <class>QEnhancedTableView</class>
-   <extends>QTableView</extends>
-   <header>qenhancedtableview.h</header>
-  </customwidget>
-  <customwidget>
    <class>QFEnhancedComboBox</class>
    <extends>QComboBox</extends>
    <header>qfenhancedcombobox.h</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>cmbGraphType</tabstop>
+  <tabstop>edtGraphTitle</tabstop>
+  <tabstop>chkShowTitle</tabstop>
+  <tabstop>cmbFunctionType</tabstop>
+  <tabstop>edtFunction</tabstop>
+  <tabstop>btnFunctionHelp</tabstop>
+  <tabstop>cmbQFFitFunction</tabstop>
+  <tabstop>cmbLinesXData</tabstop>
+  <tabstop>btnClearLinesXData</tabstop>
+  <tabstop>btnAutoX</tabstop>
+  <tabstop>cmbLinesXError</tabstop>
+  <tabstop>btnClearLinesXError</tabstop>
+  <tabstop>chkXErrSym</tabstop>
+  <tabstop>cmbLinesXError2</tabstop>
+  <tabstop>btnClearLinesXError2</tabstop>
+  <tabstop>cmbLinesYData</tabstop>
+  <tabstop>btnClearLinesYData</tabstop>
+  <tabstop>btnAutoY</tabstop>
+  <tabstop>cmbLinesYError</tabstop>
+  <tabstop>btnClearLinesYError</tabstop>
+  <tabstop>chkYErrSym</tabstop>
+  <tabstop>cmbLinesYError2</tabstop>
+  <tabstop>btnClearLinesYError2</tabstop>
+  <tabstop>cmbLinesMean</tabstop>
+  <tabstop>btnClearLinesMean</tabstop>
+  <tabstop>cmbLinesQ75</tabstop>
+  <tabstop>btnClearLinesQ75</tabstop>
+  <tabstop>cmbLinesMax</tabstop>
+  <tabstop>btnClearLinesMax</tabstop>
+  <tabstop>tabFunctionParameters</tabstop>
+  <tabstop>chkSTrided</tabstop>
+  <tabstop>spinStrideStart</tabstop>
+  <tabstop>spinStride</tabstop>
+  <tabstop>chkSelectData</tabstop>
+  <tabstop>cmbSelectDataColumn</tabstop>
+  <tabstop>cmbSelectDataCompare</tabstop>
+  <tabstop>edtSelectDataValue</tabstop>
+  <tabstop>edtSelectDataValue2</tabstop>
+  <tabstop>edtRangeStart</tabstop>
+  <tabstop>edtRangeEnd</tabstop>
+  <tabstop>edtRangeCenter</tabstop>
+  <tabstop>cmbLineColor</tabstop>
+  <tabstop>sliderPlotTransparent</tabstop>
+  <tabstop>spinBox_8</tabstop>
+  <tabstop>chkDrawLine</tabstop>
+  <tabstop>spinLineWidth</tabstop>
+  <tabstop>cmbLineStyle</tabstop>
+  <tabstop>cmbFillColor</tabstop>
+  <tabstop>chkFillColAuto</tabstop>
+  <tabstop>sliderFillTransparent</tabstop>
+  <tabstop>spinBox_7</tabstop>
+  <tabstop>cmbFillStyle</tabstop>
+  <tabstop>cmbSymbol</tabstop>
+  <tabstop>spinSymbolSize</tabstop>
+  <tabstop>edtWidth</tabstop>
+  <tabstop>edtShift</tabstop>
+  <tabstop>btnShiftAuto</tabstop>
+  <tabstop>cmbWhiskerStyle</tabstop>
+  <tabstop>edtOffset</tabstop>
+  <tabstop>cmbErrorStyle</tabstop>
+  <tabstop>cmbErrorColor</tabstop>
+  <tabstop>chkErrorColAuto</tabstop>
+  <tabstop>sliderErrorTransparent</tabstop>
+  <tabstop>spinBox_4</tabstop>
+  <tabstop>spinErrorLineWidth</tabstop>
+  <tabstop>spinErrorBarWidth</tabstop>
+  <tabstop>cmbErrorLineStyle</tabstop>
+  <tabstop>spinImageWidth</tabstop>
+  <tabstop>edtColorbarLabel</tabstop>
+  <tabstop>edtColorbarLabelG</tabstop>
+  <tabstop>edtColorbarLabelB</tabstop>
+  <tabstop>cmbColormap</tabstop>
+  <tabstop>cmbModifierMode</tabstop>
+  <tabstop>edtColorbarLabelMod</tabstop>
+  <tabstop>cmbImageTrueColor</tabstop>
+  <tabstop>sliderImageTrueColor</tabstop>
+  <tabstop>spinBox_10</tabstop>
+  <tabstop>cmbImageFalseColor</tabstop>
+  <tabstop>sliderImageFalseColor</tabstop>
+  <tabstop>spinBox_9</tabstop>
+  <tabstop>edtImageWidth</tabstop>
+  <tabstop>edtImageHeight</tabstop>
+  <tabstop>edtImageX</tabstop>
+  <tabstop>edtImageY</tabstop>
+  <tabstop>chkImageAutorange</tabstop>
+  <tabstop>edtImageMin</tabstop>
+  <tabstop>edtImageMax</tabstop>
+  <tabstop>spinColorbarWidth</tabstop>
+  <tabstop>chkImageColorbarRight</tabstop>
+  <tabstop>chkImageColorbarTop</tabstop>
+  <tabstop>spinColorbarHeight</tabstop>
+  <tabstop>spinColorbarFontsize</tabstop>
+  <tabstop>spinColorbarTicks</tabstop>
+  <tabstop>spinColorbarModTicks</tabstop>
+  <tabstop>spinColorbarTickLength</tabstop>
+  <tabstop>cmbColorbarLabelType</tabstop>
+  <tabstop>spinColorbarLabelDigits</tabstop>
+  <tabstop>btnAutoImageSizes</tabstop>
+  <tabstop>chkRangeFillRange</tabstop>
+  <tabstop>chkRangeInverted</tabstop>
+  <tabstop>chkRangeDrawCenter</tabstop>
+  <tabstop>cmbRangeCenterColor</tabstop>
+  <tabstop>chkCenterColAuto</tabstop>
+  <tabstop>sliderRangeCenterTransparency</tabstop>
+  <tabstop>spinBox_5</tabstop>
+  <tabstop>cmbRangeCenterStyle</tabstop>
+  <tabstop>spinRangeCenterWidth</tabstop>
+  <tabstop>btnRefit</tabstop>
+  <tabstop>btnFit</tabstop>
+ </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
@@ -3070,12 +3181,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>567</x>
-     <y>646</y>
+     <x>549</x>
+     <y>643</y>
     </hint>
     <hint type="destinationlabel">
      <x>595</x>
-     <y>647</y>
+     <y>644</y>
     </hint>
    </hints>
   </connection>
@@ -3086,12 +3197,12 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>453</x>
-     <y>692</y>
+     <x>435</x>
+     <y>689</y>
     </hint>
     <hint type="destinationlabel">
      <x>481</x>
-     <y>693</y>
+     <y>690</y>
     </hint>
    </hints>
   </connection>
@@ -3102,7 +3213,7 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>566</x>
+     <x>548</x>
      <y>787</y>
     </hint>
     <hint type="destinationlabel">
@@ -3119,11 +3230,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>74</x>
-     <y>549</y>
+     <y>546</y>
     </hint>
     <hint type="destinationlabel">
      <x>595</x>
-     <y>552</y>
+     <y>549</y>
     </hint>
    </hints>
   </connection>
@@ -3183,11 +3294,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>595</x>
-     <y>647</y>
+     <y>644</y>
     </hint>
     <hint type="destinationlabel">
-     <x>567</x>
-     <y>646</y>
+     <x>549</x>
+     <y>643</y>
     </hint>
    </hints>
   </connection>
@@ -3199,11 +3310,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>481</x>
-     <y>693</y>
+     <y>690</y>
     </hint>
     <hint type="destinationlabel">
-     <x>453</x>
-     <y>692</y>
+     <x>435</x>
+     <y>689</y>
     </hint>
    </hints>
   </connection>
@@ -3218,7 +3329,7 @@
      <y>788</y>
     </hint>
     <hint type="destinationlabel">
-     <x>566</x>
+     <x>548</x>
      <y>787</y>
     </hint>
    </hints>
@@ -3230,7 +3341,7 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>567</x>
+     <x>549</x>
      <y>931</y>
     </hint>
     <hint type="destinationlabel">
@@ -3246,7 +3357,7 @@
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>567</x>
+     <x>549</x>
      <y>954</y>
     </hint>
     <hint type="destinationlabel">
@@ -3266,7 +3377,7 @@
      <y>932</y>
     </hint>
     <hint type="destinationlabel">
-     <x>567</x>
+     <x>549</x>
      <y>931</y>
     </hint>
    </hints>
@@ -3282,7 +3393,7 @@
      <y>955</y>
     </hint>
     <hint type="destinationlabel">
-     <x>567</x>
+     <x>549</x>
      <y>954</y>
     </hint>
    </hints>
@@ -3294,12 +3405,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>303</x>
-     <y>690</y>
+     <x>294</x>
+     <y>687</y>
     </hint>
     <hint type="destinationlabel">
-     <x>259</x>
-     <y>693</y>
+     <x>250</x>
+     <y>690</y>
     </hint>
    </hints>
   </connection>
@@ -3310,11 +3421,11 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>476</x>
+     <x>459</x>
      <y>1201</y>
     </hint>
     <hint type="destinationlabel">
-     <x>432</x>
+     <x>415</x>
      <y>1204</y>
     </hint>
    </hints>
@@ -3326,11 +3437,11 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>385</x>
+     <x>373</x>
      <y>785</y>
     </hint>
     <hint type="destinationlabel">
-     <x>341</x>
+     <x>329</x>
      <y>788</y>
     </hint>
    </hints>
@@ -3358,12 +3469,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>74</x>
-     <y>572</y>
+     <x>83</x>
+     <y>569</y>
     </hint>
     <hint type="destinationlabel">
-     <x>467</x>
-     <y>575</y>
+     <x>583</x>
+     <y>572</y>
     </hint>
    </hints>
   </connection>
@@ -3374,8 +3485,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>161</x>
-     <y>207</y>
+     <x>227</x>
+     <y>224</y>
     </hint>
     <hint type="destinationlabel">
      <x>272</x>

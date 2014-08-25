@@ -316,7 +316,7 @@ void QFRDRTablePlotWidget::graphDataChanged() {
 
             ui->widGraphSettings->writeGraphData(graph);
             ui->listGraphs->item(r)->setText(graph.title);
-            ui->listGraphs->item(r)->setIcon(ui->widGraphSettings->getGraphIcon(graph.type));
+            ui->listGraphs->item(r)->setIcon(QFRDRTable::GraphType2Icon(graph.type));
 
             ui->widSystemSettings->graphDataChanged(r);
 

@@ -218,7 +218,10 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     QMapIterator<QString, QFToolTipsData> it(tooltips);
     while (it.hasNext()) {
         it.next();
-        if (it.value().tooltip.startsWith("%")) tooltips[it.key()]=tooltips[it.value().tooltip.mid(1)];
+        if (it.value().tooltip.startsWith("%")) {
+            //qDebug()<<it.key()<<": "<<it.value().tooltip<<"->"<<tooltips[it.value().tooltip.mid(1)].tooltip<<" ["<<it.value().tooltip.mid(1)<<"]";
+            tooltips[it.key()]=tooltips[it.value().tooltip.mid(1)];
+        }
     }
     //qDebug()<<tooltips;
     helpWindow->setTooltips(tooltips);
@@ -3334,7 +3337,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 int level=rxHeader.cap(1).toInt();
                 QString text=rxHeader.cap(3);
                 QString hres=rxHeader.cap(2);
-                qDebug()<<text<<hres;
+                //qDebug()<<text<<hres;
 
                 if (!hres.toLower().contains("id=\"title\"") && !text.contains("<!-- title -->")) {
                     ContentsEntry h;
@@ -3394,7 +3397,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 int level=rxHeader.cap(1).toInt();
                 QString text=rxHeader.cap(3);
                 QString hres=rxHeader.cap(2);
-                qDebug()<<text<<hres;
+                //qDebug()<<text<<hres;
 
                 if (!hres.toLower().contains("id=\"title\"") && !text.contains("<!-- title -->")) {
                     QString prefix="";
@@ -3530,16 +3533,15 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             // insert tooltips: search all occurences of the tooltip keywords that are not inside a tag (i.e. surrounded by a closing tag on
             // the left and an opening tag on the right) and where the tag is not something special (like headers or links).
             QMapIterator<QString, QFToolTipsData> itTT(tooltips);
-            while (itTT.hasNext()) {
-                itTT.next();
+            itTT.toBack();
+            while (itTT.hasPrevious()) {
+                itTT.previous();
                 QRegExp rxTT(QString("\\<\\s*(\\w\\w*)[^\\>]*\\>[^\\<\\>]*(%1)[^\\<\\>]*\\<").arg(itTT.key()));
                 rxTT.setMinimal(true);
                 pos = 0;
                 //qDebug()<<rxTT;
                 while ((pos = rxTT.indexIn(result, pos)) != -1) {
                     QString rep=QString("<a href=\"tooltip:%1\">%2</a>").arg(itTT.key()).arg(rxTT.cap(2));
-                    //qDebug()<<pos<<": "<<rxTT.cap(1)<<" ("<<rxTT.pos(1)<<")";
-                    //qDebug()<<pos<<": "<<rxTT.cap(2)<<" ("<<rxTT.pos(2)<<")  <==  "<<rep;
                     QString tag=rxTT.cap(1).toLower();
                     if (tag!="h1" && tag!="h2" && tag!="h3" && tag!="h4" && tag!="h5" && tag!="title" && tag!="a") {
                         result=result.replace(rxTT.pos(2), rxTT.cap(2).size(), rep);
