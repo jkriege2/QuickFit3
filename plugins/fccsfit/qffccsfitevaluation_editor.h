@@ -53,6 +53,22 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief executed when the sliders values change */
         void slidersChanged(int userMin, int userMax, int min, int max);
 
+
+        /** \brief this signal is emited when the user clicks the "copy to all" context menu of the min widget item. */
+        void slidersCopyUserMinToAll(int userMin);
+
+        /** \brief this signal is emited when the user clicks the "copy to all" context menu of the max widget item. */
+        void slidersCopyUserMaxToAll(int userMax);
+
+        /** \brief this signal is emited when the user clicks the "copy to all runs" context menu of the max widget item. */
+        void slidersCopyUserMinMaxToAll(int userMin, int userMax);
+
+        void setUserMinMaxInternal(QFFCCSFitEvaluationItem* data, QFRawDataRecord* rdr, int userMin, int userMax);
+        void setUserMinInternal(QFFCCSFitEvaluationItem* data, QFRawDataRecord* rdr, int userMin);
+        void setUserMaxInternal(QFFCCSFitEvaluationItem* data, QFRawDataRecord* rdr, int userMax);
+
+
+
         void zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old);
@@ -80,6 +96,8 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void configureForASPFCCS();
         void configureFor2CSPIMFCCS();
         void onConfigureGlobalItemClicked();
+        void configureFitFromGlobal(const QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig& config);
+        QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig getCurrentGlobalFitConfig() const;
 
         void filesSetActivated(const QModelIndex& idx);
         void on_chkSaveStrings_toggled(bool checked);
@@ -87,6 +105,9 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void setParameterVisibility();
         void on_btnAddFile_clicked();
         void on_btnRemoveFile_clicked();
+
+        void loadGlobalFitConfig();
+        void saveGlobalFitConfig();
     protected:
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFFCCSFitEvaluationEditor *ui;
@@ -109,6 +130,8 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         QAction* actPrintReport;
         QAction* actSaveReport;
         QAction* actGuess;
+        QAction* actLoadGLobalFitConfig;
+        QAction* actSaveGLobalFitConfig;
 
 
         QAction* actResetCurrent;

@@ -300,7 +300,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *rec
         for (int i=0; i<N; i++) weights[i]=ww;
         if (weighting==QFFCSWeightingTools::EqualWeighting) weightsOK=true;
     }
-    qDebug()<<"allocWeights weightsOK="<<weightsOK<<weights<<weighting;
+    //qDebug()<<"allocWeights weightsOK="<<weightsOK<<weights<<weighting;
 
     if (weightsOKK) *weightsOKK=weightsOK;
     return weights;

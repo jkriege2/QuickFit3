@@ -177,7 +177,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end_notitle"), QString("</td></tr></table></td></tr></table>")));// </div>")));
 
 
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end"), tr("$$qf_commondoc_header.end_notitle$$ <font size=\"+1\"><h1>$$title$$</h1>")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end"), tr("$$qf_commondoc_header.end_notitle$$ <font size=\"+1\"><h1 id=\"TITLE\"><!-- title -->$$title$$</h1>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.separator"), QString(" | ")));
 
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.default_links"), tr("<a href=\"%1quickfit.html\">QuickFit</a> $$local_plugin_typehelp_link$$ $$local_plugin_mainhelp_link$$ $$local_plugin_tutorial_link$$ $$local_plugin_faq_link$$").arg(settings->getMainHelpDirectory())));
@@ -200,7 +200,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitalg"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_fitalg.html\">Fit Algorithms Help</a>")));
 
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.start"),
-         tr("</font><a name=\"#footer\"><table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">"
+         tr("$$DEFAULTREF$$</font><a name=\"#footer\"><table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">"
             "<table width=\"100%\">"
             "<tr><td align=\"center\" ><a href=\"#top_page\"><img src=\":/lib/help/help_top.png\"></a>&nbsp;&nbsp;&nbsp;</td><td align=\"left\" >$$local_plugin_icon$$&nbsp;&nbsp;&nbsp;</td><td align=\"right\" width=\"90%\">  <b>$$local_plugin_name$$</b> <i>$$local_plugin_copyright$$</i><br>$$local_plugin_weblink$$<br>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.end"), QString("</td></tr></table></td></tr></table>")));// </div>")));
@@ -3322,7 +3322,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // extract table of contents from header tags
-            QRegExp rxHeader("<\\s*h([123456789]).*>(.*)<\\/\\s*h\\1\\s*>", Qt::CaseInsensitive);
+            QRegExp rxHeader("<\\s*h([123456789])(.*)>(.*)<\\/\\s*h\\1\\s*>", Qt::CaseInsensitive);
             rxHeader.setMinimal(true);
             count = 0;
             pos = 0;
@@ -3332,51 +3332,54 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             while ((pos = rxHeader.indexIn(result, pos)) != -1) {
 
                 int level=rxHeader.cap(1).toInt();
-                QString text=rxHeader.cap(2);
+                QString text=rxHeader.cap(3);
+                QString hres=rxHeader.cap(2);
 
-                ContentsEntry h;
-                if (contents.size()>0) h=contents.value(contents.size()-1);
+                if (!hres.toLower().contains("id=\"title\"") && !text.contains("<!-- title -->")) {
+                    ContentsEntry h;
+                    if (contents.size()>0) h=contents.value(contents.size()-1);
 
-                h.header=text;
-                if (first) {
-                    for (int i=1; i<=level; i++) {
-                        h.num.append(1);
-                    }
-                } else {
-                    if (level==h.num.size()) {
-                        h.num[h.num.size()-1]=h.num[h.num.size()-1]+1;
-                    } else if (level>h.num.size()) {
-                        for (int i=h.num.size(); i<level; i++) {
+                    h.header=text;
+                    if (first) {
+                        for (int i=1; i<=level; i++) {
                             h.num.append(1);
                         }
-                    } else if (level<h.num.size()) {
-                        for (int i=h.num.size(); i>=level; i--) {
-                            h.num.removeAt(i);
+                    } else {
+                        if (level==h.num.size()) {
+                            h.num[h.num.size()-1]=h.num[h.num.size()-1]+1;
+                        } else if (level>h.num.size()) {
+                            for (int i=h.num.size(); i<level; i++) {
+                                h.num.append(1);
+                            }
+                        } else if (level<h.num.size()) {
+                            for (int i=h.num.size(); i>=level; i--) {
+                                h.num.removeAt(i);
+                            }
+                            h.num[h.num.size()-1]=h.num[h.num.size()-1]+1;
                         }
-                        h.num[h.num.size()-1]=h.num[h.num.size()-1]+1;
                     }
-                }
 
-                QString id="";
-                QString tid="";
-                for (int i=0; i<h.num.size(); i++) {
-                    if (!id.isEmpty()) id+="_";
-                    if (!tid.isEmpty()) tid+=".";
-                    id+=QString::number(h.num[i]);
-                    tid+=QString::number(h.num[i]);
-                }
-                if (first) {
-                    minHeaderLevel=h.num.size();
-                } else if (h.num.size()<minHeaderLevel) {
-                    minHeaderLevel=h.num.size();
-                }
-                //qDebug()<<h.num.size()<<"(min: "<<minHeaderLevel<<")"<<tid<<h.header;
-                first=false;
-                h.id=id;
-                h.prefix=tid;
+                    QString id="";
+                    QString tid="";
+                    for (int i=0; i<h.num.size(); i++) {
+                        if (!id.isEmpty()) id+="_";
+                        if (!tid.isEmpty()) tid+=".";
+                        id+=QString::number(h.num[i]);
+                        tid+=QString::number(h.num[i]);
+                    }
+                    if (first) {
+                        minHeaderLevel=h.num.size();
+                    } else if (h.num.size()<minHeaderLevel) {
+                        minHeaderLevel=h.num.size();
+                    }
+                    //qDebug()<<h.num.size()<<"(min: "<<minHeaderLevel<<")"<<tid<<h.header;
+                    first=false;
+                    h.id=id;
+                    h.prefix=tid;
 
-                contents.append(h);
-                ++count;
+                    contents.append(h);
+                    ++count;
+                }
                 pos += rxHeader.matchedLength();
 
             }
@@ -3482,7 +3485,11 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             //fromHTML_replaces.append(qMakePair(QString("references"), referencesHTML));
 
             result=result.replace("$$contents$$", contentsHTML);
+            if (!result.contains("$$references$$") && referencesHTML.size()>0) {
+                result=result.replace("$$DEFAULTREF$$", "<h2>References</h2><p>$$references$$</p>");
+            }
             result=result.replace("$$references$$", referencesHTML);
+
         }
 
 

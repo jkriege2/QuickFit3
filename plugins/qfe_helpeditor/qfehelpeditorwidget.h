@@ -32,13 +32,15 @@ class QFEHelpEditorWidget : public QWidget {
 
 
     protected slots:
+        void autosave();
+        void reloadLastAutosave();
         void documentWasModified();
         void on_btnExecute_clicked();
         void on_btnNew_clicked();
         void on_btnOpen_clicked();
         bool save();
         bool saveAs();
-        bool saveFile(const QString &filename);
+        bool saveFile(const QString &filename, bool setFilename=true);
         void on_btnSave_clicked();
         void on_btnSaveAs_clicked();
         void on_btnOpenExample_clicked();
@@ -128,6 +130,7 @@ class QFEHelpEditorWidget : public QWidget {
         bool modified;
 
         QFHTMLHighlighter* highlighter;
+        QAction* actLoadAutosave;
         QAction *cutAct;
         /** \brief action object: copy the currently selected text */
         QAction *copyAct;

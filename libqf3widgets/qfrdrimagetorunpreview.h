@@ -56,6 +56,7 @@ class QFWIDLIB_EXPORT QFRDRImageToRunPreview : public QWidget
         void setRunSelectWidgetActive(bool active);
 
         void draw(JKQTPEnhancedPainter *painter, QSize* size);
+        void setDisplayGotoAverageButton(bool display);
     signals:
         void currentRunChanged(int run);
         void currentPixelChanged(int x, int y);
@@ -65,6 +66,7 @@ class QFWIDLIB_EXPORT QFRDRImageToRunPreview : public QWidget
         void setCurrentPixel(int x, int y);
         void setMaskEditable(bool editable);
         void setSelectionEditable(bool editable);
+        void gotoAverageRun();
 
     protected slots:
         /** \brief draw overview plot */
@@ -74,6 +76,7 @@ class QFWIDLIB_EXPORT QFRDRImageToRunPreview : public QWidget
         void moveColorbarsAuto();
 
         void excludeByImage();
+
 
     protected:
         QFRawDataRecord* record;
@@ -125,6 +128,8 @@ class QFWIDLIB_EXPORT QFRDRImageToRunPreview : public QWidget
 
         QSpinBox* spinRun;
         QLabel* labRun;
+        QPushButton* btnAvgRun;
+        bool btnAvgRunVisible;
 
         QToolButton* btnEditSlected;
         QAction* actEditSelection;

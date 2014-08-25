@@ -14,6 +14,7 @@
 #include "qffcsfitchi2landscapedialog.h"
 #include "qffitfunctionmanager.h"
 #include "qffitresultsbyindexevaluationfitthread.h"
+#include "qffitfunctionconfigforglobalfittools.h"
 
 QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
     QFEvaluationEditor(services, propEditor, parent),
@@ -41,10 +42,11 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     l<<3*ui->splitter->height()/4;
     l<<ui->splitter->height()/4;
     ui->splitter->setSizes(l);
-    ui->datacut->set_allowCopyToAll(false);
-    ui->datacut->set_copyToFilesEnabled(false);
+    ui->datacut->set_allowCopyToAll(true);
+    ui->datacut->set_copyToFilesEnabled(true);
     ui->datacut->set_copyToRunsEnabled(false);
     ui->datacut->set_runsName(tr("pixels"));
+
 
     ui->cmbDisplayData->setDefaultSymbol(JKQTPcross, 5);
     ui->cmbDisplayData->addUsedSymbol(JKQTPcross, 5, true);
@@ -194,18 +196,24 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     connect(actGuess, SIGNAL(triggered()), this, SLOT(guessFromCurrentFileSet()));
     menuImFCCSFit->addAction(actGuess);
 
+    menuImFCCSFit->addSeparator();
+    actLoadGLobalFitConfig=new QAction(tr("&load global fit config ..."), this);
+    connect(actLoadGLobalFitConfig, SIGNAL(triggered()), this, SLOT(loadGlobalFitConfig()));
+    menuImFCCSFit->addAction(actLoadGLobalFitConfig);
+    actSaveGLobalFitConfig=new QAction(tr("&save global fit config ..."), this);
+    connect(actSaveGLobalFitConfig, SIGNAL(triggered()), this, SLOT(saveGlobalFitConfig()));
+    menuImFCCSFit->addAction(actSaveGLobalFitConfig);
+
 
     
     
     // connect widgets 
     connect(ui->pltData, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(zoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     connect(ui->pltResiduals, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(zoomChangedLocally(double,double,double,double,JKQtPlotter*)));
-/*    connect(ui->datacut, SIGNAL(copyUserMinToAll(int)), this, SLOT(copyUserMinToAll(int)));
-    connect(ui->datacut, SIGNAL(copyUserMaxToAll(int)), this, SLOT(copyUserMaxToAll(int)));
-    connect(ui->datacut, SIGNAL(copyUserMinMaxToAll(int,int)), this, SLOT(copyUserMinMaxToAll(int,int)));
-    connect(ui->datacut, SIGNAL(copyUserMinToAllRuns(int)), this, SLOT(copyUserMinToAllRuns(int)));
-    connect(ui->datacut, SIGNAL(copyUserMaxToAllRuns(int)), this, SLOT(copyUserMaxToAllRuns(int)));
-    connect(ui->datacut, SIGNAL(copyUserMinMaxToAllRuns(int,int)), this, SLOT(copyUserMinMaxToAllRuns(int,int)));*/
+    connect(ui->datacut, SIGNAL(copyUserMinToAll(int)), this, SLOT(slidersCopyUserMinToAll(int)));
+    connect(ui->datacut, SIGNAL(copyUserMaxToAll(int)), this, SLOT(slidersCopyUserMaxToAll(int)));
+    connect(ui->datacut, SIGNAL(copyUserMinMaxToAll(int,int)), this, SLOT(slidersCopyUserMinMaxToAll(int,int)));
+
 
     updatingData=false;
 }
@@ -517,6 +525,77 @@ void QFImFCCSFitEvaluationEditor::onConfigureGlobalItemClicked()
             }
         }
     }
+}
+
+void QFImFCCSFitEvaluationEditor::configureFitFromGlobal(const QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig &config)
+{
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+
+    if (data->getFitFileCount()<config.models.size()) {
+        while (data->getFitFileCount()<config.models.size()) {
+            data->addFitFile();
+        }
+    } else if (data->getFitFileCount()>config.models.size()) {
+        while (data->getFitFileCount()>config.models.size()) {
+            data->removeFitFile();
+        }
+    }
+
+    for (int i=0; i<config.models.size(); i++) {
+        data->setFitFunction(i, config.models[i]);
+    }
+    data->clearLinkParameters();
+
+    for (int i=0; i<config.globalParams.size(); i++) {
+        QList<QStringList> g=config.globalParams[i];
+        for (int j=0; j<g.size(); j++) {
+            QStringList sl=g[j];
+            if (sl.size()>0) {
+                for (int s=0; s<sl.size(); s++) {
+                    if (!sl[s].isEmpty()) {
+                        data->setLinkParameter(j, sl[s], i);
+                    }
+                }
+            }
+        }
+    }
+}
+
+QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFImFCCSFitEvaluationEditor::getCurrentGlobalFitConfig() const
+{
+    QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig config;
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return config;
+
+    for (int i=0; i<data->getFitFileCount(); i++) {
+        config.models.append(data->getFitFunctionID(i));
+    }
+
+    for (int i=0; i<data->getLinkParameterCount(); i++) {
+
+        QList<QStringList> l;
+        QStringList sl;
+        for (int j=0; j<data->getFitFileCount(); j++) {
+            l<<sl;
+        }
+        config.globalParams<<l;
+    }
+
+    for (int i=0; i<data->getFitFileCount(); i++) {
+        QFFitFunction* ff=data->getFitFunction(i);
+        if (ff) {
+            for (int j=0; j<ff->paramCount(); j++) {
+                const QString param=ff->getParameterID(j);
+                const int global=data->getLinkParameter(i, param);
+                if (global>=0 && global<config.globalParams.size()) {
+                    config.globalParams[global].operator[](i).append(param);
+                }
+            }
+        }
+    }
+
+    return config;
 }
 
 void QFImFCCSFitEvaluationEditor::guessFromCurrentFileSet()
@@ -1242,24 +1321,34 @@ int QFImFCCSFitEvaluationEditor::getUserMin(QFRawDataRecord *rec, int index, int
 {
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     if (!data) return defaultMin;
-    const QString resultID=data->getEvaluationResultID(-1/*index*/, rec);
+    const QString resultID=data->getEvaluationResultID(-1, rec);
+    const QString resultIDNew=QString("%1_%2").arg(data->getType()).arg(data->getID());
 
     // WORKROUND FOR OLD PROPERTY NAMES
     int defaultM=rec->getProperty(QString(resultID+"_datacut_min"), defaultMin).toInt();
 
-    return rec->getProperty(resultID+"_datacut_min", defaultM).toInt();
+    if (current) defaultM=current->getProperty("datacut_min", defaultM).toInt();
+
+    defaultM=rec->getProperty(resultID+"_datacut_min", defaultM).toInt();
+    defaultM=rec->getProperty(resultIDNew+"_datacut_min", defaultM).toInt();
+    return defaultM;
 }
 
 int QFImFCCSFitEvaluationEditor::getUserMax(QFRawDataRecord *rec, int index, int defaultMax)
 {
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     if (!data) return defaultMax;
-    const QString resultID=data->getEvaluationResultID(-1/*index*/, rec);
+    const QString resultID=data->getEvaluationResultID(-1, rec);
+    const QString resultIDNew=QString("%1_%2").arg(data->getType()).arg(data->getID());
 
     // WORKROUND FOR OLD PROPERTY NAMES
     int defaultM=rec->getProperty(QString(resultID+"_datacut_max"), defaultMax).toInt();
 
-    return rec->getProperty(resultID+"_datacut_max", defaultM).toInt();
+    if (current) defaultM=current->getProperty("datacut_max", defaultM).toInt();
+
+    defaultM= rec->getProperty(resultID+"_datacut_max", defaultM).toInt();
+    defaultM= rec->getProperty(resultIDNew+"_datacut_max", defaultM).toInt();
+    return defaultM;
     //return rec->getProperty(resultID+"_datacut_max", defaultMax).toInt();
 }
 
@@ -1268,13 +1357,11 @@ void QFImFCCSFitEvaluationEditor::setUserMinMax(int userMin, int userMax)
     if (!current) return;
     QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
     if (!data) return;
+    data->setQFProperty("datacut_max", userMax, false, false);
+    data->setQFProperty("datacut_min", userMin, false, false);
     for (int i=0; i<data->getFitFileCount(); i++) {
         QFRawDataRecord* rdr=data->getFitFile(i);
-        const QString resultID=data->getEvaluationResultID(-1, rdr);
-        rdr->disableEmitPropertiesChanged();
-        rdr->setQFProperty(resultID+"_datacut_min", userMin, false, false);
-        rdr->setQFProperty(resultID+"_datacut_max", userMax, false, false);
-        rdr->enableEmitPropertiesChanged(true);
+        setUserMinMaxInternal(data, rdr, userMin, userMax);
     }
 }
 
@@ -1283,6 +1370,120 @@ void QFImFCCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int m
     if (!current) return;
     setUserMinMax(userMin, userMax);
     displayData();
+
+}
+
+void QFImFCCSFitEvaluationEditor::slidersCopyUserMinToAll(int userMin)
+{
+    if (!current) return;
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    QList<QList<QFRawDataRecord* > > fitted=data->getFittedFiles();
+    QList<QList<QFRawDataRecord* > > guessed=data->getGuessedFiles();
+    bool setGuessed=false;
+    if ( guessed.size()>0) {
+        setGuessed=QMessageBox::question(this, tr("imFCCS: copy Min to all files"), tr("Do you also want to set min/max for guessed filesets?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
+    }
+    for (int i=0; i<fitted.size(); i++) {
+        for (int j=0; j<fitted[i].size(); j++) {
+            QFRawDataRecord* rdr=fitted[i].at(j);
+            setUserMinInternal(data, rdr, userMin);
+        }
+    }
+    if (guessed.size()>0 && setGuessed) {
+        for (int i=0; i<guessed.size(); i++) {
+            for (int j=0; j<guessed[i].size(); j++) {
+                QFRawDataRecord* rdr=guessed[i].at(j);
+                setUserMinInternal(data, rdr, userMin);
+            }
+        }
+    }
+}
+
+void QFImFCCSFitEvaluationEditor::slidersCopyUserMaxToAll(int userMax)
+{
+    if (!current) return;
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    QList<QList<QFRawDataRecord* > > fitted=data->getFittedFiles();
+    QList<QList<QFRawDataRecord* > > guessed=data->getGuessedFiles();
+    bool setGuessed=false;
+    if ( guessed.size()>0) {
+        setGuessed=QMessageBox::question(this, tr("imFCCS: copy Max to all files"), tr("Do you also want to set min/max for guessed filesets?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
+    }
+    for (int i=0; i<fitted.size(); i++) {
+        for (int j=0; j<fitted[i].size(); j++) {
+            QFRawDataRecord* rdr=fitted[i].at(j);
+            setUserMaxInternal(data, rdr, userMax);
+        }
+    }
+    if (guessed.size()>0 && setGuessed) {
+        for (int i=0; i<guessed.size(); i++) {
+            for (int j=0; j<guessed[i].size(); j++) {
+                QFRawDataRecord* rdr=guessed[i].at(j);
+                setUserMaxInternal(data, rdr, userMax);
+            }
+        }
+    }
+}
+
+void QFImFCCSFitEvaluationEditor::slidersCopyUserMinMaxToAll(int userMin, int userMax)
+{
+    if (!current) return;
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    QList<QList<QFRawDataRecord* > > fitted=data->getFittedFiles();
+    QList<QList<QFRawDataRecord* > > guessed=data->getGuessedFiles();
+    bool setGuessed=false;
+    if ( guessed.size()>0) {
+        setGuessed=QMessageBox::question(this, tr("imFCCS: copy Min/Max to all files"), tr("Do you also want to set min/max for guessed filesets?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
+    }
+    for (int i=0; i<fitted.size(); i++) {
+        for (int j=0; j<fitted[i].size(); j++) {
+            QFRawDataRecord* rdr=fitted[i].at(j);
+            //qDebug()<<"slidersCopyUserMinMaxToAll("<<userMin<<userMax<<"):  "<<rdr->getName()<<rdr;
+            setUserMinMaxInternal(data, rdr, userMin, userMax);
+        }
+    }
+    if (guessed.size()>0 && setGuessed) {
+        for (int i=0; i<guessed.size(); i++) {
+            for (int j=0; j<guessed[i].size(); j++) {
+                QFRawDataRecord* rdr=guessed[i].at(j);
+                setUserMinMaxInternal(data, rdr, userMin, userMax);
+            }
+        }
+    }
+}
+
+void QFImFCCSFitEvaluationEditor::setUserMinMaxInternal(QFImFCCSFitEvaluationItem *data, QFRawDataRecord *rdr, int userMin, int userMax)
+{
+    const QString resultIDNew=QString("%1_%2").arg(data->getType()).arg(data->getID());
+    const QString resultID=data->getEvaluationResultID(-1, rdr);
+    rdr->disableEmitPropertiesChanged();
+    rdr->setQFProperty(resultIDNew+"_datacut_min", userMin, false, false);
+    rdr->setQFProperty(resultIDNew+"_datacut_max", userMax, false, false);
+    //qDebug()<<"   "<<rdr<<resultIDNew+"_datacut_min/max";
+    rdr->enableEmitPropertiesChanged(true);
+}
+
+void QFImFCCSFitEvaluationEditor::setUserMinInternal(QFImFCCSFitEvaluationItem *data, QFRawDataRecord *rdr, int userMin)
+{
+    const QString resultIDNew=QString("%1_%2").arg(data->getType()).arg(data->getID());
+    const QString resultID=data->getEvaluationResultID(-1, rdr);
+    rdr->disableEmitPropertiesChanged();
+    rdr->setQFProperty(resultIDNew+"_datacut_min", userMin, false, false);
+    //qDebug()<<"   "<<rdr<<resultIDNew+"_datacut_min";
+    rdr->enableEmitPropertiesChanged(true);
+}
+
+void QFImFCCSFitEvaluationEditor::setUserMaxInternal(QFImFCCSFitEvaluationItem *data, QFRawDataRecord *rdr, int userMax)
+{
+    const QString resultIDNew=QString("%1_%2").arg(data->getType()).arg(data->getID());
+    const QString resultID=data->getEvaluationResultID(-1, rdr);
+    rdr->disableEmitPropertiesChanged();
+    rdr->setQFProperty(resultIDNew+"_datacut_max", userMax, false, false);
+    //qDebug()<<"   "<<rdr<<resultIDNew+"_datacut_max";
+    rdr->enableEmitPropertiesChanged(true);
 }
 
 int QFImFCCSFitEvaluationEditor::getUserRangeMax(QFRawDataRecord *rec, int index)
@@ -1365,6 +1566,28 @@ void QFImFCCSFitEvaluationEditor::plotChi2Landscape()
     dlgChi2->exec();
 
     delete dlgChi2;
+}
+
+void QFImFCCSFitEvaluationEditor::loadGlobalFitConfig()
+{
+    if (!current) return;
+    QString filename=qfGetOpenFileNameSet("QFImFCCSFitEvaluationEditor/GlobalConfig_", this, tr("load global fit configuration ..."), QFPluginServices::getInstance()->getPluginConfigDirectory("imfccs_fit")+"/globalfit_configs", tr("Global imFCCS fit configs (*.gfc)"));
+    if (QFile::exists(filename)) {
+        QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig config;
+        if (openGlobalFitConfig(filename, config)) {
+            configureFitFromGlobal(config);
+        }
+    }
+}
+
+void QFImFCCSFitEvaluationEditor::saveGlobalFitConfig()
+{
+    if (!current) return;
+    QString filename=qfGetSaveFileNameSet("QFImFCCSFitEvaluationEditor/GlobalConfig_", this, tr("save global fit configuration ..."), QFPluginServices::getInstance()->getPluginConfigDirectory("imfccs_fit")+"/globalfit_configs", tr("Global imFCCS fit configs (*.gfc)"));
+    if (!filename.isEmpty()) {
+        QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig config=getCurrentGlobalFitConfig();
+        storeGlobalFitConfig(filename, config);
+    }
 }
 
 

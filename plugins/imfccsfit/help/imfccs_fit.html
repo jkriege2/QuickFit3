@@ -6,29 +6,49 @@
   </head>
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$  
-	 <p>
-	 This plugin allows to perform fits for imaging FCCS data. <br>
-	 This plugin allows to perform fits on several processor cores in parallel (multi-threaded). Set the maximum number of processors to use in the <a href="$$mainhelpdir$$qf3_settings.html">general settings dialog</a>.
-	 <ol>
-	   <li><a href="./ui.html">imFCS Curve Fit User Interface</a></li>
-       <li><a href="$$mainhelpdir$$/fcsfit_weighting.html">Fit Weighting</a></li>
-	   <li><a href="./fit_statistics.html">Explanation of Fit Statistics</a></li>
-	   <li><a href="./calc_ccf_amplitude.html">Tool: calculate relative CCF amplitude</a></li>
-	   <li><a href="./configuration.html">Configuration (global fit parameter presets ...)</a></li>
-	   <li><a href="./options.html">Configuration options in the mains ettings dialog</a></li>
-	   <li><a href="./programmers_help.html"><small>Hints for fit model programmers</small></a></li>
-	 </ol>
-	 </p>
-	 <p>
-	 This plugin uses any of the available <a href="$$mainhelpdir$$qf3_fitalg.html">Fit Algorithm Plugins</a> to execute the model fit:
-	 $$list:fitalg:$$ 
-	 </p>
-	 <p>
-	 Models have to be implemented as <a href="$$mainhelpdir$$qf3_fitfunc.html">Fit Function Plugins</a>. Models that may be used with this plugin are:
-	 $$list:fitfunc:fcs_$$
-	 $$list:fitfunc:fccs_$$
-	 $$list:fitfunc:dls_$$
-	 </p>
+     <p>
+
+     
+<h2>Introduction/Basics</h2>    
+<p>
+<center><a name="imfccs_fit_pic000"><img src="./pic/imfccs_fit_pic000.png" border="1">
+</center>
+ 
+This plugin allows to perform global fits for imaging FCCS data. in imFCCS datasets, for each pixel, several auto- and cross-correlation functions $$bmath:g_{\gamma\rho}(\tau)=\frac{\langle I_\gamma(t)\cdot I_\rho(t+\tau)\rangle}{\langle I_\gamma(t)\rangle\cdot\langle I_\rho(t)\rangle}-1=\frac{\langle\delta I_\gamma(t)\cdot\delta I_\rho(t+\tau)\rangle}{\langle I_\gamma(t)\rangle\cdot\langle I_\rho(t)\rangle}$$ exist, that partly describe the same particles. Therefore the parameters $$math:\vec{p}$$ of the FCCS model functions, that should be fitted to the measured correlation curves $$math:\left(\tau_i, \hat{g}_{\gamma\rho,i}\right)_{i=1..N}$$ are linked. Extraction of these parameters therefore requires a global fit, that optimizes the parameters of all these functions $$math:g_{\gamma\rho}(\tau)$$ simultaneously for every pixel. This plugin implements a global fit, which solves the least-squares problem:
+$$bmath:\vec{p}^\ast=\argmin_{\vec{p}}\sum_{\gamma\rho}\sum_{i=1}^N\left[\frac{\hat{g}_{\gamma\rho,i}-g_{\gamma\rho}(\tau_i,\pi_{\gamma\rho}(\vec{p})}{\sigma_{\gamma\rho,i}}\right]^2,$$
+where $$math:\pi_{\gamma\rho}(\vec{p})$$ is a mapping, that reduces the full parameter vector $$math:\vec{p}$$ to the (shorter) parameter vector of the model for a specific channel/curve $$math:\rho\gamma$$. The different correlation functions are indexed by $$math:\rho\gamma$$, which could mean different color channel (e.g. green and red) or different pixel positions.
+<br>
+This plugin allows to perform fits on several processor cores in parallel (multi-threaded). Set the maximum number of processors to use in the <a href="$$mainhelpdir$$qf3_settings.html">general settings dialog</a>.
+</p>
+
+
+<h2>Contents of plugin online-help</h2>
+<p>
+<ol>
+ <li><a href="./ui.html">imFCS Curve Fit User Interface</a></li>
+ <li><a href="$$mainhelpdir$$/fcsfit_weighting.html">Fit Weighting</a></li>
+ <li><a href="./fit_statistics.html">Explanation of Fit Statistics</a></li>
+ <li><a href="./calc_ccf_amplitude.html">Tool: calculate relative CCF amplitude</a></li>
+ <li><a href="./tutorial.html"><b>imFCCS Tutorial</b></a></li>
+ <li><a href="./faq.html"><b>imFCCS frequently asked questions</b></a></li>
+ <li><a href="./configuration.html">Configuration (global fit parameter presets ...)</a></li>
+ <li><a href="./options.html">Configuration options in the mains ettings dialog</a></li>
+ <li><a href="./programmers_help.html"><small>Hints for fit model programmers</small></a></li>
+</ol>
+</p>
+
+<h2>Usable fit functions and algorithms</h2>
+
+<p>
+This plugin uses any of the available <a href="$$mainhelpdir$$qf3_fitalg.html">Fit Algorithm Plugins</a> to execute the model fit:
+$$list:fitalg:$$ 
+</p>
+<p>
+Models have to be implemented as <a href="$$mainhelpdir$$qf3_fitfunc.html">Fit Function Plugins</a>. Models that may be used with this plugin are:
+$$list:fitfunc:fccs_$$
+$$list:fitfunc:fcs_$$
+$$list:fitfunc:dls_$$
+</p>
   </body>
 
 </html>

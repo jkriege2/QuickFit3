@@ -34,7 +34,8 @@ HEADERS += qfimfccsfitevaluation.h \
     ../interfaces/qffitfunctionconfigforglobalfitinterface.h \
     ../base_classes/qffitresultsbyindexevaluationfitthread.h \
     qfimfccsrelativeccfcrosstalkdialog.h \
-    qfimfccsamplitudefitdialog.h
+    qfimfccsamplitudefitdialog.h \
+    ../base_classes/qffitfunctionconfigforglobalfittools.h
 
 SOURCES += qfimfccsfitevaluation.cpp \
            qfimfccsfitevaluation_item.cpp \
@@ -54,7 +55,8 @@ SOURCES += qfimfccsfitevaluation.cpp \
     qfimfccsfitchi2landscapedialog.cpp \
     ../base_classes/qffitresultsbyindexevaluationfitthread.cpp \
     qfimfccsrelativeccfcrosstalkdialog.cpp \
-    qfimfccsamplitudefitdialog.cpp
+    qfimfccsamplitudefitdialog.cpp \
+    ../base_classes/qffitfunctionconfigforglobalfittools.cpp
 
 FORMS = qfimfccsfitevaluation_editor.ui \   
     optionswidget.ui \

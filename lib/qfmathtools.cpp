@@ -216,8 +216,12 @@ QFFitStatistics calculateFitStatistics(long N, double* tauvals, double* model, d
         result.fitfunc[i]=value;
         result.residuals[i]=corrdata[i]-value;
         double res=result.residuals[i];
-        result.residuals_weighted[i]=res/weights[i];
-        if (fabs(weights[i])<1000*DBL_MIN) result.residuals_weighted[i]=0;
+        if (weights) {
+            result.residuals_weighted[i]=res/weights[i];
+            if (fabs(weights[i])<1000*DBL_MIN) result.residuals_weighted[i]=0;
+        } else {
+            result.residuals_weighted[i]=res;            
+        }
         //std::cout<<"weights["<<i<<"]="<<weights[i]<<"\n";
         double resw=result.residuals_weighted[i];
         if ((i>=datacut_min)&&(i<=datacut_max)) {

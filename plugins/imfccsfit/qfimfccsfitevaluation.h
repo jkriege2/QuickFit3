@@ -50,7 +50,7 @@ class QFImFCCSFitEvaluation : public QObject, public QFPluginEvaluationItemBase,
         virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2013 by Jan W. Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2013-2014 by Jan W. Krieger"); };
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };
@@ -61,7 +61,7 @@ class QFImFCCSFitEvaluation : public QObject, public QFPluginEvaluationItemBase,
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         };
 
 

@@ -52,6 +52,20 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         /** \brief executed when the sliders values change */
         void slidersChanged(int userMin, int userMax, int min, int max);
 
+        /** \brief this signal is emited when the user clicks the "copy to all" context menu of the min widget item. */
+        void slidersCopyUserMinToAll(int userMin);
+
+        /** \brief this signal is emited when the user clicks the "copy to all" context menu of the max widget item. */
+        void slidersCopyUserMaxToAll(int userMax);
+
+        /** \brief this signal is emited when the user clicks the "copy to all runs" context menu of the max widget item. */
+        void slidersCopyUserMinMaxToAll(int userMin, int userMax);
+
+        void setUserMinMaxInternal(QFImFCCSFitEvaluationItem* data, QFRawDataRecord* rdr, int userMin, int userMax);
+        void setUserMinInternal(QFImFCCSFitEvaluationItem* data, QFRawDataRecord* rdr, int userMin);
+        void setUserMaxInternal(QFImFCCSFitEvaluationItem* data, QFRawDataRecord* rdr, int userMax);
+
+
         void zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);
         /** \brief connect widgets to current data record */
         virtual void connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old);
@@ -78,6 +92,10 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
 
         void onConfigureGlobalItemClicked();
+        void configureFitFromGlobal(const QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig& config);
+        QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig getCurrentGlobalFitConfig() const;
+
+
         void guessFromCurrentFileSet();
 
         void filesSetActivated(const QModelIndex& idx);
@@ -89,6 +107,9 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void on_btnAddFile_clicked();
         void on_btnRemoveFile_clicked();
         void plotChi2Landscape();
+
+        void loadGlobalFitConfig();
+        void saveGlobalFitConfig();
     protected:
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFImFCCSFitEvaluationEditor *ui;
@@ -115,6 +136,8 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         QAction* actFitAllFilesetsAllPixels;
         QAction* actGuess;
         QAction* actChi2Landscape;
+        QAction* actLoadGLobalFitConfig;
+        QAction* actSaveGLobalFitConfig;
 
         QAction* actResetCurrent;
         QAction* actResetAllPixels;

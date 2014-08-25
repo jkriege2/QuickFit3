@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>imaging FCS frequently asked questions</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+     
+     
+$$faq_start$$
+  <a name="FAQ_IMFCS"><b>What is an imaging fluorescence correlatioon spectroscopy (imFCS)?</b>
+$$faq_answer$$
+  In standard FCS, measurements are performed for single positions in a sample. In imFCS, an array detector (fast camera) is used to record the fluorescence fluctuations from several pixels in the sample simultaneously. The for each pixel in the measurement, an autocorrelation (and possibly pixel-pixel or two-color-cross-correlation) curves are calculated and evaluated. Finally the fit parameters (e.g. the diffusion coefficient) can be represented as a map or image for the sample, reporting on how fast particles move at different positions in the sample. imFCS is usually impelemnted on a total internal reflection fluorescence microscope (TIRF) or a single plane illumination microscope (SPIM).
+$$faq_end$$
+      
+         
+$$faq_start$$
+  <a name="FAQ_HOWTOCORRELATE"><b>How can I correlate an image series in QuickFit for an imFCS data evaluation?</b>
+$$faq_answer$$
+  The help page <a href="imfcs_usage.html#correlating">Correlating imFCS data</a> and the tutorials <a href="tutorial_solution.html">imFCS analysis of beads in solution</a> and <a href="tutorial_cell.html">imFCS analysis in a cell</a> give a step-by-step introduction to this task.
+$$faq_end$$
+     
+         
+$$faq_start$$
+  <a name="FAQ_SIMULATE"><b>Can I simulate an imFCS/imFCCS experiment?</b>
+$$faq_answer$$
+  Yes, a simple simulator is implemented in QuickFit. It creates an image stack from the random walk of several fluorescenctly labeled particles in a plane. See <a href="simulation.html">imFCS Simulation</a> for details. 
+$$faq_end$$
+     
+         
+$$faq_start$$
+  <a name="FAQ_FCCSDATA"><b>How are imFCCS data represented in QuickFit?</b>
+$$faq_answer$$
+  In imFCCS experiments, several auto- and cross-correlation curves exist for every pixel in the measurement (e.g. two auto- [ACF0,ACF1] and one two-color cross-correlation [CCF/DCCF/FCCS] curves). QuickFit generates one raw data record (RDR) for each of these curves (all in the same RDR group) and an imFCCS global fit may recognize these several records and fit them all together. If you open the FCCS record (i.e. the RDR editor by double-clicking it in the project tree), you can choose the <b>FCCS display</b> mode:
+<center><a name="faq_pic000"><img src="./pic/faq_pic000.png" border="1"></center>
+in which also the auto-correlation functions are displayed in the correlation fucntion plot on the lhs.
+$$faq_end$$
+     
+
+  </body>
+</html>

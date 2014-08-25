@@ -1,0 +1,55 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>imaging FCCS fit frequently asked questions</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+     
+     
+$$faq_start$$
+  <a name="FAQ_WEIGHTING"><b>What do the fit weighting optins mean?</b>
+$$faq_answer$$
+  See the help-page <a href="$$mainhelpdir$$/fcsfit_weighting.html">Fit Weighting</a> for detailed information on the weighting of fits. Basically these allow to use an error estimate for each measured point on the correlation curve, which determines how much the data point should influence the final result.
+$$faq_end$$
+     
+     
+$$faq_start$$
+ <a name="FAQ_FITSTAT"><b>What do the fit statistics mean, that this plugin calculates?</b>
+$$faq_answer$$
+ See <a href="./fit_statistics.html">Explanation of Fit Statistics</a> for a detailed explanation
+$$faq_end$$
+
+
+$$faq_start$$
+  <a name="FAQ_FCSTUTORIAL"><b>How do I fit an imaging FCCS measurement with QuickFit?</b>
+$$faq_answer$$
+  See <a href="tutorial.html">imFCCS analysis tutorial</a> for a detailed tutorial on this task.
+$$faq_end$$
+
+
+$$faq_start$$
+  <a name="FAQ_RELCCFAMPLITUDES"><b>How can I calculate relatie cross-correlation amplitudes?</b>
+$$faq_answer$$
+  See the page <a href="./calc_ccf_amplitude.html">Tool: calculate relative CCF amplitude</a> for a step-by-step description.
+$$faq_end$$
+
+
+
+$$faq_start$$
+  <a name="FAQ_FILESETS"><b>What are file-sets in the context of a global imFCCS fit?</b>
+$$faq_answer$$
+  File sets are used to organize the global imaging FCCS fits. Each file set consists of a list of files and a fit function for each of these files. The global fits fit these functions to all files in the fileset simultaneously. They take the role of single RDRs/files in a global FCCS fit. This means, that you can perform a fit for (every pixel in) every fileset.
+$$faq_end$$
+
+
+$$faq_start$$
+  <a name="FAQ_GLOBALFIT"><b>What is a global imFCCS fit?</b>
+$$faq_answer$$
+  In a standard imFCS fit, there is exactly one correlation function (usually an autocorrelation) for each pixel. The fit the optimizes the parameters of a single model to best fit this correlation curve. In imFCCS measurements, several auto- and cross-correlation functions exist for each pixel. These curves are not independent, but partly determined by the same parameters (e.g. the focus volume parameters, or also the diffusion coefficients in a 2-color FCCS measurement, where the same double-labeled particles are observed in all color channels). Therefore the information from all these curves (e.g. two autocorrelations and a cross-correlation for two-color FCCS) can be used to better estimate the underlying model parameters. The (partly linked) parameters of several models are then optimized simultaneously to best fit all correlation curves in each pixel simultaneously.
+$$faq_end$$
+
+
+  </body>
+</html>

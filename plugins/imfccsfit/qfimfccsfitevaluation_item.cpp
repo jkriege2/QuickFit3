@@ -1214,7 +1214,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
 
 void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
 {
-    qDebug()<<"fit: "<<records.size()<<run;
+    //qDebug()<<"fit: "<<records.size()<<run;
     QString iparams="";
     QString oparams="";
     QString orparams="";

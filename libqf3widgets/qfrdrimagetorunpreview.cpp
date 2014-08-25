@@ -27,6 +27,7 @@ QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
     QWidget(parent)
 {
 
+    btnAvgRunVisible=true;
     actMaskByImage=new QAction(QIcon(":/qfrdrmaskeditor/maskbyimage.png"), tr("create a mask from the current overview image ..."), this);
     connect(actMaskByImage, SIGNAL(triggered()), this, SLOT(excludeByImage()));
     runSelectWidget=false;
@@ -47,6 +48,10 @@ QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
     spinRun->setSpecialValueText(tr("average"));
     l->setBuddy(spinRun);
     spinRun->setVisible(false);
+    btnAvgRun=new QPushButton(tr("avg."), this);
+    btnAvgRun->setToolTip(tr("select average run/pixel ..."));
+    btnAvgRun->setVisible(false);
+    connect(btnAvgRun, SIGNAL(clicked()), this, SLOT(gotoAverageRun()));
     row++;
 
     maskEditTools=new QFRDRImageMaskEditTools(this, "QFRDRImageToRunPreview/");
@@ -176,6 +181,7 @@ QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
     setRDR(NULL);
     setSelectionEditable(false);
     setMaskEditable(false);
+
     setRunSelectWidgetActive(false);
     connect(maskEditTools, SIGNAL(rawDataChanged()), this, SLOT(replotOverview()));
 }
@@ -221,13 +227,20 @@ void QFRDRImageToRunPreview::setRunSelectWidgetActive(bool active)
     runSelectWidget=active;
     gl->removeWidget(spinRun);
     gl->removeWidget(labRun);
+    gl->removeWidget(btnAvgRun);
     if (runSelectWidget) {
         spinRun->setVisible(true);
+        btnAvgRun->setVisible(btnAvgRunVisible);
         gl->addWidget(spinRun, 0, 1);
-        gl->addWidget(labRun, 0, 2);
+        gl->addWidget(btnAvgRun, 0, 2);
+        gl->addWidget(labRun, 0, 3);
+        gl->setColumnStretch(1,0);
+        gl->setColumnStretch(2,0);
+        gl->setColumnStretch(3,1);
         labRun->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
     } else {
         spinRun->setVisible(false);
+        btnAvgRun->setVisible(false);
         gl->addWidget(labRun, 0, 1, 1, 2);
         labRun->setAlignment(Qt::AlignLeft|Qt::AlignVCenter);
     }
@@ -244,6 +257,11 @@ void QFRDRImageToRunPreview::draw(JKQTPEnhancedPainter *painter, QSize *size)
     if (size) *size=pltOverview->size();
     painter->restore();
     painter->restore();
+}
+
+void QFRDRImageToRunPreview::setDisplayGotoAverageButton(bool display)
+{
+    btnAvgRunVisible=display;
 }
 
 void QFRDRImageToRunPreview::replotOverview()
@@ -470,6 +488,11 @@ void QFRDRImageToRunPreview::setSelectionEditable(bool editable)
         maskEditTools->setAllowEditSelection(false);
     }
     tbEdit->setVisible(maskEditTools->getMaskEditing() || maskEditTools->getAllowEditSelection());
+}
+
+void QFRDRImageToRunPreview::gotoAverageRun()
+{
+    spinRun->setValue(spinRun->minimum());
 }
 
 

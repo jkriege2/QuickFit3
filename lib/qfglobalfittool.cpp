@@ -23,8 +23,8 @@
 #include "qftools.h"
 #include "qfmathtools.h"
 
-#undef DEBUG_GLOBALFIT
 #define DEBUG_GLOBALFIT
+#undef DEBUG_GLOBALFIT
 
 
 

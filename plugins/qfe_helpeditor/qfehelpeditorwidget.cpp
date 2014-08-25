@@ -15,7 +15,7 @@
 
 
 
-
+#define AUTOSAVE_INTERVAL_MSEC 20000
 
 
 QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
@@ -50,6 +50,8 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     connect(ui->edtScript->getEditor(), SIGNAL(cursorPositionChanged()), this, SLOT(edtScript_cursorPositionChanged()));
 
 
+    actLoadAutosave=new QAction(tr("load last autosaved file ..."), this);
+    connect(actLoadAutosave, SIGNAL(triggered()), this, SLOT(reloadLastAutosave()));
 
     cutAct = new QAction(QIcon(":/qfe_helpeditor/script_cut.png"), tr("Cu&t"), this);
     cutAct->setShortcut(tr("Ctrl+X"));
@@ -151,6 +153,8 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     menuMore->addAction(findAct);
     menuMore->addAction(replaceAct);
     menuMore->addAction(findNextAct);
+    menuMore->addSeparator();
+    menuMore->addAction(actLoadAutosave);
     ui->tbMoreOptions->setMenu(menuMore);
     ui->tbFind->setDefaultAction(findAct);
     ui->tbFindNext->setDefaultAction(findNextAct);
@@ -349,7 +353,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
 
     menu=new QMenu(tr("LaTeX"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
-    addInsertAction(menu, "\\left(%1°\right)");
+    addInsertAction(menu, "\\left(%1°\\right)");
     addInsertAction(menu, "\\left[%1°\\right]");
     addInsertAction(menu, "\\left\\{%1°\\right\\}");
     addInsertAction(menu, "\\left\\langle%1°\\right\\rangle");
@@ -378,6 +382,8 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "\\underline{%1°}");
     //addInsertAction(menu, "$$$$");
 
+    QTimer::singleShot(AUTOSAVE_INTERVAL_MSEC, this, SLOT(autosave()));
+
 }
 
 QFEHelpEditorWidget::~QFEHelpEditorWidget()
@@ -399,6 +405,18 @@ void QFEHelpEditorWidget::loadSettings(QSettings &settings, QString prefix)
 void QFEHelpEditorWidget::storeSettings(QSettings &settings, QString prefix) const
 {
     recentHelpFiles->storeSettings(settings, prefix+"recentScripts/");
+}
+
+void QFEHelpEditorWidget::autosave()
+{
+    saveFile(QDir(QFPluginServices::getInstance()->getConfigFileDirectory()).absoluteFilePath("helpeditor_autosave.html"));
+    QTimer::singleShot(AUTOSAVE_INTERVAL_MSEC, this, SLOT(autosave()));
+}
+
+void QFEHelpEditorWidget::reloadLastAutosave()
+{
+    openScript(QDir(QFPluginServices::getInstance()->getConfigFileDirectory()).absoluteFilePath("helpeditor_autosave.html"), false);
+    setScriptFilename("");
 }
 
 void QFEHelpEditorWidget::documentWasModified()
@@ -463,7 +481,7 @@ bool QFEHelpEditorWidget::save() {
 
 }
 
-bool QFEHelpEditorWidget::saveFile(const QString &filename)
+bool QFEHelpEditorWidget::saveFile(const QString &filename, bool setFilename)
 {
     QFile f(filename);
     //qDebug()<<"saving to "<<filename;
@@ -472,7 +490,7 @@ bool QFEHelpEditorWidget::saveFile(const QString &filename)
         s<<ui->edtScript->getEditor()->toPlainText().toUtf8();
         lastScript=ui->edtScript->getEditor()->toPlainText();
         f.close();
-        setScriptFilename(filename);
+        if (setFilename) setScriptFilename(filename);
     }
     return true;
 }

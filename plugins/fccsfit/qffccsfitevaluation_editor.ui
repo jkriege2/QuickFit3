@@ -396,7 +396,7 @@
       </widget>
      </item>
      <item>
-      <widget class="JKQTPLinePlotStyleComboBox" name="cmbDisplayData"/>
+      <widget class="JKQTPLinePlotStyleWithSymbolSizeComboBox" name="cmbDisplayData"/>
      </item>
      <item>
       <widget class="QLabel" name="label_4">
@@ -490,11 +490,6 @@ p, li { white-space: pre-wrap; }
    <header>qffcsweightingtools.h</header>
   </customwidget>
   <customwidget>
-   <class>JKQTPLinePlotStyleComboBox</class>
-   <extends>QComboBox</extends>
-   <header>jkqtptools.h</header>
-  </customwidget>
-  <customwidget>
    <class>JKQTPerrorPlotstyleComboBox</class>
    <extends>QComboBox</extends>
    <header>jkqtptools.h</header>
@@ -515,6 +510,11 @@ p, li { white-space: pre-wrap; }
    <extends>QWidget</extends>
    <header>qfrdrrunselector.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPLinePlotStyleWithSymbolSizeComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
   </customwidget>
  </customwidgets>
  <resources>
