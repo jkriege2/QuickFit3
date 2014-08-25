@@ -412,6 +412,8 @@ void QFEHelpEditorWidget::autosave()
     if (!getScript().isEmpty()) {
         QDir d(QFPluginServices::getInstance()->getConfigFileDirectory());
         d.mkpath(d.absolutePath());
+        if (QFile::exists(d.absoluteFilePath("helpeditor_autosave_old.html"))) QFile::copy(d.absoluteFilePath("helpeditor_autosave_old.html"), d.absoluteFilePath("helpeditor_autosave_older.html"));
+        if (QFile::exists(d.absoluteFilePath("helpeditor_autosave.html"))) QFile::copy(d.absoluteFilePath("helpeditor_autosave.html"), d.absoluteFilePath("helpeditor_autosave_old.html"));
         saveFile(d.absoluteFilePath("helpeditor_autosave.html"), false);
     }
     QTimer::singleShot(AUTOSAVE_INTERVAL_MSEC, this, SLOT(autosave()));
