@@ -409,14 +409,21 @@ void QFEHelpEditorWidget::storeSettings(QSettings &settings, QString prefix) con
 
 void QFEHelpEditorWidget::autosave()
 {
-    saveFile(QDir(QFPluginServices::getInstance()->getConfigFileDirectory()).absoluteFilePath("helpeditor_autosave.html"));
+    if (!getScript().isEmpty()) {
+        QDir d(QFPluginServices::getInstance()->getConfigFileDirectory());
+        d.mkpath(d.absolutePath());
+        saveFile(d.absoluteFilePath("helpeditor_autosave.html"), false);
+    }
     QTimer::singleShot(AUTOSAVE_INTERVAL_MSEC, this, SLOT(autosave()));
 }
 
 void QFEHelpEditorWidget::reloadLastAutosave()
 {
-    openScript(QDir(QFPluginServices::getInstance()->getConfigFileDirectory()).absoluteFilePath("helpeditor_autosave.html"), false);
-    setScriptFilename("");
+    QDir d(QFPluginServices::getInstance()->getConfigFileDirectory());
+    if (QFile::exists(d.absoluteFilePath("helpeditor_autosave.html"))) {
+        openScript(d.absolutePath(), false, "helpeditor_autosave.html");
+        setScriptFilename("");
+    }
 }
 
 void QFEHelpEditorWidget::documentWasModified()
