@@ -3322,7 +3322,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // extract table of contents from header tags
-            QRegExp rxHeader("<\\s*h([123456789])(.*)>(.*)<\\/\\s*h\\1\\s*>", Qt::CaseInsensitive);
+            QRegExp rxHeader("<\\s*h([123456789])([^>]*)>(.*)<\\/\\s*h\\1\\s*>", Qt::CaseInsensitive);
             rxHeader.setMinimal(true);
             count = 0;
             pos = 0;
@@ -3334,6 +3334,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 int level=rxHeader.cap(1).toInt();
                 QString text=rxHeader.cap(3);
                 QString hres=rxHeader.cap(2);
+                qDebug()<<text<<hres;
 
                 if (!hres.toLower().contains("id=\"title\"") && !text.contains("<!-- title -->")) {
                     ContentsEntry h;
@@ -3390,31 +3391,40 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             pos = 0;
             while ((pos = rxHeader.indexIn(result, pos)) != -1) {
 
-                QString prefix="";
-                for (int j=minHeaderLevel-1; j<contents[count].num.size(); j++) {
-                    if (!prefix.isEmpty()) prefix+=".";
-                    prefix+=QString::number(contents[count].num[j]);
+                int level=rxHeader.cap(1).toInt();
+                QString text=rxHeader.cap(3);
+                QString hres=rxHeader.cap(2);
+                qDebug()<<text<<hres;
+
+                if (!hres.toLower().contains("id=\"title\"") && !text.contains("<!-- title -->")) {
+                    QString prefix="";
+                    for (int j=minHeaderLevel-1; j<contents[count].num.size(); j++) {
+                        if (!prefix.isEmpty()) prefix+=".";
+                        prefix+=QString::number(contents[count].num[j]);
+                    }
+                    contents[count].prefix=prefix;
+                    QString header=contents[count].header;
+                    QString newmatch=rxHeader.cap(0);
+                    newmatch=newmatch.replace(header, QString("<i>")+contents[count].prefix+QString(".</i>&nbsp;&nbsp;&nbsp;")+header);
+                    QString insert=QString("<a name=\"%1\">%2").arg(contents[count].id).arg(newmatch);
+
+                    //qDebug()<<rxHeader.cap(0)<<header<<newmatch;
+
+                    if (count>0 && minHeaderLevel==contents[count].num.size()) {
+                        insert=QString("$$qf_commondoc_backtop$$<br><br><br>")+insert;
+                    }
+
+                    if (rxHeader1.indexIn(insert, 0)!=-1) {
+                        insert=insert.replace(rxHeader1.cap(1), rxHeader1.cap(1)+QString(" style=\"background-color: azure;\" "));
+                    }
+
+                    result=result.replace(rxHeader.cap(0), insert);
+
+                    ++count;
+                    pos += insert.size();
+                } else {
+                    pos += rxHeader.matchedLength();
                 }
-                contents[count].prefix=prefix;
-                QString header=contents[count].header;
-                QString newmatch=rxHeader.cap(0);
-                newmatch=newmatch.replace(header, QString("<i>")+contents[count].prefix+QString(".</i>&nbsp;&nbsp;&nbsp;")+header);
-                QString insert=QString("<a name=\"%1\">%2").arg(contents[count].id).arg(newmatch);
-
-                //qDebug()<<rxHeader.cap(0)<<header<<newmatch;
-
-                if (count>0 && minHeaderLevel==contents[count].num.size()) {
-                    insert=QString("$$qf_commondoc_backtop$$<br><br><br>")+insert;
-                }
-
-                if (rxHeader1.indexIn(insert, 0)!=-1) {
-                    insert=insert.replace(rxHeader1.cap(1), rxHeader1.cap(1)+QString(" style=\"background-color: azure;\" "));
-                }
-
-                result=result.replace(rxHeader.cap(0), insert);
-
-                ++count;
-                pos += insert.size();
 
             }
             // compute table of contents
