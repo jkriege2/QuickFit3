@@ -73,6 +73,8 @@ class QFEHelpEditorWidget : public QWidget {
         void on_btnInsertMath_clicked();
         void on_btnInsertBMath_clicked();
         void on_btnInsertPluginLink_clicked();
+        void on_btnInsertSubPluginLink_clicked();
+        void on_btnCenter_clicked();
         //void on__clicked();
 
         /** \brief replaces the currently selected text by newText, hwere %1 is replaced by the selected text*/

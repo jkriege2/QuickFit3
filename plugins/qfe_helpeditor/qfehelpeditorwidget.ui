@@ -304,76 +304,25 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnImage">
+      <widget class="Line" name="line_6">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnCenter">
        <property name="text">
-        <string>insert image</string>
+        <string>insert centered text block</string>
        </property>
        <property name="icon">
         <iconset resource="qfehelpeditor.qrc">
-         <normaloff>:/qfe_helpeditor/icons/insert_image.png</normaloff>:/qfe_helpeditor/icons/insert_image.png</iconset>
+         <normaloff>:/qfe_helpeditor/icons/format_justify_center.png</normaloff>:/qfe_helpeditor/icons/format_justify_center.png</iconset>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnInsertAndCopyImage">
-       <property name="toolTip">
-        <string>select an image file to copy to the help directory and insetr into the document</string>
-       </property>
-       <property name="text">
-        <string>copy and insert image file</string>
-       </property>
-       <property name="icon">
-        <iconset resource="qfehelpeditor.qrc">
-         <normaloff>:/qfe_helpeditor/icons/copyimage.png</normaloff>:/qfe_helpeditor/icons/copyimage.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnPasteImage">
-       <property name="text">
-        <string>insert image</string>
-       </property>
-       <property name="icon">
-        <iconset resource="qfehelpeditor.qrc">
-         <normaloff>:/qfe_helpeditor/icons/paste_image.png</normaloff>:/qfe_helpeditor/icons/paste_image.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnAnchor">
-       <property name="text">
-        <string>insert anchor</string>
-       </property>
-       <property name="icon">
-        <iconset resource="qfehelpeditor.qrc">
-         <normaloff>:/qfe_helpeditor/icons/insert_anchor.png</normaloff>:/qfe_helpeditor/icons/insert_anchor.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnLink">
-       <property name="text">
-        <string>insert link</string>
-       </property>
-       <property name="icon">
-        <iconset resource="qfehelpeditor.qrc">
-         <normaloff>:/qfe_helpeditor/icons/insert_weblink.png</normaloff>:/qfe_helpeditor/icons/insert_weblink.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnInsertPluginLink">
-       <property name="text">
-        <string>insert plugin link ...</string>
-       </property>
-       <property name="icon">
-        <iconset resource="../../libqf3widgets/libqf3widgets.qrc">
-         <normaloff>:/libqf3widgets/plugin.png</normaloff>:/libqf3widgets/plugin.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QToolButton" name="btnBlockquote">
+      <widget class="QToolButton" name="btnBlockquote_2">
        <property name="text">
         <string>insert blockquote</string>
        </property>
@@ -413,6 +362,13 @@
        <property name="icon">
         <iconset resource="qfehelpeditor.qrc">
          <normaloff>:/qfe_helpeditor/icons/insert_listitem.png</normaloff>:/qfe_helpeditor/icons/insert_listitem.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line_10">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
        </property>
       </widget>
      </item>
@@ -483,6 +439,13 @@
       </widget>
      </item>
      <item>
+      <widget class="Line" name="line_8">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="btnInsertMath">
        <property name="text">
         <string>insert equation</string>
@@ -501,6 +464,100 @@
        <property name="icon">
         <iconset resource="qfehelpeditor.qrc">
          <normaloff>:/qfe_helpeditor/icons/bformula.png</normaloff>:/qfe_helpeditor/icons/bformula.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line_7">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnImage">
+       <property name="text">
+        <string>insert image</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/insert_image.png</normaloff>:/qfe_helpeditor/icons/insert_image.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnInsertAndCopyImage">
+       <property name="toolTip">
+        <string>select an image file to copy to the help directory and insetr into the document</string>
+       </property>
+       <property name="text">
+        <string>copy and insert image file</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/copyimage.png</normaloff>:/qfe_helpeditor/icons/copyimage.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnPasteImage">
+       <property name="text">
+        <string>insert image</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/paste_image.png</normaloff>:/qfe_helpeditor/icons/paste_image.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="Line" name="line_9">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnAnchor">
+       <property name="text">
+        <string>insert anchor</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/insert_anchor.png</normaloff>:/qfe_helpeditor/icons/insert_anchor.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnLink">
+       <property name="text">
+        <string>insert link</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/insert_weblink.png</normaloff>:/qfe_helpeditor/icons/insert_weblink.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnInsertPluginLink">
+       <property name="text">
+        <string>insert plugin link ...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../libqf3widgets/libqf3widgets.qrc">
+         <normaloff>:/libqf3widgets/plugin.png</normaloff>:/libqf3widgets/plugin.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnInsertSubPluginLink">
+       <property name="text">
+        <string>insert fit function/algorithm ... link ...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/fitfunc_icon.png</normaloff>:/lib/fitfunc_icon.png</iconset>
        </property>
       </widget>
      </item>

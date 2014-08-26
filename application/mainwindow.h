@@ -156,7 +156,6 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         /** \brief QFPluginServices::getPluginHelp() */
         virtual QString getPluginHelp(const QString& pluginID);
-
         /** \brief QFPluginServices::getPluginTutorial() */
         virtual QString getPluginTutorial(const QString& pluginID);
         /** \brief QFPluginServices::getPluginFAQ() */
@@ -170,6 +169,14 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         /** \brief QFPluginServices::getPluginHelpDirectory() */
         virtual QString getPluginHelpDirectory(const QString& pluginID);
 
+        /** \brief QFPluginServices::getFitFunctionHelp() */
+        virtual QString getFitFunctionHelp(const QString& pluginID);
+
+        /** \brief QFPluginServices::getFitAlgorithmHelp() */
+        virtual QString getFitAlgorithmHelp(const QString& pluginID);
+
+        /** \brief QFPluginServices::getImporterHelp() */
+        virtual QString getImporterHelp(const QString& pluginID);
         /** \brief register a configuration pane for a plugin in the main options dialog */
         virtual void registerSettingsPane(QFPluginOptionsDialogInterface* plugin);
         /** \copydoc QFPluginServices::openEvaluationEditor() */

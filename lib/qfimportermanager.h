@@ -137,6 +137,11 @@ class QFLIB_EXPORT QFImporterManager : public QObject {
         /** \brief get plugins minor version number */
         int getMinorVersion(int i);
         bool contains(const QString &ID);
+
+        inline bool hasPluginForID(const QString& id) const {
+            return getPluginForID(id)>=0;
+        }
+
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

@@ -1934,6 +1934,7 @@ QString MainWindow::getPluginHelpDirectory(const QString& pluginID) {
     else return QFileInfo(hlp).absolutePath()+"/";
 }
 
+
 void MainWindow::registerSettingsPane(QFPluginOptionsDialogInterface *plugin)
 {
     pluginOptionDialogs.append(plugin);
@@ -2230,6 +2231,25 @@ QString MainWindow::getPluginHelp(const QString& pluginID) {
     if (evaluationFactory->contains(pluginID)) return evaluationFactory->getPluginHelp(pluginID);
     if (rawDataFactory->contains(pluginID)) return rawDataFactory->getPluginHelp(pluginID);
     if (extensionManager->contains(pluginID)) return extensionManager->getPluginHelp(pluginID);
+    if (fitFunctionManager->contains(pluginID)) return fitFunctionManager->getPluginHelp( fitFunctionManager->getPluginForID(pluginID));
+    if (fitAlgorithmManager->contains(pluginID)) return fitAlgorithmManager->getPluginHelp(fitAlgorithmManager->getPluginForID(pluginID));
+    if (importerManager->contains(pluginID)) return importerManager->getPluginHelp(importerManager->getPluginForID(pluginID));
+    return "";
+}
+
+
+QString MainWindow::getFitFunctionHelp(const QString &pluginID) {
+    if (fitFunctionManager->hasPluginForID(pluginID)) return fitFunctionManager->getPluginHelp(fitFunctionManager->getPluginForID(pluginID), pluginID);
+    return "";
+}
+
+QString MainWindow::getFitAlgorithmHelp(const QString &pluginID) {
+    if (fitAlgorithmManager->hasPluginForID(pluginID)) return fitAlgorithmManager->getPluginHelp(fitAlgorithmManager->getPluginForID(pluginID), pluginID);
+    return "";
+}
+
+QString MainWindow::getImporterHelp(const QString &pluginID) {
+    if (importerManager->hasPluginForID(pluginID)) return importerManager->getPluginHelp(importerManager->getPluginForID(pluginID), pluginID);
     return "";
 }
 
@@ -3280,7 +3300,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$plugin_info:<name>:<id>$$, $$fig:file:caption$$,  $$figure:file:caption$$ items, etc.
-            QRegExp rxPluginInfo("\\$\\$(plugin_info|fig|figure|startbox)\\:([^\\$]*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxPluginInfo("\\$\\$(plugin_info|fig|figure|startbox|fitfunction|fitalgorithm|importer)\\:([^\\$]*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxPluginInfo.setMinimal(true);
             count = 0;
             pos = 0;
@@ -3297,7 +3317,58 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     if (param1=="assetsdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginAssetsDirectory(param2));
                     if (param1=="configdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginConfigDirectory(param2));
                     if (param1=="examplesdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginExamplesDirectory(param2));
-                } else if (command=="fig" || command=="figure") {
+                } else if (QFPluginServices::getInstance() && command=="fitfunction") {
+                    if (param1=="help") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getFitFunctionHelp(param2));
+                    else if (param1=="name") {
+                        QFFitFunction* f=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(param2);
+                        QString name="";
+                        if (f) {
+                            name=f->name();
+                            delete f;
+                        }
+                        result=result.replace(rxPluginInfo.cap(0), name);
+                    }
+                    else if (param1=="short_name") {
+                        QFFitFunction* f=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(param2);
+                        QString name="";
+                        if (f) {
+                            name=f->shortName();
+                            delete f;
+                        }
+                        result=result.replace(rxPluginInfo.cap(0), name);
+                    }
+                } else if (QFPluginServices::getInstance() && command=="fitalgorithm") {
+                    if (param1=="help") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getFitAlgorithmHelp(param2));
+                    else if (param1=="name") {
+                        QFFitAlgorithm* f=QFPluginServices::getInstance()->getFitAlgorithmManager()->createAlgorithm(param2);
+                        QString name="";
+                        if (f) {
+                            name=f->name();
+                            delete f;
+                        }
+                        result=result.replace(rxPluginInfo.cap(0), name);
+                    }
+                    else if (param1=="short_name") {
+                        QFFitAlgorithm* f=QFPluginServices::getInstance()->getFitAlgorithmManager()->createAlgorithm(param2);
+                        QString name="";
+                        if (f) {
+                            name=f->shortName();
+                            delete f;
+                        }
+                        result=result.replace(rxPluginInfo.cap(0), name);
+                    }
+                } else if (QFPluginServices::getInstance() && command=="importer") {
+                    if (param1=="help") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getImporterHelp(param2));
+                    else if (param1=="name" || param1=="short_name") {
+                        QFImporter* f=QFPluginServices::getInstance()->getImporterManager()->createImporter(param2);
+                        QString name="";
+                        if (f) {
+                            name=f->formatName();
+                            delete f;
+                        }
+                        result=result.replace(rxPluginInfo.cap(0), name);
+                    }
+               } else if (command=="fig" || command=="figure") {
                     QString rep=tr("<center>"
                                      "<img src=\"%1\"><br><i>%2</i><br>"
                                    "</center>").arg(param1).arg(param2);
@@ -3533,15 +3604,18 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             // insert tooltips: search all occurences of the tooltip keywords that are not inside a tag (i.e. surrounded by a closing tag on
             // the left and an opening tag on the right) and where the tag is not something special (like headers or links).
             QMapIterator<QString, QFToolTipsData> itTT(tooltips);
-            itTT.toBack();
-            while (itTT.hasPrevious()) {
-                itTT.previous();
-                QRegExp rxTT(QString("\\<\\s*(\\w\\w*)[^\\>]*\\>[^\\<\\>]*(%1)[^\\<\\>]*\\<").arg(itTT.key()));
+            QStringList ttids=tooltips.keys();
+            qSort(ttids.begin(), ttids.end(), qfQStringCompareLengthDecreasing);
+
+            for (int ti=0; ti<ttids.size(); ti++){
+                const QString key=ttids[ti];
+                const QFToolTipsData val=tooltips.value(key);
+                QRegExp rxTT(QString("\\<\\s*(\\w\\w*)[^\\>]*\\>[^\\<\\>]*(%1)[^\\<\\>]*\\<").arg(key));
                 rxTT.setMinimal(true);
                 pos = 0;
                 //qDebug()<<rxTT;
                 while ((pos = rxTT.indexIn(result, pos)) != -1) {
-                    QString rep=QString("<a href=\"tooltip:%1\">%2</a>").arg(itTT.key()).arg(rxTT.cap(2));
+                    QString rep=QString("<a href=\"tooltip:%1\">%2</a>").arg(key).arg(rxTT.cap(2));
                     QString tag=rxTT.cap(1).toLower();
                     if (tag!="h1" && tag!="h2" && tag!="h3" && tag!="h4" && tag!="h5" && tag!="title" && tag!="a") {
                         result=result.replace(rxTT.pos(2), rxTT.cap(2).size(), rep);

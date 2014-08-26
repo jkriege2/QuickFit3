@@ -11,6 +11,7 @@
 #include "pasteimagedlg.h"
 #include "selectresourceimage.h"
 #include "pluginlinkdialog.h"
+#include "subpluginlinkdialog.h"
 
 
 
@@ -275,6 +276,18 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$plugin_info:assetsdir:PLUGINID$$");
     addInsertAction(menu, "$$plugin_info:examplesdir:PLUGINID$$");
     addInsertAction(menu, "$$plugin_info:configdir:PLUGINID$$");
+    menu->addSeparator();
+    addInsertAction(menu, "$$fitfunction:help:PLUGINID$$");
+    addInsertAction(menu, "$$fitfunction:name:PLUGINID$$");
+    addInsertAction(menu, "$$fitfunction:short_name:PLUGINID$$");
+    menu->addSeparator();
+    addInsertAction(menu, "$$fitalgorithm:help:PLUGINID$$");
+    addInsertAction(menu, "$$fitalgorithm:name:PLUGINID$$");
+    addInsertAction(menu, "$$fitalgorithm:short_name:PLUGINID$$");
+    menu->addSeparator();
+    addInsertAction(menu, "$$importer:help:PLUGINID$$");
+    addInsertAction(menu, "$$importer:name:PLUGINID$$");
+
 
 
     menu=new QMenu(tr("plugin lists"), this);
@@ -876,6 +889,18 @@ void QFEHelpEditorWidget::on_btnInsertPluginLink_clicked()
     if (dlg->exec()) {
         insertAroundOld(dlg->insertText()+"%1°");
     }
+}
+
+void QFEHelpEditorWidget::on_btnInsertSubPluginLink_clicked()
+{
+    SubPluginLinkDialog* dlg=new SubPluginLinkDialog(this);
+    if (dlg->exec()) {
+        insertAroundOld(dlg->insertText()+"%1°");
+    }
+}
+void QFEHelpEditorWidget::on_btnCenter_clicked()
+{
+    insertAroundOld("\n<center>%1°</center>");
 }
 
 

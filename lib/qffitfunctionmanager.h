@@ -117,6 +117,11 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
 
         /** \brief return the plugin index for a given fit function id */
         int getPluginForID(QString id) const;
+
+        inline bool hasPluginForID(const QString& id) const {
+            return getPluginForID(id)>=0;
+        }
+
         /** \brief get plugins major version number */
         int getMajorVersion(int i);
         /** \brief get plugins minor version number */

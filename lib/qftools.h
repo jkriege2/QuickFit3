@@ -865,6 +865,20 @@ bool qfQTripleCompareThird(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, 
     return s1.third < s2.third;
 }
 
+/*! \brief can be used with qSort to sort <code>QStringlist</code> for the length of the ebrties (decreasing order)
+    \ingroup qf3lib_tools
+*/
+template <class T1, class T2>
+bool qfQStringCompareLengthDecreasing(const T1 &s1, const T2 &s2) {
+    return s1.size() > s2.size();
+}
+/*! \brief can be used with qSort to sort <code>QStringlist</code> for the length of the ebrties (increasing order)
+    \ingroup qf3lib_tools
+*/
+template <class T1, class T2>
+bool qfQStringCompareLengthIncreasing(const T1 &s1, const T2 &s2) {
+    return s1.size() < s2.size();
+}
 
 
 

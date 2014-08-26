@@ -57,6 +57,19 @@
 	  - other plugins info:
          - \c $$plugin_info:help:PLUGINID$$ the path of the help file for plugin with ID <i>PLUGINID</i>
          - \c $$plugin_info:tutorial:PLUGINID$$ the path of the tutorial file for plugin with ID <i>PLUGINID</i>
+         - \c $$plugin_info:faq:PLUGINID$$ the path of the faq file for plugin with ID <i>PLUGINID</i>
+         - \c $$plugin_info:helpdir:PLUGINID$$ the path of the helpdir file for plugin with ID <i>PLUGINID</i>
+         - \c $$plugin_info:assetsdir:PLUGINID$$ the path of the assetsdir file for plugin with ID <i>PLUGINID</i>
+         - \c $$plugin_info:configdir:PLUGINID$$ the path of the configdir file for plugin with ID <i>PLUGINID</i>
+         - \c $$plugin_info:examplesdir:PLUGINID$$ the path of the examplesdir file for plugin with ID <i>PLUGINID</i>
+         - \c $$fitfunction:help:PLUGINID$$ help file for the fit function ID <i>PLUGINID</i>
+         - \c $$fitfunction:name:PLUGINID$$ name for the fit function ID <i>PLUGINID</i>
+         - \c $$fitfunction:short_name:PLUGINID$$ short name for the fit function ID <i>PLUGINID</i>
+         - \c $$fitalgorithm:help:PLUGINID$$ help file for the fit algorithm ID <i>PLUGINID</i>
+         - \c $$fitalgorithm:name:PLUGINID$$ name for the fit algorithm ID <i>PLUGINID</i>
+         - \c $$fitalgorithm:short_name:PLUGINID$$ short name for the fit algorithm ID <i>PLUGINID</i>
+         - \c $$importer:help:PLUGINID$$ help file for the importer ID <i>PLUGINID</i>
+         - \c $$importer:name:PLUGINID$$ format name for the importer ID <i>PLUGINID</i>
         .		 
 		
       - lists of available plugins

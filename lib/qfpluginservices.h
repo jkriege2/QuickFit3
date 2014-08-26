@@ -225,6 +225,16 @@ class QFLIB_EXPORT QFPluginServices {
         /** \brief return the main help file for the given plugin ID */
         virtual QString getPluginHelp(const QString& pluginID)=0;
 
+        /** \brief return the help file for the given ft function ID */
+        virtual QString getFitFunctionHelp(const QString& pluginID)=0;
+
+        /** \brief return the help file for the given ft function ID */
+        virtual QString getFitAlgorithmHelp(const QString& pluginID)=0;
+
+        /** \brief return the help file for the given ft function ID */
+        virtual QString getImporterHelp(const QString& pluginID)=0;
+
+
         /** \brief return the tutorial for the given plugin ID */
         virtual QString getPluginTutorial(const QString& pluginID)=0;
 
