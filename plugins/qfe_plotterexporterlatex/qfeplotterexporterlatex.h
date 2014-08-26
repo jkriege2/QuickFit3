@@ -35,7 +35,7 @@ class QFEPlotterExporterLatex : public QObject, public QFExtensionBase {
         /** \copydoc QFExtension::getAuthor() */
         virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c) 2013 by Jan W. Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2013-2014 by Jan W. Krieger"); };
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };
         /** \copydoc QFExtension::getIconFilename() */

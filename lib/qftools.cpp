@@ -1169,3 +1169,14 @@ void parseFAQ(const QString& filename, const QString& pluginID, QMap<QString, QF
         parseFAQInt(filename, fc, "\\$\\$faq_start\\$\\$\\s*<\\s*a\\s*name\\s*\\=\\s*\\\"\\#?([^#]*)\\\"\\s*/?\\s*>\\s*(.*)\\s*\\$\\$faq_answer\\$\\$", 2, 1, pluginID, faqs);
     }
 }
+
+
+
+
+bool qfQStringCompareLengthDecreasing(const QString &s1, const QString &s2) {
+    return s1.size() > s2.size();
+}
+
+bool qfQStringCompareLengthIncreasing(const QString &s1, const QString &s2) {
+    return s1.size() < s2.size();
+}

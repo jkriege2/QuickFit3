@@ -1,15 +1,17 @@
 #include "jkqtplatexengineadapter.h"
 
 
-JKQTPLatexEngineAdapter::JKQTPLatexEngineAdapter(bool docMode, bool colorMode, QTeXPaintDevice::OutputMode outputMode)
+JKQTPLatexEngineAdapter::JKQTPLatexEngineAdapter(bool docMode, bool colorMode, QTeXPaintDevice::OutputMode outputMode, bool m_useLatexParser)
 {
     this->docMode=docMode;
     this->colorMode=colorMode;
     this->outputMode=outputMode;
+    this->m_useLatexParser=m_useLatexParser;
     id="TIKZ";
     if (outputMode==QTeXPaintDevice::Pgf) id="PGF";
     if (!colorMode) id+="_BW";
     if (docMode) id+="_DOC";
+    if (!m_useLatexParser) id+="_NOTEXPARSER";
 }
 
 QString JKQTPLatexEngineAdapter::getFilter() const
@@ -23,6 +25,7 @@ QString JKQTPLatexEngineAdapter::getFilter() const
     if (!colorMode) m+=QObject::tr(" b&w");
     if (!docMode) m+=QObject::tr(" include file");
     else  m+=QObject::tr(" full document");
+    if (!m_useLatexParser) m+=QObject::tr(" no TeX parser");
     return QObject::tr("LaTeX [%1] (*.tex)").arg(m);
 }
 
@@ -61,11 +64,17 @@ bool JKQTPLatexEngineAdapter::isPrinter() const
     return false;
 }
 
+bool JKQTPLatexEngineAdapter::useLatexParser() const
+{
+    return m_useLatexParser;
+}
+
 QPaintDevice *JKQTPLatexEngineAdapter::createPaintdevice(const QString &filename, int widthPix, int heightPix) const
 {
     //qDebug()<<"create EMF-device for "<<filename<<QSize(widthPix, heightPix);
     QTeXPaintDevice * emf=new QTeXPaintDevice(filename, QSize(ceil(double(widthPix)/96.0*25.4*72.0), ceil(double(heightPix)/96.0*25.4*72.0)), QTeXPaintDevice::pt);
     emf->setColorMode((colorMode)?(QPrinter::Color):(QPrinter::GrayScale));
     emf->setDocumentMode(docMode);
+    emf->setEscapeTextMode(m_useLatexParser);
     return emf;
 }

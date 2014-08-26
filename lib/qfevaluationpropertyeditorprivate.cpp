@@ -370,7 +370,17 @@ void QFEvaluationPropertyEditorPrivate::propsChanged(const QString& property, bo
         }
         /*labTopIcon->setPixmap(d->current->getSmallIcon().pixmap(16,16));
         labTop->setText(tr("<b>%1</b>").arg(d->current->getName()));*/
-        d->setWindowTitle(d->current->getName());
+        QString prefix="";
+        int whm=ProgramOptions::getConfigValue("quickfit/windowheadermode", 1).toInt();
+        if (whm==1) {
+            prefix=QFileInfo(d->current->getProject()->getFile()).fileName();
+        } else if (whm==2) {
+            prefix=d->current->getProject()->getName();
+            if (prefix.isEmpty()) prefix=QFileInfo(d->current->getProject()->getFile()).fileName();
+        }
+        if (!prefix.isEmpty()) prefix += QString(": ");
+
+        d->setWindowTitle(QString("%2Evaluation: %1").arg(d->current->getName()).arg(prefix));
         d->setWindowIcon(d->current->getSmallIcon());
         labID->setText(QString::number(d->current->getID()));
         labType->setText(d->current->getTypeDescription());

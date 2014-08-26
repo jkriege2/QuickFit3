@@ -207,7 +207,7 @@ class QFRDRImagingFCSCorrelationJobThread : public QThread {
         };
 
         struct Fileinfo{                
-                Fileinfo(const QString& filename=QString(""), const QString& role=QString(""), int internalDualViewMode=0, int dualViewID=0, bool isNandB=true, const QString &group=QString(""));
+            Fileinfo(const QString& filename=QString(""), const QString& role=QString(""), int internalDualViewMode=0, int dualViewID=0, bool isNandB=true, const QString &group=QString(""));
             QString filename;
             QString filenameVar;
             QString filenameBack;

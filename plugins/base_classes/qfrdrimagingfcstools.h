@@ -63,7 +63,7 @@ QString findOverviewFileForVideoCorrelatorFile(const QString& vidCorrFile);
 
 QString findFileWithExtensionForVideoCorrelatorFile(const QString& vidCorrFile, const QString& newExtension);
 
-int getEvalsettingsDV2Mode(const QString& filename, const QString &datafilename=QString(""), bool *isFCCS=NULL, bool *isACF=NULL, QString *inputFilename=NULL);
+int getEvalsettingsDV2Mode(const QString& filename, const QString &datafilename=QString(""), bool *isFCCS=NULL, bool *isACF=NULL, QString *inputFilename=NULL, QString *group=NULL);
 
 bool readEvalSettingsFile(const QString &evalFilename, bool isDCCF, QMap<QString, QVariant> &initParams, QStringList &paramsReadonly, int &width, int &height, QStringList &files, QStringList &files_types, QStringList &files_descriptions, QString &filename_settings, QString& filename_acquisition, QString filename_overview, QString& filename_overviewstd, QString& filename_background, QString& filename_backgroundstddev, QString& role, int dccfid, bool& overviewReal);
 void imFCSFilenameHeuristics(const QString &filename, QString* evalFilename, bool *isCross, bool *isDCCF, int* dccfid, bool* isJanBFile, QString* role);

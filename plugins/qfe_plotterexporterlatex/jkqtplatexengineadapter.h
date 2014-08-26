@@ -9,7 +9,7 @@
 class JKQTPLatexEngineAdapter : public JKQtBasePlotter::JKQTPPaintDeviceAdapter
 {
     public:
-        JKQTPLatexEngineAdapter(bool docMode=false, bool colorMode=true, QTeXPaintDevice::OutputMode outputMode=QTeXPaintDevice::Tikz);
+        JKQTPLatexEngineAdapter(bool docMode=false, bool colorMode=true, QTeXPaintDevice::OutputMode outputMode=QTeXPaintDevice::Tikz, bool useLatexParser=true);
 
         virtual QString getFilter() const;
         virtual QString getFormatName() const;
@@ -19,11 +19,13 @@ class JKQTPLatexEngineAdapter : public JKQtBasePlotter::JKQTPPaintDeviceAdapter
         virtual double getPrintSizeXInMM() const ;
         virtual double getPrintSizeYInMM() const ;
         virtual bool isPrinter() const;
+        virtual bool useLatexParser() const;
         virtual QPaintDevice* createPaintdevice(const QString& filename, int widthPix, int heightPix) const;
 
     protected:
         bool docMode;
         bool colorMode;
+        bool m_useLatexParser;
         QTeXPaintDevice::OutputMode outputMode;
         QString id;
 };

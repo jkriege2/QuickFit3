@@ -28,101 +28,101 @@
 -->
 <!--
 		<li><a name="3256"><b>2014-06-20 (SVN: 3256)</b>-->
-		<ul>
-		  <li><b>new plugins:</b><ul>
-			<li><b>qfe_plotterexportercairo</b>:  additional export filters to PDF/EPS/PS/SVG, using the cairo graphics library</li>
-		  </ul></li>
-		  <li><b>QuickFit</b><ul>
-		    <li>plotter widgets:<ul>
-				<li>data table in plotter now has context menu entry to copy data as CSV</li>
-				<li>changed appearance (default width of grid lines)</li>
-				<li>improved speed of JKQtPlotter</li>
-				<li>added rel. shift to error bars, as this allows to have shifted errorbars on bar charts</li>
-				<li>added example for barcharts</li>
-				<li>added asymmetric errorbars (different lengths to upper and lower bar.</li>
-				<li>impulse-plots and filled_curve-plots now support a baseline-parameter</li>
-				<li></li>
-				<li></li>
-				<li></li>
-				<li></li>
-				<li></li>
-				<li></li>
-			</ul></li>
-		    <li>expression parser:<ul>
-				<li>added function findfirst()</li>
-				<li>added function randvec_seed(), randintvec_seed(), randnormvec_seed(), randboolvec_seed()</li>
-				<li>added functions cumsum(), cumprod(), diff(), mad(), nmad(), indexedmad(), indexednmad(), trapez()/trapz()</li>
-				<li>added functions for date/time handling: now(), datenum(), datetimenum(), date2str(), datetime2str(), datediff2secs(), datediff2mins(), datediff2hours(), datediff2days()</li>
-				<li>parser now supports user-defined functions, that have qfmpNode*'s as parameters, rather than qfmpResult's (this allows for constructs, like "for()" in user-defined functions</li>
-				<li></li>
-				<li></li>
-				<li></li>
-				<li></li>
-				<li></li>
-				<li></li>
-				<li></li>
-				<li></li>
-				<li></li>
-			</ul></li>
-			<li>added context menu entry to tables, that allows to explicitly copy the table as "CSV", or to copy the table in a format suitable for "Excel", which depends on the current locale (e.g. for decimal separators)</li>
-			<li>bugfixed "copy to Excel/CSV" in table view, which did not copy any data (regression?)</li>
-			<li>improved LaTeX rendering</li>
-			<li>improved rendering of math in online-help and plotter widgets</li>
-			<li>results table export in RDR and evaluation now supports more file formats (via data export plugins)</li>
-			<li>added newer version of the XITS fonts</li>
-			<li>improved speed in JKQtPlotter, especially during resize (delayed plot)</li>
-			<li>updated to Qt 4.8.6</li>
-			<li>limited LOG-filesize to 50MB</li>
-			<li>improved speed of search in online-help</li>
-			<li>a right-click on any fit model selection combobox opens a context-menu with links to the model help and the model selector dialog</li>
-			<li>added button "next of same role" and menu-entries to all RDR editors</li>
-			<li>increased font size in online-help</li>
-			<li>improved online-help</li>
-			<li>bugfix in "copy table as image" (available in the context-menu of most tables in QuickFit3), the image now does not have a black background anymore (is no longer unreadable)</li>
-			<li>bugfix of regression: online-help didn't display table of contents properly</li>
-			<li>started adding a simple SDK for C fit functions</li>
-			<li>the Tutorials page in QuickFit's main help now also lists all sub tutorials for each plugin!</li>
-			<li>improved search speed in online-help search!</li>
-			<li>select RDR dialog now has a completer for the filter string</li>
-			<li>added Help-menu entry for citing QuickFit (this was a bit hidden in the copyright-help page before!</li>
+    <ul>
+      <li><b>new plugins:</b><ul>
+            <li><b>qfe_plotterexportercairo</b>:  additional export filters to PDF/EPS/PS/SVG, using the cairo graphics library</li>
+      </ul></li>
+      <li><b>QuickFit</b><ul>
+        <li>plotter widgets:<ul>
+                    <li>data table in plotter now has context menu entry to copy data as CSV</li>
+                    <li>changed appearance (default width of grid lines)</li>
+                    <li>improved speed of JKQtPlotter</li>
+                    <li>added rel. shift to error bars, as this allows to have shifted errorbars on bar charts</li>
+                    <li>added example for barcharts</li>
+                    <li>added asymmetric errorbars (different lengths to upper and lower bar.</li>
+                    <li>impulse-plots and filled_curve-plots now support a baseline-parameter</li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+            </ul></li>
+        <li>expression parser:<ul>
+                    <li>added function findfirst()</li>
+                    <li>added function randvec_seed(), randintvec_seed(), randnormvec_seed(), randboolvec_seed()</li>
+                    <li>added functions cumsum(), cumprod(), diff(), mad(), nmad(), indexedmad(), indexednmad(), trapez()/trapz()</li>
+                    <li>added functions for date/time handling: now(), datenum(), datetimenum(), date2str(), datetime2str(), datediff2secs(), datediff2mins(), datediff2hours(), datediff2days()</li>
+                    <li>parser now supports user-defined functions, that have qfmpNode*'s as parameters, rather than qfmpResult's (this allows for constructs, like "for()" in user-defined functions</li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+                    <li></li>
+            </ul></li>
+            <li>added context menu entry to tables, that allows to explicitly copy the table as "CSV", or to copy the table in a format suitable for "Excel", which depends on the current locale (e.g. for decimal separators)</li>
+            <li>bugfixed "copy to Excel/CSV" in table view, which did not copy any data (regression?)</li>
+            <li>improved LaTeX rendering</li>
+            <li>improved rendering of math in online-help and plotter widgets</li>
+            <li>results table export in RDR and evaluation now supports more file formats (via data export plugins)</li>
+            <li>added newer version of the XITS fonts</li>
+            <li>improved speed in JKQtPlotter, especially during resize (delayed plot)</li>
+            <li>updated to Qt 4.8.6</li>
+            <li>limited LOG-filesize to 50MB</li>
+            <li>improved speed of search in online-help</li>
+            <li>a right-click on any fit model selection combobox opens a context-menu with links to the model help and the model selector dialog</li>
+            <li>added button "next of same role" and menu-entries to all RDR editors</li>
+            <li>increased font size in online-help</li>
+            <li>improved online-help</li>
+            <li>bugfix in "copy table as image" (available in the context-menu of most tables in QuickFit3), the image now does not have a black background anymore (is no longer unreadable)</li>
+            <li>bugfix of regression: online-help didn't display table of contents properly</li>
+            <li>started adding a simple SDK for C fit functions</li>
+            <li>the Tutorials page in QuickFit's main help now also lists all sub tutorials for each plugin!</li>
+            <li>improved search speed in online-help search!</li>
+            <li>select RDR dialog now has a completer for the filter string</li>
+            <li>added Help-menu entry for citing QuickFit (this was a bit hidden in the copyright-help page before!</li>
             <li>added support for user-definable fit function in external shared libraries. This allows to write fit functions in C/Pascal/... or any other language, that can produce shared libraries. They will show much better performance, than user-defined fit functions using the internal expression parser. QuickFit now searches for these plugins in the sub-directory sdk_fitfunctions and sdk/sdk_fitfunctions.</li>
             <li>QuickFit now also searches for plugins in sub-directories</li>
             <li>Added citing tab to About QuickFit dialog, improved citing page in online-help</li>
             <li>fit algorithms should use the multiEvaluate() function of QFFitFunction now.</li>
-			<li>prepared main window for (different) wizards</li>
+            <li>prepared main window for (different) wizards</li>
             <li>online-help now supports a list of FAQs for QuickFit and for plugins</li>
             <li>Tools | Project Tools | set property in multiple RDRs: now can also set the name/rolw/folder/group of RDRs.</li>
           </ul></li>
 	
-		  <li><b>imFCCSFit</b><ul>
-			<li>fixed a possible crash when selecting a new fit function by hand</li>
-			<li>fit parameter names are more expressive now</li>
-			<li>the tool to calculate the crosstalk-corrected rel. FCCS amplitude now supports background-correction</li>
-			<li>replaced "run" by "pixel" to clear up the function</li>
-			<li>added button "go to average pixel"</li>
+        <li><b>imFCCSFit</b><ul>
+            <li>fixed a possible crash when selecting a new fit function by hand</li>
+            <li>fit parameter names are more expressive now</li>
+            <li>the tool to calculate the crosstalk-corrected rel. FCCS amplitude now supports background-correction</li>
+            <li>replaced "run" by "pixel" to clear up the function</li>
+            <li>added button "go to average pixel"</li>
             <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
             <li>added context-menu entries "copy Min/Max to all" to data-cut sliders</li>
             <li>added button "go to average run" to overview image</li>
             <li>added function to load/store custom global fit settings</li>
-		  </ul></li>	
-		  <li><b>FCCSFit</b><ul>
-			<li>fit parameter names are more expressive now</li>
-			<li>bugfix: fixed possible crash, when trying to select anew fit model</li>
+          </ul></li>
+          <li><b>FCCSFit</b><ul>
+            <li>fit parameter names are more expressive now</li>
+            <li>bugfix: fixed possible crash, when trying to select anew fit model</li>
             <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
             <li>added function to load/store custom global fit settings</li>
             <li></li>
-		  </ul></li>	
-		  <li><b>General fit functions</b><ul>
-			<li>bugfix: some parameters in exp/dblexp were fixed initially</li>
-			<li>"Waveforms: Sine" now also calculates the period=1/frequency</li>
-			<li>added Cosine waveform</li>
-			<li>added centered polynomial</li>
-			<li>added Gaussian distribution function</li>
-			<li>improved/bugfixed parameter estimation for Hill function and mod. Hill function</li>
-			<li>added double log-normal function</li>
-			<li></li>
-			<li></li>
-		  </ul></li>	
+          </ul></li>
+          <li><b>General fit functions</b><ul>
+            <li>bugfix: some parameters in exp/dblexp were fixed initially</li>
+            <li>"Waveforms: Sine" now also calculates the period=1/frequency</li>
+            <li>added Cosine waveform</li>
+            <li>added centered polynomial</li>
+            <li>added Gaussian distribution function</li>
+            <li>improved/bugfixed parameter estimation for Hill function and mod. Hill function</li>
+            <li>added double log-normal function</li>
+            <li></li>
+            <li></li>
+          </ul></li>
           <li><b>dataexport_basics</b><ul>
             <li>bugfix: the plugin did not export the headers properly</li>
           </ul></li>
@@ -137,32 +137,32 @@
             <li>added documentation for all fit functions</li>
           </ul></li>
           <li><b>SPIM-FCS fit functions</b><ul>
-			<li>added presets to imfccsfit, which allows to perform a flow measurement with 4 neighboring pixels</li>
-			<li>flow FCCS fit functions also calculate the angle of the flow now</li>
-			<li>added FCCS fit function with flow and 1/e^2-width and new Veff</li>
-			<li>added model of multi-component normal diffusion with different relative molecular brightnesses per species</li>
-		  </ul></li>    
-		  <li><b>TIR-FCS fit functions</b><ul>
-			<li>flow FCCS fit functions also calculate the angle of the flow now</li>
-			<li>added model of multi-component normal diffusion with different relative molecular brightnesses per species</li>
-			<li>bugfix: some models did not calculate the third component properly</li>
-			<li></li>
-		  </ul></li>	
-		  <li><b>imagingFCS</b><ul>
-			<li>bugfix: set background from selected pixels function didn't work correctly</li>
-			<li>bugfix in "mask by image" dialog: sliders should be properly initialized now</li>
-			<li>added additional button to GUI, that allow to access several functions from the menu quickly (copy mask to group, mask builder, copy fit result statistics, ...)</li>
-			<li>added menu entries/buttons to mask by the overview image, channel 2 (so far only masking by channel 1 was possible)</li>
-			<li>"set background from ..." functions stored the background divided by the frame time in the properties BACKGROUND and BACKGROUND_STD. Now the additional properties BACKGROUND_DIRECT and BACKGROUND_STD_DIRECT contain the same data, but without dividing by the frame time.</li>
-			<li>bugfix "copy fit results statistics..." did not copy the results of the "relative imFCCS amplitude" evaluation tool</li>
-			<li>simplified display of images (less ticks...)</li>
-			<li>"copy fit result statistics to table": added possibility to copy from named selections</li>
-			<li>displays average and background intensity for the selected pixels in the parameter image tab (near the bottom in the controll list on the rhs)</li>
-			<li>bugfix: data-cut-sliders below correlation curve display in image editor tab do not disappear anymore</li>
-			<li>added tool to correct CFs for an offset</li>
-			<li>"copy fit result statistics to table" now also copies the overview image intensities</li>
-			<li>the average+/-SD of both parameter images and possibly of both overview color channels is displayed in the text line above the images now + values should be updated now, when the fit parameter is reselected</li>
-			<li>The function "Data|Insert Correlation Curves as new RDR into Project" now also creates two ACF+FCCS records from an FCCS imagingFCS record and can be configured more deeply!</li>
+            <li>added presets to imfccsfit, which allows to perform a flow measurement with 4 neighboring pixels</li>
+            <li>flow FCCS fit functions also calculate the angle of the flow now</li>
+            <li>added FCCS fit function with flow and 1/e^2-width and new Veff</li>
+            <li>added model of multi-component normal diffusion with different relative molecular brightnesses per species</li>
+          </ul></li>
+         <li><b>TIR-FCS fit functions</b><ul>
+            <li>flow FCCS fit functions also calculate the angle of the flow now</li>
+            <li>added model of multi-component normal diffusion with different relative molecular brightnesses per species</li>
+            <li>bugfix: some models did not calculate the third component properly</li>
+            <li></li>
+          </ul></li>
+          <li><b>imagingFCS</b><ul>
+            <li>bugfix: set background from selected pixels function didn't work correctly</li>
+            <li>bugfix in "mask by image" dialog: sliders should be properly initialized now</li>
+            <li>added additional button to GUI, that allow to access several functions from the menu quickly (copy mask to group, mask builder, copy fit result statistics, ...)</li>
+            <li>added menu entries/buttons to mask by the overview image, channel 2 (so far only masking by channel 1 was possible)</li>
+            <li>"set background from ..." functions stored the background divided by the frame time in the properties BACKGROUND and BACKGROUND_STD. Now the additional properties BACKGROUND_DIRECT and BACKGROUND_STD_DIRECT contain the same data, but without dividing by the frame time.</li>
+            <li>bugfix "copy fit results statistics..." did not copy the results of the "relative imFCCS amplitude" evaluation tool</li>
+            <li>simplified display of images (less ticks...)</li>
+            <li>"copy fit result statistics to table": added possibility to copy from named selections</li>
+            <li>displays average and background intensity for the selected pixels in the parameter image tab (near the bottom in the controll list on the rhs)</li>
+            <li>bugfix: data-cut-sliders below correlation curve display in image editor tab do not disappear anymore</li>
+            <li>added tool to correct CFs for an offset</li>
+            <li>"copy fit result statistics to table" now also copies the overview image intensities</li>
+            <li>the average+/-SD of both parameter images and possibly of both overview color channels is displayed in the text line above the images now + values should be updated now, when the fit parameter is reselected</li>
+            <li>The function "Data|Insert Correlation Curves as new RDR into Project" now also creates two ACF+FCCS records from an FCCS imagingFCS record and can be configured more deeply!</li>
             <li>improved speed, when changing from one RDR to another</li>
             <li>imageingFCS correlator now only save lag times, that are smaller than the segment length (there is no data for larger lags anyways ;-)</li>
             <li>parameter correlation tab now has the possibility to color the scatter plot symbols according to a parameter image, coordinates etc.</li>
@@ -171,119 +171,122 @@
             <li></li>
             <li></li>
           </ul></li>
-		  <li><b>table</b><ul>
-			<li>added "QuickStatistics" and "QuickHistogram" tools, which show the statistics and histograms of the current selection (column-wise)</li>
-			<li>added function to autoset column width ("Table" menu)</li>
-			<li>added function to internal function parser: columntitle(), columntitles(), columnindexbytitle()</li>
-			<li>in "column property editor" dialog: added context menu entries for relative column references to expression editor</li>
-			<li>"edit column properties" dialog: added button that saves properties, but does not recalculate the expressions in the sheet</li>
-			<li>added options to set key line width, line color, background color, ...)</li>
-			<li>bugfix: several data access methods in function parser did not work properly for row>columnCount</li>
-			<li>added more table export formats</li>
-			<li>new format (XML) for graph settings templates</li>
-			<li>added "Refit" option to fit and regression results (only works for fits/regressions calculated in QF3 version starting from this!)</li>
-			<li>added special column with increasing number (1,2,3,...)</li>
-			<li>axis labels can be set from table columns</li>
-			<li>bar-charts now support errors</li>
-			<li>date/time/date-time axis labels work properly now</li>
-			<li>added parser functions colsavg(), colsstd(), colsmedian(), ..., which calculate a column of averages for each row in a set of columns</li>
-			<li>massive speed improvement, when evaluating expressions in the table (column and/or cells)</li>
-			<li>bugfix: in fit dialog the parameter ranges are editable now!</li>
-			<li>table fit dialog now has a button for help on fit models and algorithms</li>
-			<li>table fit dialog now has a button that opens a fit model selector</li>
-			<li>table fit dialog allows to select weighted/non-weighted fit</li>
-			<li>added button to configure fit algorithm parameters to table fit dialog</li>
-			<li>bugfix: labels from column on plot axes were not displayed correctly (first label doubled!)</li>
-			<li>added offset/baseline to barcharts, impulses, filled curves</li>
-			<li>errorbars may be asymmetic now</li>
-			<li>added checkbox do show/don't show the plot title</li>
-			<li>added widgets for several parameters to format the key (offset, separation, margin, symbol length)</li>
-			<li>added button to automatically set width/shift of bar charts</li>
-			<li>when doing fit/regression, graph colors are set properly (either they are not changed, or set, as in the source graph, but darker!)</li>
-			<li>bugfix: autocolumn 1,2,3,... is now truly 1,2,3,...</li>
-			<li>plot magnification property is hidden now!</li>
-			<li>added checkbox to hide the key entry for a graph</li>
-			<li>added possibility to filter for a range of values</li>
-			<li>newly inserted rows/columns ar not initialized as numbers (0.0) anymore</li>
-			<li>bugfixed: some possible crashed, when insetring a row/column at the start/end of the table</li>
+      <li><b>table</b><ul>
+            <li>added "QuickStatistics" and "QuickHistogram" tools, which show the statistics and histograms of the current selection (column-wise)</li>
+            <li>added function to autoset column width ("Table" menu)</li>
+            <li>added function to internal function parser: columntitle(), columntitles(), columnindexbytitle()</li>
+            <li>in "column property editor" dialog: added context menu entries for relative column references to expression editor</li>
+            <li>"edit column properties" dialog: added button that saves properties, but does not recalculate the expressions in the sheet</li>
+            <li>added options to set key line width, line color, background color, ...)</li>
+            <li>bugfix: several data access methods in function parser did not work properly for row>columnCount</li>
+            <li>added more table export formats</li>
+            <li>new format (XML) for graph settings templates</li>
+            <li>added "Refit" option to fit and regression results (only works for fits/regressions calculated in QF3 version starting from this!)</li>
+            <li>added special column with increasing number (1,2,3,...)</li>
+            <li>axis labels can be set from table columns</li>
+            <li>bar-charts now support errors</li>
+            <li>date/time/date-time axis labels work properly now</li>
+            <li>added parser functions colsavg(), colsstd(), colsmedian(), ..., which calculate a column of averages for each row in a set of columns</li>
+            <li>massive speed improvement, when evaluating expressions in the table (column and/or cells)</li>
+            <li>bugfix: in fit dialog the parameter ranges are editable now!</li>
+            <li>table fit dialog now has a button for help on fit models and algorithms</li>
+            <li>table fit dialog now has a button that opens a fit model selector</li>
+            <li>table fit dialog allows to select weighted/non-weighted fit</li>
+            <li>added button to configure fit algorithm parameters to table fit dialog</li>
+            <li>bugfix: labels from column on plot axes were not displayed correctly (first label doubled!)</li>
+            <li>added offset/baseline to barcharts, impulses, filled curves</li>
+            <li>errorbars may be asymmetic now</li>
+            <li>added checkbox do show/don't show the plot title</li>
+            <li>added widgets for several parameters to format the key (offset, separation, margin, symbol length)</li>
+            <li>added button to automatically set width/shift of bar charts</li>
+            <li>when doing fit/regression, graph colors are set properly (either they are not changed, or set, as in the source graph, but darker!)</li>
+            <li>bugfix: autocolumn 1,2,3,... is now truly 1,2,3,...</li>
+            <li>plot magnification property is hidden now!</li>
+            <li>added checkbox to hide the key entry for a graph</li>
+            <li>added possibility to filter for a range of values</li>
+            <li>newly inserted rows/columns ar not initialized as numbers (0.0) anymore</li>
+            <li>bugfixed: some possible crashed, when insetring a row/column at the start/end of the table</li>
             <li>calculated fit parameters are now properly updated in fit dialog</li>
             <li>bugfix: range-editing widgets should be usable now and the tab-order of the widgets was corrected</li>
-			<li></li>
-			<li></li>
-			<li></li>
-			<li></li>
-			<li></li>
-			<li></li>
-		  </ul></li>	
-		  <li><b>B040SPIM</b><ul>
-			<li>added JavaScript functions to set preview acquisition camera parameters</li>
-			<li>saving a movie now also saves measured values</li>
-			<li>added JavaSCript functions to set current preview settings</li>
-			<li>added JavaScript functions to set acquisition camera settings</li>
-			<li>added two filters for each of the two laser boxes</li>
-			<li>filters/objectives are sorted by name now!</li>
+            <li>graph settings are now shown inside a scroll-area, if required</li>
+            <li>bugfix: error is now displayed correctly in curve fit dialog</li>
+            <li></li>
+            <li></li>
+            <li></li>
+            <li></li>
+      </ul></li>
+      <li><b>B040SPIM</b><ul>
+            <li>added JavaScript functions to set preview acquisition camera parameters</li>
+            <li>saving a movie now also saves measured values</li>
+            <li>added JavaSCript functions to set current preview settings</li>
+            <li>added JavaScript functions to set acquisition camera settings</li>
+            <li>added two filters for each of the two laser boxes</li>
+            <li>filters/objectives are sorted by name now!</li>
             <li>added two additional preview configs to the acquisition tab</li>
             <li>added "overview series" acquisition, which allows to acquire a set of overview images with different camera settings and light pathes.</li>
-			<li></li>
-			<li></li>
-		  </ul></li>	
-		  <li><b>FCS Fit</b><ul>
-			<li>fit parameter names are more expressive now</li>
-			<li>added button to start model selector + some code refactoring (using QFFitFunctionComboBox now)</li>
-			<li>added button "go to average run"</li>
-			<li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
+            <li></li>
+            <li></li>
+      </ul></li>
+      <li><b>FCS Fit</b><ul>
+            <li>fit parameter names are more expressive now</li>
+            <li>added button to start model selector + some code refactoring (using QFFitFunctionComboBox now)</li>
+            <li>added button "go to average run"</li>
+            <li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
             <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
             <li>bugfix: weights combo-box is correctly initialized, when starting the editor</li>
           </ul></li>
-		  <li><b>FCS</b><ul>
-			<li>fixed a possible freeze of QF3, if ACF-data is imported from CSV files and no countrate-trace is provided!</li>
-			<li>import functions for correlator.com .SIN files</li>
-			<li>added tool to set background countrates in several RDRs</li>
-			<li>added tool (RDR editor menu "Tools"!) to set background rates from the rates in the current RDR</li>
-			<li>added tutorial for the background tools</li>
-			<li>added tool to correct CFs for an offset</li>
-			<li>can now also handle internally saved countrate curves</li>
-			<li>internally saved correlation curves and count rates are stored as base64-encoded arrays in the project now. This is smaller and faster to read, than CSV!</li>
-			<li>added import filter for Carl Zeiss ConfoCor3 datfiles (*.fcs)</li>
+      <li><b>FCS</b><ul>
+            <li>fixed a possible freeze of QF3, if ACF-data is imported from CSV files and no countrate-trace is provided!</li>
+            <li>import functions for correlator.com .SIN files</li>
+            <li>added tool to set background countrates in several RDRs</li>
+            <li>added tool (RDR editor menu "Tools"!) to set background rates from the rates in the current RDR</li>
+            <li>added tutorial for the background tools</li>
+            <li>added tool to correct CFs for an offset</li>
+            <li>can now also handle internally saved countrate curves</li>
+            <li>internally saved correlation curves and count rates are stored as base64-encoded arrays in the project now. This is smaller and faster to read, than CSV!</li>
+            <li>added import filter for Carl Zeiss ConfoCor3 datfiles (*.fcs)</li>
             <li>fixed possible crash, when opening the "fit function simulator" dialog</li>
-			<li></li>
-			<li></li>
-		  </ul></li>	
-		  <li><b>imagingFCS Fit</b><ul>
-			<li>fit parameter names are more expressive now</li>
-			<li>added button to start model selector + some code refactoring (using QFFitFunctionComboBox now)</li>
-			<li>added button "go to average run"</li>
-			<li>improved dialog to set fit result from other RDR/file/...</li>
-			<li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
-			<li>"set fit result from RDR/file/..." now supports image transfroms to perform a limited set of image processing operations (bluring, ...)</li>
+            <li></li>
+            <li></li>
+      </ul></li>
+      <li><b>imagingFCS Fit</b><ul>
+            <li>fit parameter names are more expressive now</li>
+            <li>added button to start model selector + some code refactoring (using QFFitFunctionComboBox now)</li>
+            <li>added button "go to average run"</li>
+            <li>improved dialog to set fit result from other RDR/file/...</li>
+            <li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
+            <li>"set fit result from RDR/file/..." now supports image transfroms to perform a limited set of image processing operations (bluring, ...)</li>
             <li>bugfix: weights combo-box is correctly initialized, when starting the editor</li>
           </ul></li>
-		  <li><b>Online-Help editor</b><ul>
-			<li>added several buttons for advanced insert/editing functions</li>
-			<li>improved past image dialog (now allows scaling and cropping of the image</li>
+      <li><b>Online-Help editor</b><ul>
+            <li>added several buttons for advanced insert/editing functions</li>
+            <li>improved past image dialog (now allows scaling and cropping of the image</li>
             <li>editor now uses line-wrapping</li>
             <li>improved selection of links (also shows files from current directory now)</li>
             <li> added autosave function</li>
           </ul></li>
-	      <li><b>spectra viewer</b><ul>
+      <li><b>spectra viewer</b><ul>
             <li>added FRET Foerster radius calculator</li>
-			<li></li>
-		  </ul></li>	
-	      <li><b>FCS MaxEnt evaluation</b><ul>
-			<li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
+            <li></li>
+      </ul></li>
+      <li><b>FCS MaxEnt evaluation</b><ul>
+            <li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
             <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
             <li></li>
-		  </ul></li>	
-		  <li><b>FCS MSD evaluation</b><ul>
-			<li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
+      </ul></li>
+      <li><b>FCS MSD evaluation</b><ul>
+            <li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
             <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
             <li></li>
-		  </ul></li>    
-          <li><b>Diffusion coefficient calculator</b><ul>
+      </ul></li>
+      <li><b>Diffusion coefficient calculator</b><ul>
             <li>now also calculates the hydrodynamic radius of the particle from the diffusion coefficient at the experiment conditions.</li>
-          </ul></li>
-        </ul></li>
-		
+      </ul></li>
+      <li><b>qfe_plotterexporterlatex</b><ul>
+            <li>added export filter option, which does not parse the LaTeX strings.</li>
+      </ul></li>
+    </ul></li>
+
 		
 		<li><a name="3152"><b>2014-02-11 (SVN: 3152)</b>
 		<ul>

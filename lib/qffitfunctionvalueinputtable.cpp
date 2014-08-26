@@ -184,7 +184,7 @@ Qt::ItemFlags QFFitFunctionValueInputTable::flags(const QModelIndex &index) cons
 
 QVariant QFFitFunctionValueInputTable::data(const QModelIndex &index, int role) const
 {
-
+    //qDebug()<<"data  errorIdx="<<errorIdx;
     int col=index.column();
     int row=index.row();
     if (col==0) {
@@ -249,11 +249,11 @@ QVariant QFFitFunctionValueInputTable::data(const QModelIndex &index, int role) 
                     return QBrush(QApplication::palette().color(QPalette::Window));
                 }
             }
-        } else if (coli==errorIdx && editerrors) {
+        } else if (coli==errorIdx && editerrors) {            
             if (role==Qt::DisplayRole || role==Qt::EditRole) {
                 const double err=getParameterError(row);
                 if (role==Qt::DisplayRole) {
-                    roundError(err);
+                    return roundError(err);
                 } else {
                     return err;
                 }

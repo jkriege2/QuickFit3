@@ -272,9 +272,12 @@ void QFRDRImagingFCSPlugin::insertRecord() {
                 QString evalsettings=findEvalsettingsFileForVideoCorrelatorFile(filename);
                 bool isFCCS=false;
                 bool isACF=false;
-                QString group=filename;
-                int dv2mode=getEvalsettingsDV2Mode(evalsettings, filename, &isFCCS, &isACF, &group);
-                group=QFileInfo(group).completeBaseName();
+                QString group="";
+                QString infile;
+                int dv2mode=getEvalsettingsDV2Mode(evalsettings, filename, &isFCCS, &isACF, &infile, &group);
+                infile=QFileInfo(infile).completeBaseName();
+                if (group.isEmpty()) group=infile;
+                if (group.isEmpty()) group=filename;
                 if ((dv2mode==0) || !isFCCS || (isFCCS && dv2mode!=1 && dv2mode!=2)) {
                     insertVideoCorrelatorFile(filename, overview, evalsettings, false, "", 0, 0, true, true, group);
                 } else if (dv2mode==1||dv2mode==2) {
@@ -296,9 +299,12 @@ void QFRDRImagingFCSPlugin::insertRecord() {
                 //qDebug()<<"evalset: "<<evalsettings;
                 bool isFCCS=false;
                 bool isACF=false;
-                QString group=filename;
-                int dv2mode=getEvalsettingsDV2Mode(evalsettings, filename, &isFCCS, &isACF, &group);
-                group=QFileInfo(group).completeBaseName();
+                QString infile, group="";
+                int dv2mode=getEvalsettingsDV2Mode(evalsettings, filename, &isFCCS, &isACF, &infile, &group);
+                infile=QFileInfo(infile).completeBaseName();
+                if (group.isEmpty()) group=infile;
+                if (group.isEmpty()) group=filename;
+
                 //qDebug()<<"isFCCS: "<<isFCCS;
                 //qDebug()<<"isACF: "<<isACF;
                 //qDebug()<<"dv2mode: "<<dv2mode;

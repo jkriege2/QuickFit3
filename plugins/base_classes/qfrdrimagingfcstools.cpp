@@ -294,7 +294,7 @@ QString findFileWithExtensionForVideoCorrelatorFile(const QString& vidCorrFile, 
 
 }
 
-int getEvalsettingsDV2Mode(const QString& filename, const QString& datafilename, bool* isFCCS, bool* isACF, QString* inputFilename) {
+int getEvalsettingsDV2Mode(const QString& filename, const QString& datafilename, bool* isFCCS, bool* isACF, QString* inputFilename, QString* group) {
     int dvMode=0;
     bool fnIsFCCS=false;
     bool fnIsACF=false;
@@ -368,6 +368,9 @@ int getEvalsettingsDV2Mode(const QString& filename, const QString& datafilename,
                     dccfdy=value.toInt();
                 } else if (name=="input file") {
                     if (inputFilename) *inputFilename=value;
+
+                } else if (name=="group") {
+                    if (group) *group=value;
 
                 /*} else if (name=="") {
                     initParams[""]=value.toInt();

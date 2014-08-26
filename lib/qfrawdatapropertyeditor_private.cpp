@@ -1330,7 +1330,16 @@ void QFRawDataPropertyEditor_private::setCurrent(QFRawDataRecord* c) {
     current=c;
     //std::cout<<"creating new editors ... \n";
     if (current) {
-        d->setWindowTitle(tr("Raw Data (%1): %2").arg(current->getTypeDescription()).arg(current->getName()));
+        QString prefix="";
+        int whm=ProgramOptions::getConfigValue("quickfit/windowheadermode", 1).toInt();
+        if (whm==1) {
+            prefix=QFileInfo(current->getProject()->getFile()).fileName();
+        } else if (whm==2) {
+            prefix=current->getProject()->getName();
+            if (prefix.isEmpty()) prefix=QFileInfo(current->getProject()->getFile()).fileName();
+        }
+        if (!prefix.isEmpty()) prefix += QString(": ");
+        d->setWindowTitle(tr("%3Raw Data (%1): %2").arg(current->getTypeDescription()).arg(current->getName()).arg(prefix));
         d->setWindowIcon(current->getLargeIcon());
         if (current->getType()!=oldType) {
             editorList.clear();

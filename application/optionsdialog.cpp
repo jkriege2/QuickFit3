@@ -97,6 +97,7 @@ void OptionsDialog::open(ProgramOptions* options) {
     edtProxyHost->setText(options->getProxyHost());
     cmbProxyType->setCurrentIndex(qBound(0,options->getProxyType(),2));
     chkUpdates->setChecked(options->getConfigValue("quickfit/checkupdates", true).toBool());
+    cmbWindowHeader->setCurrentIndex(options->getConfigValue("quickfit/windowheadermode", 1).toInt());
     edtUserFitFunctions->setText(options->getConfigValue("quickfit/user_fitfunctions", QFPluginServices::getInstance()->getConfigFileDirectory()+"/userfitfunctions/").toString());
     spinMath->setValue(options->getConfigValue("quickfit/math_pointsize", 14).toInt());
     on_spinMath_valueChanged(spinMath->value());
@@ -134,6 +135,7 @@ void OptionsDialog::open(ProgramOptions* options) {
         options->setConfigValue("quickfit/checkupdates", chkUpdates->isChecked());
         options->setConfigValue("quickfit/user_fitfunctions", edtUserFitFunctions->text());
         options->setConfigValue("quickfit/math_pointsize", spinMath->value());
+        options->setConfigValue("quickfit/windowheadermode", cmbWindowHeader->currentIndex());
         QDir dir(edtUserFitFunctions->text());
         if (!dir.exists()) dir.mkpath(dir.absolutePath());
         for (int i=0; i<m_plugins.size(); i++) {

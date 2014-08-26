@@ -38,11 +38,15 @@ void QFEPlotterExporterLatex::initExtension() {
     JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(true, false, QTeXPaintDevice::Tikz));
     JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, true, QTeXPaintDevice::Tikz));
     JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, false, QTeXPaintDevice::Tikz));
+    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, true, QTeXPaintDevice::Tikz, false));
+    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, false, QTeXPaintDevice::Tikz, false));
 
     JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(true, true, QTeXPaintDevice::Pgf));
     JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(true, false, QTeXPaintDevice::Pgf));
     JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, true, QTeXPaintDevice::Pgf));
     JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, false, QTeXPaintDevice::Pgf));
+    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, true, QTeXPaintDevice::Pgf, false));
+    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, false, QTeXPaintDevice::Pgf, false));
 #ifdef HAS_EMF_ENGINE
     JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPEMFEngineAdapter());
 #endif
