@@ -23,9 +23,10 @@ QString JKQTPLatexEngineAdapter::getFilter() const
         m=QObject::tr("Pgf");
     }
     if (!colorMode) m+=QObject::tr(" b&w");
-    if (!docMode) m+=QObject::tr(" include file");
-    else  m+=QObject::tr(" full document");
-    if (!m_useLatexParser) m+=QObject::tr(" no TeX parser");
+    else m+=QObject::tr(" color");
+    if (!docMode) m+=QObject::tr(", include file");
+    else  m+=QObject::tr(", full document");
+    if (!m_useLatexParser) m+=QObject::tr(", no TeX parser");
     return QObject::tr("LaTeX [%1] (*.tex)").arg(m);
 }
 

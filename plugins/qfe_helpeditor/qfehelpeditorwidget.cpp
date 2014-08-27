@@ -198,6 +198,8 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     menu->addSeparator();
     addInsertAction(menu, "$$qfcitation$$");
     addInsertAction(menu, "$$qfcitation_bibtex$$");
+    addInsertAction(menu, "$$jankrieger_phdthesis$$");
+    addInsertAction(menu, "$$jankrieger_phdthesis_ref$$");
 
     menu=new QMenu(tr("general help links"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());

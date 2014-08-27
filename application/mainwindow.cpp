@@ -144,6 +144,8 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("copyright"), QString(qfInfoCopyright())));
     htmlReplaceList.append(qMakePair(QString("author"), QString(qfInfoAuthor())));
     htmlReplaceList.append(qMakePair(QString("email"), QString(qfInfoEmail())));
+    htmlReplaceList.append(qMakePair(QString("jankrieger_phdthesis"), tr("Jan W. Krieger (2014): <b>\"Mapping diffusion Properties in Living Cells\"</b>, University Heidelberg, <i><a href=\"http://www.ub.uni-heidelberg.de/archiv/17187\">http://www.ub.uni-heidelberg.de/archiv/17187</a>.</i>")));
+    htmlReplaceList.append(qMakePair(QString("jankrieger_phdthesis_ref"), tr("$$ref:JKRIEGR_PHD:Jan W. Krieger (2014): <b>\"Mapping diffusion Properties in Living Cells\"</b>, University Heidelberg, <i><a href=\"http://www.ub.uni-heidelberg.de/archiv/17187\">http://www.ub.uni-heidelberg.de/archiv/17187</a>.</i>$$")));
     htmlReplaceList.append(qMakePair(QString("qfcitation"), QString(qfInfoCitationHTML())));
     htmlReplaceList.append(qMakePair(QString("qfcitation_bibtex"), QString(qfInfoCitationBiBTeX())));
     htmlReplaceList.append(qMakePair(QString("maillist"), QString(qfInfoMaillist())));

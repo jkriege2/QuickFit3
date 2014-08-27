@@ -2,11 +2,22 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Extension qfe_plotterexporterlatex Help</title>
+		<title>Extension "LaTeX (Tikz&Pgf) export for QFPlotter" Help</title>
 	</head>
 	<body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
 		
-		This plugin adds support for export to LaTeX to the graph plotter used by many plugins in QuickFit 3.
+		This plugin adds support for export to LaTeX to the graph plotter used by many plugins in QuickFit 3:
+		<ul>
+		  <li><b>Enhanced Metafile Format (EMF):</b> this is currently supported on windows only</li>
+		  <li><b>LaTeX [...]:</b><ul>
+		    <li><b>Tikz:</b> outputs <a href="http://pgf.sourceforge.net/">Tikz code</a></li>
+		    <li><b>Pgf:</b> outputs <a href="http://pgf.sourceforge.net/">Pgf code</a></li>
+		    <li><b>b&w:</b> colors are converted to black and white, if this option is not present, the output is in color</li>
+		    <li><b>include file:</b> This is the default output format, in which the produced .tex file can be included in another file with <tt>\include{...}</tt> to place the figure, where you want it.</li>
+		    <li><b>full document:</b> If this option is present, the .tex file will contain a full LaTeX header and can be compiled as a standalone file with latex directly.</li>
+		    <li><b>no TeX parser:</b> If this option is present, the LaTeX strings in a plot will not be rendered, but output directly into the document, so the text is completely typeset by LaTeX. $$note:In this mode, the text may not completely resemble the presentation in QuickFit!$$ </li>
+		  </ul></li>
+		</ul>
 	</body>
 </html>
