@@ -39,7 +39,30 @@ bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid
             error=scrintf->getSimpleCountrateStdDev(index, true)*1000.0;
         }
         if (crintf||scrintf) return true;
-    } else*/ if (paramid=="count_rate1" || paramid=="count_rate") {
+    } else*/ if (paramid=="count_rate") {
+        QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
+        value=0;
+        error=0;
+        //qDebug()<<paramid<<crintf;
+        if (crintf && crintf->getRateChannels()>0) {
+            int c=0;
+            if (crintf->getRateChannelsSwapped()) {
+                if (c==0) c=1;
+                else if (c==1) c=0;
+            }
+            error=crintf->getRateStdDev(index, c)*1000.0;
+            value=crintf->getRateMean(index, c)*1000.0;
+            //qDebug()<<"getRateMean(run="<<index<<", ch=0) = "<<value<<" +/- "<<error;
+            return true;
+        }
+        QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
+        //qDebug()<<paramid<<scrintf;
+        if (scrintf && value==0) {
+            value=scrintf->getSimpleCountrateAverage(index,0, true)*1000.0;
+            error=scrintf->getSimpleCountrateStdDev(index,0, true)*1000.0;
+            return true;
+        }
+    } else if (paramid=="count_rate1") {
         QFRDRCountRatesInterface* crintf=qobject_cast<QFRDRCountRatesInterface*>(r);
         value=0;
         error=0;
@@ -183,7 +206,21 @@ bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid
         value=angle_deg;
         error=0;
         return true;
-    } else if (paramid=="background" || paramid=="background1") {
+    } else if (paramid=="background") {
+        if (!r) return false;
+        if (r->propertyExists("BACKGROUND_INTENSITY") || r->propertyExists("BACKGROUND") || r->propertyExists("BACKGROUND_KHZ")) {
+            double back=r->getProperty("BACKGROUND_INTENSITY",
+                                                               r->getProperty("BACKGROUND",
+                                                               r->getProperty("BACKGROUND_KHZ", 0).toDouble()*1000.0).toDouble()).toDouble();
+            double backe=r->getProperty("BACKGROUND_INTENSITY_STD",
+                                        r->getProperty("BACKGROUND_STD",
+                                        r->getProperty("BACKGROUND_KHZ_STD", 0).toDouble()*1000.0).toDouble()).toDouble();
+            value=back;
+            error=backe;
+            return true;
+        }
+    }
+    if (paramid=="background" || paramid=="background1") {
         if (!r) return false;
         if (r->propertyExists("BACKGROUND_INTENSITY") || r->propertyExists("BACKGROUND") || r->propertyExists("BACKGROUND_KHZ") ||
             r->propertyExists("BACKGROUND_INTENSITY1") || r->propertyExists("BACKGROUND1") || r->propertyExists("BACKGROUND_KHZ1")) {

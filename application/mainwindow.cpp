@@ -128,7 +128,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     searchAndRegisterPlugins();
     logFileMainWidget->dec_indent();
 
-    splash->showMessage(tr("%1 Plugins loaded successfully ... prepring online-help").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()+importerManager->pluginCount()));
+    splash->showMessage(tr("%1 Plugins loaded successfully ... prepring online-help ... ").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()+importerManager->pluginCount()));
 
     logFileMainWidget->log_header(tr("preparing online-help ..."));
     logFileMainWidget->inc_indent();
@@ -159,6 +159,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("pluginsettings_list"), createPluginDocSettings()));
     htmlReplaceList.append(qMakePair(QString("plugincopyright_list"), createPluginDocCopyrights()));
     htmlReplaceList.append(qMakePair(QString("maindir"), settings->getApplicationDirectory()));
+    htmlReplaceList.append(qMakePair(QString("sourcedir"), settings->getSourceDirectory()));
     htmlReplaceList.append(qMakePair(QString("qf3dir"), settings->getApplicationDirectory()));
     htmlReplaceList.append(qMakePair(QString("applicationdir"), settings->getApplicationDirectory()));
     htmlReplaceList.append(qMakePair(QString("mainhelpdir"), settings->getMainHelpDirectory()));
@@ -207,6 +208,17 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
             "<tr><td align=\"center\" ><a href=\"#top_page\"><img src=\":/lib/help/help_top.png\"></a>&nbsp;&nbsp;&nbsp;</td><td align=\"left\" >$$local_plugin_icon$$&nbsp;&nbsp;&nbsp;</td><td align=\"right\" width=\"90%\">  <b>$$local_plugin_name$$</b> <i>$$local_plugin_copyright$$</i><br>$$local_plugin_weblink$$<br>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.end"), QString("</td></tr></table></td></tr></table>")));// </div>")));
 
+
+    //qDebug()<<QDir(settings->getMainHelpDirectory()).absoluteFilePath("globalreplaces.ini")<<QFile::exists(QDir(settings->getMainHelpDirectory()).absoluteFilePath("gloablreplaces.ini"));
+    if (QFile::exists(QDir(settings->getMainHelpDirectory()).absoluteFilePath("globalreplaces.ini"))) {
+        QSettings setLocalReplace(QDir(settings->getMainHelpDirectory()).absoluteFilePath("globalreplaces.ini"), QSettings::IniFormat);
+
+        QStringList keys=setLocalReplace.childKeys();
+        for (int i=0; i<keys.size(); i++) {
+            htmlReplaceList.append(qMakePair(QString(keys[i]), setLocalReplace.value(keys[i], "").toString()));
+            //qDebug()<<keys[i]<<setLocalReplace.value(keys[i], "").toString();
+        }
+    }
 
 
     QSettings setTooltips(settings->getMainHelpDirectory()+"tooltips.ini", QSettings::IniFormat);
@@ -2908,6 +2920,22 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                                "<tr><td align=\"left\"  style=\"background-color: lightgrey\">");
     localreplaces<<qMakePair<QString, QString>("faq_answer", "</td></tr><tr><td>");
     localreplaces<<qMakePair<QString, QString>("faq_end", "</td></tr></table></blockquote>");
+
+    localreplaces<<qMakePair<QString, QString>("funcref_start", "<blockquote>"
+                                               "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: white ;  border-color: midnightblue\" >"
+                                               "<tr><td align=\"left\"  style=\"background-color: lightgrey\">");
+    localreplaces<<qMakePair<QString, QString>("funcref_main", "</td></tr><tr><td>");
+    localreplaces<<qMakePair<QString, QString>("funcref_description", "$$funcref_main$$");
+    localreplaces<<qMakePair<QString, QString>("funcref_end", "</td></tr></table></blockquote>");
+
+    if (QFile::exists(basedir.absoluteFilePath("localreplaces.ini"))) {
+        QSettings setLocalReplace(basedir.absoluteFilePath("localreplaces.ini"), QSettings::IniFormat);
+
+        QStringList keys=setLocalReplace.childKeys();
+        for (int i=0; i<keys.size(); i++) {
+            localreplaces.append(qMakePair(keys[i], setLocalReplace.value(keys[i], "").toString()));
+        }
+    }
 
 
 

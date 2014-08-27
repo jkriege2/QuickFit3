@@ -2,7 +2,7 @@
 <h3>FCCS framework</h3>
 $$insert:framework_schwille.inc$$
 <h3>The SPIM MDF and correlation function</h3>
-We assume the MDF of a SPIM to be$$ref:WOHLAND2010:Wohland, T., X. Shi, J. Sankaran, and E. H. K. Stelzer, 2010. Single Plane Illumination Fluorescence Correlation Spectroscopy (SPIM-FCS) probes inhomogeneous three-dimensional environments. Opt. Express 10:10627???10641.$$:
+We assume the MDF of a SPIM to be$$REF_WOHLANDSPIMFCS$$ $$REF_SPIMFCCS$$ $$jankrieger_phdthesis_ref$$:
   $$bmath:\mbox{MDF}_\text{g/r}(x,y,z)= \frac{1}{\mathcal{N}}\cdot I_\text{LS}(z)\cdot\left[f_\text{pixel,g/r}(x,y)\ast \mbox{PSF}_\text{g/r}(x,y,z)\right]= \frac{1}{\mathcal{N}}\cdot I_\text{LS}(z)\cdot\int_{0}^a\int_{0}^b\mbox{PSF}_\text{g/r}(x-\mu,y-\nu,z)\;\dd\nu\;\dd\mu,$$
 where $$math:\ast$$ is a convolution and $$math:f_\text{pixel,g/r}(x,y)$$ describes the pixel extent in x- and y-direction:
   $$bmath:f_\text{pixel,g/r}(x,y)=\begin{cases}1&0\leq x\leq a\ \cap\ 0\leq y\leq b\\0&\text{else}\end{cases}$$

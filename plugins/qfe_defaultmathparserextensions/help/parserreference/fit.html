@@ -9,8 +9,9 @@
   
   <h2>Linear Fits (Regression, ...)</h2>
   <ul>
-	  <li><a name="regression"/><!-- func:regression -->
-	  <b><tt><!-- template -->regression(X, Y)<!-- /template --></tt>, <tt>regression(X, Y, "parameter", parameterValue)</tt> - <i>calculates the linear regression coefficients from the data vectors <tt>X</tt> and <tt>Y</tt> </i>:</b><br>
+	  $$funcref_start$$<a name="regression"/><!-- func:regression -->
+	  <b><tt><!-- template -->regression(X, Y)<!-- /template --></tt>, <tt>regression(X, Y, "parameter", parameterValue)</tt> - <i>calculates the linear regression coefficients from the data vectors <tt>X</tt> and <tt>Y</tt> </i>:</b>
+$$funcref_description$$
 	  The argument <tt>X</tt> and <tt>Y</tt> have to be vectors with at least two entries (one needs two datapoints to estimate two parameters of a line!). The function returns the two coefficients of $$math:f(x)=a+b\cdot x$$ as a vector with the entires <tt>[a, b]</tt>. <br>
 	  A special call <tt>regression(X, Y, "parameter", parameterValue)</tt> allows to fix one of the two parameters a or b:
 	  <blockquote>
@@ -18,11 +19,12 @@
 		  <tt>regression(X, Y, "b", 0)</tt> performs a regression with b fixed to 0
 	  </blockquote>
 	  In both cases the return vector is still <tt>[a, b]</tt>
-	  <!-- /func:regression -->
-	  </li>
+	  <!-- /func:regression -->  
+$$funcref_end$$
 
-	  <li><a name="weighted_regression"/><!-- func:weighted_regression -->
-	  <b><tt><!-- template -->weighted_regression(X, Y, W)<!-- /template --></tt>, <tt>weighted_regression(X, Y, W, "parameter", parameterValue)</tt> - <i>calculates the linear regression coefficients from the data vectors <tt>X</tt> and <tt>Y</tt>. The weights are given in <tt>W</tt> </i>:</b><br>
+	  $$funcref_start$$<a name="weighted_regression"/><!-- func:weighted_regression -->
+	  <b><tt><!-- template -->weighted_regression(X, Y, W)<!-- /template --></tt>, <tt>weighted_regression(X, Y, W, "parameter", parameterValue)</tt> - <i>calculates the linear regression coefficients from the data vectors <tt>X</tt> and <tt>Y</tt>. The weights are given in <tt>W</tt> </i>:</b>
+$$funcref_description$$
 	  The argument <tt>X</tt>, <tt>Y</tt> and <tt>W</tt> have to be vectors with at least two entries (one needs two datapoints to estimate two parameters of a line!). The function returns the two coefficients of $$math:f(x)=a+b\cdot x$$ as a vector with the entires <tt>[a, b]</tt>. <br>
 	  A special call <tt>weighted_regression(X, Y, W, "parameter", parameterValue)</tt> allows to fix one of the two parameters a or b:
 	  <blockquote>
@@ -30,11 +32,12 @@
 		  <tt>weighted_regression(X, Y, W, "b", 0)</tt> performs a regression with b fixed to 0
 	  </blockquote>
 	  In both cases the return vector is still <tt>[a, b]</tt>
-	  <!-- /func:weighted_regression -->
-	  </li>
+	  <!-- /func:weighted_regression -->  
+$$funcref_end$$
 
-	  <li><a name="irls"/><!-- func:irls -->
-	  <b><tt><!-- template -->irls(X, Y)<!-- /template --></tt>, <tt>irls(X, Y, "parameter", parameterValue)</tt> - <i>calculates the iteratively reweighted regression coefficients from the data vectors <tt>X</tt> and <tt>Y</tt> </i>:</b><br>
+	  $$funcref_start$$<a name="irls"/><!-- func:irls -->
+	  <b><tt><!-- template -->irls(X, Y)<!-- /template --></tt>, <tt>irls(X, Y, "parameter", parameterValue)</tt> - <i>calculates the iteratively reweighted regression coefficients from the data vectors <tt>X</tt> and <tt>Y</tt> </i>:</b>
+$$funcref_description$$
 	  The argument <tt>X</tt> and <tt>Y</tt> have to be vectors with at least two entries (one needs two datapoints to estimate two parameters of a line!). The function returns the two coefficients of $$math:f(x)=a+b\cdot x$$ as a vector with the entires <tt>[a, b]</tt>. <br>
 	  A special call <tt>irls(X, Y, "parameter", parameterValue)</tt> allows to fix one of the two parameters a or b:
 	  <blockquote>
@@ -71,8 +74,8 @@
 
     <center><img src="../pic/irls.png"></center>
 	$$see:C. Sidney Burrus: "Iterative Reweighted Least Squares", <a href="http://cnx.org/content/m45285/latest/">http://cnx.org/content/m45285/latest/</a>$$
-	  <!-- /func:irls -->
-	  </li>
+	  <!-- /func:irls -->  
+$$funcref_end$$
   
   </ul>
     <h2>Nonlinear Fits (Least Squares, ...)</h2>

@@ -8,122 +8,141 @@
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 	<a name="functions"/><h2>Table Access Functions</h2>
 	<ul>
-		<li><a name="column"/><!-- func:column -->
-		<b><tt><!-- template -->column(column)<!-- /template -->, column(column, rows)</tt> - <i> access a table column, returns a number vector</i>:</b><br>
+		$$funcref_start$$<a name="column"/><!-- func:column -->
+		<b><tt><!-- template -->column(column)<!-- /template -->, column(column, rows)</tt> - <i> access a table column, returns a number vector</i>:</b>
+$$funcref_description$$
 		returns the contents of the given table <tt>column</tt>  as a vector of numbers. So to divide column 1 by column 2, one could use the column expression
 		$$cexample:column(1)/column(2)$$
 		If the second argument <tt>rows</tt> is given, only the given rows are selected from the full column.
 		
-		<!-- /func:column -->
-		</li>
-		<li><a name="columnstr"/><!-- func:columnstr -->
-		<b><tt><!-- template -->columnstr(column)<!-- /template -->, columnstr(column, rows)</tt> - <i> access a table column, returns a string vector</i>:</b><br>
+		<!-- /func:column -->  
+$$funcref_end$$
+		$$funcref_start$$<a name="columnstr"/><!-- func:columnstr -->
+		<b><tt><!-- template -->columnstr(column)<!-- /template -->, columnstr(column, rows)</tt> - <i> access a table column, returns a string vector</i>:</b>
+$$funcref_description$$
 		returns the contents of the given table <tt>column</tt>  as a vector of strings.
 		
-		<!-- /func:columnstr -->
-		</li>
-		<li><a name="columnbool"/><!-- func:columnbool -->
-		<b><tt><!-- template -->columnbool(column)<!-- /template -->, columnbool(column, rows)</tt> - <i> access a table column, returns a boolean vector</i>:</b><br>
+		<!-- /func:columnstr -->  
+$$funcref_end$$
+		$$funcref_start$$<a name="columnbool"/><!-- func:columnbool -->
+		<b><tt><!-- template -->columnbool(column)<!-- /template -->, columnbool(column, rows)</tt> - <i> access a table column, returns a boolean vector</i>:</b>
+$$funcref_description$$
 		returns the contents of the given table <tt>column</tt>  as a vector of booleans.
 		
-		<!-- /func:columnbool -->
-		</li>
+		<!-- /func:columnbool -->  
+$$funcref_end$$
 
 
-		<li><a name="rowdata"/><!-- func:rowdata -->
-		<b><tt><!-- template -->rowdata(row)<!-- /template -->, rowdata(row, columns)</tt> - <i> access a table row, returns a number vector</i>:</b><br>
+		$$funcref_start$$<a name="rowdata"/><!-- func:rowdata -->
+		<b><tt><!-- template -->rowdata(row)<!-- /template -->, rowdata(row, columns)</tt> - <i> access a table row, returns a number vector</i>:</b>
+$$funcref_description$$
 		returns the contents of the given table <tt>row</tt>  as a vector of numbers. 
 		
-		<!-- /func:rowdata -->
-		</li>
-		<li><a name="rowstr"/><!-- func:rowstr -->
-		<b><tt><!-- template -->rowstr(row)<!-- /template -->, rowstr(row, columns)</tt> - <i> access a table row, returns a string vector</i>:</b><br>
+		<!-- /func:rowdata -->  
+$$funcref_end$$
+		$$funcref_start$$<a name="rowstr"/><!-- func:rowstr -->
+		<b><tt><!-- template -->rowstr(row)<!-- /template -->, rowstr(row, columns)</tt> - <i> access a table row, returns a string vector</i>:</b>
+$$funcref_description$$
 		returns the contents of the given table <tt>row</tt>  as a vector of strings.
 		
-		<!-- /func:rowstr -->
-		</li>
-		<li><a name="rowbool"/><!-- func:rowbool -->
-		<b><tt><!-- template -->rowbool(row)<!-- /template -->, rowbool(row, columns)</tt> - <i> access a table row, returns a boolean vector</i>:</b><br>
+		<!-- /func:rowstr -->  
+$$funcref_end$$
+		$$funcref_start$$<a name="rowbool"/><!-- func:rowbool -->
+		<b><tt><!-- template -->rowbool(row)<!-- /template -->, rowbool(row, columns)</tt> - <i> access a table row, returns a boolean vector</i>:</b>
+$$funcref_description$$
 		returns the contents of the given table <tt>row</tt>  as a vector of booleans.
 		
-		<!-- /func:rowbool -->
-		</li>
+		<!-- /func:rowbool -->  
+$$funcref_end$$
 
 
-		<li><a name="data"/><!-- func:data -->
-		<b><tt><!-- template -->data(row, column)<!-- /template --></tt> - <i>access a table cell (row, column)</i>:</b><br>
+		$$funcref_start$$<a name="data"/><!-- func:data -->
+		<b><tt><!-- template -->data(row, column)<!-- /template --></tt> - <i>access a table cell (row, column)</i>:</b>
+$$funcref_description$$
 		returns the value stored in table cell (row, column). If one of the arguments ia a vector of integers, the function returns the according vector of cell values.
-		<!-- /func:data -->
-		</li>
+		<!-- /func:data -->  
+$$funcref_end$$
 
-		<li><a name="dataleft"/><!-- func:dataleft -->
-		<b><tt><!-- template -->dataleft(delta_column)<!-- /template --></tt> - <i>return the value of a cell, left of the current cell</i>:</b><br>
+		$$funcref_start$$<a name="dataleft"/><!-- func:dataleft -->
+		<b><tt><!-- template -->dataleft(delta_column)<!-- /template --></tt> - <i>return the value of a cell, left of the current cell</i>:</b>
+$$funcref_description$$
 		accesses the cell <tt>(row, column-delta_column)</tt>, where (row, columns) is the current cell. So if you want to calculate the sine of the column to the left of the current column, use the expression <tt>sin(dataleft(1))</tt>. Note that you do NOT need a -1 to access a cell on the left. Use negative numbers to access cells on the right!
-		<!-- /func:dataleft -->
-		</li>
+		<!-- /func:dataleft -->  
+$$funcref_end$$
 
-		<li><a name="collength"/><!-- func:collength -->
-		<b><tt><!-- template -->collength(column)<!-- /template --></tt> - <i> returns the number of rows (with actual data) of the given column</i>:</b><br>
+		$$funcref_start$$<a name="collength"/><!-- func:collength -->
+		<b><tt><!-- template -->collength(column)<!-- /template --></tt> - <i> returns the number of rows (with actual data) of the given column</i>:</b>
+$$funcref_description$$
 		This is the same, as calling $$tt:length(column(c))$$
-		<!-- /func:collength -->
-		</li>
+		<!-- /func:collength -->  
+$$funcref_end$$
 
-		<li><a name="colimagewidth"/><!-- func:colimagewidth -->
-		<b><tt><!-- template -->colimagewidth(column)<!-- /template --></tt> - <i> returns the width of the image stored in the given column</i>:</b><br>
-		<!-- /func:colimagewidth -->
-		</li>
+		$$funcref_start$$<a name="colimagewidth"/><!-- func:colimagewidth -->
+		<b><tt><!-- template -->colimagewidth(column)<!-- /template --></tt> - <i> returns the width of the image stored in the given column</i>:</b>
+$$funcref_description$$
+		<!-- /func:colimagewidth -->  
+$$funcref_end$$
 
-		<li><a name="colimageheight"/><!-- func:colimageheight -->
-		<b><tt><!-- template -->colimageheight(column)<!-- /template --></tt> - <i> returns the height of the image stored in the given column</i>:</b><br>
-		<!-- /func:colimageheight -->
-		</li>
+		$$funcref_start$$<a name="colimageheight"/><!-- func:colimageheight -->
+		<b><tt><!-- template -->colimageheight(column)<!-- /template --></tt> - <i> returns the height of the image stored in the given column</i>:</b>
+$$funcref_description$$
+		<!-- /func:colimageheight -->  
+$$funcref_end$$
 		
-		<li><a name="columntitles"/><!-- func:columntitles -->
-		<b><tt><!-- template -->columntitles()<!-- /template --></tt> - <i> returns the string vector of column titles</i>:</b><br>
-		<!-- /func:columntitles -->
-		</li>
-
-		
-		<li><a name="columntitle"/><!-- func:columntitle -->
-		<b><tt><!-- template -->columntitle(column)<!-- /template --></tt> - <i> returns the column title of the given column</i>:</b><br>
-		<!-- /func:columntitle -->
-		</li>
+		$$funcref_start$$<a name="columntitles"/><!-- func:columntitles -->
+		<b><tt><!-- template -->columntitles()<!-- /template --></tt> - <i> returns the string vector of column titles</i>:</b>
+$$funcref_description$$
+		<!-- /func:columntitles -->  
+$$funcref_end$$
 
 		
-		<li><a name="columnindexbytitle"/><!-- func:columnindexbytitle -->
-		<b><tt><!-- template -->columnindexbytitle(column_title)<!-- /template --></tt> - <i> returns the column index of the given title (returns the smallest matching column)</i>:</b><br>
-		<!-- /func:columnindexbytitle -->
-		</li>
+		$$funcref_start$$<a name="columntitle"/><!-- func:columntitle -->
+		<b><tt><!-- template -->columntitle(column)<!-- /template --></tt> - <i> returns the column title of the given column</i>:</b>
+$$funcref_description$$
+		<!-- /func:columntitle -->  
+$$funcref_end$$
+
+		
+		$$funcref_start$$<a name="columnindexbytitle"/><!-- func:columnindexbytitle -->
+		<b><tt><!-- template -->columnindexbytitle(column_title)<!-- /template --></tt> - <i> returns the column index of the given title (returns the smallest matching column)</i>:</b>
+$$funcref_description$$
+		<!-- /func:columnindexbytitle -->  
+$$funcref_end$$
 
 	</ul>
 	
 	<a name="constants"/><h2>Table Access Constants </h2>
 	<ul>
-		<li><a name="row"/><!-- func:row -->
-		<b><tt><!-- template -->row<!-- /template --></tt> - <i>row number of current cell</i>:</b><br>
+		$$funcref_start$$<a name="row"/><!-- func:row -->
+		<b><tt><!-- template -->row<!-- /template --></tt> - <i>row number of current cell</i>:</b>
+$$funcref_description$$
 		
-		<!-- /func:row -->
-		</li>
-		<li><a name="col"/><!-- func:col -->
-		<b><tt><!-- template -->col<!-- /template --></tt> - <i>column number of current cell</i>:</b><br>
+		<!-- /func:row -->  
+$$funcref_end$$
+		$$funcref_start$$<a name="col"/><!-- func:col -->
+		<b><tt><!-- template -->col<!-- /template --></tt> - <i>column number of current cell</i>:</b>
+$$funcref_description$$
 		
-		<!-- /func:col -->
-		</li>
-		<li><a name="rows"/><!-- func:rows -->
-		<b><tt><!-- template -->rows<!-- /template --></tt> - <i>number of rows in the table</i>:</b><br>
+		<!-- /func:col -->  
+$$funcref_end$$
+		$$funcref_start$$<a name="rows"/><!-- func:rows -->
+		<b><tt><!-- template -->rows<!-- /template --></tt> - <i>number of rows in the table</i>:</b>
+$$funcref_description$$
 		
-		<!-- /func:rows -->
-		</li>
-		<li><a name="columns"/><!-- func:columns -->
-		<b><tt><!-- template -->columns<!-- /template --></tt> - <i>number of columns in the table</i>:</b><br>
+		<!-- /func:rows -->  
+$$funcref_end$$
+		$$funcref_start$$<a name="columns"/><!-- func:columns -->
+		<b><tt><!-- template -->columns<!-- /template --></tt> - <i>number of columns in the table</i>:</b>
+$$funcref_description$$
 		
-		<!-- /func:columns -->
-		</li>
-		<li><a name="rowsvec"/><!-- func:rowsvec -->
-		<b><tt><!-- template -->rowsvec<!-- /template --></tt> - <i>a vector of row-ids (1-based)</i>:</b><br>
+		<!-- /func:columns -->  
+$$funcref_end$$
+		$$funcref_start$$<a name="rowsvec"/><!-- func:rowsvec -->
+		<b><tt><!-- template -->rowsvec<!-- /template --></tt> - <i>a vector of row-ids (1-based)</i>:</b>
+$$funcref_description$$
 		If the table has 5 row, this variable will be a vector <tt>[1,2,3,4,5]</tt>
-		<!-- /func:rowsvec -->
-		</li>
+		<!-- /func:rowsvec -->  
+$$funcref_end$$
 
 	</ul>
 	

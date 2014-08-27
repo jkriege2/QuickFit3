@@ -9,7 +9,8 @@
 		<h2>SPIM-FCS fit model diffusion, different brightnesses, 1/e²-radii, new V<sub>eff</sub></h2>
 		<p>This function implements a 1...3-component pure-diffusion model for data acquired with a camera in SPIM illumination mode. Each component may have a different relative molecular brightness (relative to species 1). The model was taken from:
 		<blockquote>
-		  A. Pratap Singh, JW. Krieger, J. Buchholz, E. Charbon, J. Langowski, T. Wohland (2013): <b>The performance of 2D array detectors for light sheet based fluorescence correlation spectroscopy</b>, <i>Optics Express</i> <b>21</b>(7): 8652ff, doi: 10.1364/OE.21.008652.
+		  A. Pratap Singh, JW. Krieger, J. Buchholz, E. Charbon, J. Langowski, T. Wohland (2013): <b>The performance of 2D array detectors for light sheet based fluorescence correlation spectroscopy</b>, <i>Optics Express</i> <b>21</b>(7): 8652ff, doi: 10.1364/OE.21.008652.<br>
+		  $$jankrieger_phdthesis$$
 		</blockquote>
 		The fit function is defined as:
         $$bmath:g(\tau)=G_\infty+\frac{1}{(N/V_{\text{eff}})\cdot((1-\rho_2-\rho_3)+q_2\rho_2+q_3\rho_3)^2}\cdot\frac{1}{\sqrt{\pi}\cdot w_za^2}\cdot\sum_{i=1}^3\rho_iq_i^2\cdot\left[\mbox{erf}\left(\frac{a}{\sqrt{4D_i\tau+w_{xy}^2}}\right)+\sqrt{4D_i\tau+w_{xy}^2}\cdot\left[\exp\left(-\frac{a^2}{4D_i\tau+w_{xy}^2}\right)-1\right]\right]^2\cdot\left[1+\frac{4D_i\tau}{w_z^2}\right]^{-1/2}$$

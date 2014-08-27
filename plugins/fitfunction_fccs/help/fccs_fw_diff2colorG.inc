@@ -2,7 +2,7 @@
 <h3>FCCS framework</h3>
 $$insert:framework_schwille.inc$$
 <h3>The confocal MDF and correlation function</h3>
-We assume the MDF of a confocal microscope to begaussian:
+We assume the MDF of a confocal microscope to be gaussian:$$REF_WOHLANDSPIMFCS$$ $$REF_SPIMFCCS$$ $$jankrieger_phdthesis_ref$$
   $$bmath:\mbox{MDF}_\text{g/r}(x,y,z)= \frac{1}{\mathcal{N}}\cdot \exp\left(-2\cdot\frac{x^2+y^2}{w_{g/r}^2}-2\cdot\frac{z^2}{z_{g/r}^2}\right)$$
 Then the non-normalized crosscorrelation function for species X and between channels g and r can be written as:
   $$bmath:G_\text{gr}^{X}(\tau)=\eta_\text{g}\eta_\text{r}c_\text{X}\cdot G_\text{gr,x}^{X}(\tau)\cdot G_\text{gr,y}^{X}(\tau)\cdot G_\text{gr,z}^{X}(\tau)$$

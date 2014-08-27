@@ -1392,6 +1392,9 @@ p, li { white-space: pre-wrap; }
                </item>
                <item>
                 <widget class="QCheckBox" name="chkCCF">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
                  <property name="text">
                   <string>CCF to 4 neighbors</string>
                  </property>

@@ -101,6 +101,8 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         QString getMainHelpDirectory() const;
         /** \brief returns the directory of the QuickFit main application */
         QString getApplicationDirectory() const;
+        /** \brief returns the directory of the QuickFit source code */
+        QString getSourceDirectory() const;
 
 
         void setProxyHost(const QString& host);

@@ -123,6 +123,9 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         DualViewMode dualViewMode() const;
         void setDualViewMode(DualViewMode mode);
         bool isFCCS() const;
+        bool isDCCF() const;
+        int getDCCFDeltaX() const;
+        int getDCCFDeltaY() const;
         bool isACF() const;
         bool overviewImagesSwapped() const;
 

@@ -667,7 +667,7 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->chk2cFCCS->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/FCCS_2color", ui->chk2cFCCS->isChecked()).toBool());
     ui->chkSeparateColorChannels->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/chkSeparateColorChannels", ui->chkSeparateColorChannels->isChecked()).toBool());
     ui->chkAddNB->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/chkAddNB", ui->chkAddNB->isChecked()).toBool());
-
+    ui->chkCCF->setChecked(false);
 }
 
 int QFRDRImagingFCSCorrelationDialog::getIDForProgress(const QFRDRImagingFCSThreadProgress* w) const {
@@ -748,7 +748,7 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob(int biningForFCCS) {
         job.range_max=ui->spinLastFrame->value();
     }
     job.acf=ui->chkACF->isChecked();
-    job.ccf=ui->chkCCF->isChecked();
+    job.ccf=false; //ui->chkCCF->isChecked();
     job.video=ui->chkVideo->isChecked();
     job.video_frames=qMax(2,ui->spinVideoFrames->value());
     job.statistics=true;

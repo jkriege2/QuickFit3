@@ -1,4 +1,4 @@
-Here we formulate the SPIM-FCCS correlation functions within the framework described in $$ref:RIES2010:Ries, J., Z. Petrásek, A. J. Garcia-Sáez, and P. Schwille, 2010. A compre-hensive framework for fluorescence cross-correlation spectroscopy. New Journal of Physics 12:113009.$$.
+Here we formulate the SPIM-FCCS correlation functions within the framework described in $$ref:RIES2010:Ries, J., Z. Petrásek, A. J. Garcia-Sáez, and P. Schwille, 2010. A compre-hensive framework for fluorescence cross-correlation spectroscopy. New Journal of Physics 12:113009.$$ $$REF_SPIMFCCS$$ $$jankrieger_phdthesis_ref$$ .
 There the normalized correlation function between channels g and r is written as:
   $$bmath:g_\text{gr}(\tau)=g_\infty+\frac{G_\text{gr}(\tau)}{\langle F_\text{g}(t)\rangle\cdot\langle F_\text{r}(t)\rangle}=g_\infty+\frac{\langle\delta F_g(t)\cdot\delta F_r(t+\tau)\rangle}{\langle F_\text{g}(t)\rangle\cdot\langle F_\text{r}(t)\rangle}$$
 Then the non-normalized correlation function can be calculated:

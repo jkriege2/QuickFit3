@@ -2,14 +2,17 @@
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Importers Plugin importers_basicimages</title>
+		<title>Basic Importer Plugins for image series</title>
 	</head>
 	<body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
 		<ul>
-			<li><a href="imageimporter_libtiff.html">Importer libTIFF</a></li>
-			<li><a href="imageimporter_tinytiff.html">Importer tinyTIFF reader</a></li>
-			<li><a href="imageimporter_radhard.html">Importer Radhard2</a></li>
+		  <li>multi-frame TIFF file format:<ul>
+			<li><a href="imageimporter_libtiff.html">using libTIFF</a>:<br>supports more types of TIFF files (including several compression schemes), but is limited to 65000 frames in each file.</li>
+			<li><a href="imageimporter_tinytiff.html">Importer tinyTIFF reader</a>:<br>faster than the libTIFF importer, but can only read uncompressed TIFF files</li>
+		  </ul></li>
+		  <li><a href="imageimporter_radhard.html">Importer for data from the <i>Radhard2</i> SPAD array</a></li>
+		  <li><a href="imageimporter_diffusion4btsbinary.html">Importer for the binary dataformat of the <i>diffusion4</i></a> FCS/FCCS simulation software</li>
 		</ul>
 	</body>
 </html>

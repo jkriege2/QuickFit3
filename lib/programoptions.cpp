@@ -239,6 +239,12 @@ QString ProgramOptions::getApplicationDirectory() const {
     return appDir;
 }
 
+QString ProgramOptions::getSourceDirectory() const
+{
+    return appDir+"/source/";
+
+}
+
 
 void ProgramOptions::setProxyHost(const QString &host)
 {

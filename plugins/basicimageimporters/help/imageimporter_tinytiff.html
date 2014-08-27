@@ -6,13 +6,20 @@
 	</head>
 	<body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		<h2>Description of the plugin</h2>
 		<p>This plugin allows to read image series from TIFF files. It uses a simple home-built implementation of the TIFF file format with only a limited set of supported features. </p>
 		<p><strong>Limitations:</strong> <ul>
 		  <li>no compression of any type is supported</li>
 		  <li>only 8, 16 and 32 bits per sample are supported</li>
 		  <li>only planar TIFF files are supported by this plugin (i.e. pixels samples have to be organized as <tt>R R R ... R R R G G G ... G G G B B B ... B B B ...</tt></li>
 		  <li></li>
-		  
 		</ul></p>
+		
+		<h2>TinyTIFF library</h2>
+		<p>This plugin uses the TinyTIFF library, which was developed by Jan W. Krieger. The source code of this library is open source and is distributed together with QuickFit in the directory <a href="opendir:$$sourcedir$$/tinytiff">$$sourcedir$$/tinytiff</a>. There are two C/C++ files with one header each. <ul>
+		  <li><tt>tinytiffreader.cpp</tt>/<tt>tinytiffreader.h</tt> is a reader library for simple TIFF files</li>
+		  <li><tt>tinytiffwriter.cpp</tt>/<tt>tinytiffwriter.h</tt> is a fast writer library for simple TIFF files</li>
+		</ul>
+		Two test projects are provided along with the files, mentioned above (see <a href="opendir:$$sourcedir$$/tinytiff/test/">$$sourcedir$$/tinytiff/test/</a>).</p>
 	</body>
 </html>

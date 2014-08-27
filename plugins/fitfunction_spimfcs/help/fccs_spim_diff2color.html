@@ -8,7 +8,7 @@
   $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
   <h2>SPIM-FCCS fit model:  Diffusion 2-color crosscorrelation (1/$$math:\sqrt{e}$$ radii)</h2>
   <p>This function implements a 1-component diffusion model for 2-color crosscorrelation data acquired with a camera in SPIM illumination mode. 
-  The fit function is defined as:
+  The fit function is defined as:$$REF_WOHLANDSPIMFCS$$ $$REF_SPIMFCCS$$ $$jankrieger_phdthesis_ref$$
     $$bmath:g(\tau)=G_\infty+\frac{(I_1-B_1)\cdot(I_2-B_2)}{I_1\cdot I_2}\cdot\frac{c_{ab}}{c_a\cdot c_b} \cdot \mbox{PCF}(\tau, D_{ab}, a, \sigma_{1,xy}, \sigma_{2,xy}, d_x) \cdot \mbox{PCF}(\tau, D_{ab}, a, \sigma_{1,xy}, \sigma_{2,xy}, d_y) \cdot \mbox{GCF}(\tau, D_{ab}, \sigma_{1,z}, \sigma_{2,z}, d_z)$$
   where the lateral "pixel correlation factor" is defined as:
     $$bmath:\mbox{PCF}(\tau, D, a, \sigma_1, \sigma_2, d) = \frac{1}{2a^2}\cdot\left\{ (a-d)\cdot\erf\left(\frac{a-d}{\sqrt{2}\cdot\sqrt{2D\tau+\sigma_1^2+\sigma_2^2}}\right) - 2d\cdot\erf\left(\frac{d}{\sqrt{2}\cdot\sqrt{2D\tau+\sigma_1^2+\sigma_2^2}}\right) + (a+d)\cdot\erf\left(\frac{a+d}{\sqrt{2}\cdot\sqrt{2D\tau+\sigma_1^2+\sigma_2^2}}\right) + \right.$$

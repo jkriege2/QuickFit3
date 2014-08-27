@@ -8,28 +8,28 @@
   </head>
   <body>
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-	<h2>Expression Parser</h2>
-	<p>This page documents the formula parser/evaluator implemented in some parts of QuickFit. A description of the basic <a href="$$mainhelpdir$$/parserreference/datatypes_syntax.html">syntax</a> and <a href="#funcref">set of functions</a> are available in this document. More features may be accessible in plugins using this feature (e.g. in the <a href="$$plugin_info:help:table">table plugin</a> it is possible to access data from the table with special variables and instructions). The parser is e.g. used here in QuickFit:
-	<ul>
-	  <li><a href="$$plugin_info:help:table">table plugin</a></li>
-	  <li><a href="$$plugin_info:help:qfe_calculator">calculator plugin</a></li>
-	</ul>
-	</p>
-	<p>Basically this parser allows to evaluate mathematical expressions like these:
-	<blockquote>the expression <code> (a * 3 + 2.34^2) * sin(pi * sqrt(x))</code>will evaluate $$math:(a\cdot 3+2.34^2)\cdot\sin(\pi\cdot\sqrt{x])$$<br>
-	            <code>sin(2*pi/5)</code><br>
-				<code>mean([1,2,3,4,5,6,7,8,9,10])</code><br>
-				<code>std([1,2,3,4,5,6,7,8,9,10])</code><br>
-				<code>1+2+3*(5+76)</code><br>
-				...
-				</blockquote>
-	The Syntax used by this expression parser is a simple subset of what is allowed in many programming languages (like C or Pascal). It can handle several operators (e.g. <code>+, *, /, -, ^, ...</code>), named constants (e.g. <code>pi, kB, ...</code>), function calls (e.g. <code>sin(x), ...</code>) and uses parentheses <code>(...)</code> to group sub-expressions. 
-	
-	</p>
+    <h2>Expression Parser</h2>
+    <p>This page documents the formula parser/evaluator implemented in some parts of QuickFit. A description of the basic <a href="$$mainhelpdir$$/parserreference/datatypes_syntax.html">syntax</a> and <a href="#funcref">set of functions</a> are available in this document. More features may be accessible in plugins using this feature (e.g. in the <a href="$$plugin_info:help:table$$">table plugin</a> it is possible to access data from the table with special variables and instructions). The parser is e.g. used here in QuickFit:
+    <ul>
+      <li><a href="$$plugin_info:help:table$$">table plugin</a></li>
+      <li><a href="$$plugin_info:help:qfe_calculator$$">calculator plugin</a></li>
+    </ul>
+    </p>
+    <p>Basically this parser allows to evaluate mathematical expressions like these:
+    <blockquote>the expression <code> (a * 3 + 2.34^2) * sin(pi * sqrt(x))</code>will evaluate $$math:(a\cdot 3+2.34^2)\cdot\sin(\pi\cdot\sqrt{x])$$<br>
+                <code>sin(2*pi/5)</code><br>
+                <code>mean([1,2,3,4,5,6,7,8,9,10])</code><br>
+                <code>std([1,2,3,4,5,6,7,8,9,10])</code><br>
+                <code>1+2+3*(5+76)</code><br>
+                ...
+                </blockquote>
+    The Syntax used by this expression parser is a simple subset of what is allowed in many programming languages (like C or Pascal). It can handle several operators (e.g. <code>+, *, /, -, ^, ...</code>), named constants (e.g. <code>pi, kB, ...</code>), function calls (e.g. <code>sin(x), ...</code>) and uses parentheses <code>(...)</code> to group sub-expressions. 
+    
+    </p>
 
-	<a name="funcref"><h2>Function Reference</h2>
-	<ul>
-	  $$insertglobal:parseref.inc$$
-	</ul>
+    <a name="funcref"><h2>Function Reference</h2>
+    <ul>
+      $$insertglobal:parseref.inc$$
+    </ul>
   </body>
 </html>

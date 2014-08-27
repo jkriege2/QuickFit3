@@ -109,6 +109,9 @@
 		 .
 	  
     .  
+	
+	You can specify your own \c $$...$$ commands for a whole directory, by creating an ini-file named \c localreplaces.ini, which contains lines like <code> COMMAND_NAME="replacedtext"</code>. Then QuickFit will replace all occurences of $$COMMAND_NAME$$ by the given text.
+	
     In the default header some of the metadata from the HTML page are used to display buttons to go to the next, previous and contents page:
     \code
 <title>SPIM Plugin: Preview Windows</title>

@@ -9,7 +9,8 @@
 		<h2>SPIM-FCCS fit model: 1-component diffusion, 2-pixel crosscorrelation, 1/&radic;<span style="border-top: 1px solid black">e</span>-radii</h2>
 		<p>This function implements a 1-component diffusion model for data acquired with a camera in SPIM illumination mode. It assumes that the time series of two distant pixels were cross-correlated. The model was taken from:
 		<blockquote>
-		  Wohland T, Shi X, Sankaran J, Stelzer EH (2010): <b>Single plane illumination fluorescence correlation spectroscopy (SPIM-FCS) probes inhomogeneous three-dimensional environments</b>, <i>Optics Express</i> <b>18</b>(10): 10627-10641, doi: 10.1364/OE.18.010627.
+		  Wohland T, Shi X, Sankaran J, Stelzer EH (2010): <b>Single plane illumination fluorescence correlation spectroscopy (SPIM-FCS) probes inhomogeneous three-dimensional environments</b>, <i>Optics Express</i> <b>18</b>(10): 10627-10641, doi: 10.1364/OE.18.010627.<br>
+		  $$jankrieger_phdthesis$$
 		</blockquote>
 		The fit function is defined as:
 		$$bmath:g(\tau)=G_\infty + \frac{(I-B)^2}{I^2}\cdot\frac{1}{4a^2N}\cdot\left(1+\frac{D\tau}{\sigma_z^2}\right)^{-1/2}\cdot g_{xy}(\tau; d_x)\cdot g_{xy}(\tau; d_y)$$

@@ -195,9 +195,9 @@ double QFRDRImagingFCSData::getMeasurementDuration() const
 
 double QFRDRImagingFCSData::getFrameTime() const
 {
-    if (propertyExists("FRAMETIME_MS")) return getProperty("FRAMETIME_MS", 0).toDouble()/1000.0;
-    if (propertyExists("FRAME_TIME")) return getProperty("FRAME_TIME", 0).toDouble();
-    if (propertyExists("FRAMETIME")) return getProperty("FRAMETIME", 0).toDouble();
+    if (propertyExists("FRAMETIME_MS") && getProperty("FRAMETIME_MS", 0).toDouble()>0) return getProperty("FRAMETIME_MS", 0).toDouble()/1000.0;
+    if (propertyExists("FRAME_TIME") && getProperty("FRAME_TIME", 0).toDouble()>0) return getProperty("FRAME_TIME", 0).toDouble();
+    if (propertyExists("FRAMETIME") && getProperty("FRAMETIME", 0).toDouble()>0) return getProperty("FRAMETIME", 0).toDouble();
     if (tau && N>0) return tau[0];
     return 0;
 }
@@ -1398,6 +1398,22 @@ bool QFRDRImagingFCSData::isFCCS() const
     return fccs;
 }
 
+bool QFRDRImagingFCSData::isDCCF() const
+{
+    bool fccs=getRole().toLower().startsWith("dccf");
+    return fccs;
+}
+
+int QFRDRImagingFCSData::getDCCFDeltaX() const
+{
+    return getProperty("DCCF_DELTAX",0).toInt();
+}
+
+int QFRDRImagingFCSData::getDCCFDeltaY() const
+{
+    return getProperty("DCCF_DELTAY",0).toInt();
+}
+
 bool QFRDRImagingFCSData::isACF() const
 {
     bool acf=getRole().toLower().startsWith("acf");
@@ -2091,6 +2107,7 @@ int QFRDRImagingFCSData::getImageFromRunsHeight() const {
 
 int QFRDRImagingFCSData::getImageFromRunsChannels() const
 {
+
     if (internalDualViewMode()==QFRDRImagingFCSData::dvNone) {
         return 1;
     } else {
@@ -2401,6 +2418,8 @@ double QFRDRImagingFCSData::getSimpleCountrateAverage(int run, int channel, bool
                 //qDebug()<<"       F => "<<overviewF[run]/getTauMin()/1000.0<<"   (tauMin="<<getTauMin()<<")";
                 return overviewF[run]/getTauMin()/1000.0;
             }
+        } else if (overviewF) {
+            return overviewF[run];
         }
     }
     if (run<0&&channel==0) {
@@ -2412,16 +2431,35 @@ double QFRDRImagingFCSData::getSimpleCountrateAverage(int run, int channel, bool
             if (hasStatistics) return stat.avgCnt/getTauMin()/1000.0;
         }
     }
+    if (isDCCF()) {
+        int dx=getDCCFDeltaX();
+        int dy=getDCCFDeltaY();
+        int ry=run/widthOvr;
+        int rx=run%widthOvr;
+        int rund=(ry+dy)*widthOvr+(rx+dx);
+        if (dx>0 || dy>0) {
+            if (rund>=0 && rund<widthOvr*heightOvr && ch==1) {
+                if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF2) {
+                    if (rund>=0) {
+                        return overviewF2[rund]/getTauMin()/1000.0;
+                    } else if (overviewF2) {
+                        return overviewF2[rund];
+                    }
+                }
+            }
+        }
+    }
+
     if (run>=0&&ch==1) {
         if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF2) {
             if (run>=0) {
-                //qDebug()<<"       F2 => "<<overviewF2[run]/getTauMin()/1000.0<<"   (tauMin="<<getTauMin()<<")";
                 return overviewF2[run]/getTauMin()/1000.0;
+            } else if (overviewF2) {
+                return overviewF2[run];
             }
         }
-        //if (run==-2) return  backStat2.avgCnt/getTauMin()/1000.0;
-        //if (hasStatistics2) return stat2.avgCnt/getTauMin()/1000.0;
     }
+
     if (run<0&&channel==1) {
         if (swapChannels && overviewImagesSwapped()) {
             if (run==-2) return  backStat.avgCnt/getTauMin()/1000.0;
@@ -2457,6 +2495,8 @@ double QFRDRImagingFCSData::getSimpleCountrateStdDev(int run, int channel, bool 
     if (run>=0&&ch==0) {
         if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewFSTD) {
             if (run>=0) return overviewFSTD[run]/getTauMin()/1000.0;
+        } else if (overviewFSTD) {
+            return overviewFSTD[run];
         }
     }
     if (run<0&&channel==0) {
@@ -2468,9 +2508,31 @@ double QFRDRImagingFCSData::getSimpleCountrateStdDev(int run, int channel, bool 
             if (hasStatistics) return stat.sigmaCnt/getTauMin()/1000.0;
         }
     }
+
+    if (isDCCF()) {
+        int dx=getDCCFDeltaX();
+        int dy=getDCCFDeltaY();
+        int ry=run/widthOvr;
+        int rx=run%widthOvr;
+        int rund=(ry+dy)*widthOvr+(rx+dx);
+        if (dx>0 || dy>0) {
+            if (rund>=0 && rund<widthOvr*heightOvr && ch==1) {
+                if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF2STD) {
+                    if (rund>=0) {
+                        return overviewF2STD[rund]/getTauMin()/1000.0;
+                    } else if (overviewF2STD) {
+                        return overviewF2STD[rund];
+                    }
+                }
+            }
+        }
+    }
+
     if (run>=0&&ch==1) {
         if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF2STD) {
             if (run>=0) return overviewF2STD[run]/getTauMin()/1000.0;
+        } else if (overviewF2STD) {
+            return overviewF2STD[run];
         }
         //if (run==-2) return  backStat2.avgCnt/getTauMin()/1000.0;
         //if (hasStatistics2) return stat2.avgCnt/getTauMin()/1000.0;

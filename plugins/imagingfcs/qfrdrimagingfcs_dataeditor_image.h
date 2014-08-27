@@ -269,6 +269,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         void setBackgroundFromSelection();
         void setBackgroundFromMasked();
         void setBackground(bool* mask, bool alsoSetOtherACF);
+        void setBackground(QFRawDataRecord* current, bool* msk);
 
         void aspectRatioChanged();
         void copyMeanCFFromAll();

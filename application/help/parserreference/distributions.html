@@ -10,18 +10,20 @@
   <h2>Distribution Functions</h2>
   <ul>
 
-  <li><a name="gauss"/><!-- func:gauss -->
-  <b><tt><!-- template -->gauss(x, sigma)<!-- /template --></tt> - <i>normalized gaussian function </i>:</b><br>
+  $$funcref_start$$<a name="gauss"/><!-- func:gauss -->
+  <b><tt><!-- template -->gauss(x, sigma)<!-- /template --></tt> - <i>normalized gaussian function </i>:</b>
+$$funcref_description$$
   $$bmath:\mbox{gauss}(x,\sigma)=\frac{1}{\sigma\cdot\sqrt{2\pi}}\cdot\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right)$$
   The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
-  <!-- /func:gauss -->
-  </li>
-  <li><a name="gaussnn"/><!-- func:gaussnn -->
-  <b><tt><!-- template -->gaussnn(x, sigma)<!-- /template --></tt> - <i>non-normalized gaussian function </i>:</b><br>
+  <!-- /func:gauss -->  
+$$funcref_end$$
+  $$funcref_start$$<a name="gaussnn"/><!-- func:gaussnn -->
+  <b><tt><!-- template -->gaussnn(x, sigma)<!-- /template --></tt> - <i>non-normalized gaussian function </i>:</b>
+$$funcref_description$$
   $$bmath:\mbox{gaussnn}(x,\sigma)=\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right)$$
   The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
-  <!-- /func:gaussnn -->
-  </li>
+  <!-- /func:gaussnn -->  
+$$funcref_end$$
   
   </ul>
   

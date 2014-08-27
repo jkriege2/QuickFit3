@@ -179,6 +179,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$examplesdir$$");
     addInsertAction(menu, "$$configdir$$");
     addInsertAction(menu, "$$maindir$$");
+    addInsertAction(menu, "$$sourcedir$$");
 
     menu=new QMenu(tr("version/copyright info"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
