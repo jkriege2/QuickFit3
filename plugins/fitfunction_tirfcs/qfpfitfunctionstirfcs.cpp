@@ -65,6 +65,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsTIRFCS:
         res.groupLabel=tirfccslabel;
         res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c/D per species");
         res.models<<"fccs_tir_fw_2ddiffxy2coloracfg"<<"fccs_tir_fw_2ddiffxy2coloracfr"<<"fccs_tir_fw_2ddiffxy2colorccf";
+        res.roles<<"acf0"<<"acf1"<<"fccs";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
@@ -87,6 +88,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsTIRFCS:
         res.groupLabel=tirfccslabel;
         res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c/D per species, Da=Db=Dab");
         res.models<<"fccs_tir_fw_2ddiffxy2coloracfg"<<"fccs_tir_fw_2ddiffxy2coloracfr"<<"fccs_tir_fw_2ddiffxy2colorccf";
+        res.roles<<"acf0"<<"acf1"<<"fccs";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
@@ -108,6 +110,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsTIRFCS:
         res.groupLabel=tirfccslabel;
         res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c/D per species, Da=Db, Dab");
         res.models<<"fccs_tir_fw_2ddiffxy2coloracfg"<<"fccs_tir_fw_2ddiffxy2coloracfr"<<"fccs_tir_fw_2ddiffxy2colorccf";
+        res.roles<<"acf0"<<"acf1"<<"fccs";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
@@ -131,6 +134,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsTIRFCS:
        res.groupLabel=tirfccslabel;
        res.menuEntryLabel=tr("... 2-comp. 2D diffusion (xy), species A+B+AB, c per species, D1/D2 per channel");
        res.models<<"fccs_tir_fw_2csep2ddiffxy2coloracfg"<<"fccs_tir_fw_2csep2ddiffxy2coloracfr"<<"fccs_tir_fw_2csep2ddiffxy2colorccf";
+       res.roles<<"acf0"<<"acf1"<<"fccs";
 
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
@@ -152,6 +156,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsTIRFCS:
         res.groupLabel=tirfccslabel;
         res.menuEntryLabel=tr("... diffusion+flow, ACF + 4 neighbors");
         res.models<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2"<<"fccs_tir_diff_flowe2";
+        res.roles<<"acf"<<"dccf"<<"dccf"<<"dccf"<<"dccf";
         res.globalParams << constructQListWithMultipleItems(QStringList("n_particle"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff1"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("vflowx"), 5);

@@ -545,6 +545,31 @@ void QFImFCCSFitEvaluationEditor::configureFitFromGlobal(const QFFitFunctionConf
     for (int i=0; i<config.models.size(); i++) {
         data->setFitFunction(i, config.models[i]);
     }
+
+
+    if (config.roles.size()>0) {
+        QFRawDataRecord* rdr=data->getFitFile(0);
+        if (rdr) {
+            int group=rdr->getGroup();
+            QList<QFRawDataRecord*> l=rdr->getGroupMembers();
+            for (int i=0; i<config.roles.size(); i++) {
+                QString r=config.roles.value(i, "").toLower();
+                if (!r.isEmpty()) {
+                    int found=-1;
+                    for (int j=0; j<l.size(); j++) {
+                        if (l[j] && l[j]->getRole().toLower().startsWith(r)) {
+                            found=j;
+                            break;
+                        }
+                    }
+                    if (found>=0) {
+                        data->setFitFile(i, l[found]);
+                        l.removeAt(found);
+                    }
+                }
+            }
+        }
+    }
     data->clearLinkParameters();
 
     for (int i=0; i<config.globalParams.size(); i++) {
@@ -560,6 +585,19 @@ void QFImFCCSFitEvaluationEditor::configureFitFromGlobal(const QFFitFunctionConf
             }
         }
     }
+
+    if (config.fixes.size()>0) {
+        for (int i=0; i<config.fixes.size(); i++) {
+            QFRawDataRecord* rdr=data->getFitFile(i);
+            QFFitFunction* ff=data->getFitFunction(i);
+            if (ff && rdr && config.fixes[i].size()>0) {
+                for (int j=0; j<ff->paramCount(); j++) {
+                    if (ff->getDescription(j).fit) data->setFitFix(rdr, data->getCurrentIndex(), ff->getParameterID(j), config.fixes[i].contains(ff->getParameterID(j)));
+                }
+            }
+        }
+    }
+
 }
 
 QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFImFCCSFitEvaluationEditor::getCurrentGlobalFitConfig() const
@@ -569,7 +607,12 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFImFCCSFitEvaluationE
     if (!data) return config;
 
     for (int i=0; i<data->getFitFileCount(); i++) {
+        QString r="";
+        if (data->getFitFile(i)) {
+            r=data->getFitFile(i)->getRole();
+        }
         config.models.append(data->getFitFunctionID(i));
+        config.roles.append(r);
     }
 
     for (int i=0; i<data->getLinkParameterCount(); i++) {
@@ -584,14 +627,20 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFImFCCSFitEvaluationE
 
     for (int i=0; i<data->getFitFileCount(); i++) {
         QFFitFunction* ff=data->getFitFunction(i);
-        if (ff) {
+        QFRawDataRecord* rdr=data->getFitFile(i);
+        if (ff && rdr) {
+            QStringList fl;
             for (int j=0; j<ff->paramCount(); j++) {
                 const QString param=ff->getParameterID(j);
                 const int global=data->getLinkParameter(i, param);
                 if (global>=0 && global<config.globalParams.size()) {
                     config.globalParams[global].operator[](i).append(param);
                 }
+                if (data->getFitFix(rdr, data->getEvaluationResultID(data->getCurrentIndex(), rdr), param)) {
+                    fl<<param;
+                }
             }
+            config.fixes<<fl;
         }
     }
 

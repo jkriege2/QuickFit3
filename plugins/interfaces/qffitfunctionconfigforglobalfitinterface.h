@@ -37,6 +37,7 @@ class QFFitFunctionConfigForGlobalFitInterface
             QString menuEntryLabel;
             QStringList models;
             QStringList roles;
+            QList<QStringList> fixes;
             QList<QList<QStringList> > globalParams;
         };
 

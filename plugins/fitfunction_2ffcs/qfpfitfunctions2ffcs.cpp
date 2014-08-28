@@ -43,6 +43,8 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::
         res.groupLabel=menulabel;
         res.menuEntryLabel=tr("... 2D diffusion+flow, ACF + 4 neighbors");
         res.models<<"fccs_2f_diff2dflowfccs_2f_diff2dflow"<<"fccs_2f_diff2dflow"<<"fccs_2f_diff2dflow"<<"fccs_2f_diff2dflow"<<"fccs_2f_diff2dflow";
+        res.roles<<"acf";
+        res.roles<<"acf"<<"dccf"<<"dccf"<<"dccf"<<"dccf";
         res.globalParams << constructQListWithMultipleItems(QStringList("n_particle"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff1"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("vflowx"), 5);
@@ -54,6 +56,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::
         res.groupLabel=menulabel;
         res.menuEntryLabel=tr("... 3D diffusion+flow, ACF + 4 neighbors");
         res.models<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow";
+        res.roles<<"acf"<<"dccf"<<"dccf"<<"dccf"<<"dccf";
         res.globalParams << constructQListWithMultipleItems(QStringList("n_particle"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff1"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("vflowx"), 5);

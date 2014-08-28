@@ -192,6 +192,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
         res.groupLabel=spimfccslabel;
         res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c/D per species");
         res.models<<"fccs_spim_fw_diff2coloracfg"<<"fccs_spim_fw_diff2coloracfr"<<"fccs_spim_fw_diff2colorccf";
+        res.roles<<"acf0"<<"acf1"<<"fccs";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
@@ -217,6 +218,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
         res.groupLabel=spimfccslabel;
         res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c/D per species, Da=Db=Dab");
         res.models<<"fccs_spim_fw_diff2coloracfg"<<"fccs_spim_fw_diff2coloracfr"<<"fccs_spim_fw_diff2colorccf";
+        res.roles<<"acf0"<<"acf1"<<"fccs";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
@@ -238,6 +240,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
     } else if (i==c++) { // fccs_spim_fw_diff2coloracfg, fccs_spim_fw_diff2coloracfr, fccs_spim_fw_diff2colorccf
         res.groupLabel=spimfccslabel;
         res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c/D per species, Da=Db, Dab");
+        res.roles<<"acf0"<<"acf1"<<"fccs";
         res.models<<"fccs_spim_fw_diff2coloracfg"<<"fccs_spim_fw_diff2coloracfr"<<"fccs_spim_fw_diff2colorccf";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
@@ -264,6 +267,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
        res.groupLabel=spimfccslabel;
        res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c/D per species, Da, Db=Fb*Da, Dab=Fab*Da");
        res.models<<"fccs_spim_fw_factordiff2coloracfg"<<"fccs_spim_fw_factordiff2coloracfr"<<"fccs_spim_fw_factordiff2colorccf";
+       res.roles<<"acf0"<<"acf1"<<"fccs";
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
@@ -290,6 +294,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
        res.groupLabel=spimfccslabel;
        res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c per species, D per channel");
        res.models<<"fccs_spim_fw_sepdiff2coloracfg"<<"fccs_spim_fw_sepdiff2coloracfr"<<"fccs_spim_fw_sepdiff2colorccf";
+       res.roles<<"acf0"<<"acf1"<<"fccs";
 
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
@@ -314,6 +319,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
     } else    if (i==c++) { // fccs_spim_fw_2cdiff2coloracfg, fccs_spim_fw_2cdiff2coloracfr, fccs_spim_fw_2cdiff2colorccf
        res.groupLabel=spimfccslabel;
        res.menuEntryLabel=tr("... 2-comp. normal diffusion, species A+B+AB, c/D1/D2 per species");
+       res.roles<<"acf0"<<"acf1"<<"fccs";
        res.models<<"fccs_spim_fw_2cdiff2coloracfg"<<"fccs_spim_fw_2cdiff2coloracfr"<<"fccs_spim_fw_2cdiff2colorccf";
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
@@ -346,6 +352,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
     } else    if (i==c++) { // fccs_spim_fw_2cdiff2coloracfg, fccs_spim_fw_2cdiff2coloracfr, fccs_spim_fw_2cdiff2colorccf
        res.groupLabel=spimfccslabel;
        res.menuEntryLabel=tr("... 2-comp. normal diffusion, species A+B+AB, c/D1/D2 per species, D1A=D1B=D1AB, ...");
+       res.roles<<"acf0"<<"acf1"<<"fccs";
        res.models<<"fccs_spim_fw_2cdiff2coloracfg"<<"fccs_spim_fw_2cdiff2coloracfr"<<"fccs_spim_fw_2cdiff2colorccf";
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
@@ -372,6 +379,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
        res.groupLabel=spimfccslabel;
        res.menuEntryLabel=tr("... 2-comp. normal diffusion, species A+B+AB, c per species, D1/D2 per channel");
        res.models<<"fccs_spim_fw_2csepdiff2coloracfg"<<"fccs_spim_fw_2csepdiff2coloracfr"<<"fccs_spim_fw_2csepdiff2colorccf";
+       res.roles<<"acf0"<<"acf1"<<"fccs";
 
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
@@ -395,6 +403,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
        res.groupLabel=spimfccslabel;
        res.menuEntryLabel=tr("... 2-comp. 2D diffusion (xy), species A+B+AB, c per species, D1/D2 per channel");
        res.models<<"fccs_spim_fw_2csep2ddiffxy2coloracfg"<<"fccs_spim_fw_2csep2ddiffxy2coloracfr"<<"fccs_spim_fw_2csep2ddiffxy2colorccf";
+       res.roles<<"acf0"<<"acf1"<<"fccs";
 
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
@@ -419,6 +428,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
        res.groupLabel=spimfccslabel;
        res.menuEntryLabel=tr("... 2-comp. 2D diffusion (xz), species A+B+AB, c per species, D1/D2 per channel");
        res.models<<"fccs_spim_fw_2csep2ddiffxz2coloracfg"<<"fccs_spim_fw_2csep2ddiffxz2coloracfr"<<"fccs_spim_fw_2csep2ddiffxz2colorccf";
+       res.roles<<"acf0"<<"acf1"<<"fccs";
 
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
        res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
@@ -442,6 +452,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
         res.groupLabel=spimfccslabel;
         res.menuEntryLabel=tr("... anomalous diffusion, species A+B+AB, c/Gamma/alpha per species");
         res.models<<"fccs_spim_fw_adiff2coloracfg"<<"fccs_spim_fw_adiff2coloracfr"<<"fccs_spim_fw_adiff2colorccf";
+        res.roles<<"acf0"<<"acf1"<<"fccs";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_b"), 3);
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_ab"), 3);
@@ -468,6 +479,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsSPIMFCS
     } else if (i==c++) { // fccs_spim_fw_adiff2coloracfg, fccs_spim_fw_adiff2coloracfr, fccs_spim_fw_adiff2colorccf
         res.groupLabel=spimfccslabel;
         res.menuEntryLabel=tr("... diffusion+flow, ACF + 4 neighbors");
+        res.roles<<"acf"<<"dccf"<<"dccf"<<"dccf"<<"dccf";
         res.models<<"fccs_spim_diffflowce2"<<"fccs_spim_diffflowce2"<<"fccs_spim_diffflowce2"<<"fccs_spim_diffflowce2"<<"fccs_spim_diffflowce2";
         res.globalParams << constructQListWithMultipleItems(QStringList("n_particle"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff1"), 5);
