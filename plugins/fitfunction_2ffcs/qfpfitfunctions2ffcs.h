@@ -2,6 +2,7 @@
 #define QFPFITFUNCTIONS2FFCS_H
 
 #include "qfpluginfitfunction.h"
+#include "qffitfunctionconfigforglobalfitinterface.h"
 
 /*!
     \defgroup qf3fitfunp_fitfunctions_2ffcs Fit Function Plugin for 2f-FCS
@@ -13,9 +14,9 @@
 /*! \brief plugin class for Fit Functions
     \ingroup qf3fitfunp_fitfunctions_2ffcs
 */
-class QFPFitFunctions2FFCS : public QObject, public QFPluginFitFunction {
+class QFPFitFunctions2FFCS : public QObject, public QFPluginFitFunction, public QFFitFunctionConfigForGlobalFitInterface {
         Q_OBJECT
-        Q_INTERFACES(QFPluginFitFunction)
+        Q_INTERFACES(QFPluginFitFunction QFFitFunctionConfigForGlobalFitInterface)
         Q_INTERFACES(QFPlugin)
     public:
 
@@ -63,7 +64,7 @@ class QFPFitFunctions2FFCS : public QObject, public QFPluginFitFunction {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=2;
+            minor=3;
         };
 
         /** \brief return list of plugin IDs */
@@ -71,6 +72,9 @@ class QFPFitFunctions2FFCS : public QObject, public QFPluginFitFunction {
 
         /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
         virtual QFFitFunction* get(QString id, QObject* parent) const ;
+
+        int getGlobalFitConfigCount() const;
+        GlobalFitConfig getGlobalFitConfig(int i) const;
 
         QF_PLUGIN
     private:
