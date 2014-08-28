@@ -4370,7 +4370,7 @@ void QFRDRImagingFCSImageEditor::transformImage(double* image, uint32_t width, u
                 }
             } break;
         case QFRDRImagingFCSImageEditor::itSqrt: {
-                for (int32_t i=0; i<width*height; i++) {
+                for (uint64_t i=0; i<width*height; i++) {
                     if (image[i]>=0) image[i]=sqrt(image[i]);
                     else  image[i]=NAN;
                 }

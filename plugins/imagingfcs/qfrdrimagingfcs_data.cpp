@@ -778,7 +778,7 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
     }
 
 
-    //qDebug()<<"loaded:   "<<width<<"x"<<height<<"  N="<<N<<"   correlations="<<correlations<<"    c[0]="<<correlations[0]<<"    c[N-1]="<<correlations[N-1];
+    qDebug()<<"loaded:   "<<width<<"x"<<height<<"  N="<<N<<"   channels="<<getSimpleCountrateChannels();
 }
 
 bool QFRDRImagingFCSData::loadOverview(double* overviewF, double* overviewF2, const QString& filename) {
@@ -876,7 +876,7 @@ bool QFRDRImagingFCSData::loadImage(const QString& filename, double** data, int*
 bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int* width, int* height, uint32_t* frames, double scaleFactor, double scaleOffset) {
     bool ok=false;
 
-    qDebug()<<filename<<data<<width<<height<<frames;
+    //qDebug()<<filename<<data<<width<<height<<frames;
     if (!data || !width || !height || !frames) return false;
 
     if (*data) qfFree(*data);
@@ -906,7 +906,7 @@ bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int*
                     do {
                         ok=ok & TIFFReadFrame<double>(tif, &((*data)[i*nx*ny]));
                         if (sampleformat == SAMPLEFORMAT_UINT && bitspersample==16 && (scaleFactor!=1.0 || scaleOffset!=0.0)) {
-                            for (int jj=0; jj<nx*ny; jj++) {
+                            for (uint32_t jj=0; jj<nx*ny; jj++) {
                                 (*data)[i*nx*ny+jj]=scaleOffset+(*data)[i*nx*ny+jj]*scaleFactor;
                             }
                         }
@@ -1296,7 +1296,7 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename, bool loadOve
         allocateContents(width,height,cfr->getTotalLagCount()-1);
         //load correlation data
         for(int i=0; i<width*height; i++) {
-            for (int j=1; j<cfr->getTotalLagCount(); j++) {
+            for (uint64_t j=1; j<cfr->getTotalLagCount(); j++) {
                 tau[j-1]=cfr->getTau(i,j)*1e-6;
                 correlations[i*(cfr->getTotalLagCount()-1)+j-1]=cfr->getVal(i,j)-corroffset;
                 sigmas[i*(cfr->getTotalLagCount()-1)+j-1]=0;
@@ -1522,7 +1522,7 @@ void QFRDRImagingFCSData::allocateOverviews(int x, int y) {
 
         overviewF=(double*)qfCalloc(x*y,sizeof(double));
         overviewFSTD=(double*)qfCalloc(x*y,sizeof(double));
-        if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone /*&& !getRole().toLower().startsWith("acf")*/) {
+        if (isDCCF() || internalDualViewMode()!=QFRDRImagingFCSData::dvNone /*&& !getRole().toLower().startsWith("acf")*/) {
             overviewF2=(double*)qfCalloc(x*y,sizeof(double));
             overviewF2STD=(double*)qfCalloc(x*y,sizeof(double));
         }
@@ -1876,96 +1876,117 @@ int QFRDRImagingFCSData::getExpectedFileHeight() const
 
 void QFRDRImagingFCSData::splitImage(double* overviewF, double* overviewF2, const double* inputImage, uint32_t nx, uint32_t ny)
 {
-    //qDebug()<<getID()<<"splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width = "<<width<<"   height = "<<height<<"   intDV2="<<internalDualViewMode()<<",channel="<<internalDualViewModeChannel();
-    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && nx>=2*width && ny==height) {
-        int shift1=0;
-        int shift2=width;
-        double* out1=overviewF;
-        double* out2=overviewF2;
-        if (overviewF2 && !isFCCS()) {
-            //out2=NULL;
-            if (internalDualViewModeChannel()==0) {
-                shift1=0;
-                shift2=width;
-            } else {
-                shift1=width;
-                shift2=0;
-            }
-            if (!propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL")) {
-                setQFProperty("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL", internalDualViewModeChannel()!=0, false);
-            }
-        }
-        if (out1) {
-            for (int y=0; y<height; y++) {
-                for (int x=0; x<width; x++) {
-                    const int idxIn=y*nx+x+shift1;
-                    const int idxOut=y*width+x;
-                    out1[idxOut]=inputImage[idxIn];
+    if (isFCCS()) {
+        //qDebug()<<getID()<<"splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width = "<<width<<"   height = "<<height<<"   intDV2="<<internalDualViewMode()<<",channel="<<internalDualViewModeChannel();
+        if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && (int64_t)nx>=2*width && (int64_t)ny==height) {
+            int shift1=0;
+            int shift2=width;
+            double* out1=overviewF;
+            double* out2=overviewF2;
+            if (overviewF2 && !isFCCS()) {
+                //out2=NULL;
+                if (internalDualViewModeChannel()==0) {
+                    shift1=0;
+                    shift2=width;
+                } else {
+                    shift1=width;
+                    shift2=0;
+                }
+                if (!propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL")) {
+                    setQFProperty("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL", internalDualViewModeChannel()!=0, false);
                 }
             }
-            //qDebug()<<"writing out1["<<out2<<"] ="<<out1[0]<<out1[1]<<out1[2];
-        }
-        if (out2) {            
-            for (int y=0; y<height; y++) {
-                for (int x=0; x<width; x++) {
-                    const int idxIn=y*nx+x+shift2;
-                    const int idxOut=y*width+x;
-                    out2[idxOut]=inputImage[idxIn];
+            if (out1) {
+                for (int y=0; y<height; y++) {
+                    for (int x=0; x<width; x++) {
+                        const int idxIn=y*nx+x+shift1;
+                        const int idxOut=y*width+x;
+                        out1[idxOut]=inputImage[idxIn];
+                    }
+                }
+                //qDebug()<<"writing out1["<<out2<<"] ="<<out1[0]<<out1[1]<<out1[2];
+            }
+            if (out2) {
+                for (int y=0; y<height; y++) {
+                    for (int x=0; x<width; x++) {
+                        const int idxIn=y*nx+x+shift2;
+                        const int idxOut=y*width+x;
+                        out2[idxOut]=inputImage[idxIn];
+                    }
+                }
+                //qDebug()<<"writing out2["<<out2<<"] ="<<out2[0]<<out2[1]<<out2[2];
+            }
+            return;
+        } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && (int64_t)nx==width && (int64_t)ny>=2*height) {
+            int shift1=0;
+            int shift2=height;
+            double* out1=overviewF;
+            double* out2=overviewF2;
+            if (overviewF2 && !isFCCS()) {
+                //out2=NULL;
+                if (internalDualViewModeChannel()==0) {
+                    shift1=0;
+                    shift2=height;
+                } else {
+                    shift1=height;
+                    shift2=0;
+                }
+                if (!propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL")) {
+                    setQFProperty("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL", internalDualViewModeChannel()!=0, false);
                 }
             }
-            //qDebug()<<"writing out2["<<out2<<"] ="<<out2[0]<<out2[1]<<out2[2];
-        }
-    } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && nx==width && ny>=2*height) {
-        int shift1=0;
-        int shift2=height;
-        double* out1=overviewF;
-        double* out2=overviewF2;
-        if (overviewF2 && !isFCCS()) {
-            //out2=NULL;
-            if (internalDualViewModeChannel()==0) {
-                shift1=0;
-                shift2=height;
-            } else {
-                shift1=height;
-                shift2=0;
+            if (out1) {
+                for (int y=0; y<height; y++) {
+                    for (int x=0; x<width; x++) {
+                        const int idxIn=(y+shift1)*nx+x;
+                        const int idxOut=y*width+x;
+                        out1[idxOut]=inputImage[idxIn];
+                    }
+                }
             }
-            if (!propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL")) {
-                setQFProperty("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL", internalDualViewModeChannel()!=0, false);
+            if (out2) {
+                for (int y=0; y<height; y++) {
+                    for (int x=0; x<width; x++) {
+                        const int idxIn=(y+shift2)*nx+x;
+                        const int idxOut=y*width+x;
+                        out2[idxOut]=inputImage[idxIn];
+                    }
+                }
             }
+            return;
         }
-        if (out1) {
-            for (int y=0; y<height; y++) {
-                for (int x=0; x<width; x++) {
-                    const int idxIn=(y+shift1)*nx+x;
-                    const int idxOut=y*width+x;
-                    out1[idxOut]=inputImage[idxIn];
+    } else if (isDCCF()) {
+        if ((int64_t)nx==width && (int64_t)ny==height) {
+            if (overviewF) { memcpy(overviewF, inputImage, nx*ny*sizeof(double)); }
+            if (overviewF2) {
+                int dx=getDCCFDeltaX();
+                int dy=getDCCFDeltaY();
+                for (int run=0; run<width*height; run++) {
+                    int ry=run/width;
+                    int rx=run%width;
+                    int rund=(ry+dy)*width+(rx+dx);
+                    overviewF2[run]=0;
+                    if (rund>=0 && rund<width*height) {
+                        overviewF2[run]=inputImage[rund];
+                    }
                 }
             }
         }
-        if (out2) {
-            for (int y=0; y<height; y++) {
-                for (int x=0; x<width; x++) {
-                    const int idxIn=(y+shift2)*nx+x;
-                    const int idxOut=y*width+x;
-                    out2[idxOut]=inputImage[idxIn];
-                }
-            }
-        }
+        return;
+    }
 
+    if ((int64_t)nx==width && (int64_t)ny==height) {
+        if (overviewF) { memcpy(overviewF, inputImage, nx*ny*sizeof(double)); }//qDebug()<<"  !!!copied overviewF!!!"; }
+        if (overviewF2) { memcpy(overviewF2, inputImage, nx*ny*sizeof(double)); }//qDebug()<<"  !!!copied overviewF2!!!"; }
     } else {
-        if (nx==width && ny==height) {
-            if (overviewF) { memcpy(overviewF, inputImage, nx*ny*sizeof(double)); }//qDebug()<<"  !!!copied overviewF!!!"; }
-            if (overviewF2) { memcpy(overviewF2, inputImage, nx*ny*sizeof(double)); }//qDebug()<<"  !!!copied overviewF2!!!"; }
-        } else {
-            //qDebug()<<"  !!!didn't copy!!!";
-        }
+        //qDebug()<<"  !!!didn't copy!!!";
     }
 }
 
 double QFRDRImagingFCSData::readValueFromPossiblySplitImage(const double *inputImage, uint32_t nx, uint32_t ny, int oldIndex, bool readOtherChannel)
 {
     //qDebug()<<getID()<<"splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width = "<<width<<"   height = "<<height<<"   intDV2="<<internalDualViewMode()<<",channel="<<internalDualViewModeChannel();
-    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && nx>=2*width && ny==height) {
+    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && (int64_t)nx>=2*width && (int64_t)ny==height) {
         int shift1=0;
         if (!isFCCS()) {
             if (internalDualViewModeChannel()==0) {
@@ -1985,7 +2006,7 @@ double QFRDRImagingFCSData::readValueFromPossiblySplitImage(const double *inputI
             return inputImage[idxIn];
             //qDebug()<<"writing out1["<<out2<<"] ="<<out1[0]<<out1[1]<<out1[2];
         }
-    } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && nx==width && ny>=2*height) {
+    } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && (int64_t)nx==width && (int64_t)ny>=2*height) {
         int shift1=0;
         if (!isFCCS()) {
             if (internalDualViewModeChannel()==0) {
@@ -2006,7 +2027,7 @@ double QFRDRImagingFCSData::readValueFromPossiblySplitImage(const double *inputI
         }
 
     } else {
-        if (nx==width && ny==height) {
+        if ((int64_t)nx==width && (int64_t)ny==height) {
             return inputImage[oldIndex];
         } else {
             return NAN;
@@ -2018,7 +2039,7 @@ double QFRDRImagingFCSData::readValueFromPossiblySplitImage(const double *inputI
 float QFRDRImagingFCSData::readValueFromPossiblySplitImage(const float *inputImage, uint32_t nx, uint32_t ny, int oldIndex, bool readOtherChannel)
 {
     //qDebug()<<getID()<<"splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width = "<<width<<"   height = "<<height<<"   intDV2="<<internalDualViewMode()<<",channel="<<internalDualViewModeChannel();
-    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && nx>=2*width && ny==height) {
+    if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && (int64_t)nx>=2*width && (int64_t)ny==height) {
         int shift1=0;
         if (!isFCCS()) {
             if (internalDualViewModeChannel()==0) {
@@ -2038,7 +2059,7 @@ float QFRDRImagingFCSData::readValueFromPossiblySplitImage(const float *inputIma
             return inputImage[idxIn];
             //qDebug()<<"writing out1["<<out2<<"] ="<<out1[0]<<out1[1]<<out1[2];
         }
-    } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && nx==width && ny>=2*height) {
+    } else if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && (int64_t)nx==width && (int64_t)ny>=2*height) {
         int shift1=0;
         if (!isFCCS()) {
             if (internalDualViewModeChannel()==0) {
@@ -2059,7 +2080,7 @@ float QFRDRImagingFCSData::readValueFromPossiblySplitImage(const float *inputIma
         }
 
     } else {
-        if (nx==width && ny==height) {
+        if ((int64_t)nx==width && (int64_t)ny==height) {
             return inputImage[oldIndex];
         } else {
             return NAN;
@@ -2109,6 +2130,7 @@ int QFRDRImagingFCSData::getImageFromRunsChannels() const
 {
 
     if (internalDualViewMode()==QFRDRImagingFCSData::dvNone) {
+        if (isDCCF() && overviewF2) return 2;
         return 1;
     } else {
         if ((overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL"))) || isFCCS()) return 2;
@@ -2431,7 +2453,7 @@ double QFRDRImagingFCSData::getSimpleCountrateAverage(int run, int channel, bool
             if (hasStatistics) return stat.avgCnt/getTauMin()/1000.0;
         }
     }
-    if (isDCCF()) {
+    /*if (isDCCF()) {
         int dx=getDCCFDeltaX();
         int dy=getDCCFDeltaY();
         int ry=run/widthOvr;
@@ -2448,7 +2470,7 @@ double QFRDRImagingFCSData::getSimpleCountrateAverage(int run, int channel, bool
                 }
             }
         }
-    }
+    }*/
 
     if (run>=0&&ch==1) {
         if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF2) {
@@ -2509,7 +2531,7 @@ double QFRDRImagingFCSData::getSimpleCountrateStdDev(int run, int channel, bool 
         }
     }
 
-    if (isDCCF()) {
+    /*if (isDCCF()) {
         int dx=getDCCFDeltaX();
         int dy=getDCCFDeltaY();
         int ry=run/widthOvr;
@@ -2526,7 +2548,7 @@ double QFRDRImagingFCSData::getSimpleCountrateStdDev(int run, int channel, bool 
                 }
             }
         }
-    }
+    }*/
 
     if (run>=0&&ch==1) {
         if (!getProperty("IS_OVERVIEW_SCALED", true).toBool() && overviewF2STD) {

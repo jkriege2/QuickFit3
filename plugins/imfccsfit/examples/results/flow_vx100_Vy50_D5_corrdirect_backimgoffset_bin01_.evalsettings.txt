@@ -1,0 +1,66 @@
+date/time                   : 2014/08/28 11:19:54
+input file                  : ../plugins/imfccsfit/examples/flow_vx100_Vy50_D5.tif
+input description file      : ../flow_vx100_Vy50_D5.configuration.ini
+overview image file         : flow_vx100_Vy50_D5_corrdirect_backimgoffset_bin01_.overview.tif
+overview image file real    : flow_vx100_Vy50_D5_corrdirect_backimgoffset_bin01_.overview_float.tif
+overview std image          : flow_vx100_Vy50_D5_corrdirect_backimgoffset_bin01_.overviewstd.tif
+background image file       : flow_vx100_Vy50_D5_corrdirect_backimgoffset_bin01_.background.tif
+background stddev           : flow_vx100_Vy50_D5_corrdirect_backimgoffset_bin01_.backgroundstd.tif
+uncorr. overview image file : flow_vx100_Vy50_D5_corrdirect_backimgoffset_bin01_.overview_uncorrected.tif
+uncorr. overview std image  : flow_vx100_Vy50_D5_corrdirect_backimgoffset_bin01_.overviewstd_uncorrected.tif
+video file                  : flow_vx100_Vy50_D5_corrdirect_backimgoffset_bin01_.video.tif
+uncorrected video file      : flow_vx100_Vy50_D5_corrdirect_backimgoffset_bin01_.videouncorr.tif
+statistics file             : flow_vx100_Vy50_D5_corrdirect_backimgoffset_bin01_.statistics.dat
+background statistics file  : flow_vx100_Vy50_D5_corrdirect_backimgoffset_bin01_.backstatistics.dat
+uncorrected statistics file : flow_vx100_Vy50_D5_corrdirect_backimgoffset_bin01_.uncorrstatistics.dat
+width                       : 10
+height                      : 10
+frametime (ms)              : 0.02
+frametime (s)               : 2e-05
+dualview mode               : 0
+binning                     : 1
+interleaved binning         : false
+averaging binning           : false
+frame count in file         : 20000
+frame count                 : 20000
+first frame                 : 0
+last frame                  : 19999
+correlation segments        : 0.4
+segments length (s)         : 1
+correlator S                : 8
+correlator m                : 2
+correlator P                : 16
+correlator type             : 0
+correlator type name        : direct
+smallest tau [s]            : 2e-05
+baseline                    : 0
+video sum up                : 200
+video frames                : 100
+video avgMin                : -1.64
+video avgMax                : 75.16
+video uncorrected avgMin    : 99.01
+video uncorrected avgMax    : 173.2
+statistics over             : 200
+DCCF 0 role                   : DCCF(1,0)
+DCCF 0 Delta x                : 1
+DCCF 0 Delta y                : 0
+DCCF 0 frame width            : 10
+DCCF 0 frame height           : 10
+DCCF 1 role                   : DCCF(-1,0)
+DCCF 1 Delta x                : -1
+DCCF 1 Delta y                : 0
+DCCF 1 frame width            : 10
+DCCF 1 frame height           : 10
+DCCF 2 role                   : DCCF(0,1)
+DCCF 2 Delta x                : 0
+DCCF 2 Delta y                : 1
+DCCF 2 frame width            : 10
+DCCF 2 frame height           : 10
+DCCF 3 role                   : DCCF(0,-1)
+DCCF 3 Delta x                : 0
+DCCF 3 Delta y                : -1
+DCCF 3 frame width            : 10
+DCCF 3 frame height           : 10
+bleach correction           : remove frame average
+bleach average frames       : 8
+duration [s]                : 15.28
