@@ -15,6 +15,10 @@ QFEHelpEditor::QFEHelpEditor(QObject* parent):
 QFEHelpEditor::~QFEHelpEditor() {
     if (dlg) delete dlg;
     dlg=NULL;
+    for (int i=0; i<dlgs.size(); i++) {
+        if (dlgs[i]) delete dlgs[i];
+    }
+    dlgs.clear();
 }
 
 
@@ -35,11 +39,14 @@ void QFEHelpEditor::initExtension() {
 	// some example code that may be used to register a menu and a tool button:
 	services->log_global_text(tr("initializing extension '%1' ...\n").arg(getName()));
     
-    actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Online-Help Editor"), this);
+    actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Online-Help Editor [last window]"), this);
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
+    actStartNewPlugin=new QAction(QIcon(getIconFilename()), tr("Online-Help Editor [new window]"), this);
+    connect(actStartNewPlugin, SIGNAL(triggered()), this, SLOT(startNewPlugin()));
     QMenu* extm=services->getMenu("tools");
     if (extm) {
         extm->addAction(actStartPlugin);
+        extm->addAction(actStartNewPlugin);
     }
     services->log_global_text(tr("initializing extension '%1' ... DONE\n").arg(getName()));
 }
@@ -48,7 +55,17 @@ void QFEHelpEditor::startPlugin() {
     if (!dlg) {
         dlg=new QFEHelpEditorWidget(NULL);
         dlg->loadSettings(*(ProgramOptions::getInstance()->getQSettings()), getID());
+        dlgs.append(dlg);
     }
+    dlg->show();
+    dlg->raise();
+}
+
+void QFEHelpEditor::startNewPlugin()
+{
+    dlg=new QFEHelpEditorWidget(NULL);
+    dlg->loadSettings(*(ProgramOptions::getInstance()->getQSettings()), getID());
+    dlgs.append(dlg);
     dlg->show();
     dlg->raise();
 }

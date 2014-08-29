@@ -447,7 +447,7 @@ void QFHTMLHelpWindow::setTooltips(const QMap<QString, QFToolTipsData> &list)
     tooltips=list;
 }
 
-void QFHTMLHelpWindow::setPluginDirList(QList<QFPluginServices::HelpDirectoryInfo>* pluginList) {
+void QFHTMLHelpWindow::setPluginDirList(QList<QFHelpDirectoryInfo>* pluginList) {
     this->pluginList=pluginList;
 }
 

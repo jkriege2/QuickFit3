@@ -388,7 +388,11 @@ QString QFFunctionReferenceTool::getFunctionHelp(QString name)
 {
     QString html="";
     if (functionhelp.contains(name)) {
-        return transformQF3HelpHTML(functionhelp[name.toLower()].fhelp, functionhelp[name.toLower()].fhelpfile);
+        QString hlp=functionhelp[name.toLower()].fhelp;
+        hlp=hlp.remove("$$funcref_start$$");
+        hlp=hlp.remove("$$funcref_description$$");
+        hlp=hlp.remove("$$funcref_end$$");
+        return transformQF3HelpHTML(hlp, functionhelp[name.toLower()].fhelpfile);
     }
 
     return QString();

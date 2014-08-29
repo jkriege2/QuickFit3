@@ -134,11 +134,12 @@ void QFRDRTableEditor::createWidgets() {
     connect(actSaveTableTemplate, SIGNAL(triggered()), this, SLOT(slSaveTableTemplate()));
     actLoadTableTemplate=new QAction(tr("load table template"), this);
     connect(actLoadTableTemplate, SIGNAL(triggered()), this, SLOT(slLoadTableTemplate()));
+    connect(this, SIGNAL(enableActions(bool)), actLoadTableTemplate, SLOT(setEnabled(bool)));
     actCopyTemplate=new QAction(tr("copy selected table column template"), this);
     connect(actCopyTemplate, SIGNAL(triggered()), this, SLOT(slCopyTableTemplate()));
     actPasteTemplate=new QAction(tr("paste selected table column  template"), this);
     connect(actPasteTemplate, SIGNAL(triggered()), this, SLOT(slPasteTableTemplate()));
-
+    connect(this, SIGNAL(enableActions(bool)), actPasteTemplate, SLOT(setEnabled(bool)));
 
     actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy selection for clipboard (for Excel ...)"), this);
     actCopyResultsNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy selection to clipboard (for Excel ...) without herader rows/columns"), this);
@@ -249,24 +250,23 @@ void QFRDRTableEditor::createWidgets() {
 
     actUndo=new QAction(QIcon(":/lib/undo.png"), tr("undo"), this);
     actUndo->setShortcut(QKeySequence::Undo);
+    connect(this, SIGNAL(enableActions(bool)), actUndo, SLOT(setEnabled(bool)));
     actRedo=new QAction(QIcon(":/lib/redo.png"), tr("redo"), this);
     actRedo->setShortcut(QKeySequence::Redo);
+    connect(this, SIGNAL(enableActions(bool)), actRedo, SLOT(setEnabled(bool)));
 
     actQuickStat=new QAction(QIcon(":/table/quickstat.png"), tr("Quick Statistics"), this);
     actQuickStat->setCheckable(true);
     actQuickStat->setChecked(false);
     connect(actQuickStat, SIGNAL(toggled(bool)), this, SLOT(slQuickStat(bool)));
-    connect(this, SIGNAL(enableActions(bool)), actQuickStat, SLOT(setEnabled(bool)));
 
     actQuickHistogram=new QAction(QIcon(":/table/quickhist.png"), tr("Quick Histogram"), this);
     actQuickHistogram->setCheckable(true);
     actQuickHistogram->setChecked(false);
     connect(actQuickHistogram, SIGNAL(toggled(bool)), this, SLOT(slQuickHistogram(bool)));
-    connect(this, SIGNAL(enableActions(bool)), actQuickHistogram, SLOT(setEnabled(bool)));
 
     actAutosetColumnWidth=new QAction(tr("Autoset column &width"), this);
     connect(actAutosetColumnWidth, SIGNAL(triggered()), this, SLOT(slAutoSetColumnWidth()));
-    connect(this, SIGNAL(enableActions(bool)), actAutosetColumnWidth, SLOT(setEnabled(bool)));
 
     actIndexedStat=new QAction(tr("insert indexed statistics columns"), this);
     connect(actIndexedStat, SIGNAL(triggered()), this, SLOT(slInsertIndexedStat()));

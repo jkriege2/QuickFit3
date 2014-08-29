@@ -1316,6 +1316,9 @@ QFLIB_EXPORT QStringList qfDirListFilesRecursive(QDir& dir, const QStringList& f
  */
 QFLIB_EXPORT void parseFAQ(const QString& filename, const QString& pluginID, QMap<QString, QFFAQData> &faqs);
 
+QFLIB_EXPORT void parseTooltips(const QString& directory, QMap<QString, QFToolTipsData>& tooltips);
+
+QFLIB_EXPORT void parseAutolinks(const QString& directory, QMap<QString, QString>& autolinks);
 #endif // QFTOOLS_H
 
 

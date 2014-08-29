@@ -12,7 +12,8 @@
 #include "selectresourceimage.h"
 #include "pluginlinkdialog.h"
 #include "subpluginlinkdialog.h"
-
+#include "faqentrydialog.h"
+#include "functionreferencedialog.h"
 
 
 
@@ -298,6 +299,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$list:extension:INTERFACENAME$$");
     addInsertAction(menu, "$$list:fitfunc:STARTSWITH$$");
     addInsertAction(menu, "$$list:fitalg:$$");
+    addInsertAction(menu, "$$list:importers:STARTSWITH$$");
 
 
     menu=new QMenu(tr("help lists"), this);
@@ -355,12 +357,19 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
 
     menu=new QMenu(tr("FAQs"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
-    addInsertAction(menu, "$$faq_start$$\n  <a name=\"FAQ1\"><b>Question?</b>\n$$faq_answer$$\n  Answer ...\n$$faq_end$$");
+    addInsertAction(menu, tr("FAQ entry"), "$$faq_start$$\n  <a name=\"FAQ1\"><b>Question?</b>\n$$faq_answer$$\n  Answer ...\n$$faq_end$$");
     menu->addSeparator();
     addInsertAction(menu, "$$faq_start");
     addInsertAction(menu, "$$faq_answer");
     addInsertAction(menu, "$$faq_end");
 
+    menu=new QMenu(tr("FAQs"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, tr("Function reference entry"), "$$funcref_start$$<a name=\"NAME\"/><!-- func:NAME -->\n  <b><tt><!-- template -->NAME<!-- /template --></tt> - <i> DESCRIPTION </i>:</b>\n$$funcref_description$$\n    DESCRIPTION\n  <!-- /func:NAME -->\n$$funcref_end$$");
+    menu->addSeparator();
+    addInsertAction(menu, "$$funcref_start");
+    addInsertAction(menu, "$$funcref_description");
+    addInsertAction(menu, "$$funcref_end");
 
     menu=new QMenu(tr("insert other markups"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
@@ -423,14 +432,19 @@ void QFEHelpEditorWidget::storeSettings(QSettings &settings, QString prefix) con
     recentHelpFiles->storeSettings(settings, prefix+"recentScripts/");
 }
 
+void QFEHelpEditorWidget::setWinID(int winID)
+{
+    this->m_winID=winID;
+}
+
 void QFEHelpEditorWidget::autosave()
 {
     if (!getScript().isEmpty()) {
         QDir d(QFPluginServices::getInstance()->getConfigFileDirectory());
         d.mkpath(d.absolutePath());
-        if (QFile::exists(d.absoluteFilePath("helpeditor_autosave_old.html"))) QFile::copy(d.absoluteFilePath("helpeditor_autosave_old.html"), d.absoluteFilePath("helpeditor_autosave_older.html"));
-        if (QFile::exists(d.absoluteFilePath("helpeditor_autosave.html"))) QFile::copy(d.absoluteFilePath("helpeditor_autosave.html"), d.absoluteFilePath("helpeditor_autosave_old.html"));
-        saveFile(d.absoluteFilePath("helpeditor_autosave.html"), false);
+        if (QFile::exists(d.absoluteFilePath(QString("helpeditor%1_autosave_old.html").arg(m_winID)))) QFile::copy(d.absoluteFilePath(QString("helpeditor%1_autosave_old.html").arg(m_winID)), d.absoluteFilePath(QString("helpeditor%1_autosave_older.html").arg(m_winID)));
+        if (QFile::exists(d.absoluteFilePath(QString("helpeditor%1_autosave.html").arg(m_winID)))) QFile::copy(d.absoluteFilePath(QString("helpeditor%1_autosave.html").arg(m_winID)), d.absoluteFilePath(QString("helpeditor%1_autosave_old.html").arg(m_winID)));
+        saveFile(d.absoluteFilePath(QString("helpeditor%1_autosave.html").arg(m_winID)), false);
     }
     QTimer::singleShot(AUTOSAVE_INTERVAL_MSEC, this, SLOT(autosave()));
 }
@@ -438,10 +452,10 @@ void QFEHelpEditorWidget::autosave()
 void QFEHelpEditorWidget::reloadLastAutosave()
 {
     QDir d(QFPluginServices::getInstance()->getConfigFileDirectory());
-    if (QFile::exists(d.absoluteFilePath("helpeditor_autosave.html"))) {
-        openScript(d.absolutePath(), false, "helpeditor_autosave.html");
+    //if (QFile::exists(d.absoluteFilePath("helpeditor_autosave.html"))) {
+        openScript(d.absolutePath(), false);
         setScriptFilename("");
-    }
+    //}
 }
 
 void QFEHelpEditorWidget::documentWasModified()
@@ -486,18 +500,7 @@ void QFEHelpEditorWidget::on_btnOpen_clicked()
 }
 
 bool QFEHelpEditorWidget::save() {
-    /*QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastScriptDir", ProgramOptions::getInstance()->getMainHelpDirectory()).toString();
-    QDir d(dir);
-    QString filename=qfGetSaveFileName(this, tr("save acquisition script ..."), d.absoluteFilePath(currentScript), tr("QuickFit 3 help (*.html *.htm *.inc);;All Files (*.*)"));
-    if (!filename.isEmpty()) {
-        bool ok=true;
-        if (ok) {
-            saveFile(filename);
-            dir=QFileInfo(filename).absolutePath();
-        }
-    }
-    ProgramOptions::getInstance()->getQSettings()->setValue("QFEHelpEditorWidget/lastScriptDir", dir);
-    return true;*/
+
     if (currentScript.isEmpty()) {
         return saveAs();
     } else {
@@ -529,7 +532,7 @@ bool QFEHelpEditorWidget::saveAs()
 {
     QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastScriptDir", ProgramOptions::getInstance()->getMainHelpDirectory()).toString();
     QDir d(dir);
-    QString filename=qfGetSaveFileName(this, tr("save acquisition script ..."), d.absoluteFilePath(currentScript), tr("QuickFit 3 help (*.html *.htm *.inc *.ini);;All Files (*.*)"));
+    QString filename=qfGetSaveFileName(this, tr("save online-help page ..."), d.absoluteFilePath(currentScript), tr("QuickFit 3 help (*.html *.htm *.inc *.ini);;All Files (*.*)"));
     if (!filename.isEmpty()) {
         bool ok=true;
         if (ok) {
@@ -904,6 +907,23 @@ void QFEHelpEditorWidget::on_btnInsertSubPluginLink_clicked()
 void QFEHelpEditorWidget::on_btnCenter_clicked()
 {
     insertAroundOld("\n<center>%1°</center>");
+}
+
+void QFEHelpEditorWidget::on_btnInsertFAQ_clicked()
+{
+    FAQEntryDialog* dlg=new FAQEntryDialog(this);
+    if (dlg->exec()) {
+        insertAroundOld(QString("%1°")+dlg->insertText());
+    }
+}
+
+void QFEHelpEditorWidget::on_btnFunctionReference_clicked()
+{
+    FunctionReferenceDialog* dlg=new FunctionReferenceDialog(this);
+    if (dlg->exec()) {
+        insertAroundOld(QString("%1°")+dlg->insertText());
+    }
+
 }
 
 

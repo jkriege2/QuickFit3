@@ -562,6 +562,35 @@
       </widget>
      </item>
      <item>
+      <widget class="Line" name="line_11">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnInsertFAQ">
+       <property name="text">
+        <string>insert FAQ entry ...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/help/help_faq.png</normaloff>:/lib/help/help_faq.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnFunctionReference">
+       <property name="text">
+        <string>insert function reference entry ...</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/expression_parser.png</normaloff>:/lib/expression_parser.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
       <spacer name="horizontalSpacer_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>

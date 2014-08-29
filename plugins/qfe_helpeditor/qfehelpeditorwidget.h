@@ -30,6 +30,8 @@ class QFEHelpEditorWidget : public QWidget {
         void loadSettings(QSettings& settings, QString prefix);
         void storeSettings(QSettings& settings, QString prefix) const;
 
+        void setWinID(int m_winID);
+
 
     protected slots:
         void autosave();
@@ -75,6 +77,8 @@ class QFEHelpEditorWidget : public QWidget {
         void on_btnInsertPluginLink_clicked();
         void on_btnInsertSubPluginLink_clicked();
         void on_btnCenter_clicked();
+        void on_btnInsertFAQ_clicked();
+        void on_btnFunctionReference_clicked();
         //void on__clicked();
 
         /** \brief replaces the currently selected text by newText, hwere %1 is replaced by the selected text*/
@@ -123,6 +127,7 @@ class QFEHelpEditorWidget : public QWidget {
 
         QString currentScript;
     private:
+        int m_winID;
         Ui::QFEHelpEditorWidget *ui;
         QRecentFilesMenu* recentHelpFiles;
 

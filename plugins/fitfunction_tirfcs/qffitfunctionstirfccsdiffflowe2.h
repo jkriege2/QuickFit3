@@ -13,7 +13,7 @@ class QFFitFunctionsTIRFCCSDiffFlowE2: public QFFitFunction {
         QFFitFunctionsTIRFCCSDiffFlowE2();
         virtual ~QFFitFunctionsTIRFCCSDiffFlowE2() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("TIR-FCCS: 2D Diffusion+Flow (1/e² radii)"); }
+        virtual QString name() const { return QString("TIR-FCCS: 2D Diffusion+Flow (1/e^2 radii)"); }
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */

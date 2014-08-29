@@ -103,6 +103,10 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
         QString getApplicationDirectory() const;
         /** \brief returns the directory of the QuickFit source code */
         QString getSourceDirectory() const;
+        /** \brief returns a sub-directory for QF3 in the user's home directory, which can be used to store masks, configs etzc. */
+        QString getHomeQFDirectory() const;
+
+        void setHomeQFDirectory(const QString& dir);
 
 
         void setProxyHost(const QString& host);

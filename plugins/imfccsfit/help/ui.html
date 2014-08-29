@@ -2,7 +2,7 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-  <title>imFCCS Fit: User Interface</title>
+  <title>imFCCS Fit: User Interface &amp; Workflow</title>
   </head>
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
@@ -13,10 +13,13 @@
 <p><center><img src="./pic/ui_overview.png"></center>
 The imFCCS plugin screen is separated into different parts:
 <ul>
-  <li>At the top of the window, you can select the fit algorithm and the data weighting to be used.</li>
-  <li>In the center of the screen, an overview image of the measurement is displayed. Here you can also select (by clicking) the current pixel/run can be selected.</li>
-  <li>The correlation curves of the selected pixel are displayed on the left of the overview image. This plot also contains the current fit function as thick dashed lines. Below this plot, the residuals (difference between data and model) is shown in a second plot. Here the thick lines represent a running average over the fit functions. the plot style can be edited with the widgets above the plots (error/weight style, plot style, ...). </li>
-  <li>Below the plot you can limit the lag-time range, that is used for the fit (cut parts of the curve). </li>
+  <li>At the top of the window, you can select the <b>fit algorithm</b> and the <b>data weighting</b> to be used.</li>
+  <li>In the center of the screen, an <b>overview image</b> of the measurement is displayed. Here you can also select (by clicking) the current pixel/run can be selected.</li>
+  <li>The <b>correlation curves</b> of the selected pixel are displayed on the left of the overview image. This plot also contains the current fit function as thick dashed lines. Below this plot, the residuals (difference between data and model) is shown in a second plot. Here the thick lines represent a running average over the fit functions. the plot style can be edited with the widgets above the plots (error/weight style, plot style, ...). </li>
+  <li><b>lower/upper cut-off:</b> Below the plot you can limit the lag-time range, that is used for the fit (cut parts of the curve). </li>
+  <li>At the bottom left of the window, a <b>fit parameter table</b> displays all currently selected files/RDRs and the according fit models together with all parameters. Each combination of  specific RDRs is called a <b>file set</b> and for each such file set, a fit can be performed.</li>
+  <li>On the bottom right, several buttons and widgets allow to start a fit for the currently chosen set of files/RDRs.</li>
+  <li>Above these buttons, a<b> list shows all available file sets</b>. If a fit has already been performed for a specific file set, it is displayed as a dark blue or black entry. Based on the last fit, QuickFit tries to guess other sets of RDRs from the project, which can also be fitted with the currently selected models. These "guessed" file sets are displayed in gray.</li>
 </ul>
 </p>
 
@@ -27,7 +30,19 @@ The imFCCS plugin screen is separated into different parts:
 
 
 <h2>Detailed description of the different functions</h2>
-<p></p>
+<p><ul>
+  <li><b>Fit Current</b> fits the currently select pixel/run in the current file set</li>
+  <li><b>Fit All Piels</b> fits all pixels/runs in the current file set</li>
+  <li><b>Fit All Pixels Filesets</b> fits all pixels/runs in all available (also the guessed) file sets</li>
+  <li><b>Save/Print Report</b> saves (PDF,PS,HTML,ODT) or prints a report, which contains all currently displayed plots amd the fit result table. Also all settings for the fit are included. </li>
+  <li><b>Reset Current</b> Resets the fit results, that are currently displayed (current pixel/run + file set) to the initial values.</li>
+  <li><b>Reset All pixels</b> resets the fit results in all pixels.</li>
+  <li><b>Copy to Initial</b> tells the plugin to use the current fit results as initial values for all further fits.</li>
+  <li><b>local/global iterations</b> if this is a number <i>N</i>&gt;0, the fit will iterate <i>N</i>-times over these setps:<ol><li>fit each model to each file/RDR locally</li><li>fir all files/RDRs globally using the values form the last step as initial values</li></ol>This procedure may improve convergence on difficult problems.</li>
+  <li><b>repeat fits</b> if this is a number <i>N</i>&gt;1, the fit for each pixel will be repeated <i>N</i>-times, where each time, the result of the last fit run is used as initial value for the next. Often <i>N=3</i> is a good choice to improve convergence in imFCCS fits. The additionally required processing time is relatively low, as the fits typically already start with good initial conditions.</li>
+  <li><b>don't fit masked pixels</b> if this is activated (default), only those pixels will be fitted, which are not masked out. Especially in fits of cells it is therefore advisable to mask all pixels, which do NOT belong to the cell, so processing time is reduced significantly. $$note: Typically fits take significantly longer, when no proper correlation functions is present, such as in the case of pixels outside a cell, which do  not show any non-vanishing correlation.$$</li>
+  <li><b>save long result strings</b> If this is activated (by default not) additional information is stored for each RDR in the fit results (e.g. a string describing the fit results). This information is typically superfluous and only needed for debugging. Also it will significantly increase the project file size.<b> Therefore it is advisable to leave this deactiveated.</b></li>
+</ul></p>
 
 
   </body>

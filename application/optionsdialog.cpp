@@ -11,6 +11,8 @@ OptionsDialog::OptionsDialog(QWidget* parent):
     labMath->setText("g_\\text{gg}^\\text{A}(\\tau)=\\frac{1}{N}\\cdot\\left(1+\\frac{\\tau}{\\tau_D}\\right)^{-1}\\cdot\\left(1+\\frac{\\tau}{\\gamma^2\\tau_D}\\right)^{-1/2}");
     QFStyledButton* btn=new QFStyledButton(QFStyledButton::SelectDirectory, edtUserFitFunctions, edtUserFitFunctions);
     edtUserFitFunctions->addButton(btn);
+    btn=new QFStyledButton(QFStyledButton::SelectDirectory, edtUserSettings, edtUserSettings);
+    edtUserSettings->addButton(btn);
 }
 
 OptionsDialog::~OptionsDialog()
@@ -98,7 +100,10 @@ void OptionsDialog::open(ProgramOptions* options) {
     cmbProxyType->setCurrentIndex(qBound(0,options->getProxyType(),2));
     chkUpdates->setChecked(options->getConfigValue("quickfit/checkupdates", true).toBool());
     cmbWindowHeader->setCurrentIndex(options->getConfigValue("quickfit/windowheadermode", 1).toInt());
-    edtUserFitFunctions->setText(options->getConfigValue("quickfit/user_fitfunctions", QFPluginServices::getInstance()->getConfigFileDirectory()+"/userfitfunctions/").toString());
+    QDir dhome(options->getHomeQFDirectory());
+    if (!QDir(dhome.absolutePath()+"/userfitfunctions").exists()) dhome.mkdir("userfitfunctions");
+    edtUserFitFunctions->setText(options->getConfigValue("quickfit/user_fitfunctions", options->getHomeQFDirectory()+"/userfitfunctions/").toString());
+    edtUserSettings->setText(options->getHomeQFDirectory());
     spinMath->setValue(options->getConfigValue("quickfit/math_pointsize", 14).toInt());
     on_spinMath_valueChanged(spinMath->value());
 
@@ -134,10 +139,18 @@ void OptionsDialog::open(ProgramOptions* options) {
         options->setProxyType(cmbProxyType->currentIndex());
         options->setConfigValue("quickfit/checkupdates", chkUpdates->isChecked());
         options->setConfigValue("quickfit/user_fitfunctions", edtUserFitFunctions->text());
+        options->setHomeQFDirectory(edtUserSettings->text());
         options->setConfigValue("quickfit/math_pointsize", spinMath->value());
         options->setConfigValue("quickfit/windowheadermode", cmbWindowHeader->currentIndex());
-        QDir dir(edtUserFitFunctions->text());
-        if (!dir.exists()) dir.mkpath(dir.absolutePath());
+        {
+            QDir dir(edtUserFitFunctions->text());
+            if (!dir.exists()) dir.mkpath(dir.absolutePath());
+        }
+        {
+            QDir dir(edtUserSettings->text());
+            if (!dir.exists()) dir.mkpath(dir.absolutePath());
+        }
+
         for (int i=0; i<m_plugins.size(); i++) {
             m_plugins[i]->writeSettings(options);
         }

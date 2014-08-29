@@ -429,6 +429,11 @@ bool QFFitAlgorithm::displayConfig() {
     return false;
 }
 
+bool QFFitAlgorithm::isDeprecated() const
+{
+    return false;
+}
+
 
 
 

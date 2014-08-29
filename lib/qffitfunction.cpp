@@ -25,6 +25,11 @@
 #include <cmath>
 #include"qftools.h"
 
+bool QFFitFunction::isDeprecated() const
+{
+    return false;
+}
+
 QVector<double> QFFitFunction::multiEvaluate(const QVector<double> &x, const double *parameters) const
 {
     QVector<double> y(x.size(), NAN);

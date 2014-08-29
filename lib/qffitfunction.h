@@ -168,6 +168,9 @@ class QFLIB_EXPORT QFFitFunction {
         /** \brief return a short unique model ID string */
         virtual QString id() const=0;
 
+        /** \brief indicates, that this fit function should not be used any longer, i.e. is DEPRECATED */
+        virtual bool isDeprecated() const;
+
         /*! \brief evaluate the fitting function \f$ f(x, \vec{p}) \f$ at the position \f$ x \f$ with the given parameter vector \f$ \vec{p} \f$
             \param x position \f$ x \f$ where to evaluate the fit function
             \param parameters parameter vector \f$ \vec{p}\in\mathbb{R}^N \f$

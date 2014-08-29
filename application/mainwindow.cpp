@@ -132,7 +132,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
 
     logFileMainWidget->log_header(tr("preparing online-help ..."));
     logFileMainWidget->inc_indent();
-    parseFAQ(settings->getMainHelpDirectory()+"/faq.html", "quickfit", faqs);
+    parseFAQ(settings->getMainHelpDirectory()+"/faq.html", "quickfit", helpdata.faqs);
 
 
     htmlReplaceList.append(qMakePair(QString("version.svnrevision"), QString(qfInfoSVNVersion()).trimmed()));
@@ -146,6 +146,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("email"), QString(qfInfoEmail())));
     htmlReplaceList.append(qMakePair(QString("jankrieger_phdthesis"), tr("Jan W. Krieger (2014): <b>\"Mapping diffusion Properties in Living Cells\"</b>, University Heidelberg, <i><a href=\"http://www.ub.uni-heidelberg.de/archiv/17187\">http://www.ub.uni-heidelberg.de/archiv/17187</a>.</i>")));
     htmlReplaceList.append(qMakePair(QString("jankrieger_phdthesis_ref"), tr("$$ref:JKRIEGR_PHD:Jan W. Krieger (2014): <b>\"Mapping diffusion Properties in Living Cells\"</b>, University Heidelberg, <i><a href=\"http://www.ub.uni-heidelberg.de/archiv/17187\">http://www.ub.uni-heidelberg.de/archiv/17187</a>.</i>$$")));
+    htmlReplaceList.append(qMakePair(QString("jankrieger_phdthesis_invisibleref"), tr("$$invisibleref:JKRIEGR_PHD:Jan W. Krieger (2014): <b>\"Mapping diffusion Properties in Living Cells\"</b>, University Heidelberg, <i><a href=\"http://www.ub.uni-heidelberg.de/archiv/17187\">http://www.ub.uni-heidelberg.de/archiv/17187</a>.</i>$$")));
     htmlReplaceList.append(qMakePair(QString("qfcitation"), QString(qfInfoCitationHTML())));
     htmlReplaceList.append(qMakePair(QString("qfcitation_bibtex"), QString(qfInfoCitationBiBTeX())));
     htmlReplaceList.append(qMakePair(QString("maillist"), QString(qfInfoMaillist())));
@@ -201,6 +202,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.extension"), tr("")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitfunc"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_evalscreen.html\">Fit Functions Help</a>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitalg"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_fitalg.html\">Fit Algorithms Help</a>")));
+    htmlReplaceList.append(qMakePair(QString("qf_further_reading"), QString("")));
 
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.start"),
          tr("$$DEFAULTREF$$</font><a name=\"#footer\"><table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">"
@@ -220,25 +222,31 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
         }
     }
 
+    parseAutolinks(settings->getMainHelpDirectory(), helpdata.autolinks);
 
-    QSettings setTooltips(settings->getMainHelpDirectory()+"tooltips.ini", QSettings::IniFormat);
+    parseTooltips(settings->getMainHelpDirectory(), helpdata.tooltips);
 
-    QStringList keys=setTooltips.childKeys();
-    for (int i=0; i<keys.size(); i++) {
-        tooltips[keys[i]].tooltip=setTooltips.value(keys[i], tr("<i>no tooltip available</i>")).toString();
-        tooltips[keys[i]].tooltipfile=settings->getMainHelpDirectory()+"tooltips.ini";
-    }
 
-    QMapIterator<QString, QFToolTipsData> it(tooltips);
+    QMapIterator<QString, QFToolTipsData> it(helpdata.tooltips);
     while (it.hasNext()) {
         it.next();
         if (it.value().tooltip.startsWith("%")) {
             //qDebug()<<it.key()<<": "<<it.value().tooltip<<"->"<<tooltips[it.value().tooltip.mid(1)].tooltip<<" ["<<it.value().tooltip.mid(1)<<"]";
-            tooltips[it.key()]=tooltips[it.value().tooltip.mid(1)];
+            helpdata.tooltips[it.key()]=helpdata.tooltips[it.value().tooltip.mid(1)];
         }
     }
     //qDebug()<<tooltips;
-    helpWindow->setTooltips(tooltips);
+    helpWindow->setTooltips(helpdata.tooltips);
+
+
+
+    QMapIterator<QString, QString> ita(helpdata.autolinks);
+    while (ita.hasNext()) {
+        ita.next();
+        if (ita.value().startsWith("%")) {
+            helpdata.autolinks[ita.key()]=helpdata.autolinks[ita.value().mid(1)];
+        }
+    }
 
 
     logFileMainWidget->dec_indent();
@@ -286,12 +294,12 @@ void MainWindow::reloadCurrentProject()
 
 void MainWindow::searchAndRegisterPlugins() {
     // find plugins
-    rawDataFactory->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips, faqs);
-    evaluationFactory->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips, faqs);
-    fitFunctionManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips, faqs);
-    fitAlgorithmManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips, faqs);
-    importerManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips, faqs);
-    extensionManager->searchPlugins(settings->getPluginDirectory(), &pluginHelpList, tooltips, faqs);
+    rawDataFactory->searchPlugins(settings->getPluginDirectory(), helpdata);//&pluginHelpList, tooltips, faqs);
+    evaluationFactory->searchPlugins(settings->getPluginDirectory(), helpdata);//&pluginHelpList, tooltips, faqs);
+    fitFunctionManager->searchPlugins(settings->getPluginDirectory(), helpdata);//&pluginHelpList, tooltips, faqs);
+    fitAlgorithmManager->searchPlugins(settings->getPluginDirectory(), helpdata);//&pluginHelpList, tooltips, faqs);
+    importerManager->searchPlugins(settings->getPluginDirectory(), helpdata);//&pluginHelpList, tooltips, faqs);
+    extensionManager->searchPlugins(settings->getPluginDirectory(), helpdata);//&pluginHelpList, tooltips, faqs);
 
 
     // distribute application hooks
@@ -660,7 +668,7 @@ QString MainWindow::createFAQ()
     QString text="";
     QString textd="";
     int cnt=0;
-    QMapIterator<QString, QFFAQData> it(faqs);
+    QMapIterator<QString, QFFAQData> it(helpdata.faqs);
     while (it.hasNext()) {
         it.next();
         QString faq="";
@@ -745,7 +753,7 @@ QString MainWindow::createPluginDocCopyrights(QString mainitem_before, QString m
     }
     text+=mainitem_after;
 
-    text+=mainitem_before.arg(tr("Importers"));
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_importer.html\">Importers</a>"));
     // gather information about plugins
     for (int i=0; i<importerManager->pluginCount(); i++) {
         int id=i;
@@ -847,7 +855,7 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     }
     text+=mainitem_after;
 
-    text+=mainitem_before.arg(tr("Importers"));
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_importer.html\">Importers</a>"));
     // gather information about plugins
     for (int i=0; i<importerManager->pluginCount(); i++) {
         int id=i;
@@ -925,7 +933,7 @@ QString MainWindow::createPluginDocSettings(QString mainitem_before, QString mai
     }
     text+=mainitem_after;
 
-    text+=mainitem_before.arg(tr("Importers"));
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_importer.html\">Importers</a>"));
     // gather information about plugins
     for (int i=0; i<importerManager->pluginCount(); i++) {
         int id=i;
@@ -983,7 +991,7 @@ QString MainWindow::createPluginDocHelp(QString mainitem_before, QString mainite
     }
     text+=mainitem_after;
 
-    text+=mainitem_before.arg(tr("Importers"));
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_importer.html\">Importers</a>"));
     // gather information about plugins
     for (int i=0; i<importerManager->pluginCount(); i++) {
         int id=i;
@@ -2137,6 +2145,11 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     else setCurrentProject("");
 }
 
+QFPluginHelpData &MainWindow::getPluginHelpData()
+{
+    return helpdata;
+}
+
 
 
 
@@ -2260,6 +2273,25 @@ QString MainWindow::getFitFunctionHelp(const QString &pluginID) {
 QString MainWindow::getFitAlgorithmHelp(const QString &pluginID) {
     if (fitAlgorithmManager->hasPluginForID(pluginID)) return fitAlgorithmManager->getPluginHelp(fitAlgorithmManager->getPluginForID(pluginID), pluginID);
     return "";
+}
+
+void MainWindow::addToHelpFurtherReading(const QString &text)
+{
+    //* The substring should contain one or more $$invisible_ref::$$ entry/ies, which will be displayed on the further_reading page */
+    bool found =false;
+    for (int i=0; i<htmlReplaceList.size(); i++) {
+        if (htmlReplaceList[i].first=="qf_further_reading") {
+            htmlReplaceList[i].second=htmlReplaceList[i].second+text;
+            //qDebug()<<"qf_further_reading="<<htmlReplaceList[i].second;
+            found=true;
+            break;
+        }
+    }
+    if (!found) {
+        htmlReplaceList.append(qMakePair(QString("qf_further_reading"), text));
+        //qDebug()<<"qf_further_reading="<<text;
+    }
+
 }
 
 QString MainWindow::getImporterHelp(const QString &pluginID) {
@@ -2857,11 +2889,11 @@ void MainWindow::appendOrAddHTMLReplacement(const QString &name, const QString &
 }
 
 QMap<QString, QFToolTipsData> MainWindow::getTooltips() const {
-    return tooltips;
+    return helpdata.tooltips;
 }
 
-QList<QFPluginServices::HelpDirectoryInfo>* MainWindow::getPluginHelpList() {
-    return &pluginHelpList;
+QList<QFHelpDirectoryInfo>* MainWindow::getPluginHelpList() {
+    return &(helpdata.pluginHelpList);
 
 }
 
@@ -2897,7 +2929,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
     if (!fileDir.endsWith("/")) fileDir.append("/");
     QList<QPair<QString, QString> > fromHTML_replaces;
     QList<QPair<QString, QString> >* replaces=QFPluginServices::getInstance()->getHTMLReplacementList();
-    QList<QFPluginServices::HelpDirectoryInfo>* pluginList=QFPluginServices::getInstance()->getPluginHelpList();
+    QList<QFHelpDirectoryInfo>* pluginList=QFPluginServices::getInstance()->getPluginHelpList();
     QF3HelpReplacesList localreplaces;
     localreplaces<<qMakePair<QString, QString>("startbox", "<blockquote>"
                                                "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: white ;  border-color: midnightblue\" >"
@@ -3064,7 +3096,36 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 result=result.replace(QString("<body>"), QString("<body>$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$"));
             }
             if (!result.contains("$$contents")) {
-                result=result.replace(QString("$$qf_commondoc_header.end$$"), QString("$$qf_commondoc_header.end$$\n<br><hr><br>$$contents$$<br><hr><br>"));
+                result=result.replace(QString("$$qf_commondoc_header.end$$"), QString("$$qf_commondoc_header.end$$\n$$contents_full$$"));
+            }
+        }
+
+
+        {
+            // insert autolinks
+            QStringList ttids=helpdata.autolinks.keys();
+            qSort(ttids.begin(), ttids.end(), qfQStringCompareLengthDecreasing);
+
+            for (int ti=0; ti<ttids.size(); ti++){
+                const QString key=ttids[ti];
+                const QString val=helpdata.autolinks.value(key);
+                QRegExp rxTT(QString("\\<\\s*(\\w\\w*)[^\\>]*\\>[^\\<\\>]*(%1)[^\\<\\>]*\\<").arg(key));
+                rxTT.setMinimal(true);
+                rxTT.setCaseSensitivity(Qt::CaseInsensitive);
+                pos = 0;
+                //qDebug()<<rxTT;
+                while ((pos = rxTT.indexIn(result, pos)) != -1) {
+                    QString rep=QString("%2 <a href=\"%1\"><img src=\":/lib/help/autolink.png\" border=\"0\" alt=\"get more information about %3\"></a>").arg(val).arg(rxTT.cap(2)).arg(key);
+                    QString tag=rxTT.cap(1).toLower();
+                    //qDebug()<<key<<val<<rep<<tag;
+                    if (tag!="h1" && tag!="h2" && tag!="h3" && tag!="h4" && tag!="h5" && tag!="title" && tag!="a") {
+                        result=result.replace(rxTT.pos(2), rxTT.cap(2).size(), rep);
+                        pos += rep.size();
+                    } else {
+                        pos += rxTT.matchedLength();
+                    }
+                }
+
             }
         }
 
@@ -3144,6 +3205,32 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                 if (a) {
                                     name=a->name();
                                     dir=dir=QFPluginServices::getInstance()->getFitFunctionManager()->getPluginHelp(id, j.key());
+                                    delete a;
+                                    if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
+                                    else text+=item_template_nolink.arg(icon).arg(name);
+                                }
+                            }
+
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                        }
+                    } else if (list=="importers") {
+                        QString text="";
+                        QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+                        QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
+                        // gather information about plugins
+                            QMap<QString, QFImporter*> models= QFPluginServices::getInstance()->getImporterManager()->createImporters<QFImporter*>(filter);
+                            QMapIterator<QString, QFImporter*> j(models);
+                            while (j.hasNext()) {
+                                j.next();
+                                int id=QFPluginServices::getInstance()->getImporterManager()->getPluginForID(j.key());
+                                QString dir=QFPluginServices::getInstance()->getImporterManager()->getPluginHelp(id);
+                                QString name=QFPluginServices::getInstance()->getImporterManager()->getName(id);
+                                QString icon=QFPluginServices::getInstance()->getImporterManager()->getIconFilename(id);
+                                QFImporter* a=j.value();
+                                if (a) {
+                                    name=a->formatName();
+                                    dir=dir=QFPluginServices::getInstance()->getImporterManager()->getPluginHelp(id, j.key());
                                     delete a;
                                     if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
                                     else text+=item_template_nolink.arg(icon).arg(name);
@@ -3598,7 +3685,12 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             }
             //fromHTML_replaces.append(qMakePair(QString("references"), referencesHTML));
 
-            result=result.replace("$$contents$$", contentsHTML);
+            if (!result.contains("$$no_contents$$")) {
+                result=result.replace("$$contents$$", contentsHTML);
+                QString contentsFull=contentsHTML;
+                if (!contentsFull.isEmpty()) contentsFull=tr("<br><hr><br>%1<br><hr><br>").arg(contentsFull);
+                result=result.replace("$$contents_full$$", contentsFull);
+            }
             if (!result.contains("$$references$$") && referencesHTML.size()>0) {
                 result=result.replace("$$DEFAULTREF$$", "<h2>References</h2><p>$$references$$</p>");
             }
@@ -3633,13 +3725,13 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         if (insertTooltips) {
             // insert tooltips: search all occurences of the tooltip keywords that are not inside a tag (i.e. surrounded by a closing tag on
             // the left and an opening tag on the right) and where the tag is not something special (like headers or links).
-            QMapIterator<QString, QFToolTipsData> itTT(tooltips);
-            QStringList ttids=tooltips.keys();
+            QMapIterator<QString, QFToolTipsData> itTT(helpdata.tooltips);
+            QStringList ttids=helpdata.tooltips.keys();
             qSort(ttids.begin(), ttids.end(), qfQStringCompareLengthDecreasing);
 
             for (int ti=0; ti<ttids.size(); ti++){
                 const QString key=ttids[ti];
-                const QFToolTipsData val=tooltips.value(key);
+                const QFToolTipsData val=helpdata.tooltips.value(key);
                 QRegExp rxTT(QString("\\<\\s*(\\w\\w*)[^\\>]*\\>[^\\<\\>]*(%1)[^\\<\\>]*\\<").arg(key));
                 rxTT.setMinimal(true);
                 pos = 0;
@@ -3657,6 +3749,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
             }
         }
+
         //qDebug()<<result;
 
 

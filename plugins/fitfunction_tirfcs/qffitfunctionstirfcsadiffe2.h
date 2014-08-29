@@ -13,7 +13,7 @@ class QFFitFunctionsTIRFCSADiffE2: public QFFitFunction {
         QFFitFunctionsTIRFCSADiffE2();
         virtual ~QFFitFunctionsTIRFCSADiffE2() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("TIR-FCS: 2D anomalous Diffusion (1/e² radii)"); }
+        virtual QString name() const { return QString("TIR-FCS: 2D anomalous Diffusion (1/e^2 radii)"); }
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */

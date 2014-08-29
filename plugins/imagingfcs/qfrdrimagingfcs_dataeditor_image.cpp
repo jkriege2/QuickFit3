@@ -53,6 +53,7 @@
 QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent):
     QFRawDataEditor(services, propEditor, parent)
 {
+    //lastMaskDir=ProgramOptions::getInstance()->getHomeQFDirectory();
     param1Default<<"fitparam_diff_coeff";
     param1Default<<"fitparam_diff_coeff1";
     param1Default<<"fitparam_diff_coeff";

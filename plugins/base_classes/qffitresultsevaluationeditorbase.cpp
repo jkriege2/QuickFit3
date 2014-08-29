@@ -32,7 +32,7 @@ QFFitResultsEvaluationEditorBase::QFFitResultsEvaluationEditorBase(QString iniPr
     QFEvaluationEditor(services, propEditor, parent)
 {
     m_iniPrefix=iniPrefix;
-    m_currentFPSSaveDir="";
+    m_currentFPSSaveDir=ProgramOptions::getInstance()->getHomeQFDirectory();
     m_currentSaveDirectory="";
     actSaveReport=new QAction(QIcon(":/lib/savereport.png"), tr("Save Report"), this);
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));

@@ -39,7 +39,7 @@ QFEvaluationItemFactory::~QFEvaluationItemFactory()
 }
 
 
-void QFEvaluationItemFactory::searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData>& tooltips, QMap<QString, QFFAQData> &faqs) {
+void QFEvaluationItemFactory::searchPlugins(QString directory, QFPluginHelpData &helpdata) {
     QDir pluginsDir = QDir(directory);
     foreach (QString fileName, qfDirListFilesRecursive(pluginsDir)) {//pluginsDir.entryList(QDir::Files)) {
         QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
@@ -63,32 +63,30 @@ void QFEvaluationItemFactory::searchPlugins(QString directory, QList<QFPluginSer
                 emit showMessage(tr("loaded evaluation plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
                 emit showLongMessage(tr("loaded evaluation plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(filenames[iRecord->getID()]).arg(iRecord->getName()).arg(iRecord->getAuthor()).arg(iRecord->getCopyright()));
                 // , QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList
-                if (pluginHelpList) {
-                    QFPluginServices::HelpDirectoryInfo info;
-                    info.plugin=iRecord;
-                    info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(fileName).baseName()+QString("/");
-                    info.mainhelp=info.directory+iRecord->getID()+QString(".html");
-                    info.tutorial=info.directory+QString("tutorial.html");
-                    info.settings=info.directory+QString("settings.html");
-                    info.faq=info.directory+QString("faq.html");
-                    if (!QFile::exists(info.mainhelp)) info.mainhelp="";
-                    if (!QFile::exists(info.tutorial)) info.tutorial="";
-                    if (!QFile::exists(info.settings)) info.settings="";
-                    if (!QFile::exists(info.faq)) info.faq="";
-                    if (!info.faq.isEmpty()) parseFAQ(info.faq, iRecord->getID(), faqs);
-                    info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_evalscreen.html");
-                    info.plugintypename=tr("Evaluation Plugins");
-                    info.pluginDLLbasename=QFileInfo(fileName).baseName();
-                    info.pluginDLLSuffix=QFileInfo(fileName).suffix();
-                    pluginHelpList->append(info);
-                    QSettings setTooltips(info.directory+"tooltips.ini", QSettings::IniFormat);
 
-                    QStringList keys=setTooltips.childKeys();
-                    for (int i=0; i<keys.size(); i++) {
-                        tooltips[keys[i]].tooltip=setTooltips.value(keys[i], tr("<i>no tooltip available</i>")).toString();
-                        tooltips[keys[i]].tooltipfile=info.directory+"tooltips.ini";
-                    }
-                }
+                QFHelpDirectoryInfo info;
+                info.plugin=iRecord;
+                info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(fileName).baseName()+QString("/");
+                info.mainhelp=info.directory+iRecord->getID()+QString(".html");
+                info.tutorial=info.directory+QString("tutorial.html");
+                info.settings=info.directory+QString("settings.html");
+                info.faq=info.directory+QString("faq.html");
+                if (!QFile::exists(info.mainhelp)) info.mainhelp="";
+                if (!QFile::exists(info.tutorial)) info.tutorial="";
+                if (!QFile::exists(info.settings)) info.settings="";
+                if (!QFile::exists(info.faq)) info.faq="";
+                if (!info.faq.isEmpty()) parseFAQ(info.faq, iRecord->getID(), helpdata.faqs);
+                info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_evalscreen.html");
+                info.plugintypename=tr("Evaluation Plugins");
+                info.pluginDLLbasename=QFileInfo(fileName).baseName();
+                info.pluginDLLSuffix=QFileInfo(fileName).suffix();
+                helpdata.pluginHelpList.append(info);
+
+                parseTooltips(info.directory, helpdata.tooltips);
+                parseAutolinks(info.directory, helpdata.autolinks);
+
+
+
                 QFPluginServices::getInstance()->getExtensionManager()->addExtensionPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalExtensionPlugins());
                 addEvalPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalEvaluationPlugins());
                 QFPluginServices::getInstance()->getRawDataRecordFactory()->addRDRPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalRDRPlugins());

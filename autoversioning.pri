@@ -67,7 +67,7 @@ win32 {
     DATESTRYEAR = $$system(date +%Y)
 }
 isEmpty(DATESTR) {
-    DATESTR = ---
+    DATESTR = _DATE_
     DATESTRYEAR = 2014
 }
 message("COMPILE MODE: SVNVERSION is: $$SVNVERSION")

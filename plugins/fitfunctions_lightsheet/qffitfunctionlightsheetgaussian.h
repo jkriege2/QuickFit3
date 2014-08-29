@@ -14,9 +14,9 @@ class QFFitFunctionLightsheetGaussian: public QFFitFunction {
         QFFitFunctionLightsheetGaussian();
         virtual ~QFFitFunctionLightsheetGaussian() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("gaussian SPIM lightsheet, 1/e²-halfwidth"); };
+        virtual QString name() const { return QString("gaussian SPIM lightsheet, 1/e^2-halfwidth"); };
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("lightsheet: gaussian (1/e²)"); };
+        virtual QString shortName() const { return QObject::tr("lightsheet: gaussian (1/e^2)"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("lightsheet_gaussian"); };
 

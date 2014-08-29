@@ -78,11 +78,14 @@ class QFEHelpEditor : public QObject, public QFExtensionBase {
         QFPluginLogService* logService;
 
         QAction* actStartPlugin;
+        QAction* actStartNewPlugin;
         QFEHelpEditorWidget* dlg;
+        QList<QPointer<QFEHelpEditorWidget> > dlgs;
 
 	protected slots:
 	    /** \brief target, used in example code in initExtension() */
         void startPlugin();
+        void startNewPlugin();
 
 
 };

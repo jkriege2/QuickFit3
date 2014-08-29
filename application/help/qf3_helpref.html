@@ -75,7 +75,22 @@ The Online-Help system of QuickFit is based on HTML. A <a href="http://qt-projec
 <h3>other plugins info:</h3><ul>
 <li><code>&#36;&#36;plugin_info:help:PLUGINID&#36;&#36;</code> the path of the help file for plugin with ID <em>PLUGINID</em></li>
 <li><code>&#36;&#36;plugin_info:tutorial:PLUGINID&#36;&#36;</code> the path of the tutorial file for plugin with ID <em>PLUGINID</em></li>
+<li><code>&#36;&#36;plugin_info:faq:PLUGINID&#36;&#36;</code> the path of the frequently asked questions file for plugin with ID <em>PLUGINID</em></li>
+<li><code>&#36;&#36;plugin_info:helpdir:PLUGINID&#36;&#36;</code> the path of the helpdir file for plugin with ID <i>PLUGINID</i></li>
+<li><code>&#36;&#36;plugin_info:assetsdir:PLUGINID&#36;&#36;</code> the path of the assetsdir file for plugin with ID <i>PLUGINID</i></li>
+<li><code>&#36;&#36;plugin_info:configdir:PLUGINID&#36;&#36;</code> the path of the configdir file for plugin with ID <i>PLUGINID</i></li>
+<li><code>&#36;&#36;plugin_info:examplesdir:PLUGINID&#36;&#36;</code> the path of the examplesdir file for plugin with ID <i>PLUGINID</i></li>
+<li><code>&#36;&#36;fitfunction:help:PLUGINID&#36;&#36;</code> help file for the fit function ID <i>PLUGINID</i></li>
+<li><code>&#36;&#36;fitfunction:name:PLUGINID&#36;&#36;</code> name for the fit function ID <i>PLUGINID</i></li>
+<li><code>&#36;&#36;fitfunction:short_name:PLUGINID&#36;&#36;</code> short name for the fit function ID <i>PLUGINID</i></li>
+<li><code>&#36;&#36;fitalgorithm:help:PLUGINID&#36;&#36;</code> help file for the fit algorithm ID <i>PLUGINID</i></li>
+<li><code>&#36;&#36;fitalgorithm:name:PLUGINID&#36;&#36;</code> name for the fit algorithm ID <i>PLUGINID</i></li>
+<li><code>&#36;&#36;fitalgorithm:short_name:PLUGINID&#36;&#36;</code> short name for the fit algorithm ID <i>PLUGINID</i></li>
+<li><code>&#36;&#36;importer:help:PLUGINID&#36;&#36;</code> help file for the importer ID <i>PLUGINID</i></li>
+<li><code>&#36;&#36;importer:name:PLUGINID&#36;&#36;</code> format name for the importer ID <i>PLUGINID</i></li>
 </ul>
+
+
 <h3>lists of available plugins</h3><ul>
 <li><code>&#36;&#36;list:extension:INTERFACENAME&#36;&#36; </code> makes a list (unordered HTML list) of all available extensions of type <code>INTERFACENAME</code> (can also be empty, then the list contains all extensions)</li>
 <li><code>&#36;&#36;list:fitfunc:STARTSWITH&#36;&#36; </code> makes a list (unordered HTML list) of all fit functions that start with <code>STARTSWITH</code> (can also be empty, then the list contains all fit functions)</li>
@@ -87,6 +102,8 @@ The Online-Help system of QuickFit is based on HTML. A <a href="http://qt-projec
 <li><code>&#36;&#36;insert:FILENAME&#36;&#36; </code> insert the contents (complete !!!) of the given file <code>FILENAME</code> (path relative to current directory)</li>
 <li><code>&#36;&#36;insertglobal:FILENAME&#36;&#36; </code> insert the contents (complete !!!) of the given file <code>FILENAME</code> in the global help directory</li>
 </ul>
+
+
 <h3>insert LaTeX formulas</h3><ul>
 <li><code>&#36;&#36;math:LATEX&#36;&#36; </code> renders the given LaTeX fragment using <a href="jkqtmathtext.html" >a LaTeX parser</a> and displays the result. Note that the rendering quality of this is not nearly as good as the quality output by LaTeX. So if you want high-quality output, or don't like a formula rendered with <code>&#36;&#36;math:...&#36;&#36;</code>
  or need a LaTeX feature not supported by this, please include a direct LaTeX rendering result as PNG. </li>
@@ -101,9 +118,94 @@ The Online-Help system of QuickFit is based on HTML. A <a href="http://qt-projec
 <li><code>&#36;&#36;invisibleref:ID:REFERENCE TEXT&#36;&#36;</code> works like above, but no bracketed number is introduced. The referenced literature will still be introduced into the referneces list.</li>
 <li><code>&#36;&#36;references&#36;&#36;</code> will introduce a list of references into the document.</li>
 </ul>
+
+
+<h3>Additional Commands:</h3>
+<ul>
+<li><code>&#36;&#36;see:text&#36;&#36;</code> will add a yellow box with the test "See" and the given <i>text</i> to the help document</li>
+<li><code>&#36;&#36;note:text&#36;&#36;</code> will add a blue box with the test "Note" and the given <i>text</i> to the help document</li>
+<li><code>&#36;&#36;info:text&#36;&#36;</code> will add a blue box with the test "Information" and the given <i>text</i> to the help document</li>
+<li><code>&#36;&#36;warning:text&#36;&#36;</code> will add a orange/red box with the test "Warning" and the given <i>text</i> to the help document</li>
+<li><code>&#36;&#36;example:text&#36;&#36;</code> will add a blue/gray box with the text formatted as example</li>
+<li><code>&#36;&#36;cexample:text&#36;&#36;</code> / <code>&#36;&#36;codeexample:text&#36;&#36;</code> will add a blue/gray box with the text formatted as a code example (typewrite/Courier font)</li>
+<li><code>&#36;&#36;tt:text&#36;&#36;</code> / <code>&#36;&#36;code:text&#36;&#36;</code>  will format the text in the typewrite/Courier font</li>
+<li><code>&#36;&#36;fig:file:caption&#36;&#36;</code> / <code>&#36;&#36;figure:file:caption&#36;&#36;</code> will add the given image  file as a figure with the given caption</li>
+</ul>
+
+
+<h3>Special files in online-help</h3>
+<h4>localreplaces.ini</h4>
+<p>You can specify your own <code>&#36;&#36;...&#36;&#36;</code> commands for a whole directory, by creating an ini-file named  <tt>localreplaces.ini</tt>, which contains lines like <code> COMMAND_NAME="replacedtext"</code>. Then QuickFit will replace all occurences of <code>&#36;&#36;COMMAND_NAME&#36;&#36;</code> by the given text.</p>
+<h4>tooltips.ini</h4>
+<p>You can specify tooltips, which will be used globall by the QuickFit online-help system, by adding a file <tt>tooltips.ini</tt> to your plugin online-help directory. This file is organized as an INI-file, as follows:
+<pre>
+RDR=&quot;&lt;b&gt;raw data record&lt;/b&gt;, an intem in the QuickFit project tree, representing some raw data (e.g. correlation curves, an image stack, ...)&quot;
+raw data record=%RDR
+rdr group=&quot;Raw data records can be grouped in oder to tell QuickFit that several RDRs belong together. e.g. for an FCCS measurement the two autocorrelations and the crosscorrelation data will be grouped.&quot;
+TIFF=&quot;&lt;b&gt;tagged image file format (TIFF)&lt;/b&gt;: a fileformat to store images or series of images&quot;
+</pre>
+The lhs of each line (before the <tt>=</tt>) contains the text, that should be clickable afterwards. The rhs (after the <tt>=</tt>), the tooltip is written in quotation marks. If you need to use quotation marks within you tooltip, you need to escape them as <tt>\&quot;</tt>. QuickFit will transfrom the first match of the lhs in each help file into a tooltip-link. SO if the user clicks on that text, a sub-window with your tooltip will be displayed. Since often several different writing should all lead to the same tooltip, there is a short cut: You can define the tooltip with a lhs (e.g. <tt>RDR</tt> in the example above) without whitespaces and special characters. Then you can reuse that tooltip, by writing <tt>%RDR</tt> on the rhs.
+</p>
+<h4>autolinks.ini</h4>
+<p>Autolinks work a bit like tooltips, but they do not show up as a hovering sub-window, but as a small image (<img src=":/lib/help/autolink.png">) in the text, which links to a special help page for the topic. You can add new autolinks, by adding a file <tt>autolinks.ini</tt> to you project, which has the following format:
+<pre>
+expression parser=&quot;mathparser.html&quot;
+plotter widget=&quot;jkqtplotter.html&quot;
+regular expressions=&quot;&#36;&#36;mainhelpdir&#36;&#36;qf3_qtregexp.html&quot;
+</pre>
+All the same as for tooltips, the lhs defines the word(s) to match and the rhs the file to link to. You can use the <code>&#36;&#36;mainhelpdir&#36;&#36;</code>-macro to specify files in the main help directory. If the path does NOT start with a <code>&#36;&#36;</code>, it is interpreted as a relative path within the help directory of your plugin. The <tt>%...</tt> shortcut also works for auto-links.
+</p>
+<h4>tutorials.ini</h4>
+<p>If you plugin comes with only one tutorial, you can simply generate a file <tt>tutorial.html</tt>, which contains the tutorial. If there are several tutorials, you might want them to be listed in QuickFi's main tutorial page. Then you will have to put each tutorial in it's separate file, have <tt>tutorial.html</tt> link to each of these files and generate an additional file <tt>tutirals.ini</tt>, which summarizes all your tutorials in the following format:
+<pre>
+[tutorial1]
+name=Tutorial for Sub 1
+file=tutorial_sub1.html
+
+[tutorial2]
+name=Tutorial for Sub 2
+file=tutorial_sub2.html
+</pre>
+</p>
+
+
+
+<h3>Expression parser reference files</h3>
+<p>If your plugin implements functions for QuickFit's expression parser, you should also add documentation for these functions. This documentation has to be stored in a special format, which allows QuickFit to parse it. You need to do several things:<ol>
+  <li>generate a sub-directory <tt>parserreference</tt>, which will contain several HTML help files, which describe the fit fucntions (each file may also describe a group of functions).</li>
+  <li>Directly in the help directory, generate a file <tt>parserref.ini</tt> with the following format:
+<pre>   
+  &lt;li&gt;&lt;b&gt;&lt;a href=&quot;$$plugin_info:helpdir:PLUGINID$$/parserreference/FILENAME1.html&quot;&gt;&lt;/a&gt;&lt;/b&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;b&gt;&lt;a href=&quot;$$plugin_info:helpdir:PLUGINID$$/parserreference/FILENAME2.html&quot;&gt;&lt;/a&gt;&lt;/b&gt;&lt;/li&gt;
+</pre>
+which lists all  HTML help pages, that you generated in <tt>parserreference</tt> (here FILENAME1.html, FILENAME2.html). Also make sure to replace PLUGINID by the ID of your plugin! With this file present, the help files will be listed in the main expression parser help.</li>
+  <li>In the main help of your plugin, you can add a line like <tt>&lt;ul&gt;$$insert:parserref.inc$$&lt;/ul&gt;</tt> to generate a list of your help files.</li>
+  <li>Now generate the sub-help files in <tt>parserreference</tt>, i.e. FILENAME1.html and FILENAME2.htmlin the example above. Each file should list the description of one or more of the functions and constants, that you added to the expression parser. The default form is:
+<pre>
+&#36;&#36;funcref_start&#36;&#36;&lt;a name=&quot;FUNC_NAME&quot;/&gt;&lt;!-- func:FUNC_NAME --&gt;&lt;b&gt;&lt;tt&gt;&lt;!-- template --&gt;FUNC_NAME(x)&lt;!-- /template --&gt;&lt;/tt&gt; - &lt;i&gt; compute BLA of parameter &lt;tt&gt;x&lt;/tt&gt; &lt;/i&gt;:&lt;/b&gt;
+&#36;&#36;funcref_description&#36;&#36;
+    MORE ELABORATE DESCRIPTION.
+        &#36;&#36;example:The call &lt;tt&gt;FUNC_NAME([1,2,3])&lt;/tt&gt; will return &lt;tt&gt;BLA&lt;/tt&gt;&#36;&#36;  
+&lt;!-- /func:FUNC_NAME --&gt;
+&#36;&#36;funcref_end&#36;&#36;
+</pre></li>
+</ol></p>
+
+
+<h3>Frequently asked questions page</h3>
+<p>Each plugin may also provide a list of FAQs. This is done in a single help HTML-file <tt>faq.html</tt>. For each FAQ, it has to contain an entry like this:
+<pre>
+&#36;&#36;faq_start&#36;&#36;
+  &lt;a name=&quot;FAQ1&quot;&gt;&lt;b&gt;How to ...?&lt;/b&gt;
+&#36;&#36;faq_answer&#36;&#36;
+  Answer ...
+&#36;&#36;faq_end&#36;&#36;
+</pre>
+All entries of this format will be recognized by QuickFit and the FAQs will be listed in QuickFit's main FAQ page.
+</p>
+
 <h3>Metadata</h3>
 <p>In the default header some of the metadata from the HTML page are used to display buttons to go to the next, previous and contents page: </p>
-
 <blockquote>
 <code>&lt;title&gt;SPIM Plugin: Preview Windows&lt;/title&gt;<br>
 &lt;link rel=<span class="stringliteral">&quot;prev&quot;</span> href=<span class="stringliteral">&quot;ext_spimb040_camconfig.html&quot;</span>&gt; <br>

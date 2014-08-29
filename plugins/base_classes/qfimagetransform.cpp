@@ -30,6 +30,7 @@
 #include "qfpluginservices.h"
 #include <QDebug>
 #include "qfmathparser.h"
+#include "programoptions.h"
 
 QFImageTransformWidget::QFImageTransformWidget(QWidget *parent)
 {
@@ -144,7 +145,8 @@ void QFImageTransformWidget::save(const QString &filename)
 {
     QString fn=filename;
     if (fn.isEmpty()) {
-        QString dir=QFPluginServices::getInstance()->getConfigFileDirectory()+"image_transforms/";
+        QDir(ProgramOptions::getInstance()->getHomeQFDirectory()).mkpath("image_transforms");
+        QString dir=ProgramOptions::getInstance()->getHomeQFDirectory()+"image_transforms/";
         QString filter=tr("image transform configuration (*.itc)");
         fn=qfGetSaveFileNameSet(QString("QFImageTransformWidget/"), this, tr("save image-transform item configuration ..."), dir, filter);
     }

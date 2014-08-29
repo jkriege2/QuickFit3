@@ -245,6 +245,21 @@ QString ProgramOptions::getSourceDirectory() const
 
 }
 
+QString ProgramOptions::getHomeQFDirectory() const
+{
+    QString cfg=getConfigValue("quickfit/homedir", "").toString();
+    if (!cfg.isEmpty() && QDir(cfg).exists()) return cfg;
+
+    QDir d=QDir::home();
+    if (!QDir(d.absolutePath()+"/quickfit3").exists()) d.mkdir("quickfit3");
+    return d.absolutePath()+"/quickfit3/";
+}
+
+void ProgramOptions::setHomeQFDirectory(const QString &dir)
+{
+    setConfigValue("quickfit/homedir", dir);
+}
+
 
 void ProgramOptions::setProxyHost(const QString &host)
 {

@@ -89,22 +89,24 @@ class QFLIB_EXPORT QFImporterManager : public QObject {
         /** \brief returns a fit algorthms \a faID main help file (html) for a specified plugin \a ID. */
         QString getPluginHelp(int ID, QString faID);
         /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory, QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList, QMap<QString, QFToolTipsData> &tooltips, QMap<QString, QFFAQData> &faqs);
+        void searchPlugins(QString directory, QFPluginHelpData& helpdata);
 
         QFImporter* createImporter(const QString& id) const;
 
         /** \brief return a list of the models which may be converted to the given class */
         template<class T>
-        QMap<QString, QFImporter*> createImporters() {
+        QMap<QString, QFImporter*> createImporters(const QString& startswith=QString()) const {
             QMap<QString, QFImporter*>  result;
             for (int i=0; i<plugins.size(); i++) {
                 QStringList ids=plugins[i]->getIDs();
                 for (int j=0; j<ids.size(); j++) {
-                    QFImporter* imp=plugins[i]->createImporter(ids[j]);
-                    if (dynamic_cast<T>(imp)!=NULL) {
-                        result[ids[j]]=imp;
-                    } else {
-                        delete imp;
+                    if (startswith.isEmpty() || ids[j].startsWith(startswith)) {
+                        QFImporter* imp=plugins[i]->createImporter(ids[j]);
+                        if (dynamic_cast<T>(imp)!=NULL) {
+                            result[ids[j]]=imp;
+                        } else {
+                            delete imp;
+                        }
                     }
                 }
 
@@ -114,16 +116,18 @@ class QFLIB_EXPORT QFImporterManager : public QObject {
         }
 
         template<class T>
-        QStringList getImporters() {
+        QStringList getImporters(const QString& startswith=QString()) const {
             QStringList  result;
             for (int i=0; i<plugins.size(); i++) {
                 QStringList ids=plugins[i]->getIDs();
                 for (int j=0; j<ids.size(); j++) {
-                    QFImporter* imp=plugins[i]->createImporter(ids[j]);
-                    if (dynamic_cast<T>(imp)!=NULL) {
-                        result.append(ids[j]);
+                    if (startswith.isEmpty() || ids[j].startsWith(startswith)) {
+                        QFImporter* imp=plugins[i]->createImporter(ids[j]);
+                        if (dynamic_cast<T>(imp)!=NULL) {
+                            result.append(ids[j]);
+                        }
+                        delete imp;
                     }
-                    delete imp;
                 }
 
 

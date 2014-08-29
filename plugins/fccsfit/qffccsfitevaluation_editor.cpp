@@ -1508,7 +1508,7 @@ void QFFCCSFitEvaluationEditor::on_btnRemoveFile_clicked()
 void QFFCCSFitEvaluationEditor::loadGlobalFitConfig()
 {
     if (!current) return;
-    QString filename=qfGetOpenFileNameSet("QFFCCSFitEvaluationEditor/GlobalConfig_", this, tr("load global fit configuration ..."), QFPluginServices::getInstance()->getPluginConfigDirectory("fccs_fit")+"/globalfit_configs", tr("Global FCCS fit configs (*.gfc)"));
+    QString filename=qfGetOpenFileNameSet("QFFCCSFitEvaluationEditor/GlobalConfig_", this, tr("load global fit configuration ..."), ProgramOptions::getInstance()->getHomeQFDirectory()+"/globalfit_configs", tr("Global FCCS fit configs (*.gfc)"));
     if (QFile::exists(filename)) {
         QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig config;
         if (openGlobalFitConfig(filename, config)) {
@@ -1520,7 +1520,8 @@ void QFFCCSFitEvaluationEditor::loadGlobalFitConfig()
 void QFFCCSFitEvaluationEditor::saveGlobalFitConfig()
 {
     if (!current) return;
-    QString filename=qfGetSaveFileNameSet("QFFCCSFitEvaluationEditor/GlobalConfig_", this, tr("save global fit configuration ..."), QFPluginServices::getInstance()->getPluginConfigDirectory("fccs_fit")+"/globalfit_configs", tr("Global FCCS fit configs (*.gfc)"));
+    QDir(ProgramOptions::getInstance()->getHomeQFDirectory()).mkpath("globalfit_configs");
+    QString filename=qfGetSaveFileNameSet("QFFCCSFitEvaluationEditor/GlobalConfig_", this, tr("save global fit configuration ..."), ProgramOptions::getInstance()->getHomeQFDirectory()+"/globalfit_configs", tr("Global FCCS fit configs (*.gfc)"));
     if (!filename.isEmpty()) {
         QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig config=getCurrentGlobalFitConfig();
         storeGlobalFitConfig(filename, config);

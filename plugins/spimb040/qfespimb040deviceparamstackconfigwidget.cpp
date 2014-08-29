@@ -988,8 +988,8 @@ double QFESPIMB040DeviceParamStackConfigWidget::delay() const
 
 void QFESPIMB040DeviceParamStackConfigWidget::on_btnSaveTemplate_clicked()
 {
-    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/");
-    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040DeviceParamStackConfigWidget/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/").toString();
+    QDir().mkpath(ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040DeviceParamStackConfigWidget/lasttemplatedir", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString();
     QString filename=qfGetSaveFileName(this, tr("save as template ..."), dir, tr("device parameter stack configuration (*.dpsc)"))    ;
     if (!filename.isEmpty()) {
         bool ok=true;
@@ -1010,8 +1010,8 @@ void QFESPIMB040DeviceParamStackConfigWidget::on_btnSaveTemplate_clicked()
 
 void QFESPIMB040DeviceParamStackConfigWidget::on_btnLoadTemplate_clicked()
 {
-    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/");
-    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040DeviceParamStackConfigWidget/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/").toString();
+    QDir().mkpath(ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040DeviceParamStackConfigWidget/lasttemplatedir", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString();
     QString filename=qfGetOpenFileName(this, tr("open template ..."), dir, tr("device parameter stack configuration (*.dpsc)"))    ;
     if (!filename.isEmpty()) {
         QSettings set(filename, QSettings::IniFormat);

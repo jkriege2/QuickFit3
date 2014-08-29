@@ -597,6 +597,9 @@ class QFLIB_EXPORT QFFitAlgorithm {
         /** \brief return a short unique algorithm ID string */
         virtual QString id() const=0;
 
+        /** \brief indicates, that this fit algorithm should not be used any longer, i.e. is DEPRECATED */
+        virtual bool isDeprecated() const;
+
         /** \brief \c true if the algorithm supports bounded optimization with box constraints and \c false else */
         virtual bool get_supportsBoxConstraints() const =0;
         /** \brief \c true if the algorithm may be used in a multi-threaded environment, i.e. it is threadsafe.

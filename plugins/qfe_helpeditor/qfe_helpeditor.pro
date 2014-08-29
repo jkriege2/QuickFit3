@@ -20,7 +20,9 @@ HEADERS += qfehelpeditor.h \
     pasteimagedlg.h \
     selectresourceimage.h \
     pluginlinkdialog.h \
-    subpluginlinkdialog.h
+    subpluginlinkdialog.h \
+    faqentrydialog.h \
+    functionreferencedialog.h
 
 SOURCES += qfehelpeditor.cpp \
            qfehelpeditorwidget.cpp \
@@ -29,7 +31,9 @@ SOURCES += qfehelpeditor.cpp \
     pasteimagedlg.cpp \
     selectresourceimage.cpp \
     pluginlinkdialog.cpp \
-    subpluginlinkdialog.cpp
+    subpluginlinkdialog.cpp \
+    faqentrydialog.cpp \
+    functionreferencedialog.cpp
 
 FORMS =    qfehelpeditorwidget.ui \
     replacedialog.ui \
@@ -37,7 +41,9 @@ FORMS =    qfehelpeditorwidget.ui \
     pasteimagedlg.ui \
     selectresourceimage.ui \
     pluginlinkdialog.ui \
-    subpluginlinkdialog.ui
+    subpluginlinkdialog.ui \
+    faqentrydialog.ui \
+    functionreferencedialog.ui
 
 RESOURCES += qfehelpeditor.qrc
 

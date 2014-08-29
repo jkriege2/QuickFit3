@@ -13,7 +13,7 @@ class QFFitFunctionsSPIMFCCSFW2CSep2DDiffXZ2ColorACFR: public QFFitFunction {
         QFFitFunctionsSPIMFCCSFW2CSep2DDiffXZ2ColorACFR();
         virtual ~QFFitFunctionsSPIMFCCSFW2CSep2DDiffXZ2ColorACFR() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCCS: 2-comp. 2D diffusion (xz), species A+B+AB, c per species, D1/D2 per channel, ACF red (1/e² radii)"); }
+        virtual QString name() const { return QString("SPIM-FCCS: 2-comp. 2D diffusion (xz), species A+B+AB, c per species, D1/D2 per channel, ACF red (1/e^2 radii)"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_spim_fw_2csep2ddiffxz2coloracfr"); }
 

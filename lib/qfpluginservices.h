@@ -81,18 +81,38 @@ class QFLIB_EXPORT QFPluginLogService {
 Q_DECLARE_INTERFACE(QFPluginLogService,
                      "www.dkfz.de.b040.quickfit3.QFPluginLogService/1.0")
 
-struct QFToolTipsData{
+struct QFLIB_EXPORT QFToolTipsData{
     QString tooltip;
     QString tooltipfile;
 };
 
-struct FAQEntry {
+struct QFLIB_EXPORT  FAQEntry {
         QString question;
         QString answer;
         QString link;
 };
 
 typedef QList<FAQEntry> QFFAQData;
+
+struct QFLIB_EXPORT  QFHelpDirectoryInfo {
+        QString directory;
+        QFPlugin* plugin;
+        QString tutorial;
+        QString settings;
+        QString mainhelp;
+        QString faq;
+        QString plugintypehelp;
+        QString plugintypename;
+        QString pluginDLLbasename;
+        QString pluginDLLSuffix;
+};
+
+struct QFLIB_EXPORT QFPluginHelpData {
+    QList<QFHelpDirectoryInfo> pluginHelpList;
+    QMap<QString, QFToolTipsData> tooltips;
+    QMap<QString, QString> autolinks;
+    QMap<QString, QFFAQData> faqs;
+};
 
 /*! \brief wrapper class that allows plugins to access basic services of the QuickFit application
     \ingroup qf3plugintools
@@ -102,18 +122,7 @@ typedef QList<FAQEntry> QFFAQData;
 */
 class QFLIB_EXPORT QFPluginServices {
     public:
-        struct HelpDirectoryInfo {
-            QString directory;
-            QFPlugin* plugin;
-            QString tutorial;
-            QString settings;
-            QString mainhelp;
-            QString faq;
-            QString plugintypehelp;
-            QString plugintypename;
-            QString pluginDLLbasename;
-            QString pluginDLLSuffix;
-        };
+
 
         QFPluginServices();
 
@@ -206,9 +215,11 @@ class QFLIB_EXPORT QFPluginServices {
 
         /** \brief a list of the online help directories of all plugins with metadata.
          */
-        virtual QList<HelpDirectoryInfo>* getPluginHelpList()=0;
+        virtual QList<QFHelpDirectoryInfo>* getPluginHelpList()=0;
         /** \brief returns a list of tooltips for the online-help */
         virtual QMap<QString, QFToolTipsData> getTooltips() const=0;
+
+        virtual QFPluginHelpData& getPluginHelpData() =0;
 
         /** \brief display the help window and open the given file. If no file is given, des QuickFit main help page is shown. */
         virtual void displayHelpWindow(const QString& helpfile=QString(""))=0;
@@ -263,6 +274,11 @@ class QFLIB_EXPORT QFPluginServices {
          */
         virtual QString transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced=true, const QF3HelpReplacesList& more_replaces=QF3HelpReplacesList(), bool insertTooltips=false, bool dontCreatePics=false, bool isMainHelp=false)=0;
 
+
+        /** \brief add a substring to the further reading list in the onine-help
+         *
+         * The substring should contain one or more $$invisible_ref::$$ entry/ies, which will be displayed on the further_reading page */
+        virtual void addToHelpFurtherReading(const QString& text)=0;
 
         /** \brief returns a global configuration value. This can be used to implement an application wide communication/exchange
           *

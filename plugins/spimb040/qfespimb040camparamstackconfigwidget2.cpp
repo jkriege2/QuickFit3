@@ -315,8 +315,8 @@ bool QFESPIMB040CamParamStackConfigWidget2::previewMode() const
 
 void QFESPIMB040CamParamStackConfigWidget2::on_btnSaveTemplate_clicked()
 {
-    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/");
-    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040CamParamStackConfigWidget2/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/").toString();
+    QDir().mkpath(ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040CamParamStackConfigWidget2/lasttemplatedir", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString();
     QString filename=qfGetSaveFileName(this, tr("save as template ..."), dir, tr("camera parameter stack configuration (*.cpsc)"))    ;
     if (!filename.isEmpty()) {
         bool ok=true;
@@ -337,8 +337,8 @@ void QFESPIMB040CamParamStackConfigWidget2::on_btnSaveTemplate_clicked()
 
 void QFESPIMB040CamParamStackConfigWidget2::on_btnLoadTemplate_clicked()
 {
-    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/");
-    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040CamParamStackConfigWidget2/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/").toString();
+    QDir().mkpath(ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040CamParamStackConfigWidget2/lasttemplatedir", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString();
     QString filename=qfGetOpenFileName(this, tr("open template ..."), dir, tr("camera parameter stack configuration (*.cpsc)"))    ;
     if (!filename.isEmpty()) {
         QSettings set(filename, QSettings::IniFormat);

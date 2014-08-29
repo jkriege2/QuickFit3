@@ -74,6 +74,10 @@ void QFFitAlgorithmComboBox::updateFitAlgorithms()
         QFFitAlgorithm* a=manager->createAlgorithm(m_ids[i], this);
         if (a->isThreadSafe()) addItem(QIcon(":/lib/fitalg_icon_mt.png"), a->name() , m_ids[i]);
         else addItem(QIcon(":/lib/fitalg_icon.png"), a->name() , m_ids[i]);
+        if (a->isDeprecated()) {
+            setItemData(i, QColor("grey"), Qt::TextColorRole);
+            setItemText(i, tr("[DEPRECATED]: %1").arg(itemText(i)));
+        }
         delete a;
     }
     model()->sort(0);

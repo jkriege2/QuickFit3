@@ -755,8 +755,8 @@ int QFESPIMB040OverviewAcquisitionConfigWidget::previewCount()
 
 void QFESPIMB040OverviewAcquisitionConfigWidget::on_btnSaveTemplate_clicked()
 {
-    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/");
-    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040OverviewAcquisitionConfigWidget/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/").toString();
+    QDir().mkpath(ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040OverviewAcquisitionConfigWidget/lasttemplatedir", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString();
     QString filename=qfGetSaveFileName(this, tr("save as template ..."), dir, tr("overview acquisition configuration (*.oac)"))    ;
     if (!filename.isEmpty()) {
         bool ok=true;
@@ -777,8 +777,8 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::on_btnSaveTemplate_clicked()
 
 void QFESPIMB040OverviewAcquisitionConfigWidget::on_btnLoadTemplate_clicked()
 {
-    QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/");
-    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040OverviewAcquisitionConfigWidget/lasttemplatedir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acq_templates/").toString();
+    QDir().mkpath(ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/");
+    QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040OverviewAcquisitionConfigWidget/lasttemplatedir", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString();
     QString filename=qfGetOpenFileName(this, tr("open template ..."), dir, tr("overview acquisition configuration (*.oac)"))    ;
     if (!filename.isEmpty()) {
         QSettings set(filename, QSettings::IniFormat);

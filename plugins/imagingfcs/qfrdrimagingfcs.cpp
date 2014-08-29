@@ -53,6 +53,9 @@ void QFRDRImagingFCSPlugin::init()
     connect(actOffset, SIGNAL(triggered()), this, SLOT(correctOffset()));
     tmenu->addAction(actOffset);
 
+    QFPluginServices::getInstance()->addToHelpFurtherReading("$$INVISIBLEREF_SPIMFCCS$$$$INVISIBLEREF_WOHLANDSPIMFCS$$$$INVISIBLEREF_RIES$$");
+
+
 }
 
 void QFRDRImagingFCSPlugin::imfcsCorrRemoteUserSelectFile()

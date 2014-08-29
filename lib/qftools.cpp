@@ -1172,6 +1172,37 @@ void parseFAQ(const QString& filename, const QString& pluginID, QMap<QString, QF
 
 
 
+void parseTooltips(const QString& directory, QMap<QString, QFToolTipsData>& tooltips) {
+    QDir d(directory);
+    if (QFile::exists(d.absoluteFilePath("tooltips.ini"))) {
+        QSettings setTooltips(d.absoluteFilePath("tooltips.ini"), QSettings::IniFormat);
+
+        QStringList keys=setTooltips.childKeys();
+        for (int i=0; i<keys.size(); i++) {
+            tooltips[keys[i]].tooltip=setTooltips.value(keys[i], QObject::tr("<i>no tooltip available</i>")).toString();
+            tooltips[keys[i]].tooltipfile=d.absoluteFilePath("tooltips.ini");
+        }
+    }
+}
+
+
+void parseAutolinks(const QString& directory, QMap<QString, QString>& autolinks) {
+    QDir d(directory);
+    if (QFile::exists(d.absoluteFilePath("autolinks.ini"))) {
+        QSettings setAutolinks(d.absoluteFilePath("autolinks.ini"), QSettings::IniFormat);
+
+        QStringList keys=setAutolinks.childKeys();
+        for (int i=0; i<keys.size(); i++) {
+            QString l=setAutolinks.value(keys[i]).toString();
+            if (!l.startsWith("$$")) {
+                l=d.absoluteFilePath(l);
+            }
+            if (!l.isEmpty()) {
+                autolinks[keys[i]]=l;
+            }
+        }
+    }
+}
 
 bool qfQStringCompareLengthDecreasing(const QString &s1, const QString &s2) {
     return s1.size() > s2.size();

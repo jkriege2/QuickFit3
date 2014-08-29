@@ -40,8 +40,11 @@
         <file alias="help_help.png">icons/help_help.png</file>
         <file alias="www.png">icons/www.png</file>
         <file alias="help_faq.png">icons/help_faq.png</file>
+        <file alias="autolink.png">icons/autolink.png</file>
     </qresource>
     <qresource prefix="/lib">
+        <file alias="expression_parser.png">icons/expression_parser.png</file>
+        <file alias="expression_parser_big.png">icons/expression_parser_big.png</file>
         <file alias="edit_fitfunction.png">icons/edit_fitfunction.png</file>
         <file alias="select_fitfunction.png">icons/edit_fitfunction.png</file>
         <file alias="delete16.png">icons/delete16.png</file>

@@ -20,11 +20,13 @@ class QFFitFunctionsSPIMFCSDiffE2: public QFFitFunction {
         QFFitFunctionsSPIMFCSDiffE2();
         virtual ~QFFitFunctionsSPIMFCSDiffE2() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCS: Diffusion (1/e² radii)"); }
+        virtual QString name() const { return QString("SPIM-FCS: Diffusion (1/e^2 radii)"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("SPIM-FCS: Diffusion (1/e² radii)"); }
+        virtual QString shortName() const { return QObject::tr("SPIM-FCS: Diffusion (1/e^2 radii)"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_spim_diffe2"); }
+
+        virtual bool isDeprecated() { return true; };
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

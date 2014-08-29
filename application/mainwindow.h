@@ -105,7 +105,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
 
         /** \copydocQFPluginServices::getPluginHelpList() */
-        virtual QList<QFPluginServices::HelpDirectoryInfo>* getPluginHelpList();
+        virtual QList<QFHelpDirectoryInfo>* getPluginHelpList();
         /** \copydoc QFPluginServices::getAssetsDirectory() */
         virtual QString getAssetsDirectory();
         /** \copydoc QFPluginServices::getExamplesDirectory() */
@@ -175,6 +175,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         /** \brief QFPluginServices::getFitAlgorithmHelp() */
         virtual QString getFitAlgorithmHelp(const QString& pluginID);
 
+        /** \brief QFPluginServices::addToHelpFurtherReading() */
+        virtual void addToHelpFurtherReading(const QString& text);
+
         /** \brief QFPluginServices::getImporterHelp() */
         virtual QString getImporterHelp(const QString& pluginID);
         /** \brief register a configuration pane for a plugin in the main options dialog */
@@ -220,6 +223,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual QString getPluginConfigDirectory(const QString& pluginID);
 
         virtual void setProjectMode(bool projectModeEnabled=true, const QString& nonProjectTitle=QString("non-project mode"));
+
+        virtual QFPluginHelpData &getPluginHelpData();
 
         /** \brief searches for the given inifile (or \c PLUGINID.ini if \a inifiles is empty) in a list of subdirectories:
          *
@@ -389,9 +394,11 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QPointer<QFProject> project;
 
         QList<QPair<QString, QString> > htmlReplaceList;
-        QList<QFPluginServices::HelpDirectoryInfo> pluginHelpList;
-        QMap<QString, QFToolTipsData> tooltips;
-        QMap<QString, QFFAQData> faqs;
+        //QList<QFPluginServices::HelpDirectoryInfo> pluginHelpList;
+        //QMap<QString, QFToolTipsData> tooltips;
+        //QMap<QString, QFFAQData> faqs;
+
+        QFPluginHelpData helpdata;
 
 
         QList<QFPluginOptionsDialogInterface*> pluginOptionDialogs;

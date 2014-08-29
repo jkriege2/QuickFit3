@@ -116,6 +116,12 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
         it.next();
         if (it.value()) {
             addItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->shortName(), it.key());
+            if (it.value()->isDeprecated()) {
+                int i=count()-1;
+                setItemData(i, QColor("grey"), Qt::TextColorRole);
+                setItemText(i, tr("[DEPRECATED]: %1").arg(itemText(i)));
+            }
+
             delete it.value();
         }
     }

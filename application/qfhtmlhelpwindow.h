@@ -64,7 +64,7 @@ class QFHTMLHelpWindow : public QWidget {
         void setTooltips(const QMap<QString, QFToolTipsData> &list);
 
         /** \brief init with a list of plugin help directories */
-        void setPluginDirList(QList<QFPluginServices::HelpDirectoryInfo>* pluginList);
+        void setPluginDirList(QList<QFHelpDirectoryInfo>* pluginList);
 
         /** \brief init object from plugin servies object (then you don't need setHtmlReplacementList() and setPluginDirList() ), also stores the services object for further use */
         void initFromPluginServices(QFPluginServices* services);
@@ -94,7 +94,7 @@ class QFHTMLHelpWindow : public QWidget {
 
         QList<QPair<QString, QString> >* replaces;
 
-        QList<QFPluginServices::HelpDirectoryInfo>* pluginList;
+        QList<QFHelpDirectoryInfo>* pluginList;
 
         QList<QPair<QString, QString> > internal_replaces;
 

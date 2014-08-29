@@ -77,7 +77,7 @@ bool UserFitFunctionsEditor::storeCurrentFF()
             QMessageBox::critical(this, tr("User Fit Function Editor"), tr("You have to specify at least an ID and an expression!"), QMessageBox::Ok, QMessageBox::Ok);
             return false;
         }
-        QDir d(ProgramOptions::getInstance()->getConfigValue("quickfit/user_fitfunctions", QFPluginServices::getInstance()->getConfigFileDirectory()+"/userfitfunctions/").toString()+"/");
+        QDir d(ProgramOptions::getInstance()->getConfigValue("quickfit/user_fitfunctions", ProgramOptions::getInstance()->getHomeQFDirectory()+"/userfitfunctions").toString()+"/");
         QString fn=d.absoluteFilePath(ui->edtID->text()+".qff");
         if (QFile::exists(manager->getUserFitFunctionFile(currentID))) {
             fn=manager->getUserFitFunctionFile(currentID);

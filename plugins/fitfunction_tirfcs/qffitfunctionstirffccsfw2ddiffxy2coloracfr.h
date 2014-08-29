@@ -13,7 +13,7 @@ class QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorACFR: public QFFitFunction {
         QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorACFR();
         virtual ~QFFitFunctionsTIRFFCCSFW2DDiffXY2ColorACFR() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("TIR-FCCS: 1-comp. 2D diffusion (xy), species A+B+AB, c/D per species, ACF red (1/e² radii)"); }
+        virtual QString name() const { return QString("TIR-FCCS: 1-comp. 2D diffusion (xy), species A+B+AB, c/D per species, ACF red (1/e^2 radii)"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_tir_fw_2ddiffxy2coloracfr"); }
 

@@ -1620,7 +1620,7 @@ void QFImFCCSFitEvaluationEditor::plotChi2Landscape()
 void QFImFCCSFitEvaluationEditor::loadGlobalFitConfig()
 {
     if (!current) return;
-    QString filename=qfGetOpenFileNameSet("QFImFCCSFitEvaluationEditor/GlobalConfig_", this, tr("load global fit configuration ..."), QFPluginServices::getInstance()->getPluginConfigDirectory("imfccs_fit")+"/globalfit_configs", tr("Global imFCCS fit configs (*.gfc)"));
+    QString filename=qfGetOpenFileNameSet("QFImFCCSFitEvaluationEditor/GlobalConfig_", this, tr("load global fit configuration ..."), ProgramOptions::getInstance()->getHomeQFDirectory()+"/globalfit_configs", tr("Global imFCCS fit configs (*.gfc)"));
     if (QFile::exists(filename)) {
         QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig config;
         if (openGlobalFitConfig(filename, config)) {
@@ -1632,7 +1632,8 @@ void QFImFCCSFitEvaluationEditor::loadGlobalFitConfig()
 void QFImFCCSFitEvaluationEditor::saveGlobalFitConfig()
 {
     if (!current) return;
-    QString filename=qfGetSaveFileNameSet("QFImFCCSFitEvaluationEditor/GlobalConfig_", this, tr("save global fit configuration ..."), QFPluginServices::getInstance()->getPluginConfigDirectory("imfccs_fit")+"/globalfit_configs", tr("Global imFCCS fit configs (*.gfc)"));
+    QDir(ProgramOptions::getInstance()->getHomeQFDirectory()).mkpath("globalfit_configs");
+    QString filename=qfGetSaveFileNameSet("QFImFCCSFitEvaluationEditor/GlobalConfig_", this, tr("save global fit configuration ..."), ProgramOptions::getInstance()->getHomeQFDirectory()+"/globalfit_configs", tr("Global imFCCS fit configs (*.gfc)"));
     if (!filename.isEmpty()) {
         QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig config=getCurrentGlobalFitConfig();
         storeGlobalFitConfig(filename, config);

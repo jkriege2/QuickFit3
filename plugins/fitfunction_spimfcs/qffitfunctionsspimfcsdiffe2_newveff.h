@@ -20,9 +20,9 @@ class QFFitFunctionsSPIMFCSDiffE2NewVeff: public QFFitFunction {
         QFFitFunctionsSPIMFCSDiffE2NewVeff();
         virtual ~QFFitFunctionsSPIMFCSDiffE2NewVeff() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCS: Diffusion (1/e² radii, new Veff)"); }
+        virtual QString name() const { return QString("SPIM-FCS: Diffusion (1/e^2 radii, new Veff)"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("SPIM-FCS: Diffusion (1/e² radii, new Veff)"); }
+        virtual QString shortName() const { return QObject::tr("SPIM-FCS: Diffusion (1/e^2 radii, new Veff)"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_spim_diffe2_newveff"); }
 
