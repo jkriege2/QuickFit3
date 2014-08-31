@@ -32,6 +32,17 @@ QFFitResultsByIndexEvaluation::QFFitResultsByIndexEvaluation(const QString& fitF
 QFFitResultsByIndexEvaluation::~QFFitResultsByIndexEvaluation() {
 }
 
+void QFFitResultsByIndexEvaluation::setPresetProperty(const QString &id, const QVariant &data, bool usereditable, bool visible)
+{
+    QString lid=id.toLower();
+    if (lid=="preset_current_index" || lid=="preset_current_run" || lid=="preset_current_pixel") {
+        setCurrentIndex(data.toInt());
+    } else {
+        QFFitResultsEvaluation::setPresetProperty(id, data, usereditable, visible);
+    }
+
+}
+
 QString QFFitResultsByIndexEvaluation::getEvaluationResultID(QString fitFunction, int currentIndex) const {
     if (getEvaluationResultIDUsesFitFunction) {
         //qDebug()<<"QFFitResultsByIndexEvaluation::getEvaluationResultID("<<fitFunction<<", "<<currentIndex<<")";

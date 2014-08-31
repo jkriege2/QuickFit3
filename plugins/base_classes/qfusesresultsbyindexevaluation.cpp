@@ -10,6 +10,16 @@ QFUsesResultsByIndexEvaluation::~QFUsesResultsByIndexEvaluation()
 {
 }
 
+void QFUsesResultsByIndexEvaluation::setPresetProperty(const QString &id, const QVariant &data, bool usereditable, bool visible)
+{
+    QString uid=id.toUpper();
+    if (uid=="PRESET_CURRENT_INDEX" || uid=="PRESET_CURRENT_RUN" || uid=="PRESET_CURRENT_PIXEL") {
+        setCurrentIndex(data.toInt());
+    } else {
+        QFUsesResultsEvaluation::setPresetProperty(id, data, usereditable, visible);
+    }
+}
+
 bool QFUsesResultsByIndexEvaluation::hasResults(QFRawDataRecord *r1, int index) const {
     QFRawDataRecord* r=r1;
     QString rsid=getEvaluationResultID(index);

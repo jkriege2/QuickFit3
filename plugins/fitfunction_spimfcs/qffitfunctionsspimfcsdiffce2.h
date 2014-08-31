@@ -27,7 +27,7 @@ class QFFitFunctionsSPIMFCSDiffCE2: public QFFitFunction {
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_spim_diffce2"); }
 
-        virtual bool isDeprecated() { return true; };
+        virtual bool isDeprecated() const { return true; };
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

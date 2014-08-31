@@ -568,8 +568,8 @@ void QFRDRImageMaskEditTools::maskBorder()
         if (chkOverwrite->isChecked()) imagemask->maskClear();
         for (uint32_t x=0; x<imagemask->maskGetWidth(); x++) {
             for (uint32_t y=0; y<imagemask->maskGetHeight(); y++) {
-                if (!(   x>=spinLeft->value() && x<imagemask->maskGetWidth()-spinRight->value()
-                    && y>=spinBot->value() && y<imagemask->maskGetHeight()-spinTop->value())) {
+                if (!(   x>=(uint64_t)spinLeft->value() && x<imagemask->maskGetWidth()-(uint64_t)spinRight->value()
+                    && y>=(uint64_t)spinBot->value() && y<imagemask->maskGetHeight()-(uint64_t)spinTop->value())) {
                     imagemask->maskSet(x,y);
                 }
             }
@@ -700,7 +700,7 @@ void QFRDRImageMaskEditTools::imageClicked(double x, double y, Qt::KeyboardModif
     int yy=(int)floor(y);
     if (maskEditing &&( !selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0))) {
         if (!imagemask) return;
-        if (xx>=0 && xx<imagemask->maskGetWidth() && yy>=0 && yy<imagemask->maskGetHeight()) {
+        if (xx>=0 && xx<(int64_t)imagemask->maskGetWidth() && yy>=0 && yy<(int64_t)imagemask->maskGetHeight()) {
 
             if (modifiers==Qt::ControlModifier && !actImagesScribble->isChecked()) {
                 imagemask->maskToggle(xx,yy);
@@ -737,7 +737,7 @@ void QFRDRImageMaskEditTools::imageScribbled(double x, double y, Qt::KeyboardMod
 
     if (maskEditing && (!selectionEditing || (selectionEditing&& cmbMode->currentIndex()==0))) {
         if (!imagemask) return;
-        if (xx>=0 && xx<imagemask->maskGetWidth() && yy>=0 && yy<imagemask->maskGetHeight()) {
+        if (xx>=0 && xx<(int64_t)imagemask->maskGetWidth() && yy>=0 && yy<(int64_t)imagemask->maskGetHeight()) {
 
             if (first && modifiers==Qt::NoModifier) imagemask->maskClear();
             if (modifiers==Qt::ShiftModifier) {

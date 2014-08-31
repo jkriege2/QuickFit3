@@ -147,6 +147,12 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
          *         list of raw data records presented to the user */
         bool isFilteredAndApplicable(QFRawDataRecord* record);
 
+        /** \brief creates a property \c "PRESET_"+id, which can be interpreted as a PRESET-value for anything.
+         *
+         *  By overwriting this function in a derived class, you can directly interpret the preset-property
+         */
+        virtual void setPresetProperty(const QString& id, const QVariant& data, bool usereditable=true, bool visible=true);
+
 
         /** \brief return the next sibling rawdata record in the project */
         inline QFEvaluationItem* getNext() { return project->getNextEvaluation(this); };

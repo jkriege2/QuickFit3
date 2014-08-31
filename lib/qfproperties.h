@@ -52,6 +52,14 @@ class QFLIB_EXPORT QFProperties {
         QVariant getProperty( const QString& p) const ;
         /** \brief return the value of the specified property or the supplied default value */
         QVariant getProperty(const QString& p, const QVariant& defaultValue) const;
+        /** \brief return the value of the specified property */
+        inline QVariant getQFProperty( const QString& p) const {
+            return getProperty(p);
+        }
+        /** \brief return the value of the specified property or the supplied default value */
+        inline QVariant getQFProperty(const QString& p, const QVariant& defaultValue) const {
+            return getProperty(p, defaultValue);
+        }
         /** \brief return the number of properties in the object */
         unsigned int getPropertyCount() const;
         /** \brief return the number of visible properties in the object */

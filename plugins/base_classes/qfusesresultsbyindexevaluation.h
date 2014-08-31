@@ -23,6 +23,9 @@ class QFUsesResultsByIndexEvaluation : public QFUsesResultsEvaluation {
         explicit QFUsesResultsByIndexEvaluation(QFProject *parent = 0, bool showRDRList=true, bool useSelection=false);
         virtual ~QFUsesResultsByIndexEvaluation();
 
+        /** \copydoc QFEvaluationItem::setPresetProperty() */
+        virtual void setPresetProperty(const QString& id, const QVariant& data, bool usereditable=true, bool visible=true);
+
         /** \breif return \c true if an evaluation has been performed for the given record \a r1 and the given inde x\a index therein */
         virtual bool hasResults(QFRawDataRecord* r1, int index) const;
 

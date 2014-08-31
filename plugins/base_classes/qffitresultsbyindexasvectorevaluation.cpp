@@ -29,6 +29,11 @@ QFFitResultsByIndexAsVectorEvaluation::QFFitResultsByIndexAsVectorEvaluation(con
 QFFitResultsByIndexAsVectorEvaluation::~QFFitResultsByIndexAsVectorEvaluation() {
 }
 
+void QFFitResultsByIndexAsVectorEvaluation::setPresetProperty(const QString &id, const QVariant &data, bool usereditable, bool visible)
+{
+    QFFitResultsByIndexEvaluation::setPresetProperty(id, data, usereditable, visible);
+}
+
 QString QFFitResultsByIndexAsVectorEvaluation::transformResultID(const QString &resultID) const {
     QRegExp rx("(.+)(\\_run|\\_r)(.+)");
     rx.setCaseSensitivity(Qt::CaseInsensitive);

@@ -120,10 +120,15 @@ class QFEHelpEditorWidget : public QWidget {
 
         void insertIcon();
 
+        void toEntity();
+        void toChars();
+
     protected:
         bool maybeSave();
         void setScriptFilename(QString filename);
         void closeEvent(QCloseEvent* event);
+        QString getSelection() const;
+        void replaceSelection(const QString& newText);
 
         QString currentScript;
     private:
@@ -167,6 +172,10 @@ class QFEHelpEditorWidget : public QWidget {
         QAction *gotoLineAct;
         /** \brief action object: print */
         QAction *printAct;
+        /** \brief action object: coonvert characters to entities */
+        QAction* toEntityAct;
+        /** \brief action object: coonvert entities to characters */
+        QAction* toCharAct;
 
         QAction* actInsertIcon;
 

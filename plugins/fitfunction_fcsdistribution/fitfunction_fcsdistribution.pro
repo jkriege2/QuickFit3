@@ -5,18 +5,22 @@ TARGET = fitfunctions_fcsdistribution
 DEPENDPATH += ./
 
 include(../plugins.pri)
+include(../../extlibs/gsl.pri)
+
 DESTDIR = $$QFOUTPUT/plugins
 
 # Input
 HEADERS += qfpfitfunctionsfcsdistribution.h \
            qffitfunctionfcsdistributionloggaussian.h \
     qffitfunctionfcsdistributiongaussianD.h \
-    qffitfunctionfcsdistributiongaussian.h
+    qffitfunctionfcsdistributiongaussian.h \
+    qffitfunctionfcsdistributiongaussianint.h
 
 SOURCES += qfpfitfunctionsfcsdistribution.cpp\
            qffitfunctionfcsdistributionloggaussian.cpp \
     qffitfunctionfcsdistributiongaussianD.cpp \
-    qffitfunctionfcsdistributiongaussian.cpp
+    qffitfunctionfcsdistributiongaussian.cpp \
+    qffitfunctionfcsdistributiongaussianint.cpp
 
 FORMS =
 

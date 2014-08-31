@@ -59,6 +59,12 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slDeleteRow();
         void slDeleteColumn();
         void slSetDatatype();
+        void setDatatype(QVariant::Type t);
+        void slSetDatatypeString();
+        void slSetDatatypeDouble();
+        void slSetDatatypeInteger();
+        void slSetDatatypeBool();
+        void slSetDatatypeDate();
         void slSaveTable();
         void slLoadTable();
         void slEditColumnProperties(int col=-1);
@@ -67,6 +73,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slPaste();
         void slCut();
         void slDelete();
+        void slMakeEditable();
 
         void slCopyTableTemplate();
         void slPasteTableTemplate();
@@ -113,6 +120,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
 
 
         QAction* actSaveTable;
+        QAction* actMakeEditable;
         QAction* actLoadTable;
         QAction* actAppendRow;
         QAction* actAppendColumn;
@@ -129,6 +137,14 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actDelete;
         QAction* actAutosetColumnWidth;
         QAction* actIndexedStat;
+
+        QAction* actSetDatatypeString;
+        QAction* actSetDatatypeInteger;
+        QAction* actSetDatatypeDouble;
+        QAction* actSetDatatypeDate;
+        QAction* actSetDatatypeBool;
+        QMenu* menuDatatypes;
+        QAction* actMenuDatatypes;
 
         QAction* actSetColumnValues;
         QAction* actCalcCell;

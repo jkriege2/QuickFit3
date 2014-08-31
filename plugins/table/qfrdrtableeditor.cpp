@@ -117,6 +117,10 @@ void QFRDRTableEditor::createWidgets() {
     actSaveTable->setShortcut(QKeySequence::SaveAs);
     connect(actSaveTable, SIGNAL(triggered()), this, SLOT(slSaveTable()));
 
+    actMakeEditable=new QAction(tr("make the table editable ..."), this);
+    connect(actMakeEditable, SIGNAL(triggered()), this, SLOT(slMakeEditable()));
+    connect(this, SIGNAL(enableActions(bool)), actMakeEditable, SLOT(setDisabled(bool)));
+
     actCopy=new QAction(QIcon(":/table/copy.png"), tr("Copy"), this);
     actCopy->setShortcut(QKeySequence::Copy);
     connect(actCopy, SIGNAL(triggered()), this, SLOT(slCopy()));
@@ -204,6 +208,31 @@ void QFRDRTableEditor::createWidgets() {
     connect(actSetDatatype, SIGNAL(triggered()), this, SLOT(slSetDatatype()));
     connect(this, SIGNAL(enableActions(bool)), actSetDatatype, SLOT(setEnabled(bool)));
 
+
+    actSetDatatypeString=new QAction(QIcon(":/table/cell_string.png"), tr("... string"), this);
+    actSetDatatypeString->setToolTip(tr("set the datatype of the currently selected cells to string"));
+    connect(actSetDatatypeString, SIGNAL(triggered()), this, SLOT(slSetDatatypeString()));
+    connect(this, SIGNAL(enableActions(bool)), actSetDatatypeString, SLOT(setEnabled(bool)));
+    actSetDatatypeInteger=new QAction(QIcon(":/table/cell_integer.png"), tr("... integer"), this);
+    actSetDatatypeInteger->setToolTip(tr("set the datatype of the currently selected cells to integer"));
+    connect(actSetDatatypeInteger, SIGNAL(triggered()), this, SLOT(slSetDatatypeInteger()));
+    connect(this, SIGNAL(enableActions(bool)), actSetDatatypeInteger, SLOT(setEnabled(bool)));
+    actSetDatatypeDouble=new QAction(QIcon(":/table/cell_double.png"), tr("... floating-point number"), this);
+    actSetDatatypeDouble->setToolTip(tr("set the datatype of the currently selected cells to floating-point number"));
+    connect(actSetDatatypeDouble, SIGNAL(triggered()), this, SLOT(slSetDatatypeDouble()));
+    connect(this, SIGNAL(enableActions(bool)), actSetDatatypeDouble, SLOT(setEnabled(bool)));
+    actSetDatatypeDate=new QAction(QIcon(":/table/cell_date.png"), tr("... date"), this);
+    actSetDatatypeDate->setToolTip(tr("set the datatype of the currently selected cells to date"));
+    connect(actSetDatatypeDate, SIGNAL(triggered()), this, SLOT(slSetDatatypeDate()));
+    connect(this, SIGNAL(enableActions(bool)), actSetDatatypeDate, SLOT(setEnabled(bool)));
+    actSetDatatypeBool=new QAction(QIcon(":/table/cell_string.png"), tr("... boolean"), this);
+    actSetDatatypeBool->setToolTip(tr("set the datatype of the currently selected cells to boolean"));
+    connect(actSetDatatypeBool, SIGNAL(triggered()), this, SLOT(slSetDatatypeBool()));
+    connect(this, SIGNAL(enableActions(bool)), actSetDatatypeBool, SLOT(setEnabled(bool)));
+
+
+
+
     actSetColumnTitle=new QAction(QIcon(":/table/column_title.png"), "edit column properties", this);
     actSetColumnTitle->setToolTip(tr("edit the column title and the clumn expression ..."));
     connect(actSetColumnTitle, SIGNAL(triggered()), this, SLOT(slEditColumnProperties()));
@@ -224,7 +253,7 @@ void QFRDRTableEditor::createWidgets() {
     actClearExpression=new QAction(QIcon(":/table/formulaclear.png"), tr("clear math expression"), this);
     actClearExpression->setToolTip(tr("clear any expressions from the selected cells"));
     connect(actClearExpression, SIGNAL(triggered()), this, SLOT(slClearExpression()));
-    connect(this, SIGNAL(enableActions(bool)), actCalcCell, SLOT(setEnabled(bool)));
+    connect(this, SIGNAL(enableActions(bool)), actClearExpression, SLOT(setEnabled(bool)));
 
     actRecalcAll=new QAction(QIcon(":/table/formularecalc.png"), tr("reevaluate all/selected math expression"), this);
     actRecalcAll->setToolTip(tr("reevaluate all math expressions ..."));
@@ -341,6 +370,8 @@ void QFRDRTableEditor::createWidgets() {
     menuFile->addAction(actLoadTable);
     menuFile->addAction(actSaveTable);
     menuFile->addSeparator();
+    menuFile->addAction(actMakeEditable);
+    menuFile->addSeparator();
     menuFile->addAction(actLoadTableTemplate);
     menuFile->addAction(actSaveTableTemplate);
     menuFile->addSeparator();
@@ -358,11 +389,9 @@ void QFRDRTableEditor::createWidgets() {
     menuEdit->addAction(actCopyResultsNoHead);
     menuEdit->addSeparator();
     menuEdit->addAction(actDelete);
-    menuEdit->addAction(actSetDatatype);
     menuEdit->addAction(actClearExpression);
-    menuEdit->addSeparator();
-    menuEdit->addAction(actSetDatatype);
-    menuEdit->addAction(actCalcCell);
+    menuEdit->addAction(actDeleteRow);
+    menuEdit->addAction(actDeleteColumn);
 
     QMenu* menuTab=propertyEditor->addMenu("&Table", 0);
     menuTab->addAction(actCopyTemplate);
@@ -377,6 +406,16 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addAction(actDeleteColumn);
     menuTab->addSeparator();
     menuTab->addAction(actSetDatatype);
+    menuDatatypes=menuTab->addMenu(QIcon(":/table/cell_type.png"), tr("set datatype to ..."));
+    menuDatatypes->addAction(actSetDatatypeString);
+    menuDatatypes->addAction(actSetDatatypeDouble);
+    menuDatatypes->addAction(actSetDatatypeInteger);
+    menuDatatypes->addAction(actSetDatatypeBool);
+    menuDatatypes->addAction(actSetDatatypeDate);
+    actMenuDatatypes=menuDatatypes->menuAction();
+    tvMain->insertAction(actSetDatatype, actMenuDatatypes);
+    tbMain->insertAction(actSetDatatype, actMenuDatatypes);
+    menuTab->addSeparator();
     menuTab->addAction(actSetColumnTitle);
     menuTab->addAction(actSetColumnValues);
     menuTab->addAction(actCalcCell);
@@ -772,7 +811,6 @@ void QFRDRTableEditor::slSetDatatype() {
                 bool ok;
                 QString item = QInputDialog::getItem(this, tr("Change cell types ..."), tr("Select a new datatype:"), items, type, false, &ok);
                 if (ok && items.indexOf(item)>=0) {
-                    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
                     QVariant::Type t=QVariant::String;
                     switch (items.indexOf(item)) {
                         case 0: t=QVariant::String; break;
@@ -782,20 +820,60 @@ void QFRDRTableEditor::slSetDatatype() {
                         case 4: t=QVariant::Bool; break;
                     }
 
-                    QItemSelection sel=tvMain->selectionModel()->selection();
-                    QModelIndex cur=tvMain->selectionModel()->currentIndex();
-                    m->model()->disableSignals();
-                    for (int i=0; i<l.size(); i++) {
-                        m->model()->changeDatatype(l[i].row(), l[i].column(), t);
-                    }
-                    m->model()->enableSignals(true);
-                    tvMain->selectionModel()->select(sel, QItemSelectionModel::Select);
-                    tvMain->selectionModel()->setCurrentIndex(cur, QItemSelectionModel::Current);
-                    QApplication::restoreOverrideCursor();
+                    setDatatype(t);
                 }
             }
         }
     }
+}
+
+void QFRDRTableEditor::setDatatype(QVariant::Type t)
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            QItemSelectionModel* sm=tvMain->selectionModel();
+            if (sm->hasSelection()) {
+                QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+                QModelIndexList l=sm->selectedIndexes();
+                QItemSelection sel=tvMain->selectionModel()->selection();
+                QModelIndex cur=tvMain->selectionModel()->currentIndex();
+                m->model()->disableSignals();
+                for (int i=0; i<l.size(); i++) {
+                    m->model()->changeDatatype(l[i].row(), l[i].column(), t);
+                }
+                m->model()->enableSignals(true);
+                tvMain->selectionModel()->select(sel, QItemSelectionModel::Select);
+                tvMain->selectionModel()->setCurrentIndex(cur, QItemSelectionModel::Current);
+                QApplication::restoreOverrideCursor();
+            }
+        }
+    }
+}
+
+void QFRDRTableEditor::slSetDatatypeString()
+{
+    setDatatype(QVariant::String);
+}
+
+void QFRDRTableEditor::slSetDatatypeDouble()
+{
+    setDatatype(QVariant::Double);
+}
+
+void QFRDRTableEditor::slSetDatatypeInteger()
+{
+    setDatatype(QVariant::LongLong);
+}
+
+void QFRDRTableEditor::slSetDatatypeBool()
+{
+    setDatatype(QVariant::Bool);
+}
+
+void QFRDRTableEditor::slSetDatatypeDate()
+{
+    setDatatype(QVariant::DateTime);
 }
 
 void QFRDRTableEditor::slEditColumnProperties(int col) {
@@ -924,6 +1002,26 @@ void QFRDRTableEditor::slDelete() {
             QApplication::restoreOverrideCursor();
         }
     }
+}
+
+void QFRDRTableEditor::slMakeEditable()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            bool ok=QMessageBox::warning(this, tr("make table RDR editable ..."), tr("You are about to make this table editable.\nCurrently the table data is read from an external file. If you use this function, the table contents will no longer be read from the file, but a possibly changed version will be stored in the project.\n\nDo you really want to do this?\n\n[Alternatively you can create a new editable table RDR and load an external file into it.]"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes;
+
+            if (ok) {
+                QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+                m->model()->disableSignals();
+                m->setQFProperty("DONT_READWRITE_FILE", true, false, false);
+                m->model()->setReadonly(false);
+                setActionsEnabled(true);
+                QApplication::restoreOverrideCursor();
+            }
+        }
+    }
+
 }
 
 

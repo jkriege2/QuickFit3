@@ -14,6 +14,7 @@
 #include "subpluginlinkdialog.h"
 #include "faqentrydialog.h"
 #include "functionreferencedialog.h"
+#include "qfhtmlhelptools.h"
 
 
 
@@ -132,6 +133,15 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     actInsertIcon->setToolTip(tr("print the current SDFF file "));
     connect(actInsertIcon, SIGNAL(triggered()), this, SLOT(insertIcon()));
 
+
+    toEntityAct = new QAction(QIcon(":/qfe_helpeditor/toentity.png"), tr("&Convert characters to entities ..."), this);
+    toEntityAct->setToolTip(tr("convert characters in the selected text to HTML entities"));
+    connect(toEntityAct, SIGNAL(triggered()), this, SLOT(toEntity()));
+
+    toCharAct = new QAction(QIcon(":/qfe_helpeditor/tochars.png"), tr("&Convert entities to characters ..."), this);
+    toCharAct->setToolTip(tr("convert HTML entities in the selected text to characters"));
+    connect(toCharAct, SIGNAL(triggered()), this, SLOT(toChars()));
+
     cutAct->setEnabled(false);
     copyAct->setEnabled(false);
     undoAct->setEnabled(false);
@@ -148,6 +158,9 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     menuMore->addAction(unindentAct);
     menuMore->addAction(commentAct);
     menuMore->addAction(unCommentAct);
+    menuMore->addSeparator();
+    menuMore->addAction(toEntityAct);
+    menuMore->addAction(toCharAct);
     menuMore->addSeparator();
     menuMore->addAction(actInsertIcon);
     menuMore->addSeparator();
@@ -167,6 +180,8 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     ui->tbPaste->setDefaultAction(pasteAct);
     ui->tbRedo->setDefaultAction(redoAct);
     ui->tbUndo->setDefaultAction(undoAct);
+    ui->tbEntity->setDefaultAction(toEntityAct);
+    ui->tbChars->setDefaultAction(toCharAct);
 
 
 
@@ -406,6 +421,12 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "\\mathscript{%1°}");
     addInsertAction(menu, "\\underline{%1°}");
     //addInsertAction(menu, "$$$$");
+
+    menu=new QMenu(tr("Special Characters"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "$" "&#36;");
+    addInsertAction(menu, "$$" "&#36;&#36;");
+
 
     QTimer::singleShot(AUTOSAVE_INTERVAL_MSEC, this, SLOT(autosave()));
 
@@ -1061,6 +1082,18 @@ void QFEHelpEditorWidget::insertIcon()
     }
 }
 
+void QFEHelpEditorWidget::toEntity()
+{
+    QString txt=getSelection();
+    replaceSelection(escapeHTML(txt));
+}
+
+void QFEHelpEditorWidget::toChars()
+{
+    QString txt=getSelection();
+    replaceSelection(deescapeHTML(txt));
+}
+
 void QFEHelpEditorWidget::insertAroundOld(const QString &newText)
 {
     QString txt=ui->edtScript->getEditor()->getSelection()+newText;
@@ -1090,6 +1123,17 @@ void QFEHelpEditorWidget::insertAroundOld(const QString &newText)
 
     }
 
+}
+
+QString QFEHelpEditorWidget::getSelection() const
+{
+    return ui->edtScript->getEditor()->getSelection();
+}
+
+void QFEHelpEditorWidget::replaceSelection(const QString &newText)
+{
+    QTextCursor cur=ui->edtScript->getEditor()->textCursor();
+    cur.insertText(newText);
 }
 
 

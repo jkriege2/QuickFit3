@@ -32,6 +32,10 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
         /** Default destructor */
         virtual ~QFFCSMSDEvaluationItem();
 
+        /** \copydoc QFEvaluationItem::setPresetProperty() */
+        virtual void setPresetProperty(const QString& id, const QVariant& data, bool usereditable=true, bool visible=true);
+
+
         /** \brief return type (short type string) */
         virtual QString getType() const { return QString("fcs_msd"); }
         /** \brief return type (longer type string, user readable) */

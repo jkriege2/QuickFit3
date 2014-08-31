@@ -92,6 +92,11 @@ public:
     QFFitResultsEvaluation(const QString& fitFunctionPrefix, QFProject* parent, bool showRDRList=true, bool useSelection=false);
     virtual ~QFFitResultsEvaluation();
 
+
+    /** \copydoc QFEvaluationItem::setPresetProperty() */
+    virtual void setPresetProperty(const QString& id, const QVariant& data, bool usereditable=true, bool visible=true);
+
+
     /** \brief returns a list of all FCS fitting functions available for this evaluation
      *  \note This class uses only those fit functions where the ID starts with \c "fcs_"
      */

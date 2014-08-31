@@ -20,7 +20,7 @@ QFRawDataRecord* QFPRDRTable::createRecord(QFProject* parent) {
 
 
 void QFPRDRTable::registerToMenu(QMenu* menu) {
-    QAction* insertRDTableFileAct = new QAction(QIcon(":/table/table_open.png"), tr("Table from File"), parentWidget);
+    QAction* insertRDTableFileAct = new QAction(QIcon(":/table/table_open.png"), tr("Table from File [readonly]"), parentWidget);
     insertRDTableFileAct->setStatusTip(tr("Insert a new table raw data item from a specified file"));
     connect(insertRDTableFileAct, SIGNAL(triggered()), this, SLOT(insertTableFile()));
 

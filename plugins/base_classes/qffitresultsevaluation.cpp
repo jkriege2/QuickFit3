@@ -92,6 +92,45 @@ QFFitResultsEvaluation::~QFFitResultsEvaluation() {
     if (fitParamGlobalSettings) delete fitParamGlobalSettings;
 }
 
+void QFFitResultsEvaluation::setPresetProperty(const QString &id, const QVariant &data, bool usereditable, bool visible)
+{
+    QString lid=id.toLower();
+    if (lid=="preset_fit_algorithm") {
+        setFitAlgorithm(data.toString());
+    } else if (lid=="preset_fit_model" || lid=="preset_model") {
+        setFitFunction(data.toString());
+    } else if (lid.startsWith("preset_") && lid.endsWith("_fix")) {
+        QString idd=id;
+        idd=idd.remove(0, QString("preset_").size());
+        idd=idd.left(idd.size()-QString("_fix").size());
+        setInitFitFix(idd, data.toBool());
+    /*} else if (lid.startsWith("preset_") && lid.endsWith("_error")) {
+        QString idd=id;
+        idd=idd.remove(0, QString("preset_").size());
+        idd=idd.left(idd.size()-QString("_error").size());
+        setInitFitValueError(idd, data.toDouble());
+    } else if (lid.startsWith("preset_") && lid.endsWith("_min")) {
+        QString idd=id;
+        idd=idd.remove(0, QString("preset_").size());
+        idd=idd.left(idd.size()-QString("_min").size());
+        setInitFitValueMin(idd, data.toDouble());
+    } else if (lid.startsWith("preset_") && lid.endsWith("_max")) {
+        QString idd=id;
+        idd=idd.remove(0, QString("preset_").size());
+        idd=idd.left(idd.size()-QString("_max").size());
+        setInitFitValueMax(idd, data.toDouble());
+        */
+    } else if (lid.startsWith("preset_")) {
+        QString idd=id;
+        idd=idd.remove(0, QString("preset_").size());
+        //qDebug()<<"init_"<<idd<<" = "<<data;
+        setInitFitValue(idd, data.toDouble());
+    } else {
+        QFEvaluationItem::setPresetProperty(id, data, usereditable, visible);
+    }
+
+}
+
 
 
 QStringList QFFitResultsEvaluation::getAvailableFitAlgorithms() const {
@@ -1213,7 +1252,7 @@ void QFFitResultsEvaluation::resetAllFitResultsAllFiles() {
 void QFFitResultsEvaluation::setInitFitValue(const QString& id, double value, double error, QFRawDataRecord *rin) {
     QFRawDataRecord* r=rin;
     if (!rin) r=getHighlightedRecord();
-    if (r!=NULL) {
+    //if (r!=NULL) {
         QFFitFunction* f=getFitFunction(r);
         if (f) {
             QString dsid=getParameterStoreID(r, f->id(), id);
@@ -1232,13 +1271,13 @@ void QFFitResultsEvaluation::setInitFitValue(const QString& id, double value, do
                 project->setDataChanged();
             }
         }
-    }
+    //}
 }
 
 void QFFitResultsEvaluation::setInitFitFix(const QString& id, bool fix, QFRawDataRecord* rin) {
     QFRawDataRecord* r=rin;
     if (!rin) r=getHighlightedRecord();
-    if (r!=NULL) {
+    //if (r!=NULL) {
         QFFitFunction* f=getFitFunction(r);
         if (f) {
             QString dsid=getParameterStoreID(r, f->id(), id);
@@ -1250,7 +1289,7 @@ void QFFitResultsEvaluation::setInitFitFix(const QString& id, bool fix, QFRawDat
                 project->setDataChanged();
             }
         }
-    }
+    //}
 }
 
 

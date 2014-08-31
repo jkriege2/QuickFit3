@@ -96,6 +96,8 @@ void QFFitFunctionSelectDialog::init(const QString &filter, const QString &curre
         m_fitFunctions=manager->getModels(filter, this);
     }
 
+    QStandardItemModel *m = model;
+
     QMapIterator<QString, QFFitFunction*> it(m_fitFunctions);
     int i=0;
 
@@ -105,6 +107,12 @@ void QFFitFunctionSelectDialog::init(const QString &filter, const QString &curre
             QStandardItem* item=new QStandardItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->shortName());
             item->setData(it.key(), Qt::UserRole+1);
             model->appendRow(item);
+            if (it.value()->isDeprecated() && m) {
+                item->setForeground(QColor("darkgrey"));
+                item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
+
+            }
+
             if (it.key()==current) idx=i;
             i++;
         }
@@ -135,6 +143,7 @@ void QFFitFunctionSelectDialog::init(const QStringList &availableFF, const QStri
             m_fitFunctions[availableFF[i]]=manager->createFunction(availableFF[i], this);
         }
 
+        QStandardItemModel *m = model;
 
         QMapIterator<QString, QFFitFunction*> it(m_fitFunctions);
         int i=0;
@@ -145,6 +154,13 @@ void QFFitFunctionSelectDialog::init(const QStringList &availableFF, const QStri
                 QStandardItem* item=new QStandardItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->shortName());
                 item->setData(it.key(), Qt::UserRole+1);
                 model->appendRow(item);
+
+                if (it.value()->isDeprecated() && m) {
+                    item->setForeground(QColor("darkgrey"));
+                    item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
+
+                }
+
                 if (it.key()==current) idx=i;
                 i++;
                 delete it.value();

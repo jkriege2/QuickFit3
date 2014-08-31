@@ -6,6 +6,16 @@ QFUsesResultsByIndexAndModelEvaluation::QFUsesResultsByIndexAndModelEvaluation(Q
     currentModel=0;
 }
 
+void QFUsesResultsByIndexAndModelEvaluation::setPresetProperty(const QString &id, const QVariant &data, bool usereditable, bool visible)
+{
+    QString uid=id.toUpper();
+    if (uid=="PRESET_MODEL" || uid=="PRESET_FIT_MODEL") {
+        setCurrentModel(data.toInt());
+    } else {
+        QFUsesResultsByIndexEvaluation::setPresetProperty(id, data, usereditable, visible);
+    }
+}
+
 bool QFUsesResultsByIndexAndModelEvaluation::hasResults(QFRawDataRecord *r1, int index, int model) const {
     QFRawDataRecord* r=r1;
     QString rsid=getEvaluationResultID(index, model);

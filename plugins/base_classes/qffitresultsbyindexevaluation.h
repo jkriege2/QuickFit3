@@ -52,6 +52,10 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         virtual ~QFFitResultsByIndexEvaluation();
 
 
+        /** \copydoc QFEvaluationItem::setPresetProperty() */
+        virtual void setPresetProperty(const QString& id, const QVariant& data, bool usereditable=true, bool visible=true);
+
+
     signals:
         void currentIndexChanged(int newIndex);
 

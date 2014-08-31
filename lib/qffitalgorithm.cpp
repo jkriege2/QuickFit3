@@ -612,7 +612,7 @@ void QFFitAlgorithm::IRLSFunctorAdaptor::irlsReweight(const double *params)
 {
     double* err=(double*)malloc(irls_functor->get_evalout()*sizeof(double));
 
-    if (irls_functor->get_evalout()>=irls_functor->getDataPoints()) {
+    if (irls_functor->get_evalout()>=(int64_t)irls_functor->getDataPoints()) {
         // calculate error vector (f(xi,p)-yi)/sigmai
         irls_functor->evaluate(err, params);
         for (int i=0; i<irls_functor->get_evalout(); i++) {

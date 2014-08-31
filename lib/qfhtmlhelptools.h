@@ -68,4 +68,17 @@ QFLIB_EXPORT QString transformQF3HelpHTML(const QString& input_html, const QStri
 QFLIB_EXPORT QString transformQF3HelpHTMLFile(const QString& filename, const QString& defaultText=QString("<center>No help available ...</center>"), bool removeNonReplaced=true, const QFHelpReplacesList& more_replaces=QFHelpReplacesList(), bool insertTooltips=false, bool dontCreatePics=false, bool isMainHelp=false);
 
 
+
+/*! \brief escape characters to HTML entities
+    \ingroup qf3lib_tools
+*/
+QFLIB_EXPORT QString escapeHTML(const QString& data);
+
+/*! \brief deescape characters from HTML entities
+    \ingroup qf3lib_tools
+*/
+QFLIB_EXPORT QString deescapeHTML(const QString& data);
+
+
+
 #endif // QFHTMLHELPTOOLS_H

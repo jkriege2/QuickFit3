@@ -22,6 +22,8 @@
         <file alias="script_selectall.png">icons/script_edit-select-all.png</file>
         <file alias="script_unindent.png">icons/script_format-indent-less.png</file>
         <file alias="script_indent.png">icons/script_format-indent-more.png</file>
+        <file alias="toentity.png">icons/toentity.png</file>
+        <file alias="tochars.png">icons/tochars.png</file>
         <file>icons/format_indent_less.png</file>
         <file>icons/format_indent_more.png</file>
         <file>icons/format_justify_center.png</file>

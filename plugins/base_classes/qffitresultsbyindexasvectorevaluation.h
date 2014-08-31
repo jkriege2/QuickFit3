@@ -52,6 +52,11 @@ class QFFitResultsByIndexAsVectorEvaluation : public QFFitResultsByIndexEvaluati
         virtual ~QFFitResultsByIndexAsVectorEvaluation();
 
 
+        /** \copydoc QFEvaluationItem::setPresetProperty() */
+        virtual void setPresetProperty(const QString& id, const QVariant& data, bool usereditable=true, bool visible=true);
+
+
+
         virtual QString transformResultID(const QString& resultID) const;
 
         virtual void resetAllFitResultsCurrentFileAllIndices();

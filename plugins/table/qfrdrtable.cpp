@@ -1940,7 +1940,7 @@ void QFRDRTable::intReadData(QDomElement* e) {
 
     datamodel->clear();
     datamodel->setReadonly(false);
-    if (files.size()>0) {
+    if (files.size()>0 && !getQFProperty("DONT_READWRITE_FILE", false).toBool() ) {
         //qDebug()<<"    reading CSV\n";
         QString s=getProperty("column_separator", ",").toString();
         char column_separator=(s.size()>0)?s[0].toAscii():',';
@@ -1955,6 +1955,11 @@ void QFRDRTable::intReadData(QDomElement* e) {
 
         datamodel->readCSV(files[0], column_separator, decimal_separator, header_start, comment_start);
         datamodel->setReadonly(true);
+        if (propertyExists("CONVERT_READWRITE") && getQFProperty("CONVERT_READWRITE", false).toBool()) {
+            datamodel->setReadonly(true);
+            setQFProperty("DONT_READWRITE_FILE", true, false, false);
+            deleteProperty("CONVERT_READWRITE");
+        }
         datamodel->resetChanged();
         //qDebug()<<datamodel->getColumnTitles();
     } else if (e) {
@@ -2055,7 +2060,7 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
         connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
     }
-    if (files.size()>0) {
+    if (files.size()>0 && !getQFProperty("DONT_READWRITE_FILE", false).toBool()) {
         if (datamodel->hasChanged()) datamodel->saveCSV(files[0]);
     } else {
         for (quint32 c=0; c<datamodel->columnCount(); c++) {

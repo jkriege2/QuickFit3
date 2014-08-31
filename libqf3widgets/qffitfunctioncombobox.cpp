@@ -111,15 +111,22 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
     } else {
         m_fitFunctions=manager->getModels(filter, this);
     }
+
+    QStandardItemModel *m = qobject_cast<QStandardItemModel *>(model());
+
+
     QMapIterator<QString, QFFitFunction*> it(m_fitFunctions);
     while (it.hasNext())  {
         it.next();
         if (it.value()) {
             addItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->shortName(), it.key());
-            if (it.value()->isDeprecated()) {
+            if (it.value()->isDeprecated() && m) {
                 int i=count()-1;
-                setItemData(i, QColor("grey"), Qt::TextColorRole);
-                setItemText(i, tr("[DEPRECATED]: %1").arg(itemText(i)));
+                //qDebug()<<"deprecated: "<<i<<it.value()->name();
+                QStandardItem *item = m->item(i,0);
+                item->setForeground(QColor("darkgrey"));
+                item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
+
             }
 
             delete it.value();
@@ -138,11 +145,21 @@ void QFFitFunctionComboBox::updateFitFunctions(const QStringList &availableFF)
         QFFitFunctionManager* manager=QFFitFunctionManager::getInstance();
         bool upd=updatesEnabled();
         setUpdatesEnabled(false);
+        QStandardItemModel *m = qobject_cast<QStandardItemModel *>(model());
+
+
         clear();
         for (int i=0; i<m_availableFuncs.size(); i++)  {
             QFFitFunction* ff=manager->createFunction(m_availableFuncs[i], this);
             if (ff) {
                 addItem(QIcon(":/lib/fitfunc_icon.png"), ff->shortName(), m_availableFuncs[i]);
+                if (ff->isDeprecated()) {
+                    int i=count()-1;
+                    //qDebug()<<"deprecated: "<<i<<ff->name();
+                    QStandardItem *item = m->item(i,0);
+                    item->setForeground(QColor("darkgrey"));
+                    item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
+                }
                 delete ff;
             }
         }

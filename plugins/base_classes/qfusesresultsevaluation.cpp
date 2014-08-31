@@ -18,6 +18,39 @@ QFUsesResultsEvaluation::~QFUsesResultsEvaluation()
 {
 }
 
+void QFUsesResultsEvaluation::setPresetProperty(const QString &id, const QVariant &data, bool usereditable, bool visible)
+{
+    QString lid=id.toLower();
+    if (lid.startsWith("preset_") && lid.endsWith("_error")) {
+        QString idd=id;
+        idd=idd.remove(0, QString("preset_").size());
+        idd=idd.left(idd.size()-QString("_error").size());
+        setInitFitValueError(idd, data.toDouble());
+    } else if (lid.startsWith("preset_") && lid.endsWith("_fix")) {
+        QString idd=id;
+        idd=idd.remove(0, QString("preset_").size());
+        idd=idd.left(idd.size()-QString("_fix").size());
+        setInitFitFix(idd, data.toBool());
+    } else if (lid.startsWith("preset_") && lid.endsWith("_min")) {
+        QString idd=id;
+        idd=idd.remove(0, QString("preset_").size());
+        idd=idd.left(idd.size()-QString("_min").size());
+        setInitFitValueMin(idd, data.toDouble());
+    } else if (lid.startsWith("preset_") && lid.endsWith("_max")) {
+        QString idd=id;
+        idd=idd.remove(0, QString("preset_").size());
+        idd=idd.left(idd.size()-QString("_max").size());
+        setInitFitValueMax(idd, data.toDouble());
+    } else if (lid.startsWith("preset_")) {
+        QString idd=id;
+        idd=idd.remove(0, QString("preset_").size());
+        setInitFitValue(idd, data.toDouble());
+    } else {
+        QFEvaluationItem::setPresetProperty(id, data, usereditable, visible);
+    }
+
+}
+
 bool QFUsesResultsEvaluation::hasResults(QFRawDataRecord *r1) const {
     return hasResults(r1, getEvaluationResultID());
 }

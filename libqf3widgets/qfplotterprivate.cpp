@@ -110,7 +110,7 @@ void QFPlotterPrivate::copyToTable()
                 bool copyCol=false;
                 if (!dlg->copyOnlyPlotData()) copyCol=true;
                 else {
-                    for (int j=0; j<p->getGraphCount(); j++) {
+                    for (size_t j=0; j<p->getGraphCount(); j++) {
                         JKQTPgraph* g=p->getGraph(j);
                         if (g->usesColumn(cids[i])) {
                             copyCol=true;
@@ -122,7 +122,7 @@ void QFPlotterPrivate::copyToTable()
                 if(copyCol) {
                     QList<QVariant> d;
                     JKQTPcolumn col=ds->getColumn(cids[i]);
-                    for (int j=0; j<col.getRows(); j++) {
+                    for (unsigned long long j=0; j<col.getRows(); j++) {
                         d<<col.getValue(j);
                     }
                     tab->tableSetColumnData(idx, d);
@@ -158,7 +158,7 @@ void QFPlotterPrivate::copyToTable()
                 }
                 cols->colgraphSetPlotXRange(plotid, p->getXMin(), p->getXMax());
                 cols->colgraphSetPlotYRange(plotid, p->getYMin(), p->getYMax());
-                for (int j=0; j<p->getGraphCount(); j++) {
+                for (size_t j=0; j<p->getGraphCount(); j++) {
                     JKQTPgraph* g=p->getGraph(j);
                     if (g && g->get_visible()) {
                         QString name=g->get_title();

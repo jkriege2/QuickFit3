@@ -823,37 +823,56 @@ void QFPRDRFCS::startFCSProjectWizard()
                 else if (i==1) ev=project->addEvaluation("fcs_maxent", "FCS MaxEnt Evaluation");
                 else if (i==2 && meastype->currentItem()!=2) ev=project->addEvaluation("fcs_msd", "FCS MSD Evaluation");
                 if (ev) {
-                    if (i==0) ev->setQFProperty("PRESET_FIT_MODEL", evsetData.cmbFitFunc->currentFitFunctionID());
+                    //if (i==0) ev->setQFProperty("PRESET_FIT_MODEL", evsetData.cmbFitFunc->currentFitFunctionID());
+                    if (i==0) ev->setPresetProperty("PRESET_FIT_MODEL", evsetData.cmbFitFunc->currentFitFunctionID());
                     else if (i==1) {
-                        ev->setQFProperty("PRESET_MODEL", 0);
-                        if (meastype->currentItem()==1) ev->setQFProperty("PRESET_MODEL", 2);
-                        else if (meastype->currentItem()==2) ev->setQFProperty("PRESET_MODEL", 3);
-                        else if (meastype->currentItem()==3) ev->setQFProperty("PRESET_MODEL", 5);
-                        else if (meastype->currentItem()==4) ev->setQFProperty("PRESET_MODEL", 6);
+                        ev->setPresetProperty("PRESET_MODEL", 0);
+                        if (meastype->currentItem()==1) ev->setPresetProperty("PRESET_MODEL", 2);
+                        else if (meastype->currentItem()==2) ev->setPresetProperty("PRESET_MODEL", 3);
+                        else if (meastype->currentItem()==3) ev->setPresetProperty("PRESET_MODEL", 5);
+                        else if (meastype->currentItem()==4) ev->setPresetProperty("PRESET_MODEL", 6);
                     } else if (i==2) {
-                        ev->setQFProperty("PRESET_MODEL", 1);
-                        if (meastype->currentItem()==1) ev->setQFProperty("PRESET_MODEL", 0);
-                        else if (meastype->currentItem()==3) ev->setQFProperty("PRESET_MODEL", 4);
-                        else if (meastype->currentItem()==4) ev->setQFProperty("PRESET_MODEL", 5);
+                        ev->setPresetProperty("PRESET_MODEL", 1);
+                        if (meastype->currentItem()==1) ev->setPresetProperty("PRESET_MODEL", 0);
+                        else if (meastype->currentItem()==3) ev->setPresetProperty("PRESET_MODEL", 4);
+                        else if (meastype->currentItem()==4) ev->setPresetProperty("PRESET_MODEL", 5);
                     }
                     if (meastype->currentItem()==2) {
                         if (i==0) ev->setName("DLS Fit");
                         else if (i==1) ev->setName("DLS MaxEnt Fit");
-                        ev->setQFProperty("PRESET_DLS_ANGLE", evsetData.spinDLSAngle->value());
-                        ev->setQFProperty("PRESET_REFRACTIVE_INDEX", evsetData.spinDLSN->value());
-                        ev->setQFProperty("PRESET_WAVELENGTH", evsetData.spinDLSLambda->value());
+//                        ev->setQFProperty("PRESET_DLS_ANGLE", evsetData.spinDLSAngle->value());
+//                        ev->setQFProperty("PRESET_REFRACTIVE_INDEX", evsetData.spinDLSN->value());
+//                        ev->setQFProperty("PRESET_WAVELENGTH", evsetData.spinDLSLambda->value());
+                        ev->setPresetProperty("preset_dls_angle", evsetData.spinDLSAngle->value());
+                        ev->setPresetProperty("preset_refractive_index", evsetData.spinDLSN->value());
+                        ev->setPresetProperty("preset_wavelength", evsetData.spinDLSLambda->value());
                     } else if (meastype->currentItem()==1) {
-                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
+//                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
+                        ev->setPresetProperty("preset_focus_width", evsetData.spinWxy->value());
+                        ev->setPresetProperty("preset_maxent_wxy", evsetData.spinWxy->value());
                     } else if (meastype->currentItem()==3) {
-                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
-                        ev->setQFProperty("PRESET_PIXEL_WIDTH", evsetData.spinA->value());
-                        ev->setQFProperty("PRESET_FOCUS_HEIGHT", evsetData.spinWz->value());
+//                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
+//                        ev->setQFProperty("PRESET_PIXEL_WIDTH", evsetData.spinA->value());
+//                        ev->setQFProperty("PRESET_FOCUS_HEIGHT", evsetData.spinWz->value());
+                        ev->setPresetProperty("preset_focus_width", evsetData.spinWxy->value());
+                        ev->setPresetProperty("preset_pixel_width", evsetData.spinA->value());
+                        ev->setPresetProperty("preset_focus_height", evsetData.spinWz->value());
+                        ev->setPresetProperty("preset_focus_hieght", evsetData.spinWz->value());
+                        ev->setPresetProperty("preset_maxent_wxy", evsetData.spinWxy->value());
+                        ev->setPresetProperty("preset_pixel_size", evsetData.spinA->value());
                     } else if (meastype->currentItem()==4) {
-                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
-                        ev->setQFProperty("PRESET_PIXEL_WIDTH", evsetData.spinA->value());
+//                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
+//                        ev->setQFProperty("PRESET_PIXEL_WIDTH", evsetData.spinA->value());
+                        ev->setPresetProperty("preset_focus_width", evsetData.spinWxy->value());
+                        ev->setPresetProperty("preset_pixel_width", evsetData.spinA->value());
+                        ev->setPresetProperty("preset_pixel_size", evsetData.spinA->value());
+                        ev->setPresetProperty("preset_maxent_wxy", evsetData.spinWxy->value());
                     } else {
-                        ev->setQFProperty("PRESET_FOCUS_STRUCT_FAC", evsetData.spinGamma->value());
-                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
+//                        ev->setQFProperty("PRESET_FOCUS_STRUCT_FAC", evsetData.spinGamma->value());
+//                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
+                        ev->setPresetProperty("preset_focus_struct_fac", evsetData.spinGamma->value());
+                        ev->setPresetProperty("preset_focus_width", evsetData.spinWxy->value());
+                        ev->setPresetProperty("preset_maxent_wxy", evsetData.spinWxy->value());
                     }
                 }
             }

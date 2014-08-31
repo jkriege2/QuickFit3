@@ -36,6 +36,8 @@ class QFUsesResultsEvaluation : public QFEvaluationItem, public QFSimpleFitParam
         explicit QFUsesResultsEvaluation(QFProject *parent = 0, bool showRDRList=true, bool useSelection=false);
         virtual ~QFUsesResultsEvaluation();
 
+        /** \copydoc QFEvaluationItem::setPresetProperty() */
+        virtual void setPresetProperty(const QString& id, const QVariant& data, bool usereditable=true, bool visible=true);
 
 
 

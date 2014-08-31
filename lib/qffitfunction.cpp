@@ -39,7 +39,7 @@ QVector<double> QFFitFunction::multiEvaluate(const QVector<double> &x, const dou
 
 void QFFitFunction::multiEvaluate(double *y, const double *x, uint64_t N, const double *parameters) const
 {
-    for (int i=0; i<N; i++) {
+    for (uint64_t i=0; i<N; i++) {
         y[i]=evaluate(x[i], parameters);
     }
 }

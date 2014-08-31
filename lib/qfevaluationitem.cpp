@@ -71,6 +71,13 @@ bool QFEvaluationItem::isFilteredAndApplicable(QFRawDataRecord *record)
 
 }
 
+void QFEvaluationItem::setPresetProperty(const QString &id, const QVariant &data, bool usereditable, bool visible)
+{
+    QString d=id;
+    if (!id.startsWith("PRESET_")) d=QString("PRESET_")+id;
+    setQFProperty(d, data, usereditable, visible);
+}
+
 QFEvaluationItem::~QFEvaluationItem() {
     //std::cout<<"deleting QFEvaluationItem\n";
     //std::cout<<"deleting QFEvaluationItem ... OK\n";

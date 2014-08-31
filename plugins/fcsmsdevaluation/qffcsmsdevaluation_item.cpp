@@ -19,6 +19,29 @@ QFFCSMSDEvaluationItem::~QFFCSMSDEvaluationItem() {
 
 }
 
+void QFFCSMSDEvaluationItem::setPresetProperty(const QString &id, const QVariant &data, bool usereditable, bool visible)
+{
+    QString uid=id.toUpper();
+    QString lid=id.toLower();
+    if (uid=="PRESET_GAMMA" || uid=="PRESET_FOCUS_STRUCT_FAC") {
+        setInitFitValue("focus_struct_fac", data.toDouble());
+    } else if (uid=="PRESET_FOCUS_WIDTH") {
+        setInitFitValue("focus_width", data.toDouble());
+    } else if (lid=="preset_focus_height") {
+        setInitFitValue("focus_height", data.toDouble());
+    } else if (lid=="preset_pixel_size") {
+        setInitFitValue("pixel_size", data.toDouble());
+    } else if (lid=="preset_n_particle") {
+        setInitFitValue("n_particle", data.toDouble());
+    } else if (lid=="preset_nonfl_theta1") {
+        setInitFitValue("nonfl_theta1", data.toDouble());
+    } else if (lid=="preset_nonfl_tau1") {
+        setInitFitValue("nonfl_tau1", data.toDouble());
+    } else {
+        QFUsesResultsByIndexAndModelEvaluation::setPresetProperty(id, data, usereditable, visible);
+    }
+}
+
 QString QFFCSMSDEvaluationItem::getEvaluationResultID(int currentIndex, int model) const {
     if (currentIndex<0) return QString("%1_%2_m%3_runavg").arg(getType()).arg(getID()).arg(model);
     return QString("%1_%2_m%3_run%4").arg(getType()).arg(getID()).arg(model).arg(currentIndex);
