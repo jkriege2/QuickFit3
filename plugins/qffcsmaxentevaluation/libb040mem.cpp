@@ -86,12 +86,12 @@ void MaxEntB040::setData(const double* taus, const double* correlation,\
             break;
         case 3:{
                 const double offset=param_list[0];
-                qDebug()<<"correct for DLS, offset="<<offset;
+                //qDebug()<<"correct for DLS, offset="<<offset;
                 for (int i=0;i<m_Nd;i++)
                 {
                     m_ydata(i)=sqrt(m_ydata(i)-offset);
                     if (!QFFloatIsOK(m_ydata(i))) m_ydata(i)=0;
-                    qDebug()<<i<<m_ydata(i);
+                    //qDebug()<<i<<m_ydata(i);
                 }
 
             }
