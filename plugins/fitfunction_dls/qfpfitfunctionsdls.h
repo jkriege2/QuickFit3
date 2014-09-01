@@ -2,8 +2,6 @@
 #define QFPFITFUNCTIONSDLS_H
 
 #include "qfpluginfitfunction.h"
-#include "qffitfunctiondlsg2.h"
-#include "qffitfunctiondlsg2indext.h"
 
 /*!
     \defgroup qf3fitfunp_fitfunctions_dls Fit Function Plugin for Dynamic Light Scattering
@@ -43,7 +41,7 @@ class QFPFitFunctionsDLS : public QObject, public QFPluginFitFunction {
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("(c) 2012 by Jan W. Krieger, Benedikt Häusele");
+            return tr("(c) 2012-2014 by Jan W. Krieger, Benedikt Häusele");
         };
 
         /** \brief weblink for the plugin */
@@ -65,7 +63,7 @@ class QFPFitFunctionsDLS : public QObject, public QFPluginFitFunction {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         };
 
         /** \brief return list of plugin IDs */

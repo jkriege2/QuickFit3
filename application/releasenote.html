@@ -134,7 +134,13 @@
             <li>added function for normal diffusion fit with different relative brightnesses of the species, which also supports up to four blinking components</li>
             <li>added fit function for anomalous diffusion with different molecular brightnesses</li>
             <li>added fit function for 2D normal diffusion with different molecular brightnesses</li>
-            </ul></li>
+          </ul></li>
+          <li><b>DLS fit functions</b><ul>
+          <li>added fit functions for normal distribution of correlation times, which calculate the integral with numeric integration (improved accuracy over the old implementation with a sum!)</li>
+          </ul></li>
+          <li><b>FCS fit functions with parameter distributions</b><ul>
+            <li>added fit functions for normal and log-normal distributions, which calculate the integral with numeric integration (improved accuracy over the old implementation with a sum!)</li>
+          </ul></li>
           <li><b>2-focus FCCS fit functions</b><ul>
             <li>added fit functions for 2D diffusion and 2D diffusion+flow</li>
             <li>added documentation for all fit functions</li>
@@ -175,7 +181,7 @@
             <li></li>
             <li></li>
           </ul></li>
-      <li><b>table</b><ul>
+        <li><b>table</b><ul>
             <li>added "QuickStatistics" and "QuickHistogram" tools, which show the statistics and histograms of the current selection (column-wise)</li>
             <li>added function to autoset column width ("Table" menu)</li>
             <li>added function to internal function parser: columntitle(), columntitles(), columnindexbytitle()</li>
@@ -278,7 +284,7 @@
       <li><b>FCS MaxEnt evaluation</b><ul>
             <li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
             <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
-            <li></li>
+            <li>bugfix: plugin now works for DLS data</li>
       </ul></li>
       <li><b>FCS MSD evaluation</b><ul>
             <li>added overlay plot feater ("Tools|Overlay plot" menu)</li>

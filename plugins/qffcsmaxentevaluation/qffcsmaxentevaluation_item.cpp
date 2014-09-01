@@ -151,6 +151,41 @@ double QFFCSMaxEntEvaluationItem::getWXY() const {
     return getFitValue("maxent_wxy");
 }
 
+void QFFCSMaxEntEvaluationItem::setLambda(double val)
+{
+    setFitValue("wavelength", wxy);
+}
+
+double QFFCSMaxEntEvaluationItem::getLambda() const
+{
+     return getFitValue("wavelength");
+}
+
+void QFFCSMaxEntEvaluationItem::setTheta(double val)
+{
+    setFitValue("dls_angle", wxy);
+}
+
+double QFFCSMaxEntEvaluationItem::getTheta() const
+{
+     return getFitValue("dls_angle");
+}
+
+void QFFCSMaxEntEvaluationItem::setRefIndx(double val)
+{
+    setFitValue("refractive_index", wxy);
+}
+
+double QFFCSMaxEntEvaluationItem::getRefIndx() const
+{
+     return getFitValue("refractive_index");
+}
+
+double QFFCSMaxEntEvaluationItem::getDLSQ() const
+{
+    return 4.0*M_PI*getRefIndx()/getLambda()*sin(getTheta()/180.0*M_PI/2.0);
+}
+
 ///////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////
 

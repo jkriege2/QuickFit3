@@ -3,11 +3,12 @@
 <body>
 $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 This plugin implements a 3D diffusion model for the fitting routines in QuickFit. It supports up to three diffusing components which may have different relative brightnesses and up to four non-fluorescent components. The model may be denoted as: 
-$$bmath:G(\tau)=G_\infty+\frac{1}{N\cdot((1-\rho_2-\rho_3)+q_2\rho_2+q_3\rho_3)^2}\cdot T(\tau)\cdot\left[(1-\rho_2-\rho_3)\cdot g_1(\tau)+\rho_2q_2^2\cdot g_2(\tau)+\rho_3q_3^2\cdot g_3(\tau)\right]$$
+$$bmath:G(\tau)=G_\infty+\frac{1}{N\cdot((1-\rho_2-\rho_3)+q_2\rho_2+q_3\rho_3)^2}\cdot X_{back}\cdot T(\tau)\cdot\left[(1-\rho_2-\rho_3)\cdot g_1(\tau)+\rho_2q_2^2\cdot g_2(\tau)+\rho_3q_3^2\cdot g_3(\tau)\right]$$
 with
 $$bmath:g_i(\tau)=\left(1+\frac{\tau}{\tau_{diff,i}}\right)^{-1}$$
 $$bmath:T(\tau)=\frac{1+\sum\limits_{i=1}^4\Theta_{dark,i}\mathrm{e}^{-\tau/\tau_{dark,i}}-\Theta_{dark,i}}{1-\sum_{i=^}^4\Theta_{dark,i}}$$
-
+The background correction is performed by factor
+$$bmath:X_{back}=\frac{(I-B)^2}{I^2}.$$
 
 The parameters are:
 <ul>

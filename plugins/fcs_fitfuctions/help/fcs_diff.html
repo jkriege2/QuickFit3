@@ -3,9 +3,11 @@
 <body>
 $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 This plugin implements a 3D diffusion model for the fitting routines in QuickFit. The model may be denoted as: 
-<blockquote><img alt="\[ G(\tau)=G_\infty+\frac{1}{N}\cdot\left(\frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}\right)\cdot\left[(1-\rho_2-\rho_3)\cdot g_1(\tau)+\rho_2\cdot g_2(\tau)+\rho_3\cdot g_3(\tau)\right] \]" src="./pic/form_790.png"/></blockquote>
+$$bmath:G(\tau)=G_\infty+\frac{1}{N}\cdot X_{back}\cdot\left(\frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}\right)\cdot\left[(1-\rho_2-\rho_3)\cdot g_1(\tau)+\rho_2\cdot g_2(\tau)+\rho_3\cdot g_3(\tau)\right]$$
 with
-<blockquote><img alt="\[ g_i(\tau)=\left(1+\frac{\tau}{\tau_{diff,i}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff,i}}\right)^{-1/2} \]" src="./pic/form_200.png"/></blockquote>
+$$bmath: g_i(\tau)=\left(1+\frac{\tau}{\tau_{diff,i}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff,i}}\right)^{-1/2}$$
+The background correction is performed by factor
+$$bmath:X_{back}=\frac{(I-B)^2}{I^2}.$$
 
 
 The parameters are:

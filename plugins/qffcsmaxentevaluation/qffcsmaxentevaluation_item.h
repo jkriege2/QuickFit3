@@ -78,6 +78,14 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation,
         /** \brief return the current wxy value in nanometers */
         double getWXY() const;
 
+        void setLambda(double val);
+        double getLambda() const;
+        void setTheta(double val);
+        double getTheta() const;
+        void setRefIndx(double val);
+        double getRefIndx() const;
+        double getDLSQ() const;
+
 
 
         /** \brief return the name for the given parameter in the given model in either HTML richtext or plain text */

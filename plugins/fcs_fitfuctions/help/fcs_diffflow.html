@@ -10,7 +10,8 @@ $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$
 
 This file implement a one-component 3D diffusion model which also includes a flow and a triplett term. The model may be denoted as:
 <center><img src="./pic/equation_flow.png"></center>
-
+The background correction is performed by factor
+$$bmath:X_{back}=\frac{(I-B)^2}{I^2}.$$
 <p> The parameters are: </p>
 <ul>
 <li><img alt="$ G_\infty $" src="./pic/form_4.png">: offset of the correlation function</li>

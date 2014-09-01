@@ -50,6 +50,8 @@ QFFitFunctionFCSDistributionIntLogGaussian::QFFitFunctionFCSDistributionIntLogGa
     #define FCSDLG_diff_coeff1 16
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
     #define FCSDLG_count_rate 17
+    addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
+    #define FCSDiff_background 22
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
     #define FCSDLG_cpm 18
 }
@@ -85,6 +87,12 @@ double QFFitFunctionFCSDistributionIntLogGaussian::evaluate(double t, const doub
     const double b=data[FCSDLG_b];
     const double tau_min=data[FCSDLG_tau_range_min]/1.0e6;
     const double tau_max=data[FCSDLG_tau_range_max]/1.0e6;
+
+    const double background=data[FCSDiff_background];
+    const double cr=data[FCSDLG_count_rate];
+    double backfactor=qfSqr(cr-background)/qfSqr(cr);
+    if (fabs(cr)<1e-15) backfactor=1;
+
 
     double gamma=data[FCSDLG_focus_struct_fac];
     if (gamma==0) gamma=1;
@@ -133,9 +141,9 @@ double QFFitFunctionFCSDistributionIntLogGaussian::evaluate(double t, const doub
         } else if (nonfl_comp==2) {
             pre=(1.0-nf_theta1+nf_theta1*exp(-t/nf_tau1)-nf_theta2+nf_theta2*exp(-t/nf_tau2))/(1.0-nf_theta1-nf_theta2);
         }
-        return offset+pre/N*diff;
+        return offset+pre/N*diff*backfactor;
     } else {
-        return -1.0*exp(-0.5*qfSqr((log(t)-log(tauD1))/b))/N;
+        return -1.0*exp(-0.5*qfSqr((log(t)-log(tauD1))/b))/N*backfactor;
     }
 }
 
@@ -167,6 +175,8 @@ void QFFitFunctionFCSDistributionIntLogGaussian::calcParameter(double* data, dou
     double ecps=0;
     //double cpm=data[FCSDLG_cpm];
     double ecpm=0;
+    double background=data[FCSDiff_background];
+    double ebackground=0;
 
     if (error) {
         eN=error[FCSDLG_n_particle];
@@ -181,6 +191,7 @@ void QFFitFunctionFCSDistributionIntLogGaussian::calcParameter(double* data, dou
         eoffset=error[FCSDLG_offset];
         ecps=error[FCSDLG_count_rate];
         ecpm=error[FCSDLG_cpm];
+        ebackground=error[FCSDiff_background];
     }
 
     // correct for invalid fractions
@@ -218,8 +229,9 @@ void QFFitFunctionFCSDistributionIntLogGaussian::calcParameter(double* data, dou
     }
 
     // calculate CPM = CPS/N
-    data[FCSDLG_cpm]=cps/N;
-    error[FCSDLG_cpm]=sqrt(sqr(ecps/N)+sqr(eN*cps/sqr(N)));
+    // calculate CPM = CPS/N
+    data[FCSDLG_cpm]=(cps-background)/N;
+    if (error) error[FCSDLG_cpm]=sqrt(sqr(ecps/N)+sqr(ebackground/N)+sqr(eN*(cps-background)/sqr(N)));
 }
 
 bool QFFitFunctionFCSDistributionIntLogGaussian::isParameterVisible(int parameter, const double* data) const {

@@ -14,11 +14,11 @@ class QFFitFunctionDLSG2: public QFFitFunction {
         QFFitFunctionDLSG2();
         virtual ~QFFitFunctionDLSG2() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("DLS: G2 autocorrelation"); };
+        virtual QString name() const { return QString("DLS: G2 autocorrelation"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("DLS: G2 autocorrelation"); };
+        virtual QString shortName() const { return QObject::tr("DLS: G2 autocorrelation"); }
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("dls_g2"); };
+        virtual QString id() const { return QString("dls_g2"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

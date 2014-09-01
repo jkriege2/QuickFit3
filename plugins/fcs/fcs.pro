@@ -81,10 +81,12 @@ CONFIG += exceptions rtti stl
 
 ASSETSTESTDATA_FILES.files = ./examples/fcs_testdata/*.*
 ASSETSTESTDATA_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/fcs_testdata/
+ASSETSTESTDLSDATA_FILES.files = ./examples/dls_testdata/*.*
+ASSETSTESTDLSDATA_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/dls_testdata/
 ASSETSTESTFCCSDATA_FILES.files = ./examples/fccs_data/*.*
 ASSETSTESTFCCSDATA_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/fccs_data/
 
-INSTALLS += ASSETSTESTDATA_FILES ASSETSTESTFCCSDATA_FILES
+INSTALLS += ASSETSTESTDATA_FILES ASSETSTESTFCCSDATA_FILES ASSETSTESTDLSDATA_FILES
 
 
 

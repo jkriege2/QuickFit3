@@ -8,9 +8,9 @@
 $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 
 <p>This class implements a 3D diffusion model for the fitting routines in QuickFit3. This model has one diffusing and one non-fluorescent species, plus it implements analytical derivatives. The model may be denoted as: </p>
-<p>
-<img alt="\[ G(\tau)=G_\infty+\frac{1}{N}\cdot\left(\frac{1-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{trip}}\right)\cdot\left(1+\frac{\tau}{\tau_{diff}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-1/2} \]" src="./pic/form_29.png">
-</p>
+$$bmath:G(\tau)=G_\infty+\frac{1}{N}\cdot\left(\frac{1-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{trip}}\right)\cdot\left(1+\frac{\tau}{\tau_{diff}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{diff}}\right)^{-1/2} $$
+The background correction is performed by factor
+$$bmath:X_{back}=\frac{(I-B)^2}{I^2}.$$
 <p> The parameters are: </p>
 <ul>
 <li><img alt="$ G_\infty $" src="./pic/form_4.png">: offset of the correlation function</li>

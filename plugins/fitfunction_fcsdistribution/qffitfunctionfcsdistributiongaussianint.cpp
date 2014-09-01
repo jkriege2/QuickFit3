@@ -48,10 +48,20 @@ QFFitFunctionFCSDistributionIntGaussian::QFFitFunctionFCSDistributionIntGaussian
     #define FCSDLG_concentration 15
     addParameter(FloatNumber,  "diff_coeff1",             "center diffusion coefficient of distribution",          "D<sub>c</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
     #define FCSDLG_diff_coeff1 16
+    addParameter(FloatNumber,  "viscosity",               "sample viscosity",                                      "&eta;",                    "mPa*s",      "mPa&middot;s",           false,    true,        false,              QFFitFunction::NoError, false, 1.002,        0,        1e50,     0.02    );
+    #define FCSDLG_viscosity 17
+    addParameter(FloatNumber,  "temperature",             "sample temperature",                                      "&thetasym;",                 "°C",      "°C",                       false,    true,        false,              QFFitFunction::NoError, false, 20,        0,        1e50,     1    );
+    #define FCSDLG_temperature 18
+    addParameter(FloatNumber,  "hydrodyn_radius1",        "center hydrodynamic radius",                            "R<sub>H,c</sub>",          "nm",        "nm",                      false,    false,        false,              QFFitFunction::DisplayError, false, 1,           1,        1e10,     1,   0        );
+    #define FCSDLG_RH 19
+    addParameter(FloatNumber,  "hydrodyn_radius_sigma",   "distibution width of hydrodynamic radius",              "&sigma;(R<sub>H,c</sub>)", "nm",        "nm",                      false,    false,        false,              QFFitFunction::DisplayError, false, 1,           1,        1e10,     1,   0        );
+    #define FCSDLG_RH_sigma 20
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCSDLG_count_rate 17
+    #define FCSDLG_count_rate 21
+    addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
+    #define FCSDiff_background 22
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
-    #define FCSDLG_cpm 18
+    #define FCSDLG_cpm 23
 }
 
 QFFitFunctionFCSDistributionIntGaussian::~QFFitFunctionFCSDistributionIntGaussian()
@@ -84,6 +94,12 @@ double QFFitFunctionFCSDistributionIntGaussian::evaluate(double t, const double*
     const double tauD1_sigma=data[FCSDLG_dif_tau_sigma]/1.0e6;
     const double tau_min=data[FCSDLG_tau_range_min]/1.0e6;
     const double tau_max=data[FCSDLG_tau_range_max]/1.0e6;
+
+
+    const double background=data[FCSDiff_background];
+    const double cr=data[FCSDLG_count_rate];
+    double backfactor=qfSqr(cr-background)/qfSqr(cr);
+    if (fabs(cr)<1e-15) backfactor=1;
 
     double gamma=data[FCSDLG_focus_struct_fac];
     if (gamma==0) gamma=1;
@@ -141,9 +157,9 @@ double QFFitFunctionFCSDistributionIntGaussian::evaluate(double t, const double*
         } else if (nonfl_comp==2) {
             pre=(1.0-nf_theta1+nf_theta1*exp(-t/nf_tau1)-nf_theta2+nf_theta2*exp(-t/nf_tau2))/(1.0-nf_theta1-nf_theta2);
         }
-        return offset+pre/N*diff;
+        return offset+pre/N*diff*backfactor;
     } else {
-        return -1.0*exp(-0.5*sqr(t-tauD1)/tauD1_sigma/tauD1_sigma)/N;
+        return -1.0*exp(-0.5*sqr(t-tauD1)/tauD1_sigma/tauD1_sigma)/N*backfactor;
     }
 }
 
@@ -175,6 +191,13 @@ void QFFitFunctionFCSDistributionIntGaussian::calcParameter(double* data, double
     double ecps=0;
     //double cpm=data[FCSDLG_cpm];
     double ecpm=0;
+    double background=data[FCSDiff_background];
+    double ebackground=0;
+
+    double viscosity=data[FCSDLG_viscosity]/1.0e3;
+    double eviscosity=0;
+    double temperature=273.15+data[FCSDLG_temperature];
+    double etemperature=0;
 
     if (error) {
         eN=error[FCSDLG_n_particle];
@@ -189,6 +212,10 @@ void QFFitFunctionFCSDistributionIntGaussian::calcParameter(double* data, double
         ecps=error[FCSDLG_count_rate];
         ecpm=error[FCSDLG_cpm];
         etauD1_sigma=error[FCSDLG_dif_tau_sigma]/1.0e6;
+        ebackground=error[FCSDiff_background];
+        eviscosity=error[FCSDLG_viscosity]/1.0e3;
+        etemperature=error[FCSDLG_temperature];
+
     }
 
     // correct for invalid fractions
@@ -226,9 +253,14 @@ void QFFitFunctionFCSDistributionIntGaussian::calcParameter(double* data, double
     }
 
 
+    // calculate hydrodyn radii
+    data[FCSDLG_RH]=4.0*KBOLTZ*temperature*tauD1/sqr(wxy*1e-6)/6.0/M_PI/viscosity*1.0e9;
+    data[FCSDLG_RH_sigma]=4.0*KBOLTZ*temperature*tauD1_sigma/sqr(wxy*1e-6)/6.0/M_PI/viscosity*1.0e9;
+
     // calculate CPM = CPS/N
-    data[FCSDLG_cpm]=cps/N;
-    error[FCSDLG_cpm]=sqrt(sqr(ecps/N)+sqr(eN*cps/sqr(N)));
+    data[FCSDLG_cpm]=(cps-background)/N;
+    if (error) error[FCSDLG_cpm]=sqrt(sqr(ecps/N)+sqr(ebackground/N)+sqr(eN*(cps-background)/sqr(N)));
+
 }
 
 bool QFFitFunctionFCSDistributionIntGaussian::isParameterVisible(int parameter, const double* data) const {

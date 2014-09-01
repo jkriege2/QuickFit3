@@ -7,11 +7,16 @@
     <body>
         $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
 
+<h2>Model definition</h2>
 <p>This model function implements a 3D normal diffusion FCS model, where the diffusion times (and therefore also the hydrodynamic radii) are distributed according to a gaussian distribution. It also supports up to two non-fluorescent species.: </p>
-$$bmath:g(\tau)=G_\infty+\frac{1}{N}\cdot X_{nf}(\tau)\cdot\sum_{k=0}^{K\cdot N_{decades}}\cdot\exp\left[-\frac{1}{2}\cdot\left(\frac{\tau_{k}-\tau_{diff,c}}{\sigma(\tau_D)}\right)^2\right]\left(1+\frac{\tau}{\tau_{k}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{k}}\right)^{-1/2}$$
-<p> with </p>
-$$math:N_{nf}(\tau)= \frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}.$$
-<p>The parameters are:</p>
+$$bmath:g(\tau)=\frac{1}{N}\cdot X_{back}\cdot X_{nf}(\tau)\cdot\frac{\int_{\tau_{min}}^{\tau_{max}}p(\tau_D)\cdot\left(1+\frac{\tau}{\tau_D}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_D}\right)^{-1/2}\;\mathrm{d}\tau_D}{\int_{\tau_{min}}^{\tau_{max}}p(\tau_D)\;\mathrm{d}\tau_D}.$$
+ with a Gaussian distribution
+$$bmath:p(\tau_D)=\frac{1}{\sqrt{2\pi\sigma^2(\tau_D)}}\cdot\exp\left[-\frac{1}{2}\cdot\frac{(\tau_D-\tau_{diff,c})^2}{\sigma^2(\tau_D)}\right].$$
+and a photophysics (non-fluorescenct) factor
+$$bmath:X_{nf}(\tau)= \frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}.$$
+The background correction is performed by factor
+$$bmath:X_{back}=\frac{(I-B)^2}{I^2}.$$
+The parameters are:</p>
 <ul>
 <li>$$math:G_\infty$$: offset of the correlation function</li>
 <li>$$math:N$$: overall particle number (including currently dark particles, e.g. in triplet state)</li>
@@ -22,10 +27,10 @@ $$math:N_{nf}(\tau)= \frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{no
 <li>$$math:\gamma=\frac{z_0}{w_{xy}}$$: aspect ratio of the gaussian used to approximate the focus</li>
 <li>$$math:w_{xy}$$: lateral half axis of the focus gaussian</li>
 <li>$$math:z_0$$: longitudinal half axis of the focus gaussian</li>
-<li>$$math:K\cdot N_{decades}$$: number of $$math:\tau_k$$-values sampled, where $$math:N_{decades}$$ is the number of decades between $$math:\tau_{min}$$ and $$math:\tau_{max}$$ and $$math:K$$ is the number of samples per decade</li>
+<li>$$math:\tau_{min}$$ and $$math:\tau_{max}$$ are the integration limits</li>
 </ul>
-<p>The values $$math:\tau_k$$ used in the sum of this fitting function are logarithmically spaced between the given minimum and maximum values $$math:\tau_{min}$$ and $$math:\tau_{max}$$, i.e. $$bmath:\tau_k={10^{\log_{10}(\tau_{min})+k/K}$$</p>
-<p><b>Note:</b> This model is relatively complex, as for every evaluation a sum has to be calculated. So it is wise to use a fast fit algorithm in conjunction with this model, like e.g. <i><a href="$$fitalgorithm:help:fit_lmfit$$">$$fitalgorithm:name:fit_lmfit$$</a></i>.</p>
+$$FCS_SD_INTEGRATION$$
+
 <p>This model also calculates the diffusion coefficient, if the width $$math:w_{xy}$$ of the laser focus (xy plane) is known, as: </p>
 $$bmath:D=\frac{w_{xy}^2}{4\tau_D}$$
 <p> where $$math:\tau_D $$ is the diffusion time. Also the effective focal volume $$math:V_{eff}$$ is calculated: </p>
@@ -42,7 +47,7 @@ In addition also the hydrodynamic radius corresponding to $$math:\tau_{diff, c}$
 $$bmath:R_H(\tau_{diff,c})=\frac{4k_BT\cdot\tau_{diff,c}}{w_{xy}^2\cdot 6\pi\eta}$$
 where $$math:\eta$$ is the viscosity of the sample and $$math:T$$ is the sample temperature (in K) and $$math:k_B$$ is Boltzman's constant.
 
-<p>This model is based on ideas in the paper:<ul><li>Nibedita Pal, Sachin Dev Verma, Moirangthem Kiran Singh, and Sobhan Sen (2011): <b>Fluorescence Correlation Spectroscopy: An Efficient Tool for Measuring Size, Size-Distribution and Polydispersity of Microemulsion Droplets in Solution.</b> <i>Anal. Chem.</i> 83(20), pp 7736-7744, DOI: 10.1021/ac2012637</li></ul></p>
+<p>This model is based on ideas in the paper Ref. $$REF_PAL_FCSDIST</p>
 
 
     </body>

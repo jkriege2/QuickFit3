@@ -75,14 +75,27 @@ void MaxEntB040::setData(const double* taus, const double* correlation,\
     ///// model specific transformation of the ydata //////////
     switch (model)
     {
-        case 1:
-        double offset;
-        offset=param_list[5];
-        for (int i=0;i<m_Nd;i++)
-            {
-            m_ydata(i)=m_ydata(i)-offset;
+        case 1:{
+                const double offset=param_list[5];
+                for (int i=0;i<m_Nd;i++)
+                {
+                    m_ydata(i)=m_ydata(i)-offset;
+                }
+
             }
-        break;
+            break;
+        case 3:{
+                const double offset=param_list[0];
+                qDebug()<<"correct for DLS, offset="<<offset;
+                for (int i=0;i<m_Nd;i++)
+                {
+                    m_ydata(i)=sqrt(m_ydata(i)-offset);
+                    if (!QFFloatIsOK(m_ydata(i))) m_ydata(i)=0;
+                    qDebug()<<i<<m_ydata(i);
+                }
+
+            }
+            break;
 
     }
     ///////////////////////////////////////////////////////////
@@ -665,7 +678,7 @@ void MaxEntB040::evaluateModel(double * taus,double *modelEval,uint32_t N,\
                     sum=sum+dist[j]*exp(-taus[i]/distTaus[j]);
                 }
             } else {
-            sum=1.0/double(N);
+                sum=1.0/double(N);
             }
             modelEval[i]=A+sqr(sum);
             }

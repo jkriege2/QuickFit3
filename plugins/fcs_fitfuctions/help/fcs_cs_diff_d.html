@@ -3,8 +3,9 @@
 <body>
 $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 This plugin implements a 3D diffusion model for circle-scanning FCS$$ref:Petrasek:Zdenek Petrášek, Petra Schwille (2008): Precise Measurement of Diffusion Coefficients using Scanning Fluorescence Correlation Spectroscopy , Biophysical Journal, <b>94</b>(4), 1437–1448, <a href="http://dx.doi.org/10.1529/biophysj.107.108811">Doi: 10.1529/biophysj.107.108811</a>$$ the fitting routines in QuickFit. The model may be denoted as: 
-$$bmath:G(\tau)=G_\infty+\frac{1}{N}\cdot\left(\frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}\right)\cdot \left(1+\frac{4D\cdot\tau}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{4D\cdot\tau}{w_{z}^2}\right)^{-1/2}\cdot\exp\left(-\frac{R^2\cdot\sin^2(\pi f \tau)}{(w_{xy}^2/2)^2+D\tau}\right)$$
-
+$$bmath:G(\tau)=G_\infty+\frac{1}{N}\cdot X_{back}\cdot\left(\frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}\right)\cdot \left(1+\frac{4D\cdot\tau}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{4D\cdot\tau}{w_{z}^2}\right)^{-1/2}\cdot\exp\left(-\frac{R^2\cdot\sin^2(\pi f \tau)}{(w_{xy}^2/2)^2+D\tau}\right)$$
+The background correction is performed by factor
+$$bmath:X_{back}=\frac{(I-B)^2}{I^2}.$$
 
 The parameters are:
 <ul>

@@ -9,8 +9,9 @@ $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$
 
 
 This file implement a one-component 3D diffusion model which also includes a flow and a triplett term. The model may be denoted as:
-$$bmath:G(\tau)=G_\infty+\frac{1}{N}\cdot\frac{1}{(1+b/\mbox{cps})^2}\cdot\left(\frac{1-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{trip}}\right)\cdot\left(1+\frac{4D\tau}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{4D\tau}{\gamma^2w_{xy}^2}\right)^{-1/2}\cdot\exp\left(-\frac{v\tau}{w_{xy}\cdot\left(1+\frac{4D\tau}{w_{xy}^2}\right)\right)$$
-
+$$bmath:G(\tau)=G_\infty+\frac{1}{N}\cdot X_{back}\cdot\frac{1}{(1+b/\mbox{cps})^2}\cdot\left(\frac{1-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{trip}}\right)\cdot\left(1+\frac{4D\tau}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{4D\tau}{\gamma^2w_{xy}^2}\right)^{-1/2}\cdot\exp\left(-\frac{v\tau}{w_{xy}\cdot\left(1+\frac{4D\tau}{w_{xy}^2}\right)\right)$$
+The background correction is performed by factor
+$$bmath:X_{back}=\frac{(I-B)^2}{I^2}.$$
 <p> The parameters are: </p>
 <ul>
 <li>$$math:G_\infty$$  : offset of the correlation function</li>
