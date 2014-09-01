@@ -173,6 +173,7 @@
 		
 		
 		<h2>Implementation Details</h2>
+		<h3>The MaxEnt algorithm</h3>
 		<p>
 		As known from basics maximisation tasks, maximizing   <img src="./pic/Qfunctional.png"> can be done by satisfying the condition <img src="./pic/maxcond.png"> 
 		One key aspect of the implementation is the reduction of the higher dimensional problem to the singular space of the given matrix T, by computing the Singular Value Decomposition
@@ -207,7 +208,14 @@
 		in the paper by Richard K. Bryan.
 		</p>
 		
-	    
+	    <h3>Diffusion coefficient distributions</h3>
+		<p>
+		THis plugin calculates distributions of (diffusion) correlation times $$math:\tau_i$$. For FCS and DLS, these can be recalibrated to diffusion coefficients $$math:D_i$$. This is done, using additional parameters, such as the focus size $$math:w_{xy}$$ for FCS, or the scattering angle $$math:\Theta$$, the refactive index $$math:n$$ and the wavelength $$math:\lambda$$ for DLS in the following fashion:
+		<ul>
+		  <li><b>FCS:</b> $$bmath:D_i=\frac{w_{xy}^2}{4\tau_i}$$</li>
+		  <li><b>DLS:</b> $$bmath:D_i=\frac{1}{q^2\cdot \tau_i}$$ with the squared scattering vector $$bmath:q=\frac{4\pi n}{\lambda}\cdot\sin(\Theta/2)$$</li>
+		</ul>
+		</p>
 	    
 		
 		

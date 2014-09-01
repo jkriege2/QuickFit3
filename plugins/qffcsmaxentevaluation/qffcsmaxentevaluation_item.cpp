@@ -3,6 +3,7 @@
 #include "../interfaces/qfrdrfcsdatainterface.h"
 #include "qfmathtools.h"
 #include "libb040mem.h"
+#include "qffcstools.h"
 
 
 #define sqr(x) ((x)*(x))
@@ -21,6 +22,13 @@ QFFCSMaxEntEvaluationItem::~QFFCSMaxEntEvaluationItem() {
 QString QFFCSMaxEntEvaluationItem::getEvaluationResultID(int currentIndex, int model) const {
     if (currentIndex<0) return QString("%1_%2_m%3_runavg").arg(getType()).arg(getID()).arg(model);
     return QString("%1_%2_m%3_run%4").arg(getType()).arg(getID()).arg(model).arg(currentIndex);
+}
+
+bool QFFCSMaxEntEvaluationItem::hasSpecial(const QFRawDataRecord *r, const QString &resultID, const QString &paramid, double &value, double &error) const
+{
+    int index=getIndexFromEvaluationResultID(resultID);
+    return qfFCSHasSpecial(r, index, paramid, value, error);
+    return QFUsesResultsByIndexAndModelEvaluation::hasSpecial(r, resultID, paramid, value, error);
 }
 
 
@@ -151,39 +159,64 @@ double QFFCSMaxEntEvaluationItem::getWXY() const {
     return getFitValue("maxent_wxy");
 }
 
+double QFFCSMaxEntEvaluationItem::getWXY(QFRawDataRecord *r, int index, int model) const
+{
+    return getFitValue(r, index, model, "maxent_wxy");
+}
+
 void QFFCSMaxEntEvaluationItem::setLambda(double val)
 {
-    setFitValue("wavelength", wxy);
+    setFitValue("wavelength", val);
 }
 
 double QFFCSMaxEntEvaluationItem::getLambda() const
 {
-     return getFitValue("wavelength");
+    return getFitValue("wavelength");
+}
+
+double QFFCSMaxEntEvaluationItem::getLambda(QFRawDataRecord *r, int index, int model) const
+{
+    return getFitValue(r, index, model, "wavelength");
 }
 
 void QFFCSMaxEntEvaluationItem::setTheta(double val)
 {
-    setFitValue("dls_angle", wxy);
+    setFitValue("dls_angle", val);
 }
 
 double QFFCSMaxEntEvaluationItem::getTheta() const
 {
-     return getFitValue("dls_angle");
+    return getFitValue("dls_angle");
+}
+
+double QFFCSMaxEntEvaluationItem::getTheta(QFRawDataRecord *r, int index, int model) const
+{
+    return getFitValue(r, index, model, "dls_angle");
 }
 
 void QFFCSMaxEntEvaluationItem::setRefIndx(double val)
 {
-    setFitValue("refractive_index", wxy);
+    setFitValue("refractive_index", val);
 }
 
 double QFFCSMaxEntEvaluationItem::getRefIndx() const
 {
-     return getFitValue("refractive_index");
+    return getFitValue("refractive_index");
+}
+
+double QFFCSMaxEntEvaluationItem::getRefIndx(QFRawDataRecord *r, int index, int model) const
+{
+    return getFitValue(r, index, model, "refractive_index");
 }
 
 double QFFCSMaxEntEvaluationItem::getDLSQ() const
 {
-    return 4.0*M_PI*getRefIndx()/getLambda()*sin(getTheta()/180.0*M_PI/2.0);
+    return 4.0*M_PI*getRefIndx()/(getLambda()/1e3)*sin(getTheta()/180.0*M_PI/2.0);
+}
+
+double QFFCSMaxEntEvaluationItem::getDLSQ(QFRawDataRecord *r, int index, int model) const
+{
+    return 4.0*M_PI*getRefIndx(r, index, model)/(getLambda(r, index, model)/1e3)*sin(getTheta(r, index, model)/180.0*M_PI/2.0);
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -221,7 +254,23 @@ QVector<double> QFFCSMaxEntEvaluationItem::getDistributionDs(QFRawDataRecord *re
     QVector<double> res;
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
     if (data) {
-        res=getFitValueNumberArray(record, index, "maxent_D");
+        res=getFitValueNumberArray(record, index, "maxent_tau");
+
+        if (model!=3) {
+            const double wxy=getWXY(record, index, model);
+            for (uint32_t i=0; i<res.size(); i++) {
+                res[i]=wxy*wxy/1000000.0/(4.0*res[i]);
+            }
+        } else if (model==3) {
+            const double q2=qfSqr(getDLSQ(record, index, model));
+            //qDebug()<<"q2="<<q2<<"  n="<<getRefIndx(record, index, model)<<"  l="<<getLambda(record, index, model)<<"  theta="<<getTheta(record, index, model);
+            for (uint32_t i=0; i<res.size(); i++) {
+                const double t=res[i];
+                res[i]=1.0/(q2*t);
+                //qDebug()<<i<<t<<res[i];
+            }
+        }
+
     }
     return res;
 }
@@ -772,9 +821,17 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         getProject()->getServices()->log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(duration).arg(fitSuccess?tr("success"):tr("no convergence")));
 
         distDs=(double*)calloc(Ndist, sizeof(double));
-        double wxy=getWXY();
-        for (uint32_t i=0; i<Ndist; i++) {
-            distDs[i]=wxy*wxy/1000000.0/(4.0*distTaus[i]);
+        if (model!=3) {
+            const double wxy=getWXY();
+            for (uint32_t i=0; i<Ndist; i++) {
+                distDs[i]=wxy*wxy/1000000.0/(4.0*distTaus[i]);
+            }
+        } else if (model==3) {
+            const double q2=qfSqr(getDLSQ());
+            //qDebug()<<"q2="<<q2;
+            for (uint32_t i=0; i<Ndist; i++) {
+                distDs[i]=1.0/(q2*distTaus[i]);
+            }
         }
 
         // now store the results:

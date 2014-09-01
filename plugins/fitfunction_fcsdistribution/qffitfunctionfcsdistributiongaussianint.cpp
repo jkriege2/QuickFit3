@@ -28,7 +28,7 @@ QFFitFunctionFCSDistributionIntGaussian::QFFitFunctionFCSDistributionIntGaussian
     #define FCSDLG_n_particle 5
     addParameter(FloatNumber,  "1n_particle",             "1/particle number N",                                   "1/N",                      "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, false, 0.1,          1e-10,    1e5,      0.1, 0);
     #define FCSDLG_1n_particle 6
-    addParameter(FloatNumber,  "diff_tau1",               "center diffusion time of distribution",                 "&tau;<sub>D,c</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, false, 30,           1,        1e10,     1,   0        );
+    addParameter(FloatNumber,  "diff_tau1",               "center diffusion time of distribution",                 "&tau;<sub>D,c</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, false, 300,           1,        1e10,     1,   0        );
     #define FCSDLG_diff_tau1 7
     addParameter(FloatNumber,  "diff_tau_sigma",          "width of tauD  distribution",                           "&sigma;(&tau;<sub>D</sub>)", "usec",        "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 1,            1e-10,    1e10,     1,   0);
     #define FCSDLG_dif_tau_sigma 8
@@ -110,11 +110,9 @@ double QFFitFunctionFCSDistributionIntGaussian::evaluate(double t, const double*
 
     if (N>0) {
         register double diff=0.0;
-        register double diff1=0.0;
-        register double diff2=0.0;
-        /*register double diff3=0.0;
-        register double diff4=0.0;*/
-        register double error=0;
+        double diff1=0.0;
+        double diff2=0.0;
+        double error=0;
 
         QFFitFunctionFCSDistributionIntGaussian_intparam p;
         p.gamma=gamma;
@@ -128,16 +126,6 @@ double QFFitFunctionFCSDistributionIntGaussian::evaluate(double t, const double*
 
         gsl_error_handler_t * old_h=gsl_set_error_handler_off();
 
-       /* gsl_integration_qags(&F, 0, (tauD1-2.0*tauD1_sigma)*1e6, 0, 1e-7, wN, w, &diff1, &error);
-        //diff=diff+diff1;
-        gsl_integration_qags(&F, (tauD1-2.0*tauD1_sigma)*1e6, tauD1*1e6, 0, 1e-7, wN, w, &diff2, &error);
-        //diff=diff+diff1;
-        gsl_integration_qags(&F, tauD1*1e6, (tauD1+2.0*tauD1_sigma)*1e6, 0, 1e-7, wN, w, &diff3, &error);
-        //diff=diff+diff1;
-        gsl_integration_qagiu(&F, (tauD1+2.0*tauD1_sigma)*1e6, 0, 1e-7, wN, w, &diff4, &error);
-
-        diff=diff1+diff2+diff3+diff4;*/
-        //qDebug()<<tauD1*1e6<<tauD1_sigma*1e6<<diff<<"="<<diff1<<"+"<<diff2<<"+"<<diff3<<"+"<<diff4;
 
         gsl_integration_qags(&F, log(tau_min), log(tauD1), 0, 1e-7, wN, w, &diff1, &error);
         gsl_integration_qags(&F, log(tauD1), log(tau_max), 0, 1e-7, wN, w, &diff2, &error);

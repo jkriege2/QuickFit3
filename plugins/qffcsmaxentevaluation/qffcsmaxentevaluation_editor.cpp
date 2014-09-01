@@ -96,11 +96,7 @@ void QFFCSMaxEntEvaluationEditor::getPlotData(QFRawDataRecord *record, int index
             QVector<double> mem_D=eval->getDistributionDs(record, index, model);
             QVector<double> mem_dist=eval->getDistribution(record, index, model);
 
-            mem_D=mem_tau;
-            double wxy=eval->getFitValue(record, index, model, "maxent_wxy");
-            for (int i=0; i<mem_tau.size(); i++) {
-                mem_D[i]=wxy*wxy/1000000.0/4.0/mem_tau[i];
-            }
+
 
 
             if (option==0) {
@@ -155,7 +151,26 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     QHBoxLayout* lrange;
     edtWxy=new QFDoubleEdit(this);
     edtWxy->setRange(1e-3,1e10);
-    flAlgorithmParams->addRow(tr("<i>w<sub>xy</sub></i> [nm] <i>= </i>"), edtWxy);
+    flAlgorithmParams->addRow(labWxy=new QLabel(tr("<i>w<sub>xy</sub></i> [nm] <i>= </i>")), edtWxy);
+
+
+    edtRefIndx=new QFDoubleEdit(this);
+    edtRefIndx->setRange(0,1000);
+    flAlgorithmParams->addRow(labRefIndx=new QLabel(tr("<i>n = </i>")), edtRefIndx);
+    edtRefIndx->setVisible(false);
+    labRefIndx->setVisible(false);
+
+    edtTheta=new QFDoubleEdit(this);
+    edtTheta->setRange(0,180);
+    flAlgorithmParams->addRow(labTheta=new QLabel(tr("<i>&Theta;</i> [°] <i>= </i>")), edtTheta);
+    edtTheta->setVisible(false);
+    labTheta->setVisible(false);
+
+    edtLambda=new QFDoubleEdit(this);
+    edtLambda->setRange(0,10000);
+    flAlgorithmParams->addRow(labLambda=new QLabel(tr("<i>&lambda;</i> [nm] <i>= </i>")), edtLambda);
+    edtLambda->setVisible(false);
+    labLambda->setVisible(false);
 
 
     edtAlpha=new QFDoubleEdit(this);
@@ -320,8 +335,8 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomIn());
     tbPlotDistribution->addAction(pltDistribution->get_plotter()->get_actZoomOut());
     cmbXAxisType=new QComboBox(this);//(tr("show D-axis"));
-    cmbXAxisType->addItem(tr("time-axis"));
-    cmbXAxisType->addItem(tr("FCS diffusion coefficient"));
+    cmbXAxisType->addItem(tr("correlation time tau"));
+    cmbXAxisType->addItem(tr("FCS/DLS diffusion coefficient D"));
     chkShowRanges=new QCheckBox(tr("ranges"), this);
     tbPlotDistribution->addSeparator();
     tbPlotDistribution->addWidget(new QLabel("x-axis: "));
@@ -368,6 +383,10 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
     if (old) {
 
         disconnect(edtWxy, SIGNAL(valueChanged(double)), this, SLOT(wxyChanged(double)));
+        disconnect(edtTheta, SIGNAL(valueChanged(double)), this, SLOT(thetaChanged(double)));
+        disconnect(edtRefIndx, SIGNAL(valueChanged(double)), this, SLOT(nChanged(double)));
+        disconnect(edtLambda, SIGNAL(valueChanged(double)), this, SLOT(lambdaChanged(double)));
+        disconnect(edtTheta, SIGNAL(valueChanged(double)), this, SLOT(thetaChanged(double)));
         disconnect(edtAlpha, SIGNAL(valueChanged(double)), this, SLOT(alphaChanged(double)));
         disconnect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
         disconnect(edtNdist, SIGNAL(valueChanged(int)),this,SLOT(NdistChanged(int)));
@@ -388,6 +407,12 @@ void QFFCSMaxEntEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
     if (item) {
         dataEventsEnabled=false;
 
+        edtTheta->setValue(item->getTheta());
+        connect(edtTheta, SIGNAL(valueChanged(double)), this, SLOT(thetaChanged(double)));
+        edtRefIndx->setValue(item->getRefIndx());
+        connect(edtRefIndx, SIGNAL(valueChanged(double)), this, SLOT(nChanged(double)));
+        edtLambda->setValue(item->getLambda());
+        connect(edtLambda, SIGNAL(valueChanged(double)), this, SLOT(lambdaChanged(double)));
 
 
         edtWxy->setValue(item->getWXY());
@@ -452,6 +477,19 @@ void QFFCSMaxEntEvaluationEditor::writeSettings() {
 
 }
 
+void QFFCSMaxEntEvaluationEditor::modelChanged(int model)
+{
+    QFFCSByIndexAndModelEvaluationEditor::modelChanged(model);
+    edtWxy->setVisible(model!=3);
+    labWxy->setVisible(model!=3);
+    edtLambda->setVisible(model==3);
+    labLambda->setVisible(model==3);
+    edtTheta->setVisible(model==3);
+    labTheta->setVisible(model==3);
+    edtRefIndx->setVisible(model==3);
+    labRefIndx->setVisible(model==3);
+}
+
 
 
 void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
@@ -478,6 +516,9 @@ void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRec
         }
 
         edtWxy->setValue(eval->getWXY());
+        edtLambda->setValue(eval->getLambda());
+        edtRefIndx->setValue(eval->getRefIndx());
+        edtTheta->setValue(eval->getTheta());
         edtAlpha->setValue(eval->getAlpha());
         edtTauMin->setValue(eval->getTauMin());
         edtTauMax->setValue(eval->getTauMax());
@@ -493,9 +534,11 @@ void QFFCSMaxEntEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRec
         edtRange2Min->setValue(current->getProperty(QString("rdr%1_range2min").arg(eval->getHighlightedRecord()?eval->getHighlightedRecord()->getID():0), current->getProperty("range2min", 1e-3)).toDouble());
         edtRange2Max->setValue(current->getProperty(QString("rdr%1_range2max").arg(eval->getHighlightedRecord()?eval->getHighlightedRecord()->getID():0), current->getProperty("range2max", 1e-2)).toDouble());
         sumRangesChanged();
+        modelChanged(eval->getCurrentModel());
         dataEventsEnabled=oldde;
     }
     QFFCSByIndexAndModelEvaluationEditor::highlightingChanged(formerRecord, currentRecord);
+
 
 }
 
@@ -935,13 +978,6 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 QVector<double> mem_D=eval->getDistributionDs(record, index, model);
                 QVector<double> mem_dist=eval->getDistribution(record, index, model);
 
-                //if (mem_D.size()<mem_tau.size()) {
-                    mem_D=mem_tau;
-                    double wxy=eval->getWXY();
-                    for (int i=0; i<mem_tau.size(); i++) {
-                        mem_D[i]=wxy*wxy/1000000.0/4.0/mem_tau[i];
-                    }
-                //}
                 int c_disttau=-1;
                 int c_distD=-1;
                 int c_dist=-1;
@@ -986,7 +1022,7 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 g_dist->set_title("MaxEnt distribution");
                 if (cmbXAxisType->currentIndex()==1) {
                     g_dist->set_xColumn(c_distD);
-                    pltDistribution->getXAxis()->set_axisLabel(tr("diffusion coefficient $D$ [ï¿½mï¿½/s]"));
+                    pltDistribution->getXAxis()->set_axisLabel(tr("diffusion coefficient $D$ [\\mu m^2/s]"));
                 } else {
                     g_dist->set_xColumn(c_disttau);
                     pltDistribution->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
@@ -1349,6 +1385,42 @@ void QFFCSMaxEntEvaluationEditor::wxyChanged(double wxy) {
     if (!current->getHighlightedRecord()) return;
     QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
     if (data) data->setWXY(wxy);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    displayData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSMaxEntEvaluationEditor::nChanged(double wxy)
+{
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    if (data) data->setRefIndx(wxy);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    displayData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSMaxEntEvaluationEditor::lambdaChanged(double wxy)
+{
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    if (data) data->setLambda(wxy);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    displayData();
+    QApplication::restoreOverrideCursor();
+}
+
+void QFFCSMaxEntEvaluationEditor::thetaChanged(double wxy)
+{
+    if (!dataEventsEnabled) return;
+    if (!current) return;
+    if (!current->getHighlightedRecord()) return;
+    QFFCSMaxEntEvaluationItem* data=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    if (data) data->setTheta(wxy);
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     displayData();
     QApplication::restoreOverrideCursor();

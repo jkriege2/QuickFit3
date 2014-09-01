@@ -69,7 +69,7 @@ double QFFitFunctionDLSG2inD::evaluate(double t, const double* data) const {
     const double offset=data[DLSG2_offset];
 
     const double n=data[DLSG2_refractive];
-    const double theta=data[DLSG2_angle]/180*M_PI;
+    const double theta=data[DLSG2_angle]/180.0*M_PI;
     const double lambda=data[DLSG2_wavelength]/1e3;
     const double q=4.0*M_PI*n/lambda*sin(theta/2.0);
     const double q2=sqr(q);
@@ -96,7 +96,7 @@ void QFFitFunctionDLSG2inD::calcParameter(double* data, double* error) const {
 
     const double n=data[DLSG2_refractive];
     double en=0;
-    const double theta=data[DLSG2_angle]/180*M_PI;
+    const double theta=data[DLSG2_angle]/180.0*M_PI;
     double etheta=0;
     const double lambda=data[DLSG2_wavelength]/1e3;
     double elambda=0;

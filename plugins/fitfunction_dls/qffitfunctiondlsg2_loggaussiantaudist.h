@@ -1,5 +1,5 @@
-#ifndef QFFitFunctionDLSG2NormTauDist_H
-#define QFFitFunctionDLSG2NormTauDist_H
+#ifndef QFFitFunctionDLSG2LogNormTauDist_H
+#define QFFitFunctionDLSG2LogNormTauDist_H
 #include "qfpluginfitfunction.h"
 #include <gsl/gsl_integration.h>
 #include <gsl/gsl_errno.h>
@@ -10,16 +10,16 @@
     \ingroup qf3fitfunp_fitfunctions_dls
 
 */
-class QFFitFunctionDLSG2NormTauDist: public QFFitFunction {
+class QFFitFunctionDLSG2LogNormTauDist: public QFFitFunction {
     public:
-        QFFitFunctionDLSG2NormTauDist();
-        virtual ~QFFitFunctionDLSG2NormTauDist();
+        QFFitFunctionDLSG2LogNormTauDist();
+        virtual ~QFFitFunctionDLSG2LogNormTauDist();
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("DLS: G2 autocorrelation, normally distributed correlation times [num_int]"); };
+        virtual QString name() const { return QString("DLS: G2 autocorrelation, log-normally distributed correlation times [num_int]"); };
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("DLS: G2, norm-al distribution of tau [num_int]"); };
+        virtual QString shortName() const { return QObject::tr("DLS: G2, log-norm distribution of tau [num_int]"); };
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("dls_g2_int_taunormdist"); };
+        virtual QString id() const { return QString("dls_g2_int_taulognormdist"); };
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
@@ -42,4 +42,4 @@ class QFFitFunctionDLSG2NormTauDist: public QFFitFunction {
 
 };
 
-#endif // QFFitFunctionDLSG2NormTauDist_H
+#endif // QFFitFunctionDLSG2LogNormTauDist_H

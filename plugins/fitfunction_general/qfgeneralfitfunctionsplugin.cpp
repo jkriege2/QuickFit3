@@ -1,5 +1,6 @@
 #include "qfgeneralfitfunctionsplugin.h"
 #include "qffitfunctiongeneralgaussianvar.h"
+#include "qffitfunctiongeneralskewgaussianvar.h"
 #include "qffitfunctiongeneral2gaussianvar.h"
 #include "qffitfunctiongeneral3gaussianvar.h"
 #include "qffitfunctiongeneralsigmoid.h"
@@ -23,6 +24,7 @@
 QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     QStringList res;
     res<<"gen_gaussian_sqrte";
+    res<<"gen_skewgaussian_sqrte";
     res<<"gen_gaussiandist_sqrte";
     res<<"gen_2gaussian_sqrte";
     res<<"gen_3gaussian_sqrte";
@@ -48,6 +50,8 @@ QFFitFunction* QFGeneralFitFunctionsPlugin::get(QString id, QObject* parent) con
         return new QFFitFunctionGeneralSigmoid();
     } else if (id=="gen_gaussian_sqrte") {
         return new QFFitFunctionGeneralGaussianVar();
+    } else if (id=="gen_skewgaussian_sqrte") {
+        return new QFFitFunctionGeneralSkewGaussianVar();
     } else if (id=="gen_gaussiandist_sqrte") {
         return new QFFitFunctionGeneralGaussianDistVar();
     } else if (id=="gen_2gaussian_sqrte") {

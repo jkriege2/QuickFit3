@@ -1,4 +1,4 @@
-#include "qffitfunctiondlsg2_gaussiantaudist.h"
+#include "qffitfunctiondlsg2_loggaussiantaudist.h"
 
 #include <cmath>
 #include "qfmathtools.h"
@@ -8,7 +8,7 @@
 #define pow5(x) ((x)*(x)*(x)*(x)*(x))
 
 
-QFFitFunctionDLSG2NormTauDist::QFFitFunctionDLSG2NormTauDist() {
+QFFitFunctionDLSG2LogNormTauDist::QFFitFunctionDLSG2LogNormTauDist() {
     wN=1000;
     w = gsl_integration_workspace_alloc (wN);
     //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialFix, initialValue, minValue, maxValue, inc, absMin, absMax
@@ -19,8 +19,8 @@ QFFitFunctionDLSG2NormTauDist::QFFitFunctionDLSG2NormTauDist() {
 
     addParameter(FloatNumber,  "tau1",                    "correlation time 1",                                    "&tau;<sub>1</sub>",        "µs",         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 1000,         1e-10,    1e50,     1    );
     #define DLSG2_tau1 2
-    addParameter(FloatNumber,  "tau_sigma",               "width of tau distribution",                             "&sigma;(&tau;<sub>D</sub>)", "usec",        "&mu;s",               true,      true,         true,              QFFitFunction::DisplayError, false, 100,          1e-10,    1e50,     1    );
-    #define DLSG2_tau1_sigma 3
+    addParameter(FloatNumber,  "b",                       "width parameter of tau distribution",                   "b",                        "ln(sec)",    "ln(sec)",                true,      true,         true,              QFFitFunction::DisplayError, false, 1,          1e-10,    1e50,     1    );
+    #define DLSG2_b 3
 
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 1,            -10,      10,       0.1  );
     #define DLSG2_offset 4
@@ -44,31 +44,31 @@ QFFitFunctionDLSG2NormTauDist::QFFitFunctionDLSG2NormTauDist() {
 
 }
 
-QFFitFunctionDLSG2NormTauDist::~QFFitFunctionDLSG2NormTauDist()
+QFFitFunctionDLSG2LogNormTauDist::~QFFitFunctionDLSG2LogNormTauDist()
 {
     if (w) gsl_integration_workspace_free (w);
 }
 
 
-struct QFFitFunctionDLSG2NormTauDist_intparam {
+struct QFFitFunctionDLSG2LogNormTauDist_intparam {
     double tau;
     double tauC;
-    double tauSigma;
+    double b;
 };
 
-double QFFitFunctionDLSG2NormTauDist_f(double x, void * params) {
-    const QFFitFunctionDLSG2NormTauDist_intparam* p = (QFFitFunctionDLSG2NormTauDist_intparam*)params;
+double QFFitFunctionDLSG2LogNormTauDist_f(double x, void * params) {
+    const QFFitFunctionDLSG2LogNormTauDist_intparam* p = (QFFitFunctionDLSG2LogNormTauDist_intparam*)params;
     const double expx=exp(x);
-    return exp(-0.5*qfSqr((expx-p->tauC)/p->tauSigma))/sqrt(2.0*M_PI*qfSqr(p->tauSigma))*exp(-p->tau/expx);
+    return exp(-0.5*qfSqr((x-log(p->tauC))/p->b))/sqrt(2.0*M_PI*qfSqr(p->b*expx))*exp(-p->tau/expx);
 }
 
 
-double QFFitFunctionDLSG2NormTauDist::evaluate(double t, const double* data) const {
+double QFFitFunctionDLSG2LogNormTauDist::evaluate(double t, const double* data) const {
     const double epsilon=data[DLSG2_epsilon];
     const double A=data[DLSG2_A];
     const double tau1=data[DLSG2_tau1]/1e6;
     const double offset=data[DLSG2_offset];
-    const double tau1_sigma=data[DLSG2_tau1_sigma]/1.0e6;
+    const double b=data[DLSG2_b];
     const double tau_min=data[DLSG2_tau_range_min]/1.0e6;
     const double tau_max=data[DLSG2_tau_range_max]/1.0e6;
 
@@ -79,13 +79,13 @@ double QFFitFunctionDLSG2NormTauDist::evaluate(double t, const double* data) con
         double diff2=0.0;
         double error=0;
 
-        QFFitFunctionDLSG2NormTauDist_intparam p;
+        QFFitFunctionDLSG2LogNormTauDist_intparam p;
         p.tau=t;
         p.tauC=tau1;
-        p.tauSigma=tau1_sigma;
+        p.b=b;
 
         gsl_function F;
-        F.function = &QFFitFunctionDLSG2NormTauDist_f;
+        F.function = &QFFitFunctionDLSG2LogNormTauDist_f;
         F.params = &p;
 
         gsl_error_handler_t * old_h=gsl_set_error_handler_off();
@@ -104,12 +104,12 @@ double QFFitFunctionDLSG2NormTauDist::evaluate(double t, const double* data) con
 
         return offset+epsilon+sqr(A*g1);
     } else {
-        return -exp(-0.5*sqr(t-tau1)/tau1_sigma/tau1_sigma)*A+offset+epsilon;
+        return -exp(-0.5*qfSqr((log(t)-log(tau1))/b))*A+offset+epsilon;
     }
 }
 
 
-void QFFitFunctionDLSG2NormTauDist::calcParameter(double* data, double* error) const {
+void QFFitFunctionDLSG2LogNormTauDist::calcParameter(double* data, double* error) const {
     const double tau1=data[DLSG2_tau1]/1e6;
     double etau1=0;
 
@@ -147,15 +147,15 @@ void QFFitFunctionDLSG2NormTauDist::calcParameter(double* data, double* error) c
 
 }
 
-bool QFFitFunctionDLSG2NormTauDist::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionDLSG2LogNormTauDist::isParameterVisible(int parameter, const double* data) const {
     return true;
 }
 
-unsigned int QFFitFunctionDLSG2NormTauDist::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionDLSG2LogNormTauDist::getAdditionalPlotCount(const double* params) {
     return 1;
 }
 
-QString QFFitFunctionDLSG2NormTauDist::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionDLSG2LogNormTauDist::transformParametersForAdditionalPlot(int plot, double* params) {
     if (plot==0) {
         params[DLSG2_A]=-1.0*fabs(params[DLSG2_A]);
         return "distribution";

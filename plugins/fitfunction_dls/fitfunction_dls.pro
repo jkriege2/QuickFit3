@@ -14,13 +14,15 @@ HEADERS += qfpfitfunctionsdls.h \
            qffitfunctiondlsg2.h \
     qffitfunctiondlsg2ind.h \
     qffitfunctiondlsg2indext.h \
-    qffitfunctiondlsg2_gaussiantaudist.h
+    qffitfunctiondlsg2_gaussiantaudist.h \
+    qffitfunctiondlsg2_loggaussiantaudist.h
 
 SOURCES += qfpfitfunctionsdls.cpp\
            qffitfunctiondlsg2.cpp \
     qffitfunctiondlsg2ind.cpp \
     qffitfunctiondlsg2indext.cpp \
-    qffitfunctiondlsg2_gaussiantaudist.cpp
+    qffitfunctiondlsg2_gaussiantaudist.cpp \
+    qffitfunctiondlsg2_loggaussiantaudist.cpp
 
 FORMS =
 

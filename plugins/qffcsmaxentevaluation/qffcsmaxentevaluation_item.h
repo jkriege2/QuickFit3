@@ -77,14 +77,24 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation,
         void setWXY(double wxy);
         /** \brief return the current wxy value in nanometers */
         double getWXY() const;
+        double getWXY(QFRawDataRecord* r, int index, int model) const;
 
         void setLambda(double val);
         double getLambda() const;
+        double getLambda(QFRawDataRecord* r, int index, int model) const;
         void setTheta(double val);
         double getTheta() const;
+        double getTheta(QFRawDataRecord* r, int index, int model) const;
         void setRefIndx(double val);
         double getRefIndx() const;
+        double getRefIndx(QFRawDataRecord* r, int index, int model) const;
+        /** \brief DLS q-value
+         *
+         *  \f[ q=\frac{4\pi n}{\lambda}\Cdot\sin(\Theta/2) \f]
+         *  returned in units of 1/micron!!!
+         */
         double getDLSQ() const;
+        double getDLSQ(QFRawDataRecord* r, int index, int model) const;
 
 
 
@@ -133,6 +143,19 @@ class QFFCSMaxEntEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation,
 
         virtual QString getEvaluationResultID(int currentIndex, int model) const;
         using QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID;
+
+        /*! \brief allows to draw certain fit parameters from other sources (e.g. copy a property of the underlying record
+
+            \param r record this appplies to
+            \param resultID the result ID which to access in the raw data records result store
+            \param paramid the parameter we are looking up
+            \param[out] value in this parameter the value is returned, if the function returns \c true
+            \param[out] error in this parameter the value' error is returned, if the function returns \c true
+            \return \c true if a special value is found. In that case it returns the value in \a value and \a error
+
+         */
+        virtual bool hasSpecial(const QFRawDataRecord* r, const QString& resultID, const QString& paramid, double& value, double& error) const;
+
 protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */

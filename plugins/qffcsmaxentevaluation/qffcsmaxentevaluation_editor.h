@@ -85,6 +85,9 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
     protected slots:
         void alphaChanged(double alpha);
         void wxyChanged(double wxy);
+        void nChanged(double wxy);
+        void lambdaChanged(double wxy);
+        void thetaChanged(double wxy);
         void weightsChanged(int weights);
         void NdistChanged(int Ndist);
         void NumIterChanged(int NumIter);
@@ -99,6 +102,8 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         virtual void readSettings();
         /** \brief write the settings */
         virtual void writeSettings();
+
+        virtual void modelChanged(int model);
 
 
         /** \brief activated when the highlighted record changed */
@@ -153,6 +158,15 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         QLabel* labRange2;
 
         QFDoubleEdit* edtWxy;
+        QLabel* labWxy;
+
+        QFDoubleEdit* edtRefIndx;
+        QLabel* labRefIndx;
+        QFDoubleEdit* edtTheta;
+        QLabel* labTheta;
+        QFDoubleEdit* edtLambda;
+        QLabel* labLambda;
+
         QComboBox* cmbXAxisType;
         QCheckBox* chkShowRanges;
         QFRDRImageToRunPreview* pltOverview;

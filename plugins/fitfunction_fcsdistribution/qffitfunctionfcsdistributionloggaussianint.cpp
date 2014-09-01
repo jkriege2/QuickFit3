@@ -28,7 +28,7 @@ QFFitFunctionFCSDistributionIntLogGaussian::QFFitFunctionFCSDistributionIntLogGa
     #define FCSDLG_n_particle 5
     addParameter(FloatNumber,  "1n_particle",             "1/particle number N",                                   "1/N",                      "",            "",                      false,     false,        false,             QFFitFunction::DisplayError, false, 0.1,          1e-10,    1e5,      0.1, 0);
     #define FCSDLG_1n_particle 6
-    addParameter(FloatNumber,  "diff_tau1",               "center diffusion time of distribution",                 "&tau;<sub>D,c</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, false, 30,           1,        1e10,     1,   0        );
+    addParameter(FloatNumber,  "diff_tau1",               "center diffusion time of distribution",                 "&tau;<sub>D,c</sub>",      "usec",        "&mu;s",                 true,      true,         true,              QFFitFunction::DisplayError, false, 300,           1,        1e10,     1,   0        );
     #define FCSDLG_diff_tau1 7
     addParameter(FloatNumber,  "b",                       "width parameter distribution",                          "b",                        "ln(sec)",    "ln(sec)",                true,      true,         true,              QFFitFunction::DisplayError, false, 1,            1e-10,    1e10,     1,   0);
     #define FCSDLG_b 8
@@ -103,9 +103,9 @@ double QFFitFunctionFCSDistributionIntLogGaussian::evaluate(double t, const doub
 
     if (N>0) {
         register double diff=0.0;
-        register double diff1=0.0;
-        register double diff2=0.0;
-        register double error=0;
+        double diff1=0.0;
+        double diff2=0.0;
+        double error=0;
 
         QFFitFunctionFCSDistributionIntLogGaussian_intparam p = {t, tauD1, b, gamma};
         p.gamma=gamma;

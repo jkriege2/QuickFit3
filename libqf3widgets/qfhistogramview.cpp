@@ -19,7 +19,6 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-
 #include "qfhistogramview.h"
 #include <QDebug>
 #include <math.h>
@@ -44,6 +43,12 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QProgressDialog>
 #include "datatools.h"
 #include "jkqtptools.h"
+#include "qffitalgorithm.h"
+#include "qffitalgorithmmanager.h"
+#include "qffitfunction.h"
+#include "qffitfunctionmanager.h"
+#include "qffitfunctionplottools.h"
+
 
 QFHistogramView::QFHistogramView(QWidget *parent) :
     QWidget(parent)
@@ -106,8 +111,20 @@ void QFHistogramView::createWidgets() {
     flHistSet->addRow(tr("log-scale:"), chkLogHistogram);
     chkNormalizedHistograms=new QCheckBox("", grpHistogramSettings);
     flHistSet->addRow(tr("normalized:"), chkNormalizedHistograms);
-    chkHistogramRangeAuto=new QCheckBox("auto", grpHistogramSettings);
-    flHistSet->addRow(tr("range:"), chkHistogramRangeAuto);
+    chkHistogramRangeAuto=new QRadioButton("auto", grpHistogramSettings);
+    chkHistogramRangeRelaxAuto=new QRadioButton("relaxed auto", grpHistogramSettings);
+    chkHistogramRangeManual=new QRadioButton("manual", grpHistogramSettings);
+    QHBoxLayout* layradAuto=new QHBoxLayout();
+    layradAuto->addWidget(chkHistogramRangeManual);
+    layradAuto->addWidget(chkHistogramRangeAuto);
+    layradAuto->addWidget(chkHistogramRangeRelaxAuto);
+    layradAuto->addStretch();
+    flHistSet->addRow(tr("range:"), layradAuto);
+    edtHistogramRelaxedRangePercent=new QDoubleSpinBox(this);
+    edtHistogramRelaxedRangePercent->setRange(0,100);
+    edtHistogramRelaxedRangePercent->setSuffix(" %");
+    edtHistogramRelaxedRangePercent->setValue(5);
+    flHistSet->addRow(tr("relaxed percentil:"), edtHistogramRelaxedRangePercent);
     edtHistogramMin=new QFDoubleEdit(this);
     edtHistogramMin->setCheckBounds(false, false);
     edtHistogramMin->setValue(0);
@@ -121,9 +138,17 @@ void QFHistogramView::createWidgets() {
     coll->addStretch();
     coll->setContentsMargins(0,0,0,0);
     flHistSet->addRow(QString(""), coll);
+
+
+    cmbFitFunction=new QFFitFunctionComboBox(this);
+    cmbFitFunction->updateFitFunctions("gen_,gendist_,dist_");
+    cmbFitFunction->setCurrentFitFunction("gen_gaussian_sqrte");
+    flHistSet->addRow(tr("distribution fit:"), cmbFitFunction);
+
+
     chkKey=new QCheckBox(this);
     chkKey->setChecked(true);
-    flHistSet->addRow(tr("show key"), chkKey);
+    flHistSet->addRow(tr("show key:"), chkKey);
 
     // HISTOGRAM PLOTS ///////////////////////////////////////////////////////////////////////
     splitterHistogram=new QVisibleHandleSplitter(this);
@@ -145,12 +170,15 @@ void QFHistogramView::createWidgets() {
     tabHistogramParameters->setCellCreate(1, 0, tr("average"));
     tabHistogramParameters->setCellCreate(2, 0, tr("median"));
     tabHistogramParameters->setCellCreate(3, 0, tr("std. dev. &sigma;"));
-    tabHistogramParameters->setCellCreate(4, 0, tr("min"));
-    tabHistogramParameters->setCellCreate(5, 0, tr("25% quantile"));
-    tabHistogramParameters->setCellCreate(6, 0, tr("75% quantile"));
-    tabHistogramParameters->setCellCreate(7, 0, tr("max"));
-    tabHistogramParameters->setCellCreate(8, 0, tr("skewness &gamma;<sub>1</sub>"));
-    tabHistogramParameters->setCellCreate(9, 0, tr("invalid values"));
+    tabHistogramParameters->setCellCreate(4, 0, tr("norm. median abs. dev. NMAD"));
+    tabHistogramParameters->setCellCreate(5, 0, tr("min"));
+    tabHistogramParameters->setCellCreate(6, 0, tr("25% quantile"));
+    tabHistogramParameters->setCellCreate(7, 0, tr("75% quantile"));
+    tabHistogramParameters->setCellCreate(8, 0, tr("max"));
+    tabHistogramParameters->setCellCreate(9, 0, tr("skewness &gamma;<sub>1</sub>"));
+    tabHistogramParameters->setCellCreate(10, 0, tr("invalid values"));
+    tabHistogramParameters->setCellCreate(11, 0, tr("Gauss-fit: mean"));
+    tabHistogramParameters->setCellCreate(12, 0, tr("Gauss-fit: &sigma;"));
     tabHistogramParameters->setReadonly(true);
 
     tvHistogramParameters->setModel(tabHistogramParameters);
@@ -259,9 +287,13 @@ void QFHistogramView::connectParameterWidgets(bool connectTo) {
             connect(chkNormalizedHistograms, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
             connect(spinHistogramBins, SIGNAL(valueChanged(int)), this, SLOT(histogramSettingsChanged()));
             connect(chkHistogramRangeAuto, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+            connect(chkHistogramRangeRelaxAuto, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+            connect(chkHistogramRangeManual, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
             connect(edtHistogramMin, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
+            connect(edtHistogramRelaxedRangePercent, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
             connect(edtHistogramMax, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
             connect(chkKey, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+            connect(cmbFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(histogramSettingsChanged()));
         //}
     } else {
         //connectParameterWidgetsCounter++;
@@ -269,9 +301,13 @@ void QFHistogramView::connectParameterWidgets(bool connectTo) {
         disconnect(chkNormalizedHistograms, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
         disconnect(spinHistogramBins, SIGNAL(valueChanged(int)), this, SLOT(histogramSettingsChanged()));
         disconnect(chkHistogramRangeAuto, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+        disconnect(chkHistogramRangeRelaxAuto, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+        disconnect(chkHistogramRangeManual, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
         disconnect(edtHistogramMin, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
+        disconnect(edtHistogramRelaxedRangePercent, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
         disconnect(edtHistogramMax, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
         disconnect(chkKey, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
+        disconnect(cmbFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(histogramSettingsChanged()));
     }
 }
 
@@ -292,7 +328,9 @@ void QFHistogramView::writeQFProperties(QFProperties *current, const QString &pr
     current->setQFProperty(prefix+QString("log_%1_%2").arg(egroup).arg(param), getLog(), false, false);
     current->setQFProperty(prefix+QString("rauto_%1_%2").arg(egroup).arg(param), getAutorange(), false, false);
     current->setQFProperty(prefix+QString("showkey_%1_%2").arg(egroup).arg(param), chkKey->isChecked(), false, false);
-    if (!getAutorange()) {
+    current->setQFProperty(prefix+QString("distfit_%1_%2").arg(egroup).arg(param), cmbFitFunction->currentFitFunctionID(), false, false);
+    current->setQFProperty(prefix+QString("rangepercent_%1_%2").arg(egroup).arg(param), edtHistogramRelaxedRangePercent->value(), false, false);
+    if (chkHistogramRangeManual->isChecked()) {
         current->setQFProperty(prefix+QString("rmin_%1_%2").arg(egroup).arg(param), getMin(), false, false);
         current->setQFProperty(prefix+QString("rmax_%1_%2").arg(egroup).arg(param), getMax(), false, false);
     }
@@ -305,7 +343,9 @@ void QFHistogramView::readQFProperties(QFProperties *current, const QString &pre
     setLog(current->getProperty(prefix+QString("log_%1_%2").arg(egroup).arg(param), false).toBool());
     setAutorange(current->getProperty(prefix+QString("rauto_%1_%2").arg(egroup).arg(param), true).toBool());
     chkKey->setChecked(current->getProperty(prefix+QString("showkey_%1_%2").arg(egroup).arg(param), true).toBool());
-    if (!getAutorange()) {
+    cmbFitFunction->setCurrentFitFunction(current->getProperty(prefix+QString("distfit_%1_%2").arg(egroup).arg(param), "gen_gaussian_sqrte").toString());
+    edtHistogramRelaxedRangePercent->setValue(current->getProperty(prefix+QString("rangepercent_%1_%2").arg(egroup).arg(param), 5).toDouble());
+    if (chkHistogramRangeManual->isChecked()) {
         setMin(current->getProperty(prefix+QString("rmin_%1_%2").arg(egroup).arg(param), 0).toDouble());
         setMax(current->getProperty(prefix+QString("rmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
     }
@@ -401,8 +441,9 @@ void QFHistogramView::replotHistogram() {
 /** \brief recalculate histogram over all pixels */
 void QFHistogramView::updateHistogram(bool replot, int which) {
 
-    edtHistogramMin->setEnabled(!chkHistogramRangeAuto->isChecked());
-    edtHistogramMax->setEnabled(!chkHistogramRangeAuto->isChecked());
+    edtHistogramMin->setEnabled(chkHistogramRangeManual->isChecked());
+    edtHistogramMax->setEnabled(chkHistogramRangeManual->isChecked());
+    edtHistogramRelaxedRangePercent->setEnabled(chkHistogramRangeRelaxAuto->isChecked());
 
     pltParamHistogram->set_doDrawing(false);
     tvHistogramParameters->setModel(NULL);
@@ -450,6 +491,8 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
     }
     double amin=0;
     double amax=0;
+    double ramin=0;
+    double ramax=0;
     bool first=true;
     for (int hh=histStart; hh<histEnd; hh++) {
         //qDebug()<<hh<<histograms.size();
@@ -466,17 +509,23 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                         datasize++;
                     }
                 }
-                double dmin, dmax;
+                double dmin, dmax, q5min,q5max;
                 statisticsSort(datahist, datasize);
                 //datasize=statisticsFilterGoodFloat(datahist, datasize);
                 dmin=statisticsSortedMin(datahist, datasize);
                 dmax=statisticsSortedMax(datahist, datasize);
+                q5min=statisticsSortedQuantile(datahist, datasize, edtHistogramRelaxedRangePercent->value()/100.0);
+                q5max=statisticsSortedQuantile(datahist, datasize, (100.0-edtHistogramRelaxedRangePercent->value())/100.0);
                 if (first) {
                     amin=dmin;
                     amax=dmax;
+                    ramin=q5min;
+                    ramax=q5max;
                 } else {
                     amin=qMin(amin, dmin);
                     amax=qMax(amax, dmax);
+                    ramin=qMin(ramin, q5min);
+                    ramax=qMax(ramax, q5max);
                 }
                 first=false;
                 free(datahist);
@@ -501,6 +550,14 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                             datasize++;
                         }
                     }
+                } else if (chkHistogramRangeRelaxAuto->isChecked() && hh==0){
+                    for (register int32_t i=0; i<imageSize; i++) {
+                        const double v=hist.data[i];
+                        if (statisticsFloatIsOK(v)) {
+                            datahist[i]=v;
+                            datasize++;
+                        }
+                    }
                 } else {
                     for (register int32_t i=0; i<imageSize; i++) {
                         const double v=hist.data[i];
@@ -513,7 +570,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
 
 
                 statisticsSort(datahist, datasize);
-                double dmean, dstd, dmin, dmax, dmedian, dq25, dq75, dskew;
+                double dmean, dstd, dmin, dmax, dmedian, dq25, dq75, dskew, dnmad;
                 dmean=statisticsAverageVariance(dstd, datahist, datasize);
                 dstd=sqrt(dstd);
                 dmin=statisticsSortedMin(datahist, datasize);
@@ -522,22 +579,31 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 dq25=statisticsSortedQuantile(datahist, datasize, 0.25);
                 dq75=statisticsSortedQuantile(datahist, datasize, 0.75);
                 dskew=statisticsSkewness(datahist, datasize);
+                dnmad=statisticsSortedNMAD(datahist, datasize);
                 tabHistogramParameters->setCellCreate(0, hh+1, datasize);
                 tabHistogramParameters->setCellCreate(1, hh+1, dmean);
                 tabHistogramParameters->setCellCreate(2, hh+1, dmedian);
                 tabHistogramParameters->setCellCreate(3, hh+1, dstd);
-                tabHistogramParameters->setCellCreate(4, hh+1, dmin);
-                tabHistogramParameters->setCellCreate(5, hh+1, dq25);
-                tabHistogramParameters->setCellCreate(6, hh+1, dq75);
-                tabHistogramParameters->setCellCreate(7, hh+1, dmax);
-                tabHistogramParameters->setCellCreate(8, hh+1, dskew);
-                tabHistogramParameters->setCellCreate(9, hh+1, imageSize-datasize);
+                tabHistogramParameters->setCellCreate(4, hh+1, dnmad);
+                tabHistogramParameters->setCellCreate(5, hh+1, dmin);
+                tabHistogramParameters->setCellCreate(6, hh+1, dq25);
+                tabHistogramParameters->setCellCreate(7, hh+1, dq75);
+                tabHistogramParameters->setCellCreate(8, hh+1, dmax);
+                tabHistogramParameters->setCellCreate(9, hh+1, dskew);
+                tabHistogramParameters->setCellCreate(10, hh+1, imageSize-datasize);
+                int rowcnt=11;
                 tabHistogramParameters->setColumnTitle(hh+1, hist.name);
 
                 if (chkHistogramRangeAuto->isChecked() && hh==0) {
                     connectParameterWidgets(false);
                     edtHistogramMin->setValue(amin);
                     edtHistogramMax->setValue(amax);
+                    connectParameterWidgets(true);
+                }
+                if (chkHistogramRangeRelaxAuto->isChecked() && hh==0) {
+                    connectParameterWidgets(false);
+                    edtHistogramMin->setValue(ramin);
+                    edtHistogramMax->setValue(ramax);
                     connectParameterWidgets(true);
                 }
 
@@ -549,9 +615,50 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 if (chkHistogramRangeAuto->isChecked() && hh==0) {
                     //statisticsHistogram<double, double>(datahist, datasize, histX, histY, histBins, chkNormalizedHistograms->isChecked());
                     statisticsHistogramRanged<double, double>(datahist, datasize, amin, amax, histX, histY, histBins, chkNormalizedHistograms->isChecked());
+                } else if (chkHistogramRangeRelaxAuto->isChecked() && hh==0) {
+                    //statisticsHistogram<double, double>(datahist, datasize, histX, histY, histBins, chkNormalizedHistograms->isChecked());
+                    statisticsHistogramRanged<double, double>(datahist, datasize, ramin, ramax, histX, histY, histBins, chkNormalizedHistograms->isChecked());
                 } else {
                     statisticsHistogramRanged<double, double>(datahist, datasize, mmin, mmax, histX, histY, histBins, chkNormalizedHistograms->isChecked());
                 }
+
+                QFFitAlgorithm* alg=QFFitAlgorithmManager::getInstance()->createAlgorithm("fit_lmfit");
+                QFFitFunction* ff=cmbFitFunction->createCurrentInstance();
+                QVector<double> p;
+                if (alg && ff && histX && histY && histBins>0) {
+                    QVector<double> perr;
+                    QVector<bool> fix;
+                    for (int i=0; i<ff->paramCount(); i++) {
+                        perr.append(0);
+                        p.append(ff->getDescription(i).initialValue);
+                        if (ff->getDescription(i).id=="offset") {
+                            fix.append(true);
+                        } else {
+                            fix.append(ff->getDescription(i).initialFix);
+                        }
+                    }
+                    //qDebug()<<p<<fix;
+                    ff->estimateInitial(p.data(), histX, histY, histBins, fix.data());
+                    for (int i=0; i<ff->paramCount(); i++) {
+                        if (ff->getDescription(i).id=="offset") {
+                            p[i]=0;
+                        }
+                    }
+                    alg->fit(p.data(), perr.data(), histX, histY, NULL, histBins, ff, p.data(), fix.data());
+                    //qDebug()<<p<<fix;
+                    for (int i=0; i<ff->paramCount(); i++) {
+                        QFFitFunction::ParameterDescription d=ff->getDescription(i);
+                        if (ff->isParameterVisible(i, p.data())) {
+                            tabHistogramParameters->setCellCreate(rowcnt, hh+1, p[i]);
+                            tabHistogramParameters->setCellCreate(rowcnt, 0, tr("fit: %1").arg(d.label));
+                            rowcnt++;
+                        }
+                    }
+                }
+
+
+                if (alg) delete alg;
+
 
                 if (hh==0) mainHistogramMax=statisticsMax(histY, histBins);
                 double barY=mainHistogramMax*1.1;
@@ -604,9 +711,24 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 plteParamHistogram->set_title(tr("histogram (%1)").arg(hist.name));
                 pltParamHistogram->addGraph(plteParamHistogram);
 
+                if (ff && p.size()>0) {
+                    JKQTPxQFFitFunctionLineGraph* plteFit=new JKQTPxQFFitFunctionLineGraph(pltParamHistogram->get_plotter());
+                    plteFit->set_fitFunction(ff, true);
+                    plteFit->set_params(p);
+                    plteFit->set_color(plteParamHistogramBoxplot->get_color());
+                    plteFit->set_drawLine(true);
+                    plteFit->set_style(Qt::SolidLine);
+                    plteFit->set_lineWidth(1.5);
+                    plteParamHistogram->set_title(tr("fit %2 (%1)").arg(hist.name).arg(ff->shortName()));
+                    pltParamHistogram->addGraph(plteFit);
+                } else {
+                    if (ff) delete ff;
+                }
+
                 free(histX);
                 free(histY);
                 free(datahist);
+
             }
         }
     }

@@ -48,6 +48,8 @@
 #include <QTextDocument>
 #include "libwid_imexport.h"
 #include "qfproperties.h"
+#include "qffitfunctioncombobox.h"
+#include <QRadioButton>
 
 /*! \brief This class displays a histogram together with some statistical data on it
     \ingroup qf3rdrdp_imaging_fcs
@@ -162,7 +164,10 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         QVisibleHandleSplitter* splitterHistogram;
         QCheckBox* chkNormalizedHistograms;
         double mainHistogramMax;
-        QCheckBox* chkHistogramRangeAuto;
+        QRadioButton* chkHistogramRangeAuto;
+        QRadioButton* chkHistogramRangeRelaxAuto;
+        QRadioButton* chkHistogramRangeManual;
+        QDoubleSpinBox* edtHistogramRelaxedRangePercent;
         QFDoubleEdit* edtHistogramMin;
         QFDoubleEdit* edtHistogramMax;
         QFormLayout* flHistSet;
@@ -170,6 +175,7 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         QVBoxLayout* laySplitterTable;
         QGridLayout* layHist;
         QCheckBox* chkKey;
+        QFFitFunctionComboBox* cmbFitFunction;
 
         QAction* actPrintReport;
         QAction* actSaveReport;

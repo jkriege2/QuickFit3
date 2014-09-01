@@ -103,7 +103,7 @@ class QFFCSByIndexAndModelEvaluationEditor : public QFUsesResultsByIndexEvaluati
         void plotMouseMove(double x, double y);
         void zoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);
         void runChanged(int run);
-        void modelChanged(int model);
+        virtual void modelChanged(int model);
         void slidersChanged(int userMin, int userMax, int min, int max);
         void residualHistogramBinsChanged(int bins);
         void chkWeightedResidualsToggled(bool checked);

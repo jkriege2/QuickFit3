@@ -90,7 +90,7 @@ void QFFitFunctionDLSG2::calcParameter(double* data, double* error) const {
 
     const double n=data[DLSG2_refractive];
     double en=0;
-    const double theta=data[DLSG2_angle]/180*M_PI;
+    const double theta=data[DLSG2_angle]/180.0*M_PI;
     double etheta=0;
     const double lambda=data[DLSG2_wavelength]/1e3;
     double elambda=0;

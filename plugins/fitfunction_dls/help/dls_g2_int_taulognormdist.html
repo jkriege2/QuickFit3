@@ -1,0 +1,30 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>DLS: G2 autocorrelation, log-normally distributed correlation times [num_int]</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        <p>This plugin implements a DLS diffusion model with log-normally distributed correlation times:
+        $$bmath: G^{(2)}(\tau)=G_\infty+\epsilon+\left(A\cdot\frac{\int_{\tau_{min}}^{\tau_{max}}p(\tau_D)\cdot\exp\left[-\tau/\tau_D\right]\;\mathrm{d}\tau_D}{\int_{\tau_{min}}^{\tau_{max}}p(\tau_D)\;\mathrm{d}\tau_D}\right)^2$$
+ with a log-normal distribution
+$$bmath:p(\tau_D)=\frac{1}{\sqrt{2\pi\sigma^2(\tau_D)}\cdot\tau_D}\cdot\exp\left[-\frac{1}{2}\cdot\frac{\left[\log(\tau_D)-\log(\tau_{c})\right]^2}{b^2}\right].$$
+
+        where the parameters are:
+        <ul>
+          <li>$$math:G_\infty$$: offset value (usually fixed to 1)</li>
+          <li>$$math:\epsilon$$: offset correction</li>
+          <li>$$math:A$$: amplitude correction factor</li>
+          <li>$$math:\tau_{c}$$: center correlation time of the distribution</li>
+          <li>$$math:b$$: width of the distribution</li>
+        </ul>
+        </p>
+        $$DLS_SD_INTEGRATION$$
+        <p>This plugin also calculates the apparent diffusion coefficients from a given wavelength &lambda;, refractive index <i>n</i>, scattering angle &Theta; and the measured correlation time $$math:\tau_i$$ as $$bmath:D_i=\frac{1}{q^2\cdot\tau_i}, q=\frac{4\pi n}{\lambda}\cdot\sin(\Theta/2)$$</p>
+        <p>These formulas are used to calculate parameter errors:
+        $$bmath:\Delta q=\sqrt{\left(\Delta n\cdot 8\pi\cdot q/\lambda\cdot\sin(\Theta/2)\right)^2+\left(\Delta\lambda\cdot 8\pi\cdot n\cdot q/\lambda^2\cdot\sin(\Theta/2)\right)^2+\left(\Delta\Theta\cdot 4\pi\cdot q/\lambda\cdot\cos(\Theta/2)\right)^2}$$
+        $$bmath:\Delta D_i=\sqrt{\left(\Delta q\cdot \frac{2}{q^3\cdot\tau_i}\right)^2+\left(\Delta\tau_i\cdot\frac{1}{q^2\cdot\tau_i^2}\right)^2}$$
+        </p>
+    </body>
+</html>
