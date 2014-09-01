@@ -3,10 +3,11 @@
 #include "qffitfunctionfcsdistributionloggaussian.h"
 #include "qffitfunctionfcsdistributiongaussian.h"
 #include "qffitfunctionfcsdistributiongaussianint.h"
+#include "qffitfunctionfcsdistributionloggaussianint.h"
 
 QStringList QFPFitFunctionsFCSDistribution::getIDs() const {
     QStringList res;
-    res<<"fcs_dist_norm"<<"fcs_dist_norm_d"<<"fcs_dist_lognorm";//<<"fcs_dist_int_norm";
+    res<<"fcs_dist_norm"<<"fcs_dist_norm_d"<<"fcs_dist_lognorm"<<"fcs_dist_int_lognorm"<<"fcs_dist_int_norm";
     return res;
 }
 
@@ -17,6 +18,8 @@ QFFitFunction* QFPFitFunctionsFCSDistribution::get(QString id, QObject* parent) 
             return new QFFitFunctionFCSDistributionGaussian();
     } else if (id=="fcs_dist_int_norm") {
             return new QFFitFunctionFCSDistributionIntGaussian();
+    } else if (id=="fcs_dist_int_lognorm") {
+            return new QFFitFunctionFCSDistributionIntLogGaussian();
     } else if (id=="fcs_dist_norm_d") {
         return new QFFitFunctionFCSDistributionGaussianD();
     }

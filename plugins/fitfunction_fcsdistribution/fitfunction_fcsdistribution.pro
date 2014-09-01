@@ -14,13 +14,15 @@ HEADERS += qfpfitfunctionsfcsdistribution.h \
            qffitfunctionfcsdistributionloggaussian.h \
     qffitfunctionfcsdistributiongaussianD.h \
     qffitfunctionfcsdistributiongaussian.h \
-    qffitfunctionfcsdistributiongaussianint.h
+    qffitfunctionfcsdistributiongaussianint.h \
+    qffitfunctionfcsdistributionloggaussianint.h
 
 SOURCES += qfpfitfunctionsfcsdistribution.cpp\
            qffitfunctionfcsdistributionloggaussian.cpp \
     qffitfunctionfcsdistributiongaussianD.cpp \
     qffitfunctionfcsdistributiongaussian.cpp \
-    qffitfunctionfcsdistributiongaussianint.cpp
+    qffitfunctionfcsdistributiongaussianint.cpp \
+    qffitfunctionfcsdistributionloggaussianint.cpp
 
 FORMS =
 

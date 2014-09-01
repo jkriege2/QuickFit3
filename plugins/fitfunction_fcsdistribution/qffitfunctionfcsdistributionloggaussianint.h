@@ -1,29 +1,27 @@
-#ifndef QFFITFUNCTIONFCSDISTRIBUTIONGaussian_H
-#define QFFITFUNCTIONFCSDISTRIBUTIONGaussian_H
+#ifndef QFFitFunctionFCSDistributionIntLogGaussian_H
+#define QFFitFunctionFCSDistributionIntLogGaussian_H
 #include "qfpluginfitfunction.h"
 #include <QVector>
 #include <QPair>
 #include <stdint.h>
-
+#include <gsl/gsl_integration.h>
+#include <gsl/gsl_errno.h>
 
 
 /*! \brief QFFitFunction class for FCS fit with an assumed gaussian distribution of diffusion times
     \ingroup qf3fitfunp_fitfunctions_fcsdistribution
 
 */
-class QFFitFunctionFCSDistributionGaussian: public QFFitFunction {
+class QFFitFunctionFCSDistributionIntLogGaussian: public QFFitFunction {
     public:
-        QFFitFunctionFCSDistributionGaussian();
-        virtual ~QFFitFunctionFCSDistributionGaussian() {}
+        QFFitFunctionFCSDistributionIntLogGaussian();
+        virtual ~QFFitFunctionFCSDistributionIntLogGaussian();
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS SD: Normal Diffuion 3D with gaussian diffusion time distribution"); }
+        virtual QString name() const { return QString("FCS Dist: Normal Diffuion 3D with log-normal diffusion time distribution [num_int]"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("FCS SD: gaussian"); }
+        virtual QString shortName() const { return QObject::tr("FCS Dist: log-norm [num_int]"); }
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("fcs_dist_norm"); }
-
-        /** \copydoc QFFitFunction::isDeprecated() */
-        virtual bool isDeprecated() const { return true; }
+        virtual QString id() const { return QString("fcs_dist_int_lognorm"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
@@ -45,17 +43,9 @@ class QFFitFunctionFCSDistributionGaussian: public QFFitFunction {
 
     protected:
 
-        /*double last_tau_min;
-        double last_tau_max;
-        double last_logc;
-        double last_b;*/
+        gsl_integration_workspace * w;
+        size_t wN;
 
-        QVector<QPair<double, double> >  tau_val;
-
-        /** \brief make sure that tau_val is filled with semi-log spaced tau from tau_min to \a tau_max
-         *
-         * If (last_tau_min==tau_min and last_tau_max==tau_max) nothing has to be done! */
-        QVector<QPair<double, double> >  fillTauVal(double tau_min, double tau_max, uint32_t tau_values, double tauC, double tauSigma) const;
 };
 
-#endif // QFFITFUNCTIONFCSDISTRIBUTIONGaussian_H
+#endif // QFFitFunctionFCSDistributionIntLogGaussian_H

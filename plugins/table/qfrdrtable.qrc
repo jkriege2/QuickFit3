@@ -16,6 +16,7 @@
         <file alias="column_delete.png">icons/column_delete.png</file>
         <file alias="column_title.png">icons/column_title.png</file>
         <file alias="cell_type.png">icons/cell_type.png</file>
+        <file alias="cell_types.png">icons/cell_types.png</file>
 
         <file alias="cell_string.png">icons/cell_string.png</file>
         <file alias="cell_integer.png">icons/cell_integer.png</file>

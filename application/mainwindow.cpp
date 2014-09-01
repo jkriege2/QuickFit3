@@ -205,7 +205,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_further_reading"), QString("")));
 
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.start"),
-         tr("$$DEFAULTREF$$</font><a name=\"#footer\"><table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">"
+         tr("$$DEFAULTREF$$</font>\n<a name=\"#footer\"><table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">"
             "<table width=\"100%\">"
             "<tr><td align=\"center\" ><a href=\"#top_page\"><img src=\":/lib/help/help_top.png\"></a>&nbsp;&nbsp;&nbsp;</td><td align=\"left\" >$$local_plugin_icon$$&nbsp;&nbsp;&nbsp;</td><td align=\"right\" width=\"90%\">  <b>$$local_plugin_name$$</b> <i>$$local_plugin_copyright$$</i><br>$$local_plugin_weblink$$<br>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.end"), QString("</td></tr></table></td></tr></table>")));// </div>")));
@@ -3678,10 +3678,10 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             }
             QString referencesHTML="";
             for (int i=0; i<refList.size(); i++) {
-                referencesHTML=referencesHTML+QString("<li><a name=\"ref%1\">%2</li>").arg(i+1).arg(refList[i]);
+                referencesHTML=referencesHTML+QString("<li><a name=\"ref%1\">%2</li>\n").arg(i+1).arg(refList[i]);
             }
             if (refList.size()>0) {
-                referencesHTML=QString("<ol>%1</ol>").arg(referencesHTML);
+                referencesHTML=QString("<ol>\n%1</ol>").arg(referencesHTML);
             }
             //fromHTML_replaces.append(qMakePair(QString("references"), referencesHTML));
 
@@ -3692,7 +3692,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 result=result.replace("$$contents_full$$", contentsFull);
             }
             if (!result.contains("$$references$$") && referencesHTML.size()>0) {
-                result=result.replace("$$DEFAULTREF$$", "<h2>References</h2><p>$$references$$</p>");
+                result=result.replace("$$DEFAULTREF$$", "<h2>References</h2>\n<p>$$references$$\n</p>");
             }
             result=result.replace("$$references$$", referencesHTML);
 

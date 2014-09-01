@@ -406,7 +406,7 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addAction(actDeleteColumn);
     menuTab->addSeparator();
     menuTab->addAction(actSetDatatype);
-    menuDatatypes=menuTab->addMenu(QIcon(":/table/cell_type.png"), tr("set datatype to ..."));
+    menuDatatypes=menuTab->addMenu(QIcon(":/table/cell_types.png"), tr("set datatype to ..."));
     menuDatatypes->addAction(actSetDatatypeString);
     menuDatatypes->addAction(actSetDatatypeDouble);
     menuDatatypes->addAction(actSetDatatypeInteger);

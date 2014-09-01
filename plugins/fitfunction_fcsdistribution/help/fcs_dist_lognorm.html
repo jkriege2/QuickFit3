@@ -8,55 +8,43 @@
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
 
 <p>This model function implements a 3D normal diffusion FCS model, where the diffusion times are log-normally distributed. It also supports up to two non-fluorescent species.: </p>
-<p class="formulaDsp">
-<img class="formulaDsp" alt="\[ g(\tau)=G_\infty+\frac{1}{N}\cdot X_{nf}(\tau)\cdot\sum\limits_{k=0}^KA\cdot\exp\left[-\frac{1}{2}\cdot\left(\frac{\ln(\tau_{k})-\ln(\tau_{diff,c})}{b}\right)^2\right]\left(1+\frac{\tau}{\tau_{k}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{k}}\right)^{-1/2} \]" src="./pic/form_402.png">
-</p>
+$$bmath:g(\tau)=G_\infty+\frac{1}{N}\cdot X_{nf}(\tau)\cdot\sum\limits_{k=0}^KA\cdot\exp\left[-\frac{1}{2}\cdot\left(\frac{\ln(\tau_{k})-\ln(\tau_{diff,c})}{b}\right)^2\right]\left(1+\frac{\tau}{\tau_{k}}\right)^{-1}\cdot\left(1+\frac{\tau}{\gamma^2\tau_{k}}\right)^{-1/2}$$
 <p> with </p>
-<p class="formulaDsp">
-<img class="formulaDsp" alt="\[ N_{nf}(\tau)= \frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}} \]" src="./pic/form_403.png">
-</p>
+$$bmath:N_{nf}(\tau)= \frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}$$
 <p>. </p>
 <p>The parameters are:</p>
 <ul>
-<li><img class="formulaInl" alt="$ G_\infty $" src="./pic/form_4.png">: offset of the correlation function</li>
-<li><img class="formulaInl" alt="$ N $" src="./pic/form_5.png">: overall particle number (including currently dark particles, e.g. in triplet state)</li>
-<li><img class="formulaInl" alt="$ \Theta_{trip}, \Theta_{non} $" src="./pic/form_6.png">: fraction of the particles in one of the first two non-fluorescent states (priplet, ...)</li>
-<li><img class="formulaInl" alt="$ \tau_{trip}, \tau_{non} $" src="./pic/form_7.png">: decay time of the first two non-fluorescent states (triplet, ...)</li>
-<li><img class="formulaInl" alt="$ \tau_{diff,c} $" src="./pic/form_404.png">: center diffusion decay time</li>
-<li><img class="formulaInl" alt="$ b $" src="./pic/form_228.png">: width parameter of the diffusion time distribution</li>
-<li><img class="formulaInl" alt="$ \gamma=\frac{z_0}{w_{xy}} $" src="./pic/form_11.png">: aspect ratio of the gaussian used to approximate the focus</li>
-<li><img class="formulaInl" alt="$ w_{xy} $" src="./pic/form_12.png">: lateral half axis of the focus gaussian</li>
-<li><img class="formulaInl" alt="$ z_0 $" src="./pic/form_13.png">: longitudinal half axis of the focus gaussian</li>
+<li>$$math:G_\infty$$: offset of the correlation function</li>
+<li>$$math:N$$: overall particle number (including currently dark particles, e.g. in triplet state)</li>
+<li>$$math:\Theta_{trip}, \Theta_{non}$$: fraction of the particles in one of the first two non-fluorescent states (priplet, ...)</li>
+<li>$$math:\tau_{trip}, \tau_{non}$$: decay time of the first two non-fluorescent states (triplet, ...)</li>
+<li>$$math:\tau_{diff,c}$$: center diffusion decay time</li>
+<li>$$math:b$$: width parameter of the diffusion time distribution</li>
+<li>$$math:\gamma=\frac{z_0}{w_{xy}}$$: aspect ratio of the gaussian used to approximate the focus</li>
+<li>$$math:w_{xy}$$: lateral half axis of the focus gaussian</li>
+<li>$$math:z_0$$: longitudinal half axis of the focus gaussian</li>
 </ul>
-<p>The values <img class="formulaInl" alt="$ \tau_k $" src="./pic/form_405.png"> used in the sum of this fitting function are beeing semi-logarithmically spaced between the given minimum and maximum values.</p>
-<p><b>Note:</b> This model is relatively complex, as for every evaluation a sum has to be calculated. So it is wise to use a fast fit algorithm in conjunction with this model, like e.g. <i>lmfit</i>.</p>
-<p>This model also calculates the diffusion coefficient, if the width <img class="formulaInl" alt="$ w_{xy} $" src="./pic/form_12.png"> of the laser focus (xy plane) is known, as: </p>
-<p class="formulaDsp">
-<img class="formulaDsp" alt="\[ D=\frac{w_{xy}^2}{4\tau_D} \]" src="./pic/form_20.png">
-</p>
-<p> where <img class="formulaInl" alt="$ \tau_D $" src="./pic/form_21.png"> is the diffusion time. Also the effective focal volume <img class="formulaInl" alt="$ V_{eff} $" src="./pic/form_22.png"> is calculated: </p>
-<p class="formulaDsp">
-<img class="formulaDsp" alt="\[ V_{eff}=\pi^{3/2}\cdot\gamma\cdot w_{xy}^3 \]" src="./pic/form_14.png">
-</p>
+<p>The values $$math:\tau_k$$ used in the sum of this fitting function are beeing semi-logarithmically spaced between the given minimum and maximum values.</p>
+<p><b>Note:</b> This model is relatively complex, as for every evaluation a sum has to be calculated. So it is wise to use a fast fit algorithm in conjunction with this model, like e.g. <i><a href="$$fitalgorithm:help:fit_lmfit$$">$$fitalgorithm:name:fit_lmfit$$</a></i>.</p>
+<p>This model also calculates the diffusion coefficient, if the width $$math:w_{xy}$$ of the laser focus (xy plane) is known, as: </p>
+$$bmath:D=\frac{w_{xy}^2}{4\tau_D}$$
+<p> where $$math:\tau_D$$ is the diffusion time. Also the effective focal volume $$math:V_{eff}$$ is calculated: </p>
+$$bmath:V_{eff}=\pi^{3/2}\cdot\gamma\cdot w_{xy}^3$$
 <p> Given this focal volume, the plugin may also calculate the particle concentration in the sample: </p>
-<p class="formulaDsp">
-<img class="formulaDsp" alt="\[ C=\frac{N}{V_{eff}} \]" src="./pic/form_15.png">
-</p>
+$$bmath:C=\frac{N}{V_{eff}}$$
+
 <p>The plugin also calculates some parameter errors: </p>
-<p class="formulaDsp">
-<img class="formulaDsp" alt="\[ \Delta \left(\frac{1}{N}\right)=\left|\frac{\Delta N}{N^2}\right| \]" src="./pic/form_16.png">
-</p>
- <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ \Delta D=\sqrt{\left(\Delta w_{xy}\cdot\frac{w_{xy}}{2\tau_D}\right)^2+\left(\Delta \tau_D\cdot\frac{w_{xy}^2}{4\tau_D^2}\right)^2} \]" src="./pic/form_23.png">
-</p>
- <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ \Delta V_{eff}=\sqrt{\left(\Delta\gamma\cdot\pi^{3/2}\cdot w_{xy}^3\right)^2+\left(\Delta w_{xy}\cdot 3\pi^{3/2}\cdot \gamma\cdot w_{xy}^2\right)^2} \]" src="./pic/form_17.png">
-</p>
- <p class="formulaDsp">
-<img class="formulaDsp" alt="\[ \Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2} \]" src="./pic/form_18.png">
-</p>
+
+$$bmath:\Delta \left(\frac{1}{N}\right)=\left|\frac{\Delta N}{N^2}\right|$$
+
+$$bmath:\Delta D=\sqrt{\left(\Delta w_{xy}\cdot\frac{w_{xy}}{2\tau_D}\right)^2+\left(\Delta \tau_D\cdot\frac{w_{xy}^2}{4\tau_D^2}\right)^2}$$
+
+$$bmath:\Delta V_{eff}=\sqrt{\left(\Delta\gamma\cdot\pi^{3/2}\cdot w_{xy}^3\right)^2+\left(\Delta w_{xy}\cdot 3\pi^{3/2}\cdot \gamma\cdot w_{xy}^2\right)^2}$$
+
+$$bmath:\Delta C=\sqrt{\left(\frac{\Delta N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^{3}}\right)^2+\left(\Delta\gamma\cdot\frac{N}{\pi^{3/2}\cdot w{xy}^3\cdot\gamma^2}\right)^2+\left(\Delta w_{xy}\cdot\frac{3\cdot N}{\pi^{3/2}\cdot\gamma\cdot w_{xy}^4}\right)^2}$$
 
 
-<p>This model was taken from the paper:<ul><li>Nibedita Pal, Sachin Dev Verma, Moirangthem Kiran Singh, and Sobhan Sen (2011): <b>Fluorescence Correlation Spectroscopy: An Efficient Tool for Measuring Size, Size-Distribution and Polydispersity of Microemulsion Droplets in Solution.</b> Anal. Chem., 83(20), pp 7736–7744, DOI: 10.1021/ac2012637</li></ul></p>
+
+<p>This model was taken from the paper:<ul><li>Nibedita Pal, Sachin Dev Verma, Moirangthem Kiran Singh, and Sobhan Sen (2011): <b>Fluorescence Correlation Spectroscopy: An Efficient Tool for Measuring Size, Size-Distribution and Polydispersity of Microemulsion Droplets in Solution.</b> Anal. Chem., 83(20), pp 7736&ndash;7744, DOI: 10.1021/ac2012637</li></ul></p>
 	</body>
 </html>

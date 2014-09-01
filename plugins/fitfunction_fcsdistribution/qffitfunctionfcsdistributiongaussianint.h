@@ -45,13 +45,6 @@ class QFFitFunctionFCSDistributionIntGaussian: public QFFitFunction {
 
         gsl_integration_workspace * w;
         size_t wN;
-
-        QVector<QPair<double, double> >  tau_val;
-
-        /** \brief make sure that tau_val is filled with semi-log spaced tau from tau_min to \a tau_max
-         *
-         * If (last_tau_min==tau_min and last_tau_max==tau_max) nothing has to be done! */
-        QVector<QPair<double, double> >  fillTauVal(double tau_min, double tau_max, uint32_t tau_values, double tauC, double tauSigma) const;
 };
 
 #endif // QFFitFunctionFCSDistributionIntGaussian_H

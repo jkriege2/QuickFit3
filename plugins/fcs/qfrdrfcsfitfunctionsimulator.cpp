@@ -54,7 +54,7 @@ QFRDRFCSFitFunctionSimulator::QFRDRFCSFitFunctionSimulator(QFPluginServices* ser
     widParameters->setLayout(layParameters);
 
 
-    ui->cmbFunction->updateFitFunctions();
+    ui->cmbFunction->updateFitFunctions("fcs_,fccs_,dls_");
     /*m_fitFunctions=services->getFitFunctionManager()->getModels("", this);
     QStringList ff=m_fitFunctions.keys();
 

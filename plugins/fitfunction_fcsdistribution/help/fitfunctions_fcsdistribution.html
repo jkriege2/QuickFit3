@@ -1,15 +1,33 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>FCS: Fit Functions with parameter distributions</title>
-	</head>
-	<body>
-		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-		<ul>
-			<li><a href="fcs_dist_norm.html">FCS SD: Normal Diffuion 3D with gaussian size distribution</a></li>
-			<li><a href="fcs_dist_norm_d.html">FCS SD: Normal Diffuion 3D with gaussian diffusion coefficient distribution</a></li>
-			<li><a href="fcs_dist_lognorm.html">FCS SD: Normal Diffuion 3D with log-normal size distribution</a></li>
-		</ul>
-	</body>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>FCS: Fit Functions with parameter distributions</title>
+</head>
+<body>
+$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+<h2>Introduction</h2>        
+$$insert:dist_basics.inc$$
+<p>Some older version of these models (marked as deprecated!) implement the integrals as a sum over semi-logarithmically spaced diffusion times $$math:\tau_D\in\{\tau_{min}...\tau_{max}\}$$. </p>
+<p>Models like these are defined/used e.g. in $$REF_PAL_FCSDIST$$.
+</p>
+    
+<h2>List of available models</h2>
+<p>
+<ul>
+  <li><b>models, using numerical integration:</b><ul>
+    <li><a href="$$fitfunction:help:fcs_dist_int_norm$$">$$fitfunction:name:fcs_dist_int_norm$$</a></li>
+    <li><a href="$$fitfunction:help:fcs_dist_int_lognorm$$">$$fitfunction:name:fcs_dist_int_lognorm$$</a></li>
+  </ul></li>
+  <li><b>models, <u>not</u> using numerical integration:</b><ul>
+    <li><a href="$$fitfunction:help:fcs_dist_norm_d$$">$$fitfunction:name:fcs_dist_norm_d$$</a></li>
+  </ul></li>
+  <li><b>deprecated models</b>, replaced by models using numerical integration:<ul>
+    <li><a href="$$fitfunction:help:fcs_dist_norm$$">$$fitfunction:name:fcs_dist_norm$$</a></li>
+    <li><a href="$$fitfunction:help:fcs_dist_lognorm$$">$$fitfunction:name:fcs_dist_lognorm$$</a></li>
+  </ul></li>
+</ul>
+</p> 
+    
+</body>
 </html>
