@@ -168,6 +168,7 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         QRadioButton* chkHistogramRangeRelaxAuto;
         QRadioButton* chkHistogramRangeManual;
         QDoubleSpinBox* edtHistogramRelaxedRangePercent;
+        QDoubleSpinBox* edtHistogramRelaxedRangePercentUp;
         QFDoubleEdit* edtHistogramMin;
         QFDoubleEdit* edtHistogramMax;
         QFormLayout* flHistSet;

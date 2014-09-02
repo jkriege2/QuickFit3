@@ -123,8 +123,7 @@ SOURCES += qfrdrimagingfcs.cpp \
     ../base_classes/qfimageparametergroupbox.cpp \
     qfrdrimagingfcsmaskbuilder.cpp \
     qfrdrimagingfcscopycorrasrdrdialog.cpp \
-    qfrdrimagingfcspostprocessbinningdialog.cpp \
-    ../../../../../LIB/trunk/correlator_multitau.cc
+    qfrdrimagingfcspostprocessbinningdialog.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \

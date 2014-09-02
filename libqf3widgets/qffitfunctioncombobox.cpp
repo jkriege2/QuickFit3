@@ -94,7 +94,7 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
     m_availableFuncs.clear();
     QFFitFunctionManager* manager=QFFitFunctionManager::getInstance();
     bool upd=updatesEnabled();
-    setUpdatesEnabled(false);
+    //setUpdatesEnabled(false);
     clear();
     QMap<QString, QFFitFunction*> m_fitFunctions;
     if (filter.contains(",")) {
@@ -133,7 +133,7 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
         }
     }
     model()->sort(0);
-    setUpdatesEnabled(upd);
+    //setUpdatesEnabled(upd);
 }
 
 void QFFitFunctionComboBox::updateFitFunctions(const QStringList &availableFF)
@@ -144,7 +144,7 @@ void QFFitFunctionComboBox::updateFitFunctions(const QStringList &availableFF)
     else {
         QFFitFunctionManager* manager=QFFitFunctionManager::getInstance();
         bool upd=updatesEnabled();
-        setUpdatesEnabled(false);
+        //setUpdatesEnabled(false);
         QStandardItemModel *m = qobject_cast<QStandardItemModel *>(model());
 
 
@@ -164,6 +164,6 @@ void QFFitFunctionComboBox::updateFitFunctions(const QStringList &availableFF)
             }
         }
         model()->sort(0);
-        setUpdatesEnabled(upd);
+        //setUpdatesEnabled(upd);
     }
 }

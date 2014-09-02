@@ -100,7 +100,7 @@ echo -e "\n\ndetermining bit depth:"
 BITDEPTH=`./quickfit3.exe --getbits`
 echo -e "\n   bit depth: ${BITDEPTH}\n\n"
 
-THISDIR=´pwd´
+THISDIR=`pwd`
 
 QF3REPOSITORY=https://www.dkfz.de/svn/B040/FCSTOOLS/trunk/QuickFit3
 LIBREPOSITORY=https://www.dkfz.de/svn/B040/LIB
@@ -138,7 +138,6 @@ if [ "${create_deploy}" != "0" ]; then
 	for f in `find . -type d -name .svn`
 	do
 		rm -rf $f
-		#echo "REMOVE ${f}"
 	done
 	
 	LIB_FILES=`../../tools/qf3sourcedeploy/qf3sourcedeploy ./FCSTOOLS`
@@ -182,10 +181,13 @@ if [ "${create_deploy}" != "0" ]; then
 	for f in `find ./LIB -type f`
 	do
 	    if [[ !( $LIB_FILES =~ $f ) ]]; then
-		    #echo "REMOVE ${f}"
 			rm -rf $f
 		fi
-		
+	done
+
+	for f in `find . -type d -name .svn`
+	do
+		rm -rf $f
 	done
 
 
@@ -228,18 +230,17 @@ fi
 
 if [ "${createZIP}" != "0" ]; then
     cd deploy_source_dir
-	echo -e "\n\nCREATING ZIP ARCHIVES FOR DEPLOYMENT:\n\n"
+	echo -e "\n\nCREATING ZIP ARCHIVES FOR DEPLOYMENT:\n  output: ${ZIPFILE}\n\n"
 	zip -rv9 ../${ZIPFILE} *
 	cd ..	
 fi
 
 if [ "${deploy_qt}" != "0" ]; then
-
-    QTPATH=´qmake -query QT_INSTALL_PREFIX´
-	QTVERSION=´qmake -query QT_VERSION´
+    QTPATH=`qmake -query QT_INSTALL_PREFIX`
+	QTVERSION=`qmake -query QT_VERSION`
 	ZIPFILEQT="qt-${QTVERSION}-win${BITDEPTH}-mingw.zip"
     cd $QTPATH
-	echo -e "\n\nCREATING ZIP ARCHIVE OF QT:\n\n"
+	echo -e "\n\nCREATING ZIP ARCHIVE OF QT:\n  output: ${ZIPFILEQT}\n  Qt path: ${QTPATH}\n  Qt version: ${QTVERSION}\n\n"
 	zip -rv9 ${THISDIR}/${ZIPFILEQT} *
 	cd ${THISDIR}	
 fi

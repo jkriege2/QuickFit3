@@ -106,25 +106,41 @@ void QFHistogramView::createWidgets() {
 
 
 
+
+    edtHistogramRelaxedRangePercent=new QDoubleSpinBox(this);
+    edtHistogramRelaxedRangePercent->setRange(0,100);
+    edtHistogramRelaxedRangePercent->setSuffix(" %");
+    edtHistogramRelaxedRangePercent->setValue(5);
+    edtHistogramRelaxedRangePercentUp=new QDoubleSpinBox(this);
+    edtHistogramRelaxedRangePercentUp->setRange(0,100);
+    edtHistogramRelaxedRangePercentUp->setSuffix(" %");
+    edtHistogramRelaxedRangePercentUp->setValue(5);
     flHistSet->addRow(tr("# bins:"), coll);
+    QHBoxLayout* layHistogram=new QHBoxLayout();
     chkLogHistogram=new QCheckBox("", grpHistogramSettings);
-    flHistSet->addRow(tr("log-scale:"), chkLogHistogram);
     chkNormalizedHistograms=new QCheckBox("", grpHistogramSettings);
-    flHistSet->addRow(tr("normalized:"), chkNormalizedHistograms);
+    chkKey=new QCheckBox(this);
+    chkKey->setChecked(true);
+    layHistogram->addWidget(chkLogHistogram);
+    layHistogram->addWidget(new QLabel(tr("   normalized:")));
+    layHistogram->addWidget(chkNormalizedHistograms);
+    layHistogram->addWidget(new QLabel(tr("   show key:")));
+    layHistogram->addWidget(chkKey);
+    layHistogram->addStretch();
+    flHistSet->addRow(tr("log-scale:"), layHistogram);
+
     chkHistogramRangeAuto=new QRadioButton("auto", grpHistogramSettings);
-    chkHistogramRangeRelaxAuto=new QRadioButton("relaxed auto", grpHistogramSettings);
+    chkHistogramRangeRelaxAuto=new QRadioButton("relaxed auto: ", grpHistogramSettings);
     chkHistogramRangeManual=new QRadioButton("manual", grpHistogramSettings);
     QHBoxLayout* layradAuto=new QHBoxLayout();
     layradAuto->addWidget(chkHistogramRangeManual);
     layradAuto->addWidget(chkHistogramRangeAuto);
     layradAuto->addWidget(chkHistogramRangeRelaxAuto);
+    layradAuto->addWidget(edtHistogramRelaxedRangePercent);
+    layradAuto->addWidget(new QLabel(tr("  up:")));
+    layradAuto->addWidget(edtHistogramRelaxedRangePercentUp);
     layradAuto->addStretch();
     flHistSet->addRow(tr("range:"), layradAuto);
-    edtHistogramRelaxedRangePercent=new QDoubleSpinBox(this);
-    edtHistogramRelaxedRangePercent->setRange(0,100);
-    edtHistogramRelaxedRangePercent->setSuffix(" %");
-    edtHistogramRelaxedRangePercent->setValue(5);
-    flHistSet->addRow(tr("relaxed percentil:"), edtHistogramRelaxedRangePercent);
     edtHistogramMin=new QFDoubleEdit(this);
     edtHistogramMin->setCheckBounds(false, false);
     edtHistogramMin->setValue(0);
@@ -141,14 +157,9 @@ void QFHistogramView::createWidgets() {
 
 
     cmbFitFunction=new QFFitFunctionComboBox(this);
-    cmbFitFunction->updateFitFunctions("gen_,gendist_,dist_");
-    cmbFitFunction->setCurrentFitFunction("gen_gaussian_sqrte");
     flHistSet->addRow(tr("distribution fit:"), cmbFitFunction);
 
 
-    chkKey=new QCheckBox(this);
-    chkKey->setChecked(true);
-    flHistSet->addRow(tr("show key:"), chkKey);
 
     // HISTOGRAM PLOTS ///////////////////////////////////////////////////////////////////////
     splitterHistogram=new QVisibleHandleSplitter(this);
@@ -177,8 +188,6 @@ void QFHistogramView::createWidgets() {
     tabHistogramParameters->setCellCreate(8, 0, tr("max"));
     tabHistogramParameters->setCellCreate(9, 0, tr("skewness &gamma;<sub>1</sub>"));
     tabHistogramParameters->setCellCreate(10, 0, tr("invalid values"));
-    tabHistogramParameters->setCellCreate(11, 0, tr("Gauss-fit: mean"));
-    tabHistogramParameters->setCellCreate(12, 0, tr("Gauss-fit: &sigma;"));
     tabHistogramParameters->setReadonly(true);
 
     tvHistogramParameters->setModel(tabHistogramParameters);
@@ -206,6 +215,10 @@ void QFHistogramView::createWidgets() {
     //connectParameterWidgets(true);
 
     setSpaceSavingMode(true);
+    cmbFitFunction->updateFitFunctions("gen_,gendist_,dist_");
+    cmbFitFunction->setCurrentFitFunction("gen_gaussian_sqrte");
+    cmbFitFunction->setUpdatesEnabled(true);
+
 }
 
 
@@ -291,6 +304,7 @@ void QFHistogramView::connectParameterWidgets(bool connectTo) {
             connect(chkHistogramRangeManual, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
             connect(edtHistogramMin, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
             connect(edtHistogramRelaxedRangePercent, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
+            connect(edtHistogramRelaxedRangePercentUp, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
             connect(edtHistogramMax, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
             connect(chkKey, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
             connect(cmbFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(histogramSettingsChanged()));
@@ -305,6 +319,7 @@ void QFHistogramView::connectParameterWidgets(bool connectTo) {
         disconnect(chkHistogramRangeManual, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
         disconnect(edtHistogramMin, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
         disconnect(edtHistogramRelaxedRangePercent, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
+        disconnect(edtHistogramRelaxedRangePercentUp, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
         disconnect(edtHistogramMax, SIGNAL(valueChanged(double)), this, SLOT(histogramSettingsChanged()));
         disconnect(chkKey, SIGNAL(toggled(bool)), this, SLOT(histogramSettingsChanged()));
         disconnect(cmbFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(histogramSettingsChanged()));
@@ -330,6 +345,7 @@ void QFHistogramView::writeQFProperties(QFProperties *current, const QString &pr
     current->setQFProperty(prefix+QString("showkey_%1_%2").arg(egroup).arg(param), chkKey->isChecked(), false, false);
     current->setQFProperty(prefix+QString("distfit_%1_%2").arg(egroup).arg(param), cmbFitFunction->currentFitFunctionID(), false, false);
     current->setQFProperty(prefix+QString("rangepercent_%1_%2").arg(egroup).arg(param), edtHistogramRelaxedRangePercent->value(), false, false);
+    current->setQFProperty(prefix+QString("rangepercentup_%1_%2").arg(egroup).arg(param), edtHistogramRelaxedRangePercentUp->value(), false, false);
     if (chkHistogramRangeManual->isChecked()) {
         current->setQFProperty(prefix+QString("rmin_%1_%2").arg(egroup).arg(param), getMin(), false, false);
         current->setQFProperty(prefix+QString("rmax_%1_%2").arg(egroup).arg(param), getMax(), false, false);
@@ -345,6 +361,7 @@ void QFHistogramView::readQFProperties(QFProperties *current, const QString &pre
     chkKey->setChecked(current->getProperty(prefix+QString("showkey_%1_%2").arg(egroup).arg(param), true).toBool());
     cmbFitFunction->setCurrentFitFunction(current->getProperty(prefix+QString("distfit_%1_%2").arg(egroup).arg(param), "gen_gaussian_sqrte").toString());
     edtHistogramRelaxedRangePercent->setValue(current->getProperty(prefix+QString("rangepercent_%1_%2").arg(egroup).arg(param), 5).toDouble());
+    edtHistogramRelaxedRangePercentUp->setValue(current->getProperty(prefix+QString("rangepercentup_%1_%2").arg(egroup).arg(param), 5).toDouble());
     if (chkHistogramRangeManual->isChecked()) {
         setMin(current->getProperty(prefix+QString("rmin_%1_%2").arg(egroup).arg(param), 0).toDouble());
         setMax(current->getProperty(prefix+QString("rmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
@@ -444,6 +461,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
     edtHistogramMin->setEnabled(chkHistogramRangeManual->isChecked());
     edtHistogramMax->setEnabled(chkHistogramRangeManual->isChecked());
     edtHistogramRelaxedRangePercent->setEnabled(chkHistogramRangeRelaxAuto->isChecked());
+    edtHistogramRelaxedRangePercentUp->setEnabled(chkHistogramRangeRelaxAuto->isChecked());
 
     pltParamHistogram->set_doDrawing(false);
     tvHistogramParameters->setModel(NULL);
@@ -515,7 +533,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 dmin=statisticsSortedMin(datahist, datasize);
                 dmax=statisticsSortedMax(datahist, datasize);
                 q5min=statisticsSortedQuantile(datahist, datasize, edtHistogramRelaxedRangePercent->value()/100.0);
-                q5max=statisticsSortedQuantile(datahist, datasize, (100.0-edtHistogramRelaxedRangePercent->value())/100.0);
+                q5max=statisticsSortedQuantile(datahist, datasize, (100.0-edtHistogramRelaxedRangePercentUp->value())/100.0);
                 if (first) {
                     amin=dmin;
                     amax=dmax;
@@ -545,7 +563,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 if (chkHistogramRangeAuto->isChecked() && hh==0) {
                     for (register int32_t i=0; i<imageSize; i++) {
                         const double v=hist.data[i];
-                        if (statisticsFloatIsOK(v)) {
+                        if (statisticsFloatIsOK(v) && v>=amin && v<=amax) {
                             datahist[i]=v;
                             datasize++;
                         }
@@ -553,7 +571,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 } else if (chkHistogramRangeRelaxAuto->isChecked() && hh==0){
                     for (register int32_t i=0; i<imageSize; i++) {
                         const double v=hist.data[i];
-                        if (statisticsFloatIsOK(v)) {
+                        if (statisticsFloatIsOK(v) && v>=ramin && v<=ramax) {
                             datahist[i]=v;
                             datasize++;
                         }
@@ -613,10 +631,8 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
 
 
                 if (chkHistogramRangeAuto->isChecked() && hh==0) {
-                    //statisticsHistogram<double, double>(datahist, datasize, histX, histY, histBins, chkNormalizedHistograms->isChecked());
                     statisticsHistogramRanged<double, double>(datahist, datasize, amin, amax, histX, histY, histBins, chkNormalizedHistograms->isChecked());
                 } else if (chkHistogramRangeRelaxAuto->isChecked() && hh==0) {
-                    //statisticsHistogram<double, double>(datahist, datasize, histX, histY, histBins, chkNormalizedHistograms->isChecked());
                     statisticsHistogramRanged<double, double>(datahist, datasize, ramin, ramax, histX, histY, histBins, chkNormalizedHistograms->isChecked());
                 } else {
                     statisticsHistogramRanged<double, double>(datahist, datasize, mmin, mmax, histX, histY, histBins, chkNormalizedHistograms->isChecked());
