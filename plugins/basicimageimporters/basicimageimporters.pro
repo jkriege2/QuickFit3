@@ -42,7 +42,8 @@ HEADERS += qfbasicimageimporters.h \
     qfimagereadertinytiff.h \
     ../../../../../LIB/trunk/tinytiffwriter.h \
     ../../../../../LIB/trunk/tinytiffreader.h \
-    qfimagereaderdiffusion4binary.h
+    qfimagereaderdiffusion4binary.h \
+    ../../../../../LIB/trunk/helper.h
 
 SOURCES += qfbasicimageimporters.cpp\
            qfimagereaderlibtiff.cpp \
