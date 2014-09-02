@@ -1,3 +1,4 @@
+
 /*
   Name: replacedialog.cpp
   Copyright: (c) 2008
