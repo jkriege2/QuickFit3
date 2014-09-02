@@ -140,6 +140,11 @@ if [ "${create_deploy}" != "0" ]; then
 		rm -rf $f
 	done
 	
+	rm ./FCSTOOLS/trunk/QuickFit3/extlibs/andor_win32/ATMCD32D.DLL
+	rm ./FCSTOOLS/trunk/QuickFit3/extlibs/andor_win32/ATMCD32D.H
+	rm ./FCSTOOLS/trunk/QuickFit3/extlibs/andor_win64/atmcd64d.DLL
+	rm ./FCSTOOLS/trunk/QuickFit3/extlibs/andor_win64/ATMCD32D.H
+	
 	LIB_FILES=`../../tools/qf3sourcedeploy/qf3sourcedeploy ./FCSTOOLS`
 	
 	TEMP_VAR=`find ./LIB/trunk/test/multitau-correlator_test -type f`
