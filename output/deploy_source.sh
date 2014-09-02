@@ -241,7 +241,7 @@ if [ "${deploy_qt}" != "0" ]; then
 	ZIPFILEQT="qt-${QTVERSION}-win${BITDEPTH}-mingw.zip"
     cd $QTPATH
 	echo -e "\n\nCREATING ZIP ARCHIVE OF QT:\n  output: ${ZIPFILEQT}\n  Qt path: ${QTPATH}\n  Qt version: ${QTVERSION}\n\n"
-	zip -rv9 ${THISDIR}/${ZIPFILEQT} *
+	zip -rv9 ${THISDIR}/${ZIPFILEQT} * -x *.o
 	cd ${THISDIR}	
 fi
 
