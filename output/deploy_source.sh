@@ -241,7 +241,7 @@ if [ "${deploy_qt}" != "0" ]; then
     cd $QTPATH
 	echo -e "\n\nCREATING ZIP ARCHIVE OF QT:\n\n"
 	zip -rv9 ${THISDIR}/${ZIPFILEQT} *
-	cd ..	
+	cd ${THISDIR}	
 fi
 
 
