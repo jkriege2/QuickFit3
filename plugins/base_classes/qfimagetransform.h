@@ -21,6 +21,8 @@
 
 #ifndef QFIMAGETRANSFORM_H
 #define QFIMAGETRANSFORM_H
+#include <QtCore>
+#include <QtGui>
 #include <QTextStream>
 #include <QObject>
 #include <QVector>
@@ -35,6 +37,19 @@
 #include <QGridLayout>
 #include <QVBoxLayout>
 #include <QComboBox>
+
+#include <QTextStream>
+#include <QDir>
+#include <QFileDialog>
+#include "CImg.h"
+#include <QHBoxLayout>
+#include "qftools.h"
+#include <QToolButton>
+#include <QInputDialog>
+#include "qfpluginservices.h"
+#include <QDebug>
+#include "qfmathparser.h"
+#include "programoptions.h"
 
 class QFImageTransformItemWidget; // forward
 

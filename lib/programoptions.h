@@ -22,6 +22,8 @@
 #ifndef PROGRAMOPTIONS_H
 #define PROGRAMOPTIONS_H
 
+#include <QtCore>
+
 #include "lib_imexport.h"
 #include <QtGui>
 #include "lib_imexport.h"

@@ -38,9 +38,13 @@
 /** \file QFMathParser.h
  *  \ingroup qf3lib_mathtools_parser
  */
+#ifndef QFMATHPARSER_H
+#define QFMATHPARSER_H
+
 #include "lib_imexport.h"
 #include "qftools.h"
 #include <cmath>
+#include <QtCore>
 #include <QTextIStream>
 #include <QTextStream>
 
@@ -55,8 +59,6 @@
 #include <QDebug>
 #include "qfmathparsertools.h"
 
-#ifndef QFMATHPARSER_H
-#define QFMATHPARSER_H
 
 
 /**
