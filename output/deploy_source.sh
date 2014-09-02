@@ -8,6 +8,8 @@ function help {
 	echo -e "    -? --help        this help message"
 	echo -e "    --nozip/--zip    switch off/on creation of ZIP archives for " 
 	echo -e "                     deployment                       (default: make_zip)"
+	echo -e "    --deployqt/nodeployqt  salso create a ZIP-file of the Qt folder" 
+	echo -e "                                                      (default: off)"
 	echo -e "    --nodeldeploy    do not clean up at the end of the process" 
 	echo -e "                     (delete deploy directory)        (default: delete)"
 	echo -e "    --nocreatedeploy create deploy directory at start of script" 
@@ -21,6 +23,7 @@ deployspecials="0"
 delete_deploy="1"
 create_deploy="1"
 SPECIALS=""
+deploy_qt="0"
 
 until [ -z "$1" ]  # Until all parameters used up . . .
 do
@@ -35,6 +38,12 @@ do
 	fi
     if [ "$1" == "--zip" ]; then
 	    createZIP="1"
+	fi
+    if [ "$1" == "--nodeployqt" ]; then
+	    deploy_qt="0"
+	fi
+    if [ "$1" == "--deployqt" ]; then
+	    deploy_qt="1"
 	fi
     if [ "$1" == "--nsis" ]; then
 	    runNSIS="1"
@@ -75,6 +84,23 @@ echo -e "\n   SVN version: ${SVNVER}"
 echo -e "\n\ndetermining compile date:"
 COMPILEDATE=`date +%Y-%m-%d`
 echo -e "\n   compile date: ${COMPILEDATE}"
+echo -e "\n\ndetermining bit depth:"
+#echo '
+##include <stdio.h>
+#int main() {
+#	int i=sizeof(void*)*8;
+#	printf("%d\n", i);
+#	return 0;
+#}
+#' > test~.cpp
+#g++ -o a.out test~.cpp
+#BITDEPTH=`./a.out`
+#rm a.out 
+#rm test~.cpp
+BITDEPTH=`./quickfit3.exe --getbits`
+echo -e "\n   bit depth: ${BITDEPTH}\n\n"
+
+THISDIR=´pwd´
 
 QF3REPOSITORY=https://www.dkfz.de/svn/B040/FCSTOOLS/trunk/QuickFit3
 LIBREPOSITORY=https://www.dkfz.de/svn/B040/LIB
@@ -204,6 +230,17 @@ if [ "${createZIP}" != "0" ]; then
     cd deploy_source_dir
 	echo -e "\n\nCREATING ZIP ARCHIVES FOR DEPLOYMENT:\n\n"
 	zip -rv9 ../${ZIPFILE} *
+	cd ..	
+fi
+
+if [ "${deploy_qt}" != "0" ]; then
+
+    QTPATH=´qmake -query QT_INSTALL_PREFIX´
+	QTVERSION=´qmake -query QT_VERSION´
+	ZIPFILEQT="qt-${QTVERSION}-win${BITDEPTH}-mingw.zip"
+    cd $QTPATH
+	echo -e "\n\nCREATING ZIP ARCHIVE OF QT:\n\n"
+	zip -rv9 ${THISDIR}/${ZIPFILEQT} *
 	cd ..	
 fi
 
