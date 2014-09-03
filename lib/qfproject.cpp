@@ -582,9 +582,12 @@ void QFProject::internalReadXML(const QString& file) {
 
                             try {
                                 QFEvaluationItem* e=getEvaluationItemFactory()->createRecord(t, services, this);
-                                e->init(rd, m_dummy);
+                                if (e) e->init(rd, m_dummy);
+                                else {
+                                    setError(tr("Error while creating evaluation element: no evaluation plugin of type '%2' was found in your QF3 version!").arg(t));
+                                }
                             } catch(std::exception& E) {
-                                setError(tr("Error while opening raw data element: %2").arg(E.what()));
+                                setError(tr("Error while initializing evaluation element: %2").arg(E.what()));
                             }
                         }
 
