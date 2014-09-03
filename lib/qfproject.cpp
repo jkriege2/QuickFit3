@@ -545,7 +545,11 @@ void QFProject::internalReadXML(const QString& file) {
                         if (loadRec) {
                             try {
                                 QFRawDataRecord* e=getRawDataRecordFactory()->createRecord(t, this);
-                                e->init(rd, m_dummy);
+                                if (e) e->init(rd, m_dummy);
+                                else {
+                                    setError(tr("Error while creating raw data element: no raw data record plugin of type '%2' was found in your QF3 version!").arg(t));
+                                }
+
                             } catch(std::exception& E) {
                                 setError(tr("Error while opening raw data element: %2").arg(E.what()));
                             }

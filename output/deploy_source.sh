@@ -106,6 +106,7 @@ QF3REPOSITORY=https://www.dkfz.de/svn/B040/FCSTOOLS/trunk/QuickFit3
 LIBREPOSITORY=https://www.dkfz.de/svn/B040/LIB
 COMPILETXT2_REPOSITORY=https://www.dkfz.de/svn/B040/compile_quickfit3.txt
 COMPILETXT1_REPOSITORY=https://www.dkfz.de/svn/B040/install_mingw64_and_qt.txt
+COMPILEIMGS_REPOSITORY=https://www.dkfz.de/svn/B040/
 
 INSTALLER_BASENAME=quickfit3_source${SPECIALS}_${SVNVER}
 INSTALLER_INSTDIR="\$PROGRAMFILES32"
@@ -127,12 +128,27 @@ if [ "${create_deploy}" != "0" ]; then
 	LIB_FILES=""
     echo -e "NOW IN:\n"
 	pwd 
-	echo -e "\n\nCHECKING OUT QuickFit3:\n"
+	echo -e "\n\nCHECKING OUT readme files:\n"
     svn export --force ${COMPILETXT2_REPOSITORY} .
     svn export --force ${COMPILETXT1_REPOSITORY} .
+    svn export --force ${COMPILEIMGS_REPOSITORY}build_quickfit3_config_qtcreator_debug.png .
+    svn export --force ${COMPILEIMGS_REPOSITORY}build_quickfit3_config_qtcreator_release.png .
+    svn export --force ${COMPILEIMGS_REPOSITORY}build_quickfit3_config_qtcreator_run.png .
+    svn export --force ${COMPILEIMGS_REPOSITORY}qtcreator_kit_qt32.png .
+    svn export --force ${COMPILEIMGS_REPOSITORY}qtcreator_kit_qt64.png .
+    svn export --force ${COMPILEIMGS_REPOSITORY}qtcreator_mingw32.png .
+    svn export --force ${COMPILEIMGS_REPOSITORY}qtcreator_mingw64.png .
+    svn export --force ${COMPILEIMGS_REPOSITORY}qtcreator_qt32.png .
+    svn export --force ${COMPILEIMGS_REPOSITORY}qtcreator_qt64.png .
 	rm -rf .svn
+	
+	echo -e "\n\nCHECKING OUT QuickFit3:\n"
+    svn checkout --force ${QF3REPOSITORY} ./FCSTOOLS/trunk/QuickFit3
+    svn checkout --force ${QF3REPOSITORY} ./FCSTOOLS/trunk/QuickFit3
     svn checkout --force ${QF3REPOSITORY} ./FCSTOOLS/trunk/QuickFit3
 	echo -e "\n\nCHECKING OUT QuickFit3-LIB:\n"
+    svn checkout --force ${LIBREPOSITORY} ./LIB
+    svn checkout --force ${LIBREPOSITORY} ./LIB
     svn checkout --force ${LIBREPOSITORY} ./LIB
 	echo -e "\n\nDELETING .svn:\n"
 	for f in `find . -type d -name .svn`
