@@ -20,8 +20,12 @@
 #
 
 
-include(../../extlibs/cairo.pri)
+#include(../../extlibs/cairo.pri)
 
+INCLUDEPATH +=  cairo pixman-1
+LIBS +=  -lcairo -lpixman-1 -lz -lpng
+DEFINES += QF_HAS_LIBCAIRO QF_HAS_LIBPIXMAN
+win32:LIBS += -lgdi32
 
 QT       += core gui
 

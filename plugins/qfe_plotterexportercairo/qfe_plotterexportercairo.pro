@@ -60,6 +60,16 @@ QT += gui xml svg
 CONFIG += exceptions rtti stl
 
 
+CAIRO4QTv2_FILES.files = qcairopaintdevice.cpp \
+                         qcairopaintengine.cpp \
+                         qcairopaintdevice.h \
+                         qcairopaintengine.h \
+                         cairoQPaintDevice_test.cpp \
+                         cairoQPaintDevice_test.pro \
+                         $$GPL3LICENSE
+CAIRO4QTv2_FILES.path = $${QFOUTPUT}/source/cairo4qtv2/
+
+INSTALLS += CAIRO4QTv2_FILES
 
 
 SRC_DISTRIBUTED.files = $$HEADERS \

@@ -111,6 +111,8 @@ COMPILEIMGS_REPOSITORY=https://www.dkfz.de/svn/B040/
 INSTALLER_BASENAME=quickfit3_source${SPECIALS}_${SVNVER}
 INSTALLER_INSTDIR="\$PROGRAMFILES32"
 ZIPFILE=quickfit3_source${SPECIALS}_${SVNVER}.zip
+CAIRO4QTZIPFILE=cairo4qtv2_source_${SVNVER}.zip
+TINYTIFFZIPFILE=tinytiff_source_${SVNVER}.zip
 SPECIALPLUGINS=""
 if [ "${deployspecials}" == "1" ]; then
 	SPECIALPLUGINS=
@@ -150,6 +152,34 @@ if [ "${create_deploy}" != "0" ]; then
     svn checkout --force ${LIBREPOSITORY} ./LIB
     svn checkout --force ${LIBREPOSITORY} ./LIB
     svn checkout --force ${LIBREPOSITORY} ./LIB
+	
+	echo -e "\n\nCREATING ${CAIRO4QTZIPFILE}:\n"
+	mkdir cairo4qtv2
+	cp ./FCSTOOLS/trunk/QuickFit3/plugins/qfe_plotterexportercairo/qcairo*.* ./cairo4qtv2
+	cp ./FCSTOOLS/trunk/QuickFit3/plugins/qfe_plotterexportercairo/cairoQ*.* ./cairo4qtv2
+	cp ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./cairo4qtv2
+	cd cairo4qtv2
+	zip -rv9 ../../${CAIRO4QTZIPFILE} *
+	cd ..
+	rm -rf cairo4qtv2
+	
+	echo -e "\n\nCREATING ${TINYTIFFZIPFILE}:\n"
+	mkdir tinytiff
+	mkdir tinytiff/test/tinytiff_reader_test
+	mkdir tinytiff/test/tinytiffwriter_test
+	cp ./LIB/trunk/tinytiff*.* ./tinytiff
+	cp ./LIB/trunk/lib_imexport.h ./tinytiff
+	cp ./LIB/trunk/libtiff_tools.* ./tinytiff
+	cp ./LIB/trunk/highrestimer.* ./tinytiff
+	cp ./LIB/trunk/tools.* ./tinytiff
+	cp ./LIB/trunk/test/tinytiffwriter_test ./tinytiff/test/
+	cp ./LIB/trunk/test/tinytiff_reader_test ./tinytiff/test/
+	cp ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./tinytiff
+	cd tinytiff
+	zip -rv9 ../../${TINYTIFFZIPFILE} *
+	cd ..
+	rm -rf tinytiff
+	
 	echo -e "\n\nDELETING .svn:\n"
 	for f in `find . -type d -name .svn`
 	do

@@ -22,23 +22,25 @@
 
 include(../../extlibs/cairo.pri)
 
+#INCLUDEPATH +=  cairo pixman-1
+#LIBS +=  -lcairo -lpixman-1 -lz -lpng
+#DEFINES += QF_HAS_LIBCAIRO QF_HAS_LIBPIXMAN
+#win32:LIBS += -lgdi32
 
 QT       += core gui
 
-TARGET = cairo4qt_test
+TARGET = cairoQPaintDevice_test
 #CONFIG   += console
 #CONFIG   -= app_bundle
 
 TEMPLATE = app
 
 
-SOURCES += cairo4qt_test.cpp \
-    cairo4qt/src/brushpattern.cpp \
-    cairo4qt/src/qcairopaintdevice.cpp \
-    cairo4qt/src/qpaintengine_cairo.cpp
+SOURCES += cairoQPaintDevice_test.cpp \
+    qcairopaintdevice.cpp \
+    qcairopaintengine.cpp
 
 HEADERS += \
-    cairo4qt/src/qcairopaintdevice.h \
-    cairo4qt/src/qpaintengine_cairo_p.h \
-    cairo4qt/src/qpaintengine_p.h \
-    cairo4qt/src/qt_x11_p.h
+    qcairopaintdevice.h \ 
+    qcairopaintengine.h
+    

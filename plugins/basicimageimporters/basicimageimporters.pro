@@ -70,7 +70,8 @@ INCLUDEPATH += ../../lib/
 TINYTIFF_FILES.files = ../../../../../LIB/trunk/tinytiffwriter.cpp \
                        ../../../../../LIB/trunk/tinytiffreader.cpp  \
                        ../../../../../LIB/trunk/tinytiffwriter.h \
-                       ../../../../../LIB/trunk/tinytiffreader.h
+                       ../../../../../LIB/trunk/tinytiffreader.h \
+                       $$GPL3LICENSE
 TINYTIFF_FILES.path = $${QFOUTPUT}/source/tinytiff/
 tinytiff_reader_test_FILES.files = ../../../../../LIB/trunk/test/tinytiff_reader_test/*.*
 tinytiff_reader_test_FILES.path = $${QFOUTPUT}/source/tinytiff/test/tinytiff_reader_test
