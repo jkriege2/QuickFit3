@@ -155,9 +155,9 @@ if [ "${create_deploy}" != "0" ]; then
 	
 	echo -e "\n\nCREATING ${CAIRO4QTZIPFILE}:\n"
 	mkdir cairo4qtv2
-	cp ./FCSTOOLS/trunk/QuickFit3/plugins/qfe_plotterexportercairo/qcairo*.* ./cairo4qtv2
-	cp ./FCSTOOLS/trunk/QuickFit3/plugins/qfe_plotterexportercairo/cairoQ*.* ./cairo4qtv2
-	cp ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./cairo4qtv2
+	cp -rf ./FCSTOOLS/trunk/QuickFit3/plugins/qfe_plotterexportercairo/qcairo*.* ./cairo4qtv2
+	cp -rf ./FCSTOOLS/trunk/QuickFit3/plugins/qfe_plotterexportercairo/cairoQ*.* ./cairo4qtv2
+	cp -rf ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./cairo4qtv2
 	cd cairo4qtv2
 	zip -rv9 ../../${CAIRO4QTZIPFILE} *
 	cd ..
@@ -165,16 +165,17 @@ if [ "${create_deploy}" != "0" ]; then
 	
 	echo -e "\n\nCREATING ${TINYTIFFZIPFILE}:\n"
 	mkdir tinytiff
+	mkdir tinytiff/test
 	mkdir tinytiff/test/tinytiff_reader_test
 	mkdir tinytiff/test/tinytiffwriter_test
-	cp ./LIB/trunk/tinytiff*.* ./tinytiff
-	cp ./LIB/trunk/lib_imexport.h ./tinytiff
-	cp ./LIB/trunk/libtiff_tools.* ./tinytiff
-	cp ./LIB/trunk/highrestimer.* ./tinytiff
-	cp ./LIB/trunk/tools.* ./tinytiff
-	cp ./LIB/trunk/test/tinytiffwriter_test ./tinytiff/test/
-	cp ./LIB/trunk/test/tinytiff_reader_test ./tinytiff/test/
-	cp ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./tinytiff
+	cp -rf ./LIB/trunk/tinytiff*.* ./tinytiff
+	cp -rf ./LIB/trunk/lib_imexport.h ./tinytiff
+	cp -rf ./LIB/trunk/libtiff_tools.* ./tinytiff
+	cp -rf ./LIB/trunk/highrestimer.* ./tinytiff
+	cp -rf ./LIB/trunk/tools.* ./tinytiff
+	cp -rf ./LIB/trunk/test/tinytiffwriter_test/* ./tinytiff/test/tinytiffwriter_test/
+	cp -rf ./LIB/trunk/test/tinytiff_reader_test/* ./tinytiff/test/tinytiff_reader_test/
+	cp -rf ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./tinytiff
 	cd tinytiff
 	zip -rv9 ../../${TINYTIFFZIPFILE} *
 	cd ..
