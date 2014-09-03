@@ -351,7 +351,7 @@ int QFRDRImagingFCSPlugin::checkColumns(QString filename) {
     return result;
 }
 
-QFRawDataRecord* QFRDRImagingFCSPlugin::insertProjectRecord(const QString &type, const QString &name, const QString &filename, const QString& role, const QString& group, const QString &description, const QString &directory, const QMap<QString,QVariant>& init_params, const QStringList& init_params_readonly) {
+QFRawDataRecord* QFRDRImagingFCSPlugin::insertProjectRecord(const QString &type, const QString &name, const QString &filename, const QString& role, const QString& group, const QString &description, const QString &directory, const QMap<QString,QVariant>& init_params, const QStringList& init_params_readonly, const QMap<QString, QVariant> &inputfile_props, const QString &inputfile_comment) {
     bool found=false;
     QFRawDataRecord*  r;
     for (int i=0; i<project->getRawDataCount(); i++) {
@@ -365,10 +365,20 @@ QFRawDataRecord* QFRDRImagingFCSPlugin::insertProjectRecord(const QString &type,
         QStringList files, files_types;
         files<<filename;
 
+        QMap<QString,QVariant> ipar=inputfile_props;
+        QStringList iparro=inputfile_props.keys();
+        iparro.append(init_params_readonly);
+        QMapIterator<QString,QVariant> it(init_params);
+        while (it.hasNext()) {
+            it.next();
+            ipar[it.key()]=it.value();
+        }
+
+
         // insert new record:                  type ID, name for record,                                  list of files,    initial parameters, which parameters are readonly?
-        QFRawDataRecord* e=project->addRawData(type, name, role, files,  init_params, init_params_readonly, QStringList(), QStringList());
+        QFRawDataRecord* e=project->addRawData(type, name, role, files,  ipar, iparro, QStringList(), QStringList());
         e->setFolder(directory);
-        e->setDescription(description);
+        e->setDescription(description+"\n\n"+inputfile_comment);
         if (!group.isEmpty()) e->setGroup(project->addOrFindRDRGroup(group));
         if (e->error()) { // when an error occured: remove record and output an error message
             QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
@@ -382,7 +392,7 @@ QFRawDataRecord* QFRDRImagingFCSPlugin::insertProjectRecord(const QString &type,
     return NULL;
 }
 
-QFRawDataRecord* QFRDRImagingFCSPlugin::insertProjectRecordFiles(const QString &type, const QString &name, const QStringList &files, const QString& role, const QString& group, const QStringList &filetypes, const QStringList &filedescriptions, const QString &description, const QString &directory, const QMap<QString,QVariant>& init_params, const QStringList& init_params_readonly) {
+QFRawDataRecord* QFRDRImagingFCSPlugin::insertProjectRecordFiles(const QString &type, const QString &name, const QStringList &files, const QString& role, const QString& group, const QStringList &filetypes, const QStringList &filedescriptions, const QString &description, const QString &directory, const QMap<QString,QVariant>& init_params, const QStringList& init_params_readonly, const QMap<QString, QVariant> &inputfile_props, const QString &inputfile_comment) {
     bool found=false;
     QFRawDataRecord*  r=NULL;
     for (int i=0; i<project->getRawDataCount(); i++) {
@@ -393,11 +403,19 @@ QFRawDataRecord* QFRDRImagingFCSPlugin::insertProjectRecordFiles(const QString &
         }
     }
     if (!found && project->getRawDataRecordFactory()->contains(type)) {
+        QMap<QString,QVariant> ipar=inputfile_props;
+        QStringList iparro=inputfile_props.keys();
+        iparro.append(init_params_readonly);
+        QMapIterator<QString,QVariant> it(init_params);
+        while (it.hasNext()) {
+            it.next();
+            ipar[it.key()]=it.value();
+        }
 
         // insert new record:                  type ID, name for record,                                  list of files,    initial parameters, which parameters are readonly?
-        QFRawDataRecord* e=project->addRawData(type, name, role, files,  init_params, init_params_readonly, filetypes, filedescriptions);
+        QFRawDataRecord* e=project->addRawData(type, name, role, files,  ipar, iparro, filetypes, filedescriptions);
         e->setFolder(directory);
-        e->setDescription(description);
+        e->setDescription(description+"\n\n"+inputfile_comment);
         if (!group.isEmpty()) e->setGroup(project->addOrFindRDRGroup(group));
         if (e->error()) { // when an error occured: remove record and output an error message
             QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(files.value(0, "---")).arg(e->errorDescription()));
@@ -464,10 +482,10 @@ bool QFRDRImagingFCSPlugin::parseSPIMSettings(const QString& filename_settings, 
     return false;
 }
 
-void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, const QString& filename_overvieww, const QString& filename_evalsettings, bool binary, const QString& roleIn, int internalDualViewMode, int dualViewID, bool addCorrelations, bool adNandB, const QString& group) {
+void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, const QString& filename_overvieww, const QString& filename_evalsettings, bool binary, const QString& roleIn, int internalDualViewMode, int dualViewID, bool addCorrelations, bool adNandB, const QString& group, const QMap<QString, QVariant>& props, const QString& comment) {
 
     // here we store some initial parameters
-    QMap<QString, QVariant> initParams;
+    QMap<QString, QVariant> initParams=props;
     QString filename_overview=filename_overvieww;
     QString filename_overviewstd="";
     QString filename_background="";
@@ -480,7 +498,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
     int dccfid=-1;
 
     // add all properties in initParams that will be readonly
-    QStringList paramsReadonly;
+    QStringList paramsReadonly=props.keys();
     paramsReadonly<<"FILETYPE"<<"IS_OVERVIEW_SCALED"<<"INTERNAL_DUALVIEW_MODE"<<"INTERNAL_DUALVIEW_MODE_CHANNEL";
 
     bool ok=true;
@@ -547,7 +565,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - %1").arg(role), role, files, initParams, paramsReadonly, files_types, files_descriptions);
                     e->setFolder(folder);
                     if (!group.isEmpty()) e->setGroup(project->addOrFindRDRGroup(group));
-                    if (!description.isEmpty()) e->setDescription(description);
+                    if (!description.isEmpty() || !comment.isEmpty()) e->setDescription(description+"\n\n"+comment);
                     if (e->error()) { // when an error occured: remove record and output an error message
                         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
                         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
@@ -566,7 +584,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - %1").arg(role), role, files, initParams, paramsReadonly, files_types, files_descriptions);
                         e->setFolder(folder);
                         if (!group.isEmpty()) e->setGroup(project->addOrFindRDRGroup(group));
-                        if (!description.isEmpty()) e->setDescription(description);
+                        if (!description.isEmpty() || !comment.isEmpty()) e->setDescription(description+"\n\n"+comment);
 
                         if (e->error()) { // when an error occured: remove record and output an error message
                             QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
@@ -586,7 +604,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                         QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - %1").arg(role), role, files, initParams, paramsReadonly, files_types, files_descriptions);
                         e->setFolder(folder);
                         if (!group.isEmpty()) e->setGroup(project->addOrFindRDRGroup(group));
-                        if (!description.isEmpty()) e->setDescription(description);
+                        if (!description.isEmpty() || !comment.isEmpty()) e->setDescription(description+"\n\n"+comment);
                         if (e->error()) { // when an error occured: remove record and output an error message
                             QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
                             services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
@@ -610,7 +628,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                     QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - %1").arg(role), role, files, initParams, paramsReadonly, files_types, files_descriptions);
                     e->setFolder(folder);
                     if (!group.isEmpty()) e->setGroup(project->addOrFindRDRGroup(group));
-                    if (!description.isEmpty()) e->setDescription(description);
+                    if (!description.isEmpty() || !comment.isEmpty()) e->setDescription(description+"\n\n"+comment);
                     if (e->error()) { // when an error occured: remove record and output an error message
                         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
                         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
@@ -635,7 +653,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
                 QStringList init_params_readonly=paramsReadonly;
                 init_params["BACKGROUND_CORRECTED"]=true;
                 init_params_readonly<<"BACKGROUND_CORRECTED";
-                insertProjectRecordFiles("number_and_brightness", fi.fileName()+tr(" - number & brightness"), ffiles, "", group, ffile_types, ffiles_descriptions, description, folder, init_params, init_params_readonly);
+                insertProjectRecordFiles("number_and_brightness", fi.fileName()+tr(" - number & brightness"), ffiles, "", group, ffile_types, ffiles_descriptions, description, folder, init_params, init_params_readonly, props, comment);
             }
 
             if (QFile::exists(filename_settings)) {
@@ -667,7 +685,7 @@ void QFRDRImagingFCSPlugin::insertVideoCorrelatorFile(const QString& filename, c
 
 }
 
-void QFRDRImagingFCSPlugin::insertNandBFromVideoCorrelatorFile(const QString& evalFilename, const QString &filename_overvieww, const QString &filename_overviewstdw, const QString &filenameBack, const QString &filenameBackStd, int internalDualViewMode, int dualViewID, const QString& roleIn, const QString& group)
+void QFRDRImagingFCSPlugin::insertNandBFromVideoCorrelatorFile(const QString& evalFilename, const QString &filename_overvieww, const QString &filename_overviewstdw, const QString &filenameBack, const QString &filenameBackStd, int internalDualViewMode, int dualViewID, const QString& roleIn, const QString& group, const QMap<QString, QVariant> &props, const QString &comment)
 {
 
     // here we store some initial parameters
@@ -751,7 +769,7 @@ void QFRDRImagingFCSPlugin::insertNandBFromVideoCorrelatorFile(const QString& ev
                 QStringList init_params_readonly=paramsReadonly;
                 init_params["BACKGROUND_CORRECTED"]=true;
                 init_params_readonly<<"BACKGROUND_CORRECTED";
-                insertProjectRecordFiles("number_and_brightness", fi.fileName()+tr(" - number & brightness"), ffiles, role, group, ffile_types, ffiles_descriptions, description, folder, init_params, init_params_readonly);
+                insertProjectRecordFiles("number_and_brightness", fi.fileName()+tr(" - number & brightness"), ffiles, role, group, ffile_types, ffiles_descriptions, description, folder, init_params, init_params_readonly, props, comment);
             }
 
             if (QFile::exists(filename_settings)) {

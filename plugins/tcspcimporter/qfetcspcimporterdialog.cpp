@@ -304,6 +304,8 @@ void QFETCSPCImporterDialog::writeSettings() {
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/fcs_taumin", ui->spinFCSTauMin->value());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/range_start", ui->spinRangeStart->value());
     options->getQSettings()->setValue("tcspcimporter/dlg_correlate/range_end", ui->spinRangeEnd->value());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/chkCountrate", ui->chkCountrate->isChecked());
+    options->getQSettings()->setValue("tcspcimporter/dlg_correlate/chkFCS", ui->chkFCS->isChecked());
 }
 
 void QFETCSPCImporterDialog::readSettings() {
@@ -324,6 +326,8 @@ void QFETCSPCImporterDialog::readSettings() {
     ui->spinFCSTauMin->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/fcs_taumin", ui->spinFCSTauMin->value()).toDouble());
     ui->spinRangeEnd->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/range_end", ui->spinRangeEnd->value()).toDouble());
     ui->spinRangeStart->setValue(options->getQSettings()->value("tcspcimporter/dlg_correlate/range_start", ui->spinRangeStart->value()).toDouble());
+    ui->chkCountrate->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/chkCountrate", ui->chkAddToProject->isChecked()).toBool());
+    ui->chkFCS->setChecked(options->getQSettings()->value("tcspcimporter/dlg_correlate/chkFCS", ui->chkFCS->isChecked()).toBool());
 
 }
 
@@ -577,7 +581,7 @@ void QFETCSPCImporterDialog::updateFromFile(bool readFrameCount) {
 }
 
 
-QList<QPair<QStringList, QString> > QFETCSPCImporterDialog::getFilesToAdd() const {
+QList<QFETCSPCImporterJobThreadAddFileProps > QFETCSPCImporterDialog::getFilesToAdd() const {
     return filesToAdd;
 }
 

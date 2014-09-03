@@ -58,9 +58,7 @@ double QFETCSPCImporterJobThread::durationS() const {
     return duration;
 }
 
-QList<QPair<QStringList, QString> > QFETCSPCImporterJobThread::getAddFiles() const {
-    return addFiles;
-}
+
 
 TCSPCImporterJob QFETCSPCImporterJobThread::getJob() const {
     return job;
@@ -107,6 +105,11 @@ int QFETCSPCImporterJobThread::getImporterCount(QFPluginServices *pluginservices
     QStringList imp=pluginservices->getImporterManager()->getImporters<QFTCSPCReader*>();
     return imp.size();
 
+}
+
+QList<QFETCSPCImporterJobThreadAddFileProps> QFETCSPCImporterJobThread::getAddFiles() const
+{
+    return addFiles;
 }
 
 int QFETCSPCImporterJobThread::status() const {
@@ -196,6 +199,8 @@ void QFETCSPCImporterJobThread::run() {
                 if (reader) messageChanged(tr("error opening file '%1': %2").arg(job.filename).arg(reader->lastError()));
                 else emit messageChanged(tr("error opening file '%1'").arg(job.filename));
             } else {
+                job.props=reader->getFileInfo().properties;
+                job.comment=reader->getFileInfo().comment;
                 emit progressIncrement(10);
                 ////////////////////////////////////////////////////////////////////////////////////////////
                 // CREATE FILENAMES FOR RESULTS AND MAKE SURE THE DIRECTORY FOR THE FILES EXISTS (mkpath() )
@@ -246,7 +251,10 @@ void QFETCSPCImporterJobThread::run() {
                     if (job.doCountrate) {
                         countrate_items=uint64_t(ceil(range_duration/job.countrate_binning));
                         if (crFile.open(QIODevice::WriteOnly)) {
-                            addFiles.append(qMakePair(QStringList(crFilenameBin), QString("photoncounts_binary")));
+                            QFETCSPCImporterJobThreadAddFileProps fp(QStringList(crFilenameBin), QString("photoncounts_binary"), job.props);
+                            fp.comment=job.comment;
+                            fp.group=job.filename;
+                            addFiles.append(fp);
                             crFile.write("QF3.0CNTRT");
                             binfileWriteUint16(crFile, job.countrate_channels.size());
                             binfileWriteUint64(crFile, countrate_items);
@@ -403,16 +411,28 @@ void QFETCSPCImporterJobThread::run() {
                              ccfFilenames.append(fn);
                              if (ccf.first==ccf.second) {
                                  if (localFilenameCR.isEmpty()) {
-                                     addFiles.append(qMakePair(QStringList(localFilename), QString("fcs_csv")));
+                                     QFETCSPCImporterJobThreadAddFileProps fp(QStringList(localFilename), QString("fcs_csv"), job.props);
+                                     fp.comment=job.comment;
+                                     fp.group=job.filename;
+                                     fp.role=QString("ACF%1").arg(fn.channel1);
+                                     addFiles.append(fp);
                                  } else {
                                      QStringList sl;
                                      sl<<localFilename<<localFilenameCR;
-                                     addFiles.append(qMakePair(sl, QString("fcs_csv")));
+                                     QFETCSPCImporterJobThreadAddFileProps fp(sl, QString("fcs_csv"), job.props);
+                                     fp.comment=job.comment;
+                                     fp.group=job.filename;
+                                     fp.role=QString("ACF%1").arg(fn.channel1);
+                                     addFiles.append(fp);
                                  }
                              } else {
                                  QStringList sl;
                                  sl<<localFilename<<localFilenameCR;
-                                 addFiles.append(qMakePair(sl, QString("fcs_cross_csv")));
+                                 QFETCSPCImporterJobThreadAddFileProps fp(sl, QString("fcs_cross_csv"), job.props);
+                                 fp.comment=job.comment;
+                                 fp.group=job.filename;
+                                 fp.role=QString("FCCS(%1-%2)").arg(fn.channel1).arg(fn.channel2);
+                                 addFiles.append(fp);
                              }
 
                         }

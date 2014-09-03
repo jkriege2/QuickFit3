@@ -114,7 +114,16 @@ p, li { white-space: pre-wrap; }
          <property name="verticalSpacing">
           <number>2</number>
          </property>
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item row="1" column="0">
@@ -378,7 +387,7 @@ p, li { white-space: pre-wrap; }
             <string>&amp;counrate:</string>
            </property>
            <property name="checked">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -457,8 +466,20 @@ p, li { white-space: pre-wrap; }
          </item>
          <item row="5" column="1">
           <widget class="QWidget" name="widCountrate" native="true">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <layout class="QVBoxLayout" name="verticalLayout_4">
-            <property name="margin">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <item>
@@ -602,7 +623,16 @@ p, li { white-space: pre-wrap; }
          <item row="3" column="1">
           <widget class="QWidget" name="widFCS" native="true">
            <layout class="QVBoxLayout" name="verticalLayout">
-            <property name="margin">
+            <property name="leftMargin">
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>0</number>
+            </property>
+            <property name="rightMargin">
+             <number>0</number>
+            </property>
+            <property name="bottomMargin">
              <number>0</number>
             </property>
             <item>
@@ -1080,7 +1110,16 @@ p, li { white-space: pre-wrap; }
           <property name="spacing">
            <number>2</number>
           </property>
-          <property name="margin">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
            <number>2</number>
           </property>
           <item>
@@ -1189,6 +1228,7 @@ p, li { white-space: pre-wrap; }
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfetcspcimporter.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
@@ -1201,8 +1241,8 @@ p, li { white-space: pre-wrap; }
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>868</x>
-     <y>612</y>
+     <x>900</x>
+     <y>640</y>
     </hint>
     <hint type="destinationlabel">
      <x>719</x>
@@ -1234,7 +1274,7 @@ p, li { white-space: pre-wrap; }
    <hints>
     <hint type="sourcelabel">
      <x>195</x>
-     <y>317</y>
+     <y>345</y>
     </hint>
     <hint type="destinationlabel">
      <x>487</x>

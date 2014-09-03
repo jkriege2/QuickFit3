@@ -28,6 +28,7 @@
 #include "qmodernprogresswidget.h"
 #include <QPair>
 #include "qfrawdatarecord.h"
+#include"qfetcspcimporterjobthread.h"
 
 #define LOG_PREFIX QString("tcspcimporter >>> ").toUpper()
 
@@ -83,7 +84,7 @@ void QFETCSPCImporter::startPlugin() {
     }
 }
 
-void QFETCSPCImporter::insertFCSCSVFile(const QString& filenameFCS, const QString &filenameCR, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group, const QString& role) {
+QFRawDataRecord *QFETCSPCImporter::insertFCSCSVFile(const QString& filenameFCS, const QString &filenameCR, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group, const QString& role) {
     QStringList sl, types;
     sl<<filenameFCS;
     types<<"ACF";
@@ -91,18 +92,21 @@ void QFETCSPCImporter::insertFCSCSVFile(const QString& filenameFCS, const QStrin
         sl<<filenameCR;
         types<<"RATE";
     }
-
-    QFRawDataRecord* e=project->addRawData("fcs", QFileInfo(filenameFCS).fileName(), sl, paramValues, paramReadonly, types);
+    QString r="";
+    if (!role.isEmpty()) r=QString(" - ")+role;
+    QFRawDataRecord* e=project->addRawData("fcs", QFileInfo(filenameFCS).fileName()+r, sl, paramValues, paramReadonly, types);
     e->setRole(role);
     if (!group.isEmpty()) e->setGroup(project->addOrFindRDRGroup(group));
     if (e->error()) {
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filenameFCS).arg(e->errorDescription()));
         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filenameFCS).arg(e->errorDescription()));
         project->deleteRawData(e->getID());
+        return NULL;
     }
+    return e;
 }
 
-void QFETCSPCImporter::insertFCCSCSVFile(const QString& filenameFCS, const QString &filenameCR1, const QString &filenameCR2, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group, const QString& role) {
+QFRawDataRecord *QFETCSPCImporter::insertFCCSCSVFile(const QString& filenameFCS, const QString &filenameCR1, const QString &filenameCR2, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString& group, const QString& role) {
     QStringList sl, types;
 
     sl<<filenameFCS;
@@ -116,35 +120,42 @@ void QFETCSPCImporter::insertFCCSCSVFile(const QString& filenameFCS, const QStri
         types<<"RATE";
     }
 
-
-    QFRawDataRecord* e=project->addRawData("fcs", QFileInfo(filenameFCS).fileName(), sl, paramValues, paramReadonly, types);
+    QString r="";
+    if (!role.isEmpty()) r=QString(" - ")+role;
+    QFRawDataRecord* e=project->addRawData("fcs", QFileInfo(filenameFCS).fileName()+r, sl, paramValues, paramReadonly, types);
     e->setRole(role);
     if (!group.isEmpty()) e->setGroup(project->addOrFindRDRGroup(group));
     if (e->error()) {
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filenameFCS).arg(e->errorDescription()));
         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filenameFCS).arg(e->errorDescription()));
         project->deleteRawData(e->getID());
+        return NULL;
     }
+    return e;
 }
 
-void QFETCSPCImporter::insertCountRate(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly, const QString& group, const QString& role) {
-    QFRawDataRecord* e=project->addRawData("photoncounts", QFileInfo(filename).fileName(), QStringList(filename), paramValues, paramReadonly);
+QFRawDataRecord *QFETCSPCImporter::insertCountRate(const QString& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly, const QString& group, const QString& role) {
+    QString r="";
+    if (!role.isEmpty()) r=QString(" - ")+role;
+    QFRawDataRecord* e=project->addRawData("photoncounts", QFileInfo(filename).fileName()+r, QStringList(filename), paramValues, paramReadonly);
     e->setRole(role);
     if (!group.isEmpty()) e->setGroup(project->addOrFindRDRGroup(group));
     if (e->error()) {
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
         services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
         project->deleteRawData(e->getID());
+        return NULL;
     }
+    return e;
 }
 
 void QFETCSPCImporter::correlationDialogClosed() {
     if (!dlgCorrelate) return;
 
 
-    QList<QPair<QStringList, QString> > list=dlgCorrelate->getFilesToAdd();
+    QList<QFETCSPCImporterJobThreadAddFileProps > list=dlgCorrelate->getFilesToAdd();
 
-    QList<QPair<QStringList, QString> >::Iterator it = list.begin();
+    QList<QFETCSPCImporterJobThreadAddFileProps >::Iterator it = list.begin();
     services->setProgressRange(0, list.size());
     services->setProgress(0);
     int i=0;
@@ -154,39 +165,43 @@ void QFETCSPCImporter::correlationDialogClosed() {
     progress.open();
     while(it != list.end()) {
         i++;
-        QString filename=it->first.value(0,"");
-        QString type=it->second.toLower();
+        QString filename=it->files.value(0,"");
+        QString type=it->type.toLower();
 
         services->log_text(tr("loading [%2] '%1' ...\n").arg(filename).arg(type));
         progress.setLabelText(tr("loading [%2] '%1' ...\n").arg(filename).arg(type));
         QApplication::processEvents();
-        QMap<QString, QVariant> initParams;
-        QStringList paramsReadonly;
+        QMap<QString, QVariant> initParams=it->props;
+        QStringList paramsReadonly=it->props.keys();
+        QFRawDataRecord* rdr=NULL;
         if (type=="photoncounts") {
             initParams["FILETYPE"]="CSV";
             paramsReadonly<<"FILETYPE";
-            insertCountRate(filename, initParams, paramsReadonly);
+            rdr=insertCountRate(filename, initParams, paramsReadonly);
         } else if (type=="photoncounts_binary") {
             initParams["FILETYPE"]="BINARY";
             paramsReadonly<<"FILETYPE";
-            insertCountRate(filename, initParams, paramsReadonly);
+            rdr=insertCountRate(filename, initParams, paramsReadonly);
         } else if (type=="fcs_csv") {
             initParams["FILETYPE"]="CSV_CORR";
-            if (it->first.value(1,"")!="") initParams["FILETYPE"]="CSV_CORR_RATE";
+            if (it->files.value(1,"")!="") initParams["FILETYPE"]="CSV_CORR_RATE";
             initParams["CSV_SEPARATOR"]=QString(",");
             initParams["CSV_COMMENT"]=QString("#");
             initParams["CROSS_CORRELATION"]=false;
             paramsReadonly<<"FILETYPE"<<"CSV_COMMENT"<<"CSV_SEPARATOR"<<"CROSS_CORRELATION";
-            insertFCSCSVFile(filename, it->first.value(1,""), initParams, paramsReadonly);
+            rdr=insertFCSCSVFile(filename, it->files.value(1,""), initParams, paramsReadonly,it->group, it->role);
         } else if (type=="fcs_cross_csv") {
             initParams["FILETYPE"]="CSV_CORR";
-            if (it->first.value(1,"")!="") initParams["FILETYPE"]="CSV_CORR_RATE";
+            if (it->files.value(1,"")!="") initParams["FILETYPE"]="CSV_CORR_RATE";
             initParams["CSV_SEPARATOR"]=QString(",");
             initParams["CSV_COMMENT"]=QString("#");
             initParams["CROSS_CORRELATION"]=true;
             paramsReadonly<<"FILETYPE"<<"CSV_COMMENT"<<"CSV_SEPARATOR"<<"CROSS_CORRELATION";
 
-            insertFCCSCSVFile(filename, it->first.value(1,""), it->first.value(2,""), initParams, paramsReadonly);
+            rdr=insertFCCSCSVFile(filename, it->files.value(1,""), it->files.value(2,""), initParams, paramsReadonly,it->group, it->role);
+        }
+        if (rdr) {
+            rdr->setDescription(rdr->getDescription()+QString("\n\n")+it->comment);
         }
         //insertVideoCorrelatorFile(filename, overview, filename.toLower().endsWith(".bin"));
         settings->setCurrentRawDataDir(QFileInfo(filename).dir().absolutePath());

@@ -26,7 +26,8 @@ TARGET = fit_lmfit
 DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 include(../plugins.pri)
-include(../../extlibs/lmfit.pri)
+#include(../../extlibs/lmfit.pri)
+include(../../extlibs/lmfit5.pri)
 
 DESTDIR = $${QFOUTPUT}/plugins/
 include(../../libquickfitwidgets.pri)

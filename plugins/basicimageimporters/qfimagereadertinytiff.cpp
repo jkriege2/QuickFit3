@@ -80,6 +80,7 @@ bool QFImageReaderTinyTIFF::open(QString filename) {
     width=0;
     height=0;
     frame=0;
+    fileinfo.init(filename);
     tif=TinyTIFFReader_open(filename.toLocal8Bit().data());
     if (TinyTIFFReader_success(tif)) {
         this->filename=filename;

@@ -239,6 +239,8 @@ class QFRDRImagingFCSCorrelationJobThread : public QThread {
             int internalDualViewMode;
             int dualViewID;
             FileTypes filetype;
+            QMap<QString, QVariant> props;
+            QString comment;
         };
 
         Fileinfo getFileInfo(const QString& filename, const QString& filenameEvalSettings, const QString& role="", const QString& group="");
@@ -574,6 +576,10 @@ data                                                   size [bytes]             
         static QMutex* mutexFilename;
 
         QFPluginServices* pluginservices;
+
+        FileTypes filetype;
+        QMap<QString, QVariant> props;
+        QString comment;
 
 };
 

@@ -23,6 +23,10 @@
 #define QFIMPORTER_H
 
 #include <QString>
+#include <QDateTime>
+#include <QMap>
+#include <QVariant>
+#include <QFileInfo>
 #include "lib_imexport.h"
 
 /*! \brief interface (file) reader reader classes (importer)
@@ -31,6 +35,22 @@
 */
 class QFLIB_EXPORT QFImporter {
     public:
+        struct QFLIB_EXPORT FileInfo {
+            QString comment;
+            QDateTime date;
+            QString filename;
+            QMap<QString, QVariant> properties;
+            FileInfo() {
+                comment="";
+                date=QDateTime::currentDateTime();
+                properties.clear();
+            }
+            inline void init(const QString& filename) {
+                date=QFileInfo(filename).created();
+                this->filename=filename;
+            }
+        };
+
         virtual ~QFImporter() {}
 
         /** \brief return a description of the last error that occured */
@@ -42,7 +62,9 @@ class QFLIB_EXPORT QFImporter {
         /** \brief return a name string for the file format */
         virtual QString formatName() const =0;
 
-
+        const FileInfo& getFileInfo() const {
+            return fileinfo;
+        }
 
     protected:
 
@@ -52,7 +74,10 @@ class QFLIB_EXPORT QFImporter {
 
     private:
         QString err;
+    protected:
+        FileInfo fileinfo;
 };
 
 
 #endif // QFIMPORTER_H
+

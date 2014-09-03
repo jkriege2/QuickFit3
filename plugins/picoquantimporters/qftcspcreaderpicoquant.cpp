@@ -45,6 +45,7 @@ QString QFTCSPCReaderPicoquant::formatName() const {
 
 bool QFTCSPCReaderPicoquant::open(const QString &filename, const QString &parameters) {
     close();
+    fileinfo.init(filename);
     tttrfile=fopen(filename.toAscii().data(), "rb");
     if (tttrfile) {
         QString error="";

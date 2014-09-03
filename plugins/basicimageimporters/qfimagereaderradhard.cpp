@@ -78,6 +78,7 @@ bool QFImageReaderRadhard::open(QString filename) {
   close();
   bool result=true;
   file = new QFile(filename);
+  fileinfo.init(filename);
   if (!file->open(QIODevice::ReadOnly)) {
       setLastError(file->errorString());
       return false;

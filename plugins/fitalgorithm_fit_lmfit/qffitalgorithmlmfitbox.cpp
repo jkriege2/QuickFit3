@@ -80,7 +80,7 @@ QFFitAlgorithmLMFitBox::QFFitAlgorithmLMFitBox() {
     setParameter("gtol", control.gtol);
     setParameter("epsilon", control.epsilon);
     setParameter("stepbound", control.stepbound);
-    setParameter("max_iterations", control.maxcall);
+    setParameter("max_iterations", control.patience);
 }
 
 QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, double* paramErrorsOut, const double* initialParams, QFFitAlgorithm::Functor* model, const double* paramsMin, const double* paramsMax) {
@@ -94,13 +94,13 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
 
     lm_status_struct status;
     lm_control_struct control = lm_control_double;
-    control.printflags = 0; // monitor status (+1) and parameters (+2)
+    control.verbosity = 0; // monitor status (+1) and parameters (+2)
     control.ftol=getParameter("ftol").toDouble();
     control.xtol=getParameter("xtol").toDouble();
     control.gtol=getParameter("gtol").toDouble();
     control.epsilon=getParameter("epsilon").toDouble();
     control.stepbound=getParameter("stepbound").toDouble();
-    control.maxcall=getParameter("max_iterations").toInt();
+    control.patience=getParameter("max_iterations").toInt();
 
     QFFItAlgorithmGSL_evalData d;
     d.model=model;
@@ -111,7 +111,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
 
     bool transformParams=paramsMin&&paramsMax;
 
-    lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status, NULL );
+    lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status );
     if (paramsMin && paramsMax) {
         for (int i=0; i<paramCount; i++) {
             const double mi=paramsMin[i];
@@ -150,9 +150,16 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
     result.addNumber("error_sum", status.fnorm);
     result.addNumber("iterations", status.nfev);
 
-    result.fitOK=QString(lm_infmsg[status.info]).contains("success");
-    result.message=QString(lm_infmsg[status.info]);
-    result.messageSimple=QString(lm_infmsg[status.info]);
+    if (status.outcome>=0) {
+        result.fitOK=QString(lm_infmsg[status.outcome]).contains("success") || QString(lm_infmsg[status.outcome]).contains("converged");
+        result.message=QString(lm_infmsg[status.outcome]);
+        result.messageSimple=QString(lm_infmsg[status.outcome]);
+    } else {
+        result.fitOK=true;
+        result.message="";
+        result.messageSimple="";
+    }
+
     if (d.p) free(d.p);
 
     return result;

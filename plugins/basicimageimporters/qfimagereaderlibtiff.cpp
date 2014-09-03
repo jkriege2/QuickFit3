@@ -84,7 +84,7 @@ bool QFImageReaderLIBTIFF::open(QString filename) {
     close();
 
 
-
+    fileinfo.init(filename);
     //TIFFSetWarningHandler(0);
     //qDebug()<<"QFImageReaderLIBTIFF::open("<<filename<<")     tif="<<tif;
     tif = TIFFOpen(filename.toAscii().data(),"r");
@@ -95,6 +95,12 @@ bool QFImageReaderLIBTIFF::open(QString filename) {
         width=nx;
         height=ny;
         this->filename=filename;
+        char* desc=NULL;
+        if (!TIFFGetField(tif, TIFFTAG_DOCUMENTNAME, &desc)) {
+            TIFFGetField(tif, TIFFTAG_IMAGEDESCRIPTION, &desc);
+        }
+        if (desc) fileinfo.comment=desc;
+
         //TIFFSetWarningHandler(NULL);
         //qDebug()<<"  QFImageReaderLIBTIFF::open("<<filename<<")   tif="<<tif<<"  result=false";
         logTIFFMessage("QFImageReaderLIBTIFF", "opened file %s\n", filename.toLocal8Bit().data());

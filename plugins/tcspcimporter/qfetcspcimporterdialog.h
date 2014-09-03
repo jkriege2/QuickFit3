@@ -32,6 +32,7 @@
 #include "qftablemodel.h"
 
 class QFETCSPCImporterJobThread; // forward
+class QFETCSPCImporterJobThreadAddFileProps;
 struct TCSPCImporterJob; // forward
 namespace Ui {
     class QFETCSPCImporterDialog; // forward
@@ -59,7 +60,7 @@ public:
     void writeSettings();
     void readSettings();
 
-    QList<QPair<QStringList, QString> > getFilesToAdd() const;
+    QList<QFETCSPCImporterJobThreadAddFileProps> getFilesToAdd() const;
 
     protected slots:
     void on_spinRangeEnd_valueChanged(double val);
@@ -101,7 +102,7 @@ private:
     QFTableModel* tmCR;
     QFTableModel* tmFCS;
     //QList<Job> jobsToAdd;
-    QList<QPair<QStringList, QString> > filesToAdd;
+    QList<QFETCSPCImporterJobThreadAddFileProps > filesToAdd;
     QString countRateString;
     bool closing;
     double duration;

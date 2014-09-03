@@ -60,6 +60,7 @@ bool QFImageReaderDiffusion4Binary::open(QString filename) {
     frames=0;
     this->filename="";
     framedata.clear();
+    fileinfo.init(filename);
 
     input.setFileName(filename);
     if (input.open(QIODevice::ReadOnly)) {

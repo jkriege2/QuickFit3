@@ -56,6 +56,7 @@ QString QFSimpleTCSPCImporter::formatName() const {
 
 bool QFSimpleTCSPCImporter::open(const QString &filename, const QString &parameters) {
     close();
+    fileinfo.init(filename);
     tttrfile=fopen(filename.toAscii().data(), "rb");
     bool dok=false;
     double pd=parameters.toDouble(&dok);

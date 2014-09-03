@@ -63,7 +63,7 @@ class QFPicoQuantImporters : public QObject, public QFPluginImporters {
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("(c) 2012 by Jan W. Krieger");
+            return tr("(c) 2012-2014 by Jan W. Krieger");
         }
 
         /** \brief weblink for the plugin */
@@ -84,7 +84,7 @@ class QFPicoQuantImporters : public QObject, public QFPluginImporters {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         }
 
         /** \brief return list of plugin IDs */

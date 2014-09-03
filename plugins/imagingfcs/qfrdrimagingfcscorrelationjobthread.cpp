@@ -225,6 +225,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
             } else {
                 emit progressIncrement(10);
                 emit messageChanged(tr("counting frames ..."));
+                props=reader->getFileInfo().properties;
+                comment=reader->getFileInfo().comment;
                 reader->setBinning(job.binning);
                 reader->setInterleavedBinning(job.interleaved_binning);
                 reader->setAverageBinning(job.binAverage);
@@ -3191,6 +3193,8 @@ QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThrea
     i.group=group;
     i.dualViewID=0;
     i.internalDualViewMode=0;
+    i.props=props;
+    i.comment=comment;
     return i;
 }
 
@@ -3203,6 +3207,8 @@ QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThrea
     i.group=group;
     i.dualViewID=dualViewID;
     i.internalDualViewMode=job.dualViewMode;
+    i.props=props;
+    i.comment=comment;
     return i;
 }
 
@@ -3219,6 +3225,8 @@ QFRDRImagingFCSCorrelationJobThread::Fileinfo QFRDRImagingFCSCorrelationJobThrea
     i.dualViewID=dualViewID;
     i.internalDualViewMode=job.dualViewMode;
     i.filetype=QFRDRImagingFCSCorrelationJobThread::ftNandB;
+    i.props=props;
+    i.comment=comment;
     //qDebug()<<"getFileInfoNandB:"<<filename<<filenameVar<<filenameBack<<filenameBackVar;
     return i;
 }

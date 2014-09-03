@@ -41,6 +41,9 @@
 #include <QSet>
 #include <QPair>
 
+// TODO: reimplement this properly, so ACF0 and ACF1 in FCCS evals see both count rates ... possibly use an internal binary dataformat?
+// TODO: add bleach correction
+
 class QFETCSPCImporterThreadProgress; // forward
 class QFETCSPCImporterJobThread; // forward
 
@@ -104,6 +107,23 @@ struct TCSPCImporterJob {
     QSet<QPair<int, int> > fcs_correlate;
     QSet<int> countrate_channels;
 
+    QMap<QString, QVariant> props;
+    QString comment;
+
+};
+
+struct QFETCSPCImporterJobThreadAddFileProps {
+    QStringList files;
+    QString type;
+    QMap<QString, QVariant> props;
+    QString comment;
+    QString group;
+    QString role;
+    QFETCSPCImporterJobThreadAddFileProps(const QStringList& files, const QString& type, const QMap<QString, QVariant>& props) {
+        this->files=files;
+        this->type=type;
+        this->props=props;
+    }
 };
 
 /*! \brief this thread does all the evaluation work
@@ -147,6 +167,8 @@ class QFETCSPCImporterJobThread : public QThread
 {
     Q_OBJECT
 public:
+
+
     explicit QFETCSPCImporterJobThread(QFPluginServices* services, QObject *parent = 0);
     ~QFETCSPCImporterJobThread();
     int status() const;
@@ -155,7 +177,7 @@ public:
     static QStringList getImporterFormatNameList(QFPluginServices *pluginServices);
     static QFTCSPCReader* getImporter(int idx, QFPluginServices *pluginServices);
     static int getImporterCount(QFPluginServices *pluginServices);
-    QList<QPair<QStringList, QString> > getAddFiles() const;
+    QList<QFETCSPCImporterJobThreadAddFileProps > getAddFiles() const;
     TCSPCImporterJob getJob() const;
     double durationMS() const;
     double durationS() const;
@@ -246,7 +268,7 @@ protected:
     QFTCSPCReader* reader;
 
     QLocale outLocale;
-    QList<QPair<QStringList, QString> > addFiles;
+    QList<QFETCSPCImporterJobThreadAddFileProps > addFiles;
     QString outputFilenameBase;
 
 
@@ -283,11 +305,14 @@ protected:
 
         QStringList filenameCR;
 
+        bool cr_swapped;
+
         ccfFileConfig() {
             channel1=0;
             channel2=0;
             filename="";
             filenameCR.clear();
+            cr_swapped=false;
         }
     };
 };

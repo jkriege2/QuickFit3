@@ -45,6 +45,7 @@ QString QFTCSPCReaderPicoquantPT3::formatName() const {
 
 bool QFTCSPCReaderPicoquantPT3::open(const QString &filename, const QString &parameters) {
     close();
+    fileinfo.init(filename);
     tttrfile=fopen(filename.toAscii().data(), "rb");
     if (tttrfile) {
         QString error="";
@@ -133,6 +134,7 @@ bool QFTCSPCReaderPicoquantPT3::nextRecord() {
         double truetime = (truensync*syncperiod + (double)TTTRrecord.bits.dtime*(double)boardHeader.Resolution)/1000000000.0;
 
         current.macrotime=truetime;
+        current.isPhoton=false;
         if(TTTRrecord.bits.channel!=0xF) {
             current.input_channel=TTTRrecord.bits.channel;
             current.microtime_channel=TTTRrecord.bits.dtime;
@@ -146,6 +148,7 @@ bool QFTCSPCReaderPicoquantPT3::nextRecord() {
             } else {
                 // we have a marker
                 truetime = truensync*syncperiod/1000000000.0;
+                current.macrotime=truetime;
                 current.marker_type=TTTRrecord.special.markers;
                 ok=true;
             }

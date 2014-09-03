@@ -64,7 +64,7 @@ class QFPFitAlgorithmLMFitPlugin : public QObject, public QFPluginFitAlgorithm {
 
         /** \brief copyright information the plugin */
         virtual QString getCopyright() const {
-            return tr("plugin: (c) 2011;-2013 Jan Krieger<br/>lmfit: (c) 2009-2010  Joachim Wuttke <j.wuttke@fz-juelich.de>");
+            return tr("plugin: (c) 2011-2014 Jan Krieger<br/>lmfit: (c) 2009-2013  Joachim Wuttke <j.wuttke@fz-juelich.de>");
         };
 
         /** \brief weblink for the plugin */

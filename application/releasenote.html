@@ -96,6 +96,8 @@
             <li>added autolinks to the online-help system</li>
             <li>in reults tables: parameter histograms now support a relaxed auto-ranging</li>
             <li>in reults tables: parameter histograms now support a distribution fit to the histogram</li>
+            <li>bugfix: fixed possible crash, when loading a project, which contains an evaluation object, for which no plugin is installed.</li>
+            <li>QFImporters can now return properties from the file</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -303,6 +305,15 @@
       </ul></li>
       <li><b>qfe_plotterexporterlatex</b><ul>
             <li>added export filter option, which does not parse the LaTeX strings.</li>
+      </ul></li>
+      <li><b>fit_lmfit</b><ul>
+        <li>now uses lmit-5.1</li>
+      </ul></li>
+      <li><b>picoquantimporters</b><ul>
+        <li>added support for PicoQuant PTU files</li>
+      </ul></li>
+      <li><b>tcspcimporter:</b><ul>
+        <li>improvements: now group+role of the output records are set properly (according to input file!)</li>
       </ul></li>
     </ul></li>
 

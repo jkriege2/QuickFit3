@@ -23,11 +23,13 @@
 #include "qfpicoquantimporters.h"
 #include "qftcspcreaderpicoquant.h"
 #include "qftcspcreaderpicoquantpt3.h"
+#include "qftcspcreaderpicoquantptu.h"
 
 QStringList QFPicoQuantImporters::getIDs() const {
     QStringList res;
     res<<"tcspcimporter_picoquant";
     res<<"tcspcimporter_picoquantpt3";
+    res<<"tcspcimporter_picoquantptu";
     return res;
 }
 
@@ -37,6 +39,9 @@ QFImporter* QFPicoQuantImporters::createImporter(QString id) const  {
     } 
     if (id=="tcspcimporter_picoquantpt3") {
         return new QFTCSPCReaderPicoquantPT3();
+    }
+    if (id=="tcspcimporter_picoquantptu") {
+        return new QFTCSPCReaderPicoquantPTU();
     }
     return NULL;
 }
