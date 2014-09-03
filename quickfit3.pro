@@ -193,109 +193,111 @@ SUBDIRS += plg_qfe_dataexportbasics
 plg_qfe_dataexportbasics.subdir=./plugins/qfe_dataexportbasics
 plg_qfe_dataexportbasics.depends = lib libqf3widgets
 
+!contains(QF3CONFIG, nohardwaredrivers) {
+	!macx {
 
-!macx {
+		SUBDIRS += plg_spimb040
+		plg_spimb040.subdir=./plugins/spimb040
+		plg_spimb040.depends = lib libqf3widgets
 
-    SUBDIRS += plg_spimb040
-    plg_spimb040.subdir=./plugins/spimb040
-    plg_spimb040.depends = lib libqf3widgets
+		SUBDIRS += plg_cam_testcamera
+		plg_cam_testcamera.subdir=./plugins/cam_testcamera
+		plg_cam_testcamera.depends = lib libqf3widgets
 
-    SUBDIRS += plg_cam_testcamera
-    plg_cam_testcamera.subdir=./plugins/cam_testcamera
-    plg_cam_testcamera.depends = lib libqf3widgets
+		SUBDIRS += plg_cam_server
+		plg_cam_server.subdir=./plugins/cam_server
+		plg_cam_server.depends = lib libqf3widgets
 
-    SUBDIRS += plg_cam_server
-    plg_cam_server.subdir=./plugins/cam_server
-    plg_cam_server.depends = lib libqf3widgets
+		!contains(QF3CONFIG, bits64) {
+			SUBDIRS += plg_cam_systemcamera
+			plg_cam_systemcamera.subdir=./plugins/cam_systemcamera
+			plg_cam_systemcamera.depends = lib libqf3widgets
+		}
 
-    !contains(QF3CONFIG, bits64) {
-        SUBDIRS += plg_cam_systemcamera
-        plg_cam_systemcamera.subdir=./plugins/cam_systemcamera
-        plg_cam_systemcamera.depends = lib libqf3widgets
-    }
+		!contains(QF3CONFIG, nospecialdrivers) {
+			SUBDIRS += plg_cam_radhard2
+			plg_cam_radhard2.subdir=./plugins/cam_radhard2
+			plg_cam_radhard2.depends = lib libqf3widgets
 
-    !contains(QF3CONFIG, nospecialdrivers) {
-        SUBDIRS += plg_cam_radhard2
-        plg_cam_radhard2.subdir=./plugins/cam_radhard2
-        plg_cam_radhard2.depends = lib libqf3widgets
+			unix {
+				SUBDIRS += plg_cam_rh2v2
+				plg_cam_rh2v2.subdir=./plugins/cam_rh2v2
+				plg_cam_rh2v2.depends = lib libqf3widgets
+			}
 
-        unix {
-            SUBDIRS += plg_cam_rh2v2
-            plg_cam_rh2v2.subdir=./plugins/cam_rh2v2
-            plg_cam_rh2v2.depends = lib libqf3widgets
-        }
+			!contains(QF3CONFIG, noandor) {
+				SUBDIRS += plg_cam_andor
+				plg_cam_andor.subdir=./plugins/cam_andor
+				plg_cam_andor.depends = lib libqf3widgets
+			}
 
-        !contains(QF3CONFIG, noandor) {
-            SUBDIRS += plg_cam_andor
-            plg_cam_andor.subdir=./plugins/cam_andor
-            plg_cam_andor.depends = lib libqf3widgets
-        }
+		}
 
-    }
+		SUBDIRS += plg_stage_pi
+		plg_stage_pi.subdir=./plugins/stage_pi
+		plg_stage_pi.depends = lib libqf3widgets
 
-    SUBDIRS += plg_stage_pi
-    plg_stage_pi.subdir=./plugins/stage_pi
-    plg_stage_pi.depends = lib libqf3widgets
+		SUBDIRS += plg_stage_pi2
+		plg_stage_pi2.subdir=./plugins/stage_pi2
+		plg_stage_pi2.depends = lib libqf3widgets
 
-    SUBDIRS += plg_stage_pi2
-    plg_stage_pi2.subdir=./plugins/stage_pi2
-    plg_stage_pi2.depends = lib libqf3widgets
+		SUBDIRS += plg_shutter_servo_arduino
+		plg_shutter_servo_arduino.subdir=./plugins/shutter_servo_arduino
+		plg_shutter_servo_arduino.depends = lib libqf3widgets
 
-    SUBDIRS += plg_shutter_servo_arduino
-    plg_shutter_servo_arduino.subdir=./plugins/shutter_servo_arduino
-    plg_shutter_servo_arduino.depends = lib libqf3widgets
+		SUBDIRS += plg_shutter_relais_arduino
+		plg_shutter_relais_arduino.subdir=./plugins/shutter_relais_arduino
+		plg_shutter_relais_arduino.depends = lib libqf3widgets
 
-    SUBDIRS += plg_shutter_relais_arduino
-    plg_shutter_relais_arduino.subdir=./plugins/shutter_relais_arduino
-    plg_shutter_relais_arduino.depends = lib libqf3widgets
+		SUBDIRS += plg_servo_pololu_maestro
+		plg_servo_pololu_maestro.subdir=./plugins/servo_pololu_maestro
+		plg_servo_pololu_maestro.depends = lib libqf3widgets
 
-    SUBDIRS += plg_servo_pololu_maestro
-    plg_servo_pololu_maestro.subdir=./plugins/servo_pololu_maestro
-    plg_servo_pololu_maestro.depends = lib libqf3widgets
+		SUBDIRS += plg_meas_b040resheater
+		plg_meas_b040resheater.subdir=./plugins/meas_b040resheater
+		plg_meas_b040resheater.depends = lib libqf3widgets
 
-    SUBDIRS += plg_meas_b040resheater
-    plg_meas_b040resheater.subdir=./plugins/meas_b040resheater
-    plg_meas_b040resheater.depends = lib libqf3widgets
+		SUBDIRS += plg_meas_spadmeasurement
+		plg_meas_spadmeasurement.subdir=./plugins/meas_spadmeasurement
+		plg_meas_spadmeasurement.depends = lib libqf3widgets
 
-    SUBDIRS += plg_meas_spadmeasurement
-    plg_meas_spadmeasurement.subdir=./plugins/meas_spadmeasurement
-    plg_meas_spadmeasurement.depends = lib libqf3widgets
+		SUBDIRS += plg_filterc_test
+		plg_filterc_test.subdir=./plugins/filterc_test
+		plg_filterc_test.depends = lib libqf3widgets
 
-    SUBDIRS += plg_filterc_test
-    plg_filterc_test.subdir=./plugins/filterc_test
-    plg_filterc_test.depends = lib libqf3widgets
+		SUBDIRS += plg_filterc_tmcl
+		plg_filterc_tmcl.subdir=./plugins/filterc_tmcl
+		plg_filterc_tmcl.depends = lib libqf3widgets
 
-    SUBDIRS += plg_filterc_tmcl
-    plg_filterc_tmcl.subdir=./plugins/filterc_tmcl
-    plg_filterc_tmcl.depends = lib libqf3widgets
+		SUBDIRS += plg_lights_pccsled
+		plg_lights_pccsled.subdir=./plugins/lights_pccsled
+		plg_lights_pccsled.depends = lib libqf3widgets
 
-    SUBDIRS += plg_lights_pccsled
-    plg_lights_pccsled.subdir=./plugins/lights_pccsled
-    plg_lights_pccsled.depends = lib libqf3widgets
+		SUBDIRS += plg_lights_coboltlaser
+		plg_lights_coboltlaser.subdir=./plugins/lights_coboltlaser
+		plg_lights_coboltlaser.depends = lib libqf3widgets
 
-    SUBDIRS += plg_lights_coboltlaser
-    plg_lights_coboltlaser.subdir=./plugins/lights_coboltlaser
-    plg_lights_coboltlaser.depends = lib libqf3widgets
+		SUBDIRS += plg_qfextensioncoboltlaser
+		plg_qfextensioncoboltlaser.subdir=./plugins/lights_b040laserbox
+		plg_lights_b040laserbox.depends = lib libqf3widgets
 
-    SUBDIRS += plg_qfextensioncoboltlaser
-    plg_qfextensioncoboltlaser.subdir=./plugins/lights_b040laserbox
-    plg_lights_b040laserbox.depends = lib libqf3widgets
+		contains(QF3CONFIG, ffmdrivers) {
+			SUBDIRS += plg_b040_ffmcontrol
+			plg_b040_ffmcontrol.subdir=./plugins/b040_ffmcontrol
+			plg_b040_ffmcontrol.depends = lib libqf3widgets
 
-#    SUBDIRS += plg_b040_ffmcontrol
-    plg_b040_ffmcontrol.subdir=./plugins/b040_ffmcontrol
-    plg_b040_ffmcontrol.depends = lib libqf3widgets
+			SUBDIRS += plg_multicontrol_stage
+			plg_multicontrol_stage.subdir=./plugins/multicontrol_stage
+			plg_multicontrol_stage.depends = lib libqf3widgets
 
-#    SUBDIRS += plg_multicontrol_stage
-    plg_multicontrol_stage.subdir=./plugins/multicontrol_stage
-    plg_multicontrol_stage.depends = lib libqf3widgets
+			SUBDIRS += plg_alv_autocorrelator5000
+			plg_alv_autocorrelator5000.subdir=./plugins/alv_autocorrelator5000
+			plg_alv_autocorrelator5000.depends = lib libqf3widgets
 
-#    SUBDIRS += plg_alv_autocorrelator5000
-    plg_alv_autocorrelator5000.subdir=./plugins/alv_autocorrelator5000
-    plg_alv_autocorrelator5000.depends = lib libqf3widgets
-
-#    SUBDIRS += plg_scanner2000_nicounter
-    plg_scanner2000_nicounter.subdir=./plugins/scanner2000_nicounter
-    plg_scanner2000_nicounter.depends = lib libqf3widgets
+			SUBDIRS += plg_scanner2000_nicounter
+			plg_scanner2000_nicounter.subdir=./plugins/scanner2000_nicounter
+			plg_scanner2000_nicounter.depends = lib libqf3widgets
+		}
+	}
 }
-
 

@@ -623,7 +623,7 @@ libnidaqmxOK=-5
 ISMSYS=`uname -o`
 echo $ISMSYS
 if [ "$ISMSYS" != "${string/Msys/}" ] ; then
-	libusbOK=-1
+	libnidaqmxOK=-1
 	read -p "Do you want to build 'libNIDAQmx' (windows only!!!) (y/n)? " -n 1 INSTALL_ANSWER
 	echo -e  "\n"
 	if [ $INSTALL_ANSWER == "y" ] ; then
@@ -645,6 +645,53 @@ if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 	fi
 fi
 
+
+
+
+
+
+libandorOK=-5
+ISMSYS=`uname -o`
+echo $ISMSYS
+if [ "$ISMSYS" != "${string/Msys/}" ] ; then
+	libandorOK=-1
+	read -p "Do you want to build 'libAndor' (windows only!!!) (y/n)? " -n 1 INSTALL_ANSWER
+	echo -e  "\n"
+	if [ $INSTALL_ANSWER == "y" ] ; then
+
+		echo -e  "------------------------------------------------------------------------\n"\
+		"-- BUILDING: libAndor                                                 --\n"\
+		"------------------------------------------------------------------------\n\n"\
+		echo -e "first we have to copy the file ATMCD32D.H from the Andor SDK to \n"
+		echo -e "andor_win32 and andor_win64. Then ATMCD32D.DLL has to be copied \n"
+		echo -e "to andor_win32 and atmcd64d.dll to andor_win64. Finally a script\n"
+		echo -e "in each of these diretories will create the 32bit/64bit link libs\n"
+		echo -e "which are needed to build the andor camera driver with mingw.\n\n"
+	    read -p "please enter the directory of the Andor SDK "  ANDORSDK
+	    echo -e  "\n"
+	    read -p "Do you want to build 32bit or 64bit (3/6)? " -n 1 SELECTBITS
+	    echo -e  "\n"
+	    if [ $SELECTBITS == "6" ] ; then
+            cd andor_win64
+			cp $ANDORSDK/atmcd64d.dll .
+			cp $ANDORSDK/ATMCD32D.H .
+		else
+            cd andor_win32
+			cp $ANDORSDK/ATMCD32D.DLL .
+			cp $ANDORSDK/ATMCD32D.H .
+		fi
+		
+		./create_testcpp.sh
+		libOK=$?
+		cd ${CURRENTDIR}
+		
+		if [ $libOK -eq 0 ] ; then		
+			libandorOK=0
+		else
+			libandorOK=-3
+		fi
+	fi
+fi
 
 
 
@@ -832,6 +879,7 @@ print_result "libtiff" $libtiffOK
 print_result "gsl" $libgslOK
 print_result "libusb" $libusbOK
 print_result "libNIDAQmx" $libnidaqmxOK
+print_result "libNIDAQmx" $libandorOK
 print_result "eigen" $eigenOK
 print_result "cimg" $cimgOK
 print_result "pixman" $libpixmanOK

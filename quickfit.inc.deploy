@@ -15,13 +15,13 @@
 # deactivate non-standard plugins:
 
 # prevents building of SPIM hardware drivers (cameras, stages, ...)
-#QF3CONFIG+=nohardwaredrivers
+QF3CONFIG+=nohardwaredrivers
 # prevents building of the camera plugins:
-#QF3CONFIG+=nospecialdrivers
+QF3CONFIG+=nospecialdrivers
 # if "nospecialdrivers" is not activated, this can be used to selectively deactive the ANDOR driver
-#QF3CONFIG+=noandor
+QF3CONFIG+=noandor
 # switch off some special plugins (e.g. pre-publication versions of imfccsfit)
-#QF3CONFIG+=nospecials
+QF3CONFIG+=nospecials
 # on Windows: set this if you use a 64-bit build, as it will deactivate plugins that do not work on 64-bit!
 #QF3CONFIG+=bits64
 
