@@ -28,7 +28,8 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/ \
                ../interfaces \
-               ../base_classes
+               ../base_classes \
+               ../../extlibs/
 
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/

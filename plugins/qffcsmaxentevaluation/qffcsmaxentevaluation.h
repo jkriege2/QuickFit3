@@ -26,7 +26,6 @@
 #define QFFCSMAXENTEVALUATION_H
 
 #include "qfpluginevaluation.h"
-#include "qffitresultsbyindexevaluationfittools.h"
 /*!
     \defgroup qf3rdrdp_GROUPNAME Evaluation Item Plugin
     \ingroup qf3evaluationplugins

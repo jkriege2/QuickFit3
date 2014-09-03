@@ -31,7 +31,6 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfevaluationitemfactory.h"
 #include "../base_classes/qfusesresultsbyindexevaluation.h"
 #include "../base_classes/qfusesresultsbyindexandmodelevaluation.h"
-#include "qffitresultsbyindexevaluationfittools.h"
 #include "qffcsweightingtools.h"
 #define MSDTHEORYCOUNT 4
 

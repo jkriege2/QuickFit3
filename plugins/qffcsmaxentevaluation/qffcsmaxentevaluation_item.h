@@ -34,7 +34,6 @@
 #include "qfevaluationitemfactory.h"
 #include "../base_classes/qfusesresultsbyindexevaluation.h"
 #include "../base_classes/qfusesresultsbyindexandmodelevaluation.h"
-#include "qffitresultsbyindexevaluationfittools.h"
 
 /*! \brief evaluation item class 
     \ingroup qf3rdrdp_GROUPNAME
