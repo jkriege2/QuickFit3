@@ -450,6 +450,8 @@ QString toQFTableModelXML(const QList<QList<QVariant> >& data, const QStringList
             w.writeEndElement();
         w.writeEndElement();
     w.writeEndDocument();
+
+    //qDebug()<<res;
     return res;
 }
 
@@ -472,6 +474,8 @@ QStringList QFDataExportHandler::getFormats()  {
     sl<<QObject::tr("SYLK dataformat, flipped (*.slk *.sylk)");
     sl<<QObject::tr("Matlab script (*.m)");
     sl<<QObject::tr("Matlab script, flipped (*.m)");
+    sl<<QObject::tr("QuickFit table XML (*.qftxml)");
+    sl<<QObject::tr("QuickFit table XML, flipped (*.qftxml)");
     for (int i=0; i<writers.size(); i++) {
         sl<<writers[i]->getFilter();
     }
@@ -489,31 +493,36 @@ void QFDataExportHandler::registerDataWriter(QFDataExportHandler::DataWriter *wr
 
 void QFDataExportHandler::save(const QList<QVector<double> >& data, int format, const QString& filename, const QStringList& columnHeaders, const QStringList& rowHeaders) {
 
-    if (format==0) { // CSV
+    int f=0;
+    if (format==f++) { // CSV
         saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, '.', ", ", true, '\"', "#! ", 15));
-    } else  if (format==1) { // CSV
+    } else  if (format==f++) { // CSV
         saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, '.', ", ", true, '\"', "#! ", 15));
-    } else if (format==2) { // SSV
+    } else if (format==f++) { // SSV
         saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, '.', "; ", true, '\"', "#! ", 15));
-    } else if (format==3) { // SSV
+    } else if (format==f++) { // SSV
         saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, '.', "; ", true, '\"', "#! ", 15));
-    } else if (format==4) { // SSV,
+    } else if (format==f++) { // SSV,
         saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, ',', "; ", true, '\"', "#! ", 15));
-    } else if (format==5) { // SSV,
+    } else if (format==f++) { // SSV,
         saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, ',', "; ", true, '\"', "#! ", 15));
-    } else if (format==6) { // TSV
+    } else if (format==f++) { // TSV
         saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, '.', "\t", true, '\"', "#! ", 15));
-    } else if (format==7) { // TSV
+    } else if (format==f++) { // TSV
         saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, '.', "\t", true, '\"', "#! ", 15));
-    } else if (format==8) { // SYLK
+    } else if (format==f++) { // SYLK
         saveStringToFile(filename, toSYLK(data, columnHeaders, rowHeaders));
-    } else if (format==9) { // SYLK flipped
+    } else if (format==f++) { // SYLK flipped
         saveStringToFile(filename, toSYLK(dataRotate(data), columnHeaders, rowHeaders));
-    } else if (format==10) { // Matlab
+    } else if (format==f++) { // Matlab
         saveStringToFile(filename, toMatlab(data, false));
-    } else if (format==11) { // Matlab
+    } else if (format==f++) { // Matlab
         saveStringToFile(filename, toMatlab(dataRotate(data), false));
-    } else if (format-12>=0 && format-12<writers.size()) {
+    } else if (format==f++) { // QFTable XML
+        saveStringToFile(filename, toQFTableModelXML(data, columnHeaders, rowHeaders), QString("UTF-8"));
+    } else if (format==f++) { // QFTable XML, flipped
+        saveStringToFile(filename, toQFTableModelXML(dataRotate(data), columnHeaders, rowHeaders), QString("UTF-8"));
+    } else if (format-f>=0 && format-f<writers.size()) {
         writers[format-12]->save(data, filename, columnHeaders, rowHeaders);
     }
 }
@@ -534,41 +543,46 @@ void QFDataExportHandler::save(const QList<QVector<double> > &data, const QStrin
 
 void QFDataExportHandler::copyCSV(const QList<QList<double> > &data, const QStringList &columnHeaders, const QStringList &rowHeaders)
 {
-    csvCopy(data, columnHeaders, rowHeaders);
+    csvCopy(data, columnHeaders, rowHeaders, false);
 }
 
 void QFDataExportHandler::copyCSV(const QList<QVector<double> > &data, const QStringList &columnHeaders, const QStringList &rowHeaders)
 {
-    csvCopy(data, columnHeaders, rowHeaders);
+    csvCopy(data, columnHeaders, rowHeaders, false);
 }
 
 void QFDataExportHandler::save(const QList<QList<QVariant> >& data, int format, const QString& filename, const QStringList& columnHeaders, const QStringList& rowHeaders) {
 
-    if (format==0) { // CSV
+    int f=0;
+    if (format==f++) { // CSV
         saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, '.', ", ", true, '\"', "#! ", 15));
-    } else  if (format==1) { // CSV
+    } else  if (format==f++) { // CSV
         saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, '.', ", ", true, '\"', "#! ", 15));
-    } else if (format==2) { // SSV
+    } else if (format==f++) { // SSV
         saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, '.', "; ", true, '\"', "#! ", 15));
-    } else if (format==3) { // SSV
+    } else if (format==f++) { // SSV
         saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, '.', "; ", true, '\"', "#! ", 15));
-    } else if (format==4) { // SSV,
+    } else if (format==f++) { // SSV,
         saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, ',', "; ", true, '\"', "#! ", 15));
-    } else if (format==5) { // SSV,
+    } else if (format==f++) { // SSV,
         saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, ',', "; ", true, '\"', "#! ", 15));
-    } else if (format==6) { // TSV
+    } else if (format==f++) { // TSV
         saveStringToFile(filename, toCSV(data, columnHeaders, rowHeaders, '.', "\t", true, '\"', "#! ", 15));
-    } else if (format==7) { // TSV
+    } else if (format==f++) { // TSV
         saveStringToFile(filename, toCSV(dataRotate(data), columnHeaders, rowHeaders, '.', "\t", true, '\"', "#! ", 15));
-    } else if (format==8) { // SYLK
+    } else if (format==f++) { // SYLK
         saveStringToFile(filename, toSYLK(data, columnHeaders, rowHeaders));
-    } else if (format==9) { // SYLK flipped
+    } else if (format==f++) { // SYLK flipped
         saveStringToFile(filename, toSYLK(dataRotate(data), columnHeaders, rowHeaders));
-    } else if (format==10) { // Matlab
+    } else if (format==f++) { // Matlab
         saveStringToFile(filename, toMatlab(data, false));
-    } else if (format==11) { // Matlab
+    } else if (format==f++) { // Matlab
         saveStringToFile(filename, toMatlab(dataRotate(data), false));
-    } else if (format-12>=0 && format-12<writers.size()) {
+    } else if (format==f++) { // QFTable XML
+        saveStringToFile(filename, toQFTableModelXML(data, columnHeaders, rowHeaders), QString("UTF-8"));
+    } else if (format==f++) { // QFTable XML, flipped
+        saveStringToFile(filename, toQFTableModelXML(dataRotate(data), columnHeaders, rowHeaders), QString("UTF-8"));
+    } else if (format-f>=0 && format-f<writers.size()) {
         writers[format-12]->save(data, filename, columnHeaders, rowHeaders);
     }
 }
@@ -589,6 +603,21 @@ void QFDataExportHandler::save(const QList<QList<QVariant> > &data, const QStrin
 void QFDataExportHandler::copyCSV(const QList<QList<QVariant> > &data, const QStringList &columnHeaders, const QStringList &rowHeaders)
 {
     csvCopy(data, columnHeaders, rowHeaders,false);
+}
+
+void QFDataExportHandler::copyExcel(const QList<QList<double> > &data, const QStringList &columnHeaders, const QStringList &rowHeaders)
+{
+    csvCopy(data, columnHeaders, rowHeaders, true);
+}
+
+void QFDataExportHandler::copyExcel(const QList<QVector<double> > &data, const QStringList &columnHeaders, const QStringList &rowHeaders)
+{
+    csvCopy(data, columnHeaders, rowHeaders, true);
+}
+
+void QFDataExportHandler::copyExcel(const QList<QList<QVariant> > &data, const QStringList &columnHeaders, const QStringList &rowHeaders)
+{
+    csvCopy(data, columnHeaders, rowHeaders, true);
 }
 
 void QFDataExportHandler::copyMatlab(const QList<QList<QVariant> > &data)

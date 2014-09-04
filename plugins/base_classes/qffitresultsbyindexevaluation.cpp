@@ -54,22 +54,6 @@ QString QFFitResultsByIndexEvaluation::getEvaluationResultID(QString fitFunction
     }
 }
 
-int QFFitResultsByIndexEvaluation::getIndexFromEvaluationResultID(const QString &resultID) const {
-    if (resultID.size()<=0) return -1;
-    if (resultID.endsWith("runavg")) return -1;
-    int l=0;
-    while (resultID[resultID.size()-1-l].isDigit()) {
-        l++;
-    }
-
-
-    if (l>0) {
-        //qDebug()<<"QFFitResultsByIndexEvaluation::getIndexFromEvaluationResultID("<<resultID<<"):  l="<<l<<"  => result="<<resultID.right(l).toInt();
-        return resultID.right(l).toInt();
-    }
-    //qDebug()<<"QFFitResultsByIndexEvaluation::getIndexFromEvaluationResultID("<<resultID<<"):  l="<<l<<"  => result=-1";
-    return -1;
-}
 
 
 

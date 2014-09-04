@@ -362,6 +362,29 @@ bool QFEvaluationItem::getNameNotFilterRegExp() const
     return nameNotFilter.patternSyntax()==QRegExp::RegExp;
 }
 
+int QFEvaluationItem::getIndexFromEvaluationResultID(const QString &resultID) const
+{
+    if (resultID.size()<=0) return -1;
+    if (resultID.endsWith("runavg")) return -1;
+    if (resultID.endsWith("avg")) return -1;
+
+    //QRegExp rxNum("[+-]\\d+");
+
+    int l=0;
+    const QString digits="0123456789+-";
+    QChar c;
+    while (l<resultID.size() && (digits.contains(c=resultID[resultID.size()-1-l]))) {
+        l++;
+        if (c=='+' || c=='-') break;
+    }
+
+
+    if (l>0) {
+        return resultID.right(l).toInt();
+    }
+    return -1;
+}
+
 void QFEvaluationItem::setDataChanged()
 {
     if (project) project->setDataChanged();

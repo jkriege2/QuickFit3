@@ -129,6 +129,9 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
         QCheckBox* chkFilterFilesRegExp;
         QCheckBox* chkFilterResultsRegExp;
 
+        QCheckBox* chkExtractRuns;
+        QCheckBox* chkRemoveUnusedRuns;
+
         QFEnhancedLineEdit* edtFilterRecords;
         QFEnhancedLineEdit* edtFilterRecordsNot;
         QFCompleterFromFile* compFilterRecords;

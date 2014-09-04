@@ -53,7 +53,7 @@ QFLIB_EXPORT QList<QVector<double> > importCSVAskUser(const QString& filename, c
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList(), bool copyAllVariant=true);
+QFLIB_EXPORT void csvCopy(const QList<QList<double> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList(), bool withLocalePriority=true);
 
 
 /*! \brief copy the given data columns as CSV to the clipboard
@@ -61,14 +61,14 @@ QFLIB_EXPORT void csvCopy(const QList<QList<double> >& data, const QStringList& 
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList(), bool copyAllVariant=true);
+QFLIB_EXPORT void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList(), bool withLocalePriority=true);
 
 /*! \brief copy the given data columns as CSV to the clipboard
     \ingroup qf3lib_tools
 
     \note data is given as a list of columns
 */
-QFLIB_EXPORT void csvCopy(const QList<QVector<double> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList(), bool copyAllVariant=true);
+QFLIB_EXPORT void csvCopy(const QList<QVector<double> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList(), bool withLocalePriority=true);
 
 /*! \brief exchange rows and columns
     \ingroup qf3lib_tools

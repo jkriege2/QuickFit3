@@ -1,0 +1,43 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Histogram View</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        <p>
+        A histogram view or window is a central widget, provided by QuickFit, which allows to display the histogram of one or more datasets. The following image shows an example histogram for a single dataset.
+        <center><a name="qfhistogram_pic000"><img src="./pic/qfhistogram_pic000.png" border="1">
+        </center>
+        
+        <ul>
+            <li>The left part of the widget shows a <a href="jkqtplotter.html">plot</a> with the histogram as bar chart, a boxplot (above the histogram) of the statistical parameters of the distribution and a distribution fit to the histogram (red line).  You can right-click the plot to open a context-menu, which allows to print, copy and save the data in the plot. You can also <a href="jkqtplotter.html#tablerdr">copy the plot into a table RDR</a>.</li>
+            <li>The major distribution properties are shown as a boxplot:
+            <center><img src="./pic/boxplot.png"></center></li>
+            <li>The appearance of the histogram can be changed in several ways:
+            <ul>
+                <li><b># bins</b> allows to set the number of bis, that are used to span the range of the histogram.</li>
+                <li><b>log-scale:</b> If this option is checked, the frequency axis of the histogram is scaled logarithmically. This is useful, if the distribution has low-frequency tails.</li>
+                <li><b>show key</b> switches the key in the histogram on and off.</li>
+                  <li><b>range</b> allows to set the range of values, that are used for the histogram:<ul>
+                            <li><b>manual</b> The user can set the range manually below the radio-buttons</li>
+                            <li><b>auto</b> uses the full data range for the histogram</li>
+                            <li><b>relaxed auto</b> uses the full data range, but removes a fraction p<sub>l</sub> at the lower end and  p<sub>u</sub> at the upper end. The fractions can be given on the rhs of the radio-button.</li>
+                        </ul></li>
+                  <li><b>distribution fit</b> allows to select a fit function, which is automatically fitted to the histogram (shown as solid line). the resulting fit parameters are displayed in the table below.</li>
+                  <li>additional widgets may appear, based on the place, where this view is used within QuickFit</li>
+            </ul></li>
+            <li>The <b>table</b> at the bottom right of the window shows several statistical parameters (mean, median, quantiles, standard deviation, skewness etc. In addition the parameters of the current distribution fit are shown as <tt>fit: ...</tt>. You can right-click the table to open a context-menu, which allows to print, copy and save the data in the table.</li>
+          <li>At the top of the window, a series of buttons offers a set of possibilities to export the data in the histogram:
+          <ul>
+              <li><img src=":/lib/printreport.png"> <b>Print histogram report</b> prints a report with the histogram and the table of statistical properties.</li>
+              <li><img src=":/lib/savereport.png"> <b>Save histogram report</b> saves a report with the histogram and all statistical parameters as a PDF or ODT file.</li>
+              <li><img src=":/lib/copy16.png"> <b>Copy data used for histogram</b> copies the input data, used to calculate the histogram, as a table into the clipboad (e.g. for use with Excel or Origin)</li>
+              <li><img src=":/lib/copy16_matlab.png"> <b>Copy data used for histogram as Matlab script</b> copies the input data, used to calculate the histogram, as a Matlab script</li>
+              <li><img src=":/lib/savedata.png"> <b>Save data used for histogram</b> saves the input data, used to calculate the histogram, into a data file (CSV, Matlab, Excel, ...)</li>
+          </ul></li>
+        </ul>
+        </p>
+    </body>
+</html>

@@ -66,13 +66,11 @@ HEADERS += qfpevalimfcsfit.h \
     ../base_classes/qffitresultsevaluationeditorbase.h \
     ../base_classes/qffitresultsbyindexevaluationeditorbase.h \
     ../interfaces/qfrdrsimplecountrateinterface.h \
-    ../interfaces/qfrdrimagetoruninterface.h \
     ../base_classes/qffitresultsbyindexasvectorevaluation.h \
     ../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h \
     imfcscalibrationdialog.h \
     ../base_classes/qffitresultsbyindexevaluationfitthread.h \
     optionswidget.h \
-    ../interfaces/qfrdrrunselection.h \
     ../base_classes/qffcsweightingtools.h \
     ../base_classes/qffitresultsbyindexevaluationfittools.h \
     ../base_classes/qffcstools.h \

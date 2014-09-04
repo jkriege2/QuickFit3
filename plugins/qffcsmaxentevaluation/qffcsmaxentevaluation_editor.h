@@ -59,7 +59,7 @@
 #include "datacutslider.h"
 #include "jkverticalscrollarea.h"
 #include "qvisiblehandlesplitter.h"
-#include "../interfaces/qfrdrfcsdatainterface.h"
+#include "qfrdrfcsdatainterface.h"
 #include "qfsimplefitparameterswidget.h"
 #include "qfusesresultsbyindexevaluationeditor.h"
 #include "qffcsbyindexandmodelevaluationeditor.h"
@@ -72,7 +72,7 @@
 #include <QFormLayout>
 #include "qfrawdatarecord.h"
 #include "qfevaluationitem.h"
-#include "../interfaces/qfrdrfcsdatainterface.h"
+#include "qfrdrfcsdatainterface.h"
 #include <iostream>
 #include <cfloat>
 #include "tools.h"

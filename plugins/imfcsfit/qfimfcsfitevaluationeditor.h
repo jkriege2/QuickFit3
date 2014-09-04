@@ -57,7 +57,7 @@
 #include "../base_classes/qffitresultsevaluationeditorbase.h"
 #include "../base_classes/qffitresultsbyindexevaluationeditorbase.h"
 #include "../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h"
-#include "../interfaces/qfrdrimagetoruninterface.h"
+#include "qfrdrimagetoruninterface.h"
 #include "qffitresultsbyindexevaluationfitthread.h"
 #include "dlgqfprogressdialog.h"
 #include "qffcsweightingtools.h"

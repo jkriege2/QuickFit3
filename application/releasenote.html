@@ -94,10 +94,14 @@
             <li>Tools | Project Tools | set property in multiple RDRs: now can also set the name/rolw/folder/group of RDRs.</li>
             <li>added option dialog entry, which allows to set a global path for user-settings/config files</li>
             <li>added autolinks to the online-help system</li>
-            <li>in reults tables: parameter histograms now support a relaxed auto-ranging</li>
-            <li>in reults tables: parameter histograms now support a distribution fit to the histogram</li>
+            <li>in results tables: parameter histograms now support a relaxed auto-ranging</li>
+            <li>in results tables: parameter histograms now support a distribution fit to the histogram</li>
+            <li>in results tables: parameter correlation now support a relaxed auto-ranging</li>
+            <li>bugfix: in results tables: parameter histograms works correctly for auto-ranging</li>
             <li>bugfix: fixed possible crash, when loading a project, which contains an evaluation object, for which no plugin is installed.</li>
             <li>QFImporters can now return properties from the file</li>
+            <li>added possible init()/deinit() methods to fit function, fit algorithm and importer plugins</li>
+            <li>evaluation editors|results table: added checkboxes, which allows to show an additional column with the run/index/pixel of the result and a checkbox, which allows to hide all removed runs/indices/pixels</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -184,6 +188,8 @@
             <li>parameter correlation tab now has the possibility to color the scatter plot symbols according to a parameter image, coordinates etc.</li>
             <li>post-processing binning now supports a mode for overlapping/interleaved binning (i.e. no reduction of image size)</li>
             <li>masks now work when using post-processing binning</li>
+            <li>histograms now support a relaxed auto-ranging</li>
+            <li>parameter correlation now supports a relaxed auto-ranging</li>
             <li></li>
             <li></li>
           </ul></li>

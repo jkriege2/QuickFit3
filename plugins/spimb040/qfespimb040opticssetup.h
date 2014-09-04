@@ -35,7 +35,7 @@
 
 #include "qtlogfile.h"
 #include "qfextensionmanager.h"
-#include "../interfaces/qfextensioncamera.h"
+#include "qfextensioncamera.h"
 #include "qfextension.h"
 #include "tools.h"
 #include "objectives.h"
@@ -44,7 +44,7 @@
 #include "qcheckablestringlistmodel.h"
 #include "qftablemodel.h"
 #include "qprogresslistwidget.h"
-#include "../interfaces/qfextensionglobalsettingsreadwrite.h"
+#include "qfextensionglobalsettingsreadwrite.h"
 #include "qfextensionmeasurementdevice.h"
 #include "qfextensionlightsource.h"
 #include "qfextensionfilterchanger.h"

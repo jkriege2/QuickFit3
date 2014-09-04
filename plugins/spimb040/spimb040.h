@@ -55,10 +55,10 @@ class QFESPIMB040 : public QObject, public QFExtensionBase {
         virtual QString getDescription() const  { return tr("controls the SPIM microscope in dep. B040 of DKFZ, Heidelberg"); };
 
         /** \copydoc QFExtension::getAuthor() */
-        virtual QString getAuthor() const  { return tr("Jan Krieger"); };
+        virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
 
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c) 2011-2012 by Jan Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2011-2014 by Jan Krieger"); };
 
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr(""); };

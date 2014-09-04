@@ -26,9 +26,9 @@
 #include <QSettings>
 
 #include "qfevaluationitem.h"
-#include "../interfaces/qfrdrfcsdatainterface.h"
-#include "../interfaces/qfrdrsimplecountrateinterface.h"
-#include "../interfaces/qfrdrcountratesinterface.h"
+#include "qfrdrfcsdatainterface.h"
+#include "qfrdrsimplecountrateinterface.h"
+#include "qfrdrcountratesinterface.h"
 #include "qfevaluationitemfactory.h"
 #include "qffitfunction.h"
 #include "qffitalgorithm.h"

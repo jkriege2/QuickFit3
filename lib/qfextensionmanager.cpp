@@ -87,6 +87,7 @@ void QFExtensionManager::searchPlugins(QString directory, QFPluginHelpData &help
 
                 parseTooltips(info.directory, helpdata.tooltips);
                 parseAutolinks(info.directory, helpdata.autolinks);
+                parseGlobalreplaces(info.directory);
 
 
                 addExtensionPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalExtensionPlugins());

@@ -124,7 +124,7 @@ void QFExtensionTMCLFilterChanger::deinit() {
     QSettings inifile(services->getGlobalConfigFileDirectory()+QString("/%1").arg(GLOBAL_CONFIGFILE), QSettings::IniFormat);
     if (inifile.isWritable()) {
         inifile.setValue("filterwheel_count", getFilterChangerCount());
-        for (unsigned int i=0; i<wheels.size(); i++) {
+        for (unsigned int i=0; i<(uint64_t)wheels.size(); i++) {
             int p=wheels[i].port;
             if (ports.getCOMPort(p)) {
                 ports.storeCOMPort(p, inifile, "filterwheel"+QString::number(i+1)+"/");
@@ -316,7 +316,7 @@ void QFExtensionTMCLFilterChanger::realignFW() {
 
 
 bool QFExtensionTMCLFilterChanger::TMCLRealignFW(int filterChanger) {
-    if (filterChanger<0 || filterChanger>=getFilterChangerCount()) return false;
+    if (filterChanger<0 || filterChanger>=(int64_t)getFilterChangerCount()) return false;
     JKSerialConnection* com=ports.getCOMPort(wheels[filterChanger].port);
     QF3TMCLProtocolHandler* tmcl=wheels[filterChanger].tmcl;
     if (!com) return false;
@@ -416,13 +416,13 @@ void QFExtensionTMCLFilterChanger::readGlobalSettings(QSettings &inifile, const 
     fcMenu->clear();
 
     if (getFilterChangerCount()>0) {
-        for (int i=0; i<getFilterChangerCount(); i++) {
+        for (int i=0; i<(int64_t)getFilterChangerCount(); i++) {
             if (isFilterChangerConnected(i)) filterChangerDisonnect(i);
         }
     }
 
     /* add code for cleanup here */
-    for (unsigned int i=0; i<wheels.size(); i++) {
+    for (unsigned int i=0; i<(uint64_t)wheels.size(); i++) {
         delete wheels[i].actRealign;
     }
     wheels.clear();
@@ -465,7 +465,7 @@ void QFExtensionTMCLFilterChanger::writeGlobalSettings(QSettings &inifile, const
 {
     if (inifile.isWritable()) {
         inifile.setValue(prefix+"filterwheel_count", getFilterChangerCount());
-        for (unsigned int i=0; i<wheels.size(); i++) {
+        for (unsigned int i=0; i<(uint64_t)wheels.size(); i++) {
             int p=wheels[i].port;
             if (ports.getCOMPort(p)) {
                 ports.storeCOMPort(p, inifile, prefix+"filterwheel"+QString::number(i+1)+"/");

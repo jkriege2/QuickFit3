@@ -34,7 +34,7 @@
 #include <QFormLayout>
 #include "qfrawdatarecord.h"
 #include "qfevaluationitem.h"
-#include "../interfaces/qfrdrfcsdatainterface.h"
+#include "qfrdrfcsdatainterface.h"
 #include <iostream>
 #include <cfloat>
 #include "tools.h"

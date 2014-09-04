@@ -43,6 +43,12 @@ class QFLIB_EXPORT QFPluginImporters: public QFPlugin {
 
         /** \brief return a QFImporter instance for the given ID */
         virtual QFImporter* createImporter(QString id) const =0;
+
+        /** \brief deinit plugin, this function is guaranteed to be called once, before  */
+        virtual void deinit() {};
+
+        /** \brief init plugin, this function is guaranteed to be called once, before  */
+        virtual void init() {};
 };
 
 Q_DECLARE_INTERFACE(QFPluginImporters,

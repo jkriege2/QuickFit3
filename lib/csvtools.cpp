@@ -411,12 +411,12 @@ void csvCopy(const QList<QList<QVariant> >& data, const QStringList& columnsName
     clipboard->setMimeData(mime);
 }
 
-void csvCopy(const QList<QVector<double> >& data, const QStringList& columnsNames, const QStringList& rowNames, bool copyAllVariant) {
+void csvCopy(const QList<QVector<double> >& data, const QStringList& columnsNames, const QStringList& rowNames, bool withLocalePriority) {
     QList<QList<double> > d;
     for (int i=0; i<data.size(); i++) {
         d.append(data[i].toList());
     }
-    csvCopy(d, columnsNames, rowNames, copyAllVariant);
+    csvCopy(d, columnsNames, rowNames, withLocalePriority);
 }
 
 QList<QVector<double> > csvDataRotate(const QList<QVector<double> >& data) {

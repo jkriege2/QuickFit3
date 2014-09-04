@@ -145,6 +145,7 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         void copyData();
         void saveData();
         void copyDataMatlab();
+        void showHelp();
         void fillDataArray(QList<QVector<double> >& data, QStringList &headers);
     protected:
 
@@ -183,6 +184,7 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         QAction* actCopyData;
         QAction* actCopyDataMatlab;
         QAction* actSaveData;
+        QAction* actHelp;
 
 
 

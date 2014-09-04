@@ -139,7 +139,9 @@ HEADERS += dlgnewproperty.h \
     sdk_fitfunctions/quickfit-model-header.h \
     qflibraryfitfunction.h \
     qfwizard.h \
-    qfhelptoolbutton.h
+    qfhelptoolbutton.h \
+    qfrdrrunselection.h \
+    qfrdrimagetoruninterface.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \

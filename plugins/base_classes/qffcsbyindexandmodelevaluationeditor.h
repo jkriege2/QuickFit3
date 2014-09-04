@@ -56,7 +56,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "datacutslider.h"
 #include "jkverticalscrollarea.h"
 #include "qvisiblehandlesplitter.h"
-#include "../interfaces/qfrdrfcsdatainterface.h"
+#include "qfrdrfcsdatainterface.h"
 #include "qfsimplefitparameterswidget.h"
 #include "qfusesresultsbyindexevaluationeditor.h"
 #include "qfrdrfcsdatainterface.h"

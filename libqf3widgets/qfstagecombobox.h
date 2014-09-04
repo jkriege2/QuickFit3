@@ -28,7 +28,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include <QComboBox>
 #include "qfextensionmanager.h"
-#include "../interfaces/qfextensionlinearstage.h"
+#include "qfextensionlinearstage.h"
 #include "qfextension.h"
 #include "libwid_imexport.h"
 #include "qenhancedcombobox.h"

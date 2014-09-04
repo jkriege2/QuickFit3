@@ -23,7 +23,7 @@
 
 #include <QComboBox>
 #include "qfextensionmanager.h"
-#include "../interfaces/qfextensionlightsource.h"
+#include "qfextensionlightsource.h"
 #include "qfextension.h"
 #include "libwid_imexport.h"
 #include "qenhancedcombobox.h"

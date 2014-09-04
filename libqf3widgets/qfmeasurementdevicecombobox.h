@@ -23,7 +23,7 @@
 
 #include <QComboBox>
 #include "qfextensionmanager.h"
-#include "../interfaces/qfextensionmeasurementdevice.h"
+#include "qfextensionmeasurementdevice.h"
 #include "qfextension.h"
 #include "libwid_imexport.h"
 #include "qenhancedcombobox.h"

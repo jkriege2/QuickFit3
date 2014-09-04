@@ -137,7 +137,7 @@ unsigned int QFExtensionB040SPADMeasurement::getMeasurementDeviceCount()
 
 QString QFExtensionB040SPADMeasurement::getMeasurementDeviceName(unsigned int measuremenDevice)
 {
-    if (measuremenDevice>=0 && measuremenDevice<devices.size()) {
+    if (measuremenDevice>=0 && measuremenDevice<(uint64_t)devices.size()) {
         return devices[measuremenDevice].label;
     }
     return QString();
@@ -277,7 +277,7 @@ unsigned int QFExtensionB040SPADMeasurement::getMeasurementDeviceValueCount(unsi
 
 QString QFExtensionB040SPADMeasurement::getMeasurementDeviceValueName(unsigned int measuremenDevice, unsigned int value)
 {
-    if (measuremenDevice>=0 && measuremenDevice<devices.size()) {
+    if (measuremenDevice>=0 && measuremenDevice<(uint64_t)devices.size()) {
         if (value>=0 && value<8) return devices[measuremenDevice].valuelabels.value(value, QString("PARAMETER%1").arg(value));
         switch (value) {
             case 8: return tr("relay 1");
@@ -293,7 +293,7 @@ QString QFExtensionB040SPADMeasurement::getMeasurementDeviceValueName(unsigned i
 
 QString QFExtensionB040SPADMeasurement::getMeasurementDeviceValueShortName(unsigned int measuremenDevice, unsigned int value)
 {
-    if (measuremenDevice>=0 && measuremenDevice<devices.size()) {
+    if (measuremenDevice>=0 && measuremenDevice<(uint64_t)devices.size()) {
         if (value>=0 && value<8) return devices[measuremenDevice].valueids.value(value, QString("PARAMETER%1").arg(value));
         switch (value) {
             case 8: return tr("RELAY1");

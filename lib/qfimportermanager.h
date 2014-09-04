@@ -146,6 +146,8 @@ class QFLIB_EXPORT QFImporterManager : public QObject {
             return getPluginForID(id)>=0;
         }
 
+        void deinit();
+        void init();
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

@@ -4,23 +4,33 @@
 #define cimg_display 0
 
 #ifdef QF_HAS_PNG
-#define cimg_use_png
+#  ifndef cimg_use_png
+#    define cimg_use_png
+#  endif
 #endif
 
 #ifdef QF_HAS_LIBTIFF
-#define cimg_use_tiff
+#  ifndef cimg_use_tiff
+#    define cimg_use_tiff
+#  endif
 #endif
 
 #ifdef QF_HAS_LIBJPEG
-#define cimg_use_jpeg
+#  ifndef cimg_use_jpeg
+#    define cimg_use_jpeg
+#  endif
 #endif
 
 #ifdef QF_HAS_LIBZ
-#define cimg_use_zlib
+#  ifndef cimg_use_zlib
+#    define cimg_use_zlib
+#  endif
 #endif
 
 #ifdef QF_HAS_LAPACK
-#define cimg_use_lapack
+#  ifndef cimg_use_lapack
+#    define cimg_use_lapack
+#  endif
 #endif
 
 #include "cimg/CImg.h"

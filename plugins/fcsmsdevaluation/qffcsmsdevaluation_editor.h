@@ -56,8 +56,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "datacutslider.h"
 #include "jkverticalscrollarea.h"
 #include "qvisiblehandlesplitter.h"
-#include "../interfaces/qfrdrfcsdatainterface.h"
-#include "../interfaces/qfrdrrunselection.h"
+#include "qfrdrfcsdatainterface.h"
+#include "qfrdrrunselection.h"
 #include "qfsimplefitparameterswidget.h"
 #include "qfusesresultsbyindexevaluationeditor.h"
 #include "qffcsbyindexandmodelevaluationeditor.h"
@@ -70,7 +70,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QFormLayout>
 #include "qfrawdatarecord.h"
 #include "qfevaluationitem.h"
-#include "../interfaces/qfrdrfcsdatainterface.h"
+#include "qfrdrfcsdatainterface.h"
 #include <iostream>
 #include <cfloat>
 #include "tools.h"

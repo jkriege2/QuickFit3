@@ -1181,8 +1181,18 @@ void parseTooltips(const QString& directory, QMap<QString, QFToolTipsData>& tool
         for (int i=0; i<keys.size(); i++) {
             tooltips[keys[i]].tooltip=setTooltips.value(keys[i], QObject::tr("<i>no tooltip available</i>")).toString();
             tooltips[keys[i]].tooltipfile=d.absoluteFilePath("tooltips.ini");
+            //qDebug()<<keys[i]<<setTooltips.value(keys[i], QObject::tr("<i>no tooltip available</i>")).toString();
+        }
+        QMapIterator<QString, QFToolTipsData> it(tooltips);
+        while (it.hasNext()) {
+            it.next();
+            if (it.value().tooltip.startsWith("%") && tooltips.contains(it.value().tooltip.mid(1))) {
+                //qDebug()<<it.key()<<": "<<it.value().tooltip<<"->"<<tooltips[it.value().tooltip.mid(1)].tooltip<<" ["<<it.value().tooltip.mid(1)<<"]";
+                tooltips[it.key()]=tooltips[it.value().tooltip.mid(1)];
+            }
         }
     }
+
 }
 
 
@@ -1194,11 +1204,19 @@ void parseAutolinks(const QString& directory, QMap<QString, QString>& autolinks)
         QStringList keys=setAutolinks.childKeys();
         for (int i=0; i<keys.size(); i++) {
             QString l=setAutolinks.value(keys[i]).toString();
-            if (!l.startsWith("$$")) {
+            if (!l.startsWith("$$") && !l.startsWith("http://") && !l.startsWith("https://") && !l.startsWith("ftp://") && !l.startsWith("ftps://")) {
                 l=d.absoluteFilePath(l);
             }
             if (!l.isEmpty()) {
                 autolinks[keys[i]]=l;
+            }
+        }
+
+        QMapIterator<QString, QString> ita(autolinks);
+        while (ita.hasNext()) {
+            ita.next();
+            if (ita.value().startsWith("%") && autolinks.contains(ita.value().mid(1))) {
+                autolinks[ita.key()]=autolinks[ita.value().mid(1)];
             }
         }
     }
@@ -1210,4 +1228,16 @@ bool qfQStringCompareLengthDecreasing(const QString &s1, const QString &s2) {
 
 bool qfQStringCompareLengthIncreasing(const QString &s1, const QString &s2) {
     return s1.size() < s2.size();
+}
+
+void parseGlobalreplaces(const QString& directory) {
+    QDir d(directory);
+    if (QFile::exists(d.absoluteFilePath("globalreplaces.ini"))) {
+        QSettings setLocalReplace(d.absoluteFilePath("globalreplaces.ini"), QSettings::IniFormat);
+
+        QStringList keys=setLocalReplace.childKeys();
+        for (int i=0; i<keys.size(); i++) {
+            QFPluginServices::getInstance()->setOrAddHTMLReplacement(keys[i], setLocalReplace.value(keys[i], "").toString());
+        }
+    }
 }

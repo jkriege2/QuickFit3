@@ -232,42 +232,18 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.end"), QString("</td></tr></table></td></tr></table>")));// </div>")));
 
 
-    //qDebug()<<QDir(settings->getMainHelpDirectory()).absoluteFilePath("globalreplaces.ini")<<QFile::exists(QDir(settings->getMainHelpDirectory()).absoluteFilePath("gloablreplaces.ini"));
-    if (QFile::exists(QDir(settings->getMainHelpDirectory()).absoluteFilePath("globalreplaces.ini"))) {
-        QSettings setLocalReplace(QDir(settings->getMainHelpDirectory()).absoluteFilePath("globalreplaces.ini"), QSettings::IniFormat);
-
-        QStringList keys=setLocalReplace.childKeys();
-        for (int i=0; i<keys.size(); i++) {
-            htmlReplaceList.append(qMakePair(QString(keys[i]), setLocalReplace.value(keys[i], "").toString()));
-            //qDebug()<<keys[i]<<setLocalReplace.value(keys[i], "").toString();
-        }
-    }
-
+    parseGlobalreplaces(settings->getMainHelpDirectory());
     parseAutolinks(settings->getMainHelpDirectory(), helpdata.autolinks);
-
     parseTooltips(settings->getMainHelpDirectory(), helpdata.tooltips);
 
 
-    QMapIterator<QString, QFToolTipsData> it(helpdata.tooltips);
-    while (it.hasNext()) {
-        it.next();
-        if (it.value().tooltip.startsWith("%")) {
-            //qDebug()<<it.key()<<": "<<it.value().tooltip<<"->"<<tooltips[it.value().tooltip.mid(1)].tooltip<<" ["<<it.value().tooltip.mid(1)<<"]";
-            helpdata.tooltips[it.key()]=helpdata.tooltips[it.value().tooltip.mid(1)];
-        }
-    }
+
     //qDebug()<<tooltips;
     helpWindow->setTooltips(helpdata.tooltips);
 
 
 
-    QMapIterator<QString, QString> ita(helpdata.autolinks);
-    while (ita.hasNext()) {
-        ita.next();
-        if (ita.value().startsWith("%")) {
-            helpdata.autolinks[ita.key()]=helpdata.autolinks[ita.value().mid(1)];
-        }
-    }
+
 
 
     logFileMainWidget->dec_indent();
@@ -331,6 +307,9 @@ void MainWindow::searchAndRegisterPlugins() {
     // init other plugins
     evaluationFactory->init();
     rawDataFactory->init();
+    importerManager->init();
+    fitFunctionManager->init();
+    fitAlgorithmManager->init();
 
     // init extensions
     extensionManager->init(this, this);
@@ -363,6 +342,10 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         evaluationFactory->deinit();
         extensionManager->distribute(NULL);
         extensionManager->deinit();
+        importerManager->deinit();
+        fitFunctionManager->deinit();
+        fitAlgorithmManager->deinit();
+
         newProjectTimer.stop();
         helpWindow->close();
         {
@@ -3130,21 +3113,35 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             for (int ti=0; ti<ttids.size(); ti++){
                 const QString key=ttids[ti];
                 const QString val=helpdata.autolinks.value(key);
-                QRegExp rxTT(QString("\\<\\s*(\\w\\w*)[^\\>]*\\>[^\\<\\>]*(%1)[^\\<\\>]*\\<").arg(key));
+                QRegExp rxTT(QString("\\<\\s*(\\w\\w*)([^\\>]*)\\>[^\\<\\>]*(%1).*\\<\\s*\\/\\s*([^\\>\\s]*)\\s*\\>").arg(key));
                 rxTT.setMinimal(true);
                 rxTT.setCaseSensitivity(Qt::CaseInsensitive);
+                QRegExp rxTooltip("href\\s*\\=\\s*\\\"tooltip\\:");
                 pos = 0;
-                //qDebug()<<rxTT;
+                //qDebug()<<"-------------------------------- "<<key<<" -------------------------";
                 while ((pos = rxTT.indexIn(result, pos)) != -1) {
-                    QString rep=QString("%2 <a href=\"%1\"><img src=\":/lib/help/autolink.png\" border=\"0\" alt=\"get more information about %3\"></a>").arg(val).arg(rxTT.cap(2)).arg(key);
+                    //qDebug()<<rxTT.cap()<<"\n   "<<rxTT.cap(1)<<rxTT.cap(2)<<rxTT.cap(3)<<rxTT.cap(4);
+                    QString img=":/lib/help/autolink.png";
+                    if (val.toLower().startsWith("http://") || val.toLower().startsWith("https://") || val.toLower().startsWith("ftp://") || val.toLower().startsWith("ftps://")) {
+                        img=":/lib/help/autolinkweb.png";
+                    }                    
                     QString tag=rxTT.cap(1).toLower();
                     //qDebug()<<key<<val<<rep<<tag;
                     if (tag!="h1" && tag!="h2" && tag!="h3" && tag!="h4" && tag!="h5" && tag!="title" && tag!="a") {
-                        result=result.replace(rxTT.pos(2), rxTT.cap(2).size(), rep);
+                        QString rep=QString("%2 <a href=\"%1\"><img src=\"%4\" border=\"0\" alt=\"get more information about %3\"></a>").arg(val).arg(rxTT.cap(3)).arg(key).arg(img);
+                        result=result.replace(rxTT.pos(3), rxTT.cap(3).size(), rep);
+                        pos += rxTT.matchedLength()-rxTT.cap(3).size()+rep.size();
+                        //qDebug()<<"  replaced";
+                    } else if (tag=="a" && rxTT.cap(4)=="a" && rxTooltip.indexIn(rxTT.cap(2))>=0) {
+                        QString rep=QString("%2 <a href=\"%1\"><img src=\"%4\" border=\"0\" alt=\"get more information about %3\"></a>").arg(val).arg(rxTT.cap()).arg(key).arg(img);
+                        result=result.replace(rxTT.pos(), rxTT.matchedLength(), rep);
                         pos += rep.size();
+                        //qDebug()<<"  replaced in tooltip";
                     } else {
                         pos += rxTT.matchedLength();
+                        //qDebug()<<"  skipped";
                     }
+                    //qDebug()<<pos;
                 }
 
             }
@@ -3756,8 +3753,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 QRegExp rxTT(QString("\\<\\s*(\\w\\w*)[^\\>]*\\>[^\\<\\>]*(%1)[^\\<\\>]*\\<").arg(key));
                 rxTT.setMinimal(true);
                 pos = 0;
-                //qDebug()<<rxTT;
+                //qDebug()<<"----- "<<key<<" ------";
                 while ((pos = rxTT.indexIn(result, pos)) != -1) {
+                    //qDebug()<<rxTT.cap()<<rxTT.cap(1)<<rxTT.cap(2);
                     QString rep=QString("<a href=\"tooltip:%1\">%2</a>").arg(key).arg(rxTT.cap(2));
                     QString tag=rxTT.cap(1).toLower();
                     if (tag!="h1" && tag!="h2" && tag!="h3" && tag!="h4" && tag!="h5" && tag!="title" && tag!="a") {

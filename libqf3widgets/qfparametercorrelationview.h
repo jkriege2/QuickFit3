@@ -49,6 +49,7 @@
 #include "libwid_imexport.h"
 #include "qfproperties.h"
 #include "jkqtptools.h"
+#include <QRadioButton>
 
 /*! \brief This class displays a correlation graph, i.e. it plots two parameters against each other
     \ingroup qf3rdrdp_imaging_fcs
@@ -137,6 +138,7 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
         void copyData();
         void saveData();
         void copyDataMatlab();
+        void showHelp();
         void fillDataArray(QList<QVector<double> >& data, QStringList &headers);
 
 protected:
@@ -171,21 +173,33 @@ protected:
 
     double mainHistogramMax;
 
-    QCheckBox* chkHistogramRangeAuto1;
+    QRadioButton* chkHistogramRangeAuto1;
+    QRadioButton* chkHistogramRangeRelaxAuto1;
+    QRadioButton* chkHistogramRangeManual1;
     QFDoubleEdit* edtHistogramMin1;
     QFDoubleEdit* edtHistogramMax1;
+    QDoubleSpinBox* spinHistogramQL1;
+    QDoubleSpinBox* spinHistogramQU1;
 
-    QCheckBox* chkHistogramRangeAuto2;
+    QRadioButton* chkHistogramRangeAuto2;
+    QRadioButton* chkHistogramRangeRelaxAuto2;
+    QRadioButton* chkHistogramRangeManual2;
     QFDoubleEdit* edtHistogramMin2;
     QFDoubleEdit* edtHistogramMax2;
+    QDoubleSpinBox* spinHistogramQL2;
+    QDoubleSpinBox* spinHistogramQU2;
 
     JKQTPSymbolComboBox* cmbSymbol;
     QSpinBox* spinSymbolSize;
 
     JKQTPMathImageColorPaletteComboBox* cmbColorScale;
-    QCheckBox* chkColorRangeAuto;
+    QRadioButton* chkColorRangeAuto;
+    QRadioButton* chkColorRangeRelaxAuto;
+    QRadioButton* chkColorRangeManual;
     QFDoubleEdit* edtColorMin;
     QFDoubleEdit* edtColorMax;
+    QDoubleSpinBox* spinColQL;
+    QDoubleSpinBox* spinColQU;
 
 
 
@@ -198,6 +212,7 @@ protected:
     QGridLayout* layHist;
 
     QLabel* labPlotPos;
+    QAction* actHelp;
     QAction* actPrintReport;
     QAction* actSaveReport;
     QAction* actCopyData;

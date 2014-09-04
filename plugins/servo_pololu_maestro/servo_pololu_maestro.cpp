@@ -47,7 +47,7 @@ void QFExtensionServoPololuMaestro::deinit() {
     QSettings inifile(services->getGlobalConfigFileDirectory()+"/servo_pololu_maestro.ini", QSettings::IniFormat);
     if (inifile.isWritable()) {
         inifile.setValue("device_count", getShutterCount());
-        for (unsigned int i=0; i<deviceIndex.size(); i++) {
+        for (int i=0; i<deviceIndex.size(); i++) {
             if (deviceIndex[i].first==0) {
                 int p=shutters[deviceIndex[i].second].port;
                 if (ports.getCOMPort(p)) {

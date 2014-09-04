@@ -154,8 +154,6 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/qt/qfvisualize3dgleditor.h \
     qconfigcomboboxwidget.h \
     qffitfunctionselectdialog.h \
-    qfgetplotdatainterface.h \
-    ../plugins/interfaces/qfoverlayplotdialog.h \
     qfoverlayplotdialog.h \
     ../plugins/interfaces/qfgetplotdatainterface.h \
     qfselectfileslistwidget.h \

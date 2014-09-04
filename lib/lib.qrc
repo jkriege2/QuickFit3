@@ -41,6 +41,7 @@
         <file alias="www.png">icons/www.png</file>
         <file alias="help_faq.png">icons/help_faq.png</file>
         <file alias="autolink.png">icons/autolink.png</file>
+        <file alias="autolinkweb.png">icons/autolinkweb.png</file>
     </qresource>
     <qresource prefix="/lib">
         <file alias="expression_parser.png">icons/expression_parser.png</file>
@@ -80,6 +81,7 @@
         <file alias="help_help.png">icons/help_help.png</file>
         <file alias="mail.png">icons/mail.png</file>
         <file alias="result_statistics.png">icons/result_statistics.png</file>
+        <file alias="result_statistics_row.png">icons/result_statistics_row.png</file>
         <file alias="result_statistics_compare.png">icons/result_statistics_compare.png</file>
         <file alias="result_statistics_icon.png">icons/result_statistics_icon.png</file>
         <file alias="copy16_matlab.png">icons/copy16_matlab.png</file>

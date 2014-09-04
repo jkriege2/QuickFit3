@@ -54,6 +54,12 @@ void QFRDRImagingFCSPlugin::init()
     tmenu->addAction(actOffset);
 
     QFPluginServices::getInstance()->addToHelpFurtherReading("$$INVISIBLEREF_SPIMFCCS$$$$INVISIBLEREF_WOHLANDSPIMFCS$$$$INVISIBLEREF_RIES$$");
+    QFPluginServices::getInstance()->appendOrAddHTMLReplacement("FILEFORMATS_LIST", QString("<li><b>ImagingFCS:</b><ul>\n"
+                                                                                            "<li><a href=\"$$plugin_info:helpdir:%1$$/imfcs_dataformats.html#formats_acf\">CSV autocorrelation data</a></li>\n"
+                                                                                            "<li><a href=\"$$plugin_info:helpdir:%1$$/imfcs_dataformats.html#formats_binacf\">binary autocorrelation data</a></li>\n"
+                                                                                            "<li><a href=\"$$plugin_info:helpdir:%1$$/imfcs_dataformats.html#formats_binccf\">binary cross-correlation data</a></li>\n"
+                                                                                            "<li><a href=\"$$plugin_info:helpdir:%1$$/imfcs_dataformats.html#formats_evalsettings\">evaluation settings report</a></li>\n"
+                                                                                            "</ul></li>\n").arg(getID()));
 
 
 }

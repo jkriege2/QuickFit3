@@ -37,10 +37,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrdrimagingfcs_dataeditor_image.h"
 #include "qfrdrimagingfcs_dataeditor_countrate.h"
 #include "qfrawdatarecordfactory.h"
-#include "../interfaces/qfrdrfcsdatainterface.h"
-#include "../interfaces/qfrdrimagetoruninterface.h"
-#include "../interfaces/qfrdroverviewimageinterface.h"
-#include "../interfaces/qfrdrsimplecountrateinterface.h"
+#include "qfrdrfcsdatainterface.h"
+#include "qfrdroverviewimageinterface.h"
+#include "qfrdrsimplecountrateinterface.h"
 #include "csvtools.h"
 #include "qtriple.h"
 #include "qfrdrimagingfcsoverviewrateeditor.h"
@@ -50,6 +49,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrdrimagemask.h"
 #include "qfrdrrunselectiontools.h"
 #include "qfrdrimagemasktools.h"
+#include "qfrdrimagetoruninterface.h"
 
 
 /*! \brief QFRawDataRecord implementation

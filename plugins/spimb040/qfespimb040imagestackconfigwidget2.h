@@ -27,7 +27,7 @@
 #include <QAction>
 #include <QToolButton>
 #include <QWidget>
-#include "../interfaces/qfextensionlinearstage.h"
+#include "qfextensionlinearstage.h"
 #include "qfespimb040filenametool.h"
 #include "qfespimb040opticssetup.h"
 #include "qfespimb040acquisitiondescription.h"

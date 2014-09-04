@@ -23,7 +23,7 @@
 
 #include <QtGui>
 #include "qfextensionmanager.h"
-#include "../interfaces/qfextensionacquisition.h"
+#include "qfextensionacquisition.h"
 #include "qfextension.h"
 #include "qfacquisitioncombobox.h"
 #include "libwid_imexport.h"

@@ -54,8 +54,8 @@
 
 #include "qtlogfile.h"
 #include "qfextensionmanager.h"
-#include "../interfaces/qfextensioncamera.h"
-#include "../interfaces/qfextensionlinearstage.h"
+#include "qfextensioncamera.h"
+#include "qfextensionlinearstage.h"
 #include "qfextension.h"
 #include "tools.h"
 #include "qfespimb040samplestageconfig.h"

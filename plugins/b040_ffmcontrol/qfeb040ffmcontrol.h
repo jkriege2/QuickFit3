@@ -36,9 +36,9 @@ public:
     /** \copydoc QFExtension::getID() */
     virtual QString getID() const  { return QString("b040_ffmcontrol"); };
     /** \copydoc QFExtension::getName() */
-    virtual QString getName() const  { return tr( "QFEB040FFM" ); };
+    virtual QString getName() const  { return tr( "B040 Fluorescence fluctuation microscope control" ); };
         /** \copydoc QFExtension::getDescription() */
-    virtual QString getDescription() const  { return tr("Control software for the FCS Microscope"); };
+    virtual QString getDescription() const  { return tr("Control software for the FFM Microscope at B040/DKFZ Heidelberg"); };
     /** \copydoc QFExtension::getAuthor() */
     virtual QString getAuthor() const  { return tr("Sindbad the Sailor"); };
     /** \copydoc QFExtension::getCopyright() */

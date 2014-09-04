@@ -208,6 +208,7 @@ void QFFitFunctionManager::searchPlugins(QString directory, QFPluginHelpData &he
 
                 parseTooltips(info.directory, helpdata.tooltips);
                 parseAutolinks(info.directory, helpdata.autolinks);
+                parseGlobalreplaces(info.directory);
             }
         }
     }
@@ -336,6 +337,7 @@ QObject *QFFitFunctionManager::getPluginObject(int i) const
 
 int QFFitFunctionManager::getPluginForID(QString id) const {
     for (int i=0; i<fitPlugins.size(); i++) {
+        if (fitPlugins[i]->getID()==id) return i;
          QStringList ids=fitPlugins[i]->getIDs();
          if (ids.contains(id)) return i;
    }
@@ -532,4 +534,18 @@ QString QFFitFunctionManager::getPluginHelp(int ID, QString faID) {
     return "";
 }
 
+
+
+void QFFitFunctionManager::deinit() {
+    for (int i=0; i<pluginCount(); i++) {
+        if (fitPlugins.value(i, NULL)) fitPlugins.value(i, NULL)->deinit();
+    }
+}
+
+void QFFitFunctionManager::init()
+{
+    for (int i=0; i<pluginCount(); i++) {
+        if (fitPlugins.value(i, NULL)) fitPlugins.value(i, NULL)->init();
+    }
+}
 

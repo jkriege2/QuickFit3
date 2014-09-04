@@ -87,6 +87,9 @@ void QFHistogramView::createWidgets() {
     coll->addStretch();
 
     QToolButton* tb;
+    actHelp=createActionAndButton(tb, QIcon(":/lib/help.png"), tr("show help for histogram widget"), this);
+    connect(actHelp, SIGNAL(triggered()), this, SLOT(showHelp()));
+    coll->addWidget(tb);
     actPrintReport=createActionAndButton(tb, QIcon(":/lib/printreport.png"), tr("Print histogram report"), this);
     connect(actPrintReport, SIGNAL(triggered()), this, SLOT(printReport()));
     coll->addWidget(tb);
@@ -117,17 +120,17 @@ void QFHistogramView::createWidgets() {
     edtHistogramRelaxedRangePercentUp->setValue(5);
     flHistSet->addRow(tr("# bins:"), coll);
     QHBoxLayout* layHistogram=new QHBoxLayout();
-    chkLogHistogram=new QCheckBox("", grpHistogramSettings);
-    chkNormalizedHistograms=new QCheckBox("", grpHistogramSettings);
-    chkKey=new QCheckBox(this);
+    chkLogHistogram=new QCheckBox(tr("log-scale"), grpHistogramSettings);
+    chkNormalizedHistograms=new QCheckBox(tr("normalized"), grpHistogramSettings);
+    chkKey=new QCheckBox(tr("show key"),this);
     chkKey->setChecked(true);
     layHistogram->addWidget(chkLogHistogram);
-    layHistogram->addWidget(new QLabel(tr("   normalized:")));
+    layHistogram->addSpacing(15);
     layHistogram->addWidget(chkNormalizedHistograms);
-    layHistogram->addWidget(new QLabel(tr("   show key:")));
+    layHistogram->addSpacing(15);
     layHistogram->addWidget(chkKey);
     layHistogram->addStretch();
-    flHistSet->addRow(tr("log-scale:"), layHistogram);
+    flHistSet->addRow(tr(""), layHistogram);
 
     chkHistogramRangeAuto=new QRadioButton("auto", grpHistogramSettings);
     chkHistogramRangeRelaxAuto=new QRadioButton("relaxed auto: ", grpHistogramSettings);
@@ -875,6 +878,11 @@ void QFHistogramView::copyDataMatlab()
     fillDataArray(data, headers);
 
     matlabCopy(data);
+}
+
+void QFHistogramView::showHelp()
+{
+    QFPluginServices::getInstance()->displayMainHelpWindow("qfhistogram.html");
 }
 
 void QFHistogramView::saveData()

@@ -21,7 +21,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include "qffccsfitevaluation_item.h"
 #include "qffccsfitevaluation_editor.h"
-#include "../interfaces/qfrdrfcsdatainterface.h"
+#include "qfrdrfcsdatainterface.h"
 #include "qffitfunction.h"
 #include "qftools.h"
 #include "qffcstools.h"

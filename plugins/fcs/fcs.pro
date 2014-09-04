@@ -48,12 +48,10 @@ HEADERS += dlgcsvparameters.h \
             ../base_classes/qfrdrimagemasktools.h \
             ../base_classes/qffinderroneouscorrelationdlg.h \
             ../base_classes/qffcstools.h \
-            ../interfaces/qfrdrrunselection.h \
             ../interfaces/qfrdrfcsdatainterface.h \
             ../interfaces/qfrdrcountratesinterface.h \
             ../interfaces/qfrdrfcsdatainterface.h \
             ../interfaces/qfrdrimageselectioninterface.h \
-            ../interfaces/qfrdrrunselection.h \
     ../base_classes/qfrdrrunselectiontools.h \
     confocor3tools.h \
     flex_sin_tools.h \

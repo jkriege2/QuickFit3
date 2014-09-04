@@ -1,0 +1,83 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>SPIM Plugin: File formats</title>
+  <link rel="contents" href="ext_spimb040.html"> 
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+     
+     <a name="config_ini"><h2>Acquisition configuration files <tt>configuration.ini</tt></h2>
+     <h3>Basic format &amp; Example</h3>
+     <p>The B040 SPIM plugin creates <tt>.configuration.ini</tt> files for every (data/image) acquisition, that is performed. These are files in the INI file format, i.e. generally consist of key/value pairs and groups:
+     <pre>
+    [acquisition]
+    acquisition\accumulation_time=0.00056
+    acquisition\binning_horizontal=1
+    acquisition\binning_vertical=1
+    acquisition\bit_depth=14
+    acquisition\camera_controller_card=CCI-23
+    ...
+    type=acquisition
+    pixel_width=0.4
+    pixel_height=0.4
+    camera_pixel_width=24
+    camera_pixel_height=24
+    camera_model=DU860_BV
+    sensor_model=DU860_BV
+    magnification=60
+
+    [setup]
+    filterchangers\detection\filter=0
+    filters\detection_filterchanger\manufacturer=Semrock
+    filters\detection_filterchanger\name=Edge Basic 488 LP
+    filters\detection_filterchanger\type=long pass
+    filters\detection_splitter\manufacturer=???
+    filters\detection_splitter\name=50:50 splitter
+    filters\detection_splitter\type=neutral beam splitter
+    laser1\line1\enabled=true
+    laser1\line1\measured_power=10
+    laser1\line1\name=491nm
+    laser1\line1\set_power=10
+    laser1\line1\unit=mW
+    laser1\shutter=true
+    
+
+    [experiment]
+    cell=5
+    comment=mit Loch
+    date=2012-12-06T14:45:36
+    experimenter=JanK + Gy\xf6rgy
+    plate=1
+    sample="alte beads samples in S\xe4\x63kchen ... aber jetzt  neu: S\xe4\x63kchen mit Loch, um FLuss zu sehen ;-)"
+    start_time=2012-12-06T14:43:52
+    title=bead-scans in EMCCD + Radhard2
+    well=1
+
+    [files]
+    count=2
+    name0=emccd_beads_no05mit_Loch_laser1_491nm_10mW_001_overview.tif
+    type0=TIFF16
+    description0=overview before acquisition with lightpath 1 for camera 1
+    name1=emccd_beads_no05mit_Loch_laser1_491nm_10mW_001.tif
+    type1=TIFF16
+    description1=Andor camera acquisition image series
+     </pre>
+     </p>
+     <h3>Common entries</h3>
+     <p>The files are mostly split into these larger groups:
+     <ul>
+       <li><b>[acquisition]</b> describes the setup of the microscope and cameras during the acquisition. If during an acquisition, several images/image series are taken, the settings for each of these are typically stored here. The settings during the main acquisition are then stored with the prefix <tt>acquisition\</tt>, the settings for taking a background image series with the prefix <tt>background\</tt>, for overview images under <tt>overview\</tt> and so on.</li>
+       <li><b>[experiment]</b> contains general describing information on the experiment, as they can be entered in the "experiment description" tab.</li>
+       <li><b>[files]</b> contains a list of files, that belong to this acquisition. For each file, the relative path (<tt>name</tt>), the file type and a description are given.</li>
+     </ul>
+     </p>
+     <p>These files are used e.g. by the <a href="$$plugin_info:help:imaging_fcs$$">imagingFCS Correlator</a> to determine the pixel size, framerate etc.</p>
+     
+     <a name="meas_dat"><h2>Measurements files <tt>measured.dat</tt></h2>
+     <p>These are comma-separated values files (dot '.' as decimal separator), which contain measurements, such as temperature readings or laser powers, acquired <u>during</u> an image acquisition. The first column is the approximate time (in seconds, since start of the acquisition), at which the data was acquired.
+     </p>
+     
+  </body>
+</html>

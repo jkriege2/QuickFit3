@@ -182,6 +182,15 @@ class QFLIB_EXPORT QFDataExportHandler {
         static void copyCSV(const QList<QList<QVariant> >& data, const QStringList& columnHeaders=QStringList(), const QStringList& rowHeaders=QStringList());
         /*! \brief save the given \a data in the given \A format (index into the list, as returned by dataGetFormats() )
          */
+        static void copyExcel(const QList<QList<double> >& data, const QStringList& columnHeaders=QStringList(), const QStringList& rowHeaders=QStringList());
+        /*! \brief save the given \a data in the given \A format (index into the list, as returned by dataGetFormats() )
+         */
+        static void copyExcel(const QList<QVector<double> >& data, const QStringList& columnHeaders=QStringList(), const QStringList& rowHeaders=QStringList());
+        /*! \brief save the given \a data in the given \A format (index into the list, as returned by dataGetFormats() )
+         */
+        static void copyExcel(const QList<QList<QVariant> >& data, const QStringList& columnHeaders=QStringList(), const QStringList& rowHeaders=QStringList());
+        /*! \brief save the given \a data in the given \A format (index into the list, as returned by dataGetFormats() )
+         */
         static void save(const QList<QList<QVariant> > &data, int format, const QString& filename, const QStringList& columnHeaders=QStringList(), const QStringList& rowHeaders=QStringList());
         /*! \brief save the given \a data in the given \A format (index into the list, as returned by dataGetFormats() )
          */

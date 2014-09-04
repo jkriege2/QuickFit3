@@ -51,24 +51,7 @@ QString QFUsesResultsByIndexEvaluation::getEvaluationResultID(int index) const {
     return QString("%1_%2_i%3").arg(getType()).arg(getID()).arg(index);
 }
 
-int QFUsesResultsByIndexEvaluation::getIndexFromEvaluationResultID(const QString &resultID) const
-{
-    if (resultID.size()<=0) return -1;
-    if (resultID.endsWith("runavg")) return -1;
-    if (resultID.endsWith("avg")) return -1;
-    int l=0;
-    while (resultID[resultID.size()-1-l].isDigit() || resultID[resultID.size()-1-l]=='-') {
-        l++;
-    }
 
-
-    if (l>0) {
-        //qDebug()<<"QFFitResultsByIndexEvaluation::getIndexFromEvaluationResultID("<<resultID<<"):  l="<<l<<"  => result="<<resultID.right(l).toInt();
-        return resultID.right(l).toInt();
-    }
-    //qDebug()<<"QFFitResultsByIndexEvaluation::getIndexFromEvaluationResultID("<<resultID<<"):  l="<<l<<"  => result=-1";
-    return -1;
-}
 
 void QFUsesResultsByIndexEvaluation::setFitResultGroup(QFRawDataRecord *r, int index, const QString &parameterID, const QString &group) {
     setFitResultGroup(r, getEvaluationResultID(index), parameterID, group);

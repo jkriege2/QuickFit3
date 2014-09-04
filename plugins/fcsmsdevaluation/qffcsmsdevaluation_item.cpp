@@ -21,7 +21,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include "qffcsmsdevaluation_item.h"
 #include "qffcsmsdevaluation_editor.h"
-#include "../interfaces/qfrdrfcsdatainterface.h"
+#include "qfrdrfcsdatainterface.h"
 #include "qfmathtools.h"
 #include "qffcstools.h"
 #include "imfcstools.h"
@@ -537,7 +537,7 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
         ok=true;
         t_msdstart=msdTaus[0];
         t_msdend=msdTaus[Nmsd-1];
-        for (int i=0; i<N; i++) {
+        for (uint32_t i=0; i<N; i++) {
             if (taus[i]==t_msdstart) {
                 first=i;
                 break;
@@ -580,7 +580,7 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
             if (msdTaus && msd && Nmsd>1) {
 
                 int k=0;
-                for (uint32_t i=first; i<=last; i++) {
+                for (int32_t i=first; i<=last; i++) {
                     const double tau=msdTaus[k];
                     const double ms=msd[k];
                     modelEval[i]=1.0/N_particle/(1.0+2.0/3.0*ms/sqr(wxy));
@@ -595,7 +595,7 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
             const double N_particle=getFitValue(record,index,model,"n_particle");;
 
             int k=0;
-            for (uint32_t i=first; i<=last; i++) {
+            for (int32_t i=first; i<=last; i++) {
                 const double tau=msdTaus[k];
                 const double ms=msd[k];
                 modelEval[i]=1.0/N_particle/(1.0+2.0/3.0*ms/sqr(wxy))/sqrt(1.0+2.0/3.0*ms/sqr(wxy)/sqr(gamma));;
@@ -612,7 +612,7 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
             const double tauT=getFitValue(record,index,model,"nonfl_tau1")*1e-6;
 
             int k=0;
-            for (uint32_t i=first; i<=last; i++) {
+            for (int32_t i=first; i<=last; i++) {
                 const double tau=msdTaus[k];
                 const double ms=msd[k];
                 modelEval[i]=1.0/N_particle/(1.0+2.0/3.0*ms/sqr(wxy))*qfFCSTripletTerm(tau, fT, tauT);
@@ -629,7 +629,7 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
             const double tauT=getFitValue(record,index,model,"nonfl_tau1")*1e-6;
 
             int k=0;
-            for (uint32_t i=first; i<=last; i++) {
+            for (int32_t i=first; i<=last; i++) {
                 const double tau=msdTaus[k];
                 const double ms=msd[k];
                 modelEval[i]=1.0/N_particle/(1.0+2.0/3.0*ms/sqr(wxy))/sqrt(1.0+2.0/3.0*ms/sqr(wxy)/sqr(gamma))*qfFCSTripletTerm(tau, fT, tauT);
@@ -649,7 +649,7 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
             const double pre=1.0/(sqpi*wz*qfSqr(a)*C);
 
             int k=0;
-            for (uint32_t i=first; i<=last; i++) {
+            for (int32_t i=first; i<=last; i++) {
                 const double tau=msdTaus[k];
                 const double ms=msd[k];
                 const double fourdt=2.0/3.0*ms;
@@ -671,7 +671,7 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
             const double pre=1.0/(qfSqr(a)*C);
 
             int k=0;
-            for (uint32_t i=first; i<=last; i++) {
+            for (int32_t i=first; i<=last; i++) {
                 const double tau=msdTaus[k];
                 const double ms=msd[k];
                 const double fourdt=2.0/3.0*ms;

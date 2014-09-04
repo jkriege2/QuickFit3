@@ -83,11 +83,14 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
         void setResultFilterUsesRegExp(bool use);
         void setDisplayProperties(const QStringList& props);
         void setShowVectorMatrixAvg(bool show);
+        void setExtractIndexes(bool enabled);
+        void setRemoveUnusedIndexes(bool enabled);
     protected:
         QFEvaluationItem* evaluation;
         QString evalFilter;
 
         void calcStatistics(QString resultName, double& average, double& stddev) const;
+        int getExtraColumns() const;
     private:
 
         /** \brief calculate average and standard deviation over all result for a given result name */
@@ -107,6 +110,9 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
         QString filesFilterNot;
         bool resultFilterRegExp;
         bool filesFilterRegExp;
+
+        bool extractRuns;
+        bool removeUnusedRuns;
 };
 
 #endif // QFEVALUATIONRESULTSMODEL_H

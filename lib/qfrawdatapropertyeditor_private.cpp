@@ -429,9 +429,9 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     actSaveResultsAveraged=new QAction(tr("Save all results to file with averaged vector/matrix results"), d);
     tbResults->addAction(actSaveResults);
     tbResults->addSeparator();
-    actStatistics=new QAction(QIcon(":/lib/result_statistics.png"), tr("Result statistics, summarizing cells"), d);
+    actStatistics=new QAction(QIcon(":/lib/result_statistics_row.png"), tr("histogram: row-wise"), d);
     tbResults->addAction(actStatistics);
-    actStatisticsComparing=new QAction(QIcon(":/lib/result_statistics_compare.png"), tr("Result statistics, comparing cells"), d);
+    actStatisticsComparing=new QAction(QIcon(":/lib/result_statistics_compare.png"), tr("Result histogram: cell-wise"), d);
     tbResults->addAction(actStatisticsComparing);
     actCorrelation=new QAction(QIcon(":/lib/result_correlation.png"), tr("Result correlation"), d);
     tbResults->addAction(actCorrelation);

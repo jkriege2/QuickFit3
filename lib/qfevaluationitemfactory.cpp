@@ -84,6 +84,7 @@ void QFEvaluationItemFactory::searchPlugins(QString directory, QFPluginHelpData 
 
                 parseTooltips(info.directory, helpdata.tooltips);
                 parseAutolinks(info.directory, helpdata.autolinks);
+                parseGlobalreplaces(info.directory);
 
 
 

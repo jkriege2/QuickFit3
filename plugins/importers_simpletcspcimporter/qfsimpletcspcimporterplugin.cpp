@@ -21,6 +21,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include "qfsimpletcspcimporterplugin.h"
 #include "qfsimpletcspcimporter.h"
+#include "qfpluginservices.h"
 
 
 QStringList QFSimpleTCSPCImporterPlugin::getIDs() const {
@@ -34,6 +35,14 @@ QFImporter* QFSimpleTCSPCImporterPlugin::createImporter(QString id) const  {
         return new QFSimpleTCSPCImporter();
     } 
     return NULL;
+}
+
+void QFSimpleTCSPCImporterPlugin::init()
+{
+    QFPluginServices::getInstance()->appendOrAddHTMLReplacement("FILEFORMATS_LIST", QString("<li><b>%2:</b><ul>\n"
+                                                                                            "<li><a href=\"$$plugin_info:helpdir:%1$$/tcspcimporter_simpletcspc.html\">Simple TCSPC file [Hungarian 64-bit]</a></li>\n"
+                                                                                            "</ul></li>\n").arg(getID()).arg(getName()));
+
 }
 
 Q_EXPORT_PLUGIN2(importers_simpletcspcimporter, QFSimpleTCSPCImporterPlugin)

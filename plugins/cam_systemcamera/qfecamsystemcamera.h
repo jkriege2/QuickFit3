@@ -26,7 +26,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QObject>
 #include <QStringList>
 #include "qfextension.h"
-#include "../interfaces/qfextensioncamera.h"
+#include "qfextensioncamera.h"
 #include "videocapture.h"
 /*!
     \defgroup qf3ext_cam_systemcam QFExtensionCamera implementation

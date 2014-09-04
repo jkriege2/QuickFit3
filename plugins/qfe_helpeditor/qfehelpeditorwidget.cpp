@@ -48,6 +48,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     ui(new Ui::QFEHelpEditorWidget)
 {
     modified=false;
+    newScript=true;
     ui->setupUi(this);
 
     ui->edtScript->getEditor()->setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
@@ -400,7 +401,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$faq_answer");
     addInsertAction(menu, "$$faq_end");
 
-    menu=new QMenu(tr("FAQs"), this);
+    menu=new QMenu(tr("Function References"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
     addInsertAction(menu, tr("Function reference entry"), "$$funcref_start$$<a name=\"NAME\"/><!-- func:NAME -->\n  <b><tt><!-- template -->NAME<!-- /template --></tt> - <i> DESCRIPTION </i>:</b>\n$$funcref_description$$\n    DESCRIPTION\n  <!-- /func:NAME -->\n$$funcref_end$$");
     menu->addSeparator();
@@ -544,7 +545,7 @@ void QFEHelpEditorWidget::on_btnOpen_clicked()
 
 bool QFEHelpEditorWidget::save() {
 
-    if (currentScript.isEmpty()) {
+    if (currentScript.isEmpty() || newScript) {
         return saveAs();
     } else {
         return saveFile(currentScript);
@@ -561,6 +562,7 @@ bool QFEHelpEditorWidget::saveFile(const QString &filename, bool setFilename)
         s<<ui->edtScript->getEditor()->toPlainText().toUtf8();
         lastScript=ui->edtScript->getEditor()->toPlainText();
         f.close();
+        newScript=false;
         if (setFilename) setScriptFilename(filename);
     }
     return true;
@@ -602,8 +604,9 @@ void QFEHelpEditorWidget::on_btnOpenExample_clicked()
 
 void QFEHelpEditorWidget::on_btnOpenTemplate_clicked()
 {
+    QDir d=QFileInfo(currentScript).absoluteDir();
     openScript(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/qfe_helpeditor/templates/", false);
-    setScriptFilename("");
+    setScriptFilename(d.absoluteFilePath(QFileInfo(currentScript).fileName()), true, false);
 }
 
 void QFEHelpEditorWidget::on_btnOpenTemplate2_clicked()
@@ -666,14 +669,17 @@ bool QFEHelpEditorWidget::maybeSave() {
     return true;
 }
 
-void QFEHelpEditorWidget::setScriptFilename(QString filename)
+void QFEHelpEditorWidget::setScriptFilename(QString filename, bool newscript, bool addToRecent)
 {
     currentScript=filename;
-    recentHelpFiles->addRecentFile(filename);
+    newScript=QFile::exists(filename)||newscript||filename.isEmpty();
+    if (addToRecent && QFile::exists(filename)) recentHelpFiles->addRecentFile(filename);
     if (filename.isEmpty()) ui->labScriptFilename->setText(tr("current file: <tt><i>NEW FILE</i></tt>"));
-    else ui->labScriptFilename->setText(tr("current file: <tt><i>%1</i></tt>").arg(QFileInfo(filename).fileName()));
+    else if (QFile::exists(filename) && !newScript) ui->labScriptFilename->setText(tr("current file: <tt><i>%1</i></tt>").arg(QFileInfo(filename).fileName()));
+    else ui->labScriptFilename->setText(tr("new file: <tt><i>%1</i></tt>").arg(QFileInfo(filename).fileName()));
     ui->edtScript->getEditor()->document()->setModified(false);
     modified=false;
+
 }
 
 void QFEHelpEditorWidget::closeEvent(QCloseEvent *event)

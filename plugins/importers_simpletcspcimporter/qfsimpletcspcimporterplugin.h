@@ -91,6 +91,8 @@ class QFSimpleTCSPCImporterPlugin : public QObject, public QFPluginImporters {
 
         /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
         virtual QFImporter* createImporter(QString id) const ;
+
+        virtual void init();
 		
 		QF_PLUGIN
     private:

@@ -52,7 +52,7 @@ class QFESPIMB040MainWindow; // forward
 #include "jkqttools.h"
 #include "qtlogfile.h"
 #include "qfextensionmanager.h"
-#include "../interfaces/qfextensionlinearstage.h"
+#include "qfextensionlinearstage.h"
 #include "qfextension.h"
 #include "tools.h"
 #include "qfstagecombobox.h"

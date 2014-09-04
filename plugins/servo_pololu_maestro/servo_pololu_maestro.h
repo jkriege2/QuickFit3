@@ -28,7 +28,7 @@
 #include <QVector>
 #include <QList>
 #include "qfextension.h"
-#include "../interfaces/qfextensionshutter.h"
+#include "qfextensionshutter.h"
 #include "../base_classes/qfbinaryserialprotocolhandler.h"
 #include "../base_classes/qf3comportmanager.h"
 #include "../../../../../LIB/trunk/jkserialconnection.h"

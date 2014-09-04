@@ -21,7 +21,7 @@
 
 #include "qfimfcsfitevaluation.h"
 #include "qfimfcsfitevaluationeditor.h"
-#include "../interfaces/qfrdrfcsdatainterface.h"
+#include "qfrdrfcsdatainterface.h"
 #include "qffitfunction.h"
 #include "qftools.h"
 #include "qffcstools.h"

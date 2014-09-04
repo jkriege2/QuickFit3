@@ -25,7 +25,7 @@ Copyright (c) 2008-2014 Jan Buchholz, German Cancer Research Center
 #include <time.h>
 #include <QObject>
 #include "qfextension.h"
-#include "../interfaces/qfextensioncamera.h"
+#include "qfextensioncamera.h"
 #include "processing_chain.h"
 #include "qenhancedlineedit.h"
 #include "jkstyledbutton.h"

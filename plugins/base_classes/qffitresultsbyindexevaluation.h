@@ -64,8 +64,6 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *         current fit function for a given fitFunction ID */
         virtual QString getEvaluationResultID(QString fitFunction, int currentIndex) const;
 
-        /** \brief extract the index number (or -1 for average) from the supplied resultID, which has to have been created with getEvaluationResultID() from this class */
-        virtual int getIndexFromEvaluationResultID(const QString& resultID) const;
 
         /** \brief return the smallest available index */
         virtual int getIndexMin(QFRawDataRecord* r) const=0 ;

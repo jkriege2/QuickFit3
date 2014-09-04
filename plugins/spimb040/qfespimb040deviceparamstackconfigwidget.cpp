@@ -26,7 +26,7 @@
 #include "qfpluginservices.h"
 #include "qfstagecombobox.h"
 #include "qfextensionmanager.h"
-#include "../interfaces/qfextensionlinearstage.h"
+#include "qfextensionlinearstage.h"
 #include "qfextension.h"
 #include <QtGui>
 #include <QtCore>

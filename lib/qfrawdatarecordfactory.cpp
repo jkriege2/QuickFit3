@@ -81,6 +81,7 @@ void QFRawDataRecordFactory::searchPlugins(QString directory, QFPluginHelpData &
 
                 parseTooltips(info.directory, helpdata.tooltips);
                 parseAutolinks(info.directory, helpdata.autolinks);
+                parseGlobalreplaces(info.directory);
 
                 QFPluginServices::getInstance()->getExtensionManager()->addExtensionPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalExtensionPlugins());
                 QFPluginServices::getInstance()->getEvaluationItemFactory()->addEvalPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalEvaluationPlugins());

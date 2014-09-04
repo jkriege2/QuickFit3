@@ -22,6 +22,7 @@
 #include "qfevaluationresultsmodel.h"
 #include "qfevaluationitem.h"
 #include "qfproject.h"
+#include "qfrdrrunselection.h"
 
 QFEvaluationResultsModel::QFEvaluationResultsModel(QObject* parent):
     QAbstractTableModel(parent)
@@ -35,6 +36,8 @@ QFEvaluationResultsModel::QFEvaluationResultsModel(QObject* parent):
     filesFilterRegExp=false;
     displayProperties.clear();
     showVectorMatrixAvg=true;
+    extractRuns=true;
+    removeUnusedRuns=false;
 }
 
 QFEvaluationResultsModel::~QFEvaluationResultsModel()
@@ -85,15 +88,28 @@ void QFEvaluationResultsModel::resultsChanged(QFRawDataRecord* record, const QSt
                 if (l[i].first.isEmpty()) lastResultLabels.append(l[i].second);
                 else lastResultLabels.append(l[i].first);
             }
-            /*for (int i=0; i<lastResults.size(); i++) {
-                if (lastResults[i].first) {
-                    lastResults[i].first->resultsGetGroup(lastResults[i].second, )
-                }
-            }*/
+
         } else {
             lastResultNames.clear();
             lastResultLabels.clear();
             lastResults.clear();
+        }
+
+        if (extractRuns && removeUnusedRuns && evaluation) {
+            for (int i=lastResults.size()-1; i>=0; i--) {
+                int run=evaluation->getIndexFromEvaluationResultID(lastResults[i].second);
+                QFRawDataRecord* rdr=lastResults[i].first;
+                QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(rdr);
+                bool ok=true;
+                if (runsel && run>=0) {
+                    ok=!runsel->leaveoutRun(run);
+                    qDebug()<<rdr->getName()<<run<<ok;
+                }
+
+                if (!ok) {
+                    lastResults.removeAt(i);
+                }
+            }
         }
 
         if ((!filesFilter.isEmpty()) || (!filesFilterNot.isEmpty())) {
@@ -186,6 +202,15 @@ void QFEvaluationResultsModel::setDisplayProperties(const QStringList &props) {
 }
 
 QVariant QFEvaluationResultsModel::headerData(int section, Qt::Orientation orientation, int role) const {
+
+    // EXTRACO_L1, EXTRACOL_2, ... EXTRACOL_E | PROP_1, PROP_2, ... PROP_P | RESULT_1, RESULT_2, ..., RESULT_N
+    //     0           1               E-1        E       E+1        E+P-1    E+P        E+P+1         E+P+N-1
+
+    int extraID=section;
+    int propID=section-getExtraColumns();
+    int resnameID=section-getExtraColumns()-displayProperties.size();
+
+
     if (!evaluation) return QVariant();
     if (role==Qt::DisplayRole) {
         if (orientation==Qt::Vertical) {
@@ -197,8 +222,15 @@ QVariant QFEvaluationResultsModel::headerData(int section, Qt::Orientation orien
                 }
             } else return tr("Average %3 StdDev").arg(QChar(0xB1));
         } else {
-            if (section<displayProperties.size()) return QVariant(tr("property: %1").arg(displayProperties[section]));
-            else if (section<lastResultLabels.size()+displayProperties.size()) return QVariant(lastResultLabels[section-displayProperties.size()]);
+            if (resnameID<0) {
+                if (propID<0) {
+                    if (extraID==0 && extractRuns) return tr("index/run");
+                } else {
+                    return QVariant(tr("prop: %1").arg(displayProperties.value(propID, "???")));
+                }
+            } else {
+                return QVariant(lastResultLabels.value(resnameID, "???"));
+            }
 
         }
     }
@@ -209,6 +241,18 @@ void QFEvaluationResultsModel::setShowVectorMatrixAvg(bool show)
 {
     showVectorMatrixAvg=show;
     reset();
+}
+
+void QFEvaluationResultsModel::setExtractIndexes(bool enabled)
+{
+    extractRuns=enabled;
+    resultsChanged();
+}
+
+void QFEvaluationResultsModel::setRemoveUnusedIndexes(bool enabled)
+{
+    removeUnusedRuns=enabled;
+    if (extractRuns) resultsChanged();
 }
 int QFEvaluationResultsModel::rowCount(const QModelIndex &parent) const {
     if (!evaluation) {
@@ -221,7 +265,7 @@ int QFEvaluationResultsModel::columnCount(const QModelIndex &parent) const {
     if (!evaluation) {
         return 0;
     }
-    return lastResultNames.size()+displayProperties.size();
+    return lastResultNames.size()+displayProperties.size()+getExtraColumns();
 }
 
 Qt::ItemFlags QFEvaluationResultsModel::flags(const QModelIndex &index) const {
@@ -229,47 +273,70 @@ Qt::ItemFlags QFEvaluationResultsModel::flags(const QModelIndex &index) const {
 }
 
 QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) const {
-    int resNameI=index.column()-displayProperties.size();
+    // EXTRACO_L1, EXTRACOL_2, ... EXTRACOL_E | PROP_1, PROP_2, ... PROP_P | RESULT_1, RESULT_2, ..., RESULT_N
+    //     0           1               E-1        E       E+1        E+P-1    E+P        E+P+1         E+P+N-1
+
+    int extraID=index.column();
+    int propID=index.column()-getExtraColumns();
+    int resnameID=index.column()-getExtraColumns()-displayProperties.size();
+
     int resI=index.row();
+
+    //qDebug()<<"QFEvaluationResultsModel::data resI="<<resI<<"/"<<lastResults.size()<<"  extraID="<<extraID<<"  propID="<<propID<<"  resnameID="<<resnameID;
+
     if (!evaluation || !index.isValid()) return QVariant();
-    if (resNameI<0) {
-        if (role==Qt::DisplayRole || role==Qt::EditRole || role==ValueRole || (role==AvgRole) || (role==SumRole) || (role==MedianRole)) {
-            if (resI<lastResults.size()) {
-                QFRawDataRecord* record=lastResults[resI].first;
-                QString propname=displayProperties.value(index.column(), "");
-                if (record && !propname.isEmpty()) {
-                    return record->getProperty(propname, QVariant());
+    if (resnameID<0) {
+        if (propID<0) {
+            if (extraID==0 && extractRuns && resI<lastResults.size()) { // return run column data
+                QString en=lastResults[resI].second;
+                int run=evaluation->getIndexFromEvaluationResultID(en);
+                if (role==Qt::DisplayRole || role==Qt::EditRole || role==ValueRole || (role==AvgRole) || (role==SumRole) || (role==MedianRole)) {
+                    return run;
+                } else if ((role==Qt::ToolTipRole)||(role==Qt::StatusTipRole)) {
+                    return QVariant(tr("the results in this row belong to run %1").arg(run));
+                } else if (role==Qt::BackgroundColorRole) {
+                    return QColor("lightgrey");
                 }
-            } else if (resI==lastResults.size()) {
-                return QVariant();
             }
-        } else if (role==CountRole) {
-            return 1;
-        } else if (role==SDRole) {
-            return 0;
-        } else if ((role==Qt::ToolTipRole)||(role==Qt::StatusTipRole)) {
-            if (resI<lastResults.size()) {
-                QFRawDataRecord* record=lastResults[resI].first;
-                QString propname=displayProperties.value(index.column(), "");
-                QVariant v=record->getProperty(propname, QVariant());
-                return QVariant(tr("property: %1<br>contents: %2<br><i>&nbsp;&nbsp;&nbsp;%3</i>").arg(propname).arg(v.toString()).arg(v.typeName()));
+        } else {
+            if (role==Qt::DisplayRole || role==Qt::EditRole || role==ValueRole || (role==AvgRole) || (role==SumRole) || (role==MedianRole)) {
+                if (resI<lastResults.size()) {
+                    QFRawDataRecord* record=lastResults[resI].first;
+                    QString propname=displayProperties.value(propID, "");
+                    if (record && !propname.isEmpty()) {
+                        return record->getProperty(propname, QVariant());
+                    }
+                } else if (resI==lastResults.size()) {
+                    return QVariant();
+                }
+            } else if (role==CountRole) {
+                return 1;
+            } else if (role==SDRole) {
+                return 0;
+            } else if ((role==Qt::ToolTipRole)||(role==Qt::StatusTipRole)) {
+                if (resI<lastResults.size()) {
+                    QFRawDataRecord* record=lastResults[resI].first;
+                    QString propname=displayProperties.value(propID, "");
+                    QVariant v=record->getProperty(propname, QVariant());
+                    return QVariant(tr("property: %1<br>contents: %2<br><i>&nbsp;&nbsp;&nbsp;%3</i>").arg(propname).arg(v.toString()).arg(v.typeName()));
+                }
+            } else if ((role==NameRole)) {
+                if (resI<lastResults.size()) {
+                    QFRawDataRecord* record=lastResults[resI].first;
+                    QString propname=displayProperties.value(propID, "");
+                    return propname;
+                }
+            } else if (role==Qt::BackgroundColorRole) {
+                return QColor("lightgrey");
             }
-        } else if ((role==NameRole)) {
-            if (resI<lastResults.size()) {
-                QFRawDataRecord* record=lastResults[resI].first;
-                QString propname=displayProperties.value(index.column(), "");
-                return propname;
-            }
-        } else if (role==Qt::BackgroundColorRole) {
-            return QColor("lightgrey");
         }
     } else {
         if (role==Qt::DisplayRole) {
-            if (resNameI<lastResultNames.size()) {
+            if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
                     QString en=lastResults[resI].second;
-                    QString rname=lastResultNames[resNameI];
+                    QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ( (r.type!=QFRawDataRecord::qfrdreNumberVector) && (r.type!=QFRawDataRecord::qfrdreNumberMatrix) &&
@@ -296,7 +363,7 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 }else if (resI==lastResults.size()) {
                     double average=0;
                     double stddev=0;
-                    QString rname=lastResultNames[resNameI];
+                    QString rname=lastResultNames[resnameID];
                     calcStatistics(rname, average, stddev);
                     return QVariant(QString("%1 %3 %2").arg(roundWithError(average, stddev)).arg(roundError(stddev)).arg(QChar(0xB1)));
                 }
@@ -306,11 +373,11 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 return QColor("lightsteelblue");
             }
         } else if ((role==Qt::ToolTipRole)||(role==Qt::StatusTipRole)) {
-            if (resNameI<lastResultNames.size()) {
+            if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
                     QString en=lastResults[resI].second;
-                    QString rname=lastResultNames[resNameI];
+                    QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         QString common=tr("<small><font color=\"darkgrey\"><i><br><br>result name: %2<br>evaluation name: %1<br>group: %3</i></font></small>").arg(en).arg(rname).arg(r.group);
@@ -337,11 +404,11 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 }
             }
         } else if ((role==AvgRole)) {
-            if (resNameI<lastResultNames.size()) {
+            if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
                     QString en=lastResults[resI].second;
-                    QString rname=lastResultNames[resNameI];
+                    QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
@@ -356,11 +423,11 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 }
             }
         } else if ((role==SumRole)) {
-            if (resNameI<lastResultNames.size()) {
+            if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
                     QString en=lastResults[resI].second;
-                    QString rname=lastResultNames[resNameI];
+                    QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
@@ -377,11 +444,11 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 }
             }
         } else if ((role==Sum2Role)) {
-            if (resNameI<lastResultNames.size()) {
+            if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
                     QString en=lastResults[resI].second;
-                    QString rname=lastResultNames[resNameI];
+                    QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
@@ -399,11 +466,11 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 }
             }
         } else if ((role==CountRole)) {
-            if (resNameI<lastResultNames.size()) {
+            if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
                     QString en=lastResults[resI].second;
-                    QString rname=lastResultNames[resNameI];
+                    QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
@@ -420,11 +487,11 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 }
             }
         } else if ((role==SDRole)) {
-            if (resNameI<lastResultNames.size()) {
+            if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
                     QString en=lastResults[resI].second;
-                    QString rname=lastResultNames[resNameI];
+                    QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
@@ -441,11 +508,11 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 }
             }
         } else if ((role==MedianRole)) {
-            if (resNameI<lastResultNames.size()) {
+            if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
                     QString en=lastResults[resI].second;
-                    QString rname=lastResultNames[resNameI];
+                    QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
@@ -462,11 +529,11 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 }
             }
         } else if ((role==Quantile25Role)) {
-            if (resNameI<lastResultNames.size()) {
+            if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
                     QString en=lastResults[resI].second;
-                    QString rname=lastResultNames[resNameI];
+                    QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
@@ -483,11 +550,11 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 }
             }
         } else if ((role==Quantile75Role)) {
-            if (resNameI<lastResultNames.size()) {
+            if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
                     QString en=lastResults[resI].second;
-                    QString rname=lastResultNames[resNameI];
+                    QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
@@ -504,11 +571,11 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 }
             }
         } else if ((role==ValueRole)||(role==Qt::EditRole)) {
-            if (resNameI<lastResultNames.size()) {
+            if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
                     QString en=lastResults[resI].second;
-                    QString rname=lastResultNames[resNameI];
+                    QString rname=lastResultNames[resnameID];
                     if (record) {
                         return record->resultsGetAsQVariant(en, rname);
                     }
@@ -516,7 +583,7 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             }
 
         } else if (role==EvalNameRole) {
-            if (resNameI<lastResultNames.size()) {
+            if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QString en=lastResults[resI].second;
                     //QString rname=lastResultNames[resNameI];
@@ -524,16 +591,16 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 }
             }
         } else if (role==ResultNameRole) {
-            if (resNameI<lastResultNames.size()) {
+            if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     //QString en=lastResults[resI].second;
-                    QString rname=lastResultNames[resNameI];
+                    QString rname=lastResultNames[resnameID];
                     return rname;
                 }
             }
 
         } else if (role==ResultIDRole) {
-            if (resNameI<lastResultNames.size()) {
+            if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
                     if (record) {
@@ -544,8 +611,8 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             return -1;
 
         } else if (role==NameRole) {
-            if (resNameI<lastResultNames.size()) {
-                return QVariant(lastResultNames[resNameI]);
+            if (resnameID<lastResultNames.size()) {
+                return QVariant(lastResultNames[resnameID]);
             }
         }
     }
@@ -599,4 +666,11 @@ void QFEvaluationResultsModel::calcStatistics(QString resultName, double& averag
             stddev=sqrt(sum2/count-sum*sum/count/count);
         }
     }
+}
+
+int QFEvaluationResultsModel::getExtraColumns() const
+{
+    int extraColumns=0;
+    if (extractRuns) extraColumns++;
+    return extraColumns;
 }

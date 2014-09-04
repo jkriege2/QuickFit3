@@ -47,7 +47,6 @@ HEADERS +=  qfpevalfcsfit.h \
     ../interfaces/qfextensiontool.h \
     ../base_classes/qffitresultsbyindexevaluationfitthread.h \
     optionswidget.h \
-    ../interfaces/qfrdrrunselection.h \
     ../base_classes/qffcsweightingtools.h \
     ../base_classes/qffitresultsbyindexevaluationfittools.h \
     ../base_classes/qffcstools.h \

@@ -46,6 +46,12 @@ class QFLIB_EXPORT QFPluginFitAlgorithm: public QFPlugin {
 
         /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
         virtual QFFitAlgorithm* get(QString id, QObject* parent) const =0;
+
+        /** \brief deinit plugin, this function is guaranteed to be called once, before  */
+        virtual void deinit() {};
+
+        /** \brief init plugin, this function is guaranteed to be called once, before  */
+        virtual void init() {};
     protected:
     private:
 };

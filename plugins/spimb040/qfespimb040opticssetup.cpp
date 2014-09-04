@@ -1415,7 +1415,7 @@ void QFESPIMB040OpticsSetup::unlockLightpath() {
 
 void saveMeasurementDevice1(QMap<QString, QVariant>& setup, const QString& prefix, const QString& name, QFExtensionMeasurementAndControlDevice* device, int id) {
     if (!device) return;
-    for (int i=0; i<device->getMeasurementDeviceValueCount(id); i++) {
+    for (unsigned int i=0; i<device->getMeasurementDeviceValueCount(id); i++) {
         setup[prefix+QString("%2/%1").arg(device->getMeasurementDeviceValueShortName(id, i)).arg(name)]=device->getMeasurementDeviceValue(id, i);
     }
 }

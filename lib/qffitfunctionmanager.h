@@ -141,6 +141,8 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         QStringList getLibraryFitFunctionIDs() const;
         QLibrary* getLibraryFitFunctionLibrary(const QString& id) const;
 
+        void deinit();
+        void init();
     public slots:
         void reloadUserFitFunctions();
 

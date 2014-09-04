@@ -49,7 +49,7 @@
 
 #include "qtlogfile.h"
 #include "qfextensionmanager.h"
-#include "../interfaces/qfextensioncamera.h"
+#include "qfextensioncamera.h"
 #include "qfextension.h"
 #include "tools.h"
 #include "qfcameracombobox.h"

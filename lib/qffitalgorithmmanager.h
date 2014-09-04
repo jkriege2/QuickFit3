@@ -130,6 +130,8 @@ class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
         }
 
         bool contains(const QString &ID);
+        void deinit();
+        void init();
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

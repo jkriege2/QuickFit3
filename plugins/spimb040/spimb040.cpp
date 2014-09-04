@@ -68,6 +68,13 @@ void QFESPIMB040::initExtension() {
     if (extm) {
         extm->addAction(actStartPlugin);
     }
+
+    QFPluginServices::getInstance()->appendOrAddHTMLReplacement("FILEFORMATS_LIST", QString("<li><b>%2:</b><ul>\n"
+                                                                                            "<li><a href=\"$$plugin_info:helpdir:%1$$/ext_spimb040_fileformats.html#config_ini\">Acquisition configuration files <tt>configuration.ini</tt></a></li>\n"
+                                                                                            "<li><a href=\"$$plugin_info:helpdir:%1$$/ext_spimb040_fileformats.html#meas_dat\">Measurements files <tt>measured.dat</tt></a></li>\n"
+                                                                                            "<li><a href=\"$$plugin_info:helpdir:%1$$/optsetupfiles.html\">Optics Setup Configuration Files</a></li>\n"
+                                                                                            "</ul></li>\n").arg(getID()).arg(getName()));
+
     services->log_global_text(tr("initializing extension '%1' ... DONE\n").arg(getName()));
 }
 

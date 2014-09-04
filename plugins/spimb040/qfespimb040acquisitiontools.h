@@ -23,8 +23,8 @@
 #ifndef QFESPIMB040ACQUISITIONTOOLS_H
 #define QFESPIMB040ACQUISITIONTOOLS_H
 #include <QString>
-#include "../interfaces/qfextensioncamera.h"
-#include "../interfaces/qfextensionlinearstage.h"
+#include "qfextensioncamera.h"
+#include "qfextensionlinearstage.h"
 #include "qfextension.h"
 #include "qfespimb040opticssetup.h"
 #include <QMap>

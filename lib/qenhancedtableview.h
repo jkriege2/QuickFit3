@@ -60,6 +60,8 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         QSizeF getTotalSize() const;
 
         void getVariantDataTable(int copyrole, QList<QList<QVariant> >& csvData, QStringList& colnames, QStringList& rownames) const;
+        void getVariantDataTableValueError(int copyrole, int errorrole, QList<QList<QVariant> >& data, QStringList& colnames, QStringList& rownames, const QString& copyPrefix=QString(""), const QString& errorPrefix=QString("error: ")) const;
+        void getVariantDataTableMedianQuantiles(int medianrole, int q25role, int q75role, QList<QList<QVariant> >& data, QStringList& colnames, QStringList& rownames, const QString& medianPrefix=QString("median: "), const QString& q25Prefix=QString("Q25%: "), const QString& q75Prefix=QString("Q75%: ")) const;
 
     signals:
         void keyPressed(int key, Qt::KeyboardModifiers modifiers, QString text);

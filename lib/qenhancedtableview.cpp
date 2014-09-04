@@ -43,6 +43,15 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QSvgGenerator>
 #include "datatools.h"
 
+int copySelectionAsValueErrorToExcelcompare_firstrole=-1;
+
+bool copySelectionAsValueErrorToExcelcompare(const QPair<int, int>& s1, const QPair<int, int>& s2) {
+    if (s1.first<s2.first) return true;
+    if (s1.second==copySelectionAsValueErrorToExcelcompare_firstrole) return true;
+    return false;
+}
+
+
 QEnhancedTableView::QEnhancedTableView(QWidget* parent, bool noCopyShortcut):
     QTableView(parent)
 {
@@ -166,6 +175,8 @@ void QEnhancedTableView::copySelectionToMatlabExpandedNoHead(int copyrole, bool 
     QFDataExportHandler::copyMatlab(csvData);
 }
 
+
+
 void QEnhancedTableView::getVariantDataTable(int copyrole, QList<QList<QVariant> > &csvData, QStringList &colnames, QStringList &rownames) const
 {
     if (!model()) return;
@@ -233,6 +244,267 @@ void QEnhancedTableView::getVariantDataTable(int copyrole, QList<QList<QVariant>
     }
 }
 
+void QEnhancedTableView::getVariantDataTableValueError(int valuerole, int errorrole, QList<QList<QVariant> > &data, QStringList &colnames, QStringList &rownames, const QString &copyPrefix, const QString &errorPrefix) const
+{
+
+    if (valuerole==errorrole) {
+        getVariantDataTable(valuerole, data, colnames, rownames);
+    } else {
+        if (!model()) return;
+        if (!selectionModel()) return;
+        QModelIndexList sel=selectionModel()->selectedIndexes();
+        QSet<QPair<int, int> > rows, cols;
+        int colmin=0;
+        int rowmin=0;
+        for (int i=0; i<sel.size(); i++) {
+            int r=sel[i].row();
+            int c=sel[i].column();
+            rows.insert(qMakePair(r,valuerole));
+            cols.insert(qMakePair(c,valuerole));
+            cols.insert(qMakePair(c,errorrole));
+            if (i==0) {
+                colmin=c;
+                rowmin=r;
+            } else {
+                if (c<colmin) colmin=c;
+                if (r<rowmin) rowmin=r;
+            }
+        }
+        copySelectionAsValueErrorToExcelcompare_firstrole=valuerole;
+        QList<QPair<int, int> > rowlist=QList<QPair<int, int> >::fromSet(rows);
+        qSort(rowlist.begin(), rowlist.end());
+        QList<QPair<int, int> > collist=QList<QPair<int, int> >::fromSet(cols);
+        qSort(collist.begin(), collist.end());
+        int rowcnt=rowlist.size();
+        int colcnt=collist.size();
+        data.clear();
+        QLocale loc=QLocale::system();
+        loc.setNumberOptions(QLocale::OmitGroupSeparator);
+
+        // header row/column titles:
+        //
+        //  <EMPTY> | <HOR_HEDER1> | <HOR_HEADER2> | ...
+        colnames.clear();
+        for (int c=0; c<colcnt; c++) {
+            if (collist[c].second==valuerole) colnames.append(copyPrefix+model()->headerData(collist[c].first, Qt::Horizontal).toString());
+            else colnames.append(errorPrefix+model()->headerData(collist[c].first, Qt::Horizontal).toString());
+        }
+
+        // now add data rows:
+        //
+        //               <~~~~~~~~~ colcnt times ~~~~~~~~~~>
+        //  <VER_HEADER> | <EMPTY> | <EMPTY> | ... | <EMPTY>
+        rownames.clear();
+        for (int r=0; r<rowcnt; r++) {
+            rownames.append(model()->headerData(rowlist[r].first, Qt::Vertical).toString()); // vertical header
+
+            QList<QVariant> row;
+            for (int c=0; c<colcnt; c++) {
+                row.append(QVariant()); // empty columns for data
+            }
+            data.append(row);
+        }
+        for (int i=0; i<sel.size(); i++) {
+            int r=-1;
+            int c=-1;
+            for (int ri=0; ri<rowlist.size(); ri++) {
+                if (rowlist[ri].first==sel[i].row() && rowlist[ri].second==valuerole) {
+                    r=ri;
+                    break;
+                }
+            }
+            for (int ci=0; ci<collist.size(); ci++) {
+                if (collist[ci].first==sel[i].column() && collist[ci].second==valuerole) {
+                    c=ci;
+                    break;
+                }
+            }
+
+            QVariant vdata=sel[i].data(valuerole);
+            QVariant edata=sel[i].data(errorrole);
+            QVariant dat_out, edat_out;
+            switch (vdata.type()) {
+                case QVariant::Invalid:
+                    break;
+                case QVariant::Int:
+                case QVariant::LongLong:
+                case QVariant::UInt:
+                case QVariant::ULongLong:
+                case QVariant::Bool:
+                case QVariant::Double:
+                    dat_out=vdata;
+                    break;
+                case QVariant::PointF:
+                    dat_out=vdata.toPointF().x();
+                    break;
+                default:
+                    dat_out=vdata.toString();
+                    break;
+            }
+            switch (edata.type()) {
+                case QVariant::Invalid:
+                    break;
+                case QVariant::Int:
+                case QVariant::LongLong:
+                case QVariant::UInt:
+                case QVariant::ULongLong:
+                case QVariant::Bool:
+                    edat_out=edata;
+                    break;
+                case QVariant::PointF:
+                    edat_out=edata.toPointF().x();
+                    break;
+                default:
+                    edat_out=edata.toString();
+                    break;
+            }
+            if ((r>=0) && (c>=0) && (r<=data.size()) && (c<=colcnt)) {
+                data[r][c]=dat_out;
+                if (c+1<=colcnt) data[r][c+1]=edat_out;
+            }
+        }
+
+    }
+}
+
+void QEnhancedTableView::getVariantDataTableMedianQuantiles(int medianrole, int q25role, int q75role, QList<QList<QVariant> > &data, QStringList &colnames, QStringList &rownames, const QString &medianPrefix, const QString &q25Prefix, const QString &q75Prefix) const
+{
+    if (!model()) return;
+    if (!selectionModel()) return;
+    QModelIndexList sel=selectionModel()->selectedIndexes();
+    QSet<QPair<int, int> > rows, cols;
+    int colmin=0;
+    int rowmin=0;
+    for (int i=0; i<sel.size(); i++) {
+        int r=sel[i].row();
+        int c=sel[i].column();
+        rows.insert(qMakePair(r,medianrole) );
+        cols.insert(qMakePair(c,medianrole));
+        cols.insert(qMakePair(c,q25role));
+        cols.insert(qMakePair(c,q75role));
+        if (i==0) {
+            colmin=c;
+            rowmin=r;
+        } else {
+            if (c<colmin) colmin=c;
+            if (r<rowmin) rowmin=r;
+        }
+    }
+    copySelectionAsValueErrorToExcelcompare_firstrole=medianrole;
+    QList<QPair<int, int> > rowlist=QList<QPair<int, int> >::fromSet(rows);
+    qSort(rowlist.begin(), rowlist.end());
+    QList<QPair<int, int> > collist=QList<QPair<int, int> >::fromSet(cols);
+    qSort(collist.begin(), collist.end());
+    int rowcnt=rowlist.size();
+    int colcnt=collist.size();
+
+    data.clear();
+
+    // header row:
+    //
+    //  <EMPTY> | <HOR_HEDER1> | <HOR_HEADER2> | ...
+    for (int c=0; c<colcnt; c++) {
+        if (collist[c].second==medianrole) colnames.append(medianPrefix+model()->headerData(collist[c].first, Qt::Horizontal).toString());
+        else if  (collist[c].second==q25role) colnames.append(q25Prefix+model()->headerData(collist[c].first, Qt::Horizontal).toString());
+        else if  (collist[c].second==q75role) colnames.append(q75Prefix+model()->headerData(collist[c].first, Qt::Horizontal).toString());
+    }
+
+    // now add dta rows:
+    //
+    //               <~~~~~~~~~ colcnt times ~~~~~~~~~~>
+    //  <VER_HEADER> | <EMPTY> | <EMPTY> | ... | <EMPTY>
+    for (int r=0; r<rowcnt; r++) {
+
+        rownames.append(model()->headerData(rowlist[r].first, Qt::Vertical).toString());
+
+        QList<QVariant> row;
+        for (int c=0; c<colcnt; c++) {
+            row.append(QVariant()); // empty columns for data
+        }
+        data.append(row);
+    }
+    for (int i=0; i<sel.size(); i++) {
+        int r=-1;
+        int c=-1;
+        for (int ri=0; ri<rowlist.size(); ri++) {
+            if (rowlist[ri].first==sel[i].row() && rowlist[ri].second==medianrole) {
+                r=ri;
+                break;
+            }
+        }
+        for (int ci=0; ci<collist.size(); ci++) {
+            if (collist[ci].first==sel[i].column() && collist[ci].second==medianrole) {
+                c=ci;
+                break;
+            }
+        }
+
+        QVariant vdata=sel[i].data(medianrole);
+        QVariant q25data=sel[i].data(q25role);
+        QVariant q75data=sel[i].data(q75role);
+        QVariant txt, q25txt, q75txt;
+        switch (vdata.type()) {
+            case QVariant::Invalid:
+                break;
+            case QVariant::Int:
+            case QVariant::LongLong:
+            case QVariant::UInt:
+            case QVariant::ULongLong:
+            case QVariant::Bool:
+            case QVariant::Double:
+                txt=vdata;
+                break;
+            case QVariant::PointF:
+                txt=vdata.toPointF().x();
+                break;
+            default:
+                txt=vdata.toString();
+                break;
+        }
+        switch (q25data.type()) {
+            case QVariant::Invalid:
+                break;
+            case QVariant::Int:
+            case QVariant::LongLong:
+            case QVariant::UInt:
+            case QVariant::ULongLong:
+            case QVariant::Bool:
+            case QVariant::Double:
+                q25txt=q25data;
+                break;
+            case QVariant::PointF:
+                q25txt=q25data.toPointF().x();
+                break;
+            default:
+                q25txt=q25data.toString();
+                break;
+        }
+        switch (q75data.type()) {
+            case QVariant::Invalid:
+                break;
+            case QVariant::Int:
+            case QVariant::LongLong:
+            case QVariant::UInt:
+            case QVariant::ULongLong:
+            case QVariant::Bool:
+            case QVariant::Double:
+                q75txt=q75data;
+                break;
+            case QVariant::PointF:
+                q75txt=q75data.toPointF().x();
+                break;
+            default:
+                q75txt=q75data.toString();
+                break;
+        }
+        if ((r>=0) && (c>=0) && (r<=data.size()) && (c<=colcnt)) {
+            data[r][c]=txt;
+            if (c+1<=colcnt) data[r][c+1]=q25txt;
+            if (c+2<=colcnt) data[r][c+2]=q75txt;
+        }
+    }
+}
+
 void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead, bool flipped) {
     if (!model()) return;
     if (!selectionModel()) return;
@@ -253,8 +525,8 @@ void QEnhancedTableView::copySelectionToExcel(int copyrole, bool storeHead, bool
     }
     //qDebug()<<csvData.first().first();
     //qDebug()<<csvData.size()<<colnames.size();
-    if (storeHead) QFDataExportHandler::copyCSV(csvData, colnames, rownames);
-    else QFDataExportHandler::copyCSV(csvData);
+    if (storeHead) QFDataExportHandler::copyExcel(csvData, colnames, rownames);
+    else QFDataExportHandler::copyExcel(csvData);
 
 
 }
@@ -283,150 +555,22 @@ void QEnhancedTableView::copySelectionToCSV(int copyrole, bool storeHead, bool f
 
 }
 
-int copySelectionAsValueErrorToExcelcompare_firstrole;
-
-bool copySelectionAsValueErrorToExcelcompare(const QPair<int, int>& s1, const QPair<int, int>& s2) {
-    if (s1.first<s2.first) return true;
-    if (s1.second==copySelectionAsValueErrorToExcelcompare_firstrole) return true;
-    return false;
-}
 
 void QEnhancedTableView::copySelectionAsValueErrorToExcel(int valuerole, int errorrole, bool storeHead, Qt::Orientation orientation) {
     if (valuerole==errorrole) {
         copySelectionToExcel(valuerole);
     } else {
-        if (!model()) return;
-        if (!selectionModel()) return;
-        QModelIndexList sel=selectionModel()->selectedIndexes();
-        QSet<QPair<int, int> > rows, cols;
-        int colmin=0;
-        int rowmin=0;
-        for (int i=0; i<sel.size(); i++) {
-            int r=sel[i].row();
-            int c=sel[i].column();
-            rows.insert(qMakePair(r,valuerole) );
-            cols.insert(qMakePair(c,valuerole));
-            if (orientation==Qt::Horizontal) cols.insert(qMakePair(c,errorrole));
-            else rows.insert(qMakePair(r,errorrole));
-            if (i==0) {
-                colmin=c;
-                rowmin=r;
-            } else {
-                if (c<colmin) colmin=c;
-                if (r<rowmin) rowmin=r;
-            }
-        }
-        copySelectionAsValueErrorToExcelcompare_firstrole=valuerole;
-        QList<QPair<int, int> > rowlist=QList<QPair<int, int> >::fromSet(rows);
-        qSort(rowlist.begin(), rowlist.end());
-        QList<QPair<int, int> > collist=QList<QPair<int, int> >::fromSet(cols);
-        qSort(collist.begin(), collist.end());
-        int rowcnt=rowlist.size();
-        int colcnt=collist.size();
-        QList<QStringList> data;
-        QLocale loc=QLocale::system();
-        loc.setNumberOptions(QLocale::OmitGroupSeparator);
+        QStringList colnames, rownames;
+        QList<QList<QVariant> > data;
 
-        // header row:
-        //
-        //  <EMPTY> | <HOR_HEDER1> | <HOR_HEADER2> | ...
-        QStringList hrow;
-        if (storeHead) {
-            hrow.append(""); // empty header for first column (vertical headers!)
-            for (int c=0; c<colcnt; c++) {
-                if (collist[c].second==valuerole) hrow.append(QString("\"%1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " ")));
-                else hrow.append(QString("\"error: %1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " ")));
-            }
-            data.append(hrow);
-        }
+        getVariantDataTableValueError(valuerole, errorrole, data, colnames, rownames, "", tr("error: "));
 
-        // now add dta rows:
-        //
-        //               <~~~~~~~~~ colcnt times ~~~~~~~~~~>
-        //  <VER_HEADER> | <EMPTY> | <EMPTY> | ... | <EMPTY>
-        for (int r=0; r<rowcnt; r++) {
-            QStringList row;
-            if (storeHead) {
-                if (rowlist[r].second==valuerole) row.append(QString("\"%1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "))); // vertical header
-                else row.append(QString("\"error: %1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "))); // vertical header
-            }
-            for (int c=0; c<colcnt; c++) {
-                row.append(""); // empty columns for data
-            }
-            data.append(row);
+        if (orientation==Qt::Vertical)  {
+            data=dataRotate(data);
+            qSwap(colnames, rownames);
         }
-        for (int i=0; i<sel.size(); i++) {
-            int r=-1;
-            int c=-1;
-            for (int ri=0; ri<rowlist.size(); ri++) {
-                if (rowlist[ri].first==sel[i].row() && rowlist[ri].second==valuerole) {
-                    r=ri;
-                    break;
-                }
-            }
-            for (int ci=0; ci<collist.size(); ci++) {
-                if (collist[ci].first==sel[i].column() && collist[ci].second==valuerole) {
-                    c=ci;
-                    break;
-                }
-            }
-
-            QVariant vdata=sel[i].data(valuerole);
-            QVariant edata=sel[i].data(errorrole);
-            QString txt="", etxt="";
-            switch (vdata.type()) {
-                case QVariant::Int:
-                case QVariant::LongLong:
-                case QVariant::UInt:
-                case QVariant::ULongLong:
-                case QVariant::Bool:
-                    txt=vdata.toString();
-                    break;
-                case QVariant::Double:
-                    txt=loc.toString(vdata.toDouble());
-                    break;
-                case QVariant::PointF:
-                    txt=loc.toString(vdata.toPointF().x());
-                    break;
-                default:
-                    txt=QString("\"%1\"").arg(vdata.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
-                    break;
-            }
-            switch (edata.type()) {
-                case QVariant::Int:
-                case QVariant::LongLong:
-                case QVariant::UInt:
-                case QVariant::ULongLong:
-                case QVariant::Bool:
-                    etxt=edata.toString();
-                    break;
-                case QVariant::Double:
-                    etxt=loc.toString(edata.toDouble());
-                    break;
-                case QVariant::PointF:
-                    etxt=loc.toString(edata.toPointF().x());
-                    break;
-                default:
-                    etxt=QString("\"%1\"").arg(edata.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
-                    break;
-            }
-            int shift=0;
-            if (storeHead) shift=1;
-            if ((r>=0) && (c>=0) && (r<=data.size()) && (c<=colcnt)) {
-                data[r+shift][c+shift]=txt;
-                if (orientation==Qt::Horizontal) {
-                    if (c+1<=colcnt) data[r+shift][c+1+shift]=etxt;
-                } else {
-                    if (r+1<=rowcnt) data[r+1+shift][c+shift]=etxt;
-                }
-            }
-        }
-
-        QString result="";
-        for (int r=0; r<data.size(); r++) {
-            result+=data[r].join("\t")+"\n";
-        }
-        QApplication::clipboard()->setText(result);
+        if (storeHead) QFDataExportHandler::copyExcel(data, colnames, rownames);
+        else QFDataExportHandler::copyExcel(data);
     }
 }
 
@@ -437,166 +581,17 @@ void QEnhancedTableView::copySelectionAsMedianQuantilesToExcel(int medianrole, i
     } else if (q25role!=-1 && q75role==-1) {
         copySelectionAsValueErrorToExcel(medianrole, q25role, storeHead, orientation);
     } else {
-        if (!model()) return;
-        if (!selectionModel()) return;
-        QModelIndexList sel=selectionModel()->selectedIndexes();
-        QSet<QPair<int, int> > rows, cols;
-        int colmin=0;
-        int rowmin=0;
-        for (int i=0; i<sel.size(); i++) {
-            int r=sel[i].row();
-            int c=sel[i].column();
-            rows.insert(qMakePair(r,medianrole) );
-            cols.insert(qMakePair(c,medianrole));
-            if (orientation==Qt::Horizontal) {
-                cols.insert(qMakePair(c,q25role));
-                cols.insert(qMakePair(c,q75role));
-            } else {
-                rows.insert(qMakePair(r,q25role));
-                rows.insert(qMakePair(r,q75role));
-            }
-            if (i==0) {
-                colmin=c;
-                rowmin=r;
-            } else {
-                if (c<colmin) colmin=c;
-                if (r<rowmin) rowmin=r;
-            }
-        }
-        copySelectionAsValueErrorToExcelcompare_firstrole=medianrole;
-        QList<QPair<int, int> > rowlist=QList<QPair<int, int> >::fromSet(rows);
-        qSort(rowlist.begin(), rowlist.end());
-        QList<QPair<int, int> > collist=QList<QPair<int, int> >::fromSet(cols);
-        qSort(collist.begin(), collist.end());
-        int rowcnt=rowlist.size();
-        int colcnt=collist.size();
-        QList<QStringList> data;
-        QLocale loc=QLocale::system();
-        loc.setNumberOptions(QLocale::OmitGroupSeparator);
+        QStringList colnames, rownames;
+        QList<QList<QVariant> > data;
 
-        // header row:
-        //
-        //  <EMPTY> | <HOR_HEDER1> | <HOR_HEADER2> | ...
-        QStringList hrow;
-        if (storeHead) {
-            hrow.append(""); // empty header for first column (vertical headers!)
-            for (int c=0; c<colcnt; c++) {
-                if (collist[c].second==medianrole) hrow.append(QString("\"%1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " ")));
-                else if  (collist[c].second==q25role) hrow.append(QString("\"25% quantile: %1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " ")));
-                else if  (collist[c].second==q75role) hrow.append(QString("\"75% quantile: %1\"").arg(model()->headerData(collist[c].first, Qt::Horizontal).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " ")));
-            }
-            data.append(hrow);
-        }
+        getVariantDataTableMedianQuantiles(medianrole, q25role, q75role, data, colnames, rownames, tr("median: "), tr("Q25%: "), tr("Q75%: "));
 
-        // now add dta rows:
-        //
-        //               <~~~~~~~~~ colcnt times ~~~~~~~~~~>
-        //  <VER_HEADER> | <EMPTY> | <EMPTY> | ... | <EMPTY>
-        for (int r=0; r<rowcnt; r++) {
-            QStringList row;
-            if (storeHead) {
-                if (rowlist[r].second==medianrole) row.append(QString("\"%1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "))); // vertical header
-                else if (rowlist[r].second==q25role) row.append(QString("\"25% quantile: %1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "))); // vertical header
-                else if (rowlist[r].second==q75role) row.append(QString("\"75% quantile: %1\"").arg(model()->headerData(rowlist[r].first, Qt::Vertical).toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "))); // vertical header
-            }
-            for (int c=0; c<colcnt; c++) {
-                row.append(""); // empty columns for data
-            }
-            data.append(row);
+        if (orientation==Qt::Vertical)  {
+            data=dataRotate(data);
+            qSwap(colnames, rownames);
         }
-        for (int i=0; i<sel.size(); i++) {
-            int r=-1;
-            int c=-1;
-            for (int ri=0; ri<rowlist.size(); ri++) {
-                if (rowlist[ri].first==sel[i].row() && rowlist[ri].second==medianrole) {
-                    r=ri;
-                    break;
-                }
-            }
-            for (int ci=0; ci<collist.size(); ci++) {
-                if (collist[ci].first==sel[i].column() && collist[ci].second==medianrole) {
-                    c=ci;
-                    break;
-                }
-            }
-
-            QVariant vdata=sel[i].data(medianrole);
-            QVariant q25data=sel[i].data(q25role);
-            QVariant q75data=sel[i].data(q75role);
-            QString txt="", q25txt="", q75txt="";
-            switch (vdata.type()) {
-                case QVariant::Int:
-                case QVariant::LongLong:
-                case QVariant::UInt:
-                case QVariant::ULongLong:
-                case QVariant::Bool:
-                    txt=vdata.toString();
-                    break;
-                case QVariant::Double:
-                    txt=loc.toString(vdata.toDouble());
-                    break;
-                case QVariant::PointF:
-                    txt=loc.toString(vdata.toPointF().x());
-                    break;
-                default:
-                    txt=QString("\"%1\"").arg(vdata.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
-                    break;
-            }
-            switch (q25data.type()) {
-                case QVariant::Int:
-                case QVariant::LongLong:
-                case QVariant::UInt:
-                case QVariant::ULongLong:
-                case QVariant::Bool:
-                    q25txt=q25data.toString();
-                    break;
-                case QVariant::Double:
-                    q25txt=loc.toString(q25data.toDouble());
-                    break;
-                case QVariant::PointF:
-                    q25txt=loc.toString(q25data.toPointF().x());
-                    break;
-                default:
-                    q25txt=QString("\"%1\"").arg(q25data.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
-                    break;
-            }
-            switch (q75data.type()) {
-                case QVariant::Int:
-                case QVariant::LongLong:
-                case QVariant::UInt:
-                case QVariant::ULongLong:
-                case QVariant::Bool:
-                    q75txt=q75data.toString();
-                    break;
-                case QVariant::Double:
-                    q75txt=loc.toString(q75data.toDouble());
-                    break;
-                case QVariant::PointF:
-                    q75txt=loc.toString(q75data.toPointF().x());
-                    break;
-                default:
-                    q75txt=QString("\"%1\"").arg(q75data.toString().replace('"', "''").replace('\n', "\\n ").replace('\r', "\\r ").replace('\t', " "));
-                    break;
-            }
-            int shift=0;
-            if (storeHead) shift=1;
-            if ((r>=0) && (c>=0) && (r<=data.size()) && (c<=colcnt)) {
-                data[r+shift][c+shift]=txt;
-                if (orientation==Qt::Horizontal) {
-                    if (c+1<=colcnt) data[r+shift][c+1+shift]=q25txt;
-                    if (c+2<=colcnt) data[r+shift][c+2+shift]=q75txt;
-                } else {
-                    if (r+1<=rowcnt) data[r+1+shift][c+shift]=q25txt;
-                    if (r+2<=rowcnt) data[r+2+shift][c+shift]=q75txt;
-                }
-            }
-        }
-
-        QString result="";
-        for (int r=0; r<data.size(); r++) {
-            result+=data[r].join("\t")+"\n";
-        }
-        QApplication::clipboard()->setText(result);
+        if (storeHead) QFDataExportHandler::copyExcel(data, colnames, rownames);
+        else QFDataExportHandler::copyExcel(data);
     }
 }
 

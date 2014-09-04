@@ -681,6 +681,144 @@ QVector<T> removeQListDouplicates(const QVector<T>& list) {
     return out;
 }
 
+
+
+/*! \brief swap two elements \a l and \a r in an array \a a
+    \ingroup tools_math_stat
+
+*/
+template <class T>
+inline void qfstatisticsSwap(T* a, long long l, long long r){
+    const T tmp=a[l];
+    a[l]=a[r];
+    a[r]=tmp;
+}
+
+
+
+
+/*! \brief QuickSort (recursive implementation)
+    \ingroup qf3lib_tools
+
+    implementation from http://www.linux-related.de/index.html?/coding/sort/sort_quick.htm
+*/
+template <class T>
+void qfstatisticsQuicksort(T* a, long long l, long long r){
+    if(r>l){
+        long long i=l-1;
+        long long j=r;
+
+        for(;;){
+            while(a[++i]<a[r]);
+            while(a[--j]>a[r] && j>i);
+            if(i>=j) break;
+            statisticsSwap(a, i, j);
+        }
+        qfstatisticsSwap(a, i, r);
+
+        qfstatisticsQuicksort(a, l, i-1);
+        qfstatisticsQuicksort(a, i+1, r);
+    }
+}
+
+
+/*! \brief QuickSort (recursive implementation), sorts \a a2 alongside \a a, using \a a as sort criterion
+    \ingroup qf3lib_tools
+
+    implementation from http://www.linux-related.de/index.html?/coding/sort/sort_quick.htm
+*/
+template <class T>
+void qfstatisticsQuicksort(T* a, T* a2, long long l, long long r){
+    if(r>l){
+        long long i=l-1;
+        long long j=r;
+
+        for(;;){
+            while(a[++i]<a[r]);
+            while(a[--j]>a[r] && j>i);
+            if(i>=j) break;
+            qfstatisticsSwap(a, i, j);
+            qfstatisticsSwap(a2, i, j);
+        }
+        qfstatisticsSwap(a, i, r);
+        qfstatisticsSwap(a2, i, r);
+
+        qfstatisticsQuicksort(a, a2, l, i-1);
+        qfstatisticsQuicksort(a, a2, i+1, r);
+    }
+}
+
+
+
+
+
+
+
+/*! \brief sort the given arrays, using \a input as sort criterion
+    \ingroup qf3lib_tools
+
+    \param input array to be sorted
+    \param input2 array to be sorted
+    \param N size of the array input
+    \param output if \c !=NULL data is written here (the memory location pointed at by \a output has to have at least the length \a N !!!),
+                  otherwise the array input is sorted inplace.
+    \param output2 if \c !=NULL data is written here (the memory location pointed at by \a output has to have at least the length \a N !!!),
+                  otherwise the array input is sorted inplace.
+
+ */
+template <class T>
+inline void qfstatisticsSort(T* input, T* input2, long long N, T* output=NULL, T* output2=NULL) {
+    if ((!input)) return ;
+    if (N<=0) return;
+    T* data=input;
+    if (output!=NULL) {
+        data=output;
+        memcpy(output, input, N*sizeof(T));
+    }
+    T* data2=input2;
+    if (output2!=NULL && input2!=NULL) {
+        data2=output2;
+        memcpy(output2, input2, N*sizeof(T));
+    }
+    qfstatisticsQuicksort(data, data2, 0, N-1);
+}
+
+
+
+/*! \brief sort the given array
+    \ingroup qf3lib_tools
+
+    \param input array to be sorted
+    \param N size of the array input
+    \param output if \c !=NULL data is written here (the memory location pointed at by \a output has to have at least the length \a N !!!),
+                  otherwise the array input is sorted inplace.
+
+ */
+template <class T>
+inline void qfstatisticsSort(T* input, long long N, T* output=NULL) {
+    if ((!input)) return ;
+    if (N<=0) return;
+    T* data=input;
+    if (output!=NULL) {
+        data=output;
+        memcpy(output, input, N*sizeof(T));
+    }
+    qfstatisticsQuicksort(data, 0, N-1);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 /*! \brief duplicate a memory array, i.e. reserve the data of the array a second time using malloc() and copy the contents
     \ingroup qf3lib_tools
 
@@ -690,6 +828,17 @@ T* duplicateArray(const T* input, long long N) {
     if (!input||N<=0) return NULL;
     T* out=(T*)malloc(N*sizeof(T));
     if (out && input && N>=0) memcpy(out, input, N*sizeof(T));
+    return out;
+}
+
+/*! \brief duplicate a memory array, i.e. reserve the data of the array a second time using malloc() and copy the contents
+    \ingroup qf3lib_tools
+
+*/
+template <class T>
+T* duplicateArraySort(const T* input, long long N) {
+    T* out=duplicateArray(input, N);
+    if (out && N>0) qfstatisticsSort(out, N);
     return out;
 }
 
@@ -1319,6 +1468,8 @@ QFLIB_EXPORT void parseFAQ(const QString& filename, const QString& pluginID, QMa
 QFLIB_EXPORT void parseTooltips(const QString& directory, QMap<QString, QFToolTipsData>& tooltips);
 
 QFLIB_EXPORT void parseAutolinks(const QString& directory, QMap<QString, QString>& autolinks);
+
+QFLIB_EXPORT void parseGlobalreplaces(const QString& directory);
 #endif // QFTOOLS_H
 
 

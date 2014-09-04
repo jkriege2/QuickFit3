@@ -24,7 +24,7 @@
 #include "qfpluginservices.h"
 #include "qfstagecombobox.h"
 #include "qfextensionmanager.h"
-#include "../interfaces/qfextensionlinearstage.h"
+#include "qfextensionlinearstage.h"
 #include "qfextension.h"
 #include <QtGui>
 #include <QtCore>
@@ -360,7 +360,7 @@ QString QFESPIMB040ScriptedAcquisitionInstrumentControl::getAcqDescPrefix() cons
 void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDConnect(const QString &device_name, int id)
 {
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
-    if (md && id<md->getMeasurementDeviceCount()) {
+    if (md && id<(int64_t)md->getMeasurementDeviceCount()) {
         md->connectMeasurementDevice(id);
         if (!md->isMeasurementDeviceConnected(id)) {
             throwEngineException(tr("could not connect to measurement dveice '%1', %2").arg(device_name).arg(id));
@@ -373,7 +373,7 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDConnect(const QString &d
 void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDDisconnect(const QString &device_name, int id)
 {
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
-    if (md && id<md->getMeasurementDeviceCount()) {
+    if (md && id<(int64_t)md->getMeasurementDeviceCount()) {
         md->disconnectMeasurementDevice(id);
     } else {
         throwEngineException(tr("no measurement device '%1', %2 available").arg(device_name).arg(id));
@@ -383,7 +383,7 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDDisconnect(const QString
 QVariant QFESPIMB040ScriptedAcquisitionInstrumentControl::MDGet(const QString &device_name, int id, int parameter)
 {
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
-    if (md && id<md->getMeasurementDeviceCount()) {
+    if (md && id<(int64_t)md->getMeasurementDeviceCount()) {
         return md->getMeasurementDeviceValue(id, parameter);
     } else {
         throwEngineException(tr("no measurement device '%1', %2 available").arg(device_name).arg(id));
@@ -394,7 +394,7 @@ QVariant QFESPIMB040ScriptedAcquisitionInstrumentControl::MDGet(const QString &d
 void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDSet(const QString &device_name, int id, int parameter, const QVariant &value)
 {
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
-    if (md && id<md->getMeasurementDeviceCount()) {
+    if (md && id<(int64_t)md->getMeasurementDeviceCount()) {
         if (md->isMeasurementDeviceValueEditable(id, parameter)) {
             md->setMeasurementDeviceValue(id, parameter, value);
         } else {
@@ -409,7 +409,7 @@ QVariant QFESPIMB040ScriptedAcquisitionInstrumentControl::MDGetN(const QString &
 {
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
     if (md) {
-        for (int i=0; i<md->getMeasurementDeviceValueCount(id); i++) {
+        for (int i=0; i<(int64_t)md->getMeasurementDeviceValueCount(id); i++) {
             if (parameter==md->getMeasurementDeviceValueShortName(id, i)) {
                 return md->getMeasurementDeviceValue(id, i);
             }
@@ -425,7 +425,7 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDSetN(const QString &devi
 {
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
     if (md) {
-        for (int i=0; i<md->getMeasurementDeviceValueCount(id); i++) {
+        for (int i=0; i<(int64_t)md->getMeasurementDeviceValueCount(id); i++) {
             if (parameter==md->getMeasurementDeviceValueShortName(id, i)) {
                 if (md->isMeasurementDeviceValueEditable(id, i)) {
                     md->setMeasurementDeviceValue(id, i, value);
@@ -445,7 +445,7 @@ void QFESPIMB040ScriptedAcquisitionInstrumentControl::MDSetN(const QString &devi
 int QFESPIMB040ScriptedAcquisitionInstrumentControl::MDGetParamCount(const QString &device_name, int id)
 {
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
-    if (md && id<md->getMeasurementDeviceCount()) {
+    if (md && id<(int64_t)md->getMeasurementDeviceCount()) {
         return md->getMeasurementDeviceValueCount(id);
     } else {
         throwEngineException(tr("no measurement device '%1', %2 available").arg(device_name).arg(id));
@@ -456,7 +456,7 @@ int QFESPIMB040ScriptedAcquisitionInstrumentControl::MDGetParamCount(const QStri
 QString QFESPIMB040ScriptedAcquisitionInstrumentControl::MDGetParamName(const QString &device_name, int id, int parameter)
 {
     QFExtensionMeasurementAndControlDevice* md=getMDevice(device_name);
-    if (md && id<md->getMeasurementDeviceCount()) {
+    if (md && id<(int64_t)md->getMeasurementDeviceCount()) {
         return md->getMeasurementDeviceValueShortName(id, parameter);
     } else {
         throwEngineException(tr("no measurement device '%1', %2 available").arg(device_name).arg(id));

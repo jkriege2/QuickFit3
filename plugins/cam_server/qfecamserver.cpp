@@ -82,7 +82,7 @@ void QFECamServer::deinit() {
     QSettings inifile(services->getGlobalConfigFileDirectory()+QString("/%1").arg(GLOBAL_CONFIGFILE), QSettings::IniFormat);
     if (inifile.isWritable()) {
         inifile.setValue("camera_count", getCameraCount());
-        for (unsigned int i=0; i<sources.size(); i++) {
+        for (int i=0; i<sources.size(); i++) {
             inifile.setValue("camera"+QString::number(i+1)+"/host", sources[i].host);
             inifile.setValue("camera"+QString::number(i+1)+"/port", sources[i].port);
             inifile.setValue("camera"+QString::number(i+1)+"/camera_name", sources[i].camera_name);
@@ -165,7 +165,7 @@ unsigned int QFECamServer::getMeasurementDeviceValueCount(unsigned int measureme
 QVariant QFECamServer::getMeasurementDeviceValue(unsigned int measurementDevice, unsigned int value)
 {
     if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<sources[measurementDevice].params.size()) {
+        if (value>=0 && value<(long long)sources[measurementDevice].params.size()) {
             QTcpSocket* server=sources[measurementDevice].server;
             if (!server) return QVariant::Invalid;
 
@@ -231,7 +231,7 @@ QVariant QFECamServer::getMeasurementDeviceValue(unsigned int measurementDevice,
 QString QFECamServer::getMeasurementDeviceValueName(unsigned int measurementDevice, unsigned int value)
 {
     if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<sources[measurementDevice].params.size()) {
+        if (value>=0 && value<(long long)sources[measurementDevice].params.size()) {
             return sources[measurementDevice].params[value].description;
         }
     }
@@ -241,7 +241,7 @@ QString QFECamServer::getMeasurementDeviceValueName(unsigned int measurementDevi
 QString QFECamServer::getMeasurementDeviceValueShortName(unsigned int measurementDevice, unsigned int value)
 {
     if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<sources[measurementDevice].params.size()) {
+        if (value>=0 && value<(long long)sources[measurementDevice].params.size()) {
             return sources[measurementDevice].params[value].id;
         }
     }
@@ -251,7 +251,7 @@ QString QFECamServer::getMeasurementDeviceValueShortName(unsigned int measuremen
 bool QFECamServer::isMeasurementDeviceValueEditable(unsigned int measurementDevice, unsigned int value)
 {
     if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<sources[measurementDevice].params.size()) {
+        if (value>=0 && value<(long long)sources[measurementDevice].params.size()) {
             return sources[measurementDevice].params[value].editable;
         }
 
@@ -262,7 +262,7 @@ bool QFECamServer::isMeasurementDeviceValueEditable(unsigned int measurementDevi
 void QFECamServer::setMeasurementDeviceValue(unsigned int measurementDevice, unsigned int value, const QVariant &data)
 {
     if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<sources[measurementDevice].params.size() && sources[measurementDevice].params[value].editable) {
+        if (value>=0 && value<(long long)sources[measurementDevice].params.size() && sources[measurementDevice].params[value].editable) {
             QTcpSocket* server=sources[measurementDevice].server;
             if (!server) return ;
 
@@ -283,7 +283,7 @@ void QFECamServer::setMeasurementDeviceValue(unsigned int measurementDevice, uns
 QVariant::Type QFECamServer::getMeasurementDeviceEditableValueType(unsigned int measurementDevice, unsigned int value)
 {
     if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<sources[measurementDevice].params.size()) {
+        if (value>=0 && value<(long long)sources[measurementDevice].params.size()) {
             return sources[measurementDevice].params[value].type;
         }
 
@@ -294,7 +294,7 @@ QVariant::Type QFECamServer::getMeasurementDeviceEditableValueType(unsigned int 
 QFExtensionMeasurementAndControlDevice::WidgetTypes QFECamServer::getMeasurementDeviceValueWidget(unsigned int measurementDevice, unsigned int value, QStringList *comboboxEntries)
 {
     if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<sources[measurementDevice].params.size()) {
+        if (value>=0 && value<(long long)sources[measurementDevice].params.size()) {
             return sources[measurementDevice].params[value].widget;
         }
     }
@@ -304,7 +304,7 @@ QFExtensionMeasurementAndControlDevice::WidgetTypes QFECamServer::getMeasurement
 void QFECamServer::getMeasurementDeviceEditableValueRange(unsigned int measurementDevice, unsigned int value, double &minimum, double &maximum)
 {
     if (measurementDevice>=0 && measurementDevice<getMeasurementDeviceCount() && isMeasurementDeviceConnected(measurementDevice)) {
-        if (value>=0 && value<sources[measurementDevice].params.size()) {
+        if (value>=0 && value<(long long)sources[measurementDevice].params.size()) {
             minimum=sources[measurementDevice].params[value].range_min;
             maximum=sources[measurementDevice].params[value].range_max;
         }
@@ -332,7 +332,7 @@ void QFECamServer::useCameraSettingsInt(unsigned int camera, const QSettings& se
     if (camera<0 || camera>=getCameraCount()) return;
     if (isMeasurementDeviceConnected(camera) ) {
         int cnt=0;
-        for (int i=0; i<getMeasurementDeviceValueCount(camera); i++) {
+        for (unsigned int i=0; i<getMeasurementDeviceValueCount(camera); i++) {
             if (sources[camera].params[i].editable && settings.contains(sources[camera].params[i].id)) {
                 //qDebug()<<"set value "<<sources[camera].params[i].id<<"("<<i<<")"<<" = "<<settings.value(sources[camera].params[i].id);
                 if (logService) {
@@ -412,7 +412,7 @@ void QFECamServer::showCameraSettingsDialog(unsigned int camera, QSettings& sett
     if ( dlg->exec()==QDialog::Accepted ) {
         //  read back values entered into the widgets and store in settings
         // settings.setValue(QString("device/name%1").arg(camera), widget->value() );
-        for (int i=0; i<getMeasurementDeviceValueCount(camera); i++) {
+        for (unsigned int i=0; i<getMeasurementDeviceValueCount(camera); i++) {
             settings.setValue(getMeasurementDeviceValueShortName(camera, i), getMeasurementDeviceValue(camera, i));
         }
     }

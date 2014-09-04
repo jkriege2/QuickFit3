@@ -341,6 +341,7 @@ void QFEvaluationPropertyEditorPrivate::showStatisticsComparing()
 
 }
 
+
 void QFEvaluationPropertyEditorPrivate::nameChanged(const QString& text) {
     if (d->current) {
         d->current->setName(text);
@@ -528,10 +529,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     tbResults->addAction(actDeleteResults);
     tbResults->addSeparator();
 
-    /*actCopyResults=new QAction(QIcon(":/lib/copy16.png"), tr("Copy Selection to clipboard (for Excel ...)"), this);
-    tbResults->addAction(actCopyResults);
-    actCopyResultsNoHead=new QAction(QIcon(":/lib/copy16_nohead.png"), tr("Copy Selection without header"), this);
-    tbResults->addAction(actCopyResultsNoHead);*/
+
     tvResults->addActionsToToolbar(tbResults);
     actCopyValErrResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as value+error pairs"), this);
     tbResults->addAction(actCopyValErrResults);
@@ -562,9 +560,9 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     actSaveResultsAveraged=new QAction(tr("Save all results to file, averaged vector/matrix results"), d);
 
     tbResults->addSeparator();
-    actStatistics=new QAction(QIcon(":/lib/result_statistics.png"), tr("Result statistics, summarizing cells"), d);
+    actStatistics=new QAction(QIcon(":/lib/result_statistics.png"), tr("histogram: column-wise"), d);
     tbResults->addAction(actStatistics);
-    actStatisticsComparing=new QAction(QIcon(":/lib/result_statistics_compare.png"), tr("Result statistics, comparing cells"), d);
+    actStatisticsComparing=new QAction(QIcon(":/lib/result_statistics_compare.png"), tr("histogram: cell-wise"), d);
     tbResults->addAction(actStatisticsComparing);
 
     tbResults->addSeparator();
@@ -573,13 +571,25 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     chkShowAvg->setChecked(true);
     connect(chkShowAvg, SIGNAL(toggled(bool)), this, SLOT(showAvgClicked(bool)));
     tbResults->addSeparator();
+
+    chkExtractRuns=new QCheckBox(tr("show runs/indices"), d);
+    chkExtractRuns->setChecked(true);
+    tbResults->addSeparator();
+    tbResults->addWidget(chkExtractRuns);
+    connect(chkExtractRuns, SIGNAL(toggled(bool)), d->resultsModel, SLOT(setExtractIndexes(bool)));
+    chkRemoveUnusedRuns=new QCheckBox(tr("don't show removed runs"), d);
+    chkRemoveUnusedRuns->setChecked(false);
+    tbResults->addWidget(chkRemoveUnusedRuns);
+    connect(chkExtractRuns, SIGNAL(toggled(bool)), chkRemoveUnusedRuns, SLOT(setEnabled(bool)));
+    connect(chkRemoveUnusedRuns, SIGNAL(toggled(bool)), d->resultsModel, SLOT(setRemoveUnusedIndexes(bool)));
+
+
     tbResults->addWidget(new QLabel(" display properties: "));
     edtDisplayProperties=new QFEnhancedLineEdit(d);
     edtDisplayProperties->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtDisplayProperties, edtDisplayProperties));
     edtDisplayProperties->setToolTip(tr("put a comma ',' separated list of properties here that should be part of the results table. <br><b>Note:</b> These properties can NOT be filtered with the filters below."));
     connect(edtDisplayProperties, SIGNAL(textChanged(QString)), this, SLOT(propertiesTextChanged(QString)));
     tbResults->addWidget(edtDisplayProperties);
-
 
 
 

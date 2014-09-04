@@ -55,8 +55,6 @@ class QFUsesResultsByIndexEvaluation : public QFUsesResultsEvaluation {
          *         current fit function for a given fitFunction ID */
         virtual QString getEvaluationResultID(int index) const;
 
-        /** \brief extract the index number (or -1 for average) from the supplied resultID, which has to have been created with getEvaluationResultID() from this class */
-        virtual int getIndexFromEvaluationResultID(const QString& resultID) const;
 
 
 

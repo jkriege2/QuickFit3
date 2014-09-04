@@ -1072,7 +1072,7 @@ double QFESPIMB040OpticsSetup2::getCameraMagnification(int setup_cam) const {
 
 void saveMeasurementDevice(QMap<QString, QVariant>& setup, const QString& prefix, const QString& name, QFExtensionMeasurementAndControlDevice* device, int id) {
     if (!device) return;
-    for (int i=0; i<device->getMeasurementDeviceValueCount(id); i++) {
+    for (int i=0; i<(int64_t)device->getMeasurementDeviceValueCount(id); i++) {
         setup[prefix+QString("%2/%1").arg(device->getMeasurementDeviceValueShortName(id, i)).arg(name)]=device->getMeasurementDeviceValue(id, i);
     }
 }

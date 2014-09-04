@@ -26,7 +26,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QFormLayout>
 #include "qfrawdatarecord.h"
 #include "qfevaluationitem.h"
-#include "../interfaces/qfrdrfcsdatainterface.h"
+#include "qfrdrfcsdatainterface.h"
 #include <iostream>
 #include <cfloat>
 #include "qffcsfitevaluation.h"

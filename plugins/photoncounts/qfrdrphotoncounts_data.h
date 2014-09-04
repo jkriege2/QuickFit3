@@ -35,7 +35,7 @@
 #include <QAction>
 #include "qfrawdatarecord.h"
 #include "qfrawdatarecordfactory.h"
-#include "../interfaces/qfrdrphotoncountsinterface.h"
+#include "qfrdrphotoncountsinterface.h"
 
 
 /*! \brief QFRawDataRecord to represent a set of photon counts acquired in a set of channels

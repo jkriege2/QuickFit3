@@ -24,7 +24,7 @@
 
 #include "qffcsmaxentevaluation_item.h"
 #include "qffcsmaxentevaluation_editor.h"
-#include "../interfaces/qfrdrfcsdatainterface.h"
+#include "qfrdrfcsdatainterface.h"
 #include "qfmathtools.h"
 #include "libb040mem.h"
 #include "qffcstools.h"
@@ -282,13 +282,13 @@ QVector<double> QFFCSMaxEntEvaluationItem::getDistributionDs(QFRawDataRecord *re
 
         if (model!=3) {
             const double wxy=getWXY(record, index, model);
-            for (uint32_t i=0; i<res.size(); i++) {
+            for (int64_t i=0; i<res.size(); i++) {
                 res[i]=wxy*wxy/1000000.0/(4.0*res[i]);
             }
         } else if (model==3) {
             const double q2=qfSqr(getDLSQ(record, index, model));
             //qDebug()<<"q2="<<q2<<"  n="<<getRefIndx(record, index, model)<<"  l="<<getLambda(record, index, model)<<"  theta="<<getTheta(record, index, model);
-            for (uint32_t i=0; i<res.size(); i++) {
+            for (int64_t i=0; i<res.size(); i++) {
                 const double t=res[i];
                 res[i]=1.0/(q2*t);
                 //qDebug()<<i<<t<<res[i];

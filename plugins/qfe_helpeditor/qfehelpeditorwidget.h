@@ -147,12 +147,13 @@ class QFEHelpEditorWidget : public QWidget {
 
     protected:
         bool maybeSave();
-        void setScriptFilename(QString filename);
+        void setScriptFilename(QString filename, bool newscript=false, bool addToRecent=true);
         void closeEvent(QCloseEvent* event);
         QString getSelection() const;
         void replaceSelection(const QString& newText);
 
         QString currentScript;
+        bool newScript;
     private:
         int m_winID;
         Ui::QFEHelpEditorWidget *ui;

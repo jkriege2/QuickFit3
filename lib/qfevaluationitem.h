@@ -273,6 +273,21 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         QString getNameNotFilter() const;
         bool getNameNotFilterRegExp() const;
 
+        /** \brief extract the index number (or -1 for average) from the supplied resultID
+         *
+         *  Many RDRs organize the data in runs/pixels/indexes and many evaluations use index-specific result IDs (an example are FCS data, where each
+         *  run corresponds to an index, average is the index -1 and FCS fit save the results for each run/index with a separate resultID. Thsi function
+         *  allows to extract these indices from the resultIDs, which in turn allows to filter out unused runs from the result table in the evaluation
+         *  editor window.
+         *
+         *  This is a general function, which assumes that the index is a digit-only number at the end of the resultID. If
+         *  you encode the index in any other way, you can overwrite this function. If the string ends with \c avg or \c runavg , the value -1 is returned
+         *  The default return value is -1.
+         *
+         */
+        virtual int getIndexFromEvaluationResultID(const QString& resultID) const;
+
+
     public slots:
         /** \brief call this to tell the class that data has changed and the project has to be saved! */
         void setDataChanged();

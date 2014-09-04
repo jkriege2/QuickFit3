@@ -39,7 +39,6 @@ HEADERS += qfrdrimagingfcs.h \
            qfrdrimagingfcs_data.h \
 		   qfrdrimagingfcs_dataeditor.h \
            ../interfaces/qfrdrfcsdatainterface.h \
-    ../interfaces/qfrdrimagetoruninterface.h \
     ../interfaces/qfrdroverviewimageinterface.h \
     ../base_classes/qfrdrimagingfcstools.h \
     ../base_classes/qfrdrimagemasktools.h \
@@ -50,7 +49,6 @@ HEADERS += qfrdrimagingfcs.h \
     ../interfaces/qfrdrsimplecountrateinterface.h \
     ../interfaces/qfrdrimageselectioninterface.h \
     ../base_classes/qfrdroverviewimagedisplay.h \
-    ../interfaces/qfrdrrunselection.h \
     ../interfaces/qfrdrimagemask.h \
     ../interfaces/qfrdrimfcscorrelatorremote.h \
     qfrdrimagingfcs_dataeditor_image.h \

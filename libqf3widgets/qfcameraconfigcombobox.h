@@ -23,7 +23,7 @@
 
 #include <QtGui>
 #include "qfextensionmanager.h"
-#include "../interfaces/qfextensioncamera.h"
+#include "qfextensioncamera.h"
 #include "qfextension.h"
 #include "qfcameracombobox.h"
 #include "libwid_imexport.h"

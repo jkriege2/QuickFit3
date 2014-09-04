@@ -11,7 +11,7 @@
 
 #define VERSION_STATUS "beta"
 
-#define QF_THANKS_TO "Jan Buchholz, Tabea Elbel, Dr. Nicolas Dross, Dr. György Vámosi, Dr. Vera Böhm, Prof. Jörg Langowski, Dr. Katalin Tòth"
+#define QF_THANKS_TO "Jan Buchholz, Tabea Elbel, Dr. Nicolas Dross, Dr. György Vámosi, Dr. Vera Böhm, Prof. Jörg Langowski, Dr. Katalin Tòth, PD Dr. Christoh Garbe, Prof. Dr. Thorsten Wohland"
 
 #define QF_COPYRIGHT QString("&copy; 2010-%1 by Jan W. Krieger").arg(QDate::currentDate().year())
 
@@ -29,7 +29,7 @@
 #define QF_UPDATESPECIALXMLURL "http://www.dkfz.de/Macromol/quickfit/update.xml"
 //#define QF_UPDATESPECIALXMLURL "http://www.dkfz.de/Macromol/quickfit/updatespecial.xml"
 
-#define QF_LICENSE QT_TR_NOOP("<b>This is POSTCARD-ware, so if you like the program and use it, please let us know by sending a nice postcard from your place on the world to:</b><br>DKFZ (German Cancer Research Center)<br>Dept. B040 (Biophysics of Macromolecules)<br>z.H. Jan Krieger<br>Im Neuenheimer Feld 580<br>D-69120 Heidelberg<br>GERMANY")
+#define QF_LICENSE QT_TR_NOOP("<b>GNU General Public License (GPL) 3.0</b><br><small><i>Also: This is POSTCARD-ware, so if you like the program and use it, please let us know by sending a nice postcard from your place on the world to:</i><br>DKFZ (German Cancer Research Center)<br>Dept. B040 (Biophysics of Macromolecules)<br>z.H. Jan Krieger<br>Im Neuenheimer Feld 580<br>D-69120 Heidelberg<br>GERMANY</small>")
 
 #define QF_CITATION_HTML QString("Jan Wolfgang Krieger, J&ouml;rg Langowski (2010-%6): <b>QuickFit %1 (compiled: %2, SVN: %3): A data evaluation application for biophysics</b>, <i>[web page] <a href=\"%4\">%4</a> [Accessed on %5]</i>").arg(QF_VERSION).arg(COMPILEDATE).arg(SVNVERSION).arg(QF_WEBLINK).arg(QDate::currentDate().toString("yyyy/MM/d")).arg(QDate::currentDate().year())
 #define QF_CITATION_BIBTEX QString("@misc{quickfit3,\n" \

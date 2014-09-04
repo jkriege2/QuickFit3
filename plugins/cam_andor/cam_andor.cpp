@@ -773,7 +773,7 @@ QVariant QFExtensionCameraAndor::getCameraSetting(QSettings& settings, QFExtensi
 
 QVariant QFExtensionCameraAndor::getCameraCurrentSetting(int camera, QFExtensionCamera::CameraSetting which)
 {
-    if (camera<0 || camera>=getCameraCount()) return QVariant();
+    if (camera<0 || camera>=(long long)getCameraCount()) return QVariant();
 
     if (which==QFExtensionCamera::CamSetExposureTime) return camInfos[camera].expoTime;
     if (which==QFExtensionCamera::CamSetNumberFrames) return camInfos[camera].numKins;

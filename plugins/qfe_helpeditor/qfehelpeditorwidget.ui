@@ -322,7 +322,7 @@
       </widget>
      </item>
      <item>
-      <widget class="QToolButton" name="btnBlockquote_2">
+      <widget class="QToolButton" name="btnBlockquote">
        <property name="text">
         <string>insert blockquote</string>
        </property>

@@ -120,7 +120,7 @@ unsigned int QFExtensionB040ResistorHeater::getMeasurementDeviceCount()
 
 QString QFExtensionB040ResistorHeater::getMeasurementDeviceName(unsigned int measuremenDevice)
 {
-    if (measuremenDevice>=0 && measuremenDevice<devices.size()) {
+    if (measuremenDevice>=0 && (long long)measuremenDevice<devices.size()) {
         return devices[measuremenDevice].label;
     }
     return QString();

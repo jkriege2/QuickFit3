@@ -25,7 +25,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <time.h>
 #include <QObject>
 #include "qfextension.h"
-#include "../interfaces/qfextensioncamera.h"
+#include "qfextensioncamera.h"
 #include "highrestimer.h"
 // include libTIFF header
 #include <tiffio.h>

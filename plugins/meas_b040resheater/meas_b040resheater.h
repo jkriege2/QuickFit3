@@ -28,7 +28,7 @@
 #include <QVector>
 #include <QList>
 #include "qfextension.h"
-#include "../interfaces/qfextensionmeasurementdevice.h"
+#include "qfextensionmeasurementdevice.h"
 #include "../base_classes/qf3simpleb040serialprotocolhandler.h"
 #include "../base_classes/qf3comportmanager.h"
 #include "../../../../../LIB/trunk/jkserialconnection.h"
