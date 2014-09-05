@@ -646,8 +646,8 @@ QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension*
 
         }
     }
-    settings.setValue("acquisition/pixel_width", ecamera->getCameraPixelWidth(camera)*magnification);
-    settings.setValue("acquisition/pixel_height", ecamera->getCameraPixelHeight(camera)*magnification);
+    settings.setValue("acquisition/pixel_width", ecamera->getCameraPixelWidth(camera)/magnification);
+    settings.setValue("acquisition/pixel_height", ecamera->getCameraPixelHeight(camera)/magnification);
     settings.setValue("acquisition/camera_pixel_width", ecamera->getCameraPixelWidth(camera));
     settings.setValue("acquisition/camera_pixel_height", ecamera->getCameraPixelHeight(camera));
     settings.setValue("acquisition/camera_model", ecamera->getCameraName(camera));

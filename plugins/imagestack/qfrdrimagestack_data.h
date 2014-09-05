@@ -176,6 +176,8 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
          */
         QVariant getDoubleEnumeratedProperty(const QString &prop, int stack, int channel, QVariant defaultValue) const;
 
+        void setStackProperties(const QMap<QString,QVariant>& props, int stack, int channel=0);
+
     protected:
         /** \brief write the contents of the object to a XML file */
         virtual void intWriteData(QXmlStreamWriter& w);
@@ -207,6 +209,9 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
             int channels;
             int file;
             DualViewMode dvMode;
+
+            QMap<QString,QVariant> props;
+            QString description;
         };
 
         /*! \brief load imagestack from file

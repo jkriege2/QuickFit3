@@ -80,6 +80,11 @@ bool QFFitFunctionGeneralLogNormal::estimateInitial(double *params, const double
         double pH=0;
         double pP=statisticsPeakFind(pW, dX.data(), dataY, N, 0.0, (double)NAN, &pB, &pH);
         if (statisticsFloatIsOK(pP)) {
+            double dx=0;
+            statisticsMinDistance(dataX, N, &dx);
+            if (dx>0) {
+                pW=qMax(pW,6.0*dx);
+            }
             params[PARAM_OFFSET]=pB;
             params[PARAM_AMPLITUDE]=pH;
             params[PARAM_POSITION]=pP;

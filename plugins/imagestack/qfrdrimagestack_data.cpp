@@ -95,12 +95,16 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                         stacks.last().channels=2;
                     }
                     getProject()->getServices()->log_text(tr("    * image stack %1 (file: '%2', %7) size:   width=%3,   height=%4,   frames=%5,   DualViewMode=%6\n").arg(stacks.size()).arg(files[f]).arg(stacks.last().width).arg(stacks.last().height).arg(stacks.last().frames).arg(dvMode).arg(ft));
+                    setStackProperties(stacks.last().props, stacks.size()-1);
+
                     setQFProperty(QString("WIDTH%1").arg(stacks.size()-1), stacks.last().width, false, true);
                     setQFProperty(QString("HEIGHT%1").arg(stacks.size()-1), stacks.last().height, false, true);
                     setQFProperty(QString("FRAMES%1").arg(stacks.size()-1), stacks.last().frames, false, true);
                     setQFProperty(QString("CHANNELS%1").arg(stacks.size()-1), stacks.last().channels, false, true);
                     setQFProperty(QString("FILENUM%1").arg(stacks.size()-1), stacks.last().file, false, true);
                     setQFProperty(QString("DUALVIEWMODE%1").arg(stacks.size()-1), stacks.last().dvMode, false, true);
+
+
 
                     QString p;
                     p=QString("XUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, "pixels"), true, true);
@@ -201,6 +205,8 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                     setQFProperty(QString("FILENUM%1").arg(stacks.size()-1), stacks.last().file, false, true);
                     setQFProperty(QString("DUALVIEWMODE%1").arg(stacks.size()-1), stacks.last().dvMode, false, true);
 
+
+
                     stacks.last().channels=c+1;
 
                     setQFProperty(QString("CHANNELS%1").arg(stacks.size()-1), stacks.last().channels, false, true);
@@ -245,6 +251,7 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                     if (ft=="image") {
                         getProject()->getServices()->log_text(tr("    * loading image stack %1 (file: '%2') ...\n").arg(stacks.size()).arg(files[f]));
                         if (loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmReadData, channel)) {
+                            setStackProperties(stacks.last().props, stacks.size()-1, channel);
                             channel++;
                         } else {
                             setError(tr("error loading image stack %1 (file: '%2')\n").arg(stacks.size()).arg(files[f]));
@@ -254,6 +261,7 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                     } else if (ft=="image_ldualview") {
                         getProject()->getServices()->log_text(tr("    * loading image stack %1 (file: '%2', left half) ...\n").arg(stacks.size()).arg(files[f]));
                         if (loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmReadData, channel, qfihLeft)) {
+                            setStackProperties(stacks.last().props, stacks.size()-1, channel);
                             channel++;
                         } else {
                             setError(tr("error loading image stack %1 (file: '%2', left half)\n").arg(stacks.size()).arg(files[f]));
@@ -263,6 +271,7 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                     } else if (ft=="image_rdualview") {
                         getProject()->getServices()->log_text(tr("    * loading image stack %1 (file: '%2', right half) ...\n").arg(stacks.size()).arg(files[f]));
                         if (loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmReadData, channel, qfihRight)) {
+                            setStackProperties(stacks.last().props, stacks.size()-1, channel);
                             channel++;
                         } else {
                             setError(tr("error loading image stack %1 (file: '%2', right half)\n").arg(stacks.size()).arg(files[f]));
@@ -272,6 +281,7 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                     } else if (ft=="image_tdualview") {
                         getProject()->getServices()->log_text(tr("    * loading image stack %1 (file: '%2', top half) ...\n").arg(stacks.size()).arg(files[f]));
                         if (loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmReadData, channel, qfihTop)) {
+                            setStackProperties(stacks.last().props, stacks.size()-1, channel);
                             channel++;
                         } else {
                             setError(tr("error loading image stack %1 (file: '%2', top half)\n").arg(stacks.size()).arg(files[f]));
@@ -281,6 +291,7 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                     } else if (ft=="image_bdualview") {
                         getProject()->getServices()->log_text(tr("    * loading image stack %1 (file: '%2', bottom half) ...\n").arg(stacks.size()).arg(files[f]));
                         if (loadImageFile(stacks.last(), files[f], QFRDRImageStackData::lmReadData, channel, qfihBottom)) {
+                            setStackProperties(stacks.last().props, stacks.size()-1, channel);
                             channel++;
                         } else {
                             setError(tr("error loading image stack %1 (file: '%2', bottom half)\n").arg(stacks.size()).arg(files[f]));
@@ -288,6 +299,7 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                             return;
                         }
                     }
+
                     //qDebug()<<"OK";
                 }
                 if (maskS.size()>0) getProject()->getServices()->log_text(tr("    * loading image mask (%1) ...\n").arg(maskS));
@@ -323,6 +335,8 @@ bool QFRDRImageStackData::loadImageFile(QFRDRImageStackData::ImageStack& stack, 
     QFImporterImageSeries* reader=getImageReader(reader_idx, getProject()->getServices());
     if (reader) {
         if (reader->open(filename)) {
+            stack.props=reader->getFileInfo().properties;
+            stack.description=reader->getFileInfo().comment;
             if (mode==QFRDRImageStackData::lmGetSize) {
                 stack.channels=1;
                 stack.width=reader->frameWidth();
@@ -418,6 +432,18 @@ QVariant QFRDRImageStackData::getDoubleEnumeratedProperty(const QString &prop, i
     if (channel>=0) return getProperty(prop+"_"+QString::number(channel), res);
     if (stack>=0 && channel>=0) return  getProperty(prop+QString(stack)+"_"+QString::number(channel), res);
     else return res;
+}
+
+void QFRDRImageStackData::setStackProperties(const QMap<QString, QVariant> &props, int stack, int channel)
+{
+    QMapIterator<QString,QVariant> it(props);
+    while (it.hasNext()) {
+        it.next();
+        if (!propertyExists(it.key())) {
+            setQFProperty(QString(it.key())+QString::number(stack), it.value(), false, true);
+        }
+
+    }
 }
 
 int QFRDRImageStackData::getImageStackCount() const {

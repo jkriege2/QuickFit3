@@ -2,49 +2,67 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-  <title>Plugin Image Stack</title>
+  <title>Image Stack Plugin</title>
   </head>
   <body>
-	$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-	<h2>Introduction</h2>
-	<p>This plugin allows to view 2D/3D/4D images. It represents the image stacks as:
-	<ul>
-	  <li>2D: a single frame (width &times; height) with one color channel</li>
-	  <li>3D: a single frame (width &times; height) with several color channels</li>
-	  <li>3D: a set of frames (width &times; height) with one color channel</li>
-	  <li>4D: a set of frames (width &times; height) with several color channels</li>
-	</ul>
-	in addition each image stack RDR may contain several separate image stacks.
-	</p>
-	
-	
-	<h2>User Interface</h2>
-	<h3>Inserting an image stack</h3>
-	<p>
-	  The plugin can load all image stack files for which a reader plugin is available (by default at least TIFF files). There are several options available in the menu <tt>Raw data Items|Image Stacks</tt>:
-	  <ul>
-	    <li><img src=":/image_stack/singlefile_stack.png"> <b>Single file image stack</b>: Loads an image stack with a single color channel from a file.  If several files are selected, each file is loaded as a separate image stack RDR.</li>
-	    <li><img src=":/image_stack/multifile_stack.png"> <b>Multi file image stack</b>: Loads a multi-channel image stack from several files (select several files when adding this type of RDR). Each file is loaded as a separate color channel.</li>
-	    <li><img src=":/image_stack/singlefile_dvh_stack.png"> <b>Horizontal DualView image stack</b>: Loads an image series acquired with a DualView optics imaging the two color channels side by side. Each image half is loaded as a color channel and if several farmes are available in the file, these are loaded as separate frames. If several files are selected, each file is loaded as a separate image stack RDR.</li>
-	    <li><img src=":/image_stack/singlefile_dvv_stack.png"> <b>Vertical DualView image stack</b>: Loads an image series acquired with a DualView optics imaging the two color channels above each other. Each image half is loaded as a color channel and if several farmes are available in the file, these are loaded as separate frames. If several files are selected, each file is loaded as a separate image stack RDR.</li>
-		
-	  </ul>
-	</p>
-	
+    $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+    <h2>Introduction</h2>
+    <p>This plugin allows to view 2D/3D/4D images. It represents the image stacks as:
+    <ul>
+      <li>2D: a single frame (width &times; height) with one color channel</li>
+      <li>3D: a single frame (width &times; height) with several color channels</li>
+      <li>3D: a set of frames (width &times; height &times; timepoints/positions) with one color channel</li>
+      <li>4D: a set of frames (width &times; height &times; timepoints/positions) with several color channels</li>
+    </ul>
+    in addition each image stack RDR may contain several separate image stacks.
+    </p>
+    
+    
+    <h2>User Interface</h2>
+    <h3>Inserting an image stack</h3>
+    <p>
+      The plugin can load all image stack files for which a reader plugin is available (by default at least TIFF files). There are several options available in the menu <tt>Raw data Items|Image Stacks</tt>:
+      <ul>
+        <li><img src=":/image_stack/singlefile_stack.png"> <b>Single file image stack</b>: Loads an image stack with a single color channel from a file.  If several files are selected, each file is loaded as a separate image stack RDR.</li>
+        <li><img src=":/image_stack/multifile_stack.png"> <b>Multi file image stack</b>: Loads a multi-channel image stack from several files (select several files when adding this type of RDR). Each file is loaded as a separate color channel.</li>
+        <li><img src=":/image_stack/singlefile_dvh_stack.png"> <b>Horizontal DualView image stack</b>: Loads an image series acquired with a DualView optics imaging the two color channels side by side. Each image half is loaded as a color channel and if several farmes are available in the file, these are loaded as separate frames. If several files are selected, each file is loaded as a separate image stack RDR.</li>
+        <li><img src=":/image_stack/singlefile_dvv_stack.png"> <b>Vertical DualView image stack</b>: Loads an image series acquired with a DualView optics imaging the two color channels above each other. Each image half is loaded as a color channel and if several farmes are available in the file, these are loaded as separate frames. If several files are selected, each file is loaded as a separate image stack RDR.</li>
+        
+      </ul>
+    </p>
+    
     <h3>RDR Editor</h3>
-	<p>
-	  The RDR editor has one main tab, which displays the image stack. The different color channels can be overlayn in different <b>channel modes</b>:
-	  <ul>
-	    <li><b>singe channel:</b> Displays a single color channel in false-colors with a selectable color palette. A second channel can be used for the alpha channel to set some pixels invisible.</li>
-	    <li><b>4-channel RGBA:</b> Here up to three color channels can be associated with the red green and blue color channel of the final image. A fourth channel can be used for alpha blending.</li>
-	  </ul>
-	  The slider below the image display allows to move through the iage stack.
-	  On the RHS of the image view, a histogram of the pixel values is displayed. It constains all channels currently displayed on the left.
-	</p>
-	<p>The Menu <tt>Mask</tt> and the widgets above the image plot allow to edit the image mask. With the rectangle, circle, ... tools you can draw selections with the mous (drag with left button) on the image display. It is also possible to select a subset of the pixels.</p>
-	
-	<h3>3D Viewer</h3>
-	This plugin also contains a <a href="3dviewer.html"><img src=":/image_stack/viewer3d.png"> 3D Viewer</a>, which can be started using the menu entry <tt>"Stack Tools | 3D Viewer"</tt>. the viewer display one stack at a time and each channel as a separate volume dataset.
-	$$see:<a href="3dviewer.html">3D Viewer Documentation</a>$$
+    <p>
+      The RDR editor has one main tab, which displays the image stack. The different color channels can be overlayn in different <b>channel modes</b>:
+      <ul>
+        <li><b>singe channel:</b> Displays a single color channel in false-colors with a selectable color palette. A second channel can be used for the alpha channel to set some pixels invisible.</li>
+        <li><b>4-channel RGBA:</b> Here up to three color channels can be associated with the red green and blue color channel of the final image. A fourth channel can be used for alpha blending.</li>
+      </ul>
+      The slider below the image display allows to move through the iage stack.
+      On the RHS of the image view, a histogram of the pixel values is displayed. It constains all channels currently displayed on the left.
+    </p>
+    <p>The Menu <tt>Mask</tt> and the widgets above the image plot allow to edit the image mask. With the rectangle, circle, ... tools you can draw selections with the mous (drag with left button) on the image display. It is also possible to select a subset of the pixels.</p>
+    
+    <h3>3D Viewer</h3>
+<p>    This plugin also contains a <a href="3dviewer.html"><img src=":/image_stack/viewer3d.png"> 3D Viewer</a>, which can be started using the menu entry <tt>"Stack Tools | 3D Viewer"</tt>. the viewer display one stack at a time and each channel as a separate volume dataset.
+    $$see:<a href="3dviewer.html">3D Viewer Documentation</a>$$
+    </p>
+    
+    <h3>Information for Plugin Programmers</h3>    
+    <p>If you want to use this plugin from other plugins, the following information might be helpfull:
+    <ul>
+        <li>The axis units and labels for the image stacks in each image stack RDR can be set by RDR properties with the following names (<i>n</i>=0,1,2,... is the internal number of the image stack to which this applies, if the RDR contains several image stacks. The version without <i>n</i> is the fallback value, which is used if no <i>n</i>-specific value is given):
+          <ul>
+              <li><tt>XUNIT_FACTOR</tt> / <tt>XUNIT_FACTOR<i>n</i></tt><br><tt>YUNIT_FACTOR</tt> / <tt>YUNIT_FACTOR<i>n</i></tt><br><tt>TUNIT_FACTOR</tt> / <tt>TUNIT_FACTOR<i>n</i></tt><br><tt>CUNIT_FACTOR</tt> / <tt>CUNIT_FACTOR<i>n</i></tt>: factor, which converts the dimensions in pixels to real units (e.g. 400, if the pixel size was 400 nm und you want the image to be in nm). The image dimensions are <tt>X</tt> and <tt>Y</tt> for each frame, <tt>T</tt> for the third axis (time or z-axis, depending on the data) and <tt>C</tt> for the color/pixel value axis. The default value is <tt>1</tt>.</li>
+              <li><tt>XUNIT_NAME</tt> / <tt>XUNIT_NAME<i>n</i></tt><br><tt>YUNIT_NAME</tt> / <tt>YUNIT_NAME<i>n</i></tt><br><tt>TUNIT_NAME</tt> / <tt>TUNIT_NAME<i>n</i></tt><br><tt>CUNIT_NAME</tt> / <tt>CUNIT_NAME<i>n</i></tt>: name of the true axis unit (e.g. nm or &mu;m for microscopy images). The default value is <tt>pixels</tt>. </li>
+              <li><tt>XAXIS_NAME</tt> / <tt>XAXIS_NAME<i>n</i></tt><br><tt>YAXIS_NAME</tt> / <tt>YAXIS_NAME<i>n</i></tt><br><tt>TAXIS_NAME</tt> / <tt>TAXIS_NAME<i>n</i></tt><br><tt>CAXIS_NAME</tt> / <tt>CAXIS_NAME<i>n</i></tt>: name of the axis (e.g. <tt>X</tt>, <tt>Y</tt>, <tt>time</tt>, ...). </li>
+              <li><tt>STACK_DESCRIPTION</tt> / <tt>STACK_DESCRIPTION<i>n</i></tt>: a description for each stack</li>
+              <li<tt>CHANNELNAME_<i>n</i>_<i>c</i></tt>: name for the <i>c</i>-th channel in the <i>n</i>-th stack in this RDR</li>
+              <li<tt>TIMEPOINTNAME_<i>n</i>_<i>t</i></tt>: name for the <i>t</i>-th timepoint/frame in the <i>n</i>-th stack in this RDR</li>
+              <li><tt>STACKTYPE</tt> This property is either <tt>ONEFILEPERSTACK</tt> (then each file, whicb is linked to the RDR is loaded as a separate stack in this RDR), or <tt>ONEFILEPERCHANNEL</tt> (each file represents one color channel and only one stack is contained in this RDR).</li>
+          </ul></li>
+          <li>You can cause the plugin to split an image into two color channels (DualView mode, i.e. split left/right or top/bottom), by using the file types <tt>image_ldualview</tt>, <tt>image_rdualview</tt>, <tt>image_tdualview</tt>, <tt>image_bdualview</tt> for the left/right or top/bottom image half. the default file type for image files is <tt>image</tt>. This only makes sense for  <tt>STACKTYPE==ONEFILEPERCHANNEL</tt>. In the case of  <tt>STACKTYPE==ONEFILEPERSTACK</tt>, you have to use the file types <tt>image_hdualview</tt> to cause a horizontal split and  <tt>image_vdualview</tt> to cause a vertical split.</li>
+    </ul>
+    </p>
   </body>
 </html>

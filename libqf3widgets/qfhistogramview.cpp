@@ -738,7 +738,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                     plteFit->set_drawLine(true);
                     plteFit->set_style(Qt::SolidLine);
                     plteFit->set_lineWidth(1.5);
-                    plteParamHistogram->set_title(tr("fit %2 (%1)").arg(hist.name).arg(ff->shortName()));
+                    plteFit->set_title(tr("fit (%1): %2").arg(hist.name).arg(ff->shortName()));
                     pltParamHistogram->addGraph(plteFit);
                 } else {
                     if (ff) delete ff;
