@@ -234,6 +234,9 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir build
 	tar xvf lmfit-5.1.tar -C ./build/
 	cd build/lmfit-5.1
+        export LDFLAGS="${LDFLAGS} -fPIC "
+        export CFLAGS="${CFLAGS} -fPIC "
+        export CPPFLAGS="${CPPFLAGS} -fPIC"
 	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS=" ${MORECFLAGS}" CPPFLAGS=" ${MORECFLAGS}"	
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
