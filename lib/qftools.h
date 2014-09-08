@@ -712,9 +712,9 @@ void qfstatisticsQuicksort(T* a, long long l, long long r){
             while(a[++i]<a[r]);
             while(a[--j]>a[r] && j>i);
             if(i>=j) break;
-            statisticsSwap(a, i, j);
+            qfstatisticsSwap<T>(a, i, j);
         }
-        qfstatisticsSwap(a, i, r);
+        qfstatisticsSwap<T>(a, i, r);
 
         qfstatisticsQuicksort(a, l, i-1);
         qfstatisticsQuicksort(a, i+1, r);
