@@ -258,20 +258,20 @@ inline bool ProcessHHT2(PTUInfo& ptu, const uint32_t& TTTRRecord, QFTCSPCRecord&
         {
             if(HHVersion == 1)
             {
-                oflcorrection += (unsigned __int64)T2WRAPAROUND_V1;
+                oflcorrection += (uint64_t)T2WRAPAROUND_V1;
                 overflows++;
                 return false;
             } else {
                 //number of overflows is stored in timetag
                 if(T2Rec.bits.timetag==0) //if it is zero it is an old style single overflow
                 {
-                    oflcorrection += (unsigned __int64)T2WRAPAROUND_V2;  //should never happen with new Firmware!
+                    oflcorrection += (uint64_t)T2WRAPAROUND_V2;  //should never happen with new Firmware!
                     overflows++;
                     return false;
                 }
                 else
                 {
-                    oflcorrection += (unsigned __int64)T2WRAPAROUND_V2 * T2Rec.bits.timetag;
+                    oflcorrection += (uint64_t)T2WRAPAROUND_V2 * T2Rec.bits.timetag;
                     overflows++;
                     return false;
                 }
@@ -335,13 +335,13 @@ inline bool ProcessHHT3(PTUInfo& ptu, const uint32_t& TTTRRecord, QFTCSPCRecord&
             //number of overflows is stored in nsync
             if((T3Rec.bits.nsync==0) || (HHVersion==1)) //if it is zero or old version it is an old style single oferflow
             {
-                oflcorrection += (unsigned __int64)T3WRAPAROUND;
+                oflcorrection += (uint64_t)T3WRAPAROUND;
                 overflows++;
                 return false;
             }
             else
             {
-                oflcorrection += (unsigned __int64)T3WRAPAROUND * T3Rec.bits.nsync;
+                oflcorrection += (uint64_t)T3WRAPAROUND * T3Rec.bits.nsync;
                 overflows++;
                 return false;
             }
