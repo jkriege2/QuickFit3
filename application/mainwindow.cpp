@@ -3277,6 +3277,32 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
                         }
+                    } else if (list=="tooltips") {
+                        QString text="";
+                        QString item_template=QString("<tr><td><b>%1</b></td><td>%2</td></tr></li>\n");
+                        QStringList ttids=helpdata.tooltips.keys();
+                        qSort(ttids.begin(), ttids.end(), qfQStringCompareLengthDecreasing);
+                        for (int ti=0; ti<ttids.size(); ti++){
+                            QString id=ttids[ti];
+                            QString tt=helpdata.tooltips.value(ttids[ti]).tooltip;
+                            text+=item_template.arg(id).arg(tt);
+                        }
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<table border=\"1\" spacing=\"1\" padding=\"1\">\n")+text+QString("</table>"));
+                        }
+                    } else if (list=="autolinks") {
+                        QString text="";
+                        QString item_template=QString("<tr><td><b>%1</b></td><td><a href=\"%2\">%2</a></td></tr></li>\n");
+                        QStringList ttids=helpdata.autolinks.keys();
+                        qSort(ttids.begin(), ttids.end(), qfQStringCompareLengthDecreasing);
+                        for (int ti=0; ti<ttids.size(); ti++){
+                            QString id=ttids[ti];
+                            QString lnk=helpdata.autolinks.value(ttids[ti]);
+                            text+=item_template.arg(id).arg(lnk);
+                        }
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<table border=\"1\" spacing=\"1\" padding=\"1\">\n")+text+QString("</table>"));
+                        }
                     }
                 }
 

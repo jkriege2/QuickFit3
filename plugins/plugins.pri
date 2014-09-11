@@ -132,6 +132,8 @@ release {
 
 DEFINES += QTLIB_IN_DLL LIB_IN_DLL
 
+QT += xml
+
 CONFIG += link_prl
 
 

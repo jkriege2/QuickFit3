@@ -889,6 +889,7 @@ void QFImFCCSFitEvaluationItem::calcChi2Landscape(double *chi2Landscape, int par
     if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
 
     restoreQFFitAlgorithmParameters(falg);
+    falg->readErrorEstimateParametersFit(this);
 
 
     QList<doFitData> fitData;
@@ -968,6 +969,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
     if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
 
     restoreQFFitAlgorithmParameters(falg);
+    falg->readErrorEstimateParametersFit(this);
     falg->setReporter(dlgFitProgress);
 
     if (doLog) QFPluginLogTools::log_text(tr("setting up global fit for run %1 ... \n").arg(runname));
@@ -1268,6 +1270,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord 
     if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
 
     restoreQFFitAlgorithmParameters(falg);
+    falg->readErrorEstimateParametersFit(this);
     //falg->setReporter(dlgFitProgress);
 
 

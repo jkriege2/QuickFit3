@@ -54,6 +54,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "dlgqffitalgorithmprogressdialog.h"
 #include "qffitalgorithmthreaddedfit.h"
 #include "qvisiblehandlesplitter.h"
+#include "qffitalgorithmerrorestimatemodewidget.h"
 #include "../base_classes/qffitresultsevaluationeditorbase.h"
 #include "../base_classes/qffitresultsbyindexevaluationeditorbase.h"
 #include "../base_classes/qffitresultsbyindexevaluationeditorwithwidgets.h"
@@ -139,6 +140,7 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWithW
         /** \brief button used to calculate the focal volume */
         QToolButton* btnCalibrateFocalVolume;
         QSpinBox* spinRepeats;
+        QFFitAlgorithmErrorEstimateModeWidget* widFitErrorEstimate;
 
 
         /** \brief create a report in a given QTextDocument object
@@ -171,6 +173,7 @@ class QFFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWithW
         /** \brief called when the weights changes */
         void weightsChanged(int weight);
         void repeatsChanged(int r);
+        void errorEstimateModeChanged();
 
     private:
         /** \brief create all widgets on the form */

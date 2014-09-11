@@ -38,6 +38,7 @@ QFEvaluationResultsModel::QFEvaluationResultsModel(QObject* parent):
     showVectorMatrixAvg=true;
     extractRuns=true;
     removeUnusedRuns=false;
+    mindRunsForVectorStat=true;
 }
 
 QFEvaluationResultsModel::~QFEvaluationResultsModel()
@@ -103,7 +104,7 @@ void QFEvaluationResultsModel::resultsChanged(QFRawDataRecord* record, const QSt
                 bool ok=true;
                 if (runsel && run>=0) {
                     ok=!runsel->leaveoutRun(run);
-                    qDebug()<<rdr->getName()<<run<<ok;
+                    //qDebug()<<rdr->getName()<<run<<ok;
                 }
 
                 if (!ok) {
@@ -254,6 +255,12 @@ void QFEvaluationResultsModel::setRemoveUnusedIndexes(bool enabled)
     removeUnusedRuns=enabled;
     if (extractRuns) resultsChanged();
 }
+
+void QFEvaluationResultsModel::setMinUnusedIndexesForStatistics(bool enabled)
+{
+    mindRunsForVectorStat=enabled;
+    resultsChanged();
+}
 int QFEvaluationResultsModel::rowCount(const QModelIndex &parent) const {
     if (!evaluation) {
         return 0;
@@ -376,6 +383,9 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+                    QVector<bool> mask;
+                    if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
@@ -384,11 +394,11 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
                             || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
                             double var=0;
-                            double mean=qfstatisticsAverageVariance(var, r.dvec);
+                            double mean=qfstatisticsMaskedAverageVariance(var, mask, r.dvec);
                             return QVariant(QString("mean: %1<br>S.D.: %2<br>count: %3<br><i>&nbsp;&nbsp;&nbsp;%4</i>").arg(mean).arg(sqrt(var)).arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type))+common);
                         } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
                             double var=0;
-                            double mean=qfstatisticsAverageVariance(var, r.ivec);
+                            double mean=qfstatisticsMaskedAverageVariance(var, mask, r.ivec);
                             return QVariant(QString("mean: %1<br>S.D.: %2<br>count: %3<br><i>&nbsp;&nbsp;&nbsp;%4</i>").arg(mean).arg(sqrt(var)).arg(r.getVectorMatrixItems()).arg(QFRawDataRecord::evaluationResultType2String(r.type))+common);
                         } else if ((r.type==QFRawDataRecord::qfrdreBooleanVector) || (r.type==QFRawDataRecord::qfrdreBooleanMatrix) ) {
                             int cnt=0;
@@ -407,15 +417,18 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+                    QVector<bool> mask;
+                    if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
                             || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
-                            return qfstatisticsAverage(r.dvec);
+                            return qfstatisticsMaskedAverage(mask, r.dvec);
                         } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
-                            return qfstatisticsAverage(r.ivec);
+                            return qfstatisticsMaskedAverage(mask, r.ivec);
                         } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
                             return record->resultsGetAsDouble(en, rname);
                         }
@@ -426,15 +439,18 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+                    QVector<bool> mask;
+                    if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
                             || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
-                            return qfstatisticsSum(r.dvec);
+                            return qfstatisticsMaskedSum(mask, r.dvec);
                         } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
-                            return qfstatisticsSum(r.ivec);
+                            return qfstatisticsMaskedSum(mask, r.ivec);
                         } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
                             return record->resultsGetAsDouble(en, rname);
                         } else {
@@ -447,15 +463,18 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+                    QVector<bool> mask;
+                    if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
                             || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
-                            return qfstatisticsSum2(r.dvec);
+                            return qfstatisticsMaskedSum2(mask, r.dvec);
                         } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
-                            return qfstatisticsSum2(r.ivec);
+                            return qfstatisticsMaskedSum2(mask, r.ivec);
                         } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
                             double v= record->resultsGetAsDouble(en, rname);
                             return v*v;
@@ -469,15 +488,18 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+                    QVector<bool> mask;
+                    if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
                             || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
-                            return qfstatisticsCount(r.dvec);
+                            return qfstatisticsMaskedCount(mask, r.dvec);
                         } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
-                            return qfstatisticsCount(r.ivec);
+                            return qfstatisticsMaskedCount(mask, r.ivec);
                         } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
                             return 1;
                         } else {
@@ -490,15 +512,18 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+                    QVector<bool> mask;
+                    if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
                             || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
-                            return sqrt(qfstatisticsVariance(r.dvec));
+                            return sqrt(qfstatisticsMaskedVariance(mask, r.dvec));
                         } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
-                            return sqrt(qfstatisticsVariance(r.ivec));
+                            return sqrt(qfstatisticsMaskedVariance(mask, r.ivec));
                         } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
                             return record->resultsGetErrorAsDouble(en, rname);
                         } else {
@@ -511,15 +536,18 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+                    QVector<bool> mask;
+                    if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
                             || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
-                            return qfstatisticsMedian(r.dvec);
+                            return qfstatisticsMaskedMedian(mask, r.dvec);
                         } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
-                            return qfstatisticsMedian(r.ivec);
+                            return qfstatisticsMaskedMedian(mask, r.ivec);
                         } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
                             return record->resultsGetErrorAsDouble(en, rname);
                         } else {
@@ -532,15 +560,18 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+                    QVector<bool> mask;
+                    if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
                             || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
-                            return qfstatisticsQuantile(r.dvec, 0.25);
+                            return qfstatisticsMaskedQuantile(mask, r.dvec, 0.25);
                         } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
-                            return qfstatisticsQuantile(r.ivec, 0.25);
+                            return qfstatisticsMaskedQuantile(mask, r.ivec, 0.25);
                         } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
                             return 0;
                         } else {
@@ -553,15 +584,18 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+                    QVector<bool> mask;
+                    if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
                         const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
                         if ((r.type==QFRawDataRecord::qfrdreNumberVector) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
                             || (r.type==QFRawDataRecord::qfrdreNumberMatrix) || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
-                            return qfstatisticsQuantile(r.dvec, 0.75);
+                            return qfstatisticsMaskedQuantile(mask, r.dvec, 0.75);
                         } else if ((r.type==QFRawDataRecord::qfrdreIntegerVector) || (r.type==QFRawDataRecord::qfrdreIntegerMatrix) ) {
-                            return qfstatisticsQuantile(r.ivec, 0.75);
+                            return qfstatisticsMaskedQuantile(mask, r.ivec, 0.75);
                         } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
                             return 0;
                         } else {
@@ -633,6 +667,7 @@ void QFEvaluationResultsModel::calcStatistics(QString resultName, double& averag
 
     for (register int i=0; i<lastResults.size(); i++) {
         QFRawDataRecord* record=lastResults[i].first;
+        QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
         QString en=lastResults[i].second;
         if (record) {
             QFRawDataRecord::evaluationResultType t=record->resultsGetType(en, resultName);
@@ -640,11 +675,24 @@ void QFEvaluationResultsModel::calcStatistics(QString resultName, double& averag
                 ||t==QFRawDataRecord::qfrdreIntegerVector||t==QFRawDataRecord::qfrdreIntegerMatrix) {
 
                 QVector<double> d=record->resultsGetAsDoubleList(en, resultName);
-                for (int di=0; di<d.size(); di++) {
+                QVector<bool> mask;
+                if (runsel && d.size()==runsel->leaveoutGetRunCount()) {
+                    mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
+                }
+                if (mindRunsForVectorStat && mask.size()>=d.size()){
+                    sum=sum+qfstatisticsMaskedSum(mask,d);
+                    sum2=sum2+qfstatisticsMaskedSum2(mask,d);
+                    count=count+qfstatisticsMaskedCount(mask,d);
+                } else {
+                    sum=sum+qfstatisticsSum(d);
+                    sum2=sum2+qfstatisticsSum2(d);
+                    count=count+qfstatisticsCount(d);
+                }
+                /*for (int di=0; di<d.size(); di++) {
                     sum=sum+d[di];
                     sum2=sum2+d[di]*d[di];
                 }
-                count=count+d.size();
+                count=count+d.size();*/
 
             } else {
                 bool ok=false;

@@ -579,6 +579,9 @@ void QFRDRTable::colgraphToolsSetGraphtype(QFRDRTable::GraphInfo &g, QFRDRColumn
         case QFRDRColumnGraphsInterface::cgtRGBImage:
             g.type=gtRGBImage;
             break;
+        case QFRDRColumnGraphsInterface::cgtBoxPlot:
+            g.type=gtBoxplotY;
+            break;
     }
 }
 
@@ -1600,6 +1603,7 @@ void QFRDRTable::readGraphInfo(GraphInfo& graph, QDomElement ge) {
     graph.functionType=String2GTFunctionType(ge.attribute("functiontype", "string"));
     graph.modifierMode=JKQTPMathImage::StringToModifierMode(ge.attribute("modifier_mode", "none"));
     graph.functionParameters=stringToDoubleArray_base64(ge.attribute("fparams", ""));
+    //graph.functionParameterErrors=stringToDoubleArray_base64(ge.attribute("ferrors", ""));
 
 
     graph.rangeStart=CQStringToDouble(ge.attribute("range_start", "0"));
@@ -1629,10 +1633,15 @@ void QFRDRTable::readGraphInfo(GraphInfo& graph, QDomElement ge) {
     QDomElement gmp=ge.firstChildElement("property");
     while (!gmp.isNull()) {
         QString name=gmp.attribute("name");
-        QString type=gmp.attribute("type");
-        QString value=gmp.text();
-        if (!name.isEmpty() && !type.isEmpty()) {
+        //QString type=gmp.attribute("type");
+        //QString value=gmp.text();
+        /*if (!name.isEmpty() && !type.isEmpty()) {
             graph.moreProperties[name]=getQVariantFromString(type, value);
+        }*/
+        QVariant value=readQVariant(gmp);
+        if (!name.isEmpty() && value.isValid()) {
+            //qDebug()<<name<<value;
+            graph.moreProperties[name]=value;
         }
         gmp=gmp.nextSiblingElement("property");
     }
@@ -1799,6 +1808,7 @@ void QFRDRTable::writeGraphInfo(QXmlStreamWriter &w, const QFRDRTable::GraphInfo
     w.writeAttribute("function", graph.function);
     w.writeAttribute("functiontype", GTFunctionType2String(graph.functionType));
     w.writeAttribute("fparams", doubleArrayToString_base64(graph.functionParameters));
+    //w.writeAttribute("ferrors", doubleArrayToString_base64(graph.functionParameterErrors));
     w.writeAttribute("stride", QString::number(graph.stride));
     w.writeAttribute("stride_start", QString::number(graph.strideStart));
     w.writeAttribute("is_strided", boolToQString(graph.isStrided));
@@ -1849,8 +1859,19 @@ void QFRDRTable::writeGraphInfo(QXmlStreamWriter &w, const QFRDRTable::GraphInfo
          mit.next();
          w.writeStartElement("property");
          w.writeAttribute("name", mit.key());
-         w.writeAttribute("type", getQVariantType(mit.value()));
-         w.writeCDATA(mit.value().toString());
+         writeQVariant(w, mit.value());
+         /*w.writeAttribute("type", getQVariantType(mit.value()));
+         if (mit.value().type()==QVariant::List) {
+             QVariantList vl=mit.value();
+             for (int j=0; j<vl.size(); vl++) {
+                 w.writeStartElement("list_item");
+                 const QVariant v=vl[j];
+                 w.writeAttribute("type", getQVariantType(v.value()));
+                 w.writeEndElement();
+             }
+         } else {
+            w.writeCDATA(mit.value().toString());
+         }*/
          w.writeEndElement();
     }
 
@@ -2085,7 +2106,7 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
     if (files.size()>0 && !getQFProperty("DONT_READWRITE_FILE", false).toBool()) {
         if (datamodel->hasChanged()) datamodel->saveCSV(files[0]);
     } else {
-        for (quint32 c=0; c<datamodel->columnCount(); c++) {
+        for (qint32 c=0; c<datamodel->columnCount(); c++) {
             w.writeStartElement("column");
             w.writeAttribute("title", datamodel->columnTitle(c));
             if (datamodel->hasColumnHeaderData(c, ColumnExpressionRole)) {
@@ -2102,7 +2123,7 @@ void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
 
                 }
             }
-            for (quint32 r=0; r<datamodel->rowCount(); r++) {
+            for (qint32 r=0; r<datamodel->rowCount(); r++) {
                 w.writeStartElement("row");
                 w.writeAttribute("type", getQVariantType(datamodel->cell(r, c)));
                 if (datamodel->cell(r, c).isValid()) {

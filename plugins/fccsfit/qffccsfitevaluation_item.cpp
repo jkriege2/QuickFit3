@@ -750,6 +750,7 @@ void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int
     if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
 
     restoreQFFitAlgorithmParameters(falg);
+    falg->readErrorEstimateParametersFit(this);
     falg->setReporter(dlgFitProgress);
 
     if (doLog) QFPluginLogTools::log_text(tr("setting up global fit for run %1 ... \n").arg(runname));

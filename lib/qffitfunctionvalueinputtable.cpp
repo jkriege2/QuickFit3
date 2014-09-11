@@ -50,6 +50,9 @@ QFFitFunctionValueInputTable::QFFitFunctionValueInputTable(QObject *parent) :
     errorIdx=-1;
     rangeIdx=-1;
     fixIdx=-1;
+    errorsUserEditable=true;
+    rangesUserEditable=true;
+    fixUserEditable=true;
 }
 
 QFFitFunctionValueInputTable::~QFFitFunctionValueInputTable()
@@ -127,6 +130,21 @@ void QFFitFunctionValueInputTable::setEditFix(bool editfix)
     rebuildModel();
 }
 
+void QFFitFunctionValueInputTable::setUserEditRanges(bool enabled)
+{
+    rangesUserEditable=enabled;
+}
+
+void QFFitFunctionValueInputTable::setUserEditErrors(bool enabled)
+{
+    errorsUserEditable=enabled;
+}
+
+void QFFitFunctionValueInputTable::setUserEditFix(bool enabled)
+{
+    fixUserEditable=enabled;
+}
+
 void QFFitFunctionValueInputTable::setAuxiliaryWriteTo(QVector<double> *errorvector, QVector<double> *minvector, QVector<double> *maxvector, QVector<bool> *fixvector)
 {
     this->errorvector=errorvector;
@@ -158,24 +176,24 @@ Qt::ItemFlags QFFitFunctionValueInputTable::flags(const QModelIndex &index) cons
             if (getParameterEditable(row)) f=f|Qt::ItemIsEditable;
         } else if (fitfunction && editfix && coli==fixIdx) {
             FitParam fp=fitparamids.value(row, FitParam());
-            if (fp.isValid() && fitfunction->hasParameter(fp.id) && fitfunction->getDescription(fp.id).fit) {
+            if (fp.isValid() && fitfunction->hasParameter(fp.id) && fitfunction->getDescription(fp.id).fit && fixUserEditable) {
                 f=f|Qt::ItemIsUserCheckable;
             }
-        } else if (editfix && coli==fixIdx) {
+        } else if (editfix && coli==fixIdx && fixUserEditable) {
             f=f|Qt::ItemIsUserCheckable;
         } else if (fitfunction && editerrors && coli==errorIdx) {
             FitParam fp=fitparamids.value(row, FitParam());
-            if (fp.isValid() && fitfunction->hasParameter(fp.id) && fitfunction->getDescription(fp.id).displayError==QFFitFunction::EditError) {
+            if (fp.isValid() && fitfunction->hasParameter(fp.id) && fitfunction->getDescription(fp.id).displayError==QFFitFunction::EditError && errorsUserEditable) {
                 f=f|Qt::ItemIsEditable;
             }
-        } else if (editerrors && coli==errorIdx) {
+        } else if (editerrors && coli==errorIdx && errorsUserEditable) {
             f=f|Qt::ItemIsEditable;
         } else if (fitfunction && editRanges && (coli==rangeIdx || coli==rangeIdx+1)) {
             FitParam fp=fitparamids.value(row, FitParam());
-            if (fp.isValid() && fitfunction->hasParameter(fp.id)) {
+            if (fp.isValid() && fitfunction->hasParameter(fp.id) && rangesUserEditable) {
                 f=f|Qt::ItemIsEditable;
             }
-        } else if (editRanges && (coli==rangeIdx || coli==rangeIdx+1)) {
+        } else if (editRanges && (coli==rangeIdx || coli==rangeIdx+1) && rangesUserEditable) {
             f=f|Qt::ItemIsEditable;
         }
     }
@@ -266,7 +284,7 @@ QVariant QFFitFunctionValueInputTable::data(const QModelIndex &index, int role) 
                             return wtErrorEdit;
                         }
                         return wtNone;
-                    } else if (role==Qt::BackgroundRole && desc.displayError!=QFFitFunction::EditError){
+                    } else if (role==Qt::BackgroundRole && (!errorsUserEditable || desc.displayError!=QFFitFunction::EditError)){
                         return QBrush(QApplication::palette().color(QPalette::Window));
                     }
                 } else if (role==widgetTypeRole) {
@@ -285,7 +303,7 @@ QVariant QFFitFunctionValueInputTable::data(const QModelIndex &index, int role) 
                             return wtRangeEditMin;
                         }
                         return wtNone;
-                    } else if (role==Qt::BackgroundRole && !desc.userRangeEditable){
+                    } else if (role==Qt::BackgroundRole && (!rangesUserEditable || !desc.userRangeEditable)){
                         return QBrush(QApplication::palette().color(QPalette::Window));
                     }
                 } else if (role==widgetTypeRole) {
@@ -304,7 +322,7 @@ QVariant QFFitFunctionValueInputTable::data(const QModelIndex &index, int role) 
                             return wtRangeEditMax;
                         }
                         return wtNone;
-                    } else if (role==Qt::BackgroundRole && !desc.userRangeEditable){
+                    } else if (role==Qt::BackgroundRole && (!rangesUserEditable || !desc.userRangeEditable)){
                         return QBrush(QApplication::palette().color(QPalette::Window));
                     }
                 } else if (role==widgetTypeRole) {
@@ -314,6 +332,8 @@ QVariant QFFitFunctionValueInputTable::data(const QModelIndex &index, int role) 
         } else if (coli==fixIdx && editfix) {
             if (role==Qt::CheckStateRole) {
                 return getParameterFix(row)?2:0;
+            } else if (role==Qt::BackgroundRole) {
+                if (!fixUserEditable) return QBrush(QApplication::palette().color(QPalette::Window));
             }
         }
     }
@@ -754,7 +774,9 @@ double QFFitFunctionValueInputTable::getParameterError(int row) const {
     if (item && fp.isValid()) {
         rangeval=item->getFitError(fp.id);
     } else {
+        //qDebug()<<"QFFitFunctionValueInputTable::getParameterError("<<row<<"): errorvector="<<errorvector<<" fp.num="<<fp.num;
         if (errorvector) {
+            //qDebug()<<"QFFitFunctionValueInputTable::getParameterError("<<row<<"):   errorvector.size()="<<errorvector->size()<<"   val@fp.num="<<errorvector->value(fp.num, rangeval);
             rangeval=errorvector->value(fp.num, rangeval);
         } else if (datamap && fp.isValid() && datamap->contains(fp.id)) {
             rangeval=(*datamap)[fp.id].error;

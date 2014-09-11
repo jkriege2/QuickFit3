@@ -611,7 +611,7 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                 } else {
                     int64_t emptyrecords=(int64_t)floor((t-fcsNextStoreInterval)/job.fcs_crbinning)+1;
                     //qDebug()<<emptyrecords;
-                    for (register uint64_t i=0; i<channels*emptyrecords; i++) {
+                    for (register int64_t i=0; i<(int64_t)channels*emptyrecords; i++) {
                         int cc=i%channels;
                         fcs_crs[xyAdressToUInt32(fcs_segment, cc)].append(fcs_storecountrate[cc]/job.fcs_crbinning/1000.0);
                         fcs_storecountrate[cc]=0;

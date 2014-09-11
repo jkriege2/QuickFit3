@@ -141,7 +141,8 @@ HEADERS += dlgnewproperty.h \
     qfwizard.h \
     qfhelptoolbutton.h \
     qfrdrrunselection.h \
-    qfrdrimagetoruninterface.h
+    qfrdrimagetoruninterface.h \
+    qffitalgorithmerrorestimatemodewidget.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -225,13 +226,15 @@ SOURCES += dlgnewproperty.cpp \
     qfdlgcsvparameters.cpp \
     qflibraryfitfunction.cpp \
     qfwizard.cpp \
-    qfhelptoolbutton.cpp
+    qfhelptoolbutton.cpp \
+    qffitalgorithmerrorestimatemodewidget.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \
     dlg_qfprogress.ui \
     dlg_qffileeditdialog.ui \
-    qfdlg_csvparameters.ui
+    qfdlg_csvparameters.ui \
+    qffitalgorithmerrorestimatemodewidget.ui
 
 RESOURCES += lib.qrc
 

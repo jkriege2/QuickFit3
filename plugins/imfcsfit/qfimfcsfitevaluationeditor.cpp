@@ -236,6 +236,15 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
     layAlgorithm->addWidget(cmbWeights);
     layAlgorithm->addStretch();
 
+    widFitErrorEstimate=new QFFitAlgorithmErrorEstimateModeWidget(this);
+    l=new QLabel(tr("&Error Estimation: "), this);
+    l->setBuddy(widFitErrorEstimate);
+    layAfterAlgorithm->addSpacing(32);
+    layAfterAlgorithm->addWidget(l);
+    layAfterAlgorithm->addWidget(widFitErrorEstimate);
+    layAfterAlgorithm->addStretch();
+
+
 
     spinRepeats=new QSpinBox(this);
     spinRepeats->setRange(1, 100);
@@ -283,6 +292,7 @@ void QFImFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEva
 
     if (old!=NULL) {
         disconnect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
+        disconnect(widFitErrorEstimate, SIGNAL(parametersChanged()), this, SLOT(errorEstimateModeChanged()));
     }
 
 
@@ -291,6 +301,8 @@ void QFImFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEva
 
         dataEventsEnabled=false;
         cmbWeights->setCurrentIndex(current->getProperty("weights", 0).toInt());
+        widFitErrorEstimate->readSettings(fcs);
+        spinRepeats->setValue(current->getProperty("FIT_REPEATS", 1).toInt());
         dataEventsEnabled=true;
 
         if (current->propertyExists("PRESET_FIT_MODEL")) {
@@ -302,6 +314,7 @@ void QFImFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEva
     }
 
     connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
+    connect(widFitErrorEstimate, SIGNAL(parametersChanged()), this, SLOT(errorEstimateModeChanged()));
 
     displayModel(true);
     replotData();
@@ -326,6 +339,7 @@ void QFImFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerReco
         dataEventsEnabled=false;
         cmbWeights->setCurrentWeight(eval->getFitDataWeighting());
         spinRepeats->setValue(current->getProperty("FIT_REPEATS", 1).toInt());
+        widFitErrorEstimate->readSettings(current);
         chkDontSaveFitResultMessage->setChecked(current->getProperty("dontSaveFitResultMessage", true).toBool());
         chkLeaveoutMasked->setChecked(current->getProperty("LEAVEOUTMASKED", true).toBool());
         pltOverview->setRDR(currentRecord);
@@ -1032,7 +1046,7 @@ void QFImFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     QTextTableFormat tableFormat;
     tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
     tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
-    QTextTable* table = cursor.insertTable(3, 4, tableFormat);
+    QTextTable* table = cursor.insertTable(4, 4, tableFormat);
     table->cellAt(0, 0).firstCursorPosition().insertText(tr("file:"), fTextBold);
     table->cellAt(0, 1).firstCursorPosition().insertText(record->getName(), fText);
     table->cellAt(0, 2).firstCursorPosition().insertText(tr("pixel:"), fTextBold);
@@ -1049,6 +1063,8 @@ void QFImFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     table->cellAt(2, 1).firstCursorPosition().insertText(ffunc->name(), fText);
     table->cellAt(2, 2).firstCursorPosition().insertText(tr("data weighting:"), fTextBold);
     table->cellAt(2, 3).firstCursorPosition().insertText(cmbWeights->currentText(), fText);
+    table->cellAt(3, 2).firstCursorPosition().insertText(tr("error estimates:"), fTextBold);
+    table->cellAt(3, 3).firstCursorPosition().insertText(widFitErrorEstimate->toString(), fText);
     cursor.movePosition(QTextCursor::End);
 
     cursor.insertBlock(); cursor.insertBlock();
@@ -1272,6 +1288,12 @@ void QFImFCSFitEvaluationEditor::setFitParameterFromFile()
         }
         if (d) free(d);
     }
+}
+
+void QFImFCSFitEvaluationEditor::errorEstimateModeChanged()
+{
+    if (!current) return;
+    widFitErrorEstimate->saveSettings(current);
 }
 
 

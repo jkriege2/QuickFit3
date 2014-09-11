@@ -84,7 +84,7 @@ void QFRDRImageMaskTools::maskLoadFromListString(const QString& maskstring, QCha
         //qDebug()<<"maskLoadFromListString: "<<d;
         if (d.size()==2) {
             int idx=d[1]*mask_w+d[0];
-            if (idx>=0 && idx<mask_h*mask_w) mask[idx]=true;
+            if (idx>=0 && (uint64_t)idx<mask_h*mask_w) mask[idx]=true;
         }
     }
 

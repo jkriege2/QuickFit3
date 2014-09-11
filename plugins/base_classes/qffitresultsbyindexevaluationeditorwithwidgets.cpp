@@ -101,6 +101,11 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
     vbl->addLayout(layAlgorithm);
 
+    layAfterAlgorithm=new QHBoxLayout();
+    layAfterAlgorithm->setContentsMargins(0,0,0,0);
+    vbl->addLayout(layAfterAlgorithm);
+
+
 
     layModel=new QHBoxLayout();
     layModel->setContentsMargins(0,0,0,0);
@@ -119,6 +124,10 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     layModel->addWidget(btnModelHelp);
     layModel->addStretch();
     vbl->addLayout(layModel);
+
+    layAfterModel=new QHBoxLayout();
+    layAfterModel->setContentsMargins(0,0,0,0);
+    vbl->addLayout(layAfterModel);
 
 
     /*QFrame* frame=new QFrame(this);

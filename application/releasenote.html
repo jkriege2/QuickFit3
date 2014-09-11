@@ -102,6 +102,8 @@
             <li>QFImporters can now return properties from the file</li>
             <li>added possible init()/deinit() methods to fit function, fit algorithm and importer plugins</li>
             <li>evaluation editors|results table: added checkboxes, which allows to show an additional column with the run/index/pixel of the result and a checkbox, which allows to hide all removed runs/indices/pixels</li>
+            <li>FFitAlgorithm now supports error estimates via bootstrapping, in fit()</li>
+            <li>added help page, which displays all registeres tooltips and autolinks</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -115,12 +117,14 @@
             <li>added button "go to average run" to overview image</li>
             <li>added function to load/store custom global fit settings</li>
             <li>added example project for directed motion/flow</li>
+            <li>new: added error estimation, using bootstrapping to curve fit (in plots)</li>
           </ul></li>
           <li><b>FCCSFit</b><ul>
             <li>fit parameter names are more expressive now</li>
             <li>bugfix: fixed possible crash, when trying to select anew fit model</li>
             <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
             <li>added function to load/store custom global fit settings</li>
+            <li>new: added error estimation, using bootstrapping to curve fit (in plots)</li>
             <li></li>
           </ul></li>
           <li><b>General fit functions</b><ul>
@@ -144,12 +148,12 @@
             <li>added fit function for 2D normal diffusion with different molecular brightnesses</li>
           </ul></li>
           <li><b>DLS fit functions</b><ul>
-          <li>added fit functions for normal distribution of correlation times, which calculate the integral with numeric integration (improved accuracy over the old implementation with a sum!)</li>
-          <li>added fit functions for log-normal distribution of correlation times, which calculate the integral with numeric integration (improved accuracy over the old implementation with a sum!)</li>
+            <li>added fit functions for normal distribution of correlation times, which calculate the integral with numeric integration (improved accuracy over the old implementation with a sum!)</li>
+            <li>added fit functions for log-normal distribution of correlation times, which calculate the integral with numeric integration (improved accuracy over the old implementation with a sum!)</li>
           </ul></li>
           <li><b>FCS fit functions with parameter distributions</b><ul>
-          <li>added fit functions for normal distribution, which calculate the integral with numeric integration (improved accuracy over the old implementation with a sum!)</li>
-          <li>added fit functions for log-normal distribution, which calculate the integral with numeric integration (improved accuracy over the old implementation with a sum!)</li>
+            <li>added fit functions for normal distribution, which calculate the integral with numeric integration (improved accuracy over the old implementation with a sum!)</li>
+            <li>added fit functions for log-normal distribution, which calculate the integral with numeric integration (improved accuracy over the old implementation with a sum!)</li>
           </ul></li>
           <li><b>2-focus FCCS fit functions</b><ul>
             <li>added fit functions for 2D diffusion and 2D diffusion+flow</li>
@@ -190,6 +194,8 @@
             <li>masks now work when using post-processing binning</li>
             <li>histograms now support a relaxed auto-ranging</li>
             <li>parameter correlation now supports a relaxed auto-ranging</li>
+            <li>parameter histograms now support a relaxed auto-ranging</li>
+            <li>parameter histograms now support a distribution fit to the histogram</li>
             <li></li>
             <li></li>
           </ul></li>
@@ -233,8 +239,8 @@
             <li>graph settings are now shown inside a scroll-area, if required</li>
             <li>bugfix: error is now displayed correctly in curve fit dialog</li>
             <li>new: a table can be made editable with an entry in the menu of the table RDR editor</li>
-            <li></li>
-            <li></li>
+            <li>new: added error estimation, using bootstrapping to curve fit (in plots)</li>
+            <li>bugfix: all fit properties (including errors) are now saved properly and fit parameter errors are displayed, in the graph editor of the fit function</li>
             <li></li>
       </ul></li>
       <li><b>B040SPIM</b><ul>
@@ -256,6 +262,7 @@
             <li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
             <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
             <li>bugfix: weights combo-box is correctly initialized, when starting the editor</li>
+            <li>new: added error estimation, using bootstrapping to curve fit (in plots)</li>
           </ul></li>
       <li><b>FCS</b><ul>
             <li>fixed a possible freeze of QF3, if ACF-data is imported from CSV files and no countrate-trace is provided!</li>
@@ -279,8 +286,7 @@
             <li>added overlay plot feater ("Tools|Overlay plot" menu)</li>
             <li>"set fit result from RDR/file/..." now supports image transfroms to perform a limited set of image processing operations (bluring, ...)</li>
             <li>bugfix: weights combo-box is correctly initialized, when starting the editor</li>
-            <li>parameter histograms now support a relaxed auto-ranging</li>
-            <li>parameter histograms now support a distribution fit to the histogram</li>
+            <li>new: added error estimation, using bootstrapping to curve fit (in plots)</li>
           </ul></li>
       <li><b>Online-Help editor</b><ul>
             <li>added several buttons for advanced insert/editing functions</li>

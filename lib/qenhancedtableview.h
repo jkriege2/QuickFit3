@@ -104,6 +104,9 @@ class QFLIB_EXPORT QEnhancedTableView : public QTableView {
         QAction* actSaveFlipped;
         QAction* actSaveExtendedFlipped;
         QMenu* menuSave;
+        QMenu* menuCopyCSV;
+        QMenu* menuCopyExcel;
+        QMenu* menuCopyMatlab;
         bool noCopyShortcut;
 };
 

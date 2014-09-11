@@ -99,7 +99,7 @@ void QFPRDRFCS::setBackgroundInFCS(const QVector<double> &backgrounds, const QVe
     tab->setReadonly(false);
     tab->clear();
     tab->setUndoEnabled(false);
-    for (unsigned int i=0; i<qMax(2, backgrounds.size()); i++) {
+    for (int i=0; i<qMax(2, backgrounds.size()); i++) {
         tab->setCellCreate(i, 0, backgrounds.value(i, 0.0));
         tab->setCellCreate(i, 1, background_sds.value(i, 0.0));
         tab->setCellCheckedRoleCreate(i, 2, background_set.value(i, true)?(Qt::Checked):(Qt::Unchecked));

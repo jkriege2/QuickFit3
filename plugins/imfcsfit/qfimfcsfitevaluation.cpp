@@ -226,6 +226,7 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
     int fitrepeats=qBound(1,getProperty("FIT_REPEATS", 1).toInt(),1000);
 
     restoreQFFitAlgorithmParameters(falg);
+    falg->readErrorEstimateParametersFit(this);
 
     //QFImFCSFitEvaluation::DataWeight weighting=getFitDataWeighting();
 
@@ -746,6 +747,7 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
     int fitrepeats=qBound(1,getProperty("FIT_REPEATS", 1).toInt(),1000);
 
     restoreQFFitAlgorithmParameters(falg);
+    falg->readErrorEstimateParametersFit(this);
 
 
     if (data->getCorrelationN()>0) {
@@ -1259,7 +1261,7 @@ void QFImFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFi
                 fm.evaluate(d, pm);
 
                 double chi2=0;
-                for (int i=0; i<fm.get_evalout(); i++)  {
+                for (uint64_t i=0; i<fm.get_evalout(); i++)  {
                     chi2=chi2+qfSqr(d[i]);
                 }
                 chi2Landscape[idx]=chi2;

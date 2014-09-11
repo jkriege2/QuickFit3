@@ -297,6 +297,7 @@ void QFFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEval
         disconnect(ui->datacut, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersChanged(int, int, int, int)));
         disconnect(item_old->getParameterInputTableModel(), SIGNAL(fitParamChanged()), this, SLOT(displayEvaluation()));
         disconnect(item_old->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(setParameterTableSpans()));
+        disconnect(ui->widFitErrorEstimate, SIGNAL(parametersChanged()), this, SLOT(errorEstimateModeChanged()));
     }
 
 
@@ -312,7 +313,7 @@ void QFFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEval
         ui->chkKey->setChecked(item->getProperty("FCCSFit/key", true).toBool());
         ui->chkSaveStrings->setChecked(!item->getProperty("dontSaveFitResultMessage", true).toBool());
         ui->lstFileSets->setModel(item->getFileSetsModel());
-
+        ui->widFitErrorEstimate->readSettings(item);
         ui->tableView->setModel(item->getParameterInputTableModel());
         connect(item->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(ensureCorrectParamaterModelDisplay()));
         setParameterTableSpans();
@@ -325,6 +326,7 @@ void QFFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEval
         connect(item->getParameterInputTableModel(), SIGNAL(fitParamChanged()), this, SLOT(displayEvaluation()));
         connect(ui->lstFileSets, SIGNAL(clicked(QModelIndex)), this, SLOT(filesSetActivated(QModelIndex)));
         connect(item->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(setParameterTableSpans()));
+        connect(ui->widFitErrorEstimate, SIGNAL(parametersChanged()), this, SLOT(errorEstimateModeChanged()));
         ui->pltOverview->setRDR(item->getFitFile(0));
         updatingData=false;
     }
@@ -1592,6 +1594,14 @@ void QFFCCSFitEvaluationEditor::buildGlobalConfigs(QFFCCSFitEvaluationItem *curr
         }
     }
 }
+
+void QFFCCSFitEvaluationEditor::errorEstimateModeChanged()
+{
+    if (!current) return;
+    ui->widFitErrorEstimate->saveSettings(current);
+}
+
+
 
 
 void QFFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {

@@ -708,7 +708,7 @@ void QFRDRTableRegressionDialog::intInit(QFRDRTable *table, int colX, int colY, 
     ui->cmbSaveColumn->clear();
     ui->cmbSaveColumn->addItem(tr("--- no ---"));
     ui->cmbSaveColumn->addItem(tr("--- add new column ---"));
-    for (unsigned int i=0; i<table->colgraphGetPlotCount(); i++) {
+    for ( int i=0; i<table->colgraphGetPlotCount(); i++) {
         ui->cmbSaveColumn->addItem(tr("save to column %1 [%2]").arg(i+1).arg(table->tableGetColumnTitle(i)));
     }
 

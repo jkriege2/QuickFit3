@@ -175,6 +175,7 @@ void QFTableGraphSettings::rawDataChanged()
 
     //connectWidgets();
     //updateGraph();
+    cmbFunctionTypeCurrentIndexChanged(ui->cmbFunctionType->currentIndex());
 }
 
 void QFTableGraphSettings::readSettings(QSettings &settings, const QString &prefix)
@@ -455,6 +456,27 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
         ui->cmbQFFitFunction->setCurrentFitFunction(graph.function);
     }
     fitfuncValues=graph.functionParameters;
+    fitfuncErrors.clear();
+    if (graph.moreProperties.contains("FIT_ERRORPARAMS")) {
+        QList<QVariant> el=graph.moreProperties["FIT_ERRORPARAMS"].toList();
+        //qDebug()<<"FIT_ERRORPARAMS="<<graph.moreProperties["FIT_ERRORPARAMS"];
+        //qDebug()<<"FIT_ERRORPARAMS.toList="<<el;
+        //qDebug()<<"fitfuncValues="<<fitfuncValues;
+        //qDebug()<<"FIT_ERRORPARAMS.size="<<el.size()<<"   fitfuncValues.size()="<<fitfuncValues.size();
+        if (el.size()==fitfuncValues.size()) {
+            for (int i=0; i<fitfuncValues.size(); i++) {
+                bool ok=false;
+                fitfuncErrors.append(el[i].toDouble(&ok));
+                if (!ok) {
+                    fitfuncErrors.clear();
+                    //qDebug()<<"   !!! NOT OK AT "<<i;
+                    break;
+                }
+            }
+            //qDebug()<<"fitfuncErrors="<<fitfuncErrors;
+        }
+    }
+    cmbFunctionTypeCurrentIndexChanged(ui->cmbFunctionType->currentIndex());
     ui->tabFunctionParameters->resizeColumnsToContents();
     ui->tabFunctionParameters->resizeRowsToContents();
 
@@ -1615,8 +1637,10 @@ void QFTableGraphSettings::on_btnClearLinesQ75_clicked()
 
 void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
 {
+
     if (ui->cmbFunctionType->currentIndex()==0) {
         fitfuncValuesTable->setWriteTo(&fitfuncValuesDummy, QStringList());
+        fitfuncValuesTable->setAuxiliaryWriteTo(&fitfuncValuesDummy, NULL, NULL, NULL);
     } else if (ui->cmbFunctionType->currentIndex()==1) {
         int vsize=11;
         if (fitfuncValues.size()>vsize) fitfuncValues.remove(fitfuncValues.size()-(fitfuncValues.size()-vsize), fitfuncValues.size()-vsize);
@@ -1627,6 +1651,10 @@ void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
             pn.append(tr("p%1").arg(i+1));
         }
         fitfuncValuesTable->setWriteTo(&fitfuncValues, pn);
+        //qDebug()<<"1: fitfuncErrors.size()="<<fitfuncErrors.size()<<"   fitfuncValues.size()="<<fitfuncValues.size();
+        if (fitfuncErrors.size()==fitfuncValues.size()) {
+            fitfuncValuesTable->setAuxiliaryWriteTo(&fitfuncErrors, NULL, NULL, NULL);
+        }
     } else if (ui->cmbFunctionType->currentIndex()==2) {
         int vsize=3;
         if (fitfuncValues.size()>vsize) fitfuncValues.remove(fitfuncValues.size()-(fitfuncValues.size()-vsize), fitfuncValues.size()-vsize);
@@ -1634,6 +1662,11 @@ void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
         QStringList pn;
         pn<<tr("offset")<<tr("amplitude")<<tr("exponent_div");
         fitfuncValuesTable->setWriteTo(&fitfuncValues, pn);
+        //qDebug()<<"2: fitfuncErrors.size()="<<fitfuncErrors.size()<<"   fitfuncValues.size()="<<fitfuncValues.size();
+        if (fitfuncErrors.size()==fitfuncValues.size()) {
+            fitfuncValuesTable->setAuxiliaryWriteTo(&fitfuncErrors, NULL, NULL, NULL);
+        }
+
     } else if (ui->cmbFunctionType->currentIndex()==3) {
         int vsize=3;
         if (fitfuncValues.size()>vsize) {
@@ -1644,6 +1677,11 @@ void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
         QStringList pn;
         pn<<tr("offset")<<tr("amplitude")<<tr("exponent");
         fitfuncValuesTable->setWriteTo(&fitfuncValues, pn);
+        //qDebug()<<"3: fitfuncErrors.size()="<<fitfuncErrors.size()<<"   fitfuncValues.size()="<<fitfuncValues.size();
+        if (fitfuncErrors.size()==fitfuncValues.size()) {
+            fitfuncValuesTable->setAuxiliaryWriteTo(&fitfuncErrors, NULL, NULL, NULL);
+        }
+
     } else if (ui->cmbFunctionType->currentIndex()==4) {
         QFFitFunction* ff(ui->cmbQFFitFunction->createCurrentInstance(fitfuncValuesTable));
         //fitfuncValues.clear();
@@ -1657,7 +1695,14 @@ void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
             }
         }
         fitfuncValuesTable->setWriteTo(&fitfuncValues, ff, true);
+        //qDebug()<<"4: fitfuncErrors.size()="<<fitfuncErrors.size()<<"   fitfuncValues.size()="<<fitfuncValues.size();
+        if (fitfuncErrors.size()==fitfuncValues.size()) {
+            fitfuncValuesTable->setAuxiliaryWriteTo(&fitfuncErrors, NULL, NULL, NULL);
+        }
+
     }
+    fitfuncValuesTable->setEditErrors(true);
+    fitfuncValuesTable->setUserEditErrors(false);
     updatePlotWidgetVisibility();
     writeGraphData();
 }

@@ -298,6 +298,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         disconnect(ui->datacut, SIGNAL(slidersChanged(int, int, int, int)), this, SLOT(slidersChanged(int, int, int, int)));
         disconnect(item_old->getParameterInputTableModel(), SIGNAL(fitParamChanged()), this, SLOT(displayEvaluation()));
         disconnect(item_old->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(setParameterTableSpans()));
+        disconnect(ui->widFitErrorEstimate, SIGNAL(parametersChanged()), this, SLOT(errorEstimateModeChanged()));
     }
 
 
@@ -322,6 +323,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
             ui->lstFileSets->setCurrentIndex(ui->lstFileSets->model()->index(0,0));
             filesSetActivated(ui->lstFileSets->currentIndex());
         }
+        ui->widFitErrorEstimate->readSettings(item);
 
         ui->tableView->setModel(item->getParameterInputTableModel());
         connect(item->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(ensureCorrectParamaterModelDisplay()));
@@ -335,6 +337,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         connect(item->getParameterInputTableModel(), SIGNAL(fitParamChanged()), this, SLOT(displayEvaluation()));
         connect(ui->lstFileSets, SIGNAL(clicked(QModelIndex)), this, SLOT(filesSetActivated(QModelIndex)));
         connect(item->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(setParameterTableSpans()));
+        connect(ui->widFitErrorEstimate, SIGNAL(parametersChanged()), this, SLOT(errorEstimateModeChanged()));
         QFRawDataRecord* ovr=item->getFitFile(0);
         for (int i=0; i<item->getFitFileCount(); i++) {
             QFRawDataRecord* r=item->getFitFile(i);
@@ -1661,6 +1664,11 @@ void QFImFCCSFitEvaluationEditor::saveGlobalFitConfig()
     }
 }
 
+void QFImFCCSFitEvaluationEditor::errorEstimateModeChanged()
+{
+    if (!current) return;
+    ui->widFitErrorEstimate->saveSettings(current);
+}
 
 
 void QFImFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {

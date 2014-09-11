@@ -1,0 +1,20 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>QuickFit $$version$$: Fit: Error Estimation Methods</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+     <p>QuickFit provides internal means to estimate the parameter errors during a fit:
+	 <ul>
+	   <li><strong>By the fit algorithm:</strong> In this mode, the errors are estimated by the fit algorithm directly. This is implemented only in some fit algorithms, such as <a href="$$plugin_info:help:fit_levmar$$">LevMar Plugin</a></li>
+	   <li><strong>Bootstrapping</strong> is a statistical method, which allows to estimate errors for the parameters in a parameter fit, even if no assumptions about the distribution of the fit parameters can be made, or if a fit algorithm does not provide estimates of the parameter errors. <br>The method first fits the full dataset <i>(x_i, y_i), i=1...N</i> of input data to obtain the fit parameters. Then the fit is repeated <i>M</i> (usually around 20, parameter: REPEATS) times, where each time a new subset of <i>N&times;FRACTION&lt;N</i> datapoints is selected randomly from the full dataset. Also the start parameters for each fit are slightly distorted (parameter DISTORTION). Finally the standard deviation of the fit results is calculated for each parameter from the <i>M</i> fits.
+	   $$note:Although this method gives good estimates for the fit parameter errors, it requires a significant amount of time, due to the repeted fits.$$</li>
+	 </ul>
+	 </p>
+
+	 
+  </body>
+</html>
+

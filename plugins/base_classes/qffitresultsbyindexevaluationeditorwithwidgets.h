@@ -106,7 +106,9 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QFFitFunctionComboBox* cmbModel;
 
         QHBoxLayout* layAlgorithm;
+        QHBoxLayout* layAfterAlgorithm;
         QHBoxLayout* layModel;
+        QHBoxLayout* layAfterModel;
 
         /** \brief ploter for the data&curves */
         QFPlotter* pltData;

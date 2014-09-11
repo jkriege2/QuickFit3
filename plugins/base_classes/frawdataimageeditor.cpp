@@ -270,7 +270,7 @@ void FRawDataImageEditor::readParameterImage(double *image, uint32_t width, uint
             int grpIdx=rdr->resultsGetEvaluationGroupIndex(en);
             int x=m->runToX(grpIdx);
             int y=m->runToY(grpIdx);
-            if (x>=0 && x<width && y>=0 && y<height) {
+            if (x>=0 && x<(int64_t)width && y>=0 && y<(int64_t)height) {
                 if (rdr->resultsExists(en, fitParam)) {
                     image[y*width+x]=rdr->resultsGetAsDouble(en, fitParam);
                 }
@@ -287,24 +287,24 @@ void FRawDataImageEditor::transformImage(double *image, uint32_t width, uint32_t
 {
     switch(tranFitParam) {
         case FRawDataImageEditor::itAbs: {
-                for (int32_t i=0; i<width*height; i++) {
+                for (uint64_t i=0; i<width*height; i++) {
                     image[i]=fabs(image[i]);
                 }
             } break;
         case FRawDataImageEditor::itLog: {
-                for (int32_t i=0; i<width*height; i++) {
+                for (uint64_t i=0; i<width*height; i++) {
                     if (image[i]>0) image[i]=log(image[i])/log(10.0);
                     else  image[i]=NAN;
                 }
             } break;
         case FRawDataImageEditor::itReciprocal: {
-                for (int32_t i=0; i<width*height; i++) {
+                for (uint64_t i=0; i<width*height; i++) {
                     if (image[i]!=0) image[i]=1.0/image[i];
                     else  image[i]=NAN;
                 }
             } break;
         case FRawDataImageEditor::itSqrt: {
-                for (int32_t i=0; i<width*height; i++) {
+                for (uint64_t i=0; i<width*height; i++) {
                     if (image[i]>=0) image[i]=sqrt(image[i]);
                     else  image[i]=NAN;
                 }

@@ -74,6 +74,14 @@ void QFFCSFitEvaluationEditor::createWidgets() {
     layAlgorithm->addWidget(cmbWeights);
     layAlgorithm->addStretch();
 
+    widFitErrorEstimate=new QFFitAlgorithmErrorEstimateModeWidget(this);
+    l=new QLabel(tr("&Error Estimation: "), this);
+    l->setBuddy(widFitErrorEstimate);
+    layAfterAlgorithm->addSpacing(32);
+    layAfterAlgorithm->addWidget(l);
+    layAfterAlgorithm->addWidget(widFitErrorEstimate);
+    layAfterAlgorithm->addStretch();
+
     btnCalibrateFocalVolume=createButtonAndActionShowText(actCalibrateFocalVolume, QIcon(":/fcsfit/focalvolume.png"), tr("Focal &Volume"), this);
     actCalibrateFocalVolume->setToolTip(tr("estimate the focal volume from a given concentration or diffusion coefficient"));
     layButtons->addWidget(btnCalibrateFocalVolume, 8, 0);
@@ -104,6 +112,7 @@ void QFFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
 
     if (old!=NULL) {
         disconnect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
+        disconnect(widFitErrorEstimate, SIGNAL(parametersChanged()), this, SLOT(errorEstimateModeChanged()));
     }
 
 
@@ -112,6 +121,7 @@ void QFFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
 
         dataEventsEnabled=false;
         cmbWeights->setCurrentIndex(current->getProperty("weights", 0).toInt());
+        widFitErrorEstimate->readSettings(fcs);
         spinRepeats->setValue(current->getProperty("FIT_REPEATS", 1).toInt());
         dataEventsEnabled=true;
         if (current->propertyExists("PRESET_FIT_MODEL")) {
@@ -121,6 +131,7 @@ void QFFCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
     }
 
     connect(cmbWeights, SIGNAL(currentIndexChanged(int)), this, SLOT(weightsChanged(int)));
+    connect(widFitErrorEstimate, SIGNAL(parametersChanged()), this, SLOT(errorEstimateModeChanged()));
 
     displayModel(true);
     replotData();
@@ -138,12 +149,13 @@ void QFFCSFitEvaluationEditor::writeSettings() {
 }
 
 void QFFCSFitEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
-    qDebug()<<"### highlightingChanged("<<formerRecord<<currentRecord<<")";
+    //qDebug()<<"### highlightingChanged("<<formerRecord<<currentRecord<<")";
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);
     if (eval) {
         dataEventsEnabled=false;
-        qDebug()<<"highlightingChanged "<<eval->getFitDataWeighting();
+        //qDebug()<<"highlightingChanged "<<eval->getFitDataWeighting();
         cmbWeights->setCurrentWeight(eval->getFitDataWeighting());
+        widFitErrorEstimate->readSettings(current);
         dataEventsEnabled=true;
     }
     QFFitResultsByIndexEvaluationEditorWithWidgets::highlightingChanged(formerRecord, currentRecord);
@@ -589,6 +601,12 @@ void QFFCSFitEvaluationEditor::repeatsChanged(int r)
     if (!current) return;
     current->setQFProperty("FIT_REPEATS", r, false, false);
 
+}
+
+void QFFCSFitEvaluationEditor::errorEstimateModeChanged()
+{
+    if (!current) return;
+    widFitErrorEstimate->saveSettings(current);
 }
 
 
@@ -1238,7 +1256,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     QTextTableFormat tableFormat;
     tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
     tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
-    QTextTable* table = cursor.insertTable(3, 4, tableFormat);
+    QTextTable* table = cursor.insertTable(4, 4, tableFormat);
     table->cellAt(0, 0).firstCursorPosition().insertText(tr("file:"), fTextBold);
     table->cellAt(0, 1).firstCursorPosition().insertText(record->getName(), fText);
     table->cellAt(0, 2).firstCursorPosition().insertText(tr("run:"), fTextBold);
@@ -1251,6 +1269,8 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
     table->cellAt(2, 1).firstCursorPosition().insertText(ffunc->name(), fText);
     table->cellAt(2, 2).firstCursorPosition().insertText(tr("data weighting:"), fTextBold);
     table->cellAt(2, 3).firstCursorPosition().insertText(cmbWeights->currentText(), fText);
+    table->cellAt(2, 2).firstCursorPosition().insertText(tr("error estimates:"), fTextBold);
+    table->cellAt(2, 3).firstCursorPosition().insertText(widFitErrorEstimate->toString(), fText);
     cursor.movePosition(QTextCursor::End);
 
     cursor.insertBlock(); cursor.insertBlock();

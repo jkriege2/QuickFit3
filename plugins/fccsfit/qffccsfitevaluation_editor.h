@@ -220,6 +220,7 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void guessFromCurrentFileSet();
 
 
+        void errorEstimateModeChanged();
 };
 
 #endif // QFFCCSFITEVALUATIONEDITOR_H

@@ -29,6 +29,7 @@
 #include <stdint.h>
 #include <QSettings>
 #include <QWidget>
+#include <QDomDocument>
 #include <QSplitter>
 #include <QFile>
 #include "lib_imexport.h"
@@ -41,7 +42,7 @@
 #include <QListWidget>
 #include "qtriple.h"
 #include "qfpluginservices.h"
-
+#include <QXmlStreamWriter>
 #include <QBitArray>
 
 /*! \brief QuickFit's internal malloc replacement (on some systems, this does a boundary-aligned malloc)
@@ -203,6 +204,23 @@ QFLIB_EXPORT void loadSplitter(QSettings& settings, QSplitter* splitter, QString
     \return a string describing the type of \a variant
 */
 QFLIB_EXPORT QString getQVariantType(const QVariant& variant);
+
+
+/*! \brief writes a QVariant into XML (value as text and type as type-parameter, encodes lists)
+    \ingroup qf3lib_tools
+
+    \note before calling this, you have to start an element using w.writeStartElement() and after this finishes, you have to call w.writeEndElement()
+*/
+QFLIB_EXPORT void writeQVariant(QXmlStreamWriter& w, const QVariant& variant);
+
+/*! \brief read a QVariant from an XML node (value as text and type as type-parameter, encoded lists)
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QVariant readQVariant(QDomElement& e);
+
+
+
 
 /*! \brief outputs a string encoding the contents of a QVariant
     \ingroup qf3lib_tools
@@ -1433,7 +1451,8 @@ QList<T> qfUniqueApplyFunction2I(const QList<T>& input, const QVector<T>& inputY
 /*! \brief group the data in \a input and \a inputY according to the labels given in \a index. Then return a vector where the function \a func is applied to every vector of values from \a input and \a inputY, which all have the same index in \a index.
     \ingroup qf3lib_tools
 
- */template <typename T, typename TIDX, typename TFUNC>
+ */
+template <typename T, typename TIDX, typename TFUNC>
 QVector<T> qfUniqueApplyFunction2I(const QVector<T>& input, const QVector<T>& inputY, const QList<TIDX>& index, TFUNC func) {
     QVector<T> res;
     QMap<TIDX, QPair<QVector<T> , QVector<T> > > dataset;
@@ -1470,6 +1489,76 @@ QFLIB_EXPORT void parseTooltips(const QString& directory, QMap<QString, QFToolTi
 QFLIB_EXPORT void parseAutolinks(const QString& directory, QMap<QString, QString>& autolinks);
 
 QFLIB_EXPORT void parseGlobalreplaces(const QString& directory);
+
+/*! \brief return a shuffled version of a given vector
+    \ingroup qf3lib_tools
+
+*/
+template <typename T>
+QVector<T> qfShuffledVector(const QVector<T>& value) {
+    std::vector<T> mm=value.toStdVector();
+    std::random_shuffle( mm.begin(), mm.end() );
+    return QVector<T>::fromStdVector(mm);
+}
+
+/*! \brief return a shuffled version of a given list
+    \ingroup qf3lib_tools
+
+*/
+template <typename T>
+QList<T> qfShuffledVector(const QList<T>& value) {
+   std::vector<T> mm;
+   mm.resize(value.size());
+   for (int i=0; i<value.size(); i++) {
+       mm[i]=value[i];
+   }
+   std::random_shuffle( mm.begin(), mm.end() );
+
+   QList<T> ret;
+   ret.reserve(mm.size());
+   for (size_t i=0; i<mm.size(); i++) {
+       ret.append(mm[i]);
+   }
+   return ret;
+}
+
+/*! \brief shuffle a given list
+    \ingroup qf3lib_tools
+
+*/
+template <typename T>
+void qfShuffleInplace(QList<T>& value) {
+   std::vector<T> mm;
+   mm.resize(value.size());
+   for (int i=0; i<value.size(); i++) {
+       mm[i]=value[i];
+   }
+   std::random_shuffle( mm.begin(), mm.end() );
+
+   for (size_t i=0; i<mm.size(); i++) {
+       value[i]=mm[i];
+   }
+}
+
+/*! \brief shuffle a given list
+    \ingroup qf3lib_tools
+
+*/
+template <typename T>
+void qfShuffleInplace(QVector<T>& value) {
+   std::vector<T> mm;
+   mm.resize(value.size());
+   for (int i=0; i<value.size(); i++) {
+       mm[i]=value[i];
+   }
+   std::random_shuffle( mm.begin(), mm.end() );
+
+   for (size_t i=0; i<mm.size(); i++) {
+       value[i]=mm[i];
+   }
+}
+
+
 #endif // QFTOOLS_H
 
 

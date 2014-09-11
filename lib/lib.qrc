@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file alias="lib/print.png">../images/16x16/document_print.png</file>
         <file alias="lib/save16.png">../images/16x16/filesave.png</file>
+        <file alias="lib/savedata_flipped.png">icons/savedata.png</file>
         <file alias="lib/refresh16.png">../images/16x16/reload.png</file>
         <file alias="lib/prop_add.png">icons/list_add.png</file>
         <file alias="lib/prop_delete.png">icons/list_remove.png</file>
@@ -85,6 +86,11 @@
         <file alias="result_statistics_compare.png">icons/result_statistics_compare.png</file>
         <file alias="result_statistics_icon.png">icons/result_statistics_icon.png</file>
         <file alias="copy16_matlab.png">icons/copy16_matlab.png</file>
+        <file alias="copy16_excel.png">icons/copy16_excel.png</file>
+        <file alias="copy16_csv.png">icons/copy16_csv.png</file>
+        <file alias="copy16_image.png">icons/copy16_image.png</file>
+        <file alias="copy16_excel_nohead.png">icons/copy16_excel_nohead.png</file>
+        <file alias="copy16_csv_nohead.png">icons/copy16_csv_nohead.png</file>
         <file alias="report_bug.png">icons/tools_report_bug.png</file>
         <file alias="wizard.png">icons/tools_wizard.png</file>
         <file alias="save_all.png">icons/save_all.png</file>

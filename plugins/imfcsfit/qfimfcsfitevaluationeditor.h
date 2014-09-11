@@ -62,6 +62,7 @@
 #include "dlgqfprogressdialog.h"
 #include "qffcsweightingtools.h"
 #include "qfrdrimagetorunpreview.h"
+#include "qffitalgorithmerrorestimatemodewidget.h"
 
 
 /*! \brief editor class for imaging FCS least-square fits
@@ -115,6 +116,8 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
 
         QAction* actSetParameterFromFile;
 
+        QFFitAlgorithmErrorEstimateModeWidget* widFitErrorEstimate;
+
 
 
 
@@ -127,6 +130,8 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
 
     protected slots:
         void setFitParameterFromFile();
+
+        void errorEstimateModeChanged();
 
         /** \brief display all data and parameters describing the current record */
         virtual void displayModel(bool newWidget);

@@ -85,6 +85,7 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
         void setShowVectorMatrixAvg(bool show);
         void setExtractIndexes(bool enabled);
         void setRemoveUnusedIndexes(bool enabled);
+        void setMinUnusedIndexesForStatistics(bool enabled);
     protected:
         QFEvaluationItem* evaluation;
         QString evalFilter;
@@ -113,6 +114,7 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
 
         bool extractRuns;
         bool removeUnusedRuns;
+        bool mindRunsForVectorStat;
 };
 
 #endif // QFEVALUATIONRESULTSMODEL_H

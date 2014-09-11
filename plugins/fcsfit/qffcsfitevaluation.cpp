@@ -156,6 +156,7 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
     int fitrepeats=qBound(1,getProperty("FIT_REPEATS", 1).toInt(),1000);
 
     restoreQFFitAlgorithmParameters(falg);
+    falg->readErrorEstimateParametersFit(this);
 
     //QFFCSFitEvaluation::DataWeight weighting=getFitDataWeighting();
 
@@ -535,6 +536,7 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
     int fitrepeats=qBound(1,getProperty("FIT_REPEATS", 1).toInt(),1000);
 
     restoreQFFitAlgorithmParameters(falg);
+    falg->readErrorEstimateParametersFit(this);
 
 
     if (data->getCorrelationN()>0) {

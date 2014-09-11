@@ -69,6 +69,8 @@ void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, in
     this->colW=colW;
     ui->chkWeighted->setChecked(colW!=-1);
     ui->chkWeighted->setEnabled(colW!=-1);
+    ui->chkBootstrap->setEnabled(true);
+    //ui->chkBootstrap->setChecked(false);
     this->table=table;
     ui->chkLogX->setChecked(logX);
     ui->chkLogY->setChecked(logY);
@@ -84,7 +86,7 @@ void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, in
     ui->cmbSaveColumn->clear();
     ui->cmbSaveColumn->addItem(tr("--- no ---"));
     ui->cmbSaveColumn->addItem(tr("--- add new column ---"));
-    for (unsigned int i=0; i<table->tableGetColumnCount(); i++) {
+    for ( int i=0; i<table->tableGetColumnCount(); i++) {
         ui->cmbSaveColumn->addItem(tr("save in column %1 [%2]").arg(i+1).arg(table->tableGetColumnTitle(i)));
     }
 
@@ -358,6 +360,11 @@ void QFRDRTableCurveFitDialog::on_btnFit_clicked()
         progress->setProgress(0);
         progress->show();
         algorithm->setReporter(progressReporter);
+
+        algorithm->setErrorEstimateModeFit(QFFitAlgorithm::fpeAlgorithm);
+        if (ui->chkBootstrap->isChecked()) {
+            algorithm->setErrorEstimateModeFit(QFFitAlgorithm::fpeBootstrapping);
+        }
 
         QFFitAlgorithm::FitResult res;
         try {
@@ -998,6 +1005,7 @@ void QFRDRTableCurveFitDialog::writeFitProperties(int pid, int gid, int saveToCo
     table->colgraphSetGraphProperty(pid, gid, "FIT_CUTLOW", ui->datacut->get_userMin());
     table->colgraphSetGraphProperty(pid, gid, "FIT_CUTHIGH", ui->datacut->get_userMax());
     table->colgraphSetGraphProperty(pid, gid, "FIT_WEIGHTED", ui->chkWeighted->isChecked());
+    table->colgraphSetGraphProperty(pid, gid, "FIT_BOOTSTRAPPING", ui->chkBootstrap->isChecked());
     table->colgraphSetGraphProperty(pid, gid, "FIT_LOGX", ui->chkLogX->isChecked());
     table->colgraphSetGraphProperty(pid, gid, "FIT_LOGY", ui->chkLogY->isChecked());
     table->colgraphSetGraphProperty(pid, gid, "FIT_RESULTCOLUMN", ui->cmbSaveColumn->currentIndex());
@@ -1030,7 +1038,9 @@ void QFRDRTableCurveFitDialog::readFitProperties(int pid, int gid, int* resultCo
     ui->datacut->set_userMin(table->colgraphGetGraphProperty(pid, gid, "FIT_CUTLOW", ui->datacut->get_userMin()).toDouble());
     ui->datacut->set_userMax(table->colgraphGetGraphProperty(pid, gid, "FIT_CUTHIGH", ui->datacut->get_userMax()).toDouble());
     bool logX=false;
-    ui->chkWeighted->setChecked(logX=table->colgraphGetGraphProperty(pid, gid, "FIT_WEIGHTED", ui->chkWeighted->isChecked()).toBool());
+    ui->chkWeighted->setChecked(table->colgraphGetGraphProperty(pid, gid, "FIT_WEIGHTED", ui->chkWeighted->isChecked()).toBool());
+    qDebug()<<pid<<gid<<"FIT_BOOTSTRAPPING="<<table->colgraphGetGraphProperty(pid, gid, "FIT_BOOTSTRAPPING");
+    ui->chkBootstrap->setChecked(table->colgraphGetGraphProperty(pid, gid, "FIT_BOOTSTRAPPING", ui->chkBootstrap->isChecked()).toBool());
     ui->chkLogX->setChecked(logX=table->colgraphGetGraphProperty(pid, gid, "FIT_LOGX", ui->chkLogX->isChecked()).toBool());
     ui->chkLogY->setChecked(table->colgraphGetGraphProperty(pid, gid, "FIT_LOGY", ui->chkLogY->isChecked()).toBool());
     ui->datacut->setLogScale(logX, 20);

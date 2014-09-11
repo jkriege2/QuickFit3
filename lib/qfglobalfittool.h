@@ -85,7 +85,7 @@
     according parameter.
 
 */
-class QFLIB_EXPORT QFFitMultiQFFitFunctionFunctor: public QFFitAlgorithm::Functor {
+class QFLIB_EXPORT QFFitMultiQFFitFunctionFunctor: public QFFitAlgorithm::Functor, public QFFitAlgorithm::FunctorBootstrapInterface {
     public:
         /*! \brief constructor, initializes the functor
         */
@@ -139,6 +139,23 @@ class QFLIB_EXPORT QFFitMultiQFFitFunctionFunctor: public QFFitAlgorithm::Functo
         inline int mapSubFunctorToGlobal(int functor, int parameter) const { return subFunctors[functor].mapToLocal[parameter]; }
 
         void setDoRecalculateInternals(bool enabled);
+
+
+
+        /** \brief prepares a new selection of data for bootstrapping
+         *
+         * \note if you only want to reapply the current selection and not select new data, call reapplyBootstrapselection() instead.
+         */
+        virtual void prepareBootstrapSelection();
+        /** \brief this function reapplies the current bootstrappig selection, i.e. if the input-data changed, but not its number and also the selection should not be recreated.
+         *
+         * \note to create a new subset from the input data, call prepareBootstrapSelection()
+         */
+        virtual void reapplyBootstrapselection();
+        /** \brief switches bootstrapping on and off, if \c enabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
+        virtual void setBootstrappingEnabled(bool enabled, bool prepBootstrapping=true);
+        /** \brief sets the fraction of the datapoints, that are selected by prepareBootstrapSelection(), if \c bootstrappingEnabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
+        virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true);
     protected:
         struct subFunctorData {
             /** \brief functor to evaluate this data term */
@@ -171,6 +188,9 @@ class QFLIB_EXPORT QFFitMultiQFFitFunctionFunctor: public QFFitAlgorithm::Functo
         int m_linkedParamsCount;
 
         bool doRecalculateInternals;
+
+        bool bsEnabled;
+        double bsFraction;
 
         void recalculateInternals();
 

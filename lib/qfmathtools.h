@@ -351,6 +351,38 @@ double qfstatisticsAverageVariance(double& var, const T& value) {
     return sum/(double)NN;
 }
 
+
+
+
+/*! \brief calculate the average and variance of a given array, limited to where mask==maskUseValue
+    \ingroup qf3lib_mathtools
+
+    \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
+    \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot (v_i-\overline{v})^2}{\sum\limits_{i=0}^{N-1}w_i} \f]
+
+*/
+template <class T>
+double qfstatisticsMaskedAverageVariance(double& var, const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+    if (mask.size()<value.size()) return qfstatisticsAverageVariance(var, value);
+    long long N=value.size();
+    if (N<=1) return 0;
+    register double sum=0;
+    register double sum2=0;
+    long long NN=0;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i]) && mask[i]==maskUseValue) {
+            sum2=sum2+(double)(value[i]*value[i]);
+            sum=sum+(double)(value[i]);
+            NN++;
+        }
+    }
+    var= ( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
+    return sum/(double)NN;
+}
+
+
+
+
 /*! \brief calculate the average and variance of a given array
     \ingroup qf3lib_mathtools
 
@@ -362,6 +394,23 @@ template <class T>
 double qfstatisticsAverageStd(double& std, const T& value) {
     double var=0;
     double avg=qfstatisticsAverageVariance(var, value);
+    var=sqrt(var);
+    return avg;
+}
+
+
+/*! \brief calculate the average and variance of a given array
+    \ingroup qf3lib_mathtools
+
+    \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
+    \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot (v_i-\overline{v})^2}{\sum\limits_{i=0}^{N-1}w_i} \f]
+
+*/
+template <class T>
+double qfstatisticsMaskedverageStd(double& std, const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+    if (mask.size()<value.size()) return qfstatisticsAverageStd(std, value);
+    double var=0;
+    double avg=qfstatisticsMaskedAverageVariance(var, mask, value, maskUseValue);
     var=sqrt(var);
     return avg;
 }
@@ -386,6 +435,30 @@ double qfstatisticsAverage(const T& value) {
     }
     return sum/(double)NN;
 }
+
+/*! \brief calculate the average and variance of a given array, limited to where mask==maskUseValue
+    \ingroup qf3lib_mathtools
+
+    \f[ \overline{v}=\frac{1}{N}\cdot\sum\limits_{i=0}^{N-1} v_i \f]
+*/
+template <class T>
+double qfstatisticsMaskedAverage(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+    if (mask.size()<value.size()) return qfstatisticsAverage(value);
+    long long N=value.size();
+    if (N==1) return value[0];
+    if (N<=0) return 0;
+    register double sum=0;
+    long long NN=0;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i]) && mask[i]==maskUseValue) {
+            sum=sum+(double)(value[i]);
+            NN++;
+        }
+    }
+    return sum/(double)NN;
+}
+
+
 
 /*! \brief calculate the correlation coefficient
     \ingroup qf3lib_mathtools
@@ -504,16 +577,33 @@ double qfstatisticsMoment(const T& value, int order) {
 
 /*! \brief calculate the number of elements in \a value that contain a valid float
     \ingroup qf3lib_mathtools
-
-    \f[ \overline{v}=\cdot\sum\limits_{i=0}^{N-1} v_i \f]
 */
 template <class T>
 long long qfstatisticsCount(const T& value) {
     long long N=value.size();
     if (N<=0) return 0;
-    long long NN=0;
+    register long long NN=0;
     for (register long long i=0; i<N; i++) {
         if (QFFloatIsOK(value[i])) {
+            NN++;
+        }
+    }
+    return NN;
+}
+
+
+/*! \brief calculate the number of elements in \a value that contain a valid float, limited to where mask==maskUseValue
+    \ingroup qf3lib_mathtools
+
+*/
+template <class T>
+double qfstatisticsMaskedCount(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+    if (mask.size()<value.size()) return qfstatisticsCount(value);
+    long long N=value.size();
+    if (N<1) return 0;
+    register long long NN=0;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i]) && mask[i]==maskUseValue) {
             NN++;
         }
     }
@@ -604,6 +694,24 @@ double qfstatisticsSum(const T& value) {
     return sum;
 }
 
+/*! \brief calculate the sum of data, limited to where mask==maskUseValue
+    \ingroup qf3lib_mathtools
+
+    \f[ \overline{v}=\sum\limits_{i=0}^{N-1} v_i \f]
+*/
+template <class T>
+double qfstatisticsMaskedSum(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+    if (mask.size()<value.size()) return qfstatisticsSum(value);
+    long long N=value.size();
+    if (N<1) return 0;
+    register double sum=0;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i]) && mask[i]==maskUseValue) {
+            sum=sum+(double)(value[i]);
+        }
+    }
+    return sum;
+}
 
 /*! \brief calculate the cumulative sum of data
     \ingroup qf3lib_mathtools
@@ -765,6 +873,26 @@ double qfstatisticsSum2(const T& value) {
     return sum;
 }
 
+
+/*! \brief calculate the sum of squared data, limited to where mask==maskUseValue
+    \ingroup qf3lib_mathtools
+
+    \f[ \overline{v}=\sum\limits_{i=0}^{N-1} v_i^2 \f]
+*/
+template <class T>
+double qfstatisticsMaskedSum2(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+    if (mask.size()<value.size()) return qfstatisticsSum2(value);
+    long long N=value.size();
+    if (N<1) return 0;
+    register double sum=0;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i]) && mask[i]==maskUseValue) {
+            sum=sum+(double)(value[i])*(double)(value[i]);
+        }
+    }
+    return sum;
+}
+
 /*! \brief calculate the average and variance of a given array
     \ingroup qf3lib_mathtools
 
@@ -797,8 +925,35 @@ double qfstatisticsStd(const T& value) {
 
 
 
+/*! \brief calculate the average and variance of a given array, limited to where mask==maskUseValue
+    \ingroup qf3lib_mathtools
 
+    \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
+    \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot (v_i-\overline{v})^2}{\sum\limits_{i=0}^{N-1}w_i} \f]
 
+*/
+template <class T>
+double qfstatisticsMaskedVariance(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+    if (mask.size()<value.size()) return qfstatisticsVariance(value);
+    long long N=value.size();
+    if (N<=1) return 0;
+    register double sum=0;
+    register double sum2=0;
+    long long NN=0;
+    for (register long long i=0; i<N; i++) {
+        if (QFFloatIsOK(value[i]) && mask[i]==maskUseValue) {
+            sum2=sum2+(double)(value[i]*value[i]);
+            sum=sum+(double)(value[i]);
+            NN++;
+        }
+    }
+    return ( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
+}
+
+template <class T>
+double qfstatisticsStd(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+    return sqrt(qfstatisticsMaskedVariance(mask, value, maskUseValue));
+}
 
 
 /*! \brief return the smallest element from a sorted array
@@ -853,6 +1008,21 @@ typename T::value_type qfstatisticsMedian(const T& input_in) {
 
 
 
+/*! \brief return the median from a array, limited to where mask==maskUseValue
+    \ingroup tools_math_stat
+
+    if \a N is odd, then the center element is returned, otherwise the function returns the average of the two centering elements
+*/
+template <typename T>
+typename T::value_type qfstatisticsMaskedMedian(const QVector<bool>& mask, const T& input_in, bool maskUseValue=true) {
+    if (mask.size()<input_in.size()) return qfstatisticsMedian(input_in);
+    T input;
+    for (int i=0; i<input_in.size(); i++) {
+        if (mask[i]==maskUseValue) input<<input_in[i];
+    }
+    qSort(input);
+    return qfstatisticsSortedMedian(input);
+}
 
 
 /*! \brief calculates the median absolute deviation about the median (MAD), a robust measure of sample deviation, the data has to be a sorted array!
@@ -974,6 +1144,22 @@ typename T::value_type qfstatisticsQuantile(const T& input_in, double quantile) 
 
 
 
+
+/*! \brief return the quantile from a array, limited to where mask==maskUseValue
+    \ingroup tools_math_stat
+
+    if \a N is odd, then the center element is returned, otherwise the function returns the average of the two centering elements
+*/
+template <typename T>
+typename T::value_type qfstatisticsMaskedQuantile(const QVector<bool>& mask, const T& input_in, double quantile, bool maskUseValue=true) {
+    if (mask.size()<input_in.size()) return qfstatisticsQuantile(input_in, quantile);
+    T input;
+    for (int i=0; i<input_in.size(); i++) {
+        if (mask[i]==maskUseValue) input<<input_in[i];
+    }
+    qSort(input);
+    return qfstatisticsSortedQuantile(input, quantile);
+}
 
 
 

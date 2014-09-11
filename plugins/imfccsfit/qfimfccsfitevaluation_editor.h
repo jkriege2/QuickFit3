@@ -224,6 +224,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
 
         void on_spinFitLocalGlobals_valueChanged(int value);
+        void errorEstimateModeChanged();
 };
 
 #endif // QFIMFCCSFITEVALUATIONEDITOR_H

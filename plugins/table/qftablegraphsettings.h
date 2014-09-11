@@ -116,6 +116,7 @@ class QFTableGraphSettings : public QWidget
 
         QFFitFunctionValueInputTable* fitfuncValuesTable;
         QVector<double> fitfuncValues, fitfuncValuesDummy;
+        QVector<double> fitfuncErrors, fitfuncErrorsDummy;
 
         QAction* actFit;
         QAction* actRegression;

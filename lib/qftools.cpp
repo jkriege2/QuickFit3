@@ -231,7 +231,52 @@ void loadSplitter(QSettings& settings, QSplitter* splitter, QString prefix) {
 
 
 
+void writeQVariant(QXmlStreamWriter& w, const QVariant& v){
+    w.writeAttribute("type", getQVariantType(v));
+    if (v.type()==QVariant::List) {
+        QVariantList vl=v.toList();
+        for (int j=0; j<vl.size(); j++) {
+            w.writeStartElement("list_item");
+            const QVariant v=vl[j];
+            writeQVariant(w, v);
+            w.writeEndElement();
+        }
+    } else if (v.type()==QVariant::StringList) {
+        QStringList vl=v.toStringList();
+        for (int j=0; j<vl.size(); j++) {
+            w.writeStartElement("list_item");
+            w.writeCDATA(vl[j]);
+            w.writeEndElement();
+        }
+    } else {
+        w.writeCDATA(getQVariantData(v));
+    }
+}
 
+QVariant readQVariant(QDomElement& e) {
+    QVariant res;
+    QString type=e.attribute("type");
+    if (type=="list") {
+        QDomElement c=e.firstChildElement("list_item");
+        QVariantList vl;
+        while (!c.isNull()) {
+            vl.append(readQVariant(c));
+            c=c.nextSiblingElement("list_item");
+        }
+        res=vl;
+    } else if (type=="stringlist") {
+        QDomElement c=e.firstChildElement("list_item");
+        QStringList vl;
+        while (!c.isNull()) {
+            vl.append(c.text());
+            c=c.nextSiblingElement("list_item");
+        }
+        res=vl;
+    } else {
+        res=getQVariantFromString(type, e.text());
+    }
+    return res;
+}
 
 QString getQVariantType(const QVariant& variant) {
     QString t="invalid";

@@ -26,6 +26,7 @@
 #include <QString>
 #include <QList>
 #include <QChar>
+#include <QVector>
 
 /*! \brief interface for run selection/leaveout
     \ingroup qf3rdrdp_fcs
@@ -63,6 +64,17 @@ class QFRDRRunSelectionsInterface {
 
 
 };
+
+
+inline QVector<bool> QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(QFRDRRunSelectionsInterface* rs) {
+    QVector<bool> b;
+    if (rs) {
+        for (int i=0; i<rs->leaveoutGetRunCount(); i++) {
+            b.append(!rs->leaveoutRun(i));
+        }
+    }
+    return b;
+}
 
 Q_DECLARE_INTERFACE( QFRDRRunSelectionsInterface,
                      "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRRunSelectionsInterface/1.1")

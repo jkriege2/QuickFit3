@@ -109,6 +109,9 @@ class QFLIB_EXPORT QFFitFunctionValueInputTable : public QAbstractTableModel
         void setEditRanges(bool enabled);
         void setEditErrors(bool editerrors);
         void setEditFix(bool editfix);
+        void setUserEditRanges(bool enabled);
+        void setUserEditErrors(bool editerrors);
+        void setUserEditFix(bool editfix);
         void setDoRebuildModel(bool doReb);
     public:
         bool checkRebuildModel(bool alwaysreset=false);
@@ -129,6 +132,10 @@ class QFLIB_EXPORT QFFitFunctionValueInputTable : public QAbstractTableModel
         bool editerrors;
         bool editfix;
         bool editRanges;
+
+        bool errorsUserEditable;
+        bool rangesUserEditable;
+        bool fixUserEditable;
         int rangeIdx;
         int errorIdx;
         int fixIdx;

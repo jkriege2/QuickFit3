@@ -419,9 +419,14 @@ QString toQFTableModelXML(const QList<QList<QVariant> >& data, const QStringList
     w.writeStartDocument();
         w.writeStartElement("qfrdrtable");
             w.writeStartElement("state.columns");
+            w.writeStartElement("col");
+            w.writeAttribute("col", QString::number(0));
+            w.writeAttribute("name", QObject::tr("row names"));
+            w.writeEndElement();
+
             for (int i=0; i<cols; i++) {
                 w.writeStartElement("col");
-                w.writeAttribute("col", QString::number(i));
+                w.writeAttribute("col", QString::number(i+coffset));
                 w.writeAttribute("name", columnsNames.value(i));
                 w.writeEndElement();
             }

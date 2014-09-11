@@ -341,6 +341,42 @@ void QFEvaluationPropertyEditorPrivate::showStatisticsComparing()
 
 }
 
+void QFEvaluationPropertyEditorPrivate::storeSettings()
+{
+    if (!d->current) return;
+    d->current->setQFProperty("RESULTS_PROPERTIES", edtDisplayProperties->text(), false, false);
+    d->current->setQFProperty("FILES_FILTER", edtFilterFiles->text(), false, false);
+    d->current->setQFProperty("FILES_FILTERNOT", edtFilterFilesNot->text(), false, false);
+    d->current->setQFProperty("FILES_FILTER_REGEXP", chkFilterFilesRegExp->isChecked(), false, false);
+    d->current->setQFProperty("RESULTS_FILTER", edtFilterResults->text(), false, false);
+    d->current->setQFProperty("RESULTS_FILTERNOT", edtFilterResultsNot->text(), false, false);
+    d->current->setQFProperty("RESULTS_FILTER_REGEXP", chkFilterResultsRegExp->isChecked(), false, false);
+
+
+    d->current->setQFProperty("RESULTS_MIND_UNUSED_VECSTAT", chkMindUnusedForVectorStat->isChecked(), false, false);
+    d->current->setQFProperty("RESULTS_EXTRACT_RUNS", chkExtractRuns->isChecked(), false, false);
+    d->current->setQFProperty("RESULTS_REMOVE_UNUSED_RUNS", chkRemoveUnusedRuns->isChecked(), false, false);
+    d->current->setQFProperty("RESULTS_SHOW_AVG", chkShowAvg->isChecked(), false, false);
+}
+
+void QFEvaluationPropertyEditorPrivate::loadSettings()
+{
+    if (!d->current) return;
+    edtDisplayProperties->setText(d->current->getProperty("RESULTS_PROPERTIES", "").toString());
+    edtFilterFiles->setText(d->current->getProperty("FILES_FILTER", "").toString());
+    edtFilterFilesNot->setText(d->current->getProperty("FILES_FILTERNOT", "").toString());
+    chkFilterFilesRegExp->setChecked(d->current->getProperty("FILES_FILTER_REGEXP", false).toBool());
+    edtFilterResults->setText(d->current->getProperty("RESULTS_FILTER", "").toString());
+    edtFilterResultsNot->setText(d->current->getProperty("RESULTS_FILTERNOT", "").toString());
+    chkFilterResultsRegExp->setChecked(d->current->getProperty("RESULTS_FILTER_REGEXP", false).toBool());
+
+
+    chkMindUnusedForVectorStat->setChecked(d->current->getProperty("RESULTS_MIND_UNUSED_VECSTAT", true).toBool());
+    chkExtractRuns->setChecked(d->current->getProperty("RESULTS_EXTRACT_RUNS", true).toBool());
+    chkRemoveUnusedRuns->setChecked(d->current->getProperty("RESULTS_REMOVE_UNUSED_RUNS", true).toBool());
+    chkShowAvg->setChecked(d->current->getProperty("RESULTS_SHOW_AVG", true).toBool());
+}
+
 
 void QFEvaluationPropertyEditorPrivate::nameChanged(const QString& text) {
     if (d->current) {
@@ -520,6 +556,10 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
 
     tbResults=new QToolBar("toolbar_eval_results", d);
     rwvlayout->addWidget(tbResults);
+    tbResultsSettings=new QToolBar("toolbar_eval_results_settings", d);
+    rwvlayout->addWidget(tbResultsSettings);
+
+
     actRefreshResults=new QAction(QIcon(":/lib/refresh16.png"), tr("Refresh results ..."), d);
     actRefreshResults->setShortcut(tr("F5"));
     tbResults->addAction(actRefreshResults);
@@ -565,31 +605,40 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     actStatisticsComparing=new QAction(QIcon(":/lib/result_statistics_compare.png"), tr("histogram: cell-wise"), d);
     tbResults->addAction(actStatisticsComparing);
 
-    tbResults->addSeparator();
+    //tbResults->addSeparator();
     chkShowAvg=new QCheckBox(tr("show Avg+/-SD for vector/matrix resuts"), d);
-    tbResults->addWidget(chkShowAvg);
+    tbResultsSettings->addWidget(chkShowAvg);
     chkShowAvg->setChecked(true);
     connect(chkShowAvg, SIGNAL(toggled(bool)), this, SLOT(showAvgClicked(bool)));
-    tbResults->addSeparator();
+    connect(chkShowAvg, SIGNAL(toggled(bool)), this, SLOT(storeSettings()));
+    tbResultsSettings->addSeparator();
 
     chkExtractRuns=new QCheckBox(tr("show runs/indices"), d);
     chkExtractRuns->setChecked(true);
-    tbResults->addSeparator();
-    tbResults->addWidget(chkExtractRuns);
+    tbResultsSettings->addWidget(chkExtractRuns);
     connect(chkExtractRuns, SIGNAL(toggled(bool)), d->resultsModel, SLOT(setExtractIndexes(bool)));
+    connect(chkExtractRuns, SIGNAL(toggled(bool)), this, SLOT(storeSettings()));
     chkRemoveUnusedRuns=new QCheckBox(tr("don't show removed runs"), d);
     chkRemoveUnusedRuns->setChecked(false);
-    tbResults->addWidget(chkRemoveUnusedRuns);
+    tbResultsSettings->addWidget(chkRemoveUnusedRuns);
     connect(chkExtractRuns, SIGNAL(toggled(bool)), chkRemoveUnusedRuns, SLOT(setEnabled(bool)));
     connect(chkRemoveUnusedRuns, SIGNAL(toggled(bool)), d->resultsModel, SLOT(setRemoveUnusedIndexes(bool)));
+    connect(chkRemoveUnusedRuns, SIGNAL(toggled(bool)), this, SLOT(storeSettings()));
+
+    chkMindUnusedForVectorStat=new QCheckBox(tr("mind excluded runs for in-cell statistics"), d);
+    chkMindUnusedForVectorStat->setChecked(true);
+    tbResultsSettings->addWidget(chkMindUnusedForVectorStat);
+    connect(chkMindUnusedForVectorStat, SIGNAL(toggled(bool)), d->resultsModel, SLOT(setMinUnusedIndexesForStatistics(bool)));
+    connect(chkMindUnusedForVectorStat, SIGNAL(toggled(bool)), this, SLOT(storeSettings()));
 
 
-    tbResults->addWidget(new QLabel(" display properties: "));
+    tbResultsSettings->addSeparator();
+    tbResultsSettings->addWidget(new QLabel(" display properties: "));
     edtDisplayProperties=new QFEnhancedLineEdit(d);
     edtDisplayProperties->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtDisplayProperties, edtDisplayProperties));
     edtDisplayProperties->setToolTip(tr("put a comma ',' separated list of properties here that should be part of the results table. <br><b>Note:</b> These properties can NOT be filtered with the filters below."));
     connect(edtDisplayProperties, SIGNAL(textChanged(QString)), this, SLOT(propertiesTextChanged(QString)));
-    tbResults->addWidget(edtDisplayProperties);
+    tbResultsSettings->addWidget(edtDisplayProperties);
 
 
 
@@ -611,6 +660,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     connect(edtFilterFilesNot, SIGNAL(textChanged(QString)), d->resultsModel, SLOT(setFilesFilterNot(QString)));
     tbResultsFilter->addWidget(edtFilterFilesNot);
     chkFilterFilesRegExp=new QCheckBox(tr("RegExp"), d);
+    connect(chkFilterFilesRegExp, SIGNAL(toggled(bool)), this, SLOT(storeSettings()));
     chkFilterFilesRegExp->setChecked(false);
     tbResultsFilter->addWidget(chkFilterFilesRegExp);
     connect(chkFilterFilesRegExp, SIGNAL(clicked(bool)), d->resultsModel, SLOT(setFilesFilterUsesRegExp(bool)));
@@ -1104,6 +1154,7 @@ void QFEvaluationPropertyEditorPrivate::filterFilesTextChanged(const QString &te
        }
        s->setPalette(p);
     }
+    storeSettings();
 }
 
 void QFEvaluationPropertyEditorPrivate::filterResultsTextChanged(const QString &text)
@@ -1123,6 +1174,7 @@ void QFEvaluationPropertyEditorPrivate::filterResultsTextChanged(const QString &
        }
        s->setPalette(p);
     }
+    storeSettings();
 }
 
 void QFEvaluationPropertyEditorPrivate::filterRecordsTextChanged(const QString &text)
@@ -1142,4 +1194,5 @@ void QFEvaluationPropertyEditorPrivate::filterRecordsTextChanged(const QString &
        }
        s->setPalette(p);
     }
+    storeSettings();
 }

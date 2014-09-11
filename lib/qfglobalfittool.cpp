@@ -262,6 +262,36 @@ void QFFitMultiQFFitFunctionFunctor::setDoRecalculateInternals(bool enabled)
     if (enabled) recalculateInternals();
 }
 
+void QFFitMultiQFFitFunctionFunctor::prepareBootstrapSelection()
+{
+    for (int i=0; i<subFunctors.size(); i++) {
+        subFunctors[i].f->setBootstrappingEnabled(bsEnabled, false);
+        subFunctors[i].f->setBootstrappingFraction(bsFraction, false);
+        subFunctors[i].f->prepareBootstrapSelection();
+    }
+}
+
+void QFFitMultiQFFitFunctionFunctor::reapplyBootstrapselection()
+{
+    for (int i=0; i<subFunctors.size(); i++) {
+        subFunctors[i].f->setBootstrappingEnabled(bsEnabled, false);
+        subFunctors[i].f->setBootstrappingFraction(bsFraction, false);
+        subFunctors[i].f->reapplyBootstrapselection();
+    }
+}
+
+void QFFitMultiQFFitFunctionFunctor::setBootstrappingEnabled(bool enabled, bool prepBootstrapping)
+{
+    bsEnabled=enabled;
+    if (bsEnabled&&prepBootstrapping) prepareBootstrapSelection();
+}
+
+void QFFitMultiQFFitFunctionFunctor::setBootstrappingFraction(double fraction, bool prepBootstrapping)
+{
+    bsFraction=fraction;
+    if (bsEnabled&&prepBootstrapping) prepareBootstrapSelection();
+}
+
 QFGlobalFitTool::QFGlobalFitTool(QFFitAlgorithm *algorithm)
 {
     m_algorithm=algorithm;

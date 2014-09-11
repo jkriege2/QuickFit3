@@ -31,7 +31,7 @@ The first tab <b>Properties</b> (see image above) may be used to enter a name fo
       <center><img src="./pic/qf3_eval_results.png"></center>
 <ul>
 <li>The results are shown as a table, where every row represents the set of results for ONE raw data record. Every row is designated by the evaluation result id, which consists of the raw data record name (e.g. <tt>20nM_488_Day2_04s.asc - CH0</tt>), the evaluation type name together with the internal ID of the evaluation object (e.g. <tt>fcs_fit_1</tt> where <tt>1</tt> is the ID) and an evaluation-dependend suffix (e.g. <tt>fcd_diff1_run0</tt>) . Every column shows the single results (if they are numbers or strings).</li>
-<li>average and standard deviation over the currently selected cells will be sidplayed as a second table below the results table.</li>
+<li>average and standard deviation over the currently selected cells will be displayed as a second table below the results table.</li>
 <li>If a cell contains not a single value or value/error pair it might not be possible to display it in a concise form. Usually vectors/matrices are only displayed directly, if they contain less than 10 elements. If there are more items only the data type name is displayed to save space. If the mouse hovers of a vector/matrix field, the average value and standard deviation of the numbers in the list (if applicable) is shown as a tooltip.</li>
 <li><img src=":/lib/refresh16.png"> reloads the results. This may be necessary, when new fit results were produced, but the table was not yet updated with them.</li>
 <li><img src=":/lib/delete16.png"> deletes the selected results. You can also click on the top-left corner of the table, which will select all results and then click on <img src=":/lib/delete16.png">. This will delete all results from the current evaluation in the current project.</li>
@@ -45,8 +45,8 @@ The first tab <b>Properties</b> (see image above) may be used to enter a name fo
   <li><a name="#filertable"><a name="filertable"> The <b>filename filter</b> allows to interactively filter the rows in the table: If this is non-empty, only rows that match (match means "contains", wildcards * for many characters and ? for a single character are possible) the filter string are displayed. If "RegExp" is activated you may use full <a href="qf3_qtregexp.html">regular expressions</a> instead of the simple wildcards.</li>
   <li>The <b>results filter</b> allows to filter the columns, the same way as the filename filter filters the rows. If "RegExp" is activated you may use full <a href="qf3_qtregexp.html">regular expressions</a> instead of the simple wildcards.</li>
   <li>You can display any RDR property as an additional row in the table, by adding the property name to the "<b>display roles</b>" field. You can separate several properties by commas.</li>
-  <li>Results may also be in vector or matrix form. For these two display modes are available, which may be changed with the checkbox "show avg+/-SD for vector/matrix results": If it is activated, the average and standard deviation over the full vector/matrix is displayed (in blue and italic). Also the datatype is named in the second line in each cell. If this option is deactivated, only the type name is displayed if more than 10 entries are present. Otherwise the entries are displayed as a list. </li>
-  
+  <li>Results may also be in vector or matrix form. For these two display modes are available, which may be changed with the checkbox "<b>show avg+/-SD for vector/matrix results</b>": If it is activated, the average and standard deviation over the full vector/matrix is displayed (in blue and italic). Also the datatype is named in the second line in each cell. If this option is deactivated, only the type name is displayed if more than 10 entries are present. Otherwise the entries are displayed as a list. If in addition "<b>mind excluded runs for in-cell statistics</b>" is checked, and the result is for a RDR with a mask, the masked runs are not included in the statistics.</li>
+  <li>The checkbox <b>show runs/indices</b> allows to add an additional column (at the start of the table), which contains the run/index of the current row of fit results (if applicable). The value -1 is displayed, if no run could be extracted from the row of values (i.e. the result set).<br>If in addition <b>don't show removed runs</b> is checked, all those rows/results are removed from the table, where the according run is removed/masked from the record.</li>
 </ul></p>
 
 
@@ -72,17 +72,7 @@ The following functions apply only to the <u>currently selected cells</u> in the
     <li><b>Copy Selection in expanded form, to Matlab</b>  copies the selected cells as a table in expanded form into a Matlab script</li>
     <li><b>Copy Selection in expanded form, to Matlab, flipped</b> copies the selected cells as a table in expanded form into a Matlab script </li>
     </ul></li>
-    <li><img src=":/lib/copy16.png"> <b>Copy Selection to Clipboard (for Excel ...)</b> copies the selected cells as a table in a format, which can be pasted into Microsoft Excel</li>
-    <li><img src=":/lib/copy16_nohead.png"> <b>Copy Selection to clipboard (for Excel ...) without header row/column</b> copies the selected cells as a table in a format, which can be pasted into Microsoft Excel, but omits the row/column headers</li>
-    <li><img src=":/lib/copy16.png"> <b>Copy Selection to Clipboard (CSV)</b> copies the selected cells as a table as comma-separated values ('.' as decimal separator!) </li>
-    <li><img src=":/lib/copy16_nohead.png"> <b>Copy Selection to clipboard (CSV) without header row/column</b> copies the selected cells as a table as comma-separated values ('.' as decimal separator!), but omits the row/column headers </li>
-    <li><img src=":/lib/copy16_matlab.png"> <b>Copy Selection to clipboard (Matlab)</b> copies the selected cells as a Matlab script </li>
-    <li><img src=":/lib/save16.png"> <b>save table:</b><ul>
-      <li><img src=":/lib/save16.png"> <b>Save table</b> saves the selected cells into a file </li>
-      <li><img src=":/lib/save16.png"> <b>Save table, flipped</b> saves the selected cells into a file and rotates the table</li>
-      <li><img src=":/lib/save16.png"> <b>Save table, extended form</b> saves the selected cells in expanded form (i.e. every cell, whcih contains a vector/matrix is expanded into several columns) into a file</li>
-      <li><img src=":/lib/save16.png"> <b>Save table, extended form, flipped</b> saves the selected cells in expanded form (i.e. every cell, whcih contains a vector/matrix is expanded into several rows) into a file and rotates the table. </li>
-    </ul></li> 
+    $$insert:qf3_enhancedtablemenu.inc$$
 </ul>
 $$see:See also the help page on <a href="qf3_fileformats.html">Common Fileformats in QuickFit</a> for informations on some of the different available export formats.$$
 $$startbox_info$$

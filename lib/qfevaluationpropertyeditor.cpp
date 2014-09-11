@@ -290,12 +290,8 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         p->compFilterRecords->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterrecords.txt");
         p->compFilterRecordsNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evfilterrecordsnot.txt");
 
-        p->edtFilterFiles->setText(current->getProperty("FILES_FILTER", "").toString());
-        p->edtFilterFilesNot->setText(current->getProperty("FILES_FILTERNOT", "").toString());
-        p->chkFilterFilesRegExp->setChecked(current->getProperty("FILES_FILTER_REGEXP", false).toBool());
-        p->edtFilterResults->setText(current->getProperty("RESULTS_FILTER", "").toString());
-        p->edtFilterResultsNot->setText(current->getProperty("RESULTS_FILTERNOT", "").toString());
-        p->chkFilterResultsRegExp->setChecked(current->getProperty("RESULTS_FILTER_REGEXP", false).toBool());
+        p->loadSettings();
+
 
         p->filterRecordsChanged();
 

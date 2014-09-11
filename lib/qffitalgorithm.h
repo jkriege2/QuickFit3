@@ -29,6 +29,7 @@
 #include <QVariant>
 #include <stdint.h>
 #include "qfrawdatarecord.h"
+#include "qfproperties.h"
 
 /*! \brief reporter interface for fitting algorithms
     \ingroup qf3lib_fitting
@@ -102,6 +103,37 @@ class QFLIB_EXPORT QFFitAlgorithmReporter {
 */
 class QFLIB_EXPORT QFFitAlgorithm {
     public:
+        /*! \brief an interface, which may be used by Functor derived classes to implement bootstrapping
+
+            This function implements a mode for bootstrapping during the fit. In this mode, not all \f$ N \f$ data in  \f$(x_m,y_m,\sigma_m)\f$ are used for the fit,
+            but only a subset of \f$ \mbox{bootstrapFraction}\cdot N \f$ datapoints, which are chosen randomly from the provided input data on every call of
+            prepareBootstrapSelection(). This feature can be used to implement e.g. error estimates by bootstrapping of the fit input data vector, i.e.
+            repeat the fit \f$ M \f$ times with each time a new subset of data and the calculate the standard deviation of the fit values.
+
+            This class manages the data internally and the protected members m_dataX, m_dataY and m_dataWeight are redirected, as required.
+            they are also returned by getDatX(), getDataY(), getDataWeight(). The same is done for m_M and getDataPoints().
+            These arrays either point to the arrays, provided in the constructor or by the \c setData...() methods, if bootstrapping is
+            disabled, or they point to internal vectors, which contain the currently selected subset of the dataset.
+
+         */
+        class QFLIB_EXPORT FunctorBootstrapInterface {
+            public:
+                virtual ~FunctorBootstrapInterface() {}
+                /** \brief prepares a new selection of data for bootstrapping
+                 *
+                 * \note if you only want to reapply the current selection and not select new data, call reapplyBootstrapselection() instead.
+                 */
+                virtual void prepareBootstrapSelection()=0;
+                /** \brief this function reapplies the current bootstrappig selection, i.e. if the input-data changed, but not its number and also the selection should not be recreated.
+                 *
+                 * \note to create a new subset from the input data, call prepareBootstrapSelection()
+                 */
+                virtual void reapplyBootstrapselection()=0;
+                /** \brief switches bootstrapping on and off, if \c enabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
+                virtual void setBootstrappingEnabled(bool enabled, bool prepBootstrapping=true)=0;
+                /** \brief sets the fraction of the datapoints, that are selected by prepareBootstrapSelection(), if \c bootstrappingEnabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
+                virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true)=0;
+        };
         /*! \brief functor base class that may be used to optimize arbitrary functions
 
             This functor allows to evaluate arbitrary vector-valued functions
@@ -114,53 +146,65 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
          */
         class QFLIB_EXPORT Functor {
-            public:
-                Functor(int Mevalout) { m_evalout=Mevalout; }
+        public:
+            explicit Functor(int Mevalout) { m_evalout=Mevalout; }
 
-                virtual  ~Functor() {};
+            virtual  ~Functor() {};
 
-                /*! \brief function that evaluates the arbitrary function
+            /*! \brief function that evaluates the arbitrary function
 
-                    \param[out] evalout with size get_evalout()
-                    \param params parameter vector with size get_paramcount()
-                 */
-                virtual void evaluate(double* evalout, const double* params)=0;
+                \param[out] evalout with size get_evalout()
+                \param params parameter vector with size get_paramcount()
+             */
+            virtual void evaluate(double* evalout, const double* params)=0;
 
-                /*! \brief function that evaluates the arbitrary function
+            /*! \brief function that evaluates the arbitrary function
 
-                    \param[out] evalout with size get_evalout()*get_paramcount() in the order
-                                \f$ \left[ \frac{\partial f_1}{\partial p_1}, \frac{\partial f_1}{\partial p_2}, ..., \frac{\partial f_1}{\partial p_N}, \frac{\partial f_2}{\partial p_1}, \frac{\partial f_2}{\partial p_2}, ..., \frac{\partial f_2}{\partial p_N}, ..., \frac{\partial f_M}{\partial p_N} \right] \f$
-                    \param params parameter vector with size get_paramcount()
+                \param[out] evalout with size get_evalout()*get_paramcount() in the order
+                            \f$ \left[ \frac{\partial f_1}{\partial p_1}, \frac{\partial f_1}{\partial p_2}, ..., \frac{\partial f_1}{\partial p_N}, \frac{\partial f_2}{\partial p_1}, \frac{\partial f_2}{\partial p_2}, ..., \frac{\partial f_2}{\partial p_N}, ..., \frac{\partial f_M}{\partial p_N} \right] \f$
+                \param params parameter vector with size get_paramcount()
 
-                    \note This is only implemented if get_implementsJacobian() returns true
-                 */
-                virtual void evaluateJacobian(double* evalout, const double* params);
+                \note This is only implemented if get_implementsJacobian() returns true
+             */
+            virtual void evaluateJacobian(double* evalout, const double* params);
 
-                /** \brief return the number of parameters \f$ N \f$ */
-                virtual int get_paramcount() const=0;
+            /** \brief return the number of parameters \f$ N \f$ */
+            virtual int get_paramcount() const=0;
 
-                /** \brief return \c true if the jacobian is implemented */
-                virtual bool get_implementsJacobian() const { return false; };
+            /** \brief return \c true if the jacobian is implemented */
+            virtual bool get_implementsJacobian() const { return false; };
 
-                /** \brief return dimension of function output vector \f$ M \f$ */
-                inline int get_evalout() const { return m_evalout; };
+            /** \brief return dimension of function output vector \f$ M \f$ */
+            inline uint64_t get_evalout() const { return m_evalout; };
 
-            protected:
-                /** \brief size of function output \f$ M \f$ */
-                int m_evalout;
+        protected:
+            /** \brief size of function output \f$ M \f$ */
+            uint64_t m_evalout;
 
-                Functor() { m_evalout=1; };
+            Functor() { m_evalout=1; };
         };
 
 
-        /*! \brief base class for QFFitAlgorthm::Functor classes that let the user fit a dataset \f$(x_i,y_i,\sigma_i)\f$ to a 1D-function
+        /*! \brief base class for QFFitAlgorthm::Functor classes that let the user fit a dataset \f$(x_m,y_m,\sigma_m)\f$ to a 1D-function
 
                 \f[ g_m(\vec{p})=\frac{y_m-f(x_m; m(\vec{p}))}{\sigma_m} \f]
 
             This class does not assume anything about the function \f$f(\cdot)\f$. it's implementatoin
             is left to child classes of this virtual class (see e.g. QFFitAlgorithm::FitQFFitFunctionFunctor ).
+
+            This function implements a mode for bootstrapping during the fit. In this mode, not all \f$ N \f$ data in  \f$(x_m,y_m,\sigma_m)\f$ are used for the fit,
+            but only a subset of \f$ \mbox{bootstrapFraction}\cdot N \f$ datapoints, which are chosen randomly from the provided input data on every call of
+            prepareBootstrapSelection(). This feature can be used to implement e.g. error estimates by bootstrapping of the fit input data vector, i.e.
+            repeat the fit \f$ M \f$ times with each time a new subset of data and the calculate the standard deviation of the fit values.
+
+            This class manages the data internally and the protected members m_dataX, m_dataY and m_dataWeight are redirected, as required.
+            they are also returned by getDatX(), getDataY(), getDataWeight(). The same is done for m_M and getDataPoints().
+            These arrays either point to the arrays, provided in the constructor or by the \c setData...() methods, if bootstrapping is
+            disabled, or they point to internal vectors, which contain the currently selected subset of the dataset.
+
+            \note The default bootstrapFraction is 0.7!
         */
-        class QFLIB_EXPORT FitFunctionFunctor: public Functor {
+        class QFLIB_EXPORT FitFunctionFunctor: public Functor, public FunctorBootstrapInterface {
             public:
                 /*! \brief constructor, initializes the functor
                     \param dataX the x-values data vector \f$ x_m \f$
@@ -168,29 +212,92 @@ class QFLIB_EXPORT QFFitAlgorithm {
                     \param dataWeights the weight vector \f$ \sigma_m \f$
                     \param M number of datapoints
                 */
-                FitFunctionFunctor(const double* dataX, const double* dataY, const double* dataWeight, uint64_t M) ;
+                explicit FitFunctionFunctor(const double* dataX, const double* dataY, const double* dataWeight, uint64_t M) ;
 
                 virtual ~FitFunctionFunctor();
 
+                /** \brief returns a pointer to the current x-data \f$ x_m \f$ */
                 const double* getDataX() const;
+                /** \brief returns a pointer to the current y-data \f$ y_m \f$ */
                 const double* getDataY() const;
+                /** \brief returns a pointer to the current weights-data \f$ \sigma_m \f$ */
                 const double* getDataWeight() const;
+                /** \brief returns the current number of datapoints in the \f$(x_m,y_m,\sigma_m)\f$ dataset. */
                 uint64_t getDataPoints() const;
 
+                /** \brief sets a new input data vector for x-data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
                 void setDataX(const double* data);
+                /** \brief sets a new input data vector for y-data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
                 void setDataY(const double* data);
+                /** \brief sets a new input data vector for weights-data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
                 void setDataWeight(const double* data);
+                /** \brief sets a new count of input data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
+                void setDataPoints(uint64_t data);
+
+                /** \brief prepares a new selection of data for bootstrapping
+                 *
+                 * \note if you only want to reapply the current selection and not select new data, call reapplyBootstrapselection() instead.
+                 */
+                virtual void prepareBootstrapSelection();
+                /** \brief this function reapplies the current bootstrappig selection, i.e. if the input-data changed, but not its number and also the selection should not be recreated.
+                 *
+                 * \note to create a new subset from the input data, call prepareBootstrapSelection()
+                 */
+                virtual void reapplyBootstrapselection();
+                /** \brief switches bootstrapping on and off, if \c enabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
+                virtual void setBootstrappingEnabled(bool enabled, bool prepBootstrapping=true);
+                virtual bool getBootstrappingEnabled() const;
+                /** \brief sets the fraction of the datapoints, that are selected by prepareBootstrapSelection(), if \c bootstrappingEnabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
+                virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true);
+                virtual double getBootstrappingFraction() const;
 
             protected:
 
-                /** \brief the x-values data vector \f$ x_m \f$ */
+                /** \brief the x-values data vector \f$ x_m \f$, possibly with a bootstrapping selection */
                 const double* m_dataX;
-                /** \brief the y-values data vector \f$ y_m \f$ */
+                /** \brief the y-values data vector \f$ y_m \f$, possibly with a bootstrapping selection */
                 const double* m_dataY;
-                /** \brief the weight vector \f$ \sigma_m \f$ */
+                /** \brief the weight vector \f$ \sigma_m \f$, possibly with a bootstrapping selection */
                 const double* m_dataWeight;
-                /** \brief number of datapoints      */
+                /** \brief number of datapoints, possibly with a bootstrapping selection      */
                 uint64_t m_M;
+
+
+                /** \brief fraction [0..1] of data points, selected by  prepareBootstrapSelection(). The default value is 0.7. */
+                double m_bootstrapFraction;
+                /** \brief indicates, whether bootstrapping is enabled */
+                bool m_bootstrapEnabled;
+
+            private:
+                /** \brief the x-values data vector \f$ x_m \f$ before bootstrapping selection */
+                const double* i_dataX;
+                /** \brief the y-values data vector \f$ y_m \f$ before bootstrapping selection */
+                const double* i_dataY;
+                /** \brief the weight vector \f$ \sigma_m \f$ before bootstrapping selection */
+                const double* i_dataWeight;
+                /** \brief number of datapoints before bootstrapping selection      */
+                uint64_t i_M;
+
+                /** \brief helper-vector, used for bootstrapping */
+                QVector<double> bootstrappedX;
+                /** \brief helper-vector, used for bootstrapping */
+                QVector<double> bootstrappedY;
+                /** \brief helper-vector, used for bootstrapping */
+                QVector<double> bootstrappedW;
+                /** \brief shuffled list of indexes into the input data, used to select the bootstrap data */
+                QList<uint64_t> bootstrapIDs;
         };
 
 
@@ -232,7 +339,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
             public:
                 /*! \brief constructor, initializes the functor
                 */
-                IRLSFunctorAdaptor(FitFunctionFunctor* functor, double irls_parameter=1.1) ;
+                explicit IRLSFunctorAdaptor(FitFunctionFunctor* functor, double irls_parameter=1.1) ;
 
                 virtual ~IRLSFunctorAdaptor() ;
 
@@ -306,7 +413,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                     \param dataWeights the weight vector \f$ \sigma_m \f$
                     \param M number of datapoints
                 */
-                FitQFFitFunctionFunctor(QFFitFunction* model, const double* currentParams, const bool* fixParams, const double* dataX, const double* dataY, const double* dataWeight, uint64_t M) ;
+                explicit FitQFFitFunctionFunctor(QFFitFunction* model, const double* currentParams, const bool* fixParams, const double* dataX, const double* dataY, const double* dataWeight, uint64_t M) ;
 
                 virtual ~FitQFFitFunctionFunctor();
 
@@ -392,7 +499,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                     \param currentParams the initial parameters. You will have to give the values of ALL non-fit parameters in this vector!
                     \param fixParams \c true if a parameter is fixed by the user
                 */
-                FitQFOptimizeFunctionFunctor(Functor* model, const double* currentParams, const bool* fixParams) ;
+                explicit FitQFOptimizeFunctionFunctor(Functor* model, const double* currentParams, const bool* fixParams) ;
 
                 ~FitQFOptimizeFunctionFunctor();
 
@@ -439,6 +546,29 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 double* m_modelParams;
         };
 
+        class QFLIB_EXPORT FitQFOptimizeFunctionBootstrapFunctor: public FitQFOptimizeFunctionFunctor, public FunctorBootstrapInterface {
+            public:
+                virtual ~FitQFOptimizeFunctionBootstrapFunctor(){};
+                explicit FitQFOptimizeFunctionBootstrapFunctor(Functor* model, const double* currentParams, const bool* fixParams) ;
+
+                /** \brief prepares a new selection of data for bootstrapping
+                 *
+                 * \note if you only want to reapply the current selection and not select new data, call reapplyBootstrapselection() instead.
+                 */
+                virtual void prepareBootstrapSelection();
+                /** \brief this function reapplies the current bootstrappig selection, i.e. if the input-data changed, but not its number and also the selection should not be recreated.
+                 *
+                 * \note to create a new subset from the input data, call prepareBootstrapSelection()
+                 */
+                virtual void reapplyBootstrapselection();
+                /** \brief switches bootstrapping on and off, if \c enabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
+                virtual void setBootstrappingEnabled(bool enabled, bool prepBootstrapping=true);
+                /** \brief sets the fraction of the datapoints, that are selected by prepareBootstrapSelection(), if \c bootstrappingEnabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
+                virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true);
+
+                FunctorBootstrapInterface* getModelAsBootstrap() const;
+        };
+
 
         /** \brief this struct is used to return the fit result */
         struct QFLIB_EXPORT FitResult {
@@ -475,11 +605,13 @@ class QFLIB_EXPORT QFFitAlgorithm {
             QString  getAsString(QString resultName);
         };
 
+
+
         /** \brief class construtor */
-        QFFitAlgorithm() { m_reporter=NULL; }
+        QFFitAlgorithm();
 
         /** \brief class destructor */
-        virtual ~QFFitAlgorithm() {}
+        virtual ~QFFitAlgorithm();
 
 
         /** \brief return a list with the names of all fitting algorithm parameters */
@@ -495,6 +627,42 @@ class QFLIB_EXPORT QFFitAlgorithm {
         inline void setParameter(QString id, QVariant value) {
             m_parameters[id]=value;
         }
+
+        /** \brief defines the possibilities to estimate the fit parameter errors, when calling fit() */
+        enum FitParameterErrorEstimates {
+            fpeAlgorithm=0,
+            fpeBootstrapping=1
+        };
+
+        /** \brief sets the number of bootstrapping repeats, that fit() will do, if setErrorEstimateModeFit() was set to fpeBootstrapping */
+        void setBootstrapRepeats(int repeats);
+        /** \brief returns the number of bootstrapping repeats, that fit() will do, if setErrorEstimateModeFit() was set to fpeBootstrapping */
+        int getBootstrapRepeats() const;
+
+        /** \brief sets the bootstrap fraction, that fit() will do, if setErrorEstimateModeFit() was set to fpeBootstrapping */
+        void setBootstrapFraction(double fraction);
+        /** \brief returns the bootstrap fraction, that fit() will do, if setErrorEstimateModeFit() was set to fpeBootstrapping */
+        double getBootstrapFraction() const;
+
+        /** \brief sets the relative bootstrap distortion, that fit() will do, if setErrorEstimateModeFit() was set to fpeBootstrapping */
+        void setBootstrapDistortion(double distortion);
+        /** \brief returns the relative bootstrap distortion, that fit() will do, if setErrorEstimateModeFit() was set to fpeBootstrapping */
+        double getBootstrapDistortion() const;
+
+        /** \brief define, how fit() estimates the parameter errors */
+        void setErrorEstimateModeFit(FitParameterErrorEstimates mode);
+        /** \brief define, how fit() estimates the parameter errors */
+        void setErrorEstimateModeFit(int mode);
+        /** \brief define, how fit() estimates the parameter errors */
+        void setErrorEstimateModeFit(FitParameterErrorEstimates mode, int repeats);
+        /** \brief define, how fit() estimates the parameter errors */
+        void setErrorEstimateModeFit(FitParameterErrorEstimates mode, int repeats, double bootstrapFraction);
+        /** \brief define, how fit() estimates the parameter errors */
+        void setErrorEstimateModeFit(FitParameterErrorEstimates mode, int repeats, double bootstrapFraction, double distortion);
+        /** \brief returns, how fit() estimates the parameter errors */
+        FitParameterErrorEstimates getErrorEstimateModeFit() const;
+
+        void readErrorEstimateParametersFit(const QFProperties *props, const QString& prefix=QString());
 
 
         /*! \brief this wrapper routine allows to use the fitting algorithm for 1D data fitting with a given model function \f$ f(x; \vec{p}) \f$ encoded in \a model
@@ -513,6 +681,11 @@ class QFLIB_EXPORT QFFitAlgorithm {
             \param paramsMin lower parameter bound
             \param paramsMax upper parameter bound
             \return a FitResult object describing the fit result
+
+            \note If the bootstrapping mode is activated (see setErrorEstimateModeFit() ) then this function will first do the actual fit with the full input data vector
+                  (of which the parameters are returned). Then it will perform a given number of bootstrapping repeats, where the fit is repeated with the result of the
+                  first fit as initial parameters (distorted by a small fraction), but only for a subset of the input data. Then, from the results of these fits, a standard
+                  deviation for each parameter is calculated and returned as error estimate. <b>Note, that this routine will require significantly more time, than a simple fit!</b>
         */
         FitResult fit(double* paramsOut, double* paramErrorsOut, const double* dataX, const double* dataY, const double* dataWeight, uint64_t N, QFFitFunction* model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL);
 
@@ -554,6 +727,15 @@ class QFLIB_EXPORT QFFitAlgorithm {
 
         /** \brief reporter object */
         QFFitAlgorithmReporter* m_reporter;
+
+        /** \brief number of repeats, when calculating errors with bootstrapping. The default value is 20. */
+        int m_bootstrapRepeats;
+        /** \brief bootstrapping fraction, initially 0.6 */
+        double m_bootstrapFraction;
+        /** \brief relative bootstrapping distortion of the fit values, initially 2%=0.02 */
+        double m_bootstrapDistortion;
+        /** \brief the error estimateion mode for fit() */
+        FitParameterErrorEstimates m_errorEstimateModeFit;
 
 
         /** \brief report a status message */

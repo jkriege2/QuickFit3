@@ -89,6 +89,8 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
         /** \brief toolbar to access functions of tvResults */
         QToolBar* tbResults;
         /** \brief toolbar to access functions of tvResults */
+        QToolBar* tbResultsSettings;
+        /** \brief toolbar to access functions of tvResults */
         QToolBar* tbResultsFilter;
         /** \brief action used to copy selection in tvResults to clipbord */
         QAction* actCopyResults;
@@ -131,6 +133,7 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
 
         QCheckBox* chkExtractRuns;
         QCheckBox* chkRemoveUnusedRuns;
+        QCheckBox* chkMindUnusedForVectorStat;
 
         QFEnhancedLineEdit* edtFilterRecords;
         QFEnhancedLineEdit* edtFilterRecordsNot;
@@ -243,6 +246,9 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
 
         void showStatistics();
         void showStatisticsComparing();
+
+        void storeSettings();
+        void loadSettings();
 
 };
 

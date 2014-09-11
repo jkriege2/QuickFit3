@@ -61,8 +61,8 @@ QVector<double> stringToDoubleArray_hex(const QString& data) {
 }
 
 QByteArray doubleArrayToString_base64(const QVector<double>& data) {
-    QElapsedTimer t;
-    t.start();
+    //QElapsedTimer t;
+    //t.start();
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
     QVector<double> datai=data;
     for (int i=0; i<datai.size(); i++) {
@@ -79,8 +79,8 @@ QByteArray doubleArrayToString_base64(const QVector<double>& data) {
 }
 
 QByteArray doubleArrayToString_hex(const QVector<double>& data) {
-    QElapsedTimer t;
-    t.start();
+    //QElapsedTimer t;
+    //t.start();
 
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
     QVector<double> datai=data;
@@ -141,8 +141,8 @@ QVector<qlonglong> stringToQlonglongArray_hex(const QString& data) {
 }
 
 QByteArray qlonglongArrayToString_base64(const QVector<qlonglong>& data) {
-    QElapsedTimer t;
-    t.start();
+//    QElapsedTimer t;
+//    t.start();
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
     QVector<qlonglong> datai=data;
     for (int i=0; i<datai.size(); i++) {
@@ -160,8 +160,8 @@ QByteArray qlonglongArrayToString_base64(const QVector<qlonglong>& data) {
 }
 
 QByteArray qlonglongArrayToString_hex(const QVector<qlonglong>& data) {
-    QElapsedTimer t;
-    t.start();
+//    QElapsedTimer t;
+//    t.start();
 #if Q_BYTE_ORDER == Q_BIG_ENDIAN
     QVector<qlonglong> datai=data;
     for (int i=0; i<datai.size(); i++) {

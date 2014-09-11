@@ -2843,7 +2843,7 @@ bool QFRDRFCSData::loadOlegData(QString filename)
                 corr= binfileReadDoubleArrayV(f, corrN*runs);
                 cntRuns=runs;
                 cnt= binfileReadDoubleArrayV(f, cntN*cntRuns);
-                for (int i=0; i<cntN*runs; i++) {
+                for (int64_t i=0; i<cntN*(int32_t)runs; i++) {
                     cnt[i]=cnt[i]/1000.0;
                 }
             } else if (version==1) {
@@ -2942,7 +2942,7 @@ bool QFRDRFCSData::loadOlegData(QString filename)
             bool dontUse=false;
             while (csize>2 && ( dontUse || lags[csize-1]==0.0 || lags[csize-1]==-1.0 || !QFFloatIsOK(lags[csize-1]) || (runtime>0 && lags[csize-1]>runtime))) {
                 dontUse=true;
-                for (int r=0; r<runs; r++) {
+                for (uint32_t r=0; r<runs; r++) {
                     const double cv=corr.value(r*lags.size()+csize-1);
                     if (cv!=0.0 && cv!=-1.0) {
                         dontUse=false;
@@ -2978,7 +2978,7 @@ bool QFRDRFCSData::loadOlegData(QString filename)
                         rateT[t]=double(t)*runtime/double(cntN);
                     }
                     nn=0;
-                    for (uint32_t r=0; r<rateRuns; r++) {
+                    for (int32_t r=0; r<rateRuns; r++) {
                         for (int t=0; t<rateN; t++) {
                             rate[nn]=cnt.value(nn, 0)/1000.0;
                             nn++;
@@ -3033,8 +3033,8 @@ bool QFRDRFCSData::loadCorrelatorComSIN(QString filename)
             rateT[t]=data.counts_time.value(t, 0);
         }
         nn=0;
-        for (uint32_t c=0; c<rateChannels; c++) {
-            for (uint32_t r=0; r<rateRuns; r++) {
+        for (int32_t c=0; c<rateChannels; c++) {
+            for (int32_t r=0; r<rateRuns; r++) {
                 for (int t=0; t<rateN; t++) {
                     rate[nn]=data.counts[c].value(t, 0)/1000.0;
                     nn++;
