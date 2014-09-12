@@ -23,101 +23,7 @@
 #include "qfecalculatordialog.h"
 #include "ui_qfecalculatordialog.h"
 #include "qfecalculator.h"
-
-qfmpResult fPlot(const qfmpResult* params, unsigned int  n, QFMathParser* p){
-  QFECalculatorDialog* dlg=(QFECalculatorDialog*)(p->getGeneraldata("QFECalculatorDialog/pointer", 0).toLongLong());
-  int fid=p->getGeneraldata("QFECalculatorDialog/current_figure", int(-1)).toInt();
-  if (dlg) {
-      QFECalculatorPlotDialog* fig=dlg->getPlot(fid, &fid);
-      if (fig) {
-          p->setGeneralData("QFECalculatorDialog/current_figure", fid);
-          qDebug()<<"current_figure="<<fid;
-          fig->clearPlots();
-          fig->startAddingPlots();
-          unsigned int i=0;
-          while (i<n) {
-              QVector<double> X, Y;
-              QString spec="";
-              QString label="";
-              X=params[i].asVector();
-              i++;
-              if (i<n) {
-                  Y=params[i].asVector();
-                  i++;
-              }
-              if (i<n && params[i].type==qfmpString) {
-                  spec=params[i].str;
-                  i++;
-              }
-              if (i<n && params[i].type==qfmpString) {
-                  label=params[i].str;
-                  i++;
-              }
-
-              if (X.size()>0 && Y.size()>0) {
-                  fig->addPlot(X, Y, spec, label);
-              }
-          }
-          fig->endAddingPlots();
-      }
-  }
-  return qfmpResult::voidResult();
-}
-
-qfmpResult fDisp(const qfmpResult* params, unsigned int  n, QFMathParser* p){
-  QFECalculatorDialog* dlg=(QFECalculatorDialog*)(p->getGeneraldata("QFECalculatorDialog/pointer", 0).toLongLong());
-  if (dlg) {
-      QPlainTextEdit* h=dlg->getHistory();
-
-      QString t="";
-      for (int i=0; i<n; i++) {
-          t=t+params[i].toString(dlg->getPrecision());
-      }
-
-      QTextCursor cur1(h->document());
-      cur1.movePosition(QTextCursor::End);
-      cur1.insertFragment(QTextDocumentFragment::fromPlainText(t+"\n"));
-
-  }
-  return qfmpResult::voidResult();
-}
-
-qfmpResult fDispNLB(const qfmpResult* params, unsigned int  n, QFMathParser* p){
-    QFECalculatorDialog* dlg=(QFECalculatorDialog*)(p->getGeneraldata("QFECalculatorDialog/pointer", 0).toLongLong());
-  if (dlg) {
-      QPlainTextEdit* h=dlg->getHistory();
-
-      QString t="";
-      for (int i=0; i<n; i++) {
-          t=t+params[i].toString(dlg->getPrecision());
-      }
-
-      QTextCursor cur1(h->document());
-      cur1.movePosition(QTextCursor::End);
-      cur1.insertFragment(QTextDocumentFragment::fromPlainText(t));
-
-  }
-  return qfmpResult::voidResult();
-}
-
-qfmpResult fDispType(const qfmpResult* params, unsigned int  n, QFMathParser* p){
-    QFECalculatorDialog* dlg=(QFECalculatorDialog*)(p->getGeneraldata("QFECalculatorDialog/pointer", 0).toLongLong());
-  if (dlg) {
-      QPlainTextEdit* h=dlg->getHistory();
-
-      QString t="";
-      for (int i=0; i<n; i++) {
-          t=t+params[i].toTypeString(dlg->getPrecision());
-      }
-
-      QTextCursor cur1(h->document());
-      cur1.movePosition(QTextCursor::End);
-      cur1.insertFragment(QTextDocumentFragment::fromPlainText(t+"\n"));
-
-  }
-  return qfmpResult::voidResult();
-}
-
+#include "qfecalculatorlibrary.h"
 
 
 QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
@@ -161,11 +67,7 @@ void QFECalculatorDialog::setupParser(QFMathParser *parser) const
 {
     parser->setGeneralData("QFECalculatorDialog/pointer", (qlonglong)this);
     parser->setGeneralData("QFECalculatorDialog/current_figure", int(-1));
-    parser->addFunction("plot", fPlot);
-    parser->addFunction("write", fDispNLB);
-    parser->addFunction("writeln", fDisp);
-    parser->addFunction("disp", fDisp);
-    parser->addFunction("dispType", fDispType);
+    registerQFECalculatorFunctions(parser);
 }
 
 QFECalculatorDialog::~QFECalculatorDialog()

@@ -143,7 +143,8 @@ HEADERS += dlgnewproperty.h \
     qfrdrrunselection.h \
     qfrdrimagetoruninterface.h \
     qffitalgorithmerrorestimatemodewidget.h \
-    qfsimpleplotservice.h
+    qfsimpleplotservice.h \
+    ../version.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \

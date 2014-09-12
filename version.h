@@ -5,6 +5,7 @@
 #include "compiledate.h"
 #include "svnversion.h"
 #include "compiler.h"
+#include "qfversion.h"
 
 #define VERSION_FULL "3.0"
 #define QF_VERSION VERSION_FULL
@@ -31,7 +32,7 @@
 
 #define QF_LICENSE QT_TR_NOOP("<b>GNU General Public License (GPL) 3.0</b><br><small><i>Also: This is POSTCARD-ware, so if you like the program and use it, please let us know by sending a nice postcard from your place on the world to:</i><br>DKFZ (German Cancer Research Center)<br>Dept. B040 (Biophysics of Macromolecules)<br>z.H. Jan Krieger<br>Im Neuenheimer Feld 580<br>D-69120 Heidelberg<br>GERMANY</small>")
 
-#define QF_CITATION_HTML QString("Jan Wolfgang Krieger, J&ouml;rg Langowski (2010-%6): <b>QuickFit %1 (compiled: %2, SVN: %3): A data evaluation application for biophysics</b>, <i>[web page] <a href=\"%4\">%4</a> [Accessed on %5]</i>").arg(QF_VERSION).arg(COMPILEDATE).arg(SVNVERSION).arg(QF_WEBLINK).arg(QDate::currentDate().toString("yyyy/MM/d")).arg(QDate::currentDate().year())
+#define QF_CITATION_HTML QString("Jan Wolfgang Krieger, J&ouml;rg Langowski (2010-%6): <b>QuickFit %1 (compiled: %2, SVN: %3): A data evaluation application for biophysics</b>, <i>[web page] <a href=\"%4\">%4</a> [Accessed on %5]</i>").arg(QF_VERSION).arg(qfInfoCompileDate()).arg(qfInfoSVNVersion()).arg(QF_WEBLINK).arg(QDate::currentDate().toString("yyyy/MM/d")).arg(QDate::currentDate().year())
 #define QF_CITATION_BIBTEX QString("@misc{quickfit3,\n" \
     "  author={Jan Wolfgang Krieger and J{\\\"o}rg Langowski},\n" \
     "  title={{QuickFit %1} (compiled: %2, {SVN:} %3): A data evaluation application for biophysics},\n" \
@@ -45,7 +46,7 @@
     "  url={%4},\n" \
     "  year={2010--%6},\n" \
     "  note={accessed on %5},\n" \
-    "}").arg(QF_VERSION).arg(COMPILEDATE).arg(SVNVERSION).arg(QF_WEBLINK).arg(QDate::currentDate().toString("yyyy/MM/dd")).arg(QDate::currentDate().year())
+    "}").arg(QF_VERSION).arg(qfInfoCompileDate()).arg(qfInfoSVNVersion()).arg(QF_WEBLINK).arg(QDate::currentDate().toString("yyyy/MM/dd")).arg(QDate::currentDate().year())
 
 
 #endif //VERSION_H

@@ -27,6 +27,11 @@ class QFECalculatorPlotDialog : public QDialog
         void setXAxisLabel(const QString& label);
         void setYAxisLabel(const QString& label);
         void addPlot(const QVector<double>& X, const QVector<double>& Y, const QString& spec=QString(), const QString& label=QString());
+        void addBarPlot(const QVector<double>& X, const QVector<double>& Y, const QString& spec=QString(), const QString& label=QString());
+        void addErrorPlot(const QVector<double>& X, const QVector<double>& Y, const QVector<double>& Xerrors, const QVector<double>& Yerrors, const QString& spec=QString(), const QString& label=QString(), JKQTPerrorPlotstyle errorstyle=JKQTPerrorBars);
+        void addScatterPlot(const QVector<double>& X, const QVector<double>& Y, const QVector<double>& S, const QString& spec=QString(), const QString& label=QString());
+        void addColorScatterPlot(const QVector<double>& X, const QVector<double>& Y, const QVector<double>& S, const QString& spec=QString(), const QString& label=QString(), const QString& colorscale=QString("matlab"));
+        void fitRanges();
 
     protected slots:
         void showHelp();
