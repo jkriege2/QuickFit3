@@ -24,6 +24,46 @@
 #include "ui_qfecalculatordialog.h"
 #include "qfecalculator.h"
 
+qfmpResult fPlot(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+  QFECalculatorDialog* dlg=(QFECalculatorDialog*)(p->getGeneraldata("QFECalculatorDialog/pointer", 0).toLongLong());
+  int fid=p->getGeneraldata("QFECalculatorDialog/current_figure", int(-1)).toInt();
+  if (dlg) {
+      QFECalculatorPlotDialog* fig=dlg->getPlot(fid, &fid);
+      if (fig) {
+          p->setGeneralData("QFECalculatorDialog/current_figure", fid);
+          qDebug()<<"current_figure="<<fid;
+          fig->clearPlots();
+          fig->startAddingPlots();
+          unsigned int i=0;
+          while (i<n) {
+              QVector<double> X, Y;
+              QString spec="";
+              QString label="";
+              X=params[i].asVector();
+              i++;
+              if (i<n) {
+                  Y=params[i].asVector();
+                  i++;
+              }
+              if (i<n && params[i].type==qfmpString) {
+                  spec=params[i].str;
+                  i++;
+              }
+              if (i<n && params[i].type==qfmpString) {
+                  label=params[i].str;
+                  i++;
+              }
+
+              if (X.size()>0 && Y.size()>0) {
+                  fig->addPlot(X, Y, spec, label);
+              }
+          }
+          fig->endAddingPlots();
+      }
+  }
+  return qfmpResult::voidResult();
+}
+
 qfmpResult fDisp(const qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFECalculatorDialog* dlg=(QFECalculatorDialog*)(p->getGeneraldata("QFECalculatorDialog/pointer", 0).toLongLong());
   if (dlg) {
@@ -120,6 +160,8 @@ QFECalculatorDialog::QFECalculatorDialog(QFECalculator *calc, QWidget *parent) :
 void QFECalculatorDialog::setupParser(QFMathParser *parser) const
 {
     parser->setGeneralData("QFECalculatorDialog/pointer", (qlonglong)this);
+    parser->setGeneralData("QFECalculatorDialog/current_figure", int(-1));
+    parser->addFunction("plot", fPlot);
     parser->addFunction("write", fDispNLB);
     parser->addFunction("writeln", fDisp);
     parser->addFunction("disp", fDisp);
@@ -128,7 +170,15 @@ void QFECalculatorDialog::setupParser(QFMathParser *parser) const
 
 QFECalculatorDialog::~QFECalculatorDialog()
 {
-
+    QMapIterator<int, QPointer<QFECalculatorPlotDialog> > i(plots);
+    while (i.hasNext()) {
+        i.next();
+        if (i.value()) {
+            i.value()->close();
+            delete i.value();
+        }
+    }
+    plots.clear();
     delete ui;
     delete parser;
 }
@@ -141,6 +191,29 @@ int QFECalculatorDialog::getPrecision() const
 QPlainTextEdit *QFECalculatorDialog::getHistory() const
 {
     return ui->edtHistory;
+}
+
+QFECalculatorPlotDialog *QFECalculatorDialog::getPlot(int ii, int* index)
+{
+    int i=ii;
+    if (ii==-1) {
+        i=parser->getGeneraldata("QFECalculatorDialog/current_figure", int(-1)).toInt();
+    }
+    if (i>=0 && plots.contains(i) && plots[i]) {
+        if (index) *index=i;
+        plots[i]->show();
+        plots[i]->raise();
+        return plots[i];
+    }
+
+    if (i<0) i=qfstatisticsMax(plots.keys())+1;
+    QFECalculatorPlotDialog* dlg=new QFECalculatorPlotDialog(NULL);
+    plots[i]=dlg;
+    dlg->setWindowTitle(tr("QFECalculator figure %1").arg(i));
+    if (index) *index=i;
+    dlg->show();
+    dlg->raise();
+    return dlg;
 }
 
 void QFECalculatorDialog::showHelp()

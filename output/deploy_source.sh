@@ -113,6 +113,7 @@ INSTALLER_INSTDIR="\$PROGRAMFILES32"
 ZIPFILE=quickfit3_source${SPECIALS}_${SVNVER}.zip
 CAIRO4QTZIPFILE=cairo4qtv2_source_${SVNVER}.zip
 TINYTIFFZIPFILE=tinytiff_source_${SVNVER}.zip
+JKQTPLOTTERZIPFILE=jkqtplotter_source_${SVNVER}.zip
 SPECIALPLUGINS=""
 if [ "${deployspecials}" == "1" ]; then
 	SPECIALPLUGINS=
@@ -155,6 +156,7 @@ if [ "${create_deploy}" != "0" ]; then
 	
 	echo -e "\n\nCREATING ${CAIRO4QTZIPFILE}:\n"
 	mkdir cairo4qtv2
+	cp -f ./FCSTOOLS/trunk/QuickFit3/plugins/qfe_plotterexportercairo/cairo4qtv2.readme ./cairo4qtv2/readme.txt
 	cp -rf ./FCSTOOLS/trunk/QuickFit3/plugins/qfe_plotterexportercairo/qcairo*.* ./cairo4qtv2
 	cp -rf ./FCSTOOLS/trunk/QuickFit3/plugins/qfe_plotterexportercairo/cairoQ*.* ./cairo4qtv2
 	cp -rf ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./cairo4qtv2
@@ -168,6 +170,7 @@ if [ "${create_deploy}" != "0" ]; then
 	mkdir tinytiff/test
 	mkdir tinytiff/test/tinytiff_reader_test
 	mkdir tinytiff/test/tinytiffwriter_test
+	cp -f ./LIB/trunk/tinytiff.readme ./tinytiff/readme.txt
 	cp -rf ./LIB/trunk/tinytiff*.* ./tinytiff
 	cp -rf ./LIB/trunk/lib_imexport.h ./tinytiff
 	cp -rf ./LIB/trunk/libtiff_tools.* ./tinytiff
@@ -181,6 +184,34 @@ if [ "${create_deploy}" != "0" ]; then
 	cd ..
 	rm -rf tinytiff
 	
+	echo -e "\n\nCREATING ${JKQTPLOTTERZIPFILE}:\n"
+	mkdir jkqtplotter
+	mkdir jkqtplotter/qt/test
+	mkdir jkqtplotter/qt/test/jkqtfastplotter_test
+	mkdir jkqtplotter/qt/test/jkqtmathtext_test
+	mkdir jkqtplotter/qt/test/jkqtplot_test
+	mkdir jkqtplotter/qt/images
+	cp -f ./LIB/trunk/qt/jkqtplotter.readme ./jkqtplotter/qt
+	cp -f ./LIB/trunk/qt/jkqtfastplotter.readme ./jkqtplotter/qt
+	cp -f ./LIB/trunk/qt/jkqtmathtext.readme ./jkqtplotter/qt
+	cp -rf ./jkqtplotter/qt/images/* ./jkqtplotter/qt/images
+	cp -rf ./LIB/trunk/lib_imexport.h ./jkqtplotter
+	cp -rf ./LIB/trunk/highrestimer.* ./jkqtplotter
+	cp -rf ./LIB/trunk/tools.* ./jkqtplotter
+	cp -rf ./LIB/trunk/jkmathparser.* ./jkqtplotter
+	cp -rf ./LIB/trunk/qt/jkautooutputtimer.* ./jkqtplotter/qt
+	cp -rf ./LIB/trunk/qt/jkqtmathtext.* ./jkqtplotter/qt
+	cp -rf ./LIB/trunk/qt/jkqttools.* ./jkqtplotter/qt
+	cp -rf ./LIB/trunk/qt/jkqtp*.* ./jkqtplotter/qt
+	cp -rf ./LIB/trunk/qt/test/jkqtfastplotter_test/* ./jkqtplotter/qt/test/jkqtfastplotter_test/
+	cp -rf ./LIB/trunk/qt/test/jkqtmathtext_test/* ./jkqtplotter/qt/test/jkqtmathtext_test/
+	cp -rf ./LIB/trunk/qt/test/jkqtplot_test/* ./jkqtplotter/qt/test/jkqtplot_test/
+	cp -rf ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./jkqtplotter
+	cd jkqtplotter
+	zip -rv9 ../../${JKQTPLOTTERZIPFILE} *
+	cd ..
+	rm -rf jkqtplotter
+	
 	echo -e "\n\nDELETING .svn:\n"
 	for f in `find . -type d -name .svn`
 	do
@@ -191,6 +222,13 @@ if [ "${create_deploy}" != "0" ]; then
 	rm ./FCSTOOLS/trunk/QuickFit3/extlibs/andor_win32/ATMCD32D.H
 	rm ./FCSTOOLS/trunk/QuickFit3/extlibs/andor_win64/atmcd64d.DLL
 	rm ./FCSTOOLS/trunk/QuickFit3/extlibs/andor_win64/ATMCD32D.H
+	
+	THISDIRSD=`pwd`
+	cd ../../tools/qf3sourcedeploy/
+	qmake
+	make
+	make
+	cd ${THISDIRSD}
 	
 	LIB_FILES=`../../tools/qf3sourcedeploy/qf3sourcedeploy ./FCSTOOLS`
 	

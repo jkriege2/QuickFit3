@@ -26,6 +26,7 @@
 #include "qfmathparser.h"
 
 qfmpResult fRegression(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+qfmpResult fPolyFit(const qfmpResult* params, unsigned int  n, QFMathParser* p);
 qfmpResult fWeightedRegression(const qfmpResult* params, unsigned int  n, QFMathParser* p);
 qfmpResult fIRLS(const qfmpResult* params, unsigned int  n, QFMathParser* p);
 

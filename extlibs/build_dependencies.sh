@@ -882,7 +882,7 @@ print_result "libtiff" $libtiffOK
 print_result "gsl" $libgslOK
 print_result "libusb" $libusbOK
 print_result "libNIDAQmx" $libnidaqmxOK
-print_result "libNIDAQmx" $libandorOK
+print_result "libAndor" $libandorOK
 print_result "eigen" $eigenOK
 print_result "cimg" $cimgOK
 print_result "pixman" $libpixmanOK

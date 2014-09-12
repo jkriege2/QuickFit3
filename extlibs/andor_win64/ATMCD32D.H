@@ -2,7 +2,7 @@
 // Windows C Interface
 #if !defined(__atmcd32d_h)
 #define __atmcd32d_h
-
+#pragma hdrstop
 
 #include "windows.h"
 

@@ -71,15 +71,33 @@ QString qfInfoLicense() {
 }
 
 QString qfInfoSVNVersion() {
-    return QString(SVNVERSION);
+    QString s= QString(SVNVERSION);
+    if (s.contains("exportiert", Qt::CaseInsensitive) || s.contains("exported", Qt::CaseInsensitive)) {
+        s="---";
+    } else if (s.endsWith("M")) {
+        s=s.left(s.length()-1);
+    }
+    return s;
 }
 
 QString qfInfoCompiler() {
-    return QString(COMPILER);
+    QString s=QString(COMPILER);
+    QRegExp rxc("(g\\+\\+\\s\\([^\\)]*\\).*)Copyright.*(\\(MACHINE.*\\))");
+    rxc.setCaseSensitivity(Qt::CaseInsensitive);
+    if (rxc.indexIn(s)>=0) {
+        s=rxc.cap(1)+QString(" ")+rxc.cap(2);
+    }
+    return s;
 }
 
 QString qfInfoCompileDate() {
-    return QString(COMPILEDATE);
+    QString s=QString(COMPILEDATE);
+    QRegExp rx("\\s*(\\d\\d)\\.(\\d\\d)\\.(\\d\\d\\d\\d)\\s*");
+    rx.setCaseSensitivity(Qt::CaseInsensitive);
+    if (rx.indexIn(s)==0 && rx.matchedLength()==s.length()) {
+        s=QDate(rx.cap(3).toInt(), rx.cap(2).toInt(), rx.cap(1).toInt()).toString("yyyy/MM/dd");
+    }
+    return s;
 }
 
 

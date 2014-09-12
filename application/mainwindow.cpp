@@ -370,6 +370,17 @@ void MainWindow::closeEvent(QCloseEvent *event) {
             }
             correlationViews.clear();
         }
+        {
+            QMapIterator<QString, QFSimplePlotView*> ii(plotViews);
+            while (ii.hasNext()) {
+                ii.next();
+                QString name=ii.key();
+                plotViews[name]->writeSettings(*(ProgramOptions::getInstance()->getQSettings()), "simpleplotview/"+cleanStringForFilename(name)+"/");
+                plotViews[name]->close();
+                plotViews[name]->deleteLater();
+            }
+            plotViews.clear();
+        }
         ProgramOptions::setConfigValue("quickfit/lastrunsvn", qfInfoSVNVersion());
         event->accept();
         //qDebug()<<"main: exiting application";
@@ -2256,6 +2267,56 @@ void MainWindow::addCorrelationToView(const QString &name, const QFParameterCorr
         correlationViews[name]->updateCorrelation(true);
     }
 
+}
+
+void MainWindow::addPlotToView(const QString &name, const QFSimplePlotService::PlotData &data)
+{
+    /*if (correlationViews.contains(name)) {
+        correlationViews[name]->addCopiedCorrelation(data.nameX+tr(" vs. ")+data.nameY, data.dataX.data(), data.dataY.data(), qMin(data.dataX.size(), data.dataY.size()));
+        correlationViews[name]->setCorrelation1Label(data.nameX);
+        correlationViews[name]->setCorrelation2Label(data.nameY);
+        correlationViews[name]->updateCorrelation(true);
+    }*/
+
+}
+
+void MainWindow::clearSimplePlotView(const QString &name)
+{
+    /*if (correlationViews.contains(name)) {
+        correlationViews[name]->clear();
+        correlationViews[name]->updateCorrelation(true);
+    }*/
+
+}
+
+QWidget *MainWindow::getCreateSimplePlotView(const QString &name, const QString &title)
+{
+    /*if (!correlationViews.contains(name)) {
+        correlationViews[name]=new QFParameterCorrelationView(NULL);
+    }
+    correlationViews[name]->setWindowTitle(title);
+    correlationViews[name]->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+    correlationViews[name]->setWindowIcon(QIcon(":/lib/result_correlation_icon.png"));
+    correlationViews[name]->show();
+    correlationViews[name]->raise();
+    //correlationViews[name]->setAttribute(Qt::WA_DeleteOnClose);
+    if (correlationViews.size()>1) {
+        QSize s=ProgramOptions::getConfigValue("QFParameterCorrelationView/size", QSize(800,600)).toSize();
+        QPoint p=correlationViews[name]->pos();
+        if (correlationViews.contains(lastParamCorr)) {
+            p=correlationViews[lastParamCorr]->pos();
+            s=correlationViews[lastParamCorr]->size();
+        }
+
+        correlationViews[name]->move(p+QPoint(32,32));
+        correlationViews[name]->resize(s);
+    } else {
+        correlationViews[name]->resize(QSize(500,300));
+    }
+    correlationViews[name]->readSettings(*(ProgramOptions::getInstance()->getQSettings()), "paramcorr/"+cleanStringForFilename(name)+"/");
+    lastParamCorr=name;
+    return correlationViews[name];*/
+    return NULL;
 }
 
 QString MainWindow::getPluginHelp(const QString& pluginID) {

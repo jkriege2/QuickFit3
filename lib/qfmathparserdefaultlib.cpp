@@ -1424,13 +1424,13 @@ namespace QFMathParser_DefaultLib {
             QVector<double> d=params[0].asVector();
 
             if (params[1].type==qfmpDouble || params[1].type==qfmpDoubleVector) {
-                return qfmpResult(qfUniqueApplyFunction(d, params[1].asVector(), qfstatisticsStd<QVector<double> >));
+                return qfmpResult(qfUniqueApplyFunction<double, double, qfDoubleVectorToDoubleFunc>(d, params[1].asVector(), qfstatisticsStd<QVector<double> >));
             }
             if (params[1].type==qfmpBool || params[1].type==qfmpBoolVector) {
-                return qfmpResult(qfUniqueApplyFunction(d, params[1].asBoolVector(), qfstatisticsStd<QVector<double> >));
+                return qfmpResult(qfUniqueApplyFunction<double, bool, qfDoubleVectorToDoubleFunc>(d, params[1].asBoolVector(), qfstatisticsStd<QVector<double> >));
             }
             if (params[1].type==qfmpString || params[1].type==qfmpStringVector) {
-                return qfmpResult(qfUniqueApplyFunction(d, params[1].asStrVector(), qfstatisticsStd<QVector<double> >));
+                return qfmpResult(qfUniqueApplyFunction<double, QString, qfDoubleVectorToDoubleFunc>(d, params[1].asStrVector(), qfstatisticsStd<QVector<double> >));
             }
         } else {
             p->qfmpError("indexedstd(data, index) needs a number vector as data argument and an equal sized index array of any type");

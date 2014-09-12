@@ -53,8 +53,7 @@
                     <li>added function randvec_seed(), randintvec_seed(), randnormvec_seed(), randboolvec_seed()</li>
                     <li>added functions cumsum(), cumprod(), diff(), mad(), nmad(), indexedmad(), indexednmad(), trapez()/trapz()</li>
                     <li>added functions for date/time handling: now(), datenum(), datetimenum(), date2str(), datetime2str(), datediff2secs(), datediff2mins(), datediff2hours(), datediff2days()</li>
-                    <li>parser now supports user-defined functions, that have qfmpNode*'s as parameters, rather than qfmpResult's (this allows for constructs, like "for()" in user-defined functions</li>
-                    <li></li>
+                    <li>parser now supports user-defined functions, that have qfmpNode*'s as parameters, rather than qfmpResult's (this allows for constructs, like "for()" in user-defined functions</li>                    
                     <li></li>
                     <li></li>
                     <li></li>
@@ -326,6 +325,12 @@
       </ul></li>
       <li><b>tcspcimporter:</b><ul>
         <li>improvements: now group+role of the output records are set properly (according to input file!)</li>
+      </ul></li>
+      <li><b>qfe_defaultmathparserextensions</b><ul>
+            <li>added function polyfit(), which obtains the least-squares coefficients of a polynomial from given data</li>
+      </ul></li>
+      <li><b>qfe_calculator</b><ul>
+            <li>a new set of plot-commands allows to generate graphs: <tt>plot()</tt></li>
       </ul></li>
     </ul></li>
 

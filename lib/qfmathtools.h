@@ -722,7 +722,7 @@ template <class T>
 T qfstatisticsCumSum(const T& value) {
     long long N=value.size();
     if (N<1) return T();
-    register double sum=0;
+    double sum=0;
     T res;
     for (register long long i=0; i<N; i++) {
         if (QFFloatIsOK(value[i])) {
@@ -826,7 +826,7 @@ template <class T>
 T qfstatisticsCumProd(const T& value) {
     long long N=value.size();
     if (N<1) return T();
-    register double prod=1;
+    double prod=1;
     T res;
     for (register long long i=0; i<N; i++) {
         if (QFFloatIsOK(value[i])) {

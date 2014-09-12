@@ -27,6 +27,7 @@
 #include "qfmathparser.h"
 #include "qftools.h"
 #include "qffunctionreferencetool.h"
+#include "qfecalculatorplotdialog.h"
 
 class QFECalculator;
 
@@ -42,6 +43,7 @@ class QFECalculatorDialog : public QDialog {
         ~QFECalculatorDialog();
         int getPrecision() const;
         QPlainTextEdit* getHistory() const;
+        QFECalculatorPlotDialog* getPlot(int i=-1, int *index=NULL);
     protected slots:
         void showHelp();
         void showCache();
@@ -50,13 +52,14 @@ class QFECalculatorDialog : public QDialog {
         void on_btnClearCache_clicked();
         void delayedStartSearch();
         void on_edtExpression_textChanged(QString text);
-        void on_chkMultiline_toggled(bool enabled);
+        void on_chkMultiline_toggled(bool enabled);        
     private:
         Ui::QFECalculatorDialog *ui;
         QFMathParser* parser;
         QFECalculator* calc;
         QFFunctionReferenceTool* functionRef;
         QStringList history;
+        QMap<int, QPointer<QFECalculatorPlotDialog> > plots;
         void setupParser(QFMathParser* parser) const;
 };
 

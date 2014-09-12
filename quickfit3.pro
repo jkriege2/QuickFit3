@@ -28,6 +28,10 @@ CONFIG(debug, debug|release):message("building QuickFit in DEBUG mode")
 
 TEMPLATE = subdirs
 
+SUBDIRS += tool_bitdepth
+tool_bitdepth.subdir = ./tools/qf3bitdepth
+tool_bitdepth.depends=
+
 
 SUBDIRS += lib libqf3widgets application
 application.depends = lib libqf3widgets
@@ -211,24 +215,24 @@ plg_qfe_dataexportbasics.depends = lib libqf3widgets
 		!contains(QF3CONFIG, bits64) {
 			SUBDIRS += plg_cam_systemcamera
 			plg_cam_systemcamera.subdir=./plugins/cam_systemcamera
-			plg_cam_systemcamera.depends = lib libqf3widgets
+                        plg_cam_systemcamera.depends = lib libqf3widgets
 		}
 
 		!contains(QF3CONFIG, nospecialdrivers) {
 			SUBDIRS += plg_cam_radhard2
 			plg_cam_radhard2.subdir=./plugins/cam_radhard2
-			plg_cam_radhard2.depends = lib libqf3widgets
+                        plg_cam_radhard2.depends = lib libqf3widgets
 
 			unix {
 				SUBDIRS += plg_cam_rh2v2
 				plg_cam_rh2v2.subdir=./plugins/cam_rh2v2
-				plg_cam_rh2v2.depends = lib libqf3widgets
+                                plg_cam_rh2v2.depends = lib libqf3widgets
 			}
 
 			!contains(QF3CONFIG, noandor) {
 				SUBDIRS += plg_cam_andor
 				plg_cam_andor.subdir=./plugins/cam_andor
-				plg_cam_andor.depends = lib libqf3widgets
+                                plg_cam_andor.depends = lib libqf3widgets
 			}
 
 		}

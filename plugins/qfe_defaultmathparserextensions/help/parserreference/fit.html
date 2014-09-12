@@ -52,7 +52,7 @@ $$funcref_description$$
 	      <tt>irls(X, Y, p, "a", 2)</tt><br>
 	      <tt>irls(X, Y, p, iterations, "a", 2)</tt><br>
 	  </blockquote>
-	  <br>
+	  <br><br>
 	  <u>Algorithm Description:</u><br>
 
     This is a simple form of the IRLS algorithm to estimate the parameters a and b in a linear model $$math: f(x)=a+b\cdot x $$.
@@ -80,6 +80,17 @@ $$funcref_end$$
   
     <h2>Nonlinear Fits (Least Squares, ...)</h2>
 	
+$$funcref_start$$<a name="polyfit"/><!-- func:polyfit -->
+	  <b><tt><!-- template -->polyfit(X, Y, n)<!-- /template --></tt> - <i>fits a polynomial of degree <i>n</n> to the data vectors <tt>X</tt> and <tt>Y</tt> </i>:</b>
+$$funcref_description$$
+	  The argument <tt>X</tt> and <tt>Y</tt> have to be vectors with at least <i>n+1</i> entries. The function returns the <i>n+1</i> coefficients of the polynomial expression $$bmath:f(x)=\sum_{j=0}^n a_j\cdot x^j$$ as a vector with the entires <tt>[a<sub>0</sub>, a<sub>1</sub>, ..., a<sub>n</sub>]</tt>. <br><br>
+	  <u>Algorithm Description:</u><br>
+	  This method  obtains the least-squares parameters of the polynomial, by solving the linear equation system (using a simple Gauss-Jordan solver):
+	        $$bmath:\begin{bmatrix} y_1\\ y_2\\ y_3 \\ \vdots \\ y_n \end{bmatrix}= \begin{bmatrix} 1 & x_1 & x_1^2 & \dots & x_1^P \\ 1 & x_2 & x_2^2 & \dots & x_2^P\\ 1 & x_3 & x_3^2 & \dots & x_3^P \\ \vdots & \vdots & \vdots & & \vdots \\ 1 & x_n & x_n^2 & \dots & x_n^P \end{bmatrix} \begin{bmatrix} p_0\\ p_1\\ p_2\\ \vdots \\ p_P \end{bmatrix}$$
+            $$bmath: \vec{y}=V\vec{p}\ \ \ \ \ \Rightarrow\ \ \ \ \ \vec{p}=(V^TV)^{-1}V^T\vec{y} $$
+    The method is e.g. described in <a href="https://en.wikipedia.org/wiki/Polynomial_regression">https://en.wikipedia.org/wiki/Polynomial_regression</a>.
+	  <!-- /func:polyfit -->  
+$$funcref_end$$
 	
 
   </body>

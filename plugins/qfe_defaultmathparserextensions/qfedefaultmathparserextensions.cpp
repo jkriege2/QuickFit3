@@ -62,6 +62,7 @@ void QFEDefaultMathParserExtensions::initExtension() {
 
 
     QFMathParser::addGlobalFunction("regression", fRegression);
+    QFMathParser::addGlobalFunction("polyfit", fPolyFit);
     QFMathParser::addGlobalFunction("weighted_regression", fWeightedRegression);
     QFMathParser::addGlobalFunction("irls", fIRLS);
 

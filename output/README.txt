@@ -1,10 +1,13 @@
 --------------------------------------------------------------------------------
 -- QuickFit 3.0                                                               --
--- (c) 2010-2013 by Jan W. Krieger                                            --
+-- (c) 2010-2014 by Jan W. Krieger                                            --
 --     Biophysics of Macromolecules (B040)                                    --
---     German Cancer Research center (DKFZ)                                   --
+--        German Cancer Research center (DKFZ)                                --
+--     Institute for scientific computation (IWR)                             --
+--        University of Heidelberg                                            --
 --------------------------------------------------------------------------------
 --   http://www.dkfz.de/Macromol/quickfit/                                    --
+--   http://www.dkfz.de/Macromol/quickfit/source.html                         --
 --------------------------------------------------------------------------------
 
 
@@ -16,8 +19,9 @@ together with the software. New plugins that provide additional features will be
 added to this distribution of QuickFit when they become available. Currently 
 these features are supported:
 
-  * FCS:
-      * dataimport from ALV5000, ISS Alba files, CSV files
+  * FCS/FCCS:
+      * dataimport from ALV5000-7000, ISS Alba files, CSV files, Zeiss Confocor3,
+	    correlator.com SIN-files
       * correlation of TCSPC files from PicoQuant TimeHarp, PicoHarp
       * model fit with different predefined models (normal/anomalous 1D/2D/3D 
         diffusion, photophysics, SPIM-FCS, DLS ...) and fit algorithms
@@ -27,7 +31,8 @@ these features are supported:
       * Extract mean squared displacement from FCS measurements (e.g. for 
 	    polymer physics)
       * calculator for diffusion coefficients of several dyes in a given solution
-  * imaging FCS (imFCS):
+	  * global FCCS fitting
+  * imaging FCS/FCCS (imFCS/imFCCS):
       * importing dataset from CSV files
       * correlating TIFF image series
       * model fit (SPIM-FCS, ...)

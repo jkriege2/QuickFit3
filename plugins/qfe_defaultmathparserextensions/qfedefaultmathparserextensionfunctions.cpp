@@ -22,6 +22,44 @@
 
 #include "qfedefaultmathparserextensionfunctions.h"
 #include "statistics_tools.h"
+#include <stdint.h>
+
+qfmpResult fPolyFit(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+    qfmpResult r;
+    r.type=qfmpDoubleVector;
+    if (n!=3) {
+        p->qfmpError("polyfit(X,Y,n) needs 3 arguments");
+        return p->getInvalidResult();
+    }
+    if (!(params[0].convertsToVector() && params[1].convertsToVector())) {
+        p->qfmpError("polyfit(X,Y,n) arguments X and Y have to be of type number vector");
+        return p->getInvalidResult();
+    }
+    if (params[0].length()!= params[1].length()) {
+        p->qfmpError("polyfit(X,Y,n) arguments X and Y have to have the same length");
+        return p->getInvalidResult();
+    }
+    if (!(params[2].isInteger())) {
+        p->qfmpError("polyfit(X,Y,n) argument n has to be a positive integer number");
+        return p->getInvalidResult();
+    }
+
+    QVector<double> X=params[0].asVector();
+    QVector<double> Y=params[1].asVector();
+    int32_t np=params[2].toInteger();
+
+    if (np<=0) {
+        p->qfmpError("polyfit(X,Y,n) argument n has to be a positive integer number");
+        return p->getInvalidResult();
+    }
+
+    r.numVec.clear();
+    r.numVec.resize(np+1);
+    for (int i=0; i<np+1; i++) r.numVec[i]=0.0;
+    bool ok=statisticsPolyFit(X.data(), Y.data(), qMin(X.size(), Y.size()), np, r.numVec.data());
+    return r;
+}
+
 
 qfmpResult fRegression(const qfmpResult* params, unsigned int  n, QFMathParser* p){
     qfmpResult r;

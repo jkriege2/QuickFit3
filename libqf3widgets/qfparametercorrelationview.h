@@ -82,9 +82,9 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
         explicit QFParameterCorrelationView(QWidget *parent = 0);
         ~QFParameterCorrelationView();
         /** \brief read the settings */
-        void readSettings(QSettings& settings, const QString& prefix=QString("histogram/"));
+        void readSettings(QSettings& settings, const QString& prefix=QString("paramcorr/"));
         /** \brief write the settings */
-        void writeSettings(QSettings& settings, const QString& prefix=QString("histogram/"));
+        void writeSettings(QSettings& settings, const QString& prefix=QString("paramcorr/"));
 
         void writeQFProperties(QFProperties* current, const QString& prefix, const QString& egroup, const QString& param);
         void readQFProperties(QFProperties* current, const QString& prefix, const QString& egroup, const QString& param);

@@ -56,10 +56,13 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "userfitfunctionseditor.h"
 #include "qfparametercorrelationservice.h"
 #include "qfparametercorrelationview.h"
+#include "qfsimpleplotservice.h"
+#include "qfsimpleplotview.h"
+
 /*! \brief main widget for QuickFit
     \ingroup qf3app
 */
-class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogramService, public QFParameterCorrelationService {
+class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogramService, public QFParameterCorrelationService, public QFSimplePlotService {
         Q_OBJECT
         Q_INTERFACES(QFPluginServices)
     public:
@@ -269,6 +272,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual void clearParameterCorrelationView(const QString& name);
         virtual void addCorrelationToView(const QString& name, const ParameterCorrelation& data);
 
+        virtual QWidget* getCreateSimplePlotView(const QString& name, const QString& title);
+        virtual void clearSimplePlotView(const QString& name);
+        virtual void addPlotToView(const QString& name, const PlotData& data);
 
         virtual QMap<QString, QFToolTipsData> getTooltips() const;
     protected:
@@ -425,6 +431,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QList<QFPluginOptionsDialogInterface*> pluginOptionDialogs;
         QMap<QString, QFHistogramView*> histograms;
         QMap<QString, QFParameterCorrelationView*> correlationViews;
+        QMap<QString, QFSimplePlotView*> plotViews;
         QMap<QString, QVariant> globalParameterStore;
         QString lastHistogram;
         QString lastParamCorr;

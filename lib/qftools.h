@@ -1278,7 +1278,7 @@ QFLIB_EXPORT QString qfShortenString(const QString& input, int maxLen=250, int k
 
 
 
-
+typedef double (*qfDoubleVectorToDoubleFunc)(const QVector<double>&);
 
 
 /*! \brief group the data in \a input according to the labels given in \a index. Then return a vector where the function \a func is applied to every vector of values from \input, which all have the same index in \a index.
@@ -1359,7 +1359,8 @@ QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QVector<TIDX>& i
 /*! \brief group the data in \a input according to the labels given in \a index. Then return a vector where the function \a func is applied to every vector of values from \input, which all have the same index in \a index.
     \ingroup qf3lib_tools
 
- */template <typename T, typename TIDX, typename TFUNC, typename TFUNCPARAM>
+ */
+template <typename T, typename TIDX, typename TFUNC, typename TFUNCPARAM>
 QList<T> qfUniqueApplyFunction(const QList<T>& input, const QList<TIDX>& index, TFUNC func, TFUNCPARAM funcParam) {
     QList<T> res;
     QMap<TIDX, QList<T> > dataset;
@@ -1377,7 +1378,8 @@ QList<T> qfUniqueApplyFunction(const QList<T>& input, const QList<TIDX>& index, 
 /*! \brief group the data in \a input according to the labels given in \a index. Then return a vector where the function \a func is applied to every vector of values from \input, which all have the same index in \a index.
     \ingroup qf3lib_tools
 
- */template <typename T, typename TIDX, typename TFUNC, typename TFUNCPARAM>
+ */
+template <typename T, typename TIDX, typename TFUNC, typename TFUNCPARAM>
 QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QList<TIDX>& index, TFUNC func, TFUNCPARAM funcParam) {
     QVector<T> res;
     QMap<TIDX, QVector<T> > dataset;

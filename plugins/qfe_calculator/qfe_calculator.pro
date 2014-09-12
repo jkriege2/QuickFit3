@@ -37,14 +37,17 @@ DESTDIR = $${QFOUTPUT}/plugins/
 # Input
 HEADERS += qfecalculator.h \
     qfecalculatordialog.h \
-    ../base_classes/qffunctionreferencetool.h
+    ../base_classes/qffunctionreferencetool.h \
+    qfecalculatorplotdialog.h
 
 SOURCES += qfecalculator.cpp \
     qfecalculatordialog.cpp \
-    ../base_classes/qffunctionreferencetool.cpp
+    ../base_classes/qffunctionreferencetool.cpp \
+    qfecalculatorplotdialog.cpp
 
 FORMS = \
-    qfecalculatordialog.ui
+    qfecalculatordialog.ui \
+    qfecalculatorplotdialog.ui
 
 RESOURCES += qfecalculator.qrc
 
