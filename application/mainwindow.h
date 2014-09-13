@@ -58,6 +58,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfparametercorrelationview.h"
 #include "qfsimpleplotservice.h"
 #include "qfsimpleplotview.h"
+#include "jkqtpimagetools.h"
 
 /*! \brief main widget for QuickFit
     \ingroup qf3app

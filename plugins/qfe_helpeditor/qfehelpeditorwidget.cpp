@@ -250,7 +250,8 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, tr("Link: Expression parser help"), "<a href=\"$$qf_mathparser_helpfile$$\">$$qf_mathparser_helpfiletitle$$</a>" );
     //addInsertAction(menu, tr("Link:  help"), "<a href=\"$$aa$$\">$$aa$$</a>" );
     //addInsertAction(menu, tr("Link:  help"), QString("<a href=\"$$mainhelpdir$$aa\">aa</a>") );
-    addInsertAction(menu, tr("Link: Color paletes help"), QString("<a href=\"$$mainhelpdir$$colorpalettes.html\">color paletes</a>") );
+    addInsertAction(menu, tr("Link: Custom color palettes help"), QString("<a href=\"$$mainhelpdir$$colorpalettes.html\">custom color paletes</a>") );
+    addInsertAction(menu, tr("Link: Available color palettes"), QString("<a href=\"$$mainhelpdir$$installedcolorpalettes.html\">available color paletes</a>") );
     addInsertAction(menu, tr("Link: Regular Expressions"), QString("<a href=\"$$mainhelpdir$$qf3_qtregexp.html\">regular expressions</a>") );
     addInsertAction(menu, tr("Link: Fit Functions"), QString("<a href=\"$$mainhelpdir$$qf3_fitfunc.html\">fit functions</a>") );
     addInsertAction(menu, tr("Link: Fit Algorithms"), QString("<a href=\"$$mainhelpdir$$qf3_fitalg.html\">fit algorithms</a>") );

@@ -24,6 +24,7 @@ class QFECalculatorPlotDialog : public QDialog
         void setAxisLabel(const QString &labX, const QString &labY);
         void setLogX(bool log);
         void setLogY(bool log);
+        void setGrid(bool enabled, const QString &style=QString());
         void setXAxisLabel(const QString& label);
         void setYAxisLabel(const QString& label);
         void addPlot(const QVector<double>& X, const QVector<double>& Y, const QString& spec=QString(), const QString& label=QString());
@@ -40,6 +41,7 @@ class QFECalculatorPlotDialog : public QDialog
 
         void on_chkLogX_toggled(bool checked);
         void on_chkLogY_toggled(bool checked);
+        void on_chkGrid_toggled(bool checked);
 
     private:
         Ui::QFECalculatorPlotDialog *ui;

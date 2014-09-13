@@ -4,6 +4,140 @@
 #include "qfpluginservices.h"
 #include "qftools.h"
 
+
+
+
+#define V_PARSE_COLOR_SPEC(spec, c) {\
+    QRegExp rxRGB("rgb\\(\\s*(\\d+)\\s*\\,\\s*(\\d+)\\s*\\,\\s*(\\d+)\\s*\\)"); \
+    QRegExp rxRGBA("rgba\\(\\s*(\\d+)\\s*\\,\\s*(\\d+)\\s*\\,\\s*(\\d+)\\s*,\\s*(\\d+)\\s*\\)"); \
+    QRegExp rxGray("gray\\(\\s*(\\d+)\\s*\\)"); \
+    QRegExp rxGrayA("gray\\(\\s*(\\d+)\\s*\\,\\s*(\\d+)\\s*\\)"); \
+    if (rxRGB.indexIn(spec)==0) {\
+        c=QColor(rxRGB.cap(1).toInt(),rxRGB.cap(2).toInt(),rxRGB.cap(3).toInt());\
+    } else if (rxRGBA.indexIn(spec)==0) {\
+        c=QColor(rxRGBA.cap(1).toInt(),rxRGBA.cap(2).toInt(),rxRGBA.cap(3).toInt(),rxRGBA.cap(4).toInt());\
+    } else if (rxGray.indexIn(spec)==0) {\
+        c=QColor(rxGray.cap(1).toInt(),rxGray.cap(1).toInt(),rxGray.cap(1).toInt());\
+    } else if (rxGrayA.indexIn(spec)==0) {\
+        c=QColor(rxGrayA.cap(1).toInt(),rxGrayA.cap(1).toInt(),rxGrayA.cap(1).toInt(),rxGrayA.cap(2).toInt());\
+    } else if (spec.startsWith("r")) {\
+        c=QColor("red");\
+    } else if (spec.startsWith("g")) {\
+        c=QColor("green");\
+    } else if (spec.startsWith("b")) {\
+        c=QColor("blue");\
+    } else if (spec.startsWith("y")) {\
+        c=QColor("yellow");\
+    } else if (spec.startsWith("m")) {\
+        c=QColor("magenta");\
+    } else if (spec.startsWith("k")) {\
+        c=QColor("black");\
+    } else if (spec.startsWith("c")) {\
+        c=QColor("cyan");\
+    }\
+    }
+
+#define V_PARSE_LINE_SPEC(spec, le, ls, lw) {\
+    le=false;\
+    if (spec.contains("--")) {\
+        le=true;\
+        ls=Qt::DashLine;\
+    } else if (spec.contains("-..") || spec.contains("-:")) {\
+        le=true;\
+        ls=Qt::DashDotDotLine;\
+    } else if (spec.contains("-.")) {\
+        le=true;\
+        ls=Qt::DashDotLine;\
+    } else if (spec.contains("-")) {\
+        le=true;\
+        ls=Qt::SolidLine;\
+    } else if (spec.contains(":")) {\
+        le=true;\
+        ls=Qt::DotLine;\
+    }\
+    lw=1;\
+    QRegExp rxLW("lw\\(\\s*(\\d+\\.?\\d*)\\s*\\)"); \
+    if (rxLW.indexIn(spec)>=0) {\
+        lw=rxLW.cap(1).toDouble();\
+    } else if (spec.contains("lw2")) {\
+        lw=2;\
+    } else if (spec.contains("lw3")) {\
+        lw=3;\
+    }\
+    }
+
+
+#define PARSE_COLOR_SPEC(spec, g) {\
+    QColor c=g->get_color();\
+    V_PARSE_COLOR_SPEC(spec, c)\
+    g->set_color(c); \
+    g->set_errorColor(g->get_color().darker());\
+    g->set_fillColor(g->get_color().lighter());\
+    }
+
+#define PARSE_SPEC(spec, g) {\
+    g->set_symbol(JKQTPcircle);\
+    bool le=g->get_drawLine();\
+    double lw=g->get_lineWidth(); \
+    Qt::PenStyle ls=g->get_style();\
+    V_PARSE_LINE_SPEC(spec,le,ls,lw)\
+    g->set_drawLine(le);\
+    g->set_style(ls);\
+    g->set_lineWidth(lw);\
+    PARSE_COLOR_SPEC(spec,g)\
+    if (spec.contains("o")) {\
+        g->set_symbol(JKQTPcircle);\
+        if (spec.contains("of")) g->set_symbol(JKQTPfilledCircle);\
+    } else if (spec.contains("x")) {\
+        g->set_symbol(JKQTPcross);\
+    } else if (spec.contains("s")) {\
+        g->set_symbol(JKQTPrect);\
+        if (spec.contains("sf")) g->set_symbol(JKQTPfilledRect);\
+    } else if (spec.contains("d")) {\
+        g->set_symbol(JKQTPdiamond);\
+        if (spec.contains("df")) g->set_symbol(JKQTPfilledDiamond);\
+    } else if (spec.contains("^")) {\
+        g->set_symbol(JKQTPtriangle);\
+        if (spec.contains("^f")) g->set_symbol(JKQTPfilledTriangle);\
+    } else if (spec.contains("v")) {\
+        g->set_symbol(JKQTPdownTriangle);\
+        if (spec.contains("vf")) g->set_symbol(JKQTPfilledDownTriangle);\
+    } else if (spec.contains("+")) {\
+        g->set_symbol(JKQTPplus);\
+    } else if (spec.contains("*")) {\
+        g->set_symbol(JKQTPstar);\
+        if (spec.contains("*f")) g->set_symbol(JKQTPfilledStar);\
+    } else if (spec.contains("'")) {\
+        g->set_symbol(JKQTPdot);\
+    } else if (spec.size()>0){\
+        g->set_symbol(JKQTPnoSymbol);\
+    }\
+     QRegExp rxSS("SS\\(\\s*(\\d+\\.?\\d*)\\s*\\)"); \
+    if (rxSS.indexIn(spec)>=0) {\
+        g->set_symbolSize(rxSS.cap(1).toDouble());\
+    }\
+    }
+
+#define PARSE_SPEC_ERROR(spec, es) \
+    if (spec.contains("EB")) {\
+        es=JKQTPerrorBars; \
+    } else if (spec.contains("EL")) {\
+        es=JKQTPerrorLines; \
+    } else if (spec.contains("EP")) {\
+        es=JKQTPerrorPolygons; \
+    } else if (spec.contains("ES")) {\
+        es=JKQTPerrorSimpleBars; \
+    } else if (spec.contains("EE")) {\
+        es=JKQTPerrorEllipses; \
+    }\
+
+
+
+
+
+
+
+
 QFECalculatorPlotDialog::QFECalculatorPlotDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QFECalculatorPlotDialog)
@@ -55,6 +189,11 @@ void QFECalculatorPlotDialog::on_chkLogY_toggled(bool checked)
     setLogY(checked);
 }
 
+void QFECalculatorPlotDialog::on_chkGrid_toggled(bool checked)
+{
+    setGrid(checked);
+}
+
 
 QFPlotter *QFECalculatorPlotDialog::getPlotter() const
 {
@@ -83,6 +222,8 @@ void QFECalculatorPlotDialog::setLog(bool logX, bool logY)
 {
     ui->plot->getXAxis()->set_logAxis(logX);
     ui->plot->getYAxis()->set_logAxis(logY);
+    ui->chkLogX->setChecked(logX);
+    ui->chkLogY->setChecked(logY);
 }
 
 void QFECalculatorPlotDialog::setAxisLabel(const QString &labX, const QString &labY)
@@ -95,12 +236,35 @@ void QFECalculatorPlotDialog::setLogX(bool log)
 {
     ui->plot->getXAxis()->set_logAxis(log);
     ui->plot->zoomToFit();
+    ui->chkLogX->setChecked(log);
 }
 
 void QFECalculatorPlotDialog::setLogY(bool log)
 {
     ui->plot->getYAxis()->set_logAxis(log);
     ui->plot->zoomToFit();
+    ui->chkLogY->setChecked(log);
+}
+
+void QFECalculatorPlotDialog::setGrid(bool enabled, const QString& style)
+{
+    if (!style.isEmpty()) {
+        Qt::PenStyle ls=ui->plot->getXAxis()->get_gridStyle();
+        double lw=ui->plot->getXAxis()->get_gridWidth();
+        QColor lc=ui->plot->getXAxis()->get_gridColor();
+        bool le=true;
+        V_PARSE_LINE_SPEC(style,le,ls,lw)
+        if (!le || ls==Qt::NoPen) ls=Qt::SolidLine;
+        ui->plot->getXAxis()->set_gridStyle(ls);
+        ui->plot->getXAxis()->set_gridWidth(lw);
+        ui->plot->getXAxis()->set_gridColor(lc);
+        ui->plot->getYAxis()->set_gridStyle(ls);
+        ui->plot->getYAxis()->set_gridWidth(lw);
+        ui->plot->getYAxis()->set_gridColor(lc);
+    }
+    ui->plot->setGrid(enabled);
+    ui->plot->update_plot();
+    ui->chkGrid->setChecked(enabled);
 }
 
 void QFECalculatorPlotDialog::setXAxisLabel(const QString &label)
@@ -114,81 +278,6 @@ void QFECalculatorPlotDialog::setYAxisLabel(const QString &label)
 }
 
 
-#define PARSE_COLOR_SPEC(spec, g) {\
-    QRegExp rxRGB("rgb\\(\\s(\\d+)\\s\\,\\s(\\d+)\\s\\,\\s(\\d+)\\s\\)"); \
-    if (rxRGB.indexIn(spec)==0) {\
-        g->set_color(QColor(rxRGB.cap(1).toInt(),rxRGB.cap(2).toInt(),rxRGB.cap(3).toInt()));\
-    } else if (spec.startsWith("r")) {\
-        g->set_color(QColor("red"));\
-    } else if (spec.startsWith("g")) {\
-        g->set_color(QColor("green"));\
-    } else if (spec.startsWith("b")) {\
-        g->set_color(QColor("blue"));\
-    } else if (spec.startsWith("y")) {\
-        g->set_color(QColor("yellow"));\
-    } else if (spec.startsWith("m")) {\
-        g->set_color(QColor("magenta"));\
-    } else if (spec.startsWith("k")) {\
-        g->set_color(QColor("black"));\
-    } else if (spec.startsWith("c")) {\
-        g->set_color(QColor("cyan"));\
-    }\
-    g->set_errorColor(g->get_color().darker());\
-    g->set_fillColor(g->get_color().lighter());\
-    }
-
-#define PARSE_SPEC(spec, g) {\
-    g->set_symbol(JKQTPcircle);\
-    g->set_drawLine(false);\
-    if (spec.contains("--")) {\
-        g->set_drawLine(true);\
-        g->set_style(Qt::DashLine);\
-    } else if (spec.contains("-..")) {\
-        g->set_drawLine(true);\
-        g->set_style(Qt::DashDotDotLine);\
-    } else if (spec.contains("-.")) {\
-        g->set_drawLine(true);\
-        g->set_style(Qt::DashDotLine);\
-    } else if (spec.contains("-")) {\
-        g->set_drawLine(true);\
-        g->set_style(Qt::SolidLine);\
-    } else if (spec.contains(":")) {\
-        g->set_drawLine(true);\
-        g->set_style(Qt::DotLine);\
-    }\
-    PARSE_COLOR_SPEC(spec,g)\
-    if (spec.contains("o")) {\
-        g->set_symbol(JKQTPcircle);\
-    } else if (spec.contains("x")) {\
-        g->set_symbol(JKQTPcross);\
-    } else if (spec.contains("s")) {\
-        g->set_symbol(JKQTPrect);\
-    } else if (spec.contains("d")) {\
-        g->set_symbol(JKQTPdiamond);\
-    } else if (spec.contains("^")) {\
-        g->set_symbol(JKQTPtriangle);\
-    } else if (spec.contains("v")) {\
-        g->set_symbol(JKQTPdownTriangle);\
-    } else if (spec.contains("+")) {\
-        g->set_symbol(JKQTPplus);\
-    } else if (spec.contains("*")) {\
-        g->set_symbol(JKQTPstar);\
-    } else if (spec.contains("'")) {\
-        g->set_symbol(JKQTPdot);\
-    } else if (spec.size()>0){\
-        g->set_symbol(JKQTPnoSymbol);\
-    }\
-    g->set_lineWidth(1);\
-    }
-
-#define PARSE_SPEC_ERROR(spec, es) \
-    if (spec.contains("EB")) {\
-        es=JKQTPerrorBars; \
-    } else if (spec.contains("EL")) {\
-        es=JKQTPerrorLines; \
-    } else if (spec.contains("EP")) {\
-        es=JKQTPerrorPolygons; \
-    }\
 
 
 void QFECalculatorPlotDialog::addPlot(const QVector<double> &X, const QVector<double> &Y, const QString &spec, const QString& label)
@@ -228,8 +317,37 @@ void QFECalculatorPlotDialog::addBarPlot(const QVector<double> &X, const QVector
         g->set_fillColor(g->get_color());
         g->set_color(g->get_fillColor().darker());
 
-
         plt->addGraph(g);
+
+        double cnt=0;
+        for (size_t i=0; i<plt->getGraphCount(); i++) {
+            if (dynamic_cast<JKQTPbarHorizontalGraph*>(plt->getGraph(i))) {
+                cnt++;
+            }
+        }
+        double s=0.0;
+        double w=0.9;
+        if (cnt>1) {
+            double w=1.0/cnt*0.7;
+            double d=0.8/(cnt);
+            double h=0.1+d/2.0;
+            for (size_t i=0; i<plt->getGraphCount(); i++) {
+                JKQTPbarHorizontalGraph* b=dynamic_cast<JKQTPbarHorizontalGraph*>(plt->getGraph(i));
+                if (b) {
+                    b->set_width(w);
+                    b->set_shift(h-0.5);
+                    h=h+d;
+                }
+            }
+        } else {
+            for (size_t i=0; i<plt->getGraphCount(); i++) {
+                JKQTPbarHorizontalGraph* b=dynamic_cast<JKQTPbarHorizontalGraph*>(plt->getGraph(i));
+                if (b) {
+                    b->set_width(w);
+                    b->set_shift(s);
+                }
+            }
+        }
     }
 
 }

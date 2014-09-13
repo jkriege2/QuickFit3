@@ -192,6 +192,7 @@ qfmpResult fHist(const qfmpResult* params, unsigned int  n, QFMathParser* p){
           if (clearplots!=0) fig->clearPlots();
           fig->startAddingPlots();
           QVector<double> D;
+          QVector<double> range;
           uint32_t bins=11;
           QString spec="";
           QString label="";
@@ -199,9 +200,12 @@ qfmpResult fHist(const qfmpResult* params, unsigned int  n, QFMathParser* p){
           if (n>=1) {
               D=params[0].asVector();
           }
-          if (n==2 && params[1].isUInt()) {
-              D=params[0].asVector();
-              bins=params[1].toUInt();
+          if (n>1 && params[i].type==qfmpDoubleVector && params[i].numVec.size()==2) {
+              range=params[i].numVec;
+              i++;
+          }
+          if (n>1 && params[i].isUInt()) {
+              bins=params[i].toUInt();
               i++;
           }
           if (i<n && params[i].type==qfmpString) {
@@ -215,7 +219,8 @@ qfmpResult fHist(const qfmpResult* params, unsigned int  n, QFMathParser* p){
           QVector<double> X, Y;
           X.resize(bins);
           Y.resize(bins);
-          statisticsHistogram(D.data(), D.size(), X.data(), Y.data(), bins);
+          if (range.size()!=2) statisticsHistogram(D.data(), D.size(), X.data(), Y.data(), bins);
+          else statisticsHistogramRanged(D.data(), D.size(), range[0], range[1], X.data(), Y.data(), bins);
 
           if (X.size()>0 && Y.size()>0) {
               fig->addBarPlot(X, Y, spec, label);
@@ -443,6 +448,115 @@ qfmpResult fLogScale(const qfmpResult* params, unsigned int  n, QFMathParser* p)
 }
 
 
+qfmpResult fGrid(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+  QFECalculatorDialog* dlg=(QFECalculatorDialog*)(p->getGeneraldata("QFECalculatorDialog/pointer", 0).toLongLong());
+  int fid=p->getGeneraldata("QFECalculatorDialog/current_figure", int(-1)).toInt();
+
+  if (dlg) {
+      bool grid=false;
+      QString style="";
+      if (n==1 && params[0].type==qfmpBool) {
+          grid=params[0].boolean;
+      } else if (n==2 && params[0].type==qfmpBool && params[1].type==qfmpString) {
+          grid=params[0].boolean;
+          style=params[1].str;
+      } else {
+          p->qfmpError(QObject::tr("grid(enabled)/grid(enabled,\"style\") require one boolean and one optional string argument"));
+          return qfmpResult::invalidResult();
+      }
+      QFECalculatorPlotDialog* fig=dlg->getPlot(fid, &fid);
+      if (fig) {
+          p->setGeneralData("QFECalculatorDialog/current_figure", fid);
+          fig->startAddingPlots();
+          fig->setGrid(grid, style);
+          fig->endAddingPlots();
+      }
+  }
+  return qfmpResult::voidResult();
+}
+
+template<int axes>
+qfmpResult fTicks(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+  QFECalculatorDialog* dlg=(QFECalculatorDialog*)(p->getGeneraldata("QFECalculatorDialog/pointer", 0).toLongLong());
+  int fid=p->getGeneraldata("QFECalculatorDialog/current_figure", int(-1)).toInt();
+
+  QString f="ticks(xspacing,yspacing)";
+  if (axes==0) f="xticks(spacing)";
+  if (axes==1) f="yticks(spacing)";
+  if (dlg) {
+      double spacingX=0;
+      double spacingY=0;
+      if (axes<0 && n==2 && params[0].type==qfmpDouble && params[1].type==qfmpDouble) {
+          spacingX=params[0].num;
+          spacingY=params[1].num;
+      } else if (axes<0 && n==1 && params[0].type==qfmpDouble) {
+          spacingY=spacingX=params[0].num;
+      } else if (axes==0 && n==1 && params[0].type==qfmpDouble) {
+          spacingX=params[0].num;
+      } else if (axes==1 && n==1 && params[0].type==qfmpDouble) {
+          spacingY=params[0].num;
+      } else {
+          p->qfmpError(QObject::tr("%1: wrong number/type of arguments").arg(f));
+          return qfmpResult::invalidResult();
+      }
+      QFECalculatorPlotDialog* fig=dlg->getPlot(fid, &fid);
+      if (fig) {
+          p->setGeneralData("QFECalculatorDialog/current_figure", fid);
+          fig->startAddingPlots();
+          if (axes<0 || axes==0) {
+              fig->getPlotter()->getXAxis()->set_userTickSpacing(spacingX);
+              fig->getPlotter()->getXAxis()->set_autoAxisSpacing(false);
+          }
+          if (axes<0 || axes==1) {
+              fig->getPlotter()->getYAxis()->set_userTickSpacing(spacingY);
+              fig->getPlotter()->getYAxis()->set_autoAxisSpacing(false);
+          }
+          fig->endAddingPlots();
+      }
+  }
+  return qfmpResult::voidResult();
+}
+
+template<int axes>
+qfmpResult fAutoTicks(const qfmpResult* params, unsigned int  n, QFMathParser* p){
+  QFECalculatorDialog* dlg=(QFECalculatorDialog*)(p->getGeneraldata("QFECalculatorDialog/pointer", 0).toLongLong());
+  int fid=p->getGeneraldata("QFECalculatorDialog/current_figure", int(-1)).toInt();
+
+  QString f="autoticks(x,y)";
+  if (axes==0) f="xautoticks(enabled)";
+  if (axes==1) f="yautoticks(enabled)";
+  if (dlg) {
+      bool XAuto=true;
+      double YAuto=true;
+      if (axes<0 && n==2 && params[0].type==qfmpBool && params[1].type==qfmpBool) {
+          XAuto=params[0].boolean;
+          YAuto=params[1].boolean;
+      } else if (axes<0 && n==1 && params[0].type==qfmpBool) {
+          YAuto=XAuto=params[0].boolean;
+      } else if (axes==0 && n==1 && params[0].type==qfmpBool) {
+          XAuto=params[0].boolean;
+      } else if (axes==1 && n==1 && params[0].type==qfmpBool) {
+          YAuto=params[0].boolean;
+      } else {
+          p->qfmpError(QObject::tr("%1: wrong number/type of arguments").arg(f));
+          return qfmpResult::invalidResult();
+      }
+      QFECalculatorPlotDialog* fig=dlg->getPlot(fid, &fid);
+      if (fig) {
+          p->setGeneralData("QFECalculatorDialog/current_figure", fid);
+          fig->startAddingPlots();
+          if (axes<0 || axes==0) {
+              fig->getPlotter()->getXAxis()->set_autoAxisSpacing(XAuto);
+          }
+          if (axes<0 || axes==1) {
+              fig->getPlotter()->getYAxis()->set_autoAxisSpacing(YAuto);
+          }
+          fig->endAddingPlots();
+      }
+  }
+  return qfmpResult::voidResult();
+}
+
 qfmpResult fDisp(const qfmpResult* params, unsigned int  n, QFMathParser* p){
   QFECalculatorDialog* dlg=(QFECalculatorDialog*)(p->getGeneraldata("QFECalculatorDialog/pointer", 0).toLongLong());
   if (dlg) {
@@ -502,6 +616,13 @@ qfmpResult fDispType(const qfmpResult* params, unsigned int  n, QFMathParser* p)
 
 void registerQFECalculatorFunctions(QFMathParser *parser)
 {
+    parser->addFunction("grid", fGrid);
+    parser->addFunction("ticks", fTicks<-1>);
+    parser->addFunction("xticks", fTicks<0>);
+    parser->addFunction("yticks", fTicks<1>);
+    parser->addFunction("autoticks", fAutoTicks<-1>);
+    parser->addFunction("xautoticks", fAutoTicks<0>);
+    parser->addFunction("yautoticks", fAutoTicks<1>);
     parser->addFunction("logscale", fLogScale);
     parser->addFunction("label", fLabel<-1>);
     parser->addFunction("xlabel", fLabel<0>);
@@ -510,14 +631,17 @@ void registerQFECalculatorFunctions(QFMathParser *parser)
     parser->addFunction("ylim", fLim<1>);
     parser->addFunction("plot", fPlot<1,false,false>);
     parser->addFunction("addplot", fPlot<0,false,false>);
+
     parser->addFunction("bar", fBar<1,false,false>);
     parser->addFunction("addbar", fBar<0,false,false>);
     parser->addFunction("hist", fHist<1>);
     parser->addFunction("addhist", fHist<0>);
+
     parser->addFunction("scatter", fScatter<1,false,false>);
     parser->addFunction("addscatter", fScatter<0,false,false>);
     parser->addFunction("colorscatter", fColorScatter<1,false,false>);
     parser->addFunction("addcolorscatter", fColorScatter<0,false,false>);
+
     parser->addFunction("semilogx", fPlot<1,true,false>);
     parser->addFunction("addsemilogx", fPlot<0,true,false>);
     parser->addFunction("semilogy", fPlot<1,false,true>);

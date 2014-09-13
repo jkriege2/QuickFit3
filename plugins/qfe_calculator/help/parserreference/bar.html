@@ -1,0 +1,92 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1250">
+<title>Data Table Online-Help: Expression parser: Bar Charts/Histograms</title>
+</head>
+<body> 
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+
+
+<h3>Bar Charts</h3>
+$$funcref_start$$<a name="bar"/><!-- func:bar -->
+  <b><tt><!-- template -->bar(X,Y,"spec", "label")<!-- /template --></tt> - <i> creates a bar chart </i>:</b>
+$$funcref_description$$
+<b>Example:</b>
+$$codeexample:bar(x=1:10,2+sin(x))$$
+<center><a name="scatter_pic000"><img src="./pic/scatter_pic000.png" border="1">
+</center>
+several bar plots are layed out, so the bars are besides each other
+$$codeexample:bar(x=1:0.5:10,1+sin(x),"r",x,1-sin(x),"g",x,0.2*x,"b")$$
+
+<center><a name="bar_pic002"><img src="./pic/bar_pic002.png" border="1">
+</center>
+
+
+      <!-- /func:bar -->
+$$funcref_end$$
+
+$$funcref_start$$<a name="addbar"/><!-- func:addbar -->
+  <b><tt><!-- template -->addbar(X,Y,"spec", "label")<!-- /template --></tt> - <i> adds a bar chart to the current figure</i>:</b>
+$$funcref_description$$
+<b>Example:</b>
+$$codeexample:addbar(x=1:10,sin(x))$$
+<center><a name="scatter_pic000"><img src="./pic/scatter_pic000.png" border="1">
+</center>
+several bar plots are layed out, so the bars are besides each other
+$$codeexample:bar(x=1:0.5:10,1+sin(x),"r");<br>addbar(x,1-sin(x),"g",x,0.2*x,"b")$$
+
+<center><a name="bar_pic002"><img src="./pic/bar_pic002.png" border="1">
+</center>
+
+      <!-- /func:addbar -->
+$$funcref_end$$
+
+
+
+
+<h3>Histograms</h3>
+$$funcref_start$$<a name="hist"/><!-- func:hist -->
+  <b><tt><!-- template -->hist(X,[rangemin,rangemax],nbins,"spec", "label")<!-- /template --></tt> - <i> creates a histogram from the provided data </i>:</b>
+$$funcref_description$$
+<tt>X</tt> is a vector of data, over which the histogram is calculated.
+<tt>[rangemin,rangemax]</tt> (optional) is the value range for the histogram.
+<tt>nbins</tt> (optional) is the number of bins in the histogram.
+<tt>spec</tt> (optional) defines the plot style.
+<tt>label</tt> (optional) is the plot label.<br><br>
+<b>Example:</b>
+$$codeexample:hist(randnormvec(500),20,"r","Gaussian")$$
+<center><a name="bar_pic000"><img src="./pic/bar_pic000.png" border="1">
+</center>
+$$codeexample:hist(randnormvec(500),[-4,4],20,"r","N(0,1)");<br>addhist(randnormvec(500,1,0.5),[-4,4],20,"b","N(1,0.5)");$$
+
+<center><a name="bar_pic001"><img src="./pic/bar_pic001.png" border="1">
+</center>
+
+      <!-- /func:hist -->
+$$funcref_end$$
+
+$$funcref_start$$<a name="addhist"/><!-- func:addhist -->
+  <b><tt><!-- template -->addhist(X,[rangemin,rangemax],nbins,"spec", "label")<!-- /template --></tt> - <i> adds a histogram from the provided data</i>:</b>
+$$funcref_description$$
+<tt>X</tt> is a vector of data, over which the histogram is calculated.
+<tt>[rangemin,rangemax]</tt> (optional) is the value range for the histogram.
+<tt>nbins</tt> (optional) is the number of bins in the histogram.
+<tt>spec</tt> (optional) defines the plot style.
+<tt>label</tt> (optional) is the plot label.<br><br>
+<b>Example:</b>
+$$codeexample:addhist(randnormvec(500),20,"r","Gaussian")$$
+<center><a name="bar_pic000"><img src="./pic/bar_pic000.png" border="1">
+</center>
+$$codeexample:hist(randnormvec(500),[-4,4],20,"r","N(0,1)");<br>addhist(randnormvec(500,1,0.5),[-4,4],20,"b","N(1,0.5)");$$
+
+<center><a name="bar_pic001"><img src="./pic/bar_pic001.png" border="1">
+</center>
+
+      <!-- /func:addhist -->
+$$funcref_end$$
+
+
+</body>
+</html>

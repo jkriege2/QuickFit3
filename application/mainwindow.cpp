@@ -3338,6 +3338,21 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
                         }
+                    } else if (list=="colorpalettes") {
+                        QString text="";
+                        QString item_template=QString("<tr><td><img alt=\"%1\" src=\"%2\"></td><td><b>%1</b></td></tr></li>\n");
+                        QStringList ttids=JKQTPimagePlot_getPredefinedPalettes();
+                        for (int ti=0; ti<ttids.size(); ti++){
+                            QString id=ttids[ti];
+                            QImage pix=JKQTPMathImageGetPaletteImage(ti, 128,16);
+                            QString palfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+"_pal"+QString::number(ti)+".png";
+                            //qDebug()<<"latex-render: "<<latex<<"\n    size = "<<size<<"  output = "<<texfilename;
+                            pix.save(palfilename);
+                            text+=item_template.arg(id).arg(palfilename);
+                        }
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<table border=\"0\" spacing=\"1\" padding=\"1\">\n")+text+QString("</table>"));
+                        }
                     } else if (list=="tooltips") {
                         QString text="";
                         QString item_template=QString("<tr><td><b>%1</b></td><td>%2</td></tr></li>\n");

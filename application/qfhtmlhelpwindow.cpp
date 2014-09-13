@@ -319,6 +319,9 @@ void QFHTMLHelpWindow::displayTitle() {
 }
 
 void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
     QString linkstr=link.toString();
     QString scheme=link.scheme().toLower();
 
@@ -382,9 +385,11 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
     } else {
         QDesktopServices::openUrl(link);
     }
+    QApplication::restoreOverrideCursor();
 }
 
 void QFHTMLHelpWindow::showFile(QString filename1) {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QString filename=filename1;
     QString fragment="";
     int hashpos=filename1.indexOf("#");
@@ -408,6 +413,7 @@ void QFHTMLHelpWindow::showFile(QString filename1) {
     if (!fragment.isEmpty()) {
         descriptionBrowser->scrollToAnchor(QString("#")+fragment);
     }
+    QApplication::restoreOverrideCursor();
 }
 
 void QFHTMLHelpWindow::previous() {
@@ -444,17 +450,23 @@ void QFHTMLHelpWindow::print() {
         delete p;
         return;
     }
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     descriptionBrowser->print(p);
     delete p;
+    QApplication::restoreOverrideCursor();
 }
 
 
 
 QString QFHTMLHelpWindow::loadHTML(QString filename, bool noPics) {
 
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     const QString defaultTxt=tr("<html><header><title>Error: Help page does not exist</title></header><body>$$qf_commondoc_header.start$$ $$qf_commondoc_header.simplest$$ $$qf_commondoc_header.end$$<center>The Quickfit online-help page you are trying to access does not exist!<br><br>File was: <i>%1</i></center></body></html>").arg(filename);
 
-    return transformQF3HelpHTMLFile(filename, defaultTxt, true, QFHelpReplacesList(), true, noPics, true);
+    QString s= transformQF3HelpHTMLFile(filename, defaultTxt, true, QFHelpReplacesList(), true, noPics, true);
+    QApplication::restoreOverrideCursor();
+
+    return s;
 
 }
 

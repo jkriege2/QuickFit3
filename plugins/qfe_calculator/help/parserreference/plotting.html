@@ -7,7 +7,39 @@
 <body> 
 $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 
+
+<h2>Simple (Line) Plots</h2>
+
+$$funcref_start$$<a name="plot"/><!-- func:plot -->
+  <b><tt><!-- template -->plot(X,Y,"spec", "label")<!-- /template --></tt> - <i> creates a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>.   </i>:</b>
+$$funcref_description$$
+<tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.
+<br><br><b>Example:</b>
+  The following one-liner draws sine- and cosine-functions:
+  $$codeexample:plot(x=1:0.1:10, sin(x), "r-", x, cos(x), "b:")$$
+  <center><a name="plotting_pic000"><img src="./pic/plotting_pic000.png" border="1"></center><br><br>
+  $$insert:plotspec.inc$$
+  <!-- /func:plot -->
+$$funcref_end$$
+
+$$funcref_start$$<a name="addplot"/><!-- func:addplot -->
+  <b><tt><!-- template -->addplot(X,Y,"spec", "label")<!-- /template --></tt> - <i> adds a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>to the current figure.  </i>:</b>
+$$funcref_description$$
+<tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title. 
+<br><br><b>Example:</b>
+  The following one-liner draws sine- and cosine-functions:
+  $$codeexample:addplot(x=1:0.1:10, sin(x), "r-", x, cos(x), "b:")$$
+  <center><a name="plotting_pic000"><img src="./pic/plotting_pic000.png" border="1"></center><br><br>
+  $$insert:plotspec.inc$$
+  <!-- /func:addplot -->
+$$funcref_end$$
+
+
+
+
+
 <h2>General Functions</h2>
+<h3>Figure Window Control</h3>
 $$funcref_start$$<a name="figure"/><!-- func:figure -->
   <b><tt><!-- template -->figure(n)<!-- /template --></tt> - <i> All further plot commands will be directed to the figure with number <tt>n</tt>. If the figure does not yet exist, it is generated. </i>:</b>
 $$funcref_description$$
@@ -16,6 +48,8 @@ $$codeexample:figure(1);<br>xerrorbar(x=1:10, 2+sin(x), 0.1*x, "roEB");<br>figur
 will open two figure windows and plot two different graphs.
       <!-- /func:figure -->
 $$funcref_end$$
+
+<h3>Labels</h3>
 
 $$funcref_start$$<a name="label"/><!-- func:label -->
   <b><tt><!-- template -->label("text")<!-- /template --></tt> - <i> sets the plot label to the given text </i>:</b>
@@ -35,6 +69,7 @@ $$funcref_description$$
       <!-- /func:ylabel -->
 $$funcref_end$$
 
+<h3>Plot Ranges</h3>
 $$funcref_start$$<a name="xlim"/><!-- func:xlim -->
   <b><tt><!-- template -->xlim(min,max)<!-- /template --> / <!-- template -->xlim([min,max])<!-- /template --></tt> - <i> sets the x-axis range to the given limits </i>:</b>
 $$funcref_description$$
@@ -49,234 +84,54 @@ $$funcref_end$$
 
 
 
-
-
-
-
-
-
-<h2>Simple Plots</h2>
-
-$$funcref_start$$<a name="plot"/><!-- func:plot -->
-  <b><tt><!-- template -->plot(X,Y,"spec", "label")<!-- /template --></tt> - <i> creates a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
+<h3>Axis Ticks/Grid Spacing</h3>
+$$funcref_start$$<a name="autoticks"/><!-- func:autoticks -->
+  <b><tt><!-- template -->autoticks(xauto,yauto)<!-- /template --></tt> - <i> switches the autoscaling of axis ticks for both axes on/off </i>:</b>
 $$funcref_description$$
-  The following one-liner draws sine- and cosine-functions:
-  $$codeexample:plot(x=1:0.1:10, sin(x), "r-", x, cos(x), "b:")$$
-  <center><a name="plotting_pic000"><img src="./pic/plotting_pic000.png" border="1"></center><br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:plot -->
+      <!-- /func:autoticks -->
 $$funcref_end$$
 
-$$funcref_start$$<a name="addplot"/><!-- func:addplot -->
-  <b><tt><!-- template -->addplot(X,Y,"spec", "label")<!-- /template --></tt> - <i> adds a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>to the current figure. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
+$$funcref_start$$<a name="xautoticks"/><!-- func:xautoticks -->
+  <b><tt><!-- template -->xautoticks(xauto)<!-- /template --></tt> - <i> switches the autoscaling of axis ticks for the x-axis on/off </i>:</b>
 $$funcref_description$$
-  The following one-liner draws sine- and cosine-functions:
-  $$codeexample:addplot(x=1:0.1:10, sin(x), "r-", x, cos(x), "b:")$$
-  <center><a name="plotting_pic000"><img src="./pic/plotting_pic000.png" border="1"></center><br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:addplot -->
+      <!-- /func:xautoticks -->
 $$funcref_end$$
 
-
-
-
-
-
-
-
-
-
-<h2>Logarithmic Plots</h2>
-$$funcref_start$$<a name="logscale"/><!-- func:logscale -->
-  <b><tt><!-- template -->logscale(xlog, ylog)<!-- /template --></tt> - <i> sets the logscales of the x- and y-axis in the current figure. <tt>xlog</tt>/<tt>ylog</tt> are boolean parameters, which define whether linear or logarithmic scaling should be used. </i>:</b>
+$$funcref_start$$<a name="yautoticks"/><!-- func:yautoticks -->
+  <b><tt><!-- template -->yautoticks(yauto)<!-- /template --></tt> - <i> switches the autoscaling of axis ticks for the y-axis on/off </i>:</b>
 $$funcref_description$$
-      <!-- /func:logscale -->
-$$funcref_end$$
-    
-$$funcref_start$$<a name="semilogx"/><!-- func:semilogx -->
-  <b><tt><!-- template -->semilogx(X,Y,"spec", "label")<!-- /template --></tt> - <i> creates a x-semi-logarithmic plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
-$$funcref_description$$
-  The following one-liner draws sine- and cosine-functions:
-  $$codeexample:semilogx(x=1:0.1:1000, exp(sin(x)), "r-")$$
-  
-  <center><a name="plotting_pic006"><img src="./pic/plotting_pic006.png" border="1">
-  </center>
-  <br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:semilogx -->
+      <!-- /func:yautoticks -->
 $$funcref_end$$
 
-$$funcref_start$$<a name="addsemilogx"/><!-- func:addsemilogx -->
-  <b><tt><!-- template -->addsemilogx(X,Y,"spec", "label")<!-- /template --></tt> - <i> adds a x-semi-logarithmic plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>to the current figure. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
+$$funcref_start$$<a name="ticks"/><!-- func:ticks -->
+  <b><tt><!-- template -->ticks(xspacing,yspacing)<!-- /template --></tt> - <i> sets the axis tick spacing for both axes </i>:</b>
 $$funcref_description$$
-  The following one-liner draws sine- and cosine-functions:
-   $$codeexample:addsemilogx(x=1:0.1:1000, exp(sin(x)), "r-")$$
-  
-  <center><a name="plotting_pic006"><img src="./pic/plotting_pic006.png" border="1">
-  </center><br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:addsemilogx -->
-$$funcref_end$$
-    
-   
-$$funcref_start$$<a name="semilogy"/><!-- func:semilogy -->
-  <b><tt><!-- template -->semilogy(X,Y,"spec", "label")<!-- /template --></tt> - <i> creates a y-semi-logarithmic plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
-$$funcref_description$$
-  The following one-liner draws sine- and cosine-functions:
-  $$codeexample:semilogy(x=1:10, exp(-x+1), "r-")$$
-  
-    <center><a name="plotting_pic008"><img src="./pic/plotting_pic008.png" border="1">
-    </center>
-      
-  <br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:semilogy -->
+      <!-- /func:ticks -->
 $$funcref_end$$
 
-$$funcref_start$$<a name="addsemilogy"/><!-- func:addsemilogy -->
-  <b><tt><!-- template -->addsemilogy(X,Y,"spec", "label")<!-- /template --></tt> - <i> adds a y-semi-logarithmic plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>to the current figure. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
+$$funcref_start$$<a name="xticks"/><!-- func:xticks -->
+  <b><tt><!-- template -->xticks(xspacing)<!-- /template --></tt> - <i> sets the axis tick spacing for the x-axis </i>:</b>
 $$funcref_description$$
-  The following one-liner draws sine- and cosine-functions:
-   $$codeexample:addsemilogy(x=1:10, exp(-x+1), "r-")$$  
-  <center><a name="plotting_pic008"><img src="./pic/plotting_pic008.png" border="1">
-    </center><br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:addsemilogy -->
-$$funcref_end$$ 
-    
-$$funcref_start$$<a name="semilogx"/><!-- func:semilogx -->
-  <b><tt><!-- template -->semilogx(X,Y,"spec", "label")<!-- /template --></tt> - <i> creates a x-semi-logarithmic plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
-$$funcref_description$$
-  The following one-liner draws sine- and cosine-functions:
-  $$codeexample:semilogx(x=1:0.1:1000, exp(sin(x)), "r-")$$
-  
-  <center><a name="plotting_pic006"><img src="./pic/plotting_pic006.png" border="1">
-  </center>
-  <br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:semilogx -->
+      <!-- /func:xticks -->
 $$funcref_end$$
 
-$$funcref_start$$<a name="addsemilogx"/><!-- func:addsemilogx -->
-  <b><tt><!-- template -->addsemilogx(X,Y,"spec", "label")<!-- /template --></tt> - <i> adds a x-semi-logarithmic plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>to the current figure. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
+$$funcref_start$$<a name="yticks"/><!-- func:yticks -->
+  <b><tt><!-- template -->yticks(yspacing)<!-- /template --></tt> - <i> sets the axis tick spacing for the y-axis </i>:</b>
 $$funcref_description$$
-  The following one-liner draws sine- and cosine-functions:
-   $$codeexample:addsemilogx(x=1:0.1:1000, exp(sin(x)), "r-")$$
-  
-  <center><a name="plotting_pic006"><img src="./pic/plotting_pic006.png" border="1">
-  </center><br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:addsemilogx -->
-$$funcref_end$$
-    
-    
-$$funcref_start$$<a name="loglog"/><!-- func:loglog -->
-  <b><tt><!-- template -->loglog(X,Y,"spec", "label")<!-- /template --></tt> - <i> creates a semi-logarithmic plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
-$$funcref_description$$
-  The following one-liner draws sine- and cosine-functions:
-  $$codeexample:loglog(x=1:1000, 2*x^0.7, "r-")$$
-  
-  <center><a name="plotting_pic009"><img src="./pic/plotting_pic009.png" border="1">
-  </center>
-  
-  <br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:loglog -->
-$$funcref_end$$
-
-$$funcref_start$$<a name="addloglog"/><!-- func:addloglog -->
-  <b><tt><!-- template -->addloglog(X,Y,"spec", "label")<!-- /template --></tt> - <i> adds a semi-logarithmic plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>to the current figure. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
-$$funcref_description$$
-  The following one-liner draws sine- and cosine-functions:
-   $$codeexample:addloglog(x=1:1000, 2*x^0.7, "r-")$$
-  <center><a name="plotting_pic009"><img src="./pic/plotting_pic009.png" border="1">
-  </center><br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:addloglog -->
-$$funcref_end$$
-    
-<h2>Plots with Errorbars</h2>
-
-$$funcref_start$$<a name="errorbar"/><!-- func:errorbar -->
-  <b><tt><!-- template -->errorbar(X,Y,Xerr,Yerr,"spec", "label")<!-- /template --></tt> - <i> creates a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>. The vectors <tt>Xerr</tt> and <tt>Yerr</tt> contain the length of the errorbars in every point of the plot. If only a single number is given, all errorbars have equal length. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
-$$funcref_description$$
-  The following one-liners draws some example error bars:
-  $$codeexample:errorbar(x=1:10, 2+sin(x), 0.5, 0.1*x, "roEB")$$
-  
-  <center><a name="plotting_pic004"><img src="./pic/plotting_pic004.png" border="1">  
-  </center>
-  
-  
-  <br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:errorbar -->
-$$funcref_end$$
-
-$$funcref_start$$<a name="adderrorbar"/><!-- func:errorbar -->
-  <b><tt><!-- template -->adderrorbar(X,Y,Xerr,Yerr,"spec", "label")<!-- /template --></tt> - <i> adds a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt> to the current figure. The vectors <tt>Xerr</tt> and <tt>Yerr</tt> contain the length of the errorbars in every point of the plot. If only a single number is given, all errorbars have equal length. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
-$$funcref_description$$
-  The following one-liner draws some example error bars:
-  $$codeexample:adderrorbar(x=1:10, 2+sin(x), 0.5, 0.1*x, "r-oEB")$$
-  <center><a name="plotting_pic004"><img src="./pic/plotting_pic004.png" border="1">  
-  </center>
-  <br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:adderrorbar -->
+      <!-- /func:yticks -->
 $$funcref_end$$
 
 
-$$funcref_start$$<a name="yerrorbar"/><!-- func:yerrorbar -->
-  <b><tt><!-- template -->yerrorbar(X,Y,Yerr,"spec", "label")<!-- /template --></tt> - <i> creates a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>. The vector <tt>Yerr</tt> contain the length of the errorbars in every point of the plot. If only a single number is given, all errorbars have equal length. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
+<h3>Grid</h3>
+$$funcref_start$$<a name="grid"/><!-- func:grid -->
+  <b><tt><!-- template -->grid(enabled)<!-- /template --> / <!-- template -->grid(enabled, "style")<!-- /template --></tt> - <i> switches the grid on/off </i>:</b>
 $$funcref_description$$
-  The following one-liners draws some example error bars, lines and polygons:
-  $$codeexample:yerrorbar(x=1:10, 2+sin(x), 0.1*x, "roEB")<br>yerrorbar(x=1:10, 2+sin(x), 0.1*x, "roEL")<br>yerrorbar(x=1:10, 2+sin(x), 0.1*x, "roEP")$$
-  <center><a name="plotting_pic001"><img src="./pic/plotting_pic001.png" border="1">
-  <a name="plotting_pic002"><img src="./pic/plotting_pic002.png" border="1">
-  <a name="plotting_pic003"><img src="./pic/plotting_pic003.png" border="1">
-  </center>
-  
-  <br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:yerrorbar -->
+      The parameter <tt>style</tt> defines the line style of the grid.
+	  $$insert:plotspec.inc$$
+      <!-- /func:grid -->
 $$funcref_end$$
 
-$$funcref_start$$<a name="addyerrorbar"/><!-- func:addyerrorbar -->
-  <b><tt><!-- template -->addyerrorbar(X,Y,Yerr,"spec", "label")<!-- /template --></tt> - <i> adds a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt> to the current figure. The vector <tt>Yerr</tt> contain the length of the errorbars in every point of the plot. If only a single number is given, all errorbars have equal length. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
-$$funcref_description$$
-  The following one-liner draws some example error bars:
-  $$codeexample:addyerrorbar(x=1:10, 2+sin(x), 0.1*x, "roEB")$$
-  <center><a name="plotting_pic001"><img src="./pic/plotting_pic001.png" border="1">
-  </center>
-  <br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:addyerrorbar -->
-$$funcref_end$$
 
-  
-  
-$$funcref_start$$<a name="xerrorbar"/><!-- func:xerrorbar -->
-  <b><tt><!-- template -->xerrorbar(X,Y,Xerr,"spec", "label")<!-- /template --></tt> - <i> creates a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>. The vector <tt>Xerr</tt> contain the length of the errorbars in every point of the plot. If only a single number is given, all errorbars have equal length. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
-$$funcref_description$$
-  The following one-liners draws some example error bars:
-  $$codeexample:xerrorbar(x=1:10, 2+sin(x), 0.1*x, "roEB")$$
-  <center><a name="plotting_pic005"><img src="./pic/plotting_pic005.png" border="1">
-  </center>
-  <br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:xerrorbar -->
-$$funcref_end$$
-
-$$funcref_start$$<a name="addxerrorbar"/><!-- func:addxerrorbar -->
-  <b><tt><!-- template -->addxerrorbar(X,Y,Xerr,"spec", "label")<!-- /template --></tt> - <i> adds a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt> to the current figure. The vector <tt>Xerr</tt> contain the length of the errorbars in every point of the plot. If only a single number is given, all errorbars have equal length. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
-$$funcref_description$$
-  The following one-liner draws some example error bars:
-  $$codeexample:addxerrorbar(x=1:10, 2+sin(x), 0.1*x, "roEB")$$
-<center><a name="plotting_pic005"><img src="./pic/plotting_pic005.png" border="1">
-  </center>
-    <br><br>
-  $$insert:plotspec.inc$$
-  <!-- /func:addxerrorbar -->
-$$funcref_end$$
 
 </body>
 </html>

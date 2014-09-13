@@ -1,0 +1,106 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1250">
+<title>Data Table Online-Help: Expression parser: Plots with Errorbars</title>
+</head>
+<body> 
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+    
+
+$$funcref_start$$<a name="errorbar"/><!-- func:errorbar -->
+  <b><tt><!-- template -->errorbar(X,Y,Xerr,Yerr,"spec", "label")<!-- /template --></tt> - <i> creates a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>.  </i>:</b>
+$$funcref_description$$
+The vectors <tt>Xerr</tt> and <tt>Yerr</tt> contain the length of the errorbars in every point of the plot. If only a single number is given, all errorbars have equal length. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title. 
+<br><br><b>Example:</b>
+  The following one-liners draws some example error bars:
+  $$codeexample:errorbar(x=1:10, 2+sin(x), 0.5, 0.1*x, "roEB")$$
+  
+  <center><a name="plotting_pic004"><img src="./pic/plotting_pic004.png" border="1">  
+  </center>
+  
+  
+  <br><br>
+  $$insert:plotspec.inc$$
+  <!-- /func:errorbar -->
+$$funcref_end$$
+
+$$funcref_start$$<a name="adderrorbar"/><!-- func:errorbar -->
+  <b><tt><!-- template -->adderrorbar(X,Y,Xerr,Yerr,"spec", "label")<!-- /template --></tt> - <i> adds a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt> to the current figure. </i>:</b>
+$$funcref_description$$
+The vectors <tt>Xerr</tt> and <tt>Yerr</tt> contain the length of the errorbars in every point of the plot. If only a single number is given, all errorbars have equal length. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  
+<br><br><b>Example:</b>
+  The following one-liner draws some example error bars:
+  $$codeexample:adderrorbar(x=1:10, 2+sin(x), 0.5, 0.1*x, "r-oEB")$$
+  <center><a name="plotting_pic004"><img src="./pic/plotting_pic004.png" border="1">  
+  </center>
+  <br><br>
+  $$insert:plotspec.inc$$
+  <!-- /func:adderrorbar -->
+$$funcref_end$$
+
+
+$$funcref_start$$<a name="yerrorbar"/><!-- func:yerrorbar -->
+  <b><tt><!-- template -->yerrorbar(X,Y,Yerr,"spec", "label")<!-- /template --></tt> - <i> creates a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>.  </i>:</b>
+$$funcref_description$$
+The vector <tt>Yerr</tt> contain the length of the errorbars in every point of the plot. If only a single number is given, all errorbars have equal length. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title. 
+<br><br><b>Example:</b>
+  The following one-liners draws some example error bars, lines and polygons:
+  $$codeexample:yerrorbar(x=1:10, 2+sin(x), 0.1*x, "roEB")<br>yerrorbar(x=1:10, 2+sin(x), 0.1*x, "roEL")<br>yerrorbar(x=1:10, 2+sin(x), 0.1*x, "roEP")$$
+  <center><a name="plotting_pic001"><img src="./pic/plotting_pic001.png" border="1">
+  <a name="plotting_pic002"><img src="./pic/plotting_pic002.png" border="1">
+  <a name="plotting_pic003"><img src="./pic/plotting_pic003.png" border="1">
+  </center>
+  
+  <br><br>
+  $$insert:plotspec.inc$$
+  <!-- /func:yerrorbar -->
+$$funcref_end$$
+
+$$funcref_start$$<a name="addyerrorbar"/><!-- func:addyerrorbar -->
+  <b><tt><!-- template -->addyerrorbar(X,Y,Yerr,"spec", "label")<!-- /template --></tt> - <i> adds a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt> to the current figure.</i>:</b>
+$$funcref_description$$
+ The vector <tt>Yerr</tt> contain the length of the errorbars in every point of the plot. If only a single number is given, all errorbars have equal length. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  
+<br><br><b>Example:</b>
+  The following one-liner draws some example error bars:
+  $$codeexample:addyerrorbar(x=1:10, 2+sin(x), 0.1*x, "roEB")$$
+  <center><a name="plotting_pic001"><img src="./pic/plotting_pic001.png" border="1">
+  </center>
+  <br><br>
+  $$insert:plotspec.inc$$
+  <!-- /func:addyerrorbar -->
+$$funcref_end$$
+
+  
+  
+$$funcref_start$$<a name="xerrorbar"/><!-- func:xerrorbar -->
+  <b><tt><!-- template -->xerrorbar(X,Y,Xerr,"spec", "label")<!-- /template --></tt> - <i> creates a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>. </i>:</b>
+$$funcref_description$$
+The vector <tt>Xerr</tt> contain the length of the errorbars in every point of the plot. If only a single number is given, all errorbars have equal length. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  
+<br><br><b>Example:</b>
+  The following one-liners draws some example error bars:
+  $$codeexample:xerrorbar(x=1:10, 2+sin(x), 0.1*x, "roEB")$$
+  <center><a name="plotting_pic005"><img src="./pic/plotting_pic005.png" border="1">
+  </center>
+  <br><br>
+  $$insert:plotspec.inc$$
+  <!-- /func:xerrorbar -->
+$$funcref_end$$
+
+$$funcref_start$$<a name="addxerrorbar"/><!-- func:addxerrorbar -->
+  <b><tt><!-- template -->addxerrorbar(X,Y,Xerr,"spec", "label")<!-- /template --></tt> - <i> adds a plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt> to the current figure. </i>:</b>
+$$funcref_description$$
+ The vector <tt>Xerr</tt> contain the length of the errorbars in every point of the plot. If only a single number is given, all errorbars have equal length. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title. 
+<br><br><b>Example:</b>
+  The following one-liner draws some example error bars:
+  $$codeexample:addxerrorbar(x=1:10, 2+sin(x), 0.1*x, "roEB")$$
+<center><a name="plotting_pic005"><img src="./pic/plotting_pic005.png" border="1">
+  </center>
+    <br><br>
+  $$insert:plotspec.inc$$
+  <!-- /func:addxerrorbar -->
+$$funcref_end$$
+
+</body>
+</html>

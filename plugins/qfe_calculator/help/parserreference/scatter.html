@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1250">
+<title>Data Table Online-Help: Expression parser: Scatter Plots</title>
+</head>
+<body> 
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+<h3>Blob plots</h3>
+$$funcref_start$$<a name="scatter"/><!-- func:scatter -->
+  <b><tt><!-- template -->scatter(X,Y,S,"spec", "label")<!-- /template --></tt> - <i> creates a scatter-plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>. The vector <tt>S</tt> specifies the size of each data point. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
+$$funcref_description$$
+  Example:
+  $$codeexample:scatter(randvec(n=25,10), randvec(n,10), randvec(n,25), "ro", "circles", randvec(n=10,10), randvec(n,10), 10+randvec(n,25), "b*", "stars")$$
+  <center><a name="plotting_pic010"><img src="./pic/plotting_pic010.png" border="1">
+  </center>
+  <br><br>
+  $$insert:plotspec.inc$$
+  <!-- /func:scatter -->
+$$funcref_end$$
+
+$$funcref_start$$<a name="addscatter"/><!-- func:addscatter -->
+  <b><tt><!-- template -->addscatter(X,Y,S,"spec", "label")<!-- /template --></tt> - <i> adds a scatter-plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>to the current figure. The vector <tt>S</tt> specifies the size of each data point. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
+$$funcref_description$$
+  Example:
+  $$codeexample:addscatter(randvec(n=25,10), randvec(n,10), randvec(n,25), "ro", "circles", randvec(n=10,10), randvec(n,10), 10+randvec(n,25), "b*", "stars")$$
+  <center><a name="plotting_pic010"><img src="./pic/plotting_pic010.png" border="1">
+  </center><br><br>
+  $$insert:plotspec.inc$$
+  <!-- /func:addscatter -->
+$$funcref_end$$
+
+<h3>Color Scatter Plots</h3>
+$$funcref_start$$<a name="colorscatter"/><!-- func:colorscatter -->
+  <b><tt><!-- template -->colorscatter(X,Y,S,"spec", "palette", "label")<!-- /template --></tt> - <i> creates a colorscatter-plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>. The vector <tt>S</tt> specifies the color from the given <tt>"palette"</tt> (the palette is optional). <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
+$$funcref_description$$
+  Example:
+  $$codeexample:colorscatter(randvec(n=25,10), randvec(n,10), randvec(n,25), "of", "Matlab", "circles")$$
+  <center><a name="plotting_pic011"><img src="./pic/plotting_pic011.png" border="1">
+  </center>
+  <br><br>
+  $$insert:plotspec.inc$$
+  <!-- /func:colorscatter -->
+$$funcref_end$$
+
+$$funcref_start$$<a name="addcolorscatter"/><!-- func:addcolorscatter -->
+  <b><tt><!-- template -->addcolorscatter(X,Y,S,"spec", "palette", "label")<!-- /template --></tt> - <i> adds a colorscatter-plot of the data in the vector <tt>X</tt> against the data in the vector <tt>Y</tt>to the current figure. The vector <tt>S</tt> specifies the color from the given <tt>"palette"</tt>. <tt>"spec"</tt> (optional) describes the plot formatting (format spec) and <tt>"label"</tt> (optional) is the plot title.  </i>:</b>
+$$funcref_description$$
+  Example:
+  $$codeexample:addcolorscatter(randvec(n=25,10), randvec(n,10), randvec(n,25), "of", "Matlab", "circles")$$
+  <center><a name="plotting_pic011"><img src="./pic/plotting_pic011.png" border="1">
+  </center><br><br>
+  $$insert:plotspec.inc$$
+  <!-- /func:addcolorscatter -->
+$$funcref_end$$
+
+</body>
+</html>
