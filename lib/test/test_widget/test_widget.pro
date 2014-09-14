@@ -35,12 +35,21 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     ../../qfdoubleedit.cpp \
     ../../qfdoubleslider.cpp \
-    ../../qfenhancedlineedit.cpp
+    ../../qfenhancedlineedit.cpp \
+    ../../qfcollapsibleframe.cpp \
+    ../../qfelidedlabel.cpp \
+    ../../qfrotatablelabel.cpp
 
 HEADERS  += mainwindow.h \
     ../../qfdoubleedit.h \
     ../../lib_imexport.h \
     ../../qfdoubleslider.h \
-    ../../qfenhancedlineedit.h
+    ../../qfenhancedlineedit.h \
+    ../../qfcollapsibleframe.h \
+    ../../qfelidedlabel.h \
+    ../../qfrotatablelabel.h
 
 FORMS    += mainwindow.ui
+
+RESOURCES += \
+    ../../lib.qrc

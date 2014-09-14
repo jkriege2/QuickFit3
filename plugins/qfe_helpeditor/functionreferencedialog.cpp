@@ -22,20 +22,54 @@
 
 #include "functionreferencedialog.h"
 #include "ui_functionreferencedialog.h"
+#include "programoptions.h"
+#include "qftools.h"
+
 
 FunctionReferenceDialog::FunctionReferenceDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::FunctionReferenceDialog)
 {
     ui->setupUi(this);
+
+    loadWidgetGeometry(ProgramOptions::getInstance(), this, "FunctionReferenceDialog");
+
+    ProgramOptions::getConfigQPlainTextEdit(ui->edtLong, "FunctionReferenceDialog/edtLong");
+    ProgramOptions::getConfigQLineEdit(ui->edtTemplate, "FunctionReferenceDialog/edtTemplate");
+    ProgramOptions::getConfigQLineEdit(ui->edtName, "FunctionReferenceDialog/edtName");
+    ProgramOptions::getConfigQLineEdit(ui->edtShort, "FunctionReferenceDialog/edtShort");
+
 }
 
 FunctionReferenceDialog::~FunctionReferenceDialog()
 {
+    saveWidgetGeometry(ProgramOptions::getInstance(), this, "FunctionReferenceDialog");
+
+    ProgramOptions::setConfigQPlainTextEdit(ui->edtLong, "FunctionReferenceDialog/edtLong");
+    ProgramOptions::setConfigQLineEdit(ui->edtName, "FunctionReferenceDialog/edtName");
+    ProgramOptions::setConfigQLineEdit(ui->edtShort, "FunctionReferenceDialog/edtShort");
+    ProgramOptions::setConfigQLineEdit(ui->edtTemplate, "FunctionReferenceDialog/edtTemplate");
     delete ui;
 }
 
 QString FunctionReferenceDialog::insertText() const
 {
     return QString("$$funcref_start$$<a name=\"%1\"/><!-- func:%1 -->\n  <b><tt><!-- template -->%2<!-- /template --></tt> - <i> %3 </i>:</b>\n$$funcref_description$$\n    %4  <!-- /func:%1 -->\n$$funcref_end$$").arg(ui->edtName->text()).arg(ui->edtTemplate->text()).arg(ui->edtShort->text()).arg(ui->edtLong->toPlainText());
+}
+
+void FunctionReferenceDialog::on_edtName_textChanged(const QString &text)
+{
+    if (!text.isEmpty()) {
+        if (ui->edtTemplate->text().isEmpty()) {
+            ui->edtTemplate->setText(text+"()");
+        } else {
+            QString s=ui->edtTemplate->text();
+            int idx=s.indexOf('(');
+            if (idx>=0) {
+                ui->edtTemplate->setText(text+s.right(idx));
+            } else {
+                ui->edtTemplate->setText(text+"("+s+")");
+            }
+        }
+    }
 }

@@ -38,6 +38,8 @@ class FunctionReferenceDialog : public QDialog
         ~FunctionReferenceDialog();
 
         QString insertText() const;
+    protected slots:
+        void on_edtName_textChanged(const QString& text);
 
     private:
         Ui::FunctionReferenceDialog *ui;

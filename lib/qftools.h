@@ -44,6 +44,7 @@
 #include "qfpluginservices.h"
 #include <QXmlStreamWriter>
 #include <QBitArray>
+#include "programoptions.h"
 
 /*! \brief QuickFit's internal malloc replacement (on some systems, this does a boundary-aligned malloc)
     \ingroup qf3lib_tools
@@ -149,7 +150,12 @@ QFLIB_EXPORT QToolButton* createButtonForActionShowText(QAction* action, QWidget
     \param prefix this prefix is prepended to the QSettings keys
 */
 QFLIB_EXPORT void saveWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix=QString(""));
-
+inline void saveWidgetGeometry(QSettings* settings, QWidget* widget, QString prefix=QString("")) {
+    if (settings) saveWidgetGeometry(*settings,widget, prefix);
+}
+inline void saveWidgetGeometry(ProgramOptions* settings, QWidget* widget, QString prefix=QString("")) {
+    if (settings) saveWidgetGeometry(*settings->getQSettings(),widget, prefix);
+}
 /*! \brief load the geometry of a given widget to a QSettings
     \ingroup qf3lib_tools
 
@@ -160,6 +166,12 @@ QFLIB_EXPORT void saveWidgetGeometry(QSettings& settings, QWidget* widget, QStri
     \param prefix this prefix is prepended to the QSettings keys
 */
 QFLIB_EXPORT void loadWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix=QString(""));
+inline void loadWidgetGeometry(QSettings* settings, QWidget* widget, QString prefix=QString("")) {
+    if (settings) loadWidgetGeometry(*settings,widget, prefix);
+}
+inline void loadWidgetGeometry(ProgramOptions* settings, QWidget* widget, QString prefix=QString("")) {
+    if (settings) loadWidgetGeometry(*settings->getQSettings(),widget, prefix);
+}
 
 
 /*! \brief load the geometry of a given widget to a QSettings

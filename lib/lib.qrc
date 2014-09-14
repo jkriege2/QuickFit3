@@ -45,6 +45,10 @@
         <file alias="autolinkweb.png">icons/autolinkweb.png</file>
     </qresource>
     <qresource prefix="/lib">
+        <file alias="collapse_opened.png">icons/collapse_opened.png</file>
+        <file alias="collapse_closed.png">icons/collapse_closed.png</file>
+        <file alias="collapse_closedhover.png">icons/collapse_closedhover.png</file>
+        <file alias="collapse_openedhover.png">icons/collapse_openedhover.png</file>
         <file alias="expression_parser.png">icons/expression_parser.png</file>
         <file alias="expression_parser_big.png">icons/expression_parser_big.png</file>
         <file alias="edit_fitfunction.png">icons/edit_fitfunction.png</file>

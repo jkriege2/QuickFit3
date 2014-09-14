@@ -6,6 +6,30 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    ui->coll1->setTitle("Title 1");
+    ui->coll1->setIcon(QPixmap(":/lib/print.png"));
+    ui->coll2->setTitle("Title 2");
+    ui->coll3->setIcon(QPixmap(":/lib/print.png"));
+    ui->coll3->setTitle("Title 3");
+
+    ui->labR1->setText("text, <b>normal</b>");
+    ui->labR2->setText("text, clock");
+    ui->labR2->setOrientation(QFRotatableLabel::ClockwiseRotation);
+    ui->labR3->setText("text, <b>counter-clock</b>");
+    ui->labR3->setOrientation(QFRotatableLabel::CounterClockwiseRotation);
+    ui->labR4->setText("text,\nupside-down");
+    ui->labR4->setOrientation(QFRotatableLabel::UpsideDownRotation);
+
+    ui->labR1_2->setPixmap(QPixmap(":/lib/help/autolinkweb.png"));
+    ui->labR2_2->setPixmap(QPixmap(":/lib/help/autolinkweb.png"));
+    ui->labR2_2->setOrientation(QFRotatableLabel::ClockwiseRotation);
+    ui->labR3_2->setPixmap(QPixmap(":/lib/help/autolinkweb.png"));
+    ui->labR3_2->setOrientation(QFRotatableLabel::CounterClockwiseRotation);
+    ui->labR4_2->setPixmap(QPixmap(":/lib/help/autolinkweb.png"));
+    ui->labR4_2->setOrientation(QFRotatableLabel::UpsideDownRotation);
+
+
     ui->edtLogDouble->setLogScale(true);
     ui->edtInt->setIntegerWidget(true);
 

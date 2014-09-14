@@ -19,7 +19,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-DEFINES += QTLIB_IN_DLL
+DEFINES += QTLIB_IN_DLL IS_QUICKFIT3
 
 MOC_DIR = ./.mocs/
 UI_DIR = ./.uis/

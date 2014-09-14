@@ -25,6 +25,7 @@
 #include <QSlider>
 
 #include "lib_imexport.h"
+#include "programoptions.h"
 
 /*! \brief a slider that support double-values
     \ingroup qf3lib_widgets
@@ -53,5 +54,7 @@ class QFLIB_EXPORT QFDoubleSlider : public QSlider
         int m_steps;
         
 };
+
+CREATE_WIDGET_PROGRAMOPTIONS_QFLOADSTORE(QFDoubleSlider,setDValue,dvalue,double)
 
 #endif // QFDOUBLESLIDER_H

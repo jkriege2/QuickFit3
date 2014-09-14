@@ -467,6 +467,17 @@
       </widget>
      </item>
      <item>
+      <widget class="QToolButton" name="btnTable">
+       <property name="text">
+        <string>insert a table</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/insert_table.png</normaloff>:/qfe_helpeditor/icons/insert_table.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
       <widget class="QToolButton" name="btnInsertMath">
        <property name="text">
         <string>insert equation</string>

@@ -57,4 +57,6 @@ class QFLIB_EXPORT QFResultsGroupComboBox : public QComboBox {
         QString containsParamInGroup;
 };
 
+CREATE_WIDGET_PROGRAMOPTIONS_QFLOADSTORE(QFResultsGroupComboBox,setCurrentEvaluationGroup,currentEvaluationGroup,QString)
+
 #endif // QFRESULTSGROUPCOMBOBOX_H

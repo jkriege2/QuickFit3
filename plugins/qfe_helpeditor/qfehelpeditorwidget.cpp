@@ -37,7 +37,7 @@
 #include "faqentrydialog.h"
 #include "functionreferencedialog.h"
 #include "qfhtmlhelptools.h"
-
+#include "newtabledialog.h"
 
 
 #define AUTOSAVE_INTERVAL_MSEC 20000
@@ -67,6 +67,8 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     completer->setCaseSensitivity(Qt::CaseInsensitive);
     completer->setWrapAround(false);
     ui->edtScript->getEditor()->setCompleter(completer);
+
+
 
     recentHelpFiles=new QRecentFilesMenu(this);
     recentHelpFiles->setUseSystemFileIcons(false);
@@ -945,6 +947,8 @@ void QFEHelpEditorWidget::on_btnInsertPluginLink_clicked()
     if (dlg->exec()) {
         insertAroundOld(dlg->insertText()+"%1°");
     }
+    delete dlg;
+
 }
 
 void QFEHelpEditorWidget::on_btnInsertSubPluginLink_clicked()
@@ -953,6 +957,8 @@ void QFEHelpEditorWidget::on_btnInsertSubPluginLink_clicked()
     if (dlg->exec()) {
         insertAroundOld(dlg->insertText()+"%1°");
     }
+    delete dlg;
+
 }
 void QFEHelpEditorWidget::on_btnCenter_clicked()
 {
@@ -965,6 +971,7 @@ void QFEHelpEditorWidget::on_btnInsertFAQ_clicked()
     if (dlg->exec()) {
         insertAroundOld(QString("%1°")+dlg->insertText());
     }
+    delete dlg;
 }
 
 void QFEHelpEditorWidget::on_btnFunctionReference_clicked()
@@ -973,7 +980,16 @@ void QFEHelpEditorWidget::on_btnFunctionReference_clicked()
     if (dlg->exec()) {
         insertAroundOld(QString("%1°")+dlg->insertText());
     }
+    delete dlg;
+}
 
+void QFEHelpEditorWidget::on_btnTable_clicked()
+{
+    NewTableDialog* dlg=new NewTableDialog(this);
+    if (dlg->exec()) {
+        insertAroundOld(QString("%1°")+dlg->insertText());
+    }
+    delete dlg;
 }
 
 

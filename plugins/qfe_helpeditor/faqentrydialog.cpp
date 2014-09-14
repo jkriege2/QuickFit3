@@ -22,16 +22,26 @@
 
 #include "faqentrydialog.h"
 #include "ui_faqentrydialog.h"
+#include "programoptions.h"
+#include "qftools.h"
 
 FAQEntryDialog::FAQEntryDialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::FAQEntryDialog)
 {
     ui->setupUi(this);
+    loadWidgetGeometry(ProgramOptions::getInstance(), this, "FAQEntryDialog");
+
+    ProgramOptions::getConfigQPlainTextEdit(ui->edtAnswer, "FAQEntryDialog/edtAnswer");
+    ProgramOptions::getConfigQPlainTextEdit(ui->edtQuestion, "FAQEntryDialog/edtQuestion");
+
 }
 
 FAQEntryDialog::~FAQEntryDialog()
 {
+    saveWidgetGeometry(ProgramOptions::getInstance(), this, "FAQEntryDialog");
+    ProgramOptions::setConfigQPlainTextEdit(ui->edtAnswer, "FAQEntryDialog/edtAnswer");
+    ProgramOptions::setConfigQPlainTextEdit(ui->edtQuestion, "FAQEntryDialog/edtQuestion");
     delete ui;
 }
 

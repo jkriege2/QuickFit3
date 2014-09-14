@@ -65,4 +65,6 @@ class QFLIB_EXPORT QFRDRComboBox : public QComboBox
         
 };
 
+CREATE_WIDGET_PROGRAMOPTIONS_QFLOADSTORE(QFRDRComboBox,setCurrentRDRID,currentRDRID,int)
+
 #endif // QFRDRCOMBOBOX_H

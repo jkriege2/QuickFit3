@@ -31,6 +31,7 @@
 #include <QList>
 #include <QAction>
 #include <QPair>
+#include "programoptions.h"
 /*! \brief this QLineEdit descendent implements a validating edit field that allows to enter floating point numbers
            with a possibly defined range
     \ingroup qf3lib_widgets
@@ -152,5 +153,8 @@ class QFLIB_EXPORT QFDoubleEdit : public QLineEdit {
         virtual void resizeEvent ( QResizeEvent * event ) ;
         virtual void wheelEvent ( QWheelEvent * event );
 };
+
+
+CREATE_WIDGET_PROGRAMOPTIONS_QFLOADSTORE(QFDoubleEdit,setValue,value,double)
 
 #endif // QFDOUBLEEDIT_H

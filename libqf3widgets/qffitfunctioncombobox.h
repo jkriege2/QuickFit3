@@ -53,4 +53,7 @@ class QFWIDLIB_EXPORT QFFitFunctionComboBox : public QComboBox
 
 };
 
+#  include "programoptions.h"
+CREATE_WIDGET_PROGRAMOPTIONS_QFLOADSTORE(QFFitFunctionComboBox,setCurrentFitFunction,currentFitFunctionID,QString)
+
 #endif // QFFITFUNCTIONCOMBOBOX_H

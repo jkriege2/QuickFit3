@@ -830,6 +830,10 @@ QFCompleterTextEdit::QFCompleterTextEdit(QWidget* parent):
 {
     editor = new QFCompleterTextEditWidget(this);
     editor->setFrameStyle(QFrame::NoFrame);
+    QFont f("Monospace");
+    f.setStyleHint(QFont::TypeWriter);
+    editor->setFontFamily(f.family());
+    editor->setTabwidth(2);
 
     numbers = new QFCompleterTextEditNumberBar(editor, this);
     layout = new QHBoxLayout();

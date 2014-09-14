@@ -43,7 +43,8 @@ HEADERS += qfehelpeditor.h \
     pluginlinkdialog.h \
     subpluginlinkdialog.h \
     faqentrydialog.h \
-    functionreferencedialog.h
+    functionreferencedialog.h \
+    newtabledialog.h
 
 SOURCES += qfehelpeditor.cpp \
            qfehelpeditorwidget.cpp \
@@ -54,7 +55,8 @@ SOURCES += qfehelpeditor.cpp \
     pluginlinkdialog.cpp \
     subpluginlinkdialog.cpp \
     faqentrydialog.cpp \
-    functionreferencedialog.cpp
+    functionreferencedialog.cpp \
+    newtabledialog.cpp
 
 FORMS =    qfehelpeditorwidget.ui \
     replacedialog.ui \
@@ -64,7 +66,8 @@ FORMS =    qfehelpeditorwidget.ui \
     pluginlinkdialog.ui \
     subpluginlinkdialog.ui \
     faqentrydialog.ui \
-    functionreferencedialog.ui
+    functionreferencedialog.ui \
+    newtabledialog.ui
 
 RESOURCES += qfehelpeditor.qrc
 

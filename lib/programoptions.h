@@ -29,6 +29,29 @@
 #include "lib_imexport.h"
 
 
+#define ADD_WIDGET_PROGRAMOPTIONS(widgetClass, setterF, getterF, datatype) \
+    static void getConfig##widgetClass(widgetClass* cb, const QString& name, QVariant defaultValue) {\
+        if (cb) cb->setterF(ProgramOptions::getConfigValue(name, defaultValue).value<datatype>());\
+    }\
+    static void getConfig##widgetClass(widgetClass* cb, const QString& name) {\
+        if (cb) ProgramOptions::getConfig##widgetClass(cb, name, QVariant::fromValue<datatype>(cb->getterF()));\
+    }\
+    static void setConfig##widgetClass(widgetClass* cb, const QString& name) {\
+        if (cb) ProgramOptions::setConfigValue(name, QVariant::fromValue<datatype>(cb->getterF()));\
+    }
+
+#define CREATE_WIDGET_PROGRAMOPTIONS_QFLOADSTORE(widgetClass, setterF, getterF, datatype) \
+    inline void qfGetConfig##widgetClass(widgetClass* cb, const QString& name, QVariant defaultValue) {\
+        if (cb) cb->setterF(ProgramOptions::getConfigValue(name, defaultValue).value<datatype>());\
+    }\
+    inline void qfGetConfig##widgetClass(widgetClass* cb, const QString& name) {\
+        if (cb) qfGetConfig##widgetClass(cb, name, QVariant::fromValue<datatype>(cb->getterF()));\
+    }\
+    inline void qfSetConfig##widgetClass(widgetClass* cb, const QString& name) {\
+        if (cb) ProgramOptions::setConfigValue(name, QVariant::fromValue<datatype>(cb->getterF()));\
+    }
+
+
 /*! \brief this class manages the overall program options (and may also display an options Dialog
     \ingroup qf3lib_settings
 
@@ -230,6 +253,14 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
             inst->settings->setValue(name, value);
             inst->settings->sync();
         }
+
+        ADD_WIDGET_PROGRAMOPTIONS(QCheckBox,setChecked,isChecked,bool)
+        ADD_WIDGET_PROGRAMOPTIONS(QRadioButton,setChecked,isChecked,bool)
+        ADD_WIDGET_PROGRAMOPTIONS(QDoubleSpinBox,setValue,value,double)
+        ADD_WIDGET_PROGRAMOPTIONS(QSpinBox,setValue,value,int)
+        ADD_WIDGET_PROGRAMOPTIONS(QComboBox,setCurrentIndex,currentIndex,int)
+        ADD_WIDGET_PROGRAMOPTIONS(QLineEdit,setText,text,QString)
+        ADD_WIDGET_PROGRAMOPTIONS(QPlainTextEdit,setPlainText,toPlainText,QString)
 };
 
 
