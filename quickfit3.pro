@@ -28,10 +28,6 @@ CONFIG(debug, debug|release):message("building QuickFit in DEBUG mode")
 
 TEMPLATE = subdirs
 
-SUBDIRS += tool_qf3infotool
-tool_qf3infotool.subdir = ./tools/qf3infotool
-tool_qf3infotool.depends=
-
 
 SUBDIRS += lib libqf3widgets application
 application.depends = lib libqf3widgets
