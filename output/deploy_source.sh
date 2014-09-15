@@ -85,18 +85,7 @@ echo -e "\n\ndetermining compile date:"
 COMPILEDATE=`date +%Y-%m-%d`
 echo -e "\n   compile date: ${COMPILEDATE}"
 echo -e "\n\ndetermining bit depth:"
-#echo '
-##include <stdio.h>
-#int main() {
-#	int i=sizeof(void*)*8;
-#	printf("%d\n", i);
-#	return 0;
-#}
-#' > test~.cpp
-#g++ -o a.out test~.cpp
-#BITDEPTH=`./a.out`
-#rm a.out 
-#rm test~.cpp
+
 BITDEPTH=`./quickfit3.exe --getbits`
 echo -e "\n   bit depth: ${BITDEPTH}\n\n"
 

@@ -28,7 +28,7 @@
 #try to read compiler name and version
 COMPILERVERSION=$$system($$QMAKE_CXX --version)
 COMPILERVERSION_MACHINE=$$system($$QMAKE_CXX -dumpmachine)
-
+system($$QMAKE_CXX $$QMAKE_CXXFLAGS_RELEASE .$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}main.cpp -o .$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX})
 
 # try to read the SVN version
 SVNVERSION = $$system(svnversion)
@@ -44,40 +44,13 @@ isEmpty(SVNVERSION) {
     SVNVERSION = ---
 }
 
+DATESTR = $$system(.$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX} --date)
+DATESTRYEAR = $$system(.$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX} --year)
 
-win32 {
-    # first we have to check whether a MS Windows style date command is called. If you call this without the /T option, it will
-    # expect a new date on input, whereas the unix date command with the /T option will return an error message containing the
-    # word "invalid". So we call date /T and check the output for "invalid". if it is present, we have a Unix-style date command,
-    # otherwise the MS Windows date. Finally we can set DATESTR using the right command.
-    HAS_WINDOWS_DATE=TRUE
-    DATE_OUTPUT=$$system(date /T)
-    contains(DATE_OUTPUT, "invalid"):HAS_WINDOWS_DATE=FALSE
-    message($$DATE_OUTPUT)
-    contains(HAS_WINDOWS_DATE, FALSE) {
-        !isEmpty(QMAKE_SH) {
-            DATESTR = $$system(date +%Y/%m/%d)
-            DATESTRYEAR = $$system(date +%Y)
-        }
-    } else {
-        DATESTR = $$system(date /T)
-        DATESTRYEAR = $$system(date /T)
-    }
-} else {
-    # on UNIX we just call the date command!
-    DATESTR = $$system(date +%Y/%m/%d)
-    DATESTRYEAR = $$system(date +%Y)
-}
-isEmpty(DATESTR) {
-    DATESTR = _DATE_
-    DATESTRYEAR = 2014
-}
 message("COMPILE MODE: SVNVERSION is: $$SVNVERSION")
 message("COMPILE MODE: build date is: $$DATESTR")
 message("COMPILE MODE: compiler: $$COMPILERVERSION")
 message("COMPILE MODE: compiler.machine: $$COMPILERVERSION_MACHINE")
-
-
 
 
 

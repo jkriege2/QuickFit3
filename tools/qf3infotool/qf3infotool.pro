@@ -8,7 +8,7 @@ DESTDIR = ./
 QT       += core
 QT       -= gui
 
-TARGET = qf3bitdepth
+TARGET = qf3infotool
 CONFIG   += console
 CONFIG   -= app_bundle
 
