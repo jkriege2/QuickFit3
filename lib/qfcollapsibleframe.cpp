@@ -22,26 +22,47 @@ QFCollapsibleFrame::QFCollapsibleFrame(const QPixmap &pix, const QString &title,
 }
 
 
+QFCollapsibleFrame::QFCollapsibleFrame(QFCollapsibleFrame::HeaderPosition pos, QWidget *parent):
+    QFrame(parent)
+{
+    init();
+    setHeaderPosition(pos);
+}
+
+QFCollapsibleFrame::QFCollapsibleFrame(const QString &title, QFCollapsibleFrame::HeaderPosition pos, QWidget *parent):
+    QFrame(parent)
+{
+    init();
+    setTitle(title);
+    setHeaderPosition(pos);
+}
+
+QFCollapsibleFrame::QFCollapsibleFrame(const QPixmap &pix, const QString &title, QFCollapsibleFrame::HeaderPosition pos, QWidget *parent):
+    QFrame(parent)
+{
+    init();
+    setTitle(title);
+    setIcon(pix);
+    setHeaderPosition(pos);
+}
+
 void QFCollapsibleFrame::init()
 {
+
+    m_pos=North;
     m_iconOpened=QPixmap(":/lib/collapse_opened.png");
     m_iconClosed=QPixmap(":/lib/collapse_closed.png");
     m_iconOpenedHover=QPixmap(":/lib/collapse_openedhover.png");
     m_iconClosedHover=QPixmap(":/lib/collapse_closedhover.png");
 
-    /*m_border=0;
-    m_separation=6;
-    m_headerSeparation=2;
-    m_title="";
-    m_icon=QPixmap();*/
     m_opened=true;
 
 
-    mainLayout=new QVBoxLayout();
+    mainLayout=new QBoxLayout(QBoxLayout::TopToBottom);
     mainLayout->setSpacing(2);
     mainLayout->setContentsMargins(2,2,2,2);
     frameHeader=new QFrame(this);
-    headerLayout=new QHBoxLayout();
+    headerLayout=new QBoxLayout(QBoxLayout::LeftToRight);
     headerLayout->setContentsMargins(0,0,0,0);
     headerLayout->setSpacing(6);
     frameHeader->setLayout(headerLayout);
@@ -64,12 +85,13 @@ void QFCollapsibleFrame::init()
     headerLayout->addWidget(labIcon, 0);
     headerLayout->addWidget(labTitle, 1);
     headerLayout->addWidget(labButton, 0);
-    mainLayout->addWidget(frameHeader);
 
     widMain=new QWidget(this);
     privateMain=true;
-    mainLayout->addWidget(widMain, 1);
+    mainLayout->addWidget(frameHeader);
+    mainLayout->addWidget(widMain);
     mainLayout->addStretch();
+
     QFrame::setLayout(mainLayout);
 }
 
@@ -106,8 +128,19 @@ int QFCollapsibleFrame::headerSeparation() const
     //return m_headerSeparation;
 }
 
+QFCollapsibleFrame::HeaderPosition QFCollapsibleFrame::headerPos() const
+{
+    return m_pos;
+}
+
 void QFCollapsibleFrame::setLayout(QLayout *layout)
 {
+    if (!privateMain) {
+        mainLayout->removeWidget(widMain);
+        widMain=new QWidget(this);
+        mainLayout->insertWidget(1,widMain,1);
+        privateMain=true;
+    }
     widMain->setLayout(layout);
     //invalidate();
 }
@@ -125,10 +158,11 @@ void QFCollapsibleFrame::setWidget(QWidget *widget)
             delete widMain;
         }
     }
-    if (widget) mainLayout->insertWidget(1, widget,1);
+    if (widget) mainLayout->insertWidget(1,widget,1);
     privateMain=false;
     widMain=widget;
     invalidate();
+    setHeaderPosition(headerPos());
 }
 
 QWidget *QFCollapsibleFrame::widget() const
@@ -164,40 +198,14 @@ QGridLayout *QFCollapsibleFrame::setGridLayout()
     return l;
 }
 
-/*QSize QFCollapsibleFrame::sizeHint() const
-{
-    QSize fs=QFrame::sizeHint();
-    int hh=getHeaderHeight();
-    int hw=getHeaderWidth();
-    QSize s;
-    if (m_opened) {
-        s=QSize(qMax(fs.width(), hw), fs.height()+hh);
-    } else {
-        s=QSize(hw, hh);
-    }
-    return s;
-}
-
-QSize QFCollapsibleFrame::minimumSizeHint() const
-{
-    int hh=getHeaderHeight();
-    int hw=getHeaderWidth();
-    QSize fs=QFrame::minimumSizeHint();
-    return QSize(qMax(fs.width(), hw), fs.height()+hh);
-}*/
-
 void QFCollapsibleFrame::setTitle(const QString &text)
 {
     labTitle->setText(text+"  ");
-    //m_title=text;
-    //invalidate();
 }
 
 void QFCollapsibleFrame::setIcon(const QPixmap &icon)
 {
     labIcon->setPixmap(icon);
-    //m_icon=icon;
-    //invalidate();
 }
 
 void QFCollapsibleFrame::setOpened(bool opened)
@@ -212,17 +220,56 @@ void QFCollapsibleFrame::setSeparation(int separation)
     headerLayout->setSpacing(separation);
 }
 
-/*void QFCollapsibleFrame::setSeparation(int separation)
-{
-    m_separation=separation;
-    invalidate();
-}*/
 
 void QFCollapsibleFrame::setHeaderSeparation(int separation)
 {
     mainLayout->setSpacing(separation);
-    /*m_headerSeparation=separation;
-    invalidate();*/
+}
+
+void QFCollapsibleFrame::setHeaderPosition(QFCollapsibleFrame::HeaderPosition pos)
+{
+    m_pos=pos;
+
+
+
+    switch (m_pos) {
+        case South: {
+                mainLayout->setDirection(QBoxLayout::BottomToTop);
+                labIcon->setOrientation(QFRotatableLabel::NoRotation);
+                labTitle->setOrientation(QFRotatableLabel::NoRotation);
+                labButton->setOrientation(QFRotatableLabel::UpsideDownRotation);
+                headerLayout->setDirection(QBoxLayout::LeftToRight);
+            }
+            break;
+        case West: {
+                mainLayout->setDirection(QBoxLayout::LeftToRight);
+                labIcon->setOrientation(QFRotatableLabel::CounterClockwiseRotation);
+                labTitle->setOrientation(QFRotatableLabel::CounterClockwiseRotation);
+                labButton->setOrientation(QFRotatableLabel::CounterClockwiseRotation);
+                headerLayout->setDirection(QBoxLayout::BottomToTop);
+            }
+            break;
+        case East: {
+
+                mainLayout->setDirection(QBoxLayout::RightToLeft);
+                labIcon->setOrientation(QFRotatableLabel::ClockwiseRotation);
+                labTitle->setOrientation(QFRotatableLabel::ClockwiseRotation);
+                labButton->setOrientation(QFRotatableLabel::ClockwiseRotation);
+                headerLayout->setDirection(QBoxLayout::BottomToTop);
+            }
+            break;
+        default:
+        case North: {
+
+                mainLayout->setDirection(QBoxLayout::TopToBottom);
+                labIcon->setOrientation(QFRotatableLabel::NoRotation);
+                labTitle->setOrientation(QFRotatableLabel::NoRotation);
+                labButton->setOrientation(QFRotatableLabel::NoRotation);
+                headerLayout->setDirection(QBoxLayout::LeftToRight);
+            }
+            break;
+    }
+    invalidate();
 }
 
 void QFCollapsibleFrame::invalidate()
@@ -267,93 +314,4 @@ void QFCollapsibleFrame::toggle()
     emit toggled(m_opened);
 }
 
-/*void QFCollapsibleFrame::myDrawFrame(QPainter *p)
-{
-    int hh=getHeaderHeight();
-    //int hw=getHeaderWidth();
-    Q_D(QFrame);
-    QStyleOptionFrameV3 opt;
-    opt.init(this);
-    int frameShape  = d->frameStyle & QFrame::Shape_Mask;
-    int frameShadow = d->frameStyle & QFrame::Shadow_Mask;
-    opt.frameShape = Shape(int(opt.frameShape) | frameShape);
-    opt.rect = frameRect();
-    opt.rect.setHeight(opt.rect.height()-hh);
-    opt.rect.setTop(opt.rect.top()+hh);
-    switch (frameShape) {
-        case QFrame::Box:
-        case QFrame::HLine:
-        case QFrame::VLine:
-        case QFrame::StyledPanel:
-        case QFrame::Panel:
-            opt.lineWidth = d->lineWidth;
-            opt.midLineWidth = d->midLineWidth;
-            break;
-        default:
-            // most frame styles do not handle customized line and midline widths
-            // (see updateFrameWidth()).
-            opt.lineWidth = d->frameWidth;
-            break;
-    }
 
-    if (frameShadow == Sunken)
-        opt.state |= QStyle::State_Sunken;
-    else if (frameShadow == Raised)
-        opt.state |= QStyle::State_Raised;
-
-    style()->drawControl(QStyle::CE_ShapedFrame, &opt, p, this);
-}
-
-
-void QFCollapsibleFrame::paintEvent(QPaintEvent *event)
-{
-    int hh=getHeaderHeight();
-    int hw=getHeaderWidth();
-    QPainter paint(this);
-    int x=0;
-    int y=0;
-    QFontMetrics fm(font());
-    if (m_icon.width()>0) {
-        paint.drawPixmap(x,y,m_icon);
-        x=x+m_icon.width()+m_separation;
-    }
-    paint.drawText(QRect(x, y, fm.width(m_title), hh),Qt::AlignLeft|Qt::AlignBottom,  m_title);
-
-    if (m_opened) {
-        paint.drawPixmap(width()-m_iconOpened.width(), hh-m_iconOpened.height(), m_iconOpened);
-        paint.translate(0,hh);
-        myDrawFrame(&paint);
-    } else {
-        paint.drawPixmap(width()-m_iconClosed.width(), hh-m_iconClosed.height(), m_iconClosed);
-    }
-}
-
-int QFCollapsibleFrame::getHeaderHeight() const
-{
-    int h=m_iconOpened.height();
-    h=qMax(h,m_iconClosed.height());
-    h=qMax(h,m_iconOpenedHover.height());
-    h=qMax(h,m_iconClosedHover.height());
-    QFontMetrics fm(font());
-    h=qMax(h,fm.height());
-    return h+m_headerSeparation;
-}
-
-int QFCollapsibleFrame::getHeaderWidth() const
-{
-    int hiw=m_iconOpened.width();
-    h=qMax(h,m_iconClosed.width());
-    h=qMax(h,m_iconOpenedHover.width());
-    h=qMax(h,m_iconClosedHover.width());
-    QFontMetrics fm(font());
-    int w=fm.width(m_title)+m_separation+hiw;
-    if (m_icon.width()>0) w=w+m_icon.width()+m_separation;
-    return qMax(width(), w);
-}*/
-
-
-void QFCollapsibleForm::init()
-{
-    QFCollapsibleFrame::init();
-    m_form=setFormLayout();
-}

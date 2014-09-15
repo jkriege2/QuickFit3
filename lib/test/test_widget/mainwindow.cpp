@@ -15,14 +15,27 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->coll3->setTitle("Title 3");
 
     QFCollapsibleFrame* f=new QFCollapsibleFrame(QPixmap(":/lib/print.png"), tr("Print Settings 1"), ui->tab_3);
+    cframes<<f;
     ui->gridLayout_2->addWidget(f, 4,0,1,2);
     f=new QFCollapsibleFrame(QPixmap(":/lib/print.png"), tr("Print Settings 2"), ui->tab_3);
+    cframes<<f;
     ui->gridLayout_2->addWidget(f, 5,0,1,2);
     QHBoxLayout* hbl=new QHBoxLayout();
     f->setLayout(hbl);
     QFCollapsibleFrame* ff=new QFCollapsibleFrame(QPixmap(":/lib/print.png"), tr("Print Settings 2.1"), this);
+    cframes<<ff;
     hbl->addWidget(ff);
-    ff=new QFCollapsibleFrame(QPixmap(":/lib/print.png"), tr("Print Settings 2.1"), this);
+    ff=new QFCollapsibleFrame(QPixmap(":/lib/print.png"), tr("Print Settings 2.2"), this);
+    cframes<<ff;
+    hbl->addWidget(ff);
+    ff=new QFCollapsibleFrame(QPixmap(":/lib/print.png"), tr("Print Settings 2.3"), this);
+    cframes<<ff;
+    hbl->addWidget(ff);
+    ff=new QFCollapsibleFrame(QPixmap(":/lib/print.png"), tr("Print Settings 2.4"), this);
+    cframes<<ff;
+    hbl->addWidget(ff);
+    ff=new QFCollapsibleFrame(QPixmap(":/lib/print.png"), tr("Print Settings 2.5"), this);
+    cframes<<ff;
     hbl->addWidget(ff);
 
     ui->labR1->setText("text, <b>normal</b>");
@@ -93,4 +106,14 @@ void MainWindow::updateRLabels()
     ui->labR2_2->setAlignment(a);
     ui->labR3_2->setAlignment(a);
     ui->labR4_2->setAlignment(a);
+}
+
+void MainWindow::on_cmbCollapsibleOrientation_currentIndexChanged(int index)
+{
+    ui->coll1->setHeaderPosition(QFCollapsibleScrollArea::HeaderPosition(index));
+    ui->coll2->setHeaderPosition(QFCollapsibleScrollArea::HeaderPosition(index));
+    ui->coll3->setHeaderPosition(QFCollapsibleScrollArea::HeaderPosition(index));
+    for (int i=0; i<cframes.size(); i++) {
+        cframes[i]->setHeaderPosition(QFCollapsibleFrame::HeaderPosition(index));
+    }
 }

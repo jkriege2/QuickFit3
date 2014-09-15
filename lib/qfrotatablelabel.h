@@ -20,8 +20,8 @@ class QFLIB_EXPORT QFRotatableLabel : public QFrame
         enum Rotation {
             NoRotation=0,
             UpsideDownRotation=180,
-            ClockwiseRotation=-90,
-            CounterClockwiseRotation=90
+            ClockwiseRotation=90,
+            CounterClockwiseRotation=-90
         };
 
         explicit QFRotatableLabel(QWidget *parent=0, Qt::WindowFlags f=0);
