@@ -17,6 +17,7 @@ class MainWindow : public QMainWindow
 
     public slots:
         void updateWidgets();
+        void updateRLabels();
     private:
         Ui::MainWindow *ui;
 };

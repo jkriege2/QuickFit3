@@ -144,7 +144,10 @@ HEADERS += dlgnewproperty.h \
     qfrdrimagetoruninterface.h \
     qffitalgorithmerrorestimatemodewidget.h \
     qfsimpleplotservice.h \
-    ../version.h
+    ../version.h \
+    qfcollapsibleframe.h \
+    qfcollapsiblescrollarea.h \
+    qfrotatablelabel.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -230,7 +233,10 @@ SOURCES += dlgnewproperty.cpp \
     qfwizard.cpp \
     qfhelptoolbutton.cpp \
     qffitalgorithmerrorestimatemodewidget.cpp \
-    qfsimpleplotservice.cpp
+    qfsimpleplotservice.cpp \
+    qfcollapsibleframe.cpp \
+    qfcollapsiblescrollarea.cpp \
+    qfrotatablelabel.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "qfcollapsibleframe.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -12,6 +13,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->coll2->setTitle("Title 2");
     ui->coll3->setIcon(QPixmap(":/lib/print.png"));
     ui->coll3->setTitle("Title 3");
+
+    QFCollapsibleFrame* f=new QFCollapsibleFrame(QPixmap(":/lib/print.png"), tr("Print Settings 1"), ui->tab_3);
+    ui->gridLayout_2->addWidget(f, 4,0,1,2);
+    f=new QFCollapsibleFrame(QPixmap(":/lib/print.png"), tr("Print Settings 2"), ui->tab_3);
+    ui->gridLayout_2->addWidget(f, 5,0,1,2);
+    QHBoxLayout* hbl=new QHBoxLayout();
+    f->setLayout(hbl);
+    QFCollapsibleFrame* ff=new QFCollapsibleFrame(QPixmap(":/lib/print.png"), tr("Print Settings 2.1"), this);
+    hbl->addWidget(ff);
+    ff=new QFCollapsibleFrame(QPixmap(":/lib/print.png"), tr("Print Settings 2.1"), this);
+    hbl->addWidget(ff);
 
     ui->labR1->setText("text, <b>normal</b>");
     ui->labR2->setText("text, clock");
@@ -44,6 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->lineEdit->addInsertContextMenuEntry("sub;;test1", "stest1");
 
     updateWidgets();
+    updateRLabels();
 
 }
 
@@ -61,4 +74,23 @@ void MainWindow::updateWidgets()
     ui->edtLogDouble->setIncrement(ui->spinDInc_2->value());
     ui->edtInt->setRange(ui->spinIRangeMin->value(), ui->spinIRangeMax->value());
     ui->edtInt->setIncrement(ui->spinIInc->value());
+}
+
+void MainWindow::updateRLabels()
+{
+    Qt::Alignment a=0;
+    if (ui->cmbHAlign->currentIndex()==0) a=a|Qt::AlignLeft;
+    if (ui->cmbHAlign->currentIndex()==1) a=a|Qt::AlignHCenter;
+    if (ui->cmbHAlign->currentIndex()==2) a=a|Qt::AlignRight;
+    if (ui->cmbVAlign->currentIndex()==0) a=a|Qt::AlignTop;
+    if (ui->cmbVAlign->currentIndex()==1) a=a|Qt::AlignVCenter;
+    if (ui->cmbVAlign->currentIndex()==2) a=a|Qt::AlignBottom;
+    ui->labR1->setAlignment(a);
+    ui->labR2->setAlignment(a);
+    ui->labR3->setAlignment(a);
+    ui->labR4->setAlignment(a);
+    ui->labR1_2->setAlignment(a);
+    ui->labR2_2->setAlignment(a);
+    ui->labR3_2->setAlignment(a);
+    ui->labR4_2->setAlignment(a);
 }

@@ -18,7 +18,7 @@
     <item>
      <widget class="QTabWidget" name="tabWid">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_3">
        <attribute name="title">
@@ -26,7 +26,7 @@
        </attribute>
        <layout class="QGridLayout" name="gridLayout_2">
         <item row="0" column="1">
-         <widget class="QFCollapsibleFrame" name="coll2">
+         <widget class="QFCollapsibleScrollArea" name="coll2">
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -35,8 +35,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>99</width>
-             <height>116</height>
+             <width>417</width>
+             <height>122</height>
             </rect>
            </property>
            <layout class="QFormLayout" name="formLayout_7">
@@ -85,7 +85,7 @@
          </widget>
         </item>
         <item row="0" column="0">
-         <widget class="QFCollapsibleFrame" name="coll1">
+         <widget class="QFCollapsibleScrollArea" name="coll1">
           <property name="frameShape">
            <enum>QFrame::StyledPanel</enum>
           </property>
@@ -100,8 +100,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>99</width>
-             <height>64</height>
+             <width>417</width>
+             <height>122</height>
             </rect>
            </property>
            <layout class="QFormLayout" name="formLayout_6">
@@ -130,7 +130,7 @@
          </widget>
         </item>
         <item row="1" column="0">
-         <widget class="QFCollapsibleFrame" name="coll3">
+         <widget class="QFCollapsibleScrollArea" name="coll3">
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
@@ -139,8 +139,8 @@
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>99</width>
-             <height>116</height>
+             <width>417</width>
+             <height>123</height>
             </rect>
            </property>
            <layout class="QFormLayout" name="formLayout_8">
@@ -208,26 +208,6 @@
         <string>QFRotatableLabel</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="1" column="1">
-         <widget class="QFRotatableLabel" name="labR4">
-          <property name="frameShape">
-           <enum>QFrame::Box</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QFRotatableLabel" name="labR3">
-          <property name="frameShape">
-           <enum>QFrame::Box</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Raised</enum>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="2">
          <widget class="QFRotatableLabel" name="labR1_2">
           <property name="frameShape">
@@ -238,8 +218,41 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="4">
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item row="1" column="1">
+         <widget class="QFRotatableLabel" name="labR4">
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="2">
          <widget class="QFRotatableLabel" name="labR3_2">
+          <property name="frameShape">
+           <enum>QFrame::Box</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Raised</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QFRotatableLabel" name="labR3">
           <property name="frameShape">
            <enum>QFrame::Box</enum>
           </property>
@@ -288,18 +301,64 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="4">
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+        <item row="0" column="5" rowspan="2">
+         <layout class="QFormLayout" name="formLayout">
+          <property name="leftMargin">
+           <number>10</number>
           </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
+          <item row="0" column="0">
+           <widget class="QLabel" name="label_12">
+            <property name="text">
+             <string>h align</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>v align</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="cmbHAlign">
+            <item>
+             <property name="text">
+              <string>left</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>center</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>right</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QComboBox" name="cmbVAlign">
+            <item>
+             <property name="text">
+              <string>top</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>center</string>
+             </property>
+            </item>
+            <item>
+             <property name="text">
+              <string>bottom</string>
+             </property>
+            </item>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -597,15 +656,15 @@
    <header>qfenhancedlineedit.h</header>
   </customwidget>
   <customwidget>
-   <class>QFCollapsibleFrame</class>
-   <extends>QScrollArea</extends>
-   <header>qfcollapsibleframe.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QFRotatableLabel</class>
    <extends>QFrame</extends>
    <header>qfrotatablelabel.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFCollapsibleScrollArea</class>
+   <extends>QScrollArea</extends>
+   <header>qfcollapsiblescrollarea.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -618,8 +677,8 @@
    <slot>updateWidgets()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>541</x>
-     <y>86</y>
+     <x>64</x>
+     <y>72</y>
     </hint>
     <hint type="destinationlabel">
      <x>592</x>
@@ -634,8 +693,8 @@
    <slot>updateWidgets()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>642</x>
-     <y>86</y>
+     <x>76</x>
+     <y>72</y>
     </hint>
     <hint type="destinationlabel">
      <x>694</x>
@@ -650,8 +709,8 @@
    <slot>updateWidgets()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>803</x>
-     <y>85</y>
+     <x>101</x>
+     <y>72</y>
     </hint>
     <hint type="destinationlabel">
      <x>796</x>
@@ -666,8 +725,8 @@
    <slot>updateWidgets()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>608</x>
-     <y>169</y>
+     <x>64</x>
+     <y>84</y>
     </hint>
     <hint type="destinationlabel">
      <x>499</x>
@@ -682,8 +741,8 @@
    <slot>updateWidgets()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>703</x>
-     <y>169</y>
+     <x>76</x>
+     <y>84</y>
     </hint>
     <hint type="destinationlabel">
      <x>386</x>
@@ -698,8 +757,8 @@
    <slot>updateWidgets()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>855</x>
-     <y>169</y>
+     <x>101</x>
+     <y>84</y>
     </hint>
     <hint type="destinationlabel">
      <x>277</x>
@@ -714,12 +773,12 @@
    <slot>setValue(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>177</x>
-     <y>106</y>
+     <x>39</x>
+     <y>76</y>
     </hint>
     <hint type="destinationlabel">
-     <x>176</x>
-     <y>82</y>
+     <x>39</x>
+     <y>72</y>
     </hint>
    </hints>
   </connection>
@@ -730,17 +789,50 @@
    <slot>setDValue(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>259</x>
-     <y>82</y>
+     <x>39</x>
+     <y>72</y>
     </hint>
     <hint type="destinationlabel">
-     <x>260</x>
-     <y>107</y>
+     <x>39</x>
+     <y>76</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbHAlign</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>updateRLabels()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>836</x>
+     <y>85</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>882</x>
+     <y>167</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbVAlign</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>MainWindow</receiver>
+   <slot>updateRLabels()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>815</x>
+     <y>113</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>882</x>
+     <y>145</y>
     </hint>
    </hints>
   </connection>
  </connections>
  <slots>
   <slot>updateWidgets()</slot>
+  <slot>updateRLabels()</slot>
  </slots>
 </ui>

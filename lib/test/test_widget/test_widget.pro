@@ -38,7 +38,8 @@ SOURCES += main.cpp\
     ../../qfenhancedlineedit.cpp \
     ../../qfcollapsibleframe.cpp \
     ../../qfelidedlabel.cpp \
-    ../../qfrotatablelabel.cpp
+    ../../qfrotatablelabel.cpp \
+    ../../qfcollapsiblescrollarea.cpp
 
 HEADERS  += mainwindow.h \
     ../../qfdoubleedit.h \
@@ -47,7 +48,8 @@ HEADERS  += mainwindow.h \
     ../../qfenhancedlineedit.h \
     ../../qfcollapsibleframe.h \
     ../../qfelidedlabel.h \
-    ../../qfrotatablelabel.h
+    ../../qfrotatablelabel.h \
+    ../../qfcollapsiblescrollarea.h
 
 FORMS    += mainwindow.ui
 

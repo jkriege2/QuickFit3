@@ -1,29 +1,32 @@
-#include "qfcollapsibleframe.h"
+#include "qfcollapsiblescrollarea.h"
 
-QFCollapsibleFrame::QFCollapsibleFrame(QWidget *parent) :
-    QFrame(parent)
+QFCollapsibleScrollArea::QFCollapsibleScrollArea(QWidget *parent) :
+    QScrollArea(parent)
 {
     init();
 }
 
-QFCollapsibleFrame::QFCollapsibleFrame(const QString &title, QWidget *parent):
-    QFrame(parent)
+QFCollapsibleScrollArea::QFCollapsibleScrollArea(const QString &title, QWidget *parent):
+    QScrollArea(parent)
 {
     init();
     setTitle(title);
 }
 
-QFCollapsibleFrame::QFCollapsibleFrame(const QPixmap &pix, const QString &title, QWidget *parent):
-    QFrame(parent)
+QFCollapsibleScrollArea::QFCollapsibleScrollArea(const QPixmap &pix, const QString &title, QWidget *parent):
+    QScrollArea(parent)
 {
     init();
     setTitle(title);
     setIcon(pix);
 }
 
-
-void QFCollapsibleFrame::init()
-{
+void QFCollapsibleScrollArea::init() {
+    setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setAlignment(Qt::AlignTop|Qt::AlignLeft);
+    setWidgetResizable(true);
+    setFrameShape(QFrame::NoFrame);
     m_iconOpened=QPixmap(":/lib/collapse_opened.png");
     m_iconClosed=QPixmap(":/lib/collapse_closed.png");
     m_iconOpenedHover=QPixmap(":/lib/collapse_openedhover.png");
@@ -45,8 +48,9 @@ void QFCollapsibleFrame::init()
     headerLayout->setContentsMargins(0,0,0,0);
     headerLayout->setSpacing(6);
     frameHeader->setLayout(headerLayout);
-    setFrameShape(QFrame::StyledPanel);
-    setFrameShadow(QFrame::Plain);
+    frameAll=new QFrame(this);
+    frameAll->setFrameShape(QFrame::StyledPanel);
+    frameAll->setFrameShadow(QFrame::Plain);
     labIcon=new QFRotatableLabel(this);
     labTitle=new QFRotatableLabel(this);
     QFont tf=labTitle->font();
@@ -70,54 +74,83 @@ void QFCollapsibleFrame::init()
     privateMain=true;
     mainLayout->addWidget(widMain, 1);
     mainLayout->addStretch();
-    QFrame::setLayout(mainLayout);
+    frameAll->setLayout(mainLayout);
+    QScrollArea::setWidget(frameAll);
 }
 
-QString QFCollapsibleFrame::title() const
+QFormLayout *QFCollapsibleScrollArea::setFormLayout()
+{
+    QFormLayout* l=new QFormLayout();
+    setLayout(l);
+    return l;
+}
+
+QHBoxLayout *QFCollapsibleScrollArea::setHBoxLayout()
+{
+    QHBoxLayout* l=new QHBoxLayout();
+    setLayout(l);
+    return l;
+}
+
+QVBoxLayout *QFCollapsibleScrollArea::setVBoxLayout()
+{
+    QVBoxLayout* l=new QVBoxLayout();
+    setLayout(l);
+    return l;
+}
+
+QGridLayout *QFCollapsibleScrollArea::setGridLayout()
+{
+    QGridLayout* l=new QGridLayout();
+    setLayout(l);
+    return l;
+}
+
+QString QFCollapsibleScrollArea::title() const
 {
     return labTitle->text();
     //return m_title;
 }
 
-bool QFCollapsibleFrame::isOpened() const
+bool QFCollapsibleScrollArea::isOpened() const
 {
     return m_opened;
 }
 
-const QPixmap* QFCollapsibleFrame::icon() const
+const QPixmap* QFCollapsibleScrollArea::icon() const
 {
     return labIcon->pixmap();
     //return m_icon;
 }
 
-int QFCollapsibleFrame::separation() const
+int QFCollapsibleScrollArea::separation() const
 {
     return headerLayout->spacing();
 }
 
-/*int QFCollapsibleFrame::separation() const
+/*int QFCollapsibleScrollArea::separation() const
 {
     return m_separation;
 }*/
 
-int QFCollapsibleFrame::headerSeparation() const
+int QFCollapsibleScrollArea::headerSeparation() const
 {
     return mainLayout->spacing();
     //return m_headerSeparation;
 }
 
-void QFCollapsibleFrame::setLayout(QLayout *layout)
+void QFCollapsibleScrollArea::setLayout(QLayout *layout)
 {
     widMain->setLayout(layout);
     //invalidate();
 }
 
-QLayout *QFCollapsibleFrame::layout()
+QLayout *QFCollapsibleScrollArea::layout()
 {
     return widMain->layout();
 }
 
-void QFCollapsibleFrame::setWidget(QWidget *widget)
+void QFCollapsibleScrollArea::setWidget(QWidget *widget)
 {
     if (widMain) {
         mainLayout->removeWidget(widMain);
@@ -131,40 +164,12 @@ void QFCollapsibleFrame::setWidget(QWidget *widget)
     invalidate();
 }
 
-QWidget *QFCollapsibleFrame::widget() const
+QWidget *QFCollapsibleScrollArea::widget() const
 {
     return widMain;
 }
 
-QFormLayout *QFCollapsibleFrame::setFormLayout()
-{
-    QFormLayout* l=new QFormLayout();
-    setLayout(l);
-    return l;
-}
-
-QHBoxLayout *QFCollapsibleFrame::setHBoxLayout()
-{
-    QHBoxLayout* l=new QHBoxLayout();
-    setLayout(l);
-    return l;
-}
-
-QVBoxLayout *QFCollapsibleFrame::setVBoxLayout()
-{
-    QVBoxLayout* l=new QVBoxLayout();
-    setLayout(l);
-    return l;
-}
-
-QGridLayout *QFCollapsibleFrame::setGridLayout()
-{
-    QGridLayout* l=new QGridLayout();
-    setLayout(l);
-    return l;
-}
-
-/*QSize QFCollapsibleFrame::sizeHint() const
+/*QSize QFCollapsibleScrollArea::sizeHint() const
 {
     QSize fs=QFrame::sizeHint();
     int hh=getHeaderHeight();
@@ -178,7 +183,7 @@ QGridLayout *QFCollapsibleFrame::setGridLayout()
     return s;
 }
 
-QSize QFCollapsibleFrame::minimumSizeHint() const
+QSize QFCollapsibleScrollArea::minimumSizeHint() const
 {
     int hh=getHeaderHeight();
     int hw=getHeaderWidth();
@@ -186,46 +191,46 @@ QSize QFCollapsibleFrame::minimumSizeHint() const
     return QSize(qMax(fs.width(), hw), fs.height()+hh);
 }*/
 
-void QFCollapsibleFrame::setTitle(const QString &text)
+void QFCollapsibleScrollArea::setTitle(const QString &text)
 {
     labTitle->setText(text+"  ");
     //m_title=text;
     //invalidate();
 }
 
-void QFCollapsibleFrame::setIcon(const QPixmap &icon)
+void QFCollapsibleScrollArea::setIcon(const QPixmap &icon)
 {
     labIcon->setPixmap(icon);
     //m_icon=icon;
     //invalidate();
 }
 
-void QFCollapsibleFrame::setOpened(bool opened)
+void QFCollapsibleScrollArea::setOpened(bool opened)
 {
     bool o=m_opened;
     m_opened=opened;
     if (opened!=o) invalidate();
 }
 
-void QFCollapsibleFrame::setSeparation(int separation)
+void QFCollapsibleScrollArea::setSeparation(int separation)
 {
     headerLayout->setSpacing(separation);
 }
 
-/*void QFCollapsibleFrame::setSeparation(int separation)
+/*void QFCollapsibleScrollArea::setSeparation(int separation)
 {
     m_separation=separation;
     invalidate();
 }*/
 
-void QFCollapsibleFrame::setHeaderSeparation(int separation)
+void QFCollapsibleScrollArea::setHeaderSeparation(int separation)
 {
     mainLayout->setSpacing(separation);
     /*m_headerSeparation=separation;
     invalidate();*/
 }
 
-void QFCollapsibleFrame::invalidate()
+void QFCollapsibleScrollArea::invalidate()
 {
     widMain->setVisible(m_opened);
     if (m_opened) {
@@ -240,7 +245,7 @@ void QFCollapsibleFrame::invalidate()
 }
 
 
-void QFCollapsibleFrame::buttonEntered()
+void QFCollapsibleScrollArea::buttonEntered()
 {
     if (m_opened) {
         labButton->setPixmap(m_iconOpenedHover);
@@ -249,7 +254,7 @@ void QFCollapsibleFrame::buttonEntered()
     }
 }
 
-void QFCollapsibleFrame::buttonLeft()
+void QFCollapsibleScrollArea::buttonLeft()
 {
     if (m_opened) {
         labButton->setPixmap(m_iconOpened);
@@ -258,8 +263,7 @@ void QFCollapsibleFrame::buttonLeft()
     }
 }
 
-
-void QFCollapsibleFrame::toggle()
+void QFCollapsibleScrollArea::toggle()
 {
     m_opened=!m_opened;
     //qDebug()<<"toggle(): opened="<<m_opened;
@@ -267,7 +271,7 @@ void QFCollapsibleFrame::toggle()
     emit toggled(m_opened);
 }
 
-/*void QFCollapsibleFrame::myDrawFrame(QPainter *p)
+/*void QFCollapsibleScrollArea::myDrawFrame(QPainter *p)
 {
     int hh=getHeaderHeight();
     //int hw=getHeaderWidth();
@@ -305,7 +309,7 @@ void QFCollapsibleFrame::toggle()
 }
 
 
-void QFCollapsibleFrame::paintEvent(QPaintEvent *event)
+void QFCollapsibleScrollArea::paintEvent(QPaintEvent *event)
 {
     int hh=getHeaderHeight();
     int hw=getHeaderWidth();
@@ -328,7 +332,7 @@ void QFCollapsibleFrame::paintEvent(QPaintEvent *event)
     }
 }
 
-int QFCollapsibleFrame::getHeaderHeight() const
+int QFCollapsibleScrollArea::getHeaderHeight() const
 {
     int h=m_iconOpened.height();
     h=qMax(h,m_iconClosed.height());
@@ -339,7 +343,7 @@ int QFCollapsibleFrame::getHeaderHeight() const
     return h+m_headerSeparation;
 }
 
-int QFCollapsibleFrame::getHeaderWidth() const
+int QFCollapsibleScrollArea::getHeaderWidth() const
 {
     int hiw=m_iconOpened.width();
     h=qMax(h,m_iconClosed.width());
@@ -350,10 +354,3 @@ int QFCollapsibleFrame::getHeaderWidth() const
     if (m_icon.width()>0) w=w+m_icon.width()+m_separation;
     return qMax(width(), w);
 }*/
-
-
-void QFCollapsibleForm::init()
-{
-    QFCollapsibleFrame::init();
-    m_form=setFormLayout();
-}
