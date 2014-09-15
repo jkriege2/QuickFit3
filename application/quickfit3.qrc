@@ -25,7 +25,6 @@
         <file alias="evaluation_insert.png">../images/22x22/eval_add.png</file>
         <file alias="qf3fileicon.png">../images/22x22/qf3fileicon.png</file>
         <file alias="reload_project.png">../images/16x16/reload.png</file>
-
         <file alias="wizard.png">../images/22x22/wizard2.png</file>
         <file alias="project_wizard.png">../images/22x22/project_wizard.png</file>
         <file alias="rdr_wizard.png">../images/22x22/rdr_wizard.png</file>
@@ -41,5 +40,6 @@
         <file>optionsdlg_icons/opt_parallel.png</file>
         <file>optionsdlg_icons/debugging.png</file>
         <file alias="releasenotes.html">releasenote.html</file>
+        <file alias="gpl3-0.html">gpl3-0.html</file>
     </qresource>
 </RCC>

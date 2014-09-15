@@ -73,9 +73,15 @@ QString qfInfoLicense() {
 QString qfInfoSVNVersion() {
     QString s= QString(SVNVERSION);
     if (s.contains("exportiert", Qt::CaseInsensitive) || s.contains("exported", Qt::CaseInsensitive)) {
-        s="---";
+        s="???";
     } else if (s.endsWith("M")) {
         s=s.left(s.length()-1);
+    }
+    QRegExp rxc("(\\d+)\\:(\\d+)");
+    if (rxc.indexIn(s)>=0) {
+        int i1=rxc.cap(1).toInt();
+        int i2=rxc.cap(2).toInt();
+        s.setNum(qMax(i1,i2));
     }
     return s;
 }

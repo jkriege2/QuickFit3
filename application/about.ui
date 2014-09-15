@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>568</width>
-    <height>644</height>
+    <height>719</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -88,12 +88,19 @@
        <item>
         <widget class="QLabel" name="labLicense">
          <property name="text">
-          <string>&lt;b&gt;This is POSTCARD-ware, so if you like the program and use it, please let us know by sending a nice postcard from your place on the world to:&lt;/b&gt;&lt;br&gt;DKFZ&lt;br&gt;z.H. Jan Krieger&lt;br&gt;Im Neuenheimer Feld 580&lt;br&gt;D-69120 Heidelberg&lt;br&gt;GERMANY</string>
+          <string>&lt;b&gt;This is POSTCARD-ware, so if you like the program and use it, please let us know by sending a nice postcard from your place on the world to:&lt;/b&gt;&lt;br&gt;DKFZ, Abt. B040, z.H. Jan W. Krieger&lt;br&gt;Im Neuenheimer Feld 580&lt;br&gt;D-69120 Heidelberg - GERMANY</string>
          </property>
          <property name="alignment">
           <set>Qt::AlignCenter</set>
          </property>
          <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QTextBrowser" name="edtLicense">
+         <property name="openExternalLinks">
           <bool>true</bool>
          </property>
         </widget>

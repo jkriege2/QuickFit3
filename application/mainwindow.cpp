@@ -590,6 +590,7 @@ void MainWindow::about() {
     ui.setupUi(widget);
     QTextBrowser* ui_textEdit = qFindChild<QTextBrowser*>(widget, "edtInfo");
     QTextBrowser* ui_releasenotes = qFindChild<QTextBrowser*>(widget, "edtReleaseNotes");
+    QTextBrowser* ui_license = qFindChild<QTextBrowser*>(widget, "edtLicense");
     QTextBrowser* ui_citing = qFindChild<QTextBrowser*>(widget, "edtCiting");
     QLabel* ui_label = qFindChild<QLabel*>(widget, "labSplash");
     QLabel* ui_labelLic = qFindChild<QLabel*>(widget, "labLicense");
@@ -617,6 +618,13 @@ void MainWindow::about() {
         ui_releasenotes->setText(text);
     } else {
         ui_releasenotes->setPlainText(tr("none available :-((("));
+    }
+    QFile f2(":/quickfit3/gpl3-0.html");
+    if (f2.open(QIODevice::ReadOnly|QIODevice::Text)) {
+        QByteArray ba=f2.readAll();
+        ui_license->setText(QString::fromUtf8(ba.data(), ba.size()));
+    } else {
+        ui_license->setVisible(false);
     }
     widget->exec();
     delete widget;
