@@ -237,7 +237,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
         export LDFLAGS="${LDFLAGS} -fPIC "
         export CFLAGS="${CFLAGS} -fPIC "
         export CPPFLAGS="${CPPFLAGS} -fPIC"
-	./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS=" ${MORECFLAGS}" CPPFLAGS=" ${MORECFLAGS}"	
+        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS="-fPIC ${MORECFLAGS}" CPPFLAGS="-fPIC ${MORECFLAGS}"	LDFLAGS="-fPIC"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}
