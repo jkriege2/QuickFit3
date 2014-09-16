@@ -6,6 +6,7 @@ QF3CorrelationDataFormatTool::QF3CorrelationDataFormatTool()
 
 bool QF3CorrelationDataFormatTool::loadFile(const QString &filename, bool propertiesOnly)
 {
+    clearErrors();
     clear();
     this->filename=filename;
     ok=true;
@@ -30,7 +31,7 @@ bool QF3CorrelationDataFormatTool::loadFile(const QString &filename, bool proper
             // first we search for a comment character, which has not been escaped with \#
             // if we are in section==0 (properties), the # is also ignored, if it is found within " ... " (which may also be escaped by \")
             int comment=-1;
-            isQuot=false;
+            bool isQuot=false;
             for (int i=0; i<line.size(); i++) {
                 if (section==0) {
                     if (line[i]=='"' && (i<=0 || !isQuot || line[i-1]!='\\')) {
@@ -62,7 +63,7 @@ bool QF3CorrelationDataFormatTool::loadFile(const QString &filename, bool proper
                     if (section==0) { // properties section
                         QString name, value;
                         bool isName=true;
-                        for (in i=0; i<line.size(); i++) {
+                        for (int i=0; i<line.size(); i++) {
                             if (isName) {
                                 if (line[i]!='=') {
                                     name+=line[i];
@@ -76,7 +77,7 @@ bool QF3CorrelationDataFormatTool::loadFile(const QString &filename, bool proper
                         name=name.trimmed();
                         value=value.trimmed();
                         if (value.startsWith('"') && value.endsWith('"')) {
-                            value=value.mid(1,value.simplified()-2);
+                            value=value.mid(1,value.size()-2);
                             QString val;
                             bool skip=false;
                             for (int i=0; i<value.size(); i++) {
@@ -103,7 +104,7 @@ bool QF3CorrelationDataFormatTool::loadFile(const QString &filename, bool proper
                         value=value.trimmed();
                         const QString nameL=name.toLower();
                         if (nameL=="codec") {
-                            QTextCodec cc=QTextCodec::codecForName(value.toLatin1());
+                            QTextCodec* cc=QTextCodec::codecForName(value.toLatin1());
                             if (cc) {
                                 codec=cc;
                             }
@@ -121,8 +122,8 @@ bool QF3CorrelationDataFormatTool::loadFile(const QString &filename, bool proper
                             runs=value.toInt();
                         } else if (nameL=="channels") {
                             channels=value.toInt();
-                        } else if (nameL=="correlations") {
-                            correlations=value.toInt();
+                        } else if (nameL=="correlations"||nameL=="correlationtypes"||nameL=="correlation_types") {
+                            correlationTypes=value.toInt();
                         } else if (rxRole.exactMatch(nameL)) {
                             int idx=rxRole.cap(1).toInt();
                             while (idx>=0 && roles.size()<=idx){
@@ -185,6 +186,7 @@ void QF3CorrelationDataFormatTool::reserveRate()
 
 void QF3CorrelationDataFormatTool::clear()
 {
+    clearErrors();
     filename="";
     ok=false;
     correlationTypes=1;

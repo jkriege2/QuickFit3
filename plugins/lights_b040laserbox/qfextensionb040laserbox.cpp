@@ -94,7 +94,7 @@ void QFExtensionB040LaserBox::deinit() {
     QSettings inifile(services->getGlobalConfigFileDirectory()+QString("/%1").arg(GLOBAL_CONFIGFILE), QSettings::IniFormat);
     if (inifile.isWritable()) {
         inifile.setValue("lightsource_count", getLightSourceCount());
-        for (unsigned int i=0; i<sources.size(); i++) {
+        for (unsigned int i=0; (int64_t)i<sources.size(); i++) {
             int p=sources[i].port;
             if (ports.getCOMPort(p)) {
                 ports.storeCOMPort(p, inifile, "lightsource"+QString::number(i+1)+"/");

@@ -60,7 +60,7 @@ class QF3CorrelationDataFormatTool
         }
 
     private:
-        QString errormessage="";
+        QString errormessage;
 
 };
 
