@@ -47,6 +47,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrdrsimplecountrateinterface.h"
 #include "qfrdrrunselectiontools.h"
 
+
 /*! \brief manages a FCS dataset (set of correlation curves with multiple runs)
     \ingroup qf3rdrdp_fcs
 

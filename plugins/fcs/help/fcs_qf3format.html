@@ -1,0 +1,63 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>FCS/DLS Plugin: QF3 ASCII Correlation data Format</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	 
+	 <p> This help page defines a simple ASCII data format, which can be used to store auto- and cross-correlation data in order to load it into an FCS/DLS raw data record. The file is split into three major parts:<ul>
+	   <li>a <b>[Properties]</b> section, which contains data, that will end up as RDR properties and/or will be used to set up the RDR. Especially the properties <b>runs</b>, <b>channels</b> and <b>correlations</b> are important, as these define the number of runs, input (color) channels and different correlation functions (e.g. ACFs,FCCSs, ...) in this file  </li>
+	   <li>The section <b>[CorrelationData]</b> contains a matrix with the correlation data, where each row assembles all data for one lag time &tau;<sub>i</sub> in the order runs-major, correlations. This means, that first all runs for the first correlation fucntion type are put into the table, then all runs for the second correlation function type ...<br> The correlation functions <u>should</u> decay to 0 (for FCS) and lag times are given in units of seconds.</li>
+	   <li>The section <b>[RateData]</b> contains a matrix with the correlation data, where each row assembles all countrate data for one timepoint t<sub>i</sub> in the order runs-major, channels.  This means, that first all rates for the first channel are put into the table, then all runs for the second channel ...<br> Count rates are given in units of KiloHertz, times in units of seconds.</li>
+	 </ul>
+	 All data is given in ASCII format, using dots '.' as decimal separator ans commas ',' as column separators. Comments always start with a hash '#'.</p>
+	 <p>
+	 The format is defined as follows:
+$$startbox_example$$
+<tt>	 
+<b>[Properties]</b><br>
+<i>propname</i>=<i>data</i><br>
+<i>propname</i>=<i>data</i><br>
+...<br>
+<i>propname</i>=<i>data</i><br>
+<br>
+<b>group</b>=<i>(OPTIONAL) proposed group name</i><br>
+<b>folder</b>=<i>(OPTIONAL) proposed folder</i><br>
+<b>input_file</b>=<i>(OPTIONAL) name of raw data file</i><br>
+<b>runs</b>=<i>number of runs</i><br>
+<b>channels</b>=<i>number of input channels</i><br>
+<b>correlations</b>=<i>number of different correlation functions (e.g. 3 for ACF1+ACF2+FCCS)</i><br>
+<b>role</b>=<i>default role name for all (or fallback for role0, role1, ...)</i><br>
+<b>role0</b>=<i>role name for first correlation (e.g. ACF1)</i><br>
+<b>role1</b>=<i>role name for second correlation (e.g. ACF2)</i><br>
+...<br>
+<b>role</b><i>(correlations-1)</i>=<i>role name for last correlation (e.g. FCCS)</i><br>
+<b>channel_name</b>=<i>default role name for all (or fallback for role0, role1, ...)</i><br>
+<b>channel_name0</b>=<i>name for first channel (e.g. green fluorescence)</i><br>
+<b>channel_name1</b>=<i>name for second channel (e.g. red fluorescence)</i><br>
+...<br>
+<b>channel_name</b><i>(channels-1)</i>=<i>name for last channel (e.g. red fluorescence)</i><br>
+<br>
+<br>
+<b>[CorrelationData]</b><br>
+&tau;<sub>0</sub>, g(&tau;<sub>0</sub>; c=0, r=0), g(&tau;<sub>0</sub>; c=0, r=1), ..., g(&tau;<sub>0</sub>; c=0, r=runs-1), g(&tau;<sub>0</sub>; c=1, r=0), g(&tau;<sub>0</sub>; c=1, r=1), ..., g(&tau;<sub>0</sub>; c=1, r=runs-1), ...<br>
+&tau;<sub>1</sub>, g(&tau;<sub>1</sub>; c=0, r=0), g(&tau;<sub>1</sub>; c=0, r=1), ..., g(&tau;<sub>1</sub>; c=0, r=runs-1), g(&tau;<sub>1</sub>; c=1, r=0), g(&tau;<sub>1</sub>; c=1, r=1), ..., g(&tau;<sub>1</sub>; c=1, r=runs-1), ...<br>
+&tau;<sub>2</sub>, g(&tau;<sub>2</sub>; c=0, r=0), g(&tau;<sub>2</sub>; c=0, r=1), ..., g(&tau;<sub>2</sub>; c=0, r=runs-1), g(&tau;<sub>2</sub>; c=1, r=0), g(&tau;<sub>2</sub>; c=1, r=1), ..., g(&tau;<sub>2</sub>; c=1, r=runs-1), ...<br>
+...<br>
+<br>
+<br>
+<b>[RateData]</b><br>
+t<sub>0</sub>, I(t<sub>0</sub>; c=0, r=0), I(t<sub>0</sub>; c=0, r=1), ..., I(t<sub>0</sub>; c=0, r=runs-1), I(t<sub>0</sub>; c=1, r=0), I(t<sub>0</sub>; c=1, r=1), ..., I(t<sub>0</sub>; c=1, r=runs-1), ...<br>
+t<sub>1</sub>, I(t<sub>1</sub>; c=0, r=0), I(t<sub>1</sub>; c=0, r=1), ..., I(t<sub>1</sub>; c=0, r=runs-1), I(t<sub>1</sub>; c=1, r=0), I(t<sub>1</sub>; c=1, r=1), ..., I(t<sub>1</sub>; c=1, r=runs-1), ...<br>
+t<sub>2</sub>, I(t<sub>2</sub>; c=0, r=0), I(t<sub>2</sub>; c=0, r=1), ..., I(t<sub>2</sub>; c=0, r=runs-1), I(t<sub>2</sub>; c=1, r=0), I(t<sub>2</sub>; c=1, r=1), ..., I(t<sub>2</sub>; c=1, r=runs-1), ...<br>
+<br>
+</tt>
+$$endbox$$
+
+$$note:In the definition above, <tt>g(&tau;<sub>i</sub>; c=C, r=R)</tt> is the correlation data of run <i>R</i> in correlation type <i>C</i> at lag time <i>&tau;<sub>i</sub></i> and <tt>I(t<sub>i</sub>; c=C, r=R)</tt> is the count rate data of run <i>R</i> in input channel <i>C</i> at lag time <i>t<sub>i</sub></i>.$$
+	 
+</p>	 
+  </body>
+</html>

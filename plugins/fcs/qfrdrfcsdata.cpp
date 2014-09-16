@@ -29,7 +29,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "alv6000tools.h"
 #include "alv7000tools.h"
 #include "confocor3tools.h"
-
+#include "qf3correlationdataformattool.h"
 
 #define loadSeveral(res, filenames, loadFunction) {\
     res=false; \
