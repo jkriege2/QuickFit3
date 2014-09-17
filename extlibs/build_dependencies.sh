@@ -88,7 +88,7 @@ if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 		cp /mingw/bin/libwinpthread*.dll ../output/
 		
 		USEDQTMODULES="QtCore4 QtGui4 QtOpenGL4 QtScript4 QtScriptTools4 QtSvg4 QtXml4 QtNetwork4"
-		USEDQTPLUGINS= "imageformats/*.dll"
+		USEDQTPLUGINS= "${QT_INFO_PLUGINS}/imageformats/*.dll"
 		mkdir ../output/qtplugins
 		for f in $USEDQTMODULES
 		do
