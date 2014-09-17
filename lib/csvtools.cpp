@@ -79,6 +79,10 @@ QList<QVector<double> > readCSV(QTextStream& f, QChar separator_char, QChar deci
     return dataRotate(res);
 }
 
+QVector<double> csvReadline(QString f, QChar separator_char, QChar comment_char, double non_value, const QString& eolChars, const QString& ignoreChars) {
+    QTextStream ff(&f);
+    return csvReadline(ff, separator_char, comment_char,  non_value,  eolChars,  ignoreChars);
+}
 QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_char, double non_value, const QString& eolChars, const QString& ignoreChars) {
     //const QString line=f.readLine();
     QString line="";

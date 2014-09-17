@@ -241,6 +241,13 @@ QFLIB_EXPORT QVariant readQVariant(QDomElement& e);
     \return a string encoding the contents of \a variant
 */
 QFLIB_EXPORT QString getQVariantData(const QVariant& variant);
+/*! \brief outputs a string encoding the contents of a QVariant, strings are C-escaped and if quotations is given, the result is enclosed in quotation marks, if it is a string.
+    \ingroup qf3lib_tools
+
+    \param variant input QVariant
+    \return a string encoding the contents of \a variant
+*/
+QFLIB_EXPORT QString getQVariantDataCEscaped(const QVariant& variant, QChar quotations='\0');
 
 /*! \brief outputs a Variant, from a type and data, as encoded by getQVariantType() and getQVariantData()
     \ingroup qf3lib_tools
@@ -1504,6 +1511,14 @@ QFLIB_EXPORT void parseAutolinks(const QString& directory, QMap<QString, QString
 
 QFLIB_EXPORT void parseGlobalreplaces(const QString& directory);
 
+/*! \brief escape \\n, \\r, \\", \\', \\\\, \\t...
+    \ingroup qf3lib_tools
+
+
+ */
+QFLIB_EXPORT QString qfCEscaped(const QString& data);
+
+
 /*! \brief return a shuffled version of a given vector
     \ingroup qf3lib_tools
 
@@ -1571,6 +1586,7 @@ void qfShuffleInplace(QVector<T>& value) {
        value[i]=mm[i];
    }
 }
+
 
 
 #endif // QFTOOLS_H

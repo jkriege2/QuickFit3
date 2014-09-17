@@ -105,12 +105,13 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         QStringList getExportFiletypes() {
             QStringList sl;
             //sl << "CSV" << "SYLK";
+            sl<<"QF3ASCIICORR";
             return sl;
-        };
+        }
         /** \brief returns the title of the Export file dialog */
-        QString getExportDialogTitle() { return tr("Export FCS Data  ..."); };
+        QString getExportDialogTitle() { return tr("Export FCS Data  ..."); }
         /** \brief returns the filetype of the Export file dialog */
-        QString getExportDialogFiletypes() { return tr("Comma Separated Value Files (*.csv, *.txt);;SYLK File (*.sylk, *.slk);;DIF File (*.dif)"); };
+        QString getExportDialogFiletypes() { return tr("QuickFit 3.0 ASCII Correlation Data (*.qf3acorr)"); }
 
 
         /** \brief channel represented by this object (a file e.g. from ALV may contain several channels,
@@ -386,6 +387,8 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
 
         /** \brief load  data format of Zeiss COnfocor3 (*.fcs) */
         bool loadConfocor3(QString filename);
+        /** \brief load  data format QF3ASCIICORR */
+        bool loadQF3ASCII(QString filename);
 
         /** \brief load a CSV file containing a count rate curve */
         bool loadCountRatesFromCSV(QStringList filenames, int rateChannels=1);

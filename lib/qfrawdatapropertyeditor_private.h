@@ -119,6 +119,8 @@ class QFRawDataPropertyEditor_private : public QObject
         QToolButton* btnPasteProperty;
         QAction* actPasteProperty;
 
+        QAction* actExportPluginData;
+
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
         QWidget* widResults;
         /** \brief button to display help */
@@ -309,6 +311,8 @@ class QFRawDataPropertyEditor_private : public QObject
 
         void selectRecordFromTreeClicked();
         void selectRecordFromTreeSelected(const QModelIndex& index);
+
+        void exportData();
 };
 
 #endif // QFRAWDATAPROPERTYEDITOR_PRIVATE_H

@@ -160,11 +160,18 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         void insertConfocor3File(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
         /*! \brief add a correlator.com .SIN file to the current project
 
-            \param filename filename of the Confocor3 file
+            \param filename filename of the  file
             \param paramValues values for parameters in paramNames
             \param paramReadonly names of initial parameters that should be declared readonly
         */
         void insertFLEX_SINFile(const QStringList &filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly);
+        /*! \brief add a QF3 ASCII Correlation file to the current project
+
+            \param filename filename of the  file
+            \param paramValues values for parameters in paramNames
+            \param paramReadonly names of initial parameters that should be declared readonly
+        */
+        void insertQF3ASCIIFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly);
     private:
 };
 

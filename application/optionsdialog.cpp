@@ -86,6 +86,12 @@ void OptionsDialog::on_spinMath_valueChanged(int value)
 
 }
 
+void OptionsDialog::updateFontExample()
+{
+    labFontExample->setText("Test Example");
+    labFontExample->setFont(QFont(cmbHelpFont->currentFont().family(), spinHelpFontsize->value()));
+}
+
 
 void OptionsDialog::open(ProgramOptions* options) {
     spnMaxThreads->setRange(1,100);
@@ -125,8 +131,11 @@ void OptionsDialog::open(ProgramOptions* options) {
     if (!QDir(dhome.absolutePath()+"/userfitfunctions").exists()) dhome.mkdir("userfitfunctions");
     edtUserFitFunctions->setText(options->getConfigValue("quickfit/user_fitfunctions", options->getHomeQFDirectory()+"/userfitfunctions/").toString());
     edtUserSettings->setText(options->getHomeQFDirectory());
+    spinHelpFontsize->setValue(options->getConfigValue("quickfit/help_pointsize", 11).toInt());
     spinMath->setValue(options->getConfigValue("quickfit/math_pointsize", 14).toInt());
+    cmbHelpFont->setCurrentFont(QFont(options->getConfigValue("quickfit/help_font", font().family()).toString()));
     on_spinMath_valueChanged(spinMath->value());
+    updateFontExample();
 
 
     // find all available stylesheets
@@ -162,6 +171,8 @@ void OptionsDialog::open(ProgramOptions* options) {
         options->setConfigValue("quickfit/user_fitfunctions", edtUserFitFunctions->text());
         options->setHomeQFDirectory(edtUserSettings->text());
         options->setConfigValue("quickfit/math_pointsize", spinMath->value());
+        options->setConfigValue("quickfit/help_pointsize", spinHelpFontsize->value());
+        options->setConfigValue("quickfit/help_font", cmbHelpFont->currentFont().family());
         options->setConfigValue("quickfit/windowheadermode", cmbWindowHeader->currentIndex());
         {
             QDir dir(edtUserFitFunctions->text());

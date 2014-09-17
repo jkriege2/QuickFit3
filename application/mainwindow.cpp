@@ -195,7 +195,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_backtop"), tr("<div style=\"background-color: lightsteelblue;  border-color: midnightblue; border-style: solid; padding-top:5px; padding-left:5px; padding-right:5px; padding-bottom:5px; margin: 5px;\"> <a href=\"#top_page\"><img src=\":/lib/help/help_top.png\"></a></div>")));
 
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.start"),
-         tr("<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">"
+         tr("<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue;\" ><tr><td align=\"left\">"
             "<table width=\"100%\">"
             "<tr><td align=\"center\" colspan=\"3\">$$local_plugin_icon$$</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=\"90%\" align=\"left\"><b>$$local_plugin_name$$</b>  </td></tr> "
             "<tr><td align=\"left\" rowspan=\"2\">$$rel_prev$$</td><td align=\"left\" rowspan=\"2\">$$rel_contents$$</td><td align=\"left\" rowspan=\"2\">$$rel_next$$</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=\"90%\" align=\"left\">$$qf_commondoc_header.default_links$$  ")));
@@ -225,10 +225,13 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.fitalg"), tr("$$qf_commondoc_header.separator$$ <a href=\"%1qf3_fitalg.html\">Fit Algorithms Help</a>")));
     htmlReplaceList.append(qMakePair(QString("qf_further_reading"), QString("")));
 
+    htmlReplaceList.append(qMakePair(QString("qf_css_mainfile"), readFile(settings->getMainHelpDirectory()+"/qf3style.css")));
+    htmlReplaceList.append(qMakePair(QString("qf_css_mainfile_block"), QString("<style>\n$$qf_css_mainfile$$\n</style>\n")));
+
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.start"),
          tr("$$DEFAULTREF$$</font>\n<a name=\"#footer\"><table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">"
             "<table width=\"100%\">"
-            "<tr><td align=\"center\" ><a href=\"#top_page\"><img src=\":/lib/help/help_top.png\"></a>&nbsp;&nbsp;&nbsp;</td><td align=\"left\" >$$local_plugin_icon$$&nbsp;&nbsp;&nbsp;</td><td align=\"right\" width=\"90%\">  <b>$$local_plugin_name$$</b> <i>$$local_plugin_copyright$$</i><br>$$local_plugin_weblink$$<br>")));
+            "<tr><td align=\"center\" ><a href=\"#top_page\" font-size: $$main_fontsize:-2$$;\"><img src=\":/lib/help/help_top.png\"></a>&nbsp;&nbsp;&nbsp;</td><td align=\"left\" style=\" font-size: $$main_fontsize:-2$$;\">$$local_plugin_icon$$&nbsp;&nbsp;&nbsp;</td><td align=\"right\" width=\"90%\" font-size: $$main_fontsize:-2$$;\">  <b>$$local_plugin_name$$</b> <i>$$local_plugin_copyright$$</i><br>$$local_plugin_weblink$$<br>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.end"), QString("</td></tr></table></td></tr></table>")));// </div>")));
 
 
@@ -3032,6 +3035,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
     localreplaces<<qMakePair<QString, QString>("funcref_main", "</td></tr><tr><td>");
     localreplaces<<qMakePair<QString, QString>("funcref_description", "$$funcref_main$$");
     localreplaces<<qMakePair<QString, QString>("funcref_end", "</td></tr></table></blockquote>");
+    localreplaces<<qMakePair<QString, QString>("main_fontsize", QString("%1pt").arg(settings->getConfigValue("quickfit/help_pointsize", 11).toInt()));
+    localreplaces<<qMakePair<QString, QString>("math_fontsize", QString("%1pt").arg(settings->getConfigValue("quickfit/math_pointsize", 14).toInt()));
+    localreplaces<<qMakePair<QString, QString>("main_font", QString("%1").arg(settings->getConfigValue("quickfit/help_font", font().family()).toString()));
 
     if (QFile::exists(basedir.absoluteFilePath("localreplaces.ini"))) {
         QSettings setLocalReplace(basedir.absoluteFilePath("localreplaces.ini"), QSettings::IniFormat);
@@ -3161,15 +3167,25 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
     // handle replaces, also handles special commands, like $$list:...$$
     if (!result.isEmpty()) {
+        QRegExp rxBody("\\<\\s*body([^\\>]*)\\>");
         if (isMainHelp) {
             if (!result.contains("$$qf_commondoc_footer")) {
                 result=result.replace(QString("</body>"), QString("<br><br><br><br><br>$$qf_commondoc_footer.start$$ $$qf_commondoc_footer.end$$</body>"));
             }
-            if (!result.contains("$$qf_commondoc_header")) {
+            /*if (!result.contains("$$qf_commondoc_header")) {
                 result=result.replace(QString("<body>"), QString("<body>$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$"));
-            }
+            }*/
             if (!result.contains("$$contents")) {
                 result=result.replace(QString("$$qf_commondoc_header.end$$"), QString("$$qf_commondoc_header.end$$\n$$contents_full$$"));
+            }
+        }
+        int bidx=-1;
+        if ((bidx=rxBody.indexIn(result))>=0) {
+            if (isMainHelp && !result.contains("$$qf_commondoc_header")) {
+                result=result.replace(bidx, rxBody.matchedLength(), QString("$$qf_css_mainfile_block$$\n%1\n$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$").arg(rxBody.cap(0)));
+                //result=result.replace(QString("<body>"), QString("<body>$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$"));
+            } else {
+                result=result.replace(bidx, rxBody.matchedLength(), QString("$$qf_css_mainfile_block$$\n%1").arg(rxBody.cap(0)));
             }
         }
 
@@ -3398,7 +3414,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$insert:<filename>$$ and $$insertglobal:<filename>$$ items
-            QRegExp rxInsert("\\$\\$(insert|insertglobal|see|note|info|warning|example|codeexample|cexample|tt|code|bqtt|bqcode|startbox)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxInsert("\\$\\$(insert|insertglobal|see|note|info|warning|example|codeexample|cexample|tt|code|bqtt|bqcode|startbox|main_fontsize)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxInsert.setMinimal(true);
             count = 0;
             pos = 0;
@@ -3472,6 +3488,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 } else if (QFPluginServices::getInstance()&&(command=="bqtt"||command=="bqcode")) {
                    QString rep=tr("<blockquote><tt>%1</tt></blockquote>").arg(file);
 
+                   result=result.replace(rxInsert.cap(0), rep);
+                } else if (QFPluginServices::getInstance()&&(command=="main_fontsize")) {
+                   QString rep=QString("%1pt").arg(settings->getConfigValue("quickfit/help_pointsize", 11).toInt()+file.toInt());
                    result=result.replace(rxInsert.cap(0), rep);
                 }
                 ++count;

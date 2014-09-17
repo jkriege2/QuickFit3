@@ -49,6 +49,7 @@ class OptionsDialog : public QDialog, public Ui::OptionsDlg {
         void on_btnHelp_clicked();
         void on_listWidget_currentRowChanged(int currentRow );
         void on_spinMath_valueChanged(int value);
+        void updateFontExample();
 
     private:
         ProgramOptions* m_options;

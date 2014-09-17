@@ -7,11 +7,47 @@
 </head>
 <body>
 $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+
+<a name="#ui"><h2>Basic User Interface</h2>
+<h3>Window</h3>
 <p>
 This page describes the basic features any raw data record screen implements. 
       <center><img src="./pic/qf3_rdr.png"></center>
 The screen shows at least three tabs at the top. The button <b><img src=":/help.png"> Help</b> may be used to display this online help message. </p>
 <p>In the head-line of this dialog you will find two buttons <img src="./pic/btn_rdr_next.png"> and <img src="./pic/btn_rdr_prev.png"> that allow to move to the next and previous record of the same type. The button <img src="./pic/btn_rdr_removerec.png"> allows to delete the current record from the project. Between the buttons QuickFit displays an icon representing the type of the current record and also its name.</p>
+
+<a name="#menu"><h3>Menus/Buttons</h3>
+<p>Several menu entries (and buttons) are available for all plugins. These menus may be extended by plugins. Then the documentation of these functions can be found in the Plugin documentation!
+<ul>
+  <li><u><b>Buttons:</b></u><ul>
+    <li><img src="./pic/btn_rdr_prev.png">: move to previous RDR</li>
+    <li><img src="./pic/btn_rdr_next.png">: move to next RDR</li>
+    <li><img src="./pic/qf3_rdrscreen_pic000.png" border="1">: move to next RDR, which has the same role as the current RDR</li>
+    <li><img src="./pic/btn_rdr_removerec.png">: remove the current RDR from the project</li>
+    <li><b><img src=":/help.png"> Help</b>: open the online-help for the plugin</li>
+  </ul></li>
+  <li><u><b>Menus:</b></u><ul>
+    <li><b>Record</b><ul>
+      <li><img src=":lib/prop_previous.png"> <b>previous, same role</b>: move to previous RDR of the same type 8as the current RDR) </li>
+      <li><img src=":lib/prop_previous.png"> <b>previous</b>: move to previous RDR  </li>
+      <li><img src=":lib/prop_next.png"> <b>next, same role</b>: move to next RDR of the same type 8as the current RDR)</li>
+      <li><img src=":lib/prop_next.png"> <b>next</b>: move to next RDR </li>
+      <li><img src=":lib/item_delete.png"> <b>Remove Record</b>: remove the current RDR from the project</li>
+      <li><img src=":lib/export_data.png"> <b>Export Data</b>: if the plugin support this feature, this function allows to store the data in the current RDR into a file. YOu will be asked to enter a new filename and can then also select the data type, which should be exported.</li>
+      <li><img src=":lib/exit.png"> <b>Close Window</b>: close the current RDR editor window</li>
+<!--      <li> <b></b>: </li>-->
+    </ul></li>
+    <li><b>Help</b><ul>
+          <li>allows to display several different online-help pages</li>
+    </ul></li>
+  </ul></li>
+</ul>
+</p>
+
+
+
+
+
 
 <a name="#properties"><h2>Properties</h2>
 <p>The first tab <b>Properties</b> (see image above) may be used to enter these:
@@ -28,6 +64,14 @@ The screen shows at least three tabs at the top. The button <b><img src=":/help.
 </ul>
 </p> 
 <p> </p>
+
+
+
+
+
+
+
+
 
 <a name="#results"><h2>Evaluation Results</h2>
 <p>The second last tab <b>Evaluation Results</b> may be used to view the results of all evaluation objects that were used together with the current raw data record. These results (but only for one evaluation item) are also visible on the <a href="qf3_evalscreen.html">evaluation screen</a>.

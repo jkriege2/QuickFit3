@@ -74,6 +74,9 @@ $$qf_commondoc_backtop$$
 $$qf_commondoc_backtop$$
 
 
+
+
+
 <h2>Image File Formats</h2>
 <h3><a name="TIFF">Tagged Image File Format</h3>
 <p>QuickFit allows at several points to save data as Tagged Image File Format (TIFF) files. This format allows to also save multiple frames into a single file. The frames may have different data formats ranging from 1-bit black/white images, to 8-bit integers, to 64-bit floating point numbers (double). Several channels per pixel are also possible. An application that can read a fair amount of multi-frame TIFF files is <a href="http://rsbweb.nih.gov/ij/">ImageJ</a> or <a href="http://www.fiji.sc">FIJI ... is just ImageJ</a>. Many other applications have support for TIFF, but note that many computer graphics programs only read integer images and maybe not high-resolution images. Also the most common library to read TIFF file is <a href="http://www.libtiff.org/">libTIFF</a> which may read any TIFF file but is limited to at most 65000 frames per file (this limit does not apply to ImageJ!).<br>
@@ -91,6 +94,15 @@ Single-frame image may be read in Matlab using <blockquote><tt>M = <a href="http
 </tt></blockquote>
 </p>
 
+
+
+
+<h2>Specialized File Formats</h2>
+<p><ul>
+  <li><a href="$$mainhelpdir$$/fcs_qf3format.html.html">QF3 ASCII (FCS) Correlation Data Format</a></li>
+</ul>
+</p>
+$$qf_commondoc_backtop$$
 
 
 <h2>Fileformats from Plugins</h2>

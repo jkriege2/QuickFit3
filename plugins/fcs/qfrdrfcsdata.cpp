@@ -163,7 +163,7 @@ QFRDRFCSData::~QFRDRFCSData()
 }
 
 void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
-    qDebug()<<"resizeCorrelations( N="<<N<<",  runs="<<runs<<")";
+    //qDebug()<<"resizeCorrelations( N="<<N<<",  runs="<<runs<<")";
     if (correlationT) free(correlationT);
     if (correlation) free(correlation);
     if (correlationMean) free(correlationMean);
@@ -190,7 +190,7 @@ void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
 }
 
 void QFRDRFCSData::resizeRates(long long N, int runs, int channels) {
-    qDebug()<<"resizeRates( N="<<N<<",  runs="<<runs<<",  channels="<<channels<<")";
+    //qDebug()<<"resizeRates( N="<<N<<",  runs="<<runs<<",  channels="<<channels<<")";
     if (rateT) free(rateT);
     if (rate) free(rate);
     rateRuns=0;
@@ -216,7 +216,7 @@ void QFRDRFCSData::resizeRates(long long N, int runs, int channels) {
 }
 
 void QFRDRFCSData::resizeBinnedRates(long long N) {
-    qDebug()<<"resizeBinnedRates( N="<<N<<"),  rateChannels="<<rateChannels<<",  rateRuns="<<rateRuns;
+    //qDebug()<<"resizeBinnedRates( N="<<N<<"),  rateChannels="<<rateChannels<<",  rateRuns="<<rateRuns;
     if (binnedRateT) free(binnedRateT);
     if (binnedRate) free(binnedRate);
     binnedRateN=0;
@@ -293,6 +293,7 @@ bool QFRDRFCSData::selectNewFiles(QStringList &files, QStringList &types, QStrin
     if (filetype=="DIFFUSION4_SIMRESULTS") filter=tr("Diffusion4 simulation results (*corr.dat *bts.dat)");
     if (filetype=="CORRELATOR.COM_SIN") filter=tr("correlator.com files (*.sin)");
     if (filetype=="CONFOCOR3") filter=tr("Zeiss Confocor3 files (*.fcs)");
+    if (filetype=="QF3ASCIICORR") filter=tr("QuickFit 3.0 ASCII Correlation Data (*.qf3acorr)");
 
 
     if (filetype!="INTERNAL") {
@@ -465,6 +466,51 @@ void QFRDRFCSData::getRateMinMax(int run, double &min, double &max, int channel)
 
 
 void QFRDRFCSData::exportData(const QString& format, const QString& filename)const  {
+    if (format.toUpper()=="QF3ASCIICORR") {
+        QF3CorrelationDataFormatTool tool;
+        tool.channels=rateChannels;
+        tool.correlationTypes=1;
+        tool.filename=filename;
+        tool.folder=getFolder();
+        tool.group=getGroupName();
+        tool.input_file=getFileName(0);
+        tool.role=getRole();
+        tool.runs=correlationRuns;
+        tool.rateRuns=rateRuns;
+        for (int i=0; i<getPropertyCount(); i++) {
+            QString id=getPropertyName(i);
+            if (isPropertyVisible(id)) {
+                tool.properties.insert(id, getQFProperty(id));
+            }
+        }
+        tool.reserveCorrelations();
+        tool.reserveRate();
+        for (int i=0; i<correlationN; i++) {
+            tool.taus.append(correlationT[i]);
+        }
+        for (int r=0; r<correlationRuns; r++) {
+            double* rd=getCorrelationRun(r);
+            for (int i=0; i<correlationN; i++) {
+                tool.addCorrelationEntry(rd[i], r);
+            }
+        }
+        //qDebug()<<tool.correlations;
+        //qDebug()<<tool.correlations[0];
+        //qDebug()<<tool.correlations[0].operator [](0);
+        for (int i=0; i<rateN; i++) {
+            tool.times.append(rateT[i]);
+        }
+        for (int c=0; c<rateChannels; c++) {
+            for (int r=0; r<rateRuns; r++) {
+                double* rd=getRateRun(r, c);
+                for (int i=0; i<rateN; i++) {
+                    tool.addCountrateEntry(rd[i], r, c);
+                }
+            }
+        }
+
+        tool.saveFile(filename);
+    }
 /*    if (!datamodel) return;
     QString f=format.toUpper();
     if (f=="CSV") {
@@ -2641,6 +2687,18 @@ bool QFRDRFCSData::reloadFromFiles() {
            loadSeveral(res, files, loadConfocor3);
        }
        return res;
+    } else if (filetype.toUpper()=="QF3ASCIICORR") {
+       bool res=false;
+       if (files.size()<=0) {
+          setError(tr("there are no files in the FCS record!"));
+          return false;
+       }
+       if (files.size()==1) {
+           res=loadQF3ASCII(files[0]);
+       } else if (files.size()>1) {
+           loadSeveral(res, files, loadQF3ASCII);
+       }
+       return res;
     } else if (filetype.toUpper()=="OLEGKRIECHEVSKYBINARY") {
        if (files.size()<=0) {
           setError(tr("there are no files in the FCS record!"));
@@ -3213,6 +3271,60 @@ bool QFRDRFCSData::loadConfocor3(QString filename)
             ok=false;
             setError(tr("Error while importing ConfoCor3 file '%1':\n    no items selected to import.\n").arg(filename));
             return ok;
+        }
+    }
+
+    recalculateCorrelations();
+    emitRawDataChanged();
+    return ok;
+}
+
+bool QFRDRFCSData::loadQF3ASCII(QString filename)
+{
+    bool ok=true;
+    QF3CorrelationDataFormatTool reader;
+    reader.loadFile(filename);
+    if (reader.wasError()) {
+        ok=false;
+        setError(tr("Error while importing QF3 ASCII file '%1':\n    %2\n").arg(filename).arg(reader.getErrorMessage()));
+        return ok;
+    } else {
+        int corrT=getProperty("QF3ASCII_CORRELATION_TYPE", 0).toInt();
+        QMapIterator<QString, QVariant> it(reader.properties);
+        while (it.hasNext()) {
+            it.next();
+            if (it.key().toLower()!="channel") setQFProperty(it.key(), it.value(), false, true);
+        }
+
+        resizeCorrelations(reader.taus.size(), reader.runs);
+        resizeRates(reader.times.size(), reader.rateRuns, reader.channels);
+
+        //qDebug()<<filename<<corrT<<correlationN<<correlationRuns<<rateN<<rateRuns<<rateChannels;
+
+        if (correlationN>0 && correlation) {
+            for (int i=0; i<correlationN; i++) {
+                correlationT[i]=reader.taus[i];
+            }
+            for (int r=0; r<correlationRuns; r++) {
+                double* cr=getCorrelationRun(r);
+                for (int i=0; i<correlationN; i++) {
+                    cr[i]=reader.getCorrelationEntry(i, r, corrT);
+                }
+            }
+        }
+
+        if (rateN>0 && rate) {
+            for (int i=0; i<rateN; i++) {
+                rateT[i]=reader.times[i];
+            }
+            for (int c=0; c<rateChannels; c++) {
+                for (int r=0; r<rateRuns; r++) {
+                    double* cr=getRateRun(r, c);
+                    for (int i=0; i<rateN; i++) {
+                        cr[i]=reader.getCountrateEntry(i, r, c);
+                    }
+                }
+            }
         }
     }
 

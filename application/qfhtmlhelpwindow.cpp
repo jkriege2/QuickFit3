@@ -412,6 +412,7 @@ void QFHTMLHelpWindow::showFile(QString filename1) {
     descriptionBrowser->setHtml(loadHTML(QFileInfo(filename).absoluteFilePath()));
     if (!fragment.isEmpty()) {
         descriptionBrowser->scrollToAnchor(QString("#")+fragment);
+        descriptionBrowser->scrollToAnchor(fragment);
     }
     QApplication::restoreOverrideCursor();
 }

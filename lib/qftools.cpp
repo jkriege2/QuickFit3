@@ -326,6 +326,22 @@ QString getQVariantData(const QVariant& variant) {
     return t;
 }
 
+QString getQVariantDataCEscaped(const QVariant& variant, QChar quotations) {
+    if (!variant.isValid()) return QString();
+    QString t="";
+    QLocale loc=QLocale::c();
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    switch(variant.type()) {
+        case QVariant::Double: t=loc.toString(variant.toDouble(), 'g', 10); break;
+        case QVariant::Int: t=QString::number(variant.toInt()); break;
+        case QVariant::UInt: t=QString::number(variant.toUInt()); break;
+        case QVariant::LongLong: t=QString::number(variant.toLongLong()); break;
+        case QVariant::ULongLong: t=QString::number(variant.toULongLong()); break;
+        default: t=qfCEscaped(variant.toString()); if (quotations!='\0') {t=quotations+t+quotations;} break;
+    }
+    return t;
+}
+
 QVariant getQVariantFromString(const QString& type, const QString& data) {
     QVariant d=data;
     //std::cout<<"  prop "<<n.toStdString()<<" ["+t.toStdString()+"] = "<<d.toString().toStdString()<<"\n";
@@ -1285,4 +1301,26 @@ void parseGlobalreplaces(const QString& directory) {
             QFPluginServices::getInstance()->setOrAddHTMLReplacement(keys[i], setLocalReplace.value(keys[i], "").toString());
         }
     }
+}
+
+QString qfCEscaped(const QString& data) {
+    QString res;
+    for (int i=0; i<data.size(); i++) {
+        if (data[i]=='"') {
+            res+="\\\"";
+        } else if (data[i]=='\'') {
+            res+="\\\'";
+        } else if (data[i]=='\\') {
+            res+="\\\\";
+        } else if (data[i]=='\n') {
+            res+="\\n";
+        } else if (data[i]=='\r') {
+            res+="\\r";
+        } else if (data[i]=='\t') {
+            res+="\\t";
+        } else {
+            res+=data[i];
+        }
+    }
+    return res;
 }

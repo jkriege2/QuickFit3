@@ -27,6 +27,7 @@ $$startbox_example$$
 <b>folder</b>=<i>(OPTIONAL) proposed folder</i><br>
 <b>input_file</b>=<i>(OPTIONAL) name of raw data file</i><br>
 <b>runs</b>=<i>number of runs</i><br>
+<b>rate_runs</b>=<i>number of runs in the [RateData] section</i><br>
 <b>channels</b>=<i>number of input channels</i><br>
 <b>correlations</b>=<i>number of different correlation functions (e.g. 3 for ACF1+ACF2+FCCS)</i><br>
 <b>role</b>=<i>default role name for all (or fallback for role0, role1, ...)</i><br>
@@ -39,6 +40,10 @@ $$startbox_example$$
 <b>channel_name1</b>=<i>name for second channel (e.g. red fluorescence)</i><br>
 ...<br>
 <b>channel_name</b><i>(channels-1)</i>=<i>name for last channel (e.g. red fluorescence)</i><br>
+<b>preferred_channel0</b>=<i>preferred count-rate channel for the first correlation type (e.g. 0 for ACF1)</i><br>
+<b>preferred_channel1</b>=<i>preferred count-rate channel for the second correlation type (e.g. 1 for ACF2)</i><br>
+...<br>
+<b>preferred_channel</b><i>(channels-1)</i>=<i>preferred count-rate channel for the last correlation type (e.g. 0 for FCCS)</i><br>
 <br>
 <br>
 <b>[CorrelationData]</b><br>

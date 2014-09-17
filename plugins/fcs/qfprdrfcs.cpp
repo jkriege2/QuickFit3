@@ -37,6 +37,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfwizard.h"
 #include "qfselectfileslistwidget.h"
 #include "qffitfunctioncombobox.h"
+#include "qf3correlationdataformattool.h"
 
 QFPRDRFCS::QFPRDRFCS(QObject* parent):
     QObject(parent)
@@ -395,6 +396,36 @@ void QFPRDRFCS::insertConfocor3File(const QStringList &filename, const QMap<QStr
     }
 }
 
+void QFPRDRFCS::insertQF3ASCIIFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly)
+{
+    unsigned int cc=1;
+
+    QF3CorrelationDataFormatTool reader;
+    reader.loadFile(filename.value(0, ""), true);
+    if (reader.wasError()) {
+        cc=0;
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing QF3 ASCII file '%1':\n%2").arg(filename.value(0, "")).arg(reader.getErrorMessage()));
+        services->log_error(tr("Error while importing QF3 ASCII file '%1':\n    %2\n").arg(filename.value(0, "")).arg(reader.getErrorMessage()));
+    } else {
+        for (int c=0; c<reader.correlationTypes; c++) {
+            QMap<QString, QVariant> p=paramValues;
+            QStringList pro=paramReadonly;
+            p["QF3ASCII_CORRELATION_TYPE"]=c;
+            p["CHANNEL"]=reader.getCorrelationTypePreferredChannel(c);
+            pro<<"QF3ASCII_CORRELATION_TYPE";
+            QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - %2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(reader.getRole(c)), filename, p, pro);
+            e->setRole(reader.getRole(c));
+            e->setFolder(reader.folder);
+            e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()+"_"+reader.group));
+            if (e->error()) {
+                QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing QF3 ASCII file '%1':\n%2").arg(filename.value(0, "")).arg(e->errorDescription()));
+                services->log_error(tr("Error while importing QF3 ASCII file '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
+                project->deleteRawData(e->getID());
+            }
+
+        }
+    }
+}
 void QFPRDRFCS::insertFLEX_SINFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly)
 {
     unsigned int cc=1;
@@ -452,6 +483,7 @@ const QString QFPRDRFCS_flexf=QObject::tr("correlator.com files (*.sin)");
 const QString QFPRDRFCS_zeisscf3=QObject::tr("Zeiss Confocor3 files (*.fcs)");
 const QString QFPRDRFCS_asciif=QObject::tr("ASCII Data Files (*.txt *.dat *.csv)");
 const QString QFPRDRFCS_albaf=QObject::tr("ISS Alba Files (*.csv)");
+const QString QFPRDRFCS_qf3ascii=QObject::tr("QuickFit 3.0 ASCII Correlation Data (*.qf3acorr)");
 const QString QFPRDRFCS_diff4f=QObject::tr("diffusion4 correlation (*corr.dat)");
 const QString QFPRDRFCS_olegf=QObject::tr("Oleg Kriechevsky's Binary format(*. *.dat)");
 
@@ -459,7 +491,7 @@ QStringList QFPRDRFCS::getFCSFilters() const
 {
 
     QStringList sl;
-    sl<<QFPRDRFCS_alvf<<QFPRDRFCS_alvf6<<QFPRDRFCS_alvf7<<QFPRDRFCS_flexf<<QFPRDRFCS_zeisscf3<<QFPRDRFCS_asciif<<QFPRDRFCS_albaf<<QFPRDRFCS_diff4f<<QFPRDRFCS_olegf;
+    sl<<QFPRDRFCS_alvf<<QFPRDRFCS_alvf6<<QFPRDRFCS_alvf7<<QFPRDRFCS_flexf<<QFPRDRFCS_zeisscf3<<QFPRDRFCS_asciif<<QFPRDRFCS_albaf<<QFPRDRFCS_qf3ascii<<QFPRDRFCS_diff4f<<QFPRDRFCS_olegf;
     return sl;
 }
 
@@ -482,6 +514,9 @@ void QFPRDRFCS::setFCSFilterProperties(QMap<QString, QVariant> &p, const QString
        p["CHANNEL"]=0;
     } else if (currentFCSFileFormatFilter==QFPRDRFCS_olegf){
        p["FILETYPE"]="OLEGKRIECHEVSKYBINARY";
+       p["CHANNEL"]=0;
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_qf3ascii){
+       p["FILETYPE"]="QF3ASCIICORR";
        p["CHANNEL"]=0;
     } else if (currentFCSFileFormatFilter==QFPRDRFCS_asciif) {
         p["FILETYPE"]="CSV_CORR";
@@ -549,6 +584,8 @@ void QFPRDRFCS::loadFCSFilterFiles(const QStringList &files, const QString &curr
         insertFLEX_SINFile(files, p, paramsReadonly);
     } else if (currentFCSFileFormatFilter==QFPRDRFCS_zeisscf3) {
         insertConfocor3File(files, p, paramsReadonly);
+    } else if (currentFCSFileFormatFilter==QFPRDRFCS_qf3ascii) {
+        insertQF3ASCIIFile(files, p, paramsReadonly);
     } else {
         insertCSVFile(files, p, paramsReadonly);
     }

@@ -45,6 +45,7 @@
         <file alias="autolinkweb.png">icons/autolinkweb.png</file>
     </qresource>
     <qresource prefix="/lib">
+        <file alias="export_data.png">icons/export_data.png</file>
         <file alias="collapse_opened.png">icons/collapse_opened.png</file>
         <file alias="collapse_closed.png">icons/collapse_closed.png</file>
         <file alias="collapse_closedhover.png">icons/collapse_closedhover.png</file>

@@ -1,0 +1,24 @@
+body,p {
+  font-size: $$main_fontsize$$;
+  font-family: $$main_font$$;
+}
+h1 {
+  font-size: $$main_fontsize:+7$$;
+  font-family: $$main_font$$;
+}
+h2 {
+  font-size: $$main_fontsize:+5$$;
+  font-family: $$main_font$$;
+}
+h3 {
+  font-size: $$main_fontsize:+3$$;
+  font-family: $$main_font$$;
+}
+h4 {
+  font-size: $$main_fontsize:+2$$;
+  font-family: $$main_font$$;
+}
+h5 {
+  font-size: $$main_fontsize:+1$$;
+  font-family: $$main_font$$;
+}

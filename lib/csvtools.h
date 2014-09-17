@@ -29,12 +29,18 @@
 #include <QStringList>
 #include "lib_imexport.h"
 
-/*! \brief Reads in one line of text from the specified file and interpret it as Comma-Separated-Values file.
+/*! \brief Reads in one line of text from the specified stream and interpret it as Comma-Separated-Values file.
            Returns its contents as a vector of doubles.
     \ingroup qf3lib_tools
 
  */
 QFLIB_EXPORT QVector<double> csvReadline(QTextStream& f, QChar separator_char=',', QChar comment_char='#', double non_value=0, const QString& eolChars=QString("\n"), const QString& ignoreChars=QString("\r"));
+/*! \brief Reads in one line of text from the specified string and interpret it as Comma-Separated-Values file.
+           Returns its contents as a vector of doubles.
+    \ingroup qf3lib_tools
+
+ */
+QFLIB_EXPORT QVector<double> csvReadline(QString f, QChar separator_char=',', QChar comment_char='#', double non_value=0, const QString& eolChars=QString("\n"), const QString& ignoreChars=QString("\r"));
 
 /*! \brief Reads a CSV file
     \ingroup qf3lib_tools

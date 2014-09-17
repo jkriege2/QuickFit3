@@ -103,6 +103,9 @@
             <li>evaluation editors|results table: added checkboxes, which allows to show an additional column with the run/index/pixel of the result and a checkbox, which allows to hide all removed runs/indices/pixels</li>
             <li>FFitAlgorithm now supports error estimates via bootstrapping, in fit()</li>
             <li>added help page, which displays all registeres tooltips and autolinks</li>
+            <li>added stylesheet (CSS) for main help formating</li>
+            <li>added widgets to options dialog, which allow to set the font name and size in the main help</li>
+            <li>added menu entry to RDR editor, which allows to export the contained data into a file (only enabled, if the plugin supports this function!)</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -263,7 +266,7 @@
             <li>bugfix: weights combo-box is correctly initialized, when starting the editor</li>
             <li>new: added error estimation, using bootstrapping to curve fit (in plots)</li>
           </ul></li>
-      <li><b>FCS</b><ul>
+      <li><b>FCS/DLS</b><ul>
             <li>fixed a possible freeze of QF3, if ACF-data is imported from CSV files and no countrate-trace is provided!</li>
             <li>import functions for correlator.com .SIN files</li>
             <li>added tool to set background countrates in several RDRs</li>
@@ -275,7 +278,8 @@
             <li>added import filter for Carl Zeiss ConfoCor3 datfiles (*.fcs)</li>
             <li>fixed possible crash, when opening the "fit function simulator" dialog</li>
             <li>added generic internal ASCII data format for correlation data</li>
-            <li></li>
+            <li>added option to export the current data into a file (currently only the QF3 ASCII Correlation Data Format)</li>
+            <li>added import filter for QF3 ASCII Correlation Data Format</li>
       </ul></li>
       <li><b>imagingFCS Fit</b><ul>
             <li>fit parameter names are more expressive now</li>

@@ -108,6 +108,8 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     actPrevious->setToolTip(tr("move to previous record"));
     actPreviousSameRole=new QAction(QIcon(":/lib/prop_previous.png"), tr("&previous, same role"), d);
     actPreviousSameRole->setToolTip(tr("move to previous record of same role"));
+    actExportPluginData=new QAction(QIcon(":/lib/export_data.png"), tr("&Export Data"), d);
+    actExportPluginData->setToolTip(tr("export the data from the current RDR into a file (enabled, if the plugin supports this feature)"));
 
     btnPrevious=new QToolButton(d);
     btnPrevious->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -116,6 +118,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     vl->addWidget(btnPrevious);
     connect(actPrevious, SIGNAL(triggered()), this, SLOT(previousPressed()));
     connect(actPreviousSameRole, SIGNAL(triggered()), this, SLOT(previousOfRolePressed()));
+    connect(actExportPluginData, SIGNAL(triggered()), this, SLOT(exportData()));
 
     btnSelectFromTree=new QPushButton(tr("select RDR"), d);
     btnSelectFromTree->setToolTip(tr("click this to select the next record to display from a tree of all records in the current project which are of the semae type"));
@@ -164,6 +167,8 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     menuRDR->addAction(actNextSameRole);
     menuRDR->addSeparator();
     menuRDR->addAction(actDelete);
+    menuRDR->addSeparator();
+    menuRDR->addAction(actExportPluginData);
     menuRDR->addSeparator();
     menuRDR->addAction(actClose);
 
@@ -1301,7 +1306,7 @@ void QFRawDataPropertyEditor_private::setCurrent(QFRawDataRecord* c) {
         disconnect(chkShowAvg, SIGNAL(toggled(bool)), this, SLOT(showAvgClicked(bool)));
 
 
-
+        actExportPluginData->setEnabled(c->getExportFiletypes().size()>0);
 
 
 
@@ -1581,6 +1586,19 @@ void QFRawDataPropertyEditor_private::selectRecordFromTreeSelected(const QModelI
         projectTree=NULL;*/
     }
 
+}
+
+void QFRawDataPropertyEditor_private::exportData()
+{
+    if (current) {
+        QStringList ids=current->getExportFiletypes();
+        QStringList filters=current->getExportDialogFiletypes().split(";;");
+        if (ids.size()>0 && filters.size()>0) {
+            QString filter=filters[0];
+            QString filename=qfGetSaveFileNameSet("rdr/export-data/", d, current->getExportDialogTitle(), QString(), filters.join(";;"), &filter);
+            current->exportData(ids.value(filters.indexOf(filter), ""), filename);
+        }
+    }
 }
 
 
