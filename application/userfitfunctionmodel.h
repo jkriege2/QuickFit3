@@ -25,6 +25,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QAbstractTableModel>
 #include <QSettings>
 #include <QStringList>
+#include <QVector>
 
 class UserFitFunctionModel : public QAbstractTableModel
 {
@@ -33,6 +34,7 @@ class UserFitFunctionModel : public QAbstractTableModel
         explicit UserFitFunctionModel(QObject *parent = 0);
         void loadSettings(QSettings& settings);
         void storeSettings(QSettings& settings) const;
+        QVector<double> getInitParams() const;
 
         void deleteParameter(int idx);
         void addParameter();

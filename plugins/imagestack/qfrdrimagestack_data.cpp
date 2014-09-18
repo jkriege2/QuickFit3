@@ -32,10 +32,6 @@ QFRDRImageStackData::~QFRDRImageStackData() {
     clearMemory();
 }
 
-void QFRDRImageStackData::exportData(const QString& format, const QString& filename)const  {
-	// here you may export the data of the record into the specified format (see getExportFiletypes() )
-	// THIS IS OPTIONAL
-}
 
 
 void QFRDRImageStackData::intWriteData(QXmlStreamWriter& w) {
@@ -595,3 +591,11 @@ QFRDRImageStackData::ImageStack::ImageStack() {
     file=-1;
 }
 
+
+
+void QFRDRImageStackData::exportData(const QString &format, const QString &filename) const
+{
+    if (format.toUpper()=="TIFF") {
+
+    }
+}

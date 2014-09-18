@@ -301,3 +301,6 @@ plg_qfe_dataexportbasics.depends = lib libqf3widgets
 	}
 }
 
+RESOURCES += \
+    ../lib/lib.qrc
+

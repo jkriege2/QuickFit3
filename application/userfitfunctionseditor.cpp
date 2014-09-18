@@ -26,6 +26,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctionmanager.h"
 #include "userfitfunctiondelegate.h"
 #include "qfmathparser.h"
+#include "qffitfunctionparsed.h"
+
 
 UserFitFunctionsEditor::UserFitFunctionsEditor(QWidget *parent) :
     QDialog(parent),
@@ -38,12 +40,33 @@ UserFitFunctionsEditor::UserFitFunctionsEditor(QWidget *parent) :
     functionRef->setCompleterFile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/userfitfunctions_expression.txt");
     functionRef->setDefaultWordsMathExpression();
     functionRef->registerEditor(ui->edtExpression);
+    ui->spinPrevRangeMin->setCheckBounds(false, false);
+    ui->spinPrevRangeMax->setCheckBounds(false, false);
+    //ui->spinPrevRangeMin->setRange(0,1e38);
+    ui->spinPrevRangeMin->setValue(0);
+    //ui->spinPrevRangeMax->setRange(0,1e38);
+    ui->spinPrevRangeMax->setValue(10);
+    //connect(ui->chkPrevLogX, SIGNAL(toggled(bool)), ui->spinPrevRangeMin, SLOT(setCheckMinimum(bool)));
+    //connect(ui->chkPrevLogX, SIGNAL(toggled(bool)), ui->spinPrevRangeMax, SLOT(setCheckMinimum(bool)));
+    connect(ui->chkPrevLogX, SIGNAL(toggled(bool)), ui->spinPrevRangeMin, SLOT(setLogScale(bool)));
+    connect(ui->chkPrevLogX, SIGNAL(toggled(bool)), ui->spinPrevRangeMax, SLOT(setLogScale(bool)));
+
+    ProgramOptions::getConfigWindowGeometry(this, "UserFitFunctionsEditor/geometry/");
+    ProgramOptions::getConfigQSplitter(ui->splitter, "UserFitFunctionsEditor/splitter/");
+    ProgramOptions::getConfigQSplitter(ui->splitter_3, "UserFitFunctionsEditor/splitter_3/");
+    //connect(ui->spinPrevRangeMin, SIGNAL(valueChanged(double)), ui->spinPrevRangeMax, SLOT(setMinimum(double)));
     init();
 
 }
 
 UserFitFunctionsEditor::~UserFitFunctionsEditor()
 {
+    ProgramOptions::setConfigWindowGeometry(this, "UserFitFunctionsEditor/geometry/");
+    ProgramOptions::setConfigQSplitter(ui->splitter, "UserFitFunctionsEditor/splitter/");
+    ProgramOptions::setConfigQSplitter(ui->splitter_3, "UserFitFunctionsEditor/splitter_3/");
+    if (simplePlot) {
+        simplePlot->close();
+    }
     delete ui;
 }
 
@@ -67,6 +90,10 @@ void UserFitFunctionsEditor::showFF(const QString &idd)
 
     QString fn=manager->getUserFitFunctionFile(id);
     QString name=tr("new name"), expression="x^2+2", shortname="";
+    bool logX=false;
+    bool logY=false;
+    double rangemin=0;
+    double rangemax=10;
     if (QFile::exists(fn)) {
         QSettings settings(fn, QSettings::IniFormat);
         expression=settings.value("function/expression", expression).toString();
@@ -74,8 +101,22 @@ void UserFitFunctionsEditor::showFF(const QString &idd)
         name=settings.value("function/name", name).toString();
         shortname=settings.value("function/short_name", shortname).toString();
         model.loadSettings(settings);
+        if (id.startsWith("fcs_") << id.startsWith("dls_")|| id.startsWith("fccs_")) {
+            logX=true;
+            logY=false;
+            rangemin=1e-6;
+            rangemax=10;
+        }
+        settings.value("test/log_x", logX);
+        settings.value("test/log_y", logY);
+        settings.value("test/range_min", rangemin);
+        settings.value("test/range_max", rangemax);
     }
 
+    ui->chkPrevLogX->setChecked(logX);
+    ui->chkPrevLogY->setChecked(logY);
+    ui->spinPrevRangeMin->setValue(rangemin);
+    ui->spinPrevRangeMax->setValue(rangemax);
 
     ui->groupBox->setEnabled(false);
     ui->edtExpression->setText(expression);
@@ -89,7 +130,7 @@ void UserFitFunctionsEditor::showFF(const QString &idd)
     ui->buttonBox->setEnabled(false);
 }
 
-bool UserFitFunctionsEditor::storeCurrentFF()
+bool UserFitFunctionsEditor::storeCurrentFF(const QString& filename)
 {
     //qDebug()<<"storeCurrentFF()";
     QFFitFunctionManager* manager=QFFitFunctionManager::getInstance();
@@ -98,17 +139,18 @@ bool UserFitFunctionsEditor::storeCurrentFF()
             QMessageBox::critical(this, tr("User Fit Function Editor"), tr("You have to specify at least an ID and an expression!"), QMessageBox::Ok, QMessageBox::Ok);
             return false;
         }
-        QDir d(ProgramOptions::getInstance()->getConfigValue("quickfit/user_fitfunctions", ProgramOptions::getInstance()->getHomeQFDirectory()+"/userfitfunctions").toString()+"/");
-        QString fn=d.absoluteFilePath(ui->edtID->text()+".qff");
-        if (QFile::exists(manager->getUserFitFunctionFile(currentID))) {
-            fn=manager->getUserFitFunctionFile(currentID);
-        }
+        QString fn=getFFFilename();
+        if (!filename.isEmpty()) fn=filename;
         //qDebug()<<"storeCurrentFF(): fn="<<fn;
         QSettings settings(fn, QSettings::IniFormat);
         settings.setValue("function/id", ui->edtID->text());
         settings.setValue("function/name", ui->edtName->text());
         settings.setValue("function/short_name", ui->edtShortName->text());
         settings.setValue("function/expression", ui->edtExpression->text());
+        settings.setValue("test/log_x", ui->chkPrevLogX->isChecked());
+        settings.setValue("test/log_y", ui->chkPrevLogY->isChecked());
+        settings.setValue("test/range_min", ui->spinPrevRangeMin->value());
+        settings.setValue("test/range_max", ui->spinPrevRangeMax->value());
         //settings.setValue("function/param_count", model.rowCount());
         model.storeSettings(settings);
 
@@ -132,6 +174,17 @@ void UserFitFunctionsEditor::init()
         w->setText(name);
     }
     clearFF();
+}
+
+QString UserFitFunctionsEditor::getFFFilename()
+{
+    QFFitFunctionManager* manager=QFFitFunctionManager::getInstance();
+    QDir d(ProgramOptions::getInstance()->getConfigValue("quickfit/user_fitfunctions", ProgramOptions::getInstance()->getHomeQFDirectory()+"/userfitfunctions").toString()+"/");
+    QString fn=d.absoluteFilePath(ui->edtID->text()+".qff");
+    if (QFile::exists(manager->getUserFitFunctionFile(currentID))) {
+        fn=manager->getUserFitFunctionFile(currentID);
+    }
+    return fn;
 }
 
 void UserFitFunctionsEditor::on_btnNewF_clicked()
@@ -235,4 +288,58 @@ void UserFitFunctionsEditor::showHelp()
 void UserFitFunctionsEditor::on_btnFunctionHelp_clicked()
 {
     QFPluginServices::getInstance()->displayMainHelpWindow("mathparser.html");
+}
+
+void UserFitFunctionsEditor::on_btnUpdatePreview_clicked()
+{
+    if (!simplePlot) {
+        simplePlot=new QFSimplePlotDialog();
+        simplePlot->setAxesEditable(false);
+        simplePlot->setWindowTitle("QuickFit 3.0: User fit-function preview");
+        simplePlot->setModal(false);
+    }
+    if (simplePlot) {
+        simplePlot->show();
+        simplePlot->raise();
+        QFSimplePlotWidget* wid=simplePlot->getSimplePlot();
+        wid->startAddingPlots();
+        wid->clearPlots();
+        wid->setLog(ui->chkPrevLogX->isChecked(), ui->chkPrevLogY->isChecked());
+        wid->setXRange(ui->spinPrevRangeMin->value(), ui->spinPrevRangeMax->value());
+
+        QString fn=qfGetTempFilename("qf_ffeditor_temp_XXXXXX");
+        storeCurrentFF(fn);
+        QFFitFunctionParsed* ff=new QFFitFunctionParsed(fn);
+        QVector<double> params=model.getInitParams();
+
+        double rmi=ui->spinPrevRangeMin->value();
+        double rma=ui->spinPrevRangeMax->value();
+        if (rma<rmi) qSwap(rmi,rma);
+        if (ff) {
+            if (ff->isValid()) {
+                double ymin=0;
+                double ymax=0;
+                if (!ui->chkPrevLogX->isChecked()) {
+                    ymin=ymax=ff->evaluate(rmi, params.data());
+                    for (double v=rmi; v<=rma; v=v+(rma-rmi)/50.0) {
+                        double e=ff->evaluate(v, params.data());
+                        if (e<ymin) ymin=e;
+                        if (e>ymax) ymax=e;
+                    }
+                } else {
+                    ymin=ymax=ff->evaluate(rmi, params.data());
+                    for (double v=log(rmi); v<=log(rma); v=v+(log(rma)-log(rmi))/50.0) {
+                        double e=ff->evaluate(exp(v), params.data());
+                        if (e<ymin) ymin=e;
+                        if (e>ymax) ymax=e;
+                    }
+                }
+                wid->addFunctionPlot(ff, "r-lw(1.5)", ui->edtID->text(), params);
+                wid->setYRange(ymin, ymax);
+            } else {
+                delete ff;
+            }
+        }
+        wid->endAddingPlots();
+    }
 }

@@ -44,7 +44,8 @@
 #include "qfpluginservices.h"
 #include <QXmlStreamWriter>
 #include <QBitArray>
-#include "programoptions.h"
+
+class ProgramOptions; // forward
 
 /*! \brief QuickFit's internal malloc replacement (on some systems, this does a boundary-aligned malloc)
     \ingroup qf3lib_tools
@@ -150,12 +151,8 @@ QFLIB_EXPORT QToolButton* createButtonForActionShowText(QAction* action, QWidget
     \param prefix this prefix is prepended to the QSettings keys
 */
 QFLIB_EXPORT void saveWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix=QString(""));
-inline void saveWidgetGeometry(QSettings* settings, QWidget* widget, QString prefix=QString("")) {
-    if (settings) saveWidgetGeometry(*settings,widget, prefix);
-}
-inline void saveWidgetGeometry(ProgramOptions* settings, QWidget* widget, QString prefix=QString("")) {
-    if (settings) saveWidgetGeometry(*settings->getQSettings(),widget, prefix);
-}
+QFLIB_EXPORT void saveWidgetGeometry(QSettings* settings, QWidget* widget, QString prefix=QString(""));
+QFLIB_EXPORT void saveWidgetGeometry(ProgramOptions* settings, QWidget* widget, QString prefix=QString(""));
 /*! \brief load the geometry of a given widget to a QSettings
     \ingroup qf3lib_tools
 
@@ -166,12 +163,8 @@ inline void saveWidgetGeometry(ProgramOptions* settings, QWidget* widget, QStrin
     \param prefix this prefix is prepended to the QSettings keys
 */
 QFLIB_EXPORT void loadWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix=QString(""));
-inline void loadWidgetGeometry(QSettings* settings, QWidget* widget, QString prefix=QString("")) {
-    if (settings) loadWidgetGeometry(*settings,widget, prefix);
-}
-inline void loadWidgetGeometry(ProgramOptions* settings, QWidget* widget, QString prefix=QString("")) {
-    if (settings) loadWidgetGeometry(*settings->getQSettings(),widget, prefix);
-}
+QFLIB_EXPORT void loadWidgetGeometry(QSettings* settings, QWidget* widget, QString prefix=QString(""));
+QFLIB_EXPORT void loadWidgetGeometry(ProgramOptions* settings, QWidget* widget, QString prefix=QString(""));
 
 
 /*! \brief load the geometry of a given widget to a QSettings
@@ -1510,6 +1503,8 @@ QFLIB_EXPORT void parseTooltips(const QString& directory, QMap<QString, QFToolTi
 QFLIB_EXPORT void parseAutolinks(const QString& directory, QMap<QString, QString>& autolinks);
 
 QFLIB_EXPORT void parseGlobalreplaces(const QString& directory);
+
+QFLIB_EXPORT QString qfGetTempFilename(const QString& templateName=QString("qf_temp_XXXXXX"));
 
 /*! \brief escape \\n, \\r, \\", \\', \\\\, \\t...
     \ingroup qf3lib_tools

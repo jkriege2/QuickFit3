@@ -84,6 +84,15 @@ void UserFitFunctionModel::storeSettings(QSettings &settings) const
     }
 }
 
+QVector<double> UserFitFunctionModel::getInitParams() const
+{
+    QVector<double> dat;
+    for (int i=0; i<items.count(); i++) {
+        dat<<items[i].initialValue;
+    }
+    return dat;
+}
+
 void UserFitFunctionModel::deleteParameter(int idx)
 {
     if (idx>=0 && idx<items.size()) items.removeAt(idx);

@@ -199,6 +199,21 @@ void loadWidgetGeometry(QSettings& settings, QWidget* widget, QPoint defaultPosi
     widget->resize(size.boundedTo(QApplication::desktop()->screenGeometry(widget).size()));
 }
 
+
+void saveWidgetGeometry(QSettings* settings, QWidget* widget, QString prefix) {
+    if (settings) saveWidgetGeometry(*settings,widget, prefix);
+}
+void saveWidgetGeometry(ProgramOptions* settings, QWidget* widget, QString prefix) {
+    if (settings) saveWidgetGeometry(*settings->getQSettings(),widget, prefix);
+}
+
+void loadWidgetGeometry(QSettings* settings, QWidget* widget, QString prefix) {
+    if (settings) loadWidgetGeometry(*settings,widget, prefix);
+}
+void loadWidgetGeometry(ProgramOptions* settings, QWidget* widget, QString prefix) {
+    if (settings) loadWidgetGeometry(*settings->getQSettings(),widget, prefix);
+}
+
 void loadWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix) {
     loadWidgetGeometry(settings, widget, QPoint(10, 10), QSize(100, 100), prefix);
 }
@@ -1323,4 +1338,13 @@ QString qfCEscaped(const QString& data) {
         }
     }
     return res;
+}
+
+QString qfGetTempFilename(const QString& templateName) {
+    QTemporaryFile f(templateName);
+    f.setAutoRemove(true);
+    f.open();
+    QString fn=f.fileName();
+    f.close();
+    return fn;
 }

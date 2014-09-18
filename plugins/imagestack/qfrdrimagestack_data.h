@@ -85,12 +85,13 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportFiletypes() */
         QStringList getExportFiletypes() {
             QStringList sl;
+            //sl<<"TIFF";
             return sl;
         };
         /** \brief returns the title of the Export file dialog */
-        QString getExportDialogTitle() { return tr(""); }
+        QString getExportDialogTitle() { return tr("export image stacks"); }
         /** \brief returns the filetype of the Export file dialog */
-        QString getExportDialogFiletypes() { return tr(""); }
+        QString getExportDialogFiletypes() { return tr("TIFF file [one file per channel,stack] (*.tif)"); }
 
 
 

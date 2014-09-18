@@ -26,6 +26,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QListWidgetItem>
 #include "userfitfunctionmodel.h"
 #include "../plugins/base_classes/qffunctionreferencetool.h"
+#include "qfsimpleplotwidget.h"
+#include "qftools.h"
 
 namespace Ui {
     class UserFitFunctionsEditor;
@@ -42,8 +44,9 @@ class UserFitFunctionsEditor : public QDialog
     protected:
         void clearFF();
         void showFF(const QString& id);
-        bool storeCurrentFF();
+        bool storeCurrentFF(const QString &filename=QString());
         void init();
+        QString getFFFilename();
     protected slots:
         void on_btnNewF_clicked();
         void on_btnDeleteF_clicked();
@@ -56,12 +59,15 @@ class UserFitFunctionsEditor : public QDialog
         void on_btnDelete_clicked();
         void on_edtExpression_textChanged(const QString &text);
         void on_btnFunctionHelp_clicked();
+        void on_btnUpdatePreview_clicked();
         void showHelp();
     private:
         Ui::UserFitFunctionsEditor *ui;
         QString currentID;
         UserFitFunctionModel model;
         QFFunctionReferenceTool* functionRef;
+        QPointer<QFSimplePlotDialog> simplePlot;
+
 };
 
 

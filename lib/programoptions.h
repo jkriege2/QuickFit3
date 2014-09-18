@@ -26,7 +26,7 @@
 
 #include "lib_imexport.h"
 #include <QtGui>
-#include "lib_imexport.h"
+#include "qftools.h"
 
 
 #define ADD_WIDGET_PROGRAMOPTIONS(widgetClass, setterF, getterF, datatype) \
@@ -253,6 +253,31 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
             inst->settings->setValue(name, value);
             inst->settings->sync();
         }
+
+
+
+
+        static void getConfigWindowGeometry(QWidget* cb, const QString& name) {
+            if (cb) {
+                saveWidgetGeometry(ProgramOptions::getInstance(), cb, name);
+            }
+        }
+        static void setConfigWindowGeometry(QWidget* cb, const QString& name) {
+            if (cb) {
+                loadWidgetGeometry(ProgramOptions::getInstance(), cb, name);
+            }
+        }
+        static void getConfigQSplitter(QSplitter* cb, const QString& name) {
+            if (cb) {
+                saveSplitter(*(ProgramOptions::getInstance()->getQSettings()), cb, name);
+            }
+        }
+        static void setConfigQSplitter(QSplitter* cb, const QString& name) {
+            if (cb) {
+                loadSplitter(*(ProgramOptions::getInstance()->getQSettings()), cb, name);
+            }
+        }
+
 
         ADD_WIDGET_PROGRAMOPTIONS(QCheckBox,setChecked,isChecked,bool)
         ADD_WIDGET_PROGRAMOPTIONS(QRadioButton,setChecked,isChecked,bool)
