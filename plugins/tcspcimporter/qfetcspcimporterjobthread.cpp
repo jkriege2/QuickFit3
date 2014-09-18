@@ -28,6 +28,7 @@
 #include "qfimportermanager.h"
 #include "binarydatatools.h"
 #include "qftools.h"
+#include "qf3correlationdataformattool.h"
 
 QMutex* QFETCSPCImporterJobThread::mutexFilename=NULL;
 
@@ -156,6 +157,29 @@ QString QFETCSPCImporterJobThread::replacePostfixSpecials(const QString& input, 
     result=result.replace("%correlatorid%", QString::number(job.fcs_correlator), Qt::CaseInsensitive);
     return result;
 }
+
+struct QF3CorrFileData {
+    QList<QPair<int, int> > store;
+    int ACFs;
+    int CCFs;
+};
+
+bool QFETCSPCImporterJobThread_store_compare(const QPair<int, int> &s1, const QPair<int, int> &s2)
+ {
+    if (s1.first==s1.second ) {
+        if (s2.first!=s2.second) {
+            return true;
+        } else {
+            return s1.first<s2.first;
+        }
+    } else {
+        if (s2.first==s2.second) {
+            return false;
+        } else {
+            return s1.first<s2.first;
+        }
+    }
+ }
 
 void QFETCSPCImporterJobThread::run() {
     QTime ptime;
@@ -309,8 +333,12 @@ void QFETCSPCImporterJobThread::run() {
 
                         emit messageChanged(tr("saving FCS results ..."));
 
+                        QSet<int> usedChannels;
+
                         for (QSet<QPair<int, int> >::iterator i = job.fcs_correlate.begin(); i != job.fcs_correlate.end(); ++i) {
                              QPair<int, int> ccf=*i;
+                             usedChannels.insert(ccf.first);
+                             usedChannels.insert(ccf.second);
 
                              QString localFilename=outputFilenameBase+QString(".ccf%1_%2.csv").arg(ccf.first).arg(ccf.second);
                              if (ccf.first==ccf.second) localFilename=outputFilenameBase+QString(".acf%1.csv").arg(ccf.first);
@@ -403,7 +431,7 @@ void QFETCSPCImporterJobThread::run() {
                                  }
                              }
 
-                             QFETCSPCImporterJobThread::ccfFileConfig fn;
+                             /*QFETCSPCImporterJobThread::ccfFileConfig fn;
                              fn.filename=localFilename;
                              fn.channel1=ccf.first;
                              fn.channel2=ccf.second;
@@ -433,8 +461,48 @@ void QFETCSPCImporterJobThread::run() {
                                  fp.group=job.filename;
                                  fp.role=QString("FCCS(%1-%2)").arg(fn.channel1).arg(fn.channel2);
                                  addFiles.append(fp);
-                             }
+                             }*/
 
+                        }
+
+                        QList<int> clist=usedChannels.toList();
+                        qSort(clist);
+                        QList<QF3CorrFileData> storeFiles;
+                        for (int i=0; i<clist.size(); i++) {
+                            QList<QPair<int, int> > storeCross;
+                            QList<QPair<int, int> > storeAuto;
+                            QPair<int, int> p_acf=qMakePair<int,int>(i,i);
+                            if (job.fcs_correlate.contains(p_acf)) {
+                                storeAuto.append(p_acf);
+                            }
+                            for (int j=0; j<clist.size(); j++) {
+                                if (i!=j) {
+                                    QPair<int, int> p_ccf=qMakePair<int,int>(i,j);
+                                    QPair<int, int> p_fcc=qMakePair<int,int>(j,i);
+                                    QPair<int, int> p_jacf=qMakePair<int,int>(j,j);
+                                    if (job.fcs_correlate.contains(p_ccf)) {
+                                        storeCross.append(p_ccf);
+                                    }
+                                    if (job.fcs_correlate.contains(p_fcc)) {
+                                        storeCross.append(p_fcc);
+                                    }
+                                    if (job.fcs_correlate.contains(p_jacf)) {
+                                        storeAuto.append(p_jacf);
+                                    }
+                                }
+                            }
+                            QF3CorrFileData store;
+                            store.store=storeAuto;
+                            store.store.append(storeCross);
+                            qSort(store.store, QFETCSPCImporterJobThread_store_compare);
+                            store.ACFs=storeAuto.size();
+                            store.CCFs=storeCross.size();
+                            if (!storeFiles.contains(store)) storeFiles.append(store);
+                        }
+                        for (int i=0; i<storeFiles.size(); i++) {
+                            const QList<QPair<int, int> >& store=storeFiles[i];
+                            QF3CorrelationDataFormatTool tool;
+                            tool.channels=
                         }
 
                     }
