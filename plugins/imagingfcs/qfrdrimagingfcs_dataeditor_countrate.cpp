@@ -232,11 +232,13 @@ void QFRDRImagingFCSDataEditorCountrate::createWidgets() {
 
 void QFRDRImagingFCSDataEditorCountrate::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
     if (old) {
+        writeSettings();
         disconnect(old, 0, this, 0);
         disconnect(old, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));        
     }
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
+        readSettings();
         runs.setCurrent(current);
         QStringList sl;
 

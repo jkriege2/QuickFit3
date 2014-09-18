@@ -287,11 +287,13 @@ void QFRDRImagingFCSDataEditor::createWidgets() {
 void QFRDRImagingFCSDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
     if (old) {
         //disconnect(old, 0, this, 0);
+        writeSettings();
         disconnect(old, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
     }
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     correlationMaskTools->setRDR(current);
     if (m) {
+        readSettings();
         runs.setCurrent(current);
         sliders->disableSliderSignals();
         sliders->set_min(0);

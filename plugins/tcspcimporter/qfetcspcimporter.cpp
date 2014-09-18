@@ -29,6 +29,7 @@
 #include <QPair>
 #include "qfrawdatarecord.h"
 #include"qfetcspcimporterjobthread.h"
+#include "qf3correlationdataformattool.h"
 
 #define LOG_PREFIX QString("tcspcimporter >>> ").toUpper()
 
@@ -149,6 +150,52 @@ QFRawDataRecord *QFETCSPCImporter::insertCountRate(const QString& filename, cons
     return e;
 }
 
+QList<QPointer<QFRawDataRecord> > QFETCSPCImporter::insertQF3ASCIICORRFile(const QString &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly, const QString &group)
+{
+    unsigned int cc=1;
+    QList<QPointer<QFRawDataRecord> > res;
+    QF3CorrelationDataFormatTool reader;
+    reader.loadFile(filename, true);
+    if (reader.wasError()) {
+        cc=0;
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing QF3 ASCII file '%1':\n%2").arg(filename).arg(reader.getErrorMessage()));
+        services->log_error(tr("Error while importing QF3 ASCII file '%1':\n    %2\n").arg(filename).arg(reader.getErrorMessage()));
+    } else {
+        //services->log_indent();
+        services->log_text(tr("  * correlation types: %1\n").arg(reader.correlationTypes));
+        services->log_text(tr("  * correlation runs: %1\n").arg(reader.runs));
+        services->log_text(tr("  * channels: %1\n").arg(reader.channels));
+        services->log_text(tr("  * rate runs: %1\n").arg(reader.rateRuns));
+        for (int c=0; c<reader.correlationTypes; c++) {
+            QMap<QString, QVariant> p=paramValues;
+            QStringList pro=paramReadonly;
+            p["QF3ASCII_CORRELATION_TYPE"]=c;
+            p["CHANNEL"]=reader.getCorrelationTypePreferredChannel(c);
+            pro<<"QF3ASCII_CORRELATION_TYPE";
+            QString name=tr("%1 - %2").arg(QFileInfo(filename).fileName()).arg(reader.getRole(c));
+            services->log_text(tr("    + adding %1\n").arg(name));
+            QFRawDataRecord* e=project->addRawData("fcs", name, QStringList(filename), p, pro);
+            if (e) {
+                e->setRole(reader.getRole(c));
+                e->setFolder(reader.folder);
+                e->setGroup(project->addOrFindRDRGroup(group));//project->addOrFindRDRGroup(QFileInfo(filename).fileName()+"_"+reader.group));
+                if (e->error()) {
+                    QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing QF3 ASCII file '%1':\n%2").arg(filename).arg(e->errorDescription()));
+                    services->log_error(tr("Error while importing QF3 ASCII file '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+                    project->deleteRawData(e->getID());
+                } else {
+                    res<<e;
+                }
+            } else {
+                QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing QF3 ASCII file '%1':\n%2").arg(filename).arg(tr("could not create RDR")));
+                services->log_error(tr("Error while importing QF3 ASCII file '%1':\n    %2\n").arg(filename).arg(tr("could not create RDR")));
+            }
+        }
+        //services->log_unindent();
+    }
+    return res;
+}
+
 void QFETCSPCImporter::correlationDialogClosed() {
     if (!dlgCorrelate) return;
 
@@ -174,6 +221,7 @@ void QFETCSPCImporter::correlationDialogClosed() {
         QMap<QString, QVariant> initParams=it->props;
         QStringList paramsReadonly=it->props.keys();
         QFRawDataRecord* rdr=NULL;
+        QList<QPointer<QFRawDataRecord> > rdrs;
         if (type=="photoncounts") {
             initParams["FILETYPE"]="CSV";
             paramsReadonly<<"FILETYPE";
@@ -199,9 +247,19 @@ void QFETCSPCImporter::correlationDialogClosed() {
             paramsReadonly<<"FILETYPE"<<"CSV_COMMENT"<<"CSV_SEPARATOR"<<"CROSS_CORRELATION";
 
             rdr=insertFCCSCSVFile(filename, it->files.value(1,""), it->files.value(2,""), initParams, paramsReadonly,it->group, it->role);
+        } else if (type=="qf3asciicorr") {
+            initParams["FILETYPE"]="QF3ASCIICORR";
+            paramsReadonly<<"FILETYPE";
+            rdr=NULL;
+            rdrs=insertQF3ASCIICORRFile(filename, initParams, paramsReadonly, it->group);
         }
         if (rdr) {
             rdr->setDescription(rdr->getDescription()+QString("\n\n")+it->comment);
+        }
+        for (int i=0; i<rdrs.size(); i++) {
+            if (rdrs[i]) {
+                rdrs[i]->setDescription(rdrs[i]->getDescription()+QString("\n\n")+it->comment);
+            }
         }
         //insertVideoCorrelatorFile(filename, overview, filename.toLower().endsWith(".bin"));
         settings->setCurrentRawDataDir(QFileInfo(filename).dir().absolutePath());

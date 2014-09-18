@@ -227,10 +227,14 @@ void QFRDRFCSCorrelationEditor::createWidgets() {
 };
 
 void QFRDRFCSCorrelationEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
-    if (old) disconnect(old, 0, this, 0);
+    if (old) {
+        writeSettings();
+        disconnect(old, 0, this, 0);
+    }
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
     correlationMaskTools->setRDR(current);
     if (m) {
+        readSettings();
         cmbRunDisplay->setCurrentIndex(m->getProperty("FCS_RUN_DISPLAY", 0).toInt());
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         runs.setCurrent(current);

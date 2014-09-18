@@ -3303,7 +3303,7 @@ bool QFRDRFCSData::loadQF3ASCII(QString filename)
 
         if (correlationN>0 && correlation) {
             for (int i=0; i<correlationN; i++) {
-                correlationT[i]=reader.taus[i];
+                correlationT[i]=reader.taus.value(i,NAN);
             }
             for (int r=0; r<correlationRuns; r++) {
                 double* cr=getCorrelationRun(r);
@@ -3315,7 +3315,7 @@ bool QFRDRFCSData::loadQF3ASCII(QString filename)
 
         if (rateN>0 && rate) {
             for (int i=0; i<rateN; i++) {
-                rateT[i]=reader.times[i];
+                rateT[i]=reader.times.value(i,NAN);
             }
             for (int c=0; c<rateChannels; c++) {
                 for (int r=0; r<rateRuns; r++) {

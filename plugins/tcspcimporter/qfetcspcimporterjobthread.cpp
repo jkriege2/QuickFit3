@@ -162,6 +162,9 @@ struct QF3CorrFileData {
     QList<QPair<int, int> > store;
     int ACFs;
     int CCFs;
+    bool operator==(const QF3CorrFileData& b) const {
+        return (ACFs==b.ACFs) && (CCFs==b.CCFs) && (store==b.store);
+    }
 };
 
 bool QFETCSPCImporterJobThread_store_compare(const QPair<int, int> &s1, const QPair<int, int> &s2)
@@ -431,78 +434,134 @@ void QFETCSPCImporterJobThread::run() {
                                  }
                              }
 
-                             /*QFETCSPCImporterJobThread::ccfFileConfig fn;
-                             fn.filename=localFilename;
-                             fn.channel1=ccf.first;
-                             fn.channel2=ccf.second;
-                             fn.filenameCR=localFilenameCR;
-                             ccfFilenames.append(fn);
-                             if (ccf.first==ccf.second) {
-                                 if (localFilenameCR.isEmpty()) {
-                                     QFETCSPCImporterJobThreadAddFileProps fp(QStringList(localFilename), QString("fcs_csv"), job.props);
-                                     fp.comment=job.comment;
-                                     fp.group=job.filename;
-                                     fp.role=QString("ACF%1").arg(fn.channel1);
-                                     addFiles.append(fp);
-                                 } else {
-                                     QStringList sl;
-                                     sl<<localFilename<<localFilenameCR;
-                                     QFETCSPCImporterJobThreadAddFileProps fp(sl, QString("fcs_csv"), job.props);
-                                     fp.comment=job.comment;
-                                     fp.group=job.filename;
-                                     fp.role=QString("ACF%1").arg(fn.channel1);
-                                     addFiles.append(fp);
-                                 }
-                             } else {
-                                 QStringList sl;
-                                 sl<<localFilename<<localFilenameCR;
-                                 QFETCSPCImporterJobThreadAddFileProps fp(sl, QString("fcs_cross_csv"), job.props);
-                                 fp.comment=job.comment;
-                                 fp.group=job.filename;
-                                 fp.role=QString("FCCS(%1-%2)").arg(fn.channel1).arg(fn.channel2);
-                                 addFiles.append(fp);
-                             }*/
 
                         }
 
                         QList<int> clist=usedChannels.toList();
                         qSort(clist);
                         QList<QF3CorrFileData> storeFiles;
+                        QList<QPair<int, int> > usedPairs;
                         for (int i=0; i<clist.size(); i++) {
-                            QList<QPair<int, int> > storeCross;
-                            QList<QPair<int, int> > storeAuto;
+
+                            QList<QPair<int, int> > storeAutoA;
                             QPair<int, int> p_acf=qMakePair<int,int>(i,i);
                             if (job.fcs_correlate.contains(p_acf)) {
-                                storeAuto.append(p_acf);
+                                storeAutoA.append(p_acf);
                             }
                             for (int j=0; j<clist.size(); j++) {
+                                QList<QPair<int, int> > storeCross;
+                                QList<QPair<int, int> > storeAuto=storeAutoA;
                                 if (i!=j) {
+                                    if (job.fcs_correlate.contains(p_acf)) {
+                                        usedPairs.append(p_acf);
+                                    }
                                     QPair<int, int> p_ccf=qMakePair<int,int>(i,j);
                                     QPair<int, int> p_fcc=qMakePair<int,int>(j,i);
                                     QPair<int, int> p_jacf=qMakePair<int,int>(j,j);
                                     if (job.fcs_correlate.contains(p_ccf)) {
                                         storeCross.append(p_ccf);
+                                        usedPairs.append(p_ccf);
                                     }
                                     if (job.fcs_correlate.contains(p_fcc)) {
                                         storeCross.append(p_fcc);
+                                        usedPairs.append(p_fcc);
                                     }
                                     if (job.fcs_correlate.contains(p_jacf)) {
                                         storeAuto.append(p_jacf);
+                                        usedPairs.append(p_jacf);
+                                    }
+                                    QF3CorrFileData store;
+                                    store.store=storeAuto;
+                                    store.store.append(storeCross);
+                                    qSort(store.store.begin(), store.store.end(), QFETCSPCImporterJobThread_store_compare);
+                                    store.ACFs=storeAuto.size();
+                                    store.CCFs=storeCross.size();
+                                    if (!storeFiles.contains(store)) storeFiles.append(store);
+                                }
+                            }
+
+                        }
+                        for (QSet<QPair<int, int> >::iterator i = job.fcs_correlate.begin(); i != job.fcs_correlate.end(); ++i) {
+                            QPair<int, int> ccf=*i;
+                            if (!usedPairs.contains(ccf)) {
+                                QF3CorrFileData store;
+                                store.store.append(ccf);
+                                store.ACFs=0;
+                                store.CCFs=0;
+                                if (ccf.first==ccf.second) store.ACFs++;
+                                else store.CCFs;
+                                if (!storeFiles.contains(store)) storeFiles.append(store);
+                                usedPairs.append(ccf);
+                            }
+                        }
+                        for (int fid=0; fid<storeFiles.size(); fid++) {
+                            QF3CorrFileData& store=storeFiles[fid];
+                            QF3CorrelationDataFormatTool tool;
+                            tool.channels=store.ACFs;
+                            tool.correlationTypes=store.ACFs+store.CCFs;
+                            tool.runs=job.fcs_segments;
+                            tool.rateRuns=job.fcs_segments;
+                            tool.input_file=job.filename;
+                            tool.reserveCorrelations();
+                            tool.reserveRate();
+
+                            int critems=0;
+
+                            for (int acf=0; acf<store.ACFs; acf++) {
+                                int c=store.store[acf].first;
+                                tool.channel_names[acf]=QString("channel %1").arg(c);
+                                tool.preferred_channels[acf]=acf;
+                                tool.roles[acf]=QString("ACF%1").arg(c);
+                                for (int r=0; r<job.fcs_segments; r++) {
+                                    uint32_t id=xyAdressToUInt32(r, c);
+                                    if (r==0) critems=fcs_crs[id].size();
+                                    else critems=qMax(critems, fcs_crs[id].size());
+                                }
+                            }
+                            for (int ccf=store.ACFs; ccf<store.ACFs+store.CCFs; ccf++) {
+                                int c1=store.store[ccf].first;
+                                int c2=store.store[ccf].second;
+                                tool.preferred_channels[ccf]=0;
+                                if (c2<c1) tool.preferred_channels[ccf]=1;
+                                tool.roles[ccf]=QString("FCCS(%1,%2)").arg(c1).arg(c2);
+                            }
+
+
+                            for (int i=0; i<critems; i++) {
+                                tool.times.append(double(i)*job.fcs_crbinning);
+                                for (int acf=0; acf<store.ACFs; acf++) {
+                                    int c=store.store[acf].first;
+                                    for (int r=0; r<job.fcs_segments; r++) {
+                                        uint32_t id=xyAdressToUInt32(r, c);
+                                        tool.addCountrateEntry(fcs_crs[id].value(i, 0), r, acf);
                                     }
                                 }
                             }
-                            QF3CorrFileData store;
-                            store.store=storeAuto;
-                            store.store.append(storeCross);
-                            qSort(store.store, QFETCSPCImporterJobThread_store_compare);
-                            store.ACFs=storeAuto.size();
-                            store.CCFs=storeCross.size();
-                            if (!storeFiles.contains(store)) storeFiles.append(store);
-                        }
-                        for (int i=0; i<storeFiles.size(); i++) {
-                            const QList<QPair<int, int> >& store=storeFiles[i];
-                            QF3CorrelationDataFormatTool tool;
-                            tool.channels=
+
+                            for (int i=0; i<fcs_tau.size(); i++) {
+                                if (fcs_tau[i]<=range_duration/double(job.fcs_segments)) {
+                                    tool.taus.append(fcs_tau[i]);
+                                    for (int cf=0; cf<store.ACFs+store.CCFs; cf++) {
+                                        int c1=store.store[cf].first;
+                                        int c2=store.store[cf].second;
+                                        for (int r=0; r<job.fcs_segments; r++) {
+                                            uint64_t id=xyzAdressToUInt64(c1, c2, r);
+                                            tool.addCorrelationEntry(fcs_ccfs[id].value(i, 0), r, cf);
+                                        }
+                                    }
+                                }
+                            }
+                            //qDebug()<<tool.correlations.size()<<tool.correlations.value(0).size()<<tool.correlations.value(0).value(0).size();
+                            tool.properties.unite(job.props);
+
+
+                            QString localFilename=outputFilenameBase+QString("_fcsdata%1.qf3acorr").arg(fid);
+                            tool.saveFile(localFilename);
+                            QFETCSPCImporterJobThreadAddFileProps fp(QStringList(localFilename), "QF3ASCIICORR", job.props);
+                            fp.comment=job.comment;
+                            fp.group=QString("%1_fcsdata%2").arg(job.filename).arg(fid);
+                            fp.role="";
+                            addFiles.append(fp);
                         }
 
                     }
@@ -622,6 +681,7 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
     uint16_t fcs_segment=0;
     fcs_ccfs.clear();
     real_countrate_items=0;
+    bool done=false;
     do {
         QFTCSPCRecord record=reader->getCurrentRecord();
         const register double t=record.absoluteTime()-starttime;
@@ -718,7 +778,8 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
             emit messageChanged(tr("running data processing [t=%1s, runtime: %2s] ...").arg(t).arg(range_duration));
         }
 
-    } while (reader->nextRecord() && (m_status==1) && (!was_canceled));
+        done=(t>range_duration);
+    } while (reader->nextRecord() && (m_status==1) && (!was_canceled) && !done);
     if (job.doFCS) {
         if (fcs_countrate_counter>0) shiftIntoCorrelators(fcs_countrate, fcs_countrate_counter);
         while (fcs_segment<job.fcs_segments) {

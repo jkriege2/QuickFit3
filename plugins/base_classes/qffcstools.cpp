@@ -53,6 +53,7 @@ bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid
             error=crintf->getRateStdDev(index, c)*1000.0;
             value=crintf->getRateMean(index, c)*1000.0;
             //qDebug()<<"getRateMean(run="<<index<<", ch=0) = "<<value<<" +/- "<<error;
+            //qDebug()<<"count_rate,"<<r->getRole()<<": getRateMean(run="<<index<<", ch="<<c<<crintf->getRateChannelsSwapped()<<") = "<<value<<" +/- "<<error;
             return true;
         }
         QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
@@ -69,13 +70,13 @@ bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid
         //qDebug()<<paramid<<crintf;
         if (crintf && crintf->getRateChannels()>0) {
             int c=0;
-            if (crintf->getRateChannelsSwapped()) {
+            /*if (crintf->getRateChannelsSwapped()) {
                 if (c==0) c=1;
                 else if (c==1) c=0;
-            }
+            }*/
             error=crintf->getRateStdDev(index, c)*1000.0;
             value=crintf->getRateMean(index, c)*1000.0;
-            //qDebug()<<"getRateMean(run="<<index<<", ch=0) = "<<value<<" +/- "<<error;
+            //qDebug()<<"count_rate1: getRateMean(run="<<index<<", ch="<<c<<crintf->getRateChannelsSwapped()<<") = "<<value<<" +/- "<<error;
             return true;
         }
         QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);
@@ -91,13 +92,14 @@ bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid
         error=0;
         if (crintf && crintf->getRateChannels()>1) {
             int c=1;
-            if (crintf->getRateChannelsSwapped()) {
+            /*if (crintf->getRateChannelsSwapped()) {
                 if (c==0) c=1;
                 else if (c==1) c=0;
-            }
+            }*/
             error=crintf->getRateStdDev(index, c)*1000.0;
             value=crintf->getRateMean(index, c)*1000.0;
             //qDebug()<<"getRateMean(run="<<index<<", ch=1) = "<<value<<" +/- "<<error;
+            //qDebug()<<"count_rate2: getRateMean(run="<<index<<", ch="<<c<<crintf->getRateChannelsSwapped()<<") = "<<value<<" +/- "<<error;
             return true;
         }
         QFRDRSimpleCountRatesInterface* scrintf=qobject_cast<QFRDRSimpleCountRatesInterface*>(r);

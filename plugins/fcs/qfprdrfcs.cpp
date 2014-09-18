@@ -426,6 +426,7 @@ void QFPRDRFCS::insertQF3ASCIIFile(const QStringList &filename, const QMap<QStri
         }
     }
 }
+
 void QFPRDRFCS::insertFLEX_SINFile(const QStringList &filename, const QMap<QString, QVariant> &paramValues, const QStringList &paramReadonly)
 {
     unsigned int cc=1;

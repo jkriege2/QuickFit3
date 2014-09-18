@@ -64,10 +64,10 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         virtual QString getDescription() const  { return tr("manages Fluorescence Correlations Spectroscopy (FCS) and Dynamic Light Scattering (DLS) correlation curve data."); };
 
         /** \brief author the plugin */
-        virtual QString getAuthor() const  { return tr("Jan Krieger, Benedikt Häusele (ALV6000 import)"); };
+        virtual QString getAuthor() const  { return tr("Jan Krieger, Benedikt Haeusele (ALV6000 import)"); };
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2010-2014 by Jan Krieger, Benedikt Häusele (ALV6000 import)"); };
+        virtual QString getCopyright() const  { return tr("(c) 2010-2014 by Jan Krieger, portions: Benedikt Haeusele (ALV6000 import)"); };
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const  { return tr(""); };
