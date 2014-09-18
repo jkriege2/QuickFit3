@@ -310,6 +310,8 @@ void UserFitFunctionsEditor::on_btnUpdatePreview_clicked()
         QString fn=qfGetTempFilename("qf_ffeditor_temp_XXXXXX");
         storeCurrentFF(fn);
         QFFitFunctionParsed* ff=new QFFitFunctionParsed(fn);
+
+        QFile::remove(fn);
         QVector<double> params=model.getInitParams();
 
         double rmi=ui->spinPrevRangeMin->value();
