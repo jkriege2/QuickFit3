@@ -2,84 +2,200 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-	<title>Imaging FCS Plugin: Usage</title>
-	  <link rel="prev" href="imaging_fcs.html"> 
-	  <link rel="next" href="imfcs_ui.html"> 
-	  <link rel="contents" href="imaging_fcs.html">   
+    <title>Imaging FCS Plugin: Usage</title>
+      <link rel="prev" href="imaging_fcs.html"> 
+      <link rel="next" href="imfcs_ui.html"> 
+      <link rel="contents" href="imaging_fcs.html">   
   </head>
   <body>
-    $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-	<a name="#import"><h2>Importing Imaging FCS Data</h2>
-	<p>
-	<ol>
-	   <li>In order to import imaging FCS data into QuickFit $$version$$ click on <b>Data Items | Insert Raw Data | Insert Imaging FCS Dataset</b> in QuickFit's <a href="$$mainhelpdir$$qf3_mainscreen.html">mainwindow</a>. Then you should select an appropriate file to import (see section <a href="imfcs_dataformats.html#formats">Data Formats</a> for details on the importable files). Usually a <tt><i>BASENAME</i>.evalsettings.txt</tt> should exist, if you selected to import a file <tt><i>BASENAME</i>.autocorrelation.dat</tt>. If so the plugin will use it to extract some metadata about the imported correlation data (width/height of the imaging FCS region, settings of the correlator, ...). If this files is not present you will have to provide some data by hand (width/height of the imaging FCS data). If you imported cross-correlation data this function will create one raw data record for every cross correlation function in the file, as one imaging FCS raw data record may only represent one curve per pixel.</li>
-	   <li>This plugin also provides a <a href="#correlating">software correlator</a> that can read image series and then  calculate the autocorrelation from these.<li>
-	</ol></p>
-	<p></p>
-	<p></p>
-	<p></p>
-	<p></p>
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$   
 
-	
-	<a name="#correlating"><h2>Correlating imFCS data</h2>
-    <p>This plugin supplied a simple dialog that allows to set all options, for the evaluation described above. It allows to define several "jobs" and to evaluate these one-by one (also some in parallel on a multi-core machine), as usually the correlation may take several minutes (which allows you to go and drink a short coffee ;-) Note however that correlation usually creates a high load on hard disk access, so you do not always improve the processing speed with more cores, as the bottle-neck is the harddisk access speed.</p>
-    <p>First you will have to select a file containing the image series (<b>Image Series</b>):<ul>
-	  <li><img src=":/imaging_fcs/fileopen.png"> displays a dialog that allows to selecta file from the hard disk.</li>
-	  <li><img src=":/imaging_fcs/use_file.png"> will load an image series entered in the input field by hand.</li>
-	</ul></p>
-	<p>Subsequently the plugin will read the image series properties and meta-data. Then you can set all the properties (<b>Details:</b>) defining the actions to be taken:
-	<ul>
-	    <li>All the output files start with the same <tt>basename</tt> in the filenames (see above). This <tt>basename</tt> is created from three parts (let's assume that the input filename is <tt><i>[path_to]/[inputfilename].[ext]</i></tt>):
-			<blockquote><tt><i>[path_to]/</i><b>[prefix]</b><i>[inputfilename]</i><b>[postfix]</b><i>[ending]</i></tt></blockquote>
-			Here <tt><i>[inputfilename]</i></tt> is the filename without extension of the input file (i.e. <tt>inputfilename</tt>), <tt></i>[ending]</i></tt> is the ending specifying the output file (see above, e.g. <tt>.evalsetting.txt</tt>, <tt>.autocorrelation.dat</tt>, ...). If <tt><i>[prefix]</i></tt> contains directory separators (<tt>/</tt>) the output files will be created in subdirectories. in addition you may use some special strings in <tt><i>[prefix]</i></tt> and <tt><i>[postfix]</i></tt> (case-insensitive):
-			<ul>
-			  <li><tt>%COUNTER%</tt> will first simply be deleted. If a set of output files with the given name already exist, the counter is increased until no output files with the given name exist.</li>
-			  <li><tt>%S%</tt> S parameter of the correlator</li>
-			  <li><tt>%P%</tt> P parameter of the correlator</li>
-			  <li><tt>%M%</tt> m parameter of the correlator</li>
-			  <li><tt>%framerate%</tt> framerate in Herz</li>
-			  <li><tt>%frametime%</tt> frametime in microseconds</li>
-			  <li><tt>%first%</tt> first used frame</li>
-			  <li><tt>%last%</tt> last used frame</li>
-			  <li><tt>%backoffset%</tt> offset of background correction</li>
-			  <li><tt>%backcorrection%</tt> background correction mode</li>
-			  <li><tt>%backcorrectionid%</tt> background correction mode as number</li>
-			  <li><tt>%segments%</tt> segments the image series is cut into</li>
-			  <li><tt>%correlator%</tt> correlator type used</li>
-			  <li><tt>%correlatorid%</tt> correlator type used as number</li>
-			</ul>
-			As an example if <tt><i>[prefix]</i>="./results/"</tt> and <tt><i>[postfix]</i>="%COUNTER%"</tt>, the these output files will be created:
-			<blockquote><tt>[path_to]/results/[inputfilename].autocorrelation.dat<br>[path_to]/results/[inputfilename].crosscorrelation.dat<br>...
-			</tt></blockquote>
-			If you start a job for the same input file and the same postfox/prefix again, these files will be created:
-			<blockquote><tt>[path_to]/results/[inputfilename]<b>1</b>.autocorrelation.dat<br>[path_to]/results/[inputfilename]<b>1</b>.crosscorrelation.dat<br>...
-			</tt></blockquote>
-		</li>
-	    <li>If your microscope does not save metadata (e.g. pixel sizes) together with the raw data or they are not readable by QuickFit, then you can supply some of these data next to the checkbox "camera description", if it is activated. This can also be used to overwrite values possibly set in the experiment description. The setable values are:<ol>
-		  <li>pixel width/height in nanometers: These are the width/height of the pixels in the image plane, i.e. taking into account the magnification.</li>
-		</ol></li>
-	    <li>Sometimes one wants to exclude certain parts of the image series. This is possible by setting the <b>first</b> and <b>last frame</b>.</li>
-		<li>Sometimes model fitting is more reliable, if an estimate of the statistic error <i>&Delta;g(&tau;)</i> introduced when estimating the ACF/CCF is known. So this module allows to <b>cut the input image series into several segments</b> (taking into account the iven first and last frame) and to correlate each segment separately. Then the ACF/CCF may be calculated as the average and the error as the standard deviation over the ACF/CCF for the single segments.</li>
-		<li>It is especially important to set the correct <b>framerate</b> (in images/second) or <b>frame time</b> (=1/framerate in microseconds), as this is crucial for the correctlag time axis.</li> 
-		<li>If you want to immediately add the results to the current project, don't forget to check the corresponding box below the parameters.</li> 
-		<li>The rest of the settings were already described above.</li>
-	</ul></p>
-	<p>Finally a click on <b><img src=":/imaging_fcs/add_job.png"> add job</b> will add the job to the list of jobs to be processed (bottom of the window). </p>
-    <p>All the processing jobs (threads) are shown as a list in the bottom of the correlator dialog. The status of each job is displayed together with its progress and the overall progress. The current status of each job is shown as an icon:
-	<blockquote>
-	    <img src=":/imaging_fcs/thread_wait.png"> <b>waiting:</b> The job waits for an empty processing slot.<br>
-	    <img src=":/imaging_fcs/thread_run.png"> <b>running:</b> The job is currently processed.<br>
-	    <img src=":/imaging_fcs/thread_ok.png"> <b>done:</b> Processing of the job finished successfully.<br>
-	    <img src=":/imaging_fcs/thread_error.png"> <b>error: Processing of the job finished with an error. The error is displayed together with the job status.</b>
-	</blockquote>
-	</p>
-    <p>Click <b>Close</b> to close the window. If some jobs are still running, you may either wait until they are finished, or cancel them. All jobs that finished sucessfully and were marked to be added to the project will now be added. It is also possible to add a job later, by simply selecting the <tt>basename.autocorrelation.dat</tt> or <tt>basename.crosscorrelation.dat</tt> files as described <a href="imfcs_usage.html#import">here</a>.</p>
-	<p></p>
-	<p>Further details on the algorithms applied to the data can be found in section <a href="imfcs_correlation.html">Image Correlation</a></p>
+$$note:This page describes the basic functionalit of the plugin (loading imFCS data, startuing a correlation etc.). If this is not, what you were look for, these links might help:
+<ol>
+    <li><a href="imfcs_ui.html">Description of the User Interface of a imFCS raw data record editor.</a></li>
+    <li><a href="imfcs_correlator.html">Theoretic description of the implemented correlation algorithms</a></li>
+    <li><a href="tutorial_solution.html">Tutorial on the correlation of an imFCS measurement</a></li>
+</ol>$$
+ 
+<h2>Viewing imFCS data</h2>
+<p>The imFCS (or imFCCS) data is represented as imagingFCS raw data records (RDRs) in a QuickFit project. If FCCS data was acquired, each type of correlation function (e.g. ACF1, ACF2 and FCCS for two-color cross-correlation data) is represented as its own RDR. the role of the RDRs encodes the type of correlation curve. 
+<center><a name="imfcs_usage_pic000"><img src="./pic/imfcs_usage_pic000.png" border="1">
+</center></p>
 
-	
-	
-	</body>
+<p>By double-clicking on any such RDR, the <a href="imfcs_ui.html">imagingFCS RDR editor</a> opens up.
+<center><a name="imfcs_usage_pic001"><img src="./pic/imfcs_usage_pic001.png" border="1">
+</center>
+
+
+$$see:For details on this editor, see the help-page <a href="imfcs_ui.html">imagingFCS RDR editor</a>.$$
+</p>
+$$qf_commondoc_backtop$$
+
+
+<a name="#import"><h2>Importing Imaging FCS Data</h2>
+<p>In order to import imaging FCS data into QuickFit $$version$$ click on <b>Data Items | Insert Raw Data | load imFCS Dataset</b> in QuickFit's <a href="$$mainhelpdir$$qf3_mainscreen.html">mainwindow</a>. Then you should select an appropriate file to import (see section <a href="imfcs_dataformats.html#formats">Data Formats</a> for details on the importable files). Usually a <tt><i>BASENAME</i>.evalsettings.txt</tt> should exist, if you selected to import a file <tt><i>BASENAME</i>.autocorrelation.dat</tt>. If so the plugin will use it to extract some metadata about the imported correlation data (width/height of the imaging FCS region, settings of the correlator, ...). If this files is not present you will have to provide some data by hand (width/height of the imaging FCS data). If you imported cross-correlation data this function will create one raw data record for every cross correlation function in the file, as one imaging FCS raw data record may only represent one curve per pixel.
+<center><a name="imfcs_usage_pic002"><img src="./pic/imfcs_usage_pic002.png" border="1">
+</center>
+</p>
+<p>This plugin also provides a <a href="#correlating">software correlator</a> that can read image series and then  calculate the autocorrelation from these and a <a href="#simulation">Simulation Tool</a>.</p>
+
+$$qf_commondoc_backtop$$
+
+<a name="#correlating"><h2>Correlating imFCS data</h2>
+$$see:The help page on <a href="imfcs_correlator.html">theoretic description of the implemented correlation algorithms</a> for additional details. This page describes the user-interface!$$
+<h3>Starting the correlator</h3>
+<p>This plugin supplied a simple dialog that allows to set all options, for the evaluation described above. It allows to define several "jobs" and to evaluate these one-by one (also some in parallel on a multi-core machine), as usually the correlation may take several minutes (which allows you to go and drink a short coffee ;-) Note however that correlation usually creates a high load on hard disk access, so you do not always improve the processing speed with more cores, as the bottle-neck is the harddisk access speed.</p>
+<p>You start the correlator by clicking on <b>Data Items | Insert Raw Data | correlate images and insert</b>.<center><a name="imfcs_usage_pic002"><img src="./pic/imfcs_usage_pic002.png" border="1">
+</center> Then a dialog will pop up, as shown below:
+<center><a name="imfcs_usage_pic003"><img src="./pic/imfcs_usage_pic003.png" border="1">
+</center>
+</p> 
+</p>
+
+<h3>Opening an image file</h3>
+<p>First you will have to select a file containing the image series (<b>Image Series</b>):<ul>
+  <li><img src=":/imaging_fcs/fileopen.png"> displays a dialog that allows to selecta file from the hard disk.</li>
+  <li><img src=":/imaging_fcs/use_file.png"> will load an image series entered in the input field by hand.</li>
+  <li>The <b>"don't count"</b> alternatives are faster options. The assume that the newly selected image file has the same number of frames and other properties, as the current one. Therefore the software does not have to count the frames in the input file, which can be significantly faster, especially for TIFF files.</li>
+</ul></p>
+<p>Subsequently the plugin will read the image series properties and meta-data. Then you can set all the properties (details, <a href="#corroptions">see below</a>) defining the actions to be taken.</p>
+
+
+
+    
+<a name="corroptions"><h3>Correlator Options</h3>
+$$see:The help page on <a href="imfcs_correlator.html">theoretic description of the implemented correlation algorithms</a> for additional details. This page describes the user-interface!$$
+<h4>Output filename</h4>
+<p>All the output files start with the same <tt>basename</tt> in the filenames (see above). This <tt>basename</tt> is created from three parts (let's assume that the input filename is <tt><i>[path_to]/[inputfilename].[ext]</i></tt>):
+    <blockquote><tt><i>[path_to]/</i><b>[prefix]</b><i>[inputfilename]</i><b>[postfix]</b><i>[ending]</i></tt></blockquote>
+    Here <tt><i>[inputfilename]</i></tt> is the filename without extension of the input file (i.e. <tt>inputfilename</tt>), <tt></i>[ending]</i></tt> is the ending specifying the output file (see above, e.g. <tt>.evalsetting.txt</tt>, <tt>.autocorrelation.dat</tt>, ...). If <tt><i>[prefix]</i></tt> contains directory separators (<tt>/</tt>) the output files will be created in subdirectories. in addition you may use some special strings in <tt><i>[prefix]</i></tt> and <tt><i>[postfix]</i></tt> (case-insensitive):
+    <ul>
+      <li><tt>%COUNTER%</tt> will first simply be deleted. If a set of output files with the given name already exist, the counter is increased until no output files with the given name exist.</li>
+      <li><tt>%S%</tt> S parameter of the correlator</li>
+      <li><tt>%P%</tt> P parameter of the correlator</li>
+      <li><tt>%M%</tt> m parameter of the correlator</li>
+      <li><tt>%framerate%</tt> framerate in Herz</li>
+      <li><tt>%frametime%</tt> frametime in microseconds</li>
+      <li><tt>%first%</tt> first used frame</li>
+      <li><tt>%last%</tt> last used frame</li>
+      <li><tt>%backoffset%</tt> offset of background correction</li>
+      <li><tt>%backcorrection%</tt> background correction mode</li>
+      <li><tt>%backcorrectionid%</tt> background correction mode as number</li>
+      <li><tt>%segments%</tt> segments the image series is cut into</li>
+      <li><tt>%correlator%</tt> correlator type used</li>
+      <li><tt>%correlatorid%</tt> correlator type used as number</li>
+    </ul>
+    As an example if <tt><i>[prefix]</i>="./results/"</tt> and <tt><i>[postfix]</i>="%COUNTER%"</tt>, the these output files will be created:
+    <blockquote><tt>[path_to]/results/[inputfilename].autocorrelation.dat<br>[path_to]/results/[inputfilename].crosscorrelation.dat<br>...
+    </tt></blockquote>
+    If you start a job for the same input file and the same postfox/prefix again, these files will be created:
+    <blockquote><tt>[path_to]/results/[inputfilename]<b>1</b>.autocorrelation.dat<br>[path_to]/results/[inputfilename]<b>1</b>.crosscorrelation.dat<br>...
+    </tt></blockquote>
+</p>
+
+
+
+<h4>Microscope/Camera properties</h4>
+<p>If your microscope does not save metadata (e.g.<b> pixel size</b>s) together with the raw data or they are not readable by QuickFit, then you can supply some of these data next to the checkbox "<b>camera description</b>", if it is activated. This can also be used to overwrite values possibly set in the experiment description. The setable values are:<ol>
+    <li>pixel width/height in nanometers: These are the width/height of the pixels in the image plane, i.e. taking into account the magnification.</li>
+  </ol></p>
+<p>It is especially important to set the correct <b>framerate</b> (in images/second) or <b>frame time</b> (=1/framerate in microseconds), as this is crucial for the correctlag time axis.</li> 
+</p>
+
+
+
+<h4>Cropping of the Image Series in Space &amp; Time</h4>
+<p>Sometimes one wants to exclude certain parts of the image series. This is possible by setting the <b>first</b> and <b>last frame</b> under <b>frame range</b>. If the check-boxes for each of the range ends are checked, the correlation starts at the first frame in the file/ends with the last frame in the file. If you deactivate the check-boxes, you can set the range freely (within the number of frames in the file).</p>
+<p>With the <b>cropping</b>-widgets, you can crop the input image to a given x- and y-range. The button "select cropping" allows to select one of several predefined seetings:
+<center><a name="imfcs_usage_pic004"><img src="./pic/imfcs_usage_pic004.png" border="1">
+</center>
+When using predefined cropping, you will be asked for the size <i>N</i> of the region (in pixels). The available options for predefined cropping are:
+<ol>
+    <li><b>crop center</b> crops only the central <i>N*N</i> pixels</li>
+    <li><b>crop left center</b> crops <i>N*N</i> pixels in the center of the left half image (useful for DualView images, to select the central pixels in the left color channel)</li>
+    <li><b>crop right center</b> crops <i>N*N</i> pixels in the center of the right half image (useful for DualView images, to select the central pixels in the right color channel)</li>
+    <li><b>crop top center</b> crops <i>N*N</i> pixels in the center of the top half image (useful for DualView images, to select the central pixels in the top color channel)</li>
+    <li><b>crop bottom center</b> crops <i>N*N</i> pixels in the center of the bottom half image (useful for DualView images, to select the central pixels in the bottom color channel)</li>
+</ol>
+<center><a name="imfcs_usage_pic005"><img src="./pic/imfcs_usage_pic005.png" border="1">
+</center>
+</p>
+
+
+
+<h4>Background Correction</h4>
+$$see:<a href="imfcs_background.html">This help-page</a> for theoretic/mathematical details on the implemented background-correction$$
+  <li>Sometimes model fitting is more reliable, if an estimate of the statistic error <i>&Delta;g(&tau;)</i> introduced when estimating the ACF/CCF is known. So this module allows to <b>cut the input image series into several segments</b> (taking into account the iven first and last frame) and to correlate each segment separately. Then the ACF/CCF may be calculated as the average and the error as the standard deviation over the ACF/CCF for the single segments.</li>
+  <li></li> 
+  <li>The rest of the settings were already described above.</li>
+</ul></p>
+    
+
+
+<h4>Bleach Correction</h4>
+<p>
+        
+</p>
+
+
+
+<h4>DualView-mode and FCCS-settings</h4>
+<p>
+        
+</p>
+
+
+
+<h4>Correlator Settings</h4>
+<p>
+        
+</p>
+
+
+    
+<h4>Number &amp; Brightness</h4>    
+<p>
+        
+</p>
+
+
+
+<h4>Statistics &amp; Video</h4>    
+<p>
+        
+</p>
+
+    
+    
+       
+<h3>Starting the Correlation</h3>    
+$$note:If you want to immediately add the results to the current project, don't forget to check the corresponding box below the parameters.$$
+<p>Finally a click on <b><img src=":/imaging_fcs/add_job.png"> add job</b> will add the job to the list of jobs to be processed (bottom of the window). </p>
+<p>All the processing jobs (threads) are shown as a list in the bottom of the correlator dialog. The status of each job is displayed together with its progress and the overall progress. The current status of each job is shown as an icon:
+<blockquote>
+    <img src=":/imaging_fcs/thread_wait.png"> <b>waiting:</b> The job waits for an empty processing slot.<br>
+    <img src=":/imaging_fcs/thread_run.png"> <b>running:</b> The job is currently processed.<br>
+    <img src=":/imaging_fcs/thread_ok.png"> <b>done:</b> Processing of the job finished successfully.<br>
+    <img src=":/imaging_fcs/thread_error.png"> <b>error: Processing of the job finished with an error. The error is displayed together with the job status.</b>
+</blockquote>
+</p>
+<p>Click <b>Close</b> to close the window. If some jobs are still running, you may either wait until they are finished, or cancel them. All jobs that finished sucessfully and were marked to be added to the project will now be added. It is also possible to add a job later, by simply selecting the <tt>basename.autocorrelation.dat</tt> or <tt>basename.crosscorrelation.dat</tt> files as described <a href="imfcs_usage.html#import">here</a>.</p>
+<p></p>
+$$see:Further details on the algorithms applied to the data can be found in section <a href="imfcs_correlation.html">Image Correlation</a>.$$
+
+$$qf_commondoc_backtop$$    
+    
+<a name="#simulation"><h2>Simulation Tool</h2>
+<p>This plugin also provides a simulation tool, which can generate TIFF image stacks by simulating the random walk of fluorescent particles. The generated image stacks have to be correlated, as described above. The simulator can generate single-color image series and also simulate a DualView optics for imFCCS.</p>
+<p>You can start the simulator from Quickfit's main window, by clicking  <b>Data Items | Insert Raw Data | simulate images for correlation</b>
+<center><a name="imfcs_usage_pic002"><img src="./pic/imfcs_usage_pic002.png" border="1">
+</center>
+The simulation dialog looks like this:
+<center><a name="imfcs_usage_pic006"><img src="./pic/imfcs_usage_pic006.png" border="1">
+</center>
+</p>
+$$see:The <a href="simulation.html">help-page on the imFCS simulator</a> for further details on the simulation procedure.$$
+</body>
 </html>
 
 

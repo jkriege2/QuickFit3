@@ -105,7 +105,7 @@ class QFEHelpEditorWidget : public QWidget {
         //void on__clicked();
 
         /** \brief replaces the currently selected text by newText, hwere %1 is replaced by the selected text*/
-        void insertAroundOld(const QString& newText);
+        void insertAroundOld(const QString& newText, bool ensureNewLine=false);
 
 
 

@@ -858,38 +858,38 @@ void QFEHelpEditorWidget::on_btnLink_clicked()
 
 void QFEHelpEditorWidget::on_btnBlockquote_clicked()
 {
-    insertAroundOld("\n<blockquote>\n    %1\n</blockquote>\n");
+    insertAroundOld("\n<blockquote>\n    %1°\n</blockquote>\n");
 }
 
 void QFEHelpEditorWidget::on_btnNumberedList_clicked()
 {
-    insertAroundOld("\n<ol>\n    <li>%1</li>\n</ol>");
+    insertAroundOld("\n<ol>\n    <li>%1°</li>\n</ol>");
 
 }
 
 void QFEHelpEditorWidget::on_btnBulletList_clicked()
 {
-    insertAroundOld("\n<ul>\n    <li>%1</li>\n</ul>");
+    insertAroundOld("\n<ul>\n    <li>%1°</li>\n</ul>");
 }
 
 void QFEHelpEditorWidget::on_btnInsertH1_clicked()
 {
-    insertAroundOld("\n\n<h1>%1°</h1>\n<p></p>\n");
+    insertAroundOld("\n\n<h1>%1°</h1>\n<p></p>\n", true);
 }
 
 void QFEHelpEditorWidget::on_btnInsertH2_clicked()
 {
-    insertAroundOld("\n\n<h2>%1°</h2>\n<p></p>\n");
+    insertAroundOld("\n\n<h2>%1°</h2>\n<p></p>\n", true);
 }
 
 void QFEHelpEditorWidget::on_btnInsertH3_clicked()
 {
-    insertAroundOld("\n\n<h3>%1°</h3>\n<p></p>\n");
+    insertAroundOld("\n\n<h3>%1°</h3>\n<p></p>\n", true);
 }
 
 void QFEHelpEditorWidget::on_btnInsertH4_clicked()
 {
-    insertAroundOld("\n\n<h4>%1°</h4>\n<p></p>\n");
+    insertAroundOld("\n\n<h4>%1°</h4>\n<p></p>\n", true);
 }
 
 void QFEHelpEditorWidget::on_btnInsertParagraph_clicked()
@@ -1139,7 +1139,7 @@ void QFEHelpEditorWidget::toChars()
     replaceSelection(deescapeHTML(txt));
 }
 
-void QFEHelpEditorWidget::insertAroundOld(const QString &newText)
+void QFEHelpEditorWidget::insertAroundOld(const QString &newText, bool ensureNewLine)
 {
     QString txt=ui->edtScript->getEditor()->getSelection()+newText;
     if (newText.contains("%1")) txt=newText.arg(ui->edtScript->getEditor()->getSelection());
@@ -1147,11 +1147,36 @@ void QFEHelpEditorWidget::insertAroundOld(const QString &newText)
         QTextCursor cur=ui->edtScript->getEditor()->textCursor();
         cur.select(QTextCursor::LineUnderCursor);
         QString line=cur.selectedText();
-        int wsc=0, i=0;
+        cur.movePosition(QTextCursor::Up);
+        cur.select(QTextCursor::LineUnderCursor);
+        QString lastline=cur.selectedText();
+
+        int column=ui->edtScript->getEditor()->textCursor().columnNumber();
+
+        int wscll=0, i=0; // starting whitespaces in previous line
+        while (i<lastline.size() && (lastline[i]==' ' || lastline[i]=='\t')) {
+            if (lastline[i]==' ') wscll++;
+            if (lastline[i]=='\t') wscll+=4;
+            i++;
+        }
+
+        bool lineEmpty=true;
+        int wsc=0; // starting whitespaces in current line
+        i=0;
         while (i<line.size() && (line[i]==' ' || line[i]=='\t')) {
             if (line[i]==' ') wsc++;
             if (line[i]=='\t') wsc+=4;
-            i++;
+            i++;            
+        }
+        lineEmpty=(i>=line.size());
+        if (lineEmpty && !ensureNewLine) {
+            wsc=wscll;
+            while (txt.size()>0 && txt[0].isSpace()) {
+                txt=txt.remove(0,1);
+            }
+            if (column<wscll) {
+                txt=QString(wscll-column, ' ')+txt;
+            }
         }
         txt=txt.replace('\n', "\n"+QString(wsc, QChar(' ')));
 

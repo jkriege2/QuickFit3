@@ -3,23 +3,34 @@
   <head>
       <meta http-equiv="content-type" content="text/html; charset=windows-1250">
       <title>Imaging FCS Simulation</title>
-	  <link rel="prev" href="imaging_dataformats.html"> 
-	  <link rel="next" href="tutorial_solution.html"> 
-	  <link rel="contents" href="imaging_fcs.html">   
+      <link rel="prev" href="imaging_dataformats.html"> 
+      <link rel="next" href="tutorial_solution.html"> 
+      <link rel="contents" href="imaging_fcs.html">   
   </head>
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 
-    <h2>Introduction</h2>	
+    <h2>Introduction</h2>    
     <p>The simulation function allows to create an image stack that can subsequently be correlated using the 
     <a href="imfcs_correlation.html">imFCS correlator</a>. The image stack is e.g. created from a configurable random walk and 
     stored as TIFF sequence to harddisk. All necessary meta-information (frametime, pixel-size, ...) is stored together with the TIFF file in a configuration 
     file format that the imFCS correlator understands.</p>
    
-   
+<h2>Starting the sSmulator</h2>
+<p>You can start the simulator from Quickfit's main window, by clicking  <b>Data Items | Insert Raw Data | simulate images for correlation</b>
+<center><a name="imfcs_usage_pic002"><img src="./pic/imfcs_usage_pic002.png" border="1">
+</center>
+The simulation dialog looks like this:
+<center><a name="imfcs_usage_pic006"><img src="./pic/imfcs_usage_pic006.png" border="1">
+</center>
+</p>
+<p>After entering all simulation properties (see below), you have to click on <b>Run Simulation</b> to start the process. This will generate the TIFF-file, specified as <b>output filename</b>, along with some text-files, describing the simulation and image properties. When the simulation is finished, the simulation dialog will be closed and the TIFF-file will be loaded into the <a href="imfcs_ui.html">imFCS correlator</a> dialog.
+</p>
+
+
 
 <h2>Simulation Properties</h2>
-
+<h3>2D Random Walk</h3>
 <ul>
     <li>The simulation performs a 2D random walk with periodic boundary conditions for each walker</li>
     <li>There are up to three sets of walkers: green ones (always there), red ones and red+green ones (the last two only in the dual view mode). 
