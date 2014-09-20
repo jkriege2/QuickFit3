@@ -61,6 +61,7 @@ void QFHTMLHighlighter::highlightBlock(const QString &text)
                     } else {
                         state = InTag;
                     }
+                    start=pos;
                     break;
                 } else if (ch == '&') {
                     setFormat(start, pos - start,

@@ -292,7 +292,7 @@ void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian(double* evalout, 
 QFFitAlgorithm::QFFitAlgorithm()
 {
     m_bootstrapFraction=0.6;
-    m_bootstrapDistortion=0.02;
+    m_bootstrapDistortion=0.075;
     m_reporter=NULL;
     m_bootstrapRepeats=20;
     m_errorEstimateModeFit=fpeAlgorithm;
@@ -476,11 +476,18 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double *paramsOut, double *paramEr
             //qDebug()<<"BS>>   step "<<i<<" ok="<<ok<<"     p="<<arrayToString(bsParams, fm.get_paramcount());
         }
 
-        for (int j=0; j<fm.get_paramcount(); j++) {
-            tparamErrorsOut[j]=sqrt((bsParamSqrSum[j]-bsParamSum[j]*bsParamSum[j]/N)/(N-1.0));
+        if (N>1) {
+            for (int j=0; j<fm.get_paramcount(); j++) {
+                tparamErrorsOut[j]=sqrt((bsParamSqrSum[j]-bsParamSum[j]*bsParamSum[j]/N)/(N-1.0));
+            }
+        } else {
+            for (int j=0; j<fm.get_paramcount(); j++) {
+                tparamErrorsOut[j]=0;
+            }
         }
         result.addString("errorEstimateMode", "bootstrapping");
         result.addInteger("bootstrapRepeats", m_bootstrapRepeats);
+        result.addInteger("bootstrapSuccessfulRepeats", N);
         result.addNumber("bootstrapFraction", m_bootstrapFraction);
         result.addNumber("bootstrapDistortion", m_bootstrapDistortion);
         result.addNumberList("bootstrapInitialparams", bsInitParams, fm.get_paramcount());
@@ -616,11 +623,18 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::optimize(double* paramsOut, double* pa
             //qDebug()<<"BS>>   step "<<i<<" ok="<<ok<<"     p="<<arrayToString(bsParams, fm->get_paramcount());
         }
 
-        for (int j=0; j<fm->get_paramcount(); j++) {
-            tparamErrorsOut[j]=sqrt((bsParamSqrSum[j]-bsParamSum[j]*bsParamSum[j]/N)/(N-1.0));
+        if (N>1) {
+            for (int j=0; j<fm->get_paramcount(); j++) {
+                tparamErrorsOut[j]=sqrt((bsParamSqrSum[j]-bsParamSum[j]*bsParamSum[j]/N)/(N-1.0));
+            }
+        } else {
+            for (int j=0; j<fm->get_paramcount(); j++) {
+                tparamErrorsOut[j]=0;
+            }
         }
         result.addString("errorEstimateMode", "bootstrapping");
         result.addInteger("bootstrapRepeats", m_bootstrapRepeats);
+        result.addInteger("bootstrapSuccessfulRepeats", N);
         result.addNumber("bootstrapFraction", m_bootstrapFraction);
         result.addNumber("bootstrapDistortion", m_bootstrapDistortion);
         result.addNumberList("bootstrapInitialparams", bsInitParams, fm->get_paramcount());
@@ -815,7 +829,7 @@ void QFFitAlgorithm::FitFunctionFunctor::setDataPoints(uint64_t data)
 
 void QFFitAlgorithm::FitFunctionFunctor::prepareBootstrapSelection()
 {
-    uint64_t mBS=qRound64(double(i_M)*m_bootstrapFraction);
+    int64_t mBS=qRound64(double(i_M)*m_bootstrapFraction);
     if (mBS<(uint64_t)get_paramcount()+1) mBS=get_paramcount()+1;
 
     if (m_bootstrapEnabled) {

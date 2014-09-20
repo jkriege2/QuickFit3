@@ -2,127 +2,158 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-	<title>Imaging FCS Plugin: User Interface</title>
-	  <link rel="prev" href="imaging_usage.html"> 
-	  <link rel="next" href="imfcs_correlation.html"> 
-	  <link rel="contents" href="imaging_fcs.html">   
+    <title>Imaging FCS Plugin: User Interface (UI)</title>
+      <link rel="prev" href="imaging_usage.html"> 
+      <link rel="next" href="imfcs_correlation.html"> 
+      <link rel="contents" href="imaging_fcs.html">   
   </head>
   <body>
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-	<h2>User Interface (UI)</h2>
-	<a name="#rdreditor"><h3>Imaging FCS Data Editor</h3>
-	<h3>Correlation Curves</h3>
-	<p>In this editor you may look at the correlation curves (ACF/CCF) for each pixel. You can either select a pixel from the given list of pixel coordinates or from the image below this list. In addition to the selected pixels, also an average (and standard deviation) over all pixels that were not excluded (button below image) may be displayed. By excluding the ACF/CCF from a pixel you remove it from the average. This feature may be used if the sample is uniform and you want to fit to an averaged ACF/CCF. The plots have several <a href="$$mainhelpdir$$jkqtplotter.html">means to interact with the user</a>.</p>
-	<p></p>
-	<h3>Parameter Image</h3>	
-	<p>This editor is used to display the result of fits as an image. It collects the fit results from a given set for each pixel. these fit results are displayed as a color-coded image (top left). In addition a second parameter may be selected that serves as measure for the goodnes of fit (top center plot). In the top right plot the overview image of the measurement is displayed. By clicking on one of the images, you may select the corresponding ACF/CCF to be displayed below. If you keep Ctrl pressed, while clicking, multiple pixels may be selected. The currently selected pixels may optionally be shown as overlays in the three top-row plots. In addition to the ACFs/CCFs, also the fits is displayed. The fitparameters are shown in the table on the right of the correlation function plot. </p>
-	<p>On the right-hand side you may select different options that change the appearance of the plots (color scales, ranges, ...).</p>
-	<p>The parameters to display are selected above the plots. First you will have to select a fit parameter set. If you use the FCS Fit plugin for fitting, a new set will be created for every differing combination of evaluation item (if you have two, you can distinguish these), fit algorithm and fit function. Then as a second step you may selectthe parameters to display. The parameters can be transformed with some basic mathematical transformations (none reciprocal 1/x, square root, logarithm) before they are displayed. The display settings (transformation, color coding, ...) are stored for every fit parameter and result set separately in the project, so you can switch to and back between different parameters, without loosing the settings.</p>
-	<p>The plots have several <a href="$$mainhelpdir$$jkqtplotter.html">means to interact with the user</a>.</p>
-	<p>There are several options to mask and select pixels: On the one hand you may "draw" a selection or mask onto any image, on the other hand, several automatic tools are grouped in the Mask and Selection menus. In addition the current selection may be saved under a given name in the RDR, using the "stored selections" controls on the rhs column. A click on <img src=":/imaging_fcs/storeselection.png"> will ask for a new name for the selection and save it. Afterwards the selection can be restored, by selecting it from the combobox next to this button. The current selection may be deleted from the list of stored selections by clicking <img src=":/imaging_fcs/deleteselection.png">.</p>
-	<p>Often the background intensity (considered by a fit) should be set from a region in the image. This is possible by selection the region to average over and then using <tt>"Select|Set backgrund from selection"</tt>. The backhround intensity will be saved as a RDR property <tt>BACKRGOUND...</tt> as AVERAGE_INTENSITY/MIN_LAGTIME. A second option <tt>"Mask|Set backgrund from masked"</tt> averages over all masked pixels for the background</p>
-	<p>Further display options:
-	<ul>
-	  <li><b>Correlation plot styles/Selection Display mode:</b> here you can select what the correlation display should contain if several pixels are selected: Either the curves of all selected pixels are shown (which is possibly slow if you selected many pixels, or an average over these correlation curves is displayed. In that case the parameters table also contains the statistics of all selected fit results. Note that in DualView mode (see above) one average/statistics for every image channel will be displayed!</li>
 
-	  <li><b><font color="red">deprecated:</font></b><br><small><b>general options/DualView mode:</b> If your microscope is equipped with DualView (or OptoSplit) optics, the displayed image will be split in the center into two parts (left/right, top/bottom) which correspond to two detection channels. This option allows to use this information. If the DualView mode is set properly, the e.g. when selecting pixels, they will be selected in both channels. Also the correlation curve display below will display two averaged curves if several pixels are detected to allow for a comparison of the two image channels.</small></li>
-	</ul>
-	</p>
-	
-	
-	<h4>Histograms</h4>
-	<p>This editor also calculates histograms of all currently displayed parameter values. You find them in the Histograms tab (behind the parameter image tab). </p>
-	<p>Like the parameter image plot itself, the histograms are calculated over the transformed parameters. In addition a boxplot shows the statistical parameters of the histogram.
-	<!--<blockquote><img src="boxplot.png"></blockquote>-->
-	On the rhs of the histogram plot, you can select some properties of the displayed histogram. If you checked the box <b>mind exvluded runs</b>, the pixels that were excluded (see above) are not used to calculate the histograms. The plots have several <a href="$$mainhelpdir$$jkqtplotter.html">means to interact with the user</a>.
-	</p>
-	<p>If you selected more than one pixel in the parameter image, a second histogram shows the statistics of the selected pixels only.</p>
+  
+  
+  
+    <h2>Parameter Image</h2>   
+     <center><a name="imfcs_ui_pic004"><img src="./pic/imfcs_ui_pic004.png" border="1">
+    </center>    
+    <p>This editor is used to display the result of fits as an image. It collects the fit results from a given set for each pixel. these fit results are displayed as a color-coded image (top left). In addition a second parameter may be selected that serves as measure for the goodnes of fit (top center plot). In the top right plot the overview image of the measurement is displayed. By clicking on one of the images, you may select the corresponding ACF/CCF to be displayed below. If you keep Ctrl pressed, while clicking, multiple pixels may be selected. The currently selected pixels may optionally be shown as overlays in the three top-row plots. In addition to the ACFs/CCFs, also the fits is displayed. The fitparameters are shown in the table on the right of the correlation function plot. </p>
+    <p>On the right-hand side you may select different options that change the appearance of the plots (color scales, ranges, ...).</p>
+    <p>The parameters to display are selected above the plots. First you will have to select a fit parameter set. If you use the FCS Fit plugin for fitting, a new set will be created for every differing combination of evaluation item (if you have two, you can distinguish these), fit algorithm and fit function. Then as a second step you may selectthe parameters to display. The parameters can be transformed with some basic mathematical transformations (none reciprocal 1/x, square root, logarithm) before they are displayed. The display settings (transformation, color coding, ...) are stored for every fit parameter and result set separately in the project, so you can switch to and back between different parameters, without loosing the settings.</p>
+    <p>The plots have several <a href="$$mainhelpdir$$jkqtplotter.html">means to interact with the user</a>.</p>
+    <p>There are several options to mask and select pixels: On the one hand you may "draw" a selection or mask onto any image, on the other hand, several automatic tools are grouped in the Mask and Selection menus. In addition the current selection may be saved under a given name in the RDR, using the "stored selections" controls on the rhs column. A click on <img src=":/imaging_fcs/storeselection.png"> will ask for a new name for the selection and save it. Afterwards the selection can be restored, by selecting it from the combobox next to this button. The current selection may be deleted from the list of stored selections by clicking <img src=":/imaging_fcs/deleteselection.png">.</p>
+    <p>Often the background intensity (considered by a fit) should be set from a region in the image. This is possible by selection the region to average over and then using <tt>"Select|Set backgrund from selection"</tt>. The backhround intensity will be saved as a RDR property <tt>BACKRGOUND...</tt> as AVERAGE_INTENSITY/MIN_LAGTIME. A second option <tt>"Mask|Set backgrund from masked"</tt> averages over all masked pixels for the background</p>
+    <p>Further display options:
+    <ul>
+      <li><b>Correlation plot styles/Selection Display mode:</b> here you can select what the correlation display should contain if several pixels are selected: Either the curves of all selected pixels are shown (which is possibly slow if you selected many pixels, or an average over these correlation curves is displayed. In that case the parameters table also contains the statistics of all selected fit results. Note that in DualView mode (see above) one average/statistics for every image channel will be displayed!</li>
 
-          <h4>Correlation Plots</h4>
-          <p></p>
+      <li><b><font color="red">deprecated:</font></b><br><small><b>general options/DualView mode:</b> If your microscope is equipped with DualView (or OptoSplit) optics, the displayed image will be split in the center into two parts (left/right, top/bottom) which correspond to two detection channels. This option allows to use this information. If the DualView mode is set properly, the e.g. when selecting pixels, they will be selected in both channels. Also the correlation curve display below will display two averaged curves if several pixels are detected to allow for a comparison of the two image channels.</small></li>
+    </ul>
+    </p>
+    
+    
+    <h3>Histograms</h3>
+    <center><a name="imfcs_ui_pic005"><img src="./pic/imfcs_ui_pic005.png" border="1">
+    </center>
+    $$see:See <a href="$$mainhelpdir$$/qfhistogram.html">this help page</a> for details on the histogram widget and the provided options.$$
+    <p>This editor also calculates histograms of all currently displayed parameter values. You find them in the Histograms tab (behind the parameter image tab). </p>
+    <p>Like the parameter image plot itself, the histograms are calculated over the transformed parameters. In addition a boxplot shows the statistical parameters of the histogram.
+    On the rhs of the histogram plot, you can select some properties of the displayed histogram. If you checked the box <b>mind exvluded runs</b>, the pixels that were excluded (see above) are not used to calculate the histograms. The plots have several <a href="$$mainhelpdir$$jkqtplotter.html">means to interact with the user</a>.
+    </p>
 
-	
-	
-	<h4>Saving Data and Reports</h4>
-	<p>You can save the parameter and goodnes-of-fit images as data files for further processing, or as a report:
-		<ul>
-		  <li><b><img src=":/imaging_fcs/preview_savedata.png"> Data | Save data:</b> Saves the parameter image and goodnes of fit image as a separate file. The selected parameter transformations are omitted. You can select different file formats:
-		    <ol>
-			  <li><i>Comma-Separated value:</i> saves the data as text file which contains a matrix of numbers, separated by commas (,) and with a dot (.) as decimal separator.</li>
-			  <li><i>Semicolon-Separated value [German Excel]:</i> saves the data as text file which contains a matrix of numbers, separated by semicolons (;) and with a comma (,) as decimal separator.</li>
-			  <li><i>SYLK:</i> saves the data as a SYLK file which can be imported by many spread sheet programs</li>
-			  <li><i>float-TIFF:</i> saves the data as a TIFF image with 32-bit floating point values in each pixel.</li>
-			  <li><i>16-bit-TIFF:</i> saves the data as a TIFF image with 16-bit unsigned integer values in each pixel.</li>
-			  <li><i>color-coded PNG image:</i> saves the data as PNG image with the color coding used in the dialog (note: this uses the same transformation as the dialog).</li>
-			</ol>
-			The two images are saved into separae files. They end with the suffix <tt>.param.ext</tt> for the parameter image or <tt>.gof.ext</tt> for the goodnes of fit image.
-		  </li>
-		  <li><b><img src=":/imaging_fcs/copydatatomatlab.png"> Data | Copy Images to Matlab:</b> copies the currently displayed images to the clipboard as a Matlab script. When the script is executed it defines four variables, one for each type of data (parameter image, goodnes of fit image, mask image, overview image).</li>
-		  <li><b><img src=":/imaging_fcs/copydata.png"> Data | Copy Images as Columns:</b> copies the currently displayed images to the clipboard in a format so they can be imported into spreadsheet programs. This function serializes the data, i.e. each image is copies as one column. Before the data is actually copied, you will be rpesented with a dialog that allows to select the columns that should be exported. It is also possible to add the pixel ID (integer number starting at <tt>(0,0) -> 0</tt> and numbering all pixels in row-major order) and pixel coordinates.</li>
-		  <li><b>Data | Insert Correlation Curves as new RDR into Project:</b> This function takes the currently selected pixels and copies the according ACFs into a new <a href="$$mainhelpdir$$/../plugins/help/qfrdrfcs/fcs.html">fcs raw data record</a>. This new RDR is then inserted into the project. Then you can perform additional FCS evaluations on these. Note that all information about the position of the pixels gets lost! Each pixel's ACF is inserted as a run into the fcs record.</li>
-		  <li><b>imFCS Tools | copy all CFs from group to table:</b> This function will average the correlation functions in the current selection and copy it into a new table raw data record. Then it does the same for all files in the same rdr group as the current file. Finally the table will contain all averaged ACFs for the given selection from all files in the group and a plot contaiing all those. You can use this function to create FCCS overview plots like this one: <center>
-	<a name="imfcs_ui_pic000"><img src="./pic/imfcs_ui_pic000.png" border="1"><br/>
+    <p>If you selected more than one pixel in the parameter image, a second histogram shows the statistics of the selected pixels only.</p>
+
+    <h3>Correlation Plots</h3>
+    <center><a name="imfcs_ui_pic006"><img src="./pic/imfcs_ui_pic006.png" border="1">
+    </center>    
+    $$see:See <a href="$$mainhelpdir$$/qfparametercorrelation.html">this help page</a> for details on the correlation plot widget and the provided options.$$
+    <p>This editor also calculates correlation plot between the two currently displayed fit parameters. You find them in the Correlation plot tab (behind the histogram tab).</p>
+    <center><a name="imfcs_ui_pic007"><img src="./pic/imfcs_ui_pic007.png" border="1">
+    </center>    
+    <p>At the top of the tab, you can select, which parameters should be correlated (<b>correlation plot mode</b>). The default is "parameter 1 vs. parameter 2", but it is also possible to plot one of the parameters vs. the pixel intensity, or pixel-coordinates. If you plot versusthe image intensity, the spin-box <b>channel</b> allows to select the color-channel, from which to take the intensity.</p>
+    <p>In addition, if a scatter plot exists, each datapoint can be colored according to a third parameter, which can be selected from <b>color mode</b>.</p>
+
+    
+    
+    <h3>Saving Data and Reports</h3>
+    <p>You can save the parameter and goodnes-of-fit images as data files for further processing, or as a report:
+        <ul>
+          <li><b><img src=":/imaging_fcs/preview_savedata.png"> Data | Save data:</b> Saves the parameter image and goodnes of fit image as a separate file. The selected parameter transformations are omitted. You can select different file formats:
+            <ol>
+              <li><i>Comma-Separated value:</i> saves the data as text file which contains a matrix of numbers, separated by commas (,) and with a dot (.) as decimal separator.</li>
+              <li><i>Semicolon-Separated value [German Excel]:</i> saves the data as text file which contains a matrix of numbers, separated by semicolons (;) and with a comma (,) as decimal separator.</li>
+              <li><i>SYLK:</i> saves the data as a SYLK file which can be imported by many spread sheet programs</li>
+              <li><i>float-TIFF:</i> saves the data as a TIFF image with 32-bit floating point values in each pixel.</li>
+              <li><i>16-bit-TIFF:</i> saves the data as a TIFF image with 16-bit unsigned integer values in each pixel.</li>
+              <li><i>color-coded PNG image:</i> saves the data as PNG image with the color coding used in the dialog (note: this uses the same transformation as the dialog).</li>
+            </ol>
+            The two images are saved into separae files. They end with the suffix <tt>.param.ext</tt> for the parameter image or <tt>.gof.ext</tt> for the goodnes of fit image.
+          </li>
+          <li><b><img src=":/imaging_fcs/copydatatomatlab.png"> Data | Copy Images to Matlab:</b> copies the currently displayed images to the clipboard as a Matlab script. When the script is executed it defines four variables, one for each type of data (parameter image, goodnes of fit image, mask image, overview image).</li>
+          <li><b><img src=":/imaging_fcs/copydata.png"> Data | Copy Images as Columns:</b> copies the currently displayed images to the clipboard in a format so they can be imported into spreadsheet programs. This function serializes the data, i.e. each image is copies as one column. Before the data is actually copied, you will be rpesented with a dialog that allows to select the columns that should be exported. It is also possible to add the pixel ID (integer number starting at <tt>(0,0) -> 0</tt> and numbering all pixels in row-major order) and pixel coordinates.</li>
+          <li><b>Data | Insert Correlation Curves as new RDR into Project:</b> This function takes the currently selected pixels and copies the according ACFs into a new <a href="$$mainhelpdir$$/../plugins/help/qfrdrfcs/fcs.html">fcs raw data record</a>. This new RDR is then inserted into the project. Then you can perform additional FCS evaluations on these. Note that all information about the position of the pixels gets lost! Each pixel's ACF is inserted as a run into the fcs record.</li>
+          <li><b>imFCS Tools | copy all CFs from group to table:</b> This function will average the correlation functions in the current selection and copy it into a new table raw data record. Then it does the same for all files in the same rdr group as the current file. Finally the table will contain all averaged ACFs for the given selection from all files in the group and a plot contaiing all those. You can use this function to create FCCS overview plots like this one: <center>
+    <a name="imfcs_ui_pic000"><img src="./pic/imfcs_ui_pic000.png" border="1"><br/>
 <i>FCCS plot</i>
 </center></li>
-		  <li><b><img src=":/imaging_fcs/report_save.png"> Save report:</b> Save the contenst of the current window as a PDF or PostScript file.</li>
-		  <li><b><img src=":/imaging_fcs/report_print.png"> Print report:</b> Print the contents of the curret window.</li>
+          <li><b><img src=":/imaging_fcs/report_save.png"> Save report:</b> Save the contenst of the current window as a PDF or PostScript file.</li>
+          <li><b><img src=":/imaging_fcs/report_print.png"> Print report:</b> Print the contents of the curret window.</li>
                       <li><a href="imfcs_copyfitresults.html"><b>Copy result fit result statistics</b></a> </li>
-		</ul>
-	</p>
-	
-	
-	
-	<h3>Tab "Correlation Curves"</h3>
-	 In this tab you will see all correlation curves loaded into the current raw data record. On the rhs. you may choose how they are presented to you and see a list of all available runs. There are also buttons to exclude selected runs from the evaluation. These options are available:
-	 <ul>
-	   <li><b>display average:</b> select a display style for the average over all runs.</li>
-	   <li><b>display runs:</b> choose how to display the different runs in the file <ul>
-	     <li><i>no pixels:</i> displays only the average</li>
-	     <li><i>all pixels:</i> displays all runs in different colors</li>
-	     <li><i>all pixels (highlighted):</i> displays all runs in gray, and the selected runs in red</li>
-	     <li><i>selected pixels:</i> displays only the currently selected run</li>
-	   </ul></li>
-	   <li><b>select pixels to display:</b> a list of all pixels in the image (row-major ordered). Select a pixel to display its intensity trace</li>
-	   <li><b>exclude/include pixel:</b> excludes/includes the currently selected pixel ("select runs to display" list or overview image) from the evaluation. Note that the runs won't be deleted physically from the file, but will rather be marked as "do not use" in the project only. So the input data files are NEVER altered.</li>
-	   <li><b>overview:</b> overview image (time-averaged image stack) of the measurement. Klicking a pixel selects the pixel. Excluded and selected pixels are displayed in blue/red.</li>
-	   <li><b>Graph/Plot:</b> For information on how to interact with the plot, please see <a href="$$qf_ui_jkqtplotter_helpfile$$">the according online-help page.</a></li>
-	   <li>Also see the page "<a href="$$qf_ui_rdr_helpfile$$">$$qf_ui_rdr_helpfiletitle$$</a>" for futher information about UI elements common to all raw data records.
-	 </ul>
-	 <h3>Tab "Countrate/Intensity Trace"</h3>
-	 In this tab you can look at the intensity time traces of each pixel. 
+        </ul>
+    </p>
+    
+    
+    
+    <h2>Tab "Correlation Curves"</h2>
+    <center><a name="imfcs_ui_pic003"><img src="./pic/imfcs_ui_pic003.png" border="1">
+    </center>
+    
+    <p>
+     In this tab you will see all correlation curves loaded into the current raw data record. On the rhs. you may choose how they are presented to you and see a list of all available runs. There are also buttons to exclude selected runs from the evaluation. These options are available:
+     <ul>
+       <li><b>display average:</b> select a display style for the average over all runs.</li>
+       <li><b>display runs:</b> choose how to display the different runs in the file <ul>
+         <li><i>no pixels:</i> displays only the average</li>
+         <li><i>all pixels:</i> displays all runs in different colors</li>
+         <li><i>all pixels (highlighted):</i> displays all runs in gray, and the selected runs in red</li>
+         <li><i>selected pixels:</i> displays only the currently selected run</li>
+       </ul></li>
+       <li><b>select pixels to display:</b> a list of all pixels in the image (row-major ordered). Select a pixel to display its intensity trace</li>
+       <li><b>exclude/include pixel:</b> excludes/includes the currently selected pixel ("select runs to display" list or overview image) from the evaluation. Note that the runs won't be deleted physically from the file, but will rather be marked as "do not use" in the project only. So the input data files are NEVER altered.</li>
+       <li><b>overview:</b> overview image (time-averaged image stack) of the measurement. Klicking a pixel selects the pixel. Excluded and selected pixels are displayed in blue/red.</li>
+       <li><b>Graph/Plot:</b> For information on how to interact with the plot, please see <a href="$$qf_ui_jkqtplotter_helpfile$$">the according online-help page.</a></li>
+       <li>Also see the page "<a href="$$qf_ui_rdr_helpfile$$">$$qf_ui_rdr_helpfiletitle$$</a>" for futher information about UI elements common to all raw data records.
+     </ul>
+     </p>
+     
+     
+     
+     
+     
+     <h2>Tab "Countrate/Intensity Trace"</h2>
+     <center><a name="imfcs_ui_pic002"><img src="./pic/imfcs_ui_pic002.png" border="1">
+     </center>     
+     <p>
+     In this tab you can look at the intensity time traces of each pixel. 
   On the rhs you may choose how they are presented to you and see a list of all available pixels and a time-averaged overview intensity image in which pixels may be selected by clicking. There are also buttons to exclude selected pixels from the evaluation. These options are available:
-	 <ul>
-	   <li><b>data display mode:</b> <ul>
-	     <li><i>time-binned video:</i> display the binned timetrace as calculated as "video" in the imagingFCS correlator tool after background and bleach correction</li>
-	     <li><i>uncorrected time-binned video:</i> display the binned timetrace as calculated as "video" in the imagingFCS correlator tool</li>
-	   </ul></li>
-	   <li><b>select pixels to display:</b> a list of all pixels in the image (row-major ordered). Select a pixel to display its intensity trace</li>
-	   <li><b>exclude/include pixel:</b> excludes/includes the currently selected pixel ("select runs to display" list or overview image) from the evaluation. Note that the runs won't be deleted physically from the file, but will rather be marked as "do not use" in the project only. So the input data files are NEVER altered.</li>
-	   <li><b>overview:</b> overview image (time-averaged image stack) of the measurement. Klicking a pixel selects the pixel. Excluded and selected pixels are displayed in blue/red.</li>
-	   <li><b>Graph/Plot:</b> For information on how to interact with the plot, please see <a href="$$qf_ui_jkqtplotter_helpfile$$">the according online-help page.</a></li>
-	   <li>Also see the page "<a href="$$qf_ui_rdr_helpfile$$">$$qf_ui_rdr_helpfiletitle$$</a>" for futher information about UI elements common to all raw data records.
-	 </ul>
+     <ul>
+       <li><b>data display mode:</b> <ul>
+         <li><i>time-binned video:</i> display the binned timetrace as calculated as "video" in the imagingFCS correlator tool after background and bleach correction</li>
+         <li><i>uncorrected time-binned video:</i> display the binned timetrace as calculated as "video" in the imagingFCS correlator tool. In this mode, also the bleach-correction fit functions for every pixel are displayed as dashed lines. The horizontal lines indicate the level of background intenisty.</li>
+       </ul></li>
+       <li><b>select pixels to display:</b> a list of all pixels in the image (row-major ordered). Select a pixel to display its intensity trace</li>
+       <li><b>exclude/include pixel:</b> excludes/includes the currently selected pixel ("select runs to display" list or overview image) from the evaluation. Note that the runs won't be deleted physically from the file, but will rather be marked as "do not use" in the project only. So the input data files are NEVER altered.</li>
+       <li><b>overview:</b> overview image (time-averaged image stack) of the measurement. Clicking a pixel selects the pixel. Excluded and selected pixels are displayed in blue/red.</li>
+       <li><b>Graph/Plot:</b> For information on how to interact with the plot, please see <a href="$$qf_ui_jkqtplotter_helpfile$$">the according online-help page.</a></li>
+       <li>Also see the page "<a href="$$qf_ui_rdr_helpfile$$">$$qf_ui_rdr_helpfiletitle$$</a>" for futher information about UI elements common to all raw data records.
+     </ul>
+     </p>
+     
+     
+     
+     
+     
   
-	   <h3>Tab "Images, Videos, Timetrace"</h3>
-	   <ul>
-	   
-		  <li>This tab displays the overview images and videos stored together with the data. In the "image/video" combobox you can select the image or video, which is then displayed below. If a video is selected, control elements are accessible below. For each currently displayed image the according intensity histogram is available in the "Histogram" tab.</li>
-		  <li>Also the countrate statistics (averaged over the whole image frame) is displayed (rhs). </li>
-	   </ul>
-	   
-	  <h3>General Tools</h3>
-	  <p>The tools mentioned in this section are available in the RDR editor in the menu <tt>imagingFCS Tools</tt>.</p>
-	  <ul>
-	    <li><b>recorrelate file</b>: open a correlation dialog with the same input file, as the current imagingFCS RDR.</li>
-		<li><b>post processing: bin correlation functions</b>: this option enables (or disables, if binning is set to 1) an option that averages the correlation functions of N*N neighboring pixels into a single ACF. The image size is then either reduced to with/N * height/N, or is kept constant, but then the averaging patches overlap ("interleaved binning mode"). It is comparable to binning in the correlator, but does not require recorrelating the data. It should only be used, when recorrelating is not possible, as the latter poses the better option.  $$note:This option may be dangerous, as the image size is reduced and old fit results cannot be used anymore (they are not altered though!)$$</li>
-		<li><b>copy all CFs from group to table</b>: copy all correlation functions as displayed in the parameter image editor to a table RDR</li>
-		<li><b>copy average CF from all files to table</b>: copy the average run correlation fucntion from all imFCS files in the project into a table RDR.</li>
-		<li><b>copy selected CF from all files to table</b>: copy the correlation functions from the currently selected pixels (in the parameter image RDR) and from these in all applicable imagingFCS record in the project, into a table RDR</li>
-		<li><b>copy selected pixels average CF from all files to table</b>: same as above, but does not copy the single correlation functions, but averages over all selected pixels in each file.</li>
-		<!--<li><b></b>:</li>-->
-	  </ul>
+       <a name="images_videos"><h2>Tab "Images, Videos, Timetrace"</h2>
+       <center><a name="imfcs_ui_pic001"><img src="./pic/imfcs_ui_pic001.png" border="1">
+       </center>
+       <ul>       
+          <li>This tab displays the overview images and videos stored together with the data. In the "image/video" combobox you can select the image or video, which is then displayed below. If a video is selected, control elements are accessible below. For each currently displayed image the according intensity histogram is available in the "Histogram" tab.</li>
+          <li>On the rhs, the average intensity time-traces are displayed (averaged over all pixels).</li>
+       </ul>
+       
+      <h2>General Tools</h2>
+      <p>The tools mentioned in this section are available in the RDR editor in the menu <tt>imagingFCS Tools</tt>.</p>
+      <ul>
+        <li><b>recorrelate file</b>: open a correlation dialog with the same input file, as the current imagingFCS RDR.</li>
+        <li><b>post processing: bin correlation functions</b>: this option enables (or disables, if binning is set to 1) an option that averages the correlation functions of N*N neighboring pixels into a single ACF. The image size is then either reduced to with/N * height/N, or is kept constant, but then the averaging patches overlap ("interleaved binning mode"). It is comparable to binning in the correlator, but does not require recorrelating the data. It should only be used, when recorrelating is not possible, as the latter poses the better option.  $$note:This option may be dangerous, as the image size is reduced and old fit results cannot be used anymore (they are not altered though!)$$</li>
+        <li><b>copy all CFs from group to table</b>: copy all correlation functions as displayed in the parameter image editor to a table RDR</li>
+        <li><b>copy average CF from all files to table</b>: copy the average run correlation fucntion from all imFCS files in the project into a table RDR.</li>
+        <li><b>copy selected CF from all files to table</b>: copy the correlation functions from the currently selected pixels (in the parameter image RDR) and from these in all applicable imagingFCS record in the project, into a table RDR</li>
+        <li><b>copy selected pixels average CF from all files to table</b>: same as above, but does not copy the single correlation functions, but averages over all selected pixels in each file.</li>
+        <!--<li><b></b>:</li>-->
+      </ul>
 
-	</body>
+    </body>
 </html>
 
 

@@ -479,6 +479,8 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbDualView_currentIndexChanged(int in
         //ui->lab2cFCCS->setText(tr("<b>Distance CCFs will be calculated for the full DualView image!</b>"));
         //ui->lab2cFCCS->setVisible(true);
     }
+    ui->chkSeparateColorChannels->setChecked(true);
+    ui->chkSeparateColorChannels->setVisible(false);
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_chkSeparateColorChannels_toggled(bool value)
@@ -666,8 +668,13 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->chkCamera->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/camera", ui->chkCamera->isChecked()).toBool());
     ui->chk2cFCCS->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/FCCS_2color", ui->chk2cFCCS->isChecked()).toBool());
     ui->chkSeparateColorChannels->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/chkSeparateColorChannels", ui->chkSeparateColorChannels->isChecked()).toBool());
+
+    ui->chkSeparateColorChannels->setChecked(true);
+    ui->chkSeparateColorChannels->setVisible(false);
+
     ui->chkAddNB->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/chkAddNB", ui->chkAddNB->isChecked()).toBool());
     ui->chkCCF->setChecked(false);
+    ui->chkCCF->setVisible(false);
 }
 
 int QFRDRImagingFCSCorrelationDialog::getIDForProgress(const QFRDRImagingFCSThreadProgress* w) const {
@@ -1037,6 +1044,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFrameCount() {
     if (frames>0) {
         ui->labInputLength->setText(tr("length: %1 = %2 s").arg((int64_t)round(frames)).arg(frames*taumin));
         ui->labRange->setText(tr("= %1 frames").arg(round(frames)));
+        segment_length=frames/ui->spinSegments->value();
         if (ui->spinSegments->value()!=0) ui->labSegments->setText(tr("segments of length: %1 (à %2 s)").arg(frames/ui->spinSegments->value()).arg(taumin*(double)(frames/ui->spinSegments->value())));
         else ui->labSegments->setText("");
         if (ui->spinStatistics->value()!=0) ui->labStatistics->setText(tr("&Delta;<sub>Statistics</sub>= %1 &mu;s  => %2 values").arg(1e6*taumin*(double)ui->spinStatistics->value()).arg(frames/ui->spinStatistics->value()));
@@ -1044,6 +1052,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFrameCount() {
         if (ui->spinVideoFrames->value()!=0) ui->labVideo->setText(tr("&Delta;<sub>Video</sub>= %1 &mu;s  => %2 frames").arg(1e6*taumin*(double)ui->spinVideoFrames->value()).arg(frames/ui->spinVideoFrames->value()));
         else ui->labVideo->setText(QString(""));
     } else {
+        segment_length=0;
         ui->labInputLength->setText(QString(""));
         ui->labRange->setText(QString(""));
         ui->labSegments->setText(QString(""));
@@ -1059,7 +1068,27 @@ void QFRDRImagingFCSCorrelationDialog::updateBleach() {
     //ui->labDecay->setText(tr("&tau;<sub>Bleach,1</sub> = %1 s").arg((double)ui->spinDecay->value()*ui->edtFrameTime->value()/1e6));
 }
 
-void QFRDRImagingFCSCorrelationDialog::updateCorrelator() {
+double QFRDRImagingFCSCorrelationDialog_getCorrelatorProps(int corrType, double taumin, int S, int m, int P) {
+    double taumax=0;
+    if (corrType==CORRELATOR_MTAUALLMON) {
+        taumax=0;
+        for (int s=0; s<S; s++) {
+            if (s==0) {
+                taumax+=pow(m, s)*taumin*P;
+            } else {
+                taumax+=pow(m, s)*taumin*P*(m-1.0)/m;
+            }
+        }
+    } else {
+        taumax=0;
+        for (int s=0; s<S; s++) {
+            taumax+=pow(m, s)*taumin*P;
+        }
+    }
+    return taumax;
+}
+
+void QFRDRImagingFCSCorrelationDialog::updateCorrelator(bool setS) {
     int corrType=ui->cmbCorrelator->currentIndex();
     if (corrType==CORRELATOR_MTAUONEMON) {
         ui->spinM->setEnabled(false);
@@ -1076,21 +1105,15 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator() {
     double taumin=ui->edtFrameTime->value();
     double taumax=taumin;
 
-    if (corrType==CORRELATOR_MTAUALLMON) {
-        taumax=0;
-        for (int s=0; s<S; s++) {
-            if (s==0) {
-                taumax+=pow(m, s)*taumin*P;
-            } else {
-                taumax+=pow(m, s)*taumin*P*(m-1.0)/m;
-            }
-        }
-    } else {
-        taumax=0;
-        for (int s=0; s<S; s++) {
-            taumax+=pow(m, s)*taumin*P;
-        }
+    int idealS=1;
+    while (idealS<1000 && taumax<double(segment_length)*taumin && segment_length>0) {
+        taumax=QFRDRImagingFCSCorrelationDialog_getCorrelatorProps(corrType, taumin, idealS, m, P);
     }
+    if (setS) {
+        S=idealS;
+        ui->spinS->setValue(S);
+    }
+    taumax=QFRDRImagingFCSCorrelationDialog_getCorrelatorProps(corrType, taumin, S, m, P);
     ui->labCorrelator->setText(tr("<i>correlator lags:</i> &tau;<sub>min</sub> = %1&mu;s ...&tau;<sub>max</sub><i> = %2s</i>").arg(taumin).arg(taumax/1e6));
 }
 

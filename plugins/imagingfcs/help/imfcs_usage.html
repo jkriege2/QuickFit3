@@ -65,7 +65,10 @@ $$see:The help page on <a href="imfcs_correlator.html">theoretic description of 
     
 <a name="corroptions"><h3>Correlator Options</h3>
 $$see:The help page on <a href="imfcs_correlator.html">theoretic description of the implemented correlation algorithms</a> for additional details. This page describes the user-interface!$$
+
 <h4>Output filename</h4>
+<center><a name="imfcs_usage_pic010"><img src="./pic/imfcs_usage_pic010.png" border="1">
+</center>
 <p>All the output files start with the same <tt>basename</tt> in the filenames (see above). This <tt>basename</tt> is created from three parts (let's assume that the input filename is <tt><i>[path_to]/[inputfilename].[ext]</i></tt>):
     <blockquote><tt><i>[path_to]/</i><b>[prefix]</b><i>[inputfilename]</i><b>[postfix]</b><i>[ending]</i></tt></blockquote>
     Here <tt><i>[inputfilename]</i></tt> is the filename without extension of the input file (i.e. <tt>inputfilename</tt>), <tt></i>[ending]</i></tt> is the ending specifying the output file (see above, e.g. <tt>.evalsetting.txt</tt>, <tt>.autocorrelation.dat</tt>, ...). If <tt><i>[prefix]</i></tt> contains directory separators (<tt>/</tt>) the output files will be created in subdirectories. in addition you may use some special strings in <tt><i>[prefix]</i></tt> and <tt><i>[postfix]</i></tt> (case-insensitive):
@@ -92,6 +95,11 @@ $$see:The help page on <a href="imfcs_correlator.html">theoretic description of 
     <blockquote><tt>[path_to]/results/[inputfilename]<b>1</b>.autocorrelation.dat<br>[path_to]/results/[inputfilename]<b>1</b>.crosscorrelation.dat<br>...
     </tt></blockquote>
 </p>
+$$note:Good values for these parameters are:
+<ul>
+    <li><b>prefix = </b> <tt>./results/</tt></li>
+    <li><b>postfix = </b> <tt>_corr%correlator%_back%backcorrection%_bleach%bleach%_bin%binning%_%COUNTER%</tt></li>
+</ul>$$
 
 
 
@@ -121,48 +129,93 @@ When using predefined cropping, you will be asked for the size <i>N</i> of the r
 </center>
 </p>
 
+<h4>Pixel Binning</h4>
+$$see:<a href="imfcs_binning.html#binning">This help-page</a> for theoretic/mathematical details on the implemented binning.$$
+<center><a name="imfcs_usage_pic007"><img src="./pic/imfcs_usage_pic007.png" border="1">
+</center>
+<p>With these controls you can set the binning of the pixels in the input image series:
+<ul>
+    <li>The value <i>B</i> given in the spin-box "<b>binning</b>" tell QuickFit to form super-pixels, consisting of <i>B*B</i> input pixels, before correlation.</li>
+    <li>Typically the values for the super-pixel are summed up. If you want to average the values, you can activate the check-box "<b>average</b>".</li>
+    <li>Usually every input pixel only contributes to one super-pixel, i.e. the super-pisels are shifted by <i>B</i> pixels. The check-box <b>interleaved</b> allows to use a scheme, where the super-pixels are shifted by one pixel only:
+<center><img src="binning.png"></center> </li>
+</ul>
+</p>
+
 
 
 <h4>Background Correction</h4>
 $$see:<a href="imfcs_background.html">This help-page</a> for theoretic/mathematical details on the implemented background-correction$$
-  <li>Sometimes model fitting is more reliable, if an estimate of the statistic error <i>&Delta;g(&tau;)</i> introduced when estimating the ACF/CCF is known. So this module allows to <b>cut the input image series into several segments</b> (taking into account the iven first and last frame) and to correlate each segment separately. Then the ACF/CCF may be calculated as the average and the error as the standard deviation over the ACF/CCF for the single segments.</li>
-  <li></li> 
-  <li>The rest of the settings were already described above.</li>
-</ul></p>
+<center><a name="imfcs_usage_pic008"><img src="./pic/imfcs_usage_pic008.png" border="1">
+</center>
+<p>Here you can set the mode of background-correction. QuickFit can either:
+<ol>
+    <li>perform no correction</li>
+    <li>subtract a fixed value</li>
+    <li>remove the minimum pixel value over the whole input image series</li>
+    <li>subtract the average over a given image series, which has to have the same size (width/height) and file format as the input image series.</li>
+</ol>
+</p>
+
+
     
 
 
 <h4>Bleach Correction</h4>
+$$see:<a href="imfcs_bleach.html">This help-page</a> for theoretic/mathematical details on the implemented bleach correction.$$
+<center><a name="imfcs_usage_pic009"><img src="./pic/imfcs_usage_pic009.png" border="1">
+</center>
 <p>
-        
+  Here you can choose the mode of bleach-correction, that QuickFit will apply after subtracting the background signal and before calculating the correlation functions. In all cases QuickFit will first generate a coarse time-series for the intensity in every pixel, to which an appropriate model function is fit. Then this decaying model function is removed from the detailed input time-series of the pixel ("de-trending"). <a href="imfcs_bleach.html">The help-page on the details of the bleach correction</a> lists all possibilities, that can be selected in the combobox. The value in the spin-box "<b>frames to average for the bleach correction</b>" determines how many frames to average for the coarse time-series, used for the fit. $$note:This value is typically automatically determined by QuickFit to be <i>N/2500</i>, where <i>N</i> is the number of rames in the input image series, which is usually a good guess.$$
 </p>
 
 
 
-<h4>DualView-mode and FCCS-settings</h4>
-<p>
-        
-</p>
+<h4>DualView-mode and 2-color-FCCS-Settings</h4>
+<center><a name="imfcs_usage_pic010"><img src="./pic/dualview_fccs.png" border="1">
+</center>
+<p>The imFCS correlator is written to directly support imagingFCCS measurements, that were acquired on a DualView optics. The image series then contains two color channels (e.g. green and red) side-by-side in each frame. The correlator will split the image in two halves (the mode of splitting and the ordering of the color-channels can be selected in the combobox "<b>Dual-view mode</b>"). Then for each half-image, an autocorrelation function is calculated (ACF1: left/top &amp; ACF2: right/bottom). In addition the two-color cross-correlation function can be calculated (FCCS), if the check-box "<b>2-color FCCS is activated</b>".</p>
+<p>The three correlation functions (ACF1+ACF2+FCCS) will be imported as three separate records into the project!</p>
 
 
 
 <h4>Correlator Settings</h4>
+$$see:The help page on <a href="imfcs_correlator.html">theoretic description of the implemented correlation algorithms</a> for additional details. This page describes the user-interface!$$
+<br>
+<center><a name="imfcs_usage_pic011"><img src="./pic/imfcs_usage_pic011.png" border="1">
+</center>
 <p>
-        
+These controls allow set the detailed properties of the used correlation algorithm and which correlation functions to calculate:
+<ul>
+    <li>if <b>ACF for each pixel</b> is checked, the autocorrelation of every pixel is calculated. $$bmath:g(\tau):=\frac{\langle I(t;x,y)\cdot I(t+\tau;x,y)\rangle}{\langle I(t;x,y)\rangle^2}-1$$</li>
+    <li>if <b>CCF to distant pixel</b> is checked, a set of 2-pixel cross-correlation functions is calculated. The input field <b>&Delta;x1,&Deltay1;...</b> lists the pixel shifts (&Delta;x, &Delta;y) that should be calculated. For every shift (&Delta;x, &Delta;y) that is given in the list, one cross-correlation function $$bmath:g_{\times}(\tau; \Delta x,\Delta y):=\frac{\langle I(t;x,y)\cdot I(t+\tau;x+\Delta x,y+\Delta y)\rangle}{\langle I(t;x,y)\rangle\cdot\langle I(t; x+\Delta x,y+\Delta y)\rangle}-1$$ is calculated. The list of shifts (&Delta;x, &Delta;y) is given in the form
+<blockquote>
+    <tt>&Delta;x<sub>1</sub>, &Delta;y<sub>1</sub> ; &Delta;x<sub>2</sub>, &Delta;y<sub>2</sub> ; &Delta;x<sub>3</sub>, &Delta;y<sub>3</sub> </tt>
+</blockquote>
+So if you want to calculate the distance cross-correlation functions to all four neighboring pixels, you will have to give the shifts:
+$$codeexample:1,0 ; -1,0 ; 0,1 ; 0,-1$$
+You can right-click the input field to open its context-menu, which contains entries, that generate pre-defined lists of shifts, e.g. for the 4 direct neighbors. The downward arrow at the rhs of the input field allows to select previously used shift-settings.
+    <li>The spin-box <b>"segments"</b> allows you to split the input image series into <i>N</i> segments. For each of these (equally long) segments, a separate correlation function is calculated and finally the average and standard deviation over these correlation functions is loaded into the project. This allows to use the standard deviation as an estimate of the measurement error of the correlation function, which can improve fit results. Also it is possible to later remove some of these segments form the average, e.g. to exclude any discontinuities from the measurement (e.g. aggregates moving through a pixel/the image).<br>Typically the segments should not be too short (at least 10,000-20,000 frames), so the calculated correlation function has sufficient statistical significance. Usually a value of 3-6 is a good choice, if ~100,000 frames were acquired.</li>
+    <li>The input widgets <b>correlator</b> allow to modify the type of correlator, that is used for the data processing. the details of the available choices are explained in the help-page <a href="imfcs_correlator.html">theoretic description of the implemented correlation algorithms</a>.<br>A good choice is usually: $$example:<b>correlator</b> = <tt>Direct Correlation with Averaging</tt>, <br><b>P</b> = <tt>8 or 16</tt>, <br><b>m</b> = <tt>2</tt>, <br><b>S</b> selected, so &tau;<sub>max</sub> is a little bit larger than the segment length.$$</li>
+</li>
+</ul>
 </p>
 
 
     
 <h4>Number &amp; Brightness</h4>    
-<p>
-        
-</p>
+<p>If this check-box is activated, also a <a href="$$plugin_info:help:number_and_brightness$$">number &amp; brightness RDR</a> from the measurement is loaded into the project.</p>
 
 
 
 <h4>Statistics &amp; Video</h4>    
 <p>
-        
+The controls in this section allow to set options for additional statistics dtaa, that the correlator calculates:
+<ul>
+    <li>The correlator calculates <b>statistics</b> from the input image-series, by averaging (+ standard deviation, minima, maxima, ...) the given number of input frames (and all pixels therein). these datasets are stored as CSV-files and can be used to see, whether global intensity changes or discontinuities occured in the image series. Several statistics files are generated, for the un-corrected, the corrected input data and also for the background data.</li>
+    <li>A <b>video</b> is calculated, by averaging the given number of input frames into video-frames. Usually the number of frames is set, so approximately 1000 video-frames are produced. Actually two videos will be stored to disk (as TIFF files), one before and one after bleach correction. These videos allow to inspect, what has happened during the measurement. In addition they can be used to extract e.g. image flow maps from the measurement.</li>
+</ul>
+All datset, produced in this section will be loaded and displayed in the tab <a href="imfcs_ui.html#images_videos">"Images, Videos, Staistics"</a> of the imFCS raw data record editor.
 </p>
 
     

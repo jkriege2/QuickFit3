@@ -93,7 +93,7 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         void frameRateChanged(double value);
         void updateProgress();
         void updateFromFile(bool readFiles=true, bool countFrames=true);
-        void updateCorrelator();
+        void updateCorrelator(bool setS=false);
         void updateFrameCount();
         void updateImageSize();
         void updateBleach();
@@ -142,6 +142,7 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
 
         int image_width;
         int image_height;
+        int segment_length;
         int32_t frame_count;
         QString filenameDisplayed;
 
