@@ -3352,16 +3352,16 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                                "<tr><td align=\"left\">");
     localreplaces<<qMakePair<QString, QString>("startbox_info", "<blockquote>"
                                                "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" >"
-                                               "<tr><td align=\"left\"><img src=\":/lib/help/helpboxlogo_info.png\"></td><td align=\"left\">");
+                                               "<tr><td width=\"35px\" align=\"left\"><img src=\":/lib/help/helpboxlogo_info.png\"></td><td align=\"left\">");
     localreplaces<<qMakePair<QString, QString>("startbox_note", "<blockquote>"
                                                "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" >"
-                                               "<tr><td align=\"left\"><img src=\":/lib/help/helpboxlogo_note.png\"></td><td align=\"left\">");
+                                               "<tr><td width=\"35px\" align=\"left\"><img src=\":/lib/help/helpboxlogo_note.png\"></td><td align=\"left\">");
     localreplaces<<qMakePair<QString, QString>("startbox_see", "<blockquote>"
                                                "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: cornsilk ;  border-color: darkgreen\" >"
-                                               "<tr><td align=\"left\"><img src=\":/lib/help/helpboxlogo_see.png\"></td><td align=\"left\">");
+                                               "<tr><td width=\"35px\" align=\"left\"><img src=\":/lib/help/helpboxlogo_see.png\"></td><td align=\"left\">");
     localreplaces<<qMakePair<QString, QString>("startbox_warning", "<blockquote>"
                                                "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: navajowhite ;  border-color: orangered\" >"
-                                               "<tr><td align=\"left\"><img src=\":/lib/help/helpboxlogo_warning.png\"></td><td align=\"left\">");
+                                               "<tr><td width=\"35px\" align=\"left\"><img src=\":/lib/help/helpboxlogo_warning.png\"></td><td align=\"left\">");
     localreplaces<<qMakePair<QString, QString>("startbox_example", "<blockquote>"
                                                "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightgrey ;  border-color: midnightblue\" >"
                                                "<tr><td align=\"left\">");
@@ -3785,28 +3785,28 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 } else if (QFPluginServices::getInstance()&&(command=="see")) {
                     QString rep=tr("<blockquote>"
                                      "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: cornsilk ;  border-color: darkgreen\" >"
-                                   "<tr><td align=\"left\"><img src=\":/lib/help/helpboxlogo_see.png\"></td><td align=\"left\"><b>See:</b> %1</td></tr>"
+                                   "<tr><td width=\"35px\" align=\"left\"><img src=\":/lib/help/helpboxlogo_see.png\"></td><td align=\"left\"><b>See:</b> %1</td></tr>"
                                    "</table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
                 } else if (QFPluginServices::getInstance()&&(command=="note")) {
                     QString rep=tr("<blockquote>"
                                      "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" >"
-                                   "<tr><td align=\"left\"><img src=\":/lib/help/helpboxlogo_note.png\"></td><td align=\"left\"><b>Note:</b> %1</td></tr>"
+                                   "<tr><td width=\"35px\" align=\"left\"><img src=\":/lib/help/helpboxlogo_note.png\"></td><td align=\"left\"><b>Note:</b> %1</td></tr>"
                                    "</table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
                 } else if (QFPluginServices::getInstance()&&(command=="info")) {
                     QString rep=tr("<blockquote>"
                                      "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" >"
-                                   "<tr><td align=\"left\"><img src=\":/lib/help/helpboxlogo_info.png\"></td><td align=\"left\"><b>Information:</b> %1</td></tr>"
+                                   "<tr><td width=\"35px\" align=\"left\"><img src=\":/lib/help/helpboxlogo_info.png\"></td><td align=\"left\"><b>Information:</b> %1</td></tr>"
                                    "</table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
                  } else if (QFPluginServices::getInstance()&&(command=="warning")) {
                     QString rep=tr("<blockquote>"
                                      "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: navajowhite ;  border-color: orangered\" >"
-                                   "<tr><td align=\"left\"><img src=\":/lib/help/helpboxlogo_warning.png\"></td><td align=\"left\"><b>Note:</b> %1</td></tr>"
+                                   "<tr><td width=\"35px\" align=\"left\"><img src=\":/lib/help/helpboxlogo_warning.png\"></td><td align=\"left\"><b>Note:</b> %1</td></tr>"
                                    "</table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
