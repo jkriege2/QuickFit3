@@ -992,6 +992,29 @@ void QFEHelpEditorWidget::on_btnTable_clicked()
     delete dlg;
 }
 
+void QFEHelpEditorWidget::on_btnSelectImage_clicked()
+{
+    QString dir=QFileInfo(currentScript).absolutePath();//ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastImageDir", ProgramOptions::getInstance()->getMainHelpDirectory()).toString();
+    QStringList dirs, prefixes, baseNodeNames;
+    dirs<<dir<<QFPluginServices::getInstance()->getMainHelpDirectory();
+    prefixes<<""<<"$$mainhelpdir$$";
+    baseNodeNames<<tr("local")<<tr("main help");
+
+    SelectResourceImage* dlg=new SelectResourceImage(dirs, this, prefixes, baseNodeNames);
+    if (dlg->exec()) {
+        insertAroundOld(QString("<img src=\"%1\">°").arg(dlg->getSelectFile()));
+    }
+    delete dlg;
+
+/*
+
+    QString filename=qfGetOpenFileName(this, tr("select image file ..."), dir, tr("Image Files (*.png *.jpg *.bmp)") );
+    if (!filename.isEmpty()) {
+        dir=QFileInfo(filename).absolutePath();
+        insertAroundOld(QString("<img src=\"%1\">").arg(QFileInfo(dir).absoluteDir().relativeFilePath(filename)));
+    }*/
+}
+
 
 
 void QFEHelpEditorWidget::findFirst()
@@ -1121,7 +1144,7 @@ void QFEHelpEditorWidget::insertActionClicked()
 
 void QFEHelpEditorWidget::insertIcon()
 {
-    SelectResourceImage* dlg=new SelectResourceImage(this);
+    SelectResourceImage* dlg=new SelectResourceImage(":/", this);
     if (dlg->exec()) {
         insertAroundOld(QString("<img src=\"%1\">°").arg(dlg->getSelectFile()));
     }

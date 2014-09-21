@@ -43,6 +43,7 @@ class PasteImageDlg : public QDialog
     protected slots:
         void clipboardChanged();
         void updateImage();
+        void on_chkFine_toggled(bool enabled);
 
         
     private:

@@ -281,8 +281,13 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
 
         ADD_WIDGET_PROGRAMOPTIONS(QCheckBox,setChecked,isChecked,bool)
         ADD_WIDGET_PROGRAMOPTIONS(QRadioButton,setChecked,isChecked,bool)
+        ADD_WIDGET_PROGRAMOPTIONS(QToolButton,setChecked,isChecked,bool)
+        ADD_WIDGET_PROGRAMOPTIONS(QPushButton,setChecked,isChecked,bool)
+        ADD_WIDGET_PROGRAMOPTIONS(QAction,setChecked,isChecked,bool)
         ADD_WIDGET_PROGRAMOPTIONS(QDoubleSpinBox,setValue,value,double)
         ADD_WIDGET_PROGRAMOPTIONS(QSpinBox,setValue,value,int)
+        ADD_WIDGET_PROGRAMOPTIONS(QSlider,setValue,value,int)
+        ADD_WIDGET_PROGRAMOPTIONS(QDial,setValue,value,int)
         ADD_WIDGET_PROGRAMOPTIONS(QComboBox,setCurrentIndex,currentIndex,int)
         ADD_WIDGET_PROGRAMOPTIONS(QLineEdit,setText,text,QString)
         ADD_WIDGET_PROGRAMOPTIONS(QPlainTextEdit,setPlainText,toPlainText,QString)

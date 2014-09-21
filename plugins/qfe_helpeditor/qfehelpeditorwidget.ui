@@ -520,10 +520,24 @@
      <item>
       <widget class="QToolButton" name="btnInsertAndCopyImage">
        <property name="toolTip">
-        <string>select an image file to copy to the help directory and insetr into the document</string>
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;select an image file to copy to the help directory and insert into the document. After a click you can also crop the file and change the magnification.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
        </property>
        <property name="text">
         <string>copy and insert image file</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfehelpeditor.qrc">
+         <normaloff>:/qfe_helpeditor/icons/opensaveimage.png</normaloff>:/qfe_helpeditor/icons/opensaveimage.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnSelectImage">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;select an image file from the help directory and insert into the document. In contrast to the option &lt;img src=&quot;:/qfe_helpeditor/icons/opensaveimage.png&quot;/&gt; , this function leaves the file, where it is and generates a relative path.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>select image file</string>
        </property>
        <property name="icon">
         <iconset resource="qfehelpeditor.qrc">

@@ -574,7 +574,7 @@ void QFGlobalFitTool::evalueCHi2Landscape(double *chi2Landscape, int paramXFile,
             //qDebug()<<"-- x,y = "<<paramXValues[x]<<paramYValues[y];
             //qDebug()<<"-- evalout_count = "<<functor->get_evalout();
             //qDebug()<<"---------------------------------------------------------------------------";
-            for (int i=0; i<functor->get_evalout(); i++)  {
+            for (uint64_t i=0; i<functor->get_evalout(); i++)  {
                 chi2=chi2+qfSqr(d[i]);
                 //qDebug()<<d[i]<<qfSqr(d[i])<<chi2;
             }

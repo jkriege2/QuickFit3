@@ -102,6 +102,7 @@ class QFEHelpEditorWidget : public QWidget {
         void on_btnInsertFAQ_clicked();
         void on_btnFunctionReference_clicked();
         void on_btnTable_clicked();
+        void on_btnSelectImage_clicked();
         //void on__clicked();
 
         /** \brief replaces the currently selected text by newText, hwere %1 is replaced by the selected text*/

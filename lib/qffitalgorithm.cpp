@@ -830,7 +830,7 @@ void QFFitAlgorithm::FitFunctionFunctor::setDataPoints(uint64_t data)
 void QFFitAlgorithm::FitFunctionFunctor::prepareBootstrapSelection()
 {
     int64_t mBS=qRound64(double(i_M)*m_bootstrapFraction);
-    if (mBS<(uint64_t)get_paramcount()+1) mBS=get_paramcount()+1;
+    if (mBS<get_paramcount()+1) mBS=get_paramcount()+1;
 
     if (m_bootstrapEnabled) {
         bootstrapIDs.clear();

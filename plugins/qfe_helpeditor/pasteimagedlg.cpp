@@ -100,3 +100,11 @@ void PasteImageDlg::updateImage()
     }
 }
 
+void PasteImageDlg::on_chkFine_toggled(bool enabled)
+{
+    ui->spinCutBottom->setSingleStep(enabled?1:10);
+    ui->spinCutLeft->setSingleStep(enabled?1:10);
+    ui->spinCutTop->setSingleStep(enabled?1:10);
+    ui->spinCutRight->setSingleStep(enabled?1:10);
+}
+

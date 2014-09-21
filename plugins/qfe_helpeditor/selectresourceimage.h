@@ -36,15 +36,21 @@ class SelectResourceImage : public QDialog
         Q_OBJECT
 
     public:
-        explicit SelectResourceImage(QWidget *parent = 0);
+        explicit SelectResourceImage(const QString& directory=QString(":/"), QWidget *parent = 0, const QString& pathPrefix=QString(""));
+        explicit SelectResourceImage(const QStringList& directories, QWidget *parent = 0, const QStringList& pathPrefixes=QStringList(), const QStringList& baseNodeNames=QStringList());
         ~SelectResourceImage();
 
         QString getSelectFile() const;
     private:
         Ui::SelectResourceImage *ui;
         QStandardItemModel model;
+        bool isMulti;
     protected:
-        void listDirectory(QDir dir, QStandardItem *parentItem);
+        void listDirectory(QDir dir, QStandardItem *parentItem, const QString &pathPrefix=QString(""));
+    protected slots:
+        void updateView();
+        void treeClicked(const QModelIndex& index);
+        void listDoubleClicked(const QModelIndex& index);
 };
 
 #endif // SELECTRESOURCEIMAGE_H

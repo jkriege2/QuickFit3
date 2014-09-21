@@ -61,5 +61,6 @@
         <file>icons/openexample.png</file>
         <file>icons/opentemplate.png</file>
         <file>icons/copyimage.png</file>
+        <file>icons/opensaveimage.png</file>
     </qresource>
 </RCC>
