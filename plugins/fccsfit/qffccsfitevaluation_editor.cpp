@@ -1522,9 +1522,25 @@ void QFFCCSFitEvaluationEditor::on_btnRemoveFile_clicked()
 {
     QFFCCSFitEvaluationItem* data=qobject_cast<QFFCCSFitEvaluationItem*>(current);
     if (!data) return;
-    data->removeFitFile();
-    setParameterTableSpans();
-    ensureCorrectParamaterModelDisplay();
+    QStringList files;
+
+    for (int i=0; i<data->getFitFileCount(); i++) {
+        QFRawDataRecord* rdr=data->getFitFile(i);
+        QFFitFunction* ff=data->getFitFunction(i);
+        QString f=tr("file #%1").arg(i+1);
+        if (rdr) {
+            f=f+QString(": ")+rdr->getName();
+        }
+        files<<f;
+    }
+
+    bool ok=false;
+    int id=files.indexOf(QInputDialog::getItem(this, tr("remove file"), tr("please select the file to remove [default: last file]:"), files, files.size()-1, false, &ok));
+    if (ok) {
+        data->removeFitFile(id);
+        setParameterTableSpans();
+        ensureCorrectParamaterModelDisplay();
+    }
     //connect(ui->btnRemoveFile, SIGNAL(clicked()), item, SLOT(removeFitFile()));
 }
 

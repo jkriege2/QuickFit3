@@ -59,6 +59,7 @@ void QFEDefaultMathParserExtensions::initExtension() {
     QStringList sl=QFPluginServices::getInstance()->getGlobalConfigValue("QFMathParser_ref").toStringList();
     sl.append(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
     QFPluginServices::getInstance()->setGlobalConfigValue("QFMathParser_ref", sl);
+    QFPluginServices::getInstance()->addQFMathParserRefernceDir(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
 
 
     QFMathParser::addGlobalFunction("regression", fRegression);

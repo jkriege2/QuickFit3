@@ -159,7 +159,10 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfselectfileslistwidget.h \
     ../../../../LIB/trunk/mathtools.h \
     qfsimpleplotview.h \
-    qfsimpleplotwidget.h
+    qfsimpleplotwidget.h\
+    qffunctionreferencetool.h \
+    qfmathparserwidget.h \
+    qfmathparserwidgetsmall.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -257,7 +260,10 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfselectfileslistwidget.cpp \
     ../../../../LIB/trunk/mathtools.cpp \
     qfsimpleplotview.cpp \
-    qfsimpleplotwidget.cpp
+    qfsimpleplotwidget.cpp \
+    qffunctionreferencetool.cpp \
+    qfmathparserwidget.cpp \
+    qfmathparserwidgetsmall.cpp
 
 
 FORMS += qf3objectiveeditor.ui \
@@ -272,7 +278,9 @@ FORMS += qf3objectiveeditor.ui \
     qfoverlayplotdialog.ui \
     qfselectfileslistwidget.ui \
     qfsimpleplotview.ui \
-    qfsimpleplotwidget.ui
+    qfsimpleplotwidget.ui \
+    qfmathparserwidget.ui \
+    qfmathparserwidgetsmall.ui
 
 
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \

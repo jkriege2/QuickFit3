@@ -1,0 +1,272 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>DlgSetRDRPropertyByExpressionEditor</class>
+ <widget class="QFrame" name="DlgSetRDRPropertyByExpressionEditor">
+  <property name="enabled">
+   <bool>true</bool>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>465</width>
+    <height>153</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Set RDR Property by RegExp ...</string>
+  </property>
+  <property name="frameShape">
+   <enum>QFrame::StyledPanel</enum>
+  </property>
+  <property name="frameShadow">
+   <enum>QFrame::Raised</enum>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <property name="fieldGrowthPolicy">
+    <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+   </property>
+   <item row="0" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QLabel" name="labID">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QToolButton" name="btnDelete">
+       <property name="text">
+        <string>delete this item</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../lib/lib.qrc">
+         <normaloff>:/lib/file_delete.png</normaloff>:/lib/file_delete.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_5">
+     <property name="text">
+      <string>property to set:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QComboBox" name="cmbOutput">
+     <item>
+      <property name="text">
+       <string>RDR group</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>role</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>folder</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>name</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>RDR property (add or set)</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_10">
+     <property name="text">
+      <string>property name:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QComboBox" name="cmbPropertyName">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="editable">
+      <bool>true</bool>
+     </property>
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <item>
+      <property name="text">
+       <string>NEW_PROPERTY</string>
+      </property>
+     </item>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>output string:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QFMathParserWidgetSmall" name="edtExpression">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_6">
+     <property name="text">
+      <string>test result:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="QLabel" name="labTest">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QLabel" name="labError">
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFMathParserWidgetSmall</class>
+   <extends>QFrame</extends>
+   <header>qfmathparserwidgetsmall.h</header>
+   <container>1</container>
+   <slots>
+    <signal>expressionChanged(QString)</signal>
+   </slots>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>cmbOutput</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>DlgSetRDRPropertyByExpressionEditor</receiver>
+   <slot>updateTest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>454</x>
+     <y>59</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>353</x>
+     <y>152</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbOutput</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>DlgSetRDRPropertyByExpressionEditor</receiver>
+   <slot>emitWidgetContentsChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>144</x>
+     <y>48</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>55</x>
+     <y>32</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbPropertyName</sender>
+   <signal>editTextChanged(QString)</signal>
+   <receiver>DlgSetRDRPropertyByExpressionEditor</receiver>
+   <slot>emitWidgetContentsChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>111</x>
+     <y>72</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>363</x>
+     <y>125</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtExpression</sender>
+   <signal>expressionChanged(QString)</signal>
+   <receiver>DlgSetRDRPropertyByExpressionEditor</receiver>
+   <slot>emitWidgetContentsChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>233</x>
+     <y>102</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>287</x>
+     <y>110</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtExpression</sender>
+   <signal>expressionChanged(QString)</signal>
+   <receiver>DlgSetRDRPropertyByExpressionEditor</receiver>
+   <slot>updateTest()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>103</x>
+     <y>99</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>71</x>
+     <y>135</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>updateTest()</slot>
+  <slot>showHelp()</slot>
+  <slot>emitWidgetContentsChanged()</slot>
+ </slots>
+</ui>

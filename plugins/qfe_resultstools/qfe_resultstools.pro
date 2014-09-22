@@ -37,19 +37,14 @@ DESTDIR = $${QFOUTPUT}/plugins/
 # Input
 HEADERS += qferesultstools.h \
     qfertresultcalculator.h \
-    ../base_classes/qfmathparserwidget.h \
-    ../base_classes/qffunctionreferencetool.h \
     ../../../../../LIB/trunk/jkmathparser.h
 
 SOURCES += qferesultstools.cpp \
     qfertresultcalculator.cpp \
-    ../base_classes/qfmathparserwidget.cpp \
-    ../base_classes/qffunctionreferencetool.cpp \
     ../../../../../LIB/trunk/jkmathparser.cpp
 
 FORMS = \
-    qfertresultcalculator.ui \
-    ../base_classes/qfmathparserwidget.ui
+    qfertresultcalculator.ui
 
 RESOURCES += qferesultstools.qrc \
     ../../lib/lib.qrc

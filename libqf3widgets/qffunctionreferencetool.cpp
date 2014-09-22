@@ -22,6 +22,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffunctionreferencetool.h"
 #include "qfpluginservices.h"
 #include "qfhtmlhelptools.h"
+#include "qfenhancedlineedit.h"
 #include <QTextCursor>
 QFFunctionReferenceToolDocSearchThread::QFFunctionReferenceToolDocSearchThread(QStringList files, QObject *parent):
     QThread(parent)
@@ -103,6 +104,11 @@ QFFunctionReferenceTool::QFFunctionReferenceTool(QObject *parent) :
     btnCurrentHelp=NULL;
     labHelp=NULL;
     labTemplate=NULL;
+
+    actDefaultHelp=new QAction(tr("show parser help"), this);
+    actCurrentFunctionHelp=new QAction(tr("help for function under cursor"), this);
+    connect(actDefaultHelp, SIGNAL(triggered()), SLOT(showDefaultHelp()));
+    connect(actCurrentFunctionHelp, SIGNAL(triggered()), SLOT(showCurrentFunctionHelp()));
 }
 
 void QFFunctionReferenceTool::setRxDefinition(const QRegExp &rxDefinition)
@@ -348,12 +354,21 @@ void QFFunctionReferenceTool::registerEditor(QLineEdit *edtFormula)
 {
     connect(edtFormula, SIGNAL(cursorPositionChanged(int,int)), this, SLOT(onCursorPositionChanged(int,int)));
     edtFormula->setCompleter(compExpression);
+    QFEnhancedLineEdit* ed=qobject_cast<QFEnhancedLineEdit*>(edtFormula);
+    if (ed) {
+        connect(ed, SIGNAL(helpKeyPressed(int)), this, SLOT(showCurrentFunctionHelp()));
+    }
+
+    edtFormula->addAction(actDefaultHelp);
+    edtFormula->addAction(actCurrentFunctionHelp);
 }
 
 void QFFunctionReferenceTool::registerEditor(QPlainTextEdit *edtFormula)
 {
     connect(edtFormula, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
     //edtFormula->setCompleter(compExpression);
+    edtFormula->addAction(actDefaultHelp);
+    edtFormula->addAction(actCurrentFunctionHelp);
 }
 
 bool QFFunctionReferenceTool::hasFunction(const QString name)
@@ -475,6 +490,11 @@ void QFFunctionReferenceTool::showCurrentFunctionHelp()
     showFunctionHelp(currentFunction);
 }
 
+void QFFunctionReferenceTool::showDefaultHelp()
+{
+    QFPluginServices::getInstance()->displayHelpWindow(defaultHelp);
+}
+
 
 void QFFunctionReferenceTool::onCursorPositionChanged(int /*old*/, int newPosIn)
 {
@@ -529,9 +549,11 @@ void QFFunctionReferenceTool::onCursorPositionChanged(int /*old*/, int newPosIn)
             if (currentFunction.isEmpty()) {
                 btnCurrentHelp->setEnabled(false);
                 btnCurrentHelp->setToolTip(tr("no function selected ..."));
+                actCurrentFunctionHelp->setText(tr("help on function under cursor"));
             } else {
                 btnCurrentHelp->setEnabled(true);
                 btnCurrentHelp->setToolTip(tr("show help for \"%1\"").arg(currentFunction));
+                actCurrentFunctionHelp->setText(tr("help on \"%1\"").arg(currentFunction));
             }
         }
 

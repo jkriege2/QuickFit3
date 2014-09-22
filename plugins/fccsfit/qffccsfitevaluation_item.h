@@ -145,6 +145,7 @@ class QFFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, pu
         virtual void setFitFunction(QString fitFunction);
         virtual int addFitFile();
         virtual void removeFitFile();
+        virtual void removeFitFile(int i);
         /** \brief set the current index to use */
         virtual void setCurrentIndex(int index);
         /** \brief set the global parameter of the given file and fit parameter \a parameter therein */

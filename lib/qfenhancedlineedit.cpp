@@ -322,6 +322,10 @@ void QFEnhancedLineEdit::keyPressEvent(QKeyEvent *event) {
     if (event->key()==Qt::Key_Enter || event->key()==Qt::Key_Return) {
         history.append(text());
     }
+    if (event->key()==Qt::Key_Help) {
+        emit helpKeyPressed(cursorPosition());
+        emit helpKeyPressed(text(), cursorPosition());
+    }
     // default handler for event
     QLineEdit::keyPressEvent(event);
 }

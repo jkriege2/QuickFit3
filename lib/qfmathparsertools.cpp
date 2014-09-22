@@ -441,6 +441,30 @@ QVariantList qfmpResult::asVariantList() const
     }
      return vl;
 }
+QVariant qfmpResult::asVariant() const
+{
+    QVariant vl;
+    if (type==qfmpDouble) {
+        vl=num;
+        if (isInteger()) vl=toInteger();
+    } else if (type==qfmpString) {
+        vl=str;
+    } else if (type==qfmpBool) {
+        vl=boolean;
+    } else if (type==qfmpDoubleVector) {
+        vl=asVariantList();
+    } else if (type==qfmpStringVector) {
+        vl=asVariantList();
+    } else if (type==qfmpBoolVector) {
+        vl=asVariantList();
+    } else if (type==qfmpCustom && m_custom) {
+        QVariantList l=m_custom->asVariantList();
+        if (l.size()==1) vl=l[0];
+        else vl=l;
+
+    }
+     return vl;
+}
 
 QStringList qfmpResult::asStrVector() const
 {

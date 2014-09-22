@@ -31,7 +31,7 @@ qfmpResult QFMathParserWidget_dummy(const qfmpResult* params, unsigned char n, Q
     return res;
 }
 
-QFMathParserWidget::QFMathParserWidget(QWidget *parent) :
+QFMathParserWidget::QFMathParserWidget(QWidget *parent, const QStringList &moreRefDirs) :
     QWidget(parent),
     ui(new Ui::QFMathParserWidget)
 {
@@ -63,6 +63,7 @@ QFMathParserWidget::QFMathParserWidget(QWidget *parent) :
     ui->edtFormula->setText(ProgramOptions::getConfigValue("QFMathParserWidget/expression", "").toString());
     ui->lstFunctions->setModel(functionRef->getHelpModel());
 
+    this->moreRefDirs=moreRefDirs;
     QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
 
 }
@@ -88,6 +89,13 @@ void QFMathParserWidget::setExpression(const QString &exp)
 void QFMathParserWidget::addExpressionDefaultWords(const QStringList &words)
 {
     functionRef->addDefaultWords(words);
+}
+
+void QFMathParserWidget::addFunctionReferenceDirectory(const QString &directory)
+{
+    QStringList sl;
+    sl<<directory;
+    functionRef->startSearch(sl);
 }
 
 void QFMathParserWidget::on_edtFormula_textChanged(QString text) {
@@ -192,8 +200,8 @@ void QFMathParserWidget::on_lstFunctions_clicked(const QModelIndex &index)
 
 void QFMathParserWidget::delayedStartSearch()
 {
-    QStringList sl;
-    sl<<QFPluginServices::getInstance()->getMainHelpDirectory()+"/parserreference/";
+    QStringList sl=QFPluginServices::getInstance()->getQFMathParserRefernceDirs();
+    sl<<moreRefDirs;
     functionRef->startSearch(sl);
 }
 

@@ -184,6 +184,7 @@ struct QFLIB_EXPORT qfmpResult {
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
         QFLIB_EXPORT QVector<double> asVector() const;
         QFLIB_EXPORT QVariantList asVariantList() const;
+        QFLIB_EXPORT QVariant asVariant() const;
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
         QFLIB_EXPORT QStringList asStrVector() const;
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */

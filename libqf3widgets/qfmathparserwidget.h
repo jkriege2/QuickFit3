@@ -29,6 +29,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QStringListModel>
 #include "qffunctionreferencetool.h"
 #include "qfmathparser.h"
+#include "libwid_imexport.h"
 
 
 
@@ -55,16 +56,19 @@ namespace Ui {
     on the rhs of the dialog.
 */
 
-class QFMathParserWidget : public QWidget {
+class QFWIDLIB_EXPORT QFMathParserWidget : public QWidget {
         Q_OBJECT
     public:
-        explicit QFMathParserWidget(QWidget *parent = 0);
+        explicit QFMathParserWidget(QWidget *parent = 0, const QStringList &moreRefDirs=QStringList());
         ~QFMathParserWidget();
 
         QString getExpression() const;
         void setExpression(const QString& exp);
         void addExpressionDefaultWords(const QStringList& words);
         QFMathParser* getMathParser() const { return mp; }
+        QFFunctionReferenceTool* getReferenceTool() const { return functionRef; }
+
+        void addFunctionReferenceDirectory(const QString& directory);
 
    protected slots:
         void on_edtFormula_textChanged(QString text);
@@ -79,6 +83,7 @@ class QFMathParserWidget : public QWidget {
         QFMathParser* mp;
 
         QFFunctionReferenceTool* functionRef;
+        QStringList moreRefDirs;
 
         QString getFunctionTemplate(QString name);
         QString getFunctionHelp(QString name);

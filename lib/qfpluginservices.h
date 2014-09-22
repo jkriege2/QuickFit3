@@ -213,6 +213,14 @@ class QFLIB_EXPORT QFPluginServices {
           */
         virtual void appendOrAddHTMLReplacement(const QString& name, const QString& appendValue, const QString& separator=QString("\n"))=0;
 
+        /** \brief add a directory, which contains global math parser online-help
+          */
+        virtual void addQFMathParserRefernceDir(const QString& directory)=0;
+        /** \brief get a list of directories, which contains global math parser online-help
+          */
+        virtual QStringList getQFMathParserRefernceDirs()=0;
+
+
         /** \brief a list of the online help directories of all plugins with metadata.
          */
         virtual QList<QFHelpDirectoryInfo>* getPluginHelpList()=0;

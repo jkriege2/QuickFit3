@@ -56,14 +56,21 @@ void QConfigComboboxWidget::registerWidget(const QString &id, QWidget *widget)
     widgets[id]=widget;
 
     bool saved=false;
-    for (int i=0; i<widgetFunctions.size(); i++) {
+    /*for (int i=0; i<widgetFunctions.size(); i++) {
         if (widgetFunctions[i].registerWidget) saved=(*widgetFunctions[i].registerWidget)(widget, this);
         if (saved) break;
-    }
+    }*/
     if (!saved) {
         QLineEdit* edt=qobject_cast<QLineEdit*>(widget);
         if (edt) {
             connect(edt, SIGNAL(textChanged(QString)), this, SLOT(widgetContentsChanged()));
+            saved=true;
+        }
+    }
+    if (!saved) {
+        QConfigComboboxWidgetSaveable* edt=dynamic_cast<QConfigComboboxWidgetSaveable*>(widget);
+        if (edt) {
+            connect(widget, SIGNAL(widgetContentsChanged()), this, SLOT(widgetContentsChanged()));
             saved=true;
         }
     }
@@ -125,15 +132,31 @@ void QConfigComboboxWidget::registerWidget(const QString &id, QWidget *widget)
     }
 }
 
+void QConfigComboboxWidget::registerWidget(const QString &id, const QConfigComboboxWidget::WidgetFunctions &widget)
+{
+     widgets[id]=widget.widget;
+     widgetFunctions.append(widget);
+     widget.registerWidget(widget.widget, this);
+}
+
 void QConfigComboboxWidget::unregisterWidget(const QString &id)
 {
     QWidget* wid=widgets[id];
 
     bool saved=false;
     for (int i=0; i<widgetFunctions.size(); i++) {
-        if (widgetFunctions[i].unregisterWidget) saved=(*widgetFunctions[i].unregisterWidget)(wid, this);
-        if (saved) break;
+        if (widgetFunctions[i].widget==wid) {
+            if (widgetFunctions[i].unregisterWidget) saved=(*widgetFunctions[i].unregisterWidget)(wid, this);
+            if (saved) break;
+        }
     }
+    if (!saved) {
+        QConfigComboboxWidgetSaveable* edt=dynamic_cast<QConfigComboboxWidgetSaveable*>(wid);
+        if (edt) {
+            disconnect(wid, SIGNAL(widgetContentsChanged()), this, SLOT(widgetContentsChanged()));
+            saved=true;
+        }
+     }
     if (!saved) {
         QLineEdit* edt=qobject_cast<QLineEdit*>(wid);
         if (edt) {
@@ -218,6 +241,29 @@ void QConfigComboboxWidget::unregisterWidgets()
     }
 }
 
+void QConfigComboboxWidget::renameEditor(const QString &id_old, const QString &id)
+{
+    setEditorName(widgets.value(id_old, NULL), id);
+}
+
+void QConfigComboboxWidget::setEditorName(QWidget *wid, const QString &id)
+{
+    if (wid) {
+        QMapIterator<QString, QWidget*> it(widgets);
+        QStringList ids;
+        while (it.hasNext()) {
+            it.next();
+            if (it.value()==wid) ids<<it.key();
+        }
+        for (int i=0; i<ids.size(); i++) {
+            widgets.remove(ids[i]);
+        }
+        widgets[id]=wid;
+        combobox->setCurrentIndex(-1);
+    }
+}
+
+
 int QConfigComboboxWidget::currentConfig() const
 {
     return combobox->currentIndex();
@@ -300,8 +346,17 @@ void QConfigComboboxWidget::saveWidgets(const QString &id)
         w.next();
         bool saved=false;
         for (int i=0; i<widgetFunctions.size(); i++) {
-            if (widgetFunctions[i].saveWidget) saved=(*widgetFunctions[i].saveWidget)(w.value(), *settings, sid+QString("/%1/").arg(w.key()));
-            if (saved) break;
+            if (widgetFunctions[i].widget==w.value()) {
+                if (widgetFunctions[i].saveWidget) saved=(*widgetFunctions[i].saveWidget)(w.value(), *settings, sid+QString("/%1/").arg(w.key()));
+                if (saved) break;
+            }
+        }
+        if (!saved) {
+            QConfigComboboxWidgetSaveable* edt=dynamic_cast<QConfigComboboxWidgetSaveable*>(w.value());
+            if (edt) {
+                edt->saveWidget(settings, sid+QString("/%1/").arg(w.key()));
+                saved=true;
+            }
         }
         if (!saved) {
             QLineEdit* edt=qobject_cast<QLineEdit*>(w.value());
@@ -385,76 +440,94 @@ void QConfigComboboxWidget::loadWidgets(const QString &id)
         QString sid=groups[idx];
         QMapIterator<QString, QWidget*> w(widgets);
 
+        bool getMain=true;
         while (w.hasNext()) {
             w.next();
-            bool loaded=false;
-            for (int i=0; i<widgetFunctions.size(); i++) {
-                if (widgetFunctions[i].loadWidget) loaded=(*widgetFunctions[i].loadWidget)(w.value(), *settings, sid+QString("/%1/").arg(w.key()));
-                if (loaded) break;
-            }
-            if (!loaded) {
-                QLineEdit* edt=qobject_cast<QLineEdit*>(w.value());
-                if (edt) {
-                    edt->setText(settings->value(sid+QString("/%1/text").arg(w.key()), edt->text()).toString());
-                    loaded=true;
+            if (w.key().toLower().startsWith("main") || (!getMain && !w.key().toLower().startsWith("main"))) {
+                //qDebug()<<"loading "<<w.key()<<w.value();
+                bool loaded=false;
+                for (int i=0; i<widgetFunctions.size(); i++) {
+                    if (widgetFunctions[i].widget==w.value()) {
+                        if (widgetFunctions[i].loadWidget) loaded=(*widgetFunctions[i].loadWidget)(w.value(), *settings, sid+QString("/%1/").arg(w.key()));
+                        if (loaded) break;
+                    }
+                }
+                if (!loaded) {
+                    QConfigComboboxWidgetSaveable* edt=dynamic_cast<QConfigComboboxWidgetSaveable*>(w.value());
+                    if (edt) {
+                        edt->loadWidget(settings, sid+QString("/%1/").arg(w.key()));
+                        loaded=true;
+                    }
+                }
+
+                if (!loaded) {
+                    QLineEdit* edt=qobject_cast<QLineEdit*>(w.value());
+                    if (edt) {
+                        edt->setText(settings->value(sid+QString("/%1/text").arg(w.key()), edt->text()).toString());
+                        loaded=true;
+                    }
+                }
+                if (!loaded) {
+                    QCheckBox* edt=qobject_cast<QCheckBox*>(w.value());
+                    if (edt) {
+                        edt->setChecked(settings->value(sid+QString("/%1/checked").arg(w.key()), edt->isChecked()).toBool());
+                        loaded=true;
+                    }
+                }
+                if (!loaded) {
+                    QRadioButton* edt=qobject_cast<QRadioButton*>(w.value());
+                    if (edt) {
+                        edt->setChecked(settings->value(sid+QString("/%1/checked").arg(w.key()), edt->isChecked()).toBool());
+                        loaded=true;
+                    }
+                }
+                if (!loaded) {
+                    QSpinBox* edt=qobject_cast<QSpinBox*>(w.value());
+                    if (edt) {
+                        edt->setValue(settings->value(sid+QString("/%1/value").arg(w.key()), edt->value()).toInt());
+                        loaded=true;
+                    }
+                }
+                if (!loaded) {
+                    QDoubleSpinBox* edt=qobject_cast<QDoubleSpinBox*>(w.value());
+                    if (edt) {
+                        edt->setValue(settings->value(sid+QString("/%1/value").arg(w.key()), edt->value()).toDouble());
+                        loaded=true;
+                    }
+                }
+                if (!loaded) {
+                    QFDoubleEdit* edt=qobject_cast<QFDoubleEdit*>(w.value());
+                    if (edt) {
+                        edt->setValue(settings->value(sid+QString("/%1/value").arg(w.key()), edt->value()).toDouble());
+                        loaded=true;
+                    }
+                }
+                if (!loaded) {
+                    QSlider* edt=qobject_cast<QSlider*>(w.value());
+                    if (edt) {
+                        edt->setValue(settings->value(sid+QString("/%1/value").arg(w.key()), edt->value()).toInt());
+                        loaded=true;
+                    }
+                }
+                if (!loaded) {
+                    QPlainTextEdit* edt=qobject_cast<QPlainTextEdit*>(w.value());
+                    if (edt) {
+                        edt->setPlainText(settings->value(sid+QString("/%1/text").arg(w.key()), edt->toPlainText()).toString());
+                        loaded=true;
+                    }
+                }
+                if (!loaded) {
+                    QComboBox* edt=qobject_cast<QComboBox*>(w.value());
+                    if (edt) {
+                        if (edt->isEditable()) edt->setEditText(settings->value(sid+QString("/%1/text").arg(w.key()), edt->currentText()).toString());
+                        else edt->setCurrentIndex(settings->value(sid+QString("/%1/item").arg(w.key()), edt->currentIndex()).toInt());
+                        loaded=true;
+                    }
                 }
             }
-            if (!loaded) {
-                QCheckBox* edt=qobject_cast<QCheckBox*>(w.value());
-                if (edt) {
-                    edt->setChecked(settings->value(sid+QString("/%1/checked").arg(w.key()), edt->isChecked()).toBool());
-                    loaded=true;
-                }
-            }
-            if (!loaded) {
-                QRadioButton* edt=qobject_cast<QRadioButton*>(w.value());
-                if (edt) {
-                    edt->setChecked(settings->value(sid+QString("/%1/checked").arg(w.key()), edt->isChecked()).toBool());
-                    loaded=true;
-                }
-            }
-            if (!loaded) {
-                QSpinBox* edt=qobject_cast<QSpinBox*>(w.value());
-                if (edt) {
-                    edt->setValue(settings->value(sid+QString("/%1/value").arg(w.key()), edt->value()).toInt());
-                    loaded=true;
-                }
-            }
-            if (!loaded) {
-                QDoubleSpinBox* edt=qobject_cast<QDoubleSpinBox*>(w.value());
-                if (edt) {
-                    edt->setValue(settings->value(sid+QString("/%1/value").arg(w.key()), edt->value()).toDouble());
-                    loaded=true;
-                }
-            }
-            if (!loaded) {
-                QFDoubleEdit* edt=qobject_cast<QFDoubleEdit*>(w.value());
-                if (edt) {
-                    edt->setValue(settings->value(sid+QString("/%1/value").arg(w.key()), edt->value()).toDouble());
-                    loaded=true;
-                }
-            }
-            if (!loaded) {
-                QSlider* edt=qobject_cast<QSlider*>(w.value());
-                if (edt) {
-                    edt->setValue(settings->value(sid+QString("/%1/value").arg(w.key()), edt->value()).toInt());
-                    loaded=true;
-                }
-            }
-            if (!loaded) {
-                QPlainTextEdit* edt=qobject_cast<QPlainTextEdit*>(w.value());
-                if (edt) {
-                    edt->setPlainText(settings->value(sid+QString("/%1/text").arg(w.key()), edt->toPlainText()).toString());
-                    loaded=true;
-                }
-            }
-            if (!loaded) {
-                QComboBox* edt=qobject_cast<QComboBox*>(w.value());
-                if (edt) {
-                    if (edt->isEditable()) edt->setEditText(settings->value(sid+QString("/%1/text").arg(w.key()), edt->currentText()).toString());
-                    else edt->setCurrentIndex(settings->value(sid+QString("/%1/item").arg(w.key()), edt->currentIndex()).toInt());
-                    loaded=true;
-                }
+            if (getMain && !w.hasNext()) {
+                w=QMapIterator<QString, QWidget*>(widgets);
+                getMain=false;
             }
         }
     }
@@ -535,15 +608,24 @@ void QConfigComboboxWidget::widgetContentsChanged()
             w.next();
 
             for (int i=0; i<widgetFunctions.size(); i++) {
-                if (widgetFunctions[i].equalsWidget) equals=equals&(*widgetFunctions[i].equalsWidget)(w.value(), *settings, sid+QString("/%1/").arg(w.key()));
+                if (widgetFunctions[i].widget==w.value()) {
+                    if (widgetFunctions[i].equalsWidget) equals=equals&(*widgetFunctions[i].equalsWidget)(w.value(), *settings, sid+QString("/%1/").arg(w.key()));
+                    break;
+                }
             }
             {
+                QConfigComboboxWidgetSaveable* edt=dynamic_cast<QConfigComboboxWidgetSaveable*>(w.value());
+                if (edt) {
+                    equals=equals&(!edt->widgetChanged(settings, sid+QString("/%1/").arg(w.key())));
+                }
+            }
+            {
+
                 QLineEdit* edt=qobject_cast<QLineEdit*>(w.value());
                 if (edt) {
                     equals=equals&(edt->text()==(settings->value(sid+QString("/%1/text").arg(w.key()), edt->text()).toString()));
                 }
-            }
-            {
+            }            {
                 QCheckBox* edt=qobject_cast<QCheckBox*>(w.value());
                 if (edt) {
                     equals=equals&(edt->isChecked()==settings->value(sid+QString("/%1/checked").arg(w.key()), edt->isChecked()).toBool());

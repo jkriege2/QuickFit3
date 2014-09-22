@@ -37,6 +37,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "renamegroupsdialog.h"
 #include "userfitfunctionseditor.h"
 #include "qfparametercorrelationview.h"
+#include "dlgsetrdrpropertybyexpression.h"
 #include <QNetworkRequest>
 #include <QNetworkProxy>
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
@@ -238,6 +239,8 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     parseGlobalreplaces(settings->getMainHelpDirectory());
     parseAutolinks(settings->getMainHelpDirectory(), helpdata.autolinks);
     parseTooltips(settings->getMainHelpDirectory(), helpdata.tooltips);
+
+    mathParserRefDirs<<QString(settings->getMainHelpDirectory()+"/parserreference/");
 
 
 
@@ -1267,6 +1270,8 @@ void MainWindow::createActions() {
     connect(actRenameGroups, SIGNAL(triggered()), this, SLOT(renameGroups()));
     actSetRDRPropertyByRegExp=new QAction(tr("set RDR property by RegExp"), this);
     connect(actSetRDRPropertyByRegExp, SIGNAL(triggered()), this, SLOT(setRDRPropertyByRegExp()));
+    actSetRDRPropertyByExpression=new QAction(tr("caluclate RDR property"), this);
+    connect(actSetRDRPropertyByExpression, SIGNAL(triggered()), this, SLOT(setRDRPropertyByExpression()));
 
     actUserFitfunctionsEditor=new QAction(QIcon(":/lib/edit_fitfunction.png"), tr("edit user fit functions"), this);
     connect(actUserFitfunctionsEditor, SIGNAL(triggered()), this, SLOT(editUserFitFunctions()));
@@ -1333,6 +1338,7 @@ void MainWindow::createMenus() {
     projectToolsMenu->addSeparator();
     projectToolsMenu->addAction(actRenameGroups);
     projectToolsMenu->addSeparator();
+    projectToolsMenu->addAction(actSetRDRPropertyByExpression);
     projectToolsMenu->addAction(actSetRDRPropertyByRegExp);
     projectToolsMenu->addSeparator();
     projectToolsMenu->addAction(actFixFilesPathes);
@@ -2157,6 +2163,7 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     actReloadProject->setEnabled(projectModeEnabled);
     actRenameGroups->setEnabled(projectModeEnabled);
     actSetRDRPropertyByRegExp->setEnabled(projectModeEnabled);
+    actSetRDRPropertyByExpression->setEnabled(projectModeEnabled);
     actRDRReplace->setEnabled(projectModeEnabled);
     actUserFitfunctionsEditor->setEnabled(projectModeEnabled);
     actRDRUndoReplace->setEnabled(projectModeEnabled);
@@ -2512,6 +2519,16 @@ void MainWindow::registerWizard(const QString &menu, const QString &title, QIcon
     connect(actW, SIGNAL(triggered()), receiver, method);
     registerWizard(menu, actW);
     if (actOut) *actOut=actW;
+}
+
+void MainWindow::addQFMathParserRefernceDir(const QString &directory)
+{
+    if (!mathParserRefDirs.contains(directory)) mathParserRefDirs.append(mathParserRefDirs);
+}
+
+QStringList MainWindow::getQFMathParserRefernceDirs()
+{
+    return mathParserRefDirs;
 }
 
 QFExtensionManager* MainWindow::getExtensionManager() const {
@@ -3112,6 +3129,33 @@ void MainWindow::setRDRPropertyByRegExp()
             if (i%10==0) {
                 setProgress(i);
                 QApplication::processEvents();
+            }
+        }
+        setProgressRange(0, 100);
+        setProgress(0);
+        QApplication::restoreOverrideCursor();
+
+    }
+    delete dlg;
+}
+
+void MainWindow::setRDRPropertyByExpression()
+{
+    if (!project) return;
+    DlgSetRDRPropertyByExpression* dlg=new DlgSetRDRPropertyByExpression(this);
+    dlg->setProject(project);
+    if (dlg->exec()) {
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        QList<QPointer<QFRawDataRecord> > rdrs=dlg->getSelectedRDRs();
+        QList<DlgSetRDRPropertyByExpressionEditor*> editors=dlg->getEditors();
+        setProgressRange(0, rdrs.size()*editors.size());
+        for (int j=0; j<editors.size(); j++) {
+            for (int i=0; i<rdrs.size(); i++) {
+                if (rdrs[i]) dlg->applyResult(editors[j], rdrs[i]);
+                if (i%10==0) {
+                    setProgress(j*rdrs.size()+i);
+                    QApplication::processEvents();
+                }
             }
         }
         setProgressRange(0, 100);

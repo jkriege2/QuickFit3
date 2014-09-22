@@ -25,7 +25,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QDialog>
 #include <QListWidgetItem>
 #include "userfitfunctionmodel.h"
-#include "../plugins/base_classes/qffunctionreferencetool.h"
+#include "qffunctionreferencetool.h"
 #include "qfsimpleplotwidget.h"
 #include "qftools.h"
 

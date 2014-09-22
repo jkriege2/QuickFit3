@@ -185,6 +185,16 @@ void QFImFCCSFitEvaluationItem::removeFitFile()
 
 }
 
+void QFImFCCSFitEvaluationItem::removeFitFile(int i)
+{
+    if (i>=0 && i<fitFilesList.size() && fitFilesList.size()>1) {
+        fitFilesList.removeAt(i);
+        if (fitFilesList.size()>0) emit fileChanged(0, fitFilesList.first());
+        paramTable->rebuildModel();
+        setDataChanged();
+    }
+}
+
 void QFImFCCSFitEvaluationItem::setCurrentIndex(int index)
 {
     m_currentIndex=index;

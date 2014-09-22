@@ -32,7 +32,16 @@
       <number>0</number>
      </property>
      <layout class="QFormLayout" name="formLayout">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>5</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>5</number>
+      </property>
+      <property name="bottomMargin">
        <number>5</number>
       </property>
       <item row="0" column="0">
@@ -43,7 +52,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="edtFormula">
+       <widget class="QFEnhancedLineEdit" name="edtFormula">
         <property name="font">
          <font>
           <pointsize>9</pointsize>
@@ -72,7 +81,7 @@
         <string>&amp;Parser Reference</string>
        </property>
        <property name="icon">
-        <iconset resource="../../lib/lib.qrc">
+        <iconset resource="../lib/lib.qrc">
          <normaloff>:/lib/help/help.png</normaloff>:/lib/help/help.png</iconset>
        </property>
       </widget>
@@ -130,7 +139,16 @@
       <property name="fieldGrowthPolicy">
        <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
       </property>
-      <property name="margin">
+      <property name="leftMargin">
+       <number>5</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>5</number>
+      </property>
+      <property name="bottomMargin">
        <number>5</number>
       </property>
       <item row="1" column="1">
@@ -178,7 +196,16 @@
       <number>0</number>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>5</number>
+      </property>
+      <property name="topMargin">
+       <number>5</number>
+      </property>
+      <property name="rightMargin">
+       <number>5</number>
+      </property>
+      <property name="bottomMargin">
        <number>5</number>
       </property>
       <item row="0" column="0">
@@ -227,11 +254,20 @@ p, li { white-space: pre-wrap; }
    <header>qmodernprogresswidget.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QFEnhancedLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfenhancedlineedit.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
  </resources>
  <connections/>
 </ui>

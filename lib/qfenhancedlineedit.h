@@ -78,7 +78,9 @@ class QFLIB_EXPORT QFEnhancedLineEdit : public QLineEdit {
         void addToHistory(const QString& item);
         void setHistory(const QStringList& history);
 
-
+    signals:
+        void helpKeyPressed(const QString& currentText, int cursoPos);
+        void helpKeyPressed(int cursoPos);
     protected:
         virtual void focusOutEvent ( QFocusEvent * event ) ;
         virtual void resizeEvent ( QResizeEvent * event );

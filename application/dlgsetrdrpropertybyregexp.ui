@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>DlgSetRDRPropertyByRegExp</class>
  <widget class="QDialog" name="DlgSetRDRPropertyByRegExp">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="enabled">
    <bool>true</bool>
   </property>

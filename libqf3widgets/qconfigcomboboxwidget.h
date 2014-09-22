@@ -28,6 +28,13 @@
 #include <QSettings>
 #include "libwid_imexport.h"
 
+class QFWIDLIB_EXPORT QConfigComboboxWidgetSaveable {
+    public:
+        virtual bool widgetChanged(QSettings* settings, const QString& prefix)=0;
+        virtual bool saveWidget(QSettings* settings, const QString& prefix)=0;
+        virtual bool loadWidget(QSettings* settings, const QString& prefix)=0;
+};
+
 class QFWIDLIB_EXPORT QConfigComboboxWidget : public QWidget
 {
         Q_OBJECT
@@ -39,21 +46,26 @@ class QFWIDLIB_EXPORT QConfigComboboxWidget : public QWidget
         typedef bool (*UnregisterWidgetFunction)(QWidget*, QConfigComboboxWidget* config);
 
         struct WidgetFunctions {
-            SaveWidgetFunction* saveWidget;
-            LoadWidgetFunction* loadWidget;
-            EqualsWidgetFunction* equalsWidget;
-            RegisterWidgetFunction* registerWidget;
-            UnregisterWidgetFunction* unregisterWidget;
+            SaveWidgetFunction saveWidget;
+            LoadWidgetFunction loadWidget;
+            EqualsWidgetFunction equalsWidget;
+            RegisterWidgetFunction registerWidget;
+            UnregisterWidgetFunction unregisterWidget;
+            QWidget* widget;
         };
 
         explicit QConfigComboboxWidget(QString filename=QString("configcombobox.ini"), QWidget *parent = 0);
         explicit QConfigComboboxWidget(QWidget *parent = 0);
         virtual ~QConfigComboboxWidget();
 
+
         void registerWidget(const QString& id, QWidget* widget);
+        void registerWidget(const QString& id, const WidgetFunctions& widget);
         void unregisterWidget(const QString& id);
         void unregisterWidget(QWidget* widget);
         void unregisterWidgets();
+        void renameEditor(const QString& id_old, const QString& id);
+        void setEditorName(QWidget* wid, const QString& id);
         int currentConfig() const;
         QString currentConfigName() const;
         QString currentFilename() const;

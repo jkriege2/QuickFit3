@@ -68,7 +68,8 @@ HEADERS += mainwindow.h \
     userfitfunctionseditor.h \
     userfitfunctionmodel.h \
     userfitfunctiondelegate.h \
-    ../plugins/base_classes/qffunctionreferencetool.h
+    dlgsetrdrpropertybyexpression.h \
+    dlgsetrdrpropertybyexpressioneditor.h
 
 SOURCES += main.cpp \
            mainwindow.cpp \
@@ -85,7 +86,8 @@ SOURCES += main.cpp \
     userfitfunctionseditor.cpp \
     userfitfunctionmodel.cpp \
     userfitfunctiondelegate.cpp \
-    ../plugins/base_classes/qffunctionreferencetool.cpp
+    dlgsetrdrpropertybyexpression.cpp \
+    dlgsetrdrpropertybyexpressioneditor.cpp
 
 FORMS =    optionsdialog.ui \
            about.ui \
@@ -98,7 +100,9 @@ FORMS =    optionsdialog.ui \
     dlgfixfilepaths.ui \
     renamegroupsdialog.ui \
     dlgsetrdrpropertybyregexp.ui \
-    userfitfunctionseditor.ui
+    userfitfunctionseditor.ui \
+    dlgsetrdrpropertybyexpression.ui \
+    dlgsetrdrpropertybyexpressioneditor.ui
 
 RESOURCES += quickfit3.qrc
 
@@ -147,7 +151,10 @@ HELPREF_FILES.path = $${QFOUTPUT}/assets/help/parserreference/
 HELPREFPIC_FILES.files = ./help/parserreference/pic/*.*
 HELPREFPIC_FILES.path = $${QFOUTPUT}/assets/help/parserreference/pic/
 
-INSTALLS += ASSETSSTYLESHEET_FILES HELPREF_FILES HELPREFPIC_FILES ICON_FILES ASSETSFF_FILES ASSETSCOLORPALETTES_FILES
+HELPDLGREF_FILES.files = ./help/dlgsetrdrpropertybyexpression_ref/*.*
+HELPDLGREF_FILES.path = $${QFOUTPUT}/assets/help/dlgsetrdrpropertybyexpression_ref/
+
+INSTALLS += ASSETSSTYLESHEET_FILES HELPREF_FILES HELPREFPIC_FILES ICON_FILES ASSETSFF_FILES ASSETSCOLORPALETTES_FILES HELPDLGREF_FILES
 
 OTHER_FILES += \
     releasenote.html

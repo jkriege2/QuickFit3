@@ -46,7 +46,6 @@ HEADERS += qfrdrtable.h \
     qfrdrtablesortdialog.h \
     qfrdrtablehistogramdialog.h \
     qfrdrtableparserfunctions.h \
-    ../base_classes/qffunctionreferencetool.h \
     qfrdrtableenhancedtableview.h \
     ../interfaces/qfrdrtableinterface.h \
     ../interfaces/qfrdrcolumngraphsinterface.h \
@@ -74,7 +73,6 @@ SOURCES += qfrdrtable.cpp \
     qfrdrtablesortdialog.cpp \
     qfrdrtablehistogramdialog.cpp \
     qfrdrtableparserfunctions.cpp \
-    ../base_classes/qffunctionreferencetool.cpp \
     qfrdrtableenhancedtableview.cpp \
     qftablegraphsettings.cpp \
     qfrdrtablecolumneditor.cpp \

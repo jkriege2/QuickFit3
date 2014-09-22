@@ -33,8 +33,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QLineEdit>
 #include <QPlainTextEdit>
 #include "qmodernprogresswidget.h"
+#include "libwid_imexport.h"
 
-class QFFunctionReferenceToolDocSearchThread: public QThread {
+class QFWIDLIB_EXPORT QFFunctionReferenceToolDocSearchThread: public QThread {
        Q_OBJECT
    public:
        QFFunctionReferenceToolDocSearchThread(QStringList files, QObject* parent=NULL);
@@ -77,7 +78,7 @@ class QFFunctionReferenceToolDocSearchThread: public QThread {
     by the user.
 
 */
-class QFFunctionReferenceTool : public QObject
+class QFWIDLIB_EXPORT QFFunctionReferenceTool : public QObject
 {
         Q_OBJECT
     public:
@@ -121,6 +122,7 @@ class QFFunctionReferenceTool : public QObject
         void startSearch(const QString& directory, const QString& globalConfigVar=QString("QFMathParser_ref"));
         /** \brief opens an online-help window and displays the help entry for the function currentyl under the cursor */
         void showCurrentFunctionHelp();
+        void showDefaultHelp();
     protected slots:
         void onCursorPositionChanged(int old=0, int newPos=0);
         void threadFinished();
@@ -159,6 +161,8 @@ class QFFunctionReferenceTool : public QObject
         QLabel* labTemplate;
         QString currentFunction;
         QAbstractButton* btnCurrentHelp;
+        QAction* actDefaultHelp;
+        QAction* actCurrentFunctionHelp;
 };
 
 #endif // QFFUNCTIONREFERENCETOOL_H

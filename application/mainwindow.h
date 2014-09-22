@@ -160,6 +160,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         /** \copydoc QFPluginServices::registerWizard() */
         virtual void registerWizard(const QString& menu, const QString &title, QIcon icon, const QObject * receiver, const char * method, QAction** actOut=NULL);
 
+        virtual void addQFMathParserRefernceDir(const QString& directory);
+        virtual QStringList getQFMathParserRefernceDirs();
 
         /** \copydoc QFPluginServices::getExtensionManager() */
         virtual QFExtensionManager* getExtensionManager() const;
@@ -381,6 +383,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         void renameGroups();
         void setRDRPropertyByRegExp();
+        void setRDRPropertyByExpression();
 
         void editUserFitFunctions();
         void closeUserFitEditor();
@@ -493,6 +496,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QAction* actFixFilesPathes;
         QAction* actRenameGroups;
         QAction* actSetRDRPropertyByRegExp;
+        QAction* actSetRDRPropertyByExpression;
         QProgressBar* prgMainProgress;
 
         /** \brief length of the list of recently opened files */
@@ -548,6 +552,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QFExtensionManager* extensionManager;
         /** \brief QFImporter manager */
         QFImporterManager* importerManager;
+
+        QStringList mathParserRefDirs;
 
         /** \brief help display widget */
         QFHTMLHelpWindow* helpWindow;
