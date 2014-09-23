@@ -28,8 +28,8 @@ message(AUTOVERSIONING IN $$PWD)
 #try to read compiler name and version
 COMPILERVERSION=$$system($$QMAKE_CXX --version)
 COMPILERVERSION_MACHINE=$$system($$QMAKE_CXX -dumpmachine)
-message($$QMAKE_CXX  .$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}main.cpp -o .$${QF3BASEDIR}$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX})
-system($$QMAKE_CXX  .$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}main.cpp -o .$${QF3BASEDIR}$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX})
+message($$QMAKE_CXX  .$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}main.cpp -o .$${DIR_SEPARATOR}output$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX})
+system($$QMAKE_CXX  .$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}main.cpp -o .$${DIR_SEPARATOR}output$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX})
 
 # try to read the SVN version
 SVNVERSION = $$system(svnversion)
@@ -45,8 +45,8 @@ isEmpty(SVNVERSION) {
     SVNVERSION = ---
 }
 
-DATESTR = $$system(.$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX} --date)
-DATESTRYEAR = $$system(.$${DIR_SEPARATOR}tools$${DIR_SEPARATOR}qf3infotool$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX} --year)
+DATESTR = $$system(.$${DIR_SEPARATOR}output$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX} --date)
+DATESTRYEAR = $$system(.$${DIR_SEPARATOR}output$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX} --year)
 
 message("COMPILE MODE: SVNVERSION is: $$SVNVERSION")
 message("COMPILE MODE: build date is: $$DATESTR")
