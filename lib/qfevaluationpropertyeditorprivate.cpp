@@ -968,7 +968,7 @@ void QFEvaluationPropertyEditorPrivate::saveResults() {
 
         }
 
-        qDebug()<<all<<exportAll<<indxs.size();
+        //qDebug()<<all<<exportAll<<indxs.size();
 
         QStringList evalIDs;
         QList<QPair<QPointer<QFRawDataRecord>, QString> > records;
@@ -977,7 +977,7 @@ void QFEvaluationPropertyEditorPrivate::saveResults() {
                 evalIDs.append(indxs[i].data(QFEvaluationResultsModel::ResultNameRole).toString());
                 QPointer<QFRawDataRecord>  pp=d->current->getProject()->getRawDataByID(indxs[i].data(QFEvaluationResultsModel::ResultIDRole).toInt());
                 records.append(qMakePair(pp, indxs[i].data(QFEvaluationResultsModel::EvalNameRole).toString()));
-                qDebug()<<evalIDs.last()<<records.last().first<<records.last().second;
+                //qDebug()<<evalIDs.last()<<records.last().first<<records.last().second;
             }
         }
 

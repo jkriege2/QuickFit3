@@ -778,7 +778,7 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
     }
 
 
-    qDebug()<<"loaded:   "<<width<<"x"<<height<<"  N="<<N<<"   channels="<<getSimpleCountrateChannels();
+    //qDebug()<<"loaded:   "<<width<<"x"<<height<<"  N="<<N<<"   channels="<<getSimpleCountrateChannels();
 }
 
 bool QFRDRImagingFCSData::loadOverview(double* overviewF, double* overviewF2, const QString& filename) {
@@ -1522,7 +1522,7 @@ void QFRDRImagingFCSData::allocateOverviews(int x, int y) {
 
         overviewF=(double*)qfCalloc(x*y,sizeof(double));
         overviewFSTD=(double*)qfCalloc(x*y,sizeof(double));
-        if (isDCCF() || internalDualViewMode()!=QFRDRImagingFCSData::dvNone /*&& !getRole().toLower().startsWith("acf")*/) {
+        if (isFCCS() || isDCCF() || internalDualViewMode()!=QFRDRImagingFCSData::dvNone /*&& !getRole().toLower().startsWith("acf")*/) {
             overviewF2=(double*)qfCalloc(x*y,sizeof(double));
             overviewF2STD=(double*)qfCalloc(x*y,sizeof(double));
         }
@@ -1876,8 +1876,8 @@ int QFRDRImagingFCSData::getExpectedFileHeight() const
 
 void QFRDRImagingFCSData::splitImage(double* overviewF, double* overviewF2, const double* inputImage, uint32_t nx, uint32_t ny)
 {
-    if (isFCCS()) {
-        //qDebug()<<getID()<<"splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width = "<<width<<"   height = "<<height<<"   intDV2="<<internalDualViewMode()<<",channel="<<internalDualViewModeChannel();
+    if (!isDCCF()) {
+        //qDebug()<<getName()<<"\n  splitImage(overviewF="<<overviewF<<",  overviewF2="<<overviewF2<<",  nx="<<nx<<",  ny="<<ny<<")   width = "<<width<<"   height = "<<height<<"   intDV2="<<internalDualViewMode()<<",channel="<<internalDualViewModeChannel();
         if (internalDualViewMode()==QFRDRImagingFCSData::dvHorizontal && (int64_t)nx>=2*width && (int64_t)ny==height) {
             int shift1=0;
             int shift2=width;
@@ -2133,7 +2133,7 @@ int QFRDRImagingFCSData::getImageFromRunsChannels() const
         if (isDCCF() && overviewF2) return 2;
         return 1;
     } else {
-        if ((overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL"))) || isFCCS()) return 2;
+        if (overviewF2) return 2;
         //if ((overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL")&&getProperty("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL", false).toBool())) || isFCCS()) return 2;
         return 1;
     }

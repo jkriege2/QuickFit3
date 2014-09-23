@@ -1526,7 +1526,7 @@ void QFRDRTableEditor::slRecalcAll()
                 QApplication::processEvents();
                 if (!ok) break;
                 iterations++;
-                qDebug()<<"** reeval: "<<iterations<<changes;
+                //qDebug()<<"** reeval: "<<iterations<<changes;
             }
             if (iterations>=maxIterations) {
                 QMessageBox::critical(this, tr("QuickFit-table"), tr("Stopped reevaluating expressions after %1 iterations!\n  Changes were detected after %1 iterations, this might point to circular references in expression.\n  So results might not be reliable, rerun!").arg(maxIterations));

@@ -560,9 +560,9 @@ void QFMeasurementDeviceConfigWidget::setValue(int line, const QVariant &power) 
     int MeasurementDeviceID=getMeasurementDeviceID();
     if (MeasurementDevice) {
         lockMeasurementDevice();
-        qDebug()<<"set param no. "<<line<<" to "<<power;
+        //qDebug()<<"set param no. "<<line<<" to "<<power;
         MeasurementDevice->setMeasurementDeviceValue(MeasurementDeviceID, line, power);
-        qDebug()<<"set param no. "<<line<<" to "<<power<<"   DONE";
+        //qDebug()<<"set param no. "<<line<<" to "<<power<<"   DONE";
         unlockMeasurementDevice();
 
     }

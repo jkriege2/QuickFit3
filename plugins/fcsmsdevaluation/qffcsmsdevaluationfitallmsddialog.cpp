@@ -162,7 +162,7 @@ void QFFCSMSDEvaluationFitAllMSDDialog::performFit()
 
                 evaluation->calcMSDFit(alpha, fixAlphas[theoryID]->isChecked(), D, fixDs[theoryID]->isChecked(), applyTo[i].record, applyTo[i].run, evaluation->getCurrentModel(), Ps[theoryID]->value(), rmin, rmax, ui->cmbFitType->currentIndex());
                 evaluation->setTheory(theoryID, true, Ps[theoryID]->value(), D, alpha, applyTo[i].record, applyTo[i].run);
-                qDebug()<<applyTo[i].run;
+                //qDebug()<<applyTo[i].run;
 
                 QString param=QString("msd_theory%1_fit_trangemin").arg(theoryID);
                 evaluation->setFitValue(applyTo[i].record, applyTo[i].run, evaluation->getCurrentModel(), param, ui->datacut->get_userMin());

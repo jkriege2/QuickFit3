@@ -108,7 +108,7 @@ void QFFCSFitChi2LandscapeDialog::on_btnPlot_clicked()
 
     int pX=ui->cmbParameterX->itemData(ui->cmbParameterX->currentIndex()).toInt();
     int pY=ui->cmbParameterY->itemData(ui->cmbParameterY->currentIndex()).toInt();
-    qDebug()<<pX<<pY;
+    //qDebug()<<pX<<pY;
     item->calcChi2Landscape(d, 0, pX, xData, 0, pY, yData, item->getHighlightedRecord(), index);
     if (ui->chkLogscale->isChecked()) {
         for (int i=0; i<ui->spinXPixels->value()*ui->spinYPixels->value(); i++) {

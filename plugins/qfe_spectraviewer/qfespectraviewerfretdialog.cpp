@@ -106,7 +106,7 @@ void QFESpectraViewerFRETDialog::updateFRET()
             //qDebug()<<"JJ="<<J/Jn;
             double fret=0.211*pow(J/Jn*Q/pow(n, 4)*kappa2, 1.0/6.0);
                     //pow(9000.0*Q*M_LN10*kappa2*J/Jn/128.0/pow(M_PI, 5)/pow(n, 4)/QF_NAVOGADRO, 1.0/6.0)*10.0;
-            qDebug()<<"R0="<<fret<<" Angstrom";
+            //qDebug()<<"R0="<<fret<<" Angstrom";
             model.setCellCreate(i+2, c, fret);
             model.setColumnTitleCreate(c, fluorophores[j].name);
             c++;

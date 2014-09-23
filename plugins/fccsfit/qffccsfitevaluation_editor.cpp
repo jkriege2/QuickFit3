@@ -1197,7 +1197,7 @@ void QFFCCSFitEvaluationEditor::fitAllFilesetsAllPixels()
 
             QList<QFRawDataRecord*> records=filesets[fsIdx];
             if (records.size()>0) {
-                qDebug()<<"fitting "<<records[0]->getName();
+                //qDebug()<<"fitting "<<records[0]->getName();
                 //for (int i=0; i<records.size(); i++) { eval->setFitFile(0, records[i]); }
                 //QApplication::processEvents();
                 QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(records[0]);

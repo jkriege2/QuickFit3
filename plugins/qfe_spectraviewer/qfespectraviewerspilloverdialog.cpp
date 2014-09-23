@@ -76,7 +76,7 @@ void QFESpectraViewerSpilloverDialog::init(const QList<QFESpectraViewerPlotItem>
         c++;        
         for (int j=0; j<filters.size(); j++) {
             model.setColumnTitleCreate(c, filters[j].name);
-            qDebug()<<fluorophores[i].name<<filters[j].name;
+            //qDebug()<<fluorophores[i].name<<filters[j].name;
             if (manager->spectrumExists(fluorophores[i].spectrum_fl) && manager->spectrumExists(filters[j].spectrum)) {
                 model.setCellCreate(i, c, QString::number(manager->getSpectrum(fluorophores[i].spectrum_fl)->getMulSpectrumIntegral(manager->getSpectrum(filters[j].spectrum))/manager->getSpectrum(fluorophores[i].spectrum_fl)->getSpectrumFullIntegral()*100.0)+QString(" %"));
             }
@@ -84,7 +84,7 @@ void QFESpectraViewerSpilloverDialog::init(const QList<QFESpectraViewerPlotItem>
         }
         for (int j=0; j<filtersSimple.size(); j++) {
             model.setColumnTitleCreate(c, filtersSimple[j].name);
-            qDebug()<<fluorophores[i].name<<filtersSimple[j].name;
+            //qDebug()<<fluorophores[i].name<<filtersSimple[j].name;
             if (manager->spectrumExists(fluorophores[i].spectrum_fl)) {
                 if (filtersSimple[j].type==qfesFilterBandpass) {
                     model.setCellCreate(i, c, QString::number(manager->getSpectrum(fluorophores[i].spectrum_fl)->getSpectrumIntegral(filtersSimple[j].center-filtersSimple[j].width/2.0,filtersSimple[j].center+filtersSimple[j].width/2.0)/manager->getSpectrum(fluorophores[i].spectrum_fl)->getSpectrumFullIntegral()*100.0)+QString(" %"));

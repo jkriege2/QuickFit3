@@ -88,7 +88,7 @@ bool QFImageTransformWidget::transform(const QVector<double> &input, int width, 
         bool ok=true;
         for (int i=0; i<items.size(); i++) {
             ok=ok&&items[i]->transform(invec, iwidth, iheight, output, width_out, height_out);
-            qDebug()<<"  i="<<i+1<<"/"<<items.size()<<":    ("<<iwidth<<iheight<<")  ->  ("<<width_out<<height_out<<")";
+            //qDebug()<<"  i="<<i+1<<"/"<<items.size()<<":    ("<<iwidth<<iheight<<")  ->  ("<<width_out<<height_out<<")";
             if (i+1<items.size()) {
                 invec=output;
                 iwidth=width_out;

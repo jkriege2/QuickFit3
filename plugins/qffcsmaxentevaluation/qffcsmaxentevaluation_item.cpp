@@ -770,14 +770,14 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
                         dist[i]=init_dist[i];
                     }
                 old_distribution=true;
-                qDebug()<< "OLDDIST TRUE";
+                //qDebug()<< "OLDDIST TRUE";
             }
         else
             {
                 distTaus=NULL;
                 dist=NULL;
                 old_distribution=false;
-                qDebug()<< "OLDDIST FALSE";
+                //qDebug()<< "OLDDIST FALSE";
                 if (int64_t(Ndist)>(rangeMaxDatarange-rangeMinDatarange))
                     {
                         Ndist=(rangeMaxDatarange-rangeMinDatarange);

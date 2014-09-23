@@ -394,9 +394,9 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
 
 
 
-                qDebug()<<mmin1<<mmax1;
+                /*qDebug()<<mmin1<<mmax1;
                 qDebug()<<mmin2<<mmax2;
-                qDebug()<<mmin3<<mmax3;
+                qDebug()<<mmin3<<mmax3;*/
 
                 for (register int32_t i=0; i<imageSize; i++) {
                     const double v1=hist.data1[i];

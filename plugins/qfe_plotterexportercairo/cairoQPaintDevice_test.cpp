@@ -88,48 +88,48 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    qDebug()<<"create PDF:";
+    //qDebug()<<"create PDF:";
     {
         QCairoPaintDevice * cairoPDF=new QCairoPaintDevice(QSize(200,100), "test.pdf", QCairoPaintDevice::cftPDF);
-        qDebug()<<"  paint PDF";
+        //qDebug()<<"  paint PDF";
         paint(cairoPDF);
-        qDebug()<<"  delete PDF";
+        //qDebug()<<"  delete PDF";
         delete cairoPDF;
     }
 
-    qDebug()<<"create PDF+text:";
+    //qDebug()<<"create PDF+text:";
     {
         QCairoPaintDevice * cairoPDF=new QCairoPaintDevice(QSize(200,100), "testtxt.pdf", QCairoPaintDevice::cftPDF, true);
-        qDebug()<<"  paint PDF+text";
+        //qDebug()<<"  paint PDF+text";
         paint(cairoPDF);
-        qDebug()<<"  delete PDF+text";
+        //qDebug()<<"  delete PDF+text";
         delete cairoPDF;
     }
 
-    qDebug()<<"create SVG:";
+    //qDebug()<<"create SVG:";
     {
         QCairoPaintDevice * cairoPDF=new QCairoPaintDevice(QSize(200,100), "test.svg", QCairoPaintDevice::cftSVG);
-        qDebug()<<"  paint SVG";
+        //qDebug()<<"  paint SVG";
         paint(cairoPDF);
-        qDebug()<<"  delete SVG";
+        //qDebug()<<"  delete SVG";
         delete cairoPDF;
     }
 
-    qDebug()<<"create PS:";
+    //qDebug()<<"create PS:";
     {
         QCairoPaintDevice * cairoPDF=new QCairoPaintDevice(QSize(200,100), "test.ps", QCairoPaintDevice::cftPS);
-        qDebug()<<"  paint PS";
+        //qDebug()<<"  paint PS";
         paint(cairoPDF);
-        qDebug()<<"  delete PS";
+        //qDebug()<<"  delete PS";
         delete cairoPDF;
     }
 
-    qDebug()<<"create EPS:";
+    //qDebug()<<"create EPS:";
     {
         QCairoPaintDevice * cairoPDF=new QCairoPaintDevice(QSize(200,100), "test.eps", QCairoPaintDevice::cftEPS);
-        qDebug()<<"  paint EPS";
+        //qDebug()<<"  paint EPS";
         paint(cairoPDF);
-        qDebug()<<"  delete EPS";
+        //qDebug()<<"  delete EPS";
         delete cairoPDF;
     }
 

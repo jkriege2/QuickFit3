@@ -382,7 +382,7 @@ void QFPEvalIMFCSFit::imFCSCalibrationTool2()
                     double Dvar=0;
                     double Dmean=qfstatisticsAverageVariance(Dvar, D);
                     //tab->tableSetData(ri, 1+counter*2, Dmean);
-                    qDebug()<<"Dvals["<<counter<<"/"<<Dvals.size()<<"]="<<Dmean;
+                    //qDebug()<<"Dvals["<<counter<<"/"<<Dvals.size()<<"]="<<Dmean;
                     Dvals[counter]<<Dmean;
                     Derrs[counter]<<sqrt(Dvar);
                     //tab->tableSetData(ri, 1+counter*2+1, sqrt(Dvar));

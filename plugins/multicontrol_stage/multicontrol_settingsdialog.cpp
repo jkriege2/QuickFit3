@@ -104,7 +104,7 @@ void MulticontrolSettingsDialog::confirm()
         settings->setValue("driver/maxvelocity", QString::number(maxVelBox->value(), 'f'));
         settings->setValue("driver/maxjoyspeed", QString::number(maxJoyspeedBox->value(), 'f'));
         QString newComPort(tr("COM%1").arg(comCombo->currentIndex()+1));
-        qDebug() << newComPort;
+        //qDebug() << newComPort;
         settings->setValue("driver/port", newComPort);
     } else {
         log_error("Settings could not be written.");

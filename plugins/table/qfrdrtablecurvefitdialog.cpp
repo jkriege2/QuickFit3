@@ -1039,7 +1039,7 @@ void QFRDRTableCurveFitDialog::readFitProperties(int pid, int gid, int* resultCo
     ui->datacut->set_userMax(table->colgraphGetGraphProperty(pid, gid, "FIT_CUTHIGH", ui->datacut->get_userMax()).toDouble());
     bool logX=false;
     ui->chkWeighted->setChecked(table->colgraphGetGraphProperty(pid, gid, "FIT_WEIGHTED", ui->chkWeighted->isChecked()).toBool());
-    qDebug()<<pid<<gid<<"FIT_BOOTSTRAPPING="<<table->colgraphGetGraphProperty(pid, gid, "FIT_BOOTSTRAPPING");
+    //qDebug()<<pid<<gid<<"FIT_BOOTSTRAPPING="<<table->colgraphGetGraphProperty(pid, gid, "FIT_BOOTSTRAPPING");
     ui->chkBootstrap->setChecked(table->colgraphGetGraphProperty(pid, gid, "FIT_BOOTSTRAPPING", ui->chkBootstrap->isChecked()).toBool());
     ui->chkLogX->setChecked(logX=table->colgraphGetGraphProperty(pid, gid, "FIT_LOGX", ui->chkLogX->isChecked()).toBool());
     ui->chkLogY->setChecked(table->colgraphGetGraphProperty(pid, gid, "FIT_LOGY", ui->chkLogY->isChecked()).toBool());

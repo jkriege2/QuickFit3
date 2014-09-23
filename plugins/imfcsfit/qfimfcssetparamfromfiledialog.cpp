@@ -139,7 +139,7 @@ void QFImFCSSetParamFromFileDialog::replotOvr()
 
         ui->labInfo->setText(tr("desired image size: %1 x %2 = %3         output data size: %4 (%5x%6)").arg(desiredwidth).arg(desiredheight).arg(desiredwidth*desiredheight).arg(dcopysize).arg(w).arg(h));
 
-        qDebug()<<w<<h<<d.size()<<dcopysize;
+        //qDebug()<<w<<h<<d.size()<<dcopysize;
         if (ui->chkMapDesired->isChecked()) {
             w=desiredwidth;
             h=desiredheight;
@@ -151,9 +151,9 @@ void QFImFCSSetParamFromFileDialog::replotOvr()
                 dcopysize=desiredwidth*desiredheight;
             }
         }
-        qDebug()<<w<<h<<d.size()<<dcopysize;
+        //qDebug()<<w<<h<<d.size()<<dcopysize;
 
-        qDebug()<<"PLOT!!!";
+        //qDebug()<<"PLOT!!!";
         //while (d.size()<w*h) d.append(0);
 
 
