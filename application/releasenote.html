@@ -54,7 +54,7 @@
                     <li>added functions cumsum(), cumprod(), diff(), mad(), nmad(), indexedmad(), indexednmad(), trapez()/trapz()</li>
                     <li>added functions for date/time handling: now(), datenum(), datetimenum(), date2str(), datetime2str(), datediff2secs(), datediff2mins(), datediff2hours(), datediff2days()</li>
                     <li>parser now supports user-defined functions, that have qfmpNode*'s as parameters, rather than qfmpResult's (this allows for constructs, like "for()" in user-defined functions</li>                    
-                    <li></li>
+                    <li>bugfix: regular expressions functions now work correctly</li>
                     <li></li>
                     <li></li>
                     <li></li>
@@ -202,7 +202,7 @@
             <li>parameter correlation now supports a relaxed auto-ranging</li>
             <li>parameter histograms now support a relaxed auto-ranging</li>
             <li>parameter histograms now support a distribution fit to the histogram</li>
-            <li></li>
+            <li>added warning to the correlation dialog, when you try to correlate files, that are larger than 1GB, since this will require a lot of RAM!</li>
             <li></li>
           </ul></li>
         <li><b>table</b><ul>

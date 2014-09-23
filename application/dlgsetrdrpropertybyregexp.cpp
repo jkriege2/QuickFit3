@@ -48,6 +48,10 @@ DlgSetRDRPropertyByRegExp::DlgSetRDRPropertyByRegExp(QWidget *parent) :
     ui->widConfig->registerWidget("edtRegExp", ui->edtRegExp);
     ui->widConfig->registerWidget("cmbPropertyName", ui->cmbPropertyName);
     ui->widConfig->registerWidget("cmbPropertyType", ui->cmbPropertyType);
+
+    ProgramOptions::getConfigWindowGeometry(this, "DlgSetRDRPropertyByExpression/window");
+    ProgramOptions::getConfigQSplitter(ui->splitter, "DlgSetRDRPropertyByExpression/splitter");
+
 }
 
 DlgSetRDRPropertyByRegExp::~DlgSetRDRPropertyByRegExp()
@@ -62,6 +66,10 @@ DlgSetRDRPropertyByRegExp::~DlgSetRDRPropertyByRegExp()
     ProgramOptions::setConfigValue("DlgSetRDRPropertyByRegExp/regexp", ui->edtRegExp->text());
     ProgramOptions::setConfigValue("DlgSetRDRPropertyByRegExp/propname", ui->cmbPropertyName->currentText());
     ProgramOptions::setConfigValue("DlgSetRDRPropertyByRegExp/proptype", ui->cmbPropertyType->currentIndex());
+
+    ProgramOptions::setConfigWindowGeometry(this, "DlgSetRDRPropertyByExpression/window");
+    ProgramOptions::setConfigQSplitter(ui->splitter, "DlgSetRDRPropertyByExpression/splitter");
+
     delete ui;
 }
 

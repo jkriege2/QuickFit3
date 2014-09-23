@@ -497,7 +497,7 @@ QVariant qfmpResult::asVariant() const
     QVariant vl;
     if (type==qfmpDouble) {
         vl=num;
-        if (isInteger()) vl=toInteger();
+        //if (isInteger()) vl=toInteger();
     } else if (type==qfmpString) {
         vl=str;
     } else if (type==qfmpBool) {

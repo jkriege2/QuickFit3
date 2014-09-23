@@ -174,11 +174,16 @@ DlgSetRDRPropertyByExpression::DlgSetRDRPropertyByExpression(QWidget *parent) :
     ui->widConfig->registerWidget("main", f);
 
     on_btnAdd_clicked();
+
+    ProgramOptions::getConfigWindowGeometry(this, "DlgSetRDRPropertyByExpression/window");
+    ProgramOptions::getConfigQSplitter(ui->splitter, "DlgSetRDRPropertyByExpression/splitter");
 }
 
 DlgSetRDRPropertyByExpression::~DlgSetRDRPropertyByExpression()
 {
     ui->widConfig->unregisterWidgets();
+    ProgramOptions::setConfigWindowGeometry(this, "DlgSetRDRPropertyByExpression/window");
+    ProgramOptions::setConfigQSplitter(ui->splitter, "DlgSetRDRPropertyByExpression/splitter");
     delete ui;
 }
 
@@ -291,7 +296,10 @@ void DlgSetRDRPropertyByExpression::applyResult(DlgSetRDRPropertyByExpressionEdi
 QFRawDataRecord *DlgSetRDRPropertyByExpression::currentRDR() const
 {
     int idx=ui->lstRDR->currentRow();
-    if (idx<0) return rdrs.value(idx, NULL);idx=0;
+    //qDebug()<<"curRow: "<<idx;
+    if (idx<0) idx=0;
+    //qDebug()<<"curRow_checked: "<<idx<<rdrs.value(idx, NULL);
+    //if (rdrs.value(idx, NULL)) qDebug()<<"   "<<rdrs.value(idx, NULL)->getName();
     return rdrs.value(idx, NULL);
 }
 

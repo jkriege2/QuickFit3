@@ -26,10 +26,23 @@
       <li>A click on OK will apply the items to all selected RDRs, yb first applying the first item to all RDRs, then the second, ...</li>
     </ol>
     </p>
+    <p>The widgtes
+    <center><a name="dlgsetrdrpropertybyexpression_pic002"><img src="./pic/dlgsetrdrpropertybyexpression_pic002.png" border="1">
+    </center>
+    can be used to store the current configuration in a configuration file. If you click on "+", you can enter a new name. If you select one of the names in the combo-box, the according configuration will be loaded. With "-" you can remove a configuration.</p>
     <h2>Examples</h2>
     <p>The item
     <center><a name="dlgsetrdrpropertybyexpression_pic000"><img src="./pic/dlgsetrdrpropertybyexpression_pic000.png" border="1">
     </center>will set the RDR group, by reading the property <tt>BB</tt> and adding the string <tt>" babe"</tt>.
+    </p>
+    <p>
+    <center><a name="dlgsetrdrpropertybyexpression_pic001"><img src="./pic/dlgsetrdrpropertybyexpression_pic001.png" border="1">
+    </center>
+    This item sets the (new) property <tt>T_BLEACH</tt> to a value, which is calculated by
+    $$codeexample:if(containssubstring(name, "noBleach"), 0, str2num(regexpcap(".*__tauBleach([^\_]+)_", name)))$$
+    This is designed to parse filenames, such as 
+    $$codeexample:photodyn_FL1X__D90_c3__IsatRel0.5__tauT2_thetaT0.2__noBleach__IsatRel0.5_alvacf.asc - ACF0<br>photodyn_FL1X__D90_c3__IsatRel1__tauT2_thetaT0.2__tauBleach0.001__noIsat_alvacf.asc - ACF0$$
+    The expression extracts either the nubmer, which is written behin <tt>__tauBleach</tt>, or returns <tt>0</tt>, if the name contains <tt>noBleach</tt>.
     </p>
   </body>
 </html>

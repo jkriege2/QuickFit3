@@ -790,15 +790,14 @@ static inline void FName(qfmpResult& r, const qfmpResult* params, unsigned int  
 */
 #define QFMATHPARSER_DEFINE_1PARAM_STRING2NUM_FUNC(FName, NAME_IN_PARSER, CFUNC) \
 static inline void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
-    r.type=qfmpDouble;\
-    r.isValid=true;\
+    r.setInvalid();\
     if (n!=1) {\
         p->qfmpError(QObject::tr("%1(...) needs exacptly 1 argument").arg(#NAME_IN_PARSER));\
         r.setInvalid();\
         return; \
     }\
     if (params[0].type==qfmpString) {\
-        r.num=CFUNC(params[0].str);\
+        r.setDouble(CFUNC(params[0].str));\
     } else if (params[0].type==qfmpStringVector) {\
         r.setDoubleVec(params[0].strVec.size());\
         for (int i=0; i<params[0].strVec.size(); i++) {\

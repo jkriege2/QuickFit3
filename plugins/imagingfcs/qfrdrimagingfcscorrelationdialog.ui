@@ -162,7 +162,16 @@
           </sizepolicy>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
            <number>0</number>
           </property>
           <item>
@@ -195,7 +204,16 @@
              <property name="verticalSpacing">
               <number>2</number>
              </property>
-             <property name="margin">
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
               <number>0</number>
              </property>
              <item row="1" column="0">
@@ -439,7 +457,16 @@ p, li { white-space: pre-wrap; }
                 <bool>false</bool>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_17">
-                <property name="margin">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
                  <number>0</number>
                 </property>
                 <item>
@@ -799,7 +826,16 @@ p, li { white-space: pre-wrap; }
                   <property name="spacing">
                    <number>3</number>
                   </property>
-                  <property name="margin">
+                  <property name="leftMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="topMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="rightMargin">
+                   <number>0</number>
+                  </property>
+                  <property name="bottomMargin">
                    <number>0</number>
                   </property>
                   <item>
@@ -883,7 +919,7 @@ p, li { white-space: pre-wrap; }
                   <item>
                    <widget class="QToolButton" name="btnSelCrop">
                     <property name="text">
-                     <string>select ropping ...</string>
+                     <string>select cropping ...</string>
                     </property>
                     <property name="popupMode">
                      <enum>QToolButton::InstantPopup</enum>
@@ -1409,7 +1445,7 @@ p, li { white-space: pre-wrap; }
                   <enum>Qt::Horizontal</enum>
                  </property>
                  <property name="sizeType">
-                  <enum>QSizePolicy::Fixed</enum>
+                  <enum>QSizePolicy::Expanding</enum>
                  </property>
                  <property name="sizeHint" stdset="0">
                   <size>
@@ -1441,22 +1477,6 @@ p, li { white-space: pre-wrap; }
                   <number>5</number>
                  </property>
                 </widget>
-               </item>
-               <item>
-                <spacer name="horizontalSpacer_24">
-                 <property name="orientation">
-                  <enum>Qt::Horizontal</enum>
-                 </property>
-                 <property name="sizeType">
-                  <enum>QSizePolicy::MinimumExpanding</enum>
-                 </property>
-                 <property name="sizeHint" stdset="0">
-                  <size>
-                   <width>20</width>
-                   <height>20</height>
-                  </size>
-                 </property>
-                </spacer>
                </item>
                <item>
                 <widget class="QLabel" name="labSegments">
@@ -1976,6 +1996,13 @@ p, li { white-space: pre-wrap; }
                </property>
               </widget>
              </item>
+             <item row="21" column="1">
+              <widget class="QLabel" name="labWarning">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
             </layout>
            </widget>
           </item>
@@ -2261,7 +2288,16 @@ p, li { white-space: pre-wrap; }
           <property name="spacing">
            <number>2</number>
           </property>
-          <property name="margin">
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
            <number>2</number>
           </property>
           <item>

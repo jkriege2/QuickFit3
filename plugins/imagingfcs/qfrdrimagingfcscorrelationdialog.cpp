@@ -424,7 +424,7 @@ void QFRDRImagingFCSCorrelationDialog::setProject(QFProject* project) {
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_spinP_valueChanged(int val) {
-    updateCorrelator();
+    updateCorrelator(true);
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_spinS_valueChanged(int val) {
@@ -432,7 +432,7 @@ void QFRDRImagingFCSCorrelationDialog::on_spinS_valueChanged(int val) {
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_spinM_valueChanged(int val) {
-    updateCorrelator();
+    updateCorrelator(true);
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_spinDecay_valueChanged(double val) {
@@ -443,7 +443,7 @@ void QFRDRImagingFCSCorrelationDialog::on_spinDecay2_valueChanged(double val) {
     updateBleach();
 }
 void QFRDRImagingFCSCorrelationDialog::on_cmbCorrelator_currentIndexChanged(int idx) {
-    updateCorrelator();
+    updateCorrelator(true);
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_cmbBackground_currentIndexChanged(int idx) {
@@ -990,7 +990,7 @@ void QFRDRImagingFCSCorrelationDialog::frameTimeChanged(double value) {
         ui->edtFrameRate->setValue(1.0/(value/1e6));
         connect(ui->edtFrameRate, SIGNAL(valueChanged(double)), this, SLOT(frameRateChanged(double)));
     }
-    updateCorrelator();
+    updateCorrelator(true);
     updateFrameCount();
     updateBleach();
 }
@@ -1001,7 +1001,7 @@ void QFRDRImagingFCSCorrelationDialog::frameRateChanged(double value) {
         ui->edtFrameTime->setValue((1.0/value)*1e6);
         connect(ui->edtFrameTime, SIGNAL(valueChanged(double)), this, SLOT(frameTimeChanged(double)));
     }
-    updateCorrelator();
+    updateCorrelator(true);
     updateFrameCount();
     updateBleach();
 }
@@ -1106,11 +1106,12 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator(bool setS) {
     double taumax=taumin;
 
     int idealS=1;
-    while (idealS<1000 && taumax<double(segment_length)*taumin && segment_length>0) {
+    while (idealS<200 && taumax<double(segment_length)*taumin && segment_length>0) {
         taumax=QFRDRImagingFCSCorrelationDialog_getCorrelatorProps(corrType, taumin, idealS, m, P);
+        idealS++;
     }
     if (setS) {
-        S=idealS;
+        S=idealS-1;
         ui->spinS->setValue(S);
     }
     taumax=QFRDRImagingFCSCorrelationDialog_getCorrelatorProps(corrType, taumin, S, m, P);
@@ -1128,7 +1129,17 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool count
     QApplication::processEvents();
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
+
+
     filenameDisplayed=QFileInfo(ui->edtImageFile->text()).absoluteFilePath();
+    qint64 filesize=QFileInfo(ui->edtImageFile->text()).size();
+    if (filesize>1024*1024*1024) {
+        ui->labWarning->setText(tr("<table border=\"0\"><tr><td><img src=\":/lib/help/helpboxlogo_warning.png\"></td><td><b><font color=\"red\">WARNING! The file you are about to correlate has a size of %1GB. Make sure, that your computer has enough free memory for this correlation!</font></b></td></tr></table>").arg(double(filesize)/double(1024*1024*1024)));
+    } else {
+        ui->labWarning->clear();
+    }
+    QApplication::processEvents();
+
     double frametime=ui->edtFrameTime->value();
     double baseline_offset=ui->edtOffset->value();
     QString backgroundF=ui->edtBackgroundFile->text();

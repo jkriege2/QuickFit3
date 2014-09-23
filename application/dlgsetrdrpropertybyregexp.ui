@@ -19,317 +19,350 @@
   <property name="windowTitle">
    <string>Set RDR Property by RegExp ...</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout" columnstretch="2,1,0">
-   <item row="1" column="0">
-    <layout class="QFormLayout" name="formLayout">
-     <item row="0" column="0">
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>input:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QComboBox" name="cmbInputData">
-       <item>
-        <property name="text">
-         <string>name</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>folder</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>group</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>role</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>first file</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>ID</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>mode:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="cmbMode">
-       <item>
-        <property name="text">
-         <string>use output string, when matches</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>use output string, when mismatches</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>use match</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>use capture 1</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>use capture 2</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>use capture 3</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>replace %0,%1,... in output string by captures</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>regular expression:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="1">
-      <widget class="QLineEdit" name="edtRegExp"/>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="text">
-        <string>output string:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QLineEdit" name="edtOutputValue"/>
-     </item>
-     <item row="9" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>property to set:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="9" column="1">
-      <widget class="QComboBox" name="cmbOutput">
-       <item>
-        <property name="text">
-         <string>RDR group</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>role</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>folder</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>name</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>RDR property (add or set)</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="7" column="0">
-      <widget class="QLabel" name="label_6">
-       <property name="text">
-        <string>test result:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="1">
-      <widget class="QLabel" name="labTest">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <widget class="QCheckBox" name="chkCaseSensitive">
-       <property name="text">
-        <string>case sensitive</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QCheckBox" name="chkMinimal">
-       <property name="text">
-        <string>minimal</string>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="1">
-      <widget class="QLabel" name="labError">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="QLabel" name="label_9">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;font size=&quot;-1&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;special replaces:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;&lt;ul&gt;&lt;li&gt;%name%: RDR name&lt;/li&gt;&lt;li&gt;%group%: RDR group&lt;/li&gt;&lt;li&gt;%id$%: RDR ID&lt;/li&gt;&lt;li&gt;%role%: RDR role&lt;/li&gt;&lt;/ul&gt;&lt;/span&gt;&lt;/font&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item row="10" column="0">
-      <widget class="QLabel" name="label_10">
-       <property name="text">
-        <string>property name:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="10" column="1">
-      <widget class="QComboBox" name="cmbPropertyName">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="editable">
-        <bool>true</bool>
-       </property>
-       <property name="currentIndex">
-        <number>0</number>
-       </property>
-       <item>
-        <property name="text">
-         <string>NEW_PROPERTY</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="11" column="0">
-      <widget class="QLabel" name="label_11">
-       <property name="text">
-        <string>property type:</string>
-       </property>
-      </widget>
-     </item>
-     <item row="11" column="1">
-      <widget class="QComboBox" name="cmbPropertyType">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <item>
-        <property name="text">
-         <string>string</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>integer number</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>floating-point number</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>boolean</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="12" column="1">
-      <spacer name="verticalSpacer_2">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="13" column="1">
-      <widget class="QConfigComboboxWidget" name="widConfig" native="true"/>
-     </item>
-     <item row="13" column="0">
-      <widget class="QLabel" name="label_12">
-       <property name="text">
-        <string>saved settings:</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="0" column="1">
-    <widget class="QLabel" name="label_8">
-     <property name="text">
-      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;in these records:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+  <layout class="QVBoxLayout" name="verticalLayout_3">
+   <item>
+    <widget class="QVisibleHandleSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
+     <widget class="QWidget" name="">
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
+         <item>
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>&lt;b&gt;set:&lt;/b&gt;</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>input:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="cmbInputData">
+           <item>
+            <property name="text">
+             <string>name</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>folder</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>group</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>role</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>first file</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>ID</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>mode:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="cmbMode">
+           <item>
+            <property name="text">
+             <string>use output string, when matches</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>use output string, when mismatches</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>use match</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>use capture 1</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>use capture 2</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>use capture 3</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>replace %0,%1,... in output string by captures</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>regular expression:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="edtRegExp"/>
+         </item>
+         <item row="5" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>output string:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLineEdit" name="edtOutputValue"/>
+         </item>
+         <item row="9" column="0">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>property to set:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="1">
+          <widget class="QComboBox" name="cmbOutput">
+           <item>
+            <property name="text">
+             <string>RDR group</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>role</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>folder</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>name</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>RDR property (add or set)</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="7" column="0">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>test result:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QLabel" name="labTest">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QCheckBox" name="chkCaseSensitive">
+           <property name="text">
+            <string>case sensitive</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QCheckBox" name="chkMinimal">
+           <property name="text">
+            <string>minimal</string>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QLabel" name="labError">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;font size=&quot;-1&quot;&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;special replaces:&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-style:italic;&quot;&gt;&lt;ul&gt;&lt;li&gt;%name%: RDR name&lt;/li&gt;&lt;li&gt;%group%: RDR group&lt;/li&gt;&lt;li&gt;%id$%: RDR ID&lt;/li&gt;&lt;li&gt;%role%: RDR role&lt;/li&gt;&lt;/ul&gt;&lt;/span&gt;&lt;/font&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLabel" name="label_10">
+           <property name="text">
+            <string>property name:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="1">
+          <widget class="QComboBox" name="cmbPropertyName">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="editable">
+            <bool>true</bool>
+           </property>
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <item>
+            <property name="text">
+             <string>NEW_PROPERTY</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="11" column="0">
+          <widget class="QLabel" name="label_11">
+           <property name="text">
+            <string>property type:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="11" column="1">
+          <widget class="QComboBox" name="cmbPropertyType">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <item>
+            <property name="text">
+             <string>string</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>integer number</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>floating-point number</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>boolean</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="12" column="1">
+          <spacer name="verticalSpacer_2">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="13" column="1">
+          <widget class="QConfigComboboxWidget" name="widConfig" native="true"/>
+         </item>
+         <item row="13" column="0">
+          <widget class="QLabel" name="label_12">
+           <property name="text">
+            <string>saved settings:</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="">
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;in these records:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QListWidget" name="lstRDR">
+         <property name="selectionMode">
+          <enum>QAbstractItemView::ExtendedSelection</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <layout class="QVBoxLayout" name="verticalLayout">
+         <item>
+          <widget class="QPushButton" name="btnSelectAll">
+           <property name="text">
+            <string>select all</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnSelectNone">
+           <property name="text">
+            <string>deselect all</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="verticalSpacer">
+           <property name="orientation">
+            <enum>Qt::Vertical</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>20</width>
+             <height>40</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
-   <item row="1" column="2">
-    <layout class="QVBoxLayout" name="verticalLayout">
-     <item>
-      <widget class="QPushButton" name="btnSelectAll">
-       <property name="text">
-        <string>select all</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnSelectNone">
-       <property name="text">
-        <string>deselect all</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-    </layout>
-   </item>
-   <item row="2" column="0" colspan="3">
+   <item>
     <widget class="QDialogButtonBox" name="buttonBox">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
@@ -339,24 +372,6 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QListWidget" name="lstRDR">
-     <property name="selectionMode">
-      <enum>QAbstractItemView::ExtendedSelection</enum>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="0">
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
-     <item>
-      <widget class="QLabel" name="label_7">
-       <property name="text">
-        <string>&lt;b&gt;set:&lt;/b&gt;</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -364,6 +379,12 @@
    <class>QConfigComboboxWidget</class>
    <extends>QWidget</extends>
    <header>qconfigcomboboxwidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QVisibleHandleSplitter</class>
+   <extends>QSplitter</extends>
+   <header>qvisiblehandlesplitter.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

@@ -26,7 +26,7 @@
 
 
 /******************************************************************************************
- * default-Funktionen für den Parser
+ * default-Funktionen fï¿½r den Parser
  ******************************************************************************************/
 
 
@@ -277,19 +277,18 @@ namespace QFMathParser_DefaultLib {
     qfmpResult fMax(const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
 
-    qfmpResult fLength(const qfmpResult* params, unsigned int  n, QFMathParser* p);
-    qfmpResult fRemove(const qfmpResult* params, unsigned int  n, QFMathParser* p);
-    qfmpResult fReverse(const qfmpResult* params, unsigned int  n, QFMathParser* p);
-    qfmpResult fDot(const qfmpResult* params, unsigned int  n, QFMathParser* p);
-    qfmpResult fConcat(const qfmpResult* params, unsigned int  n, QFMathParser* p);
-    qfmpResult fRemoveAll(const qfmpResult* params, unsigned int  n, QFMathParser* p);
-    qfmpResult fFind(const qfmpResult* params, unsigned int  n, QFMathParser* p);
-    qfmpResult fFindFirst(const qfmpResult* params, unsigned int  n, QFMathParser* p);
-    qfmpResult fContains(const qfmpResult* params, unsigned int  n, QFMathParser* p);
-    qfmpResult fContainsSubString(const qfmpResult* params, unsigned int  n, QFMathParser* p);
-    qfmpResult fFilterFinite(const qfmpResult* params, unsigned int  n, QFMathParser* p);
-    qfmpResult fSelect(const qfmpResult* params, unsigned int  n, QFMathParser* p);
-    qfmpResult fUnique(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fLength(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRemove(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fReverse(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fDot(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fConcat(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRemoveAll(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fFind(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fFindFirst(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fContainsSubString(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fFilterFinite(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fSelect(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fUnique(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fIndexedAvg(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fIndexedVar(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fIndexedStd(const qfmpResult* params, unsigned int  n, QFMathParser* p);
