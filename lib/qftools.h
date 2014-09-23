@@ -628,6 +628,93 @@ QList<T> constructQListFromItems(const T& item1, const T& item2, const T& item3,
 
 
 
+
+
+
+/*! \brief remove all duplicates from a list
+    \ingroup qf3lib_tools
+
+    This copies the input list to the return argument omitting all duplicates. This should have complexity \f$ \mathcal{O}(N^2) \f$ but preserves the sorting order!
+*/
+template <class T>
+QVector<T> removeQVectorDouplicates(const QVector<T>& list) {
+    QVector<T> out;
+    for (int i=0; i<list.size(); i++) {
+        if (out.indexOf(list[i])<0) out<<list[i];
+    }
+    return out;
+}
+
+
+/*! \brief constructs a list with the given default item contained N times
+    \ingroup qf3lib_tools
+*/
+template <class T>
+QVector<T> constructQVectorWithMultipleItems(const T& item, int N=1) {
+    QVector<T> out;
+    for (int i=0; i<N; i++) {
+        out<<item;
+    }
+    return out;
+}
+
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+template <class T>
+QVector<T> constructQVectorFromItems(const T& item1) {
+    QVector<T> out;
+    out<<item1;
+    return out;
+}
+
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+template <class T>
+QVector<T> constructQVectorFromItems(const T& item1, const T& item2) {
+    QVector<T> out;
+    out<<item1<<item2;
+    return out;
+}
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+template <class T>
+QVector<T> constructQVectorFromItems(const T& item1, const T& item2, const T& item3) {
+    QVector<T> out;
+    out<<item1<<item2<<item3;
+    return out;
+}
+
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+template <class T>
+QVector<T> constructQVectorFromItems(const T& item1, const T& item2, const T& item3, const T& item4) {
+    QVector<T> out;
+    out<<item1<<item2<<item3<<item4;
+    return out;
+}
+
+/*! \brief constructs a list with the given default item contained
+    \ingroup qf3lib_tools
+*/
+template <class T>
+QVector<T> constructQVectorFromItems(const T& item1, const T& item2, const T& item3, const T& item4, const T& item5) {
+    QVector<T> out;
+    out<<item1<<item2<<item3<<item4<<item5;
+    return out;
+}
+
+
+
+
+
+
+
+
+
 /*! \brief constructs a list with the given default item contained
     \ingroup qf3lib_tools
 */

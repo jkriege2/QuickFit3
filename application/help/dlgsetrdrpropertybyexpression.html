@@ -6,11 +6,30 @@
   </head>
   <body>
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-
-	<p>In many cases it is desireable to set the raw data records properties (name, filder, group, ...) from other data available in the RDR. The menu entry $$bqtt:Tools | project tools | calculate RDR properties$$ opens a dialog, which allows to set some RDR properties using the internal <a href="mathparser.html">math expression parser</a>.
-	<ol>
-	  <li>First select the RDRs in which to set properties</li>
-	</ol>
-	</p>
+    <h2>User Interface</h2>
+    <p>In many cases it is desireable to set the raw data records properties (name, filder, group, ...) from other data available in the RDR. The menu entry $$bqtt:Tools | project tools | calculate RDR properties$$ opens a dialog, which allows to set some RDR properties using the internal <a href="mathparser.html">math expression parser</a>.
+    <ol>
+      <li>First select the RDRs in which to set properties</li>
+      <li>Now you can add any number of items to the list on the lhs. Each item sets one property in the selected RDRs. In each item you can set:<ul>
+        <li>the property, which should be set and if it is a property with a free name, also its name. the type is determined by the return value of the expression</li>
+        <li>a <a href="mathparser.html">math expression parser</a>, which calculates the new value of the property. You cann use all default functions&variable of the parser and a set of special functions/constants, which allow to access the properties of the current RDR:<ul>
+              <li><a href="./dlgsetrdrpropertybyexpression_ref/dlgsetrdrpropertybyexpression_ref.html#consts">RDR access constants</a></li>
+              <li><a href="./dlgsetrdrpropertybyexpression_ref/dlgsetrdrpropertybyexpression_ref.html#functions">RDR access functions</a></li>
+            </ul>
+            The default functions are:  
+            <ul>
+                $$insertglobal:parseref.inc$$
+            </ul></li>
+      </ul></li>
+      <li>Each item contains a small <img src=":lib/file_delete.png">-button, which allows to remove it from the list.</li>
+      <li>Finally you have to select all those RDRs in the list on the rhs (by checking/unchecking the checkbox next to the RDR name), to which the items should be applied.</li>
+      <li>A click on OK will apply the items to all selected RDRs, yb first applying the first item to all RDRs, then the second, ...</li>
+    </ol>
+    </p>
+    <h2>Examples</h2>
+    <p>The item
+    <center><a name="dlgsetrdrpropertybyexpression_pic000"><img src="./pic/dlgsetrdrpropertybyexpression_pic000.png" border="1">
+    </center>will set the RDR group, by reading the property <tt>BB</tt> and adding the string <tt>" babe"</tt>.
+    </p>
   </body>
 </html>

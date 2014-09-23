@@ -66,9 +66,9 @@ void FunctionReferenceDialog::on_edtName_textChanged(const QString &text)
             QString s=ui->edtTemplate->text();
             int idx=s.indexOf('(');
             if (idx>=0) {
-                ui->edtTemplate->setText(text+s.right(idx));
+                ui->edtTemplate->setText(text+s.right(s.size()-idx));
             } else {
-                ui->edtTemplate->setText(text+"("+s+")");
+                ui->edtTemplate->setText(text);
             }
         }
     }

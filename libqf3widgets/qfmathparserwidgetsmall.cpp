@@ -90,6 +90,11 @@ void QFMathParserWidgetSmall::addExpressionDefaultWords(const QStringList &words
     functionRef->addDefaultWords(words);
 }
 
+QFEnhancedLineEdit *QFMathParserWidgetSmall::getEdit() const
+{
+    return ui->edtFormula;
+}
+
 void QFMathParserWidgetSmall::addFunctionReferenceDirectory(const QString &directory)
 {
     QStringList sl;

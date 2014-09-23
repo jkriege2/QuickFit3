@@ -9,6 +9,11 @@ DlgSetRDRPropertyByExpressionEditor::DlgSetRDRPropertyByExpressionEditor(DlgSetR
     ui->setupUi(this);
     project=NULL;
     this->par=par;
+    ui->edtExpression->getEdit()->addInsertContextMenuEntry("rdrproperty(id)", "rdrproperty(id)");
+    ui->edtExpression->getEdit()->addInsertContextMenuEntry("rdrproperty(id, default)", "rdrproperty(id, default)");
+    ui->edtExpression->getEdit()->addInsertContextMenuEntry("rdrfile(id)", "rdrfile(id)");
+    ui->edtExpression->getEdit()->addInsertContextMenuEntry("rdrfiles(id)", "rdrfiles(id)");
+    ui->edtExpression->getEdit()->addInsertContextMenuEntry("rdrfiletype(id)", "rdrfiletype(id)");
 }
 
 DlgSetRDRPropertyByExpressionEditor::~DlgSetRDRPropertyByExpressionEditor()

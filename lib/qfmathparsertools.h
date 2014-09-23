@@ -183,8 +183,15 @@ struct QFLIB_EXPORT qfmpResult {
         QFLIB_EXPORT void setStringVec(int size=0, const QString& defaultVal=QString(""));
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
         QFLIB_EXPORT QVector<double> asVector() const;
+        /** \brief converst the result to a list of QVariants */
         QFLIB_EXPORT QVariantList asVariantList() const;
+        /** \brief converst the result to a single QVariant */
         QFLIB_EXPORT QVariant asVariant() const;
+        /** \brief initializes from a QVariant
+         *
+         * \return \c true on success
+         */
+        QFLIB_EXPORT bool setVariant(const QVariant& data);
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
         QFLIB_EXPORT QStringList asStrVector() const;
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */

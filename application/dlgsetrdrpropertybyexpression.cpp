@@ -68,10 +68,92 @@ bool DlgSetRDRPropertyByExpression_UnregisterWidgetFunction(QWidget*wid, QConfig
     return false;
 }
 
+
+
+
+
+
+void fProperty(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+    QFRawDataRecord * rdr=(QFRawDataRecord *)p->getGeneraldata("currentRDR", NULL).toULongLong();
+
+    bool ok=true;
+    if (n<1 || n>2) { ok=false; p->qfmpError(QObject::tr("rdrproperty(name,default) accepts 1, 2 or 3 arguments")); }
+    if (n>0 && (params[0].type!=qfmpString)) { ok=false; p->qfmpError(QObject::tr("rdrproperty(name,default) needs a string as first argument")); }
+    QString prop;
+    if (n>0) prop=params[0].str;
+    QVariant defaultVal=QVariant();
+    if (n>1) defaultVal=params[1].asVariant();
+    if (ok && rdr) {
+        r.setVariant(rdr->getQFProperty(prop, defaultVal));
+    } else {
+        r.setInvalid();
+    }
+}
+
+void fFile(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+    QFRawDataRecord * rdr=(QFRawDataRecord *)p->getGeneraldata("currentRDR", NULL).toULongLong();
+
+    bool ok=true;
+    if (n!=1) { ok=false; p->qfmpError(QObject::tr("rdrfile(id) accepts 1 argument")); }
+    if (n>0 && (params[0].type!=qfmpString)&& (!params[0].isUInt())) { ok=false; p->qfmpError(QObject::tr("rdrfile(id) needs a string or an unsigned integer as first argument")); }
+    int id=-1;
+    QString ids;
+    if (n>0 && params[0].isUInt()) id=params[0].toInteger();
+    else if (n>0 && params[0].type==qfmpString) ids=params[0].str;
+    if (ok && rdr) {
+        if (id>=0) r.setString(rdr->getFileName(id));
+        else r.setString(rdr->getFileForType(ids));
+    } else {
+        r.setInvalid();
+    }
+}
+
+void fFileType(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+    QFRawDataRecord * rdr=(QFRawDataRecord *)p->getGeneraldata("currentRDR", NULL).toULongLong();
+
+    bool ok=true;
+    if (n!=1) { ok=false; p->qfmpError(QObject::tr("rdrfiletype(id) accepts 1 argument")); }
+    if (n>0 && (!params[0].isUInt())) { ok=false; p->qfmpError(QObject::tr("rdrfiletype(id) needs an unsigned integer as first argument")); }
+    int id=-1;
+    if (n>0 && params[0].isUInt()) id=params[0].toInteger();
+    if (ok && rdr) {
+        if (id>=0) r.setString(rdr->getFileType(id));
+        else r.setString("");
+    } else {
+        r.setInvalid();
+    }
+}
+
+void fFiles(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+    QFRawDataRecord * rdr=(QFRawDataRecord *)p->getGeneraldata("currentRDR", NULL).toULongLong();
+
+    bool ok=true;
+    if (n!=1) { ok=false; p->qfmpError(QObject::tr("rdrfiles(id) accepts 1 argument")); }
+    if (n>0 && (params[0].type!=qfmpString)&& (!params[0].isUInt())) { ok=false; p->qfmpError(QObject::tr("rdrfiles(id) needs a string or an unsigned integer as first argument")); }
+    int id=-1;
+    QString ids;
+    if (n>0 && params[0].isUInt()) id=params[0].toInteger();
+    else if (n>0 && params[0].type==qfmpString) ids=params[0].str;
+    if (ok && rdr) {
+        if (id>=0) r.setString(rdr->getFileName(id));
+        else r.setStringVec(rdr->getFilesForType(ids));
+    } else {
+        r.setInvalid();
+    }
+}
+
+
+
 DlgSetRDRPropertyByExpression::DlgSetRDRPropertyByExpression(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgSetRDRPropertyByExpression)
 {
+
+    mp.addFunction("rdrproperty", fProperty);
+    mp.addFunction("rdrfile", fFile);
+    mp.addFunction("rdrfiletype", fFileType);
+    mp.addFunction("rdrfiles", fFiles);
+
     lastExpression="";
     lastNode=NULL;
 
@@ -157,11 +239,13 @@ QVariant DlgSetRDRPropertyByExpression::getResult(const QString& expression, QFR
     if (n) {
         if (rdr) {
             mp.addVariableString("name", rdr->getName());
+            mp.addVariableString("description", rdr->getDescription());
             mp.addVariableString("group", rdr->getGroupName());
             mp.addVariableDouble("groupid", rdr->getGroup());
             mp.addVariableString("role", rdr->getRole());
             mp.addVariableString("folder", rdr->getFolder());
             mp.addVariableStringVector("files", rdr->getFiles());
+            mp.addVariableDouble("filecount", rdr->getFilesCount());
             mp.setGeneralData("currentRDR", (uint64_t)rdr);
         }
 

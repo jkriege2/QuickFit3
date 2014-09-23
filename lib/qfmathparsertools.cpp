@@ -441,6 +441,57 @@ QVariantList qfmpResult::asVariantList() const
     }
      return vl;
 }
+
+bool qfmpResult::setVariant(const QVariant& data) {
+    setInvalid();
+    switch (data.type()) {
+        case QVariant::Bool: setBoolean(data.toBool()); break;
+        case QVariant::Double:
+        case QVariant::Int:
+        case QVariant::UInt:
+        case QVariant::ULongLong:
+        case QVariant::LongLong: setDouble(data.toDouble()); break;
+
+        case QVariant::String:
+        case QVariant::ByteArray:
+        case QVariant::Url: setString(data.toString()); break;
+        case QVariant::Char: setString(data.toChar()); break;
+        case QVariant::Date:
+        case QVariant::DateTime: setDouble(data.toDateTime().toMSecsSinceEpoch()); break;
+        case QVariant::StringList: setStringVec(data.toStringList()); break;
+        case QVariant::Time: setDouble(QDateTime(QDate::currentDate(), data.toTime()).toMSecsSinceEpoch()); break;
+        case QVariant::Point: setDoubleVec(constructQVectorFromItems<double>(data.toPoint().x(), data.toPoint().y())); break;
+        case QVariant::PointF: setDoubleVec(constructQVectorFromItems<double>(data.toPointF().x(), data.toPointF().y())); break;
+        case QVariant::Size: setDoubleVec(constructQVectorFromItems<double>(data.toSize().width(), data.toSize().height())); break;
+        case QVariant::SizeF: setDoubleVec(constructQVectorFromItems<double>(data.toSizeF().width(), data.toSizeF().height())); break;
+        case QVariant::Rect: setDoubleVec(constructQVectorFromItems<double>(data.toRect().x(), data.toRect().y(), data.toRect().width(), data.toRect().height())); break;
+        case QVariant::RectF: setDoubleVec(constructQVectorFromItems<double>(data.toRectF().x(), data.toRectF().y(), data.toRectF().width(), data.toRectF().height())); break;
+        case QVariant::Invalid: setInvalid(); break;
+        case QVariant::List: {
+                QVariantList vl=data.toList();
+                if (vl.size()>0) {
+                    switch (vl[0].type()) {
+                        case QVariant::Bool: {type=qfmpBoolVector; boolVec.clear(); for (int i=0; i<vl.size(); i++) boolVec<<vl[i].toBool();} break;
+                        case QVariant::Double:
+                        case QVariant::Int:
+                        case QVariant::UInt:
+                        case QVariant::ULongLong:
+                        case QVariant::LongLong: {type=qfmpDoubleVector; numVec.clear(); for (int i=0; i<vl.size(); i++) numVec<<vl[i].toDouble();} break;
+                        case QVariant::Date:
+                        case QVariant::DateTime: {type=qfmpDoubleVector; numVec.clear(); for (int i=0; i<vl.size(); i++) numVec<<vl[i].toDateTime().toMSecsSinceEpoch();} break;
+                        case QVariant::String:
+                        case QVariant::ByteArray:
+                        case QVariant::Url:
+                        default: {type=qfmpStringVector; strVec.clear(); for (int i=0; i<vl.size(); i++) strVec<<vl[i].toString();} break;
+                    }
+                }
+            } break;
+
+        default: setString(data.toString()); break;
+    }
+    return true;
+}
+
 QVariant qfmpResult::asVariant() const
 {
     QVariant vl;

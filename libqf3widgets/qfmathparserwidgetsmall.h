@@ -30,7 +30,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffunctionreferencetool.h"
 #include "qfmathparser.h"
 #include "libwid_imexport.h"
-
+#include "qfenhancedlineedit.h"
 
 
 namespace Ui {
@@ -65,8 +65,10 @@ class QFWIDLIB_EXPORT QFMathParserWidgetSmall : public QFrame {
         QString getExpression() const;
         void setExpression(const QString& exp);
         void addExpressionDefaultWords(const QStringList& words);
-        QFMathParser* getMathParser() const { return mp; }
-        QFFunctionReferenceTool* getReferenceTool() const { return functionRef; }
+        inline QFMathParser* getMathParser() const { return mp; }
+        inline QFFunctionReferenceTool* getReferenceTool() const { return functionRef; }
+
+        QFEnhancedLineEdit* getEdit() const;
 
         void addFunctionReferenceDirectory(const QString &directory);
     protected slots:
