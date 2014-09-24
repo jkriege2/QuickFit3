@@ -74,7 +74,7 @@ bool DlgSetRDRPropertyByExpression_UnregisterWidgetFunction(QWidget*wid, QConfig
 
 
 void fProperty(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
-    QFRawDataRecord * rdr=(QFRawDataRecord *)p->getGeneraldata("currentRDR", NULL).toULongLong();
+    QFRawDataRecord * rdr=(QFRawDataRecord *)p->getGeneraldata("currentRDR", (qlonglong)NULL).toULongLong();
 
     bool ok=true;
     if (n<1 || n>2) { ok=false; p->qfmpError(QObject::tr("rdrproperty(name,default) accepts 1, 2 or 3 arguments")); }
@@ -91,7 +91,7 @@ void fProperty(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathP
 }
 
 void fFile(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
-    QFRawDataRecord * rdr=(QFRawDataRecord *)p->getGeneraldata("currentRDR", NULL).toULongLong();
+    QFRawDataRecord * rdr=(QFRawDataRecord *)p->getGeneraldata("currentRDR", (qlonglong)NULL).toULongLong();
 
     bool ok=true;
     if (n!=1) { ok=false; p->qfmpError(QObject::tr("rdrfile(id) accepts 1 argument")); }
@@ -109,7 +109,7 @@ void fFile(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParse
 }
 
 void fFileType(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
-    QFRawDataRecord * rdr=(QFRawDataRecord *)p->getGeneraldata("currentRDR", NULL).toULongLong();
+    QFRawDataRecord * rdr=(QFRawDataRecord *)p->getGeneraldata("currentRDR", (qlonglong)NULL).toULongLong();
 
     bool ok=true;
     if (n!=1) { ok=false; p->qfmpError(QObject::tr("rdrfiletype(id) accepts 1 argument")); }
@@ -125,7 +125,7 @@ void fFileType(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathP
 }
 
 void fFiles(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
-    QFRawDataRecord * rdr=(QFRawDataRecord *)p->getGeneraldata("currentRDR", NULL).toULongLong();
+    QFRawDataRecord * rdr=(QFRawDataRecord *)p->getGeneraldata("currentRDR", (qlonglong)NULL).toULongLong();
 
     bool ok=true;
     if (n!=1) { ok=false; p->qfmpError(QObject::tr("rdrfiles(id) accepts 1 argument")); }
@@ -251,7 +251,7 @@ QVariant DlgSetRDRPropertyByExpression::getResult(const QString& expression, QFR
             mp.addVariableString("folder", rdr->getFolder());
             mp.addVariableStringVector("files", rdr->getFiles());
             mp.addVariableDouble("filecount", rdr->getFilesCount());
-            mp.setGeneralData("currentRDR", (uint64_t)rdr);
+            mp.setGeneralData("currentRDR", (qulonglong)rdr);
         }
 
         mp.resetErrors();
