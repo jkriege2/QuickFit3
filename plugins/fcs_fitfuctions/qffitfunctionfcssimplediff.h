@@ -93,7 +93,7 @@ class QFFitFunctionFCSSimpleDiff: public QFFitFunction {
         virtual QString transformParametersForAdditionalPlot(int plot, double* params);
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
-        virtual bool get_implementsDerivatives() { return true; };
+        virtual bool get_implementsDerivatives() const { return true; };
 
         /*! \copydoc QFFitFunction::evaluateDerivatives()   */
         virtual void evaluateDerivatives(double* derivatives, double x, const double* parameters) const ;

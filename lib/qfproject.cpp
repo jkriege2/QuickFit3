@@ -39,6 +39,7 @@ QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactor
     QObject(parent), QFProperties()
 {
     dataChange=false;
+    propertiesChange=false;
     this->services=services;
     this->rdrFactory=rdrFactory;
     this->evalFactory=evalFactory;
@@ -270,7 +271,7 @@ bool QFProject::registerRawDataRecord(QFRawDataRecord* rec) {
     rawDataOrder.append(newID);
     IDs.insert(newID);
     dataChange=true;
-    connect(rec, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(setDataChanged()));
+    connect(rec, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(setPropertiesChanged()));
     connect(rec, SIGNAL(basicPropertiesChanged()), this, SLOT(setStructureChanged()));
     connect(rec, SIGNAL(rawDataChanged()), this, SLOT(setDataChanged()));
     connect(rec, SIGNAL(resultsChanged(QString,QString,bool)), this, SLOT(setDataChanged()));
@@ -290,7 +291,7 @@ bool QFProject::registerEvaluation(QFEvaluationItem* rec) {
     IDs.insert(newID);
     connect(rec, SIGNAL(basicPropertiesChanged()), this, SLOT(setStructureChanged()));
     connect(rec, SIGNAL(resultsChanged(QFRawDataRecord*,QString,QString)), this, SLOT(setDataChanged()));
-    connect(rec, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(setDataChanged()));
+    connect(rec, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(setPropertiesChanged()));
     emitStructureChanged();
     return true;
 }
@@ -674,10 +675,14 @@ QFEvaluationItem* QFProject::addEvaluation(QString type, QString name) {
 
 
 
-QStringList QFProject::getAllPropertyNames() {
+QStringList QFProject::getAllPropertyNames(bool visible_only) {
     QStringList sl;
     for (int i=0; i<getRawDataCount(); i++) {
-        sl.append(getRawDataByNum(i)->getPropertyNames());
+        if (!visible_only) {
+            sl.append(getRawDataByNum(i)->getPropertyNames());
+        } else {
+            sl.append(getRawDataByNum(i)->getVisibleProperties());
+        }
     }
     sl.removeDuplicates();
     sl.sort();
@@ -1561,6 +1566,15 @@ void QFProject::setDataChanged() {
     dataChange=true;
     //qDebug()<<"QFProject emit wasChanged(dataChange="<<dataChange<<")";
     if (m_signalsEnabled) emit wasChanged(dataChange);
+}
+
+void QFProject::setPropertiesChanged()
+{
+    if (propertiesChange) return;
+    propertiesChange=true;
+    //qDebug()<<"QFProject emit wasChanged(dataChange="<<dataChange<<")";
+    if (m_signalsEnabled) emit propertiesChanged();
+    setDataChanged();
 }
 
 void QFProject::setStructureChanged() {

@@ -101,7 +101,8 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
 
 
 
-
+        /** \brief indicates, whether the next of same role/previous of same role buttons should be displayed */
+        virtual bool showNextPreviousOfSameRoleButton() const;
 
 
 

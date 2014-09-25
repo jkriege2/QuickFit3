@@ -40,6 +40,7 @@
 #include "qfcompleterfromfile.h"
 #include "qfproject.h"
 #include "qfhistogramservice.h"
+#include "qfcompleterproperties.h"
 
 
 class QFEvaluationPropertyEditor;
@@ -120,6 +121,7 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
         QAction* actStatisticsComparing;
 
         QFEnhancedLineEdit* edtDisplayProperties;
+        QFCompleterProperties* compDisplayProperties;
         QFEnhancedLineEdit* edtFilterFiles;
         QFEnhancedLineEdit* edtFilterResults;
         QFEnhancedLineEdit* edtFilterFilesNot;

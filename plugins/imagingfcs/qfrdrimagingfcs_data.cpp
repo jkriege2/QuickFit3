@@ -1358,13 +1358,14 @@ double* QFRDRImagingFCSData::getCorrelationRunErrors() const {
 bool QFRDRImagingFCSData::dualViewModeUserEditable() const
 {
     if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) return false;
-    return true;
+    return false;
 }
 
 QFRDRImagingFCSData::DualViewMode QFRDRImagingFCSData::dualViewMode() const
 {
-    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) return QFRDRImagingFCSData::dvNone;
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone || isDCCF() || !dualViewModeUserEditable()) return QFRDRImagingFCSData::dvNone;
 
+    //if ()
 
     QString dv=getProperty("DUALVIEW_MODE", "none").toString().toLower();
 
@@ -1380,7 +1381,7 @@ QFRDRImagingFCSData::DualViewMode QFRDRImagingFCSData::dualViewMode() const
 
 void QFRDRImagingFCSData::setDualViewMode(QFRDRImagingFCSData::DualViewMode mode)
 {
-    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone) return;
+    if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone || isDCCF()) return;
     QFRDRImagingFCSData::DualViewMode m_dualview=mode;
     if (m_dualview==QFRDRImagingFCSData::dvNone) setQFProperty("DUALVIEW_MODE", "none", false);
     if (m_dualview==QFRDRImagingFCSData::dvHorizontal) setQFProperty("DUALVIEW_MODE", "horicontal", false);

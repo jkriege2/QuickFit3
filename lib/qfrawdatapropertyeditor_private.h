@@ -92,6 +92,8 @@ class QFRawDataPropertyEditor_private : public QObject
         QToolButton* btnNext;
         /** \brief button to switch to next record */
         QToolButton* btnNextSameRole;
+        /** \brief button to switch to previous record */
+        QToolButton* btnPreviousSameRole;
         /** \brief button to insert a new property */
         QToolButton* btnNewProperty;
         QAction* actNewProperty;

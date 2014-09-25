@@ -543,7 +543,7 @@ void QFRDRImagingFCSCorrelationDialog::on_btnSelectBackgroundFile_clicked() {
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_btnHelp_clicked() {
-    pluginServices->displayHelpWindow(pluginServices->getPluginHelpDirectory("imaging_fcs")+"imfcs_correlation.html");
+    pluginServices->displayHelpWindow(pluginServices->getPluginHelpDirectory("imaging_fcs")+"imfcs_usage.html");
 }
 
 void QFRDRImagingFCSCorrelationDialog::on_btnLoad_clicked() {
@@ -1108,6 +1108,7 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator(bool setS) {
     int idealS=1;
     while (idealS<200 && taumax<double(segment_length)*taumin && segment_length>0) {
         taumax=QFRDRImagingFCSCorrelationDialog_getCorrelatorProps(corrType, taumin, idealS, m, P);
+        qDebug()<<idealS<<taumax<<double(segment_length)*taumin<<taumin;
         idealS++;
     }
     if (setS) {
@@ -1278,6 +1279,26 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool count
                     frameTimeChanged(frametime);
 
                 }
+                v=reader->getFileProperty("FRAMETIME");
+                if (v.canConvert(QVariant::Double) && v.toDouble()>0) {
+                    double frametime=v.toDouble()*1e6;
+                    ui->edtFrameTime->setValue(frametime);
+                    frameTimeChanged(frametime);
+
+                }
+                v=reader->getFileProperty("PIXEL_SIZE");
+                if (v.canConvert(QVariant::Double) && v.toDouble()>0) {
+                    ui->spinPixelWidth->setValue(v.toDouble());
+                    ui->spinPixelHeight->setValue(v.toDouble());
+                }
+                v=reader->getFileProperty("PIXEL_WIDTH");
+                if (v.canConvert(QVariant::Double) && v.toDouble()>0) {
+                    ui->spinPixelWidth->setValue(v.toDouble());
+                }
+                v=reader->getFileProperty("PIXEL_HEIGHT");
+                if (v.canConvert(QVariant::Double) && v.toDouble()>0) {
+                    ui->spinPixelHeight->setValue(v.toDouble());
+                }
                 if (countFrames) frame_count=reader->countFrames();
                 if (frame_count>0) {
                     ui->spinLastFrame->setMaximum(frame_count-1);
@@ -1313,6 +1334,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool count
 
     updateFrameCount();
     updateImageSize();
+    updateCorrelator(true);
 }
 
 

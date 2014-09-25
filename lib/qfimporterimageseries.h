@@ -28,7 +28,7 @@
 #include "qfimporter.h"
 
 /*! \brief interface for image reader classes
-    \ingroup qf3rdrdp_imaging_fcs
+    \ingroup qf3importerplugins
 
     This class is used to read an image series frame by frame. It is used in this manner:
 

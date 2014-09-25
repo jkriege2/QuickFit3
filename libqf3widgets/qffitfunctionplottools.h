@@ -39,10 +39,10 @@ class QFWIDLIB_EXPORT JKQTPxQFFitFunctionLineGraph: public JKQTPxFunctionLineGra
 
 
 
-        GetMacro(QFFitFunction*, fitFunction);
-        GetSetMacro(bool, ownsFunction);
-        GetSetMacro(double, scaleX);
-        GetSetMacro(double, offsetX);
+        GET_MACRO(QFFitFunction*, fitFunction)
+        GET_SET_MACRO(bool, ownsFunction)
+        GET_SET_MACRO(double, scaleX)
+        GET_SET_MACRO(double, offsetX)
 
         void set_fitFunction(QFFitFunction* fitFunction, bool ownsFunction=true);
     protected:

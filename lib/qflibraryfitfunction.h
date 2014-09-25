@@ -65,7 +65,7 @@ class QFLIB_EXPORT QFLibraryFitFunction : public QFFitFunction
         virtual void evaluateDerivatives(double* derivatives, double x, const double* parameters) const ;
 
         /*! \copydoc QFFitFunction::()  */
-        virtual bool get_implementsDerivatives();
+        virtual bool get_implementsDerivatives()const ;
 
         /*! \copydoc QFFitFunction::()  */
         virtual void calcParameter(double* parameterValues, double* error=NULL) const ;

@@ -37,6 +37,7 @@ QFImageReaderLIBTIFF::QFImageReaderLIBTIFF() {
     width=0;
     height=0;
     filename="";
+    imageDescription="";
     tif=NULL;
     QString lf=ProgramOptions::getConfigValue("importers_basicimages/libtiff/logfile", ProgramOptions::getInstance()->getConfigFileDirectory()+"/importers_basicimages_libtiff.log").toString();
     if (ProgramOptions::getConfigValue("importers_basicimages/libtiff/log", false).toBool()) {
@@ -92,6 +93,9 @@ bool QFImageReaderLIBTIFF::open(QString filename) {
         uint32 nx,ny;
         TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
         TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
+        char* val;
+        TIFFGetField(tif,TIFFTAG_IMAGEDESCRIPTION,&val);
+        imageDescription=val;
         width=nx;
         height=ny;
         this->filename=filename;
@@ -100,6 +104,29 @@ bool QFImageReaderLIBTIFF::open(QString filename) {
             TIFFGetField(tif, TIFFTAG_IMAGEDESCRIPTION, &desc);
         }
         if (desc) fileinfo.comment=desc;
+
+        bool metaOK=false;
+        int cnt=0;
+        while (!metaOK && cnt<5) {
+            char* vall;
+            TIFFGetField(tif,TIFFTAG_IMAGEDESCRIPTION,&vall);
+            QByteArray imgD=vall;
+
+            if (imgD.size()>0) {
+                metaOK=qfimdtGetOMEMetaData(fileinfo.properties, imgD);
+                if (!metaOK) {
+                    metaOK=qfimdtGetImageJMetaData(fileinfo.properties, imgD);
+                }
+                if (!metaOK) {
+                    metaOK=qfimdtGetTinyTIFFMetaData(fileinfo.properties, imgD);
+                }
+                imageDescription+=QString("\n\n%1").arg(QString::fromLatin1(imgD.data()));
+            }
+            metaOK=metaOK||(!nextFrame());
+            cnt++;
+        }
+        reset();
+
 
         //TIFFSetWarningHandler(NULL);
         //qDebug()<<"  QFImageReaderLIBTIFF::open("<<filename<<")   tif="<<tif<<"  result=false";
@@ -121,6 +148,7 @@ void QFImageReaderLIBTIFF::close() {
     TIFFClose(tif);
     QString fn=filename;
     filename="";
+    imageDescription="";
     tif=NULL;
     logTIFFMessage("QFImageReaderLIBTIFF", "closed file %s\n", fn.toLocal8Bit().data());
     //qDebug()<<"  QFImageReaderLIBTIFF::close()   tif="<<tif;
@@ -128,6 +156,14 @@ void QFImageReaderLIBTIFF::close() {
 
 uint32_t QFImageReaderLIBTIFF::countFrames() {
     if (!tif) return 0;
+
+    if (fileinfo.properties.contains("FRAMES")) {
+        bool ok=false;
+        uint32_t f=fileinfo.properties["FRAMES"].toULongLong(&ok);
+        if (ok && f>0) {
+            return f;
+        }
+    }
 
     uint32_t nb_images = 0;
     //tdir_t dir=TIFFCurrentDirectory(tif);

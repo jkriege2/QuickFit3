@@ -89,7 +89,7 @@ void qf_statisticsAutocorrelate(double* dataout, const double* data, long long N
     }
 }
 
-double* statisticsAllocAutocorrelate(const double* data, long long N) {
+double* qfstatisticsAllocAutocorrelate(const double* data, long long N) {
     double* d=(double*)malloc(ceil((double)N/2.0)*sizeof(double));
     qf_statisticsAutocorrelate(d, data, N);
     return d;
@@ -309,8 +309,8 @@ QFFitStatistics calculateFitStatistics(long N, double* tauvals, double* model, d
     /////////////////////////////////////////////////////////////////////////////////
     // calculate residual correlation
     /////////////////////////////////////////////////////////////////////////////////
-    result.resCorrelation=statisticsAllocAutocorrelate(&(result.residuals[datacut_min]), datacut_max-datacut_min);
-    result.resWCorrelation=statisticsAllocAutocorrelate(&(result.residuals_weighted[datacut_min]), datacut_max-datacut_min);
+    result.resCorrelation=qfstatisticsAllocAutocorrelate(&(result.residuals[datacut_min]), datacut_max-datacut_min);
+    result.resWCorrelation=qfstatisticsAllocAutocorrelate(&(result.residuals_weighted[datacut_min]), datacut_max-datacut_min);
     result.resN=ceil((double)(datacut_max-datacut_min)/2.0);
     for (register int i=0; i<result.resN; i++) {
         result.resCorrelation[i]/=(result.residStdDev*result.residStdDev);

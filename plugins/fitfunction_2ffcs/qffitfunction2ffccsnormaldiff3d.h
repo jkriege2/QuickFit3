@@ -56,7 +56,7 @@ class QFFitFunctionFCCSNormalDiff3D2Focus: public QFFitFunction {
         virtual QString transformParametersForAdditionalPlot(int plot, double* params);
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
-        virtual bool get_implementsDerivatives() { return false; }
+        virtual bool get_implementsDerivatives() const { return false; }
     protected:
         bool hasGamma;
 };

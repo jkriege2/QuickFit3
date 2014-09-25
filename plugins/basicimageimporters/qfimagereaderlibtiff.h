@@ -28,6 +28,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfimporterimageseries.h"
 #include <tiffio.h>
 #include <QMutex>
+#include "qfimagemetadatatool.h"
 
 
 
@@ -76,6 +77,7 @@ class QFImageReaderLIBTIFF: public QFImporterImageSeries {
         uint32_t height;
         TIFF* tif;
         QString filename;
+        QByteArray imageDescription;
 
         static void logTIFFMessage(const char* module, const char* fmt, ...)  {
             va_list vl;

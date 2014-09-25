@@ -220,7 +220,7 @@ void QFLibraryFitFunction::evaluateDerivatives(double *derivatives, double x, co
     else QFFitFunction::evaluateDerivatives(derivatives, x, parameters);
 }
 
-bool QFLibraryFitFunction::get_implementsDerivatives()
+bool QFLibraryFitFunction::get_implementsDerivatives() const
 {
     if (d->lib_evalDerivative) return true;
     return QFFitFunction::get_implementsDerivatives();

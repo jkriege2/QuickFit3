@@ -108,6 +108,8 @@
             <li>added menu entry to RDR editor, which allows to export the contained data into a file (only enabled, if the plugin supports this function!)</li>
             <li>added preview plot to user fit-function editor</li>
             <li>added dialog to calculate RDR properties (Tools|Project Tools|calculate RDR properties) using the internal math expression parser</li>
+            <li>bugfix: completer in editors of the evaluation editor widnows now work correctly and store the list of texts to disk</li>
+            <li>added initial support for image file meta-data, such as OME or from ImageJ</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -203,7 +205,8 @@
             <li>parameter histograms now support a relaxed auto-ranging</li>
             <li>parameter histograms now support a distribution fit to the histogram</li>
             <li>added warning to the correlation dialog, when you try to correlate files, that are larger than 1GB, since this will require a lot of RAM!</li>
-            <li></li>
+            <li>added initial support for image file meta-data, such as OME or from ImageJ (e.g. reads image stack size from file header, pixel sizes, ...)</li>
+            <li>added "DCCF display" (correlation plot/selection display) mode for parameter image tab, which simply plots the correlation curves from all RDRs from the current group.</li>
           </ul></li>
         <li><b>table</b><ul>
             <li>added "QuickStatistics" and "QuickHistogram" tools, which show the statistics and histograms of the current selection (column-wise)</li>
@@ -343,6 +346,12 @@
       </ul></li>
       <li><b>qfe_calculator</b><ul>
             <li>a new set of plot-commands allows to generate graphs (somewhat working like the respective Matlab functions): <tt>plot(), bar(), scatter(), semilogx(), semilogy(), colorscatter(), errorbar(), xerrorbar(), yerrorbar(), ...</tt></li>
+      </ul></li>
+      <li><b>basicimageimporters</b><ul>
+            <li>added initial support for image file meta-data for TIFF images, such as OME or from ImageJ</li>
+      </ul></li>
+      <li><b>image_stack</b><ul>
+            <li>now tries to read metadat (pixel size, deltaZ/T, ...) from file properties (e.g. OME)</li>
       </ul></li>
     </ul></li>
 

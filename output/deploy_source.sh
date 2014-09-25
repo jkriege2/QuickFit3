@@ -160,6 +160,8 @@ if [ "${create_deploy}" != "0" ]; then
 	mkdir tinytiff/test/tinytiff_reader_test
 	mkdir tinytiff/test/tinytiffwriter_test
 	cp -f ./LIB/trunk/tinytiff.readme ./tinytiff/readme.txt
+	cp -f ./LIB/trunk/tinytiff.Doxyfile ./tinytiff
+	cp -f ./LIB/trunk/tinytiff.dox ./tinytiff
 	cp -rf ./LIB/trunk/tinytiff*.* ./tinytiff
 	cp -rf ./LIB/trunk/lib_imexport.h ./tinytiff
 	cp -rf ./LIB/trunk/libtiff_tools.* ./tinytiff
@@ -169,6 +171,16 @@ if [ "${create_deploy}" != "0" ]; then
 	cp -rf ./LIB/trunk/test/tinytiff_reader_test/* ./tinytiff/test/tinytiff_reader_test/
 	cp -rf ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./tinytiff
 	cd tinytiff
+	doxygen tinytiff.Doxyfile
+	cd tinytiff_doc/latex
+	pdflatex -interaction=nonstopmode  refman.tex
+	makeindex refman.tex
+	pdflatex -interaction=nonstopmode  refman.tex
+	pdflatex -interaction=nonstopmode  refman.tex
+	pdflatex -interaction=nonstopmode  refman.tex
+	rm *.aux *.idx *.log *.out *.toc
+	cp refman.pdf ../tinytiff.pdf
+	cd ../../
 	zip -rv9 ../../${TINYTIFFZIPFILE} *
 	cd ..
 	rm -rf tinytiff
@@ -197,6 +209,18 @@ if [ "${create_deploy}" != "0" ]; then
 	cp -rf ./LIB/trunk/qt/test/jkqtplot_test/* ./jkqtplotter/qt/test/jkqtplot_test/
 	cp -rf ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./jkqtplotter
 	cd jkqtplotter
+	
+	doxygen jkqtplotter.Doxyfile
+	cd jkqtplotter_doc/latex
+	pdflatex -interaction=nonstopmode  refman.tex
+	makeindex refman.tex
+	pdflatex -interaction=nonstopmode  refman.tex
+	pdflatex -interaction=nonstopmode  refman.tex
+	pdflatex -interaction=nonstopmode  refman.tex
+	rm *.aux *.idx *.log *.out *.toc
+	cp refman.pdf ../jkqtplotter.pdf
+	cd ../../
+	
 	zip -rv9 ../../${JKQTPLOTTERZIPFILE} *
 	cd ..
 	rm -rf jkqtplotter

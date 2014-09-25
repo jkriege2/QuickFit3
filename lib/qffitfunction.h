@@ -205,7 +205,7 @@ class QFLIB_EXPORT QFFitFunction {
         virtual void evaluateDerivatives(double* derivatives, double x, const double* parameters) const {};
 
         /** \brief retrun \c if this fit function implements analytic derivatives in evaluateDerivatives() */
-        virtual bool get_implementsDerivatives() { return false; };
+        virtual bool get_implementsDerivatives() const { return false; };
 
         /*! \brief calculate non-fit parameters and their errors (if \a error is supplied), i.e. \c fit=userEditable=false
             \param[in,out] parameterValues the parameter values on which to base the calculation. This is also
@@ -263,8 +263,9 @@ class QFLIB_EXPORT QFFitFunction {
                  <a href="http://oregonstate.edu/instruct/ch490/lessons/lesson11.htm">http://oregonstate.edu/instruct/ch490/lessons/lesson11.htm</a>
                  <a href="http://en.wikipedia.org/wiki/Five-point_stencil">http://en.wikipedia.org/wiki/Five-point_stencil</a>
          */
-        void evaluateNumericalDerivatives(double* derivatives, double x, const double* parameters, double stepsize=1e-8) const;
+        void evaluateNumericalDerivatives(double* derivatives, double x, const double* parameters, double stepsize=30.0*sqrt(DBL_EPSILON)) const;
 
+        void evaluateNumericalParameterErrors(double* errors, double x, const double* parameters, double residualSigma2=1.0, double stepsize=30.0*sqrt(DBL_EPSILON)) const;
 
         /** \brief returns the description of the i-th parameter */
         ParameterDescription getDescription(int i) const  {

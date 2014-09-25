@@ -45,16 +45,16 @@ class QFWIDLIB_EXPORT DoubleDataCutSliders : public QWidget
     public:
         explicit DoubleDataCutSliders(QWidget *parent = 0);
 
-        GetSetMacroI(double, min, update())
-        GetSetMacroI(double, max, update())
-        GetSetMacroI(double, userMin, update())
-        GetSetMacroI(double, userMax, update())
-        GetSetMacro(bool, allowCopyToAll)
-        GetSetMacro(QString, runsName)
-        GetSetMacro(QString, filesName)
-        GetSetMacro(bool, copyToRunsEnabled)
-        GetSetMacro(bool, copyToFilesEnabled)
-        GetMacro(bool, sliderSignals)
+        GET_SET_MACRO_I(double, min, update())
+        GET_SET_MACRO_I(double, max, update())
+        GET_SET_MACRO_I(double, userMin, update())
+        GET_SET_MACRO_I(double, userMax, update())
+        GET_SET_MACRO(bool, allowCopyToAll)
+        GET_SET_MACRO(QString, runsName)
+        GET_SET_MACRO(QString, filesName)
+        GET_SET_MACRO(bool, copyToRunsEnabled)
+        GET_SET_MACRO(bool, copyToFilesEnabled)
+        GET_MACRO(bool, sliderSignals)
 
         void setLogScale(bool enabled, double increments=20);
 

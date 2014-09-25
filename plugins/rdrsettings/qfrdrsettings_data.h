@@ -84,6 +84,9 @@ class QFRDRSettingsData : public QFRawDataRecord {
         /** \brief returns the filetype of the Export file dialog */
         QString getExportDialogFiletypes() { return tr(""); }
 
+        /** \brief indicates, whether the next of same role/previous of same role buttons should be displayed */
+        virtual bool showNextPreviousOfSameRoleButton() const;
+
 
 		/** \brief some example method that returns data */
         QSettings* getData() const;

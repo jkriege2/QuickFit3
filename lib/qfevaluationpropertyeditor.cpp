@@ -177,6 +177,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
     if (current) {
         //std::cout<<"disconnecting old ...\n";
         p->lstRawData->setModel(NULL);
+        p->compDisplayProperties->setProject(NULL);
         rdrProxy->setEvaluation(NULL);
         rdrProxy->setEditor(NULL);
         rdrModel->setProject(NULL);
@@ -218,6 +219,7 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
     if (current) {
         //std::cout<<"connecting new ...\n";
         rdrModel->setProject(current->getProject());
+        p->compDisplayProperties->setProject(current->getProject());
         rdrProxy->setEvaluation(current);
         rdrProxy->setEditor(this);
         resultsModel->init(current, current->getResultsDisplayFilter());
@@ -315,6 +317,8 @@ void QFEvaluationPropertyEditor::setCurrent(QFEvaluationItem* c) {
         rdrModel->setProject(NULL);
         p->compFilterFiles->setFilename("");
         p->compFilterFilesNot->setFilename("");
+        p->compFilterRecords->setFilename("");
+        p->compFilterRecordsNot->setFilename("");
         p->compFilterResults->setFilename("");
         p->compFilterResultsNot->setFilename("");
 

@@ -135,7 +135,7 @@ QString QFFitFunctionParsed::id() const
 }
 
 
-bool QFFitFunctionParsed::get_implementsDerivatives()
+bool QFFitFunctionParsed::get_implementsDerivatives() const
 {
     return false;
 }

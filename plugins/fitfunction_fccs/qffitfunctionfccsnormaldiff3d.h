@@ -56,7 +56,7 @@ class QFFitFunctionFCCSNormalDiff3D: public QFFitFunction {
         virtual QString transformParametersForAdditionalPlot(int plot, double* params);
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
-        virtual bool get_implementsDerivatives() { return false; }
+        virtual bool get_implementsDerivatives() const { return false; }
 };
 
 #endif // QFFITFUNCTIONFCCSNORMALDIFF3D_H

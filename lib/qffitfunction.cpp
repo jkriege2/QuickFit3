@@ -23,7 +23,8 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cmath>
-#include"qftools.h"
+#include "qftools.h"
+#include "statistics_tools.h"
 
 bool QFFitFunction::isDeprecated() const
 {
@@ -56,7 +57,7 @@ void QFFitFunction::evaluateNumericalDerivatives(double *derivatives, double x, 
     for (int i=0; i<N; i++) {
         derivatives[i]=0;
         const double oldpi=ptemp[i];
-        ptemp[i]=oldpi+2.*stepsize;
+        ptemp[i]=oldpi+2.0*stepsize;
         const double fp2h=evaluate(x, ptemp);
         ptemp[i]=oldpi+stepsize;
         const double fp1h=evaluate(x, ptemp);
@@ -70,9 +71,34 @@ void QFFitFunction::evaluateNumericalDerivatives(double *derivatives, double x, 
     free(ptemp);
 }
 
+void QFFitFunction::evaluateNumericalParameterErrors(double *errors, double x, const double *parameters, double residualSigma2, double stepsize) const
+{
+    const int pcount=paramCount();
+    double* cov=(double*)qfMalloc(pcount*pcount*sizeof(double));
+    double* g=(double*)qfMalloc(pcount*sizeof(double));
+    if (get_implementsDerivatives()) {
+        evaluateDerivatives(g, x, parameters);
+    } else {
+        evaluateNumericalDerivatives(g, x, parameters, stepsize);
+    }
+    for (int i=0; i<pcount; i++) {
+        for (int j=0; j<pcount; j++) {
+            cov[i*pcount+j]=g[i]*g[j];
+        }
+    }
+    statisticsMatrixInversion(cov, pcount);
+
+    for (int i=0; i<pcount; i++) {
+        errors[i]=sqrt(cov[i*pcount+i]*residualSigma2);
+    }
+    qfFree(g);
+    qfFree(cov);
+}
+
 QFFitStatistics QFFitFunction::calcFitStatistics(long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* /*errors*/, bool* paramsFix, int runAvgWidth, int residualHistogramBins) {
     int fitparamN=0;
-    for (int i=0; i<paramCount(); i++) {
+    const int pcount=paramCount();
+    for (int i=0; i<pcount; i++) {
         if (isParameterVisible(i, fullParams) && (!paramsFix[i]) && getDescription(i).fit) {
             fitparamN++;
         }

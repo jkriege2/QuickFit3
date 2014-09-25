@@ -276,7 +276,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbDualView->addItem(QIcon(":/imaging_fcs/dvnone.png"), tr("none"));
     cmbDualView->addItem(QIcon(":/imaging_fcs/dvhor.png"), tr("split horizontal"));
     cmbDualView->addItem(QIcon(":/imaging_fcs/dvver.png"), tr("split vertical"));
-    glVisPlots->addWidget(new QLabel("DualView mode:"), 2, 0);
+
+    glVisPlots->addWidget(labDV=new QLabel("DualView mode:"), 2, 0);
     glVisPlots->addWidget(cmbDualView, 2, 1, 1, 2);
     vbl->addWidget(grpVisiblePlots);
 
@@ -634,6 +635,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbSeletionCorrDisplayMode->addItem(tr("display average"));
     cmbSeletionCorrDisplayMode->addItem(tr("display all"));
     cmbSeletionCorrDisplayMode->addItem(tr("FCCS display"));
+    cmbSeletionCorrDisplayMode->addItem(tr("DCCF display"));
     gl->addRow(tr("selection display:"), cmbSeletionCorrDisplayMode);
 
     QWidget* wcrosstalk=new QWidget(this);
@@ -1681,7 +1683,7 @@ void QFRDRImagingFCSImageEditor::excludeByImage(double* imageIn) {
             mask[i]=false;
             image[i]=imageIn[i];
         }
-        dialog->init(mask, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), cmbDualView->currentIndex());
+        dialog->init(mask, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(),  (cmbDualView->isEnabled())?cmbDualView->currentIndex():0);
         if (dialog->exec()==QDialog::Accepted) {
             if (dialog->getMaskMode()==2) {
                 bool* newMask=m->maskGet();
@@ -1716,7 +1718,7 @@ void QFRDRImagingFCSImageEditor::selectByImage(double* imageIn) {
             mask[i]=false;
             image[i]=imageIn[i];
         }
-        dialog->init(mask, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), cmbDualView->currentIndex());
+        dialog->init(mask, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), (cmbDualView->isEnabled())?cmbDualView->currentIndex():0);
         if (dialog->exec()==QDialog::Accepted) {
             if (dialog->getMaskMode()==2) {
                 for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
@@ -2172,6 +2174,9 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         selected.clear();
         cmbDualView->setCurrentIndex(int(m->dualViewMode()));
         cmbDualView->setEnabled(m->dualViewModeUserEditable());
+        labDV->setVisible(m->dualViewModeUserEditable());
+        cmbDualView->setVisible(m->dualViewModeUserEditable());
+
         actSelectionByIntensity2->setEnabled(m->getImageFromRunsChannels()>1);
         actMaskByIntensity2->setEnabled(m->getImageFromRunsChannels()>1);
         selectedInsert(0);
@@ -3704,7 +3709,26 @@ void QFRDRImagingFCSImageEditor::replotData() {
         labBackground1->setText(tr("(%1+/-%2) kAU/s = (%3+/-%4) AU/&Delta;t<sub>frame</sub>").arg(back1/1000.0).arg(backe1/1000.0).arg(back1*m->getFrameTime()).arg(backe1*m->getFrameTime()));
         labBackground2->setText(tr("(%1+/-%2) kAU/s = (%3+/-%4) AU/&Delta;t<sub>frame</sub>").arg(back2/1000.0).arg(backe2/1000.0).arg(back2*m->getFrameTime()).arg(backe2*m->getFrameTime()));
 
-        if (m->isFCCS() && cmbSeletionCorrDisplayMode->currentIndex()==2 ) { // FCCS mode
+        if (cmbSeletionCorrDisplayMode->currentIndex()==3 || (cmbSeletionCorrDisplayMode->currentIndex()==2 && !m->isFCCS() && m->isDCCF())) { // DCCF mode
+            QList<QFRDRImagingFCSData*> lst=filterListForClass<QFRawDataRecord, QFRDRImagingFCSData>(m->getGroupMembers());
+            int w=m->getImageFromRunsWidth();
+            int h=m->getImageFromRunsHeight();
+
+            for (int ri=0; ri<lst.size(); ri++) {
+                if (lst[ri] && w==lst[ri]->getImageFromRunsWidth() && h==lst[ri]->getImageFromRunsHeight()) {
+                    QColor col=getCycleColor(ri, 2*lst.size()-1);
+                    col.setAlphaF(1);
+                    col=col.darker();
+                    if (selected.size()==1) {
+                        plotRun(lst[ri], *(selected.begin()), true, plotter, plotterResid, tabFitvals, c_tau, NULL,NULL,NULL, col, lst[ri]->getRole());
+                    } else {
+                        plotRunsAvg(lst[ri], selected, true, plotter, plotterResid, tabFitvals, c_tau, NULL,NULL,NULL, col, lst[ri]->getRole());
+                    }
+                }
+            }
+
+
+        } else if (m->isFCCS() && (cmbSeletionCorrDisplayMode->currentIndex()==2 || cmbSeletionCorrDisplayMode->currentIndex()==3) ) { // FCCS mode
             QVector<double> dataTauACF0, dataCorrACF0, dataCorrErrACF0;
             QVector<double> dataTauACF1, dataCorrACF1, dataCorrErrACF1;
             QVector<double> dataTauCCF,  dataCorrCCF,  dataCorrErrCCF;
@@ -3806,7 +3830,11 @@ void QFRDRImagingFCSImageEditor::replotData() {
         } else {
             int maxSingleItems=1;
             int mode=cmbSeletionCorrDisplayMode->currentIndex();
-            if (mode==2 && !m->isFCCS()) mode=0;
+            if (mode==2 && !m->isFCCS()) {
+                mode=0;
+                if (m->isDCCF()) mode=3;
+            }
+            if (mode==3 && !m->isDCCF()) mode=0;
             if (cmbDualView->currentIndex()>0) maxSingleItems=2;
             if ((mode==1) || (mode==0 && selected.size()<=maxSingleItems)) {
                 for (int i=0; i<m->getCorrelationRuns(); i++) {
@@ -4701,9 +4729,11 @@ void QFRDRImagingFCSImageEditor::dualviewChanged(int mode) {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
     if (m) {
-        if (mode==1) m->setDualViewMode(QFRDRImagingFCSData::dvHorizontal);
-        else if (mode==2) m->setDualViewMode(QFRDRImagingFCSData::dvVertical);
-        else m->setDualViewMode(QFRDRImagingFCSData::dvNone);
+        if (m->dualViewModeUserEditable()) {
+            if (mode==1) m->setDualViewMode(QFRDRImagingFCSData::dvHorizontal);
+            else if (mode==2) m->setDualViewMode(QFRDRImagingFCSData::dvVertical);
+            else m->setDualViewMode(QFRDRImagingFCSData::dvNone);
+        }
         if (mode!=QFRDRImagingFCSData::dvNone) {
             histogram_2->setVisible(true);
             histogram2_2->setVisible(true);
@@ -5982,9 +6012,9 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
 
 
     histogram->writeReport(cursor, document);
-    if (cmbDualView->currentIndex()>0) histogram_2->writeReport(cursor, document);
+    if (cmbDualView->currentIndex()>0 && cmbDualView->isEnabled()) histogram_2->writeReport(cursor, document);
     histogram2->writeReport(cursor, document);
-    if (cmbDualView->currentIndex()>0) histogram2_2->writeReport(cursor, document);
+    if (cmbDualView->currentIndex()>0 && cmbDualView->isEnabled()) histogram2_2->writeReport(cursor, document);
     corrView->writeReport(cursor, document);
     cursor.movePosition(QTextCursor::End);
     QApplication::processEvents();
@@ -6020,8 +6050,8 @@ void QFRDRImagingFCSImageEditor::replotHistogram() {
     histogram->replotHistogram();
     histogram2->replotHistogram();
     corrView->replotCorrelation();
-    if (cmbDualView->currentIndex()>0) histogram_2->replotHistogram();
-    if (cmbDualView->currentIndex()>0) histogram2_2->replotHistogram();
+    if (cmbDualView->currentIndex()>0 && cmbDualView->isEnabled()) histogram_2->replotHistogram();
+    if (cmbDualView->currentIndex()>0 && cmbDualView->isEnabled()) histogram2_2->replotHistogram();
 }
 
 void QFRDRImagingFCSImageEditor::updateHistogram(QFHistogramView* histogram, QFRDRImagingFCSData* m, double* plteImageData, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram) {
@@ -6265,7 +6295,7 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
     if (!m) return;
 
 
-    bool dv=cmbDualView->currentIndex()>0;
+    bool dv=cmbDualView->currentIndex()>0 && cmbDualView->isEnabled();
 
     corrView->clear();
     histogram->clear();
@@ -6307,7 +6337,7 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
     if (!m) return;
 
 
-    bool dv=cmbDualView->currentIndex()>0;
+    bool dv=cmbDualView->currentIndex()>0 && cmbDualView->isEnabled();
 
     updateHistogram(histogram, m, pltImage->getData(), pltImage->getDataSize(), chkExcludeExcludedRunsFromHistogram->isChecked(), false, true);
     histogram->setHistogramXLabel(cmbParameter->currentText());

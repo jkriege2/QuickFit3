@@ -28,6 +28,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "gsl/gsl_multimin.h"
 #include "gsl/gsl_vector.h"
 #include "gsl/gsl_blas.h"
+#include "gsl/gsl_deriv.h"
 
 struct QFFItAlgorithmGSL_evalData {
     QFFitAlgorithm::Functor* model;
@@ -35,14 +36,25 @@ struct QFFItAlgorithmGSL_evalData {
     const double* paramsMax;
     int pcount;
 
+    /** \brief pre-allocated memory of the size of the model-function output */
     gsl_vector * out;
+    /** \brief pre-allocated memory of the size of the model-function output */
     gsl_vector * out_ast;
+    /** \brief pre-allocated memory of the size of the parameter vector */
     gsl_vector * params;
+    /** \brief pre-allocated memory of the size of the parameter vector */
     gsl_vector * params_ast;
 
 };
 
 double QFFitAlgorithmGSL_f (const gsl_vector *v, void *params);
+struct QFFitAlgorithmGSL_fForDerivData {
+    gsl_vector *v;
+    int index;
+    void* params;
+    double (* f) (const gsl_vector  * x, void * params);
+};
+double QFFitAlgorithmGSL_fForDeriv (double x, void *params);
 void QFFitAlgorithmGSL_df (const gsl_vector *v, void *params, gsl_vector * g);
 void QFFitAlgorithmGSL_fdf (const gsl_vector *x, void *params, double *f, gsl_vector *df);
 

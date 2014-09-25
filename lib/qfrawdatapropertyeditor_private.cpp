@@ -115,6 +115,11 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     btnPrevious->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
     btnPrevious->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     btnPrevious->setDefaultAction(actPrevious);
+    btnPreviousSameRole=new QToolButton(d);
+    btnPreviousSameRole->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+    btnPreviousSameRole->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    btnPreviousSameRole->setDefaultAction(actPreviousSameRole);
+    vl->addWidget(btnPreviousSameRole);
     vl->addWidget(btnPrevious);
     connect(actPrevious, SIGNAL(triggered()), this, SLOT(previousPressed()));
     connect(actPreviousSameRole, SIGNAL(triggered()), this, SLOT(previousOfRolePressed()));
@@ -1312,6 +1317,8 @@ void QFRawDataPropertyEditor_private::setCurrent(QFRawDataRecord* c) {
 
         if (c) {
             if (c->getType()!=oldType) {
+                btnPreviousSameRole->setVisible(c->showNextPreviousOfSameRoleButton());
+                btnNextSameRole->setVisible(c->showNextPreviousOfSameRoleButton());
                 for (int i=editorList.size()-1; i>=0; i--) {
                     QFRawDataEditor* w=editorList[i];
                     if (w) {

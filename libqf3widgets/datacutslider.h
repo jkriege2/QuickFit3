@@ -46,16 +46,16 @@ class QFWIDLIB_EXPORT DataCutSliders : public QWidget
         explicit DataCutSliders(QWidget* parent=0);
         virtual ~DataCutSliders();
 
-        GetSetMacroI(int, min, updateSliderWidgets())
-        GetSetMacroI(int, max, updateSliderWidgets())
-        GetSetMacroI(int, userMin, updateSliderWidgets())
-        GetSetMacroI(int, userMax, updateSliderWidgets())
-        GetSetMacro(bool, allowCopyToAll)
-        GetSetMacro(QString, runsName)
-        GetSetMacro(QString, filesName)
-        GetSetMacro(bool, copyToRunsEnabled)
-        GetSetMacro(bool, copyToFilesEnabled)
-        GetMacro(bool, sliderSignals)
+        GET_SET_MACRO_I(int, min, updateSliderWidgets())
+        GET_SET_MACRO_I(int, max, updateSliderWidgets())
+        GET_SET_MACRO_I(int, userMin, updateSliderWidgets())
+        GET_SET_MACRO_I(int, userMax, updateSliderWidgets())
+        GET_SET_MACRO(bool, allowCopyToAll)
+        GET_SET_MACRO(QString, runsName)
+        GET_SET_MACRO(QString, filesName)
+        GET_SET_MACRO(bool, copyToRunsEnabled)
+        GET_SET_MACRO(bool, copyToFilesEnabled)
+        GET_MACRO(bool, sliderSignals)
 
         /** \brief switches off the slidersChanged() signal. */
         void disableSliderSignals() {

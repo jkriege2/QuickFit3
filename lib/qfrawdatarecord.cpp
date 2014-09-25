@@ -4263,6 +4263,11 @@ bool QFRawDataRecord::isRoleUserEditable() const
     return false;
 }
 
+bool QFRawDataRecord::showNextPreviousOfSameRoleButton() const
+{
+    return true;
+}
+
 QString QFRawDataRecord::resultsGetInStringMatrix(const QString &evaluationName, const QString &resultName, int row, int column, const QString &defaultValue) const {
     
 #ifdef DEBUG_THREAN

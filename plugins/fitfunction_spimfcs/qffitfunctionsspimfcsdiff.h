@@ -64,7 +64,7 @@ class QFFitFunctionsSPIMFCSDiff: public QFFitFunction {
         virtual QString transformParametersForAdditionalPlot(int plot, double* params);
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
-        virtual bool get_implementsDerivatives() { return false; };
+        virtual bool get_implementsDerivatives() const { return false; };
 
         /*! \copydoc QFFitFunction::evaluateDerivatives()   */
         virtual void evaluateDerivatives(double* derivatives, double t, const double* parameters) const ;

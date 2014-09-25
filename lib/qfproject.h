@@ -98,6 +98,8 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         QString errorDesc;
         /** \brief indicates whether the data has changed  */
         bool dataChange;
+        /** \brief indicates whether the properties changed  */
+        bool propertiesChange;
         /** \brief data model which may be used to display a list of all
          *         contained raw data items. This model is dragf-enabled! */
         QFProjectRawDataModel* rdModel;
@@ -229,7 +231,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         QFEvaluationItem* getPreviousEvaluationOfSameType(QFEvaluationItem* current);
 
         /** brief returns a QStringList with all property names currently used in the project */
-        QStringList getAllPropertyNames();
+        QStringList getAllPropertyNames(bool visible_only=false);
 
         /** \brief returns a QList with all the used IDs for rawData records*/
         inline QList<int> getRawDataIDList() { return rawData.keys(); }
@@ -471,6 +473,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
     public slots:
         /** \brief tell the project that the data contained in it has changed ... and it needs to be saved */
         void setDataChanged();
+        void setPropertiesChanged();
 
         virtual void setStructureChanged();
 

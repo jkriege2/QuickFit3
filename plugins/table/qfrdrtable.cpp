@@ -284,6 +284,11 @@ QVariant QFRDRTable::getModelData(quint32 row, quint32 column) {
     return datamodel->data(datamodel->index(row, column), Qt::DisplayRole);
 }
 
+bool QFRDRTable::showNextPreviousOfSameRoleButton() const
+{
+    return false;
+}
+
 
 
 QVariant QFRDRTable::tableGetData(quint32 row, quint32 column) const

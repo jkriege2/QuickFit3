@@ -124,6 +124,27 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                         setQFProperty(p, getProperty(p, QFileInfo(files[f]).completeBaseName()), true, true);
                     }
 
+                    if (stacks.last().props.contains("PIXEL_WIDTH")) {
+                        p=QString("XUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), stacks.last().props["PIXEL_WIDTH"].toDouble(), false, true);
+                        p=QString("XUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), tr("nm"), false, true);
+                    }
+                    if (stacks.last().props.contains("PIXEL_HEIGHT")) {
+                        p=QString("YUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), stacks.last().props["PIXEL_HEIGHT"].toDouble(), false, true);
+                        p=QString("YUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), tr("nm"), false, true);
+                    }
+                    if (stacks.last().props.contains("STEPSIZE")) {
+                        p=QString("TUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), stacks.last().props["STEPSIZE"].toDouble(), false, true);
+                        p=QString("TUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), tr("nm"), false, true);
+                    }
+                    if (stacks.last().props.contains("DELTAZ")) {
+                        p=QString("TUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), stacks.last().props["DELTAZ"].toDouble(), false, true);
+                        p=QString("TUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), tr("nm"), false, true);
+                    }
+                    if (stacks.last().props.contains("FRAMETIME")) {
+                        p=QString("TUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), stacks.last().props["DELTAZ"].toDouble(), false, true);
+                        p=QString("TUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), tr("nm"), false, true);
+                    }
+
                 }
 
             }
@@ -237,6 +258,27 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
             p=QString("CUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, 1.0), true, true);
 
             p=QString("STACK_DESCRIPTION"); setQFProperty(p+QString::number(stacks.size()-1), getEnumeratedProperty(p, stacks.size()-1, tr("stack %1").arg(stacks.size())), true, true);
+
+            if (stacks.last().props.contains("PIXEL_WIDTH")) {
+                p=QString("XUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), stacks.last().props["PIXEL_WIDTH"].toDouble(), false, true);
+                p=QString("XUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), tr("nm"), false, true);
+            }
+            if (stacks.last().props.contains("PIXEL_HEIGHT")) {
+                p=QString("YUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), stacks.last().props["PIXEL_HEIGHT"].toDouble(), false, true);
+                p=QString("YUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), tr("nm"), false, true);
+            }
+            if (stacks.last().props.contains("STEPSIZE")) {
+                p=QString("TUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), stacks.last().props["STEPSIZE"].toDouble(), false, true);
+                p=QString("TUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), tr("nm"), false, true);
+            }
+            if (stacks.last().props.contains("DELTAZ")) {
+                p=QString("TUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), stacks.last().props["DELTAZ"].toDouble(), false, true);
+                p=QString("TUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), tr("nm"), false, true);
+            }
+            if (stacks.last().props.contains("FRAMETIME")) {
+                p=QString("TUNIT_FACTOR"); setQFProperty(p+QString::number(stacks.size()-1), stacks.last().props["DELTAZ"].toDouble(), false, true);
+                p=QString("TUNIT_NAME"); setQFProperty(p+QString::number(stacks.size()-1), tr("nm"), false, true);
+            }
 
             if (allocateMemory()) {
                 int channel=0;
@@ -598,4 +640,9 @@ void QFRDRImageStackData::exportData(const QString &format, const QString &filen
     if (format.toUpper()=="TIFF") {
 
     }
+}
+
+bool QFRDRImageStackData::showNextPreviousOfSameRoleButton() const
+{
+    return false;
 }

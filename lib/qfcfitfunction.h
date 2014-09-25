@@ -273,7 +273,7 @@ class LIB_EXPORT QFCFitFunction {
         virtual void evaluateDerivatives(double* derivatives, double x, const double* parameters) const {};
 
         /** \brief retrun \c if this fit function implements analytic derivatives in evaluateDerivatives() */
-        virtual bool get_implementsDerivatives() { return false; };
+        virtual bool get_implementsDerivatives() const { return false; };
 
         /*! \brief calculate non-fit parameters and their errors (if \a error is supplied), i.e. \c fit=userEditable=false
             \param[in,out] parameterValues the parameter values on which to base the calculation. This is also

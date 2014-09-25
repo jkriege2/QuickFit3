@@ -34,6 +34,7 @@ release {
 
 
 INCLUDEPATH += .
+INCLUDEPATH += ../../../../LIB/trunk/
 
 
 QT += gui xml svg network
@@ -76,6 +77,8 @@ HEADERS += dlgnewproperty.h \
            qfplugin.h \
            qflib_version.h \
            csvtools.h \
+    ../../../../LIB/trunk/statistics_tools.h \
+    ../../../../LIB/trunk/mathtools.h \
     qtriple.h \
     qvisiblehandlesplitter.h \
     lib_imexport.h \
@@ -147,7 +150,9 @@ HEADERS += dlgnewproperty.h \
     ../version.h \
     qfcollapsibleframe.h \
     qfcollapsiblescrollarea.h \
-    qfrotatablelabel.h
+    qfrotatablelabel.h \
+    qfcompleterproperties.h \
+    qfimagemetadatatool.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -175,6 +180,8 @@ SOURCES += dlgnewproperty.cpp \
            qfextensionmanager.cpp \
            qfevaluationresultsmodel.cpp \
            csvtools.cpp \
+    ../../../../LIB/trunk/statistics_tools.cpp \
+    ../../../../LIB/trunk/mathtools.cpp \
     qvisiblehandlesplitter.cpp \
     qfpluginrawdata.cpp \
     qfhtmldelegate.cpp \
@@ -236,7 +243,9 @@ SOURCES += dlgnewproperty.cpp \
     qfsimpleplotservice.cpp \
     qfcollapsibleframe.cpp \
     qfcollapsiblescrollarea.cpp \
-    qfrotatablelabel.cpp
+    qfrotatablelabel.cpp \
+    qfcompleterproperties.cpp \
+    qfimagemetadatatool.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \
@@ -249,11 +258,10 @@ RESOURCES += lib.qrc
 
 TRANSLATIONS= ./translations/de.lib.ts
 
-INCLUDEPATH +=
 
 CONFIG += dll lib_bundle exceptions rtti stl create_prl
 
-DEFINES += QFLIB_LIBRARY
+DEFINES += QFLIB_LIBRARY LIB_IN_DLL LIB_EXPORT_LIBRARY
 
 
 

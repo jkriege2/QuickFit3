@@ -13,7 +13,8 @@
   
   
   
-    <h2>Parameter Image</h2>   
+    <h2>Parameter Image</h2>  
+    <h3>Overview of Parameter Image Tab</h3>	
      <center><a name="imfcs_ui_pic004"><img src="./pic/imfcs_ui_pic004.png" border="1">
     </center>    
     <p>This editor is used to display the result of fits as an image. It collects the fit results from a given set for each pixel. these fit results are displayed as a color-coded image (top left). In addition a second parameter may be selected that serves as measure for the goodnes of fit (top center plot). In the top right plot the overview image of the measurement is displayed. By clicking on one of the images, you may select the corresponding ACF/CCF to be displayed below. If you keep Ctrl pressed, while clicking, multiple pixels may be selected. The currently selected pixels may optionally be shown as overlays in the three top-row plots. In addition to the ACFs/CCFs, also the fits is displayed. The fitparameters are shown in the table on the right of the correlation function plot. </p>
@@ -25,8 +26,15 @@
     <p>Further display options:
     <ul>
       <li><b>Correlation plot styles/Selection Display mode:</b> here you can select what the correlation display should contain if several pixels are selected: Either the curves of all selected pixels are shown (which is possibly slow if you selected many pixels, or an average over these correlation curves is displayed. In that case the parameters table also contains the statistics of all selected fit results. Note that in DualView mode (see above) one average/statistics for every image channel will be displayed!</li>
-
-      <li><b><font color="red">deprecated:</font></b><br><small><b>general options/DualView mode:</b> If your microscope is equipped with DualView (or OptoSplit) optics, the displayed image will be split in the center into two parts (left/right, top/bottom) which correspond to two detection channels. This option allows to use this information. If the DualView mode is set properly, the e.g. when selecting pixels, they will be selected in both channels. Also the correlation curve display below will display two averaged curves if several pixels are detected to allow for a comparison of the two image channels.</small></li>
+    </ul>
+    </p>
+    <h3>Correlation Curve display options</h3>
+    <p>QuickFit display the correlation curve for the currently selected pixel(s) in the bottom-left corner of the Parameter Image tab. On the rhs of the window, you can choos between different <b>selection display</b> modes, that control, exactly which correlation curves should be displayed:
+	<ul>	
+	  <li><b>display average:</b> Displays the average (and standard deviation) over the correlation curves from all selected pixels.</li>
+	  <li><b>display average:</b> Displays all the correlation curves from all selected pixels.</li>
+      <li><b>FCCS Mode:</b> In this mode, QuickFit finds two ACFs and the FCCS correlation curve from the current group and displays them together. This is useful for fluorescnece cross-correlation data, as you can view the classic ACFs+FCCS plot. If more than one pixel is selected, this displays the average and standard deviation.</li>
+      <li><b>DCCF Mode:</b> In this mode QuickFit displays the correlation curves from all imFCS records in the current group. This is useful for distance cross-correlation data, as then the plot contains the ACF and all DCCFs, that you calculated. If more than one pixel is selected, this displays the average and standard deviation.</li>
     </ul>
     </p>
     

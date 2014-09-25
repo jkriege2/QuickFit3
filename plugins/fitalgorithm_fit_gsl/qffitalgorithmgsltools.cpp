@@ -65,20 +65,30 @@ double QFFitAlgorithmGSL_f (const gsl_vector *v, void *eparams)
   return result;
 }
 
+double QFFitAlgorithmGSL_fForDeriv (double x, void *params) {
+    QFFitAlgorithmGSL_fForDerivData* data=(QFFitAlgorithmGSL_fForDerivData*)params;
+    const double temp=gsl_vector_get(data->v, data->index);
+    gsl_vector_set(data->v, data->index, x);
+    const double res=data->f(data->v, data->params);
+    gsl_vector_set(data->v, data->index, temp);
+    return res;
+}
+
 
 void QFFitAlgorithmGSL_df (const gsl_vector *v, void *eparams, gsl_vector * g)
 {
-  double result=0, result_ast=0;
+  //double result=0, result_ast=0;
   QFFItAlgorithmGSL_evalData *p = (QFFItAlgorithmGSL_evalData *)eparams;
 
   double eps = GSL_SQRT_DBL_EPSILON*10.0;
 
-  gsl_vector * out=p->out;
-  gsl_vector * out_ast=p->out_ast;
+  //gsl_vector * out=p->out;
+  //gsl_vector * out_ast=p->out_ast;
   gsl_vector * params=p->params;
-  gsl_vector * params_ast=p->params_ast;
+  //gsl_vector * params_ast=p->params_ast;
 
 
+  // ensure parameters are stored in params and params_ast and that they are within the parameter ranges (if applicable)
   if (p->paramsMin&& p->paramsMax) {
 
       /*for (int i=0; i<p->pcount; i++) {
@@ -99,21 +109,21 @@ void QFFitAlgorithmGSL_df (const gsl_vector *v, void *eparams, gsl_vector * g)
            double val=qBound(mi, gsl_vector_get(v, i), ma);
 
            gsl_vector_set(params, i, val);
-           gsl_vector_set(params_ast, i, val);
+           //gsl_vector_set(params_ast, i, val);
        }
   } else {
       for (int i=0; i<p->pcount; i++) {
           const double val=gsl_vector_get(v, i);
           gsl_vector_set(params, i, val);
-          gsl_vector_set(params_ast, i, val);
+          //gsl_vector_set(params_ast, i, val);
       }
   }
 
 
   // evaluate fit function out = [ f0(p), f1(p), ... ]
-  p->model->evaluate(gsl_vector_ptr(out, 0), gsl_vector_ptr(params, 0));
+  //p->model->evaluate(gsl_vector_ptr(out, 0), gsl_vector_ptr(params, 0));
   // calculate sum of squares out^T*out = out[0]^2+out[1]^2+...
-  gsl_blas_ddot(out, out, &result);
+  //gsl_blas_ddot(out, out, &result);
 
   //qDebug()<<"x="<<arrayToString(gsl_vector_ptr(out, 0), p->pcount)<<"   x^2="<<result;
 
@@ -126,8 +136,24 @@ void QFFitAlgorithmGSL_df (const gsl_vector *v, void *eparams, gsl_vector * g)
    *  ....
    * where h[i]=max(eps, x[i]*eps) with eps=sqrt(machine precision)
    */
+
+  QFFitAlgorithmGSL_fForDerivData dd;
+  dd.f=QFFitAlgorithmGSL_f;
+  dd.index=0;
+  dd.params=eparams;
+  dd.v=gsl_vector_alloc(params->size);
+  gsl_vector_memcpy(dd.v, params);
+  gsl_function F;
+  F.function=QFFitAlgorithmGSL_fForDeriv;
+  F.params=&dd;
+  double resultd, abserr;
   for (int i=0; i<p->pcount; i++) {
-      double val=gsl_vector_get(params, i);
+      dd.index=i;
+
+      gsl_deriv_central(&F,gsl_vector_get(params,i),eps,&resultd,&abserr);
+      gsl_vector_set(g, i, resultd);
+
+      /*double val=gsl_vector_get(params, i);
       double h=eps*val;
       if (h==0.0) h=eps;
       if (h<eps) h=eps;
@@ -145,7 +171,11 @@ void QFFitAlgorithmGSL_df (const gsl_vector *v, void *eparams, gsl_vector * g)
 
       gsl_vector_set(g, i, (result_ast-result)/h);
       //qDebug()<<"dx("<<i<<") [v="<<val<<" v*="<<val_ast<<"]:    ( "<<result_ast<<" - "<<result<<" ) / "<<h<<"  =  "<<gsl_vector_get(g, i)<<"    (eps="<<eps<<")";
-      gsl_vector_set(params_ast, i, val);
+      gsl_vector_set(params_ast, i, val);*/
+
+
+
+
   }
 
 }

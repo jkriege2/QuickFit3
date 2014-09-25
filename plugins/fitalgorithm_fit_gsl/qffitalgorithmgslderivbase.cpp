@@ -38,8 +38,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 QFFitAlgorithmGSLDerivativeBase::QFFitAlgorithmGSLDerivativeBase(const gsl_multimin_fdfminimizer_type *T):
     QFFitAlgorithm()
 {
-    setParameter("stepsize", 0.1);
-    setParameter("tol", 0.01);
+    setParameter("stepsize", 50.0*DBL_EPSILON);
+    setParameter("tol", 1e-4);
     setParameter("gtol", 1e-4);
     setParameter("max_iterations", 200);
 

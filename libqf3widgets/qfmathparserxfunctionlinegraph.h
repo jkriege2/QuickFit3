@@ -58,9 +58,9 @@ class QFWIDLIB_EXPORT QFMathParserXFunctionLineGraph : public JKQTPxFunctionLine
         /** \brief class destructor */
         virtual ~QFMathParserXFunctionLineGraph();
 
-        GetSetMacro(QString, function);
+        GET_SET_MACRO(QString, function)
 
-        GetSetMacro(QString, errorFunction);
+        GET_SET_MACRO(QString, errorFunction)
     protected:
 
 
@@ -71,10 +71,10 @@ class QFWIDLIB_EXPORT QFMathParserXFunctionLineGraph : public JKQTPxFunctionLine
         QString errorFunction;
         QFMathParserXFunctionLineGraphFunctionData efdata;
 
-        GetSetMacroI(jkqtpPlotFunctionType, plotFunction, clearData());
-        GetSetMacroI(void*, params, clearData());
-        GetSetMacro(jkqtpPlotFunctionType, errorPlotFunction);
-        GetSetMacro(void*, errorParams);
+        GET_SET_MACRO_I(jkqtpPlotFunctionType, plotFunction, clearData())
+        GET_SET_MACRO_I(void*, params, clearData())
+        GET_SET_MACRO(jkqtpPlotFunctionType, errorPlotFunction)
+        GET_SET_MACRO(void*, errorParams)
 
         /** \brief fill the data array with data from the function plotFunction */
         virtual void createPlotData(bool collectParams=true);

@@ -80,13 +80,37 @@ bool QFImageReaderTinyTIFF::open(QString filename) {
     width=0;
     height=0;
     frame=0;
+    imageDescription="";
     fileinfo.init(filename);
     tif=TinyTIFFReader_open(filename.toLocal8Bit().data());
     if (TinyTIFFReader_success(tif)) {
         this->filename=filename;
         width=TinyTIFFReader_getWidth(tif);
         height=TinyTIFFReader_getHeight(tif);
+        imageDescription=TinyTIFFReader_getImageDescription(tif).c_str();
         tinyTIFFMessageHandler("QFImageReaderTinyTIFF", QObject::tr("opened file '%1', size: %2x%3\n").arg(filename).arg(width).arg(height));
+
+
+        bool metaOK=false;
+        int cnt=0;
+        while (!metaOK && cnt<5) {
+            QByteArray imgD=TinyTIFFReader_getImageDescription(tif).c_str();
+
+            if (imgD.size()>0) {
+                metaOK=qfimdtGetOMEMetaData(fileinfo.properties, imgD);
+                if (!metaOK) {
+                    metaOK=qfimdtGetImageJMetaData(fileinfo.properties, imgD);
+                }
+                if (!metaOK) {
+                    metaOK=qfimdtGetTinyTIFFMetaData(fileinfo.properties, imgD);
+                }
+                imageDescription+=QString("\n\n%1").arg(QString::fromLatin1(imgD.data()));
+            }
+            metaOK=metaOK||(!nextFrame());
+            cnt++;
+        }
+        reset();
+
 
         return true;
     } else {
@@ -101,7 +125,17 @@ bool QFImageReaderTinyTIFF::open(QString filename) {
 }
 
 uint32_t QFImageReaderTinyTIFF::countFrames() {
-    if (tif) return TinyTIFFReader_countFrames(tif);
+    if (tif) {
+        if (fileinfo.properties.contains("FRAMES")) {
+            bool ok=false;
+            uint32_t f=fileinfo.properties["FRAMES"].toULongLong(&ok);
+            if (ok && f>0) {
+                return f;
+            }
+        }
+
+        return TinyTIFFReader_countFrames(tif);
+    }
     return 0;
 }
 

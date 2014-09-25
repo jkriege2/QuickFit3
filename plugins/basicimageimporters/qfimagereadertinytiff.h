@@ -30,7 +30,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <tiffio.h>
 #include <QMutex>
 #include <stdint.h>
-
+#include "qfimagemetadatatool.h"
 
 /*! \brief QFImporter class for TIFF files using tinyTIFF reader which supports only a simple baseset of TIFF files, but with more frames than LibTIFF (\see QFImageReaderLIBTIFF)
     \ingroup qf3importerplugins_importers_basicimages
@@ -82,6 +82,8 @@ class QFImageReaderTinyTIFF: public QFImporterImageSeries
         uint32_t width;
         uint32_t height;
         uint32_t frame;
+
+        QByteArray imageDescription;
 
     public:
         static FILE* fLibTIFFLog;

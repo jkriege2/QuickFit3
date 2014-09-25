@@ -61,7 +61,7 @@ QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
     tbEdit->addAction(actMaskByImage);
     tbEdit->addSeparator();
     maskEditTools->registerPlotterMaskToolsToToolbar(tbEdit);
-    gl->addWidget(tbEdit, row, 0,1,3);
+    gl->addWidget(tbEdit, row, 0,1,4);
     row++;
 
     pltOverview=new QFPlotter(this);
@@ -103,7 +103,7 @@ QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
 //    gl->addWidget(pltOverview, row, 0, 2, 3);
     connect(pltOverview, SIGNAL(plotMouseClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)), this,SLOT(previewClicked(double,double,Qt::KeyboardModifiers,Qt::MouseButton)));
     maskEditTools->registerPlotter(pltOverview);
-    gl->addWidget(pltOverview, row, 0, 2, 3);
+    gl->addWidget(pltOverview, row, 0, 2, 4);
     gl->setRowStretch(row, 2);
     row+=2;
     labInfo=new QLabel(this);
@@ -235,8 +235,8 @@ void QFRDRImageToRunPreview::setRunSelectWidgetActive(bool active)
         gl->addWidget(btnAvgRun, 0, 2);
         gl->addWidget(labRun, 0, 3);
         gl->setColumnStretch(1,0);
-        gl->setColumnStretch(2,0);
-        gl->setColumnStretch(3,1);
+        gl->setColumnStretch(2,1);
+        gl->setColumnStretch(3,0);
         labRun->setAlignment(Qt::AlignRight|Qt::AlignVCenter);
     } else {
         spinRun->setVisible(false);

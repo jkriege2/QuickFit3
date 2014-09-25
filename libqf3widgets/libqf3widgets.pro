@@ -139,7 +139,6 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/qt/fillstylecombobox.h \
     qfsimplecurvefitdialog.h \
     qfparametercorrelationview.h \
-    ../../../../LIB/trunk/statistics_tools.h \
     qfmeasurementtable.h \
     qfmeasurementdevicecombobox.h \
     qfmeasurementdeviceconfigwidgetthread.h \
@@ -157,7 +156,6 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfoverlayplotdialog.h \
     ../plugins/interfaces/qfgetplotdatainterface.h \
     qfselectfileslistwidget.h \
-    ../../../../LIB/trunk/mathtools.h \
     qfsimpleplotview.h \
     qfsimpleplotwidget.h\
     qffunctionreferencetool.h \
@@ -242,7 +240,6 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     ../../../../LIB/trunk/qt/fillstylecombobox.cpp \
     qfsimplecurvefitdialog.cpp \
     qfparametercorrelationview.cpp \
-    ../../../../LIB/trunk/statistics_tools.cpp \
     qfmeasurementtable.cpp \
     qfmeasurementdevicecombobox.cpp \
     qfmeasurementdeviceconfigwidgetthread.cpp \
@@ -258,7 +255,6 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qffitfunctionselectdialog.cpp \
     qfoverlayplotdialog.cpp \
     qfselectfileslistwidget.cpp \
-    ../../../../LIB/trunk/mathtools.cpp \
     qfsimpleplotview.cpp \
     qfsimpleplotwidget.cpp \
     qffunctionreferencetool.cpp \

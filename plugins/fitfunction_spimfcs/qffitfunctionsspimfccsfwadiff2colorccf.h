@@ -53,7 +53,7 @@ class QFFitFunctionsSPIMFCCSFWADiff2ColorCCF: public QFFitFunction {
         virtual QString transformParametersForAdditionalPlot(int plot, double* params);
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
-        virtual bool get_implementsDerivatives() { return false; }
+        virtual bool get_implementsDerivatives() const { return false; }
 };
 
 #endif // QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_H

@@ -437,6 +437,9 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         /** \brief returns the table contents at the given position */
         QVariant getModelData(quint32 row, quint32 column);
 
+        /** \brief indicates, whether the next of same role/previous of same role buttons should be displayed */
+        virtual bool showNextPreviousOfSameRoleButton() const;
+
 
         virtual QVariant tableGetData(quint32 row, quint32 column) const;
         virtual void tableSetData(quint32 row, quint32 column, const QVariant& data);

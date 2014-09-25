@@ -621,6 +621,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QToolButton* btnCopyDataAsColumns;
 
         QComboBox* cmbDualView;
+        QLabel* labDV;
 
 
 

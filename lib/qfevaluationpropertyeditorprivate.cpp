@@ -636,7 +636,11 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     tbResultsSettings->addWidget(new QLabel(" display properties: "));
     edtDisplayProperties=new QFEnhancedLineEdit(d);
     edtDisplayProperties->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtDisplayProperties, edtDisplayProperties));
+    edtDisplayProperties->addButton(new QFStyledButton(QFStyledButton::SelectFromCompleter, edtDisplayProperties, edtDisplayProperties));
     edtDisplayProperties->setToolTip(tr("put a comma ',' separated list of properties here that should be part of the results table. <br><b>Note:</b> These properties can NOT be filtered with the filters below."));
+    compDisplayProperties=new QFCompleterProperties(d);
+    edtDisplayProperties->setCompleter(compDisplayProperties);
+
     connect(edtDisplayProperties, SIGNAL(textChanged(QString)), this, SLOT(propertiesTextChanged(QString)));
     tbResultsSettings->addWidget(edtDisplayProperties);
 
@@ -647,7 +651,6 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     tbResultsFilter->addWidget(new QLabel(" filter: file contains "));
     edtFilterFiles=new QFEnhancedLineEdit(d);
     edtFilterFiles->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterFiles, edtFilterFiles));
-    edtFilterFiles->setCompleter(new QFCompleterFromFile());
     compFilterFiles=new QFCompleterFromFile(d);
     edtFilterFiles->setCompleter(compFilterFiles);
     connect(edtFilterFiles, SIGNAL(textChanged(QString)), d->resultsModel, SLOT(setFilesFilter(QString)));
@@ -823,6 +826,14 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     menuResults->addSeparator();
     menuResults->addAction(actStatistics);
     menuResults->addAction(actStatisticsComparing);
+
+    /*QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/");
+    compFilterFiles->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evalfilterfiles.txt");
+    compFilterResults->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evalfilterresults.txt");
+    compFilterFilesNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evalfilterfiles_not.txt");
+    compFilterResultsNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evalfilterresults_not.txt");
+    compFilterRecords->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evalfilterrecords.txt");
+    compFilterRecordsNot->setFilename(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/"+current->getType()+"_evalfilterrecords_not.txt");*/
 
     currentTabChanged(0);
 }

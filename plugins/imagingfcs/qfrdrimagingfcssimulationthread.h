@@ -34,31 +34,31 @@ class QFRDRImagingFCSSimulationThread : public QThread
         explicit QFRDRImagingFCSSimulationThread(QObject *parent = 0);
         int getCurrentFrame() const;
 
-        GetSetMacro(double, DG);
-        GetSetMacro(double, DR);
-        GetSetMacro(double, DRG);
-        GetSetMacro(double, psf_size_g);
-        GetSetMacro(double, psf_size_r);
-        GetSetMacro(double, crosstalk);
-        GetSetMacro(double, VX);
-        GetSetMacro(double, VY);
-        GetSetMacro(double, deltax);
-        GetSetMacro(double, deltay);
-        GetSetMacro(double, pixel_size);
-        GetSetMacro(double, frametime);
-        GetSetMacro(long, frames);
-        GetSetMacro(long, warmup);
-        GetSetMacro(bool, dualView);
-        GetSetMacro(QString, filename);
-        GetSetMacro(int, width);
-        GetSetMacro(int, height);
-        GetSetMacro(double, brightnessG);
-        GetSetMacro(double, brightnessR);
-        GetSetMacro(double, background);
-        GetSetMacro(double, backgroundNoise);
-        GetSetMacro(int, walkersG);
-        GetSetMacro(int, walkersR);
-        GetSetMacro(int, walkersRG);
+        GET_SET_MACRO(double, DG)
+        GET_SET_MACRO(double, DR)
+        GET_SET_MACRO(double, DRG)
+        GET_SET_MACRO(double, psf_size_g)
+        GET_SET_MACRO(double, psf_size_r)
+        GET_SET_MACRO(double, crosstalk)
+        GET_SET_MACRO(double, VX)
+        GET_SET_MACRO(double, VY)
+        GET_SET_MACRO(double, deltax)
+        GET_SET_MACRO(double, deltay)
+        GET_SET_MACRO(double, pixel_size)
+        GET_SET_MACRO(double, frametime)
+        GET_SET_MACRO(long, frames)
+        GET_SET_MACRO(long, warmup)
+        GET_SET_MACRO(bool, dualView)
+        GET_SET_MACRO(QString, filename)
+        GET_SET_MACRO(int, width)
+        GET_SET_MACRO(int, height)
+        GET_SET_MACRO(double, brightnessG)
+        GET_SET_MACRO(double, brightnessR)
+        GET_SET_MACRO(double, background)
+        GET_SET_MACRO(double, backgroundNoise)
+        GET_SET_MACRO(int, walkersG)
+        GET_SET_MACRO(int, walkersR)
+        GET_SET_MACRO(int, walkersRG)
     public slots:
         void cancel();
         void waitForFinish();

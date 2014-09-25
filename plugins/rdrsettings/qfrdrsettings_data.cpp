@@ -39,6 +39,11 @@ void QFRDRSettingsData::exportData(const QString& format, const QString& filenam
     // THIS IS OPTIONAL
 }
 
+bool QFRDRSettingsData::showNextPreviousOfSameRoleButton() const
+{
+    return false;
+}
+
 QSettings *QFRDRSettingsData::getData() const
 {
     return data;

@@ -42,13 +42,13 @@ public:
     /** Access m_filename
      * \return The current value of m_filename
      */
-    QString filename() { return m_filename; }
+    inline QString filename() { return m_filename; }
     /** Set m_filename
      * \param val New value to set
      */
     void setFilename(QString val);
     /** \brief return the QStringListModel that holds the completer list */
-    QStringListModel* stringlistModel() const { return m_stringlist; }
+    inline QStringListModel* stringlistModel() const { return m_stringlist; }
 protected:
 private:
     /** \brief filename of the file that is used to read and store the internal model

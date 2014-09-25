@@ -279,9 +279,14 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         virtual QStringList getAvailableRoles() const;
         /** \brief if this returns \c true, the user may change the RDRs role in the QFRawDataPropertyEditor, default: \c false */
         virtual bool isRoleUserEditable() const;
+
+        /** \brief indicates, whether the next of same role/previous of same role buttons should be displayed */
+        virtual bool showNextPreviousOfSameRoleButton() const;
+
     protected:
         /** \copybrief QFProperties::setPropertiesError() */
         virtual void setPropertiesError(const QString& message) { setError(message); }
+
 
         mutable QReadWriteLock* lock;
 

@@ -59,7 +59,7 @@ class QFLIB_EXPORT QFFitFunctionParsed : public QFFitFunction{
         virtual QString transformParametersForAdditionalPlot(int plot, double* params);
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
-        virtual bool get_implementsDerivatives();
+        virtual bool get_implementsDerivatives() const;
 
 
     protected:
