@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
+#    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 #	
 #	 last modification: $LastChangedDate$  (revision $Rev$)
 #
@@ -21,6 +21,6 @@
 
 include(zlib.pri)
 include(png.pri)
-INCLUDEPATH += ../../extlibs/pixman/include/pixman-1/ ../../extlibs/pixman/include/ pixman-1
-LIBS += -L../../extlibs/pixman/lib/ -lpixman-1
+INCLUDEPATH += $$PWD/pixman/include/pixman-1/ $$PWD/pixman/include/ pixman-1
+LIBS += -L$$PWD/pixman/lib/ -lpixman-1
 DEFINES += QF_HAS_LIBPIXMAN

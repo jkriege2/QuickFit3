@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
+#    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 #	
 #	 last modification: $LastChangedDate$  (revision $Rev$)
 #
@@ -19,8 +19,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-LIBS += -L../../extlibs/lmfit/lib/ -L../../extlibs/lmfit/lib64/ -llmmin 
-INCLUDEPATH += ../../extlibs/lmfit/include/
+LIBS += -L$$PWD/lmfit/lib/ -L$$PWD/lmfit/lib64/ -llmmin 
+INCLUDEPATH += $$PWD/lmfit/include/
 
 
 

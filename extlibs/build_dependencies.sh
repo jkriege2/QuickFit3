@@ -743,7 +743,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd cimg
 	mkdir build
-	tar xvf ./CImg-1.5.6.tar.bz2 -C ./build/
+	tar xvf ./CImg-1.5.9.tar.bz2 -C ./build/
 	cd build/
 	cp -r * ../
 	libOK=$?

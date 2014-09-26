@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
+#    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 #	
 #	 last modification: $LastChangedDate$  (revision $Rev$)
 #
@@ -19,7 +19,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-INCLUDEPATH += ../../extlibs/libusb/include/libusb ../../extlibs/libusb/include/
-LIBS += -L../../extlibs/libusb/lib/ -lusb-1.0
+INCLUDEPATH += $$PWD/libusb/include/libusb $$PWD/libusb/include/
+LIBS += -L$$PWD/libusb/lib/ -lusb-1.0
 DEFINES += QF_HAS_LIBUSB
 win32:LIBS += -lgdi32

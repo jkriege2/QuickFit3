@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
+#    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 #	
 #	 last modification: $LastChangedDate$  (revision $Rev$)
 #
@@ -24,11 +24,11 @@ exists(andor.inc):include(andor.inc)
 
 win32 {
     contains( ANDOR_WIN64, true )|contains( QF3CONFIG, bits64 )|contains(BIT_DEPTH, 64) {
-      LIBS+= -L../../extlibs/andor_win64
-      INCLUDEPATH += ../../extlibs/andor_win64
+      LIBS+= -L$$PWD/andor_win64
+      INCLUDEPATH += $$PWD/andor_win64
     } else {
-      LIBS+= -L../../extlibs/andor_win32
-      INCLUDEPATH += ../../extlibs/andor_win32
+      LIBS+= -L$$PWD/andor_win32
+      INCLUDEPATH += $$PWD/andor_win32
     }
 }
 

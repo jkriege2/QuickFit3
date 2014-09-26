@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
+#    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 #	
 #	 last modification: $LastChangedDate$  (revision $Rev$)
 #
@@ -20,10 +20,10 @@
 #
 
 contains( HAS_LAPACK, true ) {
-   LIBS += $$LAPACK_LINK -L../../extlibs/levmar/lib/ -llevmar
+   LIBS += $$LAPACK_LINK -L$$PWD/levmar/lib/ -llevmar
    INCLUDEPATH += $$LAPACK_INCLUDE \
-                  ../../extlibs/levmar/include/
+                  $$PWD/levmar/include/
 } else {
-   LIBS += -L../../extlibs/levmar/lib/ -llevmar
-   INCLUDEPATH += ../../extlibs/levmar/include/
+   LIBS += -L$$PWD/levmar/lib/ -llevmar
+   INCLUDEPATH += $$PWD/levmar/include/
 }

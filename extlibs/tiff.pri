@@ -1,5 +1,5 @@
 #
-#    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
+#    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 #	
 #	 last modification: $LastChangedDate$  (revision $Rev$)
 #
@@ -20,6 +20,6 @@
 #
 
 include(zlib.pri)
-INCLUDEPATH += ../../extlibs/libtiff/include/
-LIBS += -L../../extlibs/libtiff/lib/ -ltiff
+INCLUDEPATH += $$PWD/libtiff/include/
+LIBS += -L$$PWD/libtiff/lib/ -ltiff
 DEFINES += QF_HAS_LIBTIFF cimg_use_tiff
