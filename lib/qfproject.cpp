@@ -381,7 +381,11 @@ void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& 
     } else {
         setError(tr("could not write temporary project file ..."));
     }
-    fcpy.remove(tmpfn);
+    if (QFile::exists(tmpfn)) {
+        fcpy.remove(tmpfn);
+        QFile fdel(tmpfn);
+        fdel.remove(tmpfn);
+    }
 }
 
 
