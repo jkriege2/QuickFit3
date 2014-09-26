@@ -341,6 +341,8 @@ void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& 
     QString tmpfn=qfGetTempFilename();
     {
         QFile f(tmpfn);
+        f.open(QFile::WriteOnly);
+        //qDebug()<<"writing "<<tmpfn;
         /*QTemporaryFile f(tmppath+"XXXXXX.tmp");
     QString tmpfn=f.fileName();*/
         //qDebug()<<tmpfn<<"\n"<<"  -> opened: "<<f.open(QFile::WriteOnly)<<"  fn="<<f.fileName();
