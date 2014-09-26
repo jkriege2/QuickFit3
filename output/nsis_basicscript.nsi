@@ -1,3 +1,5 @@
+!include "FileAssociation.nsh"
+
 # A few handy definitions to avoid repetition
 !define COMPANY_NAME "German Cancer Research Center (DKFZ)"
 !define BIT_DEPTH "%%BITDEPTH%%"
@@ -189,6 +191,17 @@ SectionEnd
 
 
 
+# This section does the file extension association
+Section "associate file extensions (*.qfp/qfpz)" sec_assoc
+	Push $OUTDIR ; Store previous output directory
+	SetOutPath "$INSTDIR" ; Set output directory
+	
+	${registerExtension} "$INSTDIR\quickfit3.exe" ".qfp" "QFP_File"
+	${registerExtension} "$INSTDIR\quickfit3.exe" ".qfpz" "QFPZ_File"
+	${registerExtension} "$INSTDIR\quickfit3.exe" ".qfp.gz" "QFPGZ_File"
+
+	Pop $OUTDIR ; Restore the original output directory
+SectionEnd
 
 
 
@@ -244,6 +257,7 @@ function .onInit
 	  IntOp $0 ${SF_SELECTED} | ${SF_RO}
 	  IntOp $0 $0 | ${SF_BOLD}
       SectionSetFlags ${sec_main} $0
+      SectionSetFlags ${sec_assoc} $0
       SectionSetFlags ${sec_spim} 0
 
 functionEnd
