@@ -337,26 +337,28 @@ void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& 
     bool namechanged=(filename!=this->file);
     if (!filename.isEmpty()) this->file=filename;
 
-    QString tmppath;
-    if (!filename.isEmpty()) tmppath=QFileInfo(filename).absolutePath()+"/";
-    QTemporaryFile f(tmppath+"XXXXXX.tmp");
-    f.open();
-    QString tmpfn=f.fileName();
 
-    internalWriteXML(&f, resetDataChanged, namechanged);
+    QString tmpfn=qfGetTempFilename();
+    {
+        QFile f(tmpfn);
+        /*QTemporaryFile f(tmppath+"XXXXXX.tmp");
+    QString tmpfn=f.fileName();*/
+        //qDebug()<<tmpfn<<"\n"<<"  -> opened: "<<f.open(QFile::WriteOnly)<<"  fn="<<f.fileName();
 
-    if (!filename.isEmpty()) {
-        QFile f2(filename+".backup");
-        if (f2.exists()) f2.remove();
 
-        QFile f1(file);
-        f1.rename(filename+".backup");
+        internalWriteXML(&f, resetDataChanged, namechanged);
+        f.close();
+
+        if (!filename.isEmpty()) {
+            QFile f2(filename+".backup");
+            if (f2.exists()) f2.remove();
+
+            QFile f1(file);
+            f1.rename(filename+".backup");
+        }
     }
 
-    f.setAutoRemove(false);
-    f.close();
-
-    QFile fcpy(filename);
+    QFile fcpy(tmpfn);
     if (fcpy.open(QFile::ReadOnly)) {
         size_t chunksize=PROJECT_COPY_CHUNKSIZE;
         char* chunk=qfMallocT<char>(PROJECT_COPY_CHUNKSIZE);
@@ -368,6 +370,7 @@ void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& 
             while (!fcpy.atEnd()) {
                 qint64 bytesRead=fcpy.read(chunk, chunksize);
                 file->write(chunk, bytesRead);
+                //qDebug()<<"writing chunk of size "<<bytesRead;
             }
 
             qfFree(chunk);
@@ -375,8 +378,10 @@ void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& 
             setError(tr("Error while writing file: Could not allocate enough memory!"));
         }
         fcpy.close();
-        fcpy.remove();
+    } else {
+        setError(tr("could not write temporary project file ..."));
     }
+    fcpy.remove(tmpfn);
 }
 
 
@@ -429,9 +434,9 @@ void QFProject::internalWriteXML(QIODevice *file, bool resetDataChanged, bool na
         }
     }
 
-    if (w.hasError() || file->errorString().size()>0) {
+    /*if (w.hasError() || file->errorString().size()>0) {
         setError(tr("Could no write project file!\n Error description: %2.").arg(file->errorString()));
-    }
+    }*/
 }
 
 void QFProject::writeXML(const QString& file, bool resetDataChanged) {
@@ -441,7 +446,9 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
     this->file=file;
 
     QTemporaryFile f(QFileInfo(file).absolutePath()+"/XXXXXX.tmp");
+    f.setAutoRemove(false);
     f.open();
+    f.setAutoRemove(false);
 
     internalWriteXML(&f, resetDataChanged, namechanged);
 

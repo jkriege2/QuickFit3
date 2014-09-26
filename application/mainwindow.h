@@ -535,6 +535,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QList<QPointer<QFEvaluationPropertyEditor> > evaluationPropEditors;
         /** \brief the last project open/save directory */
         QString currentProjectDir;
+        /** \brief the last project open/save directory */
+        QString currentProjectFilter;
         /** \brief the last rawdata insert directory */
         QString currentRawDataDir;
         /** \brief ProgramOptions object used for the application settings */

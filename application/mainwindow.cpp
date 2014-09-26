@@ -115,6 +115,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     //settings=NULL;
     project=NULL;
     currentProjectDir="";
+    currentProjectFilter="";
 
     timerAutosave=new QTimer(this);
     timerAutosave->setInterval(5*60*1000);
@@ -268,7 +269,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     QStringList args=QApplication::arguments();
     if (args.size()>0) {
         QString lastarg=args[args.size()-1];
-        if (QFile::exists(lastarg) && (QFileInfo(lastarg).suffix()=="qfp")) {
+        if (QFile::exists(lastarg) && ((QFileInfo(lastarg).suffix()=="qfp")||(QFileInfo(lastarg).suffix()=="qfpz")||(QFileInfo(lastarg).suffix()=="qfp.gz"))) {
             currentProjectDir=QFileInfo(lastarg).dir().absolutePath();
             loadProject(lastarg);
         }
@@ -579,7 +580,7 @@ bool MainWindow::saveProject() {
 }
 
 bool MainWindow::saveProjectAs() {
-    QString fileName = qfGetSaveFileName(this, tr("Save Project As ..."), currentProjectDir, projectSaveFileFilter);
+    QString fileName = qfGetSaveFileName(this, tr("Save Project As ..."), currentProjectDir, projectSaveFileFilter, &currentProjectFilter);
     if (fileName.isEmpty())
         return false;
     currentProjectDir=QFileInfo(fileName).dir().absolutePath();
@@ -1494,6 +1495,7 @@ void MainWindow::readSettings() {
 
 
     currentProjectDir=settings->getQSettings()->value("mainwindow/currentProjectDir", currentProjectDir).toString();
+    currentProjectFilter=settings->getQSettings()->value("mainwindow/currentProjectFilter", currentProjectFilter).toString();
     currentRawDataDir=settings->getQSettings()->value("mainwindow/currentRawDataDir", currentRawDataDir).toString();
     //column_separator=settings->getQSettings()->value("csvimport/column_separator", column_separator).toString();
     //decimal_separator=settings->getQSettings()->value("csvimport/decimal_separator", decimal_separator).toString();
@@ -1561,6 +1563,7 @@ void MainWindow::writeSettings() {
     logFileProjectWidget->saveSettings(*(settings->getQSettings()), "mainwindow/logProject");
 
     settings->getQSettings()->setValue("mainwindow/currentProjectDir", currentProjectDir);
+    settings->getQSettings()->setValue("mainwindow/currentProjectFilter", currentProjectFilter);
     settings->getQSettings()->setValue("mainwindow/currentRawDataDir", currentRawDataDir);
 
     helpWindow->writeSettings(*settings->getQSettings(), "mainwindow/help_");
@@ -1632,8 +1635,9 @@ void MainWindow::loadProject(const QString &fileName, bool subsetMode, const QSe
 
 
     if (fn.toLower().contains(".qfpz") || fn.toLower().contains(".qfp.gz")) {
+        logFileProjectWidget->log_text("WRITING TO GZIPPED PROJECT!\n");
         QuaGzipFile gzf(fn);
-        if (gzf.open(QFile::ReadOnly)) {
+        if (gzf.open(QIODevice::ReadOnly)) {
             if (subsetMode) {
                 project->readXMLSubSet(&gzf, fn, rdrSelected, evalSelected);
             } else {
@@ -1703,8 +1707,9 @@ bool MainWindow::saveProject(const QString &fileName) {
         time.start();
 
         if (fileName.toLower().contains(".qfpz") || fileName.toLower().contains(".qfp.gz")) {
+            logFileProjectWidget->log_text("LOADING FROM GZIPPED PROJECT!\n");
             QuaGzipFile gzf(fileName);
-            if (gzf.open(QFile::WriteOnly)) {
+            if (gzf.open(QIODevice::WriteOnly)) {
                 project->writeXML(&gzf, true, fileName);
                 gzf.close();
             } else {
