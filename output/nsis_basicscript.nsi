@@ -256,8 +256,9 @@ function .onInit
 	  !insertmacro MULTIUSER_INIT
 	  IntOp $0 ${SF_SELECTED} | ${SF_RO}
 	  IntOp $0 $0 | ${SF_BOLD}
+	  IntOp $1 ${SF_SELECTED} | ${SF_BOLD}
       SectionSetFlags ${sec_main} $0
-      SectionSetFlags ${sec_assoc} $0
+      SectionSetFlags ${sec_assoc} $1
       SectionSetFlags ${sec_spim} 0
 
 functionEnd
