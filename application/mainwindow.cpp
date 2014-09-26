@@ -1635,7 +1635,7 @@ void MainWindow::loadProject(const QString &fileName, bool subsetMode, const QSe
 
 
     if (fn.toLower().contains(".qfpz") || fn.toLower().contains(".qfp.gz")) {
-        logFileProjectWidget->log_text("WRITING TO GZIPPED PROJECT!\n");
+        logFileProjectWidget->log_text("LOADING FROM GZIPPED PROJECT!\n");
         QuaGzipFile gzf(fn);
         if (gzf.open(QIODevice::ReadOnly)) {
             if (subsetMode) {
@@ -1707,7 +1707,7 @@ bool MainWindow::saveProject(const QString &fileName) {
         time.start();
 
         if (fileName.toLower().contains(".qfpz") || fileName.toLower().contains(".qfp.gz")) {
-            logFileProjectWidget->log_text("LOADING FROM GZIPPED PROJECT!\n");
+            logFileProjectWidget->log_text("SAVING TO GZIPPED PROJECT!\n");
             QuaGzipFile gzf(fileName);
             if (gzf.open(QIODevice::WriteOnly)) {
                 project->writeXML(&gzf, true, fileName);
@@ -1741,7 +1741,7 @@ bool MainWindow::saveProject(const QString &fileName) {
 
     setCurrentProject(fileName);
     statusBar()->showMessage(tr("Project file '%1' saved!").arg(fileName), 2000);
-    logFileProjectWidget->log_text(tr("Project file '%1' saved after %2 secs!\n").arg(fileName).arg(elapsed));
+    logFileProjectWidget->log_text(tr("Project file '%1' saved after %2 secs (Filesize: %3 MB)!\n").arg(fileName).arg(elapsed).arg(double(QFileInfo(fileName).size())/1024.0/1024.0));
     return true;
 }
 
