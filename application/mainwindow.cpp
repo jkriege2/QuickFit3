@@ -40,6 +40,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "dlgsetrdrpropertybyexpression.h"
 #include <QNetworkRequest>
 #include <QNetworkProxy>
+#include <quagzipfile.h>
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
 
@@ -86,8 +87,8 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     dlgUserFitFunctionEditor=NULL;
     projectModeEnabled=true;
     nonprojectTitle=tr("non-project mode");
-    projectFileFilter=tr("QuickFit Project (*.qfp);;QuickFit Project Autosave (*.qfp.autosave *.qfp.autosave.backup);;QuickFit Project backup (*.qfp.backup)");
-    projectSaveFileFilter=tr("QuickFit Project (*.qfp)");
+    projectFileFilter=tr("QuickFit Project (*.qfp *.qfpz);;QuickFit Project Autosave (*.qfp.autosave *.qfp.autosave.backup *.qfpz.autosave *.qfpz.autosave.backup);;QuickFit Project backup (*.qfp.backup *.qfpz.backup)");
+    projectSaveFileFilter=tr("QuickFit Project (*.qfp);;Zipped QuickFit Project (*.qfpz)");
     settings=s;
     splashPix=splash->pixmap();
     project=NULL;
@@ -1628,11 +1629,30 @@ void MainWindow::loadProject(const QString &fileName, bool subsetMode, const QSe
     logFileProjectWidget->clearLogStore();
     //project=new QFProject(fn, getEvaluationItemFactory(), getRawDataRecordFactory(), this, this);
     project=new QFProject(getEvaluationItemFactory(), getRawDataRecordFactory(), this, this);
-    if (subsetMode) {
-        project->readXMLSubSet(fn, rdrSelected, evalSelected);
+
+
+    if (fn.toLower().contains(".qfpz") || fn.toLower().contains(".qfp.gz")) {
+        QuaGzipFile gzf(fn);
+        if (gzf.open(QFile::ReadOnly)) {
+            if (subsetMode) {
+                project->readXMLSubSet(&gzf, fn, rdrSelected, evalSelected);
+            } else {
+                project->readXML(&gzf, fn);
+            }
+            gzf.close();
+        } else {
+            QMessageBox::critical(this, tr("QuickFit %1").arg(qfInfoVersionFull()), tr("Could not open GZip-file for output!\n   file: '%1'\n   error: '%2'").arg(fileName).arg(gzf.errorString()));
+            logFileProjectWidget->log_error(tr("Could not open GZip-file for output (file: '%1', error: '%2')").arg(fileName).arg(gzf.errorString())+"\n");
+        }
     } else {
-        project->readXML(fn);
+        if (subsetMode) {
+            project->readXMLSubSet(fn, rdrSelected, evalSelected);
+        } else {
+            project->readXML(fn);
+        }
     }
+
+
     prgMainProgress->reset();
     prgMainProgress->setRange(0,1);
     prgMainProgress->setValue(0);
@@ -1681,7 +1701,22 @@ bool MainWindow::saveProject(const QString &fileName) {
         logFileProjectWidget->open_logfile(tr("%1.log").arg(fileName), true);
         logFileProjectWidget->clearLogStore();
         time.start();
-        project->writeXML(fileName);
+
+        if (fileName.toLower().contains(".qfpz") || fileName.toLower().contains(".qfp.gz")) {
+            QuaGzipFile gzf(fileName);
+            if (gzf.open(QFile::WriteOnly)) {
+                project->writeXML(&gzf, true, fileName);
+                gzf.close();
+            } else {
+                QMessageBox::critical(this, tr("QuickFit %1").arg(qfInfoVersionFull()), tr("Could not open GZip-file for output!\n   file: '%1'\n   error: '%2'").arg(fileName).arg(gzf.errorString()));
+                logFileProjectWidget->log_error(tr("Could not open GZip-file for output (file: '%1', error: '%2')").arg(fileName).arg(gzf.errorString())+"\n");
+            }
+        } else {
+            project->writeXML(fileName);
+        }
+
+
+
 #if QT_VERSION >= 0x040800
    elapsed=double(time.nsecsElapsed())/1.0e9;
 #else

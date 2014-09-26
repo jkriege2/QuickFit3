@@ -20,7 +20,16 @@
 #
 
 include(zlib.pri)
-include($$PWD/quazip/quazip-0.7/quazip.pri)
+
+# This one handles dllimport/dllexport directives.
+DEFINES += QUAZIP_BUILD QUAZIP_STATIC
+
+win32 {
+    # workaround for qdatetime.h macro bug
+    #DEFINES += NOMINMAX
+}
+
+include(./quazip/quazip-0.7/quazip.pri)
 
 INCLUDEPATH += $$PWD/quazip/quazip-0.7
 

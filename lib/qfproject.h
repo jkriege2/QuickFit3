@@ -288,6 +288,15 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         void writeXML(const QString& file, bool resetDataChanged=true);
         /** \brief open XML project file, sets error and errorDescription, as well as \c dataChange=false */
         void readXML(const QString& file);
+        /*! \brief write project to XML file, sets error and errorDescription, as well as \c dataChange=false
+            \param file the QIODevice to store the project to
+            \param resetDataChanged if \c true (default) the property dataChange is reset to \c false.
+                   Set this to \c false, if you want to save the project, without influence on the contained data (e.g. for autosaves).
+            \param if the filename, we are writing to with file is known, it can be provided here! (if this is not provided and file can be cast to a QFile, the the filename is taken from that QFile!)
+        */
+        void writeXML(QIODevice* file, bool resetDataChanged=true, const QString &filename=QString());
+        /** \brief open XML project file, sets error and errorDescription, as well as \c dataChange=false */
+        void readXML(QIODevice* file, const QString& filename=QString());
         /** \brief open XML project file, but read only the RDRs and evaluation items where the IDs are contained in the given sets, sets error and errorDescription, as well as \c dataChange=false
          *
          * \note This function will change the filename from \c dir/dir/project.qfp to \c dir/dir/project_subsetI.qfp where \c I is replaced by a number
@@ -302,6 +311,20 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
          * If this method is used, the method isDummy() will return \c true.
          */
         void readXMLDummy(const QString& file);
+        /** \brief open XML project file, but read only the RDRs and evaluation items where the IDs are contained in the given sets, sets error and errorDescription, as well as \c dataChange=false
+         *
+         * \note This function will change the filename from \c dir/dir/project.qfp to \c dir/dir/project_subsetI.qfp where \c I is replaced by a number
+         *       that makes the filename unique!
+         */
+        void readXMLSubSet(QIODevice* file, const QString& filename, const QSet<int>& rdrSelected, const QSet<int>& evalSelected);
+        /** \brief open XML project file in dummy mode, sets error and errorDescription, as well as \c dataChange=false
+         *
+         * In dummy mode all records in the file (RDR and evaluations) are created, but initialized only with the basic properties (e.g. folder, name, type, ID, ...)
+         * No actual data or results are loaded. This allows to inspect the structure of a project without having to load the full dataset. It may be used
+         * to create a mode where the user may look at the project, but not use its contents (e.g. to allow him to select a subset of records to actually load).
+         * If this method is used, the method isDummy() will return \c true.
+         */
+        void readXMLDummy(QIODevice* file, const QString& filename=QString());
 
         /** \brief returns \c true, if the project was loaded using readXMLDummy(). */
         bool isDummy() const;
@@ -491,6 +514,10 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \copybrief QFProperties::setPropertiesError() */
         virtual void setPropertiesError(QString message);
 
+        /** \brief open XML project file, sets error and errorDescription, as well as \c dataChange=false */
+        void internalReadXML(QIODevice* file, const QString& filename=QString());
+        /** \brief write XML project file, sets error and errorDescription, as well as \c dataChange=false */
+        void internalWriteXML(QIODevice* file, bool resetDataChanged, bool namechanged);
         /** \brief open XML project file, sets error and errorDescription, as well as \c dataChange=false */
         void internalReadXML(const QString& file);
 

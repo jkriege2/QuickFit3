@@ -34,6 +34,7 @@
 #include <QElapsedTimer>
 //#define DEBUG_TIMING
 #undef DEBUG_TIMING
+#define PROJECT_COPY_CHUNKSIZE 1024*1024*32
 
 QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent):
     QObject(parent), QFProperties()
@@ -322,84 +323,127 @@ void QFProject::deleteEvaluation(int ID) {
     }
 }
 
+
+
+void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& filename_in)
+{
+    QString filename=filename_in;
+    QFile* ffile=qobject_cast<QFile*>(file);
+    if (filename.isEmpty() && ffile) {
+        filename=ffile->fileName();
+    }
+    if (reading) return;
+
+    bool namechanged=(filename!=this->file);
+    if (!filename.isEmpty()) this->file=filename;
+
+    QString tmppath;
+    if (!filename.isEmpty()) tmppath=QFileInfo(filename).absolutePath()+"/";
+    QTemporaryFile f(tmppath+"XXXXXX.tmp");
+    f.open();
+    QString tmpfn=f.fileName();
+
+    internalWriteXML(&f, resetDataChanged, namechanged);
+
+    if (!filename.isEmpty()) {
+        QFile f2(filename+".backup");
+        if (f2.exists()) f2.remove();
+
+        QFile f1(file);
+        f1.rename(filename+".backup");
+    }
+
+    f.setAutoRemove(false);
+    f.close();
+
+    QFile fcpy(filename);
+    if (fcpy.open(QFile::ReadOnly)) {
+        size_t chunksize=PROJECT_COPY_CHUNKSIZE;
+        char* chunk=qfMallocT<char>(PROJECT_COPY_CHUNKSIZE);
+        while (!chunk && chunksize>1024) {
+            chunksize=chunksize/2;
+            chunk=qfMallocT<char>(PROJECT_COPY_CHUNKSIZE);
+        }
+        if (chunk) {
+            while (!fcpy.atEnd()) {
+                qint64 bytesRead=fcpy.read(chunk, chunksize);
+                file->write(chunk, bytesRead);
+            }
+
+            qfFree(chunk);
+        } else {
+            setError(tr("Error while writing file: Could not allocate enough memory!"));
+        }
+        fcpy.close();
+        fcpy.remove();
+    }
+}
+
+
+void QFProject::internalWriteXML(QIODevice *file, bool resetDataChanged, bool namechanged)
+{
+    QXmlStreamWriter w(file);
+
+    w.setAutoFormatting(false);
+    w.writeStartDocument();
+    w.writeStartElement("quickfitproject");
+    w.writeAttribute("quickfit_version", qfInfoVersionFull());
+    w.writeAttribute("quickfit_svn", qfInfoSVNVersion());
+    w.writeAttribute("quickfit_compiledate", qfInfoCompileDate());
+    w.writeAttribute("name", name);
+    w.writeAttribute("creator", creator);
+    w.writeStartElement("rdr_groups");
+    for (int i=0; i<rdrgroups.size(); i++) {
+        w.writeStartElement("rdr_group");
+        w.writeCDATA(rdrgroups[i]);
+        w.writeEndElement();
+    }
+    w.writeEndElement();
+    w.writeStartElement("description");
+    w.writeCDATA(description);
+    w.writeEndElement();
+    w.writeStartElement("properties");
+    storeProperties(w);
+    w.writeEndElement();
+    w.writeStartElement("rawdata");
+
+    for (int i=0; i<rawDataOrder.size(); i++) {
+        QFRawDataRecord* rec=getRawDataByID(rawDataOrder[i]);
+        if (rec) rec->writeXML(w);
+    }
+    w.writeEndElement();
+    w.writeStartElement("evaluations");
+
+    for (int i=0; i<evaluationsOrder.size(); i++) {
+        QFEvaluationItem* rec=getEvaluationByID(evaluationsOrder[i]);
+        if (rec) rec->writeXML(w);
+    }
+    w.writeEndElement();
+
+    w.writeEndElement();
+    w.writeEndDocument();
+    if (resetDataChanged) {
+        if (!errorOcc) {
+            emitStructureChanged();
+            if (namechanged) emitPropertiesChanged();
+        }
+    }
+
+    if (w.hasError() || file->errorString().size()>0) {
+        setError(tr("Could no write project file!\n Error description: %2.").arg(file->errorString()));
+    }
+}
+
 void QFProject::writeXML(const QString& file, bool resetDataChanged) {
 
     if (reading) return;
     bool namechanged=(file!=this->file);
     this->file=file;
-    /*QFile f(file);
-    if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
-        return;
-    }*/
+
     QTemporaryFile f(QFileInfo(file).absolutePath()+"/XXXXXX.tmp");
     f.open();
-    QXmlStreamWriter w(&f);
-    //QByteArray bytemp;
-    //{
-//        QBuffer buf(&bytemp);
-  //      QXmlStreamWriter w(&buf);
-        w.setAutoFormatting(false);
-        w.writeStartDocument();
-        w.writeStartElement("quickfitproject");
-        w.writeAttribute("quickfit_version", qfInfoVersionFull());
-        w.writeAttribute("quickfit_svn", qfInfoSVNVersion());
-        w.writeAttribute("quickfit_compiledate", qfInfoCompileDate());
-        w.writeAttribute("name", name);
-        w.writeAttribute("creator", creator);
-        w.writeStartElement("rdr_groups");
-        for (int i=0; i<rdrgroups.size(); i++) {
-            w.writeStartElement("rdr_group");
-            w.writeCDATA(rdrgroups[i]);
-            w.writeEndElement();
-        }
-        w.writeEndElement();
-        w.writeStartElement("description");
-        w.writeCDATA(description);
-        w.writeEndElement();
-        w.writeStartElement("properties");
-        storeProperties(w);
-        w.writeEndElement();
-        w.writeStartElement("rawdata");
-        /*QMapIterator<int, QFRawDataRecord*> ir(rawData);
-        //for (int i=0; i<rawData.keys().size(); i++) {
-        while (ir.hasNext()) {
-            ir.next();
-            //qDebug()<<"writing rdr "<<ir.key();
-            //int k=rawData.keys().at(i);
-            ir.value()->writeXML(w);
-            //qDebug()<<"   DONE!";
-        }*/
-        for (int i=0; i<rawDataOrder.size(); i++) {
-            QFRawDataRecord* rec=getRawDataByID(rawDataOrder[i]);
-            if (rec) rec->writeXML(w);
-        }
-        w.writeEndElement();
-        w.writeStartElement("evaluations");
-        /*QMapIterator<int, QFEvaluationItem*> i(evaluations);
-        //for (int i=0; i<evaluations.keys().size(); i++) {
-        while (i.hasNext()) {
-            i.next();
-            //qDebug()<<"writing eval "<<i.key();
-            //int k=evaluations.keys().at(i);
-            i.value()->writeXML(w);
-            //qDebug()<<"   DONE!";
-        }*/
-        for (int i=0; i<evaluationsOrder.size(); i++) {
-            QFEvaluationItem* rec=getEvaluationByID(evaluationsOrder[i]);
-            if (rec) rec->writeXML(w);
-        }
-        w.writeEndElement();
 
-        w.writeEndElement();
-        w.writeEndDocument();
-        if (resetDataChanged) {
-            if (!errorOcc) {
-                emitStructureChanged();
-                if (namechanged) emitPropertiesChanged();
-            }
-        }
-  //  }
+    internalWriteXML(&f, resetDataChanged, namechanged);
 
     QFile f2(file+".backup");
     if (f2.exists()) f2.remove();
@@ -407,20 +451,10 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
     QFile f1(file);
     f1.rename(file+".backup");
 
-    //QFile f(file);
-    //if (f.open(QIODevice::WriteOnly)) {
-//        f.write(bytemp);
-//    } else {
-//        setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
-//    }
     f.setAutoRemove(false);
     if (!f.rename(file)) {
         setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
     }
-    /*if (!f.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
-        return;
-    }*/
 }
 
 void QFProject::readXML(const QString &file)
@@ -432,13 +466,25 @@ void QFProject::readXML(const QString &file)
     internalReadXML(file);
 }
 
-void QFProject::readXMLSubSet(const QString &file, const QSet<int> &rdrSelected, const QSet<int> &evalSelected)
+
+
+void QFProject::readXML(QIODevice *file, const QString& filename)
+{
+    m_dummy=false;
+    m_subset=false;
+    subsetRDR.clear();
+    subsetEval.clear();
+    internalReadXML(file, filename);
+}
+
+
+void QFProject::readXMLSubSet(QIODevice *file, const QString& filename, const QSet<int> &rdrSelected, const QSet<int> &evalSelected)
 {
     m_dummy=false;
     m_subset=true;
     subsetRDR=rdrSelected;
     subsetEval=evalSelected;
-    internalReadXML(file);
+    internalReadXML(file, filename);
 
     // change filename, so old project does not get overwritten!
     QFileInfo fi=QFileInfo(this->file);
@@ -452,6 +498,19 @@ void QFProject::readXMLSubSet(const QString &file, const QSet<int> &rdrSelected,
     setDataChanged();
 
     setName(tr("subset of '%1'").arg(getName()));
+    m_subset=false;
+    subsetRDR.clear();
+    subsetEval.clear();
+}
+
+void QFProject::readXMLSubSet(const QString &file, const QSet<int> &rdrSelected, const QSet<int> &evalSelected)
+{
+    QFile f(file);
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        setError(tr("Could no open file '%1' for input!\n Error description: %2.").arg(file).arg(f.errorString()));
+        return;
+    }
+    readXMLSubSet(&f, file, rdrSelected, evalSelected);
 }
 
 void QFProject::readXMLDummy(const QString &file)
@@ -463,29 +522,32 @@ void QFProject::readXMLDummy(const QString &file)
     internalReadXML(file);
 }
 
+void QFProject::readXMLDummy(QIODevice *file, const QString &filename)
+{
+    m_dummy=true;
+    m_subset=false;
+    subsetRDR.clear();
+    subsetEval.clear();
+    internalReadXML(file, filename);
+}
 
-void QFProject::internalReadXML(const QString& file) {
-    this->reading=true;
-    bool namechanged=(file!=this->file);
-    this->file=file;
 
-#ifdef DEBUG_TIMING
-    QElapsedTimer time;
-    time.start();
-#endif
 
-    QFile f(file);
-    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        setError(tr("Could no open file '%1' for input!\n Error description: %2.").arg(file).arg(f.errorString()));
-        this->reading=false;
-        return;
+
+void QFProject::internalReadXML(QIODevice *f, const QString &filename_in)
+{
+    QString filename=filename_in;
+    QFile* ffile=qobject_cast<QFile*>(f);
+    if (filename.isEmpty() && ffile) {
+        filename=ffile->fileName();
     }
+
+    bool oldreading=this->reading;
+    this->reading=true;
+    this->file=filename;
     QDomDocument d("quickfitproject");
     QString errorm="";
-#ifdef DEBUG_TIMING
-        qDebug()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
-#endif
-    if (d.setContent(&f, &errorm)) {
+    if (d.setContent(f, &errorm)) {
         QDomElement e=d.documentElement();
 #ifdef DEBUG_TIMING
         qDebug()<<"parsed XML      "<<time.elapsed()<<"ms"; time.start();
@@ -494,7 +556,7 @@ void QFProject::internalReadXML(const QString& file) {
             QString v=e.attribute("quickfit_version");
             if (v.toDouble()>3.0) {
                 setError(tr("Error while parsing project file '%1'!\n Error description: The project file was written by a newer version of QuickFit than this one (writer version: %1).").arg(file).arg(v));
-                this->reading=false;
+                this->reading=oldreading;
                 return;
             } else {
                 name=e.attribute("name");
@@ -608,14 +670,49 @@ void QFProject::internalReadXML(const QString& file) {
             }
         } else {
             setError(tr("Error while parsing project file '%1'!\n Error description: This is not a QuickFit 3.0 project file.").arg(file));
-            this->reading=false;
+            this->reading=oldreading;
             return;
         }
     } else {
         setError(tr("Error while parsing project file '%1'!\n Error description: %2.").arg(file).arg(errorm));
+        this->reading=oldreading;
+        return;
+    }
+
+    this->reading=oldreading;
+}
+
+
+
+
+
+void QFProject::internalReadXML(const QString& file) {
+    this->reading=true;
+    bool namechanged=(file!=this->file);
+    this->file=file;
+
+#ifdef DEBUG_TIMING
+    QElapsedTimer time;
+    time.start();
+#endif
+
+    QFile f(file);
+    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        setError(tr("Could no open file '%1' for input!\n Error description: %2.").arg(file).arg(f.errorString()));
         this->reading=false;
         return;
     }
+
+#ifdef DEBUG_TIMING
+        qDebug()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
+#endif
+
+
+    internalReadXML(&f);
+
+
+
+
     if (!errorOcc) {
         dataChange=false;
 #ifdef DEBUG_TIMING
@@ -1616,7 +1713,7 @@ void QFProject::emitStructureChanged() {
 
 void QFProject::setPropertiesError(QString message) {
     setError(message);
-};
+}
 
 void QFProject::setName(const QString& n) {
     if (name!=n) {

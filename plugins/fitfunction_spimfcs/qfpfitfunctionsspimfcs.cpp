@@ -61,6 +61,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctionsspimfccsfw2csep2ddiffxz2coloracfr.h"
 
 #include "qffitfunctionsspimfccsdiffflowce2_newVeff.h"
+#include "qffitfunctionsspimfccsdiffce2_newVeff.h"
+#include "qffitfunctionsspimfccsdiffflowce2_newVeff_2.h"
 #include "qftools.h"
 
 QStringList QFPFitFunctionsSPIMFCS::getIDs() const {
@@ -81,6 +83,8 @@ QStringList QFPFitFunctionsSPIMFCS::getIDs() const {
     res<<"fccs_spim_diffflow";
     res<<"fccs_spim_diffflowce2";
     res<<"fccs_spim_diff2color";
+    res<<"fccs_spim_diffce2";
+    res<<"fccs_spim_global_diffflowce2";
 
     res<<"fccs_spim_fw_diff2colorccf";
     res<<"fccs_spim_fw_diff2coloracfg";
@@ -125,6 +129,10 @@ QFFitFunction* QFPFitFunctionsSPIMFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionsSPIMFCSDiffCE2();
     } else if (id=="fcs_spim_diffe2") {
         return new QFFitFunctionsSPIMFCSDiffE2();
+    } else if (id=="fccs_spim_diffce2") {
+        return new QFFitFunctionsSPIMFCCSDiffCENewVeff2();
+    } else if (id=="fccs_spim_global_diffflowce2") {
+        return new QFFitFunctionsSPIMFCCSDiffFlowCENewVeff2Global();
     } else if (id=="fcs_spim_diffe2_newveff") {
         return new QFFitFunctionsSPIMFCSDiffE2NewVeff();
     } else if (id=="fcs_spim_diffe2_newveff_diffbright") {

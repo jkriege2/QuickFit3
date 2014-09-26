@@ -110,6 +110,7 @@
             <li>added dialog to calculate RDR properties (Tools|Project Tools|calculate RDR properties) using the internal math expression parser</li>
             <li>bugfix: completer in editors of the evaluation editor widnows now work correctly and store the list of texts to disk</li>
             <li>added initial support for image file meta-data, such as OME or from ImageJ</li>
+            <li>added support for zipped QFP-project files (*.qfpz)</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -173,6 +174,8 @@
             <li>added FCCS fit function with flow and 1/e^2-width and new Veff</li>
             <li>added model of multi-component normal diffusion with different relative molecular brightnesses per species</li>
             <li>marked several 1/sqrt(e)-models as deprecated!</li>
+            <li>added fit function for 2-pixel FCCS with 1-3 diffusing components (no flow)</li>
+            <li>added fit function for 2-pixel FCCS with 1 diffusing+flow component and one diffusing global component (does not mind the shift!!!)</li>
           </ul></li>
          <li><b>TIR-FCS fit functions</b><ul>
             <li>flow FCCS fit functions also calculate the angle of the flow now</li>

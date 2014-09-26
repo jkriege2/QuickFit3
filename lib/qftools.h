@@ -51,15 +51,36 @@ class ProgramOptions; // forward
     \ingroup qf3lib_tools
  */
 QFLIB_EXPORT void* qfMalloc(size_t size);
+
+/*! \brief Tool for malloc, which allows to allocate with the type specified as template parameter
+    \ingroup qf3lib_tools
+ */
+template <typename T>
+inline T* qfMallocT(size_t items) {
+    return (T*)qfMalloc(items*sizeof(T));
+}
+
 /*! \brief QuickFit's internal malloc replacement (on some systems, this does a boundary-aligned malloc)
     \ingroup qf3lib_tools
  */
 QFLIB_EXPORT void* qfCalloc(size_t num, size_t size);
 
+/*! \brief Tool for malloc, which allows to allocate with the type specified as template parameter
+    \ingroup qf3lib_tools
+ */
+template <typename T>
+inline T* qfCallocT(size_t items) {
+    return (T*)qfCalloc(items, sizeof(T));
+}
 /*! \brief QuickFit's internal realloc replacement (on some systems, this does a boundary-aligned malloc)
     \ingroup qf3lib_tools
  */
 QFLIB_EXPORT void* qfRealloc (void* ptr, size_t size);
+template <typename T>
+inline T* qfReallocT(T* ptr, size_t items) {
+    return (T*)qfRealloc(ptr, items*sizeof(T));
+}
+
 /*! \brief QuickFit's internal free replacement
     \ingroup qf3lib_tools
  */

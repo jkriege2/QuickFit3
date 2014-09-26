@@ -104,7 +104,7 @@ void QFFitFunctionSelectDialog::init(const QString &filter, const QString &curre
     while (it.hasNext())  {
         it.next();
         if (it.value()) {
-            QStandardItem* item=new QStandardItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->shortName());
+            QStandardItem* item=new QStandardItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->name());
             item->setData(it.key(), Qt::UserRole+1);
             model->appendRow(item);
             if (it.value()->isDeprecated() && m) {
@@ -151,7 +151,7 @@ void QFFitFunctionSelectDialog::init(const QStringList &availableFF, const QStri
         while (it.hasNext())  {
             it.next();
             if (it.value()) {
-                QStandardItem* item=new QStandardItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->shortName());
+                QStandardItem* item=new QStandardItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->name());
                 item->setData(it.key(), Qt::UserRole+1);
                 model->appendRow(item);
 

@@ -1,0 +1,48 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>SPIM-FCCS fit model: 1-component diffusion, 2-pixel crosscorrelation, 1/e^2-radii</title>
+	</head>
+	<body>
+		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		<h2>SPIM-FCCS fit model: 1-component diffusion, 2-pixel crosscorrelation, 1/e<sup>2</sup>-radii</h2>
+		<p>This function implements a 1-component diffusion model for data acquired with a camera in SPIM illumination mode. It assumes that the time series of two distant pixels were cross-correlated. The model was taken from:
+		<blockquote>
+		  Wohland T, Shi X, Sankaran J, Stelzer EH (2010): <b>Single plane illumination fluorescence correlation spectroscopy (SPIM-FCS) probes inhomogeneous three-dimensional environments</b>, <i>Optics Express</i> <b>18</b>(10): 10627-10641, doi: 10.1364/OE.18.010627.<br>
+		  $$jankrieger_phdthesis$$
+		</blockquote>
+		The fit function is defined as:
+		$$bmath:g(\tau)=G_\infty + \frac{(I-B)^2}{I^2}\cdot\frac{1}{N/V_{\text{eff}}}\cdot \sum_{i=1}^3\rho_i\cdot g_{xy}(\tau; d_x, 0,D_i)\cdot g_{xy}(\tau; d_y, 0,D_i)\cdot g_{z}(\tau; d_z, 0,D_i)$$
+		$$bmath:\mathrm{with:} g_{xy}(\tau;d,v,D)=\frac{1}{2a^2}\cdot\left[(a-d+v\tau)\cdot\mbox{erf}\left(\frac{a-d+v\tau}{\sqrt{4D\tau+w_{xy}^2}}\right)+ -2(d-v\tau)\cdot\mbox{erf}\left(\frac{d-v\tau}{\sqrt{4D\tau+w_{xy}^2}}\right)+ (a+d-v\tau)\cdot\mbox{erf}\left(\frac{a+d-v\tau}{\sqrt{4D\tau+w_{xy}^2}}\right)+ \frac{\sqrt{4D\tau+w_{xy}^2}}{2\sqrt{\pi}\cdot\left[\exp\left(-\frac{(a+d-v\tau)^2}{4D\tau+w_{xy}^2}\right)+\exp\left(-\frac{(a-d+v\tau)^2}{4D\tau+w_{xy}^2}\right)-2\exp\left(-\frac{(d-v\tau)^2}{4D\tau+w_{xy}^2}\right)\right]\right]^2$$
+		$$bmath:\mathrm{with:} g_{z}(\tau;v,d)=\frac{1}{\sqrt{\pi}\cdot w_z}\cdot\left(1+\frac{4D\tau}{w_{z}^2}\right)^{-1/2}\cdot\exp\left(-\frac{v^2\tau^2}{4D\tau+w_z^2}\right)$$
+		$$bmath:\rho_1+\rho_2+\rho_3=1$$
+		The parameters are:
+		<blockquote><table border=1>
+		  <tr><th>var.</th><th>Parameter</th></tr>
+		  <tr><td>$$math:G_\infty$$</i></td><td>constant offset</td></tr>
+		  <tr><td><i>N</i></td><td>particle number in the observation volume</td></tr>
+		  <tr><td><i>D<sub>i</sub></i></td><td> diffusion coefficient</td></tr>
+		  <tr><td><i>&rho;<sub>i</sub></i></td><td> fraction of i-th diffusing component</td></tr>
+		  <tr><td><i>a</i></td><td>width of a (square) pixel in the image plane (i.e. pixel size of camera divided by the magnification)</td></tr>
+		  <tr><td><i>w<sub>xy</sub></i></td><td>lateral radius of the point-spread function (PSF), 1/e<sup>2</sup>-radius</td></tr>
+		  <tr><td><i>w<sub>z</sub></i></td><td>longitudinal radius of the point-spread function (PSF), 1/e<sup>2</sup>-radius</td></tr>
+    		  <tr><td>$$math:d_x$$</td><td> distance between pixels in x-direction</td></tr>
+    		  <tr><td>$$math:d_y$$</td><td> distance between pixels in y-direction </td></tr>
+		  <tr><td>$$math:I$$</td><td>average measured intensity in focus during measurement</td></tr>
+    		  <tr><td>$$math:B$$</td><td>average background intenisty in focus during measurement</td></tr>
+		</table>  </blockquote>
+		</p>
+		<p>The focal volume is calculated as:
+		<blockquote><img src="./pic/form_388.png"><br><img src="./pic/form_389.png"></blockquote>
+		and the concentration therefore is:
+		<blockquote><img src="./pic/form_390.png"><br><img src="./pic/form_391.png"></blockquote>
+		</p>
+		<p>Additional parameters:
+		  <ul>
+		    <li>$$math:\alpha_{flow}=(\mbox{atan2}(v_x,v_y)/\pi+1)\cdot 180^\circ$$</li>
+		    <li>$$math:|v_{flow}|=\sqrt{v_x^2+v_y^2}$$</li>
+		  </ul>	
+		</p>
+	</body>
+</html>
