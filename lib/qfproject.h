@@ -46,6 +46,7 @@ class QFProjectTreeModel;
 class QFEvaluationItemFactory;
 class QFRawDataRecordFactory;
 class QFPluginServices;
+class QFListProgressDialog;
 
 typedef QMap<QString, QVariant> qfp_param_type;
 
@@ -93,9 +94,9 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \brief file associated with the project project (empty if none)*/
         QString file;
         /** \brief indicates whether an error has occured */
-        bool errorOcc;
+        mutable bool errorOcc;
         /** \brief contains the description of the last error */
-        QString errorDesc;
+        mutable QString errorDesc;
         /** \brief indicates whether the data has changed  */
         bool dataChange;
         /** \brief indicates whether the properties changed  */
@@ -202,7 +203,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \brief returns \c true if a raw data record for the specified ID exists */
         bool getEvaluationIndex(QFEvaluationItem* rec) const;
         /** \brief return the raw data record specified by the ID, or \c NULL */
-        QFRawDataRecord* getRawDataByID(int ID);
+        QFRawDataRecord* getRawDataByID(int ID) const;
         /** \brief return the i-th raw data record, or \c NULL */
         QFRawDataRecord* getRawDataByNum(int i) const;
         /** \brief returns all RDR records in the given folder */
@@ -286,6 +287,11 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
                    Set this to \c false, if you want to save the project, without influence on the contained data (e.g. for autosaves).
         */
         void writeXML(const QString& file, bool resetDataChanged=true);
+        /*! \brief write project to XML file and compresses it alongside all required&linked files into a ZIP-archive
+            \param file the file to store the project to
+            \param pdlg progress dialog
+        */
+        void exportProjectToZIP(const QString& file, QFListProgressDialog *pdlg=NULL);
         /** \brief open XML project file, sets error and errorDescription, as well as \c dataChange=false */
         void readXML(const QString& file);
         /*! \brief write project to XML file, sets error and errorDescription, as well as \c dataChange=false
@@ -504,9 +510,33 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         void log_warning(const QString& message) const;
         void log_error(const QString& message) const;
 
+    public:
+        struct QFLIB_EXPORT FileCopyList {
+            QString inFile;
+            QString outFile;
+            QFLIB_EXPORT inline FileCopyList(const QString& inFile, const QString& outFile) {
+                this->inFile=inFile;
+                this->outFile=outFile;
+            }
+        };
+
+        /** \brief changes the given \a newFilename (by adding a 3-6-digit number), so it is not yet contained in \a filecopylist
+         *
+         *  This function does two things:
+         *     # If the \a inFilename is found in \a filecopylist, the found output-file is returned
+         *     # If \a inFilename is NOT found:
+         *        # if \a newFilename is NOT found in \a filecopylist, \a newFilename is returned
+         *        # if \a newFilename is found, an increasing 3-6-digit number is appended to the filename, until the new filename is not contained in filecopylist. This changed filename is returned.
+         *     .
+         *  .
+         */
+        static QString ensureUniqueFilename(const QString& inFilename, const QString& newFilename, QList<QFProject::FileCopyList> *filecopylist, bool addToList=false) ;
+        static int fileCopyListConatins(const QString &inFilename, const QString& outFile, const QList<FileCopyList> *filecopylist) ;
     protected:
         /** \brief set the internal error flag and description */
-        void setError(QString description);
+        void setError(QString description) const;
+        /** \brief set the internal error flag and description */
+        void setError(QString description) ;
         /** \copydoc QFProperties::emitPropertiesChanged() */
         virtual void emitPropertiesChanged();
 
@@ -517,7 +547,9 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \brief open XML project file, sets error and errorDescription, as well as \c dataChange=false */
         void internalReadXML(QIODevice* file, const QString& filename=QString());
         /** \brief write XML project file, sets error and errorDescription, as well as \c dataChange=false */
-        void internalWriteXML(QIODevice* file, bool resetDataChanged, bool namechanged);
+        void internalWriteXML(QIODevice* file, bool resetDataChanged, bool namechanged, const QString &projectFileName, bool copyFilesToSubfolder=false, const QString &rdrsubfoldername=QString("raw_data_files/"), const QString &evalsubfoldername=QString("eval_files/"), QList<QFProject::FileCopyList > *filecopylist=NULL);
+        /** \brief write XML project file, sets error and errorDescription, as well as \c dataChange=false */
+        void internalWriteXMLConst(QIODevice* file, const QString &projectFileName, bool copyFilesToSubfolder=false, const QString &rdrsubfoldername=QString("raw_data_files/"), const QString &evalsubfoldername=QString("eval_files/"), QList<QFProject::FileCopyList > *filecopylist=NULL) const;
         /** \brief open XML project file, sets error and errorDescription, as well as \c dataChange=false */
         void internalReadXML(const QString& file);
 

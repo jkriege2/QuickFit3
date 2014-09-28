@@ -296,7 +296,7 @@ void QFFCCSFitEvaluationItem::setFitFileSet(int idx)
 }
 
 
-void QFFCCSFitEvaluationItem::intWriteData(QXmlStreamWriter &w)
+void QFFCCSFitEvaluationItem::intWriteData(QXmlStreamWriter &w) const
 {
     QFFitResultsByIndexAsVectorEvaluation::intWriteData(w);
 

@@ -164,7 +164,7 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDROvervie
 
     protected:
         /** \brief write the contents of the object to a XML file */
-        virtual void intWriteData(QXmlStreamWriter& w);
+        virtual void intWriteData(QXmlStreamWriter& w) const;
         /** \brief read in external data files <b>and</b> data stored in the project file <b>IMPLEMENT IN CHILD CLASSES!</b>
          *
          * If \a e is \c NULL then this method should only read the datafiles already saved in the files property.

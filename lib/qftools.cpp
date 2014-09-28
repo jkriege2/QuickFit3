@@ -528,6 +528,14 @@ bool touchFile(const QString& filename) {
     return false;
 }
 
+QString replaceFileExt(const QString& filename, const QString& extension) {
+    QFileInfo fi(filename);
+    QString ext=extension;
+    if (!ext.startsWith('.')) ext=QString(".")+ext;
+    QString f=fi.absolutePath()+"/"+fi.baseName()+ext;
+    return f;
+}
+
 QString readFile(const QString& filename) {
     if (!QFile::exists(filename)) return QString();
     QFile f(filename);
@@ -1347,4 +1355,26 @@ QString qfGetTempFilename(const QString& templateName) {
     QString fn=f.fileName();
     f.close();
     return fn;
+}
+
+#define QFCOPYDATA_CHUNKSIZEHUNKSIZE 1024*1024*32
+
+
+bool qfCopyData( QIODevice* in, QIODevice* out) {
+    size_t chunksize=QFCOPYDATA_CHUNKSIZEHUNKSIZE;
+    char* chunk=qfMallocT<char>(QFCOPYDATA_CHUNKSIZEHUNKSIZE);
+    while (!chunk && chunksize>1024) {
+        chunksize=chunksize/2;
+        chunk=qfMallocT<char>(QFCOPYDATA_CHUNKSIZEHUNKSIZE);
+    }
+    if (chunk) {
+        while (!in->atEnd()) {
+            qint64 bytesRead=in->read(chunk, chunksize);
+            out->write(chunk, bytesRead);
+        }
+        qfFree(chunk);
+    } else {
+        return false;
+    }
+    return true;
 }

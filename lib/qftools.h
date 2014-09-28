@@ -393,6 +393,11 @@ QFLIB_EXPORT QString boolToQString(bool data);
 
 */
 QFLIB_EXPORT bool touchFile(const QString& filename);
+/*! \brief returns the given filename with its extension replaced by \a extension
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString replaceFileExt(const QString& filename, const QString& extension);
 /*! \brief reads the contenst of a file
     \ingroup qf3lib_tools
 
@@ -1596,7 +1601,11 @@ QVector<T> qfUniqueApplyFunction2I(const QVector<T>& input, const QVector<T>& in
 
  */
 QFLIB_EXPORT void saveStringToFile(const QString& filename, const QString& text, const QString& codec=QString("ISO-8859-1"));
+/*! \brief returns a list of all files in a directory, recursively
+    \ingroup qf3lib_tools
 
+
+ */
 QFLIB_EXPORT QStringList qfDirListFilesRecursive(QDir& dir, const QStringList& filters=QStringList());
 
 /*! \brief extract FAQs from a faq.html file
@@ -1611,8 +1620,19 @@ QFLIB_EXPORT void parseTooltips(const QString& directory, QMap<QString, QFToolTi
 QFLIB_EXPORT void parseAutolinks(const QString& directory, QMap<QString, QString>& autolinks);
 
 QFLIB_EXPORT void parseGlobalreplaces(const QString& directory);
+/*! \brief returns a filename for a temporary file
+    \ingroup qf3lib_tools
 
+
+ */
 QFLIB_EXPORT QString qfGetTempFilename(const QString& templateName=QString("qf_temp_XXXXXX"));
+
+/*! \brief copies data (in chunks) from one file to another
+    \ingroup qf3lib_tools
+
+
+ */
+QFLIB_EXPORT bool qfCopyData( QIODevice* in, QIODevice* out);
 
 /*! \brief escape \\n, \\r, \\", \\', \\\\, \\t...
     \ingroup qf3lib_tools

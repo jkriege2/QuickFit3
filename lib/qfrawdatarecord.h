@@ -332,7 +332,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
          */
         void readXML(QDomElement& e, bool loadAsDummy=false);
         /** \brief write data contents to QXmlStreamWriter (data tag) <b>IMPLEMENT IN CHILD CLASSES!</b> */
-        virtual void intWriteData(QXmlStreamWriter& w) {}
+        virtual void intWriteData(QXmlStreamWriter& w) const {}
         /** \brief read in external data files <b>and</b> data stored in the project file <b>IMPLEMENT IN CHILD CLASSES!</b>
          *
          * If \a e is \c NULL then this method should only read the datafiles already saved in the files property.
@@ -881,16 +881,52 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         virtual QString getEditorName(int i);
         /** \brief create an object for the i-th editor pane */
         virtual QFRawDataEditor* createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i=0, QWidget* parent=NULL);
-        /** \brief export the raw data into the specified format */
-        virtual void exportData(const QString& format, const QString& filename) const;
-        /** \brief write object contents into XML file */
-        void writeXML(QXmlStreamWriter& w);
+        /** \brief write object contents into XML file
+         *
+         *  \param w QXmlStreamWriter class for the output
+         *  \param projectfilename filename of the output project file
+         *  \param copyFilesToSubfolder if this is activated (\c true), the function copies any file, which is not yet in a subfolder of the project,
+         *                              into a subfolder inside subfoldername. The copy operation is not executed immediately, but the files to copy
+         *                              are appended to filecopylist. The references in the written XML file already point to the new, anticipated file
+         *                              locations.
+         *  \param subfoldername name of the subfolder, which assembles the files in the project
+         *  \param filecopylist list of required file copy operations.
+         *
+         *  \note If \c copyFilesToSubfolder==true then this function writes only thise files into the XML fragment, for which doCopyFileForExport() returns \c true .
+         *        If a file is copied/written in this mode, its location is changed in the following way:
+         *           # files, that are within a subfolder of the \a projectfilename are written with a relative path.
+         *           # if the files are not in a subfolder, they are to be copied into a subfolder within \a subfoldername below the directory of projectfilename
+         *           # if doCopyFileForExport() returns a \c newFilename, that filename is used for the new file.
+         *        .
+         *        This function does not copy/move any file, it simply adds the files (old/new location) to \a filecopylist, if it is supplied.
+         */
+        void writeXML(QXmlStreamWriter& w, const QString& projectfilename, bool copyFilesToSubfolder=false, const QString &subfoldername=QString("raw_data_files/"), QList<QFProject::FileCopyList> *filecopylist=NULL) const;
+
+        /** \brief this function is called by writeXML() in order to determine, whether a linked file should be included in an export operation
+         *
+         *  The default implementation returns \c true.
+         *
+         *  \param filename input filename
+         *  \param fileType file type string of the file \a filename
+         *  \param[out] newFilename you can optionally provide a new (relative) file path/name for this file.
+         *  \param filecopylist can be used to check, whether a file already exists.
+         *  \param subfoldername default subfolder for copied files
+         *
+         *  \note You will HAVE to use filecopylist to ensure, that no two distinct files are written to the SAME output filename.
+         *        You can use QFProject::ensureUniqueFilename() to ensure a unique filename in filecopylist.
+         */
+        virtual bool doCopyFileForExport(const QString& filename, const QString& fileType, QString& newFilename, const QList<QFProject::FileCopyList> *filecopylist=NULL, const QString &subfoldername=QString("rdr_data_files/")) const;
+
+
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportDialogFiletypes() */
         virtual QStringList getExportFiletypes();
         /** \brief returns the title of the Export file dialog */
         virtual QString getExportDialogTitle();
         /** \brief returns the filetype of the Export file dialog */
         virtual QString getExportDialogFiletypes();
+        /** \brief export the raw data into the specified format */
+        virtual void exportData(const QString& format, const QString& filename)const ;
+
 
 
 

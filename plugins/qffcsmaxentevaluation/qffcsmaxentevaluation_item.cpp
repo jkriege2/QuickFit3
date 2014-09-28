@@ -57,7 +57,7 @@ bool QFFCSMaxEntEvaluationItem::hasSpecial(const QFRawDataRecord *r, const QStri
 
 
 
-void QFFCSMaxEntEvaluationItem::intWriteData(QXmlStreamWriter& w) {
+void QFFCSMaxEntEvaluationItem::intWriteData(QXmlStreamWriter& w) const {
     QFUsesResultsByIndexAndModelEvaluation::intWriteData(w);
     w.writeStartElement("maxent_config");
     w.writeAttribute("current_weights", QString::number(m_weighting));

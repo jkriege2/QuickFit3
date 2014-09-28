@@ -546,7 +546,7 @@ signals:
         virtual QString getParameterStoreIDInQSettings(QString parameter) const;
 
         virtual void intReadData(QDomElement *e);
-        virtual void intWriteData(QXmlStreamWriter &w);
+        virtual void intWriteData(QXmlStreamWriter &w) const;
 
 
         /** \brief may be used to transform a resultID before it is used in any of the \c QFRawDataRecord.results... functions */

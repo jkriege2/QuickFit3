@@ -533,7 +533,7 @@ QString QFUsesResultsEvaluation::getParameterStoreIDInQSettings(QString paramete
 }
 
 
-void QFUsesResultsEvaluation::intWriteData(QXmlStreamWriter& w) {
+void QFUsesResultsEvaluation::intWriteData(QXmlStreamWriter& w) const {
     w.writeStartElement("default_parameters");
     QHashIterator<QString, FitParameter> i(parameterStore);
     while (i.hasNext()) {

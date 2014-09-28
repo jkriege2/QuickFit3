@@ -535,7 +535,7 @@ double *QFRDRFCSData::getCorrelationRunError(int run) const
 }
 
 
-void QFRDRFCSData::intWriteData(QXmlStreamWriter& w) {
+void QFRDRFCSData::intWriteData(QXmlStreamWriter& w) const {
     if (leaveout.size()>0) {
         QString l="";
         for (int i=0; i<leaveout.size(); i++) {

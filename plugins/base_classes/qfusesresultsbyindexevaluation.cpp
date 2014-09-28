@@ -142,7 +142,7 @@ bool QFUsesResultsByIndexEvaluation::getFitFix(QFRawDataRecord *r, int index, co
     return getFitFix(r, getEvaluationResultID(index), parameterID);
 }
 
-void QFUsesResultsByIndexEvaluation::intWriteData(QXmlStreamWriter &w) {
+void QFUsesResultsByIndexEvaluation::intWriteData(QXmlStreamWriter &w) const {
     QFUsesResultsEvaluation::intWriteData(w);
     w.writeTextElement("current_index", QString::number(currentIndex));
 }

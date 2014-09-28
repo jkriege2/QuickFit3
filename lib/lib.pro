@@ -24,7 +24,7 @@ TARGET = quickfit3lib
 DEPENDPATH += .
 
 include(../quickfit3.pri)
-
+include(../extlibs/quazip.pri)
 
 release {
     message("building $$TARGET $$TEMPLATE in RELEASE mode, output is in $$QFOUTPUT")
@@ -152,7 +152,8 @@ HEADERS += dlgnewproperty.h \
     qfcollapsiblescrollarea.h \
     qfrotatablelabel.h \
     qfcompleterproperties.h \
-    qfimagemetadatatool.h
+    qfimagemetadatatool.h \
+    qflistprogressdialog.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -245,14 +246,16 @@ SOURCES += dlgnewproperty.cpp \
     qfcollapsiblescrollarea.cpp \
     qfrotatablelabel.cpp \
     qfcompleterproperties.cpp \
-    qfimagemetadatatool.cpp
+    qfimagemetadatatool.cpp \
+    qflistprogressdialog.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \
     dlg_qfprogress.ui \
     dlg_qffileeditdialog.ui \
     qfdlg_csvparameters.ui \
-    qffitalgorithmerrorestimatemodewidget.ui
+    qffitalgorithmerrorestimatemodewidget.ui \
+    qflistprogressdialog.ui
 
 RESOURCES += lib.qrc
 

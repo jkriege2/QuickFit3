@@ -20,6 +20,7 @@
         <file alias="project_open.png">../images/22x22/project_open.png</file>
         <file alias="project_open_recent.png">../images/22x22/project_open_recent.png</file>
         <file alias="project_save.png">../images/22x22/project_save.png</file>
+        <file alias="project_zip.png">../images/22x22/project_zip.png</file>
         <file alias="project_saveas.png">../images/22x22/project_saveas.png</file>
         <file alias="rawdata_insert.png">../images/22x22/rdr_add.png</file>
         <file alias="evaluation_insert.png">../images/22x22/eval_add.png</file>

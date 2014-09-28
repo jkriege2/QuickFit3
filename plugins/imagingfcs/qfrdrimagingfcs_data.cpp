@@ -274,7 +274,7 @@ void QFRDRImagingFCSData::exportData(const QString& format, const QString& filen
 }
 
 
-void QFRDRImagingFCSData::intWriteData(QXmlStreamWriter& w) {
+void QFRDRImagingFCSData::intWriteData(QXmlStreamWriter& w) const {
 	// write data to the project XML file using the QXmlStreamWriter
     QString l=maskToIndexString(',');
 
@@ -2667,6 +2667,12 @@ QFRDRImagingFCSData *QFRDRImagingFCSData::getRoleFromThisGroup(const QString &ro
     QList<QFRDRImagingFCSData*> items=filterListForClass<QFRawDataRecord, QFRDRImagingFCSData>(getRecordsWithRoleFromGroup(role));
     if (items.size()>0) return items.first();
     return NULL;
+}
+
+bool QFRDRImagingFCSData::doCopyFileForExport(const QString &filename, const QString &fileType, QString &newFilename, const QList<QFProject::FileCopyList> *filecopylist, const QString &subfoldername) const
+{
+    if (fileType.toLower()=="input") return false;
+    return true;
 }
 
 

@@ -82,7 +82,7 @@ int QFRDRPhotonCountsData::getPhotonCountsChannels()
 }
 
 
-void QFRDRPhotonCountsData::intWriteData(QXmlStreamWriter& w) {
+void QFRDRPhotonCountsData::intWriteData(QXmlStreamWriter& w) const {
 	// write data to the project XML file using the QXmlStreamWriter
     /*        
 	w.writeStartElement("mytag");

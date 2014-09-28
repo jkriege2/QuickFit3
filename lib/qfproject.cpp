@@ -29,6 +29,11 @@
 #include "qfpluginservices.h"
 #include "qfversion.h"
 #include "datatools.h"
+#include "qflistprogressdialog.h"
+#include <quagzipfile.h>
+#include <quazip.h>
+#include <quazipfile.h>
+#include <JlCompress.h>
 
 #include <QTemporaryFile>
 #include <QElapsedTimer>
@@ -348,7 +353,7 @@ void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& 
         //qDebug()<<tmpfn<<"\n"<<"  -> opened: "<<f.open(QFile::WriteOnly)<<"  fn="<<f.fileName();
 
 
-        internalWriteXML(&f, resetDataChanged, namechanged);
+        internalWriteXML(&f, resetDataChanged, namechanged, filename);
         f.close();
 
         if (!filename.isEmpty()) {
@@ -391,7 +396,7 @@ void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& 
 }
 
 
-void QFProject::internalWriteXML(QIODevice *file, bool resetDataChanged, bool namechanged)
+void QFProject::internalWriteXMLConst(QIODevice *file, const QString &projectFileName, bool copyFilesToSubfolder, const QString &rdrsubfoldername, const QString &evalsubfoldername, QList<QFProject::FileCopyList> *filecopylist) const
 {
     QXmlStreamWriter w(file);
 
@@ -420,19 +425,26 @@ void QFProject::internalWriteXML(QIODevice *file, bool resetDataChanged, bool na
 
     for (int i=0; i<rawDataOrder.size(); i++) {
         QFRawDataRecord* rec=getRawDataByID(rawDataOrder[i]);
-        if (rec) rec->writeXML(w);
+        if (rec) rec->writeXML(w, projectFileName, copyFilesToSubfolder, rdrsubfoldername, filecopylist);
     }
     w.writeEndElement();
     w.writeStartElement("evaluations");
 
     for (int i=0; i<evaluationsOrder.size(); i++) {
         QFEvaluationItem* rec=getEvaluationByID(evaluationsOrder[i]);
-        if (rec) rec->writeXML(w);
+        if (rec) rec->writeXML(w, projectFileName, copyFilesToSubfolder, evalsubfoldername, filecopylist);
     }
     w.writeEndElement();
 
     w.writeEndElement();
     w.writeEndDocument();
+}
+
+
+void QFProject::internalWriteXML(QIODevice *file, bool resetDataChanged, bool namechanged, const QString& projectFileName, bool copyFilesToSubfolder, const QString &rdrsubfoldername, const QString &evalsubfoldername, QList<FileCopyList> *filecopylist)
+{
+
+    internalWriteXMLConst(file, projectFileName, copyFilesToSubfolder, rdrsubfoldername, evalsubfoldername, filecopylist);
     if (resetDataChanged) {
         if (!errorOcc) {
             emitStructureChanged();
@@ -447,26 +459,195 @@ void QFProject::internalWriteXML(QIODevice *file, bool resetDataChanged, bool na
 
 void QFProject::writeXML(const QString& file, bool resetDataChanged) {
 
-    if (reading) return;
-    bool namechanged=(file!=this->file);
-    this->file=file;
+    if (file.toLower().contains(".qfpz") || file.toLower().contains(".qfp.gz")) {
+        QuaGzipFile gzf(file);
+        if (gzf.open(QIODevice::WriteOnly)) {
+            writeXML(&gzf, resetDataChanged, file);
+            gzf.close();
+        } else {
+            setError(tr("Could not open GZip-file for output (file: '%1', error: '%2')").arg(file).arg(gzf.errorString())+"\n");
+        }
+    } else {
 
-    QTemporaryFile f(QFileInfo(file).absolutePath()+"/XXXXXX.tmp");
-    f.setAutoRemove(false);
-    f.open();
-    f.setAutoRemove(false);
+        if (reading) return;
+        bool namechanged=(file!=this->file);
+        this->file=file;
 
-    internalWriteXML(&f, resetDataChanged, namechanged);
+        QTemporaryFile f(QFileInfo(file).absolutePath()+"/XXXXXX.tmp");
+        f.setAutoRemove(false);
+        f.open();
+        f.setAutoRemove(false);
 
-    QFile f2(file+".backup");
-    if (f2.exists()) f2.remove();
+        internalWriteXML(&f, resetDataChanged, namechanged, file);
 
-    QFile f1(file);
-    f1.rename(file+".backup");
+        QFile f2(file+".backup");
+        if (f2.exists()) f2.remove();
 
-    f.setAutoRemove(false);
-    if (!f.rename(file)) {
-        setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
+        QFile f1(file);
+        f1.rename(file+".backup");
+
+
+
+        f.setAutoRemove(false);
+        if (!f.rename(file)) {
+            setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
+        }
+    }
+}
+
+QString QFProject_QuaZIPError(int error) {
+    if (error==UNZ_OK) return  QObject::tr("NO ERROR");
+    if (error==UNZ_END_OF_LIST_OF_FILE) return  QObject::tr("UNZ_END_OF_LIST_OF_FILE");
+    if (error==UNZ_ERRNO) return  QObject::tr("UNZ_ERRNO");
+    if (error==UNZ_EOF) return  QObject::tr("UNZ_EOF");
+    if (error==UNZ_PARAMERROR) return  QObject::tr("UNZ_PARAMERROR");
+    if (error==UNZ_BADZIPFILE) return  QObject::tr("UNZ_BADZIPFILE");
+    if (error==UNZ_INTERNALERROR) return  QObject::tr("UNZ_INTERNALERROR");
+    if (error==UNZ_CRCERROR) return  QObject::tr("UNZ_CRCERROR");
+    return QObject::tr("ERROR No. %1").arg(error);
+}
+
+bool QFProject_compressFile(QuaZip* zip, QString fileName, QString fileDest, QString& error) {
+    error="";
+    QFile inFile;
+    inFile.setFileName(fileName);
+    if(!inFile.open(QIODevice::ReadOnly)) {
+        error=QObject::tr("error opening file %1: %2").arg(fileName).arg(inFile.errorString());
+        return false;
+    }
+
+    QuaZipFile outFile(zip);
+    if(!outFile.open(QIODevice::WriteOnly, QuaZipNewInfo(fileDest, inFile.fileName()))) {
+        error=QObject::tr("error opening file %1 in ZIP: %2").arg(fileDest).arg(outFile.errorString());
+        return false;
+    }
+
+    if (!qfCopyData(&inFile, &outFile) || outFile.getZipError()!=UNZ_OK) {
+        if (outFile.getZipError()!=UNZ_OK) error=QObject::tr("error writing data into ZIP: %1").arg(QFProject_QuaZIPError(outFile.getZipError()));
+        else error=QObject::tr("error writing data into ZIP");
+        return false;
+    }
+
+    outFile.close();
+    if (outFile.getZipError()!=UNZ_OK) {
+        error=QObject::tr("error closing file in ZIP: %1").arg(QFProject_QuaZIPError(outFile.getZipError()));
+        return false;
+    }
+    inFile.close();
+    return true;
+}
+
+
+void QFProject::exportProjectToZIP(const QString &file, QFListProgressDialog* pdlg)
+{
+    QString currentProjectLocation=this->file;
+    errorOcc=false;
+    bool copyFilesToSubfolder=true;
+    QString rdrsubfoldername="rdr_data_files/";
+    QString evalsubfoldername="eval_data_files/";
+    QList<FileCopyList> filecopylist;
+    QString tmpfn=qfGetTempFilename();
+    QString pfn=replaceFileExt(file, ".qfp");
+    {
+        QFile f(tmpfn);
+        if (f.open(QFile::WriteOnly|QFile::Text)) {
+            //qDebug()<<f.fileName();
+            internalWriteXMLConst(&f, currentProjectLocation, copyFilesToSubfolder, rdrsubfoldername, evalsubfoldername, &filecopylist);
+            f.close();
+        }
+    }
+
+
+    if (QFile::exists(tmpfn)) {
+        if (QFile::exists(file)) QFile::remove(file);
+        if (pdlg) {
+            pdlg->setRange(0, filecopylist.size()+2);
+            pdlg->setProgress(0);
+            pdlg->setMainMessage(tr("compressing project into ZIP-file ..."));
+            pdlg->addMessage(tr("creating ZIP-file '%1'...").arg(file));
+        }
+        QuaZip zip(file);
+        if (zip.open(QuaZip::mdCreate)) {
+            if (pdlg) {
+                pdlg->incProgress();
+                pdlg->addMessage(tr("adding project file '%1'...").arg(QFileInfo(pfn).fileName()));
+            }
+            //qDebug()<<tr("adding project file '%1'...").arg(QFileInfo(pfn).fileName());
+            QString errorStr;
+            bool ok=QFProject_compressFile(&zip, tmpfn, QFileInfo(pfn).fileName(), errorStr);
+            //qDebug()<<"\n     "<<ok<<errorStr;
+            if (ok && (!pdlg || (pdlg && !pdlg->wasCanceled()))) {
+                if (filecopylist.size()>0) {
+                    /*QString remstart="";
+                    for (int j=0; j<10; j++) {
+                        QString start="";
+                        for (int i=0; i<filecopylist.size(); i++) {
+                            QStringList sl=filecopylist[i].outFile.split("/");
+                            if (j+1<sl.size()) {
+                                start=sl[j];
+                                break;
+                            }
+                        }
+                        bool allStartEqual=true;
+                        if (!start.isEmpty()) {
+                            for (int i=0; i<filecopylist.size(); i++) {
+                                QStringList sl=filecopylist[i].outFile.split("/");
+                                if (!(sl.size()>j+1 && start==sl[j])) {
+                                    allStartEqual=false;
+                                    break;
+                                }
+                            }
+                        }
+                        if (allStartEqual && !start.isEmpty()) {
+                            remstart=remstart+start+"/";
+                        } else{
+                            break;
+                        }
+                    }*/
+                    //pdlg->addMessage(tr("removing from folder '%1'...").arg(remstart));
+                    for (int i=0; i<filecopylist.size(); i++) {
+                        QString outf=filecopylist[i].outFile;
+                        /*if (remstart.size()>0 && outf.indexOf(remstart)==0) {
+                            outf=outf.right(outf.size()-remstart.size());
+                        }*/
+                        if (pdlg) {
+                            pdlg->incProgress();
+                            pdlg->addMessage(tr("adding data file '%1'...").arg(filecopylist[i].outFile));
+                        }
+                        ok=QFProject_compressFile(&zip, filecopylist[i].inFile, outf, errorStr);
+                        //qDebug()<<tr("adding data file %1 -> %2...").arg(filecopylist[i].inFile).arg(filecopylist[i].outFile)<<"\n     "<<ok<<errorStr;
+                        if (!ok) {
+                            setError(tr("Could not add file '%1' to ZIP-file '%2', error: %3").arg(filecopylist[i].outFile).arg(file).arg(errorStr));
+                            break;
+                        }
+                        if (pdlg && pdlg->wasCanceled()) {
+                            setError(tr("Compressing project to ZIP-file '%1' was canceled by the user").arg(file));
+                            break;
+                        }
+                    }
+                }
+            } else {
+                setError(tr("Could not add project file '%1' to ZIP-file '%2', error: %3").arg(pfn).arg(file).arg(errorStr));
+            }
+            zip.close();
+        } else {
+            setError(tr("Could not create ZIP-file '%1', error code: %2").arg(file).arg(QFProject_QuaZIPError(zip.getZipError())));
+        }
+        QFile::remove(tmpfn);
+    }
+    if (pdlg) {
+        pdlg->setProgresComplete();
+        if (errorOcc) pdlg->setMessage(tr("FINISHED WITH ERRORS:\n   %1\n   ZIP-filesize: %2 MBytes").arg(errorDesc).arg(double(QFileInfo(file).size())/1024.0/1024.0));
+        else pdlg->setMessage(tr("FINISHED SUCCESSFULLY!\n   ZIP-filesize: %1 MBytes").arg(double(QFileInfo(file).size())/1024.0/1024.0));
+        pdlg->addMessage("");
+        if (errorOcc) {
+            pdlg->addMessage(tr("FINISHED WITH ERRORS!"));
+            pdlg->addMessage("  "+errorDesc);
+        } else {
+            pdlg->addMessage(tr("FINISHED SUCCESSFULLY!"));
+        }
+        pdlg->addMessage(tr("  ZIP-filesize: %1 MBytes").arg(double(QFileInfo(file).size())/1024.0/1024.0));
+        pdlg->setUserClose();
     }
 }
 
@@ -476,6 +657,7 @@ void QFProject::readXML(const QString &file)
     m_subset=false;
     subsetRDR.clear();
     subsetEval.clear();
+
     internalReadXML(file);
 }
 
@@ -518,12 +700,21 @@ void QFProject::readXMLSubSet(QIODevice *file, const QString& filename, const QS
 
 void QFProject::readXMLSubSet(const QString &file, const QSet<int> &rdrSelected, const QSet<int> &evalSelected)
 {
-    QFile f(file);
-    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        setError(tr("Could no open file '%1' for input!\n Error description: %2.").arg(file).arg(f.errorString()));
-        return;
+    if (file.toLower().contains(".qfpz") || file.toLower().contains(".qfp.gz")) {
+        QuaGzipFile f(file);
+        if (!f.open(QIODevice::ReadOnly)) {
+            setError(tr("Could no open GZipped project file '%1' for input!\n Error description: %2.").arg(file).arg(f.errorString()));
+            return;
+        }
+        readXMLSubSet(&f, file, rdrSelected, evalSelected);
+    } else{
+        QFile f(file);
+        if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            setError(tr("Could no open file '%1' for input!\n Error description: %2.").arg(file).arg(f.errorString()));
+            return;
+        }
+        readXMLSubSet(&f, file, rdrSelected, evalSelected);
     }
-    readXMLSubSet(&f, file, rdrSelected, evalSelected);
 }
 
 void QFProject::readXMLDummy(const QString &file)
@@ -699,6 +890,7 @@ void QFProject::internalReadXML(QIODevice *f, const QString &filename_in)
 
 
 
+
 void QFProject::internalReadXML(const QString& file) {
     this->reading=true;
     bool namechanged=(file!=this->file);
@@ -709,20 +901,36 @@ void QFProject::internalReadXML(const QString& file) {
     time.start();
 #endif
 
-    QFile f(file);
-    if (!f.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        setError(tr("Could no open file '%1' for input!\n Error description: %2.").arg(file).arg(f.errorString()));
-        this->reading=false;
-        return;
+    QIODevice* f=NULL;
+    QuaGzipFile fz(file);
+    QFile ff(file);
+    if (file.toLower().contains(".qfpz") || file.toLower().contains(".qfp.gz")) {
+        f=&fz;
+        if (!fz.open(QIODevice::ReadOnly)) {
+            setError(tr("Could no open GZipped project file '%1' for input!\n Error description: %2.").arg(file).arg(fz.errorString()));
+            this->reading=false;
+            return;
+        }
+    } else {
+        f=&ff;
+        if (!ff.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            setError(tr("Could no open file '%1' for input!\n Error description: %2.").arg(file).arg(ff.errorString()));
+            this->reading=false;
+            return;
+        }
     }
+
+
+
 
 #ifdef DEBUG_TIMING
         qDebug()<<"opened file     "<<time.elapsed()<<"ms"; time.start();
 #endif
 
 
-    internalReadXML(&f);
+    internalReadXML(f);
 
+    f->close();
 
 
 
@@ -1704,13 +1912,52 @@ void QFProject::log_warning(const QString &message) const
 void QFProject::log_error(const QString &message) const
 {
     if (services) services->log_error(message);
-};
+}
+
+QString QFProject::ensureUniqueFilename(const QString &inFilename, const QString &newFilename, QList<FileCopyList> *filecopylist, bool addToList)
+{
+    //qDebug()<<inFilename;
+    for (int i=0; i<filecopylist->size(); i++) {
+        if ((*filecopylist)[i].inFile==inFilename) {
+            //qDebug()<<"  => "<<(*filecopylist)[i].outFile;
+            return (*filecopylist)[i].outFile;
+        }
+    }
+
+    int num=0;
+    QString newFN=newFilename;
+    QFileInfo fi(newFilename);
+    while (fileCopyListConatins(inFilename, newFN, filecopylist)>=0 && num<2000)  {
+        num++;
+        newFN=fi.filePath()+"/"+fi.baseName()+QString("_cnt%1.").arg(num, 4,10,QChar('0'))+fi.completeSuffix();
+        //qDebug()<<"  newFN("<<num<<") "<<newFN;
+    }
+    if (addToList) filecopylist->append(FileCopyList(inFilename, newFN));
+    //qDebug()<<"  => "<<newFN;
+    return newFN;
+}
+
+int QFProject::fileCopyListConatins(const QString &inFilename, const QString &outFile, const QList<FileCopyList> *filecopylist)
+{
+    for (int i=0; i<filecopylist->size(); i++) {
+        if ((*filecopylist)[i].outFile==outFile) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 
 void QFProject::setError(QString description) {
     errorOcc=true;
     errorDesc=description;
     emit errorOccured(description);
+}
+
+void QFProject::setError(QString description) const {
+    errorOcc=true;
+    errorDesc=description;
+    //emit errorOccured(description);
 }
 
 void QFProject::emitPropertiesChanged() {
@@ -1815,7 +2062,7 @@ bool QFProject::getEvaluationIndex(QFEvaluationItem* rec) const  {
     return evaluations.values().indexOf(rec);
 }
 
-QFRawDataRecord* QFProject::getRawDataByID(int ID) {
+QFRawDataRecord* QFProject::getRawDataByID(int ID) const {
     if (rawDataIDExists(ID)) return rawData[ID];
     return NULL;
 }

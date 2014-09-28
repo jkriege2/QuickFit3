@@ -914,7 +914,7 @@ void QFEHelpEditorWidget::on_btnPasteImage_clicked()
 void QFEHelpEditorWidget::on_btnInsertAndCopyImage_clicked()
 {
     QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFEHelpEditorWidget/lastImageDir", ProgramOptions::getInstance()->getMainHelpDirectory()).toString();
-    QString filename=qfGetOpenFileName(this, tr("select image file ..."), dir, tr("Image Files (*.png *.jpg *.bmp)") );
+    QString filename=qfGetOpenFileName(this, tr("select image file ..."), dir, tr("Image Files (*.png *.jpg *.tif *.svg *.bmp)") );
     if (!filename.isEmpty()) {
         dir=QFileInfo(filename).absolutePath();
         ProgramOptions::getInstance()->getQSettings()->setValue("QFEHelpEditorWidget/lastImageDir", dir);
@@ -1008,7 +1008,7 @@ void QFEHelpEditorWidget::on_btnSelectImage_clicked()
 
 /*
 
-    QString filename=qfGetOpenFileName(this, tr("select image file ..."), dir, tr("Image Files (*.png *.jpg *.bmp)") );
+    QString filename=qfGetOpenFileName(this, tr("select image file ..."), dir, tr("Image Files (*.png *.jpg *.tif *.svg *.bmp)") );
     if (!filename.isEmpty()) {
         dir=QFileInfo(filename).absolutePath();
         insertAroundOld(QString("<img src=\"%1\">").arg(QFileInfo(dir).absoluteDir().relativeFilePath(filename)));

@@ -840,7 +840,7 @@ protected:
     *  this function saves the id of the current fit function and algorithm, as well as the contents of parameterStore to
     *  the given XML file.
     */
-    virtual void intWriteData(QXmlStreamWriter& w);
+    virtual void intWriteData(QXmlStreamWriter& w) const;
     /** \brief read back the data stored by intWriteXML() */
     virtual void intReadData(QDomElement* e);
 

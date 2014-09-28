@@ -15,6 +15,9 @@ $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$
 <p>Quickfit summarizes these raw data records and the data evaluations in a project. The project can be saved (<tt>.qfp</tt> file), so you can reload it without loosing any data lateron. The project file will usually not contain the data, but only references to the external files (as relative links, so you can simply copy the project+files between different computers, as long as their relative positions stays the same). But it will contain all evaluation results, annotations and properties.<br>
 The projects are saved in an .qfp file, which contains the data in the (mostly) human-readable XML format. So you can still extract data, even if QuickFit is not available, as most tags in the qfp-file are self-explanatory. </p>
 
+<h2>Compress a Project</h2>
+<p>You can use the function <b>File | <img src=":/project_zip.png"> Compress project</b> to compress the current project into a ZIP-archive. The archive will contain the QuickFit-project (QFP-file) and in addition all raw data files, which are referenced in this project.
+</p>
 
 <h2>QuickFit $$version$$ Project File Format</h2>
 <p>QuickFit $$version$$ projects are stored to disk as XML files (*.qfp files). In addition it is possible to compress those files on-line by saving the project as a *.qfpz file. The compression algorithm is GZip.

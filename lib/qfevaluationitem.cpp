@@ -129,7 +129,7 @@ void QFEvaluationItem::readXML(QDomElement& e, bool loadAsDummy) {
 }
 
 
-void QFEvaluationItem::writeXML(QXmlStreamWriter& w) {
+void QFEvaluationItem::writeXML(QXmlStreamWriter& w, const QString &projectfilename, bool copyFilesToSubfolder, const QString &subfoldername, QList<QFProject::FileCopyList> *filecopylist) {
     w.writeStartElement("evaluationelement");
     w.writeAttribute("type", getType());
     w.writeAttribute("name", name);
@@ -156,6 +156,11 @@ void QFEvaluationItem::writeXML(QXmlStreamWriter& w) {
     intWriteData(w);
     w.writeEndElement();
     w.writeEndElement();
+}
+
+bool QFEvaluationItem::doCopyFileForExport(const QString &filename, const QString &fileType, QString &newFilename, const QList<QFProject::FileCopyList> *filecopylist, const QString &subfoldername) const
+{
+    return true;
 }
 
 void QFEvaluationItem::setHighlightedRecord(QFRawDataRecord* record) {

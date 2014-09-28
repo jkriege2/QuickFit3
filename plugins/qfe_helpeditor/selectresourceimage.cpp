@@ -121,7 +121,7 @@ void SelectResourceImage::listDirectory(QDir dir, QStandardItem *parentItem, con
 {
     QStringList dirs=dir.entryList(QDir::AllDirs|QDir::NoDotAndDotDot,QDir::Name);
     QStringList filters;
-    filters<<"*.png"<<"*.jpg"<<"*.bmp";
+    filters<<"*.png"<<"*.jpg"<<"*.bmp"<<"*.svg"<<"*.tif";
     QStringList files=dir.entryList(filters,QDir::Files,QDir::Name);
     for (int i = 0; i < dirs.size(); ++i) {
         QStandardItem *item = new QStandardItem(dirs[i]);

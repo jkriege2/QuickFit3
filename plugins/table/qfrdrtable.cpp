@@ -2099,14 +2099,15 @@ void QFRDRTable::intReadData(QDomElement* e) {
     }
 }
 
-void QFRDRTable::intWriteData(QXmlStreamWriter& w) {
+void QFRDRTable::intWriteData(QXmlStreamWriter& w) const {
     if (!datamodel) {
-        datamodel=new QFTablePluginModel(this);
+        /*datamodel=new QFTablePluginModel(this);
         datamodel->setUndoEnabled(true);
         datamodel->setVerticalHeaderShowRowNumbers(true);
         datamodel->setDefaultEditValue(DEFAULT_EDITVAL);
         connect(datamodel, SIGNAL(modelReset()), this, SLOT(trawDataChanged()));
-        connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));
+        connect(datamodel, SIGNAL(dataChanged( const QModelIndex & , const QModelIndex &  )), this, SLOT(tdataChanged( const QModelIndex & , const QModelIndex &  )));*/
+        return;
     }
     if (files.size()>0 && !getQFProperty("DONT_READWRITE_FILE", false).toBool()) {
         if (datamodel->hasChanged()) datamodel->saveCSV(files[0]);

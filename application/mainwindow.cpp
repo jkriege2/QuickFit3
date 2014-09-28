@@ -40,7 +40,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "dlgsetrdrpropertybyexpression.h"
 #include <QNetworkRequest>
 #include <QNetworkProxy>
-#include <quagzipfile.h>
+#include "qflistprogressdialog.h"
+
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
 
@@ -494,6 +495,22 @@ void MainWindow::openExample()
         }
     }
 
+}
+
+void MainWindow::zipProject()
+{
+    if (maybeSave()) {
+        QString fileName = qfGetSaveFileNameSet("MainWindow/zipProject/", this, tr("ZIP Project ..."), currentProjectDir, tr("ZIP-archives (*.zip)"));
+        if (!fileName.isEmpty()) {
+            QApplication::setOverrideCursor(Qt::WaitCursor);
+            QFListProgressDialog* pdlg=new QFListProgressDialog(this);
+            pdlg->show();
+            project->exportProjectToZIP(fileName, pdlg);
+            /*pdlg->close();
+            delete pdlg;*/
+            QApplication::restoreOverrideCursor();
+        }
+    }
 }
 
 void MainWindow::openProjectSubset()
@@ -1190,6 +1207,10 @@ void MainWindow::createActions() {
     saveProjectAsAct->setStatusTip(tr("Save the project under a new name"));
     connect(saveProjectAsAct, SIGNAL(triggered()), this, SLOT(saveProjectAs()));
 
+    zipProjectAct = new QAction(QIcon(":/project_zip.png"), tr("&Compress Project"), this);
+    zipProjectAct->setStatusTip(tr("compress project, icluding data files into a ZIP-archive"));
+    connect(zipProjectAct, SIGNAL(triggered()), this, SLOT(zipProject()));
+
     optionsAct = new QAction(QIcon(":/configure.png"), tr("&Preferences ..."), this);
     optionsAct->setStatusTip(tr("Application settings dialog"));
     optionsAct->setMenuRole(QAction::PreferencesRole);
@@ -1312,6 +1333,8 @@ void MainWindow::createMenus() {
     fileMenu->addSeparator();
     fileMenu->addAction(saveProjectAct);
     fileMenu->addAction(saveProjectAsAct);
+    fileMenu->addSeparator();
+    fileMenu->addAction(zipProjectAct);
     fileMenu->addSeparator();
     fileMenu->addAction(optionsAct);
     fileMenu->addSeparator();
@@ -1634,26 +1657,11 @@ void MainWindow::loadProject(const QString &fileName, bool subsetMode, const QSe
     project=new QFProject(getEvaluationItemFactory(), getRawDataRecordFactory(), this, this);
 
 
-    if (fn.toLower().contains(".qfpz") || fn.toLower().contains(".qfp.gz")) {
-        logFileProjectWidget->log_text("LOADING FROM GZIPPED PROJECT!\n");
-        QuaGzipFile gzf(fn);
-        if (gzf.open(QIODevice::ReadOnly)) {
-            if (subsetMode) {
-                project->readXMLSubSet(&gzf, fn, rdrSelected, evalSelected);
-            } else {
-                project->readXML(&gzf, fn);
-            }
-            gzf.close();
-        } else {
-            QMessageBox::critical(this, tr("QuickFit %1").arg(qfInfoVersionFull()), tr("Could not open GZip-file for output!\n   file: '%1'\n   error: '%2'").arg(fileName).arg(gzf.errorString()));
-            logFileProjectWidget->log_error(tr("Could not open GZip-file for output (file: '%1', error: '%2')").arg(fileName).arg(gzf.errorString())+"\n");
-        }
+
+    if (subsetMode) {
+        project->readXMLSubSet(fn, rdrSelected, evalSelected);
     } else {
-        if (subsetMode) {
-            project->readXMLSubSet(fn, rdrSelected, evalSelected);
-        } else {
-            project->readXML(fn);
-        }
+        project->readXML(fn);
     }
 
 
@@ -1706,7 +1714,9 @@ bool MainWindow::saveProject(const QString &fileName) {
         logFileProjectWidget->clearLogStore();
         time.start();
 
-        if (fileName.toLower().contains(".qfpz") || fileName.toLower().contains(".qfp.gz")) {
+        project->writeXML(fileName);
+
+        /*if (fileName.toLower().contains(".qfpz") || fileName.toLower().contains(".qfp.gz")) {
             logFileProjectWidget->log_text("SAVING TO GZIPPED PROJECT!\n");
             QuaGzipFile gzf(fileName);
             if (gzf.open(QIODevice::WriteOnly)) {
@@ -1718,7 +1728,7 @@ bool MainWindow::saveProject(const QString &fileName) {
             }
         } else {
             project->writeXML(fileName);
-        }
+        }*/
 
 
 
@@ -2199,6 +2209,7 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     openProjectSubsetAct->setEnabled(projectModeEnabled);
     openExampleAct->setEnabled(projectModeEnabled);
     saveProjectAct->setEnabled(projectModeEnabled);
+    zipProjectAct->setEnabled(projectModeEnabled);
     saveProjectAsAct->setEnabled(projectModeEnabled);
     actReloadProject->setEnabled(projectModeEnabled);
     actRenameGroups->setEnabled(projectModeEnabled);

@@ -32,9 +32,6 @@ INCLUDEPATH += . \
 
 include(../quickfit3.pri)
 include(../libquickfitwidgets.pri)
-#include(../extlibs/zlib.pri)
-#include(../extlibs/minizip.pri)
-include(../extlibs/quazip.pri)
 
 release {
     message("building $$TARGET $$TEMPLATE in RELEASE mode, output is in $$QFOUTPUT ")

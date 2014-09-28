@@ -50,7 +50,7 @@ QSettings *QFRDRSettingsData::getData() const
 }
 
 
-void QFRDRSettingsData::intWriteData(QXmlStreamWriter& w) {
+void QFRDRSettingsData::intWriteData(QXmlStreamWriter& w) const {
 	// write data to the project XML file using the QXmlStreamWriter
     /*        
 	w.writeStartElement("mytag");

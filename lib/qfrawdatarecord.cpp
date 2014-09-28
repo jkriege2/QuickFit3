@@ -870,7 +870,7 @@ QString QFRawDataRecord::evaluationResultType2String(QFRawDataRecord::evaluation
 }
 
 
-void QFRawDataRecord::writeXML(QXmlStreamWriter& w) {
+void QFRawDataRecord::writeXML(QXmlStreamWriter& w, const QString &projectfilename, bool copyFilesToSubfolder, const QString& subfoldername, QList<QFProject::FileCopyList >* filecopylist) const {
     
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QReadLocker";
@@ -1044,18 +1044,50 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
         w.writeStartElement("files");
         for (int i=0; i< files.size(); i++) {
             QString file=files[i];
-            QFileInfo fi(project->getFile());
+            QFileInfo fi(projectfilename);
+            QDir pdir=QDir(fi.canonicalPath());
             //file=fi.absoluteDir().relativeFilePath(files[i]);
-            file=QDir(fi.canonicalPath()).relativeFilePath(QFileInfo(files[i]).canonicalFilePath());
-            w.writeStartElement("file");
-            if (i<files_types.size()) {
-                if (!files_types[i].isEmpty()) {
-                    if (i<files_types.size()) w.writeAttribute("type", files_types[i]);
-                    if (i<files_desciptions.size()) w.writeAttribute("description", files_desciptions[i]);
+            file=pdir.absoluteFilePath(QFileInfo(files[i]).canonicalFilePath());
+            QString ftype="";
+            if (i<files_types.size()) ftype=files_types[i];
+            QString fdescription="";
+            if (i<files_desciptions.size()) fdescription=files_desciptions[i];
+
+            bool writeOut=!copyFilesToSubfolder;
+
+            if (copyFilesToSubfolder) {
+                QString newFN="";
+                newFN=pdir.relativeFilePath(files[i]);
+                //qDebug()<<"rel. path newFN: "<<newFN<<pdir<<projectfilename;
+                if (newFN.startsWith('/') || (newFN.size()>2 && newFN[0].isLetter() && newFN[1]==':' && (newFN[2]=='/'||newFN[2]=='\\')) || newFN.startsWith("../") || newFN.startsWith("..\\") || newFN.startsWith("\\\\") || newFN.startsWith("//")) {
+                    QString fn=QFileInfo(newFN).fileName();
+                    QStringList dirs=QFileInfo(newFN).absolutePath().split('/');
+                    newFN=subfoldername+"/";
+                    if (dirs.size()>1 && dirs[dirs.size()-2]!="." && dirs[dirs.size()-2]!=".." && dirs.last()!="." && dirs.last()!="..") newFN=newFN+dirs[dirs.size()-2]+"/"+dirs.last()+"/";
+                    else if (dirs.size()>0 && dirs.last()!="." && dirs.last()!="..") newFN=newFN+dirs.last()+"/";
+                    newFN=newFN+fn;
                 }
+                QString tnewFN=newFN;
+
+                if (doCopyFileForExport(file, ftype, newFN, filecopylist, subfoldername)) {
+                    if (newFN.isEmpty()) {
+                        newFN=tnewFN;
+                    }
+                    newFN=newFN.replace("//", "/");
+                    file=QFProject::ensureUniqueFilename(file, newFN, filecopylist, true);
+                    writeOut=true;
+                }
+            } else {
+                file=fi.absoluteDir().relativeFilePath(files[i]);
             }
-            w.writeCharacters(file);
-            w.writeEndElement();
+
+            if (writeOut) {
+                w.writeStartElement("file");
+                if (!ftype.isEmpty()) w.writeAttribute("type", ftype);
+                if (!fdescription.isEmpty()) w.writeAttribute("description", fdescription);
+                w.writeCharacters(file);
+                w.writeEndElement();
+            }
         }
         w.writeEndElement();
     }
@@ -1063,6 +1095,11 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
     intWriteData(w);
     w.writeEndElement();
     w.writeEndElement();
+}
+
+bool QFRawDataRecord::doCopyFileForExport(const QString &filename, const QString &fileType, QString &newFilename, const QList<QFProject::FileCopyList> *filecopylist, const QString& subfoldername) const
+{
+    return true;
 }
 
 
@@ -1098,20 +1135,21 @@ QFRawDataEditor* QFRawDataRecord::createEditor(QFPluginServices* services,  QFRa
     return NULL;
 }
 
-void QFRawDataRecord::exportData(const QString& format, const QString& filename) const {
-
-}
-
 QStringList QFRawDataRecord::getExportFiletypes() {
     return QStringList();
 }
 
 QString QFRawDataRecord::getExportDialogTitle() {
-    return tr("");
+    return QString("");
 }
 
 QString QFRawDataRecord::getExportDialogFiletypes() {
-    return tr("");
+    return QString("");
+}
+
+void QFRawDataRecord::exportData(const QString &format, const QString &filename) const
+{
+
 }
 
 

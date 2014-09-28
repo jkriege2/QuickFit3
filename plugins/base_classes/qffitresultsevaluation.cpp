@@ -246,7 +246,7 @@ void QFFitResultsEvaluation::restoreQFFitAlgorithmParameters(QFFitAlgorithm* alg
 }*/
 
 
-void QFFitResultsEvaluation::intWriteData(QXmlStreamWriter& w) {
+void QFFitResultsEvaluation::intWriteData(QXmlStreamWriter& w) const {
     w.writeStartElement("algorithms");
     w.writeAttribute("current", m_fitAlgorithm);
     intWriteDataAlgorithm(w);

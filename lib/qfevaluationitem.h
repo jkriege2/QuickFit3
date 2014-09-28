@@ -234,8 +234,35 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         virtual QString getEditorName() { return QString(""); };
         /** \brief create an object for the i-th editor pane */
         virtual QFEvaluationEditor* createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL) { return NULL; };
-        /** \brief write object contents into XML file */
-        virtual void writeXML(QXmlStreamWriter& w);
+        /** \brief write object contents into XML file
+         *
+         *  \param w QXmlStreamWriter class for the output
+         *  \param projectfilename filename of the output project file
+         *  \param copyFilesToSubfolder if this is activated (\c true), the function copies any file, which is not yet in a subfolder of the project,
+         *                              into a subfolder inside subfoldername. The copy operation is not executed immediately, but the files to copy
+         *                              are appended to filecopylist. The references in the written XML file already point to the new, anticipated file
+         *                              locations.
+         *  \param subfoldername name of the subfolder, which assembles the files in the project
+         *  \param filecopylist list of required file copy operations.
+         */
+        virtual void writeXML(QXmlStreamWriter& w, const QString& projectfilename, bool copyFilesToSubfolder=false, const QString &subfoldername=QString("eval_files/"), QList<QFProject::FileCopyList >* filecopylist=NULL);
+
+
+        /** \brief this function is called by writeXML() in order to determine, whether a linked file should be included in an export operation
+         *
+         *  Strictly, this function is not (yet) used by QFEvaluationItem. The default implementation returns \c true.
+         *
+         *  \param filename input filename
+         *  \param fileType file type string of the file \a filename
+         *  \param[out] newFilename you can optionally provide a new (relative) file path/name for this file.
+         *  \param filecopylist can be used to check, whether a file already exists.
+         *  \param subfoldername default subfolder for copied files
+         *
+         *  \note You will HAVE to use filecopylist to ensure, that no two distinct files are written to the SAME output filename.
+         *        You can use QFProject::ensureUniqueFilename() to ensure a unique filename in filecopylist.
+         */
+        virtual bool doCopyFileForExport(const QString& filename, const QString& fileType, QString& newFilename, const QList<QFProject::FileCopyList> *filecopylist=NULL, const QString &subfoldername=QString("rdr_data_files/")) const;
+
 
         /** \brief list of the raw data records this evaluation is applicable to */
         QList<QPointer<QFRawDataRecord> > getApplicableRecords();
@@ -367,7 +394,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
          * evaluation class in order to ensure that all data is correctly stored to the project file! Do so by calling
          * \code QFEvaluationItem::intWriteData(e); \endcode at the start of your method !!!
          */
-        virtual void intWriteData(QXmlStreamWriter& w) {};
+        virtual void intWriteData(QXmlStreamWriter& w) const {};
         /** \brief read in data stored in the project file <b>IMPLEMENT IN CHILD CLASSES!</b>
          *
          * This method may be used to read additional data (like algorithm configuration ...) from the project file

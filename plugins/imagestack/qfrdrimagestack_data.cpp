@@ -34,7 +34,7 @@ QFRDRImageStackData::~QFRDRImageStackData() {
 
 
 
-void QFRDRImageStackData::intWriteData(QXmlStreamWriter& w) {
+void QFRDRImageStackData::intWriteData(QXmlStreamWriter& w) const {
 	// write data to the project XML file using the QXmlStreamWriter
     /*
     w.writeStartElement("imagestacks");

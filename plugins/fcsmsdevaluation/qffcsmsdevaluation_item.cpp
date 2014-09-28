@@ -70,7 +70,7 @@ QString QFFCSMSDEvaluationItem::getEvaluationResultID(int currentIndex, int mode
 
 
 
-void QFFCSMSDEvaluationItem::intWriteData(QXmlStreamWriter& w) {
+void QFFCSMSDEvaluationItem::intWriteData(QXmlStreamWriter& w) const {
     QFUsesResultsByIndexAndModelEvaluation::intWriteData(w);
     w.writeStartElement("msd_config");
     w.writeAttribute("current_weights", QString::number(m_weighting));

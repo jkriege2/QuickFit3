@@ -45,7 +45,7 @@ QFSPIMLightsheetEvaluationItem::~QFSPIMLightsheetEvaluationItem() {
 }
 
 
-void QFSPIMLightsheetEvaluationItem::intWriteData(QXmlStreamWriter& w) {
+void QFSPIMLightsheetEvaluationItem::intWriteData(QXmlStreamWriter& w) const {
     /* store global evaluation parameters / initial values or anything else to the project tree here */
 }
 

@@ -145,7 +145,7 @@ bool QFRDRNumberAndBrightnessData::leaveoutRun(int run) const
 }
 
 
-void QFRDRNumberAndBrightnessData::intWriteData(QXmlStreamWriter& w) {
+void QFRDRNumberAndBrightnessData::intWriteData(QXmlStreamWriter& w) const {
     if (leaveout) {
         QString l="";
         for (int i=0; i<width*height; i++) {

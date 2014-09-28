@@ -57,7 +57,7 @@ QString QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID(int curren
     return QString("%1_%2_m%3_run%4").arg(getType()).arg(getID()).arg(model).arg(currentIndex);
 }
 
-void QFUsesResultsByIndexAndModelEvaluation::intWriteData(QXmlStreamWriter &w) {
+void QFUsesResultsByIndexAndModelEvaluation::intWriteData(QXmlStreamWriter &w) const {
     QFUsesResultsByIndexEvaluation::intWriteData(w);
     w.writeTextElement("current_model", QString::number(currentModel));
 }

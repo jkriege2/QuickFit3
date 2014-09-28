@@ -235,7 +235,11 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
 
     protected:
 
+        virtual bool doCopyFileForExport(const QString& filename, const QString& fileType, QString& newFilename, const QList<QFProject::FileCopyList> *filecopylist=NULL, const QString &subfoldername=QString("rdr_data_files/")) const;
+
         void loadPostProcess();
+
+
 
         /** \brief indicates whether the internal data representation is "dual view", this is independent of dualViewMode() and setDualViewMode() which only influences the data display! */
         DualViewMode internalDualViewMode() const;
@@ -244,7 +248,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         void setInternalDualViewMode(DualViewMode mode);
 
         /** \brief write the contents of the object to a XML file */
-        virtual void intWriteData(QXmlStreamWriter& w);
+        virtual void intWriteData(QXmlStreamWriter& w) const;
         /** \brief read in external data files <b>and</b> data stored in the project file <b>IMPLEMENT IN CHILD CLASSES!</b>
          *
          * If \a e is \c NULL then this method should only read the datafiles already saved in the files property.
