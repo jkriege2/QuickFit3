@@ -201,6 +201,44 @@ namespace QFMathParser_DefaultLib {
     QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fToLower, tolower, QFMathParser_tolower)
     QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fToUpper, toupper, QFMathParser_toupper)
 
+    QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fReadFile, readfile, readFile)
+    QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fescapify, escapify, escapify)
+    QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fdeescapify, deescapify, deescapify)
+    QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fcleanStringForFilename, clean_string_for_filename, cleanStringForFilename)
+
+
+    static inline QString QFMathParser_extractfilename(const QString& value) {
+        return QFileInfo(value).fileName();
+    }
+    QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fextractfilename, extract_filename, QFMathParser_extractfilename)
+    static inline QString QFMathParser_extractfilepath(const QString& value) {
+        return QFileInfo(value).path();
+    }
+    QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fextractfilepath, extract_file_path, QFMathParser_extractfilepath)
+    static inline QString QFMathParser_extractfileabspath(const QString& value) {
+        return QFileInfo(value).absolutePath();
+    }
+    QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fextractfileabspath, extract_absolute_path, QFMathParser_extractfileabspath)
+    static inline QString QFMathParser_extractfileabsfilepath(const QString& value) {
+        return QFileInfo(value).absoluteFilePath();
+    }
+    QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fextractfileabsfilepath, extract_absolute_file_path, QFMathParser_extractfileabsfilepath)
+    static inline QString QFMathParser_extractfileext(const QString& value) {
+        return QFileInfo(value).suffix();
+    }
+    QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fextractfileext, extract_ext, QFMathParser_extractfileext)
+    static inline QString QFMathParser_extractfilefullext(const QString& value) {
+        return QFileInfo(value).completeSuffix();
+    }
+    QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fextractfilefullext, extract_complete_ext, QFMathParser_extractfilefullext)
+    static inline QString QFMathParser_extractfilebasename(const QString& value) {
+        return QFileInfo(value).baseName();
+    }
+    QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fextractfilebasename, extract_basename, QFMathParser_extractfilebasename)
+    static inline QString QFMathParser_extractfilefullbasename(const QString& value) {
+        return QFileInfo(value).completeBaseName();
+    }
+    QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fextractfilefullbasenam, extract_complete_basename, QFMathParser_extractfilefullbasename)
 
     qfmpResult fSRand(const qfmpResult* params, unsigned int  n, QFMathParser* p);
 

@@ -27,6 +27,10 @@
 #include <QDate>
 #include <QTime>
 
+
+#define QFMATHPARSER_REGISTER_FUNC(FName, NAME_IN_PARSER) p->addFunction(#NAME_IN_PARSER, QFMathParser_DefaultLib::FName);
+
+
 bool QFMathParser_DefaultLib::hasDefaultVariables(QFMathParser* p)
 {
     return p->functionExists("pi")
@@ -276,6 +280,23 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
 
 
 
+
+    QFMATHPARSER_REGISTER_FUNC(fextractfilename, extract_filename)
+    QFMATHPARSER_REGISTER_FUNC(fextractfilebasename, extract_basename)
+
+    QFMATHPARSER_REGISTER_FUNC(fextractfilefullbasenam, extract_complete_basename)
+    QFMATHPARSER_REGISTER_FUNC(fextractfileext, extract_ext)
+    QFMATHPARSER_REGISTER_FUNC(fextractfilefullext, extract_complete_ext)
+
+    QFMATHPARSER_REGISTER_FUNC(fextractfilepath, extract_file_path)
+    QFMATHPARSER_REGISTER_FUNC(fextractfileabspath, extract_absolute_path)
+    QFMATHPARSER_REGISTER_FUNC(fextractfileabsfilepath, extract_absolute_file_path)
+
+
+    QFMATHPARSER_REGISTER_FUNC(fReadFile, readfile)
+    QFMATHPARSER_REGISTER_FUNC(fescapify, escapify)
+    QFMATHPARSER_REGISTER_FUNC(fdeescapify, deescapify)
+    QFMATHPARSER_REGISTER_FUNC(fcleanStringForFilename, clean_string_for_filename)
 
 
 }

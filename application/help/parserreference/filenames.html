@@ -1,0 +1,72 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Filename Functions</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  $$funcref_start$$<a name="extract_filename"/><!-- func:extract_filename -->
+    <b><tt><!-- template -->extract_filename(filename)<!-- /template --></tt> - <i> extracts the filename </i>:</b>
+  $$funcref_description$$
+  $$example:extract_filename("c:/temp/subdir/archive.tar.gz")<br>&nbsp;&nbsp;&nbsp; = [string] archive.tar.gz$$
+        <!-- /func:extract_filename -->
+  $$funcref_end$$
+  
+  
+  $$funcref_start$$<a name="extract_basename"/><!-- func:extract_basename -->
+    <b><tt><!-- template -->extract_basename(filename)<!-- /template --></tt> - <i> extracts the basename of a file (filename without all extensions)</i>:</b>
+  $$funcref_description$$
+  $$example:extract_basename("c:/temp/subdir/archive.tar.gz")<br>&nbsp;&nbsp;&nbsp; = [string] archive$$
+         <!-- /func:extract_basename -->
+  $$funcref_end$$
+    
+    
+    $$funcref_start$$<a name="extract_complete_basename"/><!-- func:extract_complete_basename -->
+      <b><tt><!-- template -->extract_complete_basename(filename)<!-- /template --></tt> - <i> extracts the complete basename of a file (filename without the last extension) </i>:</b>
+    $$funcref_description$$
+  $$example:extract_complete_basename("c:/temp/subdir/archive.tar.gz")<br>&nbsp;&nbsp;&nbsp; = [string] archive.tar$$
+          <!-- /func:extract_complete_basename -->
+    $$funcref_end$$
+    
+    $$funcref_start$$<a name="extract_ext"/><!-- func:extract_ext -->
+      <b><tt><!-- template -->extract_ext(filename)<!-- /template --></tt> - <i> extracts the (last) extension of a file </i>:</b>
+    $$funcref_description$$
+        $$example:extract_ext("c:/temp/subdir/archive.tar.gz")<br>&nbsp;&nbsp;&nbsp; = [string] gz$$  <!-- /func:extract_ext -->
+    $$funcref_end$$
+    
+    $$funcref_start$$<a name="extract_complete_ext"/><!-- func:extract_complete_ext -->
+      <b><tt><!-- template -->extract_complete_ext(filename)<!-- /template --></tt> - <i> extracts all extensions of a file </i>:</b>
+    $$funcref_description$$
+        $$example:extract_complete_ext("c:/temp/subdir/archive.tar.gz")<br>&nbsp;&nbsp;&nbsp; = [string] tar.gz$$  <!-- /func:extract_complete_ext -->
+    $$funcref_end$$
+    
+    $$funcref_start$$<a name="extract_file_path"/><!-- func:extract_file_path -->
+      <b><tt><!-- template -->extract_file_path(filename)<!-- /template --></tt> - <i> extracts the path of a file </i>:</b>
+    $$funcref_description$$
+        $$example:extract_file_path("c:/temp/subdir/archive.tar.gz")<br>&nbsp;&nbsp;&nbsp; = [string] c:/temp/subdir$$  <!-- /func:extract_file_path -->
+    $$funcref_end$$
+    
+    $$funcref_start$$<a name="extract_absolute_path"/><!-- func:extract_absolute_path -->
+      <b><tt><!-- template -->extract_absolute_path(filename)<!-- /template --></tt> - <i> extracts the absolute path of a file </i>:</b>
+    $$funcref_description$$
+        $$example:extract_file_path("./temp/subdir/archive.tar.gz")<br>&nbsp;&nbsp;&nbsp; = [string] c:/temp/subdir$$  <!-- /func:extract_absolute_path -->
+    $$funcref_end$$
+    
+    $$funcref_start$$<a name="extract_absolute_file_path"/><!-- func:extract_absolute_file_path -->
+      <b><tt><!-- template -->extract_absolute_file_path(filename)<!-- /template --></tt> - <i> extracts the absolute path of a file, including the filename </i>:</b>
+    $$funcref_description$$
+        $$example:extract_absolute_file_path("./temp/subdir/archive.tar.gz")<br>&nbsp;&nbsp;&nbsp; = [string] c:/temp/subdir/archive.tar.gz$$  <!-- /func:extract_absolute_file_path -->
+    $$funcref_end$$
+    
+    $$funcref_start$$<a name="clean_string_for_filename"/><!-- func:clean_string_for_filename -->
+      <b><tt><!-- template -->clean_string_for_filename(text)<!-- /template --></tt> - <i> remove all characters from a string, which should not be used in filenames </i>:</b>
+    $$funcref_description$$
+        $$example:clean_string_for_filename("this is a %5554§/\/ strange test text")<br>&nbsp;&nbsp;&nbsp; = [string] this_is_a_5554_strange_test_text$$  
+<!-- /func:extract_absolute_file_path -->
+          <!-- /func:clean_string_for_filename -->
+    $$funcref_end$$
+  </body>
+  </html>
+  
