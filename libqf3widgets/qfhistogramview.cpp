@@ -332,11 +332,36 @@ void QFHistogramView::connectParameterWidgets(bool connectTo) {
 void QFHistogramView::readSettings(QSettings& settings, const QString& prefix) {
     connectParameterWidgets(false);
     loadSplitter(settings, splitterHistogram, prefix+"splitterhistogramSizes");
+    setBins(settings.value(prefix+QString("bins"), 50).toInt());
+    setNormalized(settings.value(prefix+QString("norm"), true).toBool());
+    setLog(settings.value(prefix+QString("log"), false).toBool());
+    setAutorange(settings.value(prefix+QString("rauto"), true).toBool());
+    chkKey->setChecked(settings.value(prefix+QString("showkey"), true).toBool());
+    cmbFitFunction->setCurrentFitFunction(settings.value(prefix+QString("distfit"), "gen_gaussian_sqrte").toString());
+    edtHistogramRelaxedRangePercent->setValue(settings.value(prefix+QString("rangepercent"), 5).toDouble());
+    edtHistogramRelaxedRangePercentUp->setValue(settings.value(prefix+QString("rangepercentup"), 5).toDouble());
+    if (chkHistogramRangeManual->isChecked()) {
+        setMin(settings.value(prefix+QString("rmin"), 0).toDouble());
+        setMax(settings.value(prefix+QString("rmax"), 10).toDouble());
+    }
     connectParameterWidgets(true);
 }
 
 void QFHistogramView::writeSettings(QSettings& settings, const QString& prefix) {
     saveSplitter(settings, splitterHistogram, prefix+"splitterhistogramSizes");
+
+    settings.setValue(prefix+QString("bins"), getBins());
+    settings.setValue(prefix+QString("norm"), getNormalized());
+    settings.setValue(prefix+QString("log"), getLog());
+    settings.setValue(prefix+QString("rauto"), getAutorange());
+    settings.setValue(prefix+QString("showkey"), chkKey->isChecked());
+    settings.setValue(prefix+QString("distfit"), cmbFitFunction->currentFitFunctionID());
+    settings.setValue(prefix+QString("rangepercent"), edtHistogramRelaxedRangePercent->value());
+    settings.setValue(prefix+QString("rangepercentup"), edtHistogramRelaxedRangePercentUp->value());
+    if (chkHistogramRangeManual->isChecked()) {
+        settings.setValue(prefix+QString("rmin"), getMin());
+        settings.setValue(prefix+QString("rmax"), getMax());
+    }
 }
 
 void QFHistogramView::writeQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)

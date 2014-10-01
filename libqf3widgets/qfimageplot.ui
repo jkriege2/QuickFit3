@@ -1,0 +1,321 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFImagePlot</class>
+ <widget class="QWidget" name="QFImagePlot">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>568</width>
+    <height>425</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Image VIew</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../lib/lib.qrc">
+    <normaloff>:/lib/dataexplorer.png</normaloff>:/lib/dataexplorer.png</iconset>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
+      <number>0</number>
+     </property>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Image</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_2" stretch="0,0,1,0">
+       <item>
+        <layout class="QFormLayout" name="formLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>range:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QWidget" name="gridWidget" native="true">
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="0" column="1">
+             <widget class="QRadioButton" name="chkRangeFull">
+              <property name="text">
+               <string>full</string>
+              </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="2">
+             <widget class="QRadioButton" name="chkRangeUser">
+              <property name="text">
+               <string>user:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="3">
+             <widget class="QFDoubleEdit" name="edtRangeMin">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="4">
+             <widget class="QLabel" name="label_2">
+              <property name="text">
+               <string>...</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="5">
+             <widget class="QFDoubleEdit" name="edtRangeMax">
+              <property name="enabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="text">
+            <string>colors:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="JKQTPMathImageColorPaletteComboBox" name="cmbCOlorbar"/>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <widget class="Line" name="line">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFPlotter" name="image" native="true"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout">
+         <item>
+          <widget class="QLabel" name="labInfo">
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="labMouse">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="tab_2">
+      <attribute name="title">
+       <string>Histogram</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="QFHistogramView" name="histogram" native="true"/>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFPlotter</class>
+   <extends>QWidget</extends>
+   <header>qfplotter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFHistogramView</class>
+   <extends>QWidget</extends>
+   <header>qfhistogramview.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
+   <slots>
+    <signal>valueChanged(double)</signal>
+    <slot>setValue(double)</slot>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPMathImageColorPaletteComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtpimagetools.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+  <include location="../lib/lib.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>chkRangeUser</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtRangeMin</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>118</x>
+     <y>42</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>179</x>
+     <y>42</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkRangeUser</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtRangeMax</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>116</x>
+     <y>49</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>398</x>
+     <y>46</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkRangeFull</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFImagePlot</receiver>
+   <slot>update_plot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>60</x>
+     <y>44</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-6</x>
+     <y>72</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkRangeUser</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFImagePlot</receiver>
+   <slot>update_plot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>128</x>
+     <y>35</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-3</x>
+     <y>45</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtRangeMin</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFImagePlot</receiver>
+   <slot>update_plot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>290</x>
+     <y>44</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-4</x>
+     <y>28</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>edtRangeMax</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFImagePlot</receiver>
+   <slot>update_plot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>520</x>
+     <y>50</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>569</x>
+     <y>54</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbCOlorbar</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFImagePlot</receiver>
+   <slot>update_plot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>528</x>
+     <y>70</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>572</x>
+     <y>80</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>update_plot()</slot>
+ </slots>
+</ui>

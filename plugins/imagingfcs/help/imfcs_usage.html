@@ -59,6 +59,8 @@ $$see:The help page on <a href="imfcs_correlator.html">theoretic description of 
   <li>The <b>"don't count"</b> alternatives are faster options. The assume that the newly selected image file has the same number of frames and other properties, as the current one. Therefore the software does not have to count the frames in the input file, which can be significantly faster, especially for TIFF files.</li>
 </ul></p>
 <p>Subsequently the plugin will read the image series properties and meta-data. Then you can set all the properties (details, <a href="#corroptions">see below</a>) defining the actions to be taken.</p>
+<p>If you activate the <b>Preview</b> button, a new window will open, which shows the first frame of the image series, that you selected.</p>
+<p>$$note:If your image data is stored as a TIFF file, it is advised to use the <b>tinyTIFF</b> image reader, since it is faster than libTIFF and can read more frames. If your file is not readablke with tinyTIFF, you will have to revert to libTIFF!$$</p>
 
 
 

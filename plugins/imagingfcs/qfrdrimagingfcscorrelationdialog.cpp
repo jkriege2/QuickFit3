@@ -36,13 +36,16 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     QDialog(parent),
     ui(new Ui::QFRDRImagingFCSCorrelationDialog)
 {
+    frame_data=NULL;
     this->pluginServices=pluginservices;
     closing=false;
     image_width=image_height=1;
     this->options=opt;
     lastImagefileDir="";
     filenameDisplayed="";
+
     ui->setupUi(this);
+
     ui->scrollAreaParams->setMaximumHeight(int(1.1*ui->widDetails->height()));
     //qDebug()<<ui->scrollAreaParams->maximumHeight()<<ui->widDetails->height()<<int(1.1*ui->widDetails->height());
     QRegExp rxv("\\s*([\\+\\-]?\\d+\\s*\\,\\s*[\\+\\-]?\\d+(\\s*;\\s*[\\+\\-]?\\d+\\s*\\,\\s*[\\+\\-]?\\d+)*)");
@@ -140,6 +143,8 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
 
 QFRDRImagingFCSCorrelationDialog::~QFRDRImagingFCSCorrelationDialog() {
     delete ui;
+    if (frame_data) qfFree(frame_data);
+    frame_data=NULL;
 }
 
 void  QFRDRImagingFCSCorrelationDialog::setEditControlsEnabled(bool enabled) {
@@ -491,6 +496,35 @@ void QFRDRImagingFCSCorrelationDialog::on_chkSeparateColorChannels_toggled(bool 
 void QFRDRImagingFCSCorrelationDialog::on_btnSimulate_clicked()
 {
     emit runSimulation();
+}
+
+void QFRDRImagingFCSCorrelationDialog::on_btnPreview_clicked()
+{
+    if (!image) {
+        image=new QFImagePlot(0, "QFRDRImagingFCSCorrelationDialog/imagePlot/");
+        image->setAttribute(Qt::WA_DeleteOnClose);
+        connect(image, SIGNAL(destroyed(QObject*)), this, SLOT(previewDestroyed(QObject*)));
+    }
+    if (image) {
+        image->show();
+        image->raise();
+        image->setImage(frame_data, image_width,image_height);
+        disconnect(ui->btnPreview, SIGNAL(toggled(bool)), this, SLOT(on_btnPreview_clicked()));
+        ui->btnPreview->setChecked(true);
+        connect(ui->btnPreview, SIGNAL(toggled(bool)), this, SLOT(on_btnPreview_clicked()));
+    } else {
+        disconnect(ui->btnPreview, SIGNAL(toggled(bool)), this, SLOT(on_btnPreview_clicked()));
+        ui->btnPreview->setChecked(false);
+        connect(ui->btnPreview, SIGNAL(toggled(bool)), this, SLOT(on_btnPreview_clicked()));
+    }
+}
+
+void QFRDRImagingFCSCorrelationDialog::previewDestroyed(QObject* object)
+{
+    disconnect(object, SIGNAL(destroyed(QObject*)), this, SLOT(previewDestroyed(QObject*)));
+    disconnect(ui->btnPreview, SIGNAL(toggled(bool)), this, SLOT(on_btnPreview_clicked()));
+    ui->btnPreview->setChecked(false);
+    connect(ui->btnPreview, SIGNAL(toggled(bool)), this, SLOT(on_btnPreview_clicked()));
 }
 
 
@@ -1108,7 +1142,7 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator(bool setS) {
     int idealS=1;
     while (idealS<200 && taumax<double(segment_length)*taumin && segment_length>0) {
         taumax=QFRDRImagingFCSCorrelationDialog_getCorrelatorProps(corrType, taumin, idealS, m, P);
-        qDebug()<<idealS<<taumax<<double(segment_length)*taumin<<taumin;
+        //qDebug()<<idealS<<taumax/1e6<<double(segment_length)*taumin/1e6<<taumin<<(taumax<double(segment_length)*taumin);
         idealS++;
     }
     if (setS) {
@@ -1122,6 +1156,7 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator(bool setS) {
 
 
 void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool countFrames) {
+
     QModernProgressDialog prg(this);
     prg.setWindowTitle(tr("imFCS: Correlator"));
     prg.setLabelText(tr("Reading image series information ... reading config file ..."));
@@ -1272,6 +1307,10 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool count
                 QApplication::processEvents();
                 image_width=reader->frameWidth();
                 image_height=reader->frameHeight();
+                if (frame_data) qfFree(frame_data);
+                frame_data=NULL;
+                frame_data=qfMallocT<double>(image_width*image_height);
+                reader->readFrameDouble(frame_data);
                 QVariant v=reader->getFileProperty("FRAMERATE");
                 if (v.canConvert(QVariant::Double) && v.toDouble()>0) {
                     frametime=1.0/v.toDouble()*1e6;
@@ -1335,6 +1374,7 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool count
     updateFrameCount();
     updateImageSize();
     updateCorrelator(true);
+    if (ui->btnPreview->isChecked()) on_btnPreview_clicked();
 }
 
 

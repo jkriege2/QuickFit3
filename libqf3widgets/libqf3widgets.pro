@@ -160,7 +160,8 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfsimpleplotwidget.h\
     qffunctionreferencetool.h \
     qfmathparserwidget.h \
-    qfmathparserwidgetsmall.h
+    qfmathparserwidgetsmall.h \
+    qfimageplot.h
 
 
 SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
@@ -259,7 +260,8 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfsimpleplotwidget.cpp \
     qffunctionreferencetool.cpp \
     qfmathparserwidget.cpp \
-    qfmathparserwidgetsmall.cpp
+    qfmathparserwidgetsmall.cpp \
+    qfimageplot.cpp
 
 
 FORMS += qf3objectiveeditor.ui \
@@ -276,7 +278,8 @@ FORMS += qf3objectiveeditor.ui \
     qfsimpleplotview.ui \
     qfsimpleplotwidget.ui \
     qfmathparserwidget.ui \
-    qfmathparserwidgetsmall.ui
+    qfmathparserwidgetsmall.ui \
+    qfimageplot.ui
 
 
 RESOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.qrc \

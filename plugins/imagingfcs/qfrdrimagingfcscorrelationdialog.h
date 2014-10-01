@@ -30,6 +30,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrdrimagingfcsseriesdialog.h"
 #include <stdint.h>
 #include "qfrdrimagingfcscorrelationjobthread.h"
+#include "qfimageplot.h"
 
 struct IMFCSJob; // forward
 namespace Ui {
@@ -89,6 +90,9 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         void on_chkSeparateColorChannels_toggled(bool value);
         void on_btnSimulate_clicked();
 
+        void on_btnPreview_clicked();
+        void previewDestroyed(QObject *object);
+
         void frameTimeChanged(double value);
         void frameRateChanged(double value);
         void updateProgress();
@@ -139,9 +143,11 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         QAction* actCropBottomCenter;
 
 
+        QPointer<QFImagePlot> image;
 
         int image_width;
         int image_height;
+        double* frame_data;
         int segment_length;
         int32_t frame_count;
         QString filenameDisplayed;

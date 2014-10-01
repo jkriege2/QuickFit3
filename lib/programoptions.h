@@ -259,22 +259,22 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
 
         static void getConfigWindowGeometry(QWidget* cb, const QString& name) {
             if (cb) {
-                saveWidgetGeometry(ProgramOptions::getInstance(), cb, name);
+                loadWidgetGeometry(ProgramOptions::getInstance(), cb, name);
             }
         }
         static void setConfigWindowGeometry(QWidget* cb, const QString& name) {
             if (cb) {
-                loadWidgetGeometry(ProgramOptions::getInstance(), cb, name);
+                saveWidgetGeometry(ProgramOptions::getInstance(), cb, name);
             }
         }
         static void getConfigQSplitter(QSplitter* cb, const QString& name) {
             if (cb) {
-                saveSplitter(*(ProgramOptions::getInstance()->getQSettings()), cb, name);
+                loadSplitter(*(ProgramOptions::getInstance()->getQSettings()), cb, name);
             }
         }
         static void setConfigQSplitter(QSplitter* cb, const QString& name) {
             if (cb) {
-                loadSplitter(*(ProgramOptions::getInstance()->getQSettings()), cb, name);
+                saveSplitter(*(ProgramOptions::getInstance()->getQSettings()), cb, name);
             }
         }
 

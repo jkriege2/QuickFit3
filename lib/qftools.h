@@ -973,7 +973,17 @@ T* duplicateArray(const T* input, long long N) {
     if (out && input && N>=0) memcpy(out, input, N*sizeof(T));
     return out;
 }
+/*! \brief duplicate a memory array, i.e. reserve the data of the array a second time using malloc() and copy the contents
+    \ingroup qf3lib_tools
 
+*/
+template <class T>
+T* qfDuplicateArray(const T* input, long long N) {
+    if (!input||N<=0) return NULL;
+    T* out=(T*)qfMalloc(N*sizeof(T));
+    if (out && input && N>=0) memcpy(out, input, N*sizeof(T));
+    return out;
+}
 /*! \brief duplicate a memory array, i.e. reserve the data of the array a second time using malloc() and copy the contents
     \ingroup qf3lib_tools
 
