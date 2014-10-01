@@ -109,10 +109,12 @@ bool QFImageReaderTinyTIFF::open(QString filename) {
             metaOK=metaOK||(!nextFrame());
             cnt++;
         }
-        reset();
+        //reset();
+        TinyTIFFReader_close(tif);
+        tif=TinyTIFFReader_open(filename.toLocal8Bit().data());
+        frame=0;
 
-
-        return true;
+        return tif;
     } else {
         tinyTIFFErrorHandler("QFImageReaderTinyTIFF", QObject::tr("error opening file '%1': %2\n").arg(filename).arg(TinyTIFFReader_getLastError(tif)));
         close();
