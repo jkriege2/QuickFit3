@@ -60,14 +60,14 @@ int main(int argc, char *argv[])
 		    std::cout<<8*sizeof(void*)<<"\n";
 		} else if (strcmp(argv[1], "--writedate")==0) {
 		    FILE* f=fopen(replace_to_system_pathseparator(argv[2]).c_str(), "w");
-			std::cout<<replace_to_system_pathseparator(argv[2])<<"\n"<<argv[2]<<"\n\n";
+			//std::cout<<replace_to_system_pathseparator(argv[2])<<"\n"<<argv[2]<<"\n\n";
 			if (f) {
 				strftime (buffer,80,"%Y/%m/%d",timeinfo);
 				fprintf(f, "#define COMPILEDATE \"%s\"\n", buffer);
-				printf("#define COMPILEDATE \"%s\"\n", buffer);
+				//printf("#define COMPILEDATE \"%s\"\n", buffer);
 				strftime (buffer,80,"%Y",timeinfo);
 				fprintf(f, "#define COMPILEDATE_YEAR \"%s\"\n", buffer);
-				printf("#define COMPILEDATE_YEAR \"%s\"\n", buffer);
+				//printf("#define COMPILEDATE_YEAR \"%s\"\n", buffer);
 				//std::cout<<buffer<<"\n";
 				fclose(f);
 			}
