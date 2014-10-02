@@ -53,17 +53,17 @@ message("COMPILE MODE: build date is: $$DATESTR")
 message("COMPILE MODE: compiler: $$COMPILERVERSION")
 message("COMPILE MODE: compiler.machine: $$COMPILERVERSION_MACHINE")
 
-
+system($$PWD$${DIR_SEPARATOR}output$${DIR_SEPARATOR}qf3infotool$${EXE_SUFFIX} --writedate $$PWD$${DIR_SEPARATOR}compiledate.h)
 
 win32 {
     system(echo $$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"  > svnversion.h )
-    system(echo $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"  > compiledate.h )
     system(echo $$LITERAL_HASH define COMPILER \"$$COMPILERVERSION (MACHINE: $$COMPILERVERSION_MACHINE)\"  > compiler.h )
 } else {
     system(echo \'$$LITERAL_HASH define SVNVERSION \"$$SVNVERSION\"\'  > svnversion.h )
-    system(echo \'$$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"\'  > compiledate.h )
     system(echo \'$$LITERAL_HASH define COMPILER \"$$COMPILERVERSION (MACHINE: $$COMPILERVERSION_MACHINE)\"\'  > compiler.h )
 }
+#    system(echo $$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"  > compiledate1.h )
+#    system(echo \'$$LITERAL_HASH define COMPILEDATE \"$$DATESTR\"\'  > compiledate1.h )
 
 
 message(AUTOVERSIONING DONE IN $$PWD)
