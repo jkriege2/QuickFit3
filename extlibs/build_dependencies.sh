@@ -744,15 +744,15 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	cd cimg
 	mkdir build
 	tar xvf ./CImg-1.5.9.tar.bz2 -C ./build/
-	cd build/
-	cp -r * ../
+	cd build/CImg-1.5.9/
+	cp -r * ../../
 	libOK=$?
 	if [ $libOK -ne 0 ] ; then		
 		libOK=-4
 	else
 		libOK=0
 	fi
-	cd ../
+	cd ../../
 	if [ $KEEP_BUILD_DIR == "n" ] ; then
 		rm -rf build
 	fi
