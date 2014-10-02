@@ -187,6 +187,7 @@ if [ "${create_deploy}" != "0" ]; then
 	rm ./*temp*.*
 	rm ./untitled*.*
 	rm ./*.a
+	rm ./*.zip
 	rm ./qf3infotool.exe
 	rm ./qf3infotool*.*
 	rm ./qf3infotool
