@@ -9,5 +9,123 @@
   <body>
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
     
+    
+    <h2>Overview</h2>
+    <p>The table plugin's main editor can be reached in the tab <b>"Data Table"</b>.
+    <center><a name="tableeditor_pic000"><img src="./pic/tableeditor_pic000.png" border="1">
+    </center>
+    The window consists of a set of tool-buttons above the main table widget. All functions (and even more, than available in the tool buttons) are accessible in the different menus of the dialog. </p>
+
+<h2>Basic Editing</h2>
+<h3>Cells</h3>
+<p>The main table allows direct editing of data in each cell. At the bottom right of each cell, the data type is specified. The data types are:
+<ul>
+    <li>f: floating-point number</li>
+    <li>i: integer number</li>
+    <li>s: string/text</li>
+    <li>b: boolean (true/false)</li>
+    <li>d: date/time</li>
+</ul> You can change the datatype of the currently selected cells with the buttons 
+<center><a name="tableeditor_pic001"><img src="./pic/tableeditor_pic001.png" border="1">
+</center>
+.$$note:This plugin (as well as the math parser) represent dates and times in the standard Unix date format, i.e. as an integer, which specifies the number of milliseconds since the 1.1.1970 00:00:00!$$
+$$note:You can only enter values of the specified datatype, so if you want to enter string, instead of numbers, you have to change the datatype first!$$ 
+    </p>
+    <p>You can start editing a cell value by double-clicking into the cell, or by simply starting to type a value. If the editor is open, you can use the up/down cursor keys to navigate up/down. The key ENTER will also navigate one cell down. The key TAB wil navigate to the next cell on the right and SHIFT+TAB to the neighboring cell on the left. $$note: TAB, SHIFT+TAB and ENTER jump to the first/last cell in the next/previous line, if you try to navigate beyound the borders of the table!$$</p>
+    <p>The contents of all currently selected cells can be deleted by pressinf DEL or with <img src=":/table/cell_clear.png">
+</p>
+
+    
+    
+    <a name="COLPROPS"><h3>Column Properties</h3>
+    <p>In addition to the cell-properties, there are also column-properties, such as the column title or a column expression. These are accessible by double-clicking the column-header. A dialog will open, which allows to specify these properties:
+
+<ul>
+    <li>column <b>title</b></li>
+    <li>a <b>comment</b> for the column</li>
+    <li>If the column represents an image, the <b>width of the image</b> in pixels. Images are represented in row-major format, which means, that the column will first contain the pixel values (left to right) of the first row, then of the second row, ... In order to decode this, the width of the image (i.e. the width of one row) has to be known.</li>
+    <li>A <b>column expression</b>. This is a <a href="mathparser.html">math expression</a>, which should evaluate to a vector of values (either string, boolen or a number). The values in the column are then taken from the resul of this expression. $$see:See <a href="tutorial_columnexpression.html">this tutorial</a> for further details.$$</li>
+</ul></p>
+
+    
+    <h3>Expressions</h3>
+    <p>The table plugin has the capability to perform calculations on the data in the table. It uses QuickFit's internal <a href="mathparser.html">math expression parser</a> for this task. Two types of expressions are available:
+<ul>
+    <li><b>Column expressions</b> (see the section on <a href="#COLPROPS">column properties</a> above), which evaluate to a vector of values and calculate the contents of a complete column</li>
+    <li><b>Cell expressions</b>, which evaluate to a single number/string/boolean and set the value of a single cell.<br>You can set the expression of a cell (or of multiple cells at the same time) by selecting the cell and clicking the button <img src=":table/formula.png">. Equivalently you can use the short cut <code>=</code>. Existing cell expressions can be edited the same way, or by clicking on the <img src=":table/formula.png"> that appears within the cell, when the cell is double-clicked. You can remove a cell or column expression by selecting the cell/column and using the function <img src=":table/formulaclear.png">.</li>
+</ul>
+Cells in which the contents is calculated by an expression have a gray background!</p>
+<p>QuickFit uses the following algorithm to evaluate the cells:
+<ol>
+    <li>evaluate all column expressions from left to right</li>
+    <li>evaluate all cell expressions</li>
+    <li>evaluate all column expressions from right to left</li>
+    <li>evaluate all cell expressions</li>
+</ol>These four steps are iterated over several times (max. 20) to ensure, that also cells, that depend on other cells have correct values. The iteration stops, if no more changes in any cell were detected, or after 20 iterations. $$note:If you generate random numbers in a cell or column, the evaluation algorithm would ALWAYS performs 20 iterations, since it always detects a change for every call of a random function. To circumvent this problem QuickFit seed the RNG of the parser with a specific seed value for every cell. These seed are still random (for every call of the evaluation algorithm), but do not change during one run of the evaluation algorithm! This function is swicthed on by default and can be switched off with the menu entry <b>Table | use single seed for reevaluations</b>$$</p>
+$$note:If you cange a single dtaa value, or a single cell or column expression, you have to reevaluate ALL expressions in the table, as there may be indirect dependencies. This can be achieved by clicking on <img src=":table/formularecalc.png">.$$
+    
+    
+    
+    
+    <h3>Changing the table size</h3>
+    <p>There are several options, that allow to change the table size:
+    <ul>
+        <li>The button <img src=":table/table_resize.png"> resizes the table to a user-definable number of columns and rows.</li>
+        <li>New column can be appended with <img src=":table/column_append.png"></li>
+        <li>New column can be inserted next to the currently selected cell with <img src=":table/column_insert.png"></li>
+        <li>New rows can be appended with <img src=":table/row_append.png"></li>
+        <li>New rows can be inserted next to the currently selected cell with <img src=":table/row_insert.png"></li>
+        <li>The selected rows/columns can be removed from the table with <img src=":table/row_delete.png"> and <img src=":table/column_delete.png"></li>
+        <li>Finally, if a column expressions returns more items, than rows in the table, the table is extended automatically.</li>
+    </ul></p>
+    
+    
+    
+    
+    <h3>Saving/Loading the Table</h3>
+    <p>You can load data from an external data file and save the table contents into such a file using the buttons <img src=":table/table_open.png"> <img src=":table/table_save.png">. The functions support several file formats (CSV, SYLK, ...) and especially QuickFit Table XML, which supports most of the properties of a table (e.g. expressions!). </p>
+
+
+
+    <h3>Table Templates</h3>
+    <p>You can also save the current table as a template (basically only the size of the table and the table properties will be stored into a file). This way you can recreate a table in another project. The template functions are located in the file menu: <b>File | load/save table template</b>.</p>
+    <p> The same can be achieved with the clipboard by using the functions <b>Table | copy/paste selected table clumn template</b>.</p>
+
+    
+    
+    <h2>Quick Statistics</h2>
+    <p>The table plugin as a QUickStatistics feature, which allows to easily calculate the statistical properties of a column and to draw histograms. To activate these two features press:
+<ul>
+    <li><img src=":table/quickstat.png"> for the QuickStatistics tool</li>
+    <li><img src=":table/quickhist.png"> for the QuickHistograms tool</li>
+</ul> In both cases a pane will open up at the bottom of the window, which contains a table with the column statistics and a plot of the column histogram. You can also select several column. Then the statistics of these columns are calculated separately and several histograms are displayed.
+
+<center><a name="tableeditor_pic002"><img src="./pic/tableeditor_pic002.png" border="1">
+<a name="tableeditor_pic003"><img src="./pic/tableeditor_pic003.png" border="1">
+</center>
+</p>
+    
+    
+    
+    <h2>Advanced Functions</h2>
+    <p>Several advanced functions exist in the menus of the table editor:
+    <ul>
+        <li><b>Table | set column values</b> opens a dialog, which allows you to generate a column of linearly or logaritmically spaced values.</li>
+        <li><b>Table | calculate histogram</b> opens a dilaog, which allows to calculate a histogram of the values in the curently selected column. 
+<center><a name="tableeditor_pic004"><img src="./pic/tableeditor_pic004.png" border="1">
+</center>You have to the possibility to choose different methods for the histogram:
+<ul>
+    <li><b>histograms</b></li>
+    <li>several different <b>kernel density estimates (KDE)</b> with different basis functions. A KDE is basically a smoothed histogram, where a narrow function is positioned at the value of each datapoint and then the functions are summed up.</li>
+</ul>
+For the histograms you can specify ranges and the number of bins, or the bin width. It is also possible to calculate cumulative histograms and to normalize the histogram (with the number of used datapoints).<br>The resulting histogram is stored in two columne (with the range centers and the histogram values) in the table
+</li>
+<li><b>Table | calculate 2D histogram</b> This function requires two columns (euither selected or choosen at the top of the window) and calculates a 2-dimensional histogram or kernel density estimate. Also here the result is stored as a column in the table. 
+<center><a name="tableeditor_pic005"><img src="./pic/tableeditor_pic005.png" border="1">
+</center>
+</li>
+<li><b>sort selected cells</b> sorts the currently selected cells, according to a user-selectable column.</li>
+    </ul></p>
+    
     </body>
 </html>

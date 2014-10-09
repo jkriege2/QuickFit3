@@ -72,6 +72,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         /** \brief write the settings */
         virtual void writeSettings();
 
+        void slExpressionSeedBeforeTableEval();
         void slAppendRow();
         void slAppendColumn();
         void slInsertRow();
@@ -173,6 +174,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actClearExpression;
         QAction* actRecalcAll;
         QAction* actSort;
+        QAction* actExpressionSeedBeforeTableEval;
 
         QAction* actCopy;
         QAction* actCut;

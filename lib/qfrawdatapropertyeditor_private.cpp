@@ -1316,9 +1316,9 @@ void QFRawDataPropertyEditor_private::setCurrent(QFRawDataRecord* c) {
 
 
         if (c) {
+            btnPreviousSameRole->setVisible(c->showNextPreviousOfSameRoleButton());
+            btnNextSameRole->setVisible(c->showNextPreviousOfSameRoleButton());
             if (c->getType()!=oldType) {
-                btnPreviousSameRole->setVisible(c->showNextPreviousOfSameRoleButton());
-                btnNextSameRole->setVisible(c->showNextPreviousOfSameRoleButton());
                 for (int i=editorList.size()-1; i>=0; i--) {
                     QFRawDataEditor* w=editorList[i];
                     if (w) {

@@ -282,6 +282,12 @@ void QFRDRTableEditor::createWidgets() {
     connect(actRecalcAll, SIGNAL(triggered()), this, SLOT(slRecalcAll()));
     connect(this, SIGNAL(enableActions(bool)), actRecalcAll, SLOT(setEnabled(bool)));
 
+    actExpressionSeedBeforeTableEval=new QAction(tr("use single seed for reevaluations"), this);
+    actExpressionSeedBeforeTableEval->setCheckable(true);
+    actExpressionSeedBeforeTableEval->setChecked(true);
+    connect(actExpressionSeedBeforeTableEval, SIGNAL(triggered()), this, SLOT(slExpressionSeedBeforeTableEval()));
+    connect(this, SIGNAL(enableActions(bool)), actExpressionSeedBeforeTableEval, SLOT(setEnabled(bool)));
+
     actHistogram=new QAction(QIcon(":/table/histogram.png"), tr("calculate histogramn"), this);
     actHistogram->setToolTip(tr("calculate and insert histograms of the selected columns"));
     actHistogram->setVisible(true);
@@ -383,6 +389,8 @@ void QFRDRTableEditor::createWidgets() {
     tvMain->addAction(actCalcCell);
     tvMain->addAction(actClearExpression);
     tvMain->addAction(actRecalcAll);
+    tvMain->addAction(actExpressionSeedBeforeTableEval);
+    tvMain->addAction(getSeparatorAction(this));
     tvMain->addAction(actHistogram);
     tvMain->addAction(actHistogram2D);
     tvMain->addAction(actSort);
@@ -480,6 +488,7 @@ void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord*
     //std::cout<<m<<" ... ";
     //if (m) std::cout<<m->model()<<" ... ";
     if (m && m->model()) {
+        actExpressionSeedBeforeTableEval->setChecked(m->getQFProperty("actExpressionSeedBeforeTableEval", true).toBool());
         tvMain->setModel(m->model());
         connect(m->model(), SIGNAL(notReadonlyChanged(bool)), this, SLOT(setActionsEnabled(bool)));
         connect(tvMain->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(slEditColumnProperties(int)));
@@ -511,6 +520,13 @@ void QFRDRTableEditor::writeSettings() {
     if (settings) {
         settings->getQSettings()->setValue("rawtableeditor/currentTableDir", currentTableDir);
         settings->getQSettings()->sync();
+    }
+}
+
+void QFRDRTableEditor::slExpressionSeedBeforeTableEval()
+{
+    if (current) {
+        current->setQFProperty("actExpressionSeedBeforeTableEval", actExpressionSeedBeforeTableEval->isChecked(), false, false);
     }
 }
 
@@ -1381,6 +1397,12 @@ void QFRDRTableEditor::slRecalcAll()
 
             bool ok=true;
             QFMathParser mp, mpColumns; // instanciate
+            uint32_t seed1=mp.get_rng()->randInt();
+            uint32_t seed2=mp.get_rng()->randInt();
+            if (actExpressionSeedBeforeTableEval->isChecked()) {
+                mp.get_rng()->seed(seed1);
+                mpColumns.get_rng()->seed(seed2);
+            }
             addQFRDRTableFunctions(&mp);
             addQFRDRTableFunctions(&mpColumns, NULL, true);
             mp.addVariableDouble("row", 1);
@@ -1415,8 +1437,13 @@ void QFRDRTableEditor::slRecalcAll()
                 }
 
 
+
+
                 //for (int i=0; i<m->model()->columnCount(); i++) {
                 if (m->model()->columnCount()>0) while (i!=itend) {
+                    if (actExpressionSeedBeforeTableEval->isChecked()) {
+                        mpColumns.get_rng()->seed(seed2+i);
+                    }
                     QString lexp=m->model()->getColumnHeaderData(i, QFRDRTable::ColumnExpressionRole).toString();
                     if (!lexp.isEmpty()) {
                         QVariantList ov=m->model()->getColumnData(i, Qt::DisplayRole);
@@ -1438,6 +1465,7 @@ void QFRDRTableEditor::slRecalcAll()
                             if (ok) {
                                 //qDebug()<<"     reeval4 col("<<i<<ov.size()<<")";
                                 mpColumns.resetErrors();
+
                                 QVariantList nv=evaluateExpression(mpColumns, cnodes[lexp], m->model()->index(0,i), &ok, lexp, true).toList();
                                 //qDebug()<<"     reeval5 col("<<i<<n.size()<<")\n        <= "<<ok<<nv.size();
                                 bool equalWithVariant=true;
@@ -1489,6 +1517,9 @@ void QFRDRTableEditor::slRecalcAll()
 
                 // evaluate cell expressions
                 for (int i=0; i<idxs.size(); i++) {
+                    if (actExpressionSeedBeforeTableEval->isChecked()) {
+                        mp.get_rng()->seed(seed1+i);
+                    }
                     QString lexp=exprs.value(i, "");//m->model()->cellUserRole(QFRDRTable::TableExpressionRole, idxs[i].row(), idxs[i].column()).toString();
                     if (!lexp.isEmpty()) {
                         QVariant ov=m->model()->cell(idxs[i].row(), idxs[i].column());
