@@ -9,14 +9,17 @@
   <body>
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
     <h2>Expression Parser</h2>
-    The expression parser uses a standard syntax for math expressions, which is defined in <a href="$$mainhelpdir$$mathparser.html">expression parser docuemntation.</a>
+    $$see:The expression parser uses a standard syntax for math expressions, which is defined in <a href="$$mainhelpdir$$mathparser.html">expression parser documentation.</a>$$
+    <p>The table plugin uses the internal expression parser to perform cell-centered and column-centered calculations. Details on how these calculations/expressions can be inserted into a table can be found in <a href="tableeditor.html">this help page</a>.</p>
 
     <h2>Function Reference</h2>
+    <p>The funcion parser in the table plugin supports all standard functionsof QuickFit's internal math parser (see list below). In addition some special functions are defined, that allow to access the data from the current table directly.
     <ul>
       <li><b><a href="./parserreference/dataaccess.html">data access functions</a></b></li>
       <li><b><a href="./parserreference/columnstatistics.html">column statistcis functions</a></b></li>
       <li><b><a href="./parserreference/rowstatistics.html">row statistcis functions</a></b></li>      
+    </ul>Standard functions:<ul>
       $$insertglobal:parseref.inc$$
-    </ul>
+    </ul></p>
   </body>
 </html>

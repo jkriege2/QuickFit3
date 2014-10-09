@@ -3716,7 +3716,7 @@ void QFRDRImagingFCSImageEditor::replotData() {
 
             for (int ri=0; ri<lst.size(); ri++) {
                 if (lst[ri] && w==lst[ri]->getImageFromRunsWidth() && h==lst[ri]->getImageFromRunsHeight()) {
-                    QColor col=getCycleColor(ri, 2*lst.size()-1);
+                    QColor col=getCycleColor(ri, 2*lst.size()-1, 1,1);
                     col.setAlphaF(1);
                     col=col.darker();
                     if (selected.size()==1) {

@@ -41,6 +41,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QNetworkRequest>
 #include <QNetworkProxy>
 #include "qflistprogressdialog.h"
+#include "qfimporterimageseries.h"
+#include "qftcspcreader.h"
 
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
@@ -3778,6 +3780,58 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                 QString icon=QFPluginServices::getInstance()->getImporterManager()->getIconFilename(id);
                                 QFImporter* a=j.value();
                                 if (a) {
+                                    name=a->formatName();
+                                    dir=dir=QFPluginServices::getInstance()->getImporterManager()->getPluginHelp(id, j.key());
+                                    delete a;
+                                    if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
+                                    else text+=item_template_nolink.arg(icon).arg(name);
+                                }
+                            }
+
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                        }
+                    } else if (list=="imageseriesimporters") {
+                        QString text="";
+                        QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+                        QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
+                        // gather information about plugins
+                            QMap<QString, QFImporter*> models= QFPluginServices::getInstance()->getImporterManager()->createImporters<QFImporter*>(filter);
+                            QMapIterator<QString, QFImporter*> j(models);
+                            while (j.hasNext()) {
+                                j.next();
+                                int id=QFPluginServices::getInstance()->getImporterManager()->getPluginForID(j.key());
+                                QString dir=QFPluginServices::getInstance()->getImporterManager()->getPluginHelp(id);
+                                QString name=QFPluginServices::getInstance()->getImporterManager()->getName(id);
+                                QString icon=QFPluginServices::getInstance()->getImporterManager()->getIconFilename(id);
+                                QFImporter* a=j.value();
+                                if (a && dynamic_cast<QFImporterImageSeries*>(a)) {
+                                    name=a->formatName();
+                                    dir=dir=QFPluginServices::getInstance()->getImporterManager()->getPluginHelp(id, j.key());
+                                    delete a;
+                                    if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
+                                    else text+=item_template_nolink.arg(icon).arg(name);
+                                }
+                            }
+
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                        }
+                    } else if (list=="tcspcimporters") {
+                        QString text="";
+                        QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+                        QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
+                        // gather information about plugins
+                            QMap<QString, QFImporter*> models= QFPluginServices::getInstance()->getImporterManager()->createImporters<QFImporter*>(filter);
+                            QMapIterator<QString, QFImporter*> j(models);
+                            while (j.hasNext()) {
+                                j.next();
+                                int id=QFPluginServices::getInstance()->getImporterManager()->getPluginForID(j.key());
+                                QString dir=QFPluginServices::getInstance()->getImporterManager()->getPluginHelp(id);
+                                QString name=QFPluginServices::getInstance()->getImporterManager()->getName(id);
+                                QString icon=QFPluginServices::getInstance()->getImporterManager()->getIconFilename(id);
+                                QFImporter* a=j.value();
+                                if (a && dynamic_cast<QFTCSPCReader*>(a)) {
                                     name=a->formatName();
                                     dir=dir=QFPluginServices::getInstance()->getImporterManager()->getPluginHelp(id, j.key());
                                     delete a;

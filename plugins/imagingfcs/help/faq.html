@@ -21,6 +21,11 @@ $$faq_answer$$
   The help page <a href="imfcs_usage.html#correlating">Correlating imFCS data</a> and the tutorials <a href="tutorial_solution.html">imFCS analysis of beads in solution</a> and <a href="tutorial_cell.html">imFCS analysis in a cell</a> give a step-by-step introduction to this task.
 $$faq_end$$
      
+     $$faq_start$$
+       <a name="FAQ_IMAGESTACK_DATAFORMATS"><b>Which image stack data formats are supported by QuickFit?</b>
+     $$faq_answer$$
+       QuickFit supports all image stack data formats, for which a reader plugin is installed. The most common formats are: <b>uncompressed multi-frame TIFFs</b>, as they can be exported from most microscope control software packages.<br>Your QuickFit installation has these image imprter plugins installed:$$list:imageseriesimporters:$$
+     $$faq_end$$
          
 $$faq_start$$
   <a name="FAQ_SIMULATE"><b>Can I simulate an imFCS/imFCCS experiment?</b>
@@ -34,7 +39,11 @@ $$faq_start$$
 $$faq_answer$$
   In imFCCS experiments, several auto- and cross-correlation curves exist for every pixel in the measurement (e.g. two auto- [ACF0,ACF1] and one two-color cross-correlation [CCF/DCCF/FCCS] curves). QuickFit generates one raw data record (RDR) for each of these curves (all in the same RDR group) and an imFCCS global fit may recognize these several records and fit them all together. If you open the FCCS record (i.e. the RDR editor by double-clicking it in the project tree), you can choose the <b>FCCS display</b> mode:
 <center><a name="faq_pic000"><img src="./pic/faq_pic000.png" border="1"></center>
-in which also the auto-correlation functions are displayed in the correlation fucntion plot on the lhs.
+This mode is suitable for 2-color FCCS data, since it will display the autocorrelation curves ACF0 (green), ACF1 (red) and the cross-correlation curve FCCS (blue) for each pixel in the correlation fucntion plot on the lhs. In addition you can provide a cross-talk and QuickFit will display crosstalk-corrected correlation amplitudes as lines in the plots and as number in the parameter panel on the rhs of the dialog (see screenshot above!).
+<center><a name="faq_pic002"><img src="./pic/faq_pic002.png" border="1">
+</center>
+<br>For 2-pixel cross-correlation data (also often called distance cross-correlation data), you can choose the <b>DCCF mode</b>, which is more general than the FCCS mode. It displays for each pixel all correlation curves in the currenzt group, but it lacks the possibility to calculate cross-talk corrected CF amplitudes, since this does not make sense in all settings.
+<center><a name="faq_pic001"><img src="./pic/faq_pic001.png" border="1"></center>
 $$faq_end$$
      
      

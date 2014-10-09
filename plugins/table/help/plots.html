@@ -9,21 +9,196 @@
   </head>
   <body>
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-	<h2>Plots</h2>
-	<p>This plugin provides several plotting capabilities for data from the table in the "Plots" tab of the raw data record editor window. First you will have to add a new plot by clicking <img src=":/table/plot_add.png">. Then you can add graphs to this plot. If you created several plots these will be shown as a set of tabs that can also be delete using <img src=":/table/plot_delete.png"> or by clicking the "X" symbol inside the plot's tab.</p>
-	<p>For each plot the window will be split in two halfs (that can be resized by grabbing the separating line with the mouse). On the left you will see the plot itself together with some buttons to save/print/copy the data and the graphis. On the rhs two tabs "Plots" and "System" allow to add graphs to the plot and to change its overall appearance</p>
-	<p>The <b>"System"</b> tab contains several options for the coordinate system and axis properties:<ul>
-	  <li>Plot title and axis labels may be set freely. You can use a <a href="$$mainhelpdir$$jkqtmathtext.html">subset of LaTeX</a> in these to render mathematical expressions.</li>
-	  <li>Axis ranges can either be set by hand or using the two autorange buttons (after plots have been added). If an Autorange button is used, the plot range will be adjusted, so all plots are displayed completely on the graph. So the ranges are a bit larger than the actual datarange.</li>
-	  <li>It is possibly to scale both axes logarithmically (decadic logarithm).</li>
-	  <li>The grid may be switched on or off</li>
-	  <li>The plot may contain a key (usually in the top right corner). For this ky you may choose the position, whether it is displayed at all and several other appearence options.</li>
-	  <li>The plot uses the same font family for all texts (except if you use e.g. \rm or \sf in labels), only the sizes may be set separately for different types of labels.</li>
-	</ul></p>
-	<p>In the <b>"Plots"</b> you may add to or remove plots from the list of graphs using the buttons above the list. Below the list you can specify options for each graph:<ul>
-	  <li>Each graph has a type (lines, bars, image, ...) and a title which is displayed in the key. </li>
-	  <li>Depending on the type of plot you may choose up to four columns (X data and error, Y data and error) from which to take the data for the plot. You may also use only a subset of datapoints from the colmun(s) by a method called "striding". If this is activated, the graph will use the row "strid start" as first data element and then only every stride-th row from the column. So if start=1 and stride=2 the plot will only show the data from rows 1,3,5,7,... For start=2 and stride=3 the used rows are 2,5,8,...</li>
-	  <li>For image plots you have to specify the width of the image in pixels. The height of the image in pixels is then the number of rows in the selected column divided by the width (integer division!). Here is an example of a column containing 30 rows. with an image width of 10, the resulting image will be 10 pixels wide and 3 pixels high, with the ordering as given here:<blockquote>
+    <h2>Basic Plot User Interface</h2>
+    <center><a name="plots_pic000"><img src="./pic/plots_pic000.png" border="1">
+</center>
+    <p>This plugin provides several plotting capabilities for data from the table in the "Plots" tab of the raw data record editor window. First you will have to add a new plot by clicking <img src=":/table/plot_add.png">. Then you can add graphs to this plot. If you created several plots these will be shown as a set of tabs that can also be delete using <img src=":/table/plot_delete.png"> or by clicking the "X" symbol inside the plot's tab.</p>
+    <p>For each plot the window will be split in two halfs (that can be resized by grabbing the separating line with the mouse). On the left you will see the plot itself together with some buttons to save/print/copy the data and the graphis. On the rhs two tabs "Plots" and "System" allow to add graphs to the plot and to change its overall appearance</p>
+
+
+
+
+
+
+<h2>Coordinate System settings</h2>
+
+<center><a name="plots_pic002"><img src="./pic/plots_pic002.png" border="1">
+</center>
+
+    <p>The <b>"System"</b> tab contains several options for the coordinate system and axis properties. They are split within several sub-tabs.</p>
+    
+    
+    <h3>Plot Settings</h3>
+    <center><a name="plots_pic001"><img src="./pic/plots_pic001.png" border="1">
+</center>
+    <p>
+    <ul>
+        <li><b>title</b>: the plot title, displayed above the plot, if "show" is actiavted. This title is also displayed in the tab of the plot. You can use <a href="$$qf_ui_latex_helpfile$$">LaTeX markup</a> in this field. Here is an example of the plot title "plot of $f(x)=a_1\cdot x^2$":
+<center><a name="plots_pic017"><img src="./pic/plots_pic017.png" border="1">
+</center>
+</li>
+        <li><b>title font size</b>: font size for the title. The general font (see below) is used to typseset the title</li>
+        <li><b>background</b>: background color of the plot</li>
+        <li><b>aspect ratio</b>: allows to force a certain aspect ratio on the axes and the data:
+        <ul>
+            <li>the <b>data aspect ratio</b> $$math:r_{data}$$ ensures, that each 1x1- is displayed as a rectangle with a width, which is $$math:r_{data}$$ as large as its hieght. Here are three examples for $$math:r_{data}=0.5$$, $$math:r_{data}=1$$ and $$math:r_{data}=3$$.
+<center><a name="plots_pic008"><img src="./pic/plots_pic007.png" border="1"><a name="plots_pic008"><img src="./pic/plots_pic008.png" border="1"><a name="plots_pic009"><img src="./pic/plots_pic009.png" border="1">
+</center>
+
+This function is useful to ensure, that e.g. pixels in an image are displayed as a square ($$math:r_{data}=1$$).</li>
+            <li>The <b>axis aspect ratio</b> ensures, that the axes ranges represent a fixed ration $$math:r_{axis}=\frac{xmax-xmin}{ymax-ymin}$$.</li>
+        </ul>$$note:To ensure, that an image of size 100x100 pixels and square pixels is displayed as such and in a square plot, you will have to set both ratios to 1 and activate both!$$</li>
+        <li><b>font</b>: This is the font used for al labels in the plot</li>
+        <li><b>plot size</b>: If <b>autosize</b> is deactvated, the plot is resized to fill the available space on the screen. When exporting (e.g. to a PDF) or printing the plot, QuickFit will calculate the true plot size, based on the reolution of the screen and the plot will also appear, as on the screen. If you want to ensure a certain size of the plot (in millimeters), e.g. to prepare a graph for a publication, you can deactivate <b>autosize</b> and set the desired plot size below. $$note: If the plot appears too smal on the screen, you can magnify the view using the zoom control above the plot:<a name="plots_pic010"><img src="./pic/plots_pic010.png" border="1">$$</li>
+    </ul></p>
+    
+    
+    
+    <h3>Axes</h3>
+    <center><a name="plots_pic004"><img src="./pic/plots_pic004.png" border="1">
+    </center>
+    In this tab, you can specify the properties/appearance of the plot axes. One tab exists for every axis in the plot (e.g. x, y).
+    <p><ul>
+        <li><b>label</b>: The axis label. You can use <a href="$$qf_ui_latex_helpfile$$">LaTeX markup</a> in this field. The position of the axis label (left/center/right) can also be specified. THe following examples show the label "position $\xi_2$ [mm]" in the three positions left, center and right:
+<center><a name="plots_pic012"><img src="./pic/plots_pic012.png" border="1"><a name="plots_pic011"><img src="./pic/plots_pic011.png" border="1"><a name="plots_pic013"><img src="./pic/plots_pic013.png" border="1"></center>And the same settings for the y-axis, where left/center/right translates to bottom/center/top:
+<center><a name="plots_pic014"><img src="./pic/plots_pic014.png" border="1"><a name="plots_pic015"><img src="./pic/plots_pic015.png" border="1"><a name="plots_pic016"><img src="./pic/plots_pic016.png" border="1">
+</center>
+
+        <li><b>range</b>: here you can specify the axis range (minimum ... maximu) and set the axis mode to <b>log-scale</b>. It is also possible to autoscale the plot with the button "<b>autoscale</b>" (or "<b>autoscale XY</b>" for a simultaneous autoscale of both axes). Then QuickFit will set the axis range, so that all data points of all plots are shown. Here are two examples of linear and logarithmic axes for the range of 1..1000:
+<center><a name="plots_pic018"><img src="./pic/plots_pic018.png" border="1">
+<a name="plots_pic019"><img src="./pic/plots_pic019.png" border="1"></center>
+</li>
+        <li><b>ticks</b>: Here you can set the appearance of the axis ticks. The first two comboboxes allow to set, what type of axis should be drawn on the bottom and on the top (x-axis) or left and right (y-axis) of the plot:
+        <ul>
+            <li><b>complete</b> is an axis with ticks and labels <i>This is the default setting for bottom or left axes.</i>
+            <center><a name="plots_pic020"><img src="./pic/plots_pic020.png" border="1">
+            </center>
+            </li>
+            <li><b>tick+lab.</b> is an axis with ticks and tick-labels, but without axis label
+            <center><a name="plots_pic021"><img src="./pic/plots_pic021.png" border="1">
+            </center>
+            </li>
+            <li><b>tick</b> is an axis with ticks, but without tick or axis labels
+            <center><a name="plots_pic022"><img src="./pic/plots_pic022.png" border="1">
+            </center>
+            </li>
+            <li><b>line</b> only displays a line, that limits the plot. <i>This is the default setting for right or top axes.</i>
+            <center><a name="plots_pic023"><img src="./pic/plots_pic023.png" border="1">
+            </center>
+            </li>
+            <li><b>none</b> this does not even plot a line
+            <center><a name="plots_pic024"><img src="./pic/plots_pic024.png" border="1">
+            </center>
+            </li>
+        </ul>In the third combobox you can specify, how the axis ticks should be plotted:
+        <ul>
+            <li><b>exponent</b> <i>(the default)</i> displays numbers in the exponential form
+            <center><a name="plots_pic026"><img src="./pic/plots_pic025.png" border="1">
+            </center>
+            As you can see in the example, the number is limited to a given number of significant digits (entered in the input field "digits" on the right of the combobox). This number of digits is also used to decide, whether the number is written with or without an exponent.</li>
+            <li><b>default</b> displays the number as a floating point number with the specified number of digits:
+            <center><a name="plots_pic026"><img src="./pic/plots_pic026.png" border="1">
+            </center>
+            </li>
+            <li><b>character</b> uses the standard characters (f, p, n, µ, m, k, M, G) to specify the exponent of the number:
+            <center><a name="plots_pic027"><img src="./pic/plots_pic027.png" border="1">
+            </center>
+            </li>
+            <li><b>time/date/datetime</b> displays the tick labels as dates, times, or both.
+            <center><a name="plots_pic028"><img src="./pic/plots_pic028.png" border="1">
+            </center>
+            <center><a name="plots_pic029"><img src="./pic/plots_pic029.png" border="1">
+            </center>
+            <center><a name="plots_pic030"><img src="./pic/plots_pic030.png" border="1">
+            </center>
+            $$note: dates and times are represented as the number of milliseconds since the 1.1.1970 00:00:00 (Unix time!).$$
+            </li>
+        </ul>Finally you can specify the tick spacing:
+        <ul>
+            <li>If <b>min #ticks/#minor ticks</b> is activated, you can specify the minimum number of ticks, that QuickFit should display within the given axis range. The plugin will then choose the tick spacing (using an internal algorithm) so, that this requirement is met. In linear mode, this algorithm uses spacings, that are multiples of 1, 2, 2.5, 5. This algorithm works for both linear and logarithmic axes.</li>
+            <li>If <b>min #ticks/#minor ticks</b> is deactivated, you can specify the tick spacing directly. THe numbering starts at 0, so if you enter a spacing of 10, you will end up with axis ticks at 0, 10, 20, 30, ... or whatever of this series fits into your axis range.</li>
+        </ul>The minor ticks are always given as the number of ticks between two major ticks. The default is 1:
+        <center><a name="plots_pic033"><img src="./pic/plots_pic033.png" border="1"></center>Especially for logarithmic axes, a choice of 9 might be useful:
+<center><a name="plots_pic034"><img src="./pic/plots_pic034.png" border="1">
+</center>
+<center><a name="plots_pic035"><img src="./pic/plots_pic035.png" border="1">
+</center>
+
+</li>
+        <li><b>named ticks</b>: You can also generate an axis with user specified axis ticks. For that, you have to add two columns to the table. One, which specifies the location of the tick and one with the labe, that should be displayed in the tick. The select these two column in the given comboboxes. Here is an example:
+<center><a name="plots_pic032"><img src="./pic/plots_pic032.png" border="1"><a name="plots_pic031"><img src="./pic/plots_pic031.png" border="1">
+</center>
+
+</li>
+        <li><b>tick sizes</b>: Here you can specify the width, inside and outside lengths of the mino and major ticks.</li>
+        <li><b>show 0-axis</b>: if activated, the plot will contain a thick line through 0 (i.e. perpendicular to the axis). Here are two examples with and without the 0-axes:
+<center><a name="plots_pic036"><img src="./pic/plots_pic036.png" border="1">
+<a name="plots_pic037"><img src="./pic/plots_pic037.png" border="1"></center>
+</li>
+        <li><b>invert axis</b>: reverses the axis, so the range 0..100 is actually a range 100..0</li>
+        <li><b>font sizes</b>: sets the font sizes used to draw the axis tick labels and the axis labels.</li>
+    </ul></p>
+    
+    
+    
+    <h3>Key</h3>
+    <center><a name="plots_pic005"><img src="./pic/plots_pic005.png" border="1">
+    </center>
+    <p>Grid lines are always drawn perpendicular to the two axis at the positions of the major axis ticks.<ul>
+        <li><b>show grid</b>: switches the grid on and off< (for both axes!)/li>
+        <li><b>line width</b>: line width of the grid lines</li>
+        <li><b>grid color</b>: color of the grid lines</li>
+        <li><b>grid style</b>: style of the grid lines (solid, dashed, dotted, ...)</li>
+    </ul></p>
+    
+    
+    
+    
+    <h3>Key/Legend</h3>
+    <center><a name="plots_pic006"><img src="./pic/plots_pic006.png" border="1">
+    </center>
+    
+    <p>This plugin may add a key/lgened to the graph, which contains an entry for all graphs with a visible title!<ul>
+        <li><b>visible</b>: switches the key on or off.</li>
+        <li><b>background color</b>: background color of the key</li>
+        <li><b>transparency</b>: allows to make the key box (i.e. only the background!) translucent</li>
+        <li><b>box</b>: allows to specify, whether a solid rectangle is drawn around the key and if so, in which color and width</li>
+        <li><b>layout</b>: specifies the layout (one or multiple columns) of the key</li>
+        <li><b>font size</b>: font size of the key entries</li>
+        <li><b>margin</b>: margin between the key box and the entries</li>
+        <li><b>separation</b>: separation between lines and columns in the key</li>
+        <li><b>position</b>: position of the key</li>
+        <li><b>offset</b>: offset of the key from the location, specified in position</li>
+        <li><b>symbol width</b>: width of the graph symbol, that is displayed next to the graph name.</li>
+    </ul></p>
+    
+    
+    
+    <h3>Saving/Loading Axis settings</h3>
+    <p>You can use the two buttons <a name="plots_pic038"><img src="./pic/plots_pic038.png" border="1"> at the top of the system tab to store the current settings to a file and reload them later for another plot.</p>
+    
+
+
+
+
+
+
+
+
+<h2>Graphs</h2>    
+<center><a name="plots_pic003"><img src="./pic/plots_pic003.png" border="1">
+</center>
+
+
+<h3>Basic Graph Properties</h3>
+
+    <p>In the <b>"Graphs"</b> you may add to or remove graphs from the list of graphs using the buttons above the list. Below the list you can specify options for each graph:<ul>
+      <li>Each graph has a type (lines, bars, image, ...) and a title which is displayed in the key (if the checkbox <b>show</b> next to the label edit widget is activated). </li>
+      <li>Depending on the type of plot you may choose up to four columns (X data and error, Y data and error) from which to take the data for the plot. </li>
+      <li>Error may either be symmetric (e.g. if obtained from the standard deviation) or asymmetric (e.g. if the 25% and 75% quartiles are used for the error bars). In the first case, the error bars span the range $$math:x-\sigma...x+\sigma$$, where $$math:\sigma$$ is the symmetric error and x is the position of the data point. In the second case, the error bars span the range $$math:x-\sigma_L...x+\sigma_U$$, where $$math:\sigma_L$$ and $$math:\sigma_U$$ are the lower and upper errors.</li>
+      <li>You may also use only a subset of datapoints from the colmun(s) by a method called "striding". If this is activated, the graph will use the row "<b>stride start</b>" as first data element and then only every <b>stride</b>-th row from the column. So if start=1 and stride=2 the plot will only show the data from rows 1,3,5,7,... For start=2 and stride=3 the used rows are 2,5,8,...</li>
+      <li>A second option to select a subset of data is the <b>select data</b> function. Here you can specify a column and a condition on the values in that column. The plugin the goes through all rows of the test-column and checks, whether the specified condition applied. If so, the datapoints from the other columns, which are specified for the plot, are used. In a simple example, you can specify the X-data column as test-column and the filter "in range" -2 ... 2. Then only thise datapoints are plotted, where the x-value is in the range -2...2.</li>
+      <li>For image plots you have to specify the width of the image in pixels. The height of the image in pixels is then the number of rows in the selected column divided by the width (integer division!). Here is an example of a column containing 30 rows. with an image width of 10, the resulting image will be 10 pixels wide and 3 pixels high, with the ordering as given here:<blockquote>
 <pre>
 +--------+
 | row 1  | +
@@ -38,11 +213,130 @@
 | row 30 |       +
 +--------+
 </pre></blockquote>Then you can position the image and set its size in system coordinates (x, y, image width, image height). For image plot you may also select a colorscale and format the colorbar and a value range on which to scale the colors. For mask image plots, you may specify two colors for true (!=0) and false (equal 0). the bar label will be used as a label for the color bar axis, so do not confuse with the graph title.</li>
-	  <li>For non-image plots several options exist to set the plot appearance. Depending on the plot type you may select plot symbols (and their size) whether to draw a line between the data points (and its style), how to fill the plot and how to draw error bars (as bars, lines, polygons etc.)</li>
-	  <li>The plot type "function" is special: It does not rely on data in a column, but plots a user-specifyable function. You may use all simple math functions (except table functions of course) of the <a href="$$mainhelpdir$$mathparser.html">parser</a>, also used for table cell calculations. These functions and constants are available:<small><ul>$$insertglobal:paerserref.inc$$</ul></small></li>
-	</ul></p>
-	<p></p>
-	<p></p>
-	
-	</body>
+      <li>For non-image plots several options exist to set the plot appearance. Depending on the plot type you may select plot symbols (and their size) whether to draw a line between the data points (and its style), how to fill the plot and how to draw error bars (as bars, lines, polygons etc.)</li>
+      <!--<li>The plot type "function" is special: It does not rely on data in a column, but plots a user-specifyable function. You may use all simple math functions (except table functions of course) of the <a href="$$mainhelpdir$$mathparser.html">parser</a>, also used for table cell calculations. These functions and constants are available:<small><ul>$$insertglobal:paerserref.inc$$</ul></small></li>-->
+    </ul></p>
+    <p></p>
+    <p></p>
+    
+    
+    
+    
+    <h3>Graph Types and Advanced Properties</h3>
+    
+    
+    <h4>line/scatter plots</h4>
+    <p>These are simple plots of data X vs. Y. You can specify how the data points are drawn, whether a line is shown and a sytle for the error bars. Here is an example with standard error bars and no connecting lines, as well as with error polygons and line, but without symbols:
+<center><a name="plots_pic040"><img src="./pic/plots_pic040.png" border="1"><a name="plots_pic043"><img src="./pic/plots_pic043.png" border="1"></center></p>
+    
+    
+    
+    <h4>parametr. scatter plot</h4>
+    <p>This is an advanced scatter plot, which allows to set the color and/or size of each symbol according to a column of data. This ways you can generate bubble plots. The color is picekd from a user-specifyable color palette. The symbol size is specified in points (pt!!!). Here are two examples:
+<center><a name="plots_pic041"><img src="./pic/plots_pic041.png" border="1"><a name="plots_pic042"><img src="./pic/plots_pic042.png" border="1"></center></p>
+    
+    
+    
+    <h4>Function Plot</h4>
+    <p>This is like a line plot, but plots a user-specified function. You may use all simple math functions (except table functions of course) of the <a href="$$mainhelpdir$$mathparser.html">parser</a>, also used for table cell calculations. These functions and constants are available:<small><ul>$$insertglobal:paerserref.inc$$</ul></small>You can also choose to plot one of the internal fit functions, specified in QuickFit. Then you have to specify the function parameters in a table.<br>This plot uses an adaptive algorithm to determine the points on which the function should be evaluated.</p>
+    
+    
+    
+    <h4>Vertical Impulses</h4>
+    <p>
+    <center><a name="plots_pic044"><img src="./pic/plots_pic044.png" border="1">
+    </center>
+    </p>
+    
+    
+    <h4>Horizontal Impulses</h4>
+    <p>
+    <center><a name="plots_pic045"><img src="./pic/plots_pic045.png" border="1">
+    </center>
+    </p>
+    
+     
+    
+    <h4>Vertical Steps</h4>
+    <p>
+    <center><a name="plots_pic050"><img src="./pic/plots_pic050.png" border="1">
+    </center>
+    </p>
+  
+    
+    <h4>Horizontal Steps</h4>
+    <p>
+    <center><a name="plots_pic047"><img src="./pic/plots_pic047.png" border="1">
+    </center>
+    </p>
+    
+    <h4>Vertical Bars</h4>
+    <p>
+    <center><a name="plots_pic051"><img src="./pic/plots_pic051.png" border="1">
+    </center>
+    </p>
+  
+    
+    <h4>Horizontal Bars</h4>
+    <p>
+    <center><a name="plots_pic048"><img src="./pic/plots_pic048.png" border="1">
+    </center>
+    
+    </p>
+    
+    
+    <h4>Filled Curve X</h4>
+    <p>
+    <center><a name="plots_pic049"><img src="./pic/plots_pic049.png" border="1">
+    </center>
+    </p>
+    
+   
+    
+    <h4>Filled Curve Y</h4>
+    <p>
+    <center><a name="plots_pic046"><img src="./pic/plots_pic046.png" border="1">
+    </center>
+    </p>
+    
+    
+    
+    <h4>Vertical Boxplots</h4>
+    <p>
+    
+    <center><a name="plots_pic052"><img src="./pic/boxplot.png" border="1">
+    </center>
+    </p>
+    
+      
+    
+    <h4>Horizontal Boxplots</h4>
+    <p>
+    <center><a name="plots_pic052"><img src="./pic/boxplot.png" border="1">
+    </center></p>
+    
+      
+      
+      <h4>Image</h4>
+      <p>An image plot, where the pixels are colored from a given color palette.</p>
+      
+      
+      
+      <h4>RGB image</h4>
+      <p>An image with up to three color channels (RGB or CMY coloring).</p>
+      
+      
+      <h4>Mask</h4>
+      <p>A plot of a boolean image, where true/false pixels are colored with one of two colors. The pixels may also be transparent, then the plot can be used to mask pixels, which you want to hide from an image plot, which lies below.</p>
+      
+    
+    <h3>Data Fitting</h3>
+    <p>The table plugin supports also data fitting. To activate this function, you first have to specify a graph, with the x- and y-columns (and possible errors on y). The you can use the buttons <a name="plots_pic039"><img src="./pic/plots_pic039.png" border="1"> at the bottom of the advanced graph properties to perform the fits. You can either to full non-linear least-squares fitting of arbitrary fit functions, or a simple (linear or non-linear) regression. Details can be found here:
+<ul>
+    <li><a href="regression.html">Regression</a></li>
+    <li><a href="fit.html">Non-Linear Least-Squares Fit</a></li>
+</ul></p>
+    
+    
+    </body>
 </html>

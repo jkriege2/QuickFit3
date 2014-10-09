@@ -8,38 +8,38 @@
   </head>
   <body>
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-	<h2>Contents</h2>
-	<ul>
-	  <li><a href="#description">Description</a></li>
-	  <li><a href="#usagenotes">Usage Notes & Hints</a></li>
-	  <li><a href="plots.html">create plots</a>
-	  <ul>
-		<li><a href="regression.html">regression analysis of plots</a>
-		<li><a href="fit.html">nonlinear fit to plots</a>
-	  </ul>
-	  </li>
-	  
-	  <li><a href="$$mainhelpdir$$mathparser.html">expression parser documentation</a></li>
-	</ul>
-	<a name="description"><h2>Description</h2>
-	<p>This plugin allows the user to view/edit a table of values. It implements these features:
+
+      
+      <li><a href="$$mainhelpdir$$mathparser.html">expression parser documentation</a></li>
+    </ul>
+    <a name="description"><h2>Description</h2>
+    <p>This plugin allows the user to view/edit a table of values. It implements these features:
       <ul>
-	    <li>The values may be of diferent datatypes (integer or floating point number, text, ...).</li>
-	    <li>Data may be loaded from or saved to external files.</li>
-		<li>Data exchange with other applications (Excel, Origin, ...) and other QuickFit plugins is usually possible via the clipboard.</li>
-		<li>Many common table editing functions are implemented (insert/delete rows/cols, table resize, ...).</li>
-		<li>A <a href="mathparser.html">expression parser</a> allows to calculate the contents of cells (or complete columns) in dependence of the contents of other cells.</li>
-		<!--<li>There is some support for gathering data from the results and properties of other raw data records.</li>-->
-		<li>It is possible to <a href="plots.html">create plots</a> of the data in the table. Each column is seen as a single dataseries for the plot.</li>
-		<li>You can access all editing functionality from the menu, a context-menu you reach by a right-click on the table and the buttons above the table</li>
-		<li>The columns may be formatted via the menu or by double-clicking on a column header. A dialog that allows to change its properties will pop up.</li>
-	  </ul>  
-	</p>
-	
-	<a name="usagenotes"><h2>Usage Notes & Hints</h2>
-	<p><ul>
-	  <li>You may insert either an <strong>"Editable Table"</strong> or a <strong>"Table From File"</strong> into a QuickFit project. The lather one may NOT be edited by the user, as it simply represents the contents of a file. If you want to edit the contents of a file insert an "Editable Table" and then load the file using <img src=":/table/table_open.png">. The data of an Editable Table is stored inside the QuickFit project file, so such a raw data record does NOT depend on any external file.</li>
-	  
-	</ul></p>
+        <li>The values may be of diferent datatypes (integer or floating point number, text, ...).</li>
+        <li>Data may be loaded from or saved to external files.</li>
+        <li>Data exchange with other applications (Excel, Origin, ...) and other QuickFit plugins is usually possible via the clipboard.</li>
+        <li>Many common table editing functions are implemented (insert/delete rows/cols, table resize, ...).</li>
+        <li>A <a href="mathparser.html">expression parser</a> allows to calculate the contents of cells (or complete columns) in dependence of the contents of other cells.</li>
+        <li>You can access all editing functionality from the menu, a context-menu you reach by a right-click on the table and the buttons above the table</li>
+        <li>The columns may be formatted via the menu or by double-clicking on a column header. A dialog that allows to change its properties will pop up.</li>
+      </ul>  
+      $$see:Details on the table editor part of this plugin are described in <a href="tableeditor.html">this help page</a>.$$
+    </p>
+    <p>In addition it is possible to create column-oriented <a href="plots.html">plots</a> from the data in that table. The curves in such a plot can also be used for data fittng:<ul>
+        <li><a href="regression.html">regression analysis of plots</a>
+        <li><a href="fit.html">nonlinear fit to plots</a>
+      </ul>
+      $$see:Details on the plot editor part of this plugin are described in <a href="plots.html">this help page</a>.$$</p>
+    
+    <a name="usagenotes"><h2>Usage Notes & Hints</h2>
+    <p><ul>
+      <li>In order to add a table to the project, there are different ways:
+      <ol>
+          <li>In QuickFit's main window, click on <b>Data Items | Insert Raw Data | Table | Editable Table</b> or <b> ... | Tabel | Table from file</b> to add a new empty table, or a read-only table, read from a file to the project.</li>
+          <li>Most plots in QuickFit can be converted to a table. For that, right-click on the plot and choose <b>copy plot to table RDR</b>. This function will generate a new (or extend an existing) table record and add all data, that is associated with the plot. In addition the plot is also copied into the table RDR, so you can edit, or extend it. See <a href="$$qf_ui_jkqtplotter_helpfile$$">$$qf_ui_jkqtplotter_helpfiletitle$$</a> for more information on this.</li>
+      </ol></li>
+      <li>You may insert either an <strong>"Editable Table"</strong> or a <strong>"Table From File"</strong> into a QuickFit project. The lather one may NOT be edited by the user, as it simply represents the contents of a file. If you want to edit the contents of a file insert an "Editable Table" and then load the file using <img src=":/table/table_open.png">. The data of an Editable Table is stored inside the QuickFit project file, so such a raw data record does NOT depend on any external file. The data of a read-only table is typically stored in an external file, which has to be present along with the QuickFit project file, so the data can be displayed.</li>
+      
+    </ul></p>
   </body>
 </html>

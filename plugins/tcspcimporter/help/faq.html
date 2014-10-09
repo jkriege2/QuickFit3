@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>$$local_plugin_name$$: Frequently asked questions (FAQs)</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+
+$$faq_start$$
+  <b>Ho can I perform FCS/FCCS data evaluation, using TCSPC data files acquired on a microscope?</b>
+$$faq_answer$$
+  QuickFit contains the tcspcimporter plugin, which allows to read and process TCSPC data from a number of diferent input file formats. It offers an option to directly correlate the TCSPC data with different algorithms. Finally the FCS/FCCS data evaluation can be perfromed with diferent othe rplugins, such as <a href="$$plugin_info:help:fcs_fit$$">FCS Curve Fitting</a>, <a href="$$plugin_info:help:fcs_maxent$$">FCS MaxEnt evaluation</a>, an <a href="$$plugin_info:help:fcs_msd$$">FCS MSD Evaluation</a>, an <a href="$$plugin_info:help:fccs_fit$$">FCCS global fit</a> etc.<br><br>
+$$see:<a href="tcspcimporter.html">The main documentation</a> on an explanation of the TCSPC-importer plugin and <a href="tutorial_fcs.html">this tutorial</a>.$$
+$$faq_end$$
+
+
+     $$faq_start$$
+       <a name="FAQ_TCSPC_DATAFORMATS"><b>Which TCSPC data formats are supported by QuickFit?</b>
+     $$faq_answer$$
+       QuickFit supports all TCSPC data formats, for which a reader plugin is installed.<br>Your QuickFit installation has these image imprter plugins installed:$$list:tcspcimporters:$$
+     $$faq_end$$
+        
+    </body>
+</html>

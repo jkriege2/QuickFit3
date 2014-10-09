@@ -568,7 +568,7 @@ QFLIB_EXPORT void removeAllActions(QWidget* widget);
 /*! \brief return a color that encodes \a max items in diferent colors. \a value gives the (0-based) item ID.
     \ingroup qf3lib_tools
 */
-QFLIB_EXPORT QColor getCycleColor(int value, unsigned int max, double S=0.5, double V=1.0);
+QFLIB_EXPORT QColor getCycleColor(int value, unsigned int max, double S=1.0, double V=1.0);
 
 /*! \brief remove all duplicates from a list
     \ingroup qf3lib_tools
