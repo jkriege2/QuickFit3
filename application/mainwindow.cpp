@@ -269,14 +269,14 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     evaluationFactory->distribute(project, settings, this, this);
 
     // scan program arguments for a project file (has to be the last argument)
-    QStringList args=QApplication::arguments();
+    /*QStringList args=QApplication::arguments();
     if (args.size()>0) {
         QString lastarg=args[args.size()-1];
         if (QFile::exists(lastarg) && ((QFileInfo(lastarg).suffix()=="qfp")||(QFileInfo(lastarg).suffix()=="qfpz")||(QFileInfo(lastarg).suffix()=="qfp.gz"))) {
             currentProjectDir=QFileInfo(lastarg).dir().absolutePath();
             loadProject(lastarg);
         }
-    }
+    }*/
 
     autoWriteSettings();
     timerAutosave->start();
@@ -284,6 +284,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     setWindowIcon(QIcon(":/icon_large.png"));
 
     if (settings->getConfigValue("quickfit/checkupdates", true).toBool() ) QTimer::singleShot(2000, this, SLOT(checkUpdatesAutomatic()));
+    QTimer::singleShot(100, this, SLOT(checkCallArguments()));
 }
 
 
@@ -3270,6 +3271,20 @@ void MainWindow::checkUpdates(bool userRequest)
 void MainWindow::checkUpdatesAutomatic()
 {
     checkUpdates(false);
+}
+
+void MainWindow::checkCallArguments()
+{
+    // scan program arguments for a project file (has to be the last argument)
+    QStringList args=QApplication::arguments();
+    if (args.size()>1) {
+
+        QString lastarg=args[args.size()-1];
+        if (QFile::exists(lastarg) && ((QFileInfo(lastarg).suffix()=="qfp")||(QFileInfo(lastarg).suffix()=="qfpz")||(QFileInfo(lastarg).suffix()=="qfp.gz"))) {
+            currentProjectDir=QFileInfo(lastarg).dir().absolutePath();
+            loadProject(lastarg);
+        }
+    }
 }
 
 void MainWindow::showUpdateInfo(QNetworkReply* reply) {

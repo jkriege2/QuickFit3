@@ -6,18 +6,38 @@
   </head>
   <body>
     $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-    <h2>Table Plugin Tutorial: Column Expresssions</h2>
-	<h3>Introduction</h3>
-	<p>The table column expressions are a powerful tool to perform calulations in a table. First of all the expression use the built-in <a href="mathparser.html">expression parser</a>, which has been extended with special functions to access the <a href="./parserreference/dataaccess.html">table contents</a> and for <a href="./parserreference/columnstatistics.html">column statistics</a>.</p>
-	<p>You can reach this functionality by double-clicking any column header and then activating the "expression" checkbox in the table column editor dialog.
-	</p>
-	<p>
-	</p>
-	<p>
-	</p>
-	<p>
-	</p>
-	
+    <h2>Introduction</h2>
+<p>The table column expressions are a powerful tool to perform calulations in a table. First of all the expression use the built-in <a href="mathparser.html">expression parser</a>, which has been extended with special functions to access the <a href="./parserreference/dataaccess.html">table contents</a> and for <a href="./parserreference/columnstatistics.html">column statistics</a>.</p>
+<p>You can reach this functionality by double-clicking any column header and then activating the "expression" checkbox in the table column editor dialog.
+</p>
+    
+ 
+ 
+<h2>Tutorial</h2>
+<p>
+<ol>
+    <li>Start a new QuickFit project and add an editable table (<b>Data Items | Insert Raw Data | Table | Editable Table</b>) and open the table editor (double-click table in project</li>
+    <li>Go to the "Data Table" tab. It will now display an empkty table.</li>
+    <li>For this tutorial we will create some column expression and use them to perform diverse calculations. First we create a few columns, that contain sine and cosine functions, evaluated at equidistant points<ol></li>
+      <li>double-click the first column and set the title to "X", activate the expression-checkbox and set the expression to $$codeexample:0:0.25:(4*pi)$$This will generate column of values between 0 and $$math:2\pi$$, with a distance of 0.25.</li>
+      <li>Now double-click the second column-feader, set the title to "sin(x)" and the expüression to $$codeexample:sin(column(1))$$This will calcuate the sine of the data in the first column. The function <tt>column(1)</tt> simply returns the vector of all numbers in the first column.$$note:You can always right-click the expression editor widget to open a context-menu, in which you can also insert a <tt>column(...)</tt> reference to one of the columns in the table (towards the end of the menu).$$</li>
+      <li>Double-click the third column and set the title to "error". Set the expression to $$codeexample:0.2*abs(column(col-1))$$This will calculate the absolute value of the previous column (<tt>col</tt> contains the number of the current column!) and multiply it by 0.2.</li>
+      <li></li>
+    </ol>Now we are going to create a plot of the data in the table, to get a better idea of what we did:<ol>      
+      <li>Change into the plot tab and add a new plot using <img src=":table/plot_add.png"></li>
+      <li>Add a graph to the plot using <img src=":table/plot_add.png"> in the graph tab.</li>
+      <li>Select column X as x data col, column sin(x) as y data col. and column error as Y error col.</li>
+      <li>Set the symbol to none and select error polygons as error style. Set their transparency to 150.</li>
+      <li>Finally change to the "Coordinate System" tab and there to "Axes". Click on "Autoscale XY".</li>
+      <li>Now you should have a plot like this:
+      <center><a name="tutorial_columnexpression_pic000"><img src="./pic/tutorial_columnexpression_pic000.png" border="1">
+      </center>
+      </li>
+    </ol></li>
+    <li></li>
+    <li></li>
+</ol></p>
+ 
     
   </body>
 </html>

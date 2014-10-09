@@ -393,6 +393,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         /** \brief check the update.xml file on the QF3 webpage for a new version. If \a userRequest is \c true, the method waits until the request completes, before returning control to the user, otherwise it runs in the background */
         void checkUpdates(bool userRequest=true);
         void checkUpdatesAutomatic();
+        void checkCallArguments();
         void showUpdateInfo(QNetworkReply *reply);
         void openLabelLink(const QString& link);
 
