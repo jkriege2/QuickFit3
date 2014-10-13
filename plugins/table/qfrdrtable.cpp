@@ -126,10 +126,10 @@ QFRDRTable::GraphInfo::GraphInfo() {
     centerColorAuto=true;
 
     isDataSelect=false;
-    dataSelectColumn=-1;
-    dataSelectOperation=dsoEquals;
-    dataSelectCompareValue=0;
-    dataSelectCompareValue2=1;
+    dataSelect1Column=-1;
+    dataSelect1Operation=dsoEquals;
+    dataSelect1CompareValue=0;
+    dataSelect1CompareValue2=1;
 
     offset=0;
     xerrorcolumnlower=-1;
@@ -1569,10 +1569,24 @@ void QFRDRTable::readGraphInfo(GraphInfo& graph, QDomElement ge) {
     graph.shift=CQStringToDouble(ge.attribute("shift", "0"));
 
     graph.isDataSelect=QStringToBool(ge.attribute("is_data_select", "false"));
-    graph.dataSelectColumn=ge.attribute("data_select_column", "-1").toInt();;
-    graph.dataSelectOperation=String2DataSelectOperation(ge.attribute("data_select_operation", "=="));
-    graph.dataSelectCompareValue=CQStringToDouble(ge.attribute("data_select_value", "0.0"));
-    graph.dataSelectCompareValue2=CQStringToDouble(ge.attribute("data_select_value2", "1.0"));
+    graph.dataSelect1Column=ge.attribute("data_select_column", "-1").toInt();;
+    graph.dataSelect1Operation=String2DataSelectOperation(ge.attribute("data_select_operation", "=="));
+    graph.dataSelect1CompareValue=CQStringToDouble(ge.attribute("data_select_value", "0.0"));
+    graph.dataSelect1CompareValue2=CQStringToDouble(ge.attribute("data_select_value2", "1.0"));
+
+    graph.dataSelectLogic12=String2DataSelectLogicOperation(ge.attribute("data_select_logic12", "NONE"));
+    graph.dataSelectLogic23=String2DataSelectLogicOperation(ge.attribute("data_select_logic23", "NONE"));
+
+
+    graph.dataSelect2Column=ge.attribute("data_select2_column", "-1").toInt();;
+    graph.dataSelect2Operation=String2DataSelectOperation(ge.attribute("data_select2_operation", "=="));
+    graph.dataSelect2CompareValue=CQStringToDouble(ge.attribute("data_select2_value", "0.0"));
+    graph.dataSelect2CompareValue2=CQStringToDouble(ge.attribute("data_select2_value2", "1.0"));
+
+    graph.dataSelect3Column=ge.attribute("data_select3_column", "-1").toInt();;
+    graph.dataSelect3Operation=String2DataSelectOperation(ge.attribute("data_select3_operation", "=="));
+    graph.dataSelect3CompareValue=CQStringToDouble(ge.attribute("data_select3_value", "0.0"));
+    graph.dataSelect3CompareValue2=CQStringToDouble(ge.attribute("data_select3_value2", "1.0"));
 
 
     graph.imageTrueColor=QStringToQColor(ge.attribute("image_truecolor", "blue"));
@@ -1820,11 +1834,24 @@ void QFRDRTable::writeGraphInfo(QXmlStreamWriter &w, const QFRDRTable::GraphInfo
     w.writeAttribute("modifier_mode", JKQTPMathImage::ModifierModeToString(graph.modifierMode));
 
     w.writeAttribute("is_data_select", boolToQString(graph.isDataSelect));
-    w.writeAttribute("data_select_column", QString::number(graph.dataSelectColumn));
-    w.writeAttribute("data_select_operation", DataSelectOperation2String(graph.dataSelectOperation));
-    w.writeAttribute("data_select_value", CDoubleToQString(graph.dataSelectCompareValue));
-    w.writeAttribute("data_select_value2", CDoubleToQString(graph.dataSelectCompareValue2));
+    w.writeAttribute("data_select_column", QString::number(graph.dataSelect1Column));
+    w.writeAttribute("data_select_operation", DataSelectOperation2String(graph.dataSelect1Operation));
+    w.writeAttribute("data_select_value", CDoubleToQString(graph.dataSelect1CompareValue));
+    w.writeAttribute("data_select_value2", CDoubleToQString(graph.dataSelect1CompareValue2));
 
+    w.writeAttribute("data_select_logic12", DataSelectLogicOperation2String(graph.dataSelectLogic12));
+    w.writeAttribute("data_select_logic23", DataSelectLogicOperation2String(graph.dataSelectLogic23));
+
+
+    w.writeAttribute("data_select2_column", QString::number(graph.dataSelect2Column));
+    w.writeAttribute("data_select2_operation", DataSelectOperation2String(graph.dataSelect2Operation));
+    w.writeAttribute("data_select2_value", CDoubleToQString(graph.dataSelect2CompareValue));
+    w.writeAttribute("data_select2_value2", CDoubleToQString(graph.dataSelect2CompareValue2));
+
+    w.writeAttribute("data_select3_column", QString::number(graph.dataSelect3Column));
+    w.writeAttribute("data_select3_operation", DataSelectOperation2String(graph.dataSelect3Operation));
+    w.writeAttribute("data_select3_value", CDoubleToQString(graph.dataSelect3CompareValue));
+    w.writeAttribute("data_select3_value2", CDoubleToQString(graph.dataSelect3CompareValue2));
 
 
     w.writeAttribute("error_width", CDoubleToQString(graph.errorWidth));
@@ -2183,7 +2210,9 @@ void QFRDRTable::columnsInserted(int start, int count, bool emitRebuild)
             g.meancolumn=QFRDRTableOffsetIfLarger(g.meancolumn, start, count);
             g.q75column=QFRDRTableOffsetIfLarger(g.q75column, start, count);
             g.maxcolumn=QFRDRTableOffsetIfLarger(g.maxcolumn, start, count);
-            g.dataSelectColumn=QFRDRTableOffsetIfLarger(g.dataSelectColumn, start, count);
+            g.dataSelect1Column=QFRDRTableOffsetIfLarger(g.dataSelect1Column, start, count);
+            g.dataSelect2Column=QFRDRTableOffsetIfLarger(g.dataSelect2Column, start, count);
+            g.dataSelect3Column=QFRDRTableOffsetIfLarger(g.dataSelect3Column, start, count);
         }
         p.xAxis.columnNamedTickNames=QFRDRTableOffsetIfLarger(p.xAxis.columnNamedTickNames, start, count);
         p.xAxis.columnNamedTickValues=QFRDRTableOffsetIfLarger(p.xAxis.columnNamedTickValues, start, count);
@@ -2220,7 +2249,9 @@ void QFRDRTable::columnsRemoved(int start, int count, bool emitRebuild)
             g.meancolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.meancolumn, start, count);
             g.q75column=QFRDRTableOffsetIfLargerM1IfInRange(g.q75column, start, count);
             g.maxcolumn=QFRDRTableOffsetIfLargerM1IfInRange(g.maxcolumn, start, count);
-            g.dataSelectColumn=QFRDRTableOffsetIfLargerM1IfInRange(g.dataSelectColumn, start, count);
+            g.dataSelect1Column=QFRDRTableOffsetIfLargerM1IfInRange(g.dataSelect1Column, start, count);
+            g.dataSelect2Column=QFRDRTableOffsetIfLargerM1IfInRange(g.dataSelect2Column, start, count);
+            g.dataSelect3Column=QFRDRTableOffsetIfLargerM1IfInRange(g.dataSelect3Column, start, count);
         }
         p.xAxis.columnNamedTickNames=QFRDRTableOffsetIfLargerM1IfInRange(p.xAxis.columnNamedTickNames, start, count);
         p.xAxis.columnNamedTickValues=QFRDRTableOffsetIfLargerM1IfInRange(p.xAxis.columnNamedTickValues, start, count);

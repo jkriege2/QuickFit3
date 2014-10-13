@@ -7,7 +7,7 @@
   <body> 
   $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
   
-  <h2>Vector Manipulation Functions</h2>
+  <h2>Sorting &amp; Reordering</h2>
   
 
   $$funcref_start$$<a name="sort"/><!-- func:sort -->
@@ -34,6 +34,14 @@ $$funcref_description$$
   example: <tt>[1,2,3] -> [3,2,1]</tt>
   <!-- /func:reverse -->  
 $$funcref_end$$
+
+
+
+
+
+
+
+<h2>Concatenation</h2>
   
   $$funcref_start$$<a name="concat"/><!-- func:concat -->
   <b><tt><!-- template -->concat(x1, x2, ...)<!-- /template --></tt> - <i>concatenate the parameter vectors <tt>x1, x2, ...</tt> </i>:</b>
@@ -43,6 +51,12 @@ $$funcref_description$$
 $$funcref_end$$
   
   
+  
+  
+  
+  
+  
+<h2>Filtering<(h2>
   $$funcref_start$$<a name="removeall"/><!-- func:removeall -->
   <b><tt><!-- template -->removeall(x, val)<!-- /template --></tt> - <i>remove all occurenced of value <tt>val</tt> from vector <tt>x</tt> </i>:</b>
 $$funcref_description$$
@@ -68,6 +82,29 @@ $$funcref_description$$
   <!-- /func:remove -->  
 $$funcref_end$$
   
+
+  $$funcref_start$$<a name="unique"/><!-- func:unique -->
+  <b><tt><!-- template -->unique(x)<!-- /template --></tt> - <i>returns a list containing all elements in <tt>x</tt>, if any value appears more than once in <tt>x</tt> it is returned only once. The order is the order in the initial data vector <tt>x</tt>.</b>
+$$funcref_description$$
+  Example:<br><blockquote><tt>
+  x=[1,3,2,1,2,3,3,2,1];
+  unique[x] -> [1,3,2]
+  </tt></blockquote>
+  <!-- /func:unique-->  
+$$funcref_end$$
+
+
+  $$funcref_start$$<a name="filter"/><!-- func:filter -->
+  <b><tt><!-- template -->filter(x, old_value, new_value)<!-- /template --></tt> - <i>replace all occurences of <tt>old_value</tt> in the vector or string <tt>x</tt> by <tt>new_value</tt> </i>:</b>
+$$funcref_description$$
+  <!-- /func:filter -->  
+$$funcref_end$$
+  
+  
+  
+  
+  
+<h2>Test-Operations &amp; Search (contains, find, ...)</h2>
   
 $$funcref_start$$<a name="contains"/><!-- func:contains -->
   <b><tt><!-- template -->contains(x, v)<!-- /template --></tt> - <i>returns <tt>true</tt> if the element <tt>v</tt> is contained in the vector <tt>x</tt>.  If both elements are string, it returns true, if the substring <tt>v</tt> appears in <tt>x</tt>. </i>:</b>
@@ -100,25 +137,7 @@ $$funcref_description$$
   <!-- /func:findfirst -->  
 $$funcref_end$$
   
-  $$funcref_start$$<a name="select"/><!-- func:select -->
-  <b><tt><!-- template -->select(x, cond)<!-- /template --></tt> - <i>returns only those elements of a vector <tt>x</tt> where the boolean vector <tt>cond</tt> contains <tt>true</tt>. Both vectors have to have the same number of elements. </i>:</b>
-$$funcref_description$$
-  This function can be used to filter vectors according to a boolean expression, e.g. <tt>select(x, x>4)</tt> will return a vector containing only those elements in x where the value is larger than 4. This can also be implemented using <tt>x[<a href="#find">find</a>(x>4)]</tt>. So this function is a more expressive short-form for that. $$see:<a href="#findfirst">findfirst()</a>, <a href="#find">find()</a>$$
-  <!-- /func:select -->  
-$$funcref_end$$
   
-  $$funcref_start$$<a name="length"/><!-- func:length -->
-  <b><tt><!-- template -->length(x)<!-- /template --></tt> - <i>returns the length of vector <tt>x</tt> </i>:</b>
-$$funcref_description$$
-  <!-- /func:length -->  
-$$funcref_end$$
-
-  $$funcref_start$$<a name="dot"/><!-- func:dot -->
-  <b><tt><!-- template -->dot(x,y)<!-- /template --></tt> - <i>returns the dot product of two numeric vectors <tt>x</tt> and  <tt>x</tt> </i>:</b>
-$$funcref_description$$
-  <!-- /func:dot -->  
-$$funcref_end$$
-     
   $$funcref_start$$<a name="alltrue"/><!-- func:alltrue -->
   <b><tt><!-- template -->alltrue(x)<!-- /template --></tt> - <i>returns <tt>true</tt> if all elements of the boolean vector <tt>x</tt> are <tt>true</tt> </i>:</b>
 $$funcref_description$$
@@ -142,25 +161,21 @@ $$funcref_end$$
 $$funcref_description$$
   <!-- /func:anyfalse-->  
 $$funcref_end$$
-  
-  
-  $$funcref_start$$<a name="countoccurences"/><!-- func:countoccurences -->
-  <b><tt><!-- template -->countoccurences(x, value)<!-- /template --></tt> - <i>returns the number of elements in the vector <tt>x</tt> that have value <tt>value</tt> </i>:</b>
+
+
+
+
+
+
+
+<h2>Subvector Extraction &amp; Item Access</h2>
+  $$funcref_start$$<a name="select"/><!-- func:select -->
+  <b><tt><!-- template -->select(x, cond)<!-- /template --></tt> - <i>returns only those elements of a vector <tt>x</tt> where the boolean vector <tt>cond</tt> contains <tt>true</tt>. Both vectors have to have the same number of elements. </i>:</b>
 $$funcref_description$$
-  <!-- /func:countoccurences-->  
-$$funcref_end$$
- 
-  $$funcref_start$$<a name="unique"/><!-- func:unique -->
-  <b><tt><!-- template -->unique(x)<!-- /template --></tt> - <i>returns a list containing all elements in <tt>x</tt>, if any value appears more than once in <tt>x</tt> it is returned only once. The order is the order in the initial data vector <tt>x</tt>.</b>
-$$funcref_description$$
-  Example:<br><blockquote><tt>
-  x=[1,3,2,1,2,3,3,2,1];
-  unique[x] -> [1,3,2]
-  </tt></blockquote>
-  <!-- /func:unique-->  
+  This function can be used to filter vectors according to a boolean expression, e.g. <tt>select(x, x>4)</tt> will return a vector containing only those elements in x where the value is larger than 4. This can also be implemented using <tt>x[<a href="#find">find</a>(x>4)]</tt>. So this function is a more expressive short-form for that. $$see:<a href="#findfirst">findfirst()</a>, <a href="#find">find()</a>$$
+  <!-- /func:select -->  
 $$funcref_end$$
 
-  
   $$funcref_start$$<a name="first"/><!-- func:first -->
   <b><tt><!-- template -->first(x)<!-- /template --></tt> - <i>returns the first element in the vector <tt>x</tt></i>:</b>
 $$funcref_description$$
@@ -182,7 +197,41 @@ $$funcref_description$$
   $$example:<tt>item("abcdefghi", [true,true,true,false,false,false,true,false,true])</tt> will return <tt>"abcgi"</tt>$$
   <!-- /func:item-->  
 $$funcref_end$$
+
+
+
+
+
+
+<h2>Vector Properties</h2>
+  $$funcref_start$$<a name="length"/><!-- func:length -->
+  <b><tt><!-- template -->length(x)<!-- /template --></tt> - <i>returns the length of vector <tt>x</tt> </i>:</b>
+$$funcref_description$$
+  <!-- /func:length -->  
+$$funcref_end$$
+
   
+  $$funcref_start$$<a name="countoccurences"/><!-- func:countoccurences -->
+  <b><tt><!-- template -->countoccurences(x, value)<!-- /template --></tt> - <i>returns the number of elements in the vector <tt>x</tt> that have value <tt>value</tt> </i>:</b>
+$$funcref_description$$
+  <!-- /func:countoccurences-->  
+$$funcref_end$$
+
+
+
+
+
+
+
+<h2>Mathematical Vector-Operations</h2>
+  $$funcref_start$$<a name="dot"/><!-- func:dot -->
+  <b><tt><!-- template -->dot(x,y)<!-- /template --></tt> - <i>returns the dot product of two numeric vectors <tt>x</tt> and  <tt>x</tt> </i>:</b>
+$$funcref_description$$
+  <!-- /func:dot -->  
+$$funcref_end$$
+     
+  
+   
   $$funcref_start$$<a name="runningaverage"/><!-- func:runningaverage -->
   <b><tt><!-- template -->runningaverage(x, width)<!-- /template --></tt> - <i>calculates the running average over vector <tt>x</tt> with width <tt>width</tt></i>. The argument <tt>x</tt> has to be a vector of numbers and <tt>width</tt> an integer >0</b>
 $$funcref_description$$

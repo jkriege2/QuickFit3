@@ -86,6 +86,9 @@ class QFTableGraphSettings : public QWidget
         void on_btnClearLinesMax_clicked();
         void on_btnClearLinesMean_clicked();
         void on_btnClearLinesQ75_clicked();
+        void on_cmbSelectDataLogic12_currentIndexChanged(int index);
+        void on_cmbSelectDataLogic23_currentIndexChanged(int index);
+        void updateSelectDataEnabled();
 
         void cmbFunctionTypeCurrentIndexChanged(int index);
 

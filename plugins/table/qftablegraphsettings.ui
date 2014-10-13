@@ -2608,7 +2608,7 @@
      <property name="enabled">
       <bool>false</bool>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_12" stretch="1,0,1,0">
+     <layout class="QGridLayout" name="gridLayout_6">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -2621,7 +2621,111 @@
       <property name="bottomMargin">
        <number>0</number>
       </property>
-      <item>
+      <item row="1" column="1">
+       <widget class="QFEnhancedComboBox" name="cmbSelectDataColumn_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QComboBox" name="cmbSelectDataLogic12">
+        <item>
+         <property name="text">
+          <string>none</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>and</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>or</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>xor</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QComboBox" name="cmbSelectDataCompare_2">
+        <item>
+         <property name="text">
+          <string>==</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>!=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&gt;=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&lt;=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&gt;</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&lt;</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>in-range</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>out-of-range</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QFDoubleEdit" name="edtSelectDataValue_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="4">
+       <widget class="QFDoubleEdit" name="edtSelectDataValue2_2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
        <widget class="QFEnhancedComboBox" name="cmbSelectDataColumn">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
@@ -2637,7 +2741,27 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="3">
+       <widget class="QFDoubleEdit" name="edtSelectDataValue">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="4">
+       <widget class="QFDoubleEdit" name="edtSelectDataValue2">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
        <widget class="QComboBox" name="cmbSelectDataCompare">
         <item>
          <property name="text">
@@ -2681,8 +2805,92 @@
         </item>
        </widget>
       </item>
-      <item>
-       <widget class="QFDoubleEdit" name="edtSelectDataValue">
+      <item row="2" column="0">
+       <widget class="QComboBox" name="cmbSelectDataLogic23">
+        <item>
+         <property name="text">
+          <string>none</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>and</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>or</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>xor</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QFEnhancedComboBox" name="cmbSelectDataColumn_3">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>80</width>
+          <height>0</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QComboBox" name="cmbSelectDataCompare_3">
+        <item>
+         <property name="text">
+          <string>==</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>!=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&gt;=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&lt;=</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&gt;</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>&lt;</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>in-range</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>out-of-range</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QFDoubleEdit" name="edtSelectDataValue_3">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -2691,8 +2899,8 @@
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QFDoubleEdit" name="edtSelectDataValue2">
+      <item row="2" column="4">
+       <widget class="QFDoubleEdit" name="edtSelectDataValue2_3">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -3230,11 +3438,11 @@
    <hints>
     <hint type="sourcelabel">
      <x>74</x>
-     <y>546</y>
+     <y>494</y>
     </hint>
     <hint type="destinationlabel">
      <x>595</x>
-     <y>549</y>
+     <y>497</y>
     </hint>
    </hints>
   </connection>
@@ -3469,8 +3677,8 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>83</x>
-     <y>569</y>
+     <x>92</x>
+     <y>517</y>
     </hint>
     <hint type="destinationlabel">
      <x>583</x>

@@ -154,6 +154,12 @@ qfmpResult::qfmpResult(const qfmpResult &value):
 
 qfmpResult &qfmpResult::operator=(const qfmpResult &value)
 {
+    set(value);
+    return *this;
+}
+
+void qfmpResult::set(const qfmpResult &value)
+{
     isValid=value.isValid;
     type=value.type;
     num=value.num;
@@ -163,7 +169,6 @@ qfmpResult &qfmpResult::operator=(const qfmpResult &value)
     else if (type==qfmpStringVector) this->strVec=value.strVec;
     else if (type==qfmpBoolVector) this->boolVec=value.boolVec;
     else if (type==qfmpCustom) this->setCustomCopy(value.custom());
-    return *this;
 }
 
 void qfmpResult::setInvalid()

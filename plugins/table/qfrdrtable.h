@@ -104,7 +104,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             }
 
         }
-        static GTFunctionType String2GTFunctionType(QString type) {
+        static GTFunctionType String2GTFunctionType(const QString& type) {
             if(type=="qffunction") return gtfQFFunction;
             if(type=="poly") return gtfPolynomial;
             if(type=="exp") return gtfExponential;
@@ -166,7 +166,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
 
 
-        static GraphType String2GraphType(QString type) {
+        static GraphType String2GraphType(const QString& type) {
             QString s=type.trimmed().toLower();
             if (s=="lines") return gtLines;
             if (s=="impulsesv") return gtImpulsesVertical;
@@ -200,6 +200,12 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             dsoInRange=6,
             dsoOutOfRange=7,
         };
+        enum DataSelectLogicOperation {
+            dsoNone=0,
+            dsoAnd=1,
+            dsoOr=2,
+            dsoXor=3
+        };
 
         static QString DataSelectOperation2String(DataSelectOperation type) {
             switch(type) {
@@ -215,7 +221,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             }
 
         }
-        static DataSelectOperation String2DataSelectOperation(QString type) {
+        static DataSelectOperation String2DataSelectOperation(const QString& type) {
             if(type=="!=") return dsoUnequal;
             if(type==">=") return dsoGreaterOrEqual;
             if(type=="<=") return dsoSmallerOrEqual;
@@ -224,6 +230,24 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             if(type=="inrange") return dsoInRange;
             if(type=="outrange") return dsoOutOfRange;
             return dsoEquals;
+        }
+
+        static QString DataSelectLogicOperation2String(DataSelectLogicOperation type) {
+            switch(type) {
+                case dsoAnd: return QString("AND");
+                case dsoOr: return QString("OR");
+                case dsoXor: return QString("XOR");
+                default:
+                case dsoNone: return QString("NONE");
+            }
+
+        }
+        static DataSelectLogicOperation String2DataSelectLogicOperation(const QString& type) {
+            if(type.toUpper()=="AND") return dsoAnd;
+            if(type.toUpper()=="OR") return dsoOr;
+            if(type.toUpper()=="XOR") return dsoXor;
+            if(type.toUpper()=="NONE") return dsoNone;
+            return dsoNone;
         }
 
 
@@ -275,10 +299,23 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             bool isStrided;
 
             bool isDataSelect;
-            int dataSelectColumn;
-            DataSelectOperation dataSelectOperation;
-            double dataSelectCompareValue;
-            double dataSelectCompareValue2;
+            int dataSelect1Column;
+            DataSelectOperation dataSelect1Operation;
+            double dataSelect1CompareValue;
+            double dataSelect1CompareValue2;
+
+            DataSelectLogicOperation dataSelectLogic12;
+            int dataSelect2Column;
+            DataSelectOperation dataSelect2Operation;
+            double dataSelect2CompareValue;
+            double dataSelect2CompareValue2;
+
+            DataSelectLogicOperation dataSelectLogic23;
+            int dataSelect3Column;
+            DataSelectOperation dataSelect3Operation;
+            double dataSelect3CompareValue;
+            double dataSelect3CompareValue2;
+
 
             int imageTicks;
             int imageModTicks;

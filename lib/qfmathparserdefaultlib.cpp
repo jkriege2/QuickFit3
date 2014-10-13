@@ -194,6 +194,7 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
 
     p->addFunction("containssubstring", QFMathParser_DefaultLib::fContainsSubString);
     p->addFunction("contains", QFMathParser_DefaultLib::fContains);
+    p->addFunction("replace", QFMathParser_DefaultLib::fReplace);
 
     p->addFunction("isnan", QFMathParser_DefaultLib::fIsNan);
     p->addFunction("isinf", QFMathParser_DefaultLib::fIsInf);
@@ -2629,6 +2630,31 @@ namespace QFMathParser_DefaultLib {
             return;
         }
         return;
+    }
+
+    void fReplace(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        r.setInvalid();
+        if (n>0) r.set(params[0]);
+        if (n==3 && params[0].type==qfmpDoubleVector && params[1].type==qfmpDouble && params[2].type==qfmpDouble) {
+            for (int i=0; i<r.numVec.size(); i++) {
+                if (r.numVec[i]==params[1].num) r.numVec[i]=params[2].num;
+            }
+        } else if (n==3 && params[0].type==qfmpStringVector && params[1].type==qfmpString && params[2].type==qfmpString) {
+            for (int i=0; i<r.strVec.size(); i++) {
+                if (r.strVec[i]==params[1].str) r.strVec[i]=params[2].str;
+            }
+        } else if (n==3 && params[0].type==qfmpBoolVector && params[1].type==qfmpBool && params[2].type==qfmpBool) {
+            for (int i=0; i<r.boolVec.size(); i++) {
+                if (r.boolVec[i]==params[1].boolean) r.boolVec[i]=params[2].boolean;
+            }
+        } else if (n==3 && params[0].type==qfmpString && params[1].type==qfmpString && params[2].type==qfmpString) {
+            r.str=r.str.replace(params[1].str, params[2].str);
+        } else {
+            p->qfmpError(QObject::tr("replace(x, old_value,new_value) needs 3 arguments: one vector x and two corresponding element values, or 3 strings"));
+            r.setInvalid();
+            return;
+        }
     }
 
 

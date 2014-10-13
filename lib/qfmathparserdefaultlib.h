@@ -146,6 +146,7 @@ namespace QFMathParser_DefaultLib {
     void fAnyFalse(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
     void fContains(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fReplace(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fCountOccurences(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
 

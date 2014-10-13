@@ -147,7 +147,8 @@ struct QFLIB_EXPORT qfmpResult {
         qfmpResult(const QStringList &value);
 
         qfmpResult(const qfmpResult &value);
-        qfmpResult& operator=(const qfmpResult &value);
+        QFLIB_EXPORT qfmpResult& operator=(const qfmpResult &value);
+        QFLIB_EXPORT void set(const qfmpResult &value);
 
         QFLIB_EXPORT void setInvalid();
         QFLIB_EXPORT void setVoid();

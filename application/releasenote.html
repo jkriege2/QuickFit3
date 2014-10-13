@@ -42,7 +42,7 @@
                     <li>added asymmetric errorbars (different lengths to upper and lower bar.</li>
                     <li>impulse-plots and filled_curve-plots now support a baseline-parameter</li>
                     <li>bugfix: crash, when images have size 0 or NAN</li>
-                    <li></li>
+                    <li>parametrized scatter plots now use the correct color palette</li>
                     <li></li>
                     <li></li>
                     <li></li>
@@ -56,8 +56,8 @@
                     <li>parser now supports user-defined functions, that have qfmpNode*'s as parameters, rather than qfmpResult's (this allows for constructs, like "for()" in user-defined functions</li>                    
                     <li>bugfix: regular expressions functions now work correctly</li>
                     <li>added functions for filename-handling: extract_filename, extract_basename, extract_complete_basename, extract_ext, extract_complete_ext, extract_file_path, extract_absolute_path, extract_absolute_file_path, clean_string_for_filename</li>
-                    <li></li>
-                    <li></li>
+                    <li>added function replace() for strings/vectors</li>
+                    <li>for() now also create string and boolean vectors</li>
                     <li></li>
                     <li></li>
                     <li></li>
@@ -255,7 +255,8 @@
             <li>new: a table can be made editable with an entry in the menu of the table RDR editor</li>
             <li>new: added error estimation, using bootstrapping to curve fit (in plots)</li>
             <li>bugfix: all fit properties (including errors) are now saved properly and fit parameter errors are displayed, in the graph editor of the fit function</li>
-            <li></li>
+            <li>parametrized scatter plots now use the correct color palette</li>
+            <li>added additional filters with logic operations connecting them</li>
       </ul></li>
       <li><b>B040SPIM</b><ul>
             <li>added JavaScript functions to set preview acquisition camera parameters</li>

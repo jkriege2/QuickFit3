@@ -157,6 +157,8 @@ void QFTableGraphSettings::updateComboboxes()
     reloadColumns(ui->cmbLinesMean);
     reloadColumns(ui->cmbLinesQ75);
     reloadColumns(ui->cmbSelectDataColumn);
+    reloadColumns(ui->cmbSelectDataColumn_2);
+    reloadColumns(ui->cmbSelectDataColumn_3);
 }
 
 void QFTableGraphSettings::fitFunctionChanged()
@@ -329,10 +331,24 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.modifierMode=(JKQTPMathImage::ModifierMode)ui->cmbModifierMode->currentIndex();
 
         graph.isDataSelect=ui->chkSelectData->isChecked();
-        graph.dataSelectColumn=qMax(-2, ui->cmbSelectDataColumn->currentData().toInt());
-        graph.dataSelectOperation=(QFRDRTable::DataSelectOperation)ui->cmbSelectDataCompare->currentIndex();
-        graph.dataSelectCompareValue=ui->edtSelectDataValue->value();
-        graph.dataSelectCompareValue2=ui->edtSelectDataValue2->value();
+        graph.dataSelect1Column=qMax(-2, ui->cmbSelectDataColumn->currentData().toInt());
+        graph.dataSelect1Operation=(QFRDRTable::DataSelectOperation)ui->cmbSelectDataCompare->currentIndex();
+        graph.dataSelect1CompareValue=ui->edtSelectDataValue->value();
+        graph.dataSelect1CompareValue2=ui->edtSelectDataValue2->value();
+
+        graph.dataSelect2Column=qMax(-2, ui->cmbSelectDataColumn_2->currentData().toInt());
+        graph.dataSelect2Operation=(QFRDRTable::DataSelectOperation)ui->cmbSelectDataCompare_2->currentIndex();
+        graph.dataSelect2CompareValue=ui->edtSelectDataValue_2->value();
+        graph.dataSelect2CompareValue2=ui->edtSelectDataValue2_2->value();
+
+        graph.dataSelect3Column=qMax(-2, ui->cmbSelectDataColumn_3->currentData().toInt());
+        graph.dataSelect3Operation=(QFRDRTable::DataSelectOperation)ui->cmbSelectDataCompare_3->currentIndex();
+        graph.dataSelect3CompareValue=ui->edtSelectDataValue_3->value();
+        graph.dataSelect3CompareValue2=ui->edtSelectDataValue2_3->value();
+
+        graph.dataSelectLogic12=(QFRDRTable::DataSelectLogicOperation)ui->cmbSelectDataLogic12->currentIndex();
+        graph.dataSelectLogic23=(QFRDRTable::DataSelectLogicOperation)ui->cmbSelectDataLogic23->currentIndex();
+
         graph.offset=ui->edtOffset->value();
 
         graph.functionType=(QFRDRTable::GTFunctionType)ui->cmbFunctionType->currentIndex();
@@ -446,10 +462,23 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
 
 
     ui->chkSelectData->setChecked(graph.isDataSelect);
-    ui->cmbSelectDataColumn->setCurrentData(graph.dataSelectColumn);
-    ui->cmbSelectDataCompare->setCurrentIndex(graph.dataSelectOperation);
-    ui->edtSelectDataValue->setValue(graph.dataSelectCompareValue);
-    ui->edtSelectDataValue2->setValue(graph.dataSelectCompareValue2);
+    ui->cmbSelectDataColumn->setCurrentData(graph.dataSelect1Column);
+    ui->cmbSelectDataCompare->setCurrentIndex(graph.dataSelect1Operation);
+    ui->edtSelectDataValue->setValue(graph.dataSelect1CompareValue);
+    ui->edtSelectDataValue2->setValue(graph.dataSelect1CompareValue2);
+
+    ui->cmbSelectDataColumn_2->setCurrentData(graph.dataSelect2Column);
+    ui->cmbSelectDataCompare_2->setCurrentIndex(graph.dataSelect2Operation);
+    ui->edtSelectDataValue_2->setValue(graph.dataSelect2CompareValue);
+    ui->edtSelectDataValue2_2->setValue(graph.dataSelect2CompareValue2);
+
+    ui->cmbSelectDataColumn_3->setCurrentData(graph.dataSelect3Column);
+    ui->cmbSelectDataCompare_3->setCurrentIndex(graph.dataSelect3Operation);
+    ui->edtSelectDataValue_3->setValue(graph.dataSelect3CompareValue);
+    ui->edtSelectDataValue2_3->setValue(graph.dataSelect3CompareValue2);
+
+    ui->cmbSelectDataLogic12->setCurrentIndex(graph.dataSelectLogic12);
+    ui->cmbSelectDataLogic23->setCurrentIndex(graph.dataSelectLogic23);
 
     ui->cmbFunctionType->setCurrentIndex((int)graph.functionType);
     if (graph.functionType==QFRDRTable::gtfQFFunction) {
@@ -501,6 +530,7 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->chkErrorColAuto->setChecked(graph.errorColorAuto);
 
 
+    updateSelectDataEnabled();
     updating=false;
 }
 
@@ -509,8 +539,11 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
     if (current) {
         if (this->plot<0 || this->plot>=current->getPlotCount()) return;
 
+
         bool updt=updatesEnabled();
-        setUpdatesEnabled(false);
+        if (isVisible()) setUpdatesEnabled(false);
+
+        updateSelectDataEnabled();
 
         this->setVisible(true);
 
@@ -1147,7 +1180,7 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 break;
         }
 
-        setUpdatesEnabled(updt);
+        if (isVisible()) setUpdatesEnabled(updt);
 
     }
 }
@@ -1220,6 +1253,16 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->cmbSelectDataCompare, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->edtSelectDataValue, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->edtSelectDataValue2, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->cmbSelectDataColumn_2, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbSelectDataCompare_2, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->edtSelectDataValue_2, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtSelectDataValue2_2, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->cmbSelectDataColumn_3, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbSelectDataCompare_3, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->edtSelectDataValue_3, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->edtSelectDataValue2_3, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->cmbSelectDataLogic12, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbSelectDataLogic23, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
     connect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
 
@@ -1317,6 +1360,16 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->cmbSelectDataCompare, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->edtSelectDataValue, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->edtSelectDataValue2, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbSelectDataColumn_2, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbSelectDataCompare_2, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->edtSelectDataValue_2, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtSelectDataValue2_2, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbSelectDataColumn_3, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbSelectDataCompare_3, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->edtSelectDataValue_3, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->edtSelectDataValue2_3, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbSelectDataLogic12, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbSelectDataLogic23, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
 
     disconnect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
     disconnect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
@@ -1633,6 +1686,31 @@ void QFTableGraphSettings::on_btnClearLinesMean_clicked()
 void QFTableGraphSettings::on_btnClearLinesQ75_clicked()
 {
     ui->cmbLinesQ75->setCurrentData(-1);
+}
+
+void QFTableGraphSettings::on_cmbSelectDataLogic12_currentIndexChanged(int index)
+{
+    updateSelectDataEnabled();
+}
+
+void QFTableGraphSettings::on_cmbSelectDataLogic23_currentIndexChanged(int index)
+{
+    updateSelectDataEnabled();
+}
+
+void QFTableGraphSettings::updateSelectDataEnabled()
+{
+    ui->cmbSelectDataColumn_2->setEnabled(ui->cmbSelectDataLogic12->currentIndex()>0);
+    ui->cmbSelectDataCompare_2->setEnabled(ui->cmbSelectDataLogic12->currentIndex()>0);
+    ui->edtSelectDataValue_2->setEnabled(ui->cmbSelectDataLogic12->currentIndex()>0);
+    ui->edtSelectDataValue2_2->setEnabled(ui->cmbSelectDataLogic12->currentIndex()>0);
+    ui->cmbSelectDataColumn_3->setEnabled(ui->cmbSelectDataLogic12->currentIndex()>0 && ui->cmbSelectDataLogic23->currentIndex()>0);
+    ui->cmbSelectDataCompare_3->setEnabled(ui->cmbSelectDataLogic12->currentIndex()>0 && ui->cmbSelectDataLogic23->currentIndex()>0);
+    ui->edtSelectDataValue_3->setEnabled(ui->cmbSelectDataLogic12->currentIndex()>0 && ui->cmbSelectDataLogic23->currentIndex()>0);
+    ui->edtSelectDataValue2_3->setEnabled(ui->cmbSelectDataLogic12->currentIndex()>0 && ui->cmbSelectDataLogic23->currentIndex()>0);
+    ui->cmbSelectDataLogic23->setEnabled(ui->cmbSelectDataLogic12->currentIndex()>0);
+
+
 }
 
 void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
