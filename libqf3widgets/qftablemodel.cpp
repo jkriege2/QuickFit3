@@ -589,8 +589,9 @@ void QFTableModel::setColumn(quint32 column, const QList<QVariant>& value)
 {
     //std::cout<<"setCell("<<row<<", "<<column<<", '"<<value.toString().toStdString()<<"' ["<<value.typeName()<<"])\n";
     if (readonly || (column>=state.columns)) return;
-    addUndoStep();
+    startMultiUndo();
     quint32 row=0;
+    bool olddoEmitSignals=doEmitSignals;
     for (int i=0; i<qMin(int64_t(state.rows), (int64_t)value.size()); i++) {
         //if (row<state.rows) {
             const quint64 a=xyAdressToUInt64(row, column);
@@ -598,30 +599,29 @@ void QFTableModel::setColumn(quint32 column, const QList<QVariant>& value)
         //}
         row++;
     }
+    if (state.rows>value.size()) {
+         doEmitSignals=false;
+         for (int i=value.size(); i<state.rows; i++) {
+             deleteCell(i, column);
+             row++;
+         }
+    }
+    doEmitSignals=olddoEmitSignals;
+    endMultiUndo();
     if (doEmitSignals) emit dataChanged(index(0, column), index(row-1, column));
 }
 
 void QFTableModel::setColumn(quint32 column, const QVector<double> &value)
 {
-    //std::cout<<"setCell("<<row<<", "<<column<<", '"<<value.toString().toStdString()<<"' ["<<value.typeName()<<"])\n";
-    if (readonly || (column>=state.columns)) return;
-    addUndoStep();
-    quint32 row=0;
-    for (int i=0; i<value.size(); i++) {
-        if (row<state.rows) {
-            quint64 a=xyAdressToUInt64(row, column);
-            state.dataMap[a]=value[i];
-        }
-        row++;
-    }
-    if (doEmitSignals) emit dataChanged(index(0, column), index(row-1, column));
+    setColumn(column, value.data(), value.size());
 }
 
 void QFTableModel::setColumn(quint32 column, const double *value, int N)
 {
     //std::cout<<"setCell("<<row<<", "<<column<<", '"<<value.toString().toStdString()<<"' ["<<value.typeName()<<"])\n";
     if (readonly || (column>=state.columns)) return;
-    addUndoStep();
+    startMultiUndo();
+    bool olddoEmitSignals=doEmitSignals;
     quint32 row=0;
     for (int i=0; i<N; i++) {
         if (row<state.rows) {
@@ -630,6 +630,15 @@ void QFTableModel::setColumn(quint32 column, const double *value, int N)
         }
         row++;
     }
+    if (state.rows>N) {
+         doEmitSignals=false;
+         for (int i=N; i<state.rows; i++) {
+             deleteCell(i, column);
+             row++;
+         }
+    }
+    doEmitSignals=olddoEmitSignals;
+    endMultiUndo();
     if (doEmitSignals) emit dataChanged(index(0, column), index(row-1, column));
 }
 

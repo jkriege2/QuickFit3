@@ -2766,13 +2766,16 @@ namespace QFMathParser_DefaultLib {
                 eval=params[1].str;
                 result=params[2].str;
                 QFRawDataRecord* rdr=p->getRawDataByID(rdrID);
+                //qDebug()<<"fRDRGetResult"<<rdrID<<eval<<result;
                 if (rdr) {
                     QVariant v=rdr->resultsGetAsQVariantNoError(eval, result);
                     if (v.isValid())  r.setVariant(v);
                     else r.setVariant(def);
+                    //qDebug()<<"  -> "<<v;
                 } else {
                     r.setVariant(def);
                 }
+                //qDebug()<<"  => "<<r.toTypeString();
             } else {
                 parser->qfmpError(QObject::tr("rdr_getresult(rdr, evalID, resultID[, default]) needs an integer and two string arguments"));
                 r.setInvalid();
@@ -2918,7 +2921,7 @@ namespace QFMathParser_DefaultLib {
             return ;
         }
         for (int i=0; i<n; i++) {
-            if (params[i].isValid && !params[i].type==qfmpVoid) {
+            if (params[i].isValid && params[i].type!=qfmpVoid) {
                 res=params[i];
                 return;
             }

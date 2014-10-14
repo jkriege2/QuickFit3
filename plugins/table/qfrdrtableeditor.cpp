@@ -1429,11 +1429,11 @@ void QFRDRTableEditor::slRecalcAll()
                 // evaluate column expressions
                 int i=0;
                 int delta=1;
-                int itend=m->model()->columnCount()-1;
+                int itend=m->model()->columnCount();
                 if (iterations%2==1) {
                     i=m->model()->columnCount()-1;
                     delta=-1;
-                    itend=0;
+                    itend=-1;
                 }
 
 
@@ -1495,7 +1495,7 @@ void QFRDRTableEditor::slRecalcAll()
                                 //qDebug()<<ok<<ov.size()<<nv.size()<<equalWithVariant;
                                 if (ok && !equalWithVariant) {
                                     changes++;
-                                    m->model()->setColumn(i, nv);
+                                    m->model()->setColumnCreate(i, nv);
                                     m->model()->setCellsUserRoleCreate(QFRDRTable::TableExpressionRole, 0, qMax(nv.size()-1, m->model()->rowCount()-1), i, i, QVariant());
                                     /*for (int r=0; r<qMax(nv.size(), m->model()->rowCount()); r++) {
                                         m->model()->setCellCreate(r, i, nv.value(r, QVariant()));
