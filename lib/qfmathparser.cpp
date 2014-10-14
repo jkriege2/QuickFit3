@@ -830,12 +830,12 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                         }
                         cn->setElse(params.last());
                         res=cn;
-                    } else if (lvarname=="cumsum" || lvarname=="cumprod" || lvarname=="sum" || lvarname=="prod" || lvarname=="for" || lvarname=="savefor") {
+                    } else if (lvarname=="cumsum" || lvarname=="cumprod" || lvarname=="sum" || lvarname=="prod" || lvarname=="for" || lvarname=="savefor" || lvarname=="filterfor" || lvarname=="savefilterfor") {
                         if (params.size()==1) {
                             if (lvarname!="for"&&lvarname!="savefor") {
                                 res=new qfmpFunctionNode(varname, params, this, NULL);
                             } else {
-                                qfmpError(QObject::tr("'for(NAME, start[, delta], end, expression)' expects 4 or 5 arguments, but '%1' found").arg(params.size()));
+                                qfmpError(QObject::tr("'%2(NAME, start[, delta], end, expression)' expects 3-5 arguments, but '%1' found").arg(params.size()).arg(lvarname));
                                 return NULL;
                             }
                         } else if (params.size()==3){
@@ -3235,132 +3235,206 @@ qfmpResult QFMathParser::qfmpVectorOperationNode::evaluate()
 void QFMathParser::qfmpVectorOperationNode::evaluate(qfmpResult &r)
 {
      r.isValid=false;
-     QStringList strVec;
-     QVector<bool> boolVec;
+     QStringList strVec, itemValsS;
+     QVector<bool> boolVec, itemValsB;
      QVector<double> numVec, itemVals;
      qfmpResultType resType=qfmpDouble;
-     if (items) {
-         qfmpResult ri;
-         items->evaluate(ri);
-         if (ri.type==qfmpDouble) itemVals<<ri.num;
-         else if (ri.type==qfmpDoubleVector) itemVals=ri.numVec;
-         else {
-             if (getParser()) getParser()->qfmpError(QObject::tr("%1(NAME, ITEMS, EXPRESSION) expects a list of numbers as ITEMS").arg(operationName));
-             r.setInvalid();
-             return;
-         }
-     } else {
-         qfmpResult rs;
-         start->evaluate(rs);
-         qfmpResult re;
-         end->evaluate(re);
-         double s=rs.num;
-         double e=re.num;
-         if (rs.type!=qfmpDouble) {
-             if (getParser()) getParser()->qfmpError(QObject::tr("%1(NAME, START, DELTA, END, EXPRESSION) expects a number for START").arg(operationName));
-             r.setInvalid();
-             return;
-         }
-         if (re.type!=qfmpDouble) {
-             if (getParser()) getParser()->qfmpError(QObject::tr("%1(NAME, START, DELTA, END, EXPRESSION) expects a number for END").arg(operationName));
-             r.setInvalid();
-             return;
-         }
-         double d=1;
-         if (delta) {
-             qfmpResult rd;
-             delta->evaluate(rd);
-             if (rd.type==qfmpDouble) {
-                 d=rd.num;
-             } else {
-                 if (getParser()) getParser()->qfmpError(QObject::tr("%1(NAME, START, DELTA, END, EXPRESSION) expects a number for DELTA").arg(operationName));
+     bool evalItems=true;
+     bool ok=false;
+     bool isString=false;
+     bool isBool=false;
+
+     int cnt=0;
+     if (!ok) {
+         if (items) {
+             qfmpResult ri;
+             if (evalItems) {
+                 items->evaluate(ri);
+                 if (ri.type==qfmpDouble) {itemVals<<ri.num; cnt=itemVals.size(); }
+                 else if (ri.type==qfmpDoubleVector) {itemVals=ri.numVec; cnt=itemVals.size(); }
+                 else if (ri.type==qfmpString) {itemValsS<<ri.str; isString=true; cnt=itemValsS.size(); }
+                 else if (ri.type==qfmpStringVector) {itemValsS=ri.strVec; isString=true; cnt=itemValsS.size();}
+                 else if (ri.type==qfmpBool) {itemValsB<<ri.boolean; isBool=true; cnt=itemValsB.size();}
+                 else if (ri.type==qfmpBoolVector) {itemValsB=ri.boolVec; isBool=true; cnt=itemValsB.size();}
+                 else {
+                     if (getParser()) getParser()->qfmpError(QObject::tr("%1(NAME, ITEMS, EXPRESSION) expects a list of numbers, booleans or strings as ITEMS").arg(operationName));
+                     r.setInvalid();
+                     return;
+                 }
+             }
+         } else {
+             qfmpResult rs;
+             start->evaluate(rs);
+             qfmpResult re;
+             end->evaluate(re);
+             double s=rs.num;
+             double e=re.num;
+             if (rs.type!=qfmpDouble) {
+                 if (getParser()) getParser()->qfmpError(QObject::tr("%1(NAME, START, DELTA, END, EXPRESSION) expects a number for START").arg(operationName));
                  r.setInvalid();
                  return;
              }
-
-         }
-         //qDebug()<<"for: t="<<s<<"; t<="<<e<<"; t=t+"<<d;
-         for (double t=s; t<=e; t=t+d) {
-             itemVals<<t;
-         }
-     }
-     if (itemVals.size()<=0) {
-         if (operationName=="for"||operationName=="savefor") {
-             r.setDoubleVec(QVector<double>());
-             return;
-         } else {
-             r.setDouble(0.0);
-             return;
-         }
-     }
-     getParser()->enterBlock();
-     qfmpResult thisr;
-     for (int i=0; i<itemVals.size(); i++) {
-         getParser()->addVariable(variableName, qfmpResult(itemVals[i]));
-         expression->evaluate(thisr);
-         if (i==0) {
-             resType=thisr.type;
-         } else if ((resType==qfmpString && resType!=thisr.type) || ((resType==qfmpDouble || resType==qfmpDoubleVector)&&(thisr.type!=qfmpDouble && thisr.type!=qfmpDoubleVector)) ) {
-             if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to the same type in every iteration: expected %2, but found %3 in iteration %4").arg(operationName).arg(thisr.toTypeString()).arg(resultTypeToString(resType)).arg(i+1));
-             r.setInvalid();
-             return;
-         }
-         switch(resType) {
-             case qfmpDouble:
-                 numVec<<thisr.num;
-                 break;
-             case qfmpDoubleVector:
-                 numVec+=thisr.num;
-                 break;
-             case qfmpString:
-                 if (operationName=="sum" || operationName=="for") {
-                     strVec<<thisr.str;
-                 } else if (operationName!="savefor")  {
-                     if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to number: but found %2 in iteration %3").arg(operationName).arg(resultTypeToString(resType)).arg(i+1));
-                     r.setInvalid();
-                     return;
-                 }
-                 break;
-             case qfmpBool:
-                 if (operationName=="for") {
-                     boolVec<<thisr.boolean;
-                 } else if (operationName!="savefor")  {
-                     if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to number: but found %2 in iteration %3").arg(operationName).arg(resultTypeToString(resType)).arg(i+1));
-                     r.setInvalid();
-                     return;
-                 }
-                 break;
-             default:
-                 if (operationName!="savefor") {
-                     if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to string or number: but found %2 in iteration %3").arg(operationName).arg(resultTypeToString(resType)).arg(i+1));
-                     r.setInvalid();
-                 }
+             if (re.type!=qfmpDouble) {
+                 if (getParser()) getParser()->qfmpError(QObject::tr("%1(NAME, START, DELTA, END, EXPRESSION) expects a number for END").arg(operationName));
+                 r.setInvalid();
                  return;
+             }
+             double d=1;
+             if (delta) {
+                 qfmpResult rd;
+                 delta->evaluate(rd);
+                 if (rd.type==qfmpDouble) {
+                     d=rd.num;
+                 } else {
+                     if (getParser()) getParser()->qfmpError(QObject::tr("%1(NAME, START, DELTA, END, EXPRESSION) expects a number for DELTA").arg(operationName));
+                     r.setInvalid();
+                     return;
+                 }
+
+             }
+             //qDebug()<<"for: t="<<s<<"; t<="<<e<<"; t=t+"<<d;
+             if (d>0) {
+                 for (double t=s; t<=e; t=t+d) {
+                     itemVals<<t;
+                 }
+             } else if (d<0) {
+                 for (double t=s; t>=e; t=t+d) {
+                     itemVals<<t;
+                 }
+             }
+             cnt=itemVals.size();
+         }
+         if (cnt<=0) {
+             if (operationName=="for"||operationName=="savefor") {
+                 r.setDoubleVec(QVector<double>());
+                 return;
+             } else {
+                 r.setDouble(0.0);
+                 return;
+             }
+         }
+         getParser()->enterBlock();
+         qfmpResult thisr;
+         bool isFilterFor=((operationName=="filterfor") || (operationName=="savefilterfor"));
+         for (int i=0; i<cnt; i++) {
+             if (isBool) {
+                 getParser()->addVariable(variableName, qfmpResult(itemValsB[i]));
+             } else if (isString) {
+                 getParser()->addVariable(variableName, qfmpResult(itemValsS[i]));
+             } else {
+                 getParser()->addVariable(variableName, qfmpResult(itemVals[i]));
+             }
+             expression->evaluate(thisr);
+             if (isFilterFor) {
+                 if (i==0) {
+                     if (isBool) {
+                         resType=qfmpBoolVector;
+                         boolVec.clear();
+                     } else if (isString) {
+                         resType=qfmpStringVector;
+                         strVec.clear();
+                     } else {
+                         resType=qfmpDoubleVector;
+                         numVec.clear();
+                     }
+                 }
+                 if (thisr.type==qfmpBool) {
+                     if (thisr.boolean) {
+                         if (isBool) {
+                             boolVec.append(itemValsB[i]);
+                         } else if (isString) {
+                             strVec.append(itemValsS[i]);
+                         } else {
+                             numVec.append(itemVals[i]);
+                         }
+                     }
+                 } else {
+                     if (operationName!="savefilterfor") {
+                         if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to a boolean, but found %2 in iteration %3").arg(operationName).arg(resultTypeToString(thisr.type)).arg(i+1));
+                         r.setInvalid();
+                     }
+                     return;
+                 }
+             } else {
+                 if (i==0) {
+                     switch(thisr.type) {
+                         case qfmpBool:
+                         case qfmpBoolVector:
+                             resType=qfmpBoolVector;
+                             break;
+                         case qfmpString:
+                         case qfmpStringVector:
+                             resType=qfmpStringVector;
+                             break;
+                         default:
+                         case qfmpDouble:
+                         case qfmpDoubleVector:
+                             resType=qfmpDoubleVector;
+                             break;
+                     }
+
+                     //resType=thisr.type;
+                 } else if ((resType==qfmpBoolVector && thisr.type!=qfmpBool && thisr.type!=qfmpBoolVector)
+                            || (resType==qfmpStringVector && thisr.type!=qfmpString && thisr.type!=qfmpStringVector)
+                            || (resType==qfmpDoubleVector && thisr.type!=qfmpDouble && thisr.type!=qfmpDoubleVector)) { //(resType==qfmpString && resType!=thisr.type) || ((resType==qfmpDouble || resType==qfmpDoubleVector)&&(thisr.type!=qfmpDouble && thisr.type!=qfmpDoubleVector)) ) {
+                     if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to a compatible type in every iteration: expected compaitble with %2 (single/vector), but found %3 in iteration %4").arg(operationName).arg(thisr.toTypeString()).arg(resultTypeToString(resType)).arg(i+1));
+                     r.setInvalid();
+                     return;
+                 }
+                 switch(resType) {
+                     case qfmpDoubleVector:
+                         if (thisr.type==qfmpDouble) numVec<<thisr.num;
+                         else if (thisr.type==qfmpDoubleVector) numVec<<thisr.numVec;
+                         break;
+                     case qfmpStringVector:
+                         if (operationName=="sum" || operationName=="for" || operationName=="savefor") {
+                             if (thisr.type==qfmpString) strVec<<thisr.str;
+                             else if (thisr.type==qfmpStringVector) strVec<<thisr.strVec;
+                         } else  if (operationName!="savefor")  {
+                             if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to number: but found %2 in iteration %3").arg(operationName).arg(resultTypeToString(resType)).arg(i+1));
+                             r.setInvalid();
+                             return;
+                         }
+                         break;
+                     case qfmpBoolVector:
+                         if (operationName=="for" || operationName=="savefor") {
+                             if (thisr.type==qfmpBool) boolVec<<thisr.boolean;
+                             else if (thisr.type==qfmpBoolVector) boolVec<<thisr.boolVec;
+                         } else  if (operationName!="savefor")  {
+                             if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to number: but found %2 in iteration %3").arg(operationName).arg(resultTypeToString(resType)).arg(i+1));
+                             r.setInvalid();
+                             return;
+                         }
+                         break;
+                     default:
+                         if (operationName!="savefor") {
+                             if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to string or number: but found %2 in iteration %3").arg(operationName).arg(resultTypeToString(resType)).arg(i+1));
+                             r.setInvalid();
+                         }
+                         return;
+                 }
+             }
+         }
+         getParser()->leaveBlock();
+
+         r.isValid=true;
+         if (operationName=="for"||operationName=="savefor"||operationName=="filterfor"||operationName=="savefilterfor") {
+             if (resType==qfmpDoubleVector) r.setDoubleVec(numVec);
+             else if (resType==qfmpStringVector) r.setStringVec(strVec);
+             else if (resType==qfmpBoolVector) r.setBoolVec(boolVec);
+             else if (operationName=="savefor" || operationName=="savefilterfor") {
+                 r.setDoubleVec(QVector<double>());
+             } else r.setInvalid();
+
+         } else if (operationName=="sum") {
+             if (resType==qfmpDoubleVector) r.setDouble(qfstatisticsSum(numVec));
+             else if (resType==qfmpStringVector) r.setString(strVec.join(""));
+             else r.setInvalid();
+         } else if (operationName=="prod") {
+             if (resType==qfmpDoubleVector) r.setDouble(qfstatisticsProd(numVec));
+             else r.setInvalid();
          }
      }
-     getParser()->leaveBlock();
-
-     r.isValid=true;
-     if (operationName=="for"||operationName=="savefor") {
-         if (boolVec.size()==itemVals.size()) r.setBoolVec(boolVec);
-         else if (strVec.size()==itemVals.size()) r.setStringVec(strVec);
-         else if (numVec.size()==itemVals.size()) r.setDoubleVec(numVec);
-         else {
-             if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to the same value in all iterations").arg(operationName));
-             r.setInvalid();
-             return;
-         }
-     } else if (operationName=="sum") {
-         if (resType==qfmpString) {
-             r.setString(strVec.join(""));
-         } else {
-             r.setDouble(qfstatisticsSum(numVec));
-         }
-     } else if (operationName=="prod") {
-         r.setDouble(qfstatisticsProd(numVec));
-     }
-
-
 }
 
 bool QFMathParser::qfmpVectorOperationNode::createByteCode(QFMathParser::ByteCodeProgram &program, QFMathParser::ByteCodeEnvironment *environment)

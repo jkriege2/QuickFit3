@@ -1,0 +1,161 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Special Mathematical Functions</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  
+  
+  $$funcref_start$$<a name="sigmoid"/><!-- func:sigmoid -->
+  <b><tt><!-- template -->sigmoid(x)<!-- /template --></tt> - <i>sigmoidal function </i>:</b>
+$$funcref_description$$
+  $$bmath:\mathrm{sigmoid}(x)=\frac{1}{1+\exp(-x)}$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:sigmoid -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="sign"/><!-- func:sign -->
+  <b><tt><!-- template -->sign(x)<!-- /template --></tt> - <i>sign function </i>:</b>
+$$funcref_description$$
+  $$bmath:\mbox{sign}(x)=\begin{cases}-1 & x<0\\0 & x\equiv 0\\+1 & x>0\end{cases}$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:sign -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="theta"/><!-- func:theta -->
+  <b><tt><!-- template -->theta(x)<!-- /template --></tt> - <i>theta step function </i>:</b>
+$$funcref_description$$
+  $$bmath:\Theta(x)=\begin{cases}-1 & x<0\\0 & x\equiv 0\\+1 & x>0\end{cases}$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:theta -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="tanc"/><!-- func:tanc -->
+  <b><tt><!-- template -->tanc(x)<!-- /template --></tt> - <i>tanc function </i>:</b>
+$$funcref_description$$
+  $$bmath:\mbox{tanc}(x)=\begin{cases}1 & x\equiv0\\\frac{\tan(x)}{x}&\mathrm{elsewhere}\end{cases}$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:tanc -->  
+$$funcref_end$$
+  
+  
+  $$funcref_start$$<a name="slit"/><!-- func:slit -->
+  <b><tt><!-- template -->slit(x,a)<!-- /template --></tt> - <i>slit function (two step function) </i>:</b>
+$$funcref_description$$
+  $$bmath:\mbox{slit}(x,a)=\begin{cases}1 & -a/2 \geq x\geq a/2 \\0 & \text{elsewhere}\end{cases}$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:slit -->  
+$$funcref_end$$
+  
+  
+  $$funcref_start$$<a name="sinc"/><!-- func:sinc -->
+  <b><tt><!-- template -->sinc(x)<!-- /template --></tt> - <i>sinc function </i>:</b>
+$$funcref_description$$
+  $$bmath:\mbox{sinc}(x)=\begin{cases}1 & x\equiv0\\\frac{\sin(x)}{x}&\mathrm{elsewhere}\end{cases}$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:sinc -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="erf"/><!-- func:erf -->
+  <b><tt><!-- template -->erf(x)<!-- /template --></tt> - <i>error function </i>:</b>
+$$funcref_description$$
+  $$bmath:\operatorname{erf}(x) = \frac{2}{\sqrt{\pi}} \int_0^x e^{-\tau^2}\,\mathrm{d}\tau$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:erf -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="erfc"/><!-- func:erfc -->
+  <b><tt><!-- template -->erfc(x)<!-- /template --></tt> - <i>erfc function </i>:</b>
+$$funcref_description$$
+  $$bmath:\operatorname{erfc}(x) = 1 - \operatorname{erf}(x) = \frac{2}{\sqrt{\pi}} \int_x^\infty e^{-\tau^2}\,\mathrm{d}\tau.$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:erfc -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="lgamma"/><!-- func:lgamma -->
+  <b><tt><!-- template -->lgamma(x)<!-- /template --></tt> - <i>logarithmic gamma function </i>:</b>
+$$funcref_description$$
+  $$bmath:\ln\left(\Gamma(x)\right) = \ln\left[\int_0^\infty t^{x-1} \mathrm{e}^{-t} \mathrm{d}t\right]$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:lgamma -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="tgamma"/><!-- func:tgamma -->
+  <b><tt><!-- template -->sinc(x)<!-- /template --></tt> - <i>gamma function </i>:</b>
+$$funcref_description$$
+  $$bmath:\Gamma(x) = \int_0^\infty t^{x-1} \mathrm{e}^{-t} \mathrm{d}t$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:tgamma -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="j0"/><!-- func:j0 -->
+  <b><tt><!-- template -->j0(x)<!-- /template --></tt> - <i>Bessel functions of the first kind </i>:</b>
+$$funcref_description$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:j0 -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="j1"/><!-- func:j1 -->
+  <b><tt><!-- template -->j1(x)<!-- /template --></tt> - <i>Bessel functions of the first kind </i>:</b>
+$$funcref_description$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:j1 -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="jn"/><!-- func:jn -->
+  <b><tt><!-- template -->jn(n, x)<!-- /template --></tt> - <i>Bessel functions of the first kind </i>:</b>
+$$funcref_description$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:jn -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="y0"/><!-- func:y0 -->
+  <b><tt><!-- template -->y0(x)<!-- /template --></tt> - <i>Bessel functions of the second kind </i>:</b>
+$$funcref_description$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:y0 -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="y1"/><!-- func:y1 -->
+  <b><tt><!-- template -->y1(x)<!-- /template --></tt> - <i>Bessel functions of the second kind </i>:</b>
+$$funcref_description$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:y1 -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="yn"/><!-- func:yn -->
+  <b><tt><!-- template -->yn(n, x)<!-- /template --></tt> - <i>Bessel functions of the second kind </i>:</b>
+$$funcref_description$$
+  The argument <tt>x</tt> may be a vector, then the return value is also a vector of numbers where the function has been applied to each entry of the input vector.
+  <!-- /func:yn -->  
+$$funcref_end$$
+
+
+  $$funcref_start$$<a name="min"/><!-- func:min -->
+  <b><tt><!-- template -->min(x,y)<!-- /template --></tt> - <i>returns the smaller of the two arguments </i>:</b>
+$$funcref_description$$
+  <!-- /func:min -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="max"/><!-- func:max -->
+  <b><tt><!-- template -->max(x,y)<!-- /template --></tt> - <i>returns the larger of the two arguments </i>:</b>
+$$funcref_description$$
+  <!-- /func:max -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="fmod"/><!-- func:fmod -->
+  <b><tt><!-- template -->fmod(x,y)<!-- /template --></tt> - <i>returns the reminder after division x/y division </i>:</b>
+$$funcref_description$$
+  The arguments <tt>x</tt> and <tt>y</tt> may be vectors, then the return value is also a vector of numbers where the function has been applied to each pair of entries of the input vectors.
+  <!-- /func:fmod -->  
+$$funcref_end$$
+
+
+  
+  
+  </body>
+  </html>
+  

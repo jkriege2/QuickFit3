@@ -616,6 +616,18 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             a double (qfrdreNumber), QPointF (qfrdreNumberError) or a QList<QVariant> (qfrdreNumberVector).
         */
         QVariant resultsGetAsQVariant(const QString& evalName, const QString& resultName) const;
+        /*! \brief return a specified result as a QVariant, if the result has an associated error, only the values is returned
+
+            The resulting QVariant conatins either a boolean (qfrdreBoolean), a QString (qfrdreString), an integer (qfrdreInteger),
+            a double (qfrdreNumber) or a QList<QVariant> (qfrdreNumberVector).
+        */
+        QVariant resultsGetAsQVariantNoError(const QString& evalName, const QString& resultName) const;
+        /*! \brief return the error associated to a specified result as a QVariant
+
+            The resulting QVariant conatins either a boolean (qfrdreBoolean), a QString (qfrdreString), an integer (qfrdreInteger),
+            a double (qfrdreNumber) or a QList<QVariant> (qfrdreNumberVector).
+        */
+        QVariant resultsGetAsQVariantOnlyError(const QString& evalName, const QString& resultName) const;
         /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */
         double resultsGetAsDouble(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
         /** \brief return a specified result's error as double vector (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */

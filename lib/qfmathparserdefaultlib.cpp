@@ -27,6 +27,13 @@
 #include <QDate>
 #include <QTime>
 
+#ifdef QFLIB_LIBRARY
+#  include "qfpluginservices.h"
+#  include "qfproject.h"
+#  include "qfrawdatarecord.h"
+#  include "qfevaluationitem.h"
+#endif
+
 
 #define QFMATHPARSER_REGISTER_FUNC(FName, NAME_IN_PARSER) p->addFunction(#NAME_IN_PARSER, QFMathParser_DefaultLib::FName);
 
@@ -151,9 +158,14 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("roundsig", QFMathParser_DefaultLib::fRoundSig, NULL, roundError, roundError);
     p->addFunction("tosystempathseparator", QFMathParser_DefaultLib::fToSystemPathSeparator);
     p->addFunction("trimm", QFMathParser_DefaultLib::fTrimm);
-    p->addFunction("tolower", QFMathParser_DefaultLib::fToLower);
+    p->addFunction("simplify", QFMathParser_DefaultLib::fSimplify);
+    p->addFunction("split", QFMathParser_DefaultLib::fSplit);
+    p->addFunction("join", QFMathParser_DefaultLib::fJoin);
+    p->addFunction("removeemtystrings", QFMathParser_DefaultLib::fRemoveEmpty);
+
     p->addFunction("toupper", QFMathParser_DefaultLib::fToUpper);
     p->addFunction("length", QFMathParser_DefaultLib::fLength);
+    p->addFunction("size", QFMathParser_DefaultLib::fLength);
     p->addFunction("sort", QFMathParser_DefaultLib::fSort);
     p->addFunction("dsort", QFMathParser_DefaultLib::fDSort);
     p->addFunction("count", QFMathParser_DefaultLib::fCount);
@@ -228,6 +240,7 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("first", QFMathParser_DefaultLib::fFirst);
     p->addFunction("returnlast", QFMathParser_DefaultLib::fReturnLast);
     p->addFunction("returnfirst", QFMathParser_DefaultLib::fReturnFirst);
+    p->addFunction("returnfirstvalid", QFMathParser_DefaultLib::fReturnFirstValid);
     p->addFunction("item", QFMathParser_DefaultLib::fItem);
 
     p->addFunction("runningaverage", QFMathParser_DefaultLib::fRunningAverage);
@@ -279,6 +292,19 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
 
     p->addFunction("varname", QFMathParser_DefaultLib::fVarname);
 
+
+#ifdef QFLIB_LIBRARY
+    p->addFunction("rdr_ids", QFMathParser_DefaultLib::fRDRIDs);
+    p->addFunction("eval_ids", QFMathParser_DefaultLib::fEvalIDs);
+    p->addFunction("rdr_getresult", QFMathParser_DefaultLib::fRDRGetResult);
+    p->addFunction("rdr_getresulterror", QFMathParser_DefaultLib::fRDRGetResultError);
+    p->addFunction("rdr_getname", QFMathParser_DefaultLib::fRDRGetName);
+    p->addFunction("rdr_getfolder", QFMathParser_DefaultLib::fRDRGetFolder);
+    p->addFunction("rdr_getgroup", QFMathParser_DefaultLib::fRDRGetGroup);
+    p->addFunction("rdr_getproperty", QFMathParser_DefaultLib::fRDRGetProperty);
+    p->addFunction("rdr_gettype", QFMathParser_DefaultLib::fRDRGetType);
+
+#endif
 
 
 
@@ -2657,6 +2683,255 @@ namespace QFMathParser_DefaultLib {
         }
     }
 
+    void fSplit(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        r.setInvalid();
+        if (n==2 && params[0].type==qfmpString && params[1].type==qfmpString) {
+            r.setStringVec(params[0].str.split(params[1].str));
+        } else {
+            p->qfmpError(QObject::tr("split(x, param) needs 2 string arguments"));
+            r.setInvalid();
+            return;
+        }
+    }
+
+    void fRemoveEmpty(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        r.setInvalid();
+        if (n==1 && params[0].type==qfmpStringVector) {
+            r.setStringVec(QStringList());
+            for (int i=0; i<params[0].strVec.size(); i++) {
+                if (!params[0].strVec[i].isEmpty()) r.strVec<<params[0].strVec[i];
+            }
+        } else {
+            p->qfmpError(QObject::tr("removeemptystrings(x) needs 1 string vector arguments"));
+            r.setInvalid();
+            return;
+        }
+    }
+
+    void fJoin(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        QString sep="";
+        r.setString("");
+        if (n==2) {
+            if (params[1].type==qfmpString) {
+                sep=params[1].str;
+            } else {
+                p->qfmpError(QObject::tr("join(x, separator) needs a string as second argument"));
+                r.setInvalid();
+                return;
+            }
+        }
+        if (n>0 && params[0].type==qfmpStringVector) {
+            r.setString(params[0].strVec.join(sep));
+        } else {
+            p->qfmpError(QObject::tr("join(x, separator) needs a string vector as first argument"));
+            r.setInvalid();
+            return;
+        }
+    }
+
+#ifdef QFLIB_LIBRARY
+    void fRDRIDs(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        r.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            QList<int> ids=p->getRawDataIDList();
+            r.setDoubleVec(ids.size(), -1);
+            for (int i=0; i<ids.size(); i++)
+                r.numVec[i]=ids[i];
+        }
+    }
+    void fEvalIDs(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        r.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            QList<int> ids=p->getEvaluationIDList();
+            r.setDoubleVec(ids.size(), -1);
+            for (int i=0; i<ids.size(); i++)
+                r.numVec[i]=ids[i];
+        }
+    }
+    void fRDRGetResult(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        r.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int rdrID=-1;
+            QString eval="";
+            QString result="";
+            QVariant def;
+            if (n>=3 && params[0].type==qfmpDouble && params[1].type==qfmpString && params[2].type==qfmpString) {
+                rdrID=params[0].toInteger();
+                eval=params[1].str;
+                result=params[2].str;
+                QFRawDataRecord* rdr=p->getRawDataByID(rdrID);
+                if (rdr) {
+                    QVariant v=rdr->resultsGetAsQVariantNoError(eval, result);
+                    if (v.isValid())  r.setVariant(v);
+                    else r.setVariant(def);
+                } else {
+                    r.setVariant(def);
+                }
+            } else {
+                parser->qfmpError(QObject::tr("rdr_getresult(rdr, evalID, resultID[, default]) needs an integer and two string arguments"));
+                r.setInvalid();
+                return;
+            }
+        }
+    }
+    void fRDRGetResultError(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        r.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int rdrID=-1;
+            QString eval="";
+            QString result="";
+            if (n==3 && params[0].type==qfmpDouble && params[1].type==qfmpString && params[2].type==qfmpString) {
+                rdrID=params[0].toInteger();
+                eval=params[1].str;
+                result=params[2].str;
+                QFRawDataRecord* rdr=p->getRawDataByID(rdrID);
+                if (rdr) {
+                    r.setVariant(rdr->resultsGetAsQVariantOnlyError(eval, result));
+                }
+            } else {
+                parser->qfmpError(QObject::tr("rdr_getresulterror(rdr, evalID, resultID) needs an integer and two string arguments"));
+                r.setInvalid();
+                return;
+            }
+        }
+    }
+    void fRDRGetName(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        r.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int rdrID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                rdrID=params[0].toInteger();
+                QFRawDataRecord* rdr=p->getRawDataByID(rdrID);
+                if (rdr) {
+                    r.setString(rdr->getName());
+                } else {
+                    r.setString("");
+                }
+            } else {
+                parser->qfmpError(QObject::tr("rdr_getname(rdr) needs one integer argument"));
+                r.setInvalid();
+                return;
+            }
+        }
+    }
+    void fRDRGetType(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        r.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int rdrID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                rdrID=params[0].toInteger();
+                QFRawDataRecord* rdr=p->getRawDataByID(rdrID);
+                if (rdr) {
+                    r.setString(rdr->getType());
+                } else {
+                    r.setString("");
+                }
+            } else {
+                parser->qfmpError(QObject::tr("rdr_gettype(rdr) needs one integer argument"));
+                r.setInvalid();
+                return;
+            }
+        }
+    }
+    void fRDRGetFolder(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        r.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int rdrID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                rdrID=params[0].toInteger();
+                QFRawDataRecord* rdr=p->getRawDataByID(rdrID);
+                if (rdr) {
+                    r.setString(rdr->getFolder());
+                } else {
+                    r.setString("");
+                }
+            } else {
+                parser->qfmpError(QObject::tr("rdr_getfolder(rdr) needs one integer argument"));
+                r.setInvalid();
+                return;
+            }
+        }
+    }
+    void fRDRGetGroup(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        r.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int rdrID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                rdrID=params[0].toInteger();
+                QFRawDataRecord* rdr=p->getRawDataByID(rdrID);
+                if (rdr) {
+                    r.setString(rdr->getGroupName());
+                } else {
+                    r.setString("");
+                }
+            } else {
+                parser->qfmpError(QObject::tr("rdr_getgroup(rdr) needs one integer argument"));
+                r.setInvalid();
+                return;
+            }
+        }
+    }
+    void fRDRGetProperty(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        r.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int rdrID=-1;
+            QString prop="";
+            QVariant def;
+            if (n>=2 && params[0].type==qfmpDouble && params[1].type==qfmpString ) {
+                rdrID=params[0].toInteger();
+                prop=params[1].str;
+                if (n==3) {
+                    def=params[2].asVariant();
+                }
+                QFRawDataRecord* rdr=p->getRawDataByID(rdrID);
+                if (rdr) {
+                    r.setVariant(rdr->getQFProperty(prop, def));
+                } else {
+                    r.setVariant(def);
+                }
+            } else {
+                parser->qfmpError(QObject::tr("rdr_getproperty(rdr, propertyID) needs an integer and a string argument"));
+                r.setInvalid();
+                return;
+            }
+        }
+    }
+
+    void fReturnFirstValid(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        res.setInvalid();
+
+        if (n<1) {
+            p->qfmpError("returnfirstvalid(x1,x2,x3,...) needs at least one argument");
+            return ;
+        }
+        for (int i=0; i<n; i++) {
+            if (params[i].isValid && !params[i].type==qfmpVoid) {
+                res=params[i];
+                return;
+            }
+        }
+    }
+
+#endif
+
+
 
 
 }
+
+
+
+

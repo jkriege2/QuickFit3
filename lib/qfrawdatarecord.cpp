@@ -2736,6 +2736,115 @@ QVariant QFRawDataRecord::resultsGetAsQVariant(const QString& evalName, const QS
     return result;
 }
 
+QVariant QFRawDataRecord::resultsGetAsQVariantNoError(const QString &evalName, const QString &resultName) const
+{
+    QVariant result;
+    const evaluationResult r=resultsGet(evalName, resultName);
+    switch(r.type) {
+        case qfrdreBoolean: result=r.bvalue; break;
+        case qfrdreInteger: result=(qlonglong)r.ivalue; break;
+        case qfrdreNumberError: result=r.dvalue; break;
+        case qfrdreNumber: result=r.dvalue; break;
+        case qfrdreNumberMatrix:
+        case qfrdreNumberVector:
+        case qfrdreNumberErrorMatrix:
+        case qfrdreNumberErrorVector: {
+            QList<QVariant> data;
+            for (int i=0; i<r.dvec.size(); i++) {
+                data.append(r.dvec[i]);
+            }
+            result=data;
+            break;
+        }
+        case qfrdreStringMatrix:
+        case qfrdreStringVector: {
+            QList<QVariant> data;
+            for (int i=0; i<r.svec.size(); i++) {
+                data.append(r.svec[i]);
+            }
+            result=data;
+            break;
+        }
+        case qfrdreIntegerMatrix:
+        case qfrdreIntegerVector: {
+            QList<QVariant> data;
+            for (int i=0; i<r.ivec.size(); i++) {
+                data.append(r.ivec[i]);
+            }
+            result=data;
+            break;
+        }
+        case qfrdreBooleanMatrix:
+        case qfrdreBooleanVector: {
+            QList<QVariant> data;
+            for (int i=0; i<r.bvec.size(); i++) {
+                data.append(r.bvec[i]);
+            }
+            result=data;
+            break;
+        }
+        case qfrdreString: result=r.svalue; break;
+        default: result=QVariant(); break;
+    }
+    return result;
+}
+
+QVariant QFRawDataRecord::resultsGetAsQVariantOnlyError(const QString &evalName, const QString &resultName) const
+{
+    QVariant result;
+    const evaluationResult r=resultsGet(evalName, resultName);
+    switch(r.type) {
+        case qfrdreString:
+        case qfrdreNumber:
+        case qfrdreBoolean:
+        case qfrdreInteger: result=double(0.0); break;
+        case qfrdreNumberError: result=r.derror; break;
+        case qfrdreNumberMatrix:
+        case qfrdreNumberVector: {
+                QList<QVariant> data;
+                for (int i=0; i<r.dvec.size(); i++) {
+                    data.append(double(0.0));
+                }
+                result=data;
+            } break;
+        case qfrdreNumberErrorMatrix:
+        case qfrdreNumberErrorVector: {
+            QList<QVariant> data;
+            for (int i=0; i<r.dvec.size(); i++) {
+                data.append(r.evec.value(i, 0.0));
+            }
+            result=data;
+            break;
+        }
+        case qfrdreStringMatrix:
+        case qfrdreStringVector: {
+                QList<QVariant> data;
+                for (int i=0; i<r.svec.size(); i++) {
+                    data.append(double(0.0));
+                }
+                result=data;
+            } break;
+        case qfrdreIntegerMatrix:
+        case qfrdreIntegerVector: {
+                QList<QVariant> data;
+                for (int i=0; i<r.ivec.size(); i++) {
+                    data.append(double(0.0));
+                }
+                result=data;
+            } break;
+        case qfrdreBooleanMatrix:
+        case qfrdreBooleanVector: {
+                QList<QVariant> data;
+                for (int i=0; i<r.bvec.size(); i++) {
+                    data.append(double(0.0));
+                }
+                result=data;
+            } break;
+        default: result=QVariant(); break;
+    }
+    return result;
+}
+
 QString QFRawDataRecord::resultsGetAsString(const QString& evalName, const QString& resultName) const {
     const evaluationResult& r=resultsGet(evalName, resultName);
     switch(r.type) {

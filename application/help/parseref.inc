@@ -5,6 +5,9 @@
 <li><b><a href="$$mainhelpdir$$/parserreference/power_roots.html">powers and roots</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/round_abs.html">rounding and absolute values</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/special.html">special functions</a></b></li>
+<li><b><a href="$$mainhelpdir$$/parserreference/special_functionlike.html">function-like constructs (if, cases, for, sum, ...)</a></b></li>
+<li><b><a href="$$mainhelpdir$$/parserreference/special_math.html">special math functions</a></b></li>
+<li><b><a href="$$mainhelpdir$$/parserreference/floatingpointfunctions.html">floating-point special functions (isnan etc.)</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/polynomials.html">polynomial functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/distributions.html">distribution functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/string.html">string functions</a></b></li>
@@ -16,5 +19,6 @@
 <li><b><a href="$$mainhelpdir$$/parserreference/datetime.html">date/time functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/unit.html">unit conversion functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/constants.html">common math/physics constants</a></b></li>
+<li><b><a href="$$mainhelpdir$$/parserreference/project_access.html">access to the current QuickFit project</a></b></li>
 <!--<li><b><a href="./parserreference/.html"></a></b></li>-->
 $$qfmathparser_ref$$

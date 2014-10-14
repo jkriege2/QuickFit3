@@ -26,7 +26,7 @@
 
 
 /******************************************************************************************
- * default-Funktionen f�r den Parser
+ * default-functions for farser
  ******************************************************************************************/
 
 
@@ -149,6 +149,9 @@ namespace QFMathParser_DefaultLib {
     void fReplace(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fCountOccurences(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
+    void fSplit(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fJoin(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRemoveEmpty(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
     QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fMean, mean, qfstatisticsAverage)
 
@@ -191,6 +194,9 @@ namespace QFMathParser_DefaultLib {
     static inline QString QFMathParser_trimm(const QString& value) {
         return value.trimmed();
     }
+    static inline QString QFMathParser_simplify(const QString& value) {
+        return value.simplified();
+    }
     static inline QString QFMathParser_tolower(const QString& value) {
         return value.toLower();
     }
@@ -198,7 +204,9 @@ namespace QFMathParser_DefaultLib {
         return value.toUpper();
     }
 
+
     QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fTrimm, trimm, QFMathParser_trimm)
+    QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fSimplify, simplify, QFMathParser_simplify)
     QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fToLower, tolower, QFMathParser_tolower)
     QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fToUpper, toupper, QFMathParser_toupper)
 
@@ -347,6 +355,7 @@ namespace QFMathParser_DefaultLib {
     qfmpResult fIndexedNMAD(const qfmpResult* params, unsigned int  n, QFMathParser* p) ;
     qfmpResult fReturnLast(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fReturnFirst(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fReturnFirstValid(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fLast(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fFirst(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fItem(const qfmpResult* params, unsigned int  n, QFMathParser* p);
@@ -422,6 +431,21 @@ namespace QFMathParser_DefaultLib {
     bool hasDefaultFunctions(QFMathParser* p);
     void addDefaultVariables(QFMathParser *p);
     bool hasDefaultVariables(QFMathParser* p);
+
+
+
+#ifdef QFLIB_LIBRARY
+    void fRDRIDs(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fEvalIDs(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDRGetResult(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDRGetResultError(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDRGetName(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDRGetType(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDRGetFolder(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDRGetGroup(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDRGetProperty(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+#endif
+
 }
 
 

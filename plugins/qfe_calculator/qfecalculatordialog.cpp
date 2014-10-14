@@ -151,24 +151,24 @@ void QFECalculatorDialog::on_btnEvaluate_clicked()
     if (ui->chkMultiline->isChecked()) expression=ui->pteExpression->toPlainText();
     QTextCursor cur1(ui->edtHistory->document());
     cur1.movePosition(QTextCursor::End);
-    cur1.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&gt;&gt; <i>%1</i></tt><br>").arg(expression)));
+    cur1.insertFragment(QTextDocumentFragment::fromHtml(tr("<tt>&gt;&gt; <i>%1</i></tt><br>").arg(Qt::escape(expression))));
     parser->resetErrors();
     qfmpResult r=parser->evaluate(expression);
 
     QString result;
     if (r.isValid) {
         if (r.type==qfmpBool) {
-            result=tr("<font color=\"blue\">[boolean] %1</font>").arg(boolToQString(r.boolean));
+            result=tr("<font color=\"blue\">[boolean] %1</font>").arg(Qt::escape(boolToQString(r.boolean)));
         } else if (r.type==qfmpDouble) {
             result=tr("<font color=\"blue\">[float] %1</font>").arg(r.num, 0, 'g', ui->spinDigits->value());
         } else if (r.type==qfmpDoubleVector) {
-            result=tr("<font color=\"blue\">[float vector] %1</font>").arg(numlistToString(r.numVec));
+            result=tr("<font color=\"blue\">[float vector] %1</font>").arg(Qt::escape(numlistToString(r.numVec)));
         } else if (r.type==qfmpStringVector) {
-            result=tr("<font color=\"blue\">[string vector] %1</font>").arg(listToString(r.strVec));
+            result=tr("<font color=\"blue\">[string vector] %1</font>").arg(Qt::escape(listToString(r.strVec)));
         } else if (r.type==qfmpBoolVector) {
-            result=tr("<font color=\"blue\">[boolean vector] %1</font>").arg(listToString(r.boolVec));
+            result=tr("<font color=\"blue\">[boolean vector] %1</font>").arg(Qt::escape(listToString(r.boolVec)));
         } else if (r.type==qfmpString) {
-            result=tr("<font color=\"blue\">[string] %1</font>").arg(r.str);
+            result=tr("<font color=\"blue\">[string] %1</font>").arg(Qt::escape(r.str));
         } else if (r.type==qfmpVoid) {
             result=tr("<font color=\"blue\">[void]</font>");
         } else {
