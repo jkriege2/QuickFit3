@@ -25,7 +25,7 @@
      <property name="orientation">
       <enum>Qt::Horizontal</enum>
      </property>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout" stretch="0">
@@ -63,8 +63,8 @@
              <rect>
               <x>0</x>
               <y>0</y>
-              <width>346</width>
-              <height>373</height>
+              <width>379</width>
+              <height>382</height>
              </rect>
             </property>
            </widget>
@@ -102,15 +102,12 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="">
+     <widget class="QWidget" name="layoutWidget">
       <layout class="QGridLayout" name="gridLayout">
        <item row="1" column="0">
         <widget class="QListWidget" name="lstRDR">
          <property name="selectionMode">
           <enum>QAbstractItemView::ExtendedSelection</enum>
-         </property>
-         <property name="selectionBehavior">
-          <enum>QAbstractItemView::SelectRows</enum>
          </property>
         </widget>
        </item>
@@ -127,6 +124,13 @@
           <widget class="QPushButton" name="btnSelectNone">
            <property name="text">
             <string>deselect all</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnToggled">
+           <property name="text">
+            <string>toggle selected</string>
            </property>
           </widget>
          </item>

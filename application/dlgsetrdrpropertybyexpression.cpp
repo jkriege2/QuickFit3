@@ -156,6 +156,7 @@ DlgSetRDRPropertyByExpression::DlgSetRDRPropertyByExpression(QWidget *parent) :
 
     lastExpression="";
     lastNode=NULL;
+    project=NULL;
 
     ui->setupUi(this);
     layItems=new QVBoxLayout();
@@ -191,14 +192,15 @@ void DlgSetRDRPropertyByExpression::setProject(QFProject *project)
 {
     this->project=project;
 
-    if (project) {
-        for (int i=0; i<editors.size(); i++) {
-            if (editors[i]) {
-                editors[i]->setProject(project);
-            }
+    for (int i=0; i<editors.size(); i++) {
+        if (editors[i]) {
+            editors[i]->setProject(project);
         }
-        rdrs.clear();
-        for (int i=0; i<project->getRawDataCount(); i++) {
+    }
+    rdrs.clear();
+    ui->lstRDR->clear();
+    if (project) {
+         for (int i=0; i<project->getRawDataCount(); i++) {
             QPointer<QFRawDataRecord> r=project->getRawDataByNum(i);
             rdrs.append(r);
             QListWidgetItem* item=new QListWidgetItem(r->getName(), ui->lstRDR);
@@ -272,7 +274,7 @@ void DlgSetRDRPropertyByExpression::applyResult(DlgSetRDRPropertyByExpressionEdi
 {
     bool apply=false;
     QVariant res=getResult(wid->getExpression(), rdr, &apply);
-    if (apply) {
+    if (apply&&project&&rdr) {
         switch (wid->getType()) {
             case 0: // RDR group
                 rdr->setGroup(project->addOrFindRDRGroup(res.toString()));
@@ -367,6 +369,19 @@ void DlgSetRDRPropertyByExpression::on_btnSelectAll_clicked()
 {
     for (int i=0; i<ui->lstRDR->count(); i++)  {
         ui->lstRDR->item(i)->setCheckState(Qt::Checked);
+    }
+}
+
+void DlgSetRDRPropertyByExpression::on_btnToggled_clicked()
+{
+    QList<QListWidgetItem*> items=ui->lstRDR->selectedItems();
+    for (int i=0; i<items.count(); i++)  {
+        if (items[i]) {
+            if (items[i]->checkState()==Qt::Checked)
+                items[i]->setCheckState(Qt::Unchecked);
+            else
+                items[i]->setCheckState(Qt::Checked);
+        }
     }
 }
 

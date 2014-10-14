@@ -9,6 +9,15 @@ DlgSetRDRPropertyByExpressionEditor::DlgSetRDRPropertyByExpressionEditor(DlgSetR
     ui->setupUi(this);
     project=NULL;
     this->par=par;
+
+    ui->edtExpression->getEdit()->addInsertContextMenuEntry("name", "name");
+    ui->edtExpression->getEdit()->addInsertContextMenuEntry("description", "description");
+    ui->edtExpression->getEdit()->addInsertContextMenuEntry("group", "group");
+    ui->edtExpression->getEdit()->addInsertContextMenuEntry("groupid", "groupid");
+    ui->edtExpression->getEdit()->addInsertContextMenuEntry("role", "role");
+    ui->edtExpression->getEdit()->addInsertContextMenuEntry("folder", "folder");
+    ui->edtExpression->getEdit()->addInsertContextMenuEntry("files", "files");
+    ui->edtExpression->getEdit()->addInsertContextMenuEntry("filecount", "filecount");
     ui->edtExpression->getEdit()->addInsertContextMenuEntry("rdrproperty(id)", "rdrproperty(id)");
     ui->edtExpression->getEdit()->addInsertContextMenuEntry("rdrproperty(id, default)", "rdrproperty(id, default)");
     ui->edtExpression->getEdit()->addInsertContextMenuEntry("rdrfile(id)", "rdrfile(id)");
@@ -66,9 +75,9 @@ void DlgSetRDRPropertyByExpressionEditor::setProject(QFProject *project)
 {
     this->project=project;
 
+    ui->cmbPropertyName->clear();
     if (project) {
         QString n=ui->cmbPropertyName->currentText();
-        ui->cmbPropertyName->clear();
         ui->cmbPropertyName->addItems(project->getAllPropertyNames());
         ui->cmbPropertyName->setEditText(n);
     }
