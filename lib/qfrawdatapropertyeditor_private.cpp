@@ -631,7 +631,7 @@ void QFRawDataPropertyEditor_private::newPropClicked() {
                 current->setProperty(name, v);
             }
         }*/
-        dlgNewProperty* d=new dlgNewProperty(d);
+        dlgNewProperty* d=new dlgNewProperty(this->d);
         d->addPropertyNames(current->getProject()->getAllPropertyNames());
         d->setPropertyName(ProgramOptions::getConfigValue(QString("rawdatapropeditor%1/newprop/name").arg(id), tr("new_property")).toString());
         d->setPropertyType(ProgramOptions::getConfigValue(QString("rawdatapropeditor%1/newprop/type").arg(id), 1).toInt());
@@ -1232,8 +1232,8 @@ void QFRawDataPropertyEditor_private::showCorrelation()
             int i2=cs.last();
             QString n=names.value(i1)+tr(" vs. ")+names.value(i2);
             QFParameterCorrelationService::ParameterCorrelation d;
-            d.nameX=names.value(i1);
-            d.nameY=names.value(i2);
+            d.nameX=QString("\\verb{%1}").arg(names.value(i1));
+            d.nameY=QString("\\verb{%1}").arg(names.value(i2));
             d.dataX=hists.value(i1);
             d.dataY=hists.value(i2);
             hs->addCorrelationToView(histID, d);
@@ -1311,11 +1311,11 @@ void QFRawDataPropertyEditor_private::setCurrent(QFRawDataRecord* c) {
         disconnect(chkShowAvg, SIGNAL(toggled(bool)), this, SLOT(showAvgClicked(bool)));
 
 
-        actExportPluginData->setEnabled(c->getExportFiletypes().size()>0);
 
 
 
         if (c) {
+            actExportPluginData->setEnabled(c->getExportFiletypes().size()>0);
             btnPreviousSameRole->setVisible(c->showNextPreviousOfSameRoleButton());
             btnNextSameRole->setVisible(c->showNextPreviousOfSameRoleButton());
             if (c->getType()!=oldType) {

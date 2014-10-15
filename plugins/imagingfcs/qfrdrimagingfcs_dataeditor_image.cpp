@@ -5852,7 +5852,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
     tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
     QTextTableFormat tableFormat1=tableFormat;
     tableFormat1.setWidth(QTextLength(QTextLength::VariableLength, 1));
-    QTextTable* table = cursor.insertTable(6, 2, tableFormat);
+    QTextTable* table = cursor.insertTable(8, 2, tableFormat);
     table->mergeCells(0,0,1,2);
     {
         int line=0;
@@ -6247,9 +6247,9 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
 
     }
 
-    corrView->setCorrelation1Label(l1);
-    corrView->setCorrelation2Label(l2);
-    corrView->setCorrelationColorLabel(lc);
+    corrView->setCorrelation1Label(QString("\\verb{%1}").arg(l1));
+    corrView->setCorrelation2Label(QString("\\verb{%1}").arg(l2));
+    corrView->setCorrelationColorLabel(QString("\\verb{%1}").arg(lc));
 
     if (cd1&&cd2) {
         if (selHistogram) {
@@ -6300,11 +6300,11 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
     corrView->clear();
     histogram->clear();
     updateHistogram(histogram, m, pltImage->getData(), pltImage->getDataSize(), chkExcludeExcludedRunsFromHistogram->isChecked(), false, false);
-    histogram->setHistogramXLabel(cmbParameter->currentText());
+    histogram->setHistogramXLabel(QString("\\verb{%1}").arg(cmbParameter->currentText()));
 
     histogram2->clear();
     updateHistogram(histogram2, m, pltParamImage2->getData(), pltParamImage2->getDataSize(), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false);
-    histogram2->setHistogramXLabel(cmbParameter2->currentText());
+    histogram2->setHistogramXLabel(QString("\\verb{%1}").arg(cmbParameter2->currentText()));
 
     corrView->clear();
     updateCorrelation(corrView, m, pltImage->getData(), pltParamImage2->getData(), qMin(pltImage->getDataSize(), pltParamImage2->getDataSize()), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false, cmbCorrelationDisplayMode->currentIndex(), cmbCorrelationDisplayColorMode->currentIndex(), spinCorrelationChannel->value(), cmbParameter->currentText(), cmbParameter2->currentText(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
@@ -6314,10 +6314,10 @@ void QFRDRImagingFCSImageEditor::updateHistogram() {
     if (dv) {
 
         updateHistogram(histogram_2, m, pltImage->getData(), pltImage->getDataSize(), chkExcludeExcludedRunsFromHistogram_2->isChecked(), dv, false);
-        histogram_2->setHistogramXLabel(cmbParameter->currentText());
+        histogram_2->setHistogramXLabel(QString("\\verb{%1}").arg(cmbParameter->currentText()));
 
         updateHistogram(histogram2_2, m, pltParamImage2->getData(), pltParamImage2->getDataSize(), chkExcludeExcludedRunsFromHistogram2_2->isChecked(), dv, false);
-        histogram2_2->setHistogramXLabel(cmbParameter2->currentText());
+        histogram2_2->setHistogramXLabel(QString("\\verb{%1}").arg(cmbParameter2->currentText()));
     }
 
 
@@ -6340,20 +6340,20 @@ void QFRDRImagingFCSImageEditor::updateSelectionHistogram(bool replot) {
     bool dv=cmbDualView->currentIndex()>0 && cmbDualView->isEnabled();
 
     updateHistogram(histogram, m, pltImage->getData(), pltImage->getDataSize(), chkExcludeExcludedRunsFromHistogram->isChecked(), false, true);
-    histogram->setHistogramXLabel(cmbParameter->currentText());
+    histogram->setHistogramXLabel(QString("\\verb{%1}").arg(cmbParameter->currentText()));
 
     updateHistogram(histogram2, m, pltParamImage2->getData(), pltParamImage2->getDataSize(), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, true);
-    histogram2->setHistogramXLabel(cmbParameter2->currentText());
+    histogram2->setHistogramXLabel(QString("\\verb{%1}").arg(cmbParameter2->currentText()));
 
     updateCorrelation(corrView, m, pltImage->getData(), pltParamImage2->getData(), qMin(pltImage->getDataSize(), pltParamImage2->getDataSize()), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, true, cmbCorrelationDisplayMode->currentIndex(), cmbCorrelationDisplayColorMode->currentIndex(), spinCorrelationChannel->value(), cmbParameter->currentText(), cmbParameter2->currentText(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
 
     if (dv) {
 
         updateHistogram(histogram_2, m, pltImage->getData(), pltImage->getDataSize(), chkExcludeExcludedRunsFromHistogram_2->isChecked(), dv, true);
-        histogram_2->setHistogramXLabel(cmbParameter->currentText());
+        histogram_2->setHistogramXLabel(QString("\\verb{%1}").arg(cmbParameter->currentText()));
 
         updateHistogram(histogram2_2, m, pltParamImage2->getData(), pltParamImage2->getDataSize(), chkExcludeExcludedRunsFromHistogram2_2->isChecked(), dv, true);
-        histogram2_2->setHistogramXLabel(cmbParameter2->currentText());
+        histogram2_2->setHistogramXLabel(QString("\\verb{%1}").arg(cmbParameter2->currentText()));
     }
 
 

@@ -25,6 +25,7 @@
         <file alias="lib/file_open.png">icons/fileselect.png</file>
     </qresource>
     <qresource prefix="/lib/help">
+        <file alias="tooltip.png">icons/tooltip.png</file>
         <file alias="help_down.png">icons/help_down.png</file>
         <file alias="help_next.png">icons/help_next.png</file>
         <file alias="help_prev.png">icons/help_prev.png</file>
@@ -49,6 +50,7 @@
         <file alias="helpboxlogo_warning.png">icons/helpboxlogo_warning.png</file>
     </qresource>
     <qresource prefix="/lib">
+        <file alias="tooltip.png">icons/tooltip.png</file>
         <file alias="export_data.png">icons/export_data.png</file>
         <file alias="collapse_opened.png">icons/collapse_opened.png</file>
         <file alias="collapse_closed.png">icons/collapse_closed.png</file>

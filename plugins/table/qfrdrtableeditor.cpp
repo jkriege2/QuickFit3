@@ -778,7 +778,7 @@ void QFRDRTableEditor::slDeleteColumn() {
             if (!sm->hasSelection()) {
             } else {
                 QMessageBox::StandardButton answer;
-                answer = QMessageBox::question(this, tr("Delete row(s) ..."), tr("Are you sure that you want to delete the selected rows?"), QMessageBox::Yes | QMessageBox::No);
+                answer = QMessageBox::question(this, tr("Delete row(s) ..."), tr("Are you sure that you want to delete the selected columns?"), QMessageBox::Yes | QMessageBox::No);
                 if (answer == QMessageBox::Yes) {
                     QModelIndexList l=sm->selectedIndexes();
                     QList<int> rl;

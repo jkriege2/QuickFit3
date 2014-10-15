@@ -1,0 +1,62 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Table Plugin Tutorial: Table From Fit Results</title>
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+    <h2>Introduction</h2>
+    <p>This tutorial describes, how a table can be automatically built from fit results in the project. For this, it uses the <a href="$$qf_mathparser_helpfile$$">internal expression parser</a> and <a href="tutorial_columnexpression.html">column expressions</a>. Especially the expression parser functions for <a href="$$mainhelpdir$$/parserreference/project_access.html">project access</a> are used.</p>
+
+<p>It is based on a FCS data evaluation, which is stored in the example project 
+<blockquote>
+    <code><a href="openfile://$$plugin_info:examplesdir:table$$tutorial_fitresults.qfp">$$plugin_info:examplesdir:table$$tutorial_fitresults.qfp</a></code>
+</blockquote>
+</p>
+
+
+
+<h2>Tutorial</h2>
+<p>
+<ol>
+    <li>Open the example project <a href="openfile://$$plugin_info:examplesdir:table$$tutorial_fitresults.qfp">tutorial_fitresults.qfp</a> (see above) in QuickFit. You can find it by clicking on <b>File | Special Project Tools ... | Open Example Projects ...</b> in the subfolder <tt>qfrdrtable</tt>.<br>This project contains four <a href="$$plugin_info:help:fcs$$">FCS data files</a> and a <a href="$$plugin_info:help:fcs_fit$$">FCS curve fit evaluation</a>, which has already been performed. In addition a table is contained, which will be used for this tutorial.<br>The FCS data is based on simulations of diffusing particles at different levels of saturation intensity $$math:I_{sat}/I_0$$, where $$math:I_{sat}$$ is the saturation intensity of the fluorophore and $$math:I_0$$ is the peak intensity in the laser focus. The lower $$math:I_{sat}/I_0$$, the stronger the focus is broadened by the saturation, so we expect a larger particle number and a higher diffusion time. </li>
+    <li>First we may inspect the data, so open one of the FCS RDRs by a double-click on the entry in the project tree. Change over to the Evaluation Results. Here you see a table of fit results for the current data file. 
+<center><a name="tutorial_fitresults_pic000"><img src="./pic/tutorial_fitresults_pic000.png" border="1">
+</center>
+All results are grouped and each group is shown as a column. If you had different evaluations, several groups/columns would be displayed, with possibly different results. The names of the results are shown in the first column. The results from all the RDRs in the project look like this, but will list different result values. The column header <tt>fcs_fit_5_fcs_diff_runavg</tt> is the same in all of them, since it encodes the used evaluation item (<small>type: <tt>fcs_fit</tt>, ID: <tt>5</tt></small>). Each fit result has a label, which is displayed in the first column and an internal ID, which is displayed in the tooltip for a cell, which is shown, if the mouse hovers a little longer over the result:
+<center><a name="tutorial_fitresults_pic001"><img src="./pic/tutorial_fitresults_pic001.png" border="1">
+</center>
+In the example shown here, the evaluation name/ID is <tt>fcs_fit_5_fcs_diff_runavg</tt> and the result name/ID is <tt>fitparam_diff_tau1</tt> for the "diffusion time of first component".
+</li>
+<li>Now switch to the tab "Properties" and observe the value of the property <tt>ISAT</tt> in all FCS RDRs. It was set to match the values, used for the simulation. the value 4 is used instead of $$math:\infty$$, i.e. for no saturation effects.</li>
+    <li>In the same way, as noted above, also find the evaluation and result name/ID for the parameters "particle number". It should be <tt>fcs_fit_5_fcs_diff_runavg</tt>/<tt>fitparam_n_particle</tt>. </li>
+    <li>Now close the FCS RDR and open the table. The idea is now, that we want to create a table of the fit results <tt>fitparam_n_particle</tt> and <tt>fitparam_diff_tau1</tt>, as well as the property <tt>ISAT</tt> for each record. In order to obtain this table, follow these steps:
+      <ol>
+          <li>ensure, that the table contains at least 4 columns</li>
+          <li>double-click the first column header and enter these values:$$example:column title: <tt>RDR ID</tt><br>expression: <tt>rdr_ids("fcs")</tt>$$ This will fill the column with the IDs of all RDRs, which are of the type <tt>fcs</tt>. In this example, the result should be 0,1,2,3. This first column can now be used to access the data for the records, as shown in the following steps</li>
+          <li>double-click the second column header and enter this data:$$example:column title: <tt>I_{sat}/I_0</tt><br>expression: <tt>for(i,column(1),rdr_getproperty(i, "ISAT"))</tt>$$. This will return a column, containing all the values of the property ISAT for each record. The instruction <tt>for()</tt> iterates over all entries in the vector <tt>column(1)</tt>, which returns the values in the first column. In each iteration, the variable <tt>i</tt> is set to a value from <tt>column(1)</tt> and the fucntion evaluates the expression, given in the last parameter, i.e. it obtains the property from the given RDR. The it combines the results of all iterations into a single vector, which is returned. This is necessary, since the function <tt>rdr_getproperty()</tt> does not accept array parameters. </li>
+          <li>Now set edit the column-properties of the last two columns and set these values: in column 3: $$example:column title: <tt>\tau_D</tt><br>expression: <tt>for(i,column(1),rdr_getresult(i, "fcs_fit_5_fcs_diff_runavg", "fitparam_diff_tau1"))</tt>$$ and in column 4: $$example:column title: <tt>N</tt><br>expression: <tt>for(i,column(1),rdr_getresult(i, "fcs_fit_5_fcs_diff_runavg", "fitparam_n_particle"))</tt>$$These instruction work like the one from the last item, except that they extract the fit parameters (compare the evaluation ID and result IDs obatined above!)</li>
+          <li>Now you should have a table, that looks like this:
+          <center><a name="tutorial_fitresults_pic003"><img src="./pic/tutorial_fitresults_pic003.png" border="1">
+          </center>
+          </li>
+      </ol></li>
+    <li>To finish this part of the tutorial, you can add plots to inspect the data: 
+    <center><a name="tutorial_fitresults_pic004"><img src="./pic/tutorial_fitresults_pic004.png" border="1">
+
+<a name="tutorial_fitresults_pic006"><img src="./pic/tutorial_fitresults_pic005.png" border="1">
+    </center>
+    </li>
+    <li>As an addendum to this tutorial, you can also add columns to the table, that contain the fit errors. these column use the expressions: $$example:column title: <tt>error: \tau_D</tt><br>expression: <tt>for(i,column(1),rdr_getresulterror(i, "fcs_fit_5_fcs_diff_runavg", "fitparam_diff_tau1"))</tt>$$ and $$example:column title: <tt>error: N</tt><br>expression: <tt>for(i,column(1),rdr_getresulterror(i, "fcs_fit_5_fcs_diff_runavg", "fitparam_n_particle"))</tt>$$ Using these columns will result in a table and plots like these:
+<center><a name="tutorial_fitresults_pic006"><img src="./pic/tutorial_fitresults_pic006.png" border="1"><br>
+ <a name="tutorial_fitresults_pic007"><img src="./pic/tutorial_fitresults_pic007.png" border="1">
+</center>
+</li>
+</ol></p>
+
+
+
+    
+  </body>
+</html>

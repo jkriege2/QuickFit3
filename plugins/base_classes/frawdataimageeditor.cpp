@@ -675,11 +675,11 @@ void FRawDataImageEditor::updateHistogram()
     corrView->clear();
     histogram->clear();
     updateHistogram(histogram, msel, pltImage->getData(), pltImage->getDataSize(), chkExcludeExcludedRunsFromHistogram->isChecked(), false, false);
-    histogram->setHistogramXLabel(cmbParameter->currentText());
+    histogram->setHistogramXLabel(QString("\\verb{%1}").arg(cmbParameter->currentText()));
 
     histogram2->clear();
     updateHistogram(histogram2, msel, pltParamImage2->getData(), pltParamImage2->getDataSize(), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false);
-    histogram2->setHistogramXLabel(cmbParameter2->currentText());
+    histogram2->setHistogramXLabel(QString("\\verb{%1}").arg(cmbParameter2->currentText()));
 
     corrView->clear();
     updateCorrelation(corrView, current, pltImage->getData(), pltParamImage2->getData(), qMin(pltImage->getDataSize(), pltParamImage2->getDataSize()), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false, cmbCorrelationDisplayMode->currentIndex(), spinCorrelationChannel->value(), cmbParameter->currentText(), cmbParameter2->currentText(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
@@ -895,10 +895,10 @@ void FRawDataImageEditor::updateSelectionHistogram(bool replot)
     if (!m || !msel) return;
 
     updateHistogram(histogram, msel, pltImage->getData(), pltImage->getDataSize(), chkExcludeExcludedRunsFromHistogram->isChecked(), false, true);
-    histogram->setHistogramXLabel(cmbParameter->currentText());
+    histogram->setHistogramXLabel(QString("\\verb{%1}").arg(cmbParameter->currentText()));
 
     updateHistogram(histogram2, msel, pltParamImage2->getData(), pltParamImage2->getDataSize(), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, true);
-    histogram2->setHistogramXLabel(cmbParameter2->currentText());
+    histogram2->setHistogramXLabel(QString("\\verb{%1}").arg(cmbParameter2->currentText()));
 
     updateCorrelation(corrView, current, pltImage->getData(), pltParamImage2->getData(), qMin(pltImage->getDataSize(), pltParamImage2->getDataSize()), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, true, cmbCorrelationDisplayMode->currentIndex(), spinCorrelationChannel->value(), cmbParameter->currentText(), cmbParameter2->currentText(), m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
 

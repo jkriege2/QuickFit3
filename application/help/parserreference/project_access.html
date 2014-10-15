@@ -7,12 +7,18 @@
   <body> 
   $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
   
-  <h2>Basic Access to Raw Data Records (RDRs)</h2>
+  
+  
+  
+  
+  
+  <h2>Access to Raw Data Records</h2>
+  <h3>Basic Access to Raw Data Records (RDRs)</h3>
   
   $$funcref_start$$<a name="rdr_ids"/><!-- func:rdr_ids -->
-    <b><tt><!-- template -->rdr_ids()<!-- /template --></tt> - <i> returns a vector of numbers, containing the IDs of the raw data records (RDRs) in the current project </i>:</b>
+    <b><tt><!-- template -->rdr_ids()<!-- /template --></tt>, <tt><!-- template -->rdr_ids(types)<!-- /template --></tt> - <i> returns a vector of numbers, containing the IDs of the raw data records (RDRs) in the current project </i>:</b>
   $$funcref_description$$
-  
+        The optional parameter <tt>types</tt> specifies a single raw data record type (string) or a list of raw data record types (string vector). If it is given, the function only returns those raw data record IDs, which have a type, contained in <tt>types</tt>.
         <!-- /func:rdr_ids -->
   $$funcref_end$$
   
@@ -22,8 +28,8 @@
   
   
   
-  <h2>Access to RDR Properties</h2>
-$$funcref_start$$<a name="rdr_getname"/><!-- func:rdr_getname -->
+  <h3>Access to RDR Properties</h3>
+  $$funcref_start$$<a name="rdr_getname"/><!-- func:rdr_getname -->
     <b><tt><!-- template -->rdr_getname(rdr_id)<!-- /template --></tt> - <i> returns the name (string) of the specified raw data record (RDRs) in the current project </i>:</b>
   $$funcref_description$$
   
@@ -61,9 +67,30 @@ $$funcref_start$$<a name="rdr_getname"/><!-- func:rdr_getname -->
   $$funcref_end$$
   
   
+  $$funcref_start$$<a group="rdr_getfiles"/><!-- func:rdr_getfiles -->
+    <b><tt><!-- template -->rdr_getfiles(rdr_id)<!-- /template --></tt>, <tt><!-- template -->rdr_getfiles(rdr_id, file_type)<!-- /template --></tt> - <i> returns the list of files associated with the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        If the optional parameter <tt>file_type</tt> is given, the function returns only those files, which have the specified file type. The return value of this function is a string vector.
+        <!-- /func:rdr_getfiles -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a group="rdr_gettypes"/><!-- func:rdr_gettypes -->
+    <b><tt><!-- template -->rdr_gettypes(rdr_id)<!-- /template --></tt> - <i> returns the list of the types of the files associated with the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        The return value of this function is a string vector.
+        <!-- /func:rdr_gettypes -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a group="rdr_getfiledescriptions"/><!-- func:rdr_getfiledescriptions -->
+    <b><tt><!-- template -->rdr_getfiledescriptions(rdr_id)<!-- /template --></tt> - <i> returns the list of the descriptions of the files associated with the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        The return value of this function is a string vector.
+        <!-- /func:rdr_getfiledescriptions -->
+  $$funcref_end$$
   
   
-  <h2>Access to Evaluation Results in RDRs</h2>
+  
+  <h3>Access to Evaluation Results in RDRs</h3>
   $$funcref_start$$<a name="rdr_getresult"/><!-- func:rdr_getresult -->
     <b><tt><!-- template -->rdr_getresult(rdr_id, evaluation_id, result_id)<!-- /template --></tt> - <i> returns a result from the specified raw data record (RDR) in the current project. The result is specified by the two string parameters <tt>evaluation_id</tt> and <tt>result_id</tt> </i>:</b>
   $$funcref_description$$
@@ -82,13 +109,63 @@ $$funcref_start$$<a name="rdr_getname"/><!-- func:rdr_getname -->
   
   
   
-  <h2>Basic Access to Evaluation Items</h2>
+  
+  
+  
+  
+  
+  <h2>Access to Evaluation Items</h2>
+  <h3>Basic Access to Evaluation Items</h3>
   
   $$funcref_start$$<a name="eval_ids"/><!-- func:eval_ids -->
-    <b><tt><!-- template -->eval_ids()<!-- /template --></tt> - <i> returns a vector of numbers, containing the IDs of the evaluation items in the current project </i>:</b>
+    <b><tt><!-- template -->eval_ids()<!-- /template --></tt>, <tt><!-- template -->eval_ids(types)<!-- /template --></tt> - <i> returns a vector of numbers, containing the IDs of the evaluation items in the current project </i>:</b>
+  $$funcref_description$$
+        The optional parameter <tt>types</tt> specifies a single item type (string) or a list of item types (string vector). If it is given, the function only returns those evaluation item IDs, which have a type, contained in <tt>types</tt>.
+        <!-- /func:eval_ids -->
+  $$funcref_end$$
+  
+  
+  
+  
+  
+  
+  <h3>Access to Evaluation Item Properties</h3>
+  $$funcref_start$$<a name="eval_getname"/><!-- func:eval_getname -->
+    <b><tt><!-- template -->eval_getname(eval_id)<!-- /template --></tt> - <i> returns the name (string) of the specified evaluation item in the current project </i>:</b>
   $$funcref_description$$
   
-        <!-- /func:eval_ids -->
+        <!-- /func:eval_getname -->
+  $$funcref_end$$
+    
+  $$funcref_start$$<a folder="eval_gettype"/><!-- func:eval_gettype -->
+    <b><tt><!-- template -->eval_gettype(eval_id)<!-- /template --></tt> - <i> returns the type (string) of the specified evaluation item in the current project </i>:</b>
+  $$funcref_description$$
+  
+        <!-- /func:eval_gettype -->
+  $$funcref_end$$
+  
+  
+  $$funcref_start$$<a group="eval_getproperty"/><!-- func:eval_getproperty -->
+    <b><tt><!-- template -->eval_getproperty(eval_id, property_id)<!-- /template --></tt> - <i> returns the given property of the specified evaluation item in the current project </i>:</b>
+  $$funcref_description$$
+  
+        <!-- /func:eval_getproperty -->
+  $$funcref_end$$
+  
+  
+  
+  
+  
+  
+  
+  <h2>Access to Project Properties</h2>
+  
+  
+  $$funcref_start$$<a group="project_getproperty"/><!-- func:project_getproperty -->
+    <b><tt><!-- template -->project_getproperty(property_id)<!-- /template --></tt> - <i> returns the given property of the current project </i>:</b>
+  $$funcref_description$$
+  
+        <!-- /func:project_getproperty -->
   $$funcref_end$$
   
   

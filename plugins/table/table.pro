@@ -119,8 +119,10 @@ HELPREF_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/parserreference
 HELPREFPIC_FILES.files = ./help/parserreference/pic/*.*
 HELPREFPIC_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/parserreference/pic/
 
+EXAMPLESFCSTEST_DATA_FILES.files = ./examples/fcs_simdata/*.*
+EXAMPLESFCSTEST_DATA_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/fcs_simdata/
 
-INSTALLS += HELPREF_FILES HELPREFPIC_FILES
+INSTALLS += HELPREF_FILES HELPREFPIC_FILES EXAMPLESFCSTEST_DATA_FILES
 
 
 

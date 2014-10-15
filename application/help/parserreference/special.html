@@ -30,12 +30,27 @@ $$funcref_description$$
   Example: $$example:<code>returnlast(a=1,a=a+1,a=a+1,a*2)</code> will return <code>6 <i>[=(1+1+1)*2]</i></code>. The variable <tt>a</tt> will be defined and have the value <tt>3&nbsp;<i>[=1+1+1]</i></tt> afterwards$$
   <!-- /func:returnlast -->  
 $$funcref_end$$
+
+   
+    
+  $$funcref_start$$<a name="returnnth"/><!-- func:returnnth -->
+  <b><tt><!-- template -->returnnth(n,x0,x1,x2,...)<!-- /template --></tt> - <i>evaluates all parameters <tt>x1</tt>, <tt>x2</tt>, ... and finally returns the result of the n-th (zero-based index into x0,x1,...) expression</i>:</b> 
+$$funcref_description$$
+  Example: $$example:<code>returnnth(2,a=1,a=a+1,a=a+1,a*2)</code> will return <code>2 <i>[=1+1]</i></code>. The variable <tt>a</tt> will be defined and have the value <tt>3&nbsp;<i>[=1+1+1]</i></tt> afterwards$$
+  <!-- /func:returnnth -->  
+$$funcref_end$$
    
    
   $$funcref_start$$<a name="returnfirstvalid"/><!-- func:returnfirstvalid -->
-  <b><tt><!-- template -->returnfirstvalid(x1,x2,x3,...)<!-- /template --></tt> - <i>evaluates all parameters <tt>x1</tt>, <tt>x2</tt>, ... and finally returns the first value, which is valid</i>:</b> 
+  <b><tt><!-- template -->returnfirstvalid(x1,x2,x3,...)<!-- /template --></tt> - <i>evaluates all parameters <tt>x1</tt>, <tt>x2</tt>, ... and finally returns the first value, which is valid (not void or invalid)</i>:</b> 
 $$funcref_description$$
   <!-- /func:returnfirstvalid -->  
+$$funcref_end$$
+   
+  $$funcref_start$$<a name="returnlastvalid"/><!-- func:returnlastvalid -->
+  <b><tt><!-- template -->returnlastvalid(x1,x2,x3,...)<!-- /template --></tt> - <i>evaluates all parameters <tt>x1</tt>, <tt>x2</tt>, ... and finally returns the last value, which is valid (not void or invalid)</i>:</b> 
+$$funcref_description$$
+  <!-- /func:returnlastvalid -->  
 $$funcref_end$$
 
 

@@ -356,6 +356,8 @@ namespace QFMathParser_DefaultLib {
     qfmpResult fReturnLast(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fReturnFirst(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fReturnFirstValid(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fReturnLastValid(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fReturnNth(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fLast(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fFirst(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fItem(const qfmpResult* params, unsigned int  n, QFMathParser* p);
@@ -436,14 +438,23 @@ namespace QFMathParser_DefaultLib {
 
 #ifdef QFLIB_LIBRARY
     void fRDRIDs(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
-    void fEvalIDs(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetResult(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetResultError(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetName(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetType(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetFolder(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetGroup(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDRGetFiles(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDRGetFileTypes(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDRGetFileDescriptions(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetProperty(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+
+    void fEvalIDs(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fEvalGetName(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fEvalGetType(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fEvalGetProperty(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+
+    void fProjectGetProperty(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser);
 #endif
 
 }
