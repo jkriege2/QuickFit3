@@ -512,6 +512,7 @@ void MainWindow::zipProject()
             /*pdlg->close();
             delete pdlg;*/
             QApplication::restoreOverrideCursor();
+            project->resetError();
         }
     }
 }

@@ -1960,6 +1960,12 @@ void QFProject::setError(QString description) const {
     //emit errorOccured(description);
 }
 
+void QFProject::resetError() const
+{
+    errorOcc=false;
+    errorDesc="";
+}
+
 void QFProject::emitPropertiesChanged() {
     //qDebug()<<"QFProject emit propertiesChanged()";
     if (m_signalsEnabled) emit propertiesChanged();

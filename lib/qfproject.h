@@ -511,6 +511,8 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         void log_error(const QString& message) const;
 
     public:
+        void resetError() const;
+
         struct QFLIB_EXPORT FileCopyList {
             QString inFile;
             QString outFile;

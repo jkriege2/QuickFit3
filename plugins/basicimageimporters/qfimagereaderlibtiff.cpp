@@ -93,9 +93,11 @@ bool QFImageReaderLIBTIFF::open(QString filename) {
         uint32 nx,ny;
         TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
         TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
-        char* val;
+        char* val=NULL;
         TIFFGetField(tif,TIFFTAG_IMAGEDESCRIPTION,&val);
-        imageDescription=val;
+        if (val) {
+            imageDescription=val;
+        }
         width=nx;
         height=ny;
         this->filename=filename;
@@ -108,9 +110,12 @@ bool QFImageReaderLIBTIFF::open(QString filename) {
         bool metaOK=false;
         int cnt=0;
         while (!metaOK && cnt<5) {
-            char* vall;
+            char* vall=NULL;
             TIFFGetField(tif,TIFFTAG_IMAGEDESCRIPTION,&vall);
-            QByteArray imgD=vall;
+            QByteArray imgD;
+            if (vall) {
+                imgD=vall;
+            }
 
             if (imgD.size()>0) {
                 metaOK=qfimdtGetOMEMetaData(fileinfo.properties, imgD);
