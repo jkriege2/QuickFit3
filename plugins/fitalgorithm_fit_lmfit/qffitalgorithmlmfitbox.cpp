@@ -113,11 +113,27 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
 
     lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status );
     if (paramsMin && paramsMax) {
+        bool atbound=false;
         for (int i=0; i<paramCount; i++) {
             const double mi=paramsMin[i];
             const double ma=paramsMax[i];
-            paramsOut[i]=qBound(mi, paramsOut[i], ma);
+            if (qFuzzyCompare(mi,paramsOut[i])) {
+                atbound=true;
+                paramsOut[i]=1.05*mi;
+            } else if (qFuzzyCompare(ma,paramsOut[i])) {
+                atbound=true;
+                paramsOut[i]=0.95*ma;
+            } else paramsOut[i]=qBound(mi, paramsOut[i], ma);
         }
+        if (atbound) {
+            lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_evalboxtanh, &control, &status );
+            for (int i=0; i<paramCount; i++) {
+                const double mi=paramsMin[i];
+                const double ma=paramsMax[i];
+                paramsOut[i]=qBound(mi, paramsOut[i], ma);
+            }
+        }
+
     }
 
    /* if (!transformParams) {

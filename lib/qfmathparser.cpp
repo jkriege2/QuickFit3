@@ -94,14 +94,14 @@ void QFMathParser::addStandardFunctions(){
 QString QFMathParser::resultTypeToString(qfmpResultType type)
 {
     switch(type) {
-        case qfmpDouble: return QObject::tr("number");
-        case qfmpDoubleVector: return QObject::tr("number vector");
-        case qfmpStringVector: return QObject::tr("string vector");
-        case qfmpBoolVector: return QObject::tr("bool vector");
-        case qfmpBool: return QObject::tr("bool");
-        case qfmpString: return QObject::tr("string");
-        case qfmpVoid: return QObject::tr("void");
-        case qfmpCustom: return QObject::tr("custom");
+        case qfmpDouble: return QString("number");
+        case qfmpDoubleVector: return QString("number vector");
+        case qfmpStringVector: return QString("string vector");
+        case qfmpBoolVector: return QString("bool vector");
+        case qfmpBool: return QString("bool");
+        case qfmpString: return QString("string");
+        case qfmpVoid: return QString("void");
+        case qfmpCustom: return QString("custom");
     }
     return QObject::tr("invalid");
 }

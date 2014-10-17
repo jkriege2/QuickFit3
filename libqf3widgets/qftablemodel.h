@@ -327,6 +327,35 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         bool hasColumnHeaderData(quint32 column, int role) const;
         QList<quint64> getColumnHeaderDataRoles() const;
 
+
+        enum copyColumnHeaderMode {
+            dontCopyHeader=0,
+            copyHeader=1,
+            copyHeaderAskUser=2
+        };
+
+        /** \brief copies the contents of a column in a table model into the current model
+         *
+         *  The data ends up, starting at (row_here, column_here) and only the rows between row_model_start and row_model_end from the model are copied (unless these are -1 and -1, then the complete column is copied)
+         */
+        void copyColumnFromModel(QAbstractTableModel* model, int column, int column_here, int row_here=0, int row_model_start=-1, int row_model_end=-1, copyColumnHeaderMode* copyHeader=NULL);
+        void copyColumnFromModel(QAbstractTableModel* model, int column, int column_here, const QList<int>& rows_model, int row_here=0, copyColumnHeaderMode* copyHeader=NULL);
+        void copyCellFromModelCreate(QAbstractTableModel* model, int column, int row, int column_here, int row_here, copyColumnHeaderMode* copyHeader=NULL);
+        struct QFWIDLIB_EXPORT cellToCopy {
+            int r;
+            int c;
+            int r_here;
+            int c_here;
+            cellToCopy(int r, int c, int r_here, int c_here) {
+                this->r=r;
+                this->c=c;
+                this->r_here=r_here;
+                this->c_here=c_here;
+            }
+        };
+
+        void copyCellsFromModelCreate(QAbstractTableModel* model, const QList<cellToCopy>& cells, copyColumnHeaderMode* copyHeader=NULL);
+
         /** \brief set the default QVariant value displayed in an editor, if the value does not yet exist */
         void setDefaultEditValue(QVariant defaultEditValue);
 
@@ -423,6 +452,7 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         void clearUndo();
         void startMultiUndo();
         void endMultiUndo();
+        void endMultiUndoAndReset();
         void clearMultiUndo();
         void setUndoEnabled(bool enabled);
         void emitUndoRedoSignals( bool alwaysEmit=false);

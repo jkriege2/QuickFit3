@@ -95,6 +95,29 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
         ret=dlevmar_bc_der(levmarfitfunc, levmarfitjac, paramsOut, NULL, paramCount, model->get_evalout(), pparamsMin, pparamsMax, NULL, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
     }
 
+    bool atbound=false;
+    for (int i=0; i<paramCount; i++) {
+        const double mi=paramsMin[i];
+        const double ma=paramsMax[i];
+        if (qFuzzyCompare(mi,paramsOut[i])) {
+            atbound=true;
+            paramsOut[i]=1.05*mi;
+        } else if (qFuzzyCompare(ma,paramsOut[i])) {
+            atbound=true;
+            paramsOut[i]=0.95*ma;
+        }
+    }
+    if (atbound) {
+        if ((!model->get_implementsJacobian())||(always_num_grad)) {
+            //qDebug()<<"levmar: numerical gradients\n";
+            ret=dlevmar_bc_dif(levmarfitfunc, paramsOut, NULL, paramCount, model->get_evalout(), pparamsMin, pparamsMax, NULL, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
+            numGrad=true;
+        } else {
+            //qDebug()<<"levmar: analytical gradients\n";
+            ret=dlevmar_bc_der(levmarfitfunc, levmarfitjac, paramsOut, NULL, paramCount, model->get_evalout(), pparamsMin, pparamsMax, NULL, getParameter("max_iterations").toInt(), opts, info, NULL, covar, model); // without Jacobian
+        }
+    }
+
     free(pparamsMin);
     free(pparamsMax);
 

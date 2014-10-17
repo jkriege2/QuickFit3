@@ -428,6 +428,14 @@ namespace QFMathParser_DefaultLib {
     void fDateSec(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
     void fVarname(qfmpResult& res, QFMathParser::qfmpNode **nodes, unsigned int n, QFMathParser* p);
+    void fType(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
+    void fStrVec(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
+    void fNumVec(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
+    void fBoolVec(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
+    void fInt(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
+    void fIntVec(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
+    void fNum(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
+    void fBool(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
 
     void addDefaultFunctions(QFMathParser *p);
     bool hasDefaultFunctions(QFMathParser* p);
@@ -444,6 +452,8 @@ namespace QFMathParser_DefaultLib {
     void fRDRGetType(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetFolder(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetGroup(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDRGetDescription(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDRGetRole(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetFiles(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetFileTypes(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetFileDescriptions(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
@@ -453,6 +463,7 @@ namespace QFMathParser_DefaultLib {
     void fEvalGetName(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fEvalGetType(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fEvalGetProperty(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fEvalGetDescription(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
 
     void fProjectGetProperty(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser);
 #endif

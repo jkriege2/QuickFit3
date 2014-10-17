@@ -829,6 +829,166 @@ QList<quint64> QFTableModel::getColumnHeaderDataRoles() const
     return state.headerDataMap.keys();
 }
 
+void QFTableModel::copyColumnFromModel(QAbstractTableModel *model, int column, int column_here, int row_here, int row_model_start, int row_model_end, QFTableModel::copyColumnHeaderMode *copyHeader)
+{
+    if (readonly) return;
+    QList<int> idx;
+    int row_end=row_here;
+    if (row_model_start>=0 && row_model_end>=0) {
+        for (int i=row_model_start; i<=row_model_start; i++) {
+            idx<<i;
+            row_end++;
+        }
+    } else if (row_model_start<0 && row_model_end>=0) {
+        for (int i=0; i<=row_model_end; i++) {
+            idx<<i;
+            row_end++;
+        }
+    } else if (row_model_start>=0 && row_model_end<0) {
+        for (int i=row_model_start; i<model->rowCount(); i++) {
+            idx<<i;
+            row_end++;
+        }
+    } else if (row_model_start<0 && row_model_end<0) {
+        for (int i=0; i<model->rowCount(); i++) {
+            idx<<i;
+            row_end++;
+        }
+     }
+    bool oldemit=doEmitSignals;
+    doEmitSignals=false;
+    copyColumnFromModel(model, column, column_here, idx, row_here, copyHeader);
+    doEmitSignals=oldemit;
+    if (doEmitSignals) {
+        emit dataChanged(index(row_here, column_here), index(row_end, column_here));
+    }
+}
+
+void QFTableModel::copyColumnFromModel(QAbstractTableModel *model, int column, int column_here, const QList<int> &rows_model, int row_here, copyColumnHeaderMode *copyHeader)
+{
+    if (readonly) return;
+    startMultiUndo();
+    bool oldemit=doEmitSignals;
+    doEmitSignals=false;
+    int rh=row_here;
+    for (int r=0; r<rows_model.size(); r++) {
+        copyCellFromModelCreate(model, column, r, column_here, rh, copyHeader);
+
+        rh++;
+    }
+    endMultiUndo();
+    doEmitSignals=oldemit;
+    if (doEmitSignals) {
+        for (int i=0; i<rows_model.size(); i++) {
+            emit dataChanged(index(rows_model[i], column_here), index(rows_model[i], column_here));
+        }
+    }
+}
+
+void QFTableModel::copyCellFromModelCreate(QAbstractTableModel *model, int column, int row, int column_here, int row_here, copyColumnHeaderMode *copyHeader)
+{
+    if (readonly) return;
+    QFTableModel* tm=qobject_cast<QFTableModel*>(model);
+
+    startMultiUndo();
+    bool oldemit=doEmitSignals;
+    doEmitSignals=false;
+    if (tm) {
+        bool doCopyHeader=(columnTitle(column_here)!=tm->columnTitle(column));
+        if (!doCopyHeader) {
+            const QHash<int, QVariant>& hdh=state.headerDataMap[column_here];
+            const QHash<int, QVariant>& hd=tm->state.headerDataMap[column];
+            QList<int> idxs=hdh.keys();
+            for (int i=0; i<hd.keys().size(); i++) {
+                int k=hd.keys().at(i);
+                if (!idxs.contains(k)) idxs.append(k);
+            }
+            qSort(idxs);
+            for (int i=0; i<idxs.size(); i++) {
+                if (!hdh.contains(idxs[i]) || !hd.contains(idxs[i])) doCopyHeader=true;
+                else if (hdh[idxs[i]]!=hd[idxs[i]]) doCopyHeader=true;
+                if (doCopyHeader) break;
+            }
+        }
+        if (doCopyHeader && column_here<state.columns && copyHeader && *copyHeader==copyHeaderAskUser) {
+            int user=QMessageBox::question(NULL, tr("copy header"), tr("The header in the source and target table are different.\nDo you want to overwrite the header in the target table?"), QMessageBox::Yes|QMessageBox::YesAll|QMessageBox::No|QMessageBox::NoAll, QMessageBox::No);
+            if (user==QMessageBox::No) {
+                doCopyHeader=false;
+                *copyHeader=copyHeaderAskUser;
+            } else if (user==QMessageBox::Yes) {
+                doCopyHeader=true;
+                *copyHeader=copyHeaderAskUser;
+            } else if (user==QMessageBox::NoAll) {
+                doCopyHeader=false;
+                *copyHeader=dontCopyHeader;
+            } else if (user==QMessageBox::YesAll) {
+                doCopyHeader=true;
+                *copyHeader=QFTableModel::copyHeader;
+            }
+        }
+        if (doCopyHeader || column_here>=state.columns) {
+            setColumnTitleCreate(column_here, tm->columnTitle(column));
+            const QHash<int, QVariant>& hd=tm->state.headerDataMap[column];
+            for (int i=0; i<hd.keys().size(); i++) {
+                setColumnHeaderData(column_here, hd.keys().at(i), hd[hd.keys().at(i)]);
+            }
+        }
+        //qDebug()<<"copy ("<<row<<column<<") => ("<<row_here<<column_here<<")";
+        deleteCell(row_here, column_here);
+        setCellCreate(row_here, column_here, tm->cell(row, column));
+        quint64 idx_here=xyAdressToUInt64(row_here, column_here);
+        quint64 idx=tm->xyAdressToUInt64(row, column);
+
+        state.dataMap[idx_here]=tm->state.dataMap[idx];
+        state.dataEditMap[idx_here]=tm->state.dataEditMap[idx];
+        state.dataBackgroundMap[idx_here]=tm->state.dataBackgroundMap[idx];
+        state.dataCheckedMap[idx_here]=tm->state.dataCheckedMap[idx];
+        state.moreDataMap[idx_here]=tm->state.moreDataMap[idx];
+
+    } else {
+        bool doCopyHeader=(headerData(column_here, Qt::Horizontal)!=model->headerData(column, Qt::Horizontal));
+        if (doCopyHeader && column_here<state.columns && copyHeader && *copyHeader==copyHeaderAskUser) {
+            int user=QMessageBox::question(NULL, tr("copy header"), tr("The header in the source and target table are different.\nDo you want to overwrite the header in the target table?"), QMessageBox::Yes|QMessageBox::YesAll|QMessageBox::No|QMessageBox::NoAll, QMessageBox::No);
+            if (user==QMessageBox::No) {
+                doCopyHeader=false;
+                *copyHeader=copyHeaderAskUser;
+            } else if (user==QMessageBox::Yes) {
+                doCopyHeader=true;
+                *copyHeader=copyHeaderAskUser;
+            } else if (user==QMessageBox::NoAll) {
+                doCopyHeader=false;
+                *copyHeader=dontCopyHeader;
+            } else if (user==QMessageBox::YesAll) {
+                doCopyHeader=true;
+                *copyHeader=QFTableModel::copyHeader;
+            }
+        }
+        if (doCopyHeader || column_here>=state.columns) {
+            setColumnTitleCreate(column_here, model->headerData(column, Qt::Horizontal).toString());
+        }
+        deleteCell(row_here, column_here);
+        setCellCreate(row_here, column_here, model->data(model->index(row, column)));
+    }
+    endMultiUndo();
+    doEmitSignals=oldemit;
+    if (doEmitSignals) emit dataChanged(index(row_here, column_here), index(row_here, column_here));
+}
+
+void QFTableModel::copyCellsFromModelCreate(QAbstractTableModel *model, const QList<QFTableModel::cellToCopy> &cells, QFTableModel::copyColumnHeaderMode *copyHeader)
+{
+    if (readonly || !model) return;
+    startMultiUndo();
+    bool oldemit=doEmitSignals;
+    doEmitSignals=false;
+
+    for (int i=0; i<cells.size(); i++) {
+        copyCellFromModelCreate(model, cells[i].c, cells[i].r, cells[i].c_here, cells[i].r_here, copyHeader);
+    }
+
+    doEmitSignals=oldemit;
+    endMultiUndoAndReset();
+}
+
 void QFTableModel::setDefaultEditValue(QVariant defaultEditValue)
 {
     this->defaultEditValue=defaultEditValue;
@@ -1333,15 +1493,21 @@ QList<QList<QVariant> > QFTableModel::getDataTable(QStringList &colNames, QStrin
     rowNames.clear();
 
     QSet<int> usedCols, usedrows;
-    bool saveCompleteTable=selection.isEmpty();
+    bool saveCompleteTable=selection.isEmpty() || (selection.size()<=0);
     for (int i=0; i<selection.size(); i++) {
         usedCols.insert(selection[i].column());
         usedrows.insert(selection[i].row());
     }
 
     QList<QVariant> dempty;
-    for (int r=0; r<usedrows.size(); r++) {
-        dempty<<QVariant();
+    if (saveCompleteTable) {
+        for (int r=0; r<state.rows; r++) {
+            dempty<<QVariant();
+        }
+    } else {
+        for (int r=0; r<usedrows.size(); r++) {
+            dempty<<QVariant();
+        }
     }
 
     // write column headers
@@ -1365,7 +1531,7 @@ QList<QList<QVariant> > QFTableModel::getDataTable(QStringList &colNames, QStrin
                 if (usedCols.contains(c) || saveCompleteTable) {
                     first=false;
                     quint64 a=xyAdressToUInt64(r, c);
-                    if (state.dataMap.contains(a) && ci<data.size() && ri<dempty.size()) {
+                    if (state.dataMap.contains(a) && ci<data.size() && ri<data[ci].size()) {
                         data[ci].operator [](ri)=state.dataMap[a];
                     }
                     ci++;
@@ -1973,6 +2139,12 @@ void QFTableModel::endMultiUndo()
     undoIsMultiStep--;
 
     //if (doEmitSignals) emitUndoRedoSignals();();
+}
+
+void QFTableModel::endMultiUndoAndReset()
+{
+    endMultiUndo();
+    if (doEmitSignals) reset();
 }
 
 void QFTableModel::clearMultiUndo()

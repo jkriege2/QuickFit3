@@ -1,5 +1,6 @@
 <li><b><a href="$$mainhelpdir$$/parserreference/datatypes_syntax.html">syntax</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/datatypes_syntax.html#datatypes">data types</a></b></li>
+<li><b><a href="$$mainhelpdir$$/parserreference/type_conversion.html">data type conversion/tool functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/trig.html">trigonometric functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/explog.html">exponentials and logarithms</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/power_roots.html">powers and roots</a></b></li>

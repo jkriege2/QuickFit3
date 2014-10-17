@@ -417,6 +417,13 @@ QVector<double> qfmpResult::asVector() const
     if (type==qfmpDoubleVector) return numVec;
     else if (type==qfmpBoolVector) return boolvectorToNumVec(boolVec, 1.0, 0.0);
     else if (type==qfmpDouble) return QVector<double>(1, num);
+    else if (type==qfmpCustom && custom()) {
+        if (custom()->convertsTo(qfmpDoubleVector)) {
+            qfmpResult res;
+            custom()->convertTo(res,qfmpDoubleVector);
+            if (res.isValid && res.type==qfmpDoubleVector) return res.numVec;
+        }
+    }
     return QVector<double>();
 }
 
@@ -526,6 +533,11 @@ QStringList qfmpResult::asStrVector() const
 {
     if (type==qfmpStringVector) return strVec;
     else if (type==qfmpString)  return QStringList(str);
+    else if (type==qfmpCustom && custom())  {
+        qfmpResult res;
+        custom()->convertTo(res, qfmpStringVector);
+        if (res.isValid && res.type==qfmpStringVector) return res.strVec;
+    }
     return QStringList();
 }
 
@@ -533,24 +545,33 @@ QVector<bool> qfmpResult::asBoolVector() const
 {
     if (type==qfmpBoolVector) return boolVec;
     else if (type==qfmpBool) return QVector<bool>(1, boolean);
+    else if (type==qfmpCustom && custom())  {
+        qfmpResult res;
+        custom()->convertTo(res, qfmpBoolVector);
+        if (res.isValid && res.type==qfmpBoolVector) return res.boolVec;
+    }
+
     return QVector<bool>();
 }
 
 bool qfmpResult::convertsToVector() const
 {
     if (type==qfmpDoubleVector || type==qfmpBoolVector || type==qfmpDouble) return true;
+    if (type==qfmpCustom && custom()) return custom()->convertsTo(qfmpDoubleVector);
     return false;
 }
 
 bool qfmpResult::convertsToBoolVector() const
 {
     if (type==qfmpBool || type==qfmpBoolVector) return true;
+    if (type==qfmpCustom && custom()) return custom()->convertsTo(qfmpBoolVector);
     return false;
 }
 
 bool qfmpResult::convertsToStringVector() const
 {
     if (type==qfmpStringVector || type==qfmpString) return true;
+    if (type==qfmpCustom && custom()) return custom()->convertsTo(qfmpStringVector);
     return false;
 }
 
@@ -567,6 +588,7 @@ bool qfmpResult::isUsableResult() const
 double qfmpResult::asNumber() const
 {
     if (type==qfmpDouble) return num;
+    if (type==qfmpBool) return boolean?1:0;
     return NAN;
 }
 
@@ -1832,21 +1854,20 @@ void qfmpResult::clearCustom()
 
 QString qfmpResult::typeName() const
 {
+    if (!isValid) return QString("invalid");
+    if (type==qfmpCustom && custom()) return QString("custom (%1)").arg(custom()->typeName());
     return QFMathParser::resultTypeToString(type);
 }
 
 
 QVector<int> qfmpResult::asIntVector() const
 {
-    if (type==qfmpDouble) return QVector<int>(1, num);
-    else if (type==qfmpDoubleVector) {
-        QVector<int> ii(numVec.size(), 0);
-        for (int i=0; i<numVec.size(); i++) {
-            ii[i]=numVec[i];
-        }
-        return ii;
+    QVector<double> dbl=asVector();
+    QVector<int> ii(dbl.size(), 0);
+    for (int i=0; i<dbl.size(); i++) {
+        ii[i]=dbl[i];
     }
-    return QVector<int>();
+    return ii;
 }
 
 

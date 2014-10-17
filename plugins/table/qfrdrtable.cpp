@@ -1523,6 +1523,7 @@ void QFRDRTable::exportData(const QString& format, const QString& filename)const
             int fo=rx.cap(1).toInt();
             QStringList cols, rows;
             QList<QList<QVariant> > dat=datamodel->getDataTable(cols, rows);
+            //qDebug()<<dat.size()<<dat.value(0).size()<<"\n"<<cols<<"\n"<<rows;
             QFDataExportHandler::save(dat, fo, filename, cols, rows);
         }
     }

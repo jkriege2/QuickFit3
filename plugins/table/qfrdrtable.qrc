@@ -7,6 +7,8 @@
         <file alias="projecttree_tablefile.png">icons/table.png</file>
         <file alias="table_clear.png">icons/table_clear.png</file>
         <file alias="table_open.png">icons/table_open.png</file>
+        <file alias="table_import.png">icons/table_import.png</file>
+        <file alias="table_import_large.png">icons/table_import_large.png</file>
         <file alias="table_save.png">icons/table_save.png</file>
         <file alias="row_insert.png">icons/row_insert.png</file>
         <file alias="row_append.png">icons/row_append.png</file>

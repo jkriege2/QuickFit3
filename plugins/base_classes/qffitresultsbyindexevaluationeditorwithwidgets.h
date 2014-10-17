@@ -141,6 +141,8 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
         QCheckBox* chkXLogScale;
         /** \brief checkbox to display grid */
         QCheckBox* chkGrid;
+        /** \brief checkbox to display key */
+        QCheckBox* chkKey;
         /** \brief toolbar above the plots */
         QToolBar* toolbar;
         /** \brief label to display the current position of the mouse cursor */
@@ -352,6 +354,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
 
 
+        void chkKeyToggled(bool checked);
     public slots:
         /*! \brief fit model to current data
          */

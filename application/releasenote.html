@@ -61,6 +61,8 @@
                     <li>added functions join(), split(), removeemptystrings(), ... for strings/string vectors</li>
                     <li>added functions rdr_ids(), eval_ids(), rdr_getresult(), rdr_getresulterror(), rdr_getname(), rdr_getfolder(), rdr_getgroup() to access the current project</li>
                     <li>added functions filterfor() and savefilterfor(), which allow to filter vectors according to an arbitrary expression/condition</li>
+                    <li>added type conversion functions strvec(), numvec(), boolvec(), bool(), double(), ...</li>
+                    <li></li>
                     <li></li>
             </ul></li>
             <li>added context menu entry to tables, that allows to explicitly copy the table as "CSV", or to copy the table in a format suitable for "Excel", which depends on the current locale (e.g. for decimal separators)</li>
@@ -258,6 +260,7 @@
             <li>bugfix: all fit properties (including errors) are now saved properly and fit parameter errors are displayed, in the graph editor of the fit function</li>
             <li>parametrized scatter plots now use the correct color palette</li>
             <li>added additional filters with logic operations connecting them</li>
+            <li>added "import into table" function+button</li>
       </ul></li>
       <li><b>B040SPIM</b><ul>
             <li>added JavaScript functions to set preview acquisition camera parameters</li>
@@ -279,6 +282,7 @@
             <li>added additional options for fit weighting (from standard deviation over 3,5,7,11 consecutive values of the curve, deviation from polynomial-smoothed version)</li>
             <li>bugfix: weights combo-box is correctly initialized, when starting the editor</li>
             <li>new: added error estimation, using bootstrapping to curve fit (in plots)</li>
+            <li>added checkbox to switch key/legend on/off</li>
           </ul></li>
       <li><b>FCS/DLS</b><ul>
             <li>fixed a possible freeze of QF3, if ACF-data is imported from CSV files and no countrate-trace is provided!</li>
@@ -304,6 +308,7 @@
             <li>"set fit result from RDR/file/..." now supports image transfroms to perform a limited set of image processing operations (bluring, ...)</li>
             <li>bugfix: weights combo-box is correctly initialized, when starting the editor</li>
             <li>new: added error estimation, using bootstrapping to curve fit (in plots)</li>
+            <li>added checkbox to switch key/legend on/off</li>
           </ul></li>
       <li><b>Online-Help editor</b><ul>
             <li>added several buttons for advanced insert/editing functions</li>
@@ -340,6 +345,10 @@
       </ul></li>
       <li><b>fit_lmfit</b><ul>
         <li>now uses lmit-5.1</li>
+        <li>tried to improve box-constrained LMFit, so it gets a second try at the fit, if parameters stick to their bounds</li>
+      </ul></li>
+      <li><b>fit_levmar</b><ul>
+        <li>tried to improve box-constrained LMFit, so it gets a second try at the fit, if parameters stick to their bounds</li>
       </ul></li>
       <li><b>picoquantimporters</b><ul>
         <li>added support for PicoQuant PTU files</li>

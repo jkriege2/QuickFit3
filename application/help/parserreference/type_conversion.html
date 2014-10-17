@@ -1,0 +1,88 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Data Type Conversion/Tool Functions</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  
+  
+  
+  
+  <h2>Data Type Conversion Functions</h2>
+  $$funcref_start$$<a group="num"/><!-- func:num -->
+    <b><tt><!-- template -->num(exp)<!-- /template --></tt> / <!-- template -->num(exp1, exp2, ...)<!-- /template --></tt> - <i> returns the results of the given expression <tt>exp</tt> as a number </i>:</b>
+  $$funcref_description$$
+   $$note:If multiple parameters are given, the function returns a vector with the conversion results of each individual expression <tt>exp1</tt>, <tt>exp2</tt>, ....$$
+        <!-- /func:num -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a group="double"/><!-- func:double -->
+    <b><tt><!-- template -->double(exp)<!-- /template --></tt> / <!-- template -->double(exp1, exp2, ...)<!-- /template --></tt> - <i> returns the results of the given expression <tt>exp</tt> as a number </i>:</b>
+  $$funcref_description$$
+   $$note:If multiple parameters are given, the function returns a vector with the conversion results of each individual expression <tt>exp1</tt>, <tt>exp2</tt>, ....$$
+        <!-- /func:double -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a group="numvec"/><!-- func:numvec -->
+    <b><tt><!-- template -->numvec(exp)<!-- /template --></tt> / <!-- template -->numvec(exp1, exp2, ...)<!-- /template --></tt> - <i> returns the results of the given expression <tt>exp</tt> as a number vector</i>:</b>
+  $$funcref_description$$
+   If multiple parameters are given, the function returns a vector with the conversion results of each individual expression <tt>exp1</tt>, <tt>exp2</tt>, .... If several arguments convert to a vector, the  vectors are concatenated!
+   $$note:Invalid and void results are converted to empty vectors (i.e. no error message is returned!).$$
+        <!-- /func:numvec -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a group="int"/><!-- func:int -->
+    <b><tt><!-- template -->int(exp)<!-- /template --></tt> / <!-- template -->int(exp1, exp2, ...)<!-- /template --></tt> - <i> returns the results of the given expression <tt>exp</tt> as an integer number </i>:</b>
+  $$funcref_description$$
+   $$note:If multiple parameters are given, the function returns a vector with the conversion results of each individual expression <tt>exp1</tt>, <tt>exp2</tt>, ....$$
+        <!-- /func:int -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a group="intvec"/><!-- func:intvec -->
+    <b><tt><!-- template -->intvec(exp)<!-- /template --></tt> / <!-- template -->intvec(exp1, exp2, ...)<!-- /template --></tt> - <i> returns the results of the given expression <tt>exp</tt> as an integer number vector</i>:</b>
+  $$funcref_description$$
+   If multiple parameters are given, the function returns a vector with the conversion results of each individual expression <tt>exp1</tt>, <tt>exp2</tt>, .... If several arguments convert to a vector, the  vectors are concatenated!
+   $$note:Invalid and void results are converted to empty vectors (i.e. no error message is returned!).$$
+        <!-- /func:intvec -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a group="bool"/><!-- func:bool -->
+    <b><tt><!-- template -->bool(exp)<!-- /template --></tt> / <!-- template -->bool(exp1, exp2, ...)<!-- /template --></tt> - <i> returns the results of the given expression <tt>exp</tt> as a boolean</i>:</b>
+  $$funcref_description$$
+   $$note:If multiple parameters are given, the function returns a vector with the conversion results of each individual expression <tt>exp1</tt>, <tt>exp2</tt>, ....$$
+        <!-- /func:bool -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a group="boolvec"/><!-- func:boolvec -->
+    <b><tt><!-- template -->boolvec(exp)<!-- /template --></tt> / <!-- template -->boolvec(exp1, exp2, ...)<!-- /template --></tt> - <i> returns the results of the given expression <tt>exp</tt> as a boolean vector</i>:</b>
+  $$funcref_description$$
+   If multiple parameters are given, the function returns a vector with the conversion results of each individual expression <tt>exp1</tt>, <tt>exp2</tt>, .... If several arguments convert to a vector, the  vectors are concatenated!
+   $$note:Invalid and void results are converted to empty vectors (i.e. no error message is returned!).$$
+        <!-- /func:boolvec -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a group="strvec"/><!-- func:strvec -->
+    <b><tt><!-- template -->strvec(exp)<!-- /template --></tt> / <!-- template -->strvec(exp1, exp2, ...)<!-- /template --></tt> - <i> returns the results of the given expression <tt>exp</tt> as a string vector</i>:</b>
+  $$funcref_description$$
+   If multiple parameters are given, the function returns a vector with the conversion results of each individual expression <tt>exp1</tt>, <tt>exp2</tt>, .... If several arguments convert to a vector, the  vectors are concatenated!
+   $$note:Invalid and void results are converted to empty vectors (i.e. no error message is returned!).$$
+        <!-- /func:strvec -->
+  $$funcref_end$$
+  
+  <h2>Data Type Tool Functions</h2>
+  
+  
+  $$funcref_start$$<a group="type"/><!-- func:type -->
+    <b><tt><!-- template -->type(exp)<!-- /template --></tt> / <!-- template -->type(exp1, exp2, ...)<!-- /template --></tt> - <i> returns the type of the given expression <tt>exp</tt> as a string </i>:</b>
+  $$funcref_description$$
+   $$note:If multiple parameters are given, the function returns a string list with the types of the arguments.$$
+        <!-- /func:type -->
+  $$funcref_end$$
+  
+  
+  </body>
+  </html>
+  

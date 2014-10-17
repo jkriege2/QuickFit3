@@ -90,6 +90,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slSetDatatypeDate();
         void slSaveTable();
         void slLoadTable();
+        void slImportFile();
         void slEditColumnProperties(int col=-1);
         void slResize();
         void slCopy();
@@ -145,6 +146,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actSaveTable;
         QAction* actMakeEditable;
         QAction* actLoadTable;
+        QAction* actImportTable;
         QAction* actAppendRow;
         QAction* actAppendColumn;
         QAction* actInsertRow;
