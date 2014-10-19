@@ -126,6 +126,7 @@ void OptionsDialog::open(ProgramOptions* options) {
     edtProxyHost->setText(options->getProxyHost());
     cmbProxyType->setCurrentIndex(qBound(0,options->getProxyType(),2));
     chkUpdates->setChecked(options->getConfigValue("quickfit/checkupdates", true).toBool());
+    chkStartupScreen->setChecked(options->getConfigValue("quickfit/welcomescreen", true).toBool());
     cmbWindowHeader->setCurrentIndex(options->getConfigValue("quickfit/windowheadermode", 1).toInt());
     QDir dhome(options->getHomeQFDirectory());
     if (!QDir(dhome.absolutePath()+"/userfitfunctions").exists()) dhome.mkdir("userfitfunctions");
@@ -168,6 +169,7 @@ void OptionsDialog::open(ProgramOptions* options) {
         options->setProxyPort(spinProxyPort->value());
         options->setProxyType(cmbProxyType->currentIndex());
         options->setConfigValue("quickfit/checkupdates", chkUpdates->isChecked());
+        options->setConfigValue("quickfit/welcomescreen", chkStartupScreen->isChecked());
         options->setConfigValue("quickfit/user_fitfunctions", edtUserFitFunctions->text());
         options->setHomeQFDirectory(edtUserSettings->text());
         options->setConfigValue("quickfit/math_pointsize", spinMath->value());

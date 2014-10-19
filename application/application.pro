@@ -69,7 +69,8 @@ HEADERS += mainwindow.h \
     userfitfunctionmodel.h \
     userfitfunctiondelegate.h \
     dlgsetrdrpropertybyexpression.h \
-    dlgsetrdrpropertybyexpressioneditor.h
+    dlgsetrdrpropertybyexpressioneditor.h \
+    dlgwelcomescreen.h
 
 SOURCES += main.cpp \
            mainwindow.cpp \
@@ -87,7 +88,8 @@ SOURCES += main.cpp \
     userfitfunctionmodel.cpp \
     userfitfunctiondelegate.cpp \
     dlgsetrdrpropertybyexpression.cpp \
-    dlgsetrdrpropertybyexpressioneditor.cpp
+    dlgsetrdrpropertybyexpressioneditor.cpp \
+    dlgwelcomescreen.cpp
 
 FORMS =    optionsdialog.ui \
            about.ui \
@@ -102,7 +104,8 @@ FORMS =    optionsdialog.ui \
     dlgsetrdrpropertybyregexp.ui \
     userfitfunctionseditor.ui \
     dlgsetrdrpropertybyexpression.ui \
-    dlgsetrdrpropertybyexpressioneditor.ui
+    dlgsetrdrpropertybyexpressioneditor.ui \
+    dlgwelcomescreen.ui
 
 RESOURCES += quickfit3.qrc
 

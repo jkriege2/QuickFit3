@@ -2,6 +2,9 @@
     <qresource prefix="/">
         <file alias="splash.png">../images/splash.png</file>
         <file alias="icon.png">../images/icon_32.png</file>
+        <file alias="icon48.png">../images/icon_48.png</file>
+        <file alias="icon64.png">../images/icon_64.png</file>
+        <file alias="icon128.png">../images/icon_128.png</file>
         <file alias="icon_large.png">../images/icon_256.png</file>
         <file alias="help.png">../images/16x16/help.png</file>
         <file alias="help_copyright.png">../images/16x16/help_copyright.png</file>

@@ -43,6 +43,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qflistprogressdialog.h"
 #include "qfimporterimageseries.h"
 #include "qftcspcreader.h"
+#include "dlgwelcomescreen.h"
 
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
@@ -408,10 +409,9 @@ void MainWindow::showEvent(QShowEvent *event) {
     QString lastSVN=ProgramOptions::getConfigValue("quickfit/lastrunsvn", "").toString();
 
     if (SVN!=lastSVN && !ProgramOptions::getConfigValue("quickfit/nosvncheck", false).toBool()) {
-        DlgNewVersion* dlg=new DlgNewVersion(this);
-        dlg->exec();
-        delete dlg;
-        ProgramOptions::setConfigValue("quickfit/lastrunsvn", qfInfoSVNVersion());
+        QTimer::singleShot(200,this, SLOT(displayNewVersionDlg()));
+    } else  {
+        QTimer::singleShot(200,this, SLOT(displayWelcomeDlg()));
     }
 }
 
@@ -2528,6 +2528,25 @@ void MainWindow::displayHelpFAQ()
 void MainWindow::displayHelpCiting()
 {
     displayHelpWindow(settings->getAssetsDirectory()+QString("/help/citing.html"));
+}
+
+void MainWindow::displayNewVersionDlg()
+{
+    DlgNewVersion* dlg=new DlgNewVersion(this);
+    dlg->exec();
+    delete dlg;
+    ProgramOptions::setConfigValue("quickfit/lastrunsvn", qfInfoSVNVersion());
+    QTimer::singleShot(200,this, SLOT(displayWelcomeDlg()));
+}
+
+void MainWindow::displayWelcomeDlg()
+{
+    if (options->getConfigValue("quickfit/welcomescreen", true).toBool()) {
+        DlgWelcomeScreen* dlg=new DlgWelcomeScreen(this);
+        dlg->setAttribute(Qt::WA_DeleteOnClose);
+        dlg->show();
+        dlg->raise();
+    }
 }
 void MainWindow::displayPluginHelp()
 {

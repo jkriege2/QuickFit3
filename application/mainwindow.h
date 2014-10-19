@@ -289,6 +289,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
     protected slots:
         void displayHelpCiting();
+        void displayNewVersionDlg();
+        void displayWelcomeDlg();
     private slots:
         /** \brief create a new project */
         void newProject();
