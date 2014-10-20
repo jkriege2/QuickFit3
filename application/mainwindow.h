@@ -291,6 +291,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         void displayHelpCiting();
         void displayNewVersionDlg();
         void displayWelcomeDlg();
+        void openWelcomeScreen();
     private slots:
         /** \brief create a new project */
         void newProject();
@@ -413,6 +414,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QString createPluginDoc(bool docLinks=false);
         QString createFAQ();
         QString createPluginDocTutorials(QString mainitem_before=QObject::tr("<h2>%1 Tutorials:</h2><ul>"), QString mainitem_after=QString("</ul>"));
+        QList<QAction*> getPluginTutorials();
         QString createPluginDocSettings(QString mainitem_before=QObject::tr("<h2>%1 Settings:</h2><ul>"), QString mainitem_after=QString("</ul>"));
         QString createPluginDocCopyrights(QString mainitem_before=QObject::tr("<h2>%1 Copyrights:</h2><ul>"), QString mainitem_after=QString("</ul>"));
         QString createPluginDocHelp(QString mainitem_before=QObject::tr("<h2>%1 Help:</h2><ul>"), QString mainitem_after=QString("</ul>"));
@@ -491,6 +493,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         QAction* helpContactMaillinglist;
         QAction* helpOpenWebpageAct;
         QAction* actCheckUpdate;
+        QAction* helpWelcomeScreenAct;
 
 
         QAction* actUserFitfunctionsEditor;

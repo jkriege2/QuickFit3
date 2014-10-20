@@ -22,9 +22,10 @@
 #ifndef QFELIDEDLABEL_H
 #define QFELIDEDLABEL_H
 #include "lib_imexport.h"
+#include "qfenhancedlabel.h"
 #include <QLabel>
 
-class QFLIB_EXPORT QFElidedLabel : public QLabel
+class QFLIB_EXPORT QFElidedLabel : public QFEnhancedLabel
 {
         Q_OBJECT
         Q_PROPERTY(bool isElided READ isElided)

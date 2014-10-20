@@ -153,7 +153,9 @@ HEADERS += dlgnewproperty.h \
     qfrotatablelabel.h \
     qfcompleterproperties.h \
     qfimagemetadatatool.h \
-    qflistprogressdialog.h
+    qflistprogressdialog.h \
+    qfenhancedlabel.h \
+    qfhelpaction.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -247,7 +249,9 @@ SOURCES += dlgnewproperty.cpp \
     qfrotatablelabel.cpp \
     qfcompleterproperties.cpp \
     qfimagemetadatatool.cpp \
-    qflistprogressdialog.cpp
+    qflistprogressdialog.cpp \
+    qfenhancedlabel.cpp \
+    qfhelpaction.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

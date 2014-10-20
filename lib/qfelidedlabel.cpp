@@ -25,7 +25,7 @@
 #include <QDebug>
 
 QFElidedLabel::QFElidedLabel(QWidget *parent, Qt::WindowFlags f):
-    QLabel(parent, f)
+    QFEnhancedLabel(parent, f)
 {
     setSizePolicy(QSizePolicy::Ignored, sizePolicy().verticalPolicy());
     elided=true;
@@ -34,7 +34,7 @@ QFElidedLabel::QFElidedLabel(QWidget *parent, Qt::WindowFlags f):
 }
 
 QFElidedLabel::QFElidedLabel(const QString &text, QWidget *parent, Qt::WindowFlags f):
-    QLabel(text, parent, f)
+    QFEnhancedLabel(text, parent, f)
 {
     setSizePolicy(QSizePolicy::Ignored, sizePolicy().verticalPolicy());
     elided=true;
@@ -103,7 +103,7 @@ void QFElidedLabel::paintEvent(QPaintEvent *event)
 
 
     } else {
-        QLabel::paintEvent(event);
+        QFEnhancedLabel::paintEvent(event);
     }
 }
 

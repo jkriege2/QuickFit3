@@ -44,6 +44,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfimporterimageseries.h"
 #include "qftcspcreader.h"
 #include "dlgwelcomescreen.h"
+#include "qfhelpaction.h"
 
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
@@ -948,6 +949,183 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     return text;
 }
 
+QList<QAction *> MainWindow::getPluginTutorials()
+{
+    QList<QAction *> res;
+    for (int i=0; i<getRawDataRecordFactory()->getIDList().size(); i++) {
+        QString id=getRawDataRecordFactory()->getIDList().at(i);
+        QString dir=getRawDataRecordFactory()->getPluginTutorialMain(id);
+        QStringList names, links;
+        getRawDataRecordFactory()->getPluginTutorials(id, names, links);
+        int subCnt=qMax(names.size(), links.size());
+        if (subCnt>0) {
+            if (QFile::exists(dir)) {
+                QFHelpAction* act=new QFHelpAction(this);
+                act->setHelp(dir);
+                act->setText(tr("Tutorial(s) for %1").arg(getRawDataRecordFactory()->getName(id)));
+                act->setIcon(QIcon(getRawDataRecordFactory()->getIconFilename(id)));
+                res.append(act);
+
+
+                for (int i=0; i<subCnt; i++) {
+                    if (!links.value(i, "").isEmpty()) {
+                        act=new QFHelpAction(this);
+                        act->setHelp(links.value(i, ""));
+                        act->setText(QString("    ")+names.value(i, tr("Tutorial for %1").arg(getRawDataRecordFactory()->getName(id))));
+                        res.append(act);
+                    }
+                }
+            }
+        }
+    }
+
+
+    for (int i=0; i<getEvaluationItemFactory()->getIDList().size(); i++) {
+        QString id=getEvaluationItemFactory()->getIDList().at(i);
+        QString dir=getEvaluationItemFactory()->getPluginTutorialMain(id);
+        QStringList names, links;
+        getEvaluationItemFactory()->getPluginTutorials(id, names, links);
+        int subCnt=qMax(names.size(), links.size());
+        if (subCnt>0) {
+            if (QFile::exists(dir)) {
+                QFHelpAction* act=new QFHelpAction(this);
+                act->setHelp(dir);
+                act->setText(tr("Tutorial(s) for %1").arg(getEvaluationItemFactory()->getName(id)));
+                act->setIcon(QIcon(getEvaluationItemFactory()->getIconFilename(id)));
+                res.append(act);
+
+
+                for (int i=0; i<subCnt; i++) {
+                    if (!links.value(i, "").isEmpty()) {
+                        act=new QFHelpAction(this);
+                        act->setHelp(links.value(i, ""));
+                        act->setText(QString("    ")+names.value(i, tr("Tutorial for %1").arg(getEvaluationItemFactory()->getName(id))));
+                        //act->setIcon(getEvaluationItemFactory()->getIconFilename(id));
+                        res.append(act);
+                    }
+                }
+            }
+        }
+    }
+
+
+    for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
+        QString id=getExtensionManager()->getIDList().at(i);
+        QString dir=getExtensionManager()->getPluginTutorialMain(id);
+        QStringList names, links;
+        getExtensionManager()->getPluginTutorials(id, names, links);
+        int subCnt=qMax(names.size(), links.size());
+        if (subCnt>0) {
+            if (QFile::exists(dir)) {
+                QFHelpAction* act=new QFHelpAction(this);
+                act->setHelp(dir);
+                act->setText(tr("Tutorial(s) for %1").arg(getExtensionManager()->getName(id)));
+                act->setIcon(QIcon(getExtensionManager()->getIconFilename(id)));
+                res.append(act);
+
+
+                for (int i=0; i<subCnt; i++) {
+                    if (!links.value(i, "").isEmpty()) {
+                        act=new QFHelpAction(this);
+                        act->setHelp(links.value(i, ""));
+                        act->setText(QString("    ")+names.value(i, tr("Tutorial for %1").arg(getExtensionManager()->getName(id))));
+                        //act->setIcon(getExtensionManager()->getIconFilename(id));
+                        res.append(act);
+                    }
+                }
+            }
+        }
+    }
+
+
+
+
+
+
+    for (int id=0; id<fitAlgorithmManager->pluginCount(); id++) {
+        QString dir=fitAlgorithmManager->getPluginTutorialMain(id);
+        QStringList names, links;
+        fitAlgorithmManager->getPluginTutorials(id, names, links);
+        int subCnt=qMax(names.size(), links.size());
+        if (subCnt>0) {
+            if (QFile::exists(dir)) {
+                QFHelpAction* act=new QFHelpAction(this);
+                act->setHelp(dir);
+                act->setText(tr("Tutorial(s) for %1").arg(fitAlgorithmManager->getName(id)));
+                act->setIcon(QIcon(fitAlgorithmManager->getIconFilename(id)));
+                res.append(act);
+
+
+                for (int i=0; i<subCnt; i++) {
+                    if (!links.value(i, "").isEmpty()) {
+                        act=new QFHelpAction(this);
+                        act->setHelp(links.value(i, ""));
+                        act->setText(QString("    ")+names.value(i, tr("Tutorial for %1").arg(fitAlgorithmManager->getName(id))));
+                        res.append(act);
+                    }
+                }
+            }
+        }
+    }
+
+
+    for (int id=0; id<fitFunctionManager->pluginCount(); id++) {
+        QString dir=fitFunctionManager->getPluginTutorialMain(id);
+        QStringList names, links;
+        fitFunctionManager->getPluginTutorials(id, names, links);
+        int subCnt=qMax(names.size(), links.size());
+        if (subCnt>0) {
+            if (QFile::exists(dir)) {
+                QFHelpAction* act=new QFHelpAction(this);
+                act->setHelp(dir);
+                act->setText(tr("Tutorial(s) for %1").arg(fitFunctionManager->getName(id)));
+                act->setIcon(QIcon(fitFunctionManager->getIconFilename(id)));
+                res.append(act);
+
+
+                for (int i=0; i<subCnt; i++) {
+                    if (!links.value(i, "").isEmpty()) {
+                        act=new QFHelpAction(this);
+                        act->setHelp(links.value(i, ""));
+                        act->setText(QString("    ")+names.value(i, tr("Tutorial for %1").arg(fitFunctionManager->getName(id))));
+                        res.append(act);
+                    }
+                }
+            }
+        }
+    }
+
+
+    for (int id=0; id<importerManager->pluginCount(); id++) {
+        QString dir=importerManager->getPluginTutorialMain(id);
+        QStringList names, links;
+        importerManager->getPluginTutorials(id, names, links);
+        int subCnt=qMax(names.size(), links.size());
+        if (subCnt>0) {
+            if (QFile::exists(dir)) {
+                QFHelpAction* act=new QFHelpAction(this);
+                act->setHelp(dir);
+                act->setText(tr("Tutorial(s) for %1").arg(importerManager->getName(id)));
+                act->setIcon(QIcon(importerManager->getIconFilename(id)));
+                res.append(act);
+
+
+                for (int i=0; i<subCnt; i++) {
+                    if (!links.value(i, "").isEmpty()) {
+                        act=new QFHelpAction(this);
+                        act->setHelp(links.value(i, ""));
+                        act->setText(QString("    ")+names.value(i, tr("Tutorial for %1").arg(importerManager->getName(id))));
+                        res.append(act);
+                    }
+                }
+            }
+        }
+    }
+
+
+    return res;
+}
+
 QString MainWindow::createPluginDocSettings(QString mainitem_before, QString mainitem_after) {
     QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
     QString text=mainitem_before.arg(tr("Raw Data Record"));
@@ -1232,6 +1410,8 @@ void MainWindow::createActions() {
 
     helpCopyrightAct=new QAction(QIcon(":/help_copyright.png"), tr("QuickFit &Copyright"), this);
     connect(helpCopyrightAct, SIGNAL(triggered()), this, SLOT(displayHelpCopyright()));
+    helpWelcomeScreenAct=new QAction(tr("Show Welcome Screen"), this);
+    connect(helpWelcomeScreenAct, SIGNAL(triggered()), this, SLOT(openWelcomeScreen()));
     helpPluginCopyrightAct=new QAction(QIcon(":/lib/help/help_copyright.png"), tr("Plugin C&opyright"), this);
     connect(helpPluginCopyrightAct, SIGNAL(triggered()), this, SLOT(displayHelpPluginCopyright()));
     helpCitingAct=new QAction(QIcon(":/help_copyright.png"), tr("Citing QuickFit ..."), this);
@@ -1409,6 +1589,8 @@ void MainWindow::createMenus() {
     helpMenu->addAction(aboutQtAct);
     helpMenu->addSeparator();
     helpMenu->addAction(actCheckUpdate);
+    helpMenu->addSeparator();
+    helpMenu->addAction(helpWelcomeScreenAct);
     helpMenu->addSeparator();
     helpMenu->addAction(helpOpenWebpageAct);
     helpMenu->addAction(helpContactAuthors);
@@ -2541,12 +2723,51 @@ void MainWindow::displayNewVersionDlg()
 
 void MainWindow::displayWelcomeDlg()
 {
-    if (options->getConfigValue("quickfit/welcomescreen", true).toBool()) {
-        DlgWelcomeScreen* dlg=new DlgWelcomeScreen(this);
-        dlg->setAttribute(Qt::WA_DeleteOnClose);
-        dlg->show();
-        dlg->raise();
+    if (ProgramOptions::getConfigValue("quickfit/welcomescreen", true).toBool()) {
+        openWelcomeScreen();
     }
+}
+
+void MainWindow::openWelcomeScreen()
+{
+    DlgWelcomeScreen* dlg=new DlgWelcomeScreen(this);
+    dlg->setAttribute(Qt::WA_DeleteOnClose);
+    dlg->addAction(DlgWelcomeScreen::scFirst, newProjectAct, 24);
+    dlg->addAction(DlgWelcomeScreen::scFirst, openProjectAct, 24);
+    dlg->addAction(DlgWelcomeScreen::scFirst, openExampleAct, 24);
+    dlg->addSeparator(DlgWelcomeScreen::scFirst);
+    QList<QAction*> acts=projectWizardsMenu->actions();
+    for (int i=0; i<acts.size(); i++) {
+        if (acts[i] && !acts[i]->isSeparator()) {
+            dlg->addAction(DlgWelcomeScreen::scFirst, acts[i], 24);
+        }
+    }
+    dlg->addSeparator(DlgWelcomeScreen::scFirst);
+    dlg->addAction(DlgWelcomeScreen::scFirst, helpAct, 24, false);
+    dlg->addAction(DlgWelcomeScreen::scFirst, helpFAQAct, 24, false);
+    dlg->addAction(DlgWelcomeScreen::scFirst, helpTutorialsAct, 24, false);
+
+    acts=recentMenu->actions();
+    for (int i=0; i<acts.size(); i++) {
+        if (acts[i] && !acts[i]->isSeparator()) {
+            dlg->addAction(DlgWelcomeScreen::scRecent, acts[i]);
+        }
+    }
+
+    dlg->addAction(DlgWelcomeScreen::scTutorials, helpAct, 24, false);
+    dlg->addAction(DlgWelcomeScreen::scTutorials, helpFAQAct, 24, false);
+    dlg->addAction(DlgWelcomeScreen::scTutorials, helpTutorialsAct, 24, false);
+    dlg->addSeparator(DlgWelcomeScreen::scTutorials);
+
+    acts=getPluginTutorials();
+    for (int i=0; i<acts.size(); i++) {
+        if (acts[i] && !acts[i]->isSeparator()) {
+            dlg->addAction(DlgWelcomeScreen::scTutorials, acts[i], 16,false);
+        }
+    }
+    dlg->finalizeLayout();
+    dlg->show();
+    dlg->raise();
 }
 void MainWindow::displayPluginHelp()
 {

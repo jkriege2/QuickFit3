@@ -15,6 +15,17 @@ class DlgWelcomeScreen : public QDialog
         explicit DlgWelcomeScreen(QWidget *parent = 0);
         ~DlgWelcomeScreen();
 
+        enum Screens {
+            scFirst,
+            scRecent,
+            scTutorials
+        };
+
+        void addAction(Screens s, QAction* act, int pixmapSize=16, bool closeOnClick=true);
+        void addSeparator(Screens s);
+
+        void finalizeLayout();
+
     protected slots:
         void on_chkShow_toggled(bool enabled);
         void on_btnClose_clicked();
