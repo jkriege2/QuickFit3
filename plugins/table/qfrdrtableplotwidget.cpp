@@ -1533,102 +1533,122 @@ int QFRDRTablePlotWidget::getColumnWithStride(int column, const QFRDRTable::Grap
                 istart=g.strideStart-1;
                 iinc=g.stride;
             }
+
             for (int i=istart; i< cnt; i=i+iinc) {
-                bool ok=false;
-                switch(g.dataSelect1Operation) {
-                    case QFRDRTable::dsoEquals:
-                        if (dataS[i]==g.dataSelect1CompareValue) ok=true;
-                        break;
-                    case QFRDRTable::dsoUnequal:
-                        if (dataS[i]!=g.dataSelect1CompareValue) ok=true;
-                        break;
-                    case QFRDRTable::dsoGreaterOrEqual:
-                        if (dataS[i]>=g.dataSelect1CompareValue) ok=true;
-                        break;
-                    case QFRDRTable::dsoSmallerOrEqual:
-                        if (dataS[i]<=g.dataSelect1CompareValue) ok=true;
-                        break;
-                    case QFRDRTable::dsoGreater:
-                        if (dataS[i]>g.dataSelect1CompareValue) ok=true;
-                        break;
-                    case QFRDRTable::dsoSmaller:
-                        if (dataS[i]<g.dataSelect1CompareValue) ok=true;
-                        break;
-                    case QFRDRTable::dsoInRange:
-                        if (dataS[i]>=g.dataSelect1CompareValue && dataS[i]<=g.dataSelect1CompareValue2) ok=true;
-                        break;
-                    case QFRDRTable::dsoOutOfRange:
-                        if (!(dataS[i]>=g.dataSelect1CompareValue && dataS[i]<=g.dataSelect1CompareValue2)) ok=true;
-                        break;
-                }
-                if (g.dataSelectLogic12!=QFRDRTable::dsoNone && dataS2.size()>0) {
-                    bool okLocal=false;
-                    switch(g.dataSelect2Operation) {
+                bool ok=true;
+                if (dataS.size()>0) {
+                    ok=false;
+                    switch(g.dataSelect1Operation) {
                         case QFRDRTable::dsoEquals:
-                            if (dataS2[i]==g.dataSelect2CompareValue) okLocal=true;
+                            if (dataS[i]==g.dataSelect1CompareValue) ok=true;
                             break;
                         case QFRDRTable::dsoUnequal:
-                            if (dataS2[i]!=g.dataSelect2CompareValue) okLocal=true;
+                            if (dataS[i]!=g.dataSelect1CompareValue) ok=true;
                             break;
                         case QFRDRTable::dsoGreaterOrEqual:
-                            if (dataS2[i]>=g.dataSelect2CompareValue) okLocal=true;
+                            if (dataS[i]>=g.dataSelect1CompareValue) ok=true;
                             break;
                         case QFRDRTable::dsoSmallerOrEqual:
-                            if (dataS2[i]<=g.dataSelect2CompareValue) okLocal=true;
+                            if (dataS[i]<=g.dataSelect1CompareValue) ok=true;
                             break;
                         case QFRDRTable::dsoGreater:
-                            if (dataS2[i]>g.dataSelect2CompareValue) okLocal=true;
+                            if (dataS[i]>g.dataSelect1CompareValue) ok=true;
                             break;
                         case QFRDRTable::dsoSmaller:
-                            if (dataS2[i]<g.dataSelect2CompareValue) okLocal=true;
+                            if (dataS[i]<g.dataSelect1CompareValue) ok=true;
                             break;
                         case QFRDRTable::dsoInRange:
-                            if (dataS2[i]>=g.dataSelect2CompareValue && dataS2[i]<=g.dataSelect2CompareValue2) okLocal=true;
+                            if (dataS[i]>=g.dataSelect1CompareValue && dataS[i]<=g.dataSelect1CompareValue2) ok=true;
                             break;
                         case QFRDRTable::dsoOutOfRange:
-                            if (!(dataS2[i]>=g.dataSelect2CompareValue && dataS2[i]<=g.dataSelect2CompareValue2)) okLocal=true;
+                            if (!(dataS[i]>=g.dataSelect1CompareValue && dataS[i]<=g.dataSelect1CompareValue2)) ok=true;
                             break;
                     }
-                    if (g.dataSelectLogic12==QFRDRTable::dsoAnd) ok=ok&&okLocal;
-                    else if (g.dataSelectLogic12==QFRDRTable::dsoOr) ok=ok||okLocal;
-                    else if (g.dataSelectLogic12==QFRDRTable::dsoXor) ok=(ok&&!okLocal) || (!ok&&okLocal);
-                    if (g.dataSelectLogic23!=QFRDRTable::dsoNone && dataS3.size()>0) {
-                        okLocal=false;
-                        switch(g.dataSelect3Operation) {
+                    if (g.dataSelectLogic12!=QFRDRTable::dsoNone && dataS2.size()>0) {
+                        bool okLocal=false;
+                        switch(g.dataSelect2Operation) {
                             case QFRDRTable::dsoEquals:
-                                if (dataS3[i]==g.dataSelect3CompareValue) okLocal=true;
+                                if (dataS2[i]==g.dataSelect2CompareValue) okLocal=true;
                                 break;
                             case QFRDRTable::dsoUnequal:
-                                if (dataS3[i]!=g.dataSelect3CompareValue) okLocal=true;
+                                if (dataS2[i]!=g.dataSelect2CompareValue) okLocal=true;
                                 break;
                             case QFRDRTable::dsoGreaterOrEqual:
-                                if (dataS3[i]>=g.dataSelect3CompareValue) okLocal=true;
+                                if (dataS2[i]>=g.dataSelect2CompareValue) okLocal=true;
                                 break;
                             case QFRDRTable::dsoSmallerOrEqual:
-                                if (dataS3[i]<=g.dataSelect3CompareValue) okLocal=true;
+                                if (dataS2[i]<=g.dataSelect2CompareValue) okLocal=true;
                                 break;
                             case QFRDRTable::dsoGreater:
-                                if (dataS3[i]>g.dataSelect3CompareValue) okLocal=true;
+                                if (dataS2[i]>g.dataSelect2CompareValue) okLocal=true;
                                 break;
                             case QFRDRTable::dsoSmaller:
-                                if (dataS3[i]<g.dataSelect3CompareValue) okLocal=true;
+                                if (dataS2[i]<g.dataSelect2CompareValue) okLocal=true;
                                 break;
                             case QFRDRTable::dsoInRange:
-                                if (dataS3[i]>=g.dataSelect3CompareValue && dataS3[i]<=g.dataSelect3CompareValue2) okLocal=true;
+                                if (dataS2[i]>=g.dataSelect2CompareValue && dataS2[i]<=g.dataSelect2CompareValue2) okLocal=true;
                                 break;
                             case QFRDRTable::dsoOutOfRange:
-                                if (!(dataS3[i]>=g.dataSelect3CompareValue && dataS3[i]<=g.dataSelect3CompareValue2)) okLocal=true;
+                                if (!(dataS2[i]>=g.dataSelect2CompareValue && dataS2[i]<=g.dataSelect2CompareValue2)) okLocal=true;
                                 break;
                         }
-                        if (g.dataSelectLogic23==QFRDRTable::dsoAnd) ok=ok&&okLocal;
-                        else if (g.dataSelectLogic23==QFRDRTable::dsoOr) ok=ok||okLocal;
-                        else if (g.dataSelectLogic23==QFRDRTable::dsoXor) ok=(ok&&!okLocal) || (!ok&&okLocal);
+                        if (g.dataSelectLogic12==QFRDRTable::dsoAnd) ok=ok&&okLocal;
+                        else if (g.dataSelectLogic12==QFRDRTable::dsoOr) ok=ok||okLocal;
+                        else if (g.dataSelectLogic12==QFRDRTable::dsoXor) ok=(ok&&!okLocal) || (!ok&&okLocal);
+                        if (g.dataSelectLogic23!=QFRDRTable::dsoNone && dataS3.size()>0) {
+                            okLocal=false;
+                            switch(g.dataSelect3Operation) {
+                                case QFRDRTable::dsoEquals:
+                                    if (dataS3[i]==g.dataSelect3CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoUnequal:
+                                    if (dataS3[i]!=g.dataSelect3CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoGreaterOrEqual:
+                                    if (dataS3[i]>=g.dataSelect3CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoSmallerOrEqual:
+                                    if (dataS3[i]<=g.dataSelect3CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoGreater:
+                                    if (dataS3[i]>g.dataSelect3CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoSmaller:
+                                    if (dataS3[i]<g.dataSelect3CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoInRange:
+                                    if (dataS3[i]>=g.dataSelect3CompareValue && dataS3[i]<=g.dataSelect3CompareValue2) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoOutOfRange:
+                                    if (!(dataS3[i]>=g.dataSelect3CompareValue && dataS3[i]<=g.dataSelect3CompareValue2)) okLocal=true;
+                                    break;
+                            }
+                            if (g.dataSelectLogic23==QFRDRTable::dsoAnd) ok=ok&&okLocal;
+                            else if (g.dataSelectLogic23==QFRDRTable::dsoOr) ok=ok||okLocal;
+                            else if (g.dataSelectLogic23==QFRDRTable::dsoXor) ok=(ok&&!okLocal) || (!ok&&okLocal);
+                        }
                     }
                 }
 
                 if (ok) dataO.append(data[i]);
             }
-            if (dataO.size()>0) return ui->plotter->getDatastore()->addCopiedColumn(dataO.data(), dataO.size(), tr("(%2,%3)-strided, selected (%4 %5 %6) \"%1\"").arg(ui->plotter->getDatastore()->getColumnNames().at(column)).arg(g.strideStart).arg(g.stride).arg(ui->plotter->getDatastore()->getColumnNames().at(g.dataSelect1Column)).arg(QFRDRTable::DataSelectOperation2String(g.dataSelect1Operation)).arg(g.dataSelect1CompareValue));
+            QString s1=tr("%1 %2 %3").arg(ui->plotter->getDatastore()->getColumnNames().at(g.dataSelect1Column)).arg(QFRDRTable::DataSelectOperation2String(g.dataSelect1Operation)).arg(g.dataSelect1CompareValue);
+            QString s2="";
+            QString s3="";
+            if (g.dataSelectLogic12!=QFRDRTable::dsoNone) {
+                if (g.dataSelectLogic12==QFRDRTable::dsoAnd) s2=s2+" && ";
+                if (g.dataSelectLogic12==QFRDRTable::dsoOr) s2=s2+" || ";
+                if (g.dataSelectLogic12==QFRDRTable::dsoXor) s2=s2+" ~~ ";
+                s2=s2+tr("%1 %2 %3").arg(ui->plotter->getDatastore()->getColumnNames().at(g.dataSelect2Column)).arg(QFRDRTable::DataSelectOperation2String(g.dataSelect2Operation)).arg(g.dataSelect2CompareValue);
+                if (g.dataSelectLogic23!=QFRDRTable::dsoNone) {
+                    if (g.dataSelectLogic23==QFRDRTable::dsoAnd) s3=s3+" && ";
+                    if (g.dataSelectLogic23==QFRDRTable::dsoOr) s3=s3+" || ";
+                    if (g.dataSelectLogic23==QFRDRTable::dsoXor) s3=s3+" ~~ ";
+                    s3=s3+tr("%1 %2 %3").arg(ui->plotter->getDatastore()->getColumnNames().at(g.dataSelect3Column)).arg(QFRDRTable::DataSelectOperation2String(g.dataSelect3Operation)).arg(g.dataSelect3CompareValue);
+                }
+            }
+            QString nam= tr("(%2,%3)-strided, selected (%4%5%6) \"%1\"").arg(ui->plotter->getDatastore()->getColumnNames().at(column)).arg(g.strideStart).arg(g.stride).arg(s1).arg(s2).arg(s3);
+            if (dataO.size()>0) return ui->plotter->getDatastore()->addCopiedColumn(dataO.data(), dataO.size(),nam);
             else return -1;
         } else {
             if (g.isStrided) {
