@@ -2,7 +2,7 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-  <title>imFCCS Plugin: Tutorial</title>
+  <title>imFCCS Plugin: Tutorial (imFCCS fit for DNA without correlation)</title>
   </head>
   <body>
     $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
@@ -26,13 +26,13 @@ the imFCCS fit will know which ACF1 and FCCS belong to a given ACF0. In addition
 data is represented by the record (e.g. here: ACF0, ACF1 and FCCS). Both properties can be seen (and the group can be changed) in the "Properties" tab of the
 raw data record:
 <center>
-	<a name="tutorial_pic006"><img src="./pic/tutorial_pic006.png" border="1">
+    <a name="tutorial_pic006"><img src="./pic/tutorial_pic006.png" border="1">
 </center>
 </p>
 
 <p>For the measurement these settings were used:
 <ul>
-    <li>330µs frametime on an EMCCD with EMGain 300</li>    
+    <li>330ďż˝s frametime on an EMCCD with EMGain 300</li>    
     <li>491nm and 561nm lasers with 25W and 25mW overall power</li>
     <li>565nm beam splitter</li>
     <li>525/50 bandpass for green channel</li>
@@ -51,12 +51,12 @@ raw data record:
     <li>First you can create a mask to mask out pixels that are not needed (because they are e.g. black):
     <ol>
       <li>Select the pixels to mask out:<center>
-	<a name="tutorial_pic001"><img src="./pic/tutorial_pic001.png" border="1">
+    <a name="tutorial_pic001"><img src="./pic/tutorial_pic001.png" border="1">
  
 </center></li>
       <li>click the "mask sel." button on the rhs or the menu entry "Mask|mask sel." (the curve on the bottom is the averaged ACF0 over all non-masked pixels):
       <center>
-	<a name="tutorial_pic002"><img src="./pic/tutorial_pic002.png" border="1">
+    <a name="tutorial_pic002"><img src="./pic/tutorial_pic002.png" border="1">
          <br><a name="tutorial_pic003"><img src="./pic/tutorial_pic003.png" border="1">
 </center></li>
       <li>Finally click on the menu entry "Mask|copy mask to all files in same group", which will set this mask also for the ACF1 and FCCS file!</li>
@@ -64,11 +64,11 @@ raw data record:
     </ol>
     </li>
     <li>select some pixels in the overview image (e.g. using the rectangle tool):<center>
-	<a name="tutorial_pic004"><img src="./pic/tutorial_pic004.png" border="1">
+    <a name="tutorial_pic004"><img src="./pic/tutorial_pic004.png" border="1">
 </center></li>
     <li>click on the menu entry "imagingFCS Tools|copy all CFs from group to table. A dialog like this will pop up:
     <center>
-	<a name="tutorial_pic005"><img src="./pic/tutorial_pic005.png" border="1">
+    <a name="tutorial_pic005"><img src="./pic/tutorial_pic005.png" border="1">
     </center>
     This will create a new table RDR which will contain the ACF0, ACF1 and FCCS (basically all imagingFCS RDRs in the same group as the current RDR),
     averaged over the selected pixels as different columns (obe for the tau-axis one for the average and one for the standard deviation of each correlation curve) 
@@ -78,7 +78,7 @@ raw data record:
     If you set everything the way it is set in the image above, a new table with the name "overview: DS:SS=0.5" will be added and
     a new graph in it will be created, which will have the name "compare ACFs & FCS". The result will look like this:
     <center>
-	<a name="tutorial_pic007"><img src="./pic/tutorial_pic007.png" border="1">
+    <a name="tutorial_pic007"><img src="./pic/tutorial_pic007.png" border="1">
           <a name="tutorial_pic008"><img src="./pic/tutorial_pic008.png" border="1">
     </center>
     and two more table RDRs are added to the project:<center><a name="tutorial_pic009"><img src="./pic/tutorial_pic009.png" border="1"></center>
@@ -114,21 +114,21 @@ To perform this evaluation, follow these steps:
     <li>Select the result set "rel. CCF amplitude of CCF/ACF: 'FCCS'/'ACF1'" and the parameter "results: relative CCF amplitude" therein.</li>
     <li>If you choose the "Histogram" tab, you can look at the distribution of relFCCS(x,y) values over the whole image:
     <center>
-	<a name="tutorial_pic011"><img src="./pic/tutorial_pic011.png" border="1"><br/>
+    <a name="tutorial_pic011"><img src="./pic/tutorial_pic011.png" border="1"><br/>
           <i>DL:SL=0.5, average=0.46, standard deviation=0.34</i>
     </center>
     <center>
-	<a name="tutorial_pic012"><img src="./pic/tutorial_pic012.png" border="1"><br/>
+    <a name="tutorial_pic012"><img src="./pic/tutorial_pic012.png" border="1"><br/>
           <i>DL-only, average=0.73, standard deviation=0.22</i>
     </center>
     $$note:The contributions outside 0..1 which lead to the overshooting/undershooting pixels in the dialog above!$$
     Here are also the parameter images (color range set to 0..1!!!):
     <center>
-	<a name="tutorial_pic014"><img src="./pic/tutorial_pic014.png" border="1"><br/>
+    <a name="tutorial_pic014"><img src="./pic/tutorial_pic014.png" border="1"><br/>
           <i>DL:SL=0.5</i>
     </center>
     <center>
-	<a name="tutorial_pic013"><img src="./pic/tutorial_pic013.png" border="1"><br/>
+    <a name="tutorial_pic013"><img src="./pic/tutorial_pic013.png" border="1"><br/>
           <i>DL-only</i>
     </center>
     
@@ -149,11 +149,11 @@ for the green, the red and the FCCS channel. E.g. the double-labeled species AB 
 <p>Perform these steps:
 <ol>
     <li>In the main window add an "imFCCS Curve Fitting" evaluation item to the project (menu "Data Items|Insert Evaluation|imFCCS Curve Fitting"):<center>
-	<a name="tutorial_pic015"><img src="./pic/tutorial_pic015.png" border="1">
+    <a name="tutorial_pic015"><img src="./pic/tutorial_pic015.png" border="1">
 </center>
     </li>
     <li>Open the fit module with a double-click:<center>
-	<a name="tutorial_pic016"><img src="./pic/tutorial_pic016.png" border="1">
+    <a name="tutorial_pic016"><img src="./pic/tutorial_pic016.png" border="1">
 </center>
     </li>
     <li><a name="beforeFCCSFit">On startup only one file is selected (remember we want to select 3: Two ACFs and the FCCS) and a standard model (SPIM-FCS: Diffusion (1/sqrt(e) radii) ) is choosen in the parameter list at the bottom.<br>
@@ -171,7 +171,7 @@ for the green, the red and the FCCS channel. E.g. the double-labeled species AB 
         The correlation function display will show the three selected files (possibly switch the "errors" to none to prevent the display of error bars). All the fit models will remain at their
         default settings:
         <center>
-	<a name="tutorial_pic017"><img src="./pic/tutorial_pic017.png" border="1">
+    <a name="tutorial_pic017"><img src="./pic/tutorial_pic017.png" border="1">
         </center>
         For each file the same fit model is selected and we will use those for now (they are proper SPIM-FCS fitting models after all!).
     </li>
@@ -193,8 +193,8 @@ for the green, the red and the FCCS channel. E.g. the double-labeled species AB 
         <br>Also enter the values 3, 7 and 15 for the particle number parameters "N" for the three columns and
         observe what happens to the plot:
         <center>
-	<a name="tutorial_pic018"><img src="./pic/tutorial_pic018.png" border="1">
-	&nbsp;&nbsp;<a name="tutorial_pic019"><img src="./pic/tutorial_pic019.png" border="1">
+    <a name="tutorial_pic018"><img src="./pic/tutorial_pic018.png" border="1">
+    &nbsp;&nbsp;<a name="tutorial_pic019"><img src="./pic/tutorial_pic019.png" border="1">
         </center>
         $$note:The parameters with a light grey background can not be edited by the user, but will be calculated by the model (e.g. the effective volume or the concentration).$$
         </li>
@@ -205,7 +205,7 @@ for the green, the red and the FCCS channel. E.g. the double-labeled species AB 
     $$note:As this is more complex than a standard single-curve fit, you will have to allow for more time here, than in a standard imFCS fit!$$</li>
     <li>Note that in the "file sets" list on the rhs, two entries have appeared:
     <center>
-	<a name="tutorial_pic022"><img src="./pic/tutorial_pic022.png" border="1">
+    <a name="tutorial_pic022"><img src="./pic/tutorial_pic022.png" border="1">
 </center>
     The dark-blue entry (and all other entries of this color) represent file-combinations (or sets) for which you already performed a fit. The grey entries represent
     file combinations that QuickFit thinks you might also want to fit. Here it found out that all three files fitted together were from teh same group and from there
@@ -216,11 +216,11 @@ for the green, the red and the FCCS channel. E.g. the double-labeled species AB 
     model curves will be displayed. To return to the "average" run, just enter -1 into the "pixel/run" edit field above the overview image.</li>
     <li>Finally you can open e.g. the ACF0 raw data record in the project tree and look at the fit result "diffusion coefficient of species 1" in the result set. The parameter image looks like this:
     <center>
-	<a name="tutorial_pic020"><img src="./pic/tutorial_pic020.png" border="1">
+    <a name="tutorial_pic020"><img src="./pic/tutorial_pic020.png" border="1">
 </center>
     and the parameter distribution of the diffusion coefficient is:
     <center>
-	<a name="tutorial_pic021"><img src="./pic/tutorial_pic021.png" border="1">
+    <a name="tutorial_pic021"><img src="./pic/tutorial_pic021.png" border="1">
 </center> </li>
 </ol>
 In the next section we will do a propr SPIM-FCCS fit taling into account also the crosstalk between the two channels.
@@ -240,7 +240,7 @@ we will use a set of <a href="../fitfunctions_spimfcs/fccs_spim_fw_diff2colorccf
     </ul>
     The parameters table will look like this:
     <center>
-	<a name="tutorial_pic023"><img src="./pic/tutorial_pic023.png" border="1">
+    <a name="tutorial_pic023"><img src="./pic/tutorial_pic023.png" border="1">
 </center>
     the dark grey cells represent parameters that are not present in the respctive model for the file and you see that several parameters are linked over all files/models.
     Also observe again that some parameters (e.g. the effective volumes or the different ways to express the relative concentration of double-labels) are calculated by the
@@ -255,12 +255,12 @@ we will use a set of <a href="../fitfunctions_spimfcs/fccs_spim_fw_diff2colorccf
           <li>crosstalk-coefficient $$\kappa=0.14$$ (representing the crosstalk of the green dye into the red channel: ~14%)</li>
       </ul>
       <center>
-	<a name="tutorial_pic024"><img src="./pic/tutorial_pic024.png" border="1">
+    <a name="tutorial_pic024"><img src="./pic/tutorial_pic024.png" border="1">
 </center>
     </li>
     <li>Now we are ready to perform the fit for the overview run/pixel, by clicking "Fit current":
     <center>
-	<a name="tutorial_pic025"><img src="./pic/tutorial_pic025.png" border="1">
+    <a name="tutorial_pic025"><img src="./pic/tutorial_pic025.png" border="1">
     </center>
     </li>
     <li>If the fit succeeded, copy the fit results to the initial results by clicking "Copy to Initial". Now we are ready to fit each pixel by clicking "Fit All Pixels".</li>
@@ -268,7 +268,7 @@ we will use a set of <a href="../fitfunctions_spimfcs/fccs_spim_fw_diff2colorccf
     <li>Finally you can open e.g. the FCCS raw data record in the project tree and look at the fit result "relative concentration of species AB in focus cAB/min(cA,cB)" 
         in the result set "imFCCS Fit Plugin ... (1/eÂ˛ radii): Diffusion, 2-...". The parameter image looks like this:
         <center>
-	<a name="tutorial_pic026"><img src="./pic/tutorial_pic026.png" border="1">
+    <a name="tutorial_pic026"><img src="./pic/tutorial_pic026.png" border="1">
         </center>
         This parameter gives the concentration of double-labaled DNAs as compared to the smaller of the two single-labaled concentrations ($$math:c_{AB}/\min(c_A,c_B)$$). 
         Several other parameters (e.g. $$math:K_D=c_{AB}/(c_A\cdot c_B)$$ or $$math:c_{AB}/(c_A+c_B+c_{AB})$$) available that also quantify the amount of double-labeled DNAs,
@@ -280,7 +280,7 @@ we will use a set of <a href="../fitfunctions_spimfcs/fccs_spim_fw_diff2colorccf
     <li>In the last measurement each of the three species (A, B, AB) had their own diffusion coefficient. As we know all of them are 607bp DNAs, we can also link all these diffusion coefficients.
         To do so, add a second evaluation to the project and configure it as in steps 1-3 of this section. Then choose for all diffusion coefficients the global parameter #3 (preselected for DA!):
         <center>
-	<a name="tutorial_pic027"><img src="./pic/tutorial_pic027.png" border="1">
+    <a name="tutorial_pic027"><img src="./pic/tutorial_pic027.png" border="1">
 </center></li>
      <li>Now you can fit again by fitting the average run, then "Copy to Initiaal" and finally "Fit All Pixels".</li>
      <li></li>

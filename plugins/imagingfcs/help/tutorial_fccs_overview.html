@@ -10,6 +10,7 @@
     
 
 <h2>Introduction</h2>
+$$startbox_info$$The data for this tutorial can be found in the example projects for the <a href="$$plugin_info:help:imfccs_fit$$">imFCCS Fit Plugin</a>: <tt><a href="$$plugin_info:examplesdir:imfccs_fit$$test_fccs_dna_fortutorial.qfp">$$plugin_info:examplesdir:imfccs_fit$$test_fccs_dna_fortutorial.qfp</a></tt>$$endbox$$
 <p>
     This tutorial shows how to create overview plots of an imFCCS measurement, which contain both ACFs (in green/red channel) and the crosscorrelation between them. The example we chose is a measurement of different mixing rations of single- and double-labeled DNA fragments (607bp, Alexa-488-, Alexa-594- and Alexa-488+594-labeled).
     We will evaluate two measurements: one of a DL-only sample and one with a low fraction of DL (cAB:cA:cB=0.5:1:1). Note that the labeleing was not perfect, so also the DL-only sample contains single-labeled fragments of both colors!
@@ -26,14 +27,14 @@ the imFCCS fit will know which ACF1 and FCCS belong to a given ACF0. In addition
 data is represented by the record (e.g. here: ACF0, ACF1 and FCCS). Both properties can be seen (and the group can be changed) in the "Properties" tab of the
 raw data record:
 <center>
-	<a name="tutorial_pic006"><img src="./pic/tutorial_pic006.png" border="1">
+    <a name="tutorial_pic006"><img src="./pic/tutorial_pic006.png" border="1">
 </center>
 </p>
 
 <p>For the measurement these settings were used:
 <ul>
-    <li>330µs frametime on an EMCCD with EMGain 300</li>    
-    <li>491nm and 561nm lasers with 25W and 25mW overall power</li>
+    <li>330&mu;s frametime on an EMCCD with EMGain 300</li>    
+    <li>491nm and 561nm lasers with 25mW and 25mW overall power</li>
     <li>565nm beam splitter</li>
     <li>525/50 bandpass for green channel</li>
     <li>LP568 longpass filter for red channel</li>
@@ -42,7 +43,41 @@ raw data record:
 </p>
 
 
-<h2>Tutorial</h2>
+<h2>Tutorial: Simple overview plots</h2>
+<p>The simples way to get a plot of all correlation functions side-by-side is the following:
+<ol>
+    <li>load the project, mentioned above.</li>
+    <li>double-click the first FCCS-record
+    <center><a name="tutorial_fccs_overview_pic000"><img src="./pic/tutorial_fccs_overview_pic000.png" border="1">
+    </center>
+    and choose the "Parameter Image" Tab.</li>
+    <li>In the column on the rhs, scroll down to the section <b>correlation plot styles</b>.</li>
+    <li>Choose <b>selection display</b> = <b>FCCS display</b>
+    <center><a name="tutorial_fccs_overview_pic001"><img src="./pic/tutorial_fccs_overview_pic001.png" border="1">
+    </center>
+    </li>
+    <li>In this mode, QuickFit displays the FCCS-curve (blue) together with the green and red ACF in the lower left corner of the window. If you use the tool <img src=":imaging_fcs/draw_rectangle.png"> to select a range of pixels, QuickFit will calculate the average and standard deviation over all selected pixels and display the result. Here is an example:
+<center><a name="tutorial_fccs_overview_pic002"><img src="./pic/tutorial_fccs_overview_pic002.png" border="1">
+<a name="tutorial_fccs_overview_pic003"> <img src="./pic/tutorial_fccs_overview_pic003.png" border="1">
+</center>
+The horizontal lines are the amplitude of the red autocorrelation function, corrected foir the amount of cross-talk, given above. The blue line is the level of cross-correlation, that is explained by the cross-talk only. The correlation function levels are given by averaging over the first <b>avg.</b> lag times in of the correlation function (in the case above: 3). If you choose <b>mode=corrected</b> instead of <b>mode=explained</b>, then the blue line is the cross-talk corrected amplitude of the cross-correlation function.
+</li>
+    <li>In order to save this plot for later, you can right-click on the plot and choose <b>copy plot data to table RDR</b>. Set the opening dialog as shown here:
+<center><a name="tutorial_fccs_overview_pic004"><img src="./pic/tutorial_fccs_overview_pic004.png" border="1">
+</center>
+This will create a new <a href="$$plugin_info:help:table$$">table RDR</a> in the project, which contains the data of the plot and the plot. The new RDR will be called "table from plotter".</li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+</ol>
+</p>
+
+
+<small>
+<h2>Deprecated/Old Tutorial: create overview plots</h2>
 <p>First we will create simple overview plots that show the averaged ACFs and the averaged FCCS in one plot:
 
 <ol>
@@ -50,12 +85,12 @@ raw data record:
     <li>First you can create a mask to mask out pixels that are not needed (because they are e.g. black):
     <ol>
       <li>Select the pixels to mask out:<center>
-	<a name="tutorial_pic001"><img src="./pic/tutorial_pic001.png" border="1">
+    <a name="tutorial_pic001"><img src="./pic/tutorial_pic001.png" border="1">
  
 </center></li>
       <li>click the "mask sel." button on the rhs or the menu entry "Mask|mask sel." (the curve on the bottom is the averaged ACF0 over all non-masked pixels):
       <center>
-	<a name="tutorial_pic002"><img src="./pic/tutorial_pic002.png" border="1">
+    <a name="tutorial_pic002"><img src="./pic/tutorial_pic002.png" border="1">
          <br><a name="tutorial_pic003"><img src="./pic/tutorial_pic003.png" border="1">
 </center></li>
       <li>Finally click on the menu entry "Mask|copy mask to all files in same group", which will set this mask also for the ACF1 and FCCS file!</li>
@@ -63,11 +98,11 @@ raw data record:
     </ol>
     </li>
     <li>select some pixels in the overview image (e.g. using the rectangle tool):<center>
-	<a name="tutorial_pic004"><img src="./pic/tutorial_pic004.png" border="1">
+    <a name="tutorial_pic004"><img src="./pic/tutorial_pic004.png" border="1">
 </center></li>
     <li>click on the menu entry "imagingFCS Tools|copy all CFs from group to table. A dialog like this will pop up:
     <center>
-	<a name="tutorial_pic005"><img src="./pic/tutorial_pic005.png" border="1">
+    <a name="tutorial_pic005"><img src="./pic/tutorial_pic005.png" border="1">
     </center>
     This will create a new table RDR which will contain the ACF0, ACF1 and FCCS (basically all imagingFCS RDRs in the same group as the current RDR),
     averaged over the selected pixels as different columns (obe for the tau-axis one for the average and one for the standard deviation of each correlation curve) 
@@ -77,7 +112,7 @@ raw data record:
     If you set everything the way it is set in the image above, a new table with the name "overview: DS:SS=0.5" will be added and
     a new graph in it will be created, which will have the name "compare ACFs & FCS". The result will look like this:
     <center>
-	<a name="tutorial_pic007"><img src="./pic/tutorial_pic007.png" border="1">
+    <a name="tutorial_pic007"><img src="./pic/tutorial_pic007.png" border="1">
           <a name="tutorial_pic008"><img src="./pic/tutorial_pic008.png" border="1">
     </center>
     </li>
@@ -85,7 +120,7 @@ raw data record:
     <li></li>
 </ol>
 </p>
-
+</small>
     
   </body>
 </html>

@@ -6,7 +6,61 @@
   </head>
   <body>
     $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-    <h2>Table Plugin Tutorial: Cell Expresssions</h2>
+    
+    
+    <h2>Introduction</h2>
+    <p>In addition to <a href="tutorial_columnexpression.html">table column expressions</a>, the table plugin of QuickFit $$version$$ also supports per-cell expressions. They are a powerful tool to perform calulations in a table. First of all the expression use the built-in <a href="mathparser.html">expression parser</a>, which has been extended with special functions to access the <a href="./parserreference/dataaccess.html">table contents</a> and for <a href="./parserreference/columnstatistics.html">column statistics</a>.</p>
+<p>You can set a cell expression for every table cell with the shortcut '<tt>=</tt>' or the button <img src=":table/formula.png">.</p>
+    
+    
+    
+    
+    <h2>Tutorial</h2>
+    <p><ol>
+      <li>Start a new QuickFit project and add an editable table (<b>Data Items | Insert Raw Data | Table | Editable Table</b>) and open the table editor (double-click table in project</li>
+      <li>Go to the "Data Table" tab. It will now display an empkty table.</li>
+      <li>Now we add some arbitrary data to the table. To do so, copy (select &amp; <tt>Ctrl+C</tt>) the following CSV data and insert it into the table by pressing <tt>Ctrl+V</tt>$$startbox_example$$<pre>
+#! "index"; "random numbers"; "Gaussian random numbers"
+1; 37; 66
+2; 70; 75
+3; 4; 39
+4; 47; 34
+5; 53; 68
+6; 56; 52
+7; 65; 46
+8; 56; 23
+9; 37; 85
+10; 56; 74
+</pre>$$endbox$$ This will result in a table like this:
+<center><a name="tutorial_cellexpression_pic000"><img src="./pic/tutorial_cellexpression_pic000.png" border="1">
+</center>
+The given table of values contains one column with increasing numbers, one column of random numbers drawn from a flat distribution between 0 and 100 and one column of Gaussian random variates with mean 50 and standard deviation 20.
+</li>  
+      <li>Starting from these prerequesites, we can now use cell expressions to calculate several things:<ol>
+      <li>add another column and select the whole column. Then press <tt>=</tt> or click on <img src=":table/formula.png">. A new window will open up, which allows to edit the expression, used for all seelcted cells:
+<center><a name="tutorial_cellexpression_pic001"><img src="./pic/tutorial_cellexpression_pic001.png" border="1">
+</center>
+In this window, enter the following expression:
+$$codeexample:data(row,col-2)/100-0.5$$
+After clicking <b>OK</b>, the table will look like this:
+<center><a name="tutorial_cellexpression_pic002"><img src="./pic/tutorial_cellexpression_pic002.png" border="1">
+</center>
+The expression does the following: <tt>data(r,c)</tt> retrieves the value in table cell in row <tt>r</tt> and column <tt>c</tt>. The two variables <tt>row</tt> and <tt>col</tt> contain the row and column number of the current cell, so <tt>data(row,col-2)</tt> retrieves the value of the cell, which is in the same row, but two columns to the left (i.e. the random variate from the flat distribution between 0 and 100). Then this value is divided by 100 and shifted by -0.5. Therefor the column should now contain a random number, which is distributed around 0 and with values in the range $$math:[-0.5, 0.5]$$.$$note:The cells that are calculated from a cell (or column) expressions are shown with a gray background in the table.<br>If you double-click any cell with a cell expression, an editor will be shown, as displayed for the second row in the screenshot above. It shows the symbol <font color="blue"><b>&Sigma;:</b></font> and the expression in bold-face. Behind that you have to buttons, that allow you to open the editor for this cell (<img src=":table/formula.png">), or to remove the expression (<img src=":table/formulaclear.png">). If you remove an expression, the last expression result is retained as cell value!$$
+</li>  
+      <li>Now we will calculate the statistical properties of the three columns. For that add two more columns to the table and select the first one. Then set its datatype to string, by clicking on: 
+<center><a name="tutorial_cellexpression_pic003"><img src="./pic/tutorial_cellexpression_pic003.png" border="1">
+</center>
+Finally enter these values:
+<center><a name="tutorial_cellexpression_pic004"><img src="./pic/tutorial_cellexpression_pic004.png" border="1">
+</center>
+</li>  
+      <li>One after the other, select the first six cells in the 6th column and press <tt>=</tt>/<img src=":table/formula.png"> for each. Then enter these expressions:$$codeexample:mean(column(2))<br>std(column(2))<br>mean(column(3))<br>std(column(3))<br>mean(column(4))<br>std(column(4))$$These expression calculate the mean and standard deviation of all four columns. The results should be:
+<center><a name="tutorial_cellexpression_pic005"><img src="./pic/tutorial_cellexpression_pic005.png" border="1">
+</center>
+</li>  
+</ol></li>  
+    </ol></p>
+    
     
   </body>
 </html>

@@ -64,7 +64,7 @@ class QFPEvalIMFCSFit : public QObject, public QFPluginEvaluationItemBase, publi
         virtual QString getID() const  { return tr("imfcs_fit"); }
 
         /** \brief name for the plugin */
-        virtual QString getName() const  { return tr("imagingFCS Correlation Curve Fi Plugin"); }
+        virtual QString getName() const  { return tr("imagingFCS Correlation Curve Fit Plugin"); }
 
         /** \brief short description for the plugin */
         virtual QString getDescription() const  { return tr("fit imaging Fluorescence Correlations Spectroscopy (imagingFCS) curve data."); }

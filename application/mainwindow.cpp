@@ -4643,7 +4643,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     //qDebug()<<rxTT.cap()<<rxTT.cap(1)<<rxTT.cap(2);
                     QString rep=QString("<a href=\"tooltip:%1\">%2 <img src=\":/lib/help/tooltip.png\" border=\"0\" width=\"12\" height=\"12\" alt=\"get more information about %2\"></a>").arg(key).arg(rxTT.cap(2));
                     QString tag=rxTT.cap(1).toLower();
-                    if (tag!="h1" && tag!="h2" && tag!="h3" && tag!="h4" && tag!="h5" && tag!="title" && tag!="a") {
+                    if (tag!="h1" && tag!="h2" && tag!="h3" && tag!="h4" && tag!="h5" && tag!="title" && tag!="a" && tag!="tt" && tag!="code") {
                         result=result.replace(rxTT.pos(2), rxTT.cap(2).size(), rep);
                         pos += rep.size();
                     } else {
