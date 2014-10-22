@@ -2807,7 +2807,7 @@ namespace QFMathParser_DefaultLib {
             } else {
                 r.setDoubleVec();
                 for (int i=0; i<ids.size(); i++) {
-                    QFRawDataRecord* rdr=p->getRawDataByID(i);
+                    QFRawDataRecord* rdr=p->getRawDataByID(ids[i]);
                     if (rdr && t.contains(rdr->getType())) {
                         r.numVec<<ids[i];
                     }
@@ -2840,7 +2840,7 @@ namespace QFMathParser_DefaultLib {
             } else {
                 r.setDoubleVec();
                 for (int i=0; i<ids.size(); i++) {
-                    QFEvaluationItem* eval=p->getEvaluationByID(i);
+                    QFEvaluationItem* eval=p->getEvaluationByID(ids[i]);
                     if (eval && t.contains(eval->getType())) {
                         r.numVec<<ids[i];
                     }

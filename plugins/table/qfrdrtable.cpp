@@ -139,6 +139,7 @@ QFRDRTable::GraphInfo::GraphInfo() {
 QFRDRTable::AxisInfo::AxisInfo()
 {
     label="x";
+    labelAngel=0;
     log=false;
     min=0;
     max=10;
@@ -1694,7 +1695,7 @@ void QFRDRTable::writeAxisInfo(QXmlStreamWriter &w, const QFRDRTable::AxisInfo &
     w.writeAttribute(axisName+"tickolength", CDoubleToQString(plot.TickOutsideLength));
     w.writeAttribute(axisName+"mintickilength", CDoubleToQString(plot.MinorTickInsideLength));
     w.writeAttribute(axisName+"mintickolength", CDoubleToQString(plot.MinorTickOutsideLength));
-
+    w.writeAttribute(axisName+"labelangel", CDoubleToQString(plot.labelAngel));
     w.writeAttribute(axisName+"namedticks_namecol", QString::number(plot.columnNamedTickNames));
     w.writeAttribute(axisName+"namedticks_valcol", QString::number(plot.columnNamedTickValues));
 
@@ -1996,6 +1997,7 @@ void QFRDRTable::readAxisInfo(AxisInfo& plot, const QString& axisName, QDomEleme
     plot.TickOutsideLength=CQStringToDouble(te.attribute(axisName+"tickolength", "3"));
     plot.MinorTickInsideLength=CQStringToDouble(te.attribute(axisName+"mintickilength", "2"));
     plot.MinorTickOutsideLength=CQStringToDouble(te.attribute(axisName+"mintickolength", "2"));
+    plot.labelAngel=CQStringToDouble(te.attribute(axisName+"labelangel", "0"));
 
     plot.columnNamedTickNames=te.attribute(axisName+"namedticks_namecol", "-1").toInt();
     plot.columnNamedTickValues=te.attribute(axisName+"namedticks_valcol", "-2").toInt();

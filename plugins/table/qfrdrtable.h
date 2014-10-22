@@ -401,6 +401,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             double TickOutsideLength;
             double MinorTickInsideLength;
             double MinorTickOutsideLength;
+            double labelAngel;
 
             int columnNamedTickNames;
             int columnNamedTickValues;

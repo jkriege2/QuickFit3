@@ -105,6 +105,8 @@ void QFRDRTableAxisSettingsWidget::loadPlotData(const QFRDRTable::AxisInfo& g)
     ui->cmbNamedTicksNames->setCurrentData(g.columnNamedTickNames);
     ui->cmbNamedTicksValues->setCurrentData(g.columnNamedTickValues);
 
+    ui->spinLabelAngel->setValue(g.labelAngel);
+
     updating=false;
     connectWidgets();
     doUpdateGraph();
@@ -124,6 +126,8 @@ void QFRDRTableAxisSettingsWidget::storePlotData(QFRDRTable::AxisInfo &g)
     g.labelMode2=ui->cmbXMode2->getDrawMode();
     g.min=ui->edtXMin->value();
     g.max=ui->edtXMax->value();
+
+    g.labelAngel=ui->spinLabelAngel->value();
 
     g.TickSpacing=ui->edtXTickSpacing->value();
     g.TickInsideLength=ui->spinXILength->value();
@@ -171,6 +175,7 @@ void QFRDRTableAxisSettingsWidget::saveToSettings(QSettings &set, const QString 
 
     set.setValue(axis+"inverted",ui->chkXInverted->isChecked());
     set.setValue(axis+"autoticks",ui->chkXAutoTicks->isChecked());
+    set.setValue(axis+"labelangel",ui->spinLabelAngel->value());
 
     set.setValue(axis+"tickspacing", ui->edtXTickSpacing->value());
     set.setValue(axis+"tickilength", ui->spinXILength->value());
@@ -205,6 +210,7 @@ void QFRDRTableAxisSettingsWidget::loadFromSettings(QSettings &set, const QStrin
     ui->spinXMinOLength->setValue(set.value(axis+"minortickolength", ui->spinXMinOLength->value()).toDouble());
     ui->spinXTickWidth->setValue(set.value(axis+"tickwidth", ui->spinXTickWidth->value()).toDouble());
     ui->spinXTickMinWidth->setValue(set.value(axis+"minortickwidth", ui->spinXTickMinWidth->value()).toDouble());
+    ui->spinLabelAngel->setValue(set.value(axis+"labelangel", ui->spinLabelAngel->value()).toDouble());
 
     ui->chkXInverted->setChecked(set.value(axis+"inverted", ui->chkXInverted->isChecked()).toBool());
     ui->chkXAutoTicks->setChecked(set.value(axis+"autoticks", ui->chkXAutoTicks->isChecked()).toBool());
@@ -332,6 +338,7 @@ void QFRDRTableAxisSettingsWidget::connectWidgets()
     connect(ui->spinXMinOLength, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     connect(ui->spinXTickWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     connect(ui->spinXTickMinWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->spinLabelAngel, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
 
 
 }
@@ -362,6 +369,7 @@ void QFRDRTableAxisSettingsWidget::disconnectWidgets()
     disconnect(ui->spinXMinOLength, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinXTickWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinXTickMinWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinLabelAngel, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
 
 }
 
