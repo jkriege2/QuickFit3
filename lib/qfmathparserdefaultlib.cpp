@@ -1959,7 +1959,7 @@ namespace QFMathParser_DefaultLib {
         if (idx.size()<=0 && idxb.size()<=0) {
             p->qfmpError("item(x, idx) parameter idx has to be a number, vector of numbers or vector of booleans");
             return res;
-        } else if (idx.size()<=0 && idxb.size()>0) {
+        } else if (idxb.size()>0) {
             isNumber=false;
             if (idxb.size()!=params[0].length()) {
                 p->qfmpError(QObject::tr("item(x, boolidx) parameter boolidx has to be a vector of booleans with the same length as vector x [length(x)=%2, length(boolidx)=%1]").arg(idxb.size()).arg(params[0].length()));
@@ -3252,7 +3252,7 @@ namespace QFMathParser_DefaultLib {
             p->qfmpError("returnlastvalid(x1,x2,x3,...) needs at least one argument");
             return ;
         }
-        for (unsigned int i=n-1; i>=0; i--) {
+        for ( long i=(long)n-1; i>=0; i--) {
             if (params[i].isValid && params[i].type!=qfmpVoid) {
                 res=params[i];
                 return;
@@ -3284,7 +3284,7 @@ namespace QFMathParser_DefaultLib {
         const QString iname="strvec";
         const QString tname="string";
         res.setStringVec();
-        for (int i=0; i<n; i++) {
+        for (unsigned int i=0; i<n; i++) {
             if (nodes[i].convertsToStringVector()) {
                 res.strVec<<nodes[i].asStrVector();
             } else if (nodes[i].type==qfmpVoid || !nodes[i].isValid) {
@@ -3301,7 +3301,7 @@ namespace QFMathParser_DefaultLib {
         const QString iname="numvec";
         const QString tname="number";
         res.setDoubleVec();
-        for (int i=0; i<n; i++) {
+        for (unsigned int i=0; i<n; i++) {
             if (nodes[i].convertsToVector()) {
                 res.numVec<<nodes[i].asVector();
             } else if (nodes[i].type==qfmpVoid || !nodes[i].isValid) {
@@ -3317,7 +3317,7 @@ namespace QFMathParser_DefaultLib {
         const QString iname="intvec";
         const QString tname="integer";
         res.setDoubleVec();
-        for (int i=0; i<n; i++) {
+        for (unsigned int i=0; i<n; i++) {
             if (nodes[i].convertsToVector()) {
                 QVector<int> iv=nodes[i].asIntVector();
                 for (int j=0; j<iv.size(); j++) res.numVec<<iv[j];
@@ -3352,7 +3352,7 @@ namespace QFMathParser_DefaultLib {
             }
         } else {
             res.setDoubleVec();
-            for (int i=0; i<n; i++) {
+            for (unsigned int i=0; i<n; i++) {
                 if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
                     res.numVec<<nodes[i].toInteger();
                 } else if (nodes[i].convertsToIntVector()) {
@@ -3388,7 +3388,7 @@ namespace QFMathParser_DefaultLib {
             }
         } else {
             res.setDoubleVec();
-            for (int i=0; i<n; i++) {
+            for (unsigned int i=0; i<n; i++) {
                 if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
                     res.numVec<<nodes[i].asNumber();
                 } else if (nodes[i].convertsToVector()) {
@@ -3422,7 +3422,7 @@ namespace QFMathParser_DefaultLib {
             }
         } else {
             res.setBoolVec();
-            for (int i=0; i<n; i++) {
+            for (unsigned int i=0; i<n; i++) {
                 if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
                     res.boolVec<<nodes[i].asBool();
                 } else if (nodes[i].convertsToIntVector()) {
@@ -3440,7 +3440,7 @@ namespace QFMathParser_DefaultLib {
         const QString iname="boolvec";
         const QString tname="boolean";
         res.setBoolVec();
-        for (int i=0; i<n; i++) {
+        for (unsigned int i=0; i<n; i++) {
             if (nodes[i].convertsToBoolVector()) {
                 res.boolVec<<nodes[i].asBoolVector();
             } else if (nodes[i].type==qfmpVoid || !nodes[i].isValid) {
