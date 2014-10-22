@@ -1,0 +1,79 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Access to table RDRs in the Current QuickFit Project</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  
+  
+  
+  
+  
+  <h2>Check for table RDR</h2>
+  $$funcref_start$$<a name="rdr_istable"/><!-- func:rdr_istable -->
+    <b><tt><!-- template -->rdr_istable(rdrid)<!-- /template --></tt> - <i> returns <tt>true</tt> is the given raw data record (RDR) in the current project is a table</i>:</b>
+  $$funcref_description$$
+        <!-- /func:rdr_istable -->
+  $$funcref_end$$
+  
+  
+  
+  
+  
+  
+  
+  <h2>Access to Table Properties</h2>
+  $$funcref_start$$<a name="table_columns"/><!-- func:table_columns -->
+    <b><tt><!-- template -->table_columns(rdr_id)<!-- /template --></tt> - <i> returns the number of columns of the table in the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:table_columns -->
+   $$funcref_end$$
+  
+  $$funcref_start$$<a name="table_rows"/><!-- func:table_rows -->
+    <b><tt><!-- template -->table_rows(rdr_id)<!-- /template --></tt> - <i> returns the number of rows of the table in the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:table_rows -->
+   $$funcref_end$$
+  
+  $$funcref_start$$<a name="table_columntitles"/><!-- func:table_columntitles -->
+    <b><tt><!-- template -->table_columntitles(rdr_id)<!-- /template --></tt> - <i> returns a string vector with the column titles of the table in the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:table_columntitles -->
+  $$funcref_end$$
+  
+  <h2>Access to Table Data</h2>
+  $$funcref_start$$<a name="table_column"/><!-- func:table_column -->
+    <b><tt><!-- template -->table_column(rdr_id, column)<!-- /template --></tt> - <i> returns the given column of data (as a vector) of the table in the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+    The returned data type (vector of number/string/boolean) is determined, based on the first cell in the column.
+        <!-- /func:table_column -->
+  $$funcref_end$$
+
+  $$funcref_start$$<a name="table_data"/><!-- func:table_data -->
+    <b><tt><!-- template -->table_data(rdr_id, column, row)<!-- /template --></tt> - <i> returns the given cell (column/row) in the table in the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+    The returned data type (vector of number/string/boolean) is determined, based on the cell's contents
+        <!-- /func:table_data -->
+  $$funcref_end$$
+
+  $$funcref_start$$<a name="table_numcolumn"/><!-- func:table_numcolumn -->
+    <b><tt><!-- template -->table_numcolumn(rdr_id, column)<!-- /template --></tt> - <i> returns the given column of data (as a vector) of the table in the specified raw data record (RDRs) in the current project as a vector of numbers </i>:</b>
+  $$funcref_description$$
+    The returned data type is always a vector of numbers.
+        <!-- /func:table_numcolumn -->
+  $$funcref_end$$
+
+  $$funcref_start$$<a name="table_numdata"/><!-- func:table_numdata -->
+    <b><tt><!-- template -->table_numdata(rdr_id, column, row)<!-- /template --></tt> - <i> returns the given cell (column/row) in the table in the specified raw data record (RDRs) in the current project as a number</i>:</b>
+  $$funcref_description$$
+    The returned data type is always a number
+        <!-- /func:table_numdata -->
+  $$funcref_end$$
+
+  
+  </body>
+  </html>
+  

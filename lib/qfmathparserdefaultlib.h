@@ -466,6 +466,15 @@ namespace QFMathParser_DefaultLib {
     void fEvalGetDescription(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
 
     void fProjectGetProperty(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+
+    void fRDR_istable(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fTable_column(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fTable_data(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fTable_numcolumn(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fTable_numdata(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fTable_columns(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fTable_columntitles(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fTable_rows(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
 #endif
 
 }

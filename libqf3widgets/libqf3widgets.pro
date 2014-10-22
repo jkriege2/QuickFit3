@@ -126,7 +126,6 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfplotter.h \
     qfplotterprivate.h \
     qfselectrdrdialog.h \
-    ../plugins/interfaces/qfrdrtableinterface.h \
     ../plugins/interfaces/qfrdrcolumngraphsinterface.h \
     qfrdrtablecombobox.h \
     qfplottercopytotabledialog.h \

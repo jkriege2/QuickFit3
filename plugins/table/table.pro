@@ -47,7 +47,6 @@ HEADERS += qfrdrtable.h \
     qfrdrtablehistogramdialog.h \
     qfrdrtableparserfunctions.h \
     qfrdrtableenhancedtableview.h \
-    ../interfaces/qfrdrtableinterface.h \
     ../interfaces/qfrdrcolumngraphsinterface.h \
     qftablegraphsettings.h \
     qfrdrtablecolumneditor.h \

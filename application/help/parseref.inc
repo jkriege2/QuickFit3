@@ -21,5 +21,6 @@
 <li><b><a href="$$mainhelpdir$$/parserreference/unit.html">unit conversion functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/constants.html">common math/physics constants</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/project_access.html">access to the current QuickFit project</a></b></li>
+<li><b><a href="$$mainhelpdir$$/parserreference/table_access.html">access to table RDRs in the current QuickFit project</a></b></li>
 <!--<li><b><a href="./parserreference/.html"></a></b></li>-->
 $$qfmathparser_ref$$

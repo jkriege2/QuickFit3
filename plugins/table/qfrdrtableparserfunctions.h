@@ -91,4 +91,5 @@ void fQFRDRTableEditor_colsquantile(qfmpResult& res, const qfmpResult* params, u
 void fQFRDRTableEditor_colsmin(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 void fQFRDRTableEditor_colsmax(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
+
 #endif // QFRDRTABLEPARSERFUNCTIONS_H

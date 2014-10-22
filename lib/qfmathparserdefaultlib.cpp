@@ -32,6 +32,7 @@
 #  include "qfproject.h"
 #  include "qfrawdatarecord.h"
 #  include "qfevaluationitem.h"
+#  include "qfrdrtableinterface.h"
 #endif
 
 
@@ -327,7 +328,15 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("project_getproperty", QFMathParser_DefaultLib::fProjectGetProperty);
 
 
-
+    p->addFunction("table_column", fTable_column);
+    p->addFunction("table_data", fTable_data);
+    p->addFunction("table_numcolumn", fTable_numcolumn);
+    p->addFunction("table_numdata", fTable_numdata);
+    p->addFunction("table_cell", fTable_data);
+    p->addFunction("table_columns", fTable_columns);
+    p->addFunction("table_columntitles", fTable_columntitles);
+    p->addFunction("table_rows", fTable_rows);
+    p->addFunction("rdr_istable", fRDR_istable);
 
 #endif
 
@@ -3222,6 +3231,217 @@ namespace QFMathParser_DefaultLib {
             }
         }
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    void fRDR_istable(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRTableInterface* rdr=dynamic_cast<QFRDRTableInterface*>(p->getRawDataByID(evalID));
+                res.setBoolean(rdr);
+            } else {
+                parser->qfmpError(QObject::tr("rdr_istable(rdrid) needs one integer arguments"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+    void fTable_column(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==2 && params[0].type==qfmpDouble && params[1].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                int col=params[1].toInteger();
+                QFRDRTableInterface* rdr=dynamic_cast<QFRDRTableInterface*>(p->getRawDataByID(evalID));
+                if (rdr && col>=0 && col<rdr->tableGetColumnCount()) {
+                    res.setVariant(QVariant(rdr->tableGetColumnData(col)));
+                }
+            } else {
+                parser->qfmpError(QObject::tr("table_column(rdrid, col) needs two integer arguments"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+
+    void fTable_data(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==3 && params[0].type==qfmpDouble && params[1].type==qfmpDouble && params[2].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                int col=params[1].toInteger();
+                int row=params[2].toInteger();
+                QFRDRTableInterface* rdr=dynamic_cast<QFRDRTableInterface*>(p->getRawDataByID(evalID));
+                if (rdr && col>=0 && col<rdr->tableGetColumnCount()) {
+                    res.setVariant(rdr->tableGetData(row,col));
+                }
+            } else {
+                parser->qfmpError(QObject::tr("table_data(rdrid, col, row) needs three integer arguments"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+
+
+
+
+
+
+    void fTable_numcolumn(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==2 && params[0].type==qfmpDouble && params[1].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                int col=params[1].toInteger();
+                QFRDRTableInterface* rdr=dynamic_cast<QFRDRTableInterface*>(p->getRawDataByID(evalID));
+                if (rdr && col>=0 && col<rdr->tableGetColumnCount()) {
+                    res.setDoubleVec(rdr->tableGetColumnDataAsDouble(col));
+                } else {
+                    res.setDoubleVec();
+                }
+            } else {
+                parser->qfmpError(QObject::tr("table_numcolumn(rdrid, col) needs two integer arguments"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+
+    void fTable_numdata(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==3 && params[0].type==qfmpDouble && params[1].type==qfmpDouble && params[2].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                int col=params[1].toInteger();
+                int row=params[2].toInteger();
+                QFRDRTableInterface* rdr=dynamic_cast<QFRDRTableInterface*>(p->getRawDataByID(evalID));
+                if (rdr && col>=0 && col<rdr->tableGetColumnCount()) {
+                    res.setDouble(rdr->tableGetData(row,col).toDouble());
+                } else {
+                    res.setDouble(NAN);
+                }
+            } else {
+                parser->qfmpError(QObject::tr("table_numdata(rdrid, col, row) needs three integer arguments"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+
+
+
+    void fTable_columns(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRTableInterface* rdr=dynamic_cast<QFRDRTableInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDouble(rdr->tableGetColumnCount());
+                } else {
+                    res.setDouble(0);
+                }
+            } else {
+                parser->qfmpError(QObject::tr("table_columnss(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+
+    void fTable_columntitles(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRTableInterface* rdr=dynamic_cast<QFRDRTableInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setStringVec();
+                    for (int i=0; i<rdr->tableGetColumnCount(); i++) {
+                        res.strVec<<rdr->tableGetColumnTitle(i);
+                    }
+                } else {
+                    res.setStringVec();
+                }
+            } else {
+                parser->qfmpError(QObject::tr("table_columntitles(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+
+    void fTable_rows(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRTableInterface* rdr=dynamic_cast<QFRDRTableInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDouble(rdr->tableGetRowCount());
+                } else {
+                    res.setDouble(0);
+                }
+            } else {
+                parser->qfmpError(QObject::tr("table_rows(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
 #endif
 
 

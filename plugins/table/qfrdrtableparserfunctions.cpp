@@ -74,6 +74,9 @@ void addQFRDRTableFunctions(QFMathParser* parser, QStringList* names, bool colum
 
     //}
 
+
+
+
     if (names) {
         *names  <<"data"
                 <<"dataleft"
@@ -2235,3 +2238,5 @@ void fQFRDRTableEditor_colsquantile(qfmpResult &res, const qfmpResult *params, u
     }
 
 }
+
+

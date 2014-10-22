@@ -86,6 +86,6 @@ class QFRDRTableInterface {
 };
 
 Q_DECLARE_INTERFACE( QFRDRTableInterface,
-                     "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRTableInterface/1.0")
+                     "www.dkfz.de.b040.quickfit3.QFRDRTableInterface/1.0")
 
 #endif // QFRDRTABLEINTERFACE_H
