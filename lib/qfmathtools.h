@@ -914,7 +914,7 @@ double qfstatisticsVariance(const T& value) {
             NN++;
         }
     }
-    return ( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
+    return fabs( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
 }
 
 template <class T>
@@ -947,7 +947,8 @@ double qfstatisticsMaskedVariance(const QVector<bool>& mask, const T& value, boo
             NN++;
         }
     }
-    return ( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
+    if (NN>1) return fabs(( sum2 - sum*sum/(double)NN ) / (double)(NN-1));
+    else return 0;
 }
 
 template <class T>
