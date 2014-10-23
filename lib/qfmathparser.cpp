@@ -1551,47 +1551,9 @@ QFMathParser::qfmpCompareNode::~qfmpCompareNode()
 }
 
 qfmpResult QFMathParser::qfmpCompareNode::evaluate(){
-    qfmpResult l;
-    if (left) l=left->evaluate();
-    qfmpResult r;
-    if (right) r=right->evaluate();  qfmpResult res;
-  res.type=qfmpBool;
-
-  //if (l.type!=r.type) parser->qfmpError(QObject::tr("you can't compare different datatypes"));
-
-  switch(operation) {
-    case qfmpCOMPequal:
-        qfmpResult::compareequal(res, l, r, getParser());
-        return res;
-        break;
-    case qfmpCOMPnequal:
-          qfmpResult::comparenotequal(res, l, r, getParser());
-          return res;
-          break;
-    case qfmpCOMPgreater:
-          qfmpResult::comparegreater(res, l, r, getParser());
-          return res;
-          break;
-
-    case qfmpCOMPlesser:
-          qfmpResult::comparesmaller(res, l, r, getParser());
-          return res;
-          break;
-
-    case qfmpCOMPgreaterequal:
-          qfmpResult::comparegreaterequal(res, l, r, getParser());
-          return res;
-          break;
-
-    case qfmpCOMPlesserequal:
-          qfmpResult::comparesmallerequal(res, l, r, getParser());
-          return res;
-          break;
-
-      default: parser->qfmpError(QObject::tr("compare operation between %1 and %2 not possible").arg(l.toTypeString()).arg(r.toTypeString()));
-  }
-  res.isValid=false;
-  return res;
+    qfmpResult res;
+    evaluate(res);
+    return res;
 }
 
 void QFMathParser::qfmpCompareNode::evaluate(qfmpResult &res)
@@ -1710,42 +1672,9 @@ QFMathParser::qfmpBinaryBoolNode::~qfmpBinaryBoolNode()
 }
 
 qfmpResult QFMathParser::qfmpBinaryBoolNode::evaluate(){
-    qfmpResult l;
-    if (left) l=left->evaluate();
-    qfmpResult r;
-    if (right) r=right->evaluate();
     qfmpResult res;
-
-  if ((l.type!=qfmpBool)||(r.type!=qfmpBool)) parser->qfmpError(QObject::tr("logical operations only for bool"));
-  else {
-      switch(operation) {
-          case qfmpLOPand:
-              qfmpResult::logicand(res, l, r, getParser());
-              return res;
-              break;
-          case qfmpLOPor:
-              qfmpResult::logicor(res, l, r, getParser());
-              return res;
-              break;
-          case qfmpLOPnor:
-              qfmpResult::logicnor(res, l, r, getParser());
-              return res;
-              break;
-          case qfmpLOPxor:
-              qfmpResult::logicxor(res, l, r, getParser());
-              return res;
-              break;
-          case qfmpLOPnand:
-              qfmpResult::logicnand(res, l, r, getParser());
-              return res;
-              break;
-
-          default: parser->qfmpError(QObject::tr("unknown error"));
-              break;
-      }
-  }
-  res.isValid=false;
-  return res;
+    evaluate(res);
+    return res;
 }
 
 void QFMathParser::qfmpBinaryBoolNode::evaluate(qfmpResult &res)
@@ -1755,10 +1684,10 @@ void QFMathParser::qfmpBinaryBoolNode::evaluate(qfmpResult &res)
     qfmpResult r;
     if (right) right->evaluate(r);
 
-  if ((l.type!=qfmpBool)||(r.type!=qfmpBool)) {
+  /*if ((l.type!=qfmpBool)||(r.type!=qfmpBool)) {
       res.setInvalid();
       parser->qfmpError(QObject::tr("logical operations only for bool"));
-  } else {
+  } else {*/
       switch(operation) {
           case qfmpLOPand:
               qfmpResult::logicand(res, l, r, getParser());
@@ -1781,7 +1710,7 @@ void QFMathParser::qfmpBinaryBoolNode::evaluate(qfmpResult &res)
               res.setInvalid();
               break;
       }
-  }
+  //}
 }
 
 QFMathParser::qfmpNode *QFMathParser::qfmpBinaryBoolNode::copy(QFMathParser::qfmpNode *par)

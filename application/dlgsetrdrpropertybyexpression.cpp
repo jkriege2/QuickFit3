@@ -385,6 +385,27 @@ void DlgSetRDRPropertyByExpression::on_btnToggled_clicked()
     }
 }
 
+
+void DlgSetRDRPropertyByExpression::on_btnDeselSel_clicked()
+{
+    QList<QListWidgetItem*> items=ui->lstRDR->selectedItems();
+    for (int i=0; i<items.count(); i++)  {
+        if (items[i]) {
+            items[i]->setCheckState(Qt::Unchecked);
+        }
+    }
+}
+
+void DlgSetRDRPropertyByExpression::on_btnSelSel_clicked()
+{
+    QList<QListWidgetItem*> items=ui->lstRDR->selectedItems();
+    for (int i=0; i<items.count(); i++)  {
+        if (items[i]) {
+            items[i]->setCheckState(Qt::Checked);
+        }
+    }
+}
+
 void DlgSetRDRPropertyByExpression::on_btnAdd_clicked()
 {
     addEditor();

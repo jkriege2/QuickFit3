@@ -62,8 +62,8 @@
                     <li>added functions rdr_ids(), eval_ids(), rdr_getresult(), rdr_getresulterror(), rdr_getname(), rdr_getfolder(), rdr_getgroup() to access the current project</li>
                     <li>added functions filterfor() and savefilterfor(), which allow to filter vectors according to an arbitrary expression/condition</li>
                     <li>added type conversion functions strvec(), numvec(), boolvec(), bool(), double(), ...</li>
-                    <li>added functions, that allow to access data in a table RDR</li>
-                    <li></li>
+                    <li>added functions, that allow to access data in a table RDR: table_...()</li>
+                    <li>bugfix: logical operations were not allowed for boolean vectors!</li>
             </ul></li>
             <li>added context menu entry to tables, that allows to explicitly copy the table as "CSV", or to copy the table in a format suitable for "Excel", which depends on the current locale (e.g. for decimal separators)</li>
             <li>bugfixed "copy to Excel/CSV" in table view, which did not copy any data (regression?)</li>
@@ -116,6 +116,8 @@
             <li>added function (File | Compress Project), which compresses the project file and all linked (and required) files into a single ZIP-archive</li>
             <li>bugfix: possible crash, when user adds a new property to an RDR</li>
             <li>added welcome screen</li>
+            <li>added buttons "toggle selected"/"select selected"/"deselct selected" to the project tools "set/calculate RDR properties ..."</li>
+            <li>bugfix: "set properties in multiple RDRs" now works correctly for name/folder/group/role (did not set the given string, but tried to convert it in some cases to a number/Boolean)</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>

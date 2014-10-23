@@ -260,6 +260,41 @@ void DlgSetRDRPropertyByRegExp::on_btnSelectAll_clicked()
     }
 }
 
+
+void DlgSetRDRPropertyByRegExp::on_btnToggled_clicked()
+{
+    QList<QListWidgetItem*> items=ui->lstRDR->selectedItems();
+    for (int i=0; i<items.count(); i++)  {
+        if (items[i]) {
+            if (items[i]->checkState()==Qt::Checked)
+                items[i]->setCheckState(Qt::Unchecked);
+            else
+                items[i]->setCheckState(Qt::Checked);
+        }
+    }
+}
+
+
+void DlgSetRDRPropertyByRegExp::on_btnDeselSel_clicked()
+{
+    QList<QListWidgetItem*> items=ui->lstRDR->selectedItems();
+    for (int i=0; i<items.count(); i++)  {
+        if (items[i]) {
+            items[i]->setCheckState(Qt::Unchecked);
+        }
+    }
+}
+
+void DlgSetRDRPropertyByRegExp::on_btnSelSel_clicked()
+{
+    QList<QListWidgetItem*> items=ui->lstRDR->selectedItems();
+    for (int i=0; i<items.count(); i++)  {
+        if (items[i]) {
+            items[i]->setCheckState(Qt::Checked);
+        }
+    }
+}
+
 void DlgSetRDRPropertyByRegExp::showHelp()
 {
     QFPluginServices::getInstance()->displayMainHelpWindow("dlgsetrdrpropertybyregexp.html");

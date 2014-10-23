@@ -111,6 +111,39 @@ void dlgRDRSetProperty::on_btnSelectAll_clicked()
     }
 }
 
+void dlgRDRSetProperty::on_btnToggle_clicked()
+{
+    QList<QListWidgetItem*> items=ui->lstRDR->selectedItems();
+    for (int i=0; i<items.count(); i++)  {
+        if (items[i]) {
+            if (items[i]->checkState()==Qt::Checked)
+                items[i]->setCheckState(Qt::Unchecked);
+            else
+                items[i]->setCheckState(Qt::Checked);
+        }
+    }
+}
+
+void dlgRDRSetProperty::on_btnDeselSel_clicked()
+{
+    QList<QListWidgetItem*> items=ui->lstRDR->selectedItems();
+    for (int i=0; i<items.count(); i++)  {
+        if (items[i]) {
+            items[i]->setCheckState(Qt::Unchecked);
+        }
+    }
+}
+
+void dlgRDRSetProperty::on_btnSelSel_clicked()
+{
+    QList<QListWidgetItem*> items=ui->lstRDR->selectedItems();
+    for (int i=0; i<items.count(); i++)  {
+        if (items[i]) {
+            items[i]->setCheckState(Qt::Checked);
+        }
+    }
+}
+
 void dlgRDRSetProperty::showHelp()
 {
     QFPluginServices::getInstance()->displayMainHelpWindow("dlgrdrsetproperty.html");
@@ -132,16 +165,20 @@ QStringList dlgRDRSetProperty::getNewPropNames() const
 QList<QVariant> dlgRDRSetProperty::getNewPropValues() const
 {
     QList<QVariant> l;
-    if (ui->cmbType->currentIndex()==0) {
-        l<<ui->edtValue->text();
-    } else if (ui->cmbType->currentIndex()==1) {
-        l<<QStringToDouble( ui->edtValue->text());
-    } else if (ui->cmbType->currentIndex()==2) {
-        l<<ui->edtValue->text().toInt();
-    } else if (ui->cmbType->currentIndex()==3) {
-        l<<QStringToBool(ui->edtValue->text());
+    if (ui->cmbWhich->currentIndex()==0) {
+        if (ui->cmbType->currentIndex()==0) {
+            l<<ui->edtValue->text();
+        } else if (ui->cmbType->currentIndex()==1) {
+            l<<QStringToDouble( ui->edtValue->text());
+        } else if (ui->cmbType->currentIndex()==2) {
+            l<<ui->edtValue->text().toInt();
+        } else if (ui->cmbType->currentIndex()==3) {
+            l<<QStringToBool(ui->edtValue->text());
+        } else {
+            l<<QString("");
+        }
     } else {
-        l<<QString("");
+        l<<ui->edtValue->text();
     }
     return l;
 }

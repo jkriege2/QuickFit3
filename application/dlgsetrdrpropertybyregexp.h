@@ -53,6 +53,9 @@ class DlgSetRDRPropertyByRegExp : public QDialog
         void on_btnSelectNone_clicked();
         void on_btnSelectAll_clicked();
         void showHelp();
+        void on_btnToggled_clicked();
+        void on_btnDeselSel_clicked();
+        void on_btnSelSel_clicked();
     public slots:
         void updateTest();
     private:

@@ -3278,10 +3278,10 @@ namespace QFMathParser_DefaultLib {
             int evalID=-1;
             if (n==2 && params[0].type==qfmpDouble && params[1].type==qfmpDouble) {
                 evalID=params[0].toInteger();
-                int col=params[1].toInteger();
+                int col=params[1].toInteger()-1;
                 QFRDRTableInterface* rdr=dynamic_cast<QFRDRTableInterface*>(p->getRawDataByID(evalID));
                 if (rdr && col>=0 && col<rdr->tableGetColumnCount()) {
-                    res.setVariant(QVariant(rdr->tableGetColumnData(col)));
+                    res.setVariant(QVariantList(rdr->tableGetColumnData(col)));
                 }
             } else {
                 parser->qfmpError(QObject::tr("table_column(rdrid, col) needs two integer arguments"));
@@ -3300,8 +3300,8 @@ namespace QFMathParser_DefaultLib {
             int evalID=-1;
             if (n==3 && params[0].type==qfmpDouble && params[1].type==qfmpDouble && params[2].type==qfmpDouble) {
                 evalID=params[0].toInteger();
-                int col=params[1].toInteger();
-                int row=params[2].toInteger();
+                int col=params[1].toInteger()-1;
+                int row=params[2].toInteger()-1;
                 QFRDRTableInterface* rdr=dynamic_cast<QFRDRTableInterface*>(p->getRawDataByID(evalID));
                 if (rdr && col>=0 && col<rdr->tableGetColumnCount()) {
                     res.setVariant(rdr->tableGetData(row,col));
@@ -3328,7 +3328,7 @@ namespace QFMathParser_DefaultLib {
             int evalID=-1;
             if (n==2 && params[0].type==qfmpDouble && params[1].type==qfmpDouble) {
                 evalID=params[0].toInteger();
-                int col=params[1].toInteger();
+                int col=params[1].toInteger()-1;
                 QFRDRTableInterface* rdr=dynamic_cast<QFRDRTableInterface*>(p->getRawDataByID(evalID));
                 if (rdr && col>=0 && col<rdr->tableGetColumnCount()) {
                     res.setDoubleVec(rdr->tableGetColumnDataAsDouble(col));
@@ -3352,8 +3352,8 @@ namespace QFMathParser_DefaultLib {
             int evalID=-1;
             if (n==3 && params[0].type==qfmpDouble && params[1].type==qfmpDouble && params[2].type==qfmpDouble) {
                 evalID=params[0].toInteger();
-                int col=params[1].toInteger();
-                int row=params[2].toInteger();
+                int col=params[1].toInteger()-1;
+                int row=params[2].toInteger()-1;
                 QFRDRTableInterface* rdr=dynamic_cast<QFRDRTableInterface*>(p->getRawDataByID(evalID));
                 if (rdr && col>=0 && col<rdr->tableGetColumnCount()) {
                     res.setDouble(rdr->tableGetData(row,col).toDouble());

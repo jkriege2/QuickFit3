@@ -49,6 +49,7 @@
     <b><tt><!-- template -->table_column(rdr_id, column)<!-- /template --></tt> - <i> returns the given column of data (as a vector) of the table in the specified raw data record (RDRs) in the current project </i>:</b>
   $$funcref_description$$
     The returned data type (vector of number/string/boolean) is determined, based on the first cell in the column.
+	$$note:Row/Column indices are 1-based, i.e. the top left corner is (1,1)!!!$$
         <!-- /func:table_column -->
   $$funcref_end$$
 
@@ -56,6 +57,7 @@
     <b><tt><!-- template -->table_data(rdr_id, column, row)<!-- /template --></tt> - <i> returns the given cell (column/row) in the table in the specified raw data record (RDRs) in the current project </i>:</b>
   $$funcref_description$$
     The returned data type (vector of number/string/boolean) is determined, based on the cell's contents
+	$$note:Row/Column indices are 1-based, i.e. the top left corner is (1,1)!!!$$
         <!-- /func:table_data -->
   $$funcref_end$$
 
@@ -63,13 +65,15 @@
     <b><tt><!-- template -->table_numcolumn(rdr_id, column)<!-- /template --></tt> - <i> returns the given column of data (as a vector) of the table in the specified raw data record (RDRs) in the current project as a vector of numbers </i>:</b>
   $$funcref_description$$
     The returned data type is always a vector of numbers.
+	$$note:Row/Column indices are 1-based, i.e. the top left corner is (1,1)!!!$$
         <!-- /func:table_numcolumn -->
   $$funcref_end$$
 
   $$funcref_start$$<a name="table_numdata"/><!-- func:table_numdata -->
     <b><tt><!-- template -->table_numdata(rdr_id, column, row)<!-- /template --></tt> - <i> returns the given cell (column/row) in the table in the specified raw data record (RDRs) in the current project as a number</i>:</b>
   $$funcref_description$$
-    The returned data type is always a number
+    The returned data type is always a number.
+	$$note:Row/Column indices are 1-based, i.e. the top left corner is (1,1)!!!$$
         <!-- /func:table_numdata -->
   $$funcref_end$$
 

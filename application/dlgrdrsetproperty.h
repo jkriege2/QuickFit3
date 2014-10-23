@@ -51,6 +51,9 @@ class dlgRDRSetProperty : public QDialog {
     protected slots:
         void on_btnSelectNone_clicked();
         void on_btnSelectAll_clicked();
+        void on_btnToggle_clicked();
+        void on_btnDeselSel_clicked();
+        void on_btnSelSel_clicked();
         void showHelp();
         void on_cmbWhich_currentIndexChanged(int idx);
     private:

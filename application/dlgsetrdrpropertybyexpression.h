@@ -65,6 +65,8 @@ class DlgSetRDRPropertyByExpression : public QDialog
         void removeEditor(DlgSetRDRPropertyByExpressionEditor* edt);
         void emitWidgetContentsChanged();
         void updateTest();
+        void on_btnDeselSel_clicked();
+        void on_btnSelSel_clicked();
     signals:
         void widgetContentsChanged();
     private:
