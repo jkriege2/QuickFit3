@@ -1,0 +1,68 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Table Plugin Tutorial: Get Data from Another Table</title>
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+    <h2>Introduction</h2>
+<p>Table cell and column expressions also allow to read data from another <a href="$$plugin_info:help:table$$">table RDR</a>.
+The expression use the built-in <a href="mathparser.html">expression parser</a>, which has been extended with special functions to access the<a href="./parserreference/dataaccess.html"> contents of the current table</a> and for <a href="./parserreference/columnstatistics.html">column statistics in the current table RDR</a>. This tutorial will use the functions <tt>table_...()</tt> built into the function parser, which allow to access any table within the project.</p>
+<p>You can reach this functionality by double-clicking any column header and then activating the "expression" checkbox in the table column editor dialog.
+</p>
+    
+ 
+ 
+<h2>Tutorial</h2>
+<p>
+<ol>
+    <li>Start a new QuickFit project and add two editable tables (<b>Data Items | Insert Raw Data | Table | Editable Table</b>). </li>
+    <li>Open the first table editor (double-click table in project)</li>
+      <li>Go to the "Data Table" tab. It will now display an empkty table.</li>
+      <li>Now we add some arbitrary data to the table. To do so, copy (select &amp; <tt>Ctrl+C</tt>) the following CSV data and insert it into the table by pressing <tt>Ctrl+V</tt>$$startbox_example$$<pre>
+#! "index"; "random numbers"; "Gaussian random numbers"
+1; 37; 66
+2; 70; 75
+3; 4; 39
+4; 47; 34
+5; 53; 68
+6; 56; 52
+7; 65; 46
+8; 56; 23
+9; 37; 85
+10; 56; 74
+</pre>$$endbox$$ This will result in a table like this:
+<center><a name="tutorial_cellexpression_pic000"><img src="./pic/tutorial_cellexpression_pic000.png" border="1">
+</center>
+The given table of values contains one column with increasing numbers, one column of random numbers drawn from a flat distribution between 0 and 100 and one column of Gaussian random variates with mean 50 and standard deviation 20.
+</li> 
+    <li>We will now access this data from the second table. To do so, we first need to know the ID of the table RDR within the project. To find that out, go to the tab "Properties" and note down the ID of the first table RDR. It should be "0".:
+<center><a name="tutorial_datafromothertable_pic000"><img src="./pic/tutorial_datafromothertable_pic000.png" border="1">
+</center>
+</li>
+    <li>Close the table editor again and open the editor of the second table (double-click on it in the project tree).</li>
+    <li>In the second table, double-click on the first column header and set this expression:
+    $$codeexample:table_numcolumn(0,1)$$
+    This reads the contents of the first column in table 1 as an array of numbers and inserts it into the current table as a column. The first argument is the RDR ID of the other table RDR and the second argument is the column you want to acces.$$note:the column id is 1-base,. i.e. the first column is 1, the second 2, ...$$</li>
+<li>Now double-click the second column and enter this expression:
+    $$codeexample:item(table_numcolumn(0,2), table_numcolumn(0,1)&lt;5)$$
+    This will insert only the first 4 items from the second column, i.e. those, where the value in the first column is smaller than 1. The table will look like this:
+<center><a name="tutorial_datafromothertable_pic001"><img src="./pic/tutorial_datafromothertable_pic001.png" border="1">
+</center>
+
+</li>
+  <li>Now open the first table again and change some data, i.e. in the first column:
+  <center><a name="tutorial_datafromothertable_pic002"><img src="./pic/tutorial_datafromothertable_pic002.png" border="1">
+  </center>
+  </li>
+  <li>Go back to the second table editor and press the button <img src=":table/formularecalc.png">. Now the data from the table is reread and the table will now look like this:
+<center><a name="tutorial_datafromothertable_pic003"><img src="./pic/tutorial_datafromothertable_pic003.png" border="1">
+</center>
+</li>
+  <li></li>
+</ol></p>
+ 
+    
+  </body>
+</html>
