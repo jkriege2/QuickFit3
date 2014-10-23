@@ -47,6 +47,7 @@ class QFWIDLIB_EXPORT QFFunctionReferenceToolDocSearchThread: public QThread {
        void run();
    signals:
        void foundFunction(QString name, QString templ, QString help, QString helplink);
+       void foundFunction(QString name, QStringList templ, QString help, QString helplink);
    protected:
        QStringList files;
        QRegExp rxDefinition;
@@ -128,8 +129,10 @@ class QFWIDLIB_EXPORT QFFunctionReferenceTool : public QObject
         void threadFinished();
         void delayedStartSearchThreads();
         void addFunction(QString name, QString templ, QString help, QString helplink);
+        void addFunction(QString name, QStringList templ, QString help, QString helplink);
         void stopThreadsWait();
         void updateHelpModel();
+        void delayedAddNamesAndTemplates();
     protected:
         QFCompleterFromFile* compExpression;
         struct functionDescription {
@@ -163,6 +166,8 @@ class QFWIDLIB_EXPORT QFFunctionReferenceTool : public QObject
         QAbstractButton* btnCurrentHelp;
         QAction* actDefaultHelp;
         QAction* actCurrentFunctionHelp;
+        QStringList namesToAdd, templatesToAdd;
+        QTimer timDelayedAddNamesAndTemplates;
 };
 
 #endif // QFFUNCTIONREFERENCETOOL_H
