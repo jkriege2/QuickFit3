@@ -46,7 +46,7 @@ class QFWIDLIB_EXPORT QFFunctionReferenceToolDocSearchThread: public QThread {
    protected:
        void run();
    signals:
-       void foundFunction(QString name, QString templ, QString help, QString helplink);
+       //void foundFunction(QString name, QString templ, QString help, QString helplink);
        void foundFunction(QString name, QStringList templ, QString help, QString helplink);
    protected:
        QStringList files;

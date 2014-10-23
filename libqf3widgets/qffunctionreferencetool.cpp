@@ -31,8 +31,10 @@ QFFunctionReferenceToolDocSearchThread::QFFunctionReferenceToolDocSearchThread(Q
 
     stopped=false;
     rxDefinition=QRegExp("<!--\\s*func:([\\w]*)\\s*-->(.*)<!--\\s*/func:\\1\\s*-->");
+    rxDefinition.setCaseSensitivity(Qt::CaseInsensitive);
     rxTemplate=QRegExp("<!--\\s*template\\s*-->(.*)<!--\\s*/template\\s*-->");
     rxTemplate.setMinimal(true);
+    rxTemplate.setCaseSensitivity(Qt::CaseInsensitive);
 }
 
 void QFFunctionReferenceToolDocSearchThread::setRxDefinition(const QRegExp &rxDefinition)
@@ -52,6 +54,7 @@ void QFFunctionReferenceToolDocSearchThread::stopThread()
 
 void QFFunctionReferenceToolDocSearchThread::run()
 {
+    //qDebug()<<"t.starting thread "<<files<<rxDefinition<<rxTemplate;
     for (int i=0; i<files.size(); i++) {
         QFile f(files[i]);
         if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
@@ -62,17 +65,23 @@ void QFFunctionReferenceToolDocSearchThread::run()
                 QString name=rxDefinition.cap(1).trimmed();
                 QString help=rxDefinition.cap(2).trimmed();
                 QStringList templ;
+                //qDebug()<<"t.def "<<pos<<name;
                 int pos1=0;
                 while ((pos1=rxTemplate.indexIn(help,pos1)) != -1) {
+                    //qDebug()<<"  t.templ "<<rxTemplate.cap(1);
                     templ<<rxTemplate.cap(1);
+                    if (stopped) break;
+                    pos1 += rxTemplate.matchedLength();
                 }
                 emit foundFunction(name, templ, help, QFileInfo(files[i]).absoluteFilePath()+QString("#")+name);
+                //qDebug()<<"t.found "<<name<<templ;
                 pos += rxDefinition.matchedLength();
                 if (stopped) break;
              }
         }
         if (stopped) break;
     }
+    //qDebug()<<"t.done thread ";
 }
 
 
@@ -101,8 +110,10 @@ QFFunctionReferenceTool::QFFunctionReferenceTool(QObject *parent) :
     defaultHelp="";
     rxDefinition=QRegExp("<!--\\s*func:([\\w]*)\\s*-->(.*)<!--\\s*/func:\\1\\s*-->");
     rxDefinition.setMinimal(false);
+    rxDefinition.setCaseSensitivity(Qt::CaseInsensitive);
     rxTemplate=QRegExp("<!--\\s*template\\s*-->(.*)<!--\\s*/template\\s*-->");
-    rxTemplate.setMinimal(false);
+    rxTemplate.setMinimal(true);
+    rxTemplate.setCaseSensitivity(Qt::CaseInsensitive);
     btnCurrentHelp=NULL;
     labHelp=NULL;
     labTemplate=NULL;
@@ -126,6 +137,7 @@ void QFFunctionReferenceTool::setRxTemplate(const QRegExp &rxTemplate)
 
 void QFFunctionReferenceTool::threadFinished()
 {
+    //qDebug()<<"threadFinished";
     threadsFinished++;
     if (threadsFinished>=maxThreads) {
         if (progress) {
@@ -142,6 +154,7 @@ void QFFunctionReferenceTool::threadFinished()
         searching=false;
     }
     QApplication::processEvents();
+    delayedAddNamesAndTemplates();
 }
 
 void QFFunctionReferenceTool::delayedStartSearchThreads()
@@ -170,6 +183,7 @@ void QFFunctionReferenceTool::delayedStartSearchThreads()
 
 void QFFunctionReferenceTool::addFunction(QString name, QString templ, QString help, QString helplink)
 {
+    //qDebug()<<"addFunction"<<name<<templ;
     QFFunctionReferenceTool::functionDescription fd;
     fd.fhelp=help;
     fd.ftemplate=templ;
@@ -189,6 +203,7 @@ void QFFunctionReferenceTool::addFunction(QString name, QString templ, QString h
 
 void QFFunctionReferenceTool::addFunction(QString name, QStringList templ, QString help, QString helplink)
 {
+    //qDebug()<<"addFunction"<<name<<templ;
     QFFunctionReferenceTool::functionDescription fd;
     fd.fhelp=help;
     fd.ftemplate=templ.value(0, "");
@@ -203,10 +218,11 @@ void QFFunctionReferenceTool::addFunction(QString name, QStringList templ, QStri
 
     timDelayedAddNamesAndTemplates.setSingleShot(true);
     timDelayedAddNamesAndTemplates.setInterval(150);
-    timDelayedAddNamesAndTemplates.start();
+    timDelayedAddNamesAndTemplates.start(150);
 }
 
 void QFFunctionReferenceTool::delayedAddNamesAndTemplates() {
+    //qDebug()<<"delayedAddNamesAndTemplates"<<namesToAdd<<templatesToAdd;
     QStringList sl=compExpression->stringlistModel()->stringList();
     QStringList sl2=helpModel.stringList();
     while (namesToAdd.size()>0) {
@@ -508,8 +524,9 @@ void QFFunctionReferenceTool::startSearch(const QStringList &directories_in, con
         threads.append(new QFFunctionReferenceToolDocSearchThread(absFiles[i], this));
         threads[i]->setRxDefinition(rxDefinition);
         threads[i]->setRxTemplate(rxTemplate);
+        //qDebug()<<"creating thread "<<absFiles[i]<<rxDefinition<<rxTemplate;
         connect(threads[i], SIGNAL(finished()), this, SLOT(threadFinished()));
-        connect(threads[i], SIGNAL(foundFunction(QString,QString,QString,QString)), this, SLOT(addFunction(QString,QString,QString,QString)));
+        //connect(threads[i], SIGNAL(foundFunction(QString,QString,QString,QString)), this, SLOT(addFunction(QString,QString,QString,QString)));
         connect(threads[i], SIGNAL(foundFunction(QString,QStringList,QString,QString)), this, SLOT(addFunction(QString,QStringList,QString,QString)));
     }
     delayedStartSearchThreads();
