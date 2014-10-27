@@ -9,7 +9,45 @@
 
 
 <h2>Introduction/Prerequesites</h2>
-<p>This tutorial explains, how a TCSPC file can be correlated and evaluated with the FCS/FCCS fit tools within QuickFit. What you need for thsi tutorial is a TCSPC evaluation in one of the file formats supported by QuickFit. As an example, we will discuss a simple measurement of ...</p>
+<p>This tutorial explains, how a TCSPC file can be correlated and evaluated with the FCS/FCCS fit tools within QuickFit. What you need for thsi tutorial is a TCSPC evaluation in one of the file formats supported by QuickFit. As an example, we will discuss a simple measurement of a doublöe-labeled 170bp dsDNA. The data is available from <a href="http://www.dkfz.de/Macromol/quickfit/examples.html#tcspc">http://www.dkfz.de/Macromol/quickfit/examples.html#tcspc</a> as <tt>170E_40pM.zip</tt>,. which unzips to a file <tt>170E_40pM.t3r</tt>.</p>
+
+
+
+<h2>Tutorial</h2>
+<p>
+<ol>
+    <li>Start a new QuickFit Project and start the TCSPC correlator, by clicking on  <b>Data Items | Insert Raw Data ... | import/process TCSPC</b>.</li>
+    <li>At the top of this window, use the button <img src=":tcspcimporter/fileopen.png"> to select a TCSPC file, in this case the file <tt>170E_40pM.t3r</tt>, which can be downloaded from <a href="http://www.dkfz.de/Macromol/quickfit/examples.html#tcspc">http://www.dkfz.de/Macromol/quickfit/examples.html#tcspc</a>. After selecting the file, the window will look like this:
+<center><a name="tutorial_fcs_pic000"><img src="./pic/tutorial_fcs_pic000.png" border="1">
+</center>
+ </li>
+    <li>Now activate the <b>FCS</b> checkbox and disactivate the <b>Countrate</b>checkbox.</li>
+    <li>Select the full <b>input range</b>, by checking both checkboxes in the line <b>iunput range</b>. YOu can also choose to evaluate only a subset of the whole file by unchecking one of the two (or both) check-boxes and giving the according start/end times.$$note:If you computer is slow, uncheck the box <b>end</b> and set the end-range to 60s, which will reduce the processing time by a factor of 10!$$<br>At the rhs of this line, the full duration and an estimate of the countrates in the different input channels is given. In this case, a 600s measurement was acquired and most of the countrate was detected in the first channel (only a blue laser was used for excitation).</li>
+    <li>In the <b>FCS</b> section, you can specify the correlations to calculate and the options of the correlators:
+<ul>
+    <li>choose the correlator: <b>"bin and correlator: Multi-Tau 1 (one monitor per lag)"</b>, as it gives the most accurate results.</li>
+    <li>choose to cut the sequence up into 4 <b>segments</b>. Then the full input range (600s) will be cut into four segments of 150s each and each segment will be correlated separately. The resulting four correlation curves are then averaged over and their standard deviation is used as an estimate for the measurement error.</li>
+    <li>The minimum lag-time sets the temporal resolution of the FCS curves and of the processes you want to observe. On the other hand, a smaller minimal lag time will result in longer processing times. Typically, a value of 1&mu;s is a good choice. If you want to measure also rotational dynamics and/or do high-accuracy measurements of triplett dynamics, the you might want to choose a value between 100ns and 1&mu;s. Values below 100ns do usually make no sence, since the correlator only uses the macrotime from the TCSPC files, whichhas a resolution around 100ns in many cases.</li>
+    <li>For the correlator, use the setings <tt>P=16, m=2</tt> and set <tt>S</t> to a value, which results in a maximal lag time &tau;<sub>max</sub>, which is long enough to cover also slow processes in your sample (for typical FCS/FCCS measurements, &tau;<sub>max</sub>=10-20s is a good choice). </li>
+    <li>The <b>FCS countrate binning for display</b> should be set to a value between 10ms and 100ms. It specifies the resolution of the countrate curves, displayed for each correlation curve. Since these values are usually only used for visual inspection, the given resolution range is suffuicient. This also save memory and processing time.</li>
+    <li>In the following table you can select, which correlation curves to calculate
+    <center><a name="tutorial_fcs_pic001"><img src="./pic/tutorial_fcs_pic001.png" border="1">
+    </center>
+    The diagonal elements are the autocorrelation curves (ACFs) and the off-diagonal elements are the cross-correlation curves (CCFs). Initially this is automatically configured for 2-color FCCS experiments, using all input channels, which have a significant countrate (see item 2). In this example, the two ACFs "ACF 1" and "ACF 2" are used together with the 2-color cross-correlation fucntion "CCF 1,2". The other curves are not necessary/don't make sence, since there is no input data.
+    </li>
+</ul></li>
+    <li>Finally click on <img src="./pic/tutorial_fcs_pic002.png" border="1"> to start the processing. The job is added to the list at the bottom of the window and when it is complete (<img src=":tcspcimporter/thread_ok.png">), you can click on 
+<img src="./pic/tutorial_fcs_pic003.png" border="1"> to add the results to the project.<br>The project will now contain three RDRs:
+<center><a name="tutorial_fcs_pic004"><img src="./pic/tutorial_fcs_pic004.png" border="1">
+</center>These represent the four mentioned correaltion curves. To view them, double-click any of the RDRs. In the dialog that no opens, you can look at the correlation curves and count rates.
+    </li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+    <li></li>
+</ol></p>
 
     </body>
 </html>

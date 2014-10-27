@@ -3,12 +3,12 @@
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
   <title>Imaging FCS Plugin: Image Correlators</title>
-	  <link rel="contents" href="tcspcimporter.html">     
+      <link rel="contents" href="tcspcimporter.html">     
   </head>
   <body>
     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-	
-	$$contents$$
+    
+    $$contents$$
 
 This part of the plugin calculates auto- and crosscorrelation functions from the input data, thus allowing to perform Fluorescence (Cross) Correlation Spectroscopy, F(C)CS, analyses on TCSPC data.
 <a name="#options"><h2>Processing options</h2>
@@ -29,7 +29,7 @@ For the FCS/FCCS functionality you may set several options:
 $$qf_commondoc_backtop$$
 <a name="#createdFiles"><h2>Created Files</h2>
 <ul>
-  <li>See <a href="$$mainhelpdir$$/fcs_qf3format.html.html">QF3 ASCII FCS Data Format</a> for a description of the ASCII-dataformat, used for FCS/FCCS auto- and cross-correlation data.</li>
+  <li>See <a href="$$mainhelpdir$$/fcs_qf3format.html">QF3 ASCII FCS Data Format</a> for a description of the ASCII-dataformat, used for FCS/FCCS auto- and cross-correlation data.</li>
 </ul>
 
 $$qf_commondoc_backtop$$
@@ -48,45 +48,45 @@ Here the input photon stream is binned into bins of width &tau;<sub>min</sub> th
                           $$bmath:g(\tau)=\frac{\langle I(t)\cdot J(t+\tau)\rangle}{\langle I\rangle\cdot\langle J\rangle}       \text{with}  \langle I(t)\rangle=\limi_{T\rightarrow\infty}\frac{1}{T}\int_0^T I(t)\;\mathrm{d}t$$
   The correlation scheme used in this function was introduced by K. Schätzel [1,2] for hardware correlators. It allows to estimate the ACF/CCF without keeping the whole time series in memory. It is based on the above semi-logarithmically spaced values of <i>&tau;<sub>s,p</sub></i>. For each of the <i>P</i> linear blocks an averaged set of input signals is created:
      <blockquote>
-	   <img src="./pic/multitau_signals.png">
-	 </blockquote>	  
+       <img src="./pic/multitau_signals.png">
+     </blockquote>      
   Using this scheme, the estimate of the CCF can be written as above:
      <blockquote>
-	   <img src="./pic/multitau_ccf.png">
-	 </blockquote>	  	  
+       <img src="./pic/multitau_ccf.png">
+     </blockquote>            
   As can be seen only the averages intensities <i>I<sub>s,n</sub></i> appear in the formula. This scheme can also be drawn as a schematic, which shows the direct connection to a simple hardware implementation [3]:
      <blockquote>
-	   <img src="./pic/multi_tau_schaematic.png">
-	 </blockquote>
+       <img src="./pic/multi_tau_schaematic.png">
+     </blockquote>
     The &Delta;&tau; blocks delay the input signal by &Delta;&tau;, the &times;-blocks multiply the two input signals and the &Sigma;-blocks accumulate the input. The top row (a) shows a fully linear implementation (no logarithmic spacing) and (b)/(c) the multi-&tau; implementation. This plugin contains a software version of this scheme. Using this scheme introduces an additional (triangular) averaging into the ACF/CCF (as compared to the direct estimation), but allows to calculate it without the need to keep the whole image series in memory. Also this averaging depends on the linear block <i>s</i> and has only little impakt for small <i>s</i>. the systematic error introduced increases for the larger lags for which usually measured ACFs/CCFs already decayed to 0 [4]:
      <blockquote>
-	   <img src="./pic/multitau_avg.png">
-	 </blockquote>
+       <img src="./pic/multitau_avg.png">
+     </blockquote>
   Here <img src="./pic/multitau_avg_triangle.png"> is a triangular kernel function and * denotes the convolution product. 
 
 
 <h4>Normalization</h4>
 All types of correlators use the same normalization scheme for the term <i>1/&lang;I&rang;&lang;J&rang;</i> in the definition of the ACF/CCF. The normalization scheme is called "symmetric normalization", introduced in [2]. This normalization takes care for the reduced number <i>T-&tau;<sub>s,p</sub></i> of accumulations in the ACF/CCF and is defined as:
      <blockquote>
-	   <img src="./pic/symm_normalization.png">
-	 </blockquote>
+       <img src="./pic/symm_normalization.png">
+     </blockquote>
 The "delayed monitor" <i>M(&tau;<sub>k</sub>)</i> may be estimated in two ways. Either it is calculated for every lag <i>&tau;<sub>k</sub></i> separately, or it can bes estimated as:
-	 <blockquote>
-	   <img src="./pic/symm_normalization_estimate.png">
-	 </blockquote>
+     <blockquote>
+       <img src="./pic/symm_normalization_estimate.png">
+     </blockquote>
 from the zero-lag monitor <i>M(0)</i>. This method possibly introduces additional errors that are but negligible for longer image series (see [3] for a detailed discussion).
 </p>
 <h3>Comparison of the correlators</h3>
 <p>
   In general the results of all correlation scheme are the same. Those with intrinsic averaging will decrease the noise on the correlation curve at larger lag times, where the statistics tends to get worse due to the fewer summands in the average. This is beneficial, when the correlation curves decay to zero/one in this regime, as then the estimation error is decreased. If the correlation curves do not decay, using a correlator with averaging will introduce an additional systematic error. This can be illustrated in these examples:
      <blockquote>
-	   <b>autocorrelation of a sine signal:</b><br>
-	   <img src="./pic/corr_examples_sine.png">
-	 </blockquote>		
+       <b>autocorrelation of a sine signal:</b><br>
+       <img src="./pic/corr_examples_sine.png">
+     </blockquote>        
      <blockquote>
-	   <b>autocorrelation which decays to one for different decay times:</b><br>
-	   <img src="./pic/corr_examples.png">
-	 </blockquote>	
+       <b>autocorrelation which decays to one for different decay times:</b><br>
+       <img src="./pic/corr_examples.png">
+     </blockquote>    
     In addition to these discussed errors there are other differences in the implementations: The <i>direct correlators</i> need the whole image series to reside in memory, so if your image series is very long (longer than ~1,000,000 frames and with many pixels) it is usually better to use the multi-&tau; correlators, as these are fed frame by frame, so only few frames reside in memory at every time. 
   </p>
 
