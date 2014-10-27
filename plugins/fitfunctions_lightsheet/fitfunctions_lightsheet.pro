@@ -33,13 +33,15 @@ HEADERS += qffitfunctionslightsheet.h \
            qffitfunctionlightsheetgaussian.h \
            qffitfunctionlightsheetslit.h \
            qffitfunctionlightsheetgaussianvar.h \
-    ../../../../../LIB/trunk/statistics_tools.h
+    ../../../../../LIB/trunk/statistics_tools.h \
+    qffitfunctionlightsheetgaussianfwhm.h
 
 SOURCES += qffitfunctionslightsheet.cpp\
            qffitfunctionlightsheetgaussian.cpp \
            qffitfunctionlightsheetslit.cpp \
            qffitfunctionlightsheetgaussianvar.cpp \
-    ../../../../../LIB/trunk/statistics_tools.cpp
+    ../../../../../LIB/trunk/statistics_tools.cpp \
+    qffitfunctionlightsheetgaussianfwhm.cpp
 
 FORMS =
 

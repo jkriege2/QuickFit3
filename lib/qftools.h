@@ -1644,6 +1644,13 @@ QFLIB_EXPORT QString qfGetTempFilename(const QString& templateName=QString("qf_t
  */
 QFLIB_EXPORT bool qfCopyData( QIODevice* in, QIODevice* out);
 
+/*! \brief reads the contents of the given file and compares it to the given string. Returns \c true, if the two are equal
+    \ingroup qf3lib_tools
+
+
+ */
+QFLIB_EXPORT bool qfFileEqualsString( const QString& filename, const QByteArray& data);
+
 /*! \brief escape \\n, \\r, \\", \\', \\\\, \\t...
     \ingroup qf3lib_tools
 

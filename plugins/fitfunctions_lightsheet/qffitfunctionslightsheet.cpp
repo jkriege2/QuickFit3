@@ -22,12 +22,14 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctionslightsheet.h"
 #include "qffitfunctionlightsheetgaussian.h"
 #include "qffitfunctionlightsheetgaussianvar.h"
+#include "qffitfunctionlightsheetgaussianfwhm.h"
 #include "qffitfunctionlightsheetslit.h"
 
 QStringList QFFitFunctionsLightsheet::getIDs() const {
     QStringList res;
     res<<"lightsheet_gaussian";
     res<<"lightsheet_gaussian_sqrte";
+    res<<"lightsheet_gaussian_fwhm";
     res<<"lightsheet_slit";
     return res;
 }
@@ -37,6 +39,8 @@ QFFitFunction* QFFitFunctionsLightsheet::get(QString id, QObject* parent) const 
         return new QFFitFunctionLightsheetGaussian();
     } else if (id=="lightsheet_gaussian_sqrte") {
         return new QFFitFunctionLightsheetGaussianVar();
+    } else if (id=="lightsheet_gaussian_fwhm") {
+        return new QFFitFunctionLightsheetGaussianFWHM();
     } else if (id=="lightsheet_slit") {
         return new QFFitFunctionLightsheetSlit();
     }

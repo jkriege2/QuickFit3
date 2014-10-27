@@ -1,0 +1,70 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Plugin: SPIM Lightsheet Analysis: Single-Color Tutorial</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        
+        
+        $$startbox_see$$
+          See the <a href="tutorial.html">tutorial main page</a> for an introduction to lighsheet analysis!
+        $$endbox$$
+<p>
+<ol>
+    <li>Start a new QuickFit project and load the image stack from thge x-scan by clicking: <b>Data Items | Insert Raw Data | Image Stacks | Single-File Image Stack(s) ...</b> and selecting the file <tt>twolaser_alignment_xstack_laser2_561nm_1mW_000.lightpath1.tif</tt> from the directory <code><a href="opendir://$$plugin_info:examplesdir:spim_lightsheet_eval$$/test_data/">$$plugin_info:examplesdir:spim_lightsheet_eval$$/test_data/</a></code> mentioned in the <a href="tutorial.html">introduction</a>..</li>
+    <li>Also Add a SPIM Lightsheet Evaluation to the project, by clicking <b>Data Items | Insert Evaluation | SPIM: Lightsheet Analysis</b> </li>
+    <li>Often one wants to cut a few pixels from the border of the image stack, since these contain shadowed pixels (e.g. by a dual view optics), or the illumination is uneven there.
+<center><a name="tutorial_pic003"><img src="./pic/tutorial_pic003.png" border="1">
+</center>
+This can be achieved, using the mask tools of the <a href="$$plugin_info:help:image_stack$$">image_stack plugin</a>. To do so, double-click the image stack in the project and go to the "image stack editor" tab. 
+<center><a name="tutorial_pic005"><img src="./pic/tutorial_pic005.png" border="1">
+</center>
+There you can check the frames in the image stack and set the mask either by using the mask tools above the image display or by clicking <b>Mask | mask border</b>. For this plugin we will use tha latter menu entry and cut 2 pixels around the frame:
+<center><a name="tutorial_pic004"><img src="./pic/tutorial_pic004.png" border="1">
+</center>
+Now the image looks like this with the mask in gray:
+<center><a name="tutorial_pic006"><img src="./pic/tutorial_pic006.png" border="1">
+</center>
+</li>
+    <li>Close the image stack editor again and open the Lightsheet analysis, by double-clicking it in the project window.
+<center><a name="tutorial_pic007"><img src="./pic/tutorial_pic007.png" border="1">
+</center>
+If you loaded several image stacks, you can select the stack you want to evaluate in the files/RDRs list on the rhs of the window.
+</li>
+    <li>First you have to specify the stack parameters, i.e. the pixel size (&Delta;x/&Delta;y), the step size of the mirror motion (&Delta;z) and the direction, in which to cut (hoizontal/vertical). For this tutorial, we use &Delta;x=&Delta;y=400nm, &Delta;z=1000nm and the orientation "fit columns".
+<center><a name="tutorial_pic008"><img src="./pic/tutorial_pic008.png" border="1">
+</center>
+</li>
+    <li>You can use the scrollbar above the frame display to move through the image stack and click on different columns in the frame display to display different cuts through the image on the right.</li>
+    <li>Now you have to select the fit model, you want to use and the fit algorithm. The usual choice is:
+    <ul>
+      <li>algorithm: <a href="$$fitalgorithm:help:fit_lmfit$$"><b>lmfit</b></a></li>
+      <li>model: <a href="$$fitfunction:help:lightsheet_gaussian$$">lightsheet: gaussian (1/e^2)</a><br>This model is a Gaussian function, $$bmath:f(x)=A\cdot\exp\left(-2\cdot\frac{(x-x_0)^2}{w^2}\right)$$ where the width $$math:w$$ is specified as $$math:1/e^2$$-halfwidth of the distribution! You can use different definitions, by choosing a different model, e.g. the model <a href="$$fitfunction:help:lightsheet_gaussian_fwhm$$">lightsheet: gaussian (FWHM)</a>, if you want the width given as full width at half maximum, which is a common measure in microscopy (but not in the FCS community!).</li>
+    </ul></li>
+    <li>Now click on <img src="./pic/tutorial_pic009.png" border="0"> and observe how the plugin moves through the image stack and performs the fits.
+    </li>
+    <li>If you now move throgh the stack and look at the cuts (see item 6), you can look at the fit results for the different frames in the center of the dialog:
+<center><a name="tutorial_pic010"><img src="./pic/tutorial_pic010.png" border="1">
+</center>
+</li>
+    <li>The plugin also provides a visualization of the fit results in the tab <b>"Stack Fit Results"</b>:
+<center><a name="tutorial_pic011"><img src="./pic/tutorial_pic011.png" border="1">
+</center>
+The four graphs show different fit results, in dependence of the x-position (along the direction of lightsheet propagation):
+<ul>
+    <li>top-left: width of the lightsheet $$math:w$$</li>
+    <li>top-right center position of the lightsheet $$math:x_0$$ (this moves due to the imaging properties and the movement of the mirror!)</li>
+    <li>bottom-left: a user-selectable parameter, here the amplitude $$math:A$$.</li>
+    <li></li>
+</ul>
+Usually the thinnest part of the lighsheet should be positioned around the center of the field of view, i.e. around x=25&mu;m.
+</li>
+    <li>In order to better view the results, you can set the range of "lightsheet position" values at the top left of the window and of the displayed withs in the top-left plot at the top-right of the window.</li>
+
+</ol></p>
+   
+   
+    </body>
+</html>

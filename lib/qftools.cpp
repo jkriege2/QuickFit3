@@ -1360,6 +1360,16 @@ QString qfGetTempFilename(const QString& templateName) {
 #define QFCOPYDATA_CHUNKSIZEHUNKSIZE 1024*1024*32
 
 
+bool qfFileEqualsString( const QString& filename, const QByteArray& data) {
+    QFile f(filename);
+    if (f.open(QFile::ReadOnly|QFile::Text)) {
+        bool res= (f.readAll()==data);
+        f.close();
+        return res;
+    }
+    return false;
+}
+
 bool qfCopyData( QIODevice* in, QIODevice* out) {
     size_t chunksize=QFCOPYDATA_CHUNKSIZEHUNKSIZE;
     char* chunk=qfMallocT<char>(QFCOPYDATA_CHUNKSIZEHUNKSIZE);

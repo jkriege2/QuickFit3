@@ -389,6 +389,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$startbox$$");
     addInsertAction(menu, "$$startbox_info$$");
     addInsertAction(menu, "$$startbox_note$$");
+    addInsertAction(menu, "$$startbox_see$$");
     addInsertAction(menu, "$$startbox_warning$$");
     addInsertAction(menu, "$$startbox_example$$");
     addInsertAction(menu, "$$startbox:backgroundcolor:bordercolor$$");
@@ -486,12 +487,23 @@ void QFEHelpEditorWidget::setWinID(int winID)
 
 void QFEHelpEditorWidget::autosave()
 {
-    if (!getScript().isEmpty()) {
-        QDir d(QFPluginServices::getInstance()->getConfigFileDirectory());
+    QDir d(QFPluginServices::getInstance()->getConfigFileDirectory());
+    QString ffn= d.absoluteFilePath(QString("helpeditor%1_autosave.html").arg(m_winID));
+    if (!getScript().isEmpty() && !qfFileEqualsString(ffn, ui->edtScript->getEditor()->toPlainText().toUtf8())) {
         d.mkpath(d.absolutePath());
-        if (QFile::exists(d.absoluteFilePath(QString("helpeditor%1_autosave_old.html").arg(m_winID)))) QFile::copy(d.absoluteFilePath(QString("helpeditor%1_autosave_old.html").arg(m_winID)), d.absoluteFilePath(QString("helpeditor%1_autosave_older.html").arg(m_winID)));
-        if (QFile::exists(d.absoluteFilePath(QString("helpeditor%1_autosave.html").arg(m_winID)))) QFile::copy(d.absoluteFilePath(QString("helpeditor%1_autosave.html").arg(m_winID)), d.absoluteFilePath(QString("helpeditor%1_autosave_old.html").arg(m_winID)));
-        saveFile(d.absoluteFilePath(QString("helpeditor%1_autosave.html").arg(m_winID)), false);
+        QString fn= d.absoluteFilePath(QString("helpeditor%1_autosave_old.html").arg(m_winID));
+        QString newfn= d.absoluteFilePath(QString("helpeditor%1_autosave_older.html").arg(m_winID));
+        if (QFile::exists(fn)) {
+            if (QFile::exists(newfn)) QFile::remove(newfn);
+            QFile::copy(fn, newfn);
+        }
+        fn= ffn;
+        newfn= d.absoluteFilePath(QString("helpeditor%1_autosave_old.html").arg(m_winID));
+        if (QFile::exists(fn)) {
+            if (QFile::exists(newfn)) QFile::remove(newfn);
+            QFile::copy(fn, newfn);
+        }
+        saveFile(fn, false);
     }
     QTimer::singleShot(AUTOSAVE_INTERVAL_MSEC, this, SLOT(autosave()));
 }
@@ -563,9 +575,9 @@ bool QFEHelpEditorWidget::saveFile(const QString &filename, bool setFilename)
     if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
         QTextStream s(&f);
         s<<ui->edtScript->getEditor()->toPlainText().toUtf8();
-        lastScript=ui->edtScript->getEditor()->toPlainText();
+        if (setFilename) lastScript=ui->edtScript->getEditor()->toPlainText();
         f.close();
-        newScript=false;
+        if (setFilename) newScript=false;
         if (setFilename) setScriptFilename(filename);
     }
     return true;
@@ -1002,7 +1014,7 @@ void QFEHelpEditorWidget::on_btnSelectImage_clicked()
 
     SelectResourceImage* dlg=new SelectResourceImage(dirs, this, prefixes, baseNodeNames);
     if (dlg->exec()) {
-        insertAroundOld(QString("<img src=\"%1\">°").arg(dlg->getSelectFile()));
+        insertAroundOld(QString("<img src=\"%1\">°").arg(QDir(dir).relativeFilePath(dlg->getSelectFile())));
     }
     delete dlg;
 
