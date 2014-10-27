@@ -48,6 +48,7 @@ class JKQTPCairoEngineAdapter : public JKQtBasePlotter::JKQTPPaintDeviceAdapter
         virtual double getPrintSizeYInMM() const ;
         virtual bool isPrinter() const;
         virtual QPaintDevice* createPaintdevice(const QString& filename, int widthPix, int heightPix) const;
+        virtual QPaintDevice* createPaintdeviceMM(const QString& filename, double widthMM, double heightMM) const;
 
     protected:
          Format format;

@@ -21,6 +21,8 @@
 */
 
 #include "jkqtpemfengineadapter.h"
+#include <QApplication>
+#include <QDesktopWidget>
 
 
 JKQTPEMFEngineAdapter::JKQTPEMFEngineAdapter()
@@ -51,7 +53,7 @@ QStringList JKQTPEMFEngineAdapter::getFileExtension() const
 
 bool JKQTPEMFEngineAdapter::getSetAbsolutePaperSize() const
 {
-    return false;
+    return true;
 }
 
 double JKQTPEMFEngineAdapter::getPrintSizeXInMM() const
@@ -74,4 +76,12 @@ QPaintDevice *JKQTPEMFEngineAdapter::createPaintdevice(const QString &filename, 
     //qDebug()<<"create EMF-device for "<<filename<<QSize(widthPix, heightPix);
     EmfPaintDevice * emf=new EmfPaintDevice(QSize(widthPix, heightPix), filename);
     return emf;
+}
+
+QPaintDevice *JKQTPEMFEngineAdapter::createPaintdeviceMM(const QString &filename, double widthMM, double heightMM) const
+{
+    //qDebug()<<"create EMF-device for "<<filename<<QSize(widthPix, heightPix);
+    EmfPaintDevice * emf=new EmfPaintDevice(QSize(widthMM/25.4*QApplication::desktop()->logicalDpiX(), heightMM/25.4*QApplication::desktop()->logicalDpiY()), filename);
+    return emf;
+
 }

@@ -101,3 +101,12 @@ QPaintDevice *JKQTPLatexEngineAdapter::createPaintdevice(const QString &filename
     emf->setEscapeTextMode(m_useLatexParser);
     return emf;
 }
+
+QPaintDevice *JKQTPLatexEngineAdapter::createPaintdeviceMM(const QString &filename, double widthMM, double heightMM) const
+{
+    QTeXPaintDevice * emf=new QTeXPaintDevice(filename, QSize(ceil(double(widthMM)/25.4*72.0), ceil(double(heightMM)/25.4*72.0)), QTeXPaintDevice::pt);
+    emf->setColorMode((colorMode)?(QPrinter::Color):(QPrinter::GrayScale));
+    emf->setDocumentMode(docMode);
+    emf->setEscapeTextMode(m_useLatexParser);
+    return emf;
+}

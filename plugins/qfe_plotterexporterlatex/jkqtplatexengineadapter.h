@@ -43,6 +43,7 @@ class JKQTPLatexEngineAdapter : public JKQtBasePlotter::JKQTPPaintDeviceAdapter
         virtual bool isPrinter() const;
         virtual bool useLatexParser() const;
         virtual QPaintDevice* createPaintdevice(const QString& filename, int widthPix, int heightPix) const;
+        virtual QPaintDevice* createPaintdeviceMM(const QString& filename, double widthMM, double heightMM) const;
 
     protected:
         bool docMode;
