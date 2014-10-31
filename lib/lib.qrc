@@ -65,6 +65,10 @@
         <file alias="fitalg_icon_mt.png">icons/fitalg_icon_mt.png</file>
         <file alias="fitfunc_icon.png">icons/fitfunc_icon.png</file>
         <file alias="item_delete.png">icons/item_delete.png</file>
+        <file alias="item_duplicate.png">icons/item_duplicate.png</file>
+        <file alias="item_copy.png">icons/item_copy.png</file>
+        <file alias="item_cut.png">icons/item_cut.png</file>
+        <file alias="item_paste.png">icons/item_paste.png</file>
         <file alias="printreport.png">icons/fcs_printreport.png</file>
         <file alias="savereport.png">icons/fcs_savereport.png</file>
         <file alias="importer_icon.png">icons/importer_icon.png</file>
@@ -196,6 +200,7 @@
         <file alias="insert_text.png">icons/insert_text.png</file>
         <file alias="key_enter.png">icons/key_enter.png</file>
         <file alias="table.png">icons/table.png</file>
+        <file alias="result_table.png">icons/result_table.png</file>
         <file alias="text.png">icons/text.png</file>
         <file alias="text_block.png">icons/text_block.png</file>
         <file alias="text_bold.png">icons/text_bold.png</file>

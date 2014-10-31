@@ -89,10 +89,11 @@ void myMessageOutput(QtMsgType type, const char *msg)
 MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     QMainWindow(NULL)
 {
+
     dlgUserFitFunctionEditor=NULL;
     projectModeEnabled=true;
     nonprojectTitle=tr("non-project mode");
-    projectFileFilter=tr("QuickFit Project (*.qfp *.qfpz);;QuickFit Project Autosave (*.qfp.autosave *.qfp.autosave.backup *.qfpz.autosave *.qfpz.autosave.backup);;QuickFit Project backup (*.qfp.backup *.qfpz.backup)");
+    projectFileFilter=tr("QuickFit Project (*.qfp *.qfpz *.qfp.gz);;QuickFit Project Autosave (*.qfp.autosave *.qfp.autosave.backup *.qfp.autosave.backup_old *.qfpz.autosave *.qfpz.autosave.backup *.qfpz.autosave.backup_old);;QuickFit Project backup (*.qfp.backup *.qfpz.backup *.qfp.backup_old *.qfpz.backup_old)");
     projectSaveFileFilter=tr("QuickFit Project (*.qfp);;Zipped QuickFit Project (*.qfpz)");
     settings=s;
     splashPix=splash->pixmap();
@@ -287,6 +288,8 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
 
     if (settings->getConfigValue("quickfit/checkupdates", true).toBool() ) QTimer::singleShot(2000, this, SLOT(checkUpdatesAutomatic()));
     QTimer::singleShot(100, this, SLOT(checkCallArguments()));
+    connect(QApplication::clipboard(), SIGNAL(dataChanged()), this, SLOT(clipboardDataChanged()));
+    clipboardDataChanged();
 }
 
 
@@ -1458,12 +1461,37 @@ void MainWindow::createActions() {
 
 
 
+    dupItemAct = new QAction(QIcon(":/lib/item_duplicate.png"), tr("&Duplicate Current Item(s)"), this);
+    dupItemAct->setStatusTip(tr("dupicates the currently selected items.\nIf a folder is selected, all files in the folder are duplicated"));
+    connect(dupItemAct, SIGNAL(triggered()), this, SLOT(duplicateItem()));
 
-    delItemAct = new QAction(QIcon(":/lib/item_delete.png"), tr("&Delete Current Item"), this);
+    tvMain->addAction(dupItemAct);
+
+
+    delItemAct = new QAction(QIcon(":/lib/item_delete.png"), tr("&Delete Current Item(s)"), this);
     delItemAct->setStatusTip(tr("delete the currently selected item (if deletable) ..."));
     connect(delItemAct, SIGNAL(triggered()), this, SLOT(deleteItem()));
 
     tvMain->addAction(delItemAct);
+
+    tvMain->addAction(getSeparatorAction(this));
+
+    copyItemAct = new QAction(QIcon(":/lib/item_copy.png"), tr("&Copy Current Item(s)"), this);
+    copyItemAct->setStatusTip(tr("copies the currently selected items into the clipboard"));
+    connect(copyItemAct, SIGNAL(triggered()), this, SLOT(copyItem()));
+    tvMain->addAction(copyItemAct);
+
+    cutItemAct = new QAction(QIcon(":/lib/item_cut.png"), tr("&Cut Current Item(s)"), this);
+    cutItemAct->setStatusTip(tr("cuts the currently selected items into the clipboard"));
+    connect(cutItemAct, SIGNAL(triggered()), this, SLOT(cutItem()));
+    tvMain->addAction(cutItemAct);
+
+    pastItemAct = new QAction(QIcon(":/lib/item_paste.png"), tr("&Paste Item(s)"), this);
+    pastItemAct->setStatusTip(tr("paste items from the clipboard into the current project"));
+    connect(pastItemAct, SIGNAL(triggered()), this, SLOT(pasteItem()));
+    tvMain->addAction(pastItemAct);
+
+
 
     actRDRReplace=new QAction(tr("find/replace in raw data record names/folders"), this);
     connect(actRDRReplace, SIGNAL(triggered()), this, SLOT(rdrReplace()));
@@ -1533,7 +1561,13 @@ void MainWindow::createMenus() {
 
     dataMenu->addMenu(insertItemMenu);
     dataMenu->addMenu(evaluationMenu);
+    dataMenu->addSeparator();
+    dataMenu->addAction(dupItemAct);
     dataMenu->addAction(delItemAct);
+    dataMenu->addSeparator();
+    dataMenu->addAction(copyItemAct);
+    dataMenu->addAction(cutItemAct);
+    dataMenu->addAction(pastItemAct);
 
     extensionMenu=menuBar()->addMenu(tr("&Extensions"));
     toolsMenu=menuBar()->addMenu(tr("&Tools"));
@@ -1614,6 +1648,7 @@ void MainWindow::createMenus() {
     menus["rdr_wizards"]=rdrWizardsMenu;
     menus["eval_wizards"]=evalWizardsMenu;
 
+    tvMain->addAction(getSeparatorAction(this));
     tvMain->addAction(insertItemMenu->menuAction());
     tvMain->addAction(evaluationMenu->menuAction());
 
@@ -1885,6 +1920,7 @@ bool MainWindow::saveProject(const QString &fileName) {
     QApplication::setOverrideCursor(Qt::WaitCursor);
     QElapsedTimer time;
     double elapsed=-1;
+    bool ok=true;
     if (project) {
 
         writeSettings();
@@ -1898,9 +1934,11 @@ bool MainWindow::saveProject(const QString &fileName) {
         }
         logFileProjectWidget->open_logfile(tr("%1.log").arg(fileName), true);
         logFileProjectWidget->clearLogStore();
+        project->resetError();
         time.start();
 
         project->writeXML(fileName);
+        ok=!project->error();
 
         /*if (fileName.toLower().contains(".qfpz") || fileName.toLower().contains(".qfp.gz")) {
             logFileProjectWidget->log_text("SAVING TO GZIPPED PROJECT!\n");
@@ -1928,6 +1966,7 @@ bool MainWindow::saveProject(const QString &fileName) {
         if (project->error()) {
             QMessageBox::critical(this, tr("QuickFit %1").arg(qfInfoVersionFull()), project->errorDescription());
             logFileProjectWidget->log_error(project->errorDescription()+"\n");
+            ok=false;
         }
         tvMain->setModel(project->getTreeModel());
         connect(project->getTreeModel(), SIGNAL(modelReset()), tvMain, SLOT(expandAll()));
@@ -1935,10 +1974,12 @@ bool MainWindow::saveProject(const QString &fileName) {
     }
     QApplication::restoreOverrideCursor();
 
-    setCurrentProject(fileName);
-    statusBar()->showMessage(tr("Project file '%1' saved!").arg(fileName), 2000);
-    logFileProjectWidget->log_text(tr("Project file '%1' saved after %2 secs (Filesize: %3 MB)!\n").arg(fileName).arg(elapsed).arg(double(QFileInfo(fileName).size())/1024.0/1024.0));
-    return true;
+    if (ok) {
+        setCurrentProject(fileName);
+        statusBar()->showMessage(tr("Project file '%1' saved!").arg(fileName), 2000);
+        logFileProjectWidget->log_text(tr("Project file '%1' saved after %2 secs (Filesize: %3 MB)!\n").arg(fileName).arg(elapsed).arg(double(QFileInfo(fileName).size())/1024.0/1024.0));
+    }
+    return ok;
 }
 
 void MainWindow::setCurrentProject(const QString &fileName) {
@@ -2085,6 +2126,161 @@ void MainWindow::deleteItem() {
                     }
                 }
             }
+        }
+    }
+}
+
+void MainWindow::duplicateItem()
+{
+    if (project) {
+        QFProjectTreeModelNode::nodeType nt=project->getTreeModel()->classifyIndex(tvMain->selectionModel()->currentIndex());
+        if (nt==QFProjectTreeModelNode::qfpntRawDataRecord) {
+            QFRawDataRecord* rec=project->getTreeModel()->getRawDataByIndex(tvMain->selectionModel()->currentIndex());
+            if (rec) {
+                project->duplicateRawData(rec->getID());
+            }
+        } else if (nt==QFProjectTreeModelNode::qfpntEvaluationRecord) {
+            QFEvaluationItem* rec=project->getTreeModel()->getEvaluationByIndex(tvMain->selectionModel()->currentIndex());
+            if (rec) {
+                project->duplicateEvaluation(rec->getID());
+            }
+        } else if (nt==QFProjectTreeModelNode::qfpntDirectory) {
+            QFProjectTreeModelNode* dir=project->getTreeModel()->getTreeNodeByIndex(tvMain->selectionModel()->currentIndex());
+            if (dir) {
+                QList<QFProjectTreeModelNode*> children=dir->getAllChildrenRDRandEval();
+                // build lists of the IDs to delete
+                QList<int> evalIDs, rdrIDs;
+                for (int i=0; i<children.size(); i++) {
+                    if (children[i]->type()==QFProjectTreeModelNode::qfpntEvaluationRecord && children[i]->evaluationItem())
+                        evalIDs<<children[i]->evaluationItem()->getID();
+                        //project->deleteEvaluation(children[i]->evaluationItem()->getID());
+                    if (children[i]->type()==QFProjectTreeModelNode::qfpntRawDataRecord && children[i]->rawDataRecord())
+                        rdrIDs<<children[i]->rawDataRecord()->getID();
+                        //project->deleteRawData(children[i]->rawDataRecord()->getID());
+                }
+                // delete IDs
+                for (int i=0; i<rdrIDs.size(); i++)  {
+                    project->duplicateRawData(rdrIDs[i]);
+                }
+                for (int i=0; i<evalIDs.size(); i++)  {
+                    project->duplicateEvaluation(evalIDs[i]);
+                }
+            }
+        }
+    }
+}
+
+void MainWindow::copyItem()
+{
+    QString mimetype="quickfit3/projectcopyxml";
+    if (project) {
+
+        QList<int> rdrs, evals;
+        QFProjectTreeModelNode::nodeType nt=project->getTreeModel()->classifyIndex(tvMain->selectionModel()->currentIndex());
+        if (nt==QFProjectTreeModelNode::qfpntRawDataRecord) {
+            QFRawDataRecord* rec=project->getTreeModel()->getRawDataByIndex(tvMain->selectionModel()->currentIndex());
+            if (rec) {
+                rdrs.append(rec->getID());
+            }
+        } else if (nt==QFProjectTreeModelNode::qfpntEvaluationRecord) {
+            QFEvaluationItem* rec=project->getTreeModel()->getEvaluationByIndex(tvMain->selectionModel()->currentIndex());
+            if (rec) {
+                evals.append(rec->getID());
+            }
+        } else if (nt==QFProjectTreeModelNode::qfpntDirectory) {
+            QFProjectTreeModelNode* dir=project->getTreeModel()->getTreeNodeByIndex(tvMain->selectionModel()->currentIndex());
+            if (dir) {
+                QList<QFProjectTreeModelNode*> children=dir->getAllChildrenRDRandEval();
+                // build lists of the IDs to delete
+                for (int i=0; i<children.size(); i++) {
+                    if (children[i]->type()==QFProjectTreeModelNode::qfpntEvaluationRecord && children[i]->evaluationItem()){
+                        int id=children[i]->evaluationItem()->getID();
+                        if (!evals.contains(id)) evals.append(id);
+                        //project->deleteEvaluation(children[i]->evaluationItem()->getID());
+                    }
+                    if (children[i]->type()==QFProjectTreeModelNode::qfpntRawDataRecord && children[i]->rawDataRecord()){
+                        int id=children[i]->rawDataRecord()->getID();
+                        if (!rdrs.contains(id)) rdrs.append(id);
+                        //project->deleteRawData(children[i]->rawDataRecord()->getID());
+                    }
+                }
+            }
+        }
+
+
+        //qDebug()<<rdrs<<evals;
+
+        if(rdrs.size()>0 || evals.size()>0) {
+            QString xml;
+            {
+                QXmlStreamWriter w(&xml);
+                w.writeStartDocument();
+                w.writeStartElement("quickfit3_projectcopyxml");
+                for (int i=0; i<rdrs.size(); i++) {
+                    QFRawDataRecord* r=project->getRawDataByID(rdrs[i]);
+                    if (r) {
+                        r->writeXML(w, QApplication::applicationFilePath());
+                    }
+                }
+                for (int i=0; i<evals.size(); i++) {
+                    QFEvaluationItem* r=project->getEvaluationByID(evals[i]);
+                    if (r) {
+                        r->writeXML(w, QApplication::applicationFilePath());
+                    }
+                }
+                w.writeEndElement();
+                w.writeEndDocument();
+            }
+            QClipboard *clipboard = QApplication::clipboard();
+            if (xml.size()>0) {
+                QMimeData* mime=new QMimeData();
+                mime->setData(mimetype, xml.toUtf8());
+                clipboard->setMimeData(mime);
+                //qDebug()<<"copied XML: "<<xml;
+            }
+        }
+    }
+}
+
+void MainWindow::cutItem()
+{
+    copyItem();
+    deleteItem();
+}
+
+void MainWindow::pasteItem()
+{
+    QString mimetype="quickfit3/projectcopyxml";
+    if (project && clipboardContainsProjectXML()) {
+        QClipboard *clipboard = QApplication::clipboard();
+        const QMimeData* mime=clipboard->mimeData();
+        if (mime) {
+            QString xml=QString::fromUtf8(mime->data(mimetype));
+            qDebug()<<"XML: "<<xml<<"\n\n";
+            QDomDocument doc;
+            if (doc.setContent(xml)) {
+                qDebug()<<"XML-Doc: "<<doc.toString();
+                QDomElement base=doc.firstChildElement("quickfit3_projectcopyxml");
+                QDomElement rdre=base.firstChildElement("rawdataelement");
+                while (!rdre.isNull()) {
+                    QString t=rdre.attribute("type");
+                    QFRawDataRecord* rdr=rawDataFactory->createRecord(t, project);
+                    if (rdr) {
+                        rdr->initNewID(rdre);
+                    }
+                    rdre=rdre.nextSiblingElement("rawdataelement");
+                }
+                QDomElement evale=base.firstChildElement("evaluationelement");
+                while (!evale.isNull()) {
+                    QString t=evale.attribute("type");
+                    QFEvaluationItem* eval=evaluationFactory->createRecord(t, this, project);
+                    if (eval) {
+                        eval->initNewID(evale);
+                    }
+                    evale=evale.nextSiblingElement("evaluationelement");
+                }
+            }
+
         }
     }
 }
@@ -2408,6 +2604,10 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     actRDRSetProperty->setEnabled(projectModeEnabled);
     actFixFilesPathes->setEnabled(projectModeEnabled);
     delItemAct->setEnabled(projectModeEnabled);
+    dupItemAct->setEnabled(projectModeEnabled);
+    copyItemAct->setEnabled(projectModeEnabled);
+    cutItemAct->setEnabled(projectModeEnabled);
+    pastItemAct->setEnabled(clipboardContainsProjectXML() && projectModeEnabled);
     recentMenu->setMenuEnabled(projectModeEnabled);
 
     setUpdatesEnabled(true);
@@ -2471,6 +2671,51 @@ void MainWindow::addHistogramToView(const QString &name, const QFHistogramServic
         histograms[name]->addCopiedHistogram(histogram.name, histogram.data.data(), histogram.data.size());
         histograms[name]->updateHistogram(true);
         //qDebug()<<"added "<<histogram.data.size()<<" to histogram "<<name<<" (name: "<<histogram.name<<")";
+    }
+}
+
+QWidget *MainWindow::getCreateTableView(const QString &name, const QString &title)
+{
+    if (!tables.contains(name)) {
+        tables[name]=new QFTableView(NULL);
+    }
+    tables[name]->setWindowTitle(title);
+    tables[name]->setWindowFlags(Qt::Window | Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowMinimizeButtonHint | Qt::WindowMaximizeButtonHint | Qt::WindowCloseButtonHint);
+    tables[name]->setWindowIcon(QIcon(":/lib/result_table.png"));
+    tables[name]->show();
+    tables[name]->raise();
+    //tables[name]->setAttribute(Qt::WA_DeleteOnClose);
+    if (tables.size()>1) {
+        QSize s=ProgramOptions::getConfigValue("QFTableView/size", QSize(800,600)).toSize();
+        QPoint p=tables[name]->pos();
+        if (tables.contains(lastHistogram)) {
+            p=tables[lastHistogram]->pos();
+            s=tables[lastHistogram]->size();
+        }
+
+        tables[name]->move(p+QPoint(32,32));
+        tables[name]->resize(s);
+    } else {
+        tables[name]->resize(QSize(500,300));
+    }
+    tables[name]->readSettings(*(ProgramOptions::getInstance()->getQSettings()), "tables/"+cleanStringForFilename(name)+"/");
+
+    lastHistogram=name;
+    return tables[name];
+}
+
+void MainWindow::clearTableView(const QString &name)
+{
+    if (tables.contains(name)) {
+        tables[name]->clear();
+        //qDebug()<<"cleared histogram "<<name;
+    }
+}
+
+void MainWindow::addColumnToTableView(const QString &name, const QFTableService::TableColumn &column)
+{
+    if (tables.contains(name)) {
+        tables[name]->addCopiedColumn(column.name, column.data.data(), column.data.size());
     }
 }
 
@@ -3604,6 +3849,18 @@ void MainWindow::openLabelLink(const QString &link)
         if (QMessageBox::question(this, tr("open URL"), tr("opne the URL\n   %1\nin the system's main webbrowser?").arg(link), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::Yes) QDesktopServices::openUrl(link);
     }
 
+}
+
+void MainWindow::clipboardDataChanged()
+{
+    pastItemAct->setEnabled(clipboardContainsProjectXML() && this->projectModeEnabled);
+}
+
+bool MainWindow::clipboardContainsProjectXML() const
+{
+     QClipboard *clipboard = QApplication::clipboard();
+     const QMimeData* mime=clipboard->mimeData();
+     return mime && mime->hasFormat("quickfit3/projectcopyxml");
 }
 
 QFRawDataRecordFactory *MainWindow::getRawDataRecordFactory() const

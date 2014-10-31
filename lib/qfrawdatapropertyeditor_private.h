@@ -174,6 +174,7 @@ class QFRawDataPropertyEditor_private : public QObject
         QAction* actStatistics;
         QAction* actStatisticsComparing;
         QAction* actCorrelation;
+        QAction* actShowData;
         /** \brief action used to copy selection in tvResults to clipbord, in expanded form */
         QAction* actCopyExpanded;
         QAction* actCopyExpandedNoHead;
@@ -315,6 +316,7 @@ class QFRawDataPropertyEditor_private : public QObject
         void selectRecordFromTreeSelected(const QModelIndex& index);
 
         void exportData();
+        void showData();
 };
 
 #endif // QFRAWDATAPROPERTYEDITOR_PRIVATE_H

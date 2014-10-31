@@ -37,6 +37,7 @@
 QFRDRTable::GraphInfo::GraphInfo() {
     moreProperties.clear();
     title="";
+    dataSortOrder=0;
     titleShow=true;
     isStrided=false;
     stride=1;
@@ -131,6 +132,18 @@ QFRDRTable::GraphInfo::GraphInfo() {
     dataSelect1CompareValue=0;
     dataSelect1CompareValue2=1;
 
+    dataSelectLogic12=dsoNone;
+    dataSelect2Column=-1;
+    dataSelect2Operation=dsoEquals;
+    dataSelect2CompareValue=0;
+    dataSelect2CompareValue2=1;
+
+    dataSelectLogic23=dsoNone;
+    dataSelect3Column=-1;
+    dataSelect3Operation=dsoEquals;
+    dataSelect3CompareValue=0;
+    dataSelect3CompareValue2=1;
+
     offset=0;
     xerrorcolumnlower=-1;
     yerrorcolumnlower=-1;
@@ -185,6 +198,13 @@ QFRDRTable::PlotInfo::PlotInfo()
     yAxis.label="y";
     showKey=true;
     grid=true;
+    gridMinor=false;
+
+    gridMinorX=true;
+    gridMinorY=true;
+    gridMajorX=true;
+    gridMajorY=true;
+
     QStringList fdb=QFontDatabase().families();
     fontName=QApplication::font().family();
     if (fdb.contains("DejaVu Sans")) fontName="DejaVu Sans";
@@ -211,6 +231,9 @@ QFRDRTable::PlotInfo::PlotInfo()
      gridColor=QColor("darkgrey");
      gridStyle=Qt::DashLine;
      gridWidth=0.5;
+     gridColorMinor=QColor("darkgrey");
+     gridStyleMinor=Qt::DotLine;
+     gridWidthMinor=0.3;
 
 
      keyXMargin=0.5;
@@ -231,6 +254,8 @@ QFRDRTable::PlotInfo::PlotInfo()
 QFRDRTable::QFRDRTable(QFProject* parent/*, QString name, QString inputFile*/):
     QFRawDataRecord(parent), QFFitAlgorithmParameterStorage(parent)//, name, QStringList(inputFile))
 {
+    qRegisterMetaType<QFRDRTable::GraphDataSelection>("QFRDRTable::GraphDataSelection");
+
     emitColGraphChangedSignals=true;
     datamodel=NULL;
     autocolors.append(QColor("red"));
@@ -312,7 +337,7 @@ void QFRDRTable::tableSetColumnData(quint32 column, const QList<QVariant> &data)
     }
 }
 
-QList<QVariant> QFRDRTable::tableGetColumnData(quint32 column)
+QList<QVariant> QFRDRTable::tableGetColumnData(quint32 column) const
 {
     if (datamodel)  {
         return datamodel->getColumnData(column);
@@ -327,7 +352,7 @@ void QFRDRTable::tableSetColumnDataAsDouble(quint32 column, const QVector<double
     }
 }
 
-QVector<double> QFRDRTable::tableGetColumnDataAsDouble(int column)
+QVector<double> QFRDRTable::tableGetColumnDataAsDouble(int column) const
 {
     if (datamodel)  {
         return datamodel->getColumnDataAsNumbers(column);
@@ -1502,8 +1527,8 @@ QFRawDataEditor *QFRDRTable::createEditor(QFPluginServices *services, QFRawDataP
                 QFRDRTableEditor* tabEdt=qobject_cast<QFRDRTableEditor*>(propEditor->getEditorList().value(j, NULL));
                 if (tabEdt) {
                     connect(edt, SIGNAL(performRefit(int,int)), tabEdt, SLOT(requestRefit(int,int)));
-                    connect(edt, SIGNAL(performFit(int,int,int,int,int,QString,bool,bool)), tabEdt, SLOT(requestFit(int,int,int,int,int,QString,bool,bool)));
-                    connect(edt, SIGNAL(performRegression(int,int,int,int,int,bool,bool)), tabEdt, SLOT(requestRegression(int,int,int,int,int,bool,bool)));
+                    connect(edt, SIGNAL(performFit(int,int,int,int,int,QString, QFRDRTable::GraphDataSelection ,bool,bool)), tabEdt, SLOT(requestFit(int,int,int,int,int,QString, QFRDRTable::GraphDataSelection ,bool,bool)));
+                    connect(edt, SIGNAL(performRegression(int,int,int,int,int, QFRDRTable::GraphDataSelection ,bool,bool)), tabEdt, SLOT(requestRegression(int,int,int,int,int, QFRDRTable::GraphDataSelection ,bool,bool)));
                 }
             }
         }
@@ -1562,6 +1587,7 @@ void QFRDRTable::readGraphInfo(GraphInfo& graph, QDomElement ge) {
     graph.errorLineStyle=String2QPenStyle(ge.attribute("error_line_style", "solid"));
     graph.errorBarSize=CQStringToDouble(ge.attribute("error_barsize", "7"));
 
+    graph.dataSortOrder=ge.attribute("data_sort_order", "0").toInt();
 
 
     graph.stride=ge.attribute("stride", "1").toInt();
@@ -1713,6 +1739,12 @@ void QFRDRTable::writePlotInfo(QXmlStreamWriter &w, const QFRDRTable::PlotInfo &
     w.writeAttribute("showkey", boolToQString(plot.showKey));
     w.writeAttribute("showtitle", boolToQString(plot.showTitle));
     w.writeAttribute("grid", boolToQString(plot.grid));
+    w.writeAttribute("grid_minor", boolToQString(plot.gridMinor));
+
+    w.writeAttribute("grid_minorx", boolToQString(plot.gridMinorX));
+    w.writeAttribute("grid_minory", boolToQString(plot.gridMinorY));
+    w.writeAttribute("grid_majorx", boolToQString(plot.gridMajorX));
+    w.writeAttribute("grid_majory", boolToQString(plot.gridMajorY));
 
     w.writeAttribute("keyfontsize", CDoubleToQString(plot.keyFontSize));
     w.writeAttribute("axisfontsize", CDoubleToQString(plot.axisFontSize));
@@ -1741,10 +1773,13 @@ void QFRDRTable::writePlotInfo(QXmlStreamWriter &w, const QFRDRTable::PlotInfo &
     w.writeAttribute("key_line_length", CDoubleToQString(plot.key_line_length));
 
 
-    w.writeAttribute("grid_width", CDoubleToQString(plot.gridWidth));
     w.writeAttribute("background_color", QColor2String(plot.backgroundColor));
+    w.writeAttribute("grid_width", CDoubleToQString(plot.gridWidth));
     w.writeAttribute("grid_color", QColor2String(plot.gridColor));
     w.writeAttribute("grid_style", QPenStyle2String(plot.gridStyle));
+    w.writeAttribute("grid_width_minor", CDoubleToQString(plot.gridWidthMinor));
+    w.writeAttribute("grid_color_minor", QColor2String(plot.gridColorMinor));
+    w.writeAttribute("grid_style_minor", QPenStyle2String(plot.gridStyleMinor));
 
 
 
@@ -1830,6 +1865,7 @@ void QFRDRTable::writeGraphInfo(QXmlStreamWriter &w, const QFRDRTable::GraphInfo
     w.writeAttribute("functiontype", GTFunctionType2String(graph.functionType));
     w.writeAttribute("fparams", doubleArrayToString_base64(graph.functionParameters));
     //w.writeAttribute("ferrors", doubleArrayToString_base64(graph.functionParameterErrors));
+    w.writeAttribute("data_sort_order", QString::number(graph.dataSortOrder));
     w.writeAttribute("stride", QString::number(graph.stride));
     w.writeAttribute("stride_start", QString::number(graph.strideStart));
     w.writeAttribute("is_strided", boolToQString(graph.isStrided));
@@ -1918,6 +1954,13 @@ void QFRDRTable::readPlotInfo(PlotInfo& plot, QDomElement te) {
     plot.graphWidth=te.attribute("gwidth", "150").toInt();
     plot.graphHeight=te.attribute("gheight", "150").toInt();
     plot.grid=QStringToBool( te.attribute("grid", "true"));
+    plot.gridMinor=QStringToBool( te.attribute("grid_minor", "false"));
+
+    plot.gridMinorX=QStringToBool( te.attribute("grid_minorx", "true"));
+    plot.gridMinorY=QStringToBool( te.attribute("grid_minory", "true"));
+    plot.gridMajorX=QStringToBool( te.attribute("grid_majorx", "true"));
+    plot.gridMajorY=QStringToBool( te.attribute("grid_majory", "true"));
+
     plot.showKey=QStringToBool( te.attribute("showkey", "true"));
     plot.showTitle=QStringToBool( te.attribute("showtitle", "true"));
     plot.fontName=te.attribute("fontname", "Arial");
@@ -1945,6 +1988,10 @@ void QFRDRTable::readPlotInfo(PlotInfo& plot, QDomElement te) {
     plot.gridColor=QStringToQColor(te.attribute("grid_color", "darkgrey"));
     plot.gridStyle=String2QPenStyle(te.attribute("grid_style", "dash"));
     plot.gridWidth=CQStringToDouble(te.attribute("grid_width", "1"));
+    plot.gridColorMinor=QStringToQColor(te.attribute("grid_color_minor", "darkgrey"));
+    plot.gridStyleMinor=String2QPenStyle(te.attribute("grid_style_minor", "dot"));
+    plot.gridWidthMinor=CQStringToDouble(te.attribute("grid_width_minor", "0.5"));
+
 
 
     plot.keyXMargin=CQStringToDouble(te.attribute("meyxmargin", "0.5"));
@@ -2291,3 +2338,423 @@ void QFRDRTable::loadColumnToComboBox(QComboBox *combo)
         }
     combo->setCurrentIndex(idx);
 }
+
+
+QFRDRTable::GraphDataSelection::GraphDataSelection()
+{
+    isStrided=false;
+    stride=1;
+    strideStart=1;
+    isDataSelect=false;
+    dataSelect1Column=-1;
+    dataSelect1Operation=dsoEquals;
+    dataSelect1CompareValue=0;
+    dataSelect1CompareValue2=1;
+
+    dataSelectLogic12=dsoNone;
+    dataSelect2Column=-1;
+    dataSelect2Operation=dsoEquals;
+    dataSelect2CompareValue=0;
+    dataSelect2CompareValue2=1;
+
+    dataSelectLogic23=dsoNone;
+    dataSelect3Column=-1;
+    dataSelect3Operation=dsoEquals;
+    dataSelect3CompareValue=0;
+    dataSelect3CompareValue2=1;
+}
+
+QFRDRTable::GraphDataSelection::GraphDataSelection(const QFRDRTable::GraphDataSelection &g)
+{
+    operator=(g);
+}
+
+QFRDRTable::GraphDataSelection &QFRDRTable::GraphDataSelection::operator=(const QFRDRTable::GraphInfo &g)
+{
+    isStrided=g.isStrided;
+    stride=g.stride;
+    strideStart=g.strideStart;
+    isDataSelect=g.isDataSelect;
+    dataSelect1Column=g.dataSelect1Column;
+    dataSelect1Operation=g.dataSelect1Operation;
+    dataSelect1CompareValue=g.dataSelect1CompareValue;
+    dataSelect1CompareValue2=g.dataSelect1CompareValue2;
+
+    dataSelectLogic12=g.dataSelectLogic12;
+    dataSelect2Column=g.dataSelect2Column;
+    dataSelect2Operation=g.dataSelect2Operation;
+    dataSelect2CompareValue=g.dataSelect2CompareValue;
+    dataSelect2CompareValue2=g.dataSelect2CompareValue2;
+
+    dataSelectLogic23=g.dataSelectLogic23;
+    dataSelect3Column=g.dataSelect3Column;
+    dataSelect3Operation=g.dataSelect3Operation;
+    dataSelect3CompareValue=g.dataSelect3CompareValue;
+    dataSelect3CompareValue2=g.dataSelect3CompareValue2;
+    return *this;
+}
+
+QFRDRTable::GraphDataSelection &QFRDRTable::GraphDataSelection::operator=(const QFRDRTable::GraphDataSelection &g)
+{
+    isStrided=g.isStrided;
+    stride=g.stride;
+    strideStart=g.strideStart;
+    isDataSelect=g.isDataSelect;
+    dataSelect1Column=g.dataSelect1Column;
+    dataSelect1Operation=g.dataSelect1Operation;
+    dataSelect1CompareValue=g.dataSelect1CompareValue;
+    dataSelect1CompareValue2=g.dataSelect1CompareValue2;
+
+    dataSelectLogic12=g.dataSelectLogic12;
+    dataSelect2Column=g.dataSelect2Column;
+    dataSelect2Operation=g.dataSelect2Operation;
+    dataSelect2CompareValue=g.dataSelect2CompareValue;
+    dataSelect2CompareValue2=g.dataSelect2CompareValue2;
+
+    dataSelectLogic23=g.dataSelectLogic23;
+    dataSelect3Column=g.dataSelect3Column;
+    dataSelect3Operation=g.dataSelect3Operation;
+    dataSelect3CompareValue=g.dataSelect3CompareValue;
+    dataSelect3CompareValue2=g.dataSelect3CompareValue2;
+    return *this;
+}
+
+bool QFRDRTable::GraphDataSelection::getDataWithStride(QVector<double> *dataOut, int* colOut, int column, const QFRDRTable *table, QString *newname, QFPlotter* plotter)
+{
+    if (colOut) *colOut=-1;
+    //qDebug()<<"getColumnWithStride  column="<<column<<"    strided: "<<g.isStrided<<" stride="<<g.stride<<" strideStart="<<g.strideStart;
+    if (column==-2) {
+        if (plotter && colOut) {
+            *colOut=plotter->getDatastore()->ensureColumnNum(QString("rowNumColSpecial"));
+            if (newname) *newname=QString("rowNumColSpecial");
+            return true;
+        } else if (dataOut && table) {
+            dataOut->clear();
+            for (int i=0; i<table->tableGetColumnCount(); i++) {
+                (*dataOut)<<i;
+            }
+            if (newname) *newname=QString("rowNumColSpecial");
+            return true;
+        }
+    }
+    if (plotter && colOut) {
+        if (column>=0 && column<(long)plotter->getDatastore()->getColumnCount()) {
+            QVector<double> data=plotter->getDatastore()->getColumn(column).copyData();
+            if (isDataSelect) {
+                QVector<double> dataS, dataS2, dataS3;
+                if (dataSelect1Column>=0 && dataSelect1Column<(long)plotter->getDatastore()->getColumnCount()) {
+                    dataS=plotter->getDatastore()->getColumn(dataSelect1Column).copyData();
+                }
+                int cnt=qMin(data.size(), dataS.size());
+                if (dataSelectLogic12!=QFRDRTable::dsoNone && dataSelect2Column>=0 && dataSelect2Column<(long)plotter->getDatastore()->getColumnCount()) {
+                    dataS2=plotter->getDatastore()->getColumn(dataSelect2Column).copyData();
+                    cnt=qMin(cnt, dataS2.size());
+                }
+                if (dataSelectLogic12!=QFRDRTable::dsoNone && dataSelectLogic23!=QFRDRTable::dsoNone && dataSelect3Column>=0 && dataSelect3Column<(long)plotter->getDatastore()->getColumnCount()) {
+                    dataS3=plotter->getDatastore()->getColumn(dataSelect3Column).copyData();
+                    cnt=qMin(cnt, dataS3.size());
+                }
+                QVector<double> dataO;
+                int istart=0;
+                int iinc=1;
+                if (isStrided) {
+                    istart=strideStart-1;
+                    iinc=stride;
+                }
+
+                for (int i=istart; i< cnt; i=i+iinc) {
+                    bool ok=true;
+                    if (dataS.size()>0) {
+                        ok=false;
+                        switch(dataSelect1Operation) {
+                            case QFRDRTable::dsoEquals:
+                                if (dataS[i]==dataSelect1CompareValue) ok=true;
+                                break;
+                            case QFRDRTable::dsoUnequal:
+                                if (dataS[i]!=dataSelect1CompareValue) ok=true;
+                                break;
+                            case QFRDRTable::dsoGreaterOrEqual:
+                                if (dataS[i]>=dataSelect1CompareValue) ok=true;
+                                break;
+                            case QFRDRTable::dsoSmallerOrEqual:
+                                if (dataS[i]<=dataSelect1CompareValue) ok=true;
+                                break;
+                            case QFRDRTable::dsoGreater:
+                                if (dataS[i]>dataSelect1CompareValue) ok=true;
+                                break;
+                            case QFRDRTable::dsoSmaller:
+                                if (dataS[i]<dataSelect1CompareValue) ok=true;
+                                break;
+                            case QFRDRTable::dsoInRange:
+                                if (dataS[i]>=dataSelect1CompareValue && dataS[i]<=dataSelect1CompareValue2) ok=true;
+                                break;
+                            case QFRDRTable::dsoOutOfRange:
+                                if (!(dataS[i]>=dataSelect1CompareValue && dataS[i]<=dataSelect1CompareValue2)) ok=true;
+                                break;
+                        }
+                        if (dataSelectLogic12!=QFRDRTable::dsoNone && dataS2.size()>0) {
+                            bool okLocal=false;
+                            switch(dataSelect2Operation) {
+                                case QFRDRTable::dsoEquals:
+                                    if (dataS2[i]==dataSelect2CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoUnequal:
+                                    if (dataS2[i]!=dataSelect2CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoGreaterOrEqual:
+                                    if (dataS2[i]>=dataSelect2CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoSmallerOrEqual:
+                                    if (dataS2[i]<=dataSelect2CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoGreater:
+                                    if (dataS2[i]>dataSelect2CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoSmaller:
+                                    if (dataS2[i]<dataSelect2CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoInRange:
+                                    if (dataS2[i]>=dataSelect2CompareValue && dataS2[i]<=dataSelect2CompareValue2) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoOutOfRange:
+                                    if (!(dataS2[i]>=dataSelect2CompareValue && dataS2[i]<=dataSelect2CompareValue2)) okLocal=true;
+                                    break;
+                            }
+                            if (dataSelectLogic12==QFRDRTable::dsoAnd) ok=ok&&okLocal;
+                            else if (dataSelectLogic12==QFRDRTable::dsoOr) ok=ok||okLocal;
+                            else if (dataSelectLogic12==QFRDRTable::dsoXor) ok=(ok&&!okLocal) || (!ok&&okLocal);
+                            if (dataSelectLogic23!=QFRDRTable::dsoNone && dataS3.size()>0) {
+                                okLocal=false;
+                                switch(dataSelect3Operation) {
+                                    case QFRDRTable::dsoEquals:
+                                        if (dataS3[i]==dataSelect3CompareValue) okLocal=true;
+                                        break;
+                                    case QFRDRTable::dsoUnequal:
+                                        if (dataS3[i]!=dataSelect3CompareValue) okLocal=true;
+                                        break;
+                                    case QFRDRTable::dsoGreaterOrEqual:
+                                        if (dataS3[i]>=dataSelect3CompareValue) okLocal=true;
+                                        break;
+                                    case QFRDRTable::dsoSmallerOrEqual:
+                                        if (dataS3[i]<=dataSelect3CompareValue) okLocal=true;
+                                        break;
+                                    case QFRDRTable::dsoGreater:
+                                        if (dataS3[i]>dataSelect3CompareValue) okLocal=true;
+                                        break;
+                                    case QFRDRTable::dsoSmaller:
+                                        if (dataS3[i]<dataSelect3CompareValue) okLocal=true;
+                                        break;
+                                    case QFRDRTable::dsoInRange:
+                                        if (dataS3[i]>=dataSelect3CompareValue && dataS3[i]<=dataSelect3CompareValue2) okLocal=true;
+                                        break;
+                                    case QFRDRTable::dsoOutOfRange:
+                                        if (!(dataS3[i]>=dataSelect3CompareValue && dataS3[i]<=dataSelect3CompareValue2)) okLocal=true;
+                                        break;
+                                }
+                                if (dataSelectLogic23==QFRDRTable::dsoAnd) ok=ok&&okLocal;
+                                else if (dataSelectLogic23==QFRDRTable::dsoOr) ok=ok||okLocal;
+                                else if (dataSelectLogic23==QFRDRTable::dsoXor) ok=(ok&&!okLocal) || (!ok&&okLocal);
+                            }
+                        }
+                    }
+
+                    if (ok) dataO.append(data[i]);
+                }
+                QString s1=tr("%1 %2 %3").arg(plotter->getDatastore()->getColumnNames().value(dataSelect1Column)).arg(QFRDRTable::DataSelectOperation2String(dataSelect1Operation)).arg(dataSelect1CompareValue);
+                QString s2="";
+                QString s3="";
+                if (dataSelectLogic12!=QFRDRTable::dsoNone) {
+                    if (dataSelectLogic12==QFRDRTable::dsoAnd) s2=s2+" && ";
+                    if (dataSelectLogic12==QFRDRTable::dsoOr) s2=s2+" || ";
+                    if (dataSelectLogic12==QFRDRTable::dsoXor) s2=s2+" ~~ ";
+                    s2=s2+tr("%1 %2 %3").arg(plotter->getDatastore()->getColumnNames().value(dataSelect2Column)).arg(QFRDRTable::DataSelectOperation2String(dataSelect2Operation)).arg(dataSelect2CompareValue);
+                    if (dataSelectLogic23!=QFRDRTable::dsoNone) {
+                        if (dataSelectLogic23==QFRDRTable::dsoAnd) s3=s3+" && ";
+                        if (dataSelectLogic23==QFRDRTable::dsoOr) s3=s3+" || ";
+                        if (dataSelectLogic23==QFRDRTable::dsoXor) s3=s3+" ~~ ";
+                        s3=s3+tr("%1 %2 %3").arg(plotter->getDatastore()->getColumnNames().value(dataSelect3Column)).arg(QFRDRTable::DataSelectOperation2String(dataSelect3Operation)).arg(dataSelect3CompareValue);
+                    }
+                }
+                QString nam= tr("(%2,%3)-strided, selected (%4%5%6) \"%1\"").arg(plotter->getDatastore()->getColumnNames().value(column)).arg(strideStart).arg(stride).arg(s1).arg(s2).arg(s3);
+                if (dataO.size()>0) {
+                    *colOut= plotter->getDatastore()->addCopiedColumn(dataO.data(), dataO.size(),nam);
+                    return true;
+                }
+                else return false;
+            } else {
+                if (isStrided) {
+                    *colOut= plotter->getDatastore()->copyColumn(column, strideStart-1, stride, tr("(%2,%3)-strided \"%1\"").arg(plotter->getDatastore()->getColumnNames().value(column)).arg(strideStart).arg(stride));
+                    return true;
+                } else {
+                    *colOut=column;
+                    return true;
+                }
+            }
+        }
+    } else if (dataOut && table) {
+        if (column>=0 && column<table->tableGetColumnCount()) {
+            QVector<double> data=table->tableGetColumnDataAsDouble(column);
+            if (isDataSelect) {
+                QVector<double> dataS, dataS2, dataS3;
+                if (dataSelect1Column>=0 && dataSelect1Column<(long)table->tableGetColumnCount()) {
+                    dataS=table->tableGetColumnDataAsDouble(dataSelect1Column);
+                }
+                int cnt=qMin(data.size(), dataS.size());
+                if (dataSelectLogic12!=QFRDRTable::dsoNone && dataSelect2Column>=0 && dataSelect2Column<(long)table->tableGetColumnCount()) {
+                    dataS2=table->tableGetColumnDataAsDouble(dataSelect2Column);
+                    cnt=qMin(cnt, dataS2.size());
+                }
+                if (dataSelectLogic12!=QFRDRTable::dsoNone && dataSelectLogic23!=QFRDRTable::dsoNone && dataSelect3Column>=0 && dataSelect3Column<(long)table->tableGetColumnCount()) {
+                    dataS3=table->tableGetColumnDataAsDouble(dataSelect3Column);
+                    cnt=qMin(cnt, dataS3.size());
+                }
+                QVector<double> dataO;
+                int istart=0;
+                int iinc=1;
+                if (isStrided) {
+                    istart=strideStart-1;
+                    iinc=stride;
+                }
+
+                for (int i=istart; i< cnt; i=i+iinc) {
+                    bool ok=true;
+                    if (dataS.size()>0) {
+                        ok=false;
+                        switch(dataSelect1Operation) {
+                            case QFRDRTable::dsoEquals:
+                                if (dataS[i]==dataSelect1CompareValue) ok=true;
+                                break;
+                            case QFRDRTable::dsoUnequal:
+                                if (dataS[i]!=dataSelect1CompareValue) ok=true;
+                                break;
+                            case QFRDRTable::dsoGreaterOrEqual:
+                                if (dataS[i]>=dataSelect1CompareValue) ok=true;
+                                break;
+                            case QFRDRTable::dsoSmallerOrEqual:
+                                if (dataS[i]<=dataSelect1CompareValue) ok=true;
+                                break;
+                            case QFRDRTable::dsoGreater:
+                                if (dataS[i]>dataSelect1CompareValue) ok=true;
+                                break;
+                            case QFRDRTable::dsoSmaller:
+                                if (dataS[i]<dataSelect1CompareValue) ok=true;
+                                break;
+                            case QFRDRTable::dsoInRange:
+                                if (dataS[i]>=dataSelect1CompareValue && dataS[i]<=dataSelect1CompareValue2) ok=true;
+                                break;
+                            case QFRDRTable::dsoOutOfRange:
+                                if (!(dataS[i]>=dataSelect1CompareValue && dataS[i]<=dataSelect1CompareValue2)) ok=true;
+                                break;
+                        }
+                        if (dataSelectLogic12!=QFRDRTable::dsoNone && dataS2.size()>0) {
+                            bool okLocal=false;
+                            switch(dataSelect2Operation) {
+                                case QFRDRTable::dsoEquals:
+                                    if (dataS2[i]==dataSelect2CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoUnequal:
+                                    if (dataS2[i]!=dataSelect2CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoGreaterOrEqual:
+                                    if (dataS2[i]>=dataSelect2CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoSmallerOrEqual:
+                                    if (dataS2[i]<=dataSelect2CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoGreater:
+                                    if (dataS2[i]>dataSelect2CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoSmaller:
+                                    if (dataS2[i]<dataSelect2CompareValue) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoInRange:
+                                    if (dataS2[i]>=dataSelect2CompareValue && dataS2[i]<=dataSelect2CompareValue2) okLocal=true;
+                                    break;
+                                case QFRDRTable::dsoOutOfRange:
+                                    if (!(dataS2[i]>=dataSelect2CompareValue && dataS2[i]<=dataSelect2CompareValue2)) okLocal=true;
+                                    break;
+                            }
+                            if (dataSelectLogic12==QFRDRTable::dsoAnd) ok=ok&&okLocal;
+                            else if (dataSelectLogic12==QFRDRTable::dsoOr) ok=ok||okLocal;
+                            else if (dataSelectLogic12==QFRDRTable::dsoXor) ok=(ok&&!okLocal) || (!ok&&okLocal);
+                            if (dataSelectLogic23!=QFRDRTable::dsoNone && dataS3.size()>0) {
+                                okLocal=false;
+                                switch(dataSelect3Operation) {
+                                    case QFRDRTable::dsoEquals:
+                                        if (dataS3[i]==dataSelect3CompareValue) okLocal=true;
+                                        break;
+                                    case QFRDRTable::dsoUnequal:
+                                        if (dataS3[i]!=dataSelect3CompareValue) okLocal=true;
+                                        break;
+                                    case QFRDRTable::dsoGreaterOrEqual:
+                                        if (dataS3[i]>=dataSelect3CompareValue) okLocal=true;
+                                        break;
+                                    case QFRDRTable::dsoSmallerOrEqual:
+                                        if (dataS3[i]<=dataSelect3CompareValue) okLocal=true;
+                                        break;
+                                    case QFRDRTable::dsoGreater:
+                                        if (dataS3[i]>dataSelect3CompareValue) okLocal=true;
+                                        break;
+                                    case QFRDRTable::dsoSmaller:
+                                        if (dataS3[i]<dataSelect3CompareValue) okLocal=true;
+                                        break;
+                                    case QFRDRTable::dsoInRange:
+                                        if (dataS3[i]>=dataSelect3CompareValue && dataS3[i]<=dataSelect3CompareValue2) okLocal=true;
+                                        break;
+                                    case QFRDRTable::dsoOutOfRange:
+                                        if (!(dataS3[i]>=dataSelect3CompareValue && dataS3[i]<=dataSelect3CompareValue2)) okLocal=true;
+                                        break;
+                                }
+                                if (dataSelectLogic23==QFRDRTable::dsoAnd) ok=ok&&okLocal;
+                                else if (dataSelectLogic23==QFRDRTable::dsoOr) ok=ok||okLocal;
+                                else if (dataSelectLogic23==QFRDRTable::dsoXor) ok=(ok&&!okLocal) || (!ok&&okLocal);
+                            }
+                        }
+                    }
+
+                    if (ok) dataO.append(data[i]);
+                }
+                QString s1=tr("%1 %2 %3").arg(table->tableGetColumnTitle(dataSelect1Column)).arg(QFRDRTable::DataSelectOperation2String(dataSelect1Operation)).arg(dataSelect1CompareValue);
+                QString s2="";
+                QString s3="";
+                if (dataSelectLogic12!=QFRDRTable::dsoNone) {
+                    if (dataSelectLogic12==QFRDRTable::dsoAnd) s2=s2+" && ";
+                    if (dataSelectLogic12==QFRDRTable::dsoOr) s2=s2+" || ";
+                    if (dataSelectLogic12==QFRDRTable::dsoXor) s2=s2+" ~~ ";
+                    s2=s2+tr("%1 %2 %3").arg(table->tableGetColumnTitle(dataSelect2Column)).arg(QFRDRTable::DataSelectOperation2String(dataSelect2Operation)).arg(dataSelect2CompareValue);
+                    if (dataSelectLogic23!=QFRDRTable::dsoNone) {
+                        if (dataSelectLogic23==QFRDRTable::dsoAnd) s3=s3+" && ";
+                        if (dataSelectLogic23==QFRDRTable::dsoOr) s3=s3+" || ";
+                        if (dataSelectLogic23==QFRDRTable::dsoXor) s3=s3+" ~~ ";
+                        s3=s3+tr("%1 %2 %3").arg(table->tableGetColumnTitle(dataSelect3Column)).arg(QFRDRTable::DataSelectOperation2String(dataSelect3Operation)).arg(dataSelect3CompareValue);
+                    }
+                }
+                QString nam= tr("(%2,%3)-strided, selected (%4%5%6) \"%1\"").arg(table->tableGetColumnTitle(column)).arg(strideStart).arg(stride).arg(s1).arg(s2).arg(s3);
+                if (dataO.size()>0) {
+                    *dataOut=dataO;
+                    if (newname) *newname=nam;
+                    return true;
+                }
+                else return false;
+            } else {
+                if (isStrided) {
+                    if (newname) *newname=tr("(%2,%3)-strided \"%1\"").arg(table->tableGetColumnTitle(column)).arg(strideStart).arg(stride);
+                    dataOut->clear();
+                    for (int i=strideStart-1; i<data.size(); i=i+stride) {
+                        if (i>=0 && i<data.size()) (*dataOut)<<data[i];
+                    }
+                    return true;
+                } else {
+                    if (newname) *newname=table->tableGetColumnTitle(column);
+                    *dataOut=data;
+                    return true;
+                }
+            }
+        }
+    }
+    if (dataOut) dataOut->clear();
+    if (newname) newname->clear();
+    if (colOut) *colOut=-1;
+    return false;
+}
+

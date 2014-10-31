@@ -96,6 +96,7 @@ $$endbox$$
 
 <h3>Result statistics/Plots</h3>
 <p>You may view the contents of selected cells as histogram using these functions:<ol>
+  <li><img src=":/libresult_table.png"> <b>Data Table</b> will show a new dialog with a table, which contains the data from all selected table cells. The data of each cell is shown in a separate column, so the data from cells, which contain arrays/matrices can be viewed in its completenes.</li>
   <li><img src=":/lib/result_statistics.png"> <b>histogram: column-wise</b> opens a <a href="qfhistogram.html">histogram window</a> that summarizes all selected values (vectors/matrizes are linearized) for each result into one histogram. So if you select the diffusion coefficients of species 1 and 2 from several runs, the window will contain two histograms, one for D1 and one for D2 overlayed. If you select data from several results (e.g. D1 and D2), QuickFit will ask whether to display all histograms in one window or to open one window per result.<br>Look at this example:  
   <center><img src="./pic/hist_eval.png"></center><br>
   This function will open one or two windows containing the histograms over each column. here's an example for one window (in the two-window case, the green and blue histograms will be displayed in one window each):

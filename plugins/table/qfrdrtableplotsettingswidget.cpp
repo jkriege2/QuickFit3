@@ -100,7 +100,8 @@ void QFRDRTablePlotSettingsWidget::setRecord(QFRDRTable *record, int graph)
             ui->axisY->setRecord(record, graph);
             ui->axisY->loadPlotData(g.yAxis);
 
-            ui->chkGrid->setChecked(g.grid);
+            ui->grpMajor->setChecked(g.grid);
+            ui->grpMinor->setChecked(g.gridMinor);
             ui->chkShowKey->setChecked(g.showKey);
             ui->cmbKeyPosition->setPosition(g.keyPosition);
             ui->spinKeyFontSize->setValue(g.keyFontSize);
@@ -120,11 +121,21 @@ void QFRDRTablePlotSettingsWidget::setRecord(QFRDRTable *record, int graph)
             ui->cmbKeyBoxColor->setCurrentColor(g.keyLineColor);
             ui->chkKeyBox->setChecked(g.keyBox);
 
-            ui->cmbGridColor->setCurrentColor(g.gridColor);
             ui->cmbBackgroundColor->setCurrentColor(g.backgroundColor);
+            ui->cmbGridColor->setCurrentColor(g.gridColor);
             ui->cmbGridLinestyle->setCurrentLineStyle(g.gridStyle);
             ui->spinGridWidth->setValue(g.gridWidth);
+            ui->cmbGridColorMinor->setCurrentColor(g.gridColorMinor);
+            ui->cmbGridLinestyleMinor->setCurrentLineStyle(g.gridStyleMinor);
+            ui->spinGridWidthMinor->setValue(g.gridWidthMinor);
             ui->sliderKeyTransparency->setValue(g.keyTransparency*255.0);
+
+            ui->chkGridMajorX->setChecked(g.gridMajorX);
+            ui->chkGridMajorY->setChecked(g.gridMajorY);
+            ui->chkGridMinorX->setChecked(g.gridMinorX);
+            ui->chkGridMinorY->setChecked(g.gridMinorY);
+
+
             ui->cmbKeyLayout->setCurrentIndex(g.keyLayout);
 
             ui->chkShowTitle->setChecked(g.showTitle);
@@ -237,8 +248,14 @@ void QFRDRTablePlotSettingsWidget::plotDataChanged() {
         p.graphAutosize=ui->chkPlotAutosize->isChecked();
         p.graphWidth=ui->spinWidth->value();
         p.graphHeight=ui->spinHeight->value();
-        p.grid=ui->chkGrid->isChecked();
+        p.grid=ui->grpMajor->isChecked();
+        p.gridMinor=ui->grpMinor->isChecked();
         p.showKey=ui->chkShowKey->isChecked();
+
+        p.gridMajorX=ui->chkGridMajorX->isChecked();
+        p.gridMajorY=ui->chkGridMajorY->isChecked();
+        p.gridMinorX=ui->chkGridMinorX->isChecked();
+        p.gridMinorY=ui->chkGridMinorY->isChecked();
 
         p.fontName=ui->cmbFontname->currentFont().family();
         p.axisFontSize=ui->spinAxisFontSize->value();
@@ -273,10 +290,13 @@ void QFRDRTablePlotSettingsWidget::plotDataChanged() {
         ui->axisY->storePlotData(p.yAxis);
 
 
-        p.gridColor=ui->cmbGridColor->currentColor();
         p.backgroundColor=ui->cmbBackgroundColor->currentColor();
+        p.gridColor=ui->cmbGridColor->currentColor();
         p.gridStyle=ui->cmbGridLinestyle->currentLineStyle();
         p.gridWidth=ui->spinGridWidth->value();
+        p.gridColorMinor=ui->cmbGridColorMinor->currentColor();
+        p.gridStyleMinor=ui->cmbGridLinestyleMinor->currentLineStyle();
+        p.gridWidthMinor=ui->spinGridWidthMinor->value();
         emit plotTitleChanged(this->plot, p.title);
 
         current->setPlot(this->plot, p);
@@ -297,7 +317,8 @@ void QFRDRTablePlotSettingsWidget::connectWidgets()
     //qDebug()<<"connectWidgets";
 
     connect(ui->edtTitle, SIGNAL(editingFinished()), this, SLOT(plotDataChanged()));
-    connect(ui->chkGrid, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->grpMajor, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->grpMinor, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     connect(ui->chkShowKey, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     connect(ui->cmbFontname, SIGNAL(currentIndexChanged(QString)), this, SLOT(plotDataChanged()));
     connect(ui->spinAxisFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
@@ -312,11 +333,19 @@ void QFRDRTablePlotSettingsWidget::connectWidgets()
     connect(ui->chkKeepAxisAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     connect(ui->chkKeepDataAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
 
-    connect(ui->cmbGridColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     connect(ui->cmbBackgroundColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbGridColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     connect(ui->cmbGridLinestyle, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     connect(ui->spinGridWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbGridColorMinor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->cmbGridLinestyleMinor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    connect(ui->spinGridWidthMinor, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
 
+
+    connect(ui->chkGridMajorX, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->chkGridMajorY, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->chkGridMinorX, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    connect(ui->chkGridMinorY, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
 
 
     connect(ui->cmbKeyBackground, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
@@ -351,9 +380,15 @@ void QFRDRTablePlotSettingsWidget::disconnectWidgets()
     ui->axisX->disconnectWidgets();
     ui->axisY->disconnectWidgets();
 
+    disconnect(ui->chkGridMajorX, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkGridMajorY, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkGridMinorX, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->chkGridMinorY, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+
     disconnect(ui->edtTitle, SIGNAL(editingFinished()), this, SLOT(plotDataChanged()));
-    disconnect(ui->chkGrid, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->grpMajor, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     disconnect(ui->chkShowKey, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
+    disconnect(ui->grpMinor, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     disconnect(ui->cmbFontname, SIGNAL(currentIndexChanged(QString)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinAxisFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinAxisLabelFontSize, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
@@ -366,10 +401,13 @@ void QFRDRTablePlotSettingsWidget::disconnectWidgets()
     disconnect(ui->edtDataAspect, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->chkKeepAxisAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
     disconnect(ui->chkKeepDataAspect, SIGNAL(toggled(bool)), this, SLOT(plotDataChanged()));
-    disconnect(ui->cmbGridColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     disconnect(ui->cmbBackgroundColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbGridColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     disconnect(ui->cmbGridLinestyle, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinGridWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbGridColorMinor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->cmbGridLinestyleMinor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinGridWidthMinor, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->cmbKeyBackground, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     disconnect(ui->cmbKeyBoxColor, SIGNAL(currentIndexChanged(int)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinKeyBoxWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
@@ -419,39 +457,7 @@ void QFRDRTablePlotSettingsWidget::on_btnSaveSystem_clicked() {
                 f.close();
             }
 
-            /*QSettings set(filename, QSettings::IniFormat);
 
-            ui->axisX->saveToSettings(set, "x");
-            ui->axisY->saveToSettings(set, "y");
-
-            set.setValue("title", ui->edtTitle->text());
-            set.setValue("autosize",ui->chkPlotAutosize->isChecked());
-            set.setValue("plotwidth",ui->spinWidth->value());
-            set.setValue("plotheight",ui->spinHeight->value());
-            set.setValue("grid",ui->chkGrid->isChecked());
-            set.setValue("showkey",ui->chkShowKey->isChecked());
-            set.setValue("fontname", ui->cmbFontname->currentText());
-            set.setValue("axisfontsize", ui->spinAxisFontSize->value());
-            set.setValue("axislabelfontsize", ui->spinAxisLabelFontSize->value());
-            set.setValue("keyfontsize", ui->spinKeyFontSize->value());
-            set.setValue("titlefontsize", ui->spinTitleFontSize->value());
-            set.setValue("keytransparency", ui->sliderKeyTransparency->value());
-            set.setValue("keylayout", ui->cmbKeyLayout->currentIndex());
-            set.setValue("keyposition", ui->cmbKeyPosition->currentIndex());
-            set.setValue("axisaspect", ui->edtAxisAspect->value());
-            set.setValue("dataaspect", ui->edtDataAspect->value());
-            set.setValue("keepaxisaspect", ui->chkKeepAxisAspect->isChecked());
-            set.setValue("keepdataaspect", ui->chkKeepDataAspect->isChecked());
-            set.setValue("backgroundColor", QColor2String(ui->cmbBackgroundColor->currentColor()));
-            set.setValue("gridColor", QColor2String(ui->cmbGridColor->currentColor()));
-            set.setValue("gridStyle", QPenStyle2String(ui->cmbGridLinestyle->currentLineStyle()));
-            set.setValue("gridWidth", ui->spinGridWidth->value());
-
-
-            set.setValue("keyBackgroundColor", QColor2String(ui->cmbKeyBackground->currentColor()));
-            set.setValue("keyBoxColor", QColor2String(ui->cmbKeyBoxColor->currentColor()));
-            set.setValue("keyBox", ui->chkKeyBox->isChecked());
-            set.setValue("keyBoxWidth", ui->spinKeyBoxWidth->value());*/
 
         }
     }
@@ -484,7 +490,8 @@ void QFRDRTablePlotSettingsWidget::on_btnLoadSystem_clicked() {
             ui->spinHeight->setValue(set.value("plotheight", ui->spinHeight->value()).toInt());
 
             ui->edtTitle->setText(set.value("title", ui->edtTitle->text()).toString());
-            ui->chkGrid->setChecked(set.value("grid",ui->chkGrid->isChecked()).toBool());
+            ui->grpMajor->setChecked(set.value("grid",ui->grpMajor->isChecked()).toBool());
+            ui->grpMinor->setChecked(set.value("gridMinor",ui->grpMinor->isChecked()).toBool());
             ui->chkShowKey->setChecked(set.value("showkey",ui->chkShowKey->isChecked()).toBool());
             ui->cmbFontname->setCurrentFont(QFont(set.value("fontname", ui->cmbFontname->currentFont().family()).toString()));
             ui->spinAxisFontSize->setValue(set.value("axisfontsize", ui->spinAxisFontSize->value()).toDouble());
@@ -498,10 +505,13 @@ void QFRDRTablePlotSettingsWidget::on_btnLoadSystem_clicked() {
             ui->edtDataAspect->setValue(set.value("dataaspect", ui->edtDataAspect->value()).toDouble());
             ui->chkKeepAxisAspect->setChecked(set.value("keepaxisaspect", ui->chkKeepAxisAspect->isChecked()).toBool());
             ui->chkKeepDataAspect->setChecked(set.value("keepdataaspect", ui->chkKeepDataAspect->isChecked()).toBool());
-            ui->cmbGridColor->setCurrentColor(QColor(set.value("gridColor", QColor2String(ui->cmbGridColor->currentColor())).toString()));
             ui->cmbBackgroundColor->setCurrentColor(QColor(set.value("backgroundColor", QColor2String(ui->cmbBackgroundColor->currentColor())).toString()));
+            ui->cmbGridColor->setCurrentColor(QColor(set.value("gridColor", QColor2String(ui->cmbGridColor->currentColor())).toString()));
             ui->cmbGridLinestyle->setCurrentLineStyle(String2QPenStyle(set.value("gridStyle", QPenStyle2String(ui->cmbGridLinestyle->currentLineStyle())).toString()));
             ui->spinGridWidth->setValue(set.value("gridWidth", ui->spinGridWidth->value()).toDouble());
+            ui->cmbGridColorMinor->setCurrentColor(QColor(set.value("gridColorMinor", QColor2String(ui->cmbGridColorMinor->currentColor())).toString()));
+            ui->cmbGridLinestyleMinor->setCurrentLineStyle(String2QPenStyle(set.value("gridStyleMinor", QPenStyle2String(ui->cmbGridLinestyleMinor->currentLineStyle())).toString()));
+            ui->spinGridWidthMinor->setValue(set.value("gridWidthMinor", ui->spinGridWidthMinor->value()).toDouble());
 
 
             ui->chkKeyBox->setChecked(set.value("keyBox", ui->chkKeyBox->isChecked()).toBool());

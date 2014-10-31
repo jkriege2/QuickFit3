@@ -62,6 +62,20 @@ void QFEvaluationItem::init(QDomElement& e, bool loadAsDummy) {
     //std::cout<<"created QFEvaluationItem\n";
 }
 
+void QFEvaluationItem::initNewID(QDomElement &e)
+{
+    //std::cout<<"creating QFEvaluationItem\n";
+    name="";;
+    description="";
+    //std::cout<<"  reading XML\n";
+    readXML(e, false, false);
+    //std::cout<<"  registering record\n";
+    project->registerEvaluation(this);
+    //std::cout<<"created QFEvaluationItem\n";
+
+
+}
+
 bool QFEvaluationItem::isFilteredAndApplicable(QFRawDataRecord *record)
 {
     if (!record) return false;
@@ -83,14 +97,16 @@ QFEvaluationItem::~QFEvaluationItem() {
     //std::cout<<"deleting QFEvaluationItem ... OK\n";
 }
 
-void QFEvaluationItem::readXML(QDomElement& e, bool loadAsDummy) {
+void QFEvaluationItem::readXML(QDomElement& e, bool loadAsDummy, bool readID) {
     bool ok=true;
     name=e.attribute("name", "evaluation");
-    ID=e.attribute("id", "-1").toInt(&ok);
-    if (ID==-1) { setError(tr("invalid ID in <evaluation name=\"%1\" ...>!").arg(name)); return; }
-    if (!project->checkID(ID)) {
-        setError(tr("ID %1 in <evaluation name=\"%2\" ...> already in use in the project!").arg(ID).arg(name));
-        return;
+    if (readID) {
+        ID=e.attribute("id", "-1").toInt(&ok);
+        if (ID==-1) { setError(tr("invalid ID in <evaluation name=\"%1\" ...>!").arg(name)); return; }
+        if (!project->checkID(ID)) {
+            setError(tr("ID %1 in <evaluation name=\"%2\" ...> already in use in the project!").arg(ID).arg(name));
+            return;
+        }
     }
     QDomElement te=e.firstChildElement("description");
     if (te.isNull()) { description=""; } else { description=te.text(); }
@@ -129,7 +145,7 @@ void QFEvaluationItem::readXML(QDomElement& e, bool loadAsDummy) {
 }
 
 
-void QFEvaluationItem::writeXML(QXmlStreamWriter& w, const QString &projectfilename, bool copyFilesToSubfolder, const QString &subfoldername, QList<QFProject::FileCopyList> *filecopylist) {
+void QFEvaluationItem::writeXML(QXmlStreamWriter& w, const QString &projectfilename, bool copyFilesToSubfolder, const QString &subfoldername, QList<QFProject::FileCopyList> *filecopylist, int writeMode) {
     w.writeStartElement("evaluationelement");
     w.writeAttribute("type", getType());
     w.writeAttribute("name", name);

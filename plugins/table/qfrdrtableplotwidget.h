@@ -58,12 +58,12 @@ class QFRDRTablePlotWidget : public QWidget
     signals:
         void plotTitleChanged(int plot, QString title);
     signals:
-        void performFit(int xCol, int yCol, int sigmaCol, int plot, int graph, QString function,bool xlog,bool ylog);
-        void performRegression(int xCol, int yCol, int sigmaCol, int plot,int graph,bool xlog,bool ylog);
+        void performFit(int xCol, int yCol, int sigmaCol, int plot, int graph, QString function, QFRDRTable::GraphDataSelection sel,bool xlog,bool ylog);
+        void performRegression(int xCol, int yCol, int sigmaCol, int plot,int graph, QFRDRTable::GraphDataSelection sel,bool xlog,bool ylog);
         void performRefit(int plot, int graph);
     protected slots:
-        void doFit(int xCol, int yCol, int sigmaCol, int plot, QString function);
-        void doRegression(int xCol, int yCol, int sigmaCol, int plot);
+        void doFit(int xCol, int yCol, int sigmaCol, int plot, QString function, QFRDRTable::GraphDataSelection sel);
+        void doRegression(int xCol, int yCol, int sigmaCol, int plot, QFRDRTable::GraphDataSelection sel);
         void doRefit(int plot);
         void listGraphs_currentRowChanged(int currentRow);
         void on_btnDeleteGraph_clicked();
@@ -93,7 +93,7 @@ class QFRDRTablePlotWidget : public QWidget
         void autoColorGraph(QFRDRTable::GraphInfo& g, QColor color);
 
 
-        void setAxisProps(JKQTPcoordinateAxis *axis, const QFRDRTable::AxisInfo &axisData, const QFRDRTable::PlotInfo &p);
+        void setAxisProps(JKQTPcoordinateAxis *axis, const QFRDRTable::AxisInfo &axisData, const QFRDRTable::PlotInfo &p, bool minorGrid=true, bool majorGrid=true);
     private:
         Ui::QFRDRTablePlotWidget *ui;
         QToolBar* toolbarPlot;

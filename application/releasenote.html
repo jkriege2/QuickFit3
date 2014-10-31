@@ -115,9 +115,12 @@
             <li>added support for zipped QFP-project files (*.qfpz)</li>
             <li>added function (File | Compress Project), which compresses the project file and all linked (and required) files into a single ZIP-archive</li>
             <li>bugfix: possible crash, when user adds a new property to an RDR</li>
-            <li>added welcome screen</li>
+            <li>added welcome screen, which allows to access common tasks (new Project/open project/wizards), the recent projects, the tutorials and some of the online-help</li>
             <li>added buttons "toggle selected"/"select selected"/"deselct selected" to the project tools "set/calculate RDR properties ..."</li>
             <li>bugfix: "set properties in multiple RDRs" now works correctly for name/folder/group/role (did not set the given string, but tried to convert it in some cases to a number/Boolean)</li>
+            <li>added additional level of project backup file (*.qfp.backup_old)</li>
+            <li>added menu entries to main window, which allow to duplicate items (RDRs/evals) and to copy/cut/paste items to/from the clipboard</li>
+            <li>added button/menu entries to evaluation and RDR editors, which allows to view vector/list/matrix data from the results tables as a new table, where each cell is displayed in its own column.</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -266,6 +269,9 @@
             <li>added "import into table" function+button</li>
             <li>added option to rotate axis tick labels</li>
             <li>improved startup speed of column editor dialog</li>
+            <li>data for plots can be sorted now</li>
+            <li>added widgets to control the major and minor grids of a plot more finely (width/color/style separate for both grids and grids switchable along all axes)</li>
+            <li>fit/regression now also minds strided and selected data</li>
       </ul></li>
       <li><b>B040SPIM</b><ul>
             <li>added JavaScript functions to set preview acquisition camera parameters</li>

@@ -52,7 +52,7 @@
 #include <QRadioButton>
 
 /*! \brief This class displays a histogram together with some statistical data on it
-    \ingroup qf3rdrdp_imaging_fcs
+    \ingroup qf3lib_widgets
 
 
 

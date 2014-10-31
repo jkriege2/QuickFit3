@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>605</width>
+    <width>633</width>
     <height>1270</height>
    </rect>
   </property>
@@ -383,7 +383,7 @@
      </layout>
     </widget>
    </item>
-   <item row="20" column="0">
+   <item row="21" column="0">
     <widget class="QLabel" name="labColor">
      <property name="font">
       <font>
@@ -399,7 +399,7 @@
      </property>
     </widget>
    </item>
-   <item row="20" column="1">
+   <item row="21" column="1">
     <widget class="QWidget" name="widColor" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_17" stretch="1,0,0,0">
       <property name="leftMargin">
@@ -501,7 +501,7 @@
      </layout>
     </widget>
    </item>
-   <item row="21" column="0">
+   <item row="22" column="0">
     <widget class="QLabel" name="labLinestyle">
      <property name="font">
       <font>
@@ -517,7 +517,7 @@
      </property>
     </widget>
    </item>
-   <item row="21" column="1">
+   <item row="22" column="1">
     <widget class="QWidget" name="widLineStyle" native="true">
      <layout class="QGridLayout" name="gridLayout_4" columnstretch="0,0,0,0,0,0">
       <property name="leftMargin">
@@ -603,7 +603,7 @@
      </layout>
     </widget>
    </item>
-   <item row="22" column="0">
+   <item row="23" column="0">
     <widget class="QLabel" name="labFillColor">
      <property name="font">
       <font>
@@ -619,7 +619,7 @@
      </property>
     </widget>
    </item>
-   <item row="22" column="1">
+   <item row="23" column="1">
     <widget class="QWidget" name="widFillColor" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_16" stretch="0,0,0,0,0,0">
       <property name="leftMargin">
@@ -736,7 +736,7 @@
      </layout>
     </widget>
    </item>
-   <item row="23" column="0">
+   <item row="24" column="0">
     <widget class="QLabel" name="labSymbol">
      <property name="font">
       <font>
@@ -752,7 +752,7 @@
      </property>
     </widget>
    </item>
-   <item row="23" column="1">
+   <item row="24" column="1">
     <widget class="QWidget" name="widSymbol" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_22" stretch="1,0,0">
       <property name="leftMargin">
@@ -812,7 +812,7 @@
      </layout>
     </widget>
    </item>
-   <item row="26" column="0">
+   <item row="27" column="0">
     <widget class="QLabel" name="labErrorStyle">
      <property name="font">
       <font>
@@ -828,7 +828,7 @@
      </property>
     </widget>
    </item>
-   <item row="26" column="1">
+   <item row="27" column="1">
     <widget class="QWidget" name="widErrorStyle" native="true">
      <layout class="QVBoxLayout" name="verticalLayout">
       <property name="spacing">
@@ -1036,7 +1036,7 @@
      </layout>
     </widget>
    </item>
-   <item row="28" column="0">
+   <item row="29" column="0">
     <widget class="QLabel" name="labImage">
      <property name="font">
       <font>
@@ -1052,7 +1052,7 @@
      </property>
     </widget>
    </item>
-   <item row="28" column="1">
+   <item row="29" column="1">
     <widget class="QWidget" name="widImage" native="true">
      <layout class="QGridLayout" name="gridLayout_5" rowminimumheight="0,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
       <property name="leftMargin">
@@ -1784,7 +1784,7 @@
      </layout>
     </widget>
    </item>
-   <item row="31" column="1">
+   <item row="32" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <spacer name="horizontalSpacer">
@@ -1924,7 +1924,7 @@
    <item row="16" column="1">
     <widget class="QEnhancedTableView" name="tabFunctionParameters"/>
    </item>
-   <item row="24" column="0">
+   <item row="25" column="0">
     <widget class="QLabel" name="labWidth">
      <property name="font">
       <font>
@@ -1940,7 +1940,7 @@
      </property>
     </widget>
    </item>
-   <item row="24" column="1">
+   <item row="25" column="1">
     <widget class="QWidget" name="widWidth" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <property name="leftMargin">
@@ -2061,7 +2061,7 @@
      </layout>
     </widget>
    </item>
-   <item row="19" column="0">
+   <item row="20" column="0">
     <widget class="QLabel" name="labRangeData">
      <property name="font">
       <font>
@@ -2077,7 +2077,7 @@
      </property>
     </widget>
    </item>
-   <item row="19" column="1">
+   <item row="20" column="1">
     <widget class="QWidget" name="widRangeData" native="true">
      <layout class="QGridLayout" name="gridLayout">
       <property name="leftMargin">
@@ -2146,7 +2146,7 @@
      </layout>
     </widget>
    </item>
-   <item row="29" column="0">
+   <item row="30" column="0">
     <widget class="QLabel" name="labRangeStyle">
      <property name="font">
       <font>
@@ -2162,7 +2162,7 @@
      </property>
     </widget>
    </item>
-   <item row="29" column="1">
+   <item row="30" column="1">
     <widget class="QWidget" name="widRangeStyle" native="true">
      <layout class="QGridLayout" name="gridLayout_3">
       <property name="leftMargin">
@@ -2912,7 +2912,7 @@
      </layout>
     </widget>
    </item>
-   <item row="25" column="0">
+   <item row="26" column="0">
     <widget class="QLabel" name="labOffset">
      <property name="font">
       <font>
@@ -2928,7 +2928,7 @@
      </property>
     </widget>
    </item>
-   <item row="25" column="1">
+   <item row="26" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout_13">
      <item>
       <widget class="QFDoubleEdit" name="edtOffset">
@@ -3198,6 +3198,38 @@
      </item>
     </layout>
    </item>
+   <item row="19" column="0">
+    <widget class="QLabel" name="labSort">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>sort order:</string>
+     </property>
+    </widget>
+   </item>
+   <item row="19" column="1">
+    <widget class="QComboBox" name="cmbSort">
+     <item>
+      <property name="text">
+       <string>as in table (unsorted)</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>sort in X direction</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>sort in Y direction</string>
+      </property>
+     </item>
+    </widget>
+   </item>
   </layout>
  </widget>
  <customwidgets>
@@ -3377,8 +3409,8 @@
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
-  <include location="qfrdrtable.qrc"/>
   <include location="../../lib/lib.qrc"/>
+  <include location="qfrdrtable.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>

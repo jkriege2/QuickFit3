@@ -38,7 +38,7 @@ class QFRDRTableRegressionDialog : public QDialog
         Q_OBJECT
         
     public:
-        explicit QFRDRTableRegressionDialog(QFRDRTable* table, int colX, int colY, int colW, QWidget *parent = 0, bool logX=false, bool logY=false, int resultColumn=-1, int addGraph=-1, int sourcegraph=-1);
+        explicit QFRDRTableRegressionDialog(QFRDRTable* table, int colX, int colY, int colW, QFRDRTable::GraphDataSelection sel, QWidget *parent = 0, bool logX=false, bool logY=false, int resultColumn=-1, int addGraph=-1, int sourcegraph=-1);
         explicit QFRDRTableRegressionDialog(QFRDRTable* table, int plotid, int graphid, QWidget *parent = 0);
         ~QFRDRTableRegressionDialog();
 
@@ -64,6 +64,8 @@ class QFRDRTableRegressionDialog : public QDialog
         int datapoints;
         QString fitresult;
         int colX,  colY,  colW;
+
+        QFRDRTable::GraphDataSelection selection;
 
         int overwriteGraph;
         int overwritePlot;

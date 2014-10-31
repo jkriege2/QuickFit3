@@ -64,8 +64,8 @@ QFRDRTablePlotWidget::QFRDRTablePlotWidget(QWidget *parent) :
     //ui->scrollArea->setWidget();
 
     connect(ui->widGraphSettings, SIGNAL(performRefit(int)), this, SLOT(doRefit(int)));
-    connect(ui->widGraphSettings, SIGNAL(performFit(int,int,int,int,QString)), this, SLOT(doFit(int,int,int,int,QString)));
-    connect(ui->widGraphSettings, SIGNAL(performRegression(int,int,int,int)), this, SLOT(doRegression(int,int,int,int)));
+    connect(ui->widGraphSettings, SIGNAL(performFit(int,int,int,int,QString,QFRDRTable::GraphDataSelection)), this, SLOT(doFit(int,int,int,int,QString,QFRDRTable::GraphDataSelection)));
+    connect(ui->widGraphSettings, SIGNAL(performRegression(int,int,int,int, QFRDRTable::GraphDataSelection)), this, SLOT(doRegression(int,int,int,int,QFRDRTable::GraphDataSelection)));
     connect(ui->widSystemSettings, SIGNAL(plotSettingsChanged()), this, SLOT(updateGraph()));
     connect(ui->widGraphSettings, SIGNAL(reloadGraph()), this, SLOT(reloadGraphData()));
 
@@ -365,7 +365,7 @@ void QFRDRTablePlotWidget::plotDataChanged() {
 }
 
 
-void QFRDRTablePlotWidget::setAxisProps(JKQTPcoordinateAxis* axis, const QFRDRTable::AxisInfo& axisData, const QFRDRTable::PlotInfo& p) {
+void QFRDRTablePlotWidget::setAxisProps(JKQTPcoordinateAxis* axis, const QFRDRTable::AxisInfo& axisData, const QFRDRTable::PlotInfo& p, bool minorGrid, bool majorGrid) {
     axis->clearAxisTickLabels();
     axis->set_axisLabel(axisData.label);
     axis->set_logAxis(axisData.log);
@@ -374,9 +374,14 @@ void QFRDRTablePlotWidget::setAxisProps(JKQTPcoordinateAxis* axis, const QFRDRTa
     axis->set_labelFontSize(p.axisLabelFontSize);
     axis->set_tickLabelFont(p.fontName);
     axis->set_tickLabelFontSize(p.axisFontSize);
+    axis->set_drawGrid(p.grid&&majorGrid);
     axis->set_gridWidth(p.gridWidth);
     axis->set_gridStyle(p.gridStyle);
     axis->set_gridColor(p.gridColor);
+    axis->set_minorGridWidth(p.gridWidthMinor);
+    axis->set_minorGridStyle(p.gridStyleMinor);
+    axis->set_minorGridColor(p.gridColorMinor);
+    axis->set_drawMinorGrid(p.gridMinor&&minorGrid);
     axis->set_minTicks(axisData.minTicks);
     axis->set_minorTicks(axisData.minorTicks);
     axis->set_labelPosition(axisData.labelPos);
@@ -437,8 +442,8 @@ void QFRDRTablePlotWidget::updateGraph() {
 
         ui->plotter->setMagnification(m);
 
-        setAxisProps( ui->plotter->getXAxis(), p.xAxis, p);
-        setAxisProps( ui->plotter->getYAxis(), p.yAxis, p);
+        setAxisProps( ui->plotter->getXAxis(), p.xAxis, p, p.gridMinorX, p.gridMajorX);
+        setAxisProps( ui->plotter->getYAxis(), p.yAxis, p, p.gridMinorY, p.gridMajorY);
 
 
         ui->plotter->get_plotter()->set_plotLabelFontname(p.fontName);
@@ -486,6 +491,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                pg->set_sortData(g.dataSortOrder);
                 pg->set_baseline(g.offset);
                 /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
                 if (pg->get_xErrorColumn()>=0) {
@@ -538,6 +544,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_xErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
                 pg->set_baseline(g.offset);
+                pg->set_sortData(g.dataSortOrder);
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
@@ -584,6 +591,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_width(g.width);
+                pg->set_sortData(g.dataSortOrder);
                 pg->set_shift(g.shift);
                 pg->set_baseline(g.offset);
                 pg->set_baseline(g.offset);
@@ -637,6 +645,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_baseline(g.offset);
+                pg->set_sortData(g.dataSortOrder);
                 //pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
                 pg->set_yErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
                 pg->set_width(g.width);
@@ -690,6 +699,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_baseline(g.offset);
+                pg->set_sortData(g.dataSortOrder);
                 /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
@@ -739,6 +749,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_xErrorColumn(getColumnWithStride(g.yerrorcolumn, g));
                 pg->set_baseline(g.offset);
+                pg->set_sortData(g.dataSortOrder);
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
@@ -781,6 +792,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                pg->set_sortData(g.dataSortOrder);
                 /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
@@ -821,6 +833,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
+                pg->set_sortData(g.dataSortOrder);
                 /*pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
@@ -862,6 +875,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_colorColumn(getColumnWithStride(g.meancolumn, g));
                 pg->set_sizeColumn(getColumnWithStride(g.q75column, g));
                 pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
+                pg->set_sortData(g.dataSortOrder);
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
@@ -1236,6 +1250,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_meanColumn(getColumnWithStride(g.meancolumn, g));
                 pg->set_percentile75Column(getColumnWithStride(g.q75column, g));
                 pg->set_maxColumn(getColumnWithStride(g.maxcolumn, g));
+                pg->set_sortData(g.dataSortOrder);
 
                 pg->set_boxWidth(g.width);
                 pg->set_meanSymbol(g.symbol);
@@ -1325,6 +1340,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_meanColumn(getColumnWithStride(g.meancolumn, g));
                 pg->set_percentile75Column(getColumnWithStride(g.q75column, g));
                 pg->set_maxColumn(getColumnWithStride(g.maxcolumn, g));
+                pg->set_sortData(g.dataSortOrder);
 
                 pg->set_boxWidth(g.width);
                 pg->set_meanSymbol(g.symbol);
@@ -1347,6 +1363,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_xColumn(getColumnWithStride(g.xcolumn, g));
                 pg->set_yColumn(getColumnWithStride(g.ycolumn, g));
                 pg->set_xErrorColumn(getColumnWithStride(g.xerrorcolumn, g));
+                pg->set_sortData(g.dataSortOrder);
                 if (pg->get_xErrorColumn()>=0) {
                     pg->set_xErrorStyle(g.errorStyle);
                 } else {
@@ -1509,6 +1526,15 @@ void QFRDRTablePlotWidget::magnificationChanged(int idx)
 
 int QFRDRTablePlotWidget::getColumnWithStride(int column, const QFRDRTable::GraphInfo& g)
 {
+    QFRDRTable::GraphDataSelection sel;
+    sel=g;
+    QString newname;
+    int newCol=-1;
+    if (sel.getDataWithStride(NULL, &newCol, column, NULL, &newname, ui->plotter)) {
+
+    }
+    return newCol;
+    /*
     //qDebug()<<"getColumnWithStride  column="<<column<<"    strided: "<<g.isStrided<<" stride="<<g.stride<<" strideStart="<<g.strideStart;
     if (column==-2) return ui->plotter->getDatastore()->ensureColumnNum(QString("rowNumColSpecial"));
     if (column>=0 && column<(long)ui->plotter->getDatastore()->getColumnCount()) {
@@ -1659,7 +1685,7 @@ int QFRDRTablePlotWidget::getColumnWithStride(int column, const QFRDRTable::Grap
             }
         }
     }
-    return -1;
+    return -1;*/
 }
 
 void QFRDRTablePlotWidget::autoColorGraph(QFRDRTable::GraphInfo &g, int autocolor)
@@ -1778,14 +1804,14 @@ void QFRDRTablePlotWidget::reloadGraphData()
 
 
 
-void QFRDRTablePlotWidget::doFit(int xCol, int yCol, int sigmaCol, int plot, QString function)
+void QFRDRTablePlotWidget::doFit(int xCol, int yCol, int sigmaCol, int plot, QString function, QFRDRTable::GraphDataSelection sel)
 {
-    emit performFit(xCol, yCol, sigmaCol, plot, ui->listGraphs->currentRow(), function, ui->widSystemSettings->getLogX(), ui->widSystemSettings->getLogY());
+    emit performFit(xCol, yCol, sigmaCol, plot, ui->listGraphs->currentRow(), function,sel, ui->widSystemSettings->getLogX(), ui->widSystemSettings->getLogY());
 }
 
-void QFRDRTablePlotWidget::doRegression(int xCol, int yCol, int sigmaCol, int plot)
+void QFRDRTablePlotWidget::doRegression(int xCol, int yCol, int sigmaCol, int plot, QFRDRTable::GraphDataSelection sel)
 {
-    emit performRegression(xCol, yCol, sigmaCol, plot, ui->listGraphs->currentRow(), ui->widSystemSettings->getLogX(), ui->widSystemSettings->getLogY());
+    emit performRegression(xCol, yCol, sigmaCol, plot, ui->listGraphs->currentRow(),sel, ui->widSystemSettings->getLogX(), ui->widSystemSettings->getLogY());
 }
 
 void QFRDRTablePlotWidget::doRefit(int plot)

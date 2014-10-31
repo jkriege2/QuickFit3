@@ -347,7 +347,7 @@ double qfstatisticsAverageVariance(double& var, const T& value) {
             NN++;
         }
     }
-    var= ( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
+    var= fabs( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
     return sum/(double)NN;
 }
 
@@ -376,7 +376,7 @@ double qfstatisticsMaskedAverageVariance(double& var, const QVector<bool>& mask,
             NN++;
         }
     }
-    var= ( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
+    var= fabs( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
     return sum/(double)NN;
 }
 

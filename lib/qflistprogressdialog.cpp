@@ -7,6 +7,7 @@ QFListProgressDialog::QFListProgressDialog(QWidget *parent) :
 {
     m_canceled=false;
     ui->setupUi(this);
+    setMinorProgressEnabled(false);
 }
 
 QFListProgressDialog::~QFListProgressDialog()
@@ -50,6 +51,16 @@ void QFListProgressDialog::incProgress(int inc)
     QApplication::processEvents();
 }
 
+void QFListProgressDialog::setMinorProgressEnabled(bool en)
+{
+    ui->minorProgress->setEnabled(en);
+}
+
+void QFListProgressDialog::setMinorPrgressLabel(const QString &label)
+{
+    ui->labMinor->setText(label);
+}
+
 void QFListProgressDialog::setUserClose(bool enabled)
 {
     ui->btnCancel->setVisible(!enabled);
@@ -59,6 +70,21 @@ void QFListProgressDialog::setUserClose(bool enabled)
 void QFListProgressDialog::setProgresComplete()
 {
     ui->progress->setValue(ui->progress->maximum());
+}
+
+void QFListProgressDialog::setMinorProgress(int value)
+{
+    ui->prgCurrent->setValue(value);
+}
+
+void QFListProgressDialog::setMinorProgressRange(int min, int max)
+{
+    ui->prgCurrent->setRange(min, max);
+}
+
+bool QFListProgressDialog::wasMinorProgressCanceled() const
+{
+    return m_canceled;
 }
 
 void QFListProgressDialog::on_btnCancel_clicked()

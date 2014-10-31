@@ -59,11 +59,13 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfsimpleplotservice.h"
 #include "qfsimpleplotview.h"
 #include "jkqtpimagetools.h"
+#include "qftableservice.h"
+#include "qftableview.h"
 
 /*! \brief main widget for QuickFit
     \ingroup qf3app
 */
-class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogramService, public QFParameterCorrelationService, public QFSimplePlotService {
+class MainWindow : public QMainWindow, public QFPluginServices, public QFTableService, public QFHistogramService, public QFParameterCorrelationService, public QFSimplePlotService {
         Q_OBJECT
         Q_INTERFACES(QFPluginServices)
     public:
@@ -270,6 +272,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         virtual void clearView(const QString& name);
         virtual void addHistogramToView(const QString& name, const Histogram& histogram);
 
+        virtual QWidget* getCreateTableView(const QString& name, const QString& title);
+        virtual void clearTableView(const QString& name);
+        virtual void addColumnToTableView(const QString& name, const QFTableService::TableColumn& column);
 
         virtual QWidget* getCreateParameterCorrelationView(const QString& name, const QString& title);
         virtual void clearParameterCorrelationView(const QString& name);
@@ -339,6 +344,12 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         /** \brief delete the currently selected item */
         void deleteItem();
+        /** \brief duplicates the currently selected item */
+        void duplicateItem();
+
+        void copyItem();
+        void cutItem();
+        void pasteItem();
 
         void modelReset();
 
@@ -400,7 +411,11 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
         void showUpdateInfo(QNetworkReply *reply);
         void openLabelLink(const QString& link);
 
+
+        void clipboardDataChanged();
     private:
+        bool clipboardContainsProjectXML() const;
+
         void createWidgets();
         void createActions();
         void createMenus();
@@ -441,6 +456,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
         QList<QFPluginOptionsDialogInterface*> pluginOptionDialogs;
         QMap<QString, QFHistogramView*> histograms;
+        QMap<QString, QFTableView*> tables;
         QMap<QString, QFParameterCorrelationView*> correlationViews;
         QMap<QString, QFSimplePlotView*> plotViews;
         QMap<QString, QVariant> globalParameterStore;
@@ -516,6 +532,10 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFHistogr
 
 
         QAction* delItemAct;
+        QAction* dupItemAct;
+        QAction* copyItemAct;
+        QAction* cutItemAct;
+        QAction* pastItemAct;
         /*QAction* insertRDTableAct;
         QAction* insertFCSFileAct;
         QAction* insertRDTableFileAct;*/

@@ -60,8 +60,8 @@ class QFTableGraphSettings : public QWidget
         QIcon getGraphIcon(int i) const;
     signals:
         void graphDataChanged();
-        void performFit(int xCol, int yCol, int sigmaCol, int plot, QString function);
-        void performRegression(int xCol, int yCol, int sigmaCol, int  plot);
+        void performFit(int xCol, int yCol, int sigmaCol, int plot, QString function, QFRDRTable::GraphDataSelection sel);
+        void performRegression(int xCol, int yCol, int sigmaCol, int  plot, QFRDRTable::GraphDataSelection sel);
         void performRefit(int plot);
         void reloadGraph();
     public slots:

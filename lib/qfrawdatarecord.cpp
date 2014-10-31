@@ -167,9 +167,23 @@ void QFRawDataRecord::init(QDomElement& e, bool loadAsDummy) {
     group=-1;
     //std::cout<<"  reading XML\n";
     readXML(e);
+
     //std::cout<<"  registering record\n";
     project->registerRawDataRecord(this);
     //std::cout<<"created QFRawDataRecord\n";
+}
+
+void QFRawDataRecord::initNewID(QDomElement &e)
+{
+    name="";;
+    description="";
+    group=-1;
+    //std::cout<<"  reading XML\n";
+    readXML(e, false, false);
+    this->ID=project->getNewID();
+    //std::cout<<"  registering record\n";
+    project->registerRawDataRecord(this);
+
 }
 
 bool QFRawDataRecord::hasGroup() const
@@ -501,7 +515,7 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
     if (em) emit basicPropertiesChanged();
 };
 
-void QFRawDataRecord::readXML(QDomElement& e, bool loadAsDummy) {
+void QFRawDataRecord::readXML(QDomElement& e, bool loadAsDummy, bool readID) {
     {
         
 #ifdef DEBUG_THREAN
@@ -514,12 +528,14 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
         bool ok=true;
         name=e.attribute("name", "rawdatarecord");
         role=e.attribute("role", "");
-        ID=e.attribute("id", "-1").toInt(&ok);
-        if (ID==-1) { setError(tr("invalid ID in <rawdatarecord name=\"%1\" ...>!").arg(name)); return; }
+        if (readID) {
+            ID=e.attribute("id", "-1").toInt(&ok);
+            if (ID==-1) { setError(tr("invalid ID in <rawdatarecord name=\"%1\" ...>!").arg(name)); return; }
+        }
         bool gOK=false;
         group=e.attribute("group", "-1").toInt(&gOK);
         if (!gOK) group=-1;
-        if (!project->checkID(ID)) {
+        if (readID && !project->checkID(ID)) {
             setError(tr("ID %1 in <rawdatarecord name=\"%2\" ...> already in use in the project!").arg(ID).arg(name));
             return;
         }
@@ -870,7 +886,7 @@ QString QFRawDataRecord::evaluationResultType2String(QFRawDataRecord::evaluation
 }
 
 
-void QFRawDataRecord::writeXML(QXmlStreamWriter& w, const QString &projectfilename, bool copyFilesToSubfolder, const QString& subfoldername, QList<QFProject::FileCopyList >* filecopylist) const {
+void QFRawDataRecord::writeXML(QXmlStreamWriter& w, const QString &projectfilename, bool copyFilesToSubfolder, const QString& subfoldername, QList<QFProject::FileCopyList >* filecopylist, int writeMode) const {
     
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QReadLocker";
@@ -894,152 +910,155 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
     w.writeStartElement("properties");
     storeProperties(w);
     w.writeEndElement();
-    w.writeStartElement("results");
-    QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
-    while (i.hasNext()) {
-    //for (int i=0; i<results.keys().size(); i++) {
-        i.next();
-        w.writeStartElement("evaluation");
-        QString n=i.key();
-        w.writeAttribute("name", n);
-        if (!i.value()->group.isEmpty()) w.writeAttribute("group", i.value()->group);
-        w.writeAttribute("groupindex", QString::number(i.value()->groupIndex));
-        if (!i.value()->description.isEmpty()) w.writeAttribute("description", i.value()->description);
-        QFRawDataRecordPrivate::ResultsResultsIterator  j(i.value()->results);
-        //for (int j=0; j<i.value().size(); j++) {
-        while (j.hasNext()) {
-            j.next();
-            w.writeStartElement("result");
-            QString rn=j.key();
-
-            QElapsedTimer saveTimer;
-            saveTimer.start();
-            w.writeAttribute("name", rn);
-            const evaluationResult& r=j.value();
-            if (!r.label.isEmpty()) w.writeAttribute("label", r.label);
-            if (!r.group.isEmpty()) w.writeAttribute("group", r.group);
-            if (!r.label_rich.isEmpty()) w.writeAttribute("labelrich", r.label_rich);
-            if (r.sortPriority) w.writeAttribute("sortprior", (r.sortPriority)?QString("true"):QString("false"));
-            QLocale loc=QLocale::c();
-            loc.setNumberOptions(QLocale::OmitGroupSeparator);
-            switch(r.type) {
-                case qfrdreInvalid:
-                    w.writeAttribute("type", "invalid");
-                    break;
-                case qfrdreBoolean:
-                    w.writeAttribute("type", "boolean");
-                    w.writeAttribute("value", (r.bvalue)?QString("true"):QString("false"));
-                    break;
-                case qfrdreInteger:
-                    w.writeAttribute("type", "integer");
-                  #ifdef Q_OS_WIN32
-                    w.writeAttribute("value", loc.toString(r.ivalue));
-                  #else
-                    w.writeAttribute("value", loc.toString(r.ivalue));
-                  #endif
-                    w.writeAttribute("unit", r.unit);
-                    break;
-                case qfrdreString:
-                    w.writeAttribute("type", "string");
-                    w.writeAttribute("value", r.svalue);
-                    break;
-                case qfrdreNumber:
-                    w.writeAttribute("type", "number");
-                    w.writeAttribute("value", loc.toString(r.dvalue, 'g', 10));
-                    w.writeAttribute("unit", r.unit);
-                    break;
-                case qfrdreNumberVector: {
-                    w.writeAttribute("type", "numberlist");
-                    w.writeAttribute("storage", "base64");
-                    w.writeAttribute("unit", r.unit);
-                    w.writeAttribute("value", doubleArrayToString_base64(r.dvec));
-                    } break;
-                case qfrdreNumberMatrix: {
-                    w.writeAttribute("type", "numbermatrix");
-                    w.writeAttribute("columns", loc.toString(r.columns));
-                    w.writeAttribute("storage", "base64");
-                    w.writeAttribute("unit", r.unit);
-                    w.writeAttribute("value", doubleArrayToString_base64(r.dvec));
-                    } break;
-                case qfrdreNumberErrorVector: {
-                    w.writeAttribute("type", "numbererrorlist");
-                    w.writeAttribute("storage", "base64");
-                    w.writeAttribute("unit", r.unit);
-                    w.writeAttribute("value", doubleArrayToString_base64(r.dvec));
-                    w.writeAttribute("error", doubleArrayToString_base64(r.evec));
-                    } break;
-                case qfrdreNumberErrorMatrix: {
-                    w.writeAttribute("type", "numbererrormatrix");
-                    w.writeAttribute("columns", loc.toString(r.columns));
-                    w.writeAttribute("storage", "base64");
-                    w.writeAttribute("unit", r.unit);
-                    w.writeAttribute("value", doubleArrayToString_base64(r.dvec));
-                    w.writeAttribute("error", doubleArrayToString_base64(r.evec));
-                    } break;
-                case qfrdreNumberError:
-                    w.writeAttribute("type", "numbererror");
-                    w.writeAttribute("value", loc.toString(r.dvalue, 'g', 10));
-                    w.writeAttribute("error", loc.toString(r.derror, 'g', 10));
-                    w.writeAttribute("unit", r.unit);
-                    break;
-                case qfrdreIntegerMatrix: {
-                    w.writeAttribute("type", "integermatrix");
-                    w.writeAttribute("columns", loc.toString(r.columns));
-                    w.writeAttribute("storage", "base64");
-                    w.writeAttribute("unit", r.unit);
-                    w.writeAttribute("value", qlonglongArrayToString_base64(r.ivec));
-                    } break;
-                case qfrdreIntegerVector: {
-                    w.writeAttribute("type", "integerlist");
-                    w.writeAttribute("storage", "hex");
-                    w.writeAttribute("unit", r.unit);
-                    w.writeAttribute("value", qlonglongArrayToString_base64(r.ivec));
-                    } break;
-                case qfrdreBooleanMatrix: {
-                    w.writeAttribute("type", "booleanmatrix");
-                    w.writeAttribute("columns", loc.toString(r.columns));
-                    w.writeAttribute("storage", "base64");
-                    w.writeAttribute("unit", r.unit);
-                    w.writeAttribute("value", boolArrayToString(r.bvec));
-                    } break;
-                case qfrdreBooleanVector: {
-                    w.writeAttribute("type", "booleanlist");
-                    w.writeAttribute("storage", "hex");
-                    w.writeAttribute("unit", r.unit);
-                    w.writeAttribute("value", boolArrayToString(r.bvec));
-                    } break;
-                case qfrdreStringVector: {
-                    w.writeAttribute("type", "stringlist");
-                    w.writeAttribute("unit", r.unit);
-                    w.writeAttribute("value", escapify(r.svec));
-                    } break;
-                case qfrdreStringMatrix: {
-                    w.writeAttribute("type", "stringmatrix");
-                    w.writeAttribute("columns", loc.toString(r.columns));
-                    w.writeAttribute("unit", r.unit);
-                    w.writeAttribute("value", escapify(r.svec));
-                    } break;
-
-            }
-            //qDebug()<<"   writing property "<<rn<<"   in "<<saveTimer.elapsed()<<" ms";
-            w.writeEndElement();
-        }
-        w.writeEndElement();
-    }
-    w.writeEndElement();
-
-    if (dstore->evalGroupLabels.size()>0) {
-        w.writeStartElement("evalgrouplabels");
-        QFRawDataRecordPrivate::GroupLabelsIterator i(dstore->evalGroupLabels);
+    if (writeMode & QFProject::wsmRDRResults == QFProject::wsmRDRResults) {
+        w.writeStartElement("results");
+        QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
         while (i.hasNext()) {
+            //for (int i=0; i<results.keys().size(); i++) {
             i.next();
-            w.writeStartElement("group");
-            w.writeAttribute("id", i.key());
-            w.writeAttribute("label", i.value());
+            w.writeStartElement("evaluation");
+            QString n=i.key();
+            w.writeAttribute("name", n);
+            if (!i.value()->group.isEmpty()) w.writeAttribute("group", i.value()->group);
+            w.writeAttribute("groupindex", QString::number(i.value()->groupIndex));
+            if (!i.value()->description.isEmpty()) w.writeAttribute("description", i.value()->description);
+            QFRawDataRecordPrivate::ResultsResultsIterator  j(i.value()->results);
+            //for (int j=0; j<i.value().size(); j++) {
+            while (j.hasNext()) {
+                j.next();
+                w.writeStartElement("result");
+                QString rn=j.key();
+
+                QElapsedTimer saveTimer;
+                saveTimer.start();
+                w.writeAttribute("name", rn);
+                const evaluationResult& r=j.value();
+                if (!r.label.isEmpty()) w.writeAttribute("label", r.label);
+                if (!r.group.isEmpty()) w.writeAttribute("group", r.group);
+                if (!r.label_rich.isEmpty()) w.writeAttribute("labelrich", r.label_rich);
+                if (r.sortPriority) w.writeAttribute("sortprior", (r.sortPriority)?QString("true"):QString("false"));
+                QLocale loc=QLocale::c();
+                loc.setNumberOptions(QLocale::OmitGroupSeparator);
+                switch(r.type) {
+                    case qfrdreInvalid:
+                        w.writeAttribute("type", "invalid");
+                        break;
+                    case qfrdreBoolean:
+                        w.writeAttribute("type", "boolean");
+                        w.writeAttribute("value", (r.bvalue)?QString("true"):QString("false"));
+                        break;
+                    case qfrdreInteger:
+                        w.writeAttribute("type", "integer");
+#ifdef Q_OS_WIN32
+                        w.writeAttribute("value", loc.toString(r.ivalue));
+#else
+                        w.writeAttribute("value", loc.toString(r.ivalue));
+#endif
+                        w.writeAttribute("unit", r.unit);
+                        break;
+                    case qfrdreString:
+                        w.writeAttribute("type", "string");
+                        w.writeAttribute("value", r.svalue);
+                        break;
+                    case qfrdreNumber:
+                        w.writeAttribute("type", "number");
+                        w.writeAttribute("value", loc.toString(r.dvalue, 'g', 10));
+                        w.writeAttribute("unit", r.unit);
+                        break;
+                    case qfrdreNumberVector: {
+                            w.writeAttribute("type", "numberlist");
+                            w.writeAttribute("storage", "base64");
+                            w.writeAttribute("unit", r.unit);
+                            w.writeAttribute("value", doubleArrayToString_base64(r.dvec));
+                        } break;
+                    case qfrdreNumberMatrix: {
+                            w.writeAttribute("type", "numbermatrix");
+                            w.writeAttribute("columns", loc.toString(r.columns));
+                            w.writeAttribute("storage", "base64");
+                            w.writeAttribute("unit", r.unit);
+                            w.writeAttribute("value", doubleArrayToString_base64(r.dvec));
+                        } break;
+                    case qfrdreNumberErrorVector: {
+                            w.writeAttribute("type", "numbererrorlist");
+                            w.writeAttribute("storage", "base64");
+                            w.writeAttribute("unit", r.unit);
+                            w.writeAttribute("value", doubleArrayToString_base64(r.dvec));
+                            w.writeAttribute("error", doubleArrayToString_base64(r.evec));
+                        } break;
+                    case qfrdreNumberErrorMatrix: {
+                            w.writeAttribute("type", "numbererrormatrix");
+                            w.writeAttribute("columns", loc.toString(r.columns));
+                            w.writeAttribute("storage", "base64");
+                            w.writeAttribute("unit", r.unit);
+                            w.writeAttribute("value", doubleArrayToString_base64(r.dvec));
+                            w.writeAttribute("error", doubleArrayToString_base64(r.evec));
+                        } break;
+                    case qfrdreNumberError:
+                        w.writeAttribute("type", "numbererror");
+                        w.writeAttribute("value", loc.toString(r.dvalue, 'g', 10));
+                        w.writeAttribute("error", loc.toString(r.derror, 'g', 10));
+                        w.writeAttribute("unit", r.unit);
+                        break;
+                    case qfrdreIntegerMatrix: {
+                            w.writeAttribute("type", "integermatrix");
+                            w.writeAttribute("columns", loc.toString(r.columns));
+                            w.writeAttribute("storage", "base64");
+                            w.writeAttribute("unit", r.unit);
+                            w.writeAttribute("value", qlonglongArrayToString_base64(r.ivec));
+                        } break;
+                    case qfrdreIntegerVector: {
+                            w.writeAttribute("type", "integerlist");
+                            w.writeAttribute("storage", "hex");
+                            w.writeAttribute("unit", r.unit);
+                            w.writeAttribute("value", qlonglongArrayToString_base64(r.ivec));
+                        } break;
+                    case qfrdreBooleanMatrix: {
+                            w.writeAttribute("type", "booleanmatrix");
+                            w.writeAttribute("columns", loc.toString(r.columns));
+                            w.writeAttribute("storage", "base64");
+                            w.writeAttribute("unit", r.unit);
+                            w.writeAttribute("value", boolArrayToString(r.bvec));
+                        } break;
+                    case qfrdreBooleanVector: {
+                            w.writeAttribute("type", "booleanlist");
+                            w.writeAttribute("storage", "hex");
+                            w.writeAttribute("unit", r.unit);
+                            w.writeAttribute("value", boolArrayToString(r.bvec));
+                        } break;
+                    case qfrdreStringVector: {
+                            w.writeAttribute("type", "stringlist");
+                            w.writeAttribute("unit", r.unit);
+                            w.writeAttribute("value", escapify(r.svec));
+                        } break;
+                    case qfrdreStringMatrix: {
+                            w.writeAttribute("type", "stringmatrix");
+                            w.writeAttribute("columns", loc.toString(r.columns));
+                            w.writeAttribute("unit", r.unit);
+                            w.writeAttribute("value", escapify(r.svec));
+                        } break;
+
+                }
+                //qDebug()<<"   writing property "<<rn<<"   in "<<saveTimer.elapsed()<<" ms";
+                w.writeEndElement();
+            }
             w.writeEndElement();
         }
         w.writeEndElement();
+        if (dstore->evalGroupLabels.size()>0) {
+            w.writeStartElement("evalgrouplabels");
+            QFRawDataRecordPrivate::GroupLabelsIterator i(dstore->evalGroupLabels);
+            while (i.hasNext()) {
+                i.next();
+                w.writeStartElement("group");
+                w.writeAttribute("id", i.key());
+                w.writeAttribute("label", i.value());
+                w.writeEndElement();
+            }
+            w.writeEndElement();
+        }
     }
+
+
     if (files.size()>0) {
         w.writeStartElement("files");
         for (int i=0; i< files.size(); i++) {
@@ -1057,7 +1076,12 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 
             if (copyFilesToSubfolder) {
                 QString newFN="";
-                newFN=pdir.relativeFilePath(files[i]);
+
+                if (projectfilename.isEmpty() || projectfilename==QApplication::applicationFilePath()) {
+                    newFN=pdir.absoluteFilePath(files[i]);
+                } else {
+                    newFN=pdir.relativeFilePath(files[i]);
+                }
                 //qDebug()<<"rel. path newFN: "<<newFN<<pdir<<projectfilename;
                 if (newFN.startsWith('/') || (newFN.size()>2 && newFN[0].isLetter() && newFN[1]==':' && (newFN[2]=='/'||newFN[2]=='\\')) || newFN.startsWith("../") || newFN.startsWith("..\\") || newFN.startsWith("\\\\") || newFN.startsWith("//")) {
                     QString fn=QFileInfo(newFN).fileName();

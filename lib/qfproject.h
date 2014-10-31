@@ -48,6 +48,7 @@ class QFRawDataRecordFactory;
 class QFPluginServices;
 class QFListProgressDialog;
 
+
 typedef QMap<QString, QVariant> qfp_param_type;
 
 /*! \brief this class manages one project
@@ -92,7 +93,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \brief creator of the project */
         QString creator;
         /** \brief file associated with the project project (empty if none)*/
-        QString file;
+        mutable QString file;
         /** \brief indicates whether an error has occured */
         mutable bool errorOcc;
         /** \brief contains the description of the last error */
@@ -246,6 +247,10 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         void deleteRawData(int ID);
         /** \brief delete the specified evaluation record */
         void deleteEvaluation(int ID);
+        /** \brief duplicate the specified raw data record */
+        void duplicateRawData(int ID);
+        /** \brief duplicate the specified evaluation record */
+        void duplicateEvaluation(int ID);
         /** \brief add new raw data record
          *
          * \param type type of the record to insert ("table", "unknown", ...)
@@ -301,6 +306,26 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
             \param if the filename, we are writing to with file is known, it can be provided here! (if this is not provided and file can be cast to a QFile, the the filename is taken from that QFile!)
         */
         void writeXML(QIODevice* file, bool resetDataChanged=true, const QString &filename=QString());
+
+        enum WriteSubsetModes {
+            wsmRDRs = 0x01,
+            wsmRDRResults = 0x02,
+            wsmEvals = 0x04,
+            wsmAll = wsmRDRs|wsmRDRResults|wsmEvals,
+        };
+
+        /*! \brief write project to XML file, sets error and errorDescription, as well as \c dataChange=false
+            \param file the QIODevice to store the project to
+            \param rdrSelected set of record IDs to write
+            \param evalSelected set of evaluation IDs to write
+            \param writeRecordsOnly if \c false (default) this function writes a full project file, otherwise, only the
+            \param if the filename, we are writing to with file is known, it can be provided here! (if this is not provided and file can be cast to a QFile, the the filename is taken from that QFile!)
+
+            \note This function does not create backups!
+        */
+        void writeXMLSubset(QIODevice* file, const QSet<int>& rdrSelected, const QSet<int>& evalSelected, bool writeRecordsOnly=false, int writeMode=wsmAll, const QString &filename=QString()) const;
+
+
         /** \brief open XML project file, sets error and errorDescription, as well as \c dataChange=false */
         void readXML(QIODevice* file, const QString& filename=QString());
         /** \brief open XML project file, but read only the RDRs and evaluation items where the IDs are contained in the given sets, sets error and errorDescription, as well as \c dataChange=false
@@ -551,7 +576,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \brief write XML project file, sets error and errorDescription, as well as \c dataChange=false */
         void internalWriteXML(QIODevice* file, bool resetDataChanged, bool namechanged, const QString &projectFileName, bool copyFilesToSubfolder=false, const QString &rdrsubfoldername=QString("raw_data_files/"), const QString &evalsubfoldername=QString("eval_files/"), QList<QFProject::FileCopyList > *filecopylist=NULL);
         /** \brief write XML project file, sets error and errorDescription, as well as \c dataChange=false */
-        void internalWriteXMLConst(QIODevice* file, const QString &projectFileName, bool copyFilesToSubfolder=false, const QString &rdrsubfoldername=QString("raw_data_files/"), const QString &evalsubfoldername=QString("eval_files/"), QList<QFProject::FileCopyList > *filecopylist=NULL) const;
+        void internalWriteXMLConst(QIODevice* file, const QString &projectFileName, bool copyFilesToSubfolder=false, const QString &rdrsubfoldername=QString("raw_data_files/"), const QString &evalsubfoldername=QString("eval_files/"), QList<QFProject::FileCopyList > *filecopylist=NULL, const QSet<int>& rdrSelected=QSet<int>(), const QSet<int>& evalSelected=QSet<int>(), bool writeRecordsOnly=false, int writeMode=wsmAll) const;
         /** \brief open XML project file, sets error and errorDescription, as well as \c dataChange=false */
         void internalReadXML(const QString& file);
 

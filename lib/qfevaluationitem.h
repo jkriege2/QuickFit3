@@ -142,6 +142,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
          *  \see QFProject::readXMLDummy() for more information on the property \a loadAsDummy
          */
         void init(QDomElement& e, bool loadAsDummy=false);
+        void initNewID(QDomElement& e);
 
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
@@ -245,7 +246,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
          *  \param subfoldername name of the subfolder, which assembles the files in the project
          *  \param filecopylist list of required file copy operations.
          */
-        virtual void writeXML(QXmlStreamWriter& w, const QString& projectfilename, bool copyFilesToSubfolder=false, const QString &subfoldername=QString("eval_files/"), QList<QFProject::FileCopyList >* filecopylist=NULL);
+        virtual void writeXML(QXmlStreamWriter& w, const QString& projectfilename, bool copyFilesToSubfolder=false, const QString &subfoldername=QString("eval_files/"), QList<QFProject::FileCopyList >* filecopylist=NULL, int writeMode=QFProject::wsmAll);
 
 
         /** \brief this function is called by writeXML() in order to determine, whether a linked file should be included in an export operation
@@ -386,7 +387,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
          * id, ... but not the results and not the actual data. This function can be used to build a dummy project tree.
          *  \see QFProject::readXMLDummy() for more information on the property \a loadAsDummy
          */
-        void readXML(QDomElement& e, bool loadAsDummy=false);
+        void readXML(QDomElement& e, bool loadAsDummy=false, bool readID=false);
         /** \brief write contents to QXmlStreamWriter (data tag) <b>IMPLEMENT IN CHILD CLASSES!</b>
          *
          * This method may be used to store additional data (like algorithm configuration ...) from the project file

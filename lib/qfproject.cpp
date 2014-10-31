@@ -328,6 +328,103 @@ void QFProject::deleteEvaluation(int ID) {
     }
 }
 
+void QFProject::duplicateRawData(int ID)
+{
+    if (rawDataIDExists(ID)) {
+        QFRawDataRecord* rec=rawData[ID];
+        QString xml;
+        {
+            QXmlStreamWriter w(&xml);
+            w.writeStartDocument();
+            rec->writeXML(w, file);
+            w.writeEndDocument();
+        }
+        QFRawDataRecord* newrec=getRawDataRecordFactory()->createRecord(rec->getType(), this);
+        {
+            QDomDocument doc;
+            if (doc.setContent(xml)) {
+                QDomElement e=doc.firstChildElement("rawdataelement");
+                newrec->initNewID(e);
+                QString n=tr("%1").arg(rec->getName());
+                bool found=false;
+                int cnt=1;
+                do {
+                    if (found) {
+                        cnt++;
+                        n=tr("%1 %2").arg(rec->getName()).arg(cnt);
+                    }
+                    found=false;
+                    for (int i=0; i<getRawDataCount(); i++) {
+                        if (getRawDataByNum(i) && getRawDataByNum(i)->getName()==n) {
+                            found=true;
+                            break;
+                        }
+                    }
+                } while (found && cnt<1000);
+                newrec->setName(n);
+            } else {
+                delete newrec;
+            }
+        }
+        emitStructureChanged();
+    }
+}
+
+void QFProject::duplicateEvaluation(int ID)
+{
+    if (evaluationIDExists(ID)) {
+        QFEvaluationItem* rec=evaluations[ID];
+        QString xml;
+        {
+            QXmlStreamWriter w(&xml);
+            w.writeStartDocument();
+            rec->writeXML(w, file);
+            w.writeEndDocument();
+        }
+        QFEvaluationItem* newrec=getEvaluationItemFactory()->createRecord(rec->getType(), services, this);
+        {
+            QDomDocument doc;
+            if (doc.setContent(xml)) {
+                QDomElement e=doc.firstChildElement("evaluationelement");
+                newrec->initNewID(e);
+                QString n=tr("%1").arg(rec->getName());
+                bool found=false;
+                int cnt=1;
+                do {
+                    if (found) {
+                        cnt++;
+                        n=tr("%1 %2").arg(rec->getName()).arg(cnt);
+                    }
+                    found=false;
+                    for (int i=0; i<getEvaluationCount(); i++) {
+                        if (getEvaluationByNum(i) && getEvaluationByNum(i)->getName()==n) {
+                            found=true;
+                            break;
+                        }
+                    }
+                } while (found && cnt<1000);
+                newrec->setName(n);
+            } else {
+                delete newrec;
+            }
+        }
+        emitStructureChanged();
+    }
+
+
+
+    if (evaluationIDExists(ID)) {
+        QFEvaluationItem* rec=evaluations[ID];
+        emit evaluationAboutToBeDeleted(rec);
+        rec->disconnect();
+        evaluations.remove(ID);
+        evaluationsOrder.removeAll(ID);
+        IDs.remove(ID);
+        delete rec;
+        emitStructureChanged();
+    }
+}
+
 
 
 void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& filename_in)
@@ -354,15 +451,88 @@ void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& 
 
 
         internalWriteXML(&f, resetDataChanged, namechanged, filename);
+        if (f.error()!=QFile::NoError) {
+            setError(tr("Error while writing project to file '%1'!\n Error description: %2.").arg(filename).arg(f.errorString()));
+        }
+
         f.close();
 
         if (!filename.isEmpty()) {
+            QFile f4(filename+".backup_old");
+            if (f4.exists()) f4.remove();
+
+            QFile f3(filename+".backup");
+            f3.rename(filename+".backup_old");
+
             QFile f2(filename+".backup");
             if (f2.exists()) f2.remove();
 
             QFile f1(file);
             f1.rename(filename+".backup");
         }
+    }
+
+    QFile fcpy(tmpfn);
+    if (fcpy.open(QFile::ReadOnly)) {
+        size_t chunksize=PROJECT_COPY_CHUNKSIZE;
+        char* chunk=qfMallocT<char>(PROJECT_COPY_CHUNKSIZE);
+        while (!chunk && chunksize>1024) {
+            chunksize=chunksize/2;
+            chunk=qfMallocT<char>(PROJECT_COPY_CHUNKSIZE);
+        }
+        if (chunk) {
+            while (!fcpy.atEnd() && !fcpy.error()) {
+                qint64 bytesRead=fcpy.read(chunk, chunksize);
+                qint64 written=file->write(chunk, bytesRead);
+                if (written!=bytesRead) {
+                    setError(tr("Error while writing project to file '%1'!\n Error description: could not write all data / %2.").arg(filename).arg(file->errorString()));
+                    break;
+                }
+                if (fcpy.error()) {
+                    setError(tr("Error while writing project to file '%1'!\n Error description: could not read from temporary project file / %2.").arg(filename).arg(fcpy.errorString()));
+                    break;
+                }
+                //qDebug()<<"writing chunk of size "<<bytesRead;
+            }
+
+            qfFree(chunk);
+        } else {
+            setError(tr("Error while writing file: Could not allocate enough memory!"));
+        }
+        fcpy.close();
+    } else {
+        setError(tr("could not write temporary project file ..."));
+    }
+    if (QFile::exists(tmpfn)) {
+        fcpy.remove(tmpfn);
+        QFile fdel(tmpfn);
+        fdel.remove(tmpfn);
+    }
+}
+
+void QFProject::writeXMLSubset(QIODevice *file, const QSet<int> &rdrSelected, const QSet<int> &evalSelected, bool writeRecordsOnly, int writeMode, const QString &filename_in) const
+{
+    QString filename=filename_in;
+    QFile* ffile=qobject_cast<QFile*>(file);
+    if (filename.isEmpty() && ffile) {
+        filename=ffile->fileName();
+    }
+    if (reading) return;
+
+    //bool namechanged=(filename!=this->file);
+    QString oldFile=this->file;
+    if (!filename.isEmpty()) this->file=filename;
+
+
+    QString tmpfn=qfGetTempFilename();
+    {
+        QFile f(tmpfn);
+        f.open(QFile::WriteOnly);
+
+
+        internalWriteXMLConst(&f, filename, false, false, false, NULL, rdrSelected, evalSelected, writeRecordsOnly);
+        //internalWriteXML(&f, resetDataChanged, namechanged, filename);
+        f.close();
     }
 
     QFile fcpy(tmpfn);
@@ -393,48 +563,65 @@ void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& 
         QFile fdel(tmpfn);
         fdel.remove(tmpfn);
     }
+    this->file=oldFile;
 }
 
 
-void QFProject::internalWriteXMLConst(QIODevice *file, const QString &projectFileName, bool copyFilesToSubfolder, const QString &rdrsubfoldername, const QString &evalsubfoldername, QList<QFProject::FileCopyList> *filecopylist) const
+void QFProject::internalWriteXMLConst(QIODevice *file, const QString &projectFileName, bool copyFilesToSubfolder, const QString &rdrsubfoldername, const QString &evalsubfoldername, QList<QFProject::FileCopyList> *filecopylist, const QSet<int> &rdrSelected, const QSet<int> &evalSelected, bool writeRecordsOnly, int writeMode) const
 {
     QXmlStreamWriter w(file);
 
     w.setAutoFormatting(false);
     w.writeStartDocument();
-    w.writeStartElement("quickfitproject");
-    w.writeAttribute("quickfit_version", qfInfoVersionFull());
-    w.writeAttribute("quickfit_svn", qfInfoSVNVersion());
-    w.writeAttribute("quickfit_compiledate", qfInfoCompileDate());
-    w.writeAttribute("name", name);
-    w.writeAttribute("creator", creator);
-    w.writeStartElement("rdr_groups");
-    for (int i=0; i<rdrgroups.size(); i++) {
-        w.writeStartElement("rdr_group");
-        w.writeCDATA(rdrgroups[i]);
+    if (writeRecordsOnly) {
+        w.writeStartElement("quickfitprojectsubset");
+        w.writeAttribute("quickfit_version", qfInfoVersionFull());
+        w.writeAttribute("quickfit_svn", qfInfoSVNVersion());
+        w.writeAttribute("quickfit_compiledate", qfInfoCompileDate());
+    } else {
+        w.writeStartElement("quickfitproject");
+        w.writeAttribute("quickfit_version", qfInfoVersionFull());
+        w.writeAttribute("quickfit_svn", qfInfoSVNVersion());
+        w.writeAttribute("quickfit_compiledate", qfInfoCompileDate());
+        w.writeAttribute("name", name);
+        w.writeAttribute("creator", creator);
+        w.writeAttribute("highest_id", QString::number(highestID));
+        w.writeStartElement("rdr_groups");
+        for (int i=0; i<rdrgroups.size(); i++) {
+            w.writeStartElement("rdr_group");
+            w.writeCDATA(rdrgroups[i]);
+            w.writeEndElement();
+        }
+        w.writeEndElement();
+        w.writeStartElement("description");
+        w.writeCDATA(description);
+        w.writeEndElement();
+        w.writeStartElement("properties");
+        storeProperties(w);
         w.writeEndElement();
     }
-    w.writeEndElement();
-    w.writeStartElement("description");
-    w.writeCDATA(description);
-    w.writeEndElement();
-    w.writeStartElement("properties");
-    storeProperties(w);
-    w.writeEndElement();
-    w.writeStartElement("rawdata");
 
-    for (int i=0; i<rawDataOrder.size(); i++) {
-        QFRawDataRecord* rec=getRawDataByID(rawDataOrder[i]);
-        if (rec) rec->writeXML(w, projectFileName, copyFilesToSubfolder, rdrsubfoldername, filecopylist);
+    if ((writeMode & wsmRDRs) == wsmRDRs) {
+        w.writeStartElement("rawdata");
+        for (int i=0; i<rawDataOrder.size(); i++) {
+            QFRawDataRecord* rec=getRawDataByID(rawDataOrder[i]);
+            if (rec && ((rdrSelected.size()==0 && evalSelected.size()==0) || rdrSelected.contains(rec->getID()))) {
+                rec->writeXML(w, projectFileName, copyFilesToSubfolder, rdrsubfoldername, filecopylist, writeMode);
+            }
+        }
+        w.writeEndElement();
     }
-    w.writeEndElement();
-    w.writeStartElement("evaluations");
+    if ((writeMode & wsmEvals) == wsmEvals) {
+        w.writeStartElement("evaluations");
 
-    for (int i=0; i<evaluationsOrder.size(); i++) {
-        QFEvaluationItem* rec=getEvaluationByID(evaluationsOrder[i]);
-        if (rec) rec->writeXML(w, projectFileName, copyFilesToSubfolder, evalsubfoldername, filecopylist);
+        for (int i=0; i<evaluationsOrder.size(); i++) {
+            QFEvaluationItem* rec=getEvaluationByID(evaluationsOrder[i]);
+            if (rec && ((rdrSelected.size()==0 && evalSelected.size()==0) || evalSelected.contains(rec->getID()))) {
+                rec->writeXML(w, projectFileName, copyFilesToSubfolder, evalsubfoldername, filecopylist, writeMode);
+            }
+        }
+        w.writeEndElement();
     }
-    w.writeEndElement();
 
     w.writeEndElement();
     w.writeEndDocument();
@@ -480,17 +667,29 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
 
         internalWriteXML(&f, resetDataChanged, namechanged, file);
 
-        QFile f2(file+".backup");
-        if (f2.exists()) f2.remove();
+        if (f.error()==QFile::NoError) {
 
-        QFile f1(file);
-        f1.rename(file+".backup");
+            QFile f4(file+".backup_old");
+            if (f4.exists()) f4.remove();
 
+            QFile f3(file+".backup");
+            f3.rename(file+".backup_old");
+
+            QFile f2(file+".backup");
+            if (f2.exists()) f2.remove();
+
+            QFile f1(file);
+            if (f1.exists()) f1.rename(file+".backup");
+
+        } else {
+            setError(tr("Error while writing project to file '%1'!\n Error description: %2.").arg(file).arg(f.errorString()));
+            return;
+        }
 
 
         f.setAutoRemove(false);
         if (!f.rename(file)) {
-            setError(tr("Could no open file '%1' for output!\n Error description: %2.").arg(file).arg(f.errorString()));
+            setError(tr("Could no open file '%1' for output (temp filename: %3)!\n Error description: %2.").arg(file).arg(f.errorString()).arg(f.fileName()));
         }
     }
 }
@@ -507,7 +706,7 @@ QString QFProject_QuaZIPError(int error) {
     return QObject::tr("ERROR No. %1").arg(error);
 }
 
-bool QFProject_compressFile(QuaZip* zip, QString fileName, QString fileDest, QString& error) {
+bool QFProject_compressFile(QuaZip* zip, QString fileName, QString fileDest, QString& error, QFProgressMinorProgress* pdlg) {
     error="";
     QFile inFile;
     inFile.setFileName(fileName);
@@ -522,7 +721,7 @@ bool QFProject_compressFile(QuaZip* zip, QString fileName, QString fileDest, QSt
         return false;
     }
 
-    if (!qfCopyData(&inFile, &outFile) || outFile.getZipError()!=UNZ_OK) {
+    if (!qfCopyData(&inFile, &outFile, pdlg) || outFile.getZipError()!=UNZ_OK) {
         if (outFile.getZipError()!=UNZ_OK) error=QObject::tr("error writing data into ZIP: %1").arg(QFProject_QuaZIPError(outFile.getZipError()));
         else error=QObject::tr("error writing data into ZIP");
         return false;
@@ -574,7 +773,7 @@ void QFProject::exportProjectToZIP(const QString &file, QFListProgressDialog* pd
             }
             //qDebug()<<tr("adding project file '%1'...").arg(QFileInfo(pfn).fileName());
             QString errorStr;
-            bool ok=QFProject_compressFile(&zip, tmpfn, QFileInfo(pfn).fileName(), errorStr);
+            bool ok=QFProject_compressFile(&zip, tmpfn, QFileInfo(pfn).fileName(), errorStr, pdlg);
             //qDebug()<<"\n     "<<ok<<errorStr;
             if (ok && (!pdlg || (pdlg && !pdlg->wasCanceled()))) {
                 if (filecopylist.size()>0) {
@@ -614,7 +813,10 @@ void QFProject::exportProjectToZIP(const QString &file, QFListProgressDialog* pd
                             pdlg->incProgress();
                             pdlg->addMessage(tr("adding data file '%1'...").arg(filecopylist[i].outFile));
                         }
-                        ok=QFProject_compressFile(&zip, filecopylist[i].inFile, outf, errorStr);
+                        pdlg->setMinorProgressEnabled(true);
+                        pdlg->setMinorPrgressLabel("compressing:   ");
+                        ok=QFProject_compressFile(&zip, filecopylist[i].inFile, outf, errorStr, pdlg);
+                        pdlg->setMinorProgressEnabled(false);
                         //qDebug()<<tr("adding data file %1 -> %2...").arg(filecopylist[i].inFile).arg(filecopylist[i].outFile)<<"\n     "<<ok<<errorStr;
                         if (!ok) {
                             setError(tr("Could not add file '%1' to ZIP-file '%2', error: %3").arg(filecopylist[i].outFile).arg(file).arg(errorStr));
@@ -871,6 +1073,11 @@ void QFProject::internalReadXML(QIODevice *f, const QString &filename_in)
                 if (services) {
                     services->setProgress(0);
                 }
+
+                //qDebug()<<"highestID [pre]="<<highestID;
+                if (e.hasAttribute("highest_id"))  highestID=qMax(highestID+1, e.attribute("highest_id", "-1").toInt());
+                //qDebug()<<"highestID [post]="<<highestID;
+
             }
         } else {
             setError(tr("Error while parsing project file '%1'!\n Error description: This is not a QuickFit 3.0 project file.").arg(file));

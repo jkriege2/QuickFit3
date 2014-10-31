@@ -341,6 +341,38 @@ void QFEvaluationPropertyEditorPrivate::showStatisticsComparing()
 
 }
 
+void QFEvaluationPropertyEditorPrivate::showData()
+{
+    QFTableService* hs=QFTableService::getInstance();
+    if (hs&&d->current) {
+        QModelIndexList idxs=tvResults->selectionModel()->selectedIndexes();
+        QMap<int, QFTableService::TableColumn> cols;
+        QString histID=QString("hist")+d->current->getType()+QString::number(d->current->getID());
+        hs->getCreateTableView(histID, tr("Data Table from %1").arg(d->current->getName()));
+        hs->clearTableView(histID);
+
+
+        for (int i=0; i<idxs.size(); i++) {
+            QFTableService::TableColumn h;
+            int col=idxs[i].column();
+            QString chead=d->resultsModel->headerData(col, Qt::Horizontal).toString();
+            QString rhead=d->resultsModel->headerData(col, Qt::Vertical).toString();
+
+            QString ename=d->resultsModel->data(idxs[i], QFEvaluationResultsModel::EvalNameRole).toString();
+            QString rname=d->resultsModel->data(idxs[i], QFEvaluationResultsModel::ResultNameRole).toString();
+            int rid=d->resultsModel->data(idxs[i], QFEvaluationResultsModel::ResultIDRole).toInt();
+
+            QFRawDataRecord* record=d->current->getProject()->getRawDataByID(rid);
+
+            if (record) {
+                h.name=chead+": "+rhead;
+                h.data=record->resultsGetAsDoubleList(ename, rname);
+                hs->addColumnToTableView(histID, h);
+            }
+        }
+    }
+}
+
 void QFEvaluationPropertyEditorPrivate::storeSettings()
 {
     if (!d->current) return;
@@ -600,6 +632,8 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     actSaveResultsAveraged=new QAction(tr("Save all results to file, averaged vector/matrix results"), d);
 
     tbResults->addSeparator();
+    actShowData=new QAction(QIcon(":/lib/result_table.png"), tr("show selected data as table"), d);
+    tbResults->addAction(actShowData);
     actStatistics=new QAction(QIcon(":/lib/result_statistics.png"), tr("histogram: column-wise"), d);
     tbResults->addAction(actStatistics);
     actStatisticsComparing=new QAction(QIcon(":/lib/result_statistics_compare.png"), tr("histogram: cell-wise"), d);
@@ -745,6 +779,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedRecords()));
     connect(actStatistics, SIGNAL(triggered()), this, SLOT(showStatistics()));
     connect(actStatisticsComparing, SIGNAL(triggered()), this, SLOT(showStatisticsComparing()));
+    connect(actShowData, SIGNAL(triggered()), this, SLOT(showData()));
 
 
     connect(actCopyExpanded, SIGNAL(triggered()), this, SLOT(copyExpandedResults()));
@@ -797,6 +832,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     tvResults->addAction(actSaveResultsAveraged);
     tvResults->addAction(actRefreshResults);
     tvResults->addAction(actDeleteResults);
+    tvResults->addAction(actShowData);
     tvResults->addAction(actStatistics);
     tvResults->addAction(actStatisticsComparing);
 
@@ -824,6 +860,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     menuResults->addAction(actCopyExpandedNoHeadMatlab);
     menuResults->addAction(actCopyExpandedNoHeadMatlabFlipped);
     menuResults->addSeparator();
+    menuResults->addAction(actShowData);
     menuResults->addAction(actStatistics);
     menuResults->addAction(actStatisticsComparing);
 

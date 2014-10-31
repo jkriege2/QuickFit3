@@ -34,6 +34,7 @@
 #include "qfparametercorrelationservice.h"
 #include "qfenhancedtabwidget.h"
 #include "datatools.h"
+#include "qftableservice.h"
 
 QFRawDataPropertyEditor_private::QFRawDataPropertyEditor_private(QFRawDataPropertyEditor *parent) :
     QObject(parent)
@@ -439,6 +440,10 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     actSaveResultsAveraged=new QAction(tr("Save all results to file with averaged vector/matrix results"), d);
     tbResults->addAction(actSaveResults);
     tbResults->addSeparator();
+
+    actShowData=new QAction(QIcon(":/lib/result_table.png"), tr("show selected data as table"), d);
+    tbResults->addAction(actShowData);
+
     actStatistics=new QAction(QIcon(":/lib/result_statistics_row.png"), tr("histogram: row-wise"), d);
     tbResults->addAction(actStatistics);
     actStatisticsComparing=new QAction(QIcon(":/lib/result_statistics_compare.png"), tr("Result histogram: cell-wise"), d);
@@ -568,6 +573,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     connect(actCopyExpandedNoHeadMatlabFlipped, SIGNAL(triggered()), this, SLOT(copyResultsExpandedNoHeadMatlabFlipped()));
 
     connect(actCorrelation, SIGNAL(triggered()), this, SLOT(showCorrelation()));
+    connect(actShowData, SIGNAL(triggered()), this, SLOT(showData()));
     connect(actStatistics, SIGNAL(triggered()), this, SLOT(showStatistics()));
     connect(actStatisticsComparing, SIGNAL(triggered()), this, SLOT(showStatisticsComparing()));
 
@@ -576,6 +582,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     tvResults->addAction(actSaveResults);
     tvResults->addAction(actSaveResultsAveraged);
     tvResults->addAction(actDeleteResults);
+    tvResults->addAction(actShowData);
     tvResults->addAction(actStatistics);
     tvResults->addAction(actStatisticsComparing);
     tvResults->addAction(actCorrelation);
@@ -601,6 +608,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     menuResults->addAction(actCopyExpandedNoHeadMatlab);
     menuResults->addAction(actCopyExpandedNoHeadMatlabFlipped);
     menuResults->addSeparator();
+    menuResults->addAction(actShowData);
     menuResults->addAction(actStatistics);
     menuResults->addAction(actStatisticsComparing);
     menuResults->addAction(actCorrelation);
@@ -1856,6 +1864,37 @@ void QFRawDataPropertyEditor_private::recordAboutToBeDeleted(QFRawDataRecord* r)
     if (r) {
         if (r->getProject()->getRawDataCount()<=1) {
             d->close();
+        }
+    }
+}
+
+void QFRawDataPropertyEditor_private::showData()
+{
+    QFTableService* hs=QFTableService::getInstance();
+    if (hs&&current) {
+        QModelIndexList idxs=tvResults->selectionModel()->selectedIndexes();
+        QMap<int, QFTableService::TableColumn> cols;
+        QString histID=QString("hist")+current->getType()+QString::number(current->getID());
+        hs->getCreateTableView(histID, tr("Data Table from %1").arg(current->getName()));
+        hs->clearTableView(histID);
+
+
+        for (int i=0; i<idxs.size(); i++) {
+            QFTableService::TableColumn h;
+            int col=idxs[i].column();
+            QString chead=current->resultsGetModel()->headerData(col, Qt::Horizontal).toString();
+            QString rhead=current->resultsGetModel()->headerData(col, Qt::Vertical).toString();
+
+            QString ename=current->resultsGetModel()->data(idxs[i], QFRDRResultsModel::EvalNameRole).toString();
+            QString rname=current->resultsGetModel()->data(idxs[i], QFRDRResultsModel::ResultNameRole).toString();
+
+            QFRawDataRecord* record=current;
+
+            if (record) {
+                h.name=chead+": "+rhead;
+                h.data=record->resultsGetAsDoubleList(ename, rname);
+                hs->addColumnToTableView(histID, h);
+            }
         }
     }
 }

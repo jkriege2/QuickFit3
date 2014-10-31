@@ -41,6 +41,7 @@
 #include "qfproject.h"
 #include "qfhistogramservice.h"
 #include "qfcompleterproperties.h"
+#include "qftableservice.h"
 
 
 class QFEvaluationPropertyEditor;
@@ -119,6 +120,7 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
         QWidget* widResults;
         QAction* actStatistics;
         QAction* actStatisticsComparing;
+        QAction* actShowData;
 
         QFEnhancedLineEdit* edtDisplayProperties;
         QFCompleterProperties* compDisplayProperties;
@@ -248,6 +250,7 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
 
         void showStatistics();
         void showStatisticsComparing();
+        void showData();
 
         void storeSettings();
         void loadSettings();

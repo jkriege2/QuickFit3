@@ -252,6 +252,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
 
 
+
         struct GraphInfo {
             GraphInfo();
             //void setBoxplotColumns(int position, int minC, int q25C, int medianC, int meanC, int q75C, int maxC);
@@ -291,6 +292,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             int yerrorcolumnlower;
             bool xerrorsymmetric;
             bool yerrorsymmetric;
+
+            int dataSortOrder;
 
 
 
@@ -371,7 +374,36 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
         };
 
+        struct GraphDataSelection {
+            GraphDataSelection();
+            GraphDataSelection(const GraphDataSelection& g);
+            GraphDataSelection& operator=(const GraphInfo& g);
+            GraphDataSelection& operator=(const GraphDataSelection& g);
+            int stride;
+            int strideStart;
+            bool isStrided;
 
+            bool isDataSelect;
+            int dataSelect1Column;
+            DataSelectOperation dataSelect1Operation;
+            double dataSelect1CompareValue;
+            double dataSelect1CompareValue2;
+
+            DataSelectLogicOperation dataSelectLogic12;
+            int dataSelect2Column;
+            DataSelectOperation dataSelect2Operation;
+            double dataSelect2CompareValue;
+            double dataSelect2CompareValue2;
+
+            DataSelectLogicOperation dataSelectLogic23;
+            int dataSelect3Column;
+            DataSelectOperation dataSelect3Operation;
+            double dataSelect3CompareValue;
+            double dataSelect3CompareValue2;
+
+
+            bool getDataWithStride(QVector<double> *dataOut, int* colOut, int column, const QFRDRTable* table, QString* newname=NULL, QFPlotter *plotter=NULL);
+        };
 
         struct AxisInfo {
             AxisInfo();
@@ -414,6 +446,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             PlotInfo();
             QString title;
             bool grid;
+            bool gridMinor;
             bool showKey;
             bool showTitle;
 
@@ -453,6 +486,14 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             QColor gridColor;
             Qt::PenStyle gridStyle;
             double gridWidth;
+            QColor gridColorMinor;
+            Qt::PenStyle gridStyleMinor;
+            double gridWidthMinor;
+
+            bool gridMinorX;
+            bool gridMinorY;
+            bool gridMajorX;
+            bool gridMajorY;
 
             AxisInfo xAxis;
             AxisInfo yAxis;
@@ -494,9 +535,9 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual int tableGetRowCount() const;
         virtual bool tableIsReadonly() const;
         virtual void tableSetColumnData(quint32 column, const QList<QVariant>& data);
-        virtual QList<QVariant> tableGetColumnData(quint32 column);
+        virtual QList<QVariant> tableGetColumnData(quint32 column) const;
         virtual void tableSetColumnDataAsDouble(quint32 column, const QVector<double>& data);
-        virtual QVector<double> tableGetColumnDataAsDouble(int column);
+        virtual QVector<double> tableGetColumnDataAsDouble(int column) const;
         virtual bool tablesGetDoEmitSignals() const;
         virtual void tablesSetDoEmitSignals(bool doEmit);
 

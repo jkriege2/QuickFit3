@@ -26,10 +26,11 @@
 #include "statistics_tools.h"
 #include "float.h"
 
-QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int colX, int colY, int colW, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph, int sourcegraph) :
+QFRDRTableRegressionDialog::QFRDRTableRegressionDialog(QFRDRTable *table, int colX, int colY, int colW, QFRDRTable::GraphDataSelection sel, QWidget *parent, bool logX, bool logY, int resultColumn, int addGraph, int sourcegraph) :
     QDialog(parent),
     ui(new Ui::QFRDRTableRegressionDialog)
 {
+    selection=sel;
     //qDebug()<<"QFRDRTableRegressionDialog colX="<<colX<<"  colY="<<colY<<"  colW="<<colW<<"  logX="<<logX<<"  logY="<<logY<<"  resultColumn="<<resultColumn<<"  addGraph="<<addGraph;
     parameterTable=new QFFitFunctionValueInputTable(this);
     ui->setupUi(this);
@@ -386,21 +387,21 @@ void QFRDRTableRegressionDialog::replotGraph()
     size_t c_ResYW=ds->addCopiedColumn(residualsYW.data(), residualsYW.size(), tr("weighted residuals"));
 
 
-    JKQTPxyLineErrorGraph* g_dist=new JKQTPxyLineErrorGraph(ui->pltDistribution->get_plotter());
-    g_dist->set_drawLine(true);
-    g_dist->set_title(tr("data"));
-    g_dist->set_xColumn(c_X);
-    g_dist->set_yColumn(c_Y);
-    g_dist->set_yErrorColumn(c_W);
-    g_dist->set_xErrorStyle(JKQTPnoError);
-    if (ui->chkPlotErrors->isChecked()) g_dist->set_yErrorStyle(JKQTPerrorBars);
-    else g_dist->set_yErrorStyle(JKQTPnoError);
-    g_dist->set_color(QColor("blue"));
-    g_dist->set_errorColor(g_dist->get_color().lighter());
-    g_dist->set_drawLine(false);
-    g_dist->set_symbol(JKQTPcross);
-    g_dist->set_symbolSize(7);
-    ui->pltDistribution->addGraph(g_dist);
+    JKQTPxyLineErrorGraph* g_data=new JKQTPxyLineErrorGraph(ui->pltDistribution->get_plotter());
+    g_data->set_drawLine(true);
+    g_data->set_title(tr("data"));
+    g_data->set_xColumn(c_X);
+    g_data->set_yColumn(c_Y);
+    g_data->set_yErrorColumn(c_W);
+    g_data->set_xErrorStyle(JKQTPnoError);
+    if (ui->chkPlotErrors->isChecked()) g_data->set_yErrorStyle(JKQTPerrorBars);
+    else g_data->set_yErrorStyle(JKQTPnoError);
+    g_data->set_color(QColor("blue"));
+    g_data->set_errorColor(g_data->get_color().lighter());
+    g_data->set_drawLine(false);
+    g_data->set_symbol(JKQTPcross);
+    g_data->set_symbolSize(7);
+    ui->pltDistribution->addGraph(g_data);
 
     JKQTPoverlayVerticalRange* ovlRange=new JKQTPoverlayVerticalRange(ui->datacut->get_userMin(), ui->datacut->get_userMax(), ui->pltDistribution->get_plotter());
     ovlRange->set_inverted(true);
@@ -434,6 +435,7 @@ void QFRDRTableRegressionDialog::replotGraph()
     g_res->set_drawLine(true);
     g_res->set_xColumn(c_X);
     g_res->set_yColumn(c_ResY);
+    g_res->set_sortData(JKQTPxyGraph::SortedX);
     if (ui->chkWeightedResiduals->isChecked()) {
         g_res->set_title(tr("weighted residuals"));
         g_res->set_yColumn(c_ResYW);
@@ -441,7 +443,7 @@ void QFRDRTableRegressionDialog::replotGraph()
         g_res->set_title(tr("residuals"));
         g_res->set_yColumn(c_ResY);
     }
-    g_res->set_color(g_dist->get_color());
+    g_res->set_color(g_data->get_color());
     g_res->set_symbol(JKQTPcross);
     g_res->set_symbolSize(7);
     ui->pltResiduals->addGraph(g_res);
@@ -524,13 +526,18 @@ void QFRDRTableRegressionDialog::connectSignals(bool connectS)
 void QFRDRTableRegressionDialog::readDataFromTable()
 {
 
-    dataX=table->tableGetColumnDataAsDouble(colX);
-    dataY=table->tableGetColumnDataAsDouble(colY);
+    //dataX=table->tableGetColumnDataAsDouble(colX);
+    //dataY=table->tableGetColumnDataAsDouble(colY);
+    selection.getDataWithStride(&dataX, NULL, colX, table, NULL, NULL);
+    selection.getDataWithStride(&dataY, NULL, colY, table, NULL, NULL);
+
     //qDebug()<<colX<<"dataX.size="<<dataX.size();
     //qDebug()<<colX<<"dataY.size="<<dataX.size();
     datapoints=qMin(dataX.size(), dataY.size());
     if (colW!=-1) {
-        dataW=table->tableGetColumnDataAsDouble(colW);
+        //dataW=table->tableGetColumnDataAsDouble(colW);
+        selection.getDataWithStride(&dataW, NULL, colW, table, NULL, NULL);
+
         //qDebug()<<"dataW.size="<<dataW.size();
         if (dataW.size()>0 && dataW.size()<datapoints) datapoints=dataW.size();
     } else {
@@ -634,8 +641,30 @@ void QFRDRTableRegressionDialog::writeFitProperties(int pid, int gid, int saveTo
             fixparams<<paramMap[parameterNames[i]].fix;
             errparams<<paramMap[parameterNames[i]].error;
         }
-        table->colgraphSetGraphProperty(pid, gid, "FIT_FIXEDPARAMS", fixparams);
-        table->colgraphSetGraphProperty(pid, gid, "FIT_ERRORPARAMS", errparams);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_FIXEDPARAMS", fixparams);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_ERRORPARAMS", errparams);
+
+    table->colgraphSetGraphProperty(pid, gid, "FIT_isStrided", selection.isStrided);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_stride", selection.stride);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_strideStart", selection.strideStart);
+
+    table->colgraphSetGraphProperty(pid, gid, "FIT_isDataSelect", selection.isDataSelect);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_dataSelect1Column", selection.dataSelect1Column);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_dataSelect1Operation", selection.dataSelect1Operation);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_dataSelect1CompareValue", selection.dataSelect1CompareValue);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_dataSelect1CompareValue2", selection.dataSelect1CompareValue2);
+
+    table->colgraphSetGraphProperty(pid, gid, "FIT_dataSelectLogic12", selection.dataSelectLogic12);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_dataSelect2Column", selection.dataSelect2Column);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_dataSelect2Operation", selection.dataSelect2Operation);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_dataSelect2CompareValue", selection.dataSelect2CompareValue);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_dataSelect2CompareValue2", selection.dataSelect2CompareValue2);
+
+    table->colgraphSetGraphProperty(pid, gid, "FIT_dataSelectLogic23", selection.dataSelectLogic23);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_dataSelect3Column", selection.dataSelect3Column);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_dataSelect3Operation", selection.dataSelect3Operation);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_dataSelect3CompareValue", selection.dataSelect3CompareValue);
+    table->colgraphSetGraphProperty(pid, gid, "FIT_dataSelect3CompareValue2", selection.dataSelect3CompareValue2);
 
     table->colgraphSetDoEmitSignals(emits);
 
@@ -653,6 +682,31 @@ void QFRDRTableRegressionDialog::readFitProperties(int pid, int gid, int *result
     ui->chkLogX->setChecked(logX=table->colgraphGetGraphProperty(pid, gid, "FIT_LOGX", ui->chkLogX->isChecked()).toBool());
     ui->chkLogY->setChecked(table->colgraphGetGraphProperty(pid, gid, "FIT_LOGY", ui->chkLogY->isChecked()).toBool());
     ui->datacut->setLogScale(logX, 20);
+
+
+
+    selection.isStrided=table->colgraphGetGraphProperty(pid, gid, "FIT_isStrided", selection.isStrided).toBool();
+    selection.stride=table->colgraphGetGraphProperty(pid, gid, "FIT_stride", selection.stride).toInt();
+    selection.strideStart=table->colgraphGetGraphProperty(pid, gid, "FIT_strideStart", selection.strideStart).toInt();
+
+    selection.isDataSelect=table->colgraphGetGraphProperty(pid, gid, "FIT_isDataSelect", selection.isDataSelect).toInt();
+    selection.dataSelect1Column=table->colgraphGetGraphProperty(pid, gid, "FIT_dataSelect1Column", selection.dataSelect1Column).toInt();
+    selection.dataSelect1Operation=(QFRDRTable::DataSelectOperation)table->colgraphGetGraphProperty(pid, gid, "FIT_dataSelect1Operation", selection.dataSelect1Operation).toInt();
+    selection.dataSelect1CompareValue=table->colgraphGetGraphProperty(pid, gid, "FIT_dataSelect1CompareValue", selection.dataSelect1CompareValue).toDouble();
+    selection.dataSelect1CompareValue2=table->colgraphGetGraphProperty(pid, gid, "FIT_dataSelect1CompareValue2", selection.dataSelect1CompareValue2).toDouble();
+
+    selection.dataSelectLogic12=(QFRDRTable::DataSelectLogicOperation)table->colgraphGetGraphProperty(pid, gid, "FIT_dataSelectLogic12", selection.dataSelectLogic12).toInt();
+    selection.dataSelect2Column=table->colgraphGetGraphProperty(pid, gid, "FIT_dataSelect2Column", selection.dataSelect2Column).toInt();
+    selection.dataSelect2Operation=(QFRDRTable::DataSelectOperation)table->colgraphGetGraphProperty(pid, gid, "FIT_dataSelect2Operation", selection.dataSelect2Operation).toInt();
+    selection.dataSelect2CompareValue=table->colgraphGetGraphProperty(pid, gid, "FIT_dataSelect2CompareValue", selection.dataSelect2CompareValue).toDouble();
+    selection.dataSelect2CompareValue2=table->colgraphGetGraphProperty(pid, gid, "FIT_dataSelect2CompareValue2", selection.dataSelect2CompareValue2).toDouble();
+
+    selection.dataSelectLogic23=(QFRDRTable::DataSelectLogicOperation)table->colgraphGetGraphProperty(pid, gid, "FIT_dataSelectLogic23", selection.dataSelectLogic23).toInt();
+    selection.dataSelect3Column=table->colgraphGetGraphProperty(pid, gid, "FIT_dataSelect3Column", selection.dataSelect3Column).toInt();
+    selection.dataSelect3Operation=(QFRDRTable::DataSelectOperation)table->colgraphGetGraphProperty(pid, gid, "FIT_dataSelect3Operation", selection.dataSelect3Operation).toInt();
+    selection.dataSelect3CompareValue=table->colgraphGetGraphProperty(pid, gid, "FIT_dataSelect3CompareValue", selection.dataSelect3CompareValue).toDouble();
+    selection.dataSelect3CompareValue2=table->colgraphGetGraphProperty(pid, gid, "FIT_dataSelect3CompareValue2", selection.dataSelect3CompareValue2).toDouble();
+
 
     int savedToColumn=table->colgraphGetGraphProperty(pid, gid, "FIT_SAVEDTOCOLUMN", -1).toInt();
     QList<QVariant> fixparams=table->colgraphGetGraphProperty(pid, gid, "FIT_FIXEDPARAMS").toList();

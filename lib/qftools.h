@@ -1644,6 +1644,23 @@ QFLIB_EXPORT QString qfGetTempFilename(const QString& templateName=QString("qf_t
  */
 QFLIB_EXPORT bool qfCopyData( QIODevice* in, QIODevice* out);
 
+
+
+class QFLIB_EXPORT QFProgressMinorProgress {
+    public:
+        virtual ~QFProgressMinorProgress() {}
+        virtual void setMinorProgress(int value)=0;
+        virtual void setMinorProgressRange(int min=0, int max=100)=0;
+        virtual bool wasMinorProgressCanceled() const=0;
+};
+
+/*! \brief copies data (in chunks) from one file to another
+    \ingroup qf3lib_tools
+
+
+ */
+QFLIB_EXPORT bool qfCopyData( QIODevice* in, QIODevice* out, QFProgressMinorProgress* pdlg);
+
 /*! \brief reads the contents of the given file and compares it to the given string. Returns \c true, if the two are equal
     \ingroup qf3lib_tools
 

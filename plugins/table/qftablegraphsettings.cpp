@@ -312,6 +312,7 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.imageLegendG=ui->edtColorbarLabelG->text();
         graph.imageLegendB=ui->edtColorbarLabelB->text();
         graph.imageLegendMod=ui->edtColorbarLabelMod->text();
+        graph.dataSortOrder=ui->cmbSort->currentIndex();
 
 
 
@@ -408,6 +409,8 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->edtWidth->setValue(graph.width*100.0);
     ui->edtShift->setValue(graph.shift*100.0);
     ui->edtOffset->setValue(graph.offset);
+
+    ui->cmbSort->setCurrentIndex(graph.dataSortOrder);
 
 
     ui->cmbErrorColor->setCurrentColor(graph.errorColor);
@@ -589,6 +592,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         ui->btnClearLinesMax->setVisible(false);
         ui->btnClearLinesMean->setVisible(false);
         ui->btnClearLinesQ75->setVisible(false);
+        ui->labSort->setVisible(true);
+        ui->cmbSort->setVisible(true);
 
         ui->labDataX->setText(tr("X data col.:"));
         ui->labDataY->setText(tr("Y data col.:"));
@@ -940,6 +945,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widDataSelect->setVisible(false);
                 ui->chkSTrided->setVisible(false);
                 ui->widStride->setVisible(false);
+                ui->labSort->setVisible(false);
+                ui->cmbSort->setVisible(false);
 
                 ui->labTransparencyFalse->setVisible(false);
                 ui->widFalseTransparency->setVisible(false);
@@ -989,6 +996,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widDataSelect->setVisible(false);
                 ui->chkSTrided->setVisible(false);
                 ui->widStride->setVisible(false);
+                ui->labSort->setVisible(false);
+                ui->cmbSort->setVisible(false);
 
                 ui->labTransparencyFalse->setVisible(false);
                 ui->widFalseTransparency->setVisible(false);
@@ -1030,6 +1039,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widDataSelect->setVisible(false);
                 ui->chkSTrided->setVisible(false);
                 ui->widStride->setVisible(false);
+                ui->labSort->setVisible(false);
+                ui->cmbSort->setVisible(false);
 
                 ui->labErrorY->setVisible(false);
                 ui->labSymbol->setVisible(false);
@@ -1092,6 +1103,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->widDataSelect->setVisible(false);
                 ui->chkSTrided->setVisible(false);
                 ui->widStride->setVisible(false);
+                ui->labSort->setVisible(false);
+                ui->cmbSort->setVisible(false);
 
                 ui->btnRefit->setVisible(isFitResult);
 
@@ -1122,6 +1135,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labRangeStyle->setVisible(true);
                 ui->widRangeData->setVisible(true);
                 ui->widRangeStyle->setVisible(true);
+                ui->labSort->setVisible(false);
+                ui->cmbSort->setVisible(false);
 
                 ui->widErrorX->setVisible(false);
                 ui->widErrorX2->setVisible(false);
@@ -1209,6 +1224,7 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->edtWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->edtShift, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->edtOffset, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->cmbSort, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
 
     connect(ui->cmbFillColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbErrorColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
@@ -1301,6 +1317,7 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->edtShift, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
 
     disconnect(ui->edtOffset, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbSort, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
 
     disconnect(ui->cmbLinesQ75, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->edtFunction, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
@@ -1399,7 +1416,11 @@ void QFTableGraphSettings::disconnectWidgets()
 
 void QFTableGraphSettings::doFit()
 {
-    emit performFit(ui->cmbLinesXData->currentData().toInt(), ui->cmbLinesYData->currentData().toInt(), ui->cmbLinesYError->currentData().toInt(), plot, QString(""));
+    QFRDRTable::GraphInfo graph;
+    writeGraphData(graph);
+    QFRDRTable::GraphDataSelection sel;
+    sel=graph;
+    emit performFit(ui->cmbLinesXData->currentData().toInt(), ui->cmbLinesYData->currentData().toInt(), ui->cmbLinesYError->currentData().toInt(), plot, QString(""), sel);
 }
 
 void QFTableGraphSettings::doRefit()
@@ -1409,7 +1430,11 @@ void QFTableGraphSettings::doRefit()
 
 void QFTableGraphSettings::doRegression()
 {
-    emit performRegression(ui->cmbLinesXData->currentData().toInt(), ui->cmbLinesYData->currentData().toInt(), ui->cmbLinesYError->currentData().toInt(), plot);
+    QFRDRTable::GraphInfo graph;
+    writeGraphData(graph);
+    QFRDRTable::GraphDataSelection sel;
+    sel=graph;
+    emit performRegression(ui->cmbLinesXData->currentData().toInt(), ui->cmbLinesYData->currentData().toInt(), ui->cmbLinesYError->currentData().toInt(), plot, sel);
 }
 
 

@@ -89,8 +89,15 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief initialize from QDomElement, if \a loadAsDummy is \c true this method won't load the data in the record, but only the common descrption of the record.
          *
          * The property \a loadAsSummy is used by QFProject::readXMLDummy() in order to build a dummy project tree. For more information \see QFProject::readXMLDummy()
+         *
+         * \note The record ID is read from the XML dat!
          */
         void init(QDomElement& e, bool loadAsDummy=false);
+        /** \brief initialize from QDomElement
+         *
+         * \note This method retrieves a new record ID from the project, the ID in the XML-record is ignored!
+         */
+        void initNewID(QDomElement& e);
 
 
         /** \brief return the next sibling rawdata record in the project */
@@ -330,7 +337,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
          * id, ... but not the results and not the actual data. This function can be used to build a dummy project tree.
          *  \see QFProject::readXMLDummy() for more information on the property \a loadAsDummy
          */
-        void readXML(QDomElement& e, bool loadAsDummy=false);
+        void readXML(QDomElement& e, bool loadAsDummy=false, bool readID=true);
         /** \brief write data contents to QXmlStreamWriter (data tag) <b>IMPLEMENT IN CHILD CLASSES!</b> */
         virtual void intWriteData(QXmlStreamWriter& w) const {}
         /** \brief read in external data files <b>and</b> data stored in the project file <b>IMPLEMENT IN CHILD CLASSES!</b>
@@ -912,7 +919,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
          *        .
          *        This function does not copy/move any file, it simply adds the files (old/new location) to \a filecopylist, if it is supplied.
          */
-        void writeXML(QXmlStreamWriter& w, const QString& projectfilename, bool copyFilesToSubfolder=false, const QString &subfoldername=QString("raw_data_files/"), QList<QFProject::FileCopyList> *filecopylist=NULL) const;
+        void writeXML(QXmlStreamWriter& w, const QString& projectfilename, bool copyFilesToSubfolder=false, const QString &subfoldername=QString("raw_data_files/"), QList<QFProject::FileCopyList> *filecopylist=NULL, int writeMode=QFProject::wsmAll) const;
 
         /** \brief this function is called by writeXML() in order to determine, whether a linked file should be included in an export operation
          *

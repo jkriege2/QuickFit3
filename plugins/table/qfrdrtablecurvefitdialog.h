@@ -39,7 +39,7 @@ class QFRDRTableCurveFitDialog : public QDialog
         Q_OBJECT
         
     public:
-    explicit QFRDRTableCurveFitDialog(QFRDRTable* table, int colX, int colY, int colW, QWidget *parent = 0, bool logX=false, bool logY=false, int resultColumn=-1, int addGraph=-1, int sourceGraph=-1);
+    explicit QFRDRTableCurveFitDialog(QFRDRTable* table, int colX, int colY, int colW, QFRDRTable::GraphDataSelection sel, QWidget *parent = 0, bool logX=false, bool logY=false, int resultColumn=-1, int addGraph=-1, int sourceGraph=-1);
     explicit QFRDRTableCurveFitDialog(QFRDRTable* table, int plotid, int graphid, QWidget *parent = 0);
         ~QFRDRTableCurveFitDialog();
     protected slots:
@@ -73,6 +73,8 @@ class QFRDRTableCurveFitDialog : public QDialog
         int overwriteGraph;
         int overwritePlot;
         int sourceGraph;
+
+        QFRDRTable::GraphDataSelection selection;
 
 
         QFFitFunctionValueInputTable* parameterTable;

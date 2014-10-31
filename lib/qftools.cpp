@@ -1388,3 +1388,32 @@ bool qfCopyData( QIODevice* in, QIODevice* out) {
     }
     return true;
 }
+
+bool qfCopyData( QIODevice* in, QIODevice* out, QFProgressMinorProgress* pdlg) {
+    size_t chunksize=QFCOPYDATA_CHUNKSIZEHUNKSIZE;
+    char* chunk=qfMallocT<char>(QFCOPYDATA_CHUNKSIZEHUNKSIZE);
+    while (!chunk && chunksize>1024) {
+        chunksize=chunksize/2;
+        chunk=qfMallocT<char>(QFCOPYDATA_CHUNKSIZEHUNKSIZE);
+    }
+    if (chunk) {
+        qint64 maxs=in->size();
+        int maxx=maxs/chunksize;
+        if (pdlg) pdlg->setMinorProgressRange(0, maxx);
+        int cnt=0;
+        while (!in->atEnd() && (!pdlg || !pdlg->wasMinorProgressCanceled())) {
+            qint64 bytesRead=in->read(chunk, chunksize);
+            out->write(chunk, bytesRead);
+            cnt++;
+            if (pdlg) pdlg->setMinorProgress(cnt);
+            QApplication::processEvents();
+        }
+        qfFree(chunk);
+        if (pdlg) pdlg->setMinorProgress(0);
+    } else {
+        if (pdlg) pdlg->setMinorProgress(0);
+        return false;
+    }
+    if (pdlg) return !pdlg->wasMinorProgressCanceled();
+    return true;
+}

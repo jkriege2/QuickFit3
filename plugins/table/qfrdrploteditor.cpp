@@ -224,9 +224,9 @@ void QFRDRPlotEditor::rebuildPlotWidgets(bool keepPosition) {
     } else {
         while (plotWidgets.size()<current->getPlotCount()) {
             QFRDRTablePlotWidget* w=new QFRDRTablePlotWidget(tabPlots);
-            connect(w, SIGNAL(performFit(int,int,int,int,int,QString,bool,bool)), this, SLOT(doFit(int,int,int,int,int,QString,bool,bool)));
+            connect(w, SIGNAL(performFit(int,int,int,int,int,QString, QFRDRTable::GraphDataSelection,bool,bool)), this, SLOT(doFit(int,int,int,int,int,QString, QFRDRTable::GraphDataSelection,bool,bool)));
             connect(w, SIGNAL(performRefit(int,int)), this, SLOT(doRefit(int,int)));
-            connect(w, SIGNAL(performRegression(int,int,int,int,int,bool,bool)), this, SLOT(doRegression(int,int,int,int,int,bool,bool)));
+            connect(w, SIGNAL(performRegression(int,int,int,int,int, QFRDRTable::GraphDataSelection,bool,bool)), this, SLOT(doRegression(int,int,int,int,int, QFRDRTable::GraphDataSelection,bool,bool)));
 
             plotWidgets.append(w);
             tabPlots->addTab(plotWidgets[plotWidgets.size()-1], "plot");
@@ -291,14 +291,14 @@ void QFRDRPlotEditor::sendEditorCommand(const QString &command, const QVariant &
     }
 }
 
-void QFRDRPlotEditor::doFit(int xCol, int yCol, int sigmaCol, int plot, int graph, QString function, bool xlog, bool ylog)
+void QFRDRPlotEditor::doFit(int xCol, int yCol, int sigmaCol, int plot, int graph, QString function, QFRDRTable::GraphDataSelection sel, bool xlog, bool ylog)
 {
-    emit performFit(xCol, yCol, sigmaCol, plot, graph, function,xlog, ylog);
+    emit performFit(xCol, yCol, sigmaCol, plot, graph, function, sel,xlog, ylog);
 }
 
-void QFRDRPlotEditor::doRegression(int xCol, int yCol, int sigmaCol, int plot, int graph, bool xlog, bool ylog)
+void QFRDRPlotEditor::doRegression(int xCol, int yCol, int sigmaCol, int plot, int graph, QFRDRTable::GraphDataSelection sel, bool xlog, bool ylog)
 {
-    emit performRegression(xCol, yCol, sigmaCol, plot,graph,xlog, ylog);
+    emit performRegression(xCol, yCol, sigmaCol, plot,graph,sel,xlog, ylog);
 }
 
 void QFRDRPlotEditor::doRefit(int plot, int graph)
