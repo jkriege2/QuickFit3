@@ -701,28 +701,7 @@ QFMathParser::qfmpNode* QFMathParser::vectorPrimary(bool get){
     QFMathParser::qfmpNode* res=NULL;
     if (get) getToken();
 
-    if(CurrentToken==LBRACKET) { // found primary: [ expression, expression, ... ] i.e. a vector
-
-        qfmpVectorList* vl=new qfmpVectorList(this, NULL);
-        res=vl;
-        getToken();
-        while ((CurrentToken != RBRACKET)) {
-            QFMathParser::qfmpNode* parameter=logicalExpression(vl->getCount()>0);
-            vl->add(parameter);
-            if ((CurrentToken!=RBRACKET)&&(CurrentToken!=COMMA)) {
-                qfmpError(QString("']' or ',' expected, but '%1' found after %2 elements").arg(currenttokentostring()).arg(vl->getCount()));
-                return NULL;
-            }
-            //qDebug()<<"adding to [...]: "<<vl->getCount()<<". element CurrentToke="<<currenttokentostring();
-        }
-
-
-        if ( CurrentToken != RBRACKET ) {
-            qfmpError(QString("']' expected, but '%1' found").arg(currenttokentostring()));
-            return NULL;
-        }
-        getToken();
-    } else { // vector construct start:delta:end and start:end
+     { // vector construct start:delta:end and start:end
 
 
         res=primary(false);
@@ -951,6 +930,33 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
 			getToken();
 			break;
         }
+
+
+
+
+        case LBRACKET: { // found '['
+                qfmpVectorList* vl=new qfmpVectorList(this, NULL);
+                res=vl;
+                getToken();
+                while ((CurrentToken != RBRACKET)) {
+                    QFMathParser::qfmpNode* parameter=logicalExpression(vl->getCount()>0);
+                    vl->add(parameter);
+                    if ((CurrentToken!=RBRACKET)&&(CurrentToken!=COMMA)) {
+                        qfmpError(QString("']' or ',' expected, but '%1' found after %2 elements").arg(currenttokentostring()).arg(vl->getCount()));
+                        return new qfmpInvalidNode(this, NULL);
+                    }
+                    //qDebug()<<"adding to [...]: "<<vl->getCount()<<". element CurrentToke="<<currenttokentostring();
+                }
+
+
+                if ( CurrentToken != RBRACKET ) {
+                    qfmpError(QString("']' expected, but '%1' found").arg(currenttokentostring()));
+                    return new qfmpInvalidNode(this, NULL);
+                }
+                getToken();
+
+
+            } break;
 
 		default:
             qfmpError(QObject::tr("primary expected, but '%1' found").arg(currenttokentostring()));
@@ -1297,75 +1303,42 @@ QFMathParser::qfmpUnaryNode::~qfmpUnaryNode()
     if (child) delete child;
 }
 
-qfmpResult QFMathParser::qfmpUnaryNode::evaluate(){
-  qfmpResult c=child->evaluate();
-  qfmpResult res;
-  res=c;
-
-  switch(operation) {
-    case '!':
-         if (c.type==qfmpBool) {
-           res.boolean=!c.boolean;
-           return res;
-         } else parser->qfmpError(QObject::tr("'!' only defined for bool"));
-         break;
-      case '-':
-          if (c.type==qfmpDouble) {
-            res.num=-c.num;
-            return res;
-          } else if (c.type==qfmpDoubleVector) {
-              for (int i=0; i<res.numVec.size(); i++) res.numVec[i]=-c.numVec[i];
-              return res;
-           } else parser->qfmpError(QObject::tr("'-' only defined for numbers"));
-           break;
-      case '~':
-           if (c.isInteger()) {
-               res.num=double(~c.toInteger());
-               return res;
-           } else if (c.type==qfmpDoubleVector) {
-               for (int i=0; i<res.numVec.size(); i++) res.numVec[i]=double(~int32_t(c.numVec[i]));
-               return res;
-           } else parser->qfmpError(QObject::tr("'~' only defined for integer numbers"));
-           break;
-     default: parser->qfmpError(QObject::tr("unknown unary operation"));
-  }
-  res.isValid=false;
-  return res;
-}
 
 void QFMathParser::qfmpUnaryNode::evaluate(qfmpResult &res)
 {
-    qfmpResult c;
-    child->evaluate(c);
+    //qfmpResult c;
+    child->evaluate(res);
 
     switch(operation) {
       case '!':
-           if (c.type==qfmpBool) {
-             res.setBoolean(!c.boolean);
-             return ;
-           } else parser->qfmpError(QObject::tr("'!' only defined for bool"));
+            if (res.type==qfmpBool) {
+              res.boolean=!res.boolean;
+              return ;
+            } else if (res.type==qfmpBoolVector) {
+                for (int i=0; i<res.boolVec.size(); i++) res.boolVec[i]=!res.boolVec[i];
+                return ;
+             } else parser->qfmpError(QObject::tr("'!' only defined for bool (argument type was %1)").arg(res.typeName()));
            break;
         case '-':
-            if (c.type==qfmpDouble) {
-              res.setDouble(-c.num);
-              return ;
-            } else if (c.type==qfmpDoubleVector) {
-                res.setDoubleVec(c.numVec.size());
-                for (int i=0; i<res.numVec.size(); i++) res.numVec[i]=-c.numVec[i];
+            if (res.type==qfmpDouble) {
+                res.num=-res.num;
                 return ;
-             } else parser->qfmpError(QObject::tr("'-' only defined for numbers"));
+            } else if (res.type==qfmpDoubleVector) {
+                //res.setDoubleVec(res.numVec.size());
+                for (int i=0; i<res.numVec.size(); i++) res.numVec[i]=-res.numVec[i];
+                return ;
+             } else parser->qfmpError(QObject::tr("'-' only defined for numbers (argument type was %1)").arg(res.typeName()));
              break;
         case '~':
-             if (c.isInteger()) {
-                 res.setDouble(~c.toInteger());
+             if (res.isInteger()) {
+                 res.num=~res.toInteger();
                  return ;
-             } else if (c.type==qfmpDoubleVector) {
-                 res.setDoubleVec(c.numVec.size());
-                 for (int i=0; i<res.numVec.size(); i++) res.numVec[i]=double(~int32_t(c.numVec[i]));
+             } else if (res.type==qfmpDoubleVector) {
+                 for (int i=0; i<res.numVec.size(); i++) res.numVec[i]=double(~int32_t(res.numVec[i]));
                  return ;
-             } else parser->qfmpError(QObject::tr("'~' only defined for integer numbers"));
+             } else parser->qfmpError(QObject::tr("'~' only defined for integer numbers (argument type was %1)").arg(res.typeName()));
              break;
-       default: parser->qfmpError(QObject::tr("unknown unary operation"));
+       default: parser->qfmpError(QObject::tr("unknown unary operation '%1'").arg(operation));
     }
     res.setInvalid();
 }
@@ -1428,12 +1401,6 @@ QFMathParser::qfmpBinaryArithmeticNode::~qfmpBinaryArithmeticNode()
     if (right) delete right;
 }
 
-qfmpResult QFMathParser::qfmpBinaryArithmeticNode::evaluate(){
-  qfmpResult res;  
-  res.setInvalid();
-  evaluate(res);
-  return res;
-}
 
 
 void QFMathParser::qfmpBinaryArithmeticNode::evaluate(qfmpResult& res){
@@ -1550,11 +1517,6 @@ QFMathParser::qfmpCompareNode::~qfmpCompareNode()
     if (right) delete right;
 }
 
-qfmpResult QFMathParser::qfmpCompareNode::evaluate(){
-    qfmpResult res;
-    evaluate(res);
-    return res;
-}
 
 void QFMathParser::qfmpCompareNode::evaluate(qfmpResult &res)
 {
@@ -1671,11 +1633,6 @@ QFMathParser::qfmpBinaryBoolNode::~qfmpBinaryBoolNode()
     if (right) delete right;
 }
 
-qfmpResult QFMathParser::qfmpBinaryBoolNode::evaluate(){
-    qfmpResult res;
-    evaluate(res);
-    return res;
-}
 
 void QFMathParser::qfmpBinaryBoolNode::evaluate(qfmpResult &res)
 {
@@ -1858,21 +1815,6 @@ QFMathParser::qfmpNode *QFMathParser::qfmpNodeList::popLast(bool deleteObject)
 }
 
 
-qfmpResult QFMathParser::qfmpNodeList::evaluate(){
-  int n=getCount();
-  qfmpResult res;
-  //qDebug()<<"evaluating nodelist with "<<n<<" items";
-  if (n>0) {
-     for (int i=0; i<n; i++) {
-        res.setInvalid();
-        if (list[i]) res=list[i]->evaluate();
-        //qDebug()<<"eval nodelist, item"<<i+1<<"/"<<n<<":  "<<res.toTypeString();
-     }
-     return res;
-  } else parser->qfmpError(QObject::tr("NodeList empty"));
-  res.isValid=false;
-  return res;
-}
 
 void QFMathParser::qfmpNodeList::evaluate(qfmpResult &res)
 {
@@ -2020,17 +1962,6 @@ QFMathParser::qfmpFunctionNode::qfmpFunctionNode(QString name, QVector<qfmpNode 
       if (child[i]) child[i]->setParent(this);
     }
   }
-}
-
-qfmpResult QFMathParser::qfmpFunctionNode::evaluate() {
-    /*QVector<qfmpResult> data(child.size(), QFMathParser::getInvalidResult());
-    for (int i=0; i<child.size(); i++) {
-        if (child[i]) data[i]=child[i]->evaluate();
-    }
-    return parser->evaluateFunction(fun, data);*/
-    qfmpResult r;
-    evaluate(r);
-    return r;
 }
 
 void QFMathParser::qfmpFunctionNode::evaluate(qfmpResult &result)
@@ -2732,12 +2663,6 @@ QFMathParser::qfmpFunctionAssignNode::qfmpFunctionAssignNode(QString function, Q
     this->parameterNames=parameterNames;
 }
 
-qfmpResult QFMathParser::qfmpFunctionAssignNode::evaluate()
-{
-    getParser()->addFunction(function, parameterNames, child->copy(NULL));
-    return qfmpResult::voidResult();
-}
-
 void QFMathParser::qfmpFunctionAssignNode::evaluate(qfmpResult &res)
 {
     getParser()->addFunction(function, parameterNames, child->copy(NULL));
@@ -2800,13 +2725,6 @@ void QFMathParser::qfmpInvalidNode::evaluate(qfmpResult &result)
 QFMathParser::qfmpNode *QFMathParser::qfmpInvalidNode::copy(QFMathParser::qfmpNode *par)
 {
     return new QFMathParser::qfmpInvalidNode(getParser(), par);
-}
-
-qfmpResult QFMathParser::qfmpVectorList::evaluate()
-{
-    qfmpResult res;
-    evaluate(res);
-    return res;
 }
 
 void QFMathParser::qfmpVectorList::evaluate(qfmpResult &res)
@@ -2906,40 +2824,7 @@ QFMathParser::qfmpVectorConstructionNode::~qfmpVectorConstructionNode()
     if (end) delete end;
 }
 
-qfmpResult QFMathParser::qfmpVectorConstructionNode::evaluate()
-{
-    qfmpResult res;
-    res.isValid=false;
-    res.type=qfmpDoubleVector;
-    qfmpResult rstart=start->evaluate();
-    qfmpResult rend=end->evaluate();
-    if (rstart.type!=qfmpDouble || rend.type!=qfmpDouble) {
-        if (getParser()) getParser()->qfmpError(QObject::tr("error in vector construct 'start[:delta]:end'' start, delta and end have to be numbers (start=%1, end=%2)").arg(rstart.toTypeString()).arg(rend.toTypeString()));
-        return res;
-    }
-    double s=rstart.num;
-    double e=rend.num;
-    double d=1;
-    if (step) {
-        qfmpResult rstep=step->evaluate();
-        if (rstep.type!=qfmpDouble) {
-            if (getParser()) getParser()->qfmpError(QObject::tr("error in vector construct 'start:delta:end'' delta has to be numbers (start=%1, step=%2, end=%3)").arg(rstart.toTypeString()).arg(rstep.toTypeString()).arg(rend.toTypeString()));
-            return res;
-        }
-        d=rstep.num;
-    }
-    res.isValid=true;
-    if (d>0) {
-        for (double t=s; t<=e; t=t+d) {
-            res.numVec<<t;
-        }
-    } else if (d<0) {
-        for (double t=s; t>=e; t=t+d) {
-            res.numVec<<t;
-        }
-    }
-    return res;
-}
+
 
 void QFMathParser::qfmpVectorConstructionNode::evaluate(qfmpResult &res)
 {
@@ -3007,22 +2892,7 @@ void QFMathParser::qfmpCasesNode::addCase(QFMathParser::qfmpNode *decision, QFMa
     casesNodes.append(qMakePair(decision, value));
 }
 
-qfmpResult QFMathParser::qfmpCasesNode::evaluate()
-{
-    qfmpResult r;
-    r.isValid=false;
-    for (int i=0; i<casesNodes.size(); i++) {
-        qfmpResult d=casesNodes[i].first->evaluate();
-        if (d.type==qfmpBool) {
-            if (d.boolean) return casesNodes[i].second->evaluate();
-        } else {
-            if (getParser()) getParser()->qfmpError(QObject::tr("decision statement %1 does not have type boolean").arg(i+1));
-            return r;
-        }
-    }
-    if (elseNode) r=elseNode->evaluate();
-    return r;
-}
+
 
 void QFMathParser::qfmpCasesNode::evaluate(qfmpResult &r)
 {
@@ -3154,12 +3024,6 @@ QFMathParser::qfmpVectorOperationNode::~qfmpVectorOperationNode()
     if (delta) delete delta;
 }
 
-qfmpResult QFMathParser::qfmpVectorOperationNode::evaluate()
-{
-    qfmpResult r;
-    evaluate(r);
-    return r;
-}
 
 void QFMathParser::qfmpVectorOperationNode::evaluate(qfmpResult &r)
 {

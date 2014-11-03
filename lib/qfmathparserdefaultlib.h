@@ -436,6 +436,8 @@ namespace QFMathParser_DefaultLib {
     void fIntVec(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
     void fNum(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
     void fBool(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
+    void fEnsureVectorSize(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
+    void fEnsureVectorSizeStart(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
 
     void addDefaultFunctions(QFMathParser *p);
     bool hasDefaultFunctions(QFMathParser* p);
@@ -475,6 +477,31 @@ namespace QFMathParser_DefaultLib {
     void fTable_columns(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fTable_columntitles(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fTable_rows(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+
+
+    void fRDR_isoverview(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_overviewwidth(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_overviewheight(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_overviewsize(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_overviewchannels(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_overview(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+
+    void fRDR_ismask(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fRDR_maskwidth(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_maskheight(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_masksize(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_mask(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+
+    void fRDR_isimageselection(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fRDR_imageselectionwidth(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_imageselectionheight(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_imageselectionsize(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_imageselectioncount(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_imageselectionnames(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_imageselectionlastofname(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_imageselectionfirstofname(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_imageselection(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+
 #endif
 
 }

@@ -1,0 +1,87 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Access to stored image selections in RDRs in the current QuickFit Project</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  $$startbox_note$$
+  $$IMAGESELECTION_EXPLANATION$$
+  $$endbox$$
+  
+  
+  $$funcref_start$$<a name="rdr_isimageselection"/><!-- func:rdr_isimageselection -->
+    <b><tt><!-- template -->rdr_isimageselection(rdrid)<!-- /template --></tt> - <i> returns <tt>true</tt> is the given raw data record (RDR) in the current project has a image/pixel selection</i>:</b>
+  $$funcref_description$$
+      This function mainly workf on image selections, as e.g. implemented in the standard <a href="$$plugin_info:help:imaging_fcs$$">imagingFCS plugin</a> of QuickFit. There, the user can save "stored selections", which are accessible with the functions described here.
+	  <br><small>$$IMAGESELECTION_EXPLANATION$$</small>
+        <!-- /func:rdr_isimageselection -->
+  $$funcref_end$$
+  
+  
+  $$funcref_start$$<a name="imageselection_width"/><!-- func:imageselection_width -->
+    <b><tt><!-- template -->imageselection_width(rdrid)<!-- /template --></tt> - <i> returns the width (in pixels) of the image/pixel selection in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+        <small>$$IMAGESELECTION_EXPLANATION$$</small> 
+        <!-- /func:imageselection_width -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="imageselection_height"/><!-- func:imageselection_height -->
+    <b><tt><!-- template -->imageselection_height(rdrid)<!-- /template --></tt> - <i> returns the height (in pixels) of the image/pixel selection in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+        <small>$$IMAGESELECTION_EXPLANATION$$</small> 
+        <!-- /func:imageselection_height -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="imageselection_size"/><!-- func:imageselection_size -->
+    <b><tt><!-- template -->imageselection_size(rdrid)<!-- /template --></tt> - <i> returns the size (in pixels), i.e. <tt>imageselection_width(rdrid)*imageselection_height(rdrid)</tt> of the image/pixel selection in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+        <small>$$IMAGESELECTION_EXPLANATION$$</small> 
+        <!-- /func:imageselection_size -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="imageselection_count"/><!-- func:imageselection_count -->
+    <b><tt><!-- template -->imageselection_count(rdrid)<!-- /template --></tt> - <i> returns the number of stored image/pixel selections available in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+        <small>$$IMAGESELECTION_EXPLANATION$$</small> 
+        <!-- /func:imageselection_count -->
+  $$funcref_end$$
+  
+  
+  $$funcref_start$$<a name="imageselection_names"/><!-- func:imageselection_names -->
+    <b><tt><!-- template -->imageselection_names(rdrid)<!-- /template --></tt> - <i> returns the names of stored image/pixel selections available in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+  This function resturns a vector of strings.<br>
+        <small>$$IMAGESELECTION_EXPLANATION$$</small> 
+        <!-- /func:imageselection_names -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="imageselection_image"/><!-- func:imageselection_image -->
+    <b><tt><!-- template -->imageselection_image(rdrid,selectionid)<!-- /template --></tt> - <i> returns the image/pixel selection with the given <tt>selectionid</tt> in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+    This function returns a vector of booleans with a size of <tt>imageselection_width(rdrid)*imageselection_height(rdrid)</tt>.
+        <br><small>$$IMAGESELECTION_EXPLANATION$$</small> 
+        <!-- /func:imageselection_image -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="imageselection_firstofname"/><!-- func:imageselection_lastofname -->
+    <b><tt><!-- template -->imageselection_lastofname(rdrid,name)<!-- /template --></tt> - <i> returns the first image/pixel selection with the given <tt>name</tt> in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+    This function returns a vector of booleans with a size of <tt>imageselection_width(rdrid)*imageselection_height(rdrid)</tt>.
+        <br><small>$$IMAGESELECTION_EXPLANATION$$</small> 
+        <!-- /func:imageselection_lastofname -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="imageselection_lastofname"/><!-- func:imageselection_lastofname -->
+    <b><tt><!-- template -->imageselection_lastofname(rdrid,name)<!-- /template --></tt> - <i> returns the last image/pixel selection with the given <tt>name</tt> in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+    This function returns a vector of booleans with a size of <tt>imageselection_width(rdrid)*imageselection_height(rdrid)</tt>.
+        <br><small>$$IMAGESELECTION_EXPLANATION$$</small> 
+        <!-- /func:imageselection_lastofname -->
+  $$funcref_end$$
+  
+  </body>
+  </html>
+  

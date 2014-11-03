@@ -48,7 +48,7 @@ class QFMathParser; // forward
  */
 /*@{*/
 
-#define QFMATHPARSER_VERSION "0.4"
+#define QFMATHPARSER_VERSION "0.5"
 
 
 /** possible result types
@@ -178,10 +178,37 @@ struct QFLIB_EXPORT qfmpResult {
         QFLIB_EXPORT void setString(const QString& val);
         QFLIB_EXPORT void setDoubleVec(const QVector<double>& val);
         QFLIB_EXPORT void setDoubleVec(int size=0, double defaultVal=0);
+        template <typename T>
+        inline void setDoubleVec(T* data, int size) {
+            setDoubleVec(size);
+            for (int i=0; i<size; i++) {
+                numVec[i]=double(data[i]);
+            }
+        }
+
+
         QFLIB_EXPORT void setBoolVec(const QVector<bool>& val);
         QFLIB_EXPORT void setBoolVec(int size=0, bool defaultVal=false);
+
+        template <typename T>
+        inline void setBoolVec(T* data, int size) {
+            setBoolVec(size);
+            for (int i=0; i<size; i++) {
+                boolVec[i]=bool(data[i]);
+            }
+        }
+
         QFLIB_EXPORT void setStringVec(const QStringList& val);
         QFLIB_EXPORT void setStringVec(int size=0, const QString& defaultVal=QString(""));
+
+
+        template <typename T>
+        inline void setStringVec(T* data, int size) {
+            setStringVec(size);
+            for (int i=0; i<size; i++) {
+                strVec[i]=data[i];
+            }
+        }
         /** \brief converst the result to a vector of number (numbers and number vectors are converted!) */
         QFLIB_EXPORT QVector<double> asVector() const;
         /** \brief converst the result to a list of QVariants */

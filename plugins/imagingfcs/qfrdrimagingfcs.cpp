@@ -26,6 +26,8 @@
 #include "qfrdrimagingfcstools.h"
 #include "yaid_rh.h"
 #include "qfrdrimagingfcssimulator.h"
+#include "qfrdrimagingfcs_parserfunctions.h"
+#include "qfmathparser.h"
 
 QFRDRImagingFCSPlugin* QFRDRImagingFCSPlugin::instance=NULL;
 
@@ -61,6 +63,15 @@ void QFRDRImagingFCSPlugin::init()
                                                                                             "<li><a href=\"$$plugin_info:helpdir:%1$$/imfcs_dataformats.html#formats_evalsettings\">evaluation settings report</a></li>\n"
                                                                                             "</ul></li>\n").arg(getID()));
 
+
+    QFPluginServices::getInstance()->appendOrAddHTMLReplacement("qfmathparser_ref", QString("$$insert:%1/parserref.inc$$").arg(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())));
+    QStringList sl=QFPluginServices::getInstance()->getGlobalConfigValue("QFMathParser_ref").toStringList();
+    sl.append(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
+    QFPluginServices::getInstance()->setGlobalConfigValue("QFMathParser_ref", sl);
+    QFPluginServices::getInstance()->addQFMathParserRefernceDir(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
+
+
+    QFMathParser::addGlobalFunction("rdr_isimfcs", fRDR_isimfcs);
 
 }
 

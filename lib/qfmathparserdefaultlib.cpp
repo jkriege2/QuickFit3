@@ -33,6 +33,9 @@
 #  include "qfrawdatarecord.h"
 #  include "qfevaluationitem.h"
 #  include "qfrdrtableinterface.h"
+#  include "qfrdrimagemask.h"
+#  include "qfrdrimageselectioninterface.h"
+#  include "qfrdrimagetoruninterface.h"
 #endif
 
 
@@ -51,7 +54,7 @@ bool QFMathParser_DefaultLib::hasDefaultVariables(QFMathParser* p)
 void QFMathParser_DefaultLib::addDefaultVariables(QFMathParser* p)
 {
 
-    p->addVariableString("stdlib_version", QString("0.3 (p%1)").arg(QFMATHPARSER_VERSION));
+    p->addVariableString("stdlib_version", QString("0.4 (p%1)").arg(QFMATHPARSER_VERSION));
 
 
     p->addVariableDouble("pi", M_PI);
@@ -302,6 +305,8 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("boolvec", QFMathParser_DefaultLib::fBoolVec);
     p->addFunction("numvec", QFMathParser_DefaultLib::fNumVec);
     p->addFunction("intvec", QFMathParser_DefaultLib::fIntVec);
+    p->addFunction("ensuresize", QFMathParser_DefaultLib::fEnsureVectorSize);
+    p->addFunction("ensuresize_start", QFMathParser_DefaultLib::fEnsureVectorSizeStart);
 
 
 #ifdef QFLIB_LIBRARY
@@ -337,6 +342,34 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("table_columntitles", fTable_columntitles);
     p->addFunction("table_rows", fTable_rows);
     p->addFunction("rdr_istable", fRDR_istable);
+
+
+    p->addFunction("rdr_isoverview", fRDR_isoverview);
+    p->addFunction("overview_width", fRDR_overviewwidth);
+    p->addFunction("overview_height", fRDR_overviewheight);
+    p->addFunction("overview_size", fRDR_overviewsize);
+    p->addFunction("overview_channels", fRDR_overviewchannels);
+    p->addFunction("overview_image", fRDR_overview);
+
+
+    p->addFunction("rdr_ismask", fRDR_ismask);
+    p->addFunction("mask_width", fRDR_maskwidth);
+    p->addFunction("mask_height", fRDR_maskheight);
+    p->addFunction("mask_size", fRDR_masksize);
+    p->addFunction("mask_image", fRDR_mask);
+    p->addFunction("mask_get", fRDR_mask);
+
+    p->addFunction("rdr_isimageselection", fRDR_isimageselection);
+    p->addFunction("imageselection_width", fRDR_imageselectionwidth);
+    p->addFunction("imageselection_height", fRDR_imageselectionheight);
+    p->addFunction("imageselection_size", fRDR_imageselectionsize);
+    p->addFunction("imageselection_count", fRDR_imageselectioncount);
+    p->addFunction("imageselection_names", fRDR_imageselectionnames);
+    p->addFunction("imageselection_image", fRDR_imageselection);
+    p->addFunction("imageselection_get", fRDR_imageselection);
+    p->addFunction("imageselection_lastofname", fRDR_imageselectionlastofname);
+    p->addFunction("imageselection_firstofname", fRDR_imageselectionfirstofname);
+
 
 #endif
 
@@ -2790,6 +2823,358 @@ namespace QFMathParser_DefaultLib {
         }
     }
 
+
+
+
+
+    void fReturnFirstValid(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        res.setInvalid();
+
+        if (n<1) {
+            p->qfmpError("returnfirstvalid(x1,x2,x3,...) needs at least one argument");
+            return ;
+        }
+        for (unsigned int i=0; i<n; i++) {
+            if (params[i].isValid && params[i].type!=qfmpVoid) {
+                res=params[i];
+                return;
+            }
+        }
+    }
+
+
+    void fReturnLastValid(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        res.setInvalid();
+
+        if (n<1) {
+            p->qfmpError("returnlastvalid(x1,x2,x3,...) needs at least one argument");
+            return ;
+        }
+        for ( long i=(long)n-1; i>=0; i--) {
+            if (params[i].isValid && params[i].type!=qfmpVoid) {
+                res=params[i];
+                return;
+            }
+        }
+    }
+
+    void fType(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        //qDebug()<<"fVarname "<<nodes<<n<<p;
+        QString iname="type";
+        if (n<=0) {
+            r.setInvalid();
+            p->qfmpError(QObject::tr("%1(...) needs at least 1 argument").arg(iname));
+            return;
+        }
+        if (n==1) {
+            r.setString(params[0].typeName());
+        } else if (n>=1) {
+            r.setStringVec(n, "");
+            for (unsigned int i=0; i<n; i++) {
+                r.strVec[i]=params[i].typeName();
+            }
+        }
+    }
+
+    void fStrVec(qfmpResult &res, const qfmpResult* nodes, unsigned int n, QFMathParser *p)
+    {
+        const QString iname="strvec";
+        const QString tname="string";
+        res.setStringVec();
+        for (unsigned int i=0; i<n; i++) {
+            if (nodes[i].convertsToStringVector()) {
+                res.strVec<<nodes[i].asStrVector();
+            } else if (nodes[i].type==qfmpVoid || !nodes[i].isValid) {
+            } else {
+                res.setInvalid();
+                p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3/%3 vector in argument %2").arg(iname).arg(i+1).arg(tname));
+                return;
+            }
+        }
+    }
+
+    void fNumVec(qfmpResult &res, const qfmpResult* nodes, unsigned int n, QFMathParser *p)
+    {
+        const QString iname="numvec";
+        const QString tname="number";
+        res.setDoubleVec();
+        for (unsigned int i=0; i<n; i++) {
+            if (nodes[i].convertsToVector()) {
+                res.numVec<<nodes[i].asVector();
+            } else if (nodes[i].type==qfmpVoid || !nodes[i].isValid) {
+            } else {
+                res.setInvalid();
+                p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3/%3 vector in argument %2").arg(iname).arg(i+1).arg(tname));
+                return;
+            }
+        }
+    }
+    void fIntVec(qfmpResult &res, const qfmpResult* nodes, unsigned int n, QFMathParser *p)
+    {
+        const QString iname="intvec";
+        const QString tname="integer";
+        res.setDoubleVec();
+        for (unsigned int i=0; i<n; i++) {
+            if (nodes[i].convertsToVector()) {
+                QVector<int> iv=nodes[i].asIntVector();
+                for (int j=0; j<iv.size(); j++) res.numVec<<iv[j];
+            } else if (nodes[i].type==qfmpVoid || !nodes[i].isValid) {
+            } else {
+                res.setInvalid();
+                p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3/%3 vector in argument %2").arg(iname).arg(i+1).arg(tname));
+                return;
+            }
+        }
+    }
+    void fInt(qfmpResult &res, const qfmpResult* nodes, unsigned int n, QFMathParser *p)
+    {
+        const QString iname="int";
+        const QString tname="integer";
+        if (n==0) {
+            res.setInvalid();
+            p->qfmpError(QObject::tr("%1(...) needs at least one argument").arg(iname));
+            return;
+        } else if (n==1) {
+            int i=0;
+            if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
+                res.setDouble(nodes[i].toInteger());
+            } else if (nodes[i].type==qfmpDoubleVector || nodes[i].type==qfmpBoolVector) {
+                QVector<int> iv=nodes[i].asIntVector();
+                res.setDoubleVec();
+                for (int j=0; j<iv.size(); j++) res.numVec<<iv[j];
+            } else {
+                res.setInvalid();
+                p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3 in argument %2").arg(iname).arg(1).arg(tname));
+                return;
+            }
+        } else {
+            res.setDoubleVec();
+            for (unsigned int i=0; i<n; i++) {
+                if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
+                    res.numVec<<nodes[i].toInteger();
+                } else if (nodes[i].convertsToIntVector()) {
+                    QVector<int> iv=nodes[i].asIntVector();
+                    res.setDoubleVec();
+                    for (int j=0; j<iv.size(); j++) res.numVec<<iv[j];
+                } else {
+                    res.setInvalid();
+                    p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3/%3 vector in argument %2").arg(iname).arg(i+1).arg(tname));
+                    return;
+                }
+            }
+        }
+    }
+    void fNum(qfmpResult &res, const qfmpResult* nodes, unsigned int n, QFMathParser *p)
+    {
+        const QString iname="num";
+        const QString tname="number";
+        if (n==0) {
+            res.setInvalid();
+            p->qfmpError(QObject::tr("%1(...) needs at least one argument").arg(iname));
+            return;
+        } else if (n==1) {
+            int i=0;
+            if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
+                res.setDouble(nodes[i].asNumber());
+            } else if (nodes[i].convertsToVector()) {
+                res.setDoubleVec(nodes[i].asVector());
+            } else {
+                res.setInvalid();
+                p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3 in argument %2").arg(iname).arg(1).arg(tname));
+                return;
+            }
+        } else {
+            res.setDoubleVec();
+            for (unsigned int i=0; i<n; i++) {
+                if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
+                    res.numVec<<nodes[i].asNumber();
+                } else if (nodes[i].convertsToVector()) {
+                    res.numVec<<nodes[i].asVector();
+                } else {
+                    res.setInvalid();
+                    p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3/%3 vector in argument %2").arg(iname).arg(i+1).arg(tname));
+                    return;
+                }
+            }
+        }
+    }
+    void fBool(qfmpResult &res, const qfmpResult* nodes, unsigned int n, QFMathParser *p)
+    {
+        const QString iname="bool";
+        const QString tname="boolean";
+        if (n==0) {
+            res.setInvalid();
+            p->qfmpError(QObject::tr("%1(...) needs at least one argument").arg(iname));
+            return;
+        } else if (n==1) {
+            int i=0;
+            if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
+                res.setBoolean(nodes[i].asBool());
+            } else if (nodes[i].type==qfmpDoubleVector || nodes[i].type==qfmpBoolVector || nodes[i].convertsToBoolVector()) {
+                res.setBoolVec(nodes[i].asBoolVector());
+            } else {
+                res.setInvalid();
+                p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3 in argument %2").arg(iname).arg(1).arg(tname));
+                return;
+            }
+        } else {
+            res.setBoolVec();
+            for (unsigned int i=0; i<n; i++) {
+                if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
+                    res.boolVec<<nodes[i].asBool();
+                } else if (nodes[i].convertsToIntVector()) {
+                    res.boolVec<<nodes[i].asBoolVector();
+                } else {
+                    res.setInvalid();
+                    p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3/%3 vector in argument %2").arg(iname).arg(i+1).arg(tname));
+                    return;
+                }
+            }
+        }
+    }
+    void fBoolVec(qfmpResult &res, const qfmpResult* nodes, unsigned int n, QFMathParser *p)
+    {
+        const QString iname="boolvec";
+        const QString tname="boolean";
+        res.setBoolVec();
+        for (unsigned int i=0; i<n; i++) {
+            if (nodes[i].convertsToBoolVector()) {
+                res.boolVec<<nodes[i].asBoolVector();
+            } else if (nodes[i].type==qfmpVoid || !nodes[i].isValid) {
+            } else {
+                res.setInvalid();
+                p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3/%3 vector in argument %2").arg(iname).arg(i+1).arg(tname));
+                return;
+            }
+        }
+    }
+
+
+    void fEnsureVectorSize(qfmpResult &res, const qfmpResult* params, unsigned int n, QFMathParser *p)
+    {
+        const QString iname="ensuresize";
+
+        if (n==3 && (params[0].type==qfmpDoubleVector && params[1].isInteger() && params[2].type==qfmpDouble)) {
+            int ts=params[1].toInteger();
+            res=params[0];
+            if (res.numVec.size()>ts) {
+                res.numVec.resize(ts);
+            } else if (res.numVec.size()<ts) {
+                while (res.numVec.size()<ts) res.numVec.append(params[2].num);
+            }
+        } else if (n==3 && (params[0].type==qfmpStringVector && params[1].isInteger() && params[2].type==qfmpString)) {
+            int ts=params[1].toInteger();
+            res=params[0];
+            if (res.strVec.size()>ts) {
+                while (res.strVec.size()>ts) res.strVec.removeLast();
+            } else if (res.strVec.size()<ts) {
+                while (res.strVec.size()<ts) res.strVec.append(params[2].str);
+            }
+        } else if (n==3 && (params[0].type==qfmpString && params[1].isInteger() && params[2].type==qfmpString && params[2].str.size()==1)) {
+            int ts=params[1].toInteger();
+            res=params[0];
+            if (res.str.size()>ts) {
+                res.str=res.str.left(ts);
+            } else if (res.str.size()<ts) {
+                while (res.str.size()<ts) res.str+=params[2].str;
+            }
+        } else if (n==3 && (params[0].type==qfmpBoolVector && params[1].isInteger() && params[2].type==qfmpBool)) {
+            int ts=params[1].toInteger();
+            res=params[0];
+            if (res.boolVec.size()>ts) {
+                res.boolVec.resize(ts);
+            } else if (res.boolVec.size()<ts) {
+                while (res.boolVec.size()<ts) res.boolVec.append(params[2].boolean);
+            }
+        } else {
+            res.setInvalid();
+            p->qfmpError(QObject::tr("%1(x,desiredsize,defaultvalue) needs three arguments: one vector, one integer and one argument copatible with x").arg(iname));
+            return;
+        }
+
+    }
+
+
+
+    void fEnsureVectorSizeStart(qfmpResult &res, const qfmpResult* params, unsigned int n, QFMathParser *p)
+    {
+        const QString iname="ensuresize_start";
+
+        if (n==3 && (params[0].type==qfmpDoubleVector && params[1].isInteger() && params[2].type==qfmpDouble)) {
+            int ts=params[1].toInteger();
+            res=params[0];
+            if (res.numVec.size()>ts) {
+                while (res.numVec.size()>ts) res.numVec.remove(0);
+            } else if (res.numVec.size()<ts) {
+                while (res.numVec.size()<ts) res.numVec.prepend(params[2].num);
+            }
+        } else if (n==3 && (params[0].type==qfmpStringVector && params[1].isInteger() && params[2].type==qfmpString)) {
+            int ts=params[1].toInteger();
+            res=params[0];
+            if (res.strVec.size()>ts) {
+                while (res.strVec.size()>ts) res.strVec.removeFirst();
+            } else if (res.strVec.size()<ts) {
+                while (res.strVec.size()<ts) res.strVec.prepend(params[2].str);
+            }
+        } else if (n==3 && (params[0].type==qfmpString && params[1].isInteger() && params[2].type==qfmpString && params[2].str.size()==1)) {
+            int ts=params[1].toInteger();
+            res=params[0];
+            if (res.str.size()>ts) {
+                res.str=res.str.right(ts);
+            } else if (res.str.size()<ts) {
+                while (res.str.size()<ts) res.str=params[2].str+res.str;
+            }
+        } else if (n==3 && (params[0].type==qfmpBoolVector && params[1].isInteger() && params[2].type==qfmpBool)) {
+            int ts=params[1].toInteger();
+            res=params[0];
+            if (res.boolVec.size()>ts) {
+                while (res.boolVec.size()>ts) res.boolVec.remove(0);
+            } else if (res.boolVec.size()<ts) {
+                while (res.boolVec.size()<ts) res.boolVec.prepend(params[2].boolean);
+            }
+        } else {
+            res.setInvalid();
+            p->qfmpError(QObject::tr("%1(x,desiredsize,defaultvalue) needs three arguments: one vector, one integer and one argument copatible with x").arg(iname));
+            return;
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #ifdef QFLIB_LIBRARY
     void fRDRIDs(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
         r.setInvalid();
@@ -3442,237 +3827,482 @@ namespace QFMathParser_DefaultLib {
         }
     }
 
-#endif
 
 
 
 
-    void fReturnFirstValid(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p)
+
+
+
+
+
+
+
+
+
+
+
+    void fRDR_isoverview(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
         res.setInvalid();
-
-        if (n<1) {
-            p->qfmpError("returnfirstvalid(x1,x2,x3,...) needs at least one argument");
-            return ;
-        }
-        for (unsigned int i=0; i<n; i++) {
-            if (params[i].isValid && params[i].type!=qfmpVoid) {
-                res=params[i];
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageToRunInterface* rdr=dynamic_cast<QFRDRImageToRunInterface*>(p->getRawDataByID(evalID));
+                res.setBoolean(rdr);
+            } else {
+                parser->qfmpError(QObject::tr("rdr_isoverview(rdrid) needs one integer arguments"));
+                res.setInvalid();
                 return;
             }
         }
     }
 
 
-    void fReturnLastValid(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    void fRDR_overviewwidth(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
         res.setInvalid();
-
-        if (n<1) {
-            p->qfmpError("returnlastvalid(x1,x2,x3,...) needs at least one argument");
-            return ;
-        }
-        for ( long i=(long)n-1; i>=0; i--) {
-            if (params[i].isValid && params[i].type!=qfmpVoid) {
-                res=params[i];
-                return;
-            }
-        }
-    }
-
-    void fType(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
-    {
-        //qDebug()<<"fVarname "<<nodes<<n<<p;
-        QString iname="type";
-        if (n<=0) {
-            r.setInvalid();
-            p->qfmpError(QObject::tr("%1(...) needs at least 1 argument").arg(iname));
-            return;
-        }
-        if (n==1) {
-            r.setString(params[0].typeName());
-        } else if (n>=1) {
-            r.setStringVec(n, "");
-            for (unsigned int i=0; i<n; i++) {
-                r.strVec[i]=params[i].typeName();
-            }
-        }
-    }
-
-    void fStrVec(qfmpResult &res, const qfmpResult* nodes, unsigned int n, QFMathParser *p)
-    {
-        const QString iname="strvec";
-        const QString tname="string";
-        res.setStringVec();
-        for (unsigned int i=0; i<n; i++) {
-            if (nodes[i].convertsToStringVector()) {
-                res.strVec<<nodes[i].asStrVector();
-            } else if (nodes[i].type==qfmpVoid || !nodes[i].isValid) {
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageToRunInterface* rdr=dynamic_cast<QFRDRImageToRunInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDouble(rdr->getImageFromRunsWidth());
+                } else {
+                    res.setDouble(0);
+                }
             } else {
+                parser->qfmpError(QObject::tr("overview_width(rdrid) needs one integer argument"));
                 res.setInvalid();
-                p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3/%3 vector in argument %2").arg(iname).arg(i+1).arg(tname));
                 return;
             }
         }
     }
 
-    void fNumVec(qfmpResult &res, const qfmpResult* nodes, unsigned int n, QFMathParser *p)
+    void fRDR_overviewheight(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
-        const QString iname="numvec";
-        const QString tname="number";
-        res.setDoubleVec();
-        for (unsigned int i=0; i<n; i++) {
-            if (nodes[i].convertsToVector()) {
-                res.numVec<<nodes[i].asVector();
-            } else if (nodes[i].type==qfmpVoid || !nodes[i].isValid) {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageToRunInterface* rdr=dynamic_cast<QFRDRImageToRunInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDouble(rdr->getImageFromRunsHeight());
+                } else {
+                    res.setDouble(0);
+                }
             } else {
+                parser->qfmpError(QObject::tr("overview_height(rdrid) needs one integer argument"));
                 res.setInvalid();
-                p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3/%3 vector in argument %2").arg(iname).arg(i+1).arg(tname));
                 return;
             }
         }
     }
-    void fIntVec(qfmpResult &res, const qfmpResult* nodes, unsigned int n, QFMathParser *p)
+
+    void fRDR_overviewsize(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
-        const QString iname="intvec";
-        const QString tname="integer";
-        res.setDoubleVec();
-        for (unsigned int i=0; i<n; i++) {
-            if (nodes[i].convertsToVector()) {
-                QVector<int> iv=nodes[i].asIntVector();
-                for (int j=0; j<iv.size(); j++) res.numVec<<iv[j];
-            } else if (nodes[i].type==qfmpVoid || !nodes[i].isValid) {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageToRunInterface* rdr=dynamic_cast<QFRDRImageToRunInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDouble(rdr->getImageFromRunsHeight()*rdr->getImageFromRunsWidth());
+                } else {
+                    res.setDouble(0);
+                }
             } else {
+                parser->qfmpError(QObject::tr("overview_size(rdrid) needs one integer argument"));
                 res.setInvalid();
-                p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3/%3 vector in argument %2").arg(iname).arg(i+1).arg(tname));
                 return;
             }
         }
     }
-    void fInt(qfmpResult &res, const qfmpResult* nodes, unsigned int n, QFMathParser *p)
+    void fRDR_overviewchannels(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
-        const QString iname="int";
-        const QString tname="integer";
-        if (n==0) {
-            res.setInvalid();
-            p->qfmpError(QObject::tr("%1(...) needs at least one argument").arg(iname));
-            return;
-        } else if (n==1) {
-            int i=0;
-            if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
-                res.setDouble(nodes[i].toInteger());
-            } else if (nodes[i].type==qfmpDoubleVector || nodes[i].type==qfmpBoolVector) {
-                QVector<int> iv=nodes[i].asIntVector();
-                res.setDoubleVec();
-                for (int j=0; j<iv.size(); j++) res.numVec<<iv[j];
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageToRunInterface* rdr=dynamic_cast<QFRDRImageToRunInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDouble(rdr->getImageFromRunsChannels());
+                } else {
+                    res.setDouble(0);
+                }
             } else {
+                parser->qfmpError(QObject::tr("overview_channels(rdrid) needs one integer argument"));
                 res.setInvalid();
-                p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3 in argument %2").arg(iname).arg(1).arg(tname));
                 return;
             }
-        } else {
-            res.setDoubleVec();
-            for (unsigned int i=0; i<n; i++) {
-                if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
-                    res.numVec<<nodes[i].toInteger();
-                } else if (nodes[i].convertsToIntVector()) {
-                    QVector<int> iv=nodes[i].asIntVector();
+        }
+    }
+    void fRDR_overview(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if ((n==1 && params[0].type==qfmpDouble)||(n==2 && params[0].type==qfmpDouble && params[1].type==qfmpDouble)) {
+                evalID=params[0].toInteger();
+                QFRDRImageToRunInterface* rdr=dynamic_cast<QFRDRImageToRunInterface*>(p->getRawDataByID(evalID));
+                int ch=0;
+                if (n==2) ch=params[1].toInteger();
+                if (rdr) {
+                    res.setDoubleVec(rdr->getImageFromRunsPreview(ch), rdr->getImageFromRunsHeight()*rdr->getImageFromRunsWidth());
+                } else {
                     res.setDoubleVec();
-                    for (int j=0; j<iv.size(); j++) res.numVec<<iv[j];
-                } else {
-                    res.setInvalid();
-                    p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3/%3 vector in argument %2").arg(iname).arg(i+1).arg(tname));
-                    return;
                 }
-            }
-        }
-    }
-    void fNum(qfmpResult &res, const qfmpResult* nodes, unsigned int n, QFMathParser *p)
-    {
-        const QString iname="num";
-        const QString tname="number";
-        if (n==0) {
-            res.setInvalid();
-            p->qfmpError(QObject::tr("%1(...) needs at least one argument").arg(iname));
-            return;
-        } else if (n==1) {
-            int i=0;
-            if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
-                res.setDouble(nodes[i].asNumber());
-            } else if (nodes[i].convertsToVector()) {
-                res.setDoubleVec(nodes[i].asVector());
             } else {
+                parser->qfmpError(QObject::tr("overview_image(rdrid[, channel=0]) needs one or two integer argument"));
                 res.setInvalid();
-                p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3 in argument %2").arg(iname).arg(1).arg(tname));
-                return;
-            }
-        } else {
-            res.setDoubleVec();
-            for (unsigned int i=0; i<n; i++) {
-                if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
-                    res.numVec<<nodes[i].asNumber();
-                } else if (nodes[i].convertsToVector()) {
-                    res.numVec<<nodes[i].asVector();
-                } else {
-                    res.setInvalid();
-                    p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3/%3 vector in argument %2").arg(iname).arg(i+1).arg(tname));
-                    return;
-                }
-            }
-        }
-    }
-    void fBool(qfmpResult &res, const qfmpResult* nodes, unsigned int n, QFMathParser *p)
-    {
-        const QString iname="bool";
-        const QString tname="boolean";
-        if (n==0) {
-            res.setInvalid();
-            p->qfmpError(QObject::tr("%1(...) needs at least one argument").arg(iname));
-            return;
-        } else if (n==1) {
-            int i=0;
-            if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
-                res.setBoolean(nodes[i].asBool());
-            } else if (nodes[i].type==qfmpDoubleVector || nodes[i].type==qfmpBoolVector || nodes[i].convertsToBoolVector()) {
-                res.setBoolVec(nodes[i].asBoolVector());
-            } else {
-                res.setInvalid();
-                p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3 in argument %2").arg(iname).arg(1).arg(tname));
-                return;
-            }
-        } else {
-            res.setBoolVec();
-            for (unsigned int i=0; i<n; i++) {
-                if (nodes[i].type==qfmpDouble || nodes[i].type==qfmpBool) {
-                    res.boolVec<<nodes[i].asBool();
-                } else if (nodes[i].convertsToIntVector()) {
-                    res.boolVec<<nodes[i].asBoolVector();
-                } else {
-                    res.setInvalid();
-                    p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3/%3 vector in argument %2").arg(iname).arg(i+1).arg(tname));
-                    return;
-                }
-            }
-        }
-    }
-    void fBoolVec(qfmpResult &res, const qfmpResult* nodes, unsigned int n, QFMathParser *p)
-    {
-        const QString iname="boolvec";
-        const QString tname="boolean";
-        res.setBoolVec();
-        for (unsigned int i=0; i<n; i++) {
-            if (nodes[i].convertsToBoolVector()) {
-                res.boolVec<<nodes[i].asBoolVector();
-            } else if (nodes[i].type==qfmpVoid || !nodes[i].isValid) {
-            } else {
-                res.setInvalid();
-                p->qfmpError(QObject::tr("%1(...) encountered a datatype, which cannot be converted to a %3/%3 vector in argument %2").arg(iname).arg(i+1).arg(tname));
                 return;
             }
         }
     }
 
 
+
+
+
+
+
+
+
+    void fRDR_ismask(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageMaskInterface* rdr=dynamic_cast<QFRDRImageMaskInterface*>(p->getRawDataByID(evalID));
+                res.setBoolean(rdr);
+            } else {
+                parser->qfmpError(QObject::tr("rdr_ismask(rdrid) needs one integer arguments"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+
+    void fRDR_maskwidth(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageMaskInterface* rdr=dynamic_cast<QFRDRImageMaskInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDouble(rdr->maskGetWidth());
+                } else {
+                    res.setDouble(0);
+                }
+            } else {
+                parser->qfmpError(QObject::tr("mask_width(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+    void fRDR_maskheight(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageMaskInterface* rdr=dynamic_cast<QFRDRImageMaskInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDouble(rdr->maskGetHeight());
+                } else {
+                    res.setDouble(0);
+                }
+            } else {
+                parser->qfmpError(QObject::tr("mask_height(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+    void fRDR_masksize(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageMaskInterface* rdr=dynamic_cast<QFRDRImageMaskInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDouble(rdr->maskGetHeight()*rdr->maskGetWidth());
+                } else {
+                    res.setDouble(0);
+                }
+            } else {
+                parser->qfmpError(QObject::tr("mask_size(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+    void fRDR_mask(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if ((n==1 && params[0].type==qfmpDouble)) {
+                evalID=params[0].toInteger();
+                QFRDRImageMaskInterface* rdr=dynamic_cast<QFRDRImageMaskInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setBoolVec(rdr->maskGet(), rdr->maskGetWidth()*rdr->maskGetHeight());
+                } else {
+                    res.setBoolVec();
+                }
+            } else {
+                parser->qfmpError(QObject::tr("mask_get(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+
+
+
+
+
+
+
+    void fRDR_isimageselection(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageSelectionInterface* rdr=dynamic_cast<QFRDRImageSelectionInterface*>(p->getRawDataByID(evalID));
+                res.setBoolean(rdr);
+            } else {
+                parser->qfmpError(QObject::tr("rdr_isimageselection(rdrid) needs one integer arguments"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+
+    void fRDR_imageselectionwidth(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageSelectionInterface* rdr=dynamic_cast<QFRDRImageSelectionInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDouble(rdr->getImageSelectionWidth());
+                } else {
+                    res.setDouble(0);
+                }
+            } else {
+                parser->qfmpError(QObject::tr("imageselection_width(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+    void fRDR_imageselectionheight(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageSelectionInterface* rdr=dynamic_cast<QFRDRImageSelectionInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDouble(rdr->getImageSelectionHeight());
+                } else {
+                    res.setDouble(0);
+                }
+            } else {
+                parser->qfmpError(QObject::tr("imageselection_height(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+    void fRDR_imageselectionsize(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageSelectionInterface* rdr=dynamic_cast<QFRDRImageSelectionInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDouble(rdr->getImageSelectionHeight()*rdr->getImageSelectionWidth());
+                } else {
+                    res.setDouble(0);
+                }
+            } else {
+                parser->qfmpError(QObject::tr("imageselection_size(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+    void fRDR_imageselectioncount(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageSelectionInterface* rdr=dynamic_cast<QFRDRImageSelectionInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDouble(rdr->getImageSelectionCount());
+                } else {
+                    res.setDouble(0);
+                }
+            } else {
+                parser->qfmpError(QObject::tr("imageselection_count(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+    void fRDR_imageselectionnames(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRImageSelectionInterface* rdr=dynamic_cast<QFRDRImageSelectionInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setStringVec(rdr->getImageSelectionCount());
+                    for (int i=0; i<rdr->getImageSelectionCount(); i++) {
+                        res.strVec[i]=rdr->getImageSelectionName(i);
+                    }
+                } else {
+                    res.setStringVec(0);
+                }
+            } else {
+                parser->qfmpError(QObject::tr("imageselection_names(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+    void fRDR_imageselectionlastofname(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if ((n==2 && params[0].type==qfmpDouble && params[1].type==qfmpString) ) {
+                evalID=params[0].toInteger();
+                QFRDRImageSelectionInterface* rdr=dynamic_cast<QFRDRImageSelectionInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setBoolVec();
+                    for (int i=rdr->getImageSelectionCount()-1; i>=0; i--) {
+                        if (rdr->getImageSelectionName(i)==params[1].str){
+                            res.setBoolVec(rdr->loadImageSelection(params[1].toInteger()), rdr->getImageSelectionWidth()*rdr->getImageSelectionHeight());
+                            return;
+                        }
+                    }
+                } else {
+                    res.setBoolVec();
+                }
+            } else {
+                parser->qfmpError(QObject::tr("imageselection_lastofname(rdrid, name) needs one integer and one string argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+    void fRDR_imageselectionfirstofname(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if ((n==2 && params[0].type==qfmpDouble && params[1].type==qfmpString) ) {
+                evalID=params[0].toInteger();
+                QFRDRImageSelectionInterface* rdr=dynamic_cast<QFRDRImageSelectionInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setBoolVec();
+                    for (int i=0; i<rdr->getImageSelectionCount(); i++) {
+                        if (rdr->getImageSelectionName(i)==params[1].str){
+                            res.setBoolVec(rdr->loadImageSelection(params[1].toInteger()), rdr->getImageSelectionWidth()*rdr->getImageSelectionHeight());
+                            return;
+                        }
+                    }
+                } else {
+                    res.setBoolVec();
+                }
+            } else {
+                parser->qfmpError(QObject::tr("imageselection_firstofname(rdrid, name) needs one integer and one string argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+    void fRDR_imageselection(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if ((n==2 && params[0].type==qfmpDouble && params[1].type==qfmpDouble) ) {
+                evalID=params[0].toInteger();
+                QFRDRImageSelectionInterface* rdr=dynamic_cast<QFRDRImageSelectionInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setBoolVec(rdr->loadImageSelection(params[1].toInteger()), rdr->getImageSelectionWidth()*rdr->getImageSelectionHeight());
+                } else {
+                    res.setBoolVec();
+                }
+            } else {
+                parser->qfmpError(QObject::tr("imageselection_get(rdrid, selid) needs two integer arguments"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+
+
+#endif
 }
 
 

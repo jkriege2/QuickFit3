@@ -22,5 +22,8 @@
 <li><b><a href="$$mainhelpdir$$/parserreference/constants.html">common math/physics constants</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/project_access.html">access to the current QuickFit project</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/table_access.html">access to table RDRs in the current QuickFit project</a></b></li>
+<li><b><a href="$$mainhelpdir$$/parserreference/runimage_access.html">access to FCS/imFCS/... overview images in RDRs</a></b></li>
+<li><b><a href="$$mainhelpdir$$/parserreference/imagemask_access.html">access to image masks in RDRs</a></b></li>
+<li><b><a href="$$mainhelpdir$$/parserreference/runselection_access.html">access to stored image selections in RDRs</a></b></li>
 <!--<li><b><a href="./parserreference/.html"></a></b></li>-->
 $$qfmathparser_ref$$

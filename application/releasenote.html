@@ -64,6 +64,10 @@
                     <li>added type conversion functions strvec(), numvec(), boolvec(), bool(), double(), ...</li>
                     <li>added functions, that allow to access data in a table RDR: table_...()</li>
                     <li>bugfix: logical operations were not allowed for boolean vectors!</li>
+                    <li>added functions ensuresize() and ensuresize_start(), which cut/extend vectors to a given size</li>
+                    <li>added functions to access overview images (overview_...()), named image selections (imageselection_...()) and image masks (maks_...()) in RDRs</li>
+                    <li>bugfix: unary logic negation (!/not) was not implemented for boolean vectors!</li>
+                    <li>bugfix: corrected parser, so it understands [...] vector-expressions correctly, when they are preceded by a !/-/~/... (e.g. ![true,false])</li>
             </ul></li>
             <li>added context menu entry to tables, that allows to explicitly copy the table as "CSV", or to copy the table in a format suitable for "Excel", which depends on the current locale (e.g. for decimal separators)</li>
             <li>bugfixed "copy to Excel/CSV" in table view, which did not copy any data (regression?)</li>
@@ -121,6 +125,7 @@
             <li>added additional level of project backup file (*.qfp.backup_old)</li>
             <li>added menu entries to main window, which allow to duplicate items (RDRs/evals) and to copy/cut/paste items to/from the clipboard</li>
             <li>added button/menu entries to evaluation and RDR editors, which allows to view vector/list/matrix data from the results tables as a new table, where each cell is displayed in its own column.</li>
+            <li>added context-menu entries to evaluation and RDR editors, which allow to copy the RDR ID/result ID/evaluation ID or a rdr_getresult(...) template for the current cell into the clipboard.</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>

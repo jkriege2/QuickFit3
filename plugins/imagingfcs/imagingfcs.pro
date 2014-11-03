@@ -47,9 +47,7 @@ HEADERS += qfrdrimagingfcs.h \
     ../base_classes/qffcstools.h \
     ../interfaces/qfrdrimagestackinterface.h \
     ../interfaces/qfrdrsimplecountrateinterface.h \
-    ../interfaces/qfrdrimageselectioninterface.h \
     ../base_classes/qfrdroverviewimagedisplay.h \
-    ../interfaces/qfrdrimagemask.h \
     ../interfaces/qfrdrimfcscorrelatorremote.h \
     qfrdrimagingfcs_dataeditor_image.h \
     qfrdrimagingfcsrunsmodel.h \
@@ -84,7 +82,8 @@ HEADERS += qfrdrimagingfcs.h \
     ../../../../../LIB/trunk/textcolor.h \
     ../../../../../LIB/trunk/crc_ccitt.h \
     ../../../../../LIB/trunk/crc.h \
-    ../../../../../LIB/trunk/correlator_multitau.h
+    ../../../../../LIB/trunk/correlator_multitau.h \
+    qfrdrimagingfcs_parserfunctions.h
 
 
 
@@ -121,7 +120,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     ../base_classes/qfimageparametergroupbox.cpp \
     qfrdrimagingfcsmaskbuilder.cpp \
     qfrdrimagingfcscopycorrasrdrdialog.cpp \
-    qfrdrimagingfcspostprocessbinningdialog.cpp
+    qfrdrimagingfcspostprocessbinningdialog.cpp \
+    qfrdrimagingfcs_parserfunctions.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \

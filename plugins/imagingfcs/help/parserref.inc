@@ -1,0 +1,2 @@
+<li><b><a href="$$plugin_info:helpdir:imaging_fcs$$/parserreference/imfcs.html">imagingfcs: RDR access functions</a></b></li>
+<!--<li><b><a href="$$plugin_info:helpdir:imaging_fcs$$/parserreference/.html"></a></b></li>-->

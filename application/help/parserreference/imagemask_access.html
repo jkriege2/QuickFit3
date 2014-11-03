@@ -1,0 +1,64 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Access to image masks in RDRs in the current QuickFit Project</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  
+  $$startbox_note$$
+  $$IMAGEMASK_EXPLANATION$$
+  $$endbox$$
+  
+  $$funcref_start$$<a name="rdr_ismask"/><!-- func:rdr_ismask -->
+    <b><tt><!-- template -->rdr_ismask(rdrid)<!-- /template --></tt> - <i> returns <tt>true</tt> is the given raw data record (RDR) in the current project has a mask image</i>:</b>
+  $$funcref_description$$
+         <small>$$IMAGEMASK_EXPLANATION$$</small> 
+
+        <!-- /func:rdr_ismask -->
+  $$funcref_end$$
+  
+  
+  $$funcref_start$$<a name="mask_width"/><!-- func:mask_width -->
+    <b><tt><!-- template -->mask_width(rdrid)<!-- /template --></tt> - <i> returns the width (in pixels) of the mask image in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+         <small>$$IMAGEMASK_EXPLANATION$$</small> 
+        <!-- /func:mask_width -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="mask_height"/><!-- func:mask_height -->
+    <b><tt><!-- template -->mask_height(rdrid)<!-- /template --></tt> - <i> returns the height (in pixels) of the mask image in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+         <small>$$IMAGEMASK_EXPLANATION$$</small> 
+        <!-- /func:mask_height -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="mask_size"/><!-- func:mask_size -->
+    <b><tt><!-- template -->mask_size(rdrid)<!-- /template --></tt> - <i> returns the size (in pixels), i.e. <tt>mask_width(rdrid)*mask_height(rdrid)</tt> of the mask image in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+         <small>$$IMAGEMASK_EXPLANATION$$</small> 
+        <!-- /func:mask_size -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="mask_channels"/><!-- func:mask_channels -->
+    <b><tt><!-- template -->mask_channels(rdrid)<!-- /template --></tt> - <i> returns the number of (color) channels of the mask image in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+         <small>$$IMAGEMASK_EXPLANATION$$</small> 
+        <!-- /func:mask_channels -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="mask_image"/><!-- func:mask_image -->
+    <b><tt><!-- template -->mask_image(rdrid)<!-- /template --></tt> / <tt><!-- template -->mask_image(rdrid, chanel)<!-- /template --></tt> - <i> returns the mask image in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+    This function returns a vector of booleans with a size of <tt>mask_width(rdrid)*mask_height(rdrid)</tt>.
+	        <br><small>$$IMAGEMASK_EXPLANATION$$</small> 
+
+        <!-- /func:mask_image -->
+  $$funcref_end$$
+  
+  
+  </body>
+  </html>
+  

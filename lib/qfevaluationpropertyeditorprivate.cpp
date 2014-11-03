@@ -611,7 +611,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     actCopyMedianQuantilesResults=new QAction(QIcon(":/lib/copy16valerr.png"), tr("Copy Selection as median+q25+q75"), d);
     actCopyMedianQuantilesNoHead=new QAction(QIcon(":/lib/copy16valerr_nohead.png"), tr("Copy Selection as median+q25+q75, w/o header"), d);
 
-    QMenu* menuExpanded=new QMenu(tr("copy in expanded form"), tvResults);
+    menuExpanded=new QMenu(tr("copy in expanded form"), tvResults);
     menuExpanded->setIcon(QIcon(":/lib/copy16.png"));
     tvResults->addAction(menuExpanded->menuAction());
     actCopyExpanded=new QAction( tr("Copy Selection in expanded form"), d);
@@ -626,6 +626,21 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     menuExpanded->addAction(actCopyExpandedNoHeadMatlab);
     actCopyExpandedNoHeadMatlabFlipped=new QAction( tr("Copy Selection in expanded form, to Matlab, flipped"), d);
     menuExpanded->addAction(actCopyExpandedNoHeadMatlabFlipped);
+
+
+
+    menuCopyIDs=new QMenu(tr("Copy Result/Evaluation IDs"), tvResults);
+    menuCopyIDs->setIcon(QIcon(":/lib/copy_forparser.png"));
+    tvResults->addAction(menuCopyIDs->menuAction());
+    actCopyRDRID=new QAction( tr("Copy RDR ID"), d);
+    menuCopyIDs->addAction(actCopyRDRID);;
+    actCopyEvaluationID=new QAction( tr("Copy Evaluation ID"), d);
+    menuCopyIDs->addAction(actCopyEvaluationID);;
+    actCopyResultID=new QAction( tr("Copy Result ID"), d);
+    menuCopyIDs->addAction(actCopyResultID);;
+    actCopyResultAccessParserFunction=new QAction( tr("Copy Result Access Parser Function rdr_getresult(...)"), d);
+    menuCopyIDs->addAction(actCopyResultAccessParserFunction);;
+
 
     actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), d);
     tbResults->addAction(actSaveResults);
@@ -789,6 +804,10 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     connect(actCopyExpandedNoHeadFlipped, SIGNAL(triggered()), this, SLOT(copyExpandedResultsNoHeadFlipped()));
     connect(actCopyExpandedNoHeadMatlabFlipped, SIGNAL(triggered()), this, SLOT(copyExpandedResultsNoHeadMatlabFlipped()));
 
+    connect(actCopyRDRID, SIGNAL(triggered()), this, SLOT(copyRDRID()));
+    connect(actCopyEvaluationID, SIGNAL(triggered()), this, SLOT(copyEvaluationID()));
+    connect(actCopyResultID, SIGNAL(triggered()), this, SLOT(copyResultID()));
+    connect(actCopyResultAccessParserFunction, SIGNAL(triggered()), this, SLOT(copyResultAccessParserFunction()));
 
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 
@@ -1243,4 +1262,41 @@ void QFEvaluationPropertyEditorPrivate::filterRecordsTextChanged(const QString &
        s->setPalette(p);
     }
     storeSettings();
+}
+
+
+void QFEvaluationPropertyEditorPrivate::copyRDRID()
+{
+    if (d->current) {
+        QClipboard* clp=QApplication::clipboard();
+        QModelIndex c=tvResults->currentIndex();
+        if (c.isValid()) clp->setText(tvResults->model()->data(c, QFEvaluationResultsModel::ResultIDRole).toString());
+    }
+}
+
+void QFEvaluationPropertyEditorPrivate::copyEvaluationID()
+{
+    if (d->current) {
+        QClipboard* clp=QApplication::clipboard();
+        QModelIndex c=tvResults->currentIndex();
+        if (c.isValid()) clp->setText(tvResults->model()->data(c, QFEvaluationResultsModel::EvalNameRole).toString());
+    }
+}
+
+void QFEvaluationPropertyEditorPrivate::copyResultID()
+{
+    if (d->current) {
+        QClipboard* clp=QApplication::clipboard();
+        QModelIndex c=tvResults->currentIndex();
+        if (c.isValid()) clp->setText(tvResults->model()->data(c, QFEvaluationResultsModel::ResultNameRole).toString());
+    }
+}
+
+void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunction()
+{
+    if (d->current) {
+        QClipboard* clp=QApplication::clipboard();
+        QModelIndex c=tvResults->currentIndex();
+        if (c.isValid()) clp->setText(QString("rdr_getresult(%1, \"%2\", \"%3\")").arg(tvResults->model()->data(c, QFEvaluationResultsModel::ResultIDRole).toInt()).arg(tvResults->model()->data(c, QFEvaluationResultsModel::EvalNameRole).toString()).arg(tvResults->model()->data(c, QFEvaluationResultsModel::ResultNameRole).toString()));
+    }
 }

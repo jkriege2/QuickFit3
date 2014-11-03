@@ -122,6 +122,8 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
         QAction* actStatisticsComparing;
         QAction* actShowData;
 
+        QMenu* menuExpanded;
+
         QFEnhancedLineEdit* edtDisplayProperties;
         QFCompleterProperties* compDisplayProperties;
         QFEnhancedLineEdit* edtFilterFiles;
@@ -162,6 +164,13 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
 
         QString currentSaveDir;
         QMenuBar* menuBar;
+
+
+        QMenu* menuCopyIDs;
+        QAction* actCopyRDRID;
+        QAction* actCopyEvaluationID;
+        QAction* actCopyResultID;
+        QAction* actCopyResultAccessParserFunction;
 
         QAction* actHelp;
         QAction* actHelpPlugin;
@@ -234,6 +243,12 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
         void copyExpandedResultsFlipped();
         void copyExpandedResultsNoHeadFlipped();
         void copyExpandedResultsNoHeadMatlabFlipped();
+
+        void copyRDRID();
+        void copyEvaluationID();
+        void copyResultID();
+        void copyResultAccessParserFunction();
+
 
         void filterFilesTextChanged(const QString &text);
         void filterResultsTextChanged(const QString &text);

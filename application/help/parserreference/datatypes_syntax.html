@@ -141,7 +141,6 @@ logical_expression ->  logical_term
 <pre>vec_primary     ->  primary
                  | primary <b>:</b> primary
                  | primary <b>:</b> primary <b>:</b> primary
-                 | <b>[</b> vector_list <b>]</b></pre>
 <pre>primary         ->  <b>true</b> | <b>false</b>
                  | string_constant
                  | NUMBER
@@ -158,6 +157,7 @@ logical_expression ->  logical_term
                  | <b>(</b> logical_expression <b>)</b>
                  | NAME <b>[</b> logical_expression <b>]</b>
                  | primary <b>^</b> primary</pre>
+                 | <b>[</b> vector_list <b>]</b></pre>
 <pre>string_constant -> <b>&quot;</b> STRING <b>&quot;</b> | <b>&apos;</b> STRING <b>&apos;</b></pre>
 <pre>parameter_list  ->  &lambda; | logical_expression | logical_expression <b>,</b> parameter_list</pre>
 <pre>parametername_list ->  &lambda; | NAME | NAME <b>,</b> parametername_list</pre>

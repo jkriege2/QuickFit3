@@ -182,6 +182,14 @@ class QFRawDataPropertyEditor_private : public QObject
         QAction* actCopyExpandedFlipped;
         QAction* actCopyExpandedNoHeadFlipped;
         QAction* actCopyExpandedNoHeadMatlabFlipped;
+        QMenu* menuCopyExpanded;
+
+        QMenu* menuCopyIDs;
+        QAction* actCopyRDRID;
+        QAction* actCopyEvaluationID;
+        QAction* actCopyResultID;
+        QAction* actCopyResultAccessParserFunction;
+
 
         QFEnhancedLineEdit* edtFilterEvaluation;
         QFEnhancedLineEdit* edtFilterResults;
@@ -286,6 +294,11 @@ class QFRawDataPropertyEditor_private : public QObject
         void copyResultsExpandedFlipped();
         void copyResultsExpandedNoHeadFlipped();
         void copyResultsExpandedNoHeadMatlabFlipped();
+
+        void copyRDRID();
+        void copyEvaluationID();
+        void copyResultID();
+        void copyResultAccessParserFunction();
 
         void filterEvaluationTextChanged(const QString& text);
         void filterResultsTextChanged(const QString& text);

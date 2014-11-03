@@ -451,7 +451,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     actCorrelation=new QAction(QIcon(":/lib/result_correlation.png"), tr("Result correlation"), d);
     tbResults->addAction(actCorrelation);
 
-    QMenu* menuCopyExpanded=new QMenu(tr("Copy selection in expanded form"), tvResults);
+    menuCopyExpanded=new QMenu(tr("Copy selection in expanded form"), tvResults);
     menuCopyExpanded->setIcon(QIcon(":/lib/copy16.png"));
     tvResults->addAction(menuCopyExpanded->menuAction());
     actCopyExpanded=new QAction( tr("Copy Selection in expanded form"), d);
@@ -466,6 +466,21 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     menuCopyExpanded->addAction(actCopyExpandedNoHeadMatlab);;
     actCopyExpandedNoHeadMatlabFlipped=new QAction( tr("Copy Selection in expanded form, to Matlab, flipped"), d);
     menuCopyExpanded->addAction(actCopyExpandedNoHeadMatlabFlipped);;
+
+
+
+    menuCopyIDs=new QMenu(tr("Copy Result/Evaluation IDs"), tvResults);
+    menuCopyIDs->setIcon(QIcon(":/lib/copy_forparser.png"));
+    tvResults->addAction(menuCopyIDs->menuAction());
+    actCopyRDRID=new QAction( tr("Copy RDR ID"), d);
+    menuCopyIDs->addAction(actCopyRDRID);;
+    actCopyEvaluationID=new QAction( tr("Copy Evaluation ID"), d);
+    menuCopyIDs->addAction(actCopyEvaluationID);;
+    actCopyResultID=new QAction( tr("Copy Result ID"), d);
+    menuCopyIDs->addAction(actCopyResultID);;
+    actCopyResultAccessParserFunction=new QAction( tr("Copy Result Access Parser Function rdr_getresult(...)"), d);
+    menuCopyIDs->addAction(actCopyResultAccessParserFunction);;
+
 
     tbResults->addSeparator();
     actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete selected records"), d);
@@ -571,6 +586,11 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     connect(actCopyExpandedFlipped, SIGNAL(triggered()), this, SLOT(copyResultsExpandedFlipped()));
     connect(actCopyExpandedNoHeadFlipped, SIGNAL(triggered()), this, SLOT(copyResultsExpandedNoHeadFlipped()));
     connect(actCopyExpandedNoHeadMatlabFlipped, SIGNAL(triggered()), this, SLOT(copyResultsExpandedNoHeadMatlabFlipped()));
+
+    connect(actCopyRDRID, SIGNAL(triggered()), this, SLOT(copyRDRID()));
+    connect(actCopyEvaluationID, SIGNAL(triggered()), this, SLOT(copyEvaluationID()));
+    connect(actCopyResultID, SIGNAL(triggered()), this, SLOT(copyResultID()));
+    connect(actCopyResultAccessParserFunction, SIGNAL(triggered()), this, SLOT(copyResultAccessParserFunction()));
 
     connect(actCorrelation, SIGNAL(triggered()), this, SLOT(showCorrelation()));
     connect(actShowData, SIGNAL(triggered()), this, SLOT(showData()));
@@ -1693,6 +1713,42 @@ void QFRawDataPropertyEditor_private::copyResultsExpandedNoHeadMatlabFlipped()
 {
     tvResults->copySelectionToMatlabExpandedNoHead(Qt::EditRole, true);
 }
+
+void QFRawDataPropertyEditor_private::copyRDRID()
+{
+    if (current) {
+        QClipboard* clp=QApplication::clipboard();
+        clp->setText(QString::number(current->getID()));
+    }
+}
+
+void QFRawDataPropertyEditor_private::copyEvaluationID()
+{
+    if (current) {
+        QClipboard* clp=QApplication::clipboard();
+        QModelIndex c=tvResults->currentIndex();
+        if (c.isValid()) clp->setText(tvResults->model()->data(c, QFRDRResultsModel::EvalNameRole).toString());
+    }
+}
+
+void QFRawDataPropertyEditor_private::copyResultID()
+{
+    if (current) {
+        QClipboard* clp=QApplication::clipboard();
+        QModelIndex c=tvResults->currentIndex();
+        if (c.isValid()) clp->setText(tvResults->model()->data(c, QFRDRResultsModel::ResultNameRole).toString());
+    }
+}
+
+void QFRawDataPropertyEditor_private::copyResultAccessParserFunction()
+{
+    if (current) {
+        QClipboard* clp=QApplication::clipboard();
+        QModelIndex c=tvResults->currentIndex();
+        if (c.isValid()) clp->setText(QString("rdr_getresult(%1, \"%2\", \"%3\")").arg(current->getID()).arg(tvResults->model()->data(c, QFRDRResultsModel::EvalNameRole).toString()).arg(tvResults->model()->data(c, QFRDRResultsModel::ResultNameRole).toString()));
+    }
+}
+
 void QFRawDataPropertyEditor_private::currentTabChanged(int tab) {
     int idx=tab-1;
     for (int i=0; i<menus.size(); i++) {

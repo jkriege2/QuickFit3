@@ -51,7 +51,6 @@ HEADERS += dlgcsvparameters.h \
             ../interfaces/qfrdrfcsdatainterface.h \
             ../interfaces/qfrdrcountratesinterface.h \
             ../interfaces/qfrdrfcsdatainterface.h \
-            ../interfaces/qfrdrimageselectioninterface.h \
     ../base_classes/qfrdrrunselectiontools.h \
     confocor3tools.h \
     flex_sin_tools.h \

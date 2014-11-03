@@ -38,7 +38,6 @@ HEADERS += qfrdrimagestack.h \
            qfrdrimagestack_data.h \
 		   qfrdrimagestack_dataeditor.h \
     ../interfaces/qfrdrimagestackinterface.h \
-    ../interfaces/qfrdrimagemask.h \
     ../base_classes/qfrdrimagemasktools.h \
     qfrdrimagestack3dviewer.h
 

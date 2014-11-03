@@ -157,7 +157,9 @@ HEADERS += dlgnewproperty.h \
     qfenhancedlabel.h \
     qfhelpaction.h \
     qfrdrtableinterface.h \
-    qftableservice.h
+    qftableservice.h \
+    qfrdrimagemask.h \
+    qfrdrimageselectioninterface.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \

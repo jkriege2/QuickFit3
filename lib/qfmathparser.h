@@ -591,8 +591,6 @@ class QFLIB_EXPORT QFMathParser
             /** \brief standard destructor, also destroy the children (recursively)  */
             ~qfmpBinaryArithmeticNode();
 
-            /** \brief evaluate this node */
-            virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
 
@@ -622,8 +620,6 @@ class QFLIB_EXPORT QFMathParser
             /** \brief standard destructor, also destroy the children (recursively)  */
             ~qfmpBinaryBoolNode();
 
-            /** \brief evaluate this node */
-            virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
 
@@ -654,8 +650,6 @@ class QFLIB_EXPORT QFMathParser
             /** \brief standard destructor, also destroy the children (recursively)  */
             ~qfmpCompareNode ();
 
-            /** \brief evaluate this node */
-            virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
 
@@ -685,8 +679,6 @@ class QFLIB_EXPORT QFMathParser
             /** \brief standard destructor, also destroy the children (recursively)  */
             ~qfmpUnaryNode();
 
-            /** \brief evaluate this node */
-            virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
 
@@ -803,8 +795,6 @@ class QFLIB_EXPORT QFMathParser
              */
             explicit qfmpFunctionAssignNode(QString function, QStringList parameterNames, qfmpNode* c, QFMathParser* p, qfmpNode* par);
 
-            /** \brief evaluate this node */
-            virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
 
@@ -990,8 +980,6 @@ class QFLIB_EXPORT QFMathParser
             /** \brief standard destructor, also destroy the children (recursively) */
             ~qfmpFunctionNode();
 
-            /** \brief evaluate this node */
-            virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
 
@@ -1029,8 +1017,6 @@ class QFLIB_EXPORT QFMathParser
             /** \brief remove the first node from the list and only delet it if \a deleteObject is \c true, returns a pointer to the first node, if \a deleteObject is \c false otherwise returns \c NULL */
             qfmpNode* popLast(bool deleteObject=false);
 
-            /** \brief evaluate the node */
-            virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
 
@@ -1060,8 +1046,6 @@ class QFLIB_EXPORT QFMathParser
             ~qfmpVectorList() {};
 
 
-            /** \brief evaluate the node */
-            virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
 
@@ -1092,8 +1076,6 @@ class QFLIB_EXPORT QFMathParser
             /** \brief standard destructor, also destroy the children (recursively)  */
             ~qfmpVectorConstructionNode ();
 
-            /** \brief evaluate this node */
-            virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
 
@@ -1125,8 +1107,6 @@ class QFLIB_EXPORT QFMathParser
             void setElse(qfmpNode* elseNode);
             void addCase(qfmpNode* decision, qfmpNode* value);
 
-            /** \brief evaluate this node */
-            virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
 
@@ -1160,8 +1140,6 @@ class QFLIB_EXPORT QFMathParser
             /** \brief standard destructor, also destroy the children (recursively)  */
             ~qfmpVectorOperationNode ();
 
-            /** \brief evaluate this node */
-            virtual qfmpResult evaluate();
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
             /** \brief create bytecode that evaluates the current node */

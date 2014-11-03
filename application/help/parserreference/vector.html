@@ -104,6 +104,9 @@ $$funcref_end$$
   
   
   
+  
+  
+  
 <h2>Test-Operations &amp; Search (contains, find, ...)</h2>
   
 $$funcref_start$$<a name="contains"/><!-- func:contains -->
@@ -197,6 +200,33 @@ $$funcref_description$$
   $$example:<tt>item("abcdefghi", [true,true,true,false,false,false,true,false,true])</tt> will return <tt>"abcgi"</tt>$$
   <!-- /func:item-->  
 $$funcref_end$$
+
+
+
+
+
+
+<h2>Ensure Vector Properties</h2>
+  $$funcref_start$$<a name="ensuresize"/><!-- func:ensuresize -->
+  <b><tt><!-- template -->ensuresize(x,desiredsize,defaultvalue)<!-- /template --></tt> - <i>returns the vector <tt>x</tt>, which is cut down, or elongated to length <tt>desiredsize</tt> </i>:</b>
+$$funcref_description$$
+  This function will remove elements from the end of the vector, or append elements of value <tt>defaultvalue</tt>.
+  $$note:The datatype of <tt>defaultvalue</tt> has to be the type of an element of <tt>x</tt>! If <tt>x</tt> is a string, then <tt>defaultvalue</tt> has to contain a single character!$$
+  $$example:<tt>ensuresize([1,2,3], 5, -1)</tt> will return <tt>[1,2,3,-1,-1]</tt>$$
+  $$example:<tt>ensuresize("Hello", 8, "!")</tt> will return <tt>"Hello!!!"</tt>$$
+  <!-- /func:ensuresize -->  
+$$funcref_end$$
+  $$funcref_start$$<a name="ensuresize_start"/><!-- func:ensuresize_start -->
+  <b><tt><!-- template -->ensuresize_start(x,desiredsize,defaultvalue)<!-- /template --></tt> - <i>returns the vector <tt>x</tt>, which is cut down, or elongated to length <tt>desiredsize</tt> </i>:</b>
+$$funcref_description$$
+  This function will remove elements from the start of the vector, or prepend elements of value <tt>defaultvalue</tt>.
+  $$note:The datatype of <tt>defaultvalue</tt> has to be the type of an element of <tt>x</tt>! If <tt>x</tt> is a string, then <tt>defaultvalue</tt> has to contain a single character!$$
+  $$example:<tt>ensuresize_start([1,2,3], 5, -1)</tt> will return <tt>[-1,-1,1,2,3]</tt>$$
+  $$example:<tt>ensuresize_start("Hello", 8, "!")</tt> will return <tt>"!!!Hello"</tt>$$
+  <!-- /func:ensuresize_start -->  
+$$funcref_end$$
+
+
 
 
 
