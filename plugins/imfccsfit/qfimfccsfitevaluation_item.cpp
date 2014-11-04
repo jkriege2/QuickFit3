@@ -45,6 +45,7 @@ QFImFCCSFitEvaluationItem::QFImFCCSFitEvaluationItem(QFProject* parent):
     QFFitResultsByIndexMultiRDREvaluationFitTools(),
     QFFCSWeightingTools()
 {
+    connect(project, SIGNAL(recordAboutToBeDeleted(QFRawDataRecord*)), this, SLOT(checkAndCleanFitFileSets()));
     qRegisterMetaType<QList<QFRawDataRecord*> >("QList<QFRawDataRecord*>");
     getEvaluationResultIDUsesFitFunction=true;
     matchFunctor=new QFImFCCSMatchRDRFunctor();
@@ -251,6 +252,42 @@ void QFImFCCSFitEvaluationItem::ensureFitFiles()
     }
 }
 
+void QFImFCCSFitEvaluationItem::checkAndCleanFitFileSets()
+{
+   bool removed=false;
+    for (int i=fittedFileSets.size()-1; i>=0; i--) {
+        bool ok=true, allNotOK=false;
+        for (int j=0; j<fittedFileSets[i].size(); j++) {
+            if (!fittedFileSets[i].at(j) || !isApplicable(fittedFileSets[i].at(j))) {
+                ok=false;
+            } else {
+                allNotOK=true;
+            }
+        }
+        if (!ok && allNotOK) {
+            fittedFileSets.removeAt(i);
+            removed=true;
+        }
+    }
+
+    for (int i=guessedFileSets.size()-1; i>=0; i--) {
+        bool ok=true, allNotOK=false;
+        for (int j=0; j<guessedFileSets[i].size(); j++) {
+            if (!guessedFileSets[i].at(j) || !isApplicable(guessedFileSets[i].at(j))) {
+                ok=false;
+            } else {
+                allNotOK=true;
+            }
+        }
+        if (!ok && allNotOK) {
+            guessedFileSets.removeAt(i);
+            removed=true;
+        }
+    }
+
+    if (removed) emit filesetsChanged();
+}
+
 void QFImFCCSFitEvaluationItem::setFitFile(int num, QFRawDataRecord *record)
 {
     QList<QFRawDataRecord*> fileset;
@@ -421,6 +458,7 @@ void QFImFCCSFitEvaluationItem::intReadData(QDomElement *e)
 
         e1=e1.nextSiblingElement("set");
     }
+    checkAndCleanFitFileSets();
     emit filesetsChanged();
 
     globalParams.clear();
@@ -688,7 +726,7 @@ void QFImFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &fi
                     for (int j=0; j<roles.size(); j++) newset<<NULL;
                     //qDebug()<<"  checking group "<<project->getRDRGroupName(i)<<" with "<<rlist.size()<<" files";
                     for (int j=0; j<rlist.size(); j++) {
-                        if (rlist[j]) {
+                        if (rlist[j] && isApplicable(rlist[j])) {
                             int idx=roles.indexOf(rlist[j]->getRole());
                             if (idx>=0 && idx<newset.size()) {
                                 newset[idx]=rlist[j];
@@ -707,7 +745,7 @@ void QFImFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &fi
                     bool ok=false;
                     for (int j=0; j<roles.size(); j++) newset<<NULL;
                     for (int j=0; j<rlist.size(); j++) {
-                        if (rlist[j]) {
+                        if (rlist[j] && isApplicable(rlist[j])) {
                             int idx=roles.indexOf(rlist[j]->getRole());
                             if (idx>=0 && idx<newset.size()) {
                                 newset[idx]=rlist[j];

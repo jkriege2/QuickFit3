@@ -156,6 +156,10 @@ class QFFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, pu
         virtual void clearLinkParameters(int file=-1);
     protected slots:
 
+        /** \brief check all fit file sets, whether they contain non-existing RDRs ... if so, remove them! */
+        void checkAndCleanFitFileSets();
+
+
 
     signals:
         void fileChanged(int num, QFRawDataRecord* record);
