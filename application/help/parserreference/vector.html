@@ -94,14 +94,22 @@ $$funcref_description$$
 $$funcref_end$$
 
 
-  $$funcref_start$$<a name="filter"/><!-- func:filter -->
-  <b><tt><!-- template -->filter(x, old_value, new_value)<!-- /template --></tt> - <i>replace all occurences of <tt>old_value</tt> in the vector or string <tt>x</tt> by <tt>new_value</tt> </i>:</b>
+  
+  
+  $$funcref_start$$<a name="replace"/><!-- func:replace -->
+  <b><tt><!-- template -->replace(x, old_value, new_value)<!-- /template --></tt> - <i>replace all occurences of <tt>old_value</tt> in the vector or string <tt>x</tt> by <tt>new_value</tt> </i>:</b>
 $$funcref_description$$
-  <!-- /func:filter -->  
+  <!-- /func:replace -->  
 $$funcref_end$$
   
   
   
+  $$funcref_start$$<a name="multireplace"/><!-- func:multireplace -->
+  <b><tt><!-- template -->multireplace(x, old_value1, new_value1, old_value2, new_value2, ...)<!-- /template --></tt> - <i>multiple replaces in one instruction, i.e. replaces all occurences of <tt>old_value<i>N</i></tt> in the vector or string <tt>x</tt> by <tt>new_value<i>N</i></tt> </i> for all given pairs <tt>old_value<i>N</i></tt>/<tt>new_value<i>N</i></tt>:</b>
+$$funcref_description$$
+$$note:This is like a nested <tt>replace()</tt>, i.e. <tt>multireplace(x, old_value1, new_value1, old_value2, new_value2) = replace(replace(x, old_value1, new_value1), old_value2, new_value2)</tt>$$
+  <!-- /func:multireplace -->  
+$$funcref_end$$
   
   
   

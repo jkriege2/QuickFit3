@@ -211,6 +211,7 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("containssubstring", QFMathParser_DefaultLib::fContainsSubString);
     p->addFunction("contains", QFMathParser_DefaultLib::fContains);
     p->addFunction("replace", QFMathParser_DefaultLib::fReplace);
+    p->addFunction("multireplace", QFMathParser_DefaultLib::fReplaceMulti);
 
     p->addFunction("isnan", QFMathParser_DefaultLib::fIsNan);
     p->addFunction("isinf", QFMathParser_DefaultLib::fIsInf);
@@ -2769,6 +2770,61 @@ namespace QFMathParser_DefaultLib {
             r.str=r.str.replace(params[1].str, params[2].str);
         } else {
             p->qfmpError(QObject::tr("replace(x, old_value,new_value) needs 3 arguments: one vector x and two corresponding element values, or 3 strings"));
+            r.setInvalid();
+            return;
+        }
+    }
+
+    void fReplaceMulti(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        const QString errorm=QObject::tr("multireplace(x, old_value,new_value,old2,new2,...) needs 3,5,7,... arguments: one vector x and pairs of corresponding element values, or 3/5/7/... strings");
+        r.setInvalid();
+        if (n>0) r.set(params[0]);
+        if (n>=3 && n%2==1 && params[0].type==qfmpDoubleVector && params[1].type==qfmpDouble && params[2].type==qfmpDouble) {
+            for (int j=1; j<n; j+=2) {
+                if (params[j].type!=qfmpDouble || params[j+1].type!=qfmpDouble) {
+                    p->qfmpError(errorm);
+                    r.setInvalid();
+                    return;
+                }
+                for (int i=0; i<r.numVec.size(); i++) {
+                    if (r.numVec[i]==params[j].num) r.numVec[i]=params[j+1].num;
+                }
+            }
+        } else if (n>=3 && n%2==1 && params[0].type==qfmpStringVector && params[1].type==qfmpString && params[2].type==qfmpString) {
+            for (int j=1; j<n; j+=2) {
+                if (params[j].type!=qfmpString || params[j+1].type!=qfmpString) {
+                    p->qfmpError(errorm);
+                    r.setInvalid();
+                    return;
+                }
+                for (int i=0; i<r.strVec.size(); i++) {
+                    if (r.strVec[i]==params[j].str) r.strVec[i]=params[j+1].str;
+                }
+            }
+        } else if (n>=3 && n%2==1 && params[0].type==qfmpBoolVector && params[1].type==qfmpBool && params[2].type==qfmpBool) {
+            for (int j=1; j<n; j+=2) {
+                if (params[j].type!=qfmpBool || params[j+1].type!=qfmpBool) {
+                    p->qfmpError(errorm);
+                    r.setInvalid();
+                    return;
+                }
+                for (int i=0; i<r.boolVec.size(); i++) {
+                    if (r.boolVec[i]==params[j].boolean) r.boolVec[i]=params[j+1].boolean;
+                }
+            }
+        } else if (n>=3 && n%2==1 && params[0].type==qfmpString && params[1].type==qfmpString && params[2].type==qfmpString) {
+            for (int j=1; j<n; j+=2) {
+                if (params[j].type!=qfmpString || params[j+1].type!=qfmpString) {
+                    p->qfmpError(errorm);
+                    r.setInvalid();
+                    return;
+                }
+
+                r.str=r.str.replace(params[j].str, params[j+1].str);
+            }
+        } else {
+            p->qfmpError(errorm);
             r.setInvalid();
             return;
         }

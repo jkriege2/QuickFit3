@@ -56,7 +56,7 @@
                     <li>parser now supports user-defined functions, that have qfmpNode*'s as parameters, rather than qfmpResult's (this allows for constructs, like "for()" in user-defined functions</li>                    
                     <li>bugfix: regular expressions functions now work correctly</li>
                     <li>added functions for filename-handling: extract_filename, extract_basename, extract_complete_basename, extract_ext, extract_complete_ext, extract_file_path, extract_absolute_path, extract_absolute_file_path, clean_string_for_filename</li>
-                    <li>added function replace() for strings/vectors</li>
+                    <li>added function replace()/multireplace() for strings/vectors</li>
                     <li>for() now also create string and boolean vectors</li>
                     <li>added functions join(), split(), removeemptystrings(), ... for strings/string vectors</li>
                     <li>added functions rdr_ids(), eval_ids(), rdr_getresult(), rdr_getresulterror(), rdr_getname(), rdr_getfolder(), rdr_getgroup() to access the current project</li>
@@ -68,6 +68,7 @@
                     <li>added functions to access overview images (overview_...()), named image selections (imageselection_...()) and image masks (maks_...()) in RDRs</li>
                     <li>bugfix: unary logic negation (!/not) was not implemented for boolean vectors!</li>
                     <li>bugfix: corrected parser, so it understands [...] vector-expressions correctly, when they are preceded by a !/-/~/... (e.g. ![true,false])</li>
+
             </ul></li>
             <li>added context menu entry to tables, that allows to explicitly copy the table as "CSV", or to copy the table in a format suitable for "Excel", which depends on the current locale (e.g. for decimal separators)</li>
             <li>bugfixed "copy to Excel/CSV" in table view, which did not copy any data (regression?)</li>
