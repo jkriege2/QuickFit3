@@ -289,6 +289,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
 
         void setBackgroundFromSelection();
         void setBackgroundFromMasked();
+        void setBackgroundFromMaskedInAll();
         void setBackground(bool* mask, bool alsoSetOtherACF);
         void setBackground(QFRawDataRecord* current, bool* msk);
 
@@ -448,6 +449,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QToolButton* btnSetBackgroundFromSelection;
         QAction* actSetBackgroundFromMasked;
         QAction* actPostProcessBinning;
+        QAction* actSetBackgroundFromMaskedInAll;
 
         /** \brief combobox to select a result group */
         QComboBox* cmbResultGroup;

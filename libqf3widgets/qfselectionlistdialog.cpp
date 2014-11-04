@@ -24,6 +24,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "ui_qfselectionlistdialog.h"
 #include <QInputDialog>
 #include "qfhtmldelegate.h"
+#include "qfpluginservices.h"
 
 QFSelectionListDialog::QFSelectionListDialog(QWidget *parent, bool selection_saveable) :
     QDialog(parent),
@@ -33,6 +34,7 @@ QFSelectionListDialog::QFSelectionListDialog(QWidget *parent, bool selection_sav
     ui->setupUi(this);
     ui->btnSave->setVisible(selection_saveable);
     ui->comboBox->setVisible(selection_saveable);
+    ui->btnHelp->setVisible(false);
 }
 
 QFSelectionListDialog::~QFSelectionListDialog()
@@ -187,6 +189,12 @@ void QFSelectionListDialog::selectItems(QList<bool> items)
     }
 }
 
+void QFSelectionListDialog::setHelpPage(const QString &helpfile)
+{
+    ui->btnHelp->setVisible(!helpfile.isEmpty());
+    help=helpfile;
+}
+
 void QFSelectionListDialog::on_btnSave_clicked() {
     if (!selection_saveable) return;
     QString name=tr("my selection name");
@@ -260,4 +268,9 @@ void QFSelectionListDialog::getDataColumnsByUserItemChanged(QListWidgetItem *wid
     disconnect(ui->comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(getDataColumnsByUserComboBoxSelected(int)));
     ui->comboBox->setCurrentIndex(ui->comboBox->findText(item));
     connect(ui->comboBox, SIGNAL(currentIndexChanged(int)), this, SLOT(getDataColumnsByUserComboBoxSelected(int)));
+}
+
+void QFSelectionListDialog::on_btnHelp_clicked()
+{
+    QFPluginServices::getInstance()->displayHelpWindow(help);
 }

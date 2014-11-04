@@ -1829,11 +1829,13 @@ void QFRDRImagingFCSData::loadQFPropertiesFromB040SPIMSettingsFile(QSettings &se
         else setQFProperty("PIXEL_HEIGHT", pw, true, true);
     }
 
+    QString p, p1, pb;
     if (!propertyExists("EXP_CELL") && settings.contains("experiment/cell")) setQFProperty("EXP_CELL", settings.value("experiment/cell").toInt(), false, true);
     if (!propertyExists("EXP_PLATE") && settings.contains("experiment/plate")) setQFProperty("EXP_PLATE", settings.value("experiment/plate").toInt(), false, true);
     if (!propertyExists("EXP_WELL") && settings.contains("experiment/well")) setQFProperty("EXP_WELL", settings.value("experiment/well").toInt(), false, true);
     if (!propertyExists("EXP_SAMPLENAME") && settings.contains("experiment/samplename")) setQFProperty("EXP_SAMPLENAME", settings.value("experiment/samplename").toString(), false, true);
     if (!propertyExists("EXP_DATE") && settings.contains("experiment/date")) setQFProperty("EXP_DATE", settings.value("experiment/date").toString(), false, true);
+    if (!propertyExists("EXP_DATE") && settings.contains("experiment/start_time")) setQFProperty("EXP_DATE", settings.value("experiment/start_time").toString(), false, true);
     if (!propertyExists("EXP_LASER1_MEASURED") && settings.contains("acquisition/acquisition/setup/laser1/line1/measured_power")) setQFProperty("EXP_LASER1_MEASURED", settings.value("acquisition/acquisition/setup/laser1/line1/measured_power").toDouble(), false, true);
     if (!propertyExists("EXP_LASER1_SET") && settings.contains("acquisition/acquisition/setup/laser1/line1/set_power") && settings.contains("acquisition/acquisition/setup/laser1/line1/enabled")) {
         if (settings.value("acquisition/acquisition/setup/laser1/line1/enabled").toBool())
@@ -1848,7 +1850,41 @@ void QFRDRImagingFCSData::loadQFPropertiesFromB040SPIMSettingsFile(QSettings &se
         else
             setQFProperty("EXP_LASER2_SET", 0.0, false, true);
     }
-
+    if (!propertyExists(p="EXP_CAMERA_EMGAIN")){
+        if (settings.contains(pb="acquisition/acquisition/emgain_enabled")) {
+            if (settings.value(pb).toBool()) {
+                if (settings.contains(p1="acquisition/acquisition/emgain")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+                if (settings.contains(p1="acquisition/camera/emgain")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+                else if (settings.contains(p1="acquisition/emgain")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+            } else {
+                setQFProperty(p, 0.0, false, true);
+            }
+        } else if (settings.contains(pb="acquisition/emgain_enabled")) {
+            if (settings.value(pb).toBool()) {
+                if (settings.contains(p1="acquisition/emgain")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+                else if (settings.contains(p1="acquisition/acquisition/emgain")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+                else if (settings.contains(p1="acquisition/camera/emgain")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+            } else {
+                setQFProperty(p, 0.0, false, true);
+            }
+        }
+    }
+    if (!propertyExists(p="EXP_CAMERA_EXPOSURE")){
+        if (settings.contains(p1="acquisition/acquisition/exposure_time")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+        else if (settings.contains(p1="acquisition/exposure_time")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+        else if (settings.contains(p1="acquisition/camera/exposure_time")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+        else if (settings.contains(p1="acquisition/acquisition/exposure")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+        else if (settings.contains(p1="acquisition/camera/exposure")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+        else if (settings.contains(p1="acquisition/exposure")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+    }
+    if (!propertyExists(p="EXP_CAMERA_ANALOG_GAIN")){
+        if (settings.contains(p1="acquisition/acquisition/preamplifier_gain")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+        else if (settings.contains(p1="acquisition/camera/preamplifier_gain")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+        else if (settings.contains(p1="acquisition/preamplifier_gain")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+        else if (settings.contains(p1="acquisition/acquisition/gain")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+        else if (settings.contains(p1="acquisition/camera/gain")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+        else if (settings.contains(p1="acquisition/gain")) setQFProperty(p, settings.value(p1).toDouble(), false, true);
+    }
 
 }
 

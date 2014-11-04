@@ -375,6 +375,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(actSetBackgroundFromMasked, SIGNAL(triggered()), this, SLOT(setBackgroundFromMasked()));
     glmask->addWidget(btnSetBackgroundFromMasked, mskgrpRow,0 ,1,2);
 
+    actSetBackgroundFromMaskedInAll=new QAction(tr("background from mask in all RDRs"), this);
+    connect(actSetBackgroundFromMaskedInAll, SIGNAL(triggered()), this, SLOT(setBackgroundFromMaskedInAll()));
+
     btnCopyMaskToGroup=createButtonForActionShowText(correlationMaskTools->get_actCopyMaskToGroup(), w);//createButtonAndActionShowText(actSetBackgroundFromMasked, tr("set background from masked"), w);
     correlationMaskTools->get_actCopyMaskToGroup()->setIconText(tr("copy mask to group"));
     glmask->addWidget(btnCopyMaskToGroup, mskgrpRow, 2, 1,2);
@@ -1386,6 +1389,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuMask->addAction(actMaskBuilder);
     menuMask->addSeparator();
     menuMask->addAction(actSetBackgroundFromMasked);
+    menuMask->addAction(actSetBackgroundFromMaskedInAll);
     correlationMaskTools->registerCorrelationToolsToMenu(menuMask);
 
 
@@ -1410,6 +1414,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuImagingFCSTools->addAction(actRecorrelate);
     menuImagingFCSTools->addAction(actCopyGroupACFsToTable);
     menuImagingFCSTools->addAction(actCopyMeanCFFromAll);
+    menuImagingFCSTools->addAction(actSetBackgroundFromMaskedInAll);
 
     setUpdatesEnabled(true);
 }
@@ -4972,6 +4977,7 @@ struct copyFitResultStatistics_data {
     QList<Qt::CheckState> gfix;
     int Nfit;
     QString file;
+    QVariantList props;
 };
 
 void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
@@ -4981,6 +4987,12 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
     QFSelectionListDialog* dlg=new QFSelectionListDialog(this);
     QSettings* settings=ProgramOptions::getInstance()->getQSettings();
     QString prefix="imfcsimageeditor/copyFitResultStatistics/";
+    dlg->setHelpPage(QFPluginServices::getInstance()->getPluginHelpDirectory(current->getType())+"/imfcs_copyfitresults.html");
+
+    QLineEdit* edtProps=new QLineEdit(dlg);
+    edtProps->setText(settings->value(prefix+"edtProps", "").toString());
+    edtProps->setToolTip(tr("separate with ';' or ','"));
+    dlg->addWidget(tr("add RDR property values:"), edtProps);
 
     QComboBox* cmbSelection=new QComboBox(dlg);
     cmbSelection->addItem(tr("all non-masked pixels"));
@@ -4993,6 +5005,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
     edtSelections->setText(settings->value(prefix+"edtSelections", "").toString());
     edtSelections->setToolTip(tr("separate with ';', all by 'all'"));
     dlg->addWidget(tr("named selections:"), edtSelections);
+
 
 
 
@@ -5016,7 +5029,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
     cmbMode->addItem(tr("one row per parameter"));
     cmbMode->addItem(tr("all parameters in one row"));
     cmbMode->addItem(tr("all parameters in one column"));
-    cmbMode->setCurrentIndex(settings->value(prefix+"cmbMode", 0).toInt());
+    cmbMode->setCurrentIndex(settings->value(prefix+"cmbMode", 2).toInt());
     dlg->addWidget(tr("result table orientation"), cmbMode);
 
     QCheckBox* chkHeaders=new QCheckBox("", dlg);
@@ -5062,6 +5075,9 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
     if (dlg->exec()) {
         QList<int> items=dlg->getSelectedIndexes();
         //qDebug()items;
+
+        QString props_in=edtProps->text();
+        QStringList props=props_in.split(QRegExp("[\\,\\;]"),  QString::SkipEmptyParts);
 
 
         QList<QPointer<QFRawDataRecord> > recs;
@@ -5167,6 +5183,9 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                         double* corr1=(double*)calloc(m->getCorrelationN(), sizeof(double));
                         copyFitResultStatistics_data d;
                         d.file=curRec->getName();
+                        for (int pip=0; pip<props.size(); pip++) {
+                            d.props.append(curRec->getQFProperty(props[pip], QVariant()));
+                        }
                         for (int i=0; i<m->getCorrelationN(); i++) { corr[i]=0; cerr[i]=0; }
                         double N=0;
                         d.Nfit=0;
@@ -5372,6 +5391,7 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
             settings->setValue(prefix+"chkCopyAllFiles", chkCopyAllFiles->isChecked());
             settings->setValue(prefix+"chkSaveResultToFile", chkSaveResultToFile->isChecked());
             settings->setValue(prefix+"edtSelections", edtSelections->text());
+            settings->setValue(prefix+"edtProps", edtProps->text());
 
             QList<QList<QVariant> > result;
             QStringList colNames, rowNames;
@@ -5398,6 +5418,12 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                             if (i==items.size()-1) {
                                 r.append(qfstatisticsCount(gvalues_s));
                                 colNames<<tr("pixel_count");
+                            }
+                        }
+                        if (i==items.size()-1 && data[d].props.size()>0) {
+                            for (int pip=0; pip<data[d].props.size(); pip++) {
+                                colNames<<props.value(pip, tr("property %1").arg(pip));
+                                r.append(data[d].props.value(pip, QVariant()));
                             }
                         }
                         result<<r;
@@ -5446,8 +5472,15 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                                 colNames<<tr("pixel_count");
                             }
                         }
+                        if (i==items.size()-1 && data[d].props.size()>0) {
+                            for (int pip=0; pip<data[d].props.size(); pip++) {
+                                colNames<<props.value(pip, tr("property %1").arg(pip));
+                                r.append(data[d].props.value(pip, QVariant()));
+                            }
+                        }
                         //if (chkCopyNumber->isChecked()) { r.append(qfstatisticsCount(gvalues_s)); colNames<<tr("pixel_count(%1)").arg(names.value(items[i], "")); }
                     }
+
                     if (recs.size()>1) {
                         colNames.prepend(tr("RDR"));
                         r.prepend(data[d].file);
@@ -6571,6 +6604,35 @@ void QFRDRImagingFCSImageEditor::setBackgroundFromMasked()
         setBackground(msk, alsoSetOtherACF);
         free(msk);
     }
+}
+
+void QFRDRImagingFCSImageEditor::setBackgroundFromMaskedInAll()
+{
+    if (!current) return;
+    QProgressDialog progress(tr("setting background ..."), tr("Cancel"), 0, current->getProject()->getRawDataCount(), this);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.show();
+    for (int i=0; i<current->getProject()->getRawDataCount(); i++) {
+
+        QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current->getProject()->getRawDataByNum(i));
+
+        if (m) {
+            double w=m->getImageFromRunsWidth();
+            double h=m->getImageFromRunsHeight();
+            if ((w==0) || (h==0)) {
+                w=h=1;
+            }
+
+            bool *msk=qfDuplicateArray(m->maskGet(), m->maskGetWidth()*m->maskGetHeight());
+            setBackground(m, msk);
+            qfFree(msk);
+        }
+
+        progress.setValue(i);
+        QApplication::processEvents();
+        if (progress.wasCanceled()) break;
+    }
+    progress.setValue(0);
 }
 
 void QFRDRImagingFCSImageEditor::setBackground(bool *msk, bool alsoSetOtherACF)

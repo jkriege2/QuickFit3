@@ -69,6 +69,7 @@ class QFWIDLIB_EXPORT QFSelectionListDialog : public QDialog
         QList<int> getSelectedIndexes() const;
         void addWidget(const QString &label, QWidget *widget);
         void selectItems(QList<bool> items);
+        void setHelpPage(const QString& helpfile);
         
     protected slots:
         void on_btnSave_clicked();
@@ -76,11 +77,13 @@ class QFWIDLIB_EXPORT QFSelectionListDialog : public QDialog
         void on_btnSelectAll_clicked();
         void getDataColumnsByUserComboBoxSelected(int index);
         void getDataColumnsByUserItemChanged(QListWidgetItem *widgetitem);
+        void on_btnHelp_clicked();
     protected:
         QMap<QString, QStringList> getDataColumnsByUserSaved;
     private:
         Ui::QFSelectionListDialog *ui;
         bool selection_saveable;
+        QString help;
 };
 
 #endif // QFSELECTIONLISTDIALOG_H
