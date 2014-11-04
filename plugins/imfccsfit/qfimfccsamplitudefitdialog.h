@@ -47,6 +47,8 @@ class QFImFCCSAmplitudeFitDialog : public QWidget
 
         bool calculateRelCCF(QFRawDataRecord *acf0, QFRawDataRecord *acf1, QFRawDataRecord *ccf, double **rel_out0, double **rel_error_out0, double **rel_out1, double **rel_error_out1, int&w, int& h, bool showErrorMessage=false) const;
 
+    public slots:
+        void updateProject();
     protected slots:
         void cmbACF_currentIndexChanged(int index);
         void cmbCCF_currentIndexChanged(int index);

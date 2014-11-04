@@ -86,6 +86,8 @@ class QFImFCCSFitEvaluation : public QObject, public QFPluginEvaluationItemBase,
         };
 
 
+        /** \brief set current project */
+        virtual void setProject(QFProject* project);
 
 
         QString pluginOptionsName() const;

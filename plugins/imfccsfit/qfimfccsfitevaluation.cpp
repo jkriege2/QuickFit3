@@ -101,6 +101,15 @@ void QFImFCCSFitEvaluation::init()
     QFPluginServices::getInstance()->getMenu("tools")->addMenu(menu);
 }
 
+void QFImFCCSFitEvaluation::setProject(QFProject *project)
+{
+    QFPluginEvaluationItemBase::setProject(project);
+    if (dlgRelCCF) dlgRelCCF->updateProject();
+    if (dlgRelCCFCrosstalk) dlgRelCCFCrosstalk->updateProject();
+    if (dlgRelInten) dlgRelInten->updateProject();
+    if (dlgAmpFit) dlgAmpFit->updateProject();
+}
+
 QString QFImFCCSFitEvaluation::pluginOptionsName() const
 {
     return getName();

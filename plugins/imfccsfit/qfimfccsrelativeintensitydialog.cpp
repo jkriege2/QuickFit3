@@ -39,25 +39,12 @@ QFImFCCSRelativeIntensityDialog::QFImFCCSRelativeIntensityDialog(QWidget *parent
     QWidget(parent),
     ui(new Ui::QFImFCCSRelativeIntensityDialog)
 {
+    setAttribute(Qt::WA_DeleteOnClose);
 
     plt=NULL;
     matchFunctor=new QFImFCCSMatchRDRFunctor();
-    QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
-    QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
     ui->setupUi(this);
-    ui->cmbCCF->init(project, matchFunctor);
-    ui->widOverviewCCF->setRDR(NULL);
-
-    bool okCCF=false;
-    for (int i=0; i<lst.size(); i++) {
-        if (lst[i]) {
-            if (!okCCF && isCCF(lst[i])) {
-                ui->cmbCCF->setCurrentRDR(lst[i]);
-                okCCF=true;
-            }
-        }
-        if (okCCF) break;
-    }
+    updateProject();
 
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "ImFCSCalibrationWizard");
     connect(ui->cmbCCF, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbCCF_currentIndexChanged(int)));
@@ -120,6 +107,26 @@ bool QFImFCCSRelativeIntensityDialog::calculateRelIntensity(QFRawDataRecord *ccf
     }
     QApplication::restoreOverrideCursor();
     return true;
+}
+
+void QFImFCCSRelativeIntensityDialog::updateProject()
+{
+    QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
+    QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
+    ui->cmbCCF->clear();
+    ui->cmbCCF->init(project, matchFunctor);
+    ui->widOverviewCCF->setRDR(NULL);
+
+    bool okCCF=false;
+    for (int i=0; i<lst.size(); i++) {
+        if (lst[i]) {
+            if (!okCCF && isCCF(lst[i])) {
+                ui->cmbCCF->setCurrentRDR(lst[i]);
+                okCCF=true;
+            }
+        }
+        if (okCCF) break;
+    }
 }
 
 void QFImFCCSRelativeIntensityDialog::cmbCCF_currentIndexChanged(int index)

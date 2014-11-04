@@ -43,7 +43,8 @@ class QFImFCCSRelativeCCFDialog : public QWidget
         QFRawDataRecord* getCCF() const;
 
         static bool calculateRelCCF(QFRawDataRecord* acf, QFRawDataRecord* ccf, double** rel, double** rel_error, int &w, int &h, int avgCount, bool showErrorMessage=false);
-
+    public slots:
+        void updateProject();
     protected:
         void closeEvent(QCloseEvent *event);
     protected slots:

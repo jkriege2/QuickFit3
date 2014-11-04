@@ -4766,23 +4766,7 @@ void QFRDRImagingFCSImageEditor::insertSelectedCorrelationsAsFCSRDR() {
     if (dlg->exec()) {
 
         if (mc->isFCCS()) {
-            /*int answer=QMessageBox::question(this, tr("Insert selected ACFs as FCS RDR"), tr("This is an FCCS record. Do you want to also insetr the ACFs as FCS RDRs?"), QMessageBox::Yes|QMessageBox::No|QMessageBox::Cancel, QMessageBox::Yes);
-            if (answer==QMessageBox::Cancel) return;
-            if (answer==QMessageBox::Yes) {
-                recs.clear();
-                QList<QFRawDataRecord*> l;
-                l=mc->getRecordsWithRoleFromGroup("acf0");
-                for (int i=0; i<l.size(); i++) {
-                    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(l[i]);
-                    if (m) recs.append(m);;
-                }
-                l=mc->getRecordsWithRoleFromGroup("acf1");
-                for (int i=0; i<l.size(); i++) {
-                    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(l[i]);
-                    if (m) recs.append(m);;
-                }
-                recs.append(mc);
-            }*/
+
             if (dlg->getCopyACF()) {
                 recs.clear();
                 QList<QFRawDataRecord*> l;

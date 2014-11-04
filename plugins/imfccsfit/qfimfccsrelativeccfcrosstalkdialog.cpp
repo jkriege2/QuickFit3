@@ -40,53 +40,14 @@ QFImFCCSRelativeCCFCrosstalkDialog::QFImFCCSRelativeCCFCrosstalkDialog(QWidget *
     QWidget(parent),
     ui(new Ui::QFImFCCSRelativeCCFCrosstalkDialog)
 {
+    ui->setupUi(this);
 
+    setAttribute(Qt::WA_DeleteOnClose);
     //qDebug()<<1;
     plt=NULL;
     matchFunctor=new QFImFCCSMatchRDRFunctor();
-    QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
-    QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
-    //qDebug()<<2;
-    ui->setupUi(this);
-    //qDebug()<<3;
-    ui->cmbACF0->init(project, matchFunctor);
-    ui->cmbACF1->init(project, matchFunctor);
-    //qDebug()<<4;
-    ui->cmbCCF->init(project, matchFunctor);
 
-    //qDebug()<<5;
-
-    ui->widOverviewACF0->setRDR(NULL);
-    ui->widOverviewACF1->setRDR(NULL);
-    //qDebug()<<6;
-    ui->widOverviewCCF->setRDR(NULL);
-    //qDebug()<<7;
-
-
-    //qDebug()<<8;
-
-    bool okCCF=false;
-    for (int i=0; i<lst.size(); i++) {
-        if (lst[i]) {
-            if (!okCCF && isCCF(lst[i])) {
-                ui->cmbCCF->setCurrentRDR(lst[i]);
-                okCCF=true;
-                QList<QFRawDataRecord*> lsta=lst[i]->getRecordsWithRoleFromGroup("acf0");
-                if (!lsta.isEmpty()) {
-                    ui->cmbACF0->setCurrentRDR(lsta.first());
-                } else {
-                    ui->cmbACF0->setCurrentRDR(0);
-                }
-                lsta=lst[i]->getRecordsWithRoleFromGroup("acf1");
-                if (!lsta.isEmpty()) {
-                    ui->cmbACF1->setCurrentRDR(lsta.first());
-                } else {
-                    ui->cmbACF1->setCurrentRDR(0);
-                }
-            }
-        }
-        if (okCCF) break;
-    }
+    updateProject();
 
     ui->cmbACF0ResultSet->setRDR(ui->cmbACF0->currentRDR());
     ui->cmbACF1ResultSet->setRDR(ui->cmbACF1->currentRDR());
@@ -380,6 +341,55 @@ bool QFImFCCSRelativeCCFCrosstalkDialog::calculateRelCCF(QFRawDataRecord *acf0, 
     }
     QApplication::restoreOverrideCursor();
     return true;
+}
+
+void QFImFCCSRelativeCCFCrosstalkDialog::updateProject()
+{
+    QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
+    QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
+    //qDebug()<<2;
+    //qDebug()<<3;
+    ui->cmbACF0->clear();
+    ui->cmbACF1->clear();
+    ui->cmbCCF->clear();
+    ui->cmbACF0->init(project, matchFunctor);
+    ui->cmbACF1->init(project, matchFunctor);
+    //qDebug()<<4;
+    ui->cmbCCF->init(project, matchFunctor);
+
+    //qDebug()<<5;
+
+    ui->widOverviewACF0->setRDR(NULL);
+    ui->widOverviewACF1->setRDR(NULL);
+    //qDebug()<<6;
+    ui->widOverviewCCF->setRDR(NULL);
+    //qDebug()<<7;
+
+
+    //qDebug()<<8;
+
+    bool okCCF=false;
+    for (int i=0; i<lst.size(); i++) {
+        if (lst[i]) {
+            if (!okCCF && isCCF(lst[i])) {
+                ui->cmbCCF->setCurrentRDR(lst[i]);
+                okCCF=true;
+                QList<QFRawDataRecord*> lsta=lst[i]->getRecordsWithRoleFromGroup("acf0");
+                if (!lsta.isEmpty()) {
+                    ui->cmbACF0->setCurrentRDR(lsta.first());
+                } else {
+                    ui->cmbACF0->setCurrentRDR(0);
+                }
+                lsta=lst[i]->getRecordsWithRoleFromGroup("acf1");
+                if (!lsta.isEmpty()) {
+                    ui->cmbACF1->setCurrentRDR(lsta.first());
+                } else {
+                    ui->cmbACF1->setCurrentRDR(0);
+                }
+            }
+        }
+        if (okCCF) break;
+    }
 }
 
 void QFImFCCSRelativeCCFCrosstalkDialog::cmbCCF_currentIndexChanged(int index)

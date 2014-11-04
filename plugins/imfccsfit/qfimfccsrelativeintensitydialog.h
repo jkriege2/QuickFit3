@@ -42,6 +42,8 @@ class QFImFCCSRelativeIntensityDialog : public QWidget
         QFRawDataRecord* getCCF() const;
 
         static bool calculateRelIntensity(QFRawDataRecord* ccf, double** rel, int &w, int &h, bool showErrorMessage=false);
+    public slots:
+        void updateProject();
 
     protected slots:
         void cmbCCF_currentIndexChanged(int index);

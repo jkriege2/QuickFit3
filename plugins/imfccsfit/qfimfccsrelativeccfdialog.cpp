@@ -41,47 +41,15 @@ QFImFCCSRelativeCCFDialog::QFImFCCSRelativeCCFDialog(QWidget *parent) :
     ui(new Ui::QFImFCCSRelativeCCFDialog)
 {
 
+    setAttribute(Qt::WA_DeleteOnClose);
     //qDebug()<<1;
     plt=NULL;
     matchFunctor=new QFImFCCSMatchRDRFunctor();
-    QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
-    QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
     //qDebug()<<2;
     ui->setupUi(this);
-    //qDebug()<<3;
-    ui->cmbACF->init(project, matchFunctor);
-    //qDebug()<<4;
-    ui->cmbCCF->init(project, matchFunctor);
-    //qDebug()<<5;
 
-    ui->widOverviewACF->setRDR(NULL);
-    //qDebug()<<6;
-    ui->widOverviewCCF->setRDR(NULL);
-    //qDebug()<<7;
+    updateProject();
 
-
-    //qDebug()<<8;
-
-    bool okACF=false;
-    bool okCCF=false;
-    for (int i=0; i<lst.size(); i++) {
-        if (lst[i]) {
-            //qDebug()<<lst[i]->getName();
-            if (!okACF && isACF(lst[i])) {
-                //qDebug()<<"set ACF: ";
-                ui->cmbACF->setCurrentRDR(lst[i]);
-                okACF=true;
-                //qDebug()<<"set ACF: done";
-            }
-            if (!okCCF && isCCF(lst[i])) {
-                //qDebug()<<"set CCF: ";
-                ui->cmbCCF->setCurrentRDR(lst[i]);
-                okCCF=true;
-                //qDebug()<<"set CCF: done";
-            }
-        }
-        if (okACF&&okCCF) break;
-    }
     //qDebug()<<9;
 
     loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, "ImFCSCalibrationWizard/pos");
@@ -216,6 +184,48 @@ bool QFImFCCSRelativeCCFDialog::calculateRelCCF(QFRawDataRecord *acf, QFRawDataR
     }
     QApplication::restoreOverrideCursor();
     return true;
+}
+
+void QFImFCCSRelativeCCFDialog::updateProject()
+{
+    QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
+    QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
+    ui->cmbACF->clear();
+    ui->cmbCCF->clear();
+    //qDebug()<<3;
+    ui->cmbACF->init(project, matchFunctor);
+    //qDebug()<<4;
+    ui->cmbCCF->init(project, matchFunctor);
+    //qDebug()<<5;
+
+    ui->widOverviewACF->setRDR(NULL);
+    //qDebug()<<6;
+    ui->widOverviewCCF->setRDR(NULL);
+    //qDebug()<<7;
+
+
+    //qDebug()<<8;
+
+    bool okACF=false;
+    bool okCCF=false;
+    for (int i=0; i<lst.size(); i++) {
+        if (lst[i]) {
+            //qDebug()<<lst[i]->getName();
+            if (!okACF && isACF(lst[i])) {
+                //qDebug()<<"set ACF: ";
+                ui->cmbACF->setCurrentRDR(lst[i]);
+                okACF=true;
+                //qDebug()<<"set ACF: done";
+            }
+            if (!okCCF && isCCF(lst[i])) {
+                //qDebug()<<"set CCF: ";
+                ui->cmbCCF->setCurrentRDR(lst[i]);
+                okCCF=true;
+                //qDebug()<<"set CCF: done";
+            }
+        }
+        if (okACF&&okCCF) break;
+    }
 }
 
 void QFImFCCSRelativeCCFDialog::cmbCCF_currentIndexChanged(int index)

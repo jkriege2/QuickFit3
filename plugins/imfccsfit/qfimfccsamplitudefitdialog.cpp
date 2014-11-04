@@ -43,57 +43,18 @@ QFImFCCSAmplitudeFitDialog::QFImFCCSAmplitudeFitDialog(QWidget *parent) :
     ui(new Ui::QFImFCCSAmplitudeFitDialog)
 {
 
+    setAttribute(Qt::WA_DeleteOnClose);
     tableBrightness=new QFFitFunctionValueInputTable(this);
     tableBrightness->setWriteTo(&mapBrightness, mapBrightness.keys());
     tableResults=new QFFitFunctionValueInputTable(this);
     tableBrightness->setWriteTo(&mapResults, mapResults.keys());
+    //qDebug()<<2;
+    ui->setupUi(this);
 
     //qDebug()<<1;
     plt=NULL;
     matchFunctor=new QFImFCCSMatchRDRFunctor();
-    QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
-    QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
-    //qDebug()<<2;
-    ui->setupUi(this);
-    //qDebug()<<3;
-    ui->cmbACF0->init(project, matchFunctor);
-    ui->cmbACF1->init(project, matchFunctor);
-    //qDebug()<<4;
-    ui->cmbCCF->init(project, matchFunctor);
-
-    //qDebug()<<5;
-
-    //ui->widOverviewACF0->setRDR(NULL);
-    //ui->widOverviewACF1->setRDR(NULL);
-    //qDebug()<<6;
-    ui->widOverviewCCF->setRDR(NULL);
-    //qDebug()<<7;
-
-
-    //qDebug()<<8;
-
-    bool okCCF=false;
-    for (int i=0; i<lst.size(); i++) {
-        if (lst[i]) {
-            if (!okCCF && isCCF(lst[i])) {
-                ui->cmbCCF->setCurrentRDR(lst[i]);
-                okCCF=true;
-                QList<QFRawDataRecord*> lsta=lst[i]->getRecordsWithRoleFromGroup("acf0");
-                if (!lsta.isEmpty()) {
-                    ui->cmbACF0->setCurrentRDR(lsta.first());
-                } else {
-                    ui->cmbACF0->setCurrentRDR(0);
-                }
-                lsta=lst[i]->getRecordsWithRoleFromGroup("acf1");
-                if (!lsta.isEmpty()) {
-                    ui->cmbACF1->setCurrentRDR(lsta.first());
-                } else {
-                    ui->cmbACF1->setCurrentRDR(0);
-                }
-            }
-        }
-        if (okCCF) break;
-    }
+    updateProject();
 
 
     //ui->edtSpecies->setValidator(new QRegExpValidator(QRegExp("[A-Za-z0-9_]+(\\s*,\\s*[A-Za-z0-9_]+)*")));
@@ -354,6 +315,55 @@ bool QFImFCCSAmplitudeFitDialog::calculateRelCCF(QFRawDataRecord *acf0, QFRawDat
     }
     QApplication::restoreOverrideCursor();
     return true;
+}
+
+void QFImFCCSAmplitudeFitDialog::updateProject()
+{
+    QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
+    QList<QPointer<QFRawDataRecord> > lst=matchFunctor->getFilteredList(project);
+    //qDebug()<<3;
+    ui->cmbACF0->clear();
+    ui->cmbACF1->clear();
+    ui->cmbCCF->clear();
+
+    ui->cmbACF0->init(project, matchFunctor);
+    ui->cmbACF1->init(project, matchFunctor);
+    //qDebug()<<4;
+    ui->cmbCCF->init(project, matchFunctor);
+
+    //qDebug()<<5;
+
+    //ui->widOverviewACF0->setRDR(NULL);
+    //ui->widOverviewACF1->setRDR(NULL);
+    //qDebug()<<6;
+    ui->widOverviewCCF->setRDR(NULL);
+    //qDebug()<<7;
+
+
+    //qDebug()<<8;
+
+    bool okCCF=false;
+    for (int i=0; i<lst.size(); i++) {
+        if (lst[i]) {
+            if (!okCCF && isCCF(lst[i])) {
+                ui->cmbCCF->setCurrentRDR(lst[i]);
+                okCCF=true;
+                QList<QFRawDataRecord*> lsta=lst[i]->getRecordsWithRoleFromGroup("acf0");
+                if (!lsta.isEmpty()) {
+                    ui->cmbACF0->setCurrentRDR(lsta.first());
+                } else {
+                    ui->cmbACF0->setCurrentRDR(0);
+                }
+                lsta=lst[i]->getRecordsWithRoleFromGroup("acf1");
+                if (!lsta.isEmpty()) {
+                    ui->cmbACF1->setCurrentRDR(lsta.first());
+                } else {
+                    ui->cmbACF1->setCurrentRDR(0);
+                }
+            }
+        }
+        if (okCCF) break;
+    }
 }
 
 void QFImFCCSAmplitudeFitDialog::cmbCCF_currentIndexChanged(int index)
