@@ -408,6 +408,11 @@ int QFImFCCSParameterInputTable::getColsPerRDR() const
     return 5;
 }
 
+const QList<QFImFCCSParameterInputTable::FitParam> &QFImFCCSParameterInputTable::getFitParamList() const
+{
+    return fitparamids;
+}
+
 
 void QFImFCCSParameterInputTable::rebuildModel()
 {
@@ -503,6 +508,7 @@ bool QFImFCCSParameterInputTable::checkRebuildModel(bool alwaysreset)
                     fprec.tooltip=desc.name;
                     fprec.visibleIn.insert(rdr);
                     fprec.isFit=desc.fit;
+                    fprec.isEditable=fprec.isFit||desc.userEditable;
                     int found=-1;
                     if (!fitParamListContainsID(fprec.id, fitparamids_new, &found)) fitparamids_new<<fprec;
                     else if (found>=0 && found<fitparamids_new.size()) {

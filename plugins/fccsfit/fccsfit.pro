@@ -52,7 +52,8 @@ HEADERS += qffccsfitevaluation.h \
     ../base_classes/qfrdrrunselector.h \
     dlgfccsfitallconfiguration.h \
     qffccsrelativeccfcrosstalkdialog.h \
-    ../base_classes/qffitfunctionconfigforglobalfittools.h
+    ../base_classes/qffitfunctionconfigforglobalfittools.h \
+    ../base_classes/dlgfccsresetsetparameter.h
 
 SOURCES += qffccsfitevaluation.cpp \
            qffccsfitevaluation_item.cpp \
@@ -70,12 +71,21 @@ SOURCES += qffccsfitevaluation.cpp \
     ../base_classes/qfrdrrunselector.cpp \
     dlgfccsfitallconfiguration.cpp \
     qffccsrelativeccfcrosstalkdialog.cpp \
-    ../base_classes/qffitfunctionconfigforglobalfittools.cpp
+    ../base_classes/qffitfunctionconfigforglobalfittools.cpp\
+    ../base_classes/dlgfccsresetsetparameter.cpp
 
 FORMS = qffccsfitevaluation_editor.ui \   
     optionswidget.ui \
     dlgfccsfitallconfiguration.ui \
-    qffccsrelativeccfcrosstalkdialog.ui
+    qffccsrelativeccfcrosstalkdialog.ui \
+    ../base_classes/dlgfccsresetsetparameter.ui
+
+SOURCES +=
+
+FORMS +=
+
+HEADERS +=
+
 
 RESOURCES += qffccsfitevaluation.qrc
 

@@ -66,11 +66,16 @@ class QFFitResultsByIndexAsVectorEvaluation : public QFFitResultsByIndexEvaluati
         virtual void resetAllFitResultsCurrent(QFRawDataRecord *r=NULL);
         virtual void resetAllFitResults(QFRawDataRecord* r, const QString &resultID);
         virtual void resetDefaultFitValue(QFRawDataRecord *r, const QString &resultID, const QString &id);
+        virtual void resetAllDefaultFitValue(QFRawDataRecord *r, const QString &id);
+        virtual void resetAllDefaultFitFix(QFRawDataRecord *r, const QString &id);
         virtual void resetAllFitValue();
         virtual void resetAllFitFix();
         virtual void resetDefaultFitFix(QFRawDataRecord *r, const QString &resultID, const QString &id);
         virtual bool hasFit(QFRawDataRecord *r1, const QString &evalID) const;
         virtual void setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, double value) ;
+        virtual void setAllFitResultValue(QFRawDataRecord *r, const QString &parameterID, double value) ;
+        virtual void setAllFitResultError(QFRawDataRecord *r, const QString &parameterID, double error) ;
+        virtual void setAllFitResultFix(QFRawDataRecord *r, const QString &parameterID, bool fix) ;
         virtual void setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, double value, QString unit) ;
         virtual void setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, double value, double error) ;
         virtual void setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, double value, double error, QString unit)  ;

@@ -720,6 +720,13 @@ public:
 
      */
     virtual void setInitFitValue(const QString& id, double value, double error=0.0, QFRawDataRecord *r=NULL);
+    /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value in the initial parameters
+        \param id set the value of the parameter with this id (see QFFitFunction)
+        \param value value to be stored
+        \param error error assigned to \a value
+
+     */
+    virtual void setInitFitError(const QString& id, double error, QFRawDataRecord *r=NULL);
     /*! \brief set the fix property of a fit parameter in the initial parameters
         \param id set the value of the parameter with this id (see QFFitFunction)
         \param fix value to be stored

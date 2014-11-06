@@ -56,7 +56,8 @@ HEADERS += qfimfccsfitevaluation.h \
     ../base_classes/qffitresultsbyindexevaluationfitthread.h \
     qfimfccsrelativeccfcrosstalkdialog.h \
     qfimfccsamplitudefitdialog.h \
-    ../base_classes/qffitfunctionconfigforglobalfittools.h
+    ../base_classes/qffitfunctionconfigforglobalfittools.h \
+    ../base_classes/dlgfccsresetsetparameter.h
 
 SOURCES += qfimfccsfitevaluation.cpp \
            qfimfccsfitevaluation_item.cpp \
@@ -77,7 +78,8 @@ SOURCES += qfimfccsfitevaluation.cpp \
     ../base_classes/qffitresultsbyindexevaluationfitthread.cpp \
     qfimfccsrelativeccfcrosstalkdialog.cpp \
     qfimfccsamplitudefitdialog.cpp \
-    ../base_classes/qffitfunctionconfigforglobalfittools.cpp
+    ../base_classes/qffitfunctionconfigforglobalfittools.cpp \
+    ../base_classes/dlgfccsresetsetparameter.cpp
 
 FORMS = qfimfccsfitevaluation_editor.ui \   
     optionswidget.ui \
@@ -85,7 +87,11 @@ FORMS = qfimfccsfitevaluation_editor.ui \
     qfimfccsrelativeintensitydialog.ui \
     qfimfccsfitchi2landscapedialog.ui \
     qfimfccsrelativeccfcrosstalkdialog.ui  \
-    qfimfccsamplitudefitdialog.ui
+    qfimfccsamplitudefitdialog.ui\
+    ../base_classes/dlgfccsresetsetparameter.ui
+
+
+
 
 RESOURCES += qfimfccsfitevaluation.qrc  \
     ../../lib/lib.qrc

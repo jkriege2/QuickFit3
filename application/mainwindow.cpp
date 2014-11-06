@@ -1282,7 +1282,7 @@ void MainWindow::createWidgets() {
     tvMain=new QTreeView(this);
     tvMain->setHeaderHidden(true);
     tvMain->setContextMenuPolicy(Qt::ActionsContextMenu);
-    tvMain->setEditTriggers(QAbstractItemView::SelectedClicked);
+    tvMain->setEditTriggers(QAbstractItemView::SelectedClicked|QAbstractItemView::EditKeyPressed);
     connect(tvMain, SIGNAL(doubleClicked ( const QModelIndex &)), this, SLOT(projectElementDoubleClicked(const QModelIndex&)));
     spCenter->addWidget(tvMain);
     QShortcut* shortcut = new QShortcut(QKeySequence(tr("Del")), tvMain);
@@ -1463,6 +1463,7 @@ void MainWindow::createActions() {
 
     dupItemAct = new QAction(QIcon(":/lib/item_duplicate.png"), tr("&Duplicate Current Item(s)"), this);
     dupItemAct->setStatusTip(tr("dupicates the currently selected items.\nIf a folder is selected, all files in the folder are duplicated"));
+    dupItemAct->setShortcut(QKeySequence("Ctrl+D"));
     connect(dupItemAct, SIGNAL(triggered()), this, SLOT(duplicateItem()));
 
     tvMain->addAction(dupItemAct);
@@ -1471,6 +1472,7 @@ void MainWindow::createActions() {
     delItemAct = new QAction(QIcon(":/lib/item_delete.png"), tr("&Delete Current Item(s)"), this);
     delItemAct->setStatusTip(tr("delete the currently selected item (if deletable) ..."));
     connect(delItemAct, SIGNAL(triggered()), this, SLOT(deleteItem()));
+    //delItemAct->setShortcut(QKeySequence::Delete);
 
     tvMain->addAction(delItemAct);
 
@@ -1478,17 +1480,20 @@ void MainWindow::createActions() {
 
     copyItemAct = new QAction(QIcon(":/lib/item_copy.png"), tr("&Copy Current Item(s)"), this);
     copyItemAct->setStatusTip(tr("copies the currently selected items into the clipboard"));
+    copyItemAct->setShortcut(QKeySequence::Copy);
     connect(copyItemAct, SIGNAL(triggered()), this, SLOT(copyItem()));
     tvMain->addAction(copyItemAct);
 
     cutItemAct = new QAction(QIcon(":/lib/item_cut.png"), tr("&Cut Current Item(s)"), this);
     cutItemAct->setStatusTip(tr("cuts the currently selected items into the clipboard"));
+    cutItemAct->setShortcut(QKeySequence::Cut);
     connect(cutItemAct, SIGNAL(triggered()), this, SLOT(cutItem()));
     tvMain->addAction(cutItemAct);
 
     pastItemAct = new QAction(QIcon(":/lib/item_paste.png"), tr("&Paste Item(s)"), this);
     pastItemAct->setStatusTip(tr("paste items from the clipboard into the current project"));
     connect(pastItemAct, SIGNAL(triggered()), this, SLOT(pasteItem()));
+    pastItemAct->setShortcut(QKeySequence::Paste);
     tvMain->addAction(pastItemAct);
 
 

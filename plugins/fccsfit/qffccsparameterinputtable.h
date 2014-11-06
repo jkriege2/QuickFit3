@@ -55,6 +55,19 @@ class QFFCCSParameterInputTable : public QAbstractTableModel
             globalParamRole=Qt::UserRole+5
         };
 
+        struct FitParam {
+            FitParam();
+            bool isFit;
+            bool isEditable;
+            QString id;
+            QString label;
+            QString tooltip;
+            QSet<QFRawDataRecord*> visibleIn;
+            bool isValid() const;
+
+            bool operator==(const FitParam& other)const;
+        };
+
         explicit QFFCCSParameterInputTable(QFFCCSFitEvaluationItem *parent = 0);
         
 
@@ -66,7 +79,7 @@ class QFFCCSParameterInputTable : public QAbstractTableModel
         virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
         virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
         virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
-
+        const QList<FitParam>& getFitParamList() const;
         int getColsPerRDR() const;
     signals:
         void modelRebuilt();
@@ -85,17 +98,6 @@ class QFFCCSParameterInputTable : public QAbstractTableModel
 
         bool editRanges;
 
-        struct FitParam {
-            FitParam();
-            bool isFit;
-            QString id;
-            QString label;
-            QString tooltip;
-            QSet<QFRawDataRecord*> visibleIn;
-            bool isValid() const;
-
-            bool operator==(const FitParam& other)const;
-        };
 
         QList<FitParam> fitparamids;
 

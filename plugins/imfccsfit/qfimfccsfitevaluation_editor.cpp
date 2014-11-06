@@ -36,6 +36,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctionmanager.h"
 #include "qffitresultsbyindexevaluationfitthread.h"
 #include "qffitfunctionconfigforglobalfittools.h"
+#include "dlgfccsresetsetparameter.h"
 
 QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
     QFEvaluationEditor(services, propEditor, parent),
@@ -161,7 +162,7 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
 
     //ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitAllPixels);
 
-    actFitAllFilesetsAllPixels=new QAction(QIcon(":/imfccsfit/fit_fitall.png"), tr("Fit All Filesets && Pixels"), this);
+    actFitAllFilesetsAllPixels=new QAction(QIcon(":/imfccsfit/fit_fitall.png"), tr("Fit All Filesets + Pixels"), this);
     connect(actFitAllFilesetsAllPixels, SIGNAL(triggered()), this, SLOT(fitAllFilesetsAllPixels()));
     ui->btnFitAllFilesetsAllPixels->addAction(actFitAllFilesetsAllPixels);
     ui->btnFitAllFilesetsAllPixels->setDefaultAction(actFitAllFilesetsAllPixels);
@@ -225,9 +226,13 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     connect(actSaveGLobalFitConfig, SIGNAL(triggered()), this, SLOT(saveGlobalFitConfig()));
     menuImFCCSFit->addAction(actSaveGLobalFitConfig);
 
+    menuImFCCSFit->addSeparator();
 
     
-    
+    actSetResetFitParameters=new QAction(tr("set/reset fit &parameters ..."), this);
+    connect(actSetResetFitParameters, SIGNAL(triggered()), this, SLOT(setParameterInRDRs()));
+    menuImFCCSFit->addAction(actSetResetFitParameters);
+
     // connect widgets 
     connect(ui->pltData, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(zoomChangedLocally(double,double,double,double,JKQtPlotter*)));
     connect(ui->pltResiduals, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(zoomChangedLocally(double,double,double,double,JKQtPlotter*)));
@@ -1679,6 +1684,84 @@ void QFImFCCSFitEvaluationEditor::saveGlobalFitConfig()
         QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig config=getCurrentGlobalFitConfig();
         storeGlobalFitConfig(filename, config);
     }
+}
+
+void QFImFCCSFitEvaluationEditor::setParameterInRDRs()
+{
+    QFImFCCSFitEvaluationItem* imfccseval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!imfccseval) return;
+    DlgFCCSResetSetParameter* dlg=new DlgFCCSResetSetParameter(this);
+    QList<DlgFCCSResetSetParameter::Parameter> p;
+
+    QFImFCCSParameterInputTable* tab=imfccseval->getParameterInputTableModel();
+    QList<QFImFCCSParameterInputTable::FitParam> ps=tab->getFitParamList();
+    for (int i=0; i<ps.size(); i++) {
+        if (ps[i].isEditable && !ps[i].visibleIn.isEmpty()) {
+            DlgFCCSResetSetParameter::Parameter pp;
+            pp.id=ps[i].id;
+            pp.label=ps[i].label;
+            pp.value=imfccseval->getFitValue(pp.id, ps[i].visibleIn.toList().value(0, NULL));
+            pp.error=imfccseval->getFitError(pp.id, ps[i].visibleIn.toList().value(0, NULL));
+            pp.fix=imfccseval->getFitFix(pp.id, ps[i].visibleIn.toList().value(0, NULL));
+            p.append(pp);
+        }
+    }
+
+    dlg->setParameters(p);
+    if (dlg->exec()) {
+        if (dlg->setInInitial()) {
+            QFRawDataRecord* r=NULL;
+            if (dlg->operationValue()==DlgFCCSResetSetParameter::opSet) imfccseval->setInitFitValue(dlg->getParameter(), dlg->getValue(), 0.0, r);
+            if (dlg->operationError()==DlgFCCSResetSetParameter::opSet) imfccseval->setInitFitError(dlg->getParameter(), dlg->getError(), r);
+            if (dlg->operationFix()==DlgFCCSResetSetParameter::opSet) imfccseval->setInitFitFix(dlg->getParameter(), dlg->getFix(), r);
+        }
+        QList<QList<QFRawDataRecord*> > fitfilesets;
+        QList<QFRawDataRecord*> currentFitFiles=imfccseval->getFitFiles();
+        fitfilesets.append(imfccseval->getFitFiles());
+        if (dlg->setInAll()) {
+            fitfilesets=imfccseval->getFittedFiles();
+        }
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        QProgressDialog progress(tr("Setting fit parameters"), tr("&Cancel"), 0, fitfilesets.size(), this);
+        progress.setWindowModality(Qt::WindowModal);
+        progress.show();
+        for (int i=0; i<fitfilesets.size(); i++) {
+            imfccseval->setFitFiles(fitfilesets[i]);
+            for (int j=0; j<fitfilesets[i].size(); j++) {
+                QFFitFunction* ff=imfccseval->getFitFunction(j);
+                QFRawDataRecord* r=fitfilesets[i].at(j);
+                if (r && ff && ff->hasParameter(dlg->getParameter())) {
+                    bool doEmit=r->isEmitResultsChangedEnabled();
+                    r->disableEmitResultsChanged();
+                    if (dlg->setAllIndices()) {
+                        if (dlg->operationValue()==DlgFCCSResetSetParameter::opSet) imfccseval->setAllFitResultValue(r,  dlg->getParameter(), dlg->getValue());
+                        else if (dlg->operationValue()==DlgFCCSResetSetParameter::opReset) imfccseval->resetAllDefaultFitValue(r,  dlg->getParameter());
+                        if (dlg->operationError()==DlgFCCSResetSetParameter::opSet) imfccseval->setAllFitResultError(r,  dlg->getParameter(), dlg->getError());
+                        if (dlg->operationFix()==DlgFCCSResetSetParameter::opSet) imfccseval->setAllFitResultFix(r,  dlg->getParameter(), dlg->getFix());
+                        else if (dlg->operationFix()==DlgFCCSResetSetParameter::opReset) imfccseval->resetAllDefaultFitFix(r,  dlg->getParameter());
+                    } else {
+                        QString rid=imfccseval->getEvaluationResultID(ff->id());
+                        if (dlg->operationValue()==DlgFCCSResetSetParameter::opSet) imfccseval->setFitResultValue(r, rid, dlg->getParameter(), dlg->getValue());
+                        else if (dlg->operationValue()==DlgFCCSResetSetParameter::opReset) imfccseval->resetDefaultFitValue(r, rid, dlg->getParameter());
+                        if (dlg->operationError()==DlgFCCSResetSetParameter::opSet) imfccseval->setFitResultError(r, rid, dlg->getParameter(), dlg->getError());
+                        if (dlg->operationFix()==DlgFCCSResetSetParameter::opSet) imfccseval->setFitResultFix(r, rid, dlg->getParameter(), dlg->getFix());
+                        else if (dlg->operationFix()==DlgFCCSResetSetParameter::opReset) imfccseval->resetDefaultFitFix(r, rid, dlg->getParameter());
+                    }
+                    if (doEmit) r->enableEmitResultsChanged(true);
+                }
+                QApplication::processEvents();
+                if (progress.wasCanceled()) break;
+            }
+            QApplication::processEvents();
+            progress.setValue(i);
+            if (progress.wasCanceled()) break;
+        }
+        imfccseval->setFitFiles(currentFitFiles);
+        QApplication::restoreOverrideCursor();
+
+    }
+
+    delete dlg;
 }
 
 void QFImFCCSFitEvaluationEditor::errorEstimateModeChanged()

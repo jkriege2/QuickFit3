@@ -131,6 +131,8 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
         void loadGlobalFitConfig();
         void saveGlobalFitConfig();
+
+        void setParameterInRDRs();
     protected:
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFImFCCSFitEvaluationEditor *ui;
@@ -159,6 +161,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         QAction* actChi2Landscape;
         QAction* actLoadGLobalFitConfig;
         QAction* actSaveGLobalFitConfig;
+        QAction* actSetResetFitParameters;
 
         QAction* actResetCurrent;
         QAction* actResetAllPixels;

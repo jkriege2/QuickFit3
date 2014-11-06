@@ -1271,7 +1271,31 @@ void QFFitResultsEvaluation::setInitFitValue(const QString& id, double value, do
                 project->setDataChanged();
             }
         }
-    //}
+        //}
+}
+
+void QFFitResultsEvaluation::setInitFitError(const QString &id, double error, QFRawDataRecord *rin)
+{
+    QFRawDataRecord* r=rin;
+    if (!rin) r=getHighlightedRecord();
+    //if (r!=NULL) {
+        QFFitFunction* f=getFitFunction(r);
+        if (f) {
+            QString dsid=getParameterStoreID(r, f->id(), id);
+            QFFitFunction::ParameterDescription d=f->getDescription(id);
+            if (d.userEditable) {
+                if ((error!=0)&&(d.displayError==QFFitFunction::EditError)) {
+                    parameterStore[dsid].error=error;
+                    parameterStore[dsid].errorSet=true;
+                } else {
+                    parameterStore[dsid].error=0;
+                    parameterStore[dsid].errorSet=false;
+                }
+                //emitPropertiesChanged();
+                project->setDataChanged();
+            }
+        }
+        //}
 }
 
 void QFFitResultsEvaluation::setInitFitFix(const QString& id, bool fix, QFRawDataRecord* rin) {
