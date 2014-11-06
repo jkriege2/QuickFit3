@@ -43,14 +43,17 @@ class DlgFCCSResetSetParameter : public QDialog
         bool getFix() const;
         bool setAllIndices();
         QString getParameter() const;
+        void setHelpfile(const QString help);
 
     protected slots:
         void updateWidgets();
         void on_cmbParam_currentIndexChanged();
+        void on_btnHelp_clicked();
         void dataEdited();
     private:
         Ui::DlgFCCSResetSetParameter *ui;
         QList<Parameter> params;
+        QString help;
 
 };
 

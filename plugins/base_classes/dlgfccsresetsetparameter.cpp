@@ -1,6 +1,7 @@
 #include "dlgfccsresetsetparameter.h"
 #include "ui_dlgfccsresetsetparameter.h"
 #include "qfhtmldelegate.h"
+#include "qfpluginservices.h"
 
 DlgFCCSResetSetParameter::DlgFCCSResetSetParameter(QWidget *parent) :
     QDialog(parent),
@@ -101,6 +102,12 @@ QString DlgFCCSResetSetParameter::getParameter() const
     return QString();
 }
 
+void DlgFCCSResetSetParameter::setHelpfile(const QString help)
+{
+    this->help=help;
+    ui->btnHelp->setVisible(!help.isEmpty());
+}
+
 void DlgFCCSResetSetParameter::updateWidgets()
 {
     int idx=ui->cmbParam->currentIndex();
@@ -123,6 +130,11 @@ void DlgFCCSResetSetParameter::on_cmbParam_currentIndexChanged()
         ui->edtValue->setValue(params[idx].value);
         ui->chkFixed->setChecked(params[idx].fix);
     }
+}
+
+void DlgFCCSResetSetParameter::on_btnHelp_clicked()
+{
+    QFPluginServices::displayHelpWindow(help);
 }
 
 void DlgFCCSResetSetParameter::dataEdited()

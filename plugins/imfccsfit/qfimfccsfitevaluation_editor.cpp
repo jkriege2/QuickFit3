@@ -232,6 +232,7 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     actSetResetFitParameters=new QAction(tr("set/reset fit &parameters ..."), this);
     connect(actSetResetFitParameters, SIGNAL(triggered()), this, SLOT(setParameterInRDRs()));
     menuImFCCSFit->addAction(actSetResetFitParameters);
+    menuImFCCSFit->addSeparator();
 
     // connect widgets 
     connect(ui->pltData, SIGNAL(zoomChangedLocally(double,double,double,double,JKQtPlotter*)), this, SLOT(zoomChangedLocally(double,double,double,double,JKQtPlotter*)));
@@ -1692,6 +1693,7 @@ void QFImFCCSFitEvaluationEditor::setParameterInRDRs()
     if (!imfccseval) return;
     DlgFCCSResetSetParameter* dlg=new DlgFCCSResetSetParameter(this);
     QList<DlgFCCSResetSetParameter::Parameter> p;
+    dlg->setHelpfile(QFPluginServices::getInstance()->getPluginHelpDirectory(imfccseval->getID())+"/ui.html#setresetparams");
 
     QFImFCCSParameterInputTable* tab=imfccseval->getParameterInputTableModel();
     QList<QFImFCCSParameterInputTable::FitParam> ps=tab->getFitParamList();
