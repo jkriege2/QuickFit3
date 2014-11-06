@@ -1693,7 +1693,7 @@ void QFImFCCSFitEvaluationEditor::setParameterInRDRs()
     if (!imfccseval) return;
     DlgFCCSResetSetParameter* dlg=new DlgFCCSResetSetParameter(this);
     QList<DlgFCCSResetSetParameter::Parameter> p;
-    dlg->setHelpfile(QFPluginServices::getInstance()->getPluginHelpDirectory(imfccseval->getID())+"/ui.html#setresetparams");
+    dlg->setHelpfile(QFPluginServices::getInstance()->getPluginHelpDirectory(imfccseval->getType())+"/ui.html#setresetparams");
 
     QFImFCCSParameterInputTable* tab=imfccseval->getParameterInputTableModel();
     QList<QFImFCCSParameterInputTable::FitParam> ps=tab->getFitParamList();

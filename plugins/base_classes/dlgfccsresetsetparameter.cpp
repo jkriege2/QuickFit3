@@ -9,6 +9,7 @@ DlgFCCSResetSetParameter::DlgFCCSResetSetParameter(QWidget *parent) :
 {
     ui->setupUi(this);
     ui->cmbParam->setItemDelegate(new QFHTMLDelegate(ui->cmbParam));
+    setHelpfile("");
 }
 
 DlgFCCSResetSetParameter::~DlgFCCSResetSetParameter()
@@ -134,7 +135,7 @@ void DlgFCCSResetSetParameter::on_cmbParam_currentIndexChanged()
 
 void DlgFCCSResetSetParameter::on_btnHelp_clicked()
 {
-    QFPluginServices::displayHelpWindow(help);
+    QFPluginServices::getInstance()->displayHelpWindow(help);
 }
 
 void DlgFCCSResetSetParameter::dataEdited()
