@@ -1567,7 +1567,7 @@ void QFRDRImagingFCSData::recalcCorrelations() {
                 }
                 if (abs(N-mc)<double(N)/20.0) {
                     for (int i=0; i<N; i++) {
-                        if (fabs(sigmas[p*N+i])<=100.0*DBL_MIN) sigmas[p*N+i]=m;
+                        if (fabs(sigmas[p*N+i])<=100.0*DBL_MIN) sigmas[p*N+i]=m/mc;
                     }
                 }
             }
@@ -1599,7 +1599,7 @@ void QFRDRImagingFCSData::recalcCorrelations() {
             }
             if (abs(N-mc)<double(N)/20.0) {
                 for (int i=0; i<N; i++) {
-                    if (fabs(correlationStdDev[i])<=100.0*DBL_MIN) correlationStdDev[i]=m;
+                    if (fabs(correlationStdDev[i])<=100.0*DBL_MIN) correlationStdDev[i]=m/mc;
                 }
             }
         }
