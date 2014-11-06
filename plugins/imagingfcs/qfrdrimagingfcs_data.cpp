@@ -1559,6 +1559,20 @@ void QFRDRImagingFCSData::allocateStatistics(QFRDRImagingFCSData::statisticsData
 
 void QFRDRImagingFCSData::recalcCorrelations() {
     if (correlations && correlationMean && correlationStdDev) {
+        if (sigmas) {
+            for (int p=0; p<width*height; p++) {
+                double m=0, mc=0;
+                for (int i=0; i<N; i++) {
+                    if (sigmas[p*N+i]>100.0*DBL_MIN) {m =m+sigmas[p*N+i]; mc++; }
+                }
+                if (abs(N-mc)<double(N)/20.0) {
+                    for (int i=0; i<N; i++) {
+                        if (fabs(sigmas[p*N+i])<=100.0*DBL_MIN) sigmas[p*N+i]=m;
+                    }
+                }
+            }
+        }
+
         for (int i=0; i<N; i++) {
             double norm=0;
             double sum=0;
@@ -1577,6 +1591,16 @@ void QFRDRImagingFCSData::recalcCorrelations() {
             } else {
                 correlationMean[i]=0;
                 correlationStdDev[i]=0;
+            }
+
+            double m=0, mc=0;
+            for (int i=0; i<N; i++) {
+                if (correlationStdDev[i]>100.0*DBL_MIN) {m =m+correlationStdDev[i]; mc++; }
+            }
+            if (abs(N-mc)<double(N)/20.0) {
+                for (int i=0; i<N; i++) {
+                    if (fabs(correlationStdDev[i])<=100.0*DBL_MIN) correlationStdDev[i]=m;
+                }
             }
         }
     }

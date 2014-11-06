@@ -95,13 +95,13 @@ QFFCSWeightingTools::DataWeight QFFCSWeightingTools::stringToDataWeight(QString 
     for (int i=0; i<N; i++) { \
         if ((data_start>=0) && (data_end>=0)) { \
             if ((i>=data_start)&&(i<=data_end)) { \
-                if ((fabs(weights[i])<10000.0*DBL_MIN)||(!QFFloatIsOK(weights[i]))) { \
+                if ((fabs(weights[i])<100.0*DBL_MIN)||(!QFFloatIsOK(weights[i]))) { \
                     weightsOK=false; \
                     break; \
                 } \
             }; \
         } else { \
-            if ((fabs(weights[i])<10000*DBL_MIN)||(!QFFloatIsOK(weights[i]))) { \
+            if ((fabs(weights[i])<100*DBL_MIN)||(!QFFloatIsOK(weights[i]))) { \
                 weightsOK=false; \
                 break; \
             }; \
@@ -182,7 +182,8 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *rec
     int run=run_in;
     //if (run<=-100) run=getCurrentIndex();
 
-    int N=data->getCorrelationN();
+    int N=0;
+    if (data) N=data->getCorrelationN();
 
     //qDebug()<<"allocWeights w="<<getFitDataWeighting();
     if (N<=0) return NULL;
@@ -192,6 +193,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *rec
     bool weightsOK=false;
     if (data&&weights && weighting==QFFCSWeightingTools::StdDevWeighting) {
         double* std=data->getCorrelationStdDev();
+        //qDebug()<<N<<arrayToString(std, N);
         if (std) {
             weightsOK=true;
             for (int i=0; i<N; i++) {
@@ -199,11 +201,13 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *rec
             }
             CHECK_WEIGHT
         }
+        //qDebug()<<weightsOK;
     }
     if (data&&weights&&!weightsOK&& weighting==QFFCSWeightingTools::RunErrorWeighting) {
         double* std=NULL;
         if (run>=0) std=data->getCorrelationRunError(run);
         else std=data->getCorrelationStdDev();
+        //qDebug()<<N<<arrayToString(std, N);
         if (std) {
             weightsOK=true;
             for (int i=0; i<N; i++) {
@@ -211,6 +215,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *rec
             }
             CHECK_WEIGHT
         }
+        //qDebug()<<weightsOK;
     }
     if (data&&weights&&!weightsOK&& weighting==QFFCSWeightingTools::RunningStdDev3Weight) {
         double* corrdat=NULL;
