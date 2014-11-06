@@ -4481,7 +4481,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                  } else if (QFPluginServices::getInstance()&&(command=="warning")) {
                     QString rep=tr("<blockquote>"
                                      "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: navajowhite ;  border-color: orangered\" ><tr><td>"
-                                   "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\":/lib/help/helpboxlogo_warning.png\"></td><td align=\"left\"><b>Note:</b> %1</td></tr>"
+                                   "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\":/lib/help/helpboxlogo_warning.png\"></td><td align=\"left\"><b>Warning:</b> %1</td></tr>"
                                    "</table></td></tr></table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
