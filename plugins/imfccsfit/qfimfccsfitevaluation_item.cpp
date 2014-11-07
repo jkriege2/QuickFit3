@@ -812,8 +812,8 @@ void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<
             dfd.emitSignals=record->isEmitResultsChangedEnabled();
             record->disableEmitResultsChanged();
 
-            QFFitFunction* ffunc=getFitFunction(record);
-            if (!ffunc) ffunc=getFitFunction(r);
+            QFFitFunction* ffunc=createFitFunction(record);
+            if (!ffunc) ffunc=createFitFunction(r);
             if (doLog) QFPluginLogTools::log_text(tr("   - adding RDR '%1', model '%2'' ... \n").arg(record->getName()).arg(ffunc->name()));
             dfd.N=data->getCorrelationN();
             dfd.weights=NULL;
@@ -949,8 +949,8 @@ void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<
             dfd.emitSignals=record->isEmitResultsChangedEnabled();
             //record->disableEmitResultsChanged();
 
-            QFFitFunction* ffunc=getFitFunction(record);
-            if (!ffunc) ffunc=getFitFunction(r);
+            QFFitFunction* ffunc=createFitFunction(record);
+            if (!ffunc) ffunc=createFitFunction(r);
             if (doLog) QFPluginLogTools::log_text(tr("   - adding RDR '%1', model '%2'' ... \n").arg(record->getName()).arg(ffunc->name()));
             dfd.N=data->getCorrelationN();
             dfd.weights=NULL;
@@ -1102,28 +1102,41 @@ void QFImFCCSFitEvaluationItem::calcChi2Landscape(double *chi2Landscape, int par
 
 
     freeAndClearDoFitDataList(fitData);
+    enableAndEmitResultsSignals();
 }
 
 void QFImFCCSFitEvaluationItem::freeAndClearDoFitDataList(QList<doFitData>& fitData) const {
     int cnt=0;
     for (int r=0; r<fitData.size(); r++) {
-        QFRawDataRecord* record=getFitFile(r);
+        //QFRawDataRecord* record=getFitFile(r);
 
-        if (fitData[cnt].emitSignals && record) record->enableEmitResultsChanged(true);
-        free(fitData[cnt].weights);
-        free(fitData[cnt].params);
-        free(fitData[cnt].initialparams);
-        free(fitData[cnt].errors);
-        free(fitData[cnt].errorsI);
-        free(fitData[cnt].paramsFix);
-        free(fitData[cnt].paramsMax);
-        free(fitData[cnt].paramsMin);
+        //if (fitData[cnt].emitSignals && record) record->enableEmitResultsChanged(true);
+        if (fitData[cnt].weights) free(fitData[cnt].weights);
+        if (fitData[cnt].params) free(fitData[cnt].params);
+        if (fitData[cnt].initialparams) free(fitData[cnt].initialparams);
+        if (fitData[cnt].errors) free(fitData[cnt].errors);
+        if (fitData[cnt].errorsI) free(fitData[cnt].errorsI);
+        if (fitData[cnt].paramsFix) free(fitData[cnt].paramsFix);
+        if (fitData[cnt].paramsMax) free(fitData[cnt].paramsMax);
+        if (fitData[cnt].paramsMin) free(fitData[cnt].paramsMin);
+        if (fitData[cnt].ffunc) delete fitData[cnt].ffunc;
 
         cnt++;
     }
     fitData.clear();
 }
 
+
+void QFImFCCSFitEvaluationItem::enableAndEmitResultsSignals() const {
+    int cnt=0;
+    for (int r=0; r<getFitFileCount(); r++) {
+        QFRawDataRecord* record=getFitFile(r);
+
+        if (record) record->enableEmitResultsChanged(true);
+
+        cnt++;
+    }
+}
 
 
 
@@ -1429,6 +1442,7 @@ void QFImFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, i
     if (erc) set_doEmitResultsChanged(true);
 
     freeAndClearDoFitDataList(fitData);
+    enableAndEmitResultsSignals();
     fitData.clear();
     falg->setReporter(NULL);
 
@@ -1783,6 +1797,8 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFFitResultsByIn
         QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult r;
         r.index=run;
         r.rdr=records[i];
+        r.rdrRecID=-1;
+        if (records[i]) r.rdrRecID=records[i]->getID();
         r.evalID=evalID;
         fitresult<<r;
     }

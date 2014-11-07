@@ -1197,6 +1197,8 @@ void QFFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFFitResultsByInde
         QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult r;
         r.index=run;
         r.rdr=records[i];
+        r.rdrRecID=-1;
+        if (records[i]) r.rdrRecID=records[i]->getID();
         result<<r;
     }
 

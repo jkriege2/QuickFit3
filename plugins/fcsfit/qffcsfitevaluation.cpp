@@ -520,7 +520,7 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
 void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
 {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
-    QFFitFunction* ffunc=createFitFunction(NULL);
+    QFFitFunction* ffunc=createFitFunction();
     QFFitAlgorithm* falg=createFitAlgorithm(NULL);
 
     if ((!ffunc)||(!data)||(!falg)) {
@@ -884,6 +884,9 @@ void QFFCSFitEvaluation::doFitForMultithreadReturn(QFFitResultsByIndexEvaluation
 {
     result.index=run;
     result.rdr=record;
+    result.rdrRecID=-1;
+    if (result.rdr) result.rdrRecID=result.rdr->getID();
+
 
 }
 

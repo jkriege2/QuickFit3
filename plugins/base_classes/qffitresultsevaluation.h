@@ -139,12 +139,19 @@ public:
     /** \brief get the current fitting function ID */
     virtual QString getFitFunctionID(const  QFRawDataRecord* rdr) const;
 
+    virtual QString getFitFunctionID(int num) const;
+
     /** \brief create a new instance of the current fit algorithm ... the user has to destroy the instance */
     virtual QFFitAlgorithm* createFitAlgorithm(QObject *parent=NULL) const;
 
     /** \brief create a new instance of the current fit function ... the user has to destroy the instance */
-    virtual QFFitFunction* createFitFunction(QFRawDataRecord *rdr , QObject *parent=NULL)const;
+    virtual QFFitFunction* createFitFunction(const QFRawDataRecord *rdr , QObject *parent=NULL)const;
 
+    /** \brief create a new instance of the current fit function ... the user has to destroy the instance */
+    virtual QFFitFunction* createFitFunction()const;
+
+    /** \brief create a new instance of the current fit function ... the user has to destroy the instance */
+    virtual QFFitFunction* createFitFunction(int rdr , QObject *parent=NULL)const;
 
 
     /** \brief may be used to transform a resultID before it is used in any of the \c QFRawDataRecord.results... functions */

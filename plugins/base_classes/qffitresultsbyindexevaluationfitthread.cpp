@@ -309,6 +309,10 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
             }
             while (!fitresults.isEmpty()) {
                 QFRawDataRecord* rdr=fitresults.first().getRDR(project);
+
+                bool emitchange=rdr->isEmitResultsChangedEnabled();
+                rdr->disableEmitResultsChanged();
+
                 const QString evalID=fitresults.first().evalID;
                 int index=fitresults.first().index;
 
@@ -328,6 +332,12 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                         switch(mit.value().type) {
                             case QFRawDataRecord::qfrdreBoolean: {
                                     QVector<bool> value;
+                                    if (rdr->resultsExists(evalID, pid)) {
+                                        QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult ores=rdr->resultsGet(evalID, pid);
+                                        if (ores.type==QFRawDataRecord::qfrdreBooleanVector) {
+                                            value=ores.bvec;
+                                        }
+                                    }
                                     while (value.size()<=index) value<<false;
                                     value[index]=mit.value().bvalue;
                                     for (int si=1; si<fitresults.size(); si++) {
@@ -375,7 +385,8 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                                             valuee=ores.evec;
                                         }
                                     }
-                                    while (value.size()<=index) {value<<0.0; valuee<<0.0;}
+                                    while (value.size()<=index) {value<<0.0;}
+                                    while (valuee.size()<=index) { valuee<<0.0;}
                                     value[index]=mit.value().dvalue;
                                     valuee[index]=mit.value().derror;
                                     for (int si=1; si<fitresults.size(); si++) {
@@ -383,7 +394,8 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                                         if (fitresults[si].rdr==rdr && fitresults[si].evalID==evalID && oidx>=0 && fitresults[si].fitresults.contains(pid)) {
                                             QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult ores=fitresults[si].fitresults[pid];
                                             fitresults[si].fitresults.remove(pid);
-                                            while (value.size()<=oidx){ value<<0.0; valuee<<0.0;}
+                                            while (value.size()<=oidx) {value<<0.0;}
+                                            while (valuee.size()<=oidx) { valuee<<0.0;}
                                             value[oidx]=ores.dvalue;
                                             valuee[oidx]=ores.derror;
                                         }
@@ -446,6 +458,8 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                     }
                     fitresults.first().fitresults.clear();
                 }
+
+                if (emitchange) rdr->enableEmitResultsChanged();
 
 
                 // remove all empty fit result sets

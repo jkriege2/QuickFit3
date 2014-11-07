@@ -269,15 +269,15 @@ QFFitFunction *QFFitFunctionManager::createFunction(QString ID, QObject *parent)
 
     if (userFitFunctions.contains(ID)) {
         QFFitFunctionParsed* f=new QFFitFunctionParsed(userFitFunctions[ID]);
-        if (f->isValid()) return f;
-        delete f;
+        if (f&&f->isValid()) return f;
+        if (f) delete f;
         return NULL;
     }
 
     if (libraryFitFunctions.contains(ID)) {
         QFLibraryFitFunction* f=new QFLibraryFitFunction(libraryFitFunctions[ID]);
-        if (f->isValid()) return f;
-        delete f;
+        if (f&&f->isValid()) return f;
+        if (f) delete f;
         return NULL;
     }
     return NULL;

@@ -283,7 +283,7 @@ bool QFFitResultsByIndexAsVectorEvaluation::hasFit(const QFRawDataRecord *r1, co
             QList<QString> resids=r->resultsCalcNames(tresultID);
             bool anyfit=false;
             for (int i=0; i<resids.size(); i++) {
-                if (isParamNameLocalStore(resids[i])) {
+                if (!resids[i].isEmpty() && isParamNameLocalStore(resids[i])) {
                     if (r->resultsGetInBooleanList(tresultID, resids[i], index, false)) return true;
                 }
             }

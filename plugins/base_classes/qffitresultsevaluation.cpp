@@ -188,12 +188,27 @@ QString QFFitResultsEvaluation::getFitFunctionID(const QFRawDataRecord *rdr) con
     return m_fitFunction;
 }
 
+QString QFFitResultsEvaluation::getFitFunctionID(int num) const
+{
+    return m_fitFunction;
+}
+
 QFFitAlgorithm *QFFitResultsEvaluation::createFitAlgorithm(QObject* parent) const
 {
     return QFFitAlgorithmManager::getInstance()->createAlgorithm(m_fitAlgorithm, parent);
 }
 
-QFFitFunction *QFFitResultsEvaluation::createFitFunction(QFRawDataRecord *rdr, QObject *parent) const
+QFFitFunction *QFFitResultsEvaluation::createFitFunction(const QFRawDataRecord *rdr, QObject *parent) const
+{
+    return QFFitFunctionManager::getInstance()->createFunction(getFitFunctionID(rdr), parent);
+}
+
+QFFitFunction *QFFitResultsEvaluation::createFitFunction() const
+{
+    return createFitFunction(getHighlightedRecord(), NULL);
+}
+
+QFFitFunction *QFFitResultsEvaluation::createFitFunction(int rdr, QObject *parent) const
 {
     return QFFitFunctionManager::getInstance()->createFunction(getFitFunctionID(rdr), parent);
 }
@@ -1016,11 +1031,14 @@ double* QFFitResultsEvaluation::allocFillParameters(const QFRawDataRecord *r, co
     //else qDebug()<<"  QFFitResultsEvaluation::allocFillParameters("<<r->getName()<<", "<<resultID<<", "<<NULL<<")";
     QFFitFunction* f=function;
     if (!f) f=getFitFunction(r);
-    if (f!=NULL) {
-        double* res=(double*)calloc(f->paramCount(), sizeof(double));
+    if (f!=NULL && f->paramCount()>0) {
+        int pcnt=f->paramCount();
+        if (pcnt>0) {
+            double* res=(double*)calloc(pcnt, sizeof(double));
         //qDebug()<<"    result size: "<<f->paramCount();
         fillParameters(r, resultID, res, f);
         return res;
+        }
     }
     return NULL;
 }
@@ -1028,7 +1046,7 @@ double* QFFitResultsEvaluation::allocFillParameters(const QFRawDataRecord *r, co
 double* QFFitResultsEvaluation::allocFillParameterErrors(const QFRawDataRecord *r, const QString& resultID, QFFitFunction *function) const {
     QFFitFunction* f=function;
     if (!f) f=getFitFunction(r);
-    if (f!=NULL) {
+    if (f!=NULL && f->paramCount()>0) {
         double* res=(double*)calloc(f->paramCount(), sizeof(double));
         fillParameterErrors(r, resultID, res, f);
         return res;
@@ -1042,9 +1060,9 @@ double* QFFitResultsEvaluation::allocFillParameterErrors(const QFRawDataRecord *
 bool* QFFitResultsEvaluation::allocFillFix(const QFRawDataRecord *r, const QString& resultID, QFFitFunction *function) const {
     QFFitFunction* f=function;
     if (!f) f=getFitFunction(r);
-    if (f!=NULL) {
+    if (f!=NULL && f->paramCount()>0) {
         bool* res=(bool*)calloc(f->paramCount(), sizeof(bool));
-        fillFix(r, resultID, res, f);
+        if (res) fillFix(r, resultID, res, f);
         return res;
     }
     return NULL;
@@ -1055,7 +1073,7 @@ double* QFFitResultsEvaluation::allocFillParametersMin(const QFRawDataRecord *r,
     QFFitFunction* f=function;
     if (!f) f=getFitFunction(getHighlightedRecord());
 
-    if (f!=NULL) {
+    if (f!=NULL && f->paramCount()>0) {
         double* res=(double*)calloc(f->paramCount(), sizeof(double));
         fillParametersMin(res, r, f);
         return res;
@@ -1067,7 +1085,7 @@ double* QFFitResultsEvaluation::allocFillParametersMax(const QFRawDataRecord* r,
     QFFitFunction* f=function;
     if (!f) f=getFitFunction(getHighlightedRecord());
 
-    if (f!=NULL) {
+    if (f!=NULL && f->paramCount()>0) {
         double* res=(double*)calloc(f->paramCount(), sizeof(double));
         fillParametersMax(res, r, f);
         return res;

@@ -296,7 +296,8 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual void calcChi2Landscape(double* chi2Landscape, int paramXFile, int paramXID, const QVector<double>& paramXValues, int paramYFile, int paramYID, const QVector<double>& paramYvalues, const QList<QFRawDataRecord*>& records, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1);
 
 
-    protected:
+        void enableAndEmitResultsSignals() const;
+protected:
 
         /* explicitly make some functions visible again, as the C++ compiler hides function definitions
            from a base class that are also declared in the derived class, but with different parameter sets!
