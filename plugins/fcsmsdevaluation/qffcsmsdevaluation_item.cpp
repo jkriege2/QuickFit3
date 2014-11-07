@@ -98,7 +98,7 @@ bool QFFCSMSDEvaluationItem::isApplicable(const QFRawDataRecord *record) {
 }
 
 
-int QFFCSMSDEvaluationItem::getIndexMin(QFRawDataRecord *r) const {
+int QFFCSMSDEvaluationItem::getIndexMin(const QFRawDataRecord *r) const {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(r);
     if (data) {
         return -1;
@@ -106,7 +106,7 @@ int QFFCSMSDEvaluationItem::getIndexMin(QFRawDataRecord *r) const {
     return QFUsesResultsByIndexAndModelEvaluation::getIndexMin(r);
 }
 
-int QFFCSMSDEvaluationItem::getIndexMax(QFRawDataRecord *r) const {
+int QFFCSMSDEvaluationItem::getIndexMax(const QFRawDataRecord *r) const {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(r);
     if (data) {
         return data->getCorrelationRuns()-1;
@@ -703,7 +703,7 @@ QString QFFCSMSDEvaluationItem::getModelName(int model) const {
 }
 
 
-bool QFFCSMSDEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QFUsesResultsEvaluation::FitParameterDefault &defaultValue) const {
+bool QFFCSMSDEvaluationItem::getParameterDefault(const QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QFUsesResultsEvaluation::FitParameterDefault &defaultValue) const {
 
     for (int i=0; i<MSDTHEORYCOUNT; i++) {
         if (parameterID==QString("msd_theory%1_en").arg(i)) {

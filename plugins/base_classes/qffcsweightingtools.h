@@ -67,7 +67,7 @@ class QFFCSWeightingTools
 
         /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
          *         it with the appropriate values, according to the current settings */
-        virtual double* allocWeights(bool* weightsOK, QFRawDataRecord* record_in, int run_in, int data_start=-1, int data_end=-1) const;
+        virtual double* allocWeights(bool* weightsOK, const QFRawDataRecord* record_in, int run_in, int data_start=-1, int data_end=-1) const;
 
         static DataWeight indexToWeight(int index);
     protected:

@@ -150,7 +150,7 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
 
     actFitAllPixelsMT=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels (MT)"), this);
     connect(actFitAllPixelsMT, SIGNAL(triggered()), this, SLOT(fitAllPixelsThreaded()));
-    actFitAllPixelsMT->setEnabled(false);
+    //actFitAllPixelsMT->setEnabled(false);
     ui->btnEvaluateCurrentAllRuns->addAction(actFitAllPixelsMT);
     menuEvaluation->addAction(actFitAllPixelsMT);
 
@@ -1002,13 +1002,13 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
     dlgTFitProgress->reportStatus("creating thread objects ...");
     QApplication::processEvents();
     //QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
-    QList<QFFitResultsByIndexEvaluationFitThread*> threads;
+    QList<QFFitResultsByIndexEvaluationFitSmartThread*> threads;
     int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
     if (ProgramOptions::getConfigValue(eval->getType()+"/overrule_threads", false).toBool()) {
         threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
     }
     for (int i=0; i<threadcount; i++) {
-        threads.append(new QFFitResultsByIndexEvaluationFitThread(true, this));
+        threads.append(new QFFitResultsByIndexEvaluationFitSmartThread(true, this));
     }
 
 
@@ -1030,6 +1030,7 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
                 if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
                     //qDebug()<<"t"<<thread<<"   r"<<run;
                     threads[thread]->addJob(eval, records, run, getUserMin(records[0], run, ui->datacut->get_userMin()), getUserMax(records[0], run, ui->datacut->get_userMax()));
+
                     thread++;
                     if (thread>=threadcount) thread=0;
                 }
@@ -1042,6 +1043,7 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
     // start all threads and wait for them to finish
     for (int i=0; i<threadcount; i++) {
         threads[i]->start();
+        //qDebug()<<"started thread "<<i;
     }
     bool finished=false;
     bool canceled=false;
@@ -1075,11 +1077,13 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
             }
             canceled=true;
         }
+        //qDebug()<<"finished="<<finished<<"   jobsDone="<<jobsDone<<"   canceled="<<canceled;
     }
 
 
     // free memory
     for (int i=0; i<threadcount; i++) {
+        //qDebug()<<"deleting thread "<<i<<threads[i]->isFinished()<<threads[i]->getJobsDone();
         delete threads[i];
     }
 

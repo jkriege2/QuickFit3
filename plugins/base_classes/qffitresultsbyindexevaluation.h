@@ -66,15 +66,15 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
 
 
         /** \brief return the smallest available index */
-        virtual int getIndexMin(QFRawDataRecord* r) const=0 ;
+        virtual int getIndexMin(const QFRawDataRecord* r) const=0 ;
         /** \brief return the largest available index */
-        virtual int getIndexMax(QFRawDataRecord* r) const=0;
+        virtual int getIndexMax(const QFRawDataRecord* r) const=0;
 
         /** \brief set the current index to use */
         virtual int getCurrentIndex() const;
 
         /** \brief return a name for the given index */
-        virtual QString getIndexName(QFRawDataRecord *rec, int index) const;
+        virtual QString getIndexName(const QFRawDataRecord *rec, int index) const;
 
         /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value
 
@@ -200,7 +200,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
               -# if this also fails, the value is taken from the initial value stored in the fitFunction
             .
         */
-        virtual double getFitValue(QFRawDataRecord* r, int index, const QString& id) const;
+        virtual double getFitValue(const QFRawDataRecord* r, int index, const QString& id) const;
 
         /*! \brief return the fit error of a given parameter
             \param r the record to adress
@@ -208,7 +208,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
             \param id the parameter id
             \return the error associated with the given parameter.
         */
-        virtual double getFitError(QFRawDataRecord* r, int index, const QString& id) const ;
+        virtual double getFitError(const QFRawDataRecord* r, int index, const QString& id) const ;
 
         /*! \brief set the error of a given parameter
 
@@ -246,7 +246,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
             \param id the parameter id
             For a detailed description of where the value is searched, see getFitValue()
         */
-        virtual bool getFitFix(QFRawDataRecord* r, int index, const QString& id) const ;
+        virtual bool getFitFix(const QFRawDataRecord* r, int index, const QString& id) const ;
 
         /** \brief sets the group of the given fit result
          *  \param r the record to adress
@@ -284,19 +284,19 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \param index index in \a r this applies to
          *  \param param parameter vector to fill
          */
-        virtual void fillParameters(QFRawDataRecord* r, int index, double* param, QFFitFunction* function=NULL) const;
+        virtual void fillParameters(const QFRawDataRecord* r, int index, double* param, QFFitFunction* function=NULL) const;
         /** \brief fill the given array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
          *  \param r record this appplies to
          *  \param index index in \a r this applies to
          *  \param param parameter error vector to fill
         */
-        virtual void fillParameterErrors(QFRawDataRecord* r, int index, double* param, QFFitFunction* function=NULL) const;
+        virtual void fillParameterErrors(const QFRawDataRecord* r, int index, double* param, QFFitFunction* function=NULL) const;
         /** \brief fill the given array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
          *  \param r record this appplies to
          *  \param index index in \a r this applies to
          *  \param param parameter fix vector to fill
         */
-        virtual void fillFix(QFRawDataRecord* r, int index, bool* param, QFFitFunction* function=NULL) const ;
+        virtual void fillFix(const QFRawDataRecord* r, int index, bool* param, QFFitFunction* function=NULL) const ;
 
         /*! \brief fill a newly allocated array of doubles with the current parameter values, as appropriate to use together with QFFitFunction
             \param r record this appplies to
@@ -304,21 +304,21 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
             \return parameter vector
             \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
         */
-        virtual double* allocFillParameters(QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const ;
+        virtual double* allocFillParameters(const QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const ;
         /*! \brief fill a newly allocated array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
             \param r record this appplies to
             \param index index in \a r this applies to
             \return parameter error vector
             \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
         */
-        virtual double* allocFillParameterErrors(QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const;
+        virtual double* allocFillParameterErrors(const QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const;
         /*! \brief fill a newly allocated array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
             \param r record this appplies to
             \param index index in \a r this applies to
             \return parameter fix vector
             \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
         */
-        virtual bool* allocFillFix(QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const ;
+        virtual bool* allocFillFix(const QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const ;
 
         /** \brief determine whether a fit has been carried out for the given record and index
          *
@@ -327,7 +327,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
          *  \return \c true if fit results exist for the current evaluation and fit function in the highlighted QFRawDataRecord result store.
          *          If no record is highlighted or any other circumstances prevent the determination of a proper result, the result will be \c false!
          */
-        virtual bool hasFit(QFRawDataRecord* r, int index) const;
+        virtual bool hasFit(const QFRawDataRecord* r, int index) const;
 
         /*! \brief set the given parameter \a id to the given value (and error) in all files and all indexes */
         virtual void setAllFitValues(const QString& id, double value, double error=0.0, bool currentFileOnly=false);
@@ -348,7 +348,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function */
-        virtual QString getEvaluationResultID(QFRawDataRecord *r) const ;
+        virtual QString getEvaluationResultID(const QFRawDataRecord *r) const ;
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
@@ -356,7 +356,7 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        virtual QString getEvaluationResultID(int currentIndex,  QFRawDataRecord *r) const;
+        virtual QString getEvaluationResultID(int currentIndex, const QFRawDataRecord *r) const;
 
 
         virtual bool hasSpecial(const QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error) const ;

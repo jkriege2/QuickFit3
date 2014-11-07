@@ -91,12 +91,12 @@ QFEvaluationEditor* QFFCCSFitEvaluationItem::createEditor(QFPluginServices* serv
     return new QFFCCSFitEvaluationEditor(services, propEditor, parent);
 }
 
-int QFFCCSFitEvaluationItem::getIndexMin(QFRawDataRecord *r) const
+int QFFCCSFitEvaluationItem::getIndexMin(const QFRawDataRecord *r) const
 {
     return -1;
 }
 
-int QFFCCSFitEvaluationItem::getIndexMax(QFRawDataRecord *r) const
+int QFFCCSFitEvaluationItem::getIndexMax(const QFRawDataRecord *r) const
 {
     if (!r) return -1;
     QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(r);
@@ -506,7 +506,7 @@ bool QFFCCSFitEvaluationItem::hasSpecial(const QFRawDataRecord *r, int index, co
     return qfFCSHasSpecial(r, index, paramid, value, error);
 }
 
-bool QFFCCSFitEvaluationItem::overrideFitFunctionPreset(QFRawDataRecord* r, QString paramName, double &value) const
+bool QFFCCSFitEvaluationItem::overrideFitFunctionPreset(const QFRawDataRecord* r, QString paramName, double &value) const
 {
     if (qfFCSOverrideFitFunctionPreset(this, r, paramName, value)) {
         return true;
@@ -514,7 +514,7 @@ bool QFFCCSFitEvaluationItem::overrideFitFunctionPreset(QFRawDataRecord* r, QStr
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPreset(r, paramName, value);
 }
 
-bool QFFCCSFitEvaluationItem::overrideFitFunctionPresetError(QFRawDataRecord* r, QString paramName, double &value) const
+bool QFFCCSFitEvaluationItem::overrideFitFunctionPresetError(const QFRawDataRecord* r, QString paramName, double &value) const
 {
     if (qfFCSOverrideFitFunctionPresetError(this, r, paramName, value)) {
         return true;
@@ -522,7 +522,7 @@ bool QFFCCSFitEvaluationItem::overrideFitFunctionPresetError(QFRawDataRecord* r,
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetError(r, paramName, value);
 }
 
-bool QFFCCSFitEvaluationItem::overrideFitFunctionPresetFix(QFRawDataRecord* r, QString paramName, bool &value) const
+bool QFFCCSFitEvaluationItem::overrideFitFunctionPresetFix(const QFRawDataRecord* r, QString paramName, bool &value) const
 {
     if (qfFCSOverrideFitFunctionPresetFix(this, r, paramName, value)) {
         return true;
@@ -544,18 +544,24 @@ QList<QFRawDataRecord *> QFFCCSFitEvaluationItem::getFitFiles() const
     return l;
 }
 
-QFFitFunction *QFFCCSFitEvaluationItem::getFitFunction( QFRawDataRecord *rdr) const
+QFFitFunction *QFFCCSFitEvaluationItem::getFitFunction(const QFRawDataRecord *rdr) const
 {
     //if (rdr) qDebug()<<"QFFCCSFitEvaluationItem::getFitFunction("<<rdr->getName()<<")";
     //else qDebug()<<"QFFCCSFitEvaluationItem::getFitFunction("<<rdr<<")";
     return getFitFunctionForID(getFitFunctionID(rdr));
 }
 
-QString QFFCCSFitEvaluationItem::getFitFunctionID(QFRawDataRecord *rdr) const
+QString QFFCCSFitEvaluationItem::getFitFunctionID(const QFRawDataRecord *rdr) const
 {
     //if (rdr) qDebug()<<"QFFCCSFitEvaluationItem::getFitFunctionID("<<rdr->getName()<<")";
     //else qDebug()<<"QFFCCSFitEvaluationItem::getFitFunctionID("<<rdr<<")";
-    int idx=fitFilesList.indexOf(rdr);
+    int idx=-1;
+    for (int i=0; i<fitFilesList.size(); i++) {
+        if (fitFilesList[i]==rdr) {
+            idx=i;
+            break;
+        }
+    }
     //qDebug()<<"QFFCCSFitEvaluationItem::getFitFunctionID: idx="<<idx;
     if (rdr && idx>=0) {
         return getFitFunctionID(idx);
@@ -563,9 +569,15 @@ QString QFFCCSFitEvaluationItem::getFitFunctionID(QFRawDataRecord *rdr) const
     return QString();
 }
 
-QString QFFCCSFitEvaluationItem::rdrPointerToParameterStoreID(QFRawDataRecord *rdr) const
+QString QFFCCSFitEvaluationItem::rdrPointerToParameterStoreID(const QFRawDataRecord *rdr) const
 {
-    int idx=fitFilesList.indexOf(rdr);
+    int idx=-1;
+    for (int i=0; i<fitFilesList.size(); i++) {
+        if (fitFilesList[i]==rdr) {
+            idx=i;
+            break;
+        }
+    }
     if (rdr && idx>=0) {
         return QString::number(idx);
     }
@@ -1178,3 +1190,15 @@ void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int
 void QFFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
 {
 }
+
+void QFFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult> &result, const QList<const QFRawDataRecord *> &records, const QStringList &fitfunctionIDs, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
+{
+    for (int i=0; i<records.size(); i++) {
+        QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult r;
+        r.index=run;
+        r.rdr=records[i];
+        result<<r;
+    }
+
+}
+

@@ -116,6 +116,8 @@ public:
 
     /** \brief return the instance of a given fit algorithm for this evaluation (DO NEVER DELETE THIS INSTANCE!)  */
     virtual QFFitAlgorithm* getFitAlgorithm(const QString& parameterID) const;
+    /** \brief return a new instance of a given fit algorithm for this evaluation   */
+    virtual QFFitAlgorithm* createFitAlgorithm(const QString& id) const;
 
     /*! \brief set the current fitting algorithm
 
@@ -132,10 +134,10 @@ public:
     virtual QString getFitFunctionID() const;
 
     /** \brief get the current fitting function */
-    virtual QFFitFunction* getFitFunction(QFRawDataRecord *rdr) const;
+    virtual QFFitFunction* getFitFunction(const QFRawDataRecord *rdr) const;
 
     /** \brief get the current fitting function ID */
-    virtual QString getFitFunctionID( QFRawDataRecord* rdr) const;
+    virtual QString getFitFunctionID(const  QFRawDataRecord* rdr) const;
 
     /** \brief create a new instance of the current fit algorithm ... the user has to destroy the instance */
     virtual QFFitAlgorithm* createFitAlgorithm(QObject *parent=NULL) const;
@@ -349,14 +351,14 @@ public:
           -# if this also fails, the value is taken from the initial value stored in the fitFunction
         .
     */
-    virtual double getFitValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const;
+    virtual double getFitValue(const QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const;
     /*! \brief return the fit error of a given parameter
         \param r the record to adress
         \param resultID the result ID which to access in the raw data records result store
         \param parameterID the parameter id
         \return the error associated with the given parameter.
     */
-    virtual double getFitError(QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const;
+    virtual double getFitError(const QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const;
 
     /*! \brief set the error of a given parameter
 
@@ -394,7 +396,7 @@ public:
         \param parameterID the parameter id
         For a detailed description of where the value is searched, see getFitValue()
     */
-    virtual bool getFitFix(QFRawDataRecord* r, const QString& resultID, const QString& parameterID)const ;
+    virtual bool getFitFix(const QFRawDataRecord* r, const QString& resultID, const QString& parameterID)const ;
 
 
     /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value
@@ -488,14 +490,14 @@ public:
           -# if this also fails, the value is taken from the initial value stored in the fitFunction
         .
     */
-    virtual double getFitValue(const QString& id, QFRawDataRecord* r=NULL) const ;
+    virtual double getFitValue(const QString& id, const QFRawDataRecord *r=NULL) const ;
 
     /*! \brief return the fit error of a given parameter
 
         \param id the parameter id
         \return the error associated with the given parameter.
     */
-    virtual double getFitError(const QString& id, QFRawDataRecord* r=NULL) const ;
+    virtual double getFitError(const QString& id, const QFRawDataRecord* r=NULL) const ;
 
     /*! \brief set the error of a given parameter
 
@@ -525,7 +527,7 @@ public:
         \param id the parameter id
         For a detailed description of where the value is searched, see getFitValue()
     */
-    virtual bool getFitFix(const QString& id, QFRawDataRecord* r=NULL) const ;
+    virtual bool getFitFix(const QString& id, const QFRawDataRecord* r=NULL) const ;
 
 
     /*! \brief set the value range of a fit parameter of the current fit function (see m_fitFunction)
@@ -563,7 +565,7 @@ public:
         \param id set the range min of the parameter with this id (see QFFitFunction)
         For a detailed description of where the value is searched, see getFitValue()
     */
-    virtual double getFitMin(const QString& id, QFRawDataRecord* r=NULL) const ;
+    virtual double getFitMin(const QString& id, const QFRawDataRecord* r=NULL) const ;
 
 
     /*! \brief return the upper value bound of a given parameter
@@ -571,7 +573,7 @@ public:
         \param id set the range max of the parameter with this id (see QFFitFunction)
         For a detailed description of where the value is searched, see getFitValue()
     */
-    virtual double getFitMax(const QString& id, QFRawDataRecord* r=NULL)  const ;
+    virtual double getFitMax(const QString& id, const QFRawDataRecord* r=NULL)  const ;
 
 
 
@@ -582,7 +584,7 @@ public:
      *  \return \c true if fit results exist for the current evaluation and fit function in the highlighted QFRawDataRecord result store.
      *          If no record is highlighted or any other circumstances prevent the determination of a proper result, the result will be \c false!
      */
-    virtual bool hasFit(QFRawDataRecord* r, const QString& evalID) const;
+    virtual bool hasFit(const QFRawDataRecord* r, const QString& evalID) const;
 
     /** \brief determine whether a fit has been carried out for the given record and the currently selected resultID
      *
@@ -590,7 +592,7 @@ public:
      *  \return \c true if fit results exist for the current evaluation and fit function in the highlighted QFRawDataRecord result store.
      *          If no record is highlighted or any other circumstances prevent the determination of a proper result, the result will be \c false!
      */
-    virtual bool hasFit(QFRawDataRecord* r) const;
+    virtual bool hasFit(const QFRawDataRecord* r) const;
 
     /** \brief determine whether a fit has been carried out for the currently highlighted record and the currently (implicitly) selected resultID
      *
@@ -613,11 +615,11 @@ public:
     /** \brief fill the given array of doubles with the current parameter lower bounds, as appropriate to use together with QFFitFunction
      *  \param param parameter minimums vector to fill
     */
-    virtual void fillParametersMin(double* param, QFRawDataRecord* r, QFFitFunction* function=NULL) const;
+    virtual void fillParametersMin(double* param, const QFRawDataRecord* r, QFFitFunction* function=NULL) const;
     /** \brief fill the given array of doubles with the current parameter upper bounds, as appropriate to use together with QFFitFunction
      *  \param param parameter maximums vector to fill
     */
-    virtual void fillParametersMax(double* param, QFRawDataRecord *r , QFFitFunction *function=NULL)const;
+    virtual void fillParametersMax(double* param, const QFRawDataRecord *r , QFFitFunction *function=NULL)const;
     /** \brief fill the given array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
      *  \param param parameter fix vector to fill
     */
@@ -637,12 +639,12 @@ public:
         \return parameter minimums vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual double* allocFillParametersMin(QFRawDataRecord* r, QFFitFunction* function=NULL) const;
+    virtual double* allocFillParametersMin(const QFRawDataRecord* r, QFFitFunction* function=NULL) const;
     /*! \brief fill a newly allocated array of doubles with the current parameter upper bounds, as appropriate to use together with QFFitFunction
         \return parameter maximums vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual double* allocFillParametersMax(QFRawDataRecord *r , QFFitFunction *function=NULL)const ;
+    virtual double* allocFillParametersMax(const QFRawDataRecord *r , QFFitFunction *function=NULL)const ;
     /*! \brief fill a newly allocated array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
         \return parameter fix vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
@@ -658,19 +660,19 @@ public:
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param param parameter vector to fill
      */
-    virtual void fillParameters(QFRawDataRecord* r,  const QString& resultID, double* param, QFFitFunction* function=NULL) const;
+    virtual void fillParameters(const QFRawDataRecord* r,  const QString& resultID, double* param, QFFitFunction* function=NULL) const;
     /** \brief fill the given array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
      *  \param r record this appplies to
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param param parameter error vector to fill
     */
-    virtual void fillParameterErrors(QFRawDataRecord* r,  const QString& resultID, double* param, QFFitFunction* function=NULL) const ;
+    virtual void fillParameterErrors(const QFRawDataRecord* r,  const QString& resultID, double* param, QFFitFunction* function=NULL) const ;
     /** \brief fill the given array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
      *  \param r record this appplies to
      *  \param resultID the result ID which to access in the raw data records result store
      *  \param param parameter fix vector to fill
     */
-    virtual void fillFix(QFRawDataRecord* r,  const QString& resultID, bool* param, QFFitFunction* function=NULL) const;
+    virtual void fillFix(const QFRawDataRecord* r,  const QString& resultID, bool* param, QFFitFunction* function=NULL) const;
 
     /*! \brief fill a newly allocated array of doubles with the current parameter values, as appropriate to use together with QFFitFunction
         \param r record this appplies to
@@ -678,21 +680,21 @@ public:
         \return parameter vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual double* allocFillParameters(QFRawDataRecord* r,  const QString& resultID, QFFitFunction* function=NULL) const ;
+    virtual double* allocFillParameters(const QFRawDataRecord* r,  const QString& resultID, QFFitFunction* function=NULL) const ;
     /*! \brief fill a newly allocated array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
         \param r record this appplies to
         \param resultID the result ID which to access in the raw data records result store
         \return parameter error vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual double* allocFillParameterErrors(QFRawDataRecord* r,  const QString& resultID, QFFitFunction* function=NULL) const ;
+    virtual double* allocFillParameterErrors(const QFRawDataRecord* r,  const QString& resultID, QFFitFunction* function=NULL) const ;
     /*! \brief fill a newly allocated array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
         \param r record this appplies to
         \param resultID the result ID which to access in the raw data records result store
         \return parameter fix vector
         \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
     */
-    virtual bool* allocFillFix(QFRawDataRecord* r,  const QString& resultID, QFFitFunction* function=NULL) const ;
+    virtual bool* allocFillFix(const QFRawDataRecord* r,  const QString& resultID, QFFitFunction* function=NULL) const ;
 
 
     /*! \brief reset the given parameter \a id to the initial/global/default value */
@@ -700,9 +702,9 @@ public:
     /*! \brief reset the given parameter \a id to the initial/global/default fix */
     virtual void resetDefaultFitFix(const QString& id);
     /*! \brief return the default/initial/global value of a given parameter        */
-    virtual double getDefaultFitValue(const QString& id, QFRawDataRecord *r=NULL) const;
+    virtual double getDefaultFitValue(const QString& id, const QFRawDataRecord *r=NULL) const;
     /*! \brief return the default/initial/global fix of a given parameter        */
-    virtual bool getDefaultFitFix(const QString& id, QFRawDataRecord *r=NULL) const ;
+    virtual bool getDefaultFitFix(const QString& id, const QFRawDataRecord *r=NULL) const ;
     /*! \brief reset the all fit results in the given record and resultID therein */
     virtual void resetAllFitResults(QFRawDataRecord *r, const QString& resultID);
     /*! \brief reset the all fit results to the initial/global/default value in the currently displayed curve/data */
@@ -746,7 +748,7 @@ public:
 
 
     /*! \brief return a resultID for storage of fit results in a QFRawDataRecord results store. The ID is valid for the currently highlighted record and all current settings */
-    virtual QString getEvaluationResultID(QFRawDataRecord *r) const=0;
+    virtual QString getEvaluationResultID(const QFRawDataRecord *r) const=0;
     /*! \brief reset the given parameter value (\a id) in the given raw data record \a r for the \a resultID to its default/initial value */
     virtual void resetDefaultFitValue(QFRawDataRecord *r, const QString &resultID, const QString &id);
     /*! \brief reset the given parameter fix (\a id) in the given raw data record \a r for the \a resultID to its default/initial value */
@@ -759,11 +761,11 @@ public slots:
 
 protected:
     /*! \brief implement this function and return \c true, if you want to override the fit functions preset */
-    virtual bool overrideFitFunctionPreset(QFRawDataRecord *r, QString paramName, double&value) const;
+    virtual bool overrideFitFunctionPreset(const QFRawDataRecord *r, QString paramName, double&value) const;
     /*! \brief implement this function and return \c true, if you want to override the fit functions preset error */
-    virtual bool overrideFitFunctionPresetError(QFRawDataRecord *r, QString paramName, double &value) const ;
+    virtual bool overrideFitFunctionPresetError(const QFRawDataRecord *r, QString paramName, double &value) const ;
     /*! \brief implement this function and return \c true, if you want to override the fit functions preset fix */
-    virtual bool overrideFitFunctionPresetFix(QFRawDataRecord *r, QString paramName, bool &value) const ;
+    virtual bool overrideFitFunctionPresetFix(const QFRawDataRecord *r, QString paramName, bool &value) const ;
 
 
     /*! \brief struct used to locally store fit parameter properties
@@ -834,13 +836,13 @@ protected:
 
 
     /** \brief return a valid ID to access parameterStore for the given parameter (id) in the current fit function (m_fitFunction) */
-    QString getParameterStoreID(QFRawDataRecord *rdr, QString parameter) const;
+    QString getParameterStoreID(const QFRawDataRecord *rdr, QString parameter) const;
 
     /** \brief return a valid ID to access parameterStore for the given parameter (id) in the current fit function (m_fitFunction) */
-    QString getParameterStoreID(QFRawDataRecord *rdr, QString fitfunction, QString parameter) const;
+    QString getParameterStoreID(const QFRawDataRecord *rdr, QString fitfunction, QString parameter) const;
 
     /** \brief if this returns a non-empty string (default: empty string), the result is added to the getParameterStoreID() to make the store specific to the given \a rdr */
-    virtual QString rdrPointerToParameterStoreID(QFRawDataRecord* rdr) const;
+    virtual QString rdrPointerToParameterStoreID(const QFRawDataRecord* rdr) const;
 
     /** \brief write object contents into XML file
     *

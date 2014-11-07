@@ -94,12 +94,12 @@ QFEvaluationEditor* QFImFCCSFitEvaluationItem::createEditor(QFPluginServices* se
     return new QFImFCCSFitEvaluationEditor(services, propEditor, parent);
 }
 
-int QFImFCCSFitEvaluationItem::getIndexMin(QFRawDataRecord *r) const
+int QFImFCCSFitEvaluationItem::getIndexMin(const QFRawDataRecord *r) const
 {
     return -1;
 }
 
-int QFImFCCSFitEvaluationItem::getIndexMax(QFRawDataRecord *r) const
+int QFImFCCSFitEvaluationItem::getIndexMax(const QFRawDataRecord *r) const
 {
     if (!r) return -1;
     QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(r);
@@ -513,7 +513,7 @@ bool QFImFCCSFitEvaluationItem::hasSpecial(const QFRawDataRecord *r, int index, 
     return qfFCSHasSpecial(r, index, paramid, value, error);
 }
 
-bool QFImFCCSFitEvaluationItem::overrideFitFunctionPreset(QFRawDataRecord* r, QString paramName, double &value) const
+bool QFImFCCSFitEvaluationItem::overrideFitFunctionPreset(const QFRawDataRecord* r, QString paramName, double &value) const
 {
     if (qfFCSOverrideFitFunctionPreset(this, r, paramName, value)) {
         return true;
@@ -521,7 +521,7 @@ bool QFImFCCSFitEvaluationItem::overrideFitFunctionPreset(QFRawDataRecord* r, QS
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPreset(r, paramName, value);
 }
 
-bool QFImFCCSFitEvaluationItem::overrideFitFunctionPresetError(QFRawDataRecord* r, QString paramName, double &value) const
+bool QFImFCCSFitEvaluationItem::overrideFitFunctionPresetError(const QFRawDataRecord* r, QString paramName, double &value) const
 {
     if (qfFCSOverrideFitFunctionPresetError(this, r, paramName, value)) {
         return true;
@@ -529,7 +529,7 @@ bool QFImFCCSFitEvaluationItem::overrideFitFunctionPresetError(QFRawDataRecord* 
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetError(r, paramName, value);
 }
 
-bool QFImFCCSFitEvaluationItem::overrideFitFunctionPresetFix(QFRawDataRecord* r, QString paramName, bool &value) const
+bool QFImFCCSFitEvaluationItem::overrideFitFunctionPresetFix(const QFRawDataRecord* r, QString paramName, bool &value) const
 {
     if (qfFCSOverrideFitFunctionPresetFix(this, r, paramName, value)) {
         return true;
@@ -551,27 +551,40 @@ QList<QFRawDataRecord *> QFImFCCSFitEvaluationItem::getFitFiles() const
     return l;
 }
 
-QFFitFunction *QFImFCCSFitEvaluationItem::getFitFunction( QFRawDataRecord *rdr) const
+QFFitFunction *QFImFCCSFitEvaluationItem::getFitFunction(const QFRawDataRecord *rdr) const
 {
     //if (rdr) qDebug()<<"QFImFCCSFitEvaluationItem::getFitFunction("<<rdr->getName()<<")";
     //else qDebug()<<"QFImFCCSFitEvaluationItem::getFitFunction("<<rdr<<")";
     return getFitFunctionForID(getFitFunctionID(rdr));
 }
 
-QString QFImFCCSFitEvaluationItem::getFitFunctionID(QFRawDataRecord *rdr) const
+QString QFImFCCSFitEvaluationItem::getFitFunctionID(const QFRawDataRecord *rdr) const
 {
     //if (rdr) qDebug()<<"QFImFCCSFitEvaluationItem::getFitFunctionID("<<rdr->getName()<<")";
     //else qDebug()<<"QFImFCCSFitEvaluationItem::getFitFunctionID("<<rdr<<")";
-    int idx=fitFilesList.indexOf(rdr);
+    int idx=-1;
+    for (int i=0; i<fitFilesList.size(); i++) {
+        if (fitFilesList[i]==rdr) {
+            idx=i;
+            break;
+        }
+    }
     if (rdr && idx>=0) {
         return getFitFunctionID(idx);
     }
     return NULL;
 }
 
-QString QFImFCCSFitEvaluationItem::rdrPointerToParameterStoreID(QFRawDataRecord *rdr) const
+QString QFImFCCSFitEvaluationItem::rdrPointerToParameterStoreID(const QFRawDataRecord *rdr) const
 {
-    int idx=fitFilesList.indexOf(rdr);
+    int idx=-1;
+    for (int i=0; i<fitFilesList.size(); i++) {
+        if (fitFilesList[i]==rdr) {
+            idx=i;
+            break;
+        }
+    }
+
     if (rdr && idx>=0) {
         return QString::number(idx);
     }
@@ -773,26 +786,27 @@ void QFImFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &fi
 
 
 
-void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<doFitData>* fitDataOut, QString& iparams, QList<double*>& paramsVector, QList<double*>& initialParamsVector, QList<double*>& errorsVector, QList<double*>& errorsVectorI, const QList<QFRawDataRecord *> &records, int run, int rangeMinDatarange, int rangeMaxDatarange, bool doLog) const
+void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<doFitData>* fitDataOut, QString& iparams, QList<double*>& paramsVector, QList<double*>& initialParamsVector, QList<double*>& errorsVector, QList<double*>& errorsVectorI, const QList<  QFRawDataRecord *> &records, int run, int rangeMinDatarange, int rangeMaxDatarange, bool doLog) const
 {
 
     bool dontFitMasked=getProperty("dontFitMaskedPixels", true).toBool();
     QList<doFitData> fitData;
-    QFFitAlgorithm* falg=getFitAlgorithm();
-    if ((!falg)||records.size()<=0) return;
-    QFRDRFCSDataInterface* data0=qobject_cast<QFRDRFCSDataInterface*>(records.first());
+    //QFFitAlgorithm* falg=getFitAlgorithm();
+    //if ((!falg)||records.size()<=0) return;
+    if (records.size()<=0) return;
+    const QFRDRFCSDataInterface* data0=dynamic_cast<const QFRDRFCSDataInterface*>(records.first());
     if (!data0) return;
 
     tool.clear();
     tool.setDoRecalculateInternals(false);
 
-    QFRDRRunSelectionsInterface* runsel=qobject_cast<QFRDRRunSelectionsInterface*>(records.first());
+    const QFRDRRunSelectionsInterface* runsel=dynamic_cast<const QFRDRRunSelectionsInterface*>(records.first());
     if (runsel && dontFitMasked && run>=0 && runsel->leaveoutRun(run)) return;
 
 
     for (int r=0; r<records.size(); r++) {
-        QFRawDataRecord* record=records[r];
-        QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+         QFRawDataRecord* record=records[r];
+          QFRDRFCSDataInterface* data=dynamic_cast<  QFRDRFCSDataInterface*>(record);
         if (data) {
             doFitData dfd;
             dfd.emitSignals=record->isEmitResultsChangedEnabled();
@@ -888,8 +902,145 @@ void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<
     //QList<QList<QPair<int, int> > > links(getLinkParameterCount());
     tool.setDoRecalculateInternals(false);
     for (int r=0; r<records.size(); r++) {
-        QFRawDataRecord* record=records[r];
-        QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+         QFRawDataRecord* record=records[r];
+         QFRDRFCSDataInterface* data=dynamic_cast< QFRDRFCSDataInterface*>(record);
+        if (data) {
+            QStringList paramIDs=fitData[cnt].ffunc->getParameterIDs();
+            for (int p=0; p<paramIDs.size(); p++) {
+                int l=getLinkParameter(r, paramIDs[p]);
+                if (l>=0) {
+                    tool.addToGlobalParam(l, r, p);
+                }
+            }
+            cnt++;
+        }
+    }
+    tool.setDoRecalculateInternals(true);
+    tool.createLocalFitFunctors();
+
+    if (fitDataOut) *fitDataOut=fitData;
+}
+
+
+
+void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<doFitData>* fitDataOut, QString& iparams, QList<double*>& paramsVector, QList<double*>& initialParamsVector, QList<double*>& errorsVector, QList<double*>& errorsVectorI, const QList<const  QFRawDataRecord *> &records, int run, int rangeMinDatarange, int rangeMaxDatarange, bool doLog) const
+{
+
+    bool dontFitMasked=getProperty("dontFitMaskedPixels", true).toBool();
+    QList<doFitData> fitData;
+    //QFFitAlgorithm* falg=getFitAlgorithm();
+    //if ((!falg)||records.size()<=0) return;
+    if (records.size()<=0) return;
+    const QFRDRFCSDataInterface* data0=dynamic_cast<const QFRDRFCSDataInterface*>(records.first());
+    if (!data0) return;
+
+    tool.clear();
+    tool.setDoRecalculateInternals(false);
+
+    const QFRDRRunSelectionsInterface* runsel=dynamic_cast<const QFRDRRunSelectionsInterface*>(records.first());
+    if (runsel && dontFitMasked && run>=0 && runsel->leaveoutRun(run)) return;
+
+
+    for (int r=0; r<records.size(); r++) {
+        const QFRawDataRecord* record=records[r];
+        const  QFRDRFCSDataInterface* data=dynamic_cast<const  QFRDRFCSDataInterface*>(record);
+        if (data) {
+            doFitData dfd;
+            dfd.emitSignals=record->isEmitResultsChangedEnabled();
+            //record->disableEmitResultsChanged();
+
+            QFFitFunction* ffunc=getFitFunction(record);
+            if (!ffunc) ffunc=getFitFunction(r);
+            if (doLog) QFPluginLogTools::log_text(tr("   - adding RDR '%1', model '%2'' ... \n").arg(record->getName()).arg(ffunc->name()));
+            dfd.N=data->getCorrelationN();
+            dfd.weights=NULL;
+            dfd.taudata=data->getCorrelationT();
+            dfd.corrdata=NULL;
+            if (run<0) {
+                dfd.corrdata=data->getCorrelationMean();
+            } else {
+                if (run<(int)data->getCorrelationRuns()) {
+                    dfd.corrdata=data->getCorrelationRun(run);
+                } else {
+                    dfd.corrdata=data->getCorrelationMean();
+                }
+            }
+            // we also have to care for the data cutting
+            int cut_low=rangeMinDatarange;
+            int cut_up=rangeMaxDatarange;
+            if (cut_low<0) cut_low=0;
+            if (cut_up>=dfd.N) cut_up=dfd.N-1;
+            int cut_N=cut_up-cut_low+1;
+            if (cut_N<0) {
+                cut_low=0;
+                cut_up=ffunc->paramCount()-1;
+                if (cut_up>=dfd.N) cut_up=dfd.N-1;
+                cut_N=cut_up+1;
+            }
+            if (doLog) QFPluginLogTools::log_text(tr("      - fit data range: %1...%2 (%3 datapoints)\n").arg(cut_low).arg(cut_up).arg(cut_N));
+            dfd.weightsOK=false;
+            dfd.taudata=&(dfd.taudata[cut_low]);
+            dfd.corrdata=&(dfd.corrdata[cut_low]);
+            dfd.weights=allocWeights(&(dfd.weightsOK), record, run, cut_low, cut_up);
+            if (!dfd.weightsOK && doLog) QFPluginLogTools::log_warning(tr("      - weights have invalid values => setting all weights to 1\n"));
+            // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
+            // we are working with a complete set of parameters
+            dfd.params=allocFillParameters(record, run, ffunc);
+            dfd.initialparams=allocFillParameters(record, run, ffunc);
+            dfd.errors=allocFillParameterErrors(record, run, ffunc);
+            dfd.errorsI=allocFillParameterErrors(record, run, ffunc);
+            dfd.paramsMin=allocFillParametersMin(record, ffunc);
+            dfd.paramsMax=allocFillParametersMax(record, ffunc);
+            dfd.paramsFix=allocFillFix(record, run, ffunc);
+            dfd.ffunc=ffunc;
+            dfd.cut_low=cut_low;
+            dfd.cut_up=cut_up;
+            dfd.cut_N=cut_N;
+
+            //qDebug()<<"adding "<<r<<": ("<<record->getName()<<")   ffunc="<<ffunc->name();
+            //qDebug()<<"  params="<<arrayToString(dfd.params, ffunc->paramCount());
+            //qDebug()<<"  initialparams="<<arrayToString(dfd.initialparams, ffunc->paramCount());
+            //qDebug()<<"  paramsMin="<<arrayToString(dfd.paramsMin, ffunc->paramCount());
+            //qDebug()<<"  paramsMax="<<arrayToString(dfd.paramsMax, ffunc->paramCount());
+            //qDebug()<<"  errors="<<arrayToString(dfd.errors, ffunc->paramCount());
+            //qDebug()<<"  errorsI="<<arrayToString(dfd.errorsI, ffunc->paramCount());
+
+            paramsVector.append(dfd.params);
+            initialParamsVector.append(dfd.initialparams);
+            errorsVector.append(dfd.errors);
+            errorsVectorI.append(dfd.errorsI);
+
+            ffunc->calcParameter(dfd.params, dfd.errors);
+            ffunc->calcParameter(dfd.initialparams, dfd.errors);
+
+            int fitparamcount=0;
+            //qDebug()<<"record "<<r<<"  ("<<record->getName()<<"):";
+            for (int i=0; i<ffunc->paramCount(); i++) {
+                if (ffunc->isParameterVisible(i, dfd.params) && (!dfd.paramsFix[i]) && ffunc->getDescription(i).fit) {
+                    if (!iparams.isEmpty()) iparams=iparams+";  ";
+                    fitparamcount++;
+                    iparams=iparams+QString("%1 = %2").arg(ffunc->getDescription(i).id).arg(dfd.params[i]);
+                    //iparams=iparams+QString("%1 = %2 (%3..%4)").arg(ffunc->getDescription(i).id).arg(dfd.params[i]).arg(dfd.paramsMin[i]).arg(dfd.paramsMax[i]);
+                }
+                //qDebug("  before_fit: %s = %lf +/m %lf", ffunc->getDescription(i).id.toStdString().c_str(), dfd.params[i], dfd.errors[i]);
+            }
+            //qDebug()<<"\n\n";
+            if (doLog) QFPluginLogTools::log_text(tr("      - initial params         (%1)\n").arg(iparams));
+
+
+            fitData.append(dfd);
+            tool.addTerm(ffunc, dfd.params, dfd.paramsFix, dfd.taudata, dfd.corrdata, dfd.weights, dfd.cut_N, dfd.paramsMin, dfd.paramsMax);
+        }
+    }
+
+    if (doLog) QFPluginLogTools::log_text(tr("   - adding global links ... \n"));
+    int cnt=0;
+    tool.setGlobalParamCount(getLinkParameterCount());
+    //QList<QList<QPair<int, int> > > links(getLinkParameterCount());
+    tool.setDoRecalculateInternals(false);
+    for (int r=0; r<records.size(); r++) {
+         const QFRawDataRecord* record=records[r];
+         const QFRDRFCSDataInterface* data=dynamic_cast<const  QFRDRFCSDataInterface*>(record);
         if (data) {
             QStringList paramIDs=fitData[cnt].ffunc->getParameterIDs();
             for (int p=0; p<paramIDs.size(); p++) {
@@ -1296,7 +1447,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord 
     bool saveLongStrings=!getProperty("dontSaveFitResultMessage", true).toBool();
     bool dontFitMasked=getProperty("dontFitMaskedPixels", true).toBool();
 
-    QFFitAlgorithm* falg=getFitAlgorithm();
+    QFFitAlgorithm* falg=createFitAlgorithm(NULL);
     if ((!falg)||records.size()<=0) return;
     QFRDRFCSDataInterface* data0=qobject_cast<QFRDRFCSDataInterface*>(records.first());
     if (!data0) return;
@@ -1418,6 +1569,9 @@ void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord 
                             QString unit=dfd.ffunc->getDescription(pid).unit;
                             QString fpid=getFitParamID(pid);
                             QString ffid= getFitParamFixID(pid);
+
+
+
                             if (run<0) record->resultsSetNumberError(evalID, fpid, params[i], errors[i], unit);
                             else {
                                 record->resultsSetInNumberErrorListAndBool(evalID, fpid, run, params[i], errors[i], unit, getParamNameLocalStore(fpid), true);
@@ -1618,4 +1772,334 @@ void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord 
     freeAndClearDoFitDataList(fitData);
     fitData.clear();
     falg->setReporter(NULL);
+    delete falg;
 }
+
+void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult> &fitresult, const QList<const QFRawDataRecord *> &records, const QStringList &fitfunctionIDs, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
+{
+
+    for (int i=0; i<records.size(); i++) {
+        const QString evalID=transformResultID(getEvaluationResultID(run, records[i]));
+        QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult r;
+        r.index=run;
+        r.rdr=records[i];
+        r.evalID=evalID;
+        fitresult<<r;
+    }
+
+
+
+
+
+
+    //qDebug()<<"fit: "<<records.size()<<run;
+    QString iparams="";
+    QString oparams="";
+    QString orparams="";
+    QList<double*> paramsVector;
+    QList<double*> initialParamsVector;
+    QList<double*> errorsVector, errorsVectorI;
+
+    bool saveLongStrings=!getProperty("dontSaveFitResultMessage", true).toBool();
+    bool dontFitMasked=getProperty("dontFitMaskedPixels", true).toBool();
+
+    QFFitAlgorithm* falg=createFitAlgorithm(NULL);
+    if ((!falg)||records.size()<=0) return;
+    const QFRDRFCSDataInterface* data0=dynamic_cast<const QFRDRFCSDataInterface*>(records.first());
+    if (!data0) return;
+    QFGlobalFitTool tool(falg);
+    tool.clear();
+    tool.setRepeats(qMax(1,getProperty("repeatFit", 1).toInt()));
+    tool.setGlobalLocalRepeats(qMax(0,getProperty("localGlobalFitIterations", 0).toInt()));
+    tool.setDoRecalculateInternals(false);
+
+    const QFRDRRunSelectionsInterface* runsel=dynamic_cast<const QFRDRRunSelectionsInterface*>(records.first());
+    if (runsel && dontFitMasked && run>=0 && runsel->leaveoutRun(run)) return;
+
+
+    QString runname=tr("average");
+    if (run>=0) runname=QString::number(run);
+    int rangeMinDatarange=0;
+    int rangeMaxDatarange=data0->getCorrelationN();
+    if (defaultMinDatarange>=0) rangeMinDatarange=defaultMinDatarange;
+    if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
+
+    restoreQFFitAlgorithmParameters(falg);
+    falg->readErrorEstimateParametersFit(this);
+    //falg->setReporter(dlgFitProgress);
+
+
+    //bool epc=get_doEmitPropertiesChanged();
+    //bool erc=get_doEmitResultsChanged();
+    QList<doFitData> fitData;
+    //set_doEmitPropertiesChanged(false);
+    //set_doEmitResultsChanged(false);
+
+    QString egroup=QString("%1%2__%3").arg(getType()).arg(getID()).arg(falg->id());//.arg(dfd.ffunc->id());
+    QString egrouplabel=QString("#%3 \"%1\": %2").arg(getName()).arg(falg->shortName()).arg(getID());//.arg(dfd.ffunc->shortName());
+    QString filesNames="";
+    for (int r=0; r<records.size(); r++) {
+        const QFRawDataRecord* record=records[r];
+        const QFRDRFCSDataInterface* data=dynamic_cast<const QFRDRFCSDataInterface*>(record);
+        if (data) {
+            const QFFitFunction* ffunc=getFitFunction(fitfunctionIDs.value(r));
+            if (ffunc) {
+                egroup+=QString("__"+ffunc->id());
+                egrouplabel+=QString(", "+ffunc->shortName());
+                if (!filesNames.isEmpty()) filesNames+=", ";
+                filesNames+=record->getName();
+            }
+        }
+    }
+
+
+    setupGlobalFitTool(tool, &fitData, iparams, paramsVector, initialParamsVector, errorsVector, errorsVectorI, records, run, rangeMinDatarange, rangeMaxDatarange, false);
+
+    bool OK=true;
+    try {
+
+        double deltaTime=0;
+        QElapsedTimer tstart;
+        tstart.start();
+
+        QFFitAlgorithm::FitResult result=tool.fit(paramsVector, errorsVector, initialParamsVector, errorsVectorI);
+        #if QT_VERSION >= 0x040800
+            deltaTime=double(tstart.nsecsElapsed())/1.0e6;
+        #else
+            deltaTime=double(tstart.elapsed());
+        #endif
+
+        OK=true;
+        if (OK) {
+            int cnt=0;
+            //addFittedFileSet(records);
+            for (int r=0; r<records.size(); r++) {
+                const QFRawDataRecord* record=records[r];
+                const QFRDRFCSDataInterface* data=dynamic_cast<const QFRDRFCSDataInterface*>(record);
+                //const QString evalID=transformResultID(getEvaluationResultID(run, record));
+                if (data) {
+                    const doFitData& dfd=fitData[cnt];
+                    double* errors=errorsVector[cnt];
+                    double* params=paramsVector[cnt];
+                    for (int i=0; i<dfd.ffunc->paramCount(); i++) {
+                        if (!(dfd.ffunc->isParameterVisible(i, params) && (!dfd.paramsFix[i]) && dfd.ffunc->getDescription(i).fit)) {
+                            errors[i]=dfd.errorsI[i];
+                        }
+                    }
+
+                    dfd.ffunc->calcParameter(params, errors);
+                    dfd.ffunc->sortParameter(params, errors, dfd.paramsFix);
+                    dfd.ffunc->calcParameter(params, errors);
+
+                    //qDebug()<<"record "<<r<<"  ("<<record->getName()<<"):  errors="<<errors<<"  params="<<params;
+                    for (int i=0; i<dfd.ffunc->paramCount(); i++) {
+                        if (dfd.ffunc->isParameterVisible(i, params) && (!dfd.paramsFix[i]) && dfd.ffunc->getDescription(i).fit) {
+                            if (!oparams.isEmpty()) oparams=oparams+";  ";
+
+                            oparams=oparams+QString("%1 = %2+/-%3").arg(dfd.ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
+                        }
+                        //qDebug("  after_fit: %s = %lf +/- %lf", dfd.ffunc->getDescription(i).id.toStdString().c_str(), dfd.params[i], dfd.errors[i]);
+                    }
+                    //qDebug()<<"\n\n";
+
+                    // round errors and values
+                    for (int i=0; i<dfd.ffunc->paramCount(); i++) {
+                        errors[i]=roundError(errors[i], 2);
+                        params[i]=roundWithError(params[i], errors[i], 2);
+                    }
+
+
+                    for (int i=0; i<dfd.ffunc->paramCount(); i++) {
+                        if (dfd.ffunc->isParameterVisible(i, params) && (!dfd.paramsFix[i]) && dfd.ffunc->getDescription(i).fit) {
+                            if (!orparams.isEmpty()) orparams=orparams+";  ";
+                            orparams=orparams+QString("%1 = %2+/-%3").arg(dfd.ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
+                        }
+                    }
+
+
+
+                    QString param;
+                    QString group="fit properties";
+                    bool* paramsFix=dfd.paramsFix;
+
+                    for (int i=0; i<dfd.ffunc->paramCount(); i++) {
+                        if (dfd.ffunc->isParameterVisible(i, params)) {
+                            QString pid=dfd.ffunc->getParameterID(i);
+                            QString unit=dfd.ffunc->getDescription(pid).unit;
+                            QString fpid=getFitParamID(pid);
+                            QString ffid= getFitParamFixID(pid);
+
+                            QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult res, resfix, reslocal, reslocalfix;
+                            res.setNumberError(params[i], errors[i], unit, tr("fit results"), pid+": "+dfd.ffunc->getDescription(pid).name, dfd.ffunc->getDescription(pid).label, true);
+                            resfix.setBool(paramsFix[i],  tr("fit results"), "fix_"+pid+": "+dfd.ffunc->getDescription(pid).name+tr(", fix"), dfd.ffunc->getDescription(pid).label+tr(", fix"), false);
+                            reslocal.setBool(true);
+                            reslocalfix.setBool(true);
+
+
+                            fitresult[r].fitresults[fpid]=res;
+                            fitresult[r].fitresults[ffid]=resfix;
+                            fitresult[r].fitresults[getParamNameLocalStore(fpid)]=reslocal;
+                            fitresult[r].fitresults[getParamNameLocalStore(ffid)]=reslocalfix;
+
+//                            if (run<0) record->resultsSetNumberError(evalID, fpid, params[i], errors[i], unit);
+//                            else {
+//                                record->resultsSetInNumberErrorListAndBool(evalID, fpid, run, params[i], errors[i], unit, getParamNameLocalStore(fpid), true);
+//                            }
+//                            record->resultsSetGroupLabelsAndSortPriority(evalID, fpid, tr("fit results"), pid+": "+dfd.ffunc->getDescription(pid).name, dfd.ffunc->getDescription(pid).label, true);
+
+//                            if (run<0) record->resultsSetBoolean(evalID, ffid, paramsFix[i]);
+//                            else {
+//                                record->resultsSetInBooleanListAndBool(evalID, ffid, run, paramsFix[i], QString(""), getParamNameLocalStore(ffid), true);
+//                            }
+//                            record->resultsSetGroupLabelsAndSortPriority(evalID,ffid, tr("fit results"), "fix_"+pid+": "+dfd.ffunc->getDescription(pid).name+tr(", fix"), dfd.ffunc->getDescription(pid).label+tr(", fix"), true);
+                        }
+                    }
+
+                    fitresult[r].fitresults[param="fitparam_g0"].setNumber(dfd.ffunc->evaluate(0, dfd.params),"", tr("fit results"), tr("g(0)"), tr("g(0)"), true);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+                    /*if (run<0) record->resultsSetNumber(evalID, "fitparam_g0", dfd.ffunc->evaluate(0, dfd.params));
+                    else record->resultsSetInNumberListAndBool(evalID, "fitparam_g0", run, dfd.ffunc->evaluate(0, dfd.params), "", getParamNameLocalStore("fitparam_g0"), true);
+                    record->resultsSetGroupLabelsAndSortPriority(evalID, "fitparam_g0", tr("fit results"), tr("g(0)"), tr("g(0)"), true);*/
+
+
+                    /*record->resultsSetEvaluationGroup(evalID, egroup);
+                    record->resultsSetEvaluationGroupLabel(egroup, egrouplabel);
+                    record->resultsSetEvaluationGroupIndex(evalID, run);
+                    record->resultsSetEvaluationDescription(evalID, QString(""));*/
+                    fitresult[r].evalgroup=egroup;
+                    fitresult[r].egrouplabel=egrouplabel;
+                    fitresult[r].egroupindex=run;
+                    fitresult[r].egroupdescription=QString("");
+
+
+                    QString label;
+                    fitresult[r].fitresults[param="fit_model_name"].setString(dfd.ffunc->id(), group, label=tr("fit results"), label, false);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+                    fitresult[r].fitresults[param="fitalg_name"].setString(falg->id(), group, label=tr("fit: algorithm"), label, false);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+
+                    fitresult[r].fitresults[param="fitalg_success"].setBool(result.fitOK, group, label=tr("fit: success"), label, false);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+                    fitresult[r].fitresults[param="fitalg_runtime"].setNumber(deltaTime, "msecs", group, label=tr("fit: runtime"), label, false);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+                     if (run<0 || saveLongStrings) {
+                        fitresult[r].fitresults[param="fitalg_message"].setString(result.messageSimple, group, label=tr("fit: message"), label, false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                        fitresult[r].fitresults[param="fitalg_messageHTML"].setString(result.message, group, label=tr("fit: message (markup)"), label, false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                    }
+
+                    fitresult[r].fitresults[param="fit_datapoints"].setInt(dfd.cut_N, "", group, label=tr("fit: datapoints"), label, false);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                    fitresult[r].fitresults[param="fit_cut_low"].setInt(dfd.cut_low, "", group, label=tr("fit: datapoints"), label, false);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                    fitresult[r].fitresults[param="fit_cut_up"].setInt(dfd.cut_up, "", group, label=tr("fit: datapoints"), label, false);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+
+
+
+
+                    QMapIterator<QString, QFRawDataRecord::evaluationResult> it(result.params);
+                    while (it.hasNext()) {
+                        it.next();
+                        param="";
+                        //record->resultsSet(evalID, param=("fitalg_"+it.key()), it.value());
+                        switch(it.value().type) {
+                            case QFRawDataRecord::qfrdreNumber:
+                            case QFRawDataRecord::qfrdreNumberError:
+                            case QFRawDataRecord::qfrdreInteger:
+                            case QFRawDataRecord::qfrdreBoolean:
+                            case QFRawDataRecord::qfrdreString:
+                                fitresult[r].fitresults[param="fitalg_"+it.key()]=it.value();
+                                fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                                break;
+
+                            case QFRawDataRecord::qfrdreBooleanVector:
+                            case QFRawDataRecord::qfrdreBooleanMatrix:
+                            case QFRawDataRecord::qfrdreNumberVector:
+                            case QFRawDataRecord::qfrdreNumberMatrix:
+                            case QFRawDataRecord::qfrdreNumberErrorVector:
+                            case QFRawDataRecord::qfrdreNumberErrorMatrix:
+                            case QFRawDataRecord::qfrdreIntegerVector:
+                            case QFRawDataRecord::qfrdreIntegerMatrix:
+                                if (run<0) {
+                                    fitresult[r].fitresults[param="fitalg_"+it.key()]=it.value();
+                                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                                }
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+
+                    {
+                        QFFitStatistics fit_stat= dfd.ffunc->calcFitStatistics(dfd.N, dfd.taudata, dfd.corrdata, dfd.weights, dfd.cut_low, dfd.cut_up, params, errors, dfd.paramsFix, 11, 25);
+
+                        QString group=tr("fit statistics");
+                        fitresult[r].fitresults[param="fitstat_chisquared"].setNumber(fit_stat.residSqrSum, "", group, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"), false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+                        fitresult[r].fitresults[param="fitstat_chisquared_weighted"].setNumber(fit_stat.residWeightSqrSum, "", group, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"), false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+
+                        fitresult[r].fitresults[param="fitstat_residavg"].setNumber(fit_stat.residAverage, "", group, tr("residual average"), QString("&lang;E&rang;"), false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+
+                        fitresult[r].fitresults[param="fitstat_residavg_weighted"].setNumber(fit_stat.residWeightAverage, "", group, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"), false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+                        fitresult[r].fitresults[param="fitstat_residstddev"].setNumber( fit_stat.residStdDev, "", group, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "), false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+                        fitresult[r].fitresults[param="fitstat_residstddev_weighted"].setNumber( fit_stat.residWeightStdDev, "", group, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"), false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+                        fitresult[r].fitresults[param="fitstat_fitparams"].setInt(fit_stat.fitparamN, "", group, label=tr("fit params"), label, false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+                        fitresult[r].fitresults[param="fit_datapoints"].setInt(fit_stat.dataSize, "", group, label=tr("datapoints"), label, false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+                        fitresult[r].fitresults[param="fitstat_dof"].setInt(fit_stat.degFreedom, "", group, label= tr("degrees of freedom"), label, false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+                        fitresult[r].fitresults[param="fitstat_r2"].setNumber(fit_stat.Rsquared, "", group, tr("R squared"), tr("R<sup>2</sup>"), false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+                        fitresult[r].fitresults[param="fitstat_tss"].setNumber(fit_stat.TSS, "", group, label= tr("total sum of squares"), label, false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+
+
+                        fit_stat.free();
+                    }
+                    cnt++;
+                }
+            }
+        } else {
+            //if (doLog) QFPluginLogTools::log_warning(tr("   - fit canceled by user!!!\n"));
+        }
+    } catch(std::exception& E) {
+        if (logservice) logservice->log_error(tr("fitting file '%2', run %3:\n   error during fitting, error message: %1\n").arg(E.what()).arg(filesNames).arg(run));
+    }
+
+    //if (dlgFitProgress) dlgFitProgress->reportStatus(tr("clean up ..."));
+    //if (doLog) QFPluginLogTools::log_text(tr("   - clean up ... \n"));
+    //if (epc) set_doEmitPropertiesChanged(true);
+    //if (erc) set_doEmitResultsChanged(true);
+
+    freeAndClearDoFitDataList(fitData);
+    fitData.clear();
+    falg->setReporter(NULL);
+    delete falg;
+
+}
+

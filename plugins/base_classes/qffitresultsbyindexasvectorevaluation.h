@@ -71,7 +71,7 @@ class QFFitResultsByIndexAsVectorEvaluation : public QFFitResultsByIndexEvaluati
         virtual void resetAllFitValue();
         virtual void resetAllFitFix();
         virtual void resetDefaultFitFix(QFRawDataRecord *r, const QString &resultID, const QString &id);
-        virtual bool hasFit(QFRawDataRecord *r1, const QString &evalID) const;
+        virtual bool hasFit(const QFRawDataRecord *r1, const QString &evalID) const;
         virtual void setFitResultValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, double value) ;
         virtual void setAllFitResultValue(QFRawDataRecord *r, const QString &parameterID, double value) ;
         virtual void setAllFitResultError(QFRawDataRecord *r, const QString &parameterID, double error) ;
@@ -94,9 +94,9 @@ class QFFitResultsByIndexAsVectorEvaluation : public QFFitResultsByIndexEvaluati
         virtual void setFitResultFix(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, bool fix) ;
         virtual void setFitResultGroup(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, const QString &group) ;
         virtual void setFitResultLabel(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, const QString &label, const QString &label_richtext) ;
-        virtual double getFitError(QFRawDataRecord *r, const QString &resultID, const QString &parameterID) const;
-        virtual double getFitValue(QFRawDataRecord *r, const QString &resultID, const QString &parameterID) const;
-        virtual bool getFitFix(QFRawDataRecord *r, const QString &resultID, const QString &parameterID) const;
+        virtual double getFitError(const QFRawDataRecord *r, const QString &resultID, const QString &parameterID) const;
+        virtual double getFitValue(const QFRawDataRecord *r, const QString &resultID, const QString &parameterID) const;
+        virtual bool getFitFix(const QFRawDataRecord *r, const QString &resultID, const QString &parameterID) const;
         virtual void setAllFitValues(const QString &id, double value, double error, bool currentFileOnly);
         virtual void setAllFitFixes(const QString &id, bool fix, bool currentFileOnly);
         virtual void resetAllFitResultsAllFiles();

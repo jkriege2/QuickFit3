@@ -25,7 +25,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfmathparser.h"
 
 bool DlgSetRDRPropertyByExpression_SaveWidgetFunction(const QWidget*wid, QSettings& set, const QString& prefix) {
-    const DlgSetRDRPropertyByExpression* w=qobject_cast<const DlgSetRDRPropertyByExpression*>(wid);
+    const DlgSetRDRPropertyByExpression* w=dynamic_cast<const DlgSetRDRPropertyByExpression*>(wid);
     if (w) {
         set.setValue(prefix+"editors", w->getEditorCount());
         return true;
@@ -43,7 +43,7 @@ bool DlgSetRDRPropertyByExpression_LoadWidgetFunction(QWidget*wid, const QSettin
 }
 
 bool DlgSetRDRPropertyByExpression_EqualsWidgetFunction(const QWidget*wid, const QSettings& set, const QString& prefix) {
-    const DlgSetRDRPropertyByExpression* w=qobject_cast<const DlgSetRDRPropertyByExpression*>(wid);
+    const DlgSetRDRPropertyByExpression* w=dynamic_cast<const DlgSetRDRPropertyByExpression*>(wid);
     if (w) {
         return set.value(prefix+"editors", w->getEditorCount()).toInt()==w->getEditorCount();
     }

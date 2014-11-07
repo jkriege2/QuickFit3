@@ -98,4 +98,63 @@ class QFFitResultsByIndexEvaluationFitThread : public QThread, public QFPluginLo
         
 };
 
+
+
+class QFFitResultsByIndexEvaluationFitSmartThread  : public QThread, public QFPluginLogService {
+        Q_OBJECT
+        Q_INTERFACES(QFPluginLogService)
+    public:
+
+        explicit QFFitResultsByIndexEvaluationFitSmartThread(bool stopWhenEmpty, QObject* parent=NULL);
+        virtual ~QFFitResultsByIndexEvaluationFitSmartThread();
+
+
+        virtual void run();
+
+        void addJob(QFFitResultsByIndexEvaluation* evaluation, const QFRawDataRecord* record, int run, int userMin, int userMax);
+        void addJob(QFFitResultsByIndexEvaluation* evaluation, QList<QFRawDataRecord *> records, int run, int userMin, int userMax);
+
+        void cancel(bool waitForFinished=true);
+
+        int getJobsDone();
+        int getJobCount();
+
+        virtual void log_text(QString message);
+        /** \brief log project warning message
+         *  \param message the warning message to log
+         */
+        virtual void log_warning(QString message);
+        /** \brief log project error message
+         *  \param message the error message to log
+         */
+        virtual void log_error(QString message);
+
+    signals:
+        void sigLogText(QString message);
+        void sigLogWarning(QString message);
+        void sigLogError(QString message);
+
+    protected:
+        struct Job {
+            Job();
+            const QFFitResultsByIndexEvaluation* evaluation;
+            const QFRawDataRecord* record;
+            QList<const QFRawDataRecord*> records;
+            QStringList fitfuncIDs;
+            int run;
+            int userMin;
+            int userMax;
+        };
+        QQueue<Job> jobs;
+
+        mutable QReadWriteLock* lock;
+
+        bool stopped;
+        bool stopWhenEmpty;
+
+        int jobsDone;
+        int jobCount;
+
+};
+
 #endif // QFFitResultsByIndexEvaluationFitThread_H

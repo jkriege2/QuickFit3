@@ -177,11 +177,11 @@ bool QFImFCSFitEvaluation::hasSpecial(const QFRawDataRecord *r, int index, const
     return false;*/
 }
 
-int QFImFCSFitEvaluation::getIndexMin(QFRawDataRecord* r) const {
+int QFImFCSFitEvaluation::getIndexMin(const QFRawDataRecord *r) const {
     return -1;
 }
 
-int QFImFCSFitEvaluation::getIndexMax(QFRawDataRecord* r) const {
+int QFImFCSFitEvaluation::getIndexMax(const QFRawDataRecord *r) const {
     if (!r) return -1;
     QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(r);
     if (fcs->getCorrelationRuns()<=0) return -1;
@@ -632,7 +632,7 @@ QFImFCSMatchRDRFunctor *QFImFCSFitEvaluation::getMatchFunctor() const
     return matchFunctor;
 }
 
-bool QFImFCSFitEvaluation::overrideFitFunctionPreset(QFRawDataRecord* r, QString paramid, double &value) const {
+bool QFImFCSFitEvaluation::overrideFitFunctionPreset(const QFRawDataRecord* r, QString paramid, double &value) const {
     if (qfFCSOverrideFitFunctionPreset(this, r, paramid, value)) {
         //qDebug()<<"found override for "<<paramid<<" : "<<value;
         return true;
@@ -665,7 +665,7 @@ bool QFImFCSFitEvaluation::overrideFitFunctionPreset(QFRawDataRecord* r, QString
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPreset(paramid, value);*/
 }
 
-bool QFImFCSFitEvaluation::overrideFitFunctionPresetError(QFRawDataRecord* r, QString paramid, double &value) const {
+bool QFImFCSFitEvaluation::overrideFitFunctionPresetError(const QFRawDataRecord* r, QString paramid, double &value) const {
     /*if (paramid=="focus_width") {
         if (propertyExists("PRESET_FOCUS_WIDTH_ERROR")) {
             double fw=getProperty("PRESET_FOCUS_WIDTH_ERROR", 0).toDouble();
@@ -697,7 +697,7 @@ bool QFImFCSFitEvaluation::overrideFitFunctionPresetError(QFRawDataRecord* r, QS
     return QFFitResultsByIndexAsVectorEvaluation::overrideFitFunctionPresetError(r, paramid, value);
 }
 
-bool QFImFCSFitEvaluation::overrideFitFunctionPresetFix(QFRawDataRecord* r, QString paramid, bool &value) const
+bool QFImFCSFitEvaluation::overrideFitFunctionPresetFix(const QFRawDataRecord* r, QString paramid, bool &value) const
 {
     /*if (paramid=="focus_width") {
         if (propertyExists("PRESET_FOCUS_WIDTH_FIX")) {
@@ -1152,6 +1152,13 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
 
     if (ffunc) delete ffunc;
     if (falg) delete falg;
+
+}
+
+void QFImFCSFitEvaluation::doFitForMultithreadReturn(QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult& result, const QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
+{
+    result.index=run;
+    result.rdr=record;
 
 }
 

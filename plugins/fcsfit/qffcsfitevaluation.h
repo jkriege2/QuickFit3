@@ -78,9 +78,9 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation, public QFFCSWei
 
 
         /** \brief return the smallest available index */
-        virtual int getIndexMin(QFRawDataRecord* r) const;
+        virtual int getIndexMin(const QFRawDataRecord* r) const;
         /** \brief return the largest available index */
-        virtual int getIndexMax(QFRawDataRecord* r) const;
+        virtual int getIndexMax(const QFRawDataRecord* r) const;
 
         /*! \brief perform a fit for the given \a record and \a run
 
@@ -99,6 +99,8 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation, public QFFCSWei
             The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
           */
         virtual void doFitForMultithread(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const;
+
+        virtual void doFitForMultithreadReturn(QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult& result, const QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const ;
 
         /** \brief calculates fit statistics for the given fit function and dataset. */
         //QFFitStatistics calcFitStatistics(bool saveAsresults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
@@ -124,9 +126,9 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation, public QFFCSWei
 
         virtual bool hasSpecial(const QFRawDataRecord* r, const QString& id, const QString& paramid, double& value, double& error) const;
 
-        virtual bool overrideFitFunctionPreset(QFRawDataRecord* r, QString paramName, double &value) const ;
-        virtual bool overrideFitFunctionPresetError(QFRawDataRecord* r, QString paramName, double &value) const ;
-        virtual bool overrideFitFunctionPresetFix(QFRawDataRecord* r, QString paramName, bool &value) const ;
+        virtual bool overrideFitFunctionPreset(const QFRawDataRecord* r, QString paramName, double &value) const ;
+        virtual bool overrideFitFunctionPresetError(const QFRawDataRecord* r, QString paramName, double &value) const ;
+        virtual bool overrideFitFunctionPresetFix(const QFRawDataRecord* r, QString paramName, bool &value) const ;
 
 
     public:
@@ -140,7 +142,7 @@ class QFFCSFitEvaluation : public QFFitResultsByIndexEvaluation, public QFFCSWei
         using QFFitResultsByIndexEvaluation::getEvaluationResultID;
 
 
-        virtual QString getIndexName(QFRawDataRecord *rec, int index) const ;
+        virtual QString getIndexName(const QFRawDataRecord *rec, int index) const ;
 };
 
 #endif // QFFCSFITEVALUATION_H

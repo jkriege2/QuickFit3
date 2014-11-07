@@ -85,9 +85,9 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
 
 
         /** \brief return the smallest available index */
-        virtual int getIndexMin(QFRawDataRecord* r) const;
+        virtual int getIndexMin(const QFRawDataRecord* r) const;
         /** \brief return the largest available index */
-        virtual int getIndexMax(QFRawDataRecord* r) const;
+        virtual int getIndexMax(const QFRawDataRecord* r) const;
 
         /** \brief calculates fit statistics for the given fit function and dataset. */
         QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errorsVector, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
@@ -103,11 +103,11 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual QString getFitFunctionID() const;
         virtual QList<QFRawDataRecord*> getFitFiles() const;
 
-        virtual QFFitFunction* getFitFunction(QFRawDataRecord *rdr) const;
-        virtual QString getFitFunctionID( QFRawDataRecord* rdr) const;
+        virtual QFFitFunction* getFitFunction(const QFRawDataRecord *rdr) const;
+        virtual QString getFitFunctionID(const  QFRawDataRecord* rdr) const;
 
         /** \brief if this returns a non-empty string (default: empty string), the result is added to the getParameterStoreID() to make the store specific to the given \a rdr */
-        virtual QString rdrPointerToParameterStoreID(QFRawDataRecord* rdr) const;
+        virtual QString rdrPointerToParameterStoreID(const QFRawDataRecord* rdr) const;
 
         QFImFCCSParameterInputTable* getParameterInputTableModel() const;
 
@@ -255,9 +255,9 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual bool hasSpecial(const QFRawDataRecord* r, int index, const QString& paramid, double& value, double& error) const ;
 
 
-        virtual bool overrideFitFunctionPreset(QFRawDataRecord* r, QString paramName, double &value) const ;
-        virtual bool overrideFitFunctionPresetError(QFRawDataRecord* r, QString paramName, double &value) const ;
-        virtual bool overrideFitFunctionPresetFix(QFRawDataRecord* r, QString paramName, bool &value) const ;
+        virtual bool overrideFitFunctionPreset(const QFRawDataRecord* r, QString paramName, double &value) const ;
+        virtual bool overrideFitFunctionPresetError(const QFRawDataRecord* r, QString paramName, double &value) const ;
+        virtual bool overrideFitFunctionPresetFix(const QFRawDataRecord* r, QString paramName, bool &value) const ;
 
     public:
         /*! \brief perform a fit for the given \a records and \a run
@@ -280,9 +280,11 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
             The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
           */
         virtual void doFitForMultithread(const QList<QFRawDataRecord*>& records, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const;
+        virtual void doFitForMultithreadReturn(QList<QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult>& result, const QList<const QFRawDataRecord *> &records, const QStringList& fitfunctionIDs, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const;
 
         /** \brief initialize a QFGlobalFitTool and several arrays with values needed to perform a global fit for a given run and list of files */
         void setupGlobalFitTool(QFGlobalFitTool& tool, QList<doFitData>* fitDataOut, QString& iparams, QList<double *> &paramsVector, QList<double *> &initialParamsVector, QList<double*>& errorsVector, QList<double*>& errorsVectorI, const QList<QFRawDataRecord *> &records, int run, int rangeMinDatarange, int rangeMaxDatarange, bool doLog) const;
+        void setupGlobalFitTool(QFGlobalFitTool &tool, QList<doFitData> *fitDataOut, QString &iparams, QList<double *> &paramsVector, QList<double *> &initialParamsVector, QList<double *> &errorsVector, QList<double *> &errorsVectorI, const QList<const QFRawDataRecord *> &records, int run, int rangeMinDatarange, int rangeMaxDatarange, bool doLog) const;
 
         /*! \brief fill a 2D array with a chi^2 landscape for the given fit, this is called like doFit() + some output arguments!
 

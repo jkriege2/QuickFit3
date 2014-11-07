@@ -75,8 +75,8 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
         /** \brief do the evaluation */
         virtual void doFit(QFRawDataRecord* record, int index, int model, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, int runAvgWidth=11, int residualHistogramBins=25);
 
-        virtual int getIndexMin(QFRawDataRecord* r) const;
-        virtual int getIndexMax(QFRawDataRecord* r) const;
+        virtual int getIndexMin(const QFRawDataRecord* r) const;
+        virtual int getIndexMax(const QFRawDataRecord* r) const;
         virtual int getModelCount(QFRawDataRecord* r, int index) const;
 
         /** \brief returns a list of the possible fit types for calcMSDFits() and calcMSDFit() */
@@ -164,7 +164,7 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
 
 
         /** \brief returns default values for a parameter */
-        virtual bool getParameterDefault(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, QFUsesResultsEvaluation::FitParameterDefault& defaultValue) const;
+        virtual bool getParameterDefault(const QFRawDataRecord* r, const QString& resultID, const QString& parameterID, QFUsesResultsEvaluation::FitParameterDefault& defaultValue) const;
 
 
 };

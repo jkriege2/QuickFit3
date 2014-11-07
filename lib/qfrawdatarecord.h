@@ -424,6 +424,56 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             qfmpResult getAsMathParserResult() const;
             QVariant getAsVariant() const;
             void setFromMathParserResult(const qfmpResult& result);
+
+            inline void setNumber(double value, QString unit=QString(""), QString group=QString(""), QString label=QString(""), QString label_rich=QString(""),bool sortPriority=false) {
+                this->type=qfrdreNumber;
+                this->dvalue=value;
+                this->unit=unit;
+                this->group=group;
+                this->label=label;
+                this->label_rich=label_rich;
+                this->sortPriority=sortPriority;
+            }
+
+            inline void setNumberError(double value, double error, QString unit=QString(""), QString group=QString(""), QString label=QString(""), QString label_rich=QString(""),bool sortPriority=false) {
+                this->type=qfrdreNumberError;
+                this->dvalue=value;
+                this->derror=error;
+                this->unit=unit;
+                this->group=group;
+                this->label=label;
+                this->label_rich=label_rich;
+                this->sortPriority=sortPriority;
+            }
+            inline void setInt(qlonglong value, QString unit=QString(""), QString group=QString(""), QString label=QString(""), QString label_rich=QString(""),bool sortPriority=false) {
+                this->type=qfrdreInteger;
+                this->ivalue=value;
+                this->unit=unit;
+                this->group=group;
+                this->label=label;
+                this->label_rich=label_rich;
+                this->sortPriority=sortPriority;
+            }
+
+            inline void setBool(bool value, QString group=QString(""), QString label=QString(""), QString label_rich=QString(""),bool sortPriority=false) {
+                this->type=qfrdreBoolean;
+                this->bvalue=value;
+                this->unit="";
+                this->group=group;
+                this->label=label;
+                this->label_rich=label_rich;
+                this->sortPriority=sortPriority;
+            }
+            inline void setString(const QString& value,QString group=QString(""), QString label=QString(""), QString label_rich=QString(""),bool sortPriority=false) {
+                this->type=qfrdreString;
+                this->svalue=value;
+                this->unit="";
+                this->group=group;
+                this->label=label;
+                this->label_rich=label_rich;
+                this->sortPriority=sortPriority;
+            }
+
         };
 
         /*! \brief initial size for results hash

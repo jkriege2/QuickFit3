@@ -477,7 +477,7 @@ QString QFFCSMaxEntEvaluationItem::getModelName(int model) const {
     return "";
 }
 
-bool QFFCSMaxEntEvaluationItem::getParameterDefault(QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QFUsesResultsEvaluation::FitParameterDefault &defaultValue) const {
+bool QFFCSMaxEntEvaluationItem::getParameterDefault(const QFRawDataRecord *r, const QString &resultID, const QString &parameterID, QFUsesResultsEvaluation::FitParameterDefault &defaultValue) const {
     switch (currentModel)
     {
     case 0:

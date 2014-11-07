@@ -265,14 +265,14 @@ void QFFitResultsByIndexAsVectorEvaluation::resetAllFitResultsAllFiles() {
 }
 
 
-bool QFFitResultsByIndexAsVectorEvaluation::hasFit(QFRawDataRecord* r1, const QString& evalID) const {
+bool QFFitResultsByIndexAsVectorEvaluation::hasFit(const QFRawDataRecord *r1, const QString& evalID) const {
     QString resultID=getEvaluationResultID(r1);
     int index=getIndexFromEvaluationResultID(evalID);
     if (index<0) {
         return QFFitResultsByIndexEvaluation::hasFit(r1, evalID);
     } else {
 
-        QFRawDataRecord* r=r1;
+        const QFRawDataRecord* r=r1;
         if (getFitFunction(r)==NULL) return false;
         if (r==NULL) r=getHighlightedRecord();
         if (r==NULL) return false;
@@ -814,7 +814,7 @@ void QFFitResultsByIndexAsVectorEvaluation::setFitResultValuesVisibleWithGroupAn
 }
 
 
-double QFFitResultsByIndexAsVectorEvaluation::getFitValue(QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const {
+double QFFitResultsByIndexAsVectorEvaluation::getFitValue(const QFRawDataRecord *r, const QString& resultID, const QString& parameterID) const {
     double res=0;
     int index=getIndexFromEvaluationResultID(resultID);
     QString tresultID=transformResultID(resultID);
@@ -864,7 +864,7 @@ double QFFitResultsByIndexAsVectorEvaluation::getFitValue(QFRawDataRecord* r, co
     return res;
 }
 
-double QFFitResultsByIndexAsVectorEvaluation::getFitError(QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const  {
+double QFFitResultsByIndexAsVectorEvaluation::getFitError(const QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const  {
     double res=0;
     int index=getIndexFromEvaluationResultID(resultID);
     QString tresultID=transformResultID(resultID);
@@ -915,7 +915,7 @@ double QFFitResultsByIndexAsVectorEvaluation::getFitError(QFRawDataRecord* r, co
 
 
 
-bool QFFitResultsByIndexAsVectorEvaluation::getFitFix(QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const {
+bool QFFitResultsByIndexAsVectorEvaluation::getFitFix(const QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const {
     bool res=false;
     int index=getIndexFromEvaluationResultID(resultID);
     QString tresultID=transformResultID(resultID);

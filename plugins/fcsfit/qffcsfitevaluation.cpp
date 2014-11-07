@@ -50,7 +50,7 @@ QFFCSFitEvaluation::~QFFCSFitEvaluation() {
 }
 
 
-QString QFFCSFitEvaluation::getIndexName(QFRawDataRecord *rec, int index) const {
+QString QFFCSFitEvaluation::getIndexName(const QFRawDataRecord *rec, int index) const {
     QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(rec);
     if (fcs) {
         return fcs->getCorrelationRunName(index);
@@ -83,7 +83,7 @@ bool QFFCSFitEvaluation::hasSpecial(const QFRawDataRecord* r, const QString& id,
 
 }
 
-bool QFFCSFitEvaluation::overrideFitFunctionPreset(QFRawDataRecord *r, QString paramName, double &value) const
+bool QFFCSFitEvaluation::overrideFitFunctionPreset(const QFRawDataRecord *r, QString paramName, double &value) const
 {
     if (qfFCSOverrideFitFunctionPreset(this, r, paramName, value)) {
         return true;
@@ -91,7 +91,7 @@ bool QFFCSFitEvaluation::overrideFitFunctionPreset(QFRawDataRecord *r, QString p
     return QFFitResultsByIndexEvaluation::overrideFitFunctionPreset(r, paramName, value);
 }
 
-bool QFFCSFitEvaluation::overrideFitFunctionPresetError(QFRawDataRecord *r, QString paramName, double &value) const
+bool QFFCSFitEvaluation::overrideFitFunctionPresetError(const QFRawDataRecord *r, QString paramName, double &value) const
 {
     if (qfFCSOverrideFitFunctionPresetError(this, r, paramName, value)) {
         return true;
@@ -99,7 +99,7 @@ bool QFFCSFitEvaluation::overrideFitFunctionPresetError(QFRawDataRecord *r, QStr
     return QFFitResultsByIndexEvaluation::overrideFitFunctionPresetError(r, paramName, value);
 }
 
-bool QFFCSFitEvaluation::overrideFitFunctionPresetFix(QFRawDataRecord *r, QString paramName, bool &value) const
+bool QFFCSFitEvaluation::overrideFitFunctionPresetFix(const QFRawDataRecord *r, QString paramName, bool &value) const
 {
     if (qfFCSOverrideFitFunctionPresetFix(this, r, paramName, value)) {
         return true;
@@ -107,11 +107,11 @@ bool QFFCSFitEvaluation::overrideFitFunctionPresetFix(QFRawDataRecord *r, QStrin
     return QFFitResultsByIndexEvaluation::overrideFitFunctionPresetFix(r, paramName, value);
 }
 
-int QFFCSFitEvaluation::getIndexMin(QFRawDataRecord* r) const {
+int QFFCSFitEvaluation::getIndexMin(const QFRawDataRecord *r) const {
     return -1;
 }
 
-int QFFCSFitEvaluation::getIndexMax(QFRawDataRecord* r) const {
+int QFFCSFitEvaluation::getIndexMax(const QFRawDataRecord *r) const {
     if (!r) return -1;
     QFRDRFCSDataInterface* fcs=qobject_cast<QFRDRFCSDataInterface*>(r);
     if (!fcs) return 0;
@@ -877,6 +877,13 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
 
     if (ffunc) delete ffunc;
     if (falg) delete falg;
+
+}
+
+void QFFCSFitEvaluation::doFitForMultithreadReturn(QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult& result, const QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
+{
+    result.index=run;
+    result.rdr=record;
 
 }
 

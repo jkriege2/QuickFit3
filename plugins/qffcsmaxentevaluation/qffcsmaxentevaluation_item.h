@@ -196,7 +196,7 @@ protected:
 
 
         /** \brief returns default values for a parameter */
-        virtual bool getParameterDefault(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, QFUsesResultsEvaluation::FitParameterDefault& defaultValue) const;
+        virtual bool getParameterDefault(const QFRawDataRecord* r, const QString& resultID, const QString& parameterID, QFUsesResultsEvaluation::FitParameterDefault& defaultValue) const;
 
 
 };

@@ -41,8 +41,8 @@ void QFUsesResultsByIndexEvaluation::setPresetProperty(const QString &id, const 
     }
 }
 
-bool QFUsesResultsByIndexEvaluation::hasResults(QFRawDataRecord *r1, int index) const {
-    QFRawDataRecord* r=r1;
+bool QFUsesResultsByIndexEvaluation::hasResults(const QFRawDataRecord *r1, int index) const {
+    const QFRawDataRecord* r=r1;
     QString rsid=getEvaluationResultID(index);
     return r->resultsExistsFromEvaluation(rsid);
 }
@@ -110,19 +110,19 @@ void QFUsesResultsByIndexEvaluation::setFitResultValueNumberArray(QFRawDataRecor
     setFitResultValueNumberArray(r, getEvaluationResultID(index), parameterID, value, N, unit);
 }
 
-QVector<double> QFUsesResultsByIndexEvaluation::getFitValueNumberArray(QFRawDataRecord *r, int index, const QString &parameterID) const {
+QVector<double> QFUsesResultsByIndexEvaluation::getFitValueNumberArray(const QFRawDataRecord *r, int index, const QString &parameterID) const {
     return getFitValueNumberArray(r, getEvaluationResultID(index), parameterID);
 }
 
-QVector<double> QFUsesResultsByIndexEvaluation::getFitValueErrorArray(QFRawDataRecord *r, int index, const QString &parameterID) const {
+QVector<double> QFUsesResultsByIndexEvaluation::getFitValueErrorArray(const QFRawDataRecord *r, int index, const QString &parameterID) const {
     return getFitValueErrorArray(r, getEvaluationResultID(index), parameterID);
 }
 
-double QFUsesResultsByIndexEvaluation::getFitValue(QFRawDataRecord *r, int index, const QString &parameterID) const {
+double QFUsesResultsByIndexEvaluation::getFitValue(const QFRawDataRecord *r, int index, const QString &parameterID) const {
     return getFitValue(r, getEvaluationResultID(index), parameterID);
 }
 
-double QFUsesResultsByIndexEvaluation::getFitError(QFRawDataRecord *r, int index, const QString &parameterID) const {
+double QFUsesResultsByIndexEvaluation::getFitError(const QFRawDataRecord *r, int index, const QString &parameterID) const {
     return getFitError(r, getEvaluationResultID(index), parameterID);
 }
 
@@ -138,7 +138,7 @@ void QFUsesResultsByIndexEvaluation::setFitResultFix(QFRawDataRecord *r, int ind
     setFitResultFix(r, getEvaluationResultID(index), parameterID, fix);
 }
 
-bool QFUsesResultsByIndexEvaluation::getFitFix(QFRawDataRecord *r, int index, const QString &parameterID) const {
+bool QFUsesResultsByIndexEvaluation::getFitFix(const QFRawDataRecord *r, int index, const QString &parameterID) const {
     return getFitFix(r, getEvaluationResultID(index), parameterID);
 }
 
@@ -164,11 +164,11 @@ int QFUsesResultsByIndexEvaluation::getCurrentIndex() const {
     return currentIndex;
 }
 
-int QFUsesResultsByIndexEvaluation::getIndexMin(QFRawDataRecord *r) const {
+int QFUsesResultsByIndexEvaluation::getIndexMin(const QFRawDataRecord *r) const {
     return 0;
 }
 
-int QFUsesResultsByIndexEvaluation::getIndexMax(QFRawDataRecord *r) const {
+int QFUsesResultsByIndexEvaluation::getIndexMax(const QFRawDataRecord *r) const {
     return 0;
 }
 

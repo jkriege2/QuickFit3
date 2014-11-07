@@ -135,7 +135,7 @@ void QFRDRFCSFitFunctionSimulator::setFitValue(const QString &id, double value, 
     params[id].valueset=true;
 }
 
-double QFRDRFCSFitFunctionSimulator::getFitValue(const QString &id, QFRawDataRecord* r) const
+double QFRDRFCSFitFunctionSimulator::getFitValue(const QString &id, const QFRawDataRecord* r) const
 {
     QScopedPointer<QFFitFunction> ffunc(getFitFunction(r));
 
@@ -156,7 +156,7 @@ double QFRDRFCSFitFunctionSimulator::getFitValue(const QString &id, QFRawDataRec
     return 0;
 }
 
-double QFRDRFCSFitFunctionSimulator::getFitError(const QString &id, QFRawDataRecord *r) const
+double QFRDRFCSFitFunctionSimulator::getFitError(const QString &id, const QFRawDataRecord *r) const
 {
     QScopedPointer<QFFitFunction> ffunc(getFitFunction(r));
 
@@ -178,7 +178,7 @@ void QFRDRFCSFitFunctionSimulator::setFitError(const QString &id, double error, 
     params[id].error=error;
 }
 
-bool QFRDRFCSFitFunctionSimulator::getFitFix(const QString &id, QFRawDataRecord *r) const
+bool QFRDRFCSFitFunctionSimulator::getFitFix(const QString &id, const QFRawDataRecord *r) const
 {
     return false;
 }
@@ -199,7 +199,7 @@ void QFRDRFCSFitFunctionSimulator::resetDefaultFitFix(const QString &id)
 {
 }
 
-double QFRDRFCSFitFunctionSimulator::getDefaultFitValue(const QString &id, QFRawDataRecord *r) const {
+double QFRDRFCSFitFunctionSimulator::getDefaultFitValue(const QString &id, const QFRawDataRecord *r) const {
     QScopedPointer<QFFitFunction> ffunc(getFitFunction(r));
 
     if (ffunc) {
@@ -217,11 +217,11 @@ double QFRDRFCSFitFunctionSimulator::getDefaultFitValue(const QString &id, QFRaw
     return 0;
 }
 
-bool QFRDRFCSFitFunctionSimulator::getDefaultFitFix(const QString &id, QFRawDataRecord *r) const {
+bool QFRDRFCSFitFunctionSimulator::getDefaultFitFix(const QString &id, const QFRawDataRecord *r) const {
     return false;
 }
 
-QFFitFunction *QFRDRFCSFitFunctionSimulator::getFitFunction(QFRawDataRecord *r) const {
+QFFitFunction *QFRDRFCSFitFunctionSimulator::getFitFunction(const QFRawDataRecord *r) const {
     //return m_fitFunctions.value(ui->cmbFunction->itemData(ui->cmbFunction->currentIndex()).toString(), NULL);
     return ui->cmbFunction->createCurrentInstance();
 }
@@ -422,7 +422,7 @@ void QFRDRFCSFitFunctionSimulator::modelChanged(int index) {
     QApplication::restoreOverrideCursor();
 }
 
-double QFRDRFCSFitFunctionSimulator::getFitMax(const QString &id, QFRawDataRecord* r) const
+double QFRDRFCSFitFunctionSimulator::getFitMax(const QString &id, const QFRawDataRecord *r) const
 {
     QScopedPointer<QFFitFunction> ffunc(getFitFunction(r));
 
@@ -440,7 +440,7 @@ double QFRDRFCSFitFunctionSimulator::getFitMax(const QString &id, QFRawDataRecor
     return 0;
 }
 
-double QFRDRFCSFitFunctionSimulator::getFitMin(const QString &id, QFRawDataRecord *r) const
+double QFRDRFCSFitFunctionSimulator::getFitMin(const QString &id, const QFRawDataRecord *r) const
 {
     QScopedPointer<QFFitFunction> ffunc(getFitFunction(r));
 

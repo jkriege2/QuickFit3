@@ -44,12 +44,12 @@ class QFLIB_EXPORT QFFitParameterBasicInterface {
          */
         virtual void setFitValue(const QString& id, double value, QFRawDataRecord* r=NULL)=0;
         /*! \brief return the value of a given parameter        */
-        virtual double getFitValue(const QString& id, QFRawDataRecord* r=NULL) const=0;
+        virtual double getFitValue(const QString& id, const QFRawDataRecord* r=NULL) const=0;
         /*! \brief return the fit error of a given parameter
             \return the error associated with the given parameter.
                     The error may only be stored in the QFRawDataRecord, if it is not available or accessible, then \c 0 is returned
         */
-        virtual double getFitError(const QString& id, QFRawDataRecord* r=NULL) const=0;
+        virtual double getFitError(const QString& id, const QFRawDataRecord* r=NULL) const=0;
         /*! \brief set the error of a given parameter
 
             \param id set the value of the parameter with this id (see QFFitFunction)
@@ -65,7 +65,7 @@ class QFLIB_EXPORT QFFitParameterBasicInterface {
         /*! \brief return the fix property of a given parameter
             \param id set the value of the parameter with this id (see QFFitFunction)
         */
-        virtual bool getFitFix(const QString& id, QFRawDataRecord* r=NULL) const=0;
+        virtual bool getFitFix(const QString& id, const QFRawDataRecord* r=NULL) const=0;
         /*! \brief set the value range of a fit parameter
             \param id set the value of the parameter with this id (see QFFitFunction)
             \param min lower bound for the value
@@ -88,11 +88,11 @@ class QFLIB_EXPORT QFFitParameterBasicInterface {
         /*! \brief return the lower value bound of a given parameter
             \param id set the value of the parameter with this id (see QFFitFunction)
         */
-        virtual double getFitMin(const QString& id, QFRawDataRecord* r=NULL) const=0;
+        virtual double getFitMin(const QString& id, const QFRawDataRecord* r=NULL) const=0;
         /*! \brief return the upper value bound of a given parameter
             \param id set the value of the parameter with this id (see QFFitFunction)
         */
-        virtual double getFitMax(const QString& id, QFRawDataRecord* r=NULL) const=0;
+        virtual double getFitMax(const QString& id, const QFRawDataRecord* r=NULL) const=0;
 
 
         /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value in the initial parameters
@@ -117,9 +117,9 @@ class QFLIB_EXPORT QFFitParameterBasicInterface {
         /*! \brief reset the given parameter \a id to the initial/global/default fix */
         virtual void resetDefaultFitFix(const QString& id)=0;
         /*! \brief return the default/initial/global value of a given parameter        */
-        virtual double getDefaultFitValue(const QString& id, QFRawDataRecord* r=NULL) const=0;
+        virtual double getDefaultFitValue(const QString& id, const QFRawDataRecord* r=NULL) const=0;
         /*! \brief return the default/initial/global fix of a given parameter        */
-        virtual bool getDefaultFitFix(const QString& id, QFRawDataRecord* r=NULL) const=0;
+        virtual bool getDefaultFitFix(const QString& id, const QFRawDataRecord* r=NULL) const=0;
         /*! \brief reset the all parameters to the initial/global/default value in all files */
         virtual void resetAllFitValue()=0;
         /*! \brief reset the all parameters to the initial/global/default fix in all files */

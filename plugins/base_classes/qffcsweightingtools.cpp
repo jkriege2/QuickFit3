@@ -172,12 +172,12 @@ QFFCSWeightingTools::DataWeight QFFCSWeightingTools::stringToDataWeight(QString 
 //                const double lx=log(taudat[i]);
 //                weights[i]=fabs(corrdat[i]-statisticsPolyEval<double>(lx, p.data(), P));
 
-double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, QFRawDataRecord *record_in, int run_in, int data_start, int data_end) const
+double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecord *record_in, int run_in, int data_start, int data_end) const
 {
     if (weightsOKK) *weightsOKK=false;
-    QFRawDataRecord* record=record_in;
+    const QFRawDataRecord* record=record_in;
     //if (!record_in) record=getHighlightedRecord();
-    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    const QFRDRFCSDataInterface* data=dynamic_cast<const QFRDRFCSDataInterface*>(record);
 
     int run=run_in;
     //if (run<=-100) run=getCurrentIndex();
