@@ -67,9 +67,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define GLOBAL_INI services->getConfigFileDirectory()+QString("/cam_andor.ini")
 
 
-//QElapsedTimer __timer; \
-//__timer.start(); \
-//qDebug()<<"ANDOR_INSTRUCTION  \""<<#s<<"\":  duration: "<<__timer.nsecsElapsed()/1e6<<" msecs"; \
+//QElapsedTimer __timer;
+//__timer.start();
+//qDebug()<<"ANDOR_INSTRUCTION  \""<<#s<<"\":  duration: "<<__timer.nsecsElapsed()/1e6<<" msecs";
 
 #define CHECK(s, msg) \
 { \

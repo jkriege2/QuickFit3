@@ -118,8 +118,6 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfselectionlistdialog.h \
     qfcompletertextedit.h \
     qfqtscripthighlighter.h \
-    qfcompletertextedit.h \
-    qfqtscripthighlighter.h \
     ../../../../LIB/trunk/qt/jkqtpparsedfunctionelements.h \
     ../../../../LIB/trunk/jkmathparser.h \
     qfhtmlhighlighter.h \

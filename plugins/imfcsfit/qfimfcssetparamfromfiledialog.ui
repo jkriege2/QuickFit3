@@ -153,7 +153,7 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="layoutWidget">
+     <widget class="QWidget" name="layoutWidget1">
       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1">
        <item>
         <widget class="QCheckBox" name="chkImageTransform">

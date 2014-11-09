@@ -599,9 +599,9 @@ void QFTableModel::setColumn(quint32 column, const QList<QVariant>& value)
         //}
         row++;
     }
-    if (state.rows>value.size()) {
+    if ((qint64)state.rows>value.size()) {
          doEmitSignals=false;
-         for (int i=value.size(); i<state.rows; i++) {
+         for (int i=value.size(); i<(qint64)state.rows; i++) {
              deleteCell(i, column);
              row++;
          }
@@ -630,9 +630,9 @@ void QFTableModel::setColumn(quint32 column, const double *value, int N)
         }
         row++;
     }
-    if (state.rows>N) {
+    if ((qint64)state.rows>N) {
          doEmitSignals=false;
-         for (int i=N; i<state.rows; i++) {
+         for (int i=N; i<(qint64)state.rows; i++) {
              deleteCell(i, column);
              row++;
          }
@@ -910,7 +910,7 @@ void QFTableModel::copyCellFromModelCreate(QAbstractTableModel *model, int colum
                 if (doCopyHeader) break;
             }
         }
-        if (doCopyHeader && column_here<state.columns && copyHeader && *copyHeader==copyHeaderAskUser) {
+        if (doCopyHeader && column_here<(qint64)state.columns && copyHeader && *copyHeader==copyHeaderAskUser) {
             int user=QMessageBox::question(NULL, tr("copy header"), tr("The header in the source and target table are different.\nDo you want to overwrite the header in the target table?"), QMessageBox::Yes|QMessageBox::YesAll|QMessageBox::No|QMessageBox::NoAll, QMessageBox::No);
             if (user==QMessageBox::No) {
                 doCopyHeader=false;
@@ -926,7 +926,7 @@ void QFTableModel::copyCellFromModelCreate(QAbstractTableModel *model, int colum
                 *copyHeader=QFTableModel::copyHeader;
             }
         }
-        if (doCopyHeader || column_here>=state.columns) {
+        if (doCopyHeader || column_here>=(qint64)state.columns) {
             setColumnTitleCreate(column_here, tm->columnTitle(column));
             const QHash<int, QVariant>& hd=tm->state.headerDataMap[column];
             for (int i=0; i<hd.keys().size(); i++) {
@@ -947,7 +947,7 @@ void QFTableModel::copyCellFromModelCreate(QAbstractTableModel *model, int colum
 
     } else {
         bool doCopyHeader=(headerData(column_here, Qt::Horizontal)!=model->headerData(column, Qt::Horizontal));
-        if (doCopyHeader && column_here<state.columns && copyHeader && *copyHeader==copyHeaderAskUser) {
+        if (doCopyHeader && column_here<(qint64)state.columns && copyHeader && *copyHeader==copyHeaderAskUser) {
             int user=QMessageBox::question(NULL, tr("copy header"), tr("The header in the source and target table are different.\nDo you want to overwrite the header in the target table?"), QMessageBox::Yes|QMessageBox::YesAll|QMessageBox::No|QMessageBox::NoAll, QMessageBox::No);
             if (user==QMessageBox::No) {
                 doCopyHeader=false;
@@ -963,7 +963,7 @@ void QFTableModel::copyCellFromModelCreate(QAbstractTableModel *model, int colum
                 *copyHeader=QFTableModel::copyHeader;
             }
         }
-        if (doCopyHeader || column_here>=state.columns) {
+        if (doCopyHeader || column_here>=(qint64)state.columns) {
             setColumnTitleCreate(column_here, model->headerData(column, Qt::Horizontal).toString());
         }
         deleteCell(row_here, column_here);
@@ -1501,7 +1501,7 @@ QList<QList<QVariant> > QFTableModel::getDataTable(QStringList &colNames, QStrin
 
     QList<QVariant> dempty;
     if (saveCompleteTable) {
-        for (int r=0; r<state.rows; r++) {
+        for (int r=0; r<(qint64)state.rows; r++) {
             dempty<<QVariant();
         }
     } else {

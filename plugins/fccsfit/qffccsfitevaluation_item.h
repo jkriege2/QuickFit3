@@ -276,7 +276,7 @@ class QFFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, pu
             The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
           */
         virtual void doFitForMultithread(const QList<QFRawDataRecord*>& records, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const;
-        virtual void doFitForMultithreadReturn(QList<QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult>& result, const QList<const QFRawDataRecord *> &records, const QStringList& fitfunctionIDs, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const;
+        virtual void doFitForMultithreadReturn(QList<QFRawDataRecord::QFFitFitResultsStore>& result, const QList<const QFRawDataRecord *> &records, const QStringList& fitfunctionIDs, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const;
 
     protected:
 

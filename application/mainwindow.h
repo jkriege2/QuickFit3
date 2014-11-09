@@ -413,6 +413,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
 
 
         void clipboardDataChanged();
+
+        void setProjectSortOrder(QAction* act);
+        void setProjectSortOrderActions(int order);
     private:
         bool clipboardContainsProjectXML() const;
 
@@ -472,6 +475,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         QMenu *fileMenu;
         QMenu* projectSpecialMenu;
         QMenu *dataMenu;
+        QMenu *viewMenu;
         QMenu *evaluationMenu;
         QMenu *helpMenu;
         QMenu* wizardsMenu;
@@ -499,6 +503,11 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         QAction* helpAct;
         QAction* helpCitingAct;
         QList<QAction*> helpActList;
+
+        QMenu* menuProjectSort;
+        QActionGroup* actsSort;
+
+
 
         QAction* helpCopyrightAct;
         QAction* helpPluginCopyrightAct;

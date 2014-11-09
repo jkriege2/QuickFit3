@@ -247,7 +247,7 @@ int QFRawDataRecord::getFilesCount() const
     return files.size();
 }
 
-void QFRawDataRecord::setFileName(int i, const QString file)
+void QFRawDataRecord::setFileName(int i, const QString &file)
 {
     if (i>=0 && i<files.size()) {
         #ifdef DEBUG_THREAN
@@ -262,7 +262,7 @@ void QFRawDataRecord::setFileName(int i, const QString file)
     emit basicPropertiesChanged();
 }
 
-void QFRawDataRecord::setFileType(int i, const QString type)
+void QFRawDataRecord::setFileType(int i, const QString &type)
 {
     if (i>=0 && i<files.size()) {
         #ifdef DEBUG_THREAN
@@ -278,7 +278,7 @@ void QFRawDataRecord::setFileType(int i, const QString type)
     emit basicPropertiesChanged();
 }
 
-void QFRawDataRecord::setFileDecsription(int i, const QString description)
+void QFRawDataRecord::setFileDecsription(int i, const QString &description)
 {
     if (i>=0 && i<files.size()) {
         #ifdef DEBUG_THREAN
@@ -295,7 +295,7 @@ void QFRawDataRecord::setFileDecsription(int i, const QString description)
 
 }
 
-void QFRawDataRecord::addFile(const QString file, const QString type, const QString description)
+void QFRawDataRecord::addFile(const QString &file, const QString &type, const QString &description)
 {
     {
         #ifdef DEBUG_THREAN
@@ -910,7 +910,7 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
     w.writeStartElement("properties");
     storeProperties(w);
     w.writeEndElement();
-    if (writeMode & QFProject::wsmRDRResults == QFProject::wsmRDRResults) {
+    if ((writeMode & QFProject::wsmRDRResults) == QFProject::wsmRDRResults) {
         w.writeStartElement("results");
         QFRawDataRecordPrivate::ResultsIterator i(dstore->results);
         while (i.hasNext()) {
@@ -2634,6 +2634,51 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
     emitResultsChanged(evaluationName, resultName, false);
 }
 
+void QFRawDataRecord::resultsSet(const QString &evaluationName, const QMap<QString, QFRawDataRecord::evaluationResult> &results)
+{
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    QMapIterator<QString, QFRawDataRecord::evaluationResult> it(results);
+    while (it.hasNext()) {
+        it.next();
+        dstore->results[evaluationName]->results.insert(it.key(), it.value());
+        emitResultsChanged(evaluationName, it.key(), false);
+    }
+}
+
+void QFRawDataRecord::resultsSet(const QFRawDataRecord::QFFitFitResultsStore &results, bool setGroupProps)
+{
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+#endif
+ QWriteLocker locker(lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+    const QString& evaluationName=results.evalID;
+    if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
+    if (setGroupProps) {
+        dstore->results[evaluationName]->group=results.evalgroup;
+        dstore->results[evaluationName]->description=results.egroupdescription;
+        dstore->results[evaluationName]->groupIndex=results.egroupindex;
+        dstore->results[evaluationName]->group=results.evalgroup;
+        dstore->evalGroupLabels[results.evalgroup]=results.egrouplabel;
+    }
+    QMapIterator<QString, QFRawDataRecord::evaluationResult> it(results.fitresults);
+    while (it.hasNext()) {
+        it.next();
+        dstore->results[evaluationName]->results.insert(it.key(), it.value());
+        emitResultsChanged(evaluationName, it.key(), false);
+    }
+
+}
+
 QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(const QString& evalName, const QString& resultName) const
 {
     #ifdef DEBUG_THREAN
@@ -2647,7 +2692,7 @@ QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(const QString& eva
     if (dstore->results.contains(evalName)) {
         if (dstore->results[evalName]->results.contains(resultName)) {
             if (dstore->results[evalName]) {
-                r=dstore->results[evalName]->results[resultName];
+                return dstore->results[evalName]->results[resultName];
             }
         }
     }
@@ -2664,6 +2709,12 @@ QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(const QString& eva
         return dstore->results[evalName]->results.value(resultName);
     }*/
     return r;
+}
+
+bool QFRawDataRecord::resultsHasError(const QString &evalName, const QString &resultName) const
+{
+    QFRawDataRecord::evaluationResult r=resultsGet(evalName, resultName);
+    return (r.type==qfrdreNumberError) || (r.type==qfrdreNumberErrorVector) || (r.type==qfrdreNumberErrorMatrix);
 }
 
 qfmpResult QFRawDataRecord::resultsGetForMathParser(const QString &evalName, const QString &resultName) const
@@ -2868,6 +2919,149 @@ QVariant QFRawDataRecord::resultsGetAsQVariantOnlyError(const QString &evalName,
                 result=data;
             } break;
         default: result=QVariant(); break;
+    }
+    return result;
+}
+
+QVariantList QFRawDataRecord::resultsGetAsQVariantList(const QString &evalName, const QString &resultName) const
+{
+    QVariantList result;
+    const evaluationResult r=resultsGet(evalName, resultName);
+    switch(r.type) {
+        case qfrdreBoolean: result<<r.bvalue; break;
+        case qfrdreInteger: result<<(qlonglong)r.ivalue; break;
+        case qfrdreNumberError: result<<QPointF(r.dvalue, r.derror); break;
+        case qfrdreNumber: result<<r.dvalue; break;
+        case qfrdreNumberMatrix:
+        case qfrdreNumberVector: {
+            for (int i=0; i<r.dvec.size(); i++) {
+                result.append(r.dvec[i]);
+            }
+            break;
+        }
+        case qfrdreStringMatrix:
+        case qfrdreStringVector: {
+            for (int i=0; i<r.svec.size(); i++) {
+                result.append(r.svec[i]);
+            }
+            break;
+        }
+        case qfrdreNumberErrorMatrix:
+        case qfrdreNumberErrorVector: {
+            for (int i=0; i<qMin(r.dvec.size(), r.evec.size()); i++) {
+                result.append(QPointF(r.dvec[i], r.evec[i]));
+            }
+            break;
+        }
+        case qfrdreIntegerMatrix:
+        case qfrdreIntegerVector: {
+            QList<QVariant> data;
+            for (int i=0; i<r.ivec.size(); i++) {
+                result.append(r.ivec[i]);
+            }
+            break;
+        }
+        case qfrdreBooleanMatrix:
+        case qfrdreBooleanVector: {
+            QList<QVariant> data;
+            for (int i=0; i<r.bvec.size(); i++) {
+                result.append(r.bvec[i]);
+            }
+            break;
+        }
+        case qfrdreString: result<<r.svalue; break;
+        default:  break;
+    }
+    return result;
+}
+
+QVariantList QFRawDataRecord::resultsGetAsQVariantListNoError(const QString &evalName, const QString &resultName) const
+{
+    QVariantList result;
+    const evaluationResult r=resultsGet(evalName, resultName);
+    switch(r.type) {
+        case qfrdreBoolean: result<<QVariant(r.bvalue); break;
+        case qfrdreInteger: result<<QVariant((qlonglong)r.ivalue); break;
+        case qfrdreNumberError: result<<QVariant(r.dvalue); break;
+        case qfrdreNumber: result<<QVariant(r.dvalue); break;
+        case qfrdreNumberMatrix:
+        case qfrdreNumberVector:
+        case qfrdreNumberErrorMatrix:
+        case qfrdreNumberErrorVector: {
+            for (int i=0; i<r.dvec.size(); i++) {
+                result.append(QVariant(r.dvec[i]));
+            }
+            break;
+        }
+        case qfrdreStringMatrix:
+        case qfrdreStringVector: {
+            for (int i=0; i<r.svec.size(); i++) {
+                result.append(r.svec[i]);
+            }
+            break;
+        }
+        case qfrdreIntegerMatrix:
+        case qfrdreIntegerVector: {
+            for (int i=0; i<r.ivec.size(); i++) {
+                result.append(r.ivec[i]);
+            }
+            break;
+        }
+        case qfrdreBooleanMatrix:
+        case qfrdreBooleanVector: {
+            for (int i=0; i<r.bvec.size(); i++) {
+                result.append(r.bvec[i]);
+            }
+            break;
+        }
+        case qfrdreString: result<<r.svalue; break;
+        default:  break;
+    }
+    return result;
+}
+
+QVariantList QFRawDataRecord::resultsGetAsQVariantListOnlyError(const QString &evalName, const QString &resultName) const
+{
+    QVariantList result;
+    const evaluationResult r=resultsGet(evalName, resultName);
+    switch(r.type) {
+        case qfrdreString:
+        case qfrdreNumber:
+        case qfrdreBoolean:
+        case qfrdreInteger: result<<double(0.0); break;
+        case qfrdreNumberError: result<<r.derror; break;
+        case qfrdreNumberMatrix:
+        case qfrdreNumberVector: {
+                for (int i=0; i<r.dvec.size(); i++) {
+                    result.append(double(0.0));
+                }
+            } break;
+        case qfrdreNumberErrorMatrix:
+        case qfrdreNumberErrorVector: {
+            for (int i=0; i<r.dvec.size(); i++) {
+                result.append(r.evec.value(i, 0.0));
+            }
+            break;
+        }
+        case qfrdreStringMatrix:
+        case qfrdreStringVector: {
+                for (int i=0; i<r.svec.size(); i++) {
+                    result.append(double(0.0));
+                }
+            } break;
+        case qfrdreIntegerMatrix:
+        case qfrdreIntegerVector: {
+                for (int i=0; i<r.ivec.size(); i++) {
+                    result.append(double(0.0));
+                }
+            } break;
+        case qfrdreBooleanMatrix:
+        case qfrdreBooleanVector: {
+                for (int i=0; i<r.bvec.size(); i++) {
+                    result.append(double(0.0));
+                }
+            } break;
+        default:  break;
     }
     return result;
 }

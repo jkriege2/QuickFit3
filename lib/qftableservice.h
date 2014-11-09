@@ -42,7 +42,13 @@ class QFLIB_EXPORT QFTableService {
 
 
         struct TableColumn {
-            QVector<double> data;
+            QList<QVariant> data;
+            inline void setDoubleVec(const QVector<double>& data) {
+                this->data.clear();
+                for (int i=0; i<data.size(); i++)
+                    this->data<<data[i];
+            }
+
             QString name;
         };
 

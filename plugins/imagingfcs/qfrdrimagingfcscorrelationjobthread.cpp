@@ -1569,23 +1569,23 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
             for (int i=0; i<NFitFrames; i++) {
                 int iidx=trunc((double)i/(double)(NFitFrames-1)*(double)frames);
                 if (iidx<0) iidx=0;
-                if (iidx>=frames) iidx=frames-1;
+                if (iidx>=(int64_t)frames) iidx=frames-1;
                 fit_t[i]=(double)iidx+(double)job.bleachAvgFrames/2.0;
                 //qDebug()<<i<<"/"<<NFitFrames<<":    "<<iidx<<"/"<<frames;
-                for (int idx=0; idx<frame_width*frame_height; idx++) {
+                for (uint64_t idx=0; idx<frame_width*frame_height; idx++) {
                     fit_frames[i*frame_width*frame_height+idx]=image_series[iidx*frame_width*frame_height+idx];
                 }
                 if (job.bleachAvgFrames>1) {
                     float sum=1;
-                    for (int f=1; f<job.bleachAvgFrames; f++) {
-                        if (iidx+f<frames) {
-                            for (int idx=0; idx<frame_width*frame_height; idx++) {
+                    for (uint64_t f=1; f<job.bleachAvgFrames; f++) {
+                        if (iidx+(int64_t)f<(int64_t)frames) {
+                            for (uint64_t idx=0; idx<frame_width*frame_height; idx++) {
                                 fit_frames[i*frame_width*frame_height+idx]+=image_series[(iidx+f)*frame_width*frame_height+idx];
                             }
                             sum++;
                         }
                     }
-                    for (int idx=0; idx<frame_width*frame_height; idx++) {
+                    for (uint64_t idx=0; idx<frame_width*frame_height; idx++) {
                         fit_frames[i*frame_width*frame_height+idx]/=sum;
                     }
                 }
@@ -1981,8 +1981,8 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_dv2_statistics(QFRDRImag
     //qDebug()<<"contribute_to_dv2_statistics "<<dv_width<<"x"<<dv_height<<"   shift=("<<shiftX1<<","<<shiftY1<<")";
     float* frame_data1=(float*)qfMalloc(dv_width*dv_height*sizeof(float));
     // copy frame 1
-    for (uint32_t y=0; y<dv_height; y++) {
-        for (uint32_t x=0; x<dv_width; x++) {
+    for (int y=0; y<dv_height; y++) {
+        for (int x=0; x<dv_width; x++) {
             frame_data1[y*dv_width+x]=frame_data[y*frame_width+x];
         }
     }
@@ -1990,8 +1990,8 @@ void QFRDRImagingFCSCorrelationJobThread::contribute_to_dv2_statistics(QFRDRImag
     contribute_to_statistics(state1, frame_data1, dv_width, dv_height, frame, frames, NULL, NULL, NULL, dummyUI32, dummyF, dummyF, statistics1, isBackground);
 
     // copy frame 2
-    for (uint32_t y=0; y<dv_height; y++) {
-        for (uint32_t x=0; x<dv_width; x++) {
+    for (int y=0; y<dv_height; y++) {
+        for (int x=0; x<dv_width; x++) {
             frame_data1[y*dv_width+x]=frame_data[(y+shiftY1)*frame_width+(x+shiftX1)];
         }
     }
@@ -2115,12 +2115,12 @@ bool QFRDRImagingFCSCorrelationJobThread::SaveTIFFUInt16_scaled(const QString &f
     if (tif) {
         float avgMin=average_frame[0];
         float avgMax=average_frame[0];
-        for (uint32_t i=0; i<frame_width*frame_height; i++) {
+        for (int64_t i=0; i<frame_width*frame_height; i++) {
             avgMin=(average_frame[i]<avgMin)?average_frame[i]:avgMin;
             avgMax=(average_frame[i]>avgMax)?average_frame[i]:avgMax;
         }
         uint16_t* img=(uint16_t*)qfMalloc(frame_width*frame_height*sizeof(uint16_t));
-        for (uint32_t i=0; i<frame_width*frame_height; i++) {
+        for (int64_t i=0; i<frame_width*frame_height; i++) {
             img[i]=(uint16_t)round((double)(average_frame[i]-avgMin)*(double)0xFFFF/fabs(avgMax-avgMin));
         }
         TIFFTWriteUint16(tif, img, frame_width, frame_height);
@@ -2273,9 +2273,9 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
             for (int i=0; i<NFitFrames; i++) {
                 int iidx=trunc((double)i/(double)(NFitFrames-1)*(double)frames);
                 if (iidx<0) iidx=0;
-                if (iidx>=frames) iidx=frames-1;
+                if (iidx>=(int64_t)frames) iidx=frames-1;
                 fit_t[i]=(double)iidx+(double)job.bleachAvgFrames/2.0;
-                while (frame<iidx) {
+                while ((int64_t)frame<iidx) {
                     reader->nextFrame();
                     frame++;
                 }
@@ -2283,19 +2283,19 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadsingle() {
                     m_status=-1;
                 }
                 //qDebug()<<i<<"/"<<NFitFrames<<":    "<<iidx<<"/"<<frames;
-                for (int idx=0; idx<frame_width*frame_height; idx++) {
+                for (uint64_t idx=0; idx<frame_width*frame_height; idx++) {
                     fit_frames[i*frame_width*frame_height+idx]=frame_data[idx];
                 }
                 if (job.bleachAvgFrames>1) {
-                    for (int f=1; f<job.bleachAvgFrames; f++) {
+                    for (uint32_t f=1; f<job.bleachAvgFrames; f++) {
                         reader->nextFrame();
                         frame++;
                         if (!reader->readFrameFloat(frame_data)) { m_status=-1; }
-                        for (int idx=0; idx<frame_width*frame_height; idx++) {
+                        for (uint64_t idx=0; idx<frame_width*frame_height; idx++) {
                             fit_frames[i*frame_width*frame_height+idx]+=frame_data[idx];
                         }
                     }
-                    for (int idx=0; idx<frame_width*frame_height; idx++) {
+                    for (uint64_t idx=0; idx<frame_width*frame_height; idx++) {
                         fit_frames[i*frame_width*frame_height+idx]/=(float)job.bleachAvgFrames;
                     }
                 }

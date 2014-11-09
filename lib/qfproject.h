@@ -73,6 +73,12 @@ typedef QMap<QString, QVariant> qfp_param_type;
 */
 class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         Q_OBJECT
+    public:
+        enum ProjectSortOrder {
+            sortByID=0,
+            sortByName=1,
+            sortByFolderTypeNameRole=2
+        };
     protected:
         /** \brief contains the currently highest ID */
         int highestID;
@@ -108,6 +114,9 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \brief data model representing the items in the model as a tree.
          * This model is used to display the project tree */
         QFProjectTreeModel* treeModel;
+
+        /** \brief project sort order */
+        ProjectSortOrder m_sortOrder;
 
 
         QFEvaluationItemFactory* evalFactory;
@@ -196,13 +205,13 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \brief returns \c true if a raw data record for the specified ID exists */
         bool evaluationIDExists(int ID)const;
         /** \brief returns \c true if a raw data record for the specified ID exists */
-        bool rawDataExists(QFRawDataRecord* rec) const;
+        bool rawDataExists(const QFRawDataRecord* rec) const;
         /** \brief returns \c true if a raw data record for the specified ID exists */
-        bool evaluationExists(QFEvaluationItem* rec) const;
+        bool evaluationExists(const QFEvaluationItem* rec) const;
         /** \brief returns \c true if a raw data record for the specified ID exists */
-        int getRawDataIndex(QFRawDataRecord* rec) const;
+        int getRawDataIndex(const QFRawDataRecord* rec) const;
         /** \brief returns \c true if a raw data record for the specified ID exists */
-        bool getEvaluationIndex(QFEvaluationItem* rec) const;
+        bool getEvaluationIndex(const QFEvaluationItem* rec) const;
         /** \brief return the raw data record specified by the ID, or \c NULL */
         QFRawDataRecord* getRawDataByID(int ID) const;
         /** \brief return the i-th raw data record, or \c NULL */
@@ -212,37 +221,58 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
 
 
         /** \brief return the next sibling rawdata record, or NULL if none */
-        QFRawDataRecord* getNextRawData(QFRawDataRecord* current);
+        QFRawDataRecord* getNextRawData( QFRawDataRecord* current) const;
         /** \brief return the previous sibling rawdata record, or NULL if none */
-        QFRawDataRecord* getPreviousRawData(QFRawDataRecord* current);
+        QFRawDataRecord* getPreviousRawData( QFRawDataRecord* current) const;
         /** \brief return the next sibling rawdata record, or NULL if none, which has the same type as current */
-        QFRawDataRecord* getNextRawDataOfSameType(QFRawDataRecord* current);
+        QFRawDataRecord* getNextRawDataOfSameType( QFRawDataRecord* current) const;
         /** \brief return the previous sibling rawdata record, or NULL if none, which has the same type as current */
-        QFRawDataRecord* getPreviousRawDataOfSameType(QFRawDataRecord* current);
+        QFRawDataRecord* getPreviousRawDataOfSameType( QFRawDataRecord *current) const;
         /** \brief return the raw data record specified by the ID, or \c NULL */
         QFEvaluationItem* getEvaluationByID(int ID) const;
         /** \brief return the i-th raw data record, or \c NULL */
         QFEvaluationItem* getEvaluationByNum(int i) const;
         /** \brief return the next sibling rawdata record, or NULL if none */
-        QFEvaluationItem* getNextEvaluation(QFEvaluationItem* current);
+        QFEvaluationItem* getNextEvaluation( QFEvaluationItem* current) const;
         /** \brief return the previous sibling rawdata record, or NULL if none */
-        QFEvaluationItem* getPreviousEvaluation(QFEvaluationItem* current);
+        QFEvaluationItem* getPreviousEvaluation( QFEvaluationItem* current) const;
         /** \brief return the next sibling rawdata record, or NULL if none */
-        QFEvaluationItem* getNextEvaluationOfSameType(QFEvaluationItem* current);
+        QFEvaluationItem* getNextEvaluationOfSameType( QFEvaluationItem* current) const;
         /** \brief return the previous sibling rawdata record, or NULL if none */
-        QFEvaluationItem* getPreviousEvaluationOfSameType(QFEvaluationItem* current);
+        QFEvaluationItem* getPreviousEvaluationOfSameType( QFEvaluationItem* current) const;
+
+        /** \brief return the next sibling rawdata record, or NULL if none */
+        const QFRawDataRecord* getNextRawData(const QFRawDataRecord* current) const;
+        /** \brief return the previous sibling rawdata record, or NULL if none */
+        const QFRawDataRecord* getPreviousRawData(const QFRawDataRecord* current) const;
+        /** \brief return the next sibling rawdata record, or NULL if none, which has the same type as current */
+        const QFRawDataRecord* getNextRawDataOfSameType(const QFRawDataRecord* current) const;
+        /** \brief return the previous sibling rawdata record, or NULL if none, which has the same type as current */
+        const QFRawDataRecord* getPreviousRawDataOfSameType(const QFRawDataRecord *current) const;
+        /** \brief return the next sibling rawdata record, or NULL if none */
+        const QFEvaluationItem* getNextEvaluation(const QFEvaluationItem* current) const;
+        /** \brief return the previous sibling rawdata record, or NULL if none */
+        const QFEvaluationItem* getPreviousEvaluation(const QFEvaluationItem* current) const;
+        /** \brief return the next sibling rawdata record, or NULL if none */
+        const QFEvaluationItem* getNextEvaluationOfSameType(const QFEvaluationItem* current) const;
+        /** \brief return the previous sibling rawdata record, or NULL if none */
+        const QFEvaluationItem* getPreviousEvaluationOfSameType(const QFEvaluationItem* current) const;
 
         /** brief returns a QStringList with all property names currently used in the project */
         QStringList getAllPropertyNames(bool visible_only=false);
 
         /** \brief returns a QList with all the used IDs for rawData records*/
-        inline QList<int> getRawDataIDList() { return rawData.keys(); }
+        inline QList<int> getRawDataIDList() const { return rawData.keys(); }
         /** \brief returns a QList with all the used IDs for evaluations */
-        inline QList<int> getEvaluationIDList() { return evaluations.keys(); }
+        inline QList<int> getEvaluationIDList() const { return evaluations.keys(); }
         /** \brief returns a QList with all the raw data records */
-        inline QList<QFRawDataRecord*> getRawDataList() { return rawData.values(); }
+        inline QList<QFRawDataRecord*> getRawDataList() const { return rawData.values(); }
         /** \brief returns a QList with all the evaluation records */
-        inline QList<QFEvaluationItem*> getEvaluationList() { return evaluations.values(); }
+        inline QList<QFEvaluationItem*> getEvaluationList() const { return evaluations.values(); }
+        /** \brief returns a QList with all the raw data records */
+        QList<const QFRawDataRecord*> getRawDataListConst() const;
+        /** \brief returns a QList with all the evaluation records */
+        QList<const QFEvaluationItem*> getEvaluationListConst() const;
         /** \brief delete the specified raw data record */
         void deleteRawData(int ID);
         /** \brief delete the specified evaluation record */
@@ -261,7 +291,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
          * \param inputFilesTypes types of the files listed in \a inputFiles
          * \return a pointer to the newly created record
          */
-        QFRawDataRecord* addRawData(QString type, QString name=QString(""), QStringList inputFiles=QStringList(), qfp_param_type initParams=qfp_param_type(), QStringList initParamsReadonly=QStringList(), QStringList inputFilesTypes=QStringList(), QStringList inputFilesDescriptions=QStringList());
+        QFRawDataRecord* addRawData(const QString& type, const QString& name=QString(""), const QStringList&  inputFiles=QStringList(), const qfp_param_type& initParams=qfp_param_type(), const QStringList&  initParamsReadonly=QStringList(), const QStringList&  inputFilesTypes=QStringList(), const QStringList&  inputFilesDescriptions=QStringList());
         /** \brief add new raw data record
          *
          * \param type type of the record to insert ("table", "unknown", ...)
@@ -272,7 +302,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
          * \param inputFilesTypes types of the files listed in \a inputFiles
          * \return a pointer to the newly created record
          */
-        QFRawDataRecord* addRawData(QString type, QString name, QString role, QStringList inputFiles=QStringList(), qfp_param_type initParams=qfp_param_type(), QStringList initParamsReadonly=QStringList(), QStringList inputFilesTypes=QStringList(), QStringList inputFilesDescriptions=QStringList());
+        QFRawDataRecord* addRawData(const QString& type, const QString& name, const QString& role, const QStringList& inputFiles=QStringList(), const qfp_param_type& initParams=qfp_param_type(), const QStringList&  initParamsReadonly=QStringList(), const QStringList&  inputFilesTypes=QStringList(), const QStringList&  inputFilesDescriptions=QStringList());
 
         /** \brief add new evaluation record
          *
@@ -280,7 +310,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
          * \param name name of the new record
          * \return a pointer to the newly created record
          */
-        QFEvaluationItem* addEvaluation(QString type, QString name=QString(""));
+        QFEvaluationItem* addEvaluation(const QString& type, const QString& name=QString(""));
 
         /** \brief returns \c true if an error occured */
         inline bool error() const { return errorOcc; };
@@ -361,7 +391,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         bool isDummy() const;
 
         /** \brief returns \c true when the project has changed */
-        inline bool hasChanged() { return dataChange; };
+        inline bool hasChanged() const { return dataChange; };
         /** \brief returns a data model which may be used to display a list of all
          *         contained raw data items. This model is drag-enabled! */
         QFProjectRawDataModel* getRawDataModel();
@@ -409,7 +439,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
             \param filtereRecords  if this array is non-empty, only the QFRawDataRecord, evalIDs pairs in the list will be exported
             \return \c true on success
         */
-        bool rdrResultsSaveToCSV(const QString& evalFilter, QString filename, bool vectorsToAvg=false, QChar separator=',', QChar decimalPoint='.', QChar stringDelimiter='"', const QStringList &filteredFitParamIDs=QStringList(), const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords=QList<QPair<QPointer<QFRawDataRecord>, QString> >());
+        bool rdrResultsSaveToCSV(const QString& evalFilter, const QString& filename, bool vectorsToAvg=false, QChar separator=',', QChar decimalPoint='.', QChar stringDelimiter='"', const QStringList &filteredFitParamIDs=QStringList(), const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords=QList<QPair<QPointer<QFRawDataRecord>, QString> >());
 
         /*! \brief save the raw data record results stored in this project for a given evaluation to a CSV file
 
@@ -445,7 +475,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
             \param filtereRecords  if this array is non-empty, only the QFRawDataRecord, evalIDs pairs in the list will be exported
             \return \c true on success
         */
-        bool rdrResultsSaveToSYLK(const QString& evalFilter, QString filename, bool vectorsToAvg=false, bool flipTable=false, const QStringList &filteredFitParamIDs=QStringList(), const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords=QList<QPair<QPointer<QFRawDataRecord>, QString> >());
+        bool rdrResultsSaveToSYLK(const QString& evalFilter, const QString& filename, bool vectorsToAvg=false, bool flipTable=false, const QStringList &filteredFitParamIDs=QStringList(), const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords=QList<QPair<QPointer<QFRawDataRecord>, QString> >());
 
         /*! \brief save the  raw data record results stored in this project for a given evaluation to a SYLK file
 
@@ -462,12 +492,12 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
             \param filtereRecords  if this array is non-empty, only the QFRawDataRecord, evalIDs pairs in the list will be exported
             \return \c true on success
         */
-        bool rdrResultsSave(const QString& evalFilter, QString filename, int filter, bool vectorsToAvg=false, bool flipTable=false, const QStringList &filteredFitParamIDs=QStringList(), const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords=QList<QPair<QPointer<QFRawDataRecord>, QString> >());
+        bool rdrResultsSave(const QString& evalFilter, const QString& filename, int filter, bool vectorsToAvg=false, bool flipTable=false, const QStringList &filteredFitParamIDs=QStringList(), const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords=QList<QPair<QPointer<QFRawDataRecord>, QString> >());
 
         /** \brief returns a pointer to the projects RDR factory object */
-        QFRawDataRecordFactory* getRawDataRecordFactory();
+        QFRawDataRecordFactory* getRawDataRecordFactory() const;
         /** \brief returns a pointer to the projects evaluation factory object */
-        QFEvaluationItemFactory* getEvaluationItemFactory();
+        QFEvaluationItemFactory* getEvaluationItemFactory() const;
 
         enum RecordInsertModes {
             insertRecordBefore,
@@ -476,40 +506,44 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         };
 
         /** \brief move the given RDR from its current position to the specified position */
-        void moveRawDataRecordToPosition(QFRawDataRecord* rec, int positionIndex);
+        void moveRawDataRecordToPosition(const QFRawDataRecord* rec, int positionIndex);
         /** \brief move the given RDR from its current position to the specified position */
         void moveRawDataRecordToPosition(int recID, int positionIndex);
         /** \brief move the given RDR from its current position to the position of the given second record \a rec2. The record \a rec2 is moved according to the parameter \a mode */
-        void moveRawDataRecord(QFRawDataRecord* rec, QFRawDataRecord* rec2, RecordInsertModes moveMode=insertRecordBefore);
+        void moveRawDataRecord(const QFRawDataRecord* rec, const QFRawDataRecord* rec2, RecordInsertModes moveMode=insertRecordBefore);
         /** \brief move the given RDR from its current position to the position of the given second record \a recID2. The record \a recID2 is moved according to the parameter \a mode */
         void moveRawDataRecord(int recID, int recID2, RecordInsertModes moveMode=insertRecordBefore);
         /** \brief move the given RDR one position up */
-        void moveRawDataRecordUp(QFRawDataRecord* rec);
+        void moveRawDataRecordUp(const QFRawDataRecord* rec);
         /** \brief move the given RDR one position up */
         void moveRawDataRecordUp(int recID);
         /** \brief move the given RDR one position up */
-        void moveRawDataRecordDown(QFRawDataRecord* rec);
+        void moveRawDataRecordDown(const QFRawDataRecord* rec);
         /** \brief move the given RDR one position up */
         void moveRawDataRecordDown(int recID);
 
 
         /** \brief move the given evaluation from its current position to the specified position */
-        void moveEvaluationToPosition(QFEvaluationItem* rec, int positionIndex);
+        void moveEvaluationToPosition(const QFEvaluationItem* rec, int positionIndex);
         /** \brief move the given evaluation from its current position to the specified position */
         void moveEvaluationToPosition(int recID, int positionIndex);
         /** \brief move the given evaluation from its current position to the position of the given second evaluation \a rec2. The evaluation \a rec2 is moved according to the parameter \a mode */
-        void moveEvaluation(QFEvaluationItem* rec, QFEvaluationItem* rec2, RecordInsertModes moveMode=insertRecordBefore);
+        void moveEvaluation(const QFEvaluationItem* rec, const QFEvaluationItem* rec2, RecordInsertModes moveMode=insertRecordBefore);
         /** \brief move the given evaluation from its current position to the position of the given second evaluation \a recID2. The evaluation \a recID2 is moved according to the parameter \a mode */
         void moveEvaluation(int recID, int recID2, RecordInsertModes moveMode=insertRecordBefore);
         /** \brief move the given evaluation one position up */
-        void moveEvaluationUp(QFEvaluationItem* rec);
+        void moveEvaluationUp(const QFEvaluationItem* rec);
         /** \brief move the given evaluation one position up */
         void moveEvaluationUp(int recID);
         /** \brief move the given evaluation one position up */
-        void moveEvaluationDown(QFEvaluationItem* rec);
+        void moveEvaluationDown(const QFEvaluationItem* rec);
         /** \brief move the given evaluation one position up */
         void moveEvaluationDown(int recID);
 
+    protected slots:
+        /** \brief sorts the project items (RDRs and evals) according to the given sort order */
+        void sortProjectItems(ProjectSortOrder sortorder=sortByID);
+        void emitSortOrderChanged();
     signals:
         /** \brief emitted when the data changed state of the project is modified */
         void wasChanged(bool changed);
@@ -523,8 +557,13 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         void errorOccured(QString errorDescription);
         /** \bief emitted when the project structure changes (i.e. a record is added, or renamed) */
         void structureChanged();
+        /** \brief emitted, when the sort order changes by setSortOrder() */
+        void sortOrderChanged(ProjectSortOrder order);
+        /** \brief emitted, when the sort order changes by setSortOrder() */
+        void sortOrderChanged(int order);
 
     public slots:
+
         /** \brief tell the project that the data contained in it has changed ... and it needs to be saved */
         void setDataChanged();
         void setPropertiesChanged();
@@ -535,13 +574,19 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         void log_warning(const QString& message) const;
         void log_error(const QString& message) const;
 
+        /** \brief sets the default sort order (and emits sortOrderChanged() ) */
+        void setSortOrder(ProjectSortOrder order);
+        /** \brief sets the default sort order (and emits sortOrderChanged() ) */
+        void setSortOrder(int order);
+        ProjectSortOrder getSortOrder() const;
+
     public:
         void resetError() const;
 
         struct QFLIB_EXPORT FileCopyList {
             QString inFile;
             QString outFile;
-            QFLIB_EXPORT inline FileCopyList(const QString& inFile, const QString& outFile) {
+            inline FileCopyList(const QString& inFile, const QString& outFile) {
                 this->inFile=inFile;
                 this->outFile=outFile;
             }
@@ -561,15 +606,15 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         static int fileCopyListConatins(const QString &inFilename, const QString& outFile, const QList<FileCopyList> *filecopylist) ;
     protected:
         /** \brief set the internal error flag and description */
-        void setError(QString description) const;
+        void setError(const QString& description) const;
         /** \brief set the internal error flag and description */
-        void setError(QString description) ;
+        void setError(const QString& description) ;
         /** \copydoc QFProperties::emitPropertiesChanged() */
         virtual void emitPropertiesChanged();
 
         virtual void emitStructureChanged();
         /** \copybrief QFProperties::setPropertiesError() */
-        virtual void setPropertiesError(QString message);
+        virtual void setPropertiesError(const QString& message);
 
         /** \brief open XML project file, sets error and errorDescription, as well as \c dataChange=false */
         void internalReadXML(QIODevice* file, const QString& filename=QString());

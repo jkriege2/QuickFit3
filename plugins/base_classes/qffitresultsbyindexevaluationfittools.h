@@ -45,23 +45,9 @@ class QFFitResultsByIndexEvaluationFitTools: public QFFitResultsByIndexEvaluatio
 {
     public:
 
-        typedef QFRawDataRecord::evaluationResult MultiFitFitParameterResult;
 
 
-        struct MultiFitFitResult {
-                const QFRawDataRecord* rdr;
-                int rdrRecID;
-                inline QFRawDataRecord* getRDR(QFProject* p) const {
-                    return p->getRawDataByID(rdrRecID);
-                }
-                int index;
-                QString evalID;
-                QMap<QString, MultiFitFitParameterResult> fitresults;
-                QString evalgroup;
-                QString egrouplabel;
-                int egroupindex;
-                QString egroupdescription;
-        };
+
 
         /*! \brief perform a fit for the given \a record and \a run
 
@@ -88,7 +74,7 @@ class QFFitResultsByIndexEvaluationFitTools: public QFFitResultsByIndexEvaluatio
 
             The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
           */
-        virtual void doFitForMultithreadReturn(QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult& result, const QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const =0;
+        virtual void doFitForMultithreadReturn(QFRawDataRecord::QFFitFitResultsStore& result, const QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const =0;
 
 
 };
@@ -125,7 +111,7 @@ class QFFitResultsByIndexMultiRDREvaluationFitTools: public QFFitResultsByIndexE
 
             The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
           */
-        virtual void doFitForMultithreadReturn(QList<QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult>& result, const QList<const QFRawDataRecord*>& records, const QStringList& fitfunctionIDs, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const=0;
+        virtual void doFitForMultithreadReturn(QList<QFRawDataRecord::QFFitFitResultsStore>& result, const QList<const QFRawDataRecord*>& records, const QStringList& fitfunctionIDs, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const=0;
 
 };
 #endif // QFFITRESULTSBYINDEXEVALUATIONFITTOOLS_H

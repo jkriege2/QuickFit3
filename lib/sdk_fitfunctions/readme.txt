@@ -80,7 +80,7 @@ Here is a list of often used fit parameter IDs:
     - offset: correlation offset
     - focus_struct_fac: focus: axial ratio
     - focus_width: focus: lateral radius
-    - focus_volume: focus: effective colume
+    - focus_volume: focus: effective volume
     - concentration: particle concentration in focus
     - count_rate: count rate during measurement
     - background: background count rate during measurement
@@ -118,7 +118,7 @@ Here is a list of often used fit parameter IDs:
     - focus_distance_z, foci: longitudinal distance in z-direction, d<sub>z</sub>, nm
     - focus_height1, green PSF: axial radius (1/e² radius), z<sub>g</sub>, nm
     - focus_width1, green PSF: lateral radius (1/e² radius), w<sub>g</sub>, nm
-    - focus_volume1, green focus: effective colume, V<sub>eff,g</sub>, fl
+    - focus_volume1, green focus: effective volume, V<sub>eff,g</sub>, fl
     - count_rate1, count rate green, during measurement, &lang;F<sub>g</sub>&rang;, Hz
     - background1, background count rate green, during measurement, B<sub>g</sub>, Hz
     - brightness_a, molar brightness of fluorophore on A, CPM<sub>a</sub>, counts/nM

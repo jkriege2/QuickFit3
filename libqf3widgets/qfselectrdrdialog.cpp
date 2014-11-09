@@ -156,6 +156,7 @@ void QFSelectRDRDialog::setProject(QFProject *project)
 {
     this->project=project;
     updateRdrList();
+    ui->listWidget->selectAll();
 }
 
 QList<QPointer<QFRawDataRecord> > QFSelectRDRDialog::getAllRDRs() const
@@ -231,6 +232,8 @@ void QFSelectRDRDialog::updateRdrList()
         ui->radSelect->setEnabled(false);
     }
 
+
+
 }
 
 void QFSelectRDRDialog::on_btnAll_clicked()
@@ -246,6 +249,7 @@ void QFSelectRDRDialog::on_btnNone_clicked()
 void QFSelectRDRDialog::on_lineEditFilter_textChanged(const QString &text)
 {
     updateRdrList();
+    ui->listWidget->selectAll();
 }
 
 void QFSelectRDRDialog::on_btnHelp_clicked()

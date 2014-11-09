@@ -119,6 +119,7 @@ void QFRecentFilesMenu::readSettings(QFManyFilesSettings &settings, QString pref
 }
 
 void QFRecentFilesMenu::addRecentFile(const QString &filename) {
+    if (filename.isEmpty()) return;
     m_files.removeDuplicates();
     if (m_files.size()>0) for (int j = m_files.size()-1; j >=0 ; j--) {
         if (m_files[j].trimmed().isEmpty()) {

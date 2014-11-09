@@ -366,8 +366,13 @@ void QFEvaluationPropertyEditorPrivate::showData()
 
             if (record) {
                 h.name=chead+": "+rhead;
-                h.data=record->resultsGetAsDoubleList(ename, rname);
+                h.data=record->resultsGetAsQVariantListNoError(ename, rname);
                 hs->addColumnToTableView(histID, h);
+                if (record->resultsHasError(ename, rname)) {
+                    h.name=tr("ERROR: ")+chead+": "+rhead;
+                    h.data=record->resultsGetAsQVariantListOnlyError(ename, rname);
+                    hs->addColumnToTableView(histID, h);
+                }
             }
         }
     }

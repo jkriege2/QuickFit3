@@ -898,7 +898,7 @@ void QFSPIMLightsheetEvaluationEditor::saveImageCutSeries()
     if (dlg->exec()) {
 
 
-        for (int z=0; z<data->getImageStackFrames(stack); z++) {
+        for (int z=0; z<(int64_t)data->getImageStackFrames(stack); z++) {
             for (int c=0; c<data->getImageStackChannels(stack); c++) {
                 QString resultID=eval->getEvaluationResultID(stack, c);
                 double* img=data->getImageStack(stack, z, c);
@@ -1199,7 +1199,7 @@ void QFSPIMLightsheetEvaluationEditor::doEvaluation(QFRawDataRecord *record) {
         QFSPIMLightsheetEvaluationItem::Orientation o=QFSPIMLightsheetEvaluationItem::fitRows;
         if (ui->cmbOrientation->currentIndex()==1) o=QFSPIMLightsheetEvaluationItem::fitColumns;
         ui->cmbChannel->setCurrentIndex(channel);
-        for (int stackpos=0; stackpos<data->getImageStackFrames(stack); stackpos++) {
+        for (int stackpos=0; stackpos<(int64_t)data->getImageStackFrames(stack); stackpos++) {
             if (dlgEvaluationProgress) {
                 dlgEvaluationProgress->setLabelText(tr("evaluating '%1', ch.%2, z=%3 ... ").arg(record->getName()).arg(channel).arg(stackpos));
                 dlgEvaluationProgress->setValue(channel*data->getImageStackFrames(stack)+stackpos);

@@ -2781,7 +2781,7 @@ namespace QFMathParser_DefaultLib {
         r.setInvalid();
         if (n>0) r.set(params[0]);
         if (n>=3 && n%2==1 && params[0].type==qfmpDoubleVector && params[1].type==qfmpDouble && params[2].type==qfmpDouble) {
-            for (int j=1; j<n; j+=2) {
+            for (unsigned int j=1; j<n; j+=2) {
                 if (params[j].type!=qfmpDouble || params[j+1].type!=qfmpDouble) {
                     p->qfmpError(errorm);
                     r.setInvalid();
@@ -2792,7 +2792,7 @@ namespace QFMathParser_DefaultLib {
                 }
             }
         } else if (n>=3 && n%2==1 && params[0].type==qfmpStringVector && params[1].type==qfmpString && params[2].type==qfmpString) {
-            for (int j=1; j<n; j+=2) {
+            for (unsigned int j=1; j<n; j+=2) {
                 if (params[j].type!=qfmpString || params[j+1].type!=qfmpString) {
                     p->qfmpError(errorm);
                     r.setInvalid();
@@ -2803,7 +2803,7 @@ namespace QFMathParser_DefaultLib {
                 }
             }
         } else if (n>=3 && n%2==1 && params[0].type==qfmpBoolVector && params[1].type==qfmpBool && params[2].type==qfmpBool) {
-            for (int j=1; j<n; j+=2) {
+            for (unsigned int j=1; j<n; j+=2) {
                 if (params[j].type!=qfmpBool || params[j+1].type!=qfmpBool) {
                     p->qfmpError(errorm);
                     r.setInvalid();
@@ -2814,7 +2814,7 @@ namespace QFMathParser_DefaultLib {
                 }
             }
         } else if (n>=3 && n%2==1 && params[0].type==qfmpString && params[1].type==qfmpString && params[2].type==qfmpString) {
-            for (int j=1; j<n; j+=2) {
+            for (unsigned int j=1; j<n; j+=2) {
                 if (params[j].type!=qfmpString || params[j+1].type!=qfmpString) {
                     p->qfmpError(errorm);
                     r.setInvalid();

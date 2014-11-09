@@ -67,7 +67,7 @@ QFFitFunctionsSPIMFCSADiffCE2::QFFitFunctionsSPIMFCSADiffCE2() {
     #define SPIMFCSADIFF_focus_width QFPPM_INC(SPIMFCSADIFF_focus_height)
     addParameter(FloatNumber,  "pixel_width",             "pixel width",                                           "a",                        "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 400,          0,        1e4,      10    );
     #define SPIMFCSADIFF_pixel_width QFPPM_INC(SPIMFCSADIFF_focus_width)
-    addParameter(FloatNumber,  "focus_volume",            "focus: effective colume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "focus_volume",            "focus: effective volume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
     #define SPIMFCSADIFF_focus_volume QFPPM_INC(SPIMFCSADIFF_pixel_width)
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
     #define SPIMFCSADIFF_count_rate QFPPM_INC(SPIMFCSADIFF_focus_volume)

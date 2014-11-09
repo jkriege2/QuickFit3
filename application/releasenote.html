@@ -125,9 +125,11 @@
             <li>bugfix: "set properties in multiple RDRs" now works correctly for name/folder/group/role (did not set the given string, but tried to convert it in some cases to a number/Boolean)</li>
             <li>added additional level of project backup file (*.qfp.backup_old)</li>
             <li>added menu entries to main window, which allow to duplicate items (RDRs/evals) and to copy/cut/paste items to/from the clipboard</li>
-            <li>added button/menu entries to evaluation and RDR editors, which allows to view vector/list/matrix data from the results tables as a new table, where each cell is displayed in its own column.</li>
+            <li>added button/menu entries to evaluation and RDR editors, which allows to view vector/list/matrix data from the results tables as a new table, where each cell is displayed in its own column. This displays any type of data (number, string, boolean, string lists, boolean lists, number lists, ...)</li>
             <li>added context-menu entries to evaluation and RDR editors, which allow to copy the RDR ID/result ID/evaluation ID or a rdr_getresult(...) template for the current cell into the clipboard.</li>
             <li>editing of RDR/Eval names in project tree can now be done using the systeme dit key (e.g. F2)</li>
+            <li>bugfix: "duplicate evaluation" did not work correctly</li>
+            <li>added View menu, which now allows to set the sort order of the current project.</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -147,6 +149,7 @@
             <li>bugfixed possible crash, when RDRs are deleted from the project</li>
             <li>bugfix: now it is no longer applicable to FCS data, only to imFCS data!</li>
             <li>added menu entry to set/reset fit parameters in all RDRs/runs (Tools Menu)</li>
+            <li>improved fit speed by using multi-threading</li>
           </ul></li>
           <li><b>FCCSFit</b><ul>
             <li>fit parameter names are more expressive now</li>
@@ -175,7 +178,12 @@
             <li>simple_exp: parameters are sorted by decay times now!</li>
             <li>added function for normal diffusion fit with different relative brightnesses of the species, which also supports up to four blinking components</li>
             <li>added fit function for anomalous diffusion with different molecular brightnesses</li>
+            <li>added fit function for 2D normal diffusion </li>
             <li>added fit function for 2D normal diffusion with different molecular brightnesses</li>
+            <li>added fit function for 2D anomalous diffusion </li>
+            <li>added fit function for 2D anomalous diffusion with different molecular brightnesses</li>
+            <li>added fit function for 2D normal diffusion with stretched exponential photophysics</li>
+            <li>added fit function for 3D normal diffusion with stretched exponential photophysics</li>
           </ul></li>
           <li><b>DLS fit functions</b><ul>
             <li>added fit functions for normal distribution of correlation times, which calculate the integral with numeric integration (improved accuracy over the old implementation with a sum!)</li>
@@ -324,7 +332,7 @@
             <li>added option to export the current data into a file (currently only the QF3 ASCII Correlation Data Format)</li>
             <li>added import filter for QF3 ASCII Correlation Data Format</li>
       </ul></li>
-      <li><b>imagingFCS Fit</b><ul>
+      <li><b>imFCS Fit</b><ul>
             <li>fit parameter names are more expressive now</li>
             <li>added button to start model selector + some code refactoring (using QFFitFunctionComboBox now)</li>
             <li>added button "go to average run"</li>
@@ -334,6 +342,7 @@
             <li>bugfix: weights combo-box is correctly initialized, when starting the editor</li>
             <li>new: added error estimation, using bootstrapping to curve fit (in plots)</li>
             <li>added checkbox to switch key/legend on/off</li>
+            <li>improved fit speed by using multi-threading</li>
           </ul></li>
       <li><b>Online-Help editor</b><ul>
             <li>added several buttons for advanced insert/editing functions</li>

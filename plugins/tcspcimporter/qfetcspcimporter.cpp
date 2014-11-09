@@ -256,9 +256,9 @@ void QFETCSPCImporter::correlationDialogClosed() {
         if (rdr) {
             rdr->setDescription(rdr->getDescription()+QString("\n\n")+it->comment);
         }
-        for (int i=0; i<rdrs.size(); i++) {
-            if (rdrs[i]) {
-                rdrs[i]->setDescription(rdrs[i]->getDescription()+QString("\n\n")+it->comment);
+        for (int ii=0; ii<rdrs.size(); ii++) {
+            if (rdrs[ii]) {
+                rdrs[ii]->setDescription(rdrs[ii]->getDescription()+QString("\n\n")+it->comment);
             }
         }
         //insertVideoCorrelatorFile(filename, overview, filename.toLower().endsWith(".bin"));

@@ -50,7 +50,12 @@ HEADERS += fcs_fitfuctions.h \
     qffitfunctionfcsdiffDAfterpulse.h \
     qffitfunctionfcsdiff_relbright.h \
     qffitfunctionfcsadiff_relbright.h \
-    qffitfunctionfcsdiff2d_relbright.h
+    qffitfunctionfcsdiff2d_relbright.h \
+    qffitfunctionfcsdiffstretchpp.h \
+    qffitfunctionfcsadiff2d.h \
+    qffitfunctionfcsadiff2d_relbright.h \
+    qffitfunctionfcsdiff2d.h \
+    qffitfunctionfcsdiff2dstretchpp.h
 
 SOURCES += fcs_fitfuctions.cpp\
            qffitfunctionfcsmultidiffusion.cpp \
@@ -69,7 +74,12 @@ SOURCES += fcs_fitfuctions.cpp\
     qffitfunctionfcsdiffDAfterpulse.cpp \
     qffitfunctionfcsdiff_relbright.cpp \
     qffitfunctionfcsadiff_relbright.cpp \
-    qffitfunctionfcsdiff2d_relbright.cpp
+    qffitfunctionfcsdiff2d_relbright.cpp \
+    qffitfunctionfcsdiffstretchpp.cpp \
+    qffitfunctionfcsadiff2d.cpp \
+    qffitfunctionfcsadiff2d_relbright.cpp \
+    qffitfunctionfcsdiff2d.cpp \
+    qffitfunctionfcsdiff2dstretchpp.cpp
 
 FORMS +=
 

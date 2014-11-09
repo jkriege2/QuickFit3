@@ -31,7 +31,6 @@ DESTDIR = $$QFOUTPUT/plugins
 # Input
 HEADERS += qfgeneralfitfunctionsplugin.h \
            qffitfunctiongeneralsigmoid.h \
-    ../../../../../LIB/trunk/statistics_tools.h \
     qffitfunctiongeneralgaussianvar.h \
     qffitfunctiongenerallorentzian.h \
     qffitfunctiongeneralpowerlaw.h \
@@ -53,7 +52,6 @@ HEADERS += qfgeneralfitfunctionsplugin.h \
 
 SOURCES += qfgeneralfitfunctionsplugin.cpp\
            qffitfunctiongeneralsigmoid.cpp \
-    ../../../../../LIB/trunk/statistics_tools.cpp \
     qffitfunctiongeneralgaussianvar.cpp \
     qffitfunctiongenerallorentzian.cpp \
     qffitfunctiongeneralpowerlaw.cpp \

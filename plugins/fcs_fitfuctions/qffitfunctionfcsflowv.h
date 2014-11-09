@@ -33,7 +33,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     The parameters are:
       - \f$ G_\infty \f$: offset of the correlation function
       - \f$ N \f$: overall particle number (including currently dark particles, e.g. in triplet state)
-      - \f$ \Theta_{trip} \f$: fraction of the particles in one of the first two non-fluorescent states (priplet, ...)
+      - \f$ \Theta_{trip} \f$: fraction of the particles in one of the first two non-fluorescent states (triplet, ...)
       - \f$ \tau_{trip} \f$: decay time of the first two non-fluorescent states (triplet, ...)
       - \f$ D \f$: diffusion coefficient
       - \f$ v \f$: flow velocity

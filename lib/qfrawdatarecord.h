@@ -160,28 +160,28 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
          *
          *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
          */
-        void setFileName(int i, const QString file);
+        void setFileName(int i, const QString& file);
         /** \brief set type of i-th file
          *
          *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
          *  \note Only use this function, when you overwrote isFilesListEditable() to return FilesEditable flag. and try to call reloadFromFiles() after editing the files list.
          *        This function does not internally call reloadFromFiles(), so you can do more changes before reloading!
          */
-        void setFileType(int i, const QString type);
+        void setFileType(int i, const QString& type);
         /** \brief set description of i-th file
          *
          *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
          *  \note Only use this function, when you overwrote isFilesListEditable() to return FilesEditable flag. and try to call reloadFromFiles() after editing the files list.
          *        This function does not internally call reloadFromFiles(), so you can do more changes before reloading!
          */
-        void setFileDecsription(int i, const QString description);
+        void setFileDecsription(int i, const QString& description);
         /** \brief add a new file
          *
          *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
          *  \note Only use this function, when you overwrote isFilesListEditable() to return FilesEditable flag. and try to call reloadFromFiles() after editing the files list.
          *        This function does not internally call reloadFromFiles(), so you can do more changes before reloading!
          */
-        void addFile(const QString file, const QString type, const QString description);
+        void addFile(const QString& file, const QString& type, const QString& description);
         /** \brief delete the i-th file
          *
          *  \warning Use this function with great care, as it may break the record ... changes might take effect only after saving and reloading the project.
@@ -385,7 +385,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             .
          */
         struct QFLIB_EXPORT evaluationResult {
-            evaluationResult() {
+            inline evaluationResult() {
                 type=qfrdreInvalid;
                 columns=0;
                 sortPriority=false;
@@ -417,15 +417,15 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             QString group; /**< this result belongs to a group with the given name */
             bool sortPriority; /**< this result should appear towards the start of tables */
 
-            int getVectorMatrixItems() const;
-            bool isNumberType() const;
-            double getAsDouble() const;
-            QVector<double> getAsDoubleVector() const;
-            qfmpResult getAsMathParserResult() const;
-            QVariant getAsVariant() const;
-            void setFromMathParserResult(const qfmpResult& result);
+            QFLIB_EXPORT int getVectorMatrixItems() const;
+            QFLIB_EXPORT bool isNumberType() const;
+            QFLIB_EXPORT double getAsDouble() const;
+            QFLIB_EXPORT QVector<double> getAsDoubleVector() const;
+            QFLIB_EXPORT qfmpResult getAsMathParserResult() const;
+            QFLIB_EXPORT QVariant getAsVariant() const;
+            QFLIB_EXPORT void setFromMathParserResult(const qfmpResult& result);
 
-            inline void setNumber(double value, QString unit=QString(""), QString group=QString(""), QString label=QString(""), QString label_rich=QString(""),bool sortPriority=false) {
+            inline void resultsSetNumber(double value,  const QString& unit=QString(""),  const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
                 this->type=qfrdreNumber;
                 this->dvalue=value;
                 this->unit=unit;
@@ -435,7 +435,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
                 this->sortPriority=sortPriority;
             }
 
-            inline void setNumberError(double value, double error, QString unit=QString(""), QString group=QString(""), QString label=QString(""), QString label_rich=QString(""),bool sortPriority=false) {
+            inline void resultsSetNumberError(double value, double error,  const QString& unit=QString(""),  const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
                 this->type=qfrdreNumberError;
                 this->dvalue=value;
                 this->derror=error;
@@ -445,7 +445,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
                 this->label_rich=label_rich;
                 this->sortPriority=sortPriority;
             }
-            inline void setInt(qlonglong value, QString unit=QString(""), QString group=QString(""), QString label=QString(""), QString label_rich=QString(""),bool sortPriority=false) {
+            inline void resultsSetInteger(qlonglong value,  const QString& unit=QString(""),  const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
                 this->type=qfrdreInteger;
                 this->ivalue=value;
                 this->unit=unit;
@@ -455,7 +455,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
                 this->sortPriority=sortPriority;
             }
 
-            inline void setBool(bool value, QString group=QString(""), QString label=QString(""), QString label_rich=QString(""),bool sortPriority=false) {
+            inline void resultsSetBoolean(bool value,  const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
                 this->type=qfrdreBoolean;
                 this->bvalue=value;
                 this->unit="";
@@ -464,7 +464,7 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
                 this->label_rich=label_rich;
                 this->sortPriority=sortPriority;
             }
-            inline void setString(const QString& value,QString group=QString(""), QString label=QString(""), QString label_rich=QString(""),bool sortPriority=false) {
+            inline void resultsSetString(const QString& value, const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
                 this->type=qfrdreString;
                 this->svalue=value;
                 this->unit="";
@@ -473,6 +473,274 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
                 this->label_rich=label_rich;
                 this->sortPriority=sortPriority;
             }
+
+
+
+
+
+            inline void resultsSetNumberVector(const QVector<double>& value,  const QString& unit=QString(""),  const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                this->type=qfrdreNumberVector;
+                this->dvec=value;
+                this->unit=unit;
+                this->group=group;
+                this->label=label;
+                this->label_rich=label_rich;
+                this->sortPriority=sortPriority;
+            }
+
+            inline void resultsSetNumberErrorVector(const QVector<double>& value, const QVector<double>& error,  const QString& unit=QString(""),  const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                this->type=qfrdreNumberError;
+                this->dvec=value;
+                this->evec=error;
+                this->unit=unit;
+                this->group=group;
+                this->label=label;
+                this->label_rich=label_rich;
+                this->sortPriority=sortPriority;
+            }
+            inline void resultsSetIntegerVector(const QVector<qlonglong> value,  const QString& unit=QString(""),  const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                this->type=qfrdreInteger;
+                this->ivec=value;
+                this->unit=unit;
+                this->group=group;
+                this->label=label;
+                this->label_rich=label_rich;
+                this->sortPriority=sortPriority;
+            }
+
+            inline void resultsSetBooleanVector(const QVector<bool> value,  const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                this->type=qfrdreBoolean;
+                this->bvec=value;
+                this->unit="";
+                this->group=group;
+                this->label=label;
+                this->label_rich=label_rich;
+                this->sortPriority=sortPriority;
+            }
+            inline void resultsSetStringVector(const QStringList& value, const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                this->type=qfrdreString;
+                this->svec=value;
+                this->unit="";
+                this->group=group;
+                this->label=label;
+                this->label_rich=label_rich;
+                this->sortPriority=sortPriority;
+            }
+
+
+
+
+
+            inline void resultsSetLabel(const QString& label, const QString& label_rich=QString("")) {
+                this->label=label;
+                this->label_rich=label_rich;
+            }
+
+            inline void resultsSetGroup(const QString& group) {
+                this->group=group;
+            }
+
+            inline void resultsSetGroupAndLabels(const QString& group, const QString& label, const QString& label_rich=QString("")) {
+                this->group=group;
+                this->label=label;
+                this->label_rich=label_rich;
+            }
+
+            inline void resultsSetGroupLabelsAndSortPriority(const QString& group, const QString& label, const QString& label_rich, bool pr)  {
+                this->group=group;
+                this->label=label;
+                this->label_rich=label_rich;
+                this->sortPriority=pr;
+            }
+            inline void resultsSetSortPriority(bool pr) {
+                this->sortPriority=pr;
+            }
+
+        };
+
+        struct QFLIB_EXPORT QFFitFitResultsStore {
+                const QFRawDataRecord* rdr;
+                int rdrRecID;
+                int index;
+                QString evalID;
+                QMap<QString, QFRawDataRecord::evaluationResult> fitresults;
+                QString evalgroup;
+                QString egrouplabel;
+                int64_t egroupindex;
+                QString egroupdescription;
+
+
+                inline QFFitFitResultsStore() {
+                    rdr=NULL;
+                    rdrRecID=-1;
+                    index=-1;
+                    evalID="";
+                    fitresults.clear();
+                    evalgroup="";
+                    egrouplabel="";
+                    egroupindex=0;
+                    egroupdescription="";
+                }
+
+                inline QFFitFitResultsStore(const QFRawDataRecord* rdr, QString evalID) {
+                    setRDR(rdr);
+                    index=-1;
+                    this->evalID=evalID;
+                    fitresults.clear();
+                    evalgroup="";
+                    egrouplabel="";
+                    egroupindex=0;
+                    egroupdescription="";
+                }
+
+                inline QFFitFitResultsStore(const QFRawDataRecord* rdr) {
+                    setRDR(rdr);
+                    index=-1;
+                    this->evalID="";
+                    fitresults.clear();
+                    evalgroup="";
+                    egrouplabel="";
+                    egroupindex=0;
+                    egroupdescription="";
+                }
+
+                inline QFRawDataRecord* getRDR(const QFProject* p) const {
+                    return p->getRawDataByID(rdrRecID);
+                }
+                inline void setRDR(const QFRawDataRecord* rdr) {
+                    this->rdr=rdr;
+                    this->rdrRecID=-1;
+                    if (rdr) this->rdrRecID=rdr->getID();
+                }
+                inline void resultsSetEvaluationGroup(const QString& group){
+                    this->evalgroup=group;
+                }
+                inline void resultsSetEvaluationGroupIndex(int64_t groupIndex) {
+                    this->egroupindex=groupIndex;
+                }
+                inline void resultsSetEvaluationDescription(const QString& description) {
+                    this->egroupdescription=description;
+                }
+
+
+
+                inline void setNumber(const QString& resultID, double value, const QString& unit=QString(""), const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetNumber(  value,  unit,  group,  label, label_rich, sortPriority);
+                }
+                inline void setNumberError(const QString& resultID, double value, double error, const QString& unit=QString(""), const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetNumberError(  value,  error, unit,  group,  label, label_rich, sortPriority);
+                }
+                inline void setInteger(const QString& resultID, qlonglong value, const QString& unit=QString(""), const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetInteger(  value,  unit,  group,  label, label_rich, sortPriority);
+                }
+                inline void setBool(const QString& resultID, bool value,  const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetBoolean(  value,    group,  label, label_rich, sortPriority);
+                }
+                inline void setString(const QString& resultID, const QString& value, const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetString(  value,   group,  label, label_rich, sortPriority);
+                }
+                inline void setNumberVector(const QString& resultID, const QVector<double>& value, const QString& unit=QString(""), const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetNumberVector(  value,  unit,  group,  label, label_rich, sortPriority);
+                }
+
+                inline void setNumberErrorVector(const QString& resultID, const QVector<double>& value, const QVector<double>& error, const QString& unit=QString(""), const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetNumberErrorVector(  value,  error, unit,  group,  label, label_rich, sortPriority);
+                }
+                inline void setIntegerVector(const QString& resultID, const QVector<qlonglong> value, const QString& unit=QString(""), const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetIntegerVector( value,  unit,  group,  label, label_rich, sortPriority);
+                }
+                inline void setBoolVector(const QString& resultID, const QVector<bool> value,  const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetBooleanVector(  value,   group,  label, label_rich, sortPriority);
+                }
+                inline void setStringVector(const QString& resultID, const QStringList& value, const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetStringVector(  value,   group,  label, label_rich, sortPriority);
+                }
+
+
+
+
+
+
+
+                inline  void resultsSetNumber(const QString& resultID, double value, const QString& unit=QString(""), const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetNumber(  value,  unit,  group,  label, label_rich, sortPriority);
+                }
+                inline  void resultsSetNumberError(const QString& resultID, double value, double error, const QString& unit=QString(""), const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetNumberError(  value,  error, unit,  group,  label, label_rich, sortPriority);
+                }
+                inline  void resultsSetInteger(const QString& resultID, qlonglong value, const QString& unit=QString(""), const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetInteger(  value,  unit,  group,  label, label_rich, sortPriority);
+                }
+                inline  void resultsSetBoolean(const QString& resultID, bool value,  const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetBoolean(  value,    group,  label, label_rich, sortPriority);
+                }
+                inline  void resultsSetString(const QString& resultID, const QString& value, const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetString(  value,   group,  label, label_rich, sortPriority);
+                }
+                inline  void resultsSetNumberVector(const QString& resultID, const QVector<double>& value, const QString& unit=QString(""), const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetNumberVector(  value,  unit,  group,  label, label_rich, sortPriority);
+                }
+
+                inline  void resultsSetNumberErrorVector(const QString& resultID, const QVector<double>& value, const QVector<double>& error, const QString& unit=QString(""), const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetNumberErrorVector(  value,  error, unit,  group,  label, label_rich, sortPriority);
+                }
+                inline  void resultsSetIntegerVector(const QString& resultID, const QVector<qlonglong> value, const QString& unit=QString(""), const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetIntegerVector( value,  unit,  group,  label, label_rich, sortPriority);
+                }
+                inline  void resultsSetBooleanVector(const QString& resultID, const QVector<bool> value,  const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetBooleanVector(  value,   group,  label, label_rich, sortPriority);
+                }
+                inline void resultsSetStringVector(const QString& resultID, const QStringList& value, const QString& group=QString(""), const QString& label=QString(""), const QString& label_rich=QString(""),bool sortPriority=false) {
+                    fitresults[resultID].resultsSetStringVector(  value,   group,  label, label_rich, sortPriority);
+                }
+
+
+
+
+
+                inline void resultsSetLabel(const QString& resultID, const QString& label, const QString& label_rich=QString("")) {
+                    fitresults[resultID].resultsSetLabel(label, label_rich);
+                }
+
+                inline void resultsSetGroup(const QString& resultID, const QString& group) {
+                    fitresults[resultID].resultsSetGroup(group);
+                }
+
+                inline void resultsSetGroupAndLabels(const QString& resultID, const QString& group, const QString& label, const QString& label_rich=QString("")) {
+                    fitresults[resultID].resultsSetGroupAndLabels(group, label, label_rich);
+                }
+                inline void resultsSetGroupAndLabels(const QString& resultID, const QString& group, const QString& label, const QString& label_rich, bool pr) {
+                    fitresults[resultID].resultsSetGroupLabelsAndSortPriority(group, label, label_rich, pr);
+                }
+
+                inline void resultsSetGroupLabelsAndSortPriority(const QString& resultID, const QString& group, const QString& label, const QString& label_rich, bool pr)  {
+                    fitresults[resultID].resultsSetGroupLabelsAndSortPriority(group, label, label_rich, pr);
+                }
+                inline void resultsSetSortPriority(const QString& resultID, bool pr) {
+                    fitresults[resultID].resultsSetSortPriority(pr);
+                }
+
+                inline void resultsSetNumberErrorAndBool(const QString& resultID, double value, double error, const QString& unit, const QString& resultBoolName, bool boolValue=true) {
+                    fitresults[resultID].resultsSetNumberError(value, error, unit);
+                    fitresults[resultBoolName].resultsSetBoolean(boolValue);
+                }
+
+                inline void resultsSetNumberAndBool(const QString& resultID, double value, const QString& unit, const QString& resultBoolName, bool boolValue=true) {
+                    fitresults[resultID].resultsSetNumber(value,  unit);
+                    fitresults[resultBoolName].resultsSetBoolean(boolValue);
+                }
+                inline void resultsSetIntegerAndBool(const QString& resultID, qlonglong value, const QString& unit, const QString& resultBoolName, bool boolValue=true) {
+                    fitresults[resultID].resultsSetInteger(value,  unit);
+                    fitresults[resultBoolName].resultsSetBoolean(boolValue);
+                }
+                inline void resultsSetStringAndBool(const QString& resultID, const QString& value, const QString& unit, const QString& resultBoolName, bool boolValue=true) {
+                    fitresults[resultID].resultsSetString(value);
+                    fitresults[resultBoolName].resultsSetBoolean(boolValue);
+                }
+                inline void resultsSetBooleanAndBool(const QString& resultID, bool value, const QString& unit, const QString& resultBoolName, bool boolValue=true) {
+                    fitresults[resultID].resultsSetBoolean(value);
+                    fitresults[resultBoolName].resultsSetBoolean(boolValue);
+                }
 
         };
 
@@ -643,9 +911,15 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void resultsSetBoolean(const QString& evaluationName, const QString& resultName, bool value);
         /** \brief set result from evaluationResult */
         void resultsSet(const QString& evaluationName, const QString& resultName, const evaluationResult& result);
+        /** \brief set/add the results in \a results (key is the result ID) with the given \a evaluationName */
+        void resultsSet(const QString& evaluationName, const QMap<QString, evaluationResult>& results);
+        /** \brief set/add the results in \a results, ignoring the given rdr, assuming that all results shall be given in this RDR! */
+        void resultsSet(const QFFitFitResultsStore& results, bool setGroupProps=true);
         /** \brief return a specified result  */
         evaluationResult resultsGet(const QString& evalName, const QString& resultName) const;
 
+        /** \brief set/add the results in \a results, ignoring the given rdr, assuming that all results shall be given in this RDR! */
+        bool resultsHasError(const QString& evalName, const QString& resultName) const;
         /** \brief return a specified result as a QFMathParser result (qfmpResult) */
         qfmpResult resultsGetForMathParser(const QString& evalName, const QString& resultName) const;
         /** \brief set a specified result from a QFMathParser result (qfmpResult) */
@@ -685,7 +959,25 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
             a double (qfrdreNumber) or a QList<QVariant> (qfrdreNumberVector).
         */
         QVariant resultsGetAsQVariantOnlyError(const QString& evalName, const QString& resultName) const;
-        /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */
+        /*! \brief return a specified result as a QVariant
+
+            The resulting QVariant conatins either a boolean (qfrdreBoolean), a QString (qfrdreString), an integer (qfrdreInteger),
+            a double (qfrdreNumber), QPointF (qfrdreNumberError) or a QList<QVariant> (qfrdreNumberVector).
+        */
+        QVariantList resultsGetAsQVariantList(const QString& evalName, const QString& resultName) const;
+        /*! \brief return a specified result as a QVariant, if the result has an associated error, only the values is returned
+
+            The resulting QVariant conatins either a boolean (qfrdreBoolean), a QString (qfrdreString), an integer (qfrdreInteger),
+            a double (qfrdreNumber) or a QList<QVariant> (qfrdreNumberVector).
+        */
+        QVariantList resultsGetAsQVariantListNoError(const QString& evalName, const QString& resultName) const;
+        /*! \brief return the error associated to a specified result as a QVariant
+
+            The resulting QVariant conatins either a boolean (qfrdreBoolean), a QString (qfrdreString), an integer (qfrdreInteger),
+            a double (qfrdreNumber) or a QList<QVariant> (qfrdreNumberVector).
+        */
+        QVariantList resultsGetAsQVariantListOnlyError(const QString& evalName, const QString& resultName) const;
+         /** \brief return a specified result as double (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise. */
         double resultsGetAsDouble(const QString& evalName, const QString& resultName, bool* ok=NULL) const;
         /** \brief return a specified result's error as double vector (or 0 if not possible!). If \a ok is supplied it will contain \c true if the conversion was possible and \c false otherwise.  */
         double resultsGetErrorAsDouble(const QString& evalName, const QString& resultName, bool* ok=NULL) const;

@@ -70,6 +70,19 @@ int QFTableView::addCopiedColumn(QString name, const double *data, int32_t size)
     return c;
 }
 
+int QFTableView::addColumn(QString name, const QList<QVariant> &data)
+{
+    model.setReadonly(false);
+    model.disableSignals();
+    int c=model.columnCount();
+    model.appendColumn();
+    model.setColumnTitleCreate(c, name);
+    model.setColumnCreate(c, data);
+    model.setReadonly(true);
+    model.enableSignals();
+    return c;
+}
+
 void QFTableView::clear()
 {
     model.setReadonly(false);

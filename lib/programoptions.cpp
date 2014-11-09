@@ -104,7 +104,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     style= app->style()->metaObject()->className();
     stylesheet="default";
     languageID="en";
-    maxThreads=2;
+    maxThreads=qMax(4,QThread::idealThreadCount());
     autosave=5;
 
     readSettings();

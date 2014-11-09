@@ -532,7 +532,7 @@ void QFExtensionLinearStagePI::move(unsigned int axis, double newPosition) {
 QString QFExtensionLinearStagePI::getStageName(unsigned int axis) const
 {
     QString n=tr("PI Mercury 863, axis %1").arg(axis);
-    if (axis>=0 && axis<axes.size()) n=axes[axis].label;
+    if (axis>=0 && (int64_t)axis<axes.size()) n=axes[axis].label;
     return n;
 }
 

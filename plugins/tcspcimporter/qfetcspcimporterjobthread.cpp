@@ -489,7 +489,7 @@ void QFETCSPCImporterJobThread::run() {
                                 store.ACFs=0;
                                 store.CCFs=0;
                                 if (ccf.first==ccf.second) store.ACFs++;
-                                else store.CCFs;
+                                else store.CCFs++;
                                 if (!storeFiles.contains(store)) storeFiles.append(store);
                                 usedPairs.append(ccf);
                             }

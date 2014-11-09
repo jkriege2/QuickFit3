@@ -162,12 +162,29 @@ QFFitResultsByIndexEvaluationFitSmartThread::QFFitResultsByIndexEvaluationFitSma
     this->stopWhenEmpty=stopWhenEmpty;
     jobCount=0;
     jobsDone=0;
+    writer=NULL;
 
+}
+
+QFFitResultsByIndexEvaluationFitSmartThread::QFFitResultsByIndexEvaluationFitSmartThread(QFFitResultsByIndexEvaluationFitSmartThread_Writer *writer, bool stopWhenEmpty, QObject *parent) :
+    QThread(parent)
+{
+    lock=new QReadWriteLock();
+    stopped=false;
+    this->stopWhenEmpty=stopWhenEmpty;
+    jobCount=0;
+    jobsDone=0;
+    this->writer=writer;
 }
 
 QFFitResultsByIndexEvaluationFitSmartThread::~QFFitResultsByIndexEvaluationFitSmartThread()
 {
     delete lock;
+}
+
+void QFFitResultsByIndexEvaluationFitSmartThread::setWriter(QFFitResultsByIndexEvaluationFitSmartThread_Writer *writer)
+{
+    this->writer=writer;
 }
 
 void QFFitResultsByIndexEvaluationFitSmartThread::addJob(QFFitResultsByIndexEvaluation *evaluation, const QFRawDataRecord *record, int run, int userMin, int userMax) {
@@ -248,7 +265,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
         jempty=jobs.isEmpty();
     }
 
-    QList<QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult> fitresults;
+    QList<QFRawDataRecord::QFFitFitResultsStore> fitresults;
     int cnt=0;
     bool done=false;
     while(!done) {
@@ -269,7 +286,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
             // if the record property is used, we have a single-record fit and run the according function
             const QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<const QFFitResultsByIndexEvaluationFitTools*>(job.evaluation);
             if (jobIsValid&&feval) {
-                QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult result;
+                QFRawDataRecord::QFFitFitResultsStore result;
                 feval->doFitForMultithreadReturn(result, job.record, job.run, job.userMin, job.userMax, this);
 
                 fitresults.append(result);
@@ -284,7 +301,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
             const QFFitResultsByIndexMultiRDREvaluationFitTools* feval=dynamic_cast<const QFFitResultsByIndexMultiRDREvaluationFitTools*>(job.evaluation);
             //qDebug()<<jobIsValid<<feval;
             if (jobIsValid&&feval) {
-                QList<QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult> result;
+                QList<QFRawDataRecord::QFFitFitResultsStore> result;
                 feval->doFitForMultithreadReturn(result, job.records, job.fitfuncIDs, job.run, job.userMin, job.userMax, this);
                 fitresults<<result;
                 {
@@ -297,7 +314,11 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
         cnt++;
         done=!(!stopped  && (!(stopWhenEmpty&&jempty)));
         //qDebug()<<"thread, run="<<job.run<<"  done="<<done<<"  stopped="<<stopped<<"  jempty="<<jempty;
-        if (cnt>500 || done) {
+        if (writer && (cnt>50 || done)) {
+            QWriteLocker locker(lock);
+            writer->addFitResult(fitresults);
+            fitresults.clear();
+        } else if (cnt>500 || done) {
             QWriteLocker locker(lock);
             QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
             for (int i=0; i<fitresults.size(); i++) {
@@ -317,23 +338,23 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                 int index=fitresults.first().index;
 
                 if (index<0) {
-                    QMapIterator<QString, QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult> mit(fitresults.first().fitresults);
+                    QMapIterator<QString, QFRawDataRecord::evaluationResult> mit(fitresults.first().fitresults);
                     while (mit.hasNext()) {
                         mit.next();
                         rdr->resultsSet(evalID, mit.key(), mit.value());
                     }
                     fitresults.first().fitresults.clear();
                 } else if (index>=0) {
-                    QMapIterator<QString, QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult> mit(fitresults.first().fitresults);
+                    QMapIterator<QString, QFRawDataRecord::evaluationResult> mit(fitresults.first().fitresults);
                     while (mit.hasNext()) {
                         mit.next();
                         const QString pid=mit.key();
-                        QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult newres=mit.value();
+                        QFRawDataRecord::evaluationResult newres=mit.value();
                         switch(mit.value().type) {
                             case QFRawDataRecord::qfrdreBoolean: {
                                     QVector<bool> value;
                                     if (rdr->resultsExists(evalID, pid)) {
-                                        QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult ores=rdr->resultsGet(evalID, pid);
+                                        QFRawDataRecord::evaluationResult ores=rdr->resultsGet(evalID, pid);
                                         if (ores.type==QFRawDataRecord::qfrdreBooleanVector) {
                                             value=ores.bvec;
                                         }
@@ -343,7 +364,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                                     for (int si=1; si<fitresults.size(); si++) {
                                         int oidx=fitresults[si].index;
                                         if (fitresults[si].rdr==rdr && fitresults[si].evalID==evalID && oidx>=0 && fitresults[si].fitresults.contains(pid)) {
-                                            QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult ores=fitresults[si].fitresults[pid];
+                                            QFRawDataRecord::evaluationResult ores=fitresults[si].fitresults[pid];
                                             fitresults[si].fitresults.remove(pid);
                                             while (value.size()<=oidx) value<<false;
                                             value[oidx]=ores.bvalue;
@@ -356,7 +377,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                             case QFRawDataRecord::qfrdreNumber: {
                                     QVector<double> value;
                                     if (rdr->resultsExists(evalID, pid)) {
-                                        QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult ores=rdr->resultsGet(evalID, pid);
+                                        QFRawDataRecord::evaluationResult ores=rdr->resultsGet(evalID, pid);
                                         if (ores.type==QFRawDataRecord::qfrdreNumberVector) {
                                             value=ores.dvec;
                                         }
@@ -366,7 +387,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                                     for (int si=1; si<fitresults.size(); si++) {
                                         int oidx=fitresults[si].index;
                                         if (fitresults[si].rdr==rdr && fitresults[si].evalID==evalID && oidx>=0 && fitresults[si].fitresults.contains(pid)) {
-                                            QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult ores=fitresults[si].fitresults[pid];
+                                            QFRawDataRecord::evaluationResult ores=fitresults[si].fitresults[pid];
                                             fitresults[si].fitresults.remove(pid);
                                             while (value.size()<=oidx) value<<0.0;
                                             value[oidx]=ores.dvalue;
@@ -379,7 +400,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                             case QFRawDataRecord::qfrdreNumberError: {
                                     QVector<double> value, valuee;
                                     if (rdr->resultsExists(evalID, pid)) {
-                                        QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult ores=rdr->resultsGet(evalID, pid);
+                                        QFRawDataRecord::evaluationResult ores=rdr->resultsGet(evalID, pid);
                                         if (ores.type==QFRawDataRecord::qfrdreNumberErrorVector) {
                                             value=ores.dvec;
                                             valuee=ores.evec;
@@ -392,7 +413,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                                     for (int si=1; si<fitresults.size(); si++) {
                                         int oidx=fitresults[si].index;
                                         if (fitresults[si].rdr==rdr && fitresults[si].evalID==evalID && oidx>=0 && fitresults[si].fitresults.contains(pid)) {
-                                            QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult ores=fitresults[si].fitresults[pid];
+                                            QFRawDataRecord::evaluationResult ores=fitresults[si].fitresults[pid];
                                             fitresults[si].fitresults.remove(pid);
                                             while (value.size()<=oidx) {value<<0.0;}
                                             while (valuee.size()<=oidx) { valuee<<0.0;}
@@ -408,7 +429,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                             case QFRawDataRecord::qfrdreInteger: {
                                     QVector<qlonglong> value;
                                     if (rdr->resultsExists(evalID, pid)) {
-                                        QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult ores=rdr->resultsGet(evalID, pid);
+                                        QFRawDataRecord::evaluationResult ores=rdr->resultsGet(evalID, pid);
                                         if (ores.type==QFRawDataRecord::qfrdreIntegerVector) {
                                             value=ores.ivec;
                                         }
@@ -418,7 +439,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                                     for (int si=1; si<fitresults.size(); si++) {
                                         int oidx=fitresults[si].index;
                                         if (fitresults[si].rdr==rdr && fitresults[si].evalID==evalID && oidx>=0 && fitresults[si].fitresults.contains(pid)) {
-                                            QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult ores=fitresults[si].fitresults[pid];
+                                            QFRawDataRecord::evaluationResult ores=fitresults[si].fitresults[pid];
                                             fitresults[si].fitresults.remove(pid);
                                             while (value.size()<=oidx) value<<0;
                                             value[oidx]=ores.ivalue;
@@ -431,7 +452,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                             case QFRawDataRecord::qfrdreString: {
                                     QStringList value;
                                     if (rdr->resultsExists(evalID, pid)) {
-                                        QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult ores=rdr->resultsGet(evalID, pid);
+                                        QFRawDataRecord::evaluationResult ores=rdr->resultsGet(evalID, pid);
                                         if (ores.type==QFRawDataRecord::qfrdreStringVector) {
                                             value=ores.svec;
                                         }
@@ -441,7 +462,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                                     for (int si=1; si<fitresults.size(); si++) {
                                         int oidx=fitresults[si].index;
                                         if (fitresults[si].rdr==rdr && fitresults[si].evalID==evalID && oidx>=0 && fitresults[si].fitresults.contains(pid)) {
-                                            QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult ores=fitresults[si].fitresults[pid];
+                                            QFRawDataRecord::evaluationResult ores=fitresults[si].fitresults[pid];
                                             fitresults[si].fitresults.remove(pid);
                                             while (value.size()<=oidx) value<<"";
                                             value[oidx]=ores.svalue;
@@ -451,6 +472,8 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                                     newres.svec=value;
                                     rdr->resultsSet(evalID, pid, newres);
                                 } break;
+                            default:
+                                break;
                         }
 
 
@@ -477,3 +500,248 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
 
 }
 
+
+
+QFFitResultsByIndexEvaluationFitSmartThread_Writer::QFFitResultsByIndexEvaluationFitSmartThread_Writer(const QFProject *project, QObject *parent):
+    QThread(parent)
+{
+    lock=new QReadWriteLock();
+    stopped=false;
+    this->project=project;
+}
+
+QFFitResultsByIndexEvaluationFitSmartThread_Writer::~QFFitResultsByIndexEvaluationFitSmartThread_Writer()
+{
+    delete lock;
+}
+
+void QFFitResultsByIndexEvaluationFitSmartThread_Writer::run()
+{
+
+    QList<QFRawDataRecord::QFFitFitResultsStore> localfitresults;
+    int cnt=0;
+    bool done=false;
+    while(!done) {
+        // look into input queue, whether there are still tasks to perform
+        {   QReadLocker locker(lock);
+            if (!fitresults.isEmpty()) {
+                localfitresults<<fitresults;
+                fitresults.clear();
+            }
+        }
+
+
+
+
+
+        done=stopped;
+        //qDebug()<<"thread, run="<<job.run<<"  done="<<done<<"  stopped="<<stopped<<"  jempty="<<jempty;
+        if (localfitresults.size()>500 || done) {
+            //qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done;
+            for (int i=0; i<localfitresults.size(); i++) {
+                const QString evalID=localfitresults[i].evalID;
+                localfitresults[i].getRDR(project)->resultsSetEvaluationGroup(evalID, localfitresults[i].evalgroup);
+                localfitresults[i].getRDR(project)->resultsSetEvaluationGroupLabel(localfitresults[i].evalgroup, localfitresults[i].egrouplabel);
+                localfitresults[i].getRDR(project)->resultsSetEvaluationGroupIndex(evalID, localfitresults[i].egroupindex);
+                localfitresults[i].getRDR(project)->resultsSetEvaluationDescription(evalID, localfitresults[i].egroupdescription);
+            }
+            while (!localfitresults.isEmpty()) {
+                QFRawDataRecord* rdr=localfitresults.first().getRDR(project);
+
+                bool emitchange=rdr->isEmitResultsChangedEnabled();
+                rdr->disableEmitResultsChanged();
+
+                const QString evalID=localfitresults.first().evalID;
+                int index=localfitresults.first().index;
+
+                if (index<0) {
+                    rdr->resultsSet(localfitresults.first(), true);
+                    /*QMapIterator<QString, QFRawDataRecord::evaluationResult> mit(localfitresults.first().fitresults);
+                    while (mit.hasNext()) {
+                        mit.next();
+                        rdr->resultsSet(evalID, mit.key(), mit.value());
+                    }*/
+                    localfitresults.first().fitresults.clear();
+                } else if (index>=0) {
+                    QMapIterator<QString, QFRawDataRecord::evaluationResult> mit(localfitresults.first().fitresults);
+                    while (mit.hasNext()) {
+                        mit.next();
+                        const QString pid=mit.key();
+                        QFRawDataRecord::evaluationResult newres=mit.value();
+                        switch(mit.value().type) {
+                            case QFRawDataRecord::qfrdreBoolean: {
+                                    QVector<bool> value;
+                                    if (rdr->resultsExists(evalID, pid)) {
+                                        QFRawDataRecord::evaluationResult ores=rdr->resultsGet(evalID, pid);
+                                        if (ores.type==QFRawDataRecord::qfrdreBooleanVector) {
+                                            value=ores.bvec;
+                                        }
+                                    }
+                                    while (value.size()<=index) value<<false;
+                                    value[index]=mit.value().bvalue;
+                                    for (int si=1; si<localfitresults.size(); si++) {
+                                        int oidx=localfitresults[si].index;
+                                        if (localfitresults[si].rdr==rdr && localfitresults[si].evalID==evalID && oidx>=0 && localfitresults[si].fitresults.contains(pid)) {
+                                            QFRawDataRecord::evaluationResult ores=localfitresults[si].fitresults[pid];
+                                            localfitresults[si].fitresults.remove(pid);
+                                            while (value.size()<=oidx) value<<false;
+                                            value[oidx]=ores.bvalue;
+                                        }
+                                    }
+                                    newres.type=QFRawDataRecord::qfrdreBooleanVector;
+                                    newres.bvec=value;
+                                    rdr->resultsSet(evalID, pid, newres);
+                                } break;
+                            case QFRawDataRecord::qfrdreNumber: {
+                                    QVector<double> value;
+                                    if (rdr->resultsExists(evalID, pid)) {
+                                        QFRawDataRecord::evaluationResult ores=rdr->resultsGet(evalID, pid);
+                                        if (ores.type==QFRawDataRecord::qfrdreNumberVector) {
+                                            value=ores.dvec;
+                                        }
+                                    }
+                                    while (value.size()<=index) value<<0.0;
+                                    value[index]=mit.value().dvalue;
+                                    for (int si=1; si<localfitresults.size(); si++) {
+                                        int oidx=localfitresults[si].index;
+                                        if (localfitresults[si].rdr==rdr && localfitresults[si].evalID==evalID && oidx>=0 && localfitresults[si].fitresults.contains(pid)) {
+                                            QFRawDataRecord::evaluationResult ores=localfitresults[si].fitresults[pid];
+                                            localfitresults[si].fitresults.remove(pid);
+                                            while (value.size()<=oidx) value<<0.0;
+                                            value[oidx]=ores.dvalue;
+                                        }
+                                    }
+                                    newres.type=QFRawDataRecord::qfrdreNumberVector;
+                                    newres.dvec=value;
+                                    rdr->resultsSet(evalID, pid, newres);
+                                } break;
+                            case QFRawDataRecord::qfrdreNumberError: {
+                                    QVector<double> value, valuee;
+                                    if (rdr->resultsExists(evalID, pid)) {
+                                        QFRawDataRecord::evaluationResult ores=rdr->resultsGet(evalID, pid);
+                                        if (ores.type==QFRawDataRecord::qfrdreNumberErrorVector) {
+                                            value=ores.dvec;
+                                            valuee=ores.evec;
+                                        }
+                                    }
+                                    while (value.size()<=index) {value<<0.0;}
+                                    while (valuee.size()<=index) { valuee<<0.0;}
+                                    value[index]=mit.value().dvalue;
+                                    valuee[index]=mit.value().derror;
+                                    for (int si=1; si<localfitresults.size(); si++) {
+                                        int oidx=localfitresults[si].index;
+                                        if (localfitresults[si].rdr==rdr && localfitresults[si].evalID==evalID && oidx>=0 && localfitresults[si].fitresults.contains(pid)) {
+                                            QFRawDataRecord::evaluationResult ores=localfitresults[si].fitresults[pid];
+                                            localfitresults[si].fitresults.remove(pid);
+                                            while (value.size()<=oidx) {value<<0.0;}
+                                            while (valuee.size()<=oidx) { valuee<<0.0;}
+                                            value[oidx]=ores.dvalue;
+                                            valuee[oidx]=ores.derror;
+                                        }
+                                    }
+                                    newres.type=QFRawDataRecord::qfrdreNumberErrorVector;
+                                    newres.dvec=value;
+                                    newres.evec=valuee;
+                                    rdr->resultsSet(evalID, pid, newres);
+                                } break;
+                            case QFRawDataRecord::qfrdreInteger: {
+                                    QVector<qlonglong> value;
+                                    if (rdr->resultsExists(evalID, pid)) {
+                                        QFRawDataRecord::evaluationResult ores=rdr->resultsGet(evalID, pid);
+                                        if (ores.type==QFRawDataRecord::qfrdreIntegerVector) {
+                                            value=ores.ivec;
+                                        }
+                                    }
+                                    while (value.size()<=index) value<<0;
+                                    value[index]=mit.value().ivalue;
+                                    for (int si=1; si<localfitresults.size(); si++) {
+                                        int oidx=localfitresults[si].index;
+                                        if (localfitresults[si].rdr==rdr && localfitresults[si].evalID==evalID && oidx>=0 && localfitresults[si].fitresults.contains(pid)) {
+                                            QFRawDataRecord::evaluationResult ores=localfitresults[si].fitresults[pid];
+                                            localfitresults[si].fitresults.remove(pid);
+                                            while (value.size()<=oidx) value<<0;
+                                            value[oidx]=ores.ivalue;
+                                        }
+                                    }
+                                    newres.type=QFRawDataRecord::qfrdreIntegerVector;
+                                    newres.ivec=value;
+                                    rdr->resultsSet(evalID, pid, newres);
+                                } break;
+                            case QFRawDataRecord::qfrdreString: {
+                                    QStringList value;
+                                    if (rdr->resultsExists(evalID, pid)) {
+                                        QFRawDataRecord::evaluationResult ores=rdr->resultsGet(evalID, pid);
+                                        if (ores.type==QFRawDataRecord::qfrdreStringVector) {
+                                            value=ores.svec;
+                                        }
+                                    }
+                                    while (value.size()<=index) value<<"";
+                                    value[index]=mit.value().ivalue;
+                                    for (int si=1; si<localfitresults.size(); si++) {
+                                        int oidx=localfitresults[si].index;
+                                        if (localfitresults[si].rdr==rdr && localfitresults[si].evalID==evalID && oidx>=0 && localfitresults[si].fitresults.contains(pid)) {
+                                            QFRawDataRecord::evaluationResult ores=localfitresults[si].fitresults[pid];
+                                            localfitresults[si].fitresults.remove(pid);
+                                            while (value.size()<=oidx) value<<"";
+                                            value[oidx]=ores.svalue;
+                                        }
+                                    }
+                                    newres.type=QFRawDataRecord::qfrdreStringVector;
+                                    newres.svec=value;
+                                    rdr->resultsSet(evalID, pid, newres);
+                                } break;
+                            default:
+                                break;
+                        }
+
+
+
+                    }
+                    localfitresults.first().fitresults.clear();
+                }
+
+                if (emitchange) rdr->enableEmitResultsChanged();
+
+
+                // remove all empty fit result sets
+                for (int i=localfitresults.size()-1; i>=0; i--) {
+                    if (localfitresults[i].fitresults.isEmpty()) {
+                        localfitresults.removeAt(i);
+                    }
+                }
+            }
+
+
+            cnt=0;
+        }
+    }
+}
+
+void QFFitResultsByIndexEvaluationFitSmartThread_Writer::cancel(bool waitForFinished)
+{
+    stopped=true;
+    while (waitForFinished && isRunning()) {
+        QApplication::processEvents();
+    }
+}
+
+void QFFitResultsByIndexEvaluationFitSmartThread_Writer::log_text(QString message)
+{
+    emit sigLogText(message);
+}
+
+void QFFitResultsByIndexEvaluationFitSmartThread_Writer::log_warning(QString message)
+{
+    emit sigLogWarning(message);
+}
+
+void QFFitResultsByIndexEvaluationFitSmartThread_Writer::log_error(QString message)
+{
+    emit sigLogError(message);
+}
+
+void QFFitResultsByIndexEvaluationFitSmartThread_Writer::addFitResult(const QList<QFRawDataRecord::QFFitFitResultsStore> &fitresults)
+{
+    QWriteLocker locker(lock);
+    this->fitresults<<fitresults;
+}

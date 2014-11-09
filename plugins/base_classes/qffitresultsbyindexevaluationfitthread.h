@@ -98,7 +98,45 @@ class QFFitResultsByIndexEvaluationFitThread : public QThread, public QFPluginLo
         
 };
 
+class QFFitResultsByIndexEvaluationFitSmartThread; // forward
 
+class QFFitResultsByIndexEvaluationFitSmartThread_Writer  : public QThread, public QFPluginLogService {
+        Q_OBJECT
+        Q_INTERFACES(QFPluginLogService)
+    public:
+        explicit QFFitResultsByIndexEvaluationFitSmartThread_Writer(const QFProject* project,  QObject* parent=NULL);
+        virtual ~QFFitResultsByIndexEvaluationFitSmartThread_Writer();
+
+        virtual void run();
+
+        void cancel(bool waitForFinished=true);
+
+
+        virtual void log_text(QString message);
+        /** \brief log project warning message
+         *  \param message the warning message to log
+         */
+        virtual void log_warning(QString message);
+        /** \brief log project error message
+         *  \param message the error message to log
+         */
+        virtual void log_error(QString message);
+
+        void addFitResult(const QList<QFRawDataRecord::QFFitFitResultsStore>& fitresults);
+
+    signals:
+        void sigLogText(QString message);
+        void sigLogWarning(QString message);
+        void sigLogError(QString message);
+
+    protected:
+        QList<QFRawDataRecord::QFFitFitResultsStore> fitresults;
+        const QFProject* project;
+
+        mutable QReadWriteLock* lock;
+
+        bool stopped;
+};
 
 class QFFitResultsByIndexEvaluationFitSmartThread  : public QThread, public QFPluginLogService {
         Q_OBJECT
@@ -106,8 +144,10 @@ class QFFitResultsByIndexEvaluationFitSmartThread  : public QThread, public QFPl
     public:
 
         explicit QFFitResultsByIndexEvaluationFitSmartThread(bool stopWhenEmpty, QObject* parent=NULL);
+        explicit QFFitResultsByIndexEvaluationFitSmartThread(QFFitResultsByIndexEvaluationFitSmartThread_Writer* writer, bool stopWhenEmpty, QObject* parent=NULL);
         virtual ~QFFitResultsByIndexEvaluationFitSmartThread();
 
+        void setWriter(QFFitResultsByIndexEvaluationFitSmartThread_Writer* writer);
 
         virtual void run();
 
@@ -154,6 +194,8 @@ class QFFitResultsByIndexEvaluationFitSmartThread  : public QThread, public QFPl
 
         int jobsDone;
         int jobCount;
+
+        QFFitResultsByIndexEvaluationFitSmartThread_Writer* writer;
 
 };
 

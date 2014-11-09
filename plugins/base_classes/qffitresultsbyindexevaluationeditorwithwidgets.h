@@ -358,17 +358,17 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
     public slots:
         /*! \brief fit model to current data
          */
-        void fitCurrent();
+        virtual void fitCurrent();
         /** \brief fit all files (current run) */
-        void fitAll();
+        virtual void fitAll();
         /** \brief fit all files, all runs */
-        void fitRunsAll();
+        virtual void fitRunsAll();
         /** \brief fit all runs in current file */
-        void fitRunsCurrent();
+        virtual void fitRunsCurrent();
 
-        void fitEverythingThreaded();
-        void fitAllRunsThreaded();
-        void fitAllFilesThreaded();
+        virtual void fitEverythingThreaded();
+        virtual void fitAllRunsThreaded();
+        virtual void fitAllFilesThreaded();
 
     private:
         /** \brief create all widgets on the form */

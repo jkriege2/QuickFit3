@@ -880,7 +880,7 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
 
 }
 
-void QFFCSFitEvaluation::doFitForMultithreadReturn(QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult& result, const QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
+void QFFCSFitEvaluation::doFitForMultithreadReturn(QFRawDataRecord::QFFitFitResultsStore& result, const QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
 {
     result.index=run;
     result.rdr=record;
@@ -986,7 +986,7 @@ void QFFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFile
                 fm.evaluate(d, pm);
 
                 double chi2=0;
-                for (int i=0; i<fm.get_evalout(); i++)  {
+                for (uint64_t i=0; i<fm.get_evalout(); i++)  {
                     chi2=chi2+qfSqr(d[i]);
                 }
                 chi2Landscape[idx]=chi2;

@@ -477,7 +477,7 @@ void QFRDRFCSData::exportData(const QString& format, const QString& filename)con
         tool.role=getRole();
         tool.runs=correlationRuns;
         tool.rateRuns=rateRuns;
-        for (int i=0; i<getPropertyCount(); i++) {
+        for (unsigned int i=0; i<getPropertyCount(); i++) {
             QString id=getPropertyName(i);
             if (isPropertyVisible(id)) {
                 tool.properties.insert(id, getQFProperty(id));

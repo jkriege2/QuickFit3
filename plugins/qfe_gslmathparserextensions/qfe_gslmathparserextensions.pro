@@ -34,12 +34,10 @@ DESTDIR = $${QFOUTPUT}/plugins/
 
 # Input
 HEADERS += qfe_gslmathparserextensions.h \
-    qfe_gslmathparserextensionsfunctions.h \
-    ../../../../../LIB/trunk/statistics_tools.h
+    qfe_gslmathparserextensionsfunctions.h
 
 SOURCES += qfe_gslmathparserextensions.cpp \
-    qfe_gslmathparserextensionsfunctions.cpp \
-    ../../../../../LIB/trunk/statistics_tools.cpp
+    qfe_gslmathparserextensionsfunctions.cpp
 
 FORMS =
 

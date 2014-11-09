@@ -1003,12 +1003,14 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
     QApplication::processEvents();
     //QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
     QList<QFFitResultsByIndexEvaluationFitSmartThread*> threads;
+    QFFitResultsByIndexEvaluationFitSmartThread_Writer* writerthread;
     int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
     if (ProgramOptions::getConfigValue(eval->getType()+"/overrule_threads", false).toBool()) {
         threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
     }
+    writerthread=new QFFitResultsByIndexEvaluationFitSmartThread_Writer(eval->getProject(), this);
     for (int i=0; i<threadcount; i++) {
-        threads.append(new QFFitResultsByIndexEvaluationFitSmartThread(true, this));
+        threads.append(new QFFitResultsByIndexEvaluationFitSmartThread(writerthread,true, this));
     }
 
 
@@ -1041,6 +1043,7 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
 
 
     // start all threads and wait for them to finish
+    writerthread->start();
     for (int i=0; i<threadcount; i++) {
         threads[i]->start();
         //qDebug()<<"started thread "<<i;
@@ -1086,6 +1089,11 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
         //qDebug()<<"deleting thread "<<i<<threads[i]->isFinished()<<threads[i]->getJobsDone();
         delete threads[i];
     }
+
+    dlgTFitProgress->reportStatus(tr("fit done ... finalizing writer thread\n"));
+
+    writerthread->cancel();
+    delete writerthread;
 
     dlgTFitProgress->reportStatus(tr("fit done ... updating user interface\n"));
     dlgTFitProgress->setProgress(items+2);

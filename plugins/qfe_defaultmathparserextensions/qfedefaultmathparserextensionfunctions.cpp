@@ -187,7 +187,7 @@ qfmpResult fIRLS(const qfmpResult* params, unsigned int  n, QFMathParser* p){
         }
     }
 
-    if (n==fixOffset+2) {
+    if ((int64_t)n==fixOffset+2) {
         if (!(params[fixOffset+0].type==qfmpString && params[fixOffset+1].type==qfmpDouble)) {
             p->qfmpError("irls(X,Y,...,'fixParameter',fixValue) argument fixParameter has to be a string and fixValue a number");
             return p->getInvalidResult();

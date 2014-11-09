@@ -69,6 +69,8 @@ class QFWIDLIB_EXPORT QFTableView : public QWidget
 
         /** \brief add a histogram for the given dataset, copies the data to this widget */
         int addCopiedColumn(QString name, const double* data, int32_t size);
+        /** \brief add a histogram for the given dataset, copies the data to this widget */
+        int addColumn(QString name, const QList<QVariant>& data);
 
         void clear();
     signals:

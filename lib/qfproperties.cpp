@@ -122,13 +122,13 @@ QString QFProperties::getPropertyName(int i) const
     return props.keys().at(i);
 }
 
-bool QFProperties::isPropertyVisible(QString property) const {
+bool QFProperties::isPropertyVisible(const QString &property) const {
     QReadLocker lock(propertyLocker);
     if (!props.contains(property)) return false;
     return props[property].visible;
 }
 
-bool QFProperties::isPropertyUserEditable(QString property) const{
+bool QFProperties::isPropertyUserEditable(const QString &property) const{
     QReadLocker lock(propertyLocker);
     if (!props.contains(property)) return false;
     return props[property].usereditable;

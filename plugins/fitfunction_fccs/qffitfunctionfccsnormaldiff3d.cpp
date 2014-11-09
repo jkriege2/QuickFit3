@@ -72,7 +72,7 @@ QFFitFunctionFCCSNormalDiff3D::QFFitFunctionFCCSNormalDiff3D() {
     #define FCCS3DDiff_count_rate2 18
     addParameter(FloatNumber,  "background2",             "background count rate during measurement, ch. R",       "background B<sub>R</sub>", "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,   false, 0,            0,        1e50,     1    );
     #define FCCS3DDiff_background2 19
-    addParameter(FloatNumber,  "focus_volume",            "focus: effective colume",                               "V<sub>eff,rg</sub>",       "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError,false, 0.5,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "focus_volume",            "focus: effective volume",                               "V<sub>eff,rg</sub>",       "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError,false, 0.5,          0,        1e50,     1    );
     #define FCCS3DDiff_focus_volume 20
     addParameter(FloatNumber,  "concentration",           "concentration of species ab in focus",                  "C<sub>ab</sub>",           "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError,false, 0.5,          0,        1e50,     1    );
     #define FCCS3DDiff_concentration 21

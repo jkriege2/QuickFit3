@@ -69,6 +69,7 @@ void QFEvaluationItem::initNewID(QDomElement &e)
     description="";
     //std::cout<<"  reading XML\n";
     readXML(e, false, false);
+    this->ID=project->getNewID();
     //std::cout<<"  registering record\n";
     project->registerEvaluation(this);
     //std::cout<<"created QFEvaluationItem\n";

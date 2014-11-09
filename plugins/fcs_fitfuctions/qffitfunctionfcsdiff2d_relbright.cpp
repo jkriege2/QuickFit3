@@ -74,24 +74,22 @@ QFFitFunctionFCSDiff2DDifferentBrightness::QFFitFunctionFCSDiff2DDifferentBright
     #define FCSDiff_diff_tau3 19
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
     #define FCSDiff_offset 20
-    addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                       true,      true,         true,              QFFitFunction::EditError,    true, 6,            0.01,     100,      0.5  );
-    #define FCSDiff_focus_struct_fac 21
     addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                     false,     true,        false,              QFFitFunction::EditError,    false, 250,          0,        1e4,      1    );
-    #define FCSDiff_focus_width 22
-    addParameter(FloatNumber,  "focus_area",            "focus: effective area",                               "A<sub>eff</sub>",          "micron^2",         "&mu;m<sup>2</sup>",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCSDiff_focus_volume 23
+    #define FCSDiff_focus_width 21
+    addParameter(FloatNumber,  "focus_area",              "focus: effective area",                                 "A<sub>eff</sub>",          "micron^2",         "&mu;m<sup>2</sup>",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define FCSDiff_focus_volume 22
     addParameter(FloatNumber,  "diff_coeff1",             "diffusion coefficient of species 1",                    "D<sub>1</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
-    #define FCSDiff_diff_coeff1 24
+    #define FCSDiff_diff_coeff1 23
     addParameter(FloatNumber,  "diff_coeff2",             "diffusion coefficient of species 2",                    "D<sub>2</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
-    #define FCSDiff_diff_coeff2 25
+    #define FCSDiff_diff_coeff2 24
     addParameter(FloatNumber,  "diff_coeff3",             "diffusion coefficient of species 3",                    "D<sub>3</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
-    #define FCSDiff_diff_coeff3 26
+    #define FCSDiff_diff_coeff3 25
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCSDiff_count_rate 27
+    #define FCSDiff_count_rate 26
     addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
-    #define FCSDiff_background 28
+    #define FCSDiff_background 27
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
-    #define FCSDiff_cpm 30
+    #define FCSDiff_cpm 28
 
 }
 
@@ -184,9 +182,7 @@ void QFFitFunctionFCSDiff2DDifferentBrightness::calcParameter(double* data, doub
     double erho3=0;
     double tauD3=data[FCSDiff_diff_tau3];
     double etauD3=0;
-    double gamma=data[FCSDiff_focus_struct_fac];
-    double egamma=0;
-    //double gamma2=sqr(gamma);
+
     double wxy=data[FCSDiff_focus_width]/1.0e3;
     double ewxy=0;
     //double offset=data[FCSDiff_offset];
@@ -216,7 +212,6 @@ void QFFitFunctionFCSDiff2DDifferentBrightness::calcParameter(double* data, doub
         etauD2=error[FCSDiff_diff_tau2];
         erho3=error[FCSDiff_diff_rho3];
         etauD3=error[FCSDiff_diff_tau3];
-        egamma=error[FCSDiff_focus_struct_fac];
         ewxy=error[FCSDiff_focus_width]/1.0e3;
         eoffset=error[FCSDiff_offset];
         ecps=error[FCSDiff_count_rate];

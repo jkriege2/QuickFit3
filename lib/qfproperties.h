@@ -73,9 +73,9 @@ class QFLIB_EXPORT QFProperties {
         /** \brief returns the name of the i-th property */
         QString getPropertyName(int i) const ;
         /** \brief returns whether the given property is visible */
-        bool isPropertyVisible(QString property) const;
+        bool isPropertyVisible(const QString& property) const;
         /** \brief returns whether the given property is user editable */
-        bool isPropertyUserEditable(QString property) const ;
+        bool isPropertyUserEditable(const QString& property) const ;
         /** \brief delete the given property */
         void deleteProperty(const QString& n);
 
@@ -99,7 +99,7 @@ class QFLIB_EXPORT QFProperties {
             setQFProperty(p, QVariant(value), usereditable, visible);
         }
         /** \brief set property to the specified value */
-        inline void setStringProperty(const QString& p, QString value, bool usereditable=true, bool visible=true) {
+        inline void setStringProperty(const QString& p, const QString& value, bool usereditable=true, bool visible=true) {
             setQFProperty(p, QVariant(value), usereditable, visible);
         }
 
@@ -131,7 +131,7 @@ class QFLIB_EXPORT QFProperties {
          * This should be reimplemented by the inheriting object, to comply woth its error
          * reporting system!
          */
-        virtual void setPropertiesError(QString message) {};
+        virtual void setPropertiesError(const QString& message) {};
 
         /*! \brief write the properties to an XML, using the given QXmlStreamWriter object
 

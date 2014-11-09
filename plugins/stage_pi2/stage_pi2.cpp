@@ -251,7 +251,7 @@ void QFExtensionLinearStagePI2::calibrateJoysticks() {
 
 
 bool QFExtensionLinearStagePI2::isConnected(unsigned int i) {
-    if ((i>=0)&&(i<axes.size())) {
+    if ((i>=0)&&((int64_t)i<axes.size())) {
         QMutexLocker locker(axes[i].serial->getMutex());
         return axes[i].serial->getCOM()->isConnectionOpen();
     }
@@ -259,7 +259,7 @@ bool QFExtensionLinearStagePI2::isConnected(unsigned int i) {
 }
 
 void QFExtensionLinearStagePI2::connectDevice(unsigned int i) {
-    if ((i>=0)&&(i<axes.size())) {
+    if ((i>=0)&&((int64_t)i<axes.size())) {
         QMutexLocker locker(axes[i].serial->getMutex());
         JKSerialConnection* com=axes[i].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[i].serial;
@@ -293,7 +293,7 @@ void QFExtensionLinearStagePI2::connectDevice(unsigned int i) {
 }
 
 void QFExtensionLinearStagePI2::disconnectDevice(unsigned int axis) {
-    if ((axis>=0)&&(axis<axes.size())) {
+    if ((axis>=0)&&((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         JKSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
@@ -307,7 +307,7 @@ void QFExtensionLinearStagePI2::setLogging(QFPluginLogService* logService) {
 }
 
 void QFExtensionLinearStagePI2::setJoystickActive(unsigned int axis, bool enabled, double maxVelocity) {
-    if ((axis>=0)&&(axis<axes.size())) {
+    if ((axis>=0)&&((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         JKSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
@@ -332,7 +332,7 @@ bool QFExtensionLinearStagePI2::isJoystickActive(unsigned int axis) {
 
 
 void QFExtensionLinearStagePI2::stop(unsigned int axis) {
-    if ((axis>=0)&&(axis<axes.size())) {
+    if ((axis>=0)&&((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         JKSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
@@ -344,7 +344,7 @@ void QFExtensionLinearStagePI2::stop(unsigned int axis) {
 }
 
 double QFExtensionLinearStagePI2::getSpeed(unsigned int axis) {
-    if ((axis>=0)&&(axis<axes.size())) {
+    if ((axis>=0)&&((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         JKSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
@@ -366,7 +366,7 @@ double QFExtensionLinearStagePI2::getSpeed(unsigned int axis) {
 }
 
 double QFExtensionLinearStagePI2::getPosition(unsigned int axis) {
-    if ((axis>=0)&&(axis<axes.size())) {
+    if ((axis>=0)&&((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         JKSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
@@ -388,7 +388,7 @@ double QFExtensionLinearStagePI2::getPosition(unsigned int axis) {
 }
 
 void QFExtensionLinearStagePI2::move(unsigned int axis, double newPosition) {
-    if ((axis>=0)&&(axis<axes.size())) {
+    if ((axis>=0)&&((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         JKSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
@@ -404,7 +404,7 @@ void QFExtensionLinearStagePI2::move(unsigned int axis, double newPosition) {
 }
 
 QFExtensionLinearStage::AxisState QFExtensionLinearStagePI2::getAxisState(unsigned int axis)  {
-    if ((axis>=0)&&(axis<axes.size())) {
+    if ((axis>=0)&&((int64_t)axis<axes.size())) {
         QMutexLocker locker(axes[axis].serial->getMutex());
         JKSerialConnection* com=axes[axis].serial->getCOM();
         QFExtensionLinearStagePI2ProtocolHandler* serial=axes[axis].serial;
@@ -486,7 +486,7 @@ QFExtensionLinearStage::AxisState QFExtensionLinearStagePI2::getAxisState(unsign
 QString QFExtensionLinearStagePI2::getStageName(unsigned int axis) const
 {
     QString n=tr("PI Mercury 863 v2, axis %1").arg(axis);
-    if (axis>=0 && axis<axes.size()) n=axes[axis].label;
+    if (axis>=0 && (int64_t)axis<axes.size()) n=axes[axis].label;
     return n;
 }
 

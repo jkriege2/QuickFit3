@@ -1487,8 +1487,8 @@ void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord 
     //falg->setReporter(dlgFitProgress);
 
 
-    bool epc=get_doEmitPropertiesChanged();
-    bool erc=get_doEmitResultsChanged();
+    //bool epc=get_doEmitPropertiesChanged();
+    //bool erc=get_doEmitResultsChanged();
     QList<doFitData> fitData;
     //set_doEmitPropertiesChanged(false);
     //set_doEmitResultsChanged(false);
@@ -1508,8 +1508,10 @@ void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord 
         }
     }
 
-
+    QMutexLocker locker(mutexThreadedFit);
     setupGlobalFitTool(tool, &fitData, iparams, paramsVector, initialParamsVector, errorsVector, errorsVectorI, records, run, rangeMinDatarange, rangeMaxDatarange, false);
+    locker.unlock();
+
 
     bool OK=true;
     try {
@@ -1789,12 +1791,12 @@ void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord 
     delete falg;
 }
 
-void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult> &fitresult, const QList<const QFRawDataRecord *> &records, const QStringList &fitfunctionIDs, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
+void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFRawDataRecord::QFFitFitResultsStore> &fitresult, const QList<const QFRawDataRecord *> &records, const QStringList &fitfunctionIDs, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
 {
 
     for (int i=0; i<records.size(); i++) {
         const QString evalID=transformResultID(getEvaluationResultID(run, records[i]));
-        QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult r;
+        QFRawDataRecord::QFFitFitResultsStore r;
         r.index=run;
         r.rdr=records[i];
         r.rdrRecID=-1;
@@ -1868,8 +1870,9 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFFitResultsByIn
         }
     }
 
-
+    QMutexLocker locker(mutexThreadedFit);
     setupGlobalFitTool(tool, &fitData, iparams, paramsVector, initialParamsVector, errorsVector, errorsVectorI, records, run, rangeMinDatarange, rangeMaxDatarange, false);
+    locker.unlock();
 
     bool OK=true;
     try {
@@ -1945,11 +1948,11 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFFitResultsByIn
                             QString fpid=getFitParamID(pid);
                             QString ffid= getFitParamFixID(pid);
 
-                            QFFitResultsByIndexEvaluationFitTools::MultiFitFitParameterResult res, resfix, reslocal, reslocalfix;
-                            res.setNumberError(params[i], errors[i], unit, tr("fit results"), pid+": "+dfd.ffunc->getDescription(pid).name, dfd.ffunc->getDescription(pid).label, true);
-                            resfix.setBool(paramsFix[i],  tr("fit results"), "fix_"+pid+": "+dfd.ffunc->getDescription(pid).name+tr(", fix"), dfd.ffunc->getDescription(pid).label+tr(", fix"), false);
-                            reslocal.setBool(true);
-                            reslocalfix.setBool(true);
+                            QFRawDataRecord::evaluationResult res, resfix, reslocal, reslocalfix;
+                            res.resultsSetNumberError(params[i], errors[i], unit, tr("fit results"), pid+": "+dfd.ffunc->getDescription(pid).name, dfd.ffunc->getDescription(pid).label, true);
+                            resfix.resultsSetBoolean(paramsFix[i],  tr("fit results"), "fix_"+pid+": "+dfd.ffunc->getDescription(pid).name+tr(", fix"), dfd.ffunc->getDescription(pid).label+tr(", fix"), false);
+                            reslocal.resultsSetBoolean(true);
+                            reslocalfix.resultsSetBoolean(true);
 
 
                             fitresult[r].fitresults[fpid]=res;
@@ -1971,8 +1974,8 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFFitResultsByIn
                         }
                     }
 
-                    fitresult[r].fitresults[param="fitparam_g0"].setNumber(dfd.ffunc->evaluate(0, dfd.params),"", tr("fit results"), tr("g(0)"), tr("g(0)"), true);
-                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                    fitresult[r].fitresults[param="fitparam_g0"].resultsSetNumber(dfd.ffunc->evaluate(0, dfd.params),"", tr("fit results"), tr("g(0)"), tr("g(0)"), true);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
                     /*if (run<0) record->resultsSetNumber(evalID, "fitparam_g0", dfd.ffunc->evaluate(0, dfd.params));
                     else record->resultsSetInNumberListAndBool(evalID, "fitparam_g0", run, dfd.ffunc->evaluate(0, dfd.params), "", getParamNameLocalStore("fitparam_g0"), true);
@@ -1990,32 +1993,32 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFFitResultsByIn
 
 
                     QString label;
-                    fitresult[r].fitresults[param="fit_model_name"].setString(dfd.ffunc->id(), group, label=tr("fit results"), label, false);
-                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                    fitresult[r].fitresults[param="fit_model_name"].resultsSetString(dfd.ffunc->id(), group, label=tr("fit results"), label, false);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
-                    fitresult[r].fitresults[param="fitalg_name"].setString(falg->id(), group, label=tr("fit: algorithm"), label, false);
-                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                    fitresult[r].fitresults[param="fitalg_name"].resultsSetString(falg->id(), group, label=tr("fit: algorithm"), label, false);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
 
-                    fitresult[r].fitresults[param="fitalg_success"].setBool(result.fitOK, group, label=tr("fit: success"), label, false);
-                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                    fitresult[r].fitresults[param="fitalg_success"].resultsSetBoolean(result.fitOK, group, label=tr("fit: success"), label, false);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
-                    fitresult[r].fitresults[param="fitalg_runtime"].setNumber(deltaTime, "msecs", group, label=tr("fit: runtime"), label, false);
-                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                    fitresult[r].fitresults[param="fitalg_runtime"].resultsSetNumber(deltaTime, "msecs", group, label=tr("fit: runtime"), label, false);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
                      if (run<0 || saveLongStrings) {
-                        fitresult[r].fitresults[param="fitalg_message"].setString(result.messageSimple, group, label=tr("fit: message"), label, false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
-                        fitresult[r].fitresults[param="fitalg_messageHTML"].setString(result.message, group, label=tr("fit: message (markup)"), label, false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                        fitresult[r].fitresults[param="fitalg_message"].resultsSetString(result.messageSimple, group, label=tr("fit: message"), label, false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
+                        fitresult[r].fitresults[param="fitalg_messageHTML"].resultsSetString(result.message, group, label=tr("fit: message (markup)"), label, false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
                     }
 
-                    fitresult[r].fitresults[param="fit_datapoints"].setInt(dfd.cut_N, "", group, label=tr("fit: datapoints"), label, false);
-                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
-                    fitresult[r].fitresults[param="fit_cut_low"].setInt(dfd.cut_low, "", group, label=tr("fit: datapoints"), label, false);
-                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
-                    fitresult[r].fitresults[param="fit_cut_up"].setInt(dfd.cut_up, "", group, label=tr("fit: datapoints"), label, false);
-                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                    fitresult[r].fitresults[param="fit_datapoints"].resultsSetInteger(dfd.cut_N, "", group, label=tr("fit: datapoints"), label, false);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
+                    fitresult[r].fitresults[param="fit_cut_low"].resultsSetInteger(dfd.cut_low, "", group, label=tr("fit: datapoints"), label, false);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
+                    fitresult[r].fitresults[param="fit_cut_up"].resultsSetInteger(dfd.cut_up, "", group, label=tr("fit: datapoints"), label, false);
+                    fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
 
 
@@ -2033,7 +2036,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFFitResultsByIn
                             case QFRawDataRecord::qfrdreBoolean:
                             case QFRawDataRecord::qfrdreString:
                                 fitresult[r].fitresults[param="fitalg_"+it.key()]=it.value();
-                                fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                                fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
                                 break;
 
                             case QFRawDataRecord::qfrdreBooleanVector:
@@ -2046,7 +2049,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFFitResultsByIn
                             case QFRawDataRecord::qfrdreIntegerMatrix:
                                 if (run<0) {
                                     fitresult[r].fitresults[param="fitalg_"+it.key()]=it.value();
-                                    fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                                    fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
                                 }
                                 break;
                             default:
@@ -2059,40 +2062,40 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFFitResultsByIn
                         QFFitStatistics fit_stat= dfd.ffunc->calcFitStatistics(dfd.N, dfd.taudata, dfd.corrdata, dfd.weights, dfd.cut_low, dfd.cut_up, params, errors, dfd.paramsFix, 11, 25);
 
                         QString group=tr("fit statistics");
-                        fitresult[r].fitresults[param="fitstat_chisquared"].setNumber(fit_stat.residSqrSum, "", group, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"), false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                        fitresult[r].fitresults[param="fitstat_chisquared"].resultsSetNumber(fit_stat.residSqrSum, "", group, tr("chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font>"), false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
-                        fitresult[r].fitresults[param="fitstat_chisquared_weighted"].setNumber(fit_stat.residWeightSqrSum, "", group, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"), false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
-
-
-                        fitresult[r].fitresults[param="fitstat_residavg"].setNumber(fit_stat.residAverage, "", group, tr("residual average"), QString("&lang;E&rang;"), false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                        fitresult[r].fitresults[param="fitstat_chisquared_weighted"].resultsSetNumber(fit_stat.residWeightSqrSum, "", group, tr("weighted chi squared"), QString("<font size=\"+2\">&chi;<sup>2</sup></font> (weighted)"), false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
 
-                        fitresult[r].fitresults[param="fitstat_residavg_weighted"].setNumber(fit_stat.residWeightAverage, "", group, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"), false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                        fitresult[r].fitresults[param="fitstat_residavg"].resultsSetNumber(fit_stat.residAverage, "", group, tr("residual average"), QString("&lang;E&rang;"), false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
-                        fitresult[r].fitresults[param="fitstat_residstddev"].setNumber( fit_stat.residStdDev, "", group, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "), false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
 
-                        fitresult[r].fitresults[param="fitstat_residstddev_weighted"].setNumber( fit_stat.residWeightStdDev, "", group, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"), false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                        fitresult[r].fitresults[param="fitstat_residavg_weighted"].resultsSetNumber(fit_stat.residWeightAverage, "", group, tr("weighted residual average"), QString("&lang;E&rang; (weighted)"), false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
-                        fitresult[r].fitresults[param="fitstat_fitparams"].setInt(fit_stat.fitparamN, "", group, label=tr("fit params"), label, false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                        fitresult[r].fitresults[param="fitstat_residstddev"].resultsSetNumber( fit_stat.residStdDev, "", group, tr("residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang; "), false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
-                        fitresult[r].fitresults[param="fit_datapoints"].setInt(fit_stat.dataSize, "", group, label=tr("datapoints"), label, false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                        fitresult[r].fitresults[param="fitstat_residstddev_weighted"].resultsSetNumber( fit_stat.residWeightStdDev, "", group, tr("weighted residual stddev"), QString("&radic;&lang;E<sup><font size=\"+1\">2</font></sup>&rang;  (weighted)"), false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
-                        fitresult[r].fitresults[param="fitstat_dof"].setInt(fit_stat.degFreedom, "", group, label= tr("degrees of freedom"), label, false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                        fitresult[r].fitresults[param="fitstat_fitparams"].resultsSetInteger(fit_stat.fitparamN, "", group, label=tr("fit params"), label, false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
-                        fitresult[r].fitresults[param="fitstat_r2"].setNumber(fit_stat.Rsquared, "", group, tr("R squared"), tr("R<sup>2</sup>"), false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                        fitresult[r].fitresults[param="fit_datapoints"].resultsSetInteger(fit_stat.dataSize, "", group, label=tr("datapoints"), label, false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
-                        fitresult[r].fitresults[param="fitstat_tss"].setNumber(fit_stat.TSS, "", group, label= tr("total sum of squares"), label, false);
-                        fitresult[r].fitresults[getParamNameLocalStore(param)].setBool(true);
+                        fitresult[r].fitresults[param="fitstat_dof"].resultsSetInteger(fit_stat.degFreedom, "", group, label= tr("degrees of freedom"), label, false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
+
+                        fitresult[r].fitresults[param="fitstat_r2"].resultsSetNumber(fit_stat.Rsquared, "", group, tr("R squared"), tr("R<sup>2</sup>"), false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
+
+                        fitresult[r].fitresults[param="fitstat_tss"].resultsSetNumber(fit_stat.TSS, "", group, label= tr("total sum of squares"), label, false);
+                        fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
 
 
                         fit_stat.free();

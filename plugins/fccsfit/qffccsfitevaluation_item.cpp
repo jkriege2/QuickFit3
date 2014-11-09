@@ -1191,10 +1191,10 @@ void QFFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord *>
 {
 }
 
-void QFFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult> &result, const QList<const QFRawDataRecord *> &records, const QStringList &fitfunctionIDs, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
+void QFFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFRawDataRecord::QFFitFitResultsStore> &result, const QList<const QFRawDataRecord *> &records, const QStringList &fitfunctionIDs, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
 {
     for (int i=0; i<records.size(); i++) {
-        QFFitResultsByIndexEvaluationFitTools::MultiFitFitResult r;
+        QFRawDataRecord::QFFitFitResultsStore r;
         r.index=run;
         r.rdr=records[i];
         r.rdrRecID=-1;

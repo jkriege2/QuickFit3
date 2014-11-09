@@ -117,7 +117,7 @@ void DlgComponentInfo::on_cmbPlot_currentIndexChanged(int index)
         QVector<double> dc, deta, drho, dn;
         tab.load_csv(filename.toStdString(), ',', '#');
         if (tab.get_line_count()>0 && tab.get_column_count()>=4) {
-            for (int r=0; r<tab.get_line_count(); r++) {
+            for (int r=0; r<(int64_t)tab.get_line_count(); r++) {
                 double c=tab.get(0,r);
                 if (plugin->getComponentUnit(ui->comboBox->currentIndex())=="M") dc.append(c*1000.0);
                 else dc.append(c);

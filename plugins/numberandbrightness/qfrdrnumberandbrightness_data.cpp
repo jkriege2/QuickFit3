@@ -398,7 +398,7 @@ bool QFRDRNumberAndBrightnessData::loadFile(double *target, const QString &filen
             uint32 nx,ny;
             TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
             TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
-            if (nx!=width || ny!=height) {
+            if ((int64_t)nx!=width || (int64_t)ny!=height) {
                 ok=false;
             } else {
                 ok=TIFFReadFrame<double>(tif, target);
@@ -423,6 +423,8 @@ bool QFRDRNumberAndBrightnessData::loadFile(double *target, const QString &filen
             for (int i=0; i<width*height; i++) {
                 target[i]=target[i]*target[i];
             }
+            break;
+        default:
             break;
     }
     return ok;
@@ -539,8 +541,8 @@ void QFRDRNumberAndBrightnessData::maskSave(const QString &filename) const {
     QFile f(filename);
     if (f.open(QIODevice::WriteOnly)) {
         QTextStream str(&f);
-        for (uint32_t y=0; y<height; y++) {
-            for (uint32_t x=0; x<width; x++) {
+        for (int y=0; y<height; y++) {
+            for (int x=0; x<width; x++) {
                 if (leaveout[y*width+x]) {
                     str<<x<<", "<<y<<"\n";
                 }
@@ -553,14 +555,14 @@ void QFRDRNumberAndBrightnessData::maskSave(const QString &filename) const {
 
 void QFRDRNumberAndBrightnessData::maskClear() {
     if (!leaveout) return;
-    for (uint32_t i=0; i<width*height; i++) {
+    for (int i=0; i<width*height; i++) {
         leaveout[i]=false;
     }
 }
 
 void QFRDRNumberAndBrightnessData::maskSetAll() {
     if (!leaveout) return;
-    for (uint32_t i=0; i<width*height; i++) {
+    for (int i=0; i<width*height; i++) {
         leaveout[i]=true;
     }
 }
@@ -592,7 +594,7 @@ void QFRDRNumberAndBrightnessData::maskToggle(uint32_t x, uint32_t y) {
 
 void QFRDRNumberAndBrightnessData::maskInvert() {
     if (!leaveout) return;
-    for (uint32_t i=0; i<width*height; i++) {
+    for (int i=0; i<width*height; i++) {
         leaveout[i]=!leaveout[i];
     }
 }

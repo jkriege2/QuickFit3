@@ -208,11 +208,11 @@ qfmpResult fHist(const qfmpResult* params, unsigned int  n, QFMathParser* p){
               bins=params[i].toUInt();
               i++;
           }
-          if (i<n && params[i].type==qfmpString) {
+          if (i<(int64_t)n && params[i].type==qfmpString) {
               spec=params[i].str;
               i++;
           }
-          if (i<n && params[i].type==qfmpString) {
+          if (i<(int64_t)n && params[i].type==qfmpString) {
               label=params[i].str;
               i++;
           }
@@ -563,7 +563,7 @@ qfmpResult fDisp(const qfmpResult* params, unsigned int  n, QFMathParser* p){
       QPlainTextEdit* h=dlg->getHistory();
 
       QString t="";
-      for (int i=0; i<n; i++) {
+      for (unsigned int i=0; i<n; i++) {
           t=t+params[i].toString(dlg->getPrecision());
       }
 
@@ -581,7 +581,7 @@ qfmpResult fDispNLB(const qfmpResult* params, unsigned int  n, QFMathParser* p){
       QPlainTextEdit* h=dlg->getHistory();
 
       QString t="";
-      for (int i=0; i<n; i++) {
+      for (unsigned int i=0; i<n; i++) {
           t=t+params[i].toString(dlg->getPrecision());
       }
 
@@ -599,7 +599,7 @@ qfmpResult fDispType(const qfmpResult* params, unsigned int  n, QFMathParser* p)
       QPlainTextEdit* h=dlg->getHistory();
 
       QString t="";
-      for (int i=0; i<n; i++) {
+      for (unsigned int i=0; i<n; i++) {
           t=t+params[i].toTypeString(dlg->getPrecision());
       }
 

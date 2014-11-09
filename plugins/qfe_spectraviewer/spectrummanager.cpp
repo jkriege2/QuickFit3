@@ -463,7 +463,7 @@ void SpectrumManager::Spectrum::ensureSpectrum()
             //qDebug()<<table.get_column_count()<<"x"<<table.get_line_count();
             QVector<double> wl, sp;
             if (spectrumIDInFile==0 && table.get_column_count()>=2) {
-                for (int i=0; i<table.get_line_count(); i++) {
+                for (int i=0; i<(int64_t)table.get_line_count(); i++) {
                     if (!table.is_empty(0,i) && !table.is_empty(1,i)) {
                         wl<<table.get(0,i);
                         sp<<table.get(1,i);
@@ -471,14 +471,14 @@ void SpectrumManager::Spectrum::ensureSpectrum()
                 }
             } else if (spectrumIDInFile>0) {
                 if (separateWavelengthsInFile) {
-                    for (int i=0; i<table.get_line_count(); i++) {
+                    for (int i=0; i<(int64_t)table.get_line_count(); i++) {
                         if (!table.is_empty(spectrumIDInFile*2+0,i) && !table.is_empty(spectrumIDInFile*2+1,i)) {
                             wl<<table.get(spectrumIDInFile*2+0,i);
                             sp<<table.get(spectrumIDInFile*2+1,i);
                         }
                     }
                 } else {
-                    for (int i=0; i<table.get_line_count(); i++) {
+                    for (int i=0; i<(int64_t)table.get_line_count(); i++) {
                         if (!table.is_empty(0,i) && !table.is_empty(spectrumIDInFile+1,i)) {
                             wl<<table.get(0,i);
                             sp<<table.get(spectrumIDInFile+1,i);

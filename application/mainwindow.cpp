@@ -468,6 +468,7 @@ void MainWindow::newProject() {
         tvMain->setModel(project->getTreeModel());
         connect(project->getTreeModel(), SIGNAL(modelReset()), tvMain, SLOT(expandAll()));
         tvMain->expandAll();
+        connect(project, SIGNAL(sortOrderChanged(int)), this, SLOT(setProjectSortOrderActions(int)));
 
         rawDataFactory->distribute(project, settings, this, this);
         evaluationFactory->distribute(project, settings, this, this);
@@ -1443,6 +1444,21 @@ void MainWindow::createActions() {
     helpActList.append(helpPluginCopyrightAct);
 
 
+    QAction* actSort;
+    actsSort=new QActionGroup(this);
+    actsSort->setExclusive(true);
+    actsSort->addAction(actSort=new QAction(tr("... by ID"), this));
+    actSort->setCheckable(true);
+    actSort->setChecked(true);
+    actsSort->addAction(actSort=new QAction(tr("... by Name"), this));
+    actSort->setCheckable(true);
+    actsSort->addAction(actSort=new QAction(tr("... by Folder-Type-Name-Role"), this));
+    actSort->setCheckable(true);
+    connect(actsSort, SIGNAL(triggered(QAction*)), this, SLOT(setProjectSortOrder(QAction*)));
+
+
+
+
 
     aboutAct = new QAction(QIcon(":/about.png"), tr("&About"), this);
     aboutAct->setStatusTip(tr("Show the application's About box"));
@@ -1574,6 +1590,7 @@ void MainWindow::createMenus() {
     dataMenu->addAction(cutItemAct);
     dataMenu->addAction(pastItemAct);
 
+
     extensionMenu=menuBar()->addMenu(tr("&Extensions"));
     toolsMenu=menuBar()->addMenu(tr("&Tools"));
     toolsMenu->addAction(actUserFitfunctionsEditor);
@@ -1609,6 +1626,13 @@ void MainWindow::createMenus() {
     wizardsMenu->addSeparator();
     toolsMenu->addSeparator();
 
+
+
+    viewMenu= menuBar()->addMenu(tr("&View"));
+    menuProjectSort=viewMenu->addMenu(tr("project tree &sort order ..."));
+    menuProjectSort->addActions(actsSort->actions());
+
+
     menuBar()->addSeparator();
 
     helpMenu = menuBar()->addMenu(tr("&Help"));
@@ -1637,6 +1661,7 @@ void MainWindow::createMenus() {
 
     menus["file"]=fileMenu;
     menus["data"]=dataMenu;
+    menus["view"]=viewMenu;
     menus["data/rdr"]=insertItemMenu;
     menus["data/eval"]=evaluationMenu;
     menus["extensions"]=extensionMenu;
@@ -1898,6 +1923,7 @@ void MainWindow::loadProject(const QString &fileName, bool subsetMode, const QSe
     readProjectProperties();
     connect(project, SIGNAL(wasChanged(bool)), this, SLOT(setWindowModified(bool)));
     connect(project, SIGNAL(structureChanged()), this, SLOT(modelReset()));
+    connect(project, SIGNAL(sortOrderChanged(int)), this, SLOT(setProjectSortOrderActions(int)));
     if (project->error()) {
         QMessageBox::critical(this, tr("QuickFit %1").arg(qfInfoVersionFull()), project->errorDescription());
         logFileProjectWidget->log_error(project->errorDescription()+"\n");
@@ -2587,6 +2613,7 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     projectToolsMenu->setEnabled(projectModeEnabled);
     projectSpecialMenu->setEnabled(projectModeEnabled);
     dataMenu->setEnabled(projectModeEnabled);
+    viewMenu->setEnabled(projectModeEnabled);
     evaluationMenu->setEnabled(projectModeEnabled);
     insertItemMenu->setEnabled(projectModeEnabled);
     fileToolBar->setEnabled(projectModeEnabled);
@@ -2720,7 +2747,7 @@ void MainWindow::clearTableView(const QString &name)
 void MainWindow::addColumnToTableView(const QString &name, const QFTableService::TableColumn &column)
 {
     if (tables.contains(name)) {
-        tables[name]->addCopiedColumn(column.name, column.data.data(), column.data.size());
+        tables[name]->addColumn(column.name, column.data);
     }
 }
 
@@ -3859,6 +3886,22 @@ void MainWindow::openLabelLink(const QString &link)
 void MainWindow::clipboardDataChanged()
 {
     pastItemAct->setEnabled(clipboardContainsProjectXML() && this->projectModeEnabled);
+}
+
+void MainWindow::setProjectSortOrder(QAction *act)
+{
+    if (project) {
+        QList<QAction*> actsProjectSort=actsSort->actions();
+        if (actsProjectSort.contains(act)) project->setSortOrder(actsProjectSort.indexOf(act));
+    }
+}
+
+void MainWindow::setProjectSortOrderActions(int order)
+{
+    QList<QAction*> actsProjectSort=actsSort->actions();
+    if (project && order>=0 && order<actsProjectSort.size()) {
+        actsProjectSort[order]->setChecked(true);
+    }
 }
 
 bool MainWindow::clipboardContainsProjectXML() const

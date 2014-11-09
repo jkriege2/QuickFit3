@@ -232,7 +232,7 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
 
                     if ( (c>1) && ((w!=stacks.last().width)
                          ||(h!=stacks.last().height)
-                         ||(fr!=stacks.last().frames)) ) {
+                         ||(fr!=(int64_t)stacks.last().frames)) ) {
                         setError(tr("size of file '%1'' does not fit the size of the other files in this stack").arg(files[f]));
                         log_error(tr("size of file '%1'' does not fit the size of the other files in this stack").arg(files[f]));
                     }
@@ -513,7 +513,7 @@ double *QFRDRImageStackData::getImageStack(int stackID, uint32_t frame, uint32_t
     if (stack.data==NULL) return NULL;
     else {
         if (frame>=stack.frames) return NULL;
-        if (channel>=stack.channels) return NULL;
+        if ((int64_t)channel>=stack.channels) return NULL;
         return &(stack.data[channel*stack.width*stack.height*stack.frames+frame*stack.width*stack.height]);
     }
 }
