@@ -146,6 +146,7 @@ namespace QFMathParser_DefaultLib {
     void fAnyFalse(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
     void fContains(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fContainsLC(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fReplace(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fReplaceMulti(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fCountOccurences(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
@@ -334,6 +335,7 @@ namespace QFMathParser_DefaultLib {
     void fFind(qfmpResult &r,const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fFindFirst(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fContainsSubString(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fContainsSubStringLC(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fFilterFinite(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fSelect(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fUnique(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p);

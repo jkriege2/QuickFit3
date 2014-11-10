@@ -210,6 +210,8 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
 
     p->addFunction("containssubstring", QFMathParser_DefaultLib::fContainsSubString);
     p->addFunction("contains", QFMathParser_DefaultLib::fContains);
+    p->addFunction("containssubstr_caseinsensitive", QFMathParser_DefaultLib::fContainsSubStringLC);
+    p->addFunction("contains_caseinsensitive", QFMathParser_DefaultLib::fContainsLC);
     p->addFunction("replace", QFMathParser_DefaultLib::fReplace);
     p->addFunction("multireplace", QFMathParser_DefaultLib::fReplaceMulti);
 
@@ -1308,6 +1310,31 @@ namespace QFMathParser_DefaultLib {
         }
     }
 
+    void fContainsLC(qfmpResult& r, const qfmpResult *params, unsigned int  n, QFMathParser* p){
+        r.setInvalid();
+        if (n==2 && params[0].type==qfmpDoubleVector && params[1].type==qfmpDouble) {
+            r.type=qfmpBool;
+            r.boolean=params[0].numVec.contains(params[1].num);
+            r.isValid=true;
+        } else if (n==2 && params[0].type==qfmpBoolVector && params[1].type==qfmpBool) {
+            r.type=qfmpBool;
+            r.boolean=params[0].boolVec.contains(params[1].boolean);
+            r.isValid=true;
+        } else if (n==2 && params[0].type==qfmpStringVector && params[1].type==qfmpString) {
+            r.type=qfmpBool;
+            r.boolean=params[0].strVec.contains(params[1].str, Qt::CaseInsensitive);
+            r.isValid=true;
+        } else if (n==2 && params[0].type==qfmpString && params[1].type==qfmpString) {
+            const QString& dat=params[0].str;
+            r.type=qfmpBool;
+            r.boolean=dat.contains(params[1].str, Qt::CaseInsensitive);
+        } else {
+            p->qfmpError(QObject::tr("contains_caseinsensitive(x, value) needs two arguments: one vector x and a corresponding element value (or vector)"));
+            r.setInvalid();
+            return;
+        }
+    }
+
     void fContainsSubString(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
         r.setInvalid();
 
@@ -1360,6 +1387,57 @@ namespace QFMathParser_DefaultLib {
         }
     }
 
+    void fContainsSubStringLC(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        r.setInvalid();
+
+        if (n==2 && params[0].type==qfmpStringVector && params[1].type==qfmpString) {
+            const QStringList& dat=params[0].strVec;
+            r.type=qfmpBoolVector;
+            r.boolVec.clear();
+            for (int i=0; i<dat.size(); i++) {
+                bool f=false;
+                if (dat[i].contains(params[1].str, Qt::CaseInsensitive)) {
+                    f=true;
+                    break;
+                }
+                r.boolVec.append(f);
+            }
+        } else if (n==2 && params[0].type==qfmpString && params[1].type==qfmpString) {
+            const QString& dat=params[0].str;
+            r.type=qfmpBool;
+            r.boolean=dat.contains(params[1].str, Qt::CaseInsensitive);
+        } else  if (n==2 && params[0].type==qfmpStringVector && params[1].type==qfmpStringVector) {
+            const QStringList& dat=params[0].strVec;
+            r.type=qfmpDoubleVector;
+            r.numVec.clear();
+            r.isValid=true;
+            for (int i=0; i<dat.size(); i++) {
+                int add=-1;
+                for (int j=0; j<params[1].strVec.size(); j++) {
+                    QString v=params[1].strVec[j];
+                    if (dat[i].contains(v, Qt::CaseInsensitive)) {
+                        add=j;
+                        break;
+                    }
+                }
+                r.numVec.append(add);
+            }
+        } else  if (n==2 && params[0].type==qfmpString && params[1].type==qfmpStringVector) {
+            r.type=qfmpDouble;
+            r.num=-1;
+            r.isValid=true;
+            for (int j=0; j<params[1].strVec.size(); j++) {
+                if (params[0].str.contains(params[1].strVec[j], Qt::CaseInsensitive)) {
+                    r.num=j;
+                    break;
+                }
+            }
+        }  else {
+            p->qfmpError(QObject::tr("containssubstr_caseinsensitive(x, value) needs two arguments: stringVec/string, string/string or stringvec/string_vec"));
+            r.setInvalid();
+            return;
+        }
+    }
     void fSelect(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
         r.setInvalid();
         if (n==2 && params[0].type==qfmpDoubleVector && params[1].type==qfmpBoolVector) {
@@ -2220,12 +2298,12 @@ namespace QFMathParser_DefaultLib {
                 rx.setCaseSensitivity(casesens);
                 if (params[1].type==qfmpStringVector) {
                     QVector<bool> bv;
-                    for (int i=0; i<r.strVec.size(); i++) {
-                        bv.append(rx.indexIn(r.strVec[i])>=0);
+                    for (int i=0; i<params[1].strVec.size(); i++) {
+                        bv.append(rx.indexIn(params[1].strVec[i])>=0);
                     }
                     r.setBoolVec(bv);
                 } else if (params[1].type==qfmpString) {
-                    r.setBoolean(rx.indexIn(r.str)>=0);
+                    r.setBoolean(rx.indexIn(params[1].str)>=0);
                 }
             } else {
                 p->qfmpError(QObject::tr("regexpcontains(regexp, strings) argument regexp has to be a string"));\
@@ -2254,12 +2332,12 @@ namespace QFMathParser_DefaultLib {
                 rx.setCaseSensitivity(casesens);
                 if (params[1].type==qfmpStringVector) {
                     QVector<double> bv;
-                    for (int i=0; i<r.strVec.size(); i++) {
-                        bv.append(rx.indexIn(r.strVec[i]));
+                    for (int i=0; i<params[1].strVec.size(); i++) {
+                        bv.append(rx.indexIn(params[1].strVec[i]));
                     }
                     r.setDoubleVec(bv);
                 } else if (params[1].type==qfmpString) {
-                    r.setDouble(rx.indexIn(r.str));
+                    r.setDouble(rx.indexIn(params[1].str));
                 }
             } else {
                 p->qfmpError(QObject::tr("regexpindexin(regexp, strings) argument regexp has to be a string"));\

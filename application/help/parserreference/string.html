@@ -120,7 +120,6 @@ $$funcref_end$$
 
 
 <h2>Escape-Sequences</h2>
-  <h2>Escapification</h2>
   $$funcref_start$$<a name="escapify"/><!-- func:escapify -->
     <b><tt><!-- template -->escapify(text)<!-- /template --></tt> - <i> convert the text to a text with C-escapes (\n \r ...) </i>:</b>
   $$funcref_description$$
@@ -134,106 +133,26 @@ $$funcref_end$$
   $$funcref_end$$
   
   
+  <h2>String Matching</h2>
+  
+  $$funcref_start$$<a name="containssubstring"/><!-- func:containssubstring -->
+  <b><tt><!-- template -->containssubstring(x, v)<!-- /template --></tt> - <i>returns <tt>true</tt> if the string <tt>v</tt> is contained in the string <tt>x</tt>. If <tt>x</tt> is a string vector, the function returns a vector of booleans. If <tt>v</tt> and <tt>x</tt> are string vector, the index of the first elemnt in <tt>v</tt> is returned, which is contained in each element of<tt>x</tt>.  </i>:</b>
+$$funcref_description$$
+  $$note:This function does a case-sensitive match!$$
+
+  <!-- /func:containssubstring -->  
+$$funcref_end$$
+  
+  $$funcref_start$$<a name="containssubstring_caseinsensitive"/><!-- func:containssubstring_caseinsensitive -->
+  <b><tt><!-- template -->containssubstring_caseinsensitive(x, v)<!-- /template --></tt> - <i>returns <tt>true</tt> if the string <tt>v</tt> is contained in the string <tt>x</tt>. If <tt>x</tt> is a string vector, the function returns a vector of booleans. If <tt>v</tt> and <tt>x</tt> are string vector, the index of the first elemnt in <tt>v</tt> is returned, which is contained in each element of<tt>x</tt>.  </i>:</b>
+$$funcref_description$$
+  $$note:This function does a case-insensitive match!$$
+
+  <!-- /func:containssubstring_caseinsensitive -->  
+$$funcref_end$$
   
   
   
-  
-  <h2>Regular Expressions Functions</h2>
-  <p>This chapter groups QF math parser functions for regular expressions. Please see the <a href="../qf3_qtregexp.html">QuickFit regular expressions help page</a> for details on the supported set of regular expressions and their syntax.</p>
-  
-  <h3>RegExp Searching</h3>
-  $$funcref_start$$<a name="regexpindexin"/><!-- func:regexpindexin -->
-  <b><tt><!-- template -->regexpindexin(regexp, strings)<!-- /template --></tt> - <i>returns index of the first occurence (or -1), of the given regular expression <tt>regexp</tt> in the given string or string vector (item-wise for string vectors, i.e. returns a number vector) in <tt>strings</tt>. This function uses non-minimal matching and is non-case-sensitive.</i>:</b>
-$$funcref_description$$
-  <!-- /func:regexpindexin -->  
-$$funcref_end$$
-
-  $$funcref_start$$<a name="regexpindexin_minimal"/><!-- func:regexpindexin_minimal -->
-  <b><tt><!-- template -->regexpindexin_minimal(regexp, strings)<!-- /template --></tt> - <i>returns index of the first occurence (or -1), of the given regular expression <tt>regexp</tt> in the given string or string vector (item-wise for string vectors, i.e. returns a number vector) in <tt>strings</tt>. This function uses minimal matching and is non-case-sensitive.</i>:</b>
-$$funcref_description$$
-  <!-- /func:regexpindexin_minimal -->  
-$$funcref_end$$
-
-  $$funcref_start$$<a name="regexpindexin_cs"/><!-- func:regexpindexin_cs -->
-  <b><tt><!-- template -->regexpindexin_cs(regexp, strings)<!-- /template --></tt> - <i>returns index of the first occurence (or -1), of the given regular expression <tt>regexp</tt> in the given string or string vector (item-wise for string vectors, i.e. returns a number vector) in <tt>strings</tt>. This function uses non-minimal matching and is case-sensitive.</i>:</b>
-$$funcref_description$$
-  <!-- /func:regexpindexin_cs -->  
-$$funcref_end$$
-
-
-
-
-  <h3>RegExp Check If Contains</h3>
-  $$funcref_start$$<a name="regexpcontains"/><!-- func:regexpcontains -->
-  <b><tt><!-- template -->regexpcontains(regexp, strings)<!-- /template --></tt> - <i>returns <tt>true</tt>, if the given regular expression <tt>regexp</tt> is present in the given string or string vector (item-wise for string vectors, i.e. returns a boolean vector) in <tt>strings</tt>. This function uses non-minimal matching and is non-case-sensitive.</i>:</b>
-$$funcref_description$$
-  <!-- /func:regexpcontains -->  
-$$funcref_end$$
-
-  $$funcref_start$$<a name="regexpcontains_minimal"/><!-- func:regexpcontains_minimal -->
-  <b><tt><!-- template -->regexpcontains_minimal(regexp, strings)<!-- /template --></tt> - <i>returns <tt>true</tt>, if the given regular expression <tt>regexp</tt> is present in the given string or string vector (item-wise for string vectors, i.e. returns a boolean vector) in <tt>strings</tt>. This function uses minimal matching and is non-case-sensitive.</i>:</b>
-$$funcref_description$$
-  <!-- /func:regexpcontains_minimal -->  
-$$funcref_end$$
-
-  $$funcref_start$$<a name="regexpcontains_cs"/><!-- func:regexpcontains_cs -->
-  <b><tt><!-- template -->regexpcontains_cs(regexp, strings)<!-- /template --></tt> - <i>returns <tt>true</tt>, if the given regular expression <tt>regexp</tt> is present in the given string or string vector (item-wise for string vectors, i.e. returns a boolean vector) in <tt>strings</tt>. This function uses non-minimal matching and is case-sensitive.</i>:</b>
-$$funcref_description$$
-  <!-- /func:regexpcontains_cs -->  
-$$funcref_end$$
-
-  $$funcref_start$$<a name="regexpcontains_cs_minimal"/><!-- func:regexpcontains_cs_minimal -->
-  <b><tt><!-- template -->regexpcontains_cs_minimal(regexp, strings)<!-- /template --></tt> - <i>returns <tt>true</tt>, if the given regular expression <tt>regexp</tt> is present in the given string or string vector (item-wise for string vectors, i.e. returns a boolean vector) in <tt>strings</tt>. This function uses minimal matching and is case-sensitive.</i>:</b>
-$$funcref_description$$
-  <!-- /func:regexpcontains_cs_minimal -->  
-$$funcref_end$$
-  $$funcref_start$$<a name="regexpindexin_cs_minimal"/><!-- func:regexpindexin_cs_minimal -->
-  <b><tt><!-- template -->regexpindexin_cs_minimal(regexp, strings)<!-- /template --></tt> - <i>returns index of the first occurence (or -1), of the given regular expression <tt>regexp</tt> in the given string or string vector (item-wise for string vectors, i.e. returns a number vector) in <tt>strings</tt>. This function uses minimal matching and is case-sensitive.</i>:</b>
-$$funcref_description$$
-  <!-- /func:regexpindexin_cs_minimal -->  
-$$funcref_end$$
-
-
-
-
-
-<h3>RegExp Capturing</h3>
-
-  $$funcref_start$$<a name="regexpcap"/><!-- func:regexpcap -->
-  <b><tt><!-- template -->regexpcap(regexp, strings, cap_id=1, default_string="")<!-- /template --></tt> - <i>applies the given regular expression <tt>regexp</tt> to the given string or string vector in <tt>strings</tt>. The function returns the <tt>cap_id</tt>-th captured substring (the default is <tt>cap_id=1</tt>). This function uses non-minimal matching and is non-case-sensitive.</i>:</b>
-$$funcref_description$$
-  If the regular expression does not match, the given <tt>default_string</tt> is returned.
- 
-  <!-- /func:regexpcap -->  
-$$funcref_end$$
-  
-    $$funcref_start$$<a name="regexpcap_minimal"/><!-- func:regexpcap_minimal -->
-  <b><tt><!-- template -->regexpcap_minimal(regexp, strings, cap_id=1, default_string="")<!-- /template --></tt> - <i>applies the given regular expression <tt>regexp</tt> to the given string or string vector in <tt>strings</tt>. The function returns the <tt>cap_id</tt>-th captured substring (the default is <tt>cap_id=1</tt>). This function uses minimal matching and is non-case-sensitive.</i>:</b>
-$$funcref_description$$
-  If the regular expression does not match, the given <tt>default_string</tt> is returned.
- 
-  <!-- /func:regexpcap_minimal -->  
-$$funcref_end$$
-
-  
-  
-  $$funcref_start$$<a name="regexpcap_cs"/><!-- func:regexpcap_cs -->
-  <b><tt><!-- template -->regexpcap_cs(regexp, strings, cap_id=1, default_string="")<!-- /template --></tt> - <i>applies the given regular expression <tt>regexp</tt> to the given string or string vector in <tt>strings</tt>. The function returns the <tt>cap_id</tt>-th captured substring (the default is <tt>cap_id=1</tt>). This function uses non-minimal matching and is case-sensitive.</i>:</b>
-$$funcref_description$$
-  If the regular expression does not match, the given <tt>default_string</tt> is returned.
- 
-  <!-- /func:regexpcap_cs -->  
-$$funcref_end$$
-
-
-  
-    $$funcref_start$$<a name="regexpcap_cs_minimal"/><!-- func:regexpcap_cs_minimal -->
-  <b><tt><!-- template -->regexpcap_cs_minimal(regexp, strings, cap_id=1, default_string="")<!-- /template --></tt> - <i>applies the given regular expression <tt>regexp</tt> to the given string or string vector in <tt>strings</tt>. The function returns the <tt>cap_id</tt>-th captured substring (the default is <tt>cap_id=1</tt>). This function uses minimal matching and is case-sensitive.</i>:</b>
-$$funcref_description$$
-  If the regular expression does not match, the given <tt>default_string</tt> is returned.
- 
-  <!-- /func:regexpcap_cs_minimal -->  
-$$funcref_end$$
 
   
   </body>

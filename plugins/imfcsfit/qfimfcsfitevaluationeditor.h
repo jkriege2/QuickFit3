@@ -180,9 +180,9 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         virtual int getUserRangeMax(QFRawDataRecord *rec, int index);
         virtual int getUserRangeMin(QFRawDataRecord *rec, int index);
     public slots:
-        virtual void fitEverythingThreaded();
+    /*    virtual void fitEverythingThreaded();
         virtual void fitAllRunsThreaded();
-        virtual void fitAllFilesThreaded();
+        virtual void fitAllFilesThreaded();*/
 };
 
 #endif // QFIMFCSFITEVALUATIONEDITOR_H

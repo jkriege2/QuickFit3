@@ -265,7 +265,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
         jempty=jobs.isEmpty();
     }
 
-    QList<QFRawDataRecord::QFFitFitResultsStore> fitresults;
+    QList<QFRawDataRecord::QFFitFitResultsStore> localfitresults;
     int cnt=0;
     bool done=false;
     while(!done) {
@@ -289,7 +289,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                 QFRawDataRecord::QFFitFitResultsStore result;
                 feval->doFitForMultithreadReturn(result, job.record, job.run, job.userMin, job.userMax, this);
 
-                fitresults.append(result);
+                localfitresults.append(result);
 
                 {
                     QWriteLocker locker(lock);
@@ -303,7 +303,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
             if (jobIsValid&&feval) {
                 QList<QFRawDataRecord::QFFitFitResultsStore> result;
                 feval->doFitForMultithreadReturn(result, job.records, job.fitfuncIDs, job.run, job.userMin, job.userMax, this);
-                fitresults<<result;
+                localfitresults<<result;
                 {
                     QWriteLocker locker(lock);
                     jobsDone++;
@@ -316,36 +316,40 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
         //qDebug()<<"thread, run="<<job.run<<"  done="<<done<<"  stopped="<<stopped<<"  jempty="<<jempty;
         if (writer && (cnt>50 || done)) {
             QWriteLocker locker(lock);
-            writer->addFitResult(fitresults);
-            fitresults.clear();
+            writer->addFitResult(localfitresults);
+            localfitresults.clear();
         } else if (cnt>500 || done) {
+            QElapsedTimer timer;
+            timer.start();
+            qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done;
+
             QWriteLocker locker(lock);
             QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
-            for (int i=0; i<fitresults.size(); i++) {
-                const QString evalID=fitresults[i].evalID;
-                fitresults[i].getRDR(project)->resultsSetEvaluationGroup(evalID, fitresults[i].evalgroup);
-                fitresults[i].getRDR(project)->resultsSetEvaluationGroupLabel(fitresults[i].evalgroup, fitresults[i].egrouplabel);
-                fitresults[i].getRDR(project)->resultsSetEvaluationGroupIndex(evalID, fitresults[i].egroupindex);
-                fitresults[i].getRDR(project)->resultsSetEvaluationDescription(evalID, fitresults[i].egroupdescription);
+            for (int i=0; i<localfitresults.size(); i++) {
+                const QString evalID=localfitresults[i].evalID;
+                localfitresults[i].getRDR(project)->resultsSetEvaluationGroup(evalID, localfitresults[i].evalgroup);
+                localfitresults[i].getRDR(project)->resultsSetEvaluationGroupLabel(localfitresults[i].evalgroup, localfitresults[i].egrouplabel);
+                localfitresults[i].getRDR(project)->resultsSetEvaluationGroupIndex(evalID, localfitresults[i].egroupindex);
+                localfitresults[i].getRDR(project)->resultsSetEvaluationDescription(evalID, localfitresults[i].egroupdescription);
             }
-            while (!fitresults.isEmpty()) {
-                QFRawDataRecord* rdr=fitresults.first().getRDR(project);
+            while (!localfitresults.isEmpty()) {
+                QFRawDataRecord* rdr=localfitresults.first().getRDR(project);
 
                 bool emitchange=rdr->isEmitResultsChangedEnabled();
                 rdr->disableEmitResultsChanged();
 
-                const QString evalID=fitresults.first().evalID;
-                int index=fitresults.first().index;
+                const QString evalID=localfitresults.first().evalID;
+                int index=localfitresults.first().index;
 
                 if (index<0) {
-                    QMapIterator<QString, QFRawDataRecord::evaluationResult> mit(fitresults.first().fitresults);
+                    QMapIterator<QString, QFRawDataRecord::evaluationResult> mit(localfitresults.first().fitresults);
                     while (mit.hasNext()) {
                         mit.next();
                         rdr->resultsSet(evalID, mit.key(), mit.value());
                     }
-                    fitresults.first().fitresults.clear();
+                    localfitresults.first().fitresults.clear();
                 } else if (index>=0) {
-                    QMapIterator<QString, QFRawDataRecord::evaluationResult> mit(fitresults.first().fitresults);
+                    QMapIterator<QString, QFRawDataRecord::evaluationResult> mit(localfitresults.first().fitresults);
                     while (mit.hasNext()) {
                         mit.next();
                         const QString pid=mit.key();
@@ -361,11 +365,11 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                                     }
                                     while (value.size()<=index) value<<false;
                                     value[index]=mit.value().bvalue;
-                                    for (int si=1; si<fitresults.size(); si++) {
-                                        int oidx=fitresults[si].index;
-                                        if (fitresults[si].rdr==rdr && fitresults[si].evalID==evalID && oidx>=0 && fitresults[si].fitresults.contains(pid)) {
-                                            QFRawDataRecord::evaluationResult ores=fitresults[si].fitresults[pid];
-                                            fitresults[si].fitresults.remove(pid);
+                                    for (int si=1; si<localfitresults.size(); si++) {
+                                        int oidx=localfitresults[si].index;
+                                        if (localfitresults[si].rdr==rdr && localfitresults[si].evalID==evalID && oidx>=0 && localfitresults[si].fitresults.contains(pid)) {
+                                            QFRawDataRecord::evaluationResult ores=localfitresults[si].fitresults[pid];
+                                            localfitresults[si].fitresults.remove(pid);
                                             while (value.size()<=oidx) value<<false;
                                             value[oidx]=ores.bvalue;
                                         }
@@ -384,11 +388,11 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                                     }
                                     while (value.size()<=index) value<<0.0;
                                     value[index]=mit.value().dvalue;
-                                    for (int si=1; si<fitresults.size(); si++) {
-                                        int oidx=fitresults[si].index;
-                                        if (fitresults[si].rdr==rdr && fitresults[si].evalID==evalID && oidx>=0 && fitresults[si].fitresults.contains(pid)) {
-                                            QFRawDataRecord::evaluationResult ores=fitresults[si].fitresults[pid];
-                                            fitresults[si].fitresults.remove(pid);
+                                    for (int si=1; si<localfitresults.size(); si++) {
+                                        int oidx=localfitresults[si].index;
+                                        if (localfitresults[si].rdr==rdr && localfitresults[si].evalID==evalID && oidx>=0 && localfitresults[si].fitresults.contains(pid)) {
+                                            QFRawDataRecord::evaluationResult ores=localfitresults[si].fitresults[pid];
+                                            localfitresults[si].fitresults.remove(pid);
                                             while (value.size()<=oidx) value<<0.0;
                                             value[oidx]=ores.dvalue;
                                         }
@@ -410,11 +414,11 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                                     while (valuee.size()<=index) { valuee<<0.0;}
                                     value[index]=mit.value().dvalue;
                                     valuee[index]=mit.value().derror;
-                                    for (int si=1; si<fitresults.size(); si++) {
-                                        int oidx=fitresults[si].index;
-                                        if (fitresults[si].rdr==rdr && fitresults[si].evalID==evalID && oidx>=0 && fitresults[si].fitresults.contains(pid)) {
-                                            QFRawDataRecord::evaluationResult ores=fitresults[si].fitresults[pid];
-                                            fitresults[si].fitresults.remove(pid);
+                                    for (int si=1; si<localfitresults.size(); si++) {
+                                        int oidx=localfitresults[si].index;
+                                        if (localfitresults[si].rdr==rdr && localfitresults[si].evalID==evalID && oidx>=0 && localfitresults[si].fitresults.contains(pid)) {
+                                            QFRawDataRecord::evaluationResult ores=localfitresults[si].fitresults[pid];
+                                            localfitresults[si].fitresults.remove(pid);
                                             while (value.size()<=oidx) {value<<0.0;}
                                             while (valuee.size()<=oidx) { valuee<<0.0;}
                                             value[oidx]=ores.dvalue;
@@ -436,11 +440,11 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                                     }
                                     while (value.size()<=index) value<<0;
                                     value[index]=mit.value().ivalue;
-                                    for (int si=1; si<fitresults.size(); si++) {
-                                        int oidx=fitresults[si].index;
-                                        if (fitresults[si].rdr==rdr && fitresults[si].evalID==evalID && oidx>=0 && fitresults[si].fitresults.contains(pid)) {
-                                            QFRawDataRecord::evaluationResult ores=fitresults[si].fitresults[pid];
-                                            fitresults[si].fitresults.remove(pid);
+                                    for (int si=1; si<localfitresults.size(); si++) {
+                                        int oidx=localfitresults[si].index;
+                                        if (localfitresults[si].rdr==rdr && localfitresults[si].evalID==evalID && oidx>=0 && localfitresults[si].fitresults.contains(pid)) {
+                                            QFRawDataRecord::evaluationResult ores=localfitresults[si].fitresults[pid];
+                                            localfitresults[si].fitresults.remove(pid);
                                             while (value.size()<=oidx) value<<0;
                                             value[oidx]=ores.ivalue;
                                         }
@@ -459,11 +463,11 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                                     }
                                     while (value.size()<=index) value<<"";
                                     value[index]=mit.value().ivalue;
-                                    for (int si=1; si<fitresults.size(); si++) {
-                                        int oidx=fitresults[si].index;
-                                        if (fitresults[si].rdr==rdr && fitresults[si].evalID==evalID && oidx>=0 && fitresults[si].fitresults.contains(pid)) {
-                                            QFRawDataRecord::evaluationResult ores=fitresults[si].fitresults[pid];
-                                            fitresults[si].fitresults.remove(pid);
+                                    for (int si=1; si<localfitresults.size(); si++) {
+                                        int oidx=localfitresults[si].index;
+                                        if (localfitresults[si].rdr==rdr && localfitresults[si].evalID==evalID && oidx>=0 && localfitresults[si].fitresults.contains(pid)) {
+                                            QFRawDataRecord::evaluationResult ores=localfitresults[si].fitresults[pid];
+                                            localfitresults[si].fitresults.remove(pid);
                                             while (value.size()<=oidx) value<<"";
                                             value[oidx]=ores.svalue;
                                         }
@@ -479,21 +483,22 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
 
 
                     }
-                    fitresults.first().fitresults.clear();
+                    localfitresults.first().fitresults.clear();
                 }
 
                 if (emitchange) rdr->enableEmitResultsChanged();
 
 
                 // remove all empty fit result sets
-                for (int i=fitresults.size()-1; i>=0; i--) {
-                    if (fitresults[i].fitresults.isEmpty()) {
-                        fitresults.removeAt(i);
+                for (int i=localfitresults.size()-1; i>=0; i--) {
+                    if (localfitresults[i].fitresults.isEmpty()) {
+                        localfitresults.removeAt(i);
                     }
                 }
             }
 
 
+            qDebug()<<"thread, writing  ... FINISHED AFTER "<<double(timer.nsecsElapsed())/1e6<<"ms";
             cnt=0;
         }
     }
@@ -537,7 +542,9 @@ void QFFitResultsByIndexEvaluationFitSmartThread_Writer::run()
         done=stopped;
         //qDebug()<<"thread, run="<<job.run<<"  done="<<done<<"  stopped="<<stopped<<"  jempty="<<jempty;
         if (localfitresults.size()>500 || done) {
-            //qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done;
+            QElapsedTimer timer;
+            timer.start();
+            qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done;
             for (int i=0; i<localfitresults.size(); i++) {
                 const QString evalID=localfitresults[i].evalID;
                 localfitresults[i].getRDR(project)->resultsSetEvaluationGroup(evalID, localfitresults[i].evalgroup);
@@ -713,6 +720,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread_Writer::run()
 
 
             cnt=0;
+            qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done<<"  ... FINISHED AFTER "<<double(timer.nsecsElapsed())/1e6<<"ms";
         }
     }
 }

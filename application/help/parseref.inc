@@ -12,6 +12,7 @@
 <li><b><a href="$$mainhelpdir$$/parserreference/polynomials.html">polynomial functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/distributions.html">distribution functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/string.html">string functions</a></b></li>
+<li><b><a href="$$mainhelpdir$$/parserreference/regexp.html">regular expressions functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/filenames.html">filename functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/filetools.html">file access functions</a></b></li>
 <li><b><a href="$$mainhelpdir$$/parserreference/vector.html">vector manipulation functions</a></b></li>

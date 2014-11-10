@@ -849,9 +849,9 @@ void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<
             // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
             // we are working with a complete set of parameters
             dfd.params=allocFillParameters(record, run, ffunc);
-            dfd.initialparams=allocFillParameters(record, run, ffunc);
+            dfd.initialparams=duplicateArray(dfd.params, ffunc->paramCount());// allocFillParameters(record, run, ffunc);
             dfd.errors=allocFillParameterErrors(record, run, ffunc);
-            dfd.errorsI=allocFillParameterErrors(record, run, ffunc);
+            dfd.errorsI=duplicateArray(dfd.errors, ffunc->paramCount());//allocFillParameterErrors(record, run, ffunc);
             dfd.paramsMin=allocFillParametersMin(record, ffunc);
             dfd.paramsMax=allocFillParametersMax(record, ffunc);
             dfd.paramsFix=allocFillFix(record, run, ffunc);

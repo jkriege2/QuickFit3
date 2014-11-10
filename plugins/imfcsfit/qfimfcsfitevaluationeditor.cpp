@@ -1333,7 +1333,7 @@ void QFImFCSFitEvaluationEditor::errorEstimateModeChanged()
 
 
 
-
+/*
 
 void QFImFCSFitEvaluationEditor::fitEverythingThreaded() {
     if (!current) return;
@@ -1506,7 +1506,7 @@ void QFImFCSFitEvaluationEditor::fitAllRunsThreaded() {
         threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
     }
     for (int i=0; i<threadcount; i++) {
-        threads.append(new QFFitResultsByIndexEvaluationFitSmartThread(writerthread, true, this));
+        threads.append(new QFFitResultsByIndexEvaluationFitSmartThread(writerthread,  true, this));
     }
 
 
@@ -1642,7 +1642,7 @@ void QFImFCSFitEvaluationEditor::fitAllFilesThreaded()
         threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
     }
     for (int i=0; i<threadcount; i++) {
-        threads.append(new QFFitResultsByIndexEvaluationFitSmartThread(writerthread, true, this));
+        threads.append(new QFFitResultsByIndexEvaluationFitSmartThread(writerthread,  true, this));
     }
 
 
@@ -1739,4 +1739,4 @@ void QFImFCSFitEvaluationEditor::fitAllFilesThreaded()
     QApplication::restoreOverrideCursor();
     dlgTFitProgress->done();
     delete dlgTFitProgress;
-}
+}*/

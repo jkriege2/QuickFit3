@@ -120,16 +120,17 @@ $$funcref_end$$
 $$funcref_start$$<a name="contains"/><!-- func:contains -->
   <b><tt><!-- template -->contains(x, v)<!-- /template --></tt> - <i>returns <tt>true</tt> if the element <tt>v</tt> is contained in the vector <tt>x</tt>.  If both elements are string, it returns true, if the substring <tt>v</tt> appears in <tt>x</tt>. </i>:</b>
 $$funcref_description$$
-  
+  $$note:For strings, this function does a case-sensitive match!$$
   <!-- /func:contains -->  
 $$funcref_end$$
   
-  $$funcref_start$$<a name="containssubstring"/><!-- func:containssubstring -->
-  <b><tt><!-- template -->containssubstring(x, v)<!-- /template --></tt> - <i>returns <tt>true</tt> if the string <tt>v</tt> is contained in the string <tt>x</tt>. If <tt>x</tt> is a string vector, the function returns a vector of booleans. If <tt>v</tt> and <tt>x</tt> are string vector, the index of the first elemnt in <tt>v</tt> is returned, which is contained in each element of<tt>x</tt>.  </i>:</b>
+$$funcref_start$$<a name="contains_caseinsensitive"/><!-- func:contains_caseinsensitive -->
+  <b><tt><!-- template -->contains_caseinsensitive(x, v)<!-- /template --></tt> - <i>returns <tt>true</tt> if the element <tt>v</tt> is contained in the vector <tt>x</tt>.  If both elements are string, it returns true, if the substring <tt>v</tt> appears in <tt>x</tt>. </i>:</b>
 $$funcref_description$$
-
-  <!-- /func:containssubstring -->  
+  $$note:For strings, this function does a case-insensitive match!$$
+  <!-- /func:contains_caseinsensitive -->  
 $$funcref_end$$
+  
   
   
   
