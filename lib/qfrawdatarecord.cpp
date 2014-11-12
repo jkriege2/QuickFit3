@@ -117,6 +117,26 @@ void QFRawDataRecord::setEvaluationIDMetadataInitSize(int initSize) {
     evaluationIDMetadataInitSize=initSize;
 }
 
+void QFRawDataRecord::resultsReadLock() const
+{
+    lock->lockForRead();
+}
+
+void QFRawDataRecord::resultsWriteLock() const
+{
+    lock->lockForWrite();
+}
+
+void QFRawDataRecord::resultsReadUnLock() const
+{
+    lock->unlock();
+}
+
+void QFRawDataRecord::resultsWriteUnLock() const
+{
+    lock->unlock();
+}
+
 
 QFRDRPropertyModel* QFRawDataRecord::getPropertyModel() {
     if (propModel==NULL) {
@@ -166,7 +186,7 @@ void QFRawDataRecord::init(QDomElement& e, bool loadAsDummy) {
     description="";
     group=-1;
     //std::cout<<"  reading XML\n";
-    readXML(e);
+    readXML(e, loadAsDummy, true);
 
     //std::cout<<"  registering record\n";
     project->registerRawDataRecord(this);
@@ -4307,6 +4327,11 @@ bool QFRawDataRecord::isRoleUserEditable() const
 bool QFRawDataRecord::showNextPreviousOfSameRoleButton() const
 {
     return true;
+}
+
+QReadWriteLock *QFRawDataRecord::getReadWriteLock() const
+{
+    return lock;
 }
 
 QString QFRawDataRecord::resultsGetInStringMatrix(const QString &evaluationName, const QString &resultName, int row, int column, const QString &defaultValue) const {

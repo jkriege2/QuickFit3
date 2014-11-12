@@ -290,6 +290,10 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief indicates, whether the next of same role/previous of same role buttons should be displayed */
         virtual bool showNextPreviousOfSameRoleButton() const;
 
+
+        /** \brief returns the QReadWriteLock object for this object */
+        QReadWriteLock* getReadWriteLock() const;
+
     protected:
         /** \copybrief QFProperties::setPropertiesError() */
         virtual void setPropertiesError(const QString& message) { setError(message); }
@@ -774,6 +778,13 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         bool doEmitResultsChanged;
         bool doEmitPropertiesChanged;
     public:
+
+
+        void resultsReadLock() const;
+        void resultsWriteLock() const;
+        void resultsReadUnLock() const;
+        void resultsWriteUnLock() const;
+
         /** \brief clear all evaluation results */
         void resultsClearAll();
         /** \brief clear all evaluation results of a specific evaluation name */

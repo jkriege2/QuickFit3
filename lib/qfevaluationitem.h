@@ -387,7 +387,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
          * id, ... but not the results and not the actual data. This function can be used to build a dummy project tree.
          *  \see QFProject::readXMLDummy() for more information on the property \a loadAsDummy
          */
-        void readXML(QDomElement& e, bool loadAsDummy=false, bool readID=false);
+        void readXML(QDomElement& e, bool loadAsDummy=false, bool readID=true);
         /** \brief write contents to QXmlStreamWriter (data tag) <b>IMPLEMENT IN CHILD CLASSES!</b>
          *
          * This method may be used to store additional data (like algorithm configuration ...) from the project file

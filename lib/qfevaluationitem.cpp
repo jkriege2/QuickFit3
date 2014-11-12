@@ -56,7 +56,7 @@ void QFEvaluationItem::init(QDomElement& e, bool loadAsDummy) {
     name="";;
     description="";
     //std::cout<<"  reading XML\n";
-    readXML(e);
+    readXML(e, loadAsDummy, true);
     //std::cout<<"  registering record\n";
     project->registerEvaluation(this);
     //std::cout<<"created QFEvaluationItem\n";
