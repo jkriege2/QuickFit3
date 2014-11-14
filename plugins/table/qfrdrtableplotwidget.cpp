@@ -1434,7 +1434,7 @@ void QFRDRTablePlotWidget::updateData() {
     ds->clear();
     if (current) {
         for (int c=0; c<current->model()->columnCount(); c++) {
-            double* data=(double*)malloc(current->model()->rowCount()*sizeof(double));
+            double* data=(double*)qfMalloc(current->model()->rowCount()*sizeof(double));
 
             for (int r=0; r<current->model()->rowCount(); r++) {
                 data[r]=NAN;
@@ -1458,7 +1458,7 @@ void QFRDRTablePlotWidget::updateData() {
 
             if (items>0) ds->addCopiedColumn(data, items, current->model()->columnTitle(c));
             else  ds->addCopiedColumn(&dummy, 1, current->model()->columnTitle(c));
-            free(data);
+            qfFree(data);
         }
         ds->addLinearColumn(current->model()->rowCount(), 1, current->model()->rowCount(), QString("rowNumColSpecial"));
     }

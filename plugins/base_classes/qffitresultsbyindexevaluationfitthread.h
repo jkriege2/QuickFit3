@@ -25,7 +25,7 @@
 #include <QThread>
 #include "qfrawdatarecord.h"
 #include "qfevaluationitem.h"
-#include <QReadWriteLock>
+#include <QMutex>
 #include <QReadLocker>
 #include <QWriteLocker>
 #include <QQueue>
@@ -55,6 +55,8 @@ class QFFitResultsByIndexEvaluationFitThread : public QThread, public QFPluginLo
         void addJob(QFFitResultsByIndexEvaluation* evaluation, QFRawDataRecord* record, int run, int userMin, int userMax);
         void addJob(QFFitResultsByIndexEvaluation* evaluation, QList<QFRawDataRecord*> records, int run, int userMin, int userMax);
 
+        void cleanJobs();
+
         void cancel(bool waitForFinished=true);
 
         int getJobsDone();
@@ -81,13 +83,17 @@ class QFFitResultsByIndexEvaluationFitThread : public QThread, public QFPluginLo
             QFFitResultsByIndexEvaluation* evaluation;
             QFRawDataRecord* record;
             QList<QFRawDataRecord*> records;
+            QFFitAlgorithm* falg;
+            QFFitFunction* ffunc;
             int run;
             int userMin;
             int userMax;
         };
         QQueue<Job> jobs;
+        QList<QFFitAlgorithm*> falgs;
+        QList<QFFitFunction*> ffuncs;
 
-        mutable QReadWriteLock* lock;
+        mutable QMutex* lock;
 
         bool stopped;
         bool stopWhenEmpty;
@@ -133,7 +139,7 @@ class QFFitResultsByIndexEvaluationFitSmartThread_Writer  : public QThread, publ
         QList<QFRawDataRecord::QFFitFitResultsStore> fitresults;
         const QFProject* project;
 
-        mutable QReadWriteLock* lock;
+        mutable QMutex* lock;
 
         bool stopped;
 };
@@ -159,6 +165,8 @@ class QFFitResultsByIndexEvaluationFitSmartThread  : public QThread, public QFPl
         int getJobsDone();
         int getJobCount();
 
+        void cleanJobs();
+
         virtual void log_text(QString message);
         /** \brief log project warning message
          *  \param message the warning message to log
@@ -181,13 +189,17 @@ class QFFitResultsByIndexEvaluationFitSmartThread  : public QThread, public QFPl
             const QFRawDataRecord* record;
             QList<const QFRawDataRecord*> records;
             QStringList fitfuncIDs;
+            QFFitAlgorithm* falg;
+            QFFitFunction* ffunc;
             int run;
             int userMin;
             int userMax;
         };
         QQueue<Job> jobs;
+        QList<QFFitAlgorithm*> falgs;
+        QList<QFFitFunction*> ffuncs;
 
-        mutable QReadWriteLock* lock;
+        mutable QMutex* lock;
 
         bool stopped;
         bool stopWhenEmpty;

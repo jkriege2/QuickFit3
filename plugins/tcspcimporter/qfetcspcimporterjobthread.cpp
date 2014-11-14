@@ -39,7 +39,7 @@ QMutex* QFETCSPCImporterJobThread::mutexFilename=NULL;
 QFETCSPCImporterJobThread::QFETCSPCImporterJobThread(QFPluginServices *services, QObject *parent) :
     QThread(parent)
 {
-    if (!mutexFilename) mutexFilename=new QMutex();
+    if (!mutexFilename) mutexFilename=new QMutex(QMutex::Recursive);
     outLocale=QLocale::c();
     outLocale.setNumberOptions(QLocale::OmitGroupSeparator);
     m_status=0;
@@ -835,9 +835,9 @@ void QFETCSPCImporterJobThread::createCorrelators() {
                  for (int j=0; j<job.fcs_S*job.fcs_P; j++) {
                      fcs_tau.append(corr1[0][j]*job.fcs_taumin);
                  }
-                 free(corr1[0]);
-                 free(corr1[1]);
-                 free(corr1);
+                 qfFree(corr1[0]);
+                 qfFree(corr1[1]);
+                 qfFree(corr1);
              }
          }
 
@@ -877,9 +877,9 @@ void QFETCSPCImporterJobThread::copyCorrelatorIntermediateResults(uint16_t fcs_s
              for (int tau=0; tau<qMin(job.fcs_P*job.fcs_S, fcs_tau.size()); tau++) {
                  fcs_ccfs[id].append(data[1][tau]-1.0);
              }
-             free(data[0]);
-             free(data[1]);
-             free(data);
+             qfFree(data[0]);
+             qfFree(data[1]);
+             qfFree(data);
         }
 
     }

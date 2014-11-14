@@ -23,7 +23,7 @@
 #include <cstdlib>
 #include <cmath>
 #include<QDebug>
-
+#include "qftools.h"
 QFImporterImageSeries::QFImporterImageSeries() {
     binning=1;
     x0=0;
@@ -83,12 +83,10 @@ bool QFImporterImageSeries::readFrameFloat(float* data) {
     if (!crop && binning==1) return intReadFrameFloat(data);
     int fw=intFrameWidth();
     int fh=intFrameHeight();
-    float* d=(float*)malloc(fw*fh*sizeof(float));
-    float* d1=(float*)malloc(fw*fh*sizeof(float));
-    bool OK=intReadFrameFloat(d);
+    QVector<float> d(fw*fh);
+    QVector<float> d1(fw*fh);
+    bool OK=intReadFrameFloat(d.data());
     if (!OK) {
-        free(d);
-        free(d1);
         return false;
     }
 
@@ -151,8 +149,6 @@ bool QFImporterImageSeries::readFrameFloat(float* data) {
         }
     }
 
-    free(d);
-    free(d1);
     return true;
 }
 
@@ -160,12 +156,12 @@ bool QFImporterImageSeries::readFrameDouble(double *data) {
     if (!crop && binning==1) return intReadFrameDouble(data);
     int fw=intFrameWidth();
     int fh=intFrameHeight();
-    double* d=(double*)malloc(fw*fh*sizeof(double));
-    double* d1=(double*)malloc(fw*fh*sizeof(double));
-    bool OK=intReadFrameDouble(d);
+    QVector<double> d(fw*fh);
+    QVector<double> d1(fw*fh);
+    //double* d=(double*)qfMalloc(fw*fh*sizeof(double));
+    //double* d1=(double*)qfMalloc(fw*fh*sizeof(double));
+    bool OK=intReadFrameDouble(d.data());
     if (!OK) {
-        free(d);
-        free(d1);
         return false;
     }
 
@@ -228,21 +224,17 @@ bool QFImporterImageSeries::readFrameDouble(double *data) {
         }
     }
 
-    free(d);
-    free(d1);
-    return true;
+   return true;
 }
 
 bool QFImporterImageSeries::readFrameUINT16(uint16_t* data) {
     if (!crop && binning==1) return intReadFrameUINT16(data);
     int fw=intFrameWidth();
     int fh=intFrameHeight();
-    uint16_t* d=(uint16_t*)malloc(fw*fh*sizeof(uint16_t));
-    uint16_t* d1=(uint16_t*)malloc(fw*fh*sizeof(uint16_t));
-    bool OK=intReadFrameUINT16(d);
+    QVector<uint16_t> d(fw*fh);
+    QVector<uint16_t> d1(fw*fh);
+    bool OK=intReadFrameUINT16(d.data());
     if (!OK) {
-        free(d);
-        free(d1);
         return false;
     }
 
@@ -305,8 +297,7 @@ bool QFImporterImageSeries::readFrameUINT16(uint16_t* data) {
         }
     }
 
-    free(d);
-    free(d1);
+
     return true;
 }
 

@@ -27,13 +27,12 @@
 #include <QHash>
 #include <QVariant>
 #include <QStringList>
-#include <QReadLocker>
-#include <QWriteLocker>
-#include <QReadWriteLock>
+#include "qftools.h"
 #include "lib_imexport.h"
 
 class QDomElement; // forward
 class QXmlStreamWriter;
+class QFPropertiesPrivate;
 
 /*! \brief implements a property system, together with storage to/read from XML files
     \ingroup qf3lib_project
@@ -105,6 +104,11 @@ class QFLIB_EXPORT QFProperties {
 
         /** \brief add all properties from another QFProperties object to this object */
         void addProperties(const QFProperties& other);
+
+        void propReadLock() const;
+        void propWriteLock() const;
+        void propReadUnLock() const;
+        void propWriteUnLock() const;
     protected:
         /** \brief struct to store a property */
         struct propertyItem {
@@ -114,8 +118,8 @@ class QFLIB_EXPORT QFProperties {
         };
         /** \brief internal store for the objectproperties */
         QHash<QString, propertyItem> props;
+        QFPropertiesPrivate* p;
 
-        mutable QReadWriteLock* propertyLocker;
 
         /** \brief called when the project properties (name, description, ...) changed
          *
@@ -150,5 +154,8 @@ class QFLIB_EXPORT QFProperties {
         /*! \brief read properties from a given QDomElement, which were written using storeProperties before */
         void readProperties(QDomElement& e);
 };
+
+
+DEFINE_READWRITE_LOCKERS(QFProperties, propReadLock, propWriteLock, propReadUnLock, propWriteUnLock)
 
 #endif // QFPROPERTIES_H

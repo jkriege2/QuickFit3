@@ -72,9 +72,9 @@ FRawDataImageEditor::FRawDataImageEditor(const QString& configprefix, QFPluginSe
 
 FRawDataImageEditor::~FRawDataImageEditor()
 {
-    if (plteOverviewSelectedData) free(plteOverviewSelectedData);
+    if (plteOverviewSelectedData) qfFree(plteOverviewSelectedData);
     plteOverviewSelectedData=NULL;
-    if (plteOverviewExcludedData) free(plteOverviewExcludedData);
+    if (plteOverviewExcludedData) qfFree(plteOverviewExcludedData);
     plteOverviewExcludedData=NULL;
 }
 
@@ -356,9 +356,9 @@ bool FRawDataImageEditor::evaluateFitFunction(QFRawDataRecord *current, const do
     QFFitFunction* ff=m_fitFunctions.value(fitfunc, NULL);
     //qDebug()<<evaluation<<fitfunc<<m_fitFunctions.size()<<ff;
     if (!ff) return false;
-    double* params=(double*)calloc(ff->paramCount(),sizeof(double));
-    double* errs=(double*)calloc(ff->paramCount(),sizeof(double));
-    bool* fixs=(bool*)calloc(ff->paramCount(),sizeof(bool));
+    double* params=(double*)qfCalloc(ff->paramCount(),sizeof(double));
+    double* errs=(double*)qfCalloc(ff->paramCount(),sizeof(double));
+    bool* fixs=(bool*)qfCalloc(ff->paramCount(),sizeof(bool));
     names.clear();
     namelabels.clear();
     values.clear();
@@ -421,9 +421,9 @@ bool FRawDataImageEditor::evaluateFitFunction(QFRawDataRecord *current, const do
         }
     }
 
-    free(params);
-    free(errs);
-    free(fixs);
+    qfFree(params);
+    qfFree(errs);
+    qfFree(fixs);
     return true;
 }
 
@@ -693,7 +693,7 @@ void FRawDataImageEditor::updateHistogram()
 void FRawDataImageEditor::updateHistogram(QFHistogramView *histogram, QFRDRRunSelectionsInterface *m, double *plteImageData, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram)
 {
     int32_t datasize=0;
-    double* datahist=(double*)malloc(plteImageSize*sizeof(double));
+    double* datahist=(double*)qfMalloc(plteImageSize*sizeof(double));
     if (dv) {
         histogram->clear();
         if (plteImageData && (plteImageSize>=0)) {
@@ -746,7 +746,7 @@ void FRawDataImageEditor::updateHistogram(QFHistogramView *histogram, QFRDRRunSe
             histogram->updateHistogram(true, -1);
         }
     } else histogram->addHistogram(tr("complete"), datahist, datasize, false);
-    if (datahist) free(datahist);
+    if (datahist) qfFree(datahist);
 
 }
 
@@ -763,12 +763,12 @@ void FRawDataImageEditor::updateCorrelation(QFParameterCorrelationView *corrView
 
 
     int32_t datasize=0;
-    double* datac1=(double*)malloc(plteImageSize*sizeof(double));
-    double* datac2=(double*)malloc(plteImageSize*sizeof(double));
-    double* datai=(double*)malloc(plteImageSize*sizeof(double));
-    double* dataX=(double*)malloc(plteImageSize*sizeof(double));
-    double* dataY=(double*)malloc(plteImageSize*sizeof(double));
-    double* dataC=(double*)malloc(plteImageSize*sizeof(double));
+    double* datac1=(double*)qfMalloc(plteImageSize*sizeof(double));
+    double* datac2=(double*)qfMalloc(plteImageSize*sizeof(double));
+    double* datai=(double*)qfMalloc(plteImageSize*sizeof(double));
+    double* dataX=(double*)qfMalloc(plteImageSize*sizeof(double));
+    double* dataY=(double*)qfMalloc(plteImageSize*sizeof(double));
+    double* dataC=(double*)qfMalloc(plteImageSize*sizeof(double));
 
 
     double* image=m->getImageFromRunsPreview(channel);
@@ -878,12 +878,12 @@ void FRawDataImageEditor::updateCorrelation(QFParameterCorrelationView *corrView
     }
 
 
-    if (datac1) free(datac1);
-    if (datac2) free(datac2);
-    if (datai) free(datai);
-    if (dataX) free(dataX);
-    if (dataY) free(dataY);
-    if (dataC) free(dataC);
+    if (datac1) qfFree(datac1);
+    if (datac2) qfFree(datac2);
+    if (datai) qfFree(datai);
+    if (dataX) qfFree(dataX);
+    if (dataY) qfFree(dataY);
+    if (dataC) qfFree(dataC);
 }
 
 void FRawDataImageEditor::updateSelectionHistogram(bool replot)

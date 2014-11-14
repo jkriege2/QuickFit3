@@ -760,7 +760,7 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                         res=new qfmpVectorAccessNode(varname, parameter, this, NULL);
                     }
                 } else if (CurrentToken == LPARENTHESE) { // function found
-                    //QFMathParser::qfmpNode** params=(QFMathParser::qfmpNode**)malloc(255*sizeof(QFMathParser::qfmpNode*));
+                    //QFMathParser::qfmpNode** params=(QFMathParser::qfmpNode**)qfMalloc(255*sizeof(QFMathParser::qfmpNode*));
                     QVector<QFMathParser::qfmpNode*> params;
 
 

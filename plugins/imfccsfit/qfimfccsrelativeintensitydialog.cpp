@@ -84,13 +84,13 @@ bool QFImFCCSRelativeIntensityDialog::calculateRelIntensity(QFRawDataRecord *ccf
 
             if (w>0 && h>0 && ch0 && ch1) {
                 //tim.write("2");
-                double* rel=(double*)malloc(w*h*sizeof(double));
+                double* rel=(double*)qfMalloc(w*h*sizeof(double));
                 for (int i=0; i<w*h; i++) {
 
                     rel[i]=ch1[i]/ch0[i];
                 }
                 if (rel_out) *rel_out=rel;
-                else if (rel) free(rel);
+                else if (rel) qfFree(rel);
 
                 QApplication::restoreOverrideCursor();
                 return true;
@@ -174,7 +174,7 @@ void QFImFCCSRelativeIntensityDialog::replotImages()
         ui->pltData->setAbsoluteXY(0,w,0,h);
         ui->pltData->setXY(0,w,0,h);
     }
-    if (rel) free(rel);
+    if (rel) qfFree(rel);
     ui->pltData->set_doDrawing(true);
     ui->pltData->update_plot();
     QApplication::restoreOverrideCursor();
@@ -206,7 +206,7 @@ void QFImFCCSRelativeIntensityDialog::addResult()
         ccf->resultsSetString(evalName, "ccf_file_role", ccf->getRole());
         ccf->resultsSetString(evalName, "ccf_file_name", ccf->getName());
 
-        if (rel) free(rel);
+        if (rel) qfFree(rel);
     }
     QApplication::restoreOverrideCursor();
 }

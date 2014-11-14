@@ -174,10 +174,10 @@ QFFitAlgorithm::FitQFFitFunctionFunctor::FitQFFitFunctionFunctor(QFFitFunction* 
 {
     m_model=model;
     m_N=model->paramCount();
-    functorFromModel=NULL;
-    modelFromFunctor=NULL;
+    functorFromModel.clear();
+    modelFromFunctor.clear();
 
-    m_modelparamsFix=duplicateArray(fixParams, m_N);
+    m_modelparamsFix=duplicateArrayV(fixParams, m_N);
 
     // now we calculate the mapping of the data
     m_paramCount=0;
@@ -189,8 +189,11 @@ QFFitAlgorithm::FitQFFitFunctionFunctor::FitQFFitFunctionFunctor(QFFitFunction* 
             }
         }
     }
-    functorFromModel=(int*)qfCalloc(m_N, sizeof(int));
-    modelFromFunctor=(int*)qfCalloc(m_paramCount, sizeof(int));
+    functorFromModel.resize(m_N);
+    functorFromModel.fill(0);
+    modelFromFunctor.resize(m_paramCount);
+    modelFromFunctor.fill(0);
+
     int pid=0;
     for (int i=0; i<m_N; i++) {
         functorFromModel[i]=-1;
@@ -204,20 +207,22 @@ QFFitAlgorithm::FitQFFitFunctionFunctor::FitQFFitFunctionFunctor(QFFitFunction* 
             }
         }
     }
-    m_modelParams=(double*)qfCalloc(m_N, sizeof(double));
+    m_modelParams.resize(m_N);
+    m_modelParams.fill(0);
+
     for (int i=0; i<m_N; i++) {
         m_modelParams[i]=currentParams[i];
     }
 };
 
 QFFitAlgorithm::FitQFFitFunctionFunctor::~FitQFFitFunctionFunctor() {
-    qfFree(functorFromModel);
+    /*qfFree(functorFromModel);
     qfFree(modelFromFunctor);
     qfFree(m_modelParams);
-    qfFree(m_modelparamsFix);
+    qfFree(m_modelparamsFix);*/
 }
 
-double* QFFitAlgorithm::FitQFFitFunctionFunctor::createMappedArrayForFunctor(const double* modelData) {
+double* QFFitAlgorithm::FitQFFitFunctionFunctor::createMappedArrayForFunctor(const double* modelData) const {
     double* result=(double*)qfCalloc(m_paramCount, sizeof(double));
 
     for (register int i=0; i<m_paramCount; i++) {
@@ -227,13 +232,25 @@ double* QFFitAlgorithm::FitQFFitFunctionFunctor::createMappedArrayForFunctor(con
     return result;
 }
 
-void QFFitAlgorithm::FitQFFitFunctionFunctor::mapArrayFromModelToFunctor(double* functorData, const double* modelData) {
+QVector<double> QFFitAlgorithm::FitQFFitFunctionFunctor::createMappedArrayForFunctorV(const double *modelData) const
+{
+    QVector<double> result;
+    result.resize(m_paramCount);
+
+    for (register int i=0; i<m_paramCount; i++) {
+        result[i]=modelData[modelFromFunctor[i]];
+    }
+
+    return result;
+}
+
+void QFFitAlgorithm::FitQFFitFunctionFunctor::mapArrayFromModelToFunctor(double* functorData, const double* modelData) const {
     for (register int i=0; i<m_paramCount; i++) {
         functorData[i]=modelData[modelFromFunctor[i]];
     }
 }
 
-void QFFitAlgorithm::FitQFFitFunctionFunctor::mapArrayFromFunctorToModel(double* modelData, const double* functorData) {
+void QFFitAlgorithm::FitQFFitFunctionFunctor::mapArrayFromFunctorToModel(double* modelData, const double* functorData) const {
     for (register int i=0; i<m_paramCount; i++) {
         modelData[modelFromFunctor[i]]=functorData[i];
     }
@@ -272,7 +289,10 @@ void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian(double* evalout, 
     mapArrayFromFunctorToModel(m_modelParams, params);
     register int pcount=get_paramcount();
     register int ecount=get_evalout();
-    double* p=(double*)qfCalloc(m_N, sizeof(double));
+    //double* p=(double*)qfCalloc(m_N, sizeof(double));
+    QVector<double> p;
+    p.resize(m_N);
+    p.fill(0);
     for (register int i=0; i<ecount; i++) {
         register int offset=i*pcount;
         for (register int j=0; j<m_N; j++) { p[j]=0; }
@@ -284,7 +304,7 @@ void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian(double* evalout, 
     //std::cout<<"jac"<<doublevectortostr(params, pcount)<<"=    [ecount="<<ecount<<", pcount="<<pcount<<"";
     //std::cout<<"modelFromFunctor"<<intvectortostr(modelFromFunctor, pcount)<<" ]\n";
     //std::cout<<doublearraytostr(evalout, pcount, ecount)<<std::endl;
-    qfFree(p);
+    //qfFree(p);
 }
 
 
@@ -377,6 +397,8 @@ void QFFitAlgorithm::readErrorEstimateParametersFit(const QFProperties *props, c
 
 QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double *paramsOut, double *paramErrorsOut, const double *dataX, const double *dataY, const double *dataWeight, uint64_t N, QFFitFunction *model, const double *initialParams, const bool *fixParams, const double *paramsMin, const double *paramsMax) {
     QFFitAlgorithm::FitResult result;
+    QVector<double> vppparamsMin, vppparamsMax, vdddataWeight;
+    QVector<bool> vppparamsFix;
     const double* pparamsMin=paramsMin;
     double* ppparamsMin=NULL;
     const double* pparamsMax=paramsMax;
@@ -386,28 +408,43 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double *paramsOut, double *paramEr
     const bool* pparamsFix=fixParams;
     bool* ppparamsFix=NULL;
     if (paramsMin==NULL) {
-        ppparamsMin=(double*)qfCalloc(model->paramCount(), sizeof(double));
+        //ppparamsMin=(double*)qfCalloc(model->paramCount(), sizeof(double));
+        vppparamsMin.resize(model->paramCount());
+        vppparamsMin.fill(0);
+        ppparamsMin=vppparamsMin.data();
         for (int i=0; i<model->paramCount(); i++) {
             ppparamsMin[i]=-DBL_MAX;
         }
         pparamsMin=ppparamsMin;
     }
     if (paramsMax==NULL) {
-        ppparamsMax=(double*)qfCalloc(model->paramCount(), sizeof(double));
+        //ppparamsMax=(double*)qfCalloc(model->paramCount(), sizeof(double));
+        vppparamsMax.resize(model->paramCount());
+        vppparamsMax.fill(0);
+        ppparamsMax=vppparamsMin.data();
+
         for (int i=0; i<model->paramCount(); i++) {
             ppparamsMax[i]=DBL_MAX;
         }
         pparamsMax=ppparamsMax;
     }
     if (dataWeight==NULL) {
-        dddataWeight=(double*)qfCalloc(N, sizeof(double));
+        //dddataWeight=(double*)qfCalloc(N, sizeof(double));
+        vdddataWeight.resize(N);
+        vdddataWeight.fill(0);
+        dddataWeight=vdddataWeight.data();
+
         for (uint64_t i=0; i<N; i++) {
             dddataWeight[i]=1.0;
         }
         ddataWeight=dddataWeight;
     }
     if (fixParams==NULL) {
-        ppparamsFix=(bool*)qfCalloc(model->paramCount(), sizeof(bool));
+        //ppparamsFix=(bool*)qfCalloc(model->paramCount(), sizeof(bool));
+        vppparamsFix.resize(model->paramCount());
+        vppparamsFix.fill(false);
+        ppparamsFix=vppparamsFix.data();
+
         for (int i=0; i<model->paramCount(); i++) {
             ppparamsFix[i]=false;
         }
@@ -420,23 +457,36 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double *paramsOut, double *paramEr
 
     //qDebug()<<"fm.get_paramcount()="<<fm.get_paramcount();
 
-    double* tparamsMin=fm.createMappedArrayForFunctor(pparamsMin);
-    double* tparamsMax=fm.createMappedArrayForFunctor(pparamsMax);
-    double* tparamsOut=(double*)qfCalloc(fm.get_paramcount(), sizeof(double));
-    double* tparamErrorsOut=(double*)qfCalloc(fm.get_paramcount(), sizeof(double));
-    double* tinitialParams=fm.createMappedArrayForFunctor(initialParams);
+    QVector<double> tparamsMin=fm.createMappedArrayForFunctorV(pparamsMin);
+    QVector<double> tparamsMax=fm.createMappedArrayForFunctorV(pparamsMax);
+    QVector<double> tparamsOut, tparamErrorsOut, tinitialParams;
+    tparamsOut.resize(fm.get_paramcount());
+    tparamsOut.fill(0);
+    tparamErrorsOut.resize(fm.get_paramcount());
+    tparamErrorsOut.fill(0);
+    tinitialParams=fm.createMappedArrayForFunctorV(initialParams);
 
-    result=intFit(tparamsOut, tparamErrorsOut, tinitialParams, &fm, tparamsMin, tparamsMax);
+    //double* tparamsOut=(double*)qfCalloc(fm.get_paramcount(), sizeof(double));
+    //double* tparamErrorsOut=(double*)qfCalloc(fm.get_paramcount(), sizeof(double));
+    //double* tinitialParams=fm.createMappedArrayForFunctor(initialParams);
+    double chi2=0;
+    result=intFit(tparamsOut.data(), tparamErrorsOut.data(), tinitialParams.data(), &fm, tparamsMin.data(), tparamsMax.data());
+    if (result.params.contains("error_sum")) chi2=result.params["error_sum"].getAsDouble();
 
     if (m_errorEstimateModeFit==fpeBootstrapping) {
         fm.setBootstrappingFraction(m_bootstrapFraction, false);
         fm.setBootstrappingEnabled(true, false);
 
-        double* bsParams=(double*)qfCalloc(fm.get_paramcount(), sizeof(double));
+        QVector<double> bsParams(fm.get_paramcount(), 0);
+        QVector<double> bsErrors(fm.get_paramcount(), 0);
+        QVector<double> bsParamSum(fm.get_paramcount(), 0);
+        QVector<double> bsParamSqrSum(fm.get_paramcount(), 0);
+        QVector<double> bsInitParams=tparamsOut;
+        /*double* bsParams=(double*)qfCalloc(fm.get_paramcount(), sizeof(double));
         double* bsErrors=(double*)qfCalloc(fm.get_paramcount(), sizeof(double));
         double* bsParamSum=(double*)qfCalloc(fm.get_paramcount(), sizeof(double));
         double* bsParamSqrSum=(double*)qfCalloc(fm.get_paramcount(), sizeof(double));
-        double* bsInitParams=duplicateArray(tparamsOut, fm.get_paramcount());
+        double* bsInitParams=duplicateArray(tparamsOut, fm.get_paramcount());*/
         MTRand rng;
 
         // initialize vectors and distor last fit results for initial fit parameter values,
@@ -454,9 +504,26 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double *paramsOut, double *paramEr
         //qDebug()<<"BS>> fit_result: "<<arrayToString(tparamsOut, fm.get_paramcount());
         //qDebug()<<"BS>> init_array: "<<arrayToString(bsInitParams, fm.get_paramcount());
         double N=0;
+
         for (int i=0; i<m_bootstrapRepeats; i++) {
             fm.prepareBootstrapSelection();
-            intFit(bsParams, bsErrors, bsInitParams, &fm, tparamsMin, tparamsMax);
+            double localChi2=0;
+            QFFitAlgorithm::FitResult resultbs=intFit(bsParams.data(), bsErrors.data(), bsInitParams.data(), &fm, tparamsMin.data(), tparamsMax.data());
+            if (result.params.contains("error_sum")) localChi2=result.params["error_sum"].getAsDouble();
+            if (chi2>0 && localChi2>0 && localChi2<chi2) {
+                chi2=localChi2;
+            }
+            long its=result.params.contains("iterations")?result.params["iterations"].getAsDouble():0;
+            long fevals=result.params.contains("function_evals")?result.params["function_evals"].getAsDouble():0;
+            long jevals=result.params.contains("jacobian_evals")?result.params["jacobian_evals"].getAsDouble():0;
+            long devals=result.params.contains("derivative_evals")?result.params["derivative_evals"].getAsDouble():0;
+            result=resultbs;
+            if (its>0 || result.params.contains("iterations")) result.addInteger("iterations", its+result.params.value("iterations").getAsDouble());
+            if (fevals>0 || result.params.contains("function_evals")) result.addInteger("function_evals", fevals+result.params.value("function_evals").getAsDouble());
+            if (jevals>0 || result.params.contains("jacobian_evals")) result.addInteger("jacobian_evals", jevals+result.params.value("jacobian_evals").getAsDouble());
+            if (devals>0 || result.params.contains("derivative_evals")) result.addInteger("derivative_evals", devals+result.params.value("derivative_evals").getAsDouble());
+
+
             bool ok=true;
             for (int j=0; j<fm.get_paramcount(); j++) {
                 const double p=bsParams[j];
@@ -490,12 +557,12 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double *paramsOut, double *paramEr
         result.addInteger("bootstrapSuccessfulRepeats", N);
         result.addNumber("bootstrapFraction", m_bootstrapFraction);
         result.addNumber("bootstrapDistortion", m_bootstrapDistortion);
-        result.addNumberList("bootstrapInitialparams", bsInitParams, fm.get_paramcount());
-        qfFree(bsParams);
+        result.addNumberList("bootstrapInitialparams", bsInitParams);
+        /*qfFree(bsParams);
         qfFree(bsErrors);
         qfFree(bsParamSum);
         qfFree(bsParamSqrSum);
-        qfFree(bsInitParams);
+        qfFree(bsInitParams);*/
         fm.setBootstrappingEnabled(false, true);
     } else {
         result.addString("errorEstimateMode", "by_fit_algorithm");
@@ -508,16 +575,16 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double *paramsOut, double *paramEr
     fm.mapArrayFromFunctorToModel(paramsOut, tparamsOut);
     fm.mapArrayFromFunctorToModel(paramErrorsOut, tparamErrorsOut);
 
-    qfFree(tparamsMax);
-    qfFree(tparamsMin);
-    qfFree(tparamErrorsOut);
-    qfFree(tparamsOut);
-    qfFree(tinitialParams);
+    //qfFree(tparamsMax);
+    //qfFree(tparamsMin);
+    //qfFree(tparamErrorsOut);
+    //qfFree(tparamsOut);
+    //qfFree(tinitialParams);
 
-    if (ppparamsMin==NULL) qfFree(ppparamsMin);
-    if (ppparamsMax==NULL) qfFree(ppparamsMax);
-    if (ppparamsFix==NULL) qfFree(ppparamsFix);
-    if (dddataWeight==NULL) qfFree(dddataWeight);
+    //if (ppparamsMin==NULL) qfFree(ppparamsMin);
+    //if (ppparamsMax==NULL) qfFree(ppparamsMax);
+    //if (ppparamsFix==NULL) qfFree(ppparamsFix);
+    //if (dddataWeight==NULL) qfFree(dddataWeight);
     return result;
 }
 

@@ -1200,14 +1200,14 @@ struct QFLIB_EXPORT QFFitStatistics {
         void free();
 
         int runAvgStart;   /**<  */
-        double* fitfunc;   /**<  */
-        double* residuals;   /**<  */
-        double* residuals_weighted;   /**<  */
+        QVector<double> fitfunc;   /**<  */
+        QVector<double> residuals;   /**<  */
+        QVector<double> residuals_weighted;   /**<  */
         int runAvgMaxN;   /**<  */
         int runAvgN;   /**<  */
-        double* tau_runavg;   /**<  */
-        double* residuals_runavg;   /**<  */
-        double* residuals_runavg_weighted;   /**<  */
+        QVector<double> tau_runavg;   /**<  */
+        QVector<double> residuals_runavg;   /**<  */
+        QVector<double> residuals_runavg_weighted;   /**<  */
         int fitparamN;   /**<  */
         int dataSize;   /**<  */
         int degFreedom;   /**<  */
@@ -1232,12 +1232,12 @@ struct QFLIB_EXPORT QFFitStatistics {
 
         double residHistBinWidth;   /**<  */
         double residHistWBinWidth;   /**<  */
-        double* resHistogram;   /**<  */
+        QVector<double> resHistogram;   /**<  */
         double resHistogramCount;   /**<  */
-        double* resWHistogram;   /**<  */
+        QVector<double> resWHistogram;   /**<  */
         double resWHistogramCount;   /**<  */
-        double* resCorrelation;   /**<  */
-        double* resWCorrelation;   /**<  */
+        QVector<double> resCorrelation;   /**<  */
+        QVector<double> resWCorrelation;   /**<  */
         int resN;   /**<  */
 };
 
@@ -1257,8 +1257,8 @@ struct QFLIB_EXPORT QFFitStatistics {
     \param runAvgWidth width of the averaging in the running averge
     \param residualHistogramBins bins in the residual histogram
 
-    \note the arrays in the resulting struct are allocated using \c malloc(), so you will have to free them using \c free() !!!
+    \note the arrays in the resulting struct are allocated using \c qfMalloc(), so you will have to free them using \c qfFree() !!!
   */
-QFLIB_EXPORT QFFitStatistics calculateFitStatistics(long N, double* tauvals, double* model, double* corrdata, double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins);
+QFLIB_EXPORT QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins);
 
 #endif // QFMATHTOOLS_H

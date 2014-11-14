@@ -112,8 +112,8 @@ bool QFImFCCSRelativeCCFDialog::calculateRelCCF(QFRawDataRecord *acf, QFRawDataR
 
             if (acfD && acfS && ccfD && ccfS && acfN>0 && ccfN>0) {
                 //tim.write("2");
-                double* rel=(double*)malloc(w*h*sizeof(double));
-                double* rel_error=(double*)malloc(w*h*sizeof(double));
+                double* rel=(double*)qfMalloc(w*h*sizeof(double));
+                double* rel_error=(double*)qfMalloc(w*h*sizeof(double));
                 uint64_t idxA=0;
                 uint64_t idxC=0;
                 for (int i=0; i<w*h; i++) {
@@ -159,9 +159,9 @@ bool QFImFCCSRelativeCCFDialog::calculateRelCCF(QFRawDataRecord *acf, QFRawDataR
                     //qDebug()<<i<<"/"<<w*h<<": "<<A<<D<<rel[i]<<rel_error[i];
                 }
                 if (rel_out) *rel_out=rel;
-                else if (rel) free(rel);
+                else if (rel) qfFree(rel);
                 if (rel_error_out) *rel_error_out=rel_error;
-                else if (rel_error) free(rel_error);
+                else if (rel_error) qfFree(rel_error);
 
                 QApplication::restoreOverrideCursor();
                 return true;
@@ -330,8 +330,8 @@ void QFImFCCSRelativeCCFDialog::replotImages()
         ui->pltData->setAbsoluteXY(0,w,0,h);
         ui->pltData->setXY(0,w,0,h);
     }
-    if (rel) free(rel);
-    if (rel_error) free(rel_error);
+    if (rel) qfFree(rel);
+    if (rel_error) qfFree(rel_error);
     //ui->pltData->zoomToFit();
     ui->pltData->set_doDrawing(true);
     ui->pltData->update_plot();
@@ -373,8 +373,8 @@ void QFImFCCSRelativeCCFDialog::addResult()
 
 
 
-        if (rel) free(rel);
-        if (rel_error) free(rel_error);
+        if (rel) qfFree(rel);
+        if (rel_error) qfFree(rel_error);
     }
     QApplication::restoreOverrideCursor();
 }

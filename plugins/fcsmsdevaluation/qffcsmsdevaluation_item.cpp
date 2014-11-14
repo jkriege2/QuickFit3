@@ -93,7 +93,7 @@ QFEvaluationEditor* QFFCSMSDEvaluationItem::createEditor(QFPluginServices* servi
     return new QFFCSMSDEvaluationEditor(services, propEditor, parent);
 }
 
-bool QFFCSMSDEvaluationItem::isApplicable(const QFRawDataRecord *record) {
+bool QFFCSMSDEvaluationItem::isApplicable(const QFRawDataRecord *record) const {
     return record->inherits("QFRDRFCSDataInterface");
 }
 
@@ -356,9 +356,9 @@ void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<doub
     D_out.clear();
     if (distTau.size()>1 && dist.size()>1 && evalWidth>=3) {
         for (int i=first; i<=distTau.size()-1 ; i+=qMax(1,evalShift)) {
-            double* t=(double*)calloc(evalWidth, sizeof(double));
-            double* lt=(double*)calloc(evalWidth, sizeof(double));
-            double* d=(double*)calloc(evalWidth, sizeof(double));
+            double* t=(double*)qfCalloc(evalWidth, sizeof(double));
+            double* lt=(double*)qfCalloc(evalWidth, sizeof(double));
+            double* d=(double*)qfCalloc(evalWidth, sizeof(double));
             int cnt=0;
             for (int j=i; j<=qMin(distTau.size()-1, i+evalWidth-1); j++) {
                 t[cnt]=distTau[j];
@@ -413,9 +413,9 @@ void QFFCSMSDEvaluationItem::calcMSDFits(QVector<double> &taus_out, QVector<doub
 
             }
 
-            free(lt);
-            free(t);
-            free(d);
+            qfFree(lt);
+            qfFree(t);
+            qfFree(d);
         }
     }
 }
@@ -435,13 +435,13 @@ QFFitStatistics QFFCSMSDEvaluationItem::calcFitStatistics(QFRawDataRecord *recor
         double* modelVals=modelValsIn;
         bool freeModelVals=false;
         if (!modelVals) {
-            modelVals=(double*)malloc(N*sizeof(double));
+            modelVals=(double*)qfMalloc(N*sizeof(double));
             QVector<double> msd=getMSD(record, index, model);
             QVector<double> msdTau=getMSDTaus(record, index, model);
             evaluateModel(record, index, model, taus, modelVals, N, msdTau.data(), msd.data(), msd.size());
             freeModelVals=true;
         }
-        //double* modelVals=(double*)malloc(N*sizeof(double));
+        //double* modelVals=(double*)qfMalloc(N*sizeof(double));
         //
         //(record, index, model, taus, modelVals, N);
         double* weights=allocWeights(NULL, record, index);
@@ -498,7 +498,7 @@ QFFitStatistics QFFCSMSDEvaluationItem::calcFitStatistics(QFRawDataRecord *recor
             }
         }
 
-        if (freeModelVals) free(modelVals);
+        if (freeModelVals) qfFree(modelVals);
 
         return result;
     }
@@ -966,9 +966,9 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
         uint32_t N=data->getCorrelationN();
         double* taus=data->getCorrelationT();
         int Ndist=rangeMaxDatarange-rangeMinDatarange;
-        double* distTaus=(double*)calloc(Ndist,sizeof(double));
-        double* dist=(double*)calloc(Ndist,sizeof(double));
-        double* modelEval=(double*)malloc(N*sizeof(double));
+        double* distTaus=(double*)qfCalloc(Ndist,sizeof(double));
+        double* dist=(double*)qfCalloc(Ndist,sizeof(double));
+        double* modelEval=(double*)qfMalloc(N*sizeof(double));
         bool weightsOK=false;
         double* corrdata=data->getCorrelationMean();
         if (index>=0) corrdata=data->getCorrelationRun(index);
@@ -1151,10 +1151,10 @@ void QFFCSMSDEvaluationItem::doFit(QFRawDataRecord* record, int index, int model
         //   finally we have to free the memory allocated in the calcFitStatistics() result.
         fit_stat.free();
 
-        free(dist);
-        free(weights);
-        free(modelEval);
-        free(distTaus);
+        qfFree(dist);
+        qfFree(weights);
+        qfFree(modelEval);
+        qfFree(distTaus);
 
 
     }

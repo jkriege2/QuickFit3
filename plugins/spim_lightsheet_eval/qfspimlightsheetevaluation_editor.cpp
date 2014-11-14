@@ -6,9 +6,9 @@
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
-    This software is free software: you can redistribute it and/or modify
+    This software is qfFree software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
+    the qfFree Software Foundation, either version 3 of the License, or
     (at your option) any later version.
 
     This program is distributed in the hope that it will be useful,
@@ -403,8 +403,8 @@ void QFSPIMLightsheetEvaluationEditor::showImageCut(QFSPIMLightsheetEvaluationIt
             markDataX[1]=w;
             markDataY[0]=markDataY[1]=round(y);
             item=(int)round(y);
-            double* data=(double*)malloc(h*sizeof(double));
-            double* dataX=(double*)malloc(h*sizeof(double));
+            double* data=(double*)qfMalloc(h*sizeof(double));
+            double* dataX=(double*)qfMalloc(h*sizeof(double));
             int data_count=0;
             int start_offset=0;
             if (mask) {
@@ -434,8 +434,8 @@ void QFSPIMLightsheetEvaluationEditor::showImageCut(QFSPIMLightsheetEvaluationIt
                 plteLineFitData->set_xErrorColumn(-1);
                 plteLineFitData->set_yErrorColumn(-1);
             }
-            free(data);
-            free(dataX);
+            qfFree(data);
+            qfFree(dataX);
 
         } else {
             markDataY[0]=0;
@@ -443,8 +443,8 @@ void QFSPIMLightsheetEvaluationEditor::showImageCut(QFSPIMLightsheetEvaluationIt
             markDataX[0]=markDataX[1]=round(x);
 
             item=(int)round(x);
-            double* data=(double*)malloc(h*sizeof(double));
-            double* dataX=(double*)malloc(h*sizeof(double));
+            double* data=(double*)qfMalloc(h*sizeof(double));
+            double* dataX=(double*)qfMalloc(h*sizeof(double));
 
             int data_count=0;
             int start_offset=0;
@@ -474,8 +474,8 @@ void QFSPIMLightsheetEvaluationEditor::showImageCut(QFSPIMLightsheetEvaluationIt
             plteLineFitData->set_yColumn(c_y);
             plteLineFitData->set_xErrorColumn(-1);
             plteLineFitData->set_yErrorColumn(-1);
-            free(data);
-            free(dataX);
+            qfFree(data);
+            qfFree(dataX);
         }
     }
 

@@ -73,7 +73,7 @@ QFEvaluationEditor* QFFCSFitEvaluation::createEditor(QFPluginServices* services,
     return new QFFCSFitEvaluationEditor(services, propEditor, parent);
 };
 
-bool QFFCSFitEvaluation::isApplicable(const QFRawDataRecord *record) {
+bool QFFCSFitEvaluation::isApplicable(const QFRawDataRecord *record) const {
     return record->inherits("QFRDRFCSDataInterface");
 }
 
@@ -433,14 +433,14 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
 
         // clean temporary parameters
         //delete doFitThread;
-        free(weights);
-        free(params);
-        free(initialparams);
-        free(errors);
-        free(errorsI);
-        free(paramsFix);
-        free(paramsMax);
-        free(paramsMin);
+        qfFree(weights);
+        qfFree(params);
+        qfFree(initialparams);
+        qfFree(errors);
+        qfFree(errorsI);
+        qfFree(paramsFix);
+        qfFree(paramsMax);
+        qfFree(paramsMin);
 
         //displayModel(false);
         //replotData();
@@ -517,15 +517,15 @@ void QFFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMinD
 
 
 
-void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
+void QFFCSFitEvaluation::doFitForMultithread(QFFitAlgorithm *falg, QFFitFunction *ffunc, QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
 {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
-    QFFitFunction* ffunc=createFitFunction();
-    QFFitAlgorithm* falg=createFitAlgorithm(NULL);
+    //QFFitFunction* ffunc=createFitFunction();
+    //QFFitAlgorithm* falg=createFitAlgorithm(NULL);
 
     if ((!ffunc)||(!data)||(!falg)) {
-        if (ffunc) delete ffunc;
-        if (falg) delete falg;
+        //if (ffunc) delete ffunc;
+        //if (falg) delete falg;
         return;
     }
 
@@ -535,7 +535,7 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
     if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
     int fitrepeats=qBound(1,getProperty("FIT_REPEATS", 1).toInt(),1000);
 
-    restoreQFFitAlgorithmParameters(falg);
+    //restoreQFFitAlgorithmParameters(falg);
     falg->readErrorEstimateParametersFit(this);
 
 
@@ -633,7 +633,7 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
                     result=falg->fit(params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, init, paramsFix, paramsMin, paramsMax);
                     copyArray(init, params, ffunc->paramCount());
                 }
-                free(init);
+                qfFree(init);
 
                 #if QT_VERSION >= 0x040800
                     double deltaTime=double(tstart.nsecsElapsed())/1.0e6;
@@ -865,18 +865,18 @@ void QFFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, i
 
         // clean temporary parameters
 
-        free(weights);
-        free(params);
-        free(initialparams);
-        free(errors);
-        free(paramsFix);
-        free(paramsMax);
-        free(paramsMin);
-        free(errorsI);
+        qfFree(weights);
+        qfFree(params);
+        qfFree(initialparams);
+        qfFree(errors);
+        qfFree(paramsFix);
+        qfFree(paramsMax);
+        qfFree(paramsMin);
+        qfFree(errorsI);
     }
 
-    if (ffunc) delete ffunc;
-    if (falg) delete falg;
+    //if (ffunc) delete ffunc;
+    //if (falg) delete falg;
 
 }
 
@@ -888,6 +888,13 @@ void QFFCSFitEvaluation::doFitForMultithreadReturn(QFRawDataRecord::QFFitFitResu
     if (result.rdr) result.rdrRecID=result.rdr->getID();
 
 
+}
+
+void QFFCSFitEvaluation::createFitFunctionAndAlgorithm(QFFitAlgorithm *&falg, QFFitFunction *&ffunc, const QFRawDataRecord */*record*/, int /*run*/)
+{
+    ffunc=createFitFunction();
+    falg=createFitAlgorithm(NULL);
+    restoreQFFitAlgorithmParameters(falg);
 }
 
 void QFFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFile, int paramXID, const QVector<double> &paramXValues, int paramYFile, int paramYID, const QVector<double> &paramYValues, const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange)
@@ -971,11 +978,11 @@ void QFFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFile
 
 
         QFFitAlgorithm::FitQFFitFunctionFunctor fm(ffunc, params, paramsFix, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N);
-        double* pm=(double*)malloc(fm.get_paramcount()*sizeof(double));
+        double* pm=(double*)qfMalloc(fm.get_paramcount()*sizeof(double));
         int idxX=paramXID;
         int idxY=paramYID;
         int idx=0;
-        double* d=(double*)calloc(fm.get_evalout(), sizeof(double));
+        double* d=(double*)qfCalloc(fm.get_evalout(), sizeof(double));
 
         for (int y=0; y<paramYValues.size(); y++) {
             for (int x=0; x<paramXValues.size(); x++) {
@@ -995,14 +1002,14 @@ void QFFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFile
             }
         }
 
-        free(d);
-        free(pm);
+        qfFree(d);
+        qfFree(pm);
 
 
-        free(weights);
-        free(params);
-        free(errors);
-         free(paramsFix);
+        qfFree(weights);
+        qfFree(params);
+        qfFree(errors);
+         qfFree(paramsFix);
 
 
     }

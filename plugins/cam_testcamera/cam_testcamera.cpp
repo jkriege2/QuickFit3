@@ -56,10 +56,10 @@ QFECamTestCamera::QFECamTestCamera(QObject* parent):
 
 QFECamTestCamera::~QFECamTestCamera()
 {
-    if (particleX[0]) free(particleX[0]);
-    if (particleY[0]) free(particleY[0]);
-    if (particleX[1]) free(particleX[1]);
-    if (particleY[1]) free(particleY[1]);
+    if (particleX[0]) qfFree(particleX[0]);
+    if (particleY[0]) qfFree(particleY[0]);
+    if (particleX[1]) qfFree(particleX[1]);
+    if (particleY[1]) qfFree(particleY[1]);
     particleX[0]=particleY[0]=particleX[1]=particleY[1]=NULL;
 }
 
@@ -422,10 +422,10 @@ QString QFECamTestCamera::getCameraSensorName(unsigned int camera) {
 
 void QFECamTestCamera::initParticles(int camera, int n) {
     this->particleN[camera]=n;
-    if (particleX[camera]) free(particleX[camera]);
-    if (particleY[camera]) free(particleY[camera]);
-    particleX[camera]=(int*)malloc(particleN[camera]*sizeof(int));
-    particleY[camera]=(int*)malloc(particleN[camera]*sizeof(int));
+    if (particleX[camera]) qfFree(particleX[camera]);
+    if (particleY[camera]) qfFree(particleY[camera]);
+    particleX[camera]=(int*)qfMalloc(particleN[camera]*sizeof(int));
+    particleY[camera]=(int*)qfMalloc(particleN[camera]*sizeof(int));
 
     for (int i=0; i<n; i++) {
         particleX[camera][i]=(int)round((double)rand()/(double)RAND_MAX*(double)width[camera]*1.25)-width[camera]/8;
@@ -508,7 +508,7 @@ void QFECamTestCamera::seriesStep1() {
     uint32 frame_height=getCameraImageHeight(camera);
     uint32 rowsperstrip = (uint32)-1;
 
-    uint32* frame32 = (uint32*)calloc(frame_width*frame_height, sizeof(uint32));
+    uint32* frame32 = (uint32*)qfCalloc(frame_width*frame_height, sizeof(uint32));
     uint32 frame_min=0xFFFFFFFF;
     uint32 frame_max=0;
     acquireOnCamera(camera, frame32);
@@ -517,7 +517,7 @@ void QFECamTestCamera::seriesStep1() {
         if (v<frame_min) frame_min=v;
         if (v>frame_max) frame_max=v;
     }
-    uint8* frame = (uint8*)malloc(frame_width*frame_height*sizeof(uint8));
+    uint8* frame = (uint8*)qfMalloc(frame_width*frame_height*sizeof(uint8));
     for (register unsigned int i=0; i<frame_width*frame_height; i++) {
         register uint64_t v=255;
         if (frame_max-frame_min!=0) v=(frame32[i]-frame_min)*255/(frame_max-frame_min);
@@ -565,8 +565,8 @@ void QFECamTestCamera::seriesStep1() {
     TIFFWriteDirectory(tif[camera]);
 
 
-    free(frame);
-    free(frame32);
+    qfFree(frame);
+    qfFree(frame32);
 
     seriesCount[camera]++;
     seriesRunning[camera] = seriesRunning[camera] && (seriesCount[camera]<seriesAcquisitions);
@@ -590,7 +590,7 @@ void QFECamTestCamera::seriesStep2() {
     uint32 frame_height=getCameraImageHeight(camera);
     uint32 rowsperstrip = (uint32)-1;
 
-    uint32* frame32 = (uint32*)calloc(frame_width*frame_height, sizeof(uint32));
+    uint32* frame32 = (uint32*)qfCalloc(frame_width*frame_height, sizeof(uint32));
     uint32 frame_min=0xFFFFFFFF;
     uint32 frame_max=0;
     acquireOnCamera(camera, frame32);
@@ -600,7 +600,7 @@ void QFECamTestCamera::seriesStep2() {
         if (v>frame_max) frame_max=v;
     }
     //std::cout<<"frame_min="<<frame_min<<"   frame_max="<<frame_max<<std::endl;
-    uint8* frame = (uint8*)malloc(frame_width*frame_height*sizeof(uint8));
+    uint8* frame = (uint8*)qfMalloc(frame_width*frame_height*sizeof(uint8));
     for (register unsigned int i=0; i<frame_width*frame_height; i++) {
         register uint64_t v=(frame32[i]-frame_min)*255/(frame_max-frame_min);
         if (v>255) v=255;
@@ -647,8 +647,8 @@ void QFECamTestCamera::seriesStep2() {
     TIFFWriteDirectory(tif[camera]);
 
 
-    free(frame);
-    free(frame32);
+    qfFree(frame);
+    qfFree(frame32);
 
     seriesCount[camera]++;
     seriesRunning[camera] = seriesRunning[camera] && (seriesCount[camera]<seriesAcquisitions);

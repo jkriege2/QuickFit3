@@ -45,6 +45,8 @@ class QDomElement; // forward
 class QFRawDataRecordPrivate; // forward
 struct qfmpResult; // forward
 
+
+
 /*! \brief this class manages one raw data record in the project
     \ingroup qf3lib_project
 
@@ -110,13 +112,13 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         inline QFRawDataRecord* getPreviousOfSameType() { return project->getPreviousRawDataOfSameType(this); }
 
         /** \brief return the ID */
-        inline int getID() const { return ID; }
+         int getID() const;
         /** \brief return the name */
-        inline QString getName() const { return name; }
+         QString getName() const;
         /** \brief return the role */
-        inline QString getRole() const { return role; }
+         QString getRole() const;
         /** \brief return the group */
-        inline int getGroup() const { return group; }
+         int getGroup() const;
         /** \brief returns \c true if this RDR has a group */
         bool hasGroup() const;
         /** \brief returns the name of the group of the current record, or an empty string if no group is given  */
@@ -126,27 +128,27 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         /** \brief get all records with a given role from the group of the current record */
         QList<QFRawDataRecord*> getRecordsWithRoleFromGroup(const QString& role) const;
         /** \brief return the description  */
-        inline QString getDescription() const { return description; }
+         QString getDescription() const;
         /** \brief return the list of linked files */
-        inline QStringList getFiles() const { return files; }
+         QStringList getFiles() const;
         /** \brief return the list of linked files */
-        inline QStringList getFilesTypes() const { return files_types; }
+         QStringList getFilesTypes() const;
         /** \brief return the list of linked files */
-        inline QStringList getFilesDescriptions() const { return files_desciptions; }
+         QStringList getFilesDescriptions() const;
         /** \brief return the filename associated with a given type, returns an empty string if no file was found */
         QString getFileForType(const QString& type);
         /** \brief return a list of filenames associated with a given type, returns an empty list if no files were found */
-        QStringList getFilesForType(const QString& type);
+        QStringList getFilesForType(const QString& type) const;
         /** \brief return a pointer to the project that contains this QRawDatarecord */
         inline QFProject* getProject() const { return project; }
         /** \brief return the folder */
-        inline QString getFolder() const { return folder; }
+         QString getFolder() const;
 
 
         /** \brief returns \c true if an error occured */
-        inline bool error() { return errorOcc; }
+         bool error() const;
         /** \brief returns the description of the last error */
-        inline QString errorDescription() { return errorDesc; }
+         QString errorDescription() const;
 
         /** \brief return the path to i-th file */
         QString getFileName(int i) const;
@@ -291,15 +293,12 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         virtual bool showNextPreviousOfSameRoleButton() const;
 
 
-        /** \brief returns the QReadWriteLock object for this object */
-        QReadWriteLock* getReadWriteLock() const;
 
     protected:
         /** \copybrief QFProperties::setPropertiesError() */
         virtual void setPropertiesError(const QString& message) { setError(message); }
 
 
-        mutable QReadWriteLock* lock;
 
         /** \brief a model used to access the properties */
         QFRDRPropertyModel* propModel;
@@ -780,10 +779,10 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
     public:
 
 
-        void resultsReadLock() const;
-        void resultsWriteLock() const;
-        void resultsReadUnLock() const;
-        void resultsWriteUnLock() const;
+        void readLock() const;
+        void writeLock() const;
+        void readUnLock() const;
+        void writeUnLock() const;
 
         /** \brief clear all evaluation results */
         void resultsClearAll();
@@ -1341,7 +1340,11 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
 };
 
+DEFINE_READWRITE_LOCKERS(QFRawDataRecord, readLock, writeLock, readUnLock, writeUnLock)
+
+
 Q_DECLARE_OPERATORS_FOR_FLAGS(QFRawDataRecord::FileListEditOptions)
+
 
 #endif // QFRAWDATARECORD_H
 

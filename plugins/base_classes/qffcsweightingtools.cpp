@@ -174,6 +174,24 @@ QFFCSWeightingTools::DataWeight QFFCSWeightingTools::stringToDataWeight(QString 
 
 double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecord *record_in, int run_in, int data_start, int data_end) const
 {
+    QVector<double> weights=allocVecWeights(weightsOKK, record_in, run_in, data_start, data_end);
+
+    if (weights.size()>0) {
+        double* w=(double*)qfMalloc(weights.size()*sizeof(double));
+        copyArray(w, weights.constData(), weights.size());
+        //qDebug()<<"QFFCSWeightingTools::allocWeights: "<<w<<weights.size();
+        return w;
+    }
+    //qDebug()<<"QFFCSWeightingTools::allocWeights: "<<NULL;
+    if (weightsOKK) weightsOKK=false;
+    return NULL;
+}
+
+QVector<double> QFFCSWeightingTools::allocVecWeights(bool *weightsOKK, const QFRawDataRecord *record_in, int run_in, int data_start, int data_end) const
+{
+    QVector<double> weights;
+
+
     if (weightsOKK) *weightsOKK=false;
     const QFRawDataRecord* record=record_in;
     //if (!record_in) record=getHighlightedRecord();
@@ -186,12 +204,12 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecor
     if (data) N=data->getCorrelationN();
 
     //qDebug()<<"allocWeights w="<<getFitDataWeighting();
-    if (N<=0) return NULL;
+    if (N<=0) return QVector<double>();
 
     QFFCSWeightingTools::DataWeight weighting=getFitDataWeighting();
-    double* weights=(double*)malloc(N*sizeof(double));
+    weights.resize(N);//double* weights=(double*)qfMalloc(N*sizeof(double));
     bool weightsOK=false;
-    if (data&&weights && weighting==QFFCSWeightingTools::StdDevWeighting) {
+    if (data&&weights.size()>0 && weighting==QFFCSWeightingTools::StdDevWeighting) {
         double* std=data->getCorrelationStdDev();
         //qDebug()<<N<<arrayToString(std, N);
         if (std) {
@@ -203,7 +221,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecor
         }
         //qDebug()<<weightsOK;
     }
-    if (data&&weights&&!weightsOK&& weighting==QFFCSWeightingTools::RunErrorWeighting) {
+    if (data&&weights.size()>0&&!weightsOK&& weighting==QFFCSWeightingTools::RunErrorWeighting) {
         double* std=NULL;
         if (run>=0) std=data->getCorrelationRunError(run);
         else std=data->getCorrelationStdDev();
@@ -217,7 +235,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecor
         }
         //qDebug()<<weightsOK;
     }
-    if (data&&weights&&!weightsOK&& weighting==QFFCSWeightingTools::RunningStdDev3Weight) {
+    if (data&&weights.size()>0&&!weightsOK&& weighting==QFFCSWeightingTools::RunningStdDev3Weight) {
         double* corrdat=NULL;
         if (run>=0) corrdat=data->getCorrelationRun(run);
         else if (run==-1) corrdat=data->getCorrelationMean();
@@ -227,7 +245,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecor
             CHECK_WEIGHT
         }
     }
-    if (data&&weights&&!weightsOK&& weighting==QFFCSWeightingTools::RunningStdDev5Weight) {
+    if (data&&weights.size()>0&&!weightsOK&& weighting==QFFCSWeightingTools::RunningStdDev5Weight) {
         double* corrdat=NULL;
         if (run>=0) corrdat=data->getCorrelationRun(run);
         else if (run==-1) corrdat=data->getCorrelationMean();
@@ -237,7 +255,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecor
             CHECK_WEIGHT
         }
     }
-    if (data&&weights&&!weightsOK&& weighting==QFFCSWeightingTools::RunningStdDev7Weight) {
+    if (data&&weights.size()>0&&!weightsOK&& weighting==QFFCSWeightingTools::RunningStdDev7Weight) {
         double* corrdat=NULL;
         if (run>=0) corrdat=data->getCorrelationRun(run);
         else if (run==-1) corrdat=data->getCorrelationMean();
@@ -247,7 +265,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecor
             CHECK_WEIGHT
         }
     }
-    if (data&&weights&&!weightsOK&& weighting==QFFCSWeightingTools::RunningStdDev11Weight) {
+    if (data&&weights.size()>0&&!weightsOK&& weighting==QFFCSWeightingTools::RunningStdDev11Weight) {
         double* corrdat=NULL;
         if (run>=0) corrdat=data->getCorrelationRun(run);
         else if (run==-1) corrdat=data->getCorrelationMean();
@@ -257,7 +275,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecor
             CHECK_WEIGHT
         }
     }
-    if (data&&weights&&!weightsOK&& weighting==QFFCSWeightingTools::Poly2Weight) {
+    if (data&&weights.size()>0&&!weightsOK&& weighting==QFFCSWeightingTools::Poly2Weight) {
         double* taudat=data->getCorrelationT();
         double* corrdat=NULL;
         if (run>=0) corrdat=data->getCorrelationRun(run);
@@ -268,7 +286,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecor
             CHECK_WEIGHT
         }
     }
-    if (data&&weights&&!weightsOK&& weighting==QFFCSWeightingTools::Poly3Weight) {
+    if (data&&weights.size()>0&&!weightsOK&& weighting==QFFCSWeightingTools::Poly3Weight) {
         double* taudat=data->getCorrelationT();
         double* corrdat=NULL;
         if (run>=0) corrdat=data->getCorrelationRun(run);
@@ -279,7 +297,7 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecor
             CHECK_WEIGHT
         }
     }
-    if (data&&weights&&!weightsOK&& weighting==QFFCSWeightingTools::Poly5Weight) {
+    if (data&&weights.size()>0&&!weightsOK&& weighting==QFFCSWeightingTools::Poly5Weight) {
         double* taudat=data->getCorrelationT();
         double* corrdat=NULL;
         if (run>=0) corrdat=data->getCorrelationRun(run);
@@ -290,25 +308,18 @@ double *QFFCSWeightingTools::allocWeights(bool *weightsOKK, const QFRawDataRecor
             CHECK_WEIGHT
         }
     }
-    if (!weightsOK && weights) {
+    if (!weightsOK && weights.size()>0) {
         double ww=1.0;
-        /*double* crun=data->getCorrelationRun(run_in);
-        if (crun) {
-            ww=0;
-            double cnt=0;
-            for (int i=0; i<qMin(N,10); i++) {
-                ww+=crun[i];
-                cnt++;
-            }
-            ww=0.1*ww/cnt;
-        }*/
+
         for (int i=0; i<N; i++) weights[i]=ww;
         if (weighting==QFFCSWeightingTools::EqualWeighting) weightsOK=true;
     }
     //qDebug()<<"allocWeights weightsOK="<<weightsOK<<weights<<weighting;
 
     if (weightsOKK) *weightsOKK=weightsOK;
+    //qDebug()<<"QFFCSWeightingTools::allocVecWeights "<<weights.size();
     return weights;
+
 }
 
 QFFCSWeightingTools::DataWeight QFFCSWeightingTools::indexToWeight(int index)

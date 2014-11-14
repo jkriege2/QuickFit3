@@ -106,7 +106,7 @@ void QFFCSMaxEntEvaluationEditor::getPlotData(QFRawDataRecord *record, int index
             /////////////////////////////////////////////////////////////////////////////////
             // calculate fit statistics
             /////////////////////////////////////////////////////////////////////////////////
-            double* modelVals=(double*)malloc(N*sizeof(double));
+            double* modelVals=(double*)qfMalloc(N*sizeof(double));
             QVector<double> dist=eval->getDistribution(record, index, model);
             QVector<double> distTau=eval->getDistributionTaus(record, index, model);
 
@@ -144,7 +144,7 @@ void QFFCSMaxEntEvaluationEditor::getPlotData(QFRawDataRecord *record, int index
                 plotdata.append(item);
             }
 
-            free(weights);
+            qfFree(weights);
 
         }
     } catch(std::exception& E) {
@@ -697,7 +697,7 @@ void QFFCSMaxEntEvaluationEditor::displayData() {
                 if (wok && weigm && eval->getFitDataWeighting()!=QFFCSWeightingTools::EqualWeighting) {
                     errorName=wdata->dataWeightToName(eval->getFitDataWeighting(), tr("run"));
                     c_std=ds->addCopiedColumn(weigm, data->getCorrelationN(), QString("cerr_")+wdata->dataWeightToString(eval->getFitDataWeighting()));
-                    free(weigm);
+                    qfFree(weigm);
                 }
             }
             JKQTPerrorPlotstyle styl=cmbErrorStyle->getErrorStyle();
@@ -858,7 +858,7 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 // calculate fit statistics
                 /////////////////////////////////////////////////////////////////////////////////
                 record->disableEmitResultsChanged();
-                double* modelVals=(double*)malloc(N*sizeof(double));
+                double* modelVals=(double*)qfMalloc(N*sizeof(double));
                 QVector<double> dist=eval->getDistribution(record, index, model);
                 QVector<double> distTau=eval->getDistributionTaus(record, index, model);
 
@@ -1135,7 +1135,7 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 // clean memory
                 /////////////////////////////////////////////////////////////////////////////////
-                free(weights);
+                qfFree(weights);
                 fit_stat.free();
 
                 //qDebug()<<"    n "<<t.elapsed()<<" ms";

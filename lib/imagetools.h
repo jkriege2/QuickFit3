@@ -46,7 +46,7 @@ inline void qfVideoBinInFrame(T* data, int width, int height, int frames, int bi
             }
         }
     }
-    free(temp);
+    qfFree(temp);
 }
 
 

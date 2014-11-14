@@ -91,7 +91,8 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         virtual int getUserMin();
         /** \brief get the upper datacut for the current record, reimplement this by calling getUserMin(int) with a viable choice for \a defaultMax */
         virtual int getUserMax();
-    public:
+    protected:
+        virtual void populateFitButtons(bool mulThreadEnabledInModel=true);
 
     protected slots:
         /** \brief connect widgets to current data record */
@@ -180,9 +181,15 @@ class QFImFCSFitEvaluationEditor : public QFFitResultsByIndexEvaluationEditorWit
         virtual int getUserRangeMax(QFRawDataRecord *rec, int index);
         virtual int getUserRangeMin(QFRawDataRecord *rec, int index);
     public slots:
-    /*    virtual void fitEverythingThreaded();
-        virtual void fitAllRunsThreaded();
-        virtual void fitAllFilesThreaded();*/
+        virtual void fitEverythingThreadedWriter();
+        virtual void fitAllRunsThreadedWriter();
+        virtual void fitAllFilesThreadedWriter();
+
+    protected:
+        QAction* actFitAllFilesThreadedWriter;
+        QAction* actFitAllThreadedWriter;
+        QAction* actFitAllRunsThreadedWriter;
+
 };
 
 #endif // QFIMFCSFITEVALUATIONEDITOR_H

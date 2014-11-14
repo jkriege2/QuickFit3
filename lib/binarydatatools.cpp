@@ -25,7 +25,7 @@
 #include <QtEndian>
 #include <QtGlobal>
 #include <QDebug>
-
+#include "qftools.h"
 QVector<double> stringToDoubleArray_base64(const QString& data) {
     QVector<double> result;
 
@@ -320,7 +320,7 @@ void binfileReadDoubleArray(QFile& file, double* data, uint32_t dataN) {
 
 double* binfileReadDoubleArray(QFile& file, uint32_t dataN) {
     if (dataN<=0) return NULL;
-    double* res=(double*)malloc(dataN*sizeof(double));
+    double* res=(double*)qfMalloc(dataN*sizeof(double));
     binfileReadDoubleArray(file, res, dataN);
     return res;
 }

@@ -28,6 +28,10 @@
 #include "datatools.h"
 //#define DEBUG_THREAN
 
+typedef QMutexLocker QFRDRReadLocker;
+typedef QMutexLocker QFRDRWriteLocker;
+typedef QMutex QFRDRLock;
+
 class QFRawDataRecordPrivate {
     public:
         QFRawDataRecordPrivate() {
@@ -61,7 +65,10 @@ class QFRawDataRecordPrivate {
         /** \brief maps evaluationIDMetadata.group to a human-readable version */
         GroupLabelsType evalGroupLabels;
 
+        mutable QFRDRLock* lock;
+
         ~QFRawDataRecordPrivate() {
+            lock=new QFRDRLock(QFRDRLock::Recursive);
             ResultsIterator it(results);
             while (it.hasNext()) {
                 it.next();
@@ -69,6 +76,7 @@ class QFRawDataRecordPrivate {
             }
             results.clear();
             evalGroupLabels.clear();
+            delete lock;
         }
 
 };
@@ -80,7 +88,6 @@ QFRawDataRecordPrivate::evaluationIDMetadata::evaluationIDMetadata(int initsize)
 QFRawDataRecord::QFRawDataRecord(QFProject* parent):
     QObject(parent), QFProperties()
 {
-    lock=new QReadWriteLock(QReadWriteLock::Recursive);
     project=parent;
     group=-1;
     errorOcc=false;
@@ -104,7 +111,6 @@ QFRawDataRecord::QFRawDataRecord(QFProject* parent):
 
 QFRawDataRecord::~QFRawDataRecord() {
     delete dstore;
-    delete lock;
     //std::cout<<"deleting QFRawDataRecord\n";
     //std::cout<<"deleting QFRawDataRecord ... OK\n";
 }
@@ -114,31 +120,39 @@ void QFRawDataRecord::setResultsInitSize(int initSize) {
 }
 
 void QFRawDataRecord::setEvaluationIDMetadataInitSize(int initSize) {
+    QFRDRWriteLocker locker(dstore->lock);
     evaluationIDMetadataInitSize=initSize;
 }
 
-void QFRawDataRecord::resultsReadLock() const
+void QFRawDataRecord::readLock() const
 {
-    lock->lockForRead();
+    dstore->lock->lock();
 }
 
-void QFRawDataRecord::resultsWriteLock() const
+void QFRawDataRecord::writeLock() const
 {
-    lock->lockForWrite();
+    dstore->lock->lock();
 }
 
-void QFRawDataRecord::resultsReadUnLock() const
+void QFRawDataRecord::readUnLock() const
 {
-    lock->unlock();
+    dstore->lock->unlock();
 }
 
-void QFRawDataRecord::resultsWriteUnLock() const
+void QFRawDataRecord::writeUnLock() const
 {
-    lock->unlock();
+    dstore->lock->unlock();
 }
 
 
 QFRDRPropertyModel* QFRawDataRecord::getPropertyModel() {
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
+#endif
+ QFRDRWriteLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     if (propModel==NULL) {
         propModel=new QFRDRPropertyModel();
         propModel->init(this);
@@ -162,6 +176,13 @@ void QFRawDataRecord::log_error(const QString &message) const
 }
 
 QFRDRResultsModel* QFRawDataRecord::resultsGetModel() const {
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+ QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     return resultsmodel;
 };
 
@@ -206,18 +227,43 @@ void QFRawDataRecord::initNewID(QDomElement &e)
 
 }
 
+int QFRawDataRecord::getID() const {
+    QFRDRReadLocker locker(dstore->lock);
+    return ID; }
+
+QString QFRawDataRecord::getName() const {
+    QFRDRReadLocker locker(dstore->lock);
+    return name; }
+
+QString QFRawDataRecord::getRole() const {
+    QFRDRReadLocker locker(dstore->lock);
+    return role; }
+
+int QFRawDataRecord::getGroup() const {
+    QFRDRReadLocker locker(dstore->lock);
+    return group; }
+
 bool QFRawDataRecord::hasGroup() const
 {
+#ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+    QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     return group>=0;
 }
 
 QString QFRawDataRecord::getGroupName() const
 {
+    QFRDRReadLocker locker(dstore->lock);
     return project->getRDRGroupName(group);
 }
 
 QList<QFRawDataRecord *> QFRawDataRecord::getGroupMembers() const
 {
+    QFRDRReadLocker locker(dstore->lock);
     return project->getRDRGroupMembers(group);
 }
 
@@ -233,13 +279,36 @@ QList<QFRawDataRecord *> QFRawDataRecord::getRecordsWithRoleFromGroup(const QStr
     return out;
 }
 
+QString QFRawDataRecord::getDescription() const {
+    QFRDRReadLocker locker(dstore->lock);
+    return description; }
+
+QStringList QFRawDataRecord::getFiles() const {
+    QFRDRReadLocker locker(dstore->lock);
+    return files; }
+
+QStringList QFRawDataRecord::getFilesTypes() const {
+    QFRDRReadLocker locker(dstore->lock);
+    return files_types; }
+
+QStringList QFRawDataRecord::getFilesDescriptions() const {
+    QFRDRReadLocker locker(dstore->lock);
+    return files_desciptions; }
+
 QString QFRawDataRecord::getFileForType(const QString &type) {
     QStringList sl=getFilesForType(type);
     if (sl.size()>0) return sl[0];
     return "";
 }
 
-QStringList QFRawDataRecord::getFilesForType(const QString &type) {
+QStringList QFRawDataRecord::getFilesForType(const QString &type) const {
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+ QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     QStringList result;
     for (int i=0; i<qMin(files_types.size(), files.size()); i++) {
         if (files_types[i].toLower()==type) result.append(files[i]);
@@ -247,69 +316,115 @@ QStringList QFRawDataRecord::getFilesForType(const QString &type) {
     return result;
 }
 
+QString QFRawDataRecord::getFolder() const {
+    QFRDRReadLocker locker(dstore->lock);
+    return folder; }
+
+bool QFRawDataRecord::error() const {
+    QFRDRReadLocker locker(dstore->lock);
+    return errorOcc; }
+
+QString QFRawDataRecord::errorDescription() const {
+    QFRDRReadLocker locker(dstore->lock);
+    return errorDesc; }
+
 QString QFRawDataRecord::getFileName(int i) const
 {
+#ifdef DEBUG_THREAN
+    qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+    QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     return files.value(i, "");
 }
 
 QString QFRawDataRecord::getFileType(int i) const
 {
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+ QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     return files_types.value(i, "");
 }
 
 QString QFRawDataRecord::getFileDescription(int i) const
 {
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+ QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     return files_desciptions.value(i, "");
 }
 
 int QFRawDataRecord::getFilesCount() const
 {
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+ QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     return files.size();
 }
 
 void QFRawDataRecord::setFileName(int i, const QString &file)
 {
-    if (i>=0 && i<files.size()) {
-        #ifdef DEBUG_THREAN
-        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
-        #endif
-         QWriteLocker locker(lock);
-        #ifdef DEBUG_THREAN
-         qDebug()<<Q_FUNC_INFO<<"  locked";
-        #endif
-        files[i]=file;
+    {
+#ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
+#endif
+        QFRDRWriteLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (i>=0 && i<files.size()) {
+            files[i]=file;
+        }
     }
     emit basicPropertiesChanged();
 }
 
 void QFRawDataRecord::setFileType(int i, const QString &type)
 {
-    if (i>=0 && i<files.size()) {
-        #ifdef DEBUG_THREAN
-        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
-        #endif
-         QWriteLocker locker(lock);
-        #ifdef DEBUG_THREAN
-         qDebug()<<Q_FUNC_INFO<<"  locked";
-        #endif
-        while (i>=files_types.size()) files_types.append("");
-        files_types[i]=type;
+    {
+#ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
+#endif
+        QFRDRWriteLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (i>=0 && i<files.size()) {
+            while (i>=files_types.size()) files_types.append("");
+            files_types[i]=type;
+        }
     }
     emit basicPropertiesChanged();
 }
 
 void QFRawDataRecord::setFileDecsription(int i, const QString &description)
 {
-    if (i>=0 && i<files.size()) {
-        #ifdef DEBUG_THREAN
-        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
-        #endif
-         QWriteLocker locker(lock);
-        #ifdef DEBUG_THREAN
-         qDebug()<<Q_FUNC_INFO<<"  locked";
-        #endif
-        while (i>=files_desciptions.size()) files_desciptions.append("");
-        files_desciptions[i]=description;
+    {
+#ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
+#endif
+        QFRDRWriteLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+        qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+        if (i>=0 && i<files.size()) {
+            while (i>=files_desciptions.size()) files_desciptions.append("");
+            files_desciptions[i]=description;
+        }
     }
     emit basicPropertiesChanged();
 
@@ -319,9 +434,9 @@ void QFRawDataRecord::addFile(const QString &file, const QString &type, const QS
 {
     {
         #ifdef DEBUG_THREAN
-        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
         #endif
-         QWriteLocker locker(lock);
+         QFRDRWriteLocker locker(dstore->lock);
         #ifdef DEBUG_THREAN
          qDebug()<<Q_FUNC_INFO<<"  locked";
         #endif
@@ -336,9 +451,9 @@ void QFRawDataRecord::deleteFile(int i)
 {
     if (i>=0 && i<files.size()) {
         #ifdef DEBUG_THREAN
-        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
         #endif
-         QWriteLocker locker(lock);
+         QFRDRWriteLocker locker(dstore->lock);
         #ifdef DEBUG_THREAN
          qDebug()<<Q_FUNC_INFO<<"  locked";
         #endif
@@ -367,9 +482,9 @@ void QFRawDataRecord::moveFilesUp(const QList<int> &list) {
     if (l.size()>0) {
 
         #ifdef DEBUG_THREAN
-        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
         #endif
-         QWriteLocker locker(lock);
+         QFRDRWriteLocker locker(dstore->lock);
         #ifdef DEBUG_THREAN
          qDebug()<<Q_FUNC_INFO<<"  locked";
         #endif
@@ -400,9 +515,9 @@ void QFRawDataRecord::moveFilesDown(const QList<int> &list) {
     if (l.size()>0) {
 
         #ifdef DEBUG_THREAN
-        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
         #endif
-         QWriteLocker locker(lock);
+         QFRDRWriteLocker locker(dstore->lock);
         #ifdef DEBUG_THREAN
          qDebug()<<Q_FUNC_INFO<<"  locked";
         #endif
@@ -442,9 +557,9 @@ void QFRawDataRecord::setName(const QString &n) {
     {
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -462,9 +577,9 @@ void QFRawDataRecord::setFolder(const QString& n) {
     {
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -482,9 +597,9 @@ void QFRawDataRecord::setRole(const QString &n)
     {
 
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -502,9 +617,9 @@ void QFRawDataRecord::setGroup(int g)
     {
 
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -521,9 +636,9 @@ void QFRawDataRecord::setDescription(const QString& d) {
     {
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -539,9 +654,9 @@ void QFRawDataRecord::readXML(QDomElement& e, bool loadAsDummy, bool readID) {
     {
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -909,9 +1024,9 @@ QString QFRawDataRecord::evaluationResultType2String(QFRawDataRecord::evaluation
 void QFRawDataRecord::writeXML(QXmlStreamWriter& w, const QString &projectfilename, bool copyFilesToSubfolder, const QString& subfoldername, QList<QFProject::FileCopyList >* filecopylist, int writeMode) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1228,9 +1343,9 @@ void QFRawDataRecord::resultsClearAll() {
     {
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1249,9 +1364,9 @@ void QFRawDataRecord::resultsClear(const QString& name) {
     {
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1271,9 +1386,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 int QFRawDataRecord::resultsGetCount(const QString& evalName) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1284,9 +1399,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 int QFRawDataRecord::resultsGetEvaluationCount() const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1296,9 +1411,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 QString QFRawDataRecord::resultsGetEvaluationName(int i) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1309,9 +1424,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 void QFRawDataRecord::resultsSetNumber(const QString& evaluationName, const QString& resultName, double value, const QString& unit) {
     {    
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1329,9 +1444,9 @@ void QFRawDataRecord::resultsRemove(const QString& evalName, const QString& resu
     bool changed=false;
     {    
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1358,9 +1473,9 @@ void QFRawDataRecord::resultsClear(const QString& name, const QString& postfix) 
     {
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1382,9 +1497,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 bool QFRawDataRecord::resultsExists(const QString& evalName, const QString& resultName) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1398,9 +1513,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 bool QFRawDataRecord::resultsExistsFromEvaluation(const QString& evalName) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1410,9 +1525,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 void QFRawDataRecord::resultsSetNumberList(const QString& evaluationName, const QString& resultName, const QVector<double>& value, const QString& unit) {
     {    
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1430,9 +1545,9 @@ void QFRawDataRecord::resultsSetNumberMatrix(const QString& evaluationName, cons
     {
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1468,9 +1583,9 @@ void QFRawDataRecord::resultsSetNumberErrorList(const QString& evaluationName, c
     {
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1489,9 +1604,9 @@ void QFRawDataRecord::resultsSetNumberErrorMatrix(const QString& evaluationName,
     {
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1531,9 +1646,9 @@ void QFRawDataRecord::resultsSetInNumberList(const QString &evaluationName, cons
     {
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1555,9 +1670,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetInNumberMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double value, const QString &unit) {
     {    
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1581,9 +1696,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetInNumberErrorList(const QString &evaluationName, const QString &resultName, int position, double value, double error, const QString &unit) {
     {    
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1611,9 +1726,9 @@ void QFRawDataRecord::resultsSetInNumberErrorListAndBool(const QString &evaluati
 {
     {
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1652,9 +1767,9 @@ void QFRawDataRecord::resultsSetInNumberListAndBool(const QString &evaluationNam
 {
     {
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1689,9 +1804,9 @@ void QFRawDataRecord::resultsSetInIntegerListAndBool(const QString &evaluationNa
 {
     {
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1727,9 +1842,9 @@ void QFRawDataRecord::resultsSetInStringListAndBool(const QString &evaluationNam
 {
     {
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1765,9 +1880,9 @@ void QFRawDataRecord::resultsSetInBooleanListAndBool(const QString &evaluationNa
 {
     {
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1803,9 +1918,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetErrorInNumberErrorList(const QString &evaluationName, const QString &resultName, int position, double error) {
      {    
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1827,9 +1942,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetInNumberErrorMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double value, double error, const QString &unit) {
     {   
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1858,9 +1973,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetInIntegerList(const QString &evaluationName, const QString &resultName, int position, qlonglong value, const QString &unit) {
     {    
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1884,9 +1999,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetInIntegerMatrix(const QString &evaluationName, const QString &resultName, int row, int column, qlonglong value, const QString &unit) {
     {     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1911,9 +2026,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetInBooleanList(const QString &evaluationName, const QString &resultName, int position, bool value, const QString &unit) {
     {     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1937,9 +2052,9 @@ void QFRawDataRecord::resultsSetInBooleanMatrix(const QString &evaluationName, c
     {
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1963,9 +2078,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetInStringList(const QString &evaluationName, const QString &resultName, int position, const QString &value, const QString &unit) {
     {     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -1989,9 +2104,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetInStringMatrix(const QString &evaluationName, const QString &resultName, int row, int column, const QString &value, const QString &unit) {
     {     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2015,9 +2130,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsResetInMatrix(const QString &evaluationName, const QString &resultName, int row, int column) {
     {   
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2040,9 +2155,9 @@ qDebug()<<Q_FUNC_INFO<<"unlock";
 void QFRawDataRecord::resultsResetInList(const QString &evaluationName, const QString &resultName, int position) {
     {    
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2097,9 +2212,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 double QFRawDataRecord::resultsGetInNumberList(const QString &evaluationName, const QString &resultName, int position, double defaultValue) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2118,9 +2233,9 @@ void QFRawDataRecord::resultsSetIntegerList(const QString &evaluationName, const
     {
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2137,9 +2252,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetIntegerMatrix(const QString &evaluationName, const QString &resultName, const QVector<qlonglong> &value, int columns, const QString &unit) {
     { 
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2173,9 +2288,9 @@ void QFRawDataRecord::resultsSetIntegerMatrix(const QString &evaluationName, con
 void QFRawDataRecord::resultsSetBooleanList(const QString &evaluationName, const QString &resultName, const QVector<bool> &value, const QString &unit) {
     { 
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2192,9 +2307,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetBooleanMatrix(const QString &evaluationName, const QString &resultName, const QVector<bool> &value, int columns, const QString &unit) {
     { 
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2228,9 +2343,9 @@ void QFRawDataRecord::resultsSetBooleanMatrix(const QString &evaluationName, con
 void QFRawDataRecord::resultsSetStringList(const QString &evaluationName, const QString &resultName, const QVector<QString> &value, const QString &unit) {
     { 
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2247,9 +2362,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetStringMatrix(const QString &evaluationName, const QString &resultName, const QVector<QString> &value, int columns, const QString &unit) {
     { 
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2269,9 +2384,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetNumberError(const QString& evaluationName, const QString& resultName, double value, double error, const QString& unit)  {
     { 
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2289,9 +2404,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetNumberErrorError(const QString &evaluationName, const QString &resultName, double error) {
     { 
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2307,9 +2422,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetInteger(const QString& evaluationName, const QString& resultName, int64_t value, const QString& unit) {
     { 
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2326,9 +2441,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetString(const QString& evaluationName, const QString& resultName, const QString& value) {
     { 
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2344,10 +2459,10 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetLabel(const QString& evaluationName, const QString& resultName, const QString& label, const QString& label_rich) {
     bool ok=true;
     #ifdef DEBUG_THREAN
-    qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+    qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
     #endif
-     //QReadLocker locker(lock);
-    lock->lockForRead();
+     //QFRDRReadLocker locker(dstore->lock);
+    readLock();
     //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): lock read";
     #ifdef DEBUG_THREAN
      qDebug()<<Q_FUNC_INFO<<"  locked";
@@ -2360,15 +2475,15 @@ void QFRawDataRecord::resultsSetLabel(const QString& evaluationName, const QStri
          }
      }
      //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): ok="<<ok<<"   unlock read";
-     lock->unlock();
+     readUnLock();
 
 
     if (ok) {
         
         #ifdef DEBUG_THREAN
-        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
         #endif
-         QWriteLocker locker(lock);
+         QFRDRWriteLocker locker(dstore->lock);
         #ifdef DEBUG_THREAN
          qDebug()<<Q_FUNC_INFO<<"  locked";
         #endif
@@ -2391,10 +2506,10 @@ void QFRawDataRecord::resultsSetGroup(const QString& evaluationName, const QStri
         evaluationResult r=resultsGet(evaluationName, resultName);*/
     bool ok=true;
     #ifdef DEBUG_THREAN
-    qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+    qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
     #endif
-     //QReadLocker locker(lock);
-    lock->lockForRead();
+     //QFRDRReadLocker locker(dstore->lock);
+    readLock();
     //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): lock read";
     #ifdef DEBUG_THREAN
      qDebug()<<Q_FUNC_INFO<<"  locked";
@@ -2405,15 +2520,15 @@ void QFRawDataRecord::resultsSetGroup(const QString& evaluationName, const QStri
          }
      }
      //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): ok="<<ok<<"   unlock read";
-     lock->unlock();
+     readUnLock();
 
 
     if (ok) {
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- //QWriteLocker locker(lock);
- lock->lockForWrite();
+ //QFRDRWriteLocker locker(dstore->lock);
+ writeLock();
  //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): lock write";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
@@ -2428,7 +2543,7 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
         if (!dstore->results.contains(evaluationName)) dstore->results[evaluationName] = new QFRawDataRecordPrivate::evaluationIDMetadata(evaluationIDMetadataInitSize);
         dstore->results[evaluationName]->results[resultName]=r;
         //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): unlock write";
-        lock->unlock();
+        writeUnLock();
         emitResultsChanged(evaluationName, resultName, false);
     }
 
@@ -2437,10 +2552,10 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSetSortPriority(const QString& evaluationName, const QString& resultName, bool pr) {
     bool ok=true;
     #ifdef DEBUG_THREAN
-    qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+    qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
     #endif
-     //QReadLocker locker(lock);
-    lock->lockForRead();
+     //QFRDRReadLocker locker(dstore->lock);
+    readLock();
     //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): lock read";
     #ifdef DEBUG_THREAN
      qDebug()<<Q_FUNC_INFO<<"  locked";
@@ -2451,16 +2566,16 @@ void QFRawDataRecord::resultsSetSortPriority(const QString& evaluationName, cons
          }
      }
      //qDebug()<<"resultsSetGroup("<<evaluationName<<", "<<resultName<<", "<<group<<"): ok="<<ok<<"   unlock read";
-     lock->unlock();
+     readUnLock();
 
 
     if (ok)  {
 
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2487,9 +2602,9 @@ bool QFRawDataRecord::resultsGetSortPriority(const QString& evaluationName, cons
 void QFRawDataRecord::resultsSetEvaluationGroupIndex(const QString& evaluationName, int64_t groupIndex) {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2500,9 +2615,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 int64_t QFRawDataRecord::resultsGetEvaluationGroupIndex(const QString& evaluationName) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2515,9 +2630,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 void QFRawDataRecord::resultsSetEvaluationGroupLabel(const QString& evalGroup, const QString& label) {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2527,9 +2642,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 QString QFRawDataRecord::resultsGetLabelForEvaluationGroup(const QString& evalGroup) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2543,9 +2658,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 void QFRawDataRecord::resultsSetEvaluationGroup(const QString& evaluationName, const QString& group) {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2556,9 +2671,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 QString QFRawDataRecord::resultsGetEvaluationGroup(const QString& evaluationName) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2571,9 +2686,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 QString QFRawDataRecord::resultsGetEvaluationGroupLabel(const QString& evaluationName) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2594,9 +2709,9 @@ qDebug()<<Q_FUNC_INFO<<"unlock";
 void QFRawDataRecord::resultsSetEvaluationDescription(const QString& evaluationName, const QString& description) {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2607,9 +2722,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 QString QFRawDataRecord::resultsGetEvaluationDescription(const QString& evaluationName) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2624,9 +2739,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 void QFRawDataRecord::resultsSetBoolean(const QString& evaluationName, const QString& resultName, bool value) {
     { 
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2642,9 +2757,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSet(const QString& evaluationName, const QString& resultName, const evaluationResult& result) {
     { 
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2657,9 +2772,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSet(const QString &evaluationName, const QMap<QString, QFRawDataRecord::evaluationResult> &results)
 {
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2675,9 +2790,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 void QFRawDataRecord::resultsSet(const QFRawDataRecord::QFFitFitResultsStore &results, bool setGroupProps)
 {
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2702,9 +2817,9 @@ qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
 QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(const QString& evalName, const QString& resultName) const
 {
     #ifdef DEBUG_THREAN
-    qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+    qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
     #endif
-     QReadLocker locker(lock);
+     QFRDRReadLocker locker(dstore->lock);
     #ifdef DEBUG_THREAN
      qDebug()<<Q_FUNC_INFO<<"  locked";
     #endif
@@ -2720,9 +2835,9 @@ QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(const QString& eva
 
 /*    if (resultsExists(evalName, resultName)) {
         #ifdef DEBUG_THREAN
-        qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+        qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
         #endif
-         QReadLocker locker(lock);
+         QFRDRReadLocker locker(dstore->lock);
         #ifdef DEBUG_THREAN
          qDebug()<<Q_FUNC_INFO<<"  locked";
         #endif
@@ -2746,9 +2861,9 @@ void QFRawDataRecord::resultsSetFromMathParser(const QString &evaluationName, co
 {
     {
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -2764,9 +2879,9 @@ QFRawDataRecord::evaluationResultType QFRawDataRecord::resultsGetType(const QStr
     if (resultsExists(evalName, resultName)) {
         
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -3614,9 +3729,9 @@ void QFRawDataRecord::resultsSetGroupAndLabels(const QString &evaluationName, co
 {
     {
         #ifdef DEBUG_THREAN
-        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
         #endif
-         QWriteLocker locker(lock);
+         QFRDRWriteLocker locker(dstore->lock);
         #ifdef DEBUG_THREAN
          qDebug()<<Q_FUNC_INFO<<"  locked";
         #endif
@@ -3640,9 +3755,9 @@ void QFRawDataRecord::resultsSetGroupLabelsAndSortPriority(const QString &evalua
 {
     {
         #ifdef DEBUG_THREAN
-        qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+        qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
         #endif
-         QWriteLocker locker(lock);
+         QFRDRWriteLocker locker(dstore->lock);
         #ifdef DEBUG_THREAN
          qDebug()<<Q_FUNC_INFO<<"  locked";
         #endif
@@ -3674,9 +3789,9 @@ QString QFRawDataRecord::resultsGetLabelRichtext(const QString& evaluationName, 
 QString QFRawDataRecord::resultsGetResultName(const QString& evaluationName, int i) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -3693,9 +3808,9 @@ void QFRawDataRecord::resultsCopy(const QString& oldEvalName, const QString& new
     if (resultsExistsFromEvaluation(oldEvalName)) {
         {     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QWriteLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QWriteLocker locker(lock);
+ QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -3735,6 +3850,13 @@ bool QFRawDataRecord::resultsSaveToCSV(const QString& filename, bool vectorsToAv
 
 QList<QList<QVariant> > QFRawDataRecord::resultsGetTable(bool vectorsToAvg, QStringList *colNames, QStringList *rowNames) const
 {
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+ QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
     QList<QPair<QString,QString> > rnames=resultsCalcNamesAndLabels();
     QList<QList<QVariant> > data; // initially a list of rows of data
     QList<QVariant> dempty; // empty column of data
@@ -3953,23 +4075,23 @@ bool QFRawDataRecord::resultsSave(const QString &filename, int format, bool vect
 
 
 
-bool QFRawDataRecord_StringPairCaseInsensitiveCompare(const QPair<QString, QString> &s1, const QPair<QString, QString> &s2) {
+static bool QFRawDataRecord_StringPairCaseInsensitiveCompare(const QPair<QString, QString> &s1, const QPair<QString, QString> &s2) {
     return s1.first.toLower() < s2.first.toLower();
 }
 
-bool QFRawDataRecord_StringTripleCaseInsensitiveCompare(const QTriple<QString, QString, QString> &s1, const QTriple<QString, QString, QString> &s2) {
+static bool QFRawDataRecord_StringTripleCaseInsensitiveCompare(const QTriple<QString, QString, QString> &s1, const QTriple<QString, QString, QString> &s2) {
     return s1.first.toLower() < s2.first.toLower();
 }
 
-bool QFRawDataRecord_StringPairCaseInsensitiveCompareSecond(const QPair<QString, QString> &s1, const QPair<QString, QString> &s2) {
+static bool QFRawDataRecord_StringPairCaseInsensitiveCompareSecond(const QPair<QString, QString> &s1, const QPair<QString, QString> &s2) {
     return s1.second.toLower() < s2.second.toLower();
 }
 
-bool QFRawDataRecord_StringTripleCaseInsensitiveCompareSecond(const QTriple<QString, QString, QString> &s1, const QTriple<QString, QString, QString> &s2) {
+static bool QFRawDataRecord_StringTripleCaseInsensitiveCompareSecond(const QTriple<QString, QString, QString> &s1, const QTriple<QString, QString, QString> &s2) {
     return s1.second.toLower() < s2.second.toLower();
 }
 
-bool QFRawDataRecord_StringTripleCaseInsensitiveCompareThird(const QTriple<QString, QString, QString> &s1, const QTriple<QString, QString, QString> &s2) {
+static bool QFRawDataRecord_StringTripleCaseInsensitiveCompareThird(const QTriple<QString, QString, QString> &s1, const QTriple<QString, QString, QString> &s2) {
     return s1.third.toLower() < s2.third.toLower();
 }
 
@@ -3983,9 +4105,9 @@ bool QFRawDataRecord_StringTripleCaseInsensitiveCompareThird(const QTriple<QStri
 QList<QString> QFRawDataRecord::resultsCalcNames(const QString& evalName, const QString& group, const QString& evalgroup) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4021,9 +4143,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 QList<QString> QFRawDataRecord::resultsCalcGroups(const QString& evalName) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4052,9 +4174,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabels(const QString& evalName, const QString& group, const QString& evalgroup) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4103,9 +4225,9 @@ QList<QTriple<QString, QString, QString> > QFRawDataRecord::resultsCalcNamesEval
 {
 
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4154,9 +4276,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 QList<QPair<QString, QString> > QFRawDataRecord::resultsCalcNamesAndLabelsRichtext(const QString& evalName, const QString& group, const QString& evalgroup) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4209,9 +4331,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 QList<QString> QFRawDataRecord::resultsCalcEvaluationsInGroup(const QString& evalGroup) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4233,9 +4355,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 QList<QString> QFRawDataRecord::resultsCalcEvalGroups(const QString& paramgroup) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4329,17 +4451,14 @@ bool QFRawDataRecord::showNextPreviousOfSameRoleButton() const
     return true;
 }
 
-QReadWriteLock *QFRawDataRecord::getReadWriteLock() const
-{
-    return lock;
-}
+
 
 QString QFRawDataRecord::resultsGetInStringMatrix(const QString &evaluationName, const QString &resultName, int row, int column, const QString &defaultValue) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4361,9 +4480,9 @@ qDebug()<<Q_FUNC_INFO<<"unlock";
 bool QFRawDataRecord::resultsGetInBooleanMatrix(const QString &evaluationName, const QString &resultName, int row, int column, bool defaultValue) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4385,9 +4504,9 @@ qDebug()<<Q_FUNC_INFO<<"unlock";
 QString QFRawDataRecord::resultsGetInStringList(const QString &evaluationName, const QString &resultName, int position, const QString &defaultValue) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4404,9 +4523,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 qlonglong QFRawDataRecord::resultsGetInIntegerMatrix(const QString &evaluationName, const QString &resultName, int row, int column, qlonglong defaultValue) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4428,9 +4547,9 @@ qDebug()<<Q_FUNC_INFO<<"unlock";
 bool QFRawDataRecord::resultsGetInBooleanList(const QString &evaluationName, const QString &resultName, int position, bool defaultValue) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4448,9 +4567,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 double QFRawDataRecord::resultsGetErrorInNumberErrorMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double defaultValue) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4472,9 +4591,9 @@ qDebug()<<Q_FUNC_INFO<<"unlock";
 qlonglong QFRawDataRecord::resultsGetInIntegerList(const QString &evaluationName, const QString &resultName, int position, qlonglong defaultValue) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4491,9 +4610,9 @@ qDebug()<<Q_FUNC_INFO<<"QReadLocker";
 double QFRawDataRecord::resultsGetInNumberMatrix(const QString &evaluationName, const QString &resultName, int row, int column, double defaultValue) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -4515,9 +4634,9 @@ qDebug()<<Q_FUNC_INFO<<"unlock";
 double QFRawDataRecord::resultsGetErrorInNumberErrorList(const QString &evaluationName, const QString &resultName, int position, double defaultValue) const {
     
 #ifdef DEBUG_THREAN
-qDebug()<<Q_FUNC_INFO<<"QReadLocker";
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #endif
- QReadLocker locker(lock);
+ QFRDRReadLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif

@@ -188,8 +188,8 @@ QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
 
 QFRDRImageToRunPreview::~QFRDRImageToRunPreview()
 {
-    if (plteOverviewSelectedData) free(plteOverviewSelectedData);
-    if (plteOverviewExcludedData) free(plteOverviewExcludedData);
+    if (plteOverviewSelectedData) qfFree(plteOverviewSelectedData);
+    if (plteOverviewExcludedData) qfFree(plteOverviewExcludedData);
 }
 
 void QFRDRImageToRunPreview::setRDR(QFRawDataRecord *record)
@@ -306,9 +306,9 @@ void QFRDRImageToRunPreview::replotOverview()
 
         if (plteOverviewSelectedSize!=w*h) {
             plteOverviewSelectedSize=w*h;
-            plteOverviewSelectedData=(bool*)realloc(plteOverviewSelectedData, plteOverviewSelectedSize*sizeof(bool));
+            plteOverviewSelectedData=(bool*)qfRealloc(plteOverviewSelectedData, plteOverviewSelectedSize*sizeof(bool));
             for (int i=0; i<plteOverviewSelectedSize; i++) plteOverviewSelectedData[i]=false;
-            plteOverviewExcludedData=(bool*)realloc(plteOverviewExcludedData, plteOverviewSelectedSize*sizeof(bool));
+            plteOverviewExcludedData=(bool*)qfRealloc(plteOverviewExcludedData, plteOverviewSelectedSize*sizeof(bool));
         }
         plteOverviewSelectedW=w;
         plteOverviewSelectedH=h;
@@ -500,7 +500,7 @@ void QFRDRImageToRunPreview::excludeByImage() {
     if (!(rrRecord&&maskEditTools->getMaskEditing()&&rrRecord)) return;
 
 
-        bool* mask=(bool*)malloc(rrRecord->getImageFromRunsWidth()*rrRecord->getImageFromRunsHeight()*sizeof(bool));
+        bool* mask=(bool*)qfMalloc(rrRecord->getImageFromRunsWidth()*rrRecord->getImageFromRunsHeight()*sizeof(bool));
         bool* newMask=duplicateArray(mask, rrRecord->getImageFromRunsWidth()*rrRecord->getImageFromRunsHeight());
         maskEditTools->copyMask(mask, rrRecord->getImageFromRunsWidth()*rrRecord->getImageFromRunsHeight());
 
@@ -538,8 +538,8 @@ void QFRDRImageToRunPreview::excludeByImage() {
             }
         }
         delete dialog;
-        free(mask);
-        free(newMask);
+        qfFree(mask);
+        qfFree(newMask);
         replotOverview();
 
 }

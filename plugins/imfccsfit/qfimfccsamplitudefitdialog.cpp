@@ -198,10 +198,10 @@ bool QFImFCCSAmplitudeFitDialog::calculateRelCCF(QFRawDataRecord *acf0, QFRawDat
 
             if (ok && acf0D && acf0S && acf1D && acf1S && ccfD && ccfS && acf0N>0 && acf1N>0 && ccfN>0) {
                 //tim.write("2");
-                double* rel0=(double*)malloc(w*h*sizeof(double));
-                double* rel0_error=(double*)malloc(w*h*sizeof(double));
-                double* rel1=(double*)malloc(w*h*sizeof(double));
-                double* rel1_error=(double*)malloc(w*h*sizeof(double));
+                double* rel0=(double*)qfMalloc(w*h*sizeof(double));
+                double* rel0_error=(double*)qfMalloc(w*h*sizeof(double));
+                double* rel1=(double*)qfMalloc(w*h*sizeof(double));
+                double* rel1_error=(double*)qfMalloc(w*h*sizeof(double));
                 uint64_t idxA0=0;
                 uint64_t idxA1=0;
                 uint64_t idxC=0;
@@ -285,14 +285,14 @@ bool QFImFCCSAmplitudeFitDialog::calculateRelCCF(QFRawDataRecord *acf0, QFRawDat
                     }
                 }
                 if (rel_out0) *rel_out0=rel0;
-                else if (rel0) free(rel0);
+                else if (rel0) qfFree(rel0);
                 if (rel_error_out0) *rel_error_out0=rel0_error;
-                else if (rel0_error) free(rel0_error);
+                else if (rel0_error) qfFree(rel0_error);
 
                 if (rel_out1) *rel_out1=rel1;
-                else if (rel1) free(rel1);
+                else if (rel1) qfFree(rel1);
                 if (rel_error_out1) *rel_error_out1=rel1_error;
-                else if (rel1_error) free(rel1_error);
+                else if (rel1_error) qfFree(rel1_error);
 
                 QApplication::restoreOverrideCursor();
                 return true;
@@ -455,8 +455,8 @@ void QFImFCCSAmplitudeFitDialog::replotImages()
             pltData->setAbsoluteXY(0,w,0,h);
             pltData->setXY(0,w,0,h);
 
-            if (rel) free(rel);
-            if (rel_error) free(rel_error);
+            if (rel) qfFree(rel);
+            if (rel_error) qfFree(rel_error);
         }*/
     } else {
         ui->labError->setText("<font color=\"red\"><b>ERROR CALCULATING REL: CCF</b></font>");
@@ -538,8 +538,8 @@ void QFImFCCSAmplitudeFitDialog::addResult()
 
 
 
-            if (rel) free(rel);
-            if (rel_error) free(rel_error);
+            if (rel) qfFree(rel);
+            if (rel_error) qfFree(rel_error);
         }
     }
     QApplication::restoreOverrideCursor();

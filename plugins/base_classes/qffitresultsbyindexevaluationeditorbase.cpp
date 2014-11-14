@@ -337,7 +337,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyToAll() {
     eval->set_doEmitPropertiesChanged(true);
     eval->emitResultsChanged();
 
-    free(params);
+    qfFree(params);
     QApplication::restoreOverrideCursor();
 }
 
@@ -381,7 +381,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyToAllRuns() {
     eval->set_doEmitPropertiesChanged(true);
     eval->emitResultsChanged();
 
-    free(params);
+    qfFree(params);
     QApplication::restoreOverrideCursor();
 }
 
@@ -428,7 +428,7 @@ void QFFitResultsByIndexEvaluationEditorBase::copyToAllCurrentRun() {
     eval->set_doEmitPropertiesChanged(true);
     eval->emitResultsChanged();
 
-    free(params);
+    qfFree(params);
     QApplication::restoreOverrideCursor();
 }
 

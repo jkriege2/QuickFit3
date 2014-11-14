@@ -58,7 +58,7 @@ QFEvaluationEditor* QFSPIMLightsheetEvaluationItem::createEditor(QFPluginService
     return new QFSPIMLightsheetEvaluationEditor(services, propEditor, parent);
 }
 
-bool QFSPIMLightsheetEvaluationItem::isApplicable(const QFRawDataRecord *record) {
+bool QFSPIMLightsheetEvaluationItem::isApplicable(const QFRawDataRecord *record) const {
     /* CHECK WHETHER A GIVEN RECORD MAY BE USED TOGETHER WITH THE EVALUATION */
     return qobject_cast<QFRDRImageStackInterface*>(record);
 }
@@ -108,8 +108,8 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
     if (data) {
         int w=data->getImageStackWidth(stack);
         int h=data->getImageStackHeight(stack);
-        double* img=(double*)malloc(w*h*sizeof(double));
-        bool* mask=(bool*)malloc(w*h*sizeof(bool));
+        double* img=(double*)qfMalloc(w*h*sizeof(double));
+        bool* mask=(bool*)qfMalloc(w*h*sizeof(bool));
         for (int i=0; i<w*h; i++) mask[i]=false;
         bool* maskD=NULL;
         if (useMask && dataM) {
@@ -158,8 +158,8 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
             avgValues.append(valEmpty);
         }
 
-        double* dataX=(double*)malloc(wi*sizeof(double));
-        double* dataY=(double*)malloc(wi*sizeof(double));
+        double* dataX=(double*)qfMalloc(wi*sizeof(double));
+        double* dataY=(double*)qfMalloc(wi*sizeof(double));
         for (int f=0; f<hi; f++) {
             int data_count=0;
             for (int i=0; i<wi; i++) {
@@ -173,9 +173,9 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
 
 
             int pcount=model->paramCount();
-            double* parIn=(double*)malloc(pcount*sizeof(double));
-            double* paramOut=(double*)malloc(pcount*sizeof(double));
-            double* paramErrOut=(double*)malloc(pcount*sizeof(double));
+            double* parIn=(double*)qfMalloc(pcount*sizeof(double));
+            double* paramOut=(double*)qfMalloc(pcount*sizeof(double));
+            double* paramErrOut=(double*)qfMalloc(pcount*sizeof(double));
 
             double par[4];
             long long maxpos=0;
@@ -215,9 +215,9 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
             //widths.append(sqrt(par[3]));
             widths.append(par[3]);*/
 
-            free(parIn);
-            free(paramOut);
-            free(paramErrOut);
+            qfFree(parIn);
+            qfFree(paramOut);
+            qfFree(paramErrOut);
         }
 
         QString param;
@@ -261,9 +261,9 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
             record->resultsSetString(resultID, param=QString("fit_orientation"), "fit_rows");
         }
         record->resultsSetGroupLabelsAndSortPriority(resultID, param, group, tr(""), tr(""), false);
-        free(dataX);
-        free(dataY);
-        free(img);
+        qfFree(dataX);
+        qfFree(dataY);
+        qfFree(img);
     }
 }
 

@@ -186,12 +186,12 @@ template <class Tin, class Tout>
 void readTinyTIFFFrame(TinyTIFFReaderFile* tif, Tout* buffer) {
     uint32_t wwidth=TinyTIFFReader_getWidth(tif);
     uint32_t hheight=TinyTIFFReader_getHeight(tif);
-    Tin* tmp=(Tin*)calloc(wwidth*hheight, sizeof(Tin));
+    Tin* tmp=(Tin*)qfCalloc(wwidth*hheight, sizeof(Tin));
     TinyTIFFReader_getSampleData(tif, tmp, 0);
     for (uint32_t i=0; i<wwidth*hheight; i++) {
         buffer[i]=tmp[i];
     }
-    free(tmp);
+    qfFree(tmp);
 }
 
 

@@ -29,6 +29,7 @@
 #include <QVector>
 #include <QFileInfo>
 #include <QDebug>
+#include "qftools.h"
 
 inline double sqr(const double& x) { return x*x; }
 
@@ -147,7 +148,7 @@ void QFRDRImagingFCSSimulationThread::run()
         framesize=2*width*height;
     }
     TinyTIFFFile* tif=TinyTIFFWriter_open(filename.toLatin1().data(), 16, realwidth, height);
-    uint16_t* frame=(uint16_t*)malloc(framesize*sizeof(uint16_t));
+    uint16_t* frame=(uint16_t*)qfMalloc(framesize*sizeof(uint16_t));
     QVector<QFRDRImagingFCSSimulationThread::WalkerData> wg=createWalkers(walkersG);
     QVector<QFRDRImagingFCSSimulationThread::WalkerData> wr=createWalkers(walkersR);
     QVector<QFRDRImagingFCSSimulationThread::WalkerData> wrg=createWalkers(walkersRG);
@@ -239,7 +240,7 @@ void QFRDRImagingFCSSimulationThread::run()
         emit statusMessage(tr("simulation finished ..."));
         TinyTIFFWriter_close(tif);
     }
-    free(frame);
+    qfFree(frame);
 }
 
 QVector<QFRDRImagingFCSSimulationThread::WalkerData> QFRDRImagingFCSSimulationThread::createWalkers(int count)

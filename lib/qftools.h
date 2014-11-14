@@ -45,6 +45,62 @@
 #include <QXmlStreamWriter>
 #include <QBitArray>
 
+
+#define DEFINE_READWRITE_LOCKERS(CLASS, readLockF, writeLockF, readUnlockF, writeUnlockF) \
+    class QFLIB_EXPORT CLASS##ReadLocker {\
+        private:\
+            const CLASS* item;\
+            bool locked;\
+        public:\
+            inline CLASS##ReadLocker(const CLASS* item) {\
+                this->item=item;\
+                item->readLockF();\
+                locked=true;\
+            }\
+            inline ~CLASS##ReadLocker() {\
+                item->readUnlockF();\
+                locked=false;\
+            }\
+            inline void unlock() {\
+                if (!locked) return;\
+                item->readUnlockF();\
+                locked=false;\
+            }\
+            inline void relock() {\
+                if (locked) return;\
+                item->readLockF();\
+                locked=true;\
+            }\
+    };\
+    class QFLIB_EXPORT CLASS##WriteLocker {\
+        private:\
+            const CLASS* item;\
+            bool locked;\
+        public:\
+            inline CLASS##WriteLocker(const CLASS* item) {\
+                this->item=item;\
+                item->writeLockF();\
+                locked=true;\
+            }\
+            inline ~CLASS##WriteLocker() {\
+                item->writeUnlockF();\
+                locked=false;\
+            }\
+            inline void unlock() {\
+                if (!locked) return;\
+                item->writeUnlockF();\
+                locked=false;\
+            }\
+            inline void relock() {\
+                if (locked) return;\
+                item->writeLockF();\
+                locked=true;\
+            }\
+    };
+
+
+
+
 class ProgramOptions; // forward
 
 /*! \brief QuickFit's internal malloc replacement (on some systems, this does a boundary-aligned malloc)
@@ -64,6 +120,11 @@ inline T* qfMallocT(size_t items) {
     \ingroup qf3lib_tools
  */
 QFLIB_EXPORT void* qfCalloc(size_t num, size_t size);
+
+/*! \brief QuickFit's internal malloc replacement (on some systems, this does a boundary-aligned malloc)
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT void* qfCalloc(size_t size);
 
 /*! \brief Tool for malloc, which allows to allocate with the type specified as template parameter
     \ingroup qf3lib_tools
@@ -961,19 +1022,45 @@ inline void qfstatisticsSort(T* input, long long N, T* output=NULL) {
 
 
 
+/*! \brief duplicate a memory array, i.e. reserve the data of the array a second time using qfMalloc() and copy the contents
+    \ingroup qf3lib_tools
 
-/*! \brief duplicate a memory array, i.e. reserve the data of the array a second time using malloc() and copy the contents
+*/
+template <class T>
+QVector<T> duplicateArrayV(const T* input, long long N) {
+    if (!input||N<=0) return QVector<T>();
+    QVector<T> out(N);
+    for (long long i=0; i<N; i++) {
+        out[i]=input[i];
+    }
+    return out;
+}
+
+/*! \brief duplicate a memory array, i.e. reserve the data of the array a second time using qfMalloc() and copy the contents
     \ingroup qf3lib_tools
 
 */
 template <class T>
 T* duplicateArray(const T* input, long long N) {
     if (!input||N<=0) return NULL;
-    T* out=(T*)malloc(N*sizeof(T));
+    T* out=(T*)qfMalloc(N*sizeof(T));
     if (out && input && N>=0) memcpy(out, input, N*sizeof(T));
     return out;
 }
-/*! \brief duplicate a memory array, i.e. reserve the data of the array a second time using malloc() and copy the contents
+
+/*! \brief duplicate a memory array, i.e. reserve the data of the array a second time using qfMalloc() and copy the contents
+    \ingroup qf3lib_tools
+
+*/
+template <class T>
+T* duplicateArray(const QVector<T>& input) {
+    long long N=input.size();
+    if (!input||N<=0) return NULL;
+    T* out=(T*)qfMalloc(N*sizeof(T));
+    if (out && input && N>=0) memcpy(out, input, N*sizeof(T));
+    return out;
+}
+/*! \brief duplicate a memory array, i.e. reserve the data of the array a second time using qfMalloc() and copy the contents
     \ingroup qf3lib_tools
 
 */
@@ -984,7 +1071,7 @@ T* qfDuplicateArray(const T* input, long long N) {
     if (out && input && N>=0) memcpy(out, input, N*sizeof(T));
     return out;
 }
-/*! \brief duplicate a memory array, i.e. reserve the data of the array a second time using malloc() and copy the contents
+/*! \brief duplicate a memory array, i.e. reserve the data of the array a second time using qfMalloc() and copy the contents
     \ingroup qf3lib_tools
 
 */
@@ -1287,7 +1374,7 @@ void qfSortVectorByPermutation(const T1 &initialOrder, const T1 &newOrder, T2* d
         data[newOrder[i]]=c[initialOrder[i]];
     }
 
-    free(c);
+    qfFree(c);
 }
 
 template <typename T1, typename T2>

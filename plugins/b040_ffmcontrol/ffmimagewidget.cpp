@@ -29,9 +29,9 @@ FFMImageWidget::FFMImageWidget(QWidget *parent) :
 
     // make test images
     //begin testpart
-    testr = (uint32_t*) malloc(img_x * img_y * img_z * sizeof(uint32_t)); // get memory
-    testg = (uint32_t*) malloc(img_x * img_y * img_z * sizeof(uint32_t));
-    testb = (uint32_t*) malloc(img_x * img_y * img_z * sizeof(uint32_t));
+    testr = (uint32_t*) qfMalloc(img_x * img_y * img_z * sizeof(uint32_t)); // get memory
+    testg = (uint32_t*) qfMalloc(img_x * img_y * img_z * sizeof(uint32_t));
+    testb = (uint32_t*) qfMalloc(img_x * img_y * img_z * sizeof(uint32_t));
     testimage1(testr);                                                    // initialize images
     testimage2(testg);
     testimage3(testb);
@@ -124,9 +124,9 @@ FFMImageWidget::FFMImageWidget(QWidget *parent) :
 
 FFMImageWidget::~FFMImageWidget()
 {
-    free(testr);
-    free(testg);
-    free(testb);
+    qfFree(testr);
+    qfFree(testg);
+    qfFree(testb);
 }
 
 void FFMImageWidget::setLog(QFPluginLogService *log)

@@ -623,7 +623,7 @@ void QFESPIMB040CamParamStackConfigWidget2::performStack()
                             log->log_text(tr("  - prepared camer 1!\n"));
                             width1=ecamera1->getCameraImageWidth(camera1);
                             height1=ecamera1->getCameraImageHeight(camera1);
-                            buffer1=(uint32_t*)realloc(buffer1, width1*height1*sizeof(uint32_t));
+                            buffer1=(uint32_t*)qfRealloc(buffer1, width1*height1*sizeof(uint32_t));
                             if (!buffer1) {
                                 ok=false;
                                 CAMPARAMSTACK_ERROR(tr("could not allocate image buffer for camera 1!\n"));
@@ -659,7 +659,7 @@ void QFESPIMB040CamParamStackConfigWidget2::performStack()
                             log->log_text(tr("  - prepared camer 2!\n"));
                             width2=ecamera2->getCameraImageWidth(camera2);
                             height2=ecamera2->getCameraImageHeight(camera2);
-                            buffer2=(uint32_t*)realloc(buffer2, width2*height2*sizeof(uint32_t));
+                            buffer2=(uint32_t*)qfRealloc(buffer2, width2*height2*sizeof(uint32_t));
                             if (!buffer2) {
                                 ok=false;
                                 CAMPARAMSTACK_ERROR(tr("could not allocate image buffer for camera 2!\n"));
@@ -717,8 +717,8 @@ void QFESPIMB040CamParamStackConfigWidget2::performStack()
                     QApplication::processEvents();
                 }
                 duration=timAcquisition.elapsed()/1000.0;
-                if (buffer1) free(buffer1);
-                if (buffer2) free(buffer2);
+                if (buffer1) qfFree(buffer1);
+                if (buffer2) qfFree(buffer2);
                 buffer1=buffer2=NULL;
 
             }
@@ -818,8 +818,8 @@ void QFESPIMB040CamParamStackConfigWidget2::performStack()
                     }
                 }
                 duration=timAcquisition.elapsed()/1000.0;
-                if (buffer1) free(buffer1);
-                if (buffer2) free(buffer2);
+                if (buffer1) qfFree(buffer1);
+                if (buffer2) qfFree(buffer2);
                 buffer1=buffer2=NULL;
 
             }

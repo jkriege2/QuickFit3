@@ -2,6 +2,7 @@
 #include "picoquant_pt3_tools.h"
 #include <QObject>
 #include <QDebug>
+#include "qftools.h"
 
 bool PT3ReadConfiguration(FILE* fpin, PT3TxtHdr* txtHeader, PT3BinHdr* binHeader, PT3BoardHdr* boardHeader, PT3TTTRHdr* TTTRHeader, QString& error) {
     long int result;

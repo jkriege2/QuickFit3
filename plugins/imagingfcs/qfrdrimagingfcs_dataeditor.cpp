@@ -66,9 +66,9 @@ QFRDRImagingFCSDataEditor::QFRDRImagingFCSDataEditor(QFPluginServices* services,
 
 QFRDRImagingFCSDataEditor::~QFRDRImagingFCSDataEditor()
 {
-    if (plteOverviewSelectedData) free(plteOverviewSelectedData);
+    if (plteOverviewSelectedData) qfFree(plteOverviewSelectedData);
     plteOverviewSelectedData=NULL;
-    if (plteOverviewExcludedData) free(plteOverviewExcludedData);
+    if (plteOverviewExcludedData) qfFree(plteOverviewExcludedData);
     plteOverviewExcludedData=NULL;
 }
 
@@ -447,8 +447,8 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
 
         if (plteOverviewSelectedSize!=w*h) {
             plteOverviewSelectedSize=w*h;
-            plteOverviewSelectedData=(bool*)realloc(plteOverviewSelectedData, plteOverviewSelectedSize*sizeof(bool));
-            plteOverviewExcludedData=(bool*)realloc(plteOverviewExcludedData, plteOverviewSelectedSize*sizeof(bool));
+            plteOverviewSelectedData=(bool*)qfRealloc(plteOverviewSelectedData, plteOverviewSelectedSize*sizeof(bool));
+            plteOverviewExcludedData=(bool*)qfRealloc(plteOverviewExcludedData, plteOverviewSelectedSize*sizeof(bool));
         }
 
         plteOverviewSelected->set_data(plteOverviewSelectedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());

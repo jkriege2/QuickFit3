@@ -250,7 +250,7 @@ class QFFitResultsByIndexEvaluationEditorWithWidgets : public QFFitResultsByInde
 
 
     protected:
-        void populateFitButtons(bool mulThreadEnabledInModel=true);
+        virtual void populateFitButtons(bool mulThreadEnabledInModel=true);
 
         /** \brief to fit current file */
         QToolButton* btnFitCurrent;

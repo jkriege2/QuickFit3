@@ -158,7 +158,7 @@ class QFLIB_EXPORT QFFitFunction {
         virtual ~QFFitFunction() {}
 
         /** \brief returns the number of parameters */
-        virtual int paramCount() const {
+        inline virtual int paramCount() const {
             return m_parameters.size();
         }
         /** \brief return a name for the model */
@@ -177,6 +177,9 @@ class QFLIB_EXPORT QFFitFunction {
             \return the fitting function \f$ f(x, \vec{p}) \f$ at the position \f$ x \f$ with the given parameter vector \f$ \vec{p} \f$
          */
         virtual double evaluate(double x, const double* parameters) const =0;
+        inline virtual double evaluate(double x, const QVector<double>& parameters) const {
+            return evaluate(x, parameters.constData());
+        }
 
 
         /*! \brief evaluate the fitting function \f$ f(x_i, \vec{p}) \f$ at the positions \f$ x_i \f$ with the given parameter vector \f$ \vec{p} \f$
@@ -185,6 +188,10 @@ class QFLIB_EXPORT QFFitFunction {
             \return the fitting function \f$ y_i=f(x_i, \vec{p}) \f$ at the positions \f$ x_i \f$ with the given parameter vector \f$ \vec{p} \f$
          */
         QVector<double> multiEvaluate(const QVector<double>& x, const double* parameters) const;
+        QVector<double> multiEvaluate(const double* x, long long N, const double* parameters) const;
+        inline QVector<double> multiEvaluate(const QVector<double>& x, const QVector<double>& parameters) const {
+            return multiEvaluate(x, parameters.constData());
+        }
 
         /*! \brief evaluate the fitting function \f$ f(x_i, \vec{p}) \f$ at the positions \f$ x_i \f$ with the given parameter vector \f$ \vec{p} \f$
             \param y the fitting function \f$ y_i=f(x_i, \vec{p}) \f$ at the positions \f$ x_i \f$ with the given parameter vector \f$ \vec{p} \f$
@@ -194,6 +201,16 @@ class QFLIB_EXPORT QFFitFunction {
          */
         virtual void multiEvaluate(double* y, const double* x, uint64_t N,  const double* parameters) const;
 
+        /*! \brief evaluate the fitting function \f$ f(x_i, \vec{p}) \f$ at the positions \f$ x_i \f$ with the given parameter vector \f$ \vec{p} \f$
+            \param y the fitting function \f$ y_i=f(x_i, \vec{p}) \f$ at the positions \f$ x_i \f$ with the given parameter vector \f$ \vec{p} \f$
+            \param x vector of positions \f$ \vec{x}=(x_i) \f$ where to evaluate the fit function
+            \param N items in x and y
+            \param parameters parameter vector \f$ \vec{p}\in\mathbb{R}^N \f$
+         */
+        inline virtual void multiEvaluate(double* y, const double* x, uint64_t N,  const QVector<double>& parameters) const {
+            multiEvaluate(y, x, N, parameters.constData());
+        }
+
         /*! \brief evaluate the fitting function derivatives  \f$ J_n=\frac{\partial f}{\partial p_n}(x, \vec{p}) \f$ at the position
                    \f$ x \f$ with the given parameter vector \f$ \vec{p} \f$
             \param[out] derivatives as a vector \f$ \left[\frac{\partial f}{\partial p_1}, \frac{\partial f}{\partial p_2}, ..., \frac{\partial f}{\partial p_N}\right] \f$ .
@@ -202,10 +219,21 @@ class QFLIB_EXPORT QFFitFunction {
             \param parameters parameter vector \f$ \vec{p}\in\mathbb{R}^N \f$
             \note this is only implemented when get_implementsDerivatives() returns \c true
          */
-        virtual void evaluateDerivatives(double* derivatives, double x, const double* parameters) const {};
+        virtual void evaluateDerivatives(double* derivatives, double x, const double* parameters) const ;
+        inline virtual void evaluateDerivatives(double* derivatives, double x, const QVector<double>&  parameters) const {
+            evaluateDerivatives(derivatives, x, parameters.constData());
+        }
+        inline virtual void evaluateDerivatives(QVector<double>& derivatives, double x, const QVector<double>&  parameters) const {
+            derivatives.resize(m_parameters.size());
+            evaluateDerivatives(derivatives.data(), x, parameters.constData());
+        }
+        inline virtual void evaluateDerivatives(QVector<double>& derivatives, double x, const double*  parameters) const {
+            derivatives.resize(m_parameters.size());
+            evaluateDerivatives(derivatives.data(), x, parameters);
+        }
 
         /** \brief retrun \c if this fit function implements analytic derivatives in evaluateDerivatives() */
-        virtual bool get_implementsDerivatives() const { return false; };
+        virtual bool get_implementsDerivatives() const ;
 
         /*! \brief calculate non-fit parameters and their errors (if \a error is supplied), i.e. \c fit=userEditable=false
             \param[in,out] parameterValues the parameter values on which to base the calculation. This is also
@@ -214,7 +242,13 @@ class QFLIB_EXPORT QFFitFunction {
                            errors are also stored in this array.
             \see sortParameter()
         */
-        virtual void calcParameter(double* parameterValues, double* error=NULL) const {};
+        virtual void calcParameter(double* parameterValues, double* error=NULL) const ;
+        inline virtual void calcParameter(QVector<double>& parameterValues, QVector<double>& error) const {
+            calcParameter(parameterValues.data(), error.data());
+        }
+        inline virtual void calcParameter(QVector<double>& parameterValues) const {
+            calcParameter(parameterValues.data(), NULL);
+        }
 
         /*! \brief Sometimes it is desireable to sort the fit parameters in some given order. This function may be uused to do so.
                    <b>DO NOT SORT IN calcParameter()</b>
@@ -222,33 +256,63 @@ class QFLIB_EXPORT QFFitFunction {
             \param[in,out] error if \c !=NULL this contains the errors to be sorted
             \see calcParameter()
         */
-        virtual void sortParameter(double* parameterValues, double* error=NULL, bool* fix=NULL) const {};
+        virtual void sortParameter(double* parameterValues, double* error=NULL, bool* fix=NULL) const ;
+        inline virtual void sortParameter(QVector<double>& parameterValues, QVector<double>& error, QVector<bool>& fix) const {
+            sortParameter(parameterValues.data(), error.data(), fix.data());
+        }
+        inline virtual void sortParameter(QVector<double>& parameterValues, QVector<bool>& fix) const {
+            sortParameter(parameterValues.data(), NULL, fix.data());
+        }
+        inline virtual void sortParameter(QVector<double>& parameterValues, QVector<double>& error) const {
+            sortParameter(parameterValues.data(), error.data(), NULL);
+        }
+        inline virtual void sortParameter(QVector<double>& parameterValues) const {
+            sortParameter(parameterValues.data(), NULL, NULL);
+        }
 
         /*! \brief returns \c true if the given parameter is currently visible (which could e.g. depend on the setting of the other parameters)
             \param parameter which parameter to test
             \param parameterValues the parameter values on which to base the decission
             \return \c true if parameter is visibled (based on the parameter values in \a parameterValues )
         */
-        virtual bool isParameterVisible(int parameter, const double* parameterValues) const { return true; };
+        virtual bool isParameterVisible(int parameter, const double* parameterValues) const ;
+        inline virtual bool isParameterVisible(int parameter, const QVector<double>& parameterValues) const {
+            return isParameterVisible(parameter, parameterValues.data());
+        }
 
         /*! \brief return the number of graphs that should be plotted additional to the function grph itself
             \param params The decision may be based on this parameter set.
             \return number of additional plots, or 0 if none
         */
-        virtual unsigned int getAdditionalPlotCount(const double* params) { return 0; }
+        virtual unsigned int getAdditionalPlotCount(const double* params);
+        inline virtual unsigned int getAdditionalPlotCount(const QVector<double>& params) {
+            return getAdditionalPlotCount(params.constData());
+        }
 
         /*! \brief transform the given parameter vector so tht it my be used to plot the \a plot -th additional graph
             \param plot the number of the plot to plot
             \param[in,out] params parameter vector. This is assumed to be filled with the full parameters when the function is called
             \return label/name for the graph
         */
-        virtual QString transformParametersForAdditionalPlot(int plot, double* params) { return QString(""); }
+        virtual QString transformParametersForAdditionalPlot(int plot, double* params) ;
+        inline virtual QString transformParametersForAdditionalPlot(int plot, QVector<double>& params) {
+            params.resize(m_parameters.size());
+            return transformParametersForAdditionalPlot(plot, params.data());
+        }
 
         /*! \brief if implemented (and returns \c true) this function tries to estimate the initial parameters of a fit function from provided data. If called with NULL parameters, this should still return, whether guessing is possible at all!
 
             The parameter fix is optional and may be ignored by the function. It indicates which values should be fixed to the value given in params for the estimation.
          */
         virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N, const bool *fix=NULL);
+        inline virtual bool estimateInitial(QVector<double>& params, const QVector<double>& dataX, const QVector<double>& dataY, const QVector<bool>& fix) {
+            params.resize(m_parameters.size());
+            return estimateInitial(params.data(), dataX.constData(), dataY.constData(), qMin(dataX.size(), dataY.size()), fix.constData());
+        }
+        inline virtual bool estimateInitial(QVector<double>& params, const QVector<double>& dataX, const QVector<double>& dataY) {
+            params.resize(m_parameters.size());
+            return estimateInitial(params.data(), dataX.constData(), dataY.constData(), qMin(dataX.size(), dataY.size()), NULL);
+        }
 
         /*! \brief numerically estimates the fitting function derivatives  \f$ J_n=\frac{\partial f}{\partial p_n}(x, \vec{p}) \f$ at the position
                    \f$ x \f$ with the given parameter vector \f$ \vec{p} \f$
@@ -264,23 +328,40 @@ class QFLIB_EXPORT QFFitFunction {
                  <a href="http://en.wikipedia.org/wiki/Five-point_stencil">http://en.wikipedia.org/wiki/Five-point_stencil</a>
          */
         void evaluateNumericalDerivatives(double* derivatives, double x, const double* parameters, double stepsize=30.0*sqrt(DBL_EPSILON)) const;
+        void evaluateNumericalDerivatives(QVector<double>& derivatives, double x, const QVector<double>& parameters, double stepsize=30.0*sqrt(DBL_EPSILON)) const {
+            evaluateNumericalDerivatives(derivatives.data(), x, parameters.constData(), stepsize);
+        }
+        void evaluateNumericalDerivatives(QVector<double>& derivatives, double x, const double* parameters, double stepsize=30.0*sqrt(DBL_EPSILON)) const {
+            evaluateNumericalDerivatives(derivatives.data(), x, parameters, stepsize);
+        }
+        QVector<double> evaluateNumericalDerivatives(double x, const QVector<double>& parameters, double stepsize=30.0*sqrt(DBL_EPSILON)) const {
+            QVector<double> vec;
+            vec.resize(m_parameters.size());
+            evaluateNumericalDerivatives(vec.data(), x, parameters.constData(), stepsize);
+            return vec;
+        }
 
         void evaluateNumericalParameterErrors(double* errors, double x, const double* parameters, double residualSigma2=1.0, double stepsize=30.0*sqrt(DBL_EPSILON)) const;
-
+        QVector<double> evaluateNumericalParameterErrors(double x, const QVector<double>& parameters, double residualSigma2=1.0, double stepsize=30.0*sqrt(DBL_EPSILON)) const {
+            QVector<double> vec;
+            vec.resize(m_parameters.size());
+            evaluateNumericalParameterErrors(vec.data(), x, parameters.constData(), residualSigma2, stepsize);
+            return vec;
+        }
         /** \brief returns the description of the i-th parameter */
-        ParameterDescription getDescription(int i) const  {
+        inline ParameterDescription getDescription(int i) const  {
             return m_parameters[i];
         }
 
         /** \brief returns the description of the parameter id */
-        ParameterDescription getDescription(QString id) const  {
+        inline ParameterDescription getDescription(QString id) const  {
             int i=getParameterNum(id);
             if (i>-1) return m_parameters[i];
             else return ParameterDescription();
         }
 
         /** \brief get num of the given parameter or -1 */
-        int getParameterNum(QString param) const {
+        inline int getParameterNum(QString param) const {
             for (int i=0; i<m_parameters.size(); i++) {
                 if (m_parameters[i].id==param) return i;
             }
@@ -288,18 +369,18 @@ class QFLIB_EXPORT QFFitFunction {
         }
 
         /** \brief return \c true if a parameter wit the given id exists */
-        bool hasParameter(QString id) {
+        inline bool hasParameter(QString id) {
             return (getParameterNum(id)>=0);
         }
 
         /** \brief get id of the given parameter or an empty string */
-        QString getParameterID(int i) {
+        inline QString getParameterID(int i) {
             if ((i>=0) && (i<m_parameters.size())) return m_parameters[i].id;
             return QString("");
         }
 
         /** \brief return a list with the ids of all parameters of this model */
-        QStringList getParameterIDs() {
+        inline QStringList getParameterIDs() {
             QStringList sl;
             for (int i=0; i<m_parameters.size(); i++) sl.append(m_parameters[i].id);
             return sl;
@@ -321,9 +402,9 @@ class QFLIB_EXPORT QFFitFunction {
             \param runAvgWidth width of the averaging in the running averge
             \param residualHistogramBins bins in the residual histogram
 
-            \note the arrays in the resulting struct are allocated using \c malloc(), so you will have to free them using \c free() !!!
+            \note the arrays in the resulting struct are allocated using \c qfMalloc(), so you will have to free them using \c qfFree() !!!
           */
-        QFFitStatistics calcFitStatistics(long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins);
+        QFFitStatistics calcFitStatistics(long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins) const;
     protected:
         /*! \brief add a parameter description
 
@@ -331,7 +412,7 @@ class QFLIB_EXPORT QFFitFunction {
             \param description parameter description to be aded
             \return the id of the parameter
          */
-        int addParameter(const ParameterDescription& description) {
+        inline int addParameter(const ParameterDescription& description) {
             m_parameters.append(description);
             return m_parameters.size()-1;
         }
@@ -340,7 +421,7 @@ class QFLIB_EXPORT QFFitFunction {
             used in the constructor to define the model parameters
             \return the id of the parameter
          */
-        int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, QString unitLabel, bool fit, bool userEditable, bool userRangeEditable, ErrorDisplayMode displayError, bool initialFix, double initialValue, double minValue=-DBL_MAX, double maxValue=DBL_MAX, double inc=1, double absMinValue=-DBL_MAX, double absMaxValue=DBL_MAX, QStringList comboItems=QStringList()) {
+        inline int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, QString unitLabel, bool fit, bool userEditable, bool userRangeEditable, ErrorDisplayMode displayError, bool initialFix, double initialValue, double minValue=-DBL_MAX, double maxValue=DBL_MAX, double inc=1, double absMinValue=-DBL_MAX, double absMaxValue=DBL_MAX, QStringList comboItems=QStringList()) {
             ParameterDescription d;
             d.type=type;
             d.id=id;

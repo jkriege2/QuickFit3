@@ -125,6 +125,6 @@ void QFFitAlgorithmParameterStorage::restoreQFFitAlgorithmParameters(QFFitAlgori
     QStringList params=algorithm->getParameterIDs();
     for (int i=0; i<params.size(); i++) {
         QString pid=params[i];
-        algorithm->setParameter(pid, algorithm_parameterstore[aid].value(pid, algorithm->getParameter(pid)));
+        if (algorithm_parameterstore.contains(aid)) algorithm->setParameter(pid, algorithm_parameterstore[aid].value(pid, algorithm->getParameter(pid)));
     }
 }

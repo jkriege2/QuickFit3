@@ -977,6 +977,85 @@ bool* QFFitResultsEvaluation::allocFillFix(QFFitFunction* function) const {
     return allocFillFix(getHighlightedRecord(), getEvaluationResultID(getHighlightedRecord()), function);
 }
 
+QVector<double> QFFitResultsEvaluation::allocVecFillParameters(QFFitFunction *function) const
+{
+    return allocVecFillParameters(getHighlightedRecord(), getEvaluationResultID(getHighlightedRecord()), function);
+}
+
+QVector<double> QFFitResultsEvaluation::allocVecFillParameterErrors(QFFitFunction *function) const
+{
+    return allocVecFillParameterErrors(getHighlightedRecord(), getEvaluationResultID(getHighlightedRecord()), function);
+ }
+
+QVector<double> QFFitResultsEvaluation::allocVecFillParametersMin(const QFRawDataRecord *r, QFFitFunction *function) const
+{
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction(r);
+    QVector<double> res;
+    if (f!=NULL && f->paramCount()>0) {
+        res.resize(f->paramCount());
+        fillParametersMin(res.data(), r, f);
+    }
+    return res;
+
+
+}
+
+QVector<double> QFFitResultsEvaluation::allocVecFillParametersMax(const QFRawDataRecord *r, QFFitFunction *function) const
+{
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction(r);
+    QVector<double> res;
+    if (f!=NULL && f->paramCount()>0) {
+        res.resize(f->paramCount());
+        fillParametersMax(res.data(), r, f);
+    }
+    return res;
+
+
+}
+
+QVector<bool> QFFitResultsEvaluation::allocVecFillFix(QFFitFunction *function) const
+{
+    return allocVecFillFix(getHighlightedRecord(), getEvaluationResultID(getHighlightedRecord()), function);
+}
+
+QVector<double> QFFitResultsEvaluation::allocVecFillParameters(const QFRawDataRecord *r, const QString &resultID, QFFitFunction *function) const
+{
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction(r);
+    QVector<double> res;
+    if (f!=NULL && f->paramCount()>0) {
+        res.resize(f->paramCount());
+        fillParameters(r, resultID, res.data(), f);
+    }
+    return res;
+}
+
+QVector<double> QFFitResultsEvaluation::allocVecFillParameterErrors(const QFRawDataRecord *r, const QString &resultID, QFFitFunction *function) const
+{
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction(r);
+    QVector<double> res;
+    if (f!=NULL && f->paramCount()>0) {
+        res.resize(f->paramCount());
+        fillParameterErrors(r, resultID, res.data(), f);
+    }
+    return res;
+}
+
+QVector<bool> QFFitResultsEvaluation::allocVecFillFix(const QFRawDataRecord *r, const QString &resultID, QFFitFunction *function) const
+{
+    QFFitFunction* f=function;
+    if (!f) f=getFitFunction(r);
+    QVector<bool> res;
+    if (f!=NULL && f->paramCount()>0) {
+        res.resize(f->paramCount());
+        fillFix(r, resultID, res.data(), f);
+    }
+    return res;
+}
+
 
 
 
@@ -1034,7 +1113,7 @@ double* QFFitResultsEvaluation::allocFillParameters(const QFRawDataRecord *r, co
     if (f!=NULL && f->paramCount()>0) {
         int pcnt=f->paramCount();
         if (pcnt>0) {
-            double* res=(double*)calloc(pcnt, sizeof(double));
+            double* res=(double*)qfCalloc(pcnt, sizeof(double));
         //qDebug()<<"    result size: "<<f->paramCount();
         fillParameters(r, resultID, res, f);
         return res;
@@ -1047,7 +1126,7 @@ double* QFFitResultsEvaluation::allocFillParameterErrors(const QFRawDataRecord *
     QFFitFunction* f=function;
     if (!f) f=getFitFunction(r);
     if (f!=NULL && f->paramCount()>0) {
-        double* res=(double*)calloc(f->paramCount(), sizeof(double));
+        double* res=(double*)qfCalloc(f->paramCount(), sizeof(double));
         fillParameterErrors(r, resultID, res, f);
         return res;
     }
@@ -1061,7 +1140,7 @@ bool* QFFitResultsEvaluation::allocFillFix(const QFRawDataRecord *r, const QStri
     QFFitFunction* f=function;
     if (!f) f=getFitFunction(r);
     if (f!=NULL && f->paramCount()>0) {
-        bool* res=(bool*)calloc(f->paramCount(), sizeof(bool));
+        bool* res=(bool*)qfCalloc(f->paramCount(), sizeof(bool));
         if (res) fillFix(r, resultID, res, f);
         return res;
     }
@@ -1074,7 +1153,7 @@ double* QFFitResultsEvaluation::allocFillParametersMin(const QFRawDataRecord *r,
     if (!f) f=getFitFunction(getHighlightedRecord());
 
     if (f!=NULL && f->paramCount()>0) {
-        double* res=(double*)calloc(f->paramCount(), sizeof(double));
+        double* res=(double*)qfCalloc(f->paramCount(), sizeof(double));
         fillParametersMin(res, r, f);
         return res;
     }
@@ -1086,7 +1165,7 @@ double* QFFitResultsEvaluation::allocFillParametersMax(const QFRawDataRecord* r,
     if (!f) f=getFitFunction(getHighlightedRecord());
 
     if (f!=NULL && f->paramCount()>0) {
-        double* res=(double*)calloc(f->paramCount(), sizeof(double));
+        double* res=(double*)qfCalloc(f->paramCount(), sizeof(double));
         fillParametersMax(res, r, f);
         return res;
     }

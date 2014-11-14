@@ -455,8 +455,8 @@ bool QFFitFunctionValueInputTable::recalculateFitParameters(bool emitFitParamSig
         // 3. emit dataChanged() signals for all cells that have changed and set changed to true, if any changed
 
         QStringList fpids=fitfunction->getParameterIDs();
-        double* p_old=(double*)calloc(fitfunction->paramCount(), sizeof(double));
-        double* e_old=(double*)calloc(fitfunction->paramCount(), sizeof(double));
+        double* p_old=(double*)qfCalloc(fitfunction->paramCount(), sizeof(double));
+        double* e_old=(double*)qfCalloc(fitfunction->paramCount(), sizeof(double));
         for (int i=0; i<fpids.size(); i++) {
             p_old[i]=getParameterValue(fpids[i]);
             e_old[i]=getParameterError(fpids[i]);
@@ -487,10 +487,10 @@ bool QFFitFunctionValueInputTable::recalculateFitParameters(bool emitFitParamSig
                 }
             }
         }
-        free(p);
-        free(e);
-        free(p_old);
-        free(e_old);
+        qfFree(p);
+        qfFree(e);
+        qfFree(p_old);
+        qfFree(e_old);
     }
 
 
@@ -560,7 +560,7 @@ bool QFFitFunctionValueInputTable::checkRebuildModel(bool alwaysreset)
 
 
     if (fitfunction) {
-        double* p=(double*)calloc(fitfunction->paramCount(), sizeof(double));
+        double* p=(double*)qfCalloc(fitfunction->paramCount(), sizeof(double));
         QStringList fpids=fitfunction->getParameterIDs();
         for (int i=0; i<fpids.size(); i++) {
             p[i]=getParameterValue(fpids[i]);
@@ -580,7 +580,7 @@ bool QFFitFunctionValueInputTable::checkRebuildModel(bool alwaysreset)
                 if (!fitParamListContainsID(fprec.id, fitparamids_new, &found)) fitparamids_new<<fprec;
             }
         }
-        free(p);
+        qfFree(p);
 
 
     } else {

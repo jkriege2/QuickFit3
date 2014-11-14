@@ -1,5 +1,5 @@
 #include "radhard2flash.h"
-
+#include "qftools.h"
 //-----------------------------------------------------------------------------
 //
 //  Defines
@@ -189,7 +189,7 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
     strcat(message, tmpMessage);
     return 0;
   }
-  buffer = (char*)malloc(flen * sizeof(char));
+  buffer = (char*)qfMalloc(flen * sizeof(char));
   if (!buffer)
   {
     memset(tmpMessage, 0, TEMPSIZE);
@@ -218,7 +218,7 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
     memset(tmpMessage, 0, TEMPSIZE);
     sprintf(tmpMessage, "\n\nCould not set the USB configuration 0x%08X" , device->config->bConfigurationValue );
     strcat(message, tmpMessage);
-    free(buffer);
+    qfFree(buffer);
     usb_close(h_device);
     return 0;
   }
@@ -231,7 +231,7 @@ int flash_bitfile(char * infilename, char* message, char fpga) {
 			device->config->interface->
 			altsetting->bInterfaceNumber);
   usb_close(h_device);
-  free(buffer);
+  qfFree(buffer);
   if (rv < 0)
   {
     memset(tmpMessage, 0, TEMPSIZE);

@@ -135,7 +135,7 @@ QVariant QFFCCSParameterInputTable::data(const QModelIndex &index, int role) con
                 QFFitFunction::ParameterDescription desc=ff->getDescription(fp.id);
                 /*double* p=item->allocFillParameters(rdr, item->getCurrentIndex(), ff);
                 bool visible=ff->isParameterVisible(ff->getParameterNum(fp.id), p);
-                free(p);*/
+                qfFree(p);*/
                 bool visible=fp.visibleIn.contains(rdr);
                 if (visible) {
                     if (coli==0) {
@@ -459,10 +459,10 @@ bool QFFCCSParameterInputTable::recalculateFitParameters(bool emitFitParamSignal
                     }
                 }
             }
-            free(p);
-            free(e);
-            free(p_old);
-            free(e_old);
+            qfFree(p);
+            qfFree(e);
+            qfFree(p_old);
+            qfFree(e_old);
         }
     }
 
@@ -516,7 +516,7 @@ bool QFFCCSParameterInputTable::checkRebuildModel(bool alwaysreset)
                     //qDebug()<<"   added "<<fprec.id<<"  "<<fprec.label;
                 }
             }
-            free(p);
+            qfFree(p);
         }
     }
     /*if (fitparamids_new.size()>1) {

@@ -69,7 +69,7 @@ void QFImFCCSFitChi2LandscapeDialog::on_btnPlot_clicked()
     ui->plotter->set_doDrawing(false);
     ui->plotter->getDatastore()->clear();
     ui->plotter->clearGraphs();
-    double* d=(double*)calloc(ui->spinXPixels->value()*ui->spinYPixels->value(), sizeof(double));
+    double* d=(double*)qfCalloc(ui->spinXPixels->value()*ui->spinYPixels->value(), sizeof(double));
 
 
 
@@ -135,5 +135,5 @@ void QFImFCCSFitChi2LandscapeDialog::on_btnPlot_clicked()
     ui->plotter->set_doDrawing(true);
     ui->plotter->update_plot();
 
-    free(d);
+    qfFree(d);
 }

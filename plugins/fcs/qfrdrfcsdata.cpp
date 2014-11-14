@@ -96,11 +96,11 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
             } \
             for (int i=0; res && i<otherdata.size(); i++) { \
                 dataArr t_=otherdata[i]; \
-                if (t_.correlation) free(t_.correlation); \
-                if (t_.correlationErrors) free(t_.correlationErrors); \
-                if (t_.correlationT) free(t_.correlationT); \
-                if (t_.rateT) free(t_.rateT); \
-                if (t_.rate) free(t_.rate); \
+                if (t_.correlation) qfFree(t_.correlation); \
+                if (t_.correlationErrors) qfFree(t_.correlationErrors); \
+                if (t_.correlationT) qfFree(t_.correlationT); \
+                if (t_.rateT) qfFree(t_.rateT); \
+                if (t_.rate) qfFree(t_.rate); \
             } \
             otherdata.clear(); \
         } \
@@ -134,15 +134,15 @@ QFRDRFCSData::QFRDRFCSData(QFProject* parent):
 
 QFRDRFCSData::~QFRDRFCSData()
 {
-    if (correlationT) free(correlationT);
-    if (correlation) free(correlation);
-    if (correlationErrors) free(correlationErrors);
-    if (correlationMean) free(correlationMean);
-    if (correlationStdDev) free(correlationStdDev);
-    if (rateT) free(rateT);
-    if (rate) free(rate);
-    if (binnedRateT) free(binnedRateT);
-    if (binnedRate) free(binnedRate);
+    if (correlationT) qfFree(correlationT);
+    if (correlation) qfFree(correlation);
+    if (correlationErrors) qfFree(correlationErrors);
+    if (correlationMean) qfFree(correlationMean);
+    if (correlationStdDev) qfFree(correlationStdDev);
+    if (rateT) qfFree(rateT);
+    if (rate) qfFree(rate);
+    if (binnedRateT) qfFree(binnedRateT);
+    if (binnedRate) qfFree(binnedRate);
     correlationRuns=0;
     correlationN=0;
     correlationT=NULL;
@@ -164,10 +164,10 @@ QFRDRFCSData::~QFRDRFCSData()
 
 void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
     //qDebug()<<"resizeCorrelations( N="<<N<<",  runs="<<runs<<")";
-    if (correlationT) free(correlationT);
-    if (correlation) free(correlation);
-    if (correlationMean) free(correlationMean);
-    if (correlationStdDev) free(correlationStdDev);
+    if (correlationT) qfFree(correlationT);
+    if (correlation) qfFree(correlation);
+    if (correlationMean) qfFree(correlationMean);
+    if (correlationStdDev) qfFree(correlationStdDev);
     correlationRuns=0;
     correlationN=0;
     correlationT=NULL;
@@ -179,11 +179,11 @@ void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
     for (int i=0; i<=N; i++) runsVisibleList.append(true);
     correlationN=N;
     correlationRuns=runs;
-    correlationT=(double*)calloc(correlationN, sizeof(double));
-    correlationMean=(double*)calloc(correlationN, sizeof(double));
-    correlationStdDev=(double*)calloc(correlationN, sizeof(double));
-    correlation=(double*)calloc(correlationN*correlationRuns, sizeof(double));
-    correlationErrors=(double*)calloc(correlationN*correlationRuns, sizeof(double));
+    correlationT=(double*)qfCalloc(correlationN, sizeof(double));
+    correlationMean=(double*)qfCalloc(correlationN, sizeof(double));
+    correlationStdDev=(double*)qfCalloc(correlationN, sizeof(double));
+    correlation=(double*)qfCalloc(correlationN*correlationRuns, sizeof(double));
+    correlationErrors=(double*)qfCalloc(correlationN*correlationRuns, sizeof(double));
     if (!correlationT || !correlation || !correlationMean || !correlationStdDev || !correlationErrors)
         setError(tr("Error while allocating memory for correlation function data!"));
     emitRawDataChanged();
@@ -191,8 +191,8 @@ void QFRDRFCSData::resizeCorrelations(long long N, int runs) {
 
 void QFRDRFCSData::resizeRates(long long N, int runs, int channels) {
     //qDebug()<<"resizeRates( N="<<N<<",  runs="<<runs<<",  channels="<<channels<<")";
-    if (rateT) free(rateT);
-    if (rate) free(rate);
+    if (rateT) qfFree(rateT);
+    if (rate) qfFree(rate);
     rateRuns=0;
     rateN=0;
     rateT=NULL;
@@ -201,9 +201,9 @@ void QFRDRFCSData::resizeRates(long long N, int runs, int channels) {
     rateRuns=runs;
     rateChannels=channels;
     if (N>0) {
-        rateT=(double*)calloc(rateN, sizeof(double));
+        rateT=(double*)qfCalloc(rateN, sizeof(double));
         if (runs>0 && channels>0) {
-            rate=(double*)calloc(rateChannels*rateN*rateRuns, sizeof(double));
+            rate=(double*)qfCalloc(rateChannels*rateN*rateRuns, sizeof(double));
         }
         if (!rateT || !rate)
             setError(tr("Error while allocating memory for count rate data (N=%1, runs=%2, channels=%3)!").arg(N).arg(runs).arg(channels));
@@ -217,15 +217,15 @@ void QFRDRFCSData::resizeRates(long long N, int runs, int channels) {
 
 void QFRDRFCSData::resizeBinnedRates(long long N) {
     //qDebug()<<"resizeBinnedRates( N="<<N<<"),  rateChannels="<<rateChannels<<",  rateRuns="<<rateRuns;
-    if (binnedRateT) free(binnedRateT);
-    if (binnedRate) free(binnedRate);
+    if (binnedRateT) qfFree(binnedRateT);
+    if (binnedRate) qfFree(binnedRate);
     binnedRateN=0;
     binnedRateT=NULL;
     binnedRate=NULL;
     binnedRateN=N;
     if (N>0) {
-        binnedRateT=(double*)calloc(binnedRateN, sizeof(double));
-        binnedRate=(double*)calloc(rateChannels*binnedRateN*rateRuns, sizeof(double));
+        binnedRateT=(double*)qfCalloc(binnedRateN, sizeof(double));
+        binnedRate=(double*)qfCalloc(rateChannels*binnedRateN*rateRuns, sizeof(double));
         if (!binnedRateT || !binnedRate)
             setError(tr("Error while allocating memory for binned count rate data!"));
         setIntProperty("BINNED_RATE_N", binnedRateN, false, false);

@@ -31,6 +31,7 @@ bool QFFitFunction::isDeprecated() const
     return false;
 }
 
+
 QVector<double> QFFitFunction::multiEvaluate(const QVector<double> &x, const double *parameters) const
 {
     QVector<double> y(x.size(), NAN);
@@ -38,11 +39,54 @@ QVector<double> QFFitFunction::multiEvaluate(const QVector<double> &x, const dou
     return y;
 }
 
+QVector<double> QFFitFunction::multiEvaluate(const double *x, long long N, const double *parameters) const
+{
+    QVector<double> y(N, NAN);
+    multiEvaluate(y.data(), x, N, parameters);
+    return y;
+
+}
+
 void QFFitFunction::multiEvaluate(double *y, const double *x, uint64_t N, const double *parameters) const
 {
     for (uint64_t i=0; i<N; i++) {
         y[i]=evaluate(x[i], parameters);
     }
+}
+
+void QFFitFunction::evaluateDerivatives(double *derivatives, double x, const double *parameters) const
+{
+
+}
+
+bool QFFitFunction::get_implementsDerivatives() const
+{
+    return false;
+}
+
+void QFFitFunction::calcParameter(double *parameterValues, double *error) const
+{
+
+}
+
+void QFFitFunction::sortParameter(double *parameterValues, double *error, bool *fix) const
+{
+
+}
+
+bool QFFitFunction::isParameterVisible(int parameter, const double *parameterValues) const
+{
+    return true;
+}
+
+unsigned int QFFitFunction::getAdditionalPlotCount(const double *params)
+{
+    return 0;
+}
+
+QString QFFitFunction::transformParametersForAdditionalPlot(int plot, double *params)
+{
+    return QString("");
 }
 
 bool QFFitFunction::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
@@ -68,14 +112,17 @@ void QFFitFunction::evaluateNumericalDerivatives(double *derivatives, double x, 
         ptemp[i]=oldpi;
         derivatives[i]=(-fp2h+8.0*fp1h-8.0*fm1h+fm2h)/(12.0*stepsize);
     }
-    free(ptemp);
+    qfFree(ptemp);
 }
 
 void QFFitFunction::evaluateNumericalParameterErrors(double *errors, double x, const double *parameters, double residualSigma2, double stepsize) const
 {
     const int pcount=paramCount();
-    double* cov=(double*)qfMalloc(pcount*pcount*sizeof(double));
-    double* g=(double*)qfMalloc(pcount*sizeof(double));
+    QVector<double> cov, g;
+    cov.reserve(pcount*pcount);
+    g.resize(pcount);
+    //double* cov=(double*)qfMalloc(pcount*pcount*sizeof(double));
+    //double* g=(double*)qfMalloc(pcount*sizeof(double));
     if (get_implementsDerivatives()) {
         evaluateDerivatives(g, x, parameters);
     } else {
@@ -86,16 +133,16 @@ void QFFitFunction::evaluateNumericalParameterErrors(double *errors, double x, c
             cov[i*pcount+j]=g[i]*g[j];
         }
     }
-    statisticsMatrixInversion(cov, pcount);
+    statisticsMatrixInversion(cov.data(), pcount);
 
     for (int i=0; i<pcount; i++) {
         errors[i]=sqrt(cov[i*pcount+i]*residualSigma2);
     }
-    qfFree(g);
-    qfFree(cov);
+    //qfFree(g);
+    //qfFree(cov);
 }
 
-QFFitStatistics QFFitFunction::calcFitStatistics(long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* /*errors*/, bool* paramsFix, int runAvgWidth, int residualHistogramBins) {
+QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* /*errors*/, const bool* paramsFix, int runAvgWidth, int residualHistogramBins) const {
     int fitparamN=0;
     const int pcount=paramCount();
     for (int i=0; i<pcount; i++) {
@@ -104,12 +151,12 @@ QFFitStatistics QFFitFunction::calcFitStatistics(long N, double* tauvals, double
         }
     }
 
-    QVector<double> model(N, 0);
-    for (int i=0; i<N; i++) {
+    QVector<double> model=multiEvaluate(tauvals, N, fullParams);
+    /*for (int i=0; i<N; i++) {
         model[i]=evaluate(tauvals[i], fullParams);
-    }
+    }*/
 
-    return calculateFitStatistics(N, tauvals, model.data(), corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins);
+    return calculateFitStatistics(N, tauvals, model.constData(), corrdata, weights, datacut_min, datacut_max, fitparamN, runAvgWidth, residualHistogramBins);
 }
 
 

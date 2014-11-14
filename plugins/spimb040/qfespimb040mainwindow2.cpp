@@ -353,7 +353,7 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
         ecamera->useCameraSettings(camera, settings);
         width=ecamera->getCameraImageWidth(camera);
         height=ecamera->getCameraImageHeight(camera);
-        buffer=(uint32_t*)calloc(width*height, sizeof(uint32_t));
+        buffer=(uint32_t*)qfCalloc(width*height, sizeof(uint32_t));
         if (!buffer) {
             ok=false;
         }
@@ -490,7 +490,7 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
             }
         }
 
-        if (buffer) free(buffer);
+        if (buffer) qfFree(buffer);
     }
 
     //////////////////////////////////////////////////////////////////////////////////////
@@ -1022,7 +1022,7 @@ bool QFESPIMB040MainWindow2::prepareCamera(int num, int camera, QFExtensionCamer
     ecamera->useCameraSettings(camera, settings);
     width=ecamera->getCameraImageWidth(camera);
     height=ecamera->getCameraImageHeight(camera);
-    *buffer=(uint32_t*)calloc(width*height, sizeof(uint32_t));
+    *buffer=(uint32_t*)qfCalloc(width*height, sizeof(uint32_t));
     if (!(*buffer)) {
         SPIMACQUISITION_ERROR(tr("could not allocate image buffer for camera 1!\n"), acquisitionTitle);
         return false;

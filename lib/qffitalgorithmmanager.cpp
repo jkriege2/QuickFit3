@@ -32,7 +32,7 @@ QFFitAlgorithmManager::QFFitAlgorithmManager(ProgramOptions* options, QObject* p
     QObject(parent)
 {
     m_options=options;
-    mutex=new QMutex();
+    mutex=new QMutex(QMutex::Recursive);
 }
 
 QFFitAlgorithmManager::~QFFitAlgorithmManager()

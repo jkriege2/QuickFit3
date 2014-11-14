@@ -302,23 +302,61 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
             \param r record this appplies to
             \param index index in \a r this applies to
             \return parameter vector
-            \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
+            \note This function calls \c qfCalloc() internally, so you will have to free the created arrays using \c qfFree() of the C standard library!
         */
         virtual double* allocFillParameters(const QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const ;
         /*! \brief fill a newly allocated array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
             \param r record this appplies to
             \param index index in \a r this applies to
             \return parameter error vector
-            \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
+            \note This function calls \c qfCalloc() internally, so you will have to free the created arrays using \c qfFree() of the C standard library!
         */
         virtual double* allocFillParameterErrors(const QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const;
         /*! \brief fill a newly allocated array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
             \param r record this appplies to
             \param index index in \a r this applies to
             \return parameter fix vector
-            \note This function calls \c calloc() internally, so you will have to free the created arrays using \c free() of the C standard library!
+            \note This function calls \c qfCalloc() internally, so you will have to free the created arrays using \c qfFree() of the C standard library!
         */
         virtual bool* allocFillFix(const QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const ;
+
+
+
+
+
+
+
+
+
+        /*! \brief fill a newly allocated array of doubles with the current parameter values, as appropriate to use together with QFFitFunction
+            \param r record this appplies to
+            \param index index in \a r this applies to
+            \return parameter vector
+            \note This function calls \c qfCalloc() internally, so you will have to free the created arrays using \c qfFree() of the C standard library!
+        */
+        virtual QVector<double> allocVecFillParameters(const QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const ;
+        /*! \brief fill a newly allocated array of doubles with the current parameter errors, as appropriate to use together with QFFitFunction
+            \param r record this appplies to
+            \param index index in \a r this applies to
+            \return parameter error vector
+            \note This function calls \c qfCalloc() internally, so you will have to free the created arrays using \c qfFree() of the C standard library!
+        */
+        virtual QVector<double> allocVecFillParameterErrors(const QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const;
+        /*! \brief fill a newly allocated array of bools with the current parameter fix values, as appropriate to use together with QFFitFunction
+            \param r record this appplies to
+            \param index index in \a r this applies to
+            \return parameter fix vector
+            \note This function calls \c qfCalloc() internally, so you will have to free the created arrays using \c qfFree() of the C standard library!
+        */
+        virtual QVector<bool> allocVecFillFix(const QFRawDataRecord* r, int index, QFFitFunction* function=NULL) const ;
+
+
+
+
+
+
+
+
 
         /** \brief determine whether a fit has been carried out for the given record and index
          *
@@ -427,6 +465,11 @@ class QFFitResultsByIndexEvaluation : public QFFitResultsEvaluation {
         using QFFitResultsEvaluation::allocFillParametersMin;
         using QFFitResultsEvaluation::allocFillParametersMax;
         using QFFitResultsEvaluation::allocFillFix;
+        using QFFitResultsEvaluation::allocVecFillParameters;
+        using QFFitResultsEvaluation::allocVecFillParameterErrors;
+        using QFFitResultsEvaluation::allocVecFillParametersMin;
+        using QFFitResultsEvaluation::allocVecFillParametersMax;
+        using QFFitResultsEvaluation::allocVecFillFix;
         using QFFitResultsEvaluation::resetDefaultFitValue;
         using QFFitResultsEvaluation::resetDefaultFitFix;
         using QFFitResultsEvaluation::getDefaultFitValue;

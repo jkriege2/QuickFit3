@@ -35,8 +35,8 @@ NIDAQ6602::NIDAQ6602(QObject *parent) :
     // create new memory blocks
     samplesPerChannel = lineLength;
     measDataSize = lineLength * sizeof(uInt32);
-    measData1 = (uInt32*) malloc(measDataSize);
-    measData2 = (uInt32*) malloc(measDataSize);
+    measData1 = (uInt32*) qfMalloc(measDataSize);
+    measData2 = (uInt32*) qfMalloc(measDataSize);
     clearDataBuffer();
 
     measTask1 = (measTask2 = (triggerTask1 = (triggerTask2 = NULL )));
@@ -54,8 +54,8 @@ NIDAQ6602::~NIDAQ6602()
     DAQmxExtErrWarChk(DAQmxClearTask(measTask2));
     DAQmxExtErrWarChk(DAQmxClearTask(triggerTask2));
     */
-    free(measData1);
-    free(measData2);
+    qfFree(measData1);
+    qfFree(measData2);
 
     // TESTWIDGET
     //delete testwidget;
@@ -121,9 +121,9 @@ void NIDAQ6602::configureLineMode(uint32_t lineLength, uint32_t newLineMeasTimeP
     lineMeasTimePerPixel = (uint32_t) settings->value("measSettings/lineMeasTimePerPixel", "100").toInt();
     samplesPerChannel = lineLength;
     measDataSize = samplesPerChannel * sizeof(uint32_t);
-    // reallocate memory
-    measData1 = (uInt32*) realloc(measData1, measDataSize);
-    measData2 = (uInt32*) realloc(measData2, measDataSize);
+    // qfReallocate memory
+    measData1 = (uInt32*) qfRealloc(measData1, measDataSize);
+    measData2 = (uInt32*) qfRealloc(measData2, measDataSize);
     ////////////////////////////////////////
     // Create and configure trigger Tasks //
     ////////////////////////////////////////
@@ -200,9 +200,9 @@ void NIDAQ6602::configureStaticMode(uint32_t pointMeasTime)
    // lineMeasTimePerPixel = (uint32_t) settings->value("measSettings/lineMeasTimePerPixel", "100").toInt();
     samplesPerChannel = 5;
     measDataSize = samplesPerChannel * sizeof(uint32_t);
-    // reallocate memory
-    measData1 = (uInt32*) realloc(measData1, measDataSize);
-    measData2 = (uInt32*) realloc(measData2, measDataSize);
+    // qfReallocate memory
+    measData1 = (uInt32*) qfRealloc(measData1, measDataSize);
+    measData2 = (uInt32*) qfRealloc(measData2, measDataSize);
     ////////////////////////////////////////
     // Create and configure trigger Tasks //
     ////////////////////////////////////////
@@ -271,10 +271,10 @@ void NIDAQ6602::resetDevice()
         DAQmxExtErrWarChk(DAQmxClearTask(triggerTask2));
         DAQmxExtErrWarChk(DAQmxClearTask(measTask1));
         DAQmxExtErrWarChk(DAQmxClearTask(triggerTask2));
-        free(measTask1);
-        free(triggerTask1);
-        free(measTask2);
-        free(triggerTask2);
+        qfFree(measTask1);
+        qfFree(triggerTask1);
+        qfFree(measTask2);
+        qfFree(triggerTask2);
     }
     DAQmxExtErrWarChk(DAQmxResetDevice(counter1Device.toStdString().c_str()));
     DAQmxExtErrWarChk(DAQmxSelfTestDevice(counter1Device.toStdString().c_str()));
@@ -564,10 +564,10 @@ void NIDAQ6602::configureCard(int sampleNumber)
     ///////////////////////(/////
     // Allocate reading memory //
     /////////////////////////////
-    log_text("Reallocate reading memory:");
+    log_text("qfReallocate reading memory:");
     measDataSize = sampleNumber * sizeof(uInt32);
-    measData1 = (uInt32*) realloc(measData1, sampleNumber * sizeof(uInt32));
-    measData2 = (uInt32*) realloc(measData2, sampleNumber * sizeof(uInt32));
+    measData1 = (uInt32*) qfRealloc(measData1, sampleNumber * sizeof(uInt32));
+    measData2 = (uInt32*) qfRealloc(measData2, sampleNumber * sizeof(uInt32));
     clearDataBuffer();
 
     log_text("Configuration finished.");

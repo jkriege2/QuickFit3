@@ -1566,8 +1566,8 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
         for (int lp=0; lp<tiff2.size(); lp++) if (tiff2[lp]) TIFFClose(tiff2[lp]);
         tiff1.clear();
         tiff2.clear();
-        if (buffer1) free(buffer1);
-        if (buffer2) free(buffer2);
+        if (buffer1) qfFree(buffer1);
+        if (buffer2) qfFree(buffer2);
         buffer1=buffer2=NULL;
 
         progress.setProgressText(tr("collecting acquisition data ..."));

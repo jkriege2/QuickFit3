@@ -97,8 +97,8 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
 
     //initialise image histogram data arrays
     histogram_n=255;
-    histogram_x=(double*)malloc(histogram_n*sizeof(double));
-    histogram_y=(double*)malloc(histogram_n*sizeof(double));
+    histogram_x=(double*)qfMalloc(histogram_n*sizeof(double));
+    histogram_y=(double*)qfMalloc(histogram_n*sizeof(double));
     for (unsigned int i=0; i<histogram_n; i++) {
         histogram_x[i]=i;
         histogram_y[i]=0;
@@ -118,16 +118,16 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
 
     pltDataMarginalBottomN=image.width();
     pltDataMarginalLeftN=image.height();
-    pltDataMarginalBottomX=(double*)calloc(pltDataMarginalBottomN,sizeof(double));
-    pltDataMarginalBottomY=(double*)calloc(pltDataMarginalBottomN,sizeof(double));
-    pltDataMarginalLeftX=(double*)calloc(pltDataMarginalLeftN,sizeof(double));
-    pltDataMarginalLeftY=(double*)calloc(pltDataMarginalLeftN,sizeof(double));
+    pltDataMarginalBottomX=(double*)qfCalloc(pltDataMarginalBottomN,sizeof(double));
+    pltDataMarginalBottomY=(double*)qfCalloc(pltDataMarginalBottomN,sizeof(double));
+    pltDataMarginalLeftX=(double*)qfCalloc(pltDataMarginalLeftN,sizeof(double));
+    pltDataMarginalLeftY=(double*)qfCalloc(pltDataMarginalLeftN,sizeof(double));
     pltDataMarginalBottomFitN=qMax((uint32_t)MARGINAL_FIT_MINVALUES,pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR);
     pltDataMarginalLeftFitN=qMax((uint32_t)MARGINAL_FIT_MINVALUES,pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR);
-    pltDataMarginalFitBottomY=(double*)calloc(pltDataMarginalBottomFitN,sizeof(double));
-    pltDataMarginalFitLeftY=(double*)calloc(pltDataMarginalLeftFitN,sizeof(double));
-    pltDataMarginalFitBottomX=(double*)calloc(pltDataMarginalBottomFitN,sizeof(double));
-    pltDataMarginalFitLeftX=(double*)calloc(pltDataMarginalLeftFitN,sizeof(double));
+    pltDataMarginalFitBottomY=(double*)qfCalloc(pltDataMarginalBottomFitN,sizeof(double));
+    pltDataMarginalFitLeftY=(double*)qfCalloc(pltDataMarginalLeftFitN,sizeof(double));
+    pltDataMarginalFitBottomX=(double*)qfCalloc(pltDataMarginalBottomFitN,sizeof(double));
+    pltDataMarginalFitLeftX=(double*)qfCalloc(pltDataMarginalLeftFitN,sizeof(double));
     pltDataMarginalXPixelF=pltDataMarginalXPixel=0;
     pltDataMarginalYPixelF=pltDataMarginalYPixel=0;
     pltDataMarginalLeftYMin=0;
@@ -157,16 +157,16 @@ void QFESPIMB040CameraView::init(int cameraID, QFCameraConfigComboBoxStartResume
 
 QFESPIMB040CameraView::~QFESPIMB040CameraView()
 {
-    free(histogram_x);
-    free(histogram_y);
-    free(pltDataMarginalLeftX);
-    free(pltDataMarginalLeftY);
-    free(pltDataMarginalBottomX);
-    free(pltDataMarginalBottomY);
-    free(pltDataMarginalFitBottomY);
-    free(pltDataMarginalFitLeftY);
-    free(pltDataMarginalFitBottomX);
-    free(pltDataMarginalFitLeftX);
+    qfFree(histogram_x);
+    qfFree(histogram_y);
+    qfFree(pltDataMarginalLeftX);
+    qfFree(pltDataMarginalLeftY);
+    qfFree(pltDataMarginalBottomX);
+    qfFree(pltDataMarginalBottomY);
+    qfFree(pltDataMarginalFitBottomY);
+    qfFree(pltDataMarginalFitLeftY);
+    qfFree(pltDataMarginalFitBottomX);
+    qfFree(pltDataMarginalFitLeftX);
 }
 
 void QFESPIMB040CameraView::hideEvent(QHideEvent * event) {
@@ -645,10 +645,10 @@ void QFESPIMB040CameraView::loadSettings(QSettings& settings, QString prefix) {
     histogram_n=settings.value(prefix+"histogram.items", histogram_n).toUInt();
     spinHistogramBins->setValue(histogram_n);
     // reallocate histogram and initialize
-    if (histogram_x) free(histogram_x);
-    if (histogram_y) free(histogram_y);
-    histogram_x=(double*)malloc(histogram_n*sizeof(double));
-    histogram_y=(double*)malloc(histogram_n*sizeof(double));
+    if (histogram_x) qfFree(histogram_x);
+    if (histogram_y) qfFree(histogram_y);
+    histogram_x=(double*)qfMalloc(histogram_n*sizeof(double));
+    histogram_y=(double*)qfMalloc(histogram_n*sizeof(double));
     for (unsigned int i=0; i<histogram_n; i++) {
         histogram_x[i]=i;
         histogram_y[i]=0;
@@ -702,10 +702,10 @@ void QFESPIMB040CameraView::loadSettings(QFManyFilesSettings &settings, QString 
      histogram_n=settings.value(prefix+"histogram.items", histogram_n).toUInt();
      spinHistogramBins->setValue(histogram_n);
      // reallocate histogram and initialize
-     if (histogram_x) free(histogram_x);
-     if (histogram_y) free(histogram_y);
-     histogram_x=(double*)malloc(histogram_n*sizeof(double));
-     histogram_y=(double*)malloc(histogram_n*sizeof(double));
+     if (histogram_x) qfFree(histogram_x);
+     if (histogram_y) qfFree(histogram_y);
+     histogram_x=(double*)qfMalloc(histogram_n*sizeof(double));
+     histogram_y=(double*)qfMalloc(histogram_n*sizeof(double));
      for (unsigned int i=0; i<histogram_n; i++) {
          histogram_x[i]=i;
          histogram_y[i]=0;
@@ -1152,17 +1152,17 @@ void QFESPIMB040CameraView::prepareImage() {
             }
         }
         if (changed) {
-            pltDataMarginalBottomX=(double*)realloc((void*)pltDataMarginalBottomX, pltDataMarginalBottomN*sizeof(double));
-            pltDataMarginalBottomY=(double*)realloc((void*)pltDataMarginalBottomY, pltDataMarginalBottomN*sizeof(double));
-            pltDataMarginalLeftX=(double*)realloc((void*)pltDataMarginalLeftX, pltDataMarginalLeftN*sizeof(double));
-            pltDataMarginalLeftY=(double*)realloc((void*)pltDataMarginalLeftY, pltDataMarginalLeftN*sizeof(double));
+            pltDataMarginalBottomX=(double*)qfRealloc((void*)pltDataMarginalBottomX, pltDataMarginalBottomN*sizeof(double));
+            pltDataMarginalBottomY=(double*)qfRealloc((void*)pltDataMarginalBottomY, pltDataMarginalBottomN*sizeof(double));
+            pltDataMarginalLeftX=(double*)qfRealloc((void*)pltDataMarginalLeftX, pltDataMarginalLeftN*sizeof(double));
+            pltDataMarginalLeftY=(double*)qfRealloc((void*)pltDataMarginalLeftY, pltDataMarginalLeftN*sizeof(double));
 
             pltDataMarginalBottomFitN=qMax((uint32_t)MARGINAL_FIT_MINVALUES,pltDataMarginalBottomN*MARGINAL_FIT_SIZE_FACTOR);
             pltDataMarginalLeftFitN=qMax((uint32_t)MARGINAL_FIT_MINVALUES,pltDataMarginalLeftN*MARGINAL_FIT_SIZE_FACTOR);
-            pltDataMarginalFitBottomY=(double*)realloc((void*)pltDataMarginalFitBottomY, pltDataMarginalBottomFitN*sizeof(double));
-            pltDataMarginalFitLeftY=(double*)realloc((void*)pltDataMarginalFitLeftY, pltDataMarginalLeftFitN*sizeof(double));
-            pltDataMarginalFitBottomX=(double*)realloc((void*)pltDataMarginalFitBottomX, pltDataMarginalBottomFitN*sizeof(double));
-            pltDataMarginalFitLeftX=(double*)realloc((void*)pltDataMarginalFitLeftX, pltDataMarginalLeftFitN*sizeof(double));
+            pltDataMarginalFitBottomY=(double*)qfRealloc((void*)pltDataMarginalFitBottomY, pltDataMarginalBottomFitN*sizeof(double));
+            pltDataMarginalFitLeftY=(double*)qfRealloc((void*)pltDataMarginalFitLeftY, pltDataMarginalLeftFitN*sizeof(double));
+            pltDataMarginalFitBottomX=(double*)qfRealloc((void*)pltDataMarginalFitBottomX, pltDataMarginalBottomFitN*sizeof(double));
+            pltDataMarginalFitLeftX=(double*)qfRealloc((void*)pltDataMarginalFitLeftX, pltDataMarginalLeftFitN*sizeof(double));
         }
         if (cmbRotation->currentIndex()==0) {
             // +x-
@@ -1666,7 +1666,7 @@ void QFESPIMB040CameraView::histogramMask() {
             }
         }
 
-        free(d);
+        qfFree(d);
 
         maskEmpty=false;
         redrawFrameRecalc();
@@ -2238,7 +2238,7 @@ void QFESPIMB040CameraView::transformImage(JKImage<QFESPIMB040CameraView_interna
     if (cmbImageMode->currentIndex()==1)  {
         out.resize(raw.width(), (uint32_t)ceil((double)raw.height()/2.0));
        /* QFESPIMB040CameraView_internalImageType* dat=out.data();
-        int64_t* dout=(int64_t*)calloc(out.width()*out.height(), sizeof(int64_t));
+        int64_t* dout=(int64_t*)qfCalloc(out.width()*out.height(), sizeof(int64_t));
         const uint32_t* din=raw.data();
         int64_t mino=0;
         int64_t maxo=0;
@@ -2253,7 +2253,7 @@ void QFESPIMB040CameraView::transformImage(JKImage<QFESPIMB040CameraView_interna
         for (register uint32_t i=0; i<out.width()*out.height(); i++) {
 
         }
-        free(dout);*/
+        qfFree(dout);*/
         QFESPIMB040CameraView_internalImageType* dout=out.data();
         const uint32_t* din=raw.data();
         register double amean=0, bmean=0;

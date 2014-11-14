@@ -72,7 +72,7 @@ bool QFImageReaderDiffusion4Binary::open(QString filename) {
         timestep=binfileReadDouble(input);
         frame=-1;
 
-        //framedata=(double*)calloc(width*height, sizeof(double));
+        //framedata=(double*)qfCalloc(width*height, sizeof(double));
         framedata.clear();
         for (uint64_t i=0; i<width*height; i++) framedata<<0.0;
 

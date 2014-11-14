@@ -82,7 +82,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFit::intFit(double* paramsOut, double*
     d.paramsMin=paramsMin;
     d.paramsMax=paramsMax;
     d.pcount=paramCount;
-    d.p=(double*)malloc(paramCount*sizeof(double));
+    d.p=(double*)qfMalloc(paramCount*sizeof(double));
 
     lmmin( paramCount, paramsOut, model->get_evalout(), &d, lmfit_eval, &control, &status );
 
@@ -107,7 +107,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFit::intFit(double* paramsOut, double*
         result.messageSimple="";
     }
 
-    if (d.p) free(d.p);
+    if (d.p) qfFree(d.p);
 
     return result;
 }

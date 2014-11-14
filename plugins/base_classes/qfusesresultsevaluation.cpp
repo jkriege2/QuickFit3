@@ -125,8 +125,7 @@ void QFUsesResultsEvaluation::setFitResultEvaluationDescription(QFRawDataRecord 
 }
 
 void QFUsesResultsEvaluation::resetAllFitResults(QFRawDataRecord *r, const QString &resultID) {
-    QFRawDataRecord* re=getHighlightedRecord();
-    if (!re) return;
+    if (!r) return;
     r->resultsClear(transformResultID(resultID));
 
 }

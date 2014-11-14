@@ -120,8 +120,8 @@ QFRDRFCSFitFunctionSimulator::~QFRDRFCSFitFunctionSimulator()
         delete i.value();
     }
     m_fitFunctions.clear();*/
-    if (tau) free(tau);
-    if (corr) free(corr);
+    if (tau) qfFree(tau);
+    if (corr) qfFree(corr);
 }
 
 QMap<QString,QVariant> QFRDRFCSFitFunctionSimulator::getParams()
@@ -227,8 +227,8 @@ QFFitFunction *QFRDRFCSFitFunctionSimulator::getFitFunction(const QFRawDataRecor
 }
 
 void QFRDRFCSFitFunctionSimulator::updateTau() {
-    if (tau) free(tau);
-    if (corr) free(corr);
+    if (tau) qfFree(tau);
+    if (corr) qfFree(corr);
     tau=NULL;
     corr=NULL;
     tauN=0;
@@ -241,8 +241,8 @@ void QFRDRFCSFitFunctionSimulator::updateTau() {
         if (tauN%8==0)dt=dt*2;
     }
     if (tauN>0) {
-        tau=(double*)calloc(tauN*runs, sizeof(double));
-        corr=(double*)calloc(tauN*runs, sizeof(double));
+        tau=(double*)qfCalloc(tauN*runs, sizeof(double));
+        corr=(double*)qfCalloc(tauN*runs, sizeof(double));
         dt=ui->edtMinTau->value();
         t=dt;
         int i=0;
@@ -377,8 +377,8 @@ void QFRDRFCSFitFunctionSimulator::updateParameterValues() {
 
     if (!ffunc) return;
 
-    double* fullParams=(double*)calloc(ffunc->paramCount(), sizeof(double));
-    double* errors=(double*)calloc(ffunc->paramCount(), sizeof(double));
+    double* fullParams=(double*)qfCalloc(ffunc->paramCount(), sizeof(double));
+    double* errors=(double*)qfCalloc(ffunc->paramCount(), sizeof(double));
     for (int p=0; p<ffunc->paramCount(); p++) {
         QFFitFunction::ParameterDescription d=ffunc->getDescription(p);
         QString id=d.id;
@@ -410,8 +410,8 @@ void QFRDRFCSFitFunctionSimulator::updateParameterValues() {
         }
     }
 
-    free(fullParams);
-    free(errors);
+    qfFree(fullParams);
+    qfFree(errors);
 
 }
 
@@ -490,8 +490,8 @@ void QFRDRFCSFitFunctionSimulator::replotFitFunction() {
             // we are working with a complete set of parameters
             /////////////////////////////////////////////////////////////////////////////////
 
-            double* fullParams=(double*)calloc(ffunc->paramCount(), sizeof(double));
-            double* errors=(double*)calloc(ffunc->paramCount(), sizeof(double));
+            double* fullParams=(double*)qfCalloc(ffunc->paramCount(), sizeof(double));
+            double* errors=(double*)qfCalloc(ffunc->paramCount(), sizeof(double));
             double Nparticle=0;
             bool hasNParticle=false;
             for (int p=0; p<ffunc->paramCount(); p++) {

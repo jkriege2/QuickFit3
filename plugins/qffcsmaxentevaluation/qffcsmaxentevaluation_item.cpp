@@ -80,7 +80,7 @@ QFEvaluationEditor* QFFCSMaxEntEvaluationItem::createEditor(QFPluginServices* se
     return new QFFCSMaxEntEvaluationEditor(services, propEditor, parent);
 }
 
-bool QFFCSMaxEntEvaluationItem::isApplicable(const QFRawDataRecord *record) {
+bool QFFCSMaxEntEvaluationItem::isApplicable(const QFRawDataRecord *record) const {
     return record->inherits("QFRDRFCSDataInterface");
 }
 
@@ -312,13 +312,13 @@ QFFitStatistics QFFCSMaxEntEvaluationItem::calcFitStatistics(QFRawDataRecord *re
         double* modelVals=modelValsIn;
         bool freeModelVals=false;
         if (!modelVals) {
-            modelVals=(double*)malloc(N*sizeof(double));
+            modelVals=(double*)qfMalloc(N*sizeof(double));
             QVector<double> dist=getDistribution(record, index, model);
             QVector<double> distTau=getDistributionTaus(record, index, model);
             evaluateModel(record, index, model, taus, modelVals, N, distTau.data(), dist.data(), dist.size());
             freeModelVals=true;
         }
-        //double* modelVals=(double*)malloc(N*sizeof(double));
+        //double* modelVals=(double*)qfMalloc(N*sizeof(double));
         //
         //(record, index, model, taus, modelVals, N);
         double* weights=allocWeights(NULL, record, index);
@@ -375,7 +375,7 @@ QFFitStatistics QFFCSMaxEntEvaluationItem::calcFitStatistics(QFRawDataRecord *re
             }
         }
 
-        if (freeModelVals) free(modelVals);
+        if (freeModelVals) qfFree(modelVals);
 
         return result;
     }
@@ -675,10 +675,10 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
 
         uint32_t N=data->getCorrelationN();
         double* taus=data->getCorrelationT();
-        double* distTaus=NULL;//(double*)calloc(Ndist,sizeof(double));
-        double* distDs=NULL;//(double*)calloc(Ndist,sizeof(double));
-        double* dist=NULL;//(double*)calloc(Ndist,sizeof(double));
-        double* modelEval=(double*)malloc(N*sizeof(double));
+        double* distTaus=NULL;//(double*)qfCalloc(Ndist,sizeof(double));
+        double* distDs=NULL;//(double*)qfCalloc(Ndist,sizeof(double));
+        double* dist=NULL;//(double*)qfCalloc(Ndist,sizeof(double));
+        double* modelEval=(double*)qfMalloc(N*sizeof(double));
         bool weightsOK=false;
         double* corrdata=data->getCorrelationMean();
         if (index>=0) corrdata=data->getCorrelationRun(index);
@@ -762,8 +762,8 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         if (init_tau.size()>0 && init_dist.size()>0)
             {
                 Ndist=qMin(init_tau.size(), init_dist.size());
-                distTaus=(double*)calloc(Ndist,sizeof(double));
-                dist=(double*)calloc(Ndist,sizeof(double));
+                distTaus=(double*)qfCalloc(Ndist,sizeof(double));
+                dist=(double*)qfCalloc(Ndist,sizeof(double));
                 for (uint32_t i=0; i<Ndist; i++)
                     {
                         distTaus[i]=init_tau[i];
@@ -803,8 +803,8 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         fitSuccess=true;
         if (old_distribution==false)
             {
-                distTaus=(double*)calloc(Ndist,sizeof(double));
-                dist=(double*)calloc(Ndist,sizeof(double));
+                distTaus=(double*)qfCalloc(Ndist,sizeof(double));
+                dist=(double*)qfCalloc(Ndist,sizeof(double));
             }
         mem.writeDistTaus(distTaus);
         mem.writeDistribution(dist);
@@ -844,7 +844,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
 
         getProject()->getServices()->log_text(tr("   - fit completed after %1 msecs with result %2\n").arg(duration).arg(fitSuccess?tr("success"):tr("no convergence")));
 
-        distDs=(double*)calloc(Ndist, sizeof(double));
+        distDs=(double*)qfCalloc(Ndist, sizeof(double));
         if (model!=3) {
             const double wxy=getWXY();
             for (uint32_t i=0; i<Ndist; i++) {
@@ -984,11 +984,11 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
         //   finally we have to free the memory allocated in the calcFitStatistics() result.
         fit_stat.free();
 
-        free(dist);
-        free(weights);
-        free(modelEval);
-        free(distTaus);
-        free(distDs);
+        qfFree(dist);
+        qfFree(weights);
+        qfFree(modelEval);
+        qfFree(distTaus);
+        qfFree(distDs);
 
 
     }

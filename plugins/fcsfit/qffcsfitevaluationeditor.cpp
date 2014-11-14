@@ -324,7 +324,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 }
 
 
-                size_t c_fit = ds->addCopiedColumn(fitResults.fitfunc, N, "fit_model");
+                size_t c_fit = ds->addCopiedColumn(fitResults.fitfunc, "fit_model");
                 //qDebug()<<"    f "<<t.elapsed()<<" ms";
                 t.start();
 
@@ -342,7 +342,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                     double* params=eval->allocFillParameters();
                     QString name=ffunc->transformParametersForAdditionalPlot(i, params);
                     //qDebug()<<arrayToString(params, ffunc->paramCount());
-                    double* afitfunc=(double*)malloc(N*sizeof(double));
+                    double* afitfunc=(double*)qfMalloc(N*sizeof(double));
                     for (int j=0; j<N; j++) {
                         afitfunc[j]=ffunc->evaluate(tauvals[j], params);
                     }
@@ -355,8 +355,8 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                     g_afit->set_datarange_start(datacut->get_userMin());
                     g_afit->set_datarange_end(datacut->get_userMax());
                     pltData->addGraph(g_afit);
-                    free(params);
-                    free(afitfunc);
+                    qfFree(params);
+                    qfFree(afitfunc);
                 }
                 pltData->addGraph(g_fit);
                 //qDebug()<<"    g "<<t.elapsed()<<" ms";
@@ -370,10 +370,10 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 size_t c_residuals=0;
                 JKQTPxyLineGraph* g_residuals=new JKQTPxyLineGraph(pltResiduals->get_plotter());
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residuals=dsres->addCopiedColumn(fitResults.residuals_weighted, N, "residuals_weighted");
+                    c_residuals=dsres->addCopiedColumn(fitResults.residuals_weighted,  "residuals_weighted");
                     g_residuals->set_title("weighted residuals");
                 } else {
-                    c_residuals=dsres->addCopiedColumn(fitResults.residuals, N, "residuals");
+                    c_residuals=dsres->addCopiedColumn(fitResults.residuals,  "residuals");
                     g_residuals->set_title("residuals");
                 }
                 g_residuals->set_xColumn(c_taures);
@@ -397,16 +397,16 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 // plot residuals running average
                 /////////////////////////////////////////////////////////////////////////////////
-                size_t c_tauresra=dsres->addCopiedColumn(fitResults.tau_runavg, fitResults.runAvgN, "tau_resid_runavg");
+                size_t c_tauresra=dsres->addCopiedColumn(fitResults.tau_runavg,  "tau_resid_runavg");
                 size_t c_residualsra=0;
                 JKQTPxyLineGraph* g_residualsra=new JKQTPxyLineGraph(pltResiduals->get_plotter());
 
 
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residualsra=dsres->addCopiedColumn(fitResults.residuals_runavg_weighted, fitResults.runAvgN, "residuals_runavg_weighted");
+                    c_residualsra=dsres->addCopiedColumn(fitResults.residuals_runavg_weighted,  "residuals_runavg_weighted");
                     g_residualsra->set_title("weighted residuals, movAvg");
                 } else {
-                    c_residualsra=dsres->addCopiedColumn(fitResults.residuals_runavg, fitResults.runAvgN, "residuals_runavg");
+                    c_residualsra=dsres->addCopiedColumn(fitResults.residuals_runavg,  "residuals_runavg");
                     g_residualsra->set_title("residuals, movAvg");
                 }
                 g_residualsra->set_xColumn(c_tauresra);
@@ -435,10 +435,10 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 size_t c_residualHistogramY=0;
                 if (chkWeightedResiduals->isChecked()) {
                     c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, fitResults.rminw+fitResults.residHistWBinWidth/2.0, fitResults.rmaxw-fitResults.residHistWBinWidth/2.0, "residualhist_weighted_x");
-                    c_residualHistogramY=dsresh->addCopiedColumn(fitResults.resWHistogram, residualHistogramBins, "residualhist_weighted_y");
+                    c_residualHistogramY=dsresh->addCopiedColumn(fitResults.resWHistogram,  "residualhist_weighted_y");
                 } else {
                     c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, fitResults.rmin+fitResults.residHistBinWidth/2.0, fitResults.rmax-fitResults.residHistBinWidth/2.0, "residualhist_x");
-                    c_residualHistogramY=dsresh->addCopiedColumn(fitResults.resHistogram, residualHistogramBins, "residualhist_y");
+                    c_residualHistogramY=dsresh->addCopiedColumn(fitResults.resHistogram,  "residualhist_y");
                 }
                 JKQTPbarHorizontalGraph* g_residualsHistogram=new JKQTPbarHorizontalGraph(pltResidualHistogram->get_plotter());
                 g_residualsHistogram->set_xColumn(c_residualHistogramX);
@@ -531,12 +531,12 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 // clean memory
                 /////////////////////////////////////////////////////////////////////////////////
-                free(fullParams);
-                free(errors);
-                free(weights);
-                free(paramsFix);
-                if (weightsNorm) free(weightsNorm);
-                if (corrdataNorm) free(corrdataNorm);
+                qfFree(fullParams);
+                qfFree(errors);
+                qfFree(weights);
+                qfFree(paramsFix);
+                if (weightsNorm) qfFree(weightsNorm);
+                if (corrdataNorm) qfFree(corrdataNorm);
                 fitResults.free();
 
                 //qDebug()<<"    n "<<t.elapsed()<<" ms";
@@ -742,9 +742,9 @@ void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
                 /////////////////////////////////////////////////////////////////////////////////
                 // clean memory
                 /////////////////////////////////////////////////////////////////////////////////
-                free(fullParams);
-                free(errors);
-                free(weights);
+                qfFree(fullParams);
+                qfFree(errors);
+                qfFree(weights);
             }
         } catch(std::exception& E) {
             services->log_error(tr("error during plotting, error message: %1\n").arg(E.what()));
@@ -761,7 +761,7 @@ void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
         if (ok && w) {
             item.yerrors=arrayToVector(w, data->getCorrelationN());
         }
-        if (w) free(w);
+        if (w) qfFree(w);
         item.name=rec->getName()+": "+data->getCorrelationRunName(index);
         if (option==2 || option==3) {
             item.name+=tr(", normalized");
@@ -927,7 +927,7 @@ void QFFCSFitEvaluationEditor::replotData() {
             if (wok && weigm && eval->getFitDataWeighting()!=QFFCSWeightingTools::EqualWeighting) {
                 errorName=wdata->dataWeightToName(eval->getFitDataWeighting(), m_runName);
                 c_std=ds->addCopiedColumn(weigm, data->getCorrelationN(), QString("cerr_")+wdata->dataWeightToString(eval->getFitDataWeighting()));
-                free(weigm);
+                qfFree(weigm);
             }
             //qDebug()<<wok<<weigm<<c_std<<errorName;
         }
@@ -1142,8 +1142,8 @@ void QFFCSFitEvaluationEditor::calibrateFocalVolume() {
                 }
                 ffunc->calcParameter(p, pe);
                 eval->setFitResultValuesVisible(eval->getHighlightedRecord(), run, p, pe);
-                free(p);
-                free(pe);
+                qfFree(p);
+                qfFree(pe);
                 progress.setValue(run);
                 QApplication::processEvents();
                 if (progress.wasCanceled()) break;

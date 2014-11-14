@@ -37,6 +37,7 @@
 #include "programoptions.h"
 #include "qfpluginservices.h"
 #include "qfhtmlhelptools.h"
+#include <QMutex>
 #ifndef __LINUX__
 # if defined(linux)
 #  define __LINUX__
@@ -48,37 +49,66 @@
 #include "stdlib.h"
 #endif
 
+#ifndef QF_ALIGNMENT_BYTES
+#define QF_ALIGNMENT_BYTES 16
+#endif
+
+#if !defined(QF_DONT_USE_ALIGNED_MALLOC)
+#warning("using aligned _aligned_malloc, _aligned_free, _aligned_realloc")
+#else
+#warning("using non-aligned malloc, free, realloc")
+#endif
+
+static QMutex qfallocationMutex(QMutex::Recursive);
+
 void* qfMalloc(size_t size) {
+    QMutexLocker locker(&qfallocationMutex);
 #ifdef __LINUX__
     return valloc(size);
 #else
+    #if  !defined(QF_DONT_USE_ALIGNED_MALLOC)
+    return _aligned_malloc(size, QF_ALIGNMENT_BYTES);
+    #else
     return malloc(size);
+    #endif
 #endif
+}
+
+void* qfCalloc(size_t size) {
+    return qfCalloc(size, 1);
 }
 
 void* qfCalloc(size_t num, size_t size) {
-#ifdef __LINUX__
+    QMutexLocker locker(&qfallocationMutex);
     void* res=qfMalloc(num*size);
     memset(res, 0, num*size);
     return res;
-#else
-    return calloc(num, size);
-#endif
 }
 
 void* qfRealloc (void* ptr, size_t size) {
+    QMutexLocker locker(&qfallocationMutex);
 #ifdef __LINUX__
     return realloc(ptr, size);
 #else
+    #if !defined(QF_DONT_USE_ALIGNED_MALLOC)
+    return _aligned_realloc(ptr, size, QF_ALIGNMENT_BYTES);
+    #else
     return realloc(ptr, size);
+    #endif
 #endif
 }
 
 void qfFree(void* data) {
+    QMutexLocker locker(&qfallocationMutex);
 #ifdef __LINUX__
     free(data);
 #else
+    #if !defined(QF_DONT_USE_ALIGNED_MALLOC)
+    return _aligned_free(data);
+    #else
     free(data);
+    #endif
+
 #endif
 }
 

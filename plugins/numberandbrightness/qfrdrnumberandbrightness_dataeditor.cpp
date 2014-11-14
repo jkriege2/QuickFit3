@@ -92,21 +92,21 @@ void QFRDRNumberAndBrightnessDataEditor::addPlotter(QFPlotter *&plotter, JKQTPMa
 
 void QFRDRNumberAndBrightnessDataEditor::reallocMem(int size) {
     if (size==0) {
-        free(plteNumberData);
-        free(plteBrightnessData);
-        free(plteOverviewData);
-        free(plteCorrelationData);
-        free(plteOverviewSelectedData);
-        free(plteOverviewExcludedData);
+        qfFree(plteNumberData);
+        qfFree(plteBrightnessData);
+        qfFree(plteOverviewData);
+        qfFree(plteCorrelationData);
+        qfFree(plteOverviewSelectedData);
+        qfFree(plteOverviewExcludedData);
     } else if (size!=plotsSize) {
         plotsSize=size;
-        plteNumberData=(double*)realloc(plteNumberData, plotsSize*sizeof(double));
-        plteBrightnessData=(double*)realloc(plteBrightnessData, plotsSize*sizeof(double));
-        plteOverviewData=(double*)realloc(plteOverviewData, plotsSize*sizeof(double));
-        plteCorrelationData=(double*)realloc(plteCorrelationData, plotsSize*sizeof(double));
+        plteNumberData=(double*)qfRealloc(plteNumberData, plotsSize*sizeof(double));
+        plteBrightnessData=(double*)qfRealloc(plteBrightnessData, plotsSize*sizeof(double));
+        plteOverviewData=(double*)qfRealloc(plteOverviewData, plotsSize*sizeof(double));
+        plteCorrelationData=(double*)qfRealloc(plteCorrelationData, plotsSize*sizeof(double));
 
-        plteOverviewSelectedData=(bool*)realloc(plteOverviewSelectedData, plotsSize*sizeof(bool));
-        plteOverviewExcludedData=(bool*)realloc(plteOverviewExcludedData, plotsSize*sizeof(bool));
+        plteOverviewSelectedData=(bool*)qfRealloc(plteOverviewSelectedData, plotsSize*sizeof(bool));
+        plteOverviewExcludedData=(bool*)qfRealloc(plteOverviewExcludedData, plotsSize*sizeof(bool));
         for (int i=0; i<plotsSize; i++) {
             plteOverviewSelectedData[i]=false;
             plteOverviewExcludedData[i]=false;
@@ -370,8 +370,8 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
         int dataSize=m->getWidth()*m->getHeight();
         int dataSelSize=m->getWidth()*m->getHeight();
 
-        double* data=(double*)calloc(dataSize, sizeof(double));
-        double* dataSel=(double*)calloc(dataSelSize, sizeof(double));
+        double* data=(double*)qfCalloc(dataSize, sizeof(double));
+        double* dataSel=(double*)qfCalloc(dataSelSize, sizeof(double));
         dataSize=0;
         dataSelSize=0;
         for (int i=0; i<m->getWidth()*m->getHeight(); i++) {
@@ -387,16 +387,16 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
         histNumber->clear();
         histNumber->setHistogramXLabel(tr("particle number $N$"));
         histNumber->addHistogram("complete", data, dataSize, false);
-        free(data);
+        qfFree(data);
         if (dataSelSize>1) histNumber->addHistogram("selection", dataSel, dataSelSize, false);
-        free(dataSel);
+        qfFree(dataSel);
 
 
         dataSize=m->getWidth()*m->getHeight();
         dataSelSize=m->getWidth()*m->getHeight();
 
-        data=(double*)calloc(dataSize, sizeof(double));
-        dataSel=(double*)calloc(dataSelSize, sizeof(double));
+        data=(double*)qfCalloc(dataSize, sizeof(double));
+        dataSel=(double*)qfCalloc(dataSelSize, sizeof(double));
         dataSize=0;
         dataSelSize=0;
         for (int i=0; i<m->getWidth()*m->getHeight(); i++) {
@@ -412,9 +412,9 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
         histBrightness->clear();
         histBrightness->setHistogramXLabel(tr("particle brightness $\\epsilon$"));
         histBrightness->addHistogram("complete", data, dataSize, false);
-        free(data);
+        qfFree(data);
         if (dataSelSize>1) histBrightness->addHistogram("selection", dataSel, dataSelSize, false);
-        free(dataSel);
+        qfFree(dataSel);
 
         histNumber->updateHistogram(true);
         histBrightness->updateHistogram(true);

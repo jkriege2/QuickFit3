@@ -65,9 +65,9 @@ QFRDRImagingFCSDataEditorCountrate::QFRDRImagingFCSDataEditorCountrate(QFPluginS
 
 QFRDRImagingFCSDataEditorCountrate::~QFRDRImagingFCSDataEditorCountrate()
 {
-    if (plteOverviewSelectedData) free(plteOverviewSelectedData);
+    if (plteOverviewSelectedData) qfFree(plteOverviewSelectedData);
     plteOverviewSelectedData=NULL;
-    if (plteOverviewExcludedData) free(plteOverviewExcludedData);
+    if (plteOverviewExcludedData) qfFree(plteOverviewExcludedData);
     plteOverviewExcludedData=NULL;
 }
 
@@ -335,8 +335,8 @@ void QFRDRImagingFCSDataEditorCountrate::replotOverview() {
 
         if (plteOverviewSelectedSize!=w*h) {
             plteOverviewSelectedSize=w*h;
-            plteOverviewSelectedData=(bool*)realloc(plteOverviewSelectedData, plteOverviewSelectedSize*sizeof(bool));
-            plteOverviewExcludedData=(bool*)realloc(plteOverviewExcludedData, plteOverviewSelectedSize*sizeof(bool));
+            plteOverviewSelectedData=(bool*)qfRealloc(plteOverviewSelectedData, plteOverviewSelectedSize*sizeof(bool));
+            plteOverviewExcludedData=(bool*)qfRealloc(plteOverviewExcludedData, plteOverviewSelectedSize*sizeof(bool));
         }
 
         plteOverviewSelected->set_data(plteOverviewSelectedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
@@ -411,8 +411,8 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
     //qDebug()<<cmbVideo->currentIndex()<<cmbVideo->currentText()<<vidW<<vidH<<frames;
 
     labRuns->setText(QString("%1x%2 = %3").arg(vidW).arg(vidH).arg(m->getCorrelationRuns()));
-    labCorrelationPoints->setText(tr("%1 à exp: %2ms (=%3frames)").arg(frames).arg(exposure*double(sumframes)).arg(sumframes));
-    labSegments->setText(tr("%1 à %2s").arg(segments).arg(duration/double(segments)));
+    labCorrelationPoints->setText(tr("%1 <i>&agrave;</i> exp: %2ms (=%3frames)").arg(frames).arg(exposure*double(sumframes)).arg(sumframes));
+    labSegments->setText(tr("%1 <i>&agrave;</i> %2s").arg(segments).arg(duration/double(segments)));
     labDuration->setText(QString("%1s").arg(duration));
 
     if (vidW*vidH==m->getCorrelationRuns()) {
@@ -578,7 +578,7 @@ void QFRDRImagingFCSDataEditorCountrate::replotData(int dummy) {
 //                        qDebug()<<"bleachFactor3="<<hasBFactor3<<bleachFactor3;
 //                        qDebug()<<"bleachOffset="<<hasBOffset<<bleachOffset;
                         if (hasBTime && hasBA) {
-                            double* d=(double*)malloc(frames*sizeof(double));
+                            double* d=(double*)qfMalloc(frames*sizeof(double));
                             double timeFactor=m->getProperty("FRAME_COUNT", 1).toDouble()/double(frames);
                             if (hasBFactor2&&hasBFactor3&&hasBFactor4&&hasBFactor5) {
                                 for (int tt=0; tt<frames; tt++) {

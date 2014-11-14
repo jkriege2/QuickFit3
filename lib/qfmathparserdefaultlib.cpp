@@ -594,10 +594,10 @@ namespace QFMathParser_DefaultLib {
       qfmpResult r;
       r.type=qfmpDouble;
       //if (n!=1) p->qfmpError(QObject::tr("srand accepts 1 argument"));
-      if (n>=0 && params[0].type!=qfmpDouble) p->qfmpError(QObject::tr("srand needs double argument"));
+      if (n>=1 && params[0].type!=qfmpDouble) p->qfmpError(QObject::tr("srand needs double argument"));
       r.num=0;
       //srand((unsigned int)params[0].num);
-      if (n>=0) p->get_rng()->seed(uint32_t(params[0].num));
+      if (n>=1) p->get_rng()->seed(uint32_t(params[0].num));
       else p->get_rng()->seed();
       return r;
     }
@@ -1334,6 +1334,7 @@ namespace QFMathParser_DefaultLib {
             return;
         }
     }
+
 
     void fContainsSubString(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
         r.setInvalid();
@@ -4433,6 +4434,7 @@ namespace QFMathParser_DefaultLib {
             }
         }
     }
+
 
 
 

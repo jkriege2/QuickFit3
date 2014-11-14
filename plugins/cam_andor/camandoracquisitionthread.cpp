@@ -20,7 +20,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 */
 
 #include "camandoracquisitionthread.h"
-
+#include "qftools.h"
 #include <iostream>
 #include <unistd.h>
 #include <time.h>
@@ -188,7 +188,7 @@ void CamAndorAcquisitionThread::run() {
             setPriority(QThread::HighestPriority);
             int status=DRV_ACQUIRING;
             int64_t imageCount=0;
-            uint16_t* imageBuffer=(uint16_t*)calloc(m_width*m_height, sizeof(uint16_t));
+            uint16_t* imageBuffer=(uint16_t*)qfCalloc(m_width*m_height, sizeof(uint16_t));
             QTime duration;
             duration.start();
             QTime ttimer;
@@ -240,7 +240,7 @@ void CamAndorAcquisitionThread::run() {
                 raw=NULL;
             }
 
-            free(imageBuffer);
+            qfFree(imageBuffer);
 
         }
 

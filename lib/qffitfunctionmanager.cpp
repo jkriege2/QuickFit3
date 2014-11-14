@@ -32,7 +32,7 @@ QFFitFunctionManager::QFFitFunctionManager(ProgramOptions* options, QObject* par
     QObject(parent)
 {
     m_options=options;
-    mutex=new QMutex();
+    mutex=new QMutex(QMutex::Recursive);
     reloadUserFitFunctions();
     reloadLibraryFitFunctions();
 }

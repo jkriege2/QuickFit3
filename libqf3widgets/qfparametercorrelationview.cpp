@@ -54,8 +54,8 @@ QFParameterCorrelationView::QFParameterCorrelationView(QWidget *parent) :
 QFParameterCorrelationView::~QFParameterCorrelationView()
 {
     for (int i=0; i<histograms.size(); i++) {
-        if (histograms[i].data1 && !histograms[i].external) free(histograms[i].data1);
-        if (histograms[i].data2 && !histograms[i].external) free(histograms[i].data2);
+        if (histograms[i].data1 && !histograms[i].external) qfFree(histograms[i].data1);
+        if (histograms[i].data2 && !histograms[i].external) qfFree(histograms[i].data2);
     }
     histograms.clear();
 }
@@ -468,8 +468,8 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 }
 
                 long histBinsX=spinHistogramBins1->value();
-                double* histXX=(double*)malloc(histBinsX*sizeof(double));
-                double* histXY=(double*)malloc(histBinsX*sizeof(double));
+                double* histXX=(double*)qfMalloc(histBinsX*sizeof(double));
+                double* histXY=(double*)qfMalloc(histBinsX*sizeof(double));
                 statisticsHistogramRanged<double, double>(d1r, datasize, mmin1, mmax1, histXX, histXY, histBinsX, false);
 
 
@@ -503,16 +503,16 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 }
 
                 long histBinsY=spinHistogramBins2->value();
-                double* histYX=(double*)malloc(histBinsY*sizeof(double));
-                double* histYY=(double*)malloc(histBinsY*sizeof(double));
+                double* histYX=(double*)qfMalloc(histBinsY*sizeof(double));
+                double* histYY=(double*)qfMalloc(histBinsY*sizeof(double));
                 statisticsHistogramRanged<double, double>(d2r, datasize, mmin2, mmax2, histYX, histYY, histBinsY, false);
 
                 long hist2DBinsX=spin2DHistogramBins1->value();
                 long hist2DBinsY=spin2DHistogramBins2->value();
-                double* hist2DX=(double*)malloc(hist2DBinsX*sizeof(double));
-                double* hist2DY=(double*)malloc(hist2DBinsY*sizeof(double));
-                double* hist2D=(double*)calloc(hist2DBinsX*hist2DBinsY,sizeof(double));
-                double* kde2D=(double*)calloc(hist2DBinsX*hist2DBinsY,sizeof(double));
+                double* hist2DX=(double*)qfMalloc(hist2DBinsX*sizeof(double));
+                double* hist2DY=(double*)qfMalloc(hist2DBinsY*sizeof(double));
+                double* hist2D=(double*)qfCalloc(hist2DBinsX*hist2DBinsY,sizeof(double));
+                double* kde2D=(double*)qfCalloc(hist2DBinsX*hist2DBinsY,sizeof(double));
                 double bwX=(mmax1-mmin1)/double(hist2DBinsX);
                 double bwY=(mmax2-mmin2)/double(hist2DBinsY);
                 if (cmb2DHistogram->currentIndex()==2) statistics2DKDEHistogramRanged(d1r, d2r, datasize, statisticsKernel2DGaussian, bwX, bwY, mmin1, mmax1, mmin2, mmax2, hist2DX, hist2DY, kde2D, hist2DBinsX, hist2DBinsY);
@@ -647,26 +647,26 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                 }
 
 
-                free(histXX);
-                free(histXY);
+                qfFree(histXX);
+                qfFree(histXY);
 
-                free(histYX);
-                free(histYY);
+                qfFree(histYX);
+                qfFree(histYY);
 
-                free(hist2DX);
-                free(hist2DY);
-                free(hist2D);
-                free(kde2D);
+                qfFree(hist2DX);
+                qfFree(hist2DY);
+                qfFree(hist2D);
+                qfFree(kde2D);
 
-                free(d1);
-                free(d2);
-                free(d3);
-                free(d1r);
-                free(d2r);
-                free(d3r);
-                free(d1s);
-                free(d2s);
-                free(d3s);
+                qfFree(d1);
+                qfFree(d2);
+                qfFree(d3);
+                qfFree(d1r);
+                qfFree(d2r);
+                qfFree(d3r);
+                qfFree(d1s);
+                qfFree(d2s);
+                qfFree(d3s);
 
 
 
@@ -701,8 +701,8 @@ void QFParameterCorrelationView::addSettingsWidget(const QString &label, QWidget
 void QFParameterCorrelationView::clear()
 {
     for (int i=0; i<histograms.size(); i++) {
-        if (histograms[i].data1 && !histograms[i].external) free(histograms[i].data1);
-        if (histograms[i].data2 && !histograms[i].external) free(histograms[i].data2);
+        if (histograms[i].data1 && !histograms[i].external) qfFree(histograms[i].data1);
+        if (histograms[i].data2 && !histograms[i].external) qfFree(histograms[i].data2);
     }
     histograms.clear();
     updateCorrelation(true);
@@ -760,8 +760,8 @@ void QFParameterCorrelationView::setCorrelation(int i, QString name, double *dat
 {
     if (i<0 || i>=histograms.size()) return;
     QFParameterCorrelationView::CorrelationItem h=histograms[i];
-    if (h.data1 && !h.external) free(h.data1);
-    if (h.data2 && !h.external) free(h.data2);
+    if (h.data1 && !h.external) qfFree(h.data1);
+    if (h.data2 && !h.external) qfFree(h.data2);
     h.data1=data1;
     h.data2=data2;
     if (!external) {
@@ -778,9 +778,9 @@ void QFParameterCorrelationView::setCorrelation(int i, QString name, double *dat
 {
     if (i<0 || i>=histograms.size()) return;
     QFParameterCorrelationView::CorrelationItem h=histograms[i];
-    if (h.data1 && !h.external) free(h.data1);
-    if (h.data2 && !h.external) free(h.data2);
-    if (h.data3 && !h.external) free(h.data3);
+    if (h.data1 && !h.external) qfFree(h.data1);
+    if (h.data2 && !h.external) qfFree(h.data2);
+    if (h.data3 && !h.external) qfFree(h.data3);
     h.data1=data1;
     h.data2=data2;
     h.data3=data3;
@@ -799,8 +799,8 @@ void QFParameterCorrelationView::setCopiedCorrelation(int i, QString name, const
 {
     if (i<0 || i>=histograms.size()) return;
     QFParameterCorrelationView::CorrelationItem h=histograms[i];
-    if (h.data1 && !h.external) free(h.data1);
-    if (h.data2 && !h.external) free(h.data2);
+    if (h.data1 && !h.external) qfFree(h.data1);
+    if (h.data2 && !h.external) qfFree(h.data2);
     h.data1=duplicateArray(data1, size);
     h.data2=duplicateArray(data2, size);
     h.name=name;
@@ -812,8 +812,8 @@ void QFParameterCorrelationView::setCopiedCorrelation(int i, QString name, const
 void QFParameterCorrelationView::removeCorrelation(int i)
 {
     if (i<0 || i>=histograms.size()) return;
-    if (histograms[i].data1 && !histograms[i].external) free(histograms[i].data1);
-    if (histograms[i].data2 && !histograms[i].external) free(histograms[i].data2);
+    if (histograms[i].data1 && !histograms[i].external) qfFree(histograms[i].data1);
+    if (histograms[i].data2 && !histograms[i].external) qfFree(histograms[i].data2);
     histograms.removeAt(i);
 }
 

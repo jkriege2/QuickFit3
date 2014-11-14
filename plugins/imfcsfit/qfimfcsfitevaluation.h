@@ -110,11 +110,16 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation, publi
 
             The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
           */
-        virtual void doFitForMultithread(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const;
+        virtual void doFitForMultithread(QFFitAlgorithm* falg, QFFitFunction* ffunc, QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const;
         virtual void doFitForMultithreadReturn(QFRawDataRecord::QFFitFitResultsStore& result, const QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const ;
+        /*! \brief This function should return a usable QFFitAlgoruthm and QFFitFunction as freshly created objects for the given record and run
+         *
+         * \note This does not have to be thread safe!!!
+         */
+        virtual void createFitFunctionAndAlgorithm(QFFitAlgorithm*& falg, QFFitFunction*& ffunc, const QFRawDataRecord* record, int run);
 
         /** \brief calculates fit statistics for the given fit function and dataset. */
-        QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
+        QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* errors, const bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
 
         QFImFCSMatchRDRFunctor* getMatchFunctor() const;
 
@@ -131,7 +136,7 @@ class QFImFCSFitEvaluation : public QFFitResultsByIndexAsVectorEvaluation, publi
         QFImFCSMatchRDRFunctor* matchFunctor;
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
-        virtual bool isApplicable(const QFRawDataRecord* record);
+        virtual bool isApplicable(const QFRawDataRecord* record) const;
 
         /*! \copydoc QFFitResultsEvaluation::intWriteDataAlgorithm()      */
         virtual void intWriteDataAlgorithm(QXmlStreamWriter& w) const;

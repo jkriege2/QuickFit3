@@ -361,6 +361,6 @@ QString QFFitFunctionFCSDiff2DDifferentBrightness::transformParametersForAdditio
     /*for (int i=0; i<paramCount(); i++) {
         qDebug()<<dat[i]<<" -> "<<params[i];
     }
-    free(dat);*/
+    qfFree(dat);*/
     return "";
 }

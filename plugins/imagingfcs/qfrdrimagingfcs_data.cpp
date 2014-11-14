@@ -198,6 +198,7 @@ double QFRDRImagingFCSData::getFrameTime() const
     if (propertyExists("FRAMETIME_MS") && getProperty("FRAMETIME_MS", 0).toDouble()>0) return getProperty("FRAMETIME_MS", 0).toDouble()/1000.0;
     if (propertyExists("FRAME_TIME") && getProperty("FRAME_TIME", 0).toDouble()>0) return getProperty("FRAME_TIME", 0).toDouble();
     if (propertyExists("FRAMETIME") && getProperty("FRAMETIME", 0).toDouble()>0) return getProperty("FRAMETIME", 0).toDouble();
+    //QFRawDataRecordReadLocker locker(this);
     if (tau && N>0) return tau[0];
     return 0;
 }
@@ -240,9 +241,13 @@ void QFRDRImagingFCSData::setSegmentUsed(int segment, bool used)
 
 void QFRDRImagingFCSData::recalcSegmentedAverages()
 {
+    ////QFRawDataRecordWriteLocker locker(this);
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     log_text(tr("recalculating segmented CF averages ... \n"));
     QString filetype=getProperty("FILETYPE", "unknown").toString();
+
+    QString mask=maskToString();
+
     bool loaded=false;
     for (int i=0; i<files.size(); i++) {
         if (i<files_types.size()) {
@@ -264,6 +269,7 @@ void QFRDRImagingFCSData::recalcSegmentedAverages()
     recalcCorrelations();
 
     emitRawDataChanged();
+    maskLoadFromString(mask);
     log_text(tr("recalculating segmented CF averages ... DONE!\n"));
     QApplication::restoreOverrideCursor();
 }
@@ -275,7 +281,8 @@ void QFRDRImagingFCSData::exportData(const QString& format, const QString& filen
 
 
 void QFRDRImagingFCSData::intWriteData(QXmlStreamWriter& w) const {
-	// write data to the project XML file using the QXmlStreamWriter
+    ////QFRawDataRecordReadLocker locker(this);
+    // write data to the project XML file using the QXmlStreamWriter
     QString l=maskToIndexString(',');
 
     if (l.size()>0) {
@@ -809,6 +816,7 @@ bool QFRDRImagingFCSData::loadOverview(double* overviewF, double* overviewF2, co
         log_warning(tr("WARNING: could not find overview image file '%1'\n").arg(filename));
     }
 
+    //QFRawDataRecordReadLocker locker(this);
     if (!ok && overviewF) {
         for (int i=0; i<width*height; i++) {
             overviewF[i]=0;
@@ -928,7 +936,8 @@ bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int*
 }
 
 bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
-	bool ok=true;
+    //QFRawDataRecordWriteLocker locker(this);
+    bool ok=true;
 	QString errorDescription="";
 
 #ifdef DEBUG_TIMING
@@ -1075,6 +1084,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFile(const QString &filename) {
 
 
 bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
+    //QFRawDataRecordWriteLocker locker(this);
     bool ok=true;
     QString errorDescription="";
 
@@ -1276,6 +1286,7 @@ bool QFRDRImagingFCSData::loadVideoCorrelatorFileBin(const QString &filename) {
 }
 
 bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename, bool loadOverview) {
+    //QFRawDataRecordWriteLocker locker(this);
     int64_t height=getExpectedFileHeight();
     int64_t width=getExpectedFileWidth();
     int64_t steps=getProperty("STEPS", 0).toInt();
@@ -1440,11 +1451,13 @@ bool QFRDRImagingFCSData::leaveoutRun(int run) const {
 }
 
 double* QFRDRImagingFCSData::getCorrelationRun(int run) const {
+    //QFRawDataRecordReadLocker locker(this);
     if (run<0) return getCorrelationMean();
     return &(correlations[run*N]);
 }
 
 double* QFRDRImagingFCSData::getCorrelationRunError(int run) const {
+    //QFRawDataRecordReadLocker locker(this);
     if (run<0) return getCorrelationStdDev();
     return &(sigmas[run*N]);
 }

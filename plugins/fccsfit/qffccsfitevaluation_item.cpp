@@ -105,7 +105,7 @@ int QFFCCSFitEvaluationItem::getIndexMax(const QFRawDataRecord *r) const
     else return fcs->getCorrelationRuns()-1;
 }
 
-QFFitStatistics QFFCCSFitEvaluationItem::calcFitStatistics(bool storeAsResults, QFFitFunction *ffunc, long N, double *tauvals, double *corrdata, double *weights, int datacut_min, int datacut_max, double *fullParams, double *errors, bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord *record, int run)
+QFFitStatistics QFFCCSFitEvaluationItem::calcFitStatistics(bool storeAsResults, QFFitFunction *ffunc, long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord *record, int run)
 {
     return QFFitResultsByIndexEvaluationFitToolsBase::calcFitStatistics(storeAsResults, ffunc,  N, tauvals, corrdata, weights,  datacut_min,  datacut_max, fullParams, errors, paramsFix,  runAvgWidth,  residualHistogramBins, record,  run);
 }
@@ -476,7 +476,7 @@ void QFFCCSFitEvaluationItem::intReadData(QDomElement *e)
 
 
 
-bool QFFCCSFitEvaluationItem::isApplicable(const QFRawDataRecord *record)
+bool QFFCCSFitEvaluationItem::isApplicable(const QFRawDataRecord *record) const
 {
     //return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
     return matchFunctor->matches(record);
@@ -1170,14 +1170,14 @@ void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int
         QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
         if (data) {
             if (fitData[cnt].emitSignals) record->enableEmitResultsChanged(true);
-            free(fitData[cnt].weights);
-            free(fitData[cnt].params);
-            free(fitData[cnt].initialparams);
-            free(fitData[cnt].errors);
-            free(fitData[cnt].errorsI);
-            free(fitData[cnt].paramsFix);
-            free(fitData[cnt].paramsMax);
-            free(fitData[cnt].paramsMin);
+            qfFree(fitData[cnt].weights);
+            qfFree(fitData[cnt].params);
+            qfFree(fitData[cnt].initialparams);
+            qfFree(fitData[cnt].errors);
+            qfFree(fitData[cnt].errorsI);
+            qfFree(fitData[cnt].paramsFix);
+            qfFree(fitData[cnt].paramsMax);
+            qfFree(fitData[cnt].paramsMin);
 
             cnt++;
         }

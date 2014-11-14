@@ -109,9 +109,9 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
 
 QFRDRImagingFCSImageEditor::~QFRDRImagingFCSImageEditor()
 {
-    if (plteOverviewSelectedData) free(plteOverviewSelectedData);
+    if (plteOverviewSelectedData) qfFree(plteOverviewSelectedData);
     plteOverviewSelectedData=NULL;
-    if (plteOverviewExcludedData) free(plteOverviewExcludedData);
+    if (plteOverviewExcludedData) qfFree(plteOverviewExcludedData);
     plteOverviewExcludedData=NULL;
 }
 
@@ -1682,8 +1682,8 @@ void QFRDRImagingFCSImageEditor::excludeByImage(double* imageIn) {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
         QFRDRImagingFCSMaskByIntensity* dialog=new QFRDRImagingFCSMaskByIntensity(this);
-        bool* mask=(bool*)malloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(bool));
-        double* image=(double*)malloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(double));
+        bool* mask=(bool*)qfMalloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(bool));
+        double* image=(double*)qfMalloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(double));
         for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
             mask[i]=false;
             image[i]=imageIn[i];
@@ -1706,8 +1706,8 @@ void QFRDRImagingFCSImageEditor::excludeByImage(double* imageIn) {
             m->recalcCorrelations();
             rawDataChanged();
         }
-        free(mask);
-        free(image);
+        qfFree(mask);
+        qfFree(image);
     }
 }
 
@@ -1717,8 +1717,8 @@ void QFRDRImagingFCSImageEditor::selectByImage(double* imageIn) {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
     if (m) {
         QFRDRImagingFCSMaskByIntensity* dialog=new QFRDRImagingFCSMaskByIntensity(this, true);
-        bool* mask=(bool*)malloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(bool));
-        double* image=(double*)malloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(double));
+        bool* mask=(bool*)qfMalloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(bool));
+        double* image=(double*)qfMalloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(double));
         for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
             mask[i]=false;
             image[i]=imageIn[i];
@@ -1745,8 +1745,8 @@ void QFRDRImagingFCSImageEditor::selectByImage(double* imageIn) {
             selectionEdited();
             rawDataChanged();
         }
-        free(mask);
-        free(image);
+        qfFree(mask);
+        qfFree(image);
     }
 }
 
@@ -1809,8 +1809,8 @@ void QFRDRImagingFCSImageEditor::buildSelection(bool select_notmask)
             paramNames.append(cmbParameter->itemText(i));
         }
         QFRDRImagingFCSMaskBuilder* dlg=new   QFRDRImagingFCSMaskBuilder(params, paramNames, this);
-        bool* mask=(bool*)malloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(bool));
-        double* image=(double*)malloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(double));
+        bool* mask=(bool*)qfMalloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(bool));
+        double* image=(double*)qfMalloc(m->getImageFromRunsWidth()*m->getImageFromRunsHeight()*sizeof(double));
         for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
             mask[i]=true;
         }
@@ -1970,8 +1970,8 @@ void QFRDRImagingFCSImageEditor::buildSelection(bool select_notmask)
             }
             rawDataChanged();
         }
-        free(mask);
-        free(image);
+        qfFree(mask);
+        qfFree(image);
         delete dlg;
     }
 }
@@ -2773,8 +2773,8 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         double* plteImage2ImageData=0;
         plteImageSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
         if (plteImageSize>0) {
-            plteImageData=(double*)malloc(plteImageSize*sizeof(double));
-            plteImage2ImageData=(double*)malloc(plteImageSize*sizeof(double));
+            plteImageData=(double*)qfMalloc(plteImageSize*sizeof(double));
+            plteImage2ImageData=(double*)qfMalloc(plteImageSize*sizeof(double));
         }
         readParameterImage(plteImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFitParameter(), currentFitParameterTransfrom());
         readParameterImage(plteImage2ImageData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), currentFit2Parameter(), currentFit2ParameterTransfrom(), !chkOtherFileP2->isChecked(), cmbOtherFileRole->itemData(cmbOtherFileRole->currentIndex()).toString(), cmbOtherFilesResultGroup->itemData(cmbOtherFilesResultGroup->currentIndex()).toString());
@@ -2783,7 +2783,7 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         pltImage->updateImage(plteImageData, plteOverviewSelectedData, plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), formatTransformAndParameter(cmbParameter, cmbParameterTransform), false, true);
         pltParamImage2->updateImage(plteImage2ImageData, plteOverviewSelectedData, plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), formatTransformAndParameter(cmbParameter2, cmbParameter2Transform), false, true);
 
-        if (plteImageData) free(plteImageData);
+        if (plteImageData) qfFree(plteImageData);
 
 
 
@@ -2803,8 +2803,8 @@ void QFRDRImagingFCSImageEditor::updateSelectionArrays() {
         int siz=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
         if (plteOverviewSize!=m->getImageFromRunsWidth()*m->getImageFromRunsHeight()) {
             plteOverviewSize=m->getImageFromRunsWidth()*m->getImageFromRunsHeight();
-            plteOverviewSelectedData=(bool*)realloc(plteOverviewSelectedData, plteOverviewSize*sizeof(bool));
-            plteOverviewExcludedData=(bool*)realloc(plteOverviewExcludedData, plteOverviewSize*sizeof(bool));
+            plteOverviewSelectedData=(bool*)qfRealloc(plteOverviewSelectedData, plteOverviewSize*sizeof(bool));
+            plteOverviewExcludedData=(bool*)qfRealloc(plteOverviewExcludedData, plteOverviewSize*sizeof(bool));
         }
         for (register int i=0; i<siz; i++) {
             int x=m->runToX(i);
@@ -2930,7 +2930,7 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
         double ovrVar=0;
         double ovrAvg2=0;
         double ovrVar2=0;
-        bool *msk=(bool*)calloc(w*h, sizeof(bool));
+        bool *msk=(bool*)qfCalloc(w*h, sizeof(bool));
         int cnt=0;
         for (int i=0; i<w*h; i++) {
             msk[i]=plteOverviewSelectedData[i]&&(!plteOverviewExcludedData[i]);
@@ -3256,8 +3256,8 @@ void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plo
      qDebug()<<"replotData   add graph "<<i<<": "<<t.nsecsElapsed()/1000<<" usecs = "<<(double)t.nsecsElapsed()/1000000.0<<" msecs"; t.start();
 #endif
 
-    double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
-    double* resid=(double*)calloc(m->getCorrelationN(), sizeof(double));
+    double* corr=(double*)qfCalloc(m->getCorrelationN(), sizeof(double));
+    double* resid=(double*)qfCalloc(m->getCorrelationN(), sizeof(double));
     QStringList names, units, unitlabels, namelabels;
     QList<double> values, errors;
     QList<bool> fix;
@@ -3385,8 +3385,8 @@ void QFRDRImagingFCSImageEditor::plotRun(QFRDRImagingFCSData *m, int i, bool plo
 
     }
 
-    free(corr);
-    free(resid);
+    qfFree(corr);
+    qfFree(resid);
 }
 
 
@@ -3403,9 +3403,9 @@ void QFRDRImagingFCSImageEditor::plotRunsAvg(QFRDRImagingFCSData *m, QSet<int32_
     int avgs=1;
     if (cmbDualView->currentIndex()>0)  avgs=2;
     for (int avgIdx=0; avgIdx<avgs; avgIdx++) {
-        double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
-        double* cerr=(double*)calloc(m->getCorrelationN(), sizeof(double));
-        double* corr1=(double*)calloc(m->getCorrelationN(), sizeof(double));
+        double* corr=(double*)qfCalloc(m->getCorrelationN(), sizeof(double));
+        double* cerr=(double*)qfCalloc(m->getCorrelationN(), sizeof(double));
+        double* corr1=(double*)qfCalloc(m->getCorrelationN(), sizeof(double));
         QList<QList<double> > gvalues;
         QStringList names, units, unitlabels, namelabels;
         QList<Qt::CheckState> gfix;
@@ -3591,9 +3591,9 @@ void QFRDRImagingFCSImageEditor::plotRunsAvg(QFRDRImagingFCSData *m, QSet<int32_
         }
 
 
-        free(corr);
-        free(cerr);
-        free(corr1);
+        qfFree(corr);
+        qfFree(cerr);
+        qfFree(corr1);
     }
 }
 
@@ -4545,9 +4545,9 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, c
     QFFitFunction* ff=m_fitFunctions.value(fitfunc, NULL);
     //qDebug()<<evaluation<<fitfunc<<m_fitFunctions.size()<<ff;
     if (!ff) return false;
-    double* params=(double*)calloc(ff->paramCount(),sizeof(double));
-    double* errs=(double*)calloc(ff->paramCount(),sizeof(double));
-    bool* fixs=(bool*)calloc(ff->paramCount(),sizeof(bool));
+    double* params=(double*)qfCalloc(ff->paramCount(),sizeof(double));
+    double* errs=(double*)qfCalloc(ff->paramCount(),sizeof(double));
+    bool* fixs=(bool*)qfCalloc(ff->paramCount(),sizeof(bool));
     names.clear();
     namelabels.clear();
     values.clear();
@@ -4612,9 +4612,9 @@ bool QFRDRImagingFCSImageEditor::evaluateFitFunction(QFRawDataRecord* current, c
         }
     }
 
-    free(params);
-    free(errs);
-    free(fixs);
+    qfFree(params);
+    qfFree(errs);
+    qfFree(fixs);
     return true;
 }
 
@@ -4694,7 +4694,7 @@ void QFRDRImagingFCSImageEditor::storeSelection()
         }
         QString name= QInputDialog::getItem(this, tr("store selection"), tr("new name"), items, 0, true, &ok);
         if (ok) {
-            bool* sel=(bool*)calloc(m->getImageSelectionHeight()*m->getImageSelectionWidth(), sizeof(bool));
+            bool* sel=(bool*)qfCalloc(m->getImageSelectionHeight()*m->getImageSelectionWidth(), sizeof(bool));
             for (int i=0; i<m->getImageSelectionHeight()*m->getImageSelectionWidth(); i++) sel[i]=false;
 
             QSetIterator<int32_t> it(selected);
@@ -4707,7 +4707,7 @@ void QFRDRImagingFCSImageEditor::storeSelection()
 
             m->addImageSelection(sel, name);
 
-            free(sel);
+            qfFree(sel);
             updateSelectionCombobox();
             cmbStoredSelections->setCurrentIndex(cmbStoredSelections->findText(name));
         }
@@ -4909,7 +4909,7 @@ void QFRDRImagingFCSImageEditor::getCurrentResultNamesAndLabels(QStringList& nam
     if (!m) return;
     if (m->getCorrelationN()<=0) return;
 
-    double* corr1=(double*)calloc(m->getCorrelationN(), sizeof(double));
+    double* corr1=(double*)qfCalloc(m->getCorrelationN(), sizeof(double));
     for (int i=0; i<m->getCorrelationRuns(); i++) {
         //qDebug()<<"r"<<i<<"  "<<indexIsDualView2(i);
         if (!m->leaveoutRun(i) && !indexIsDualView2(i)) {
@@ -4950,7 +4950,7 @@ void QFRDRImagingFCSImageEditor::getCurrentResultNamesAndLabels(QStringList& nam
             break;
         }
     }
-    free(corr1);
+    qfFree(corr1);
 }
 
 
@@ -5162,9 +5162,9 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                     //qDebug()<<"  iss="<<iss<<masel_name;
                     for (int avgIdx=0; avgIdx<avgs; avgIdx++) {
                         //qDebug()<<"    avgIdx="<<avgIdx;
-                        double* corr=(double*)calloc(m->getCorrelationN(), sizeof(double));
-                        double* cerr=(double*)calloc(m->getCorrelationN(), sizeof(double));
-                        double* corr1=(double*)calloc(m->getCorrelationN(), sizeof(double));
+                        double* corr=(double*)qfCalloc(m->getCorrelationN(), sizeof(double));
+                        double* cerr=(double*)qfCalloc(m->getCorrelationN(), sizeof(double));
+                        double* corr1=(double*)qfCalloc(m->getCorrelationN(), sizeof(double));
                         copyFitResultStatistics_data d;
                         d.file=curRec->getName();
                         for (int pip=0; pip<props.size(); pip++) {
@@ -5330,9 +5330,9 @@ void QFRDRImagingFCSImageEditor::copyFitResultStatistics() {
                         }
 
 
-                        free(corr);
-                        free(cerr);
-                        free(corr1);
+                        qfFree(corr);
+                        qfFree(cerr);
+                        qfFree(corr1);
                         dataint.append(d);
 
                     }
@@ -6073,7 +6073,7 @@ void QFRDRImagingFCSImageEditor::replotHistogram() {
 
 void QFRDRImagingFCSImageEditor::updateHistogram(QFHistogramView* histogram, QFRDRImagingFCSData* m, double* plteImageData, int32_t plteImageSize, bool excludeExcluded, bool dv, bool selHistogram) {
     int32_t datasize=0;
-    double* datahist=(double*)malloc(plteImageSize*sizeof(double));
+    double* datahist=(double*)qfMalloc(plteImageSize*sizeof(double));
     if (dv) {
         histogram->clear();
         if (plteImageData && (plteImageSize>=0)) {
@@ -6126,7 +6126,7 @@ void QFRDRImagingFCSImageEditor::updateHistogram(QFHistogramView* histogram, QFR
             histogram->updateHistogram(true, -1);
         }
     } else histogram->addHistogram(tr("complete"), datahist, datasize, false);
-    if (datahist) free(datahist);
+    if (datahist) qfFree(datahist);
 
 }
 
@@ -6138,14 +6138,14 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
     }
 
     int32_t datasize=0;
-    double* datac1=(double*)malloc(plteImageSize*sizeof(double));
-    double* datac2=(double*)malloc(plteImageSize*sizeof(double));
-    double* datai=(double*)malloc(plteImageSize*sizeof(double));
-    double* dataX=(double*)malloc(plteImageSize*sizeof(double));
-    double* dataY=(double*)malloc(plteImageSize*sizeof(double));
-    double* dataC=(double*)malloc(plteImageSize*sizeof(double));
+    double* datac1=(double*)qfMalloc(plteImageSize*sizeof(double));
+    double* datac2=(double*)qfMalloc(plteImageSize*sizeof(double));
+    double* datai=(double*)qfMalloc(plteImageSize*sizeof(double));
+    double* dataX=(double*)qfMalloc(plteImageSize*sizeof(double));
+    double* dataY=(double*)qfMalloc(plteImageSize*sizeof(double));
+    double* dataC=(double*)qfMalloc(plteImageSize*sizeof(double));
 
-    double* dataCorrA=(double*)malloc(plteImageSize*sizeof(double));
+    double* dataCorrA=(double*)qfMalloc(plteImageSize*sizeof(double));
 
     double* image=m->getImageFromRunsPreview(channel);    
     if (!dv) {
@@ -6295,13 +6295,13 @@ void QFRDRImagingFCSImageEditor::updateCorrelation(QFParameterCorrelationView *c
     }
 
 
-    if (datac1) free(datac1);
-    if (datac2) free(datac2);
-    if (datai) free(datai);
-    if (dataX) free(dataX);
-    if (dataY) free(dataY);
-    if (dataC) free(dataC);
-    if (dataCorrA) free(dataCorrA);
+    if (datac1) qfFree(datac1);
+    if (datac2) qfFree(datac2);
+    if (datai) qfFree(datai);
+    if (dataX) qfFree(dataX);
+    if (dataY) qfFree(dataY);
+    if (dataC) qfFree(dataC);
+    if (dataCorrA) qfFree(dataCorrA);
 }
 
 
@@ -6552,7 +6552,7 @@ void QFRDRImagingFCSImageEditor::setBackgroundFromSelection()
             w=h=1;
         }
 
-        bool *msk=(bool*)calloc(w*h, sizeof(bool));
+        bool *msk=(bool*)qfCalloc(w*h, sizeof(bool));
         bool ignoreExclusion=QMessageBox::question(this, tr("set background from selection ..."), tr("Should the mask be considered?\n   YES: only non-masked pixels will be used for average\n   NO:  all pixels will be used for average"), QMessageBox::Yes|QMessageBox::No, QMessageBox::No)==QMessageBox::No;
         bool alsoSetOtherACF=false;
         if ((m->isFCCS() || m->isACF())&&(m->getProject()->getRDRGroupMembers(m->getGroup()).size()>1)) {
@@ -6562,7 +6562,7 @@ void QFRDRImagingFCSImageEditor::setBackgroundFromSelection()
             msk[i]=plteOverviewSelectedData[i]&&(ignoreExclusion || !plteOverviewExcludedData[i]);
         }
         setBackground(msk, alsoSetOtherACF);
-        free(msk);
+        qfFree(msk);
     }
 }
 
@@ -6577,7 +6577,7 @@ void QFRDRImagingFCSImageEditor::setBackgroundFromMasked()
             w=h=1;
         }
 
-        bool *msk=(bool*)calloc(w*h, sizeof(bool));
+        bool *msk=(bool*)qfCalloc(w*h, sizeof(bool));
         bool alsoSetOtherACF=false;
         if ((m->isFCCS() || m->isACF())&&(m->getProject()->getRDRGroupMembers(m->getGroup()).size()>1)) {
             alsoSetOtherACF=QMessageBox::question(this, tr("set background from masked ..."), tr("Should the same pixels be used to set the background intensity in other RDRs from the same group (e.g. also set background in ACF0,ACF1 for an FCCS record)?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
@@ -6586,7 +6586,7 @@ void QFRDRImagingFCSImageEditor::setBackgroundFromMasked()
             msk[i]=plteOverviewExcludedData[i];
         }
         setBackground(msk, alsoSetOtherACF);
-        free(msk);
+        qfFree(msk);
     }
 }
 
@@ -6632,7 +6632,7 @@ void QFRDRImagingFCSImageEditor::setBackground(bool *msk, bool alsoSetOtherACF)
 
         double ovrAvg=0;
         double ovrVar=0;
-        //bool *msk=(bool*)calloc(w*h, sizeof(bool));
+        //bool *msk=(bool*)qfCalloc(w*h, sizeof(bool));
         int cnt=0;
         for (int i=0; i<w*h; i++) {
             if (msk[i]) cnt++;

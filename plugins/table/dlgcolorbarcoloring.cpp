@@ -95,23 +95,23 @@ QList<QColor> DlgColorbarColoring::getColors() const
         QList<QPair<double, QRgb> > vals;
         vals<<qMakePair(0.0, ui->cmbCol21->currentColor().rgb());
         vals<<qMakePair(1.0, ui->cmbCol22->currentColor().rgb());
-        int* lut=(int*)malloc((2+count)*sizeof(int));
+        int* lut=(int*)qfMalloc((2+count)*sizeof(int));
         JKQTPimagePlot_buildDefinedPaletteLinInterpolate(lut, vals, count);
         for (int i=0; i<count; i++) {
             col.setPixel(i,0,lut[i]);
         }
-        free(lut);
+        qfFree(lut);
     } else if (ui->radBar3->isChecked()) {
         QList<QPair<double, QRgb> > vals;
         vals<<qMakePair(0.0, ui->cmbCol31->currentColor().rgb());
         vals<<qMakePair(1.0, ui->cmbCol32->currentColor().rgb());
         vals<<qMakePair(2.0, ui->cmbCol33->currentColor().rgb());
-        int* lut=(int*)malloc((2+count)*sizeof(int));
+        int* lut=(int*)qfMalloc((2+count)*sizeof(int));
         JKQTPimagePlot_buildDefinedPaletteLinInterpolate(lut, vals, count);
         for (int i=0; i<count; i++) {
             col.setPixel(i,0,lut[i]);
         }
-        free(lut);
+        qfFree(lut);
     }
     for (int i=0; i<chk.size(); i++) {
         if (chk.value(i, true)) {

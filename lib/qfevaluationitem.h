@@ -45,6 +45,9 @@
 
 // forward declaration
 class QFEvaluationPropertyEditor;
+class QFEvaluationItemPrivate;
+
+
 
 
 /*! \brief this class manages one evaluation record in the project
@@ -146,7 +149,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
 
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
-        bool isFilteredAndApplicable(QFRawDataRecord* record);
+        bool isFilteredAndApplicable(QFRawDataRecord* record) const;
 
         /** \brief creates a property \c "PRESET_"+id, which can be interpreted as a PRESET-value for anything.
          *
@@ -156,40 +159,40 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
 
 
         /** \brief return the next sibling rawdata record in the project */
-        inline QFEvaluationItem* getNext() { return project->getNextEvaluation(this); };
+        QFEvaluationItem* getNext();
         /** \brief return the next sibling rawdata record in the project */
-        inline QFEvaluationItem* getPrevious() { return project->getPreviousEvaluation(this); };
+        QFEvaluationItem* getPrevious();
         /** \brief return the next sibling rawdata record in the project, which has the same type as this evaluation */
-        inline QFEvaluationItem* getNextOfSameType() { return project->getNextEvaluationOfSameType(this); };
+        QFEvaluationItem* getNextOfSameType();
         /** \brief return the next sibling rawdata record in the project, which has the same type as this evaluation */
-        inline QFEvaluationItem* getPreviousOfSameType() { return project->getPreviousEvaluationOfSameType(this); };
+        QFEvaluationItem* getPreviousOfSameType();
 
         /** \brief return the ID */
-        inline int getID() const { return ID; };
+        int getID() const;
         /** \brief return the name */
-        inline QString getName() const { return name; }
+        QString getName() const;
         /** \brief return the description  */
-        inline QString getDescription() const { return description; };
+        QString getDescription() const;
         /** \brief return a pointer to the project that contains this QRawDatarecord */
         inline QFProject* getProject() const { return project; }
 
 
         /** \brief returns \c true if an error occured */
-        inline bool error() const { return errorOcc; }
+        bool error() const;
         /** \brief returns the description of the last error */
-        inline QString errorDescription() const { return errorDesc; }
+        QString errorDescription() const;
 
 
 
 
         /** \brief returns whether the user may select a set of records (\c true ) or not (\c false ). */
-        bool getUseSelection() const { return useSelection; };
+        bool getUseSelection() const;
 
         /** \brief returns whether a list of applicable records is displayed (\c true ) or not (\c false ). */
-        bool getShowRDRList() const { return showRDRList; };
+        bool getShowRDRList() const;
 
         /** \brief returns a list of currently selected items */
-        QList<QPointer<QFRawDataRecord> > getSelectedRecords() const { return selectedRecords; };
+        QList<QPointer<QFRawDataRecord> > getSelectedRecords() const;
 
         /** \brief add a record to the set of selected records */
         void selectRecord(QFRawDataRecord* record);
@@ -204,19 +207,19 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         void deselectRecord(int i);
 
         /** \brief return the number of selected records */
-        inline int getSelectedRecordCount() { return selectedRecords.size(); }
+        inline int getSelectedRecordCount();
 
         /** \brief return the i-th selected record */
-        QPointer<QFRawDataRecord> getSelectedRecord(int i);
+        QPointer<QFRawDataRecord> getSelectedRecord(int i) const;
 
         /** \brief empty list of selected records */
         void clearSelectedRecords();
 
         /** \brief returns \c true, if the given record is selected */
-        bool isSelected(QFRawDataRecord* record) const { return selectedRecords.contains(record); };
+        bool isSelected(QFRawDataRecord* record) const;
 
         /** \brief returns the currently highlughted record */
-        QFRawDataRecord* getHighlightedRecord() const { return highlightedRecord; };
+        QFRawDataRecord* getHighlightedRecord() const;
 
         /** \brief this method may be called in order to select a new record or to select none (call with \c NULL as argument) */
         void setHighlightedRecord(QFRawDataRecord* record);
@@ -266,7 +269,7 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
 
 
         /** \brief list of the raw data records this evaluation is applicable to */
-        QList<QPointer<QFRawDataRecord> > getApplicableRecords();
+        QList<QPointer<QFRawDataRecord> > getApplicableRecords() const;
 
         /*! \brief the filter returned by this function is used to filter the evaluation reeults to display in the
                    "results" pane of the QFEvaluationPropertyEditor dialog.
@@ -279,22 +282,14 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         virtual QString getResultsDisplayFilter() const;
 
         /** \brief return whether resultsChanged() signals are enabled */
-        inline bool get_doEmitResultsChanged() const {
-            return doEmitResultsChanged;
-        }
+        bool get_doEmitResultsChanged() const;
         /** \brief set whether resultsChanged() signals are enabled */
-        inline void set_doEmitResultsChanged(bool enable) {
-            doEmitResultsChanged=enable;
-        }
+        void set_doEmitResultsChanged(bool enable);
 
         /** \brief return whether propertiesChanged() signals are enabled */
-        inline bool get_doEmitPropertiesChanged() const {
-            return doEmitPropertiesChanged;
-        }
+        bool get_doEmitPropertiesChanged() const;
         /** \brief set whether propertiesChanged() signals are enabled */
-        inline void set_doEmitPropertiesChanged(bool enable) {
-            doEmitPropertiesChanged=enable;
-        }
+        void set_doEmitPropertiesChanged(bool enable);
 
         QString getNameFilter() const;
         bool getNameFilterRegExp() const;
@@ -315,7 +310,10 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
          */
         virtual int getIndexFromEvaluationResultID(const QString& resultID) const;
 
-
+        void readLock() const;
+        void writeLock() const;
+        void readUnLock() const;
+        void writeUnLock() const;
     public slots:
         /** \brief call this to tell the class that data has changed and the project has to be saved! */
         void setDataChanged();
@@ -358,7 +356,9 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
 
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
-        virtual bool isApplicable(const QFRawDataRecord* record) { return true; };
+        virtual bool isApplicable(const QFRawDataRecord* record) const { return true; };
+
+        QFEvaluationItemPrivate* p;
 
 
         /** \brief ID of the raw data record */
@@ -431,6 +431,9 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
         friend class QFMatchRDRFunctorSelectApplicable;
 
 };
+
+
+DEFINE_READWRITE_LOCKERS(QFEvaluationItem, readLock, writeLock, readUnLock, writeUnLock)
 
 #endif // QEVALUATIONITEM_H
 

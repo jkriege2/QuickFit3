@@ -21,12 +21,34 @@
 
 #include "qfevaluationitem.h"
 #include "qfevaluationpropertyeditor.h"
+#include <QMutex>
+#include <QReadLocker>
+#include <QMutexLocker>
+#include <QWriteLocker>
+#include <QReadWriteLock>
+
+typedef QMutexLocker QFEvalReadLocker;
+typedef QMutexLocker QFEvalWriteLocker;
+
+class QFEvaluationItemPrivate {
+    public:
+        explicit QFEvaluationItemPrivate(QFEvaluationItem* dd) {
+            d=dd;
+            lock=new QMutex(QMutex::Recursive);
+        }
+        ~QFEvaluationItemPrivate() {
+            delete lock;
+        }
 
 
+        QFEvaluationItem* d;
+        mutable QMutex* lock;
+};
 
 QFEvaluationItem::QFEvaluationItem(QFProject* parent, bool showRDRList, bool useSelection):
     QObject(parent), QFProperties()
 {
+    p=new QFEvaluationItemPrivate(this);
     this->useSelection=useSelection;
     this->showRDRList=showRDRList;
     doEmitPropertiesChanged=true;
@@ -77,8 +99,9 @@ void QFEvaluationItem::initNewID(QDomElement &e)
 
 }
 
-bool QFEvaluationItem::isFilteredAndApplicable(QFRawDataRecord *record)
+bool QFEvaluationItem::isFilteredAndApplicable(QFRawDataRecord *record) const
 {
+    QFEvalReadLocker locker(p->lock);
     if (!record) return false;
     return isApplicable(record)
             && (nameFilter.pattern().isEmpty() || record->getName().indexOf(nameFilter)>=0)
@@ -91,6 +114,59 @@ void QFEvaluationItem::setPresetProperty(const QString &id, const QVariant &data
     QString d=id;
     if (!id.startsWith("PRESET_")) d=QString("PRESET_")+id;
     setQFProperty(d, data, usereditable, visible);
+}
+
+QFEvaluationItem *QFEvaluationItem::getNext()
+{
+    QFEvalReadLocker locker(p->lock);
+    return project->getNextEvaluation(this);
+}
+
+QFEvaluationItem *QFEvaluationItem::getPrevious() {
+    QFEvalReadLocker locker(p->lock);
+    return project->getPreviousEvaluation(this); }
+
+QFEvaluationItem *QFEvaluationItem::getNextOfSameType() {
+    QFEvalReadLocker locker(p->lock);
+    return project->getNextEvaluationOfSameType(this); }
+
+QFEvaluationItem *QFEvaluationItem::getPreviousOfSameType() {
+    QFEvalReadLocker locker(p->lock);
+    return project->getPreviousEvaluationOfSameType(this); }
+
+int QFEvaluationItem::getID() const {
+    QFEvalReadLocker locker(p->lock);
+    return ID; }
+
+QString QFEvaluationItem::getName() const {
+    QFEvalReadLocker locker(p->lock);
+    return name; }
+
+QString QFEvaluationItem::getDescription() const {
+    QFEvalReadLocker locker(p->lock);
+    return description; }
+
+bool QFEvaluationItem::error() const {
+    QFEvalReadLocker locker(p->lock);
+    return errorOcc; }
+
+QString QFEvaluationItem::errorDescription() const {
+    QFEvalReadLocker locker(p->lock);
+    return errorDesc; }
+
+bool QFEvaluationItem::getUseSelection() const {
+    QFEvalReadLocker locker(p->lock);
+    return useSelection;
+}
+
+bool QFEvaluationItem::getShowRDRList() const {
+    QFEvalReadLocker locker(p->lock);
+    return showRDRList;
+}
+
+QList<QPointer<QFRawDataRecord> > QFEvaluationItem::getSelectedRecords() const {
+    QFEvalReadLocker locker(p->lock);
+    return selectedRecords;
 }
 
 QFEvaluationItem::~QFEvaluationItem() {
@@ -147,6 +223,7 @@ void QFEvaluationItem::readXML(QDomElement& e, bool loadAsDummy, bool readID) {
 
 
 void QFEvaluationItem::writeXML(QXmlStreamWriter& w, const QString &projectfilename, bool copyFilesToSubfolder, const QString &subfoldername, QList<QFProject::FileCopyList> *filecopylist, int writeMode) {
+    QFEvalReadLocker locker(p->lock);
     w.writeStartElement("evaluationelement");
     w.writeAttribute("type", getType());
     w.writeAttribute("name", name);
@@ -181,6 +258,7 @@ bool QFEvaluationItem::doCopyFileForExport(const QString &filename, const QStrin
 }
 
 void QFEvaluationItem::setHighlightedRecord(QFRawDataRecord* record) {
+    QFEvalWriteLocker locker(p->lock);
     if (isFilteredAndApplicable(record)) {
         QFRawDataRecord* old=highlightedRecord;
         //disconnect(old, NULL, this, NULL);
@@ -192,6 +270,7 @@ void QFEvaluationItem::setHighlightedRecord(QFRawDataRecord* record) {
 }
 
 void QFEvaluationItem::setSelectedRecords(QList<QPointer<QFRawDataRecord> > records) {
+    QFEvalWriteLocker locker(p->lock);
     for (int i=records.size()-1; i>=0; i--) {
         if (!isFilteredAndApplicable(records[i])) records.removeAt(i);
         //disconnect(selectedRecords[i], NULL, this, NULL);
@@ -203,6 +282,7 @@ void QFEvaluationItem::setSelectedRecords(QList<QPointer<QFRawDataRecord> > reco
 }
 
 void QFEvaluationItem::selectRecord(QFRawDataRecord* record) {
+    QFEvalWriteLocker locker(p->lock);
     if ((record!=NULL) && isFilteredAndApplicable(record)) {
         if (!selectedRecords.contains(record)) {
             selectedRecords.append(record);
@@ -214,6 +294,7 @@ void QFEvaluationItem::selectRecord(QFRawDataRecord* record) {
 }
 
 void QFEvaluationItem::deselectRecord(QFRawDataRecord* record) {
+    QFEvalWriteLocker locker(p->lock);
     if (selectedRecords.contains(record)) {
         selectedRecords.removeAll(record);
         //qDebug()<<"QFEvaluationItem ("<<name<<") emits selectionChanged("<<selectedRecords.size()<<")";
@@ -223,6 +304,7 @@ void QFEvaluationItem::deselectRecord(QFRawDataRecord* record) {
 }
 
 void QFEvaluationItem::deselectRecord(int i) {
+    QFEvalWriteLocker locker(p->lock);
     if ((i>=0) && (i<selectedRecords.size())) {
         selectedRecords.removeAt(i);
         //qDebug()<<"QFEvaluationItem ("<<name<<") emits selectionChanged("<<selectedRecords.size()<<")";
@@ -231,7 +313,14 @@ void QFEvaluationItem::deselectRecord(int i) {
     }
 }
 
-QPointer<QFRawDataRecord> QFEvaluationItem::getSelectedRecord(int i) {
+int QFEvaluationItem::getSelectedRecordCount() {
+    QFEvalReadLocker locker(p->lock);
+
+    return selectedRecords.size();
+}
+
+QPointer<QFRawDataRecord> QFEvaluationItem::getSelectedRecord(int i) const {
+    QFEvalReadLocker locker(p->lock);
     if ((i>=0) && (i<selectedRecords.size())) {
         return selectedRecords[i];
     }
@@ -239,6 +328,7 @@ QPointer<QFRawDataRecord> QFEvaluationItem::getSelectedRecord(int i) {
 }
 
 void QFEvaluationItem::clearSelectedRecords() {
+    QFEvalWriteLocker locker(p->lock);
     if (selectedRecords.size()>0) {
         selectedRecords.clear();
         //qDebug()<<"QFEvaluationItem ("<<name<<") emits selectionChanged("<<selectedRecords.size()<<")";
@@ -247,7 +337,12 @@ void QFEvaluationItem::clearSelectedRecords() {
     }
 }
 
+bool QFEvaluationItem::isSelected(QFRawDataRecord *record) const {     QFEvalReadLocker locker(p->lock); return selectedRecords.contains(record); }
+
+QFRawDataRecord *QFEvaluationItem::getHighlightedRecord() const {     QFEvalReadLocker locker(p->lock); return highlightedRecord; }
+
 void QFEvaluationItem::selectAllAplicableRecords() {
+    QFEvalWriteLocker locker(p->lock);
     if (project!=NULL) {
         bool added=false;
         for (int i=0; i<project->getRawDataCount(); i++) {
@@ -265,7 +360,8 @@ void QFEvaluationItem::selectAllAplicableRecords() {
     }
 }
 
-QList<QPointer<QFRawDataRecord> > QFEvaluationItem::getApplicableRecords() {
+QList<QPointer<QFRawDataRecord> > QFEvaluationItem::getApplicableRecords() const {
+    QFEvalReadLocker locker(p->lock);
     QList<QPointer<QFRawDataRecord> > recs;
     for (int i=0; i<project->getRawDataCount(); i++) {
         QPointer<QFRawDataRecord> rec=project->getRawDataByNum(i);
@@ -278,7 +374,29 @@ QString QFEvaluationItem::getResultsDisplayFilter() const {
     return getType()+"_"+QString::number(getID())+"*";
 }
 
+bool QFEvaluationItem::get_doEmitResultsChanged() const {
+    QFEvalReadLocker locker(p->lock);
+    return doEmitResultsChanged;
+}
+
+void QFEvaluationItem::set_doEmitResultsChanged(bool enable) {
+    QFEvalReadLocker locker(p->lock);
+    doEmitResultsChanged=enable;
+}
+
+bool QFEvaluationItem::get_doEmitPropertiesChanged() const {
+    QFEvalReadLocker locker(p->lock);
+    return doEmitPropertiesChanged;
+}
+
+void QFEvaluationItem::set_doEmitPropertiesChanged(bool enable)
+{
+    QFEvalReadLocker locker(p->lock);
+    doEmitPropertiesChanged=enable;
+}
+
 void QFEvaluationItem::recordAboutToBeDeleted(QFRawDataRecord* r) {
+    QFEvalWriteLocker locker(p->lock);
     bool wasCurrent=false;
     if (highlightedRecord==r) {
         highlightedRecord=r->getNextOfSameType();
@@ -299,6 +417,7 @@ void QFEvaluationItem::recordAboutToBeDeleted(QFRawDataRecord* r) {
 }
 
 void QFEvaluationItem::setName(const QString n) {
+    QFEvalWriteLocker locker(p->lock);
     if (name!=n) {
         name=n;
         emit basicPropertiesChanged();
@@ -306,6 +425,7 @@ void QFEvaluationItem::setName(const QString n) {
 }
 
 void QFEvaluationItem::setDescription(const QString& d) {
+    QFEvalWriteLocker locker(p->lock);
     if (description!=d) {
         description=d;
         emit basicPropertiesChanged();
@@ -313,6 +433,7 @@ void QFEvaluationItem::setDescription(const QString& d) {
 };
 
 void QFEvaluationItem::emitResultsChanged(QFRawDataRecord* record, const QString& evaluationName, const QString& resultName)  {
+    QFEvalReadLocker locker(p->lock);
     if (doEmitResultsChanged) {
         //qDebug()<<"QFEvaluationItem ("<<name<<") emits resultsChanged()";
         emit resultsChanged(record, evaluationName, resultName);
@@ -320,6 +441,7 @@ void QFEvaluationItem::emitResultsChanged(QFRawDataRecord* record, const QString
 }
 
 void QFEvaluationItem::emitPropertiesChanged(const QString& property, bool visible)  {
+    QFEvalReadLocker locker(p->lock);
     if (doEmitPropertiesChanged) {
         //qDebug()<<"QFEvaluationItem ("<<name<<") emits propertiesChanged()";
         emit propertiesChanged(property, visible);
@@ -328,6 +450,7 @@ void QFEvaluationItem::emitPropertiesChanged(const QString& property, bool visib
 
 void QFEvaluationItem::setNameFilter(QString filter, bool regexp)
 {
+    QFEvalWriteLocker locker(p->lock);
     nameFilter.setPattern(filter);
     nameFilter.setCaseSensitivity(Qt::CaseInsensitive);
     if (regexp) nameFilter.setPatternSyntax(QRegExp::RegExp);
@@ -338,6 +461,7 @@ void QFEvaluationItem::setNameFilter(QString filter, bool regexp)
 
 void QFEvaluationItem::setNameNotFilter(QString filter, bool regexp)
 {
+    QFEvalWriteLocker locker(p->lock);
     nameNotFilter.setPattern(filter);
     nameNotFilter.setCaseSensitivity(Qt::CaseInsensitive);
     if (regexp) nameNotFilter.setPatternSyntax(QRegExp::RegExp);
@@ -348,6 +472,7 @@ void QFEvaluationItem::setNameNotFilter(QString filter, bool regexp)
 
 void QFEvaluationItem::setNameNameNotFilter(QString filter, QString filterNot, bool regexp, bool regexpNot)
 {
+    QFEvalWriteLocker locker(p->lock);
     nameFilter.setPattern(filter);
     nameFilter.setCaseSensitivity(Qt::CaseInsensitive);
     if (regexp) nameFilter.setPatternSyntax(QRegExp::RegExp);
@@ -366,26 +491,31 @@ void QFEvaluationItem::setNameNameNotFilter(QString filter, QString filterNot, b
 
 QString QFEvaluationItem::getNameFilter() const
 {
+    QFEvalReadLocker locker(p->lock);
     return nameFilter.pattern();
 }
 
 bool QFEvaluationItem::getNameFilterRegExp() const
 {
+    QFEvalReadLocker locker(p->lock);
     return nameFilter.patternSyntax()==QRegExp::RegExp;
 }
 
 QString QFEvaluationItem::getNameNotFilter() const
 {
+    QFEvalReadLocker locker(p->lock);
     return nameNotFilter.pattern();
 }
 
 bool QFEvaluationItem::getNameNotFilterRegExp() const
 {
+    QFEvalReadLocker locker(p->lock);
     return nameNotFilter.patternSyntax()==QRegExp::RegExp;
 }
 
 int QFEvaluationItem::getIndexFromEvaluationResultID(const QString &resultID) const
 {
+    QFEvalReadLocker locker(p->lock);
     if (resultID.size()<=0) return -1;
     if (resultID.endsWith("runavg")) return -1;
     if (resultID.endsWith("avg")) return -1;
@@ -407,7 +537,28 @@ int QFEvaluationItem::getIndexFromEvaluationResultID(const QString &resultID) co
     return -1;
 }
 
+void QFEvaluationItem::readLock() const
+{
+    p->lock->lock();
+}
+
+void QFEvaluationItem::writeLock() const
+{
+    p->lock->lock();
+}
+
+void QFEvaluationItem::readUnLock() const
+{
+    p->lock->unlock();
+}
+
+void QFEvaluationItem::writeUnLock() const
+{
+    p->lock->unlock();
+}
+
 void QFEvaluationItem::setDataChanged()
 {
+    QFEvalReadLocker locker(p->lock);
     if (project) project->setDataChanged();
 }

@@ -65,9 +65,13 @@ class QFFCSWeightingTools
         static QString dataWeightToName(DataWeight weight, const QString& runname=QString("run"));
         static DataWeight stringToDataWeight(QString weight);
 
-        /** \brief allocate an array for the weights (using calloc(), so use free() to delete the array) and fill
+        /** \brief allocate an array for the weights (using qfCalloc(), so use qfFree() to delete the array) and fill
          *         it with the appropriate values, according to the current settings */
         virtual double* allocWeights(bool* weightsOK, const QFRawDataRecord* record_in, int run_in, int data_start=-1, int data_end=-1) const;
+
+        /** \brief allocate an array for the weights (using qfCalloc(), so use qfFree() to delete the array) and fill
+         *         it with the appropriate values, according to the current settings */
+        virtual QVector<double> allocVecWeights(bool* weightsOK, const QFRawDataRecord* record_in, int run_in, int data_start=-1, int data_end=-1) const;
 
         static DataWeight indexToWeight(int index);
     protected:

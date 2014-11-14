@@ -360,7 +360,7 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
                 QString l=te.attribute("list", "");
                 int selSize=getImageSelectionWidth()*getImageSelectionHeight();
                 QFRDRNumberAndBrightnessData::ImageSelection sel;
-                sel.selection=(bool*)calloc(selSize, sizeof(bool));
+                sel.selection=(bool*)qfCalloc(selSize, sizeof(bool));
                 for (int i=0; i<selSize; i++) sel.selection[i]=false;
                 sel.name=n;
 
@@ -431,13 +431,13 @@ bool QFRDRNumberAndBrightnessData::loadFile(double *target, const QString &filen
 }
 
 void QFRDRNumberAndBrightnessData::allocateContents(int x, int y, int N) {
-    if (numberImage) free(numberImage);
-    if (brightnessImage) free(brightnessImage);
-    if (image) free(image);
-    if (imageVariance) free(imageVariance);
-    if (background) free(background);
-    if (backgroundVariance) free(backgroundVariance);
-    if (leaveout) free(leaveout);
+    if (numberImage) qfFree(numberImage);
+    if (brightnessImage) qfFree(brightnessImage);
+    if (image) qfFree(image);
+    if (imageVariance) qfFree(imageVariance);
+    if (background) qfFree(background);
+    if (backgroundVariance) qfFree(backgroundVariance);
+    if (leaveout) qfFree(leaveout);
     image=NULL;
     numberImage=NULL;
     imageVariance=NULL;
@@ -446,13 +446,13 @@ void QFRDRNumberAndBrightnessData::allocateContents(int x, int y, int N) {
     leaveout=NULL;
     int NN=1;
     if ((x>0) && (y>0) && (NN>0)) {
-        image=(double*)calloc(x*y*NN,sizeof(double));
-        imageVariance=(double*)calloc(x*y*NN,sizeof(double));
-        background=(double*)calloc(x*y*NN,sizeof(double));
-        backgroundVariance=(double*)calloc(x*y*NN,sizeof(double));
-        numberImage=(double*)calloc(x*y*NN,sizeof(double));
-        brightnessImage=(double*)calloc(x*y*NN,sizeof(double));
-        leaveout=(bool*)calloc(x*y,sizeof(bool));
+        image=(double*)qfCalloc(x*y*NN,sizeof(double));
+        imageVariance=(double*)qfCalloc(x*y*NN,sizeof(double));
+        background=(double*)qfCalloc(x*y*NN,sizeof(double));
+        backgroundVariance=(double*)qfCalloc(x*y*NN,sizeof(double));
+        numberImage=(double*)qfCalloc(x*y*NN,sizeof(double));
+        brightnessImage=(double*)qfCalloc(x*y*NN,sizeof(double));
+        leaveout=(bool*)qfCalloc(x*y,sizeof(bool));
         width=x;
         height=y;
         setQFProperty("WIDTH", x, false, true);
@@ -510,7 +510,7 @@ void QFRDRNumberAndBrightnessData::loadQFPropertiesFromB040SPIMSettingsFile(QSet
 
 void QFRDRNumberAndBrightnessData::clearOvrImages() {
     for (int i=0; i<ovrImages.size(); i++) {
-        free(ovrImages[i].image);
+        qfFree(ovrImages[i].image);
     }
     ovrImages.clear();
 }
@@ -678,7 +678,7 @@ void QFRDRNumberAndBrightnessData::addImageSelection(bool *selection, const QStr
 {
     QFRDRNumberAndBrightnessData::ImageSelection s;
     s.name=name;
-    s.selection=(bool*)calloc(getImageSelectionHeight()*getImageSelectionWidth(), sizeof(bool));
+    s.selection=(bool*)qfCalloc(getImageSelectionHeight()*getImageSelectionWidth(), sizeof(bool));
     memcpy(s.selection, selection, getImageSelectionHeight()*getImageSelectionWidth()*sizeof(bool));
     selections.append(s);
 }
@@ -722,7 +722,7 @@ void QFRDRNumberAndBrightnessData::clearSelections()
 bool QFRDRNumberAndBrightnessData::loadImage(const QString& filename, double** data, int* width, int* height) {
     bool ok=false;
 
-    if (*data) free(*data);
+    if (*data) qfFree(*data);
     *data=NULL;
     *width=0;
     *height=0;
@@ -735,7 +735,7 @@ bool QFRDRNumberAndBrightnessData::loadImage(const QString& filename, double** d
             TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
             *width=nx;
             *height=ny;
-            *data=(double*)malloc(nx*ny*sizeof(double));
+            *data=(double*)qfMalloc(nx*ny*sizeof(double));
             ok=TIFFReadFrame<double>(tif, *data);
             TIFFClose(tif);
         }
@@ -746,7 +746,7 @@ bool QFRDRNumberAndBrightnessData::loadImage(const QString& filename, double** d
 bool QFRDRNumberAndBrightnessData::loadVideo(const QString& filename, double** data, int* width, int* height, uint32_t* frames) {
     bool ok=false;
 
-    if (*data) free(*data);
+    if (*data) qfFree(*data);
     *data=NULL;
     *width=0;
     *height=0;
@@ -761,7 +761,7 @@ bool QFRDRNumberAndBrightnessData::loadVideo(const QString& filename, double** d
             TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
             *width=nx;
             *height=ny;
-            *data=(double*)malloc(nx*ny*(*frames)*sizeof(double));
+            *data=(double*)qfMalloc(nx*ny*(*frames)*sizeof(double));
             uint32_t i=0;
             do {
                 ok=ok & TIFFReadFrame<double>(tif, &((*data)[i*nx*ny]));

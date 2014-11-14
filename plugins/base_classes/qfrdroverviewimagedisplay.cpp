@@ -658,7 +658,7 @@ void QFRDROverviewImageDisplay::showFrame(int frame) {
                 imageRGB->set_autoImageRange(false);
                 imageRGB->set_imageMin(qmi);
                 imageRGB->set_imageMax(qma);
-                free(datas);
+                qfFree(datas);
 
                 datas=duplicateArray(mv->getImageStack(idx, frame, 0), width*height);
                 statisticsSort(datas, width*height);
@@ -667,7 +667,7 @@ void QFRDROverviewImageDisplay::showFrame(int frame) {
                 imageRGB->set_autoImageRange(false);
                 imageRGB->set_imageMinG(qmi);
                 imageRGB->set_imageMaxG(qma);
-                free(datas);
+                qfFree(datas);
 
                 datas=duplicateArray(mv->getImageStack(idx, frame, 2), width*height);
                 statisticsSort(datas, width*height);
@@ -676,7 +676,7 @@ void QFRDROverviewImageDisplay::showFrame(int frame) {
                 imageRGB->set_autoImageRange(false);
                 imageRGB->set_imageMinB(qmi);
                 imageRGB->set_imageMaxB(qma);
-                free(datas);
+                qfFree(datas);
 
             } else {
                 double* datas=duplicateArray(data, width*height);
@@ -686,7 +686,7 @@ void QFRDROverviewImageDisplay::showFrame(int frame) {
                 image->set_autoImageRange(false);
                 image->set_imageMin(qmi);
                 image->set_imageMax(qma);
-                free(datas);
+                qfFree(datas);
             }
         } else {
             image->set_autoImageRange(true);
@@ -866,7 +866,7 @@ void QFRDROverviewImageDisplay::showHistograms(double *data, int size)
     double* hs=NULL;
     if (selected.size()>0) {
         histCount++;
-        hs=(double*)calloc(selected.size(),sizeof(double));
+        hs=(double*)qfCalloc(selected.size(),sizeof(double));
         QSetIterator<int32_t> i(selected);
         int c=0;
         while (i.hasNext()) {
@@ -881,18 +881,18 @@ void QFRDROverviewImageDisplay::showHistograms(double *data, int size)
         histogram->clear();
     } else if (histogram->histogramCount()<histCount) {
         histogram->clear();
-        //double* d=(double*)calloc(size,sizeof(double));
+        //double* d=(double*)qfCalloc(size,sizeof(double));
         //memcpy(d, data, sizeof(double)*size);
         histogram->addHistogram( tr("full"), data, size, false);
         if (selected.size()>0) histogram->addHistogram( tr("selection"), hs, selected.size(), false);
     } else {
-        //double* d=(double*)calloc(size,sizeof(double));
+        //double* d=(double*)qfCalloc(size,sizeof(double));
         //memcpy(d, data, sizeof(double)*size);
         histogram->setHistogram(0, tr("full"), data, size, false);
         if (selected.size()>0) histogram->setHistogram(1, tr("selection"), hs, selected.size(), false);
     }
     histogram->updateHistogram(true);
-    if (hs) free(hs);
+    if (hs) qfFree(hs);
 }
 
 
@@ -910,7 +910,7 @@ void QFRDROverviewImageDisplay::updateSelectionArrays() {
         int siz=selected_width*selected_height;
         if (plteOverviewSize!=siz) {
             plteOverviewSize=siz;
-            plteOverviewSelectedData=(bool*)realloc(plteOverviewSelectedData, plteOverviewSize*sizeof(bool));
+            plteOverviewSelectedData=(bool*)qfRealloc(plteOverviewSelectedData, plteOverviewSize*sizeof(bool));
         }
         for (register int i=0; i<siz; i++) {
             plteOverviewSelectedData[i]=selected.contains(i);

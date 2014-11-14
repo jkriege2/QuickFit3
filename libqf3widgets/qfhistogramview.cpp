@@ -60,7 +60,7 @@ QFHistogramView::QFHistogramView(QWidget *parent) :
 
 QFHistogramView::~QFHistogramView() {
     for (int i=0; i<histograms.size(); i++) {
-        if (histograms[i].data && !histograms[i].external) free(histograms[i].data);
+        if (histograms[i].data && !histograms[i].external) qfFree(histograms[i].data);
     }
     histograms.clear();
 }
@@ -399,7 +399,7 @@ void QFHistogramView::readQFProperties(QFProperties *current, const QString &pre
 
 void QFHistogramView::clear() {
     for (int i=0; i<histograms.size(); i++) {
-        if (histograms[i].data && !histograms[i].external) free(histograms[i].data);
+        if (histograms[i].data && !histograms[i].external) qfFree(histograms[i].data);
     }
     histograms.clear();
     updateHistogram(true);
@@ -431,7 +431,7 @@ int QFHistogramView::addCopiedHistogram(QString name, const double *data, int32_
 void QFHistogramView::setHistogram(int i, QString name, double* data, int32_t size, bool external) {
     if (i<0 || i>=histograms.size()) return;
     QFHistogramView::Histogram h=histograms[i];
-    if (h.data && !h.external) free(h.data);
+    if (h.data && !h.external) qfFree(h.data);
     h.data=data;
     if (!external) h.data=duplicateArray(data, size);
     h.name=name;
@@ -444,7 +444,7 @@ void QFHistogramView::setCopiedHistogram(int i, QString name, const double *data
 {
     if (i<0 || i>=histograms.size()) return;
     QFHistogramView::Histogram h=histograms[i];
-    if (h.data && !h.external) free(h.data);
+    if (h.data && !h.external) qfFree(h.data);
     h.data=duplicateArray(data, size);
     h.name=name;
     h.size=size;
@@ -454,7 +454,7 @@ void QFHistogramView::setCopiedHistogram(int i, QString name, const double *data
 
 void QFHistogramView::removeHistogram(int i) {
     if (i<0 || i>=histograms.size()) return;
-    if (histograms[i].data && !histograms[i].external) free(histograms[i].data);
+    if (histograms[i].data && !histograms[i].external) qfFree(histograms[i].data);
     histograms.removeAt(i);
 }
 
@@ -546,7 +546,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
             QFHistogramView::Histogram hist=histograms[hh];
             if (hist.data && (hist.size>0)) {
                 int imageSize=hist.size;
-                double* datahist=(double*)malloc(imageSize*sizeof(double));
+                double* datahist=(double*)qfMalloc(imageSize*sizeof(double));
                 long long datasize=0;
                 for (register long long i=0; i<imageSize; i++) {
                     const double v=hist.data[i];
@@ -574,7 +574,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                     ramax=qMax(ramax, q5max);
                 }
                 first=false;
-                free(datahist);
+                qfFree(datahist);
             }
         }
     }
@@ -584,7 +584,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
             QFHistogramView::Histogram hist=histograms[hh];
             if (hist.data && (hist.size>0)) {
                 int imageSize=hist.size;
-                double* datahist=(double*)malloc(imageSize*sizeof(double));
+                double* datahist=(double*)qfMalloc(imageSize*sizeof(double));
                 int32_t datasize=0;
                 double mmin=edtHistogramMin->value();
                 double mmax=edtHistogramMax->value();
@@ -654,8 +654,8 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 }
 
                 long histBins=spinHistogramBins->value();
-                double* histX=(double*)malloc(histBins*sizeof(double));
-                double* histY=(double*)malloc(histBins*sizeof(double));
+                double* histX=(double*)qfMalloc(histBins*sizeof(double));
+                double* histY=(double*)qfMalloc(histBins*sizeof(double));
 
 
                 if (chkHistogramRangeAuto->isChecked() && hh==0) {
@@ -769,9 +769,9 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                     if (ff) delete ff;
                 }
 
-                free(histX);
-                free(histY);
-                free(datahist);
+                qfFree(histX);
+                qfFree(histY);
+                qfFree(datahist);
 
             }
         }

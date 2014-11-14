@@ -250,7 +250,7 @@ void QFImFCSSetParamFromFileDialog::on_btnLoadFile_clicked()
             if (TIFFReadFrame<double>(filename.toLocal8Bit().data(), &data, &width, &height)) {
                 if (data && width>0 && height>0) {
                     newData=arrayToVector(data, width*height);
-                    free(data);
+                    qfFree(data);
                     datawidth=width;
                     dataheight=height;
                 }

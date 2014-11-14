@@ -44,7 +44,7 @@ QFRDRImageStackDataEditor::~QFRDRImageStackDataEditor()
         delete viewer3D;
         viewer3D=NULL;
     }
-    if (selection) free(selection);
+    if (selection) qfFree(selection);
 }
 
 void QFRDRImageStackDataEditor::createWidgets() {
@@ -319,8 +319,8 @@ void QFRDRImageStackDataEditor::writeSettings() {
 void QFRDRImageStackDataEditor::addDataHistogram(double *data, bool* mask, int size, const QString &title, const QString &colX, const QString &colY, QColor col, double shift, double width) {
     JKQTPdatastore* dsData=pltData->getDatastore();
 
-    double* histX=(double*)calloc(spinBins->value(), sizeof(double));
-    double* histY=(double*)calloc(spinBins->value(), sizeof(double));
+    double* histX=(double*)qfCalloc(spinBins->value(), sizeof(double));
+    double* histY=(double*)qfCalloc(spinBins->value(), sizeof(double));
 
     if (mask) statisticsHistogramMasked(data, mask, size, histX, histY, spinBins->value(), false, false);
     else statisticsHistogram(data, size, histX, histY, spinBins->value(), false);
@@ -337,8 +337,8 @@ void QFRDRImageStackDataEditor::addDataHistogram(double *data, bool* mask, int s
     plteHistogram->set_color(col);
     pltData->addGraph(plteHistogram);
 
-    free(histX);
-    free(histY);
+    qfFree(histX);
+    qfFree(histY);
 }
 
 void QFRDRImageStackDataEditor::connectWidgets()
@@ -398,7 +398,7 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
         if (ar && mv->maskGet()) statisticsMaskedMinMax(ar, mv->maskGet(), width*height, amin, amax, false);
 
         if (!selection || selectionWidth!=width || selectionHeight!=height) {
-            selection=(bool*)realloc(selection, width*height*sizeof(bool));
+            selection=(bool*)qfRealloc(selection, width*height*sizeof(bool));
             selectionWidth=width;
             selectionHeight=height;
             if (selection) for (int i=0; i<width*height; i++) selection[i]=false;

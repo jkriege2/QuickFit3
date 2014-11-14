@@ -182,16 +182,16 @@ bool QFImFCCSRelativeCCFCrosstalkDialog::calculateRelCCF(QFRawDataRecord *acf0, 
 
             if (ok && acf0D && acf0S && acf1D && acf1S && ccfD && ccfS && acf0N>0 && acf1N>0 && ccfN>0) {
                 //tim.write("2");
-                double* rel0=(double*)malloc(w*h*sizeof(double));
-                double* rel0_error=(double*)malloc(w*h*sizeof(double));
-                double* rel1=(double*)malloc(w*h*sizeof(double));
-                double* rel1_error=(double*)malloc(w*h*sizeof(double));
-                double* acf0_out=(double*)malloc(w*h*sizeof(double));
-                double* acf1_out=(double*)malloc(w*h*sizeof(double));
-                double* ccf_out=(double*)malloc(w*h*sizeof(double));
-                double* acf0UC_out=(double*)malloc(w*h*sizeof(double));
-                double* acf1UC_out=(double*)malloc(w*h*sizeof(double));
-                double* ccfUC_out=(double*)malloc(w*h*sizeof(double));
+                double* rel0=(double*)qfMalloc(w*h*sizeof(double));
+                double* rel0_error=(double*)qfMalloc(w*h*sizeof(double));
+                double* rel1=(double*)qfMalloc(w*h*sizeof(double));
+                double* rel1_error=(double*)qfMalloc(w*h*sizeof(double));
+                double* acf0_out=(double*)qfMalloc(w*h*sizeof(double));
+                double* acf1_out=(double*)qfMalloc(w*h*sizeof(double));
+                double* ccf_out=(double*)qfMalloc(w*h*sizeof(double));
+                double* acf0UC_out=(double*)qfMalloc(w*h*sizeof(double));
+                double* acf1UC_out=(double*)qfMalloc(w*h*sizeof(double));
+                double* ccfUC_out=(double*)qfMalloc(w*h*sizeof(double));
                 uint64_t idxA0=0;
                 uint64_t idxA1=0;
                 uint64_t idxC=0;
@@ -294,32 +294,32 @@ bool QFImFCCSRelativeCCFCrosstalkDialog::calculateRelCCF(QFRawDataRecord *acf0, 
                     }
                 }
                 if (rel_out0) *rel_out0=rel0;
-                else if (rel0) free(rel0);
+                else if (rel0) qfFree(rel0);
                 if (rel_error_out0) *rel_error_out0=rel0_error;
-                else if (rel0_error) free(rel0_error);
+                else if (rel0_error) qfFree(rel0_error);
 
                 if (rel_out1) *rel_out1=rel1;
-                else if (rel1) free(rel1);
+                else if (rel1) qfFree(rel1);
                 if (rel_error_out1) *rel_error_out1=rel1_error;
-                else if (rel1_error) free(rel1_error);
+                else if (rel1_error) qfFree(rel1_error);
 
                 if (acf0Amplitude) *acf0Amplitude=acf0_out;
-                else if (acf0_out) free(acf0_out);//chkStoreAmplitudes
+                else if (acf0_out) qfFree(acf0_out);//chkStoreAmplitudes
 
                 if (acf1Amplitude) *acf1Amplitude=acf1_out;
-                else if (acf1_out) free(acf1_out);//chkStoreAmplitudes
+                else if (acf1_out) qfFree(acf1_out);//chkStoreAmplitudes
 
                 if (ccfAmplitude) *ccfAmplitude=ccf_out;
-                else if (ccf_out) free(ccf_out);//chkStoreAmplitudes
+                else if (ccf_out) qfFree(ccf_out);//chkStoreAmplitudes
 
                 if (acf0UCAmplitude) *acf0UCAmplitude=acf0UC_out;
-                else if (acf0UC_out) free(acf0UC_out);
+                else if (acf0UC_out) qfFree(acf0UC_out);
 
                 if (acf1UCAmplitude) *acf1UCAmplitude=acf1UC_out;
-                else if (acf1UC_out) free(acf1UC_out);
+                else if (acf1UC_out) qfFree(acf1UC_out);
 
                 if (ccfUCAmplitude) *ccfUCAmplitude=ccfUC_out;
-                else if (ccfUC_out) free(ccfUC_out);
+                else if (ccfUC_out) qfFree(ccfUC_out);
                 QApplication::restoreOverrideCursor();
                 return true;
             } else {
@@ -481,8 +481,8 @@ void QFImFCCSRelativeCCFCrosstalkDialog::replotImages()
             pltData->setAbsoluteXY(0,w,0,h);
             pltData->setXY(0,w,0,h);
 
-            if (rel) free(rel);
-            if (rel_error) free(rel_error);
+            if (rel) qfFree(rel);
+            if (rel_error) qfFree(rel_error);
         }
     } else {
         ui->labError->setText("<font color=\"red\"><b>ERROR CALCULATING REL: CCF</b></font>");
@@ -663,16 +663,16 @@ void QFImFCCSRelativeCCFCrosstalkDialog::addResult()
 
 
 
-            if (rel) free(rel);
-            if (rel_error) free(rel_error);
+            if (rel) qfFree(rel);
+            if (rel_error) qfFree(rel_error);
         }
 
-        if(acf0Amplitude) free(acf0Amplitude);
-        if(acf0UCAmplitude) free(acf0UCAmplitude);
-        if(acf1Amplitude) free(acf1Amplitude);
-        if(acf1UCAmplitude) free(acf1UCAmplitude);
-        if(ccfAmplitude) free(ccfAmplitude);
-        if(ccfUCAmplitude) free(ccfUCAmplitude);
+        if(acf0Amplitude) qfFree(acf0Amplitude);
+        if(acf0UCAmplitude) qfFree(acf0UCAmplitude);
+        if(acf1Amplitude) qfFree(acf1Amplitude);
+        if(acf1UCAmplitude) qfFree(acf1UCAmplitude);
+        if(ccfAmplitude) qfFree(ccfAmplitude);
+        if(ccfUCAmplitude) qfFree(ccfUCAmplitude);
     }
     QApplication::restoreOverrideCursor();
 }

@@ -107,7 +107,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
     d.paramsMin=paramsMin;
     d.paramsMax=paramsMax;
     d.pcount=paramCount;
-    d.p=(double*)malloc(paramCount*sizeof(double));
+    d.p=(double*)qfMalloc(paramCount*sizeof(double));
 
     bool transformParams=paramsMin&&paramsMax;
 
@@ -176,7 +176,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLMFitBox::intFit(double* paramsOut, doub
         result.messageSimple="";
     }
 
-    if (d.p) free(d.p);
+    if (d.p) qfFree(d.p);
 
     return result;
 }

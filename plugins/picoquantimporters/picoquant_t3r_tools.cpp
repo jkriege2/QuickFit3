@@ -1,6 +1,7 @@
 
 #include "picoquant_t3r_tools.h"
 #include <QObject>
+#include "qftools.h"
 
 bool TTTRReadConfiguration(FILE* fpin, TTTRTxtHdr* txtHeader, TTTRBinHdr* binHeader, TTTRBoardHdr* boardHeader, TTTRHdr* TTTRHeader, QString &error) {
     long int result;

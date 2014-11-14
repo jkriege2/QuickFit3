@@ -24,22 +24,45 @@
 #include <QtXml>
 #include "qftools.h"
 #include <QDebug>
+#include <QReadLocker>
+#include <QWriteLocker>
+#include <QReadWriteLock>
+
+
+typedef QMutexLocker QFPropsReadLocker;
+typedef QMutexLocker QFPropsWriteLocker;
+typedef QMutex QFPropsLock;
+
+
+class QFPropertiesPrivate {
+    public:
+        explicit QFPropertiesPrivate(QFProperties* dd) {
+            d=dd;
+            propertyLocker=new QFPropsLock(QFPropsLock::Recursive);
+        }
+        ~QFPropertiesPrivate() {
+            delete propertyLocker;
+        }
+
+        QFProperties* d;
+        mutable QFPropsLock* propertyLocker;
+};
 
 
 QFProperties::QFProperties()
 {
-    propertyLocker=new QReadWriteLock();
+    p=new QFPropertiesPrivate(this);
 }
 
 QFProperties::~QFProperties() {
     props.clear();
-    delete propertyLocker;
+    delete p;
 }
 
 void QFProperties::clearProperties()
 {
     {
-        QWriteLocker lock();
+        QFPropsWriteLocker lock(this->p->propertyLocker);
         props.clear();
     }
     emitPropertiesChanged();
@@ -48,13 +71,13 @@ void QFProperties::clearProperties()
 
 QVariant QFProperties::getProperty(const QString &p) const
 {
-    QReadLocker lock(propertyLocker);
+    QFPropsReadLocker lock(this->p->propertyLocker);
     if (props.contains(p)) return props[p].data; else return QVariant();
 }
 
 QVariant QFProperties::getProperty(const QString &p, const QVariant &defaultValue) const
 {
-    QReadLocker lock(propertyLocker);
+    QFPropsReadLocker lock(this->p->propertyLocker);
     if (props.contains(p)) return props[p].data;
     return defaultValue;
 
@@ -62,13 +85,13 @@ QVariant QFProperties::getProperty(const QString &p, const QVariant &defaultValu
 
 unsigned int QFProperties::getPropertyCount() const
 {
-    QReadLocker lock(propertyLocker); return props.size();
+    QFPropsReadLocker lock(this->p->propertyLocker); return props.size();
 }
 
 
 
 unsigned int QFProperties::getVisiblePropertyCount() const {
-    QReadLocker lock(propertyLocker);
+    QFPropsReadLocker lock(this->p->propertyLocker);
     unsigned int c=0;
     //for (int i=0; i<props.keys().size(); i++) {
         //QString p=props.keys().at(i);
@@ -82,7 +105,7 @@ unsigned int QFProperties::getVisiblePropertyCount() const {
 
 QStringList QFProperties::getVisibleProperties() const
 {
-    QReadLocker lock(propertyLocker);
+    QFPropsReadLocker lock(this->p->propertyLocker);
     QStringList c;
     //for (int i=0; i<props.keys().size(); i++) {
         //QString p=props.keys().at(i);
@@ -95,7 +118,7 @@ QStringList QFProperties::getVisibleProperties() const
 }
 
 QString QFProperties::getVisibleProperty(unsigned int j) const {
-    QReadLocker lock(propertyLocker);
+    QFPropsReadLocker lock(this->p->propertyLocker);
     unsigned int c=0;
     //for (int i=0; i<props.keys().size(); i++) {
         //QString p=props.keys().at(i);
@@ -112,44 +135,44 @@ QString QFProperties::getVisibleProperty(unsigned int j) const {
 
 QStringList QFProperties::getPropertyNames() const
 {
-    QReadLocker lock(propertyLocker);
+    QFPropsReadLocker lock(this->p->propertyLocker);
     return props.keys();
 }
 
 QString QFProperties::getPropertyName(int i) const
 {
-    QReadLocker lock(propertyLocker);
+    QFPropsReadLocker lock(this->p->propertyLocker);
     return props.keys().at(i);
 }
 
 bool QFProperties::isPropertyVisible(const QString &property) const {
-    QReadLocker lock(propertyLocker);
+    QFPropsReadLocker lock(this->p->propertyLocker);
     if (!props.contains(property)) return false;
     return props[property].visible;
 }
 
 bool QFProperties::isPropertyUserEditable(const QString &property) const{
-    QReadLocker lock(propertyLocker);
+    QFPropsReadLocker lock(this->p->propertyLocker);
     if (!props.contains(property)) return false;
     return props[property].usereditable;
 }
 
 void QFProperties::deleteProperty(const QString &n) {
     {
-        QWriteLocker lock(propertyLocker);
+        QFPropsWriteLocker lock(this->p->propertyLocker);
         props.remove(n);
     }
     emitPropertiesChanged();
 }
 
 bool QFProperties::propertyExists(const QString &p) const {
-    QReadLocker lock(propertyLocker);
+    QFPropsReadLocker lock(this->p->propertyLocker);
     return props.contains(p);
 }
 
 void QFProperties::setQFProperty(const QString &p, QVariant value, bool usereditable, bool visible) {
     {
-        QWriteLocker lock(propertyLocker);
+        QFPropsWriteLocker lock(this->p->propertyLocker);
         propertyItem i;
         i.data=value;
         i.usereditable=usereditable;
@@ -163,7 +186,7 @@ void QFProperties::setQFPropertyIfNotUserEditable(const QString &p, QVariant val
 {
     bool ok=true;
     {
-        QWriteLocker lock(propertyLocker);
+        QFPropsWriteLocker lock(this->p->propertyLocker);
         if (props.contains(p)) {
             ok = !props[p].usereditable;
         }
@@ -180,8 +203,8 @@ void QFProperties::setQFPropertyIfNotUserEditable(const QString &p, QVariant val
 
 void QFProperties::addProperties(const QFProperties &other)
 {
-    QReadLocker lockOther(other.propertyLocker);
-    QWriteLocker lock(propertyLocker);
+    QFPropsReadLocker lockOther(other.p->propertyLocker);
+    QFPropsWriteLocker lock(this->p->propertyLocker);
     QHashIterator<QString, propertyItem> i(other.props);
     while (i.hasNext()) {
         i.next();
@@ -190,8 +213,28 @@ void QFProperties::addProperties(const QFProperties &other)
     }
 }
 
+void QFProperties::propReadLock() const
+{
+    this->p->propertyLocker->lock();
+}
+
+void QFProperties::propWriteLock() const
+{
+    this->p->propertyLocker->lock();
+}
+
+void QFProperties::propReadUnLock() const
+{
+    this->p->propertyLocker->unlock();
+}
+
+void QFProperties::propWriteUnLock() const
+{
+    this->p->propertyLocker->unlock();
+}
+
 void QFProperties::storeProperties(QXmlStreamWriter& w) const {
-    QReadLocker lock(propertyLocker);
+    QFPropsReadLocker lock(this->p->propertyLocker);
     QHashIterator<QString, propertyItem> i(props);
     while (i.hasNext()) {
         i.next();
@@ -210,7 +253,7 @@ void QFProperties::storeProperties(QXmlStreamWriter& w) const {
 
 void QFProperties::readProperties(QDomElement& e) {
     {
-        QWriteLocker lock(propertyLocker);
+        QFPropsWriteLocker lock(this->p->propertyLocker);
         QDomElement te=e.firstChildElement("property");
         props.clear();
         while (!te.isNull()) {

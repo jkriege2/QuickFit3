@@ -27,7 +27,7 @@ cam_rh2v2_cordlg::cam_rh2v2_cordlg(QWidget *parent) :
     ui(new Ui::cam_rh2v2_cordlg)
 {
     ui->setupUi(this);
-    plots=(JKQTFPLinePlot **) calloc(1024,sizeof(JKQTFPLinePlot*));
+    plots=(JKQTFPLinePlot **) qfCalloc(1024,sizeof(JKQTFPLinePlot*));
     for(int i=0;i<1024;i++){
         plots[i]=new JKQTFPLinePlot((JKQTFastPlotter*)NULL,0,(double*)NULL,(double*)NULL,QColor(((i>>7)&0x7)*32,((i>>4)&0x7)*32,(i&0xF)*16));
     }
@@ -35,7 +35,7 @@ cam_rh2v2_cordlg::cam_rh2v2_cordlg(QWidget *parent) :
     reconfigure(3,3);
 
 
-    data = static_cast<double **>(malloc(32*32*sizeof(double*)));
+    data = static_cast<double **>(qfMalloc(32*32*sizeof(double*)));
     for(int i=0;i<32*32;i++){
         data[i]=static_cast<double *>(calloc(14*8,sizeof(double)));
     }
@@ -57,11 +57,11 @@ void cam_rh2v2_cordlg::reconfigure(int widthNew,int heightNew){
                 }
             }
         }
-        free(plotters);
+        qfFree(plotters);
     }
     width=widthNew;
     height=heightNew;
-    plotters=static_cast<JKQTFastPlotter**>(malloc(width*height*sizeof(JKQTFastPlotter*)));
+    plotters=static_cast<JKQTFastPlotter**>(qfMalloc(width*height*sizeof(JKQTFastPlotter*)));
     for(int x=0;x<width;x++){
         for(int y=0;y<height;y++){
             int i=y*width+x;

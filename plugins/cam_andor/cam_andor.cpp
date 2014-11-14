@@ -357,8 +357,8 @@ void QFExtensionCameraAndor::showCameraSettingsDialog(unsigned int camera, QSett
         dlg->readSettings(settings);
         dlg->setInfo(getCameraInfo(camera, false, false, true, false));
 
-        uint32_t* data=(uint32_t*)calloc(info.width*info.height, sizeof(uint32_t));
-        uint32_t* data1=(uint32_t*)calloc(info.width*info.height, sizeof(uint32_t));
+        uint32_t* data=(uint32_t*)qfCalloc(info.width*info.height, sizeof(uint32_t));
+        uint32_t* data1=(uint32_t*)qfCalloc(info.width*info.height, sizeof(uint32_t));
         useCameraSettings(camera, settings);
         acquireFullFrame(camera, data);
         useCameraSettings(camera, settings);
@@ -373,8 +373,8 @@ void QFExtensionCameraAndor::showCameraSettingsDialog(unsigned int camera, QSett
         camGlobalSettings[camera].shutterMode=oldShutterMode; // reset shutter mode
         setGlobalSettings(camera);
 
-        free(data);
-        free(data1);
+        qfFree(data);
+        qfFree(data1);
         delete dlg;
     }
 }
@@ -519,12 +519,12 @@ bool QFExtensionCameraAndor::acquireOnCamera(unsigned int camera, uint32_t* data
 
 
         int imagesize=getCameraImageWidth(camera)*getCameraImageHeight(camera);
-        at_32* imageData = (at_32*)malloc(imagesize*sizeof(at_32));
-        CHECK_ON_ERROR(GetAcquiredData(imageData,imagesize), tr("error while acquiring frame"), free(imageData));
+        at_32* imageData = (at_32*)qfMalloc(imagesize*sizeof(at_32));
+        CHECK_ON_ERROR(GetAcquiredData(imageData,imagesize), tr("error while acquiring frame"), qfFree(imageData));
 
         for(int i=0;i<imagesize;i++) data[i]=imageData[i];
 
-        free(imageData);
+        qfFree(imageData);
 #ifdef DEBUG_TIMING
         //qDebug()<<"data read "<<timer.get_time()<<" us";
         timer.start();
@@ -567,11 +567,11 @@ bool QFExtensionCameraAndor::acquireFullFrame(unsigned int camera, uint32_t* dat
 	if (time.elapsed()<=timeout)  {
 
 
-        at_32* imageData = (at_32*)malloc(info.width*info.height*sizeof(at_32));
-        CHECK_ON_ERROR(GetAcquiredData(imageData, info.width*info.height), tr("error while acquiring frame"), free(imageData));
+        at_32* imageData = (at_32*)qfMalloc(info.width*info.height*sizeof(at_32));
+        CHECK_ON_ERROR(GetAcquiredData(imageData, info.width*info.height), tr("error while acquiring frame"), qfFree(imageData));
 
         for(int i=0;i<info.width*info.height;i++) data[i]=imageData[i];
-        free(imageData);
+        qfFree(imageData);
 
 		return true;
 	} else {

@@ -111,56 +111,6 @@ struct  QFCFitFunctionParameterDescription {
 
 
 
-/** \brief a very simple string class */
-class LIB_EXPORT QFCFFSDKString {
-    private:
-        char* data;
-        int length;
-    public:
-        QFCFFSDKString() {
-            data=malloc(1*sizeof(char));
-            data[0]=0;
-            length=0;
-        }
-
-        QFCFFSDKString(const char* init) {
-            length=strlen(init);
-            data=malloc((length+1)*sizeof(char));
-            strcpy(data, init);
-        }
-
-        QFCFFSDKString(const QFCFFSDKString& init) {
-            length=init.length;
-            data=malloc((length+1)*sizeof(char));
-            strcpy(data, init.data);
-        }
-
-        ~QFCFFSDKString() {
-            if (data) free(data);
-        }
-
-        void operator=(const QFCFFSDKString& init) {
-            free(data);
-            length=init.length;
-            data=malloc((length+1)*sizeof(char));
-            strcpy(data, init.data);
-        }
-
-        void operator=(const char* init) {
-            free(data);
-            length=strlen(init);
-            data=malloc((length+1)*sizeof(char));
-            strcpy(data, init);
-        }
-
-        void clear() {
-            data[0]='\0';
-            length=0;
-        }
-
-        char* c_str() const { return data; }
-        size_t count() const { return length; }
-};
 
 class LIB_EXPORT QFCFitFunction {
     public:

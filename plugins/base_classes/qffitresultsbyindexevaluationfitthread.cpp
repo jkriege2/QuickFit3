@@ -26,7 +26,7 @@
 QFFitResultsByIndexEvaluationFitThread::QFFitResultsByIndexEvaluationFitThread(bool stopWhenEmpty, QObject *parent) :
     QThread(parent)
 {
-    lock=new QReadWriteLock();
+    lock=new QMutex();
     stopped=false;
     this->stopWhenEmpty=stopWhenEmpty;
     jobCount=0;
@@ -41,14 +41,14 @@ QFFitResultsByIndexEvaluationFitThread::~QFFitResultsByIndexEvaluationFitThread(
 
 void QFFitResultsByIndexEvaluationFitThread::run() {
     bool jempty=false;
-    { QReadLocker locker(lock);
+    { QMutexLocker locker(lock);
         jempty=jobs.isEmpty();
     }
     while(!stopped  && (!(stopWhenEmpty&&jempty))) {
         QFFitResultsByIndexEvaluationFitThread::Job job;
         bool jobIsValid=false;
         // look into input queue, whether there are still tasks to perform
-        {   QReadLocker locker(lock);
+        {   QMutexLocker locker(lock);
             if (!jobs.isEmpty()) {
                 job=jobs.dequeue();
                 jobIsValid= ((job.record||(!job.record&&job.records.size()>0)) && job.evaluation);
@@ -61,10 +61,10 @@ void QFFitResultsByIndexEvaluationFitThread::run() {
             // if the record property is used, we have a single-record fit and run the according function
             QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(job.evaluation);
             if (jobIsValid&&feval) {
-                feval->doFitForMultithread(job.record, job.run, job.userMin, job.userMax, this);
+                feval->doFitForMultithread(job.falg, job.ffunc, job.record, job.run, job.userMin, job.userMax, this);
 
                 {
-                    QWriteLocker locker(lock);
+                    QMutexLocker locker(lock);
                     jobsDone++;
                 }
             }
@@ -76,7 +76,7 @@ void QFFitResultsByIndexEvaluationFitThread::run() {
                 feval->doFitForMultithread(job.records, job.run, job.userMin, job.userMax, this);
 
                 {
-                    QWriteLocker locker(lock);
+                    QMutexLocker locker(lock);
                     jobsDone++;
                 }
             }
@@ -92,7 +92,35 @@ void QFFitResultsByIndexEvaluationFitThread::addJob(QFFitResultsByIndexEvaluatio
     j.run=run;
     j.userMax=userMax;
     j.userMin=userMin;
-    QWriteLocker locker(lock);
+    QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(j.evaluation);
+    if (feval) {
+        feval->createFitFunctionAndAlgorithm(j.falg, j.ffunc, j.record, j.run);
+        if (j.falg) {
+            bool add=true;
+            for (int i=0; i<falgs.size(); i++) {
+                if (falgs[i]->id()==j.falg->id()) {
+                    delete j.falg;
+                    j.falg=falgs[i];
+                    add=false;
+                    break;
+                }
+            }
+            if (add) falgs<<j.falg;
+        }
+        if (j.ffunc) {
+            bool add=true;
+            for (int i=0; i<ffuncs.size(); i++) {
+                if (ffuncs[i]->id()==j.ffunc->id()) {
+                    delete j.ffunc;
+                    j.ffunc=ffuncs[i];
+                    add=false;
+                    break;
+                }
+            }
+            if (add) ffuncs<<j.ffunc;
+        }
+    }
+    QMutexLocker locker(lock);
     jobs.enqueue(j);
     jobCount++;
 }
@@ -106,9 +134,22 @@ void QFFitResultsByIndexEvaluationFitThread::addJob(QFFitResultsByIndexEvaluatio
     j.run=run;
     j.userMax=userMax;
     j.userMin=userMin;
-    QWriteLocker locker(lock);
+    QMutexLocker locker(lock);
     jobs.enqueue(j);
     jobCount++;
+}
+
+void QFFitResultsByIndexEvaluationFitThread::cleanJobs()
+{
+    for (int i=0; i<falgs.size(); i++) {
+        if (falgs[i]) delete falgs[i];
+    }
+    for (int i=0; i<ffuncs.size(); i++) {
+        if (ffuncs[i]) delete ffuncs[i];
+    }
+    ffuncs.clear();
+    falgs.clear();
+    jobs.clear();
 }
 
 void QFFitResultsByIndexEvaluationFitThread::cancel(bool waitForFinished) {
@@ -120,7 +161,7 @@ void QFFitResultsByIndexEvaluationFitThread::cancel(bool waitForFinished) {
 
 int QFFitResultsByIndexEvaluationFitThread::getJobsDone()
 {
-    QReadLocker locker(lock);
+    QMutexLocker locker(lock);
     return jobsDone;
 }
 
@@ -131,6 +172,8 @@ QFFitResultsByIndexEvaluationFitThread::Job::Job() {
     run=-1;
     userMin=0;
     userMax=0;
+    falg=NULL;
+    ffunc=NULL;
 }
 
 int QFFitResultsByIndexEvaluationFitThread::getJobCount()
@@ -157,7 +200,7 @@ void QFFitResultsByIndexEvaluationFitThread::log_warning(QString message)
 QFFitResultsByIndexEvaluationFitSmartThread::QFFitResultsByIndexEvaluationFitSmartThread(bool stopWhenEmpty, QObject *parent) :
     QThread(parent)
 {
-    lock=new QReadWriteLock();
+    lock=new QMutex();
     stopped=false;
     this->stopWhenEmpty=stopWhenEmpty;
     jobCount=0;
@@ -169,7 +212,7 @@ QFFitResultsByIndexEvaluationFitSmartThread::QFFitResultsByIndexEvaluationFitSma
 QFFitResultsByIndexEvaluationFitSmartThread::QFFitResultsByIndexEvaluationFitSmartThread(QFFitResultsByIndexEvaluationFitSmartThread_Writer *writer, bool stopWhenEmpty, QObject *parent) :
     QThread(parent)
 {
-    lock=new QReadWriteLock();
+    lock=new QMutex();
     stopped=false;
     this->stopWhenEmpty=stopWhenEmpty;
     jobCount=0;
@@ -194,7 +237,38 @@ void QFFitResultsByIndexEvaluationFitSmartThread::addJob(QFFitResultsByIndexEval
     j.run=run;
     j.userMax=userMax;
     j.userMin=userMin;
-    QWriteLocker locker(lock);
+
+    QFFitResultsByIndexEvaluationFitTools* feval=dynamic_cast<QFFitResultsByIndexEvaluationFitTools*>(evaluation);
+    if (feval) {
+        feval->createFitFunctionAndAlgorithm(j.falg, j.ffunc, j.record, j.run);
+        if (j.falg) {
+            bool add=true;
+            for (int i=0; i<falgs.size(); i++) {
+                if (falgs[i]->id()==j.falg->id()) {
+                    delete j.falg;
+                    j.falg=falgs[i];
+                    add=false;
+                    break;
+                }
+            }
+            if (add) falgs<<j.falg;
+        }
+        if (j.ffunc) {
+            bool add=true;
+            for (int i=0; i<ffuncs.size(); i++) {
+                if (ffuncs[i]->id()==j.ffunc->id()) {
+                    delete j.ffunc;
+                    j.ffunc=ffuncs[i];
+                    add=false;
+                    break;
+                }
+            }
+            if (add) ffuncs<<j.ffunc;
+        }
+    }
+
+
+    QMutexLocker locker(lock);
     jobs.enqueue(j);
     jobCount++;
 }
@@ -211,7 +285,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::addJob(QFFitResultsByIndexEval
     j.run=run;
     j.userMax=userMax;
     j.userMin=userMin;
-    QWriteLocker locker(lock);
+    QMutexLocker locker(lock);
     jobs.enqueue(j);
     jobCount++;
 }
@@ -225,7 +299,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::cancel(bool waitForFinished) {
 
 int QFFitResultsByIndexEvaluationFitSmartThread::getJobsDone()
 {
-    QReadLocker locker(lock);
+    QMutexLocker locker(lock);
     return jobsDone;
 }
 
@@ -241,6 +315,19 @@ QFFitResultsByIndexEvaluationFitSmartThread::Job::Job() {
 int QFFitResultsByIndexEvaluationFitSmartThread::getJobCount()
 {
     return jobCount;
+}
+
+void QFFitResultsByIndexEvaluationFitSmartThread::cleanJobs()
+{
+    for (int i=0; i<falgs.size(); i++) {
+        if (falgs[i]) delete falgs[i];
+    }
+    for (int i=0; i<ffuncs.size(); i++) {
+        if (ffuncs[i]) delete ffuncs[i];
+    }
+    ffuncs.clear();
+    falgs.clear();
+    jobs.clear();
 }
 
 void QFFitResultsByIndexEvaluationFitSmartThread::log_text(QString message)
@@ -261,7 +348,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::log_warning(QString message)
 void QFFitResultsByIndexEvaluationFitSmartThread::run()
 {
     bool jempty=false;
-    { QReadLocker locker(lock);
+    { QMutexLocker locker(lock);
         jempty=jobs.isEmpty();
     }
 
@@ -272,7 +359,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
         QFFitResultsByIndexEvaluationFitSmartThread::Job job;
         bool jobIsValid=false;
         // look into input queue, whether there are still tasks to perform
-        {   QReadLocker locker(lock);
+        {   QMutexLocker locker(lock);
             if (!jobs.isEmpty()) {
                 job=jobs.dequeue();
                 jobIsValid= ((job.record||(!job.record&&job.records.size()>0)) && job.evaluation);
@@ -292,7 +379,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                 localfitresults.append(result);
 
                 {
-                    QWriteLocker locker(lock);
+                    QMutexLocker locker(lock);
                     jobsDone++;
                 }
             }
@@ -305,7 +392,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
                 feval->doFitForMultithreadReturn(result, job.records, job.fitfuncIDs, job.run, job.userMin, job.userMax, this);
                 localfitresults<<result;
                 {
-                    QWriteLocker locker(lock);
+                    QMutexLocker locker(lock);
                     jobsDone++;
                 }
             }
@@ -315,7 +402,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
         done=!(!stopped  && (!(stopWhenEmpty&&jempty)));
         //qDebug()<<"thread, run="<<job.run<<"  done="<<done<<"  stopped="<<stopped<<"  jempty="<<jempty;
         if (writer && (cnt>50 || done)) {
-            QWriteLocker locker(lock);
+            //QMutexLocker locker(lock);
             writer->addFitResult(localfitresults);
             localfitresults.clear();
         } else if (cnt>500 || done) {
@@ -323,7 +410,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
             timer.start();
             qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done;
 
-            QWriteLocker locker(lock);
+            //QMutexLocker locker(lock);
             QFProject* project=QFPluginServices::getInstance()->getCurrentProject();
             for (int i=0; i<localfitresults.size(); i++) {
                 const QString evalID=localfitresults[i].evalID;
@@ -510,7 +597,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
 QFFitResultsByIndexEvaluationFitSmartThread_Writer::QFFitResultsByIndexEvaluationFitSmartThread_Writer(const QFProject *project, QObject *parent):
     QThread(parent)
 {
-    lock=new QReadWriteLock();
+    lock=new QMutex();
     stopped=false;
     this->project=project;
 }
@@ -524,11 +611,10 @@ void QFFitResultsByIndexEvaluationFitSmartThread_Writer::run()
 {
 
     QList<QFRawDataRecord::QFFitFitResultsStore> localfitresults;
-    int cnt=0;
     bool done=false;
     while(!done) {
         // look into input queue, whether there are still tasks to perform
-        {   QReadLocker locker(lock);
+        {   QMutexLocker locker(lock);
             if (!fitresults.isEmpty()) {
                 localfitresults<<fitresults;
                 fitresults.clear();
@@ -719,7 +805,6 @@ void QFFitResultsByIndexEvaluationFitSmartThread_Writer::run()
             }
 
 
-            cnt=0;
             qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done<<"  ... FINISHED AFTER "<<double(timer.nsecsElapsed())/1e6<<"ms";
         }
     }
@@ -750,6 +835,6 @@ void QFFitResultsByIndexEvaluationFitSmartThread_Writer::log_error(QString messa
 
 void QFFitResultsByIndexEvaluationFitSmartThread_Writer::addFitResult(const QList<QFRawDataRecord::QFFitFitResultsStore> &fitresults)
 {
-    QWriteLocker locker(lock);
+    QMutexLocker locker(lock);
     this->fitresults<<fitresults;
 }

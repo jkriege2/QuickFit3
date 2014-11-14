@@ -6,11 +6,62 @@
 #include <QStringList>
 #include "../../qfpreprocessormagic.h"
 #include <QDebug>
+#include <QMutex>
+#include <QReadWriteLock>
+#include <QThread>
 
+#include "threadtest.h"
 
 int main(int argc, char *argv[])
 {
 
+    QReadWriteLock* lock=new QReadWriteLock(QReadWriteLock::Recursive);
+    QReadLockThread* readThread=new QReadLockThread(lock, NULL);
+    qDebug()<<"thread "<<QThread::currentThread()<<": before";
+    lock->lockForRead();
+    readThread->start();
+
+    QElapsedTimer time;
+    time.start();
+    while (time.elapsed()<1000) ;
+
+    qDebug()<<"thread "<<QThread::currentThread()<<": locked read 1";
+    lock->lockForRead();
+    readThread->start();
+
+    qDebug()<<"thread "<<QThread::currentThread()<<": locked read 2";
+    lock->unlock();
+    qDebug()<<"thread "<<QThread::currentThread()<<": unlocked read 2";
+    lock->unlock();
+    qDebug()<<"thread "<<QThread::currentThread()<<": unlocked read 1";
+
+    qDebug()<<"thread "<<QThread::currentThread()<<": done";
+
+    time.start();
+    while (time.elapsed()<5000) ;
+    QWriteLockThread* writeThread=new QWriteLockThread(lock, NULL);
+    qDebug()<<"\n\n\n\nthread "<<QThread::currentThread()<<": before";
+    lock->lockForWrite();
+    writeThread->start();
+
+    time.start();
+    while (time.elapsed()<1000) ;
+
+    qDebug()<<"thread "<<QThread::currentThread()<<": locked write 1";
+    lock->lockForWrite();
+    writeThread->start();
+
+    qDebug()<<"thread "<<QThread::currentThread()<<": locked write 2";
+    lock->unlock();
+    qDebug()<<"thread "<<QThread::currentThread()<<": unlocked write 2";
+    lock->unlock();
+    qDebug()<<"thread "<<QThread::currentThread()<<": unlocked write 1";
+
+    qDebug()<<"thread "<<QThread::currentThread()<<": done";
+
+
+    time.start();
+    while (time.elapsed()<5000) ;
 
     QStringList test1, test1res;
     test1<<"123"<<"abc"<<"xyz"<<"XyZ";
@@ -37,8 +88,8 @@ int main(int argc, char *argv[])
     qDebug()<<PARAMCNT2;
 
 
-    QDir d("../../");
-    qDebug()<<qfDirListFilesRecursive(d).join("\n");
+    //QDir d("../../");
+    //qDebug()<<qfDirListFilesRecursive(d).join("\n");
 
     return 0;
 }

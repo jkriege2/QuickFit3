@@ -520,8 +520,8 @@ void SpectrumManager::Spectrum::clear()
 {
     if (accel) gsl_interp_accel_free(accel);
     if (spline) gsl_spline_free(spline);
-    if (wavelength) free(wavelength);
-    if (spectrum) free(spectrum);
+    if (wavelength) qfFree(wavelength);
+    if (spectrum) qfFree(spectrum);
     accel=NULL;
     spline=NULL;
     wavelength=NULL;
@@ -847,8 +847,8 @@ void SpectrumManager::Spectrum::internalInit(const QVector<double> &lambda, cons
     this->normalizeSpectrum=normalizeSpectrum;
     if (lambda.size()>0&&eff.size()>0) {
         N=qMin(lambda.size(), eff.size());
-        this->wavelength=(double*)realloc(this->wavelength, N*sizeof(double));
-        this->spectrum=(double*)realloc(this->spectrum, N*sizeof(double));
+        this->wavelength=(double*)qfRealloc(this->wavelength, N*sizeof(double));
+        this->spectrum=(double*)qfRealloc(this->spectrum, N*sizeof(double));
         if (accel) gsl_interp_accel_free(accel);
         if (spline) gsl_spline_free(spline);
         /*copyArray(this->wavelength, lambda.data(), N);
@@ -889,8 +889,8 @@ void SpectrumManager::Spectrum::internalInit(const QVector<double> &lambda, cons
     } else {
         if (accel) gsl_interp_accel_free(accel);
         if (spline) gsl_spline_free(spline);
-        if (this->wavelength) free(this->wavelength);
-        if (this->spectrum) free(this->spectrum);
+        if (this->wavelength) qfFree(this->wavelength);
+        if (this->spectrum) qfFree(this->spectrum);
         accel=NULL;
         spline=NULL;
         this->wavelength=NULL;

@@ -22,7 +22,7 @@
 
 
 QT       += core network
-QT += gui
+QT += gui xml
 
 DEFINES += QFLIB_LIBRARY
 CONFIG   += console
@@ -40,7 +40,10 @@ SOURCES += main.cpp \
     ../../datatools.cpp \
     ../../csvtools.cpp \
     ../../binarydatatools.cpp \
-    ../../qfdlgcsvparameters.cpp
+    ../../qfdlgcsvparameters.cpp \
+    ../../qfhtmlhelptools.cpp \
+    ../../qfpluginservices.cpp \
+    threadtest.cpp
 
 HEADERS += \
     ../../qftools.h \
@@ -51,7 +54,9 @@ HEADERS += \
     ../../datatools.h \
     ../../csvtools.h \
     ../../binarydatatools.h \
-    ../../qfdlgcsvparameters.h
+    ../../qfdlgcsvparameters.h \
+    ../../qfhtmlhelptools.h \
+    threadtest.h
 
 FORMS += \
     ../../qfdlg_csvparameters.ui

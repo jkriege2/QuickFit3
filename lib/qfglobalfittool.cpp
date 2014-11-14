@@ -50,7 +50,7 @@ void QFFitMultiQFFitFunctionFunctor::addTerm(QFFitFunction *model, const double 
     //qDebug()<<"   dataY="<<arrayToString(dataY, M);
 
     sfd.f=new QFFitAlgorithm::FitQFFitFunctionFunctor(model, currentParams, fixParams, dataX, dataY, dataWeight, M);
-    sfd.mapToLocal=(int*)calloc(sfd.f->get_paramcount(), sizeof(int));
+    sfd.mapToLocal=(int*)qfCalloc(sfd.f->get_paramcount(), sizeof(int));
     sfd.modelParams=duplicateArray(currentParams, model->paramCount());
     sfd.paramsMin=NULL;
     sfd.paramsMax=NULL;
@@ -68,14 +68,14 @@ void QFFitMultiQFFitFunctionFunctor::evaluate(double *evalout, const double *par
         double* eout=&(evalout[outCnt]);
         QFFitAlgorithm::FitQFFitFunctionFunctor* f=subFunctors[i].f;
         int pcount=f->get_paramcount();
-        double* pin=(double*)malloc(pcount*sizeof(double));
+        double* pin=(double*)qfMalloc(pcount*sizeof(double));
 
         for (int p=0; p<pcount; p++) {
             pin[p]=params[subFunctors[i].mapToLocal[p]];
         }
 
         f->evaluate(eout, pin);
-        free(pin);
+        qfFree(pin);
 
         outCnt+=subFunctors[i].f->get_evalout();
     }
@@ -230,11 +230,11 @@ void QFFitMultiQFFitFunctionFunctor::clear()
     for (int i=0; i<subFunctors.size(); i++) {
         if (subFunctors[i].f) delete subFunctors[i].f;
         //subFunctors[i].f=NULL;
-        if (subFunctors[i].mapToLocal) free(subFunctors[i].mapToLocal);
-        if (subFunctors[i].paramsMin) free(subFunctors[i].paramsMin);
-        if (subFunctors[i].paramsMax) free(subFunctors[i].paramsMax);
-        if (subFunctors[i].paramsFix) free(subFunctors[i].paramsFix);
-        if (subFunctors[i].modelParams) free(subFunctors[i].modelParams);
+        if (subFunctors[i].mapToLocal) qfFree(subFunctors[i].mapToLocal);
+        if (subFunctors[i].paramsMin) qfFree(subFunctors[i].paramsMin);
+        if (subFunctors[i].paramsMax) qfFree(subFunctors[i].paramsMax);
+        if (subFunctors[i].paramsFix) qfFree(subFunctors[i].paramsFix);
+        if (subFunctors[i].modelParams) qfFree(subFunctors[i].modelParams);
     }
     subFunctors.clear();
     m_paramCount=0;
@@ -424,11 +424,11 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
 {
     QFFitAlgorithm::FitResult res;
     int ppcount=functor->get_paramcount();
-    double* params=(double*)calloc(ppcount,sizeof(double));
-    double* errors=(double*)calloc(ppcount,sizeof(double));
-    double* pmin=(double*)calloc(ppcount,sizeof(double));
-    double* pmax=(double*)calloc(ppcount,sizeof(double));
-    bool* fix=(bool*)calloc(ppcount,sizeof(bool));
+    double* params=(double*)qfCalloc(ppcount,sizeof(double));
+    double* errors=(double*)qfCalloc(ppcount,sizeof(double));
+    double* pmin=(double*)qfCalloc(ppcount,sizeof(double));
+    double* pmax=(double*)qfCalloc(ppcount,sizeof(double));
+    bool* fix=(bool*)qfCalloc(ppcount,sizeof(bool));
     for (int i=0; i<ppcount; i++) fix[i]=true;
     bool minmax=true;
 
@@ -527,11 +527,11 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
 #endif
         }
     }
-    free(params);
-    free(errors);
-    free(pmin);
-    free(pmax);
-    free(fix);
+    qfFree(params);
+    qfFree(errors);
+    qfFree(pmin);
+    qfFree(pmax);
+    qfFree(fix);
 #ifdef DEBUG_GLOBALFIT
     qDebug()<<"return";
 #endif
@@ -541,7 +541,7 @@ QFFitAlgorithm::FitResult QFGlobalFitTool::fitGlobal(const QList<double *> &para
 void QFGlobalFitTool::evalueCHi2Landscape(double *chi2Landscape, int paramXFile, int paramXID, const QVector<double> &paramXValues, int paramYFile, int paramYID, const QVector<double> &paramYValues, const QList<double *>& initialParams)
 {
     int ppcount=functor->get_paramcount();
-    double* params=(double*)calloc(ppcount,sizeof(double));
+    double* params=(double*)qfCalloc(ppcount,sizeof(double));
 
     // fill parameter vector
     for (int i=0; i<functor->getSubFunctorCount(); i++) {
@@ -559,7 +559,7 @@ void QFGlobalFitTool::evalueCHi2Landscape(double *chi2Landscape, int paramXFile,
     int idxX=functor->mapSubFunctorToGlobal(paramXFile, paramXID);
     int idxY=functor->mapSubFunctorToGlobal(paramYFile, paramYID);
     int idx=0;
-    double* d=(double*)calloc(functor->get_evalout(), sizeof(double));
+    double* d=(double*)qfCalloc(functor->get_evalout(), sizeof(double));
 
     for (int y=0; y<paramYValues.size(); y++) {
         for (int x=0; x<paramXValues.size(); x++) {
@@ -584,7 +584,7 @@ void QFGlobalFitTool::evalueCHi2Landscape(double *chi2Landscape, int paramXFile,
         }
     }
 
-    free(d);
+    qfFree(d);
 }
 
 QFFitMultiQFFitFunctionFunctor *QFGlobalFitTool::getFunctor() const

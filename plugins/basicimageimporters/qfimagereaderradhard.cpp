@@ -23,6 +23,7 @@ Copyright (c) 2008-2014 Jan Buchholz & Jan W. Krieger, German Cancer Research Ce
 
 #include <QObject>
 #include <QtGlobal>
+#include "qftools.h"
 
 QFImageReaderRadhard::QFImageReaderRadhard():
     QFImporterImageSeries()
@@ -105,7 +106,7 @@ bool QFImageReaderRadhard::open(QString filename) {
       result=false;
   }
   if (result) {
-      buffer = (unsigned char*)malloc(frameSize*sizeof(unsigned char)); //new unsigned char [frameSize];
+      buffer = (unsigned char*)qfMalloc(frameSize*sizeof(unsigned char)); //new unsigned char [frameSize];
   }
   nextFrame();
   return result;
@@ -113,7 +114,7 @@ bool QFImageReaderRadhard::open(QString filename) {
 
 void QFImageReaderRadhard::close() {
   if (!file) return ;
-  if (buffer) free(buffer);
+  if (buffer) qfFree(buffer);
   buffer=NULL;
   file->close();
   delete file;

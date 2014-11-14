@@ -37,7 +37,7 @@ QMutex* QFRDRImagingFCSCorrelationJobThread::mutexFilename=NULL;
 QFRDRImagingFCSCorrelationJobThread::QFRDRImagingFCSCorrelationJobThread(QFPluginServices *services, QObject *parent) :
     QThread(parent)
 {
-    if (!mutexFilename) mutexFilename=new QMutex();
+    if (!mutexFilename) mutexFilename=new QMutex(QMutex::Recursive);
     outLocale=QLocale::c();
     outLocale.setNumberOptions(QLocale::OmitGroupSeparator);
     m_status=0;

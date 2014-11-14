@@ -33,7 +33,7 @@ class QFFitResultsByIndexEvaluationFitToolsBase {
         virtual ~QFFitResultsByIndexEvaluationFitToolsBase();
 
         /** \brief calculates fit statistics for the given fit function and dataset. */
-        virtual QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
+        virtual QFFitStatistics calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* errors, const bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record=NULL, int run=-1);
 
     protected:
 
@@ -63,8 +63,10 @@ class QFFitResultsByIndexEvaluationFitTools: public QFFitResultsByIndexEvaluatio
             If both are -1, the full range is used
 
             The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
+
+            \note THIS FUNCTION NEEDS TO BE THREAD SAFE!!!
           */
-        virtual void doFitForMultithread(QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const =0;
+        virtual void doFitForMultithread(QFFitAlgorithm* falg, QFFitFunction* ffunc, QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const =0;
 
 
         /*! \brief perform a fit for the given \a record and \a run
@@ -73,9 +75,17 @@ class QFFitResultsByIndexEvaluationFitTools: public QFFitResultsByIndexEvaluatio
             If both are -1, the full range is used
 
             The object \a dlgFitProgress (if supplied) is used to report the progress and to check whether the user clicked "Cancel".
+
+            \note THIS FUNCTION NEEDS TO BE THREAD SAFE!!!
           */
         virtual void doFitForMultithreadReturn(QFRawDataRecord::QFFitFitResultsStore& result, const QFRawDataRecord* record, int run, int defaultMinDatarange=-1, int defaultMaxDatarange=-1, QFPluginLogService *logservice=NULL) const =0;
 
+
+        /*! \brief This function should return a usable QFFitAlgoruthm and QFFitFunction as freshly created objects for the given record and run
+         *
+         * \note This does not have to be thread safe!!!
+         */
+        virtual void createFitFunctionAndAlgorithm(QFFitAlgorithm*& falg, QFFitFunction*& ffunc, const QFRawDataRecord* record, int run)=0;
 
 };
 

@@ -55,8 +55,8 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
     double opts[LM_OPTS_SZ];
     double info[LM_INFO_SZ];
 
-    double* pparamsMin=(double*)malloc(paramCount*sizeof(double));
-    double* pparamsMax=(double*)malloc(paramCount*sizeof(double));
+    double* pparamsMin=(double*)qfMalloc(paramCount*sizeof(double));
+    double* pparamsMax=(double*)qfMalloc(paramCount*sizeof(double));
     memcpy(pparamsMin, paramsMin, paramCount*sizeof(double));
     memcpy(pparamsMax, paramsMax, paramCount*sizeof(double));
 
@@ -71,7 +71,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
 
     // allocate memory for covariance matrix
     // the matrix will be returned by levmar calls, if memory is provided!
-    double* covar=(double*)calloc(paramCount*paramCount, sizeof(double));
+    double* covar=(double*)qfCalloc(paramCount*paramCount, sizeof(double));
 
     // copy initial parameters to output parameters
     for (int i=0; i<paramCount; i++) {
@@ -118,8 +118,8 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
         }
     }
 
-    free(pparamsMin);
-    free(pparamsMax);
+    qfFree(pparamsMin);
+    qfFree(pparamsMax);
 
     result.addNumber("initial_error_sum", info[0]);
     result.addNumber("error_sum", info[1]);
@@ -168,7 +168,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithmLevmar::intFit(double* paramsOut, double
         //qDebug()<<"  o.param "<<i<<":   ("<<paramsOut[i]<<" +/- "<<paramErrorsOut[i]<<")";
     }
 
-    free(covar);
+    qfFree(covar);
 
     result.fitOK=(ret!=LM_ERROR);
     return result;

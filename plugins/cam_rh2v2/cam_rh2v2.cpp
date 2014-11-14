@@ -46,7 +46,7 @@ QFExtensionCameraRh2v2::QFExtensionCameraRh2v2(QObject* parent):
     retries =10;
     retryDelay=1000;
     connected=false;
-  cameraSetting=(QFExtensionCameraRh2v2::cameraSettings*)calloc(2,sizeof(struct cameraSettings));
+  cameraSetting=(QFExtensionCameraRh2v2::cameraSettings*)qfCalloc(2,sizeof(struct cameraSettings));
 
   cameraSetting[0].prefix=new QString("Radhard2");
   cameraSetting[0].raw.settings = new QSettings(QString(":/cam_rh2v2.raw.ini"), QSettings::IniFormat );/** read ini file */
@@ -107,7 +107,7 @@ QFExtensionCameraRh2v2::~QFExtensionCameraRh2v2() {
     delete cameraSetting[0].params;
     delete cameraSetting[1].prefix;
     delete cameraSetting[1].params;
-    free(cameraSetting);
+    qfFree(cameraSetting);
 }
 
 

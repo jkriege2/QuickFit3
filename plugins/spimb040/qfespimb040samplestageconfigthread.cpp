@@ -41,7 +41,7 @@ QFESPIMB040SampleStageConfigThread::QFESPIMB040SampleStageConfigThread(QFESPIMB0
     connX=false;
     connY=false;
     connZ=false;
-    InstructionMutex=new QMutex();
+    InstructionMutex=new QMutex(QMutex::Recursive);
 }
 
 QFESPIMB040SampleStageConfigThread::~QFESPIMB040SampleStageConfigThread() {

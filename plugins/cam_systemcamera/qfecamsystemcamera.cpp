@@ -282,7 +282,7 @@ bool QFECamSystemcamera::acquireOnCamera(unsigned int camera, uint32_t* data, ui
         *timestamp=(uint64_t)round(timer[camera].elapsed());;
     }
 
-    uint8_t* img=(uint8_t*)calloc(getCameraImageWidth(camera)*getCameraImageHeight(camera)*3, sizeof(uint8_t));
+    uint8_t* img=(uint8_t*)qfCalloc(getCameraImageWidth(camera)*getCameraImageHeight(camera)*3, sizeof(uint8_t));
     int retry=0;
     bool ok=false;
     while (retry<40 && !ok) {
@@ -304,7 +304,7 @@ bool QFECamSystemcamera::acquireOnCamera(unsigned int camera, uint32_t* data, ui
     }
 
     if (retry>5) log_warning(tr("retries for frame: %1\n").arg(retry));
-    free(img);
+    qfFree(img);
     return true;
 }
 

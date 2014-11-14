@@ -47,6 +47,7 @@ class QFEvaluationItemFactory;
 class QFRawDataRecordFactory;
 class QFPluginServices;
 class QFListProgressDialog;
+class QFProjectPrivate;
 
 
 typedef QMap<QString, QVariant> qfp_param_type;
@@ -133,6 +134,8 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         QSet<int> subsetEval;
         QStringList rdrgroups;
 
+        QFProjectPrivate* p;
+
     public:
         /** Default constructor */
         QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent=NULL);
@@ -217,7 +220,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \brief return the i-th raw data record, or \c NULL */
         QFRawDataRecord* getRawDataByNum(int i) const;
         /** \brief returns all RDR records in the given folder */
-        QList<QFRawDataRecord*> getRDRsInFolder(const QString& folder, bool alsoSubfolders=false);
+        QList<QFRawDataRecord*> getRDRsInFolder(const QString& folder, bool alsoSubfolders=false) const;
 
 
         /** \brief return the next sibling rawdata record, or NULL if none */

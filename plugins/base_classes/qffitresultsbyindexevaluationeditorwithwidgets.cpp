@@ -56,6 +56,7 @@ QFFitResultsByIndexEvaluationEditorWithWidgets::QFFitResultsByIndexEvaluationEdi
 
     createWidgets(hasMultiThreaded, multiThreadPriority);
 
+
 }
 
 
@@ -770,8 +771,8 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::updateParameterValues(QFRaw
         }
     }
 
-    free(fullParams);
-    free(errors);
+    qfFree(fullParams);
+    qfFree(errors);
 
     if (eval->hasFit()) labFitParameters->setText(tr("<b><u>Local</u> Fit Parameters:</b>"));
     else labFitParameters->setText(tr("<b><u>Global</u> Fit Parameters:</b>"));
@@ -1560,6 +1561,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitEverythingThreaded() {
     QApplication::processEvents();
     QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
     QList<QFFitResultsByIndexEvaluationFitThread*> threads;
+
     int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
     if (ProgramOptions::getConfigValue(eval->getType()+"/overrule_threads", false).toBool()) {
         threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
@@ -1642,6 +1644,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitEverythingThreaded() {
 
     // free memory
     for (int i=0; i<threadcount; i++) {
+        threads[i]->cleanJobs();
         delete threads[i];
     }
 
@@ -1773,6 +1776,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllRunsThreaded() {
 
     // free memory
     for (int i=0; i<threadcount; i++) {
+        threads[i]->cleanJobs();
         delete threads[i];
     }
 
@@ -1900,6 +1904,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllFilesThreaded()
 
     // free memory
     for (int i=0; i<threadcount; i++) {
+        threads[i]->cleanJobs();
         delete threads[i];
     }
 

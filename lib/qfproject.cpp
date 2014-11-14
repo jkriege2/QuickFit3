@@ -41,9 +41,37 @@
 #undef DEBUG_TIMING
 #define PROJECT_COPY_CHUNKSIZE 1024*1024*32
 
+
+
+
+
+#include <QMutex>
+#include <QReadLocker>
+#include <QMutexLocker>
+#include <QWriteLocker>
+#include <QReadWriteLock>
+
+typedef QMutexLocker QFProjectReadLocker;
+typedef QMutexLocker QFProjectWriteLocker;
+
+class QFProjectPrivate {
+    public:
+        explicit QFProjectPrivate(QFProject* dd) {
+            d=dd;
+            lock=new QMutex(QMutex::Recursive);
+        }
+        ~QFProjectPrivate() {
+            delete lock;
+        }
+
+        QFProject* d;
+        mutable QMutex* lock;
+};
+
 QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent):
     QObject(parent), QFProperties()
 {
+    p=new QFProjectPrivate(this);
     m_sortOrder=QFProject::sortByID;
     dataChange=false;
     propertiesChange=false;
@@ -90,6 +118,7 @@ QFProject::~QFProject()
 
 void QFProject::setSignalsEnabled(bool enabled, bool emitChange)
 {
+    QFProjectWriteLocker locker(p->lock);
     m_signalsEnabled=enabled;
     if (emitChange) {
         emit structureChanged();
@@ -99,6 +128,7 @@ void QFProject::setSignalsEnabled(bool enabled, bool emitChange)
 }
 
 QFProjectRawDataModel* QFProject::getRawDataModel() {
+    QFProjectWriteLocker locker(p->lock);
     if (rdModel==NULL) {
         rdModel=new QFProjectRawDataModel(this);
         rdModel->setParent(this);
@@ -107,6 +137,7 @@ QFProjectRawDataModel* QFProject::getRawDataModel() {
 };
 
 QFProjectTreeModel* QFProject::getTreeModel() {
+    QFProjectWriteLocker locker(p->lock);
     if (treeModel==NULL) {
         treeModel=new QFProjectTreeModel(this);
         treeModel->init(this);
@@ -115,6 +146,7 @@ QFProjectTreeModel* QFProject::getTreeModel() {
 };
 
 QFRawDataRecord* QFProject::getNextRawData( QFRawDataRecord *current) const {
+    QFProjectReadLocker locker(p->lock);
     if ( (!current) || (rawData.size()<=0) || rawDataOrder.isEmpty() ) return NULL;
     /*int i=rawData.values().indexOf(current);
     if ((i+1>0) && (i+1<rawData.size())) return rawData.values().at(i+1);
@@ -128,6 +160,7 @@ QFRawDataRecord* QFProject::getNextRawData( QFRawDataRecord *current) const {
 }
 
 QFRawDataRecord* QFProject::getPreviousRawData( QFRawDataRecord* current) const {
+    QFProjectReadLocker locker(p->lock);
     if ( (!current) || (rawData.size()<=0) || rawDataOrder.isEmpty() ) return NULL;
     /*int i=rawData.values().indexOf(current);
     if ((i-1>=0) && (i-1<rawData.size()) ) return rawData.values().at(i-1);
@@ -142,6 +175,7 @@ QFRawDataRecord* QFProject::getPreviousRawData( QFRawDataRecord* current) const 
 }
 
 QFRawDataRecord* QFProject::getNextRawDataOfSameType( QFRawDataRecord* current) const {
+    QFProjectReadLocker locker(p->lock);
     /*if (!current || rawData.size()<=0) return NULL;
     int i=rawData.values().indexOf(current);
     QString t=current->getType();
@@ -165,6 +199,7 @@ QFRawDataRecord* QFProject::getNextRawDataOfSameType( QFRawDataRecord* current) 
 }
 
 QFRawDataRecord* QFProject::getPreviousRawDataOfSameType( QFRawDataRecord* current) const {
+    QFProjectReadLocker locker(p->lock);
     /*if (!current || rawData.size()<=0) return NULL;
     int i=rawData.values().indexOf(current);
     QString t=current->getType();
@@ -188,6 +223,7 @@ QFRawDataRecord* QFProject::getPreviousRawDataOfSameType( QFRawDataRecord* curre
 }
 
 QFEvaluationItem* QFProject::getNextEvaluation( QFEvaluationItem* current) const {
+    QFProjectReadLocker locker(p->lock);
     /*if (!current || evaluations.size()<=0) return NULL;
     int i=evaluations.values().indexOf(current);
     if (i+1>=0 && i+1<evaluations.size()) return evaluations.values().at(i+1);
@@ -203,6 +239,7 @@ QFEvaluationItem* QFProject::getNextEvaluation( QFEvaluationItem* current) const
 }
 
 QFEvaluationItem* QFProject::getPreviousEvaluation( QFEvaluationItem* current) const {
+    QFProjectReadLocker locker(p->lock);
     /*if (!current || evaluations.size()<=0) return NULL;
     int i=evaluations.values().indexOf(current);
     if (i-1>=0 && i-1<evaluations.size()) return evaluations.values().at(i-1);
@@ -217,6 +254,7 @@ QFEvaluationItem* QFProject::getPreviousEvaluation( QFEvaluationItem* current) c
 }
 
 QFEvaluationItem* QFProject::getNextEvaluationOfSameType( QFEvaluationItem* current) const {
+    QFProjectReadLocker locker(p->lock);
     /*if (!current || evaluations.size()<=0) return NULL;
     int i=evaluations.values().indexOf(current);
     QString t=current->getType();
@@ -240,6 +278,7 @@ QFEvaluationItem* QFProject::getNextEvaluationOfSameType( QFEvaluationItem* curr
 }
 
 QFEvaluationItem* QFProject::getPreviousEvaluationOfSameType( QFEvaluationItem *current) const {
+    QFProjectReadLocker locker(p->lock);
     /*if (!current || evaluations.size()<=0) return NULL;
     int i=evaluations.values().indexOf(current);
     QString t=current->getType();
@@ -276,6 +315,7 @@ QFEvaluationItem* QFProject::getPreviousEvaluationOfSameType( QFEvaluationItem *
 
 
 const QFRawDataRecord* QFProject::getNextRawData(const QFRawDataRecord *current) const {
+    QFProjectReadLocker locker(p->lock);
     if ( (!current) || (rawData.size()<=0) || rawDataOrder.isEmpty() ) return NULL;
     /*int i=rawData.values().indexOf(current);
     if ((i+1>0) && (i+1<rawData.size())) return rawData.values().at(i+1);
@@ -289,6 +329,7 @@ const QFRawDataRecord* QFProject::getNextRawData(const QFRawDataRecord *current)
 }
 
 const QFRawDataRecord* QFProject::getPreviousRawData(const QFRawDataRecord* current) const {
+    QFProjectReadLocker locker(p->lock);
     if ( (!current) || (rawData.size()<=0) || rawDataOrder.isEmpty() ) return NULL;
     /*int i=rawData.values().indexOf(current);
     if ((i-1>=0) && (i-1<rawData.size()) ) return rawData.values().at(i-1);
@@ -303,6 +344,7 @@ const QFRawDataRecord* QFProject::getPreviousRawData(const QFRawDataRecord* curr
 }
 
 const QFRawDataRecord* QFProject::getNextRawDataOfSameType(const QFRawDataRecord* current) const {
+    QFProjectReadLocker locker(p->lock);
     /*if (!current || rawData.size()<=0) return NULL;
     int i=rawData.values().indexOf(current);
     QString t=current->getType();
@@ -326,6 +368,7 @@ const QFRawDataRecord* QFProject::getNextRawDataOfSameType(const QFRawDataRecord
 }
 
 const QFRawDataRecord* QFProject::getPreviousRawDataOfSameType(const QFRawDataRecord* current) const {
+    QFProjectReadLocker locker(p->lock);
     /*if (!current || rawData.size()<=0) return NULL;
     int i=rawData.values().indexOf(current);
     QString t=current->getType();
@@ -349,6 +392,7 @@ const QFRawDataRecord* QFProject::getPreviousRawDataOfSameType(const QFRawDataRe
 }
 
 const QFEvaluationItem* QFProject::getNextEvaluation(const QFEvaluationItem* current)  const{
+    QFProjectReadLocker locker(p->lock);
     /*if (!current || evaluations.size()<=0) return NULL;
     int i=evaluations.values().indexOf(current);
     if (i+1>=0 && i+1<evaluations.size()) return evaluations.values().at(i+1);
@@ -364,6 +408,7 @@ const QFEvaluationItem* QFProject::getNextEvaluation(const QFEvaluationItem* cur
 }
 
 const QFEvaluationItem* QFProject::getPreviousEvaluation(const QFEvaluationItem* current) const {
+    QFProjectReadLocker locker(p->lock);
     /*if (!current || evaluations.size()<=0) return NULL;
     int i=evaluations.values().indexOf(current);
     if (i-1>=0 && i-1<evaluations.size()) return evaluations.values().at(i-1);
@@ -378,6 +423,7 @@ const QFEvaluationItem* QFProject::getPreviousEvaluation(const QFEvaluationItem*
 }
 
 const QFEvaluationItem* QFProject::getNextEvaluationOfSameType(const QFEvaluationItem* current) const {
+    QFProjectReadLocker locker(p->lock);
     /*if (!current || evaluations.size()<=0) return NULL;
     int i=evaluations.values().indexOf(current);
     QString t=current->getType();
@@ -401,6 +447,7 @@ const QFEvaluationItem* QFProject::getNextEvaluationOfSameType(const QFEvaluatio
 }
 
 const QFEvaluationItem* QFProject::getPreviousEvaluationOfSameType(const QFEvaluationItem *current) const {
+    QFProjectReadLocker locker(p->lock);
     /*if (!current || evaluations.size()<=0) return NULL;
     int i=evaluations.values().indexOf(current);
     QString t=current->getType();
@@ -443,11 +490,13 @@ const QFEvaluationItem* QFProject::getPreviousEvaluationOfSameType(const QFEvalu
 
 
 int QFProject::getNewID() {
+    QFProjectWriteLocker locker(p->lock);
     highestID++;
     return highestID;
 }
 
 bool QFProject::registerRawDataRecord(QFRawDataRecord* rec) {
+    QFProjectWriteLocker locker(p->lock);
     if (!rec) return false;
     int newID=rec->getID();
     if (rawData.contains(newID)) return false;
@@ -467,6 +516,7 @@ bool QFProject::registerRawDataRecord(QFRawDataRecord* rec) {
 }
 
 bool QFProject::registerEvaluation(QFEvaluationItem* rec) {
+    QFProjectWriteLocker locker(p->lock);
     if (!rec) return false;
     int newID=rec->getID();
     if (evaluations.contains(newID)) return false;
@@ -483,6 +533,7 @@ bool QFProject::registerEvaluation(QFEvaluationItem* rec) {
 }
 
 void QFProject::deleteRawData(int ID) {
+    QFProjectWriteLocker locker(p->lock);
     if (rawDataIDExists(ID)) {
         QFRawDataRecord* rec=rawData[ID];
         emit recordAboutToBeDeleted(rec);
@@ -496,6 +547,7 @@ void QFProject::deleteRawData(int ID) {
 }
 
 void QFProject::deleteEvaluation(int ID) {
+    QFProjectWriteLocker locker(p->lock);
     if (evaluationIDExists(ID)) {
         QFEvaluationItem* rec=evaluations[ID];
         emit evaluationAboutToBeDeleted(rec);
@@ -510,6 +562,7 @@ void QFProject::deleteEvaluation(int ID) {
 
 void QFProject::duplicateRawData(int ID)
 {
+    QFProjectWriteLocker locker(p->lock);
     if (rawDataIDExists(ID)) {
         QFRawDataRecord* rec=rawData[ID];
         QString xml;
@@ -552,6 +605,7 @@ void QFProject::duplicateRawData(int ID)
 
 void QFProject::duplicateEvaluation(int ID)
 {
+    QFProjectWriteLocker locker(p->lock);
     if (evaluationIDExists(ID)) {
         QFEvaluationItem* rec=evaluations[ID];
         QString xml;
@@ -817,6 +871,7 @@ void QFProject::internalWriteXML(QIODevice *file, bool resetDataChanged, bool na
 }
 
 void QFProject::writeXML(const QString& file, bool resetDataChanged) {
+    QFProjectReadLocker locker(p->lock);
 
     if (file.toLower().contains(".qfpz") || file.toLower().contains(".qfp.gz")) {
         QuaGzipFile gzf(file);
@@ -866,7 +921,7 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
     }
 }
 
-QString QFProject_QuaZIPError(int error) {
+static QString QFProject_QuaZIPError(int error) {
     if (error==UNZ_OK) return  QObject::tr("NO ERROR");
     if (error==UNZ_END_OF_LIST_OF_FILE) return  QObject::tr("UNZ_END_OF_LIST_OF_FILE");
     if (error==UNZ_ERRNO) return  QObject::tr("UNZ_ERRNO");
@@ -878,7 +933,7 @@ QString QFProject_QuaZIPError(int error) {
     return QObject::tr("ERROR No. %1").arg(error);
 }
 
-bool QFProject_compressFile(QuaZip* zip, QString fileName, QString fileDest, QString& error, QFProgressMinorProgress* pdlg) {
+static bool QFProject_compressFile(QuaZip* zip, QString fileName, QString fileDest, QString& error, QFProgressMinorProgress* pdlg) {
     error="";
     QFile inFile;
     inFile.setFileName(fileName);
@@ -1344,6 +1399,7 @@ QFRawDataRecord* QFProject::addRawData(const QString& type, const QString& name,
 
 QFRawDataRecord *QFProject::addRawData(const QString &type, const QString &name, const QString &role, const QStringList &inputFiles, const qfp_param_type &initParams, const QStringList &initParamsReadonly, const QStringList &inputFilesTypes, const QStringList &inputFilesDescriptions)
 {
+    QFProjectWriteLocker locker(p->lock);
     QString t=type.toLower();
     QFRawDataRecord* rde=NULL;
     rde=getRawDataRecordFactory()->createRecord(type, this);
@@ -1364,6 +1420,7 @@ QFRawDataRecord *QFProject::addRawData(const QString &type, const QString &name,
 }
 
 QFEvaluationItem* QFProject::addEvaluation(const QString &type, const QString &name) {
+    QFProjectWriteLocker locker(p->lock);
     QString t=type.toLower();
     QFEvaluationItem* rde=NULL;
     rde=getEvaluationItemFactory()->createRecord(type, services, this);
@@ -1380,6 +1437,7 @@ QFEvaluationItem* QFProject::addEvaluation(const QString &type, const QString &n
 
 
 QStringList QFProject::getAllPropertyNames(bool visible_only) {
+    QFProjectReadLocker locker(p->lock);
     QStringList sl;
     for (int i=0; i<getRawDataCount(); i++) {
         if (!visible_only) {
@@ -1395,6 +1453,7 @@ QStringList QFProject::getAllPropertyNames(bool visible_only) {
 
 QList<const QFRawDataRecord *> QFProject::getRawDataListConst() const
 {
+    QFProjectReadLocker locker(p->lock);
     QList<const QFRawDataRecord *> res;
     for (int i=0; i<rawData.size(); i++) res<<rawData[i];
     return res;
@@ -1402,6 +1461,7 @@ QList<const QFRawDataRecord *> QFProject::getRawDataListConst() const
 
 QList<const QFEvaluationItem *> QFProject::getEvaluationListConst() const
 {
+    QFProjectReadLocker locker(p->lock);
     QList<const QFEvaluationItem *> res;
     for (int i=0; i<evaluations.size(); i++) res<<evaluations[i];
     return res;
@@ -1419,6 +1479,7 @@ bool QFProject_StringPairCaseInsensitiveCompare(const QPair<QString, T1> &s1, co
 }
 
 QList<QPair<QString, QString> > QFProject::rdrCalcMatchingResultsNamesAndLabels(const QString& evalFilter, const QString& groupFilter) const {
+    QFProjectReadLocker locker(p->lock);
     QList<QPair<QString, QString> > list, listp;
     QStringList l;
     QRegExp rx(evalFilter);
@@ -1465,6 +1526,7 @@ QList<QPair<QString, QString> > QFProject::rdrCalcMatchingResultsNamesAndLabels(
 }
 
 QStringList QFProject::rdrCalcMatchingResultsNames(const QString& evalFilter, const QString& groupFilter) const {
+    QFProjectReadLocker locker(p->lock);
     QStringList l, lp;
     QRegExp rx(evalFilter);
     rx.setPatternSyntax(QRegExp::Wildcard);
@@ -1498,236 +1560,11 @@ QStringList QFProject::rdrCalcMatchingResultsNames(const QString& evalFilter, co
 }
 
 bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, const QString &filename, bool vectorsToAvg, QChar separator, QChar decimalPoint, QChar stringDelimiter, const QStringList& filteredFitParamIDs, const QList<QPair<QPointer<QFRawDataRecord>, QString> >& filtereRecords) {
-    /*QString sdel=stringDelimiter;
-    QString dp=decimalPoint;
-    QList<QPair<QString,QString> > colnames=rdrCalcMatchingResultsNamesAndLabels(evalFilter);
-    QList<QPair<QPointer<QFRawDataRecord>, QString> > records=rdrCalcMatchingResults(evalFilter);
 
-    if (filteredFitParamIDs.size()>0) {
-        for (int j=colnames.size()-1; j>=0; j--) {
-            bool found=false;
-            for (int i=0; i<filteredFitParamIDs.size(); i++) {
-                if (filteredFitParamIDs[i]==colnames[j].second) {
-                    found=true;
-                    break;
-                }
-            }
-            //qDebug()<<"check colname"<<colnames[j].second<<found;
-            if (!found) colnames.removeAt(j);
-        }
-    }
-
-    if (filtereRecords.size()>0) {
-        for (int j=records.size()-1; j>=0; j--) {
-            bool found=false;
-            for (int i=0; i<filtereRecords.size(); i++) {
-                if (filtereRecords[i]==records[j] && records[j].first) {
-                    found=true;
-                    break;
-                }
-            }
-            //qDebug()<<"check record"<<records[j].second<<found;
-            if (!found) records.removeAt(j);
-        }
-    }
-
-    QStringList header, data;
-    header.append(sdel+tr("file")+sdel);
-    header.append("");
-    QLocale loc=QLocale::c();
-    loc.setNumberOptions(QLocale::OmitGroupSeparator);
-    for (int i=0; i<records.size(); i++) data.append(sdel+records[i].first->getName()+": "+records[i].second+sdel);
-
-
-    QMap<int, int> subcolumns;
-    for (int c=0; c<colnames.size(); c++) {
-        subcolumns[c]=1;
-        if (!vectorsToAvg) {
-            for (int r=0; r<records.size(); r++) {
-                QFRawDataRecord* record=records[r].first;
-                QString evalname=records[r].second;
-                if (record) {
-                    if (record->resultsExists(evalname, colnames[c].second)) {
-                        switch(record->resultsGet(evalname, colnames[c].second).type) {
-                            case QFRawDataRecord::qfrdreNumberError:
-                            case QFRawDataRecord::qfrdreNumber:
-                            case QFRawDataRecord::qfrdreInteger:
-                            case QFRawDataRecord::qfrdreBoolean:
-                            case QFRawDataRecord::qfrdreString: subcolumns[c]=qMax(subcolumns[c], 1); break;
-                            case QFRawDataRecord::qfrdreNumberErrorVector:
-                            case QFRawDataRecord::qfrdreNumberErrorMatrix:
-                            case QFRawDataRecord::qfrdreNumberVector:
-                            case QFRawDataRecord::qfrdreNumberMatrix:  subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).dvec.size()); break;
-                            case QFRawDataRecord::qfrdreIntegerVector:
-                            case QFRawDataRecord::qfrdreIntegerMatrix:  subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).ivec.size()); break;
-                            case QFRawDataRecord::qfrdreBooleanVector:
-                            case QFRawDataRecord::qfrdreBooleanMatrix: subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).bvec.size()); break;
-                            case QFRawDataRecord::qfrdreStringVector:
-                            case QFRawDataRecord::qfrdreStringMatrix: subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).svec.size()); break;
-                            default: subcolumns[c]=qMax(subcolumns[c], 1); break;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-
-    for (int c=0; c<colnames.size(); c++) {
-        header[0] += separator+sdel+colnames[c].first+sdel;
-        header[1] += separator+sdel+tr("value")+sdel;
-        bool hasError=false;
-        int hcols;
-        for (int r=0; r<records.size(); r++) {
-            QFRawDataRecord* record=records[r].first;
-            QString evalname=records[r].second;
-            QString dat="";
-            int colcnt=0;
-            if (record) {
-                if (record->resultsExists(evalname, colnames[c].second)) {
-                    switch(record->resultsGet(evalname, colnames[c].second).type) {
-                        case QFRawDataRecord::qfrdreNumber: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); break;
-                        case QFRawDataRecord::qfrdreNumberVector:
-                        case QFRawDataRecord::qfrdreNumberMatrix: {
-                            QVector<double> d=record->resultsGetAsDoubleList(evalname, colnames[c].second);
-                            if (!vectorsToAvg) {
-                                for (int it=0; it<d.size(); it++) {
-                                    if (it>0) dat+=separator;
-                                    dat+=doubleToQString(d[it], 15, 'g', decimalPoint);
-                                }
-                                colcnt=d.size();
-                            } else {
-                                dat+=doubleToQString(qfstatisticsAverage(d), 15, 'g', decimalPoint);
-                            }
-                        } break;
-                        case QFRawDataRecord::qfrdreNumberErrorVector:
-                        case QFRawDataRecord::qfrdreNumberErrorMatrix: {
-                            QVector<double> d=record->resultsGetAsDoubleList(evalname, colnames[c].second);
-                            if (!vectorsToAvg) {
-                                for (int it=0; it<d.size(); it++) {
-                                    if (it>0) dat+=separator;
-                                    dat+=doubleToQString(d[it], 15, 'g', decimalPoint);
-                                }
-                                colcnt=d.size();
-                            } else {
-                                dat+=doubleToQString(qfstatisticsAverage(d), 15, 'g', decimalPoint);
-                            }
-                            hasError=true;
-                        } break;
-                        case QFRawDataRecord::qfrdreNumberError: dat=doubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint); hasError=true; break;
-                        case QFRawDataRecord::qfrdreInteger: dat=loc.toString((qlonglong)record->resultsGetAsInteger(evalname, colnames[c].second)); break;
-                        case QFRawDataRecord::qfrdreIntegerVector:
-                        case QFRawDataRecord::qfrdreIntegerMatrix:
-                        case QFRawDataRecord::qfrdreBooleanVector:
-                        case QFRawDataRecord::qfrdreBooleanMatrix: {
-                            QVector<qlonglong> d=record->resultsGetAsIntegerList(evalname, colnames[c].second);
-                            if (!vectorsToAvg) {
-                                for (int it=0; it<d.size(); it++) {
-                                    if (it>0) dat+=separator;
-                                    dat+=loc.toString(d[it]);
-                                }
-                                colcnt=d.size();
-                            } else {
-                                dat+=loc.toString(qfstatisticsAverage(d), 15);
-                            }
-
-                        } break;
-                        case QFRawDataRecord::qfrdreBoolean: dat=(record->resultsGetAsBoolean(evalname, colnames[c].second))?QString("1"):QString("0"); break;
-                        case QFRawDataRecord::qfrdreString: dat=stringDelimiter+record->resultsGetAsString(evalname, colnames[c].second).replace(separator, "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_")+stringDelimiter; break;
-                        case QFRawDataRecord::qfrdreStringVector:
-                        case QFRawDataRecord::qfrdreStringMatrix: {
-                            QStringList d=record->resultsGetAsStringList(evalname, colnames[c].second);
-                            if (!vectorsToAvg) {
-                                for (int it=0; it<d.size(); it++) {
-                                    if (it>0) dat+=separator;
-                                    dat+=stringDelimiter+d[it].replace(separator, "_").replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(stringDelimiter, "_")+stringDelimiter;
-                                }
-                                colcnt=d.size();
-                            }
-                        } break;
-                        default: dat=""; break;
-                    }
-                }
-            }
-            data[r]+=separator+dat;
-            colcnt=qMax(1,colcnt);
-            int addcols=subcolumns[c]-colcnt;
-            for (int ac=0; ac<addcols; ac++) {
-                data[r]+=separator;
-            }
-            hcols+=addcols;
-        }
-        for (int ac=0; ac<subcolumns[c]-1; ac++) {
-            header[0]+=separator;
-            header[1]+=separator;
-        }
-
-        hcols=0;
-        if (hasError) {
-            header[0] += separator;
-            header[1] += separator+sdel+tr("error")+sdel;
-            for (int r=0; r<records.size(); r++) {
-                QFRawDataRecord* record=records[r].first;
-                QString evalname=records[r].second;
-                QString dat="";
-                int colcnt=1;
-                if (record) {
-                    if (record->resultsExists(evalname, colnames[c].second)) {
-                        switch (record->resultsGet(evalname, colnames[c].second).type) {
-                            case QFRawDataRecord::qfrdreNumberError:
-                                dat=doubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c].second), 15, 'g', decimalPoint);
-                                break;
-                            case QFRawDataRecord::qfrdreNumberErrorVector:
-                            case QFRawDataRecord::qfrdreNumberErrorMatrix: {
-                                QVector<double> d=record->resultsGetErrorAsDoubleList(evalname, colnames[c].second);
-                                if (!vectorsToAvg) {
-                                    for (int it=0; it<d.size(); it++) {
-                                        if (it>0) dat+=separator;
-                                        dat+=doubleToQString(d[it], 15, 'g', decimalPoint);
-                                    }
-                                    colcnt=d.size();
-                                } else {
-                                    dat+=doubleToQString(qfstatisticsAverage(d), 15, 'g', decimalPoint);
-                                }
-                            } break;
-                            default: break;
-                        }
-                    }
-                }
-                data[r]+=separator+dat;
-                colcnt=qMax(1,colcnt);
-                int addcols=subcolumns[c]-colcnt;
-                for (int ac=0; ac<addcols; ac++) {
-                    data[r]+=separator;
-                }
-                //hcols+=addcols;
-            }
-
-            for (int ac=0; ac<subcolumns[c]-1; ac++) {
-                header[0]+=separator;
-                header[1]+=separator;
-            }
-        }
-
-    }
-
-    QFile of(filename);
-    if (of.open(QFile::WriteOnly | QFile::Truncate)) {
-        QTextStream out(&of);
-        QTextCodec* c=QTextCodec::codecForName("ISO-8859-1");
-        if (c==NULL) c=QTextCodec::codecForCStrings();
-        if (c==NULL) c=QTextCodec::codecForLocale();
-        out.setCodec(c);
-        for (int i=0; i<header.size(); i++) out<<header[i]<<"\n";
-        for (int i=0; i<data.size(); i++) out<<data[i]<<"\n";
-    } else { return false; }
-    return true;*/
     QStringList colname, rownames;
     QList<QList<QVariant> > data=rdrResultsGetTable(&colname, &rownames, evalFilter, vectorsToAvg, filteredFitParamIDs, filtereRecords);
-    /*if (flipTable) {
-        data=dataRotate(data);
-        qSwap(colname, rownames);
-    }*/
+
+
     QString dat=toCSV(data, colname, rownames, decimalPoint, separator, true, stringDelimiter);
     QFile of(filename);
     if (of.open(QFile::WriteOnly | QFile::Truncate)) {
@@ -1746,6 +1583,7 @@ bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, const QString &fi
 
 QList<QList<QVariant> > QFProject::rdrResultsGetTable(QStringList* colNames, QStringList* rowNames, const QString &evalFilter, bool vectorsToAvg, const QStringList &filteredFitParamIDs, const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords)
 {
+    QFProjectReadLocker locker(p->lock);
     QList<QList<QVariant> > data;
     QStringList colnames, rownames;
 
@@ -1957,239 +1795,7 @@ QList<QList<QVariant> > QFProject::rdrResultsGetTable(QStringList* colNames, QSt
 }
 
 bool QFProject::rdrResultsSaveToSYLK(const QString &evalFilter, const QString &filename, bool vectorsToAvg, bool flipTable, const QStringList &filteredFitParamIDs, const QList<QPair<QPointer<QFRawDataRecord>, QString> > &filtereRecords) {
-    /*QFile of(filename);
-    if (of.open(QFile::WriteOnly | QFile::Truncate)) {
-        QTextStream out(&of);
-        QTextCodec* c=QTextCodec::codecForName("ISO-8859-1");
-        if (c==NULL) c=QTextCodec::codecForCStrings();
-        if (c==NULL) c=QTextCodec::codecForLocale();
-        out.setCodec(c);
-        out<<"ID;P\n";
 
-
-
-        QChar stringDelimiter='"';
-        QList<QPair<QString,QString> > colnames=rdrCalcMatchingResultsNamesAndLabels(evalFilter);
-        QList<QPair<QPointer<QFRawDataRecord>, QString> > records=rdrCalcMatchingResults(evalFilter);
-        QLocale loc=QLocale::c();
-        loc.setNumberOptions(QLocale::OmitGroupSeparator);
-
-        if (filteredFitParamIDs.size()>0) {
-            for (int j=colnames.size()-1; j>=0; j--) {
-                bool found=false;
-                for (int i=0; i<filteredFitParamIDs.size(); i++) {
-                    if (filteredFitParamIDs[i]==colnames[j].second) {
-                        found=true;
-                        break;
-                    }
-                }
-                if (!found) colnames.removeAt(j);
-            }
-        }
-
-        if (filtereRecords.size()>0) {
-            for (int j=records.size()-1; j>=0; j--) {
-                bool found=false;
-                for (int i=0; i<filtereRecords.size(); i++) {
-                    if (filtereRecords[i]==records[j] && records[j].first) {
-                        found=true;
-                        break;
-                    }
-                }
-                if (!found) records.removeAt(j);
-            }
-        }
-
-
-        QMap<int, int> subcolumns;
-        for (int c=0; c<colnames.size(); c++) {
-            subcolumns[c]=1;
-            if (!vectorsToAvg) {
-                for (int r=0; r<records.size(); r++) {
-                    QFRawDataRecord* record=records[r].first;
-                    QString evalname=records[r].second;
-                    QString dat="";
-                    if (record) {
-                        if (record->resultsExists(evalname, colnames[c].second)) {
-                            switch(record->resultsGet(evalname, colnames[c].second).type) {
-                                case QFRawDataRecord::qfrdreNumberError:
-                                case QFRawDataRecord::qfrdreNumber:
-                                case QFRawDataRecord::qfrdreInteger:
-                                case QFRawDataRecord::qfrdreBoolean:
-                                case QFRawDataRecord::qfrdreString: subcolumns[c]=qMax(subcolumns[c], 1); break;
-                                case QFRawDataRecord::qfrdreNumberErrorVector:
-                                case QFRawDataRecord::qfrdreNumberErrorMatrix:
-                                case QFRawDataRecord::qfrdreNumberVector:
-                                case QFRawDataRecord::qfrdreNumberMatrix:  subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).dvec.size()); break;
-                                case QFRawDataRecord::qfrdreIntegerVector:
-                                case QFRawDataRecord::qfrdreIntegerMatrix:  subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).ivec.size()); break;
-                                case QFRawDataRecord::qfrdreBooleanVector:
-                                case QFRawDataRecord::qfrdreBooleanMatrix: subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).bvec.size()); break;
-                                case QFRawDataRecord::qfrdreStringVector:
-                                case QFRawDataRecord::qfrdreStringMatrix: subcolumns[c]=qMax(subcolumns[c], record->resultsGet(evalname, colnames[c].second).svec.size()); break;
-                                default: subcolumns[c]=qMax(subcolumns[c], 1); break;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-
-        loc.setNumberOptions(QLocale::OmitGroupSeparator);
-        for (int i=0; i<records.size(); i++) {
-            if (flipTable)
-                out<<QString("F;SDS;Y%2;X%1\nC;Y%2;X%1;K\"%3\"\n").arg(i+3).arg(1).arg(QString(records[i].first->getName()+": "+records[i].second).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_"));
-            else
-                out<<QString("F;SDS;Y%1;X%2\nC;Y%1;X%2;K\"%3\"\n").arg(i+3).arg(1).arg(QString(records[i].first->getName()+": "+records[i].second).replace(stringDelimiter, "\\"+QString(stringDelimiter)).replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_"));
-        }
-        int col=2;
-        for (int c=0; c<colnames.size(); c++) {
-            if (flipTable) {
-                out<<QString("F;SDS;Y%2;X%1\nC;Y%2;X%1;K\"%3\"\n").arg(1).arg(col).arg(colnames[c].first);
-                out<<QString("F;SDIS;Y%2;X%1\nC;Y%2;X%1;K\"%3\"\n").arg(2).arg(col).arg(tr("value"));
-            } else {
-                out<<QString("F;SDS;Y%1;X%2\nC;Y%1;X%2;K\"%3\"\n").arg(1).arg(col).arg(colnames[c].first);
-                out<<QString("F;SDIS;Y%1;X%2\nC;Y%1;X%2;K\"%3\"\n").arg(2).arg(col).arg(tr("value"));
-            }
-            bool hasError=false;
-            for (int r=0; r<records.size(); r++) {
-                QFRawDataRecord* record=records[r].first;
-                QString evalname=records[r].second;
-                QStringList dat;
-                int colcnt=1;
-                if (record) {
-                    if (record->resultsExists(evalname, colnames[c].second)) {
-                        switch(record->resultsGet(evalname, colnames[c].second).type) {
-                            case QFRawDataRecord::qfrdreNumber: dat<<CDoubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second)); break;
-                            case QFRawDataRecord::qfrdreNumberVector:
-                            case QFRawDataRecord::qfrdreNumberMatrix: {
-                                QVector<double> d=record->resultsGetAsDoubleList(evalname, colnames[c].second);
-                                if (!vectorsToAvg) {
-                                    for (int it=0; it<d.size(); it++) {
-                                        dat<<CDoubleToQString(d[it]);
-                                    }
-                                    colcnt=d.size();
-                                } else {
-                                    dat<<CDoubleToQString(qfstatisticsAverage(d));
-                                }
-                            } break;
-                            case QFRawDataRecord::qfrdreNumberErrorVector:
-                            case QFRawDataRecord::qfrdreNumberErrorMatrix: {
-                                QVector<double> d=record->resultsGetAsDoubleList(evalname, colnames[c].second);
-                                if (!vectorsToAvg) {
-                                    for (int it=0; it<d.size(); it++) {
-                                        dat<<CDoubleToQString(d[it]);
-                                    }
-                                    colcnt=d.size();
-                                } else {
-                                    dat<<CDoubleToQString(qfstatisticsAverage(d));
-                                }
-                                hasError=true;
-                            } break;
-                            case QFRawDataRecord::qfrdreNumberError: dat<<CDoubleToQString(record->resultsGetAsDouble(evalname, colnames[c].second)); hasError=true; break;
-                            case QFRawDataRecord::qfrdreInteger: dat<<loc.toString((qlonglong)record->resultsGetAsInteger(evalname, colnames[c].second)); break;
-                            case QFRawDataRecord::qfrdreIntegerVector:
-                            case QFRawDataRecord::qfrdreIntegerMatrix:
-                            case QFRawDataRecord::qfrdreBooleanVector:
-                            case QFRawDataRecord::qfrdreBooleanMatrix: {
-                                QVector<qlonglong> d=record->resultsGetAsIntegerList(evalname, colnames[c].second);
-                                if (!vectorsToAvg) {
-                                    for (int it=0; it<d.size(); it++) {
-                                        dat<<loc.toString(d[it]);
-                                    }
-                                    colcnt=d.size();
-                                } else {
-                                    dat<<CDoubleToQString(qfstatisticsAverage(d));
-                                }
-                            } break;
-                            case QFRawDataRecord::qfrdreBoolean: if (record->resultsGetAsBoolean(evalname, colnames[c].second)) dat<<QString("1"); else dat<<QString("0"); break;
-                            case QFRawDataRecord::qfrdreString: dat<<(stringDelimiter+record->resultsGetAsString(evalname, colnames[c].second).replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_")+stringDelimiter); break;
-                            case QFRawDataRecord::qfrdreStringVector:
-                            case QFRawDataRecord::qfrdreStringMatrix: {
-                                QStringList d=record->resultsGetAsStringList(evalname, colnames[c].second);
-                                if (!vectorsToAvg) {
-                                    for (int it=0; it<d.size(); it++) {
-                                        dat<<(stringDelimiter+d[it].replace('\t', " ").replace('\n', "\\n").replace('\r', "\\r").replace(';', ",").replace(stringDelimiter, "_")+stringDelimiter);
-                                    }
-                                    colcnt=d.size();
-                                }
-                            } break;
-                            default: break;
-                        }
-                    }
-                }
-                for (int i=0; i<dat.size(); i++) {
-                    if (flipTable) {
-                        out<<QString("C;X%2;Y%1;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
-                    } else {
-                        out<<QString("C;X%1;Y%2;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
-                    }
-                    //col++;
-                }
-                //if ((subcolumns[c]-colcnt)>0) col+=(subcolumns[c]-colcnt);
-            }
-            col+=subcolumns[c];
-            if (hasError) {
-                if (flipTable) {
-                    out<<QString("F;SDIS;Y%2;X%1\nC;Y%2;X%1;K\"%3\"\n").arg(2).arg(col).arg(tr("error"));
-                } else {
-                    out<<QString("F;SDIS;Y%1;X%2\nC;Y%1;X%2;K\"%3\"\n").arg(2).arg(col).arg(tr("error"));
-                }
-                for (int r=0; r<records.size(); r++) {
-                    QFRawDataRecord* record=records[r].first;
-                    QString evalname=records[r].second;
-                    QStringList dat;
-                    int colcnt=1;
-                    if (record) {
-                        if (record->resultsExists(evalname, colnames[c].second)) {
-                            switch (record->resultsGet(evalname, colnames[c].second).type) {
-                                case QFRawDataRecord::qfrdreNumberError:
-                                    dat<<CDoubleToQString(record->resultsGetErrorAsDouble(evalname, colnames[c].second));
-                                    break;
-                                case QFRawDataRecord::qfrdreNumberErrorVector:
-                                case QFRawDataRecord::qfrdreNumberErrorMatrix: {
-                                    QVector<double> d=record->resultsGetErrorAsDoubleList(evalname, colnames[c].second);
-                                    if (!vectorsToAvg) {
-                                        for (int it=0; it<d.size(); it++) {
-                                            dat<<CDoubleToQString(d[it]);
-                                        }
-                                        colcnt=d.size();
-                                    } else {
-                                        dat<<CDoubleToQString(qfstatisticsAverage(d));
-                                    }
-                                } break;
-                                    default: break;
-                            }
-                        }
-                    }
-                    //if (!dat.isEmpty()) out<<QString("C;X%1;Y%2;K%3\n").arg(col).arg(r+3).arg(dat);
-                    for (int i=0; i<dat.size(); i++) {
-                        if (flipTable) {
-                            out<<QString("C;X%2;Y%1;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
-                        } else {
-                            out<<QString("C;X%1;Y%2;K%3\n").arg(col+i).arg(r+3).arg(dat[i]);
-                        }
-                        //col++;
-                    }
-                    //if ((subcolumns[c]-colcnt)>0) col+=(subcolumns[c]-colcnt);
-                }
-            }
-        }
-
-        if (flipTable) {
-            out<<"F;R1;SDSB\n";
-            out<<"F;C1;SDS\n";
-            out<<"F;C2;SDSR\n";
-        } else {
-            out<<"F;C1;SDSR\n";
-            out<<"F;R1;SDS\n";
-            out<<"F;R2;SDSB\n";
-        }
-        out<<"E\n";
-
-    } else { return false; }
-    return true;*/
 
 
     QStringList colname, rownames;
@@ -2231,17 +1837,19 @@ bool QFProject::rdrResultsSave(const QString &evalFilter, const QString &filenam
 
 QFRawDataRecordFactory *QFProject::getRawDataRecordFactory() const
 {
+    QFProjectReadLocker locker(p->lock);
     return rdrFactory;
 }
 
 QFEvaluationItemFactory *QFProject::getEvaluationItemFactory() const
 {
+    QFProjectReadLocker locker(p->lock);
     return evalFactory;
 }
 
 
 
-bool rdrCalcMatchingResults_compare(const QPair<QPointer<QFRawDataRecord>, QString> &s1, const QPair<QPointer<QFRawDataRecord>, QString> &s2) {
+static bool rdrCalcMatchingResults_compare(const QPair<QPointer<QFRawDataRecord>, QString> &s1, const QPair<QPointer<QFRawDataRecord>, QString> &s2) {
     QString ss1=s1.first->getName()+": "+s1.second;
     QString ss2=s2.first->getName()+": "+s2.second;
     return ss1.toLower() < ss2.toLower();
@@ -2249,6 +1857,7 @@ bool rdrCalcMatchingResults_compare(const QPair<QPointer<QFRawDataRecord>, QStri
 
 
 QList<QPair<QPointer<QFRawDataRecord>, QString> > QFProject::rdrCalcMatchingResults(const QString& evalFilter) const {
+    QFProjectReadLocker locker(p->lock);
     QList<QPair<QPointer<QFRawDataRecord>, QString> > l;
 
     QRegExp rx(evalFilter);
@@ -2281,6 +1890,7 @@ QList<QPair<QPointer<QFRawDataRecord>, QString> > QFProject::rdrCalcMatchingResu
 
 
 void QFProject::setDataChanged() {
+    QFProjectWriteLocker locker(p->lock);
     if (dataChange) return;
     dataChange=true;
     //qDebug()<<"QFProject emit wasChanged(dataChange="<<dataChange<<")";
@@ -2289,6 +1899,7 @@ void QFProject::setDataChanged() {
 
 void QFProject::setPropertiesChanged()
 {
+    QFProjectWriteLocker locker(p->lock);
     if (propertiesChange) return;
     propertiesChange=true;
     //qDebug()<<"QFProject emit wasChanged(dataChange="<<dataChange<<")";
@@ -2317,6 +1928,7 @@ void QFProject::log_error(const QString &message) const
 
 void QFProject::setSortOrder(QFProject::ProjectSortOrder order)
 {
+    QFProjectWriteLocker locker(p->lock);
     if (m_sortOrder != order) {
         m_sortOrder=order;
         sortProjectItems(order);
@@ -2331,6 +1943,7 @@ void QFProject::setSortOrder(int order)
 
 QFProject::ProjectSortOrder QFProject::getSortOrder() const
 {
+    QFProjectReadLocker locker(p->lock);
     return m_sortOrder;
 }
 
@@ -2369,12 +1982,14 @@ int QFProject::fileCopyListConatins(const QString &inFilename, const QString &ou
 
 
 void QFProject::setError(const QString &description) {
+    QFProjectWriteLocker locker(p->lock);
     errorOcc=true;
     errorDesc=description;
     emit errorOccured(description);
 }
 
 void QFProject::setError(const QString &description) const {
+    QFProjectWriteLocker locker(p->lock);
     errorOcc=true;
     errorDesc=description;
     //emit errorOccured(description);
@@ -2382,18 +1997,21 @@ void QFProject::setError(const QString &description) const {
 
 void QFProject::resetError() const
 {
+    QFProjectWriteLocker locker(p->lock);
     errorOcc=false;
     errorDesc="";
 }
 
 void QFProject::emitPropertiesChanged() {
     //qDebug()<<"QFProject emit propertiesChanged()";
+    QFProjectReadLocker locker(p->lock);
     if (m_signalsEnabled) emit propertiesChanged();
 };
 
 void QFProject::emitStructureChanged() {
     setDataChanged();
     //qDebug()<<"QFProject emit structureChanged()";
+    QFProjectReadLocker locker(p->lock);
     if (m_signalsEnabled) emit structureChanged();
 };
 
@@ -2402,6 +2020,7 @@ void QFProject::setPropertiesError(const QString &message) {
 }
 
 void QFProject::setName(const QString& n) {
+    QFProjectWriteLocker locker(p->lock);
     if (name!=n) {
         name=n;
         emitPropertiesChanged();
@@ -2409,10 +2028,12 @@ void QFProject::setName(const QString& n) {
 }
 
 QString QFProject::getDescription()const  {
+    QFProjectReadLocker locker(p->lock);
     return description;
 }
 
 void QFProject::setDescription(const QString& d) {
+    QFProjectWriteLocker locker(p->lock);
     if (description!=d) {
         description=d;
         emitPropertiesChanged();
@@ -2420,10 +2041,12 @@ void QFProject::setDescription(const QString& d) {
 }
 
 QString QFProject::getCreator()const  {
+    QFProjectReadLocker locker(p->lock);
     return creator;
 }
 
 void QFProject::setCreator(const QString& c) {
+    QFProjectWriteLocker locker(p->lock);
     if (creator!=c) {
         creator=c;
         emitPropertiesChanged();
@@ -2431,16 +2054,19 @@ void QFProject::setCreator(const QString& c) {
 }
 
 QString QFProject::getFile()const  {
+    QFProjectReadLocker locker(p->lock);
     return file;
 }
 
 QString QFProject::getRDRGroupName(int group) const
 {
+    QFProjectReadLocker locker(p->lock);
     return rdrgroups.value(group, "");
 }
 
 QList<QFRawDataRecord *> QFProject::getRDRGroupMembers(int group) const
 {
+    QFProjectReadLocker locker(p->lock);
     QList<QFRawDataRecord *> l;
     //if (group>=0 && group<rdrgroups.size()) {
     for (int i=0; i<getRawDataCount(); i++) {
@@ -2456,23 +2082,28 @@ QList<QFRawDataRecord *> QFProject::getRDRGroupMembers(int group) const
 }
 
 int QFProject::getRawDataCount()const  {
+
     return rawData.size();
 }
 
 
 int QFProject::getEvaluationCount()const  {
+    QFProjectReadLocker locker(p->lock);
     return evaluations.size();
 }
 
 bool QFProject::rawDataIDExists(int ID)const  {
+    QFProjectReadLocker locker(p->lock);
     return rawData.contains(ID);
 }
 
 bool QFProject::evaluationIDExists(int ID)const  {
+    QFProjectReadLocker locker(p->lock);
     return evaluations.contains(ID);
 }
 
 bool QFProject::rawDataExists(const QFRawDataRecord *rec) const  {
+    QFProjectReadLocker locker(p->lock);
     for (int i=0; i<rawData.values().size(); i++) {
         if (rawData.values().at(i)==rec) return true;
     }
@@ -2480,6 +2111,7 @@ bool QFProject::rawDataExists(const QFRawDataRecord *rec) const  {
 }
 
 bool QFProject::evaluationExists(const QFEvaluationItem* rec) const  {
+    QFProjectReadLocker locker(p->lock);
     for (int i=0; i<evaluations.values().size(); i++) {
         if (evaluations.values().at(i)==rec) return true;
     }
@@ -2488,6 +2120,7 @@ bool QFProject::evaluationExists(const QFEvaluationItem* rec) const  {
 }
 
 int QFProject::getRawDataIndex(const QFRawDataRecord *rec) const  {
+    QFProjectReadLocker locker(p->lock);
     for (int i=0; i<rawData.values().size(); i++) {
         if (rawData.values().at(i)==rec) return i;
     }
@@ -2496,6 +2129,7 @@ int QFProject::getRawDataIndex(const QFRawDataRecord *rec) const  {
 }
 
 bool QFProject::getEvaluationIndex(const QFEvaluationItem *rec) const  {
+    QFProjectReadLocker locker(p->lock);
     for (int i=0; i<evaluations.values().size(); i++) {
         if (evaluations.values().at(i)==rec) return i;
     }
@@ -2504,11 +2138,13 @@ bool QFProject::getEvaluationIndex(const QFEvaluationItem *rec) const  {
 }
 
 QFRawDataRecord* QFProject::getRawDataByID(int ID) const {
+    QFProjectReadLocker locker(p->lock);
     if (rawDataIDExists(ID)) return rawData[ID];
     return NULL;
 }
 
 QFRawDataRecord* QFProject::getRawDataByNum(int i) const {
+    QFProjectReadLocker locker(p->lock);
     /*QList<int> keys=rawData.keys();
     if ((i>=keys.size()) || (i<0)) return NULL;
     int ID=keys.at(i);
@@ -2520,8 +2156,9 @@ QFRawDataRecord* QFProject::getRawDataByNum(int i) const {
     else return NULL;
 }
 
-QList<QFRawDataRecord *> QFProject::getRDRsInFolder(const QString &folder, bool alsoSubfolders)
+QList<QFRawDataRecord *> QFProject::getRDRsInFolder(const QString &folder, bool alsoSubfolders) const
 {
+    QFProjectReadLocker locker(p->lock);
     QList<QFRawDataRecord *> lst;
     for (int i=0; i<getRawDataCount(); i++) {
         QFRawDataRecord * r=getRawDataByNum(i);
@@ -2533,11 +2170,13 @@ QList<QFRawDataRecord *> QFProject::getRDRsInFolder(const QString &folder, bool 
 
 
 QFEvaluationItem* QFProject::getEvaluationByID(int ID) const {
+    QFProjectReadLocker locker(p->lock);
     if (evaluationIDExists(ID)) return evaluations[ID];
     return NULL;
 }
 
 QFEvaluationItem* QFProject::getEvaluationByNum(int i) const {
+    QFProjectReadLocker locker(p->lock);
     /*QList<int> keys=evaluations.keys();
     if ((i>=keys.size()) || (i<0)) return NULL;
     int ID=keys.at(i);
@@ -2551,15 +2190,18 @@ QFEvaluationItem* QFProject::getEvaluationByNum(int i) const {
 }
 
 bool QFProject::checkID(int ID)const {
+    QFProjectReadLocker locker(p->lock);
     return !IDs.contains(ID);
 }
 
 QString QFProject::getName()const {
+    QFProjectReadLocker locker(p->lock);
     return name;
 }
 
 void QFProject::moveRawDataRecordToPosition(const QFRawDataRecord *rec, int positionIndex)
 {
+    QFProjectWriteLocker locker(p->lock);
     if (!rec) return;
     int ID=rec->getID();
     int idx=rawDataOrder.indexOf(ID);
@@ -2575,6 +2217,7 @@ void QFProject::moveRawDataRecord(int recID, int recID2, QFProject::RecordInsert
 
 void QFProject::moveRawDataRecordUp(const QFRawDataRecord *rec)
 {
+    QFProjectWriteLocker locker(p->lock);
     if (!rec) return;
     int ID=rec->getID();
     int pos=rawDataOrder.indexOf(ID);
@@ -2589,6 +2232,7 @@ void QFProject::moveRawDataRecordToPosition(int recID, int positionIndex)
 
 void QFProject::moveRawDataRecord(const QFRawDataRecord *rec, const QFRawDataRecord *rec2, QFProject::RecordInsertModes moveMode)
 {
+    QFProjectWriteLocker locker(p->lock);
     if (!rec || !rec2) return;
     int ID=rec->getID();
     int pos=rawDataOrder.indexOf(ID);
@@ -2613,6 +2257,7 @@ void QFProject::moveRawDataRecordUp(int recID)
 
 void QFProject::moveRawDataRecordDown(const QFRawDataRecord *rec)
 {
+    QFProjectWriteLocker locker(p->lock);
     if (!rec) return;
     int ID=rec->getID();
     int pos=rawDataOrder.indexOf(ID);
@@ -2627,6 +2272,7 @@ void QFProject::moveRawDataRecordDown(int recID)
 
 void QFProject::moveEvaluationToPosition(const QFEvaluationItem *rec, int positionIndex)
 {
+    QFProjectWriteLocker locker(p->lock);
     if (!rec) return;
     int ID=rec->getID();
     int idx=evaluationsOrder.indexOf(ID);
@@ -2642,6 +2288,7 @@ void QFProject::moveEvaluationToPosition(int recID, int positionIndex)
 
 void QFProject::moveEvaluation(const QFEvaluationItem *rec, const QFEvaluationItem *rec2, QFProject::RecordInsertModes moveMode)
 {
+    QFProjectWriteLocker locker(p->lock);
     if (!rec || !rec2) return;
     int ID=rec->getID();
     int pos=evaluationsOrder.indexOf(ID);
@@ -2666,6 +2313,7 @@ void QFProject::moveEvaluation(int recID, int recID2, QFProject::RecordInsertMod
 
 void QFProject::moveEvaluationUp(const QFEvaluationItem *rec)
 {
+    QFProjectWriteLocker locker(p->lock);
     if (!rec) return;
     int ID=rec->getID();
     int pos=evaluationsOrder.indexOf(ID);
@@ -2680,6 +2328,7 @@ void QFProject::moveEvaluationUp(int recID)
 
 void QFProject::moveEvaluationDown(const QFEvaluationItem *rec)
 {
+    QFProjectWriteLocker locker(p->lock);
     if (!rec) return;
     int ID=rec->getID();
     int pos=evaluationsOrder.indexOf(ID);
@@ -2788,6 +2437,7 @@ class qfproject_eval_ByFolderTypeNameRole_lesser {
 
 void QFProject::sortProjectItems(QFProject::ProjectSortOrder sortorder)
 {
+    QFProjectWriteLocker locker(p->lock);
 
     if (sortorder==QFProject::sortByID) {
         qSort(rawDataOrder.begin(), rawDataOrder.end());
@@ -2806,6 +2456,7 @@ void QFProject::sortProjectItems(QFProject::ProjectSortOrder sortorder)
 
 void QFProject::emitSortOrderChanged()
 {
+    QFProjectWriteLocker locker(p->lock);
     if (m_signalsEnabled) {
         emit sortOrderChanged(m_sortOrder);
         emit sortOrderChanged((int)m_sortOrder);
@@ -2814,16 +2465,19 @@ void QFProject::emitSortOrderChanged()
 
 bool QFProject::areSignalsEnabled() const
 {
+    QFProjectReadLocker locker(p->lock);
     return m_signalsEnabled;
 }
 
 bool QFProject::isDummy() const
 {
+    QFProjectReadLocker locker(p->lock);
     return m_dummy;
 }
 
 int QFProject::addRDRGroup(const QString &name)
 {
+    QFProjectWriteLocker locker(p->lock);
     rdrgroups<<name;
     emitStructureChanged();
     return rdrgroups.size()-1;
@@ -2831,6 +2485,7 @@ int QFProject::addRDRGroup(const QString &name)
 
 void QFProject::setRDRGroupName(int group, const QString &name)
 {
+    QFProjectWriteLocker locker(p->lock);
     if (group>=0 && group<rdrgroups.size()) {
         rdrgroups[group]=name;
         emitStructureChanged();
@@ -2839,16 +2494,19 @@ void QFProject::setRDRGroupName(int group, const QString &name)
 
 int QFProject::getRDRGroupCount() const
 {
+    QFProjectReadLocker locker(p->lock);
     return rdrgroups.size();
 }
 
 QStringList QFProject::getRDRGroupNames() const
 {
+    QFProjectReadLocker locker(p->lock);
     return rdrgroups;
 }
 
 int QFProject::addOrFindRDRGroup(const QString &name)
 {
+    QFProjectWriteLocker locker(p->lock);
     int i=findRDRGroup(name);
     if (i<0) {
         i=addRDRGroup(name);
@@ -2858,6 +2516,7 @@ int QFProject::addOrFindRDRGroup(const QString &name)
 
 int QFProject::findRDRGroup(const QString &name)
 {
+    QFProjectWriteLocker locker(p->lock);
     return rdrgroups.indexOf(name);
 }
 

@@ -68,7 +68,7 @@ QFEvaluationEditor* QFImFCSFitEvaluation::createEditor(QFPluginServices* service
     return new QFImFCSFitEvaluationEditor(services, propEditor, parent);
 };
 
-bool QFImFCSFitEvaluation::isApplicable(const QFRawDataRecord *record) {
+bool QFImFCSFitEvaluation::isApplicable(const QFRawDataRecord *record) const {
     //return record->inherits("QFRDRFCSDataInterface") && record->inherits("QFRDRImageToRunInterface");
     return matchFunctor->matches(record);
 }
@@ -417,6 +417,8 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                     QString egrouplabel=QString("#%4 \"%1\": %2, %3").arg(getName()).arg(falg->shortName()).arg(ffunc->shortName()).arg(getID());
 
 
+                    //record->resultsWriteLock();
+
                     if (!has_g0) {
                         if (run<0) record->resultsSetNumber(evalID, "fitparam_g0", ffunc->evaluate(0, params));
                         else record->resultsSetInNumberList(evalID, "fitparam_g0", run, ffunc->evaluate(0, params));
@@ -522,6 +524,8 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
                             record->resultsSetGroup(evalID, param, group);
                             record->resultsSetLabel(evalID, param, it.value().label, it.value().label_rich);
                         }
+
+                        //record->resultsWriteUnLock();
                     }
 
 
@@ -550,14 +554,14 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
 
         // clean temporary parameters
         //delete doFitThread;
-        free(weights);
-        free(params);
-        free(initialparams);
-        free(errors);
-        free(errorsI);
-        free(paramsFix);
-        free(paramsMax);
-        free(paramsMin);
+        qfFree(weights);
+        qfFree(params);
+        qfFree(initialparams);
+        qfFree(errors);
+        qfFree(errorsI);
+        qfFree(paramsFix);
+        qfFree(paramsMax);
+        qfFree(paramsMin);
 
         //displayModel(false);
         //replotData();
@@ -570,7 +574,7 @@ void QFImFCSFitEvaluation::doFit(QFRawDataRecord* record, int run, int defaultMi
 
 
 
-QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, double* tauvals, double* corrdata, double* weights, int datacut_min, int datacut_max, double* fullParams, double* errors, bool* paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record, int run) {
+QFFitStatistics QFImFCSFitEvaluation::calcFitStatistics(bool storeAsResults, QFFitFunction* ffunc, long N, const double *tauvals, const double *corrdata, const double *weights, int datacut_min, int datacut_max, const double *fullParams, const double *errors, const bool *paramsFix, int runAvgWidth, int residualHistogramBins, QFRawDataRecord* record, int run) {
     QFFitStatistics result= ffunc->calcFitStatistics(N, tauvals, corrdata, weights, datacut_min, datacut_max, fullParams, errors, paramsFix, runAvgWidth, residualHistogramBins);
 
     if (record) {
@@ -728,14 +732,15 @@ bool QFImFCSFitEvaluation::overrideFitFunctionPresetFix(const QFRawDataRecord* r
 
 
 
-void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const {
+void QFImFCSFitEvaluation::doFitForMultithread(QFFitAlgorithm* falg, QFFitFunction* ffunc, QFRawDataRecord *record, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
-    QFFitFunction* ffunc=createFitFunction();
-    QFFitAlgorithm* falg=createFitAlgorithm(NULL);
+    //QFFitFunction* ffunc=createFitFunction();
+    //QFFitAlgorithm* falg=createFitAlgorithm(NULL);
+    //restoreQFFitAlgorithmParameters(falg);
 
     if ((!ffunc)||(!data)||(!falg)) {
-        if (ffunc) delete ffunc;
-        if (falg) delete falg;
+        //if (ffunc) delete ffunc;
+        //if (falg) delete falg;
         return;
     }
 
@@ -746,7 +751,6 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
 
     int fitrepeats=qBound(1,getProperty("FIT_REPEATS", 1).toInt(),1000);
 
-    restoreQFFitAlgorithmParameters(falg);
     falg->readErrorEstimateParametersFit(this);
 
 
@@ -763,7 +767,7 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
         //if (logservice) logservice->log_text(tr("running fit with '%1' (%2) and model '%3' (%4) on raw data record '%5', run %6 ... \n").arg(falg->name()).arg(falg->id()).arg(ffunc->name()).arg(ffunc->id()).arg(record->getName()).arg(runname));
 
         long N=data->getCorrelationN();
-        double* weights=NULL;
+        QVector<double> weightsVec;
         double* taudata=data->getCorrelationT();
         double* corrdata=NULL;
         if (run<0) {
@@ -792,20 +796,23 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
         QMutexLocker locker(mutexThreadedFit);
         //if (logservice) logservice->log_text(tr("   - fit data range: %1...%2 (%3 datapoints)\n").arg(cut_low).arg(cut_up).arg(cut_N));
         bool weightsOK=false;
-        weights=allocWeights(&weightsOK, record, run, cut_low, cut_up);
+        double* weights=NULL;
+        weightsVec=allocVecWeights(&weightsOK, record, run, cut_low, cut_up);
         if (!weightsOK && logservice) {
             logservice->log_warning(tr("fitting file '%1', run %2:\n   weights have invalid values => setting all weights to 1\n").arg(record->getName()).arg(run));
+        } else {
+            weights=weightsVec.data();
         }
 
         // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
         // we are working with a complete set of parameters
-        double* params=allocFillParameters(record, run, ffunc);
-        double* initialparams=allocFillParameters(record, run, ffunc);
-        double* errors=allocFillParameterErrors(record, run, ffunc);
-        double* errorsI=allocFillParameterErrors(record, run, ffunc);
-        double* paramsMin=allocFillParametersMin(record, ffunc);
-        double* paramsMax=allocFillParametersMax(record, ffunc);
-        bool* paramsFix=allocFillFix(record, run, ffunc);
+        QVector<double> params=allocVecFillParameters(record, run, ffunc);
+        QVector<double> initialparams=params;
+        QVector<double> errors=allocVecFillParameterErrors(record, run, ffunc);
+        QVector<double> errorsI=errors;
+        QVector<double> paramsMin=allocVecFillParametersMin(record, ffunc);
+        QVector<double> paramsMax=allocVecFillParametersMax(record, ffunc);
+        QVector<bool> paramsFix=allocVecFillFix(record, run, ffunc);
         locker.unlock();
 
 
@@ -838,13 +845,13 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
 
                 QElapsedTimer tstart;
                 tstart.start();
-                double* init=duplicateArray(initialparams, ffunc->paramCount());
+                QVector<double> init=initialparams;
                 QFFitAlgorithm::FitResult result;
                 for (int rep=0; rep<fitrepeats; rep++) {
-                    result=falg->fit(params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
-                    copyArray(init, params, ffunc->paramCount());
+                    result=falg->fit(params.data(), errors.data(), &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, init.data(), paramsFix.data(), paramsMin.data(), paramsMax.data());
+                    init=params;
                 }
-                free(init);
+                //qfFree(init);
                 #if QT_VERSION >= 0x040800
                     double deltaTime=double(tstart.nsecsElapsed())/1.0e6;
                 #else
@@ -852,18 +859,18 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
                 #endif
 
                 for (int i=0; i<ffunc->paramCount(); i++) {
-                    if (!(ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit)) {
+                    if (!(ffunc->isParameterVisible(i, params.data()) && (!paramsFix[i]) && ffunc->getDescription(i).fit)) {
                         errors[i]=errorsI[i];
                     }
                     //printf("  fit: %s = %lf +/- %lf\n", ffunc->getDescription(i).id.toStdString().c_str(), params[i], errors[i]);
                 }
 
-                ffunc->calcParameter(params, errors);
-                ffunc->sortParameter(params, errors, paramsFix);
-                ffunc->calcParameter(params, errors);
+                ffunc->calcParameter(params.data(), errors.data());
+                ffunc->sortParameter(params.data(), errors.data(), paramsFix.data());
+                ffunc->calcParameter(params.data(), errors.data());
 
                 for (int i=0; i<ffunc->paramCount(); i++) {
-                    if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
+                    if (ffunc->isParameterVisible(i, params.data()) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
                         if (!oparams.isEmpty()) oparams=oparams+";  ";
 
                         oparams=oparams+QString("%1 = %2+/-%3").arg(ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
@@ -884,7 +891,7 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
 
 
                 for (int i=0; i<ffunc->paramCount(); i++) {
-                    if (ffunc->isParameterVisible(i, params) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
+                    if (ffunc->isParameterVisible(i, params.data()) && (!paramsFix[i]) && ffunc->getDescription(i).fit) {
                         if (!orparams.isEmpty()) orparams=orparams+";  ";
                         orparams=orparams+QString("%1 = %2+/-%3").arg(ffunc->getDescription(i).id).arg(params[i]).arg(errors[i]);
                     }
@@ -910,7 +917,7 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
 
                 bool has_g0=false;
                 for (int i=0; i<ffunc->paramCount(); i++) {
-                    if (ffunc->isParameterVisible(i, params)) {
+                    if (ffunc->isParameterVisible(i, params.data())) {
                         QString pid=ffunc->getParameterID(i);
                         has_g0=has_g0||(pid=="g0");
                         QString unit=ffunc->getDescription(pid).unit;
@@ -930,8 +937,8 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
                     }
                 }
                 if (!has_g0) {
-                    if (run<0) record->resultsSetNumber(evalID, "fitparam_g0", ffunc->evaluate(0, params));
-                    else record->resultsSetInNumberListAndBool(evalID, "fitparam_g0", run, ffunc->evaluate(0, params), "", getParamNameLocalStore("fitparam_g0"), true);
+                    if (run<0) record->resultsSetNumber(evalID, "fitparam_g0", ffunc->evaluate(0, params.data()));
+                    else record->resultsSetInNumberListAndBool(evalID, "fitparam_g0", run, ffunc->evaluate(0, params.data()), "", getParamNameLocalStore("fitparam_g0"), true);
                 }
                 record->resultsSetGroupLabelsAndSortPriority(evalID, "fitparam_g0", tr("fit results"), tr("g(0)"), tr("g(0)"), true);
 
@@ -1055,7 +1062,7 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
 
 
                 {
-                    QFFitStatistics result= ffunc->calcFitStatistics(N, taudata, corrdata, weights, cut_low, cut_up, params, errors, paramsFix, 11, 25);
+                    QFFitStatistics result= ffunc->calcFitStatistics(N, taudata, corrdata, weights, cut_low, cut_up, params.data(), errors.data(), paramsFix.data(), 11, 25);
 
                     QString group=tr("fit statistics");
                     if (run<0) record->resultsSetNumber(evalID, param="fitstat_chisquared", result.residSqrSum);
@@ -1140,18 +1147,18 @@ void QFImFCSFitEvaluation::doFitForMultithread(QFRawDataRecord *record, int run,
 
         // clean temporary parameters
 
-        free(weights);
-        free(params);
-        free(initialparams);
-        free(errors);
-        free(errorsI);
-        free(paramsFix);
-        free(paramsMax);
-        free(paramsMin);
+        //free(weights);
+        /*free(params);
+        qfFree(initialparams);
+        qfFree(errors);
+        qfFree(errorsI);
+        qfFree(paramsFix);
+        qfFree(paramsMax);
+        qfFree(paramsMin);*/
     }
 
-    if (ffunc) delete ffunc;
-    if (falg) delete falg;
+    //if (ffunc) delete ffunc;
+    //if (falg) delete falg;
 
 }
 
@@ -1197,8 +1204,8 @@ void QFImFCSFitEvaluation::doFitForMultithreadReturn(QFRawDataRecord::QFFitFitRe
 
         long N=data->getCorrelationN();
         double* weights=NULL;
-        double* taudata=data->getCorrelationT();
-        double* corrdata=NULL;
+        const double* taudata=data->getCorrelationT();
+        const double* corrdata=NULL;
         if (run<0) {
             corrdata=data->getCorrelationMean();
         } else {
@@ -1274,10 +1281,10 @@ void QFImFCSFitEvaluation::doFitForMultithreadReturn(QFRawDataRecord::QFFitFitRe
                 double* init=duplicateArray(initialparams, ffunc->paramCount());
                 QFFitAlgorithm::FitResult result;
                 for (int rep=0; rep<fitrepeats; rep++) {
-                    result=falg->fit(params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, initialparams, paramsFix, paramsMin, paramsMax);
+                    result=falg->fit(params, errors, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N, ffunc, init, paramsFix, paramsMin, paramsMax);
                     copyArray(init, params, ffunc->paramCount());
                 }
-                free(init);
+                qfFree(init);
                 #if QT_VERSION >= 0x040800
                     double deltaTime=double(tstart.nsecsElapsed())/1.0e6;
                 #else
@@ -1573,19 +1580,26 @@ void QFImFCSFitEvaluation::doFitForMultithreadReturn(QFRawDataRecord::QFFitFitRe
 
         // clean temporary parameters
 
-        free(weights);
-        free(params);
-        free(initialparams);
-        free(errors);
-        free(errorsI);
-        free(paramsFix);
-        free(paramsMax);
-        free(paramsMin);
+        qfFree(weights);
+        qfFree(params);
+        qfFree(initialparams);
+        qfFree(errors);
+        qfFree(errorsI);
+        qfFree(paramsFix);
+        qfFree(paramsMax);
+        qfFree(paramsMin);
     }
 
     if (ffunc) delete ffunc;
     if (falg) delete falg;
 
+}
+
+void QFImFCSFitEvaluation::createFitFunctionAndAlgorithm(QFFitAlgorithm *&falg, QFFitFunction *&ffunc, const QFRawDataRecord *record, int run)
+{
+    ffunc=createFitFunction();
+    falg=createFitAlgorithm(NULL);
+    restoreQFFitAlgorithmParameters(falg);
 }
 
 
@@ -1677,14 +1691,14 @@ void QFImFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFi
 
 
         QFFitAlgorithm::FitQFFitFunctionFunctor fm(ffunc, params, paramsFix, &taudata[cut_low], &corrdata[cut_low], &weights[cut_low], cut_N);
-        double* pm=(double*)malloc(fm.get_paramcount()*sizeof(double));
+        double* pm=(double*)qfMalloc(fm.get_paramcount()*sizeof(double));
 
 
 
         int idxX=paramXID;
         int idxY=paramYID;
         int idx=0;
-        double* d=(double*)calloc(fm.get_evalout(), sizeof(double));
+        double* d=(double*)qfCalloc(fm.get_evalout(), sizeof(double));
 
         for (int y=0; y<paramYValues.size(); y++) {
             for (int x=0; x<paramXValues.size(); x++) {
@@ -1703,14 +1717,14 @@ void QFImFCSFitEvaluation::calcChi2Landscape(double *chi2Landscape, int paramXFi
             }
         }
 
-        free(d);
-        free(pm);
+        qfFree(d);
+        qfFree(pm);
 
 
-        free(weights);
-        free(params);
-        free(errors);
-         free(paramsFix);
+        qfFree(weights);
+        qfFree(params);
+        qfFree(errors);
+         qfFree(paramsFix);
 
 
     }

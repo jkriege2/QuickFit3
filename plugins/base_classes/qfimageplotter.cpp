@@ -44,7 +44,7 @@ QFImagePlotter::QFImagePlotter(QWidget *parent) :
 
 QFImagePlotter::~QFImagePlotter()
 {
-    if (plteImageData) free(plteImageData);
+    if (plteImageData) qfFree(plteImageData);
 }
 
 double *QFImagePlotter::getData() const
@@ -184,12 +184,12 @@ void QFImagePlotter::updateImage(double *data, bool *plteOverviewSelectedData, b
 
     if (plteImageSize!=width*height) {
         plteImageSize=width*height;
-        plteImageData=(double*)realloc(plteImageData, plteImageSize*sizeof(double));
+        plteImageData=(double*)qfRealloc(plteImageData, plteImageSize*sizeof(double));
     }
 
     if (data && plteImageData) {
         memcpy(plteImageData, data, width*height*sizeof(double));
-        if (deleteData) free(data);
+        if (deleteData) qfFree(data);
     }
     plteImageWidth=width;
     plteImageHeight=height;
@@ -336,7 +336,7 @@ void QFImagePlotter::setDisplayOverlay(bool displayOverlay, double *avgOut, doub
     if (containsGraph(plteImageSelected)) moveGraphTop(plteImageSelected);
 
     if ((avgOut || sdOut)&&plteOverviewSelectedData&&plteOverviewExcludedData) {
-        bool *msk=(bool*)calloc(plteImageWidth*plteImageHeight, sizeof(bool));
+        bool *msk=(bool*)qfCalloc(plteImageWidth*plteImageHeight, sizeof(bool));
         int cnt=0;
         for (int i=0; i<plteImageWidth*plteImageHeight; i++) {
             msk[i]=plteOverviewSelectedData[i]&&(!plteOverviewExcludedData[i]);
@@ -350,7 +350,7 @@ void QFImagePlotter::setDisplayOverlay(bool displayOverlay, double *avgOut, doub
         } else {
             imgAvg=statisticsAverageVarianceMasked(imgVar, plteOverviewExcludedData, plteImageData, plteImageWidth*plteImageHeight, false);
         }
-        free(msk);
+        qfFree(msk);
 
         if (avgOut) *avgOut=imgAvg;
         if (sdOut) *sdOut=sqrt(imgVar);
@@ -405,7 +405,7 @@ void QFImagePlotter::setCurrent(QFRawDataRecord *current)
 
 void QFImagePlotter::clearImage()
 {
-    if (plteImageData) free(plteImageData);
+    if (plteImageData) qfFree(plteImageData);
     plteImageData=NULL;
     plteImageSize=0;
     plteImageWidth=0;

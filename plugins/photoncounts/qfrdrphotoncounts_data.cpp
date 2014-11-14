@@ -45,10 +45,10 @@ QFRDRPhotonCountsData::QFRDRPhotonCountsData(QFProject* parent):
 
 QFRDRPhotonCountsData::~QFRDRPhotonCountsData()
 {
-    if (rateT) free(rateT);
-    if (rate) free(rate);
-    if (binnedRateT) free(binnedRateT);
-    if (binnedRate) free(binnedRate);
+    if (rateT) qfFree(rateT);
+    if (rate) qfFree(rate);
+    if (binnedRateT) qfFree(binnedRateT);
+    if (binnedRate) qfFree(binnedRate);
 
     binnedRateN=0;
     binnedRateT=NULL;
@@ -183,7 +183,7 @@ bool QFRDRPhotonCountsData::loadCountRatesFromBinary(QString filename) {
             resizeRates(itemsPerChannel, channels);
             averageT=deltaT;
             uint32_t chunkSize=qMin(itemsPerChannel, (uint64_t)1024)*channels;
-            uint16_t* temp=(uint16_t*)malloc(chunkSize*sizeof(uint16_t));
+            uint16_t* temp=(uint16_t*)qfMalloc(chunkSize*sizeof(uint16_t));
 
             for (register uint64_t i=0; i<itemsPerChannel; i++) {
                 rateT[i]=double(i)*deltaT;
@@ -205,7 +205,7 @@ bool QFRDRPhotonCountsData::loadCountRatesFromBinary(QString filename) {
                 }*/
                 if (f.atEnd()) break;
             }
-            free(temp);
+            qfFree(temp);
 
             emitRawDataChanged();
             if (rateN<1000) autoCalcRateN=rateN;
@@ -342,16 +342,16 @@ int QFRDRPhotonCountsData::GetPhotonCountsBinnedNFactor() {
 }
 
 void QFRDRPhotonCountsData::resizeRates(long long N, int channels) {
-    if (rateT) free(rateT);
-    if (rate) free(rate);
+    if (rateT) qfFree(rateT);
+    if (rate) qfFree(rate);
     rateChannels=0;
     rateN=0;
     rateT=NULL;
     rate=NULL;
     rateN=N;
     rateChannels=channels;
-    rateT=(double*)calloc(rateN, sizeof(double));
-    rate=(double*)calloc(rateN*rateChannels, sizeof(double));
+    rateT=(double*)qfCalloc(rateN, sizeof(double));
+    rate=(double*)qfCalloc(rateN*rateChannels, sizeof(double));
     if (!rateT || !rate)
         setError(tr("Error while allocating memory for count rate data!"));
     emitRawDataChanged();
@@ -362,15 +362,15 @@ void QFRDRPhotonCountsData::resizeRates(long long N, int channels) {
 }
 
 void QFRDRPhotonCountsData::resizeBinnedRates(long long N) {
-    if (binnedRateT) free(binnedRateT);
-    if (binnedRate) free(binnedRate);
+    if (binnedRateT) qfFree(binnedRateT);
+    if (binnedRate) qfFree(binnedRate);
     binnedRateN=0;
     binnedRateT=NULL;
     binnedRate=NULL;
     binnedRateN=N;
     if (N>0) {
-        binnedRateT=(double*)calloc(binnedRateN, sizeof(double));
-        binnedRate=(double*)calloc(binnedRateN*rateChannels, sizeof(double));
+        binnedRateT=(double*)qfCalloc(binnedRateN, sizeof(double));
+        binnedRate=(double*)qfCalloc(binnedRateN*rateChannels, sizeof(double));
         if (!binnedRateT || !binnedRate)
             setError(tr("Error while allocating memory for binned count rate data!"));
         setIntProperty("BINNED_RATE_N", binnedRateN, false, false);

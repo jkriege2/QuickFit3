@@ -22,7 +22,7 @@
 #include "qfmathtools.h"
 #include <float.h>
 #include <QDebug>
-
+#include "qftools.h"
 
 double qfTanc( double x ) {
     if (x==0) return 1;
@@ -90,7 +90,7 @@ void qf_statisticsAutocorrelate(double* dataout, const double* data, long long N
 }
 
 double* qfstatisticsAllocAutocorrelate(const double* data, long long N) {
-    double* d=(double*)malloc(ceil((double)N/2.0)*sizeof(double));
+    double* d=(double*)qfMalloc(ceil((double)N/2.0)*sizeof(double));
     qf_statisticsAutocorrelate(d, data, N);
     return d;
 }
@@ -116,14 +116,14 @@ double roundWithError(double value, double error, int addSignifcant)  {
 
 QFFitStatistics::QFFitStatistics() {
     runAvgStart=0;
-    fitfunc=0;
-    residuals=0;
-    residuals_weighted=0;
+    //fitfunc=0;
+    //residuals=0;
+    //residuals_weighted=0;
     runAvgMaxN=0;
     runAvgN=0;
-    tau_runavg=0;
-    residuals_runavg=0;
-    residuals_runavg_weighted=0;
+    //tau_runavg=0;
+    //residuals_runavg=0;
+    //residuals_runavg_weighted=0;
     fitparamN=0;
     dataSize=0;
     degFreedom=0;
@@ -148,18 +148,18 @@ QFFitStatistics::QFFitStatistics() {
 
     residHistBinWidth=0;
     residHistWBinWidth=0;
-    resHistogram=0;
+    //resHistogram=0;
     resHistogramCount=0;
-    resWHistogram=0;
+    //resWHistogram=0;
     resWHistogramCount=0;
-    resCorrelation=0;
-    resWCorrelation=0;
+    //resCorrelation=0;
+    //resWCorrelation=0;
     resN=0;
 }
 
 void QFFitStatistics::free() {
 
-    if (fitfunc) { std::free(fitfunc); fitfunc=NULL; }
+    /*if (fitfunc) { std::free(fitfunc); fitfunc=NULL; }
     if (residuals) { std::free(residuals); residuals=NULL; }
     if (residuals_weighted) { std::free(residuals_weighted); residuals_weighted=NULL; }
     if (tau_runavg) { std::free(tau_runavg); tau_runavg=NULL; }
@@ -168,23 +168,23 @@ void QFFitStatistics::free() {
     if (resHistogram) { std::free(resHistogram); resHistogram=NULL; }
     if (resWHistogram) { std::free(resWHistogram); resWHistogram=NULL; }
     if (resCorrelation) { std::free(resCorrelation); resCorrelation=NULL; }
-    if (resWCorrelation) {std::free(resWCorrelation); resWCorrelation=NULL; }
+    if (resWCorrelation) {std::free(resWCorrelation); resWCorrelation=NULL; }*/
 }
 
-QFFitStatistics calculateFitStatistics(long N, double* tauvals, double* model, double* corrdata, double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins) {
+QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins) {
     QFFitStatistics result;
     /////////////////////////////////////////////////////////////////////////////////
     // retrieve data and tau-values from rawdata record
     /////////////////////////////////////////////////////////////////////////////////
     result.runAvgStart=-1*runAvgWidth/2;
-    result.fitfunc=(double*)calloc(N,sizeof(double));
-    result.residuals=(double*)calloc(N,sizeof(double));
-    result.residuals_weighted=(double*)calloc(N,sizeof(double));
+    result.fitfunc.resize(N);//=(double*)qfCalloc(N,sizeof(double));
+    result.residuals.resize(N);//=(double*)qfCalloc(N,sizeof(double));
+    result.residuals_weighted.resize(N);//=(double*)qfCalloc(N,sizeof(double));
     result.runAvgMaxN=N;
     result.runAvgN=0;
-    result.tau_runavg=(double*)calloc(result.runAvgMaxN, sizeof(double));
-    result.residuals_runavg=(double*)calloc(result.runAvgMaxN, sizeof(double));
-    result.residuals_runavg_weighted=(double*)calloc(result.runAvgMaxN, sizeof(double));
+    result.tau_runavg.resize(result.runAvgMaxN);//=(double*)qfCalloc(result.runAvgMaxN, sizeof(double));
+    result.residuals_runavg.resize(result.runAvgMaxN);//=(double*)qfCalloc(result.runAvgMaxN, sizeof(double));
+    result.residuals_runavg_weighted.resize(result.runAvgMaxN);//=(double*)qfCalloc(result.runAvgMaxN, sizeof(double));
 
     /////////////////////////////////////////////////////////////////////////////////
     // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
@@ -275,9 +275,9 @@ QFFitStatistics calculateFitStatistics(long N, double* tauvals, double* model, d
     /////////////////////////////////////////////////////////////////////////////////
     // calculate residual histogram
     /////////////////////////////////////////////////////////////////////////////////
-    result.resHistogram=(double*)calloc(residualHistogramBins, sizeof(double));
+    result.resHistogram.resize(residualHistogramBins);//=(double*)qfCalloc(residualHistogramBins, sizeof(double));
     result.resHistogramCount=0;
-    result.resWHistogram=(double*)calloc(residualHistogramBins, sizeof(double));
+    result.resWHistogram.resize(residualHistogramBins);//=(double*)qfCalloc(residualHistogramBins, sizeof(double));
     result.resWHistogramCount=0;
     for (int i=0; i<N; i++) {
         if ((i>=datacut_min)&&(i<=datacut_max)) {
@@ -309,9 +309,13 @@ QFFitStatistics calculateFitStatistics(long N, double* tauvals, double* model, d
     /////////////////////////////////////////////////////////////////////////////////
     // calculate residual correlation
     /////////////////////////////////////////////////////////////////////////////////
-    result.resCorrelation=qfstatisticsAllocAutocorrelate(&(result.residuals[datacut_min]), datacut_max-datacut_min);
-    result.resWCorrelation=qfstatisticsAllocAutocorrelate(&(result.residuals_weighted[datacut_min]), datacut_max-datacut_min);
     result.resN=ceil((double)(datacut_max-datacut_min)/2.0);
+    result.resCorrelation.resize(result.resN+1);//=qfstatisticsAllocAutocorrelate(&(result.residuals[datacut_min]), datacut_max-datacut_min);
+    result.resWCorrelation.resize(result.resN+1);//=qfstatisticsAllocAutocorrelate(&(result.residuals_weighted[datacut_min]), datacut_max-datacut_min);
+    double* dat=result.residuals.data();
+    qf_statisticsAutocorrelate(result.resCorrelation.data(), &(dat[datacut_min]), datacut_max-datacut_min);
+    dat=result.residuals_weighted.data();
+    qf_statisticsAutocorrelate(result.resWCorrelation.data(), &(dat[datacut_min]), datacut_max-datacut_min);
     for (register int i=0; i<result.resN; i++) {
         result.resCorrelation[i]/=(result.residStdDev*result.residStdDev);
         result.resWCorrelation[i]/=(result.residWeightStdDev*result.residWeightStdDev);

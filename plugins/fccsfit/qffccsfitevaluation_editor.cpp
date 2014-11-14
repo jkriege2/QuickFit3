@@ -812,7 +812,7 @@ void QFFCCSFitEvaluationEditor::displayData() {
             bool wOK=false;
             double* sigma=eval->allocWeights(&wOK, rec, eval->getCurrentIndex(), ui->datacut->get_userMin(), ui->datacut->get_userMax());//fcs->getCorrelationRunError(eval->getCurrentIndex());
             if ((!wOK  || eval->getFitDataWeighting()==QFFCSWeightingTools::EqualWeighting) && sigma) {
-                free(sigma);
+                qfFree(sigma);
                 sigma=NULL;
             }
             long N=fcs->getCorrelationN();
@@ -899,11 +899,11 @@ void QFFCCSFitEvaluationEditor::displayData() {
 
 
 
-                free(params);
-                free(err);
-                free(fix);
+                qfFree(params);
+                qfFree(err);
+                qfFree(fix);
             }
-            if (sigma) free(sigma);
+            if (sigma) qfFree(sigma);
 
             ui->pltData->zoomToFit();
             ui->pltResiduals->zoomToFit();
@@ -1065,6 +1065,7 @@ void QFFCCSFitEvaluationEditor::fitAllRunsThreaded()
 
     // free memory
     for (int i=0; i<threadcount; i++) {
+        threads[i]->cleanJobs();
         delete threads[i];
     }*/
 
@@ -1337,7 +1338,7 @@ void QFFCCSFitEvaluationEditor::copyToInitial()
                 //qDebug()<<"set("<<rec->getID()<<") "<<id<<" = "<<value<<" +/- "<<error;
             };
         }
-        free(params);
+        qfFree(params);
     }
 
 

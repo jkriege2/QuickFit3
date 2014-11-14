@@ -221,6 +221,23 @@ bool* QFFitResultsByIndexEvaluation::allocFillFix(const QFRawDataRecord *r, int 
     return allocFillFix(r, getEvaluationResultID(index, r), function);
 }
 
+QVector<double> QFFitResultsByIndexEvaluation::allocVecFillParameters(const QFRawDataRecord *r, int index, QFFitFunction *function) const
+{
+    return allocVecFillParameters(r, getEvaluationResultID(index, r), function);
+
+}
+
+QVector<double> QFFitResultsByIndexEvaluation::allocVecFillParameterErrors(const QFRawDataRecord *r, int index, QFFitFunction *function) const
+{
+    return allocVecFillParameterErrors(r, getEvaluationResultID(index, r), function);
+}
+
+QVector<bool> QFFitResultsByIndexEvaluation::allocVecFillFix(const QFRawDataRecord *r, int index, QFFitFunction *function) const
+{
+    return allocVecFillFix(r, getEvaluationResultID(index, r), function);
+
+}
+
 void QFFitResultsByIndexEvaluation::setCurrentIndex(int index) {
     QFRawDataRecord* r=getHighlightedRecord();
     if ((r!=NULL)) {

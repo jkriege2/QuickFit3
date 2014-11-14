@@ -46,7 +46,7 @@ double QFFitAlgorithmSimAnneal::chi2(QFFitAlgorithm::Functor* model, double* p) 
     chi2EvalCount++;
     register double c2=0;
     register int imax=model->get_evalout();
-    double* data=(double*)calloc(imax, sizeof(double));
+    double* data=(double*)qfCalloc(imax, sizeof(double));
 
     model->evaluate(data, p);
 
@@ -55,7 +55,7 @@ double QFFitAlgorithmSimAnneal::chi2(QFFitAlgorithm::Functor* model, double* p) 
         c2=c2+d*d;
     }
 
-    free(data);
+    qfFree(data);
     return c2;
 }
 
@@ -100,14 +100,14 @@ QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, dou
     int Nepsilon=getParameter("nepsilon").toDouble();
 
     // step vector, this vector holds the current maximúm step sizes */
-    double* v=(double*)calloc(fitParamCount,sizeof(double));
+    double* v=(double*)qfCalloc(fitParamCount,sizeof(double));
     // init step vector v
     for (int i=0; i<fitParamCount; i++) {
         v[i]=fabs(paramsMax[i]-paramsMin[i])/1000.0;
     };
 
     // current parameters */
-    double* x0=(double*)calloc(fitParamCount,sizeof(double));;
+    double* x0=(double*)qfCalloc(fitParamCount,sizeof(double));;
     memcpy(x0, initialParams, fitParamCount*sizeof(double));
     memcpy(paramsOut, initialParams, fitParamCount*sizeof(double));
 
@@ -141,8 +141,8 @@ QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, dou
     int error=0;
     bool finished=false;
     double T=T0*pow(10.0,floor(log10(currentChi2)));
-    int* dirVariations=(int*)calloc(fitParamCount, sizeof(int));
-    double* f_asterisk=(double*)calloc(Nepsilon, sizeof(double));
+    int* dirVariations=(int*)qfCalloc(fitParamCount, sizeof(int));
+    double* f_asterisk=(double*)qfCalloc(Nepsilon, sizeof(double));
     for (int i=0; i<Nepsilon; i++) {
         f_asterisk[i]=currentChi2;
     }
@@ -279,10 +279,10 @@ QFFitAlgorithm::FitResult QFFitAlgorithmSimAnneal::intFit(double* paramsOut, dou
     result.fitOK=(error==0);
 
 
-    free(v);
-    free(x0);
-    free(dirVariations);
-    free(f_asterisk);
+    qfFree(v);
+    qfFree(x0);
+    qfFree(dirVariations);
+    qfFree(f_asterisk);
 
 
     return result;

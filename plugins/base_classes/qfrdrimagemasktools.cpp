@@ -24,6 +24,7 @@
 #include <QTextStream>
 #include "csvtools.h"
 #include <QDebug>
+#include "qftools.h"
 
 QFRDRImageMaskTools::QFRDRImageMaskTools()
 {
@@ -34,7 +35,7 @@ QFRDRImageMaskTools::QFRDRImageMaskTools()
 
 QFRDRImageMaskTools::~QFRDRImageMaskTools()
 {
-    if (mask) free(mask);
+    if (mask) qfFree(mask);
 }
 
 void QFRDRImageMaskTools::maskInit(uint32_t w, uint32_t h)
@@ -43,7 +44,7 @@ void QFRDRImageMaskTools::maskInit(uint32_t w, uint32_t h)
     if (w*h>0) {
         mask_w=w;
         mask_h=h;
-        mask=(bool*)malloc(w*h*sizeof(bool));
+        mask=(bool*)qfMalloc(w*h*sizeof(bool));
         for (uint32_t i=0; i<w*h; i++)  {
             mask[i]=false;
         }
@@ -52,7 +53,7 @@ void QFRDRImageMaskTools::maskInit(uint32_t w, uint32_t h)
 
 void QFRDRImageMaskTools::maskDelete()
 {
-    if (mask) free(mask);
+    if (mask) qfFree(mask);
     mask=NULL;
     mask_w=0;
     mask_h=0;

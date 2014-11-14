@@ -1,7 +1,7 @@
 #include <QtCore>
 #include "picoquant_ptu_tools.h"
 #include <wchar.h>
-
+#include "qftools.h"
 const int EpochDiff = 25569; // days between 30/12/1899 and 01/01/1970
 const int SecsInDay = 86400; // number of seconds in a day
 
@@ -116,7 +116,7 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
                       GlobRes = *(double*)&(PTUTagHead.TagValue); // in ns
               break;
           case tyFloat8Array: {
-              double* buf=(double*)malloc(PTUTagHead.TagValue);
+              double* buf=(double*)qfMalloc(PTUTagHead.TagValue);
               fread(buf, PTUTagHead.TagValue, 1, fpin);
               QVariantList vl;
               for (int i=0; i<PTUTagHead.TagValue/sizeof(double); i++) {
@@ -134,27 +134,27 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
               //fprintf(fpout, "%s", asctime(gmtime(&CreateTime)), "\0");
               break;
           case tyAnsiString:
-              AnsiBuffer = (char*)calloc((size_t)PTUTagHead.TagValue,1);
+              AnsiBuffer = (char*)qfCalloc((size_t)PTUTagHead.TagValue,1);
               Result = fread(AnsiBuffer, 1, (size_t)PTUTagHead.TagValue, fpin);
               if (Result!= PTUTagHead.TagValue) {
                   error=QObject::tr("Incomplete File.");
-                  free(AnsiBuffer);
+                  qfFree(AnsiBuffer);
                   return false;
               }
               tagData=QString(AnsiBuffer);
-              free(AnsiBuffer);
+              qfFree(AnsiBuffer);
               break;
           case tyWideString:
-              WideBuffer = (WCHAR*)calloc((size_t)PTUTagHead.TagValue,1);
+              WideBuffer = (WCHAR*)qfCalloc((size_t)PTUTagHead.TagValue,1);
               Result = fread(WideBuffer, 1, (size_t)PTUTagHead.TagValue, fpin);
               if (Result!= PTUTagHead.TagValue) {
                   error=QObject::tr("Incomplete File.");
-                  free(WideBuffer);
+                  qfFree(WideBuffer);
                   return false;
               }
               //fwprintf(fpout, L"%s", WideBuffer);
               tagData=QString::fromUtf16((ushort*)WideBuffer);
-              free(WideBuffer);
+              qfFree(WideBuffer);
               break;
           case tyBinaryBlob:{
                   //fprintf(fpout, "<Binary Blob contains %d Bytes>", PTUTagHead.TagValue);

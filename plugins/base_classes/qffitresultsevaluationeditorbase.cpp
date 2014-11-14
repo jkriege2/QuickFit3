@@ -173,11 +173,11 @@ void QFFitResultsEvaluationEditorBase::saveCurrentFitResults(QFRawDataRecord* re
                     }
                 }
             }
-            free(fullParams);
-            free(errors);
-            free(paramsFix);
-            free(paramsMin);
-            free(paramsMax);
+            qfFree(fullParams);
+            qfFree(errors);
+            qfFree(paramsFix);
+            qfFree(paramsMin);
+            qfFree(paramsMax);
         }
     }
 }
@@ -408,7 +408,7 @@ void QFFitResultsEvaluationEditorBase::copyToAll(QFRawDataRecord* rec) {
     eval->set_doEmitPropertiesChanged(true);
     eval->emitResultsChanged();
 
-    free(params);
+    qfFree(params);
     QApplication::restoreOverrideCursor();
 }
 
@@ -443,7 +443,7 @@ void QFFitResultsEvaluationEditorBase::copyToInitial(bool emitSignals, QFRawData
     eval->set_doEmitPropertiesChanged(true);
     if (emitSignals) eval->emitResultsChanged();
 
-    free(params);
+    qfFree(params);
     QApplication::restoreOverrideCursor();
 }
 

@@ -128,12 +128,12 @@ QFRDRImagingFCSDataExplorer::QFRDRImagingFCSDataExplorer(QWidget *parent) :
 QFRDRImagingFCSDataExplorer::~QFRDRImagingFCSDataExplorer()
 {
     delete ui;
-    if (avg) free(avg);
-    if (stddev) free(stddev);
-    if (fit) free(fit);
-    if (fit2) free(fit2);
-    if (frame) free(frame);
-    if (frameRaw) free(frameRaw);
+    if (avg) qfFree(avg);
+    if (stddev) qfFree(stddev);
+    if (fit) qfFree(fit);
+    if (fit2) qfFree(fit2);
+    if (frame) qfFree(frame);
+    if (frameRaw) qfFree(frameRaw);
 }
 
 void QFRDRImagingFCSDataExplorer::writeSettings(QSettings &settings, QString prefix) {
@@ -308,10 +308,10 @@ void QFRDRImagingFCSDataExplorer::reallocStatistics(uint32_t N) {
     this->N=0;
     this->Nfit=0;
     uint32_t NF=qMin((uint32_t)500, qMax((uint32_t)10, N/100));
-    avg=(double*)malloc(N*sizeof(double));
-    stddev=(double*)malloc(N*sizeof(double));
-    fit=(double*)malloc(NF*sizeof(double));
-    fit2=(double*)malloc(NF*sizeof(double));
+    avg=(double*)qfMalloc(N*sizeof(double));
+    stddev=(double*)qfMalloc(N*sizeof(double));
+    fit=(double*)qfMalloc(NF*sizeof(double));
+    fit2=(double*)qfMalloc(NF*sizeof(double));
     this->N=N;
     this->Nfit=NF;
 
@@ -333,19 +333,19 @@ void QFRDRImagingFCSDataExplorer::reallocStatistics(uint32_t N) {
     avgFit2->set_yColumn(colF2);
 
 
-    if (oldAvg) free(oldAvg);
-    if (oldStd) free(oldStd);
-    if (oldFit) free(oldFit);
-    if (oldFit2) free(oldFit2);
+    if (oldAvg) qfFree(oldAvg);
+    if (oldStd) qfFree(oldStd);
+    if (oldFit) qfFree(oldFit);
+    if (oldFit2) qfFree(oldFit2);
 
 }
 
 void QFRDRImagingFCSDataExplorer::reallocFrames() {
-    if (frame) free(frame);
-    if (frameRaw) free(frameRaw);
+    if (frame) qfFree(frame);
+    if (frameRaw) qfFree(frameRaw);
 
-    frame=(float*)malloc(imgWidth*imgHeight*sizeof(float));
-    frameRaw=(float*)malloc(imgRawWidth*imgRawHeight*sizeof(float));
+    frame=(float*)qfMalloc(imgWidth*imgHeight*sizeof(float));
+    frameRaw=(float*)qfMalloc(imgRawWidth*imgRawHeight*sizeof(float));
 }
 
 void QFRDRImagingFCSDataExplorer::skipFrames(int N) {

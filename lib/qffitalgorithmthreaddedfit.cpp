@@ -55,7 +55,7 @@ void QFFitAlgorithmThreadedFit::run() {
         result=algorithm->fit(paramsOut, paramErrorsOut, dataX, dataY, dataWeight, N, model, init, fixParams, paramsMin, paramsMax);
         copyArray(init, paramsOut, model->paramCount());
     }
-    free(init);
+    qfFree(init);
     deltaTime=(double)tstart.msecsTo(QTime::currentTime());
 };
 

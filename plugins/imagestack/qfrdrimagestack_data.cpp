@@ -388,7 +388,7 @@ bool QFRDRImageStackData::loadImageFile(QFRDRImageStackData::ImageStack& stack, 
                         double* d=&(stack.data[channel*stack.width*stack.height*stack.frames + i*stack.width*stack.height]);
                         reader->readFrameDouble(d);
                     } else {
-                        double* tmp=(double*)malloc(reader->frameWidth()*reader->frameHeight()*sizeof(double));
+                        double* tmp=(double*)qfMalloc(reader->frameWidth()*reader->frameHeight()*sizeof(double));
                         reader->readFrameDouble(tmp);
                         if (whichHalfToLoad==qfihAny) {
                             double* d1=&(stack.data[channel*stack.width*stack.height*stack.frames + i*stack.width*stack.height]);
@@ -404,7 +404,7 @@ bool QFRDRImageStackData::loadImageFile(QFRDRImageStackData::ImageStack& stack, 
                             double* d1=&(stack.data[channel*stack.width*stack.height*stack.frames + i*stack.width*stack.height]);
                             qfCopyImageHalf(d1, tmp, reader->frameWidth(), reader->frameHeight(), whichHalfToLoad);
                         }
-                        free(tmp);
+                        qfFree(tmp);
                     }
                     //qDebug()<<"read frame "<<i<<" OK";
                     i++;
@@ -435,7 +435,7 @@ bool QFRDRImageStackData::allocateMemory() {
     bool ok=true;
     memsize=0;
     for (int i=0; i<stacks.size(); i++) {
-        stacks[i].data=(double*)calloc(stacks[i].channels*stacks[i].frames*stacks[i].height*stacks[i].width, sizeof(double));
+        stacks[i].data=(double*)qfCalloc(stacks[i].channels*stacks[i].frames*stacks[i].height*stacks[i].width, sizeof(double));
         ok=ok && (stacks[i].data!=NULL);
         if (stacks[i].data) {
             memsize+=stacks[i].channels*stacks[i].frames*stacks[i].height*stacks[i].width*sizeof(double);
@@ -449,7 +449,7 @@ bool QFRDRImageStackData::allocateMemory() {
 
 void QFRDRImageStackData::clearMemory() {
     for (int i=0; i<stacks.size(); i++) {
-        if (stacks[i].data) free(stacks[i].data);
+        if (stacks[i].data) qfFree(stacks[i].data);
         stacks[i].data=NULL;
     }
     memsize=0;
