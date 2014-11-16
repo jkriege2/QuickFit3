@@ -880,11 +880,11 @@ void QFImFCCSFitEvaluationEditor::displayData() {
 
                     QFFitStatistics fstat=ff->calcFitStatistics(N, tau, data, sigma, ui->datacut->get_userMin(), ui->datacut->get_userMax(), params, err, fix, 3, 100);
 
-                    size_t c_resid=ds->addCopiedColumn(fstat.residuals, N, tr("file%1: residuals").arg(file+1));
-                    size_t c_residw=ds->addCopiedColumn(fstat.residuals_weighted, N, tr("file%1: weighted residuals").arg(file+1));
-                    size_t c_residat=ds->addCopiedColumn(fstat.tau_runavg, fstat.runAvgN, tr("file%1: tau for avg. res.").arg(file+1));
-                    size_t c_resida=ds->addCopiedColumn(fstat.residuals_runavg, N, tr("file%1: avg. residuals").arg(file+1));
-                    size_t c_residaw=ds->addCopiedColumn(fstat.residuals_runavg_weighted, N, tr("file%1: weighted avg. residuals").arg(file+1));
+                    size_t c_resid=ds->addCopiedColumn(fstat.residuals, tr("file%1: residuals").arg(file+1));
+                    size_t c_residw=ds->addCopiedColumn(fstat.residuals_weighted, tr("file%1: weighted residuals").arg(file+1));
+                    size_t c_residat=ds->addCopiedColumn(fstat.tau_runavg, tr("file%1: tau for avg. res.").arg(file+1));
+                    size_t c_resida=ds->addCopiedColumn(fstat.residuals_runavg, tr("file%1: avg. residuals").arg(file+1));
+                    size_t c_residaw=ds->addCopiedColumn(fstat.residuals_runavg_weighted, tr("file%1: weighted avg. residuals").arg(file+1));
                     JKQTPxyLineGraph* g_res=new JKQTPxyLineGraph();
                     g_res->set_xColumn(c_tau);
                     g_res->set_yColumn(c_resid);

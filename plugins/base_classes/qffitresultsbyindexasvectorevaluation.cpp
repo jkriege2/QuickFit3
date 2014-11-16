@@ -273,9 +273,9 @@ bool QFFitResultsByIndexAsVectorEvaluation::hasFit(const QFRawDataRecord *r1, co
     } else {
 
         const QFRawDataRecord* r=r1;
-        if (getFitFunction(r)==NULL) return false;
         if (r==NULL) r=getHighlightedRecord();
         if (r==NULL) return false;
+        if (getFitFunction(r)==NULL) return false;
         QString tresultID=transformResultID(evalID);
         if (!r->resultsExistsFromEvaluation(tresultID)) {
             return false;

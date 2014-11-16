@@ -159,7 +159,8 @@ HEADERS += dlgnewproperty.h \
     qfrdrtableinterface.h \
     qftableservice.h \
     qfrdrimagemask.h \
-    qfrdrimageselectioninterface.h
+    qfrdrimageselectioninterface.h \
+    qfthreadingtools.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -256,7 +257,8 @@ SOURCES += dlgnewproperty.cpp \
     qflistprogressdialog.cpp \
     qfenhancedlabel.cpp \
     qfhelpaction.cpp \
-    qftableservice.cpp
+    qftableservice.cpp \
+    qfthreadingtools.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

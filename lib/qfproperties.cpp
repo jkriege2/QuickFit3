@@ -29,9 +29,9 @@
 #include <QReadWriteLock>
 
 
-typedef QMutexLocker QFPropsReadLocker;
-typedef QMutexLocker QFPropsWriteLocker;
-typedef QMutex QFPropsLock;
+typedef QReadLocker QFPropsReadLocker;
+typedef QWriteLocker QFPropsWriteLocker;
+typedef QReadWriteLock QFPropsLock;
 
 
 class QFPropertiesPrivate {
@@ -49,9 +49,9 @@ class QFPropertiesPrivate {
 };
 
 
-QFProperties::QFProperties()
+QFProperties::QFProperties():
+    p(new QFPropertiesPrivate(this))
 {
-    p=new QFPropertiesPrivate(this);
 }
 
 QFProperties::~QFProperties() {
@@ -215,12 +215,12 @@ void QFProperties::addProperties(const QFProperties &other)
 
 void QFProperties::propReadLock() const
 {
-    this->p->propertyLocker->lock();
+    this->p->propertyLocker->lockForRead();
 }
 
 void QFProperties::propWriteLock() const
 {
-    this->p->propertyLocker->lock();
+    this->p->propertyLocker->lockForWrite();
 }
 
 void QFProperties::propReadUnLock() const
@@ -234,7 +234,7 @@ void QFProperties::propWriteUnLock() const
 }
 
 void QFProperties::storeProperties(QXmlStreamWriter& w) const {
-    QFPropsReadLocker lock(this->p->propertyLocker);
+    //QFPropsReadLocker lock(this->p->propertyLocker);
     QHashIterator<QString, propertyItem> i(props);
     while (i.hasNext()) {
         i.next();
@@ -253,7 +253,7 @@ void QFProperties::storeProperties(QXmlStreamWriter& w) const {
 
 void QFProperties::readProperties(QDomElement& e) {
     {
-        QFPropsWriteLocker lock(this->p->propertyLocker);
+        //QFPropsWriteLocker lock(this->p->propertyLocker);
         QDomElement te=e.firstChildElement("property");
         props.clear();
         while (!te.isNull()) {

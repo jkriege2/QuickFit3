@@ -345,6 +345,19 @@ public:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
     /*! \brief return the value of a given parameter
         \param r the record to adress
         \param resultID the result ID which to access in the raw data records result store
@@ -366,6 +379,81 @@ public:
         \return the error associated with the given parameter.
     */
     virtual double getFitError(const QFRawDataRecord* r, const QString& resultID, const QString& parameterID) const;
+
+
+    /*! \brief return the fix property of a given parameter
+
+        \param r the record to adress
+        \param resultID the result ID which to access in the raw data records result store
+        \param parameterID the parameter id
+        For a detailed description of where the value is searched, see getFitValue()
+    */
+    virtual bool getFitFix(const QFRawDataRecord* r, const QString& resultID, const QString& parameterID)const ;
+
+
+    /*! \brief return the value of a given parameter
+        \param id the parameter id
+        \return the value of the given parameter \a id
+
+        This function looks for the value at several positions:
+          -# if a fit has already been performed for the current record, the value is read from raw data record
+          -# if no fit has been performed, the value is taken from this evaluation (i.e. the preset value)
+          -# if also locally no value is available, the value is looked up in the application INI
+          -# if this also fails, the value is taken from the initial value stored in the fitFunction
+        .
+    */
+    virtual double getFitValue(const QString& id, const QFRawDataRecord *r=NULL) const ;
+
+    /*! \brief return the fit error of a given parameter
+
+        \param id the parameter id
+        \return the error associated with the given parameter.
+    */
+    virtual double getFitError(const QString& id, const QFRawDataRecord* r=NULL) const ;
+
+
+    /*! \brief return the fix property of a given parameter
+
+        \param id the parameter id
+        For a detailed description of where the value is searched, see getFitValue()
+    */
+    virtual bool getFitFix(const QString& id, const QFRawDataRecord* r=NULL) const ;
+    /*! \brief return the lower value bound of a given parameter
+
+        \param id set the range min of the parameter with this id (see QFFitFunction)
+        For a detailed description of where the value is searched, see getFitValue()
+    */
+    virtual double getFitMin(const QString& id, const QFRawDataRecord* r=NULL) const ;
+
+
+    /*! \brief return the upper value bound of a given parameter
+
+        \param id set the range max of the parameter with this id (see QFFitFunction)
+        For a detailed description of where the value is searched, see getFitValue()
+    */
+    virtual double getFitMax(const QString& id, const QFRawDataRecord* r=NULL)  const ;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     /*! \brief set the error of a given parameter
 
@@ -395,15 +483,6 @@ public:
      *  \param fix fix to be stored
      */
     virtual void setFitResultFix(QFRawDataRecord* r, const QString& resultID, const QString& parameterID, bool fix) ;
-
-    /*! \brief return the fix property of a given parameter
-
-        \param r the record to adress
-        \param resultID the result ID which to access in the raw data records result store
-        \param parameterID the parameter id
-        For a detailed description of where the value is searched, see getFitValue()
-    */
-    virtual bool getFitFix(const QFRawDataRecord* r, const QString& resultID, const QString& parameterID)const ;
 
 
     /*! \brief set a fit parameter of the current fit function (see m_fitFunction) to the specified value
@@ -486,25 +565,6 @@ public:
      */
     virtual void setFitResultValuesVisible(double* values, double* errors) ;
 
-    /*! \brief return the value of a given parameter
-        \param id the parameter id
-        \return the value of the given parameter \a id
-
-        This function looks for the value at several positions:
-          -# if a fit has already been performed for the current record, the value is read from raw data record
-          -# if no fit has been performed, the value is taken from this evaluation (i.e. the preset value)
-          -# if also locally no value is available, the value is looked up in the application INI
-          -# if this also fails, the value is taken from the initial value stored in the fitFunction
-        .
-    */
-    virtual double getFitValue(const QString& id, const QFRawDataRecord *r=NULL) const ;
-
-    /*! \brief return the fit error of a given parameter
-
-        \param id the parameter id
-        \return the error associated with the given parameter.
-    */
-    virtual double getFitError(const QString& id, const QFRawDataRecord* r=NULL) const ;
 
     /*! \brief set the error of a given parameter
 
@@ -528,13 +588,6 @@ public:
      *  \param fix fix to be stored
      */
     virtual void setFitResultFix(const QString& id, bool fix) ;
-
-    /*! \brief return the fix property of a given parameter
-
-        \param id the parameter id
-        For a detailed description of where the value is searched, see getFitValue()
-    */
-    virtual bool getFitFix(const QString& id, const QFRawDataRecord* r=NULL) const ;
 
 
     /*! \brief set the value range of a fit parameter of the current fit function (see m_fitFunction)
@@ -567,20 +620,7 @@ public:
 
      */
     virtual void setFitMax(const QString& id, double max, QFRawDataRecord* r=NULL);
-    /*! \brief return the lower value bound of a given parameter
 
-        \param id set the range min of the parameter with this id (see QFFitFunction)
-        For a detailed description of where the value is searched, see getFitValue()
-    */
-    virtual double getFitMin(const QString& id, const QFRawDataRecord* r=NULL) const ;
-
-
-    /*! \brief return the upper value bound of a given parameter
-
-        \param id set the range max of the parameter with this id (see QFFitFunction)
-        For a detailed description of where the value is searched, see getFitValue()
-    */
-    virtual double getFitMax(const QString& id, const QFRawDataRecord* r=NULL)  const ;
 
 
 

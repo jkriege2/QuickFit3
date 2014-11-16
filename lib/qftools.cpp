@@ -62,7 +62,9 @@
 static QMutex qfallocationMutex(QMutex::Recursive);
 
 void* qfMalloc(size_t size) {
+#ifndef QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC
     QMutexLocker locker(&qfallocationMutex);
+#endif
 #ifdef __LINUX__
     return valloc(size);
 #else
@@ -79,14 +81,18 @@ void* qfCalloc(size_t size) {
 }
 
 void* qfCalloc(size_t num, size_t size) {
+#ifndef QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC
     QMutexLocker locker(&qfallocationMutex);
+#endif
     void* res=qfMalloc(num*size);
     memset(res, 0, num*size);
     return res;
 }
 
 void* qfRealloc (void* ptr, size_t size) {
+#ifndef QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC
     QMutexLocker locker(&qfallocationMutex);
+#endif
 #ifdef __LINUX__
     return realloc(ptr, size);
 #else
@@ -99,7 +105,9 @@ void* qfRealloc (void* ptr, size_t size) {
 }
 
 void qfFree(void* data) {
+#ifndef QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC
     QMutexLocker locker(&qfallocationMutex);
+#endif
 #ifdef __LINUX__
     free(data);
 #else

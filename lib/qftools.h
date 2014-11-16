@@ -52,7 +52,7 @@
             const CLASS* item;\
             bool locked;\
         public:\
-            inline CLASS##ReadLocker(const CLASS* item) {\
+            explicit inline CLASS##ReadLocker(const CLASS* item) {\
                 this->item=item;\
                 item->readLockF();\
                 locked=true;\
@@ -77,7 +77,7 @@
             const CLASS* item;\
             bool locked;\
         public:\
-            inline CLASS##WriteLocker(const CLASS* item) {\
+            explicit inline CLASS##WriteLocker(const CLASS* item) {\
                 this->item=item;\
                 item->writeLockF();\
                 locked=true;\

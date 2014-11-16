@@ -172,6 +172,7 @@ void QFFitStatistics::free() {
 }
 
 QFFitStatistics calculateFitStatistics(long N, const double* tauvals, const double* model, const double* corrdata, const double* weights, int datacut_min, int datacut_max, int paramCount, int runAvgWidth, int residualHistogramBins) {
+    datacut_max=qBound((long)datacut_min, (long)datacut_max, (long)N-1);
     QFFitStatistics result;
     /////////////////////////////////////////////////////////////////////////////////
     // retrieve data and tau-values from rawdata record

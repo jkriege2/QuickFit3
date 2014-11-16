@@ -27,14 +27,15 @@
 #include "qfmathparser.h"
 #include "datatools.h"
 //#define DEBUG_THREAN
+#include "qfthreadingtools.h"
 
-typedef QMutexLocker QFRDRReadLocker;
-typedef QMutexLocker QFRDRWriteLocker;
-typedef QMutex QFRDRLock;
+typedef QReadLocker QFRDRReadLocker;
+typedef QWriteLocker QFRDRWriteLocker;
+typedef QReadWriteLock QFRDRLock;
 
 class QFRawDataRecordPrivate {
     public:
-        QFRawDataRecordPrivate() {
+        explicit QFRawDataRecordPrivate(): lock(new QFRDRLock(QFRDRLock::Recursive)) {
 
         }
 
@@ -68,7 +69,6 @@ class QFRawDataRecordPrivate {
         mutable QFRDRLock* lock;
 
         ~QFRawDataRecordPrivate() {
-            lock=new QFRDRLock(QFRDRLock::Recursive);
             ResultsIterator it(results);
             while (it.hasNext()) {
                 it.next();
@@ -86,7 +86,7 @@ QFRawDataRecordPrivate::evaluationIDMetadata::evaluationIDMetadata(int initsize)
 }
 
 QFRawDataRecord::QFRawDataRecord(QFProject* parent):
-    QObject(parent), QFProperties()
+    QObject(parent), QFProperties(), dstore(new QFRawDataRecordPrivate()), resultsmodel(new QFRDRResultsModel())
 {
     project=parent;
     group=-1;
@@ -96,14 +96,12 @@ QFRawDataRecord::QFRawDataRecord(QFProject* parent):
     folder="";
     description="";
     role="";
-    resultsmodel=NULL;
+    //resultsmodel=NULL;
     propModel=NULL;
     doEmitResultsChanged=true;
     doEmitPropertiesChanged=true;
     evaluationIDMetadataInitSize=100;
-    dstore=new QFRawDataRecordPrivate();
     setResultsInitSize(100);
-    resultsmodel=new QFRDRResultsModel();
     resultsmodel->init(this);
 
 }
@@ -126,12 +124,12 @@ void QFRawDataRecord::setEvaluationIDMetadataInitSize(int initSize) {
 
 void QFRawDataRecord::readLock() const
 {
-    dstore->lock->lock();
+    dstore->lock->lockForRead();
 }
 
 void QFRawDataRecord::writeLock() const
 {
-    dstore->lock->lock();
+    dstore->lock->lockForWrite();
 }
 
 void QFRawDataRecord::readUnLock() const
@@ -656,7 +654,7 @@ void QFRawDataRecord::readXML(QDomElement& e, bool loadAsDummy, bool readID) {
 #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #endif
- QFRDRWriteLocker locker(dstore->lock);
+ //QFRDRWriteLocker locker(dstore->lock);
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
@@ -684,7 +682,7 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
         #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"unlock";
 #endif
- locker.unlock();
+ //locker.unlock();
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  unlocked";
 #endif
@@ -693,7 +691,7 @@ qDebug()<<Q_FUNC_INFO<<"unlock";
         #ifdef DEBUG_THREAN
 qDebug()<<Q_FUNC_INFO<<"relock";
 #endif
- locker.relock();
+ //locker.relock();
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  relocked";
 #endif
@@ -1392,7 +1390,7 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
-    if (dstore->results.contains(evalName)) return dstore->results[evalName]->results.size();
+    if (dstore->results.contains(evalName) && dstore->results.value(evalName)) return dstore->results.value(evalName)->results.size();
     return 0;
 };
 
@@ -1450,7 +1448,7 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
-        if (dstore->results.contains(evalName)) {
+        if (dstore->results.contains(evalName) && dstore->results[evalName]) {
             if (dstore->results[evalName]->results.remove(resultName)>0) changed=true;
             if (dstore->results[evalName]->results.isEmpty()) {
                 #ifdef DEBUG_THREAN
@@ -1479,12 +1477,16 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRWriteLocker";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
-        if (dstore->results.contains(name)) {
+        if (dstore->results.contains(name) && dstore->results.value(name)) {
             QFRawDataRecordPrivate::ResultsResultsIterator i(dstore->results[name]->results);
+            QStringList delkeys;
             while (i.hasNext()) {
                 i.next();
                 //cout << i.key() << ": " << i.value() << endl;
-                if (i.key().endsWith(postfix)) dstore->results[name]->results.remove(i.key());
+                if (i.key().endsWith(postfix)) delkeys<<i.key(); //dstore->results[name]->results.remove(i.key());
+            }
+            for (int ii=0; ii<delkeys.size(); ii++) {
+                dstore->results[name]->results.remove(delkeys[ii]);
             }
             if (dstore->results[name]->results.isEmpty()) dstore->results.remove(name);
             em=true;
@@ -1504,8 +1506,8 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
     if (dstore->results.contains(evalName)) {
-        if (dstore->results[evalName])
-            return dstore->results[evalName]->results.contains(resultName);
+        if (dstore->results.value(evalName))
+            return dstore->results.value(evalName)->results.contains(resultName);
     }
     return false;
 }
@@ -1519,7 +1521,7 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
-    return dstore->results.contains(evalName) && dstore->results[evalName] && (dstore->results[evalName]->results.size()>0) ;
+    return dstore->results.contains(evalName) && dstore->results.value(evalName) && (dstore->results.value(evalName)->results.size()>0) ;
 }
 
 void QFRawDataRecord::resultsSetNumberList(const QString& evaluationName, const QString& resultName, const QVector<double>& value, const QString& unit) {
@@ -2824,11 +2826,10 @@ QFRawDataRecord::evaluationResult QFRawDataRecord::resultsGet(const QString& eva
      qDebug()<<Q_FUNC_INFO<<"  locked";
     #endif
     evaluationResult r;
-    if (dstore->results.contains(evalName)) {
-        if (dstore->results[evalName]->results.contains(resultName)) {
-            if (dstore->results[evalName]) {
-                return dstore->results[evalName]->results[resultName];
-            }
+    if (dstore->results.contains(evalName) && dstore->results.value(evalName)) {
+        const QFRawDataRecordPrivate::evaluationIDMetadata* emd=dstore->results.value(evalName);
+        if (emd->results.contains(resultName)) {
+            return emd->results.value(resultName);
         }
     }
     //return false;
@@ -2885,7 +2886,7 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
-        return dstore->results[evalName]->results.value(resultName).type;
+        if (dstore->results.value(evalName, NULL)) return dstore->results.value(evalName)->results.value(resultName).type;
     }
     return qfrdreInvalid;
 }
@@ -3795,8 +3796,8 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
-    if (dstore->results.contains(evaluationName)) {
-        QList<QString> r=dstore->results[evaluationName]->results.keys();
+    if (dstore->results.contains(evaluationName) && dstore->results.value(evaluationName)) {
+        QList<QString> r=dstore->results.value(evaluationName)->results.keys();
         if (i<r.size()) {
             return r.at(i);
         }

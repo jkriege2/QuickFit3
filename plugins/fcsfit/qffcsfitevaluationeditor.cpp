@@ -456,9 +456,11 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 size_t c_residualCorrelationX=dsresc->addLinearColumn(fitResults.resN-1, 1, fitResults.resN-1, "residualcorr_x");
                 size_t c_residualCorrelationY=0;
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residualCorrelationY=dsresc->addCopiedColumn(&(fitResults.resWCorrelation[1]), fitResults.resN-1, "residualcorr_weighted_y");
+                    double* data=fitResults.resWCorrelation.data();
+                    c_residualCorrelationY=dsresc->addCopiedColumn(&(data[1]), fitResults.resN-1, "residualcorr_weighted_y");
                 } else {
-                    c_residualCorrelationY=dsresh->addCopiedColumn(&(fitResults.resCorrelation[1]), fitResults.resN-1, "residualcorr_y");
+                    double* data=fitResults.resCorrelation.data();
+                    c_residualCorrelationY=dsresh->addCopiedColumn(&(data[1]), fitResults.resN-1, "residualcorr_y");
                 }
                 JKQTPxyLineGraph* g_residualsCorrelation=new JKQTPxyLineGraph(pltResidualCorrelation->get_plotter());
                 g_residualsCorrelation->set_xColumn(c_residualCorrelationX);

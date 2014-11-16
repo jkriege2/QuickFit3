@@ -69,9 +69,8 @@ class QFProjectPrivate {
 };
 
 QFProject::QFProject(QFEvaluationItemFactory* evalFactory, QFRawDataRecordFactory* rdrFactory, QFPluginServices* services, QObject* parent):
-    QObject(parent), QFProperties()
-{
-    p=new QFProjectPrivate(this);
+    QObject(parent), QFProperties(), p(new QFProjectPrivate(this))
+{    
     m_sortOrder=QFProject::sortByID;
     dataChange=false;
     propertiesChange=false;

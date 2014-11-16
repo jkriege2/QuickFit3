@@ -1083,7 +1083,7 @@ void QFFCSMSDEvaluationEditor::updateFitFunctions() {
                 record->enableEmitResultsChanged();
 
 
-                size_t c_fit = ds->addCopiedColumn(fit_stat.fitfunc, N, "fit_model");
+                size_t c_fit = ds->addCopiedColumn(fit_stat.fitfunc, "fit_model");
                 //qDebug()<<"    f "<<t.elapsed()<<" ms";
                 t.start();
 
@@ -1116,10 +1116,10 @@ void QFFCSMSDEvaluationEditor::updateFitFunctions() {
                 size_t c_residuals=0;
                 JKQTPxyLineGraph* g_residuals=new JKQTPxyLineGraph(pltResiduals->get_plotter());
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residuals=dsres->addCopiedColumn(fit_stat.residuals_weighted, N, "residuals_weighted");
+                    c_residuals=dsres->addCopiedColumn(fit_stat.residuals_weighted, "residuals_weighted");
                     g_residuals->set_title("weighted residuals");
                 } else {
-                    c_residuals=dsres->addCopiedColumn(fit_stat.residuals, N, "residuals");
+                    c_residuals=dsres->addCopiedColumn(fit_stat.residuals, "residuals");
                     g_residuals->set_title("residuals");
                 }
                 g_residuals->set_xColumn(c_taures);
@@ -1143,16 +1143,16 @@ void QFFCSMSDEvaluationEditor::updateFitFunctions() {
                 /////////////////////////////////////////////////////////////////////////////////
                 // plot residuals running average
                 /////////////////////////////////////////////////////////////////////////////////
-                size_t c_tauresra=dsres->addCopiedColumn(fit_stat.tau_runavg, fit_stat.runAvgN, "tau_resid_runavg");
+                size_t c_tauresra=dsres->addCopiedColumn(fit_stat.tau_runavg, "tau_resid_runavg");
                 size_t c_residualsra=0;
                 JKQTPxyLineGraph* g_residualsra=new JKQTPxyLineGraph(pltResiduals->get_plotter());
 
 
                 if (chkWeightedResiduals->isChecked()) {
-                    c_residualsra=dsres->addCopiedColumn(fit_stat.residuals_runavg_weighted, fit_stat.runAvgN, "residuals_runavg_weighted");
+                    c_residualsra=dsres->addCopiedColumn(fit_stat.residuals_runavg_weighted, "residuals_runavg_weighted");
                     g_residualsra->set_title("weighted residuals, movAvg");
                 } else {
-                    c_residualsra=dsres->addCopiedColumn(fit_stat.residuals_runavg, fit_stat.runAvgN, "residuals_runavg");
+                    c_residualsra=dsres->addCopiedColumn(fit_stat.residuals_runavg, "residuals_runavg");
                     g_residualsra->set_title("residuals, movAvg");
                 }
                 g_residualsra->set_xColumn(c_tauresra);
@@ -1181,10 +1181,10 @@ void QFFCSMSDEvaluationEditor::updateFitFunctions() {
                 size_t c_residualHistogramY=0;
                 if (chkWeightedResiduals->isChecked()) {
                     c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, fit_stat.rminw+fit_stat.residHistWBinWidth/2.0, fit_stat.rmaxw-fit_stat.residHistWBinWidth/2.0, "residualhist_weighted_x");
-                    c_residualHistogramY=dsresh->addCopiedColumn(fit_stat.resWHistogram, residualHistogramBins, "residualhist_weighted_y");
+                    c_residualHistogramY=dsresh->addCopiedColumn(fit_stat.resWHistogram,  "residualhist_weighted_y");
                 } else {
                     c_residualHistogramX=dsresh->addLinearColumn(residualHistogramBins, fit_stat.rmin+fit_stat.residHistBinWidth/2.0, fit_stat.rmax-fit_stat.residHistBinWidth/2.0, "residualhist_x");
-                    c_residualHistogramY=dsresh->addCopiedColumn(fit_stat.resHistogram, residualHistogramBins, "residualhist_y");
+                    c_residualHistogramY=dsresh->addCopiedColumn(fit_stat.resHistogram,  "residualhist_y");
                 }
                 JKQTPbarHorizontalGraph* g_residualsHistogram=new JKQTPbarHorizontalGraph(pltResidualHistogram->get_plotter());
                 g_residualsHistogram->set_xColumn(c_residualHistogramX);

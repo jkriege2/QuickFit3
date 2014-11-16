@@ -46,9 +46,8 @@ class QFEvaluationItemPrivate {
 };
 
 QFEvaluationItem::QFEvaluationItem(QFProject* parent, bool showRDRList, bool useSelection):
-    QObject(parent), QFProperties()
+    QObject(parent), QFProperties(), p(new QFEvaluationItemPrivate(this))
 {
-    p=new QFEvaluationItemPrivate(this);
     this->useSelection=useSelection;
     this->showRDRList=showRDRList;
     doEmitPropertiesChanged=true;
