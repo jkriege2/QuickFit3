@@ -62,7 +62,7 @@ class QFSPIMLightsheetEvaluation : public QObject, public QFPluginEvaluationItem
         virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2012 by Jan W. Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2012-2014 by Jan W. Krieger"); };
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };
@@ -73,12 +73,15 @@ class QFSPIMLightsheetEvaluation : public QObject, public QFPluginEvaluationItem
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         };
+
+        virtual void init();
 
     protected slots:
         /** \brief insert FCS data from file*/
         void insertEvaluation();
+
 
     private:
 };

@@ -219,6 +219,18 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("isinf", QFMathParser_DefaultLib::fIsInf);
     p->addFunction("isfinite", QFMathParser_DefaultLib::fIsFinite);
     p->addFunction("isnumok", QFMathParser_DefaultLib::fIsFloatOK);
+    p->addFunction("isvalid", QFMathParser_DefaultLib::fIsValid);
+    p->addFunction("isvoid", QFMathParser_DefaultLib::fIsVoid);
+    p->addFunction("isint", QFMathParser_DefaultLib::fIsInt);
+    p->addFunction("isuint", QFMathParser_DefaultLib::fIsUInt);
+    p->addFunction("isbool", QFMathParser_DefaultLib::fIsBool);
+    p->addFunction("isstring", QFMathParser_DefaultLib::fIsString);
+    p->addFunction("isnumber", QFMathParser_DefaultLib::fIsDouble);
+    p->addFunction("isdouble", QFMathParser_DefaultLib::fIsDouble);
+    p->addFunction("isdoublevector", QFMathParser_DefaultLib::fIsDoubleVector);
+    p->addFunction("isnumbervector", QFMathParser_DefaultLib::fIsDoubleVector);
+    p->addFunction("isboolvector", QFMathParser_DefaultLib::fIsBoolVector);
+    p->addFunction("isstringvector", QFMathParser_DefaultLib::fIsStringVector);
 
     p->addFunction("unique", QFMathParser_DefaultLib::fUnique);
     p->addFunction("indexedmean", QFMathParser_DefaultLib::fIndexedAvg);
@@ -471,6 +483,126 @@ namespace QFMathParser_DefaultLib {
         }
         return;
     }
+
+
+    void fIsValid(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("isvalid"));
+            r.setInvalid();
+            return;
+        }
+        r.setBoolean(params[0].isValid);
+    }
+
+    void fIsVoid(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("isvoid"));
+            r.setInvalid();
+            return;
+        }
+        r.setBoolean(params[0].type==qfmpVoid);
+    }
+
+
+    void fIsInt(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("isint"));
+            r.setInvalid();
+            return;
+        }
+        r.setBoolean(params[0].isInteger());
+
+    }
+
+    void fIsUInt(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("isuint"));
+            r.setInvalid();
+            return;
+        }
+        r.setBoolean(params[0].isUInt());
+
+
+    }
+
+    void fIsDouble(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("isdouble"));
+            r.setInvalid();
+            return;
+        }
+        r.setBoolean(params[0].type==qfmpDouble);
+
+    }
+
+    void fIsString(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("isstring"));
+            r.setInvalid();
+            return;
+        }
+        r.setBoolean(params[0].type==qfmpString);
+    }
+
+    void fIsBool(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("isbool"));
+            r.setInvalid();
+            return;
+        }
+        r.setBoolean(params[0].type==qfmpBool);
+    }
+
+    void fIsVector(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("isvector"));
+            r.setInvalid();
+            return;
+        }
+        r.setBoolean(params[0].type==qfmpDoubleVector || params[0].type==qfmpBoolVector || params[0].type==qfmpStringVector);
+    }
+
+    void fIsBoolVector(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("isboolvector"));
+            r.setInvalid();
+            return;
+        }
+        r.setBoolean(params[0].type==qfmpBoolVector);
+    }
+
+    void fIsDoubleVector(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("isdoublevector"));
+            r.setInvalid();
+            return;
+        }
+        r.setBoolean(params[0].type==qfmpDoubleVector);
+    }
+
+    void fIsStringVector(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n!=1) {
+            p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg("isstringbool"));
+            r.setInvalid();
+            return;
+        }
+        r.setBoolean(params[0].type==qfmpStringVector);
+    }
+
+
+
+
 
 
     void fAllTrue(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
@@ -3310,6 +3442,7 @@ namespace QFMathParser_DefaultLib {
 
 
 
+
 #ifdef QFLIB_LIBRARY
     void fRDRIDs(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
         r.setInvalid();
@@ -4434,6 +4567,7 @@ namespace QFMathParser_DefaultLib {
             }
         }
     }
+
 
 
 

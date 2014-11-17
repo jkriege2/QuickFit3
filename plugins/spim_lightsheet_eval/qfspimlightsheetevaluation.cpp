@@ -47,6 +47,11 @@ void QFSPIMLightsheetEvaluation::registerToMenu(QMenu* menu) {
     menu->addAction(actAddEval);
 }
 
+void QFSPIMLightsheetEvaluation::init()
+{
+
+}
+
 
 
 
@@ -55,5 +60,7 @@ void QFSPIMLightsheetEvaluation::insertEvaluation() {
         project->addEvaluation(getID(), getName());
     }
 }
+
+
 
 Q_EXPORT_PLUGIN2(spim_lightsheet_eval, QFSPIMLightsheetEvaluation)

@@ -483,18 +483,18 @@ bool qfmpResult::setVariant(const QVariant& data) {
                 QVariantList vl=data.toList();
                 if (vl.size()>0) {
                     switch (vl[0].type()) {
-                        case QVariant::Bool: {type=qfmpBoolVector; boolVec.clear(); for (int i=0; i<vl.size(); i++) boolVec<<vl[i].toBool();} break;
+                        case QVariant::Bool: { isValid=true; type=qfmpBoolVector; boolVec.clear(); for (int i=0; i<vl.size(); i++) boolVec<<vl[i].toBool();} break;
                         case QVariant::Double:
                         case QVariant::Int:
                         case QVariant::UInt:
                         case QVariant::ULongLong:
-                        case QVariant::LongLong: {type=qfmpDoubleVector; numVec.clear(); for (int i=0; i<vl.size(); i++) numVec<<vl[i].toDouble();} break;
+                        case QVariant::LongLong: {isValid=true; type=qfmpDoubleVector; numVec.clear(); for (int i=0; i<vl.size(); i++) numVec<<vl[i].toDouble();} break;
                         case QVariant::Date:
-                        case QVariant::DateTime: {type=qfmpDoubleVector; numVec.clear(); for (int i=0; i<vl.size(); i++) numVec<<vl[i].toDateTime().toMSecsSinceEpoch();} break;
+                        case QVariant::DateTime: {isValid=true; type=qfmpDoubleVector; numVec.clear(); for (int i=0; i<vl.size(); i++) numVec<<vl[i].toDateTime().toMSecsSinceEpoch();} break;
                         case QVariant::String:
                         case QVariant::ByteArray:
                         case QVariant::Url:
-                        default: {type=qfmpStringVector; strVec.clear(); for (int i=0; i<vl.size(); i++) strVec<<vl[i].toString();} break;
+                        default: {isValid=true; type=qfmpStringVector; strVec.clear(); for (int i=0; i<vl.size(); i++) strVec<<vl[i].toString();} break;
                     }
                 }
             } break;

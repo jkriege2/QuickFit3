@@ -133,6 +133,19 @@ namespace QFMathParser_DefaultLib {
     QVector<bool> QFMathParser_shuffleB(const QVector<bool>& value);
     QStringList QFMathParser_shuffleS(const QStringList& value);
 
+    void fIsValid(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsVoid(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsInt(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsUInt(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsDouble(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsString(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsBool(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsVector(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsBoolVector(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsDoubleVector(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIsStringVector(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+
+
     void fShuffle(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
 

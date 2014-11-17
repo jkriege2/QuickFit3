@@ -76,6 +76,8 @@ class QFRDRImageStackPlugin : public QObject, public QFPluginRawDataRecordBase {
 
         /** \brief icon for the plugin */
         virtual QString getIconFilename() const  { return QString(":/image_stack/qfrdrimagestack.png"); }
+
+        virtual void init();
     protected slots:
         /** \brief insertdata from file*/
         void insertSingleFileImageStack();
@@ -84,6 +86,7 @@ class QFRDRImageStackPlugin : public QObject, public QFPluginRawDataRecordBase {
         void insertSingleFileHDualViewImageStack();
         void insertSingleFileVDualViewImageStack();
         void insertSingleFileDualViewImageStack(char dvMode='h');
+        void startProjectWizardLightsheetAnalysis();
 };
 
 #endif // QFRDRIMAGESTACK_H
