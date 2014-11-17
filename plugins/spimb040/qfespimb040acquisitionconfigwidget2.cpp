@@ -1121,7 +1121,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                         if (!ok) {
                             ACQUISITION_ERROR(tr("  - error acquiring overview background image from camera 1, lightpath %1!\n").arg(ovrImg+1));
                         } else {
-                            log->log_text(tr("  - acquired overview image background from camer 1, lightpath %1!\n").arg(ovrImg+1));
+                            log->log_text(tr("  - acquired overview background image from camera 1, lightpath %1 (reconfigured camera: %2)!\n").arg(ovrImg+1).arg(newCamSetting));
                         }
 
                     }
@@ -1140,7 +1140,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                         if (!ok) {
                             ACQUISITION_ERROR(tr("  - error acquiring overview background image from camera 2, lightpath %1!\n").arg(ovrImg+1));
                         } else {
-                            log->log_text(tr("  - acquired overview background image from camer 2, lightpath %1!\n").arg(ovrImg+1));
+                            log->log_text(tr("  - acquired overview background image from camera 2, lightpath %1 (reconfigured camera: %2)!\n").arg(ovrImg+1).arg(newCamSetting));
                         }
                     }
                 }
@@ -1187,7 +1187,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                     if (!ok) {
                         ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 1, lightpath %1!\n").arg(ovrImg+1));
                     } else {
-                        log->log_text(tr("  - acquired overview image from camer 1, lightpath %1!\n").arg(ovrImg+1));
+                        log->log_text(tr("  - acquired overview image from camera 1, lightpath %1 (reconfigured camera: %2)!\n").arg(ovrImg+1).arg(newCamSetting));
                     }
 
                 }
@@ -1206,7 +1206,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                     if (!ok) {
                         ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 2, lightpath %1!\n").arg(ovrImg+1));
                     } else {
-                        log->log_text(tr("  - acquired overview image from camer 2, lightpath %1!\n").arg(ovrImg+1));
+                        log->log_text(tr("  - acquired overview image from camera 2, lightpath %1 (reconfigured camera: %2)!\n").arg(ovrImg+1).arg(newCamSetting));
                     }
                 }
             }
@@ -1297,7 +1297,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                     if (!ok) {
                         ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 1, lightpath %1!\n").arg(ovrImg+1));
                     } else {
-                        log->log_text(tr("  - acquired overview image from camer 1, lightpath %1!\n").arg(ovrImg+1));
+                        log->log_text(tr("  - acquired overview image from camera 1, lightpath %1 (reconfigured camera: %2)!\n").arg(ovrImg+1).arg(newCamSetting));
                     }
 
                 }
@@ -1316,7 +1316,7 @@ void QFESPIMB040AcquisitionConfigWidget2::performAcquisition()
                     if (!ok) {
                         ACQUISITION_ERROR(tr("  - error acquiring overview image from camera 2, lightpath %1!\n").arg(ovrImg+1));
                     } else {
-                        log->log_text(tr("  - acquired overview image from camer 2, lightpath %1!\n").arg(ovrImg+1));
+                        log->log_text(tr("  - acquired overview image from camera 2, lightpath %1 (reconfigured camera: %2)!\n").arg(ovrImg+1).arg(newCamSetting));
                     }
                 }
             }
