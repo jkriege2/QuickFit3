@@ -23,7 +23,7 @@
 #include "qffitresultsbyindexevaluation.h"
 #include "qffitresultsbyindexevaluationfittools.h"
 
-#define ACCUMULATE_RUNS_BEFORE_WRITE 50
+#define ACCUMULATE_RUNS_BEFORE_WRITE 256
 
 QFFitResultsByIndexEvaluationFitThread::QFFitResultsByIndexEvaluationFitThread(bool stopWhenEmpty, QObject *parent) :
     QThread(parent)
@@ -403,7 +403,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread::run()
         cnt++;
         done=!(!stopped  && (!(stopWhenEmpty&&jempty)));
         //qDebug()<<"thread, run="<<job.run<<"  done="<<done<<"  stopped="<<stopped<<"  jempty="<<jempty;
-        if (writer && (cnt>50 || done)) {
+        if (writer && (cnt>ACCUMULATE_RUNS_BEFORE_WRITE || done)) {
             //QMutexLocker locker(lock);
             writer->addFitResult(localfitresults);
             localfitresults.clear();
@@ -631,7 +631,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread_Writer::run()
         //qDebug()<<"thread, run="<<job.run<<"  done="<<done<<"  stopped="<<stopped<<"  jempty="<<jempty;
         if (localfitresults.size()>ACCUMULATE_RUNS_BEFORE_WRITE || done) {
             QElapsedTimer timer;
-            //qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done;
+            qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done;
             timer.start();
             QList<QFRawDataRecord*> rdrs;
             QList<bool> emitSignals;
@@ -847,7 +847,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread_Writer::run()
                     }
                 }
             }
-            //qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done<<"  ... FINISHED AFTER "<<double(timer.nsecsElapsed())/1e6<<"ms";
+            qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done<<"  ... FINISHED AFTER "<<double(timer.nsecsElapsed())/1e6<<"ms";
             //timer.start();
 
             for (int i=0; i<localfitresults.size(); i++) {
@@ -857,7 +857,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread_Writer::run()
             }
 
 
-            //qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done<<"  ... EMITTED AFTER "<<double(timer.nsecsElapsed())/1e6<<"ms";
+            qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done<<"  ... EMITTED AFTER "<<double(timer.nsecsElapsed())/1e6<<"ms";
         }
     }
 }

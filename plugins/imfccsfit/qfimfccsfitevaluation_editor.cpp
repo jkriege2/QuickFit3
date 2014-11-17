@@ -154,6 +154,11 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->btnEvaluateCurrentAllRuns->addAction(actFitAllPixelsMT);
     menuEvaluation->addAction(actFitAllPixelsMT);
 
+    actFitAllPixelsMTExp=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels (MT, experimental)"), this);
+    connect(actFitAllPixelsMTExp, SIGNAL(triggered()), this, SLOT(fitAllPixelsThreadedWriter()));
+    ui->btnEvaluateCurrentAllRuns->addAction(actFitAllPixelsMTExp);
+    menuEvaluation->addAction(actFitAllPixelsMTExp);
+
     actFitAllPixels=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels"), this);
     connect(actFitAllPixels, SIGNAL(triggered()), this, SLOT(fitAllPixels()));
     ui->btnEvaluateCurrentAllRuns->addAction(actFitAllPixels);
@@ -191,6 +196,11 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     connect(actCopyToInitial, SIGNAL(triggered()), this, SLOT(copyToInitial()));
     ui->btnCopyToInitial->setDefaultAction(actCopyToInitial);
     menuEvaluation->addAction(actCopyToInitial);
+
+    actCheckFilesets=new QAction(tr("Check fitted filesets"), this);
+    actCheckFilesets->setToolTip(tr("removes all fitted filesets, for which no fit results exist."));
+    connect(actCheckFilesets, SIGNAL(triggered()), this, SLOT(copyToInitial()));
+    menuEvaluation->addAction(actCheckFilesets);
 
 
     actSaveReport=new QAction(QIcon(":/imfccsfit/fit_savereport.png"), tr("&Save Report"), this);
@@ -1007,10 +1017,7 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
     if (ProgramOptions::getConfigValue(eval->getType()+"/overrule_threads", false).toBool()) {
         threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
     }
-/*    QFFitResultsByIndexEvaluationFitThread_Writer* writerthread=new QFFitResultsByIndexEvaluationFitThread_Writer(eval->getProject(), this);
-    for (int i=0; i<threadcount; i++) {
-        threads.append(new QFFitResultsByIndexEvaluationFitThread(writerthread,  true, this));
-    }*/
+
     for (int i=0; i<threadcount; i++) {
         threads.append(new QFFitResultsByIndexEvaluationFitThread(  true, this));
     }
@@ -1034,6 +1041,7 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
                 if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
                     //qDebug()<<"t"<<thread<<"   r"<<run;
                     threads[thread]->addJob(eval, records, run, getUserMin(records[0], run, ui->datacut->get_userMin()), getUserMax(records[0], run, ui->datacut->get_userMax()));
+                    eval->addFittedFileSet(records);
 
                     thread++;
                     if (thread>=threadcount) thread=0;
@@ -1045,7 +1053,151 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
 
 
     // start all threads and wait for them to finish
-    //writerthread->start();
+    for (int i=0; i<threadcount; i++) {
+        threads[i]->start();
+        //qDebug()<<"started thread "<<i;
+    }
+    bool finished=false;
+    bool canceled=false;
+    QTime time;
+    time.start();
+    while (!finished) {
+
+
+        // check whether all threads have finished and collect progress info
+        finished=true;
+        int jobsDone=0;
+        for (int i=0; i<threadcount; i++) {
+            finished=finished&&threads[i]->isFinished();
+            jobsDone=jobsDone+threads[i]->getJobsDone();
+        }
+        dlgTFitProgress->setProgress(jobsDone);
+        if (!canceled) {
+            double runtime=double(time.elapsed())/1.0e3;
+            double timeperfit=runtime/double(jobsDone);
+            double estimatedRuntime=double(items)*timeperfit;
+            double remaining=estimatedRuntime-runtime;
+            dlgTFitProgress->reportStatus(tr("processing fits in %3 threads ... %1/%2 done\nruntime: %4:%5       remaining: %6:%7 [min:secs]       %8 fits/sec").arg(jobsDone).arg(items).arg(threadcount).arg(uint(int(runtime)/60),2,10,QChar('0')).arg(uint(int(runtime)%60),2,10,QChar('0')).arg(uint(int(remaining)/60),2,10,QChar('0')).arg(uint(int(remaining)%60),2,10,QChar('0')).arg(1.0/timeperfit,5,'f',2));
+        }
+        QApplication::processEvents();
+
+        // check for user canceled
+        if (!canceled && dlgTFitProgress->isCanceled()) {
+            dlgTFitProgress->reportStatus("sending all threads the CANCEL signal");
+            for (int i=0; i<threadcount; i++) {
+                threads[i]->cancel(false);
+            }
+            canceled=true;
+        }
+        //qDebug()<<"finished="<<finished<<"   jobsDone="<<jobsDone<<"   canceled="<<canceled;
+    }
+
+
+    // free memory
+    for (int i=0; i<threadcount; i++) {
+        //qDebug()<<"deleting thread "<<i<<threads[i]->isFinished()<<threads[i]->getJobsDone();
+        threads[i]->cleanJobs();
+        delete threads[i];
+    }
+
+    dlgTFitProgress->reportStatus(tr("fit done ... finalizing writer thread\n"));
+    eval->checkAndCleanFitFileSets();
+
+
+    dlgTFitProgress->reportStatus(tr("fit done ... updating user interface\n"));
+    dlgTFitProgress->setProgress(items+2);
+    QApplication::processEvents();
+
+    for (int i=0; i<records.size(); i++) {
+        QFRawDataRecord* record=records[i];
+        if (record ) {
+            record->enableEmitResultsChanged(true);
+        }
+    }
+    current->emitResultsChanged();
+
+    dlgTFitProgress->setProgress(items+3);
+    QApplication::processEvents();
+    displayEvaluation();
+    dlgTFitProgress->setProgress(items+5);
+    QApplication::processEvents();
+    QApplication::restoreOverrideCursor();
+    dlgTFitProgress->done();
+    delete dlgTFitProgress;
+    eval->getParameterInputTableModel()->rebuildModel();
+}
+
+void QFImFCCSFitEvaluationEditor::fitAllPixelsThreadedWriter()
+{
+    if (!current) return;
+    QFImFCCSFitEvaluationItem* eval=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!eval) return;
+    QFFitAlgorithm* falg=eval->getFitAlgorithm();
+    if (!falg) return;
+    QList<QFRawDataRecord*> records=eval->getFitFiles();
+    if (records.size()<=0) return;
+    if (!falg->isThreadSafe()) {
+        fitAllPixels();
+        return;
+    }
+    if (!falg) return;
+
+    dlgQFProgressDialog* dlgTFitProgress=new dlgQFProgressDialog(this);
+    dlgTFitProgress->reportTask(tr("fit all runs in the current file<br>using algorithm '%1' \n").arg(falg->name()));
+    dlgTFitProgress->setProgressMax(100);
+    dlgTFitProgress->setProgress(0);
+    dlgTFitProgress->setAllowCancel(true);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    dlgTFitProgress->display();
+
+
+    int items=0;
+    int thread=0;
+    dlgTFitProgress->reportStatus("creating thread objects ...");
+    QApplication::processEvents();
+    //QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+    QList<QFFitResultsByIndexEvaluationFitSmartThread*> threads;
+    int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
+    if (ProgramOptions::getConfigValue(eval->getType()+"/overrule_threads", false).toBool()) {
+        threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
+    }
+    QFFitResultsByIndexEvaluationFitSmartThread_Writer* writerthread=new QFFitResultsByIndexEvaluationFitSmartThread_Writer(eval->getProject(), this);
+    for (int i=0; i<threadcount; i++) {
+        threads.append(new QFFitResultsByIndexEvaluationFitSmartThread(writerthread,  true, this));
+    }
+
+
+    // enqueue the jobs in the several threads and finally make sure they know when to stop
+    dlgTFitProgress->reportStatus("distributing jobs ...");
+    QApplication::processEvents();
+    //for (int i=0; i<recs.size(); i++) {
+    QFRawDataRecord* record=records[0];
+        QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
+
+        if (record ) {
+            record->disableEmitResultsChanged();
+            int runmax=eval->getIndexMax(record);
+            int runmin=eval->getIndexMin(record);
+            items=items+runmax-runmin+1;
+            for (int run=runmin; run<=runmax; run++) {
+                bool doall=!current->getProperty("LEAVEOUTMASKED", false).toBool();
+                //qDebug()<<doall;
+                if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
+                    //qDebug()<<"t"<<thread<<"   r"<<run;
+                    threads[thread]->addJob(eval, records, run, getUserMin(records[0], run, ui->datacut->get_userMin()), getUserMax(records[0], run, ui->datacut->get_userMax()));
+                    eval->addFittedFileSet(records);
+
+                    thread++;
+                    if (thread>=threadcount) thread=0;
+                }
+            }
+        }
+    //}
+    dlgTFitProgress->setProgressMax(items+5);
+
+
+    // start all threads and wait for them to finish
+    writerthread->start();
     for (int i=0; i<threadcount; i++) {
         threads[i]->start();
         //qDebug()<<"started thread "<<i;
@@ -1095,11 +1247,12 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
 
     dlgTFitProgress->reportStatus(tr("fit done ... finalizing writer thread\n"));
 
-    //writerthread->cancel();
-    //delete writerthread;
+    writerthread->cancel();
+    delete writerthread;
 
     dlgTFitProgress->reportStatus(tr("fit done ... updating user interface\n"));
     dlgTFitProgress->setProgress(items+2);
+    eval->checkAndCleanFitFileSets();
     QApplication::processEvents();
 
     for (int i=0; i<records.size(); i++) {
@@ -1393,6 +1546,17 @@ void QFImFCCSFitEvaluationEditor::setParameterTableSpans()
         ui->tableView->setSpan(1,i,1,data->getParameterInputTableModel()->getColsPerRDR());
     }
     setParameterVisibility();
+}
+
+void QFImFCCSFitEvaluationEditor::checkFitFileSets()
+{
+    if (!current) return;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    data->checkAndCleanFitFileSets();
+    QApplication::restoreOverrideCursor();
+
 }
 
 void QFImFCCSFitEvaluationEditor::on_cmbWeight_currentWeightChanged(QFFCSWeightingTools::DataWeight weight)

@@ -157,8 +157,6 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
         virtual void unsetLinkParameter(int file, QString parameter);
         /** \brief clear all linked parameters in the given file or all linked parameters, if \c file<0 */
         virtual void clearLinkParameters(int file=-1);
-    protected slots:
-
         /** \brief check all fit file sets, whether they contain non-existing RDRs ... if so, remove them! */
         void checkAndCleanFitFileSets();
 

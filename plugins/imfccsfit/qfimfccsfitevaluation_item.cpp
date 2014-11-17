@@ -643,7 +643,7 @@ int QFImFCCSFitEvaluationItem::getLinkParameterCount() const
 int QFImFCCSFitEvaluationItem::getLinkParameter(int file, QString parameter) const
 {
     if (globalParams.contains(file)) {
-        return globalParams[file].value(parameter, -1);
+        return globalParams.value(file).value(parameter, -1);
     }
     return -1;
 }
@@ -985,13 +985,15 @@ void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<
             if (!dfd.weightsOK && doLog) QFPluginLogTools::log_warning(tr("      - weights have invalid values => setting all weights to 1\n"));
             // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
             // we are working with a complete set of parameters
+            record->readLock();
             dfd.params=allocFillParameters(record, run, ffunc);
-            dfd.initialparams=allocFillParameters(record, run, ffunc);
+            dfd.initialparams=duplicateArray(dfd.params, ffunc->paramCount());
             dfd.errors=allocFillParameterErrors(record, run, ffunc);
-            dfd.errorsI=allocFillParameterErrors(record, run, ffunc);
+            dfd.errorsI=duplicateArray(dfd.errors, ffunc->paramCount());
             dfd.paramsMin=allocFillParametersMin(record, ffunc);
             dfd.paramsMax=allocFillParametersMax(record, ffunc);
             dfd.paramsFix=allocFillFix(record, run, ffunc);
+            record->readUnLock();
             dfd.ffunc=ffunc;
             dfd.cut_low=cut_low;
             dfd.cut_up=cut_up;
@@ -1870,9 +1872,9 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFRawDataRecord:
         }
     }
 
-    QMutexLocker locker(mutexThreadedFit);
+    //QMutexLocker locker(mutexThreadedFit);
     setupGlobalFitTool(tool, &fitData, iparams, paramsVector, initialParamsVector, errorsVector, errorsVectorI, records, run, rangeMinDatarange, rangeMaxDatarange, false);
-    locker.unlock();
+    //locker.unlock();
 
     bool OK=true;
     try {

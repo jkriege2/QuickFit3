@@ -152,6 +152,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         QAction* actConfigureFor2CSPIMFCCS;
         QAction* actConfigureForASPIMFCCS;
         QAction* actFitCurrent;
+        QAction* actFitAllPixelsMTExp;
         QAction* actFitAllPixelsMT;
         QAction* actFitAllPixels;
         QAction* actPrintReport;
@@ -167,6 +168,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         QAction* actResetAllPixels;
         QAction* actResetAllPixelsInAllFilesets;
         QAction* actCopyToInitial;
+        QAction* actCheckFilesets;
 
         QMenu* menuImFCCSFit;
         QMenu* menuEvaluation;
@@ -207,6 +209,8 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void fitCurrent();
         /** \brief all runs/pixels current file */
         void fitAllPixelsThreaded();
+        /** \brief all runs/pixels current file */
+        void fitAllPixelsThreadedWriter();
         /** \brief all runs/pixels current file, multi-threaded version */
         void fitAllPixels();
 
@@ -224,6 +228,8 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void copyToInitial();
 
         void setParameterTableSpans();
+
+        void checkFitFileSets();
 
 
         void on_spinFitLocalGlobals_valueChanged(int value);
