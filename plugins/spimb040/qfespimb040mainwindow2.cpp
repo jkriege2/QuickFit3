@@ -349,8 +349,10 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
     int width=0, height=0;
     uint32_t* buffer=NULL;
     if (ok) {
-        QSettings settings(previewSettingsFilename, QSettings::IniFormat);
-        ecamera->useCameraSettings(camera, settings);
+        if (!previewSettingsFilename.isEmpty())  {
+            QSettings settings(previewSettingsFilename, QSettings::IniFormat);
+            ecamera->useCameraSettings(camera, settings);
+        }
         width=ecamera->getCameraImageWidth(camera);
         height=ecamera->getCameraImageHeight(camera);
         buffer=(uint32_t*)qfCalloc(width*height, sizeof(uint32_t));

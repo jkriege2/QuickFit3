@@ -548,6 +548,13 @@ p, li { white-space: pre-wrap; }
          </widget>
         </item>
         <item>
+         <widget class="QCheckBox" name="chkReconfigureAlways2">
+          <property name="text">
+           <string>reconfigure camera for every image (slower, but safer)</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="horizontalSpacer_21">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
@@ -676,6 +683,13 @@ p, li { white-space: pre-wrap; }
           </property>
           <property name="text">
            <string>no preview</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chkReconfigureAlways1">
+          <property name="text">
+           <string>reconfigure camera for every image (slower, but safer)</string>
           </property>
          </widget>
         </item>
