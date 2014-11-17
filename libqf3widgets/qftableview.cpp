@@ -67,6 +67,7 @@ int QFTableView::addCopiedColumn(QString name, const double *data, int32_t size)
     model.setColumnCreate(c, data, size);
     model.setReadonly(true);
     model.enableSignals();
+    tvMain->resizeColumnsToContents();
     return c;
 }
 
@@ -80,6 +81,7 @@ int QFTableView::addColumn(QString name, const QList<QVariant> &data)
     model.setColumnCreate(c, data);
     model.setReadonly(true);
     model.enableSignals();
+    tvMain->resizeColumnsToContents();
     return c;
 }
 

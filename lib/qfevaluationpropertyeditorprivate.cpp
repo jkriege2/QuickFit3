@@ -356,7 +356,7 @@ void QFEvaluationPropertyEditorPrivate::showData()
             QFTableService::TableColumn h;
             int col=idxs[i].column();
             QString chead=d->resultsModel->headerData(col, Qt::Horizontal).toString();
-            QString rhead=d->resultsModel->headerData(col, Qt::Vertical).toString();
+            QString rhead=d->resultsModel->headerData(idxs[i].row(), Qt::Vertical).toString();
 
             QString ename=d->resultsModel->data(idxs[i], QFEvaluationResultsModel::EvalNameRole).toString();
             QString rname=d->resultsModel->data(idxs[i], QFEvaluationResultsModel::ResultNameRole).toString();

@@ -100,6 +100,10 @@ QEnhancedTableView::QEnhancedTableView(QWidget* parent, bool noCopyShortcut):
     connect(actCopyImage, SIGNAL(triggered()), this, SLOT(copyAsImage()));
     addAction(actCopyImage);
 
+    actSaveImage=new QAction(tr("Save table as image"), this);
+    connect(actSaveImage, SIGNAL(triggered()), this, SLOT(saveAsImage()));
+    addAction(actSaveImage);
+
     actPrint=new QAction(QIcon(":/lib/print.png"), tr("&Print Table"), this);
     actPrint->setShortcut(QKeySequence::Print);
     connect(actPrint, SIGNAL(triggered()), this, SLOT(print()));
@@ -895,6 +899,74 @@ void QEnhancedTableView::copyAsImage()
     mime->setImageData(pix);
     mime->setData("image/svg+xml", svg);
     clipboard->setMimeData(mime);
+
+    if (htmld) {
+        htmld->setPrintMode(false);
+    }
+}
+
+void QEnhancedTableView::saveAsImage()
+{
+    clearSelection();
+
+
+    /// PRINT HERE //////////////////////////////////////////////////////////////////////////////////
+    // calculate the total width/height table would need without scaling
+    const int rows = model()->rowCount();
+    const int cols = model()->columnCount();
+    double vhw=verticalHeader()->width()+8;
+    double totalWidth = vhw;
+    double minWidth=1e33;
+    double maxWidth=0;
+    for (int c = -1; c < cols; ++c)
+    {
+        double w=columnWidth(c);
+        totalWidth += w;
+        if (w<minWidth) minWidth=w;
+        if (w>maxWidth) maxWidth=w;
+    }
+    double hhh=horizontalHeader()->height()+8;
+    double totalHeight = hhh;
+    double minHeight=1e33;
+    double maxHeight=0;
+    for (int r = 0; r < rows; ++r)
+    {
+       double h=rowHeight(r);
+       totalHeight += h;
+       if (h<minHeight) minHeight=h;
+       if (h>maxHeight) maxHeight=h;
+    }
+
+    QFHTMLDelegate* htmld=dynamic_cast<QFHTMLDelegate*>(itemDelegate());
+    if (htmld) {
+        htmld->setPrintMode(true);
+    }
+
+
+
+    QStringList filters;
+    filters<<tr("PNG Image (*.png)")<<tr("SVG (*.svg)")<<tr("TIFF Image (*.tif)");
+    QString selFilter=filters[0];
+    QString filename=qfGetSaveFileNameSet("QEnhancedTableView/saveImage/", this, tr("save table as image ..."), QString(), filters.join(";;"), &selFilter);
+    if (filename.size()>0) {
+        if (selFilter==filters[0] || selFilter==filters[2]) {
+            QPixmap pix(totalWidth, totalHeight);
+            pix.fill(Qt::white);
+
+            {
+                QPainter painter(&pix);
+                paint(painter);
+                painter.end();
+            }
+            pix.save(filename);
+        } else if (selFilter==filters[1]) {
+            QSvgGenerator generator;
+            generator.setFileName(filename);
+            QPainter painter(&generator);
+            paint(painter);
+            painter.end();
+        }
+    }
 
     if (htmld) {
         htmld->setPrintMode(false);

@@ -1939,7 +1939,7 @@ void QFRawDataPropertyEditor_private::showData()
             QFTableService::TableColumn h;
             int col=idxs[i].column();
             QString chead=current->resultsGetModel()->headerData(col, Qt::Horizontal).toString();
-            QString rhead=current->resultsGetModel()->headerData(col, Qt::Vertical).toString();
+            QString rhead=current->resultsGetModel()->headerData(idxs[i].row(), Qt::Vertical).toString();
 
             QString ename=current->resultsGetModel()->data(idxs[i], QFRDRResultsModel::EvalNameRole).toString();
             QString rname=current->resultsGetModel()->data(idxs[i], QFRDRResultsModel::ResultNameRole).toString();
