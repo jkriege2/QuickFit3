@@ -442,9 +442,7 @@ QString QFESPIMB040AcquisitionConfigWidget2::lightpathFilenamePreview5() const {
     return ui->cmbLightpathPreview5->itemData(ui->cmbLightpathPreview5->currentIndex()).toString();
 }
 QString QFESPIMB040AcquisitionConfigWidget2::lightpathFilenamePreview6() const {
-    return ui->cmbLightpathPreview6->itemData(ui->c
-                                              ui->->setChecked(settings.value(prefix+"", true).toBool());
-                                              ui->->setChecked(settings.value(prefix+"", true).toBool());mbLightpathPreview6->currentIndex()).toString();
+    return ui->cmbLightpathPreview6->itemData(ui->cmbLightpathPreview6->currentIndex()).toString();
 }
 
 QString QFESPIMB040AcquisitionConfigWidget2::lightpathPreview3() const {
@@ -552,9 +550,7 @@ QString QFESPIMB040AcquisitionConfigWidget2::currentPreviewConfigFilename(int ca
     }
     if (preview==4) {
         if (camera==0) return ui->cmbPreviewSettings1_5->currentConfigFilename();
-        if (camera==1) return ui->cmbPreviewSett
-                ui->->setChecked(settings.value(prefix+"", true).toBool());
-                ui->->setChecked(settings.value(prefix+"", true).toBool());ings2_5->currentConfigFilename();
+        if (camera==1) return ui->cmbPreviewSettings2_5->currentConfigFilename();
     }
     if (preview==5) {
         if (camera==0) return ui->cmbPreviewSettings1_6->currentConfigFilename();
@@ -618,9 +614,7 @@ void QFESPIMB040AcquisitionConfigWidget2::lightpathesChanged(QFESPIMB040OpticsSe
         QTriple<QIcon, QString, QString> p=lightpathes[i];
         ui->cmbLightpath->addItem(p.first, p.second, p.third);
         ui->cmbLightpathPreview2->addItem(p.first, p.second, p.third);
-        ui->cmbLightpathPreview3->addItem(p.fir
-                                          ui->->setChecked(settings.value(prefix+"", true).toBool());
-                                          ui->->setChecked(settings.value(prefix+"", true).toBool());st, p.second, p.third);
+        ui->cmbLightpathPreview3->addItem(p.first, p.second, p.third);
         ui->cmbLightpathPreview4->addItem(p.first, p.second, p.third);
         ui->cmbLightpathPreview5->addItem(p.first, p.second, p.third);
         ui->cmbLightpathPreview6->addItem(p.first, p.second, p.third);
