@@ -1118,6 +1118,10 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         QString resultsGetEvaluationName(int i) const;
         /** \brief get the i-th result name */
         QString resultsGetResultName(const QString& evaluationName, int i) const;
+        /** \brief get the evaluation names */
+        QStringList resultsGetEvaluationNames() const;
+        /** \brief get the result names */
+        QStringList resultsGetResultNames(const QString& evaluationName) const;
 
         /*! \brief save a copy of all results with the given \a oldEvalName to the given \a newEvalName
             \param oldEvalName name of the evaluation results section to copy

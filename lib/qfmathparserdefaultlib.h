@@ -464,6 +464,8 @@ namespace QFMathParser_DefaultLib {
 
 #ifdef QFLIB_LIBRARY
     void fRDRIDs(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDRGetResultIDs(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDRGetEvaluationIDs(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetResult(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetResultError(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDRGetName(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p);

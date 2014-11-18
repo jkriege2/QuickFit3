@@ -1625,7 +1625,19 @@ void QFRDRTableEditor::slRecalcAll()
                                     if (in<nv.size() && in<ov.size()) {
                                         //qDebug()<<nv[in]<<ov[in]<<nv[in].isValid()<<ov[in].isValid();
                                         if (nv[in]!=ov[in]) {
-                                            equalWithVariant=false;
+                                            if (nv[in].type()==QVariant::Double && ov[in].type()==QVariant::Double) {
+                                                double nd=nv[in].toDouble();
+                                                double od=ov[in].toDouble();
+                                                if (std::isnan(nd) && std::isnan(od)) {
+                                                    // equals
+                                                } else if (std::isinf(nd) && std::isinf(od)) {
+                                                    // equals
+                                                } else {
+                                                    equalWithVariant=false;
+                                                }
+                                            } else {
+                                                equalWithVariant=false;
+                                            }
                                             //qDebug()<<"  unequal idx "<<i<<nv[i]<<ov[i];
                                             break;
                                         } else if (nv[in].isValid() && !ov[in].isValid()) {
@@ -1641,6 +1653,7 @@ void QFRDRTableEditor::slRecalcAll()
                                             break;
                                         }
                                     }
+                                    if (!equalWithVariant) break;
                                 }
                                 //qDebug()<<ok<<ov.size()<<nv.size()<<equalWithVariant;
                                 if (ok && !equalWithVariant) {

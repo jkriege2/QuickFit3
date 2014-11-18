@@ -1415,7 +1415,7 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
-    if ((long)i<dstore->results.size()) return dstore->results.keys().at(i);
+    if ((long)i<dstore->results.size()) return dstore->results.keys().value(i, "");
     return QString("");
 };
 
@@ -3797,12 +3797,38 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
     if (dstore->results.contains(evaluationName) && dstore->results.value(evaluationName)) {
-        QList<QString> r=dstore->results.value(evaluationName)->results.keys();
-        if (i<r.size()) {
-            return r.at(i);
-        }
+        return dstore->results.value(evaluationName)->results.keys().value(i, "");
     }
     return QString("");
+}
+
+QStringList QFRawDataRecord::resultsGetEvaluationNames() const
+{
+
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+ QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+    if ((long)i<dstore->results.size()) return dstore->results.keys();
+    return QStringList();
+}
+
+QStringList QFRawDataRecord::resultsGetResultNames(const QString &evaluationName) const
+{
+#ifdef DEBUG_THREAN
+qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
+#endif
+ QFRDRReadLocker locker(dstore->lock);
+#ifdef DEBUG_THREAN
+ qDebug()<<Q_FUNC_INFO<<"  locked";
+#endif
+    if (dstore->results.contains(evaluationName) && dstore->results.value(evaluationName)) {
+        return dstore->results.value(evaluationName)->results.keys();
+    }
+    return QStringList();
 }
 
 void QFRawDataRecord::resultsCopy(const QString& oldEvalName, const QString& newEvalName)  {

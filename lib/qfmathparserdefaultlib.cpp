@@ -328,6 +328,8 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("rdr_ids", QFMathParser_DefaultLib::fRDRIDs);
     p->addFunction("rdr_getresult", QFMathParser_DefaultLib::fRDRGetResult);
     p->addFunction("rdr_getresulterror", QFMathParser_DefaultLib::fRDRGetResultError);
+    p->addFunction("rdr_getresultids", QFMathParser_DefaultLib::fRDRGetResultIDs);
+    p->addFunction("rdr_getevaluationids", QFMathParser_DefaultLib::fRDRGetEvaluationIDs);
     p->addFunction("rdr_getname", QFMathParser_DefaultLib::fRDRGetName);
     p->addFunction("rdr_getfolder", QFMathParser_DefaultLib::fRDRGetFolder);
     p->addFunction("rdr_getgroup", QFMathParser_DefaultLib::fRDRGetGroup);
@@ -442,7 +444,7 @@ namespace QFMathParser_DefaultLib {
 
 
 
-    QVector<double> QFMathParser_shuffleD(const QVector<double>& value) {
+    /*QVector<double> QFMathParser_shuffleD(const QVector<double>& value) {
         std::vector<double> mm=value.toStdVector();
         std::random_shuffle( mm.begin(), mm.end() );
         return QVector<double>::fromStdVector(mm);
@@ -463,7 +465,7 @@ namespace QFMathParser_DefaultLib {
             res<<mm[i];
         }
         return res;
-    }
+    }*/
 
     void fShuffle(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
         if (n!=1) {
@@ -472,11 +474,26 @@ namespace QFMathParser_DefaultLib {
             return;
         }
         if(params[0].type==qfmpDoubleVector) {
-            r.setDoubleVec(QFMathParser_shuffleD(params[0].numVec));
+            //r.setDoubleVec(QFMathParser_shuffleD(params[0].numVec));
+            r.setDoubleVec(params[0].numVec);
+            for (int i=r.numVec.size(); i>=1; i--) {
+                int j=p->get_rng()->randInt(i);
+                qSwap(r.numVec[i], r.numVec[j]);
+            }
         } else if(params[0].type==qfmpStringVector) {
-            r.setStringVec(QFMathParser_shuffleS(params[0].strVec));
+            //r.setStringVec(QFMathParser_shuffleS(params[0].strVec));
+            r.setStringVec(params[0].strVec);
+            for (int i=r.strVec.size(); i>=1; i--) {
+                int j=p->get_rng()->randInt(i);
+                qSwap(r.strVec[i], r.strVec[j]);
+            }
         } else if(params[0].type==qfmpBoolVector) {
-            r.setBoolVec(QFMathParser_shuffleB(params[0].boolVec));
+            //r.setBoolVec(QFMathParser_shuffleB(params[0].boolVec));
+            r.setBoolVec(params[0].boolVec);
+            for (int i=r.boolVec.size(); i>=1; i--) {
+                int j=p->get_rng()->randInt(i);
+                qSwap(r.boolVec[i], r.boolVec[j]);
+            }
         } else {
             p->qfmpError(QObject::tr("%1(x) argument has to be a vector of numbers/booleans/strings").arg("shuffle"));
             r.setInvalid();
@@ -3540,6 +3557,50 @@ namespace QFMathParser_DefaultLib {
             }
         }
     }
+    void fRDRGetResultIDs(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        r.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int rdrID=-1;
+            QString eval="";
+            if (n==2 && params[0].type==qfmpDouble && params[1].type==qfmpString) {
+                rdrID=params[0].toInteger();
+                eval=params[1].str;
+                QFRawDataRecord* rdr=p->getRawDataByID(rdrID);
+                r.setStringVec();
+                if (rdr) {
+                    r.strVec=rdr->resultsGetResultNames(eval);
+                }
+                qSort(r.strVec);
+            } else {
+                parser->qfmpError(QObject::tr("rdr_getresultids(rdr, evalID) needs an integer and one string argument"));
+                r.setInvalid();
+                return;
+            }
+        }
+    }
+
+    void fRDRGetEvaluationIDs(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        r.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int rdrID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                rdrID=params[0].toInteger();
+                QFRawDataRecord* rdr=p->getRawDataByID(rdrID);
+                r.setStringVec();
+                if (rdr) {
+                    r.strVec=rdr->resultsGetEvaluationNames();
+                }
+                qSort(r.strVec);
+            } else {
+                parser->qfmpError(QObject::tr("rdr_getevaluationids(rdr) needs an integer argument"));
+                r.setInvalid();
+                return;
+            }
+        }
+    }
+
     void fRDRGetResultError(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
         r.setInvalid();
         QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
