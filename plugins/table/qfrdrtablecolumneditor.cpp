@@ -26,6 +26,7 @@
 #include "qfmathparser.h"
 #include "qfpluginservices.h"
 #include "qfrdrtableparserfunctions.h"
+#include "qfenhancedlineedit.h"
 
 qfmpResult QFRDRTableColumnEditor_dummy(const qfmpResult* params, unsigned int n, QFMathParser* p) {
     qfmpResult res;
@@ -151,6 +152,10 @@ QString QFRDRTableColumnEditor::getColumnTitle() const
 }
 
 void QFRDRTableColumnEditor::on_edtFormula_textChanged(QString text) {
+    on_edtFormula_textChanged();
+}
+
+void QFRDRTableColumnEditor::on_edtFormula_textChanged() {
 
 
 
@@ -188,64 +193,74 @@ void QFRDRTableColumnEditor::on_btnOK2_clicked()
 
 void QFRDRTableColumnEditor::on_lstFunctions_doubleClicked(const QModelIndex &index)
 {
-    QString textOld=ui->edtFormula->text();
-    QString text="";
-    QString templ=index.data().toString();
-    int cur=ui->edtFormula->cursorPosition();
-    int newcur=cur;
-    int selStart=ui->edtFormula->selectionStart();
-    int newselStart=selStart;
-    int selLen=ui->edtFormula->selectedText().size();
-    int newselLen=0;
+    QFEnhancedPlainTextEdit* pte=qobject_cast<QFEnhancedPlainTextEdit*>(ui->edtFormula);
+    QFEnhancedLineEdit* le=qobject_cast<QFEnhancedLineEdit*>(ui->edtFormula);
 
-    if (selLen>0) {
-        text=textOld.left(selStart);
-        text=text+templ;
-        text=text+textOld.right(textOld.size()-(selStart+selLen));
+    if (le) {
+        QString textOld=le->text();
+        QString text="";
+        QString templ=index.data().toString();
+        int cur=le->cursorPosition();
+        int newcur=cur;
+        int selStart=le->selectionStart();
+        int newselStart=selStart;
+        int selLen=le->selectedText().size();
+        int newselLen=0;
 
-        newcur=cur+templ.size()+1;
-        newselStart=newcur;
-        newselLen=0;
+        if (selLen>0) {
+            text=textOld.left(selStart);
+            text=text+templ;
+            text=text+textOld.right(textOld.size()-(selStart+selLen));
 
-        int ppos=templ.indexOf("(");
-        if (ppos>=0) {
-            newcur=selStart+ppos+1;
+            newcur=cur+templ.size()+1;
             newselStart=newcur;
             newselLen=0;
-            int i=ppos+1;
-            while (i<templ.size() && (templ[i].isLetterOrNumber() || templ[i]=='_')) {
-                i++;
-                newselLen++;
+
+            int ppos=templ.indexOf("(");
+            if (ppos>=0) {
+                newcur=selStart+ppos+1;
+                newselStart=newcur;
+                newselLen=0;
+                int i=ppos+1;
+                while (i<templ.size() && (templ[i].isLetterOrNumber() || templ[i]=='_')) {
+                    i++;
+                    newselLen++;
+                }
             }
-        }
-    } else {
-        text=textOld;
-        text.insert(cur, templ);
+        } else {
+            text=textOld;
+            text.insert(cur, templ);
 
-        newcur=cur+templ.size()+1;
-        newselStart=newcur;
-        newselLen=0;
-
-        int ppos=templ.indexOf("(");
-        if (ppos>=0) {
-            newcur=cur+ppos+1;
+            newcur=cur+templ.size()+1;
             newselStart=newcur;
             newselLen=0;
-            int i=ppos+1;
-            while (i<templ.size() && (templ[i].isLetterOrNumber() || templ[i]=='_')) {
-                i++;
-                newselLen++;
+
+            int ppos=templ.indexOf("(");
+            if (ppos>=0) {
+                newcur=cur+ppos+1;
+                newselStart=newcur;
+                newselLen=0;
+                int i=ppos+1;
+                while (i<templ.size() && (templ[i].isLetterOrNumber() || templ[i]=='_')) {
+                    i++;
+                    newselLen++;
+                }
             }
         }
-    }
 
-    ui->edtFormula->setText(text);
-    ui->edtFormula->setFocus(Qt::OtherFocusReason);
-    if (newselLen>0 && newselStart>=0) {
-        ui->edtFormula->setCursorPosition(newselStart);
-        ui->edtFormula->cursorForward(true, newselLen);
-    } else {
-        ui->edtFormula->setCursorPosition(newcur);
+        le->setText(text);
+        le->setFocus(Qt::OtherFocusReason);
+        if (newselLen>0 && newselStart>=0) {
+            le->setCursorPosition(newselStart);
+            le->cursorForward(true, newselLen);
+        } else {
+            le->setCursorPosition(newcur);
+        }
+    } else if (pte) {
+        QString text="";
+        QString templ=index.data().toString();
+        pte->textCursor().insertText(templ);
+        pte->setFocus(Qt::OtherFocusReason);
     }
 }
 

@@ -39,11 +39,15 @@ class QFWIDLIB_EXPORT QFSelectFilesListWidget : public QWidget
         explicit QFSelectFilesListWidget(QWidget *parent = 0);
         ~QFSelectFilesListWidget();
         void setFilters(const QStringList& filters);
+        void setFilters(const QStringList& filters, const QStringList& filterids);
         void setSettingsIDs(const QString& lastDirID, const QString& lastFilterID);
 
         int filesCount() const;
         QStringList files() const;
         QStringList fileFilters() const;
+        QStringList fileFilterIDs() const;
+        QList<int> fileFilterNums() const;
+        void setOnlyOneFormatAllowed(bool allowed);
 
     public slots:
         void addFiles();
@@ -56,8 +60,10 @@ class QFWIDLIB_EXPORT QFSelectFilesListWidget : public QWidget
     private:
         Ui::QFSelectFilesListWidget *ui;
         QStringList filters;
+        QStringList filterids;
         QString lastDirID;
         QString lastFilterID;
+        bool onlyOneFormat;
 };
 
 
@@ -71,13 +77,17 @@ class QFWIDLIB_EXPORT QFSelectFilesWizardPage : public QFWizardPage
         }
 
         void setFilters(const QStringList& filters);
+        void setFilters(const QStringList& filters, const QStringList& filterids);
         void setSettingsIDs(const QString& lastDirID, const QString& lastFilterID);
 
         int filesCount() const;
         QStringList files() const;
         QStringList fileFilters() const;
+        QStringList fileFilterIDs() const;
+        QList<int> fileFilterNums() const;
         void setAddOnStartup(bool add);
         void setFilesRequired(bool add);
+        void setOnlyOneFormatAllowed(bool allowed);
 
         virtual void initializePage();
         virtual bool validatePage();

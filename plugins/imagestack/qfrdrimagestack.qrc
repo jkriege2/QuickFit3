@@ -21,5 +21,6 @@
         <file alias="saveimage.png">images/saveimage.png</file>
         <file alias="copyimage.png">images/copyimage.png</file>
         <file alias="printimage.png">images/printimage.png</file>
+        <file alias="spim_lightsheet_scan.png">images/spim_lightsheet_scan.png</file>
     </qresource>
 </RCC>

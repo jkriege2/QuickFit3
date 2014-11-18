@@ -3812,7 +3812,7 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
 #ifdef DEBUG_THREAN
  qDebug()<<Q_FUNC_INFO<<"  locked";
 #endif
-    if ((long)i<dstore->results.size()) return dstore->results.keys();
+    return dstore->results.keys();
     return QStringList();
 }
 

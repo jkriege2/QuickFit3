@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>891</width>
-    <height>526</height>
+    <height>522</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -83,7 +83,7 @@
      <property name="checkable">
       <bool>true</bool>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
+     <layout class="QGridLayout" name="gridLayout" rowstretch="2,3">
       <item row="0" column="0" colspan="2">
        <widget class="QFrame" name="frame_2">
         <property name="frameShape">
@@ -98,8 +98,17 @@
         <property name="midLineWidth">
          <number>0</number>
         </property>
-        <layout class="QFormLayout" name="formLayout">
-         <property name="margin">
+        <layout class="QGridLayout" name="gridLayout_3" rowminimumheight="1,1">
+         <property name="leftMargin">
+          <number>5</number>
+         </property>
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="rightMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
           <number>5</number>
          </property>
          <item row="0" column="0">
@@ -107,22 +116,41 @@
            <property name="text">
             <string>&lt;b&gt;expression:&lt;/b&gt;</string>
            </property>
+           <property name="alignment">
+            <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+           </property>
           </widget>
          </item>
          <item row="0" column="1">
-          <widget class="QFEnhancedLineEdit" name="edtFormula">
-           <property name="font">
-            <font>
-             <pointsize>9</pointsize>
-            </font>
+          <widget class="QFEnhancedPlainTextEdit" name="edtFormula">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
+             <horstretch>0</horstretch>
+             <verstretch>3</verstretch>
+            </sizepolicy>
            </property>
-           <property name="placeholderText">
-            <string>enter math expression ...</string>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>32</height>
+            </size>
            </property>
           </widget>
          </item>
          <item row="1" column="1">
           <widget class="QLabel" name="labError">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+             <horstretch>0</horstretch>
+             <verstretch>2</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>32</height>
+            </size>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -149,7 +177,16 @@
          <number>0</number>
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>5</number>
+         </property>
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="rightMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
           <number>5</number>
          </property>
          <item row="0" column="0">
@@ -204,7 +241,16 @@ p, li { white-space: pre-wrap; }
          <number>0</number>
         </property>
         <layout class="QVBoxLayout" name="verticalLayout_2">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>5</number>
+         </property>
+         <property name="topMargin">
+          <number>5</number>
+         </property>
+         <property name="rightMargin">
+          <number>5</number>
+         </property>
+         <property name="bottomMargin">
           <number>5</number>
          </property>
          <item>
@@ -235,7 +281,7 @@ p, li { white-space: pre-wrap; }
               <x>0</x>
               <y>0</y>
               <width>565</width>
-              <height>139</height>
+              <height>125</height>
              </rect>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout">
@@ -343,9 +389,9 @@ p, li { white-space: pre-wrap; }
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>QFEnhancedLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>qfenhancedlineedit.h</header>
+   <class>QFEnhancedPlainTextEdit</class>
+   <extends>QPlainTextEdit</extends>
+   <header>qfenhancedplaintextedit.h</header>
   </customwidget>
  </customwidgets>
  <resources>

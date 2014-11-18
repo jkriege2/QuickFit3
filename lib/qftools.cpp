@@ -50,7 +50,7 @@
 #endif
 
 #ifndef QF_ALIGNMENT_BYTES
-#define QF_ALIGNMENT_BYTES 16
+#define QF_ALIGNMENT_BYTES 32
 #endif
 
 #if !defined(QF_DONT_USE_ALIGNED_MALLOC)
@@ -1454,4 +1454,68 @@ bool qfCopyData( QIODevice* in, QIODevice* out, QFProgressMinorProgress* pdlg) {
     }
     if (pdlg) return !pdlg->wasMinorProgressCanceled();
     return true;
+}
+
+
+QString qfGetLargestCommonStart(const QStringList& data, const QString& defaultResult) {
+    QString res;
+    int maxSize=data.value(0, "").size();
+    for (int i=0; i<data.size(); i++) {
+        if (data[i].size()<maxSize) maxSize=data[i].size();
+    }
+
+    int len=0;
+    for (int l=1; l<maxSize; l++) {
+        bool ok=true;
+        QString start=data.value(0, "").left(l);
+        for (int i=0; i<data.size(); i++) {
+            if (!data[i].startsWith(start)) {
+                ok=false;
+                break;
+            }
+        }
+        if (!ok) {
+            len=l-1;
+            break;
+        }
+    }
+
+    if (len>0) {
+        res=data.value(0, "").left(len);
+    }
+
+    if (res.size()<=0) res=defaultResult;
+    return res;
+}
+
+
+QString qfGetLargestCommonEnd(const QStringList& data, const QString& defaultResult) {
+    QString res;
+    int maxSize=data.value(0, "").size();
+    for (int i=0; i<data.size(); i++) {
+        if (data[i].size()<maxSize) maxSize=data[i].size();
+    }
+
+    int len=0;
+    for (int l=1; l<maxSize; l++) {
+        bool ok=true;
+        QString start=data.value(0, "").right(l);
+        for (int i=0; i<data.size(); i++) {
+            if (!data[i].endsWith(start)) {
+                ok=false;
+                break;
+            }
+        }
+        if (!ok) {
+            len=l-1;
+            break;
+        }
+    }
+
+    if (len>0) {
+        res=data.value(0, "").right(len);
+    }
+
+    if (res.size()<=0) res=defaultResult;
+    return res;
 }

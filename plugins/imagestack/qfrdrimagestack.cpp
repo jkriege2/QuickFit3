@@ -26,6 +26,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfselectfileslistwidget.h"
 #include "qfpluginservices.h"
 #include "qfevaluationitemfactory.h"
+#include "qfimageplot.h"
+#include "imagetools.h"
+
 
 QFRDRImageStackPlugin::QFRDRImageStackPlugin(QObject* parent):
     QObject(parent)
@@ -69,7 +72,8 @@ void QFRDRImageStackPlugin::registerToMenu(QMenu* menuMain) {
 void QFRDRImageStackPlugin::init()
 {
     if (QFPluginServices::getInstance()->getEvaluationItemFactory()->contains("spim_lightsheet_eval")) {
-        services->registerWizard("project_wizards", tr("SPIM Lightsheet Analysis Wizard"), QIcon(QFPluginServices::getInstance()->getEvaluationItemFactory()->getIconFilename("spim_lightsheet_eval")), this, SLOT(startProjectWizardLightsheetAnalysis()));
+        services->registerWizard("project_wizards", tr("SPIM Lightsheet Analysis"), QIcon(QFPluginServices::getInstance()->getEvaluationItemFactory()->getIconFilename("spim_lightsheet_eval")), this, SLOT(startProjectWizardLightsheetAnalysis()));
+        services->registerWizard("rdr_wizards", tr("Image Stacks for SPIM Lightsheet Analysis"), QIcon(QFPluginServices::getInstance()->getEvaluationItemFactory()->getIconFilename("spim_lightsheet_eval")), this, SLOT(startProjectWizardLightsheetAnalysisData()));
     }
 }
 
@@ -136,7 +140,6 @@ void QFRDRImageStackPlugin::insertMultiFileImageStack() {
     if (project) {
         // file format to import
         QStringList format_names=QFRDRImageStackData::getImageFilterList(services);
-        QStringList format_descriptions=QFRDRImageStackData::getImageFormatNameList(services);
         QStringList reader_id=QFRDRImageStackData::getImageReaderIDList(services);
         // look into INI which was the last used format
         QString current_format_name=settings->getQSettings()->value("image_stack/current_format_filter", format_names.value(0,"")).toString();
@@ -147,28 +150,41 @@ void QFRDRImageStackPlugin::insertMultiFileImageStack() {
                               format_names.join(";;"), &current_format_name);
         // store the format we just used
         settings->getQSettings()->setValue("image_stack/current_format_filter", current_format_name);
-        // here we store some initial parameters
-        QMap<QString, QVariant> initParams;
-        // set whatever you want (FILETYPE is just an example)!
-        QString format_id=reader_id.value(format_names.indexOf(current_format_name), "");
-        initParams["FILETYPE"]=format_id;
-        initParams["STACKTYPE"]="ONEFILEPERCHANNEL";
 
-        // add all properties in initParams that will be readonly
-        QStringList paramsReadonly;
-        paramsReadonly<<"FILETYPE"<<"STACKTYPE";
-        QStringList types;
-        for (int i=0; i<files.size(); i++) {
-            types.append("image");
-        }
-
-        QFRawDataRecord* e=project->addRawData(getID(), tr("new image stack"), files, initParams, paramsReadonly, types);
-        if (e->error()) { // when an error occured: remove record and output an error message
-            project->deleteRawData(e->getID());
-            QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing image stack:\n%1").arg(e->errorDescription()));
-            services->log_error(tr("Error while importing image stack:\n    %1\n").arg(e->errorDescription()));
-        }
+        addMultiFileImageStack(files, reader_id.value(format_names.indexOf(current_format_name), ""));
     }
+}
+
+QFRawDataRecord* QFRDRImageStackPlugin::addMultiFileImageStack(const QStringList &files, const QString& format_id)
+{
+
+
+    // here we store some initial parameters
+    QMap<QString, QVariant> initParams;
+    // set whatever you want (FILETYPE is just an example)!
+    initParams["FILETYPE"]=format_id;
+    initParams["STACKTYPE"]="ONEFILEPERCHANNEL";
+
+    // add all properties in initParams that will be readonly
+    QStringList paramsReadonly;
+    paramsReadonly<<"FILETYPE"<<"STACKTYPE";
+    QStringList types;
+    for (int i=0; i<files.size(); i++) {
+        types.append("image");
+    }
+
+    QStringList filenames;
+    for (int i=0; i<files.size(); i++) {
+        filenames<<QFileInfo(files[i]).fileName();
+    }
+    QFRawDataRecord* e=project->addRawData(getID(), qfGetLargestCommonStart(filenames, tr("new image stack")), files, initParams, paramsReadonly, types);
+    if (e&&e->error()) { // when an error occured: remove record and output an error message
+        project->deleteRawData(e->getID());
+        QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing image stack:\n%1").arg(e->errorDescription()));
+        services->log_error(tr("Error while importing image stack:\n    %1\n").arg(e->errorDescription()));
+        return NULL;
+    }
+    return e;
 }
 
 void QFRDRImageStackPlugin::insertSingleFileHDualViewImageStack()
@@ -246,6 +262,10 @@ void QFRDRImageStackPlugin::insertSingleFileDualViewImageStack(char dvMode)
 
 }
 
+void QFRDRImageStackPlugin::startProjectWizardLightsheetAnalysisData()
+{
+    startProjectWizardLightsheetAnalysis(false);
+}
 
 
 
@@ -261,214 +281,178 @@ void QFRDRImageStackPlugin::insertSingleFileDualViewImageStack(char dvMode)
 
 
 
-void QFRDRImageStackPlugin::startProjectWizardLightsheetAnalysis()
+
+void QFRDRImageStackPlugin::startProjectWizardLightsheetAnalysis(bool insertEval)
 {
     QFWizard* wiz=new QFWizard(parentWidget);
     wiz->setWindowTitle(tr("SPIM Lightsheet Analysis Project Wizard"));
     wiz->addPage(new QFTextWizardPage(tr("Introduction"),
-                                      tr("This wizard will help you to perform a SPIM lightsheet analysis, i.e. it will help you to load an image stack, which contains a lightsheet scan taken with a 45° mirror and then set all properties accordingly."),
+                                      tr("This wizard will help you to perform a SPIM lightsheet analysis, i.e. it will help you to load an image stack, which contains a lightsheet scan taken with a 45° mirror and then set all properties accordingly.<br><center><img src=\":/image_stack/spim_lightsheet_scan.png\"></center>"),
                                       wiz));
-    /*QFSelectFilesWizardPage* selfiles;
+
+
+
+
+
+    QFSelectFilesWizardPage* selfiles;
     wiz->addPage(selfiles=new QFSelectFilesWizardPage(tr("Image stack files ...")));
-    selfiles->setSubTitle(tr("Select one or more image stack files, that contain your lightsheet scan. You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
-    selfiles->setFilters(getFCSFilters());
-    selfiles->setSettingsIDs("fcs/last_fcswizard_dir", "fcs/current_fcs_format_filter");
+    selfiles->setSubTitle(tr("Select one or more image stack files, that contain your lightsheet scan. Each file will be treated as one color channel in the final image stack.<br>You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
+    selfiles->setFilters(QFRDRImageStackData::getImageFilterList(services), QFRDRImageStackData::getImageReaderIDList(services));
+    selfiles->setSettingsIDs("image_stack/last_lightsheetwizard_dir", "image_stack/last_lightsheetwizard_filter");
     selfiles->setAddOnStartup(false);
+    selfiles->setOnlyOneFormatAllowed(true);
 
+    wiz->addPage(wizLSAnalysisImgPreview=new QFImagePlotWizardPage(tr("Image stack preview ...")));
+    wizLSAnalysisImgPreview->setSubTitle(tr("Please set the image properties below the overview plot!"));
+    selfiles->setUserOnValidatePage(wizLSAnalysisImgPreview);
+    connect(selfiles, SIGNAL(onValidate(QWizardPage*,QWizardPage*)), this, SLOT(wizLSAnalysisImgPreviewOnValidate(QWizardPage*,QWizardPage*)));
+    wizLSAnalysisImgPreview->clear();
 
-    QFComboBoxWizardPage* meastype;
-    wiz->addPage(meastype=new QFComboBoxWizardPage(tr("Instrument used for measurmeent")));
-    meastype->setSubTitle(tr("Select the type of instrument, you used for the data acquisition."));
-    QStringList measurementTypes;
-    measurementTypes<<tr("confocal FCS (single-spot)");
-    measurementTypes<<tr("TIR FCS (single-spot)");
-    measurementTypes<<tr("dynamic light scattering (DLS)");
-    measurementTypes<<tr("SPIM-FCS (camera)");
-    measurementTypes<<tr("TIR-FCS (camera)");
-    meastype->setItems(measurementTypes);
-    meastype->setLabel(tr("instrument type:"));
+    if (insertEval) {
+        wizLSAnalysiscmbFitDir=new QComboBox(wizLSAnalysisImgPreview);
+        wizLSAnalysiscmbFitDir->addItem(tr("fit rows (lightsheet vertical)"));
+        wizLSAnalysiscmbFitDir->addItem(tr("fit column (lightsheet horizontal)"));
+        wizLSAnalysiscmbFitDir->setCurrentIndex(1);
+    }
 
-    QFCheckboxListWizardPage* evals;
-    wiz->addPage(evals=new QFCheckboxListWizardPage(tr("Evaluations")));
-    evals->setUserPreviousPage(meastype);
-    evals->setEnableable(true);
-    evals->setEnableCheckbox(tr("also add evaluation objects?"), true);
-    evals->addItem("FCS/DLS fit");
-    evals->addItem("FCS/DLS Maximum Entropy (MaxEnt) Distribution analysis");
-    evals->addItem("FCS Mean Squared Displacement (MSD) evaluation");
-    evals->setChecked(0,true);
+    wizLSAnalysisedtPixelSize=new QDoubleSpinBox(wizLSAnalysisImgPreview);
+    wizLSAnalysisedtPixelSize->setRange(0,100000);
+    wizLSAnalysisedtPixelSize->setSuffix(" nm");
+    wizLSAnalysisedtPixelSize->setValue(400);
+    wizLSAnalysisedtPixelSize->setDecimals(2);
 
+    wizLSAnalysisedtStepSize=new QDoubleSpinBox(wizLSAnalysisImgPreview);
+    wizLSAnalysisedtStepSize->setRange(0,100000);
+    wizLSAnalysisedtStepSize->setSuffix(" nm");
+    wizLSAnalysisedtStepSize->setValue(1000);
+    wizLSAnalysisedtStepSize->setDecimals(2);
 
-    FCSProjectWizardEvalSettingsData evsetData;
-    QFFormWizardPage* evalprops;
-    wiz->addPage(evalprops=new QFFormWizardPage(tr("Evaluation Properties")));
-    evsetData.evalprops=evalprops;
-    evsetData.meastype=meastype;
-    evsetData.evals=evals;
-    evsetData.cmbFitFunc=new QFFitFunctionComboBox(evalprops);
-    evalprops->addRow("<i>fit function</i> ", evsetData.cmbFitFunc);
-    evsetData.spinWxy=new QDoubleSpinBox(evalprops);
-    evsetData.spinWxy->setSuffix(" nm");
-    evsetData.spinWxy->setRange(0,100000);
-    evsetData.spinWxy->setValue(250);
-    evsetData.spinWxy->setDecimals(1);
-    evalprops->addRow("<i>1/e<sup>2</sup> focus width w<sub>xy</sub></i> = ", evsetData.spinWxy);
-    evsetData.spinWz=new QDoubleSpinBox(evalprops);
-    evsetData.spinWz->setSuffix(" nm");
-    evsetData.spinWz->setRange(0,100000);
-    evsetData.spinWz->setValue(1200);
-    evsetData.spinWz->setDecimals(1);
-    evalprops->addRow("<i>1/e<sup>2</sup> focus height w<sub>z</sub></i> = ", evsetData.spinWz);
-    evsetData.spinGamma=new QDoubleSpinBox(evalprops);
-    evsetData.spinGamma->setSuffix("");
-    evsetData.spinGamma->setRange(0.01,100000);
-    evsetData.spinGamma->setValue(8);
-    evsetData.spinGamma->setDecimals(2);
-    evalprops->addRow("<i>axial ratio &gamma;</i> = ", evsetData.spinGamma);
-    evsetData.spinA=new QDoubleSpinBox(evalprops);
-    evsetData.spinA->setSuffix(" nm");
-    evsetData.spinA->setRange(0,100000);
-    evsetData.spinA->setValue(400);
-    evsetData.spinA->setDecimals(1);
-    evalprops->addRow("<i>pixel size a = ", evsetData.spinA);
-    evsetData.spinDLSAngle=new QDoubleSpinBox(evalprops);
-    evsetData.spinDLSAngle->setSuffix(" °");
-    evsetData.spinDLSAngle->setRange(0,100000);
-    evsetData.spinDLSAngle->setValue(90);
-    evsetData.spinDLSAngle->setDecimals(1);
-    evalprops->addRow("<i>scattering angle = ", evsetData.spinDLSAngle);
-    evsetData.spinDLSN=new QDoubleSpinBox(evalprops);
-    evsetData.spinDLSN->setSuffix("");
-    evsetData.spinDLSN->setRange(0,100000);
-    evsetData.spinDLSN->setValue(1.33);
-    evsetData.spinDLSN->setDecimals(4);
-    evalprops->addRow("<i>refractive index = ", evsetData.spinDLSN);
-    evsetData.spinDLSLambda=new QDoubleSpinBox(evalprops);
-    evsetData.spinDLSLambda->setSuffix(" nm");
-    evsetData.spinDLSLambda->setRange(0,100000);
-    evsetData.spinDLSLambda->setValue(488);
-    evsetData.spinDLSLambda->setDecimals(1);
-    evalprops->addRow("<i>wavelength = ", evsetData.spinDLSLambda);
+    wizLSAnalysisspinMaskSize=new QSpinBox(wizLSAnalysisImgPreview);
+    wizLSAnalysisspinMaskSize->setRange(0,100000);
+    wizLSAnalysisspinMaskSize->setSuffix(" pixels");
+    wizLSAnalysisspinMaskSize->setValue(0);
+    connect(wizLSAnalysisspinMaskSize, SIGNAL(valueChanged(int)), this, SLOT(wizLSAnalysisImgPreviewMaskChanged(int)));
 
+    if (wizLSAnalysiscmbFitDir) {
+        ProgramOptions::getConfigQComboBox(wizLSAnalysiscmbFitDir, "image_stack/startProjectWizardLightsheetAnalysis/cmbFitDir");
+        wizLSAnalysisImgPreview->addRow(tr("fit direction"), wizLSAnalysiscmbFitDir);
+    }
+    if (wizLSAnalysisedtPixelSize) {
+        ProgramOptions::getConfigQDoubleSpinBox(wizLSAnalysisedtPixelSize, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysisedtPixelSize");
+        wizLSAnalysisImgPreview->addRow(tr("pixel size"), wizLSAnalysisedtPixelSize);
+    }
+    if (wizLSAnalysisedtStepSize) {
+        ProgramOptions::getConfigQDoubleSpinBox(wizLSAnalysisedtStepSize, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysisedtStepSize");
+        wizLSAnalysisImgPreview->addRow(tr("step size"), wizLSAnalysisedtStepSize);
+    }
+    if (wizLSAnalysisspinMaskSize) {
+        ProgramOptions::getConfigQSpinBox(wizLSAnalysisspinMaskSize, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysisspinMaskSize");
+        wizLSAnalysisImgPreview->addRow(tr("mask size"), wizLSAnalysisspinMaskSize);
+    }
 
     QFTextWizardPage* last;
-    wiz->addPage(last=new QFTextWizardPage(tr("Finalize"),
-                                           tr("You completed this wizard and all selected files, as well as all selected evaluations will be added to the project.\n\nThe data files will be added as \"raw data records (RDR)\" in the upper partof the project and the evaluations as additional items below that. By double-clicking on any project item, you can open a new window, which displays the data, or allows you to perform the desired evaluation."),
-                                      wiz));
+    if (insertEval) wiz->addPage(last=new QFTextWizardPage(tr("Finalize"),tr("You completed this wizard. The selected files will now be inserted as an image stack raw data record (RDR) into the project. Also a SPIM Lightsheet Analysis evaluation will be added to the project and preconfigured, as selected on the last page.<br><br>After the project is set up, you can perform the lightsheet analysis by double-clicking the according evaluation item and running the evaluation there."), wiz));
+    else wiz->addPage(last=new QFTextWizardPage(tr("Finalize"), tr("You completed this wizard. The selected files will now be inserted as an image stack raw data record (RDR) into the project."), wiz));
     last->setFinalPage(true);
-    evals->setNextPageIfAllDisabled(last);
-    evals->setNextPageIfDisabled(last);
 
-
-    meastype->setUserOnValidateArgument(&evsetData);
-    connect(meastype, SIGNAL(onValidateA(QWizardPage*,void*)), this, SLOT(FCSProjectWizardValidateIntrument(QWizardPage*,void*)));
 
     if (wiz->exec()) {
-
+        if (wizLSAnalysiscmbFitDir) {
+            ProgramOptions::setConfigQComboBox(wizLSAnalysiscmbFitDir, "image_stack/startProjectWizardLightsheetAnalysis/cmbFitDir");
+        }
+        if (wizLSAnalysisedtPixelSize) {
+            ProgramOptions::setConfigQDoubleSpinBox(wizLSAnalysisedtPixelSize, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysisedtPixelSize");
+        }
+        if (wizLSAnalysisedtStepSize) {
+            ProgramOptions::setConfigQDoubleSpinBox(wizLSAnalysisedtStepSize, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysisedtStepSize");
+        }
+        if (wizLSAnalysisspinMaskSize) {
+            ProgramOptions::setConfigQSpinBox(wizLSAnalysisspinMaskSize, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysisspinMaskSize");
+        }
         QStringList files=selfiles->files();
-        QStringList filters=selfiles->fileFilters();
-
+        QString filterid=selfiles->fileFilterIDs().value(0);
         //qDebug()<<"OK"<<files<<filters;
-        if (files.size()>0) {
+        if (files.size()>0 && !filterid.isEmpty()) {
 
-
-            QStringList paramsReadonly;
-            paramsReadonly<<"FILETYPE"<<"CHANNEL"<<"CSV_SEPARATOR"<<"CSV_COMMENT"<<"CSV_STARTSWITH"<<"CSV_MODE"<<"CSV_FIRSTLINE"<<"CSV_ENDSWITH"<<"CSV_TIMEFACTOR";
-            QStringList list = files;
-            QStringList::Iterator it = list.begin();
-            services->setProgressRange(0, list.size());
-            services->setProgress(0);
-            int i=0;
-            QMap<QString, QMap<QString, QVariant> > ps;
-
-            while(it != list.end()) {
-                if (QFile::exists(*it)) {
-                    QMap<QString, QVariant> p;
-                    if (ps.contains( filters.value(i))) p=ps[filters.value(i)];
-                    else setFCSFilterProperties(p, filters.value(i), files.value(i));
-                    ps[filters.value(i)]=p;
-                    //std::cout<<"loading "<<(*it).toStdString()<<std::endl;
-                    services->log_text(tr("loading [%2] '%1' ...\n").arg(*it).arg(filters.value(i)));
-                    loadFCSFilterFiles(QStringList(*it), filters.value(i), p, paramsReadonly);
-
-                    //std::cout<<"loading "<<(*it).toStdString()<<" ... done!\n";
-                    settings->setCurrentRawDataDir(QFileInfo(*it).dir().absolutePath());
-                    //std::cout<<"loading "<<(*it).toStdString()<<" ... done ... done!\n";
+            qDebug()<<filterid<<files;
+            QFRawDataRecord* e=addMultiFileImageStack(files,filterid);
+            QFRDRImageStackData* is=qobject_cast<QFRDRImageStackData*>(e);
+            if (is) {
+                is->maskClear();
+                int image_width=is->getImageStackWidth(0);
+                int image_height=is->getImageStackHeight(0);
+                int size=wizLSAnalysisspinMaskSize->value();
+                for (int y=0; y<image_height; y++) {
+                    for (int x=0; x<image_width; x++) {
+                        is->maskSet(x,y, x<size || x>image_width-size || y<size || y>image_height-size);
+                    }
                 }
-                ++it;
-                i++;
-                services->setProgress(i);
-                QApplication::processEvents(QEventLoop::AllEvents, 50);
+                is->maskMaskChangedEvent();
             }
-            services->setProgress(0);
-            //std::cout<<"loading done ...\n";
-            //tvMain->expandToDepth(2);
-        }
-        for (int i=0; i<3; i++) {
-            if (evals->getChecked(i)) {
-                QFEvaluationItem* ev=NULL;
-                if (i==0) ev=project->addEvaluation("fcs_fit", "FCS Fit");
-                else if (i==1) ev=project->addEvaluation("fcs_maxent", "FCS MaxEnt Evaluation");
-                else if (i==2 && meastype->currentItem()!=2) ev=project->addEvaluation("fcs_msd", "FCS MSD Evaluation");
+            if (e)  {
+                if (wizLSAnalysisedtPixelSize) e->setQFProperty("PIXEL_WIDTH", wizLSAnalysisedtPixelSize->value(), false, true);
+                if (wizLSAnalysisedtPixelSize) e->setQFProperty("PIXEL_HEIGHT", wizLSAnalysisedtPixelSize->value(), false, true);
+                if (wizLSAnalysisedtStepSize) e->setQFProperty("DELTAZ", wizLSAnalysisedtStepSize->value(), false, true);
+                e->setQFProperty("USEMASK", true, false, false);
+                if (wizLSAnalysiscmbFitDir) e->setQFProperty("ORIENTATION", wizLSAnalysiscmbFitDir->currentIndex(), false, false);
+            }
+
+
+
+            QFEvaluationItem* ev=NULL;
+            if (insertEval) {
+                ev=project->addEvaluation("spim_lightsheet_eval", "SPIM Lightsheet Analysis");
                 if (ev) {
-                    //if (i==0) ev->setQFProperty("PRESET_FIT_MODEL", evsetData.cmbFitFunc->currentFitFunctionID());
-                    if (i==0) ev->setPresetProperty("PRESET_FIT_MODEL", evsetData.cmbFitFunc->currentFitFunctionID());
-                    else if (i==1) {
-                        ev->setPresetProperty("PRESET_MODEL", 0);
-                        if (meastype->currentItem()==1) ev->setPresetProperty("PRESET_MODEL", 2);
-                        else if (meastype->currentItem()==2) ev->setPresetProperty("PRESET_MODEL", 3);
-                        else if (meastype->currentItem()==3) ev->setPresetProperty("PRESET_MODEL", 5);
-                        else if (meastype->currentItem()==4) ev->setPresetProperty("PRESET_MODEL", 6);
-                    } else if (i==2) {
-                        ev->setPresetProperty("PRESET_MODEL", 1);
-                        if (meastype->currentItem()==1) ev->setPresetProperty("PRESET_MODEL", 0);
-                        else if (meastype->currentItem()==3) ev->setPresetProperty("PRESET_MODEL", 4);
-                        else if (meastype->currentItem()==4) ev->setPresetProperty("PRESET_MODEL", 5);
-                    }
-                    if (meastype->currentItem()==2) {
-                        if (i==0) ev->setName("DLS Fit");
-                        else if (i==1) ev->setName("DLS MaxEnt Fit");
-//                        ev->setQFProperty("PRESET_DLS_ANGLE", evsetData.spinDLSAngle->value());
-//                        ev->setQFProperty("PRESET_REFRACTIVE_INDEX", evsetData.spinDLSN->value());
-//                        ev->setQFProperty("PRESET_WAVELENGTH", evsetData.spinDLSLambda->value());
-                        ev->setPresetProperty("preset_dls_angle", evsetData.spinDLSAngle->value());
-                        ev->setPresetProperty("preset_refractive_index", evsetData.spinDLSN->value());
-                        ev->setPresetProperty("preset_wavelength", evsetData.spinDLSLambda->value());
-                    } else if (meastype->currentItem()==1) {
-//                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
-                        ev->setPresetProperty("preset_focus_width", evsetData.spinWxy->value());
-                        ev->setPresetProperty("preset_maxent_wxy", evsetData.spinWxy->value());
-                    } else if (meastype->currentItem()==3) {
-//                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
-//                        ev->setQFProperty("PRESET_PIXEL_WIDTH", evsetData.spinA->value());
-//                        ev->setQFProperty("PRESET_FOCUS_HEIGHT", evsetData.spinWz->value());
-                        ev->setPresetProperty("preset_focus_width", evsetData.spinWxy->value());
-                        ev->setPresetProperty("preset_pixel_width", evsetData.spinA->value());
-                        ev->setPresetProperty("preset_focus_height", evsetData.spinWz->value());
-                        ev->setPresetProperty("preset_focus_hieght", evsetData.spinWz->value());
-                        ev->setPresetProperty("preset_maxent_wxy", evsetData.spinWxy->value());
-                        ev->setPresetProperty("preset_pixel_size", evsetData.spinA->value());
-                    } else if (meastype->currentItem()==4) {
-//                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
-//                        ev->setQFProperty("PRESET_PIXEL_WIDTH", evsetData.spinA->value());
-                        ev->setPresetProperty("preset_focus_width", evsetData.spinWxy->value());
-                        ev->setPresetProperty("preset_pixel_width", evsetData.spinA->value());
-                        ev->setPresetProperty("preset_pixel_size", evsetData.spinA->value());
-                        ev->setPresetProperty("preset_maxent_wxy", evsetData.spinWxy->value());
-                    } else {
-//                        ev->setQFProperty("PRESET_FOCUS_STRUCT_FAC", evsetData.spinGamma->value());
-//                        ev->setQFProperty("PRESET_FOCUS_WIDTH", evsetData.spinWxy->value());
-                        ev->setPresetProperty("preset_focus_struct_fac", evsetData.spinGamma->value());
-                        ev->setPresetProperty("preset_focus_width", evsetData.spinWxy->value());
-                        ev->setPresetProperty("preset_maxent_wxy", evsetData.spinWxy->value());
-                    }
+                    //ev->setQFProperty()
                 }
             }
         }
-    }*/
+    }
     delete wiz;
+}
+
+void QFRDRImageStackPlugin::wizLSAnalysisImgPreviewOnValidate(QWizardPage *page, QWizardPage *userPage)
+{
+    QFImagePlotWizardPage* plot=qobject_cast<QFImagePlotWizardPage*>(userPage);
+    QFSelectFilesWizardPage* files=qobject_cast<QFSelectFilesWizardPage*>(page);
+    if (plot && files) {
+        QFImporter::FileInfo info;
+        double* image=NULL;
+        int width=0, height=0;
+        plot->setImage(files->files().value(0, ""), files->fileFilterIDs().value(0, ""), -1, image, width, height, &info);
+        if (wizLSAnalysisedtPixelSize) {
+            if (info.properties.contains("PIXEL_WIDTH")) {
+                wizLSAnalysisedtPixelSize->setValue(info.properties["PIXEL_WIDTH"].toDouble());
+            } else if (info.properties.contains("PIXEL_HEIGHT")) {
+                wizLSAnalysisedtPixelSize->setValue(info.properties["PIXEL_HEIGHT"].toDouble());
+            }
+        }
+
+        if (wizLSAnalysisedtStepSize) {
+            if (info.properties.contains("DELTAZ")) {
+                wizLSAnalysisedtStepSize->setValue(info.properties["DELTAZ"].toDouble());
+            } else if (info.properties.contains("STEPSIZE")) {
+                wizLSAnalysisedtStepSize->setValue(info.properties["STEPSIZE"].toDouble());
+            }
+        }
+        if (wizLSAnalysiscmbFitDir && image && width>0 && height>0)  {
+            QFImageSymmetry s=qfGetImageSymetry(image, width, height);
+            if (s==qfisVertical) wizLSAnalysiscmbFitDir->setCurrentIndex(0);
+            if (s==qfisHorizonal) wizLSAnalysiscmbFitDir->setCurrentIndex(1);
+            qfFree(image);
+        }
+        if (wizLSAnalysisspinMaskSize) wizLSAnalysisImgPreviewMaskChanged(wizLSAnalysisspinMaskSize->value());
+    }
+}
+
+void QFRDRImageStackPlugin::wizLSAnalysisImgPreviewMaskChanged(int masksize)
+{
+    if (wizLSAnalysisImgPreview) {
+        wizLSAnalysisImgPreview->getImagePlot()->setMaskAround(masksize);
+    }
 }
 
 
 Q_EXPORT_PLUGIN2(image_stack, QFRDRImageStackPlugin)
+
 

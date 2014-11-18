@@ -158,6 +158,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
         QAction* actPrintReport;
         QAction* actSaveReport;
         QAction* actFitAllFilesetsAllPixels;
+        QAction* actFitAllFilesetsAllPixelsMTExp;
         QAction* actGuess;
         QAction* actChi2Landscape;
         QAction* actLoadGLobalFitConfig;
@@ -234,6 +235,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
         void on_spinFitLocalGlobals_valueChanged(int value);
         void errorEstimateModeChanged();
+        void fitAllFilesetsAllPixelsThreadedWriter();
 };
 
 #endif // QFIMFCCSFITEVALUATIONEDITOR_H

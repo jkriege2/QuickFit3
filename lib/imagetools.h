@@ -23,6 +23,8 @@
 #define IMAGETOOLS_H
 #include "qftools.h"
 #include <stdlib.h>
+#include "statistics_tools.h"
+
 
 /*! \brief bin each frame in an image series (video)
     \ingroup qf3lib_tools
@@ -47,6 +49,80 @@ inline void qfVideoBinInFrame(T* data, int width, int height, int frames, int bi
         }
     }
     qfFree(temp);
+}
+
+enum QFImageSymmetry {
+    qfisUnknown,
+    qfisHorizonal,
+    qfisVertical
+};
+
+/*! \brief find image symmetry
+    \ingroup qf3lib_tools
+
+    This function calculates the left-right and up-down cross-correlation coefficient and returns a symmetry according to which one is larger
+ */
+template <class T>
+inline QFImageSymmetry qfGetImageSymetry(const T* data, int width, int height, double* crossLR=NULL, double* crossTB=NULL) {
+    QFImageSymmetry sym=qfisUnknown;
+    if (data && width>0 && height>0) {
+        int lmin=0;
+        int lmax=width/2;
+        int delta=lmax;
+        if (lmax>=lmin && lmin<width && lmax<width ) {
+            double sumX=0, sum2X=0, cnt=0;
+            double sumY=0, sum2Y=0;
+            double prod=0;
+            for (int y=0; y<height; y++) {
+                for (int x=lmin; x<=lmax; x++) {
+                    const int xx=x+delta;
+                    if (x<width && xx<width) {
+                        const int idx1=y*width+x;
+                        const int idx2=y*width+xx;
+                        sumX+=data[idx1];
+                        sumY+=data[idx2];
+                        sum2X+=data[idx1]*data[idx1];
+                        sum2Y+=data[idx2]*data[idx2];
+                        prod+=data[idx1]*data[idx2];
+                        cnt++;
+                    }
+                }
+            }
+            const double cclr=(cnt*prod-sumX*sumY)/sqrt(cnt*sum2X-sumX*sumX)/sqrt(cnt*sum2Y-sumY*sumY);
+            if (crossLR) *crossLR=cclr;
+            int lmin=0;
+            int lmax=height/2;
+            int delta=lmax;
+
+            sumX=0;
+            sum2X=0;
+            cnt=0;
+            sumY=0;
+            sum2Y=0;
+            prod=0;
+            for (int y=lmin; y<=lmax; y++) {
+                for (int x=0; x<width; x++) {
+                    const int yy=y+delta;
+                    if (y<height && yy<height) {
+                        const int idx1=y*width+x;
+                        const int idx2=yy*width+x;
+                        sumX+=data[idx1];
+                        sumY+=data[idx2];
+                        sum2X+=data[idx1]*data[idx1];
+                        sum2Y+=data[idx2]*data[idx2];
+                        prod+=data[idx1]*data[idx2];
+                        cnt++;
+                    }
+                }
+            }
+            const double cctb=(cnt*prod-sumX*sumY)/sqrt(cnt*sum2X-sumX*sumX)/sqrt(cnt*sum2Y-sumY*sumY);
+            if (crossTB) *crossTB=cctb;
+            if (cctb-cclr>0.1) return qfisVertical;
+            if (cclr-cctb>0.1) return qfisHorizonal;
+        }
+    }
+
+    return sym;
 }
 
 

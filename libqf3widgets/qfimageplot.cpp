@@ -3,6 +3,9 @@
 #include "programoptions.h"
 #include "qftools.h"
 #include "statistics_tools.h"
+#include "qfimporterimageseries.h"
+#include "qfimportermanager.h"
+#include "qfimporter.h"
 
 QFImagePlot::QFImagePlot(QWidget *parent, const QString &prefix):
     QWidget(parent),
@@ -12,6 +15,7 @@ QFImagePlot::QFImagePlot(QWidget *parent, const QString &prefix):
     image_data=NULL;
     image_width=0;
     image_height=0;
+    mask=NULL;
     this->prefix=prefix;
     ui->setupUi(this);
 
@@ -59,6 +63,19 @@ void QFImagePlot::setImage(double *image, int32_t width, int32_t height)
 
 }
 
+void QFImagePlot::setMaskAround(int size)
+{
+    if (mask) qfFree(mask);
+    mask=qfMallocT<bool>(image_width*image_height);
+    for (int y=0; y<image_height; y++) {
+        for (int x=0; x<image_width; x++) {
+            int32_t idx=y*image_width+x;
+            mask[idx]=(x<size || x>image_width-size || y<size || y>image_height-size);
+        }
+    }
+    new_plots();
+}
+
 void QFImagePlot::update_plot()
 {
     if (!plteImage || !image_data || image_width<=0 || image_height<=0) return;
@@ -84,6 +101,7 @@ void QFImagePlot::clear()
     JKQTPdatastore* ds=plt->getDatastore();
     ds->clear();
     plteImage=NULL;
+    plteMask=NULL;
     ui->histogram->clear();
     clearData();
 }
@@ -91,6 +109,8 @@ void QFImagePlot::clear()
 void QFImagePlot::clearData()
 {
     if (image_data) qfFree(image_data);
+    if (mask) qfFree(mask);
+    mask=NULL;
     image_data=NULL;
     image_width=0;
     image_height=0;
@@ -129,6 +149,19 @@ void QFImagePlot::new_plots()
         plt->set_maintainAspectRatio(true);
         plt->setAbsoluteXY(0,image_width,0,image_height);
     }
+    if (mask) {
+        plteMask=new JKQTPColumnOverlayImageEnhanced(plt);
+        plteMask->set_imageColumn(ds->addCopiedImageAsColumn(mask, image_width, image_height, tr("mask")));
+        plteMask->set_x(0);
+        plteMask->set_y(0);
+        plteMask->set_width(image_width);
+        plteMask->set_height(image_height);
+        plteMask->set_Nx(image_width);
+        plteMask->set_Ny(image_height);
+        plteMask->set_trueColor(Qt::darkGray);
+        plteMask->set_falseColor(Qt::transparent);
+        plt->addGraph(plteMask);
+    }
 
     ui->image->set_doDrawing(true);
     ui->image->set_emitSignals(true);
@@ -154,3 +187,124 @@ void QFImagePlot::plotMouseMove(double x, double y)
     }
 }
 
+
+
+QFImagePlotWizardPage::QFImagePlotWizardPage(const QString &title, QWidget *parent):
+    QFWizardPage(title, parent)
+{
+    plot=new QFImagePlot(this);
+
+
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(plot);
+    formLay=new QFormLayout();
+    layout->addLayout(formLay);
+    setLayout(layout);
+
+}
+
+void QFImagePlotWizardPage::addRow(const QString &label, QWidget *widget)
+{
+    formLay->addRow(label, widget);
+}
+
+void QFImagePlotWizardPage::addRow(const QString &label, QLayout *layout)
+{
+    formLay->addRow(label, layout);
+}
+
+void QFImagePlotWizardPage::setImage(double *image, int32_t width, int32_t height)
+{
+    if (image && width>0 && height>0){
+        plot->setImage(image, width, height);
+    } else {
+        plot->clear();
+    }
+}
+
+void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, int frameNum, QFImporter::FileInfo* fileinfo)
+{
+    QFImporter* imp=QFPluginServices::getInstance()->getImporterManager()->createImporter(imageReaderID);
+    QFImporterImageSeries* r=dynamic_cast<QFImporterImageSeries*>(imp);
+    if (r) {
+        if (r->open(filename)) {
+            if (frameNum<0) {
+                frameNum=r->countFrames()/2;
+            }
+            if (frameNum>0) {
+                for (int i=0; i<frameNum; i++) {
+                    r->nextFrame();
+                }
+            }
+            double* frame=qfMallocT<double>(r->frameHeight()*r->frameWidth());
+            r->readFrameDouble(frame);
+            if (fileinfo) *fileinfo=r->getFileInfo();
+            r->close();
+            plot->setImage(frame, r->frameWidth(), r->frameHeight());
+            qfFree(frame);
+        } else {
+            plot->clear();
+        }
+        delete r;
+    } else {
+        plot->clear();
+    }
+}
+
+void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, int frameNum, double *&image, int &width, int &height, QFImporter::FileInfo *fileinfo)
+{
+    QFImporter* imp=QFPluginServices::getInstance()->getImporterManager()->createImporter(imageReaderID);
+    QFImporterImageSeries* r=dynamic_cast<QFImporterImageSeries*>(imp);
+    if (r) {
+        if (r->open(filename)) {
+            if (frameNum<0) {
+                frameNum=r->countFrames()/2;
+            }
+            if (frameNum>0) {
+                for (int i=0; i<frameNum; i++) {
+                    r->nextFrame();
+                }
+            }
+
+            double* frame=qfMallocT<double>(r->frameHeight()*r->frameWidth());
+            r->readFrameDouble(frame);
+            if (fileinfo) *fileinfo=r->getFileInfo();
+            image=duplicateArray(frame, r->frameHeight()*r->frameWidth());
+            height=r->frameHeight();
+            width=r->frameWidth();
+            r->close();
+            plot->setImage(frame, r->frameWidth(), r->frameHeight());
+            qfFree(frame);
+        } else {
+            plot->clear();
+        }
+        delete r;
+    } else {
+        plot->clear();
+    }
+}
+
+void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, QFImporter::FileInfo *fileinfo)
+{
+    setImage(filename, imageReaderID, 0, fileinfo);
+}
+
+void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, double *&image, int &width, int &height, QFImporter::FileInfo *fileinfo)
+{
+    setImage(filename, imageReaderID, 0, image, width, height, fileinfo);
+}
+
+void QFImagePlotWizardPage::clear()
+{
+    plot->clear();
+}
+
+void QFImagePlotWizardPage::initializePage()
+{
+    QFWizardPage::initializePage();
+}
+
+bool QFImagePlotWizardPage::validatePage()
+{
+     return QFWizardPage::validatePage();
+}

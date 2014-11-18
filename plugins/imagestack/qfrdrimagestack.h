@@ -24,6 +24,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include "qfpluginrawdata.h"
 
+
+class QFImagePlotWizardPage; // forward
+
 /*!
     \defgroup qf3rdrdp_image_stack Raw Data Record Plugin that manages a set of 4D image stacks
     \ingroup qf3rawdataplugins
@@ -82,11 +85,23 @@ class QFRDRImageStackPlugin : public QObject, public QFPluginRawDataRecordBase {
         /** \brief insertdata from file*/
         void insertSingleFileImageStack();
         void insertMultiFileImageStack();
+        QFRawDataRecord *addMultiFileImageStack(const QStringList& files, const QString& format_id);
 
         void insertSingleFileHDualViewImageStack();
         void insertSingleFileVDualViewImageStack();
         void insertSingleFileDualViewImageStack(char dvMode='h');
-        void startProjectWizardLightsheetAnalysis();
+        void startProjectWizardLightsheetAnalysis(bool insertEval=true);
+        void startProjectWizardLightsheetAnalysisData();
+
+    private:
+        QPointer<QDoubleSpinBox> wizLSAnalysisedtPixelSize;
+        QPointer<QSpinBox> wizLSAnalysisspinMaskSize;
+        QPointer<QDoubleSpinBox> wizLSAnalysisedtStepSize;
+        QPointer<QComboBox> wizLSAnalysiscmbFitDir;
+        QPointer<QFImagePlotWizardPage> wizLSAnalysisImgPreview;
+    private slots:
+        void wizLSAnalysisImgPreviewOnValidate(QWizardPage* page, QWizardPage* userPage);
+        void wizLSAnalysisImgPreviewMaskChanged(int masksize);
 };
 
 #endif // QFRDRIMAGESTACK_H

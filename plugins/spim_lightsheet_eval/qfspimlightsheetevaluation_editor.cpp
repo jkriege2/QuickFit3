@@ -48,18 +48,18 @@ QFSPIMLightsheetEvaluationEditor::QFSPIMLightsheetEvaluationEditor(QFPluginServi
     ui->cmbModel->setCurrentFitFunction("lightsheet_gaussian");
     ui->cmbAlgorithm->setCurrentAlgorithm("fit_lmfit");
 
-    ui->pltFit->get_plotter()->get_xAxis()->set_axisLabel(tr("position [µm]"));
+    ui->pltFit->get_plotter()->get_xAxis()->set_axisLabel(tr("position [{\\mu}m]"));
     ui->pltFit->get_plotter()->get_yAxis()->set_axisLabel(tr("intensity [A.U.]"));
     ui->pltFit->get_plotter()->set_plotLabel(tr("image frame cut and fit"));
     ui->pltImage->get_plotter()->set_plotLabel(tr("image frame"));
 
-    ui->pltParam->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [µm]"));
-    ui->pltBeamPos->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [µm]"));
-    ui->pltBeamPosDifference->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [µm]"));
-    ui->pltBeamWidth->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [µm]"));
-    ui->pltBeamPos->get_plotter()->get_yAxis()->set_axisLabel(tr("beam center position [µm]"));
-    ui->pltBeamPosDifference->get_plotter()->get_yAxis()->set_axisLabel(tr("beam center distance [µm]"));
-    ui->pltBeamWidth->get_plotter()->get_yAxis()->set_axisLabel(tr("lightsheet width [µm]"));
+    ui->pltParam->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [{\\mu}m]"));
+    ui->pltBeamPos->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [{\\mu}m]"));
+    ui->pltBeamPosDifference->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [{\\mu}m]"));
+    ui->pltBeamWidth->get_plotter()->get_xAxis()->set_axisLabel(tr("lightsheet position [{\\mu}m]"));
+    ui->pltBeamPos->get_plotter()->get_yAxis()->set_axisLabel(tr("beam center position [{\\mu}m]"));
+    ui->pltBeamPosDifference->get_plotter()->get_yAxis()->set_axisLabel(tr("beam center distance [{\\mu}m]"));
+    ui->pltBeamWidth->get_plotter()->get_yAxis()->set_axisLabel(tr("lightsheet width [{\\mu}m]"));
 
     tableFitResults=new QFTableModel(ui->tabFitResults);
     ui->tabFitResults->setModel(tableFitResults);

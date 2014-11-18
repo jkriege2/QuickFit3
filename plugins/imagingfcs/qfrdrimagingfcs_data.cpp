@@ -270,6 +270,7 @@ void QFRDRImagingFCSData::recalcSegmentedAverages()
 
     emitRawDataChanged();
     maskLoadFromString(mask);
+    maskMaskChangedEvent();
     log_text(tr("recalculating segmented CF averages ... DONE!\n"));
     QApplication::restoreOverrideCursor();
 }

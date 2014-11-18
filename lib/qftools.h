@@ -1731,6 +1731,20 @@ QFLIB_EXPORT QString qfGetTempFilename(const QString& templateName=QString("qf_t
  */
 QFLIB_EXPORT bool qfCopyData( QIODevice* in, QIODevice* out);
 
+/*! \brief returns the largest common start string of all string in data
+    \ingroup qf3lib_tools
+
+
+ */
+QFLIB_EXPORT QString qfGetLargestCommonStart(const QStringList& data, const QString& defaultResult=QString());
+
+/*! \brief returns the largest common end string of all string in data
+    \ingroup qf3lib_tools
+
+
+ */
+QFLIB_EXPORT QString qfGetLargestCommonEnd(const QStringList& data, const QString& defaultResult=QString());
+
 
 
 class QFLIB_EXPORT QFProgressMinorProgress {

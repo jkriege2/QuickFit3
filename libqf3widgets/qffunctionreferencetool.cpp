@@ -24,6 +24,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfhtmlhelptools.h"
 #include "qfenhancedlineedit.h"
 #include <QTextCursor>
+#include "qfenhancedplaintextedit.h"
 QFFunctionReferenceToolDocSearchThread::QFFunctionReferenceToolDocSearchThread(QStringList files, QObject *parent):
     QThread(parent)
 {
@@ -423,6 +424,11 @@ void QFFunctionReferenceTool::registerEditor(QLineEdit *edtFormula)
 void QFFunctionReferenceTool::registerEditor(QPlainTextEdit *edtFormula)
 {
     connect(edtFormula, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
+    QFEnhancedPlainTextEdit* ed=qobject_cast<QFEnhancedPlainTextEdit*>(edtFormula);
+    if (ed) {
+        connect(ed, SIGNAL(helpKeyPressed()), this, SLOT(showCurrentFunctionHelp()));
+    }
+
     //edtFormula->setCompleter(compExpression);
     edtFormula->addAction(actDefaultHelp);
     edtFormula->addAction(actCurrentFunctionHelp);

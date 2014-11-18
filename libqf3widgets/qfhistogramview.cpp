@@ -681,15 +681,17 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                             fix.append(ff->getDescription(i).initialFix);
                         }
                     }
-                    //qDebug()<<p<<fix;
+                    //qDebug()<<"init: "<<p<<fix;
                     ff->estimateInitial(p.data(), histX, histY, histBins, fix.data());
+                    //qDebug()<<"esti: "<<p<<fix;
                     for (int i=0; i<ff->paramCount(); i++) {
                         if (ff->getDescription(i).id=="offset") {
                             p[i]=0;
                         }
                     }
-                    alg->fit(p.data(), perr.data(), histX, histY, NULL, histBins, ff, p.data(), fix.data());
-                    //qDebug()<<p<<fix;
+                    QVector<double> pinit=p;
+                    alg->fit(p.data(), perr.data(), histX, histY, NULL, histBins, ff, pinit.constData(), fix.data());
+                    //qDebug()<<"fit:  "<<p<<fix<<histX[0]<<histY[0]<<histBins;
                     for (int i=0; i<ff->paramCount(); i++) {
                         QFFitFunction::ParameterDescription d=ff->getDescription(i);
                         if (ff->isParameterVisible(i, p.data())) {

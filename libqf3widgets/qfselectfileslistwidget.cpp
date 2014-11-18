@@ -29,6 +29,7 @@ QFSelectFilesListWidget::QFSelectFilesListWidget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::QFSelectFilesListWidget)
 {
+    onlyOneFormat=false;
     ui->setupUi(this);
     filters<<tr("All files (*.*)");
     lastDirID="QFSelectFilesListWidget/lastDir";
@@ -42,6 +43,14 @@ QFSelectFilesListWidget::~QFSelectFilesListWidget()
 
 void QFSelectFilesListWidget::setFilters(const QStringList &filters)
 {
+    this->filters=filters;
+    this->filterids=filters;
+}
+
+void QFSelectFilesListWidget::setFilters(const QStringList &filters, const QStringList &filterids)
+{
+    this->filterids=filterids;
+
     this->filters=filters;
 }
 
@@ -74,6 +83,30 @@ QStringList QFSelectFilesListWidget::fileFilters() const
     return sl;
 }
 
+QStringList QFSelectFilesListWidget::fileFilterIDs() const
+{
+    QStringList sl;
+    for (int i=0; i<ui->files->count(); i++) {
+        int idx=filters.indexOf(ui->files->item(i)->data(Qt::UserRole+2).toString());
+        sl<<filterids.value(idx, filters.value(idx, ""));
+    }
+    return sl;
+}
+
+QList<int> QFSelectFilesListWidget::fileFilterNums() const
+{
+    QList<int> sl;
+    for (int i=0; i<ui->files->count(); i++) {
+        sl<<filters.indexOf(ui->files->item(i)->data(Qt::UserRole+2).toString());
+    }
+    return sl;
+}
+
+void QFSelectFilesListWidget::setOnlyOneFormatAllowed(bool allowed)
+{
+    onlyOneFormat=allowed;
+}
+
 void QFSelectFilesListWidget::addFiles()
 {
     on_btnAdd_clicked();
@@ -83,10 +116,15 @@ void QFSelectFilesListWidget::on_btnAdd_clicked()
 {
     QString currentFCSFileFormatFilter=ProgramOptions::getConfigValue(lastFilterID, filters.value(0)).toString();
     QString dir=ProgramOptions::getConfigValue(lastDirID, "").toString();
+    QStringList filterss=filters;
+    if (onlyOneFormat && ui->files->count()>1 ) {
+        filterss.clear();
+        filterss<<currentFCSFileFormatFilter;
+    }
     QStringList files = qfGetOpenFileNames(this,
                           tr("Select File(s) ..."),
                           dir,
-                          filters.join(";;"), &currentFCSFileFormatFilter);
+                          filterss.join(";;"), &currentFCSFileFormatFilter);
     if (files.size()>0) {
         ProgramOptions::setConfigValue(lastFilterID, currentFCSFileFormatFilter);
         ProgramOptions::setConfigValue(lastDirID, QFileInfo(files[0]).absolutePath());
@@ -150,6 +188,11 @@ void QFSelectFilesWizardPage::setFilters(const QStringList &filters)
     sel->setFilters(filters);
 }
 
+void QFSelectFilesWizardPage::setFilters(const QStringList &filters, const QStringList &filterids)
+{
+    sel->setFilters(filters, filterids);
+}
+
 void QFSelectFilesWizardPage::setSettingsIDs(const QString &lastDirID, const QString &lastFilterID)
 {
     sel->setSettingsIDs(lastDirID, lastFilterID);
@@ -170,6 +213,16 @@ QStringList QFSelectFilesWizardPage::fileFilters() const
     return sel->fileFilters();
 }
 
+QStringList QFSelectFilesWizardPage::fileFilterIDs() const
+{
+    return sel->fileFilterIDs();
+}
+
+QList<int> QFSelectFilesWizardPage::fileFilterNums() const
+{
+    return sel->fileFilterNums();
+}
+
 void QFSelectFilesWizardPage::setAddOnStartup(bool add)
 {
     m_addStartup=add;
@@ -178,6 +231,11 @@ void QFSelectFilesWizardPage::setAddOnStartup(bool add)
 void QFSelectFilesWizardPage::setFilesRequired(bool add)
 {
     m_needsfiles=add;
+}
+
+void QFSelectFilesWizardPage::setOnlyOneFormatAllowed(bool allowed)
+{
+    sel->setOnlyOneFormatAllowed(allowed);
 }
 
 void QFSelectFilesWizardPage::initializePage()
