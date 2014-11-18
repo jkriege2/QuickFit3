@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
+    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
 
     last modification: $LastChangedDate$  (revision $Rev$)
 
@@ -418,50 +418,23 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 virtual ~FitQFFitFunctionFunctor();
 
                 /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
-                           The result is a NEW array created by calling \c qfCalloc()
+                           The result is a NEW array created by calling \c calloc()
                 */
-                double* createMappedArrayForFunctor(const double* modelData) const;
-                QVector<double> createMappedArrayForFunctorV(const double* modelData) const;
+                double* createMappedArrayForFunctor(const double* modelData);
 
                 /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
                            This function only copies those entries that are present in \a functorData.
                 */
-                void mapArrayFromModelToFunctor(double* functorData, const double* modelData) const;
+                void mapArrayFromModelToFunctor(double* functorData, const double* modelData);
 
                 /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ where \f$ \vec{q} \f$ is given by \a functorData.
                            and \f$ \vec{p} \f$ is returned in \a modelData. This function only overwrites the entries that are present in \a functorData.
                 */
-                inline void mapArrayFromFunctorToModel(QVector<double>& modelData, const QVector<double>& functorData) const {
-                    mapArrayFromFunctorToModel(modelData.data(), functorData.constData());
-                };
-                inline void mapArrayFromFunctorToModel(double* modelData, const QVector<double>& functorData) const {
-                    mapArrayFromFunctorToModel(modelData, functorData.constData());
-                };
-                inline void mapArrayFromFunctorToModel(QVector<double>& modelData, const double* functorData) const {
-                    mapArrayFromFunctorToModel(modelData.data(), functorData);
-                };
-
-                /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
-                           This function only copies those entries that are present in \a functorData.
-                */
-                inline void mapArrayFromModelToFunctor(QVector<double>& functorData, const QVector<double>& modelData) const {
-                    mapArrayFromModelToFunctor(functorData.data(), modelData.constData());
-                }
-                inline void mapArrayFromModelToFunctor(QVector<double>& functorData, const double* modelData) const {
-                    mapArrayFromModelToFunctor(functorData.data(), modelData);
-                }
-                inline void mapArrayFromModelToFunctor(double* functorData, const QVector<double>& modelData) const {
-                    mapArrayFromModelToFunctor(functorData, modelData.constData());
-                }
-
-                /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ where \f$ \vec{q} \f$ is given by \a functorData.
-                           and \f$ \vec{p} \f$ is returned in \a modelData. This function only overwrites the entries that are present in \a functorData.
-                */
-                void mapArrayFromFunctorToModel(double* modelData, const double* functorData) const;
+                void mapArrayFromFunctorToModel(double* modelData, const double* functorData);
 
                 /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$
                 */
-                inline int mapFromFunctorToModel(int functorIndex) const{
+                inline int mapFromFunctorToModel(int functorIndex){
                     return modelFromFunctor[functorIndex];
                 }
 
@@ -481,13 +454,9 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 QFFitFunction* getModel() const { return m_model; }
 
                 /** \brief return a pointer to the stored initial fit parameters */
-                const double* getModelParams() const { return m_modelParams.constData(); }
+                double* getModelParams() const { return m_modelParams; }
                 /** \brief return a pointer to an array indicating which parameters are fixed */
-                const bool* getModelParamsFix() const { return m_modelparamsFix.constData(); }
-                /** \brief return a pointer to the stored initial fit parameters */
-                double* getModelParams() { return m_modelParams.data(); }
-                /** \brief return a pointer to an array indicating which parameters are fixed */
-                bool* getModelParamsFix() { return m_modelparamsFix.data(); }
+                bool* getModelParamsFix() const { return m_modelparamsFix; }
                 /** \brief return the number of to the stored initial fit parameters */
                 int getModelParamsCount() const { return m_model->paramCount(); }
             protected:
@@ -500,13 +469,13 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 /** \brief number of real (non-fixed) parameters, \c m_paramCount<=m_N */
                 int m_paramCount;
                 /** \brief maps from function parameter index to model parameter index (size m_N) */
-                QVector<int> functorFromModel;
+                int* functorFromModel;
                 /** \brief maps from functor parameter index to model parameter index (size m_paramCount) */
-                QVector<int> modelFromFunctor;
+                int* modelFromFunctor;
                 /** \brief copy of the current model parameter vector (size m_N) */
-                QVector<double> m_modelParams;
+                double* m_modelParams;
                 /** \brief vector containing which parameters are fixed */
-                QVector<bool> m_modelparamsFix;
+                bool* m_modelparamsFix;
         };
 
 
@@ -535,7 +504,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 ~FitQFOptimizeFunctionFunctor();
 
                 /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
-                           The result is a NEW array created by calling \c qfCalloc()
+                           The result is a NEW array created by calling \c calloc()
                 */
                 double* createMappedArrayForFunctor(const double* modelData);
 
