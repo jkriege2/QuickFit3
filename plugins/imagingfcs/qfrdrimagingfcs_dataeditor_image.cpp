@@ -4384,6 +4384,7 @@ QString QFRDRImagingFCSImageEditor::formatTransformAndParameter(QComboBox *cmbPa
 }
 
 
+
 void QFRDRImagingFCSImageEditor::transformImage(double* image, uint32_t width, uint32_t height, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam) {
     switch(tranFitParam) {
         case QFRDRImagingFCSImageEditor::itAbs: {

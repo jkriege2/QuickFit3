@@ -147,6 +147,7 @@ class QFRawDataPropertyEditor_private : public QObject
         QAction* actMoveFilesUp;
         QAction* actMoveFilesDown;
         QAction* actOpenFileDirectory;
+        QAction* actOpenFileInSystem;
         QAction* actMakePropertyEditable;
 
 
@@ -315,6 +316,7 @@ class QFRawDataPropertyEditor_private : public QObject
         void moveFilesUp();
         void moveFilesDown();
         void openFilesDirectory();
+        void openFileInSystem();
         void showAvgClicked(bool checked);
 
         void showStatistics();

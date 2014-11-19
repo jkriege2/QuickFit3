@@ -116,6 +116,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
 
     protected slots:
 
+
         /** \brief switch plots on and off according to selected visible plots */
         void showHidePlots();
         /** \brief move color bars to appropriate position */

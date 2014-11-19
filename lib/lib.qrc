@@ -22,6 +22,7 @@
         <file alias="lib/file_down.png">icons/file_down.png</file>
         <file alias="lib/file_up.png">icons/file_up.png</file>
         <file alias="lib/file_opendir.png">icons/fileselect.png</file>
+        <file alias="lib/file_openfile.png">icons/fileselect.png</file>
         <file alias="lib/file_open.png">icons/fileselect.png</file>
     </qresource>
     <qresource prefix="/lib/help">

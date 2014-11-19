@@ -348,6 +348,9 @@ double qfstatisticsAverageVariance(double& var, const T& value) {
         }
     }
     var= fabs( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
+    if (!statisticsFloatIsOK(var) || var<0.0) {
+        var=0.0;
+    }
     return sum/(double)NN;
 }
 
@@ -377,6 +380,10 @@ double qfstatisticsMaskedAverageVariance(double& var, const QVector<bool>& mask,
         }
     }
     var= fabs( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
+    if (!statisticsFloatIsOK(var) || var<0.0) {
+        var=0.0;
+    }
+
     return sum/(double)NN;
 }
 
@@ -914,7 +921,11 @@ double qfstatisticsVariance(const T& value) {
             NN++;
         }
     }
-    return fabs( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
+    double var= fabs( sum2 - sum*sum/(double)NN ) / (double)(NN-1);
+    if (!statisticsFloatIsOK(var) || var<0.0) {
+        var=0.0;
+    }
+    return var;
 }
 
 template <class T>
@@ -947,8 +958,11 @@ double qfstatisticsMaskedVariance(const QVector<bool>& mask, const T& value, boo
             NN++;
         }
     }
-    if (NN>1) return fabs(( sum2 - sum*sum/(double)NN ) / (double)(NN-1));
-    else return 0;
+    double var= fabs(( sum2 - sum*sum/(double)NN ) / (double)(NN-1));
+    if (!statisticsFloatIsOK(var) || var<0.0) {
+        var=0.0;
+    }
+    return var;
 }
 
 template <class T>

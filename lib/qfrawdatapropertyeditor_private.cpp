@@ -293,6 +293,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     lstFiles->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     actOpenFileDirectory=new QAction(QIcon(":/lib/file_opendir.png"), tr("&open file's directory"), d);
+    actOpenFileInSystem=new QAction(QIcon(":/lib/file_openfile.png"), tr("&open file with system software"), d);
 
     actAddFile=new QAction(QIcon(":/lib/file_add.png"), tr("&add file"), d);
     actAddFile->setEnabled(false);
@@ -326,8 +327,10 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     connect(actMoveFilesUp, SIGNAL(triggered()), this, SLOT(moveFilesUp()));
     connect(actMoveFilesDown, SIGNAL(triggered()), this, SLOT(moveFilesDown()));
     connect(actOpenFileDirectory, SIGNAL(triggered()), this, SLOT(openFilesDirectory()));
+    connect(actOpenFileInSystem, SIGNAL(triggered()), this, SLOT(openFileInSystem()));
 
     lstFiles->addAction(actOpenFileDirectory);
+    lstFiles->addAction(actOpenFileInSystem);
     lstFiles->addAction(getSeparatorAction(d));
     lstFiles->addAction(actEnableFileActions);
     lstFiles->addAction(getSeparatorAction(d));
@@ -1120,6 +1123,16 @@ void QFRawDataPropertyEditor_private::openFilesDirectory() {
         int i=lstFiles->currentRow();
         if (i>=0 && i<current->getFilesCount()) {
             QDesktopServices::openUrl(QUrl(QFileInfo(current->getFileName(i)).absolutePath()));
+        }
+    }
+}
+
+void QFRawDataPropertyEditor_private::openFileInSystem()
+{
+    if (current) {
+        int i=lstFiles->currentRow();
+        if (i>=0 && i<current->getFilesCount()) {
+            QDesktopServices::openUrl(QUrl(QFileInfo(current->getFileName(i)).absoluteFilePath()));
         }
     }
 }
