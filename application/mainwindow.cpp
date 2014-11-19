@@ -1714,26 +1714,54 @@ void MainWindow::insertEvaluation() {
 
 void MainWindow::createToolBars()
 {
+    QToolButton* tb;
+
     fileToolBar = addToolBar(tr("File"));
     fileToolBar->setObjectName("toolbar_file");
     fileToolBar->addAction(newProjectAct);
+
+    tb=new QToolButton(fileToolBar);
+    tb->setMenu(projectWizardsMenu);
+    tb->setIcon(QIcon(":/project_wizard.png"));
+    tb->setToolTip(tr("project wizards ..."));
+    tb->setPopupMode(QToolButton::InstantPopup);
+    fileToolBar->addWidget(tb);
+
     fileToolBar->addAction(openProjectAct);
     fileToolBar->addAction(saveProjectAct);
     fileToolBar->addSeparator();
     fileToolBar->addAction(helpAct);
+
     dataToolBar = addToolBar(tr("Data"));
-    QToolButton* tb=new QToolButton(dataToolBar);
+
+    tb=new QToolButton(dataToolBar);
     tb->setMenu(insertItemMenu);
     tb->setIcon(QIcon(":/rawdata_insert.png"));
     tb->setToolTip(tr("insert a new raw data item ..."));
     tb->setPopupMode(QToolButton::InstantPopup);
     dataToolBar->addWidget(tb);
+
     tb=new QToolButton(dataToolBar);
     tb->setMenu(evaluationMenu);
     tb->setIcon(QIcon(":/evaluation_insert.png"));
     tb->setToolTip(tr("insert a new evaluation ..."));
     tb->setPopupMode(QToolButton::InstantPopup);
     dataToolBar->addWidget(tb);
+
+    tb=new QToolButton(dataToolBar);
+    tb->setMenu(rdrWizardsMenu);
+    tb->setIcon(QIcon(":/rdr_wizard.png"));
+    tb->setToolTip(tr("raw data record wizards ..."));
+    tb->setPopupMode(QToolButton::InstantPopup);
+    dataToolBar->addWidget(tb);
+
+    tb=new QToolButton(dataToolBar);
+    tb->setMenu(evalWizardsMenu);
+    tb->setIcon(QIcon(":/eval_wizard.png"));
+    tb->setToolTip(tr("evaluation wizards ..."));
+    tb->setPopupMode(QToolButton::InstantPopup);
+    dataToolBar->addWidget(tb);
+
     dataToolBar->addAction(delItemAct);
     dataToolBar->setObjectName("toolbar_data");
     extensionToolBar=addToolBar(tr("Extensions"));

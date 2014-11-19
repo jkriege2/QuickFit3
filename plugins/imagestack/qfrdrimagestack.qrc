@@ -22,5 +22,10 @@
         <file alias="copyimage.png">images/copyimage.png</file>
         <file alias="printimage.png">images/printimage.png</file>
         <file alias="spim_lightsheet_scan.png">images/spim_lightsheet_scan.png</file>
+        <file alias="multifile_stack_large.png">images/multifile_stack_large.png</file>
+        <file alias="singlefile_stack_large.png">images/singlefile_stack_large.png</file>
+        <file alias="singlefile_dvh_stack_large.png">images/singlefile_dvh_stack_large.png</file>
+        <file alias="singlefile_dvv_stack_large.png">images/singlefile_dvv_stack_large.png</file>
+
     </qresource>
 </RCC>

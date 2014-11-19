@@ -75,7 +75,12 @@ class QFWIDLIB_EXPORT QFSelectFilesWizardPage : public QFWizardPage
         QFSelectFilesListWidget* getSelFilesWidget() const {
             return sel;
         }
+        inline QFormLayout* getFormLayout() const {
+            return formLay;
+        }
 
+        void addRow(const QString& label, QWidget* widget);
+        void addRow(const QString& label, QLayout* layout);
         void setFilters(const QStringList& filters);
         void setFilters(const QStringList& filters, const QStringList& filterids);
         void setSettingsIDs(const QString& lastDirID, const QString& lastFilterID);
@@ -98,7 +103,7 @@ class QFWIDLIB_EXPORT QFSelectFilesWizardPage : public QFWizardPage
         QFSelectFilesListWidget *sel;
         bool m_addStartup;
         bool m_needsfiles;
-
+        QFormLayout* formLay;
 };
 
 #endif // QFSELECTFILESLISTWIDGET_H

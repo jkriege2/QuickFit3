@@ -26,6 +26,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 class QFImagePlotWizardPage; // forward
+class QFSelectFilesWizardPage;
 
 /*!
     \defgroup qf3rdrdp_image_stack Raw Data Record Plugin that manages a set of 4D image stacks
@@ -86,19 +87,23 @@ class QFRDRImageStackPlugin : public QObject, public QFPluginRawDataRecordBase {
         void insertSingleFileImageStack();
         void insertMultiFileImageStack();
         QFRawDataRecord *addMultiFileImageStack(const QStringList& files, const QString& format_id);
+        QFRawDataRecord* addSingleFileDualViewImageStack(char dvMode, const QString &filename, const QString& format_id);
 
         void insertSingleFileHDualViewImageStack();
         void insertSingleFileVDualViewImageStack();
-        void insertSingleFileDualViewImageStack(char dvMode='h');
+        void addSingleFileDualViewImageStack(char dvMode='h');
         void startProjectWizardLightsheetAnalysis(bool insertEval=true);
         void startProjectWizardLightsheetAnalysisData();
+        void startImagestackWizard();
 
     private:
         QPointer<QDoubleSpinBox> wizLSAnalysisedtPixelSize;
         QPointer<QSpinBox> wizLSAnalysisspinMaskSize;
         QPointer<QDoubleSpinBox> wizLSAnalysisedtStepSize;
         QPointer<QComboBox> wizLSAnalysiscmbFitDir;
+        QPointer<QComboBox> wizLSAnalysiscmbStackMode;
         QPointer<QFImagePlotWizardPage> wizLSAnalysisImgPreview;
+        QPointer<QFSelectFilesWizardPage> wizSelfiles;
     private slots:
         void wizLSAnalysisImgPreviewOnValidate(QWizardPage* page, QWizardPage* userPage);
         void wizLSAnalysisImgPreviewMaskChanged(int masksize);

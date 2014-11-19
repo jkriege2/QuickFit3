@@ -179,8 +179,19 @@ QFSelectFilesWizardPage::QFSelectFilesWizardPage(const QString &title, QWidget *
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->addWidget(sel);
+    formLay=new QFormLayout();
+    layout->addLayout(formLay);
     setLayout(layout);
+}
 
+void QFSelectFilesWizardPage::addRow(const QString &label, QWidget *widget)
+{
+    formLay->addRow(label, widget);
+}
+
+void QFSelectFilesWizardPage::addRow(const QString &label, QLayout *layout)
+{
+    formLay->addRow(label, layout);
 }
 
 void QFSelectFilesWizardPage::setFilters(const QStringList &filters)
