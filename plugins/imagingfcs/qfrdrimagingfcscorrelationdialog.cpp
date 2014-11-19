@@ -114,6 +114,23 @@ QFRDRImagingFCSCorrelationDialog::QFRDRImagingFCSCorrelationDialog(QFPluginServi
     ui->btnSelCrop->addAction(actCropBottomCenter);
 
 
+    actCropLeftHalf=new QAction(tr("crop left half-image ..."), this);
+    connect(actCropLeftHalf, SIGNAL(triggered()), this, SLOT(cropLeftHalf()));
+    ui->btnSelCrop->addAction(actCropLeftHalf);
+
+    actCropRightHalf=new QAction(tr("crop right half-image ..."), this);
+    connect(actCropRightHalf, SIGNAL(triggered()), this, SLOT(cropRightHalf()));
+    ui->btnSelCrop->addAction(actCropRightHalf);
+
+    actCropTopHalf=new QAction(tr("crop top half-image ..."), this);
+    connect(actCropTopHalf, SIGNAL(triggered()), this, SLOT(cropTopHalf()));
+    ui->btnSelCrop->addAction(actCropTopHalf);
+
+    actCropBottomHalf=new QAction(tr("crop bottom half-image ..."), this);
+    connect(actCropBottomHalf, SIGNAL(triggered()), this, SLOT(cropBottomHalf()));
+    ui->btnSelCrop->addAction(actCropBottomHalf);
+
+
 
     // add more fileformats here
     imageFilters=QFRDRImagingFCSCorrelationJobThread::getImageFilterList(pluginServices);
@@ -320,6 +337,43 @@ void QFRDRImagingFCSCorrelationDialog::cropBottomCenter()
     }
 
 
+}
+
+void QFRDRImagingFCSCorrelationDialog::cropLeftHalf()
+{
+    int cwidth=image_width/2;
+    ui->spinXFirst->setValue(0);
+    ui->spinXLast->setValue(cwidth-1);
+    ui->spinYFirst->setValue(0);
+    ui->spinYLast->setValue(image_height-1);
+}
+
+void QFRDRImagingFCSCorrelationDialog::cropRightHalf()
+{
+    int cwidth=image_width/2;
+    ui->spinXFirst->setValue(cwidth);
+    ui->spinXLast->setValue(image_width-1);
+    ui->spinYFirst->setValue(0);
+    ui->spinYLast->setValue(image_height-1);
+}
+
+void QFRDRImagingFCSCorrelationDialog::cropTopHalf()
+{
+    int cwidth=image_height/2;
+    ui->spinXFirst->setValue(0);
+    ui->spinXLast->setValue(image_width-1);
+    ui->spinYFirst->setValue(0);
+    ui->spinYLast->setValue(cwidth-1);
+
+}
+
+void QFRDRImagingFCSCorrelationDialog::cropBottomHalf()
+{
+    int cwidth=image_height/2;
+    ui->spinXFirst->setValue(0);
+    ui->spinXLast->setValue(image_width-1);
+    ui->spinYFirst->setValue(cwidth);
+    ui->spinYLast->setValue(image_height-1);
 }
 
 

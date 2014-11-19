@@ -176,7 +176,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("email"), QString(qfInfoEmail())));
     htmlReplaceList.append(qMakePair(QString("jankrieger_phdthesis"), tr("Jan W. Krieger (2014): <b>\"Mapping diffusion Properties in Living Cells\"</b>, University Heidelberg, <i><a href=\"http://www.ub.uni-heidelberg.de/archiv/17187\">http://www.ub.uni-heidelberg.de/archiv/17187</a>.</i>")));
     htmlReplaceList.append(qMakePair(QString("jankrieger_phdthesis_ref"), tr("$$ref:JKRIEGR_PHD:Jan W. Krieger (2014): <b>\"Mapping diffusion Properties in Living Cells\"</b>, University Heidelberg, <i><a href=\"http://www.ub.uni-heidelberg.de/archiv/17187\">http://www.ub.uni-heidelberg.de/archiv/17187</a>.</i>$$")));
-    htmlReplaceList.append(qMakePair(QString("jankrieger_phdthesis_invisibleref"), tr("$$invisibleref:JKRIEGR_PHD:Jan W. Krieger (2014): <b>\"Mapping diffusion Properties in Living Cells\"</b>, University Heidelberg, <i><a href=\"http://www.ub.uni-heidelberg.de/archiv/17187\">http://www.ub.uni-heidelberg.de/archiv/17187</a>.</i>$$")));
+    htmlReplaceList.append(qMakePair(QString("jankrieger_phdthesis_invisibleref"), tr("$$invisibleref:JKRIEGR_PHD:Jan W. Krieger (2014): <b>\"Mapping diffusion Properties in Living Cells\"</b>, dissertational thesis, University Heidelberg, <i><a href=\"http://www.ub.uni-heidelberg.de/archiv/17187\">http://www.ub.uni-heidelberg.de/archiv/17187</a>.</i>$$")));
     htmlReplaceList.append(qMakePair(QString("qfcitation"), QString(qfInfoCitationHTML())));
     htmlReplaceList.append(qMakePair(QString("qfcitation_bibtex"), QString(qfInfoCitationBiBTeX())));
     htmlReplaceList.append(qMakePair(QString("maillist"), QString(qfInfoMaillist())));
@@ -4199,7 +4199,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             for (int ti=0; ti<ttids.size(); ti++){
                 const QString key=ttids[ti];
                 const QString val=helpdata.autolinks.value(key);
-                QRegExp rxTT(QString("\\<\\s*(\\w\\w*)([^\\>]*)\\>[^\\<\\>]*(%1).*\\<\\s*\\/\\s*([^\\>\\s]*)\\s*\\>").arg(key));
+                QRegExp rxTT(QString("\\<\\s*(\\w\\w*)([^\\>]*)\\>[^\\<\\>]*[\\s\\,\\.\\(\\[\\;\\:\\-]+(%1)[\\s\\,\\.\\)\\]\\;\\:\\-]+.*\\<\\s*\\/\\s*([^\\>\\s]*)\\s*\\>").arg(key));
                 rxTT.setMinimal(true);
                 rxTT.setCaseSensitivity(Qt::CaseInsensitive);
                 QRegExp rxTooltip("href\\s*\\=\\s*\\\"tooltip\\:");
@@ -4940,7 +4940,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             for (int ti=0; ti<ttids.size(); ti++){
                 const QString key=ttids[ti];
                 const QFToolTipsData val=helpdata.tooltips.value(key);
-                QRegExp rxTT(QString("\\<\\s*(\\w\\w*)[^\\>]*\\>[^\\<\\>]*(%1)[^\\<\\>]*\\<").arg(key));
+                QRegExp rxTT(QString("\\<\\s*(\\w\\w*)[^\\>]*\\>[^\\<\\>]*[\\s\\,\\.\\(\\[\\;\\:\\-]+(%1)[\\s\\,\\.\\)\\]\\;\\:\\-]+[^\\<\\>]*\\<").arg(key));
                 rxTT.setMinimal(true);
                 pos = 0;
                 //qDebug()<<"----- "<<key<<" ------";

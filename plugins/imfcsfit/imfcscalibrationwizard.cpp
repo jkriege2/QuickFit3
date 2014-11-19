@@ -110,6 +110,7 @@ void ImFCSCalibrationWizard::on_btnReset_clicked()
     ui->widget3->setEnabled(false);
     ui->widget4->setEnabled(false);
     ui->widget5->setEnabled(false);
+    ui->pltD->clearGraphs(true);
 }
 
 void ImFCSCalibrationWizard::on_btnUnlock_clicked()

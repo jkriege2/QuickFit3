@@ -113,6 +113,10 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         void cropRightCenter();
         void cropTopCenter();
         void cropBottomCenter();
+        void cropLeftHalf();
+        void cropRightHalf();
+        void cropTopHalf();
+        void cropBottomHalf();
 
     protected:
         void done(int status);
@@ -141,6 +145,10 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         QAction* actCropRightCenter;
         QAction* actCropTopCenter;
         QAction* actCropBottomCenter;
+        QAction* actCropLeftHalf;
+        QAction* actCropRightHalf;
+        QAction* actCropTopHalf;
+        QAction* actCropBottomHalf;
 
 
         QPointer<QFImagePlot> image;
