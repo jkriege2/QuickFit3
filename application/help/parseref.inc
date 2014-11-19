@@ -18,6 +18,7 @@
 	<li><b><a href="$$mainhelpdir$$/parserreference/power_roots.html">powers and roots</a></b></li>
 	<li><b><a href="$$mainhelpdir$$/parserreference/round_abs.html">rounding and absolute values</a></b></li>
 	<li><b><a href="$$mainhelpdir$$/parserreference/special_math.html">special math functions</a></b></li>
+	<li><b><a href="$$mainhelpdir$$/parserreference/fitfunctions.html">QuickFit fit function accesss</a></b></li>
 </ul></li>
 <li><b>Advanced Mathematical Functions</b>:<ul>
 	<li><b><a href="$$mainhelpdir$$/parserreference/polynomials.html">polynomial functions</a></b></li>
@@ -30,6 +31,10 @@
 </ul></li>
 <li><b>Statistics Functions</b>:<ul>
 	<li><b><a href="$$mainhelpdir$$/parserreference/statistics.html">statistics functions</a></b></li>
+	<li><b><a href="$$mainhelpdir$$/parserreference/statisticshistograms.html">histogram functions</a></b></li>
+</ul></li>
+<li><b>Data Fitting/Optimization Functions</b>:<ul>
+	<li><b><a href="$$mainhelpdir$$/parserreference/datafit.html">data fitting functions</a></b></li>
 </ul></li>
 <li><b>String Functions</b>:<ul>
 	<li><b><a href="$$mainhelpdir$$/parserreference/string.html">string functions</a></b></li>

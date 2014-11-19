@@ -1,0 +1,22 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Model Fitting Functions</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+ 
+  
+  $$funcref_start$$<a name="fitfunction_fit"/><!-- func:fitfunction_fit -->
+  <b><tt><!-- template -->fitfunction_fit(fitalg, ffid, initparams, fix, x, y, w)<!-- /template --></tt> - <i>fits the supplied fit function to the data vectors vector <tt>x</tt>,<tt>y</tt> </i>:</b>
+$$funcref_description$$
+  This function solves the least squares fit problem:
+  $$bmath:\vec{p}^\ast=\argmin_{\vec{p}}\sum_i\left(\frac{y_i-f(x_i,\vec{p})}{w_i}\right)$$
+  where $$math:f(x,\vec{p})$$ is the fit model specified by the fit function ID <tt>ffid</tt> and the fit algorithm <tt>fitalg</tt> is used. The parameter <tt>initparams</tt> contains the starting values and <tt>fix</tt> (optional!) determines, which parameters are fixed (boolean vector!). If <tt>fix</tt> is missing, the initial fix-settings of the specified fit function are used. The vector of weights <tt>w</tt> is also optional and $$math:w_i=1$$ is used, if it is missing.
+  <!-- /func:fitfunction_fit -->  
+$$funcref_end$$
+  
+  </body>
+</html>
+  

@@ -455,6 +455,12 @@ namespace QFMathParser_DefaultLib {
     void fEnsureVectorSize(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
     void fEnsureVectorSizeStart(qfmpResult& res, const qfmpResult* nodes, unsigned int n, QFMathParser* p);
 
+
+    void fHistogram(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fHistogramBins(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRangedHistogram(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fRangedHistogramBins(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+
     void addDefaultFunctions(QFMathParser *p);
     bool hasDefaultFunctions(QFMathParser* p);
     void addDefaultVariables(QFMathParser *p);
@@ -520,6 +526,16 @@ namespace QFMathParser_DefaultLib {
     void fRDR_imageselectionfirstofname(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDR_imageselection(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
 
+    void fFitFunctionParameters(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionIsFit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionInit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionInitFix(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionIDs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionEval(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionCalc(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionParamCount(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+
+    void fFitFunctionFit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
 #endif
 
 }
