@@ -1454,6 +1454,10 @@ void MainWindow::createActions() {
     actSort->setCheckable(true);
     actsSort->addAction(actSort=new QAction(tr("... by Folder-Type-Name-Role"), this));
     actSort->setCheckable(true);
+    actsSort->addAction(actSort=new QAction(tr("... by Folder-Name-Type-Role"), this));
+    actSort->setCheckable(true);
+    actsSort->addAction(actSort=new QAction(tr("... by Folder-Role-Type-Name"), this));
+    actSort->setCheckable(true);
     connect(actsSort, SIGNAL(triggered(QAction*)), this, SLOT(setProjectSortOrder(QAction*)));
 
 

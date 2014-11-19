@@ -2383,7 +2383,7 @@ class qfproject_rdr_ByFolderTypeNameRole_lesser {
                             if (r1->getRole()==r2->getRole()) {
                                 return r1->getID()<r2->getID();
                             } else {
-                                return r1->getID()<r2->getID();
+                                return r1->getRole()<r2->getRole();
                             }
                         } else {
                             return r1->getName()<r2->getName();
@@ -2434,6 +2434,151 @@ class qfproject_eval_ByFolderTypeNameRole_lesser {
         }
 };
 
+
+
+
+
+
+
+
+
+
+
+
+class qfproject_rdr_ByFolderNameTypeRole_lesser {
+    public:
+        const QFProject* p;
+        inline qfproject_rdr_ByFolderNameTypeRole_lesser(const QFProject* p) { this->p=p; }
+        inline bool operator()(const int &t1, const int &t2) const
+        {
+            const QFRawDataRecord* r1=p->getRawDataByID(t1);
+            const QFRawDataRecord* r2=p->getRawDataByID(t2);
+            if (r1&&r2) {
+                if (r1->getFolder()==r2->getFolder()) {
+                    if (r1->getName()==r2->getName()) {
+                        if (r1->getType()==r2->getType()) {
+                            if (r1->getRole()==r2->getRole()) {
+                                return r1->getID()<r2->getID();
+                            } else {
+                                return r1->getID()<r2->getID();
+                            }
+                        } else {
+                            return r1->getType()<r2->getType();
+                        }
+                    } else {
+                        return r1->getName()<r2->getName();
+                    }
+                } else {
+                    if (r1->getFolder().isEmpty()) return false;
+                    if (r2->getFolder().isEmpty()) return true;
+                    return (r1->getFolder()<r2->getFolder());
+                }
+            }
+            return false;
+        }
+};
+
+class qfproject_eval_ByFolderNameTypeRole_lesser {
+    public:
+        const QFProject* p;
+        inline qfproject_eval_ByFolderNameTypeRole_lesser(const QFProject* p) { this->p=p; }
+        inline bool operator()(const int &t1, const int &t2) const
+        {
+            const QFEvaluationItem* r1=p->getEvaluationByID(t1);
+            const QFEvaluationItem* r2=p->getEvaluationByID(t2);
+            if (r1&&r2) {
+                //if (r1->getFolder()==r2->getFolder()) {
+                    if (r1->getName()==r2->getName()) {
+                        if (r1->getType()==r2->getType()) {
+                            //if (r1->getRole()==r2->getRole()) {
+                                return r1->getID()<r2->getID();
+//                            } else {
+//                                return r1->getRole()<r2->getRole();
+//                            }
+                        } else {
+                            return r1->getType()<r2->getType();
+                        }
+                    } else {
+                        return r1->getName()<r2->getName();
+                    }
+//                } else {
+//                    if (r1->getFolder().isEmpty()) return false;
+//                    if (r2->getFolder().isEmpty()) return true;
+//                    return (r1->getFolder()<r2->getFolder());
+//                }
+            }
+            return false;
+        }
+};
+
+
+
+
+class qfproject_rdr_ByFolderRoleTypeName_lesser {
+    public:
+        const QFProject* p;
+        inline qfproject_rdr_ByFolderRoleTypeName_lesser(const QFProject* p) { this->p=p; }
+        inline bool operator()(const int &t1, const int &t2) const
+        {
+            const QFRawDataRecord* r1=p->getRawDataByID(t1);
+            const QFRawDataRecord* r2=p->getRawDataByID(t2);
+            if (r1&&r2) {
+                if (r1->getFolder()==r2->getFolder()) {
+                    if (r1->getRole()==r2->getRole()) {
+                        if (r1->getType()==r2->getType()) {
+                            if (r1->getName()==r2->getName()) {
+                                return r1->getID()<r2->getID();
+                            } else {
+                                return r1->getName()<r2->getName();
+                            }
+                        } else {
+                            return r1->getType()<r2->getType();
+                        }
+                    } else {
+                        return r1->getRole()<r2->getRole();
+                    }
+                } else {
+                    if (r1->getFolder().isEmpty()) return false;
+                    if (r2->getFolder().isEmpty()) return true;
+                    return (r1->getFolder()<r2->getFolder());
+                }
+            }
+            return false;
+        }
+};
+
+class qfproject_eval_ByFolderRoleTypeName_lesser {
+    public:
+        const QFProject* p;
+        inline qfproject_eval_ByFolderRoleTypeName_lesser(const QFProject* p) { this->p=p; }
+        inline bool operator()(const int &t1, const int &t2) const
+        {
+            const QFEvaluationItem* r1=p->getEvaluationByID(t1);
+            const QFEvaluationItem* r2=p->getEvaluationByID(t2);
+            if (r1&&r2) {
+                //if (r1->getFolder()==r2->getFolder()) {
+                    if (r1->getType()==r2->getType()) {
+                        if (r1->getName()==r2->getName()) {
+                            //if (r1->getRole()==r2->getRole()) {
+                                return r1->getID()<r2->getID();
+//                            } else {
+//                                return r1->getRole()<r2->getRole();
+//                            }
+                        } else {
+                            return r1->getName()<r2->getName();
+                        }
+                    } else {
+                        return r1->getType()<r2->getType();
+                    }
+//                } else {
+//                    if (r1->getFolder().isEmpty()) return false;
+//                    if (r2->getFolder().isEmpty()) return true;
+//                    return (r1->getFolder()<r2->getFolder());
+//                }
+            }
+            return false;
+        }
+};
 void QFProject::sortProjectItems(QFProject::ProjectSortOrder sortorder)
 {
     QFProjectWriteLocker locker(p->lock);
@@ -2450,8 +2595,17 @@ void QFProject::sortProjectItems(QFProject::ProjectSortOrder sortorder)
         qSort(rawDataOrder.begin(), rawDataOrder.end(), qfproject_rdr_ByFolderTypeNameRole_lesser(this));
         qSort(evaluationsOrder.begin(), evaluationsOrder.end(), qfproject_eval_ByFolderTypeNameRole_lesser(this));
         emitStructureChanged();
+    } else if (sortorder==QFProject::sortByFolderNameTypeRole) {
+        qSort(rawDataOrder.begin(), rawDataOrder.end(), qfproject_rdr_ByFolderNameTypeRole_lesser(this));
+        qSort(evaluationsOrder.begin(), evaluationsOrder.end(), qfproject_eval_ByFolderNameTypeRole_lesser(this));
+        emitStructureChanged();
+    } else if (sortorder==QFProject::sortByFolderRoleTypeName) {
+        qSort(rawDataOrder.begin(), rawDataOrder.end(), qfproject_rdr_ByFolderRoleTypeName_lesser(this));
+        qSort(evaluationsOrder.begin(), evaluationsOrder.end(), qfproject_eval_ByFolderRoleTypeName_lesser(this));
+        emitStructureChanged();
     }
 }
+
 
 void QFProject::emitSortOrderChanged()
 {

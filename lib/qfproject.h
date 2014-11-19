@@ -78,7 +78,10 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         enum ProjectSortOrder {
             sortByID=0,
             sortByName=1,
-            sortByFolderTypeNameRole=2
+            sortByFolderTypeNameRole=2,
+            sortByFolderNameTypeRole=3,
+            sortByFolderRoleTypeName=4,
+
         };
     protected:
         /** \brief contains the currently highest ID */
