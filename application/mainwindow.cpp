@@ -206,7 +206,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.start"),
          tr("<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue;\" ><tr><td align=\"left\">"
             "<table width=\"100%\">"
-            "<tr><td align=\"center\" colspan=\"3\">$$local_plugin_icon$$</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=\"90%\" align=\"left\"><b>$$local_plugin_name$$</b>  </td></tr> "
+            "<tr><td align=\"center\" colspan=\"3\">$$local_plugin_icon$$</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=\"90%\" align=\"left\"><b>$$local_plugin_name$$ $$local_plugin_id_decorated$$</b>  </td></tr> "
             "<tr><td align=\"left\" rowspan=\"2\">$$rel_prev$$</td><td align=\"left\" rowspan=\"2\">$$rel_contents$$</td><td align=\"left\" rowspan=\"2\">$$rel_next$$</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=\"90%\" align=\"left\">$$qf_commondoc_header.default_links$$  ")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end_notitle"), QString("</td></tr></table></td></tr></table>")));// </div>")));
 
@@ -4137,9 +4137,26 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         for (int i=0; i<pluginList->size(); i++) {
             if (QDir(pluginList->at(i).directory)==basepath) { // we found the info for this directory
                 QString pid=pluginList->at(i).plugin->getID();
+                QString pid_sub_deocrated="";
+                QString fn=QFileInfo(filename).baseName();
+                if (QFFitAlgorithmManager::getInstance()->contains(pid)) {
+                    if (QFFitAlgorithmManager::getInstance()->getIDList().contains(fn)) {
+                        pid_sub_deocrated=tr(" fit algorithm ID: <tt>%1</tt>").arg(fn);
+                    }
+                } else  if (QFFitFunctionManager::getInstance()->contains(pid)) {
+                    if (QFFitFunctionManager::getInstance()->getIDList().contains(fn)) {
+                        pid_sub_deocrated=tr(" fit function ID: <tt>%1</tt>").arg(fn);
+                    }
+                }
+
+                QString pid_decorated=tr("<small><br>&nbsp;&nbsp;&nbsp;plugin ID: <tt>%1</tt>%2</small>").arg(pluginList->at(i).plugin->getName()).arg(pid_sub_deocrated);
+
+
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_icon"), QString("<img src=\"%1\">").arg(pluginList->at(i).plugin->getIconFilename())));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_iconfilename"), pluginList->at(i).plugin->getIconFilename()));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_name"), pluginList->at(i).plugin->getName()));
+
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_id_decorated"), pid_decorated));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_author"), pluginList->at(i).plugin->getAuthor()));
                 if (basedir.exists("copyright.html")) {
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), QString("<a href=\"copyright.html\">%1</a>").arg(pluginList->at(i).plugin->getCopyright())));
@@ -4188,7 +4205,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         fromHTML_replaces.append(qMakePair(QString("local_plugin_icon"), QString("<img src=\":/icon.png\">")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_iconfilename"), QString(":/icon.png")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_name"), QObject::tr("QuickFit $$version$$: Online-Help")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_id_decorated"), QString("")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_author"), QString("$$author$$")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_id"), QString("$$author$$")));
         if (basedir.exists("copyright.html")) {
             fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), QString("<a href=\"copyright.html\">$$copyright$$</a>")));
         } else {
@@ -4507,7 +4526,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$insert:<filename>$$ and $$insertglobal:<filename>$$ items
-            QRegExp rxInsert("\\$\\$(insert|insertglobal|see|note|info|warning|example|codeexample|cexample|tt|code|bqtt|bqcode|startbox|main_fontsize)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxInsert("\\$\\$(insert|insertglobal|tooltip|see|note|info|warning|example|codeexample|cexample|tt|code|bqtt|bqcode|startbox|main_fontsize)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxInsert.setMinimal(true);
             count = 0;
             pos = 0;
@@ -4531,6 +4550,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     if (f.open(QIODevice::ReadOnly | QIODevice::Text)) {
                         rep=f.readAll();
                     }
+                    result=result.replace(rxInsert.cap(0), rep);
+                } else if (QFPluginServices::getInstance()&&(command=="tooltip")) {
+                    QString rep=helpdata.tooltips.value(file).tooltip;
                     result=result.replace(rxInsert.cap(0), rep);
                 } else if (QFPluginServices::getInstance()&&(command=="see")) {
                     QString rep=tr("<blockquote>"

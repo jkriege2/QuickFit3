@@ -26,6 +26,7 @@
 #include "qfmathparser.h"
 #include "qfpluginservices.h"
 #include "qfrdrtableparserfunctions.h"
+#include "qfrdrtable.h"
 
 qfmpResult QFRDRTableFormulaDialog_dummy(const qfmpResult* params, unsigned char n, QFMathParser* p) {
     qfmpResult res;
@@ -33,10 +34,11 @@ qfmpResult QFRDRTableFormulaDialog_dummy(const qfmpResult* params, unsigned char
     return res;
 }
 
-QFRDRTableFormulaDialog::QFRDRTableFormulaDialog(QFTablePluginModel *model, int col, int row, QWidget *parent) :
+QFRDRTableFormulaDialog::QFRDRTableFormulaDialog(QFRDRTable *table, QFTablePluginModel *model, int col, int row, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QFRDRTableFormulaDialog)
 {
+    this->table=table;
     functionRef=new QFFunctionReferenceTool(NULL);
     functionRef->setCompleterFile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/table/table_expression.txt");
     functionRef->setDefaultWordsMathExpression();
@@ -58,6 +60,7 @@ QFRDRTableFormulaDialog::QFRDRTableFormulaDialog(QFTablePluginModel *model, int 
     defaultWords<<"row";
     defaultWords<<"column";
     defaultWords<<"col";
+    defaultWords<<"thisrdr";
     defaultWords<<"data";
     defaultWords<<"dataleft";
 
@@ -117,6 +120,7 @@ void QFRDRTableFormulaDialog::on_edtFormula_textChanged(QString text) {
     mp.addVariableDouble("row", row+1);
     mp.addVariableDouble("rows", model->rowCount());
     mp.addVariableDouble("col", col+1);
+    mp.addVariableDouble("thisrdr", table->getID());
     mp.addVariableDouble("column", col+1);
     mp.addVariableDouble("columns", model->columnCount());
     mp.set_data(&mpdata);

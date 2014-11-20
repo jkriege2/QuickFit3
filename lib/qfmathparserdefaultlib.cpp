@@ -41,6 +41,7 @@
 #  include "qffitfunctionmanager.h"
 #  include "qffitalgorithm.h"
 #  include "qffitalgorithmmanager.h"
+#  include "qffitfunctionparsed.h"
 #endif
 
 
@@ -397,7 +398,7 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("imageselection_firstofname", fRDR_imageselectionfirstofname);
 
     p->addFunction("fitfunction_parameternames", fFitFunctionParameters);
-    p->addFunction("fitfunction_fitparameters", fFitFunctionIsFit);
+    p->addFunction("fitfunction_isfitparameters", fFitFunctionIsFit);
     p->addFunction("fitfunction_init", fFitFunctionInit);
     p->addFunction("fitfunction_initfix", fFitFunctionInitFix);
     p->addFunction("fitfunction_ids", fFitFunctionIDs);
@@ -406,6 +407,9 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("fitfunction_calcparameters", fFitFunctionCalc);
     p->addFunction("fitfunction_fit", fFitFunctionFit);
 
+    p->addFunction("fitalgorithm_ids", fFitAlgorithmsIDs);
+
+    p->addFunction("fit", fFit);
 #endif
 
 
@@ -1139,7 +1143,7 @@ namespace QFMathParser_DefaultLib {
             r.setInvalid();
             return;
         }
-        r.num=params[0].length();
+        r.setDouble(params[0].length());
     }
 
     void fRemove(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
@@ -4774,8 +4778,7 @@ namespace QFMathParser_DefaultLib {
     void fFitFunctionParameters(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
         res.setInvalid();
-        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
-        if (p)  {
+
             if (n==1 && params[0].type==qfmpString ) {
                 QString ffid=params[0].str;
                 QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
@@ -4783,20 +4786,23 @@ namespace QFMathParser_DefaultLib {
                 if (ff) {
                     res.setStringVec(ff->getParameterIDs());
                     delete ff;
+                } else {
+                    parser->qfmpError(QObject::tr("fitfunction_parameternames(ffid) specified fit function not available"));
+                    res.setInvalid();
+                    return;
                 }
             } else {
                 parser->qfmpError(QObject::tr("fitfunction_parameternames(ffid) needs one string argument"));
                 res.setInvalid();
                 return;
             }
-        }
+
     }
 
     void fFitFunctionIsFit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
         res.setInvalid();
-        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
-        if (p)  {
+
             if (n==1 && params[0].type==qfmpString ) {
                 QString ffid=params[0].str;
                 QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
@@ -4807,20 +4813,23 @@ namespace QFMathParser_DefaultLib {
                         res.boolVec<<ff->getDescription(i).fit;
                     }
                     delete ff;
+                } else {
+                    parser->qfmpError(QObject::tr("fitfunction_fitparameters(ffid) specified fit function not available"));
+                    res.setInvalid();
+                    return;
                 }
             } else {
                 parser->qfmpError(QObject::tr("fitfunction_fitparameters(ffid) needs one string argument"));
                 res.setInvalid();
                 return;
             }
-        }
+
     }
 
     void fFitFunctionInit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
         res.setInvalid();
-        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
-        if (p)  {
+
             if (n==1 && params[0].type==qfmpString ) {
                 QString ffid=params[0].str;
                 QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
@@ -4831,21 +4840,24 @@ namespace QFMathParser_DefaultLib {
                         res.numVec<<ff->getDescription(i).initialValue;
                     }
                     delete ff;
+                } else {
+                    parser->qfmpError(QObject::tr("fitfunction_init(ffid) specified fit function not available"));
+                    res.setInvalid();
+                    return;
                 }
             } else {
                 parser->qfmpError(QObject::tr("fitfunction_init(ffid) needs one string argument"));
                 res.setInvalid();
                 return;
             }
-        }
+
     }
 
 
     void fFitFunctionInitFix(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
         res.setInvalid();
-        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
-        if (p)  {
+
             if (n==1 && params[0].type==qfmpString ) {
                 QString ffid=params[0].str;
                 QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
@@ -4856,20 +4868,23 @@ namespace QFMathParser_DefaultLib {
                         res.boolVec<<ff->getDescription(i).initialFix;
                     }
                     delete ff;
+                } else {
+                    parser->qfmpError(QObject::tr("fitfunction_initfix(ffid) specified fit function not available"));
+                    res.setInvalid();
+                    return;
                 }
             } else {
                 parser->qfmpError(QObject::tr("fitfunction_initfix(ffid) needs one string argument"));
                 res.setInvalid();
                 return;
             }
-        }
+
     }
 
     void fFitFunctionParamCount(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
         res.setInvalid();
-        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
-        if (p)  {
+
             if (n==1 && params[0].type==qfmpString ) {
                 QString ffid=params[0].str;
                 QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
@@ -4877,20 +4892,23 @@ namespace QFMathParser_DefaultLib {
                 if (ff) {
                     res.setDouble(ff->paramCount());
                     delete ff;
+                } else {
+                    parser->qfmpError(QObject::tr("fitfunction_paramcount(ffid) specified fit function not available"));
+                    res.setInvalid();
+                    return;
                 }
             } else {
                 parser->qfmpError(QObject::tr("fitfunction_paramcount(ffid) needs one string argument"));
                 res.setInvalid();
                 return;
             }
-        }
+
     }
 
     void fFitFunctionEval(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
         res.setInvalid();
-        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
-        if (p)  {
+
             if (n==3 && params[0].type==qfmpString && (params[1].type==qfmpDouble || params[1].type==qfmpDoubleVector) && params[2].type==qfmpDoubleVector ) {
                 QString ffid=params[0].str;
                 QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
@@ -4902,13 +4920,17 @@ namespace QFMathParser_DefaultLib {
                         res.setDoubleVec(ff->multiEvaluate(params[1].numVec, params[2].numVec));
                     }
                     delete ff;
+                } else {
+                    parser->qfmpError(QObject::tr("fitfunction_eval(ffid, x, params) specified fit function not available"));
+                    res.setInvalid();
+                    return;
                 }
             } else {
                 parser->qfmpError(QObject::tr("fitfunction_eval(ffid, x, params) needs three arguments [string, number/number_vector, number_vector]"));
                 res.setInvalid();
                 return;
             }
-        }
+
     }
 
 
@@ -4916,8 +4938,7 @@ namespace QFMathParser_DefaultLib {
     void fFitFunctionCalc(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
         res.setInvalid();
-        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
-        if (p)  {
+
             if (n==2 && params[0].type==qfmpString &&  params[1].type==qfmpDoubleVector ) {
                 QString ffid=params[0].str;
                 QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
@@ -4926,37 +4947,51 @@ namespace QFMathParser_DefaultLib {
                     res.setDoubleVec(params[1].numVec);
                     ff->calcParameter(res.numVec);
                     delete ff;
+                } else {
+                    parser->qfmpError(QObject::tr("fitfunction_calcparameters(ffid, params) specified fit function not available"));
+                    res.setInvalid();
+                    return;
                 }
             } else {
                 parser->qfmpError(QObject::tr("fitfunction_calcparameters(ffid, params) needs three arguments [string, number/number_vector, number_vector]"));
                 res.setInvalid();
                 return;
             }
-        }
+
     }
 
     void fFitFunctionIDs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
         res.setInvalid();
-        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
-        if (p)  {
+
             if (n==0) {
-                res.setStringVec(QFPluginServices::getInstance()->getFitFunctionManager()->getModels().keys());
+                res.setStringVec(QFPluginServices::getInstance()->getFitFunctionManager()->getModelIDs());
             } else {
                 parser->qfmpError(QObject::tr("fitfunction_ids() needs no arguments"));
                 res.setInvalid();
                 return;
             }
-        }
+
     }
 
+
+    void fFitAlgorithmsIDs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+             if (n==0) {
+                res.setStringVec(QFPluginServices::getInstance()->getFitAlgorithmManager()->getIDList());
+            } else {
+                parser->qfmpError(QObject::tr("fitalgorithm_ids() needs no arguments"));
+                res.setInvalid();
+                return;
+            }
+
+    }
 
 
     void fFitFunctionFit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
     {
         res.setInvalid();
-        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
-        if (p)  {
             if (n>=5 && params[0].type==qfmpString && params[1].type==qfmpString &&  params[2].type==qfmpDoubleVector ) {
                 QString ffid=params[1].str;
                 QString faid=params[0].str;
@@ -5038,9 +5073,93 @@ namespace QFMathParser_DefaultLib {
 
                     fa->fit(pout.data(), eout.data(), dx.data(), dy.data(), w.data(), Ndata, ff.data(), params[2].numVec.data(), fix.data(), pmin.data(), pmax.data());
                     res.setDoubleVec(pout);
+                } else {
+                    if (!fa) {
+                        parser->qfmpError(QObject::tr("fit(fitalg, fitfunction, parameters, initparams, dataX, dataY[, weight]) specified fit algorithm not available"));
+                        res.setInvalid();
+                        return;
+                    }
+                    if (!ff) {
+                        parser->qfmpError(QObject::tr("fit(fitalg, fitfunction, parameters, initparams, dataX, dataY[, weight]) specified fit function not available"));
+                        res.setInvalid();
+                        return;
+                    }
                 }
             } else {
                 parser->qfmpError(QObject::tr("fitfunction_fit(fitalg, ffid, initparams[, fix], dataX, dataY[, weight]) needs at least five arguments [string, string, number_vector, [boolean_vector], number_vector, number_vector, [number_vector]]"));
+                res.setInvalid();
+                return;
+            }
+
+    }
+
+    void fFit(qfmpResult &res, QFMathParser::qfmpNode **nodes, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+        if (n>=6) {
+            qfmpResult paramsFitAlg, paramsParams, paramsInitParams, paramsDataX, paramsDataY, paramsWeights;
+            nodes[0]->evaluate(paramsFitAlg);
+            nodes[2]->evaluate(paramsParams);
+            nodes[3]->evaluate(paramsInitParams);
+            nodes[4]->evaluate(paramsDataX);
+            nodes[5]->evaluate(paramsDataY);
+            if (n>=7) nodes[6]->evaluate(paramsWeights);
+            if (paramsFitAlg.type==qfmpString && paramsParams.type==qfmpStringVector && paramsInitParams.type==qfmpDoubleVector && paramsDataX.type==qfmpDoubleVector && paramsDataY.type==qfmpDoubleVector ) {
+                QScopedPointer<QFFitAlgorithm> fa(QFPluginServices::getInstance()->getFitAlgorithmManager()->createAlgorithm(paramsFitAlg.str));
+                QStringList paramnames=paramsParams.strVec;
+                QVector<double> initP=paramsInitParams.numVec;
+                if (paramnames.size()!=initP.size()) {
+                    parser->qfmpError(QObject::tr("fit(fitalg, fitfunction, parameters, initparams, dataX, dataY[, weight]) parameters 'parameters' and 'initparams' don't have the name number of entries"));
+                    res.setInvalid();
+                    return;
+                }
+                if (paramsDataX.numVec.size()!=paramsDataY.numVec.size() || paramsDataX.numVec.size()<1 || paramsDataY.numVec.size()<1) {
+                    parser->qfmpError(QObject::tr("fit(fitalg, fitfunction, parameters, initparams, dataX, dataY[, weight]) parameters 'dataX' and 'dataY' don't have the name number of entries, and/or have less than 1 entry"));
+                    res.setInvalid();
+                    return;
+                }
+                if (n>=7 && paramsWeights.isValid && paramsWeights.numVec.size()!=paramsDataY.numVec.size()) {
+                    parser->qfmpError(QObject::tr("fit(fitalg, fitfunction, parameters, initparams, dataX, dataY, weight) parameters 'dataX', 'dataY' and 'weights' don't have the name number of entries, and/or have less than 1 entry"));
+                    res.setInvalid();
+                    return;
+                }
+                QScopedPointer<QFFitFunctionQFMathparserNode> ff(new QFFitFunctionQFMathparserNode(parser, nodes[1], paramnames, initP));
+                if (fa && ff) {
+                    QVector<bool> fix;
+                    QVector<double> pmin, pmax;
+                    for (int i=0; i<initP.size(); i++) {
+                        fix<<false;
+                        pmin<<-DBL_MAX;
+                        pmax<<DBL_MAX;
+                    }
+
+
+                    QVector<double> pout=initP;
+                    QVector<double> eout(pout.size());
+                    QVector<double> w;
+
+
+
+
+                    if (n>=7 && paramsWeights.isValid) {
+                        w=paramsWeights.numVec;
+                    } else {
+                        w.fill(1, paramsDataX.numVec.size());
+                    }
+
+                    fa->fit(pout.data(), eout.data(), paramsDataX.numVec.data(), paramsDataY.numVec.data(), w.data(), paramsDataX.numVec.size(), ff.data(), initP.data(), fix.data(), pmin.data(), pmax.data());
+                    res.setDoubleVec(pout);
+                } else {
+                    if (!fa) {
+                        parser->qfmpError(QObject::tr("fit(fitalg, fitfunction, parameters, initparams, dataX, dataY[, weight]) specified fit algorithm not available"));
+                    } else {
+                        parser->qfmpError(QObject::tr("fit(fitalg, fitfunction, parameters, initparams, dataX, dataY[, weight]) could not construct fit function"));
+                    }
+                    res.setInvalid();
+                    return;
+                }
+            } else {
+                parser->qfmpError(QObject::tr("fit(fitalg, fitfunction, parameters, initparams, dataX, dataY[, weight]) needs at least five arguments [string, expression, string_vector, number_vector, number_vector, number_vector, [number_vector]]"));
                 res.setInvalid();
                 return;
             }

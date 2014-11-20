@@ -77,7 +77,35 @@ class QFLIB_EXPORT QFFitFunctionParsed : public QFFitFunction{
         mutable QVector<double> params;
         mutable double x;
 
-    
+
+};
+
+
+
+class QFLIB_EXPORT QFFitFunctionQFMathparserNode : public QFFitFunction{
+    public:
+        explicit QFFitFunctionQFMathparserNode(QFMathParser* parser, QFMathParser::qfmpNode* pnode, const QStringList& parameterNames, const QVector<double> &initVals=QVector<double>());
+        virtual ~QFFitFunctionQFMathparserNode();
+
+
+        /*! \copydoc QFFitFunction::name()   */
+        virtual QString name() const;
+        /** \copydoc QFFitFunction::shortName() */
+        virtual QString shortName() const;
+        /*! \copydoc QFFitFunction::id()   */
+        virtual QString id() const;
+
+        /*! \copydoc QFFitFunction::evaluate()   */
+        virtual double evaluate(double t, const double* parameters) const;
+
+
+    protected:
+        QFMathParser* parser;
+        QFMathParser::qfmpNode* pnode;
+        QStringList parameterNames;
+
+
+
 };
 
 #endif // QFFITFUNCTIONPARSED_H

@@ -219,7 +219,7 @@ void QFFitFunctionManager::searchPlugins(QString directory, QFPluginHelpData &he
 }
 
 
-QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start, QObject* parent) {
+QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start, QObject* parent) const {
     QMutexLocker locker(mutex);
     QMap<QString, QFFitFunction*> res;
 
@@ -258,7 +258,47 @@ QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start, 
     return res;
 }
 
-QFFitFunction *QFFitFunctionManager::createFunction(QString ID, QObject *parent) {
+QStringList QFFitFunctionManager::getModelIDs(QString id_start) const
+{
+    QMutexLocker locker(mutex);
+    QStringList res;
+
+    for (int i=0; i<fitPlugins.size(); i++) {
+        QStringList ids=fitPlugins[i]->getIDs();
+        for (int j=0; j<ids.size(); j++) {
+            if (id_start.isEmpty() || ids[j].startsWith(id_start)) {
+                res<<ids[j];
+            }
+        }
+    }
+
+    {
+        QMap<QString, QString>::const_iterator it;
+        for (it=userFitFunctions.begin(); it!=userFitFunctions.end(); ++it) {
+            if (id_start.isEmpty() || it.key().startsWith(id_start)) {
+                QFFitFunctionParsed* f=new QFFitFunctionParsed(it.value());
+                if ( f && f->isValid() && !res.contains(it.key())) res<<it.key();
+                if (f) delete f;
+            }
+        }
+    }
+
+
+    {
+        QMap<QString, QLibrary*>::const_iterator it;
+        for (it=libraryFitFunctions.begin(); it!=libraryFitFunctions.end(); ++it) {
+            if (id_start.isEmpty() || it.key().startsWith(id_start)) {
+                QFLibraryFitFunction* f=new QFLibraryFitFunction(it.value());
+                if ( f && f->isValid() && !res.contains(it.key())) res<<it.key();
+                if (f) delete f;
+            }
+        }
+    }
+
+    return res;
+}
+
+QFFitFunction *QFFitFunctionManager::createFunction(QString ID, QObject *parent) const {
     QMutexLocker locker(mutex);
     for (int i=0; i<fitPlugins.size(); i++) {
         QStringList ids=fitPlugins[i]->getIDs();
@@ -323,7 +363,12 @@ QStringList QFFitFunctionManager::getIDList(int i) const {
     return fitPlugins[i]->getIDs();
 }
 
-bool QFFitFunctionManager::contains(const QString &ID)
+QStringList QFFitFunctionManager::getIDList() const
+{
+    return getModelIDs();
+}
+
+bool QFFitFunctionManager::contains(const QString &ID) const
 {
     for (int i=0; i<fitPlugins.size(); i++)
         if (fitPlugins[i]->getID()==ID) return true;
@@ -346,7 +391,7 @@ int QFFitFunctionManager::getPluginForID(QString id) const {
    return -1;
 }
 
-int QFFitFunctionManager::getMajorVersion(int id) {
+int QFFitFunctionManager::getMajorVersion(int id) const {
     if ((id<0) || (id>=fitPlugins.size())) return 0;
     int ma, mi;
     if (id<fitPlugins.size()) {
@@ -356,7 +401,7 @@ int QFFitFunctionManager::getMajorVersion(int id) {
     return 0;
 }
 
-int QFFitFunctionManager::getMinorVersion(int id) {
+int QFFitFunctionManager::getMinorVersion(int id) const {
     if ((id<0) || (id>=fitPlugins.size())) return 0;
     int ma, mi;
     if (id<fitPlugins.size()) {
@@ -394,7 +439,7 @@ QString QFFitFunctionManager::getIconFilename(int i) const {
 }
 
 
-QString QFFitFunctionManager::getPluginHelp(int ID) {
+QString QFFitFunctionManager::getPluginHelp(int ID) const {
     if ((ID>=0) && (ID<fitPlugins.size())) {
         QString basename=QFileInfo(getPluginFilename(ID)).baseName();
     #ifndef Q_OS_WIN32
@@ -405,7 +450,7 @@ QString QFFitFunctionManager::getPluginHelp(int ID) {
     return "";
 }
 
-QString QFFitFunctionManager::getPluginTutorialMain(int ID) {
+QString QFFitFunctionManager::getPluginTutorialMain(int ID) const {
     if ((ID>=0) && (ID<fitPlugins.size())) {
         QString basename=QFileInfo(getPluginFilename(ID)).baseName();
     #ifndef Q_OS_WIN32
@@ -416,7 +461,7 @@ QString QFFitFunctionManager::getPluginTutorialMain(int ID) {
     return "";
 }
 
-QString QFFitFunctionManager::getPluginFAQ(int ID)
+QString QFFitFunctionManager::getPluginFAQ(int ID) const
 {
     if ((ID>=0) && (ID<fitPlugins.size())) {
         QString basename=QFileInfo(getPluginFilename(ID)).baseName();
@@ -429,7 +474,7 @@ QString QFFitFunctionManager::getPluginFAQ(int ID)
 
 }
 
-void QFFitFunctionManager::getPluginTutorials(int ID, QStringList &names, QStringList &files)
+void QFFitFunctionManager::getPluginTutorials(int ID, QStringList &names, QStringList &files) const
 {
     if ((ID>=0) && (ID<fitPlugins.size())) {
         QString basename=QFileInfo(getPluginFilename(ID)).baseName();
@@ -487,7 +532,7 @@ void QFFitFunctionManager::getPluginTutorials(int ID, QStringList &names, QStrin
     }
 }
 
-QString QFFitFunctionManager::getPluginSettings(int ID) {
+QString QFFitFunctionManager::getPluginSettings(int ID) const {
     if ((ID>=0) && (ID<fitPlugins.size())) {
         QString basename=QFileInfo(getPluginFilename(ID)).baseName();
     #ifndef Q_OS_WIN32
@@ -497,7 +542,7 @@ QString QFFitFunctionManager::getPluginSettings(int ID) {
     }
     return "";
 }
-QString QFFitFunctionManager::getPluginCopyrightFile(int ID) {
+QString QFFitFunctionManager::getPluginCopyrightFile(int ID) const {
     if ((ID>=0) && (ID<fitPlugins.size())) {
         QString basename=QFileInfo(getPluginFilename(ID)).baseName();
     #ifndef Q_OS_WIN32
@@ -511,7 +556,7 @@ QString QFFitFunctionManager::getPluginCopyrightFile(int ID) {
 
 
 
-QString QFFitFunctionManager::getPluginHelp(int ID, QString faID) {
+QString QFFitFunctionManager::getPluginHelp(int ID, QString faID) const {
     if ((ID>=0) && (ID<fitPlugins.size())) {
         //QStringList ids=getIDList(ID);
         //if ((faID<0) || (faID>=ids.size())) return "";

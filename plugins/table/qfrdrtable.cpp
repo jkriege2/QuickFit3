@@ -1407,6 +1407,7 @@ QVariant QFRDRTable::evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode
     int column = cell.column();
     if (m) {
         if (columnMode) {
+            mp.addVariableDouble("thisrdr", getID());
             mp.addVariableDouble("col", cell.column()+1);
             mp.addVariableDouble("rows", m->model()->rowCount());
             mp.addVariableDouble("columns", m->model()->columnCount());
@@ -1415,6 +1416,7 @@ QVariant QFRDRTable::evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode
             mp.addVariableDoubleVector("rowsvec", rv);
         } else {
             mp.addVariableDouble("row", cell.row()+1);
+            mp.addVariableDouble("thisrdr", getID());
             mp.addVariableDouble("col", cell.column()+1);
             //mp.addVariableDouble("column", cell.column()+1);
             mp.addVariableDouble("rows", m->model()->rowCount());

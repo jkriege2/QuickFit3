@@ -177,3 +177,55 @@ double QFFitFunctionParsed::evaluate(double t, const double *parameters) const
     }
     return 0;
 }
+
+
+QFFitFunctionQFMathparserNode::QFFitFunctionQFMathparserNode(QFMathParser *parser, QFMathParser::qfmpNode *pnode, const QStringList &parameterNames, const QVector<double>& initVals) :
+    QFFitFunction()
+{
+    this->parser=parser;
+    this->pnode=pnode;
+    this->parameterNames=parameterNames;
+    for (int i=0; i<parameterNames.size(); i++) {
+        addParameter(FloatNumber, parameterNames[i], parameterNames[i], parameterNames[i], "", "", true, true, true, DisplayError, false, initVals.value(i, 0));
+    }
+
+}
+
+QFFitFunctionQFMathparserNode::~QFFitFunctionQFMathparserNode()
+{
+
+}
+
+QString QFFitFunctionQFMathparserNode::name() const
+{
+    return QString("parser_fit_function");
+}
+
+QString QFFitFunctionQFMathparserNode::shortName() const
+{
+    return QString("parser_fit_function");
+}
+
+QString QFFitFunctionQFMathparserNode::id() const
+{
+    return QString("parser_fit_function");
+}
+
+double QFFitFunctionQFMathparserNode::evaluate(double t, const double *parameters) const
+{
+    double res=NAN;
+    pnode->setParser(parser);
+    parser->enterBlock();
+    parser->addVariableDouble("x", t);
+    for (int i=0; i<paramCount(); i++) {
+        parser->addVariableDouble(parameterNames[i], parameters[i]);
+    }
+    qfmpResult result;
+    pnode->evaluate(result);
+    if (result.isValid && result.type==qfmpDouble) {
+        res=result.num;
+    }
+    parser->leaveBlock();
+    return res;
+}
+

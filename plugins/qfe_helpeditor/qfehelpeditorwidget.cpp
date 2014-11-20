@@ -397,6 +397,11 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$endbox$$");
 
 
+    menu=new QMenu(tr("insert Tooltips"), this);
+    ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "$$tooltip:PHRASE$$");
+
+
     menu=new QMenu(tr("FAQs"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
     addInsertAction(menu, tr("FAQ entry"), "$$faq_start$$\n  <a name=\"FAQ1\"><b>Question?</b>\n$$faq_answer$$\n  Answer ...\n$$faq_end$$");

@@ -1077,7 +1077,7 @@ void QFRDRTableEditor::slEditColumnProperties(int col) {
                 QVariant imwid=m->model()->getColumnHeaderData(c, QFRDRTable::ColumnImageWidth);
                 QVariant exp=m->model()->getColumnHeaderData(c, QFRDRTable::ColumnExpressionRole);
 
-                QFRDRTableColumnEditor* edt=new QFRDRTableColumnEditor(m->model(), c, this);
+                QFRDRTableColumnEditor* edt=new QFRDRTableColumnEditor(m, m->model(), c, this);
                 edt->setColumnTitle(t);
                 edt->setComment(comment.toString());
                 edt->setImageWidth(imwid.toInt());
@@ -1281,7 +1281,7 @@ void QFRDRTableEditor::slCalcCell() {
                 QItemSelectionModel* smod=tvMain->selectionModel();
                 QModelIndex cur=tvMain->currentIndex();
                 if (smod->hasSelection()) {
-                    if (!dlgMathExpression) dlgMathExpression=new QFRDRTableFormulaDialog(m->model(), smod->currentIndex().column(), smod->currentIndex().row(), this);
+                    if (!dlgMathExpression) dlgMathExpression=new QFRDRTableFormulaDialog(m, m->model(), smod->currentIndex().column(), smod->currentIndex().row(), this);
                     else dlgMathExpression->init(m->model(), cur.column(), cur.row());
                     QModelIndexList idxs=smod->selectedIndexes();
                     QString exp=dlgMathExpression->getExpression();
@@ -1310,6 +1310,7 @@ void QFRDRTableEditor::slCalcCell() {
                             addQFRDRTableFunctions(&mp);
                             mp.addVariableDouble("row", 1);
                             mp.addVariableDouble("col", 1);
+                            mp.addVariableDouble("thisrdr", m->getID());
                             mp.addVariableDouble("column", 1);
                             mp.addVariableDouble("columns", 1.0);
                             mp.addVariableDouble("rows", 1.0);
@@ -1557,11 +1558,13 @@ void QFRDRTableEditor::slRecalcAll()
             addQFRDRTableFunctions(&mpColumns, NULL, true);
             mp.addVariableDouble("row", 1);
             mp.addVariableDouble("col", 1);
+            mp.addVariableDouble("thisrdr", m->getID());
             mp.addVariableDouble("column", 1);
             mp.addVariableDouble("columns", 1.0);
             mp.addVariableDouble("rows", 1.0);
 
             mpColumns.addVariableDouble("col", 1);
+            mpColumns.addVariableDouble("thisrdr", m->getID());
             mpColumns.addVariableDouble("columns", 1.0);
             mpColumns.addVariableDouble("rows", 1.0);
 

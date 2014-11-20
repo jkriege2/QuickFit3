@@ -13,6 +13,12 @@
 $$funcref_description$$
   The histogram has <tt>bins</tt> bins (default: bins=11), equidistantly distributed between the minimum and maximum of the data in <tt>x</tt>. The boolean <tt>normalize</tt> can be set to <tt>true</tt> (default: <tt>false</tt>), which results in a normalized histogram (normalized with the sum of all values, used for the histogram).
   This function ignores all NAN or INF values in <tt>x</tt>!
+  $$startbox_example$$
+  <tt>x=[0,2,3,2,2,4,1,3,2,2,0,2,3,3,3];<br>histogram(x, 4)</tt><br>Will return the histogram <tt>[ 2, 1, 6, 6 ]</tt>. The bin positions can be obtained by calling<br><tt>histogrambins(x, 4)</tt><br>which returns the vector of bin <b>centers</b> <tt>[ 0.5, 1.5, 2.5, 3.5 ]</tt>, so the bin width is <tt>1</tt>
+<center><a name="statisticshistograms_pic000"><img src="$$mainhelppicdir$$/statisticshistograms_pic000.png" border="1">
+</center>
+  $$endbox$$
+  
   $$see:<a href="#histogrambins"><tt>histogrambins()</tt></a> for a function, which returns a vector of bin centerpoints.$$
   <!-- /func:histogram -->  
 $$funcref_end$$
@@ -22,6 +28,12 @@ $$funcref_end$$
 $$funcref_description$$
   The histogram has <tt>bins</tt> bins (default: bins=11), equidistantly distributed between the minimum and maximum of the data in <tt>x</tt>. The boolean <tt>normalize</tt> can be set to <tt>true</tt> (default: <tt>false</tt>), which results in a normalized histogram (normalized with the sum of all values, used for the histogram).
   This function ignores all NAN or INF values in <tt>x</tt>!
+   $$startbox_example$$
+  <tt>x=[0,2,3,2,2,4,1,3,2,2,0,2,3,3,3];<br>histogram(x, 4)</tt><br>Will return the histogram <tt>[ 2, 1, 6, 6 ]</tt>. The bin positions can be obtained by calling<br><tt>histogrambins(x, 4)</tt><br>which returns the vector of bin <b>centers</b> <tt>[ 0.5, 1.5, 2.5, 3.5 ]</tt>, so the bin width is <tt>1</tt>
+<center><a name="statisticshistograms_pic000"><img src="$$mainhelppicdir$$/statisticshistograms_pic000.png" border="1">
+</center>
+
+  $$endbox$$
   $$see:<a href="#histogram"><tt>histogram()</tt></a> for a function, which returns the histogram itself.$$
   <!-- /func:histogrambins -->  
 $$funcref_end$$
@@ -32,10 +44,16 @@ $$funcref_end$$
 
   
   $$funcref_start$$<a name="rangedhistogram"/><!-- func:rangedhistogram -->
-  <b><tt><!-- template -->rangedhistogram(x)<!-- /template --></tt> / <tt><!-- template -->rangedhistogram(x, bins)<!-- /template --></tt> / <tt><!-- template -->rangedhistogram(x, bins, normalize)<!-- /template --></tt> - <i>returns the histogram of number vector <tt>x</tt> (range: <tt>min</tt>...<tt>max</tt>) </i>:</b>
+  <b><tt><!-- template -->rangedhistogram(x, min ,max)<!-- /template --></tt> / <tt><!-- template -->rangedhistogram(x, min ,max, bins)<!-- /template --></tt> / <tt><!-- template -->rangedhistogram(x, min ,max, bins, normalize)<!-- /template --></tt> - <i>returns the histogram of number vector <tt>x</tt> (range: <tt>min</tt>...<tt>max</tt>) </i>:</b>
 $$funcref_description$$
   The histogram has <tt>bins</tt> bins (default: bins=11), equidistantly distributed between the minimum and maximum of the data in <tt>x</tt>. The boolean <tt>normalize</tt> can be set to <tt>true</tt> (default: <tt>false</tt>), which results in a normalized histogram (normalized with the sum of all values, used for the histogram).
   This function ignores all NAN or INF values in <tt>x</tt>!
+   $$startbox_example$$
+  <tt>x=[ 1, 4, -10, 0, -1, -4, -1, 6, 4, 1, 1, 1, 3, -6, 2, 2, 8, 5, 0, 0 ];<br>rangedhistogram(x, -7,7,14)</tt><br>Will return the histogram <tt>[ 1, 1, 0, 1, 0, 0, 2, 3, 4, 2, 1, 2, 1, 2 ]</tt>. The bin positions can be obtained by calling<br><tt>rangedhistogrambins(x, -7,7,14)</tt><br>which returns the vector of bin <b>centers</b> <tt>[ -6.5, -5.5, -4.5, -3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ]</tt>, so the bin width is <tt>1</tt>
+<center><a name="statisticshistograms_pic001"><img src="$$mainhelppicdir$$/statisticshistograms_pic001.png" border="1">
+</center>
+
+  $$endbox$$
   $$see:<a href="#rangedhistogrambins"><tt>rangedhistogrambins()</tt></a> for a function, which returns a vector of bin centerpoints.$$
   <!-- /func:rangedhistogram -->  
 $$funcref_end$$
@@ -45,6 +63,12 @@ $$funcref_end$$
 $$funcref_description$$
   The histogram has <tt>bins</tt> bins (default: bins=11), equidistantly distributed between the minimum and maximum of the data in <tt>x</tt>. The boolean <tt>normalize</tt> can be set to <tt>true</tt> (default: <tt>false</tt>), which results in a normalized histogram (normalized with the sum of all values, used for the histogram).
   This function ignores all NAN or INF values in <tt>x</tt>!
+  $$startbox_example$$
+  <tt>x=[ 1, 4, -10, 0, -1, -4, -1, 6, 4, 1, 1, 1, 3, -6, 2, 2, 8, 5, 0, 0 ];<br>rangedhistogram(x, -7,7,14)</tt><br>Will return the histogram <tt>[ 1, 1, 0, 1, 0, 0, 2, 3, 4, 2, 1, 2, 1, 2 ]</tt>. The bin positions can be obtained by calling<br><tt>rangedhistogrambins(x, -7,7,14)</tt><br>which returns the vector of bin <b>centers</b> <tt>[ -6.5, -5.5, -4.5, -3.5, -2.5, -1.5, -0.5, 0.5, 1.5, 2.5, 3.5, 4.5, 5.5, 6.5 ]</tt>, so the bin width is <tt>1</tt>
+
+<center><a name="statisticshistograms_pic001"><img src="$$mainhelppicdir$$/statisticshistograms_pic001.png" border="1">
+</center>
+  $$endbox$$
   $$see:<a href="#rangedhistogram"><tt>rangedhistogram()</tt></a> for a function, which returns the histogram itself.$$
   <!-- /func:rangedhistogrambins -->  
 $$funcref_end$$

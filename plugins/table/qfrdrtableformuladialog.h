@@ -38,6 +38,7 @@ namespace Ui {
     class QFRDRTableFormulaDialog;
 }
 
+class QFRDRTable; // forward
 
 /*! \brief dialog which allows to edit math expressions
     \ingroup qf3rdrdp_table
@@ -65,7 +66,7 @@ class QFRDRTableFormulaDialog : public QDialog
 
 
     public:
-        explicit QFRDRTableFormulaDialog(QFTablePluginModel* model, int col, int row, QWidget *parent = 0);
+        explicit QFRDRTableFormulaDialog(QFRDRTable* table, QFTablePluginModel* model, int col, int row, QWidget *parent = 0);
         ~QFRDRTableFormulaDialog();
 
         void init(QFTablePluginModel* model, int col, int row);
@@ -90,6 +91,7 @@ class QFRDRTableFormulaDialog : public QDialog
         QFFunctionReferenceTool* functionRef;
 
         QStringList defaultWords;
+        QFRDRTable* table;
 
         QString getFunctionTemplate(QString name);
         QString getFunctionHelp(QString name);

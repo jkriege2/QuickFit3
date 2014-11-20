@@ -2749,7 +2749,7 @@ void QFMathParser::qfmpVectorList::evaluate(qfmpResult &res)
                     res.numVec+=r.numVec;
                 } else {
                     res.setInvalid();
-                    if (getParser()) getParser()->qfmpError(QObject::tr("error in vector construct [Val1, Val2, ...]: item %1 has the wrong type (not number or number vector!)").arg(i));
+                    if (getParser()) getParser()->qfmpError(QObject::tr("error in vector construct [Val1, Val2, ...]: item %1 has the wrong type (not number or number vector, but %2!)").arg(i).arg(r.typeName()));
                     break;
                 }
             } else if (res.type==qfmpStringVector) {
@@ -2759,7 +2759,7 @@ void QFMathParser::qfmpVectorList::evaluate(qfmpResult &res)
                     res.strVec.append(r.strVec);
                 } else {
                     res.setInvalid();
-                    if (getParser()) getParser()->qfmpError(QObject::tr("error in vector construct [Val1, Val2, ...]: item %1 has the wrong type (not string or string vector!)").arg(i));
+                    if (getParser()) getParser()->qfmpError(QObject::tr("error in vector construct [Val1, Val2, ...]: item %1 has the wrong type (not string or string vector, but %2!)").arg(i).arg(r.typeName()));
                     break;
                 }
             } else if (res.type==qfmpBoolVector) {
@@ -2769,7 +2769,7 @@ void QFMathParser::qfmpVectorList::evaluate(qfmpResult &res)
                     res.boolVec+=r.boolVec;
                 } else {
                     res.setInvalid();
-                    if (getParser()) getParser()->qfmpError(QObject::tr("error in vector construct [Val1, Val2, ...]: item %1 has the wrong type (not string or string vector!)").arg(i));
+                    if (getParser()) getParser()->qfmpError(QObject::tr("error in vector construct [Val1, Val2, ...]: item %1 has the wrong type (not string or string vector, but %2!)").arg(i).arg(r.typeName()));
                     break;
                 }
             }

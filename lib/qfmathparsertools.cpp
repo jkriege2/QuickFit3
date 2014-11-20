@@ -36,7 +36,7 @@ qfmpResult::qfmpResult()
     numVec.clear();
     boolVec.clear();
     strVec.clear();
-    m_custom=NULL;
+    m_custom=NULL;    
 }
 
 qfmpResult::~qfmpResult()

@@ -14,8 +14,65 @@ $$funcref_description$$
   This function solves the least squares fit problem:
   $$bmath:\vec{p}^\ast=\argmin_{\vec{p}}\sum_i\left(\frac{y_i-f(x_i,\vec{p})}{w_i}\right)$$
   where $$math:f(x,\vec{p})$$ is the fit model specified by the fit function ID <tt>ffid</tt> and the fit algorithm <tt>fitalg</tt> is used. The parameter <tt>initparams</tt> contains the starting values and <tt>fix</tt> (optional!) determines, which parameters are fixed (boolean vector!). If <tt>fix</tt> is missing, the initial fix-settings of the specified fit function are used. The vector of weights <tt>w</tt> is also optional and $$math:w_i=1$$ is used, if it is missing.
-  <!-- /func:fitfunction_fit -->  
+  
+ $$startbox_example$$
+ The following code will fit an exponential decay to random data in <tt>dataX</tt> and <tt>dataY</tt>:
+ <tt>dataX=1:0.25:10;<br>
+ dataY=2*exp(-dataX/3)+randnormvec(37)/10;<br>
+ fitfunction_fit("fit_lmfit", "gen_exp", [0,1,0,1], [true,false,true,false], dataX, dataY)
+ </tt><br>
+ The result is: <tt>[ 0, 1.861176878, 0, 3.184021321 ]</tt>, i.e. $$math:A=1.86, \tau=3.18$$, which is close to the ideal result (see second line) of $$math:A_{ideal}=2, \tau_{ideal}=3$$. In the example above, the fit algorithm <tt>fit_lmfit</tt> was used, which references the plugin <a href="$$fitalgorithm:help:fit_lmfit$$">$$fitalgorithm:name:fit_lmfit$$</a> and is a simple levenberg-marquardt optimizer. The fit model is <tt>gen_exp</tt>, which references <a href="$$fitfunction:help:gen_exp$$">$$fitfunction:name:gen_exp$$</a>. The parameters of this fit function can be obtained by <tt>fitfunction_parameternames("gen_exp")</tt> and are <tt>offset, amplitude, position, lifetime</tt>. The initial parameter vector is given as the 4th argument and was <tt>[0,1,0,1]</tt> and the first and third parameter (offset and psoition) were fixed due tothe argument  <tt>[true,false,true,false]</tt>.<br>
+ This plot shows the raw data:
+ <center><a name="datafit_pic000"><img src="$$mainhelppicdir$$/datafit_pic000.png" border="1">
+ </center>
+ This plot shows the raw data and the fit:
+ <center><a name="datafit_pic001"><img src="$$mainhelppicdir$$/datafit_pic001.png" border="1">
+ </center>
+ 
+ 
+ $$endbox$$
+ 
+ $$startbox_info$$
+     <b>fit function:</b> $$tooltip:FITFUNCTION$$<br><br>
+     <b>fit algorithm:</b> $$tooltip:FITALGORITHM$$
+     $$endbox$$
+   <!-- /func:fitfunction_fit -->  
+
 $$funcref_end$$
+
+
+
+  $$funcref_start$$<a name="fit"/><!-- func:fit -->
+   <b><tt><!-- template -->fit(fitalg, fitfunction, parameters, initparams, dataX, dataY[, weight])<!-- /template --></tt> - <i> fit the function, specified by <tt>fitfunction</tt> to the data supplied in <tt>dataX,dataY</tt> </i>:</b>
+ $$funcref_description$$
+     This function uses the fit algorithm <tt>fitalg</tt> to fit the function $$math:f(x,\vec{p})$$, specified as an expression in the parameter <tt>fitfunction</tt> to the data, supplied in the vectors <tt>dataX</tt>, <tt>dataY</tt>. Optionally fit weights can be supplied in the vector <tt>weights</tt> (if it is not given, all weight are equal). The fit function has to be given as a parser expression in the second argument. The running variable is called <b>x</b> and the fit parameters have names, that are listed in the string vector <tt>parameters</tt>. Here is an example of how to define the fit function $$math:f(x; A,\tau)=A\cdot\exp(-t/\tau)$$:
+$$example:fit(..., A*exp(-x/tau), ["A", "tau"], [1,1], ...);$$
+Note the parameter names in the 3rd argument <tt>["A", "tau"]</tt>, which have to match the parameter names used in the function (2nd argument). The initial parameters for the fit are supplied as 4th argument (here <tt>[1,1]</tt>).<br>
+The function <tt>fit(...)</tt> function then solves the least-squares problem:
+ $$bmath:\vec{p}^\ast=\argmin_{\vec{p}}\sum_i\left(\frac{y_i-f(x_i,\vec{p})}{w_i}\right)$$
+ 
+ $$startbox_example$$
+ The following code will fit an exponential decay to random data in <tt>dataX</tt> and <tt>dataY</tt>:
+ <tt>dataX=1:0.25:10;<br>
+ dataY=2*exp(-dataX/3)+randnormvec(37)/10;<br>
+ fit("fit_lmfit", A*exp(-x/tau), ["A", "tau"], [1,1], dataX, dataY);
+ </tt><br>
+ The result is: <tt>[ 1.861176878, 3.184021321 ]</tt>, i.e. $$math:A=1.86, \tau=2.18$$, which is close to the ideal result (see second line) of $$math:A_{ideal}=2, \tau_{ideal}=3$$. In the example above, the fit algorithm <tt>fit_lmfit</tt> was used, which references the plugin <a href="$$fitalgorithm:help:fit_lmfit$$">$$fitalgorithm:name:fit_lmfit$$</a> and is a simple levenberg-marquardt optimizer. The initial parameter vector is given as rge 4th argument and was <tt>[1,1]</tt>.<br>
+ This plot shows the raw data:
+ <center><a name="datafit_pic000"><img src="$$mainhelppicdir$$/datafit_pic000.png" border="1">
+ </center>
+ This plot shows the raw data and the fit:
+ <center><a name="datafit_pic001"><img src="$$mainhelppicdir$$/datafit_pic001.png" border="1">
+ </center>
+ 
+ 
+ $$endbox$$
+ $$startbox_info$$
+     <b>fit function:</b> $$tooltip:FITFUNCTION$$<br><br>
+     <b>fit algorithm:</b> $$tooltip:FITALGORITHM$$
+     $$endbox$$
+   <!-- /func:fit -->
+ $$funcref_end$$
   
   </body>
 </html>

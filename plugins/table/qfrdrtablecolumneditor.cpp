@@ -27,6 +27,7 @@
 #include "qfpluginservices.h"
 #include "qfrdrtableparserfunctions.h"
 #include "qfenhancedlineedit.h"
+#include "qfrdrtable.h"
 
 qfmpResult QFRDRTableColumnEditor_dummy(const qfmpResult* params, unsigned int n, QFMathParser* p) {
     qfmpResult res;
@@ -34,10 +35,11 @@ qfmpResult QFRDRTableColumnEditor_dummy(const qfmpResult* params, unsigned int n
     return res;
 }
 
-QFRDRTableColumnEditor::QFRDRTableColumnEditor(QFTablePluginModel *model, int col, QWidget *parent):
+QFRDRTableColumnEditor::QFRDRTableColumnEditor(QFRDRTable *table, QFTablePluginModel *model, int col, QWidget *parent):
     QDialog(parent),
     ui(new Ui::QFRDRTableColumnEditor)
 {
+    this->table=table;
     this->model=model;
     this->col=col;
     functionRef=new QFFunctionReferenceTool(NULL);
@@ -61,6 +63,7 @@ QFRDRTableColumnEditor::QFRDRTableColumnEditor(QFTablePluginModel *model, int co
     defaultWords<<"row";
     defaultWords<<"column";
     defaultWords<<"col";
+    defaultWords<<"thisrdr";
     defaultWords<<"data";
     defaultWords<<"datacolumn";
     defaultWords<<"dataleft";
@@ -163,6 +166,7 @@ void QFRDRTableColumnEditor::on_edtFormula_textChanged() {
     QFMathParser mp; // instanciate
     addQFRDRTableFunctions(&mp, &defaultWords, true);
     mp.addVariableDouble("col", col+1);
+    mp.addVariableDouble("thisrdr", table->getID());
     mp.addVariableDouble("columns", model->columnCount());
     mp.addVariableDouble("rows", model->rowCount());
     mp.set_data(&mpdata);

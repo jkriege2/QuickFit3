@@ -51,11 +51,13 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
 
         /** \brief return a list of all implemented IDs */
         QStringList getIDList(int i) const ;
+        /** \brief return a list of all implemented IDs */
+        QStringList getIDList() const ;
 
-        bool contains(const QString& ID);
+        bool contains(const QString& ID) const;
 
         /** \brief return number of available plugins */
-        int pluginCount() { return fitPlugins.size(); }
+        inline int pluginCount() const { return fitPlugins.size(); }
 
         QObject* getPluginObject(int i) const;
 
@@ -84,20 +86,20 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         virtual QString getWeblink(int i) const;
 
         /** \brief returns the plugins main help file (html) for a specified  ID. */
-        QString getPluginHelp(int ID);
+        QString getPluginHelp(int ID) const;
         /** \brief returns the plugins tutorial file (html) for a specified  ID. */
-        QString getPluginTutorialMain(int ID);
+        QString getPluginTutorialMain(int ID) const;
         /** \brief returns the plugins FAQ file (html) for a specified  ID. */
-        QString getPluginFAQ(int ID);
+        QString getPluginFAQ(int ID) const;
 
         /** \brief returns lists of titles (names) and links to all tutorials for for a specified plugin ID. */
-        void getPluginTutorials(int ID, QStringList& names, QStringList& files);
+        void getPluginTutorials(int ID, QStringList& names, QStringList& files) const;
         /** \brief returns the plugins settings file (html) for a specified  ID. */
-        QString getPluginSettings(int ID);
+        QString getPluginSettings(int ID) const;
         /** \brief returns the plugins copyright file (html) for a specified  ID. */
-        QString getPluginCopyrightFile(int ID);
+        QString getPluginCopyrightFile(int ID) const;
         /** \brief returns a fit algorthms \a faID main help file (html) for a specified plugin \a ID. */
-        QString getPluginHelp(int ID, QString faID);
+        QString getPluginHelp(int ID, QString faID) const;
         /** \brief search for raw data record plugins in the given directory */
         void searchPlugins(QString directory, QFPluginHelpData& helpdata);
 
@@ -106,14 +108,19 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
          *
          *  \note This function is thread-safe
          */
-        QMap<QString, QFFitFunction*> getModels(QString id_start=QString(""), QObject* parent=NULL);
+        QMap<QString, QFFitFunction*> getModels(QString id_start=QString(""), QObject* parent=NULL) const;
+        /** \brief return a list of the models which start with the specified string
+         *
+         *  \note This function is thread-safe
+         */
+        QStringList getModelIDs(QString id_start=QString("")) const;
         /** \brief returns a new instance of the model which is specified by ID
          *
          *         the instance are newly created with the given parent in every call!
          *
          *  \note This function is thread-safe
 */
-        QFFitFunction* createFunction(QString ID, QObject* parent=NULL);
+        QFFitFunction* createFunction(QString ID, QObject* parent=NULL) const;
 
         /** \brief return the plugin index for a given fit function id */
         int getPluginForID(QString id) const;
@@ -123,9 +130,9 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         }
 
         /** \brief get plugins major version number */
-        int getMajorVersion(int i);
+        int getMajorVersion(int i) const;
         /** \brief get plugins minor version number */
-        int getMinorVersion(int i);
+        int getMinorVersion(int i) const;
 
         /** \brief returns a pointer to the instance of the main manager object (singleton within a QuickFit3 instance) */
         static QFFitFunctionManager* getInstance() {

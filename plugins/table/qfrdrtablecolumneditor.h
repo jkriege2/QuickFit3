@@ -34,6 +34,8 @@
 #include "qfrdrtableparserfunctions.h"
 
 
+class QFRDRTable; // forward
+
 
 namespace Ui {
     class QFRDRTableColumnEditor;
@@ -66,7 +68,7 @@ class QFRDRTableColumnEditor : public QDialog
 
 
     public:
-        explicit QFRDRTableColumnEditor(QFTablePluginModel* model, int col, QWidget *parent = 0);
+        explicit QFRDRTableColumnEditor(QFRDRTable* table, QFTablePluginModel* model, int col, QWidget *parent = 0);
         ~QFRDRTableColumnEditor();
 
 
@@ -94,6 +96,7 @@ class QFRDRTableColumnEditor : public QDialog
         Ui::QFRDRTableColumnEditor *ui;
 
         QFTablePluginModel* model;
+        QFRDRTable* table;
         int col;
         QFMathParserData mpdata;
         QStringList defaultWords;
