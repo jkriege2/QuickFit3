@@ -533,6 +533,7 @@ namespace QFMathParser_DefaultLib {
     void fFitFunctionIDs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionEval(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionCalc(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fFitFunctionEstimate(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionParamCount(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
 
     void fFitFunctionFit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);

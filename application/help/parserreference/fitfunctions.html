@@ -90,6 +90,17 @@ $$funcref_end$$
      <!-- /func:fitfunction_init -->
   $$funcref_end$$
   
+  $$funcref_start$$<a name="fitfunction_estimateparameters"/><!-- func:fitfunction_estimateparameters -->
+    <b><tt><!-- template -->fitfunction_estimateparameters(ffid, dataX, dataY)<!-- /template --></tt> - <i> returns a number vector, which is a guess for the ideal parameters, if the fit function <tt>ffid</tt> should represet the dataset in dataX and dataY </i>:</b>
+  $$funcref_description$$
+  If this feature is not implemented for the specified fit function, the function returns the vector of intial values.
+      $$see:<a href="#fitfunction_ids"><tt>fitfunction_ids()</tt></a> for a function, which returns all available fit function IDs and <a href="#fitfunction_parameternames"><tt>fitfunction_parameternames()</tt></a> for a function, that returns the names of the fit parameters$$  
+     $$startbox_info$$
+     <b>fit function:</b> $$tooltip:FITFUNCTION$$
+     $$endbox$$
+     <!-- /func:fitfunction_estimateparameters -->
+  $$funcref_end$$
+  
   $$funcref_start$$<a name="fitfunction_initfix"/><!-- func:fitfunction_initfix -->
     <b><tt><!-- template -->fitfunction_initfix(ffid)<!-- /template --></tt> - <i> returns a boolean vector, which specified the default initial fix state for each parameter of the fit function <tt>ffid</tt> </i>:</b>
   $$funcref_description$$

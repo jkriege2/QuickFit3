@@ -405,6 +405,7 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("fitfunction_evaluate", fFitFunctionEval);
     p->addFunction("fitfunction_paramcount", fFitFunctionParamCount);
     p->addFunction("fitfunction_calcparameters", fFitFunctionCalc);
+    p->addFunction("fitfunction_estimateparameters", fFitFunctionEstimate);
     p->addFunction("fitfunction_fit", fFitFunctionFit);
 
     p->addFunction("fitalgorithm_ids", fFitAlgorithmsIDs);
@@ -4933,6 +4934,40 @@ namespace QFMathParser_DefaultLib {
 
     }
 
+
+
+    void fFitFunctionEstimate(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)
+    {
+        res.setInvalid();
+
+            if (n==3 && params[0].type==qfmpString &&  params[1].type==qfmpDoubleVector &&  params[2].type==qfmpDoubleVector) {
+                QString ffid=params[0].str;
+                QFFitFunction* ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffid);
+                res=params[1];
+                if (ff) {
+                    res.setDoubleVec();
+                    for (int i=0; i<ff->paramCount(); i++) {
+                        res.numVec<<ff->getDescription(i).initialValue;
+                    }
+                    if (params[1].numVec.size()!=params[2].numVec.size() || params[1].numVec.size()<1 || params[2].numVec.size()<1) {
+                        parser->qfmpError(QObject::tr("fitfunction_estimateparameters(ffid, dataX, dataY) the vectors dataX and dataY have to have the same number of entries and each at least one entry"));
+                        res.setInvalid();
+                        return;
+                    }
+                    ff->estimateInitial(res.numVec.data(), params[1].numVec.data(), params[2].numVec.data(), params[1].numVec.size());
+                    delete ff;
+                } else {
+                    parser->qfmpError(QObject::tr("fitfunction_estimateparameters(ffid, dataX, dataY) specified fit function not available"));
+                    res.setInvalid();
+                    return;
+                }
+            } else {
+                parser->qfmpError(QObject::tr("fitfunction_estimateparameters(ffid, dataX, dataY) needs three arguments [string, number_vector, number_vector]"));
+                res.setInvalid();
+                return;
+            }
+
+    }
 
 
     void fFitFunctionCalc(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser)

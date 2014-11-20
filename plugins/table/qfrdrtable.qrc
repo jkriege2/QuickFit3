@@ -33,6 +33,7 @@
         <file alias="plot_delete.png">icons/plot_delete.png</file>
         <file alias="quickstat.png">icons/quickstat.png</file>
         <file alias="quickhist.png">icons/quickhist.png</file>
+        <file alias="prescript.png">icons/prescript.png</file>
         <file>icons/plot_ebars.png</file>
         <file>icons/plot_elines.png</file>
         <file>icons/plot_elinesbars.png</file>

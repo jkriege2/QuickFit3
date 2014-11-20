@@ -2338,7 +2338,17 @@ void QFRDRTable::loadColumnToComboBox(QComboBox *combo)
             combo->setItemText(i+2, tr("#%1: %2").arg(i+1).arg(tab->columnTitle(i)));
             combo->setItemData(i+2, i);//tab->columnTitle(i));
         }
-    combo->setCurrentIndex(idx);
+        combo->setCurrentIndex(idx);
+}
+
+QString QFRDRTable::getParserPreScript() const
+{
+    return getQFProperty("table_parser_prescript", "").toString();
+}
+
+void QFRDRTable::setParserPreScript(const QString &script)
+{
+    setQFProperty("table_parser_prescript", script, false, false);
 }
 
 

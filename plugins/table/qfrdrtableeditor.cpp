@@ -32,6 +32,8 @@
 #include "qfrdrtableregressiondialog.h"
 #include "qfrdrtable2dhistogramdialog.h"
 #include "dlgimporttable.h"
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 
 QFRDRTableEditor::QFRDRTableEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):
     QFRawDataEditor(services, propEditor, parent)
@@ -116,6 +118,37 @@ void QFRDRTableEditor::createWidgets() {
     tabQuick=new QFEnhancedTabWidget(this);
     l->addWidget(tabQuick, 1);
     tabQuick->setVisible(false);
+
+    widPreScript=new QWidget(this);
+
+    QVBoxLayout* layPreScript=new QVBoxLayout();
+    QHBoxLayout* layPreScriptV=new QHBoxLayout();
+    widPreScript->setLayout(layPreScriptV);
+    edtPreScript=new QFEnhancedPlainTextEdit(this);
+    labPreScriptOK=new QLabel(this);
+    //labPreScriptTemplate=new QLabel(this);
+    //labPreScriptTemplate->setWordWrap(true);
+    labPreScriptHelp=new QLabel(this);
+    labPreScriptHelp->setWordWrap(true);
+    labPreScriptHelp->setTextFormat(Qt::RichText);
+    scrollPreScriptHelp=new QScrollArea(this);
+    scrollPreScriptHelp->setWidget(new QWidget());
+    scrollPreScriptHelp->widget()->setLayout(layPreScript);
+    layPreScript->addWidget(labPreScriptOK);
+    //layPreScript->addWidget(labPreScriptTemplate);
+    layPreScript->addWidget(labPreScriptHelp, 1);
+    scrollPreScriptHelp->setWidgetResizable(true);
+    functionRef=new QFFunctionReferenceTool(NULL);
+    functionRef->setCompleterFile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/table/table_expression.txt");
+    functionRef->setDefaultWordsMathExpression();
+    functionRef->registerEditor(edtPreScript);
+    functionRef->setLabHelp(labPreScriptHelp);
+    //functionRef->setLabTemplate(labPreScriptTemplate);
+    functionRef->setDefaultHelp(QFPluginServices::getInstance()->getPluginHelpDirectory("table")+"mathparser.html");
+    layPreScriptV->addWidget(edtPreScript, 3);
+    layPreScriptV->addWidget(scrollPreScriptHelp, 1);
+
+    tabQuick->addTab(widPreScript, tr("Preevaluated Expressions"));
     tvQuickStat=new QEnhancedTableView(this);
     tmQuickStat=new QFTableModel(this);
     tvQuickStat->setModel(tmQuickStat);
@@ -325,6 +358,11 @@ void QFRDRTableEditor::createWidgets() {
     actQuickStat->setChecked(false);
     connect(actQuickStat, SIGNAL(toggled(bool)), this, SLOT(slQuickStat(bool)));
 
+    actPreScript=new QAction(QIcon(":/table/prescript.png"), tr("Preevaluated Expressions"), this);
+    actPreScript->setCheckable(true);
+    actPreScript->setChecked(false);
+    connect(actPreScript, SIGNAL(toggled(bool)), this, SLOT(slPreScript(bool)));
+
     actQuickHistogram=new QAction(QIcon(":/table/quickhist.png"), tr("Quick Histogram"), this);
     actQuickHistogram->setCheckable(true);
     actQuickHistogram->setChecked(false);
@@ -366,6 +404,8 @@ void QFRDRTableEditor::createWidgets() {
     tbMain->addAction(actClearExpression);
     tbMain->addAction(actRecalcAll);
     tbMain->addAction(actSort);
+    tbMain->addSeparator();
+    tbMain->addAction(actPreScript);
     tbMain->addSeparator();
     tbMain->addAction(actQuickStat);
     tbMain->addAction(actQuickHistogram);
@@ -471,10 +511,40 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addAction(actAutosetColumnWidth);
 
     QMenu* menuTools=propertyEditor->addMenu("T&ools", 0);
+    menuTools->addAction(actPreScript);
     menuTools->addAction(actQuickStat);
     menuTools->addAction(actQuickHistogram);
 
+    QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
 }
+
+void QFRDRTableEditor::delayedStartSearch()
+{
+    QStringList sl;
+    sl<<QFPluginServices::getInstance()->getPluginHelpDirectory("table")+"parserreference/";
+    sl<<QFPluginServices::getInstance()->getMainHelpDirectory()+"/parserreference/";
+    functionRef->startSearch(sl);
+}
+
+void QFRDRTableEditor::preScriptChanged()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        m->setParserPreScript(edtPreScript->text());
+        QFMathParser mp;
+        mp.addVariableDouble("thisrdr", 1);
+        mp.addVariableDouble("columns", 1);
+        mp.addVariableDouble("rows", 1);
+        QFMathParser::qfmpNode* n=mp.parse(edtPreScript->text());
+        if (mp.hasErrorOccured()) {
+            labPreScriptOK->setText(tr("syntax check: <font color=\"red\">ERROR:<br>&nbsp;&nbsp;&nbsp;&nbsp;%1</font><br><hr>").arg(mp.getLastErrors().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
+        } else {
+            labPreScriptOK->setText(tr("syntax check: <font color=\"darkgreen\">OK</font><br><hr>"));
+        }
+        if (n) delete n;
+    }
+}
+
 
 void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
     if (old) {
@@ -487,7 +557,7 @@ void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord*
             disconnect(m->model(), SIGNAL(notReadonlyChanged(bool)), this, SLOT(setActionsEnabled(bool)));
             disconnect(tvMain->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(slEditColumnProperties(int)));
             disconnect(tvMain->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged()));
-
+            disconnect(edtPreScript, SIGNAL(textChanged()), this, SLOT(preScriptChanged()));
         }
         tmQuickStat->setReadonly(false);
         tmQuickStat->clear();
@@ -500,6 +570,8 @@ void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord*
     if (m && m->model()) {
         actExpressionSeedBeforeTableEval->setChecked(m->getQFProperty("actExpressionSeedBeforeTableEval", true).toBool());
         tvMain->setModel(m->model());
+        edtPreScript->setText(m->getParserPreScript());
+        connect(edtPreScript, SIGNAL(textChanged()), this, SLOT(preScriptChanged()));
         connect(m->model(), SIGNAL(notReadonlyChanged(bool)), this, SLOT(setActionsEnabled(bool)));
         connect(tvMain->horizontalHeader(), SIGNAL(sectionDoubleClicked(int)), this, SLOT(slEditColumnProperties(int)));
         connect(actUndo, SIGNAL(triggered()), m->model(), SLOT(undo()));
@@ -1307,13 +1379,9 @@ void QFRDRTableEditor::slCalcCell() {
 
                             bool ok=true;
                             QFMathParser mp; // instanciate
-                            addQFRDRTableFunctions(&mp);
-                            mp.addVariableDouble("row", 1);
-                            mp.addVariableDouble("col", 1);
                             mp.addVariableDouble("thisrdr", m->getID());
-                            mp.addVariableDouble("column", 1);
-                            mp.addVariableDouble("columns", 1.0);
-                            mp.addVariableDouble("rows", 1.0);
+                            mp.addVariableDouble("columns", m->model()->columnCount());
+                            mp.addVariableDouble("rows", m->model()->rowCount());
 
 
                             if (dlgMathExpression->getExpression().isEmpty())  {
@@ -1323,6 +1391,27 @@ void QFRDRTableEditor::slCalcCell() {
                             } else {
                                 QFMathParser::qfmpNode* n=NULL;
                                 mp.resetErrors();
+                                if (m->getParserPreScript().size()>0) {
+                                    QFMathParser::qfmpNode* npre=mp.parse(m->getParserPreScript());
+                                    if (mp.hasErrorOccured()) {
+                                        QMessageBox::critical(this, tr("QuickFit-table"), tr("An error occured while parsing the prescript expression '%1':\n%2").arg(m->getParserPreScript()).arg(mp.getLastError()));
+                                        ok=false;
+                                    }
+                                    if (ok && npre) {
+                                        npre->evaluate();
+                                        if (mp.hasErrorOccured()) {
+                                            QMessageBox::critical(this, tr("QuickFit-table"), tr("An error occured while evaluating the prescript expression '%1':\n%2").arg(m->getParserPreScript()).arg(mp.getLastError()));
+                                            ok=false;
+                                        }
+                                    }
+                                    if (npre) delete npre;
+                                }
+                                addQFRDRTableFunctions(&mp);
+
+                                mp.addVariableDouble("row", 0);
+                                mp.addVariableDouble("col", 0);
+                                mp.addVariableDouble("column", 1);
+
                                 n=mp.parse(dlgMathExpression->getExpression());
                                 if (mp.hasErrorOccured()) {
                                     QMessageBox::critical(this, tr("QuickFit-table"), tr("An error occured while parsing the expression '%1':\n%2").arg(dlgMathExpression->getExpression()).arg(mp.getLastError()));
@@ -1554,12 +1643,40 @@ void QFRDRTableEditor::slRecalcAll()
                 mp.get_rng()->seed(seed1);
                 mpColumns.get_rng()->seed(seed2);
             }
+            mpColumns.addVariableDouble("thisrdr", m->getID());
+            mpColumns.addVariableDouble("columns", m->model()->columnCount());
+            mpColumns.addVariableDouble("rows", m->model()->rowCount());
+            mp.addVariableDouble("thisrdr", m->getID());
+            mp.addVariableDouble("columns", m->model()->columnCount());
+            mp.addVariableDouble("rows", m->model()->rowCount());
+
+            if (m->getParserPreScript().size()>0) {
+                QFMathParser::qfmpNode* npre=mp.parse(m->getParserPreScript());
+                QFMathParser::qfmpNode* nprec=mpColumns.parse(m->getParserPreScript());
+                if (mp.hasErrorOccured()) {
+                    QMessageBox::critical(this, tr("QuickFit-table"), tr("An error occured while parsing the prescript expression '%1':\n%2").arg(m->getParserPreScript()).arg(mp.getLastError()));
+                    ok=false;
+                }
+                if (ok && npre) {
+                    npre->evaluate();
+                    if (mp.hasErrorOccured()) {
+                        QMessageBox::critical(this, tr("QuickFit-table"), tr("An error occured while evaluating the prescript expression '%1':\n%2").arg(m->getParserPreScript()).arg(mp.getLastError()));
+                        ok=false;
+                    }
+                }
+                if (ok && nprec) {
+                    nprec->evaluate();
+                }
+                if (npre) delete npre;
+                if (nprec) delete nprec;
+            }
+
             addQFRDRTableFunctions(&mp);
             addQFRDRTableFunctions(&mpColumns, NULL, true);
             mp.addVariableDouble("row", 1);
             mp.addVariableDouble("col", 1);
-            mp.addVariableDouble("thisrdr", m->getID());
             mp.addVariableDouble("column", 1);
+            mp.addVariableDouble("thisrdr", m->getID());
             mp.addVariableDouble("columns", 1.0);
             mp.addVariableDouble("rows", 1.0);
 
@@ -2047,6 +2164,15 @@ void QFRDRTableEditor::slQuickStat(bool enabled)
     }
 }
 
+void QFRDRTableEditor::slPreScript(bool enabled)
+{
+    setQuickTabVisible();
+    if (enabled) {
+        tabQuick->setCurrentWidget(widPreScript);
+        selectionChanged();
+    }
+}
+
 void QFRDRTableEditor::slQuickHistogram(bool enabled)
 {
     setQuickTabVisible();
@@ -2063,9 +2189,12 @@ void QFRDRTableEditor::slAutoSetColumnWidth()
 
 void QFRDRTableEditor::setQuickTabVisible()
 {
-    tabQuick->setVisible(actQuickStat->isChecked() || actQuickHistogram->isChecked());
+    tabQuick->setVisible(actQuickStat->isChecked() || actQuickHistogram->isChecked() || actPreScript->isChecked());
     tvQuickStat->setVisible(actQuickStat->isChecked());
     histQuick->setVisible(actQuickHistogram->isChecked());
+    tabQuick->setTabEnabled(tabQuick->indexOf(tvQuickStat), actQuickStat->isChecked());
+    tabQuick->setTabEnabled(tabQuick->indexOf(histQuick), actQuickHistogram->isChecked());
+    tabQuick->setTabEnabled(tabQuick->indexOf(widPreScript), actPreScript->isChecked());
     show();
     repaint();
 }

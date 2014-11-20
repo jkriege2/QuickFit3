@@ -206,7 +206,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.start"),
          tr("<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue;\" ><tr><td align=\"left\">"
             "<table width=\"100%\">"
-            "<tr><td align=\"center\" colspan=\"3\">$$local_plugin_icon$$</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=\"90%\" align=\"left\"><b>$$local_plugin_name$$ $$local_plugin_id_decorated$$</b>  </td></tr> "
+            "<tr><td align=\"center\" colspan=\"3\">$$local_plugin_icon$$</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=\"90%\" align=\"left\"><b>$$local_plugin_name$$</b> $$local_plugin_id_decorated$$  </td></tr> "
             "<tr><td align=\"left\" rowspan=\"2\">$$rel_prev$$</td><td align=\"left\" rowspan=\"2\">$$rel_contents$$</td><td align=\"left\" rowspan=\"2\">$$rel_next$$</td><td>&nbsp;&nbsp;&nbsp;&nbsp;</td><td width=\"90%\" align=\"left\">$$qf_commondoc_header.default_links$$  ")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end_notitle"), QString("</td></tr></table></td></tr></table>")));// </div>")));
 
@@ -4141,15 +4141,15 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 QString fn=QFileInfo(filename).baseName();
                 if (QFFitAlgorithmManager::getInstance()->contains(pid)) {
                     if (QFFitAlgorithmManager::getInstance()->getIDList().contains(fn)) {
-                        pid_sub_deocrated=tr(" fit algorithm ID: <tt>%1</tt>").arg(fn);
+                        pid_sub_deocrated=tr("&nbsp;&nbsp;&nbsp;fitAlgorithmID: <b><tt>%1</tt></b>").arg(fn);
                     }
                 } else  if (QFFitFunctionManager::getInstance()->contains(pid)) {
                     if (QFFitFunctionManager::getInstance()->getIDList().contains(fn)) {
-                        pid_sub_deocrated=tr(" fit function ID: <tt>%1</tt>").arg(fn);
+                        pid_sub_deocrated=tr("&nbsp;&nbsp;&nbsp;fitFunctionID: <b><tt>%1</tt></b>").arg(fn);
                     }
                 }
 
-                QString pid_decorated=tr("<small><br>&nbsp;&nbsp;&nbsp;plugin ID: <tt>%1</tt>%2</small>").arg(pluginList->at(i).plugin->getName()).arg(pid_sub_deocrated);
+                QString pid_decorated=tr("<small><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[pluginID: <b><tt>%1</tt></b>%2]</small>").arg(pluginList->at(i).plugin->getID()).arg(pid_sub_deocrated);
 
 
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_icon"), QString("<img src=\"%1\">").arg(pluginList->at(i).plugin->getIconFilename())));

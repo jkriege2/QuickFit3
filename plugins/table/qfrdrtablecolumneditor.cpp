@@ -164,11 +164,21 @@ void QFRDRTableColumnEditor::on_edtFormula_textChanged() {
 
 
     QFMathParser mp; // instanciate
-    addQFRDRTableFunctions(&mp, &defaultWords, true);
-    mp.addVariableDouble("col", col+1);
     mp.addVariableDouble("thisrdr", table->getID());
     mp.addVariableDouble("columns", model->columnCount());
     mp.addVariableDouble("rows", model->rowCount());
+
+    if (table && table->getParserPreScript().size()>0) {
+        QFMathParser::qfmpNode* n=mp.parse(table->getParserPreScript());
+        if (n) {
+            if (!mp.hasErrorOccured()) n->evaluate();
+            delete n;
+        }
+        mp.resetErrors();
+    }
+
+    addQFRDRTableFunctions(&mp, &defaultWords, true);
+    mp.addVariableDouble("col", col+1);
     mp.set_data(&mpdata);
     QFMathParser::qfmpNode* n;
     // parse some numeric expression
@@ -176,9 +186,13 @@ void QFRDRTableColumnEditor::on_edtFormula_textChanged() {
     if (mp.hasErrorOccured()) {
         ui->labError->setText(tr("<font color=\"red\">ERROR:<br>&nbsp;&nbsp;&nbsp;&nbsp;%1</font>").arg(mp.getLastErrors().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
     } else {
-        QString testout=qfShortenString(n->evaluate().toTypeString(), 250, 30, tr(" ... "));
+        if (ui->chkPreview->isChecked()) {
+            QString testout=qfShortenString(n->evaluate().toTypeString(), 250, 30, tr(" ... "));
 
-        ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>&nbsp;&nbsp;&nbsp;&nbsp;<i>expression result preview:</i>&nbsp;&nbsp;%1").arg(testout));
+            ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>&nbsp;&nbsp;&nbsp;&nbsp;<i>expression result preview:</i>&nbsp;&nbsp;%1").arg(testout));
+        } else {
+            ui->labError->setText(tr("<font color=\"darkgreen\">OK</font>"));
+        }
     }
     delete n;
 

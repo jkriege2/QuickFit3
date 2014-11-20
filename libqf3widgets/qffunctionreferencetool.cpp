@@ -424,8 +424,10 @@ void QFFunctionReferenceTool::registerEditor(QLineEdit *edtFormula)
 void QFFunctionReferenceTool::registerEditor(QPlainTextEdit *edtFormula)
 {
     connect(edtFormula, SIGNAL(cursorPositionChanged()), this, SLOT(onCursorPositionChanged()));
+
     QFEnhancedPlainTextEdit* ed=qobject_cast<QFEnhancedPlainTextEdit*>(edtFormula);
     if (ed) {
+        ed->setCompleter(compExpression);
         connect(ed, SIGNAL(helpKeyPressed()), this, SLOT(showCurrentFunctionHelp()));
     }
 
@@ -573,6 +575,7 @@ void QFFunctionReferenceTool::onCursorPositionChanged(int /*old*/, int newPosIn)
     }
     QPlainTextEdit* pte=qobject_cast<QPlainTextEdit*>(sender());
     if (pte) {
+        //qDebug()<<pte->textCursor().blockNumber()<<pte->textCursor().positionInBlock();
         text=pte->toPlainText();
         text=text.replace("\n\r", "\n");
         text=text.replace("\r\n", "\n");
@@ -581,7 +584,7 @@ void QFFunctionReferenceTool::onCursorPositionChanged(int /*old*/, int newPosIn)
         for (int i=0; i<pte->textCursor().blockNumber(); i++) {
             newPos+=sl.value(i, "").size()+1;
         }
-        newPos=newPos+pte->textCursor().columnNumber();
+        newPos=newPos+pte->textCursor().positionInBlock();
     }
 
     if (text.size()>0) {

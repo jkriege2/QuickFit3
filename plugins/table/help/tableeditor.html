@@ -64,8 +64,8 @@ Cells in which the contents is calculated by an expression have a gray backgroun
 </ol>These four steps are iterated over several times (max. 20) to ensure, that also cells, that depend on other cells have correct values. The iteration stops, if no more changes in any cell were detected, or after 20 iterations. $$note:If you generate random numbers in a cell or column, the evaluation algorithm would ALWAYS performs 20 iterations, since it always detects a change for every call of a random function. To circumvent this problem QuickFit seed the RNG of the parser with a specific seed value for every cell. These seed are still random (for every call of the evaluation algorithm), but do not change during one run of the evaluation algorithm! This function is swicthed on by default and can be switched off with the menu entry <b>Table | use single seed for reevaluations</b>$$</p>
 $$note:If you cange a single dtaa value, or a single cell or column expression, you have to reevaluate ALL expressions in the table, as there may be indirect dependencies. This can be achieved by clicking on <img src=":table/formularecalc.png">.$$
     
-    
-    
+    <h3>Preevaluated Expressions</h3>
+    <p>The table plugin also offers the option to enter a script, which is evaluated before any expression is evaluated. This way you can define global presets, such as variables with a specific value, or custom functions, that are valid throughout the whole table (i.e. for cell and column expressions). This preevaluated script can be entered in the table RDR editor by checking the button <img src=":table/prescript.png">, or using the menu entry <b>Tool | Preevaluated Expressions</b>. After the click an editor will open at the bottom of the table editor, where you can enter the expression.</p>
     
     <h3>Changing the table size</h3>
     <p>There are several options, that allow to change the table size:

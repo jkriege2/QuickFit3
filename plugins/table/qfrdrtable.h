@@ -655,7 +655,10 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         void writePlotInfo(QXmlStreamWriter& w, const PlotInfo &plot, bool writeGraphs=true) const;
         void writeGraphInfo(QXmlStreamWriter& w, const GraphInfo &graph) const;
         void loadColumnToComboBox(QComboBox *combo);
+
+        QString getParserPreScript() const;
     public slots:
+        void setParserPreScript(const QString& script);
         void emitRebuildPlotWidgets();
 
         void columnsInserted(int start, int count, bool emitRebuild=true);

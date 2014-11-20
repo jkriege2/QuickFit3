@@ -1191,7 +1191,7 @@ void QFEHelpEditorWidget::insertAroundOld(const QString &newText, bool ensureNew
         cur.select(QTextCursor::LineUnderCursor);
         QString lastline=cur.selectedText();
 
-        int column=ui->edtScript->getEditor()->textCursor().columnNumber();
+        int column=ui->edtScript->getEditor()->textCursor().positionInBlock();
 
         int wscll=0, i=0; // starting whitespaces in previous line
         while (i<lastline.size() && (lastline[i]==' ' || lastline[i]=='\t')) {

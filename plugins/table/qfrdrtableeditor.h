@@ -45,6 +45,7 @@
 #include "qfrdrtablehistogramdialog.h"
 #include "qfenhancedtabwidget.h"
 #include "qfhistogramview.h"
+#include "qfenhancedplaintextedit.h"
 
 /*! \brief editor class for tables
     \ingroup qf3rdrdp_table
@@ -113,6 +114,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slHistogram2D();
 
         void slQuickStat(bool enabled);
+        void slPreScript(bool enabled);
 
         void setQuickTabVisible();
 
@@ -126,6 +128,8 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void selectionChanged();
         void slQuickHistogram(bool enabled);
         void slAutoSetColumnWidth();
+        void delayedStartSearch();
+        void preScriptChanged();
     signals:
         void enableActions(bool enabled);
         void disableActions(bool enabled);
@@ -141,6 +145,12 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QEnhancedTableView* tvQuickStat;
         QFTableModel* tmQuickStat;
         QFHistogramView* histQuick;
+        QWidget* widPreScript;
+        QFEnhancedPlainTextEdit* edtPreScript;
+        QFFunctionReferenceTool* functionRef;
+        QLabel* labPreScriptHelp;
+        QLabel* labPreScriptOK;
+        QScrollArea* scrollPreScriptHelp;
 
 
         QAction* actSaveTable;
@@ -194,6 +204,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
 
         QAction* actQuickStat;
         QAction* actQuickHistogram;
+        QAction* actPreScript;
 
         QToolBar* tbMain;
 
