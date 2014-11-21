@@ -2069,6 +2069,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFRawDataRecord:
                             case QFRawDataRecord::qfrdreBoolean:
                             case QFRawDataRecord::qfrdreString:
                                 fitresult[r].fitresults[param="fitalg_"+it.key()]=it.value();
+                                fitresult[r].fitresults[param="fitalg_"+it.key()].group=group;
                                 fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
                                 break;
 
@@ -2082,6 +2083,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFRawDataRecord:
                             case QFRawDataRecord::qfrdreIntegerMatrix:
                                 if (run<0) {
                                     fitresult[r].fitresults[param="fitalg_"+it.key()]=it.value();
+                                    fitresult[r].fitresults[param="fitalg_"+it.key()].group=group;
                                     fitresult[r].fitresults[getParamNameLocalStore(param)].resultsSetBoolean(true);
                                 }
                                 break;
