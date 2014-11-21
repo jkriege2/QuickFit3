@@ -282,7 +282,7 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
 
         /** \brief initialize a QFGlobalFitTool and several arrays with values needed to perform a global fit for a given run and list of files */
         void setupGlobalFitTool(QFGlobalFitTool& tool, QList<doFitData>* fitDataOut, QString& iparams, QList<double *> &paramsVector, QList<double *> &initialParamsVector, QList<double*>& errorsVector, QList<double*>& errorsVectorI, const QList<QFRawDataRecord *> &records, int run, int rangeMinDatarange, int rangeMaxDatarange, bool doLog) const;
-        void setupGlobalFitTool(QFGlobalFitTool &tool, QList<doFitData> *fitDataOut, QString &iparams, QList<double *> &paramsVector, QList<double *> &initialParamsVector, QList<double *> &errorsVector, QList<double *> &errorsVectorI, const QList<const QFRawDataRecord *> &records, int run, int rangeMinDatarange, int rangeMaxDatarange, bool doLog) const;
+        void setupGlobalFitTool(QFGlobalFitTool &tool, QList<doFitData> *fitDataOut, QString &iparams, QList<double *> &paramsVector, QList<double *> &initialParamsVector, QList<double *> &errorsVector, QList<double *> &errorsVectorI, const QList<const QFRawDataRecord *> &records, int run, int rangeMinDatarange, int rangeMaxDatarange, bool doLog, const QStringList &fitfunctionids) const;
 
         /*! \brief fill a 2D array with a chi^2 landscape for the given fit, this is called like doFit() + some output arguments!
 

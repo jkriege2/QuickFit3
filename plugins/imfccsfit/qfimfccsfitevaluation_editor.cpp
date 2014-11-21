@@ -1018,10 +1018,10 @@ void QFImFCCSFitEvaluationEditor::fitAllPixelsThreaded()
     QApplication::processEvents();
     //QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
     QList<QFFitResultsByIndexEvaluationFitThread*> threads;
-    int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
+    int threadcount=2;/*qMax(2,ProgramOptions::getInstance()->getMaxThreads());
     if (ProgramOptions::getConfigValue(eval->getType()+"/overrule_threads", false).toBool()) {
         threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
-    }
+    }*/
 
     for (int i=0; i<threadcount; i++) {
         threads.append(new QFFitResultsByIndexEvaluationFitThread(  true, this));
@@ -1287,8 +1287,6 @@ void QFImFCCSFitEvaluationEditor::fitAllFilesetsAllPixelsThreadedWriter()
     if (!eval) return;
     QFFitAlgorithm* falg=eval->getFitAlgorithm();
     if (!falg) return;
-    QList<QFRawDataRecord*> records=eval->getFitFiles();
-    if (records.size()<=0) return;
     if (!falg->isThreadSafe()) {
         fitAllPixels();
         return;
@@ -1327,25 +1325,27 @@ void QFImFCCSFitEvaluationEditor::fitAllFilesetsAllPixelsThreadedWriter()
     fileSets.append(eval->getGuessedFiles());
 
     for (int fs=0; fs<fileSets.size(); fs++) {
-        records=fileSets[fs];
-        QFRawDataRecord* record=records[0];
-        QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
+        QList<QFRawDataRecord*> records=fileSets[fs];
+        if (records.size()>0) {
+            QFRawDataRecord* record=records[0];
+            QFRDRRunSelectionsInterface* rsel=qobject_cast<QFRDRRunSelectionsInterface*>(record);
 
-        if (record ) {
-            record->disableEmitResultsChanged();
-            int runmax=eval->getIndexMax(record);
-            int runmin=eval->getIndexMin(record);
-            items=items+runmax-runmin+1;
-            for (int run=runmin; run<=runmax; run++) {
-                bool doall=!current->getProperty("LEAVEOUTMASKED", false).toBool();
-                //qDebug()<<doall;
-                if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
-                    //qDebug()<<"t"<<thread<<"   r"<<run;
-                    threads[thread]->addJob(eval, records, run, getUserMin(records[0], run, ui->datacut->get_userMin()), getUserMax(records[0], run, ui->datacut->get_userMax()));
-                    eval->addFittedFileSet(records);
+            if (record ) {
+                record->disableEmitResultsChanged();
+                int runmax=eval->getIndexMax(record);
+                int runmin=eval->getIndexMin(record);
+                items=items+runmax-runmin+1;
+                for (int run=runmin; run<=runmax; run++) {
+                    bool doall=!current->getProperty("LEAVEOUTMASKED", false).toBool();
+                    //qDebug()<<doall;
+                    if (run<=runmax && (doall || (!doall && rsel && !rsel->leaveoutRun(run)))) {
+                        //qDebug()<<"t"<<thread<<"   r"<<run;
+                        threads[thread]->addJob(eval, records, run, getUserMin(records[0], run, ui->datacut->get_userMin()), getUserMax(records[0], run, ui->datacut->get_userMax()));
+                        eval->addFittedFileSet(records);
 
-                    thread++;
-                    if (thread>=threadcount) thread=0;
+                        thread++;
+                        if (thread>=threadcount) thread=0;
+                    }
                 }
             }
         }
@@ -1413,7 +1413,7 @@ void QFImFCCSFitEvaluationEditor::fitAllFilesetsAllPixelsThreadedWriter()
     QApplication::processEvents();
 
     for (int fs=0; fs<fileSets.size(); fs++) {
-        records=fileSets[fs];
+        QList<QFRawDataRecord*> records=fileSets[fs];
         for (int i=0; i<records.size(); i++) {
             QFRawDataRecord* record=records[i];
             if (record ) {

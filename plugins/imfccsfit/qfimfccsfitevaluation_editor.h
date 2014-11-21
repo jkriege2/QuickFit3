@@ -217,6 +217,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
         /** \brief all runs/pixels current file, multi-threaded version */
         void fitAllFilesetsAllPixels();
+        void fitAllFilesetsAllPixelsThreadedWriter();
 
         /** \brief display the data from the current raw data record */
         void displayData();
@@ -235,7 +236,6 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
         void on_spinFitLocalGlobals_valueChanged(int value);
         void errorEstimateModeChanged();
-        void fitAllFilesetsAllPixelsThreadedWriter();
 };
 
 #endif // QFIMFCCSFITEVALUATIONEDITOR_H

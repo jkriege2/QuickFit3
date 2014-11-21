@@ -28,7 +28,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfprojectrawdatamodel.h"
 #include "qfglobalfittool.h"
 #include "qfrdrrunselection.h"
-
+#include "qffitfunctionmanager.h"
 
 QFImFCCSMatchRDRFunctor::QFImFCCSMatchRDRFunctor()
 {
@@ -571,6 +571,30 @@ QString QFImFCCSFitEvaluationItem::getFitFunctionID(const QFRawDataRecord *rdr) 
     }
     if (rdr && idx>=0) {
         return getFitFunctionID(idx);
+    } else if (rdr) {
+        for (int i=0; i<fittedFileSets.size(); i++) {
+            for (int j=0; j<fittedFileSets[i].size(); j++) {
+                if (fittedFileSets[i].at(j)==rdr) {
+                    idx=j;
+                    break;
+                }
+            }
+            if (idx>=0) break;
+        }
+        if (idx<0) {
+            for (int i=0; i<guessedFileSets.size(); i++) {
+                for (int j=0; j<guessedFileSets[i].size(); j++) {
+                    if (guessedFileSets[i].at(j)==rdr) {
+                        idx=j;
+                        break;
+                    }
+                }
+                if (idx>=0) break;
+            }
+        }
+    }
+    if (rdr && idx>=0) {
+        return getFitFunctionID(idx);
     }
     return NULL;
 }
@@ -923,7 +947,7 @@ void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<
 
 
 
-void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<doFitData>* fitDataOut, QString& iparams, QList<double*>& paramsVector, QList<double*>& initialParamsVector, QList<double*>& errorsVector, QList<double*>& errorsVectorI, const QList<const  QFRawDataRecord *> &records, int run, int rangeMinDatarange, int rangeMaxDatarange, bool doLog) const
+void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<doFitData>* fitDataOut, QString& iparams, QList<double*>& paramsVector, QList<double*>& initialParamsVector, QList<double*>& errorsVector, QList<double*>& errorsVectorI, const QList<const  QFRawDataRecord *> &records, int run, int rangeMinDatarange, int rangeMaxDatarange, bool doLog, const QStringList& fitfunctionids) const
 {
 
     bool dontFitMasked=getProperty("dontFitMaskedPixels", true).toBool();
@@ -949,89 +973,96 @@ void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<
             dfd.emitSignals=record->isEmitResultsChangedEnabled();
             //record->disableEmitResultsChanged();
 
-            QFFitFunction* ffunc=createFitFunction(record);
+            QFFitFunction* ffunc=NULL;
+            if (r<fitfunctionids.size()) {
+                ffunc=QFFitFunctionManager::getInstance()->createFunction(fitfunctionids[r]);
+            }
+            if (!ffunc) ffunc=createFitFunction(record);
             if (!ffunc) ffunc=createFitFunction(r);
-            if (doLog) QFPluginLogTools::log_text(tr("   - adding RDR '%1', model '%2'' ... \n").arg(record->getName()).arg(ffunc->name()));
-            dfd.N=data->getCorrelationN();
-            dfd.weights=NULL;
-            dfd.taudata=data->getCorrelationT();
-            dfd.corrdata=NULL;
-            if (run<0) {
-                dfd.corrdata=data->getCorrelationMean();
-            } else {
-                if (run<(int)data->getCorrelationRuns()) {
-                    dfd.corrdata=data->getCorrelationRun(run);
-                } else {
+            if (!ffunc) qDebug()<<"did not find fit function for record "<<r<<record->getName();
+            if (ffunc) {
+                if (doLog) QFPluginLogTools::log_text(tr("   - adding RDR '%1', model '%2'' ... \n").arg(record->getName()).arg(ffunc->name()));
+                dfd.N=data->getCorrelationN();
+                dfd.weights=NULL;
+                dfd.taudata=data->getCorrelationT();
+                dfd.corrdata=NULL;
+                if (run<0) {
                     dfd.corrdata=data->getCorrelationMean();
+                } else {
+                    if (run<(int)data->getCorrelationRuns()) {
+                        dfd.corrdata=data->getCorrelationRun(run);
+                    } else {
+                        dfd.corrdata=data->getCorrelationMean();
+                    }
                 }
-            }
-            // we also have to care for the data cutting
-            int cut_low=rangeMinDatarange;
-            int cut_up=rangeMaxDatarange;
-            if (cut_low<0) cut_low=0;
-            if (cut_up>=dfd.N) cut_up=dfd.N-1;
-            int cut_N=cut_up-cut_low+1;
-            if (cut_N<0) {
-                cut_low=0;
-                cut_up=ffunc->paramCount()-1;
+                // we also have to care for the data cutting
+                int cut_low=rangeMinDatarange;
+                int cut_up=rangeMaxDatarange;
+                if (cut_low<0) cut_low=0;
                 if (cut_up>=dfd.N) cut_up=dfd.N-1;
-                cut_N=cut_up+1;
-            }
-            if (doLog) QFPluginLogTools::log_text(tr("      - fit data range: %1...%2 (%3 datapoints)\n").arg(cut_low).arg(cut_up).arg(cut_N));
-            dfd.weightsOK=false;
-            dfd.taudata=&(dfd.taudata[cut_low]);
-            dfd.corrdata=&(dfd.corrdata[cut_low]);
-            dfd.weights=allocWeights(&(dfd.weightsOK), record, run, cut_low, cut_up);
-            if (!dfd.weightsOK && doLog) QFPluginLogTools::log_warning(tr("      - weights have invalid values => setting all weights to 1\n"));
-            // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
-            // we are working with a complete set of parameters
-            record->readLock();
-            dfd.params=allocFillParameters(record, run, ffunc);
-            dfd.initialparams=duplicateArray(dfd.params, ffunc->paramCount());
-            dfd.errors=allocFillParameterErrors(record, run, ffunc);
-            dfd.errorsI=duplicateArray(dfd.errors, ffunc->paramCount());
-            dfd.paramsMin=allocFillParametersMin(record, ffunc);
-            dfd.paramsMax=allocFillParametersMax(record, ffunc);
-            dfd.paramsFix=allocFillFix(record, run, ffunc);
-            record->readUnLock();
-            dfd.ffunc=ffunc;
-            dfd.cut_low=cut_low;
-            dfd.cut_up=cut_up;
-            dfd.cut_N=cut_N;
-
-            //qDebug()<<"adding "<<r<<": ("<<record->getName()<<")   ffunc="<<ffunc->name();
-            //qDebug()<<"  params="<<arrayToString(dfd.params, ffunc->paramCount());
-            //qDebug()<<"  initialparams="<<arrayToString(dfd.initialparams, ffunc->paramCount());
-            //qDebug()<<"  paramsMin="<<arrayToString(dfd.paramsMin, ffunc->paramCount());
-            //qDebug()<<"  paramsMax="<<arrayToString(dfd.paramsMax, ffunc->paramCount());
-            //qDebug()<<"  errors="<<arrayToString(dfd.errors, ffunc->paramCount());
-            //qDebug()<<"  errorsI="<<arrayToString(dfd.errorsI, ffunc->paramCount());
-
-            paramsVector.append(dfd.params);
-            initialParamsVector.append(dfd.initialparams);
-            errorsVector.append(dfd.errors);
-            errorsVectorI.append(dfd.errorsI);
-
-            ffunc->calcParameter(dfd.params, dfd.errors);
-            ffunc->calcParameter(dfd.initialparams, dfd.errors);
-
-            int fitparamcount=0;
-            //qDebug()<<"record "<<r<<"  ("<<record->getName()<<"):";
-            for (int i=0; i<ffunc->paramCount(); i++) {
-                if (ffunc->isParameterVisible(i, dfd.params) && (!dfd.paramsFix[i]) && ffunc->getDescription(i).fit) {
-                    if (!iparams.isEmpty()) iparams=iparams+";  ";
-                    fitparamcount++;
-                    iparams=iparams+QString("%1 = %2").arg(ffunc->getDescription(i).id).arg(dfd.params[i]);
-                    //iparams=iparams+QString("%1 = %2 (%3..%4)").arg(ffunc->getDescription(i).id).arg(dfd.params[i]).arg(dfd.paramsMin[i]).arg(dfd.paramsMax[i]);
+                int cut_N=cut_up-cut_low+1;
+                if (cut_N<0) {
+                    cut_low=0;
+                    cut_up=ffunc->paramCount()-1;
+                    if (cut_up>=dfd.N) cut_up=dfd.N-1;
+                    cut_N=cut_up+1;
                 }
-                //qDebug("  before_fit: %s = %lf +/m %lf", ffunc->getDescription(i).id.toStdString().c_str(), dfd.params[i], dfd.errors[i]);
+                if (doLog) QFPluginLogTools::log_text(tr("      - fit data range: %1...%2 (%3 datapoints)\n").arg(cut_low).arg(cut_up).arg(cut_N));
+                dfd.weightsOK=false;
+                dfd.taudata=&(dfd.taudata[cut_low]);
+                dfd.corrdata=&(dfd.corrdata[cut_low]);
+                dfd.weights=allocWeights(&(dfd.weightsOK), record, run, cut_low, cut_up);
+                if (!dfd.weightsOK && doLog) QFPluginLogTools::log_warning(tr("      - weights have invalid values => setting all weights to 1\n"));
+                // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
+                // we are working with a complete set of parameters
+                record->readLock();
+                dfd.params=allocFillParameters(record, run, ffunc);
+                dfd.initialparams=duplicateArray(dfd.params, ffunc->paramCount());
+                dfd.errors=allocFillParameterErrors(record, run, ffunc);
+                dfd.errorsI=duplicateArray(dfd.errors, ffunc->paramCount());
+                dfd.paramsMin=allocFillParametersMin(record, ffunc);
+                dfd.paramsMax=allocFillParametersMax(record, ffunc);
+                dfd.paramsFix=allocFillFix(record, run, ffunc);
+                record->readUnLock();
+                dfd.ffunc=ffunc;
+                dfd.cut_low=cut_low;
+                dfd.cut_up=cut_up;
+                dfd.cut_N=cut_N;
+
+                //qDebug()<<"adding "<<r<<": ("<<record->getName()<<")   ffunc="<<ffunc->name();
+                //qDebug()<<"  params="<<arrayToString(dfd.params, ffunc->paramCount());
+                //qDebug()<<"  initialparams="<<arrayToString(dfd.initialparams, ffunc->paramCount());
+                //qDebug()<<"  paramsMin="<<arrayToString(dfd.paramsMin, ffunc->paramCount());
+                //qDebug()<<"  paramsMax="<<arrayToString(dfd.paramsMax, ffunc->paramCount());
+                //qDebug()<<"  errors="<<arrayToString(dfd.errors, ffunc->paramCount());
+                //qDebug()<<"  errorsI="<<arrayToString(dfd.errorsI, ffunc->paramCount());
+
+                paramsVector.append(dfd.params);
+                initialParamsVector.append(dfd.initialparams);
+                errorsVector.append(dfd.errors);
+                errorsVectorI.append(dfd.errorsI);
+
+                ffunc->calcParameter(dfd.params, dfd.errors);
+                ffunc->calcParameter(dfd.initialparams, dfd.errors);
+
+                int fitparamcount=0;
+                //qDebug()<<"record "<<r<<"  ("<<record->getName()<<"):";
+                for (int i=0; i<ffunc->paramCount(); i++) {
+                    if (ffunc->isParameterVisible(i, dfd.params) && (!dfd.paramsFix[i]) && ffunc->getDescription(i).fit) {
+                        if (!iparams.isEmpty()) iparams=iparams+";  ";
+                        fitparamcount++;
+                        iparams=iparams+QString("%1 = %2").arg(ffunc->getDescription(i).id).arg(dfd.params[i]);
+                        //iparams=iparams+QString("%1 = %2 (%3..%4)").arg(ffunc->getDescription(i).id).arg(dfd.params[i]).arg(dfd.paramsMin[i]).arg(dfd.paramsMax[i]);
+                    }
+                    //qDebug("  before_fit: %s = %lf +/m %lf", ffunc->getDescription(i).id.toStdString().c_str(), dfd.params[i], dfd.errors[i]);
+                }
+                //qDebug()<<"\n\n";
+                if (doLog) QFPluginLogTools::log_text(tr("      - initial params         (%1)\n").arg(iparams));
+
+
+                fitData.append(dfd);
+                tool.addTerm(ffunc, dfd.params, dfd.paramsFix, dfd.taudata, dfd.corrdata, dfd.weights, dfd.cut_N, dfd.paramsMin, dfd.paramsMax);
             }
-            //qDebug()<<"\n\n";
-            if (doLog) QFPluginLogTools::log_text(tr("      - initial params         (%1)\n").arg(iparams));
-
-
-            fitData.append(dfd);
-            tool.addTerm(ffunc, dfd.params, dfd.paramsFix, dfd.taudata, dfd.corrdata, dfd.weights, dfd.cut_N, dfd.paramsMin, dfd.paramsMax);
         }
     }
 
@@ -1873,7 +1904,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFRawDataRecord:
     }
 
     //QMutexLocker locker(mutexThreadedFit);
-    setupGlobalFitTool(tool, &fitData, iparams, paramsVector, initialParamsVector, errorsVector, errorsVectorI, records, run, rangeMinDatarange, rangeMaxDatarange, false);
+    setupGlobalFitTool(tool, &fitData, iparams, paramsVector, initialParamsVector, errorsVector, errorsVectorI, records, run, rangeMinDatarange, rangeMaxDatarange, false, fitfunctionIDs);
     //locker.unlock();
 
     bool OK=true;

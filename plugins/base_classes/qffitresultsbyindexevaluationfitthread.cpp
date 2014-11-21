@@ -638,6 +638,7 @@ void QFFitResultsByIndexEvaluationFitSmartThread_Writer::run()
             for (int i=0; i<localfitresults.size(); i++) {
                 const QString evalID=localfitresults[i].evalID;
                 QFRawDataRecord* rdr=localfitresults[i].getRDR(project);
+                //qDebug()<<"thread, writing to "<<rdr->getName();
                 rdrs<<rdr;
                 emitSignals<<rdr->isEmitResultsChangedEnabled();
                 rdr->writeLock();
