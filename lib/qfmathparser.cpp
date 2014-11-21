@@ -750,7 +750,7 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                 } else if (CurrentToken == LBRACKET) { // vector element access found
                     QFMathParser::qfmpNode* parameter=logicalExpression(true);
                     if ( CurrentToken != RBRACKET ) {
-                        qfmpError(QObject::tr("']' expected, but '%1' found").arg(currenttokentostring()));
+                        qfmpError(QObject::tr("']' expected after '[...', but '%1' found").arg(currenttokentostring()));
                         return NULL;
                     }
                     getToken();
@@ -769,14 +769,14 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                         QFMathParser::qfmpNode* parameter=logicalExpression(params.size()>0);
                         params.append(parameter);
                         if ((CurrentToken!=RPARENTHESE)&&(CurrentToken!=COMMA)&&(CurrentToken!=END)) {
-                            qfmpError(QObject::tr("')' or ',' expected, but '%1' found").arg(currenttokentostring()));
+                            qfmpError(QObject::tr("')' or ',' expected after '(...', but '%1' found").arg(currenttokentostring()));
                             return NULL;
                         }
 
                     }
 
                     if ( CurrentToken != RPARENTHESE ) {
-                        qfmpError(QObject::tr("')' expected, but '%1' found").arg(currenttokentostring()));
+                        qfmpError(QObject::tr("')' expected after '(...', but '%1' found").arg(currenttokentostring()));
                         return NULL;
                     }
                     getToken();
@@ -863,14 +863,15 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                             }
 
                         }
-                        //qDebug()<<"FASSIGN: "<<varname<<allParamsAreNames<<pnames;
+                        qDebug()<<"FASSIGN: "<<varname<<allParamsAreNames<<pnames<<currenttokentostring();
                         if (allParamsAreNames) {
-                            res=new qfmpFunctionAssignNode(varname, pnames, primary(true), this, NULL);
+                            res=new qfmpFunctionAssignNode(varname, pnames, logicalExpression(true)/* primary(true)*/, this, NULL);
                         } else {
                             qfmpError(QObject::tr("malformed function assignmentfound, expected this form: FNAME(P1, P2, ...)=expression").arg(currenttokentostring()));
                             return NULL;
                         }
                     } else {
+                        qDebug()<<"FNODE: "<<varname<<currenttokentostring();
                         res=new qfmpFunctionNode(varname, params, this, NULL);
                     }
 

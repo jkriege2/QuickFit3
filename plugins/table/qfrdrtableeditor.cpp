@@ -1405,6 +1405,7 @@ void QFRDRTableEditor::slCalcCell() {
                                         }
                                     }
                                     if (npre) delete npre;
+                                    mp.resetErrors();
                                 }
                                 addQFRDRTableFunctions(&mp);
 
@@ -1669,6 +1670,8 @@ void QFRDRTableEditor::slRecalcAll()
                 }
                 if (npre) delete npre;
                 if (nprec) delete nprec;
+                mp.resetErrors();
+                mpColumns.resetErrors();
             }
 
             addQFRDRTableFunctions(&mp);

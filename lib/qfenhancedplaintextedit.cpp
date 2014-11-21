@@ -35,8 +35,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 QFEnhancedPlainTextEdit::QFEnhancedPlainTextEdit(QWidget *parent) :
     QPlainTextEdit(parent)
 {
+    c=NULL;
     setContextMenuPolicy(Qt::DefaultContextMenu);
-    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(cursorChanged()));
+    //connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(cursorChanged()));
 }
 
 void QFEnhancedPlainTextEdit::addContextMenuEntry(const QString &name, QVariant data)
@@ -256,17 +257,17 @@ void QFEnhancedPlainTextEdit::insertCompletion(const QString &completion1)
     if (c->widget() != this)
         return;
     QString completion=completion1;
-    completion=completion.remove(QChar('Â°'),  Qt::CaseInsensitive);
+    completion=completion.remove(QChar('°'),  Qt::CaseInsensitive);
     QTextCursor tc = textCursor();
     int extra = completion.length() - c->completionPrefix().length();
     tc.movePosition(QTextCursor::Left);
     tc.movePosition(QTextCursor::EndOfWord);
     tc.insertText(completion.right(extra));
 
-    // handle special character 'Â°' in insertted text completion1
-    unsigned char mcount=completion1.count(QChar('Â°'), Qt::CaseInsensitive);
-    int p1=completion1.indexOf(QChar('Â°'), Qt::CaseInsensitive);
-    int p2=completion1.indexOf(QChar('Â°'), p1+1, Qt::CaseInsensitive);
+    // handle special character '°' in insertted text completion1
+    unsigned char mcount=completion1.count(QChar('°'), Qt::CaseInsensitive);
+    int p1=completion1.indexOf(QChar('°'), Qt::CaseInsensitive);
+    int p2=completion1.indexOf(QChar('°'), p1+1, Qt::CaseInsensitive);
     if (mcount==1) {
         tc.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, completion.size()-p1);
     } else if (mcount>1) {
