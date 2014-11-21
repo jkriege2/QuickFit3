@@ -863,7 +863,7 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                             }
 
                         }
-                        qDebug()<<"FASSIGN: "<<varname<<allParamsAreNames<<pnames<<currenttokentostring();
+                        //qDebug()<<"FASSIGN: "<<varname<<allParamsAreNames<<pnames<<currenttokentostring();
                         if (allParamsAreNames) {
                             res=new qfmpFunctionAssignNode(varname, pnames, logicalExpression(true)/* primary(true)*/, this, NULL);
                         } else {
@@ -871,7 +871,7 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                             return NULL;
                         }
                     } else {
-                        qDebug()<<"FNODE: "<<varname<<currenttokentostring();
+                        //qDebug()<<"FNODE: "<<varname<<currenttokentostring();
                         res=new qfmpFunctionNode(varname, params, this, NULL);
                     }
 
