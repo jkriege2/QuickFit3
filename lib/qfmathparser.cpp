@@ -2801,9 +2801,9 @@ bool QFMathParser::qfmpVectorList::createByteCode(QFMathParser::ByteCodeProgram 
 QFMathParser::qfmpNode *QFMathParser::qfmpVectorConstructionNode::copy(QFMathParser::qfmpNode *par)
 {
     if (step) {
-        return new qfmpVectorConstructionNode(start->copy(NULL), step->copy(NULL), end->copy(NULL), getParser(), par);
+        return new qfmpVectorConstructionNode(start->copy(NULL), end->copy(NULL), step->copy(NULL), getParser(), par);
     } else {
-        return new qfmpVectorConstructionNode(start->copy(NULL), NULL, end->copy(NULL), getParser(), par);
+        return new qfmpVectorConstructionNode(start->copy(NULL), end->copy(NULL), NULL, getParser(), par);
     }
 }
 
@@ -2829,6 +2829,16 @@ QFMathParser::qfmpVectorConstructionNode::~qfmpVectorConstructionNode()
 
 void QFMathParser::qfmpVectorConstructionNode::evaluate(qfmpResult &res)
 {
+    if (!start) {
+        if (getParser()) getParser()->qfmpError(QObject::tr("error in vector construct 'start[:delta]:end' INTERNAL ERROR: start does not exist"));
+        res.setInvalid();
+        return;
+    }
+    if (!end) {
+        if (getParser()) getParser()->qfmpError(QObject::tr("error in vector construct 'start[:delta]:end' INTERNAL ERROR: end does not exist"));
+        res.setInvalid();
+        return;
+    }
      res.setDoubleVec();
      qfmpResult rstart;
      start->evaluate(rstart);
