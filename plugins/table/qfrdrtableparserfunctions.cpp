@@ -977,7 +977,7 @@ void fQFRDRTableEditor_colmedian(qfmpResult& res, const qfmpResult* params, unsi
                 }
                 for (int i=0; i<d->model->rowCount(); i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
-                    if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
+                    if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String) && !std::isnan(v.toDouble()) && !std::isinf(v.toDouble())) {
                         data.append(v.toDouble());
                     }
                 }
@@ -988,7 +988,7 @@ void fQFRDRTableEditor_colmedian(qfmpResult& res, const qfmpResult* params, unsi
                 }
                 for (int i=params[1].num-1; i<=params[2].num-1; i++) {
                     QVariant v=d->model->cell(i, params[0].num-1);
-                    if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String)) {
+                    if (v.canConvert(QVariant::Double) && (v.type()!=QVariant::String) && !std::isnan(v.toDouble()) && !std::isinf(v.toDouble())) {
                         data.append(v.toDouble());
                     }
                 }
