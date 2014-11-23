@@ -827,7 +827,7 @@ void QFESPIMB040OpticsSetup2::storePluginGlobalSettings(QSettings &settings, QOb
     }
 }
 void QFESPIMB040OpticsSetup2::loadSettings(QFManyFilesSettings &settings, QString prefix) {
-    bool updt=updatesEnabled();
+    bool updt=updatesEnabled()&&isVisible();
     if (updt) setUpdatesEnabled(false);
 
    /* qDebug()<<"QFESPIMB040OpticsSetup2::loadSettings():";
@@ -855,7 +855,7 @@ void QFESPIMB040OpticsSetup2::loadSettings(QFManyFilesSettings &settings, QStrin
         shortcuts[i].shortcut->setKey(seq);
         shortcuts[i].shortcut->setEnabled(!seq.isEmpty());
     }
-    if (updt) setUpdatesEnabled(updt);
+    if (updt) setUpdatesEnabled(true);
 }
 
 void QFESPIMB040OpticsSetup2::loadSettings(const QString &settingsFilename, QString prefix)
@@ -1293,11 +1293,11 @@ void QFESPIMB040OpticsSetup2::on_btnDisconnectCameras_clicked() {
 
 }
 
-void QFESPIMB040OpticsSetup2::on_chkDetectionFilterWheel_toggled(bool checked) {
-    /*if (!checked) {
+/*void QFESPIMB040OpticsSetup2::on_chkDetectionFilterWheel_toggled(bool checked) {
+    if (!checked) {
         ui->filtcDetection->disconnectFilterChanger();
-    }*/
-}
+    }
+}*/
 
 void QFESPIMB040OpticsSetup2::configsChanged(QFESPIMB040OpticsSetupItems configs) {
     emit lightpathesChanged(configs);

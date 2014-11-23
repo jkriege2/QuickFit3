@@ -379,7 +379,7 @@ void QFMeasurementDeviceConfigWidget::configure() {
 
 void QFMeasurementDeviceConfigWidget::updateMDWidgets() {
     dontAccessWidgets=true;
-    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    bool updt=updatesEnabled(); bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     int oldLines=mdWidgets.size();
     int newLines=0;
     QFExtensionMeasurementAndControlDevice* device=getMeasurementDevice();
@@ -491,7 +491,7 @@ void QFMeasurementDeviceConfigWidget::updateMDWidgets() {
 
     linesLayoutWidget->setVisible(newLines>0);
     dontAccessWidgets=false;
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 }
 
 int QFMeasurementDeviceConfigWidget::getMDByWidget(QObject *widget) {
@@ -511,7 +511,7 @@ void QFMeasurementDeviceConfigWidget::displayStates() {
     if (useThread) return;
     if (locked) return;
 
-    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    bool updt=updatesEnabled(); bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
 
     QFExtensionMeasurementAndControlDevice* MeasurementDevice;
     int MeasurementDeviceID;
@@ -537,7 +537,7 @@ void QFMeasurementDeviceConfigWidget::displayStates() {
     }
 
     updateStates();
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 
     //QTimer::singleShot(stateUpdateInterval, this, SLOT(displayMeasurementDeviceStates()));
     if (!locked) {
@@ -570,7 +570,7 @@ void QFMeasurementDeviceConfigWidget::setValue(int line, const QVariant &power) 
 
 void QFMeasurementDeviceConfigWidget::valuesChanged(QTime time, QList<QVariant> values, QStringList lineNames, QList<bool> widgetsEnabled) {
     if (dontAccessWidgets) return;
-    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    bool updt=updatesEnabled(); bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     //qDebug()<<"QFMeasurementDeviceConfigWidget::valuesChanged("<< time<< values <<lineNames<<")";
     for (int i=0; i<mdWidgets.size(); i++) {
         if (i<values.size()) {
@@ -592,7 +592,7 @@ void QFMeasurementDeviceConfigWidget::valuesChanged(QTime time, QList<QVariant> 
         }
     }
     updateStates();
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 }
 
 void QFMeasurementDeviceConfigWidget::setPowerEditingFinished() {
@@ -765,14 +765,14 @@ void QFMeasurementDeviceConfigWidget::MDWidgets::setRange(double mi, double ma, 
         if (spinInt->maximum()!=ma) spinInt->setMaximum(ma);
     }
     if (cmbInt) {
-        cmbInt->setUpdatesEnabled(false);
+        bool widVisible=cmbInt->isVisible(); if (widVisible) cmbInt->setUpdatesEnabled(false);
         cmbInt->clear();
         int cnt=0;
         for (int cbi=mi; cbi<=ma; cbi++) {
             cmbInt->addItem(sl.value(cnt, QString::number(cbi)));
             cnt++;
         }
-        cmbInt->setUpdatesEnabled(true);
+        if (widVisible) cmbInt->setUpdatesEnabled(true);
     }
 }
 

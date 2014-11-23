@@ -67,7 +67,7 @@ void QFFitAlgorithmComboBox::updateFitAlgorithms()
 {
     QFFitAlgorithmManager* manager=QFFitAlgorithmManager::getInstance();
     bool upd=updatesEnabled();
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     clear();
     QStringList m_ids=manager->getIDList();
     for (int i=0; i<m_ids.size(); i++) {
@@ -81,6 +81,6 @@ void QFFitAlgorithmComboBox::updateFitAlgorithms()
         delete a;
     }
     model()->sort(0);
-    setUpdatesEnabled(upd);
+    if (widVisible) setUpdatesEnabled(upd);
 
 }

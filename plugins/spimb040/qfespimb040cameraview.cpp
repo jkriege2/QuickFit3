@@ -90,6 +90,8 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
 
     MarginalLeftWidth=0;
     MarginalTopWidth=0;
+    MarginalLeftPosition=0;
+    MarginalTopPosition=0;
 
     // more variable initialisation
     imageStatisticsCalculated=false;
@@ -450,8 +452,11 @@ void QFESPIMB040CameraView::createMainWidgets() {
     cmbGraphParameter->addItem(tr("maximum intensity"));
     cmbGraphParameter->addItem(tr("intensity: stddev"));
     cmbGraphParameter->addItem(tr("correlation coefficient"));
+    cmbGraphParameter->addItem(tr("center correlation coefficient"));
     cmbGraphParameter->addItem(tr("left marginal: width"));
     cmbGraphParameter->addItem(tr("bottom marginal: width"));
+    cmbGraphParameter->addItem(tr("left marginal: position"));
+    cmbGraphParameter->addItem(tr("bottom marginal: position"));
     connect(cmbGraphParameter, SIGNAL(currentIndexChanged(int)), this, SLOT(graphParameterChanged()));
 
     spinGraphWindow=new QDoubleSpinBox(w);
@@ -486,7 +491,7 @@ void QFESPIMB040CameraView::createMainWidgets() {
     cmbMaskColor=new ColorComboBox(this);
     cmbMaskColor->setMaximumWidth(200);
     fl->addRow(tr("&mask color:"), cmbMaskColor);
-    connect(cmbColorscale, SIGNAL(currentIndexChanged(int)), plteFrame, SLOT(set_palette(int)));
+    connect(cmbColorscale, SIGNAL(currentIndexChanged(int)), this, SLOT(set_palette(int)));
     connect(cmbMaskColor, SIGNAL(activated(QColor)), plteMask, SLOT(set_color(QColor)));
 
     cmbRotation=new QComboBox(w);
@@ -498,12 +503,14 @@ void QFESPIMB040CameraView::createMainWidgets() {
     fl->addRow(tr("&rotation:"), cmbRotation);
     connect(cmbRotation, SIGNAL(currentIndexChanged(int)), this, SLOT(redrawFrameRecalc()));
 
-    cmbImageMode=new QComboBox(w);
-    cmbImageMode->setMaximumWidth(200);
-    cmbImageMode->addItem(tr("none"));
-    cmbImageMode->addItem(tr("top-bottom half"));
-    cmbImageMode->addItem(tr("left-right half"));
-    fl->addRow(tr("frame &transform:"), cmbImageMode);
+    cmbImageTransformMode=new QComboBox(w);
+    cmbImageTransformMode->setMaximumWidth(200);
+    cmbImageTransformMode->addItem(tr("none"));
+    cmbImageTransformMode->addItem(tr("top-bottom half"));
+    cmbImageTransformMode->addItem(tr("left-right half"));
+    cmbImageTransformMode->addItem(tr("equalize top/bottom intensity"));
+    cmbImageTransformMode->addItem(tr("equalize left/right intensity"));
+    fl->addRow(tr("frame &transform:"), cmbImageTransformMode);
 
     QHBoxLayout* glay=new QHBoxLayout();
     glay->setContentsMargins(0,0,0,0);
@@ -544,13 +551,89 @@ void QFESPIMB040CameraView::createMainWidgets() {
     cmbMarginalFitFunction->addItem(tr("slit function fit"));
     cmbMarginalFitFunction->addItem(tr("sigmoidal function fit"));
     cmbMarginalFitFunction->setMaximumWidth(200);
-    fl->addRow(tr("&marginal evluation:"), cmbMarginalFitFunction);
+    fl->addRow(tr("&marginal evaluation:"), cmbMarginalFitFunction);
     connect(cmbMarginalFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(redrawFrameRecalc()));
 
 
+    spinTableFontsize=new QSpinBox(w);
+    spinTableFontsize->setRange(1,32);
+    spinTableFontsize->setValue(font().pointSize());
+    spinTableFontsize->setSuffix(tr(" pt"));
+    fl->addRow(tr("&table font size:"), spinTableFontsize);
+    connect(spinTableFontsize, SIGNAL(valueChanged(int)), this, SLOT(setTableFontsize(int)));
+
+
+    QFormLayout* flg;
+    QGroupBox* grpAlign;
+    grpAlign=new QGroupBox(tr(" Alignment Mode 1 Settings "), this);
+    fl->addRow(grpAlign);
+    flg=new QFormLayout();
+    grpAlign->setLayout(flg);
+
+    cmbAlign1ImageTransformMode=new QComboBox(grpAlign);
+    for (int i=0; i<cmbImageTransformMode->count(); i++) {
+        cmbAlign1ImageTransformMode->addItem(cmbImageTransformMode->itemIcon(i), cmbImageTransformMode->itemText(i), cmbImageTransformMode->itemData(i));
+    }
+    cmbAlign1ImageTransformMode->setCurrentIndex(cmbImageTransformMode->currentIndex());
+    flg->addRow(tr("frame transform:"), cmbAlign1ImageTransformMode);
+
+
+    cmbAlign1Colorscale=new QComboBox(grpAlign);;
+    for (int i=0; i<cmbColorscale->count(); i++) {
+        cmbAlign1Colorscale->addItem(cmbColorscale->itemIcon(i), cmbColorscale->itemText(i), cmbColorscale->itemData(i));
+    }
+    cmbAlign1Colorscale->setCurrentIndex(cmbColorscale->currentIndex());
+    cmbAlign1Colorscale->setMaximumWidth(200);
+    connect(cmbAlign1Colorscale, SIGNAL(currentIndexChanged(int)), this, SLOT(set_palette(int)));
+    flg->addRow(tr("color palette:"), cmbAlign1Colorscale);
+
+    cmbAlign1MarginalFitFunction=new QComboBox(grpAlign);
+    for (int i=0; i<cmbMarginalFitFunction->count(); i++) {
+        cmbAlign1MarginalFitFunction->addItem(cmbMarginalFitFunction->itemIcon(i), cmbMarginalFitFunction->itemText(i), cmbMarginalFitFunction->itemData(i));
+    }
+    cmbAlign1MarginalFitFunction->setCurrentIndex(cmbMarginalFitFunction->currentIndex());
+    cmbAlign1MarginalFitFunction->setMaximumWidth(200);
+    connect(cmbAlign1MarginalFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(redrawFrameRecalc()));
+    flg->addRow(tr("marginal evaluation:"), cmbAlign1MarginalFitFunction);
+
+
+    grpAlign=new QGroupBox(tr(" Alignment Mode 2 Settings "), this);
+    fl->addRow(grpAlign);
+    flg=new QFormLayout();
+    grpAlign->setLayout(flg);
+
+
+
+    cmbAlign2ImageTransformMode=new QComboBox(grpAlign);
+    for (int i=0; i<cmbImageTransformMode->count(); i++) {
+        cmbAlign2ImageTransformMode->addItem(cmbImageTransformMode->itemIcon(i), cmbImageTransformMode->itemText(i), cmbImageTransformMode->itemData(i));
+    }
+    cmbAlign2ImageTransformMode->setCurrentIndex(cmbImageTransformMode->currentIndex());
+    flg->addRow(tr("frame transform:"), cmbAlign2ImageTransformMode);
+
+
+    cmbAlign2Colorscale=new QComboBox(grpAlign);;
+    for (int i=0; i<cmbColorscale->count(); i++) {
+        cmbAlign2Colorscale->addItem(cmbColorscale->itemIcon(i), cmbColorscale->itemText(i), cmbColorscale->itemData(i));
+    }
+    cmbAlign2Colorscale->setCurrentIndex(cmbColorscale->currentIndex());
+    cmbAlign2Colorscale->setMaximumWidth(200);
+    connect(cmbAlign2Colorscale, SIGNAL(currentIndexChanged(int)), this, SLOT(set_palette(int)));
+    flg->addRow(tr("color palette:"), cmbAlign2Colorscale);
+
+    cmbAlign2MarginalFitFunction=new QComboBox(grpAlign);
+    for (int i=0; i<cmbMarginalFitFunction->count(); i++) {
+        cmbAlign2MarginalFitFunction->addItem(cmbMarginalFitFunction->itemIcon(i), cmbMarginalFitFunction->itemText(i), cmbMarginalFitFunction->itemData(i));
+    }
+    cmbAlign2MarginalFitFunction->setCurrentIndex(cmbMarginalFitFunction->currentIndex());
+    cmbAlign2MarginalFitFunction->setMaximumWidth(200);
+    connect(cmbAlign2MarginalFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(redrawFrameRecalc()));
+    flg->addRow(tr("marginal evaluation:"), cmbAlign2MarginalFitFunction);
 
     tabSettings->addTab(w, tr("Settings"));
 }
+
+
 
 void QFESPIMB040CameraView::createActions() {
     actSaveRaw = new QAction(QIcon(":/spimb040/saveraw.png"), tr("Save &raw image as ..."), this);
@@ -591,7 +674,7 @@ void QFESPIMB040CameraView::createActions() {
     connect(actSaveData, SIGNAL(triggered()), this, SLOT(saveData()));
 
 
-    QActionGroup* actgMouse=new QActionGroup(this);
+    actgMouse=new QActionGroup(this);
     actCursor=actgMouse->addAction(QIcon(":/spimb040/cursor.png"), tr("default mouse cursor"));
     actCursor->setCheckable(true);
 
@@ -602,6 +685,27 @@ void QFESPIMB040CameraView::createActions() {
     actMeasure->setCheckable(true);
 
     actCursor->setChecked(true);
+
+
+
+    actgAlignMode=new QActionGroup(this);
+    actNormalMode=actgAlignMode->addAction(QIcon(":/spimb040/alignmode_normal.png"), tr("Preiew Mode"));
+    actNormalMode->setCheckable(true);
+    connect(actNormalMode, SIGNAL(toggled(bool)), this, SLOT(redrawFrameRecalc()));
+
+    actAlign1Mode=actgAlignMode->addAction(QIcon(":/spimb040/alignmode_1.png"), tr("Align Mode 1"));
+    actAlign1Mode->setCheckable(true);
+    connect(actAlign1Mode, SIGNAL(toggled(bool)), this, SLOT(redrawFrameRecalc()));
+
+    actAlign2Mode=actgAlignMode->addAction(QIcon(":/spimb040/alignmode_2.png"), tr("Align Mode 2"));
+    actAlign2Mode->setCheckable(true);
+    connect(actAlign2Mode, SIGNAL(toggled(bool)), this, SLOT(redrawFrameRecalc()));
+
+
+    actNormalMode->setChecked(true);
+
+
+
 
     toolbar->addAction(actSaveRaw);
     toolbar->addAction(actSaveData);
@@ -624,6 +728,10 @@ void QFESPIMB040CameraView::createActions() {
     toolbar->addSeparator();
     toolbar->addAction(actCursor);
     toolbar->addAction(actMeasure);
+    toolbar->addSeparator();
+    toolbar->addAction(actNormalMode);
+    toolbar->addAction(actAlign1Mode);
+    toolbar->addAction(actAlign2Mode);
     toolbar->addSeparator();
 
 }
@@ -674,9 +782,18 @@ void QFESPIMB040CameraView::loadSettings(QSettings& settings, QString prefix) {
 
     chkGrid->setChecked(settings.value(prefix+"grid", false).toBool());
     spinGridWidth->setValue(settings.value(prefix+"grid_width", 32).toInt());
+    spinTableFontsize->setValue(settings.value(prefix+"table_fontsize", font().pointSize()).toInt());
     spinSaveSeriesFrames->setValue(settings.value(prefix+"saver_series_frames", 5).toInt());
     cmbGridColor->setCurrentIndex(settings.value(prefix+"grid_color", 15).toInt());
-    cmbImageMode->setCurrentIndex(settings.value(prefix+"image_mode", 0).toInt());
+    cmbImageTransformMode->setCurrentIndex(settings.value(prefix+"image_mode", 0).toInt());
+
+
+    cmbAlign1Colorscale->setCurrentIndex(settings.value(prefix+"align1_imagesettings.palette", 8).toInt());
+    cmbAlign2Colorscale->setCurrentIndex(settings.value(prefix+"align2_imagesettings.palette", 6).toInt());
+    cmbAlign1MarginalFitFunction->setCurrentIndex(settings.value(prefix+"align1_imagesettings.marginal_fitfunction", 2).toInt());
+    cmbAlign2MarginalFitFunction->setCurrentIndex(settings.value(prefix+"align2_imagesettings.marginal_fitfunction", 2).toInt());
+    cmbAlign1ImageTransformMode->setCurrentIndex(settings.value(prefix+"align1_image_mode", 2).toInt());
+    cmbAlign2ImageTransformMode->setCurrentIndex(settings.value(prefix+"align2_image_mode", 4).toInt());
 
 
     chkGraph->setChecked(settings.value(prefix+"graph", false).toBool());
@@ -718,7 +835,7 @@ void QFESPIMB040CameraView::loadSettings(QFManyFilesSettings &settings, QString 
      cmbMaskColor->setCurrentIndex(settings.value(prefix+"imagesettings.mask_color", 0).toInt());
      cmbRotation->setCurrentIndex(settings.value(prefix+"imagesettings.rotation", 0).toInt());
      cmbMarginalPlots->setCurrentIndex(settings.value(prefix+"imagesettings.marginal", 1).toInt());
-     cmbMarginalFitFunction->setCurrentIndex(settings.value(prefix+"imagesettings.marginal_fitfunction", 0).toInt());
+     cmbMarginalFitFunction->setCurrentIndex(settings.value(prefix+"imagesettings.marginal_fitfunction", 2).toInt());
      pltDataMarginalXPixel=settings.value(prefix+"imagesettings.marginal_xpixel", pltDataMarginalXPixel).toInt();
      pltDataMarginalYPixel=settings.value(prefix+"imagesettings.marginal_ypixel", pltDataMarginalYPixel).toInt();
 
@@ -731,15 +848,26 @@ void QFESPIMB040CameraView::loadSettings(QFManyFilesSettings &settings, QString 
 
      chkGrid->setChecked(settings.value(prefix+"grid", false).toBool());
      spinGridWidth->setValue(settings.value(prefix+"grid_width", 32).toInt());
+     spinTableFontsize->setValue(settings.value(prefix+"table_fontsize", font().pointSize()).toInt());
      spinSaveSeriesFrames->setValue(settings.value(prefix+"saver_series_frames", 5).toInt());
 
      cmbGridColor->setCurrentIndex(settings.value(prefix+"grid_color", 15).toInt());
-     cmbImageMode->setCurrentIndex(settings.value(prefix+"image_mode", 0).toInt());
+     cmbImageTransformMode->setCurrentIndex(settings.value(prefix+"image_mode", 0).toInt());
 
 
      chkGraph->setChecked(settings.value(prefix+"graph", false).toBool());
      cmbGraphParameter->setCurrentIndex(settings.value(prefix+"graph_parameter", 0).toInt());
      spinGraphWindow->setValue(settings.value(prefix+"graph_window", 60).toDouble());
+
+
+     cmbAlign1Colorscale->setCurrentIndex(settings.value(prefix+"align1_imagesettings.palette", 8).toInt());
+     cmbAlign2Colorscale->setCurrentIndex(settings.value(prefix+"align2_imagesettings.palette", 6).toInt());
+     cmbAlign1MarginalFitFunction->setCurrentIndex(settings.value(prefix+"align1_imagesettings.marginal_fitfunction", 2).toInt());
+     cmbAlign2MarginalFitFunction->setCurrentIndex(settings.value(prefix+"align2_imagesettings.marginal_fitfunction", 2).toInt());
+     cmbAlign1ImageTransformMode->setCurrentIndex(settings.value(prefix+"align1_image_mode", 2).toInt());
+     cmbAlign2ImageTransformMode->setCurrentIndex(settings.value(prefix+"align2_image_mode", 0).toInt());
+
+
      jkloadSplitter(settings, gsplitter, prefix+"split_graph/");
 }
 
@@ -774,13 +902,28 @@ void QFESPIMB040CameraView::storeSettings(QSettings& settings, QString prefix) {
 
     settings.setValue(prefix+"grid", chkGrid->isChecked());
     settings.setValue(prefix+"grid_width", spinGridWidth->value());
+    settings.setValue(prefix+"table_fontsize", spinTableFontsize->value());
     settings.setValue(prefix+"saver_series_frames", spinSaveSeriesFrames->value());
     settings.setValue(prefix+"grid_color", cmbGridColor->currentIndex());
-    settings.setValue(prefix+"image_mode", cmbImageMode->currentIndex());
+    settings.setValue(prefix+"image_mode", cmbImageTransformMode->currentIndex());
 
     settings.setValue(prefix+"graph", chkGraph->isChecked());
     settings.setValue(prefix+"graph_parameter", cmbGraphParameter->currentIndex());
     settings.setValue(prefix+"graph_window", spinGraphWindow->value());
+
+
+
+
+
+    settings.setValue(prefix+"align1_imagesettings.palette", cmbAlign1Colorscale->currentIndex());
+    settings.setValue(prefix+"align2_imagesettings.palette", cmbAlign2Colorscale->currentIndex());
+    settings.setValue(prefix+"align1_imagesettings.marginal_fitfunction", cmbAlign1MarginalFitFunction->currentIndex());
+    settings.setValue(prefix+"align2_imagesettings.marginal_fitfunction", cmbAlign2MarginalFitFunction->currentIndex());
+    settings.setValue(prefix+"align1_image_mode", cmbAlign1ImageTransformMode->currentIndex());
+    settings.setValue(prefix+"align2_image_mode", cmbAlign2ImageTransformMode->currentIndex());
+
+
+
     jksaveSplitter(settings, gsplitter, prefix+"split_graph/");
 
 }
@@ -817,13 +960,22 @@ void QFESPIMB040CameraView::storeSettings(QFManyFilesSettings &settings, QString
 
     settings.setValue(prefix+"grid", chkGrid->isChecked());
     settings.setValue(prefix+"grid_width", spinGridWidth->value());
+    settings.setValue(prefix+"table_fontsize", spinTableFontsize->value());
     settings.setValue(prefix+"saver_series_frames", spinSaveSeriesFrames->value());
     settings.setValue(prefix+"grid_color", cmbGridColor->currentIndex());
-    settings.setValue(prefix+"image_mode", cmbImageMode->currentIndex());
+    settings.setValue(prefix+"image_mode", cmbImageTransformMode->currentIndex());
 
     settings.setValue(prefix+"graph", chkGraph->isChecked());
     settings.setValue(prefix+"graph_parameter", cmbGraphParameter->currentIndex());
     settings.setValue(prefix+"graph_window", spinGraphWindow->value());
+
+    settings.setValue(prefix+"align1_imagesettings.palette", cmbAlign1Colorscale->currentIndex());
+    settings.setValue(prefix+"align2_imagesettings.palette", cmbAlign2Colorscale->currentIndex());
+    settings.setValue(prefix+"align1_imagesettings.marginal_fitfunction", cmbAlign1MarginalFitFunction->currentIndex());
+    settings.setValue(prefix+"align2_imagesettings.marginal_fitfunction", cmbAlign2MarginalFitFunction->currentIndex());
+    settings.setValue(prefix+"align1_image_mode", cmbAlign1ImageTransformMode->currentIndex());
+    settings.setValue(prefix+"align2_image_mode", cmbAlign2ImageTransformMode->currentIndex());
+
     jksaveSplitter(settings, gsplitter, prefix+"split_graph/");
 }
 
@@ -975,6 +1127,7 @@ void QFESPIMB040CameraView::redrawFrame() {
     if (cmbRotation->currentIndex()%2==1) {
         xtickdist=pow(10,floor(log10(image.height())));
         ytickdist=pow(10,floor(log10(image.width())));
+        plteFrame->set_palette(cmbColorscaleCurrentIndex());
         plteFrame->set_xmax(image.height());
         plteFrame->set_ymax(image.width());
         pltMain->setXRange(0, image.height());
@@ -989,6 +1142,7 @@ void QFESPIMB040CameraView::redrawFrame() {
     } else {
         xtickdist=pow(10,floor(log10(image.width())));
         ytickdist=pow(10,floor(log10(image.height())));
+        plteFrame->set_palette(cmbColorscaleCurrentIndex());
         plteFrame->set_xmax(image.width());
         plteFrame->set_ymax(image.height());
         pltMain->setXRange(0, image.width());
@@ -1003,6 +1157,7 @@ void QFESPIMB040CameraView::redrawFrame() {
 
     }
 
+    plteFrame->set_palette(cmbColorscaleCurrentIndex());
     plteFrame->set_rotation(cmbRotation->currentIndex());
     plteMask->set_rotation(cmbRotation->currentIndex());
 
@@ -1072,7 +1227,7 @@ void QFESPIMB040CameraView::redrawFrame() {
 
         pltMarginalLeft->deletePlot(plteMarginalFitLeft);
         pltMarginalBottom->deletePlot(plteMarginalFitBottom);
-        if (cmbMarginalFitFunction->currentIndex()>0) {
+        if (cmbMarginalFitFunctionCrrentIndex()>0) {
             plteMarginalFitBottom->set_data(pltDataMarginalFitBottomX, pltDataMarginalFitBottomY, pltDataMarginalBottomFitN);
             plteMarginalFitLeft->set_data(pltDataMarginalFitLeftY, pltDataMarginalFitLeftX, pltDataMarginalLeftFitN);
             pltMarginalLeft->addPlot(plteMarginalFitLeft);
@@ -1095,7 +1250,7 @@ void QFESPIMB040CameraView::redrawFrame() {
 void QFESPIMB040CameraView::redrawFrameRecalc(bool forceHisto) {
     if (currentlyRedrawing) return;
     bool updt=updatesEnabled();
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     currentlyRedrawing=true;
     QTime tim;
     tim.start();
@@ -1108,7 +1263,7 @@ void QFESPIMB040CameraView::redrawFrameRecalc(bool forceHisto) {
     redrawFrame();
     //qDebug()<<"redrawFrameRecalc(forceHisto="<<forceHisto<<")   redrawFrame = "<<tim.elapsed()<<" ms";
     currentlyRedrawing=false;
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 }
 
 void QFESPIMB040CameraView::prepareImage() {
@@ -1227,10 +1382,10 @@ void QFESPIMB040CameraView::prepareImage() {
         }
         statisticsMinMax(pltDataMarginalBottomY, pltDataMarginalBottomN, pltDataMarginalBottomYMin, pltDataMarginalBottomYMax);
         statisticsMinMax(pltDataMarginalLeftY, pltDataMarginalLeftN, pltDataMarginalLeftYMin, pltDataMarginalLeftYMax);
-        if (cmbMarginalFitFunction->currentIndex()>0) {
+        if (cmbMarginalFitFunctionCrrentIndex()>0) {
             // CALCULATE MARGINAL FITS
             marginalResults="";
-            if (cmbMarginalFitFunction->currentIndex()==1) {
+            if (cmbMarginalFitFunctionCrrentIndex()==1) {
                 marginalResults=tr("<b>Marginal Fits:</b><br><center><table border=\"0\" width=\"90%\">");
                 double var=0;
                 double avg=statisticsAverageVariance(var, pltDataMarginalLeftY, pltDataMarginalLeftX, pltDataMarginalLeftN);
@@ -1240,6 +1395,8 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitLeftY[i]=pltDataMarginalLeftYMin+(pltDataMarginalLeftYMax-pltDataMarginalLeftYMin)*exp(-0.5*(x-avg)*(x-avg)/var);
                 }
                 MarginalLeftWidth=sqrt(var);
+                MarginalLeftPosition=avg;
+
                 marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">standard deviation = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 1)).arg(roundError(sqrt(var), 1));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(avg*pixelH, sqrt(var)*pixelH, 1)).arg(roundError(sqrt(var)*pixelH, 1));
                 marginalResultsSimple+=tr(">b20|20|20|20|20\n");
@@ -1253,12 +1410,14 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitBottomY[i]=pltDataMarginalBottomYMin+(pltDataMarginalBottomYMax-pltDataMarginalBottomYMin)*exp(-0.5*(x-avg)*(x-avg)/var);
                 }
                 MarginalTopWidth=sqrt(var);
+                MarginalTopPosition=avg;
+
                 marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>standard deviation = </td><td>%2 px</td></tr>").arg(roundWithError(avg, sqrt(var), 1)).arg(roundError(sqrt(var), 1));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(avg*pixelW, sqrt(var)*pixelW, 1)).arg(roundError(sqrt(var)*pixelW, 1));
                 marginalResults+=tr("</table></center>");
 
                 marginalResultsSimple+=tr("bottom: | %1 px | %3 %5m |%2 px | %4 %5m").arg(roundWithError(avg, sqrt(var), 1)).arg(roundError(sqrt(var), 1)).arg(roundWithError(avg*pixelW, sqrt(var)*pixelW, 1)).arg(roundError(sqrt(var)*pixelW,1)).arg(QChar(0xB5));
-            } else if (cmbMarginalFitFunction->currentIndex()==2) {
+            } else if (cmbMarginalFitFunctionCrrentIndex()==2) {
                 marginalResults=tr("<b>Marginal Fits:</b><br><center><table border=\"0\" width=\"90%\">");
                 double pout[4];
                 int n_par = 4; // number of parameters
@@ -1277,6 +1436,8 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitLeftY[i]=fGauss(x, pout);
                 }
                 MarginalLeftWidth=sqrt(fabs(pout[3]))*pixelH;
+                MarginalLeftPosition=pout[2]*pixelH;
+
                 marginalResultsSimple+=tr(">b20|20|20|20|20\n");
                 marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">&nbsp;&nbsp;1/e<sup>2</sup>-width = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelH, sqrt(fabs(pout[3]))*pixelH, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelH, 2));
@@ -1303,6 +1464,8 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitBottomY[i]=fGauss(x, pout);
                 }
                 MarginalTopWidth=sqrt(fabs(pout[3]))*pixelW;
+                MarginalTopPosition=pout[2]*pixelW;
+
                 marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;1/e<sup>2</sup>-width = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], sqrt(fabs(pout[3])), 2)).arg(roundError(sqrt(fabs(pout[3])), 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelW, sqrt(fabs(pout[3]))*pixelW, 2)).arg(roundError(sqrt(fabs(pout[3]))*pixelW, 1));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
@@ -1314,7 +1477,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 marginalResultsSimple+=tr("|offset = |%1|amplitude = |%2\n").arg(pout[0]).arg(pout[1]);
                 marginalResultsSimple+=tr("|%2%3 = |%1|func:|gauss").arg(status.fnorm).arg(QChar(0x3C7)).arg(QChar(0xB2));
 
-            } else if (cmbMarginalFitFunction->currentIndex()==3) {
+            } else if (cmbMarginalFitFunctionCrrentIndex()==3) {
                 marginalResults=tr("<b>Marginal Fits:</b><br><center><table border=\"0\" width=\"90%\">");
                 double pout[4];
                 int n_par = 4; // number of parameters
@@ -1333,6 +1496,7 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitLeftY[i]=fSlit(x, pout);
                 }
                 MarginalLeftWidth=fabs(pout[3])*pixelH;
+                MarginalLeftPosition=pout[2]*pixelH;
                 marginalResultsSimple+=tr(">b20|20|20|20|20\n");
                 marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">average = </td><td width=\"20%\">%1 px</td><td width=\"20%\">&nbsp;&nbsp;x<sub>1. Zero</sub> = </td><td width=\"20%\">%2 px</td></tr>").arg(roundWithError(pout[2], fabs(pout[3]), 1)).arg(roundError(fabs(pout[3]), 1));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelH, fabs(pout[3])*pixelH, 1)).arg(roundError(fabs(pout[3])*pixelH, 1));
@@ -1359,6 +1523,7 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitBottomY[i]=fSlit(x, pout);
                 }
                 MarginalTopWidth=fabs(pout[3])*pixelW;
+                MarginalTopPosition=pout[2]*pixelW;
                 marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;x<sub>1. Zero</sub> = </td><td>%2 px</td></tr>").arg(roundWithError(pout[2], fabs(pout[3]), 1)).arg(roundError(fabs(pout[3]), 1));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundWithError(pout[2]*pixelW, fabs(pout[3])*pixelW, 1)).arg(roundError(fabs(pout[3])*pixelW, 1));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
@@ -1369,7 +1534,7 @@ void QFESPIMB040CameraView::prepareImage() {
                 marginalResultsSimple+=tr("||%1 %3m||%2 %3m\n").arg(roundWithError(pout[2]*pixelW, (fabs(pout[3]))*pixelW, 1)).arg(roundError((fabs(pout[3]))*pixelW, 1)).arg(QChar(0xB5));
                 marginalResultsSimple+=tr("|offset = |%1|amplitude = |%2\n").arg(pout[0]).arg(pout[1]);
                 marginalResultsSimple+=tr("|%2%3 = |%1|func:|slit").arg(status.fnorm).arg(QChar(0x3C7)).arg(QChar(0xB2));
-            } else if (cmbMarginalFitFunction->currentIndex()==4) {
+            } else if (cmbMarginalFitFunctionCrrentIndex()==4) {
                 marginalResults=tr("<b>Marginal Fits:</b><br><center><table border=\"0\" width=\"90%\">");
                 double pout[4];
                 int n_par = 4; // number of parameters
@@ -1388,6 +1553,7 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitLeftY[i]=fSigmoid(x, pout);
                 }
                 MarginalLeftWidth=fabs(pout[3])*pixelH;
+                MarginalLeftPosition=pout[2]*pixelH;
                 marginalResultsSimple+=tr(">b20|20|20|20|20\n");
                 marginalResults+=tr("<tr><td width=\"20%\"><b>left:&nbsp;</b></td><td width=\"20%\">center = </td><td width=\"20%\">%1 px</td><td width=\"20%\">&nbsp;&nbsp;width = </td><td width=\"20%\">%2 px</td></tr>").arg(roundError(pout[2], 2)).arg(roundError(pout[3], 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundError(pout[2]*pixelH, 2)).arg(roundError(pout[3]*pixelH, 2));
@@ -1414,6 +1580,7 @@ void QFESPIMB040CameraView::prepareImage() {
                     pltDataMarginalFitBottomY[i]=fSigmoid(x, pout);
                 }
                 MarginalTopWidth=fabs(pout[3])*pixelW;
+                MarginalTopPosition=pout[2]*pixelH;
                 marginalResults+=tr("<tr><td><b>bottom:&nbsp;</b></td><td>average = </td><td>%1 px</td><td>&nbsp;&nbsp;x<sub>1. Zero</sub> = </td><td>%2 px</td></tr>").arg(roundError(pout[2], 2)).arg(roundError((pout[3]), 2));
                 marginalResults+=tr("<tr><td></td><td></td><td>%1 &mu;m</td><td></td><td>%2 &mu;m</td></tr>").arg(roundError(pout[2]*pixelW, 2)).arg(roundError((pout[3])*pixelW, 2));
                 marginalResults+=tr("<tr><td><b></b></td><td>offset = </td><td>%1</td><td>&nbsp;&nbsp;amplitude = </td><td>%2</td></tr>").arg(pout[0]).arg(pout[1]);
@@ -1469,24 +1636,34 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
 
     // update graph pane (if activated)
     if (chkGraph->isChecked()) {
-        if (cmbGraphParameter->currentIndex()==0) {
+        int cnt=0;
+        if (cmbGraphParameter->currentIndex()==cnt++) {
             plteGraphDataX.append((double)graphTime.elapsed()/1000.0);
             plteGraphDataY.append(imageMean);
-        } else if (cmbGraphParameter->currentIndex()==1) {
+        } else if (cmbGraphParameter->currentIndex()==cnt++) {
             plteGraphDataX.append((double)graphTime.elapsed()/1000.0);
             plteGraphDataY.append(imageImax);
-        } else if (cmbGraphParameter->currentIndex()==2) {
+        } else if (cmbGraphParameter->currentIndex()==cnt++) {
             plteGraphDataX.append((double)graphTime.elapsed()/1000.0);
             plteGraphDataY.append(imageStddev);
-        } else if (cmbGraphParameter->currentIndex()==3) {
+        } else if (cmbGraphParameter->currentIndex()==cnt++) {
             plteGraphDataX.append((double)graphTime.elapsed()/1000.0);
             plteGraphDataY.append(correlationCoefficient);
-        } else if (cmbGraphParameter->currentIndex()==4) {
+        } else if (cmbGraphParameter->currentIndex()==cnt++) {
+            plteGraphDataX.append((double)graphTime.elapsed()/1000.0);
+            plteGraphDataY.append(correlationCoefficientCenter);
+        } else if (cmbGraphParameter->currentIndex()==cnt++) {
             plteGraphDataX.append((double)graphTime.elapsed()/1000.0);
             plteGraphDataY.append(MarginalLeftWidth);
-        } else if (cmbGraphParameter->currentIndex()==5) {
+        } else if (cmbGraphParameter->currentIndex()==cnt++) {
             plteGraphDataX.append((double)graphTime.elapsed()/1000.0);
             plteGraphDataY.append(MarginalTopWidth);
+        } else if (cmbGraphParameter->currentIndex()==cnt++) {
+            plteGraphDataX.append((double)graphTime.elapsed()/1000.0);
+            plteGraphDataY.append(MarginalLeftPosition);
+        } else if (cmbGraphParameter->currentIndex()==cnt++) {
+            plteGraphDataX.append((double)graphTime.elapsed()/1000.0);
+            plteGraphDataY.append(MarginalTopPosition);
         }
 
         updateGraph();
@@ -1545,10 +1722,14 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
 
     if ((labelUpdateTime.elapsed()>LABEL_UPDATE_INTERVAL_MS) || forceHistogram ) {
         QString correlation="";
-        switch (cmbImageMode->currentIndex()) {
+        switch (cmbImageTransformModeCurrentIndex()) {
             case 1:
-            case 2: correlation=tr("<tr><td>correlation =</td><td>%1</td><td></td></tr>").arg(correlationCoefficient);
-                    break;
+            case 2:
+            case 3:
+            case 4:
+                correlation=tr("<tr><td>correlation =</td><td>%1</td><td></td></tr><tr><td>center corr. =</td><td>%2</td><td></td></tr>").arg(correlationCoefficient).arg(correlationCoefficientCenter);
+                break;
+            default: break;
         }
         labImageStatisticsText=tr("<b>Image Statistics:</b><br><center><table border=\"0\" width=\"90%\"><tr><td width=\"20%\">size = </td><td width=\"40%\">%1 &times; %2</td><td width=\"40%\">= %14 &times; %15 &mu;m<sup>2</sup></td></tr><tr><td>broken pixels = </td><td>%3</td><td></td></tr>%16<tr><td>&nbsp;</td><td></td><td></td></tr><tr><td></td><td><b># photons</b></td><td><b>count rate [kHz]</b></td></tr> <tr><td>sum = </td><td>%4</td><td>%5</td></tr> <tr><td>average = </td><td>%6 &plusmn; %7</td><td>%8 &plusmn; %9</td></tr> <tr><td>min ... max = </td><td>%10 ... %11</td><td>%12 ... %13</td></tr> </table></center>")
                         .arg(image.width()).arg(image.height()).arg(imageBrokenPixels).arg(floattohtmlstr(imageSum).c_str())
@@ -1558,10 +1739,15 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
                         .arg(imageImin).arg(imageImax).arg(imageImin/imageExposureTime/1000.0).arg(imageImax/imageExposureTime/1000.0).arg((double)image.width()*pixelWidth).arg((double)image.height()*pixelHeight).arg(correlation);
         //labImageStatistics->setText(labImageStatisticsText);
         correlation="";
-        switch (cmbImageMode->currentIndex()) {
+        switch (cmbImageTransformModeCurrentIndex()) {
             case 1:
-            case 2: correlation=tr("correlation = |%1\n").arg(correlationCoefficient);
-                    break;
+            case 2:
+            case 3:
+            case 4:
+                correlation=tr("correlation = |%1\ncenter corr. = |%2\n").arg(correlationCoefficient).arg(correlationCoefficientCenter);
+                break;
+            default:
+                break;
         }
         QString s=tr(">b20|40|40\n"
                      "Image Statistics:\n"
@@ -1725,11 +1911,11 @@ void QFESPIMB040CameraView::saveMulti() {
     image.save_tifffloat(QString(fn+"_transformed_float.tif").toStdString());
 
     QImage imgo;
-    JKQTFPimagePlot_array2image<QFESPIMB040CameraView_internalImageType>(image.data(), image.width(), image.height(), imgo, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
+    JKQTFPimagePlot_array2image<QFESPIMB040CameraView_internalImageType>(image.data(), image.width(), image.height(), imgo, (JKQTFPColorPalette)cmbColorscaleCurrentIndex(), spinCountsLower->value(), spinCountsUpper->value());
     imgo.save(QString(fn+"_transformed.png"), "PNG");
 
     QImage imgo1;
-    JKQTFPimagePlot_array2image<uint32_t>(rawImage.data(), rawImage.width(), rawImage.height(), imgo1, (JKQTFPColorPalette)cmbColorscale->currentIndex(), 0,0);
+    JKQTFPimagePlot_array2image<uint32_t>(rawImage.data(), rawImage.width(), rawImage.height(), imgo1, (JKQTFPColorPalette)cmbColorscaleCurrentIndex(), 0,0);
     imgo1.save(QString(fn+".png"), "PNG");
 
     QSettings setting(QString(fn+".configuration.ini"), QSettings::IniFormat);
@@ -1741,6 +1927,7 @@ void QFESPIMB040CameraView::saveMulti() {
 
 void QFESPIMB040CameraView::saveMultiSeries()
 {
+    if (m_stopresume) m_stopresume->stop();
     QString fileName = qfGetSaveFileName(this, tr("Save current image ..."),
                             lastImagepath,
                             "TIFF (*.tif)");
@@ -1760,86 +1947,21 @@ void QFESPIMB040CameraView::saveMultiSeries()
 
 
     if (!fileName.isEmpty()) saveMultiSeries(spinSaveSeriesFrames->value(), fileName);
+    if (m_stopresume) m_stopresume->resume();
 }
 
 void QFESPIMB040CameraView::saveMultiSeries(int frames, const QString fileName)
 {
-    if (m_stopresume) m_stopresume->stop();
+    //if (m_stopresume) m_stopresume->stop();
     //saveJKImage(rawImage, tr("Save Raw Image ..."));
 
     QFESPIMB040AcquisitionTools* acqTools=opticsSetup->getAcquisitionTools();
 
     acqTools->savePreviewMovie(cameraID, frames, fileName);
 
-    /*
-
-    JKImage<uint32_t> rawImage;
-    QFExtensionCamera* camExt=opticsSetup->cameraComboBox(cameraID)->currentExtensionCamera();
-    int camID=opticsSetup->cameraComboBox(cameraID)->currentCameraID();
-    int w=camExt->getCameraImageWidth(camID);
-    int h=camExt->getCameraImageHeight(camID);
-    QFESPIMB040AcquisitionTools* acqTools=opticsSetup->getAcquisitionTools();
-    rawImage.resize(w, h);
 
 
-
-    if (fileName.isEmpty()) {
-        if (m_stopresume) m_stopresume->resume();
-        return;
-    }
-
-
-    QProgressDialog progress(tr("Acquiring image series ..."), tr("&Cancel"), 0, frames, this);
-
-    QFileInfo fi(fileName);
-    QString fn=fi.absolutePath()+"/"+fi.completeBaseName();
-    TIFF* tiff1=TIFFOpen(QString(fn+".tif").toAscii().data(), "w");
-    TIFF* tiff2=TIFFOpen(QString(fn+"_uint32.tif").toAscii().data(), "w");
-    TIFF* tiff3=TIFFOpen(QString(fn+"_float.tif").toAscii().data(), "w");
-    uint64_t timestamp=0;
-    QMap<QString, QVariant> camConfig;
-    QList<double> times;
-    QElapsedTimer timer;
-    timer.start();
-    if (tiff1&&tiff2&&tiff3) {
-        for (int i=0; i<frames; i++) {
-            if (camExt->acquireOnCamera(camID, rawImage.data(), &timestamp, &camConfig)) {
-                times.append(double(timer.elapsed())/1000.0);
-                TIFFTWriteUint16from32(tiff1, rawImage.data(), w, h, false);
-                TIFFWriteDirectory(tiff1);
-                TIFFTWriteUint32(tiff2, rawImage.data(), w, h);
-                TIFFWriteDirectory(tiff2);
-                TIFFTWriteFloatfrom32(tiff3, rawImage.data(), w, h);
-                TIFFWriteDirectory(tiff3);
-            }
-            if (progress.wasCanceled()) break;
-            progress.setValue(i);
-            QApplication::processEvents();
-        }
-    }
-    QFile f(QString(fn+"_timepoints.dat"));
-    if (f.open(QFile::WriteOnly|QFile::Text)) {
-        QTextStream str(&f);
-        for (int i=0; i<times.size(); i++) {
-            str<<CDoubleToQString(times[i])<<"\n";
-        }
-        f.close();
-    }
-
-
-    QSettings setting(QString(fn+".configuration.ini"), QSettings::IniFormat);
-    storeCameraConfig(setting);
-    QString acquisitionDescriptionPrefix="acquisition/";
-    if (camConfig.size()>0) {
-        QMapIterator<QString, QVariant> it(camConfig);
-        while (it.hasNext()) {
-            it.next();
-            setting.setValue(acquisitionDescriptionPrefix+it.key(), it.value());
-        }
-    }
-*/
-
-    if (m_stopresume) m_stopresume->resume();
+    //if (m_stopresume) m_stopresume->resume();
 }
 
 void QFESPIMB040CameraView::storeCameraConfig(QSettings& setting) {
@@ -1854,7 +1976,7 @@ void QFESPIMB040CameraView::storeCameraConfig(QSettings& setting) {
     setting.setValue("acquisition/image_height", rawImage.height());
     setting.setValue("acquisition/pixel_width", pixelWidth);
     setting.setValue("acquisition/pixel_height", pixelHeight);
-    setting.setValue("acquisition/transformation", cmbImageMode->currentText());
+    setting.setValue("acquisition/transformation", cmbImageTransformMode->currentText());
     setting.setValue("acquisition/rotation", cmbRotation->currentIndex()*90);
     setting.setValue("acquisition/color_palette", cmbColorscale->currentText());
     if (opticsSetup) setting.setValue("acquisition/magnification", opticsSetup->getCameraMagnification(cameraID));
@@ -1868,6 +1990,7 @@ void QFESPIMB040CameraView::storeCameraConfig(QSettings& setting) {
     setting.setValue("evaluation/imageImin", qlonglong(imageImin));
     setting.setValue("evaluation/imageImax", qlonglong(imageImax));
     setting.setValue("evaluation/correlationCoefficient", correlationCoefficient);
+    setting.setValue("evaluation/centerCorrelationCoefficient", correlationCoefficientCenter);
 
     QMap<QString, QVariant> acqD;
     QString acquisitionDescriptionPrefix="setup/";
@@ -1890,6 +2013,32 @@ void QFESPIMB040CameraView::storeCameraConfig(QSettings& setting) {
             setting.setValue(acquisitionDescriptionPrefix+it.key(), it.value());
         }
     }
+}
+
+int QFESPIMB040CameraView::cmbImageTransformModeCurrentIndex() const
+{
+    if (actAlign1Mode->isChecked()) return cmbAlign1ImageTransformMode->currentIndex();
+    if (actAlign2Mode->isChecked()) return cmbAlign2ImageTransformMode->currentIndex();
+    return cmbImageTransformMode->currentIndex();
+}
+
+int QFESPIMB040CameraView::cmbColorscaleCurrentIndex() const
+{
+    if (actAlign1Mode->isChecked()) return cmbAlign1Colorscale->currentIndex();
+    if (actAlign2Mode->isChecked()) return cmbAlign2Colorscale->currentIndex();
+    return cmbColorscale->currentIndex();
+}
+
+int QFESPIMB040CameraView::cmbMarginalFitFunctionCrrentIndex() const
+{
+    if (actAlign1Mode->isChecked()) return cmbAlign1MarginalFitFunction->currentIndex();
+    if (actAlign2Mode->isChecked()) return cmbAlign2MarginalFitFunction->currentIndex();
+    return cmbMarginalFitFunction->currentIndex();
+}
+
+void QFESPIMB040CameraView::set_palette(int /*dummy*/)
+{
+    plteFrame->set_palette(cmbColorscaleCurrentIndex());
 }
 
 void QFESPIMB040CameraView::saveTransformedImage() {
@@ -2155,6 +2304,14 @@ void QFESPIMB040CameraView::printReport() {
     if (m_stopresume) m_stopresume->resume();
 }
 
+void QFESPIMB040CameraView::setTableFontsize(int size)
+{
+    QFont f=labImageStatistics->font();
+    f.setPointSize( size);
+    labImageStatistics->setFont(f);
+    labMarginalFitResults->setFont(f);
+}
+
 void QFESPIMB040CameraView::saveData() {
 
     QStringList filters;
@@ -2235,79 +2392,149 @@ void QFESPIMB040CameraView::updateGrid() {
 
 
 void QFESPIMB040CameraView::transformImage(JKImage<QFESPIMB040CameraView_internalImageType>& out, const JKImage<uint32_t>& raw) {
-    if (cmbImageMode->currentIndex()==1)  {
-        out.resize(raw.width(), (uint32_t)ceil((double)raw.height()/2.0));
-       /* QFESPIMB040CameraView_internalImageType* dat=out.data();
-        int64_t* dout=(int64_t*)qfCalloc(out.width()*out.height(), sizeof(int64_t));
-        const uint32_t* din=raw.data();
-        int64_t mino=0;
-        int64_t maxo=0;
-        for (register uint32_t i=0; i<out.width()*out.height(); i++) {
-            register int64_t d=din[i]-din[i+out.width()*(out.height()/2)];
-            if (i==0) mino=maxo=d;
-            else {
-                mino=(d<mino)?d:mino;
-                maxo=(d>maxo)?d:maxo;
-            }
-        }
-        for (register uint32_t i=0; i<out.width()*out.height(); i++) {
+    const int mode=cmbImageTransformModeCurrentIndex();
+    if (mode==1 ||mode==3)  {
+        if (mode==1) out.resize(raw.width(), (uint32_t)ceil((double)raw.height()/2.0));
+        if (mode==3) out.resize(raw.width(), raw.height());
 
-        }
-        qfFree(dout);*/
         QFESPIMB040CameraView_internalImageType* dout=out.data();
         const uint32_t* din=raw.data();
-        register double amean=0, bmean=0;
+        register double amean=0, bmean=0, cnt=0;
+        register double camean=0, cbmean=0, ccnt=0;
         /* calculate subtracted output image and grey value averages */
-        for (register uint32_t i=0; i<out.width()*out.height(); i++) {
-            const QFESPIMB040CameraView_internalImageType a=din[i];
-            const QFESPIMB040CameraView_internalImageType b=din[i+out.width()*out.height()];
-            dout[i]=a-b;
-            amean+=a;
-            bmean+=b;
+        for (register uint32_t y=0; y<raw.height(); y++) {
+            for (register uint32_t x=0; x<raw.width(); x++) {
+                register uint32_t i=y*raw.width()+x;
+                register uint32_t i2=(y+raw.height()/2)*raw.width()+x;
+                if (y<raw.height()/2) {
+                    const QFESPIMB040CameraView_internalImageType a=din[i];
+                    const QFESPIMB040CameraView_internalImageType b=din[i2];
+                    if (mode==1) dout[y*out.width()+x]=a-b;
+                    amean+=a;
+                    bmean+=b;
+                    cnt++;
+                    if (x>raw.width()/4 && x<=3*raw.width()/4){
+                        camean+=a;
+                        cbmean+=b;
+                        ccnt++;
+                    }
+                }
+            }
         }
-        amean=amean/(double)(out.width()*out.height());
-        bmean=bmean/(double)(out.width()*out.height());
+        amean=amean/(double)(cnt);
+        bmean=bmean/(double)(cnt);
+        camean=camean/(double)(ccnt);
+        cbmean=cbmean/(double)(ccnt);
+
+        if (mode==3) {
+            double ascale=1;
+            double bscale=1;
+            if (amean>bmean) {
+                 bscale=amean/bmean;
+            } else if (amean<bmean) {
+                ascale=bmean/amean;
+            }
+            for (register uint32_t y=0; y<out.height(); y++) {
+                for (register uint32_t x=0; x<out.width(); x++) {
+                    register uint32_t i=y*out.width()+x;
+                    if (y<raw.height()/2) dout[i]=din[i]*ascale;
+                    else dout[i]=din[i]*bscale;
+                }
+            }
+        }
         /* calculate correlation coefficient */
         double corr=0, vara=0, varb=0;
-        for (register uint32_t i=0; i<out.width()*out.height(); i++) {
-            const double a=din[i];
-            const double b=din[i+out.width()*out.height()];
-            corr += (a-amean)*(b-bmean);
-            vara += (a-amean)*(a-amean);
-            varb += (b-bmean)*(b-bmean);
+        double ccorr=0, cvara=0, cvarb=0;
+        for (register uint32_t y=0; y<raw.height(); y++) {
+            for (register uint32_t x=0; x<raw.width(); x++) {
+                register uint32_t i=y*out.width()+x;
+                register uint32_t i2=(y+raw.height()/2)*raw.width()+x;
+                if (y<raw.height()/2) {
+                    const double a=din[i];
+                    const double b=din[i2];
+                    corr += (a-amean)*(b-bmean);
+                    vara += (a-amean)*(a-amean);
+                    varb += (b-bmean)*(b-bmean);
+                    if (x>raw.width()/4 && x<=3*raw.width()/4){
+                        ccorr += (a-camean)*(b-cbmean);
+                        cvara += (a-camean)*(a-camean);
+                        cvarb += (b-cbmean)*(b-cbmean);
+                    }
+                }
+            }
         }
         correlationCoefficient=corr/sqrt(vara*varb);
-    } else if (cmbImageMode->currentIndex()==2)  {
-        out.resize((uint32_t)ceil((double)raw.width()/2.0), raw.height());
+        correlationCoefficientCenter=ccorr/sqrt(cvara*cvarb);
+    } else if (mode==2 || mode==4)  {
+
+        if (mode==2) out.resize((uint32_t)ceil((double)raw.width()/2.0), raw.height());
+        if (mode==4) out.resize(raw.width(), raw.height());
         QFESPIMB040CameraView_internalImageType* dout=out.data();
         const uint32_t* din=raw.data();
-        register double amean=0, bmean=0;
+        register double amean=0, bmean=0, cnt=0;
+        register double camean=0, cbmean=0, ccnt=0;
         /* calculate subtracted output image and grey value averages */
-        for (register uint32_t x=0; x<out.width(); x++) {
-            for (register uint32_t y=0; y<out.height(); y++) {
-                const QFESPIMB040CameraView_internalImageType a=din[y*raw.width()+x];
-                const QFESPIMB040CameraView_internalImageType b=din[y*raw.width()+x+raw.width()/2];
-                dout[y*out.width()+x]=a-b;
-                amean+=a;
-                bmean+=b;
+        for (register uint32_t y=0; y<raw.height(); y++) {
+            for (register uint32_t x=0; x<raw.width()/2; x++) {
+                if (x<raw.width()/2) {
+                    const QFESPIMB040CameraView_internalImageType a=din[y*raw.width()+x];
+                    const QFESPIMB040CameraView_internalImageType b=din[y*raw.width()+x+raw.width()/2];
+                    if (mode==2) dout[y*out.width()+x]=a-b;
+                    amean+=a;
+                    bmean+=b;
+                    cnt++;
+                    if (y>raw.height()/4 && y<=3*raw.height()/4){
+                        camean+=a;
+                        cbmean+=b;
+                        ccnt++;
+                    }
+                }
             }
         }
-        amean=amean/(double)(out.width()*out.height());
-        bmean=bmean/(double)(out.width()*out.height());
+        amean=amean/(double)(cnt);
+        bmean=bmean/(double)(cnt);
+        camean=camean/(double)(ccnt);
+        cbmean=cbmean/(double)(ccnt);
+        if (mode==4) {
+            double ascale=1;
+            double bscale=1;
+            if (amean>bmean) {
+                 bscale=amean/bmean;
+            } else if (amean<bmean) {
+                ascale=bmean/amean;
+            }
+            for (register uint32_t y=0; y<out.height(); y++) {
+                for (register uint32_t x=0; x<out.width(); x++) {
+                    register uint32_t i=y*out.width()+x;
+                    if (x<raw.width()/2) dout[i]=din[i]*ascale;
+                    else dout[i]=din[i]*bscale;
+                }
+            }
+        }
         /* calculate correlation coefficient */
         double corr=0, vara=0, varb=0;
-        for (register uint32_t x=0; x<out.width(); x++) {
-            for (register uint32_t y=0; y<out.height(); y++) {
+        double ccorr=0, cvara=0, cvarb=0;
+        for (register uint32_t y=0; y<raw.height(); y++) {
+            for (register uint32_t x=0; x<raw.width()/2; x++) {
                 const double a=din[y*raw.width()+x];
                 const double b=din[y*raw.width()+x+raw.width()/2];
                 corr += (a-amean)*(b-bmean);
                 vara += (a-amean)*(a-amean);
                 varb += (b-bmean)*(b-bmean);
+                if (x>out.width()/4 && x<=3*out.width()/4){
+                    ccorr += (a-camean)*(b-cbmean);
+                    cvara += (a-camean)*(a-camean);
+                    cvarb += (b-cbmean)*(b-cbmean);
+                }
             }
         }
         correlationCoefficient=corr/sqrt(vara*varb);
+        correlationCoefficientCenter=ccorr/sqrt(cvara*cvarb);
     } else {
         out.assign(raw);
+        correlationCoefficient=0;
+        correlationCoefficientCenter=0;
+
     }
 
 

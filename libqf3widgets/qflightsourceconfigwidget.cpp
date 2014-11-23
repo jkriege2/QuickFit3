@@ -393,7 +393,7 @@ void QFLightSourceConfigWidget::configure() {
 
 void QFLightSourceConfigWidget::updateLSLinesWidgets() {
     dontAccessWidgets=true;
-    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    bool updt=updatesEnabled(); bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     int oldLines=lineWidgets.size();
     int newLines=0;
     QFExtensionLightSource* lightSource=getLightSource();
@@ -454,7 +454,7 @@ void QFLightSourceConfigWidget::updateLSLinesWidgets() {
 
     linesLayoutWidget->setVisible(newLines>0);
     dontAccessWidgets=false;
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 }
 
 int QFLightSourceConfigWidget::getLineByWidget(QObject *widget) {
@@ -471,7 +471,7 @@ void QFLightSourceConfigWidget::displayStates() {
     if (useThread) return;
     if (locked) return;
 
-    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    bool updt=updatesEnabled(); bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
 
     QFExtensionLightSource* LightSource;
     int LightSourceID;
@@ -504,7 +504,7 @@ void QFLightSourceConfigWidget::displayStates() {
     }
 
     updateStates();
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 
     //QTimer::singleShot(stateUpdateInterval, this, SLOT(displayLightSourceStates()));
     if (!locked) {
@@ -557,7 +557,7 @@ void QFLightSourceConfigWidget::setLinePower(int line, double power) {
 
 void QFLightSourceConfigWidget::linesChanged(QTime time, QList<bool> lineenabled, QList<double> setValues, QList<double> measuredValues, QStringList powerUnits, QStringList lineNames, QList<bool> widgetsEnabled) {
     if (dontAccessWidgets) return;
-    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    bool updt=updatesEnabled(); bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     //qDebug()<<"linesChanged("<< lineenabled<< setValues <<measuredValues<<")";
     for (int i=0; i<lineWidgets.size(); i++) {
         if (i<lineenabled.size()) {
@@ -588,7 +588,7 @@ void QFLightSourceConfigWidget::linesChanged(QTime time, QList<bool> lineenabled
         }
     }
     updateStates();
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 }
 
 void QFLightSourceConfigWidget::setPowerEditingFinished() {

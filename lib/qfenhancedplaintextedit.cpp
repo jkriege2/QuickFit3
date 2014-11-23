@@ -117,68 +117,66 @@ void QFEnhancedPlainTextEdit::contextMenuEvent(QContextMenuEvent *event)
 
 }
 
-void QFEnhancedPlainTextEdit::keyPressEvent(QKeyEvent *e)
+void QFEnhancedPlainTextEdit::keyPressEvent(QKeyEvent *event)
 {
-    if (e->key()==Qt::Key_Help) {
+    if (event->key()==Qt::Key_Help) {
         emit helpKeyPressed();
     } else {
         if (c && c->popup()->isVisible()) {
             // The following keys are forwarded by the completer to the widget
-           switch (e->key()) {
+           switch (event->key()) {
                case Qt::Key_Enter:
                case Qt::Key_Return:
                case Qt::Key_Escape:
                case Qt::Key_Tab:
                case Qt::Key_Backtab:
-                    e->ignore();
+                    event->ignore();
                     return; // completer widgets handles these keys!
                default:
                    break;
            }
-        } else {
-
-            bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
-            if (!c || !isShortcut) // dont process the shortcut when we have a completer
-                QPlainTextEdit::keyPressEvent(e);
-
-            const bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
-            if (!c || (ctrlOrShift && e->text().isEmpty()))
-                return;
-
-            static QString eow("~!@#$%^&*()+{}|:\"<>?,./;'[]\\-="); // end of word
-            bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
-            QString completionPrefix = textUnderCursor();
-            /*QMessageBox::information(this, "", tr("completionPrefix=%1\nisShortcut=%2\nctrlOrShif=%3\nhasModifier=%4")
-                                                   .arg(completionPrefix)
-                                                   .arg(isShortcut)
-                                                   .arg(ctrlOrShift)
-                                                   .arg(hasModifier)
-                                                   );*/
-
-            if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 2
-                              || eow.contains(e->text().right(1)))) {
-                c->popup()->hide();
-                return;
-            }
-            /*QMessageBox::information(this, "", tr("c->completionPrefix=%1\ncompletionPrefix=%2")
-                                                   .arg(c->completionPrefix())
-                                                   .arg(completionPrefix)
-                                                   );*/
-            if (completionPrefix != c->completionPrefix()) {
-                c->setCompletionPrefix(completionPrefix);
-                /*QMessageBox::information(this, "", tr("c->completionModel()->rowCount()=%1")
-                                                   .arg(c->completionModel()->rowCount())
-                                                   );*/
-                c->popup()->setCurrentIndex(c->completionModel()->index(0, 0));
-            }
-            QRect cr = cursorRect();
-            cr.setWidth(c->popup()->sizeHintForColumn(0)
-                        + c->popup()->verticalScrollBar()->sizeHint().width());
-            c->complete(cr); // popup it up!
         }
     }
     // default handler for event
 
+    bool isShortcut = ((event->modifiers() & Qt::ControlModifier) && event->key() == Qt::Key_E); // CTRL+E
+    if (!c || !isShortcut) // dont process the shortcut when we have a completer
+        QPlainTextEdit::keyPressEvent(event);
+
+    const bool ctrlOrShift = event->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
+    if (!c || (ctrlOrShift && event->text().isEmpty()))
+        return;
+
+    static QString eow("~!@#$%^&*()+{}|:\"<>?,./;'[]\\-="); // end of word
+    bool hasModifier = (event->modifiers() != Qt::NoModifier) && !ctrlOrShift;
+    QString completionPrefix = textUnderCursor();
+    /*QMessageBox::information(this, "", tr("completionPrefix=%1\nisShortcut=%2\nctrlOrShif=%3\nhasModifier=%4")
+                                           .arg(completionPrefix)
+                                           .arg(isShortcut)
+                                           .arg(ctrlOrShift)
+                                           .arg(hasModifier)
+                                           );*/
+
+    if (!isShortcut && (hasModifier || event->text().isEmpty()|| completionPrefix.length() < 2
+                      || eow.contains(event->text().right(1)))) {
+        c->popup()->hide();
+        return;
+    }
+    /*QMessageBox::information(this, "", tr("c->completionPrefix=%1\ncompletionPrefix=%2")
+                                           .arg(c->completionPrefix())
+                                           .arg(completionPrefix)
+                                           );*/
+    if (completionPrefix != c->completionPrefix()) {
+        c->setCompletionPrefix(completionPrefix);
+        /*QMessageBox::information(this, "", tr("c->completionModel()->rowCount()=%1")
+                                           .arg(c->completionModel()->rowCount())
+                                           );*/
+        c->popup()->setCurrentIndex(c->completionModel()->index(0, 0));
+    }
+    QRect cr = cursorRect();
+    cr.setWidth(c->popup()->sizeHintForColumn(0)
+                + c->popup()->verticalScrollBar()->sizeHint().width());
+    c->complete(cr); // popup it up!
 }
 
 void QFEnhancedPlainTextEdit::focusInEvent(QFocusEvent *e)

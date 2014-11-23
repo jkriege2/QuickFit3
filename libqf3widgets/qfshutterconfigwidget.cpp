@@ -414,7 +414,7 @@ void QFShutterConfigWidget::updateActionProperties()
 void QFShutterConfigWidget::updateActionProperties(bool opened)
 {
     disconnect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
-    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    bool updt=updatesEnabled(); bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     if (opened) {
         actState->setIcon(iconOpened);
         if (actState->text()!=tr("opened")) actState->setText(tr("opened"));
@@ -424,7 +424,7 @@ void QFShutterConfigWidget::updateActionProperties(bool opened)
         if (actState->text()!=tr("closed")) actState->setText(tr("closed"));
         if (actState->isChecked()) actState->setChecked(false);
     }
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
     connect(actState, SIGNAL(toggled(bool)), this, SLOT(shutterActionClicked(bool)));
 }
 

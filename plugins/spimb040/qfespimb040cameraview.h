@@ -39,6 +39,8 @@
 #include <QToolBar>
 #include <QTime>
 #include <QTabWidget>
+#include <QFormLayout>
+#include <QGroupBox>
 
 #include "programoptions.h"
 #include "jkimage.h"
@@ -98,6 +100,7 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief set size of pixels */
         void setPixelSize(double pixelWidth, double pixelHeight);
 
+    protected:
         void saveMultiSeries(int frames, const QString filename);
 
     public slots:
@@ -141,6 +144,8 @@ class QFESPIMB040CameraView : public QWidget {
         void saveData();
         /** \brief print a report of the evaluation results */
         void printReport();
+
+        void setTableFontsize(int size);
     protected:
 
         /*! \brief create an evaluation report for the current record */
@@ -228,6 +233,8 @@ class QFESPIMB040CameraView : public QWidget {
 
         double MarginalLeftWidth;
         double MarginalTopWidth;
+        double MarginalLeftPosition;
+        double MarginalTopPosition;
 
 
 
@@ -260,8 +267,8 @@ class QFESPIMB040CameraView : public QWidget {
         QSpinBox* spinGridWidth;
         /** \brief color combobox for the overlay color */
         ColorComboBox* cmbGridColor;
-        /** \brief combobox fo60r special image transfromation modes */
-        QComboBox* cmbImageMode;
+        /** \brief combobox for special image transfromation modes */
+        QComboBox* cmbImageTransformMode;
 
         /** \brief combobox to select fit function */
         QComboBox* cmbMarginalFitFunction;
@@ -292,6 +299,33 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief combobox for rotation of the image */
         QComboBox* cmbRotation;
 
+
+
+
+
+
+        /** \brief combobox for special image transfromation modes */
+        QComboBox* cmbAlign1ImageTransformMode;
+        /** \brief combobox to select color bar */
+        QComboBox* cmbAlign1Colorscale;
+        /** \brief combobox to select fit function */
+        QComboBox* cmbAlign1MarginalFitFunction;
+
+
+        /** \brief combobox for special image transfromation modes */
+        QComboBox* cmbAlign2ImageTransformMode;
+        /** \brief combobox to select color bar */
+        QComboBox* cmbAlign2Colorscale;
+        /** \brief combobox to select fit function */
+        QComboBox* cmbAlign2MarginalFitFunction;
+
+
+
+
+
+
+
+
         /** \brief label for image sie and framerate */
         QLabel* labVideoSettings;
 
@@ -316,6 +350,8 @@ class QFESPIMB040CameraView : public QWidget {
         QTime graphTime;
         QPushButton* btnClearGraph;
         QDoubleSpinBox* spinGraphWindow;
+
+        QSpinBox* spinTableFontsize;
 
 
 
@@ -350,10 +386,17 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief action to print a report */
         QAction* actPrintReport;
 
+        QActionGroup* actgMouse;
+
         /** \brief action to save a report */
         QAction* actSaveReport;
         /** \brief action to save marginal+histogram data */
         QAction* actSaveData;
+
+        QAction* actNormalMode;
+        QAction* actAlign1Mode;
+        QAction* actAlign2Mode;
+        QActionGroup* actgAlignMode;
 
         //bool measureFirst;
 
@@ -436,8 +479,14 @@ class QFESPIMB040CameraView : public QWidget {
 
         /** \brief image correlation coefficient */
         double correlationCoefficient;
+        double correlationCoefficientCenter;
+
+        int cmbImageTransformModeCurrentIndex() const;
+        int cmbColorscaleCurrentIndex() const;
+        int cmbMarginalFitFunctionCrrentIndex() const;
 
     protected slots:
+        void set_palette(int dummy);
         /** \brief called when the mouse moves over the image plot window */
         void imageMouseMoved(double x, double y);
         /** \brief called when the mouse is clicked on the image plot window. This is used together with actMaskEdit to control editing of image masks */
@@ -550,15 +599,15 @@ class QFESPIMB040CameraView : public QWidget {
                 img.save_csv(fileName.toStdString());
             } else if (lastImagefilter==filtPNG) {
                 QImage imgo;
-                JKQTFPimagePlot_array2image<T>(img.data(), img.width(), img.height(), imgo, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
+                JKQTFPimagePlot_array2image<T>(img.data(), img.width(), img.height(), imgo, (JKQTFPColorPalette)cmbColorscaleCurrentIndex(), spinCountsLower->value(), spinCountsUpper->value());
                 imgo.save(fileName, "PNG");
             } else if (lastImagefilter==filtBMP) {
                 QImage imgo;
-                JKQTFPimagePlot_array2image<T>(img.data(), img.width(), img.height(), imgo, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
+                JKQTFPimagePlot_array2image<T>(img.data(), img.width(), img.height(), imgo, (JKQTFPColorPalette)cmbColorscaleCurrentIndex(), spinCountsLower->value(), spinCountsUpper->value());
                 imgo.save(fileName, "BMP");
             } else if (lastImagefilter==filtTIFF) {
                 QImage imgo;
-                JKQTFPimagePlot_array2image<T>(img.data(), img.width(), img.height(), imgo, (JKQTFPColorPalette)cmbColorscale->currentIndex(), spinCountsLower->value(), spinCountsUpper->value());
+                JKQTFPimagePlot_array2image<T>(img.data(), img.width(), img.height(), imgo, (JKQTFPColorPalette)cmbColorscaleCurrentIndex(), spinCountsLower->value(), spinCountsUpper->value());
                 imgo.save(fileName, "TIFF");
             } else {
                 img.save_tiffuint16(fileName.toStdString());

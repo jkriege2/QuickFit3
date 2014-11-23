@@ -673,6 +673,11 @@ void QFESPIMB040SimpleCameraConfig::stop() {
     //qDebug()<<"stop";
     restartPreview=actStartStopPreview->isChecked();
     stopPreview();
+    QElapsedTimer timer;
+    timer.start();
+    while (timer.elapsed()<150) {
+        QApplication::processEvents();
+    }
 }
 
 void QFESPIMB040SimpleCameraConfig::resume() {
@@ -680,6 +685,11 @@ void QFESPIMB040SimpleCameraConfig::resume() {
     if (restartPreview) {
         actStartStopPreview->setChecked(true);
         startStopPreview();
+        QElapsedTimer timer;
+        timer.start();
+        while (timer.elapsed()<150) {
+            QApplication::processEvents();
+        }
     }
 }
 

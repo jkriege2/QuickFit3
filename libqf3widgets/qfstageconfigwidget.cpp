@@ -475,7 +475,7 @@ void QFStageConfigWidget::displayAxisStates(/*bool automatic*/) {
     if (useThread) return;
 
 
-    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    bool updt=updatesEnabled(); bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     bool anyconn=false;
 
         QFExtensionLinearStage* stage;
@@ -511,7 +511,7 @@ void QFStageConfigWidget::displayAxisStates(/*bool automatic*/) {
 
 
         updateStates();
-        setUpdatesEnabled(updt);
+        if (widVisible) setUpdatesEnabled(updt);
 
     /*if ((!locked) && anyconn && automatic) {
         QTimer::singleShot(stageStateUpdateInterval, this, SLOT(displayAxisStates()));
@@ -572,7 +572,7 @@ void QFStageConfigWidget::moveRelative(double x) {
 }
 
 void QFStageConfigWidget::connectStages() {
-    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    bool updt=updatesEnabled(); bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     bool bx=actConnectX->signalsBlocked();
     actConnectX->blockSignals(true);
 
@@ -581,22 +581,22 @@ void QFStageConfigWidget::connectStages() {
         disConnectX();
     }
     actConnectX->blockSignals(bx);
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 }
 
 void QFStageConfigWidget::disconnectStages() {
-    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    bool updt=updatesEnabled(); bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     if (cmbStageX->currentExtensionLinearStage() && actConnectX->isChecked()) {
         actConnectX->setChecked(true);
         actConnectX->trigger();
     }
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 }
 
 void QFStageConfigWidget::setReadOnly(bool readonly) {
-    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    bool updt=updatesEnabled(); bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     cmbStageX->setReadOnly(readonly);
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 }
 
 void QFStageConfigWidget::stageXMoved(QFExtensionLinearStage::AxisState state, double position, double speed) {
@@ -655,7 +655,7 @@ void QFStageConfigWidget::updateStageStateWidgets(QLabel* labPos, QLabel* labSpe
         if (labPos->text()!=txt) labPos->setText(txt);
         //setUpdatesEnabled(updt);
     } else {
-        bool updt=updatesEnabled(); setUpdatesEnabled(false);
+        //bool updt=updatesEnabled(); setUpdatesEnabled(false);
         if (labState->text()!="---") labState->setText("---");
         if (!labPos->text().isEmpty()) labPos->setText("");
         if (!labSpeed->text().isEmpty()) labSpeed->setText("");

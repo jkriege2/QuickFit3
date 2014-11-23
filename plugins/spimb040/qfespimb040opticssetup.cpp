@@ -174,7 +174,7 @@ QShortcut *QFESPIMB040OpticsSetup::addShortCut(const QString &id, const QString 
 }
 
 void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
-    bool updt=updatesEnabled();
+    bool updt=updatesEnabled() && isVisible();
     if (updt) setUpdatesEnabled(false);
     ui->camConfig1->loadSettings(settings, prefix+"cam_config1/");
     ui->camConfig2->loadSettings(settings, prefix+"cam_config2/");
@@ -221,7 +221,7 @@ void QFESPIMB040OpticsSetup::loadSettings(QSettings& settings, QString prefix) {
         shortcuts[i].shortcut->setKey(seq);
         shortcuts[i].shortcut->setEnabled(!seq.isEmpty());
     }
-    if (updt) setUpdatesEnabled(updt);
+    if (updt) setUpdatesEnabled(true);
 }
 
 void QFESPIMB040OpticsSetup::storeSettings(QSettings& settings, QString prefix) {

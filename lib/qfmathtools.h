@@ -1016,7 +1016,7 @@ typename T::value_type qfstatisticsSortedMedian(const T& input) {
 */
 template <typename T>
 typename T::value_type qfstatisticsMedian(const T& input_in) {
-    T input=input_in;
+    T input=qfstatisticsFilter(input_in);
     qSort(input);
     return qfstatisticsSortedMedian(input);
 }
@@ -1035,6 +1035,7 @@ typename T::value_type qfstatisticsMaskedMedian(const QVector<bool>& mask, const
     for (int i=0; i<input_in.size(); i++) {
         if (mask[i]==maskUseValue) input<<input_in[i];
     }
+    input=qfstatisticsFilter(input);
     qSort(input);
     return qfstatisticsSortedMedian(input);
 }
@@ -1092,7 +1093,7 @@ template <typename T>
 typename T::value_type qfstatisticsMAD(const T& value, typename T::value_type* median) {
     long long N=value.size();
     if (N<=1) return 0;
-    T sorted=value;
+    T sorted=qfstatisticsFilter(value);
     qSort(sorted);
     register typename T::value_type res=qfstatisticsSortedMAD(sorted, median);
     return res;
@@ -1149,7 +1150,7 @@ typename T::value_type qfstatisticsSortedQuantile(const T& input, double quantil
 */
 template <typename T>
 typename T::value_type qfstatisticsQuantile(const T& input_in, double quantile) {
-    T input=input_in;
+    T input=qfstatisticsFilter(input_in);
     qSort(input);
     return qfstatisticsSortedQuantile(input, quantile);
 }

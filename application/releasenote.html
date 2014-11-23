@@ -76,6 +76,7 @@
                     <li>added functions that allow to access QuickFit's predefined fit functions</li>
                     <li>added functions for model fitting (least-squares fitting)</li>
                     <li>bugfix: function assignment now works properly</li>
+                    <li>bugfix: all median()/quantile()/min()/max() parser functions now should properly ignore NAN values.</li>
             </ul></li>
             <li>added context menu entry to tables, that allows to explicitly copy the table as "CSV", or to copy the table in a format suitable for "Excel", which depends on the current locale (e.g. for decimal separators)</li>
             <li>bugfixed "copy to Excel/CSV" in table view, which did not copy any data (regression?)</li>
@@ -312,6 +313,7 @@
             <li>column expression editor now is a multi-line edit widget</li>
             <li>added variable "thisrdr" to column/cell expression parsers, which references the current table RDR (as rdrID)</li>
             <li>added checkboxes to cell/column expression dialogs, which allow to switch off the preview calculation. The syntax check is still performed!</li>
+            <li>bugfix: all median()/quantile()/min()/max() parser functions (column statistics!) now should properly ignore NAN values.</li>
       </ul></li>
       <li><b>B040SPIM</b><ul>
             <li>added JavaScript functions to set preview acquisition camera parameters</li>
@@ -322,8 +324,11 @@
             <li>filters/objectives are sorted by name now!</li>
             <li>added two additional preview configs to the acquisition tab</li>
             <li>added "overview series" acquisition, which allows to acquire a set of overview images with different camera settings and light pathes.</li>
-            <li></li>
-            <li></li>
+            <li>added two separately configurable "alignment modes" to preview window (mode-specific parameters: colorscale, frame tranform, marginal fits)</li>
+            <li>added center crosscorrelation coefficient to preview window (only crosscorrelates the center-half of the frame in left-right/top-bottom transfrom modes)</li>
+            <li>added marginal position as plot parameters to graph</li>
+            <li>added camera preview modes that equalize the intenisty in the left/right half images.</li>
+            <li>added spinbox to camera preview, which allows to set the font size of the parameter table.</li>
       </ul></li>
       <li><b>FCS Fit</b><ul>
             <li>fit parameter names are more expressive now</li>

@@ -100,7 +100,10 @@ void QFRDRPlotEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* 
     //std::cout<<"qobject_cast ... ";
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
     this->current=m;
-    connect(m, SIGNAL(rebuildPlotWidgets()), this, SLOT(rebuildPlotWidgets()));
+    if (m) {
+        connect(m, SIGNAL(rebuildPlotWidgets()), this, SLOT(rebuildPlotWidgets()));
+
+    }
     //std::cout<<m<<" ... ";
     //if (m) std::cout<<m->model()<<" ... ";
     rebuildPlotWidgets();

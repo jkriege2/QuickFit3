@@ -2634,7 +2634,7 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
 {
     this->projectModeEnabled=projectModeEnabled;
     this->nonprojectTitle=nonProjectTitle;
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     spMain->setEnabled(projectModeEnabled);
     tvMain->setEnabled(projectModeEnabled);
     tabLogs->setTabEnabled(tabLogs->indexOf(logFileProjectWidget), projectModeEnabled);
@@ -2674,7 +2674,7 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     pastItemAct->setEnabled(clipboardContainsProjectXML() && projectModeEnabled);
     recentMenu->setMenuEnabled(projectModeEnabled);
 
-    setUpdatesEnabled(true);
+    if (widVisible) setUpdatesEnabled(true);
     if (project) setCurrentProject(project->getFile());
     else setCurrentProject("");
 }

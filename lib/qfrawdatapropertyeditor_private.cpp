@@ -1558,7 +1558,7 @@ void QFRawDataPropertyEditor_private::reloadGroupList()
 {
     if (!current) return;
     int i=cmbGroup->currentIndex();
-    cmbGroup->setUpdatesEnabled(false);
+    bool widVisible=cmbGroup->isVisible(); if (widVisible) cmbGroup->setUpdatesEnabled(false);
     cmbGroup->blockSignals(true);
     cmbGroup->clear();
     QStringList items;
@@ -1569,7 +1569,7 @@ void QFRawDataPropertyEditor_private::reloadGroupList()
     if (i==items.size()-1) i=0;
     cmbGroup->setCurrentIndex(i);
     cmbGroup->blockSignals(false);
-    cmbGroup->setUpdatesEnabled(true);
+    if (widVisible) cmbGroup->setUpdatesEnabled(true);
 }
 
 void QFRawDataPropertyEditor_private::selectRecordFromTreeClicked()

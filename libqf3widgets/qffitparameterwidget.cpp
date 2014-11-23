@@ -630,7 +630,7 @@ void QFFitParameterWidgetWrapper::setEditRange(bool editRange) {
 
 void QFFitParameterWidgetWrapper::setEditValues(bool editValues) {
     bool updEn=m_parent->updatesEnabled();
-    m_parent->setUpdatesEnabled(false);
+    bool widVisible=m_parent->isVisible(); if (widVisible) m_parent->setUpdatesEnabled(false);
     m_editValues=editValues;
     if (spinIntValue) spinIntValue->setVisible(m_visible && editValues);
     if (neditValue) neditValue->setVisible(m_visible && editValues);
@@ -654,31 +654,31 @@ void QFFitParameterWidgetWrapper::setEditValues(bool editValues) {
     } else {
         labLabel->setVisible(m_visible);
     }
-    m_parent->setUpdatesEnabled(updEn);
+    if (widVisible)  m_parent->setUpdatesEnabled(updEn);
 }
 
 void QFFitParameterWidgetWrapper::setRangeEnabled(bool enabled) {
     bool updEn=m_parent->updatesEnabled();
-    m_parent->setUpdatesEnabled(false);
+    bool widVisible=m_parent->isVisible(); if (widVisible) m_parent->setUpdatesEnabled(false);
     if (spinIntMax) spinIntMax->setEnabled(enabled);
     if (spinIntMin) spinIntMin->setEnabled(enabled);
     if (neditMax) neditMax->setEnabled(enabled);
     if (neditMin) neditMin->setEnabled(enabled);
     if (hlabMin) hlabMin->setEnabled(enabled);
     if (hlabMax) hlabMax->setEnabled(enabled);
-    m_parent->setUpdatesEnabled(updEn);
+    if (widVisible) m_parent->setUpdatesEnabled(updEn);
 }
 
 void QFFitParameterWidgetWrapper::fillCombo(QComboBox* cmb, int min, int max) {
     cmb->clear();
     int j=0;
-    cmb->setUpdatesEnabled(false);
+    bool widVisible=cmb->isVisible(); if (widVisible) cmb->setUpdatesEnabled(false);
     for(int i=min; i<=max; i++) {
         if (j<m_comboValues.size()) cmb->addItem(m_comboValues[j], i);
         else cmb->addItem(QString::number(i), i);
         j++;
     }
-    cmb->setUpdatesEnabled(true);
+    if (widVisible) cmb->setUpdatesEnabled(true);
 }
 
 void QFFitParameterWidgetWrapper::setValueAbsoluteRange(double min, double max) {
@@ -734,7 +734,7 @@ void QFFitParameterWidgetWrapper::setToolTip(QString paramDescription) {
 
 void QFFitParameterWidgetWrapper::setVisible(bool visible) {
     bool updEn=m_parent->updatesEnabled();
-    m_parent->setUpdatesEnabled(false);
+    bool widVisible=m_parent->isVisible(); if (widVisible) m_parent->setUpdatesEnabled(false);
     m_visible=visible;
     if (!visible) {
         QFFitParameterWidgetWrapper_setVisible(neditValue);
@@ -756,7 +756,7 @@ void QFFitParameterWidgetWrapper::setVisible(bool visible) {
         setEditRange(m_editRange);
         setEditValues(m_editValues);
     }
-    m_parent->setUpdatesEnabled(updEn);
+    if (widVisible) m_parent->setUpdatesEnabled(updEn);
 }
 
 

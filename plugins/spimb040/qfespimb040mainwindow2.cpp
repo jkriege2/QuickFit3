@@ -321,7 +321,7 @@ void QFESPIMB040MainWindow2::doDeviceParameterStack()
 
 
 
-bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32, QMap<QString, QVariant>* acquisitionDescription, const QString& acquisitionDescriptionPrefix, bool mainShutterOpenOnlyForAcquisition, int frames) {
+bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32, QMap<QString, QVariant>* acquisitionDescription, const QString& acquisitionDescriptionPrefix, bool mainShutterOpenOnlyForAcquisition, int frames, bool getMeasurements) {
     //////////////////////////////////////////////////////////////////////////////////////
     // INIT variables
     //////////////////////////////////////////////////////////////////////////////////////
@@ -334,7 +334,7 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
 
 
     bool oldShutterState=false;
-    if (!optSetup->isMainIlluminationShutterAvailable()) oldShutterState=optSetup->getMainIlluminationShutter();
+    if (mainShutterOpenOnlyForAcquisition && optSetup->isMainIlluminationShutterAvailable()) oldShutterState=optSetup->getMainIlluminationShutter();
     //////////////////////////////////////////////////////////////////////////////////////
     // Close Main shutter
     //////////////////////////////////////////////////////////////////////////////////////
@@ -396,7 +396,7 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
                     (*acquisitionDescription)[acquisitionDescriptionPrefix+"/exposure_time"]=ecamera->getCameraExposureTime(camera);
                     optSetup->saveLightpathConfig((*acquisitionDescription), optSetup->getCurrentLightpath(), acquisitionDescriptionPrefix+"/lightpath/", QList<bool>(), true);
                     (*acquisitionDescription)[acquisitionDescriptionPrefix+"/timestamp"]=time;
-                    getAdditionalCameraSettings(ecamera, camera, acquisitionDescriptionPrefix, (*acquisitionDescription));
+                    getAdditionalCameraSettings(ecamera, camera, acquisitionDescriptionPrefix, (*acquisitionDescription), getMeasurements);
 
                 }
                 QDir().mkpath(QFileInfo(TIFFFIlename.toAscii().data()).absolutePath());
@@ -452,7 +452,7 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
                                 (*acquisitionDescription)[acquisitionDescriptionPrefix+"/image_height"]=height;
                                 (*acquisitionDescription)[acquisitionDescriptionPrefix+"/exposure_time"]=ecamera->getCameraExposureTime(camera);
                                 optSetup->saveLightpathConfig((*acquisitionDescription), optSetup->getCurrentLightpath(), acquisitionDescriptionPrefix+"/lightpath/", QList<bool>(), true);
-                                getAdditionalCameraSettings(ecamera, camera, acquisitionDescriptionPrefix, (*acquisitionDescription));
+                                getAdditionalCameraSettings(ecamera, camera, acquisitionDescriptionPrefix, (*acquisitionDescription), getMeasurements);
                             }
                             (*acquisitionDescription)[acquisitionDescriptionPrefix+QString("/timestamp%1").arg(f+1)]=time;
 
@@ -980,7 +980,7 @@ void QFESPIMB040MainWindow2::savePreviewMovie(int camera, int frames, const QStr
 }
 
 
-void QFESPIMB040MainWindow2::storeCameaConfig(QSettings& setting, QFExtensionCamera* cam, int camID) {
+void QFESPIMB040MainWindow2::storeCameaConfig(QSettings& setting, QFExtensionCamera* cam, int camID, bool getMeasured) {
     setting.setValue("acquisition/type", "preview");
     setting.setValue("acquisition/start_time", QDateTime::currentDateTime().toString(Qt::ISODate));
     setting.setValue("acquisition/pixel_width", cam->getCameraPixelWidth(camID)/optSetup->getCameraMagnification(camID));
@@ -995,7 +995,7 @@ void QFESPIMB040MainWindow2::storeCameaConfig(QSettings& setting, QFExtensionCam
     QString acquisitionDescriptionPrefix="setup/";
     if (optSetup) {
         acqD=optSetup->getSetup(camID);
-        meas=optSetup->getMeasuredValues();
+        if (getMeasured) meas=optSetup->getMeasuredValues();
     }
     if (acqD.size()>0) {
         QMapIterator<QString, QVariant> it(acqD);
@@ -1061,11 +1061,11 @@ bool QFESPIMB040MainWindow2::connectStageForAcquisition(QFExtensionLinearStage* 
     return ok;
 }
 
-bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathFilename, const QString& lightpathName, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& previewSettingsFilename1, const QString& outputFilename, const QString& imageID, const QString& imageDescription, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, QMap<QString, QVariant>& acquisitionDescription1, bool mainShutterOpenOnlyForAcquisition, int frames) {
+bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathFilename, const QString& lightpathName, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& previewSettingsFilename1, const QString& outputFilename, const QString& imageID, const QString& imageDescription, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, QMap<QString, QVariant>& acquisitionDescription1, bool mainShutterOpenOnlyForAcquisition, int frames, bool measureDuringAcquisitions) {
 
 
     bool oldShutterState=false;
-    if (!optSetup->isMainIlluminationShutterAvailable()) oldShutterState=optSetup->getMainIlluminationShutter();
+    if (mainShutterOpenOnlyForAcquisition && optSetup->isMainIlluminationShutterAvailable()) oldShutterState=optSetup->getMainIlluminationShutter();
     //////////////////////////////////////////////////////////////////////////////////////
     // Close Main shutter
     //////////////////////////////////////////////////////////////////////////////////////
@@ -1089,16 +1089,16 @@ bool QFESPIMB040MainWindow2::acquireImageWithLightpath(const QString& lightpathF
 
     QDateTime time=QDateTime::currentDateTime();
     QString filename32="";
-    bool ok=savePreview(extension1, ecamera1, camera1, previewSettingsFilename1, outputFilename, &filename32, &acquisitionDescription1, imageID+"/", mainShutterOpenOnlyForAcquisition, frames);
+    bool ok=savePreview(extension1, ecamera1, camera1, previewSettingsFilename1, outputFilename, &filename32, &acquisitionDescription1, imageID+"/", mainShutterOpenOnlyForAcquisition, frames, measureDuringAcquisitions);
     if (ok) {
         log_text(tr("  - acquired %1!\n").arg(imageDescription));
-        acquisitionDescription1[imageID+"/image_width"]=ecamera1->getCameraImageWidth(camera1);
+        /*acquisitionDescription1[imageID+"/image_width"]=ecamera1->getCameraImageWidth(camera1);
         acquisitionDescription1[imageID+"/image_height"]=ecamera1->getCameraImageHeight(camera1);
         acquisitionDescription1[imageID+"/exposure_time"]=ecamera1->getCameraExposureTime(camera1);
         optSetup->saveLightpathConfig(acquisitionDescription1, lightpathName, imageID+"/lightpath/", QList<bool>(), true);
-        acquisitionDescription1[imageID+"/dualview_mode"]=optSetup->dualViewMode(ecamera1, camera1);
+        acquisitionDescription1[imageID+"/dualview_mode"]=optSetup->dualViewMode(ecamera1, camera1);*/
         acquisitionDescription1[imageID+"/timestamp"]=time;
-        getAdditionalCameraSettings(ecamera1, camera1, imageID, acquisitionDescription1);
+        //getAdditionalCameraSettings(ecamera1, camera1, imageID, acquisitionDescription1, measureDuringAcquisitions);
 
         QFExtensionCamera::CameraAcquititonFileDescription d;
         d.description=imageDescription;
@@ -1358,7 +1358,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString &lightpathName, const Q
      return ok;
 }
 
-void QFESPIMB040MainWindow2::getAdditionalCameraSettings(QFExtensionCamera *ecamera, int camera, const QString &prefix, QMap<QString, QVariant> &acquisitionDescription) {
+void QFESPIMB040MainWindow2::getAdditionalCameraSettings(QFExtensionCamera *ecamera, int camera, const QString &prefix, QMap<QString, QVariant> &acquisitionDescription, bool getMeasurements) {
     acquisitionDescription[prefix+"/camera_pixel_width"]=ecamera->getCameraPixelWidth(camera);
     acquisitionDescription[prefix+"/camera_pixel_height"]=ecamera->getCameraPixelHeight(camera);
     acquisitionDescription[prefix+"/camera_model"]=ecamera->getCameraName(camera);
@@ -1382,7 +1382,7 @@ void QFESPIMB040MainWindow2::getAdditionalCameraSettings(QFExtensionCamera *ecam
             }
         }
     }
-    {
+    if (getMeasurements) {
         QMap<QString, QVariant> setup=optSetup->getMeasuredValues().data;
         QMapIterator <QString, QVariant> it(setup);
         while (it.hasNext()) {

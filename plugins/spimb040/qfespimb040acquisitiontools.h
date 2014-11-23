@@ -45,9 +45,10 @@ class QFESPIMB040AcquisitionTools {
             \param previewSettingsFilename the preview settings file used for this acquisition
             \param filename the file to save to (if a 32-version is created, its filename is the same as \A filename, but with the extension \c .32.tiff !).
             \param[out] filename32 may be used to return the filename of the potentially created 32-bit TIFF (is set to an empty string, if no 32-bit TIFF was created)
+            \param getMeasurements is true, this function also acquires measurements from several measurement devices, connected to the microscope
             \return \c true on success
          */
-        virtual bool savePreview(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32, QMap<QString, QVariant>* acquisitionDescription=NULL, const QString& acquisitionDescriptionPrefix=QString(""), bool mainShutterOpenOnlyForAcquisition=false, int frames=1)=0;
+        virtual bool savePreview(QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& previewSettingsFilename, const QString& filename, QString* filename32, QMap<QString, QVariant>* acquisitionDescription=NULL, const QString& acquisitionDescriptionPrefix=QString(""), bool mainShutterOpenOnlyForAcquisition=false, int frames=1, bool getMeasurements=true)=0;
 
 
         virtual bool prepareCamera(int num, int camera, QFExtensionCamera *cam, const QString& acquisitionSettingsFilename, int &width, int &height, uint32_t **buffer, const QString& acquisitionTitle=QString("B040 SPIM Acquisition"))=0;
@@ -57,7 +58,7 @@ class QFESPIMB040AcquisitionTools {
 
             \note THe lightpath is not altered, if lightpathFilename is left empty.
          */
-        virtual bool acquireImageWithLightpath(const QString& lightpathFilename, const QString& lightpathName, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& previewSettingsFilename1, const QString& outputFilename, const QString& imageID, const QString& imageDescription, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, QMap<QString, QVariant>& acquisitionDescription1, bool mainShutterOpenOnlyForAcquisition=false, int frames=1)=0;
+        virtual bool acquireImageWithLightpath(const QString& lightpathFilename, const QString& lightpathName, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& previewSettingsFilename1, const QString& outputFilename, const QString& imageID, const QString& imageDescription, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, QMap<QString, QVariant>& acquisitionDescription1, bool mainShutterOpenOnlyForAcquisition=false, int frames=1, bool measureDuringAcquisitions=true)=0;
 
         /*! \brief do an acquisition on one or two cameras
 
@@ -67,7 +68,7 @@ class QFESPIMB040AcquisitionTools {
         virtual bool acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, const QString& acquisitionSettingsFilename1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, const QString& acquisitionSettingsFilename2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles2, const QMap<QFExtensionCamera::CameraSetting, QVariant>& camsettings1, const QMap<QFExtensionCamera::CameraSetting, QVariant>& camsettings2, const QMap<QString, QVariant>& camsettingsstr1, const QMap<QString, QVariant>& camsettingsstr2, QList<QFESPIMB040OpticsSetupBase::measuredValues>* measured=NULL, QProgressListDialog* progress=NULL, bool* userCanceled=NULL, bool measureDuringAcquisitions=true)=0;
         virtual bool acquireSeries(const QString& lightpathName, const QString& imageID, const QString& imageDescription, bool useCam1, QFExtension* extension1, QFExtensionCamera* ecamera1, int camera1, const QString& acquisitionPrefix1, QSettings& acquisitionSettings1, QMap<QString, QVariant>& acquisitionDescription1, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles1, bool useCam2, QFExtension* extension2, QFExtensionCamera* ecamera2, int camera2, const QString& acquisitionPrefix2, QSettings& acquisitionSettings2, QMap<QString, QVariant>& acquisitionDescription2, QList<QFExtensionCamera::CameraAcquititonFileDescription>& moreFiles2, QList<QFESPIMB040OpticsSetupBase::measuredValues>* measured=NULL, QProgressListDialog* progress=NULL, bool* userCanceled=NULL, bool measureDuringAcquisitions=true)=0;
 
-        virtual void getAdditionalCameraSettings(QFExtensionCamera* ecamera, int camera, const QString& prefix, QMap<QString, QVariant>& acquisitionDescription)=0;
+        virtual void getAdditionalCameraSettings(QFExtensionCamera* ecamera, int camera, const QString& prefix, QMap<QString, QVariant>& acquisitionDescription, bool getMeasurements)=0;
 
 
         /*! \brief save a description of an acquisition to a QSettings object

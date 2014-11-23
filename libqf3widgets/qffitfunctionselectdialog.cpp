@@ -73,7 +73,7 @@ void QFFitFunctionSelectDialog::init(const QString &filter, const QString &curre
     bool upd=updatesEnabled();
     int idx=ui->lstModels->currentIndex().row();
     if (idx<0) idx=0;
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
 
     filterModel.setSourceModel(NULL);
     if (model) delete model;
@@ -120,7 +120,7 @@ void QFFitFunctionSelectDialog::init(const QString &filter, const QString &curre
     filterModel.setSourceModel(model);
     ui->lstModels->setModel(&filterModel);
     model->sort(0);
-    setUpdatesEnabled(upd);
+    if (widVisible) setUpdatesEnabled(upd);
     ui->lstModels->setCurrentIndex(model->index(idx, 0));
     ui->edtFilter->clear();
 }
@@ -133,7 +133,7 @@ void QFFitFunctionSelectDialog::init(const QStringList &availableFF, const QStri
         bool upd=updatesEnabled();
         int idx=ui->lstModels->currentIndex().row();
         if (idx<0) idx=0;
-        setUpdatesEnabled(false);
+        bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
 
         filterModel.setSourceModel(NULL);
         if (model) delete model;
@@ -169,7 +169,7 @@ void QFFitFunctionSelectDialog::init(const QStringList &availableFF, const QStri
         filterModel.setSourceModel(model);
         ui->lstModels->setModel(&filterModel);
         model->sort(0);
-        setUpdatesEnabled(upd);
+        if (widVisible) setUpdatesEnabled(upd);
         ui->lstModels->setCurrentIndex(model->index(idx, 0));
         ui->edtFilter->clear();
     }

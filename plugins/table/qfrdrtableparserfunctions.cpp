@@ -1807,10 +1807,10 @@ void fQFRDRTableEditor_colsavg(qfmpResult& res, const qfmpResult *params, unsign
                     bool nodata=true;
                     for (int c=0; c<cols.size(); c++) {
                         double dbl=d->model->cellDouble(r, cols[c]-1);
-                        data.append(dbl);
+                        if (QFFloatIsOK(dbl)) data.append(dbl);
                         nodata=nodata&&(!QFFloatIsOK(dbl));
                     }
-                    if (nodata)  {
+                    if (nodata || data.size()<=0)  {
                         res.numVec[r]=NAN;
                         noDataCount++;
                     } else {
@@ -1851,10 +1851,10 @@ void fQFRDRTableEditor_colscount(qfmpResult &res, const qfmpResult *params, unsi
                     bool nodata=true;
                     for (int c=0; c<cols.size(); c++) {
                         double dbl=d->model->cellDouble(r, cols[c]-1);
-                        data.append(dbl);
+                        if (QFFloatIsOK(dbl)) data.append(dbl);
                         nodata=nodata&&(!QFFloatIsOK(dbl));
                     }
-                    if (nodata)  {
+                    if (nodata || data.size()<=0)  {
                         res.numVec[r]=0;
                         noDataCount++;
                     } else {
@@ -1895,10 +1895,10 @@ void fQFRDRTableEditor_colssum(qfmpResult &res, const qfmpResult *params, unsign
                     bool nodata=true;
                     for (int c=0; c<cols.size(); c++) {
                         double dbl=d->model->cellDouble(r, cols[c]-1);
-                        data.append(dbl);
+                        if (QFFloatIsOK(dbl)) data.append(dbl);
                         nodata=nodata&&(!QFFloatIsOK(dbl));
                     }
-                    if (nodata)  {
+                    if (nodata || data.size()<=0)  {
                         res.numVec[r]=NAN;
                         noDataCount++;
                     } else {
@@ -1940,10 +1940,10 @@ void fQFRDRTableEditor_colssum2(qfmpResult &res, const qfmpResult *params, unsig
                     bool nodata=true;
                     for (int c=0; c<cols.size(); c++) {
                         double dbl=d->model->cellDouble(r, cols[c]-1);
-                        data.append(dbl);
+                        if (QFFloatIsOK(dbl)) data.append(dbl);
                         nodata=nodata&&(!QFFloatIsOK(dbl));
                     }
-                    if (nodata)  {
+                    if (nodata || data.size()<=0)  {
                         res.numVec[r]=NAN;
                         noDataCount++;
                     } else {
@@ -1985,10 +1985,10 @@ void fQFRDRTableEditor_colsvar(qfmpResult &res, const qfmpResult *params, unsign
                     bool nodata=true;
                     for (int c=0; c<cols.size(); c++) {
                         double dbl=d->model->cellDouble(r, cols[c]-1);
-                        data.append(dbl);
+                        if (QFFloatIsOK(dbl)) data.append(dbl);
                         nodata=nodata&&(!QFFloatIsOK(dbl));
                     }
-                    if (nodata)  {
+                    if (nodata || data.size()<=0)  {
                         res.numVec[r]=NAN;
                         noDataCount++;
                     } else {
@@ -2030,10 +2030,10 @@ void fQFRDRTableEditor_colsstd(qfmpResult &res, const qfmpResult *params, unsign
                     bool nodata=true;
                     for (int c=0; c<cols.size(); c++) {
                         double dbl=d->model->cellDouble(r, cols[c]-1);
-                        data.append(dbl);
+                        if (QFFloatIsOK(dbl)) data.append(dbl);
                         nodata=nodata&&(!QFFloatIsOK(dbl));
                     }
-                    if (nodata)  {
+                    if (nodata || data.size()<=0)  {
                         res.numVec[r]=NAN;
                         noDataCount++;
                     } else {
@@ -2075,10 +2075,10 @@ void fQFRDRTableEditor_colsmedian(qfmpResult &res, const qfmpResult *params, uns
                     bool nodata=true;
                     for (int c=0; c<cols.size(); c++) {
                         double dbl=d->model->cellDouble(r, cols[c]-1);
-                        data.append(dbl);
+                        if (QFFloatIsOK(dbl)) data.append(dbl);
                         nodata=nodata&&(!QFFloatIsOK(dbl));
                     }
-                    if (nodata)  {
+                    if (nodata || data.size()<=0)  {
                         res.numVec[r]=NAN;
                         noDataCount++;
                     } else {
@@ -2122,10 +2122,10 @@ void fQFRDRTableEditor_colsmin(qfmpResult &res, const qfmpResult *params, unsign
                     bool nodata=true;
                     for (int c=0; c<cols.size(); c++) {
                         double dbl=d->model->cellDouble(r, cols[c]-1);
-                        data.append(dbl);
+                        if (QFFloatIsOK(dbl)) data.append(dbl);
                         nodata=nodata&&(!QFFloatIsOK(dbl));
                     }
-                    if (nodata)  {
+                    if (nodata || data.size()<=0)  {
                         res.numVec[r]=NAN;
                         noDataCount++;
                     } else {
@@ -2167,10 +2167,10 @@ void fQFRDRTableEditor_colsmax(qfmpResult &res, const qfmpResult *params, unsign
                     bool nodata=true;
                     for (int c=0; c<cols.size(); c++) {
                         double dbl=d->model->cellDouble(r, cols[c]-1);
-                        data.append(dbl);
+                        if (QFFloatIsOK(dbl)) data.append(dbl);
                         nodata=nodata&&(!QFFloatIsOK(dbl));
                     }
-                    if (nodata)  {
+                    if (nodata || data.size()<=0)  {
                         res.numVec[r]=NAN;
                         noDataCount++;
                     } else {
@@ -2216,10 +2216,10 @@ void fQFRDRTableEditor_colsquantile(qfmpResult &res, const qfmpResult *params, u
                     bool nodata=true;
                     for (int c=0; c<cols.size(); c++) {
                         double dbl=d->model->cellDouble(r, cols[c]-1);
-                        data.append(dbl);
+                        if (QFFloatIsOK(dbl)) data.append(dbl);
                         nodata=nodata&&(!QFFloatIsOK(dbl));
                     }
-                    if (nodata)  {
+                    if (nodata || data.size()<=0)  {
                         res.numVec[r]=NAN;
                         noDataCount++;
                     } else {

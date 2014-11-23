@@ -135,14 +135,23 @@ void QFRDRTableEditor::createWidgets() {
     scrollPreScriptHelp->setWidget(new QWidget());
     scrollPreScriptHelp->widget()->setLayout(layPreScript);
     layPreScript->addWidget(labPreScriptOK);
+    btnPreScriptParserFHelp=new QPushButton(QIcon(":/lib/help.png"), tr("function &help"), this);
+    btnPreScriptParserHelp=new QPushButton(QIcon(":/lib/help.png"), tr("parser &help"), this);
+    QHBoxLayout* layScriptHelpButtons=new QHBoxLayout();
+    layScriptHelpButtons->addWidget(btnPreScriptParserFHelp);
+    layScriptHelpButtons->addWidget(btnPreScriptParserHelp);
+    layPreScript->addLayout(layScriptHelpButtons);
     //layPreScript->addWidget(labPreScriptTemplate);
     layPreScript->addWidget(labPreScriptHelp, 1);
     scrollPreScriptHelp->setWidgetResizable(true);
     functionRef=new QFFunctionReferenceTool(NULL);
     functionRef->setCompleterFile(ProgramOptions::getInstance()->getConfigFileDirectory()+"/completers/table/table_expression.txt");
+    functionRef->setDefaultHelp(QFPluginServices::getInstance()->getPluginHelpDirectory("table")+QString("/mathparser.html"));
     functionRef->setDefaultWordsMathExpression();
     functionRef->registerEditor(edtPreScript);
     functionRef->setLabHelp(labPreScriptHelp);
+    functionRef->setCurrentHelpButton(btnPreScriptParserHelp);
+    connect(btnPreScriptParserHelp, SIGNAL(clicked()), functionRef, SLOT(showDefaultHelp()));
     //functionRef->setLabTemplate(labPreScriptTemplate);
     functionRef->setDefaultHelp(QFPluginServices::getInstance()->getPluginHelpDirectory("table")+"mathparser.html");
     layPreScriptV->addWidget(edtPreScript, 3);
@@ -581,7 +590,8 @@ void QFRDRTableEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord*
         connect(tvMain->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selectionChanged()));
         m->model()->setReadonly(m->model()->isReadonly());
         m->model()->emitUndoRedoSignals(true);
-        setActionsEnabled(!m->model()->isReadonly());
+        actPreScript->setChecked(m->getParserPreScript().size()>0);
+        setActionsEnabled(!m->model()->isReadonly());        
     } else {
         tvMain->setModel(NULL);
     }

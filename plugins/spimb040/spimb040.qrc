@@ -32,6 +32,9 @@
         <file alias="spimb040/measure.png">icons/measure.png</file>
         <file alias="spimb040/objective_rename.png">icons/edit.png</file>
         <file alias="spimb040/config_rename.png">icons/config_rename.png</file>
+        <file alias="spimb040/alignmode_normal.png">icons/alignmode_normal.png</file>
+        <file alias="spimb040/alignmode_1.png">icons/alignmode_1.png</file>
+        <file alias="spimb040/alignmode_2.png">icons/alignmode_2.png</file>
     </qresource>
     <qresource prefix="/spimb040">
         <file alias="report_print.png">icons/report_print.png</file>

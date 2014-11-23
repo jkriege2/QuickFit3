@@ -138,7 +138,7 @@ void QF3ObjectiveCombobox::loadObjectives() {
     objectives.clear();
     QString currentO=cmbObjective->currentText();
     bool updt=updatesEnabled();
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     cmbObjective->clear();
     QSettings inifileg(globalobjectives, QSettings::IniFormat);
     QSettings inifile(localobjectives, QSettings::IniFormat);
@@ -168,7 +168,7 @@ void QF3ObjectiveCombobox::loadObjectives() {
     if (i<0) i=0;
     cmbObjective->setCurrentIndex(i);
     //hbl->update();
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 
 }
 

@@ -151,7 +151,16 @@ p, li { white-space: pre-wrap; }
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="widCam2Settings" columnstretch="0,0,0">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item row="2" column="2">
@@ -171,6 +180,9 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QPushButton" name="btnAcq2TestPreview2">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;press this button down (and keep it pressed) to switch the preview of the camera to this setting. The setting will be activated as long as the button is pressed.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt; This does not only set the camera acquisition setting, but also sets the according lightpath (if activated below)!!!&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;You can use this function to test a preview setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Test</string>
           </property>
@@ -214,6 +226,9 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QPushButton" name="btnAcq2TestPreview6">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;press this button down (and keep it pressed) to switch the preview of the camera to this setting. The setting will be activated as long as the button is pressed.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt; This does not only set the camera acquisition setting, but also sets the according lightpath (if activated below)!!!&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;You can use this function to test a preview setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Test</string>
           </property>
@@ -311,6 +326,9 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QPushButton" name="btnAcq2TestPreview4">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;press this button down (and keep it pressed) to switch the preview of the camera to this setting. The setting will be activated as long as the button is pressed.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt; This does not only set the camera acquisition setting, but also sets the according lightpath (if activated below)!!!&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;You can use this function to test a preview setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Test</string>
           </property>
@@ -348,6 +366,9 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QPushButton" name="btnAcq2TestPreview1">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;press this button down (and keep it pressed) to switch the preview of the camera to this setting. The setting will be activated as long as the button is pressed.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt; This does not only set the camera acquisition setting, but also sets the according lightpath (if activated below)!!!&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;You can use this function to test a preview setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Test</string>
           </property>
@@ -391,6 +412,9 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QPushButton" name="btnAcq2TestPreview5">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;press this button down (and keep it pressed) to switch the preview of the camera to this setting. The setting will be activated as long as the button is pressed.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt; This does not only set the camera acquisition setting, but also sets the according lightpath (if activated below)!!!&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;You can use this function to test a preview setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Test</string>
           </property>
@@ -435,6 +459,9 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QPushButton" name="btnAcq2TestPreview3">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;press this button down (and keep it pressed) to switch the preview of the camera to this setting. The setting will be activated as long as the button is pressed.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt; This does not only set the camera acquisition setting, but also sets the according lightpath (if activated below)!!!&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;You can use this function to test a preview setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Test</string>
           </property>
@@ -472,6 +499,9 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QPushButton" name="btnAcq2Test">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;press this button down (and keep it pressed) to switch the preview of the camera to this setting. The setting will be activated as long as the button is pressed.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt; This does not only set the camera acquisition setting, but also sets the according lightpath (if activated below)!!!&lt;/p&gt;&lt;p&gt;You can use this function to test a acquisition setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Test</string>
           </property>
@@ -575,7 +605,16 @@ p, li { white-space: pre-wrap; }
    <item row="1" column="0" colspan="4">
     <widget class="QWidget" name="widget" native="true">
      <layout class="QHBoxLayout" name="horizontalLayout_17">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item>
@@ -661,7 +700,16 @@ p, li { white-space: pre-wrap; }
       <bool>false</bool>
      </property>
      <layout class="QGridLayout" name="gridLayout_2" columnstretch="0,0">
-      <property name="margin">
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
        <number>0</number>
       </property>
       <item row="6" column="0" colspan="2">
@@ -760,7 +808,16 @@ p, li { white-space: pre-wrap; }
          </size>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_9" stretch="0,0,1,0,0,0">
-         <property name="margin">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
           <number>0</number>
          </property>
          <item>
@@ -778,6 +835,9 @@ p, li { white-space: pre-wrap; }
          </item>
          <item>
           <widget class="QPushButton" name="btnAcq1Test">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;press this button down (and keep it pressed) to switch the preview of the camera to this setting. The setting will be activated as long as the button is pressed.&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt; This does not only set the camera acquisition setting, but also sets the according lightpath (if activated below)!!!&lt;/p&gt;&lt;p&gt;You can use this function to test a acquisition setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
            <property name="text">
             <string>&amp;Test</string>
            </property>
@@ -879,6 +939,9 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QPushButton" name="btnAcq1TestPreview4">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;press this button down (and keep it pressed) to switch the preview of the camera to this setting. The setting will be activated as long as the button is pressed.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt; This does not only set the camera acquisition setting, but also sets the according lightpath (if activated below)!!!&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;You can use this function to test a preview setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Test</string>
           </property>
@@ -916,6 +979,9 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QPushButton" name="btnAcq1TestPreview3">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;press this button down (and keep it pressed) to switch the preview of the camera to this setting. The setting will be activated as long as the button is pressed.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt; This does not only set the camera acquisition setting, but also sets the according lightpath (if activated below)!!!&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;You can use this function to test a preview setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Test</string>
           </property>
@@ -953,6 +1019,9 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QPushButton" name="btnAcq1TestPreview2">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;press this button down (and keep it pressed) to switch the preview of the camera to this setting. The setting will be activated as long as the button is pressed.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt; This does not only set the camera acquisition setting, but also sets the according lightpath (if activated below)!!!&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;You can use this function to test a preview setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Test</string>
           </property>
@@ -996,6 +1065,9 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QPushButton" name="btnAcq1TestPreview6">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;press this button down (and keep it pressed) to switch the preview of the camera to this setting. The setting will be activated as long as the button is pressed.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt; This does not only set the camera acquisition setting, but also sets the according lightpath (if activated below)!!!&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;You can use this function to test a preview setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Test</string>
           </property>
@@ -1040,6 +1112,9 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QPushButton" name="btnAcq1TestPreview1">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;press this button down (and keep it pressed) to switch the preview of the camera to this setting. The setting will be activated as long as the button is pressed.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt; This does not only set the camera acquisition setting, but also sets the according lightpath (if activated below)!!!&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;You can use this function to test a preview setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Test</string>
           </property>
@@ -1083,6 +1158,9 @@ p, li { white-space: pre-wrap; }
         </item>
         <item>
          <widget class="QPushButton" name="btnAcq1TestPreview5">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;press this button down (and keep it pressed) to switch the preview of the camera to this setting. The setting will be activated as long as the button is pressed.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt; This does not only set the camera acquisition setting, but also sets the according lightpath (if activated below)!!!&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;You can use this function to test a preview setting.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>&amp;Test</string>
           </property>
@@ -1095,6 +1173,9 @@ p, li { white-space: pre-wrap; }
    </item>
    <item row="4" column="2">
     <widget class="QCheckBox" name="chkUse1">
+     <property name="toolTip">
+      <string>enables/disables camera 1 for the acquisition</string>
+     </property>
      <property name="text">
       <string/>
      </property>
@@ -1117,8 +1198,21 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QCheckBox" name="chkReadMeasurements">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;if this option is checked, QuickFit will acquire data from different measurement devices, connected to the microscope, during the acquisition.&lt;br/&gt;&lt;br/&gt;The data will be stored in CSV/Text files along the acquisition (&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;XXX.measurements.dat&lt;/span&gt;)!&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;This function may slow down the acquisition due to the time required to read out the devices, but more information is available for the acquisition.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>read measurements (device parameters) during acquisitionon</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkMeasurementsPreview">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;if this option is checked, QuickFit will acquire data from different measurement devices, connected to the microscope, during the acquisition of preview frames.&lt;br/&gt;&lt;br/&gt;The data will be stored in Text files along the acquisition (&lt;span style=&quot; font-family:'Courier New,courier';&quot;&gt;XXX.settings.dat&lt;/span&gt;)!&lt;/p&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-weight:600; text-decoration: underline;&quot;&gt;Note:&lt;/span&gt;&lt;span style=&quot; font-weight:600;&quot;/&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;This function may slow down the acquisition due to the time required to read out the devices, but more information is available for the acquisition.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
+       <property name="text">
+        <string>... during preview</string>
        </property>
       </widget>
      </item>
@@ -1137,6 +1231,9 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QCheckBox" name="chkCloseMainShutter">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This function ensures, that the main shutter is opened only, if a frame is acquired. &lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;This reduces the exposure of the sample with excitation light and therefore reduces sample bleaching and damage by the light!&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>close main shutter when preparing overviews</string>
        </property>
@@ -1307,6 +1404,9 @@ p, li { white-space: pre-wrap; }
    </item>
    <item row="6" column="2">
     <widget class="QCheckBox" name="chkUse2">
+     <property name="toolTip">
+      <string>enables/disables camera 2 for the acquisition</string>
+     </property>
      <property name="text">
       <string/>
      </property>

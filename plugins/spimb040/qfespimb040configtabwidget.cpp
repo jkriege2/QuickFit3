@@ -112,17 +112,17 @@ void QFESPIMB040ConfigTabWidget::reloadStylesheets(bool forSure)
     QString oldStyle=ui->cmbStyle->currentText();
     QString oldStyleSheet=ui->cmbStylesheet->currentText();
     if (forSure || !ui->cmbStyle->hasFocus()) {
-        ui->cmbStyle->setUpdatesEnabled(false);
+        bool widVisible=ui->cmbStyle->isVisible(); if (widVisible) ui->cmbStyle->setUpdatesEnabled(false);
         ui->cmbStyle->clear();
         ui->cmbStyle->addItems(QStyleFactory::keys());
         ui->cmbStyle->setCurrentIndex(ui->cmbStyle->findText(oldStyle, Qt::MatchContains));
-        ui->cmbStyle->setUpdatesEnabled(true);
+        if (widVisible) ui->cmbStyle->setUpdatesEnabled(true);
     }
 
 
     // find all available stylesheets
     if (forSure || !ui->cmbStylesheet->hasFocus()) {
-        ui->cmbStylesheet->setUpdatesEnabled(false);
+        bool widVisible=ui->cmbStylesheet->isVisible(); if (widVisible) ui->cmbStylesheet->setUpdatesEnabled(false);
         QDir dir(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/spimb040/stylesheets/");
         QStringList filters, sl;
         dir.cd("stylesheets");
@@ -144,7 +144,7 @@ void QFESPIMB040ConfigTabWidget::reloadStylesheets(bool forSure)
         }
 
         ui->cmbStylesheet->setCurrentIndex( ui->cmbStylesheet->findText(oldStyleSheet));
-        ui->cmbStylesheet->setUpdatesEnabled(true);
+        if (widVisible) ui->cmbStylesheet->setUpdatesEnabled(true);
     }
 
     //QTimer::singleShot(120000, this, SLOT(reloadStylesheets())); // rescan directory every 2 minutes

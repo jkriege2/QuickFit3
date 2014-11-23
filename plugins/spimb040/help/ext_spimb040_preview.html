@@ -25,6 +25,7 @@
 	 </ul>
 	 </p>
 	 <h2>Settings</h2>
+	 <h3>Normal Mode settings</h3>
 	 <p>In the <strong>settings tab</strong> on the right-hand side of the preview window, you set several options for the window and image display:
 	 <ul>
 	   <li>The <strong>color palette</strong> select the type of color coding. </li>
@@ -42,7 +43,22 @@
 	   </li>
 	 </ul>
 	 </p>
+	 <h3>Alignment Mode Settings</h3>
+	 <p>The "alignment modes" are special preconfigurations of the colorscale, frame transfrom and marginal fit mode. They can be used to quickly switch between different imaging modes. They can be configured on the configuration tab and  can be activated with the following buttons in the toolbar:
+	 <ul>
+	     <li><img src=":/spimb040/alignmode_normal.png"> will activate the normal mode.</li>
+	     <li><img src=":/spimb040/alignmode_1.png"> will activate the alignment mode 1.</li>
+	     <li><img src=":/spimb040/alignmode_2.png"> will activate the alignment mode 2.</li>
+	 </ul>
+	 When one of these modes is activated, the preiew window switches to the selected configuration.
+	 </p>
 	 <a name="transforms"></a><h2>Image Transformations</h2>
+	 <p>For alignment purposes you can choose different frame transfrom modes:<ul>
+	   <li><b>left-right half-image</b> separates the image into two halves, one left of the center and one right of the center, each with size width/2 * height. Then the transfrom subtracts the two halves pixel-by-pixel from each other. <i>This mode is useful to align the overlay of a dualview optics.</i></li>
+	   <li><b>top-bottom half-image</b> separates the image into two halves, one above of the center and one below of the center, each with size width * height/2. Then the transfrom subtracts the two halves pixel-by-pixel from each other. <i>This mode is useful to align the overlay of a dualview optics.</i></li>
+	   <li><b>equalize left/right intensity</b> separates the image into two halves, one left of the center and one right of the center, each with size width/2 * height. Then the intensity in each half is scaled, so they both reach the same (higher of the two) average intensity. <i>This mode is useful for dualview optics, where the intensities in the two channels are unequal.</i></li>
+	   <li><b>equalize top/bottom intensity</b> separates the image into two halves, one above of the center and one below of the center, each with size width * height/2. Then the intensity in each half is scaled, so they both reach the same (higher of the two) average intensity. <i>This mode is useful for dualview optics, where the intensities in the two channels are unequal.</i> </li>
+	 </ul></p>
 	 <h2>Masking</h2>
 	 <p>You can also <strong>mask broken pixels</strong>. Then they are not taken into account for the color scaling and statistics. This function can be used to exclude broken pixels from your camera. The mask is altered by these buttons:
 	 <ul>
@@ -65,7 +81,7 @@
 	 </p>
 	 <p></p>
 	 <h2>Saving images/reports</h2>
-	 <p>Finally you can save the current image:
+	 <p>You can save the current image:
 	 <ul>
 	     <li><img src=":/spimb040/saveraw.png"> will save the current raw (unprocessed) frame in different formats (PNG, TIFF, ... color coded or as raw data). Please select the file type in the drop down field of the selection dialog.</li>
 	     <li><img src=":/spimb040/savetransformed.png"> will save the current frame as displayed, i.e. after a possible transformation (see dettings tab) in different formats (PNG, TIFF, ... color coded or as raw data). Please select the file type in the drop down field of the selection dialog.</li>
@@ -73,5 +89,6 @@
 	     <li><img src=":/spimb040/report_print.png"> Will print the contents of the window (including marginals, statistics and fit results).</li>
 	 </ul>
 	 </p>
+	 
   </body>
 </html>

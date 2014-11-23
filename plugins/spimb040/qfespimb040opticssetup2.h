@@ -281,7 +281,7 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         void on_btnConnectCameras_clicked();
         void on_btnDisconnectDevices_clicked();
         void on_btnDisconnectCameras_clicked();
-        void on_chkDetectionFilterWheel_toggled(bool checked);
+        //void on_chkDetectionFilterWheel_toggled(bool checked);
         void on_btnLoadSetup_clicked();
         void on_btnSaveSetup_clicked();
         void configsChanged(QFESPIMB040OpticsSetupItems configs);

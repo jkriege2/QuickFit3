@@ -378,7 +378,7 @@ void QFESPIMB040ImageStackConfigWidget2::on_spinSteps_valueChanged(int value) {
 }
 
 void QFESPIMB040ImageStackConfigWidget2::updateLabel() {
-    bool updt=updatesEnabled();
+    bool updt=updatesEnabled() && isVisible();
     if (updt) setUpdatesEnabled(false);
     double start=stackStart();
     double delta=stackDelta();
@@ -429,7 +429,7 @@ void QFESPIMB040ImageStackConfigWidget2::on_btnConnect_clicked() {
 
 void QFESPIMB040ImageStackConfigWidget2::on_chkUse1_clicked(bool enabled) {
     bool updt=updatesEnabled();
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->btnAcquireNext->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->widStage->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
@@ -439,12 +439,12 @@ void QFESPIMB040ImageStackConfigWidget2::on_chkUse1_clicked(bool enabled) {
     ui->widStage3->setEnabled((ui->chkUse1->isChecked() || ui->chkUse2->isChecked()) && ui->chkStage3->isChecked());
     ui->edtPrefix1->setEnabled(ui->chkUse1->isChecked());
     ui->cmbCam1Settings->setEnabled(ui->chkUse1->isChecked());
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 }
 
 void QFESPIMB040ImageStackConfigWidget2::on_chkUse2_clicked(bool enabled) {
     bool updt=updatesEnabled();
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     ui->btnAcquire->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->btnAcquireNext->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
     ui->widStage->setEnabled(ui->chkUse1->isChecked() || ui->chkUse2->isChecked());
@@ -454,7 +454,7 @@ void QFESPIMB040ImageStackConfigWidget2::on_chkUse2_clicked(bool enabled) {
     ui->widStage3->setEnabled((ui->chkUse1->isChecked() || ui->chkUse2->isChecked()) && ui->chkStage3->isChecked());
     ui->edtPrefix2->setEnabled(ui->chkUse2->isChecked());
     ui->cmbCam2Settings->setEnabled(ui->chkUse2->isChecked());
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 }
 
 void QFESPIMB040ImageStackConfigWidget2::on_chkStage2_clicked(bool enabled) {
@@ -472,7 +472,7 @@ void QFESPIMB040ImageStackConfigWidget2::checkStage() {
     //if (stageConfig) stageConfig->lockStages();
 
     bool updt=updatesEnabled();
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     bool conn=false;
     bool found;
     if (stage()) {
@@ -537,7 +537,7 @@ void QFESPIMB040ImageStackConfigWidget2::checkStage() {
     }
     //if (stageConfig) stageConfig->unlockStages();
 
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 
     QTimer::singleShot(STAGE_INTERVAL_MS, this, SLOT(checkStage()));
 }
@@ -893,7 +893,7 @@ QString QFESPIMB040ImageStackConfigWidget2::currentConfigName(int camera) const 
 
 void QFESPIMB040ImageStackConfigWidget2::lightpathesChanged(QFESPIMB040OpticsSetupItems lightpathes) {
     bool updt=updatesEnabled();
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     QString idx1=ui->cmbLightpath1->currentText();
     QString idx2=ui->cmbLightpath2->currentText();
     QString idx3=ui->cmbLightpath3->currentText();
@@ -910,7 +910,7 @@ void QFESPIMB040ImageStackConfigWidget2::lightpathesChanged(QFESPIMB040OpticsSet
     ui->cmbLightpath1->setCurrentIndex(qMax(0, ui->cmbLightpath1->findText(idx1)));
     ui->cmbLightpath2->setCurrentIndex(qMax(0, ui->cmbLightpath2->findText(idx2)));
     ui->cmbLightpath3->setCurrentIndex(qMax(0, ui->cmbLightpath3->findText(idx3)));
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 
 }
 

@@ -846,7 +846,7 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
     if (useThread) return;
 
 
-    bool updt=updatesEnabled(); setUpdatesEnabled(false);
+    bool updt=updatesEnabled(); bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     bool anyconn=false;
 
         QFExtensionLinearStage* stage;
@@ -931,7 +931,7 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
 
 
         updateStates();
-        setUpdatesEnabled(updt);
+        if (widVisible) setUpdatesEnabled(updt);
 
     /*if ((!locked) && anyconn && automatic) {
         QTimer::singleShot(stageStateUpdateInterval, this, SLOT(displayAxisStates()));

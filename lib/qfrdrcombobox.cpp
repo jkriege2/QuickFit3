@@ -89,7 +89,7 @@ void QFRDRComboBox::refill()
     bool idxOK=true;
     int rdrID=itemData(currentIndex()).toInt(&idxOK);
     if (currentIndex()<0) idxOK=false;
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
 
     clear();
     if (project) disconnect(project, SIGNAL(structureChanged()), this, SLOT(refill()));
@@ -111,7 +111,7 @@ void QFRDRComboBox::refill()
     int idxFound=findData(rdrID);
     if (idxOK && (idxFound>=0)) setCurrentIndex(idxFound);
     else setCurrentIndex(0);
-    setUpdatesEnabled(true);
+    if (widVisible) setUpdatesEnabled(true);
     if (this->project) connect(this->project, SIGNAL(structureChanged()), this, SLOT(refill()));
     setCurrentRDR(rdr);
     if (currentIndex()<0 && count()>0) setCurrentIndex(0);

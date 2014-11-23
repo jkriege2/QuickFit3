@@ -35,7 +35,7 @@ void QFRawDataResultsComboBox::setRDR(QFRawDataRecord *rdr)
 {
     if (this->rdr) disconnect(this->rdr, 0, this, 0);
     QVariant oldData=itemData(currentIndex());
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
 
     this->rdr=rdr;
     if (rdr) {
@@ -61,7 +61,7 @@ void QFRawDataResultsComboBox::setRDR(QFRawDataRecord *rdr)
         evalIDs.clear();
         clear();
     }
-    setUpdatesEnabled(true);
+    if (widVisible) setUpdatesEnabled(true);
     if (rdr) connect(rdr, SIGNAL(rawDataChanged()), this, SLOT(refill()));
 }
 

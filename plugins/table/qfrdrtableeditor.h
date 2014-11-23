@@ -150,6 +150,8 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QFFunctionReferenceTool* functionRef;
         QLabel* labPreScriptHelp;
         QLabel* labPreScriptOK;
+        QPushButton* btnPreScriptParserFHelp;
+        QPushButton* btnPreScriptParserHelp;
         QScrollArea* scrollPreScriptHelp;
 
 

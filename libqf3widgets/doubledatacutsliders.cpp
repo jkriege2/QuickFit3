@@ -172,14 +172,14 @@ void DoubleDataCutSliders::update() {
     bool h=sliderSignals;
     sliderSignals=false;
     bool upd=updatesEnabled();
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     editLow->setRange(min, qMin(userMax, max));
     editHigh->setRange(qMax(userMin, min), max);
     editLow->setValue(userMin);
     //editLow->setSuffix(tr("/%1").arg(max));
     editHigh->setValue(userMax);
     //editHigh->setSuffix(tr("/%1").arg(max));
-    setUpdatesEnabled(upd);
+    if (widVisible) setUpdatesEnabled(upd);
     sliderSignals=h;
     if (sliderSignals) {
         emit slidersChanged(userMin, userMax, min, max);

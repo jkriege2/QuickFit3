@@ -139,7 +139,7 @@ void QF3FilterCombobox::loadFilters() {
     filters=getFilterList(globalfilters, localfilters);
     QString currentO=cmbFilters->currentText();
     bool updt=updatesEnabled();
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     cmbFilters->clear();
     cmbFilters->addItem(QIcon(":/libqf3widgets/filter_none.png"), tr("--- none ---"));
     for (int i=0; i<filters.size(); i++) {
@@ -151,7 +151,7 @@ void QF3FilterCombobox::loadFilters() {
     if (i<0) i=0;
     cmbFilters->setCurrentIndex(i);
     //hbl->update();
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 }
 
 QList<FilterDescription> QF3FilterCombobox::getFilterList(QString globalfilters, QString localfilters) {

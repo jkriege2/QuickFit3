@@ -226,7 +226,7 @@ void QFFilterChangerConfigWidget::createActions() {
 
 void QFFilterChangerConfigWidget::updateStates() {
     bool updt=updatesEnabled();
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     QFExtensionFilterChanger* FilterChanger;
     int FilterChangerID;
     bool conn;
@@ -255,12 +255,12 @@ void QFFilterChangerConfigWidget::updateStates() {
     cmbFilterChanger->setEnabled(!conn);
     actSetFilters->setEnabled(conn);
     cmbFilter->setEnabled(conn);
-    setUpdatesEnabled(updt);
+    if (widVisible) setUpdatesEnabled(updt);
 }
 
 void QFFilterChangerConfigWidget::updateFilters() {
     bool updt=updatesEnabled();
-    setUpdatesEnabled(false);
+    bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
     QString idx=cmbFilter->currentText();
     disconnect(cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(FilterChangerNewFilterSelected(int)));
     cmbFilter->clear();
@@ -286,7 +286,7 @@ void QFFilterChangerConfigWidget::updateFilters() {
     cmbFilter->setCurrentIndex(cmbFilter->findText(idx));
     connect(cmbFilter, SIGNAL(currentIndexChanged(int)), this, SLOT(FilterChangerNewFilterSelected(int)));
     updateStates();
-    setUpdatesEnabled(true);
+   if (widVisible) setUpdatesEnabled(true);
 }
 
 void QFFilterChangerConfigWidget::selectFilters() {

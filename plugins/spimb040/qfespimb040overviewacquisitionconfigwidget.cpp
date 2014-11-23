@@ -454,7 +454,7 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::on_chkUse2_toggled(bool enabled
 }
 
 void QFESPIMB040OverviewAcquisitionConfigWidget::updateBackgroundWidgets() {
-    bool updt=updatesEnabled();
+    bool updt=updatesEnabled()&&isVisible();
     if (updt) setUpdatesEnabled(false);
     ui->cmbPreviewSettings1_1->setEnabled(ui->chkLightpathPreview1->isChecked());
     ui->cmbPreviewSettings2_1->setEnabled(ui->chkLightpathPreview1->isChecked());
@@ -468,7 +468,7 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::updateBackgroundWidgets() {
     ui->cmbPreviewSettings2_5->setEnabled(ui->chkLightpathPreview5->isChecked());
     ui->cmbPreviewSettings1_6->setEnabled(ui->chkLightpathPreview6->isChecked());
     ui->cmbPreviewSettings2_6->setEnabled(ui->chkLightpathPreview6->isChecked());
-    if (updt) setUpdatesEnabled(updt);
+    if (updt) setUpdatesEnabled(true);
 }
 
 void QFESPIMB040OverviewAcquisitionConfigWidget::on_chkBackground_toggled(bool enabled) {
@@ -574,15 +574,6 @@ void QFESPIMB040OverviewAcquisitionConfigWidget::updateReplaces()
     setGlobalReplaces(opticsSetup, expDescription, acqDescription);
 }
 
-void QFESPIMB040OverviewAcquisitionConfigWidget::on_btnReset1_clicked()
-{
-    ui->spinFrames->setValue(ui->spinFrames->minimum());
-}
-
-void QFESPIMB040OverviewAcquisitionConfigWidget::on_btnReset2_clicked()
-{
-    ui->spinFrames2->setValue(ui->spinFrames2->minimum());
-}
 
 
 void QFESPIMB040OverviewAcquisitionConfigWidget::on_btnAcq1TestPreview1_pressed()

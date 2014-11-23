@@ -364,16 +364,16 @@ void QFCompleterTextEditWidget::processTab(QKeyEvent *e) {
     }
 }
 
- void QFCompleterTextEditWidget::keyPressEvent(QKeyEvent *e) {
+ void QFCompleterTextEditWidget::keyPressEvent(QKeyEvent *event) {
      if (c && c->popup()->isVisible()) {
          // The following keys are forwarded by the completer to the widget
-        switch (e->key()) {
+        switch (event->key()) {
             case Qt::Key_Enter:
             case Qt::Key_Return:
             case Qt::Key_Escape:
             case Qt::Key_Tab:
             case Qt::Key_Backtab:
-                 e->ignore();
+                 event->ignore();
                  return; // completer widgets handles these keys!
             default:
                 break;
@@ -381,13 +381,13 @@ void QFCompleterTextEditWidget::processTab(QKeyEvent *e) {
      } else {
         // if the completer is not visible, we may treat some special
         // key press events (convert TAB to spaces ...
-        if (e->key()==Qt::Key_Tab) { // convert TAB to <tabwidth> spaces
-            processTab(e);
+        if (event->key()==Qt::Key_Tab) { // convert TAB to <tabwidth> spaces
+            processTab(event);
             return; // let the completer do default behavior
-        } else if (e->key()==Qt::Key_Backtab || (e->key()==Qt::Key_Tab && e->modifiers()==Qt::ShiftModifier)) {
+        } else if (event->key()==Qt::Key_Backtab || (event->key()==Qt::Key_Tab && event->modifiers()==Qt::ShiftModifier)) {
             indentDec();
             return; // let the completer do default behavior
-        } else if (e->key()==Qt::Key_Return || e->key()==Qt::Key_Enter) {
+        } else if (event->key()==Qt::Key_Return || event->key()==Qt::Key_Enter) {
             // indent when last non-space character in current line is '{'
             QTextCursor tc = textCursor();
 
@@ -473,16 +473,16 @@ void QFCompleterTextEditWidget::processTab(QKeyEvent *e) {
      }
 
 
-     bool isShortcut = ((e->modifiers() & Qt::ControlModifier) && e->key() == Qt::Key_E); // CTRL+E
+     bool isShortcut = ((event->modifiers() & Qt::ControlModifier) && event->key() == Qt::Key_E); // CTRL+E
      if (!c || !isShortcut) // dont process the shortcut when we have a completer
-         QTextEdit::keyPressEvent(e);
+         QTextEdit::keyPressEvent(event);
 
-     const bool ctrlOrShift = e->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
-     if (!c || (ctrlOrShift && e->text().isEmpty()))
+     const bool ctrlOrShift = event->modifiers() & (Qt::ControlModifier | Qt::ShiftModifier);
+     if (!c || (ctrlOrShift && event->text().isEmpty()))
          return;
 
      static QString eow("~!@#$%^&*()+{}|:\"<>?,./;'[]\\-="); // end of word
-     bool hasModifier = (e->modifiers() != Qt::NoModifier) && !ctrlOrShift;
+     bool hasModifier = (event->modifiers() != Qt::NoModifier) && !ctrlOrShift;
      QString completionPrefix = textUnderCursor();
      /*QMessageBox::information(this, "", tr("completionPrefix=%1\nisShortcut=%2\nctrlOrShif=%3\nhasModifier=%4")
                                             .arg(completionPrefix)
@@ -491,8 +491,8 @@ void QFCompleterTextEditWidget::processTab(QKeyEvent *e) {
                                             .arg(hasModifier)
                                             );*/
 
-     if (!isShortcut && (hasModifier || e->text().isEmpty()|| completionPrefix.length() < 2
-                       || eow.contains(e->text().right(1)))) {
+     if (!isShortcut && (hasModifier || event->text().isEmpty()|| completionPrefix.length() < 2
+                       || eow.contains(event->text().right(1)))) {
          c->popup()->hide();
          return;
      }

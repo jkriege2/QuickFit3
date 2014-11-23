@@ -25,6 +25,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfenhancedlineedit.h"
 #include <QTextCursor>
 #include "qfenhancedplaintextedit.h"
+#include "programoptions.h"
 QFFunctionReferenceToolDocSearchThread::QFFunctionReferenceToolDocSearchThread(QStringList files, QObject *parent):
     QThread(parent)
 {
@@ -108,7 +109,7 @@ QFFunctionReferenceTool::QFFunctionReferenceTool(QObject *parent) :
     mprogress=NULL;
     searching=false;
     compExpression=new QFCompleterFromFile(this);
-    defaultHelp="";
+    defaultHelp=ProgramOptions::getInstance()->getMainHelpDirectory()+QString("/mathparser.html");
     rxDefinition=QRegExp("<!--\\s*func:([\\w]*)\\s*-->(.*)<!--\\s*/func:\\1\\s*-->");
     rxDefinition.setMinimal(false);
     rxDefinition.setCaseSensitivity(Qt::CaseInsensitive);

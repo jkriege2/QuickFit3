@@ -137,8 +137,6 @@ class QFESPIMB040OverviewAcquisitionConfigWidget : public QWidget, public QFESPI
         void on_chkBackground_toggled(bool enabled);
         void updateBackgroundWidgets();
         void updateReplaces();
-        void on_btnReset1_clicked();
-        void on_btnReset2_clicked();
 
 
 
