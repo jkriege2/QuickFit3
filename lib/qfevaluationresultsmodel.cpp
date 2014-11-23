@@ -213,7 +213,7 @@ QVariant QFEvaluationResultsModel::headerData(int section, Qt::Orientation orien
 
 
     if (!evaluation) return QVariant();
-    if (role==Qt::DisplayRole) {
+    if (role==Qt::DisplayRole || role==Qt::EditRole || role==Qt::ToolTipRole) {
         if (orientation==Qt::Vertical) {
             if (section<lastResults.size()) {
                 if (lastResults[section].first) {

@@ -218,7 +218,7 @@ void QFFCSMSDEvaluationFitAllMSDDialog::replotGraph()
     ui->pltDistribution->getXAxis()->set_labelFontSize(11);
     ui->pltDistribution->getXAxis()->set_tickLabelFontSize(10);
     ui->pltDistribution->getXAxis()->set_logAxis(true);
-    ui->pltDistribution->getYAxis()->set_axisLabel(tr("MSD $\\langle r^2(\\tau)\\rangle$ [\\mu m^2]"));
+    ui->pltDistribution->getYAxis()->set_axisLabel(tr("MSD $\\langle r^2(\\tau)\\rangle$ [{\\mu}m^2]"));
     ui->pltDistribution->getYAxis()->set_labelFontSize(11);
     ui->pltDistribution->getYAxis()->set_tickLabelFontSize(10);
     ui->pltDistribution->getYAxis()->set_logAxis(true);

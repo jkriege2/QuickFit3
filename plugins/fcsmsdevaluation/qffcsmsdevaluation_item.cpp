@@ -605,7 +605,6 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
         } else if (model==2) { // simple 2D model with triplet-correction
 
             // first we read the stored fit parameters:
-            const double gamma=getFitValue(record, index, model, "focus_struct_fac");
             const double wxy=getFitValue(record, index, model, "focus_width")/1.0e3;
             const double N_particle=getFitValue(record,index,model,"n_particle");;
             const double fT=getFitValue(record,index,model,"nonfl_theta1");
@@ -644,7 +643,7 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
             const double a=getFitValue(record,index,model,"pixel_size")/1.0e3;
 
             const double Veff=SPIMFCS_newVeff(a, wxy, wz);
-            const double C=N/Veff;
+            const double C=N_particle/Veff;
             const double sqpi=sqrt(M_PI);
             const double pre=1.0/(sqpi*wz*qfSqr(a)*C);
 
@@ -666,7 +665,7 @@ void QFFCSMSDEvaluationItem::evaluateModel(QFRawDataRecord *record, int index, i
             const double a=getFitValue(record,index,model,"pixel_size")/1.0e3;
 
             const double Veff=TIRFCS_newAeff(a, wxy);
-            const double C=N/Veff;
+            const double C=N_particle/Veff;
             const double sqpi=sqrt(M_PI);
             const double pre=1.0/(qfSqr(a)*C);
 

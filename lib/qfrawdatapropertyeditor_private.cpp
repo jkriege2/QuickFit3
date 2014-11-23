@@ -153,6 +153,8 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     labTopIcon=new QLabel(d);
     vl->addWidget(labTopIcon);
     labTop=new QLabel(d);
+   /* labTop->setElided(true);
+    labTop->setElidedMode(Qt::ElideMiddle);*/
     vl->addWidget(labTop);
     vl->addStretch();
 

@@ -78,6 +78,7 @@ void QFRawDataPropertyEditor::resizeEvent ( QResizeEvent * event ) {
     p->labAveragedresults->setMaximumWidth(event->size().width());
     p->cmbGroup->setMaximumWidth(event->size().width()/3);
     QWidget::resizeEvent(event);
+    p->labTop->setMaximumWidth(event->size().width()/2);
 }
 
 

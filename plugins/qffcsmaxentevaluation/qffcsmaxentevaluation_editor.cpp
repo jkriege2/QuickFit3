@@ -161,10 +161,10 @@ bool QFFCSMaxEntEvaluationEditor::getPlotDataSpecs(QStringList *optionNames, QLi
         *optionNames<<tr("autocorrelation curves + fit");
     }
     if (listPlotOptions) {
-        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("diffusion time \\tau_D [\\mu s]"), tr("MaxEnt distribution $p(\\tau_D)$"), true, false);
-        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("diffusion coefficient D [\\mu m^2/s]"), tr("MaxEnt distribution $p(D)$"), true, false);
-        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("correlation curve $g(\\tau)$"), true, false);
-        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("correlation curve $g(\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("diffusion time $\\tau_D$ [\\mu s]"), tr("MaxEnt distribution $p(\\tau_D)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("diffusion coefficient $D$\\mumu}m^2/s]"), tr("MaxEnt distribution $p(D)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time $\\tau$ [s]"), tr("correlation curve $g(\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time $\\tau$ [s]"), tr("correlation curve $g(\\tau)$"), true, false);
     }
     return true;
 }
@@ -1046,7 +1046,7 @@ void QFFCSMaxEntEvaluationEditor::updateFitFunctions() {
                 g_dist->set_title("MaxEnt distribution");
                 if (cmbXAxisType->currentIndex()==1) {
                     g_dist->set_xColumn(c_distD);
-                    pltDistribution->getXAxis()->set_axisLabel(tr("diffusion coefficient $D$ [\\mu m^2/s]"));
+                    pltDistribution->getXAxis()->set_axisLabel(tr("diffusion coefficient $D$ [{\\mu}m^2/s]"));
                 } else {
                     g_dist->set_xColumn(c_disttau);
                     pltDistribution->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));

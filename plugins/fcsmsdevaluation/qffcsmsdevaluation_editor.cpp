@@ -81,6 +81,13 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
 
     int datacut_min=datacut->get_userMin();
     int datacut_max=datacut->get_userMax();
+    int data_start=sliderDist->get_userMin();
+    int data_end=sliderDist->get_userMax();
+    int msd_start=sliderDist->get_userMin();
+    int msd_end=sliderDist->get_userMax();
+
+    int wid=spinFitWidth->value();
+    int first=0;
 
     try {
 
@@ -114,9 +121,15 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
             double* modelVals=(double*)qfMalloc(N*sizeof(double));
             QVector<double> dist=eval->getMSD(record, index, model);
             QVector<double> distTau=eval->getMSDTaus(record, index, model);
-
+            QVector<double> fitTau, fitTauStart, fitTauEnd;
+            QVector<double> fitD, fitA;
             eval->evaluateModel(record, index, model, tauvals, modelVals, N, distTau.data(), dist.data(), dist.size());
 
+            int last=distTau.size()-1;
+            if (chkFitRange->isChecked()) {
+                first=sliderDist->get_userMin();
+                last=sliderDist->get_userMax();
+            }
 
 
 
@@ -152,7 +165,109 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                 }
                 item.name=QString("\\verb{%1: norm. ACF}").arg(record->getName());
                 plotdata.append(item);
+            } else if (option>2 && distTau.size()>1 && dist.size()>1 && wid>=3 && eval->hasResults()) {
+
+                eval->calcMSDFits(fitTau, fitA, fitD, record, index, eval->getCurrentModel(), eval->getFitWidth(record, index) , qMax(1, eval->getFitWidth(record, index)/7), first, eval->getFitType(record, index), &fitTauStart, &fitTauEnd);
+
+                QVector<double> mored;
+                if (option==3) {
+                    mored=dist;
+                    for (int i=0; i<dist.size(); i++) {
+                        mored[i]=dist[i]/(6.0*distTau[i]);
+                    }
+                    QFGetPlotdataInterface::GetPlotDataItem item;
+                    item.x=acftau;
+                    item.y=mored;
+                    item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(6\\tau)").arg(record->getName());
+                    plotdata.append(item);
+                } else if (option==4) {
+                    mored=dist;
+                    for (int i=0; i<dist.size(); i++) {
+                        mored[i]=dist[i]/(4.0*distTau[i]);
+                    }
+                    QFGetPlotdataInterface::GetPlotDataItem item;
+                    item.x=acftau;
+                    item.y=mored;
+                    item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(4\\tau)").arg(record->getName());
+                    plotdata.append(item);
+
+                } else if (option==5) {
+                    mored=dist;
+                    double P=eval->getTheoryPre(0, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    double D=eval->getTheoryD(0, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    for (int i=0; i<dist.size(); i++) {
+                        mored[i]=dist[i]/(P*D*distTau[i]);
+                    }
+                    QFGetPlotdataInterface::GetPlotDataItem item;
+                    item.x=acftau;
+                    item.y=mored;
+                    item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(P\\cdot D_0\\cdot\\tau)").arg(record->getName());
+                    plotdata.append(item);
+                } else if (option==6) {
+                    mored=dist;
+                    double P=eval->getTheoryPre(1, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    double D=eval->getTheoryD(1, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    for (int i=0; i<dist.size(); i++) {
+                        mored[i]=dist[i]/(P*D*distTau[i]);
+                    }
+                    QFGetPlotdataInterface::GetPlotDataItem item;
+                    item.x=acftau;
+                    item.y=mored;
+                    item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(P\\cdot D_1\\cdot\\tau)").arg(record->getName());
+                    plotdata.append(item);
+
+                } else if (option==7) {
+                    mored=dist;
+                    double P=eval->getTheoryPre(2, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    double D=eval->getTheoryD(2, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    for (int i=0; i<dist.size(); i++) {
+                        mored[i]=dist[i]/(P*D*distTau[i]);
+                    }
+                    QFGetPlotdataInterface::GetPlotDataItem item;
+                    item.x=acftau;
+                    item.y=mored;
+                    item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(P\\cdot D_2\\cdot\\tau)").arg(record->getName());
+                    plotdata.append(item);
+                } else if (option==8) {
+                    mored=dist;
+                    double P=eval->getTheoryPre(3, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    double D=eval->getTheoryD(3, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    for (int i=0; i<dist.size(); i++) {
+                        mored[i]=dist[i]/(P*D*distTau[i]);
+                    }
+                    QFGetPlotdataInterface::GetPlotDataItem item;
+                    item.x=acftau;
+                    item.y=mored;
+                    item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(P\\cdot D_3\\cdot\\tau)").arg(record->getName());
+                    plotdata.append(item);
+                } else if (option==9) {
+                    mored=dist;
+                    double P=eval->getTheoryPre(0, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    double D=eval->getTheoryD(0, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    for (int i=0; i<dist.size(); i++) {
+                        mored[i]=dist[i]-(P*D*distTau[i]);
+                    }
+                    QFGetPlotdataInterface::GetPlotDataItem item;
+                    item.x=acftau;
+                    item.y=mored;
+                    item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle-P\\cdot D_0\\cdot\\tau").arg(record->getName());
+                    plotdata.append(item);
+                } else if (option==10) {
+                    QFGetPlotdataInterface::GetPlotDataItem item;
+                    item.x=fitTau;
+                    item.y=fitD;
+                    item.name=QString("\\verb{%1: local D}").arg(record->getName());
+                    plotdata.append(item);
+                } else if (option==11) {
+                    QFGetPlotdataInterface::GetPlotDataItem item;
+                    item.x=fitTau;
+                    item.y=fitA;
+                    item.name=QString("\\verb{%1: local \\alpha}").arg(record->getName());
+                    plotdata.append(item);
+                }
+
             }
+
 
             qfFree(weights);
             //fit_stat.free();
@@ -169,11 +284,30 @@ bool QFFCSMSDEvaluationEditor::getPlotDataSpecs(QStringList *optionNames, QList<
         *optionNames<<tr("mean squared displacements (MSDs)");
         *optionNames<<tr("autocorrelation data");
         *optionNames<<tr("normalized autocorrelation data");
+        *optionNames<<tr("MSD/(6*tau)");
+        *optionNames<<tr("MSD/(4*tau)");
+        *optionNames<<tr("MSD/(P*D0*tau)");
+        *optionNames<<tr("MSD/(P*D1*tau)");
+        *optionNames<<tr("MSD/(P*D2*tau)");
+        *optionNames<<tr("MSD/(P*D3*tau)");
+        *optionNames<<tr("MSD-(P*D0*tau)");
+        *optionNames<<tr("local D(tau)");
+        *optionNames<<tr("local alpha(tau)");
+
     }
     if (listPlotOptions) {
         *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("mean squared displacements $\\langle r^2\\rangle(\\tau)$"), true, true);
         *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("correlation curve $g(\\tau)$"), true, false);
         *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("norm. correlation curve $N\\cdot g(\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("norm. MSD $\\langle r^2\\rangle(\\tau)/(6\\tau)$ [{\\mu}m^2/s]"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("norm. MSD $\\langle r^2\\rangle(\\tau)/(4\\tau)$ [{\\mu}m^2/s]"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("norm. MSD $\\langle r^2\\rangle(\\tau)/(P{\\cdot}D_0\\cdot\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("norm. MSD $\\langle r^2\\rangle(\\tau)/(P{\\cdot}D_1\\cdot\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("norm. MSD $\\langle r^2\\rangle(\\tau)/(P{\\cdot}D_2\\cdot\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("norm. MSD $\\langle r^2\\rangle(\\tau)/(P{\\cdot}D_3\\cdot\\tau)$"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("additive MSD $\\langle r^2\\rangle(\\tau)-(P{\\cdot}D_0\\cdot\\tau)$ [{\\mu}m^2]"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("local diffusion coefficient $D(\\tau)$ [{\\mu}m^2/s]"), true, false);
+        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("local anomality coefficient $\\alpha(\\tau)$"), true, false);
     }
     return true;
 }
@@ -304,7 +438,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     pltDistribution->getXAxis()->set_labelFontSize(11);
     pltDistribution->getXAxis()->set_tickLabelFontSize(10);
     pltDistribution->getXAxis()->set_logAxis(true);
-    pltDistribution->getYAxis()->set_axisLabel(tr("MSD $\\langle r^2(\\tau)\\rangle$ [\\mu m^2]"));
+    pltDistribution->getYAxis()->set_axisLabel(tr("MSD $\\langle r^2(\\tau)\\rangle$ [{\\mu}m^2]"));
     pltDistribution->getYAxis()->set_labelFontSize(11);
     pltDistribution->getYAxis()->set_tickLabelFontSize(10);
     pltDistribution->getYAxis()->set_logAxis(true);
@@ -365,7 +499,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     pltDistResults->getXAxis()->set_labelFontSize(11);
     pltDistResults->getXAxis()->set_tickLabelFontSize(10);
     pltDistResults->getXAxis()->set_logAxis(true);
-    pltDistResults->getYAxis()->set_axisLabel("");//tr("MSD $\\langle r^2(\\tau)\\rangle$ [\\mu m^2]"));
+    pltDistResults->getYAxis()->set_axisLabel("");//tr("MSD $\\langle r^2(\\tau)\\rangle$ [{\\mu}m^2]"));
     pltDistResults->getYAxis()->set_labelFontSize(11);
     pltDistResults->getYAxis()->set_tickLabelFontSize(10);
     pltDistResults->getYAxis()->set_logAxis(false);
@@ -2230,7 +2364,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
             g_msdfit->set_symbolSize(7);
             g_msdfit->set_color(QColor("red"));
             pltDistResults->addGraph(g_msdfit);
-            pltDistResults->getYAxis()->set_axisLabel("local $D$ [\\mu m^2/s]");
+            pltDistResults->getYAxis()->set_axisLabel("local $D$ [{\\mu}m^2/s]");
         } else if (cmbDistResultsMode->currentIndex()>=2 && cmbDistResultsMode->currentIndex()<=8 )  {
             JKQTPxyLineGraph* g_msdtransform=new JKQTPxyLineGraph(pltDistribution->get_plotter());
             if (cmbDistResultsMode->currentIndex()==2) {
@@ -2238,14 +2372,14 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
                 g_msdtransform->set_xColumn(c_tau);
                 g_msdtransform->set_yColumn(c_msdtransform6tau);
                 g_msdtransform->set_color(QColor("red"));
-                pltDistResults->getYAxis()->set_axisLabel("\\langle r^2(\\tau)\\rangle/(6\\tau) [\\mu m^2]");
+                pltDistResults->getYAxis()->set_axisLabel("\\langle r^2(\\tau)\\rangle/(6\\tau) [{\\mu}m^2]");
                 pltDistResults->getYAxis()->set_logAxis(true);
             } else if (cmbDistResultsMode->currentIndex()==3) {
                 g_msdtransform->set_title("\\langle r^2(\\tau)\\rangle/(4\\tau)");
                 g_msdtransform->set_xColumn(c_tau);
                 g_msdtransform->set_yColumn(c_msdtransform4tau);
                 g_msdtransform->set_color(QColor("red"));
-                pltDistResults->getYAxis()->set_axisLabel("\\langle r^2(\\tau)\\rangle/(4\\tau) [\\mu m^2]");
+                pltDistResults->getYAxis()->set_axisLabel("\\langle r^2(\\tau)\\rangle/(4\\tau) [{\\mu}m^2]");
                 pltDistResults->getYAxis()->set_logAxis(true);
             } else if (cmbDistResultsMode->currentIndex()==4) {
                 g_msdtransform->set_title("\\langle r^2(\\tau)\\rangle/(P_0D_0\\tau)");
@@ -2280,7 +2414,7 @@ void QFFCSMSDEvaluationEditor::updateDistributionResults() {
                 g_msdtransform->set_xColumn(c_tau);
                 g_msdtransform->set_yColumn(c_msdtransformMinusPD0tau);
                 g_msdtransform->set_color(QColor("red"));
-                pltDistResults->getYAxis()->set_axisLabel("\\langle r^2(\\tau)\\rangle - P_0D_0\\tau [\\mu m^2]");
+                pltDistResults->getYAxis()->set_axisLabel("\\langle r^2(\\tau)\\rangle - P_0D_0\\tau [{\\mu}m^2]");
                 pltDistResults->getYAxis()->set_logAxis(false);
             }
 
@@ -2361,7 +2495,7 @@ void QFFCSMSDEvaluationEditor::updateDistribution() {
 
             JKQTPxFunctionLineGraph* g_dist=new JKQTPxFunctionLineGraph(pltDistribution->get_plotter());
             g_dist->set_drawLine(true);
-            g_dist->set_title(tr("MSD %1, D=%2\\mu m^2/s, \\alpha=%3").arg(i+1).arg(numD[i]->value()).arg(numAlpha[i]->value()));
+            g_dist->set_title(tr("MSD %1, D=%2{\\mu}m^2/s, \\alpha=%3").arg(i+1).arg(numD[i]->value()).arg(numAlpha[i]->value()));
             g_dist->setSpecialFunction(JKQTPxFunctionLineGraph::PowerLaw);
             QVector<double> vecP;
             vecP<<D<<a;

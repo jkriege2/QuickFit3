@@ -60,6 +60,7 @@ void QFEvaluationPropertyEditorPrivate::resultsChanged(QFRawDataRecord* record, 
     if (!d->resultsModel) return;
     //resultsModel->resultsChanged();
     if (tvResults->model()->columnCount()*tvResults->model()->rowCount()<10000) tvResults->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+    //tvResults->verticalHeader()->resizeSections(QHeaderView::ResizeToContents);
 }
 
 void QFEvaluationPropertyEditorPrivate::refreshResults()
@@ -586,7 +587,10 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
     tvResults->verticalHeader()->setResizeMode(QHeaderView::Interactive);
     tvResults->verticalHeader()->setTextElideMode(Qt::ElideMiddle);
-    tvResults->verticalHeader()->setMaximumWidth(750);
+    tvResults->verticalHeader()->setMaximumWidth(QApplication::desktop()->screenGeometry(QApplication::desktop()->primaryScreen()).width()*0.75);
+
+    tvResults->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
+    tvResults->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
     tvResults->setModel(d->resultsModel);
     tvResults->setContextMenuPolicy(Qt::ActionsContextMenu);
 

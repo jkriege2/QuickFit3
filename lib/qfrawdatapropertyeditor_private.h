@@ -45,6 +45,7 @@
 #include "qfpropertyitemdelegate.h"
 #include "dlg_qffileeditdialog.h"
 #include "qfprojecttreemodel.h"
+#include "qfelidedlabel.h"
 
 class QFRawDataPropertyEditor; // forward
 
