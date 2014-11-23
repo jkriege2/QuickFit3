@@ -40,6 +40,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctionfcspowerlaw.h"
 #include "qffitfunctionfcssimpleexp.h"
 #include "qffitfunctionfcsdiffDAfterpulse.h"
+#include "qffitfunctionfcsdiffDcAfterpulse.h"
 #include "qffitfunctionfcsdiff2d_relbright.h"
 #include "qffitfunctionfcsadiff2d_relbright.h"
 #include "qffitfunctionfcsdiffstretchpp.h"
@@ -52,7 +53,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 QStringList QFPFitFunctionFCS::getIDs() const {
     QStringList res;
-    res<<"fcs_diff"<<"fcs_diff2d"<<"fcs_adiff_diffbright"<<"fcs_diff_diffbright"<<"fcs_diff2d_diffbright"<<"fcs_diff_d"<<"fcs_diff_d_afterpulse"<<"fcs_diff_d_wz"<<"fcs_diff_d_wz_afterpulse"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff"<<"fcs_diffflow"<<"fcs_diffflowv"<<"fcs_diffrot"<<"fcs_oscillation"<<"fcs_cs_diff_d"<<"fcs_diff_cs_d_wz"<<"fcs_simpleexp"<<"fcs_exp"<<"fcs_powerlaw"<<"fcs_diff_stretchpp"<<"fcs_diff2d_stretchpp"<<"fcs_adiff2d"<<"fcs_adiff2d_diffbright";
+    res<<"fcs_diff"<<"fcs_diff2d"<<"fcs_adiff_diffbright"<<"fcs_diff_diffbright"<<"fcs_diff2d_diffbright"<<"fcs_diff_d"<<"fcs_diff_d_afterpulse"<<"fcs_diff_d_c_afterpulse"<<"fcs_diff_d_wz"<<"fcs_diff_d_wz_afterpulse"<<"fcs_diff_d_wz_c_afterpulse"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff"<<"fcs_diffflow"<<"fcs_diffflowv"<<"fcs_diffrot"<<"fcs_oscillation"<<"fcs_cs_diff_d"<<"fcs_diff_cs_d_wz"<<"fcs_simpleexp"<<"fcs_exp"<<"fcs_powerlaw"<<"fcs_diff_stretchpp"<<"fcs_diff2d_stretchpp"<<"fcs_adiff2d"<<"fcs_adiff2d_diffbright";
     return res;
 }
 
@@ -99,6 +100,8 @@ QFFitFunction* QFPFitFunctionFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionFCSDiffDAfterPulse(true);
     } else if (id=="fcs_diff_d_wz_afterpulse") {
         return new QFFitFunctionFCSDiffDAfterPulse(false);
+    } else if (id=="fcs_diff_d_wz_c_afterpulse") {
+        return new QFFitFunctionFCSDiffDcAfterPulse(false);
     } else if (id=="fcs_diff_diffbright") {
         return new QFFitFunctionFCSDiffDifferentBrightness();
     } else if (id=="fcs_diff2d_diffbright") {

@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
 
-    last modification: $LastChangedDate$  (revision $Rev$)
+    last modification: $LastChangedDate: 2014-11-09 19:22:45 +0100 (So, 09 Nov 2014) $  (revision $Rev: 3606 $)
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -19,7 +19,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "qffitfunction2ffccsnormaldiff3d.h"
+#include "qffitfunction2ffccsnormaldiff3d_c.h"
 #include "qftools.h"
 #include <cmath>
 #include <QDebug>
@@ -32,7 +32,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #define NAVOGADRO (6.02214179e23)
 
-QFFitFunctionFCCSNormalDiff3D2Focus::QFFitFunctionFCCSNormalDiff3D2Focus(bool hasGamma) {
+QFFitFunctionFCCSNormalDiff3D2Focus_c::QFFitFunctionFCCSNormalDiff3D2Focus_c(bool hasGamma) {
     //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(IntCombo,     "n_components",            "number of diffusing components",                        "components",               "",            "",                      false,     true,         false,             QFFitFunction::NoError,      false, 1,            1,        3,        1,   1,      2);
     #define FCSDiff_n_components 0
@@ -69,7 +69,7 @@ QFFitFunctionFCCSNormalDiff3D2Focus::QFFitFunctionFCCSNormalDiff3D2Focus(bool ha
     } else {
         addParameter(FloatNumber,  "focus_width",             "focus: lateral radius",                                 "w<sub>x,y</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 250,          0,        1e4,      1    );
         #define FCSDiff_focus_width 11
-        addParameter(FloatNumber,  "focus_height",            "focus: longitudinal radius",                            "w<sub>z</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 6*250,          0,        1e4,      1    );
+        addParameter(FloatNumber,  "focus_height",            "focus: longitudinal radius",                            "w<sub>z</sub>",          "nm",         "nm",                     false,      false,         false,              QFFitFunction::EditError,    true, 6*250,          0,        1e4,      1    );
         #define FCSDiff_focus_height 12
         addParameter(FloatNumber,  "focus_struct_fac",        "focus: axial ratio",                                    "&gamma;",                  "",           "",                       false,      false,         false,              QFFitFunction::DisplayError,    true, 6,            0.01,     100,      0.5  );
         #define FCSDiff_focus_struct_fac 13
@@ -77,7 +77,7 @@ QFFitFunctionFCCSNormalDiff3D2Focus::QFFitFunctionFCCSNormalDiff3D2Focus(bool ha
 
     addParameter(FloatNumber,  "focus_volume",            "focus: effective volume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
     #define FCSDiff_focus_volume 14
-    addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     true,    true,        true,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
     #define FCSDiff_concentration 15
     addParameter(FloatNumber,  "diff_tau1",               "diffusion time of first component",                     "&tau;<sub>D,1</sub>",      "usec",        "&mu;s",                 false,    false,        false,              QFFitFunction::DisplayError, false, 30,           1,        1e5,      1,   0        );
     #define FCSDiff_diff_tau1 16
@@ -98,26 +98,27 @@ QFFitFunctionFCCSNormalDiff3D2Focus::QFFitFunctionFCCSNormalDiff3D2Focus(bool ha
     #define FCSDiff_cpm 23
 }
 
-QString QFFitFunctionFCCSNormalDiff3D2Focus::id() const {
-    if (hasGamma) return QString("fccs_2f_diff3d");
-    return QString("fccs_2f_diff3d_wz");
+QString QFFitFunctionFCCSNormalDiff3D2Focus_c::id() const {
+    if (hasGamma) return QString("fccs_2f_diff3d_gamma_c");
+    return QString("fccs_2f_diff3d_wxy_c");
 }
 
-QString QFFitFunctionFCCSNormalDiff3D2Focus::name() const {
+QString QFFitFunctionFCCSNormalDiff3D2Focus_c::name() const {
     if (hasGamma) return  QString("2focus-FCS: 3D Normal Diffusion, D and gamma as parameter");
-    return QString("2focus-FCS: 3D Normal Diffusion, D and wz as parameter");
+    return QString("2focus-FCS: 3D Normal Diffusion, D, wxy & c as parameter");
 }
 
-double QFFitFunctionFCCSNormalDiff3D2Focus::evaluate(double t, const double* data) const {
+double QFFitFunctionFCCSNormalDiff3D2Focus_c::evaluate(double t, const double* data) const {
     const int comp=data[FCSDiff_n_components];
     const double N=data[FCSDiff_n_particle];
-    const double D1=data[FCSDiff_diff_coeff1]; // in µm²/s
+    const double D1=data[FCSDiff_diff_coeff1]; // in ï¿½mï¿½/s
     const double rho2=data[FCSDiff_diff_rho2];
     const double D2=data[FCSDiff_diff_coeff2];
     const double rho3=data[FCSDiff_diff_rho3];
     const double D3=data[FCSDiff_diff_coeff3];
-    const double wxy=data[FCSDiff_focus_width]/1000.0;
-    const double wz=data[FCSDiff_focus_height]/1000.0;
+    //const double wxy=data[FCSDiff_focus_width]/1000.0;
+    //const double wz=data[FCSDiff_focus_height]/1000.0;
+    double c=data[FCSDiff_concentration]*(NAVOGADRO * 1.0e-24);
     const double dxy=data[FCSDiff_focus_distance]/1000.0;
     const double background1=data[FCSDiff_background1];
     const double cr1=data[FCSDiff_count_rate1];
@@ -125,17 +126,27 @@ double QFFitFunctionFCCSNormalDiff3D2Focus::evaluate(double t, const double* dat
     const double cr2=data[FCSDiff_count_rate2];
     double backfactor=(cr1-background1)/(cr1) * (cr2-background2)/(cr2);
     if (fabs(cr1)<1e-15 || fabs(cr2)<1e-15) backfactor=1;
+
+    double wxy=data[FCSDiff_focus_width]/1E3;
     double gamma=data[FCSDiff_focus_struct_fac];
-    if (!hasGamma) {
-        gamma=wz/wxy;
+    double Veff = 0.0;
+    if(c!=0) Veff = N/c;
+    const double pi32=sqrt(cube(M_PI));
+    if (hasGamma) {
+        //qDebug()<<"We have a gamma!";
+        wxy=pow(Veff/(pi32*gamma),1.0/3.0);
+    } else {
+        gamma=Veff/(pi32*cube(wxy));
     }
+    double const wz=gamma*wxy;
+    //qDebug()<<"NEW: wxy="<<wxy<<" ,wz="<<wz<<", gamma="<<gamma<<" ,D="<<D1;
+
     if (gamma==0) gamma=1;
     const double gamma2=sqr(gamma);
     const double wxy2=sqr(wxy);
     const double dxy2=sqr(dxy);
 
     const double offset=data[FCSDiff_offset];
-    //qDebug()<<"OLD: wxy="<<wxy<<" ,wz="<<wz<<", gamma="<<gamma<<" ,D="<<D1;
 
     double relD1=0;
     if (D1!=0) relD1=4.0*D1*t/wxy2;
@@ -161,13 +172,13 @@ double QFFitFunctionFCCSNormalDiff3D2Focus::evaluate(double t, const double* dat
 
 
 
-void QFFitFunctionFCCSNormalDiff3D2Focus::calcParameter(double* data, double* error) const {
+void QFFitFunctionFCCSNormalDiff3D2Focus_c::calcParameter(double* data, double* error) const {
     int comp=data[FCSDiff_n_components];
     double N=data[FCSDiff_n_particle];
     double eN=0;
     double rho1=1.0;
     double erho1=0;
-    double D1=data[FCSDiff_diff_coeff1]; // in µm²/s
+    double D1=data[FCSDiff_diff_coeff1]; // in ï¿½mï¿½/s
     double eD1=0;
     double rho2=data[FCSDiff_diff_rho2];
     double erho2=0;
@@ -180,14 +191,15 @@ void QFFitFunctionFCCSNormalDiff3D2Focus::calcParameter(double* data, double* er
     double gamma=data[FCSDiff_focus_struct_fac];
     double egamma=0;
     //double gamma2=sqr(gamma);
-    double wxy=data[FCSDiff_focus_width]/1.0e3; // in µm
+    double wxy=data[FCSDiff_focus_width]/1.0e3; // in ï¿½m
     double ewxy=0;
-    double dxy=data[FCSDiff_focus_distance]/1.0e3; // in µm
+    double dxy=data[FCSDiff_focus_distance]/1.0e3; // in ï¿½m
     double edxy=0;
-    double wz=data[FCSDiff_focus_height]/1.0e3; // in µm
+    //double wz=data[FCSDiff_focus_height]/1.0e3; // in ï¿½m
     double ewz=0;
     //double offset=data[FCSDiff_offset];
     double eoffset=0;
+    double c=data[FCSDiff_concentration]*(NAVOGADRO * 1.0e-24);
     double cps1=data[FCSDiff_count_rate1];
     double ecps1=0;
     double background1=data[FCSDiff_background1];
@@ -287,34 +299,46 @@ void QFFitFunctionFCCSNormalDiff3D2Focus::calcParameter(double* data, double* er
         eD3=error[FCSDiff_diff_coeff3];
     }
 
+    //Veff= N / C;
+    double Veff = 0.0;
+    if(c!=0.0) Veff = N/c;
+    data[FCSDiff_focus_volume]=Veff;
+
+    const double pi32=sqrt(cube(M_PI));
     if (hasGamma) {
-        wz=gamma*wxy;
-        ewz=sqrt(sqr(ewxy*gamma)+sqr(egamma*wxy));
-        data[FCSDiff_focus_height]=wz*1000.0;
-        if (error) error[FCSDiff_focus_height]=ewz*1000.0;
+        //Veff = pi^(3/2) * gamma * wxy^3
+        wxy=pow(Veff/(pi32*gamma),1.0/3.0);
+        //TODO ewxy=0.0
+        data[FCSDiff_focus_width]=wxy*1000.0;
+        if (error) error[FCSDiff_focus_width]=ewxy*1000.0;
     } else {
-        gamma=wz/wxy;
-        egamma=sqrt(sqr(ewz/wxy)+sqr(wz*ewxy/sqr(wxy)));
+        //Veff = pi^(3/2) * gamma * wxy^3
+        gamma=Veff/(pi32*cube(wxy));
+        //TODO egamma=sqrt(sqr(ewz/wxy)+sqr(wz*ewxy/sqr(wxy)));
         data[FCSDiff_focus_struct_fac]=gamma;
         if (error) error[FCSDiff_focus_struct_fac]=egamma;
     }
+    double const wz=gamma*wxy;
+    //TODO ewz=sqrt(sqr(ewxy*gamma)+sqr(egamma*wxy));
+    data[FCSDiff_focus_height]=wz*1000.0;
+    if (error) error[FCSDiff_focus_height]=ewz*1000.0;
 
     // calculate 1/N
     data[FCSDiff_1n_particle]=1.0/N;
     if (error) error[FCSDiff_1n_particle]=fabs(eN/N/N);
 
-    // calculate Veff = pi^(3/2) * gamma * wxy^3
-    const double pi32=sqrt(cube(M_PI));
-    data[FCSDiff_focus_volume]=pi32*gamma*cube(wxy);
-    if (error) error[FCSDiff_focus_volume]=sqrt(sqr(egamma*pi32*cube(wxy))+sqr(ewxy*3.0*pi32*gamma*sqr(wxy)));
+//    // calculate Veff = pi^(3/2) * gamma * wxy^3
+//    const double pi32=sqrt(cube(M_PI));
+//    data[FCSDiff_focus_volume]=pi32*gamma*cube(wxy);
+//    if (error) error[FCSDiff_focus_volume]=sqrt(sqr(egamma*pi32*cube(wxy))+sqr(ewxy*3.0*pi32*gamma*sqr(wxy)));
 
-    // calculate C = N / Veff
-    const double pim32=1.0/sqrt(cube(M_PI));
-    if (data[FCSDiff_focus_volume]!=0) data[FCSDiff_concentration]=N/data[FCSDiff_focus_volume]/(NAVOGADRO * 1.0e-24); else data[FCSDiff_concentration]=0;
-    if (error) {
-        if ((wxy!=0)&&(gamma!=0)) error[FCSDiff_concentration]=sqrt( sqr(egamma*pim32*N/cube(wxy)/sqr(gamma)) + sqr(ewxy*3.0*pim32*N/gamma/pow4(wxy)) + sqr(eN*pim32/gamma/cube(wxy)) )/(NAVOGADRO * 1.0e-24);
-        else error[FCSDiff_concentration]=0;
-    }
+//    // calculate C = N / Veff
+//    const double pim32=1.0/sqrt(cube(M_PI));
+//    if (data[FCSDiff_focus_volume]!=0) data[FCSDiff_concentration]=N/data[FCSDiff_focus_volume]/(NAVOGADRO * 1.0e-24); else data[FCSDiff_concentration]=0;
+//    if (error) {
+//        if ((wxy!=0)&&(gamma!=0)) error[FCSDiff_concentration]=sqrt( sqr(egamma*pim32*N/cube(wxy)/sqr(gamma)) + sqr(ewxy*3.0*pim32*N/gamma/pow4(wxy)) + sqr(eN*pim32/gamma/cube(wxy)) )/(NAVOGADRO * 1.0e-24);
+//        else error[FCSDiff_concentration]=0;
+//    }
 
     // calculate tauD1 = wxy^2 / (4*D1)
     if (D1!=0) data[FCSDiff_diff_tau1]=sqr(wxy)/4.0/D1*1.0e6; else data[FCSDiff_diff_tau1]=0;
@@ -343,7 +367,7 @@ void QFFitFunctionFCCSNormalDiff3D2Focus::calcParameter(double* data, double* er
     if (error) error[FCSDiff_cpm]=sqrt(sqr(ecps1/N/2.0)+sqr(ecps2/N/2.0)+sqr(ebackground1/N/2.0)+sqr(ebackground2/N/2.0)+sqr(eN*(cps1+cps2-(background1+background2))/sqr(N)/2.0));
  }
 
-bool QFFitFunctionFCCSNormalDiff3D2Focus::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionFCCSNormalDiff3D2Focus_c::isParameterVisible(int parameter, const double* data) const {
     int comp=data[FCSDiff_n_components];
     switch(parameter) {
         case FCSDiff_diff_rho1:  return comp>1;
@@ -354,10 +378,10 @@ bool QFFitFunctionFCCSNormalDiff3D2Focus::isParameterVisible(int parameter, cons
     return true;
 }
 
-unsigned int QFFitFunctionFCCSNormalDiff3D2Focus::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionFCCSNormalDiff3D2Focus_c::getAdditionalPlotCount(const double* params) {
     return 0;
 }
 
-QString QFFitFunctionFCCSNormalDiff3D2Focus::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionFCCSNormalDiff3D2Focus_c::transformParametersForAdditionalPlot(int plot, double* params) {
     return QString();
 }

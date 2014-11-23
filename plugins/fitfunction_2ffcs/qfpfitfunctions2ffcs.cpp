@@ -21,6 +21,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include "qfpfitfunctions2ffcs.h"
 #include "qffitfunction2ffccsnormaldiff3d.h"
+#include "qffitfunction2ffccsnormaldiff3d_c.h"
 #include "qffitfunction2ffccsnormaldiff3dflow.h"
 #include "qffitfunction2ffccsnormaldiff2d.h"
 #include "qffitfunction2ffccsnormaldiff2dflow.h"
@@ -29,7 +30,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 QStringList QFPFitFunctions2FFCS::getIDs() const {
     QStringList res;
     res<<"fccs_2f_diff3d"<<"fccs_2f_diff3d_wz"<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow_wz"
-       <<"fccs_2f_diff2d"<<"fccs_2f_diff2dflow";
+       <<"fccs_2f_diff2d"<<"fccs_2f_diff2dflow"<<"fccs_2f_diff3d_wxy_c";
     return res;
 }
 
@@ -40,6 +41,8 @@ QFFitFunction* QFPFitFunctions2FFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionFCCSNormalDiff2D2Focus();
     } else if (id=="fccs_2f_diff3d_wz") {
         return new QFFitFunctionFCCSNormalDiff3D2Focus(false);
+    } else if (id=="fccs_2f_diff3d_wxy_c") {
+        return new QFFitFunctionFCCSNormalDiff3D2Focus_c(false);
     } else if (id=="fccs_2f_diff3dflow") {
         return new QFFitFunctionFCCSNormalDiff3DFlow2Focus(true);
     } else if (id=="fccs_2f_diff2dflow") {
