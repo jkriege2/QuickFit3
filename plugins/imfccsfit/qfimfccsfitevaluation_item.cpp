@@ -596,7 +596,7 @@ QString QFImFCCSFitEvaluationItem::getFitFunctionID(const QFRawDataRecord *rdr) 
     if (rdr && idx>=0) {
         return getFitFunctionID(idx);
     }
-    return NULL;
+    return "";
 }
 
 QString QFImFCCSFitEvaluationItem::rdrPointerToParameterStoreID(const QFRawDataRecord *rdr) const
@@ -606,6 +606,28 @@ QString QFImFCCSFitEvaluationItem::rdrPointerToParameterStoreID(const QFRawDataR
         if (fitFilesList[i]==rdr) {
             idx=i;
             break;
+        }
+    }
+    if (rdr&&idx<0) {
+        for (int i=0; i<fittedFileSets.size(); i++) {
+            for (int j=0; j<fittedFileSets[i].size(); j++) {
+                if (fittedFileSets[i].at(j)==rdr) {
+                    idx=j;
+                    break;
+                }
+            }
+            if (idx>=0) break;
+        }
+        if (idx<0) {
+            for (int i=0; i<guessedFileSets.size(); i++) {
+                for (int j=0; j<guessedFileSets[i].size(); j++) {
+                    if (guessedFileSets[i].at(j)==rdr) {
+                        idx=j;
+                        break;
+                    }
+                }
+                if (idx>=0) break;
+            }
         }
     }
 
