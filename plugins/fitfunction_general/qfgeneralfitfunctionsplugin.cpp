@@ -39,8 +39,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctiongeneralhill.h"
 #include "qffitfunctiongeneralgaussiandistvar.h"
 #include "qffitfunctiongeneral2lognormal.h"
-
-
+#include "qffitfunctiongeneralsegmentedline.h"
+#include "qffitfunctiongeneralsegmentedpowerlaw.h"
 
 QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     QStringList res;
@@ -58,11 +58,13 @@ QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     res<<"gen_exp";
     res<<"gen_dblexp";
     res<<"gen_powerlaw";
+    res<<"gen_segpowerlaw";
     res<<"gen_line";
     res<<"gen_polynom";
     res<<"gen_polynomcenter";
     res<<"gen_hill";
     res<<"gen_modhill5p";
+    res<<"gen_segline";
     return res;
 }
 
@@ -87,6 +89,8 @@ QFFitFunction* QFGeneralFitFunctionsPlugin::get(QString id, QObject* parent) con
         return new QFFitFunctionGeneralDblExp();
     } else if (id=="gen_powerlaw") {
         return new QFFitFunctionGeneralPowerLaw();
+    } else if (id=="gen_segpowerlaw") {
+        return new QFFitFunctionGeneralSegmentedPowerLaw();
     } else if (id=="gen_sine") {
         return new QFFitFunctionGeneralSine();
     } else if (id=="gen_cos") {
@@ -105,6 +109,8 @@ QFFitFunction* QFGeneralFitFunctionsPlugin::get(QString id, QObject* parent) con
         return new QFFitFunctionGeneralHill();
     } else if (id=="gen_modhill5p") {
         return new QFFitFunctionGeneralModHill5P();
+    } else if (id=="gen_segline") {
+        return new QFFitFunctionGeneralSegmentedLine();
     }
     return NULL;
 }

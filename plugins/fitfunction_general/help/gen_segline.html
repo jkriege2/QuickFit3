@@ -1,18 +1,20 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Segmented line fit function</title>
-	</head>
-	<body>
-		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-		<p>$$bmath:f(x)=\begin{cases}a_1+b_1\cdot x & x<x_1\\a_2+b_2\cdot x & x<x_2\\a_3+b_3\cdot x & x\geq x_3\\$$
-		The offsets $$math:a_2, a_3$$ of the second and third line segment are not directly fit parameters, but the intersection points $$math:x_i (i=2,3)$$ with 
-		  $$bmath:f_{i-1}(x_i)=a_{i-1}+b_{i-1}\cdot x_i\equiv f_{i}(x_i)=a_{i}+b_{i}\cdot x_i.$$
-		This yields:
-		  $$bmath:a_i=(b_{i-1}-b_i)\cdot x_i+a_{i-1}$$
-		  $$bmath:\Delta a_i=\sqrt{\left(x_i\cdot \Delta b_{i-1}\right)^2+\left(x_i\cdot \Delta b_i\right)^2+\left(\Delta a_{i-1}\right)^2+\left(\Delta x_i\cdot(b_{i-1}-b_i)\right)^2}$$
-		</p>
-  
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Segmented line fit function</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        <p>$$bmath:f(x)=\begin{cases}a_1+b_1\cdot x & x<x_1\\a_2+b_2\cdot x & x<x_2\\a_3+b_3\cdot x & x\geq x_3\\$$
+        The offsets $$math:a_2, a_3$$ of the second and third line segment are not directly fit parameters, but the intersection points $$math:x_i (i=2,3)$$ with 
+          $$bmath:f_{i-1}(x_i)=a_{i-1}+b_{i-1}\cdot x_i\equiv f_{i}(x_i)=a_{i}+b_{i}\cdot x_i.$$
+        This yields:
+          $$bmath:a_i=(b_{i-1}-b_i)\cdot x_i+a_{i-1}$$
+          $$bmath:\Delta a_i=\sqrt{\left(x_i\cdot \Delta b_{i-1}\right)^2+\left(x_i\cdot \Delta b_i\right)^2+\left(\Delta a_{i-1}\right)^2+\left(\Delta x_i\cdot(b_{i-1}-b_i)\right)^2}$$
+        </p>
+        <center><a name="gen_segline_pic000"><img src="./pic/gen_segline_pic000.png" border="1">
+        </center>
+        
  </body>
 </html>

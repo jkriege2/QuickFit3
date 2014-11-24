@@ -12,18 +12,18 @@ QFFitFunctionGeneralSegmentedLine::QFFitFunctionGeneralSegmentedLine() {
     #define PARAM_OFFSET1 1
     addParameter(FloatNumber,  "slope",                   "slope 1",                                                 "b<sub>1</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
     #define PARAM_SLOPE1 2
-    addParameter(FloatNumber,  "slope2",                  "slope 2",                                                 "b<sub>2</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 2.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
-    #define PARAM_SLOPE2 3
     addParameter(FloatNumber,  "intersection12",          "intersection x2",                                         "x<sub>2</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 0.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
-    #define PARAM_INTERSECT2 4
+    #define PARAM_INTERSECT2 3
     addParameter(FloatNumber,  "offset2",                 "offset 2",                                                "a<sub>2</sub>",               "",            "",                      false,     false,        false,             QFFitFunction::DisplayError,       false, 0.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
-    #define PARAM_OFFSET2 5
-    addParameter(FloatNumber,  "slope3",                  "slope 3",                                                 "b<sub>3</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 2.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
-    #define PARAM_SLOPE3 6
+    #define PARAM_OFFSET2 4
+    addParameter(FloatNumber,  "slope2",                  "slope 2",                                                 "b<sub>2</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 2.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    #define PARAM_SLOPE2 5
     addParameter(FloatNumber,  "intersection23",          "intersection x3",                                         "x<sub>3</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 0.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
-    #define PARAM_INTERSECT3 7
+    #define PARAM_INTERSECT3 6
     addParameter(FloatNumber,  "offset3",                 "offset 3",                                                "a<sub>3</sub>",               "",            "",                      false,     false,        false,             QFFitFunction::DisplayError,       false, 0.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
-    #define PARAM_OFFSET3 8
+    #define PARAM_OFFSET3 7
+    addParameter(FloatNumber,  "slope3",                  "slope 3",                                                 "b<sub>3</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 2.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    #define PARAM_SLOPE3 8
 
 }
 

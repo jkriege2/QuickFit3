@@ -114,8 +114,8 @@ QString QFFitFunctionFCSDiffDAfterPulse::id() const {
 }
 
 QString QFFitFunctionFCSDiffDAfterPulse::name() const {
-    if (hasGamma) return  QString("FCS: Normal Diffusion 3D, D & gamma, afterpulsing");
-    return QString("FCS: Normal Diffusion 3D, D & wz, afterpulsing");
+    if (hasGamma) return  QString("FCS: Normal Diffusion 3D, D, N, wxy and gamma, afterpulsing");
+    return QString("FCS: Normal Diffusion 3D, D, N, wxy and wz, afterpulsing");
 }
 double QFFitFunctionFCSDiffDAfterPulse::evaluate(double t, const double* data) const {
     const int comp=data[FCSDiff_n_components];

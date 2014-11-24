@@ -920,12 +920,12 @@ void QFRDRTableCurveFitDialog::readDataFromTable()
 
     if (dataX.size()>0) {
         double mi=qfstatisticsMin(dataX);
-        double mif=0.1*mi;
+        double mif=0.1*fabs(mi);
         if (fabs(mif)<1e-15) mif=1;
         ui->datacut->set_min(mi-mif);
         ui->datacut->set_userMin(mi-mif);
         double ma=qfstatisticsMax(dataX);
-        double maf=0.1*ma;
+        double maf=0.1*fabs(ma);
         if (fabs(maf)<1e-15) maf=1;
         ui->datacut->set_max(ma+maf);
         ui->datacut->set_userMax(ma+maf);

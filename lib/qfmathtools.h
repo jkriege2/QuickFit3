@@ -261,6 +261,16 @@ inline double qfErrorMul(double a, double ea, double b, double eb) {
     return sqrt(qfSqr(ea*b)+qfSqr(eb*a));
 }
 
+/** \brief calculate the error propagation for <code>a*b</code> with errors \a ea and \a eb
+    \ingroup qf3lib_mathtools
+
+    \f[ f=a\cdot b\bcdot c \f]
+    \f[ \Delta f=\sqrt{\left(\Delta a\cdot b\right)^2+\left(\Delta b\cdot a\right)^2} \f]
+ */
+inline double qfErrorMul(double a, double ea, double b, double eb, double c, double ec) {
+    return sqrt(qfSqr(ea*b*c)+qfSqr(eb*a*c)+qfSqr(ec*b*c));
+}
+
 /** \brief calculate the error propagation for <code>a/b</code> with errors \a ea and \a eb
     \ingroup qf3lib_mathtools
     \f[ f=\frac{a}{b} \f]

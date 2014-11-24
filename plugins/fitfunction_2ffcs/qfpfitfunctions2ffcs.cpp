@@ -30,7 +30,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 QStringList QFPFitFunctions2FFCS::getIDs() const {
     QStringList res;
     res<<"fccs_2f_diff3d"<<"fccs_2f_diff3d_wz"<<"fccs_2f_diff3dflow"<<"fccs_2f_diff3dflow_wz"
-       <<"fccs_2f_diff2d"<<"fccs_2f_diff2dflow"<<"fccs_2f_diff3d_wxy_c";
+       <<"fccs_2f_diff2d"<<"fccs_2f_diff2dflow"<<"fccs_2f_diff3d_wz_c"<<"fccs_2f_diff3d_gamma_c";
     return res;
 }
 
@@ -41,8 +41,10 @@ QFFitFunction* QFPFitFunctions2FFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionFCCSNormalDiff2D2Focus();
     } else if (id=="fccs_2f_diff3d_wz") {
         return new QFFitFunctionFCCSNormalDiff3D2Focus(false);
-    } else if (id=="fccs_2f_diff3d_wxy_c") {
+    } else if (id=="fccs_2f_diff3d_wz_c") {
         return new QFFitFunctionFCCSNormalDiff3D2Focus_c(false);
+    } else if (id=="fccs_2f_diff3d_gamma_c") {
+        return new QFFitFunctionFCCSNormalDiff3D2Focus_c(true);
     } else if (id=="fccs_2f_diff3dflow") {
         return new QFFitFunctionFCCSNormalDiff3DFlow2Focus(true);
     } else if (id=="fccs_2f_diff2dflow") {

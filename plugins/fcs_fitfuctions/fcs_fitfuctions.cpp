@@ -96,12 +96,14 @@ QFFitFunction* QFPFitFunctionFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionFCSPowerLaw();
     } else if (id=="fcs_simpleexp") {
         return new QFFitFunctionFCSSimpleExp();
-    } else if (id=="fcs_diff_d") {
+    } else if (id=="fcs_diff_d_afterpulse") {
         return new QFFitFunctionFCSDiffDAfterPulse(true);
     } else if (id=="fcs_diff_d_wz_afterpulse") {
         return new QFFitFunctionFCSDiffDAfterPulse(false);
     } else if (id=="fcs_diff_d_wz_c_afterpulse") {
         return new QFFitFunctionFCSDiffDcAfterPulse(false);
+    } else if (id=="fcs_diff_d_c_afterpulse") {
+        return new QFFitFunctionFCSDiffDcAfterPulse(true);
     } else if (id=="fcs_diff_diffbright") {
         return new QFFitFunctionFCSDiffDifferentBrightness();
     } else if (id=="fcs_diff2d_diffbright") {

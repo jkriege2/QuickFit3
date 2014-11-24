@@ -1,5 +1,5 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
-<html><head><title>Multi-Component Normal 3D Diffusion (D &amp; N) (with non-fluorescing components) + afterpulsing term</title></head>
+<html><head><title>Multi-Component Normal 3D Diffusion (D &amp; C) (with non-fluorescing components) + afterpulsing term</title></head>
 <body>
 $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 This plugin implements a 3D diffusion model for the fitting routines in QuickFit. The model may be denoted as: 
@@ -23,9 +23,10 @@ The parameters are:
 <li><img alt="$ \tau_{trip}, \tau{non} $" src="./pic/form_820.png"/>: decay time of the first two non-fluorescent states (triplet, ...)</li>
 <li><img alt="$ \rho_1=1-\rho2-\rho3, \rho_2, \rho_3 $" src="./pic/form_830.png"/>: fractions of the three diffusing components</li>
 <li>$$math:D_i$$: diffusion coefficient time of the i-th diffusing component</li>
-<li>$$math:\gamma=\frac{w_z}{w_{xy}}$$: aspect ratio of the gaussian used to approximate the focus</li>
-<li>$$math:w_{xy}$$: lateral half axis of the focus gaussian</li>
-<li>$$math:w_z$$: longitudinal half axis of the focus gaussian</li>
+<li><img alt="$ \gamma=\frac{z_0}{w_{xy}} $" src="./pic/form_850.png"/>: aspect ratio of the gaussian used to approximate the focus</li>
+<li><img alt="$ w_{xy} $" src="./pic/form_300.png"/>: lateral half axis of the focus gaussian</li>
+<li>$$math:w_z=\gamma\cdot w_{xy}$$: longitudinal half axis of the focus gaussian</li>
+<li><img alt="$ z_0 $" src="./pic/form_860.png"/>: longitudinal half axis of the focus gaussian</li>
 <li>$$math:a_{after}$$: afterpulsing amplitude</li>
 <li>$$math:b_{after}$$: afterpulsing exponent for power-law fit</li>
 <li>$$math:\tau_{after}$$: afterpulsing exponential lifetime for exponential fit</li>

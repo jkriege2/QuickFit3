@@ -49,7 +49,8 @@ HEADERS += qfgeneralfitfunctionsplugin.h \
     qffitfunctiongeneralpolynomcentered.h \
     qffitfunctiongeneralgaussiandistvar.h \
     qffitfunctiongeneralskewgaussianvar.h \
-    qffitfunctiongeneralsegmentedline.h
+    qffitfunctiongeneralsegmentedline.h \
+    qffitfunctiongeneralsegmentedpowerlaw.h
 
 SOURCES += qfgeneralfitfunctionsplugin.cpp\
            qffitfunctiongeneralsigmoid.cpp \
@@ -71,7 +72,8 @@ SOURCES += qfgeneralfitfunctionsplugin.cpp\
     qffitfunctiongeneralpolynomcentered.cpp \
     qffitfunctiongeneralgaussiandistvar.cpp \
     qffitfunctiongeneralskewgaussianvar.cpp \
-    qffitfunctiongeneralsegmentedline.cpp
+    qffitfunctiongeneralsegmentedline.cpp \
+    qffitfunctiongeneralsegmentedpowerlaw.cpp
 
 FORMS =
 

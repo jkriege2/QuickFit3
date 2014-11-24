@@ -104,8 +104,8 @@ QString QFFitFunctionFCCSNormalDiff3D2Focus::id() const {
 }
 
 QString QFFitFunctionFCCSNormalDiff3D2Focus::name() const {
-    if (hasGamma) return  QString("2focus-FCS: 3D Normal Diffusion, D and gamma as parameter");
-    return QString("2focus-FCS: 3D Normal Diffusion, D and wz as parameter");
+    if (hasGamma) return  QString("2focus-FCS: 3D Normal Diffusion, D, N, wxy and gamma as parameter");
+    return QString("2focus-FCS: 3D Normal Diffusion, D, N, wxy and wz as parameter");
 }
 
 double QFFitFunctionFCCSNormalDiff3D2Focus::evaluate(double t, const double* data) const {

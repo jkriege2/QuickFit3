@@ -563,8 +563,8 @@ void QFRDRTableRegressionDialog::readDataFromTable()
     if (dataX.size()>0) {
         double mi=qfstatisticsMin(dataX);
         double ma=qfstatisticsMax(dataX);
-        ui->datacut->set_min(mi-(ma-mi)/2.0);
-        ui->datacut->set_max(ma+(ma-mi)/2.0);
+        ui->datacut->set_min(mi-fabs(ma-mi)/2.0);
+        ui->datacut->set_max(ma+fabs(ma-mi)/2.0);
     }
 }
 
