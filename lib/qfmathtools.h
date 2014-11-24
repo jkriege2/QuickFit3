@@ -231,6 +231,26 @@ inline double qfErrorSumMinus(double a, double ea, double b, double eb, double f
     return sqrt(qfSqr(factorA*ea)+qfSqr(factorB*eb));
 }
 
+/** \brief calculate the error propagation for <code>factorA*a+factorB*b</code> or <code>factorA*a-factorB*b</code> with errors \a ea and \a eb
+    \ingroup qf3lib_mathtools
+
+    \f[ f=\alpha a+\beta b \f]
+    \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\right)^2+\left(\Delta b\cdot\beta\right)^2} \f]
+ */
+inline double qfErrorAdd(double a, double ea, double b, double eb) {
+    return sqrt(qfSqr(ea)+qfSqr(eb));
+}
+
+/** \brief calculate the error propagation for <code>factorA*a+factorB*b</code> or <code>factorA*a-factorB*b</code> with errors \a ea and \a eb
+    \ingroup qf3lib_mathtools
+
+    \f[ f=\alpha a-\beta b \f]
+    \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\right)^2+\left(\Delta b\cdot\beta\right)^2} \f]
+ */
+inline double qfErrorSub(double a, double ea, double b, double eb) {
+    return sqrt(qfSqr(ea)+qfSqr(eb));
+}
+
 /** \brief calculate the error propagation for <code>a*b</code> with errors \a ea and \a eb
     \ingroup qf3lib_mathtools
 
@@ -307,6 +327,77 @@ inline double qfErrorTan(double a, double ea, double b, double eb, double factor
     const double f=1.0/qfSqr(cos(factorA*a+factorB*b+offset));
     return sqrt(qfSqr(ea*f*factorA)+qfSqr(eb*f*factorB));
 }
+
+
+/** \brief calculate the sqrt of a sum of squares
+    \ingroup qf3lib_mathtools
+    \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
+ */
+inline double qfErrorSqrtSumSqr(double a1, double a2) {
+    return sqrt(qfSqr(a1)+qfSqr(a2));
+}
+
+/** \brief calculate the sqrt of a sum of squares
+    \ingroup qf3lib_mathtools
+    \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
+ */
+inline double qfErrorSqrtSumSqr(double a1, double a2, double a3) {
+    return sqrt(qfSqr(a1)+qfSqr(a2)+qfSqr(a3));
+}
+/** \brief calculate the sqrt of a sum of squares
+    \ingroup qf3lib_mathtools
+    \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
+ */
+inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4) {
+    return sqrt(qfSqr(a1)+qfSqr(a2)+qfSqr(a3)+qfSqr(a4));
+}
+
+/** \brief calculate the sqrt of a sum of squares
+    \ingroup qf3lib_mathtools
+    \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
+ */
+inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, double a5) {
+    return sqrt(qfSqr(a1)+qfSqr(a2)+qfSqr(a3)+qfSqr(a4)+qfSqr(a5));
+}
+
+
+/** \brief calculate the sqrt of a sum of squares
+    \ingroup qf3lib_mathtools
+    \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
+ */
+inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, double a5, double a6) {
+    return sqrt(qfSqr(a1)+qfSqr(a2)+qfSqr(a3)+qfSqr(a4)+qfSqr(a5)+qfSqr(a6));
+}
+/** \brief calculate the sqrt of a sum of squares
+    \ingroup qf3lib_mathtools
+    \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
+ */
+inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, double a5, double a6, double a7) {
+    return sqrt(qfSqr(a1)+qfSqr(a2)+qfSqr(a3)+qfSqr(a4)+qfSqr(a5)+qfSqr(a6)+qfSqr(a7));
+}
+/** \brief calculate the sqrt of a sum of squares
+    \ingroup qf3lib_mathtools
+    \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
+ */
+inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8) {
+    return sqrt(qfSqr(a1)+qfSqr(a2)+qfSqr(a3)+qfSqr(a4)+qfSqr(a5)+qfSqr(a6)+qfSqr(a7)+qfSqr(a8));
+}
+/** \brief calculate the sqrt of a sum of squares
+    \ingroup qf3lib_mathtools
+    \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
+ */
+inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9) {
+    return sqrt(qfSqr(a1)+qfSqr(a2)+qfSqr(a3)+qfSqr(a4)+qfSqr(a5)+qfSqr(a6)+qfSqr(a7)+qfSqr(a8)+qfSqr(a9));
+}
+
+/** \brief calculate the sqrt of a sum of squares
+    \ingroup qf3lib_mathtools
+    \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
+ */
+inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9, double a10) {
+    return sqrt(qfSqr(a1)+qfSqr(a2)+qfSqr(a3)+qfSqr(a4)+qfSqr(a5)+qfSqr(a6)+qfSqr(a7)+qfSqr(a8)+qfSqr(a9)+qfSqr(a10));
+}
+
 
 
 /*! \brief calculate the dot product of two vectors
