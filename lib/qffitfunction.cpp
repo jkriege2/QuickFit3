@@ -142,6 +142,16 @@ void QFFitFunction::evaluateNumericalParameterErrors(double *errors, double x, c
     //qfFree(cov);
 }
 
+double QFFitFunction::customTransform(int parameter, double value) const
+{
+    return value;
+}
+
+double QFFitFunction::customBackTransform(int parameter, double value) const
+{
+    return value;
+}
+
 QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* /*errors*/, const bool* paramsFix, int runAvgWidth, int residualHistogramBins) const {
     int fitparamN=0;
     const int pcount=paramCount();

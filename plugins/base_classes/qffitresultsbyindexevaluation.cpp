@@ -210,6 +210,7 @@ void QFFitResultsByIndexEvaluation::fillFix(const QFRawDataRecord *r, int index,
 double* QFFitResultsByIndexEvaluation::allocFillParameters(const QFRawDataRecord *r, int index, QFFitFunction* function) const {
     //if (function) qDebug()<<"QFFitResultsByIndexEvaluation::allocFillParameters("<<r->getName()<<", "<<index<<", "<<function->id()<<")";
     //else qDebug()<<"QFFitResultsByIndexEvaluation::allocFillParameters("<<r->getName()<<", "<<index<<", NULL)";
+    //qDebug()<<"QFFitResultsByIndexEvaluation::allocFillParameters("<<getEvaluationResultID(index, r)<<index<<r;
     return allocFillParameters(r, getEvaluationResultID(index, r), function);
 }
 

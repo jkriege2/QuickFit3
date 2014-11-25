@@ -4152,7 +4152,63 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         if (ff) {
                             QStringList ffeat;
                             QString fffeatures="";
-                            QString params;
+                            QString params="";
+                            if (ff->paramCount()>0) {
+                                params=tr("The parameters of this fit function are:<table width=\"95%\" border=\"1\" cellpadding=\"2\" cellspacing=\"0\">"
+                                          "<tr bgcolor=\"lightblue\"><th rowspan=\"2\">LABEL [UNIT]</th>"
+                                              "<th rowspan=\"2\">ID</th>"
+                                              "<th colspan=\"8\">DESCRIPTION</th>"
+                                              "</tr><tr bgcolor=\"lightblue\">"
+                                              "<th>TYPE</th>"
+                                              "<th>FIT</th>"
+                                              "<th>EDITABLE</th>"
+                                              "<th>ERROR</th>"
+                                              "<th>INIT. VALUE</th>"
+                                              "<th>INIT. FIX</th>"
+                                              "<th>RANGE</th>"
+                                              "<th>ABS. RANGE</th>"
+                                              "</tr>");
+                            }
+                            for (int i=0; i<ff->paramCount(); i++) {
+                                QFFitFunction::ParameterDescription d=ff->getDescription(i);
+                                QString col="";
+                                QString type=tr("fit");
+                                QString err=tr("editable");
+                                if (!d.fit && !d.userEditable) {
+                                    col=" bgcolor=\"silver\"";
+                                    type=tr("calculated");
+                                } else if (!d.fit && d.userEditable) {
+                                    type=tr("parmeter");
+                                }
+                                if (d.displayError==QFFitFunction::DisplayError) {
+                                    err=tr("displayed");
+                                } else if (d.displayError==QFFitFunction::NoError) {
+                                    err=tr("---");
+                                }
+
+
+                                params+=tr("<tr %1><td rowspan=\"2\"><b>%2</b> [%5]</td>"
+                                           "<td rowspan=\"2\"><tt><b>%3</b></tt></td>"
+                                           "<td colspan=\"8\"><i>%4</i></td>"
+                                           "</tr><tr %1>"
+                                           "<td>&nbsp;&nbsp;%8</td>"
+                                           "<td>%6</td>"
+                                           "<td>%7</td>"
+                                           "<td>&nbsp;&nbsp;%9</td>"
+                                           "<td>&nbsp;&nbsp;%10</td>"
+                                           "<td>%11</td>"
+                                           "<td>%12 ... %13</td>"
+                                           "<td>%14 ... %15%16</td>"
+                                           "</tr>").arg(col).arg(d.label).arg(ff->getParameterID(i)).arg(d.name).arg(d.unitLabel)
+                                                   .arg(d.fit?QString("<img src=\":/lib/checked.png\">"):QString("<img src=\":/lib/unchecked.png\">"))
+                                                   .arg(d.userEditable?QString("<img src=\":/lib/checked.png\">"):QString("<img src=\":/lib/unchecked.png\">"))
+                                                   .arg(type).arg(err).arg((d.fit || d.userEditable)?QString::number(d.initialValue):QString(""))
+                                                   .arg(d.fit?QString(d.initialFix?QString("<img src=\":/lib/checked.png\">"):QString("<img src=\":/lib/unchecked.png\">")):QString(""))
+                                                   .arg(d.minValue).arg(d.maxValue).arg(d.absMinValue).arg(d.absMaxValue).arg((d.comboItems.size()>0)?QString(QString(" (%1)").arg(d.comboItems.join(", "))):QString(""));
+                            }
+                            if (!params.isEmpty()) {
+                                params+=QString("</table><br><br>");
+                            }
                             if (ff->get_implementsDerivatives()) {
                                 ffeat.append(tr("analytical derivaties"));
                             }
@@ -4170,7 +4226,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                                        "  <li>shortened name: <b>%3</b></li>"
                                                        "%4"
                                                        "</ul>"
-                                                       "The parameters of this fit function are:<table>%5</table>"
+                                                       "%5"
                                                        "</p>").arg(ff->id()).arg(ff->name()).arg(ff->shortName()).arg(fffeatures).arg(params);
                             delete ff;
                         }
@@ -4692,6 +4748,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                             p.end();
                             QString texfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+"_tex"+QString::number(count)+".png";
                             //qDebug()<<"latex-render: "<<latex<<"\n    size = "<<size<<"  output = "<<texfilename;
+                            pix=cropLeftRight(pix, Qt::transparent);
                             pix.save(texfilename);
 
                             if (command=="bmath" || command=="mathb") {

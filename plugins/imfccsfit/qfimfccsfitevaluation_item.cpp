@@ -1039,6 +1039,7 @@ void QFImFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<
                 // we are working with a complete set of parameters
                 record->readLock();
                 dfd.params=allocFillParameters(record, run, ffunc);
+                //if (r==0) qDebug()<<record->getName()<<run<<arrayToString(dfd.params, ffunc->paramCount(), false);
                 dfd.initialparams=duplicateArray(dfd.params, ffunc->paramCount());
                 dfd.errors=allocFillParameterErrors(record, run, ffunc);
                 dfd.errorsI=duplicateArray(dfd.errors, ffunc->paramCount());

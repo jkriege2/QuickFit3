@@ -24,7 +24,17 @@ The plot on the left displays the data, the errors and the current fit. Below th
 The button <b>Guess parameters</b> uses a feature, that is implemented in some fit models (it is activated only, if the feature is supported), which estimates inital values for the fit parameters, based on the given dataset.
 </p>
 <p>
-The button <b>Fit</b>   performs the actual fit. Below that button, you can choose whether the fit should be weighted and whether bootstrapping should be used for the error estimates.  
+The button <b>Fit</b>   performs the actual fit. Below that button, you can choose whether the fit should be <b>weighted</b> and whether <b>bootstrapping</b> should be used for the error estimates. You can also choose to <b>fit log(Y)</b>, which can improve the fit results, if the y-values span several orders of magnitude. 
+$$startbox_info$$
+These settings influence the fit algorithm. By default (non-weighted, non-log(Y), no bootstrapping) it finds the set of fit parameters $$math:\vec{p}$$, which minimizes the sum of squared errors:
+$$bmath:\chi^2(\vec{p})=\sum\limits_i\left(y_i-f(x_i, \vec{p})\right)^2$$
+If weighting is used, weighting factors (or data errors) arre added to the &chi;<sup>2</sup>-function:
+$$bmath:\chi^2(\vec{p})=\sum\limits_i\left(\frac{y_i-f(x_i, \vec{p})}{\sigma_i}\right)^2$$
+In some cases, the y-data spans several orders of magnitude. Then the residuals may also differ by several orders of magnitude. Therefore it may be easier to fit the model function to the logarithmized y-data, i.e. xhanging the &chi;<sup>2</sup>-function to:
+$$bmath:\chi^2(\vec{p})=\sum\limits_i\left(\frac{\log(y_i)-\log(f(x_i, \vec{p}))}{\log(\sigma_i})\right)^2$$
+This requires of course, that all data is positive and also the fit function $$math:f(x,\vec{p}$$ always returns a positive value.<br><br>
+Finally you can use bootstrapping for the error estimates. Then the fit is repeated several times for changing subsets (randomly sampled) of the input data vector. Finally the standard deviation of the fit results for each parameter is returned as parameter error.
+$$endbox$$
 </p>
 <p>
 When you are satisfied with the fit results, you can click on <b>Accept Fit</b>, which will add the fit as a graph to the current plot. The fit results can either be stored as parameters in the plot, or as a column in the table. 

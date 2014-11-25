@@ -1845,7 +1845,12 @@ void qfShuffleInplace(QVector<T>& value) {
    }
 }
 
+/*! \brief crop all columns from an image from the left/right, which only contain pixels with the given color
+    \ingroup qf3lib_tools
 
+*/
+QFLIB_EXPORT QPixmap cropLeftRight(const QPixmap& pix, QColor cropcolor);
+QFLIB_EXPORT QImage cropLeftRight(const QImage& pix, QColor cropcolor);
 
 #endif // QFTOOLS_H
 

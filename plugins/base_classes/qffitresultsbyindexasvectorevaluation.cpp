@@ -839,6 +839,7 @@ double QFFitResultsByIndexAsVectorEvaluation::getFitValue(const QFRawDataRecord 
 
 
         QString psID=getParameterStoreID(r, parameterID);
+        //qDebug()<<"QFFitResultsByIndexAsVectorEvaluation::getFitValue: "<<r<<parameterID<<psID;
         if (parameterStore.contains(psID)) {
             if (parameterStore[psID].valueSet) {
                 res=parameterStore[psID].value;

@@ -24,7 +24,8 @@
 #include "qftools.h"
 #include <stdlib.h>
 #include "statistics_tools.h"
-
+#include "lib_imexport.h"
+#include <QPixmap>
 
 /*! \brief bin each frame in an image series (video)
     \ingroup qf3lib_tools
@@ -124,6 +125,8 @@ inline QFImageSymmetry qfGetImageSymetry(const T* data, int width, int height, d
 
     return sym;
 }
+
+
 
 
 #endif // IMAGETOOLS_H

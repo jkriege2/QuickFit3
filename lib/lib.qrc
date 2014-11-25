@@ -51,6 +51,8 @@
         <file alias="helpboxlogo_warning.png">icons/helpboxlogo_warning.png</file>
     </qresource>
     <qresource prefix="/lib">
+        <file alias="checked.png">icons/checked.png</file>
+        <file alias="unchecked.png">icons/unchecked.png</file>
         <file alias="tooltip.png">icons/tooltip.png</file>
         <file alias="export_data.png">icons/export_data.png</file>
         <file alias="collapse_opened.png">icons/collapse_opened.png</file>

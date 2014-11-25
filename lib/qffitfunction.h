@@ -91,6 +91,7 @@ class QFLIB_EXPORT QFFitFunction {
             StandardParameter=0, /**< a simple, linearly scaling parameter */
             LogParameter=1, /**< a parameter, which may span several orders of magnitude and is positive */
             PosNegOrderOfMagnitudeParameter=2, /**< a parameter, which may span several orders of magnitude and is positive */
+            CustomTramsformParameter=100, /**< The functions cutsomTransform() and cutsomBackTransform() have been implemented for this parameter and implement the transforms */
         };
 
         /** \brief error display mode */
@@ -174,7 +175,7 @@ class QFLIB_EXPORT QFFitFunction {
         /** \brief return a name for the model */
         virtual QString name() const=0;
         /** \brief return a short name for the model (max. around 10-20 characters) */
-        virtual QString shortName() const { return name(); };
+        virtual QString shortName() const { return name(); }
         /** \brief return a short unique model ID string */
         virtual QString id() const=0;
 
@@ -395,6 +396,11 @@ class QFLIB_EXPORT QFFitFunction {
             for (int i=0; i<m_parameters.size(); i++) sl.append(m_parameters[i].id);
             return sl;
         }
+
+        /** \brief custom transform function for parameter i */
+        virtual double customTransform(int parameter, double value) const;
+        /** \brief custom transform function for parameter i */
+        virtual double customBackTransform(int parameter, double value) const;
 
 
         /*! \brief calculate fit statistics for the given measurement dataset, using this fit function with the given parameters

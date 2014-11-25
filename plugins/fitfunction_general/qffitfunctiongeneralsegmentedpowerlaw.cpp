@@ -67,10 +67,10 @@ double QFFitFunctionGeneralSegmentedPowerLaw::evaluate(double t, const double* d
     else {
         const double a2=data[PARAM_AMPLITUDE1]*pow(data[PARAM_INTERSECT2], (data[PARAM_POWER1]-data[PARAM_POWER2]));
         if (t<data[PARAM_INTERSECT3] || segs<=2) {
-            return a2*pow(t, data[PARAM_POWER2]);
+            return data[PARAM_OFFSET]+a2*pow(t, data[PARAM_POWER2]);
         } else {
             const double a3=data[PARAM_AMPLITUDE2]*pow(data[PARAM_INTERSECT3], (data[PARAM_POWER2]-data[PARAM_POWER3]));
-            return a3*pow(t, data[PARAM_POWER3]);
+            return data[PARAM_OFFSET]+a3*pow(t, data[PARAM_POWER3]);
         }
     }
 }

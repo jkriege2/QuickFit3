@@ -295,7 +295,7 @@ class QFImFCCSFitEvaluationItem : public QFFitResultsByIndexAsVectorEvaluation, 
 
 
         void enableAndEmitResultsSignals() const;
-protected:
+    protected:
 
         /* explicitly make some functions visible again, as the C++ compiler hides function definitions
            from a base class that are also declared in the derived class, but with different parameter sets!

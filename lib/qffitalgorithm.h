@@ -460,6 +460,15 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 /** \brief return the number of to the stored initial fit parameters */
                 int getModelParamsCount() const { return m_model->paramCount(); }
 
+                inline bool isParameterTransformsEnabled() const { return enableParameterTransforms; }
+                inline void setParameterTransformsEnabled(bool enabled) {
+                    enableParameterTransforms=enabled;
+                }
+                inline bool isFitLogY() const { return fitLogY; }
+                inline void setFitLogY(bool enabled) {
+                    fitLogY=enabled;
+                }
+
                 /** \brief transform fit parameters */
                 void transfromParameters(double* params);
                 /** \brief backtransform fit parameters */
@@ -487,7 +496,12 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 bool* m_modelparamsFix;
                 /** \brief does the model contain parameter transforms? */
                 bool hasParameterTransforms;
-                QVector<QFFitFunction::ParameterType> paramTransfroms;
+                /** \brief enable or disable parameter transforms */
+                bool enableParameterTransforms;
+                /** \brief parameter transform mode for the functor parameters (calculated in the constructor from the model parameters/properties)*/
+                QVector<QFFitFunction::ParameterType> paramTransforms;
+                /** \brief if set \c true, the functor calculates log(dataY) and log(model(x,p)), which can improve the fit in some cases  */
+                bool fitLogY;
         };
 
 
@@ -692,6 +706,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
             \param fixParams which parameters to fix (if \c NULL, no parameters are fixed)
             \param paramsMin lower parameter bound
             \param paramsMax upper parameter bound
+            \param fitLogY if this is \c true, this function solves the logarithmized problem \f$ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{i=1}^M\left\|\frac{\log(y_i)-\log(f(x_i; \vec{p}))}{\log(\sigma_i)}\right\| \f$
             \return a FitResult object describing the fit result
 
             \note If the bootstrapping mode is activated (see setErrorEstimateModeFit() ) then this function will first do the actual fit with the full input data vector
@@ -699,7 +714,7 @@ class QFLIB_EXPORT QFFitAlgorithm {
                   first fit as initial parameters (distorted by a small fraction), but only for a subset of the input data. Then, from the results of these fits, a standard
                   deviation for each parameter is calculated and returned as error estimate. <b>Note, that this routine will require significantly more time, than a simple fit!</b>
         */
-        FitResult fit(double* paramsOut, double* paramErrorsOut, const double* dataX, const double* dataY, const double* dataWeight, uint64_t N, QFFitFunction* model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL);
+        FitResult fit(double* paramsOut, double* paramErrorsOut, const double* dataX, const double* dataY, const double* dataWeight, uint64_t N, QFFitFunction* model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL, bool fitLogY=false);
 
 
         /*! \brief this wrapper routine allows to use the fitting algorithm for a general optimization problem with a given model function \f$ f(\vec{p}) \f$ encoded in \a model.

@@ -1531,3 +1531,37 @@ QString qfGetLargestCommonEnd(const QStringList& data, const QString& defaultRes
     if (res.size()<=0) res=defaultResult;
     return res;
 }
+
+
+QPixmap cropLeftRight(const QPixmap& pix, QColor cropcolor) {
+    return QPixmap::fromImage(cropLeftRight(pix.toImage(), cropcolor));
+}
+
+QImage cropLeftRight(const QImage& img, QColor cropcolor) {
+    QRgb col=cropcolor.rgb();
+    int left=0;
+    int right=0;
+    for (int x=0; x<img.width(); x++) {
+        bool allc=true;
+        for (int y=0; y<img.height(); y++) {
+            allc=allc&&(img.pixel(x,y)==col);
+            if (!allc) break;
+        }
+        if (allc) left++;
+        else break;
+    }
+    for (int x=img.width()-1; x>left; x--) {
+        bool allc=true;
+        for (int y=0; y<img.height(); y++) {
+            allc=allc&&(img.pixel(x,y)==col);
+            if (!allc) break;
+        }
+        if (allc) right++;
+        else break;
+    }
+    if (left+right<img.width()) {
+        return img.copy(left,0,img.width()-left-right,img.height());
+    } else {
+        return QImage();
+    }
+}
