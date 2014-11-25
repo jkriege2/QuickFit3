@@ -38,7 +38,7 @@ QFFitFunctionParsed::QFFitFunctionParsed(const QString &configfile) :
         //if (paramCount>0) {
             for (int i=0; i<paramCount; i++) {
                 QString grp=QString("parameter%1/").arg(i+1);
-                ParameterType type=FloatNumber;
+                ParameterWidgetType type=FloatNumber;
                 QString fftype=set.value(grp+"type", "").toString().toLower().trimmed();
                 if (fftype=="log") type=LogFloatNumber;
                 if (fftype=="int_combo") type=IntCombo;

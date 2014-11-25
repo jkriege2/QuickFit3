@@ -28,6 +28,7 @@
 #include <iostream>
 #include "qfrawdatarecord.h"
 #include "../extlibs/MersenneTwister.h"
+#include "qftools.h"
 
 void QFFitAlgorithm::Functor::evaluateJacobian(double* evalout, const double* params) {
 }
@@ -178,14 +179,17 @@ QFFitAlgorithm::FitQFFitFunctionFunctor::FitQFFitFunctionFunctor(QFFitFunction* 
     modelFromFunctor=NULL;
 
     m_modelparamsFix=duplicateArray(fixParams, m_N);
+    hasParameterTransforms=false;
 
     // now we calculate the mapping of the data
     m_paramCount=0;
     for (int i=0; i<m_N; i++) {
+        QFFitFunction::ParameterDescription d=model->getDescription(i);
         if (!fixParams[i]) {
-            QFFitFunction::ParameterDescription d=model->getDescription(i);
             if (d.fit && model->isParameterVisible(i, currentParams)) {
+                paramTransfroms<<d.parameterType;
                 m_paramCount++;
+                hasParameterTransforms=hasParameterTransforms||(d.parameterType!=QFFitFunction::StandardParameter);
             }
         }
     }
@@ -231,12 +235,14 @@ void QFFitAlgorithm::FitQFFitFunctionFunctor::mapArrayFromModelToFunctor(double*
     for (register int i=0; i<m_paramCount; i++) {
         functorData[i]=modelData[modelFromFunctor[i]];
     }
+    if (hasParameterTransforms) transfromParameters(functorData);
 }
 
 void QFFitAlgorithm::FitQFFitFunctionFunctor::mapArrayFromFunctorToModel(double* modelData, const double* functorData) {
     for (register int i=0; i<m_paramCount; i++) {
         modelData[modelFromFunctor[i]]=functorData[i];
     }
+    if (hasParameterTransforms) backtransfromParameters(modelData);
 }
 
 
@@ -285,6 +291,46 @@ void QFFitAlgorithm::FitQFFitFunctionFunctor::evaluateJacobian(double* evalout, 
     //std::cout<<"modelFromFunctor"<<intvectortostr(modelFromFunctor, pcount)<<" ]\n";
     //std::cout<<doublearraytostr(evalout, pcount, ecount)<<std::endl;
     qfFree(p);
+}
+
+void QFFitAlgorithm::FitQFFitFunctionFunctor::transfromParameters(double *params)
+{
+    if (hasParameterTransforms) {
+        register int pcount=get_paramcount();
+        for (int i=0; i<pcount; i++) {
+            switch (paramTransfroms[i]) {
+                case QFFitFunction::LogParameter: params[i]=log(params[i]); break;
+                default: break;
+            }
+        }
+    }
+}
+
+void QFFitAlgorithm::FitQFFitFunctionFunctor::backtransfromParameters(double *params)
+{
+    if (hasParameterTransforms) {
+        register int pcount=get_paramcount();
+        for (int i=0; i<pcount; i++) {
+            switch (paramTransfroms[i]) {
+                case QFFitFunction::LogParameter: params[i]=exp(params[i]); break;
+                default: break;
+            }
+        }
+    }
+}
+
+QVector<double> QFFitAlgorithm::FitQFFitFunctionFunctor::transfromParametersCopy(const double *params)
+{
+    QVector<double> p=duplicateArrayV(params, get_paramcount());
+    if (hasParameterTransforms) transfromParameters(p.data());
+    return p;
+}
+
+QVector<double> QFFitAlgorithm::FitQFFitFunctionFunctor::backtransfromParametersCopy(const double *params)
+{
+    QVector<double> p=duplicateArrayV(params, get_paramcount());
+    if (hasParameterTransforms) backtransfromParameters(p.data());
+    return p;
 }
 
 

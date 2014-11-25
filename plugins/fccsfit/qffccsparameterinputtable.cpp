@@ -147,10 +147,10 @@ QVariant QFFCCSParameterInputTable::data(const QModelIndex &index, int role) con
                         }
                         if (role==Qt::EditRole) return roundWithError(item->getFitValue(fp.id, rdr), item->getFitError(fp.id, rdr));
                         if (role==widgetTypeRole && desc.userEditable) {
-                            if (desc.type==QFFitFunction::FloatNumber) return wtValueDoubleEdit;
-                            if (desc.type==QFFitFunction::LogFloatNumber) return wtValueLogDoubleEdit;
-                            if (desc.type==QFFitFunction::IntNumber) return wtValueIntEdit;
-                            if (desc.type==QFFitFunction::IntCombo) return wtValueComboBox;
+                            if (desc.widgetType==QFFitFunction::FloatNumber) return wtValueDoubleEdit;
+                            if (desc.widgetType==QFFitFunction::LogFloatNumber) return wtValueLogDoubleEdit;
+                            if (desc.widgetType==QFFitFunction::IntNumber) return wtValueIntEdit;
+                            if (desc.widgetType==QFFitFunction::IntCombo) return wtValueComboBox;
                         }
                         if (role==Qt::BackgroundRole && !desc.userEditable) return QBrush(QApplication::palette().color(QPalette::Window));
                     } if (coli==1) {
@@ -164,7 +164,7 @@ QVariant QFFCCSParameterInputTable::data(const QModelIndex &index, int role) con
                             return item->getFitMin(fp.id, rdr);
                         }
                         if (role==widgetTypeRole && desc.userEditable) {
-                            if (desc.type==QFFitFunction::FloatNumber) return wtRangeEditMin;
+                            if (desc.widgetType==QFFitFunction::FloatNumber) return wtRangeEditMin;
                         }
                         if (role==Qt::BackgroundRole && !desc.userEditable) return QBrush(QApplication::palette().color(QPalette::Window));
                     } if (editRanges && coli==3) {
@@ -172,7 +172,7 @@ QVariant QFFCCSParameterInputTable::data(const QModelIndex &index, int role) con
                             return item->getFitMax(fp.id, rdr);
                         }
                         if (role==widgetTypeRole && desc.userEditable) {
-                            if (desc.type==QFFitFunction::FloatNumber) return wtRangeEditMax;
+                            if (desc.widgetType==QFFitFunction::FloatNumber) return wtRangeEditMax;
                         }
                         if (role==Qt::BackgroundRole && !desc.userEditable) return QBrush(QApplication::palette().color(QPalette::Window));
                     } if (coli==getColsPerRDR()-3) {

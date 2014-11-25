@@ -26,30 +26,39 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <cmath>
 
 
-QFFitFunctionGeneralSegmentedPowerLaw::QFFitFunctionGeneralSegmentedPowerLaw() {
+QFFitFunctionGeneralSegmentedPowerLaw::QFFitFunctionGeneralSegmentedPowerLaw(bool logoptimized) {
+    this->logoptimized=logoptimized;
     //           type,         id,                        name,                                                    label (HTML),                      unit,          unitlabel (HTML),        fit,       userEditable, userRangeEditable, displayError, initialFix,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(IntCombo,  "segments",                   "segments",                                                "segments",                   "",            "",                      false,      true,         false,              QFFitFunction::NoError,       false, 2,          2, 3,  1,   1,    10  );
     #define PARAM_SEGMENTS 0
-    addParameter(FloatNumber,  "offset",                    "offset",                                                  "Y<sub>0</sub>",                   "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       true, 0.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    addParameter(FloatNumber,  "offset",                    "offset",                                                  "Y<sub>0</sub>",                   "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       true, 0.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MAX,    DBL_MAX  );
     #define PARAM_OFFSET 1
-    addParameter(FloatNumber,  "amplitude",                  "amplitude 1",                                                "A<sub>1</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false,1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX );
+    addParameter(FloatNumber,  "amplitude",                  "amplitude 1",                                                "A<sub>1</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false,1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MAX,    DBL_MAX );
     #define PARAM_AMPLITUDE1 2
-    addParameter(FloatNumber,  "power",                   "power 1",                                                 "p<sub>1</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    addParameter(FloatNumber,  "power",                   "power 1",                                                 "p<sub>1</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1,          -DBL_MAX, DBL_MAX,  1,   -DBL_MAX,    DBL_MAX  );
     #define PARAM_POWER1 3
-    addParameter(FloatNumber,  "intersection12",          "intersection x2",                                         "x<sub>2</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    if (logoptimized) addLogParameter(FloatNumber,  "intersection12",          "intersection x2",                                         "x<sub>2</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1,          0, DBL_MAX,  1,   0,    DBL_MAX  );
+    else addParameter(FloatNumber,  "intersection12",          "intersection x2",                                         "x<sub>2</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1,          -DBL_MAX, DBL_MAX,  1,   -DBL_MAX,    DBL_MAX  );
     #define PARAM_INTERSECT2 4
-    addParameter(FloatNumber,  "amplitude2",                 "amplitude 2",                                                "A<sub>2</sub>",               "",            "",                      false,     false,        false,             QFFitFunction::DisplayError,       false, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    addParameter(FloatNumber,  "amplitude2",                 "amplitude 2",                                                "A<sub>2</sub>",               "",            "",                      false,     false,        false,             QFFitFunction::DisplayError,       false, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MAX,    DBL_MAX  );
     #define PARAM_AMPLITUDE2 5
-    addParameter(FloatNumber,  "power2",                  "power 2",                                                 "p<sub>2</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 2.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    addParameter(FloatNumber,  "power2",                  "power 2",                                                 "p<sub>2</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 2.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MAX,    DBL_MAX  );
     #define PARAM_POWER2 6
-    addParameter(FloatNumber,  "intersection23",          "intersection x3",                                         "x<sub>3</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 10.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    if (logoptimized) addLogParameter(FloatNumber,  "intersection23",          "intersection x3",                                         "x<sub>3</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 10.0,          0, DBL_MAX,  1,   0,    DBL_MAX  );
+    else addParameter(FloatNumber,  "intersection23",          "intersection x3",                                         "x<sub>3</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 10.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MAX,    DBL_MAX  );
     #define PARAM_INTERSECT3 7
-    addParameter(FloatNumber,  "amplitude3",                 "amplitude 3",                                                "A<sub>3</sub>",               "",            "",                      false,     false,        false,             QFFitFunction::DisplayError,       false, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    addParameter(FloatNumber,  "amplitude3",                 "amplitude 3",                                                "A<sub>3</sub>",               "",            "",                      false,     false,        false,             QFFitFunction::DisplayError,       false, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MAX,    DBL_MAX  );
     #define PARAM_AMPLITUDE3 8
-    addParameter(FloatNumber,  "power3",                  "power 3",                                                 "p<sub>3</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 4.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MIN,    DBL_MAX  );
+    addParameter(FloatNumber,  "power3",                  "power 3",                                                 "p<sub>3</sub>",               "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 4.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MAX,    DBL_MAX  );
     #define PARAM_POWER3 9
 
 
+}
+
+QString QFFitFunctionGeneralSegmentedPowerLaw::id() const
+{
+    if (logoptimized) return QString("gen_segpowerlaw");
+    else return QString("gen_segpowerlaw_nonopt");
 }
 
 double QFFitFunctionGeneralSegmentedPowerLaw::evaluate(double t, const double* data) const {

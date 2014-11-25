@@ -252,10 +252,10 @@ QVariant QFFitFunctionValueInputTable::data(const QModelIndex &index, int role) 
                     QFFitFunction::ParameterDescription desc=fitfunction->getDescription(fp.id);
                     if (role==widgetTypeRole) {
                         if (desc.userEditable) {
-                            if (desc.type==QFFitFunction::FloatNumber) return wtValueDoubleEdit;
-                            if (desc.type==QFFitFunction::LogFloatNumber) return wtValueLogDoubleEdit;
-                            if (desc.type==QFFitFunction::IntNumber) return wtValueIntEdit;
-                            if (desc.type==QFFitFunction::IntCombo) return wtValueComboBox;
+                            if (desc.widgetType==QFFitFunction::FloatNumber) return wtValueDoubleEdit;
+                            if (desc.widgetType==QFFitFunction::LogFloatNumber) return wtValueLogDoubleEdit;
+                            if (desc.widgetType==QFFitFunction::IntNumber) return wtValueIntEdit;
+                            if (desc.widgetType==QFFitFunction::IntCombo) return wtValueComboBox;
                         }
                         return wtNone;
                     } else if (role==Qt::BackgroundRole && !desc.userEditable){

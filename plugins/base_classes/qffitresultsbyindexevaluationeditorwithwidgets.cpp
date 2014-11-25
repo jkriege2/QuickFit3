@@ -947,9 +947,9 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::displayModel(bool newWidget
 
             QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
             QFFitParameterWidgetWrapper::WidgetType wtype=QFFitParameterWidgetWrapper::FloatEdit;
-            if (d.type==QFFitFunction::IntNumber) wtype=QFFitParameterWidgetWrapper::IntSpinBox;
-            if (d.type==QFFitFunction::IntCombo) wtype=QFFitParameterWidgetWrapper::IntDropDown;
-            if (d.type==QFFitFunction::LogFloatNumber) wtype=QFFitParameterWidgetWrapper::LogFloatEdit;
+            if (d.widgetType==QFFitFunction::IntNumber) wtype=QFFitParameterWidgetWrapper::IntSpinBox;
+            if (d.widgetType==QFFitFunction::IntCombo) wtype=QFFitParameterWidgetWrapper::IntDropDown;
+            if (d.widgetType==QFFitFunction::LogFloatNumber) wtype=QFFitParameterWidgetWrapper::LogFloatEdit;
             bool editable=d.userEditable;
             bool displayFix=d.userEditable;
             QFFitFunction::ErrorDisplayMode displayError=d.displayError;

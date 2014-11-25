@@ -28,14 +28,14 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 */
 class QFFitFunctionGeneralSegmentedPowerLaw: public QFFitFunction {
     public:
-        QFFitFunctionGeneralSegmentedPowerLaw();
+        QFFitFunctionGeneralSegmentedPowerLaw(bool logoptimized=true);
         virtual ~QFFitFunctionGeneralSegmentedPowerLaw() {}
         /*! \copydoc QFFitFunction::name()   */
         virtual QString name() const { return QObject::tr("General: Segmented Power law"); }
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("gen_segpowerlaw"); }
+        virtual QString id() const;
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
@@ -59,7 +59,8 @@ class QFFitFunctionGeneralSegmentedPowerLaw: public QFFitFunction {
 
         /*! \brief if implemented (and returns \c true) this function tries to estimate the initial parameters of a fit function from provided data. */
         virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N, const bool *fix=NULL);
-
+    private:
+        bool logoptimized;
 };
 
 #endif // QFFITFUNCTIONGENERALSEGMENTEDPOWERLAW_H

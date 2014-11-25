@@ -78,12 +78,19 @@
 class QFLIB_EXPORT QFFitFunction {
     public:
         /** \brief different types of input widgets for parameters */
-        enum ParameterType {
+        enum ParameterWidgetType {
             FloatNumber=0, /**< a floating point number edit widget is used for the parameter*/
             LogFloatNumber=3, /**< a floating point number edit widget is used for the parameter, which uses a logarithmic stepping scheme*/
             IntNumber=1,   /**< an integer number edit widget is used for the parameter*/
             IntCombo=2,    /**< a combobox widget is used for the parameter*/
             Invalid=100    /**< invalid widget */
+        };
+
+        /** \brief parameter classes, which may be used by the fit algorithms. These could e.g. introduce parameter transform to quilibrate the ranges better. */
+        enum ParameterType {
+            StandardParameter=0, /**< a simple, linearly scaling parameter */
+            LogParameter=1, /**< a parameter, which may span several orders of magnitude and is positive */
+            PosNegOrderOfMagnitudeParameter=2, /**< a parameter, which may span several orders of magnitude and is positive */
         };
 
         /** \brief error display mode */
@@ -95,8 +102,10 @@ class QFLIB_EXPORT QFFitFunction {
         };
         /** \brief this struct is used to describe the fitting parameters */
         struct QFLIB_EXPORT ParameterDescription {
+            /** \brief type of the parameter widget */
+            ParameterWidgetType widgetType;
             /** \brief type of the parameter */
-            ParameterType type;
+            ParameterType parameterType;
             /** \brief short unique id for the parameter, e.g. "n" */
             QString id;
             /** \brief description of the parameter, e.g. "particle number N" */
@@ -135,7 +144,7 @@ class QFLIB_EXPORT QFFitFunction {
             QStringList comboItems;
 
             ParameterDescription() {
-                type=Invalid;
+                widgetType=Invalid;
                 id="";
                 name="";
                 label="";
@@ -152,6 +161,7 @@ class QFLIB_EXPORT QFFitFunction {
                 absMinValue=-DBL_MAX;
                 absMaxValue=DBL_MAX;
                 comboItems=QStringList();
+                parameterType=StandardParameter;
             }
         };
 
@@ -421,9 +431,10 @@ class QFLIB_EXPORT QFFitFunction {
             used in the constructor to define the model parameters
             \return the id of the parameter
          */
-        inline int addParameter(ParameterType type, QString id, QString name, QString label, QString unit, QString unitLabel, bool fit, bool userEditable, bool userRangeEditable, ErrorDisplayMode displayError, bool initialFix, double initialValue, double minValue=-DBL_MAX, double maxValue=DBL_MAX, double inc=1, double absMinValue=-DBL_MAX, double absMaxValue=DBL_MAX, QStringList comboItems=QStringList()) {
+        inline int addParameter(ParameterType paramType, ParameterWidgetType widgetType, const QString& id, const QString& name, const QString& label, const QString& unit, const QString& unitLabel, bool fit, bool userEditable, bool userRangeEditable, ErrorDisplayMode displayError, bool initialFix, double initialValue, double minValue=-DBL_MAX, double maxValue=DBL_MAX, double inc=1, double absMinValue=-DBL_MAX, double absMaxValue=DBL_MAX, const QStringList& comboItems=QStringList()) {
             ParameterDescription d;
-            d.type=type;
+            d.widgetType=widgetType;
+            d.parameterType=paramType;
             d.id=id;
             d.name=name;
             d.label=label;
@@ -443,6 +454,22 @@ class QFLIB_EXPORT QFFitFunction {
             d.initialFix=initialFix;
 
             return addParameter(d);
+        }
+        /*! \brief add a parameter description for a standard parameter
+
+            used in the constructor to define the model parameters
+            \return the id of the parameter
+         */
+        inline int addParameter(ParameterWidgetType widgetType, const QString& id, const QString& name, const QString& label, const QString& unit, const QString& unitLabel, bool fit, bool userEditable, bool userRangeEditable, ErrorDisplayMode displayError, bool initialFix, double initialValue, double minValue=-DBL_MAX, double maxValue=DBL_MAX, double inc=1, double absMinValue=-DBL_MAX, double absMaxValue=DBL_MAX, const QStringList& comboItems=QStringList()) {
+            return addParameter(StandardParameter, widgetType,  id,  name,  label,  unit,  unitLabel,  fit,  userEditable,  userRangeEditable,  displayError,  initialFix,  initialValue,  minValue,  maxValue,  inc,  absMinValue,  absMaxValue,  comboItems);
+        }
+        /*! \brief add a parameter description for a logarithmic parameter
+
+            used in the constructor to define the model parameters
+            \return the id of the parameter
+         */
+        inline int addLogParameter(ParameterWidgetType widgetType, const QString& id, const QString& name, const QString& label, const QString& unit, const QString& unitLabel, bool fit, bool userEditable, bool userRangeEditable, ErrorDisplayMode displayError, bool initialFix, double initialValue, double minValue=-DBL_MAX, double maxValue=DBL_MAX, double inc=1, double absMinValue=-DBL_MAX, double absMaxValue=DBL_MAX, const QStringList& comboItems=QStringList()) {
+            return addParameter(LogParameter, widgetType,  id,  name,  label,  unit,  unitLabel,  fit,  userEditable,  userRangeEditable,  displayError,  initialFix,  initialValue,  minValue,  maxValue,  inc,  absMinValue,  absMaxValue,  comboItems);
         }
 
     private:

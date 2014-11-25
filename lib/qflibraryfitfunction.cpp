@@ -141,7 +141,7 @@ QFLibraryFitFunction::QFLibraryFitFunction(QLibrary *library)
         uint16_t pc=d->lib_getParamCount();
         const QF3SimpleFFParameter* params=d->lib_getParams();
         for (int i=0; i<pc; i++) {
-            addParameter((QFFitFunction::ParameterType)params[i].type,
+            addParameter((QFFitFunction::ParameterWidgetType)params[i].type,
                          params[i].id,
                          params[i].name,
                          params[i].label,

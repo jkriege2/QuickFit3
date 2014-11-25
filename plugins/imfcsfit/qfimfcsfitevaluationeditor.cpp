@@ -1187,7 +1187,7 @@ void QFImFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
         bool fix=eval->getFitFix(id);
         QFFitFunction::ParameterDescription d=ffunc->getDescription(id);
         QString range=QString("%1...%2").arg(QString(floattohtmlstr(d.minValue, 5, true).c_str())).arg(QString(floattohtmlstr(d.maxValue, 5, true).c_str()));
-        if ((d.type==QFFitFunction::IntCombo)&&((int)value>=0)&&((int)value<d.comboItems.size())) {
+        if ((d.widgetType==QFFitFunction::IntCombo)&&((int)value>=0)&&((int)value<d.comboItems.size())) {
             value_string="<i>"+d.comboItems[(int)value]+"</i>";
         }
         if (ffunc->isParameterVisible(i, params)) {

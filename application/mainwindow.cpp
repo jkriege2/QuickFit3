@@ -211,7 +211,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end_notitle"), QString("</td></tr></table></td></tr></table>")));// </div>")));
 
 
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end"), tr("$$qf_commondoc_header.end_notitle$$ <font size=\"+1\"><h1 id=\"TITLE\"><!-- title -->$$title$$</h1>")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end"), tr("$$qf_commondoc_header.end_notitle$$ <font size=\"+1\"><h1 id=\"TITLE\"><!-- title -->$$title$$</h1>$$local_plugin_autostartdescription$$")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.separator"), QString(" | ")));
 
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.default_links"), tr("<a href=\"%1quickfit.html\">QuickFit</a> $$local_plugin_typehelp_link$$ $$local_plugin_mainhelp_link$$ $$local_plugin_tutorial_link$$ $$local_plugin_faq_link$$").arg(settings->getMainHelpDirectory())));
@@ -238,7 +238,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_css_mainfile_block"), QString("<style>\n$$qf_css_mainfile$$\n</style>\n")));
 
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.start"),
-         tr("$$DEFAULTREF$$</font>\n<a name=\"#footer\"><table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">"
+         tr("$$DEFAULTREF$$</font>\n$$local_plugin_autodescription$$\n<a name=\"#footer\"><table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">"
             "<table width=\"100%\">"
             "<tr><td align=\"center\" ><a href=\"#top_page\" font-size: $$main_fontsize:-2$$;\"><img src=\":/lib/help/help_top.png\"></a>&nbsp;&nbsp;&nbsp;</td><td align=\"left\" style=\" font-size: $$main_fontsize:-2$$;\">$$local_plugin_icon$$&nbsp;&nbsp;&nbsp;</td><td align=\"right\" width=\"90%\" font-size: $$main_fontsize:-2$$;\">  <b>$$local_plugin_name$$</b> <i>$$local_plugin_copyright$$</i><br>$$local_plugin_weblink$$<br>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.end"), QString("</td></tr></table></td></tr></table>")));// </div>")));
@@ -4138,6 +4138,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             if (QDir(pluginList->at(i).directory)==basepath) { // we found the info for this directory
                 QString pid=pluginList->at(i).plugin->getID();
                 QString pid_sub_deocrated="";
+                QString autoplugin_description;
+                QString autoplugin_startdescription;
                 QString fn=QFileInfo(filename).baseName();
                 if (QFFitAlgorithmManager::getInstance()->contains(pid)) {
                     if (QFFitAlgorithmManager::getInstance()->getIDList().contains(fn)) {
@@ -4146,6 +4148,32 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 } else  if (QFFitFunctionManager::getInstance()->contains(pid)) {
                     if (QFFitFunctionManager::getInstance()->getIDList().contains(fn)) {
                         pid_sub_deocrated=tr("&nbsp;&nbsp;&nbsp;fitFunctionID: <b><tt>%1</tt></b>").arg(fn);
+                        QFFitFunction* ff=QFFitFunctionManager::getInstance()->createFunction(fn);
+                        if (ff) {
+                            QStringList ffeat;
+                            QString fffeatures="";
+                            QString params;
+                            if (ff->get_implementsDerivatives()) {
+                                ffeat.append(tr("analytical derivaties"));
+                            }
+                            if (ff->estimateInitial(NULL, NULL, NULL, 0)) {
+                                ffeat.append(tr("estimates initial values"));
+                            }
+                            if (ff->isDeprecated()) {
+                                autoplugin_startdescription+=tr("$$note:This fit function is marked as deprecated by the author and may be removed from QuickFit in one of the future versions! Please use an alternative where possible.$$");
+                            }
+                            if (!ffeat.isEmpty()) fffeatures=tr("  <li>features: <b>%1</b></li>").arg(ffeat.join(", "));
+                            autoplugin_description+=tr("<h2>Fit Function Metadata</h2>"
+                                                       "<p>This page describes a QFFitFunction, i.e. a fit function for QuickFit $$version$$:<ul>"
+                                                       "  <li>id: <b>%1</b></li>"
+                                                       "  <li>name: <b>%2</b></li>"
+                                                       "  <li>shortened name: <b>%3</b></li>"
+                                                       "%4"
+                                                       "</ul>"
+                                                       "The parameters of this fit function are:<table>%5</table>"
+                                                       "</p>").arg(ff->id()).arg(ff->name()).arg(ff->shortName()).arg(fffeatures).arg(params);
+                            delete ff;
+                        }
                     }
                 }
 
@@ -4167,6 +4195,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink_url"), pluginList->at(i).plugin->getWeblink()));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink"), QObject::tr("<a href=\"%1\">Plugin Webpage</a>").arg(pluginList->at(i).plugin->getWeblink())));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_id"), pid));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_autodescription"), autoplugin_description));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_autostartdescription"), autoplugin_startdescription));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_dllbasename"), pluginList->at(i).pluginDLLbasename));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_dllsuffix"), pluginList->at(i).pluginDLLSuffix));
                 if (QFPluginServices::getInstance()) {
@@ -4206,6 +4236,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         fromHTML_replaces.append(qMakePair(QString("local_plugin_iconfilename"), QString(":/icon.png")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_name"), QObject::tr("QuickFit $$version$$: Online-Help")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_id_decorated"), QString("")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_autodescription"), QString("")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_autostartdescription"), QString("")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_author"), QString("$$author$$")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_id"), QString("$$author$$")));
         if (basedir.exists("copyright.html")) {
