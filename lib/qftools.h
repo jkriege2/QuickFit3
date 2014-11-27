@@ -1849,8 +1849,10 @@ void qfShuffleInplace(QVector<T>& value) {
     \ingroup qf3lib_tools
 
 */
-QFLIB_EXPORT QPixmap cropLeftRight(const QPixmap& pix, QColor cropcolor);
-QFLIB_EXPORT QImage cropLeftRight(const QImage& pix, QColor cropcolor);
+QFLIB_EXPORT QPixmap cropLeftRight(const QPixmap& pix, QRgb cropcolor);
+QFLIB_EXPORT QImage cropLeftRight(const QImage& pix, QRgb cropcolor);
+QFLIB_EXPORT QPixmap cropLeftRight(const QPixmap& pix);
+QFLIB_EXPORT QImage cropLeftRight(const QImage& pix);
 
 #endif // QFTOOLS_H
 

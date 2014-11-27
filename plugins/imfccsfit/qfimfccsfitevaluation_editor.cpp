@@ -194,6 +194,7 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     actResetAllPixelsInAllFilesets=new QAction(tr("Reset All &Pixels in all filesets"), this);
     actResetAllPixelsInAllFilesets->setToolTip(tr("reset all pixels to the initial parameters in all files fitted so far."));
     connect(actResetAllPixelsInAllFilesets, SIGNAL(triggered()), this, SLOT(resetAllPixelsInAllFilesets()));
+    connect(ui->btnClearEverything, SIGNAL(clicked()), this, SLOT(resetAllPixelsInAllFilesets()));
     menuEvaluation->addAction(actResetAllPixelsInAllFilesets);
 
     actCopyToInitial=new QAction(tr("Copy to &Initial"), this);
@@ -1637,9 +1638,10 @@ void QFImFCCSFitEvaluationEditor::resetAllPixelsInAllFilesets()
     for (int i=0; i<filesets.size(); i++) {
         for (int f=0; f<filesets[i].size(); f++) {
             QFRawDataRecord* rec=filesets[i].value(f);
-            eval->resetAllFitResultsCurrent(rec);
+            if (rec) eval->resetAllFitResultsAllIndices(rec);
         }
     }
+
     displayEvaluation();
     QApplication::restoreOverrideCursor();
 }
@@ -2068,7 +2070,7 @@ void QFImFCCSFitEvaluationEditor::setParameterInRDRs()
         progress.setWindowModality(Qt::WindowModal);
         progress.show();
         for (int i=0; i<fitfilesets.size(); i++) {
-            imfccseval->setFitFiles(fitfilesets[i]);
+            imfccseval->addFittedFileSet(fitfilesets[i]);
             for (int j=0; j<fitfilesets[i].size(); j++) {
                 QFFitFunction* ff=imfccseval->getFitFunction(j);
                 QFRawDataRecord* r=fitfilesets[i].at(j);

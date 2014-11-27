@@ -366,33 +366,33 @@ void QFHistogramView::writeSettings(QSettings& settings, const QString& prefix) 
 
 void QFHistogramView::writeQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
 {
-    current->setQFProperty(prefix+QString("bins_%1_%2").arg(egroup).arg(param), getBins(), false, false);
-    current->setQFProperty(prefix+QString("norm_%1_%2").arg(egroup).arg(param), getNormalized(), false, false);
-    current->setQFProperty(prefix+QString("log_%1_%2").arg(egroup).arg(param), getLog(), false, false);
-    current->setQFProperty(prefix+QString("rauto_%1_%2").arg(egroup).arg(param), getAutorange(), false, false);
-    current->setQFProperty(prefix+QString("showkey_%1_%2").arg(egroup).arg(param), chkKey->isChecked(), false, false);
-    current->setQFProperty(prefix+QString("distfit_%1_%2").arg(egroup).arg(param), cmbFitFunction->currentFitFunctionID(), false, false);
-    current->setQFProperty(prefix+QString("rangepercent_%1_%2").arg(egroup).arg(param), edtHistogramRelaxedRangePercent->value(), false, false);
-    current->setQFProperty(prefix+QString("rangepercentup_%1_%2").arg(egroup).arg(param), edtHistogramRelaxedRangePercentUp->value(), false, false);
+    current->setQFProperty(prefix+QString("bins_%1").arg(param), getBins(), false, false);
+    current->setQFProperty(prefix+QString("norm_%1").arg(param), getNormalized(), false, false);
+    current->setQFProperty(prefix+QString("log_%1").arg(param), getLog(), false, false);
+    current->setQFProperty(prefix+QString("rauto_%1").arg(param), getAutorange(), false, false);
+    current->setQFProperty(prefix+QString("showkey_%1").arg(param), chkKey->isChecked(), false, false);
+    current->setQFProperty(prefix+QString("distfit_%1").arg(param), cmbFitFunction->currentFitFunctionID(), false, false);
+    current->setQFProperty(prefix+QString("rangepercent_%1").arg(param), edtHistogramRelaxedRangePercent->value(), false, false);
+    current->setQFProperty(prefix+QString("rangepercentup_%1").arg(param), edtHistogramRelaxedRangePercentUp->value(), false, false);
     if (chkHistogramRangeManual->isChecked()) {
-        current->setQFProperty(prefix+QString("rmin_%1_%2").arg(egroup).arg(param), getMin(), false, false);
-        current->setQFProperty(prefix+QString("rmax_%1_%2").arg(egroup).arg(param), getMax(), false, false);
+        current->setQFProperty(prefix+QString("rmin_%1").arg(param), getMin(), false, false);
+        current->setQFProperty(prefix+QString("rmax_%1").arg(param), getMax(), false, false);
     }
 }
 
 void QFHistogramView::readQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
 {
-    setBins(current->getProperty(prefix+QString("bins_%1_%2").arg(egroup).arg(param), 50).toInt());
-    setNormalized(current->getProperty(prefix+QString("norm_%1_%2").arg(egroup).arg(param), true).toBool());
-    setLog(current->getProperty(prefix+QString("log_%1_%2").arg(egroup).arg(param), false).toBool());
-    setAutorange(current->getProperty(prefix+QString("rauto_%1_%2").arg(egroup).arg(param), true).toBool());
-    chkKey->setChecked(current->getProperty(prefix+QString("showkey_%1_%2").arg(egroup).arg(param), true).toBool());
-    cmbFitFunction->setCurrentFitFunction(current->getProperty(prefix+QString("distfit_%1_%2").arg(egroup).arg(param), "gen_gaussian_sqrte").toString());
-    edtHistogramRelaxedRangePercent->setValue(current->getProperty(prefix+QString("rangepercent_%1_%2").arg(egroup).arg(param), 5).toDouble());
-    edtHistogramRelaxedRangePercentUp->setValue(current->getProperty(prefix+QString("rangepercentup_%1_%2").arg(egroup).arg(param), 5).toDouble());
+    setBins(current->getQFPropertyHirarchy2(prefix+QString("bins_%1").arg(param), prefix+QString("bins_%1_%2").arg(egroup).arg(param), 50).toInt());
+    setNormalized(current->getQFPropertyHirarchy2(prefix+QString("norm_%1").arg(param), prefix+QString("norm_%1_%2").arg(egroup).arg(param), true).toBool());
+    setLog(current->getQFPropertyHirarchy2(prefix+QString("log_%1").arg(param), prefix+QString("log_%1_%2").arg(egroup).arg(param), false).toBool());
+    setAutorange(current->getQFPropertyHirarchy2(prefix+QString("rauto_%1").arg(param), prefix+QString("rauto_%1_%2").arg(egroup).arg(param), true).toBool());
+    chkKey->setChecked(current->getQFPropertyHirarchy2(prefix+QString("showkey_%1").arg(param), prefix+QString("showkey_%1_%2").arg(egroup).arg(param), true).toBool());
+    cmbFitFunction->setCurrentFitFunction(current->getQFPropertyHirarchy2(prefix+QString("distfit_%1").arg(param), prefix+QString("distfit_%1_%2").arg(egroup).arg(param), "gen_gaussian_sqrte").toString());
+    edtHistogramRelaxedRangePercent->setValue(current->getQFPropertyHirarchy2(prefix+QString("rangepercent_%1").arg(param), prefix+QString("rangepercent_%1_%2").arg(egroup).arg(param), 5).toDouble());
+    edtHistogramRelaxedRangePercentUp->setValue(current->getQFPropertyHirarchy2(prefix+QString("rangepercentup_%1").arg(param), prefix+QString("rangepercentup_%1_%2").arg(egroup).arg(param), 5).toDouble());
     if (chkHistogramRangeManual->isChecked()) {
-        setMin(current->getProperty(prefix+QString("rmin_%1_%2").arg(egroup).arg(param), 0).toDouble());
-        setMax(current->getProperty(prefix+QString("rmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
+        setMin(current->getQFPropertyHirarchy2(prefix+QString("rmin_%1").arg(param), prefix+QString("rmin_%1_%2").arg(egroup).arg(param), 0).toDouble());
+        setMax(current->getQFPropertyHirarchy2(prefix+QString("rmax_%1").arg(param), prefix+QString("rmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
     }
 }
 

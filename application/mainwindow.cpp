@@ -4781,7 +4781,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                             p.end();
                             QString texfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+"_tex"+QString::number(count)+".png";
                             //qDebug()<<"latex-render: "<<latex<<"\n    size = "<<size<<"  output = "<<texfilename;
-                            pix=cropLeftRight(pix, Qt::transparent);
+                            pix=cropLeftRight(pix);
                             pix.save(texfilename);
 
                             if (command=="bmath" || command=="mathb") {

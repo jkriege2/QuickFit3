@@ -106,6 +106,7 @@ void QFPEvalIMFCSFit::init()
             extm->addMenu(menu);
         }
         menuCalibration=menu;
+        services->registerWizard("eval_wizards", actWizard);
     }
 }
 

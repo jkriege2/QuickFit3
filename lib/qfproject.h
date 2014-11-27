@@ -224,6 +224,8 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         QFRawDataRecord* getRawDataByNum(int i) const;
         /** \brief returns all RDR records in the given folder */
         QList<QFRawDataRecord*> getRDRsInFolder(const QString& folder, bool alsoSubfolders=false) const;
+        /** \brief returns all RDR records in the given type */
+        QList<QFRawDataRecord*> getRDRsWithType(const QString& type) const;
 
 
         /** \brief return the next sibling rawdata record, or NULL if none */

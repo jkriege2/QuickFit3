@@ -1533,12 +1533,12 @@ QString qfGetLargestCommonEnd(const QStringList& data, const QString& defaultRes
 }
 
 
-QPixmap cropLeftRight(const QPixmap& pix, QColor cropcolor) {
+QPixmap cropLeftRight(const QPixmap& pix, QRgb cropcolor) {
     return QPixmap::fromImage(cropLeftRight(pix.toImage(), cropcolor));
 }
 
-QImage cropLeftRight(const QImage& img, QColor cropcolor) {
-    QRgb col=cropcolor.rgb();
+QImage cropLeftRight(const QImage& img, QRgb col) {
+
     int left=0;
     int right=0;
     for (int x=0; x<img.width(); x++) {
@@ -1559,9 +1559,23 @@ QImage cropLeftRight(const QImage& img, QColor cropcolor) {
         if (allc) right++;
         else break;
     }
+    //qDebug()<<"cropLeftRight("<<img.width()<<img.height()<<col<<img.pixel(0,0)<<"): "<<left<<right;
     if (left+right<img.width()) {
         return img.copy(left,0,img.width()-left-right,img.height());
     } else {
         return QImage();
     }
 }
+
+QPixmap cropLeftRight(const QPixmap& pix) {
+    return QPixmap::fromImage(cropLeftRight(pix.toImage()));
+}
+
+QImage cropLeftRight(const QImage& pix) {
+    return cropLeftRight(pix, pix.pixel(0,0));
+}
+
+
+
+
+

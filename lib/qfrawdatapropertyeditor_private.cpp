@@ -491,6 +491,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete selected records"), d);
     actDeleteResults->setShortcut(QKeySequence::Delete);
     tbResults->addAction(actDeleteResults);
+    actDeleteAllVisibleResults=new QAction(tr("Delete all visible records"), d);
 
     tbResults->addSeparator();
 
@@ -583,6 +584,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
     connect(actSaveResultsAveraged, SIGNAL(triggered()), this, SLOT(saveResultsAveraged()));
     connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedResults()));
+    connect(actDeleteAllVisibleResults, SIGNAL(triggered()), this, SLOT(deleteAllVisibleResults()));
     connect(actCopyMedianQuantilesResults, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResults()));
     connect(actCopyMedianQuantilesNoHead, SIGNAL(triggered()), this, SLOT(copyMedianQuantilesResultsNoHead()));
     connect(actCopyExpanded, SIGNAL(triggered()), this, SLOT(copyResultsExpanded()));
@@ -607,6 +609,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     tvResults->addAction(actSaveResults);
     tvResults->addAction(actSaveResultsAveraged);
     tvResults->addAction(actDeleteResults);
+    tvResults->addAction(actDeleteAllVisibleResults);
     tvResults->addAction(actShowData);
     tvResults->addAction(actStatistics);
     tvResults->addAction(actStatisticsComparing);
@@ -616,6 +619,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     menuResults->addAction(actSaveResultsAveraged);
     menuResults->addSeparator();
     menuResults->addAction(actDeleteResults);
+    menuResults->addAction(actDeleteAllVisibleResults);
     menuResults->addSeparator();
     tvResults->addActionsToMenu(menuResults);
     //menuResults->addAction(actCopyResults);
@@ -906,6 +910,10 @@ void QFRawDataPropertyEditor_private::tvResultsSelectionChanged(const QItemSelec
     labAveragedresults->setText(results);
 }
 
+void QFRawDataPropertyEditor_private::deleteAllVisibleResults() {
+    tvResults->selectAll();
+    deleteSelectedResults();
+}
 void QFRawDataPropertyEditor_private::deleteSelectedResults() {
     QModelIndexList sel=tvResults->selectionModel()->selectedIndexes();
     if (sel.size()>0) {

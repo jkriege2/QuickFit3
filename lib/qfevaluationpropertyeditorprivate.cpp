@@ -196,7 +196,7 @@ void QFEvaluationPropertyEditorPrivate::filterRecordsChanged()
     d->setFilesListFilteres(filesListFiltered);
 }
 
-void QFEvaluationPropertyEditorPrivate::deleteSelectedRecords() {
+void QFEvaluationPropertyEditorPrivate::deleteSelectedResults() {
     if (!d->current) return;
     QModelIndexList sel=tvResults->selectionModel()->selectedIndexes();
     if (sel.size()>0) {
@@ -227,7 +227,11 @@ void QFEvaluationPropertyEditorPrivate::deleteSelectedRecords() {
         }
     }
 }
+void QFEvaluationPropertyEditorPrivate::deleteAllVisibleResults() {
 
+    tvResults->selectAll();
+    deleteSelectedResults();
+}
 void QFEvaluationPropertyEditorPrivate::showAvgClicked(bool checked)
 {
     if (d->current && d->resultsModel) {
@@ -608,6 +612,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete selected results"), d);
     actDeleteResults->setShortcut(QKeySequence::Delete);
     tbResults->addAction(actDeleteResults);
+    actDeleteAllVisibleResults=new QAction(tr("Delete all visible results"), d);
     tbResults->addSeparator();
 
 
@@ -800,7 +805,8 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     connect(actSaveResults, SIGNAL(triggered()), this, SLOT(saveResults()));
     connect(actSaveResultsAveraged, SIGNAL(triggered()), this, SLOT(saveResultsAveraged()));
     connect(actRefreshResults, SIGNAL(triggered()), this, SLOT(refreshResults()));
-    connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedRecords()));
+    connect(actDeleteResults, SIGNAL(triggered()), this, SLOT(deleteSelectedResults()));
+    connect(actDeleteAllVisibleResults, SIGNAL(triggered()), this, SLOT(deleteAllVisibleResults()));
     connect(actStatistics, SIGNAL(triggered()), this, SLOT(showStatistics()));
     connect(actStatisticsComparing, SIGNAL(triggered()), this, SLOT(showStatisticsComparing()));
     connect(actShowData, SIGNAL(triggered()), this, SLOT(showData()));
@@ -860,6 +866,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     tvResults->addAction(actSaveResultsAveraged);
     tvResults->addAction(actRefreshResults);
     tvResults->addAction(actDeleteResults);
+    tvResults->addAction(actDeleteAllVisibleResults);
     tvResults->addAction(actShowData);
     tvResults->addAction(actStatistics);
     tvResults->addAction(actStatisticsComparing);
@@ -867,6 +874,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     menuResults->addAction(actRefreshResults);
     menuResults->addSeparator();
     menuResults->addAction(actDeleteResults);
+    menuResults->addAction(actDeleteAllVisibleResults);
     menuResults->addSeparator();
     menuResults->addAction(actSaveResults);
     menuResults->addAction(actSaveResultsAveraged);

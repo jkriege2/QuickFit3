@@ -83,6 +83,34 @@ QVariant QFProperties::getProperty(const QString &p, const QVariant &defaultValu
 
 }
 
+QVariant QFProperties::getQFPropertyHirarchy2(const QString &p1, const QString &p2, const QVariant &defaultValue) const
+{
+    QFPropsReadLocker lock(this->p->propertyLocker);
+    if (props.contains(p1)) return props[p1].data;
+    if (props.contains(p2)) return props[p2].data;
+    //if (props.contains(p3)) return props[p3].data;
+    return defaultValue;
+}
+
+QVariant QFProperties::getQFPropertyHirarchy3(const QString &p1, const QString &p2, const QString &p3, const QVariant &defaultValue) const
+{
+    QFPropsReadLocker lock(this->p->propertyLocker);
+    if (props.contains(p1)) return props[p1].data;
+    if (props.contains(p2)) return props[p2].data;
+    if (props.contains(p3)) return props[p3].data;
+    return defaultValue;
+}
+
+QVariant QFProperties::getQFPropertyHirarchy4(const QString &p1, const QString &p2, const QString &p3, const QString &p4, const QVariant &defaultValue) const
+{
+    QFPropsReadLocker lock(this->p->propertyLocker);
+    if (props.contains(p1)) return props[p1].data;
+    if (props.contains(p2)) return props[p2].data;
+    if (props.contains(p3)) return props[p3].data;
+    if (props.contains(p4)) return props[p3].data;
+    return defaultValue;
+}
+
 unsigned int QFProperties::getPropertyCount() const
 {
     QFPropsReadLocker lock(this->p->propertyLocker); return props.size();

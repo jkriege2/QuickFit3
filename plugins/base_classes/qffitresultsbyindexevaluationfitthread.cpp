@@ -643,10 +643,12 @@ void QFFitResultsByIndexEvaluationFitSmartThread_Writer::run()
                 emitSignals<<rdr->isEmitResultsChangedEnabled();
                 rdr->writeLock();
                 rdr->disableEmitResultsChanged();
-                rdr->resultsSetEvaluationGroup(evalID, localfitresults[i].evalgroup);
-                rdr->resultsSetEvaluationGroupLabel(localfitresults[i].evalgroup, localfitresults[i].egrouplabel);
-                rdr->resultsSetEvaluationGroupIndex(evalID, localfitresults[i].egroupindex);
-                rdr->resultsSetEvaluationDescription(evalID, localfitresults[i].egroupdescription);
+                if (!localfitresults[i].evalgroup.isEmpty()) {
+                    rdr->resultsSetEvaluationGroup(evalID, localfitresults[i].evalgroup);
+                    if (!localfitresults[i].egrouplabel.isEmpty()) rdr->resultsSetEvaluationGroupLabel(localfitresults[i].evalgroup, localfitresults[i].egrouplabel);
+                    rdr->resultsSetEvaluationGroupIndex(evalID, localfitresults[i].egroupindex);
+                    if (!localfitresults[i].egroupdescription.isEmpty()) rdr->resultsSetEvaluationDescription(evalID, localfitresults[i].egroupdescription);
+                }
                 rdr->writeUnLock();
             }
             //qDebug()<<"thread, writing "<<localfitresults.size()<<" items, done="<<done<<"  evalgroups = "<<double(timer.nsecsElapsed())/1e6<<" ms";

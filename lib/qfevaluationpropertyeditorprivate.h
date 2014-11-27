@@ -116,6 +116,7 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
         QAction* actSaveResultsAveraged;
         QAction* actRefreshResults;
         QAction* actDeleteResults;
+        QAction* actDeleteAllVisibleResults;
         /** \brief widget that is used to display the tvResults table + opt. some more compoinents */
         QWidget* widResults;
         QAction* actStatistics;
@@ -259,7 +260,7 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
 
         void filterRecordsChanged();
 
-        void deleteSelectedRecords();
+        void deleteSelectedResults();
 
         void showAvgClicked(bool checked);
 
@@ -270,6 +271,7 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
         void storeSettings();
         void loadSettings();
 
+        void deleteAllVisibleResults();
 };
 
 

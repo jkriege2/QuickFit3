@@ -135,6 +135,41 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     excludedColor=ovlExCol;
 
 
+    actUseSelStyleForAll=new QAction(tr("use this selection style for all records ..."), this);
+    connect(actUseSelStyleForAll, SIGNAL(triggered()), this, SLOT(useThisSelectionStyleForAllRDRs()));
+
+    actUseOverviewForAll=new QAction(tr("use this overview image style for all records ..."), this);
+    connect(actUseOverviewForAll, SIGNAL(triggered()), this, SLOT(useThisOverviewStyleForAllRDRs()));
+
+    actUseHist1ForAll=new QAction(tr("use settings for all RDRs (histogram 1)"), this);
+    connect(actUseHist1ForAll, SIGNAL(triggered()), this, SLOT(useThisHist1ForAllRDRs()));
+
+    actUseHist2ForAll=new QAction(tr("use settings for all RDRs (histogram 2)"), this);
+    connect(actUseHist2ForAll, SIGNAL(triggered()), this, SLOT(useThisHist2ForAllRDRs()));
+
+    actUseCorrForAll=new QAction(tr("use settings for all RDRs (correlation plot)"), this);
+    connect(actUseCorrForAll, SIGNAL(triggered()), this, SLOT(useThisCorrForAllRDRs()));
+
+    actUseParam1StyleForAll=new QAction(tr("use these parameter image 1 styles for all records ..."), this);
+    connect(actUseParam1StyleForAll, SIGNAL(triggered()), this, SLOT(useThisParam1StyleForAllRDRs()));
+
+    actUseParam2StyleForAll=new QAction(tr("use  these parameter image 2 styles for all records ..."), this);
+    connect(actUseParam2StyleForAll, SIGNAL(triggered()), this, SLOT(useThisParam2StyleForAllRDRs()));
+
+    actUseParam1and2StyleForAll=new QAction(tr("use these parameter image 1 and 2 styles for all records ..."), this);
+    connect(actUseParam1and2StyleForAll, SIGNAL(triggered()), this, SLOT(useThisParam1and2StyleForAllRDRs()));
+
+    actUseResultSetForAll=new QAction(tr("use this result set for all records ..."), this);
+    connect(actUseResultSetForAll, SIGNAL(triggered()), this, SLOT(useThisResultSetForAllRDRs()));
+
+    actUseParam1SetForAll=new QAction(tr("use this parameter 1 selection for all records ..."), this);
+    connect(actUseParam1SetForAll, SIGNAL(triggered()), this, SLOT(useThisParam1SetForAllRDRs()));
+
+    actUseParam2SetForAll=new QAction(tr("use this parameter 2 selection for all records ..."), this);
+    connect(actUseParam2SetForAll, SIGNAL(triggered()), this, SLOT(useThisParam2SetForAllRDRs()));
+
+    actUseParam1and2SetForAll=new QAction(tr("use this parameter 1 and 2 selection for all records ..."), this);
+    connect(actUseParam2SetForAll, SIGNAL(triggered()), this, SLOT(useThisParamsSetForAllRDRs()));
 
     ///////////////////////////////////////////////////////////////
     // GROUPBOX: parameter selection group box
@@ -150,12 +185,20 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbResultGroup->setMaximumWidth(700);
     cmbResultGroup->view()->setTextElideMode(Qt::ElideMiddle);
     cmbResultGroup->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cmbResultGroup->addAction(actUseResultSetForAll);
+    cmbResultGroup->addAction(actUseParam1and2SetForAll);
+
+    cmbResultGroup->setContextMenuPolicy(Qt::ActionsContextMenu);
     topgrid->addWidget((l=new QLabel(tr("&result set:"))), row, 0);
     l->setBuddy(cmbResultGroup);
     topgrid->addWidget(cmbResultGroup, row, 1);
 
     cmbParameter=new QComboBox(this);
     cmbParameter->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cmbParameter->addAction(actUseParam1SetForAll);
+    cmbParameter->addAction(actUseParam1and2SetForAll);
+    cmbParameter->setContextMenuPolicy(Qt::ActionsContextMenu);
+
     topgrid->addWidget((labParameter=new QLabel(tr("&parameter:"))), row, 3);
     labParameter->setBuddy(cmbParameter);
     topgrid->addWidget(cmbParameter, row, 4);
@@ -165,6 +208,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbParameterTransform->addItem(QIcon(":/imaging_fcs/log.png"), tr("log"));
     cmbParameterTransform->addItem(QIcon(":/imaging_fcs/reci.png"), tr("reciprocal"));
     cmbParameterTransform->addItem(QIcon(":/imaging_fcs/sqrt.png"), tr("sqrt"));
+    cmbParameterTransform->addAction(actUseParam1SetForAll);
+    cmbParameterTransform->addAction(actUseParam1and2SetForAll);
+    cmbParameterTransform->setContextMenuPolicy(Qt::ActionsContextMenu);
     topgrid->addWidget((labParameterTransform=new QLabel(tr("    &transform:"))), row, 5);
     labParameterTransform->setBuddy(cmbParameterTransform);
     topgrid->addWidget(cmbParameterTransform, row, 6);
@@ -173,9 +219,15 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QHBoxLayout* hblp2=new QHBoxLayout();
     topgrid->addLayout(hblp2, row, 3, 1, 4);
     chkOtherFileP2=new QCheckBox(tr("other RDR for parameter 2, role:"), this);
+    chkOtherFileP2->addAction(actUseParam2SetForAll);
+    chkOtherFileP2->addAction(actUseParam1and2SetForAll);
+    chkOtherFileP2->setContextMenuPolicy(Qt::ActionsContextMenu);
     hblp2->addWidget(chkOtherFileP2);
     cmbOtherFileRole=new QComboBox(this);
     cmbOtherFileRole->setEnabled(false);
+    cmbOtherFileRole->addAction(actUseParam2SetForAll);
+    cmbOtherFileRole->addAction(actUseParam1and2SetForAll);
+    cmbOtherFileRole->setContextMenuPolicy(Qt::ActionsContextMenu);
     hblp2->addWidget(cmbOtherFileRole);
     hblp2->addWidget(new QLabel(tr("result set:")));
     cmbOtherFilesResultGroup=new QComboBox(this);
@@ -183,6 +235,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbOtherFilesResultGroup->view()->setTextElideMode(Qt::ElideMiddle);
     cmbOtherFilesResultGroup->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     cmbOtherFilesResultGroup->setEnabled(false);
+    cmbOtherFilesResultGroup->addAction(actUseParam2SetForAll);
+    cmbOtherFilesResultGroup->addAction(actUseParam1and2SetForAll);
+    cmbOtherFilesResultGroup->setContextMenuPolicy(Qt::ActionsContextMenu);
     hblp2->addWidget(cmbOtherFilesResultGroup);
     connect(chkOtherFileP2, SIGNAL(toggled(bool)), cmbOtherFileRole, SLOT(setEnabled(bool)));
     connect(chkOtherFileP2, SIGNAL(toggled(bool)), cmbOtherFilesResultGroup, SLOT(setEnabled(bool)));
@@ -191,6 +246,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     row++;
     cmbParameter2=new QComboBox(this);
     cmbParameter2->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    cmbParameter2->addAction(actUseParam2SetForAll);
+    cmbParameter2->addAction(actUseParam1and2SetForAll);
+    cmbParameter2->setContextMenuPolicy(Qt::ActionsContextMenu);
     topgrid->addWidget((labParameter2=new QLabel(tr("paramater &2:"))), row, 3);
     labParameter2->setBuddy(cmbParameter2);
     topgrid->addWidget(cmbParameter2, row, 4);
@@ -200,6 +258,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/log.png"), tr("log"));
     cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/reci.png"), tr("reciprocal"));
     cmbParameter2Transform->addItem(QIcon(":/imaging_fcs/sqrt.png"), tr("sqrt"));
+    cmbParameter2Transform->addAction(actUseParam2SetForAll);
+    cmbParameter2Transform->addAction(actUseParam1and2SetForAll);
+    cmbParameter2Transform->setContextMenuPolicy(Qt::ActionsContextMenu);
     topgrid->addWidget((labParameter2Transform=new QLabel(tr("    tr&ansform:"))), row, 5);
     labParameter2Transform->setBuddy(cmbParameter2Transform);
     topgrid->addWidget(cmbParameter2Transform, row, 6);
@@ -501,28 +562,42 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     QHBoxLayout* coll;
 
 
+
     ///////////////////////////////////////////////////////////////
     // GROUPBOX: parameter image style
     ///////////////////////////////////////////////////////////////
     grpImage=new QFImageParameterGroupBox(tr(" parameter image style "), this);
+    grpImage->addAction(actUseParam1StyleForAll);
+    grpImage->addAction(actUseParam1and2StyleForAll);
     vbl->addWidget(grpImage);
     //grpImage->setStyleSheet(grpImage->styleSheet()+QString("\n\n")+ stylesheetGroupBox);
 
 
+    ///////////////////////////////////////////////////////////////
+    // GROUPBOX: selection style
+    ///////////////////////////////////////////////////////////////
     QGroupBox* wsels=new QGroupBox(tr(" selection style "), this);
+    wsels->addAction(actUseSelStyleForAll);
+    wsels->setContextMenuPolicy(Qt::ActionsContextMenu);
     gli=new QFormLayout();
     wsels->setLayout(gli);
     chkDisplayImageOverlay=new QCheckBox(wsels);
+    chkDisplayImageOverlay->addAction(actUseSelStyleForAll);
+    chkDisplayImageOverlay->setContextMenuPolicy(Qt::ActionsContextMenu);
     gli->addRow(tr("&enabled:"), chkDisplayImageOverlay);
     wsels->setFlat(true);
     vbl->addWidget(wsels);
     cmbSelectionStyle=new QFOverlayStyleCombobox(wsels);
+    cmbSelectionStyle->addAction(actUseSelStyleForAll);
+    cmbSelectionStyle->setContextMenuPolicy(Qt::ActionsContextMenu);
     gli->addRow(tr("&style:"), cmbSelectionStyle);
 
     ///////////////////////////////////////////////////////////////
     // GROUPBOX: parameter image style
     ///////////////////////////////////////////////////////////////
     grpImage2=new QFImageParameterGroupBox(tr(" parameter 2 image style "), this);
+    grpImage2->addAction(actUseParam2StyleForAll);
+    grpImage2->addAction(actUseParam1and2StyleForAll);
     vbl->addWidget(grpImage2);
     //connect(chkParamImage2Visible, SIGNAL(toggled(bool)), grpImage2, SLOT(setVisible(bool)));
     //grpImage2->setVisible(chkParamImage2Visible->isChecked());
@@ -532,22 +607,34 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     // GROUPBOX: overview image style
     ///////////////////////////////////////////////////////////////
     QGroupBox* wovr=new QGroupBox(tr(" overview image style "), this);
+    wovr->addAction(actUseOverviewForAll);
+    wovr->setContextMenuPolicy(Qt::ActionsContextMenu);
     wovr->setFlat(true);
     vbl->addWidget(wovr);
     gli=new QFormLayout();
     wovr->setLayout(gli);
 
     cmbColorbarOverview=new JKQTPMathImageColorPaletteComboBox(wovr);
+    cmbColorbarOverview->addAction(actUseOverviewForAll);
+    cmbColorbarOverview->setContextMenuPolicy(Qt::ActionsContextMenu);
+
     gli->addRow(tr("color &palette:"), cmbColorbarOverview);
 
     chkAutorangeOverview=new QCheckBox("auto", wovr);
     chkAutorangeOverview->setChecked(true);
     gli->addRow(tr("channel 1 &range:"), chkAutorangeOverview);
+    chkAutorangeOverview->addAction(actUseOverviewForAll);
+    chkAutorangeOverview->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     edtOvrMin=new QFDoubleEdit(wovr);
     edtOvrMin->setCheckBounds(false, false);
     edtOvrMax=new QFDoubleEdit(wovr);
     edtOvrMax->setCheckBounds(false, false);
+    edtOvrMin->addAction(actUseOverviewForAll);
+    edtOvrMin->setContextMenuPolicy(Qt::ActionsContextMenu);
+    edtOvrMax->addAction(actUseOverviewForAll);
+    edtOvrMax->setContextMenuPolicy(Qt::ActionsContextMenu);
+
     coll=new QHBoxLayout();
     coll->addWidget(edtOvrMin,1);
     coll->addWidget(new QLabel(" ... "));
@@ -559,6 +646,11 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     edtOvr2Min->setCheckBounds(false, false);
     edtOvr2Max=new QFDoubleEdit(wovr);
     edtOvr2Max->setCheckBounds(false, false);
+    edtOvr2Min->addAction(actUseOverviewForAll);
+    edtOvr2Min->setContextMenuPolicy(Qt::ActionsContextMenu);
+    edtOvr2Max->addAction(actUseOverviewForAll);
+    edtOvr2Max->setContextMenuPolicy(Qt::ActionsContextMenu);
+
     coll=new QHBoxLayout();
     coll->addWidget(edtOvr2Min,1);
     coll->addWidget(new QLabel(" ... "));
@@ -693,7 +785,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
 
     ///////////////////////////////////////////////////////////////
-    // GROUPBOX: overview image plot
+    // WIDGET: overview image plot
     ///////////////////////////////////////////////////////////////
     QWidget* wpltOverview=new QWidget(this);
     QVBoxLayout* lpltOverview=new QVBoxLayout();
@@ -1203,6 +1295,11 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     histogram->addSettingsWidget(tr("w/o excluded:"), chkExcludeExcludedRunsFromHistogram);
     histogram_2->addSettingsWidget(tr("w/o excluded:"), chkExcludeExcludedRunsFromHistogram_2);
     histogram_2->setVisible(false);
+    QToolButton* hbtn;
+    histogram->addSettingsWidget("", hbtn=new QToolButton(this));
+    hbtn->setDefaultAction(actUseHist1ForAll);
+    histogram_2->addSettingsWidget("", hbtn=new QToolButton(this));
+    hbtn->setDefaultAction(actUseHist1ForAll);
 
     QWidget* widHist=new QWidget(this); //=histogram;
     histLay=new QGridLayout();
@@ -1225,6 +1322,10 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     histogram2->addSettingsWidget(tr("w/o excluded:"), chkExcludeExcludedRunsFromHistogram2);
     histogram2_2->addSettingsWidget(tr("w/o excluded:"), chkExcludeExcludedRunsFromHistogram2_2);
     histogram2_2->setVisible(false);
+    histogram2->addSettingsWidget("", hbtn=new QToolButton(this));
+    hbtn->setDefaultAction(actUseHist2ForAll);
+    histogram2_2->addSettingsWidget("", hbtn=new QToolButton(this));
+    hbtn->setDefaultAction(actUseHist2ForAll);
 
     histLay->addWidget(histogram2,1,0);
     histLay->addWidget(histogram2_2,1,1);
@@ -1242,6 +1343,8 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     // CORRELATION TAB
     //////////////////////////////////////////////////////////////////////////////////////////
     corrView=new QFParameterCorrelationView(this);
+    corrView->addSettingsWidget("", hbtn=new QToolButton(this));
+    hbtn->setDefaultAction(actUseCorrForAll);
     cmbCorrelationDisplayMode=new QComboBox(this);
     cmbCorrelationDisplayMode->addItem(tr("parameter 1 vs. 2"));
     cmbCorrelationDisplayMode->addItem(tr("parameter 1 vs. image"));
@@ -1419,6 +1522,277 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     setUpdatesEnabled(true);
 }
 
+void QFRDRImagingFCSImageEditor::useThisSelectionStyleForAllRDRs()
+{
+    if (current){
+        QString egroup=filenameize(currentEvalGroup());
+        QString param=filenameize(currentFitParameter());
+        if (egroup.isEmpty() || param.isEmpty()) {
+            writeSettings();
+        } else {
+            QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRsWithType(current->getType());
+            for (int i=0; i<rdrs.size(); i++) {
+                if (rdrs[i]) {
+                    rdrs[i]->setQFProperty(QString("imfcs_imed_overlay_%1").arg(egroup), chkDisplayImageOverlay->isChecked(), false, false);
+                    rdrs[i]->setQFProperty(QString("imfcs_imed_ovstyle_%1").arg(egroup), cmbSelectionStyle->currentIndex(), false, false);
+                }
+            }
+        }
+    }
+
+}
+
+void QFRDRImagingFCSImageEditor::useThisOverviewStyleForAllRDRs()
+{
+    if (current){
+        QString egroup=filenameize(currentEvalGroup());
+        QString param=filenameize(currentFitParameter());
+        if (egroup.isEmpty() || param.isEmpty()) {
+            writeSettings();
+        } else {
+            QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRsWithType(current->getType());
+            for (int i=0; i<rdrs.size(); i++) {
+                if (rdrs[i]) {
+                    rdrs[i]->setQFProperty(QString("imfcs_imed_ovrautorange_%1").arg(egroup), chkAutorangeOverview->isChecked(), false, false);
+                    rdrs[i]->setQFProperty(QString("imfcs_imed_ovrcolorbar_%1").arg(egroup), cmbColorbarOverview->currentIndex(), false, false);
+                    if (!chkAutorangeOverview->isChecked()) {
+                        rdrs[i]->setQFProperty(QString("imfcs_imed_ovrcolmin_%1").arg(egroup), edtOvrMin->value(), false, false);
+                        rdrs[i]->setQFProperty(QString("imfcs_imed_ovrcolmax_%1").arg(egroup), edtOvrMax->value(), false, false);
+                        rdrs[i]->setQFProperty(QString("imfcs_imed_ovr2colmin_%1").arg(egroup), edtOvr2Min->value(), false, false);
+                        rdrs[i]->setQFProperty(QString("imfcs_imed_ovr2colmax_%1").arg(egroup), edtOvr2Max->value(), false, false);
+                    }
+                }
+            }
+        }
+    }
+
+}
+
+void QFRDRImagingFCSImageEditor::useThisHist1ForAllRDRs()
+{
+    if (current){
+        QString egroup=filenameize(currentEvalGroup());
+        QString param=filenameize(currentFitParameter());
+        if (egroup.isEmpty() || param.isEmpty()) {
+            writeSettings();
+        } else {
+            QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRsWithType(current->getType());
+            for (int i=0; i<rdrs.size(); i++) {
+                if (rdrs[i]) {
+                    //corrView->writeQFProperties(rdrs[i], "imfcs_imed_corrview", egroup, param);
+                    histogram->writeQFProperties(rdrs[i], "imfcs_imed_hist", egroup, param);
+                    histogram_2->writeQFProperties(rdrs[i], "imfcs_imed_hist2", egroup, param);
+                    //histogram2->writeQFProperties(rdrs[i], "imfcs_imed_hist_p2", egroup, param);
+                    //histogram2_2->writeQFProperties(rdrs[i], "imfcs_imed_hist_p22", egroup, param);
+
+                    rdrs[i]->setQFProperty(QString("imfcs_imed_histex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram->isChecked(), false, false);
+                    rdrs[i]->setQFProperty(QString("imfcs_imed_hist2ex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram_2->isChecked(), false, false);
+                    //rdrs[i]->setQFProperty(QString("imfcs_imed_hist_p2ex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false);
+                    //rdrs[i]->setQFProperty(QString("eimfcs_imed_hist_p22x_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram2_2->isChecked(), false, false);
+                    //rdrs[i]->setQFProperty(QString("eimfcs_imed_corrmode_%1_%2").arg(egroup).arg(param), cmbCorrelationDisplayMode->currentIndex(), false, false);
+                    //rdrs[i]->setQFProperty(QString("eimfcs_imed_corrcolmode_%1_%2").arg(egroup).arg(param), cmbCorrelationDisplayColorMode->currentIndex(), false, false);
+                    //rdrs[i]->setQFProperty(QString("eimfcs_imed_corrchannel_%1_%2").arg(egroup).arg(param), spinCorrelationChannel->value(), false, false);
+                }
+            }
+        }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::useThisCorrForAllRDRs()
+{
+    if (current){
+        QString egroup=filenameize(currentEvalGroup());
+        QString param=filenameize(currentFitParameter());
+        if (egroup.isEmpty() || param.isEmpty()) {
+            writeSettings();
+        } else {
+            QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRsWithType(current->getType());
+            for (int i=0; i<rdrs.size(); i++) {
+                if (rdrs[i]) {
+                    corrView->writeQFProperties(rdrs[i], "imfcs_imed_corrview", egroup, param);
+                    //histogram->writeQFProperties(rdrs[i], "imfcs_imed_hist", egroup, param);
+                    //histogram_2->writeQFProperties(rdrs[i], "imfcs_imed_hist2", egroup, param);
+                    //histogram2->writeQFProperties(rdrs[i], "imfcs_imed_hist_p2", egroup, param);
+                    //histogram2_2->writeQFProperties(rdrs[i], "imfcs_imed_hist_p22", egroup, param);
+
+                    //rdrs[i]->setQFProperty(QString("imfcs_imed_histex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram->isChecked(), false, false);
+                    //rdrs[i]->setQFProperty(QString("imfcs_imed_hist2ex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram_2->isChecked(), false, false);
+                    //rdrs[i]->setQFProperty(QString("imfcs_imed_hist_p2ex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false);
+                    //rdrs[i]->setQFProperty(QString("eimfcs_imed_hist_p22x_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram2_2->isChecked(), false, false);
+                    rdrs[i]->setQFProperty(QString("eimfcs_imed_corrmode_%1_%2").arg(egroup).arg(param), cmbCorrelationDisplayMode->currentIndex(), false, false);
+                    rdrs[i]->setQFProperty(QString("eimfcs_imed_corrcolmode_%1_%2").arg(egroup).arg(param), cmbCorrelationDisplayColorMode->currentIndex(), false, false);
+                    rdrs[i]->setQFProperty(QString("eimfcs_imed_corrchannel_%1_%2").arg(egroup).arg(param), spinCorrelationChannel->value(), false, false);
+                }
+            }
+        }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::useThisHist2ForAllRDRs()
+{
+    if (current){
+        QString egroup=filenameize(currentEvalGroup());
+        QString param=filenameize(currentFitParameter());
+        if (egroup.isEmpty() || param.isEmpty()) {
+            writeSettings();
+        } else {
+            QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRsWithType(current->getType());
+            for (int i=0; i<rdrs.size(); i++) {
+                if (rdrs[i]) {
+                    //corrView->writeQFProperties(rdrs[i], "imfcs_imed_corrview", egroup, param);
+                    //histogram->writeQFProperties(rdrs[i], "imfcs_imed_hist", egroup, param);
+                    //histogram_2->writeQFProperties(rdrs[i], "imfcs_imed_hist2", egroup, param);
+                    histogram2->writeQFProperties(rdrs[i], "imfcs_imed_hist_p2", egroup, param);
+                    histogram2_2->writeQFProperties(rdrs[i], "imfcs_imed_hist_p22", egroup, param);
+
+                    //rdrs[i]->setQFProperty(QString("imfcs_imed_histex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram->isChecked(), false, false);
+                    //rdrs[i]->setQFProperty(QString("imfcs_imed_hist2ex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram_2->isChecked(), false, false);
+                    rdrs[i]->setQFProperty(QString("imfcs_imed_hist_p2ex_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false);
+                    rdrs[i]->setQFProperty(QString("eimfcs_imed_hist_p22x_%1_%2").arg(egroup).arg(param), chkExcludeExcludedRunsFromHistogram2_2->isChecked(), false, false);
+                    //rdrs[i]->setQFProperty(QString("eimfcs_imed_corrmode_%1_%2").arg(egroup).arg(param), cmbCorrelationDisplayMode->currentIndex(), false, false);
+                    //rdrs[i]->setQFProperty(QString("eimfcs_imed_corrcolmode_%1_%2").arg(egroup).arg(param), cmbCorrelationDisplayColorMode->currentIndex(), false, false);
+                    //rdrs[i]->setQFProperty(QString("eimfcs_imed_corrchannel_%1_%2").arg(egroup).arg(param), spinCorrelationChannel->value(), false, false);
+                }
+            }
+        }
+    }
+}
+void QFRDRImagingFCSImageEditor::useThisParam1StyleForAllRDRs()
+{
+    if (current){
+        QString egroup=filenameize(currentEvalGroup());
+        QString param=filenameize(currentFitParameter());
+        if (egroup.isEmpty() || param.isEmpty()) {
+            writeSettings();
+        } else {
+            QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRsWithType(current->getType());
+            for (int i=0; i<rdrs.size(); i++) {
+                if (rdrs[i]) {
+                    grpImage->saveConfig(rdrs[i], egroup, param, "image1");
+                }
+            }
+        }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::useThisParam2StyleForAllRDRs()
+{
+    if (current){
+        QString egroup=filenameize(currentEvalGroup());
+        QString param=filenameize(currentFitParameter());
+        if (egroup.isEmpty() || param.isEmpty()) {
+            writeSettings();
+        } else {
+            QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRsWithType(current->getType());
+            for (int i=0; i<rdrs.size(); i++) {
+                if (rdrs[i]) {
+                    grpImage2->saveConfig(rdrs[i], egroup, param, "image2");
+                }
+            }
+        }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::useThisParam1and2StyleForAllRDRs()
+{
+    useThisParam1StyleForAllRDRs();
+    useThisParam2StyleForAllRDRs();
+}
+
+void QFRDRImagingFCSImageEditor::useThisResultSetForAllRDRs()
+{
+    if (current){
+        QString egroup=filenameize(currentEvalGroup());
+        QString param=filenameize(currentFitParameter());
+        if (egroup.isEmpty() || param.isEmpty()) {
+            writeSettings();
+        } else {
+            QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRsWithType(current->getType());
+            for (int i=0; i<rdrs.size(); i++) {
+                if (rdrs[i]) {
+                    int grp=cmbResultGroup->currentIndex();
+                    rdrs[i]->setQFProperty("imfcs_imed_evalgroup", cmbResultGroup->itemData(grp).toString(), false, false);
+                    /*m->setQFProperty("imfcs_imed_otherfileevalgroup", cmbOtherFilesResultGroup->currentIndex(), false, false);
+                    m->setQFProperty("imfcs_imed_otherfilegroup", cmbOtherFileRole->currentIndex(), false, false);
+                    m->setQFProperty("imfcs_imed_otherfile", chkOtherFileP2->isChecked(), false, false);
+                    m->setQFProperty("imfcs_imed_keepar", chkKeepAspect->isChecked(), false, false);*/
+
+                }
+            }
+        }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::useThisParam1SetForAllRDRs()
+{
+    if (current){
+        QString egroup=filenameize(currentEvalGroup());
+        QString param=filenameize(currentFitParameter());
+        if (egroup.isEmpty() || param.isEmpty()) {
+            writeSettings();
+        } else {
+            QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRsWithType(current->getType());
+            for (int i=0; i<rdrs.size(); i++) {
+                if (rdrs[i]) {
+                    int grp=cmbResultGroup->currentIndex();
+                    rdrs[i]->setQFProperty("imfcs_imed_evalgroup", cmbResultGroup->itemData(grp).toString(), false, false);
+                    /*m->setQFProperty("imfcs_imed_otherfileevalgroup", cmbOtherFilesResultGroup->currentIndex(), false, false);
+                    m->setQFProperty("imfcs_imed_otherfilegroup", cmbOtherFileRole->currentIndex(), false, false);
+                    m->setQFProperty("imfcs_imed_otherfile", chkOtherFileP2->isChecked(), false, false);
+                    m->setQFProperty("imfcs_imed_keepar", chkKeepAspect->isChecked(), false, false);*/
+                    QString egroup=currentEvalGroup();
+                    QString egroup2=egroup;
+                    if (chkOtherFileP2->isChecked()) egroup2=cmbOtherFilesResultGroup->itemData(cmbOtherFilesResultGroup->currentIndex()).toString();
+                    rdrs[i]->setQFProperty(QString("imfcs_imed_param_%1").arg(filenameize(egroup)), cmbParameter->itemData(cmbParameter->currentIndex()).toString(), false, false);
+                    //rdrs[i]->setQFProperty(QString("imfcs_imed_image2param_%1").arg(filenameize(egroup)), cmbParameter2->itemData(cmbParameter2->currentIndex()).toString(), false, false);
+                    rdrs[i]->setQFProperty(QString("imfcs_imed_paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter->currentIndex()), cmbParameterTransform->currentIndex(), false, false);
+                    //rdrs[i]->setQFProperty(QString("imfcs_imed_image2paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter2->currentIndex()), cmbParameter2Transform->currentIndex(), false, false);
+
+                }
+            }
+        }
+    }
+}
+
+void QFRDRImagingFCSImageEditor::useThisParam2SetForAllRDRs()
+{
+    if (current){
+        QString egroup=filenameize(currentEvalGroup());
+        QString param=filenameize(currentFitParameter());
+        if (egroup.isEmpty() || param.isEmpty()) {
+            writeSettings();
+        } else {
+            QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRsWithType(current->getType());
+            for (int i=0; i<rdrs.size(); i++) {
+                if (rdrs[i]) {
+                    int grp=cmbResultGroup->currentIndex();
+                    rdrs[i]->setQFProperty("imfcs_imed_evalgroup", cmbResultGroup->itemData(grp).toString(), false, false);
+                    rdrs[i]->setQFProperty("imfcs_imed_evalgroup", cmbResultGroup->itemData(grp).toString(), false, false);
+                    rdrs[i]->setQFProperty("imfcs_imed_otherfileevalgroup", cmbOtherFilesResultGroup->currentIndex(), false, false);
+                    rdrs[i]->setQFProperty("imfcs_imed_otherfilegroup", cmbOtherFileRole->currentIndex(), false, false);
+                    rdrs[i]->setQFProperty("imfcs_imed_otherfile", chkOtherFileP2->isChecked(), false, false);
+                    QString egroup=currentEvalGroup();
+                    QString egroup2=egroup;
+                    if (chkOtherFileP2->isChecked()) egroup2=cmbOtherFilesResultGroup->itemData(cmbOtherFilesResultGroup->currentIndex()).toString();
+                    //rdrs[i]->setQFProperty(QString("imfcs_imed_param_%1").arg(filenameize(egroup)), cmbParameter->itemData(cmbParameter->currentIndex()).toString(), false, false);
+                    rdrs[i]->setQFProperty(QString("imfcs_imed_image2param_%1").arg(filenameize(egroup)), cmbParameter2->itemData(cmbParameter2->currentIndex()).toString(), false, false);
+                    //rdrs[i]->setQFProperty(QString("imfcs_imed_paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter->currentIndex()), cmbParameterTransform->currentIndex(), false, false);
+                    rdrs[i]->setQFProperty(QString("imfcs_imed_image2paramtrans_%1_%2").arg(filenameize(egroup)).arg(cmbParameter2->currentIndex()), cmbParameter2Transform->currentIndex(), false, false);
+
+                }
+            }
+        }
+    }
+
+}
+
+void QFRDRImagingFCSImageEditor::useThisParamsSetForAllRDRs()
+{
+    useThisParam1SetForAllRDRs();
+    useThisParam2SetForAllRDRs();
+    useThisResultSetForAllRDRs();
+}
+
 void QFRDRImagingFCSImageEditor::saveImageSettings() {
     if (current){
         QString egroup=filenameize(currentEvalGroup());
@@ -1429,8 +1803,8 @@ void QFRDRImagingFCSImageEditor::saveImageSettings() {
             grpImage->saveConfig(current, egroup, param, "image1");
             grpImage2->saveConfig(current, egroup, param, "image2");
 
-            current->setQFProperty(QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), chkDisplayImageOverlay->isChecked(), false, false);
-            current->setQFProperty(QString("imfcs_imed_ovstyle_%1_%2").arg(egroup).arg(param), cmbSelectionStyle->currentIndex(), false, false);
+            current->setQFProperty(QString("imfcs_imed_overlay_%1").arg(egroup), chkDisplayImageOverlay->isChecked(), false, false);
+            current->setQFProperty(QString("imfcs_imed_ovstyle_%1").arg(egroup), cmbSelectionStyle->currentIndex(), false, false);
 
             corrView->writeQFProperties(current, "imfcs_imed_corrview", egroup, param);
             histogram->writeQFProperties(current, "imfcs_imed_hist", egroup, param);
@@ -1476,8 +1850,8 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
             grpImage->loadConfig(current, egroup, param, "image1", "imfcsimageeditor/", mi, ma);
             grpImage2->loadConfig(current, egroup, param, "image2", "imfcsimageeditor/", mi, ma);
 
-            chkDisplayImageOverlay->setChecked(current->getProperty(QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), true).toBool());
-            cmbSelectionStyle->setCurrentIndex(current->getProperty(QString("imfcs_imed_ovstyle_%1_%2").arg(egroup).arg(param), false).toBool());
+            chkDisplayImageOverlay->setChecked(current->getQFPropertyHirarchy3(QString("imfcs_imed_overlay_%1").arg(egroup), QString("imfcs_imed_overlay"), QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), true).toBool());
+            cmbSelectionStyle->setCurrentIndex(current->getQFPropertyHirarchy3(QString("imfcs_imed_ovstyle_%1").arg(egroup), QString("imfcs_imed_ovstyle"), QString("imfcs_imed_ovstyle_%1_%2").arg(egroup).arg(param), 0).toInt());
             corrView->readQFProperties(current, "imfcs_imed_corrview", egroup, param);
             histogram->readQFProperties(current, "imfcs_imed_hist", egroup, param);
             histogram_2->readQFProperties(current, "imfcs_imed_hist2", egroup, param);
@@ -1488,9 +1862,9 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
             chkExcludeExcludedRunsFromHistogram_2->setChecked(current->getProperty(QString("imfcs_imed_hist2ex_%1_%2").arg(egroup).arg(param), true).toBool());
             chkExcludeExcludedRunsFromHistogram2->setChecked(current->getProperty(QString("imfcs_imed_hist_p2ex_%1_%2").arg(egroup).arg(param), true).toBool());
             chkExcludeExcludedRunsFromHistogram2_2->setChecked(current->getProperty(QString("imfcs_imed_hist_p22ex_%1_%2").arg(egroup).arg(param), true).toBool());
-            cmbCorrelationDisplayMode->setCurrentIndex(current->getProperty(QString("eimfcs_imed_corrmode_%1_%2").arg(egroup).arg(param), 0).toInt());
-            cmbCorrelationDisplayColorMode->setCurrentIndex(current->getProperty(QString("eimfcs_imed_corrcolmode_%1_%2").arg(egroup).arg(param), 0).toInt());
-            spinCorrelationChannel->setValue(current->getProperty(QString("eimfcs_imed_corrchannel_%1_%2").arg(egroup).arg(param), 0).toInt());
+            cmbCorrelationDisplayMode->setCurrentIndex(current->getQFPropertyHirarchy3(QString("eimfcs_imed_corrmode_%1").arg(egroup), QString("eimfcs_imed_corrmode"), QString("eimfcs_imed_corrmode_%1_%2").arg(egroup).arg(param), 0).toInt());
+            cmbCorrelationDisplayColorMode->setCurrentIndex(current->getQFPropertyHirarchy3(QString("eimfcs_imed_corrcolmode_%1").arg(egroup), QString("eimfcs_imed_corrcolmode"), QString("eimfcs_imed_corrcolmode_%1_%2").arg(egroup).arg(param), 0).toInt());
+            spinCorrelationChannel->setValue(current->getQFPropertyHirarchy3(QString("eimfcs_imed_corrchannel_%1").arg(egroup), QString("eimfcs_imed_corrchannel"), QString("eimfcs_imed_corrchannel_%1_%2").arg(egroup).arg(param), 0).toInt());
 
 
             mi=0, ma=1;
@@ -1503,21 +1877,21 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
                 //if (ma2>ma) ma=ma2;
             }
 
-            int d=current->getProperty(QString("imfcs_imed_ovrcolorbar_%1").arg(egroup),
+            int d=current->getQFPropertyHirarchy2(QString("imfcs_imed_ovrcolorbar"), QString("imfcs_imed_ovrcolorbar_%1").arg(egroup),
                                        settings->getQSettings()->value(QString("imfcsimageeditor/ovrcolorbar"), cmbColorbarOverview->currentIndex())).toInt();
             if (d>=0) cmbColorbarOverview->setCurrentIndex(d);
             else if (cmbColorbarOverview->count()>0) cmbColorbarOverview->setCurrentIndex(0);
-            chkAutorangeOverview->setChecked(current->getProperty(QString("imfcs_imed_ovrautorange_%1").arg(egroup), true).toBool());
+            chkAutorangeOverview->setChecked(current->getQFPropertyHirarchy2(QString("imfcs_imed_ovrautorange"), QString("imfcs_imed_ovrautorange_%1").arg(egroup), true).toBool());
             edtOvrMin->setEnabled(!chkAutorangeOverview->isChecked());
             edtOvrMax->setEnabled(!chkAutorangeOverview->isChecked());
             edtOvr2Min->setEnabled(!chkAutorangeOverview->isChecked()&&plteOverviewRGB->get_visible());
             edtOvr2Max->setEnabled(!chkAutorangeOverview->isChecked()&&plteOverviewRGB->get_visible());
             cmbColorbarOverview->setEnabled(!plteOverviewRGB->get_visible());
             if (!chkAutorangeOverview->isChecked()) {
-                edtOvrMin->setValue(current->getProperty(QString("imfcs_imed_ovrcolmin_%1").arg(egroup), mi).toDouble());
-                edtOvrMax->setValue(current->getProperty(QString("imfcs_imed_ovrcolmax_%1").arg(egroup), ma).toDouble());
-                edtOvr2Min->setValue(current->getProperty(QString("imfcs_imed_ovr2colmin_%1").arg(egroup), mi2).toDouble());
-                edtOvr2Max->setValue(current->getProperty(QString("imfcs_imed_ovr2colmax_%1").arg(egroup), ma2).toDouble());
+                edtOvrMin->setValue(current->getQFPropertyHirarchy2(QString("imfcs_imed_ovrcolmin"), QString("imfcs_imed_ovrcolmin_%1").arg(egroup), mi).toDouble());
+                edtOvrMax->setValue(current->getQFPropertyHirarchy2(QString("imfcs_imed_ovrcolmax"), QString("imfcs_imed_ovrcolmax_%1").arg(egroup), ma).toDouble());
+                edtOvr2Min->setValue(current->getQFPropertyHirarchy2(QString("imfcs_imed_ovr2colmin"), QString("imfcs_imed_ovr2colmin_%1").arg(egroup), mi2).toDouble());
+                edtOvr2Max->setValue(current->getQFPropertyHirarchy2(QString("imfcs_imed_ovr2colmax"), QString("imfcs_imed_ovr2colmax_%1").arg(egroup), ma2).toDouble());
             }
 
             connectParameterWidgets(true);
@@ -1527,6 +1901,8 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
 
     }
 }
+
+
 
 
 
@@ -3964,18 +4340,22 @@ void QFRDRImagingFCSImageEditor::fillParameterComboBox(QComboBox* cmbParameter, 
     QList<QPair<QString, QString> > params=m->resultsCalcNamesAndLabels("", "fit results", egroup);
     QList<QPair<QString, QString> > params1=m->resultsCalcNamesAndLabels("", "results", egroup);
     QList<QPair<QString, QString> > params2=m->resultsCalcNamesAndLabels("", "evaluation results", egroup);
+    QList<QPair<QString, QString> > paramsAll=m->resultsCalcNamesAndLabels("", "", egroup);
     params.append(params1);
     params.append(params2);
     cmbParameter->clear();
+    QSet<QString> usedresults;
     for (int i=0; i<params.size(); i++) {
         if (!params[i].second.endsWith("_fix")) {
             cmbParameter->addItem(params[i].first, params[i].second);
+            usedresults.insert(params[i].second);
             //qDebug()<<params[i].second;
         }
     }
     for (int i=0; i<params.size(); i++) {
         if (params[i].second.endsWith("_fix")) {
             cmbParameter->addItem(params[i].first, params[i].second);
+            usedresults.insert(params[i].second);
         }
     }
 
@@ -3983,11 +4363,25 @@ void QFRDRImagingFCSImageEditor::fillParameterComboBox(QComboBox* cmbParameter, 
     for (int i=0; i<params.size(); i++) {
         if (!params[i].second.endsWith("_fix")) {
             cmbParameter->addItem(params[i].first, params[i].second);
+            usedresults.insert(params[i].second);
         }
     }
     for (int i=0; i<params.size(); i++) {
         if (params[i].second.endsWith("_fix")) {
             cmbParameter->addItem(params[i].first, params[i].second);
+            usedresults.insert(params[i].second);
+        }
+    }
+    for (int i=0; i<paramsAll.size(); i++) {
+        if (!usedresults.contains(paramsAll[i].second) && !paramsAll[i].second.endsWith("_fix")) {
+            cmbParameter->addItem(paramsAll[i].first, paramsAll[i].second);
+            usedresults.insert(paramsAll[i].second);
+        }
+    }
+    for (int i=0; i<paramsAll.size(); i++) {
+        if (!usedresults.contains(paramsAll[i].second) && paramsAll[i].second.endsWith("_fix")) {
+            cmbParameter->addItem(paramsAll[i].first, paramsAll[i].second);
+            usedresults.insert(paramsAll[i].second);
         }
     }
     int d=cmbParameter->findData(current->getProperty(indexPropertyName, param1Default.value(0, parameterDefault)));

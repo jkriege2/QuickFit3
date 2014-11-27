@@ -37,6 +37,25 @@ QFImageParameterGroupBox::QFImageParameterGroupBox(const QString &title, QWidget
     initGrp();
 }
 
+void QFImageParameterGroupBox::addAction(QAction *act)
+{
+    QGroupBox::addAction(act);
+
+    cmbColorbar->setContextMenuPolicy(Qt::ActionsContextMenu);;
+    cmbImageStyle->setContextMenuPolicy(Qt::ActionsContextMenu);;
+    cmbOutOfRangeMode->setContextMenuPolicy(Qt::ActionsContextMenu);;
+    chkImageAutoScale->setContextMenuPolicy(Qt::ActionsContextMenu);;
+    edtColMin->setContextMenuPolicy(Qt::ActionsContextMenu);;
+    edtColMax->setContextMenuPolicy(Qt::ActionsContextMenu);;
+
+    cmbColorbar->addAction(act);
+    cmbImageStyle->addAction(act);
+    cmbOutOfRangeMode->addAction(act);
+    chkImageAutoScale->addAction(act);
+    edtColMin->addAction(act);
+    edtColMax->addAction(act);
+}
+
 void QFImageParameterGroupBox::setSelectedMaskStyle(JKQTPOverlayImageEnhanced *plot) const
 {
     QColor col=maskColors.value(cmbImageStyle->currentIndex(), QColor("red"));
@@ -231,13 +250,13 @@ void QFImageParameterGroupBox::setColorPalette(JKQTPMathImageColorPalette palett
 
 void QFImageParameterGroupBox::saveConfig(QFRawDataRecord *current, const QString &egroup, const QString &param, const QString &imageID)
 {
-    current->setQFProperty(QString("imfcs_imed_colorbar_%1_%3_%2").arg(egroup).arg(param).arg(imageID), cmbColorbar->currentIndex(), false, false);
-    current->setQFProperty(QString("imfcs_imed_style_%1_%3_%2").arg(egroup).arg(param).arg(imageID), cmbImageStyle->currentIndex(), false, false);
-    current->setQFProperty(QString("imfcs_imed_oorc_%1_%3_%2").arg(egroup).arg(param).arg(imageID), cmbOutOfRangeMode->currentIndex(), false, false);
-    current->setQFProperty(QString("imfcs_imed_autorange_%1_%3_%2").arg(egroup).arg(param).arg(imageID), chkImageAutoScale->isChecked(), false, false);
+    current->setQFProperty(QString("imfcs_imed_colorbar_%1_%2").arg(param).arg(imageID), cmbColorbar->currentIndex(), false, false);
+    current->setQFProperty(QString("imfcs_imed_style_%1_%2").arg(param).arg(imageID), cmbImageStyle->currentIndex(), false, false);
+    current->setQFProperty(QString("imfcs_imed_oorc_%1_%2").arg(param).arg(imageID), cmbOutOfRangeMode->currentIndex(), false, false);
+    current->setQFProperty(QString("imfcs_imed_autorange_%1_%2").arg(param).arg(imageID), chkImageAutoScale->isChecked(), false, false);
     if (!chkImageAutoScale->isChecked()) {
-        current->setQFProperty(QString("imfcs_imed_colmin_%1_%3_%2").arg(egroup).arg(param).arg(imageID), edtColMin->value(), false, false);
-        current->setQFProperty(QString("imfcs_imed_colmax_%1_%3_%2").arg(egroup).arg(param).arg(imageID), edtColMax->value(), false, false);
+        current->setQFProperty(QString("imfcs_imed_colmin_%1_%2").arg(param).arg(imageID), edtColMin->value(), false, false);
+        current->setQFProperty(QString("imfcs_imed_colmax_%1_%2").arg(param).arg(imageID), edtColMax->value(), false, false);
     }
 
 }
@@ -245,17 +264,17 @@ void QFImageParameterGroupBox::saveConfig(QFRawDataRecord *current, const QStrin
 void QFImageParameterGroupBox::loadConfig(QFRawDataRecord *current, const QString &egroup, const QString &param, const QString &imageID, const QString &prefix, double mi, double ma)
 {
 
-    int d=current->getProperty(QString("imfcs_imed_colorbar_%1_%3_%2").arg(egroup).arg(param).arg(imageID),
+    int d=current->getQFPropertyHirarchy2(QString("imfcs_imed_colorbar_%1_%2").arg(param).arg(imageID),QString("imfcs_imed_colorbar_%1_%3_%2").arg(egroup).arg(param).arg(imageID),
                                current->getProperty(QString("imfcs_imed_colorbar_%1_%2").arg(egroup).arg(param),
                                ProgramOptions::getInstance()->getQSettings()->value(prefix+QString("colorbar"), cmbColorbar->currentIndex()))).toInt();
     if (d>=0) cmbColorbar->setCurrentIndex(d);
     else if (cmbColorbar->count()>0) cmbColorbar->setColorPalette(JKQTPMathImageMATLAB);
-    cmbImageStyle->setCurrentIndex(current->getProperty(QString("imfcs_imed_style_%1_%3_%2").arg(egroup).arg(param).arg(imageID), current->getProperty(QString("imfcs_imed_style_%1_%2").arg(egroup).arg(param), cmbImageStyle->currentIndex())).toInt());
-    cmbOutOfRangeMode->setCurrentIndex(current->getProperty(QString("imfcs_imed_oorc_%1_%3_%2").arg(egroup).arg(param).arg(imageID), current->getProperty(QString("imfcs_imed_oorc_%1_%2").arg(egroup).arg(param), cmbOutOfRangeMode->currentIndex())).toInt());
-    chkImageAutoScale->setChecked(current->getProperty(QString("imfcs_imed_autorange_%1_%3_%2").arg(egroup).arg(param).arg(imageID), current->getProperty(QString("imfcs_imed_autorange_%1_%2").arg(egroup).arg(param), true)).toBool());
+    cmbImageStyle->setCurrentIndex(current->getQFPropertyHirarchy2(QString("imfcs_imed_style_%1_%2").arg(param).arg(imageID),QString("imfcs_imed_style_%1_%3_%2").arg(egroup).arg(param).arg(imageID), current->getProperty(QString("imfcs_imed_style_%1_%2").arg(egroup).arg(param), cmbImageStyle->currentIndex())).toInt());
+    cmbOutOfRangeMode->setCurrentIndex(current->getQFPropertyHirarchy2(QString("imfcs_imed_oorc_%1_%2").arg(param).arg(imageID),QString("imfcs_imed_oorc_%1_%3_%2").arg(egroup).arg(param).arg(imageID), current->getProperty(QString("imfcs_imed_oorc_%1_%2").arg(egroup).arg(param), cmbOutOfRangeMode->currentIndex())).toInt());
+    chkImageAutoScale->setChecked(current->getQFPropertyHirarchy2(QString("imfcs_imed_autorange_%1_%2").arg(param).arg(imageID),QString("imfcs_imed_autorange_%1_%3_%2").arg(egroup).arg(param).arg(imageID), current->getProperty(QString("imfcs_imed_autorange_%1_%2").arg(egroup).arg(param), true)).toBool());
     if (!chkImageAutoScale->isChecked()) {
-        edtColMin->setValue(current->getProperty(QString("imfcs_imed_colmin_%1_%3_%2").arg(egroup).arg(param).arg(imageID), current->getProperty(QString("imfcs_imed_colmin_%1_%2").arg(egroup).arg(param), mi)).toDouble());
-        edtColMax->setValue(current->getProperty(QString("imfcs_imed_colmax_%1_%3_%2").arg(egroup).arg(param).arg(imageID), current->getProperty(QString("imfcs_imed_colmax_%1_%2").arg(egroup).arg(param), ma)).toDouble());
+        edtColMin->setValue(current->getQFPropertyHirarchy2(QString("imfcs_imed_colmin_%1_%2").arg(param).arg(imageID),QString("imfcs_imed_colmin_%1_%3_%2").arg(egroup).arg(param).arg(imageID), current->getProperty(QString("imfcs_imed_colmin_%1_%2").arg(egroup).arg(param), mi)).toDouble());
+        edtColMax->setValue(current->getQFPropertyHirarchy2(QString("imfcs_imed_colmax_%1_%2").arg(param).arg(imageID),QString("imfcs_imed_colmax_%1_%3_%2").arg(egroup).arg(param).arg(imageID), current->getProperty(QString("imfcs_imed_colmax_%1_%2").arg(egroup).arg(param), ma)).toDouble());
     }
 
 }
@@ -303,6 +322,7 @@ void QFImageParameterGroupBox::emitSettingsChanged()
 
 void QFImageParameterGroupBox::initGrp()
 {
+    setContextMenuPolicy(Qt::ActionsContextMenu);
     setFlat(true);
 
     QFormLayout* gli=new QFormLayout();

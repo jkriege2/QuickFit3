@@ -40,6 +40,8 @@ class QFImageParameterGroupBox : public QGroupBox
         explicit QFImageParameterGroupBox(QWidget *parent = 0);
         explicit QFImageParameterGroupBox(const QString& title, QWidget *parent = 0);
 
+        void addAction(QAction* act);
+
         void setSelectedMaskStyle(JKQTPOverlayImageEnhanced* plteImageExcluded) const;
         void setSelectedImageStyle(JKQTPMathImage* plteImage, bool* plteOverviewExcludedData, bool emitSignals=true);
         int getMaskStyle() const;

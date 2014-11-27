@@ -249,6 +249,30 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         /** \brief load the image plot settings from the raw data record properties */
         void loadImageSettings();
 
+
+
+        /** \brief sets the current selection as style for all records. */
+        void useThisSelectionStyleForAllRDRs();
+        /** \brief sets the current parameter 1 style for all records. */
+        void useThisParam1StyleForAllRDRs();
+        /** \brief sets the current parameter 1 style for all records. */
+        void useThisParam2StyleForAllRDRs();
+        void useThisParam1and2StyleForAllRDRs();
+        /** \brief sets the current result set style for all records. */
+        void useThisResultSetForAllRDRs();
+        /** \brief sets the current result set style for all records. */
+        void useThisParam1SetForAllRDRs();
+        /** \brief sets the current result set style for all records. */
+        void useThisParam2SetForAllRDRs();
+        /** \brief sets the current result set style for all records. */
+        void useThisParamsSetForAllRDRs();
+        void useThisOverviewStyleForAllRDRs();
+        void useThisHist1ForAllRDRs();
+        void useThisHist2ForAllRDRs();
+        void useThisCorrForAllRDRs();
+
+
+
         void imageZoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender);
 
         void acfZoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter* sender);
@@ -672,6 +696,19 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QAction* actCopyMeanCFFromAll;
         QAction* actCopyPixelCFFromAll;
         QAction* actCopyPixelAvgCFFromAll;
+
+        QAction* actUseHist1ForAll;
+        QAction* actUseHist2ForAll;
+        QAction* actUseCorrForAll;
+        QAction* actUseOverviewForAll;
+        QAction* actUseSelStyleForAll;
+        QAction* actUseParam1StyleForAll;
+        QAction* actUseParam2StyleForAll;
+        QAction* actUseParam1and2StyleForAll;
+        QAction* actUseResultSetForAll;
+        QAction* actUseParam1SetForAll;
+        QAction* actUseParam2SetForAll;
+        QAction* actUseParam1and2SetForAll;
 
         QMenu* menuData;
         QMenu* menuMask;

@@ -171,6 +171,7 @@ class QFRawDataPropertyEditor_private : public QObject
         QAction* actSaveResultsAveraged;
         /** \brief action used to delete selection in tvResults */
         QAction* actDeleteResults;
+        QAction* actDeleteAllVisibleResults;
         QAction* actCopyMedianQuantilesResults;
         QAction* actCopyMedianQuantilesNoHead;
         QAction* actStatistics;
@@ -333,6 +334,7 @@ class QFRawDataPropertyEditor_private : public QObject
 
         void exportData();
         void showData();
+        void deleteAllVisibleResults();
 };
 
 #endif // QFRAWDATAPROPERTYEDITOR_PRIVATE_H

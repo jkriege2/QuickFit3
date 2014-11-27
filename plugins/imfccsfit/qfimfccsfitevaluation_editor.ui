@@ -390,6 +390,22 @@
        </property>
       </widget>
      </item>
+     <item row="9" column="1">
+      <widget class="QToolButton" name="btnClearEverything">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>clear Everything</string>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
    <item row="0" column="0" colspan="2">

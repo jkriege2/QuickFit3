@@ -1087,6 +1087,7 @@ void QFProject::readXML(const QString &file)
     subsetEval.clear();
 
     internalReadXML(file);
+    this->file=file;
 }
 
 
@@ -1098,6 +1099,7 @@ void QFProject::readXML(QIODevice *file, const QString& filename)
     subsetRDR.clear();
     subsetEval.clear();
     internalReadXML(file, filename);
+    this->file=filename;
 }
 
 
@@ -1389,6 +1391,7 @@ void QFProject::internalReadXML(const QString& file) {
 #endif
     }
 
+    this->file=file;
     this->reading=false;
 }
 
@@ -2163,6 +2166,17 @@ QList<QFRawDataRecord *> QFProject::getRDRsInFolder(const QString &folder, bool 
         QFRawDataRecord * r=getRawDataByNum(i);
         if (r->getFolder()==folder) lst<<r;
         else if (alsoSubfolders&&r->getFolder().startsWith(folder)) lst<<r;
+    }
+    return lst;
+}
+
+QList<QFRawDataRecord *> QFProject::getRDRsWithType(const QString &type) const
+{
+    QFProjectReadLocker locker(p->lock);
+    QList<QFRawDataRecord *> lst;
+    for (int i=0; i<getRawDataCount(); i++) {
+        QFRawDataRecord * r=getRawDataByNum(i);
+        if (r->getType()==type) lst<<r;
     }
     return lst;
 }

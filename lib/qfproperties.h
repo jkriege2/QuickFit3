@@ -51,6 +51,15 @@ class QFLIB_EXPORT QFProperties {
         QVariant getProperty( const QString& p) const ;
         /** \brief return the value of the specified property or the supplied default value */
         QVariant getProperty(const QString& p, const QVariant& defaultValue) const;
+
+        /** \brief return the value of the specified property p1, if it doesn't exist return p2 and if that also doesn't exist, return the supplied default value */
+        QVariant getQFPropertyHirarchy2(const QString& p1, const QString& p2, const QVariant& defaultValue) const;
+        /** \brief return the value of the specified property p1, if it doesn't exist return p2, ... and if that also doesn't exist, return the supplied default value */
+        QVariant getQFPropertyHirarchy3(const QString& p1, const QString& p2, const QString& p3, const QVariant& defaultValue) const;
+        /** \brief return the value of the specified property p1, if it doesn't exist return p2, ... and if that also doesn't exist, return the supplied default value */
+        QVariant getQFPropertyHirarchy4(const QString& p1, const QString& p2, const QString& p3, const QString& p4, const QVariant& defaultValue) const;
+
+
         /** \brief return the value of the specified property */
         inline QVariant getQFProperty( const QString& p) const {
             return getProperty(p);

@@ -1850,16 +1850,6 @@ void QFImFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord 
 void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFRawDataRecord::QFFitFitResultsStore> &fitresult, const QList<const QFRawDataRecord *> &records, const QStringList &fitfunctionIDs, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const
 {
 
-    for (int i=0; i<records.size(); i++) {
-        const QString evalID=transformResultID(getEvaluationResultID(run, records[i]));
-        QFRawDataRecord::QFFitFitResultsStore r;
-        r.index=run;
-        r.rdr=records[i];
-        r.rdrRecID=-1;
-        if (records[i]) r.rdrRecID=records[i]->getID();
-        r.evalID=evalID;
-        fitresult<<r;
-    }
 
 
 
@@ -1911,6 +1901,21 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFRawDataRecord:
 
     QString egroup=QString("%1%2__%3").arg(getType()).arg(getID()).arg(falg->id());//.arg(dfd.ffunc->id());
     QString egrouplabel=QString("#%3 \"%1\": %2").arg(getName()).arg(falg->shortName()).arg(getID());//.arg(dfd.ffunc->shortName());
+
+    for (int i=0; i<records.size(); i++) {
+        const QString evalID=transformResultID(getEvaluationResultID(run, records[i]));
+        QFRawDataRecord::QFFitFitResultsStore r;
+        r.index=run;
+        r.rdr=records[i];
+        r.rdrRecID=-1;
+        if (records[i]) r.rdrRecID=records[i]->getID();
+        r.evalID=evalID;
+        r.evalgroup=egroup;
+        r.egrouplabel=egrouplabel;
+        r.egroupindex=run;
+        r.egroupdescription=QString("");
+        fitresult<<r;
+    }
     QString filesNames="";
     for (int r=0; r<records.size(); r++) {
         const QFRawDataRecord* record=records[r];
@@ -2042,10 +2047,7 @@ void QFImFCCSFitEvaluationItem::doFitForMultithreadReturn(QList<QFRawDataRecord:
                     record->resultsSetEvaluationGroupLabel(egroup, egrouplabel);
                     record->resultsSetEvaluationGroupIndex(evalID, run);
                     record->resultsSetEvaluationDescription(evalID, QString(""));*/
-                    fitresult[r].evalgroup=egroup;
-                    fitresult[r].egrouplabel=egrouplabel;
-                    fitresult[r].egroupindex=run;
-                    fitresult[r].egroupdescription=QString("");
+
 
 
                     QString label;
