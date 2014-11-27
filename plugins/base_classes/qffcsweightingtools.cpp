@@ -109,26 +109,27 @@ QFFCSWeightingTools::DataWeight QFFCSWeightingTools::stringToDataWeight(QString 
     }
 
 
-#define RUN_AVG(avg) \
+#define RUN_STD(avg) \
     for (int i=0; i<N; i++) { \
         weights[i]=0; \
         int jstart=-avg/2; \
         int jend=avg/2; \
-        while (i+jend>=N) { \
-            jstart--; \
-            jend--; \
-        } \
         while (i+jstart<0) { \
             jstart++; \
             jend++; \
         } \
-        if (i+jstart>=0 && i+jend<=N) { \
-            register double s=0, s2=0; \
-            for (register int j=jstart; j<jend; j++) { \
+        while (i+jend>=N) { \
+            jstart--; \
+            jend--; \
+        } \
+        if (i+jstart>=0 && i+jend<N) { \
+            register double s=0, s2=0, cnt=0; \
+            for (register int j=jstart; j<=jend; j++) { \
                 s=s+corrdat[i+j]; \
                 s2=s2+corrdat[i+j]*corrdat[i+j]; \
+                cnt++; \
             } \
-            weights[i]=sqrt((s2-s*s/double(avg))/double(avg-1)); \
+            weights[i]=sqrt((s2-s*s/double(cnt))/double(cnt-1)); \
         } \
     }
 
@@ -241,7 +242,7 @@ QVector<double> QFFCSWeightingTools::allocVecWeights(bool *weightsOKK, const QFR
         else if (run==-1) corrdat=data->getCorrelationMean();
         if (corrdat) {
             weightsOK=true;
-            RUN_AVG(3)
+            RUN_STD(3)
             CHECK_WEIGHT
         }
     }
@@ -251,7 +252,7 @@ QVector<double> QFFCSWeightingTools::allocVecWeights(bool *weightsOKK, const QFR
         else if (run==-1) corrdat=data->getCorrelationMean();
         if (corrdat) {
             weightsOK=true;
-            RUN_AVG(5)
+            RUN_STD(5)
             CHECK_WEIGHT
         }
     }
@@ -261,7 +262,7 @@ QVector<double> QFFCSWeightingTools::allocVecWeights(bool *weightsOKK, const QFR
         else if (run==-1) corrdat=data->getCorrelationMean();
         if (corrdat) {
             weightsOK=true;
-            RUN_AVG(7)
+            RUN_STD(7)
             CHECK_WEIGHT
         }
     }
@@ -271,7 +272,7 @@ QVector<double> QFFCSWeightingTools::allocVecWeights(bool *weightsOKK, const QFR
         else if (run==-1) corrdat=data->getCorrelationMean();
         if (corrdat) {
             weightsOK=true;
-            RUN_AVG(11)
+            RUN_STD(11)
             CHECK_WEIGHT
         }
     }

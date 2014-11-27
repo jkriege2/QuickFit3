@@ -4144,6 +4144,39 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 if (QFFitAlgorithmManager::getInstance()->contains(pid)) {
                     if (QFFitAlgorithmManager::getInstance()->getIDList().contains(fn)) {
                         pid_sub_deocrated=tr("&nbsp;&nbsp;&nbsp;fitAlgorithmID: <b><tt>%1</tt></b>").arg(fn);
+                        QFFitAlgorithm* fa=QFFitAlgorithmManager::getInstance()->createAlgorithm(fn);
+                        if (fa) {
+                            QStringList ffeat;
+                            QString fffeatures="";
+                            QString params;
+                            if (fa->get_supportsBoxConstraints()) {
+                                ffeat.append(tr("supports box-constraints"));
+                            }
+                            if (fa->isThreadSafe()) {
+                                ffeat.append(tr("supports multi-threaded fits"));
+                            }
+                            if (fa->isDeprecated()) {
+                                autoplugin_startdescription+=tr("$$note:This fit algorithm is marked as deprecated by the author and may be removed from QuickFit in one of the future versions! Please use an alternative where possible.$$");
+                            }
+                            if (fa->getParameterIDs().size()>0) {
+                                QString p;
+                                for (int i=0; i<fa->getParameterIDs().size(); i++) {
+                                    p+=tr("<li><tt>%1</tt>, default value: %2 </li>").arg(fa->getParameterIDs().at(i)).arg(fa->getParameter(fa->getParameterIDs().at(i)).toString());
+                                }
+                                params=tr("This fit algorithm can be configured with these parameters:<ul>%1</ul>").arg(p);
+                            }
+                            if (!ffeat.isEmpty()) fffeatures=tr("  <li>features: <b>%1</b></li>").arg(ffeat.join(", "));
+                            autoplugin_description+=tr("<h2>Fit Algorithm Metadata</h2>"
+                                                       "<p>This page describes a QFFitAlgorithm, i.e. a fit algorithm for QuickFit $$version$$:<ul>"
+                                                       "  <li>id: <b>%1</b></li>"
+                                                       "  <li>name: <b>%2</b></li>"
+                                                       "  <li>shortened name: <b>%3</b></li>"
+                                                       "%4"
+                                                       "</ul>"
+                                                       "%5"
+                                                       "</p>").arg(fa->id()).arg(fa->name()).arg(fa->shortName()).arg(fffeatures).arg(params);
+                            delete fa;
+                        }
                     }
                 } else  if (QFFitFunctionManager::getInstance()->contains(pid)) {
                     if (QFFitFunctionManager::getInstance()->getIDList().contains(fn)) {
