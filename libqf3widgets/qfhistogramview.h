@@ -82,6 +82,7 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         /** \brief write the settings */
         void writeSettings(QSettings& settings, const QString& prefix=QString("histogram/"));
 
+        /** NOTE: qgroup is mainly ignored by this write function!!! */
         void writeQFProperties(QFProperties* current, const QString& prefix, const QString& egroup, const QString& param);
         void readQFProperties(QFProperties* current, const QString& prefix, const QString& egroup, const QString& param);
 
