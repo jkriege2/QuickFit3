@@ -337,6 +337,8 @@ bool QFESPIMB040CamParamStackConfigWidget2::previewMode() const
 
 void QFESPIMB040CamParamStackConfigWidget2::on_btnSaveTemplate_clicked()
 {
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->stop();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->stop();
     QDir().mkpath(ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/");
     QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040CamParamStackConfigWidget2/lasttemplatedir", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString();
     QString filename=qfGetSaveFileName(this, tr("save as template ..."), dir, tr("camera parameter stack configuration (*.cpsc)"))    ;
@@ -355,10 +357,14 @@ void QFESPIMB040CamParamStackConfigWidget2::on_btnSaveTemplate_clicked()
         }
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040CamParamStackConfigWidget2/lasttemplatedir", dir);
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->resume();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->resume();
 }
 
 void QFESPIMB040CamParamStackConfigWidget2::on_btnLoadTemplate_clicked()
 {
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->stop();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->stop();
     QDir().mkpath(ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/");
     QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040CamParamStackConfigWidget2/lasttemplatedir", ProgramOptions::getInstance()->getHomeQFDirectory()+"/acq_templates/").toString();
     QString filename=qfGetOpenFileName(this, tr("open template ..."), dir, tr("camera parameter stack configuration (*.cpsc)"))    ;
@@ -368,6 +374,8 @@ void QFESPIMB040CamParamStackConfigWidget2::on_btnLoadTemplate_clicked()
         dir=QFileInfo(filename).absolutePath();
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040CamParamStackConfigWidget2/lasttemplatedir", dir);
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->resume();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->resume();
 }
 
 

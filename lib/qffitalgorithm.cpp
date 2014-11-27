@@ -915,7 +915,7 @@ void QFFitAlgorithm::FitFunctionFunctor::prepareBootstrapSelection()
         bootstrapIDs.clear();
         for (uint64_t i=0; i<i_M; i++) bootstrapIDs.append(i);
         qfShuffleInplace(bootstrapIDs);
-        while (bootstrapIDs.size()>mBS) bootstrapIDs.removeLast();
+        while (bootstrapIDs.size()>mBS && bootstrapIDs.size()>get_paramcount()+2) bootstrapIDs.removeLast();
         qSort(bootstrapIDs);
         //qDebug()<<"mBS="<<mBS<<"  IDS="<<bootstrapIDs;
     } else {

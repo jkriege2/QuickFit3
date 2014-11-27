@@ -336,11 +336,17 @@ void QFESPIMB040ScriptedAcquisition::on_btnNew_clicked()
 
 void QFESPIMB040ScriptedAcquisition::on_btnOpen_clicked()
 {
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->stop();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->stop();
     openScript("last", true);
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->resume();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->resume();
 }
 
 void QFESPIMB040ScriptedAcquisition::on_btnSave_clicked()
 {
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->stop();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->stop();
     QDir().mkpath(ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acquisitionScripts/");
     QString dir=ProgramOptions::getInstance()->getQSettings()->value("QFESPIMB040ScriptedAcquisition/lastScriptDir", ProgramOptions::getInstance()->getConfigFileDirectory()+"/plugins/ext_spimb040/acquisitionScripts/").toString();
     QDir d(dir);
@@ -368,6 +374,8 @@ void QFESPIMB040ScriptedAcquisition::on_btnSave_clicked()
         }
     }
     ProgramOptions::getInstance()->getQSettings()->setValue("QFESPIMB040ExperimentDescription/lasttemplatedir", dir);
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->resume();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->resume();
 }
 
 
@@ -498,12 +506,20 @@ void QFESPIMB040ScriptedAcquisition::on_btnSyntaxCheck_clicked()
 
 void QFESPIMB040ScriptedAcquisition::on_btnOpenExample_clicked()
 {
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->stop();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->stop();
     openScript(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/spimb040/acquisitionScriptExamples/", false);
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->resume();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->resume();
 }
 
 void QFESPIMB040ScriptedAcquisition::on_btnOpenTemplate_clicked()
 {
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->stop();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->stop();
     openScript(ProgramOptions::getInstance()->getAssetsDirectory()+"/plugins/spimb040/acquisitionScriptTemplates/", false);
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->resume();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->resume();
 }
 
 void QFESPIMB040ScriptedAcquisition::edtScript_cursorPositionChanged()
@@ -775,6 +791,8 @@ void QFESPIMB040ScriptedAcquisition::gotoLine()
 void QFESPIMB040ScriptedAcquisition::print()
 {
 #ifndef QT_NO_PRINTER
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->stop();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->stop();
    QPrinter printer;
 
    QPrintDialog *dialog = new QPrintDialog(&printer, this);
@@ -785,6 +803,8 @@ void QFESPIMB040ScriptedAcquisition::print()
        return;
 
    ui->edtScript->getEditor()->print(&printer);
+   if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->resume();
+   if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->resume();
 #endif
 
 }
@@ -792,10 +812,14 @@ void QFESPIMB040ScriptedAcquisition::print()
 void QFESPIMB040ScriptedAcquisition::printPreviewClick()
 {
 #ifndef QT_NO_PRINTER
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->stop();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->stop();
     QPrinter printer(QPrinter::HighResolution);
     QPrintPreviewDialog preview(&printer, this);
     connect(&preview, SIGNAL(paintRequested(QPrinter *)), SLOT(printPreview(QPrinter *)));
     preview.exec();
+    if (opticsSetup->getStopRelease(0)) opticsSetup->getStopRelease(0)->resume();
+    if (opticsSetup->getStopRelease(1)) opticsSetup->getStopRelease(1)->resume();
 #endif
 }
 
