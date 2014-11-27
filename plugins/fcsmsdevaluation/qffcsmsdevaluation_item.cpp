@@ -144,6 +144,9 @@ void QFFCSMSDEvaluationItem::setTheory(int i, bool enabled, double pre, double D
     setFitResultValue(record, run, getCurrentModel(), getTheoryPreName(i, record, run), pre);
     setFitResultValue(record, run, getCurrentModel(), getTheoryDName(i, record, run), D);
     setFitResultValue(record, run, getCurrentModel(), getTheoryAlphaName(i, record, run), alpha);
+    if (i>0) {
+        setFitResultValue(record, run, getCurrentModel(), getTheoryIntersectName(i-1, record, run), getTheoryIntersect(i-1, record, run));
+    }
 }
 
 int QFFCSMSDEvaluationItem::getFitWidth(QFRawDataRecord* record, int run) const {
@@ -197,6 +200,11 @@ QString QFFCSMSDEvaluationItem::getTheoryPreName(int i, QFRawDataRecord* record,
     return QString("msd_theory%1_pre").arg(i);
 }
 
+QString QFFCSMSDEvaluationItem::getTheoryIntersectName(int i, QFRawDataRecord *record, int run) const
+{
+    return QString("msd_theory%1_%2_intersect").arg(i).arg(i+1);
+}
+
 double QFFCSMSDEvaluationItem::getTheoryD(int i, QFRawDataRecord* record, int run) const {
     return getFitValue(record, run, getCurrentModel(), getTheoryDName(i, record, run));
 }
@@ -206,6 +214,20 @@ double QFFCSMSDEvaluationItem::getTheoryAlpha(int i, QFRawDataRecord* record, in
     return getFitValue(record, run, getCurrentModel(), getTheoryAlphaName(i, record, run));
 }
 
+
+double QFFCSMSDEvaluationItem::getTheoryIntersect(int i, QFRawDataRecord *record, int run) const
+{
+    if (i<MSDTHEORYCOUNT-1) {
+        double P1=getTheoryPre(i, record, run);
+        double D1=getTheoryD(i, record, run);
+        double a1=getTheoryAlpha(i, record, run);
+        double P2=getTheoryPre(i+1, record, run);
+        double D2=getTheoryD(i+1, record, run);
+        double a2=getTheoryAlpha(i+1, record, run);
+        return pow(P1*D1/P2/D2, 1.0/(a2-a1));
+    }
+    return 0;
+}
 
 
 

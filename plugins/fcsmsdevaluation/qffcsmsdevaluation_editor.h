@@ -180,6 +180,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         QFDoubleEdit* numPre[MSDTHEORYCOUNT];
         QFDoubleEdit* numD[MSDTHEORYCOUNT];
         QFDoubleEdit* numAlpha[MSDTHEORYCOUNT];
+        QFDoubleEdit* numIntersect[MSDTHEORYCOUNT-1];
         QCheckBox* chkSlope[MSDTHEORYCOUNT];
         QToolButton* btnFitMSD[MSDTHEORYCOUNT];
         QSpinBox* spinFitWidth;

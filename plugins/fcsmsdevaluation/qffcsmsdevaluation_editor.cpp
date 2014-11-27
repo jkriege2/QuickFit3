@@ -318,9 +318,15 @@ QWidget* QFFCSMSDEvaluationEditor::createSlopeWidgets(int i) {
     lay1->setContentsMargins(0,0,0,0);
     w1->setLayout(lay1);
     QWidget* w=new QWidget(this);
-    QHBoxLayout* lay=new QHBoxLayout();
+    QVBoxLayout* lay=new QVBoxLayout();
     lay->setContentsMargins(0,0,0,0);
     w->setLayout(lay);
+    /*if (i>0) {
+        QWidget* w2=new QWidget(this);
+        QHBoxLayout* lay2=new QHBoxLayout();
+        lay2->setContentsMargins(0,0,0,0);
+        w2->setLayout(lay1);
+    }*/
     numPre[i]=new QFDoubleEdit(this);
     numPre[i]->setRange(0, DBL_MAX);
     numPre[i]->setCheckBounds(true, false);
@@ -372,6 +378,15 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     flAlgorithmParams->addRow(tr("Theory:"), new QLabel(tr("<font size=\"+1\"><i>&lang;r<sup>2</sup>&rang; = f&middot;D&middot;t<sup>&alpha;<&sup></i> [&mu;m<sup>2</sup>]</size>")));
 
     for (int i=0; i<MSDTHEORYCOUNT; i++) {
+        if (i>0) {
+            numIntersect[i-1]=new QFDoubleEdit(this);
+            numIntersect[i-1]->setRange(-DBL_MAX, DBL_MAX);
+            numIntersect[i-1]->setCheckBounds(false, false);
+            numIntersect[i-1]->setDecimals(6);
+            numIntersect[i-1]->setValue(0);
+            numIntersect[i-1]->setReadOnly(true);
+            flAlgorithmParams->addRow(tr("intersect X<sub>%1, %2</sub>").arg(i, i+1), numIntersect[i-1]);
+        }
         QWidget* wsl=createSlopeWidgets(i);
         flAlgorithmParams->addRow(chkSlope[i], wsl);
     }
@@ -740,6 +755,11 @@ void QFFCSMSDEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEvalu
             numPre[i]->setValue(item->getTheoryPre(i, item->getHighlightedRecord(), item->getCurrentIndex()));
             numD[i]->setValue(item->getTheoryD(i, item->getHighlightedRecord(), item->getCurrentIndex()));
             numAlpha[i]->setValue(item->getTheoryAlpha(i, item->getHighlightedRecord(), item->getCurrentIndex()));
+            //if (i<MSDTHEORYCOUNT-1) numIntersect[i]->setValue(item->getTheoryIntersect(i, item->getHighlightedRecord(), item->getCurrentIndex()));
+            if (i>0) {
+                numIntersect[i-1]->setValue(item->getTheoryIntersect(i-1, item->getHighlightedRecord(), item->getCurrentIndex()));
+                numIntersect[i-1]->setEnabled(chkSlope[i-1]->isChecked()&&chkSlope[i]->isChecked());
+            }
         }
 
         /*edtAlpha->setValue(item->getAlpha());
@@ -894,6 +914,14 @@ void QFFCSMSDEvaluationEditor::highlightingChanged(QFRawDataRecord* formerRecord
             numPre[i]->setValue(eval->getTheoryPre(i, currentRecord, eval->getCurrentIndex()));
             numD[i]->setValue(eval->getTheoryD(i, currentRecord, eval->getCurrentIndex()));
             numAlpha[i]->setValue(eval->getTheoryAlpha(i, currentRecord, eval->getCurrentIndex()));
+            if (i>0) {
+                numIntersect[i-1]->setValue(eval->getTheoryIntersect(i-1, currentRecord, eval->getCurrentIndex()));
+                numIntersect[i-1]->setEnabled(chkSlope[i-1]->isChecked()&&chkSlope[i]->isChecked());
+            }
+
+            /*if (eval->hasResults(currentRecord, eval->getCurrentIndex(), eval->getCurrentModel())) {
+                eval->setTheory(i, chkSlope[i]->isChecked(), numPre[i]->value(), numD[i]->value(), numAlpha[i]->value(), currentRecord, eval->getCurrentIndex());
+            }*/
         }
 
         updateSliders();
@@ -1457,6 +1485,11 @@ void QFFCSMSDEvaluationEditor::displayParameters() {
         numPre[i]->setValue(eval->getTheoryPre(i, eval->getHighlightedRecord(), eval->getCurrentIndex()));
         numD[i]->setValue(eval->getTheoryD(i, eval->getHighlightedRecord(), eval->getCurrentIndex()));
         numAlpha[i]->setValue(eval->getTheoryAlpha(i, eval->getHighlightedRecord(), eval->getCurrentIndex()));
+        if (i>0) {
+            numIntersect[i-1]->setValue(eval->getTheoryIntersect(i-1, eval->getHighlightedRecord(), eval->getCurrentIndex()));
+            numIntersect[i-1]->setEnabled(chkSlope[i-1]->isChecked()&&chkSlope[i]->isChecked());
+        }
+
     }
     dataEventsEnabled=oldde;
 
@@ -1973,6 +2006,11 @@ void QFFCSMSDEvaluationEditor::fitAllMSD()
         numPre[i]->setValue(data->getTheoryPre(i, data->getHighlightedRecord(), data->getCurrentIndex()));
         numD[i]->setValue(data->getTheoryD(i, data->getHighlightedRecord(), data->getCurrentIndex()));
         numAlpha[i]->setValue(data->getTheoryAlpha(i, data->getHighlightedRecord(), data->getCurrentIndex()));
+        //if (i<MSDTHEORYCOUNT-1) numIntersect[i]->setValue(data->getTheoryIntersect(i, data->getHighlightedRecord(), data->getCurrentIndex()));
+        if (i>0) {
+            numIntersect[i-1]->setValue(data->getTheoryIntersect(i-1, data->getHighlightedRecord(), data->getCurrentIndex()));
+            numIntersect[i-1]->setEnabled(chkSlope[i-1]->isChecked()&&chkSlope[i]->isChecked());
+        }
     }
 
     delete dlg;
@@ -2592,6 +2630,10 @@ void QFFCSMSDEvaluationEditor::theoryChanged() {
     data->set_doEmitPropertiesChanged(false);
     for (int i=0; i<MSDTHEORYCOUNT; i++)     {
         data->setTheory(i, chkSlope[i]->isChecked(), numPre[i]->value(), numD[i]->value(), numAlpha[i]->value(), data->getHighlightedRecord(), data->getCurrentIndex());
+        if (i>0) {
+            numIntersect[i-1]->setValue(data->getTheoryIntersect(i-1, data->getHighlightedRecord(), data->getCurrentIndex()));
+            numIntersect[i-1]->setEnabled(chkSlope[i-1]->isChecked()&&chkSlope[i]->isChecked());
+        }
     }
     data->set_doEmitResultsChanged(rc);
     data->set_doEmitPropertiesChanged(pc);
@@ -2627,6 +2669,11 @@ void QFFCSMSDEvaluationEditor::fitMSD()
         numPre[i]->setValue(data->getTheoryPre(i, data->getHighlightedRecord(), data->getCurrentIndex()));
         numD[i]->setValue(data->getTheoryD(i, data->getHighlightedRecord(), data->getCurrentIndex()));
         numAlpha[i]->setValue(data->getTheoryAlpha(i, data->getHighlightedRecord(), data->getCurrentIndex()));
+        //if (i<MSDTHEORYCOUNT-1) numIntersect[i]->setValue(data->getTheoryIntersect(i, data->getHighlightedRecord(), data->getCurrentIndex()));
+        if (i>0) {
+            numIntersect[i-1]->setValue(data->getTheoryIntersect(i-1, data->getHighlightedRecord(), data->getCurrentIndex()));
+            numIntersect[i-1]->setEnabled(chkSlope[i-1]->isChecked()&&chkSlope[i]->isChecked());
+        }
     }
 
     delete dlg;

@@ -132,12 +132,15 @@ class QFFCSMSDEvaluationItem : public QFUsesResultsByIndexAndModelEvaluation, pu
         virtual QString getEvaluationResultID(int currentIndex, int model) const;
         using QFUsesResultsByIndexAndModelEvaluation::getEvaluationResultID;
 
+        double getTheoryIntersect(int i, QFRawDataRecord* record, int run) const;
+
         double getTheoryAlpha(int i, QFRawDataRecord* record, int run) const;
         double getTheoryD(int i, QFRawDataRecord* record, int run) const;
         double getTheoryPre(int i, QFRawDataRecord* record, int run) const;
         QString getTheoryAlphaName(int i, QFRawDataRecord* record, int run) const;
         QString getTheoryDName(int i, QFRawDataRecord* record, int run) const;
         QString getTheoryPreName(int i, QFRawDataRecord* record, int run) const;
+        QString getTheoryIntersectName(int i, QFRawDataRecord* record, int run) const;
         bool getTheoryEnabled(int i, QFRawDataRecord* record, int run) const;
         void setTheory(int i, bool enabled, double pre, double D, double alpha, QFRawDataRecord* record, int run);
         int getFitWidth(QFRawDataRecord* record, int run) const;
