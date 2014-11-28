@@ -53,12 +53,20 @@ class QFFitFunctionConfigForGlobalFitInterface
     public:
         virtual ~QFFitFunctionConfigForGlobalFitInterface() {}
 
+        struct GlobalFitParameter {
+            double value;
+            double error;
+            double rangeMin;
+            double rangeMax;
+        };
+
         struct GlobalFitConfig {
             QString groupLabel;
             QString menuEntryLabel;
             QStringList models;
             QStringList roles;
             QList<QStringList> fixes;
+            QList<QMap<QString, GlobalFitParameter> > paramValues;
             QList<QList<QStringList> > globalParams;
         };
 

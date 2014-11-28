@@ -1854,6 +1854,24 @@ QFLIB_EXPORT QImage cropLeftRight(const QImage& pix, QRgb cropcolor);
 QFLIB_EXPORT QPixmap cropLeftRight(const QPixmap& pix);
 QFLIB_EXPORT QImage cropLeftRight(const QImage& pix);
 
+/*! \brief crop all rows from an image from the bottom, which only contain pixels with the given color
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QPixmap cropBottom(const QPixmap& pix, QRgb cropcolor);
+QFLIB_EXPORT QImage cropBottom(const QImage& pix, QRgb cropcolor);
+QFLIB_EXPORT QPixmap cropBottom(const QPixmap& pix);
+QFLIB_EXPORT QImage cropBottom(const QImage& pix);
+
+/*! \brief crop all rows from an image from the top/bottom, which only contain pixels with the given color
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QPixmap cropTopBottom(const QPixmap& pix, QRgb cropcolor);
+QFLIB_EXPORT QImage cropTopBottom(const QImage& pix, QRgb cropcolor);
+QFLIB_EXPORT QPixmap cropTopBottom(const QPixmap& pix);
+QFLIB_EXPORT QImage cropTopBottom(const QImage& pix);
+
 #endif // QFTOOLS_H
 
 

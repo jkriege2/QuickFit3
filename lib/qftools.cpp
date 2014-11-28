@@ -1579,3 +1579,85 @@ QImage cropLeftRight(const QImage& pix) {
 
 
 
+
+QPixmap cropBottom(const QPixmap& pix, QRgb cropcolor) {
+    return QPixmap::fromImage(cropBottom(pix.toImage(), cropcolor));
+}
+
+QImage cropBottom(const QImage& img, QRgb col) {
+
+    int bot=0;
+    for (int y=img.height()-1; y>=0; y--) {
+        bool allc=true;
+        for (int x=0; x<img.width(); x++) {
+            allc=allc&&(img.pixel(x,y)==col);
+            if (!allc) break;
+        }
+        if (allc) bot++;
+        else break;
+    }
+
+    //qDebug()<<"cropLeftRight("<<img.width()<<img.height()<<col<<img.pixel(0,0)<<"): "<<left<<right;
+    if (bot<img.height()) {
+        return img.copy(0,0,img.width(),img.height()-bot);
+    } else {
+        return QImage();
+    }
+}
+
+QPixmap cropBottom(const QPixmap& pix) {
+    return QPixmap::fromImage(cropBottom(pix.toImage()));
+}
+
+QImage cropBottom(const QImage& pix) {
+    return cropBottom(pix, pix.pixel(0,pix.height()-1));
+}
+
+
+
+
+QPixmap cropTopBottom(const QPixmap& pix, QRgb cropcolor) {
+    return QPixmap::fromImage(cropTopBottom(pix.toImage(), cropcolor));
+}
+
+QImage cropTopBottom(const QImage& img, QRgb col) {
+
+    int bot=0;
+    int top=0;
+    for (int y=0; y<img.height(); y++) {
+        bool allc=true;
+        for (int x=0; x<img.width(); x++) {
+            allc=allc&&(img.pixel(x,y)==col);
+            if (!allc) break;
+        }
+        if (allc) top++;
+        else break;
+    }
+    for (int y=img.height()-1; y>=0; y--) {
+        bool allc=true;
+        for (int x=0; x<img.width(); x++) {
+            allc=allc&&(img.pixel(x,y)==col);
+            if (!allc) break;
+        }
+        if (allc) bot++;
+        else break;
+    }
+
+    //qDebug()<<"cropLeftRight("<<img.width()<<img.height()<<col<<img.pixel(0,0)<<"): "<<left<<right;
+    if (bot+top<img.height()) {
+        return img.copy(0,top,img.width(),img.height()-bot-top);
+    } else {
+        return QImage();
+    }
+}
+
+QPixmap cropTopBottom(const QPixmap& pix) {
+    return QPixmap::fromImage(cropTopBottom(pix.toImage()));
+}
+
+QImage cropTopBottom(const QImage& pix) {
+    return cropBottom(pix, pix.pixel(0,pix.height()-1));
+}
+
+
+

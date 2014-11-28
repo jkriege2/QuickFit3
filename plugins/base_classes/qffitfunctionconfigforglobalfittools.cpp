@@ -22,7 +22,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctionconfigforglobalfittools.h"
 #include <QtCore>
 #include <QtXml>
-
+#include "qftools.h"
 
 bool openGlobalFitConfig(const QString &filename, QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig &config)
 {
@@ -35,6 +35,12 @@ bool openGlobalFitConfig(const QString &filename, QFFitFunctionConfigForGlobalFi
         return false;
     }
     file.close();
+
+    config.paramValues.clear();
+    config.globalParams.clear();
+    config.fixes.clear();
+    config.models.clear();
+    config.roles.clear();
 
     QDomElement docElem = doc.documentElement();
 
@@ -103,6 +109,24 @@ bool openGlobalFitConfig(const QString &filename, QFFitFunctionConfigForGlobalFi
             config.globalParams<<formodels;
             gpe=gpe.nextSiblingElement("globalParam");
         }
+
+        QDomElement gppe=docElem.firstChildElement("paramPresets");
+        if (!gppe.isNull()) {
+            QDomElement gpme=gppe.firstChildElement("model");
+            while (!gpme.isNull()) {
+                QMap<QString, QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter> params;
+                QDomElement pe=gpme.firstChildElement("parameter");
+                while (!pe.isNull()) {
+                    params[pe.attribute("id")].value=CQStringToDouble(pe.attribute("value", "0"));
+                    params[pe.attribute("id")].error=CQStringToDouble(pe.attribute("error", "0"));
+                    params[pe.attribute("id")].rangeMin=CQStringToDouble(pe.attribute("min", "0"));
+                    params[pe.attribute("id")].rangeMax=CQStringToDouble(pe.attribute("max", "0"));
+                    pe=pe.nextSiblingElement("parameter");
+                }
+                gpme=gpme.nextSiblingElement("model");
+                config.paramValues<<params;
+            }
+        }
     } else {
         return false;
     }
@@ -148,6 +172,26 @@ void storeGlobalFitConfig(const QString &filename, const QFFitFunctionConfigForG
             //stream.writeAttribute("id", config.models.value(i));
             for (int k=0; k<config.globalParams[i].at(j).size(); k++) {
                 stream.writeTextElement("parameter", config.globalParams[i].at(j).at(k));
+            }
+            stream.writeEndElement();
+        }
+        stream.writeEndElement();
+    }
+
+    if (config.paramValues.size()>0) {
+        stream.writeStartElement("paramPresets");
+        for (int i=0; i<config.paramValues.size(); i++) {
+            stream.writeStartElement("model");
+            QMapIterator<QString, QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter> it(config.paramValues[i]);
+            while (it.hasNext()) {
+                it.next();
+                stream.writeStartElement("parameter");
+                stream.writeAttribute("id", it.key());
+                stream.writeAttribute("value", CDoubleToQString( it.value().value));
+                stream.writeAttribute("error", CDoubleToQString(it.value().error));
+                stream.writeAttribute("min", CDoubleToQString(it.value().rangeMin));
+                stream.writeAttribute("max", CDoubleToQString(it.value().rangeMax));
+                stream.writeEndElement();
             }
             stream.writeEndElement();
         }

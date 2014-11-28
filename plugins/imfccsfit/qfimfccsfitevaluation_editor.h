@@ -113,7 +113,7 @@ class QFImFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
 
         void onConfigureGlobalItemClicked();
-        void configureFitFromGlobal(const QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig& config);
+        void configureFitFromGlobal(const QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig& config, bool loadParams);
         QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig getCurrentGlobalFitConfig() const;
 
 

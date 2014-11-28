@@ -80,43 +80,43 @@ void QFParameterCorrelationView::writeSettings(QSettings &settings, const QStrin
 
 void QFParameterCorrelationView::writeQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
 {
-    current->setQFProperty(prefix+QString("show_scatter_%1_%2").arg(egroup).arg(param), chkScatterPlot->isChecked(), false, false);
-    current->setQFProperty(prefix+QString("show_2dhist_%1_%2").arg(egroup).arg(param), cmb2DHistogram->currentIndex(), false, false);
-    current->setQFProperty(prefix+QString("hist2dbins1_%1_%2").arg(egroup).arg(param), spin2DHistogramBins1->value(), false, false);
-    current->setQFProperty(prefix+QString("hist2dbins2_%1_%2").arg(egroup).arg(param), spin2DHistogramBins2->value(), false, false);
-    current->setQFProperty(prefix+QString("showkeys_%1_%2").arg(egroup).arg(param), chkKey->isChecked(), false, false);
+    current->setQFProperty(prefix+QString("show_scatter_%1").arg(param), chkScatterPlot->isChecked(), false, false);
+    current->setQFProperty(prefix+QString("show_2dhist_%1").arg(param), cmb2DHistogram->currentIndex(), false, false);
+    current->setQFProperty(prefix+QString("hist2dbins1_%1").arg(param), spin2DHistogramBins1->value(), false, false);
+    current->setQFProperty(prefix+QString("hist2dbins2_%1").arg(param), spin2DHistogramBins2->value(), false, false);
+    current->setQFProperty(prefix+QString("showkeys_%1").arg(param), chkKey->isChecked(), false, false);
 
-    current->setQFProperty(prefix+QString("symbol_%1_%2").arg(egroup).arg(param), cmbSymbol->currentIndex(), false, false);
-    current->setQFProperty(prefix+QString("symbsize_%1_%2").arg(egroup).arg(param), spinSymbolSize->value(), false, false);
-    current->setQFProperty(prefix+QString("bins1_%1_%2").arg(egroup).arg(param), spinHistogramBins1->value(), false, false);
-    current->setQFProperty(prefix+QString("rauto1_%1_%2").arg(egroup).arg(param), chkHistogramRangeAuto1->isChecked(), false, false);
-    current->setQFProperty(prefix+QString("rautorel1_%1_%2").arg(egroup).arg(param), chkHistogramRangeRelaxAuto1->isChecked(), false, false);
+    current->setQFProperty(prefix+QString("symbol_%1").arg(param), cmbSymbol->currentIndex(), false, false);
+    current->setQFProperty(prefix+QString("symbsize_%1").arg(param), spinSymbolSize->value(), false, false);
+    current->setQFProperty(prefix+QString("bins1_%1").arg(param), spinHistogramBins1->value(), false, false);
+    current->setQFProperty(prefix+QString("rauto1_%1").arg(param), chkHistogramRangeAuto1->isChecked(), false, false);
+    current->setQFProperty(prefix+QString("rautorel1_%1").arg(param), chkHistogramRangeRelaxAuto1->isChecked(), false, false);
     if (chkHistogramRangeManual1->isChecked()) {
-        current->setQFProperty(prefix+QString("rmin1_%1_%2").arg(egroup).arg(param), edtHistogramMin1->value(), false, false);
-        current->setQFProperty(prefix+QString("rmax1_%1_%2").arg(egroup).arg(param), edtHistogramMax2->value(), false, false);
+        current->setQFProperty(prefix+QString("rmin1_%1").arg(param), edtHistogramMin1->value(), false, false);
+        current->setQFProperty(prefix+QString("rmax1_%1").arg(param), edtHistogramMax2->value(), false, false);
     }
-    current->setQFProperty(prefix+QString("rrmin1_%1_%2").arg(egroup).arg(param), spinHistogramQL1->value(), false, false);
-    current->setQFProperty(prefix+QString("rrmax1_%1_%2").arg(egroup).arg(param), spinHistogramQU1->value(), false, false);
+    current->setQFProperty(prefix+QString("rrmin1_%1").arg(param), spinHistogramQL1->value(), false, false);
+    current->setQFProperty(prefix+QString("rrmax1_%1").arg(param), spinHistogramQU1->value(), false, false);
 
-    current->setQFProperty(prefix+QString("bins2_%1_%2").arg(egroup).arg(param), spinHistogramBins2->value(), false, false);
-    current->setQFProperty(prefix+QString("rauto2_%1_%2").arg(egroup).arg(param), chkHistogramRangeAuto2->isChecked(), false, false);
-    current->setQFProperty(prefix+QString("rautorel2_%1_%2").arg(egroup).arg(param), chkHistogramRangeRelaxAuto2->isChecked(), false, false);
+    current->setQFProperty(prefix+QString("bins2_%1").arg(param), spinHistogramBins2->value(), false, false);
+    current->setQFProperty(prefix+QString("rauto2_%1").arg(param), chkHistogramRangeAuto2->isChecked(), false, false);
+    current->setQFProperty(prefix+QString("rautorel2_%1").arg(param), chkHistogramRangeRelaxAuto2->isChecked(), false, false);
     if (chkHistogramRangeManual2->isChecked()) {
-        current->setQFProperty(prefix+QString("rmin2_%1_%2").arg(egroup).arg(param), edtHistogramMin2->value(), false, false);
-        current->setQFProperty(prefix+QString("rmax2_%1_%2").arg(egroup).arg(param), edtHistogramMax2->value(), false, false);
+        current->setQFProperty(prefix+QString("rmin2_%1").arg(param), edtHistogramMin2->value(), false, false);
+        current->setQFProperty(prefix+QString("rmax2_%1").arg(param), edtHistogramMax2->value(), false, false);
     }
-    current->setQFProperty(prefix+QString("rrmin2_%1_%2").arg(egroup).arg(param), spinHistogramQL2->value(), false, false);
-    current->setQFProperty(prefix+QString("rrmax2_%1_%2").arg(egroup).arg(param), spinHistogramQU2->value(), false, false);
+    current->setQFProperty(prefix+QString("rrmin2_%1").arg(param), spinHistogramQL2->value(), false, false);
+    current->setQFProperty(prefix+QString("rrmax2_%1").arg(param), spinHistogramQU2->value(), false, false);
 
-    current->setQFProperty(prefix+QString("colorscale_%1_%2").arg(egroup).arg(param), cmbColorScale->currentIndex(), false, false);
-    current->setQFProperty(prefix+QString("colrauto_%1_%2").arg(egroup).arg(param), chkColorRangeAuto->isChecked(), false, false);
-    current->setQFProperty(prefix+QString("colrautorel_%1_%2").arg(egroup).arg(param), chkColorRangeRelaxAuto->isChecked(), false, false);
+    current->setQFProperty(prefix+QString("colorscale_%1").arg(param), cmbColorScale->currentIndex(), false, false);
+    current->setQFProperty(prefix+QString("colrauto_%1").arg(param), chkColorRangeAuto->isChecked(), false, false);
+    current->setQFProperty(prefix+QString("colrautorel_%1").arg(param), chkColorRangeRelaxAuto->isChecked(), false, false);
     if (chkColorRangeManual->isChecked()) {
-        current->setQFProperty(prefix+QString("colrmin_%1_%2").arg(egroup).arg(param), edtColorMin->value(), false, false);
-        current->setQFProperty(prefix+QString("colrmax_%1_%2").arg(egroup).arg(param), edtColorMax->value(), false, false);
+        current->setQFProperty(prefix+QString("colrmin_%1").arg(param), edtColorMin->value(), false, false);
+        current->setQFProperty(prefix+QString("colrmax_%1").arg(param), edtColorMax->value(), false, false);
     }
-    current->setQFProperty(prefix+QString("colrrmin2_%1_%2").arg(egroup).arg(param), spinColQL->value(), false, false);
-    current->setQFProperty(prefix+QString("colrrmax2_%1_%2").arg(egroup).arg(param), spinColQU->value(), false, false);
+    current->setQFProperty(prefix+QString("colrrmin2_%1").arg(param), spinColQL->value(), false, false);
+    current->setQFProperty(prefix+QString("colrrmax2_%1").arg(param), spinColQU->value(), false, false);
 
 
 }
@@ -124,47 +124,47 @@ void QFParameterCorrelationView::writeQFProperties(QFProperties *current, const 
 void QFParameterCorrelationView::readQFProperties(QFProperties *current, const QString &prefix, const QString &egroup, const QString &param)
 {
 
-    chkScatterPlot->setChecked(current->getProperty(prefix+QString("show_scatter_%1_%2").arg(egroup).arg(param), true).toBool());
-    cmb2DHistogram->setCurrentIndex(current->getProperty(prefix+QString("show_2dhist_%1_%2").arg(egroup).arg(param), 0).toInt());
-    spin2DHistogramBins1->setValue(current->getProperty(prefix+QString("hist2dbins1_%1_%2").arg(egroup).arg(param), 30).toInt());
-    spin2DHistogramBins2->setValue(current->getProperty(prefix+QString("hist2dbins2_%1_%2").arg(egroup).arg(param), 30).toInt());
-    chkKey->setChecked(current->getProperty(prefix+QString("showkeys_%1_%2").arg(egroup).arg(param), true).toBool());
+    chkScatterPlot->setChecked(current->getQFPropertyHirarchy2(prefix+QString("show_scatter_%1").arg(param), prefix+QString("show_scatter_%1_%2").arg(egroup).arg(param), true).toBool());
+    cmb2DHistogram->setCurrentIndex(current->getQFPropertyHirarchy2(prefix+QString("show_2dhist_%1").arg(param), prefix+QString("show_2dhist_%1_%2").arg(egroup).arg(param), 0).toInt());
+    spin2DHistogramBins1->setValue(current->getQFPropertyHirarchy2(prefix+QString("hist2dbins1_%1").arg(param), prefix+QString("hist2dbins1_%1_%2").arg(egroup).arg(param), 30).toInt());
+    spin2DHistogramBins2->setValue(current->getQFPropertyHirarchy2(prefix+QString("hist2dbins2_%1").arg(param), prefix+QString("hist2dbins2_%1_%2").arg(egroup).arg(param), 30).toInt());
+    chkKey->setChecked(current->getQFPropertyHirarchy2(prefix+QString("showkeys_%1").arg(param), prefix+QString("showkeys_%1_%2").arg(egroup).arg(param), true).toBool());
 
 
 
-    cmbSymbol->setCurrentIndex(current->getProperty(prefix+QString("symbol_%1_%2").arg(egroup).arg(param), JKQTPfilledCircle).toInt());
-    spinSymbolSize->setValue(current->getProperty(prefix+QString("symbsize_%1_%2").arg(egroup).arg(param), 3).toInt());
-    spinHistogramBins1->setValue(current->getProperty(prefix+QString("bins1_%1_%2").arg(egroup).arg(param), 30).toInt());
-    chkHistogramRangeAuto1->setChecked(current->getProperty(prefix+QString("rauto1_%1_%2").arg(egroup).arg(param), true).toBool());
-    chkHistogramRangeRelaxAuto1->setChecked(current->getProperty(prefix+QString("rautorel1_%1_%2").arg(egroup).arg(param), false).toBool());
+    cmbSymbol->setCurrentIndex(current->getQFPropertyHirarchy2(prefix+QString("symbol_%1").arg(param), prefix+QString("symbol_%1_%2").arg(egroup).arg(param), JKQTPfilledCircle).toInt());
+    spinSymbolSize->setValue(current->getQFPropertyHirarchy2(prefix+QString("symbsize_%1").arg(param), prefix+QString("symbsize_%1_%2").arg(egroup).arg(param), 3).toInt());
+    spinHistogramBins1->setValue(current->getQFPropertyHirarchy2(prefix+QString("bins1_%1").arg(param), prefix+QString("bins1_%1_%2").arg(egroup).arg(param), 30).toInt());
+    chkHistogramRangeAuto1->setChecked(current->getQFPropertyHirarchy2(prefix+QString("rauto1_%1").arg(param), prefix+QString("rauto1_%1_%2").arg(egroup).arg(param), true).toBool());
+    chkHistogramRangeRelaxAuto1->setChecked(current->getQFPropertyHirarchy2(prefix+QString("rautorel1_%1").arg(param), prefix+QString("rautorel1_%1_%2").arg(egroup).arg(param), false).toBool());
     if (chkHistogramRangeManual1->isChecked()) {
-        edtHistogramMin1->setValue(current->getProperty(prefix+QString("rmin1_%1_%2").arg(egroup).arg(param), 0).toDouble());
-        edtHistogramMax1->setValue(current->getProperty(prefix+QString("rmax1_%1_%2").arg(egroup).arg(param), 10).toDouble());
+        edtHistogramMin1->setValue(current->getQFPropertyHirarchy2(prefix+QString("rmin1_%1").arg(param), prefix+QString("rmin1_%1_%2").arg(egroup).arg(param), 0).toDouble());
+        edtHistogramMax1->setValue(current->getQFPropertyHirarchy2(prefix+QString("rmax1_%1").arg(param), prefix+QString("rmax1_%1_%2").arg(egroup).arg(param), 10).toDouble());
     }
-    spinHistogramQL1->setValue(current->getProperty(prefix+QString("rrmin1_%1_%2").arg(egroup).arg(param), 5).toDouble());
-    spinHistogramQU1->setValue(current->getProperty(prefix+QString("rrmax1_%1_%2").arg(egroup).arg(param), 5).toDouble());
+    spinHistogramQL1->setValue(current->getQFPropertyHirarchy2(prefix+QString("rrmin1_%1").arg(param), prefix+QString("rrmin1_%1_%2").arg(egroup).arg(param), 5).toDouble());
+    spinHistogramQU1->setValue(current->getQFPropertyHirarchy2(prefix+QString("rrmax1_%1").arg(param), prefix+QString("rrmax1_%1_%2").arg(egroup).arg(param), 5).toDouble());
 
-    spinHistogramBins2->setValue(current->getProperty(prefix+QString("bins2_%1_%2").arg(egroup).arg(param), 30).toInt());
-    chkHistogramRangeAuto2->setChecked(current->getProperty(prefix+QString("rauto2_%1_%2").arg(egroup).arg(param), true).toBool());
-    chkHistogramRangeRelaxAuto2->setChecked(current->getProperty(prefix+QString("rautorel2_%1_%2").arg(egroup).arg(param), false).toBool());
+    spinHistogramBins2->setValue(current->getQFPropertyHirarchy2(prefix+QString("bins2_%1").arg(param), prefix+QString("bins2_%1_%2").arg(egroup).arg(param), 30).toInt());
+    chkHistogramRangeAuto2->setChecked(current->getQFPropertyHirarchy2(prefix+QString("rauto2_%1").arg(param), prefix+QString("rauto2_%1_%2").arg(egroup).arg(param), true).toBool());
+    chkHistogramRangeRelaxAuto2->setChecked(current->getQFPropertyHirarchy2(prefix+QString("rautorel2_%1").arg(param), prefix+QString("rautorel2_%1_%2").arg(egroup).arg(param), false).toBool());
     if (chkHistogramRangeManual2->isChecked()) {
-        edtHistogramMin2->setValue(current->getProperty(prefix+QString("rmin2_%1_%2").arg(egroup).arg(param), 0).toDouble());
-        edtHistogramMax2->setValue(current->getProperty(prefix+QString("rmax2_%1_%2").arg(egroup).arg(param), 10).toDouble());
+        edtHistogramMin2->setValue(current->getQFPropertyHirarchy2(prefix+QString("rmin2_%1").arg(param), prefix+QString("rmin2_%1_%2").arg(egroup).arg(param), 0).toDouble());
+        edtHistogramMax2->setValue(current->getQFPropertyHirarchy2(prefix+QString("rmax2_%1").arg(param), prefix+QString("rmax2_%1_%2").arg(egroup).arg(param), 10).toDouble());
     }
-    spinHistogramQL1->setValue(current->getProperty(prefix+QString("rrmin2_%1_%2").arg(egroup).arg(param), 5).toDouble());
-    spinHistogramQU1->setValue(current->getProperty(prefix+QString("rrmax2_%1_%2").arg(egroup).arg(param), 5).toDouble());
+    spinHistogramQL1->setValue(current->getQFPropertyHirarchy2(prefix+QString("rrmin2_%1").arg(param), prefix+QString("rrmin2_%1_%2").arg(egroup).arg(param), 5).toDouble());
+    spinHistogramQU1->setValue(current->getQFPropertyHirarchy2(prefix+QString("rrmax2_%1").arg(param), prefix+QString("rrmax2_%1_%2").arg(egroup).arg(param), 5).toDouble());
 
 
 
-    cmbColorScale->setCurrentIndex(current->getProperty(prefix+QString("colorscale_%1_%2").arg(egroup).arg(param), JKQTPMathImageMATLAB).toInt());
-    chkColorRangeAuto->setChecked(current->getProperty(prefix+QString("colrauto_%1_%2").arg(egroup).arg(param), true).toBool());
-    chkColorRangeRelaxAuto->setChecked(current->getProperty(prefix+QString("colrautorel_%1_%2").arg(egroup).arg(param), false).toBool());
+    cmbColorScale->setCurrentIndex(current->getQFPropertyHirarchy2(prefix+QString("colorscale_%1").arg(param), prefix+QString("colorscale_%1_%2").arg(egroup).arg(param), JKQTPMathImageMATLAB).toInt());
+    chkColorRangeAuto->setChecked(current->getQFPropertyHirarchy2(prefix+QString("colrauto_%1").arg(param), prefix+QString("colrauto_%1_%2").arg(egroup).arg(param), true).toBool());
+    chkColorRangeRelaxAuto->setChecked(current->getQFPropertyHirarchy2(prefix+QString("colrautorel_%1").arg(param), prefix+QString("colrautorel_%1_%2").arg(egroup).arg(param), false).toBool());
     if (chkColorRangeManual->isChecked()) {
-        edtColorMin->setValue(current->getProperty(prefix+QString("colrmin_%1_%2").arg(egroup).arg(param), 0).toDouble());
-        edtColorMax->setValue(current->getProperty(prefix+QString("colrmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
+        edtColorMin->setValue(current->getQFPropertyHirarchy2(prefix+QString("colrmin_%1").arg(param), prefix+QString("colrmin_%1_%2").arg(egroup).arg(param), 0).toDouble());
+        edtColorMax->setValue(current->getQFPropertyHirarchy2(prefix+QString("colrmax_%1").arg(param), prefix+QString("colrmax_%1_%2").arg(egroup).arg(param), 10).toDouble());
     }
-    spinColQL->setValue(current->getProperty(prefix+QString("colrrmin2_%1_%2").arg(egroup).arg(param), 5).toDouble());
-    spinColQU->setValue(current->getProperty(prefix+QString("colrrmax2_%1_%2").arg(egroup).arg(param), 5).toDouble());
+    spinColQL->setValue(current->getQFPropertyHirarchy2(prefix+QString("colrrmin2_%1").arg(param), prefix+QString("colrrmin2_%1_%2").arg(egroup).arg(param), 5).toDouble());
+    spinColQU->setValue(current->getQFPropertyHirarchy2(prefix+QString("colrrmax2_%1").arg(param), prefix+QString("colrrmax2_%1_%2").arg(egroup).arg(param), 5).toDouble());
 }
 
 void QFParameterCorrelationView::connectParameterWidgets(bool connectTo)

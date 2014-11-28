@@ -117,7 +117,7 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         void configureForASPFCCS();
         void configureFor2CSPIMFCCS();
         void onConfigureGlobalItemClicked();
-        void configureFitFromGlobal(const QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig& config);
+        void configureFitFromGlobal(const QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig& config, bool loadParams);
         QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig getCurrentGlobalFitConfig() const;
 
         void filesSetActivated(const QModelIndex& idx);

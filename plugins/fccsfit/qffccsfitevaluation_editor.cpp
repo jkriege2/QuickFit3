@@ -489,11 +489,15 @@ void QFFCCSFitEvaluationEditor::onConfigureGlobalItemClicked()
     int idx=actsGlobalConfig.indexOf(act);
     //qDebug()<<"sender()="<<sender()<<" type="<<sender()->metaObject()->className()<<"   act="<<act<<"   idx="<<idx;
     if (act&&idx>=0&&idx<globalConfig.size()) {
-        configureFitFromGlobal(globalConfig[idx]);
+        bool loadParams=false;
+        if (globalConfig[idx].paramValues.size()>0) {
+            loadParams=QMessageBox::question(this, tr("load global fit configuration ..."), tr("The configuration file also contains fit parameter presets and ranges.\nShould these also be loaded?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
+        }
+        configureFitFromGlobal(globalConfig[idx], loadParams);
     }
 }
 
-void QFFCCSFitEvaluationEditor::configureFitFromGlobal(const QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig &config)
+void QFFCCSFitEvaluationEditor::configureFitFromGlobal(const QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig &config, bool loadParams)
 {
     QFFCCSFitEvaluationItem* data=qobject_cast<QFFCCSFitEvaluationItem*>(current);
     if (!data) return;
@@ -557,7 +561,29 @@ void QFFCCSFitEvaluationEditor::configureFitFromGlobal(const QFFitFunctionConfig
             QFFitFunction* ff=data->getFitFunction(i);
             if (ff && rdr && config.fixes[i].size()>0) {
                 for (int j=0; j<ff->paramCount(); j++) {
-                    if (ff->getDescription(j).fit) data->setFitFix(rdr, data->getCurrentIndex(), ff->getParameterID(j), config.fixes[i].contains(ff->getParameterID(j)));
+                    if (ff->getDescription(j).fit) {
+                        data->setFitFix(rdr, data->getCurrentIndex(), ff->getParameterID(j), config.fixes[i].contains(ff->getParameterID(j)));
+                        data->setInitFitFix(ff->getParameterID(j), config.fixes[i].contains(ff->getParameterID(j)), rdr);
+                    }
+                }
+            }
+        }
+    }
+    if (loadParams && config.paramValues.size()>0) {
+        for (int i=0; i<config.paramValues.size(); i++) {
+            QFRawDataRecord* rdr=data->getFitFile(i);
+            QFFitFunction* ff=data->getFitFunction(i);
+            if (ff && rdr && config.paramValues[i].size()>0) {
+                QMapIterator<QString, QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter> it(config.paramValues[i]);
+                while (it.hasNext()) {
+                    it.next();
+                    if (ff->hasParameter(it.key())) {
+                        data->setInitFitValue(it.key(), it.value().value, it.value().error, rdr);
+                        data->setFitValue(rdr, data->getCurrentIndex(), it.key(), it.value().value);
+                        data->setFitError(rdr, data->getCurrentIndex(), it.key(), it.value().error);
+                        data->setFitMin(it.key(), it.value().rangeMin, rdr);
+                        data->setFitMax(it.key(), it.value().rangeMax, rdr);
+                    }
                 }
             }
         }
@@ -595,6 +621,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFFCCSFitEvaluationEdi
         QFRawDataRecord* rdr=data->getFitFile(i);
         if (ff && rdr) {
             QStringList fl;
+            QMap<QString, QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter> params;
             for (int j=0; j<ff->paramCount(); j++) {
                 const QString param=ff->getParameterID(j);
                 const int global=data->getLinkParameter(i, param);
@@ -604,8 +631,13 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFFCCSFitEvaluationEdi
                 if (data->getFitFix(rdr, data->getEvaluationResultID(data->getCurrentIndex(), rdr), param)) {
                     fl<<param;
                 }
+                params[param].value=data->getFitValue(rdr, data->getEvaluationResultID(data->getCurrentIndex(), rdr), param);
+                params[param].error=data->getFitError(rdr, data->getEvaluationResultID(data->getCurrentIndex(), rdr), param);
+                params[param].rangeMin=data->getFitMin(param, rdr);
+                params[param].rangeMax=data->getFitMax(param, rdr);
             }
             config.fixes<<fl;
+            config.paramValues<<params;
         }
     }
 
@@ -1552,7 +1584,11 @@ void QFFCCSFitEvaluationEditor::loadGlobalFitConfig()
     if (QFile::exists(filename)) {
         QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig config;
         if (openGlobalFitConfig(filename, config)) {
-            configureFitFromGlobal(config);
+            bool loadParams=false;
+            if (config.paramValues.size()>0) {
+                loadParams=QMessageBox::question(this, tr("load global fit configuration ..."), tr("The configuration file also contains fit parameter presets and ranges.\nShould these also be loaded?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
+            }
+            configureFitFromGlobal(config, loadParams);
         }
     }
 }

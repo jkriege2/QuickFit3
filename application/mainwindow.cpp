@@ -4777,11 +4777,11 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                             p.setRenderHint(QPainter::Antialiasing);
                             p.setRenderHint(QPainter::HighQualityAntialiasing);
                             p.setRenderHint(QPainter::TextAntialiasing);
-                            mathParser.draw(p,Qt::AlignTop | Qt::AlignLeft, QRectF(QPointF(0,0), size));
+                            mathParser.draw(p,Qt::AlignTop | Qt::AlignLeft, QRectF(QPointF(0,0.1*size.height()), size));
                             p.end();
                             QString texfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+"_tex"+QString::number(count)+".png";
                             //qDebug()<<"latex-render: "<<latex<<"\n    size = "<<size<<"  output = "<<texfilename;
-                            pix=cropLeftRight(pix);
+                            pix=cropTopBottom(cropLeftRight(pix));
                             pix.save(texfilename);
 
                             if (command=="bmath" || command=="mathb") {
