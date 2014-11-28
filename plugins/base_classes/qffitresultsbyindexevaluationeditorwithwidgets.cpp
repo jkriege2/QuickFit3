@@ -1562,7 +1562,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitEverythingThreaded() {
     QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
     QList<QFFitResultsByIndexEvaluationFitThread*> threads;
 
-    int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
+    int threadcount=qMin(2,qMax(2,ProgramOptions::getInstance()->getMaxThreads()));
     if (ProgramOptions::getConfigValue(eval->getType()+"/overrule_threads", false).toBool()) {
         threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
     }
@@ -1698,7 +1698,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllRunsThreaded() {
     QApplication::processEvents();
     QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
     QList<QFFitResultsByIndexEvaluationFitThread*> threads;
-    int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
+    int threadcount=qMin(2,qMax(2,ProgramOptions::getInstance()->getMaxThreads()));
     if (ProgramOptions::getConfigValue(eval->getType()+"/overrule_threads", false).toBool()) {
         threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
     }
@@ -1830,7 +1830,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::fitAllFilesThreaded()
     QApplication::processEvents();
     QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
     QList<QFFitResultsByIndexEvaluationFitThread*> threads;
-    int threadcount=qMax(2,ProgramOptions::getInstance()->getMaxThreads());
+    int threadcount=qMin(2,qMax(2,ProgramOptions::getInstance()->getMaxThreads()));
     if (ProgramOptions::getConfigValue(eval->getType()+"/overrule_threads", false).toBool()) {
         threadcount=qMax(2,ProgramOptions::getConfigValue(eval->getType()+"/threads", 1).toInt());
     }
