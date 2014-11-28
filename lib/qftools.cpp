@@ -1656,7 +1656,7 @@ QPixmap cropTopBottom(const QPixmap& pix) {
 }
 
 QImage cropTopBottom(const QImage& pix) {
-    return cropBottom(pix, pix.pixel(0,pix.height()-1));
+    return cropTopBottom(pix, pix.pixel(0,0));
 }
 
 

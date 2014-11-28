@@ -1579,7 +1579,6 @@ void QFRDRImagingFCSImageEditor::useThisHist1ForAllRDRs()
             QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRsWithType(current->getType());
             for (int i=0; i<rdrs.size(); i++) {
                 if (rdrs[i]) {
-                    //corrView->writeQFProperties(rdrs[i], "imfcs_imed_corrview", egroup, param);
                     histogram->writeQFProperties(rdrs[i], "imfcs_imed_hist", egroup, param);
                     histogram_2->writeQFProperties(rdrs[i], "imfcs_imed_hist2", egroup, param);
 
@@ -1596,25 +1595,17 @@ void QFRDRImagingFCSImageEditor::useThisCorrForAllRDRs()
     if (current){
         QString egroup=filenameize(currentEvalGroup());
         QString param=filenameize(currentFitParameter());
+        QString param2=filenameize(currentFit2Parameter());
         if (egroup.isEmpty() || param.isEmpty()) {
             writeSettings();
         } else {
             QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRsWithType(current->getType());
             for (int i=0; i<rdrs.size(); i++) {
                 if (rdrs[i]) {
-                    corrView->writeQFProperties(rdrs[i], "imfcs_imed_corrview", egroup, param);
-                    //histogram->writeQFProperties(rdrs[i], "imfcs_imed_hist", egroup, param);
-                    //histogram_2->writeQFProperties(rdrs[i], "imfcs_imed_hist2", egroup, param);
-                    //histogram2->writeQFProperties(rdrs[i], "imfcs_imed_hist_p2", egroup, param);
-                    //histogram2_2->writeQFProperties(rdrs[i], "imfcs_imed_hist_p22", egroup, param);
-
-                    //rdrs[i]->setQFProperty(QString("imfcs_imed_histex_%1").arg(param), chkExcludeExcludedRunsFromHistogram->isChecked(), false, false);
-                    //rdrs[i]->setQFProperty(QString("imfcs_imed_hist2ex_%1").arg(param), chkExcludeExcludedRunsFromHistogram_2->isChecked(), false, false);
-                    //rdrs[i]->setQFProperty(QString("imfcs_imed_hist_p2ex_%1").arg(param), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false);
-                    //rdrs[i]->setQFProperty(QString("eimfcs_imed_hist_p22x_%1").arg(param), chkExcludeExcludedRunsFromHistogram2_2->isChecked(), false, false);
-                    rdrs[i]->setQFProperty(QString("eimfcs_imed_corrmode_%1").arg(param), cmbCorrelationDisplayMode->currentIndex(), false, false);
-                    rdrs[i]->setQFProperty(QString("eimfcs_imed_corrcolmode_%1").arg(param), cmbCorrelationDisplayColorMode->currentIndex(), false, false);
-                    rdrs[i]->setQFProperty(QString("eimfcs_imed_corrchannel_%1").arg(param), spinCorrelationChannel->value(), false, false);
+                    corrView->writeQFProperties(rdrs[i], "imfcs_imed_corrview", egroup, param+"_"+param2);
+                    rdrs[i]->setQFProperty(QString("eimfcs_imed_corrmode_%1_%2").arg(param).arg(param2), cmbCorrelationDisplayMode->currentIndex(), false, false);
+                    rdrs[i]->setQFProperty(QString("eimfcs_imed_corrcolmode_%1_%2").arg(param).arg(param2), cmbCorrelationDisplayColorMode->currentIndex(), false, false);
+                    rdrs[i]->setQFProperty(QString("eimfcs_imed_corrchannel_%1_%2").arg(param).arg(param2), spinCorrelationChannel->value(), false, false);
                 }
             }
         }
@@ -1633,19 +1624,11 @@ void QFRDRImagingFCSImageEditor::useThisHist2ForAllRDRs()
             QList<QFRawDataRecord*> rdrs=current->getProject()->getRDRsWithType(current->getType());
             for (int i=0; i<rdrs.size(); i++) {
                 if (rdrs[i]) {
-                    //corrView->writeQFProperties(rdrs[i], "imfcs_imed_corrview", egroup, param);
-                    //histogram->writeQFProperties(rdrs[i], "imfcs_imed_hist", egroup, param);
-                    //histogram_2->writeQFProperties(rdrs[i], "imfcs_imed_hist2", egroup, param);
                     histogram2->writeQFProperties(rdrs[i], "imfcs_imed_hist_p2", egroup, param2);
                     histogram2_2->writeQFProperties(rdrs[i], "imfcs_imed_hist_p22", egroup, param2);
 
-                    //rdrs[i]->setQFProperty(QString("imfcs_imed_histex_%1").arg(param), chkExcludeExcludedRunsFromHistogram->isChecked(), false, false);
-                    //rdrs[i]->setQFProperty(QString("imfcs_imed_hist2ex_%1").arg(param), chkExcludeExcludedRunsFromHistogram_2->isChecked(), false, false);
                     rdrs[i]->setQFProperty(QString("imfcs_imed_hist_p2ex_%1").arg(param2), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false);
                     rdrs[i]->setQFProperty(QString("eimfcs_imed_hist_p22x_%1").arg(param2), chkExcludeExcludedRunsFromHistogram2_2->isChecked(), false, false);
-                    //rdrs[i]->setQFProperty(QString("eimfcs_imed_corrmode_%1").arg(param), cmbCorrelationDisplayMode->currentIndex(), false, false);
-                    //rdrs[i]->setQFProperty(QString("eimfcs_imed_corrcolmode_%1").arg(param), cmbCorrelationDisplayColorMode->currentIndex(), false, false);
-                    //rdrs[i]->setQFProperty(QString("eimfcs_imed_corrchannel_%1").arg(param), spinCorrelationChannel->value(), false, false);
                 }
             }
         }
@@ -1801,7 +1784,7 @@ void QFRDRImagingFCSImageEditor::saveImageSettings() {
             current->setQFProperty(QString("imfcs_imed_overlay_%1").arg(egroup), chkDisplayImageOverlay->isChecked(), false, false);
             current->setQFProperty(QString("imfcs_imed_ovstyle_%1").arg(egroup), cmbSelectionStyle->currentIndex(), false, false);
 
-            corrView->writeQFProperties(current, "imfcs_imed_corrview", egroup, param);
+            corrView->writeQFProperties(current, "imfcs_imed_corrview", egroup, param+"_"+param2);
             histogram->writeQFProperties(current, "imfcs_imed_hist", egroup, param);
             histogram_2->writeQFProperties(current, "imfcs_imed_hist2", egroup, param);
             histogram2->writeQFProperties(current, "imfcs_imed_hist_p2", egroup, param2);
@@ -1811,9 +1794,9 @@ void QFRDRImagingFCSImageEditor::saveImageSettings() {
             current->setQFProperty(QString("imfcs_imed_hist2ex_%1").arg(param), chkExcludeExcludedRunsFromHistogram_2->isChecked(), false, false);
             current->setQFProperty(QString("imfcs_imed_hist_p2ex_%1").arg(param2), chkExcludeExcludedRunsFromHistogram2->isChecked(), false, false);
             current->setQFProperty(QString("eimfcs_imed_hist_p22x_%1").arg(param2), chkExcludeExcludedRunsFromHistogram2_2->isChecked(), false, false);
-            current->setQFProperty(QString("eimfcs_imed_corrmode_%1").arg(param), cmbCorrelationDisplayMode->currentIndex(), false, false);
-            current->setQFProperty(QString("eimfcs_imed_corrcolmode_%1").arg(param), cmbCorrelationDisplayColorMode->currentIndex(), false, false);
-            current->setQFProperty(QString("eimfcs_imed_corrchannel_%1").arg(param), spinCorrelationChannel->value(), false, false);
+            current->setQFProperty(QString("eimfcs_imed_corrmode_%1_%2").arg(param).arg(param2), cmbCorrelationDisplayMode->currentIndex(), false, false);
+            current->setQFProperty(QString("eimfcs_imed_corrcolmode_%1_%2").arg(param).arg(param2), cmbCorrelationDisplayColorMode->currentIndex(), false, false);
+            current->setQFProperty(QString("eimfcs_imed_corrchannel_%1_%2").arg(param).arg(param2), spinCorrelationChannel->value(), false, false);
 
             current->setQFProperty(QString("imfcs_imed_ovrcolorba"), cmbColorbarOverview->currentIndex(), false, false);
             current->setQFProperty(QString("imfcs_imed_ovrautorange"), chkAutorangeOverview->isChecked(), false, false);
@@ -1848,7 +1831,7 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
 
             chkDisplayImageOverlay->setChecked(current->getQFPropertyHirarchy3(QString("imfcs_imed_overlay_%1").arg(param), QString("imfcs_imed_overlay"), QString("imfcs_imed_overlay_%1_%2").arg(egroup).arg(param), true).toBool());
             cmbSelectionStyle->setCurrentIndex(current->getQFPropertyHirarchy3(QString("imfcs_imed_ovstyle_%1").arg(param), QString("imfcs_imed_ovstyle"), QString("imfcs_imed_ovstyle_%1_%2").arg(egroup).arg(param), 0).toInt());
-            corrView->readQFProperties(current, "imfcs_imed_corrview", egroup, param);
+            corrView->readQFProperties(current, "imfcs_imed_corrview", egroup, param+"_"+param2);
             histogram->readQFProperties(current, "imfcs_imed_hist", egroup, param);
             histogram_2->readQFProperties(current, "imfcs_imed_hist2", egroup, param);
             histogram2->readQFProperties(current, "imfcs_imed_hist_p2", egroup, param2);
@@ -1858,9 +1841,9 @@ void QFRDRImagingFCSImageEditor::loadImageSettings() {
             chkExcludeExcludedRunsFromHistogram_2->setChecked(current->getQFPropertyHirarchy2(QString("imfcs_imed_hist2ex_%1").arg(param), QString("imfcs_imed_hist2ex_%1_%2").arg(egroup).arg(param), true).toBool());
             chkExcludeExcludedRunsFromHistogram2->setChecked(current->getQFPropertyHirarchy2(QString("imfcs_imed_hist_p2ex_%1").arg(param2), QString("imfcs_imed_hist_p2ex_%1_%2").arg(egroup).arg(param), true).toBool());
             chkExcludeExcludedRunsFromHistogram2_2->setChecked(current->getQFPropertyHirarchy2(QString("imfcs_imed_hist_p22ex_%1").arg(param2), QString("imfcs_imed_hist_p22ex_%1_%2").arg(egroup).arg(param), true).toBool());
-            cmbCorrelationDisplayMode->setCurrentIndex(current->getQFPropertyHirarchy3(QString("eimfcs_imed_corrmode_%1").arg(param), QString("eimfcs_imed_corrmode"), QString("eimfcs_imed_corrmode_%1_%2").arg(egroup).arg(param), 0).toInt());
-            cmbCorrelationDisplayColorMode->setCurrentIndex(current->getQFPropertyHirarchy3(QString("eimfcs_imed_corrcolmode_%1").arg(param), QString("eimfcs_imed_corrcolmode"), QString("eimfcs_imed_corrcolmode_%1_%2").arg(egroup).arg(param), 0).toInt());
-            spinCorrelationChannel->setValue(current->getQFPropertyHirarchy3(QString("eimfcs_imed_corrchannel_%1").arg(param), QString("eimfcs_imed_corrchannel"), QString("eimfcs_imed_corrchannel_%1_%2").arg(egroup).arg(param), 0).toInt());
+            cmbCorrelationDisplayMode->setCurrentIndex(current->getQFPropertyHirarchy3(QString("eimfcs_imed_corrmode_%1_%2").arg(param).arg(param2), QString("eimfcs_imed_corrmode"), QString("eimfcs_imed_corrmode_%1_%2").arg(egroup).arg(param), 0).toInt());
+            cmbCorrelationDisplayColorMode->setCurrentIndex(current->getQFPropertyHirarchy3(QString("eimfcs_imed_corrcolmode_%1_%2").arg(param).arg(param2), QString("eimfcs_imed_corrcolmode"), QString("eimfcs_imed_corrcolmode_%1_%2").arg(egroup).arg(param), 0).toInt());
+            spinCorrelationChannel->setValue(current->getQFPropertyHirarchy3(QString("eimfcs_imed_corrchannel_%1_%2").arg(param).arg(param2), QString("eimfcs_imed_corrchannel"), QString("eimfcs_imed_corrchannel_%1_%2").arg(egroup).arg(param), 0).toInt());
 
 
             mi=0, ma=1;
