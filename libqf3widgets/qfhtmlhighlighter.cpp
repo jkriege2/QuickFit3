@@ -38,9 +38,23 @@ QFHTMLHighlighter::QFHTMLHighlighter(const QString& settingsDir, QTextDocument *
     m_formats[QFHTMLHighlighter::Tag]=loadFormat(settings, prefix+"style/tag",  "darkred", true, false, false);
     m_formats[QFHTMLHighlighter::Comment]=loadFormat(settings, prefix+"style/comment",  "darkgray", false, true, false);
     m_formats[QFHTMLHighlighter::Text]=loadFormat(settings, prefix+"style/text",  "black", false, false, false);
+    m_formats[QFHTMLHighlighter::Special1]=loadFormat(settings, prefix+"style/special1",  "darkblue", true, false, false);
+    m_formats[QFHTMLHighlighter::Special2]=loadFormat(settings, prefix+"style/special2",  "darkblue", true, false, false);
 
 
 
+}
+
+void QFHTMLHighlighter::setUseSpecial1(const QString &specialStart, const QString &specialEnd)
+{
+    special1Start=specialStart;
+    special1End=specialEnd;
+}
+
+void QFHTMLHighlighter::setUseSpecial2(const QString &specialStart, const QString &specialEnd)
+{
+    special2Start=specialStart;
+    special2End=specialEnd;
 }
 
 void QFHTMLHighlighter::highlightBlock(const QString &text)
@@ -57,8 +71,10 @@ void QFHTMLHighlighter::highlightBlock(const QString &text)
                 QChar ch = text.at(pos);
                 if (ch == '<') {
                     if (text.mid(pos, 4) == "<!--") {
+                        lastStates.push(state);
                         state = InComment;
                     } else {
+                        lastStates.push(state);
                         state = InTag;
                     }
                     start=pos;
@@ -72,6 +88,12 @@ void QFHTMLHighlighter::highlightBlock(const QString &text)
                         ;
                     setFormat(start, pos - start,
                               m_formats[Entity]);
+                } else if (text.mid(pos, special1Start.size()) == special1Start) {
+                    lastStates.push(state);
+                    state = InSpecial1;
+                } else if (text.mid(pos, special2Start.size()) == special2Start) {
+                    lastStates.push(state);
+                    state = InSpecial2;
                 } else {
                     ++pos;
                 }
@@ -87,7 +109,7 @@ void QFHTMLHighlighter::highlightBlock(const QString &text)
             while (pos < len) {
                 if (text.mid(pos, 3) == "-->") {
                     pos += 3;
-                    state = NormalState;
+                    state = lastStates.pop();//NormalState;
                     break;
                 } else {
                     ++pos;
@@ -96,25 +118,52 @@ void QFHTMLHighlighter::highlightBlock(const QString &text)
             setFormat(start, pos - start,
                       m_formats[Comment]);
             break;
-        case InTag:
-            QChar quote = QChar::Null;
+        case InTag: {
+                    QChar quote = QChar::Null;
+                    start = pos;
+                    while (pos < len) {
+                        QChar ch = text.at(pos);
+                        if (quote.isNull()) {
+                            if (ch == '\'' || ch == '"') {
+                                quote = ch;
+                            } else if (ch == '>') {
+                                ++pos;
+                                state = lastStates.pop();//NormalState;
+                                break;
+                            }
+                        } else if (ch == quote) {
+                            quote = QChar::Null;
+                        }
+                        ++pos;
+                    }
+                    setFormat(start, pos - start, m_formats[Tag]);
+                }
+            break;
+        case InSpecial1:
             start = pos;
             while (pos < len) {
-                QChar ch = text.at(pos);
-                if (quote.isNull()) {
-                    if (ch == '\'' || ch == '"') {
-                        quote = ch;
-                    } else if (ch == '>') {
-                        ++pos;
-                        state = NormalState;
-                        break;
-                    }
-                } else if (ch == quote) {
-                    quote = QChar::Null;
+                if (text.mid(pos, special1End.size()) == special1End) {
+                    pos += special1End.size();
+                    state = lastStates.pop();//NormalState;
+                    break;
+                } else {
+                    ++pos;
                 }
-                ++pos;
             }
-            setFormat(start, pos - start, m_formats[Tag]);
+            setFormat(start, pos - start, m_formats[Special1]);
+            break;
+        case InSpecial2:
+            start = pos;
+            while (pos < len) {
+                if (text.mid(pos, special2End.size()) == special2End) {
+                    pos += special2End.size();
+                    state = lastStates.pop();//NormalState;
+                    break;
+                } else {
+                    ++pos;
+                }
+            }
+            setFormat(start, pos - start, m_formats[Special2]);
             break;
         }
     }

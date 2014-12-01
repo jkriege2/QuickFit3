@@ -4737,13 +4737,17 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$math:<latex>$$ items
-            QRegExp rxLaTeX("\\$\\$(math|bmath|mathb)\\:(.*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxLaTeX("\\$\\$(math|bmath|mathb)\\:(.*)\\$\\$|\\§\\§([^\\§]*)\\§\\§", Qt::CaseInsensitive);
             rxLaTeX.setMinimal(true);
             count = 0;
             pos = 0;
             while ((pos = rxLaTeX.indexIn(result, pos)) != -1) {
                 QString command=rxLaTeX.cap(1).toLower().trimmed();
                 QString latex="$"+rxLaTeX.cap(2).trimmed()+"$";
+                if (command.size()==0) {
+                    latex="$"+rxLaTeX.cap(3).trimmed()+"$";
+                    if (latex.size()>2) command="math";
+                }
 
                 if (command=="math" || command=="bmath" || command=="mathb") {
                     if (dontCreatePics)  {

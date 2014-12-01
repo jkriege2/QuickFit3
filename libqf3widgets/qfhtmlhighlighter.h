@@ -28,6 +28,7 @@
 #include <QHash>
 #include <QTextCharFormat>
 #include "libwid_imexport.h"
+#include <QStack>
 
 class QTextDocument;
 
@@ -45,11 +46,19 @@ class QFWIDLIB_EXPORT QFHTMLHighlighter : public QSyntaxHighlighter
             Entity=0,
             Tag=1,
             Comment=2,
+            Special1=3,
+            Special2=4,
             LastConstruct = Comment
         };
         explicit QFHTMLHighlighter(const QString& settingsDir, QTextDocument *parent = 0);
+        void setUseSpecial1(const QString& specialStart, const QString& specialEnd);
+        void setUseSpecial2(const QString& specialStart, const QString& specialEnd);
 
     protected:
+        QString special1Start;
+        QString special1End;
+        QString special2Start;
+        QString special2End;
         /** \brief implements the actual highlighting scheme */
         void highlightBlock(const QString &text);
 
@@ -57,8 +66,11 @@ class QFWIDLIB_EXPORT QFHTMLHighlighter : public QSyntaxHighlighter
                     NormalState = -1,
                     InComment,
                     InTag,
+                    InSpecial1,
+                    InSpecial2,
                     Text
                 };
+        QStack<int> lastStates;
         QTextCharFormat m_formats[LastConstruct + 1];
 
         /** \brief load the format settings, saved in the supplied \a key in the \a settings object into \a format.

@@ -1,0 +1,254 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>2-color imFCCS Plugin: Tutorial (imFCCS fit for DNA in solution, SPIM)</title>
+  </head>
+  <body>
+    $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+    
+    
+$$startbox_note$$
+The data for this tutorial is available:
+<ol>
+    <li>as pre-correlated dataset from the example data, provided together with QuickFit $$version$$: <tt><a href="$$plugin_info:examplesdir:imfccs_fit$$/test_fccs_dna_fortutorial.qfp">$$plugin_info:examplesdir:imfccs_fit$$/test_fccs_dna_fortutorial.qfp</a></tt></li>
+    <li>as raw data from <a href="http://www.dkfz.de/Macromol/quickfit/examples.html">http://www.dkfz.de/Macromol/quickfit/examples.html</a> as <tt>2013_02_25_DNA_FCCS.zip</tt>.</li>
+</ol>
+$$endbox$$    
+
+<h2>Introduction</h2>
+<p>
+    This tutorial gives a walk-through of am imagingFCCS evaluation. The example w chose is a measurement of different mixing rations of single- and double-labeled DNA fragments (607bp, Alexa-488-, Alexa-594- and Alexa-488+594-labeled).
+    We will evaluate two measurements: one of a DL-only sample and one with a low fraction of DL (cAB:cA:cB=0.5:1:1). Note that the labeleing was not perfect, so also the DL-only sample contains single-labeled fragments of both colors!
+</p>
+<p>After correlating the measurements to yield the green- and red-channel autocorrelation functions (ACF0, ACF1) and the two color crosscorrelation function (FCCS).
+The project now contains three imagingFCS raw data records for each sample:
+<center>
+<a name="tutorial_pic000"><img src="./pic/tutorial_pic000.png" border="1"><br/>
+<i>the demo project</i>
+</center>
+Note that all files belonging to one measurement are painted with the same background color shade. This indicates that all these files are inside
+one "RDR group" withing the project. This group feature allows to connect all files that belong together, so an evaluation can make use of this fact. Here
+the imFCCS fit will know which ACF1 and FCCS belong to a given ACF0. In addition to the group, each RDR has an "RDR role", which indicates what type of 
+data is represented by the record (e.g. here: ACF0, ACF1 and FCCS). Both properties can be seen (and the group can be changed) in the "Properties" tab of the
+raw data record:
+<center>
+    <a name="tutorial_pic006"><img src="./pic/tutorial_pic006.png" border="1">
+</center>
+</p>
+
+<p>For the measurement these settings were used:
+<ul>
+    <li>330&mu;s frametime on an EMCCD with EMGain 300</li>    
+    <li>491nm and 561nm lasers with 25W and 25mW overall power</li>
+    <li>565nm beam splitter</li>
+    <li>525/50 bandpass for green channel</li>
+    <li>LP568 longpass filter for red channel</li>
+    <li>Alexa-488 crosstalk into red channel: ~15%</li>
+    <li></li>
+</ul>
+</p>
+
+
+
+<a name="relFCCS"><h2>Calculate relative FCCS amplitudes</h2>
+<p>In this part of the tutorial we will calculate the relative CCF amplitude for each pixel, which is defined as:
+$$bmath:\mbox{relFCCS}(x,y)=\frac{\sum_{i=0}^{N_{avg}}g_{FCCS}(x,y; \tau_i)}{\sum_{i=0}^{N_{avg}}g_{ACF}(x,y; \tau_i)}$$
+where $$math:N$$ is a number of lag times $$math:\tau_i$$ to average over. the lag time $$math:\tau_0$$ is the minimal lagtime of the curve. The correlation curve 
+$$math:g_{ACF/FCCS}(x,y;\tau)$$ describes the auto- (ACF) or crosscorrelation (FCCS) function at the pixel coordinate $$math:(x,y)$$ and the lagtime $$math:\tau$$.
+Averaging over $$math:N_{avg}$$ channels/lags is performed to overcome the noise of the recorded correlation functions. By which ACF to divide (green or red) has to be 
+selected according to the application. Usually one chooses the ACF with the lower amplitude (here typically the red ACF1, see above).
+$$note:This measure relFCCS(x,y) can give an idea about the amount of corsscorrelation, but this is NOT crosstalk- or FRET-corrected.$$
+</p>
+
+<p>
+To perform this evaluation, follow these steps:
+<ol>
+    <li>Go to QuickFit's main window and choose the menu entry "Tools|imFCCS|calculate relative CCF amplitudes". A new window will pop up:
+    <center>    <a name="tutorial_pic010"><img src="./pic/tutorial_pic010.png" border="1"></center></li>
+    <li>Select the ACF1 and FCCS for the first measurement in the top two comboboxes. Below these, the overview images of the two selected records are shown.</li>
+    <li>Select $$math:N_{avg}=5$$ by entering 5 into the edit field "average channels".</li>
+    <li>The lowest image plot shows the result image with a fixed color scale from 0 to 1. 
+    $$note:Some pixels are above or below the sensible range of 0..1, which is mainly caused by the noisiness of the curves.$$
+    </li>
+    <li>click on "store this result" to store this image of rel. CCF amplitudes to the FCCS record. You can also click on "store all results" to store FCCS/ACF0 and 
+    FCCS/ACF1 from every measurement in the project or "store all results, same role" to only store FCCS/ACF1, but from all records in the project.<br> Use "store all results"
+    now and close the window when done.</li>
+    <li>Open the FCCS RDR from the project for each measurement and choose the "Parameter Image" tab. </li>
+    <li>Select the result set "rel. CCF amplitude of CCF/ACF: 'FCCS'/'ACF1'" and the parameter "results: relative CCF amplitude" therein.</li>
+    <li>If you choose the "Histogram" tab, you can look at the distribution of relFCCS(x,y) values over the whole image:
+    <center>
+    <a name="tutorial_pic011"><img src="./pic/tutorial_pic011.png" border="1"><br/>
+          <i>DL:SL=0.5, average=0.46, standard deviation=0.34</i>
+    </center>
+    <center>
+    <a name="tutorial_pic012"><img src="./pic/tutorial_pic012.png" border="1"><br/>
+          <i>DL-only, average=0.73, standard deviation=0.22</i>
+    </center>
+    $$note:The contributions outside 0..1 which lead to the overshooting/undershooting pixels in the dialog above!$$
+    Here are also the parameter images (color range set to 0..1!!!):
+    <center>
+    <a name="tutorial_pic014"><img src="./pic/tutorial_pic014.png" border="1"><br/>
+          <i>DL:SL=0.5</i>
+    </center>
+    <center>
+    <a name="tutorial_pic013"><img src="./pic/tutorial_pic013.png" border="1"><br/>
+          <i>DL-only</i>
+    </center>
+    
+    </li>
+
+</ol>
+</p>
+
+
+
+<a name="imFCCSFit"><h2>Global imFCCS fit</h2>
+<h3>Add evaluation item to project</h3>
+<p>As a final step we will perform an imaging FCCS fit with in per-pixel-linked parameters. So we will fit (for each pixel) the two ACFs and the FCCS curve together to 
+three distinct models. The models are parameterized with the concentrations $$math:c_A$$, $$math:c_B$$ and $$math:c_{AB}$$ (corresponding to green-SL, red-SL and green-red-DL) and the respective 
+diffusion coefficients $$math:D_A$$, $$math:D_B$$ and $$math:D_{AB}$$. Some of these parameters occur in several of the model functions $$math:g_{gg}(\tau)$$, $$math:g_{rr}(\tau)$$ and $$math:g_{gr}(\tau)$$
+for the green, the red and the FCCS channel. E.g. the double-labeled species AB is visible in the green channel, the crosscorrelation and (via inter-channel crosstalk) the red channel.</p>
+</p>
+<p>Perform these steps:
+<ol>
+    <li>In the main window add an "imFCCS Curve Fitting" evaluation item to the project (menu "Data Items|Insert Evaluation|imFCCS Curve Fitting"):<center>
+    <a name="tutorial_pic015"><img src="./pic/tutorial_pic015.png" border="1">
+</center>
+    </li>
+    <li>Open the fit module with a double-click:<center>
+    <a name="tutorial_pic016"><img src="./pic/tutorial_pic016.png" border="1">
+</center>
+    </li>
+    <li><a name="beforeFCCSFit">On startup only one file is selected (remember we want to select 3: Two ACFs and the FCCS) and a standard model (SPIM-FCS: Diffusion (1/sqrt(e) radii) ) is choosen in the parameter list at the bottom.<br>
+        In the list you can select a different file (row "file"), or a different "fit model" and it is possible to change the current model parameters in the remaining rows. To add a second file
+        or to remove the last file you can use the buttons "add file" and "remove file". </li>
+</ol>
+</p>
+
+<h3>User-Interface Tutorial</h3>
+<p>
+<i>We will now first do short walk through the user-interface with dummy models. These steps can be jumped over, if you are already familiar with them. 
+   Also this will NOT yet give a reasonable fit, but quickly explain the user interface. <br>For the <a href="#spimfccs">SPIM-FCCS tutorial, see below</a>.</i>
+<ol>
+    <li>For now press "add file" twice and select the ACF1 and FCCS in addition to the already selected ACF0.
+        The correlation function display will show the three selected files (possibly switch the "errors" to none to prevent the display of error bars). All the fit models will remain at their
+        default settings:
+        <center>
+    <a name="tutorial_pic017"><img src="./pic/tutorial_pic017.png" border="1">
+        </center>
+        For each file the same fit model is selected and we will use those for now (they are proper SPIM-FCS fitting models after all!).
+    </li>
+    <li>Now we will set some initial parameters (basically the PSF sizes): 
+      <blockquote>
+          <table>
+            <tr><th>ACF0</th><th>ACF1</th><th>FCCS</th></tr>
+            <tr><td>$$math:\sigma_{xy}=320$$</td><td>$$math:\sigma_{xy}=340$$</td><td>$$math:\sigma_{xy}=320$$</td></tr>
+            <tr><td>$$math:\sigma_{z}=575$$</td> <td>$$math:\sigma_{z}=600$$</td> <td>$$math:\sigma_{z}=600$$</td></tr>
+<!--            <tr><td></td><td></td><td></td></tr>-->
+          </table>
+      </blockquote>
+      
+    </li>
+    <li>In a next step we will link some parameters: We can assume that the diffusion coeffcients should all be the same, as we have only 607bp DNAs, independent of the type of label(s) they carry,
+        so in the "global" column and the D1-row for each file we select "global param #0". Now these parameters are linked together and editing one of the will alter all,
+        so for now enter 8 into any of the three "value" columns and observe what happens to the other D1 values. The same will happen during a fit: These three parameters will
+        always have the same value and will be treated as a single fit-parameter.
+        <br>Also enter the values 3, 7 and 15 for the particle number parameters "N" for the three columns and
+        observe what happens to the plot:
+        <center>
+    <a name="tutorial_pic018"><img src="./pic/tutorial_pic018.png" border="1">
+    &nbsp;&nbsp;<a name="tutorial_pic019"><img src="./pic/tutorial_pic019.png" border="1">
+        </center>
+        $$note:The parameters with a light grey background can not be edited by the user, but will be calculated by the model (e.g. the effective volume or the concentration).$$
+        </li>
+    <li>Now to perform a first fit, click on "Fit current", which will further optimize the fit results.</li>
+    <li>So far we only fitted the "average" run, i.e. the average correlation function (ACF/FCCS) over all non-masked pixels. In order to fit the curves for each pixel,
+    deselect "save long result strings" and first click on "Copy to Initial". This will use the current fit results as initial fit values (good guess) for each pixel's fit.
+    Finally click "Fit All Pixels" on the rhs of the dialog.<br>The plugin will now iterate over all pixels and perform the fits there. 
+    $$note:As this is more complex than a standard single-curve fit, you will have to allow for more time here, than in a standard imFCS fit!$$</li>
+    <li>Note that in the "file sets" list on the rhs, two entries have appeared:
+    <center>
+    <a name="tutorial_pic022"><img src="./pic/tutorial_pic022.png" border="1">
+</center>
+    The dark-blue entry (and all other entries of this color) represent file-combinations (or sets) for which you already performed a fit. The grey entries represent
+    file combinations that QuickFit thinks you might also want to fit. Here it found out that all three files fitted together were from teh same group and from there
+    you used the roles ACF0+ACF1+FCCS, so it proposes the same combination of roles from the second measurement. If you e.g. click on the grey entry you will see
+    that these files will be loaded then an a click on "Fit all Pixels" will also fit the second measurement (DL-only). The same initial parameters and parameter-linking
+    settings as for the last set of files will be used!</li>
+    <li>If you want to explore the fit at any position in the image, just click on the pixel of interest in the overview image and the pixels correlation curves and fitted 
+    model curves will be displayed. To return to the "average" run, just enter -1 into the "pixel/run" edit field above the overview image.</li>
+    <li>Finally you can open e.g. the ACF0 raw data record in the project tree and look at the fit result "diffusion coefficient of species 1" in the result set. The parameter image looks like this:
+    <center>
+    <a name="tutorial_pic020"><img src="./pic/tutorial_pic020.png" border="1">
+</center>
+    and the parameter distribution of the diffusion coefficient is:
+    <center>
+    <a name="tutorial_pic021"><img src="./pic/tutorial_pic021.png" border="1">
+</center> </li>
+</ol>
+In the next section we will do a propr SPIM-FCCS fit taling into account also the crosstalk between the two channels.
+</p>
+
+
+<a name="spimfccs"><h3>SPIM-FCCS Data-Evaluation Tutorial</h3>
+<p>
+Here we describe a proper SPIM-FCCS-fit. We will start again after inserting the imFCCS Curve Fit evaluation, as <a href="#beforeFCCSFit">before the last section</a>. This time
+we will use a set of <a href="../fitfunctions_spimfcs/fccs_spim_fw_diff2colorccf.html">specialized fit functions for SPIM-FCCS</a>$$ref:KRIEGER2013:JW Krieger, AP Sing, A Pernus etal. (2013): "SPIM-FCCS", <i>to be published</i>$$.
+<ol>
+    <li>Instead of setting all functions, files and initial parameters by hand, we will now use a short-cut by clicking on the menu entry "Tools|configure evaluation for ...|SPIM-FCCS: normal diffusion"</li>
+    <li>This will make sure that three files are added and load the appropriate SPIM-FCCS models:<ul>
+      <li> <a href="../fitfunctions_spimfcs/fccs_spim_fw_diff2coloracfg.html">green ACF0 model</a></li>
+      <li> <a href="../fitfunctions_spimfcs/fccs_spim_fw_diff2coloracfr.html">red ACF1 model</a></li>
+      <li> <a href="../fitfunctions_spimfcs/fccs_spim_fw_diff2colorccf.html">FCCS model</a></li>
+    </ul>
+    The parameters table will look like this:
+    <center>
+    <a name="tutorial_pic023"><img src="./pic/tutorial_pic023.png" border="1">
+</center>
+    the dark grey cells represent parameters that are not present in the respctive model for the file and you see that several parameters are linked over all files/models.
+    Also observe again that some parameters (e.g. the effective volumes or the different ways to express the relative concentration of double-labels) are calculated by the
+    model and may not be edited by the user. These have a light grey background (see also last section!).</li>
+    <li>Now we will have to enter some parameters in the models. Please enter the following numbers into the respective cells in the parameter table:
+      <ul>
+          <li>green lateral PSF size $$math:w_g=640$$</li>
+          <li>red lateral PSF size $$math:w_r=680$$</li>
+          <li>green longitudinal PSF size $$math:z_g=1150$$</li>
+          <li>red longitudinal PSF size $$math:z_r=1200$$</li>
+          <li>shift between foci $$math:d_x=d_y=d_z=0$$ (the microscope was aligned properly!)</li>
+          <li>crosstalk-coefficient $$\kappa=0.14$$ (representing the crosstalk of the green dye into the red channel: ~14%)</li>
+      </ul>
+      <center>
+    <a name="tutorial_pic024"><img src="./pic/tutorial_pic024.png" border="1">
+</center>
+    </li>
+    <li>Now we are ready to perform the fit for the overview run/pixel, by clicking "Fit current":
+    <center>
+    <a name="tutorial_pic025"><img src="./pic/tutorial_pic025.png" border="1">
+    </center>
+    </li>
+    <li>If the fit succeeded, copy the fit results to the initial results by clicking "Copy to Initial". Now we are ready to fit each pixel by clicking "Fit All Pixels".</li>
+    <li>Also fit all pixels of the second measurement by selecting the second "file set" from the rhs list and clicking "Fit All Pixels" there.</li>
+    <li>Finally you can open e.g. the FCCS raw data record in the project tree and look at the fit result "relative concentration of species AB in focus cAB/min(cA,cB)" 
+        in the result set "imFCCS Fit Plugin ... (1/e² radii): Diffusion, 2-...". The parameter image looks like this:
+        <center>
+    <a name="tutorial_pic026"><img src="./pic/tutorial_pic026.png" border="1">
+        </center>
+        This parameter gives the concentration of double-labaled DNAs as compared to the smaller of the two single-labaled concentrations ($$math:c_{AB}/\min(c_A,c_B)$$). 
+        Several other parameters (e.g. $$math:K_D=c_{AB}/(c_A\cdot c_B)$$ or $$math:c_{AB}/(c_A+c_B+c_{AB})$$) available that also quantify the amount of double-labeled DNAs,
+        but in a different measure.<br>
+        In the image above, you can see the shift of the peak of the distributions from ~0.1 to ~0.5 (peak position!) if you compare the histograms for the cDL:cSL=0.5 and the
+        DL-only measurement.
+        $$note:Here values &gt;1 are possible, but values &lt;0 are fitting artifacts.$$        
+    <center></li>
+    <li>In the last measurement each of the three species (A, B, AB) had their own diffusion coefficient. As we know all of them are 607bp DNAs, we can also link all these diffusion coefficients.
+        To do so, add a second evaluation to the project and configure it as in steps 1-3 of this section. Then choose for all diffusion coefficients the global parameter #3 (preselected for DA!):
+        <center>
+    <a name="tutorial_pic027"><img src="./pic/tutorial_pic027.png" border="1">
+</center></li>
+     <li>Now you can fit again by fitting the average run, then "Copy to Initiaal" and finally "Fit All Pixels".</li>
+     <li></li>
+</ol>
+</p>
+  </body>
+</html>

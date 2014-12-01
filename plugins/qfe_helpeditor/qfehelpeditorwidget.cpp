@@ -59,6 +59,8 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     replaceDlg=new ReplaceDialog(this);
 
     highlighter=new QFHTMLHighlighter("", ui->edtScript->getEditor()->document());
+    highlighter->setUseSpecial2("§§", "§§");
+    highlighter->setUseSpecial1("$$", "$$");
 
     completer = new QCompleter(ui->edtScript->getEditor());
     completermodel=modelFromFile(ProgramOptions::getInstance()->getAssetsDirectory()+"/qtscript/completer.txt");
@@ -358,6 +360,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
 
     menu=new QMenu(tr("insert Equations (LaTeX)"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
+    addInsertAction(menu, "§§LATEX§§");
     addInsertAction(menu, "$$math:LATEX$$");
     addInsertAction(menu, "$$bmath:LATEX$$");
 
