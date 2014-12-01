@@ -48,7 +48,7 @@ class QFWIDLIB_EXPORT QFHTMLHighlighter : public QSyntaxHighlighter
             Comment=2,
             Special1=3,
             Special2=4,
-            LastConstruct = Comment
+            Text=5
         };
         explicit QFHTMLHighlighter(const QString& settingsDir, QTextDocument *parent = 0);
         void setUseSpecial1(const QString& specialStart, const QString& specialEnd);
@@ -67,11 +67,10 @@ class QFWIDLIB_EXPORT QFHTMLHighlighter : public QSyntaxHighlighter
                     InComment,
                     InTag,
                     InSpecial1,
-                    InSpecial2,
-                    Text
+                    InSpecial2
                 };
         QStack<int> lastStates;
-        QTextCharFormat m_formats[LastConstruct + 1];
+        QMap<int, QTextCharFormat> m_formats;
 
         /** \brief load the format settings, saved in the supplied \a key in the \a settings object into \a format.
         *        The rest of the parameters are the default format specifiers

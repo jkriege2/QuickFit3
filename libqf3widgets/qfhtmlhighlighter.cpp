@@ -34,7 +34,7 @@ QFHTMLHighlighter::QFHTMLHighlighter(const QString& settingsDir, QTextDocument *
     QString prefix="";
 
     QSettings settings(sd+"/highlight.ini", QSettings::IniFormat);
-    m_formats[QFHTMLHighlighter::Entity]=loadFormat(settings, prefix+"style/entity",  "darkgreen", false, false, false);
+    m_formats[QFHTMLHighlighter::Entity]=loadFormat(settings, prefix+"style/entity",  "darkgreen", false, true, false);
     m_formats[QFHTMLHighlighter::Tag]=loadFormat(settings, prefix+"style/tag",  "darkred", true, false, false);
     m_formats[QFHTMLHighlighter::Comment]=loadFormat(settings, prefix+"style/comment",  "darkgray", false, true, false);
     m_formats[QFHTMLHighlighter::Text]=loadFormat(settings, prefix+"style/text",  "black", false, false, false);
@@ -66,42 +66,59 @@ void QFHTMLHighlighter::highlightBlock(const QString &text)
     while (pos < len) {
         switch (state) {
         case NormalState:
-        default:
-            while (pos < len) {
-                QChar ch = text.at(pos);
-                if (ch == '<') {
-                    if (text.mid(pos, 4) == "<!--") {
-                        lastStates.push(state);
-                        state = InComment;
-                    } else {
-                        lastStates.push(state);
-                        state = InTag;
-                    }
-                    start=pos;
-                    break;
-                } else if (ch == '&') {
-                    setFormat(start, pos - start,
-                              m_formats[Text]);
-                    start = pos;
-                    while (pos < len
-                           && text.at(pos++) != ';')
-                        ;
-                    setFormat(start, pos - start,
-                              m_formats[Entity]);
-                } else if (text.mid(pos, special1Start.size()) == special1Start) {
-                    lastStates.push(state);
-                    state = InSpecial1;
-                } else if (text.mid(pos, special2Start.size()) == special2Start) {
-                    lastStates.push(state);
-                    state = InSpecial2;
-                } else {
-                    ++pos;
-                }
-                if (state==NormalState) {
-                    setFormat(start, pos - start, m_formats[Text]);
+            default:{
+                    int txtstart=-1, txtend=-1;
+                    while (pos < len) {
+                        QChar ch = text.at(pos);
+                        if (ch == '<') {
+                            if (text.mid(pos, 4) == "<!--") {
+                                lastStates.push(state);
+                                state = InComment;
+                            } else {
+                                lastStates.push(state);
+                                state = InTag;
+                            }
+                            start=pos;
+                            break;
+                        } else if (ch == '&') {
+                            setFormat(start, pos - start, m_formats[Text]);
+                            start = pos;
+                            while (pos < len
+                                   && text.at(pos++) != ';')
+                                ;
+                            setFormat(start, pos - start, m_formats[Entity]);
+                            start=pos+1;
+                        } else if (special1Start.size()>0 && text.mid(pos, special1Start.size()) == special1Start) {
+                            start = pos;
+                            pos=pos+special1Start.size();
+                            lastStates.push(state);
+                            state = InSpecial1;
+                            break;
+                        } else if (special2Start.size()>0 && text.mid(pos, special2Start.size()) == special2Start) {
+                            start = pos;
+                            pos=pos+special2Start.size();
+                            lastStates.push(state);
+                            state = InSpecial2;
+                            break;
+                        } else {
+                            if (txtstart<0) {
+                                txtstart=pos;
+                                txtend=pos;
+                            } else {
+                                txtend++;
+                            }
+                            ++pos;
 
+                        }
+
+                    }
+                    if (state==NormalState) {
+                        setFormat(start, pos - start, m_formats[Text]);
+                    }
+                    if (txtstart>=0 && txtend>=0) {
+                        setFormat(txtstart, txtend - txtstart, m_formats[Text]);
+                    }
                 }
-            }
             break;
 
         case InComment:
@@ -115,8 +132,7 @@ void QFHTMLHighlighter::highlightBlock(const QString &text)
                     ++pos;
                 }
             }
-            setFormat(start, pos - start,
-                      m_formats[Comment]);
+            setFormat(start, pos - start, m_formats[Comment]);
             break;
         case InTag: {
                     QChar quote = QChar::Null;
@@ -140,7 +156,7 @@ void QFHTMLHighlighter::highlightBlock(const QString &text)
                 }
             break;
         case InSpecial1:
-            start = pos;
+            //start = pos;
             while (pos < len) {
                 if (text.mid(pos, special1End.size()) == special1End) {
                     pos += special1End.size();
@@ -153,7 +169,7 @@ void QFHTMLHighlighter::highlightBlock(const QString &text)
             setFormat(start, pos - start, m_formats[Special1]);
             break;
         case InSpecial2:
-            start = pos;
+            //start = pos;
             while (pos < len) {
                 if (text.mid(pos, special2End.size()) == special2End) {
                     pos += special2End.size();

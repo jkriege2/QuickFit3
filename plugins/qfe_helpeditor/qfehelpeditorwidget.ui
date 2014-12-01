@@ -66,6 +66,9 @@
         <iconset resource="qfehelpeditor.qrc">
          <normaloff>:/qfe_helpeditor/script_open.png</normaloff>:/qfe_helpeditor/script_open.png</iconset>
        </property>
+       <property name="popupMode">
+        <enum>QToolButton::MenuButtonPopup</enum>
+       </property>
       </widget>
      </item>
      <item>
