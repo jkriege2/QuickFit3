@@ -37,14 +37,17 @@ DESTDIR = $${QFOUTPUT}/plugins/
 # Input
 HEADERS += qferesultstools.h \
     qfertresultcalculator.h \
-    ../../../../../LIB/trunk/jkmathparser.h
+    ../../../../../LIB/trunk/jkmathparser.h \
+    qfertregexpdialog.h
 
 SOURCES += qferesultstools.cpp \
     qfertresultcalculator.cpp \
-    ../../../../../LIB/trunk/jkmathparser.cpp
+    ../../../../../LIB/trunk/jkmathparser.cpp \
+    qfertregexpdialog.cpp
 
 FORMS = \
-    qfertresultcalculator.ui
+    qfertresultcalculator.ui \
+    qfertregexpdialog.ui
 
 RESOURCES += qferesultstools.qrc \
     ../../lib/lib.qrc

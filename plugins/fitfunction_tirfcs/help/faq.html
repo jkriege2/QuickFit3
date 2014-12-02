@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>imaging FCCS fit frequently asked questions</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+     
+     
+$$faq_start$$
+  <a name="WHICH_FITFUNC_FOR_CAMERATIRF"><b>Which fit functions should I choose for TIR-FCS/FCCS measurements with a camera (i.e. most imaging TIR-FCS/FCCS)?</b>
+$$faq_answer$$
+  If you used a camera for data acquisition, the molecular detection efficiency (MDF) of the microscope is often described by a convolution of a rectangular (square) pixel (pixel size $(a)$ in the image plane), which is convolved with a 3-dimensional Gaussian function, which approximates the point-spread function (PSF). These models may then be used (they are all marked by the name addition <tt>rect. pixel</tt>):
+
+ <ul>
+     <li>plugin  <a href="$$plugin_info:help:fitfunction_tirfcs$$">TIR-FCS/FCCS Fit Functions</a>:
+         $$list:fitfunc_inplugin:fitfunction_tirfcs$$</li>
+ </ul>
+
+$$faq_end$$
+     
+  
+  </body>
+</html>

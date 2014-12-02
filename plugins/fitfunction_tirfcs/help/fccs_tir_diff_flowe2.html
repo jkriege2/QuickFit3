@@ -2,11 +2,10 @@
 <html>
 	<head>
             <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-	  <title>TIR-FCCS fit model 2D diffusion+flow, 1/e²-radii</title>
+	  <title>$$local_plugin_subname$$</title>
 	</head>
 	<body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-		<h2>TIR-FCCS fit model 2D diffusion+flow, 1/e²-radii</h2>
 		<p>This function implements a 1-component diffusion+flow model for data acquired with a camera in TIR illumination mode. It assumes that the time series of two distant pixels were cross-correlated. $$ref:Sankaran2013:Sankaran, J.; Bag, N.; Kraut, R.S.; Wohland, T. Accuracy and precision in camera-based fluorescence correlation spectroscopy measurements, Anal. Chem. 85 (8) (2013) 3948-54. $$  $$ref:Sankaran2010:Sankaran, J.; Shi, X.; Ho, L.Y.; Stelzer, E.H.; Wohland, T. ImFCS: a software for imaging FCS data analysis and visualization, Opt Express, 18 (2010) 25468-25481$$
 		The fit function is defined as:
 		$$bmath:g(\tau)=G_\infty + \frac{(I-B)^2}{I^2}\cdot\frac{1}{N/A_{\text{eff}}}\cdot g_{xy}(\tau; d_x, v_x)\cdot g_{xy}(\tau; d_y, v_y)$$

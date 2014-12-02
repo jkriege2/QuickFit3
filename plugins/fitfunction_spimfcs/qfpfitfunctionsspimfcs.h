@@ -50,7 +50,7 @@ class QFPFitFunctionsSPIMFCS : public QObject, public QFPluginFitFunction, publi
 
         /** \brief name for the plugin */
         virtual QString getName() const {
-            return tr("SPIM-FCS/SPIM-FCCS: Fit Functions");
+            return tr("SPIM-FCS/SPIM-FCCS Fit Functions");
         };
 
         /** \brief short description for the plugin */

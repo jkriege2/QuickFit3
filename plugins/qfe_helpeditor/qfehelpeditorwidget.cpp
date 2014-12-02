@@ -305,6 +305,9 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$local_plugin_weblink_url$$");
     addInsertAction(menu, "$$local_plugin_weblink$$");
     addInsertAction(menu, "$$local_plugin_id$$");
+    addInsertAction(menu, "$$local_plugin_subid$$");
+    addInsertAction(menu, "$$local_plugin_subname$$");
+    addInsertAction(menu, "$$local_plugin_subshortname$$");
     addInsertAction(menu, "$$local_plugin_tutorial_file$$");
     addInsertAction(menu, "$$local_plugin_tutorial_link$$");
     addInsertAction(menu, "$$local_plugin_mainhelp_file$$");
@@ -340,8 +343,12 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     menu=new QMenu(tr("plugin lists"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
     addInsertAction(menu, "$$list:extension:INTERFACENAME$$");
+    addInsertAction(menu, "$$list:fitfunc:$$");
     addInsertAction(menu, "$$list:fitfunc:STARTSWITH$$");
+    addInsertAction(menu, "$$list:fitfunc_inplugin:PLUGIN_ID|STARTSWITH$$");
+    addInsertAction(menu, "$$list:fitfunc_inplugin:PLUGIN_ID$$");
     addInsertAction(menu, "$$list:fitalg:$$");
+    addInsertAction(menu, "$$list:fitalg:STARTSWITH$$");
     addInsertAction(menu, "$$list:importers:STARTSWITH$$");
 
 
@@ -360,9 +367,10 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
 
     menu=new QMenu(tr("insert Equations (LaTeX)"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
-    addInsertAction(menu, "§§LATEX§§");
     addInsertAction(menu, "$$math:LATEX$$");
+    addInsertAction(menu, "$(LATEX)$");
     addInsertAction(menu, "$$bmath:LATEX$$");
+    addInsertAction(menu, "$[LATEX]$");
 
 
     menu=new QMenu(tr("insert Literature References"), this);

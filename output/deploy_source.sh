@@ -143,6 +143,9 @@ if [ "${create_deploy}" != "0" ]; then
     svn checkout --force ${LIBREPOSITORY} ./LIB
     svn checkout --force ${LIBREPOSITORY} ./LIB
 	
+	
+	DEPLOY_RETURN_DIR=`pwd`
+	
 	echo -e "\n\nCREATING ${CAIRO4QTZIPFILE}:\n"
 	mkdir cairo4qtv2
 	cp -f ./FCSTOOLS/trunk/QuickFit3/plugins/qfe_plotterexportercairo/cairo4qtv2.readme ./cairo4qtv2/readme.txt
@@ -151,7 +154,7 @@ if [ "${create_deploy}" != "0" ]; then
 	cp -rf ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./cairo4qtv2
 	cd cairo4qtv2
 	zip -rv9 ../../${CAIRO4QTZIPFILE} *
-	cd ..
+	cd DEPLOY_RETURN_DIR
 	rm -rf cairo4qtv2
 	
 	echo -e "\n\nCREATING ${TINYTIFFZIPFILE}:\n"
@@ -182,7 +185,7 @@ if [ "${create_deploy}" != "0" ]; then
 	cp refman.pdf ../tinytiff.pdf
 	cd ../../
 	zip -rv9 ../../${TINYTIFFZIPFILE} *
-	cd ..
+	cd DEPLOY_RETURN_DIR
 	rm -rf tinytiff
 	
 	echo -e "\n\nCREATING ${JKQTPLOTTERZIPFILE}:\n"
@@ -222,7 +225,7 @@ if [ "${create_deploy}" != "0" ]; then
 	cd ../../
 	
 	zip -rv9 ../../${JKQTPLOTTERZIPFILE} *
-	cd ..
+	cd DEPLOY_RETURN_DIR
 	rm -rf jkqtplotter
 	
 	echo -e "\n\nDELETING .svn:\n"

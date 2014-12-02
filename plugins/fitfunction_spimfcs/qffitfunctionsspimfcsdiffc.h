@@ -39,9 +39,8 @@ class QFFitFunctionsSPIMFCSDiffC: public QFFitFunction {
         QFFitFunctionsSPIMFCSDiffC();
         virtual ~QFFitFunctionsSPIMFCSDiffC() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCS: Diffusionc c, D as parameters (1/sqrt(e) radii)"); };
-        /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("SPIM-FCS: Diffusion params: c, D (1/sqrt(e) radii)"); };
+        virtual QString name() const { return QString("SPIM-FCS: Diffusionc c, D as parameters (rect. pixel, 1/sqrt(e) radii)"); };
+
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_spim_diffc"); };
 

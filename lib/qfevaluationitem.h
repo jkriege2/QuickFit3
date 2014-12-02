@@ -267,6 +267,9 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
          */
         virtual bool doCopyFileForExport(const QString& filename, const QString& fileType, QString& newFilename, const QList<QFProject::FileCopyList> *filecopylist=NULL, const QString &subfoldername=QString("rdr_data_files/")) const;
 
+        /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
+         *         list of raw data records presented to the user */
+        virtual bool isApplicable(const QFRawDataRecord* record) const { return true; };
 
         /** \brief list of the raw data records this evaluation is applicable to */
         QList<QPointer<QFRawDataRecord> > getApplicableRecords() const;
@@ -354,9 +357,6 @@ class QFLIB_EXPORT QFEvaluationItem : public QObject, public QFProperties {
 
     protected:
 
-        /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
-         *         list of raw data records presented to the user */
-        virtual bool isApplicable(const QFRawDataRecord* record) const { return true; };
 
         QFEvaluationItemPrivate* p;
 

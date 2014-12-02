@@ -27,6 +27,8 @@
 #include <QObject>
 #include "qfextension.h"
 #include "qfertresultcalculator.h"
+#include "qfertregexpdialog.h"
+#include <QPointer>
 /*!
     \defgroup qf3ext_qfe_resultstools QFExtension implementation
     \ingroup qf3extensionplugins
@@ -57,7 +59,7 @@ class QFEResultsTools : public QObject, public QFExtensionBase {
         /** \copydoc QFExtension::getAuthor() */
         virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c)2013 by Jan W. Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2013-2014 by Jan W. Krieger"); };
         /** \copydoc QFExtension::getWeblink() */
         virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };
         /** \copydoc QFExtension::getIconFilename() */
@@ -65,7 +67,7 @@ class QFEResultsTools : public QObject, public QFExtensionBase {
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         };
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
@@ -97,11 +99,13 @@ class QFEResultsTools : public QObject, public QFExtensionBase {
 
 	protected:
         QFPluginLogService* logService;
-        QFERTResultCalculator* dlgCalc;
+        QPointer<QFERTResultCalculator> dlgCalc;
+        QPointer<QFERTRegExpDialog> dlgRegExp;
 		
 	protected slots:
 	    /** \brief target, used in example code in initExtension() */
         void startResultsCalculator();
+        void startRegExp();
 
 };
 

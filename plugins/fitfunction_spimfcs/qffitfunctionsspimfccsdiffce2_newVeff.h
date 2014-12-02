@@ -34,9 +34,7 @@ class QFFitFunctionsSPIMFCCSDiffCENewVeff2: public QFFitFunction {
         QFFitFunctionsSPIMFCCSDiffCENewVeff2();
         virtual ~QFFitFunctionsSPIMFCCSDiffCENewVeff2() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCCS: Diffusion, 2-pixel crosscorrelation (1/e^2 radii, new Veff)"); };
-        /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("SPIM-FCCS: Diffusion (1/e^2 radii, new Veff)"); };
+        virtual QString name() const { return QString("SPIM-FCCS: Diffusion, 2-pixel crosscorrelation (rect. pixel, 1/e^2 radii, new Veff)"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_spim_diffce2"); };
 

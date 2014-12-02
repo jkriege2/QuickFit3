@@ -50,7 +50,7 @@ class QFPFitFunctionsTIRFCS : public QObject, public QFPluginFitFunction, public
 
         /** \brief name for the plugin */
         virtual QString getName() const {
-            return tr("imaging TIR-FCS/TIR-FCCS: Fit Functions");
+            return tr("TIR-FCS/TIR-FCCS Fit Functions");
         };
 
         /** \brief short description for the plugin */
@@ -75,7 +75,7 @@ class QFPFitFunctionsTIRFCS : public QObject, public QFPluginFitFunction, public
 
         /** \copydoc QFPlugin::getID()  */
         virtual QString getID() const {
-            return "fitfunction_tirfcs";
+            return "fitfunctions_tirfcs";
         };
 
         /** \copydoc QFPlugin::getIconFilename()  */

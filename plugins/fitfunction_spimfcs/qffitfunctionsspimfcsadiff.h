@@ -41,9 +41,8 @@ class QFFitFunctionsSPIMFCSADiff: public QFFitFunction {
         QFFitFunctionsSPIMFCSADiff();
         virtual ~QFFitFunctionsSPIMFCSADiff() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCS: Anomalous Diffusion (1/sqrt(e) radii)"); }
-        /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("SPIM-FCS: Anomalous Diffusion (1/sqrt(e) radii)"); }
+        virtual QString name() const { return QString("SPIM-FCS: Anomalous Diffusion (rect. pixel, 1/sqrt(e) radii)"); }
+
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_spim_adiff"); }
 

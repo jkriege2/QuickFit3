@@ -27,6 +27,7 @@
 #include "qfertresultcalculator.h"
 #include "jkmathparser.h"
 
+
 #define LOG_PREFIX QString("qfe_resultstools >>> ").toUpper()
 
 QFEResultsTools::QFEResultsTools(QObject* parent):
@@ -34,6 +35,7 @@ QFEResultsTools::QFEResultsTools(QObject* parent):
 {
 	logService=NULL;
     dlgCalc=NULL;
+    dlgRegExp=NULL;
 }
 
 QFEResultsTools::~QFEResultsTools() {
@@ -60,11 +62,14 @@ void QFEResultsTools::initExtension() {
     
     QAction* actStartResultsCalculator=new QAction(QIcon(getIconFilename()), tr("results &calculator ..."), this);
     connect(actStartResultsCalculator, SIGNAL(triggered()), this, SLOT(startResultsCalculator()));
+    QAction* actStartRegExpTool=new QAction(tr("Regular Expressions Test Tool"), this);
+    connect(actStartRegExpTool, SIGNAL(triggered()), this, SLOT(startRegExp()));
     QMenu* extm=services->getMenu("tools");
     if (extm) {
         QMenu* menu=extm->addMenu(tr("results tools ..."));
         menu->addAction(actStartResultsCalculator);
     }
+    extm->addAction(actStartRegExpTool);
     services->log_global_text(tr("initializing extension '%1' ... DONE\n").arg(getName()));
 
 }
@@ -111,6 +116,13 @@ void QFEResultsTools::startResultsCalculator()
 {
     if (!dlgCalc) dlgCalc=new QFERTResultCalculator(parentWidget);
     dlgCalc->show();
+}
+
+void QFEResultsTools::startRegExp()
+{
+    if (!dlgRegExp) dlgRegExp=new QFERTRegExpDialog(parentWidget);
+    dlgRegExp->show();
+
 }
 
 

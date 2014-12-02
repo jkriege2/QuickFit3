@@ -34,9 +34,7 @@ class QFFitFunctionsSPIMFCCSDiff2Color: public QFFitFunction {
         QFFitFunctionsSPIMFCCSDiff2Color();
         virtual ~QFFitFunctionsSPIMFCCSDiff2Color() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCCS: Diffusion 2-color crosscorrelation (1/sqrt(e) radii)"); };
-        /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("SPIM-FCCS: Diffusion 2-color (1/sqrt(e) radii)"); };
+        virtual QString name() const { return QString("SPIM-FCCS: Diffusion 2-color crosscorrelation (rect. pixel, 1/sqrt(e) radii)"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_spim_diff2color"); };
 
@@ -56,6 +54,7 @@ class QFFitFunctionsSPIMFCCSDiff2Color: public QFFitFunction {
 
         /*! \copydoc QFFitFunction::get_implementsDerivatives()   */
         virtual bool get_implementsDerivatives() const { return false; }
+        virtual bool isDeprecated() const { return true; }
 };
 
 #endif // QFFitFunctionsSPIMFCCSDiff2Color_H

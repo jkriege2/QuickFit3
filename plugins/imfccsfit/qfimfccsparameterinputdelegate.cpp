@@ -115,7 +115,8 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
             }
             //qDebug()<<"   created rdrcombo "<<t.elapsed()<<"ms";
 
-            cmb->view()->setMinimumWidth(450);
+            cmb->view()->setMinimumWidth(650);
+            cmb->view()->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
             connect(cmb, SIGNAL(currentIndexChanged(int)), this, SLOT(onEditorFinished()));
             return cmb;
         }
@@ -125,7 +126,8 @@ QWidget *QFImFCCSParameterInputDelegate::createEditor(QWidget *parent, const QSt
             cmb->updateFitFunctions(sl);
 
             //qDebug()<<"   created ffcombo "<<t.elapsed()<<"ms";
-            cmb->view()->setMinimumWidth(450);
+            cmb->view()->setMinimumWidth(650);
+            cmb->view()->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Preferred);
             connect(cmb, SIGNAL(currentIndexChanged(int)), this, SLOT(onEditorFinished()));
             return cmb;
         }

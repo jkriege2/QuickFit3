@@ -21,7 +21,7 @@
 
 #include "qfprojecttreemodel.h"
 #include "qfproject.h"
-
+#include "qfevaluationitem.h"
 QFProjectTreeModel::QFProjectTreeModel(QObject* parent):
     QAbstractItemModel(parent)
 {
@@ -36,6 +36,7 @@ QFProjectTreeModel::QFProjectTreeModel(QObject* parent):
     groupBaseColor=QColor("aliceblue");
     displayGroupAsColor=true;
     rdrTypeFiler="";
+    evalRDRApplicable=NULL;
 }
 
 QFProjectTreeModel::~QFProjectTreeModel()
@@ -106,12 +107,14 @@ void QFProjectTreeModel::createModelTree() {
         for (int i=0; i<current->getRawDataCount(); i++) {
             QFRawDataRecord* rec=current->getRawDataByNum(i);
             if (rec) {
-                if (rdrTypeFiler.isEmpty() || (!rdrTypeFiler.isEmpty() && rec->getType().toLower()==rdrTypeFiler.toLower())) {
-                    if (rec->getFolder().isEmpty()) rdrFolderItem->addChild(rec);
-                    else {
-                        QFProjectTreeModelNode* fld=rdrFolderItem->addChildFolder(rec->getFolder());
-                        if (fld) fld->addChild(rec);
-                        else rdrFolderItem->addChild(rec);
+                if (!evalRDRApplicable || (evalRDRApplicable && evalRDRApplicable->isApplicable(rec))) {
+                    if (rdrTypeFiler.isEmpty() || (!rdrTypeFiler.isEmpty() && rec->getType().toLower()==rdrTypeFiler.toLower())) {
+                        if (rec->getFolder().isEmpty()) rdrFolderItem->addChild(rec);
+                        else {
+                            QFProjectTreeModelNode* fld=rdrFolderItem->addChildFolder(rec->getFolder());
+                            if (fld) fld->addChild(rec);
+                            else rdrFolderItem->addChild(rec);
+                        }
                     }
                 }
             }
@@ -582,6 +585,13 @@ void QFProjectTreeModel::setDisplayGroupAsColor(bool enabled)
 void QFProjectTreeModel::setRDRTypeFilter(const QString &type)
 {
     rdrTypeFiler=type;
+    createModelTree();
+    reset();
+}
+
+void QFProjectTreeModel::setRDRApplicableFilter(QFEvaluationItem *eval)
+{
+    evalRDRApplicable=eval;
     createModelTree();
     reset();
 }

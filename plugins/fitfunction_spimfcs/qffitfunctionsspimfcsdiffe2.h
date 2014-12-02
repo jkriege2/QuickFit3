@@ -41,9 +41,8 @@ class QFFitFunctionsSPIMFCSDiffE2: public QFFitFunction {
         QFFitFunctionsSPIMFCSDiffE2();
         virtual ~QFFitFunctionsSPIMFCSDiffE2() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCS: Diffusion (1/e^2 radii)"); }
-        /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("SPIM-FCS: Diffusion (1/e^2 radii)"); }
+        virtual QString name() const { return QString("SPIM-FCS: Diffusion (rect. pixel, 1/e^2 radii)"); }
+
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_spim_diffe2"); }
 

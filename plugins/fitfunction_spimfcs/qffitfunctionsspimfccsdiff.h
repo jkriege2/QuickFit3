@@ -34,9 +34,9 @@ class QFFitFunctionsSPIMFCCSDiff: public QFFitFunction {
         QFFitFunctionsSPIMFCCSDiff();
         virtual ~QFFitFunctionsSPIMFCCSDiff() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCCS: Diffusion, 2-pixel crosscorrelation (1/sqrt(e) radii)"); };
+        virtual QString name() const { return QString("SPIM-FCCS: Diffusion, 2-pixel crosscorrelation (rect. pixel, 1/sqrt(e) radii)"); };
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("SPIM-FCCS: Diffusion (1/sqrt(e) radii)"); };
+        virtual QString shortName() const { return name(); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_spim_diff"); };
 

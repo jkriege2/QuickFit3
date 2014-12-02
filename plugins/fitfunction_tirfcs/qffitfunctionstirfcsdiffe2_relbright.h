@@ -34,9 +34,9 @@ class QFFitFunctionsTIRFCSDiffE2Diffbright: public QFFitFunction {
         QFFitFunctionsTIRFCSDiffE2Diffbright();
         virtual ~QFFitFunctionsTIRFCSDiffE2Diffbright() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("TIR-FCS: 2D Diffusion, different molecular brightnesses (1/e^2 radii)"); }
+        virtual QString name() const { return QString("TIR-FCS: 2D Diffusion, different molecular brightnesses (rect. pixel, 1/e^2 radii)"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("TIR-FCS: 2D Diffusion, different molecular brightnesses (1/e^2 radii)"); }
+        virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_tir_diffe2_diffbright"); }
 

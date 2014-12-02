@@ -4138,6 +4138,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             if (QDir(pluginList->at(i).directory)==basepath) { // we found the info for this directory
                 QString pid=pluginList->at(i).plugin->getID();
                 QString pid_sub_deocrated="";
+                QString faname="", fa_shortname="";
                 QString autoplugin_description;
                 QString autoplugin_startdescription;
                 QString fn=QFileInfo(filename).baseName();
@@ -4146,6 +4147,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         pid_sub_deocrated=tr("&nbsp;&nbsp;&nbsp;fitAlgorithmID: <b><tt>%1</tt></b>").arg(fn);
                         QFFitAlgorithm* fa=QFFitAlgorithmManager::getInstance()->createAlgorithm(fn);
                         if (fa) {
+                            faname=fa->name();
+                            fa_shortname=fa->shortName();
                             QStringList ffeat;
                             QString fffeatures="";
                             QString params;
@@ -4183,6 +4186,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         pid_sub_deocrated=tr("&nbsp;&nbsp;&nbsp;fitFunctionID: <b><tt>%1</tt></b>").arg(fn);
                         QFFitFunction* ff=QFFitFunctionManager::getInstance()->createFunction(fn);
                         if (ff) {
+                            faname=ff->name();
+                            fa_shortname=ff->shortName();
                             QStringList ffeat;
                             QString fffeatures="";
                             QString params="";
@@ -4274,6 +4279,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_name"), pluginList->at(i).plugin->getName()));
 
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_id_decorated"), pid_decorated));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_subid"), pid));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_subname"), faname));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_subshortname"), fa_shortname));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_author"), pluginList->at(i).plugin->getAuthor()));
                 if (basedir.exists("copyright.html")) {
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_copyright"), QString("<a href=\"copyright.html\">%1</a>").arg(pluginList->at(i).plugin->getCopyright())));
@@ -4436,7 +4444,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$list:<list_name>:<filter>$$ items
-            QRegExp rxList("\\$\\$list\\:([a-z]+)\\:([^\\$\\s]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxList("\\$\\$list\\:([a-z\\_]+)\\:([^\\$\\s]*)\\$\\$", Qt::CaseInsensitive);
             rxList.setMinimal(true);
             int count = 0;
             int pos = 0;
@@ -4487,6 +4495,39 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                 QString icon=QFPluginServices::getInstance()->getFitFunctionManager()->getIconFilename(id);
                                 QFFitFunction* a=j.value();
                                 if (a) {
+                                    name=a->name();
+                                    dir=dir=QFPluginServices::getInstance()->getFitFunctionManager()->getPluginHelp(id, j.key());
+                                    delete a;
+                                    if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
+                                    else text+=item_template_nolink.arg(icon).arg(name);
+                                }
+                            }
+
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                        }
+                    } else if (list=="fitfunc_inplugin") {
+                        QString text="";
+                        QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+                        QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
+                        QString filter2="";
+                        QString filter1=filter;
+                        if (filter.contains(":")) {
+                            filter1=filter.split(":").first();
+                            filter2=filter.split(":").at(1);
+                        }
+                        // gather information about plugins
+                            QMap<QString, QFFitFunction*> models= QFPluginServices::getInstance()->getFitFunctionManager()->getModels(filter2);
+                            QMapIterator<QString, QFFitFunction*> j(models);
+                            while (j.hasNext()) {
+                                j.next();
+                                int id=QFPluginServices::getInstance()->getFitFunctionManager()->getPluginForID(j.key());
+                                QString dir=QFPluginServices::getInstance()->getFitFunctionManager()->getPluginHelp(id);
+                                QString name=QFPluginServices::getInstance()->getFitFunctionManager()->getName(id);
+                                QString pid=QFPluginServices::getInstance()->getFitFunctionManager()->getID(id);
+                                QString icon=QFPluginServices::getInstance()->getFitFunctionManager()->getIconFilename(id);
+                                QFFitFunction* a=j.value();
+                                if ((filter1.isEmpty() || (pid==filter1) ) && a) {
                                     name=a->name();
                                     dir=dir=QFPluginServices::getInstance()->getFitFunctionManager()->getPluginHelp(id, j.key());
                                     delete a;
@@ -4737,16 +4778,22 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$math:<latex>$$ items
-            QRegExp rxLaTeX("\\$\\$(math|bmath|mathb)\\:(.*)\\$\\$|\\§\\§([^\\§]*)\\§\\§", Qt::CaseInsensitive);
+            QRegExp rxLaTeX("\\$\\$(math|bmath|mathb)\\:(.*)\\$\\$|\\$\\((.*)\\)\\$|\\$\\[(.*)\\]\\$", Qt::CaseInsensitive);
             rxLaTeX.setMinimal(true);
             count = 0;
             pos = 0;
+            //qDebug()<<result.contains("$(")<<result;
             while ((pos = rxLaTeX.indexIn(result, pos)) != -1) {
                 QString command=rxLaTeX.cap(1).toLower().trimmed();
                 QString latex="$"+rxLaTeX.cap(2).trimmed()+"$";
+                //qDebug()<<command<<latex<<rxLaTeX.cap(3)<<rxLaTeX.cap(4)<<rxLaTeX.cap(5);
                 if (command.size()==0) {
                     latex="$"+rxLaTeX.cap(3).trimmed()+"$";
                     if (latex.size()>2) command="math";
+                }
+                if (command.size()==0) {
+                    latex="$"+rxLaTeX.cap(4).trimmed()+"$";
+                    if (latex.size()>2) command="bmath";
                 }
 
                 if (command=="math" || command=="bmath" || command=="mathb") {

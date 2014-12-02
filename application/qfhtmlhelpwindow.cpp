@@ -341,7 +341,7 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
                 tooltipfn=tooltips[tooltip].tooltipfile;
             }
             //qDebug()<<"show tooltip: "<<tooltip<<tooltips.value(tooltip);
-            QToolTip::showText(descriptionBrowser->mapFromGlobal(QCursor::pos()), transformQF3HelpHTML(tooltipstr, tooltipfn), descriptionBrowser, QRect());
+            QToolTip::showText(QCursor::pos(),/*descriptionBrowser->mapFromGlobal(QCursor::pos()),*/ transformQF3HelpHTML(tooltipstr, tooltipfn), descriptionBrowser, QRect());
         } else if ((scheme=="open") || (scheme=="opendir") || (scheme=="openfile") || (scheme=="file")){
             //QDir spd(searchPath);
             //QString filenamen=link.toString(QUrl::RemoveScheme|QUrl::StripTrailingSlash);
