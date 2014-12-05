@@ -24,7 +24,7 @@
 	From these images for every pixel, the plugin calculates the particle number $$math:N$$ and the particle brightness $$math:\epsilon$$:
 	$$bmath:N=\frac{(I-B)^2}{\sigma_I^2-\sigma_B^2}$$
 	$$bmath:\epsilon=\frac{\sigma_I^2-\sigma_B^2}{I-B}$$
-	<b>Note</b> however that these quantities resemble the true values ONLY if the images were taken with a photon counting detector, as e.g. in a confocal laser scanning microscope equipped with APDs. If the detector is an analog detector (e.g. an CCD- or CMOS-camera), additional noise due to the analog-to-digital conversion is generated and the quantities above do no longer resemble the true values. A detailed discussion of this topic is given in the second reference by Unruh and Elson.
+	$$note:<b>Note</b> however that these quantities resemble the true values ONLY if the images were taken with a photon counting detector, as e.g. in a confocal laser scanning microscope equipped with APDs. If the detector is not a photon-counting detector, the equations above may not be usable any longer. This is especially true,  when a detector, such as an EMCCD camera, with an excess noise due to the stochastic amplification on chip is used. A detailed discussion of this topic is given in the second reference by Unruh and Elson.$$
 	
 	$$qf_commondoc_backtop$$
 	<br><br><br>

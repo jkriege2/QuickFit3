@@ -170,7 +170,7 @@ void QFSelectFilesListWidget::on_btnDown_clicked()
 }
 
 
-QFSelectFilesWizardPage::QFSelectFilesWizardPage(const QString &title, QWidget *parent):
+QFSelectFilesListWizardPage::QFSelectFilesListWizardPage(const QString &title, QWidget *parent):
     QFWizardPage(title, parent)
 {
     m_addStartup=false;
@@ -184,6 +184,95 @@ QFSelectFilesWizardPage::QFSelectFilesWizardPage(const QString &title, QWidget *
     setLayout(layout);
 }
 
+void QFSelectFilesListWizardPage::addRow(const QString &label, QWidget *widget)
+{
+    formLay->addRow(label, widget);
+}
+
+void QFSelectFilesListWizardPage::addRow(const QString &label, QLayout *layout)
+{
+    formLay->addRow(label, layout);
+}
+
+void QFSelectFilesListWizardPage::setFilters(const QStringList &filters)
+{
+    sel->setFilters(filters);
+}
+
+void QFSelectFilesListWizardPage::setFilters(const QStringList &filters, const QStringList &filterids)
+{
+    sel->setFilters(filters, filterids);
+}
+
+void QFSelectFilesListWizardPage::setSettingsIDs(const QString &lastDirID, const QString &lastFilterID)
+{
+    sel->setSettingsIDs(lastDirID, lastFilterID);
+}
+
+int QFSelectFilesListWizardPage::filesCount() const
+{
+    return sel->filesCount();
+}
+
+QStringList QFSelectFilesListWizardPage::files() const
+{
+    return sel->files();
+}
+
+QStringList QFSelectFilesListWizardPage::fileFilters() const
+{
+    return sel->fileFilters();
+}
+
+QStringList QFSelectFilesListWizardPage::fileFilterIDs() const
+{
+    return sel->fileFilterIDs();
+}
+
+QList<int> QFSelectFilesListWizardPage::fileFilterNums() const
+{
+    return sel->fileFilterNums();
+}
+
+void QFSelectFilesListWizardPage::setAddOnStartup(bool add)
+{
+    m_addStartup=add;
+}
+
+void QFSelectFilesListWizardPage::setFilesRequired(bool add)
+{
+    m_needsfiles=add;
+}
+
+void QFSelectFilesListWizardPage::setOnlyOneFormatAllowed(bool allowed)
+{
+    sel->setOnlyOneFormatAllowed(allowed);
+}
+
+void QFSelectFilesListWizardPage::initializePage()
+{
+    QFWizardPage::initializePage();
+    if (m_addStartup) sel->addFiles();
+}
+
+bool QFSelectFilesListWizardPage::validatePage()
+{
+    if (m_needsfiles && sel->filesCount()<=0) {
+        QMessageBox::critical(this, title(), tr("You have to add files to the list!"), QMessageBox::Ok, QMessageBox::Ok);
+        return false;
+    }
+    return QFWizardPage::validatePage();
+}
+
+
+QFSelectFilesWizardPage::QFSelectFilesWizardPage(const QString &title, QWidget *parent):
+    QFWizardPage(title, parent)
+{
+    formLay=new QFormLayout();
+    setLayout(formLay);
+    onlyOneFormat=true;
+}
+
 void QFSelectFilesWizardPage::addRow(const QString &label, QWidget *widget)
 {
     formLay->addRow(label, widget);
@@ -194,72 +283,132 @@ void QFSelectFilesWizardPage::addRow(const QString &label, QLayout *layout)
     formLay->addRow(label, layout);
 }
 
-void QFSelectFilesWizardPage::setFilters(const QStringList &filters)
+void QFSelectFilesWizardPage::addFileSelection(const QString &label, const QStringList &filters, bool required)
 {
-    sel->setFilters(filters);
+   addFileSelection(label, filters, filters, required);
 }
 
-void QFSelectFilesWizardPage::setFilters(const QStringList &filters, const QStringList &filterids)
+void QFSelectFilesWizardPage::addFileSelection(const QString &label, const QStringList &filters, const QStringList &filterids, bool required)
 {
-    sel->setFilters(filters, filterids);
+    QFSelectFilesWizardPage::FileData fd;
+    fd.label=new QLabel(label, this);
+    fd.edit=new QEnhancedLineEdit(this);
+    fd.edit->addButton(fd.button=new QFStyledButton(QFStyledButton::None, fd.edit, fd.edit));
+    fd.button->setDefaultIcon(QFStyledButton::SelectFile);
+    connect(fd.button, SIGNAL(clickedWithButton(QFStyledButton*)), this, SLOT(buttonClicked(QFStyledButton*)));
+    formLay->addRow(fd.label, fd.edit);
+    fd.filters=filters;
+    fd.filterids=filterids;
+    fd.required=required;
+    m_files.append(fd);
 }
 
 void QFSelectFilesWizardPage::setSettingsIDs(const QString &lastDirID, const QString &lastFilterID)
 {
-    sel->setSettingsIDs(lastDirID, lastFilterID);
+    this->lastDirID=lastDirID;
+    this->lastFilterID=lastFilterID;
 }
 
 int QFSelectFilesWizardPage::filesCount() const
 {
-    return sel->filesCount();
+    return m_files.size();
 }
 
 QStringList QFSelectFilesWizardPage::files() const
 {
-    return sel->files();
+    QStringList sl;
+    for (int i=0; i<m_files.size();i++) {
+        sl<<m_files[i].edit->text();
+    }
+    return sl;
 }
 
 QStringList QFSelectFilesWizardPage::fileFilters() const
 {
-    return sel->fileFilters();
+    QStringList sl;
+    for (int i=0; i<m_files.size();i++) {
+        sl<<m_files[i].format;
+    }
+    return sl;
 }
 
 QStringList QFSelectFilesWizardPage::fileFilterIDs() const
 {
-    return sel->fileFilterIDs();
+    QStringList sl;
+    for (int i=0; i<m_files.size();i++) {
+        sl<<m_files[i].filterids.value(m_files[i].filters.indexOf(m_files[i].format), m_files[i].format);
+    }
+    return sl;
 }
 
 QList<int> QFSelectFilesWizardPage::fileFilterNums() const
 {
-    return sel->fileFilterNums();
-}
-
-void QFSelectFilesWizardPage::setAddOnStartup(bool add)
-{
-    m_addStartup=add;
-}
-
-void QFSelectFilesWizardPage::setFilesRequired(bool add)
-{
-    m_needsfiles=add;
+    QList<int> sl;
+    for (int i=0; i<m_files.size();i++) {
+        sl<<m_files[i].filters.indexOf(m_files[i].format);
+    }
+    return sl;
 }
 
 void QFSelectFilesWizardPage::setOnlyOneFormatAllowed(bool allowed)
 {
-    sel->setOnlyOneFormatAllowed(allowed);
+    onlyOneFormat=allowed;
 }
 
 void QFSelectFilesWizardPage::initializePage()
 {
+    lastFormat="";
     QFWizardPage::initializePage();
-    if (m_addStartup) sel->addFiles();
 }
 
 bool QFSelectFilesWizardPage::validatePage()
 {
-    if (m_needsfiles && sel->filesCount()<=0) {
-        QMessageBox::critical(this, title(), tr("You have to add files to the list!"), QMessageBox::Ok, QMessageBox::Ok);
+    bool ok=true;
+    for (int i=0; i<m_files.size(); i++) {
+        bool thisok=(!m_files[i].required || (m_files[i].required && QFile::exists(m_files[i].edit->text())));
+        ok=ok&&thisok;
+        if (!thisok) {
+            QPalette p=m_files[i].edit->palette();
+            p.setColor(QPalette::Base, QColor("salmon"));
+            m_files[i].edit->setPalette(p);
+        }
+    }
+    if (!ok) {
+        QMessageBox::critical(this, title(), tr("You have to select an existing file for the widgets marked in red!"), QMessageBox::Ok, QMessageBox::Ok);
         return false;
     }
     return QFWizardPage::validatePage();
+}
+
+void QFSelectFilesWizardPage::buttonClicked(QFStyledButton *btn)
+{
+    int idx=-1;
+    for (int i=0; i<m_files.size(); i++) {
+        if (m_files[i].button==btn) {
+            idx=i;
+            break;
+        }
+    }
+    //qDebug()<<btn<<idx;
+    if (idx>=0) {
+        QString currentFCSFileFormatFilter=ProgramOptions::getConfigValue(lastFilterID, m_files[idx].filters.value(0)).toString();
+        QString dir=ProgramOptions::getConfigValue(lastDirID, "").toString();
+        if (m_files[idx].edit->text().size()>0) dir=QFileInfo(m_files[idx].edit->text()).absoluteFilePath();
+        QStringList filterss=m_files[idx].filters;
+        if (onlyOneFormat && !lastFormat.isEmpty() ) {
+            filterss.clear();
+            filterss<<lastFormat;
+        }
+        QString newfile = qfGetOpenFileName(this,
+                                                  tr("Select File ..."),
+                                                  dir,
+                                                  filterss.join(";;"), &currentFCSFileFormatFilter);
+        if (QFile::exists(newfile)) {
+            ProgramOptions::setConfigValue(lastFilterID, currentFCSFileFormatFilter);
+            ProgramOptions::setConfigValue(lastDirID, QFileInfo(newfile).absolutePath());
+            m_files[idx].edit->setText(QFileInfo(newfile).absoluteFilePath());
+            m_files[idx].format=currentFCSFileFormatFilter;
+            lastFormat=currentFCSFileFormatFilter;
+        }
+    }
 }

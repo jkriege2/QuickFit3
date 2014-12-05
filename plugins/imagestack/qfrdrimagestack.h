@@ -26,7 +26,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 class QFImagePlotWizardPage; // forward
-class QFSelectFilesWizardPage;
+class QFSelectFilesListWizardPage;
 
 /*!
     \defgroup qf3rdrdp_image_stack Raw Data Record Plugin that manages a set of 4D image stacks
@@ -68,14 +68,14 @@ class QFRDRImageStackPlugin : public QObject, public QFPluginRawDataRecordBase {
         virtual QString getAuthor() const  { return tr("Jan W. Krieger"); }
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2012 by Jan W. Krieger"); }
+        virtual QString getCopyright() const  { return tr("(c) 2012-2014 by Jan W. Krieger"); }
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); }
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
+            minor=1;
         }
 
         /** \brief icon for the plugin */
@@ -103,7 +103,7 @@ class QFRDRImageStackPlugin : public QObject, public QFPluginRawDataRecordBase {
         QPointer<QComboBox> wizLSAnalysiscmbFitDir;
         QPointer<QComboBox> wizLSAnalysiscmbStackMode;
         QPointer<QFImagePlotWizardPage> wizLSAnalysisImgPreview;
-        QPointer<QFSelectFilesWizardPage> wizSelfiles;
+        QPointer<QFSelectFilesListWizardPage> wizSelfiles;
     private slots:
         void wizLSAnalysisImgPreviewOnValidate(QWizardPage* page, QWizardPage* userPage);
         void wizLSAnalysisImgPreviewMaskChanged(int masksize);

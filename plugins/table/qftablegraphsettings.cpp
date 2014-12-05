@@ -355,6 +355,8 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.functionType=(QFRDRTable::GTFunctionType)ui->cmbFunctionType->currentIndex();
         if (graph.functionType==QFRDRTable::gtfQFFunction) {
             graph.function=ui->cmbQFFitFunction->currentFitFunctionID();
+            graph.subfunction=ui->cmbQFFitFunctionSubplot->currentIndex()-1;
+            graph.showallsubfunctions=ui->chkQFFitFunctionSubplotAll->isChecked();
         }
         graph.functionParameters=fitfuncValues;
 
@@ -486,6 +488,8 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->cmbFunctionType->setCurrentIndex((int)graph.functionType);
     if (graph.functionType==QFRDRTable::gtfQFFunction) {
         ui->cmbQFFitFunction->setCurrentFitFunction(graph.function);
+        ui->cmbQFFitFunctionSubplot->setCurrentIndex(graph.subfunction+1);
+        ui->chkQFFitFunctionSubplotAll->setChecked(graph.showallsubfunctions);
     }
     fitfuncValues=graph.functionParameters;
     fitfuncErrors.clear();
@@ -646,6 +650,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
         ui->btnAutoImageSizes->setVisible(true);
 
         ui->labQFFitFuction->setVisible(false);
+        ui->labQFFitFuction2->setVisible(false);
+        ui->widQFFitFunctionSubplot->setVisible(false);
         ui->labFuctionType->setVisible(false);
         ui->labFuctionParameters->setVisible(false);
         ui->cmbFunctionType->setVisible(false);
@@ -1116,6 +1122,8 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                     ui->labFuction->setVisible(true);
                 } else if (ui->cmbFunctionType->currentIndex()==ui->cmbFunctionType->count()-1) {
                     ui->labQFFitFuction->setVisible(true);
+                    ui->labQFFitFuction2->setVisible(true);
+                    ui->widQFFitFunctionSubplot->setVisible(true);
                     ui->cmbQFFitFunction->setVisible(true);
                     if (ui->cmbLinesYData->currentIndex()==0) {
                         ui->labFuctionParameters->setVisible(true);
@@ -1281,10 +1289,12 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->cmbSelectDataLogic23, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
     connect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
+    connect(ui->cmbQFFitFunctionSubplot, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
+    connect(ui->chkQFFitFunctionSubplotAll, SIGNAL(toggled(bool)), this, SLOT(fitFunctionChanged()));
 
 
-    connect(ui->cmbRangeCenterColor, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
-    connect(ui->cmbRangeCenterStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
+    connect(ui->cmbRangeCenterColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    connect(ui->cmbRangeCenterStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->chkRangeDrawCenter, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->chkRangeFillRange, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->chkRangeInverted, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
@@ -1389,9 +1399,11 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->cmbSelectDataLogic23, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
 
     disconnect(ui->cmbFunctionType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFunctionTypeCurrentIndexChanged(int)));
+    disconnect(ui->cmbQFFitFunctionSubplot, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
+    disconnect(ui->chkQFFitFunctionSubplotAll, SIGNAL(toggled(bool)), this, SLOT(fitFunctionChanged()));
     disconnect(ui->cmbQFFitFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
-    disconnect(ui->cmbRangeCenterColor, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
-    disconnect(ui->cmbRangeCenterStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(fitFunctionChanged()));
+    disconnect(ui->cmbRangeCenterColor, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
+    disconnect(ui->cmbRangeCenterStyle, SIGNAL(currentIndexChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->chkRangeDrawCenter, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     disconnect(ui->chkRangeFillRange, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     disconnect(ui->chkRangeInverted, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
@@ -1795,6 +1807,18 @@ void QFTableGraphSettings::cmbFunctionTypeCurrentIndexChanged(int index)
             }
             for (int i=0; i<ff->paramCount(); i++) {
                 if (i>=fitfuncValues.size()) fitfuncValues<<ff->getDescription(i).initialValue;
+            }
+            QVector<double> p=ff->getInitialParamValues();
+            int addplots=ff->getAdditionalPlotCount(ff->getInitialParamValues());
+            while (ui->cmbQFFitFunctionSubplot->count()<addplots+1) {
+                ui->cmbQFFitFunctionSubplot->addItem("");
+            }
+            while (ui->cmbQFFitFunctionSubplot->count()>addplots+1) {
+                ui->cmbQFFitFunctionSubplot->removeItem(ui->cmbQFFitFunctionSubplot->count()-1);
+            }
+            ui->cmbQFFitFunctionSubplot->setItemText(0, tr("function [default]"));
+            for (int i=0; i< addplots; i++) {
+                ui->cmbQFFitFunctionSubplot->setItemText(1+i, ff->transformParametersForAdditionalPlot(i, p));
             }
         }
         fitfuncValuesTable->setWriteTo(&fitfuncValues, ff, true);

@@ -27,6 +27,8 @@
 #include "qmodernprogresswidget.h"
 #include "qfrdrimagingfcstools.h"
 #include "qftools.h"
+class QFImagePlotWizardPage; // forward
+class QFSelectFilesWizardPage;
 
 /*!
     \defgroup qf3rdrdp_number_and_brightness Raw Data Record Plugin
@@ -68,7 +70,7 @@ class QFRDRNumberAndBrightnessPlugin : public QObject, public QFPluginRawDataRec
         virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2012 by Jan W. Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2012-2014 by Jan W. Krieger"); };
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };
@@ -84,11 +86,28 @@ class QFRDRNumberAndBrightnessPlugin : public QObject, public QFPluginRawDataRec
         /** \brief insertdata from file*/
         void insertFromImFCSRecord();
         void insertImFCSFile(const QString &filename);
+        QFRawDataRecord* insertPreprocessedFiles(const QString &filename_overview, const QString &filename_overviewstd, const QString &filename_background, const QString &filename_backgroundstddev);
 
         /** \brief insert record, if it is not yet contained in the project! */
         void insertProjectRecord(const QString& type, const QString& name, const QString& filename, const QString& description=QString(""), const QString& directory=QString(""), const QMap<QString,QVariant>& init_params=QFStringVariantMap(), const QStringList& init_params_readonly=QStringList());
 
         bool parseSPIMSettings(const QString& filename_settings, QString& description, QMap<QString,QVariant>& initParams, QStringList& paramsReadonly, QStringList& files, QStringList& files_types, QStringList& files_descriptions);
+        void startNANDBFromPreprocessedFilesWizard();
+
+        void wizImgPreviewOnValidate(QWizardPage *page, QWizardPage *userPage);
+        void wizMaskChanged(int masksize);
+    protected:
+        QPointer<QDoubleSpinBox> wizPixelSize;
+        QPointer<QSpinBox> wizMaskSize;
+        QPointer<QDoubleSpinBox> wizStepSize;
+        QPointer<QComboBox> wizLSAnalysiscmbFitDir;
+        QPointer<QComboBox> wizLSAnalysiscmbStackMode;
+        QPointer<QFImagePlotWizardPage> wizLSAnalysisImgPreview;
+        QPointer<QFSelectFilesWizardPage> wizSelfiles;
+        QPointer<QLabel> wizLabWidth;
+        QPointer<QLabel> wizLabHeight;
+
 };
 
 #endif // QFRDRNUMBERANDBRIGHTNESS_H
+

@@ -86,6 +86,7 @@ class QFLIB_EXPORT QFStyledButton : public QAbstractButton {
         /** \brief set buddy + action */
         void setBuddy(QWidget* b, ActionMode=ExecuteFile);
         void setBuddyWithDefaultIcon(QWidget* b, ActionMode=ExecuteFile);
+        void setDefaultIcon(ActionMode mode =ExecuteFile);
 
         virtual QSize sizeHint()const;
         virtual QSize minimumSizeHint()const;
@@ -98,6 +99,8 @@ class QFLIB_EXPORT QFStyledButton : public QAbstractButton {
 
     signals:
         void clicked(QString buddyContents);
+        void clickedWithButton(QFStyledButton* button);
+        void clickedWithBuddy(QWidget* buddy);
     protected:
         virtual void paintEvent(QPaintEvent* e);
         virtual void enterEvent(QEvent* e);

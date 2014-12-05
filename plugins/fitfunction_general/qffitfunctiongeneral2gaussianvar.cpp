@@ -62,11 +62,18 @@ bool QFFitFunctionGeneral2GaussianVar::isParameterVisible(int parameter, const d
 }
 
 unsigned int QFFitFunctionGeneral2GaussianVar::getAdditionalPlotCount(const double* params) {
-    return 0;
+    return 2;
     // we have one additional plot
 }
 
 QString QFFitFunctionGeneral2GaussianVar::transformParametersForAdditionalPlot(int plot, double* params) {
+    if (plot==0) {
+        params[PARAM_AMPLITUDE2]=0;
+        return QObject::tr("Gauss 1");
+    } else if (plot==1) {
+        params[PARAM_AMPLITUDE]=0;
+        return QObject::tr("Gauss 2");
+    }
     return "";
 }
 

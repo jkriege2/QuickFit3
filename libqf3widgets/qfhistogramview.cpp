@@ -668,6 +668,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
 
                 QFFitAlgorithm* alg=QFFitAlgorithmManager::getInstance()->createAlgorithm("fit_lmfit");
                 QFFitFunction* ff=cmbFitFunction->createCurrentInstance();
+                QList<QFFitFunction*> addFF;
                 QVector<double> p;
                 if (alg && ff && histX && histY && histBins>0) {
                     QVector<double> perr;
@@ -698,6 +699,11 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                             tabHistogramParameters->setCellCreate(rowcnt, hh+1, p[i]);
                             tabHistogramParameters->setCellCreate(rowcnt, 0, tr("fit: %1").arg(d.label));
                             rowcnt++;
+                        }
+                    }
+                    if (ff->getAdditionalPlotCount(p)>0) {
+                        for (int i=0; i<ff->getAdditionalPlotCount(p); i++) {
+                            addFF.append(cmbFitFunction->createCurrentInstance());
                         }
                     }
                 }
@@ -767,6 +773,23 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                     plteFit->set_lineWidth(1.5);
                     plteFit->set_title(tr("fit (%1): %2").arg(hist.name).arg(ff->shortName()));
                     pltParamHistogram->addGraph(plteFit);
+                    if (addFF.size()>0) {
+                        for (int i=0; i<addFF.size(); i++) {
+                            if (addFF[i]) {
+                                JKQTPxQFFitFunctionLineGraph* plteFitSub=new JKQTPxQFFitFunctionLineGraph(pltParamHistogram->get_plotter());
+                                plteFitSub->set_fitFunction(addFF[i], true);
+                                QVector<double> ps=p;
+                                addFF[i]->transformParametersForAdditionalPlot(i, ps);
+                                plteFitSub->set_params(ps);
+                                plteFitSub->set_color(plteParamHistogramBoxplot->get_color().darker());
+                                plteFitSub->set_drawLine(true);
+                                plteFitSub->set_style(Qt::DashLine);
+                                plteFitSub->set_lineWidth(1);
+                                plteFitSub->set_title("");//tr("fit (%1): %2").arg(hist.name).arg(ff->shortName()));
+                                pltParamHistogram->addGraph(plteFitSub);
+                            }
+                        }
+                    }
                 } else {
                     if (ff) delete ff;
                 }

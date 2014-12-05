@@ -69,6 +69,7 @@ QFStyledButton::QFStyledButton(ActionMode mode, QWidget* buddy, QWidget* parent)
     m_prependURL="";
     m_action=NULL;
     m_filter=tr("All Files (*.*)");
+    connect(this, SIGNAL(clicked()), this, SLOT(openBuddyContents()));
 }
 
 QFStyledButton::~QFStyledButton()
@@ -81,6 +82,10 @@ void QFStyledButton::setBasepath(QString path) {
 }
 
 void QFStyledButton::openBuddyContents() {
+    emit clickedWithBuddy(m_buddy);
+    emit clickedWithButton(this);
+
+    if (m_actionmode==None) return;
     if (!m_buddy) return;
     QString prop=m_buddy->metaObject()->userProperty().read(m_buddy).toString();
 
@@ -152,15 +157,22 @@ QWidget* QFStyledButton::buddy() const {
 };
 
 void QFStyledButton::setBuddy(QWidget* b, ActionMode mode) {
-    if (m_actionmode!=None) disconnect(this, SIGNAL(clicked()), this, SLOT(openBuddyContents()));
+    //if (m_actionmode!=None)
+    //disconnect(this, SIGNAL(clicked()), this, SLOT(openBuddyContents()));
     m_actionmode=mode;
     m_buddy=b;
-    if (m_actionmode!=None) connect(this, SIGNAL(clicked()), this, SLOT(openBuddyContents()));
+    //if (m_actionmode!=None)
+    //connect(this, SIGNAL(clicked()), this, SLOT(openBuddyContents()));
 }
 
 void QFStyledButton::setBuddyWithDefaultIcon(QWidget* b, ActionMode mode) {
     setBuddy(b, mode);
-    QIcon i;
+    setDefaultIcon(mode);
+}
+
+void QFStyledButton::setDefaultIcon(QFStyledButton::ActionMode mode)
+{
+    QIcon i=icon();
     if ((mode==OpenURL)||(mode==OpenPrependedURL)) {
         i=QIcon(":/lib/qfstyledbutton/network.png");
         i.addFile(":/lib/qfstyledbutton/network_disabled.png", QSize(), QIcon::Disabled);

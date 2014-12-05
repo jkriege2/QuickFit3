@@ -42,7 +42,10 @@ HEADERS += qfpfitfunctionstirfcs.h \
     qffitfunctionstirffccsfw2ddiffxy2coloracfr.h \
     qffitfunctionstirffccsfw2ddiffxy2coloracfg.h \
     qffitfunctionstirffccsfw2ddiffxy2colorccf.h \
-qffitfunctionstirfcsdiffe2_relbright.h
+qffitfunctionstirfcsdiffe2_relbright.h \
+    qffitfunctionstirffccsfw2dadiffxy2coloracfg.h \
+    qffitfunctionstirffccsfw2dadiffxy2coloracfr.h \
+    qffitfunctionstirffccsfw2dadiffxy2colorccf.h
 
 
 SOURCES += qfpfitfunctionstirfcs.cpp\
@@ -56,7 +59,10 @@ SOURCES += qfpfitfunctionstirfcs.cpp\
     qffitfunctionstirffccsfw2ddiffxy2colorccf.cpp \
     qffitfunctionstirffccsfw2ddiffxy2coloracfr.cpp \
     qffitfunctionstirffccsfw2ddiffxy2coloracfg.cpp \
-qffitfunctionstirfcsdiffe2_relbright.cpp
+qffitfunctionstirfcsdiffe2_relbright.cpp \
+    qffitfunctionstirffccsfw2dadiffxy2coloracfg.cpp \
+    qffitfunctionstirffccsfw2dadiffxy2coloracfr.cpp \
+    qffitfunctionstirffccsfw2dadiffxy2colorccf.cpp
 
 FORMS =
 

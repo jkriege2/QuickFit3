@@ -941,6 +941,44 @@ void QFParameterCorrelationView::setSpaceSavingMode(bool enabled)
     }
 }
 
+double QFParameterCorrelationView::getParam1Min() const
+{
+    return edtHistogramMin1->value();
+}
+
+double QFParameterCorrelationView::getParam1Max() const
+{
+    return edtHistogramMax1->value();
+}
+
+double QFParameterCorrelationView::getParam2Min() const
+{
+    return edtHistogramMin2->value();
+}
+
+double QFParameterCorrelationView::getParam2Max() const
+{
+    return edtHistogramMax2->value();
+}
+
+double QFParameterCorrelationView::getParamColorMin() const
+{
+    return edtColorMin->value();
+}
+
+double QFParameterCorrelationView::getParamColorMax() const
+{
+    return edtColorMax->value();
+}
+
+void QFParameterCorrelationView::setCorrelationHistogramStretch(int corrStretch, int histStretch)
+{
+    layPlots->setColumnStretch(0,histStretch);
+    layPlots->setColumnStretch(1,corrStretch);
+    layPlots->setRowStretch(1,corrStretch);
+    layPlots->setRowStretch(2,histStretch);
+}
+
 
 void QFParameterCorrelationView::dataSettingsChanged(bool update)
 {
@@ -1305,7 +1343,7 @@ void QFParameterCorrelationView::createWidgets()
     // HISTOGRAM PLOTS ///////////////////////////////////////////////////////////////////////
     splitterHistogram=new QVisibleHandleSplitter(this);
     QWidget* widPlotter=new QWidget(this);
-    QGridLayout* layPlots=new QGridLayout();
+    layPlots=new QGridLayout();
     widPlotter->setLayout(layPlots);
 
     labPlotPos=new QLabel(this);

@@ -739,8 +739,8 @@ void QFPRDRFCS::startFCSProjectWizard()
     wiz->addPage(new QFTextWizardPage(tr("Introduction"),
                                       tr("This wizard will help you to load a set of FCS or DLS correlation curves from files and select the appropriate mode of data evaluation. It will finally set up a complete QuickFit 3.0 project with all the data you entered."),
                                       wiz));
-    QFSelectFilesWizardPage* selfiles;
-    wiz->addPage(selfiles=new QFSelectFilesWizardPage(tr("FCS/DLS data files ...")));
+    QFSelectFilesListWizardPage* selfiles;
+    wiz->addPage(selfiles=new QFSelectFilesListWizardPage(tr("FCS/DLS data files ...")));
     selfiles->setSubTitle(tr("Select one or more FCS/DLS data files, that you want to add to the project. You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
     selfiles->setFilters(getFCSFilters());
     selfiles->setSettingsIDs("fcs/last_fcswizard_dir", "fcs/current_fcs_format_filter");

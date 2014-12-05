@@ -108,6 +108,7 @@ QFRDRTable::GraphInfo::GraphInfo() {
     colorbarWidth=20;
     colorbarRelativeHeight=0.75;
     function="";
+    subfunction=-1;
     modifierMode=JKQTPMathImage::ModifyValue;
     functionType=gtfString;
 
@@ -1649,6 +1650,8 @@ void QFRDRTable::readGraphInfo(GraphInfo& graph, QDomElement ge) {
     graph.imageLegendB=ge.attribute("image_legend_b", "");
     graph.imageLegendMod=ge.attribute("image_legend_mod", "");
     graph.function=ge.attribute("function", "");
+    graph.subfunction=ge.attribute("subfunction", "-1").toInt();
+    graph.showallsubfunctions=QStringToBool(ge.attribute("showallsubfunctions", "false"));
     graph.functionType=String2GTFunctionType(ge.attribute("functiontype", "string"));
     graph.modifierMode=JKQTPMathImage::StringToModifierMode(ge.attribute("modifier_mode", "none"));
     graph.functionParameters=stringToDoubleArray_base64(ge.attribute("fparams", ""));
@@ -1864,6 +1867,8 @@ void QFRDRTable::writeGraphInfo(QXmlStreamWriter &w, const QFRDRTable::GraphInfo
     w.writeAttribute("image_legend_b", graph.imageLegendB);
     w.writeAttribute("image_legend_mod", graph.imageLegendMod);
     w.writeAttribute("function", graph.function);
+    w.writeAttribute("subfunction", QString::number(graph.subfunction));
+    w.writeAttribute("showallsubfunctions", boolToQString(graph.showallsubfunctions));
     w.writeAttribute("functiontype", GTFunctionType2String(graph.functionType));
     w.writeAttribute("fparams", doubleArrayToString_base64(graph.functionParameters));
     //w.writeAttribute("ferrors", doubleArrayToString_base64(graph.functionParameterErrors));

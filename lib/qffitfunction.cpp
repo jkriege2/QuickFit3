@@ -26,10 +26,7 @@
 #include "qftools.h"
 #include "statistics_tools.h"
 
-bool QFFitFunction::isDeprecated() const
-{
-    return false;
-}
+
 
 
 QVector<double> QFFitFunction::multiEvaluate(const QVector<double> &x, const double *parameters) const
@@ -59,35 +56,9 @@ void QFFitFunction::evaluateDerivatives(double *derivatives, double x, const dou
 
 }
 
-bool QFFitFunction::get_implementsDerivatives() const
-{
-    return false;
-}
 
-void QFFitFunction::calcParameter(double *parameterValues, double *error) const
-{
 
-}
 
-void QFFitFunction::sortParameter(double *parameterValues, double *error, bool *fix) const
-{
-
-}
-
-bool QFFitFunction::isParameterVisible(int parameter, const double *parameterValues) const
-{
-    return true;
-}
-
-unsigned int QFFitFunction::getAdditionalPlotCount(const double *params)
-{
-    return 0;
-}
-
-QString QFFitFunction::transformParametersForAdditionalPlot(int plot, double *params)
-{
-    return QString("");
-}
 
 bool QFFitFunction::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
 {
@@ -142,15 +113,7 @@ void QFFitFunction::evaluateNumericalParameterErrors(double *errors, double x, c
     //qfFree(cov);
 }
 
-double QFFitFunction::customTransform(int parameter, double value) const
-{
-    return value;
-}
 
-double QFFitFunction::customBackTransform(int parameter, double value) const
-{
-    return value;
-}
 
 QFFitStatistics QFFitFunction::calcFitStatistics(long N, const double* tauvals, const double* corrdata, const double* weights, int datacut_min, int datacut_max, const double* fullParams, const double* /*errors*/, const bool* paramsFix, int runAvgWidth, int residualHistogramBins) const {
     int fitparamN=0;

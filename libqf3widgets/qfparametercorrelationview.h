@@ -127,6 +127,15 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
 
         void setSpaceSavingMode(bool enabled);
 
+        double getParam1Min() const;
+        double getParam1Max() const;
+        double getParam2Min() const;
+        double getParam2Max() const;
+        double getParamColorMin() const;
+        double getParamColorMax() const;
+
+        void setCorrelationHistogramStretch(int corrStretch=3, int histStretch=1);
+
     signals:
         void settingsChanged();
     public slots:
@@ -148,6 +157,8 @@ protected:
     void createWidgets();
 
     int connectParameterWidgetsCounter;
+
+    QGridLayout* layPlots;
 
     /** \brief plotter widget for the parameter histogram */
     QFPlotter* pltParamCorrelation;

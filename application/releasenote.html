@@ -146,6 +146,8 @@
             <li>fit algorithms now support parameter transforms, if a special parameterType is specified in a QFFitFunction</li>
             <li>added menu entry to evaluation/RDR editors (result table tab), which allows to delete all results</li>
             <li>online-help system now supports the shortcut <tt>&dollar;(...)&dollar;</tt> for <tt>&dollar;&dollar;math:...&dollar;&dollar;</tt> and <tt>&dollar;[...]&dollar;</tt> for <tt>&dollar;&dollar;bmath:...&dollar;&dollar;</tt></li>
+            <li>automatic links for DOIs are added to the main help</li>
+            <li>histograms show sub-plots for fit functions that support this (e.g. all single Gaussians in a double-Gaussian function)</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -233,6 +235,7 @@
             <li>added model of multi-component normal diffusion with different relative molecular brightnesses per species</li>
             <li>bugfix: some models did not calculate the third component properly</li>
             <li>bugfixed: "TIR-FCCS: 2D Diffusion+Flow (1/e² radii)"</li>
+            <li>added models for 2-color TIR-FCCS with anomalous diffusion</li>
           </ul></li>
           <li><b>imagingFCS</b><ul>
             <li>bugfix: set background from selected pixels function didn't work correctly</li>
@@ -448,6 +451,9 @@
       </ul></li>
       <li><b>qfe_resultstools:</b><ul>
         <li>added RegExp test tool to this plugin (Tools-menu in QuickFit's main dialog)</li>
+      </ul></li>
+      <li><b>number_and_brightness:</b><ul>
+        <li>added wizard, that allows to insert a N&amp;B record from average+stddev files for the iamge and the backrgound</li>
       </ul></li>
 
     </ul></li>

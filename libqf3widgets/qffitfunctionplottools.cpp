@@ -43,6 +43,7 @@ JKQTPxQFFitFunctionLineGraph::JKQTPxQFFitFunctionLineGraph(JKQtBasePlotter* pare
     ownsFunction=false;
     scaleX=1;
     offsetX=0;
+    subfunction=-1;
 }
 
 JKQTPxQFFitFunctionLineGraph::~JKQTPxQFFitFunctionLineGraph()
@@ -64,6 +65,9 @@ void JKQTPxQFFitFunctionLineGraph::collectParameters()
     intParam->param=iparams;
     intParam->scaleX=scaleX;
     intParam->offsetX=offsetX;
+    if (subfunction>=0) {
+        fitFunction->transformParametersForAdditionalPlot(subfunction, intParam->param);
+    }
     set_plotFunction(JKQTPxQFFitFunctionLineGraph_func);
     set_params((void*)intParam);
 }

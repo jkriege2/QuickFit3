@@ -43,6 +43,7 @@ class QFWIDLIB_EXPORT JKQTPxQFFitFunctionLineGraph: public JKQTPxFunctionLineGra
         GET_SET_MACRO(bool, ownsFunction)
         GET_SET_MACRO(double, scaleX)
         GET_SET_MACRO(double, offsetX)
+        GET_SET_MACRO(int, subfunction)
 
         void set_fitFunction(QFFitFunction* fitFunction, bool ownsFunction=true);
     protected:
@@ -51,6 +52,7 @@ class QFWIDLIB_EXPORT JKQTPxQFFitFunctionLineGraph: public JKQTPxFunctionLineGra
 
         double scaleX;
         double offsetX;
+        int subfunction;
 
         JKQTPxQFFitFunctionLineGraphFunctionParams* intParam;
 

@@ -26,6 +26,8 @@
 #include <QWidget>
 #include "libwid_imexport.h"
 #include "qfwizard.h"
+#include "qenhancedlineedit.h"
+#include "qfstyledbutton.h"
 
 namespace Ui {
     class QFSelectFilesListWidget;
@@ -67,11 +69,11 @@ class QFWIDLIB_EXPORT QFSelectFilesListWidget : public QWidget
 };
 
 
-class QFWIDLIB_EXPORT QFSelectFilesWizardPage : public QFWizardPage
+class QFWIDLIB_EXPORT QFSelectFilesListWizardPage : public QFWizardPage
 {
         Q_OBJECT
     public:
-        explicit QFSelectFilesWizardPage(const QString &title, QWidget *parent = 0);
+        explicit QFSelectFilesListWizardPage(const QString &title, QWidget *parent = 0);
         QFSelectFilesListWidget* getSelFilesWidget() const {
             return sel;
         }
@@ -104,6 +106,59 @@ class QFWIDLIB_EXPORT QFSelectFilesWizardPage : public QFWizardPage
         bool m_addStartup;
         bool m_needsfiles;
         QFormLayout* formLay;
+};
+
+
+
+class QFWIDLIB_EXPORT QFSelectFilesWizardPage : public QFWizardPage
+{
+        Q_OBJECT
+    public:
+        explicit QFSelectFilesWizardPage(const QString &title, QWidget *parent = 0);
+
+        inline QFormLayout* getFormLayout() const {
+            return formLay;
+        }
+
+        void addRow(const QString& label, QWidget* widget);
+        void addRow(const QString& label, QLayout* layout);
+
+        void addFileSelection(const QString& label, const QStringList& filters, bool required=true);
+        void addFileSelection(const QString& label, const QStringList& filters, const QStringList& filterids, bool required=true);
+        void setSettingsIDs(const QString& lastDirID, const QString& lastFilterID);
+
+        int filesCount() const;
+        QStringList files() const;
+        QStringList fileFilters() const;
+        QStringList fileFilterIDs() const;
+        QList<int> fileFilterNums() const;
+        void setOnlyOneFormatAllowed(bool allowed);
+
+        virtual void initializePage();
+        virtual bool validatePage();
+    signals:
+
+    public slots:
+    protected slots:
+        void buttonClicked(QFStyledButton* btn);
+    protected:
+        struct FileData {
+            QStringList filterids;
+            QStringList filters;
+            QEnhancedLineEdit* edit;
+            QLabel* label;
+            QFStyledButton* button;
+            bool required;
+            QString format;
+        };
+
+        QList<FileData> m_files;
+        QString lastDirID;
+        QString lastFilterID;
+
+        QFormLayout* formLay;
+        bool onlyOneFormat;
+        QString lastFormat;
 };
 
 #endif // QFSELECTFILESLISTWIDGET_H

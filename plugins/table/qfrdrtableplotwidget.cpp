@@ -1178,67 +1178,82 @@ void QFRDRTablePlotWidget::updateGraph() {
 
                 ui->plotter->addGraph(pg);
             } else if (g.type==QFRDRTable::gtFunction) {
-                JKQTPxFunctionLineGraph* pg=NULL;
+                QList<JKQTPxFunctionLineGraph*> pgs;
 
                 int vecItems=0;
                 if (g.functionType==QFRDRTable::gtfString) {
                     QFMathParserXFunctionLineGraph* pgf=new QFMathParserXFunctionLineGraph(ui->plotter->get_plotter());
                     pgf->set_function(g.function);
-                    pg=pgf;
+                    pgs<<pgf;
 
                 } else if (g.functionType==QFRDRTable::gtfPolynomial) {
                     JKQTPxFunctionLineGraph* pgf=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
                     pgf->setSpecialFunction(JKQTPxFunctionLineGraph::Polynomial);
-                    pg=pgf;
+                    pgs<<pgf;
                     vecItems=11;
                 } else if (g.functionType==QFRDRTable::gtfExponential) {
                     JKQTPxFunctionLineGraph* pgf=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
                     pgf->setSpecialFunction(JKQTPxFunctionLineGraph::Exponential);
-                    pg=pgf;
+                    pgs<<pgf;
                     vecItems=3;
                 } else if (g.functionType==QFRDRTable::gtfPowerLaw) {
                     JKQTPxFunctionLineGraph* pgf=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
                     pgf->setSpecialFunction(JKQTPxFunctionLineGraph::PowerLaw);
-                    pg=pgf;
+                    pgs<<pgf;
                     vecItems=3;
                 } else if (g.functionType==QFRDRTable::gtfQFFunction) {
                     JKQTPxQFFitFunctionLineGraph* pgf=new JKQTPxQFFitFunctionLineGraph(ui->plotter->get_plotter());
                     QFFitFunction* ff=NULL;
-                    pgf->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(g.function, NULL), true);
-                    pg=pgf;
+                    pgf->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(g.function, NULL), true);                    
+                    pgs<<pgf;
+                    if (!g.showallsubfunctions) {
+                        pgf->set_subfunction(g.subfunction);
+                    } else {
+                        for (int i=0; i<ff->getAdditionalPlotCount(ff->getInitialParamValues()); i++) {
+                            JKQTPxQFFitFunctionLineGraph* pgfsub=new JKQTPxQFFitFunctionLineGraph(ui->plotter->get_plotter());
+                            QFFitFunction* ff=NULL;
+                            pgfsub->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(g.function, NULL), true);
+                            pgfsub->set_subfunction(i);
+                            pgs<<pgfsub;
+                        }
+                    }
                     if (ff) vecItems=ff->paramCount();
                 }
 
 
-                if (pg) {
-                    if (g.ycolumn>=0 && g.ycolumn<(long)ui->plotter->getDatastore()->getColumnCount()) {
-                        pg->set_parameterColumn(g.ycolumn);
-                    } else {
-                        pg->set_params(g.functionParameters);
-                    }
-                    if (g.titleShow) pg->set_title(g.title); else pg->set_title("");
-                    //qDebug()<<"adding function plot "<<g.function;
-                    pg->set_drawLine(true);
-                    pg->set_lineWidth(g.linewidth);
-                    QColor c=g.color;
-                    c.setAlphaF(g.colorTransparent);
-                    pg->set_color(c);
-                    QColor ec=g.errorColor;
-                    ec.setAlphaF(g.errorColorTransparent);
-                    pg->set_errorColor(ec);
-                    QColor efc=g.errorColor;
-                    efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
-                    pg->set_errorFillColor(efc);
-                    pg->set_errorLineWidth(g.errorWidth);
-                    pg->set_errorStyle(g.errorLineStyle);
-                    //pg->set_errorbarSize(g.errorbarSize);
+                for (int i=0; i<pgs.size(); i++) {
+                    JKQTPxFunctionLineGraph* pg=pgs[i];
+                    if (pg) {
+                        if (g.ycolumn>=0 && g.ycolumn<(long)ui->plotter->getDatastore()->getColumnCount()) {
+                            pg->set_parameterColumn(g.ycolumn);
+                        } else {
+                            pg->set_params(g.functionParameters);
+                        }
+                        if (g.titleShow && i==0) pg->set_title(g.title); else pg->set_title("");
+                        //qDebug()<<"adding function plot "<<g.function;
+                        pg->set_drawLine(true);
+                        pg->set_lineWidth(g.linewidth);
+                        if (i>0) pg->set_lineWidth(g.linewidth*0.6);
+                        QColor c=g.color;
+                        c.setAlphaF(g.colorTransparent);
+                        pg->set_color(c);
+                        QColor ec=g.errorColor;
+                        ec.setAlphaF(g.errorColorTransparent);
+                        pg->set_errorColor(ec);
+                        QColor efc=g.errorColor;
+                        efc.setAlphaF(qBound(0.0,1.0,g.errorColorTransparent-0.2));
+                        pg->set_errorFillColor(efc);
+                        pg->set_errorLineWidth(g.errorWidth);
+                        pg->set_errorStyle(g.errorLineStyle);
+                        //pg->set_errorbarSize(g.errorbarSize);
 
-                    QColor fc=g.fillColor;
-                    fc.setAlphaF(g.fillColorTransparent);
-                    pg->set_fillColor(fc);
-                    pg->set_fillStyle(g.fillStyle);
-                    pg->set_style(g.style);
-                    ui->plotter->addGraph(pg);
+                        QColor fc=g.fillColor;
+                        fc.setAlphaF(g.fillColorTransparent);
+                        pg->set_fillColor(fc);
+                        pg->set_fillStyle(g.fillStyle);
+                        pg->set_style(g.style);
+                        ui->plotter->addGraph(pg);
+                    }
                 }
             } else if (g.type==QFRDRTable::gtBoxplotX) {
                 JKQTPboxplotVerticalGraph* pg=new JKQTPboxplotVerticalGraph(ui->plotter->get_plotter());

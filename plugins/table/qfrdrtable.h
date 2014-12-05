@@ -352,6 +352,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             JKQTPMathImage::ModifierMode modifierMode;
 
             QString function;
+            int subfunction;
+            bool showallsubfunctions;
             GTFunctionType functionType;
             QVector<double> functionParameters;
 

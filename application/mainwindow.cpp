@@ -4512,6 +4512,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
                         QString filter2="";
                         QString filter1=filter;
+                        //qDebug()<<"fitfunc_inplugin: filter="<<filter;
                         if (filter.contains(":")) {
                             filter1=filter.split(":").first();
                             filter2=filter.split(":").at(1);
@@ -4924,13 +4925,13 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     QString rep=tr("<center>"
                                      "<img src=\"%1\"><br><i>%2</i><br>"
                                    "</center>").arg(param1).arg(param2);
-                    result=result.replace(rxInsert.cap(0), rep);
+                    result=result.replace(rxPluginInfo.cap(0), rep);
                 } else if (command=="startbox") {
                     QString rep=tr("<blockquote>"
                                      "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: %1 ;  border-color: %2\" >"
                                    "<tr><td align=\"left\">").arg(param1).arg(param2);
 
-                    result=result.replace(rxInsert.cap(0), rep);
+                    result=result.replace(rxPluginInfo.cap(0), rep);
                 }
 
                 ++count;
@@ -4939,8 +4940,30 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
 
+
+
+
+            // try and find DOIs in the text
+            QRegExp rxDOI("(doi)?[\\:]?\\s?(10\\.\\d{4}[\\d\\:\\.\\-\\_\\/a-z]+)[\\,\\;\\:\\.\\s\\n\\r\\t\\v\\)\\]\\}]+[\\s\\n\\r\\t\\v]", Qt::CaseInsensitive);
+            rxDOI.setMinimal(true);
+            count = 0;
+            pos = 0;
+            while ((pos = rxDOI.indexIn(result, pos)) != -1) {
+                QString rep=QString("<a href=\"http://dx.doi.org/%1\">%2</a>").arg(rxDOI.cap(1)).arg(rxDOI.cap(0));
+                result=result.replace(rxDOI.cap(0), rep);
+
+
+                ++count;
+                pos += rxDOI.matchedLength();
+            }
+
+
             cnt++;
         }
+
+
+
+
 
 
 

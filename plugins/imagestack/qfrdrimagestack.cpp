@@ -326,7 +326,7 @@ void QFRDRImageStackPlugin::startImagestackWizard()
 
 
 
-    wiz->addPage(wizSelfiles=new QFSelectFilesWizardPage(tr("Image stack files ...")));
+    wiz->addPage(wizSelfiles=new QFSelectFilesListWizardPage(tr("Image stack files ...")));
     wizSelfiles->setSubTitle(tr("Select one or more image stack files, that contain your lightsheet scan. Each file will be treated as one color channel in the final image stack.<br>You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
     wizSelfiles->setFilters(QFRDRImageStackData::getImageFilterList(services), QFRDRImageStackData::getImageReaderIDList(services));
     wizSelfiles->setSettingsIDs("image_stack/last_imagestackwizard_dir", "image_stack/last_imagestackwizard_filter");
@@ -463,7 +463,7 @@ void QFRDRImageStackPlugin::startProjectWizardLightsheetAnalysis(bool insertEval
 
 
 
-    wiz->addPage(wizSelfiles=new QFSelectFilesWizardPage(tr("Image stack files ...")));
+    wiz->addPage(wizSelfiles=new QFSelectFilesListWizardPage(tr("Image stack files ...")));
     wizSelfiles->setSubTitle(tr("Select one or more image stack files, that contain your lightsheet scan. Each file will be treated as one color channel in the final image stack.<br>You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
     wizSelfiles->setFilters(QFRDRImageStackData::getImageFilterList(services), QFRDRImageStackData::getImageReaderIDList(services));
     wizSelfiles->setSettingsIDs("image_stack/last_lightsheetwizard_dir", "image_stack/last_lightsheetwizard_filter");
@@ -476,12 +476,12 @@ void QFRDRImageStackPlugin::startProjectWizardLightsheetAnalysis(bool insertEval
     connect(wizSelfiles, SIGNAL(onValidate(QWizardPage*,QWizardPage*)), this, SLOT(wizLSAnalysisImgPreviewOnValidate(QWizardPage*,QWizardPage*)));
     wizLSAnalysisImgPreview->clear();
 
-    if (insertEval) {
+    //if (insertEval) {
         wizLSAnalysiscmbFitDir=new QComboBox(wizLSAnalysisImgPreview);
         wizLSAnalysiscmbFitDir->addItem(tr("fit rows (lightsheet vertical)"));
         wizLSAnalysiscmbFitDir->addItem(tr("fit column (lightsheet horizontal)"));
         wizLSAnalysiscmbFitDir->setCurrentIndex(1);
-    }
+    //}
 
     wizLSAnalysisedtPixelSize=new QDoubleSpinBox(wizLSAnalysisImgPreview);
     wizLSAnalysisedtPixelSize->setRange(0,100000);
@@ -582,7 +582,7 @@ void QFRDRImageStackPlugin::startProjectWizardLightsheetAnalysis(bool insertEval
 void QFRDRImageStackPlugin::wizLSAnalysisImgPreviewOnValidate(QWizardPage *page, QWizardPage *userPage)
 {
     QFImagePlotWizardPage* plot=qobject_cast<QFImagePlotWizardPage*>(userPage);
-    QFSelectFilesWizardPage* files=qobject_cast<QFSelectFilesWizardPage*>(page);
+    QFSelectFilesListWizardPage* files=qobject_cast<QFSelectFilesListWizardPage*>(page);
     if (plot && files) {
         QFImporter::FileInfo info;
         double* image=NULL;
