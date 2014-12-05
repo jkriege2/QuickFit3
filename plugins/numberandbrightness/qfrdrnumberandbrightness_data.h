@@ -42,14 +42,20 @@
 #include "qtriple.h"
 #include "qfrdrimagestackinterface.h"
 #include "qfrdrimageselectioninterface.h"
+#include "qfimporter.h"
+#include "qfimporterimageseries.h"
+#include "qfimportermanager.h"
+#include "tools.h"
+#include "qfrdrimagemasktools.h"
+#include "imagetools.h"
 
 /*! \brief QFRawDataRecord implementation
     \ingroup qf3rdrdp_number_and_brightness
 
 */
-class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDROverviewImageInterface, public QFRDRImageSelectionInterface {
+class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDRAdditionalImagesInterface, public QFRDRImageSelectionInterface, public QFRDRImageMaskTools, public QFRDROverviewImagesInterface {
         Q_OBJECT
-        Q_INTERFACES(QFRDROverviewImageInterface  QFRDRImageSelectionInterface)
+        Q_INTERFACES(QFRDRAdditionalImagesInterface  QFRDRImageSelectionInterface QFRDRImageMaskInterface QFRDROverviewImagesInterface)
     public:
         /** Default constructor */
         QFRDRNumberAndBrightnessData(QFProject* parent);
@@ -98,26 +104,11 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDROvervie
 
 
 
-        /** \brief returns whether to leave out a run */
-        virtual bool leaveoutRun(int run) const ;
-        /** \brief add a run to the leaveouts */
-        virtual void leaveoutAddRun(int run);
-        /** \brief remove a run from the leaveouts */
-        virtual void leaveoutRemoveRun(int run);
-        /** \brief clear all leaveouts */
-        virtual void leaveoutClear();
-
-        void maskLoad(const QString& filename);
-        void maskSave(const QString& filename) const ;
-        void maskClear();
-        void maskSetAll();
-        void maskSet(uint32_t x, uint32_t y);
-        void maskUnset(uint32_t x, uint32_t y, bool value=true);
-        void maskToggle(uint32_t x, uint32_t y);
-        void maskInvert();
-        bool maskGet(uint32_t x, uint32_t y) const ;
-        bool* maskGet() const;
-
+        virtual int getOverviewImageCount() const;
+        virtual int getOverviewImageWidth() const;
+        virtual int getOverviewImageHeight() const;
+        virtual QString getOverviewImageName(int image) const;
+        virtual double* getOverviewImage(int image) const;
 
 
         /** \copydoc QFRDRImageSelectionInterface::getImageSelectionCount() */
@@ -139,17 +130,17 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDROvervie
 
 
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageCount() */
-        virtual int getOverviewImageCount() const;
+        virtual int getAdditionalImagesCount() const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageWidth() */
-        virtual int getOverviewImageWidth(int image) const;
+        virtual int getAdditionalImagesWidth(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageHeight() */
-        virtual int getOverviewImageHeight(int image) const;
+        virtual int getAdditionalImagesHeight(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageName() */
-        virtual QString getOverviewImageName(int image) const;
+        virtual QString getAdditionalImagesName(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImage() */
-        virtual double* getOverviewImage(int img) const;
+        virtual double* getAdditionalImage(int img) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageGeoElements() */
-        virtual QList<QFRDROverviewImageInterface::OverviewImageGeoElement> getOverviewImageAnnotations(int image) const;
+        virtual QList<QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement> getAdditionalImagesAnnotations(int image) const;
 
 
 
@@ -161,6 +152,8 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDROvervie
         virtual int indexToX(int run) const;
         /** \copydoc QFRDRImageToRunInterface::runToY() */
         virtual int indexToY(int run) const;
+
+        QFImageHalf getSelectedImageHalf() const;
 
     protected:
         /** \brief write the contents of the object to a XML file */
@@ -190,7 +183,7 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDROvervie
         bool loadVideo(const QString &filename, double **data, int *width, int *height, uint32_t *frames);
 
         /** \brief allocate memory to store a \a x by \a y set of correlation curves (+ additional data, like average and sigmas) with \a N datapoints each */
-        virtual void allocateContents(int x, int y, int N=0);
+        virtual void allocateContents(int x, int y);
 
 
     private:
@@ -212,7 +205,7 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDROvervie
             QString name;
             int width;
             int height;
-            QList<QFRDROverviewImageInterface::OverviewImageGeoElement> geoElements;
+            QList<QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement> geoElements;
 
             ovrImageData() {
                 image=NULL;

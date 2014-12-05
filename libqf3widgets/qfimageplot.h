@@ -22,6 +22,12 @@ class QFWIDLIB_EXPORT QFImagePlot : public QWidget
 
         void setImage(double* image, int32_t width, int32_t height);
         void setMaskAround(int size);
+        void setROI(double x, double y, double width, double height);
+        void setROI(QRectF r);
+        void resetROI();
+        void setROI2(double x, double y, double width, double height);
+        void setROI2(QRectF r);
+        void resetROI2();
     public slots:
         void update_plot();
         void clear();
@@ -32,12 +38,15 @@ class QFWIDLIB_EXPORT QFImagePlot : public QWidget
     private:
         QPointer<JKQTPColumnMathImage> plteImage;
         QPointer<JKQTPColumnOverlayImageEnhanced> plteMask;
+        QPointer<JKQTPgeoRectangle> plteROI;
+        QPointer<JKQTPgeoRectangle> plteROI2;
         Ui::QFImagePlot *ui;
         QString prefix;
         double* image_data;
         bool* mask;
         int32_t image_width;
         int32_t image_height;
+        QRectF roi, roi2;
 };
 
 

@@ -245,66 +245,94 @@ struct ALV700ConfigData {
 };
 
 void QFPRDRFCS::insertALV7000File(const QStringList& filename, const QMap<QString, QVariant>& paramValues, const QStringList& paramReadonly) {
-    unsigned int cc=1;
+    unsigned int channelCount=1;
     QString mode="";
     unsigned int runCount=0;
     int inputchannels=2;
     bool crossCorrelation=false;
     bool autocorrelation=false;
     int firstchannel=0;
+    int CorrColumns=0;
     QStringList pro=paramReadonly;
     pro<<"CHANNEL"<<"COLUMNS"<<"CHANNELS_SWAPPED";
     try {
-        ALV7_analyze(filename.value(0, ""), mode, cc, runCount, crossCorrelation, autocorrelation, inputchannels, firstchannel);
+        ALV7_analyze(filename.value(0, ""), mode, channelCount, runCount, crossCorrelation, autocorrelation, inputchannels, firstchannel, &CorrColumns);
     } catch (std::exception& E) {
-        cc=0;
+        channelCount=0;
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV700X file '%1':\n%2").arg(filename.value(0, "")).arg(E.what()));
         services->log_error(tr("Error while importing ALV700X file '%1':\n    %2\n").arg(filename.value(0, "")).arg(E.what()));
 
     }
     QList<ALV700ConfigData> cdata;
-    for (unsigned int i=0; i<cc; i++) {
+    for (unsigned int i=0; i<channelCount; i++) {
         ALV700ConfigData d;
         d.channel=i+firstchannel;
         d.swapped=i>0;
         //if (cc<=1) d.channel=channel;
         d.role="ACF";
         if (autocorrelation) {
+
             d.role=QString("ACF%1").arg(d.channel);
             d.columns.clear();
-            d.columns.append(i+1);
-            // TODO: possibly add more by runCount
+            if (runCount==1) {
+                d.columns.append(i+1);
+            } else {
+                for (int r=0; r<runCount; r++) {
+                    d.columns.append(1+i*(runCount+1)+r);
+                }
+            }
+            for (int i=d.columns.size()-1; i>=0; i--) {
+                if (CorrColumns>0 && d.columns[i]>=CorrColumns) d.columns.removeAt(i);
+            }
             cdata<<d;
         }
+    }
+    for (unsigned int i=0; i<channelCount; i++) {
+        ALV700ConfigData d;
+        d.channel=i+firstchannel;
+        d.swapped=i>0;
+        d.role="FCCS";
+        d.columns.clear();
+
         if (crossCorrelation) {
             d.role=(QString("FCCS"));
             if (d.channel>0) d.role=(QString("FCCS%10").arg(d.channel));
             d.columns.clear();
-            if (autocorrelation) {
-                d.columns.append(i+cc+1);
+            if (runCount==1) {
+                if (autocorrelation) {
+                    d.columns.append(i+channelCount+1);
+                } else {
+                    d.columns.append(i+1);
+                }
             } else {
-                d.columns.append(i+1);
+                for (int r=0; r<runCount; r++) {
+                    d.columns.append(1+channelCount*(runCount+1)+i*(runCount+1)+r);
+                }
             }
-            // TODO: possibly add more by runCount
+            for (int i=d.columns.size()-1; i>=0; i--) {
+                if (CorrColumns>0 && d.columns[i]>=CorrColumns) d.columns.removeAt(i);
+            }
 
             cdata<<d;
         }
     }
 
     for (int i=0; i<cdata.size(); i++) {
-        QMap<QString, QVariant> p=paramValues;
-        p["CHANNEL"]=cdata[i].channel;
-        p["COLUMNS"]=listToString(cdata[i].columns, false, false);
-        p["CHANNELS_SWAPPED"]=cdata[i].swapped;
-        QString role=cdata[i].role;
-        QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - %2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(role), filename, p, pro);
-        e->setRole(role);
-        if (cc>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
+        if (cdata[i].columns.size()>0) {
+            QMap<QString, QVariant> p=paramValues;
+            p["CHANNEL"]=cdata[i].channel;
+            p["COLUMNS"]=listToString(cdata[i].columns, false, false);
+            p["CHANNELS_SWAPPED"]=cdata[i].swapped;
+            QString role=cdata[i].role;
+            QFRawDataRecord* e=project->addRawData(getID(), tr("%1 - %2").arg(QFileInfo(filename.value(0, "")).fileName()).arg(role), filename, p, pro);
+            e->setRole(role);
+            if (channelCount>1) e->setGroup(project->addOrFindRDRGroup(QFileInfo(filename.value(0, "")).fileName()));
 
-        if (e->error()) {
-            QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV700X file '%1' (channel %3/%4):\n%2").arg(filename.value(0, "")).arg(e->errorDescription()).arg(i+1).arg(cc));
-            services->log_error(tr("Error while importing ALV700X file '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
-            project->deleteRawData(e->getID());
+            if (e->error()) {
+                QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing ALV700X file '%1' (channel %3/%4):\n%2").arg(filename.value(0, "")).arg(e->errorDescription()).arg(i+1).arg(channelCount));
+                services->log_error(tr("Error while importing ALV700X file '%1':\n    %2\n").arg(filename.value(0, "")).arg(e->errorDescription()));
+                project->deleteRawData(e->getID());
+            }
         }
     }
 }

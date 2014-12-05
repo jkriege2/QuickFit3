@@ -43,7 +43,8 @@ HEADERS += qfrdrnumberandbrightness.h \
     ../base_classes/qfrdrimagingfcstools.h \
     ../../../../../LIB/trunk/libtiff_tools.h \
     qfrdrnumberandbrightness_overvieweditor.h \
-    ../base_classes/qfrdroverviewimagedisplay.h
+    ../base_classes/qfrdroverviewimagedisplay.h \
+    ../base_classes/qfrdrimagemasktools.h
 
 SOURCES += qfrdrnumberandbrightness.cpp \
            qfrdrnumberandbrightness_data.cpp \
@@ -51,7 +52,8 @@ SOURCES += qfrdrnumberandbrightness.cpp \
     ../base_classes/qfrdrimagingfcstools.cpp \
     ../../../../../LIB/trunk/libtiff_tools.cpp \
     qfrdrnumberandbrightness_overvieweditor.cpp \
-    ../base_classes/qfrdroverviewimagedisplay.cpp
+    ../base_classes/qfrdroverviewimagedisplay.cpp \
+    ../base_classes/qfrdrimagemasktools.cpp
 
 FORMS = 
 

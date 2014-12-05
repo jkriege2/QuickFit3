@@ -230,7 +230,7 @@ void QFRDRFCSRateEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecor
 
     if (m) {
         readSettings();
-        cmbRunDisplay->setCurrentIndex(m->getProperty("FCS_RATE_RUN_DISPLAY", 0).toInt());
+        cmbRunDisplay->setCurrentIndex(m->getProperty("FCS_RATE_RUN_DISPLAY", ProgramOptions::getConfigValue("fcsdataeditor/raterun_display", 0)).toInt());
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         runs.setCurrent(current);
     } else {

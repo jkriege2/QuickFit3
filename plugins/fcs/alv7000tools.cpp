@@ -28,7 +28,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 /**************************************************************************************************************************
  * methods and functions, that are not part of a class
  **************************************************************************************************************************/
-void ALV7_analyze(QString filename, QString& mode, unsigned int& channelCount, unsigned int& runCount, bool& crossCorrelation, bool& autoCorrelation, int& inputchannels, int& firstchannel) {
+void ALV7_analyze(QString filename, QString& mode, unsigned int& channelCount, unsigned int& runCount, bool& crossCorrelation, bool& autoCorrelation, int& inputchannels, int& firstchannel, int *corrColumns) {
     FILE* alv_file=fopen(filename.toAscii().data(), "r");
     if (ferror(alv_file)) throw ALV7_exception(format("error while opening file '%s':\n  %s", filename.toAscii().data(), strerror(errno)));
     bool readingHeader=true;
@@ -83,10 +83,18 @@ void ALV7_analyze(QString filename, QString& mode, unsigned int& channelCount, u
                 // this is possible as every line of the header begins with an unquoted name
                 // token followed by a colon and number/quoted or alineabreak (identifier line!)
                 readingHeader=false;
+
             }
         }
         if (readingHeader) token=ALV7_getToken(alv_file, readingHeader);
     }
+
+    if (corrColumns &&  !feof(alv_file)) {
+        QVector<QVector<double> > dat;
+        ALV7_readNumberMatrix(alv_file, &(dat));
+        *corrColumns=dat.value(0).size();
+    }
+    if (alv_file) fclose(alv_file);
 }
 
 
@@ -155,7 +163,9 @@ QString ALV7_ReadQuoted(FILE* alv_file, char quotationMark) {
 }
 
 QDate ALV7_toDate(QString d) {
-    return QDate::fromString(d, "dd-MMM-yy");
+    QDate da= QDate::fromString(d, "dd-MMM-yy");
+    if (da.year()<0 || da.year()>2500) da=QDate::fromString(d, "dd.MMM.yyyy");
+    return da;
 }
 
 QTime ALV7_toTime(QString d){
@@ -326,5 +336,76 @@ void ALV7_analyzeMode(const QString &mode, unsigned int &channelCount, bool &cro
         crossCorrelation=mode.toUpper().contains("C-", Qt::CaseInsensitive);
         channelCount=1;
         inputchannels=1;
+        if (m.contains("A-CH0+1")) {
+            autoCorrelation=true;
+            channelCount=2;
+            inputchannels=2;
+            firstchannel=0;
+        } else if (m.contains("A-CH2+3")) {
+            autoCorrelation=true;
+            channelCount=2;
+            inputchannels=2;
+            firstchannel=2;
+        } else if (m.contains("A-CH1+2")) {
+            autoCorrelation=true;
+            channelCount=2;
+            inputchannels=2;
+            firstchannel=1;
+        } else if (m.contains("A-CH0 ")) {
+            autoCorrelation=true;
+            channelCount=1;
+            inputchannels=1;
+            firstchannel=0;
+        } else if (m.contains("A-CH1 ")) {
+            autoCorrelation=true;
+            channelCount=1;
+            inputchannels=1;
+            firstchannel=1;
+        } else if (m.contains("A-CH2 ")) {
+            autoCorrelation=true;
+            channelCount=1;
+            inputchannels=1;
+            firstchannel=2;
+        } else if (m.contains("A-CH3 ")) {
+            autoCorrelation=true;
+            channelCount=1;
+            inputchannels=1;
+            firstchannel=3;
+        }
+
+        if (m.contains("C-CH0/1+1/0")) {
+            crossCorrelation=true;
+            channelCount=2;
+            inputchannels=2;
+            firstchannel=0;
+        } else if (m.contains("C-CH1/2+2/1")) {
+            crossCorrelation=true;
+            channelCount=2;
+            inputchannels=2;
+            firstchannel=1;
+        } else if (m.contains("C-CH2/3+3/2")) {
+            crossCorrelation=true;
+            channelCount=2;
+            inputchannels=2;
+            firstchannel=2;
+        } else if (m.contains("C-CH0/1") || m.contains("C-CH1/0")) {
+            crossCorrelation=true;
+            channelCount=2;
+            inputchannels=2;
+            firstchannel=0;
+
+        } else if (m.contains("C-CH1/2") || m.contains("C-CH2/1")) {
+            crossCorrelation=true;
+            channelCount=2;
+            inputchannels=2;
+            firstchannel=1;
+
+        } else if (m.contains("C-CH2/3") || m.contains("C-CH3/2")) {
+            crossCorrelation=true;
+            channelCount=2;
+            inputchannels=2;
+            firstchannel=2;
+        }
+
     }
 }

@@ -1,0 +1,59 @@
+date/time                   : 2014/05/11 13:18:44
+input file                  : ../HeLa_4xGFP_H2AmRFP__000.tif
+input description file      : ../HeLa_4xGFP_H2AmRFP__000.configuration.ini
+overview image file         : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.overview.tif
+overview image file real    : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.overview_float.tif
+overview std image          : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.overviewstd.tif
+background image file       : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.background.tif
+background stddev           : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.backgroundstd.tif
+uncorr. overview image file : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.overview_uncorrected.tif
+uncorr. overview std image  : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.overviewstd_uncorrected.tif
+video file                  : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.video.tif
+uncorrected video file      : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.videouncorr.tif
+statistics file             : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.statistics.dat
+background statistics file  : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.backstatistics.dat
+uncorrected statistics file : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.uncorrstatistics.dat
+statistics file DV1         : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.statistics_dv1.dat
+background statistics file DV1 : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.backstatistics_dv1.dat
+uncorrected statistics file DV1 : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.uncorrstatistics_dv1.dat
+statistics file DV2         : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.statistics_dv2.dat
+background statistics file DV2 : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.backstatistics_dv2.dat
+uncorrected statistics file DV2 : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.uncorrstatistics_dv2.dat
+width                       : 128
+height                      : 20
+frametime (ms)              : 0.53
+frametime (s)               : 0.00053
+dualview mode               : 1
+binning                     : 1
+interleaved binning         : false
+averaging binning           : false
+frame count in file         : 100000
+frame count                 : 100000
+first frame                 : 0
+last frame                  : 99999
+correlation segments        : 3
+correlator S                : 11
+correlator m                : 2
+correlator P                : 16
+correlator type             : 2
+correlator type name        : direct with averaging
+smallest tau [s]            : 0.00053
+baseline                    : 0
+video sum up                : 100
+video frames                : 1000
+video avgMin                : -2.59279
+video avgMax                : 236.984
+video uncorrected avgMin    : 90.12
+video uncorrected avgMax    : 315.56
+statistics over             : 100
+bleach correction           : remove mono-exponential(polynomial) f(t)=A*exp(-(t+f*t^2+f3*t^3+f4*t^4)/tau) using LM-Fit
+bleach average frames       : 40
+bleach amplitude file       : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.bleachamplitude.tif
+bleach time file            : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.bleachtime.tif
+bleach polynomial factor file : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.bleachpoly2.tif
+bleach polynomial factor 3 file : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.bleachpoly3.tif
+bleach polynomial factor 4 file : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.bleachpoly4.tif
+bleach fit success          : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.bleachfitok.tif
+bleach timeseries t file    : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.bleachfittimes.txt
+bleach timeseries I file    : HeLa_4xGFP_H2AmRFP__000_corrdirectavg_backimgoffset_bleachexpofpoly4_bin01_.bleachfitframes.tif
+duration [s]                : 389.937

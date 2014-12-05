@@ -56,9 +56,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \ingroup qf3rdrdp_imaging_fcs
 
 */
-class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDROverviewImageInterface, public QFRDRImageStackInterface, public QFRDRSimpleCountRatesInterface, public QFRDRImageSelectionInterface, public QFRDRRunSelectionTools, public QFRDRImageMaskTools {
+class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, public QFRDRImageToRunInterface, public QFRDRAdditionalImagesInterface, public QFRDRImageStackInterface, public QFRDRSimpleCountRatesInterface, public QFRDRImageSelectionInterface, public QFRDRRunSelectionTools, public QFRDRImageMaskTools {
         Q_OBJECT
-        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDROverviewImageInterface QFRDRImageStackInterface QFRDRSimpleCountRatesInterface QFRDRImageSelectionInterface QFRDRRunSelectionsInterface QFRDRImageMaskInterface)
+        Q_INTERFACES(QFRDRFCSDataInterface QFRDRImageToRunInterface QFRDRAdditionalImagesInterface QFRDRImageStackInterface QFRDRSimpleCountRatesInterface QFRDRImageSelectionInterface QFRDRRunSelectionsInterface QFRDRImageMaskInterface)
     public:
         enum DualViewMode {
             dvNone=0,
@@ -379,7 +379,7 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
             QString id;
             int width;
             int height;
-            QList<QFRDROverviewImageInterface::OverviewImageGeoElement> geoElements;
+            QList<QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement> geoElements;
 
             ovrImageData() {
                 image=NULL;
@@ -462,18 +462,18 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         bool indexIsDualView2(int32_t sel);
 
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageCount() */
-        virtual int getOverviewImageCount() const;
+        virtual int getAdditionalImagesCount() const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageWidth() */
-        virtual int getOverviewImageWidth(int image) const;
+        virtual int getAdditionalImagesWidth(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageHeight() */
-        virtual int getOverviewImageHeight(int image) const;
+        virtual int getAdditionalImagesHeight(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageName() */
-        virtual QString getOverviewImageName(int image) const;
+        virtual QString getAdditionalImagesName(int image) const;
         virtual QString getOverviewImageID(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImage() */
-        virtual double* getOverviewImage(int image) const;
+        virtual double* getAdditionalImage(int image) const;
         /** \copydoc QFRDROverviewImageInterface::getPreviewImageGeoElements() */
-        virtual QList<QFRDROverviewImageInterface::OverviewImageGeoElement> getOverviewImageAnnotations(int image) const;
+        virtual QList<QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement> getAdditionalImagesAnnotations(int image) const;
 
 
 

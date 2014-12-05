@@ -43,6 +43,7 @@ class QFRDRImageMaskTools : public QFRDRImageMaskInterface {
         virtual void maskInvert();
         virtual bool maskGet(uint32_t x, uint32_t y) const ;
         virtual bool* maskGet() const;
+        virtual void maskSet(const bool* mask) const;
         virtual uint32_t maskGetWidth() const;
         virtual uint32_t maskGetHeight() const;
         virtual long maskGetCount() const;

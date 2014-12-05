@@ -42,6 +42,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfimportermanager.h"
 #include "tools.h"
 #include "qfrdrimagemasktools.h"
+#include "imagetools.h"
 
 /*! \brief QFRawDataRecord implementation that manages a set of 4D image stacks (implemeting QFRDRImageStackInterface)
     \ingroup qf3rdrdp_image_stack

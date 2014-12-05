@@ -49,6 +49,7 @@ class QFRDRImageMaskInterface {
         virtual void maskInvert()=0;
         virtual bool maskGet(uint32_t x, uint32_t y) const =0;
         virtual bool* maskGet() const=0;
+        virtual void maskSet(const bool* mask) const=0;
         virtual uint32_t maskGetWidth() const=0;
         virtual uint32_t maskGetHeight() const=0;
         virtual void maskMaskChangedEvent()=0;

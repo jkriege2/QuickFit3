@@ -26,6 +26,7 @@
 #include <QDebug>
 #include "qftools.h"
 
+
 QFRDRImageMaskTools::QFRDRImageMaskTools()
 {
     mask=NULL;
@@ -202,6 +203,13 @@ bool QFRDRImageMaskTools::maskGet(uint32_t x, uint32_t y) const
 bool *QFRDRImageMaskTools::maskGet() const
 {
     return mask;
+}
+
+void QFRDRImageMaskTools::maskSet(const bool *mask) const
+{
+    for (int i=0; i<mask_w*mask_h; i++) {
+        this->mask[i]=mask[i];
+    }
 }
 
 uint32_t QFRDRImageMaskTools::maskGetWidth() const

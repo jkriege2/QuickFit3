@@ -587,9 +587,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     //img.name=tr("overview before acquisition");
                     img.name=tr("overview #%1 before: %2").arg(i+1).arg(files_desciptions.value(i, QFileInfo(files[i]).fileName()));
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
-                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement rect;
                         rect.title=tr("ROI");
-                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.type=QFRDRAdditionalImagesInterface::PIGErectangle;
                         rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
                         rect.width=fabs(getProperty("ROI_X_START").toDouble()-getProperty("ROI_X_END").toDouble());
                         rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
@@ -604,9 +604,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     //img.name=tr("overview after acquisition");
                     img.name=tr("overview #%1 after: %2").arg(i+1).arg(files_desciptions.value(i, QFileInfo(files[i]).fileName()));
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
-                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement rect;
                         rect.title=tr("ROI");
-                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.type=QFRDRAdditionalImagesInterface::PIGErectangle;
                         rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
                         rect.width=fabs(getProperty("ROI_X_START").toDouble()-getProperty("ROI_X_END").toDouble());
                         rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
@@ -620,9 +620,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("overview before acquisition (transm. illumination)");
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
-                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement rect;
                         rect.title=tr("ROI");
-                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.type=QFRDRAdditionalImagesInterface::PIGErectangle;
                         rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
                         rect.width=fabs(getProperty("ROI_X_START").toDouble()- getProperty("ROI_X_END").toDouble());
                         rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
@@ -636,9 +636,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("overview after acquisition (transm. illumination)");
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
-                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement rect;
                         rect.title=tr("ROI");
-                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.type=QFRDRAdditionalImagesInterface::PIGErectangle;
                         rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
                         rect.width=fabs(getProperty("ROI_X_START").toDouble()- getProperty("ROI_X_END").toDouble());
                         rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
@@ -652,9 +652,9 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=files_desciptions.value(i, ft);
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
-                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement rect;
                         rect.title=tr("ROI");
-                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.type=QFRDRAdditionalImagesInterface::PIGErectangle;
                         rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
                         rect.width=fabs(getProperty("ROI_X_START").toDouble()- getProperty("ROI_X_END").toDouble());
                         rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
@@ -2268,14 +2268,14 @@ void QFRDRImagingFCSData::leaveoutAddRun(int run) {
 
 
 
-int QFRDRImagingFCSData::getOverviewImageCount() const {
+int QFRDRImagingFCSData::getAdditionalImagesCount() const {
     if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") || isFCCS())) {
         return 4+ovrImages.size();
     }
     return 2+ovrImages.size();
 }
 
-int QFRDRImagingFCSData::getOverviewImageWidth(int image) const {
+int QFRDRImagingFCSData::getAdditionalImagesWidth(int image) const {
     if (image==0) return getImageFromRunsWidth();
     if (image==1) return getImageFromRunsWidth();
     if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") || isFCCS())) {
@@ -2288,7 +2288,7 @@ int QFRDRImagingFCSData::getOverviewImageWidth(int image) const {
     return 0;
 }
 
-int QFRDRImagingFCSData::getOverviewImageHeight(int image) const {
+int QFRDRImagingFCSData::getAdditionalImagesHeight(int image) const {
     if (image==0) return getImageFromRunsHeight();
     if (image==1) return getImageFromRunsHeight();
     if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") || isFCCS())) {
@@ -2302,7 +2302,7 @@ int QFRDRImagingFCSData::getOverviewImageHeight(int image) const {
     return 0;
 }
 
-QString QFRDRImagingFCSData::getOverviewImageName(int image) const {
+QString QFRDRImagingFCSData::getAdditionalImagesName(int image) const {
     if (internalDualViewMode()==QFRDRImagingFCSData::dvVertical && overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") || isFCCS())) {
         if ((image==0 && !overviewImagesSwapped())
           ||(image==2 && overviewImagesSwapped())) return tr("top overview image (time average)");
@@ -2348,7 +2348,7 @@ QString QFRDRImagingFCSData::getOverviewImageID(int image) const {
     return QString("");
 }
 
-double *QFRDRImagingFCSData::getOverviewImage(int image) const {
+double *QFRDRImagingFCSData::getAdditionalImage(int image) const {
     if (image==0) return overviewF;
     if (image==1) return overviewFSTD;
     if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") || isFCCS())) {
@@ -2361,8 +2361,8 @@ double *QFRDRImagingFCSData::getOverviewImage(int image) const {
     return NULL;
 }
 
-QList<QFRDROverviewImageInterface::OverviewImageGeoElement> QFRDRImagingFCSData::getOverviewImageAnnotations(int image) const {
-    QList<QFRDROverviewImageInterface::OverviewImageGeoElement> result;
+QList<QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement> QFRDRImagingFCSData::getAdditionalImagesAnnotations(int image) const {
+    QList<QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement> result;
     if (internalDualViewMode()!=QFRDRImagingFCSData::dvNone && overviewF2 && (propertyExists("INTERNAL_DUALVIEW_MODE_SWITCHEDCHANNEL") || isFCCS())) {
         if (image>3 && image-4<ovrImages.size()) return ovrImages[image-4].geoElements;
     } else {

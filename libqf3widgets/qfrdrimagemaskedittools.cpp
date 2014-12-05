@@ -25,6 +25,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qftools.h"
 #include <QClipboard>
 #include <QButtonGroup>
+#include "qfrdrmaskbyoverviewimagedlg.h"
 #define sqr(x) ((x)*(x))
 
 #define CLICK_UPDATE_TIMEOUT 500
@@ -80,6 +81,10 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
     actMaskBorder=new QAction(QIcon(":/qfrdrmaskeditor/maskborder.png"), tr("mask &border"), parentWidget);
     actMaskBorder->setToolTip(tr("mask a border around the image"));
     connect(actMaskBorder, SIGNAL(triggered()), this, SLOT(maskBorder()));
+
+    actMaskByImage=new QAction(tr("mask by image"), parentWidget);
+    actMaskByImage->setToolTip(tr("create a mask by segmenting an overview image"));
+    connect(actMaskByImage, SIGNAL(triggered()), this, SLOT(maskByImage()));
 
     actCopyMaskToGroup=new QAction(tr("copy mask to all files in same &group"), parentWidget);
     actCopyMaskToGroup->setToolTip(tr(""));
@@ -173,6 +178,7 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
     menuSpecials->addAction(actRedoMask);
     menuSpecials->addAction(actCopyMaskToGroup);
     menuSpecials->addAction(actMaskBorder);
+    menuSpecials->addAction(actMaskByImage);
 
     timUpdateAfterClick=new QTimer(this);
     timUpdateAfterClick->setSingleShot(true);
@@ -194,6 +200,7 @@ void QFRDRImageMaskEditTools::setRDR(QFRawDataRecord *rdr)
     this->rdr=rdr;
     imagemask=qobject_cast<QFRDRImageMaskInterface*>(rdr);
     runselection=qobject_cast<QFRDRRunSelectionsInterface*>(rdr);
+    overviewimages=qobject_cast<QFRDROverviewImagesInterface*>(rdr);
     actSaveMask->setVisible(imagemask||runselection);
     actLoadMask->setVisible(imagemask||runselection);
     actCopyMask->setVisible(imagemask||runselection);
@@ -204,6 +211,7 @@ void QFRDRImageMaskEditTools::setRDR(QFRawDataRecord *rdr)
     actCopyMaskToGroup->setVisible((imagemask||runselection) && rdr && rdr->getGroup()>=0);
     actMaskSelected->setVisible((imagemask||runselection)&&maskEditing&&selectionEditing);
     actUnmaskSelected->setVisible((imagemask||runselection)&&maskEditing&&selectionEditing);
+    actMaskByImage->setVisible(imagemask && overviewimages);
 
     if (rdr)  {
         undos=rdr->getProperty(settingsPrefix+"QFRDRImageMaskEditTools_undostack",QStringList()).toStringList();
@@ -584,6 +592,22 @@ void QFRDRImageMaskEditTools::maskBorder()
 
 }
 
+void QFRDRImageMaskEditTools::maskByImage()
+{
+    if (overviewimages && imagemask && overviewimages->getOverviewImageWidth()==imagemask->maskGetWidth() && overviewimages->getOverviewImageHeight()==imagemask->maskGetHeight()) {
+        QFRDRMaskByOverviewImage* dlg=new QFRDRMaskByOverviewImage(parentWidget);
+        dlg->init(overviewimages);
+        if (dlg->exec()) {
+            bool* m=dlg->getMaskWithOld(imagemask->maskGet());
+            imagemask->maskSet(m);
+            signalMaskChanged(false, false);
+            updateUndoActions();
+        }
+
+        delete dlg;
+    }
+}
+
 
 void QFRDRImageMaskEditTools::registerMaskToolsToMenu(QMenu *menu) const
 {
@@ -602,6 +626,7 @@ void QFRDRImageMaskEditTools::registerMaskToolsToMenu(QMenu *menu) const
     menu->addAction(actClearMask);
     menu->addAction(actInvertMask);
     menu->addAction(actMaskBorder);
+    menu->addAction(actMaskByImage);
 
 }
 

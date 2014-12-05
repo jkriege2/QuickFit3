@@ -36,9 +36,14 @@
 #include <QGroupBox>
 #include <QAbstractTableModel>
 #include "datacutslider.h"
-#include "qt/jkqtfastplotter.h"
 #include "jkqtptools.h"
 #include "qfhistogramview.h"
+#include "qfrdrimagemaskedittools.h"
+#include "qfparametercorrelationview.h"
+#include "qfenhancedcombobox.h"
+#include <QCheckBox>
+#include "qfdoubleedit.h"
+#include "jkqtpgeoelements.h"
 
 class QFRDRNumberAndBrightnessData; //forward
 
@@ -67,6 +72,8 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
         void updateHistograms();
 
         void imageZoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);
+
+        void updateCorrSelection();
     protected:
         /** \brief create widgets on object creation */
         void createWidgets();
@@ -81,9 +88,8 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
 
         void addPlotter( QFPlotter*& plotter, JKQTPMathImage*& plot, JKQTPOverlayImage*& plteSelected, JKQTPOverlayImage*& plteExcluded);
 
-        void reallocMem(int size);
+        void reallocMem(int width, int height);
 
-        void updateSelectionArrays();
 
 
         QColor selectionColor;
@@ -112,10 +118,32 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
         JKQTPOverlayImage* plteOverviewExcluded;
 
         JKQTPxyLineGraph* plteCorrelation;
+        JKQTPhorizontalRange* plteRangeB;
+        JKQTPverticalRange* plteRangeN;
 
         QFHistogramView* histNumber;
         QFHistogramView* histBrightness;
+        QFHistogramView* histIntensity;
+        QFParameterCorrelationView* widCorrelation;
         QTabWidget* tabMain;
+
+        QFEnhancedComboBox* cmbCorrelationP1;
+        QFEnhancedComboBox* cmbCorrelationP2;
+        QFEnhancedComboBox* cmbCorrelationPCol;
+
+        QFDoubleEdit* edtNMin;
+        QFDoubleEdit* edtNMax;
+        QFDoubleEdit* edtBMin;
+        QFDoubleEdit* edtBMax;
+        QCheckBox* chkRangeN;
+        QCheckBox* chkRangeB;
+
+        QToolBar* toolbar;
+
+        QPointer<QFRDRImageMaskEditTools> maskTools;
+
+
+        QMenu* menuMask;
 
 
 
@@ -126,13 +154,9 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
 
         /** \brief data in plteOverviewSelected */
         bool* plteOverviewSelectedData;
-        /** \brief data in plteOverviewExcluded */
-        bool* plteOverviewExcludedData;
         /** \brief size of plteOverviewSelectedData */
         int plotsSize;
 
-        /** \brief set which contains all currently selected runs */
-        QSet<int32_t> selected;
 
 };
 

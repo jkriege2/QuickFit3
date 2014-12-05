@@ -28,7 +28,9 @@
 #include <QString>
 #include <QList>
 
-/*! \brief represents a common data interface for preview images
+
+
+/*! \brief represents a common data interface for additional images
     \ingroup qf3rdrdp_imaging_fcs
 
     The functions in this interface allow to expose access to a set of overview images where each
@@ -38,9 +40,9 @@
     Also additional geometrical elements may be defined and returned as a list of
 
 */
-class QFRDROverviewImageInterface {
+class QFRDRAdditionalImagesInterface {
     public:
-        enum OverviewImageGeoElementType {
+        enum AdditionalImagesGeoElementType {
             PIGErectangle,
             PIGEtext,
             PIGEcircle,
@@ -60,8 +62,8 @@ class QFRDROverviewImageInterface {
               - \c PIGEcross draws a cross marker at (x,y)
             .
          */
-        struct OverviewImageGeoElement {
-            OverviewImageGeoElementType type;
+        struct AdditionalImagesGeoElement {
+            AdditionalImagesGeoElementType type;
             QString title;
             double x;
             double y;
@@ -69,14 +71,69 @@ class QFRDROverviewImageInterface {
             double height;
         };
 
-        virtual ~QFRDROverviewImageInterface() {}
+        virtual ~QFRDRAdditionalImagesInterface() {}
+
+        /** \brief returns the number of available preview images */
+        virtual int getAdditionalImagesCount() const =0;
+        /** \brief returns the width of the given image */
+        virtual int getAdditionalImagesWidth(int image) const=0;
+        /** \brief returns the height of the given image */
+        virtual int getAdditionalImagesHeight(int image) const=0;
+        /** \brief returns the name of the given image */
+        virtual QString getAdditionalImagesName(int image) const=0;
+
+        /*! \brief return a pointer to a double image of size getDataImageWidth() * getDataImageHeight()
+
+            This image can be used to allow the user to select points in the image, or just as an overview. E.g. for
+            imFCS-data this could simply be the averaged intensity of every pixel.
+
+            \return  a double image of size getDataImageWidth() * getDataImageHeight(), or NULL if no image is available
+         */
+        virtual double* getAdditionalImage(int image) const=0;
+        /*! \brief returns a list of geometrix elements overlayn to the image */
+        virtual QList<AdditionalImagesGeoElement> getAdditionalImagesAnnotations(int image) const=0;
+
+};
+
+Q_DECLARE_INTERFACE( QFRDRAdditionalImagesInterface,
+                     "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRAdditionalImagesInterface/1.0")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*! \brief represents a common data interface for overview images
+    \ingroup qf3rdrdp_imaging_fcs
+
+    All overview images have to have the same size.
+
+*/
+class QFRDROverviewImagesInterface {
+    public:
+
+        virtual ~QFRDROverviewImagesInterface() {}
 
         /** \brief returns the number of available preview images */
         virtual int getOverviewImageCount() const =0;
         /** \brief returns the width of the given image */
-        virtual int getOverviewImageWidth(int image) const=0;
+        virtual int getOverviewImageWidth() const=0;
         /** \brief returns the height of the given image */
-        virtual int getOverviewImageHeight(int image) const=0;
+        virtual int getOverviewImageHeight() const=0;
         /** \brief returns the name of the given image */
         virtual QString getOverviewImageName(int image) const=0;
 
@@ -88,13 +145,12 @@ class QFRDROverviewImageInterface {
             \return  a double image of size getDataImageWidth() * getDataImageHeight(), or NULL if no image is available
          */
         virtual double* getOverviewImage(int image) const=0;
-        /*! \brief returns a list of geometrix elements overlayn to the image */
-        virtual QList<OverviewImageGeoElement> getOverviewImageAnnotations(int image) const=0;
+
 
 };
 
-Q_DECLARE_INTERFACE( QFRDROverviewImageInterface,
-                     "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDROverviewImageInterface/1.0")
+Q_DECLARE_INTERFACE( QFRDROverviewImagesInterface,
+                     "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDROverviewImagesInterface/1.0")
 
 
 #endif // QFRDROVERVIEWIMAGEINTERFACE_H

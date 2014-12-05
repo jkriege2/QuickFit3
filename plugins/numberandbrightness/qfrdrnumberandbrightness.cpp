@@ -30,11 +30,14 @@
 #include "qfevaluationitemfactory.h"
 #include "qfimageplot.h"
 #include "imagetools.h"
+#include "libtiff_tools.h"
 
 QFRDRNumberAndBrightnessPlugin::QFRDRNumberAndBrightnessPlugin(QObject* parent):
     QObject(parent)
 {
     //constructor
+    TIFFSetWarningHandler(0);
+    TIFFSetErrorHandler(0);
 }
 
 QFRDRNumberAndBrightnessPlugin::~QFRDRNumberAndBrightnessPlugin()
@@ -208,6 +211,7 @@ void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
     int width=0;
     int height=0;
     bool overviewReal=false;
+    int dualview=0;
 
     QStringList more_files, more_files_types, more_files_descriptions;
 
@@ -284,6 +288,10 @@ void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
                     } else if (name=="crop y0") {
                         initParams["CROP_Y0"]=value.toInt();
                         paramsReadonly<<"CROP_Y0";
+                    } else if (name=="dualview mode") {
+                        initParams["DUALVIEW_MODE"]=value.toInt();
+                        dualview=value.toInt();
+                        paramsReadonly<<"DUALVIEW_MODE";
                     } else if (name=="crop y1") {
                         initParams["CROP_Y1"]=value.toInt();
                         paramsReadonly<<"CROP_Y1";
@@ -403,9 +411,21 @@ void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
             initParams["BACKGROUND_CORRECTED"]=true;
             paramsReadonly<<"BACKGROUND_CORRECTED";
 
+            paramsReadonly<<"SELECT_IMAGE_HALF";
 
+            QString dvname="";
+            if (dualview==1) {
+                dvname=tr(": left");
+                initParams["SELECT_IMAGE_HALF"]="left";
+                initParams["WIDTH"]=width/2;
+            }
+            if (dualview==2) {
+                dvname=tr(": top");
+                initParams["SELECT_IMAGE_HALF"]="top";
+                initParams["HEIGHT"]=height/2;
+            }
             // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
-            QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - N&B"), files, initParams, paramsReadonly, files_types, files_descriptions);
+            QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - N&B")+dvname, files, initParams, paramsReadonly, files_types, files_descriptions);
             if (!filename_acquisition.isEmpty()) {
                 e->setFolder(QFileInfo(filename_acquisition).baseName());
             }
@@ -414,6 +434,35 @@ void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
                 QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
                 services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
                 project->deleteRawData(e->getID());
+            }
+            QString group="";
+
+            if (dualview>0) {
+                if (dualview==1) {
+                    dvname=tr(": right");
+                    initParams["SELECT_IMAGE_HALF"]="right";
+                }
+                if (dualview==2) {
+                    dvname=tr(": bottom");
+                    initParams["SELECT_IMAGE_HALF"]="bottom";
+                }
+                // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
+                QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - N&B")+dvname, files, initParams, paramsReadonly, files_types, files_descriptions);
+                group=QFileInfo(filename).fileName();
+                if (!filename_acquisition.isEmpty()) {
+                    e->setFolder(QFileInfo(filename_acquisition).baseName());
+
+                }
+                e->setGroup(project->addOrFindRDRGroup(group));
+                if (!description.isEmpty()) e->setDescription(description);
+                if (e->error()) { // when an error occured: remove record and output an error message
+                    QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
+                    services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
+                    project->deleteRawData(e->getID());
+                }
+            }
+            if (e && group.size()>0) {
+                e->setGroup(project->addOrFindRDRGroup(group));
             }
 
             if (QFile::exists(filename_settings)) {
@@ -443,18 +492,18 @@ void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
 
 }
 
-QFRawDataRecord *QFRDRNumberAndBrightnessPlugin::insertPreprocessedFiles(const QString &filename_overview, const QString & filename_overviewstd, const QString & filename_background, const QString & filename_backgroundstddev)
+QFRawDataRecord *QFRDRNumberAndBrightnessPlugin::insertPreprocessedFiles(const QString &filename_overview, const QString & filename_overviewstd, const QString & filename_background, const QString & filename_backgroundstddev, bool filename_overviewstd_isVar, bool filename_backgroundstddev_isVar, const QMap<QString, QVariant>& iParams, const QStringList& iReadonly, const QString& group)
 {
     QFRawDataRecord* res=NULL;
     // here we store some initial parameters
-    QMap<QString, QVariant> initParams;
+    QMap<QString, QVariant> initParams=iParams;
     QString filename_settings="";
     QString filename_mask="";
     QString filename_video="";
     QString filename_acquisition="";
 
     // add all properties in initParams that will be readonly
-    QStringList paramsReadonly;
+    QStringList paramsReadonly=iReadonly;
 
     int width=0;
     int height=0;
@@ -471,7 +520,8 @@ QFRawDataRecord *QFRDRNumberAndBrightnessPlugin::insertPreprocessedFiles(const Q
     }
     if (QFile::exists(filename_overviewstd)) {
         files<<filename_overviewstd;
-        files_types<<"image_std";
+        if (filename_overviewstd_isVar) files_types<<"image_var";
+        else files_types<<"image_std";
         files_descriptions<<tr("standard deviation for overview image");
     }
     if (QFile::exists(filename_video)) {
@@ -501,7 +551,8 @@ QFRawDataRecord *QFRDRNumberAndBrightnessPlugin::insertPreprocessedFiles(const Q
     }
     if (QFile::exists(filename_backgroundstddev)) {
         files<<filename_backgroundstddev;
-        files_types<<"background_stddev";
+        if (filename_backgroundstddev_isVar) files_types<<"background_var";
+        else files_types<<"background_stddev";
         files_descriptions<<tr("background standard deviation frame");
     }
 
@@ -511,8 +562,8 @@ QFRawDataRecord *QFRDRNumberAndBrightnessPlugin::insertPreprocessedFiles(const Q
 
     QString description;
     parseSPIMSettings(filename_settings,  description,  initParams,  paramsReadonly,  files,  files_types,  files_descriptions);
-    initParams["WIDTH"]=width;
-    initParams["HEIGHT"]=height;
+    if (width>0) initParams["WIDTH"]=width;
+    if (height>0) initParams["HEIGHT"]=height;
 
     initParams["IS_OVERVIEW_SCALED"]=!overviewReal;
     paramsReadonly<<"IS_OVERVIEW_SCALED";
@@ -524,7 +575,9 @@ QFRawDataRecord *QFRDRNumberAndBrightnessPlugin::insertPreprocessedFiles(const Q
     QFRawDataRecord* e=res=project->addRawData(getID(), QFileInfo(filename_overview).fileName()+QString(" - N&B"), files, initParams, paramsReadonly, files_types, files_descriptions);
     if (!filename_acquisition.isEmpty()) {
         e->setFolder(QFileInfo(filename_acquisition).baseName());
+
     }
+    if (group.size()>0) e->setGroup(project->addOrFindRDRGroup(group));;
     if (!description.isEmpty()) e->setDescription(description);
     if (e->error()) { // when an error occured: remove record and output an error message
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename_overview).arg(e->errorDescription()));
@@ -587,8 +640,18 @@ void QFRDRNumberAndBrightnessPlugin::startNANDBFromPreprocessedFilesWizard()
     filters<<tr("TIFF files (*.tif)");
     wizSelfiles->addFileSelection("intensity average:", filters, true);
     wizSelfiles->addFileSelection("intensity std.dev.:", filters, true);
+    QComboBox* cmbImageVar=new QComboBox(wizSelfiles);
+    cmbImageVar->addItem("standard deviation image");
+    cmbImageVar->addItem("variance image");
+    cmbImageVar->setCurrentIndex(0);
+    wizSelfiles->addRow("", cmbImageVar);
     wizSelfiles->addFileSelection("background average:", filters, true);
     wizSelfiles->addFileSelection("background std.dev.:", filters, true);
+    QComboBox* cmbBackVar=new QComboBox(wizSelfiles);
+    cmbBackVar->addItem("standard deviation image");
+    cmbBackVar->addItem("variance image");
+    cmbBackVar->setCurrentIndex(0);
+    wizSelfiles->addRow("", cmbBackVar);
     wizSelfiles->setSettingsIDs("number_and_brightness/last_preprocfileswizard_dir", "number_and_brightness/last_preprocfileswizard_filter");
     wizSelfiles->setOnlyOneFormatAllowed(true);
 
@@ -613,6 +676,17 @@ void QFRDRNumberAndBrightnessPlugin::startNANDBFromPreprocessedFilesWizard()
         wizLSAnalysisImgPreview->addRow(tr("pixel size"), wizPixelSize);
     }
 
+    QComboBox* cmbSubSelect=new QComboBox(wizSelfiles);
+    cmbSubSelect->addItem("full image");
+    cmbSubSelect->addItem("left half");
+    cmbSubSelect->addItem("right half");
+    cmbSubSelect->addItem("top half");
+    cmbSubSelect->addItem("bottom half");
+    cmbSubSelect->addItem("left+right half");
+    cmbSubSelect->addItem("top+bottom half");
+    connect(cmbSubSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(wizSubimagesChanged(int)));
+    cmbSubSelect->setCurrentIndex(0);
+    wizLSAnalysisImgPreview->addRow("", cmbSubSelect);
     wizLSAnalysisImgPreview->addRow(tr("image width:"), wizLabWidth);
     wizLSAnalysisImgPreview->addRow(tr("image height:"), wizLabHeight);
 
@@ -629,17 +703,39 @@ void QFRDRNumberAndBrightnessPlugin::startNANDBFromPreprocessedFilesWizard()
 
         QStringList files=wizSelfiles->files();
         QString filterid=wizSelfiles->fileFilterIDs().value(0);
+        int subselect=cmbSubSelect->currentIndex();
         //qDebug()<<"OK"<<files<<filters;
         if (files.size()>0 && !filterid.isEmpty()) {
 
             //qDebug()<<filterid<<files;
-            QFRawDataRecord* e=insertPreprocessedFiles(files[0], files[1], files[2], files[3]);
+            QMap<QString, QVariant> iParams;
+            QStringList iReadonly;
+            iReadonly<<"PIXEL_WIDTH"<<"PIXEL_HEIGHT"<<"WIDTH"<<"HEIGHT"<<"SELECT_IMAGE_HALF";
+            QString ename="";
+            if (wizPixelSize) iParams["PIXEL_WIDTH"]=wizPixelSize->value();
+            if (wizPixelSize) iParams["PIXEL_HEIGHT"]=wizPixelSize->value();
+            iParams["WIDTH"]=wizRDRImageWidth;
+            iParams["HEIGHT"]=wizRDRImageHeight;
+            if (subselect==1 || subselect==5) {iParams["SELECT_IMAGE_HALF"]="left"; ename+=tr(" - left");}
+            if (subselect==2){ iParams["SELECT_IMAGE_HALF"]="right"; ename+=tr(" - right");}
+            if (subselect==3 || subselect==6) {iParams["SELECT_IMAGE_HALF"]="top"; ename+=tr(" - top");}
+            if (subselect==4) {iParams["SELECT_IMAGE_HALF"]="bottom"; ename+=tr(" - bottom");}
+            QString group;
+            if (subselect>=5) group=QFileInfo(files[0]).fileName();
 
+            QFRawDataRecord* e=insertPreprocessedFiles(files[0], files[1], files[2], files[3], cmbImageVar->currentIndex()==1, cmbSubSelect->currentIndex()==1, iParams, iReadonly, group);
             if (e)  {
-                if (wizPixelSize) e->setQFProperty("PIXEL_WIDTH", wizPixelSize->value(), false, true);
-                if (wizPixelSize) e->setQFProperty("PIXEL_HEIGHT", wizPixelSize->value(), false, true);
-                if (wizLabWidth && wizLabWidth->text().size()>0) e->setQFProperty("WIDTH", wizLabWidth->text().toInt(), false, true);
-                if (wizLabHeight && wizLabHeight->text().size()>0) e->setQFProperty("HEIGHT", wizLabHeight->text().toInt(), false, true);
+                e->setName(e->getName()+ename);
+            }
+
+            if (subselect>=5) {
+                ename="";
+                if (subselect==5) {iParams["SELECT_IMAGE_HALF"]="right"; ename+=tr(" - right");}
+                if (subselect==6) {iParams["SELECT_IMAGE_HALF"]="bottom"; ename+=tr(" - bottom");}
+                e=insertPreprocessedFiles(files[0], files[1], files[2], files[3], cmbImageVar->currentIndex()==1, cmbSubSelect->currentIndex()==1, iParams, iReadonly, group);
+                if (e)  {
+                    e->setName(e->getName()+ename);
+                }
             }
 
 
@@ -670,6 +766,10 @@ void QFRDRNumberAndBrightnessPlugin::wizImgPreviewOnValidate(QWizardPage *page, 
             }
         }
 
+        wizFileImageWidth=width;
+        wizFileImageHeight=height;
+        wizRDRImageWidth=wizFileImageWidth;
+        wizRDRImageHeight=wizFileImageHeight;
         if (wizLabWidth) {
             wizLabWidth->setText(QString::number(width));
         }
@@ -686,6 +786,57 @@ void QFRDRNumberAndBrightnessPlugin::wizMaskChanged(int masksize)
     if (wizLSAnalysisImgPreview) {
         wizLSAnalysisImgPreview->getImagePlot()->setMaskAround(masksize);
     }
+}
+
+void QFRDRNumberAndBrightnessPlugin::wizSubimagesChanged(int index)
+{
+    int newwidth, newheight;
+    if (index==0) {
+        newwidth=wizFileImageWidth;
+        newheight=wizFileImageHeight;
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->resetROI();
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->resetROI2();
+    } else if (index==1) {
+        newwidth=wizFileImageWidth;
+        newheight=wizFileImageHeight/2;
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->setROI(0,0,newwidth, newheight);
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->resetROI2();
+    } else if (index==2) {
+        newwidth=wizFileImageWidth;
+        newheight=wizFileImageHeight/2;
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->setROI(newwidth,0,newwidth, newheight);
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->resetROI2();
+    } else if (index==3) {
+        newwidth=wizFileImageWidth/2;
+        newheight=wizFileImageHeight;
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->setROI(0,0,newwidth, newheight);
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->resetROI2();
+    } else if (index==4) {
+        newwidth=wizFileImageWidth/2;
+        newheight=wizFileImageHeight;
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->setROI(0,newheight,newwidth, newheight);
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->resetROI2();
+    } else if (index==5) {
+        newwidth=wizFileImageWidth/2;
+        newheight=wizFileImageHeight;
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->setROI(0,0,newwidth, newheight);
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->setROI2(newwidth,0,newwidth, newheight);
+    } else if (index==6) {
+        newwidth=wizFileImageWidth;
+        newheight=wizFileImageHeight/2;
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->setROI(0,0,newwidth, newheight);
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->setROI2(0,newheight,newwidth, newheight);
+    }
+
+    if (wizLabWidth) {
+        wizLabWidth->setText(tr("%1   [file width: %2]").arg(newwidth).arg(wizFileImageWidth));
+    }
+    if (wizLabHeight) {
+        wizLabHeight->setText(tr("%1   [file width: %2]").arg(newheight).arg(wizFileImageHeight));
+    }
+    wizRDRImageWidth=newwidth;
+    wizRDRImageHeight=newheight;
+
 }
 
 

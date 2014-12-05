@@ -401,8 +401,8 @@ void QFRDRImageStackDataEditor::showFrame(int frame, bool startPlayer) {
             selection=(bool*)qfRealloc(selection, width*height*sizeof(bool));
             selectionWidth=width;
             selectionHeight=height;
-            if (selection) for (int i=0; i<width*height; i++) selection[i]=false;
         }
+        if (selection) for (int i=0; i<width*height; i++) selection[i]=false;
 
         plteOverviewSelected->set_data(selection, width, height);
         plteOverviewSelected->set_width(width);

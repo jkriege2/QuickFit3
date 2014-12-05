@@ -113,6 +113,7 @@ void* qfRealloc (void* ptr, size_t size) {
 }
 
 void qfFree(void* data) {
+    if (!data) return;
 #ifndef QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC
     QMutexLocker locker(&qfallocationMutex);
 #endif

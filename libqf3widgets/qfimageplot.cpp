@@ -76,6 +76,38 @@ void QFImagePlot::setMaskAround(int size)
     new_plots();
 }
 
+void QFImagePlot::setROI(double x, double y, double width, double height)
+{
+    setROI(QRectF(x,y,width,height));
+}
+
+void QFImagePlot::setROI(QRectF r)
+{
+    roi=r;
+    new_plots();
+}
+
+void QFImagePlot::resetROI()
+{
+    setROI(QRectF());
+}
+
+void QFImagePlot::setROI2(double x, double y, double width, double height)
+{
+    setROI2(QRectF(x,y,width,height));
+}
+
+void QFImagePlot::setROI2(QRectF r)
+{
+    roi2=r;
+    new_plots();
+}
+
+void QFImagePlot::resetROI2()
+{
+    setROI2(QRectF());
+}
+
 void QFImagePlot::update_plot()
 {
     if (!plteImage || !image_data || image_width<=0 || image_height<=0) return;
@@ -103,6 +135,8 @@ void QFImagePlot::clear()
     plteImage=NULL;
     plteMask=NULL;
     ui->histogram->clear();
+    roi=QRect();
+    roi2=QRect();
     clearData();
 }
 
@@ -110,6 +144,7 @@ void QFImagePlot::clearData()
 {
     if (image_data) qfFree(image_data);
     if (mask) qfFree(mask);
+    roi=QRect();
     mask=NULL;
     image_data=NULL;
     image_width=0;
@@ -161,6 +196,14 @@ void QFImagePlot::new_plots()
         plteMask->set_trueColor(Qt::darkGray);
         plteMask->set_falseColor(Qt::transparent);
         plt->addGraph(plteMask);
+    }
+    if (roi.width()>0 && roi.height()>0) {
+        plteROI=new JKQTPgeoRectangle(plt, roi.center().x()+0.5, roi.center().y()+0.5, roi.width()-1.0, roi.height()-1.0, QColor("red"));
+        plt->addGraph(plteROI);
+    }
+    if (roi2.width()>0 && roi2.height()>0) {
+        plteROI2=new JKQTPgeoRectangle(plt, roi2.center().x()+0.5, roi2.center().y()+0.5, roi2.width()-1.0, roi2.height()-1.0, QColor("blue"));
+        plt->addGraph(plteROI2);
     }
 
     ui->image->set_doDrawing(true);

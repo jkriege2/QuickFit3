@@ -86,7 +86,7 @@ class QFRDRNumberAndBrightnessPlugin : public QObject, public QFPluginRawDataRec
         /** \brief insertdata from file*/
         void insertFromImFCSRecord();
         void insertImFCSFile(const QString &filename);
-        QFRawDataRecord* insertPreprocessedFiles(const QString &filename_overview, const QString &filename_overviewstd, const QString &filename_background, const QString &filename_backgroundstddev);
+        QFRawDataRecord* insertPreprocessedFiles(const QString &filename_overview, const QString &filename_overviewstd, const QString &filename_background, const QString &filename_backgroundstddev, bool filename_overviewstd_isVar=false, bool filename_backgroundstddev_isVar=false, const QMap<QString, QVariant> &iParams=QMap<QString, QVariant>(), const QStringList &iReadonly=QStringList(), const QString &group=QString());
 
         /** \brief insert record, if it is not yet contained in the project! */
         void insertProjectRecord(const QString& type, const QString& name, const QString& filename, const QString& description=QString(""), const QString& directory=QString(""), const QMap<QString,QVariant>& init_params=QFStringVariantMap(), const QStringList& init_params_readonly=QStringList());
@@ -96,6 +96,7 @@ class QFRDRNumberAndBrightnessPlugin : public QObject, public QFPluginRawDataRec
 
         void wizImgPreviewOnValidate(QWizardPage *page, QWizardPage *userPage);
         void wizMaskChanged(int masksize);
+        void wizSubimagesChanged(int index);
     protected:
         QPointer<QDoubleSpinBox> wizPixelSize;
         QPointer<QSpinBox> wizMaskSize;
@@ -106,6 +107,10 @@ class QFRDRNumberAndBrightnessPlugin : public QObject, public QFPluginRawDataRec
         QPointer<QFSelectFilesWizardPage> wizSelfiles;
         QPointer<QLabel> wizLabWidth;
         QPointer<QLabel> wizLabHeight;
+        int wizFileImageWidth;
+        int wizFileImageHeight;
+        int wizRDRImageWidth;
+        int wizRDRImageHeight;
 
 };
 

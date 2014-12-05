@@ -786,7 +786,19 @@ void QFRDRImagingFCSPlugin::insertNandBFromVideoCorrelatorFile(const QString& ev
                 QStringList init_params_readonly=paramsReadonly;
                 init_params["BACKGROUND_CORRECTED"]=true;
                 init_params_readonly<<"BACKGROUND_CORRECTED";
-                insertProjectRecordFiles("number_and_brightness", fi.fileName()+tr(" - number & brightness"), ffiles, role, group, ffile_types, ffiles_descriptions, description, folder, init_params, init_params_readonly, props, comment);
+                if (internalDualViewMode==1) {
+                    init_params["SELECT_IMAGE_HALF"]="left";
+                    insertProjectRecordFiles("number_and_brightness", fi.fileName()+tr(" - number & brightness: left"), ffiles, role, group, ffile_types, ffiles_descriptions, description, folder, init_params, init_params_readonly, props, comment);
+                    init_params["SELECT_IMAGE_HALF"]="right";
+                    insertProjectRecordFiles("number_and_brightness", fi.fileName()+tr(" - number & brightness: right"), ffiles, role, group, ffile_types, ffiles_descriptions, description, folder, init_params, init_params_readonly, props, comment);
+                } else if (internalDualViewMode==2) {
+                    init_params["SELECT_IMAGE_HALF"]="top";
+                    insertProjectRecordFiles("number_and_brightness", fi.fileName()+tr(" - number & brightness: top"), ffiles, role, group, ffile_types, ffiles_descriptions, description, folder, init_params, init_params_readonly, props, comment);
+                    init_params["SELECT_IMAGE_HALF"]="bottom";
+                    insertProjectRecordFiles("number_and_brightness", fi.fileName()+tr(" - number & brightness: bottom"), ffiles, role, group, ffile_types, ffiles_descriptions, description, folder, init_params, init_params_readonly, props, comment);
+                } else {
+                    insertProjectRecordFiles("number_and_brightness", fi.fileName()+tr(" - number & brightness"), ffiles, role, group, ffile_types, ffiles_descriptions, description, folder, init_params, init_params_readonly, props, comment);
+                }
             }
 
             if (QFile::exists(filename_settings)) {

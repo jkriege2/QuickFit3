@@ -22,11 +22,14 @@
 
 #include "qfrdrnumberandbrightness_dataeditor.h"
 #include "qfrdrnumberandbrightness_data.h"
+#include "qfrawdatapropertyeditor.h"
 
 
 QFRDRNumberAndBrightnessDataEditor::QFRDRNumberAndBrightnessDataEditor(QFPluginServices* services,  QFRawDataPropertyEditor*  propEditor, QWidget* parent):
     QFRawDataEditor(services, propEditor, parent)
 {
+    maskTools=new QFRDRImageMaskEditTools(this, QString("QFRDRNumberAndBrightnessDataEditor/maskTools/"));
+
     QColor ovlSelCol=QColor("red");
     ovlSelCol.setAlphaF(0.5);
     selectionColor=ovlSelCol;
@@ -35,13 +38,14 @@ QFRDRNumberAndBrightnessDataEditor::QFRDRNumberAndBrightnessDataEditor(QFPluginS
     excludedColor=ovlExCol;
 
 
+
     plteNumberData=NULL;
     plteBrightnessData=NULL;
     plteOverviewData=NULL;
     plteCorrelationData=NULL;
 
     plteOverviewSelectedData=NULL;
-    plteOverviewExcludedData=NULL;
+    //plteOverviewExcludedData=NULL;
     plotsSize=0;
 
     createWidgets();
@@ -49,7 +53,7 @@ QFRDRNumberAndBrightnessDataEditor::QFRDRNumberAndBrightnessDataEditor(QFPluginS
 
 QFRDRNumberAndBrightnessDataEditor::~QFRDRNumberAndBrightnessDataEditor()
 {
-    reallocMem(0);
+    reallocMem(0,0);
 }
 
 
@@ -90,14 +94,22 @@ void QFRDRNumberAndBrightnessDataEditor::addPlotter(QFPlotter *&plotter, JKQTPMa
 
 }
 
-void QFRDRNumberAndBrightnessDataEditor::reallocMem(int size) {
+void QFRDRNumberAndBrightnessDataEditor::reallocMem(int width, int height) {
+    int size=width*height;
     if (size==0) {
         qfFree(plteNumberData);
+        plteNumberData=NULL;
         qfFree(plteBrightnessData);
+        plteBrightnessData=NULL;
         qfFree(plteOverviewData);
+        plteOverviewData=NULL;
         qfFree(plteCorrelationData);
+        plteCorrelationData=NULL;
         qfFree(plteOverviewSelectedData);
-        qfFree(plteOverviewExcludedData);
+        plteOverviewSelectedData=NULL;
+        /*qfFree(plteOverviewExcludedData);
+        plteOverviewExcludedData=NULL;*/
+        plotsSize=0;
     } else if (size!=plotsSize) {
         plotsSize=size;
         plteNumberData=(double*)qfRealloc(plteNumberData, plotsSize*sizeof(double));
@@ -106,12 +118,20 @@ void QFRDRNumberAndBrightnessDataEditor::reallocMem(int size) {
         plteCorrelationData=(double*)qfRealloc(plteCorrelationData, plotsSize*sizeof(double));
 
         plteOverviewSelectedData=(bool*)qfRealloc(plteOverviewSelectedData, plotsSize*sizeof(bool));
-        plteOverviewExcludedData=(bool*)qfRealloc(plteOverviewExcludedData, plotsSize*sizeof(bool));
-        for (int i=0; i<plotsSize; i++) {
-            plteOverviewSelectedData[i]=false;
-            plteOverviewExcludedData[i]=false;
+        //plteOverviewExcludedData=(bool*)qfRealloc(plteOverviewExcludedData, plotsSize*sizeof(bool));
+    }
+    for (int i=0; i<plotsSize; i++) {
+        plteOverviewSelectedData[i]=false;
+    }
+
+    if (maskTools) {
+        maskTools->setAllowEditSelection(plteOverviewSelectedData&&(width>0)&&(height>0), plteOverviewSelectedData, width, height);
+        if (size>0) {
+            maskTools->setMaskEditing(true);
+            maskTools->setEditingMode(0);
         }
     }
+
 }
 
 void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
@@ -122,23 +142,32 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
     layMain->addWidget(tabMain);
 
     QGridLayout* layPlots=new QGridLayout();
+    int row=0;
     QWidget* widPlots=new QWidget(this);
     widPlots->setLayout(layPlots);
     tabMain->addTab(widPlots, tr("image plots"));
 
+    toolbar=new QToolBar(tr("toolbar"), this);
+    layPlots->addWidget(toolbar, row, 0, 1, 2);
+    row++;
+
     addPlotter(pltNumber, plteNumber, plteNumberSelected, plteNumberExcluded);
     pltNumber->get_plotter()->set_plotLabel(tr("particle number"));
-    layPlots->addWidget(pltNumber, 0,0);
+    layPlots->addWidget(pltNumber, row,0);
+    maskTools->registerPlotter(pltNumber);
 
     addPlotter(pltBrightness, plteBrightness, plteBrightnessSelected, plteBrightnessExcluded);
     pltBrightness->get_plotter()->set_plotLabel(tr("particle brightness"));
-    layPlots->addWidget(pltBrightness, 0,1);
+    layPlots->addWidget(pltBrightness, row,1);
     pltBrightness->get_plotter()->useExternalDatastore(pltNumber->getDatastore());
+    maskTools->registerPlotter(pltBrightness);
+    row++;
 
     addPlotter(pltOverview, plteOverview, plteOverviewSelected, plteOverviewExcluded);
     pltOverview->get_plotter()->set_plotLabel(tr("intensity"));
-    layPlots->addWidget(pltOverview, 1,0);
+    layPlots->addWidget(pltOverview, row,0);
     pltOverview->get_plotter()->useExternalDatastore(pltNumber->getDatastore());
+    maskTools->registerPlotter(pltOverview);
 
     pltCorrelation=new QFPlotter(this);
     pltCorrelation->get_plotter()->useExternalDatastore(pltNumber->getDatastore());
@@ -161,7 +190,105 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
 
     plteCorrelation=new JKQTPxyLineGraph(pltCorrelation->get_plotter());
     pltCorrelation->addGraph(plteCorrelation);
-    layPlots->addWidget(pltCorrelation, 1,1);
+
+    plteRangeB=new JKQTPhorizontalRange(pltCorrelation->get_plotter());
+    plteRangeB->set_visible(false);
+    plteRangeB->set_unlimitedSizeMin(true);
+    plteRangeB->set_unlimitedSizeMax(true);
+    plteRangeB->set_invertedRange(true);
+    plteRangeB->set_fillRange(true);
+    plteRangeB->set_plotCenterLine(false);
+    pltCorrelation->addGraph(plteRangeB);
+    plteRangeN=new JKQTPverticalRange(pltCorrelation->get_plotter());
+    plteRangeN->set_visible(false);
+    plteRangeN->set_unlimitedSizeMin(true);
+    plteRangeN->set_unlimitedSizeMax(true);
+    plteRangeN->set_invertedRange(true);
+    plteRangeN->set_fillRange(true);
+    plteRangeN->set_plotCenterLine(false);
+    pltCorrelation->addGraph(plteRangeN);
+
+
+    layPlots->addWidget(pltCorrelation, row,1);
+    row++;
+
+    QGroupBox* grp=new QGroupBox(tr(" selection in correlation plot "), this);
+    layPlots->addWidget(grp, row, 0, 1, 2);
+    QHBoxLayout* laySelCor=new QHBoxLayout();
+    grp->setLayout(laySelCor);
+
+    chkRangeN=new QCheckBox(tr("range on N:  "), grp);
+    chkRangeN->setChecked(false);
+    laySelCor->addWidget(chkRangeN);
+    edtNMin=new QFDoubleEdit(grp);
+    laySelCor->addWidget(edtNMin);
+    edtNMin->setEnabled(false);
+    edtNMin->setCheckBounds(true, false);
+    edtNMin->setMinimum(0);
+    connect(chkRangeN, SIGNAL(toggled(bool)), edtNMin, SLOT(setEnabled(bool)));
+
+    laySelCor->addWidget(new QLabel(" ... "));
+
+    edtNMax=new QFDoubleEdit(grp);
+    laySelCor->addWidget(edtNMax);
+    edtNMax->setEnabled(false);
+    edtNMax->setCheckBounds(true, false);
+    edtNMax->setMinimum(0);
+    connect(chkRangeN, SIGNAL(toggled(bool)), edtNMax, SLOT(setEnabled(bool)));
+
+    laySelCor->addStretch();
+
+    chkRangeB=new QCheckBox(tr("range on B:  "), grp);
+    chkRangeB->setChecked(false);
+    laySelCor->addWidget(chkRangeB);
+    edtBMin=new QFDoubleEdit(grp);
+    laySelCor->addWidget(edtBMin);
+    edtBMin->setEnabled(false);
+    edtBMin->setCheckBounds(true, false);
+    edtBMin->setMinimum(0);
+    connect(chkRangeB, SIGNAL(toggled(bool)), edtBMin, SLOT(setEnabled(bool)));
+
+
+    laySelCor->addWidget(new QLabel(" ... "));
+
+    edtBMax=new QFDoubleEdit(grp);
+    laySelCor->addWidget(edtBMax);
+    edtBMax->setEnabled(false);
+    edtBMax->setCheckBounds(true, false);
+    edtBMax->setMinimum(0);
+    connect(chkRangeB, SIGNAL(toggled(bool)), edtBMax, SLOT(setEnabled(bool)));
+
+
+    laySelCor->addStretch();
+
+    QPushButton* btnUpdate;
+    laySelCor->addWidget(btnUpdate=new QPushButton(tr("update selection"), grp));
+    connect(btnUpdate, SIGNAL(clicked()), this, SLOT(updateCorrSelection()));
+
+
+
+    toolbar->addAction(pltOverview->get_plotter()->get_actZoomAll());
+    toolbar->addAction(pltOverview->get_plotter()->get_actZoomIn());
+    toolbar->addAction(pltOverview->get_plotter()->get_actZoomOut());
+    toolbar->addSeparator();
+    maskTools->registerMaskToolsToToolbar(toolbar);
+    toolbar->addSeparator();
+    maskTools->registerPlotterMaskToolsToToolbar(toolbar);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -174,9 +301,64 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
 
     histNumber=new QFHistogramView(this);
     histBrightness=new QFHistogramView(this);
+    histIntensity=new QFHistogramView(this);
+    layHistogram->addWidget(histIntensity);
     layHistogram->addWidget(histNumber);
     layHistogram->addWidget(histBrightness);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    QGridLayout* layCorrelation=new QGridLayout();
+    QWidget* wwidCorrelation=new QWidget(this);
+    wwidCorrelation->setLayout(layCorrelation);
+    tabMain->addTab(wwidCorrelation, tr("correlations"));
+
+    widCorrelation=new QFParameterCorrelationView(this);
+    cmbCorrelationP1=new QFEnhancedComboBox(this);
+    cmbCorrelationP1->addItem(tr("particle number"), "N");
+    cmbCorrelationP1->addItem(tr("brightness"), "EPSILON");
+    cmbCorrelationP1->addItem(tr("intensity"), "INTENSITY");
+    cmbCorrelationP2=new QFEnhancedComboBox(this);
+    cmbCorrelationP2->addItem(tr("brightness"), "EPSILON");
+    cmbCorrelationP2->addItem(tr("particle number"), "N");
+    cmbCorrelationP2->addItem(tr("intensity"), "INTENSITY");
+    cmbCorrelationPCol=new QFEnhancedComboBox(this);
+    cmbCorrelationPCol->addItem(tr("---"), "NONE");
+    cmbCorrelationPCol->addItem(tr("intensity"), "INTENSITY");
+    cmbCorrelationPCol->addItem(tr("particle number"), "N");
+    cmbCorrelationPCol->addItem(tr("brightness"), "EPSILON");
+    layCorrelation->addWidget(new QLabel("x-parameter: "), 0, 0);
+    layCorrelation->addWidget(cmbCorrelationP1, 0, 1);
+    layCorrelation->addWidget(new QLabel("y-parameter: "), 0, 2);
+    layCorrelation->addWidget(cmbCorrelationP2, 0, 3);
+    layCorrelation->addWidget(new QLabel("color-parameter: "), 0, 4);
+    layCorrelation->addWidget(cmbCorrelationPCol, 0, 5);
+    layCorrelation->addWidget(widCorrelation,1,0,1,7);
+    layCorrelation->setRowStretch(1,1);
+    layCorrelation->setColumnStretch(6,1);
+
+
+
+
+
+
+
+
+
+    menuMask=propertyEditor->addMenu("&Mask", 0);
+    maskTools->registerMaskToolsToMenu(menuMask);
 }
 
 void QFRDRNumberAndBrightnessDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
@@ -188,14 +370,46 @@ void QFRDRNumberAndBrightnessDataEditor::connectWidgets(QFRawDataRecord* current
     if (old) {
         savePlotSettings();
         disconnect(old, 0, this, 0); // first disconnect from last record
+        disconnect(maskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
+        disconnect(chkRangeN, SIGNAL(toggled(bool)), this, SLOT(updateCorrSelection()));
+        disconnect(edtNMin, SIGNAL(valueChanged(double)), this, SLOT(updateCorrSelection()));
+        disconnect(edtNMax, SIGNAL(valueChanged(double)), this, SLOT(updateCorrSelection()));
+        disconnect(chkRangeB, SIGNAL(toggled(bool)), this, SLOT(updateCorrSelection()));
+        disconnect(edtBMin, SIGNAL(valueChanged(double)), this, SLOT(updateCorrSelection()));
+        disconnect(edtBMax, SIGNAL(valueChanged(double)), this, SLOT(updateCorrSelection()));
+        disconnect(cmbCorrelationP1, SIGNAL(currentIndexChanged(int)), this, SLOT(updateHistograms()));
+        disconnect(cmbCorrelationP2, SIGNAL(currentIndexChanged(int)), this, SLOT(updateHistograms()));
+        disconnect(cmbCorrelationPCol, SIGNAL(currentIndexChanged(int)), this, SLOT(updateHistograms()));
     }
     QFRDRNumberAndBrightnessData* m=qobject_cast<QFRDRNumberAndBrightnessData*>(current); // check whether we have the right QFRawDataRecord class
     if (m) {
+        reallocMem(m->getWidth(), m->getHeight());
+        maskTools->setRDR(current);
         m->recalcNumberAndBrightness();
-		// if so (and if current!=NULL anyways), connect to the new record and read some data
+        chkRangeB->setChecked(m->getQFProperty("QFRDRNumberAndBrightnessDataEditor/chkRangeB", false).toBool());
+        chkRangeN->setChecked(m->getQFProperty("QFRDRNumberAndBrightnessDataEditor/chkRangeN", false).toBool());
+        edtNMin->setValue(m->getQFProperty("QFRDRNumberAndBrightnessDataEditor/edtNMin", statisticsMin(m->getNumberImage(), m->getWidth()*m->getHeight())).toDouble());
+        edtNMax->setValue(m->getQFProperty("QFRDRNumberAndBrightnessDataEditor/edtNMax", statisticsMax(m->getNumberImage(), m->getWidth()*m->getHeight())).toDouble());
+        edtBMin->setValue(m->getQFProperty("QFRDRNumberAndBrightnessDataEditor/edtBMin", statisticsMin(m->getBrightnessImage(), m->getWidth()*m->getHeight())).toDouble());
+        edtBMax->setValue(m->getQFProperty("QFRDRNumberAndBrightnessDataEditor/edtBMax", statisticsMax(m->getBrightnessImage(), m->getWidth()*m->getHeight())).toDouble());
+        cmbCorrelationP1->setCurrentIndex(m->getQFProperty("QFRDRNumberAndBrightnessDataEditor/cmbCorrelationP1", 0).toBool());
+        cmbCorrelationP2->setCurrentIndex(m->getQFProperty("QFRDRNumberAndBrightnessDataEditor/cmbCorrelationP2", 0).toInt());
+        cmbCorrelationPCol->setCurrentIndex(m->getQFProperty("QFRDRNumberAndBrightnessDataEditor/cmbCorrelationPCol", 0).toInt());
+        // if so (and if current!=NULL anyways), connect to the new record and read some data
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
+        connect(maskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
+        connect(chkRangeN, SIGNAL(toggled(bool)), this, SLOT(updateCorrSelection()));
+        connect(edtNMin, SIGNAL(valueChanged(double)), this, SLOT(updateCorrSelection()));
+        connect(edtNMax, SIGNAL(valueChanged(double)), this, SLOT(updateCorrSelection()));
+        connect(chkRangeB, SIGNAL(toggled(bool)), this, SLOT(updateCorrSelection()));
+        connect(edtBMin, SIGNAL(valueChanged(double)), this, SLOT(updateCorrSelection()));
+        connect(edtBMax, SIGNAL(valueChanged(double)), this, SLOT(updateCorrSelection()));
+        connect(cmbCorrelationP1, SIGNAL(currentIndexChanged(int)), this, SLOT(updateHistograms()));
+        connect(cmbCorrelationP2, SIGNAL(currentIndexChanged(int)), this, SLOT(updateHistograms()));
+        connect(cmbCorrelationPCol, SIGNAL(currentIndexChanged(int)), this, SLOT(updateHistograms()));
         loadPlotSettings();
         replotData();
+        maskTools->clearSelection();
     } else {
     }
 
@@ -224,7 +438,7 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         bool reCor=pltCorrelation->get_doDrawing();
         pltCorrelation->set_doDrawing(false);
 
-        reallocMem( m->getWidth()*m->getHeight());
+        //reallocMem( m->getWidth(),m->getHeight());
         for (int i=0; i<m->getWidth()*m->getHeight(); i++) {
             plteOverviewData[i]=m->getImage()[i];
             plteNumberData[i]=m->getNumberImage()[i];
@@ -233,7 +447,7 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         /*memcpy(plteOverviewData, m->getImage(), m->getWidth()*m->getHeight()*sizeof(double));
         memcpy(plteNumberData, m->getNumberImage(), m->getWidth()*m->getHeight()*sizeof(double));
         memcpy(plteBrightnessData, m->getBrightnessImage(), m->getWidth()*m->getHeight()*sizeof(double));*/
-        updateSelectionArrays();
+
 
         double w=m->getWidth();
         double h=m->getHeight();
@@ -242,6 +456,9 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         int cN=pltCorrelation->getDatastore()->addCopiedColumn(plteNumberData, m->getWidth()*m->getHeight(), tr("particle_number"));
         int cB=pltCorrelation->getDatastore()->addCopiedColumn(plteBrightnessData, m->getWidth()*m->getHeight(), tr("particle_brightness"));
         int cI=pltCorrelation->getDatastore()->addCopiedColumn(plteOverviewData, m->getWidth()*m->getHeight(), tr("image_data"));
+        int cMN=pltCorrelation->getDatastore()->addCopiedColumnMasked(plteNumberData, m->maskGet(), m->getWidth()*m->getHeight(), tr("particle_number_masked"));
+        int cMB=pltCorrelation->getDatastore()->addCopiedColumnMasked(plteBrightnessData, m->maskGet(), m->getWidth()*m->getHeight(), tr("particle_brightness_masked"));
+        int cMI=pltCorrelation->getDatastore()->addCopiedColumnMasked(plteOverviewData, m->maskGet(), m->getWidth()*m->getHeight(), tr("image_data_masked"));
 
         pltOverview->setAbsoluteXY(0, w, 0, h);
         pltOverview->get_plotter()->set_maintainAspectRatio(true);
@@ -252,7 +469,13 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         plteOverview->set_data(plteOverviewData, m->getWidth(), m->getHeight());
         plteOverview->set_width(m->getWidth());
         plteOverview->set_height(m->getHeight());
-        plteOverviewExcluded->set_data(plteOverviewExcludedData, m->getWidth(), m->getHeight());
+        plteOverview->set_autoImageRange(false);
+        double mi,ma;
+        statisticsMaskedMinMax(plteOverviewData,m->maskGet(), m->getWidth()*m->getHeight(), mi, ma);
+        plteOverview->set_imageMin(mi);
+        plteOverview->set_imageMax(ma);
+
+        plteOverviewExcluded->set_data(m->maskGet(), m->maskGetWidth(), m->maskGetHeight());
         plteOverviewExcluded->set_width(m->getWidth());
         plteOverviewExcluded->set_height(m->getHeight());
         plteOverviewSelected->set_data(plteOverviewSelectedData, m->getWidth(), m->getHeight());
@@ -269,7 +492,12 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         plteNumber->set_data(plteNumberData, m->getWidth(), m->getHeight());
         plteNumber->set_width(m->getWidth());
         plteNumber->set_height(m->getHeight());
-        plteNumberExcluded->set_data(plteOverviewExcludedData, m->getWidth(), m->getHeight());
+        plteNumber->set_autoImageRange(false);
+        statisticsMaskedMinMax(plteNumberData, m->maskGet(), m->getWidth()*m->getHeight(), mi, ma);
+        plteNumber->set_imageMin(mi);
+        plteNumber->set_imageMax(ma);
+
+        plteNumberExcluded->set_data(m->maskGet(), m->maskGetWidth(), m->maskGetHeight());
         plteNumberExcluded->set_width(m->getWidth());
         plteNumberExcluded->set_height(m->getHeight());
         plteNumberSelected->set_data(plteOverviewSelectedData, m->getWidth(), m->getHeight());
@@ -286,7 +514,12 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         plteBrightness->set_data(plteBrightnessData, m->getWidth(), m->getHeight());
         plteBrightness->set_width(m->getWidth());
         plteBrightness->set_height(m->getHeight());
-        plteBrightnessExcluded->set_data(plteOverviewExcludedData, m->getWidth(), m->getHeight());
+        plteBrightness->set_autoImageRange(false);
+        statisticsMaskedMinMax(plteBrightnessData,m->maskGet(), m->getWidth()*m->getHeight(), mi, ma);
+        plteBrightness->set_imageMin(mi);
+        plteBrightness->set_imageMax(ma);
+
+        plteBrightnessExcluded->set_data(m->maskGet(), m->maskGetWidth(), m->maskGetHeight());
         plteBrightnessExcluded->set_width(m->getWidth());
         plteBrightnessExcluded->set_height(m->getHeight());
         plteBrightnessSelected->set_data(plteOverviewSelectedData, m->getWidth(), m->getHeight());
@@ -297,8 +530,8 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         pltBrightness->zoomToFit();
         pltOverview->zoomToFit();
 
-        plteCorrelation->set_xColumn(cN);
-        plteCorrelation->set_yColumn(cB);
+        plteCorrelation->set_xColumn(cMN);
+        plteCorrelation->set_yColumn(cMB);
         plteCorrelation->set_drawLine(false);
         plteCorrelation->set_symbol(JKQTPdot);
         plteCorrelation->set_color(QColor("red"));
@@ -334,29 +567,6 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
 }
 
 
-void QFRDRNumberAndBrightnessDataEditor::updateSelectionArrays() {
-    QFRDRNumberAndBrightnessData* m=qobject_cast<QFRDRNumberAndBrightnessData*>(current);
-    //qDebug()<<"updateSelectionArrays";
-    //pltOverview->set_doDrawing(false);
-
-
-    if (m) {
-        int siz=m->getWidth()*m->getHeight();
-        for (register int i=0; i<siz; i++) {
-            int x=m->indexToX(i);
-            int y=m->indexToY(i);
-            int idx=y*m->getWidth()+x;
-            plteOverviewSelectedData[idx]=selected.contains(i);
-            plteOverviewExcludedData[idx]=m->leaveoutRun(i);
-        }
-    } else {
-        for (register int i=0; i<plotsSize; i++) {
-            plteOverviewSelectedData[i]=false;
-            plteOverviewExcludedData[i]=false;
-        }
-    }
-    //qDebug()<<"updateSelectionArrays ... end";
-}
 
 void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
 {
@@ -364,65 +574,107 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
     if (m) {
 
         savePlotSettings();
-        updateSelectionArrays();
 
 
         int dataSize=m->getWidth()*m->getHeight();
         int dataSelSize=m->getWidth()*m->getHeight();
 
-        double* data=(double*)qfCalloc(dataSize, sizeof(double));
-        double* dataSel=(double*)qfCalloc(dataSelSize, sizeof(double));
+        double* dataEps=(double*)qfCalloc(dataSize, sizeof(double));
+        double* dataEpsSel=(double*)qfCalloc(dataSelSize, sizeof(double));
+        double* dataN=(double*)qfCalloc(dataSize, sizeof(double));
+        double* dataNSel=(double*)qfCalloc(dataSelSize, sizeof(double));
+
+        double* dataOvr=(double*)qfCalloc(dataSize, sizeof(double));
+        double* dataOvrSel=(double*)qfCalloc(dataSelSize, sizeof(double));
         dataSize=0;
         dataSelSize=0;
         for (int i=0; i<m->getWidth()*m->getHeight(); i++) {
-            if (!plteOverviewExcludedData[i]) {
-                data[dataSize]=plteNumberData[i];
+            if (!m->maskGetIdx(i)) {
+                dataN[dataSize]=plteNumberData[i];
+                dataEps[dataSize]=plteBrightnessData[i];
+                dataOvr[dataSize]=plteOverviewData[i];
                 dataSize++;
             }
-            if (!plteOverviewExcludedData[i] && plteOverviewSelectedData[i]) {
-                dataSel[dataSelSize]=plteNumberData[i];
+            if (!m->maskGetIdx(i) && plteOverviewSelectedData[i]) {
+                dataNSel[dataSelSize]=plteNumberData[i];
+                dataEpsSel[dataSelSize]=plteBrightnessData[i];
+                dataOvrSel[dataSelSize]=plteOverviewData[i];
                 dataSelSize++;
             }
         }
+
         histNumber->clear();
         histNumber->setHistogramXLabel(tr("particle number $N$"));
-        histNumber->addHistogram("complete", data, dataSize, false);
-        qfFree(data);
-        if (dataSelSize>1) histNumber->addHistogram("selection", dataSel, dataSelSize, false);
-        qfFree(dataSel);
+        histNumber->addHistogram("complete", dataN, dataSize, false);
 
-
-        dataSize=m->getWidth()*m->getHeight();
-        dataSelSize=m->getWidth()*m->getHeight();
-
-        data=(double*)qfCalloc(dataSize, sizeof(double));
-        dataSel=(double*)qfCalloc(dataSelSize, sizeof(double));
-        dataSize=0;
-        dataSelSize=0;
-        for (int i=0; i<m->getWidth()*m->getHeight(); i++) {
-            if (!plteOverviewExcludedData[i]) {
-                data[dataSize]=plteBrightnessData[i];
-                dataSize++;
-            }
-            if (!plteOverviewExcludedData[i] && plteOverviewSelectedData[i]) {
-                dataSel[dataSelSize]=plteBrightnessData[i];
-                dataSelSize++;
-            }
-        }
         histBrightness->clear();
         histBrightness->setHistogramXLabel(tr("particle brightness $\\epsilon$"));
-        histBrightness->addHistogram("complete", data, dataSize, false);
-        qfFree(data);
-        if (dataSelSize>1) histBrightness->addHistogram("selection", dataSel, dataSelSize, false);
-        qfFree(dataSel);
+        histBrightness->addHistogram("complete", dataEps, dataSize, false);
+
+        histIntensity->clear();
+        histIntensity->setHistogramXLabel(tr("image intensity $I$"));
+        histIntensity->addHistogram("complete", dataOvr, dataSize, false);
+
+        if (dataSelSize>1) histNumber->addHistogram("selection", dataNSel, dataSelSize, false);
+        if (dataSelSize>1) histBrightness->addHistogram("selection", dataEpsSel, dataSelSize, false);
+        if (dataSelSize>1) histIntensity->addHistogram("selection", dataOvrSel, dataSelSize, false);
+        double* c1=NULL;
+        double* c2=NULL;
+        double* cC=NULL;
+
+        widCorrelation->clear();
+
+        if (cmbCorrelationP1->currentIndex()==0) {
+            c1=dataN;
+            widCorrelation->setCorrelation1Label(tr("particle number $N$"));
+        } else if (cmbCorrelationP1->currentIndex()==1) {
+            c1=dataEps;
+            widCorrelation->setCorrelation1Label(tr("brightness $\\epsilon$"));
+        } else if (cmbCorrelationP1->currentIndex()==2) {
+            widCorrelation->setCorrelation1Label(tr("intensity $I$"));
+            c1=dataOvr;
+        }
+        if (cmbCorrelationP2->currentIndex()==0) {
+            c2=dataEps;
+            widCorrelation->setCorrelation2Label(tr("brightness $\\epsilon$"));
+        } else if (cmbCorrelationP2->currentIndex()==1) {
+            c2=dataN;
+            widCorrelation->setCorrelation2Label(tr("particle number $N$"));
+        } else if (cmbCorrelationP2->currentIndex()==2) {
+            widCorrelation->setCorrelation2Label(tr("intensity $I$"));
+            c2=dataOvr;
+        }
+
+        if (cmbCorrelationPCol->currentIndex()==1) {
+            widCorrelation->setCorrelationColorLabel(tr("intensity $I$"));
+            cC=dataOvr;
+        } else if (cmbCorrelationPCol->currentIndex()==2) {
+            cC=dataN;
+            widCorrelation->setCorrelationColorLabel(tr("particle number $N$"));
+        } else if (cmbCorrelationPCol->currentIndex()==3) {
+            cC=dataEps;
+            widCorrelation->setCorrelationColorLabel(tr("brightness $\\epsilon$"));
+        }
+        widCorrelation->addCorrelation(tr("complete"), c1, c2, cC, dataSize, false);
+
+        qfFree(dataN);
+        qfFree(dataNSel);
+        qfFree(dataEps);
+        qfFree(dataEpsSel);
+        qfFree(dataOvr);
+        qfFree(dataOvrSel);
+
+
 
         histNumber->updateHistogram(true);
         histBrightness->updateHistogram(true);
+        histIntensity->updateHistogram(true);
+        widCorrelation->updateCorrelation(true);
     }
 }
 
 void QFRDRNumberAndBrightnessDataEditor::rawDataChanged() {
-
+    replotData();
 }
 
 void QFRDRNumberAndBrightnessDataEditor::readSettings() {
@@ -430,6 +682,8 @@ void QFRDRNumberAndBrightnessDataEditor::readSettings() {
     if (!settings) return;
     histNumber->readSettings(*(settings->getQSettings()), "QFRDRNumberAndBrightnessDataEditor/histNumber/");
     histBrightness->readSettings(*(settings->getQSettings()), "QFRDRNumberAndBrightnessDataEditor/histBrightness/");
+    histIntensity->readSettings(*(settings->getQSettings()), "QFRDRNumberAndBrightnessDataEditor/histIntensity/");
+    widCorrelation->readSettings(*(settings->getQSettings()), "QFRDRNumberAndBrightnessDataEditor/widCorrelation/");
 }
 
 
@@ -438,43 +692,27 @@ void QFRDRNumberAndBrightnessDataEditor::writeSettings() {
     if (!settings) return;
     histNumber->writeSettings(*(settings->getQSettings()), "QFRDRNumberAndBrightnessDataEditor/histNumber/");
     histBrightness->writeSettings(*(settings->getQSettings()), "QFRDRNumberAndBrightnessDataEditor/histBrightness/");
+    histIntensity->writeSettings(*(settings->getQSettings()), "QFRDRNumberAndBrightnessDataEditor/histIntensity/");
+    widCorrelation->writeSettings(*(settings->getQSettings()), "QFRDRNumberAndBrightnessDataEditor/widCorrelation/");
 }
 
 void QFRDRNumberAndBrightnessDataEditor::loadPlotSettings() {
     QFRDRNumberAndBrightnessData* m=qobject_cast<QFRDRNumberAndBrightnessData*>(current);
     if (m) {
-        histNumber->setAutorange(m->getProperty(QString("NANDB%1_HISTNUMBER_AUTORANGE").arg(peID), true).toBool());
-        histNumber->setMin(m->getProperty(QString("NANDB%1_HISTNUMBER_MIN").arg(peID), 0).toDouble());
-        histNumber->setMax(m->getProperty(QString("NANDB%1_HISTNUMBER_MAX").arg(peID), 10).toDouble());
-        histNumber->setNormalized(m->getProperty(QString("NANDB%1_HISTNUMBER_NORMALIZED").arg(peID), true).toBool());
-        histNumber->setLog(m->getProperty(QString("NANDB%1_HISTNUMBER_LOG").arg(peID), false).toBool());
-        histNumber->setBins(m->getProperty(QString("NANDB%1_HISTNUMBER_BINS").arg(peID), 100).toInt());
-
-        histBrightness->setAutorange(m->getProperty(QString("NANDB%1_HISTNUMBER_AUTORANGE").arg(peID), true).toBool());
-        histBrightness->setMin(m->getProperty(QString("NANDB%1_HISTBRIGHTNESS_MIN").arg(peID), 0).toDouble());
-        histBrightness->setMax(m->getProperty(QString("NANDB%1_HISTBRIGHTNESS_MAX").arg(peID), 10).toDouble());
-        histBrightness->setNormalized(m->getProperty(QString("NANDB%1_HISTBRIGHTNESS_NORMALIZED").arg(peID), true).toBool());
-        histBrightness->setLog(m->getProperty(QString("NANDB%1_HISTBRIGHTNESS_LOG").arg(peID), false).toBool());
-        histBrightness->setBins(m->getProperty(QString("NANDB%1_HISTBRIGHTNESS_BINS").arg(peID), 100).toInt());
+        histNumber->readQFProperties(m, QString("NANDB%1_HISTNUMBER_").arg(peID), "", "");
+        histBrightness->readQFProperties(m, QString("NANDB%1_HISTBRIGHTNESS_").arg(peID), "", "");
+        histIntensity->readQFProperties(m, QString("NANDB%1_HISTINTENSITY_").arg(peID), "", "");
+        widCorrelation->readQFProperties(m, QString("NANDB%1_CORRPLOT_").arg(peID), "", cmbCorrelationP1->currentData().toString()+"_"+cmbCorrelationP2->currentData().toString()+"_"+cmbCorrelationPCol->currentData().toString());
     }
 }
 
 void QFRDRNumberAndBrightnessDataEditor::savePlotSettings() {
     QFRDRNumberAndBrightnessData* m=qobject_cast<QFRDRNumberAndBrightnessData*>(current);
     if (m) {
-        m->setQFProperty(QString("NANDB%1_HISTNUMBER_AUTORANGE").arg(peID), histNumber->getAutorange(), false, false);
-        m->setQFProperty(QString("NANDB%1_HISTNUMBER_MIN").arg(peID), histNumber->getMin(), false, false);
-        m->setQFProperty(QString("NANDB%1_HISTNUMBER_MAX").arg(peID), histNumber->getMax(), false, false);
-        m->setQFProperty(QString("NANDB%1_HISTNUMBER_NORMALIZED").arg(peID), histNumber->getNormalized(), false, false);
-        m->setQFProperty(QString("NANDB%1_HISTNUMBER_LOG").arg(peID), histNumber->getLog(), false, false);
-        m->setQFProperty(QString("NANDB%1_HISTNUMBER_BINS").arg(peID), histNumber->getBins(), false, false);
-
-        m->setQFProperty(QString("NANDB%1_HISTNUMBER_AUTORANGE").arg(peID), histBrightness->getAutorange(), false, false);
-        m->setQFProperty(QString("NANDB%1_HISTBRIGHTNESS_MIN").arg(peID),histBrightness->getMin()  , false, false);
-        m->setQFProperty(QString("NANDB%1_HISTBRIGHTNESS_MAX").arg(peID), histBrightness->getMax() , false, false);
-        m->setQFProperty(QString("NANDB%1_HISTBRIGHTNESS_NORMALIZED").arg(peID), histBrightness->getNormalized() , false, false);
-        m->setQFProperty(QString("NANDB%1_HISTBRIGHTNESS_LOG").arg(peID),histBrightness->getLog()  , false, false);
-        m->setQFProperty(QString("NANDB%1_HISTBRIGHTNESS_BINS").arg(peID),histBrightness->getBins() , false, false);
+        histNumber->writeQFProperties(m, QString("NANDB%1_HISTNUMBER_").arg(peID), "", "");
+        histBrightness->writeQFProperties(m, QString("NANDB%1_HISTBRIGHTNESS_").arg(peID), "", "");
+        histIntensity->writeQFProperties(m, QString("NANDB%1_HISTINTENSITY_").arg(peID), "", "");
+        widCorrelation->writeQFProperties(m, QString("NANDB%1_CORRPLOT_").arg(peID), "", cmbCorrelationP1->currentData().toString()+"_"+cmbCorrelationP2->currentData().toString()+"_"+cmbCorrelationPCol->currentData().toString());
     }
 }
 
@@ -491,5 +729,84 @@ void QFRDRNumberAndBrightnessDataEditor::imageZoomChangedLocally(double newxmin,
     } else if (sender==pltBrightness) {
         pltOverview->setXY(newxmin, newxmax, newymin, newymax);
         pltNumber->setXY(newxmin, newxmax, newymin, newymax);
+    }
+}
+
+void QFRDRNumberAndBrightnessDataEditor::updateCorrSelection()
+{
+    QFRDRNumberAndBrightnessData* m=qobject_cast<QFRDRNumberAndBrightnessData*>(current);
+    if (m) {
+        bool reOvr=pltOverview->get_doDrawing();
+        bool emOvr=pltOverview->get_emitSignals();
+        pltOverview->set_doDrawing(false);
+        pltOverview->set_emitSignals(false);
+        bool reNum=pltNumber->get_doDrawing();
+        bool emNum=pltNumber->get_emitSignals();
+        pltNumber->set_doDrawing(false);
+        pltNumber->set_emitSignals(false);
+        bool reBr=pltBrightness->get_doDrawing();
+        bool emBr=pltBrightness->get_emitSignals();
+        pltBrightness->set_doDrawing(false);
+        pltBrightness->set_emitSignals(false);
+        bool reCor=pltCorrelation->get_doDrawing();
+        bool emCor=pltBrightness->get_emitSignals();
+        pltCorrelation->set_doDrawing(false);
+        pltCorrelation->set_emitSignals(false);
+
+        m->setQFProperty("QFRDRNumberAndBrightnessDataEditor/chkRangeB", chkRangeB->isChecked(), false, false);
+        m->setQFProperty("QFRDRNumberAndBrightnessDataEditor/chkRangeN", chkRangeN->isChecked(), false, false);
+        m->setQFProperty("QFRDRNumberAndBrightnessDataEditor/edtNMin", edtNMin->value(), false, false);
+        m->setQFProperty("QFRDRNumberAndBrightnessDataEditor/edtNMax", edtNMax->value(), false, false);
+        m->setQFProperty("QFRDRNumberAndBrightnessDataEditor/edtBMin", edtBMin->value(), false, false);
+        m->setQFProperty("QFRDRNumberAndBrightnessDataEditor/edtBMax", edtBMax->value(), false, false);
+
+        plteRangeB->set_visible(chkRangeB->isChecked());
+        plteRangeB->set_rangeMin(edtBMin->value());
+        plteRangeB->set_rangeMax(edtBMax->value());
+        plteRangeN->set_visible(chkRangeN->isChecked());
+        plteRangeN->set_rangeMin(edtNMin->value());
+        plteRangeN->set_rangeMax(edtNMax->value());
+
+        if (chkRangeB->isChecked() || chkRangeN->isChecked()) {
+            double* B=m->getBrightnessImage();
+            double* N=m->getNumberImage();
+            for (int i=0; i<m->getWidth()*m->getHeight(); i++) {
+                plteOverviewSelectedData[i]=false;
+                if (chkRangeB->isChecked() && !chkRangeN->isChecked()) {
+                    if (B[i]>=edtBMin->value() && B[i]<=edtBMax->value()) {
+                        plteOverviewSelectedData[i]=true;
+                    }
+                } else if (chkRangeN->isChecked() && !chkRangeB->isChecked()) {
+                    if (N[i]>=edtNMin->value() && N[i]<=edtNMax->value()) {
+                        plteOverviewSelectedData[i]=true;
+                    }
+                } else if (chkRangeN->isChecked() && chkRangeB->isChecked()) {
+                    if (N[i]>=edtNMin->value() && N[i]<=edtNMax->value() && B[i]>=edtBMin->value() && B[i]<=edtBMax->value()) {
+                        plteOverviewSelectedData[i]=true;
+                    }
+                }
+            }
+        }
+
+        if (reOvr) {
+            pltOverview->set_doDrawing(true);
+            pltOverview->update_plot();
+        }
+        pltOverview->set_emitSignals(emOvr);
+        if (reNum) {
+            pltNumber->set_doDrawing(true);
+            pltNumber->update_plot();
+        }
+        pltNumber->set_emitSignals(emNum);
+        if (reBr) {
+            pltBrightness->set_doDrawing(true);
+            pltBrightness->update_plot();
+        }
+        pltBrightness->set_emitSignals(emBr);
+        if (reCor) {
+            pltCorrelation->set_doDrawing(true);
+            pltCorrelation->update_plot();
+        }
+        pltBrightness->set_emitSignals(emCor);
     }
 }

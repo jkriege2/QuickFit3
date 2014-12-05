@@ -1422,61 +1422,6 @@ QList<T3> qfQTripleListToThirdList(const QList<QTriple<T1, T2, T3> > &input) {
     return res;
 }
 
-enum QFImageHalf {
-    qfihNone=-1,
-    qfihLeft=0,
-    qfihRight=1,
-    qfihTop=2,
-    qfihBottom=3,
-
-    qfihAny=qfihNone
-};
-
-/*! \brief copy one half of an image
-    \ingroup qf3lib_tools
-
-    input has to be of size inWidth*inHeight, ahereas output is expected to be of size inWidth*inHeight/2!
-*/
-template <typename T1, typename T2>
-void qfCopyImageHalf(T1* output, const T2* input, int inWidth, int inHeight, QFImageHalf imageHalf) {
-    int width=inWidth;
-    int height=inHeight;
-    int shiftx=0;
-    int shifty=0;
-    bool ok=false;
-    if (imageHalf==qfihLeft) {
-        width=inWidth/2;
-        height=inHeight;
-        shiftx=0;
-        shifty=0;
-        ok=true;
-    } else if (imageHalf==qfihRight) {
-        width=inWidth/2;
-        height=inHeight;
-        shiftx=width;
-        shifty=0;
-        ok=true;
-    } else if (imageHalf==qfihTop) {
-        width=inWidth;
-        height=inHeight/2;
-        shiftx=0;
-        shifty=0;
-        ok=true;
-    } else if (imageHalf==qfihBottom) {
-        width=inWidth;
-        height=inHeight/2;
-        shiftx=0;
-        shifty=height;
-        ok=true;
-    }
-    for (int y=0; y<height; y++) {
-        for (int x=0; x<width; x++) {
-            const int idxIn=(y+shifty)*inWidth+x+shiftx;
-            const int idxOut=y*width+x;
-            output[idxOut]=input[idxIn];
-        }
-    }
-}
 
 /*! \brief converts a light wavelength (in nanometers) into a color representing this wavelength
     \ingroup qf3lib_tools

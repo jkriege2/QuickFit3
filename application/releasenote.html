@@ -271,6 +271,7 @@
             <li>excluding segments now does not delete the mask any more!</li>
             <li>correlator dialog: added entries to the crop-button, which allow to crop the left/right/top/bottom image halves.</li>
             <li>added context-menu entries and buttons to several widgets in the parameter image tab, which allow to reuse the current display settings in other RDRs.</li>
+            <li>after correlation: N and B records are now split by color channel (when newly inserted into the project!)</li>
           </ul></li>
         <li><b>table</b><ul>
             <li>added "QuickStatistics" and "QuickHistogram" tools, which show the statistics and histograms of the current selection (column-wise)</li>
@@ -366,6 +367,8 @@
             <li>added generic internal ASCII data format for correlation data</li>
             <li>added option to export the current data into a file (currently only the QF3 ASCII Correlation Data Format)</li>
             <li>added import filter for QF3 ASCII Correlation Data Format</li>
+            <li>added support for ALV-700x files (should work for most files, but may not be perfect yet!!!)</li>
+            <li>bugfix: correlation curve/countrate editors remember configuration in a more understandable way</li>
       </ul></li>
       <li><b>imFCS Fit</b><ul>
             <li>fit parameter names are more expressive now</li>
@@ -454,6 +457,8 @@
       </ul></li>
       <li><b>number_and_brightness:</b><ul>
         <li>added wizard, that allows to insert a N&amp;B record from average+stddev files for the iamge and the backrgound</li>
+        <li>improved RDR editor with a proper correlation plot, an intensity histogram and selections by N&amp;B</li>
+        <li>N and B records are now split by color channel (when newly inserted into the project!)</li>
       </ul></li>
 
     </ul></li>

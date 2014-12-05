@@ -45,7 +45,6 @@ QFRDRNumberAndBrightnessData::QFRDRNumberAndBrightnessData(QFProject* parent):
     imageVariance=NULL;
     numberImage=NULL;
     brightnessImage=NULL;
-    leaveout=NULL;
 
 }
 
@@ -121,6 +120,7 @@ int QFRDRNumberAndBrightnessData::getHeight() const
 }
 
 void QFRDRNumberAndBrightnessData::recalcNumberAndBrightness() {
+    qDebug()<<image << imageVariance << background << backgroundVariance << numberImage << brightnessImage;
     if (image && imageVariance && background && backgroundVariance && numberImage && brightnessImage) {
         if (getProperty("BACKGROUND_CORRECTED", false).toBool()) {
             for (int i=0; i<width*height; i++) {
@@ -139,27 +139,52 @@ void QFRDRNumberAndBrightnessData::recalcNumberAndBrightness() {
     }
 }
 
-bool QFRDRNumberAndBrightnessData::leaveoutRun(int run) const
+int QFRDRNumberAndBrightnessData::getOverviewImageCount() const
 {
-    return maskGet(indexToX(run), indexToY(run));
+    return 6;
+}
+
+int QFRDRNumberAndBrightnessData::getOverviewImageWidth() const
+{
+    return getWidth();
+}
+
+int QFRDRNumberAndBrightnessData::getOverviewImageHeight() const
+{
+    return getHeight();
+}
+
+QString QFRDRNumberAndBrightnessData::getOverviewImageName(int image) const
+{
+    switch(image) {
+        case 0: return tr("intensity");
+        case 1: return tr("intensity variance");
+        case 2: return tr("background");
+        case 3: return tr("background variance");
+        case 4: return tr("particle number");
+        case 5: return tr("brightness");
+    }
+    return tr("image %1").arg(image);
+}
+
+double *QFRDRNumberAndBrightnessData::getOverviewImage(int image) const
+{
+    switch(image) {
+        case 0: return getImage();
+        case 1: return getImageVariance();
+        case 2: return getBackground();
+        case 3: return getBackgroundVariance();
+        case 4: return getNumberImage();
+        case 5: return getBrightnessImage();
+    }
+    return NULL;
 }
 
 
+
 void QFRDRNumberAndBrightnessData::intWriteData(QXmlStreamWriter& w) const {
-    if (leaveout) {
-        QString l="";
-        for (int i=0; i<width*height; i++) {
-            if (leaveout[i]!=0) {
-                if (!l.isEmpty()) l=l+",";
-                l=l+QString::number(i);
-            }
-        }
-        if (l.size()>0) {
-            w.writeStartElement("leaveout");
-            w.writeAttribute("list", l);
-            w.writeEndElement();
-        }
-    }
+
+    w.writeAttribute(QString("mask"), maskToListString(", ", "; "));
     if (selections.size()>0) {
         w.writeStartElement("selections");
         for (int s=0; s<selections.size(); s++) {
@@ -183,7 +208,7 @@ void QFRDRNumberAndBrightnessData::intWriteData(QXmlStreamWriter& w) const {
 }
 
 void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
-    leaveoutClear();
+    maskClear();
     clearSelections();
     // read data from the project XML file
 
@@ -191,6 +216,7 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
 
     width=getProperty("WIDTH", 0).toInt();
     height=getProperty("HEIGHT", 0).toInt();
+
 
     allocateContents(width, height);
 
@@ -262,9 +288,9 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("overview before acquisition");
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
-                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement rect;
                         rect.title=tr("ROI");
-                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.type=QFRDRAdditionalImagesInterface::PIGErectangle;
                         rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
                         rect.width=fabs(getProperty("ROI_X_START").toDouble()-getProperty("ROI_X_END").toDouble());
                         rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
@@ -277,9 +303,9 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("overview after acquisition");
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
-                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement rect;
                         rect.title=tr("ROI");
-                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.type=QFRDRAdditionalImagesInterface::PIGErectangle;
                         rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
                         rect.width=fabs(getProperty("ROI_X_START").toDouble()-getProperty("ROI_X_END").toDouble());
                         rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
@@ -292,9 +318,9 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("overview before acquisition (transm. illumination)");
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
-                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement rect;
                         rect.title=tr("ROI");
-                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.type=QFRDRAdditionalImagesInterface::PIGErectangle;
                         rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
                         rect.width=fabs(getProperty("ROI_X_START").toDouble()- getProperty("ROI_X_END").toDouble());
                         rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
@@ -307,9 +333,9 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=tr("overview after acquisition (transm. illumination)");
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
-                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement rect;
                         rect.title=tr("ROI");
-                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.type=QFRDRAdditionalImagesInterface::PIGErectangle;
                         rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
                         rect.width=fabs(getProperty("ROI_X_START").toDouble()- getProperty("ROI_X_END").toDouble());
                         rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
@@ -322,9 +348,9 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
                     loadImage(files[i], &(img.image), &(img.width), &(img.height));
                     img.name=files_desciptions.value(i, ft);
                     if (propertyExists("ROI_X_START") && propertyExists("ROI_X_END") && propertyExists("ROI_Y_START") && propertyExists("ROI_Y_END")) {
-                        QFRDROverviewImageInterface::OverviewImageGeoElement rect;
+                        QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement rect;
                         rect.title=tr("ROI");
-                        rect.type=QFRDROverviewImageInterface::PIGErectangle;
+                        rect.type=QFRDRAdditionalImagesInterface::PIGErectangle;
                         rect.x=qMin(getProperty("ROI_X_START").toDouble(), getProperty("ROI_X_END").toDouble());
                         rect.width=fabs(getProperty("ROI_X_START").toDouble()- getProperty("ROI_X_END").toDouble());
                         rect.y=qMin(getProperty("ROI_Y_START").toDouble(), getProperty("ROI_Y_END").toDouble());
@@ -339,6 +365,9 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
 
     }
 
+
+
+
     if (e) {
         QDomElement te=e->firstChildElement("leaveout");
         QString l=te.attribute("list");
@@ -347,9 +376,15 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
         for (int i=0; i<li.size(); i++) {
             bool ok=false;
             int lo=li[i].toUInt(&ok);
-            if (ok) leaveoutAddRun(lo);
+            if (ok) maskSetIdx(lo);
             //qDebug()<<lo<<ok;
         }
+
+        QString maskS="";
+        if (e) maskS=e->attribute("mask", "").simplified().trimmed();
+        maskClear();
+        if (maskS.size()>0) maskLoadFromListString(maskS,',', ';');
+
 
         te=e->firstChildElement("selections");
         if (!te.isNull()) {
@@ -392,16 +427,41 @@ bool QFRDRNumberAndBrightnessData::loadFile(double *target, const QString &filen
 
     if (!target) return false;
 
+
+    QFImageHalf ihalf=getSelectedImageHalf();
+
     if (QFile::exists(filename)) {
         TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
         if (tif) {
             uint32 nx,ny;
             TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
             TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
-            if ((int64_t)nx!=width || (int64_t)ny!=height) {
-                ok=false;
-            } else {
-                ok=TIFFReadFrame<double>(tif, target);
+            if (ihalf==qfihNone) {
+                if ((int64_t)nx!=width || (int64_t)ny!=height) {
+                    ok=false;
+                } else {
+                    //double* filedata=(double*)qfMalloc(nx*ny*sizeof(double));
+                    //ok=TIFFReadFrame<double>(tif, filedata);
+                    ok=TIFFReadFrame<double>(tif, target);
+                }
+            } else if (ihalf==qfihLeft || ihalf==qfihRight) {
+                if ((int64_t)nx/2!=width || (int64_t)ny!=height) {
+                    ok=false;
+                } else {
+                    double* filedata=(double*)qfMalloc(nx*ny*sizeof(double));
+                    ok=TIFFReadFrame<double>(tif, filedata);
+                    qfCopyImageHalf(target, filedata, nx, ny, ihalf);
+                    qfFree(filedata);
+                }
+            } else if (ihalf==qfihTop || ihalf==qfihBottom) {
+                if ((int64_t)nx!=width || (int64_t)ny/2!=height) {
+                    ok=false;
+                } else {
+                    double* filedata=(double*)qfMalloc(nx*ny*sizeof(double));
+                    ok=TIFFReadFrame<double>(tif, filedata);
+                    qfCopyImageHalf(target, filedata, nx, ny, ihalf);
+                    qfFree(filedata);
+                }
             }
             TIFFClose(tif);
         }
@@ -412,6 +472,7 @@ bool QFRDRNumberAndBrightnessData::loadFile(double *target, const QString &filen
             target[i]=0;
         }
     }
+
 
     switch(op) {
         case QFRDRNumberAndBrightnessData::TakeSqrt:
@@ -430,20 +491,19 @@ bool QFRDRNumberAndBrightnessData::loadFile(double *target, const QString &filen
     return ok;
 }
 
-void QFRDRNumberAndBrightnessData::allocateContents(int x, int y, int N) {
+void QFRDRNumberAndBrightnessData::allocateContents(int x, int y) {
     if (numberImage) qfFree(numberImage);
     if (brightnessImage) qfFree(brightnessImage);
     if (image) qfFree(image);
     if (imageVariance) qfFree(imageVariance);
     if (background) qfFree(background);
     if (backgroundVariance) qfFree(backgroundVariance);
-    if (leaveout) qfFree(leaveout);
+    maskDelete();
     image=NULL;
     numberImage=NULL;
     imageVariance=NULL;
     background=NULL;
     backgroundVariance=NULL;
-    leaveout=NULL;
     int NN=1;
     if ((x>0) && (y>0) && (NN>0)) {
         image=(double*)qfCalloc(x*y*NN,sizeof(double));
@@ -452,7 +512,7 @@ void QFRDRNumberAndBrightnessData::allocateContents(int x, int y, int N) {
         backgroundVariance=(double*)qfCalloc(x*y*NN,sizeof(double));
         numberImage=(double*)qfCalloc(x*y*NN,sizeof(double));
         brightnessImage=(double*)qfCalloc(x*y*NN,sizeof(double));
-        leaveout=(bool*)qfCalloc(x*y,sizeof(bool));
+        maskInit(x,y);
         width=x;
         height=y;
         setQFProperty("WIDTH", x, false, true);
@@ -516,114 +576,28 @@ void QFRDRNumberAndBrightnessData::clearOvrImages() {
 }
 
 
-void QFRDRNumberAndBrightnessData::leaveoutClear() {
-    maskClear();
-}
-
-void QFRDRNumberAndBrightnessData::maskLoad(const QString &filename) {
-    QFile f(filename);
-    if (f.open(QIODevice::ReadOnly)) {
-        maskClear();
-        QTextStream str(&f);
-        while (!str.atEnd())  {
-            QVector<double> d=csvReadline(str, ',', '#', -1);
-            if (d.size()==2) {
-                int idx=xyToIndex(d[0], d[1]);
-                if (idx>=0 && idx<height*width) leaveout[idx]=true;
-            }
-        }
-
-        f.close();
-    }
-}
-
-void QFRDRNumberAndBrightnessData::maskSave(const QString &filename) const {
-    QFile f(filename);
-    if (f.open(QIODevice::WriteOnly)) {
-        QTextStream str(&f);
-        for (int y=0; y<height; y++) {
-            for (int x=0; x<width; x++) {
-                if (leaveout[y*width+x]) {
-                    str<<x<<", "<<y<<"\n";
-                }
-            }
-        }
-
-        f.close();
-    }
-}
-
-void QFRDRNumberAndBrightnessData::maskClear() {
-    if (!leaveout) return;
-    for (int i=0; i<width*height; i++) {
-        leaveout[i]=false;
-    }
-}
-
-void QFRDRNumberAndBrightnessData::maskSetAll() {
-    if (!leaveout) return;
-    for (int i=0; i<width*height; i++) {
-        leaveout[i]=true;
-    }
-}
-
-void QFRDRNumberAndBrightnessData::leaveoutRemoveRun(int run) {
-    if (run>=0 && run<width*height) leaveout[run]=false;
-}
-
-void QFRDRNumberAndBrightnessData::leaveoutAddRun(int run) {
-    if (run>=0 && run<width*height) leaveout[run]=true;
-}
-
-bool *QFRDRNumberAndBrightnessData::maskGet() const {
-    return leaveout;
-}
-
-bool QFRDRNumberAndBrightnessData::maskGet(uint32_t x, uint32_t y) const {
-    return leaveout[y*width+x];
-}
-
-void QFRDRNumberAndBrightnessData::maskUnset(uint32_t x, uint32_t y, bool value) {
-    if (!leaveout) return;
-    leaveout[y*width+x]=value;
-}
-
-void QFRDRNumberAndBrightnessData::maskToggle(uint32_t x, uint32_t y) {
-    leaveout[y*width+x]=!leaveout[y*width+x];
-}
-
-void QFRDRNumberAndBrightnessData::maskInvert() {
-    if (!leaveout) return;
-    for (int i=0; i<width*height; i++) {
-        leaveout[i]=!leaveout[i];
-    }
-}
-
-void QFRDRNumberAndBrightnessData::maskSet(uint32_t x, uint32_t y) {
-    if (!leaveout) return;
-    leaveout[y*width+x]=false;
-}
 
 
-int QFRDRNumberAndBrightnessData::getOverviewImageCount() const {
+
+int QFRDRNumberAndBrightnessData::getAdditionalImagesCount() const {
     return 4+ovrImages.size();
 }
 
-int QFRDRNumberAndBrightnessData::getOverviewImageWidth(int image) const {
+int QFRDRNumberAndBrightnessData::getAdditionalImagesWidth(int image) const {
     if (image<0) return 0;
     if (image<4) return width;
     if (image-4<ovrImages.size()) return ovrImages[image-4].width;
     return 0;
 }
 
-int QFRDRNumberAndBrightnessData::getOverviewImageHeight(int image) const {
+int QFRDRNumberAndBrightnessData::getAdditionalImagesHeight(int image) const {
     if (image<0) return 0;
     if (image<4) return height;
     if (image-4<ovrImages.size()) return ovrImages[image-4].height;
     return 0;
 }
 
-QString QFRDRNumberAndBrightnessData::getOverviewImageName(int image) const {
+QString QFRDRNumberAndBrightnessData::getAdditionalImagesName(int image) const {
     if (image==0) return tr("overview image (time average)");
     if (image==1) return tr("variance of overview image (time average)");
     if (image==2) return tr("background image (time average)");
@@ -632,7 +606,7 @@ QString QFRDRNumberAndBrightnessData::getOverviewImageName(int image) const {
     return QString("");
 }
 
-double *QFRDRNumberAndBrightnessData::getOverviewImage(int img) const {
+double *QFRDRNumberAndBrightnessData::getAdditionalImage(int img) const {
     if (img==0) return image;
     if (img==1) return imageVariance;
     if (img==2) return background;
@@ -641,8 +615,8 @@ double *QFRDRNumberAndBrightnessData::getOverviewImage(int img) const {
     return NULL;
 }
 
-QList<QFRDROverviewImageInterface::OverviewImageGeoElement> QFRDRNumberAndBrightnessData::getOverviewImageAnnotations(int image) const {
-    QList<QFRDROverviewImageInterface::OverviewImageGeoElement> result;
+QList<QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement> QFRDRNumberAndBrightnessData::getAdditionalImagesAnnotations(int image) const {
+    QList<QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement> result;
     if (image>3 && image-4<=ovrImages.size()) return ovrImages[image-2].geoElements;
     return result;
 }
@@ -783,4 +757,14 @@ int QFRDRNumberAndBrightnessData::indexToX(int run) const {
 
 int QFRDRNumberAndBrightnessData::indexToY(int run) const {
     return run/width;
+}
+
+QFImageHalf QFRDRNumberAndBrightnessData::getSelectedImageHalf() const
+{
+    QString h=getQFProperty("SELECT_IMAGE_HALF", "none").toString().trimmed().toLower();
+    if (h=="left" || h=="0") return qfihLeft;
+    if (h=="right" || h=="1") return qfihRight;
+    if (h=="top" || h=="2") return qfihTop;
+    if (h=="bottom" || h=="3") return qfihBottom;
+    return qfihNone;
 }

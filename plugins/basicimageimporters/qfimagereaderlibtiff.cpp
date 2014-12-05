@@ -63,6 +63,7 @@ QFImageReaderLIBTIFF::QFImageReaderLIBTIFF() {
         }
         fLibTIFFLogFilename="";
         TIFFSetWarningHandler(0);
+        TIFFSetErrorHandler(0);
     }
 }
 

@@ -235,7 +235,7 @@ void QFRDRFCSCorrelationEditor::connectWidgets(QFRawDataRecord* current, QFRawDa
     correlationMaskTools->setRDR(current);
     if (m) {
         readSettings();
-        cmbRunDisplay->setCurrentIndex(m->getProperty("FCS_RUN_DISPLAY", 0).toInt());
+        cmbRunDisplay->setCurrentIndex(m->getProperty("FCS_RUN_DISPLAY", ProgramOptions::getConfigValue("fcsdataeditor/run_display", 0)).toInt());
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         runs.setCurrent(current);
         sliders->disableSliderSignals();

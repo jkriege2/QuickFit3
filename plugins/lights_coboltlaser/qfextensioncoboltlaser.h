@@ -45,7 +45,7 @@
  */
 class QFExtensionCoboltLaser : public QObject, public QFExtensionBase, public QFExtensionLightSource, public QFExtensionMeasurementAndControlDevice {
         Q_OBJECT
-        Q_INTERFACES(QFExtension QFExtensionLightSource)
+        Q_INTERFACES(QFExtension QFExtensionLightSource QFExtensionMeasurementAndControlDevice)
     public:
         /** Default constructor */
         QFExtensionCoboltLaser(QObject* parent=NULL);

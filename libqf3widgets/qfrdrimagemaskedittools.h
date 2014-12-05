@@ -37,6 +37,7 @@
 #include <QWidgetAction>
 #include <QToolBar>
 #include "libwid_imexport.h"
+#include "qfrdroverviewimageinterface.h"
 
 
 class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
@@ -84,6 +85,7 @@ class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
         void undoMask();
         void redoMask();
         void maskBorder();
+        void maskByImage();
         void copyMaskToGroup();
         void maskSelected();
         void unmaskSelected();
@@ -125,6 +127,7 @@ class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
         QAction* actRedoMask;
         QAction* actMaskSelected;
         QAction* actUnmaskSelected;
+        QAction* actMaskByImage;
         QAction* actImagesZoom;
         QAction* actImagesDrawPoints;
         QAction* actImagesDrawRectangle;
@@ -143,6 +146,7 @@ class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
 
         QFRDRImageMaskInterface* imagemask;
         QFRDRRunSelectionsInterface* runselection;
+        QFRDROverviewImagesInterface* overviewimages;
 
         QStringList undos;
         int undoPos;
