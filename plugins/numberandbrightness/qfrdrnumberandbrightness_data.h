@@ -105,8 +105,8 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDRAdditio
 
 
         virtual int getOverviewImageCount() const;
-        virtual int getOverviewImageWidth() const;
-        virtual int getOverviewImageHeight() const;
+        virtual uint32_t getOverviewImageWidth() const;
+        virtual uint32_t getOverviewImageHeight() const;
         virtual QString getOverviewImageName(int image) const;
         virtual double* getOverviewImage(int image) const;
 

@@ -74,6 +74,12 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
         void imageZoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);
 
         void updateCorrSelection();
+
+        void correlationRectangleFinished(double x, double y, double width, double height, Qt::KeyboardModifiers modifiers);
+        void connectAllWidgets(bool enabled);
+        void setColorbarN(JKQTPMathImageColorPalette pal);
+        void setColorbarB(JKQTPMathImageColorPalette pal);
+        void setColorbarImg(JKQTPMathImageColorPalette pal);
     protected:
         /** \brief create widgets on object creation */
         void createWidgets();
@@ -86,7 +92,7 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
         void loadPlotSettings();
         void savePlotSettings();
 
-        void addPlotter( QFPlotter*& plotter, JKQTPMathImage*& plot, JKQTPOverlayImage*& plteSelected, JKQTPOverlayImage*& plteExcluded);
+        void addPlotter(QFPlotter*& plotter, JKQTPMathImage*& plot, JKQTPOverlayImage*& plteSelected, JKQTPOverlayImage*& plteExcluded);
 
         void reallocMem(int width, int height);
 
@@ -127,18 +133,35 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
         QFParameterCorrelationView* widCorrelation;
         QTabWidget* tabMain;
 
+        JKQTPMathImageColorPaletteComboBox* cmbColorbarN;
+        JKQTPMathImageColorPaletteComboBox* cmbColorbarB;
+        JKQTPMathImageColorPaletteComboBox* cmbColorbarOvr;
+
         QFEnhancedComboBox* cmbCorrelationP1;
         QFEnhancedComboBox* cmbCorrelationP2;
         QFEnhancedComboBox* cmbCorrelationPCol;
 
+        QCheckBox* chkAutoN;
+        QCheckBox* chkAutoB;
+        QCheckBox* chkAutoOvr;
         QFDoubleEdit* edtNMin;
         QFDoubleEdit* edtNMax;
         QFDoubleEdit* edtBMin;
         QFDoubleEdit* edtBMax;
+        QFDoubleEdit* edtOvrMin;
+        QFDoubleEdit* edtOvrMax;
+
+
+        QFDoubleEdit* edtCorrNMin;
+        QFDoubleEdit* edtCorrNMax;
+        QFDoubleEdit* edtCorrBMin;
+        QFDoubleEdit* edtCorrBMax;
         QCheckBox* chkRangeN;
         QCheckBox* chkRangeB;
 
         QToolBar* toolbar;
+        QToolBar* tbDisplay;
+        QToolBar* tbRanges;
 
         QPointer<QFRDRImageMaskEditTools> maskTools;
 

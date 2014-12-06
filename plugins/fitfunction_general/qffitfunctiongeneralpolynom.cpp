@@ -108,7 +108,11 @@ void QFFitFunctionGeneralPolynom::evaluateDerivatives(double* derivatives, doubl
 
 bool QFFitFunctionGeneralPolynom::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
 {
-    //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
+    int degree=params[PARAM_DEGREE];
+    if (N<degree-1) degree=N+1;
+    params[PARAM_DEGREE]=degree;
 
-    return QFFitFunction::estimateInitial(params, dataX, dataY, N);
+    statisticsPolyFit(dataX, dataY, N, degree, &(params[PARAM_OFFSET]));
+
+    return true;
 }

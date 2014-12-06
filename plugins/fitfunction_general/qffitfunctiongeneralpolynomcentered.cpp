@@ -30,7 +30,7 @@ QFFitFunctionGeneralPolynomCentered::QFFitFunctionGeneralPolynomCentered() {
     addParameter(IntCombo,  "degree",                    "degree",                                                  "degree",                   "",            "",                      false,      true,         false,              QFFitFunction::NoError,       false, 2,          1, 10,  1,   1,    10  );
     #define PARAM_DEGREE 0
     addParameter(FloatNumber,  "position",                    "position",                                                  "x<sub>0</sub>",                   "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 0.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MAX,    DBL_MAX  );
-    #define PARAM_OFFSET 1
+    #define PARAM_POSITION 1
     addParameter(FloatNumber,  "factor1",                    "prefactor 1",                                                  "a<sub>1</sub>",                   "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MAX,    DBL_MAX  );
     #define PARAM_FACTOR1 2
     addParameter(FloatNumber,  "factor2",                    "prefactor 2",                                                  "a<sub>2</sub>",                   "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1.0,          -DBL_MAX, DBL_MAX,  1,   -DBL_MAX,    DBL_MAX  );
@@ -56,7 +56,7 @@ QFFitFunctionGeneralPolynomCentered::QFFitFunctionGeneralPolynomCentered() {
 
 double QFFitFunctionGeneralPolynomCentered::evaluate(double t, const double* data) const {
     double res= 0;
-    const double x0=data[PARAM_OFFSET];
+    const double x0=data[PARAM_POSITION];
     int degree=data[PARAM_DEGREE];
     double x=t-x0;
     for (int i=0; i<degree; i++) {
@@ -112,4 +112,9 @@ bool QFFitFunctionGeneralPolynomCentered::estimateInitial(double *params, const 
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
 
     return QFFitFunction::estimateInitial(params, dataX, dataY, N);
+}
+
+bool QFFitFunctionGeneralPolynomCentered::isDeprecated() const
+{
+    return true;
 }

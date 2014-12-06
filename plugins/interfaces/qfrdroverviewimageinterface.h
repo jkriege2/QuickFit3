@@ -131,9 +131,9 @@ class QFRDROverviewImagesInterface {
         /** \brief returns the number of available preview images */
         virtual int getOverviewImageCount() const =0;
         /** \brief returns the width of the given image */
-        virtual int getOverviewImageWidth() const=0;
+        virtual uint32_t getOverviewImageWidth() const=0;
         /** \brief returns the height of the given image */
-        virtual int getOverviewImageHeight() const=0;
+        virtual uint32_t getOverviewImageHeight() const=0;
         /** \brief returns the name of the given image */
         virtual QString getOverviewImageName(int image) const=0;
 

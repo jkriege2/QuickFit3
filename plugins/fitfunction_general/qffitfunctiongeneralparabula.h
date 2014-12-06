@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 
-    last modification: $LastChangedDate$  (revision $Rev$)
+    last modification: $LastChangedDate: 2014-09-26 12:40:44 +0200 (Fr, 26 Sep 2014) $  (revision $Rev: 3508 $)
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -19,8 +19,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef QFFitFunctionGeneralPolynomCentered_H
-#define QFFitFunctionGeneralPolynomCentered_H
+#ifndef QFFitFunctionGeneralParabula_H
+#define QFFitFunctionGeneralParabula_H
 #include "qfpluginfitfunction.h"
 
 
@@ -30,16 +30,16 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \ingroup qf3fitfunp_fitfunction_general
 
 */
-class QFFitFunctionGeneralPolynomCentered: public QFFitFunction {
+class QFFitFunctionGeneralParabula: public QFFitFunction {
     public:
-        QFFitFunctionGeneralPolynomCentered();
-        virtual ~QFFitFunctionGeneralPolynomCentered() {}
+        QFFitFunctionGeneralParabula();
+        virtual ~QFFitFunctionGeneralParabula() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QObject::tr("General: Centered Polynom of degree 1..10"); }
+        virtual QString name() const { return QObject::tr("General: Parabula (Polynom of degree 2)"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("General: Centered Polynom"); }
+        virtual QString shortName() const { return QObject::tr("General: Parabula"); }
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("gen_polynomcenter"); }
+        virtual QString id() const { return QString("gen_parabula"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
@@ -64,8 +64,6 @@ class QFFitFunctionGeneralPolynomCentered: public QFFitFunction {
         /*! \brief if implemented (and returns \c true) this function tries to estimate the initial parameters of a fit function from provided data. */
         virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N, const bool *fix=NULL);
 
-        virtual bool isDeprecated() const;
-
 };
 
-#endif // QFFitFunctionGeneralPolynomCentered_H
+#endif // QFFitFunctionGeneralParabula_H

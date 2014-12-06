@@ -120,7 +120,7 @@ int QFRDRNumberAndBrightnessData::getHeight() const
 }
 
 void QFRDRNumberAndBrightnessData::recalcNumberAndBrightness() {
-    qDebug()<<image << imageVariance << background << backgroundVariance << numberImage << brightnessImage;
+    //qDebug()<<image << imageVariance << background << backgroundVariance << numberImage << brightnessImage;
     if (image && imageVariance && background && backgroundVariance && numberImage && brightnessImage) {
         if (getProperty("BACKGROUND_CORRECTED", false).toBool()) {
             for (int i=0; i<width*height; i++) {
@@ -144,12 +144,12 @@ int QFRDRNumberAndBrightnessData::getOverviewImageCount() const
     return 6;
 }
 
-int QFRDRNumberAndBrightnessData::getOverviewImageWidth() const
+uint32_t QFRDRNumberAndBrightnessData::getOverviewImageWidth() const
 {
     return getWidth();
 }
 
-int QFRDRNumberAndBrightnessData::getOverviewImageHeight() const
+uint32_t QFRDRNumberAndBrightnessData::getOverviewImageHeight() const
 {
     return getHeight();
 }
@@ -617,7 +617,7 @@ double *QFRDRNumberAndBrightnessData::getAdditionalImage(int img) const {
 
 QList<QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement> QFRDRNumberAndBrightnessData::getAdditionalImagesAnnotations(int image) const {
     QList<QFRDRAdditionalImagesInterface::AdditionalImagesGeoElement> result;
-    if (image>3 && image-4<=ovrImages.size()) return ovrImages[image-2].geoElements;
+    if (image>=4 && image-4<=ovrImages.size()) return ovrImages[image-4].geoElements;
     return result;
 }
 

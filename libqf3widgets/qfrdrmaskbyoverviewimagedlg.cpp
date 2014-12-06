@@ -76,11 +76,11 @@ bool *QFRDRMaskByOverviewImage::getMaskWithOld(bool *oldmask) const
     if (ui->cmbMaskMode->currentIndex()==0) {
         return getMask();
     } else if (ui->cmbMaskMode->currentIndex()==1) {
-        for (int i=0; i<m_width*m_height; i++) {
+        for (uint64_t i=0; i<m_width*m_height; i++) {
             m_maskt[i]=m_mask[i]||oldmask[i];
         }
     } else if (ui->cmbMaskMode->currentIndex()==2) {
-        for (int i=0; i<m_width*m_height; i++) {
+        for (uint64_t i=0; i<m_width*m_height; i++) {
             m_maskt[i]=oldmask[i];
             if (m_mask[i]) m_maskt[i]=false;
         }

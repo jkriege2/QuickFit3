@@ -41,6 +41,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctiongeneral2lognormal.h"
 #include "qffitfunctiongeneralsegmentedline.h"
 #include "qffitfunctiongeneralsegmentedpowerlaw.h"
+#include "qffitfunctiongeneralparabula.h"
 
 QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     QStringList res;
@@ -61,6 +62,7 @@ QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     res<<"gen_segpowerlaw";
     res<<"gen_line";
     res<<"gen_polynom";
+    res<<"gen_parabula";
     res<<"gen_polynomcenter";
     res<<"gen_hill";
     res<<"gen_modhill5p";
@@ -103,6 +105,8 @@ QFFitFunction* QFGeneralFitFunctionsPlugin::get(QString id, QObject* parent) con
         return new QFFitFunctionGeneralLine();
     } else if (id=="gen_polynom") {
         return new QFFitFunctionGeneralPolynom();
+    } else if (id=="gen_parabula") {
+        return new QFFitFunctionGeneralParabula();
     } else if (id=="gen_polynomcenter") {
         return new QFFitFunctionGeneralPolynomCentered();
     } else if (id=="gen_hill") {

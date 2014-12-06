@@ -207,7 +207,7 @@ bool *QFRDRImageMaskTools::maskGet() const
 
 void QFRDRImageMaskTools::maskSet(const bool *mask) const
 {
-    for (int i=0; i<mask_w*mask_h; i++) {
+    for (uint64_t i=0; i<mask_w*mask_h; i++) {
         this->mask[i]=mask[i];
     }
 }
