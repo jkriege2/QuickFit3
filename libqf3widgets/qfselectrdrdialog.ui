@@ -172,8 +172,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>487</x>
-     <y>388</y>
+     <x>578</x>
+     <y>386</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -188,8 +188,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>555</x>
-     <y>388</y>
+     <x>578</x>
+     <y>386</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -274,6 +274,38 @@
     <hint type="destinationlabel">
      <x>46</x>
      <y>87</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radSelect</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnAll</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>68</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>439</x>
+     <y>60</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>radSelect</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>btnNone</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>74</x>
+     <y>68</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>535</x>
+     <y>58</y>
     </hint>
    </hints>
   </connection>

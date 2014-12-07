@@ -42,6 +42,14 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctiongeneralsegmentedline.h"
 #include "qffitfunctiongeneralsegmentedpowerlaw.h"
 #include "qffitfunctiongeneralparabula.h"
+#include "qffitfunctiongeneralgaussianbeamwidth.h"
+#include "qffitfunctiongeneralgaussianbeamzintensity.h"
+#include "qffitfunctiongeneralpdfgaussianvar.h"
+#include "qffitfunctiongeneralcdfgaussiandistvar.h"
+#include "qffitfunctiongeneralpdfcauchy.h"
+#include "qffitfunctiongeneralcdfcauchy.h"
+#include "qffitfunctiongeneralpdfloggaussian.h"
+#include "qffitfunctiongeneralcdfloggaussian.h"
 
 QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     QStringList res;
@@ -67,6 +75,14 @@ QStringList QFGeneralFitFunctionsPlugin::getIDs() const {
     res<<"gen_hill";
     res<<"gen_modhill5p";
     res<<"gen_segline";
+    res<<"gen_gaussianbeam_width";
+    res<<"gen_gaussianbeam_zintensity";
+    res<<"gen_pdf_gaussian";
+    res<<"gen_cdf_gaussian";
+    res<<"gen_pdf_loggaussian";
+    res<<"gen_cdf_loggaussian";
+    res<<"gen_pdf_cauchy";
+    res<<"gen_cdf_cauchy";
     return res;
 }
 
@@ -115,6 +131,22 @@ QFFitFunction* QFGeneralFitFunctionsPlugin::get(QString id, QObject* parent) con
         return new QFFitFunctionGeneralModHill5P();
     } else if (id=="gen_segline") {
         return new QFFitFunctionGeneralSegmentedLine();
+    } else if (id=="gen_gaussianbeam_width") {
+        return new QFFitFunctionGeneralGaussianBeamWidth();
+    } else if (id=="gen_gaussianbeam_zintensity") {
+        return new QFFitFunctionGeneralGaussianBeamZIntensity();
+    } else if (id=="gen_pdf_gaussian") {
+        return new QFFitFunctionGeneralPDFGaussianVar();
+    } else if (id=="gen_cdf_gaussian") {
+        return new QFFitFunctionGeneralCDFGaussianDistVar();
+    } else if (id=="gen_pdf_loggaussian") {
+        return new QFFitFunctionGeneralPDFLogGaussian();
+    } else if (id=="gen_cdf_loggaussian") {
+        return new QFFitFunctionGeneralCDFLogGaussian();
+    } else if (id=="gen_pdf_cauchy") {
+        return new QFFitFunctionGeneralPDFCauchy();
+    } else if (id=="gen_cdf_cauchy") {
+        return new QFFitFunctionGeneralCDFCauchy();
     }
     return NULL;
 }

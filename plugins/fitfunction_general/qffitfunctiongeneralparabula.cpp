@@ -85,13 +85,15 @@ void QFFitFunctionGeneralParabula::evaluateDerivatives(double* derivatives, doub
 
 bool QFFitFunctionGeneralParabula::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix)
 {
-    double p[3]={0,0,0};
-    if (N<3) return false;
+    if (params && dataX && dataY && N>0)  {
+        double p[3]={0,0,0};
+        if (N<3) return false;
 
-    statisticsPolyFit(dataX, dataY, N, 2, p);
-    params[PARAM_FACTOR2]=p[2];
-    params[PARAM_POSITION]=p[1]/(-2.0*p[2]);
-    params[PARAM_OFFSET]=p[0]-p[2]*qfSqr(params[PARAM_POSITION]);
+        statisticsPolyFit(dataX, dataY, N, 2, p);
+        params[PARAM_FACTOR2]=p[2];
+        params[PARAM_POSITION]=p[1]/(-2.0*p[2]);
+        params[PARAM_OFFSET]=p[0]-p[2]*qfSqr(params[PARAM_POSITION]);
+    }
 
     return true;
 }

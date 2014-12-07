@@ -30,8 +30,9 @@
 #include "csvtools.h"
 #include "qfrdrimagingfcstools.h"
 #include "qfrdrnumberandbrightness_overvieweditor.h"
+#include "qfrdrnumberandbrightness_settingseditor.h"
 
-#define sqr(x) ((x)*(x))
+#define sqr(x) qfSqr(x)
 
 QFRDRNumberAndBrightnessData::QFRDRNumberAndBrightnessData(QFProject* parent):
     QFRawDataRecord(parent)
@@ -57,20 +58,22 @@ QFRDRNumberAndBrightnessData::~QFRDRNumberAndBrightnessData()
 
 int QFRDRNumberAndBrightnessData::getEditorCount()
 {
-    return 2;
+    return 3;
 }
 
 QString QFRDRNumberAndBrightnessData::getEditorName(int i)
 {
-    if (i==0) return tr("number & brightness");
-    if (i==1) return tr("overview images");
+    if (i==0) return tr("N&B settings");
+    if (i==1) return tr("number & brightness");
+    if (i==2) return tr("overview images");
     return QString("");
 }
 
 QFRawDataEditor *QFRDRNumberAndBrightnessData::createEditor(QFPluginServices *services, QFRawDataPropertyEditor *propEditor, int i, QWidget *parent)
 {
-    if (i==0) return new QFRDRNumberAndBrightnessDataEditor(services, propEditor, parent);
-    if (i==1) return new QFRDRNumberAndBrightnessOverviewEditor(services, propEditor, parent);
+    if (i==0) return new QFRDRNumberAndBrightnessSettingsEditor(services, propEditor, parent);
+    if (i==1) return new QFRDRNumberAndBrightnessDataEditor(services, propEditor, parent);
+    if (i==2) return new QFRDRNumberAndBrightnessOverviewEditor(services, propEditor, parent);
     return NULL;
 }
 
@@ -121,22 +124,32 @@ int QFRDRNumberAndBrightnessData::getHeight() const
 
 void QFRDRNumberAndBrightnessData::recalcNumberAndBrightness() {
     //qDebug()<<image << imageVariance << background << backgroundVariance << numberImage << brightnessImage;
+    bool backCorrected=getProperty("BACKGROUND_CORRECTED", false).toBool();
+    double userBackground=getProperty("BACKGROUND", 0).toDouble();
+    double userBackgroundStd=getProperty("BACKGROUND_STD", 0).toDouble();
     if (image && imageVariance && background && backgroundVariance && numberImage && brightnessImage) {
-        if (getProperty("BACKGROUND_CORRECTED", false).toBool()) {
-            for (int i=0; i<width*height; i++) {
-                numberImage[i]=(image[i]*image[i])/(imageVariance[i]-backgroundVariance[i]);
-                brightnessImage[i]=(imageVariance[i]-backgroundVariance[i])/(image[i]);
-            }
-        } else {
-            for (int i=0; i<width*height; i++) {
-                numberImage[i]=(image[i]-background[i])*(image[i]-background[i])/(imageVariance[i]-backgroundVariance[i]);
-                brightnessImage[i]=(imageVariance[i]-backgroundVariance[i])/(image[i]-background[i]);
-            }
+        for (int i=0; i<width*height; i++) {
+            double bvar=userBackgroundStd*userBackgroundStd;
+            if (backgroundVariance) bvar=bvar+backgroundVariance[i];
+            double back=userBackground;
+            if (background && !backCorrected) back=back+background[i];
+
+            numberImage[i]=(image[i]-back)*(image[i]-back)/(imageVariance[i]-bvar);
+            brightnessImage[i]=(imageVariance[i]-bvar)/(image[i]-back);
         }
+
+        bool en=isEmitResultsChangedEnabled();
+        disableEmitResultsChanged();
+        resultsSetNumberList("number_and_brightness", "particle_number", numberImage, width*height);
+        resultsSetGroupAndLabels("number_and_brightness", "particle_number", "fit results", "particle number", "particle number");
+        resultsSetNumberList("number_and_brightness", "particle_brightness", brightnessImage, width*height);
+        resultsSetGroupAndLabels("number_and_brightness", "particle_brightness", "fit results", "particle brigthness", "particle brigthness");
+        if (en) enableEmitResultsChanged();
 
         //resultsSetNumberList("number_and_brightness", "particle_number", numberImage, width*height);
         //resultsSetNumberList("number_and_brightness", "particle_brightness", brightnessImage, width*height);
     }
+    emitRawDataChanged();
 }
 
 int QFRDRNumberAndBrightnessData::getOverviewImageCount() const

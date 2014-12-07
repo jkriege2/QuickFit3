@@ -23,7 +23,8 @@
 #include "qfrdrnumberandbrightness_dataeditor.h"
 #include "qfrdrnumberandbrightness_data.h"
 #include "qfrawdatapropertyeditor.h"
-
+#include "qfselectrdrdialog.h"
+#include "datatools.h"
 
 QFRDRNumberAndBrightnessDataEditor::QFRDRNumberAndBrightnessDataEditor(QFPluginServices* services,  QFRawDataPropertyEditor*  propEditor, QWidget* parent):
     QFRawDataEditor(services, propEditor, parent)
@@ -155,13 +156,13 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
 
 
     cmbColorbarN=new JKQTPMathImageColorPaletteComboBox(this);
-    tbDisplay->addWidget(new QLabel(tr("particle number: "), this));
+    tbDisplay->addWidget(new QLabel(tr("<b>Color palettes:</b>&nbsp;&nbsp;&nbsp;particle number: "), this));
     tbDisplay->addWidget(cmbColorbarN);
     cmbColorbarB=new JKQTPMathImageColorPaletteComboBox(this);
-    tbDisplay->addWidget(new QLabel(tr("brightness: "), this));
+    tbDisplay->addWidget(new QLabel(tr("     brightness: "), this));
     tbDisplay->addWidget(cmbColorbarB);
     cmbColorbarOvr=new JKQTPMathImageColorPaletteComboBox(this);
-    tbDisplay->addWidget(new QLabel(tr("image: "), this));
+    tbDisplay->addWidget(new QLabel(tr("     image: "), this));
     tbDisplay->addWidget(cmbColorbarOvr);
     tbRanges=new QToolBar(tr("toolbar_ranges"), this);
     layPlots->addWidget(tbRanges, row, 0, 1, 2);
@@ -186,7 +187,7 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
 
 
 
-    tbRanges->addWidget(new QLabel(tr("   particle brightness: "), this));
+    tbRanges->addWidget(new QLabel(tr("     particle brightness: "), this));
     chkAutoB=new QCheckBox(tr("auto"), tbRanges);
     chkAutoB->setChecked(true);
     edtBMin=new QFDoubleEdit(tbRanges);
@@ -204,7 +205,7 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
 
 
 
-    tbRanges->addWidget(new QLabel(tr("   intensity: "), this));
+    tbRanges->addWidget(new QLabel(tr("     intensity: "), this));
     chkAutoOvr=new QCheckBox(tr("auto"), tbRanges);
     chkAutoOvr->setChecked(true);
     edtOvrMin=new QFDoubleEdit(tbRanges);
@@ -302,8 +303,7 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
     edtCorrNMin=new QFDoubleEdit(grp);
     laySelCor->addWidget(edtCorrNMin);
     edtCorrNMin->setEnabled(false);
-    edtCorrNMin->setCheckBounds(true, false);
-    edtCorrNMin->setMinimum(0);
+    edtCorrNMin->setCheckBounds(false, false);
     connect(chkRangeN, SIGNAL(toggled(bool)), edtCorrNMin, SLOT(setEnabled(bool)));
 
     laySelCor->addWidget(new QLabel(" ... "));
@@ -311,8 +311,7 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
     edtCorrNMax=new QFDoubleEdit(grp);
     laySelCor->addWidget(edtCorrNMax);
     edtCorrNMax->setEnabled(false);
-    edtCorrNMax->setCheckBounds(true, false);
-    edtCorrNMax->setMinimum(0);
+    edtCorrNMax->setCheckBounds(false, false);
     connect(chkRangeN, SIGNAL(toggled(bool)), edtCorrNMax, SLOT(setEnabled(bool)));
 
     laySelCor->addStretch();
@@ -323,8 +322,7 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
     edtCorrBMin=new QFDoubleEdit(grp);
     laySelCor->addWidget(edtCorrBMin);
     edtCorrBMin->setEnabled(false);
-    edtCorrBMin->setCheckBounds(true, false);
-    edtCorrBMin->setMinimum(0);
+    edtCorrBMin->setCheckBounds(false, false);
     connect(chkRangeB, SIGNAL(toggled(bool)), edtCorrBMin, SLOT(setEnabled(bool)));
 
 
@@ -333,8 +331,7 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
     edtCorrBMax=new QFDoubleEdit(grp);
     laySelCor->addWidget(edtCorrBMax);
     edtCorrBMax->setEnabled(false);
-    edtCorrBMax->setCheckBounds(true, false);
-    edtCorrBMax->setMinimum(0);
+    edtCorrBMax->setCheckBounds(false, false);
     connect(chkRangeB, SIGNAL(toggled(bool)), edtCorrBMax, SLOT(setEnabled(bool)));
 
 
@@ -433,11 +430,24 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
 
 
 
+    actBackgroundFromMask=new QAction(tr("background from mask"), this);
+    connect(actBackgroundFromMask, SIGNAL(triggered()), this, SLOT(setUserBackgroundFromMask()));
+    actBackgroundFromSelection=new QAction(tr("background from selection"), this);
+    connect(actBackgroundFromSelection, SIGNAL(triggered()), this, SLOT(setUserBackgroundFromSelection()));
 
+    actCopyData=new QAction(tr("copy N&&B data"), this);
+    connect(actCopyData, SIGNAL(triggered()), this, SLOT(copyData()));
 
+    menuNAB=propertyEditor->addMenu("&Evaluation Tools", -1);
+    menuNAB->addAction(actBackgroundFromMask);
+    menuNAB->addAction(actBackgroundFromSelection);
+    menuNAB->addSeparator();
+    menuNAB->addAction(actCopyData);
 
-    menuMask=propertyEditor->addMenu("&Mask", 0);
+    menuMask=propertyEditor->addMenu("&Mask", 1);
     maskTools->registerMaskToolsToMenu(menuMask);
+    menuMask->addSeparator();
+    menuMask->addAction(actBackgroundFromMask);
 }
 
 void QFRDRNumberAndBrightnessDataEditor::connectAllWidgets(bool enabled) {
@@ -519,6 +529,35 @@ void QFRDRNumberAndBrightnessDataEditor::setColorbarImg(JKQTPMathImageColorPalet
     pltOverview->update_plot();
 }
 
+void QFRDRNumberAndBrightnessDataEditor::setUserBackgroundFromMask()
+{
+    QFRDRNumberAndBrightnessData* m=qobject_cast<QFRDRNumberAndBrightnessData*>(current);
+    if (m) {
+        bool en=m->isEmitPropertiesChangedEnabled();
+        m->disableEmitPropertiesChanged();
+        m->setQFProperty("BACKGROUND", statisticsAverageMasked(m->maskGet(), m->getImage(), m->getWidth()*m->getHeight(), false), false, true);
+        m->setQFProperty("BACKGROUND_STD", sqrt(statisticsAverageMasked(m->maskGet(), m->getImageVariance(), m->getWidth()*m->getHeight(), false)), false, true);
+        if (en) m->enableEmitPropertiesChanged();
+
+        m->recalcNumberAndBrightness();
+    }
+}
+
+void QFRDRNumberAndBrightnessDataEditor::setUserBackgroundFromSelection()
+{
+    QFRDRNumberAndBrightnessData* m=qobject_cast<QFRDRNumberAndBrightnessData*>(current);
+    if (m && plteOverviewSelectedData) {
+        bool en=m->isEmitPropertiesChangedEnabled();
+        m->disableEmitPropertiesChanged();
+        m->setQFProperty("BACKGROUND", statisticsAverageMasked(plteOverviewSelectedData, m->getImage(), m->getWidth()*m->getHeight(), false), false, true);
+        m->setQFProperty("BACKGROUND_STD", sqrt(statisticsAverageMasked(plteOverviewSelectedData, m->getImageVariance(), m->getWidth()*m->getHeight(), false)), false, true);
+        if (en) m->enableEmitPropertiesChanged();
+
+        m->recalcNumberAndBrightness();
+    }
+
+}
+
 
 void QFRDRNumberAndBrightnessDataEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
 	// this functions connects to a new QFRawDataRecord which could also be NULL, so
@@ -580,6 +619,7 @@ void QFRDRNumberAndBrightnessDataEditor::connectWidgets(QFRawDataRecord* current
 
 void QFRDRNumberAndBrightnessDataEditor::replotData()
 {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRNumberAndBrightnessData* m=qobject_cast<QFRDRNumberAndBrightnessData*>(current);
     if (m) {
         //qDebug()<<"replotData()  w="<<m->getWidth()<<"  h="<<m->getHeight();
@@ -770,13 +810,127 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         }
 
     }
+    QApplication::restoreOverrideCursor();
 
+}
+
+void QFRDRNumberAndBrightnessDataEditor::copyData()
+{
+    QFRDRNumberAndBrightnessData* m=qobject_cast<QFRDRNumberAndBrightnessData*>(current);
+    if (m) {
+        QFSelectRDRDialog* dlg=new QFSelectRDRDialog(new QFMatchRDRFunctorSelectType(m->getType()), this);
+        QString prefix="number_and_brightness/copyData/";
+        dlg->setAllowCreateNew(false);
+        dlg->setAllowMultiSelect(true);
+        dlg->setProject(m->getProject());
+        dlg->setDescription(tr("Select all N and B RDRs, from which to copy the data!\nThen select the properties and statistics to copy."));
+
+        QListWidget* listParams=new QListWidget(dlg);
+        addCheckableQListWidgetItem(listParams, tr("number"), Qt::CheckState(ProgramOptions::getConfigValue(prefix+"copynumber", Qt::Checked).toInt()));
+        addCheckableQListWidgetItem(listParams, tr("brightness"), Qt::CheckState(ProgramOptions::getConfigValue(prefix+"copybrightness", Qt::Checked).toInt()));
+        addCheckableQListWidgetItem(listParams, tr("intensity"), Qt::CheckState(ProgramOptions::getConfigValue(prefix+"copyintensity", Qt::Unchecked).toInt()));
+        addCheckableQListWidgetItem(listParams, tr("background"), Qt::CheckState(ProgramOptions::getConfigValue(prefix+"copybackground", Qt::Unchecked).toInt()));
+
+        dlg->addWidget(tr("which parameterss?"), listParams);
+
+
+        QListWidget* listStat=new QListWidget(dlg);
+        addCheckableQListWidgetItem(listStat, tr("average"), Qt::CheckState(ProgramOptions::getConfigValue(prefix+"copyaverage", Qt::Checked).toInt()));
+        addCheckableQListWidgetItem(listStat, tr("median"), Qt::CheckState(ProgramOptions::getConfigValue(prefix+"copymedian", Qt::Unchecked).toInt()));
+        addCheckableQListWidgetItem(listStat, tr("standard deviation"), Qt::CheckState(ProgramOptions::getConfigValue(prefix+"copysd", Qt::Checked).toInt()));
+        addCheckableQListWidgetItem(listStat, tr("25% quantile"), Qt::CheckState(ProgramOptions::getConfigValue(prefix+"copy25q", Qt::Unchecked).toInt()));
+        addCheckableQListWidgetItem(listStat, tr("75% quantile"), Qt::CheckState(ProgramOptions::getConfigValue(prefix+"copy75q", Qt::Unchecked).toInt()));
+        addCheckableQListWidgetItem(listStat, tr("minimum"), Qt::CheckState(ProgramOptions::getConfigValue(prefix+"copymin", Qt::Unchecked).toInt()));
+        addCheckableQListWidgetItem(listStat, tr("maximum"), Qt::CheckState(ProgramOptions::getConfigValue(prefix+"copymax", Qt::Unchecked).toInt()));
+
+        dlg->addWidget(tr("which statistics?"), listStat);
+
+
+        if (dlg->exec()) {
+            QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+            ProgramOptions::setConfigValue(prefix+"copyaverage", listStat->item(0)->checkState());
+            ProgramOptions::setConfigValue(prefix+"copymedian", listStat->item(1)->checkState());
+            ProgramOptions::setConfigValue(prefix+"copysd", listStat->item(2)->checkState());
+            ProgramOptions::setConfigValue(prefix+"copy25q", listStat->item(3)->checkState());
+            ProgramOptions::setConfigValue(prefix+"copy75q", listStat->item(4)->checkState());
+            ProgramOptions::setConfigValue(prefix+"copymin", listStat->item(5)->checkState());
+            ProgramOptions::setConfigValue(prefix+"copymax", listStat->item(6)->checkState());
+
+            ProgramOptions::setConfigValue(prefix+"copynumber", listParams->item(0)->checkState());
+            ProgramOptions::setConfigValue(prefix+"copybrightness", listParams->item(1)->checkState());
+            ProgramOptions::setConfigValue(prefix+"copyintensity", listParams->item(2)->checkState());
+            ProgramOptions::setConfigValue(prefix+"copybackground", listParams->item(3)->checkState());
+
+            QList<QPointer<QFRawDataRecord> > rs=dlg->getSelectedRDRs();
+            QProgressDialog progress(tr("Copying data ..."), tr("&Cancel"), 0, rs.size(), this);
+            progress.setWindowModality(Qt::WindowModal);
+            QStringList colnames, rownames;
+            QList<QList<double> > data;
+            for (int i=0; i<rs.size(); i++) {
+                QFRDRNumberAndBrightnessData* mr=qobject_cast<QFRDRNumberAndBrightnessData*>(rs[i]);
+                if (mr) {
+                    rownames<<mr->getName();
+                    QList<double> dat;
+
+                    for (int ii=0; ii<listParams->count(); ii++) {
+                        QString pname=tr("particle number");
+                        double* d=mr->getNumberImage();
+                        bool* mask=mr->maskGet();
+                        int size=mr->getWidth()*mr->getHeight();
+                        if (ii==1) { pname=tr("particle brightness"); d=mr->getBrightnessImage();}
+                        else if (ii==2) {pname=tr("intensity"); d=mr->getImage();}
+                        else if (ii==3) {pname=tr("background intensity"); d=mr->getBackground(); }
+                        for (int j=0; j<listStat->count(); j++) {
+                            if (j==0) {
+                                if (i==0) colnames<<tr("avg(%1)").arg(pname);
+                                dat<<statisticsAverageMasked(mask, d, size, false);
+                            } else if (j==1) {
+                                if (i==0) colnames<<tr("median(%1)").arg(pname);
+                                dat<<statisticsMedianMasked(mask, d, size, false);
+                            } else if (j==2) {
+                                if (i==0) colnames<<tr("stddev(%1)").arg(pname);
+                                dat<<statisticsVarianceMasked(mask, d, size, false);
+                            } else if (j==3) {
+                                if (i==0) colnames<<tr("quantile25(%1)").arg(pname);
+                                dat<<statisticsQuantileMasked(mask, d, size, 0.25, false);
+                            } else if (j==4) {
+                                if (i==0) colnames<<tr("quantile75(%1)").arg(pname);
+                                dat<<statisticsQuantileMasked(mask, d, size, 0.75, false);
+                            } else if (j==5) {
+                                if (i==0) colnames<<tr("min(%1)").arg(pname);
+                                double mi,ma;
+                                statisticsMaskedMinMax(d, mask, size, mi, ma, false);
+                                dat<<mi;
+                            } else if (j==6) {
+                                if (i==0) colnames<<tr("max(%1)").arg(pname);
+                                double mi,ma;
+                                statisticsMaskedMinMax(d, mask, size, mi, ma, false);
+                                dat<<ma;
+                            }
+                        }
+                    }
+                    data<<dat;
+                }
+                progress.setValue(i);
+                QApplication::processEvents();
+                if (progress.wasCanceled()) break;
+            }
+
+            data=dataRotate(data);
+            QFDataExportHandler::copyCSV(data, colnames, rownames);
+            progress.setValue(rs.size());
+            QApplication::restoreOverrideCursor();
+        }
+         delete dlg;
+    }
 }
 
 
 
 void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
 {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRNumberAndBrightnessData* m=qobject_cast<QFRDRNumberAndBrightnessData*>(current);
     if (m) {
 
@@ -878,6 +1032,7 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
         histIntensity->updateHistogram(true);
         widCorrelation->updateCorrelation(true);
     }
+    QApplication::restoreOverrideCursor();
 }
 
 void QFRDRNumberAndBrightnessDataEditor::rawDataChanged() {
@@ -971,7 +1126,8 @@ void QFRDRNumberAndBrightnessDataEditor::imageZoomChangedLocally(double newxmin,
 
 void QFRDRNumberAndBrightnessDataEditor::updateCorrSelection()
 {
-    QFRDRNumberAndBrightnessData* m=qobject_cast<QFRDRNumberAndBrightnessData*>(current);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+     QFRDRNumberAndBrightnessData* m=qobject_cast<QFRDRNumberAndBrightnessData*>(current);
     if (m) {
         bool reOvr=pltOverview->get_doDrawing();
         bool emOvr=pltOverview->get_emitSignals();
@@ -1049,10 +1205,12 @@ void QFRDRNumberAndBrightnessDataEditor::updateCorrSelection()
         }
         pltBrightness->set_emitSignals(emCor);
     }
+    QApplication::restoreOverrideCursor();
 }
 
 void QFRDRNumberAndBrightnessDataEditor::correlationRectangleFinished(double x, double y, double width, double height, Qt::KeyboardModifiers modifiers)
 {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     connectAllWidgets(false);
     edtCorrNMin->setValue(qMin(x, x+width));
     edtCorrNMax->setValue(qMax(x, x+width));
@@ -1067,4 +1225,5 @@ void QFRDRNumberAndBrightnessDataEditor::correlationRectangleFinished(double x, 
     connectAllWidgets(true);
     updateCorrSelection();
     updateHistograms();
+    QApplication::restoreOverrideCursor();
 }

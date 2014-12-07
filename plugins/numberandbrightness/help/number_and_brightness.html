@@ -5,36 +5,83 @@
   <title>Number and Brightness Analysis Plugin</title>
   </head>
   <body>
-	$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
-	
-	<h2>Functionality</h2>
-	This plugin calculates the particle number and particle brightness from a set of images according to the well-established N&amp;B-method. You can find a detailed description and discussion of this method in these papers:
-	<blockquote><ul>
-	<li>Hong Qian, Elliot L. Elson (1990): <b>"Distribution of molecular aggregation by analysis of fluctuation moments"</b>, <i>PNAS,</i> <b>87</b>(14), 5479-5483,  <a href="http://www.ncbi.nlm.nih.gov/pubmed/2371284">Pubmed: 2371284</a></li>
-	<li>Jay R. Unruh, Enrico Gratton (2008): <b>"Analysis of Molecular Concentration and Brightness from Fluorescence Fluctuation Data with an Electron Multiplied CCD Camera"</b>, <i>Biophysical Journal,</i> <b>95</b>(11), 5385–5398, <a href="http://www.ncbi.nlm.nih.gov/pubmed/18805922">Pubmed: 18805922</a></li>
-	</ul></blockquote>
-	
-	According to these references, four images are needed:
-	<ol>
-	  <li>an intensity image $$math:I$$, best taken with an exposure time smaller than the particle diffusion time.</li>
-	  <li>an intensity variance image $$math:\sigma_I^2$$, e.g. calculated from a series of images.</li>
-	  <li>a background intensity image $$math:B$$, taken with the same settings as image $$math:I$$, but without illumination.</li>
-	  <li>a background variance $$math:\sigma_B^2$$</li>
-	</ol>
-	From these images for every pixel, the plugin calculates the particle number $$math:N$$ and the particle brightness $$math:\epsilon$$:
-	$$bmath:N=\frac{(I-B)^2}{\sigma_I^2-\sigma_B^2}$$
-	$$bmath:\epsilon=\frac{\sigma_I^2-\sigma_B^2}{I-B}$$
-	$$note:<b>Note</b> however that these quantities resemble the true values ONLY if the images were taken with a photon counting detector, as e.g. in a confocal laser scanning microscope equipped with APDs. If the detector is not a photon-counting detector, the equations above may not be usable any longer. This is especially true,  when a detector, such as an EMCCD camera, with an excess noise due to the stochastic amplification on chip is used. A detailed discussion of this topic is given in the second reference by Unruh and Elson.$$
-	
-	$$qf_commondoc_backtop$$
-	<br><br><br>
-	<h2>Usage/User Interface</h2>
-	This plugin adds a number-and-brightness raw data record type to QuickFit, which calculates the desired values on the fly. Several options are supplied to add such a record to the project.
-	<h3>number and brightness display editor</h3>
-	The number and brightness tab of the raw data record is split into two tabs with plots:
-	<ol>
-	  <li><b>image plots:</b> This tab shows the three important images: particle number $$math:N$$, particle brightness $$math:\epsilon$$ and the intensity image $$math:I$$. The fourth plot shows a scatter plot of the particle number against the particle brightness.</li>
-	  <li><b>histograms:</b> Shows histograms of the particle number and particle brightness images. Next to the histograms you see a summary of the statistics of these images. <b>Note:</b> Histograms of the input images can be found in the "overview images" tab of the raw data record editor!</li>
-	</ol>
+    $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+    
+    <h2>Functionality</h2>
+    
+    <p>
+        This plugin calculates the particle number and particle brightness from a set of images according to the well-established N&amp;B-method. You can find a detailed description and discussion of this method in these papers $$ref:QIANELSONWEBB:Hong Qian, Elliot L. Elson (1990): <b>"Distribution of molecular aggregation by analysis of fluctuation moments"</b>, <i>PNAS,</i> <b>87</b>(14), 5479-5483,  <a href="http://www.ncbi.nlm.nih.gov/pubmed/2371284">Pubmed: 2371284</a>$$$$ref:UNRUHGRATTON:Jay R. Unruh, Enrico Gratton (2008): <b>"Analysis of Molecular Concentration and Brightness from Fluorescence Fluctuation Data with an Electron Multiplied CCD Camera"</b>, <i>Biophysical Journal,</i> <b>95</b>(11), 5385-5398, <a href="http://www.ncbi.nlm.nih.gov/pubmed/18805922">Pubmed: 18805922</a>$$
+    This plugin impements two methods: one is suitable for data acquired with a photon-cpunting detector (e.g. a laser scanning confocal microscope) and one is usable with data acquired with an electron-multiplying CCD camera (EM-CCD).
+    </p>
+    <p>Typically this method depends on four values for each pixel: the average and variance/standard deviation of the intensity and of the background intensity. The N&amp;B analysis relies on the analysis of the fluctuations of the fluorescence intensity encoded in this dataset (actually on the relation between fluctuations/variance and average intensity). Therefore the dwell time of the acquisition should be faster than the time, that particles need to diffuse through a pixel. Note that this method does NOT rely on the repetition time of the measurements, but solely on the dwell time. E.g. for EGFP in cells, a dwell time of a few 10&mu;s is fine, even if the repetition time is a few milliseconds.
+    </p>
+    
+
+    
+    
+    <h3>Data from Photon Counting Detectors</h3>
+    <p>
+    This method is suitable for data from a photon counting detector. According to the reference $$ref:QIANELSONWEBB:$$$$ref:UNRUHGRATTON:$$, four images are needed:
+    <ol>
+      <li>an intensity image $$math:I$$, best taken with an exposure time smaller than the particle diffusion time.</li>
+      <li>an intensity variance image $$math:\sigma_I^2$$, e.g. calculated from a series of images.</li>
+      <li>a background intensity image $$math:B$$, taken with the same settings as image $$math:I$$, but without illumination.</li>
+      <li>a background variance $$math:\sigma_B^2$$</li>
+    </ol>
+    From these images for every pixel, the plugin calculates the particle number $$math:N$$ and the particle brightness $$math:\epsilon$$:
+    $$bmath:N=\frac{(I-B)^2}{\sigma_I^2-\sigma_B^2}$$
+    $$bmath:\epsilon=\frac{\sigma_I^2-\sigma_B^2}{I-B}$$
+    $$note:The background intensities B and &sigma;<sub>B</sub> are taken from an image and a possibble user-background is added to these. This user-background can be set from selected/masked pixels in the <i>Number and brightness display editor</i> or by numbers in the <i>Number and brightness parameter editor</i>$$
+</p>
+
+    
+    <h3>Data from EM-CCD Detectors</h3>
+    <p>This method is suitable for data from an electron-multiplying CCD camera (EM-CCD) and was first published in  $$ref:UNRUHGRATTON:$$.
+    </p>
+    
+
+    
+    <h2>Usage/User Interface</h2>
+<p>
+    This plugin adds a number-and-brightness raw data record type to QuickFit, which calculates the desired values on the fly. Several options are supplied to add such a record to the project.
+</p>
+
+
+<h3>Adding an N&amp;B record to the project</h3>
+<p>This plugin implements sevreal methods to add a raw data record (RDR) to the project. they are summarized in the maion window within the menu <b>Data Items | Insert Raw Data | Number &amp; Brightness Analysis</b>:
+<ol>
+    <li><b>load from imFCS dataset:</b> In this function you can select an <tt>.evalsettings.txt</tt>-file, as it is created by <a href="$$plugin_info:help:imaging_fcs$$">the imaging FCS plugin</a>. The correlator in this plugin typically creates the  four raw images, required for an N&amp;B analysis. If the data was acquired using a dual-view optics, two records are inserted into the project: One for each channel of the DualView.</li>
+    <li><b>load from average+StdDev images (TIFF):</b> This function starts a wizard, which allows the user to select the four required images as TIFF files. On the second page of the wizard, you can select the pixel size and othe rproperties of the acquisition and set the DualView-mode to use. Finally the N&amp;B records are added to the project.</li>
+</ol></p>
+
+
+    <h3>Number and brightness parameter editor</h3>
+    <p>This tab allows to set the parameters, used to calculate the N&amp;B. It also allows to recalculate the N&amp;B from the input images.
+        
+    </p>
+    
+    <h3>Number and brightness display editor</h3>
+    
+      <p>The number and brightness tab of the raw data record is split into three tabs with plots:
+    <ol>
+      <li><b>image plots:</b> <ul>
+	      <li>This tab shows the three important images: particle number $$math:N$$, particle brightness $$math:\epsilon$$ and the intensity image $$math:I$$. The fourth plot shows a scatter plot of the particle number against the particle brightness. Above the plots you can select the <a href="$$mainhelpdir$$installedcolorpalettes.html"> color palettes</a>, used for the three plots. 
+		  <li>You can also set the value ranges for the image plots, or set them to auto, which scales the colors between the minimum and maximum value within the currently non-masked pixels. </li>
+		  <li>You can also use the typical mask editor tools, available in many QuickFit plugins. these allow to draw masks into the images, or set the mask by intensity. Masks may also be copied, pasted saved etc. All these functions are available in the menu <b>Mask</b>.</li>
+	      <li>Below the plots you can set ranges for the particle number and brightness. These are displayed as ranges in the correlation plot and may also be set, by drawing a rectangle within that plot. If these ranges are given, all pixels within these ranges are selected in the three image plots (red overlay). Also the histograms on the "histograms" tab contain a second histogram with the selected pixels only.</li>
+		  <li>The menu entry <b>Evaluation Tools | copy N&amp;B data</b> allows to copy the average/stddev/median/... of several records (and in there only the non-masked pixels) into a table.</li>
+		</ul> 
+	  </li>
+      <li><b>histograms:</b> Shows <a href="$$mainhelpdir$$/qfhistogram.html">histograms</a> of the particle number, particle brightness and intensity images. Next to the histograms you see a summary of the statistics of these images. $$note:Histograms of the input images can be found in the "overview images" tab of the raw data record editor!$$</li>
+      <li><b>correlations:</b> In this tab you can generate <a href="$$mainhelpdir$$/qfparametercorrelation.html">correlation plots</a> of any parameter against any other.</li> 
+      </ol>
+      </p>
+      
+      
+      
+      <h3>Overview Images editor</h3>
+      <p>In this editor you can view the raw images and also overview images, possibly acquired together with the actual acquisition.</p>
+      
+      
   </body>
 </html>

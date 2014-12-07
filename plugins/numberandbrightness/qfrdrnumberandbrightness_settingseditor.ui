@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFRDRNumberAndBrightnessSettingsEditor</class>
+ <widget class="QWidget" name="QFRDRNumberAndBrightnessSettingsEditor">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>456</width>
+    <height>300</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QFormLayout" name="formLayout">
+   <item row="1" column="0">
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>user background intensity (Average):</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QFDoubleEdit" name="edtBackground"/>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>user background intensity (StdDev):</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QFDoubleEdit" name="edtBackgroundSD"/>
+   </item>
+   <item row="0" column="1">
+    <widget class="QCheckBox" name="chkIIsBackCorrected">
+     <property name="text">
+      <string>intensity image is already background corrected</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="4" column="1">
+    <widget class="QPushButton" name="btnRecalc">
+     <property name="text">
+      <string>recalculate N&amp;&amp;B</string>
+     </property>
+     <property name="icon">
+      <iconset resource="numberandbrightness.qrc">
+       <normaloff>:/number_and_brightness/qfrdrnumberandbrightness_small.png</normaloff>:/number_and_brightness/qfrdrnumberandbrightness_small.png</iconset>
+     </property>
+    </widget>
+   </item>
+   <item row="5" column="1">
+    <widget class="QPushButton" name="btnCopyToOthers">
+     <property name="text">
+      <string>copy these N&amp;&amp;B to other records</string>
+     </property>
+     <property name="icon">
+      <iconset resource="numberandbrightness.qrc">
+       <normaloff>:/number_and_brightness/qfrdrnumberandbrightness_small.png</normaloff>:/number_and_brightness/qfrdrnumberandbrightness_small.png</iconset>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="numberandbrightness.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>btnRecalc</sender>
+   <signal>clicked()</signal>
+   <receiver>QFRDRNumberAndBrightnessSettingsEditor</receiver>
+   <slot>recalcNB()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>277</x>
+     <y>140</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>160</x>
+     <y>166</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>btnCopyToOthers</sender>
+   <signal>clicked()</signal>
+   <receiver>QFRDRNumberAndBrightnessSettingsEditor</receiver>
+   <slot>writeDataToAllRDR()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>301</x>
+     <y>171</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>135</x>
+     <y>224</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>recalcNB()</slot>
+  <slot>writeDataToAllRDR()</slot>
+ </slots>
+</ui>

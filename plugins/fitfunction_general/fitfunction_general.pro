@@ -51,7 +51,15 @@ HEADERS += qfgeneralfitfunctionsplugin.h \
     qffitfunctiongeneralskewgaussianvar.h \
     qffitfunctiongeneralsegmentedline.h \
     qffitfunctiongeneralsegmentedpowerlaw.h \
-    qffitfunctiongeneralparabula.h
+    qffitfunctiongeneralparabula.h \
+    qffitfunctiongeneralpdfgaussianvar.h \
+    qffitfunctiongeneralcdfgaussiandistvar.h \
+    qffitfunctiongeneralgaussianbeamwidth.h \
+    qffitfunctiongeneralgaussianbeamzintensity.h \
+    qffitfunctiongeneralcdfcauchy.h \
+    qffitfunctiongeneralpdfcauchy.h \
+    qffitfunctiongeneralcdfloggaussian.h \
+    qffitfunctiongeneralpdfloggaussian.h
 
 SOURCES += qfgeneralfitfunctionsplugin.cpp\
            qffitfunctiongeneralsigmoid.cpp \
@@ -75,7 +83,15 @@ SOURCES += qfgeneralfitfunctionsplugin.cpp\
     qffitfunctiongeneralskewgaussianvar.cpp \
     qffitfunctiongeneralsegmentedline.cpp \
     qffitfunctiongeneralsegmentedpowerlaw.cpp \
-    qffitfunctiongeneralparabula.cpp
+    qffitfunctiongeneralparabula.cpp \
+    qffitfunctiongeneralpdfgaussianvar.cpp \
+    qffitfunctiongeneralcdfgaussiandistvar.cpp \
+    qffitfunctiongeneralgaussianbeamwidth.cpp \
+    qffitfunctiongeneralgaussianbeamzintensity.cpp \
+    qffitfunctiongeneralcdfcauchy.cpp \
+    qffitfunctiongeneralpdfcauchy.cpp \
+    qffitfunctiongeneralcdfloggaussian.cpp \
+    qffitfunctiongeneralpdfloggaussian.cpp
 
 FORMS =
 

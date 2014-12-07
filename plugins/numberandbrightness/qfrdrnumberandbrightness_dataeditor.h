@@ -69,6 +69,8 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
          */
         void replotData();
 
+        void copyData();
+
         void updateHistograms();
 
         void imageZoomChangedLocally(double newxmin, double newxmax, double newymin, double newymax, JKQtPlotter *sender);
@@ -80,6 +82,9 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
         void setColorbarN(JKQTPMathImageColorPalette pal);
         void setColorbarB(JKQTPMathImageColorPalette pal);
         void setColorbarImg(JKQTPMathImageColorPalette pal);
+
+        void setUserBackgroundFromMask();
+        void setUserBackgroundFromSelection();
     protected:
         /** \brief create widgets on object creation */
         void createWidgets();
@@ -97,6 +102,9 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
         void reallocMem(int width, int height);
 
 
+        QAction* actBackgroundFromMask;
+        QAction* actBackgroundFromSelection;
+        QAction* actCopyData;
 
         QColor selectionColor;
         QColor excludedColor;
@@ -166,6 +174,7 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
         QPointer<QFRDRImageMaskEditTools> maskTools;
 
 
+        QMenu* menuNAB;
         QMenu* menuMask;
 
 

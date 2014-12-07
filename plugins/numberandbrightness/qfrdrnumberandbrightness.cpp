@@ -52,14 +52,14 @@ QFRawDataRecord* QFRDRNumberAndBrightnessPlugin::createRecord(QFProject* parent)
 
 
 void QFRDRNumberAndBrightnessPlugin::registerToMenu(QMenu* menu) {
-    QMenu* m=menu->addMenu(QIcon(getIconFilename()), tr("&Number & Brightness Analysis"));
+    QMenu* m=menu->addMenu(QIcon(getIconFilename()), tr("&Number && Brightness Analysis"));
 
     QAction* action=new QAction(QIcon(getIconFilename()), tr("&load from imFCS dataset"), parentWidget);
     action->setStatusTip(tr("Insert a new record with data from an imaging FCS evaluation"));
     connect(action, SIGNAL(triggered()), this, SLOT(insertFromImFCSRecord()));
     m->addAction(action);
 
-    action=new QAction(QIcon(getIconFilename()), tr("&load from avger+StdDev images (TIFF)"), parentWidget);
+    action=new QAction(QIcon(getIconFilename()), tr("&load from average+StdDev images (TIFF)"), parentWidget);
     action->setStatusTip(tr("Insert a new record with data from four files, that contain the average/stddev of the image and the backrgound"));
     connect(action, SIGNAL(triggered()), this, SLOT(startNANDBFromPreprocessedFilesWizard()));
     m->addAction(action);
@@ -645,8 +645,8 @@ void QFRDRNumberAndBrightnessPlugin::startNANDBFromPreprocessedFilesWizard()
     cmbImageVar->addItem("variance image");
     cmbImageVar->setCurrentIndex(0);
     wizSelfiles->addRow("", cmbImageVar);
-    wizSelfiles->addFileSelection("background average:", filters, true);
-    wizSelfiles->addFileSelection("background std.dev.:", filters, true);
+    wizSelfiles->addFileSelection("background average:", filters, false);
+    wizSelfiles->addFileSelection("background std.dev.:", filters, false);
     QComboBox* cmbBackVar=new QComboBox(wizSelfiles);
     cmbBackVar->addItem("standard deviation image");
     cmbBackVar->addItem("variance image");

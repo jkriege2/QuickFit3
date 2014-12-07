@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 
-    last modification: $LastChangedDate$  (revision $Rev$)
+    last modification: $LastChangedDate: 2014-09-26 12:40:44 +0200 (Fr, 26 Sep 2014) $  (revision $Rev: 3508 $)
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -19,8 +19,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef QFFitFunctionGeneralGaussianDistVar_H
-#define QFFitFunctionGeneralGaussianDistVar_H
+#ifndef QFFitFunctionGeneralCDFCauchy_H
+#define QFFitFunctionGeneralCDFCauchy_H
 #include "qfpluginfitfunction.h"
 
 
@@ -30,16 +30,16 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \ingroup qf3fitfunp_fitfunctions_general
 
 */
-class QFFitFunctionGeneralGaussianDistVar: public QFFitFunction {
+class QFFitFunctionGeneralCDFCauchy: public QFFitFunction {
     public:
-        QFFitFunctionGeneralGaussianDistVar();
-        virtual ~QFFitFunctionGeneralGaussianDistVar() {}
+        QFFitFunctionGeneralCDFCauchy();
+        virtual ~QFFitFunctionGeneralCDFCauchy() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QObject::tr("Sigmoidals: Gaussian distribution function (1/sqrt(e) width)"); }
+        virtual QString name() const { return QObject::tr("Cummulative Distributions (CDF): Cauchy "); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return name(); }
+        virtual QString shortName() const { return QObject::tr("CDF: Cauchy"); }
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("gen_gaussiandist_sqrte"); }
+        virtual QString id() const { return QString("gen_cdf_cauchy"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
@@ -63,4 +63,4 @@ class QFFitFunctionGeneralGaussianDistVar: public QFFitFunction {
         bool estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool *fix=NULL);
 };
 
-#endif // QFFitFunctionGeneralGaussianDistVar_H
+#endif // QFFitFunctionGeneralCDFCauchy_H

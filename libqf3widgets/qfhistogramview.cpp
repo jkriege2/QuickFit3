@@ -218,7 +218,7 @@ void QFHistogramView::createWidgets() {
     //connectParameterWidgets(true);
 
     setSpaceSavingMode(true);
-    cmbFitFunction->updateFitFunctions("gen_,gendist_,dist_");
+    cmbFitFunction->updateFitFunctions("gen_pdf_,gen_,gendist_,dist_");
     cmbFitFunction->setCurrentFitFunction("gen_gaussian_sqrte");
     cmbFitFunction->setUpdatesEnabled(true);
 
