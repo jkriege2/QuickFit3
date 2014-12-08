@@ -176,7 +176,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                         mored[i]=dist[i]/(6.0*distTau[i]);
                     }
                     QFGetPlotdataInterface::GetPlotDataItem item;
-                    item.x=acftau;
+                    item.x=distTau;
                     item.y=mored;
                     item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(6\\tau)").arg(record->getName());
                     plotdata.append(item);
@@ -186,7 +186,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                         mored[i]=dist[i]/(4.0*distTau[i]);
                     }
                     QFGetPlotdataInterface::GetPlotDataItem item;
-                    item.x=acftau;
+                    item.x=distTau;
                     item.y=mored;
                     item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(4\\tau)").arg(record->getName());
                     plotdata.append(item);
@@ -199,7 +199,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                         mored[i]=dist[i]/(P*D*distTau[i]);
                     }
                     QFGetPlotdataInterface::GetPlotDataItem item;
-                    item.x=acftau;
+                    item.x=distTau;
                     item.y=mored;
                     item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(P\\cdot D_0\\cdot\\tau)").arg(record->getName());
                     plotdata.append(item);
@@ -211,7 +211,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                         mored[i]=dist[i]/(P*D*distTau[i]);
                     }
                     QFGetPlotdataInterface::GetPlotDataItem item;
-                    item.x=acftau;
+                    item.x=distTau;
                     item.y=mored;
                     item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(P\\cdot D_1\\cdot\\tau)").arg(record->getName());
                     plotdata.append(item);
@@ -224,7 +224,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                         mored[i]=dist[i]/(P*D*distTau[i]);
                     }
                     QFGetPlotdataInterface::GetPlotDataItem item;
-                    item.x=acftau;
+                    item.x=distTau;
                     item.y=mored;
                     item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(P\\cdot D_2\\cdot\\tau)").arg(record->getName());
                     plotdata.append(item);
@@ -236,7 +236,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                         mored[i]=dist[i]/(P*D*distTau[i]);
                     }
                     QFGetPlotdataInterface::GetPlotDataItem item;
-                    item.x=acftau;
+                    item.x=distTau;
                     item.y=mored;
                     item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle/(P\\cdot D_3\\cdot\\tau)").arg(record->getName());
                     plotdata.append(item);
@@ -248,7 +248,7 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                         mored[i]=dist[i]-(P*D*distTau[i]);
                     }
                     QFGetPlotdataInterface::GetPlotDataItem item;
-                    item.x=acftau;
+                    item.x=distTau;
                     item.y=mored;
                     item.name=QString("\\verb{%1:} \\langle r^2(\\tau)\\rangle-P\\cdot D_0\\cdot\\tau").arg(record->getName());
                     plotdata.append(item);
