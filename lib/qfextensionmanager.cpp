@@ -69,7 +69,11 @@ void QFExtensionManager::searchPlugins(QString directory, QFPluginHelpData &help
                 // , QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList
                 QFHelpDirectoryInfo info;
                 info.plugin=iRecord;
-                info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+QFileInfo(fileName).baseName()+QString("/");
+                QString libbasename=QFileInfo(fileName).baseName();
+                if (fileName.contains(".so")) {
+                    if (libbasename.startsWith("lib")) libbasename=libbasename.right(libbasename.size()-3);
+                }
+                info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+libbasename+QString("/");
                 info.mainhelp=info.directory+iRecord->getID()+QString(".html");
                 info.tutorial=info.directory+QString("tutorial.html");
                 info.settings=info.directory+QString("settings.html");
@@ -81,7 +85,7 @@ void QFExtensionManager::searchPlugins(QString directory, QFPluginHelpData &help
                 if (!info.faq.isEmpty()) parseFAQ(info.faq, iRecord->getID(), helpdata.faqs);
                 info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_extension.html");
                 info.plugintypename=tr("Extension Plugins");
-                info.pluginDLLbasename=QFileInfo(fileName).baseName();
+                info.pluginDLLbasename=libbasename;
                 info.pluginDLLSuffix=QFileInfo(fileName).suffix();
                 helpdata.pluginHelpList.append(info);
 
