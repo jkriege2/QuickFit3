@@ -158,6 +158,7 @@ class QFRDRNumberAndBrightnessDataEditor : public QFRawDataEditor {
         QFDoubleEdit* edtBMax;
         QFDoubleEdit* edtOvrMin;
         QFDoubleEdit* edtOvrMax;
+        QCheckBox* chkApparentProps;
 
 
         QFDoubleEdit* edtCorrNMin;

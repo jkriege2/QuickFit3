@@ -44,6 +44,8 @@ QFRDRNumberAndBrightnessData::QFRDRNumberAndBrightnessData(QFProject* parent):
     backgroundVariance=NULL;
     image=NULL;
     imageVariance=NULL;
+    appNumberImage=NULL;
+    appBrightnessImage=NULL;
     numberImage=NULL;
     brightnessImage=NULL;
 
@@ -102,6 +104,16 @@ double *QFRDRNumberAndBrightnessData::getBackgroundVariance() const
     return backgroundVariance;
 }
 
+double *QFRDRNumberAndBrightnessData::getAppNumberImage() const
+{
+    return appNumberImage;
+}
+
+double *QFRDRNumberAndBrightnessData::getAppBrightnessImage() const
+{
+    return appBrightnessImage;
+}
+
 double *QFRDRNumberAndBrightnessData::getNumberImage() const
 {
     return numberImage;
@@ -111,6 +123,61 @@ double *QFRDRNumberAndBrightnessData::getBrightnessImage() const
 {
     return brightnessImage;
 }
+
+
+
+
+
+
+
+
+
+
+double QFRDRNumberAndBrightnessData::getImage(int idx) const
+{
+    return image[idx];
+}
+
+double QFRDRNumberAndBrightnessData::getImageVariance(int idx) const
+{
+    return imageVariance[idx];
+}
+
+double QFRDRNumberAndBrightnessData::getBackground(int idx) const
+{
+    return background[idx];
+}
+
+double QFRDRNumberAndBrightnessData::getBackgroundVariance(int idx) const
+{
+    return backgroundVariance[idx];
+}
+
+double QFRDRNumberAndBrightnessData::getAppNumberImage(int idx) const
+{
+    return appNumberImage[idx];
+}
+
+double QFRDRNumberAndBrightnessData::getAppBrightnessImage(int idx) const
+{
+    return appBrightnessImage[idx];
+}
+
+double QFRDRNumberAndBrightnessData::getNumberImage(int idx) const
+{
+    return numberImage[idx];
+}
+
+double QFRDRNumberAndBrightnessData::getBrightnessImage(int idx) const
+{
+    return brightnessImage[idx];
+}
+
+
+
+
+
+
 
 int QFRDRNumberAndBrightnessData::getWidth() const
 {
@@ -127,23 +194,23 @@ void QFRDRNumberAndBrightnessData::recalcNumberAndBrightness() {
     bool backCorrected=getProperty("BACKGROUND_CORRECTED", false).toBool();
     double userBackground=getProperty("BACKGROUND", 0).toDouble();
     double userBackgroundStd=getProperty("BACKGROUND_STD", 0).toDouble();
-    if (image && imageVariance && background && backgroundVariance && numberImage && brightnessImage) {
+    if (image && imageVariance && background && backgroundVariance && appNumberImage && appBrightnessImage) {
         for (int i=0; i<width*height; i++) {
             double bvar=userBackgroundStd*userBackgroundStd;
             if (backgroundVariance) bvar=bvar+backgroundVariance[i];
             double back=userBackground;
             if (background && !backCorrected) back=back+background[i];
 
-            numberImage[i]=(image[i]-back)*(image[i]-back)/(imageVariance[i]-bvar);
-            brightnessImage[i]=(imageVariance[i]-bvar)/(image[i]-back);
+            appNumberImage[i]=(image[i]-back)*(image[i]-back)/(imageVariance[i]-bvar);
+            appBrightnessImage[i]=(imageVariance[i]-bvar)/(image[i]-back);
         }
 
         bool en=isEmitResultsChangedEnabled();
         disableEmitResultsChanged();
-        resultsSetNumberList("number_and_brightness", "particle_number", numberImage, width*height);
-        resultsSetGroupAndLabels("number_and_brightness", "particle_number", "fit results", "particle number", "particle number");
-        resultsSetNumberList("number_and_brightness", "particle_brightness", brightnessImage, width*height);
-        resultsSetGroupAndLabels("number_and_brightness", "particle_brightness", "fit results", "particle brigthness", "particle brigthness");
+        resultsSetNumberList("number_and_brightness", "app_particle_number", appNumberImage, width*height);
+        resultsSetGroupAndLabels("number_and_brightness", "app_particle_number", "fit results", "apparent particle number N", "apparent particle number N");
+        resultsSetNumberList("number_and_brightness", "app_particle_brightness", appBrightnessImage, width*height);
+        resultsSetGroupAndLabels("number_and_brightness", "app_particle_brightness", "fit results", "apparent particle brigthness B", "apparent particle brigthness B");
         if (en) enableEmitResultsChanged();
 
         //resultsSetNumberList("number_and_brightness", "particle_number", numberImage, width*height);
@@ -154,7 +221,7 @@ void QFRDRNumberAndBrightnessData::recalcNumberAndBrightness() {
 
 int QFRDRNumberAndBrightnessData::getOverviewImageCount() const
 {
-    return 6;
+    return 8;
 }
 
 uint32_t QFRDRNumberAndBrightnessData::getOverviewImageWidth() const
@@ -174,8 +241,10 @@ QString QFRDRNumberAndBrightnessData::getOverviewImageName(int image) const
         case 1: return tr("intensity variance");
         case 2: return tr("background");
         case 3: return tr("background variance");
-        case 4: return tr("particle number");
-        case 5: return tr("brightness");
+        case 4: return tr("apparent particle number");
+        case 5: return tr("apparent brightness");
+        case 6: return tr("particle number");
+        case 7: return tr("brightness");
     }
     return tr("image %1").arg(image);
 }
@@ -187,8 +256,10 @@ double *QFRDRNumberAndBrightnessData::getOverviewImage(int image) const
         case 1: return getImageVariance();
         case 2: return getBackground();
         case 3: return getBackgroundVariance();
-        case 4: return getNumberImage();
-        case 5: return getBrightnessImage();
+        case 4: return getAppNumberImage();
+        case 5: return getAppBrightnessImage();
+        case 6: return getNumberImage();
+        case 7: return getBrightnessImage();
     }
     return NULL;
 }
@@ -505,6 +576,8 @@ bool QFRDRNumberAndBrightnessData::loadFile(double *target, const QString &filen
 }
 
 void QFRDRNumberAndBrightnessData::allocateContents(int x, int y) {
+    if (appNumberImage) qfFree(appNumberImage);
+    if (appBrightnessImage) qfFree(appBrightnessImage);
     if (numberImage) qfFree(numberImage);
     if (brightnessImage) qfFree(brightnessImage);
     if (image) qfFree(image);
@@ -513,7 +586,11 @@ void QFRDRNumberAndBrightnessData::allocateContents(int x, int y) {
     if (backgroundVariance) qfFree(backgroundVariance);
     maskDelete();
     image=NULL;
+    appNumberImage=NULL;
     numberImage=NULL;
+    brightnessImage=NULL;
+    appBrightnessImage=NULL;
+
     imageVariance=NULL;
     background=NULL;
     backgroundVariance=NULL;
@@ -523,6 +600,8 @@ void QFRDRNumberAndBrightnessData::allocateContents(int x, int y) {
         imageVariance=(double*)qfCalloc(x*y*NN,sizeof(double));
         background=(double*)qfCalloc(x*y*NN,sizeof(double));
         backgroundVariance=(double*)qfCalloc(x*y*NN,sizeof(double));
+        appNumberImage=(double*)qfCalloc(x*y*NN,sizeof(double));
+        appBrightnessImage=(double*)qfCalloc(x*y*NN,sizeof(double));
         numberImage=(double*)qfCalloc(x*y*NN,sizeof(double));
         brightnessImage=(double*)qfCalloc(x*y*NN,sizeof(double));
         maskInit(x,y);

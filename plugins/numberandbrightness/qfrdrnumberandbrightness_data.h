@@ -95,8 +95,20 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDRAdditio
         double* getImageVariance() const;
         double* getBackground() const;
         double* getBackgroundVariance() const;
+        double* getAppNumberImage() const;
+        double* getAppBrightnessImage() const;
         double* getNumberImage() const;
         double* getBrightnessImage() const;
+
+        double getImage(int idx) const;
+        double getImageVariance(int idx) const;
+        double getBackground(int idx) const;
+        double getBackgroundVariance(int idx) const;
+        double getAppNumberImage(int idx) const;
+        double getAppBrightnessImage(int idx) const;
+        double getNumberImage(int idx) const;
+        double getBrightnessImage(int idx) const;
+
         int getWidth() const;
         int getHeight() const;
 
@@ -196,6 +208,8 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDRAdditio
         double* backgroundVariance;
         double* image;
         double* imageVariance;
+        double* appNumberImage;
+        double* appBrightnessImage;
         double* numberImage;
         double* brightnessImage;
 
