@@ -698,6 +698,8 @@ bool QFRDRFCSData::loadCorrelationCurvesFromCSV(QStringList filenames) {
             d.tab->load_csv(d.filename.toStdString(), separatorchar, commentchar, startswith, endswith, firstline);        // load some csv file
             long long lines=d.tab->get_line_count();
             long long columns=d.tab->get_column_count();
+            //qDebug()<<"lines="<<lines<<"   columns="<<columns<<QString::number(separatorchar);
+            QFPluginServices::getInstance()->log_text(tr("read CSV file '%1' as FCS record. Found %2 lines and %3 columns.").arg(d.filename).arg(lines).arg(columns));
             if (mode==0) { // tau, corr, corr, ...
                 rruns=rruns+columns-1;
             } else if (mode==1) { // tau, corr, error, corr, error, ...

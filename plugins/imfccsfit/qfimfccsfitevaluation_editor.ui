@@ -250,6 +250,9 @@
         <iconset>
          <normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</iconset>
        </property>
+       <property name="popupMode">
+        <enum>QToolButton::MenuButtonPopup</enum>
+       </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextBesideIcon</enum>
        </property>
@@ -343,6 +346,9 @@
        <property name="icon">
         <iconset>
          <normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</normaloff>:/imfccs_fit/qfimfccsfitevaluation_evaluate.png</iconset>
+       </property>
+       <property name="popupMode">
+        <enum>QToolButton::MenuButtonPopup</enum>
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -588,6 +594,16 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>JKQTPerrorPlotstyleComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QEnhancedTableView</class>
+   <extends>QTableView</extends>
+   <header>qenhancedtableview.h</header>
+  </customwidget>
+  <customwidget>
    <class>QFPlotter</class>
    <extends>QWidget</extends>
    <header>qfplotter.h</header>
@@ -610,20 +626,10 @@
    <header>qffcsweightingtools.h</header>
   </customwidget>
   <customwidget>
-   <class>JKQTPerrorPlotstyleComboBox</class>
-   <extends>QComboBox</extends>
-   <header>jkqtptools.h</header>
-  </customwidget>
-  <customwidget>
    <class>DataCutSliders</class>
    <extends>QWidget</extends>
    <header>datacutslider.h</header>
    <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QEnhancedTableView</class>
-   <extends>QTableView</extends>
-   <header>qenhancedtableview.h</header>
   </customwidget>
   <customwidget>
    <class>JKQTPLinePlotStyleWithSymbolSizeComboBox</class>
