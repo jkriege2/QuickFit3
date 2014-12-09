@@ -33,6 +33,18 @@ QFRDRNumberAndBrightnessSettingsEditor::QFRDRNumberAndBrightnessSettingsEditor(Q
     ui->edtBackground->setValue(0);
     ui->edtBackgroundSD->setCheckBounds(false, false);
     ui->edtBackgroundSD->setValue(0);
+
+    ui->cmbImagePortion->setItemData(0, "all");
+    ui->cmbImagePortion->setItemData(1, "left");
+    ui->cmbImagePortion->setItemData(2, "right");
+    ui->cmbImagePortion->setItemData(3, "top");
+    ui->cmbImagePortion->setItemData(4, "bottom");
+
+    ui->cmbDetector->setItemData(0, "photon_counting");
+    ui->cmbDetector->setItemData(1, "analog");
+    ui->cmbDetector->setItemData(2, "emccd");
+
+    on_cmbDetector_currentIndexChanged(ui->cmbDetector->currentIndex());
 }
 
 QFRDRNumberAndBrightnessSettingsEditor::~QFRDRNumberAndBrightnessSettingsEditor()
@@ -68,11 +80,19 @@ void QFRDRNumberAndBrightnessSettingsEditor::connectAllWidgets(bool en)
         connect(ui->edtBackground, SIGNAL(valueChanged(double)), this, SLOT(writeData()));
         connect(ui->edtBackgroundSD, SIGNAL(valueChanged(double)), this, SLOT(writeData()));
         connect(ui->chkIIsBackCorrected, SIGNAL(toggled(bool)), this, SLOT(writeData()));
+        connect(ui->cmbImagePortion, SIGNAL(currentIndexChanged(int)), this, SLOT(writeData()));
+        connect(ui->cmbDetector, SIGNAL(currentIndexChanged(int)), this, SLOT(writeData()));
+        connect(ui->spinGain, SIGNAL(valueChanged(double)), this, SLOT(writeData()));
+        connect(ui->edtExcessNoise, SIGNAL(valueChanged(double)), this, SLOT(writeData()));
         connect(current, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(rawDataChanged()));
     } else {
         disconnect(ui->edtBackground, SIGNAL(valueChanged(double)), this, SLOT(writeData()));
         disconnect(ui->edtBackgroundSD, SIGNAL(valueChanged(double)), this, SLOT(writeData()));
         disconnect(ui->chkIIsBackCorrected, SIGNAL(toggled(bool)), this, SLOT(writeData()));
+        disconnect(ui->cmbImagePortion, SIGNAL(currentIndexChanged(int)), this, SLOT(writeData()));
+        disconnect(ui->cmbDetector, SIGNAL(currentIndexChanged(int)), this, SLOT(writeData()));
+        disconnect(ui->spinGain, SIGNAL(valueChanged(double)), this, SLOT(writeData()));
+        disconnect(ui->edtExcessNoise, SIGNAL(valueChanged(double)), this, SLOT(writeData()));
         disconnect(current, SIGNAL(propertiesChanged(QString,bool)), this, SLOT(rawDataChanged()));
     }
 }
@@ -109,7 +129,7 @@ void QFRDRNumberAndBrightnessSettingsEditor::writeDataToAllRDR()
             for (int i=0; i<rs.size(); i++) {
                 QFRDRNumberAndBrightnessData* mr=qobject_cast<QFRDRNumberAndBrightnessData*>(rs[i]);
                 if (mr) {
-                    writeData(mr);
+                    writeData(mr, true);
                 }
                 progress.setValue(i);
                 QApplication::processEvents();
@@ -120,9 +140,10 @@ void QFRDRNumberAndBrightnessSettingsEditor::writeDataToAllRDR()
         }
          delete dlg;
     }
+    writeData();
 }
 
-void QFRDRNumberAndBrightnessSettingsEditor::writeData(QFRawDataRecord *current)
+void QFRDRNumberAndBrightnessSettingsEditor::writeData(QFRawDataRecord *current, bool notImageProp)
 {
     QFRDRNumberAndBrightnessData* m=qobject_cast<QFRDRNumberAndBrightnessData*>(current);
     if (m) {
@@ -131,6 +152,10 @@ void QFRDRNumberAndBrightnessSettingsEditor::writeData(QFRawDataRecord *current)
         m->setQFProperty("BACKGROUND", ui->edtBackground->value(), false, true);
         m->setQFProperty("BACKGROUND_STD", ui->edtBackgroundSD->value(), false, true);
         m->setQFProperty("BACKGROUND_CORRECTED", ui->chkIIsBackCorrected->isChecked(), false, true);
+        if (!notImageProp) m->setQFProperty("SELECT_IMAGE_HALF", ui->cmbImagePortion->currentData().toString(), false, true);
+        m->setQFProperty("N_AND_B_DETECTOR_TYPE", ui->cmbDetector->currentData().toString(), false, true);
+        m->setQFProperty("N_AND_B_DETECTOR_GAIN", ui->spinGain->value(), false, true);
+        m->setQFProperty("N_AND_B_DETECTOR_EXCESSNOISE", ui->edtExcessNoise->value(), false, true);
         if (en) m->enableEmitPropertiesChanged();
     }
 
@@ -144,7 +169,37 @@ void QFRDRNumberAndBrightnessSettingsEditor::rawDataChanged() {
         ui->edtBackground->setValue(m->getQFProperty("BACKGROUND", 0.0).toDouble());
         ui->edtBackgroundSD->setValue(m->getQFProperty("BACKGROUND_STD", 0.0).toDouble());
         ui->chkIIsBackCorrected->setChecked(m->getQFProperty("BACKGROUND_CORRECTED", false).toBool());
+        ui->cmbImagePortion->setCurrentData(m->getQFProperty("SELECT_IMAGE_HALF", "all").toString());
+        ui->cmbDetector->setCurrentData(m->getQFProperty("N_AND_B_DETECTOR_TYPE", "photon_counting").toString());
+        ui->spinGain->setValue(m->getQFProperty("N_AND_B_DETECTOR_GAIN", 1.0).toDouble());
+        ui->edtExcessNoise->setValue(m->getQFProperty("N_AND_B_DETECTOR_EXCESSNOISE", 2.0).toDouble());
         connectAllWidgets(true);
+    }
+}
+
+void QFRDRNumberAndBrightnessSettingsEditor::on_cmbDetector_currentIndexChanged(int index)
+{
+    if (index==0) {
+        ui->labExcessNoise->setVisible(false);
+        ui->edtExcessNoise->setVisible(false);
+        ui->labGain->setVisible(false);
+        ui->spinGain->setVisible(false);
+        ui->labBackgroundSD->setVisible(false);
+        ui->edtBackgroundSD->setVisible(false);
+    } else if (index==1) {
+        ui->labExcessNoise->setVisible(false);
+        ui->edtExcessNoise->setVisible(false);
+        ui->labGain->setVisible(true);
+        ui->spinGain->setVisible(true);
+        ui->labBackgroundSD->setVisible(true);
+        ui->edtBackgroundSD->setVisible(true);
+    } else  {
+        ui->labExcessNoise->setVisible(true);
+        ui->edtExcessNoise->setVisible(true);
+        ui->labGain->setVisible(true);
+        ui->spinGain->setVisible(true);
+        ui->labBackgroundSD->setVisible(true);
+        ui->edtBackgroundSD->setVisible(true);
     }
 }
 

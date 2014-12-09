@@ -6,42 +6,183 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>456</width>
-    <height>300</height>
+    <width>733</width>
+    <height>464</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QFormLayout" name="formLayout">
-   <item row="1" column="0">
-    <widget class="QLabel" name="label">
-     <property name="text">
-      <string>user background intensity (Average):</string>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string> input file options </string>
      </property>
+     <layout class="QFormLayout" name="formLayout_2">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>input file options:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+        <item>
+         <widget class="QFEnhancedComboBox" name="cmbImagePortion">
+          <item>
+           <property name="text">
+            <string>full frame</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>left half</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>right half</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>top half</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>bottom half</string>
+           </property>
+          </item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>&lt;small&gt;&lt;font color=&quot;red&quot;&gt;&lt;u&gt;Note:&lt;/u&gt; A reload of the project is required, if this option is changed!&lt;/font&gt;&lt;/small&gt;</string>
+          </property>
+          <property name="wordWrap">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="QFDoubleEdit" name="edtBackground"/>
-   </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>user background intensity (StdDev):</string>
+   <item>
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string> processing options </string>
      </property>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="4" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>user background intensity (Average):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QFDoubleEdit" name="edtBackground"/>
+      </item>
+      <item row="5" column="0">
+       <widget class="QLabel" name="labBackgroundSD">
+        <property name="text">
+         <string>readout noise (StdDev):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="5" column="1">
+       <widget class="QFDoubleEdit" name="edtBackgroundSD"/>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_4">
+        <property name="text">
+         <string>detector type:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QFEnhancedComboBox" name="cmbDetector">
+        <item>
+         <property name="text">
+          <string>photon counting</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>CCD/CMOS/... (analog, no stochastic gain)</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>EM-CCD (analog, stochastic gain)</string>
+         </property>
+        </item>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labGain">
+        <property name="text">
+         <string>detector gain:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="spinGain">
+        <property name="suffix">
+         <string> x</string>
+        </property>
+        <property name="decimals">
+         <number>5</number>
+        </property>
+        <property name="minimum">
+         <double>0.000000000000000</double>
+        </property>
+        <property name="maximum">
+         <double>1000000000.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="labExcessNoise">
+        <property name="text">
+         <string>excess noise factor F&lt;sup&gt;2&lt;/sup&gt;:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QFDoubleEdit" name="edtExcessNoise">
+        <property name="toolTip">
+         <string>this is 1 for non-stochastically amplified detectors and 2 for an EMCCD camera</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QCheckBox" name="chkIIsBackCorrected">
+        <property name="text">
+         <string>intensity image is already background corrected</string>
+        </property>
+       </widget>
+      </item>
+      <item row="6" column="1">
+       <widget class="QPushButton" name="btnCopyToOthers">
+        <property name="text">
+         <string>copy these N&amp;&amp;B to other records</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="QFDoubleEdit" name="edtBackgroundSD"/>
-   </item>
-   <item row="0" column="1">
-    <widget class="QCheckBox" name="chkIIsBackCorrected">
-     <property name="text">
-      <string>intensity image is already background corrected</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="1">
+   <item>
     <spacer name="verticalSpacer">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -54,27 +195,78 @@
      </property>
     </spacer>
    </item>
-   <item row="4" column="1">
-    <widget class="QPushButton" name="btnRecalc">
-     <property name="text">
-      <string>recalculate N&amp;&amp;B</string>
-     </property>
-     <property name="icon">
-      <iconset resource="numberandbrightness.qrc">
-       <normaloff>:/number_and_brightness/qfrdrnumberandbrightness_small.png</normaloff>:/number_and_brightness/qfrdrnumberandbrightness_small.png</iconset>
-     </property>
-    </widget>
+   <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="1">
+      <widget class="QPushButton" name="btnRecalc">
+       <property name="minimumSize">
+        <size>
+         <width>250</width>
+         <height>48</height>
+        </size>
+       </property>
+       <property name="font">
+        <font>
+         <pointsize>11</pointsize>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>recalculate N&amp;&amp;B</string>
+       </property>
+       <property name="icon">
+        <iconset resource="numberandbrightness.qrc">
+         <normaloff>:/number_and_brightness/qfrdrnumberandbrightness.png</normaloff>:/number_and_brightness/qfrdrnumberandbrightness.png</iconset>
+       </property>
+       <property name="iconSize">
+        <size>
+         <width>32</width>
+         <height>32</height>
+        </size>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="2">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
    </item>
-   <item row="5" column="1">
-    <widget class="QPushButton" name="btnCopyToOthers">
-     <property name="text">
-      <string>copy these N&amp;&amp;B to other records</string>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-     <property name="icon">
-      <iconset resource="numberandbrightness.qrc">
-       <normaloff>:/number_and_brightness/qfrdrnumberandbrightness_small.png</normaloff>:/number_and_brightness/qfrdrnumberandbrightness_small.png</iconset>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
      </property>
-    </widget>
+    </spacer>
    </item>
   </layout>
  </widget>
@@ -83,6 +275,11 @@
    <class>QFDoubleEdit</class>
    <extends>QLineEdit</extends>
    <header>qfdoubleedit.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QFEnhancedComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qfenhancedcombobox.h</header>
   </customwidget>
  </customwidgets>
  <resources>

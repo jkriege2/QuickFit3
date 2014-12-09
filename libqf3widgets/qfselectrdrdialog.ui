@@ -281,7 +281,7 @@
    <sender>radSelect</sender>
    <signal>toggled(bool)</signal>
    <receiver>btnAll</receiver>
-   <slot>setDisabled(bool)</slot>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
      <x>68</x>

@@ -657,11 +657,42 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         bool reCor=pltCorrelation->get_doDrawing();
         pltCorrelation->set_doDrawing(false);
 
-        //reallocMem( m->getWidth(),m->getHeight());
-        for (int i=0; i<m->getWidth()*m->getHeight(); i++) {
-            plteOverviewData[i]=m->getImage()[i];
-            plteNumberData[i]=m->getAppNumberImage()[i];
-            plteBrightnessData[i]=m->getAppBrightnessImage()[i];
+        double *Nother=NULL;
+        double *Bother=NULL;
+        QString Nlabel, Blabel;
+        QString NColLabel, BColLabel, NOtherColLabel, BOtherColLabel;
+
+        if (chkApparentProps->isChecked()) {
+            Nlabel=tr("apparent particle number $N$");
+            Blabel=tr("apparent particle brightness $B$");
+
+
+            //reallocMem( m->getWidth(),m->getHeight());
+            for (int i=0; i<m->getWidth()*m->getHeight(); i++) {
+                plteOverviewData[i]=m->getImage()[i];
+                plteNumberData[i]=m->getAppNumberImage()[i];
+                plteBrightnessData[i]=m->getAppBrightnessImage()[i];
+            }
+            Nother=m->getBrightnessImage();
+            Bother=m->getNumberImage();
+            NColLabel=tr("apparent_particle_number");
+            BColLabel=tr("apparent_particle_brightness");
+            NOtherColLabel=tr("particle_number");
+            BOtherColLabel=tr("particle_brightness");
+        } else {
+            Nlabel=tr("particle number $N$");
+            Blabel=tr("particle brightness $\\epsilon$");
+            for (int i=0; i<m->getWidth()*m->getHeight(); i++) {
+                plteOverviewData[i]=m->getImage()[i];
+                plteNumberData[i]=m->getNumberImage()[i];
+                plteBrightnessData[i]=m->getBrightnessImage()[i];
+            }
+            Nother=m->getAppBrightnessImage();
+            Bother=m->getAppNumberImage();
+            NOtherColLabel=tr("apparent_particle_number");
+            BOtherColLabel=tr("apparent_particle_brightness");
+            NColLabel=tr("particle_number");
+            BColLabel=tr("particle_brightness");
         }
         /*memcpy(plteOverviewData, m->getImage(), m->getWidth()*m->getHeight()*sizeof(double));
         memcpy(plteNumberData, m->getNumberImage(), m->getWidth()*m->getHeight()*sizeof(double));
@@ -676,12 +707,16 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         double h=m->getHeight();
 
         pltCorrelation->getDatastore()->clear();
-        int cN=pltCorrelation->getDatastore()->addCopiedColumn(plteNumberData, m->getWidth()*m->getHeight(), tr("particle_number"));
-        int cB=pltCorrelation->getDatastore()->addCopiedColumn(plteBrightnessData, m->getWidth()*m->getHeight(), tr("particle_brightness"));
+        int cN=pltCorrelation->getDatastore()->addCopiedColumn(plteNumberData, m->getWidth()*m->getHeight(), NColLabel);
+        int cB=pltCorrelation->getDatastore()->addCopiedColumn(plteBrightnessData, m->getWidth()*m->getHeight(), BColLabel);
         int cI=pltCorrelation->getDatastore()->addCopiedColumn(plteOverviewData, m->getWidth()*m->getHeight(), tr("image_data"));
-        int cMN=pltCorrelation->getDatastore()->addCopiedColumnMasked(plteNumberData, m->maskGet(), m->getWidth()*m->getHeight(), tr("particle_number_masked"));
-        int cMB=pltCorrelation->getDatastore()->addCopiedColumnMasked(plteBrightnessData, m->maskGet(), m->getWidth()*m->getHeight(), tr("particle_brightness_masked"));
+        int cNO=pltCorrelation->getDatastore()->addCopiedColumn(Nother, m->getWidth()*m->getHeight(), NOtherColLabel);
+        int cBO=pltCorrelation->getDatastore()->addCopiedColumn(Bother, m->getWidth()*m->getHeight(), BOtherColLabel);
+        int cMN=pltCorrelation->getDatastore()->addCopiedColumnMasked(plteNumberData, m->maskGet(), m->getWidth()*m->getHeight(), NColLabel+tr("_masked"));
+        int cMB=pltCorrelation->getDatastore()->addCopiedColumnMasked(plteBrightnessData, m->maskGet(), m->getWidth()*m->getHeight(), BColLabel+tr("_masked"));
         int cMI=pltCorrelation->getDatastore()->addCopiedColumnMasked(plteOverviewData, m->maskGet(), m->getWidth()*m->getHeight(), tr("image_data_masked"));
+        int cMNO=pltCorrelation->getDatastore()->addCopiedColumnMasked(Nother, m->maskGet(), m->getWidth()*m->getHeight(), NOtherColLabel+tr("_masked"));
+        int cMBO=pltCorrelation->getDatastore()->addCopiedColumnMasked(Bother, m->maskGet(), m->getWidth()*m->getHeight(), BOtherColLabel+tr("_masked"));
 
         pltOverview->setAbsoluteXY(0, w, 0, h);
         pltOverview->get_plotter()->set_maintainAspectRatio(true);
@@ -725,6 +760,8 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         plteNumber->set_width(m->getWidth());
         plteNumber->set_height(m->getHeight());
         plteNumber->set_autoImageRange(false);
+        plteNumber->get_colorBarTopAxis()->set_axisLabel(Nlabel);
+        plteNumber->get_colorBarRightAxis()->set_axisLabel(Nlabel);
         statisticsMaskedMinMax(plteNumberData, m->maskGet(), m->getWidth()*m->getHeight(), mi, ma);
 
         if (!chkAutoN->isChecked()) {
@@ -757,6 +794,8 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         plteBrightness->set_width(m->getWidth());
         plteBrightness->set_height(m->getHeight());
         plteBrightness->set_autoImageRange(false);
+        plteBrightness->get_colorBarTopAxis()->set_axisLabel(Blabel);
+        plteBrightness->get_colorBarRightAxis()->set_axisLabel(Blabel);
         statisticsMaskedMinMax(plteBrightnessData,m->maskGet(), m->getWidth()*m->getHeight(), mi, ma);
 
         if (!chkAutoB->isChecked()) {
@@ -786,8 +825,8 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         plteCorrelation->set_drawLine(false);
         plteCorrelation->set_symbol(JKQTPdot);
         plteCorrelation->set_color(QColor("red"));
-        pltCorrelation->getXAxis()->set_axisLabel(tr("particle number $N$"));
-        pltCorrelation->getYAxis()->set_axisLabel(tr("particle brightness $\\epsilon$"));
+        pltCorrelation->getXAxis()->set_axisLabel(Nlabel);
+        pltCorrelation->getYAxis()->set_axisLabel(Blabel);
         pltCorrelation->get_plotter()->set_showKey(false);
         pltCorrelation->zoomToFit();
 
@@ -991,19 +1030,37 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
         // TODO: implement usage of chkApparentProps
 
         histNumber->clear();
-        histNumber->setHistogramXLabel(tr("particle number $N$"));
-        histNumber->addHistogram("complete", dataAppN, dataSize, false);
-
         histBrightness->clear();
-        histBrightness->setHistogramXLabel(tr("particle brightness $\\epsilon$"));
-        histBrightness->addHistogram("complete", dataAppEps, dataSize, false);
-
         histIntensity->clear();
+
+        QString labelN=tr("apparent particle number $N$");
+        QString labelB=tr("apparent particle brightness $B$");
+
+        if (chkApparentProps->isChecked()) {
+            histNumber->setHistogramXLabel(labelN);
+            histNumber->addHistogram("complete", dataAppN, dataSize, false);
+
+            histBrightness->setHistogramXLabel(labelB);
+            histBrightness->addHistogram("complete", dataAppEps, dataSize, false);
+
+            if (dataSelSize>1) histNumber->addHistogram("selection", dataAppNSel, dataSelSize, false);
+            if (dataSelSize>1) histBrightness->addHistogram("selection", dataAppEpsSel, dataSelSize, false);
+        } else {
+            labelN=tr("particle number $N$");
+            labelB=tr("particle brightness $\\epsilon$");
+
+            histNumber->setHistogramXLabel(labelN);
+            histNumber->addHistogram("complete", dataN, dataSize, false);
+
+            histBrightness->setHistogramXLabel(labelB);
+            histBrightness->addHistogram("complete", dataEps, dataSize, false);
+
+            if (dataSelSize>1) histNumber->addHistogram("selection", dataNSel, dataSelSize, false);
+            if (dataSelSize>1) histBrightness->addHistogram("selection", dataEpsSel, dataSelSize, false);
+        }
         histIntensity->setHistogramXLabel(tr("image intensity $I$"));
         histIntensity->addHistogram("complete", dataOvr, dataSize, false);
 
-        if (dataSelSize>1) histNumber->addHistogram("selection", dataAppNSel, dataSelSize, false);
-        if (dataSelSize>1) histBrightness->addHistogram("selection", dataAppEpsSel, dataSelSize, false);
         if (dataSelSize>1) histIntensity->addHistogram("selection", dataOvrSel, dataSelSize, false);
         double* c1=NULL;
         double* c2=NULL;
@@ -1021,33 +1078,46 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
             widCorrelation->setCorrelation1Label(tr("intensity $I$"));
             c1=dataOvr;
         } else if (cmbCorrelationP1->currentIndex()==3) {
-            c1=dataAppN;
+            c1=dataN;
             widCorrelation->setCorrelation1Label(tr("particle number $n$"));
         } else if (cmbCorrelationP1->currentIndex()==4) {
-            c1=dataAppEps;
+            c1=dataEps;
             widCorrelation->setCorrelation1Label(tr("brightness $\\epsilon$"));
         }
         if (cmbCorrelationP2->currentIndex()==0) {
             c2=dataAppEps;
-            widCorrelation->setCorrelation2Label(tr("brightness $\\epsilon$"));
+            widCorrelation->setCorrelation2Label(tr("apparent brightness $B$"));
         } else if (cmbCorrelationP2->currentIndex()==1) {
             c2=dataAppN;
-            widCorrelation->setCorrelation2Label(tr("particle number $N$"));
+            widCorrelation->setCorrelation2Label(tr("apparent particle number $N$"));
         } else if (cmbCorrelationP2->currentIndex()==2) {
             widCorrelation->setCorrelation2Label(tr("intensity $I$"));
             c2=dataOvr;
+        } else if (cmbCorrelationP2->currentIndex()==3) {
+            c2=dataN;
+            widCorrelation->setCorrelation2Label(tr("particle number $n$"));
+        } else if (cmbCorrelationP2->currentIndex()==4) {
+            c2=dataEps;
+            widCorrelation->setCorrelation2Label(tr("brightness $\\epsilon$"));
         }
 
-        if (cmbCorrelationPCol->currentIndex()==1) {
+        if (cmbCorrelationPCol->currentIndex()==0) {
             widCorrelation->setCorrelationColorLabel(tr("intensity $I$"));
             cC=dataOvr;
-        } else if (cmbCorrelationPCol->currentIndex()==2) {
+        } else if (cmbCorrelationPCol->currentIndex()==1) {
             cC=dataAppN;
-            widCorrelation->setCorrelationColorLabel(tr("particle number $N$"));
-        } else if (cmbCorrelationPCol->currentIndex()==3) {
+            widCorrelation->setCorrelationColorLabel(tr("apparent particle number $N$"));
+        } else if (cmbCorrelationPCol->currentIndex()==2) {
             cC=dataAppEps;
+            widCorrelation->setCorrelationColorLabel(tr("apparent brightness $B$"));
+        } else if (cmbCorrelationPCol->currentIndex()==3) {
+            cC=dataN;
+            widCorrelation->setCorrelationColorLabel(tr("particle number $n$"));
+        } else if (cmbCorrelationPCol->currentIndex()==4) {
+            cC=dataEps;
             widCorrelation->setCorrelationColorLabel(tr("brightness $\\epsilon$"));
         }
+
         widCorrelation->addCorrelation(tr("complete"), c1, c2, cC, dataSize, false);
 
         qfFree(dataAppN);
@@ -1199,8 +1269,12 @@ void QFRDRNumberAndBrightnessDataEditor::updateCorrSelection()
         plteRangeN->set_rangeMax(edtCorrNMax->value());
 
         //if (chkRangeB->isChecked() || chkRangeN->isChecked()) {
-            double* B=m->getAppBrightnessImage();
-            double* N=m->getAppNumberImage();
+            double* B=m->getBrightnessImage();
+            double* N=m->getNumberImage();
+            if (chkApparentProps->isChecked()) {
+                B=m->getAppBrightnessImage();
+                N=m->getAppNumberImage();
+            }
             for (int i=0; i<m->getWidth()*m->getHeight(); i++) {
                 plteOverviewSelectedData[i]=false;
                 if (chkRangeB->isChecked() && !chkRangeN->isChecked()) {

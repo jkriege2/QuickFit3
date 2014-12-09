@@ -194,28 +194,54 @@ void QFRDRNumberAndBrightnessData::recalcNumberAndBrightness() {
     bool backCorrected=getProperty("BACKGROUND_CORRECTED", false).toBool();
     double userBackground=getProperty("BACKGROUND", 0).toDouble();
     double userBackgroundStd=getProperty("BACKGROUND_STD", 0).toDouble();
-    if (image && imageVariance && background && backgroundVariance && appNumberImage && appBrightnessImage) {
-        for (int i=0; i<width*height; i++) {
-            double bvar=userBackgroundStd*userBackgroundStd;
-            if (backgroundVariance) bvar=bvar+backgroundVariance[i];
-            double back=userBackground;
-            if (background && !backCorrected) back=back+background[i];
+    double gain=getProperty("N_AND_B_DETECTOR_GAIN", 1).toDouble();
+    double excessnoise=getProperty("N_AND_B_DETECTOR_EXCESSNOISE", 2).toDouble();
+    QString detector=getProperty("N_AND_B_DETECTOR_TYPE", "photon_counting").toString().trimmed().toLower();
+    if (detector=="photon_counting") {
+        if (image && imageVariance && appNumberImage && appBrightnessImage && numberImage && brightnessImage) {
+            for (int i=0; i<width*height; i++) {
+                double back=userBackground;
+                if (background && !backCorrected) back=back+background[i];
 
-            appNumberImage[i]=(image[i]-back)*(image[i]-back)/(imageVariance[i]-bvar);
-            appBrightnessImage[i]=(imageVariance[i]-bvar)/(image[i]-back);
+                appBrightnessImage[i]=(imageVariance[i])/(image[i]-back);
+                appNumberImage[i]=(image[i]-back)/appBrightnessImage[i];
+
+                brightnessImage[i]=appBrightnessImage[i]-1.0;
+                numberImage[i]=(brightnessImage[i]+1.0)/brightnessImage[i]*appNumberImage[i];
+            }
         }
+    } else if (detector=="analog" || detector=="emccd") {
+        if (image && imageVariance && appNumberImage && appBrightnessImage && numberImage && brightnessImage) {
+            if (detector=="analog") excessnoise=1.0;
+            for (int i=0; i<width*height; i++) {
+                double back=userBackground;
+                if (background && !backCorrected) back=back+background[i];
+                double backVar=userBackgroundStd*userBackgroundStd;
+                if (backgroundVariance) backVar=backVar+backgroundVariance[i];
 
-        bool en=isEmitResultsChangedEnabled();
-        disableEmitResultsChanged();
-        resultsSetNumberList("number_and_brightness", "app_particle_number", appNumberImage, width*height);
-        resultsSetGroupAndLabels("number_and_brightness", "app_particle_number", "fit results", "apparent particle number N", "apparent particle number N");
-        resultsSetNumberList("number_and_brightness", "app_particle_brightness", appBrightnessImage, width*height);
-        resultsSetGroupAndLabels("number_and_brightness", "app_particle_brightness", "fit results", "apparent particle brigthness B", "apparent particle brigthness B");
-        if (en) enableEmitResultsChanged();
+                appBrightnessImage[i]=(imageVariance[i]-backVar)/(image[i]-back);
+                appNumberImage[i]=(image[i]-back)/appBrightnessImage[i];
 
-        //resultsSetNumberList("number_and_brightness", "particle_number", numberImage, width*height);
-        //resultsSetNumberList("number_and_brightness", "particle_brightness", brightnessImage, width*height);
+                brightnessImage[i]=appBrightnessImage[i]/gain-excessnoise;
+                numberImage[i]=(brightnessImage[i]+excessnoise)/brightnessImage[i]*appNumberImage[i];
+            }
+        }
+    } else {
+        log_error(tr("number_nad_brightness: UNKNOWN DETECTOR TYPE '%1'").arg(detector));
     }
+
+    bool en=isEmitResultsChangedEnabled();
+    disableEmitResultsChanged();
+    resultsSetNumberList("number_and_brightness", "app_particle_number", appNumberImage, width*height);
+    resultsSetGroupAndLabels("number_and_brightness", "app_particle_number", "fit results", "apparent particle number N", "apparent particle number N");
+    resultsSetNumberList("number_and_brightness", "app_particle_brightness", appBrightnessImage, width*height);
+    resultsSetGroupAndLabels("number_and_brightness", "app_particle_brightness", "fit results", "apparent particle brigthness B", "apparent particle brigthness B");
+    resultsSetNumberList("number_and_brightness", "particle_number", numberImage, width*height);
+    resultsSetGroupAndLabels("number_and_brightness", "particle_number", "fit results", "particle number N", "particle number N");
+    resultsSetNumberList("number_and_brightness", "particle_brightness", brightnessImage, width*height);
+    resultsSetGroupAndLabels("number_and_brightness", "particle_brightness", "fit results", "particle brigthness B", "particle brigthness B");
+    if (en) enableEmitResultsChanged();
+
     emitRawDataChanged();
 }
 
@@ -853,7 +879,7 @@ int QFRDRNumberAndBrightnessData::indexToY(int run) const {
 
 QFImageHalf QFRDRNumberAndBrightnessData::getSelectedImageHalf() const
 {
-    QString h=getQFProperty("SELECT_IMAGE_HALF", "none").toString().trimmed().toLower();
+    QString h=getQFProperty("SELECT_IMAGE_HALF", "all").toString().trimmed().toLower();
     if (h=="left" || h=="0") return qfihLeft;
     if (h=="right" || h=="1") return qfihRight;
     if (h=="top" || h=="2") return qfihTop;

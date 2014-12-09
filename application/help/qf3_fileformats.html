@@ -12,7 +12,8 @@ $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$
 
 $$contents$$
 
-$$qf_commondoc_backtop$$
+
+
 <h2>Table-oriented Data Formats (CSV, ...)</h2>
 <h3><a name="CSV">Comma Separated Values (CSV)</h3>
 <p>This is the standard and most common format for spreadsheet like files. A CSV file represents a table of values, where each line of the file represents one line in the table. In each line the entries are separated by commas (<tt>,</tt>). This format uses points as decimal separators and strings are enclosed in double-quotes <tt>"</tt>. Note that some lines may be commented out by a leading hash character <tt>#</tt>. Here is an example:
@@ -27,51 +28,55 @@ $$qf_commondoc_backtop$$
 </blockquote>
 This format can be read by Matlab using the function <blockquote><tt>M = <a href="http://www.mathworks.de/help/techdoc/ref/csvread.html">csvread</a>(<i>filename</i>)</tt></blockquote> It may also be directly read by <a href="http://www.gnuplot.info">GnuPlot</a>
 </p>
-$$qf_commondoc_backtop$$
+
+
 <h3><a name="GEXCEL">CSV for German Excel</h3>
 <p>This is a special version of the <a href="#CSV">Comma Separated Values</a> format which uses semicolons (<tt>;</tt>) as column separators and commas as decimal separators. This is especially suitable for Microsoft Excel installations with german language support, as reading the standard CSV is possible, but not handy. This is treated as standard format on german platforms by Excel.</p>
-$$qf_commondoc_backtop$$
+
+
 <h3><a name="TSV">Tab Separated Values (CSV)</h3>
 <p>This is a special version of the <a href="#CSV">Comma Separated Values</a> format which uses tabulators as column separators.<br>
 This format can be read by Matlab using the function <blockquote><tt>M = <a href="http://www.mathworks.de/help/techdoc/ref/dlmread.html">dlmread</a>(<i>filename</i>, '\t')</tt></blockquote></p>
-$$qf_commondoc_backtop$$
+
+
 <h3><a name="SYLK">SYmbolic LinK (SYLK)</h3>
 <p>This is a spreadsheet format that also supports limited formatting and can be read by a variety of different software packages (Microsoft Excel, Libre Office, Open Office, ...). More information can be found in <a href="http://en.wikipedia.org/wiki/SYmbolic_LinK_%28SYLK%29">Wikipedia</a></p>
-$$qf_commondoc_backtop$$
+
+
 <h3><a name="DIF">Data Interchange Format (*.dif)</h3>
 <p>This is a spreadsheet format and can be read by a variety of different software packages (Microsoft Excel, Libre Office, Open Office, ...). More information can be found in <a href="http://en.wikipedia.org/wiki/Data_Interchange_Format">Wikipedia</a></p>
-$$qf_commondoc_backtop$$
+
+
 <h3><a name="QFTABLEXML">QuickFit table XML (*.qftxml)</h3>
 <p>Quickfit and especially the table plugin use this file format (XML dialect) to store tables to disk. The format does not only save the data in each cell, as well as column and row headers, but also additional properties and data, such as table expressions etc. A typical .qftxml file looks like this:
 <pre>
-	&lt;?xml version=&quot;1.0&quot;?&gt;<br>
-	&lt;qfrdrtable&gt;<br>
-		&lt;state.columns&gt;<br>
-		    <i>&lt;!-- these tags give the column names --&gt;</i><br>
-			&lt;col col=&quot;0&quot; name=&quot;fit_model_name&quot;/&gt;<br>
-			&lt;col col=&quot;1&quot; name=&quot;fit_used_run&quot;/&gt;<br>
-			&lt;col col=&quot;2&quot; name=&quot;fitalg_error_sum&quot;/&gt;<br>
-		&lt;/state.columns&gt;<br>
-		&lt;data&gt;<br>
-		    <i>&lt;!-- row names are stored as a first column --&gt;</i><br>
-			&lt;cell row=&quot;0&quot; col=&quot;0&quot; type=&quot;string&quot;&gt;20nM_488_Day2_04s.asc - CH0: fcs_fit_14_fcs_adiff_runavg&lt;/cell&gt;<br>
-			&lt;cell row=&quot;1&quot; col=&quot;0&quot; type=&quot;string&quot;&gt;20nM_488_Day2_04s.asc - CH0: fcs_fit_14_fcs_diff_run0&lt;/cell&gt;<br>
-			&lt;cell row=&quot;2&quot; col=&quot;0&quot; type=&quot;string&quot;&gt;20nM_488_Day2_04s.asc - CH0: fcs_fit_14_fcs_diff_run1&lt;/cell&gt;<br>
-		    <i>&lt;!-- here is the actual data. In each cell-tag, row/col indicate the cell location and type the datatype, the tag contents is the actual data --&gt;</i><br>
-			&lt;cell row=&quot;0&quot; col=&quot;1&quot; type=&quot;string&quot;&gt;fcs_adiff&lt;/cell&gt;<br>
-			&lt;cell row=&quot;1&quot; col=&quot;1&quot; type=&quot;string&quot;&gt;fcs_diff&lt;/cell&gt;<br>
-			&lt;cell row=&quot;2&quot; col=&quot;1&quot; type=&quot;string&quot;&gt;fcs_diff&lt;/cell&gt;<br>
-			&lt;cell row=&quot;0&quot; col=&quot;2&quot; type=&quot;longlong&quot;&gt;-1&lt;/cell&gt;<br>
-			&lt;cell row=&quot;1&quot; col=&quot;2&quot; type=&quot;longlong&quot;&gt;0&lt;/cell&gt;<br>
-			&lt;cell row=&quot;2&quot; col=&quot;2&quot; type=&quot;longlong&quot;&gt;1&lt;/cell&gt;<br>
-			&lt;cell row=&quot;0&quot; col=&quot;3&quot; type=&quot;double&quot;&gt;43.9024&lt;/cell&gt;<br>
-			&lt;cell row=&quot;1&quot; col=&quot;3&quot; type=&quot;double&quot;&gt;15.24396403&lt;/cell&gt;<br>
-			&lt;cell row=&quot;2&quot; col=&quot;3&quot; type=&quot;double&quot;&gt;14.60922039&lt;/cell&gt;<br>
-		&lt;/data&gt;<br>
-	&lt;/qfrdrtable&gt;<br>
+    &lt;?xml version=&quot;1.0&quot;?&gt;<br>
+    &lt;qfrdrtable&gt;<br>
+        &lt;state.columns&gt;<br>
+            <i>&lt;!-- these tags give the column names --&gt;</i><br>
+            &lt;col col=&quot;0&quot; name=&quot;fit_model_name&quot;/&gt;<br>
+            &lt;col col=&quot;1&quot; name=&quot;fit_used_run&quot;/&gt;<br>
+            &lt;col col=&quot;2&quot; name=&quot;fitalg_error_sum&quot;/&gt;<br>
+        &lt;/state.columns&gt;<br>
+        &lt;data&gt;<br>
+            <i>&lt;!-- row names are stored as a first column --&gt;</i><br>
+            &lt;cell row=&quot;0&quot; col=&quot;0&quot; type=&quot;string&quot;&gt;20nM_488_Day2_04s.asc - CH0: fcs_fit_14_fcs_adiff_runavg&lt;/cell&gt;<br>
+            &lt;cell row=&quot;1&quot; col=&quot;0&quot; type=&quot;string&quot;&gt;20nM_488_Day2_04s.asc - CH0: fcs_fit_14_fcs_diff_run0&lt;/cell&gt;<br>
+            &lt;cell row=&quot;2&quot; col=&quot;0&quot; type=&quot;string&quot;&gt;20nM_488_Day2_04s.asc - CH0: fcs_fit_14_fcs_diff_run1&lt;/cell&gt;<br>
+            <i>&lt;!-- here is the actual data. In each cell-tag, row/col indicate the cell location and type the datatype, the tag contents is the actual data --&gt;</i><br>
+            &lt;cell row=&quot;0&quot; col=&quot;1&quot; type=&quot;string&quot;&gt;fcs_adiff&lt;/cell&gt;<br>
+            &lt;cell row=&quot;1&quot; col=&quot;1&quot; type=&quot;string&quot;&gt;fcs_diff&lt;/cell&gt;<br>
+            &lt;cell row=&quot;2&quot; col=&quot;1&quot; type=&quot;string&quot;&gt;fcs_diff&lt;/cell&gt;<br>
+            &lt;cell row=&quot;0&quot; col=&quot;2&quot; type=&quot;longlong&quot;&gt;-1&lt;/cell&gt;<br>
+            &lt;cell row=&quot;1&quot; col=&quot;2&quot; type=&quot;longlong&quot;&gt;0&lt;/cell&gt;<br>
+            &lt;cell row=&quot;2&quot; col=&quot;2&quot; type=&quot;longlong&quot;&gt;1&lt;/cell&gt;<br>
+            &lt;cell row=&quot;0&quot; col=&quot;3&quot; type=&quot;double&quot;&gt;43.9024&lt;/cell&gt;<br>
+            &lt;cell row=&quot;1&quot; col=&quot;3&quot; type=&quot;double&quot;&gt;15.24396403&lt;/cell&gt;<br>
+            &lt;cell row=&quot;2&quot; col=&quot;3&quot; type=&quot;double&quot;&gt;14.60922039&lt;/cell&gt;<br>
+        &lt;/data&gt;<br>
+    &lt;/qfrdrtable&gt;<br>
 </pre>
 </p>
-$$qf_commondoc_backtop$$
 
 
 
@@ -99,10 +104,10 @@ Single-frame image may be read in Matlab using <blockquote><tt>M = <a href="http
 
 <h2>Specialized File Formats</h2>
 <p><ul>
-  <li><a href="$$mainhelpdir$$/fcs_qf3format.html.html">QF3 ASCII (FCS) Correlation Data Format</a></li>
+  <li><a href="$$mainhelpdir$$/fcs_qf3format.html">QF3 ASCII (FCS) Correlation Data Format</a></li>
 </ul>
 </p>
-$$qf_commondoc_backtop$$
+
 
 
 <h2>Fileformats from Plugins</h2>

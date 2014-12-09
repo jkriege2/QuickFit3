@@ -13,46 +13,36 @@
         This plugin calculates the particle number and particle brightness from a set of images according to the well-established N&amp;B-method. You can find a detailed description and discussion of this method in these papers $$ref:QIANELSONWEBB:Hong Qian, Elliot L. Elson (1990): <b>"Distribution of molecular aggregation by analysis of fluctuation moments"</b>, <i>PNAS,</i> <b>87</b>(14), 5479-5483,  <a href="http://www.ncbi.nlm.nih.gov/pubmed/2371284">Pubmed: 2371284</a>$$$$ref:DIGMANGRATTON:Michelle A. Digman, Rooshin Dalal, Alan F. Horwitz, and Enrico Gratton (2008): <b>Mapping the Number of Molecules and Brightness in the Laser Scanning Microscope</b>, <i>Biophys J.</i> <b>94</b>(6): 2320-2332. PMCID: <a href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC2257897/">PMC2257897</a>, DOI: 10.1529/biophysj.107.114645$$$$ref:UNRUHGRATTON:Jay R. Unruh, Enrico Gratton (2008): <b>"Analysis of Molecular Concentration and Brightness from Fluorescence Fluctuation Data with an Electron Multiplied CCD Camera"</b>, <i>Biophysical Journal,</i> <b>95</b>(11), 5385-5398, <a href="http://www.ncbi.nlm.nih.gov/pubmed/18805922">Pubmed: 18805922</a>$$
     This plugin implements two methods: one is suitable for data acquired with a photon-cpunting detector (e.g. a laser scanning confocal microscope) and one is usable with data acquired with an (electron-multiplying) CCD camera ((EM-)CCD).
     </p>
-    <p>Most of these methods depend on measuring the average intensity $(I)$ and its variance $(\sigma_I^2)$ for each pixel. The pixel dwell-time for acquiring these data should be shorter than the typical diffusion time $(\tau_D)$, i.e. the time the particles typically spend in the detection volume of the pixel. The $(\tau_D)$ can e.g. be measured using fluorescence correlation spectroscopy. Depending on the type of detector, the quantities $(I)$ and $(\sigma_I^2)$ may be expressed in terms of the particle brightness $(\epsilon)$ and number of particles in the pixel observatioj volume $(n)$:
-	<ul>
-	  <li><b>photon counting detectors:</b>
-	    $[I=I_N+I_0=\epsilon\cdot n+I_0,]$
-		$[\sigma_I^2=\sigma_N^2+\sigma_{det}^2=\epsilon^2\cdot n+\epsilon\cdot n,]$
-		where $(I_0)$ is a background intensity, i.e. the dark-counts of the detector. The term $(\sigma_N^2)$ is the noise due to the particle number variation, which becomes $(\sigma_N^2=\epsilon^2\cdot n)$, if the Poissonian statistics of the particle number is used. The final term $(\sigma_{det}^2)$ describes the noise due to the detection process in the photodetector. Here number of detected photo-electrons (or avalanches in an APD) is $(\epsilon\cdot n)$ and also shows Poissonian statistics, therefore $(\sigma_{det}^2=\epsilon\cdot n)$.
-	  </li>
-	  <li><b>analog detectors (e.g. CCD, CMOS, EM-CCD cameras):</b>
-	    $[I=I_N+I_0=G\cdot\epsilon\cdot n+I_0,]$
-		$[\sigma_I^2=\sigma_N^2+\sigma_{det}^2=G^2\epsilon^2\cdot n+\mathcal{F}^2\cdot G^2\cdot \epsilon\cdot n+\sigma_{read}^2,]$
-		where most measures are defined as above. In addition the term $(\sigma_{read}^2)$ is the readout noise of the detector and $(G)$ is its gain in greylevel/photoelectrons (or ADU/e<sup>-</sup>). Finally $(\mathcal{F}^2)$ is the excess noise factor, which is simply 1 for normal CCD and CMOS cameras, but $(\mathcal{F}=2)$ for electron-multiplying CCD cameras. In the latter devices, this additional noise is caused by the stochastic amplification in the EM-gain register.
-	  </li>
-	</ul>
-	$$startbox_info$$
-	The background intenisty $(I_0)$ can be measured by acquiring data without illumination. From the same measurement, the readout noise term $(\sigma_{read}^2)$ can be estimated. The gain $(G)$ of an analog detector can either be read from the camera datasheet, or should be measured by acquiring several frames with different illumination levels. In these the illumination should be done with an LED or a Laser, i.e. a light-source that does not show additional fluctuations due to particle number changes. The the background-average intensity $(I-I_0)$ for each pixel is plottet against the noise $\sigma_I^2)$ in each pixel. The slope of this graph equals $(\mathcal{F}^2\cdot G)$ and $(G)$ can be obtained from the known $(\mathcal{F}^2)$. This floowos directly, since  $(I-I_0=G\cdot N_{electrons})$ and $(\sigma_I^2=\sigma_{det}^2=\mathcal{F}^2\cdot G^2\cdot N_{electrons}+\sigma_{read}^2=\mathcal{F}^2\cdot G\cdot (I-I_0)+\sigma_{read}^2)$, where $(N_{electrons})$ is the number of photo-electrons.
-	$$endbox$$
+    <p>Most of these methods depend on measuring the average intensity $(I)$ and its variance $(\sigma_I^2)$ for each pixel. The pixel dwell-time for acquiring these data should be shorter than the typical diffusion time $(\tau_D)$, i.e. the time the particles typically spend in the detection volume of the pixel. The $(\tau_D)$ can e.g. be measured using fluorescence correlation spectroscopy (see e.g. <a href="$$plugin_info:help:fcs$$">fcs RDR plugin</a>, <a href="$$plugin_info:help:fcs_fit$$">FCS fit plugin</a>). Depending on the type of detector, the quantities $(I)$ and $(\sigma_I^2)$ may be expressed in terms of the particle brightness $(\epsilon)$ and number of particles in the pixel observatioj volume $(n)$:
+    <ul>
+      <li><b>photon counting detectors:</b>
+        $[I=I_N+I_0=\epsilon\cdot n+I_0,]$
+        $[\sigma_I^2=\sigma_N^2+\sigma_{det}^2=\epsilon^2\cdot n+\epsilon\cdot n,]$
+        where $(I_0)$ is a background intensity, i.e. the dark-counts of the detector. The term $(\sigma_N^2)$ is the noise due to the particle number variation, which becomes $(\sigma_N^2=\epsilon^2\cdot n)$, if the Poissonian statistics of the particle number is used. The final term $(\sigma_{det}^2)$ describes the noise due to the detection process in the photodetector. Here number of detected photo-electrons (or avalanches in an APD) is $(\epsilon\cdot n)$ and also shows Poissonian statistics, therefore $(\sigma_{det}^2=\epsilon\cdot n)$.
+      </li>
+      <li><b>analog detectors (e.g. CCD, CMOS, EM-CCD cameras):</b>
+        $[I=I_N+I_0=G\cdot\epsilon\cdot n+I_0,]$
+        $[\sigma_I^2=\sigma_N^2+\sigma_{det}^2=G^2\epsilon^2\cdot n+\mathcal{F}^2\cdot G^2\cdot \epsilon\cdot n+\sigma_{read}^2,]$
+        where most measures are defined as above. In addition the term $(\sigma_{read}^2)$ is the readout noise of the detector and $(G)$ is its gain in greylevel/photoelectrons (or ADU/e<sup>-</sup>). Finally $(\mathcal{F}^2)$ is the excess noise factor, which is simply 1 for normal CCD and CMOS cameras, but $(\mathcal{F}=2)$ for electron-multiplying CCD cameras. In the latter devices, this additional noise is caused by the stochastic amplification in the EM-gain register.
+      </li>
+    </ul>
+    $$startbox_info$$
+    The background intenisty $(I_0)$ can be measured by acquiring data without illumination. From the same measurement, the readout noise term $(\sigma_{read}^2)$ can be estimated. The gain $(G)$ of an analog detector can either be read from the camera datasheet, or should be measured by acquiring several frames with different illumination levels. In these the illumination should be done with an LED or a Laser, i.e. a light-source that does not show additional fluctuations due to particle number changes. The the background-average intensity $(I-I_0)$ for each pixel is plottet against the noise $\sigma_I^2)$ in each pixel. The slope of this graph equals $(\mathcal{F}^2\cdot G)$ and $(G)$ can be obtained from the known $(\mathcal{F}^2)$. This floowos directly, since  $(I-I_0=G\cdot N_{electrons})$ and $(\sigma_I^2=\sigma_{det}^2=\mathcal{F}^2\cdot G^2\cdot N_{electrons}+\sigma_{read}^2=\mathcal{F}^2\cdot G\cdot (I-I_0)+\sigma_{read}^2)$, where $(N_{electrons})$ is the number of photo-electrons.
+    $$endbox$$
     </p>
-    
-
-    
-    
-    <h3>Data from Photon Counting Detectors</h3>
     <p>
-    This method is suitable for data from a photon counting detector. According to the reference $$ref:QIANELSONWEBB:$$$$ref:UNRUHGRATTON:$$, four images are needed:
-    <ol>
-      <li>an intensity image $$math:I$$, best taken with an exposure time smaller than the particle diffusion time.</li>
-      <li>an intensity variance image $$math:\sigma_I^2$$, e.g. calculated from a series of images.</li>
-      <li>a background intensity image $$math:B$$, taken with the same settings as image $$math:I$$, but without illumination.</li>
-      <li>a background variance $$math:\sigma_B^2$$</li>
-    </ol>
-    From these images for every pixel, the plugin calculates the particle number $$math:N$$ and the particle brightness $$math:\epsilon$$:
-    $$bmath:N=\frac{(I-B)^2}{\sigma_I^2-\sigma_B^2}$$
-    $$bmath:\epsilon=\frac{\sigma_I^2-\sigma_B^2}{I-B}$$
-    $$note:The background intensities B and &sigma;<sub>B</sub> are taken from an image and a possibble user-background is added to these. This user-background can be set from selected/masked pixels in the <i>Number and brightness display editor</i> or by numbers in the <i>Number and brightness parameter editor</i>$$
-</p>
-
-    
-    <h3>Data from EM-CCD Detectors</h3>
-    <p>This method is suitable for data from an electron-multiplying CCD camera (EM-CCD) and was first published in  $$ref:UNRUHGRATTON:$$.
+    From these quantities an apparent particle number $(N)$ and an apparent brightness $(B)$ are calculated:
+     $[ \boxed{B=\frac{\sigma_I^2-\sigma_{det}^2}{I-I_0}},\ \ \ \ \ \text{with}\ \ \sigma_{det}^2=0\ \text{for\ photon-counting\ detectors} ]$
+     $[ \boxed{N=\frac{I-I_0}{B}= \frac{(I-I_0)^2}{\sigma_I^2-\sigma_{det}^2}},\ \ \ \ \ \text{with}\ \ \sigma_{det}^2=0\ \text{for\ photon-counting\ detectors} ]$
     </p>
+    <p> These quantities are related to the true brightness $(\epsilon)$ and the true particle number $(n)$, but they are not equal. To arrive at $(\epsilon)$ and $(n)$, we have to use the relations above. According to $$ref:QIANELSONWEBB:$$$$ref:UNRUHGRATTON:$$ this yiels:
+<ol>
+    <li>for photon-counting detectors: $[ \boxed{\epsilon=B-1} ]$ $[\boxed{n=\frac{\epsilon+1}{\epsilon}\cdot N}]$</li>
+    <li>for analog detectors: $[ \boxed{\epsilon=\frac{B}{G}-\mathcal{F}^2} ]$ $[\boxed{n=\frac{\epsilon+\mathcal{F}^2}{\epsilon}\cdot N}]$For EMCCD-cameras $(\mathcal{F^2}=2)$ and for analog detectors without stochastic gain $(\mathcal{F}^2=1)$.</li>
+</ol>
+    </p>
+    
+
     
 
     
@@ -63,7 +53,7 @@
 
 
 <h3>Adding an N&amp;B record to the project</h3>
-<p>This plugin implements sevreal methods to add a raw data record (RDR) to the project. they are summarized in the maion window within the menu <b>Data Items | Insert Raw Data | Number &amp; Brightness Analysis</b>:
+<p>This plugin implements sevreal methods to add a raw data record (RDR) to the project. They are summarized in the maion window within the menu <b>Data Items | Insert Raw Data | Number &amp; Brightness Analysis</b>:
 <ol>
     <li><b>load from imFCS dataset:</b> In this function you can select an <tt>.evalsettings.txt</tt>-file, as it is created by <a href="$$plugin_info:help:imaging_fcs$$">the imaging FCS plugin</a>. The correlator in this plugin typically creates the  four raw images, required for an N&amp;B analysis. If the data was acquired using a dual-view optics, two records are inserted into the project: One for each channel of the DualView.</li>
     <li><b>load from average+StdDev images (TIFF):</b> This function starts a wizard, which allows the user to select the four required images as TIFF files. On the second page of the wizard, you can select the pixel size and othe rproperties of the acquisition and set the DualView-mode to use. Finally the N&amp;B records are added to the project.</li>
@@ -71,8 +61,8 @@
 
 
     <h3>Number and brightness parameter editor</h3>
-    <p>This tab allows to set the parameters, used to calculate the N&amp;B. It also allows to recalculate the N&amp;B from the input images.
-        
+    <p>This tab allows to set the parameters, used to calculate the N&amp;B. It also allows to recalculate the N&amp;B from the input images.</p>
+   <p>The background intensity and variance are added to the values, read from optionally available background images. So if no background images are available, you can give estimates of these values here. If you want to rely completely on background images, you can set both quantities to 0. Otherwise the background images will be augmented with these values.
     </p>
     
     <h3>Number and brightness display editor</h3>
@@ -80,13 +70,13 @@
       <p>The number and brightness tab of the raw data record is split into three tabs with plots:
     <ol>
       <li><b>image plots:</b> <ul>
-	      <li>This tab shows the three important images: particle number $$math:N$$, particle brightness $$math:\epsilon$$ and the intensity image $$math:I$$. The fourth plot shows a scatter plot of the particle number against the particle brightness. Above the plots you can select the <a href="$$mainhelpdir$$installedcolorpalettes.html"> color palettes</a>, used for the three plots. 
-		  <li>You can also set the value ranges for the image plots, or set them to auto, which scales the colors between the minimum and maximum value within the currently non-masked pixels. </li>
-		  <li>You can also use the typical mask editor tools, available in many QuickFit plugins. these allow to draw masks into the images, or set the mask by intensity. Masks may also be copied, pasted saved etc. All these functions are available in the menu <b>Mask</b>.</li>
-	      <li>Below the plots you can set ranges for the particle number and brightness. These are displayed as ranges in the correlation plot and may also be set, by drawing a rectangle within that plot. If these ranges are given, all pixels within these ranges are selected in the three image plots (red overlay). Also the histograms on the "histograms" tab contain a second histogram with the selected pixels only.</li>
-		  <li>The menu entry <b>Evaluation Tools | copy N&amp;B data</b> allows to copy the average/stddev/median/... of several records (and in there only the non-masked pixels) into a table.</li>
-		</ul> 
-	  </li>
+          <li>This tab shows the three important images: particle number $$math:N$$, particle brightness $$math:\epsilon$$ and the intensity image $$math:I$$. The fourth plot shows a scatter plot of the particle number against the particle brightness. Above the plots you can select the <a href="$$mainhelpdir$$installedcolorpalettes.html"> color palettes</a>, used for the three plots. 
+          <li>You can also set the value ranges for the image plots, or set them to auto, which scales the colors between the minimum and maximum value within the currently non-masked pixels. </li>
+          <li>You can also use the typical mask editor tools, available in many QuickFit plugins. these allow to draw masks into the images, or set the mask by intensity. Masks may also be copied, pasted saved etc. All these functions are available in the menu <b>Mask</b>.</li>
+          <li>Below the plots you can set ranges for the particle number and brightness. These are displayed as ranges in the correlation plot and may also be set, by drawing a rectangle within that plot. If these ranges are given, all pixels within these ranges are selected in the three image plots (red overlay). Also the histograms on the "histograms" tab contain a second histogram with the selected pixels only.</li>
+          <li>The menu entry <b>Evaluation Tools | copy N&amp;B data</b> allows to copy the average/stddev/median/... of several records (and in there only the non-masked pixels) into a table.</li>
+        </ul> 
+      </li>
       <li><b>histograms:</b> Shows <a href="$$mainhelpdir$$/qfhistogram.html">histograms</a> of the particle number, particle brightness and intensity images. Next to the histograms you see a summary of the statistics of these images. $$note:Histograms of the input images can be found in the "overview images" tab of the raw data record editor!$$</li>
       <li><b>correlations:</b> In this tab you can generate <a href="$$mainhelpdir$$/qfparametercorrelation.html">correlation plots</a> of any parameter against any other.</li> 
       </ol>
@@ -98,5 +88,7 @@
       <p>In this editor you can view the raw images and also overview images, possibly acquired together with the actual acquisition.</p>
       
       
+      <h2>References</h2>
+      $$references$$
   </body>
 </html>

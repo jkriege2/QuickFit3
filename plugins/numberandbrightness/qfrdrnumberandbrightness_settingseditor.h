@@ -63,10 +63,11 @@ class QFRDRNumberAndBrightnessSettingsEditor : public QFRawDataEditor
         void recalcNB();
         void writeData();
         void writeDataToAllRDR();
-        void writeData(QFRawDataRecord* current);
+        void writeData(QFRawDataRecord* current, bool notImageProp=false);
         /** \brief connected to the rawDataChanged() signal of the current record */
         virtual void rawDataChanged();
 
+        void on_cmbDetector_currentIndexChanged(int index);
     protected:
         /** \brief read the settings */
         virtual void readSettings();
