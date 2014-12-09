@@ -1382,7 +1382,7 @@ void QFProject::internalReadXML(const QString& file) {
 #endif
 
 
-    internalReadXML(f);
+    internalReadXML(f,file);
 
     f->close();
 
