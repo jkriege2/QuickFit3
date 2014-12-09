@@ -1199,7 +1199,7 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
             QFileInfo fi(projectfilename);
             QDir pdir=QDir(fi.canonicalPath());
             //file=fi.absoluteDir().relativeFilePath(files[i]);
-            file=pdir.absoluteFilePath(QFileInfo(files[i]).canonicalFilePath());
+            file=QFileInfo(pdir.absoluteFilePath(files[i])).canonicalFilePath();
             QString ftype="";
             if (i<files_types.size()) ftype=files_types[i];
             QString fdescription="";
@@ -1235,7 +1235,7 @@ qDebug()<<Q_FUNC_INFO<<"QFRDRReadLocker";
                     writeOut=true;
                 }
             } else {
-                file=fi.absoluteDir().relativeFilePath(files[i]);
+                file=pdir.relativeFilePath(QFileInfo(files[i]).canonicalFilePath());
             }
 
             if (writeOut) {

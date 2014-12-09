@@ -75,8 +75,8 @@ void QFFCSMaxEntEvaluationEditor::getPlotData(QFRawDataRecord *record, int index
     }
 
 
-    int datacut_min=datacut->get_userMin();
-    int datacut_max=datacut->get_userMax();
+    int datacut_min=getUserMin(record, index);
+    int datacut_max=getUserMax(record, index);
 
 
     try {

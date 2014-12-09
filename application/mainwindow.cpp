@@ -2003,19 +2003,7 @@ bool MainWindow::saveProject(const QString &fileName) {
         project->writeXML(fileName);
         ok=!project->error();
 
-        /*if (fileName.toLower().contains(".qfpz") || fileName.toLower().contains(".qfp.gz")) {
-            logFileProjectWidget->log_text("SAVING TO GZIPPED PROJECT!\n");
-            QuaGzipFile gzf(fileName);
-            if (gzf.open(QIODevice::WriteOnly)) {
-                project->writeXML(&gzf, true, fileName);
-                gzf.close();
-            } else {
-                QMessageBox::critical(this, tr("QuickFit %1").arg(qfInfoVersionFull()), tr("Could not open GZip-file for output!\n   file: '%1'\n   error: '%2'").arg(fileName).arg(gzf.errorString()));
-                logFileProjectWidget->log_error(tr("Could not open GZip-file for output (file: '%1', error: '%2')").arg(fileName).arg(gzf.errorString())+"\n");
-            }
-        } else {
-            project->writeXML(fileName);
-        }*/
+
 
 
 
@@ -2471,7 +2459,7 @@ void MainWindow::autosaveProject() {
     logFileProjectWidget->log_text(tr("%2: autosaving project file '%1' ...\n").arg(autosaveFilename).arg(QTime::currentTime().toString("hh:mm:ss")));
     QTime time;
     time.start();
-    project->writeXML(autosaveFilename, false);
+    project->writeXML(autosaveFilename, false,  false);
     logFileProjectWidget->log_text(tr("%2: autosaving project file '%1' ... done after %3 sec\n").arg(autosaveFilename).arg(QTime::currentTime().toString("hh:mm:ss")).arg(double(time.elapsed())/1000.0));
     QApplication::restoreOverrideCursor();
 

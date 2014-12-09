@@ -79,8 +79,8 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
         return;
     }
 
-    int datacut_min=datacut->get_userMin();
-    int datacut_max=datacut->get_userMax();
+    int datacut_min=getUserMin(record, index);
+    int datacut_max=getUserMax(record, index);
     int data_start=sliderDist->get_userMin();
     int data_end=sliderDist->get_userMax();
     int msd_start=sliderDist->get_userMin();
@@ -193,8 +193,8 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
 
                 } else if (option==5) {
                     mored=dist;
-                    double P=eval->getTheoryPre(0, eval->getHighlightedRecord(), eval->getCurrentIndex());
-                    double D=eval->getTheoryD(0, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    double P=eval->getTheoryPre(0, record, index);
+                    double D=eval->getTheoryD(0, record, index);
                     for (int i=0; i<dist.size(); i++) {
                         mored[i]=dist[i]/(P*D*distTau[i]);
                     }
@@ -205,8 +205,8 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                     plotdata.append(item);
                 } else if (option==6) {
                     mored=dist;
-                    double P=eval->getTheoryPre(1, eval->getHighlightedRecord(), eval->getCurrentIndex());
-                    double D=eval->getTheoryD(1, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    double P=eval->getTheoryPre(1, record, index);
+                    double D=eval->getTheoryD(1, record, index);
                     for (int i=0; i<dist.size(); i++) {
                         mored[i]=dist[i]/(P*D*distTau[i]);
                     }
@@ -218,8 +218,8 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
 
                 } else if (option==7) {
                     mored=dist;
-                    double P=eval->getTheoryPre(2, eval->getHighlightedRecord(), eval->getCurrentIndex());
-                    double D=eval->getTheoryD(2, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    double P=eval->getTheoryPre(2, record, index);
+                    double D=eval->getTheoryD(2, record, index);
                     for (int i=0; i<dist.size(); i++) {
                         mored[i]=dist[i]/(P*D*distTau[i]);
                     }
@@ -230,8 +230,8 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                     plotdata.append(item);
                 } else if (option==8) {
                     mored=dist;
-                    double P=eval->getTheoryPre(3, eval->getHighlightedRecord(), eval->getCurrentIndex());
-                    double D=eval->getTheoryD(3, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    double P=eval->getTheoryPre(3, record, index);
+                    double D=eval->getTheoryD(3, record, index);
                     for (int i=0; i<dist.size(); i++) {
                         mored[i]=dist[i]/(P*D*distTau[i]);
                     }
@@ -242,8 +242,8 @@ void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, Q
                     plotdata.append(item);
                 } else if (option==9) {
                     mored=dist;
-                    double P=eval->getTheoryPre(0, eval->getHighlightedRecord(), eval->getCurrentIndex());
-                    double D=eval->getTheoryD(0, eval->getHighlightedRecord(), eval->getCurrentIndex());
+                    double P=eval->getTheoryPre(0, record, index);
+                    double D=eval->getTheoryD(0, record, index);
                     for (int i=0; i<dist.size(); i++) {
                         mored[i]=dist[i]-(P*D*distTau[i]);
                     }

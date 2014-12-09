@@ -328,8 +328,9 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
             \param file the file to store the project to
             \param resetDataChanged if \c true (default) the property dataChange is reset to \c false.
                    Set this to \c false, if you want to save the project, without influence on the contained data (e.g. for autosaves).
+            \param changeInternalFile if this is \c true, the internal property file (see getFile()) is set to the name of the written file (or filename), if \c false the file is written and the property file is as it was before after the call of this function
         */
-        void writeXML(const QString& file, bool resetDataChanged=true);
+        void writeXML(const QString& file, bool resetDataChanged=true, bool changeInternalFile=true);
         /*! \brief write project to XML file and compresses it alongside all required&linked files into a ZIP-archive
             \param file the file to store the project to
             \param pdlg progress dialog
@@ -341,9 +342,10 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
             \param file the QIODevice to store the project to
             \param resetDataChanged if \c true (default) the property dataChange is reset to \c false.
                    Set this to \c false, if you want to save the project, without influence on the contained data (e.g. for autosaves).
-            \param if the filename, we are writing to with file is known, it can be provided here! (if this is not provided and file can be cast to a QFile, the the filename is taken from that QFile!)
+            \param filename if the filename, we are writing to with file is known, it can be provided here! (if this is not provided and file can be cast to a QFile, the the filename is taken from that QFile!)
+            \param changeInternalFile if this is \c true, the internal property file (see getFile()) is set to the name of the written file (or filename), if \c false the file is written and the property file is as it was before after the call of this function
         */
-        void writeXML(QIODevice* file, bool resetDataChanged=true, const QString &filename=QString());
+        void writeXML(QIODevice* file, bool resetDataChanged=true, const QString &filename=QString(), bool changeInternalFile=true);
 
         enum WriteSubsetModes {
             wsmRDRs = 0x01,
@@ -359,7 +361,7 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
             \param writeRecordsOnly if \c false (default) this function writes a full project file, otherwise, only the
             \param if the filename, we are writing to with file is known, it can be provided here! (if this is not provided and file can be cast to a QFile, the the filename is taken from that QFile!)
 
-            \note This function does not create backups!
+            \note This function does not create backups and does not change the internal property file!
         */
         void writeXMLSubset(QIODevice* file, const QSet<int>& rdrSelected, const QSet<int>& evalSelected, bool writeRecordsOnly=false, int writeMode=wsmAll, const QString &filename=QString()) const;
 

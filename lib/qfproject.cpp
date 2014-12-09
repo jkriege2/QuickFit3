@@ -650,7 +650,7 @@ void QFProject::duplicateEvaluation(int ID)
 
 
 
-void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& filename_in)
+void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& filename_in, bool changeInternalFile)
 {
     QString filename=filename_in;
     QFile* ffile=qobject_cast<QFile*>(file);
@@ -658,6 +658,8 @@ void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& 
         filename=ffile->fileName();
     }
     if (reading) return;
+
+    QString oldfile=this->file;
 
     bool namechanged=(filename!=this->file);
     if (!filename.isEmpty()) this->file=filename;
@@ -731,6 +733,10 @@ void QFProject::writeXML(QIODevice *file, bool resetDataChanged, const QString& 
         QFile fdel(tmpfn);
         fdel.remove(tmpfn);
     }
+
+    if (!changeInternalFile) {
+        this->file=oldfile;
+    }
 }
 
 void QFProject::writeXMLSubset(QIODevice *file, const QSet<int> &rdrSelected, const QSet<int> &evalSelected, bool writeRecordsOnly, int writeMode, const QString &filename_in) const
@@ -753,7 +759,7 @@ void QFProject::writeXMLSubset(QIODevice *file, const QSet<int> &rdrSelected, co
         f.open(QFile::WriteOnly);
 
 
-        internalWriteXMLConst(&f, filename, false, false, false, NULL, rdrSelected, evalSelected, writeRecordsOnly);
+        internalWriteXMLConst(&f, filename, false, QString("raw_data_files/"), QString("eval_files/"), NULL, rdrSelected, evalSelected, false, wsmAll);
         //internalWriteXML(&f, resetDataChanged, namechanged, filename);
         f.close();
     }
@@ -869,13 +875,16 @@ void QFProject::internalWriteXML(QIODevice *file, bool resetDataChanged, bool na
     }*/
 }
 
-void QFProject::writeXML(const QString& file, bool resetDataChanged) {
+void QFProject::writeXML(const QString& file_in, bool resetDataChanged, bool changeInternalFile) {
     QFProjectReadLocker locker(p->lock);
+
+    QString file=QFileInfo(file_in).canonicalFilePath();
+    QString oldfile=this->file;
 
     if (file.toLower().contains(".qfpz") || file.toLower().contains(".qfp.gz")) {
         QuaGzipFile gzf(file);
         if (gzf.open(QIODevice::WriteOnly)) {
-            writeXML(&gzf, resetDataChanged, file);
+            writeXML(&gzf, resetDataChanged, file, changeInternalFile);
             gzf.close();
         } else {
             setError(tr("Could not open GZip-file for output (file: '%1', error: '%2')").arg(file).arg(gzf.errorString())+"\n");
@@ -917,6 +926,9 @@ void QFProject::writeXML(const QString& file, bool resetDataChanged) {
         if (!f.rename(file)) {
             setError(tr("Could no open file '%1' for output (temp filename: %3)!\n Error description: %2.").arg(file).arg(f.errorString()).arg(f.fileName()));
         }
+    }
+    if (!changeInternalFile) {
+        this->file=oldfile;
     }
 }
 
