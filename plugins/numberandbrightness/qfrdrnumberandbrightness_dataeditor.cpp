@@ -1101,19 +1101,19 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
             widCorrelation->setCorrelation2Label(tr("brightness $\\epsilon$"));
         }
 
-        if (cmbCorrelationPCol->currentIndex()==0) {
+        if (cmbCorrelationPCol->currentIndex()==1) {
             widCorrelation->setCorrelationColorLabel(tr("intensity $I$"));
             cC=dataOvr;
-        } else if (cmbCorrelationPCol->currentIndex()==1) {
+        } else if (cmbCorrelationPCol->currentIndex()==2) {
             cC=dataAppN;
             widCorrelation->setCorrelationColorLabel(tr("apparent particle number $N$"));
-        } else if (cmbCorrelationPCol->currentIndex()==2) {
+        } else if (cmbCorrelationPCol->currentIndex()==3) {
             cC=dataAppEps;
             widCorrelation->setCorrelationColorLabel(tr("apparent brightness $B$"));
-        } else if (cmbCorrelationPCol->currentIndex()==3) {
+        } else if (cmbCorrelationPCol->currentIndex()==4) {
             cC=dataN;
             widCorrelation->setCorrelationColorLabel(tr("particle number $n$"));
-        } else if (cmbCorrelationPCol->currentIndex()==4) {
+        } else if (cmbCorrelationPCol->currentIndex()==5) {
             cC=dataEps;
             widCorrelation->setCorrelationColorLabel(tr("brightness $\\epsilon$"));
         }
