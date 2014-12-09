@@ -1,0 +1,9 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="eval_cameracalibration/eval_cameracalibration.png">./images/eval_cameracalibration.png</file>
+    <file alias="eval_cameracalibration/eval_cameracalibration_small.png">./images/eval_cameracalibration_small.png</file>
+    <file alias="eval_cameracalibration/qfeval_savereport.png">./images/qfevalcameracalibration_save.png</file>
+    <file alias="eval_cameracalibration/qfeval_printreport.png">./images/qfevalcameracalibration_print.png</file>
+    <file alias="eval_cameracalibration/qfevalcameracalibration_evaluate.png">./images/qfevalcameracalibration_evaluate.png</file>
+</qresource>
+</RCC>
