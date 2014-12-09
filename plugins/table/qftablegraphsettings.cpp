@@ -896,11 +896,16 @@ void QFTableGraphSettings::updatePlotWidgetVisibility()
                 ui->labMax->setText(tr("max col.:"));
                 ui->labMean->setText(tr("mean col.:"));
                 ui->labQ75->setText(tr("Q75%  col.:"));
+                ui->cmbLinesXError->setVisible(true);
+                ui->cmbLinesYData->setVisible(true);
+                ui->cmbLinesYError->setVisible(true);
                 ui->cmbLinesMax->setVisible(true);
                 ui->cmbLinesMean->setVisible(true);
                 ui->cmbLinesQ75->setVisible(true);
-                ui->widErrorY->setVisible(false);
-                ui->widErrorX->setVisible(false);
+                ui->widErrorY->setVisible(true);
+                ui->widErrorX->setVisible(true);
+                ui->widErrorY2->setVisible(false);
+                ui->widErrorX2->setVisible(false);
 
                 ui->btnClearLinesMax->setVisible(true);
                 ui->btnClearLinesMean->setVisible(true);
@@ -1476,7 +1481,7 @@ void QFTableGraphSettings::on_btnAutoX_clicked()
     QStringList searchPhrases;
     QString id;
     QString typ;
-    QRegExp rxID("(.*)\\:([^\\(\\[\\{]*)[\\[\\(\\{]+(.*)[\\]\\)\\}]+");
+    QRegExp rxID("([^\\(\\[\\{]*)[\\[\\(\\{\\:]+([^\\]\\)\\}]*)[\\]\\)\\}]?");
     rxID.setCaseSensitivity(Qt::CaseInsensitive);
 
     QFRDRTable::GraphType gt=(QFRDRTable::GraphType)ui->cmbGraphType->itemData(ui->cmbGraphType->currentIndex()).toInt();
@@ -1485,8 +1490,9 @@ void QFTableGraphSettings::on_btnAutoX_clicked()
         || gt==QFRDRTable::gtStepsVertical || gt==QFRDRTable::gtBarsVertical) {
 
         if (rxID.indexIn(name)>=0) {
-            id=rxID.cap(3);
-            typ=rxID.cap(2).toLower();
+            id=rxID.cap(2);
+            typ=rxID.cap(1).toLower();
+            //qDebug()<<typ<<id;
             if (typ.contains("mean") || typ.contains("average") || typ.contains("avg") || typ.contains("mittelwert") || typ.contains("mittel") || typ.contains("median") || typ.contains("med")) {
                 searchPhrases<<"std"<<"stddev"<<"standard deviation"<<"sd"<<"s.d."<<"stabw"<<"stab"<<"iqr";
             }
@@ -1497,9 +1503,9 @@ void QFTableGraphSettings::on_btnAutoX_clicked()
                 for (int i=0; i<cmbInput->count(); i++) {
                     QString en=cmbInput->itemText(i);
                     if (en!=name) {
-                        bool found=(rxID.indexIn(name)>=0);
-                        bool exactmatch=(rxID.cap(3)==id);
-                        //qDebug()<<step<<i<<en<<found<<exactmatch<<rxID.cap(1)<<rxID.cap(2)<<rxID.cap(3);
+                        bool found=(rxID.indexIn(en)>=0);
+                        bool exactmatch=(rxID.cap(2)==id);
+                        //qDebug()<<step<<i<<en<<found<<exactmatch<<rxID.cap(1)<<rxID.cap(1)<<rxID.cap(2);
                         if ((exactmatch && step==0)||(found && step==1)) {
                             for (int j=0; j<searchPhrases.size(); j++) {
                                 if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
@@ -1523,8 +1529,10 @@ void QFTableGraphSettings::on_btnAutoY_clicked()
     QStringList searchPhrases;
     QString id;
     QString typ;
-    QRegExp rxID("(.*)\\:([^\\(\\[\\{]*)[\\[\\(\\{]+(.*)[\\]\\)\\}]+");
+    QRegExp rxID("([^\\(\\[\\{]*)[\\[\\(\\{\\:]+([^\\]\\)\\}]*)[\\]\\)\\}]?");
     rxID.setCaseSensitivity(Qt::CaseInsensitive);
+
+    QRegExp rxIDD=rxID;
 
     QFRDRTable::GraphType gt=(QFRDRTable::GraphType)ui->cmbGraphType->itemData(ui->cmbGraphType->currentIndex()).toInt();
     if (gt==QFRDRTable::gtLines || gt==QFRDRTable::gtImpulsesVertical || gt==QFRDRTable::gtFilledCurveX || gt==QFRDRTable::gtStepsHorizontal
@@ -1532,8 +1540,9 @@ void QFTableGraphSettings::on_btnAutoY_clicked()
         || gt==QFRDRTable::gtStepsVertical || gt==QFRDRTable::gtBarsVertical) {
 
         if (rxID.indexIn(name)>=0) {
-            id=rxID.cap(3);
-            typ=rxID.cap(2).toLower();
+            id=rxID.cap(2);
+            typ=rxID.cap(1).toLower();
+            //qDebug()<<typ<<id;
             if (typ.contains("mean") || typ.contains("average") || typ.contains("avg") || typ.contains("mittel") || typ.contains("mittelwert") || typ.contains("median") || typ.contains("med")) {
                 searchPhrases<<"std"<<"stddev"<<"standard deviation"<<"sd"<<"s.d."<<"stabw"<<"stab";
             }
@@ -1542,8 +1551,8 @@ void QFTableGraphSettings::on_btnAutoY_clicked()
                 for (int i=0; i<cmbInput->count(); i++) {
                     QString en=cmbInput->itemText(i);
                     if (en!=name) {
-                        bool found=(rxID.indexIn(name)>=0);
-                        bool exactmatch=(rxID.cap(3)==id);
+                        bool found=(rxID.indexIn(en)>=0);
+                        bool exactmatch=(rxID.cap(2)==id);
                         if ((exactmatch && step==0)||(found && step==1)) {
                             for (int j=0; j<searchPhrases.size(); j++) {
                                 if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
@@ -1559,66 +1568,75 @@ void QFTableGraphSettings::on_btnAutoY_clicked()
 
     } else if (gt==QFRDRTable::gtBoxplotX || gt==QFRDRTable::gtBoxplotY) {
         if (rxID.indexIn(name)>=0) {
-            id=rxID.cap(3);
-            typ=rxID.cap(2).toLower();
+            id=rxID.cap(2);
+            typ=rxID.cap(1).toLower();
+            //qDebug()<<typ<<id;
             /*if (typ.contains("mean") || typ.contains("average") || typ.contains("avg") || typ.contains("mittel") || typ.contains("median") || typ.contains("med")) {
                 searchPhrases<<"std"<<"stddev"<<"standard deviation"<<"sd"<<"s.d."<<"stabw"<<"stab";
             } else if (typ.contains("mean") || typ.contains("average") || typ.contains("avg") || typ.contains("mittel") || typ.contains("median") || typ.contains("med")) {
                 searchPhrases<<"std"<<"stddev"<<"standard deviation"<<"sd"<<"s.d."<<"stabw"<<"stab";
             }*/
 
+            bool done1=false, done2=false, done3=false, done4=false, done5=false, done6=false;
             for (int step=0; step<2; step++) {
                 for (int i=0; i<cmbInput->count(); i++) {
                     QString en=cmbInput->itemText(i);
                     if (en!=name) {
-                        bool found=(rxID.indexIn(name)>=0);
-                        bool exactmatch=(rxID.cap(3)==id);
+                        bool found=(rxID.indexIn(en)>=0);
+                        bool exactmatch=found && (rxID.cap(2)==id);
+                        //qDebug()<<step<<i<<en<<found<<exactmatch<<rxID.cap(1)<<rxID.cap(2);
                         if ((exactmatch && step==0)||(found && step==1)) {
                             searchPhrases.clear();
                             searchPhrases<<"minimum"<<"min";
                             for (int j=0; j<searchPhrases.size(); j++) {
-                                if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
+                                if (!done1 && en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
                                     ui->cmbLinesXError->setCurrentIndex(i);
+                                    done1=true;
                                     break;
                                 }
                             }
-                            searchPhrases.clear();
+                            /*searchPhrases.clear();
                             searchPhrases<<"quantile25"<<"quant25"<<"q25"<<"0.25"<<"25";
                             for (int j=0; j<searchPhrases.size(); j++) {
-                                if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
+                                if (!done2 && en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
                                     ui->cmbLinesYData->setCurrentIndex(i);
+                                    done2=true;
                                     break;
                                 }
-                            }
+                            }*/
                             searchPhrases.clear();
                             searchPhrases<<"median"<<"med"<<"quantile50"<<"quant50"<<"q50";
                             for (int j=0; j<searchPhrases.size(); j++) {
-                                if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
+                                if (!done3 && en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
                                     ui->cmbLinesYError->setCurrentIndex(i);
+                                    done3=true;
                                     break;
                                 }
                             }
                             searchPhrases.clear();
                             searchPhrases<<"quantile75"<<"quant75"<<"q75"<<"0.75"<<"75";
                             for (int j=0; j<searchPhrases.size(); j++) {
-                                if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
+                                if (!done4 && en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
                                     ui->cmbLinesQ75->setCurrentIndex(i);
+                                    done4=true;
                                     break;
                                 }
                             }
                             searchPhrases.clear();
                             searchPhrases<<"mean"<<"average"<<"avg"<<"mittel"<<"mittelwert";
                             for (int j=0; j<searchPhrases.size(); j++) {
-                                if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
+                                if (!done5 && en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
                                     ui->cmbLinesMean->setCurrentIndex(i);
+                                    done5=true;
                                     break;
                                 }
                             }
                             searchPhrases.clear();
                             searchPhrases<<"maximum"<<"max";
                             for (int j=0; j<searchPhrases.size(); j++) {
-                                if (en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
+                                if (!done6 && en.contains(searchPhrases[j], Qt::CaseInsensitive)) {
                                     ui->cmbLinesMax->setCurrentIndex(i);
+                                    done6=true;
                                     break;
                                 }
                             }
