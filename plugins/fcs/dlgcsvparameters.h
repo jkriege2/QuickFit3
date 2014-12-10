@@ -72,6 +72,8 @@ class dlgCSVParameters : public QDialog, private Ui::dlgCSVParameters
         void deleteConfig();
         void currentConfigChanged(const QString& name);
         void dataChanged();
+
+        void on_btnTab_clicked();
     protected:
         QStringList getNames();
         QVariant getProperty(QString index, QString property, QVariant defaultValue);

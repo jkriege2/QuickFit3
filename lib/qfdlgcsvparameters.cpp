@@ -98,6 +98,12 @@ void QFDlgCSVParameters::checkValues() {
     }
 }
 
+void QFDlgCSVParameters::on_btnTab_clicked()
+{
+    ui->edtColumn->setText("\n");
+
+}
+
 void QFDlgCSVParameters::guessParameters()
 {
 

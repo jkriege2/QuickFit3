@@ -68,8 +68,8 @@
     <rect>
      <x>20</x>
      <y>60</y>
-     <width>150</width>
-     <height>119</height>
+     <width>175</width>
+     <height>129</height>
     </rect>
    </property>
    <layout class="QFormLayout" name="formLayout">
@@ -86,7 +86,7 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="0">
+    <item row="2" column="0">
      <widget class="QLabel" name="label_2">
       <property name="text">
        <string>&amp;Decimal Separator:</string>
@@ -96,7 +96,7 @@
       </property>
      </widget>
     </item>
-    <item row="1" column="1">
+    <item row="2" column="1">
      <widget class="QLineEdit" name="edtDecimal">
       <property name="text">
        <string>.</string>
@@ -106,7 +106,7 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
+    <item row="3" column="0">
      <widget class="QLabel" name="label_3">
       <property name="text">
        <string>C&amp;oment Separator:</string>
@@ -116,7 +116,7 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="1">
+    <item row="3" column="1">
      <widget class="QLineEdit" name="edtComment">
       <property name="text">
        <string>#</string>
@@ -126,7 +126,7 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="0">
+    <item row="4" column="0">
      <widget class="QLabel" name="label_4">
       <property name="text">
        <string>&amp;Header Start:</string>
@@ -136,7 +136,7 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="1">
+    <item row="4" column="1">
      <widget class="QLineEdit" name="edtHeader">
       <property name="text">
        <string>#!</string>
@@ -153,6 +153,13 @@
       </property>
       <property name="buddy">
        <cstring>edtColumn</cstring>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="1">
+     <widget class="QPushButton" name="btnTab">
+      <property name="text">
+       <string>set tab</string>
       </property>
      </widget>
     </item>

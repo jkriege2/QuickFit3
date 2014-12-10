@@ -1,0 +1,1284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFRDRNumberAndBrightnessProcessingDialog</class>
+ <widget class="QDialog" name="QFRDRNumberAndBrightnessProcessingDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1102</width>
+    <height>868</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>imFCS: Correlator</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../imagingfcs/qfrdrimagingfcs.qrc">
+    <normaloff>:/imaging_fcs/qfrdrimagingfcs_correlate.png</normaloff>:/imaging_fcs/qfrdrimagingfcs_correlate.png</iconset>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout_2" stretch="1,0,0">
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string> New Correlation Job: </string>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,1,0">
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QLineEdit" name="edtImageFile">
+          <property name="placeholderText">
+           <string>enter filename here</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnSelectImageFile">
+          <property name="toolTip">
+           <string>select an image series file to correlate</string>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../imagingfcs/qfrdrimagingfcs.qrc">
+            <normaloff>:/imaging_fcs/fileopen.png</normaloff>:/imaging_fcs/fileopen.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnLoad">
+          <property name="toolTip">
+           <string>read metadata from the given image series file</string>
+          </property>
+          <property name="text">
+           <string>...</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../imagingfcs/qfrdrimagingfcs.qrc">
+            <normaloff>:/imaging_fcs/use_file.png</normaloff>:/imaging_fcs/use_file.png</iconset>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnSelectImageFileNoCount">
+          <property name="toolTip">
+           <string>select an image series file to correlate</string>
+          </property>
+          <property name="text">
+           <string>don't count</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../imagingfcs/qfrdrimagingfcs.qrc">
+            <normaloff>:/imaging_fcs/fileopen.png</normaloff>:/imaging_fcs/fileopen.png</iconset>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextBesideIcon</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QToolButton" name="btnLoadNoCount">
+          <property name="toolTip">
+           <string>read metadata from the given image series file</string>
+          </property>
+          <property name="text">
+           <string>don't count</string>
+          </property>
+          <property name="icon">
+           <iconset resource="../imagingfcs/qfrdrimagingfcs.qrc">
+            <normaloff>:/imaging_fcs/use_file.png</normaloff>:/imaging_fcs/use_file.png</iconset>
+          </property>
+          <property name="toolButtonStyle">
+           <enum>Qt::ToolButtonTextBesideIcon</enum>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="1">
+       <widget class="QScrollArea" name="scrollAreaParams">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="frameShape">
+         <enum>QFrame::NoFrame</enum>
+        </property>
+        <property name="frameShadow">
+         <enum>QFrame::Plain</enum>
+        </property>
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <widget class="QWidget" name="scrollAreaWidgetContents">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>996</width>
+           <height>533</height>
+          </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <layout class="QVBoxLayout" name="verticalLayout_4">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="QFrame" name="widDetails">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>0</width>
+              <height>528</height>
+             </size>
+            </property>
+            <property name="frameShape">
+             <enum>QFrame::NoFrame</enum>
+            </property>
+            <property name="frameShadow">
+             <enum>QFrame::Raised</enum>
+            </property>
+            <layout class="QFormLayout" name="formLayout_3">
+             <property name="fieldGrowthPolicy">
+              <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+             </property>
+             <property name="horizontalSpacing">
+              <number>6</number>
+             </property>
+             <property name="verticalSpacing">
+              <number>2</number>
+             </property>
+             <property name="leftMargin">
+              <number>0</number>
+             </property>
+             <property name="topMargin">
+              <number>0</number>
+             </property>
+             <property name="rightMargin">
+              <number>0</number>
+             </property>
+             <property name="bottomMargin">
+              <number>0</number>
+             </property>
+             <item row="1" column="0">
+              <widget class="QLabel" name="label_38">
+               <property name="text">
+                <string>input:</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+               </property>
+               <property name="buddy">
+                <cstring>cmbFileformat</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_19">
+               <item>
+                <widget class="QLabel" name="label_5">
+                 <property name="text">
+                  <string>file &amp;format:</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>cmbFileformat</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QComboBox" name="cmbFileformat">
+                 <property name="maximumSize">
+                  <size>
+                   <width>250</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                 <item>
+                  <property name="text">
+                   <string>none</string>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>TIFF</string>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_25">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QPushButton" name="btnPreview">
+                 <property name="font">
+                  <font>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>&amp;Preview</string>
+                 </property>
+                 <property name="shortcut">
+                  <string>Ctrl+P</string>
+                 </property>
+                 <property name="checkable">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="2" column="0">
+              <widget class="QLabel" name="label_21">
+               <property name="text">
+                <string>&amp;output:</string>
+               </property>
+               <property name="buddy">
+                <cstring>edtPrefix</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,1,0,0,2">
+               <item>
+                <widget class="QLabel" name="label_4">
+                 <property name="toolTip">
+                  <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;the correlation results will be saved in file starting with&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;   &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;prefix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-style:italic;&quot;&gt;input_filename_without_extension&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;postfix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-style:italic;&quot;&gt;&amp;lt;descriptive_extension&amp;gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Courier New,courier'; font-size:8pt; font-style:italic;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;So set the  &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;prefix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; e.g. with the subdirectory that you want the files to end up in and the &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;postfix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; containing e.g. the correlation settings. Templates (right-click) for certain correlation settings are available for both. Any relative diectory is relative to the input file directory.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>&amp;prefix:</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>edtPrefix</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QEnhancedLineEdit" name="edtPrefix">
+                 <property name="toolTip">
+                  <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;the correlation results will be saved in file starting with&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;   &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;prefix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-style:italic;&quot;&gt;input_filename_without_extension&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;postfix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-style:italic;&quot;&gt;&amp;lt;descriptive_extension&amp;gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Courier New,courier'; font-size:8pt; font-style:italic;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;So set the  &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;prefix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; e.g. with the subdirectory that you want the files to end up in and the &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;postfix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; containing e.g. the correlation settings. Templates (right-click) for certain correlation settings are available for both. Any relative diectory is relative to the input file directory.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>./results_NandB/</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_11">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_22">
+                 <property name="toolTip">
+                  <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;the correlation results will be saved in file starting with&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;   &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;prefix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-style:italic;&quot;&gt;input_filename_without_extension&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;postfix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-style:italic;&quot;&gt;&amp;lt;descriptive_extension&amp;gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Courier New,courier'; font-size:8pt; font-style:italic;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;So set the  &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;prefix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; e.g. with the subdirectory that you want the files to end up in and the &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;postfix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; containing e.g. the correlation settings. Templates (right-click) for certain correlation settings are available for both. Any relative diectory is relative to the input file directory.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>p&amp;ostfix:</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>edtPostfix</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QEnhancedLineEdit" name="edtPostfix">
+                 <property name="toolTip">
+                  <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;the correlation results will be saved in file starting with&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;   &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;prefix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-style:italic;&quot;&gt;input_filename_without_extension&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;postfix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-style:italic;&quot;&gt;&amp;lt;descriptive_extension&amp;gt;&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-family:'Courier New,courier'; font-size:8pt; font-style:italic;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;So set the  &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;prefix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; e.g. with the subdirectory that you want the files to end up in and the &lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; font-weight:600; color:#0000ff;&quot;&gt;postfix&lt;/span&gt;&lt;span style=&quot; font-family:'Courier New,courier'; font-size:8pt; color:#0000ff;&quot;&gt;&amp;gt;&lt;/span&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt; containing e.g. the correlation settings. Templates (right-click) for certain correlation settings are available for both. Any relative diectory is relative to the input file directory.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                 </property>
+                 <property name="text">
+                  <string>_%COUNTER%</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="3" column="0">
+              <widget class="QLabel" name="label_41">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="0">
+              <widget class="QCheckBox" name="chkCamera">
+               <property name="toolTip">
+                <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;if you activate this function, you may set some camera/microscope properties (pixel size, ...) that will overwrite the ones possibly saved together with the input image.&lt;/span&gt;&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px; font-size:8pt;&quot;&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;This is also useful, if you have a raw input image series with no attatched/readable meta-information about the acquisition system (camera+microscope ...)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>camera description:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="4" column="1">
+              <widget class="QWidget" name="horizontalWidget" native="true">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <layout class="QHBoxLayout" name="horizontalLayout_17">
+                <property name="leftMargin">
+                 <number>0</number>
+                </property>
+                <property name="topMargin">
+                 <number>0</number>
+                </property>
+                <property name="rightMargin">
+                 <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>0</number>
+                </property>
+                <item>
+                 <widget class="QLabel" name="label_11">
+                  <property name="toolTip">
+                   <string>Here you can overwrite/set the camera pixel size (in the image plane!), if your meta-data is not readable or available.</string>
+                  </property>
+                  <property name="text">
+                   <string>pixel size:</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QDoubleSpinBox" name="spinPixelWidth">
+                  <property name="toolTip">
+                   <string>Here you can overwrite/set the camera pixel size (in the image plane!), if your meta-data is not readable or available.</string>
+                  </property>
+                  <property name="minimum">
+                   <double>0.100000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>1000000.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>200.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_42">
+                  <property name="toolTip">
+                   <string>Here you can overwrite/set the camera pixel size (in the image plane!), if your meta-data is not readable or available.</string>
+                  </property>
+                  <property name="text">
+                   <string>x</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QDoubleSpinBox" name="spinPixelHeight">
+                  <property name="toolTip">
+                   <string>Here you can overwrite/set the camera pixel size (in the image plane!), if your meta-data is not readable or available.</string>
+                  </property>
+                  <property name="minimum">
+                   <double>0.100000000000000</double>
+                  </property>
+                  <property name="maximum">
+                   <double>1000000.000000000000000</double>
+                  </property>
+                  <property name="value">
+                   <double>200.000000000000000</double>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <widget class="QLabel" name="label_43">
+                  <property name="toolTip">
+                   <string>Here you can overwrite/set the camera pixel size (in the image plane!), if your meta-data is not readable or available.</string>
+                  </property>
+                  <property name="text">
+                   <string>nm²</string>
+                  </property>
+                 </widget>
+                </item>
+                <item>
+                 <spacer name="horizontalSpacer_20">
+                  <property name="orientation">
+                   <enum>Qt::Horizontal</enum>
+                  </property>
+                  <property name="sizeHint" stdset="0">
+                   <size>
+                    <width>40</width>
+                    <height>20</height>
+                   </size>
+                  </property>
+                 </spacer>
+                </item>
+               </layout>
+              </widget>
+             </item>
+             <item row="5" column="0">
+              <widget class="QLabel" name="label_18">
+               <property name="text">
+                <string>frame &amp;range:</string>
+               </property>
+               <property name="buddy">
+                <cstring>chkFirstFrame</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="5" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_10">
+               <item>
+                <widget class="QLabel" name="label_19">
+                 <property name="text">
+                  <string>from</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_18">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="chkFirstFrame">
+                 <property name="text">
+                  <string>first</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="spinFirstFrame">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="maximum">
+                  <number>10000000</number>
+                 </property>
+                 <property name="singleStep">
+                  <number>1000</number>
+                 </property>
+                 <property name="value">
+                  <number>10000</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_22">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_20">
+                 <property name="text">
+                  <string>&amp;to</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>chkLastFrame</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_16">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>20</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QCheckBox" name="chkLastFrame">
+                 <property name="text">
+                  <string>last</string>
+                 </property>
+                 <property name="checked">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="spinLastFrame">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="maximum">
+                  <number>10000000</number>
+                 </property>
+                 <property name="singleStep">
+                  <number>1000</number>
+                 </property>
+                 <property name="value">
+                  <number>100000</number>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_21">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="labRange">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="textFormat">
+                  <enum>Qt::RichText</enum>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="6" column="0">
+              <widget class="QLabel" name="label_6">
+               <property name="text">
+                <string>frame &amp;timing:</string>
+               </property>
+               <property name="buddy">
+                <cstring>edtFrameTime</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <item>
+                <widget class="QLabel" name="label_15">
+                 <property name="text">
+                  <string>frame &amp;time:</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>edtFrameTime</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QFDoubleEdit" name="edtFrameTime">
+                 <property name="maximumSize">
+                  <size>
+                   <width>150</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_13">
+                 <property name="text">
+                  <string>µs</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeType">
+                  <enum>QSizePolicy::Fixed</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>80</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_7">
+                 <property name="text">
+                  <string>frame &amp;rate:</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>edtFrameRate</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QFDoubleEdit" name="edtFrameRate">
+                 <property name="maximumSize">
+                  <size>
+                   <width>150</width>
+                   <height>16777215</height>
+                  </size>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="label_14">
+                 <property name="text">
+                  <string>fps</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <spacer name="horizontalSpacer_3">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item>
+                <widget class="QLabel" name="labInputLength">
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="textFormat">
+                  <enum>Qt::RichText</enum>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="7" column="0">
+              <widget class="QLabel" name="label_31">
+               <property name="text">
+                <string>&amp;background image:</string>
+               </property>
+               <property name="buddy">
+                <cstring>edtBackgroundFile</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="1">
+              <layout class="QHBoxLayout" name="horizontalLayout_14">
+               <item>
+                <widget class="QLineEdit" name="edtBackgroundFile">
+                 <property name="placeholderText">
+                  <string>enter filename here</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QToolButton" name="btnSelectBackgroundFile">
+                 <property name="toolTip">
+                  <string>select an image series file to correlate</string>
+                 </property>
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../imagingfcs/qfrdrimagingfcs.qrc">
+                   <normaloff>:/imaging_fcs/fileopen.png</normaloff>:/imaging_fcs/fileopen.png</iconset>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="9" column="1">
+              <widget class="QLabel" name="labBackgroundProps">
+               <property name="text">
+                <string/>
+               </property>
+               <property name="textFormat">
+                <enum>Qt::RichText</enum>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="0">
+              <widget class="QLabel" name="label_47">
+               <property name="text">
+                <string>&amp;DualView mode:</string>
+               </property>
+               <property name="buddy">
+                <cstring>cmbDualView</cstring>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="1">
+              <layout class="QGridLayout" name="gridLayout">
+               <item row="0" column="1">
+                <spacer name="horizontalSpacer_34">
+                 <property name="orientation">
+                  <enum>Qt::Horizontal</enum>
+                 </property>
+                 <property name="sizeHint" stdset="0">
+                  <size>
+                   <width>40</width>
+                   <height>20</height>
+                  </size>
+                 </property>
+                </spacer>
+               </item>
+               <item row="0" column="0">
+                <widget class="QComboBox" name="cmbDualView">
+                 <item>
+                  <property name="text">
+                   <string>none</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="../imagingfcs/qfrdrimagingfcs.qrc">
+                    <normaloff>:/imaging_fcs/dvnone.png</normaloff>:/imaging_fcs/dvnone.png</iconset>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>split horizontal</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="../imagingfcs/qfrdrimagingfcs.qrc">
+                    <normaloff>:/imaging_fcs/dvhor.png</normaloff>:/imaging_fcs/dvhor.png</iconset>
+                  </property>
+                 </item>
+                 <item>
+                  <property name="text">
+                   <string>split vertical</string>
+                  </property>
+                  <property name="icon">
+                   <iconset resource="../imagingfcs/qfrdrimagingfcs.qrc">
+                    <normaloff>:/imaging_fcs/dvver.png</normaloff>:/imaging_fcs/dvver.png</iconset>
+                  </property>
+                 </item>
+                </widget>
+               </item>
+              </layout>
+             </item>
+             <item row="11" column="1">
+              <widget class="Line" name="line">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+              </widget>
+             </item>
+             <item row="12" column="0">
+              <widget class="QLabel" name="label_17">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+             <item row="12" column="1">
+              <widget class="QLabel" name="labWarning">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>&lt;b&gt;&amp;Image File:&lt;/b&gt;</string>
+        </property>
+        <property name="buddy">
+         <cstring>edtImageFile</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="labDetails">
+        <property name="text">
+         <string>&lt;b&gt;Details:&lt;/b&gt;</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QWidget" name="widAddJob" native="true">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <item>
+          <widget class="QCheckBox" name="chkAddToProject">
+           <property name="text">
+            <string>&amp;add to project</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <spacer name="horizontalSpacer_12">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnAddJob">
+           <property name="minimumSize">
+            <size>
+             <width>120</width>
+             <height>35</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>150</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="font">
+            <font>
+             <weight>75</weight>
+             <bold>true</bold>
+            </font>
+           </property>
+           <property name="toolTip">
+            <string>execute the correlation job, as defined above</string>
+           </property>
+           <property name="text">
+            <string>&amp;add job</string>
+           </property>
+           <property name="icon">
+            <iconset resource="../imagingfcs/qfrdrimagingfcs.qrc">
+             <normaloff>:/imaging_fcs/add_job.png</normaloff>:/imaging_fcs/add_job.png</iconset>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="title">
+      <string> Progress: </string>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <layout class="QVBoxLayout" name="layProgress_3" stretch="0,1">
+      <property name="spacing">
+       <number>2</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;
+&lt;html&gt;&lt;head&gt;&lt;meta name=&quot;qrichtext&quot; content=&quot;1&quot; /&gt;&lt;style type=&quot;text/css&quot;&gt;
+p, li { white-space: pre-wrap; }
+&lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Overall Progress:&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QProgressBar" name="progressBar">
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>16</height>
+           </size>
+          </property>
+          <property name="value">
+           <number>0</number>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_4">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeType">
+           <enum>QSizePolicy::Fixed</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>max. parallel &amp;jobs:</string>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+          </property>
+          <property name="buddy">
+           <cstring>spinProcesses</cstring>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QSpinBox" name="spinProcesses">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>10</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QScrollArea" name="scrollArea">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>100</height>
+         </size>
+        </property>
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAsNeeded</enum>
+        </property>
+        <property name="widgetResizable">
+         <bool>true</bool>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <widget class="QWidget" name="widProgress2">
+         <property name="geometry">
+          <rect>
+           <x>0</x>
+           <y>0</y>
+           <width>1062</width>
+           <height>98</height>
+          </rect>
+         </property>
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <layout class="QVBoxLayout" name="layProgress">
+          <property name="spacing">
+           <number>2</number>
+          </property>
+          <property name="leftMargin">
+           <number>2</number>
+          </property>
+          <property name="topMargin">
+           <number>2</number>
+          </property>
+          <property name="rightMargin">
+           <number>2</number>
+          </property>
+          <property name="bottomMargin">
+           <number>2</number>
+          </property>
+          <item>
+           <layout class="QVBoxLayout" name="verticalLayout_3">
+            <property name="spacing">
+             <number>0</number>
+            </property>
+           </layout>
+          </item>
+          <item>
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_7">
+     <item>
+      <widget class="QPushButton" name="btnHelp">
+       <property name="text">
+        <string>&amp;Help</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_5">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>&amp;Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
+   <slots>
+    <signal>valueChanged(double)</signal>
+    <slot>setValue(double)</slot>
+   </slots>
+  </customwidget>
+  <customwidget>
+   <class>QEnhancedLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qenhancedlineedit.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>edtImageFile</tabstop>
+  <tabstop>btnSelectImageFile</tabstop>
+  <tabstop>btnLoad</tabstop>
+  <tabstop>edtPrefix</tabstop>
+  <tabstop>edtPostfix</tabstop>
+  <tabstop>chkFirstFrame</tabstop>
+  <tabstop>spinFirstFrame</tabstop>
+  <tabstop>chkLastFrame</tabstop>
+  <tabstop>spinLastFrame</tabstop>
+  <tabstop>edtFrameTime</tabstop>
+  <tabstop>edtFrameRate</tabstop>
+  <tabstop>btnSelectBackgroundFile</tabstop>
+  <tabstop>chkAddToProject</tabstop>
+  <tabstop>btnAddJob</tabstop>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>spinProcesses</tabstop>
+  <tabstop>btnHelp</tabstop>
+  <tabstop>pushButton</tabstop>
+ </tabstops>
+ <resources>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../imagingfcs/qfrdrimagingfcs.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>pushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>QFRDRNumberAndBrightnessProcessingDialog</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1035</x>
+     <y>782</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>725</x>
+     <y>679</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkCamera</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>horizontalWidget</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>133</x>
+     <y>139</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>558</x>
+     <y>138</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>updateImageSize()</slot>
+ </slots>
+</ui>

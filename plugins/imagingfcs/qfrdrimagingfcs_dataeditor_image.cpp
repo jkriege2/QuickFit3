@@ -2387,9 +2387,11 @@ void QFRDRImagingFCSImageEditor::buildSelection(bool select_notmask)
                     }
 
                     if (select_notmask) {
-                        for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
-                            bool l=mask[i];
-                            if (l) selectedInsert(i); else selectedRemove(i);
+                        if (m==this->current) {
+                            for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
+                                bool l=mask[i];
+                                if (l) selectedInsert(i); else selectedRemove(i);
+                            }
                         }
                         if (dlg->saveSelection()) m->addImageSelection(mask, dlg->selName(), true);
                         selectionEdited();

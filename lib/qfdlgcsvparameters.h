@@ -63,6 +63,7 @@ class QFLIB_EXPORT QFDlgCSVParameters : public QDialog
         void guessParameters();
     protected slots:
         void checkValues();
+        void on_btnTab_clicked();
     private:
         char column_separator;
         char decimal_separator;

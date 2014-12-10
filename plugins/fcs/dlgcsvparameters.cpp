@@ -262,3 +262,9 @@ void dlgCSVParameters::loadConfigs()
     connect(cmbParamSetName, SIGNAL(currentIndexChanged(QString)), this, SLOT(currentConfigChanged(QString)));
 
 }
+
+void dlgCSVParameters::on_btnTab_clicked()
+{
+    edtColumn->setText("\n");
+
+}
