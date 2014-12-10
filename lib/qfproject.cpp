@@ -878,8 +878,12 @@ void QFProject::internalWriteXML(QIODevice *file, bool resetDataChanged, bool na
 void QFProject::writeXML(const QString& file_in, bool resetDataChanged, bool changeInternalFile) {
     QFProjectReadLocker locker(p->lock);
 
+    if (!QFile::exists(file_in)) touchFile(file_in);
+
     QString file=QFileInfo(file_in).canonicalFilePath();
     QString oldfile=this->file;
+
+    qDebug()<<file<<file_in;
 
     if (file.toLower().contains(".qfpz") || file.toLower().contains(".qfp.gz")) {
         QuaGzipFile gzf(file);
