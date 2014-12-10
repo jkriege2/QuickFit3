@@ -2683,12 +2683,19 @@ bool *QFRDRImagingFCSData::loadImageSelection(int selection) const
     return selections.value(selection, QFRDRImagingFCSData::ImageSelection()).selection;
 }
 
-void QFRDRImagingFCSData::addImageSelection(bool *selection, const QString &name)
+void QFRDRImagingFCSData::addImageSelection(const bool *selection, const QString &name, bool overwriteIfSameNameExists)
 {
     QFRDRImagingFCSData::ImageSelection s;
     s.name=name;
     s.selection=(bool*)qfCalloc(getImageSelectionHeight()*getImageSelectionWidth(), sizeof(bool));
     memcpy(s.selection, selection, getImageSelectionHeight()*getImageSelectionWidth()*sizeof(bool));
+    for (int i=0; i<selections.size(); i++) {
+        if (selections[i].name==name) {
+            qfFree(selections[i].selection);
+            selections[i]=s;
+            return;
+        }
+    }
     selections.append(s);
 }
 
@@ -2905,7 +2912,7 @@ int QFRDRImagingFCSData::getImageSelectionWidth() const
 void QFRDRImagingFCSData::clearSelections()
 {
     for (int i=0; i<selections.size(); i++) {
-        if (selections[i].selection) delete selections[i].selection;
+        if (selections[i].selection) qfFree(selections[i].selection);
     }
     selections.clear();
 }

@@ -41,7 +41,12 @@ class QFRDRImagingFCSMaskBuilder : public QDialog
         bool use3(QString& parameter, int& mode, double& thresh1, double& thresh2);
         bool use4(QString& parameter, int& mode, double& thresh1, double& thresh2);
         bool use5(QString& parameter, int& mode, double& thresh1, double& thresh2);
-        bool onlyMasked();
+        bool onlyMasked() const;
+        bool saveSelection() const;
+        QString selName() const;
+        bool applyToOtherRDRs() const;
+
+        void enableSelectionName(bool en);
 
     private:
         Ui::QFRDRImagingFCSMaskBuilder *ui;

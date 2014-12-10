@@ -130,7 +130,7 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDRAdditio
         /** \copydoc QFRDRImageSelectionInterface::loadImageSelection() */
         virtual bool* loadImageSelection(int selection) const;
         /** \copydoc QFRDRImageSelectionInterface::addImageSelection() */
-        virtual void addImageSelection(bool* selection, const QString& name=QString(""));
+        virtual void addImageSelection(const bool *selection, const QString& name=QString(""), bool overwriteIfSameNameExists=true);
         /** \copydoc QFRDRImageSelectionInterface::deleteImageSelection() */
         virtual void deleteImageSelection(int selection);
         /** \copydoc QFRDRImageSelectionInterface::setImageSelectionName() */

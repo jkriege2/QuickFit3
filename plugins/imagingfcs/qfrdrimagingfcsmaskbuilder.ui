@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>674</width>
-    <height>276</height>
+    <height>394</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -23,153 +23,6 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout" columnstretch="0,3,0,1,1">
-     <item row="0" column="1">
-      <widget class="QLabel" name="label">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>parameter</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="2">
-      <widget class="QLabel" name="label_2">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>mode</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="4">
-      <widget class="QFDoubleEdit" name="spinT12"/>
-     </item>
-     <item row="3" column="2">
-      <widget class="QComboBox" name="cmbMode3">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <item>
-        <property name="text">
-         <string>in-range</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>out-of-range</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>&gt;threshold</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>&lt;threshold</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="0" column="3">
-      <widget class="QLabel" name="label_3">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>range start/threshold</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="4">
-      <widget class="QFDoubleEdit" name="spinT42">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="3">
-      <widget class="QFDoubleEdit" name="spinT11"/>
-     </item>
-     <item row="3" column="1">
-      <widget class="QComboBox" name="cmbP3">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="4">
-      <widget class="QLabel" name="label_4">
-       <property name="font">
-        <font>
-         <weight>75</weight>
-         <bold>true</bold>
-        </font>
-       </property>
-       <property name="text">
-        <string>range end</string>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="2">
-      <widget class="QComboBox" name="cmbMode4">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <item>
-        <property name="text">
-         <string>in-range</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>out-of-range</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>&gt;threshold</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>&lt;threshold</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="4" column="3">
-      <widget class="QFDoubleEdit" name="spinT41">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="1">
-      <widget class="QComboBox" name="cmbP4">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <widget class="QCheckBox" name="chkUse4">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
      <item row="2" column="1">
       <widget class="QComboBox" name="cmbP2">
        <property name="enabled">
@@ -177,20 +30,143 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="3">
-      <widget class="QFDoubleEdit" name="spinT21">
+     <item row="5" column="3">
+      <widget class="QFDoubleEdit" name="spinT51">
        <property name="enabled">
         <bool>false</bool>
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QComboBox" name="cmbP1"/>
-     </item>
-     <item row="2" column="4">
-      <widget class="QFDoubleEdit" name="spinT22">
+     <item row="5" column="4">
+      <widget class="QFDoubleEdit" name="spinT52">
        <property name="enabled">
         <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="1">
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="7" column="1">
+      <widget class="QCheckBox" name="chkMask">
+       <property name="text">
+        <string>non-masked only</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QCheckBox" name="chkUse5">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QComboBox" name="cmbP5">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QComboBox" name="cmbMode1">
+       <item>
+        <property name="text">
+         <string>in-range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>out-of-range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>&gt;= threshold</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>&lt;= threshold</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>in relative range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>out of relative range</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="5" column="2">
+      <widget class="QComboBox" name="cmbMode5">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <item>
+        <property name="text">
+         <string>in-range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>out-of-range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>&gt;threshold</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>&lt;threshold</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>in relative range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>out of relative range</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="3" column="4">
+      <widget class="QFDoubleEdit" name="spinT32">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="0">
+      <widget class="QCheckBox" name="chkUse3">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QCheckBox" name="chkUse2">
+       <property name="text">
+        <string/>
        </property>
       </widget>
      </item>
@@ -226,89 +202,58 @@
          <string>&lt;threshold</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>in relative range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>out of relative range</string>
+        </property>
+       </item>
       </widget>
      </item>
-     <item row="6" column="1">
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="3" column="4">
-      <widget class="QFDoubleEdit" name="spinT32">
+     <item row="2" column="4">
+      <widget class="QFDoubleEdit" name="spinT22">
        <property name="enabled">
         <bool>false</bool>
        </property>
       </widget>
      </item>
-     <item row="3" column="0">
-      <widget class="QCheckBox" name="chkUse3">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="cmbP1"/>
      </item>
-     <item row="2" column="0">
-      <widget class="QCheckBox" name="chkUse2">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="7" column="1">
-      <widget class="QCheckBox" name="chkMask">
-       <property name="text">
-        <string>non-masked only</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QComboBox" name="cmbMode1">
-       <item>
-        <property name="text">
-         <string>in-range</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>out-of-range</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>&gt;= threshold</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>&lt;= threshold</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="5" column="0">
-      <widget class="QCheckBox" name="chkUse5">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="1">
-      <widget class="QComboBox" name="cmbP5">
+     <item row="2" column="3">
+      <widget class="QFDoubleEdit" name="spinT21">
        <property name="enabled">
         <bool>false</bool>
        </property>
       </widget>
      </item>
-     <item row="5" column="2">
-      <widget class="QComboBox" name="cmbMode5">
+     <item row="4" column="0">
+      <widget class="QCheckBox" name="chkUse4">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QComboBox" name="cmbP4">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="3">
+      <widget class="QFDoubleEdit" name="spinT41">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="2">
+      <widget class="QComboBox" name="cmbMode4">
        <property name="enabled">
         <bool>false</bool>
        </property>
@@ -332,23 +277,168 @@
          <string>&lt;threshold</string>
         </property>
        </item>
+       <item>
+        <property name="text">
+         <string>in relative range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>out of relative range</string>
+        </property>
+       </item>
       </widget>
      </item>
-     <item row="5" column="3">
-      <widget class="QFDoubleEdit" name="spinT51">
+     <item row="0" column="4">
+      <widget class="QLabel" name="label_4">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>range end</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QComboBox" name="cmbP3">
        <property name="enabled">
         <bool>false</bool>
        </property>
       </widget>
      </item>
-     <item row="5" column="4">
-      <widget class="QFDoubleEdit" name="spinT52">
+     <item row="1" column="3">
+      <widget class="QFDoubleEdit" name="spinT11"/>
+     </item>
+     <item row="4" column="4">
+      <widget class="QFDoubleEdit" name="spinT42">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="3">
+      <widget class="QLabel" name="label_3">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>range start/threshold</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QComboBox" name="cmbMode3">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <item>
+        <property name="text">
+         <string>in-range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>out-of-range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>&gt;threshold</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>&lt;threshold</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>in relative range</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>out of relative range</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="1" column="4">
+      <widget class="QFDoubleEdit" name="spinT12"/>
+     </item>
+     <item row="0" column="2">
+      <widget class="QLabel" name="label_2">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>mode</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QLabel" name="label">
+       <property name="font">
+        <font>
+         <weight>75</weight>
+         <bold>true</bold>
+        </font>
+       </property>
+       <property name="text">
+        <string>parameter</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QCheckBox" name="chkSaveDel">
+       <property name="text">
+        <string>save as named selection:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="2" colspan="3">
+      <widget class="QLineEdit" name="edtSelName">
        <property name="enabled">
         <bool>false</bool>
        </property>
       </widget>
      </item>
     </layout>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string> apply to </string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="radCurrent">
+        <property name="text">
+         <string>current record</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QRadioButton" name="radSeveral">
+        <property name="text">
+         <string>several records (a selection dialog will open, once you close this dialog)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -410,8 +500,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>257</x>
-     <y>238</y>
+     <x>266</x>
+     <y>392</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -426,8 +516,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>325</x>
-     <y>238</y>
+     <x>334</x>
+     <y>392</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -688,6 +778,22 @@
     <hint type="destinationlabel">
      <x>611</x>
      <y>166</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkSaveDel</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtSelName</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>91</x>
+     <y>273</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>432</x>
+     <y>270</y>
     </hint>
    </hints>
   </connection>

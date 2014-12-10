@@ -569,6 +569,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
 
         /** \brief create a parameter image with the given evalGroup and fitParam */
         void readParameterImage(double* image, uint32_t width, uint32_t height, QString evalGroup, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, bool thisRDR=true, const QString& otherRDRRole=QString(""), const QString& otherRDRevalGroup=QString(""));
+        void readParameterImage(QFRawDataRecord* current, double* image, uint32_t width, uint32_t height, QString evalGroup, QString fitParam, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam, bool thisRDR=true, const QString& otherRDRRole=QString(""), const QString& otherRDRevalGroup=QString(""));
 
         /** \brief apply the given transformation to the image */
         void transformImage(double *image, uint32_t width, uint32_t height, QFRDRImagingFCSImageEditor::ImageTransforms tranFitParam);
@@ -598,6 +599,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
 
         /*! \brief returns the RDR from which to read fit parameter 2 */
         QFRDRImagingFCSData* getRDRForParameter2(const QString& otherRDRRole) const;
+        QFRDRImagingFCSData* getRDRForParameter2(QFRawDataRecord* current, const QString& otherRDRRole) const;
 
         virtual void createReportDoc(QTextDocument* document);
 

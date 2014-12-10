@@ -70,6 +70,10 @@ QFRDRImagingFCSMaskBuilder::QFRDRImagingFCSMaskBuilder(const QStringList& parame
     ui->chkUse3->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/use3", false).toBool());
     ui->chkUse4->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/use4", false).toBool());
     ui->chkUse5->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/use5", false).toBool());
+
+    ui->chkSaveDel->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/chkSaveDel", false).toBool());
+    ui->radCurrent->setChecked(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/radCurrent", true).toBool());
+    ui->edtSelName->setText(ProgramOptions::getConfigValue("QFRDRImagingFCSMaskBuilder/edtSelName", "").toString());
 }
 
 QFRDRImagingFCSMaskBuilder::~QFRDRImagingFCSMaskBuilder()
@@ -100,6 +104,11 @@ QFRDRImagingFCSMaskBuilder::~QFRDRImagingFCSMaskBuilder()
     ProgramOptions::setConfigValue("QFRDRImagingFCSMaskBuilder/use3", ui->chkUse3->isChecked());
     ProgramOptions::setConfigValue("QFRDRImagingFCSMaskBuilder/use4", ui->chkUse4->isChecked());
     ProgramOptions::setConfigValue("QFRDRImagingFCSMaskBuilder/use5", ui->chkUse5->isChecked());
+
+    ProgramOptions::setConfigValue("QFRDRImagingFCSMaskBuilder/chkSaveDel", ui->chkSaveDel->isChecked());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSMaskBuilder/radCurrent", ui->radCurrent->isChecked());
+    ProgramOptions::setConfigValue("QFRDRImagingFCSMaskBuilder/edtSelName", ui->edtSelName->text());
+
     delete ui;
 }
 
@@ -148,7 +157,29 @@ bool QFRDRImagingFCSMaskBuilder::use5(QString &parameter, int &mode, double &thr
     return ui->chkUse5->isChecked();
 }
 
-bool QFRDRImagingFCSMaskBuilder::onlyMasked()
+bool QFRDRImagingFCSMaskBuilder::onlyMasked() const
 {
     return ui->chkMask->isChecked();
 }
+
+bool QFRDRImagingFCSMaskBuilder::saveSelection() const
+{
+    return ui->chkSaveDel->isChecked();
+}
+
+QString QFRDRImagingFCSMaskBuilder::selName() const
+{
+    return ui->edtSelName->text();
+}
+
+bool QFRDRImagingFCSMaskBuilder::applyToOtherRDRs() const
+{
+    return ui->radSeveral->isChecked();
+}
+
+void QFRDRImagingFCSMaskBuilder::enableSelectionName(bool en)
+{
+    ui->chkSaveDel->setEnabled(en);
+    ui->edtSelName->setEnabled(en);
+}
+

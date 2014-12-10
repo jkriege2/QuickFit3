@@ -118,6 +118,7 @@ void QFSelectRDRDialog::setAllowCreateNew(bool allowNew)
     } else {
         ui->radNew->setEnabled(false);
         ui->radSelect->setEnabled(false);
+        ui->radSelect->setChecked(false);
         ui->radSelect->setChecked(true);
     }
     ui->horizontalWidget->setEnabled(ui->radSelect->isChecked() || (!ui->radSelect->isEnabled() && !ui->radNew->isEnabled()));
@@ -234,6 +235,16 @@ void QFSelectRDRDialog::updateRdrList()
 
 
 
+}
+
+void QFSelectRDRDialog::selectAll()
+{
+    on_btnAll_clicked();
+}
+
+void QFSelectRDRDialog::selectNone()
+{
+    on_btnNone_clicked();
 }
 
 void QFSelectRDRDialog::on_btnAll_clicked()

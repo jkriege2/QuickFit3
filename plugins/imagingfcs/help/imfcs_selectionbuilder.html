@@ -15,8 +15,12 @@
 	    <li>out-of-range: the parameter/image value is outside two given values (i.e. &lt; the left boundary and &gt; the right boundary)</li>
 	    <li>above threshold: the parameter/image value is above a given threshold value</li>
 	    <li>below threshold: the parameter/image value is below a given threshold value</li>
+	    <li>in rel. range: the parameter/image value is between two given fractions (in %) of the minimum/maximum value of the parameters</li>
+	    <li>out of rel. range: the parameter/image value is outside two given fractions (in %) of the minimum/maximum value of the parameters</li>
 	  </ul>
 	  Also it is possible to exclude masked pixels from the selection.</p>
+	  <p>If you build a pixel-selection, you can save it as a named selection immediately, by checking the appropriate check-box and giving a new name. NOte that an existing selection with the same name might be overwritten!</p>
+	  <p>If you check "apply to ... several records (a selection dialog will open, once you close this dialog)", QuickFit will open a new dialog, in which you can select the RDRs, in which you want to use the mask/selection builder. This is especially useful in conjunction with stored selections (see above!).</p>
 	  <p>After a click on "OK", all pixels, matching the given conditions are beeing selected.
 	</p>
 	</body>

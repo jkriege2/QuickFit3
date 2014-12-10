@@ -620,6 +620,8 @@ void QFRDRNumberAndBrightnessData::allocateContents(int x, int y) {
     imageVariance=NULL;
     background=NULL;
     backgroundVariance=NULL;
+    width=0;
+    height=0;
     int NN=1;
     if ((x>0) && (y>0) && (NN>0)) {
         image=(double*)qfCalloc(x*y*NN,sizeof(double));
@@ -766,12 +768,19 @@ bool *QFRDRNumberAndBrightnessData::loadImageSelection(int selection) const
     return selections.value(selection, QFRDRNumberAndBrightnessData::ImageSelection()).selection;
 }
 
-void QFRDRNumberAndBrightnessData::addImageSelection(bool *selection, const QString &name)
+void QFRDRNumberAndBrightnessData::addImageSelection(const bool *selection, const QString &name, bool overwriteIfSameNameExists)
 {
     QFRDRNumberAndBrightnessData::ImageSelection s;
     s.name=name;
     s.selection=(bool*)qfCalloc(getImageSelectionHeight()*getImageSelectionWidth(), sizeof(bool));
     memcpy(s.selection, selection, getImageSelectionHeight()*getImageSelectionWidth()*sizeof(bool));
+    for (int i=0; i<selections.size(); i++) {
+        if (selections[i].name==name) {
+            qfFree(selections[i].selection);
+            selections[i]=s;
+            return;
+        }
+    }
     selections.append(s);
 }
 
@@ -804,7 +813,7 @@ int QFRDRNumberAndBrightnessData::getImageSelectionWidth() const
 void QFRDRNumberAndBrightnessData::clearSelections()
 {
     for (int i=0; i<selections.size(); i++) {
-        if (selections[i].selection) delete selections[i].selection;
+        if (selections[i].selection) qfFree(selections[i].selection);
     }
     selections.clear();
 }

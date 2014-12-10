@@ -44,7 +44,7 @@ class QFRDRImageSelectionInterface {
          */
         virtual bool* loadImageSelection(int selection) const=0;
         /** \brief store the current selection under the given name (append it) */
-        virtual void addImageSelection(bool* selection, const QString& name=QString(""))=0;
+        virtual void addImageSelection(const bool* selection, const QString& name=QString(""), bool overwriteIfSameNameExists=true)=0;
         /** \brief delete the specified selection */
         virtual void deleteImageSelection(int selection)=0;
         /** \brief set the name of the specified selection */

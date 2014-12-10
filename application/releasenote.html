@@ -148,7 +148,8 @@
             <li>online-help system now supports the shortcut <tt>&dollar;(...)&dollar;</tt> for <tt>&dollar;&dollar;math:...&dollar;&dollar;</tt> and <tt>&dollar;[...]&dollar;</tt> for <tt>&dollar;&dollar;bmath:...&dollar;&dollar;</tt></li>
             <li>automatic links for DOIs are added to the main help</li>
             <li>histograms show sub-plots for fit functions that support this (e.g. all single Gaussians in a double-Gaussian function)</li>
-            <li>bigfix: online-help works correctly on Linux now (didn't recognize certain plugins correctly)</li>
+            <li>bugfix: online-help works correctly on Linux now (didn't recognize certain plugins correctly)</li>
+            <li>bugfix (thanks to Jan Buchholz): cleaned up relative path handling in projects and project file names, especially on Linux</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -276,6 +277,7 @@
             <li>correlator dialog: added entries to the crop-button, which allow to crop the left/right/top/bottom image halves.</li>
             <li>added context-menu entries and buttons to several widgets in the parameter image tab, which allow to reuse the current display settings in other RDRs.</li>
             <li>after correlation: N and B records are now split by color channel (when newly inserted into the project!)</li>
+            <li>selection builder/mask builder can now be applied to a selectable list of records and can optionally save the selection to a named selection</li>
           </ul></li>
         <li><b>table</b><ul>
             <li>added "QuickStatistics" and "QuickHistogram" tools, which show the statistics and histograms of the current selection (column-wise)</li>

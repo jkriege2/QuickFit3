@@ -83,6 +83,8 @@ class QFWIDLIB_EXPORT QFSelectRDRDialog : public QDialog
     public slots:
         /** \brief re-read the RDRs from the given project */
         void updateRdrList();
+        void selectAll();
+        void selectNone();
 
     protected slots:
         void on_btnAll_clicked();
