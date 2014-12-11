@@ -29,6 +29,7 @@
 #include "qftools.h"
 class QFImagePlotWizardPage; // forward
 class QFSelectFilesWizardPage;
+class QFSelectFilesListWizardPage;
 
 /*!
     \defgroup qf3rdrdp_number_and_brightness Raw Data Record Plugin
@@ -97,6 +98,9 @@ class QFRDRNumberAndBrightnessPlugin : public QObject, public QFPluginRawDataRec
         void wizImgPreviewOnValidate(QWizardPage *page, QWizardPage *userPage);
         void wizMaskChanged(int masksize);
         void wizSubimagesChanged(int index);
+
+        void startWizardImgeStack();
+        void wizLSAnalysisImgPreviewOnValidate(QWizardPage *page, QWizardPage *userPage);
     protected:
         QPointer<QDoubleSpinBox> wizPixelSize;
         QPointer<QSpinBox> wizMaskSize;
@@ -105,6 +109,7 @@ class QFRDRNumberAndBrightnessPlugin : public QObject, public QFPluginRawDataRec
         QPointer<QComboBox> wizLSAnalysiscmbStackMode;
         QPointer<QFImagePlotWizardPage> wizLSAnalysisImgPreview;
         QPointer<QFSelectFilesWizardPage> wizSelfiles;
+        QPointer<QFSelectFilesListWizardPage> wizSelfilesList;
         QPointer<QLabel> wizLabWidth;
         QPointer<QLabel> wizLabHeight;
         int wizFileImageWidth;

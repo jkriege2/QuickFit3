@@ -167,6 +167,11 @@ class QFRDRNumberAndBrightnessData : public QFRawDataRecord, public QFRDRAdditio
 
         QFImageHalf getSelectedImageHalf() const;
 
+        static int getImageReaderCount(QFPluginServices *pluginservices);
+        static QFImporterImageSeries *getImageReader(int idx, QFPluginServices *pluginservices);
+        static QStringList getImageFormatNameList(QFPluginServices *pluginservices);
+        static QStringList getImageReaderIDList(QFPluginServices *pluginservices);
+        static QStringList getImageFilterList(QFPluginServices *pluginservices);
     protected:
         /** \brief write the contents of the object to a XML file */
         virtual void intWriteData(QXmlStreamWriter& w) const;

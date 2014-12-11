@@ -59,7 +59,7 @@
      <item>
       <widget class="QPushButton" name="btnAll">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="text">
         <string>select all</string>
@@ -69,7 +69,7 @@
      <item>
       <widget class="QPushButton" name="btnNone">
        <property name="enabled">
-        <bool>false</bool>
+        <bool>true</bool>
        </property>
        <property name="text">
         <string>select none</string>

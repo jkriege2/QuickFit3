@@ -60,9 +60,16 @@ void QFRDRNumberAndBrightnessPlugin::registerToMenu(QMenu* menu) {
     m->addAction(action);
 
     action=new QAction(QIcon(getIconFilename()), tr("&load from average+StdDev images (TIFF)"), parentWidget);
-    action->setStatusTip(tr("Insert a new record with data from four files, that contain the average/stddev of the image and the backrgound"));
+    action->setStatusTip(tr("Insert a new record with data from four files, that contain the average/stddev of the image and the backrgound."));
     connect(action, SIGNAL(triggered()), this, SLOT(startNANDBFromPreprocessedFilesWizard()));
     m->addAction(action);
+
+    action=new QAction(QIcon(getIconFilename()), tr("&calculate from image stack(s)"), parentWidget);
+    action->setStatusTip(tr("Calculates the average and standard deviation from image stacks and adds N&B records from these datasets to the project."));
+    connect(action, SIGNAL(triggered()), this, SLOT(startWizardImgeStack()));
+    m->addAction(action);
+
+    QFPluginServices::getInstance()->registerWizard("rdr_wizards", action);
 }
 
 
@@ -745,6 +752,135 @@ void QFRDRNumberAndBrightnessPlugin::startNANDBFromPreprocessedFilesWizard()
 }
 
 
+void QFRDRNumberAndBrightnessPlugin::startWizardImgeStack()
+{
+    QFWizard* wiz=new QFWizard(parentWidget);
+    wiz->setWindowTitle(tr("Number and Brightness from Image Stacks Wizard"));
+
+
+    wiz->addPage(wizSelfilesList=new QFSelectFilesListWizardPage(tr("Image Stack Files ...")));
+    wizSelfilesList->setSubTitle(tr("Select the intensity image stacks, from which to calculate the number and brightness data.\nBelow the files list, you can select a background image stack. Note, that the same background stack will be used for all intensity stacks!"));
+
+
+    wizSelfilesList->setFilters(QFRDRNumberAndBrightnessData::getImageFilterList(services), QFRDRNumberAndBrightnessData::getImageReaderIDList(services));
+    wizSelfilesList->setSettingsIDs("image_stack/last_lightsheetwizard_dir", "image_stack/last_lightsheetwizard_filter");
+    wizSelfilesList->setAddOnStartup(false);
+    wizSelfilesList->setOnlyOneFormatAllowed(true);
+
+    wiz->addPage(wizLSAnalysisImgPreview=new QFImagePlotWizardPage(tr("Image stack preview ...")));
+    wizLSAnalysisImgPreview->setSubTitle(tr("Please set the image properties below the overview plot!"));
+    wizSelfilesList->setUserOnValidatePage(wizLSAnalysisImgPreview);
+    connect(wizSelfilesList, SIGNAL(onValidate(QWizardPage*,QWizardPage*)), this, SLOT(wizLSAnalysisImgPreviewOnValidate(QWizardPage*,QWizardPage*)));
+    wizLSAnalysisImgPreview->clear();
+
+
+    wiz->addPage(wizLSAnalysisImgPreview=new QFImagePlotWizardPage(tr("Image stack preview ...")));
+    wizLSAnalysisImgPreview->setSubTitle(tr("Please set the image properties below the overview plot of the average intensity!"));
+    wizSelfilesList->setUserOnValidatePage(wizLSAnalysisImgPreview);
+    connect(wizSelfilesList, SIGNAL(onValidate(QWizardPage*,QWizardPage*)), this, SLOT(wizImgPreviewOnValidate(QWizardPage*,QWizardPage*)));
+    wizLSAnalysisImgPreview->clear();
+
+
+    wizPixelSize=new QDoubleSpinBox(wizLSAnalysisImgPreview);
+    wizPixelSize->setRange(0,100000);
+    wizPixelSize->setSuffix(" nm");
+    wizPixelSize->setValue(400);
+    wizPixelSize->setDecimals(2);
+
+    wizLabWidth=new QLabel(wizLSAnalysisImgPreview);
+    wizLabHeight=new QLabel(wizLSAnalysisImgPreview);
+
+    if (wizPixelSize) {
+        ProgramOptions::getConfigQDoubleSpinBox(wizPixelSize, "number_and_brightness/last_preprocfileswizard/wizPixelSize");
+        wizLSAnalysisImgPreview->addRow(tr("pixel size"), wizPixelSize);
+    }
+
+    QComboBox* cmbSubSelect=new QComboBox(wizSelfilesList);
+    cmbSubSelect->addItem("full image");
+    cmbSubSelect->addItem("left half");
+    cmbSubSelect->addItem("right half");
+    cmbSubSelect->addItem("top half");
+    cmbSubSelect->addItem("bottom half");
+    cmbSubSelect->addItem("left+right half");
+    cmbSubSelect->addItem("top+bottom half");
+    connect(cmbSubSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(wizSubimagesChanged(int)));
+    cmbSubSelect->setCurrentIndex(0);
+    wizLSAnalysisImgPreview->addRow("", cmbSubSelect);
+    wizLSAnalysisImgPreview->addRow(tr("image width:"), wizLabWidth);
+    wizLSAnalysisImgPreview->addRow(tr("image height:"), wizLabHeight);
+
+
+    QFTextWizardPage* last;
+    wiz->addPage(last=new QFTextWizardPage(tr("Finalize"),tr("You completed this wizard. The selected files will now be inserted as a number and brightness raw data record (RDR) into the project."), wiz));
+    last->setFinalPage(true);
+
+
+    if (wiz->exec()) {
+        if (wizPixelSize) {
+            ProgramOptions::setConfigQDoubleSpinBox(wizPixelSize, "number_and_brightness/last_preprocfileswizard/wizPixelSize");
+        }
+
+        QStringList files=wizSelfilesList->files();
+        QString filterid=wizSelfilesList->fileFilterIDs().value(0);
+        int subselect=cmbSubSelect->currentIndex();
+        //qDebug()<<"OK"<<files<<filters;
+        if (files.size()>0 && !filterid.isEmpty()) {
+
+            //qDebug()<<filterid<<files;
+            QMap<QString, QVariant> iParams;
+            QStringList iReadonly;
+            iReadonly<<"PIXEL_WIDTH"<<"PIXEL_HEIGHT"<<"WIDTH"<<"HEIGHT"<<"SELECT_IMAGE_HALF";
+            QString ename="";
+            if (wizPixelSize) iParams["PIXEL_WIDTH"]=wizPixelSize->value();
+            if (wizPixelSize) iParams["PIXEL_HEIGHT"]=wizPixelSize->value();
+            iParams["WIDTH"]=wizRDRImageWidth;
+            iParams["HEIGHT"]=wizRDRImageHeight;
+            if (subselect==1 || subselect==5) {iParams["SELECT_IMAGE_HALF"]="left"; ename+=tr(" - left");}
+            if (subselect==2){ iParams["SELECT_IMAGE_HALF"]="right"; ename+=tr(" - right");}
+            if (subselect==3 || subselect==6) {iParams["SELECT_IMAGE_HALF"]="top"; ename+=tr(" - top");}
+            if (subselect==4) {iParams["SELECT_IMAGE_HALF"]="bottom"; ename+=tr(" - bottom");}
+            QString group;
+            if (subselect>=5) group=QFileInfo(files[0]).fileName();
+
+            /*QFRawDataRecord* e=insertPreprocessedFiles(files[0], files[1], files[2], files[3], cmbImageVar->currentIndex()==1, cmbSubSelect->currentIndex()==1, iParams, iReadonly, group);
+            if (e)  {
+                e->setName(e->getName()+ename);
+            }
+
+            if (subselect>=5) {
+                ename="";
+                if (subselect==5) {iParams["SELECT_IMAGE_HALF"]="right"; ename+=tr(" - right");}
+                if (subselect==6) {iParams["SELECT_IMAGE_HALF"]="bottom"; ename+=tr(" - bottom");}
+                e=insertPreprocessedFiles(files[0], files[1], files[2], files[3], cmbImageVar->currentIndex()==1, cmbSubSelect->currentIndex()==1, iParams, iReadonly, group);
+                if (e)  {
+                    e->setName(e->getName()+ename);
+                }
+            }*/
+
+
+        }
+    }
+    delete wiz;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -839,6 +975,54 @@ void QFRDRNumberAndBrightnessPlugin::wizSubimagesChanged(int index)
 
 }
 
+
+void QFRDRNumberAndBrightnessPlugin::wizLSAnalysisImgPreviewOnValidate(QWizardPage *page, QWizardPage *userPage)
+{
+    QFImagePlotWizardPage* plot=qobject_cast<QFImagePlotWizardPage*>(userPage);
+    QFSelectFilesListWizardPage* files=qobject_cast<QFSelectFilesListWizardPage*>(page);
+    if (plot && files) {
+        QFImporter::FileInfo info;
+        double* image=NULL;
+        int width=0, height=0;
+        plot->setImage(files->files().value(0, ""), files->fileFilterIDs().value(0, ""), -1, image, width, height, &info);
+        if (wizPixelSize) {
+            if (info.properties.contains("PIXEL_WIDTH")) {
+                wizPixelSize->setValue(info.properties["PIXEL_WIDTH"].toDouble());
+            } else if (info.properties.contains("PIXEL_HEIGHT")) {
+                wizPixelSize->setValue(info.properties["PIXEL_HEIGHT"].toDouble());
+            }
+        }
+
+
+        if (wizLSAnalysiscmbFitDir && image && width>0 && height>0)  {
+            QFImageSymmetry s=qfGetImageSymetry(image, width, height);
+            if (s==qfisVertical) wizLSAnalysiscmbFitDir->setCurrentIndex(0);
+            if (s==qfisHorizonal) wizLSAnalysiscmbFitDir->setCurrentIndex(1);
+        }
+        if (wizLSAnalysiscmbStackMode && image && width>0 && height>0) {
+            double crossLR=0, crossTB=0;
+            QFImageSymmetry s=qfGetImageSymetry(image, width, height, &crossLR, &crossTB);
+            if (crossLR>0.6 && crossTB<0.6) {
+                wizLSAnalysiscmbStackMode->setCurrentIndex(2);
+            } else if (crossLR<0.6 && crossTB>0.6) {
+                wizLSAnalysiscmbStackMode->setCurrentIndex(3);
+            } else if (crossLR<0.6 && crossTB<0.6) {
+                if (files->getSelFilesWidget()->files().size()>1) wizLSAnalysiscmbStackMode->setCurrentIndex(0);
+                else  wizLSAnalysiscmbStackMode->setCurrentIndex(1);
+            }
+            const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(wizLSAnalysiscmbStackMode->model());
+            if (model) {
+                QStandardItem* item = model->item(0);
+                bool disable=files->getSelFilesWidget()->files().size()<=1;
+                item->setFlags(disable ? item->flags() & ~(Qt::ItemIsSelectable|Qt::ItemIsEnabled) : Qt::ItemIsSelectable|Qt::ItemIsEnabled);
+            }
+        }
+        if (image && width>0 && height>0) {
+            qfFree(image);
+        }
+        if (wizMaskSize) wizMaskChanged(wizMaskSize->value());
+    }
+}
 
 
 Q_EXPORT_PLUGIN2(target_id, QFRDRNumberAndBrightnessPlugin)

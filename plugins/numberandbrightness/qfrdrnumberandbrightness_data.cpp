@@ -895,3 +895,49 @@ QFImageHalf QFRDRNumberAndBrightnessData::getSelectedImageHalf() const
     if (h=="bottom" || h=="3") return qfihBottom;
     return qfihNone;
 }
+
+
+QStringList QFRDRNumberAndBrightnessData::getImageFilterList(QFPluginServices* pluginservices)   {
+    QStringList l;
+    int i=0;
+    QFImporterImageSeries* r=NULL;
+    while ((r=getImageReader(i, pluginservices))!=NULL) {
+        l.append(r->filter());
+        delete r;
+        i++;
+    }
+    return l;
+}
+
+QStringList QFRDRNumberAndBrightnessData::getImageReaderIDList(QFPluginServices* pluginservices)   {
+    return pluginservices->getImporterManager()->getImporters<QFImporterImageSeries*>();
+}
+
+QStringList QFRDRNumberAndBrightnessData::getImageFormatNameList(QFPluginServices* pluginservices)   {
+     QStringList l;
+     int i=0;
+     QFImporterImageSeries* r=NULL;
+     while ((r=getImageReader(i, pluginservices))!=NULL) {
+         l.append(r->formatName());
+         delete r;
+         i++;
+     }
+     return l;
+}
+
+QFImporterImageSeries* QFRDRNumberAndBrightnessData::getImageReader(int idx, QFPluginServices* pluginservices)  {
+    QFImporterImageSeries* r=NULL;
+
+    QStringList imp=pluginservices->getImporterManager()->getImporters<QFImporterImageSeries*>();
+
+    if (idx>=0 && idx<imp.size()) {
+        r=dynamic_cast<QFImporterImageSeries*>(pluginservices->getImporterManager()->createImporter(imp[idx]));
+    }
+
+    return r;
+}
+
+int QFRDRNumberAndBrightnessData::getImageReaderCount(QFPluginServices* pluginservices)  {
+    QStringList imp=pluginservices->getImporterManager()->getImporters<QFImporterImageSeries*>();
+    return imp.size();
+}
