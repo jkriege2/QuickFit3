@@ -357,13 +357,13 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                 // different although they point to the same file.
                 bool found=false;
                 for (int j=0; j<files.size(); j++) {
-                    if (QFileInfo(files[j]).canonicalFilePath()==QFileInfo(lfiles[i]).canonicalFilePath()) {
+                    if (qfCanonicalOrAbsoluteFilePath(files[j])==qfCanonicalOrAbsoluteFilePath(lfiles[i])) {
                         found=true;
                         break;
                     }
                 }
                 if (!found) {
-                    files<<QFileInfo(lfiles[i]).canonicalFilePath();
+                    files<<qfCanonicalOrAbsoluteFilePath(lfiles[i]);
                     files_types<<lfiles_types.value(i, "");
                     while (files_desciptions.size()+1<files_types.size()) files_desciptions<<"";
                     files_desciptions<<lfiles_descriptions.value(i, "");
@@ -427,13 +427,13 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
             // add evalsettings file, if it doesn't exist yet
             bool found=false;
             for (int j=0; j<files.size(); j++) {
-                if (QFileInfo(files[j]).canonicalFilePath()==QFileInfo(evalsettingsFile).canonicalFilePath()) {
+                if (qfCanonicalOrAbsoluteFilePath(files[j])==qfCanonicalOrAbsoluteFilePath(evalsettingsFile)) {
                     found=true;
                     break;
                 }
             }
             if (!found) {
-                files<<QFileInfo(evalsettingsFile).canonicalFilePath();
+                files<<qfCanonicalOrAbsoluteFilePath(evalsettingsFile);
                 files_types<<"eval_settings";
                 while (files_desciptions.size()+1<files_types.size()) files_desciptions<<"";
                 files_desciptions<<tr("valuation settings");
@@ -477,13 +477,13 @@ void QFRDRImagingFCSData::intReadData(QDomElement* e) {
                 // different although they point to the same file.
                 bool found=false;
                 for (int j=0; j<files.size(); j++) {
-                    if (QFileInfo(files[j]).canonicalFilePath()==QFileInfo(lfiles[i]).canonicalFilePath()) {
+                    if (qfCanonicalOrAbsoluteFilePath(files[j])==qfCanonicalOrAbsoluteFilePath(lfiles[i])) {
                         found=true;
                         break;
                     }
                 }
                 if (!found) {
-                    files<<QFileInfo(lfiles[i]).canonicalFilePath();
+                    files<<qfCanonicalOrAbsoluteFilePath(lfiles[i]);
                     files_types<<lfiles_types.value(i, "");
                     while (files_desciptions.size()+1<files_types.size()) files_desciptions<<"";
                     files_desciptions<<lfiles_descriptions.value(i, "");

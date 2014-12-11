@@ -1817,6 +1817,10 @@ QFLIB_EXPORT QImage cropTopBottom(const QImage& pix, QRgb cropcolor);
 QFLIB_EXPORT QPixmap cropTopBottom(const QPixmap& pix);
 QFLIB_EXPORT QImage cropTopBottom(const QImage& pix);
 
+
+
+QFLIB_EXPORT QString qfCanonicalOrAbsoluteFilePath(const QString& file);
+
 #endif // QFTOOLS_H
 
 

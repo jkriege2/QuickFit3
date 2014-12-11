@@ -355,13 +355,13 @@ void QFRDRNumberAndBrightnessData::intReadData(QDomElement* e) {
                 // different although they point to the same file.
                 bool found=false;
                 for (int j=0; j<files.size(); j++) {
-                    if (QFileInfo(files[j]).canonicalFilePath()==QFileInfo(lfiles[i]).canonicalFilePath()) {
+                    if (qfCanonicalOrAbsoluteFilePath(files[j])==qfCanonicalOrAbsoluteFilePath(lfiles[i])) {
                         found=true;
                         break;
                     }
                 }
                 if (!found) {
-                    files<<QFileInfo(lfiles[i]).canonicalFilePath();
+                    files<<qfCanonicalOrAbsoluteFilePath(lfiles[i]);
                     files_types<<lfiles_types[i];
                     while (files_desciptions.size()+1<files_types.size()) files_desciptions<<"";
                     files_desciptions<<lfiles_descriptions[i];

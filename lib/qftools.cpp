@@ -1662,3 +1662,8 @@ QImage cropTopBottom(const QImage& pix) {
 
 
 
+QString qfCanonicalOrAbsoluteFilePath(const QString& file) {
+    QString fn=QFileInfo(file).canonicalFilePath();
+    if (fn.isEmpty()) return QFileInfo(file).absoluteFilePath();
+    return fn;
+}

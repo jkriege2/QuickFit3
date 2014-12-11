@@ -577,99 +577,99 @@ bool readEvalSettingsFile(const QString &evalFilename, bool isDCCF, QMap<QString
                 QString value=line.mid(colon_idx+1).trimmed();
                 //qDebug()<<name<<value;
                 if (name=="overview image file") {
-                    if (!overviewReal) filename_overview=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    if (!overviewReal) filename_overview=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                 } else if (name=="overview image file real") {
-                    filename_overview=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    filename_overview=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     overviewReal=true;
                 } else if (name=="overview std image") {
-                    filename_overviewstd=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    filename_overviewstd=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                 } else if (name=="background image file") {
-                    filename_background=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    filename_background=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                 } else if (name=="background stddev") {
-                    filename_backgroundstddev=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    filename_backgroundstddev=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                 } else if (name=="video file") {
-                    QString filename_video=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    QString filename_video=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     if (QFile::exists(filename_video)) {
                         files<<filename_video;
                         files_types<<"video";
                         files_descriptions<<QObject::tr("time-binned video");
                     }
                 } else if (name=="uncorrected video file") {
-                    QString filename_videoUncorrected=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    QString filename_videoUncorrected=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     if (QFile::exists(filename_videoUncorrected)) {
                         files<<filename_videoUncorrected;
                         files_types<<"video_uncorrected";
                         files_descriptions<<QObject::tr("uncorrected time-binned video");
                     }
                 } else if (name=="statistics file") {
-                    QString filename_statistics=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    QString filename_statistics=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     if (QFile::exists(filename_statistics)) {
                         files<<filename_statistics;
                         files_types<<"statistics";
                         files_descriptions<<QObject::tr("statistics data");
                     }
                 } else if (name=="background statistics file") {
-                    QString filename_backstatistics=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    QString filename_backstatistics=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     if (QFile::exists(filename_backstatistics)) {
                         files<<filename_backstatistics;
                         files_types<<"background_statistics";
                         files_descriptions<<QObject::tr("background statistics data");
                     }
                 } else if (name=="uncorrected statistics file") {
-                    QString filename_uncorrectedstatistics=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    QString filename_uncorrectedstatistics=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     if (QFile::exists(filename_uncorrectedstatistics)) {
                         files<<filename_uncorrectedstatistics;
                         files_types<<"uncorrected_statistics";
                         files_descriptions<<QObject::tr("uncorrected statistics data");
                     }
                 } else if (name=="statistics file dv1") {
-                    QString filename_statistics_dv1=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    QString filename_statistics_dv1=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     if (QFile::exists(filename_statistics_dv1)) {
                         files<<filename_statistics_dv1;
                         files_types<<"statistics_dv1";
                         files_descriptions<<QObject::tr("statistics data, DualView side 1");
                     }
                 } else if (name=="background statistics file dv1") {
-                    QString filename_backstatistics_dv1=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    QString filename_backstatistics_dv1=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     if (QFile::exists(filename_backstatistics_dv1)) {
                         files<<filename_backstatistics_dv1;
                         files_types<<"background_statistics_dv1";
                         files_descriptions<<QObject::tr("background statistics data, DualView side 1");
                     }
                 } else if (name=="uncorrected statistics file dv1") {
-                    QString filename_uncorrectedstatistics_dv1=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    QString filename_uncorrectedstatistics_dv1=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     if (QFile::exists(filename_uncorrectedstatistics_dv1)) {
                         files<<filename_uncorrectedstatistics_dv1;
                         files_types<<"uncorrected_statistics_dv1";
                         files_descriptions<<QObject::tr("uncorrected statistics data, DualView side 1");
                     }
                 } else if (name=="statistics file dv2") {
-                    QString filename_statistics_dv2=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    QString filename_statistics_dv2=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     if (QFile::exists(filename_statistics_dv2)) {
                         files<<filename_statistics_dv2;
                         files_types<<"statistics_dv2";
                         files_descriptions<<QObject::tr("statistics data, DualView side 2");
                     }
                 } else if (name=="background statistics file dv2") {
-                    QString filename_backstatistics_dv2=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    QString filename_backstatistics_dv2=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     if (QFile::exists(filename_backstatistics_dv2)) {
                         files<<filename_backstatistics_dv2;
                         files_types<<"background_statistics_dv2";
                         files_descriptions<<QObject::tr("background statistics data, DualView side 2");
                     }
                 } else if (name=="uncorrected statistics file dv2") {
-                    QString filename_uncorrectedstatistics_dv2=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    QString filename_uncorrectedstatistics_dv2=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     if (QFile::exists(filename_uncorrectedstatistics_dv2)) {
                         files<<filename_uncorrectedstatistics_dv2;
                         files_types<<"uncorrected_statistics_dv2";
                         files_descriptions<<QObject::tr("uncorrected statistics data, DualView side 2");
                     }
                 } else if (name=="input description file") {
-                    filename_settings=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    filename_settings=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                 } else if (name=="input file") {
-                    filename_acquisition=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    filename_acquisition=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                 } else if (name=="mask file") {
-                    QString filename_mask=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    QString filename_mask=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     if (QFile::exists(filename_mask)) {
                         files<<filename_mask;
                         files_types<<"mask";
@@ -679,7 +679,7 @@ bool readEvalSettingsFile(const QString &evalFilename, bool isDCCF, QMap<QString
                     initParams["CORRELATION_DATE"]=value;
                     paramsReadonly<<"CORRELATION_DATE";
                 } else {
-                    QString fn=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                    QString fn=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     if (QFile::exists(fn) && ((QFileInfo(fn).suffix().toLower()=="tif")||(QFileInfo(fn).suffix().toLower()=="tiff"))) {
                         files<<fn;
                         files_types<<"display_image";

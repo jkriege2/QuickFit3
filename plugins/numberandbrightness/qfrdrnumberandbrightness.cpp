@@ -328,29 +328,29 @@ void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
                     QString value=line.mid(colon_idx+1).trimmed();
                     //qDebug()<<name<<value;
                     if (name=="overview image file") {
-                        if (!overviewReal) filename_overview=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        if (!overviewReal) filename_overview=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     } else if (name=="overview image file real") {
-                        filename_overview=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        filename_overview=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                         overviewReal=true;
                     } else if (name=="overview std image") {
-                        filename_overviewstd=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        filename_overviewstd=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     } else if (name=="background image file") {
-                        filename_background=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        filename_background=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     } else if (name=="background stddev") {
-                        filename_backgroundstddev=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        filename_backgroundstddev=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     } else if (name=="video file") {
-                        filename_video=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        filename_video=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     } else if (name=="input description file") {
-                        filename_settings=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        filename_settings=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     } else if (name=="input file") {
-                        filename_acquisition=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        filename_acquisition=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     } else if (name=="mask file") {
-                        filename_mask=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        filename_mask=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     } else if (name=="date/time") {
                         initParams["CORRELATION_DATE"]=value;
                         paramsReadonly<<"CORRELATION_DATE";
                     } else {
-                        QString fn=QFileInfo(d.absoluteFilePath(value)).canonicalFilePath();
+                        QString fn=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                         if (QFile::exists(fn) && ((QFileInfo(fn).suffix().toLower()=="tif")||(QFileInfo(fn).suffix().toLower()=="tiff"))) {
                             more_files<<fn;
                             more_files_types<<"display_image";
