@@ -25,7 +25,7 @@
 #include <QFile>
 #include <QDebug>
 #include <QtEndian>
-
+#include "qftools.h"
 int stringToDualViewMode(const QString& dvin) {
     QString dv=dvin.trimmed().toLower();
     if (dv=="none" || dv=="0" || dv=="n") return 0;
