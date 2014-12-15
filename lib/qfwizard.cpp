@@ -104,6 +104,7 @@ QFComboBoxWizardPage::QFComboBoxWizardPage(const QString &title, QWidget *parent
     setEnableable(false);
     label = new QLabel(this);
     combo=new QFEnhancedComboBox(this);
+    connect(combo, SIGNAL(currentIndexChanged(int)), this, SLOT(indexChanged(int)));
     addRow(label, combo);
 }
 
@@ -127,6 +128,16 @@ void QFComboBoxWizardPage::setData(const QVariantList &data, int role)
     }
 }
 
+void QFComboBoxWizardPage::addItem(const QString &text, const QVariant &data)
+{
+    combo->addItem(text, data);
+}
+
+void QFComboBoxWizardPage::addItem(const QIcon &icon, const QString &text, const QVariant &data)
+{
+    combo->addItem(icon, text, data);
+}
+
 int QFComboBoxWizardPage::currentItem() const
 {
     return combo->currentIndex();
@@ -145,6 +156,11 @@ QVariant QFComboBoxWizardPage::currentData(int role) const
 void QFComboBoxWizardPage::setCurrentData(const QVariant &data, int role)
 {
     combo->setCurrentData(data, role);
+}
+
+void QFComboBoxWizardPage::indexChanged(int index)
+{
+    emit currentIndexChanged(index);
 }
 
 
@@ -383,4 +399,220 @@ int QFCheckboxListWizardPage::nextId() const
     }
     return QFEnableableFormWizardPage::nextId();
 
+}
+
+
+QFProcessingWizardPage::QFProcessingWizardPage(const QString &title, const QString &text, QWidget *parent):
+    QFWizardPage(title, parent)
+{
+    QLabel *label = new QLabel(text, this);
+    label->setWordWrap(true);
+
+    mainLay = new QVBoxLayout;
+    mainLay->addWidget(label);
+    setLayout(mainLay);
+    m_canceled=false;
+    m_done=false;
+    m_allowCancel=true;
+
+    mainLay->addStretch();
+
+    labMessage=new QLabel(this);
+    labMessage->setAlignment(Qt::AlignHCenter);
+    labMessage->setVisible(false);
+    mainLay->addWidget(labMessage);
+
+    progress=new QProgressBar;
+    progress->setRange(0,100);
+    progress->setValue(0);
+    progress->setVisible(false);
+    mainLay->addWidget(progress);
+
+    mainLay->addStretch();
+
+    addSubProgressWidgets();
+
+    mainLay->addStretch();
+
+    btnStart=new QPushButton(tr("START ..."));
+    connect(btnStart, SIGNAL(clicked()), this, SLOT(startClicked()));
+    mainLay->addWidget(btnStart);
+    mainLay->addStretch();
+
+    edtErrors=new QTextEdit(this);
+    edtErrors->setVisible(false);
+    mainLay->addWidget(edtErrors);
+}
+
+bool QFProcessingWizardPage::wasCanceled() const
+{
+    return m_canceled;
+}
+
+void QFProcessingWizardPage::setAllowCancel(bool enabled)
+{
+    m_allowCancel=enabled;
+}
+
+
+bool QFProcessingWizardPage::isComplete() const
+{
+    return m_done || m_canceled;
+}
+
+void QFProcessingWizardPage::setProcessingFinished(bool status)
+{
+    btnStart->setVisible(false);
+    m_done=status;
+    emit completeChanged();
+    QApplication::processEvents();
+}
+
+void QFProcessingWizardPage::setProgress(int value)
+{
+    progress->setVisible(true);
+    progress->setValue(value);
+    QApplication::processEvents();
+}
+
+void QFProcessingWizardPage::setSubProgress(int value)
+{
+    progressSub[0]->setVisible(true);
+    progressSub[0]->setValue(value);
+    QApplication::processEvents();
+}
+
+void QFProcessingWizardPage::setSubProgress(int id, int value)
+{
+    if (id>=0) {
+        while (id>=progressSub.size()) {
+            addSubProgressWidgets();
+        }
+        progressSub[id]->setVisible(true);
+        progressSub[id]->setValue(value);
+        QApplication::processEvents();
+    }
+
+}
+
+void QFProcessingWizardPage::setRange(int minimum, int maximum)
+{
+    progress->setVisible(true);
+    progress->setRange(minimum, maximum);
+    QApplication::processEvents();
+}
+
+void QFProcessingWizardPage::setSubRange(int id, int minimum, int maximum)
+{
+    if (id>=0) {
+        while (id>=progressSub.size()) {
+            addSubProgressWidgets();
+        }
+        progressSub[id]->setVisible(true);
+        progressSub[id]->setRange(minimum, maximum);
+        QApplication::processEvents();
+    }
+
+}
+
+void QFProcessingWizardPage::setSubRange(int minimum, int maximum)
+{
+    progressSub[0]->setVisible(true);
+    progressSub[0]->setRange(minimum, maximum);
+    QApplication::processEvents();
+}
+
+void QFProcessingWizardPage::setMessage(const QString &text)
+{
+    labMessage->setVisible(true);
+    labMessage->setText(text);
+    QApplication::processEvents();
+}
+
+void QFProcessingWizardPage::setSubMessage(const QString &text)
+{
+    labSubMessage[0]->setVisible(true);
+    labSubMessage[0]->setText(text);
+    QApplication::processEvents();
+}
+
+void QFProcessingWizardPage::setSubMessage(int id, const QString &text)
+{
+    if (id>=0) {
+        while (id>=progressSub.size()) {
+            addSubProgressWidgets();
+        }
+        labSubMessage[id]->setVisible(true);
+        labSubMessage[id]->setText(text);
+        QApplication::processEvents();
+    }
+}
+
+void QFProcessingWizardPage::cancelClicked()
+{
+    m_canceled=true;
+    emit cancelProcessing();
+    emit completeChanged();
+}
+
+void QFProcessingWizardPage::startClicked()
+{
+    edtErrors->setVisible(false);
+    edtErrors->clear();
+    QTextCursor c=edtErrors->textCursor();
+    c.movePosition(QTextCursor::End);
+    c.insertHtml("<font color=\"red\"><b>ERRORS:</b><br></font>");
+    disconnect(btnStart, SIGNAL(clicked()), this, SLOT(startClicked()));
+    btnStart->setText(tr("CANCEL ..."));
+    connect(btnStart, SIGNAL(clicked()), this, SLOT(cancelClicked()));
+    btnStart->setVisible(m_allowCancel);
+    emit startProcessing();
+    emit completeChanged();
+}
+
+void QFProcessingWizardPage::incProgress(int inc)
+{
+    setProgress(progress->value()+inc);
+}
+
+void QFProcessingWizardPage::incSubProgress(int inc)
+{
+    setSubProgress(progressSub[0]->value()+inc);
+}
+
+void QFProcessingWizardPage::addErrorMessage(const QString &message)
+{
+    edtErrors->setVisible(true);
+    QTextCursor c=edtErrors->textCursor();
+    c.movePosition(QTextCursor::End);
+    c.insertHtml(QString("<br><font color=\"red\">%1</font>").arg(message));
+    edtErrors->moveCursor(QTextCursor::End);
+    QApplication::processEvents();
+}
+
+void QFProcessingWizardPage::addSubProgressWidgets()
+{
+    QLabel* l=new QLabel(this);
+    l->setAlignment(Qt::AlignHCenter);
+    l->setVisible(false);
+    QFont f=l->font();
+    f.setPointSize(f.pointSize()-1);
+    l->setFont(f);
+
+    QProgressBar* p=new QProgressBar;
+    p->setRange(0,100);
+    p->setValue(0);
+    p->setVisible(false);
+    p->setMaximumHeight(10);
+    p->setFont(f);
+    if (progressSub.size()<=0) {
+        mainLay->addWidget(l);
+        mainLay->addWidget(p);
+    } else {
+        int idx=mainLay->indexOf(progressSub.back());
+        mainLay->insertWidget(idx, p);
+        mainLay->insertWidget(idx, l);
+    }
+    labSubMessage<<l;
+    progressSub<<p;
 }

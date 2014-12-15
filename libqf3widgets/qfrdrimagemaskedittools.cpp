@@ -27,6 +27,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QButtonGroup>
 #include "qfrdrmaskbyoverviewimagedlg.h"
 #define sqr(x) ((x)*(x))
+#include "qfselectrdrdialog.h"
 
 #define CLICK_UPDATE_TIMEOUT 500
 
@@ -86,9 +87,17 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
     actMaskByImage->setToolTip(tr("create a mask by segmenting an overview image"));
     connect(actMaskByImage, SIGNAL(triggered()), this, SLOT(maskByImage()));
 
-    actCopyMaskToGroup=new QAction(tr("copy mask to all files in same &group"), parentWidget);
+    actCopyMaskToGroup=new QAction(tr("copy mask to all RDRs in same &group"), parentWidget);
     actCopyMaskToGroup->setToolTip(tr(""));
     connect(actCopyMaskToGroup, SIGNAL(triggered()), this, SLOT(copyMaskToGroup()));
+
+    actCopyMaskToFiles=new QAction(tr("copy mask to other RDRs"), parentWidget);
+    actCopyMaskToFiles->setToolTip(tr(""));
+    connect(actCopyMaskToFiles, SIGNAL(triggered()), this, SLOT(copyMaskToFiles()));
+
+    actCopyMaskToFilesOfSameType=new QAction(tr("copy mask to other RDRs of the same type"), parentWidget);
+    actCopyMaskToFilesOfSameType->setToolTip(tr(""));
+    connect(actCopyMaskToFilesOfSameType, SIGNAL(triggered()), this, SLOT(copyMaskToFilesOfSameType()));
 
 
     cmbMode=new QComboBox(parentWidget);
@@ -177,6 +186,8 @@ QFRDRImageMaskEditTools::QFRDRImageMaskEditTools(QWidget *parentWidget, const QS
     menuSpecials->addAction(actUndoMask);
     menuSpecials->addAction(actRedoMask);
     menuSpecials->addAction(actCopyMaskToGroup);
+    menuSpecials->addAction(actCopyMaskToFiles);
+    menuSpecials->addAction(actCopyMaskToFilesOfSameType);
     menuSpecials->addAction(actMaskBorder);
     menuSpecials->addAction(actMaskByImage);
 
@@ -209,6 +220,8 @@ void QFRDRImageMaskEditTools::setRDR(QFRawDataRecord *rdr)
     actInvertMask->setVisible(imagemask||runselection);
     actMaskBorder->setVisible(imagemask);
     actCopyMaskToGroup->setVisible((imagemask||runselection) && rdr && rdr->getGroup()>=0);
+    actCopyMaskToFiles->setVisible((imagemask||runselection) && rdr );
+    actCopyMaskToFilesOfSameType->setVisible((imagemask||runselection) && rdr );
     actMaskSelected->setVisible((imagemask||runselection)&&maskEditing&&selectionEditing);
     actUnmaskSelected->setVisible((imagemask||runselection)&&maskEditing&&selectionEditing);
     actMaskByImage->setVisible(imagemask && overviewimages);
@@ -392,6 +405,116 @@ void QFRDRImageMaskEditTools::copyMaskToGroup()
     }
     signalMaskChanged(false, false);
 
+}
+
+void QFRDRImageMaskEditTools::copyMaskToFiles()
+{
+    if ((!runselection&&!imagemask) || !rdr) return;
+    int g=rdr->getGroup();
+    QString mask;
+    if (imagemask) mask=imagemask->maskToString();
+    else if (runselection) mask=runselection->leaveoutToString();
+
+    QList<QPointer<QFRawDataRecord> > rdrs;
+
+
+    QFSelectRDRDialog* dlg=new QFSelectRDRDialog(new QFMatchRDRFunctorSelectAll(), this);
+    dlg->setAllowCreateNew(false);
+    dlg->setAllowMultiSelect(true);
+    dlg->setProject(rdr->getProject());
+    dlg->setDescription(tr("Select all RDRs, to which the current evaluation settings should be copied!"));
+    if (dlg->exec()) {
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        rdrs=dlg->getSelectedRDRs();
+    }
+    delete dlg;
+
+
+
+    if (imagemask) {
+        for (int r=0; r<rdrs.size(); r++) {
+            QFRawDataRecord* rd=rdrs[r];
+            if (rd) {
+                QFRDRImageMaskInterface* rm=qobject_cast<QFRDRImageMaskInterface*>(rd);
+                if (rm) {
+                    rm->maskClear();
+                    rm->maskLoadFromString(mask);
+                    rm->maskMaskChangedEvent();
+                }
+            }
+
+        }
+    } else if (runselection) {
+        for (int r=0; r<rdrs.size(); r++) {
+            QFRawDataRecord* rd=rdrs[r];
+            if (rd) {
+                QFRDRRunSelectionsInterface* rm=qobject_cast<QFRDRRunSelectionsInterface*>(rd);
+                if (rm) {
+                    rm->leaveoutClear();
+                    rm->leaveoutLoadFromString(mask);
+                    rm->leaveoutChangedEvent();
+                }
+            }
+
+        }
+
+    }
+    signalMaskChanged(false, false);
+}
+
+void QFRDRImageMaskEditTools::copyMaskToFilesOfSameType()
+{
+    if ((!runselection&&!imagemask) || !rdr) return;
+    int g=rdr->getGroup();
+    QString mask;
+    if (imagemask) mask=imagemask->maskToString();
+    else if (runselection) mask=runselection->leaveoutToString();
+
+    QList<QPointer<QFRawDataRecord> > rdrs;
+
+
+    QFSelectRDRDialog* dlg=new QFSelectRDRDialog(new QFMatchRDRFunctorSelectType(rdr->getType()), this);
+    dlg->setAllowCreateNew(false);
+    dlg->setAllowMultiSelect(true);
+    dlg->setProject(rdr->getProject());
+    dlg->setDescription(tr("Select all RDRs, to which the current evaluation settings should be copied!"));
+    if (dlg->exec()) {
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        rdrs=dlg->getSelectedRDRs();
+    }
+    delete dlg;
+
+
+
+    if (imagemask) {
+        for (int r=0; r<rdrs.size(); r++) {
+            QFRawDataRecord* rd=rdrs[r];
+            if (rd) {
+                QFRDRImageMaskInterface* rm=qobject_cast<QFRDRImageMaskInterface*>(rd);
+                if (rm) {
+                    rm->maskClear();
+                    rm->maskLoadFromString(mask);
+                    rm->maskMaskChangedEvent();
+                }
+            }
+
+        }
+    } else if (runselection) {
+        for (int r=0; r<rdrs.size(); r++) {
+            QFRawDataRecord* rd=rdrs[r];
+            if (rd) {
+                QFRDRRunSelectionsInterface* rm=qobject_cast<QFRDRRunSelectionsInterface*>(rd);
+                if (rm) {
+                    rm->leaveoutClear();
+                    rm->leaveoutLoadFromString(mask);
+                    rm->leaveoutChangedEvent();
+                }
+            }
+
+        }
+
+    }
+    signalMaskChanged(false, false);
 }
 
 void QFRDRImageMaskEditTools::maskSelected()
@@ -619,6 +742,8 @@ void QFRDRImageMaskEditTools::registerMaskToolsToMenu(QMenu *menu) const
     menu->addAction(actCopyMask);
     menu->addAction(actPasteMask);
     menu->addAction(actCopyMaskToGroup);
+    menu->addAction(actCopyMaskToFiles);
+    menu->addAction(actCopyMaskToFilesOfSameType);
     menu->addSeparator();
     menu->addAction(actMaskSelected);
     menu->addAction(actUnmaskSelected);

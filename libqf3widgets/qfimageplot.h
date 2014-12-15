@@ -20,7 +20,7 @@ class QFWIDLIB_EXPORT QFImagePlot : public QWidget
         explicit QFImagePlot(QWidget *parent = 0, const QString& prefix=QString("QFImagePlot/"));
         ~QFImagePlot();
 
-        void setImage(double* image, int32_t width, int32_t height);
+        void setImage(const double *image, int32_t width, int32_t height);
         void setMaskAround(int size);
         void setROI(double x, double y, double width, double height);
         void setROI(QRectF r);
@@ -67,7 +67,8 @@ class QFWIDLIB_EXPORT QFImagePlotWizardPage : public QFWizardPage
 
         void setImage(double* image, int32_t width, int32_t height);
         void setImage(const QString& filename, const QString& imageReaderID, int frameNum=0, QFImporter::FileInfo *fileinfo=NULL);
-        void setImage(const QString& filename, const QString& imageReaderID, int frameNum, double*& image, int& width, int& height, QFImporter::FileInfo *fileinfo=NULL);
+        void setImage(const QString& filename, const QString& imageReaderID, int frameNum, double*& image, int& width, int& height, QFImporter::FileInfo *fileinfo=NULL, int *frames=NULL);
+        void setImageAvg(const QString& filename, const QString& imageReaderID, int frameStart, int frameCount, double*& image, int& width, int& height, QFImporter::FileInfo *fileinfo=NULL, int *frames=NULL);
         void setImage(const QString& filename, const QString& imageReaderID,  QFImporter::FileInfo *fileinfo=NULL);
         void setImage(const QString& filename, const QString& imageReaderID,  double*& image, int& width, int& height, QFImporter::FileInfo *fileinfo=NULL);
         void clear();

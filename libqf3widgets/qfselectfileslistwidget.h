@@ -51,6 +51,11 @@ class QFWIDLIB_EXPORT QFSelectFilesListWidget : public QWidget
         QList<int> fileFilterNums() const;
         void setOnlyOneFormatAllowed(bool allowed);
 
+        QString getLastDirectory() const;
+        QString getLastFilter() const;
+        QStringList getLastFilters() const;
+        QString showAdditionalFileDialog(QString* filter=NULL);
+
     public slots:
         void addFiles();
 

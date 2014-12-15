@@ -45,7 +45,8 @@ HEADERS += qfrdrnumberandbrightness.h \
     qfrdrnumberandbrightness_overvieweditor.h \
     ../base_classes/qfrdroverviewimagedisplay.h \
     ../base_classes/qfrdrimagemasktools.h \
-    qfrdrnumberandbrightness_settingseditor.h
+    qfrdrnumberandbrightness_settingseditor.h \
+    qfrdnnumberandbrightnessprocessingthread.h
 #\
 #    qfrdrnumberandbrightnessprocessingdialog.h \
 #    qfrdrnumberandbrightnessprocessingjobthread.h
@@ -58,7 +59,8 @@ SOURCES += qfrdrnumberandbrightness.cpp \
     qfrdrnumberandbrightness_overvieweditor.cpp \
     ../base_classes/qfrdroverviewimagedisplay.cpp \
     ../base_classes/qfrdrimagemasktools.cpp \
-    qfrdrnumberandbrightness_settingseditor.cpp
+    qfrdrnumberandbrightness_settingseditor.cpp \
+    qfrdnnumberandbrightnessprocessingthread.cpp
 #\
 #    qfrdrnumberandbrightnessprocessingdialog.cpp \
 #    qfrdrnumberandbrightnessprocessingjobthread.cpp

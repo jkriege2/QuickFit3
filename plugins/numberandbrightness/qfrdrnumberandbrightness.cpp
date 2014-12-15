@@ -31,6 +31,7 @@
 #include "qfimageplot.h"
 #include "imagetools.h"
 #include "libtiff_tools.h"
+#include "qfrdnnumberandbrightnessprocessingthread.h"
 
 QFRDRNumberAndBrightnessPlugin::QFRDRNumberAndBrightnessPlugin(QObject* parent):
     QObject(parent)
@@ -66,8 +67,12 @@ void QFRDRNumberAndBrightnessPlugin::registerToMenu(QMenu* menu) {
 
     action=new QAction(QIcon(getIconFilename()), tr("&calculate from image stack(s)"), parentWidget);
     action->setStatusTip(tr("Calculates the average and standard deviation from image stacks and adds N&B records from these datasets to the project."));
-    connect(action, SIGNAL(triggered()), this, SLOT(startWizardImgeStack()));
+    connect(action, SIGNAL(triggered()), this, SLOT(startWizardImageStack()));
     m->addAction(action);
+
+    action=new QAction(QIcon(getIconFilename()), tr("Number and Brightness: &calculate from image stack(s)"), parentWidget);
+    action->setStatusTip(tr("Calculates the average and standard deviation from image stacks and adds N&B records from these datasets to the project."));
+    connect(action, SIGNAL(triggered()), this, SLOT(startWizardImageStack()));
 
     QFPluginServices::getInstance()->registerWizard("rdr_wizards", action);
 }
@@ -125,7 +130,7 @@ void QFRDRNumberAndBrightnessPlugin::insertFromImFCSRecord() {
 
 
 
-void QFRDRNumberAndBrightnessPlugin::insertProjectRecord(const QString &type, const QString &name, const QString &filename, const QString &description, const QString &directory, const QMap<QString,QVariant>& init_params, const QStringList& init_params_readonly) {
+QFRawDataRecord* QFRDRNumberAndBrightnessPlugin::insertProjectRecord(const QString &type, const QString &name, const QString &filename, const QString &description, const QString &directory, const QMap<QString,QVariant>& init_params, const QStringList& init_params_readonly) {
     bool found=false;
     for (int i=0; i<project->getRawDataCount(); i++) {
         QFRawDataRecord*  r=project->getRawDataByNum(i);
@@ -146,8 +151,11 @@ void QFRDRNumberAndBrightnessPlugin::insertProjectRecord(const QString &type, co
             QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing '%1':\n%2").arg(filename).arg(e->errorDescription()));
             services->log_error(tr("Error while importing '%1':\n    %2\n").arg(filename).arg(e->errorDescription()));
             project->deleteRawData(e->getID());
+            return NULL;
         }
+        return e;
     }
+    return NULL;
 }
 
 bool QFRDRNumberAndBrightnessPlugin::parseSPIMSettings(const QString& filename_settings, QString& description, QMap<QString,QVariant>& initParams, QStringList& paramsReadonly, QStringList& files, QStringList& files_types, QStringList& files_descriptions)
@@ -202,6 +210,8 @@ bool QFRDRNumberAndBrightnessPlugin::parseSPIMSettings(const QString& filename_s
 void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
     // here we store some initial parameters
     QMap<QString, QVariant> initParams;
+    QString filename_uncorroverview="";
+    QString filename_uncorroverviewstd="";
     QString filename_overview="";
     QString filename_overviewstd="";
     QString filename_background="";
@@ -299,6 +309,12 @@ void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
                         initParams["DUALVIEW_MODE"]=value.toInt();
                         dualview=value.toInt();
                         paramsReadonly<<"DUALVIEW_MODE";
+                    } else if (name=="detector gain") {
+                        initParams["N_AND_B_DETECTOR_GAIN"]=CQStringToDouble(value);
+                        paramsReadonly<<"N_AND_B_DETECTOR_GAIN";
+                    } else if (name=="detector excess noise") {
+                        initParams["N_AND_B_DETECTOR_EXCESSNOISE"]=CQStringToDouble(value);
+                        paramsReadonly<<"N_AND_B_DETECTOR_EXCESSNOISE";
                     } else if (name=="crop y1") {
                         initParams["CROP_Y1"]=value.toInt();
                         paramsReadonly<<"CROP_Y1";
@@ -334,6 +350,10 @@ void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
                         overviewReal=true;
                     } else if (name=="overview std image") {
                         filename_overviewstd=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
+                    } else if (name=="uncorr. overview image file") {
+                        filename_uncorroverview=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
+                    } else if (name=="uncorr. overview std image") {
+                        filename_uncorroverviewstd=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     } else if (name=="background image file") {
                         filename_background=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                     } else if (name=="background stddev") {
@@ -349,6 +369,9 @@ void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
                     } else if (name=="date/time") {
                         initParams["CORRELATION_DATE"]=value;
                         paramsReadonly<<"CORRELATION_DATE";
+                    } else if (name=="detector type") {
+                        initParams["N_AND_B_DETECTOR_TYPE"]=value;
+                        paramsReadonly<<"N_AND_B_DETECTOR_TYPE";
                     } else {
                         QString fn=qfCanonicalOrAbsoluteFilePath(d.absoluteFilePath(value));
                         if (QFile::exists(fn) && ((QFileInfo(fn).suffix().toLower()=="tif")||(QFileInfo(fn).suffix().toLower()=="tiff"))) {
@@ -361,15 +384,31 @@ void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
             } while (!line.isNull());
         }
 
+        if (filename_settings.size()<=0) {
+            filename_settings=findB040ExperimentDescriptionForData(filename_acquisition);
+        }
+
         if (ok) {
+
+
             QStringList files, files_types, files_descriptions;
+            bool backCorr=true;
             if (QFile::exists(filename_overview)) {
                 files<<filename_overview;
                 files_types<<"image";
                 files_descriptions<<tr("average image");
+            } else if (QFile::exists(filename_uncorroverview)) {
+                files<<filename_uncorroverview;
+                files_types<<"image";
+                files_descriptions<<tr("average image");
+                backCorr=false;
             }
             if (QFile::exists(filename_overviewstd)) {
                 files<<filename_overviewstd;
+                files_types<<"image_std";
+                files_descriptions<<tr("standard deviation for overview image");
+            } else if (QFile::exists(filename_uncorroverview)) {
+                files<<filename_uncorroverview;
                 files_types<<"image_std";
                 files_descriptions<<tr("standard deviation for overview image");
             }
@@ -415,7 +454,7 @@ void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
 
             initParams["IS_OVERVIEW_SCALED"]=!overviewReal;
             paramsReadonly<<"IS_OVERVIEW_SCALED";
-            initParams["BACKGROUND_CORRECTED"]=true;
+            initParams["BACKGROUND_CORRECTED"]=backCorr;
             paramsReadonly<<"BACKGROUND_CORRECTED";
 
             paramsReadonly<<"SELECT_IMAGE_HALF";
@@ -431,8 +470,10 @@ void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
                 initParams["SELECT_IMAGE_HALF"]="top";
                 initParams["HEIGHT"]=height/2;
             }
+            QString name=QFileInfo(filename).baseName()+QString(" - N&B")+dvname;
+            //if (filename_acquisition.size()>0) name=QFileInfo(filename).baseName()+QString(" - N&B")+dvname;
             // insert new record:                  type ID, name for record,           list of files,    initial parameters, which parameters are readonly?
-            QFRawDataRecord* e=project->addRawData(getID(), QFileInfo(filename).fileName()+QString(" - N&B")+dvname, files, initParams, paramsReadonly, files_types, files_descriptions);
+            QFRawDataRecord* e=project->addRawData(getID(), name, files, initParams, paramsReadonly, files_types, files_descriptions);
             if (!filename_acquisition.isEmpty()) {
                 e->setFolder(QFileInfo(filename_acquisition).baseName());
             }
@@ -474,7 +515,10 @@ void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
 
             if (QFile::exists(filename_settings)) {
                 QFileInfo fi(filename_settings);
-                insertProjectRecord("rdr_settings", fi.fileName()+tr(" - acquisition settings"), filename_settings, description, QFileInfo(filename_settings).baseName());
+                QFRawDataRecord* ee=insertProjectRecord("rdr_settings", fi.fileName()+tr(" - acquisition settings"), filename_settings, description, QFileInfo(filename_settings).baseName());
+                if (ee && group.size()>0) {
+                    ee->setGroup(project->addOrFindRDRGroup(group));
+                }
             }
 
             for (int i=0; i<files_types.size(); i++) {
@@ -488,7 +532,10 @@ void QFRDRNumberAndBrightnessPlugin::insertImFCSFile(const QString& filename) {
 
                     QStringList roParams;
                     roParams<<"column_separator"<<"decimal_separator"<<"comment_start"<<"header_start";
-                    insertProjectRecord("table", fi.fileName(), files[i], description, QFileInfo(files[i]).baseName(), p, roParams);
+                    QFRawDataRecord* ee=insertProjectRecord("table", fi.fileName(), files[i], description, QFileInfo(files[i]).baseName(), p, roParams);
+                    if (ee && group.size()>0) {
+                        ee->setGroup(project->addOrFindRDRGroup(group));
+                    }
                 }
             }
 
@@ -752,10 +799,39 @@ void QFRDRNumberAndBrightnessPlugin::startNANDBFromPreprocessedFilesWizard()
 }
 
 
-void QFRDRNumberAndBrightnessPlugin::startWizardImgeStack()
+void QFRDRNumberAndBrightnessPlugin::startWizardImageStack()
 {
     QFWizard* wiz=new QFWizard(parentWidget);
     wiz->setWindowTitle(tr("Number and Brightness from Image Stacks Wizard"));
+
+    wizAcqType=new QFComboBoxWizardPage(tr("Acquisition Type"));
+    wiz->addPage(wizAcqType);
+    wizAcqType->setLabel(tr("acquisition type:"));
+    wizAcqType->addItem(tr("single-photon detector"), "single_photon");
+    wizAcqType->addItem(tr("CCD/CMOS/... (analog, no stochastic gain)"), "analog");
+    wizAcqType->addItem(tr("EM-CCD/... (analog, stochastic gain)"), "emccd");
+    wizAcqType->setCurrentItem(ProgramOptions::getConfigValue("number_and_brightness/last_procfileswizard/wizAcqType", 0).toInt());
+
+    wizGain=new QDoubleSpinBox(wizAcqType);
+    wizGain->setRange(0,1000000);
+    wizGain->setSuffix(" x");
+    wizGain->setValue(1);
+    wizGain->setDecimals(6);
+    wizGain->setEnabled(false);
+    ProgramOptions::getConfigQDoubleSpinBox(wizGain, "number_and_brightness/last_procfileswizard/wizGain");
+    wizAcqType->addRow(tr("camera gain:"), wizGain);
+
+    wizExcessNoise=new QDoubleSpinBox(wizAcqType);
+    wizExcessNoise->setRange(0,1000000);
+    wizExcessNoise->setValue(2);
+    wizExcessNoise->setDecimals(6);
+    wizExcessNoise->setEnabled(false);
+    wizAcqType->addRow(tr("excess noise factor:"), wizExcessNoise);
+    ProgramOptions::getConfigQDoubleSpinBox(wizExcessNoise, "number_and_brightness/last_procfileswizard/wizExcessNoise");
+
+    connect(wizAcqType, SIGNAL(currentIndexChanged(int)), this, SLOT(wizCameraTypeChanged(int)));
+    wizCameraTypeChanged(wizAcqType->currentItem());
+
 
 
     wiz->addPage(wizSelfilesList=new QFSelectFilesListWizardPage(tr("Image Stack Files ...")));
@@ -767,19 +843,23 @@ void QFRDRNumberAndBrightnessPlugin::startWizardImgeStack()
     wizSelfilesList->setAddOnStartup(false);
     wizSelfilesList->setOnlyOneFormatAllowed(true);
 
-    wiz->addPage(wizLSAnalysisImgPreview=new QFImagePlotWizardPage(tr("Image stack preview ...")));
-    wizLSAnalysisImgPreview->setSubTitle(tr("Please set the image properties below the overview plot!"));
-    wizSelfilesList->setUserOnValidatePage(wizLSAnalysisImgPreview);
-    connect(wizSelfilesList, SIGNAL(onValidate(QWizardPage*,QWizardPage*)), this, SLOT(wizLSAnalysisImgPreviewOnValidate(QWizardPage*,QWizardPage*)));
-    wizLSAnalysisImgPreview->clear();
+    edtBackgroundFile=new QEnhancedLineEdit(wizSelfilesList);
+    QFStyledButton* btn;
+    edtBackgroundFile->addButton(btn=new QFStyledButton(QFStyledButton::None, edtBackgroundFile, edtBackgroundFile));
+    btn->setDefaultIcon(QFStyledButton::SelectFile);
+    connect(btn, SIGNAL(clickedWithBuddy(QWidget*)), this, SLOT(wizSelectBackground()));
+
+    wizSelfilesList->addRow(tr("background image:"), edtBackgroundFile);
 
 
     wiz->addPage(wizLSAnalysisImgPreview=new QFImagePlotWizardPage(tr("Image stack preview ...")));
-    wizLSAnalysisImgPreview->setSubTitle(tr("Please set the image properties below the overview plot of the average intensity!"));
+    wizLSAnalysisImgPreview->setSubTitle(tr("Please set the image properties below the overview plot of the average intensity!<br><small>The overview plot shows an average over the central 50 (or less) frames in the image stack.</small>"));
     wizSelfilesList->setUserOnValidatePage(wizLSAnalysisImgPreview);
-    connect(wizSelfilesList, SIGNAL(onValidate(QWizardPage*,QWizardPage*)), this, SLOT(wizImgPreviewOnValidate(QWizardPage*,QWizardPage*)));
+    connect(wizSelfilesList, SIGNAL(onValidate(QWizardPage*,QWizardPage*)), this, SLOT(wizImageOverviewFromFilesList(QWizardPage*,QWizardPage*)));
     wizLSAnalysisImgPreview->clear();
 
+    wizFileInfo=new QLabel("", wizLSAnalysisImgPreview);
+    wizLSAnalysisImgPreview->addRow(tr("image properties:"), wizFileInfo);
 
     wizPixelSize=new QDoubleSpinBox(wizLSAnalysisImgPreview);
     wizPixelSize->setRange(0,100000);
@@ -787,78 +867,59 @@ void QFRDRNumberAndBrightnessPlugin::startWizardImgeStack()
     wizPixelSize->setValue(400);
     wizPixelSize->setDecimals(2);
 
-    wizLabWidth=new QLabel(wizLSAnalysisImgPreview);
-    wizLabHeight=new QLabel(wizLSAnalysisImgPreview);
-
     if (wizPixelSize) {
-        ProgramOptions::getConfigQDoubleSpinBox(wizPixelSize, "number_and_brightness/last_preprocfileswizard/wizPixelSize");
+        ProgramOptions::getConfigQDoubleSpinBox(wizPixelSize, "number_and_brightness/last_procfileswizard/wizPixelSize");
         wizLSAnalysisImgPreview->addRow(tr("pixel size"), wizPixelSize);
     }
 
-    QComboBox* cmbSubSelect=new QComboBox(wizSelfilesList);
-    cmbSubSelect->addItem("full image");
-    cmbSubSelect->addItem("left half");
-    cmbSubSelect->addItem("right half");
-    cmbSubSelect->addItem("top half");
-    cmbSubSelect->addItem("bottom half");
-    cmbSubSelect->addItem("left+right half");
-    cmbSubSelect->addItem("top+bottom half");
-    connect(cmbSubSelect, SIGNAL(currentIndexChanged(int)), this, SLOT(wizSubimagesChanged(int)));
-    cmbSubSelect->setCurrentIndex(0);
-    wizLSAnalysisImgPreview->addRow("", cmbSubSelect);
-    wizLSAnalysisImgPreview->addRow(tr("image width:"), wizLabWidth);
-    wizLSAnalysisImgPreview->addRow(tr("image height:"), wizLabHeight);
+    wizDualViewMode=new QFEnhancedComboBox(wizSelfilesList);
+    wizDualViewMode->addItem("single channel image");
+    wizDualViewMode->addItem("DualView: left/right half");
+    wizDualViewMode->addItem("DualView: top/bottom half");
+    connect(wizDualViewMode, SIGNAL(currentIndexChanged(int)), this, SLOT(wizDVChanged(int)));
+    wizDualViewMode->setCurrentIndex(0);
+    wizLSAnalysisImgPreview->addRow("DualView mode:", wizDualViewMode);
 
+    wizFirstFrame=new QSpinBox(wizLSAnalysisImgPreview);
+    wizFirstFrame->setRange(-1,10000000);
+    wizFirstFrame->setValue(-1);
+    wizFirstFrame->setSpecialValueText(tr("first"));
+    wizLSAnalysisImgPreview->addRow("first frame to process:", wizFirstFrame);
 
-    QFTextWizardPage* last;
-    wiz->addPage(last=new QFTextWizardPage(tr("Finalize"),tr("You completed this wizard. The selected files will now be inserted as a number and brightness raw data record (RDR) into the project."), wiz));
-    last->setFinalPage(true);
+    wizLastFrame=new QSpinBox(wizLSAnalysisImgPreview);
+    wizLastFrame->setRange(-1,10000000);
+    wizLastFrame->setValue(-1);
+    wizLastFrame->setSpecialValueText(tr("last"));
+    wizLSAnalysisImgPreview->addRow("last frame to process:", wizLastFrame);
+
+    edtResultsPrefix=new QLineEdit(wizLSAnalysisImgPreview);
+    edtResultsPrefix->setText("./results_NandB/");
+    wizLSAnalysisImgPreview->addRow("sub-directory/prefix for results:", edtResultsPrefix);
+    ProgramOptions::getConfigQLineEdit(edtResultsPrefix, "number_and_brightness/last_procfileswizard/edtResultsPrefix");
+
+    wizProc=new QFProcessingWizardPage(tr("Processing N&B data"), tr("In this step, the number and brightness data will be processed.\nPlease click on START to start processing and click on \"Next\", when the processing has finished."), wiz);
+    connect(wizProc, SIGNAL(startProcessing()), this, SLOT(wizProcessNAndB()));
+
+    wiz->addPage(wizProc);
+    wizProc->setFinalPage(true);
 
 
     if (wiz->exec()) {
         if (wizPixelSize) {
-            ProgramOptions::setConfigQDoubleSpinBox(wizPixelSize, "number_and_brightness/last_preprocfileswizard/wizPixelSize");
+            ProgramOptions::setConfigQDoubleSpinBox(wizPixelSize, "number_and_brightness/last_procfileswizard/wizPixelSize");
         }
+        ProgramOptions::setConfigQDoubleSpinBox(wizGain, "number_and_brightness/last_procfileswizard/wizGain");
+        ProgramOptions::setConfigQDoubleSpinBox(wizExcessNoise, "number_and_brightness/last_procfileswizard/wizExcessNoise");
+        ProgramOptions::setConfigQLineEdit(edtResultsPrefix, "number_and_brightness/last_procfileswizard/edtResultsPrefix");
+        ProgramOptions::setConfigValue("number_and_brightness/last_procfileswizard/wizAcqType", wizAcqType->currentItem());
 
-        QStringList files=wizSelfilesList->files();
-        QString filterid=wizSelfilesList->fileFilterIDs().value(0);
-        int subselect=cmbSubSelect->currentIndex();
-        //qDebug()<<"OK"<<files<<filters;
-        if (files.size()>0 && !filterid.isEmpty()) {
-
-            //qDebug()<<filterid<<files;
-            QMap<QString, QVariant> iParams;
-            QStringList iReadonly;
-            iReadonly<<"PIXEL_WIDTH"<<"PIXEL_HEIGHT"<<"WIDTH"<<"HEIGHT"<<"SELECT_IMAGE_HALF";
-            QString ename="";
-            if (wizPixelSize) iParams["PIXEL_WIDTH"]=wizPixelSize->value();
-            if (wizPixelSize) iParams["PIXEL_HEIGHT"]=wizPixelSize->value();
-            iParams["WIDTH"]=wizRDRImageWidth;
-            iParams["HEIGHT"]=wizRDRImageHeight;
-            if (subselect==1 || subselect==5) {iParams["SELECT_IMAGE_HALF"]="left"; ename+=tr(" - left");}
-            if (subselect==2){ iParams["SELECT_IMAGE_HALF"]="right"; ename+=tr(" - right");}
-            if (subselect==3 || subselect==6) {iParams["SELECT_IMAGE_HALF"]="top"; ename+=tr(" - top");}
-            if (subselect==4) {iParams["SELECT_IMAGE_HALF"]="bottom"; ename+=tr(" - bottom");}
-            QString group;
-            if (subselect>=5) group=QFileInfo(files[0]).fileName();
-
-            /*QFRawDataRecord* e=insertPreprocessedFiles(files[0], files[1], files[2], files[3], cmbImageVar->currentIndex()==1, cmbSubSelect->currentIndex()==1, iParams, iReadonly, group);
-            if (e)  {
-                e->setName(e->getName()+ename);
+        for (int i=0; i<wizFinishedFiles.size(); i++) {
+            if (QFile::exists(wizFinishedFiles[i])) {
+                insertImFCSFile(wizFinishedFiles[i]);
+                QApplication::processEvents();
             }
-
-            if (subselect>=5) {
-                ename="";
-                if (subselect==5) {iParams["SELECT_IMAGE_HALF"]="right"; ename+=tr(" - right");}
-                if (subselect==6) {iParams["SELECT_IMAGE_HALF"]="bottom"; ename+=tr(" - bottom");}
-                e=insertPreprocessedFiles(files[0], files[1], files[2], files[3], cmbImageVar->currentIndex()==1, cmbSubSelect->currentIndex()==1, iParams, iReadonly, group);
-                if (e)  {
-                    e->setName(e->getName()+ename);
-                }
-            }*/
-
-
         }
+
     }
     delete wiz;
 }
@@ -976,15 +1037,48 @@ void QFRDRNumberAndBrightnessPlugin::wizSubimagesChanged(int index)
 }
 
 
-void QFRDRNumberAndBrightnessPlugin::wizLSAnalysisImgPreviewOnValidate(QWizardPage *page, QWizardPage *userPage)
+void QFRDRNumberAndBrightnessPlugin::wizDVChanged(int index)
+{
+    int newwidth, newheight;
+    if (index==0) {
+        newwidth=wizFileImageWidth;
+        newheight=wizFileImageHeight;
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->resetROI();
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->resetROI2();
+    } else if (index==1) {
+        newwidth=wizFileImageWidth/2;
+        newheight=wizFileImageHeight;
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->setROI(0,0,newwidth, newheight);
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->setROI2(newwidth,0,newwidth, newheight);
+    } else if (index==2) {
+        newwidth=wizFileImageWidth;
+        newheight=wizFileImageHeight/2;
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->setROI(0,0,newwidth, newheight);
+        if (wizLSAnalysisImgPreview) wizLSAnalysisImgPreview->getImagePlot()->setROI2(0,newheight,newwidth, newheight);
+    }
+
+    if (wizLabWidth) {
+        wizLabWidth->setText(tr("%1   [file width: %2]").arg(newwidth).arg(wizFileImageWidth));
+    }
+    if (wizLabHeight) {
+        wizLabHeight->setText(tr("%1   [file width: %2]").arg(newheight).arg(wizFileImageHeight));
+    }
+    wizRDRImageWidth=newwidth;
+    wizRDRImageHeight=newheight;
+
+}
+
+
+void QFRDRNumberAndBrightnessPlugin::wizImageOverviewFromFilesList(QWizardPage *page, QWizardPage *userPage)
 {
     QFImagePlotWizardPage* plot=qobject_cast<QFImagePlotWizardPage*>(userPage);
     QFSelectFilesListWizardPage* files=qobject_cast<QFSelectFilesListWizardPage*>(page);
     if (plot && files) {
         QFImporter::FileInfo info;
         double* image=NULL;
-        int width=0, height=0;
-        plot->setImage(files->files().value(0, ""), files->fileFilterIDs().value(0, ""), -1, image, width, height, &info);
+        int width=0, height=0, frames=0;
+        //qDebug()<<files->files().value(0, "")<<files->fileFilterIDs().value(0, "");
+        plot->setImageAvg(files->files().value(0, ""), files->fileFilterIDs().value(0, ""), -1, 50, image, width, height, &info, &frames);
         if (wizPixelSize) {
             if (info.properties.contains("PIXEL_WIDTH")) {
                 wizPixelSize->setValue(info.properties["PIXEL_WIDTH"].toDouble());
@@ -999,29 +1093,132 @@ void QFRDRNumberAndBrightnessPlugin::wizLSAnalysisImgPreviewOnValidate(QWizardPa
             if (s==qfisVertical) wizLSAnalysiscmbFitDir->setCurrentIndex(0);
             if (s==qfisHorizonal) wizLSAnalysiscmbFitDir->setCurrentIndex(1);
         }
-        if (wizLSAnalysiscmbStackMode && image && width>0 && height>0) {
+        if (wizDualViewMode && image && width>0 && height>0) {
             double crossLR=0, crossTB=0;
             QFImageSymmetry s=qfGetImageSymetry(image, width, height, &crossLR, &crossTB);
             if (crossLR>0.6 && crossTB<0.6) {
-                wizLSAnalysiscmbStackMode->setCurrentIndex(2);
+                wizDualViewMode->setCurrentIndex(1);
             } else if (crossLR<0.6 && crossTB>0.6) {
-                wizLSAnalysiscmbStackMode->setCurrentIndex(3);
+                wizDualViewMode->setCurrentIndex(2);
             } else if (crossLR<0.6 && crossTB<0.6) {
-                if (files->getSelFilesWidget()->files().size()>1) wizLSAnalysiscmbStackMode->setCurrentIndex(0);
-                else  wizLSAnalysiscmbStackMode->setCurrentIndex(1);
+                wizDualViewMode->setCurrentIndex(0);
             }
-            const QStandardItemModel* model = qobject_cast<const QStandardItemModel*>(wizLSAnalysiscmbStackMode->model());
-            if (model) {
-                QStandardItem* item = model->item(0);
-                bool disable=files->getSelFilesWidget()->files().size()<=1;
-                item->setFlags(disable ? item->flags() & ~(Qt::ItemIsSelectable|Qt::ItemIsEnabled) : Qt::ItemIsSelectable|Qt::ItemIsEnabled);
-            }
+        }
+        if (wizFileInfo) {
+            wizFileInfo->setText(tr("image size: %1 x %2,   frames: %3").arg(width).arg(height).arg(frames));
         }
         if (image && width>0 && height>0) {
             qfFree(image);
         }
         if (wizMaskSize) wizMaskChanged(wizMaskSize->value());
     }
+}
+
+void QFRDRNumberAndBrightnessPlugin::wizCameraTypeChanged(int index)
+{
+    if (wizGain) {
+        wizGain->setEnabled(index>0);
+    }
+    if (wizExcessNoise) {
+        wizExcessNoise->setEnabled(index>1);
+    }
+}
+
+void QFRDRNumberAndBrightnessPlugin::wizSelectBackground()
+{
+    if (edtBackgroundFile && wizSelfilesList) {
+        QString f=wizSelfilesList->getSelFilesWidget()->showAdditionalFileDialog();
+        if (f.size()>0) edtBackgroundFile->setText(f);
+    }
+}
+
+void QFRDRNumberAndBrightnessPlugin::wizProcessNAndB()
+{
+    QList<QPointer<QFRDRNnumberAndBrightnessProcessingThread> > threads;
+    threads<<new QFRDRNnumberAndBrightnessProcessingThread(0, this);
+    if (QThread::idealThreadCount()>1) threads<<new QFRDRNnumberAndBrightnessProcessingThread(1, this);
+
+    for (int i=0; i<threads.size(); i++) {
+        connect(threads[i], SIGNAL(finishedJob(QString)), this, SLOT(wizAddFinishedFile(QString)));
+        connect(threads[i], SIGNAL(finishedJob(QString)), wizProc, SLOT(incProgress()));
+        connect(threads[i], SIGNAL(setJobProgress(int , int )), wizProc, SLOT(setSubProgress(int, int)));
+        connect(threads[i], SIGNAL(errorMessage(QString)), wizProc, SLOT(addErrorMessage(QString)));
+        connect(wizProc, SIGNAL(cancelProcessing()), threads[i], SLOT(cancel()));
+    }
+    int t=0;
+    for (int i=0; i<wizSelfilesList->filesCount(); i++) {
+        QFRDRNnumberAndBrightnessProcessingThread::Job job;
+
+        job.inputfile=wizSelfilesList->files().at(i);
+        job.readerID=wizSelfilesList->fileFilterIDs().at(i);
+        job.backgroundfile=edtBackgroundFile->text();
+        job.detectorMode=wizAcqType->currentData().toString();
+        job.start=wizFirstFrame->value();
+        job.end=wizLastFrame->value();
+        job.dvmode=wizDualViewMode->currentIndex();
+        job.excessNoise=wizExcessNoise->value();
+        job.gain=wizGain->value();
+        job.pixel_size=wizPixelSize->value();
+        QString prefix=edtResultsPrefix->text();
+        bool ok=false;
+        int cnt=0;
+        while (!ok) {
+            ok=true;
+            job.outputname=prefix+QFileInfo(job.inputfile).baseName()+QString("_%1.evalsettings.txt").arg(cnt, 4, 10, QLatin1Char('0'));
+            job.outputname=QFileInfo(job.inputfile).absoluteDir().absoluteFilePath(job.outputname);
+            job.basename=job.outputname.left(job.outputname.size()-QString(".evalsettings.txt").size());
+            QDir d=QFileInfo(job.outputname).absoluteDir();
+            if (!d.exists()) {
+                d.mkpath(d.absolutePath());
+            }
+            if (QFile::exists(job.outputname)) {
+                ok=false;
+                cnt++;
+            }
+            if (ok) {
+                touchFile(job.outputname);
+            }
+            cnt++;
+        }
+        threads[t]->addJob(job);
+        t++;
+        if (t>=threads.size()) t=0;
+    }
+
+    wizProc->setRange(0, wizSelfilesList->filesCount());
+    for (int i=0; i<threads.size(); i++) {
+        threads[i]->start();
+    }
+    bool isRunning=true;
+    while (isRunning && !wizProc->wasCanceled()) {
+        QApplication::processEvents();
+        isRunning=false;
+        for (int i=0; i<threads.size(); i++) {
+            isRunning=isRunning||threads[i]->isRunning();
+        }
+    }
+
+    for (int i=0; i<threads.size(); i++) {
+        threads[i]->cancel();
+        QElapsedTimer tim;
+        tim.start();
+        while (threads[i]->isRunning() && tim.elapsed()<60000) {
+            QApplication::processEvents();
+        }
+    }
+
+    for (int i=0; i<threads.size(); i++) {
+        threads[i]->deleteLater();
+    }
+
+    //connect(wizProc, SIGNAL(cancelProcessing()), this, SLOT(wizCancelNAndB()));
+    wizProc->setProcessingFinished(true);
+
+}
+
+void QFRDRNumberAndBrightnessPlugin::wizAddFinishedFile(const QString &file)
+{
+    wizFinishedFiles<<file;
 }
 
 

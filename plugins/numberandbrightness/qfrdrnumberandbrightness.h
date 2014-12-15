@@ -27,9 +27,13 @@
 #include "qmodernprogresswidget.h"
 #include "qfrdrimagingfcstools.h"
 #include "qftools.h"
+#include "qfenhancedcombobox.h"
 class QFImagePlotWizardPage; // forward
 class QFSelectFilesWizardPage;
 class QFSelectFilesListWizardPage;
+class QEnhancedLineEdit;
+class QFProcessingWizardPage;
+class QFComboBoxWizardPage;
 
 /*!
     \defgroup qf3rdrdp_number_and_brightness Raw Data Record Plugin
@@ -90,7 +94,7 @@ class QFRDRNumberAndBrightnessPlugin : public QObject, public QFPluginRawDataRec
         QFRawDataRecord* insertPreprocessedFiles(const QString &filename_overview, const QString &filename_overviewstd, const QString &filename_background, const QString &filename_backgroundstddev, bool filename_overviewstd_isVar=false, bool filename_backgroundstddev_isVar=false, const QMap<QString, QVariant> &iParams=QMap<QString, QVariant>(), const QStringList &iReadonly=QStringList(), const QString &group=QString());
 
         /** \brief insert record, if it is not yet contained in the project! */
-        void insertProjectRecord(const QString& type, const QString& name, const QString& filename, const QString& description=QString(""), const QString& directory=QString(""), const QMap<QString,QVariant>& init_params=QFStringVariantMap(), const QStringList& init_params_readonly=QStringList());
+        QFRawDataRecord *insertProjectRecord(const QString& type, const QString& name, const QString& filename, const QString& description=QString(""), const QString& directory=QString(""), const QMap<QString,QVariant>& init_params=QFStringVariantMap(), const QStringList& init_params_readonly=QStringList());
 
         bool parseSPIMSettings(const QString& filename_settings, QString& description, QMap<QString,QVariant>& initParams, QStringList& paramsReadonly, QStringList& files, QStringList& files_types, QStringList& files_descriptions);
         void startNANDBFromPreprocessedFilesWizard();
@@ -99,23 +103,40 @@ class QFRDRNumberAndBrightnessPlugin : public QObject, public QFPluginRawDataRec
         void wizMaskChanged(int masksize);
         void wizSubimagesChanged(int index);
 
-        void startWizardImgeStack();
-        void wizLSAnalysisImgPreviewOnValidate(QWizardPage *page, QWizardPage *userPage);
+        void startWizardImageStack();
+        void wizImageOverviewFromFilesList(QWizardPage *page, QWizardPage *userPage);
+        void wizCameraTypeChanged(int index);
+        void wizSelectBackground();
+        void wizProcessNAndB();
+        void wizAddFinishedFile(const QString& file);
+        void wizDVChanged(int index);
     protected:
         QPointer<QDoubleSpinBox> wizPixelSize;
         QPointer<QSpinBox> wizMaskSize;
         QPointer<QDoubleSpinBox> wizStepSize;
-        QPointer<QComboBox> wizLSAnalysiscmbFitDir;
-        QPointer<QComboBox> wizLSAnalysiscmbStackMode;
+        QPointer<QDoubleSpinBox> wizGain;
+        QPointer<QDoubleSpinBox> wizExcessNoise;
+        QPointer<QFEnhancedComboBox> wizLSAnalysiscmbFitDir;
+        QPointer<QFEnhancedComboBox> wizDualViewMode;
         QPointer<QFImagePlotWizardPage> wizLSAnalysisImgPreview;
         QPointer<QFSelectFilesWizardPage> wizSelfiles;
         QPointer<QFSelectFilesListWizardPage> wizSelfilesList;
+        QPointer<QEnhancedLineEdit> edtBackgroundFile;
+        QPointer<QLineEdit> edtResultsPrefix;
+        QPointer<QFComboBoxWizardPage> wizAcqType;
         QPointer<QLabel> wizLabWidth;
         QPointer<QLabel> wizLabHeight;
+        QPointer<QLabel> wizFileInfo;
+        QPointer<QSpinBox> wizFirstFrame;
+        QPointer<QSpinBox> wizLastFrame;
+        QPointer<QFProcessingWizardPage> wizProc;
         int wizFileImageWidth;
         int wizFileImageHeight;
+        int wizFileFrames;
         int wizRDRImageWidth;
         int wizRDRImageHeight;
+        QStringList wizFinishedFiles;
+
 
 };
 

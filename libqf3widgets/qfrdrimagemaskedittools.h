@@ -87,6 +87,8 @@ class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
         void maskBorder();
         void maskByImage();
         void copyMaskToGroup();
+        void copyMaskToFiles();
+        void copyMaskToFilesOfSameType();
         void maskSelected();
         void unmaskSelected();
 
@@ -122,7 +124,8 @@ class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
         QAction* actInvertMask;
         QAction* actMaskBorder;
         QAction* actCopyMaskToGroup;
-
+        QAction* actCopyMaskToFiles;
+        QAction* actCopyMaskToFilesOfSameType;
         QAction* actUndoMask;
         QAction* actRedoMask;
         QAction* actMaskSelected;

@@ -47,7 +47,7 @@ QFImagePlot::~QFImagePlot()
     clearData();
 }
 
-void QFImagePlot::setImage(double *image, int32_t width, int32_t height)
+void QFImagePlot::setImage(const double *image, int32_t width, int32_t height)
 {
     clear();
     ui->histogram->clear();
@@ -294,15 +294,20 @@ void QFImagePlotWizardPage::setImage(const QString &filename, const QString &ima
     }
 }
 
-void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, int frameNum, double *&image, int &width, int &height, QFImporter::FileInfo *fileinfo)
+void QFImagePlotWizardPage::setImage(const QString &filename, const QString &imageReaderID, int frameNum, double *&image, int &width, int &height, QFImporter::FileInfo *fileinfo, int* frames)
 {
     QFImporter* imp=QFPluginServices::getInstance()->getImporterManager()->createImporter(imageReaderID);
     QFImporterImageSeries* r=dynamic_cast<QFImporterImageSeries*>(imp);
     if (r) {
         if (r->open(filename)) {
+            int fs=0;
             if (frameNum<0) {
+                fs=r->countFrames();
                 frameNum=r->countFrames()/2;
+            } else {
+                if (frames) fs=r->countFrames();
             }
+            if (frames) *frames=fs;
             if (frameNum>0) {
                 for (int i=0; i<frameNum; i++) {
                     r->nextFrame();
@@ -318,6 +323,69 @@ void QFImagePlotWizardPage::setImage(const QString &filename, const QString &ima
             r->close();
             plot->setImage(frame, r->frameWidth(), r->frameHeight());
             qfFree(frame);
+        } else {
+            plot->clear();
+        }
+        delete r;
+    } else {
+        plot->clear();
+    }
+}
+
+void QFImagePlotWizardPage::setImageAvg(const QString &filename, const QString &imageReaderID, int frameStart, int frameCount, double *&image, int &width, int &height, QFImporter::FileInfo *fileinfo, int *frames)
+{
+    QFImporter* imp=QFPluginServices::getInstance()->getImporterManager()->createImporter(imageReaderID);
+    QFImporterImageSeries* r=dynamic_cast<QFImporterImageSeries*>(imp);
+    //qDebug()<<imp<<r;
+    if (r) {
+        if (r->open(filename)) {
+            //qDebug()<<"opened "<<filename;
+            int fs=0;
+            frameCount=qMax(frameCount, 1);
+            if (frameStart<0) {
+                fs=r->countFrames();
+                frameStart=qMax((uint32_t)0,(r->countFrames()-frameCount)/2);
+            } else {
+                if (frames) fs=r->countFrames();
+            }
+            if (frames) *frames=fs;
+            if (frameStart>0) {
+                for (int i=0; i<frameStart; i++) {
+                    r->nextFrame();
+                }
+            }
+
+            height=r->frameHeight();
+            width=r->frameWidth();
+            //qDebug()<<frameStart<<frameCount<<fs<<width<<height;
+
+            double* frame=qfMallocT<double>(width*height);
+            r->readFrameDouble(frame);
+            if (fileinfo) *fileinfo=r->getFileInfo();
+            image=duplicateArray(frame, width*height);
+            //qDebug()<<width<<height;
+            double fcnt=1;
+            for (int i=1; i<frameCount; i++) {
+                if (r->nextFrame()){
+                    if (r->readFrameDouble(frame)) {
+                        fcnt++;
+                        //qDebug()<<fcnt;
+                        for (int j=0; j<width*height; j++) {
+                            image[j]=image[j]+frame[j];
+                        }
+                    }
+                } else {
+                    break;
+                }
+            }
+            //qDebug()<<"normalize "<<fcnt;
+            for (int j=0; j<width*height; j++) {
+                image[j]=image[j]/fcnt;
+            }
+            r->close();
+            plot->setImage(image, width, height);
+            qfFree(frame);
+            //qfFree(image);
         } else {
             plot->clear();
         }

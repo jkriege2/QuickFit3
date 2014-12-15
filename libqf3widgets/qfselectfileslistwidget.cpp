@@ -107,6 +107,49 @@ void QFSelectFilesListWidget::setOnlyOneFormatAllowed(bool allowed)
     onlyOneFormat=allowed;
 }
 
+QString QFSelectFilesListWidget::getLastDirectory() const
+{
+    return ProgramOptions::getConfigValue(lastDirID, "").toString();
+}
+
+
+QString QFSelectFilesListWidget::getLastFilter() const
+{
+    return ProgramOptions::getConfigValue(lastFilterID, filters.value(0)).toString();
+}
+
+QStringList QFSelectFilesListWidget::getLastFilters() const
+{
+    QStringList filterss=filters;
+    if (onlyOneFormat && ui->files->count()>1 ) {
+        filterss.clear();
+        filterss<<getLastFilter();
+    }
+    return filterss;
+}
+
+QString QFSelectFilesListWidget::showAdditionalFileDialog(QString *filter)
+{
+    QString currentFCSFileFormatFilter=ProgramOptions::getConfigValue(lastFilterID, filters.value(0)).toString();
+    QString dir=ProgramOptions::getConfigValue(lastDirID, "").toString();
+    QStringList filterss=filters;
+    if (onlyOneFormat && ui->files->count()>1 ) {
+        filterss.clear();
+        filterss<<currentFCSFileFormatFilter;
+    }
+    QString files = qfGetOpenFileName(this,
+                          tr("Select File ..."),
+                          dir,
+                          filterss.join(";;"), &currentFCSFileFormatFilter);
+    if (files.size()>0) {
+        ProgramOptions::setConfigValue(lastFilterID, currentFCSFileFormatFilter);
+        ProgramOptions::setConfigValue(lastDirID, QFileInfo(files).absolutePath());
+        if (filter) *filter=currentFCSFileFormatFilter;
+
+    }
+    return files;
+}
+
 void QFSelectFilesListWidget::addFiles()
 {
     on_btnAdd_clicked();

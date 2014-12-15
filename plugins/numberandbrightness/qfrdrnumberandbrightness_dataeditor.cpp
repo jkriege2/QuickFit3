@@ -414,12 +414,16 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
     cmbCorrelationP1->addItem(tr("intensity"), "INTENSITY");
     cmbCorrelationP1->addItem(tr("particle number"), "N");
     cmbCorrelationP1->addItem(tr("brightness"), "EPSILON");
+    cmbCorrelationP1->addItem(tr("x-position"), "X");
+    cmbCorrelationP1->addItem(tr("y-position"), "Y");
     cmbCorrelationP2=new QFEnhancedComboBox(this);
     cmbCorrelationP2->addItem(tr("apparent brightness"), "APPEPSILON");
     cmbCorrelationP2->addItem(tr("apparent particle number"), "APPN");
     cmbCorrelationP2->addItem(tr("intensity"), "INTENSITY");
     cmbCorrelationP2->addItem(tr("particle number"), "N");
     cmbCorrelationP2->addItem(tr("brightness"), "EPSILON");
+    cmbCorrelationP2->addItem(tr("x-position"), "X");
+    cmbCorrelationP2->addItem(tr("y-position"), "Y");
     cmbCorrelationPCol=new QFEnhancedComboBox(this);
     cmbCorrelationPCol->addItem(tr("---"), "NONE");
     cmbCorrelationPCol->addItem(tr("intensity"), "INTENSITY");
@@ -427,6 +431,8 @@ void QFRDRNumberAndBrightnessDataEditor::createWidgets() {
     cmbCorrelationPCol->addItem(tr("apparent brightness"), "APPEPSILON");
     cmbCorrelationPCol->addItem(tr("particle number"), "N");
     cmbCorrelationPCol->addItem(tr("brightness"), "EPSILON");
+    cmbCorrelationPCol->addItem(tr("x-position"), "X");
+    cmbCorrelationPCol->addItem(tr("y-position"), "Y");
     layCorrelation->addWidget(new QLabel("x-parameter: "), 0, 0);
     layCorrelation->addWidget(cmbCorrelationP1, 0, 1);
     layCorrelation->addWidget(new QLabel("y-parameter: "), 0, 2);
@@ -1003,11 +1009,19 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
         double* dataEpsSel=(double*)qfCalloc(dataSelSize, sizeof(double));
         double* dataN=(double*)qfCalloc(dataSize, sizeof(double));
         double* dataNSel=(double*)qfCalloc(dataSelSize, sizeof(double));
+        double* dataX=(double*)qfCalloc(dataSize, sizeof(double));
+        double* dataY=(double*)qfCalloc(dataSelSize, sizeof(double));
 
         double* dataOvr=(double*)qfCalloc(dataSize, sizeof(double));
         double* dataOvrSel=(double*)qfCalloc(dataSelSize, sizeof(double));
         dataSize=0;
         dataSelSize=0;
+        for (int y=0; y<m->getHeight(); y++) {
+            for (int x=0; x<m->getWidth(); x++) {
+                dataX[y*m->getWidth()+x]=x;
+                dataY[y*m->getWidth()+x]=y;
+            }
+        }
         for (int i=0; i<m->getWidth()*m->getHeight(); i++) {
             if (!m->maskGetIdx(i)) {
                 dataAppN[dataSize]=m->getAppNumberImage(i);
@@ -1083,7 +1097,15 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
         } else if (cmbCorrelationP1->currentIndex()==4) {
             c1=dataEps;
             widCorrelation->setCorrelation1Label(tr("brightness $\\epsilon$"));
+        } else if (cmbCorrelationP1->currentIndex()==5) {
+            c1=dataX;
+            widCorrelation->setCorrelation1Label(tr("x-position"));
+        } else if (cmbCorrelationP1->currentIndex()==6) {
+            c1=dataY;
+            widCorrelation->setCorrelation1Label(tr("y-position"));
         }
+
+
         if (cmbCorrelationP2->currentIndex()==0) {
             c2=dataAppEps;
             widCorrelation->setCorrelation2Label(tr("apparent brightness $B$"));
@@ -1099,6 +1121,12 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
         } else if (cmbCorrelationP2->currentIndex()==4) {
             c2=dataEps;
             widCorrelation->setCorrelation2Label(tr("brightness $\\epsilon$"));
+        } else if (cmbCorrelationP2->currentIndex()==5) {
+            c2=dataX;
+            widCorrelation->setCorrelation2Label(tr("x-position"));
+        } else if (cmbCorrelationP2->currentIndex()==6) {
+            c2=dataY;
+            widCorrelation->setCorrelation2Label(tr("y-position"));
         }
 
         if (cmbCorrelationPCol->currentIndex()==1) {
@@ -1116,6 +1144,12 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
         } else if (cmbCorrelationPCol->currentIndex()==5) {
             cC=dataEps;
             widCorrelation->setCorrelationColorLabel(tr("brightness $\\epsilon$"));
+        } else if (cmbCorrelationPCol->currentIndex()==5) {
+            cC=dataX;
+            widCorrelation->setCorrelationColorLabel(tr("x-position"));
+        } else if (cmbCorrelationPCol->currentIndex()==6) {
+            cC=dataY;
+            widCorrelation->setCorrelationColorLabel(tr("y-position"));
         }
 
         widCorrelation->addCorrelation(tr("complete"), c1, c2, cC, dataSize, false);
@@ -1126,6 +1160,8 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
         qfFree(dataAppEpsSel);
         qfFree(dataOvr);
         qfFree(dataOvrSel);
+        qfFree(dataX);
+        qfFree(dataY);
 
 
 
