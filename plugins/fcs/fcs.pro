@@ -55,7 +55,8 @@ HEADERS += dlgcsvparameters.h \
     confocor3tools.h \
     flex_sin_tools.h \
     alv7000tools.h \
-    ../base_classes/qf3correlationdataformattool.h
+    ../base_classes/qf3correlationdataformattool.h \
+    qfrdrfcsparserfunctions.h
 
 
 
@@ -78,7 +79,8 @@ SOURCES += dlgcsvparameters.cpp \
     confocor3tools.cpp \
     flex_sin_tools.cpp \
     alv7000tools.cpp \
-    ../base_classes/qf3correlationdataformattool.cpp
+    ../base_classes/qf3correlationdataformattool.cpp \
+    qfrdrfcsparserfunctions.cpp
 
 
 

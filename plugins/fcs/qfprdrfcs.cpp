@@ -85,6 +85,27 @@ void QFPRDRFCS::init()
     connect(actOffset, SIGNAL(triggered()), this, SLOT(correctOffset()));
     tmenu->addAction(actOffset);
     services->registerWizard("project_wizards", tr("FCS Wizard"), QIcon(getIconFilename()), this, SLOT(startFCSProjectWizard()));
+
+
+
+
+    QFPluginServices::getInstance()->appendOrAddHTMLReplacement("qfmathparser_ref", QString("$$insert:%1/parserref.inc$$").arg(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())));
+    QStringList sl=QFPluginServices::getInstance()->getGlobalConfigValue("QFMathParser_ref").toStringList();
+    sl.append(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
+    QFPluginServices::getInstance()->setGlobalConfigValue("QFMathParser_ref", sl);
+    QFPluginServices::getInstance()->addQFMathParserRefernceDir(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
+
+
+    QFMathParser::addGlobalFunction("rdr_isfcs", fRDR_isfcs);
+    QFMathParser::addGlobalFunction("rdr_issimplecountrate", fRDR_issimplecountrate);
+    QFMathParser::addGlobalFunction("fcs_correlation", fFCS_correlation);
+    QFMathParser::addGlobalFunction("fcs_correlationerror", fFCS_correlationerror);
+    QFMathParser::addGlobalFunction("fcs_meancorrelation", fFCS_meancorrelation);
+    QFMathParser::addGlobalFunction("fcs_meancorrelationerror", fFCS_meancorrelationerror);
+    QFMathParser::addGlobalFunction("fcs_tau", fFCS_tau);
+    QFMathParser::addGlobalFunction("fcs_runs", fFCS_runs);
+
+
 }
 
 void QFPRDRFCS::setBackgroundInFCS(const QVector<double> &backgrounds, const QVector<double> &background_sds, const QVector<bool> &background_set)

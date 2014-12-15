@@ -43,9 +43,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qftools.h"
 #include "csvtools.h"
 #include "qfrdrfcsfitfunctionsimulator.h"
-#include "qfrdrrunselection.h"
 #include "qfrdrsimplecountrateinterface.h"
+#include "qfrdrrunselection.h"
 #include "qfrdrrunselectiontools.h"
+#include "qfrdrfcsparserfunctions.h"
 
 
 /*! \brief manages a FCS dataset (set of correlation curves with multiple runs)

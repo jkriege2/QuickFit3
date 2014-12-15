@@ -1,0 +1,57 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>FCS Online-Help: Expression parser: FCS data access</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  <h2>Check for FCS RDR</h2>
+  $$funcref_start$$<a name="rdr_isfcs"/><!-- func:rdr_isfcs -->
+    <b><tt><!-- template -->rdr_isfcs(rdrid)<!-- /template --></tt> - <i> returns <tt>true</tt> is the given raw data record (RDR) in the current project is an FCS record</i>:</b>
+  $$funcref_description$$
+        <!-- /func:rdr_isfcs -->
+  $$funcref_end$$
+  
+  <h2>FCS data access</h2>
+  
+    <b><tt><!-- template -->fcs_runs(rdr_id)<!-- /template --></tt> - <i> returns the number of runs of correlation datain the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:fcs_runs -->
+   $$funcref_end$$
+  
+  $$funcref_start$$<a name="fcs_tau"/><!-- func:fcs_tau -->
+    <b><tt><!-- template -->fcs_tau(rdr_id)<!-- /template --></tt> - <i> returns the lag-time vector (double-vector) of the FCS data in the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:fcs_tau -->
+   $$funcref_end$$
+  
+  $$funcref_start$$<a name="fcs_meancorrelation"/><!-- func:fcs_meancorrelation -->
+    <b><tt><!-- template -->fcs_meancorrelation(rdr_id)<!-- /template --></tt> - <i> returns average (mean) correlation curve over all non-masked curves in the specified FCS raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:fcs_meancorrelation -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="fcs_meancorrelationerror"/><!-- func:fcs_meancorrelationerror -->
+    <b><tt><!-- template -->fcs_meancorrelationerror(rdr_id)<!-- /template --></tt> - <i> returns standard deviation curve over all non-masked curves in the specified FCS  raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:fcs_meancorrelationerror -->
+  $$funcref_end$$
+  
+    
+  $$funcref_start$$<a name="fcs_correlation"/><!-- func:fcs_correlation -->
+    <b><tt><!-- template -->fcs_correlation(rdr_id, run)<!-- /template --></tt> - <i> returns correlation curve of the given run in the specified FCS  raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:fcs_correlation -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="fcs_correlationerror"/><!-- func:fcs_correlationerror -->
+    <b><tt><!-- template -->fcs_correlationerror(rdr_id, run)<!-- /template --></tt> - <i> returns correlation error curve (if available) of the given run in the specified FCS  raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:fcs_correlationerror -->
+  $$funcref_end$$
+
+  </body>
+  </html>
+  
