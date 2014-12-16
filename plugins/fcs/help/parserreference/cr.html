@@ -1,0 +1,59 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>FCS Online-Help: Expression parser: CR (count rate) data access</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  <h2>Check for CR RDR</h2>
+  $$funcref_start$$<a name="rdr_isscr"/><!-- func:rdr_isscr -->
+    <b><tt><!-- template -->rdr_isscr(rdrid)<!-- /template --></tt> - <i> returns <tt>true</tt> is the given raw data record (RDR) in the current project is a count rate (CR) record</i>:</b>
+  $$funcref_description$$
+        <!-- /func:rdr_isscr -->
+  $$funcref_end$$
+  
+  <h2>CR data access</h2>
+  
+   $$funcref_start$$<a name="cr_runs"/><!-- func:cr_runs -->
+   <b><tt><!-- template -->cr_runs(rdr_id)<!-- /template --></tt> - <i> returns the number of runs of count-rate data in the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:cr_runs -->
+   $$funcref_end$$
+  
+   $$funcref_start$$<a name="cr_channels"/><!-- func:cr_channels -->
+   <b><tt><!-- template -->cr_channels(rdr_id)<!-- /template --></tt> - <i> returns the number of channels of count-rate data in the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:cr_channels -->
+   $$funcref_end$$
+  
+  $$funcref_start$$<a name="cr_time"/><!-- func:cr_time -->
+    <b><tt><!-- template -->cr_time(rdr_id)<!-- /template --></tt> - <i> returns acquisition time vector (in seconds) for the given raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:cr_time -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="cr_rate"/><!-- func:cr_std -->
+    <b><tt><!-- template -->cr_rate(rdr_id, run, channel)<!-- /template --> / <!-- template -->cr_rate(rdr_id, run)<!-- /template --> / <!-- template -->cr_rate(rdr_id)<!-- /template --></tt> - <i> returns the count rate data vector (in kHz) for the specified run (default: 0) and channel (default: 0) in the given raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        <!-- /func:cr_std -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="cr_mean"/><!-- func:cr_mean -->
+    <b><tt><!-- template -->cr_mean(rdr_id, run, channel)<!-- /template --> / <!-- template -->cr_mean(rdr_id, run)<!-- /template --> / <!-- template -->cr_mean(rdr_id)<!-- /template --></tt> - <i> returns average (mean) count rate (in kHz) for the specified run (default: -1) and channel (default: 0) in the given raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+      The <tt>run</tt> -1 is the average count-rate over all non-masked runs in the record.
+        <!-- /func:cr_mean -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="cr_std"/><!-- func:cr_std -->
+    <b><tt><!-- template -->cr_std(rdr_id, run, channel)<!-- /template --> / <!-- template -->cr_std(rdr_id, run)<!-- /template --> / <!-- template -->cr_std(rdr_id)<!-- /template --></tt> - <i> returns standard deviation of the count rate (in kHz) for the specified run (default: -1) and channel (default: 0) in the given raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+      The <tt>run</tt> -1 is the average count-rate over all non-masked runs in the record.
+        <!-- /func:cr_std -->
+  $$funcref_end$$
+  
+  </body>
+  </html>
+  

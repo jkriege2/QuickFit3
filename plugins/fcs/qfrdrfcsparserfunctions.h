@@ -26,13 +26,25 @@
 #include "qfmathparser.h"
 
 void fRDR_isfcs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
-void fRDR_issimplecountrate(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
-
 void fFCS_correlation(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
 void fFCS_correlationerror(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
 void fFCS_meancorrelation(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
 void fFCS_meancorrelationerror(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
 void fFCS_tau(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
 void fFCS_runs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+
+void fRDR_issimplecountrate(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+void fSCR_channels(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+void fSCR_runs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+void fSCR_mean(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+void fSCR_std(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+
+void fRDR_iscountrate(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+void fCR_rate(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+void fCR_time(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+void fCR_runs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+void fCR_channels(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+void fCR_mean(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+void fCR_std(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
 
 #endif // QFRDRFCSPARSERFUNCTIONS_H

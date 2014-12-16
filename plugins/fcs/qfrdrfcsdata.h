@@ -283,6 +283,8 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         virtual double getSimpleCountrateStdDev(int run=-1, int channel=0, bool swapChannels=false) const;
         /** \copydoc QFRDRSimpleCountRatesInterface::getSimpleCountrateChannels() */
         virtual int getSimpleCountrateChannels() const;
+        /** \copydoc QFRDRSimpleCountRatesInterface::getSimpleCountrateRuns() */
+        virtual int getSimpleCountrateRuns() const;
 
     protected:
         /** \brief write the contents of the object to a XML file */

@@ -37,6 +37,8 @@ class QFRDRSimpleCountRatesInterface {
         virtual double getSimpleCountrateStdDev(int run=-1, int channel=0, bool swapChannels=false) const=0;
         /** \brief returns the number of countrate channels */
         virtual int getSimpleCountrateChannels() const=0;
+        /** \brief returns the number of countrate channels */
+        virtual int getSimpleCountrateRuns() const=0;
 };
 
 Q_DECLARE_INTERFACE( QFRDRSimpleCountRatesInterface,

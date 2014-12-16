@@ -527,6 +527,8 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         virtual double getSimpleCountrateStdDev(int run=-1, int channel=0, bool swapChannels=false) const ;
         /** \copydoc QFRDRSimpleCountRatesInterface::getSimpleCountrateChannels() */
         virtual int getSimpleCountrateChannels() const ;
+        /** \copydoc QFRDRSimpleCountRatesInterface::getSimpleCountrateRuns() */
+        virtual int getSimpleCountrateRuns() const ;
 
 };
 

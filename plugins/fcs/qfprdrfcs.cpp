@@ -97,7 +97,6 @@ void QFPRDRFCS::init()
 
 
     QFMathParser::addGlobalFunction("rdr_isfcs", fRDR_isfcs);
-    QFMathParser::addGlobalFunction("rdr_issimplecountrate", fRDR_issimplecountrate);
     QFMathParser::addGlobalFunction("fcs_correlation", fFCS_correlation);
     QFMathParser::addGlobalFunction("fcs_correlationerror", fFCS_correlationerror);
     QFMathParser::addGlobalFunction("fcs_meancorrelation", fFCS_meancorrelation);
@@ -105,6 +104,21 @@ void QFPRDRFCS::init()
     QFMathParser::addGlobalFunction("fcs_tau", fFCS_tau);
     QFMathParser::addGlobalFunction("fcs_runs", fFCS_runs);
 
+    QFMathParser::addGlobalFunction("rdr_issimplecountrate", fRDR_issimplecountrate);
+    QFMathParser::addGlobalFunction("rdr_isscr", fRDR_issimplecountrate);
+    QFMathParser::addGlobalFunction("scr_channels", fSCR_channels);
+    QFMathParser::addGlobalFunction("scr_runs", fSCR_runs);
+    QFMathParser::addGlobalFunction("scr_mean", fSCR_mean);
+    QFMathParser::addGlobalFunction("scr_std", fSCR_std);
+
+    QFMathParser::addGlobalFunction("rdr_iscountrate", fRDR_iscountrate);
+    QFMathParser::addGlobalFunction("rdr_iscr", fRDR_iscountrate);
+    QFMathParser::addGlobalFunction("cr_channels", fCR_channels);
+    QFMathParser::addGlobalFunction("cr_runs", fCR_runs);
+    QFMathParser::addGlobalFunction("cr_mean", fCR_mean);
+    QFMathParser::addGlobalFunction("cr_std", fCR_std);
+    QFMathParser::addGlobalFunction("cr_time", fCR_time);
+    QFMathParser::addGlobalFunction("cr_rate", fCR_rate);
 
 }
 

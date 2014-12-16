@@ -2652,6 +2652,11 @@ int QFRDRImagingFCSData::getSimpleCountrateChannels() const
     return getImageFromRunsChannels();
 }
 
+int QFRDRImagingFCSData::getSimpleCountrateRuns() const
+{
+    return getImageFromRunsWidth()*getImageFromRunsHeight();
+}
+
 
 
 
