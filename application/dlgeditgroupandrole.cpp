@@ -24,7 +24,6 @@ DlgEditGroupAndRole::DlgEditGroupAndRole(QFProject *project, QWidget *parent) :
 
     }
     connect(ui->tableView->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)), this, SLOT(selChanged()));
-    connect(ui->cmbGroup, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
 }
 
 DlgEditGroupAndRole::~DlgEditGroupAndRole()
@@ -100,7 +99,7 @@ void DlgEditGroupAndRole::currentIndexChanged(int index)
 {
     QComboBox* cmb=qobject_cast<QComboBox*>(sender());
     if (cmb&&project) {
-        if (index==cmb->count()-1) {
+        if (index>=0 && index==cmb->count()-1) {
             bool ok=false;
             disconnect(cmb, SIGNAL(currentIndexChanged(int)), this, SLOT(currentIndexChanged(int)));
             QString newgroup=QInputDialog::getItem(cmb, tr("new group"), tr("name of new group:"), project->getRDRGroupNames(), -1, true, &ok);
