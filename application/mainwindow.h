@@ -416,6 +416,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
 
         void setProjectSortOrder(QAction* act);
         void setProjectSortOrderActions(int order);
+
+        void editGroupAndRole();
     private:
         bool clipboardContainsProjectXML() const;
 
@@ -519,6 +521,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         QAction* helpOpenWebpageAct;
         QAction* actCheckUpdate;
         QAction* helpWelcomeScreenAct;
+        QAction* actEditGroupAndRole;
 
 
         QAction* actUserFitfunctionsEditor;

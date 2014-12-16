@@ -45,6 +45,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qftcspcreader.h"
 #include "dlgwelcomescreen.h"
 #include "qfhelpaction.h"
+#include "dlgeditgroupandrole.h"
 
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
@@ -1532,6 +1533,8 @@ void MainWindow::createActions() {
     connect(actSetRDRPropertyByRegExp, SIGNAL(triggered()), this, SLOT(setRDRPropertyByRegExp()));
     actSetRDRPropertyByExpression=new QAction(tr("caluclate RDR property"), this);
     connect(actSetRDRPropertyByExpression, SIGNAL(triggered()), this, SLOT(setRDRPropertyByExpression()));
+    actEditGroupAndRole=new QAction(tr("edit groups and roles"), this);
+    connect(actEditGroupAndRole, SIGNAL(triggered()), this, SLOT(editGroupAndRole()));
 
     actUserFitfunctionsEditor=new QAction(QIcon(":/lib/edit_fitfunction.png"), tr("edit user fit functions"), this);
     connect(actUserFitfunctionsEditor, SIGNAL(triggered()), this, SLOT(editUserFitFunctions()));
@@ -1606,11 +1609,14 @@ void MainWindow::createMenus() {
     projectToolsMenu->addAction(actRDRSetProperty);
     projectToolsMenu->addSeparator();
     projectToolsMenu->addAction(actRenameGroups);
+    projectToolsMenu->addAction(actEditGroupAndRole);
     projectToolsMenu->addSeparator();
     projectToolsMenu->addAction(actSetRDRPropertyByExpression);
     projectToolsMenu->addAction(actSetRDRPropertyByRegExp);
     projectToolsMenu->addSeparator();
     projectToolsMenu->addAction(actFixFilesPathes);
+
+
     debugToolsMenu=toolsMenu->addMenu(tr("&Debug Tools"));
     debugToolsMenu->addAction(actPerformanceTest);
     toolsMenu->addSeparator();
@@ -2652,6 +2658,7 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     actRDRReplace->setEnabled(projectModeEnabled);
     actUserFitfunctionsEditor->setEnabled(projectModeEnabled);
     actRDRUndoReplace->setEnabled(projectModeEnabled);
+    actEditGroupAndRole->setEnabled(projectModeEnabled);
     actPerformanceTest->setEnabled(projectModeEnabled);
     actRDRSetProperty->setEnabled(projectModeEnabled);
     actFixFilesPathes->setEnabled(projectModeEnabled);
@@ -3921,6 +3928,15 @@ void MainWindow::setProjectSortOrderActions(int order)
     QList<QAction*> actsProjectSort=actsSort->actions();
     if (project && order>=0 && order<actsProjectSort.size()) {
         actsProjectSort[order]->setChecked(true);
+    }
+}
+
+void MainWindow::editGroupAndRole()
+{
+    if (project) {
+        DlgEditGroupAndRole* dlg=new DlgEditGroupAndRole(project, this);
+        dlg->exec();
+        delete dlg;
     }
 }
 
