@@ -182,6 +182,9 @@ class QFLIB_EXPORT QFProject : public QObject, public QFProperties {
         /** \brief return the file name  */
         QString getFile()const;
 
+        /** \brief returns a list of all folders, used for RDRs in this project */
+        QStringList getRDRFolders() const;
+
 
         /** \brief returns the name of the given group */
         QString getRDRGroupName(int group) const;

@@ -172,6 +172,8 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
         QAction* actCopyEvaluationID;
         QAction* actCopyResultID;
         QAction* actCopyResultAccessParserFunction;
+        QAction* actCopyResultAccessParserFunctionTable;
+
 
         QAction* actHelp;
         QAction* actHelpPlugin;
@@ -249,6 +251,7 @@ class QFEvaluationPropertyEditorPrivate : public QObject {
         void copyEvaluationID();
         void copyResultID();
         void copyResultAccessParserFunction();
+        void copyResultAccessParserFunctionTable();
 
 
         void filterFilesTextChanged(const QString &text);

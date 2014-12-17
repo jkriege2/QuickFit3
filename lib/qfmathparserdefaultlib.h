@@ -526,6 +526,13 @@ namespace QFMathParser_DefaultLib {
     void fRDR_imageselectionfirstofname(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
     void fRDR_imageselection(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
 
+    void fRDR_isrunex(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+    void fRDR_runex_runs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_runex_isexcluded(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_runex_excluded(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_runex_included(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+    void fRDR_runex_mask(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *p);
+
     void fFitFunctionParameters(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionIsFit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
     void fFitFunctionInit(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);

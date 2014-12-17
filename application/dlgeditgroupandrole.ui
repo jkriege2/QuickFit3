@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Edit Groups &amp; Roles</string>
+   <string>Edit Groups, Roles &amp; Folders</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -35,39 +35,65 @@
      <property name="title">
       <string>set in selected RDRs</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,1,0,0,0">
-      <item>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="edtFolder">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
        <widget class="QCheckBox" name="chkGroup">
         <property name="text">
          <string>group:</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="1">
        <widget class="QComboBox" name="cmbGroup">
         <property name="enabled">
          <bool>false</bool>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="2" rowspan="3">
+       <widget class="QPushButton" name="btnSetSelected">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>&amp;Set</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
        <widget class="QCheckBox" name="chkRole">
         <property name="text">
          <string>role:</string>
         </property>
        </widget>
       </item>
-      <item>
+      <item row="1" column="1">
        <widget class="QLineEdit" name="edtRole">
         <property name="enabled">
          <bool>false</bool>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QPushButton" name="btnSetSelected">
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="chkFolder">
         <property name="text">
-         <string>&amp;Set</string>
+         <string>folder:</string>
         </property>
        </widget>
       </item>
@@ -78,6 +104,13 @@
     <widget class="QCheckBox" name="chkAlwaysEditable">
      <property name="text">
       <string>role always editable</string>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="chkNameEditable">
+     <property name="text">
+      <string>RDR name editable</string>
      </property>
     </widget>
    </item>
@@ -161,12 +194,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>45</x>
-     <y>450</y>
+     <x>64</x>
+     <y>403</y>
     </hint>
     <hint type="destinationlabel">
-     <x>114</x>
-     <y>450</y>
+     <x>194</x>
+     <y>404</y>
     </hint>
    </hints>
   </connection>
@@ -177,12 +210,28 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>617</x>
-     <y>447</y>
+     <x>73</x>
+     <y>430</y>
     </hint>
     <hint type="destinationlabel">
-     <x>717</x>
-     <y>448</y>
+     <x>791</x>
+     <y>432</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkFolder</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtFolder</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>35</x>
+     <y>453</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>149</x>
+     <y>450</y>
     </hint>
    </hints>
   </connection>

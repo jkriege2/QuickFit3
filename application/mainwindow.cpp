@@ -1533,7 +1533,7 @@ void MainWindow::createActions() {
     connect(actSetRDRPropertyByRegExp, SIGNAL(triggered()), this, SLOT(setRDRPropertyByRegExp()));
     actSetRDRPropertyByExpression=new QAction(tr("caluclate RDR property"), this);
     connect(actSetRDRPropertyByExpression, SIGNAL(triggered()), this, SLOT(setRDRPropertyByExpression()));
-    actEditGroupAndRole=new QAction(tr("edit groups and roles"), this);
+    actEditGroupAndRole=new QAction(tr("edit groups, roles and folders"), this);
     connect(actEditGroupAndRole, SIGNAL(triggered()), this, SLOT(editGroupAndRole()));
 
     actUserFitfunctionsEditor=new QAction(QIcon(":/lib/edit_fitfunction.png"), tr("edit user fit functions"), this);

@@ -1,0 +1,68 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Data Table Online-Help: Expression parser: Access to excluded in RDRs in the current QuickFit Project</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  
+  $$startbox_note$$
+  $$RUNEX_EXPLANATION$$
+  $$endbox$$
+  
+  $$funcref_start$$<a name="rdr_isrunexclude"/><!-- func:rdr_isrunexclude -->
+    <b><tt><!-- template -->rdr_isrunexclude(rdrid)<!-- /template --></tt> - <i> returns <tt>true</tt> is the given raw data record (RDR) in the current project can be accessed with the <tt>runex_...()</tt> functions</i>:</b>
+  $$funcref_description$$
+         <small>$$RUNEX_EXPLANATION$$</small> 
+
+        <!-- /func:rdr_isrunexclude -->
+  $$funcref_end$$
+  
+  
+  $$funcref_start$$<a name="runex_runs"/><!-- func:runex_runs -->
+    <b><tt><!-- template -->runex_runs(rdrid)<!-- /template --></tt> - <i> returns the number of runs in the given raw data record </i>:</b>
+  $$funcref_description$$
+         <small>$$RUNEX_EXPLANATION$$</small> 
+        <!-- /func:runex_runs -->
+  $$funcref_end$$
+  
+  
+  $$funcref_start$$<a name="runex_isexcluded"/><!-- func:runex_isexcluded -->
+    <b><tt><!-- template -->runex_isexcluded(rdrid, run)<!-- /template --></tt> - <i> returns <tt>true</tt> is the given run was marked as excluded in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+ 	        <br><small>$$RUNEX_EXPLANATION$$</small> 
+
+        <!-- /func:runex_isexcluded -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="runex_excluded"/><!-- func:runex_excluded -->
+    <b><tt><!-- template -->runex_excluded(rdrid)<!-- /template --></tt> - <i> returns a list of the excluded runs (integer vector) in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+	        <br><small>$$RUNEX_EXPLANATION$$</small> 
+
+        <!-- /func:runex_excluded -->
+  $$funcref_end$$
+  
+ 
+  $$funcref_start$$<a name="runex_included"/><!-- func:runex_included -->
+    <b><tt><!-- template -->runex_included(rdrid)<!-- /template --></tt> - <i> returns a list of the non-excluded/included runs (integer vector) in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+	        <br><small>$$RUNEX_EXPLANATION$$</small> 
+
+        <!-- /func:runex_included -->
+  $$funcref_end$$
+  
+ 
+  $$funcref_start$$<a name="runex_mask"/><!-- func:runex_mask -->
+    <b><tt><!-- template -->runex_mask(rdrid)<!-- /template --></tt> - <i> returns a boolean vector with <a href="#runex_runs"><tt>runex_runs()</tt></a> entries, which are <tt>true, if the run is <b>excluded</b> and <tt>false</tt> if it is <b>not excluded</b> in the given raw data record (RDR) in the current project </i>:</b>
+  $$funcref_description$$
+	        <br><small>$$RUNEX_EXPLANATION$$</small> 
+
+        <!-- /func:runex_mask -->
+  $$funcref_end$$
+  
+  </body>
+  </html>
+  

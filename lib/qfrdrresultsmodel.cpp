@@ -21,6 +21,8 @@
 
 #include "qfrdrresultsmodel.h"
 #include "qfrawdatarecord.h"
+#include "qfrdrrunselection.h"
+#include "qfrdrimagemask.h"
 
 
 QFRDRResultsModel::QFRDRResultsModel(QObject* parent):
@@ -559,6 +561,19 @@ QVariant QFRDRResultsModel::data(const QModelIndex &index, int role) const {
                     } else if (r.type==QFRawDataRecord::qfrdreNumber || r.type==QFRawDataRecord::qfrdreNumberError || r.type==QFRawDataRecord::qfrdreInteger || r.type==QFRawDataRecord::qfrdreBoolean) {
                         return 0;
                     }
+                }
+            }
+        }
+
+    } else if ((role==MaskModeRole)) {
+        if (resNameI<lastResultNames.size()) {
+            if (resI<lastResultSets.size()) {
+                QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+                QFRDRImageMaskInterface* maskrdr=dynamic_cast<QFRDRImageMaskInterface*>(record);
+                if (record) {
+                    if (runsel) return 0;
+                    if (maskrdr) return 1;
+                    return -1;
                 }
             }
         }

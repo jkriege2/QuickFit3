@@ -655,6 +655,8 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     actCopyResultAccessParserFunction=new QAction( tr("Copy Result Access Parser Function rdr_getresult(...)"), d);
     menuCopyIDs->addAction(actCopyResultAccessParserFunction);;
 
+    actCopyResultAccessParserFunctionTable=new QAction( tr("Copy selected cells as table RDR with result access parser functions"), d);
+    //menuCopyIDs->addAction(actCopyResultAccessParserFunctionTable);;
 
     actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), d);
     tbResults->addAction(actSaveResults);
@@ -823,6 +825,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     connect(actCopyEvaluationID, SIGNAL(triggered()), this, SLOT(copyEvaluationID()));
     connect(actCopyResultID, SIGNAL(triggered()), this, SLOT(copyResultID()));
     connect(actCopyResultAccessParserFunction, SIGNAL(triggered()), this, SLOT(copyResultAccessParserFunction()));
+    connect(actCopyResultAccessParserFunctionTable, SIGNAL(triggered()), this, SLOT(copyResultAccessParserFunctionTable()));
 
     tabMain->addTab(widResults, tr("Evaluation &Results"));
 
@@ -1315,5 +1318,22 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunction()
         QClipboard* clp=QApplication::clipboard();
         QModelIndex c=tvResults->currentIndex();
         if (c.isValid()) clp->setText(QString("rdr_getresult(%1, \"%2\", \"%3\")").arg(tvResults->model()->data(c, QFEvaluationResultsModel::ResultIDRole).toInt()).arg(tvResults->model()->data(c, QFEvaluationResultsModel::EvalNameRole).toString()).arg(tvResults->model()->data(c, QFEvaluationResultsModel::ResultNameRole).toString()));
+    }
+}
+
+void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
+{
+    if (d->current) {
+        QClipboard* clp=QApplication::clipboard();
+        QModelIndexList l=tvResults->selectionModel()->selectedIndexes();
+
+        QList<QList<QVariant> > parserfuns;
+        QStringList colnames, rownames;
+        tvResults->getVariantDataTable(QFEvaluationResultsModel::ParserAccessFunction, parserfuns, colnames, rownames);
+
+        dataExpand(parserfuns, &colnames);
+        dataReduce(parserfuns, &colnames);
+
+        //if (c.isValid()) clp->setText(QString("rdr_getresult(%1, \"%2\", \"%3\")").arg(tvResults->model()->data(c, QFEvaluationResultsModel::ResultIDRole).toInt()).arg(tvResults->model()->data(c, QFEvaluationResultsModel::EvalNameRole).toString()).arg(tvResults->model()->data(c, QFEvaluationResultsModel::ResultNameRole).toString()));
     }
 }

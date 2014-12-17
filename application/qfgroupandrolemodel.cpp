@@ -7,6 +7,7 @@ QFGroupAndRoleModel::QFGroupAndRoleModel(QFProject *project, QObject *parent) :
     this->project=project;
     reset();
     roleAlwaysEditable=false;
+    nameEditable=false;
     connect(project, SIGNAL(structureChanged()), this, SLOT(projectDataChanged()));
     connect(project, SIGNAL(sortOrderChanged(int)), this, SLOT(projectDataChanged()));
 }
@@ -18,8 +19,9 @@ Qt::ItemFlags QFGroupAndRoleModel::flags(const QModelIndex &index) const
     if (project) {
         QFRawDataRecord* rdr=project->getRawDataByNum(row);
         if (rdr) {
-            if (col==0) {
-                return Qt::ItemIsSelectable|Qt::ItemIsEnabled;
+            if (col==0) { // name
+                if (nameEditable) return Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsEditable;
+                else return Qt::ItemIsSelectable|Qt::ItemIsEnabled;
 
             } else if (col==1) { // group
                 return Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsEditable;
@@ -27,6 +29,8 @@ Qt::ItemFlags QFGroupAndRoleModel::flags(const QModelIndex &index) const
             } else if (col==2) { // role
                 if (rdr->isRoleUserEditable() || roleAlwaysEditable) return Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsEditable;
                 else return Qt::ItemIsSelectable|Qt::ItemIsEnabled;
+            } else if (col==3) { // folder
+                return Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsEditable;
             }
         }
     }
@@ -63,6 +67,10 @@ QVariant QFGroupAndRoleModel::data(const QModelIndex &index, int role) const
                 if (role==Qt::EditRole || role==Qt::DisplayRole) {
                     return rdr->getRole();
                 }
+            } else if (col==3) {
+                if (role==Qt::EditRole || role==Qt::DisplayRole) {
+                    return rdr->getFolder();
+                }
             }
         }
     }
@@ -76,6 +84,7 @@ QVariant QFGroupAndRoleModel::headerData(int section, Qt::Orientation orientatio
             if (section==0) return tr("RDR");
             if (section==1) return tr("group");
             if (section==2) return tr("role");
+            if (section==3) return tr("folder");
         }
     }
     return QVariant();
@@ -88,7 +97,7 @@ int QFGroupAndRoleModel::rowCount(const QModelIndex &parent) const
 
 int QFGroupAndRoleModel::columnCount(const QModelIndex &parent) const
 {
-    return 3;
+    return 4;
 }
 
 bool QFGroupAndRoleModel::setData(const QModelIndex &index, const QVariant &value, int role)
@@ -116,6 +125,16 @@ bool QFGroupAndRoleModel::setData(const QModelIndex &index, const QVariant &valu
                         return true;
                     }
                 }
+            } else if (col==3) {
+                if (role==Qt::EditRole || role==Qt::DisplayRole) {
+                    rdr->setFolder(value.toString());
+                    return true;
+                }
+            }  else if (col==0 && nameEditable) {
+                if (role==Qt::EditRole || role==Qt::DisplayRole) {
+                    rdr->setName(value.toString());
+                    return true;
+                }
             }
         }
     }
@@ -126,6 +145,12 @@ void QFGroupAndRoleModel::setRoleAlwaysEditable(bool enabled)
 {
     roleAlwaysEditable=enabled;
     emit dataChanged(index(0, 2), index(rowCount()-1, 2));
+}
+
+void QFGroupAndRoleModel::setNameEditable(bool enabled)
+{
+    nameEditable=enabled;
+    emit dataChanged(index(0, 0), index(rowCount()-1, 0));
 }
 
 void QFGroupAndRoleModel::projectDataChanged()
@@ -177,6 +202,22 @@ QWidget *QFGroupAndRoleDelegate::createEditor(QWidget *parent, const QStyleOptio
                 cmb->setEditText(index.data().toString());
                 return cmb;
             }
+        } else if (col==3) {
+            QFRawDataRecord* rdr=project->getRawDataByNum(row);
+            if (rdr) {
+                QComboBox* cmb=new QComboBox(parent);
+                cmb->setEditable(true);
+                cmb->addItems(project->getRDRFolders());
+                cmb->setEditText(index.data().toString());
+                return cmb;
+            }
+        } else if (col==0) {
+            QFRawDataRecord* rdr=project->getRawDataByNum(row);
+            if (rdr) {
+                QLineEdit* cmb=new QLineEdit(parent);
+                cmb->setText(index.data().toString());
+                return cmb;
+            }
         }
     }
     return NULL;
@@ -185,6 +226,7 @@ QWidget *QFGroupAndRoleDelegate::createEditor(QWidget *parent, const QStyleOptio
 void QFGroupAndRoleDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     QComboBox* cmb=qobject_cast<QComboBox*>(editor);
+    QLineEdit* edt=qobject_cast<QLineEdit*>(editor);
     int col=index.column();
     int row=index.row();
     if (project&&cmb) {
@@ -194,6 +236,15 @@ void QFGroupAndRoleDelegate::setEditorData(QWidget *editor, const QModelIndex &i
                 cmb->setCurrentIndex(rdr->getGroup());
             } else if (col==2) {
                 cmb->setEditText(rdr->getRole());
+            } else if (col==3) {
+                cmb->setEditText(rdr->getFolder());
+            }
+        }
+    } else if (project&&edt) {
+        QFRawDataRecord* rdr=project->getRawDataByNum(row);
+        if (rdr) {
+            if (col==0) {
+                edt->setText(rdr->getName());
             }
         }
     }
@@ -202,6 +253,7 @@ void QFGroupAndRoleDelegate::setEditorData(QWidget *editor, const QModelIndex &i
 void QFGroupAndRoleDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
     QComboBox* cmb=qobject_cast<QComboBox*>(editor);
+    QLineEdit* edt=qobject_cast<QLineEdit*>(editor);
     int col=index.column();
     int row=index.row();
     if (project&&cmb) {
@@ -220,9 +272,19 @@ void QFGroupAndRoleDelegate::setModelData(QWidget *editor, QAbstractItemModel *m
                 model->setData(index, cmb->currentIndex());
             } else if (col==2) {
                 model->setData(index, cmb->currentText());
+            } else if (col==3) {
+                model->setData(index, cmb->currentText());
+            }
+        }
+    } else     if (project&&edt) {
+        QFRawDataRecord* rdr=project->getRawDataByNum(row);
+        if (rdr) {
+            if (col==0) {
+                model->setData(index, edt->text());
             }
         }
     }
+
 }
 
 void QFGroupAndRoleDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const

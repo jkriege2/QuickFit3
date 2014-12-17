@@ -35,6 +35,7 @@
 #  include "qfevaluationitem.h"
 #  include "qfrdrtableinterface.h"
 #  include "qfrdrimagemask.h"
+#  include "qfrdrrunselection.h"
 #  include "qfrdrimageselectioninterface.h"
 #  include "qfrdrimagetoruninterface.h"
 #  include "qffitfunction.h"
@@ -385,6 +386,16 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("mask_size", fRDR_masksize);
     p->addFunction("mask_image", fRDR_mask);
     p->addFunction("mask_get", fRDR_mask);
+
+    p->addFunction("rdr_isrunexclude", fRDR_isrunex);
+    p->addFunction("rdr_isrunex", fRDR_isrunex);
+    p->addFunction("runex_runs", fRDR_runex_runs);
+    p->addFunction("runex_isexcluded", fRDR_runex_isexcluded);
+    p->addFunction("runex_excluded", fRDR_runex_excluded);
+    p->addFunction("runex_included", fRDR_runex_included);
+    p->addFunction("runex_mask", fRDR_runex_mask);
+
+
 
     p->addFunction("rdr_isimageselection", fRDR_isimageselection);
     p->addFunction("imageselection_width", fRDR_imageselectionwidth);
@@ -4564,6 +4575,131 @@ namespace QFMathParser_DefaultLib {
 
 
 
+    void fRDR_isrunex(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if (n==1 && params[0].type==qfmpDouble) {
+                evalID=params[0].toInteger();
+                QFRDRRunSelectionsInterface* rdr=dynamic_cast<QFRDRRunSelectionsInterface*>(p->getRawDataByID(evalID));
+                res.setBoolean(rdr);
+            } else {
+                parser->qfmpError(QObject::tr("rdr_isrunexclude(rdrid) needs one integer arguments"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+
+    void fRDR_runex_runs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if ((n==1 && params[0].type==qfmpDouble)) {
+                evalID=params[0].toInteger();
+                QFRDRRunSelectionsInterface* rdr=dynamic_cast<QFRDRRunSelectionsInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDouble(rdr->leaveoutGetRunCount());
+                } else {
+                    res.setDouble(0);
+                }
+            } else {
+                parser->qfmpError(QObject::tr("runex_runs(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    };
+    void fRDR_runex_isexcluded(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if ((n==2 && params[0].type==qfmpDouble && params[1].type==qfmpDouble)) {
+                evalID=params[0].toInteger();
+                int run=evalID=params[1].toInteger();
+                QFRDRRunSelectionsInterface* rdr=dynamic_cast<QFRDRRunSelectionsInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setBoolean(rdr->leaveoutRun(run));
+                }
+            } else {
+                parser->qfmpError(QObject::tr("runex_isexcluded(rdrid, run) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    };
+    void fRDR_runex_excluded(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if ((n==1 && params[0].type==qfmpDouble)) {
+                evalID=params[0].toInteger();
+                QFRDRRunSelectionsInterface* rdr=dynamic_cast<QFRDRRunSelectionsInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDoubleVec();
+                    for (int i=0; i<rdr->leaveoutGetRunCount(); i++) {
+                        if (rdr->leaveoutRun(i)) res.numVec<<i;
+                    }
+                } else {
+                    res.setDoubleVec();
+                }
+            } else {
+                parser->qfmpError(QObject::tr("runex_included(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+    void fRDR_runex_included(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if ((n==1 && params[0].type==qfmpDouble)) {
+                evalID=params[0].toInteger();
+                QFRDRRunSelectionsInterface* rdr=dynamic_cast<QFRDRRunSelectionsInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setDoubleVec();
+                    for (int i=0; i<rdr->leaveoutGetRunCount(); i++) {
+                        if (!rdr->leaveoutRun(i)) res.numVec<<i;
+                    }
+                } else {
+                    res.setDoubleVec();
+                }
+            } else {
+                parser->qfmpError(QObject::tr("runex_included(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
+    void fRDR_runex_mask(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
+        res.setInvalid();
+        QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
+        if (p)  {
+            int evalID=-1;
+            if ((n==1 && params[0].type==qfmpDouble)) {
+                evalID=params[0].toInteger();
+                QFRDRRunSelectionsInterface* rdr=dynamic_cast<QFRDRRunSelectionsInterface*>(p->getRawDataByID(evalID));
+                if (rdr) {
+                    res.setBoolVec(rdr->leaveoutGetRunCount());
+                    for (int i=0; i<rdr->leaveoutGetRunCount(); i++) {
+                        res.boolVec[i]=rdr->leaveoutRun(i);
+                    }
+                } else {
+                    res.setBoolVec();
+                }
+            } else {
+                parser->qfmpError(QObject::tr("runex_mask(rdrid) needs one integer argument"));
+                res.setInvalid();
+                return;
+            }
+        }
+    }
 
 
 

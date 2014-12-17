@@ -28,6 +28,7 @@
 #include <stdint.h>
 #include <QString>
 #include <QList>
+#include <QVector>
 
 /*! \brief represents a pixel mask (e.g. a mask marking broken pixels)
     \ingroup qf3rdrdp_imaging_fcs
@@ -55,6 +56,20 @@ class QFRDRImageMaskInterface {
         virtual void maskMaskChangedEvent()=0;
 
 };
+
+
+
+inline QVector<bool> QFRDRImageMaskInterface_getMaskAsBoolVec(QFRDRImageMaskInterface* rs) {
+    QVector<bool> b;
+    if (rs) {
+        uint32_t count=rs->maskGetWidth()*rs->maskGetHeight();
+        const bool* mask=rs->maskGet();
+        for (uint32_t i=0; i<count; i++) {
+            b.append(!mask[i]);
+        }
+    }
+    return b;
+}
 
 Q_DECLARE_INTERFACE( QFRDRImageMaskInterface,
                      "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRImageMaskInterface/1.0")

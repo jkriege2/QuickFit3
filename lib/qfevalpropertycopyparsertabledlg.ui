@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>QFEvalPropertyCopyParsertableDlg</class>
+ <widget class="QDialog" name="QFEvalPropertyCopyParsertableDlg">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>426</width>
+    <height>275</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Copy data as table RDR with expressions</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QFormLayout" name="formLayout">
+     <item row="1" column="0">
+      <widget class="QLabel" name="label">
+       <property name="text">
+        <string>statistics for data column:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QComboBox" name="cmbDataStat">
+       <item>
+        <property name="text">
+         <string>mean</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>std</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>median</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>variance</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>quantile, 25%</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>quantile 75%</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QLabel" name="label_2">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>statistics for error column:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="1">
+      <widget class="QComboBox" name="cmbErrorStat">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="currentIndex">
+        <number>1</number>
+       </property>
+       <item>
+        <property name="text">
+         <string>mean</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>std</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>median</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>variance</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>quantile, 25%</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>quantile 75%</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>mean of errors (if available)</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>median of errors (if available)</string>
+        </property>
+       </item>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <widget class="QCheckBox" name="chkCopyErrors">
+       <property name="text">
+        <string>copy also errors</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>QFEvalPropertyCopyParsertableDlg</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>QFEvalPropertyCopyParsertableDlg</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkCopyErrors</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_2</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>171</x>
+     <y>19</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>92</x>
+     <y>72</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkCopyErrors</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>cmbErrorStat</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>268</x>
+     <y>23</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>267</x>
+     <y>75</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

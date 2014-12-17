@@ -13,6 +13,7 @@ DlgEditGroupAndRole::DlgEditGroupAndRole(QFProject *project, QWidget *parent) :
     QFGroupAndRoleModel* m;
     ui->tableView->setModel(m=new QFGroupAndRoleModel(project, this));
     connect(ui->chkAlwaysEditable, SIGNAL(toggled(bool)), m, SLOT(setRoleAlwaysEditable(bool)));
+    connect(ui->chkNameEditable, SIGNAL(toggled(bool)), m, SLOT(setNameEditable(bool)));
     ui->tableView->setItemDelegate(new QFGroupAndRoleDelegate(project, this));
     ui->tableView->resizeColumnsToContents();
     ui->tableView->horizontalHeader()->setMinimumSectionSize(120);
@@ -58,6 +59,14 @@ void DlgEditGroupAndRole::on_btnSetSelected_clicked()
             QFRawDataRecord* rdr=project->getRawDataByNum(l[i].row());
             if (rdr && (rdr->isRoleUserEditable() || ui->chkAlwaysEditable->isChecked())) {
                 rdr->setRole(ui->edtRole->text());
+            }
+        }
+    }
+    if (ui->chkFolder->isChecked()) {
+        for (int i=0; i<l.size(); i++) {
+            QFRawDataRecord* rdr=project->getRawDataByNum(l[i].row());
+            if (rdr) {
+                rdr->setFolder(ui->edtFolder->text());
             }
         }
     }

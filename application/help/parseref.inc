@@ -53,6 +53,7 @@
     <li><b><a href="$$mainhelpdir$$/parserreference/table_access.html">access to table RDRs in the current QuickFit project</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/runimage_access.html">access to FCS/imFCS/... overview images in RDRs</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/imagemask_access.html">access to image masks in RDRs</a></b></li>
+    <li><b><a href="$$mainhelpdir$$/parserreference/runexclude_access.html">access to excluded runs in RDRs</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/runselection_access.html">access to stored image selections in RDRs</a></b></li>
 </ul></li>
 <li><b>Functions From Plugins</b>:<ul>

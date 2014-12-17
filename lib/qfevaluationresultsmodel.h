@@ -69,7 +69,9 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
             ResultIDRole=Qt::UserRole+9,   /**< returns the ID (numeric) of the QFRawDataRecord, the result is stored in, or -1 */
             MedianRole=Qt::UserRole+10,    /**< same as AvgRole, but returns the median  */
             Quantile25Role=Qt::UserRole+11,/**< same as AvgRole, but returns the 25% quantile  */
-            Quantile75Role=Qt::UserRole+12 /**< same as AvgRole, but returns the 75% quantile  */
+            Quantile75Role=Qt::UserRole+12, /**< same as AvgRole, but returns the 75% quantile  */
+            MaskModeRole=Qt::UserRole+13, /**< -1: none, 0: QFRDRRunSelectionsInterface, 1: QFRDRImageMaskInterface  */
+            ParserAccessFunction=Qt::UserRole+14, /**< returns an expression parser access function  */
         };
 
 

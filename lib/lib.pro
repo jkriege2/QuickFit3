@@ -162,7 +162,8 @@ HEADERS += dlgnewproperty.h \
     qfrdrimageselectioninterface.h \
     qfthreadingtools.h \
     qfenhancedplaintextedit.h \
-    qffitfunctionbase.h
+    qffitfunctionbase.h \
+    qfevalpropertycopyparsertabledlg.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -262,7 +263,8 @@ SOURCES += dlgnewproperty.cpp \
     qftableservice.cpp \
     qfthreadingtools.cpp \
     qfenhancedplaintextedit.cpp \
-    qffitfunctionbase.cpp
+    qffitfunctionbase.cpp \
+    qfevalpropertycopyparsertabledlg.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \
@@ -270,7 +272,8 @@ FORMS +=   dlg_newproperty.ui \
     dlg_qffileeditdialog.ui \
     qfdlg_csvparameters.ui \
     qffitalgorithmerrorestimatemodewidget.ui \
-    qflistprogressdialog.ui
+    qflistprogressdialog.ui \
+    qfevalpropertycopyparsertabledlg.ui
 
 RESOURCES += lib.qrc
 

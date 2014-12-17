@@ -21,11 +21,13 @@ class QFGroupAndRoleModel : public QAbstractTableModel
 
     public slots:
         void setRoleAlwaysEditable(bool enabled);
+        void setNameEditable(bool enabled);
     protected slots:
         void projectDataChanged();
     protected:
         QFProject* project;
         bool roleAlwaysEditable;
+        bool nameEditable;
 
 };
 

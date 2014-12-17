@@ -23,6 +23,7 @@
 #include "qfevaluationitem.h"
 #include "qfproject.h"
 #include "qfrdrrunselection.h"
+#include "qfrdrimagemask.h"
 
 QFEvaluationResultsModel::QFEvaluationResultsModel(QObject* parent):
     QAbstractTableModel(parent)
@@ -35,10 +36,10 @@ QFEvaluationResultsModel::QFEvaluationResultsModel(QObject* parent):
     resultFilterRegExp=false;
     filesFilterRegExp=false;
     displayProperties.clear();
+    mindRunsForVectorStat=true;
     showVectorMatrixAvg=true;
     extractRuns=true;
     removeUnusedRuns=false;
-    mindRunsForVectorStat=true;
 }
 
 QFEvaluationResultsModel::~QFEvaluationResultsModel()
@@ -297,7 +298,7 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (extraID==0 && extractRuns && resI<lastResults.size()) { // return run column data
                 QString en=lastResults[resI].second;
                 int run=evaluation->getIndexFromEvaluationResultID(en);
-                if (role==Qt::DisplayRole || role==Qt::EditRole || role==ValueRole || (role==AvgRole) || (role==SumRole) || (role==MedianRole)) {
+                if (role==Qt::DisplayRole || role==Qt::EditRole || role==ValueRole || (role==AvgRole) || (role==SumRole) || (role==MedianRole) || (role==ParserAccessFunction)) {
                     return run;
                 } else if ((role==Qt::ToolTipRole)||(role==Qt::StatusTipRole)) {
                     return QVariant(tr("the results in this row belong to run %1").arg(run));
@@ -312,6 +313,16 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                     QString propname=displayProperties.value(propID, "");
                     if (record && !propname.isEmpty()) {
                         return record->getProperty(propname, QVariant());
+                    }
+                } else if (resI==lastResults.size()) {
+                    return QVariant();
+                }
+            } else if (role==ParserAccessFunction) {
+                if (resI<lastResults.size()) {
+                    QFRawDataRecord* record=lastResults[resI].first;
+                    QString propname=displayProperties.value(propID, "");
+                    if (record && !propname.isEmpty()) {
+                        return QString("rdr_getproperty(%1, \"%2\")").arg(record->getID()).arg(propname);
                     }
                 } else if (resI==lastResults.size()) {
                     return QVariant();
@@ -384,8 +395,11 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
                     QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+                    QFRDRImageMaskInterface* maskrdr=dynamic_cast<QFRDRImageMaskInterface*>(record);
                     QVector<bool> mask;
                     if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
+                    else if (maskrdr && mindRunsForVectorStat) mask=QFRDRImageMaskInterface_getMaskAsBoolVec(maskrdr);
+
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
@@ -417,9 +431,12 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRImageMaskInterface* maskrdr=dynamic_cast<QFRDRImageMaskInterface*>(record);
                     QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
                     QVector<bool> mask;
                     if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
+                    else if (maskrdr && mindRunsForVectorStat) mask=QFRDRImageMaskInterface_getMaskAsBoolVec(maskrdr);
+
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
@@ -439,9 +456,12 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRImageMaskInterface* maskrdr=dynamic_cast<QFRDRImageMaskInterface*>(record);
                     QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
                     QVector<bool> mask;
                     if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
+                    else if (maskrdr && mindRunsForVectorStat) mask=QFRDRImageMaskInterface_getMaskAsBoolVec(maskrdr);
+
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
@@ -463,9 +483,12 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRImageMaskInterface* maskrdr=dynamic_cast<QFRDRImageMaskInterface*>(record);
                     QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
                     QVector<bool> mask;
                     if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
+                    else if (maskrdr && mindRunsForVectorStat) mask=QFRDRImageMaskInterface_getMaskAsBoolVec(maskrdr);
+
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
@@ -488,9 +511,12 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRImageMaskInterface* maskrdr=dynamic_cast<QFRDRImageMaskInterface*>(record);
                     QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
                     QVector<bool> mask;
                     if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
+                    else if (maskrdr && mindRunsForVectorStat) mask=QFRDRImageMaskInterface_getMaskAsBoolVec(maskrdr);
+
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
@@ -512,9 +538,12 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRImageMaskInterface* maskrdr=dynamic_cast<QFRDRImageMaskInterface*>(record);
                     QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
                     QVector<bool> mask;
                     if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
+                    else if (maskrdr && mindRunsForVectorStat) mask=QFRDRImageMaskInterface_getMaskAsBoolVec(maskrdr);
+
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
@@ -536,9 +565,12 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRImageMaskInterface* maskrdr=dynamic_cast<QFRDRImageMaskInterface*>(record);
                     QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
                     QVector<bool> mask;
                     if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
+                    else if (maskrdr && mindRunsForVectorStat) mask=QFRDRImageMaskInterface_getMaskAsBoolVec(maskrdr);
+
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
@@ -560,9 +592,12 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRImageMaskInterface* maskrdr=dynamic_cast<QFRDRImageMaskInterface*>(record);
                     QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
                     QVector<bool> mask;
                     if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
+                    else if (maskrdr && mindRunsForVectorStat) mask=QFRDRImageMaskInterface_getMaskAsBoolVec(maskrdr);
+
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
@@ -585,8 +620,10 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                 if (resI<lastResults.size()) {
                     QFRawDataRecord* record=lastResults[resI].first;
                     QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+                    QFRDRImageMaskInterface* maskrdr=dynamic_cast<QFRDRImageMaskInterface*>(record);
                     QVector<bool> mask;
                     if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
+                    else if (maskrdr && mindRunsForVectorStat) mask=QFRDRImageMaskInterface_getMaskAsBoolVec(maskrdr);
                     QString en=lastResults[resI].second;
                     QString rname=lastResultNames[resnameID];
                     if (record) {
@@ -604,6 +641,46 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                     }
                 }
             }
+        } else if ((role==MaskModeRole)) {
+            if (resnameID<lastResultNames.size()) {
+                if (resI<lastResults.size()) {
+                    QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+                    QFRDRImageMaskInterface* maskrdr=dynamic_cast<QFRDRImageMaskInterface*>(record);
+                    if (record) {
+                        if (runsel) return 0;
+                        if (maskrdr) return 1;
+                        return -1;
+                    }
+                }
+            }
+        } else if ((role==ParserAccessFunction)) {
+            if (resnameID<lastResultNames.size()) {
+                if (resI<lastResults.size()) {
+                    QFRawDataRecord* record=lastResults[resI].first;
+                    QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+                    QFRDRImageMaskInterface* maskrdr=dynamic_cast<QFRDRImageMaskInterface*>(record);
+                    QVector<bool> mask;
+                    if (runsel && mindRunsForVectorStat) mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
+                    else if (maskrdr && mindRunsForVectorStat) mask=QFRDRImageMaskInterface_getMaskAsBoolVec(maskrdr);
+                    QString en=lastResults[resI].second;
+                    QString rname=lastResultNames[resnameID];
+                    if (record) {
+                        const QFRawDataRecord::evaluationResult& r=record->resultsGet(en, rname);
+                        if ((r.type==QFRawDataRecord::qfrdreNumberError) || (r.type==QFRawDataRecord::qfrdreNumberErrorVector)
+                            || (r.type==QFRawDataRecord::qfrdreNumberErrorMatrix) ) {
+                            QStringList l;
+                            l<<QString("rdr_getresult(%1, \"%2\", \"%3\")").arg(record->getID()).arg(en).arg(rname);
+                            l<<QString("rdr_getresulterror(%1, \"%2\", \"%3\")").arg(record->getID()).arg(en).arg(rname);
+                            return l;
+                        } else {
+                            return QString("rdr_getresult(%1, \"%2\", \"%3\")").arg(record->getID()).arg(en).arg(rname);
+                        }
+
+                    }
+                }
+            }
+
         } else if ((role==ValueRole)||(role==Qt::EditRole)) {
             if (resnameID<lastResultNames.size()) {
                 if (resI<lastResults.size()) {
@@ -668,6 +745,9 @@ void QFEvaluationResultsModel::calcStatistics(QString resultName, double& averag
     for (register int i=0; i<lastResults.size(); i++) {
         QFRawDataRecord* record=lastResults[i].first;
         QFRDRRunSelectionsInterface* runsel=dynamic_cast<QFRDRRunSelectionsInterface*>(record);
+        QFRDRImageMaskInterface* maskrdr=dynamic_cast<QFRDRImageMaskInterface*>(record);
+
+
         QString en=lastResults[i].second;
         if (record) {
             QFRawDataRecord::evaluationResultType t=record->resultsGetType(en, resultName);
@@ -678,6 +758,8 @@ void QFEvaluationResultsModel::calcStatistics(QString resultName, double& averag
                 QVector<bool> mask;
                 if (runsel && d.size()==runsel->leaveoutGetRunCount()) {
                     mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
+                } else if (maskrdr && d.size()==maskrdr->maskGetWidth()*maskrdr->maskGetHeight()) {
+                    mask=QFRDRImageMaskInterface_getMaskAsBoolVec(maskrdr);
                 }
                 if (mindRunsForVectorStat && mask.size()>=d.size()){
                     sum=sum+qfstatisticsMaskedSum(mask,d);

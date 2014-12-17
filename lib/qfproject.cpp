@@ -2076,6 +2076,22 @@ QString QFProject::getFile()const  {
     return file;
 }
 
+QStringList QFProject::getRDRFolders() const
+{
+    QFProjectReadLocker locker(p->lock);
+    QStringList l;
+    //if (group>=0 && group<rdrgroups.size()) {
+    for (int i=0; i<getRawDataCount(); i++) {
+        QFRawDataRecord* rdr=getRawDataByNum(i);
+        if (rdr) {
+            QString f=rdr->getFolder();
+            if (!l.contains(f)) l<<f;
+        }
+    }
+    qSort(l);
+    return l;
+}
+
 QString QFProject::getRDRGroupName(int group) const
 {
     QFProjectReadLocker locker(p->lock);
