@@ -33,6 +33,7 @@ QFFCSMSDEvaluationGetNFromFits::QFFCSMSDEvaluationGetNFromFits(QFRawDataRecord *
     ui->cmbApplyTo->setCurrentIndex(ProgramOptions::getConfigValue("QFFCSMSDEvaluationGetNFromFits/applyto", 0).toInt());
     ui->chkGetN->setChecked(ProgramOptions::getConfigValue("QFFCSMSDEvaluationGetNFromFits/getN", true).toBool());
     ui->chkGetTriplet->setChecked(ProgramOptions::getConfigValue("QFFCSMSDEvaluationGetNFromFits/getTriplet", true).toBool());
+    ui->chkGetFocus->setChecked(ProgramOptions::getConfigValue("QFFCSMSDEvaluationGetNFromFits/chkGetFocus", true).toBool());
 
     ui->cmbEval->setRDR(current);
 }
@@ -42,6 +43,7 @@ QFFCSMSDEvaluationGetNFromFits::~QFFCSMSDEvaluationGetNFromFits()
     ProgramOptions::setConfigValue("QFFCSMSDEvaluationGetNFromFits/applyto", getApplyTo());
     ProgramOptions::setConfigValue("QFFCSMSDEvaluationGetNFromFits/getN", getN());
     ProgramOptions::setConfigValue("QFFCSMSDEvaluationGetNFromFits/getTriplet", getTriplet());
+    ProgramOptions::setConfigValue("QFFCSMSDEvaluationGetNFromFits/chkGetFocus", getFocusParams());
     delete ui;
 }
 
@@ -70,6 +72,26 @@ QString QFFCSMSDEvaluationGetNFromFits::getParameterTripletTau() const
     return "fitparam_nonfl_tau1";
 }
 
+QString QFFCSMSDEvaluationGetNFromFits::getParameterWxy() const
+{
+    return "fitparam_focus_width";
+}
+
+QString QFFCSMSDEvaluationGetNFromFits::getParameterWz() const
+{
+    return "fitparam_focus_height";
+}
+
+QString QFFCSMSDEvaluationGetNFromFits::getParameterGamma() const
+{
+    return "fitparam_focus_struct_fac";
+}
+
+QString QFFCSMSDEvaluationGetNFromFits::getParameterPixelSize() const
+{
+    return "fitparam_pixel_width";
+}
+
 bool QFFCSMSDEvaluationGetNFromFits::getN() const
 {
     return ui->chkGetN->isChecked();
@@ -78,5 +100,10 @@ bool QFFCSMSDEvaluationGetNFromFits::getN() const
 bool QFFCSMSDEvaluationGetNFromFits::getTriplet() const
 {
     return ui->chkGetTriplet->isChecked();
+}
+
+bool QFFCSMSDEvaluationGetNFromFits::getFocusParams() const
+{
+    return ui->chkGetFocus->isChecked();
 }
 

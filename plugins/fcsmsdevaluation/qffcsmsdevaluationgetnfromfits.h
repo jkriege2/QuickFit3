@@ -42,8 +42,13 @@ class QFFCSMSDEvaluationGetNFromFits : public QDialog
         QString getParameterN() const;
         QString getParameterTripletTheta() const;
         QString getParameterTripletTau() const;
+        QString getParameterWxy() const;
+        QString getParameterWz() const;
+        QString getParameterGamma() const;
+        QString getParameterPixelSize() const;
         bool getN() const;
         bool getTriplet() const;
+        bool getFocusParams() const;
     private:
         Ui::QFFCSMSDEvaluationGetNFromFits *ui;
 };

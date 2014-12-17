@@ -1698,6 +1698,10 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
         QString readParamN=dlg->getParameterN();
         QString readParamTF=dlg->getParameterTripletTheta();
         QString readParamTTau=dlg->getParameterTripletTau();
+        QString readParamWxy=dlg->getParameterWxy();
+        QString readParamWz=dlg->getParameterWz();
+        QString readParamGamma=dlg->getParameterGamma();
+        QString readParamA=dlg->getParameterPixelSize();
         //qDebug()<<evalGroup<<readParam;
         QModernProgressDialog progress(tr("reading parameters from fit results ..."), tr("Cancel"), this);
         progress.show();
@@ -1713,6 +1717,10 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
             double N=-1;
             double tauT=-1;
             double thetaT=-1;
+            double wxy=-1;
+            double wz=-1;
+            double a=-1;
+            double gamma=-1;
 
 
             if (record) {
@@ -1723,6 +1731,10 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
                 bool hasTrip=false;
                 bool hasN=false;
                 bool hasTripT=false;
+                bool hasWxy=false;
+                bool hasWz=false;
+                bool hasA=false;
+                bool hasGamma=false;
                 for (int ei=0; ei<eval.size(); ei++) {
                     if (eval[ei].endsWith(runid)) {
                         if (! hasN && dlg->getN() && record->resultsExists(eval[ei], readParamN)) {
@@ -1749,27 +1761,45 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
                                 hasTrip=true;
                             }
                         }
+                        if (!hasWxy && dlg->getFocusParams() && record->resultsExists(eval[ei], readParamWxy)) {
+                            bool ok=false;
+                            double NN=record->resultsGetAsDouble(eval[ei], readParamWxy, &ok);
+                            if (ok) {
+                                wxy=NN;
+                                hasWxy=true;
+                            }
+                        }
+                        if (!hasWz && dlg->getFocusParams() && record->resultsExists(eval[ei], readParamWz)) {
+                            bool ok=false;
+                            double NN=record->resultsGetAsDouble(eval[ei], readParamWz, &ok);
+                            if (ok) {
+                                wz=NN;
+                                hasWz=true;
+                            }
+                        }
+                        if (!hasA && dlg->getFocusParams() && record->resultsExists(eval[ei], readParamA)) {
+                            bool ok=false;
+                            double NN=record->resultsGetAsDouble(eval[ei], readParamA, &ok);
+                            if (ok) {
+                                a=NN;
+                                hasA=true;
+                            }
+                        }
+                        if (!hasGamma && dlg->getFocusParams() && record->resultsExists(eval[ei], readParamGamma)) {
+                            bool ok=false;
+                            double NN=record->resultsGetAsDouble(eval[ei], readParamGamma, &ok);
+                            if (ok) {
+                                gamma=NN;
+                                hasGamma=true;
+                            }
+                        }
                     }
                 }
-                //qDebug()<<record->getName()<<" run="<<run<<":  N="<<N;
             }
 
 
 
-            /*for (int j=0; j<eval->getParameterCount(eval->getCurrentModel()); j++) {
-                QString pid=eval->getParameterID(eval->getCurrentModel(), j);
-                //qDebug()<<pid<<1.0/avg;
-                if (dlg->getN() && N>0 && pid=="n_particle") {
-                    if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, N);
-                    eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, N);
-                } else if (dlg->getTriplet() && thetaT>0 && pid=="nonfl_theta1") {
-                    if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, thetaT);
-                    eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, thetaT);
-                } else if (dlg->getTriplet() && tauT>0 && pid=="nonfl_tau1") {
-                    if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, tauT);
-                    eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, tauT);
-                }
-            }*/
+
             QString pid="n_particle";
             if (dlg->getN() && N>0) {
                 //if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, N);
@@ -1784,6 +1814,26 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
             if (dlg->getTriplet() && tauT>0) {
                 //if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, tauT);
                 eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, tauT);
+            }
+            pid="focus_width";
+            if (dlg->getFocusParams() && wxy>0) {
+                //if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, tauT);
+                eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, wxy);
+            }
+            pid="focus_height";
+            if (dlg->getFocusParams() && wz>0) {
+                //if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, tauT);
+                eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, wz);
+            }
+            pid="pixel_size";
+            if (dlg->getFocusParams() && a>0) {
+                //if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, tauT);
+                eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, a);
+            }
+            pid="focus_struct_fac";
+            if (dlg->getFocusParams() && gamma>0) {
+                //if (j==0) eval->setFitValue(record, run, eval->getCurrentModel(), pid, tauT);
+                eval->setFitResultValue(record, run, eval->getCurrentModel(), pid, gamma);
             }
             QApplication::processEvents();
             if (progress.wasCanceled()) break;
