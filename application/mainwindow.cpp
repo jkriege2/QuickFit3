@@ -164,6 +164,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     logFileMainWidget->log_header(tr("preparing online-help ..."));
     logFileMainWidget->inc_indent();
     parseFAQ(settings->getMainHelpDirectory()+"/faq.html", "quickfit", helpdata.faqs);
+    parseFAQ(settings->getMainHelpDirectory()+"/faq_parser.html", "parser/quickfit", helpdata.faqs);
 
 
     htmlReplaceList.append(qMakePair(QString("version.svnrevision"), QString(qfInfoSVNVersion()).trimmed()));
@@ -187,7 +188,8 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("plugin_list"), createPluginDoc(true)));
     htmlReplaceList.append(qMakePair(QString("pluginhelp_list"), createPluginDocHelp()));
     htmlReplaceList.append(qMakePair(QString("plugintutorials_list"), createPluginDocTutorials()));
-    htmlReplaceList.append(qMakePair(QString("faq_list"), createFAQ()));
+    htmlReplaceList.append(qMakePair(QString("faq_list"), createFAQ(false)));
+    htmlReplaceList.append(qMakePair(QString("faq_parser_list"), createFAQ(true)));
     htmlReplaceList.append(qMakePair(QString("pluginsettings_list"), createPluginDocSettings()));
     htmlReplaceList.append(qMakePair(QString("plugincopyright_list"), createPluginDocCopyrights()));
     htmlReplaceList.append(qMakePair(QString("maindir"), settings->getApplicationDirectory()));
@@ -212,7 +214,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end_notitle"), QString("</td></tr></table></td></tr></table>")));// </div>")));
 
 
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end"), tr("$$qf_commondoc_header.end_notitle$$ <font size=\"+1\"><h1 id=\"TITLE\"><!-- title -->$$title$$</h1>$$local_plugin_autostartdescription$$")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.end"), tr("$$qf_commondoc_header.end_notitle$$ <font size=\"+1\"><h1 id=\"TITLE\"><!-- title -->$$title$$</h1>$$local_plugin_autostartdescription$$$$local_plugin_parserfaq$$")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.separator"), QString(" | ")));
 
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.default_links"), tr("<a href=\"%1quickfit.html\">QuickFit</a> $$local_plugin_typehelp_link$$ $$local_plugin_mainhelp_link$$ $$local_plugin_tutorial_link$$ $$local_plugin_faq_link$$").arg(settings->getMainHelpDirectory())));
@@ -721,39 +723,55 @@ QString MainWindow::createPluginDoc(bool docLinks) {
     return text;
 }
 
-QString MainWindow::createFAQ()
+QString MainWindow::createFAQ(bool parser_only)
 {
     QString text="";
     QString textd="";
     int cnt=0;
-    QMapIterator<QString, QFFAQData> it(helpdata.faqs);
-    while (it.hasNext()) {
-        it.next();
-        QString faq="";
-        QString faqdir="";
-        QString faql="";
-        for (int i=0; i<it.value().size(); i++) {
-            QString q=it.value().at(i).question;
-            //QString a=it.value().at(i).answer;
-            QString l=it.value().at(i).link;
-            //qDebug()<<q<<l;
-            if (!q.isEmpty() && !l.isEmpty()) {
-                faql+=tr("<li><a href=\"%2\"><i>%1</i></a></li>").arg(q).arg(l);
-                //faqdir+=tr("<li><a href=\"#faq%2\"><i>%1</i></a></li>").arg(q).arg(cnt);
-                //faq+=tr("<li><a name=\"faq%3\"><i>%1</i><clockquote>%2</blockquote></li>").arg(q).arg(a).arg(cnt);
-                cnt++;
+    QList<int> secs;
+    if (parser_only) secs<<1;
+    else secs<<0<<1;
+    for (int si=0; si<secs.size(); si++) {
+        int sec=secs[si];
+        text="";
+        QMapIterator<QString, QFFAQData> it(helpdata.faqs);
+        while (it.hasNext()) {
+            it.next();
+            QString faq="";
+            QString faqdir="";
+            QString faql="";
+            for (int i=0; i<it.value().size(); i++) {
+                QString q=it.value().at(i).question;
+                QString l=it.value().at(i).link;
+                if (!q.isEmpty() && !l.isEmpty()) {
+                    faql+=tr("<li><a href=\"%2\"><i>%1</i></a></li>").arg(q).arg(l);
+                    cnt++;
+                }
+            }
+            if (sec==0) {
+                if (it.key()=="quickfit") {
+                    if (!faql.isEmpty()) text+=tr("<li><b>QuickFit $$version$$:</b><ul>%1</ul></li>").arg(faql);
+                } else if (!it.key().startsWith("parser/")) {
+                    if (!faql.isEmpty()) text+=tr("<li><b>%1:</b><ul>%2</ul></li>").arg(getPluginName(it.key())).arg(faql);
+                }
+            } else if (sec==1) {
+                if (it.key()=="parser/quickfit") {
+                    if (!faql.isEmpty()) text+=tr("<li><b>QuickFit $$version$$ Expression Parser:</b><ul>%1</ul></li>").arg(faql);
+                } else if (it.key().startsWith("parser/")) {
+                    if (!faql.isEmpty()) text+=tr("<li><b>%1:</b><ul>%2</ul></li>").arg(getPluginName(it.key().right(it.key().length()-QString("parser/").size()))).arg(faql);
+                }
             }
         }
-        if (it.key()=="quickfit") {
-            if (!faql.isEmpty()) text+=tr("<li><b>QuickFit $$version$$:</b><ul>%1</ul></li>").arg(faql);
-            //textd+=tr("<li><b>%1:</b><ul>%2</ul></li>").arg(getPluginName(it.key())).arg(faqdir);
-        } else {
-            if (!faql.isEmpty()) text+=tr("<li><b>%1:</b><ul>%2</ul></li>").arg(getPluginName(it.key())).arg(faql);
-            //textd+=tr("<li><b>%1:</b><ul>%2</ul></li>").arg(getPluginName(it.key())).arg(faqdir);
+        if (text.size()>0) {
+            if (sec==0) {
+                textd=textd+tr("<li><b>Generic/Plugin FAQ:</b><ul>%1</ul></li>").arg(text);
+            } else if (sec==1) {
+                textd=textd+tr("<li><b>Expression Parser FAQ:</b><ul>%1</ul></li>").arg(text);
+            }
         }
     }
     //return textd+tr("\n\n<hr>\n\n")+text;
-    return text;
+    return textd;
 }
 
 QString MainWindow::createPluginDocItem(bool docLink, QString id, QString name, QString description, QString iconfilename, QString author, QString copyright, QString weblink, QString file, int verMajor, int verMinor, QStringList additional) {
@@ -4313,6 +4331,12 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 if (!pluginList->at(i).faq.isEmpty()) {
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_faq_file"), pluginList->at(i).faq));
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_faq_link"), QObject::tr("$$qf_commondoc_header.separator$$  <a href=\"%1\"><b>Plugin FAQ</b></a>").arg(pluginList->at(i).faq)));
+                }
+                if (!pluginList->at(i).faq_parser.isEmpty()) {
+                    fromHTML_replaces.append(qMakePair(QString("local_plugin_faq_parser_file"), pluginList->at(i).faq_parser));
+                    if (QFileInfo(filename).fileName().toLower()=="faq.html"){
+                        fromHTML_replaces.append(qMakePair(QString("local_plugin_parserfaq"), tr("$$see:Also see the <a href=\"%1\">expression parser FAQ</a> for this plugin!$$").arg(pluginList->at(i).faq_parser)));
+                    }
                 }
                 if (!pluginList->at(i).mainhelp.isEmpty()) {
                     fromHTML_replaces.append(qMakePair(QString("local_plugin_mainhelp_file"), pluginList->at(i).mainhelp));

@@ -1,0 +1,20 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <title>FCS/DLS raw data record frequently asked questions: Expression parser</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	 
+$$faq_start$$
+  <a name="FAQ_PARSER_CORR"><b>How can I access the correlation curves from the internal expression parser, or the table plugin?</b>
+$$faq_answer$$
+  <p>The FCS plugin provides math parser functions, that allow to access the <a href="./parserreference/fcs.html">correlation curves</a> and the <a href="./parserreference/cr.html">countrate traces</a> of the FCS records in the project. Each FCS RDR contains a set of runs, with one correlation curve $(g_i=g(\tau_i))$ in each. The lag-time axis $(\tau_i)$ is the same for all these curves. You can access the curve with the methods <a href="./parserreference/fcs.html#fcs_tau"><tt>fcs_tau(rdr_id)</tt></a> for the lag times $(\tau_i)$ and <a href="./parserreference/fcs.html#fcs_correlation"><tt>fcs_correlation(rdr_id, run)</tt></a> for the correlation data $(g_i=g(\tau_i))$. In addition the average and standard dveiation correlation curve (over all non-excluded runs) is available via <a href="./parserreference/fcs.html#fcs_meancorrelation"><tt>fcs_meancorrelation(rdr_id)</tt></a> and <a href="./parserreference/fcs.html#fcs_meancorrelationerror"><tt>fcs_meancorrelationerror(rdr_id)</tt></a>.</p>
+  <p>The average/standard deviation countrate data (in kHz) can be accessed using <a href="./parserreference/fcs.html#cr_mean"><tt>cr_mean(rdr_id,run,channel)</tt></a> and  <a href="./parserreference/fcs.html#cr_std"><tt>cr_std(rdr_id,run,channel)</tt></a>. The functions <a href="./parserreference/fcs.html#cr_time"><tt>cr_time(rdr_id,run,channel)</tt></a> and  <a href="./parserreference/fcs.html#cr_rate"><tt>cr_rate(rdr_id,run,channel)</tt></a> allow for an access to the whole traces, if they are available in the record.</p>
+  <p>You can also access the list of used/non-used runs, by using the functions tp <a href="$$mainhelpdir$$/parserreference/runexclude_access.html">access to excluded runs in RDRs</a>.</p>
+  $$note:The functions for correlation curves are also applicable to imagingFCS records. $$
+$$faq_end$$
+	 
+  </body>
+</html>

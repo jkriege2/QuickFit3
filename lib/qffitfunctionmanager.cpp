@@ -199,11 +199,14 @@ void QFFitFunctionManager::searchPlugins(QString directory, QFPluginHelpData &he
                 info.tutorial=info.directory+QString("tutorial.html");
                 info.settings=info.directory+QString("settings.html");
                 info.faq=info.directory+QString("faq.html");
+                info.faq_parser=info.directory+QString("faq_parser.html");
                 if (!QFile::exists(info.mainhelp)) info.mainhelp="";
                 if (!QFile::exists(info.tutorial)) info.tutorial="";
                 if (!QFile::exists(info.settings)) info.settings="";
                 if (!QFile::exists(info.faq)) info.faq="";
+                if (!QFile::exists(info.faq_parser)) info.faq_parser="";
                 if (!info.faq.isEmpty()) parseFAQ(info.faq, iRecord->getID(), helpdata.faqs);
+                if (!info.faq_parser.isEmpty()) parseFAQ(info.faq_parser, QString("parser/")+iRecord->getID(), helpdata.faqs);
                 info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_fitfunc.html");
                 info.plugintypename=tr("Fit Function Plugins");
                 info.pluginDLLbasename=libbasename;

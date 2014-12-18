@@ -432,7 +432,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         bool maybeSave();
         //void updateRecentFileActions();
         QString createPluginDoc(bool docLinks=false);
-        QString createFAQ();
+        QString createFAQ(bool parser_only);
         QString createPluginDocTutorials(QString mainitem_before=QObject::tr("<h2>%1 Tutorials:</h2><ul>"), QString mainitem_after=QString("</ul>"));
         QList<QAction*> getPluginTutorials();
         QString createPluginDocSettings(QString mainitem_before=QObject::tr("<h2>%1 Settings:</h2><ul>"), QString mainitem_after=QString("</ul>"));

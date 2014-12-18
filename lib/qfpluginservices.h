@@ -101,6 +101,7 @@ struct QFLIB_EXPORT  QFHelpDirectoryInfo {
         QString settings;
         QString mainhelp;
         QString faq;
+        QString faq_parser;
         QString plugintypehelp;
         QString plugintypename;
         QString pluginDLLbasename;

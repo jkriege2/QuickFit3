@@ -1,0 +1,41 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+<head>
+<meta name="qrichtext" content="1" />
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<title>QuickFit $$version$$ Frequently asked questions (FAQ) for Expression Parser</title>
+</head>
+<body>
+$$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+
+$$faq_start$$
+  <a name="FAQ_LISTRDR"><b>How can I get a filtered list of RDR IDs?</b>
+$$faq_answer$$
+  This expreccion will return a list of all RDRs, that are within the group <tt>my_group_name</tt>:
+    $$codeexample:filterfor(rdr, rdr_ids(), rdr_getgroup(rdr)=="my_group_name")$$
+  If you want to filter for RDR types, you typically have a function like <tt>rdr_istable()</tt> to check, whether an RDR is a table. Then the above example can be reformulated as:
+    $$codeexample:filterfor(rdr, rdr_ids(), rdr_istable(rdr))$$
+$$faq_end$$
+
+$$faq_start$$
+  <a name="FAQ_FILTER_VECTOR"><b>How can I filter a vector with an arbitrary condition for each element?</b>
+$$faq_answer$$
+  The function <tt>filterfor(item, vector, condition)</tt> helps filtering vectors. It iterates over all entries in <tt>vector</tt> and evaluates <tt>condition</tt> for each element. The value of the element is stored in a variable <tt>item</tt>. Finally the function returns a vector, which only contains those elements, for which <tt>condition</tt> evaluated to <tt>true</tt>. Here is an example, which leaves only those elemenets in the vector, that are in the range of $(-0.5...0.5)$:
+    $$codeexample:filterfor(it, -1:0.1:1, (it&gt;=-0.5) && (it&lt;=0.5))$$
+$$faq_end$$
+
+$$faq_start$$
+  <a name="FAQ_BUILD_VECTOR"><b>How can I build up a vector?</b>
+$$faq_answer$$
+  Simple vectors can be built with the following syntax:
+    $$codeexample:a=[0,1,2,3];<br>b=["text1", "text2", "text3"];<br>c=1:10;<br>d=1:0.2:10$$
+  The cases <tt>a, b</tt> are vectors, where the elements are specified explicitly. The cases <tt>c, d</tt> are number vectors, which contain the numbers from 1 to 10 (inclusive), in the case <tt>c</tt> with a stepping of 1 and in the case of <tt>d</tt> with a stepping of 0.2.<br>
+  The function <tt>for(item, vector, expression)</tt> can be used in more complex cases. It iterates over all elements in the given vector and creates a vector by concatenating the results of <tt>expression</tt> for each entry in <tt>vector</tt>:
+    $$example:<tt>for(it, -1:0.2:1, (it&gt;=-0.5) && (it&lt;=0.5))</tt><br>evaluates to the boolean vector <tt>[ false, false, false, true, true, true, true, true, false, false, false ]</tt>$$
+    $$example:<tt>for(it, -1:0.2:1, num2str(it))</tt><br>evaluates to a string vector <tt>[ "-1", "-0.8", "-0.6", "-0.4", "-0.2", "-5.551115123e-17", "0.2", "0.4", "0.6", "0.8", "1" ]</tt>$$
+$$faq_end$$
+
+</body>
+</html>
+
