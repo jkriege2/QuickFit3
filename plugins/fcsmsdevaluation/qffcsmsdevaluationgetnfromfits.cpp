@@ -72,6 +72,18 @@ QString QFFCSMSDEvaluationGetNFromFits::getParameterTripletTau() const
     return "fitparam_nonfl_tau1";
 }
 
+QString QFFCSMSDEvaluationGetNFromFits::getParameterDarkTheta() const
+{
+    return "fitparam_nonfl_theta2";
+
+}
+
+QString QFFCSMSDEvaluationGetNFromFits::getParameterDarkTau() const
+{
+    return "fitparam_nonfl_tau2";
+
+}
+
 QString QFFCSMSDEvaluationGetNFromFits::getParameterWxy() const
 {
     return "fitparam_focus_width";

@@ -413,3 +413,7 @@ void qfFCCSCrosstalkCorrection(double &acf0, double &acf1, double &ccf, double I
 double qfFCSTripletTerm(double tau, double thetaT, double tauT) {
     return (1.0-thetaT+thetaT*exp(-tau/tauT))/(1.0-thetaT);
 }
+
+double qfFCSTripletBlinkTerm(double tau, double thetaT, double tauT, double thetaT2, double tauT2) {
+    return (1.0-thetaT+thetaT*exp(-tau/tauT)-thetaT2+thetaT2*exp(-tau/tauT2))/(1.0-thetaT2);
+}
