@@ -380,6 +380,8 @@ void QFSPIMLightsheetEvaluationEditor::showImageCut(QFSPIMLightsheetEvaluationIt
     int h=data->getImageStackHeight(stack);
     QString resultID=eval->getEvaluationResultID(stack, channel);
 
+
+
     QVector<QColor> cols;
     cols<<QColor("blue")<<QColor("red")<<QColor("green")<<QColor("magenta");
 
@@ -397,16 +399,17 @@ void QFSPIMLightsheetEvaluationEditor::showImageCut(QFSPIMLightsheetEvaluationIt
 
     int item=-1;
     bool*mask=getCurrentMask();
+    int start_offset=0;
     if(img) {
         if (ui->cmbOrientation->currentIndex()==0) {
             markDataX[0]=0;
             markDataX[1]=w;
             markDataY[0]=markDataY[1]=round(y);
             item=(int)round(y);
-            double* data=(double*)qfMalloc(h*sizeof(double));
-            double* dataX=(double*)qfMalloc(h*sizeof(double));
+            double* data=(double*)qfMalloc(w*sizeof(double));
+            double* dataX=(double*)qfMalloc(w*sizeof(double));
             int data_count=0;
-            int start_offset=0;
+
             if (mask) {
                 for (int yy=0; yy<w; yy++) {
                     if (!mask[item*w+yy]) {
@@ -428,7 +431,7 @@ void QFSPIMLightsheetEvaluationEditor::showImageCut(QFSPIMLightsheetEvaluationIt
             if (data_count>0) {
                 //int c_x=ds->addLinearColumn(w, 0, double(w)*ui->spinDeltaX->value()/1000.0, "dataX");
                 int c_x=ds->addCopiedColumn(dataX, data_count, tr("X: %1").arg(ui->cmbChannel->itemText(channel)));
-                int c_y=ds->addCopiedColumn(&(data[start_offset]), data_count, tr("I: %1").arg(ui->cmbChannel->itemText(channel)));
+                int c_y=ds->addCopiedColumn(data, data_count, tr("I: %1").arg(ui->cmbChannel->itemText(channel)));
                 plteLineFitData->set_xColumn(c_x);
                 plteLineFitData->set_yColumn(c_y);
                 plteLineFitData->set_xErrorColumn(-1);
@@ -447,11 +450,11 @@ void QFSPIMLightsheetEvaluationEditor::showImageCut(QFSPIMLightsheetEvaluationIt
             double* dataX=(double*)qfMalloc(h*sizeof(double));
 
             int data_count=0;
-            int start_offset=0;
+            //int start_offset=0;
             if (mask) {
                 for (int yy=0; yy<h; yy++) {
                     if (!mask[item*w+yy]) {
-                        data[yy]=img[yy*w+item];
+                        data[data_count]=img[yy*w+item];
                         dataX[data_count]=double(yy)*ui->spinDeltaX->value()/1000.0;
                         data_count++;
                     } else {
@@ -469,7 +472,7 @@ void QFSPIMLightsheetEvaluationEditor::showImageCut(QFSPIMLightsheetEvaluationIt
 
             //int c_x=ds->addLinearColumn(h, 0, double(h)*ui->spinDeltaX->value()/1000.0, "dataX");
             int c_x=ds->addCopiedColumn(dataX, data_count, tr("X: %1").arg(ui->cmbChannel->itemText(channel)));
-            int c_y=ds->addCopiedColumn(&(data[start_offset]), data_count, tr("I: %1").arg(ui->cmbChannel->itemText(channel)));
+            int c_y=ds->addCopiedColumn(data, data_count, tr("I: %1").arg(ui->cmbChannel->itemText(channel)));
             plteLineFitData->set_xColumn(c_x);
             plteLineFitData->set_yColumn(c_y);
             plteLineFitData->set_xErrorColumn(-1);
@@ -1016,6 +1019,13 @@ void QFSPIMLightsheetEvaluationEditor::displayPreview() {
     plteImage->set_width(w);
     plteImage->set_height(h);
     ui->pltImage->setAbsoluteXY(0,w,0,h);
+    ui->pltImage->get_plotter()->set_maintainAspectRatio(true);
+    if (h>0) ui->pltImage->get_plotter()->set_aspectRatio(double(w)/double(h));
+    else ui->pltImage->get_plotter()->set_aspectRatio(1);
+    ui->pltImage->get_plotter()->set_maintainAxisAspectRatio(true);
+    if (h>0) ui->pltImage->get_plotter()->set_axisAspectRatio(double(w)/double(h));
+    else ui->pltImage->get_plotter()->set_axisAspectRatio(1);
+
 
     on_pltImage_plotMouseClicked(lastMousePreviewX, lastMousePreviewY, Qt::NoModifier, Qt::LeftButton);
 

@@ -289,6 +289,7 @@ void QFTableGraphSettings::writeGraphData(QFRDRTable::GraphInfo& graph)
         graph.fillStyle=ui->cmbFillStyle->currentFillStyle();
         graph.linewidth=ui->spinLineWidth->value();
         graph.symbolSize=ui->spinSymbolSize->value();
+        graph.symbolLineWidth=ui->spinSymbolLineWidth->value();
         graph.drawLine=ui->chkDrawLine->isChecked();
         graph.colorTransparent=double(ui->sliderPlotTransparent->value())/255.0;
         graph.errorColorTransparent=double(ui->sliderErrorTransparent->value())/255.0;
@@ -424,6 +425,7 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->cmbFillStyle->setCurrentFillStyle(graph.fillStyle);
     ui->spinLineWidth->setValue(graph.linewidth);
     ui->spinSymbolSize->setValue(graph.symbolSize);
+    ui->spinSymbolLineWidth->setValue(graph.symbolLineWidth);
     ui->chkDrawLine->setChecked(graph.drawLine);
     ui->sliderPlotTransparent->setValue(graph.colorTransparent*255.0);
     ui->sliderErrorTransparent->setValue(graph.errorColorTransparent*255.0);
@@ -1250,6 +1252,7 @@ void QFTableGraphSettings::connectWidgets()
     connect(ui->chkDrawLine, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     connect(ui->spinLineWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->spinSymbolSize, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    connect(ui->spinSymbolLineWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     connect(ui->sliderErrorTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->sliderFillTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     connect(ui->sliderPlotTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
@@ -1361,6 +1364,7 @@ void QFTableGraphSettings::disconnectWidgets()
     disconnect(ui->chkDrawLine, SIGNAL(toggled(bool)), this, SLOT(writeGraphData()));
     disconnect(ui->spinLineWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->spinSymbolSize, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
+    disconnect(ui->spinSymbolLineWidth, SIGNAL(editingFinished()), this, SLOT(writeGraphData()));
     disconnect(ui->sliderErrorTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->sliderFillTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));
     disconnect(ui->sliderPlotTransparent, SIGNAL(valueChanged(int)), this, SLOT(writeGraphData()));

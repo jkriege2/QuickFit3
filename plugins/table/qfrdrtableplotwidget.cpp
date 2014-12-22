@@ -909,6 +909,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_drawLine(g.drawLine);
                 pg->set_symbol(g.symbol);
                 pg->set_symbolSize(g.symbolSize);
+                pg->set_symbolWidth(g.symbolLineWidth);
                 pg->set_lineWidth(g.linewidth);
                 QColor c=g.color;
                 c.setAlphaF(g.colorTransparent);
@@ -1270,6 +1271,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_boxWidth(g.width);
                 pg->set_meanSymbol(g.symbol);
                 pg->set_meanSymbolSize(g.symbolSize);
+                pg->set_meanSymbolWidth(g.symbolLineWidth);
                 pg->set_lineWidth(g.linewidth);
                 QColor c=g.color;
                 c.setAlphaF(g.colorTransparent);
@@ -1360,6 +1362,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_boxWidth(g.width);
                 pg->set_meanSymbol(g.symbol);
                 pg->set_meanSymbolSize(g.symbolSize);
+                pg->set_meanSymbolWidth(g.symbolLineWidth);
                 pg->set_lineWidth(g.linewidth);
                 QColor c=g.color;
                 c.setAlphaF(g.colorTransparent);
@@ -1410,6 +1413,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                 pg->set_drawLine(g.drawLine);
                 pg->set_symbol(g.symbol);
                 pg->set_symbolSize(g.symbolSize);
+                pg->set_symbolWidth(g.symbolLineWidth);
                 pg->set_style(g.style);
 
 

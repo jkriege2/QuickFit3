@@ -60,6 +60,7 @@ QFRDRTable::GraphInfo::GraphInfo() {
     linewidth=1;
     symbol=JKQTPfilledCircle;
     symbolSize=6;
+    symbolLineWidth=1;
     errorStyle=JKQTPnoError;
     drawLine=true;
     errorStyle=JKQTPerrorBars;
@@ -238,11 +239,11 @@ QFRDRTable::PlotInfo::PlotInfo()
 
 
      keyXMargin=0.5;
-     keyYMargin=0.25;
+     keyYMargin=0.5;
      keyXOffset=0.5;
      keyYOffset=0.5;
      keyXSeparation=0.75;
-     keyYSeparation=0.2;
+     keyYSeparation=0.75;
      key_line_length=3;
 }
 
@@ -1572,7 +1573,8 @@ void QFRDRTable::readGraphInfo(GraphInfo& graph, QDomElement ge) {
     graph.maxcolumn=ge.attribute("maxcolumn", "-1").toInt();
 
     graph.linewidth=CQStringToDouble(ge.attribute("linewidth", "1"));
-    graph.symbolSize=CQStringToDouble(ge.attribute("symbolSize", "1"));
+    graph.symbolSize=CQStringToDouble(ge.attribute("symbolSize", "6"));
+    graph.symbolLineWidth=CQStringToDouble(ge.attribute("symbolLineWidth", "1"));
     graph.color=QStringToQColor(ge.attribute("color", "blue"));
     graph.errorColor=QStringToQColor(ge.attribute("errorcolor", "darkblue"));
     graph.fillColor=QStringToQColor(ge.attribute("fillcolor", "blue"));
@@ -1820,6 +1822,7 @@ void QFRDRTable::writeGraphInfo(QXmlStreamWriter &w, const QFRDRTable::GraphInfo
 
     w.writeAttribute("linewidth", CDoubleToQString(graph.linewidth));
     w.writeAttribute("symbolSize", CDoubleToQString(graph.symbolSize));
+    w.writeAttribute("symbolLineWidth", CDoubleToQString(graph.symbolLineWidth));
     w.writeAttribute("style", QPenStyle2String(graph.style));
     w.writeAttribute("whisker_style", QPenStyle2String(graph.whiskerStyle));
     w.writeAttribute("fill_style", QBrushStyle2String(graph.fillStyle));

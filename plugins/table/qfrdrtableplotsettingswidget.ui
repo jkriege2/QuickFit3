@@ -82,7 +82,7 @@
    <item>
     <widget class="QFEnhancedTabWidget" name="tabWidget_2">
      <property name="currentIndex">
-      <number>2</number>
+      <number>3</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">

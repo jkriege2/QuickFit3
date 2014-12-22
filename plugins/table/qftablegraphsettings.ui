@@ -754,7 +754,7 @@
    </item>
    <item row="26" column="1">
     <widget class="QWidget" name="widSymbol" native="true">
-     <layout class="QHBoxLayout" name="horizontalLayout_22" stretch="1,0,0">
+     <layout class="QHBoxLayout" name="horizontalLayout_22" stretch="1,0,0,0,0">
       <property name="leftMargin">
        <number>0</number>
       </property>
@@ -803,6 +803,35 @@
         </property>
         <property name="singleStep">
          <double>1.000000000000000</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="label9_3">
+        <property name="text">
+         <string>line width:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="spinSymbolLineWidth">
+        <property name="prefix">
+         <string/>
+        </property>
+        <property name="suffix">
+         <string> pt</string>
+        </property>
+        <property name="maximum">
+         <double>100.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.500000000000000</double>
         </property>
         <property name="value">
          <double>1.000000000000000</double>
@@ -3449,11 +3478,11 @@
  </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>

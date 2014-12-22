@@ -280,6 +280,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             double linewidth;
             JKQTPgraphSymbols symbol;
             double symbolSize;
+            double symbolLineWidth;
             JKQTPerrorPlotstyle errorStyle;
             bool drawLine;
 
