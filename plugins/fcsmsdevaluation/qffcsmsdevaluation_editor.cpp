@@ -593,7 +593,7 @@ void QFFCSMSDEvaluationEditor::createWidgets() {
     QAction* actFirst=menuParameters->actions().value(0, NULL);
     actAverageFirstLags=new QAction(tr("&average first few lags for N"), this);
     connect(actAverageFirstLags, SIGNAL(triggered()), this, SLOT(averageFirstFewLags()));
-    actGetNFromFits=new QAction(tr("get N from FCS fits"), this);
+    actGetNFromFits=new QAction(tr("get N+other parameters from FCS fits"), this);
     connect(actGetNFromFits, SIGNAL(triggered()), this, SLOT(getNFromFits()));
     menuParameters->insertAction(actFirst, actGetNFromFits);
     menuParameters->insertAction(actFirst, actAverageFirstLags);
@@ -1546,6 +1546,9 @@ void QFFCSMSDEvaluationEditor::averageFirstFewLags() {
     //bool ok=false;
     //int points=QInputDialog::getInt(this, windowTitle(), tr("number of points to average"), ProgramOptions::getConfigValue("QFFCSMSDEvaluationEditor/avgruns_last", 5).toInt(), 1, data_end-data_start, 1, &ok);
     if (dlg->exec()) {
+        bool esigen=eval->get_doEmitResultsChanged();
+        eval->set_doEmitResultsChanged(false);
+
         int points=dlg->getPoints();
         ProgramOptions::setConfigValue("QFFCSMSDEvaluationEditor/avgruns_last", points);
         double *d=NULL;
@@ -1631,6 +1634,7 @@ void QFFCSMSDEvaluationEditor::averageFirstFewLags() {
             if (progress.wasCanceled()) break;
         }
 
+        if (esigen) eval->set_doEmitResultsChanged(true);
     }
     delete dlg;
     widFitParams->updateWidgetValues();
@@ -1709,6 +1713,9 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
         progress.show();
         progress.setMode(true, true);
         progress.setRange(0, applyTo.size());
+        bool esigen=eval->get_doEmitResultsChanged();
+        bool sigen;
+        eval->set_doEmitResultsChanged(false);
 
         for (int i=0; i<applyTo.size(); i++) {
             progress.setValue(i);
@@ -1727,7 +1734,10 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
             double gamma=-1;
 
 
-            if (record) {
+            if (record)
+            {
+                sigen=record->isEmitResultsChangedEnabled();
+                record->disableEmitResultsChanged();
                 QStringList sl=record->resultsCalcNames("", "", evalGroup);
                 QStringList eval=record->resultsCalcEvaluationsInGroup(evalGroup);
                 QString runid="_runavg";
@@ -1860,7 +1870,12 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
             }
             QApplication::processEvents();
             if (progress.wasCanceled()) break;
+            if (record) {
+                if (sigen) record->enableEmitResultsChanged();
+            }
         }
+        if (esigen) eval->set_doEmitResultsChanged(true);
+
     }
 
     delete dlg;
@@ -2208,11 +2223,13 @@ void QFFCSMSDEvaluationEditor::fitAll() {
         QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
         QFFCSMSDEvaluationItem* eval=qobject_cast<QFFCSMSDEvaluationItem*>(current);
         QApplication::processEvents();
+        qDebug()<<record<<data<<eval;
         if ((record)&&(data)) {
             // here we call doEvaluation to execute our evaluation for the current record only
 
             for (int idx=-1; idx<data->getCorrelationRuns(); idx++) {
                 dlgEvaluationProgress->setLabelText(tr("evaluate '%1', run %2 ...").arg(record->getName()).arg(idx));
+                qDebug()<<tr("evaluate '%1', run %2 ...").arg(record->getName()).arg(idx);
                 QApplication::processEvents();
                 eval->doFit(record, idx, eval->getCurrentModel(), getUserMin(record, idx), getUserMax(record, idx), 11, spinResidualHistogramBins->value());
                 QApplication::processEvents();

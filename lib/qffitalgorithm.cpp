@@ -493,6 +493,7 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double *paramsOut, double *paramEr
     if (result.params.contains("error_sum")) chi2=result.params["error_sum"].getAsDouble();
 
     if (m_errorEstimateModeFit==fpeBootstrapping) {
+        //qDebug()<<"BS: "<<m_bootstrapFraction<<m_bootstrapDistortion<<m_bootstrapRepeats;
         fm.setBootstrappingFraction(m_bootstrapFraction, false);
         fm.setBootstrappingEnabled(true, false);
 
@@ -557,7 +558,12 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double *paramsOut, double *paramEr
 
         if (N>1) {
             for (int j=0; j<fm.get_paramcount(); j++) {
-                tparamErrorsOut[j]=sqrt((bsParamSqrSum[j]-bsParamSum[j]*bsParamSum[j]/N)/(N-1.0));
+                tparamErrorsOut[j]=(bsParamSqrSum[j]-bsParamSum[j]*bsParamSum[j]/N)/(N-1.0);
+                if (tparamErrorsOut[j]<0.0) {
+                    tparamErrorsOut[j]=0;
+                } else {
+                    tparamErrorsOut[j]=sqrt( tparamErrorsOut[j]);
+                }
             }
         } else {
             for (int j=0; j<fm.get_paramcount(); j++) {
@@ -918,6 +924,7 @@ void QFFitAlgorithm::FitFunctionFunctor::prepareBootstrapSelection()
         while (bootstrapIDs.size()>mBS && bootstrapIDs.size()>get_paramcount()+2) bootstrapIDs.removeLast();
         qSort(bootstrapIDs);
         //qDebug()<<"mBS="<<mBS<<"  IDS="<<bootstrapIDs;
+        //qDebug()<<m_bootstrapFraction<<get_paramcount()<<bootstrapIDs.size()<<"/"<<i_M;
     } else {
         bootstrapIDs.clear();
     }

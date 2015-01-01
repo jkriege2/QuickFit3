@@ -51,6 +51,7 @@ class QFRDRTableCurveFitDialog : public QDialog
         void showHelp();
         void methodChanged(int method);
         void updateFitStatistics();
+        inline double getWeight(int i) const;
      protected:
         void connectSignals(bool connectS=true);
 
@@ -59,7 +60,7 @@ class QFRDRTableCurveFitDialog : public QDialog
     private:
         Ui::QFRDRTableCurveFitDialog *ui;
         QFRDRTable* table;
-        QVector<double> dataY, dataX, dataW, weights, residualsY, residualsYW;
+        QVector<double> dataY, dataX, dataW, residualsY, residualsYW;
         QList<QVariant> lastResults, lastResultsErrors;
         QVector<double> lastResultD;
         QString resultComment;

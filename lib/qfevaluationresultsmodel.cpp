@@ -758,7 +758,7 @@ void QFEvaluationResultsModel::calcStatistics(QString resultName, double& averag
                 QVector<bool> mask;
                 if (runsel && d.size()==runsel->leaveoutGetRunCount()) {
                     mask=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runsel);
-                } else if (maskrdr && d.size()==maskrdr->maskGetWidth()*maskrdr->maskGetHeight()) {
+                } else if (maskrdr && d.size()==(int64_t)maskrdr->maskGetWidth()*(int64_t)maskrdr->maskGetHeight()) {
                     mask=QFRDRImageMaskInterface_getMaskAsBoolVec(maskrdr);
                 }
                 if (mindRunsForVectorStat && mask.size()>=d.size()){

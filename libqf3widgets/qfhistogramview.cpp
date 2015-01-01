@@ -702,7 +702,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                         }
                     }
                     if (ff->getAdditionalPlotCount(p)>0) {
-                        for (int i=0; i<ff->getAdditionalPlotCount(p); i++) {
+                        for (unsigned int i=0; i<ff->getAdditionalPlotCount(p); i++) {
                             addFF.append(cmbFitFunction->createCurrentInstance());
                         }
                     }

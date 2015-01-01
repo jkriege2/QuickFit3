@@ -70,6 +70,19 @@ QFRDRTableRegressionDialog::~QFRDRTableRegressionDialog()
     delete ui;
 }
 
+double QFRDRTableRegressionDialog::getWeight(int i) const
+{
+    if (qMin(dataX.size(), dataY.size())<=0) return 1.0;
+    const double defaultVal=1.0;//double(qMin(dataX.size(), dataY.size()));
+    /*switch(ui->cmbWeightOptions->currentIndex()) {
+        case 0: return dataW.value(i, defaultVal);
+        case 1: return sqrt(fabs(dataY.value(i, defaultVal)));
+        case 2: return fabs(dataY.value(i, defaultVal));
+        default: return defaultVal;
+    }*/
+    return defaultVal;
+}
+
 void QFRDRTableRegressionDialog::saveResults()
 {
     int method=ui->cmbFitType->itemData(ui->cmbFitType->currentIndex()).toInt();

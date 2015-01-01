@@ -53,6 +53,7 @@ class QFRDRTableRegressionDialog : public QDialog
     protected:
         void connectSignals(bool connectS=true);
         void readDataFromTable();
+        inline double getWeight(int i) const;
     private:
         Ui::QFRDRTableRegressionDialog *ui;
         QFRDRTable* table;

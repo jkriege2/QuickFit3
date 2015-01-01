@@ -528,7 +528,7 @@ void QFDataExportHandler::save(const QList<QVector<double> >& data, int format, 
     } else if (format==f++) { // QFTable XML, flipped
         saveStringToFile(filename, toQFTableModelXML(dataRotate(data), rowHeaders, columnHeaders), QString("UTF-8"));
     } else if (format-f>=0 && format-f<writers.size()) {
-        writers[format-12]->save(data, filename, columnHeaders, rowHeaders);
+        writers[format-f]->save(data, filename, columnHeaders, rowHeaders);
     }
 }
 
@@ -588,7 +588,7 @@ void QFDataExportHandler::save(const QList<QList<QVariant> >& data, int format, 
     } else if (format==f++) { // QFTable XML, flipped
         saveStringToFile(filename, toQFTableModelXML(dataRotate(data), rowHeaders, columnHeaders), QString("UTF-8"));
     } else if (format-f>=0 && format-f<writers.size()) {
-        writers[format-12]->save(data, filename, columnHeaders, rowHeaders);
+        writers[format-f]->save(data, filename, columnHeaders, rowHeaders);
     }
 }
 
