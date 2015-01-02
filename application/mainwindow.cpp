@@ -2331,10 +2331,10 @@ void MainWindow::pasteItem()
         const QMimeData* mime=clipboard->mimeData();
         if (mime) {
             QString xml=QString::fromUtf8(mime->data(mimetype));
-            qDebug()<<"XML: "<<xml<<"\n\n";
+            //qDebug()<<"XML: "<<xml<<"\n\n";
             QDomDocument doc;
             if (doc.setContent(xml)) {
-                qDebug()<<"XML-Doc: "<<doc.toString();
+                //qDebug()<<"XML-Doc: "<<doc.toString();
                 QDomElement base=doc.firstChildElement("quickfit3_projectcopyxml");
                 QDomElement rdre=base.firstChildElement("rawdataelement");
                 while (!rdre.isNull()) {
@@ -4472,7 +4472,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$list:<list_name>:<filter>$$ items
-            QRegExp rxList("\\$\\$list\\:([a-z\\_]+)\\:([^\\$\\s]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxList("\\$\\$list\\:([a-z\\_]+)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxList.setMinimal(true);
             int count = 0;
             int pos = 0;
@@ -4539,12 +4539,22 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
                         QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
                         QString filter2="";
+                        QString filter3="";
                         QString filter1=filter;
                         //qDebug()<<"fitfunc_inplugin: filter="<<filter;
                         if (filter.contains(":")) {
-                            filter1=filter.split(":").first();
-                            filter2=filter.split(":").at(1);
+                            int cnt=filter.count(':');
+                            QStringList sp=filter.split(':');
+                            if (cnt==1 && sp.size()>=2) {
+                                filter1=sp.first();
+                                filter2=sp.at(1);
+                            } else if (cnt==2 && sp.size()>=3) {
+                                filter1=sp.first();
+                                filter2=sp.at(1);
+                                filter3=sp.at(2).toLower().simplified().trimmed();
+                            }
                         }
+                        //qDebug()<<filter1<<filter2<<filter3;
                         // gather information about plugins
                             QMap<QString, QFFitFunction*> models= QFPluginServices::getInstance()->getFitFunctionManager()->getModels(filter2);
                             QMapIterator<QString, QFFitFunction*> j(models);
@@ -4556,7 +4566,12 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                 QString pid=QFPluginServices::getInstance()->getFitFunctionManager()->getID(id);
                                 QString icon=QFPluginServices::getInstance()->getFitFunctionManager()->getIconFilename(id);
                                 QFFitFunction* a=j.value();
-                                if ((filter1.isEmpty() || (pid==filter1) ) && a) {
+                                QString fname="";
+                                if (a) {
+                                    fname=a->name().toLower().simplified();
+                                }
+
+                                if ((filter1.isEmpty() || (pid==filter1) ) && (filter3.isEmpty() || (fname.contains(filter3) || j.key().toLower().simplified().contains(filter3)) ) && a) {
                                     name=a->name();
                                     dir=dir=QFPluginServices::getInstance()->getFitFunctionManager()->getPluginHelp(id, j.key());
                                     delete a;

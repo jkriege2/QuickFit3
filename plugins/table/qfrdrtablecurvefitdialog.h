@@ -51,7 +51,7 @@ class QFRDRTableCurveFitDialog : public QDialog
         void showHelp();
         void methodChanged(int method);
         void updateFitStatistics();
-        inline double getWeight(int i) const;
+        double getWeight(int i) const;
      protected:
         void connectSignals(bool connectS=true);
 
