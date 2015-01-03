@@ -39,7 +39,7 @@ QFHTMLHighlighter::QFHTMLHighlighter(const QString& settingsDir, QTextDocument *
     m_formats[QFHTMLHighlighter::Comment]=loadFormat(settings, prefix+"style/comment",  "darkgray", false, true, false);
     m_formats[QFHTMLHighlighter::Text]=loadFormat(settings, prefix+"style/text",  "black", false, false, false);
     m_formats[QFHTMLHighlighter::Special1]=loadFormat(settings, prefix+"style/special1",  "darkblue", true, false, false);
-    m_formats[QFHTMLHighlighter::Special2]=loadFormat(settings, prefix+"style/special2",  "darkblue", true, false, false);
+    m_formats[QFHTMLHighlighter::Special2]=loadFormat(settings, prefix+"style/special2",  "darkblue", true, true, false);
 
 
 
@@ -116,7 +116,7 @@ void QFHTMLHighlighter::highlightBlock(const QString &text)
                         setFormat(start, pos - start, m_formats[Text]);
                     }
                     if (txtstart>=0 && txtend>=0) {
-                        setFormat(txtstart, txtend - txtstart, m_formats[Text]);
+                        setFormat(txtstart, txtend - txtstart+1, m_formats[Text]);
                     }
                 }
             break;

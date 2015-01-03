@@ -801,64 +801,34 @@ void QFFCCSFitEvaluationItem::guessFileSets(const QList<QFRawDataRecord *> &file
 
 
 
-void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange, QFFitAlgorithmReporter *dlgFitProgress, bool doLog)
+void QFFCCSFitEvaluationItem::setupGlobalFitTool(QFGlobalFitTool& tool, QList<doFitData>* fitDataOut, QString& iparams, QList<double*>& paramsVector, QList<double*>& initialParamsVector, QList<double*>& errorsVector, QList<double*>& errorsVectorI, const QList<  QFRawDataRecord *> &records, int run, int rangeMinDatarange, int rangeMaxDatarange, bool doLog) const
 {
-    QString iparams="";
-    QString oparams="";
-    QString orparams="";
-    QList<double*> paramsVector;
-    QList<double*> initialParamsVector;
-    QList<double*> errorsVector, errorsVectorI;
 
-    bool saveLongStrings=!getProperty("dontSaveFitResultMessage", true).toBool();
-
-    QFFitAlgorithm* falg=getFitAlgorithm();
-    if ((!falg)||records.size()<=0) return;
-    QFRDRFCSDataInterface* data0=qobject_cast<QFRDRFCSDataInterface*>(records.first());
-    if (!data0) return;
-    QFGlobalFitTool tool(falg);
-    tool.clear();
-
-    if (dlgFitProgress) {
-        dlgFitProgress->reportStatus(tr("setting up ..."));
-        dlgFitProgress->setProgressMax(100);
-        dlgFitProgress->setProgress(0);
-    }
-
-    QString runname=tr("average");
-    if (run>=0) runname=QString::number(run);
-    int rangeMinDatarange=0;
-    int rangeMaxDatarange=data0->getCorrelationN();
-    if (defaultMinDatarange>=0) rangeMinDatarange=defaultMinDatarange;
-    if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
-
-    restoreQFFitAlgorithmParameters(falg);
-    falg->readErrorEstimateParametersFit(this);
-    falg->setReporter(dlgFitProgress);
-
-    if (doLog) QFPluginLogTools::log_text(tr("setting up global fit for run %1 ... \n").arg(runname));
-
-    bool epc=get_doEmitPropertiesChanged();
-    bool erc=get_doEmitResultsChanged();
+    bool dontFitMasked=getProperty("dontFitMaskedPixels", false).toBool();
     QList<doFitData> fitData;
-    set_doEmitPropertiesChanged(false);
-    set_doEmitResultsChanged(false);
+    //QFFitAlgorithm* falg=getFitAlgorithm();
+    //if ((!falg)||records.size()<=0) return;
+    if (records.size()<=0) return;
+    const QFRDRFCSDataInterface* data0=dynamic_cast<const QFRDRFCSDataInterface*>(records.first());
+    if (!data0) return;
 
-    QString egroup=QString("%1%2__%3").arg(getType()).arg(getID()).arg(falg->id());//.arg(dfd.ffunc->id());
-    QString egrouplabel=QString("#%3 \"%1\": %2").arg(getName()).arg(falg->shortName()).arg(getID());//.arg(dfd.ffunc->shortName());
+    tool.clear();
+    tool.setDoRecalculateInternals(false);
+
+    const QFRDRRunSelectionsInterface* runsel=dynamic_cast<const QFRDRRunSelectionsInterface*>(records.first());
+    if (runsel && dontFitMasked && run>=0 && runsel->leaveoutRun(run)) return;
+
 
     for (int r=0; r<records.size(); r++) {
-        QFRawDataRecord* record=records[r];
-        QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+         QFRawDataRecord* record=records[r];
+          QFRDRFCSDataInterface* data=dynamic_cast<  QFRDRFCSDataInterface*>(record);
         if (data) {
             doFitData dfd;
             dfd.emitSignals=record->isEmitResultsChangedEnabled();
             record->disableEmitResultsChanged();
 
-            QFFitFunction* ffunc=getFitFunction(record);
-            if (!ffunc) ffunc=getFitFunction(r);
-            egroup+=QString("__"+ffunc->id());
-            egrouplabel+=QString(", "+ffunc->shortName());
+            QFFitFunction* ffunc=createFitFunction(record);
+            if (!ffunc) ffunc=createFitFunction(r);
             if (doLog) QFPluginLogTools::log_text(tr("   - adding RDR '%1', model '%2'' ... \n").arg(record->getName()).arg(ffunc->name()));
             dfd.N=data->getCorrelationN();
             dfd.weights=NULL;
@@ -894,9 +864,9 @@ void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int
             // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
             // we are working with a complete set of parameters
             dfd.params=allocFillParameters(record, run, ffunc);
-            dfd.initialparams=allocFillParameters(record, run, ffunc);
+            dfd.initialparams=duplicateArray(dfd.params, ffunc->paramCount());// allocFillParameters(record, run, ffunc);
             dfd.errors=allocFillParameterErrors(record, run, ffunc);
-            dfd.errorsI=allocFillParameterErrors(record, run, ffunc);
+            dfd.errorsI=duplicateArray(dfd.errors, ffunc->paramCount());//allocFillParameterErrors(record, run, ffunc);
             dfd.paramsMin=allocFillParametersMin(record, ffunc);
             dfd.paramsMax=allocFillParametersMax(record, ffunc);
             dfd.paramsFix=allocFillFix(record, run, ffunc);
@@ -945,20 +915,89 @@ void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int
     int cnt=0;
     tool.setGlobalParamCount(getLinkParameterCount());
     //QList<QList<QPair<int, int> > > links(getLinkParameterCount());
+    tool.setDoRecalculateInternals(false);
     for (int r=0; r<records.size(); r++) {
-        QFRawDataRecord* record=records[r];
-        QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+         QFRawDataRecord* record=records[r];
+         QFRDRFCSDataInterface* data=dynamic_cast< QFRDRFCSDataInterface*>(record);
         if (data) {
             QStringList paramIDs=fitData[cnt].ffunc->getParameterIDs();
             for (int p=0; p<paramIDs.size(); p++) {
                 int l=getLinkParameter(r, paramIDs[p]);
                 if (l>=0) {
                     tool.addToGlobalParam(l, r, p);
+                    if (doLog) QFPluginLogTools::log_text(tr("     - linked in RDR %1: %2 to global #%3 \n").arg(r).arg(paramIDs[p]).arg(l));
                 }
             }
             cnt++;
         }
     }
+    tool.setDoRecalculateInternals(true);
+    tool.createLocalFitFunctors();
+
+    if (fitDataOut) *fitDataOut=fitData;
+}
+
+
+
+void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange, QFFitAlgorithmReporter *dlgFitProgress, bool doLog)
+{
+    QString iparams="";
+    QString oparams="";
+    QString orparams="";
+    QList<double*> paramsVector;
+    QList<double*> initialParamsVector;
+    QList<double*> errorsVector, errorsVectorI;
+
+    bool saveLongStrings=!getProperty("dontSaveFitResultMessage", true).toBool();
+
+    QFFitAlgorithm* falg=getFitAlgorithm();
+    if ((!falg)||records.size()<=0) return;
+    QFRDRFCSDataInterface* data0=qobject_cast<QFRDRFCSDataInterface*>(records.first());
+    if (!data0) return;
+    QFGlobalFitTool tool(falg);
+    tool.clear();
+    tool.setDoRecalculateInternals(false);
+
+    if (dlgFitProgress) {
+        dlgFitProgress->reportStatus(tr("setting up ..."));
+        dlgFitProgress->setProgressMax(100);
+        dlgFitProgress->setProgress(0);
+    }
+
+    QString runname=tr("average");
+    if (run>=0) runname=QString::number(run);
+    int rangeMinDatarange=0;
+    int rangeMaxDatarange=data0->getCorrelationN();
+    if (defaultMinDatarange>=0) rangeMinDatarange=defaultMinDatarange;
+    if (defaultMaxDatarange>=0) rangeMaxDatarange=defaultMaxDatarange;
+
+    restoreQFFitAlgorithmParameters(falg);
+    falg->readErrorEstimateParametersFit(this);
+    falg->setReporter(dlgFitProgress);
+
+    if (doLog) QFPluginLogTools::log_text(tr("setting up global fit for run %1 ... \n").arg(runname));
+
+    bool epc=get_doEmitPropertiesChanged();
+    bool erc=get_doEmitResultsChanged();
+    QList<doFitData> fitData;
+    set_doEmitPropertiesChanged(false);
+    set_doEmitResultsChanged(false);
+
+    QString egroup=QString("%1%2__%3").arg(getType()).arg(getID()).arg(falg->id());//.arg(dfd.ffunc->id());
+    QString egrouplabel=QString("#%3 \"%1\": %2").arg(getName()).arg(falg->shortName()).arg(getID());//.arg(dfd.ffunc->shortName());
+    for (int r=0; r<records.size(); r++) {
+        QFRawDataRecord* record=records[r];
+        QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+        if (data) {
+            QFFitFunction* ffunc=getFitFunction(record);
+            egroup+=QString("__"+ffunc->id());
+            egrouplabel+=QString(", "+ffunc->shortName());
+        }
+    }
+
+
+    setupGlobalFitTool(tool, &fitData, iparams, paramsVector, initialParamsVector, errorsVector, errorsVectorI, records, run, rangeMinDatarange, rangeMaxDatarange, doLog);
+
 
     bool OK=true;
     try {
@@ -980,7 +1019,7 @@ void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int
             t.start();
             while (!doFitThread->isFinished()) {
                 if (t.elapsed()>10) {
-                    QApplication::processEvents(QEventLoop::AllEvents, 50);
+                    QApplication::processEvents(QEventLoop::AllEvents, 10);
                     if (dlgFitProgress && dlgFitProgress->isCanceled()) {
                       doFitThread->terminate();
                       break;
@@ -999,7 +1038,7 @@ void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int
 
         if (OK) {
             QFFitAlgorithm::FitResult result=doFitThread->getResults();
-            cnt=0;
+            int cnt=0;
             addFittedFileSet(records);
             for (int r=0; r<records.size(); r++) {
                 QFRawDataRecord* record=records[r];
@@ -1188,27 +1227,46 @@ void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int
     if (doLog) QFPluginLogTools::log_text(tr("   - clean up ... \n"));
     if (epc) set_doEmitPropertiesChanged(true);
     if (erc) set_doEmitResultsChanged(true);
-    cnt=0;
-    for (int r=0; r<records.size(); r++) {
-        QFRawDataRecord* record=records[r];
-        QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
-        if (data) {
-            if (fitData[cnt].emitSignals) record->enableEmitResultsChanged(true);
-            qfFree(fitData[cnt].weights);
-            qfFree(fitData[cnt].params);
-            qfFree(fitData[cnt].initialparams);
-            qfFree(fitData[cnt].errors);
-            qfFree(fitData[cnt].errorsI);
-            qfFree(fitData[cnt].paramsFix);
-            qfFree(fitData[cnt].paramsMax);
-            qfFree(fitData[cnt].paramsMin);
 
-            cnt++;
-        }
-    }
+    freeAndClearDoFitDataList(fitData);
+    enableAndEmitResultsSignals();
     fitData.clear();
     falg->setReporter(NULL);
 
+}
+
+
+void QFFCCSFitEvaluationItem::freeAndClearDoFitDataList(QList<doFitData>& fitData) const {
+    int cnt=0;
+    for (int r=0; r<fitData.size(); r++) {
+        //QFRawDataRecord* record=getFitFile(r);
+
+        //if (fitData[cnt].emitSignals && record) record->enableEmitResultsChanged(true);
+        if (fitData[cnt].weights) qfFree(fitData[cnt].weights);
+        if (fitData[cnt].params) qfFree(fitData[cnt].params);
+        if (fitData[cnt].initialparams) qfFree(fitData[cnt].initialparams);
+        if (fitData[cnt].errors) qfFree(fitData[cnt].errors);
+        if (fitData[cnt].errorsI) qfFree(fitData[cnt].errorsI);
+        if (fitData[cnt].paramsFix) qfFree(fitData[cnt].paramsFix);
+        if (fitData[cnt].paramsMax) qfFree(fitData[cnt].paramsMax);
+        if (fitData[cnt].paramsMin) qfFree(fitData[cnt].paramsMin);
+        if (fitData[cnt].ffunc) delete fitData[cnt].ffunc;
+
+        cnt++;
+    }
+    fitData.clear();
+}
+
+
+void QFFCCSFitEvaluationItem::enableAndEmitResultsSignals() const {
+    int cnt=0;
+    for (int r=0; r<getFitFileCount(); r++) {
+        QFRawDataRecord* record=getFitFile(r);
+
+        if (record) record->enableEmitResultsChanged(true);
+
+        cnt++;
+    }
 }
 
 void QFFCCSFitEvaluationItem::doFitForMultithread(const QList<QFRawDataRecord *> &records, int run, int defaultMinDatarange, int defaultMaxDatarange, QFPluginLogService *logservice) const

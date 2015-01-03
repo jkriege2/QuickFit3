@@ -59,7 +59,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     replaceDlg=new ReplaceDialog(this);
 
     highlighter=new QFHTMLHighlighter("", ui->edtScript->getEditor()->document());
-    highlighter->setUseSpecial2("§§", "§§");
+    highlighter->setUseSpecial2("$(", ")$");
     highlighter->setUseSpecial1("$$", "$$");
 
     completer = new QCompleter(ui->edtScript->getEditor());

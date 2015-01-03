@@ -80,7 +80,7 @@ QVariant QFFCCSParameterInputTable::data(const QModelIndex &index, int role) con
 
     if (col==0) {
         if (row==0) {
-            if (role==Qt::DisplayRole || role==Qt::EditRole) return tr("file");
+            if (role==Qt::DisplayRole || role==Qt::EditRole) return tr("file/RDR");
         } else if (row==1) {
             if (role==Qt::DisplayRole || role==Qt::EditRole) return tr("fit model");
         } else if (row>1) {

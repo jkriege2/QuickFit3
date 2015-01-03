@@ -2,11 +2,180 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-  <title>FCCS FIt Plugin: Tutorial</title>
+  <title>FCCS Fit Plugin: Tutorial</title>
   </head>
   <body>
     $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+   
     
+    <h2>Preliminaries</h2>
     
+    $$startbox_info$$
+     
+      This tutorial uses example data provided along with the FCCS fit plugin. These datasets are available in the directory  <tt><a href="opendir:$$plugin_info:examplesdir:fccs_fit$$">$$plugin_info:examplesdir:fccs_fit$$</a></tt>. We'll use the files with the names:
+<ul>
+    <li>measurement 1: <tt>NUNC1_dil_100p_025_acf.ASC / NUNC1_dil_100p_025_ccf.ASC</tt></li>
+    <li>measurement 2: <tt>NUNC3_dil_050p_025_acf.ASC / NUNC3_dil_050p_025_ccf.ASC</tt></li>
+</ul>
+    Both measurements were taken on a home-built confocal microscope on a sample of a 170bp double-labeled dsDNA (1) and a mixture of single- and double-labeled 170bp dsDNA (2). The samples were labeled with Alexa-488/594 and a 488nm and a 568nm ArKr laser was used for the measurements.<br>
+The data was acquired in the ALV-5000 format and the <tt>..._acf.asc</tt> file contains the green and red autocorrelation function and the file <tt>..._ccf.asc</tt> contains the according cross-correlation function data. <br>The microscope has these properties (which were determined in an independent measurement:
+<ul>
+    <li>axial ratios of green and red channels $(\gamma_g = \gamma_r = 6)$</li>
+    <li>lateral green focus radius (1/e<sup>2</sup>) $(w_g = 296\mathrm{nm})$</li>
+    <li>lateral red focus radius (1/e<sup>2</sup>) $(w_r = 298\mathrm{nm})$</li>
+    <li>cross talk factor $(\kappa = 4.3\%)$</li>
+    <li>green background intensity $(B_g = 240\mathrm{Hz})$</li>
+    <li>red background intensity $(\kappa = 760\mathrm{Hz})$</li>
+    
+</ul>
+    $$endbox$$
+    
+
+
+<h2>Tutorial</h2>
+
+
+<h3>Set up the Project</h3>
+
+<p>
+    First you have to add all four files, that were mentioned above, to the project, by clicking on <b>Data Items | Insert raw Data | FCS/DLS data | Insert FCS/DLS data from file</b>:
+        <center><a name="tutorial_pic000"><img src="./pic/tutorial_pic000.png" border="1">
+        </center>
+        QuickFit then opens a dialog, where you can select the files. Make sure to choose the data format (filter) "ALV-5000". <br>You should also add an FCCS Curve Fitting evaluation, by clicking on <b>Data Items | Insert Evaluation Items |  FCCS Curve Fitting</b>. Finally the project tree should look as follows:
+<center><a name="tutorial_pic001"><img src="./pic/tutorial_pic001.png" border="1">
+</center>
+</p>
+
+
+<h3>Grouping files/RDRs</h3>
+<p>For the FCCS fit, you now have to tell QuickFit, which files belong together, i.e. group the ACF0, ACF1 and FCCS for each measurement.  This can be done by the RDR group and RDR role properties. <br>Click on <b>Tools | Project Tools | edit groups, roles and folders.</b> A new dialog will open, which looks like this:
+<center><a name="tutorial_pic002"><img src="./pic/tutorial_pic002.png" border="1">
+</center>
+As you can see, each line corresponds to one RDR in the project and the group, role and folder for each file are shown as columns. QuickFit already has set the correct roles (If they are not set, as shown and you don't have an ACF0 [green], ACF1 [red] and FCCS [green-red] yet, please set them now as shown). The groups are not yet set correctly. To change that, double-click the cells in the <b>group</b> column. The first three files and the last three files should have the same group. If you're not happy with the predefined group-names, you can also add new groups, by selecting <b>--- new group ---</b> from the drop-down list, that appears after double-clicking a role table cell. Finally the dialog should look like in the following picture and you can <b>Close</b> the dialog.
+<center><a name="tutorial_pic003"><img src="./pic/tutorial_pic003.png" border="1">
+</center>
+Now also the project tree shows the correct groups as background-colors. This step allows the global FCCS fit plugin to determine, which RDRs belong to the same measurement.
+$$note:For some data formats, such as the Confocor3 files, you can skip this step, as these files contain all three correlation curves and therefore QuickFit can already determine the correct roles and groups, when reading the files.$$</li>
+        <li>Now you can open the FCCS fit, by double-clicking the evaluation item in the project tree. Initially the dialog displays a single correlation curve:
+<center><a name="tutorial_pic004"><img src="./pic/tutorial_pic004.png" border="1">
+</center></p>
+
+
+
+<h3>Setting up the Fit</h3>
+<p>The FCCS fit is designed to globally fit three model functions $(g_{gg}(\tau), g_{rr}(\tau), g_{gr}(\tau))$ to the three correlation curves (ACF0, ACF1, FCCS) from each measurement. These functions have some parameters in common, that are linked over the three model functions and the parameters are fitted simultaneously. So first you have to choose the model to be used. As this is a very simple sample (double-labeled linear dsDNA), a 1-component normal diffusion fit is usually enough. We can also assume, that three different types of particles (AB: green/red double-labeled, A: green single-labeled, B: red single-labeled) are enough to describe this sample.<br> The simples way to set up the evaluation object is via the menu <b>Tools |configure for confocal FCCS ... | ... normal diffusion, species A+B+AB, c/D per species </b>. Now the dialog will look as follows and display already the three correlation curves (ACF0: green, ACF1: red, FCCS: blue).
+<center><a name="tutorial_pic005"><img src="./pic/tutorial_pic005.png" border="1">
+</center>
+The table at the bottom of this dialog contains a list of all fit parameters:
+<center><a name="tutorial_pic006"><img src="./pic/tutorial_pic006.png" border="1">
+</center>
+The first column contains the name of the parameter. Then each set of five columns corresponds to one RDR/file (see first row). The second row shows the <b>fit model</b> to use for this RDR/<b>file</b>. In these two rows, you can also select a different file and a different fit model. For each RDR, the first column shows the current fit <b>value</b>, the second column the <b>error</b> determiend in the fit and the fourth column allows to <b>fix</b> certain parameters (i.e. they are not a fit parameter). The third column contains the <b>unit</b> of the fit parameter. Finally the fifth column (<b>global</b>) allows to link certain parameters together. All parameters, that are set to the same "global parameter" are linked. In the example above, e.g. the concentrations of species A ($(C_a)$, global #0), B ($(C_b)$, global #1), ... Parameters, that are missing/not necessary in a model are not shown for that file and the cells are darkly grayed. In this table you can also edit the current fit values and the configuration of the global parameters, by clicking into a table cell.</p>
+
+
+
+
+<h3>Linking Parameters</h3>
+<p>
+Since for this DNA sample, we can also assume, that the three species A, B, AB have the same diffusion coefficient (they are all 170bp dsDNA strands), we can also link the diffusion coefficients of all these species together. Therefore, you should now set all diffusion coefficients $(D_a, D_b, D_{ab})$ for all files/RDRs to the same global parameter, e.g. "global #3". Also put all the parameters given in the info box at the top of this page into the table. Note, that if you edit any parameter, all other paramters, that are linked to this one also change their value! Finally the table should look like this: 
+<center><a name="tutorial_pic007"><img src="./pic/tutorial_pic007.png" border="1">
+</center>
+</p>
+
+
+<h3>Setting Parameter Ranges</h3>
+<p>In some cases it may also be a good idea to set the parameter ranges. This prevents model parameters to go out of bound during the fit and may lead to more reasonable results. In the case discussed in this example, two changes of the parameter ranges are advisable:
+<ol>
+    <li>Diffusion coefficient ranges can be set to $(D\in\left[10^{-3}, 500 \right]\mathrm{\mu m^2/s})$, since we know the size of the DNA and can expect the diffusion coefficient to not be much larger than a few hundred &mu;m<sup>2</sup>/s.</li>
+    <li>The lower bound for concentrations should be set to $(10^{-10}\mathrm{nM})$, since the models, that we use here, can evaluate to undefined values (NAN/INF), if more than one concentration goes to 0. If this happens during fitting, the fit may also fail. </li>
+</ol>
+In order to set the parameter ranges, you have to press the button <b>edit P ranges</b> at the bottom right of the table. Then two additional columns appear for every RDR/file, which are named <b>min</b> and <b>max</b>. In these columns you can edit the parameter ranges.<br>So now, you should set the new parameter ranges, as listed above. Finally the table will look like in the figure below and you can switch off the range-edit-mode again, by a second click on the "edit P ranges" button. 
+<center><a name="tutorial_pic008"><img src="./pic/tutorial_pic008.png" border="1">
+</center></p>
+
+
+
+
+
+<h3>Cutting Channels rom the Dataset</h3>
+<p>In a final set-up step, you can cut a few lag-time channels from the dataset. The first few channels of the autocorrelation curves are usually perturbed by the after-pulsing of the avalanche-photodiodes in the microscope. In our example, cutting 3-5 channels is enough. To do so, you can set the spin-box on the left, below the graphs to 3-5.</p>
+
+
+
+
+
+<h3>Fitting and Filesets</h3>
+<p>Now you can perform the fit, by clicking on the button <b>Fit Current</b> on the rhs of the dialog. The fit will be performed, using the current model parameters in the table as starting values. After that, the dialog will look like this:
+<center><a name="tutorial_pic009"><img src="./pic/tutorial_pic009.png" border="1">
+</center>
+You can notice two things:
+<ol>
+    <li>the fit models (dashed lines) fit the data (crosses) quite nicely and the residuals scatter around 0, although there are still some structures in the residuals. these are caused by the relatively strickt constraints on the fit model and possible inaccuracies, when determining the microscope parameters. Since in FCCS one is mostly concerned with the relative concentrations, as these measure the amount of association/binding, it is most important to niecly fit the amplitudes of the correlation functions, which is well achieved in this example. </li>
+    <li>The list <b>file sets</b> on the rhs of the dialog now contains two entries. One is dark-blue and represents the current fit. The second one is gray and represents a guessed combination of files from the project. Each fit result is specific to a given combination of files/RDRs, which is called a <b>fileset</b>. So after a fit (or after a click on the menu <b>Tools | Guess file sets</b>), QuickFit tries to guess other combinations of files, that are similar to the current. In this example, QuickFit found, that three files from <u>the same group</u> with the <u>roles ACF0, ACF1, FCCS</u> were fitted. It then searches the project for other groups, that contain RDRs with the roles ACF0, ACF1 and FCCS. All the filesets, that QuickFit finds this way are then shown as grayed entries in the list. By clicking on one of these entries, the dialog will switch to these files and the respective fit results or initial values.  </li>
+</ol>
+$$startbox_note$$
+If you are not happy with the fit result, or the fit didn't converge, you can repeat the fit several times, but each time, altering the initial parameters a bit. When you click on "Fit Current" a second time, the fit will be re-done, but this time using the last fit results as starting values. So you can change some of the parameters in the table to more accurate values and redo the fit. If this also doesn't help, it may also be adviseable to reset the fit completely, by clicking on <b>Reset Current</b>. This will delete the last fit result and go back to the initial values, we set above. Then you can alter these and redo the fit. Sometimes it also helps to use another fit algorithm, such as <a href="$$fitalgorithm:help:fit_simanneal$$">$$fitalgorithm:name:fit_simanneal$$</a>, as that algorithm uses a stochastic approach, which sometimes converges better.<br><br>Also note, that some fitting algorithms (such as <a href="$$fitalgorithm:help:fit_lmfit$$">$$fitalgorithm:name:fit_lmfit$$</a>, which is used here) may have problems, when fit parameters are initially at the parameter boundaries (e.g. a triplet decay time is at 10&mu;s). Then you can reset them to a more senseful value and redo the fit. <br><br>It is also possible to initially fix some parameters to reasonable values and then fit, release the fixing and fit again. This way, you can force the fit algorithm a little bit in a certain direction.<br><br>
+Experience also showed, that convergence of global FCCS fits can be improved, if the initial concentrations before the fit are set lower than expected (i.e. the initial model functions have a higher amplitude, than expected).
+$$endbox$$</p>
+
+
+
+<h3>Fitting more Filesets</h3>
+<p>Our test project contains - as mentioned - two measurements. Both were taken on the same type of sample (170bp DNA), but with different mixtures of single- and double-labeled strands. Still the fit results of the first fileset (see last step), may also be good starting values for the next step. Therefore you can click on the button <b>Copy to Initial</b> to use the current fit results as initial values for any further fit $$note:If a fileset has not yet been fitted (grayed filesets in the list), these initial parameters will be used as starting values for the fit. If a fit has already been performed (blue/black filesets), the last fit result will be used as starting value. You can discard it and go back to the initial values, by clicking on <b>"Reset Current"</b> for that fileset.$$</p>
+<p>So to also fit the second measurement, perform these steps:
+<ol>
+    <li>click on "Copy to Initial" for the first fileset.</li>
+    <li>click on the second, grayed, fileset in the list.</li>
+    <li>Now the second fileset, with the old fit results should be displayed (which do not fit). Click on "Fit Current" to also fit the second fileset. If the fits do not converge immediately, try to repeat the fit, by clicking on "Fit Current" again.</li>
+</ol></p>
+
+
+
+
+<h3>Fit Errors</h3>
+<p>The fit algorithm, that was used so far (<a href="$$fitalgorithm:help:fit_lmfit$$">$$fitalgorithm:name:fit_lmfit$$</a>) does not return errors for the fit parameters, so the error columns are still empty. To overcome this, we can use bootstrapping to estimate the fit parameter errors. To do so, choose the <b>error estimation</b> mode <b>bootstrapping (BS)</b> at the top of the window:
+<center><a name="tutorial_pic010"><img src="./pic/tutorial_pic010.png" border="1">
+</center>
+This will cause the plugin to repeat each fit <b>BS-repeats</b> times. Each time only 75% (<b>BS-fraction</b>) of the data points in the correlation curves are used and the initial parameters are varied by 20% (<b>BS-distortion</b>) before each fit. Then the plugin returns the best fit value and the standard deviation obtained from all these 30 fits as errors.
+</p>
+<p>Now refit each of the two filesets and observe the non-zero errors in the table.</p>
+
+
+
+
+<h3>Results of this Tutorial</h3>
+<p>Finally we can collect some results from this tutorial: The following figure shows the data and final fits to each of the two measurements. Observe, how the blue cross-correlation function has a lower amplitude (relative to the ACFs) in the left graph. This is due to the higher amount of single-labeled DNA strands in the second sample.
+<center><a name="tutorial_pic011"><img src="./pic/tutorial_pic011.png" border="1"><a name="tutorial_pic012"><img src="./pic/tutorial_pic012.png" border="1">
+</center>
+The following table summarizes the fit results obtained in the fits:
+<center><table cellspacing="0" cellpadding="1" border="1">
+  <tr>
+    <th bgcolor="#a0a0a4"><b>sample</b></th>
+    <th bgcolor="#a0a0a4"><b>$(D)$</b></th>
+    <th bgcolor="#a0a0a4"><b>$(c_a)$</b></th>
+    <th bgcolor="#a0a0a4"><b>$(c_b)$</b></th>
+    <th bgcolor="#a0a0a4"><b>$(c_{ab})$</b></th>
+    <th bgcolor="#a0a0a4"><b>$(c_{ab}/(c_a+c_b+c_{ab}))$</b></th>
+  </tr>
+  <tr>
+    <th bgcolor="#a0a0a4"><b>sample 1 (100p)</b></th>
+    <td>$((35.6\pm0.1)\mathrm{\mu m^2/s})$</td>
+    <td>$$math:(5.35\pm0.01)\mathrm{nM}$$</td>
+    <td>$$math:(5.35\pm0.01)\mathrm{nM}$$</td>
+    <td>$$math:(5.76\pm0.01)\mathrm{nM}$$</td>
+    <td>$$math:35\%$$</td>
+  </tr>
+  <tr>
+    <th bgcolor="#a0a0a4"><b>sample 2 (50p)</b></th>
+    <td>$$math:(35.1\pm0.1)\mathrm{\mu m^2/s}$$</td>
+    <td>$$math:(5.65\pm0.01)\mathrm{nM}$$</td>
+    <td>$$math:(6.2\pm0.01)\mathrm{nM}$$</td>
+    <td>$$math:(2.78\pm0.01)\mathrm{nM}$$</td>
+    <td>$$math:19\%$$</td>
+  </tr>
+</table></center>
+
+
+</p>
+
   </body>
 </html>

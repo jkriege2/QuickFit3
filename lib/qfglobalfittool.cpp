@@ -151,8 +151,9 @@ void QFFitMultiQFFitFunctionFunctor::recalculateInternals()
 #endif
     m_linkedParamsCount=0;
     m_evalout=0;
+   // QMap<int, int> global_reorder;
     for (int i=0; i<linkedParams.size(); i++) {
-        if (!isLinkedSingle(i)) {
+        //if (!isLinkedSingle(i)) {
             m_linkedParamsCount++;
 #ifdef DEBUG_GLOBALFIT
             dbg +=QString(" G%1 |").arg(m_linkedParamsCount-1,2,10,QLatin1Char(' '));
@@ -160,7 +161,7 @@ void QFFitMultiQFFitFunctionFunctor::recalculateInternals()
             dbg2+=QString("     |");
             dbg0+=QString("      ");
 #endif
-        }
+        //}
     }
 #ifdef DEBUG_GLOBALFIT
     dbg0+=QString("#| ");
@@ -183,6 +184,9 @@ void QFFitMultiQFFitFunctionFunctor::recalculateInternals()
         int realp=0;
         for (int p=0; p<pcount; p++) {
             int idx=getLinkID(i, f->mapFromFunctorToModel(p));
+#ifdef DEBUG_GLOBALFIT
+            qDebug()<<"cheking "<<i<<p<<f->mapFromFunctorToModel(p)<<" ["<<m_linkedParamsCount<<"]  => "<<idx;
+#endif
             if (idx>=0 && idx<m_linkedParamsCount) {
                 subFunctors[i].mapToLocal[p]=idx;
 #ifdef DEBUG_GLOBALFIT

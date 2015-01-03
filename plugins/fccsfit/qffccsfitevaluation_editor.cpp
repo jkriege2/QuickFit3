@@ -313,6 +313,10 @@ void QFFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEval
         ui->chkKey->setChecked(item->getProperty("FCCSFit/key", true).toBool());
         ui->chkSaveStrings->setChecked(!item->getProperty("dontSaveFitResultMessage", true).toBool());
         ui->lstFileSets->setModel(item->getFileSetsModel());
+        if (ui->lstFileSets->model()->rowCount()>0) {
+            ui->lstFileSets->setCurrentIndex(ui->lstFileSets->model()->index(0,0));
+            filesSetActivated(ui->lstFileSets->currentIndex());
+        }
         ui->widFitErrorEstimate->readSettings(item);
         ui->tableView->setModel(item->getParameterInputTableModel());
         connect(item->getParameterInputTableModel(), SIGNAL(modelRebuilt()), this, SLOT(ensureCorrectParamaterModelDisplay()));
@@ -1419,24 +1423,34 @@ int QFFCCSFitEvaluationEditor::getUserMin(QFRawDataRecord *rec, int index, int d
 {
     QFFCCSFitEvaluationItem* data=qobject_cast<QFFCCSFitEvaluationItem*>(current);
     if (!data) return defaultMin;
-    const QString resultID=data->getEvaluationResultID(-1/*index*/, rec);
+    const QString resultID=data->getEvaluationResultID(-1, rec);
+    const QString resultIDNew=QString("%1_%2").arg(data->getType()).arg(data->getID());
 
     // WORKROUND FOR OLD PROPERTY NAMES
     int defaultM=rec->getProperty(QString(resultID+"_datacut_min"), defaultMin).toInt();
 
-    return rec->getProperty(resultID+"_datacut_min", defaultM).toInt();
+    if (current) defaultM=current->getProperty("datacut_min", defaultM).toInt();
+
+    defaultM=rec->getProperty(resultID+"_datacut_min", defaultM).toInt();
+    defaultM=rec->getProperty(resultIDNew+"_datacut_min", defaultM).toInt();
+    return defaultM;
 }
 
 int QFFCCSFitEvaluationEditor::getUserMax(QFRawDataRecord *rec, int index, int defaultMax)
 {
     QFFCCSFitEvaluationItem* data=qobject_cast<QFFCCSFitEvaluationItem*>(current);
     if (!data) return defaultMax;
-    const QString resultID=data->getEvaluationResultID(-1/*index*/, rec);
+    const QString resultID=data->getEvaluationResultID(-1, rec);
+    const QString resultIDNew=QString("%1_%2").arg(data->getType()).arg(data->getID());
 
     // WORKROUND FOR OLD PROPERTY NAMES
     int defaultM=rec->getProperty(QString(resultID+"_datacut_max"), defaultMax).toInt();
 
-    return rec->getProperty(resultID+"_datacut_max", defaultM).toInt();
+    if (current) defaultM=current->getProperty("datacut_max", defaultM).toInt();
+
+    defaultM= rec->getProperty(resultID+"_datacut_max", defaultM).toInt();
+    defaultM= rec->getProperty(resultIDNew+"_datacut_max", defaultM).toInt();
+    return defaultM;
     //return rec->getProperty(resultID+"_datacut_max", defaultMax).toInt();
 }
 
@@ -1464,17 +1478,84 @@ void QFFCCSFitEvaluationEditor::slidersChanged(int userMin, int userMax, int min
 
 void QFFCCSFitEvaluationEditor::slidersCopyUserMinToAll(int userMin)
 {
-
+    if (!current) return;
+    QFFCCSFitEvaluationItem* data=qobject_cast<QFFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    QList<QList<QFRawDataRecord* > > fitted=data->getFittedFiles();
+    QList<QList<QFRawDataRecord* > > guessed=data->getGuessedFiles();
+    bool setGuessed=false;
+    if ( guessed.size()>0) {
+        setGuessed=QMessageBox::question(this, tr("FCCS: copy Min to all files"), tr("Do you also want to set min/max for guessed filesets?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
+    }
+    for (int i=0; i<fitted.size(); i++) {
+        for (int j=0; j<fitted[i].size(); j++) {
+            QFRawDataRecord* rdr=fitted[i].at(j);
+            setUserMinInternal(data, rdr, userMin);
+        }
+    }
+    if (guessed.size()>0 && setGuessed) {
+        for (int i=0; i<guessed.size(); i++) {
+            for (int j=0; j<guessed[i].size(); j++) {
+                QFRawDataRecord* rdr=guessed[i].at(j);
+                setUserMinInternal(data, rdr, userMin);
+            }
+        }
+    }
 }
 
 void QFFCCSFitEvaluationEditor::slidersCopyUserMaxToAll(int userMax)
 {
-
+    if (!current) return;
+    QFFCCSFitEvaluationItem* data=qobject_cast<QFFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    QList<QList<QFRawDataRecord* > > fitted=data->getFittedFiles();
+    QList<QList<QFRawDataRecord* > > guessed=data->getGuessedFiles();
+    bool setGuessed=false;
+    if ( guessed.size()>0) {
+        setGuessed=QMessageBox::question(this, tr("FCCS: copy Max to all files"), tr("Do you also want to set min/max for guessed filesets?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
+    }
+    for (int i=0; i<fitted.size(); i++) {
+        for (int j=0; j<fitted[i].size(); j++) {
+            QFRawDataRecord* rdr=fitted[i].at(j);
+            setUserMaxInternal(data, rdr, userMax);
+        }
+    }
+    if (guessed.size()>0 && setGuessed) {
+        for (int i=0; i<guessed.size(); i++) {
+            for (int j=0; j<guessed[i].size(); j++) {
+                QFRawDataRecord* rdr=guessed[i].at(j);
+                setUserMaxInternal(data, rdr, userMax);
+            }
+        }
+    }
 }
 
 void QFFCCSFitEvaluationEditor::slidersCopyUserMinMaxToAll(int userMin, int userMax)
 {
-
+    if (!current) return;
+    QFFCCSFitEvaluationItem* data=qobject_cast<QFFCCSFitEvaluationItem*>(current);
+    if (!data) return;
+    QList<QList<QFRawDataRecord* > > fitted=data->getFittedFiles();
+    QList<QList<QFRawDataRecord* > > guessed=data->getGuessedFiles();
+    bool setGuessed=false;
+    if ( guessed.size()>0) {
+        setGuessed=QMessageBox::question(this, tr("imFCCS: copy Min/Max to all files"), tr("Do you also want to set min/max for guessed filesets?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
+    }
+    for (int i=0; i<fitted.size(); i++) {
+        for (int j=0; j<fitted[i].size(); j++) {
+            QFRawDataRecord* rdr=fitted[i].at(j);
+            //qDebug()<<"slidersCopyUserMinMaxToAll("<<userMin<<userMax<<"):  "<<rdr->getName()<<rdr;
+            setUserMinMaxInternal(data, rdr, userMin, userMax);
+        }
+    }
+    if (guessed.size()>0 && setGuessed) {
+        for (int i=0; i<guessed.size(); i++) {
+            for (int j=0; j<guessed[i].size(); j++) {
+                QFRawDataRecord* rdr=guessed[i].at(j);
+                setUserMinMaxInternal(data, rdr, userMin, userMax);
+            }
+        }
+    }
 }
 
 void QFFCCSFitEvaluationEditor::setUserMinMaxInternal(QFFCCSFitEvaluationItem *data, QFRawDataRecord *rdr, int userMin, int userMax)
