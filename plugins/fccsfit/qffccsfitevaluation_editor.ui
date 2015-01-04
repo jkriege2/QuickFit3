@@ -101,6 +101,36 @@ p, li { white-space: pre-wrap; }
    </item>
    <item row="2" column="1" rowspan="2">
     <layout class="QGridLayout" name="gridLayout_3">
+     <item row="3" column="0">
+      <widget class="QCheckBox" name="chkDontFitMasked">
+       <property name="text">
+        <string>don't fit excluded runs</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="0">
+      <widget class="QLabel" name="label_9">
+       <property name="text">
+        <string>local-global iterations:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QToolButton" name="btnClearEverything">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>clear Everything</string>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="0" colspan="2">
       <widget class="QLabel" name="label_6">
        <property name="text">
@@ -147,14 +177,14 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
-     <item row="7" column="0" colspan="2">
+     <item row="9" column="0" colspan="2">
       <widget class="Line" name="line_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="8" column="0">
+     <item row="10" column="0">
       <widget class="QToolButton" name="btnSaveReport">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -194,7 +224,7 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
-     <item row="8" column="1">
+     <item row="10" column="1">
       <widget class="QToolButton" name="btnPrintReport">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -214,7 +244,7 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item row="7" column="0">
       <widget class="QToolButton" name="btnClearCurrent">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -230,14 +260,14 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
-     <item row="4" column="0" colspan="2">
+     <item row="6" column="0" colspan="2">
       <widget class="Line" name="line_3">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
       </widget>
      </item>
-     <item row="6" column="0">
+     <item row="8" column="0">
       <widget class="QToolButton" name="btnCopyToInitial">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -253,7 +283,7 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
-     <item row="5" column="1">
+     <item row="7" column="1">
       <widget class="QToolButton" name="btnClearAllPixels">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
@@ -269,10 +299,37 @@ p, li { white-space: pre-wrap; }
        </property>
       </widget>
      </item>
-     <item row="3" column="0" colspan="2">
+     <item row="3" column="1">
       <widget class="QCheckBox" name="chkSaveStrings">
        <property name="text">
         <string>save long result strings</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QLabel" name="label_10">
+       <property name="text">
+        <string>repeat fits:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QSpinBox" name="spinFitRepeats">
+       <property name="minimum">
+        <number>1</number>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <widget class="QSpinBox" name="spinFitLocalGlobals">
+       <property name="specialValueText">
+        <string>global only</string>
+       </property>
+       <property name="minimum">
+        <number>0</number>
+       </property>
+       <property name="value">
+        <number>2</number>
        </property>
       </widget>
      </item>
@@ -476,7 +533,7 @@ p, li { white-space: pre-wrap; }
        </property>
        <property name="sizeHint" stdset="0">
         <size>
-         <width>64</width>
+         <width>32</width>
          <height>20</height>
         </size>
        </property>
@@ -491,6 +548,12 @@ p, li { white-space: pre-wrap; }
      </item>
      <item>
       <widget class="QFFitAlgorithmErrorEstimateModeWidget" name="widFitErrorEstimate" native="true">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <property name="minimumSize">
         <size>
          <width>16</width>
@@ -518,6 +581,16 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
+   <class>JKQTPerrorPlotstyleComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QEnhancedTableView</class>
+   <extends>QTableView</extends>
+   <header>qenhancedtableview.h</header>
+  </customwidget>
+  <customwidget>
    <class>QFPlotter</class>
    <extends>QWidget</extends>
    <header>qfplotter.h</header>
@@ -540,25 +613,9 @@ p, li { white-space: pre-wrap; }
    <header>qffcsweightingtools.h</header>
   </customwidget>
   <customwidget>
-   <class>JKQTPerrorPlotstyleComboBox</class>
-   <extends>QComboBox</extends>
-   <header>jkqtptools.h</header>
-  </customwidget>
-  <customwidget>
    <class>DataCutSliders</class>
    <extends>QWidget</extends>
    <header>datacutslider.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
-   <class>QEnhancedTableView</class>
-   <extends>QTableView</extends>
-   <header>qenhancedtableview.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QFRDRRunSelector</class>
-   <extends>QWidget</extends>
-   <header>qfrdrrunselector.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -570,6 +627,12 @@ p, li { white-space: pre-wrap; }
    <class>QFFitAlgorithmErrorEstimateModeWidget</class>
    <extends>QWidget</extends>
    <header>qffitalgorithmerrorestimatemodewidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFRDRRunSelector</class>
+   <extends>QWidget</extends>
+   <header>qfrdrrunselector.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

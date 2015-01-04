@@ -30,12 +30,6 @@ $$faq_end$$
 
 
 $$faq_start$$
-  <a name="FAQ_RELCCFAMPLITUDES"><b>How can I calculate relative cross-correlation amplitudes?</b>
-$$faq_answer$$
-  See the page <a href="./calc_ccf_amplitude.html">Tool: calculate relative CCF amplitude</a> for a step-by-step description.
-$$faq_end$$
-
-$$faq_start$$
   <a name="FAQ_GLOBALFIT"><b>What is a global FCCS fit?</b>
 $$faq_answer$$
   In a standard FCS fit, there is exactly one correlation function (usually an autocorrelation) for each run. The fit then optimizes the parameters of a single model to best fit this correlation curve. In FCCS measurements, several auto- and cross-correlation functions exist for each run. These curves are not independent, but partly determined by the same parameters (e.g. the focus volume parameters, or also the diffusion coefficients in a 2-color FCCS measurement, where the same double-labeled particles are observed in all color channels). Therefore the information from all these curves (e.g. two autocorrelations and a cross-correlation for two-color FCCS) can be used to better estimate the underlying model parameters. The (partly linked) parameters of several models are then optimized simultaneously to best fit all correlation curves in each pixel simultaneously.

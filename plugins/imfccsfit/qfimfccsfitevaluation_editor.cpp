@@ -205,7 +205,7 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
 
     actCheckFilesets=new QAction(tr("Check fitted filesets"), this);
     actCheckFilesets->setToolTip(tr("removes all fitted filesets, for which no fit results exist."));
-    connect(actCheckFilesets, SIGNAL(triggered()), this, SLOT(copyToInitial()));
+    connect(actCheckFilesets, SIGNAL(triggered()), this, SLOT(checkFitFileSets()));
     menuEvaluation->addAction(actCheckFilesets);
 
 
@@ -338,7 +338,7 @@ void QFImFCCSFitEvaluationEditor::connectWidgets(QFEvaluationItem* current, QFEv
         ui->chkKey->setChecked(item->getProperty("imFCCSFit/key", true).toBool());
         ui->chkSaveStrings->setChecked(!item->getProperty("dontSaveFitResultMessage", true).toBool());
         ui->chkDontFitMasked->setChecked(item->getProperty("dontFitMaskedPixels", true).toBool());
-        ui->spinFitRepeats->setValue(item->getProperty("repeatFit", 1).toInt());
+        ui->spinFitRepeats->setValue(item->getProperty("repeatFit", 2).toInt());
         ui->spinFitLocalGlobals->setValue(item->getProperty("localGlobalFitIterations", 0).toInt());
         ui->lstFileSets->setModel(item->getFileSetsModel());
         if (ui->lstFileSets->model()->rowCount()>0) {

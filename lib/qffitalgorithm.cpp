@@ -524,15 +524,15 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double *paramsOut, double *paramEr
 
             double localChi2=0;
             QFFitAlgorithm::FitResult resultbs=intFit(bsParams, bsErrors, bsInitParams, &fm, tparamsMin, tparamsMax);
-            if (result.params.contains("error_sum")) localChi2=resultbs.params["error_sum"].getAsDouble();
+            if (resultbs.params.contains("error_sum")) localChi2=resultbs.params["error_sum"].getAsDouble();
             if (chi2>0 && localChi2>0 && localChi2<chi2) {
                 chi2=localChi2;
-                result=resultbs;
+                //result=resultbs;
             }
-            long its=result.params.contains("iterations")?result.params["iterations"].getAsDouble():0;
-            long fevals=result.params.contains("function_evals")?result.params["function_evals"].getAsDouble():0;
-            long jevals=result.params.contains("jacobian_evals")?result.params["jacobian_evals"].getAsDouble():0;
-            long devals=result.params.contains("derivative_evals")?result.params["derivative_evals"].getAsDouble():0;
+            long its=resultbs.params.contains("iterations")?resultbs.params["iterations"].getAsDouble():0;
+            long fevals=resultbs.params.contains("function_evals")?resultbs.params["function_evals"].getAsDouble():0;
+            long jevals=resultbs.params.contains("jacobian_evals")?resultbs.params["jacobian_evals"].getAsDouble():0;
+            long devals=resultbs.params.contains("derivative_evals")?resultbs.params["derivative_evals"].getAsDouble():0;
             if (its>0 || result.params.contains("iterations")) result.addInteger("iterations", its+result.params.value("iterations").getAsDouble());
             if (fevals>0 || result.params.contains("function_evals")) result.addInteger("function_evals", fevals+result.params.value("function_evals").getAsDouble());
             if (jevals>0 || result.params.contains("jacobian_evals")) result.addInteger("jacobian_evals", jevals+result.params.value("jacobian_evals").getAsDouble());

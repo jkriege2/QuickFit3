@@ -153,12 +153,14 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
         QAction* actGuess;
         QAction* actLoadGLobalFitConfig;
         QAction* actSaveGLobalFitConfig;
+        QAction* actSetResetFitParameters;
 
 
         QAction* actResetCurrent;
         QAction* actResetAllRuns;
         QAction* actResetAllPixelsInAllFilesets;
         QAction* actCopyToInitial;
+        QAction* actCheckFilesets;
 
         QMenu* menuFCCSFit;
         QMenu* menuEvaluation;
@@ -221,6 +223,13 @@ class QFFCCSFitEvaluationEditor : public QFEvaluationEditor {
 
 
         void errorEstimateModeChanged();
+        void checkFitFileSets();
+
+        void on_spinFitLocalGlobals_valueChanged(int value);
+
+        void on_chkDontFitMasked_toggled(bool checked);
+        void on_spinFitRepeats_valueChanged(int value);
+        void setParameterInRDRs();
 };
 
 #endif // QFFCCSFITEVALUATIONEDITOR_H

@@ -949,6 +949,7 @@ void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int
     QList<double*> errorsVector, errorsVectorI;
 
     bool saveLongStrings=!getProperty("dontSaveFitResultMessage", true).toBool();
+    bool dontFitMasked=getProperty("dontFitMaskedPixels", true).toBool();
 
     QFFitAlgorithm* falg=getFitAlgorithm();
     if ((!falg)||records.size()<=0) return;
@@ -956,7 +957,12 @@ void QFFCCSFitEvaluationItem::doFit(const QList<QFRawDataRecord *> &records, int
     if (!data0) return;
     QFGlobalFitTool tool(falg);
     tool.clear();
+    tool.setRepeats(qMax(1,getProperty("repeatFit", 1).toInt()));
+    tool.setGlobalLocalRepeats(qMax(0,getProperty("localGlobalFitIterations", 0).toInt()));
     tool.setDoRecalculateInternals(false);
+
+    QFRDRRunSelectionsInterface* runsel=qobject_cast<QFRDRRunSelectionsInterface*>(records.first());
+    if (runsel && dontFitMasked && run>=0 && runsel->leaveoutRun(run)) return;
 
     if (dlgFitProgress) {
         dlgFitProgress->reportStatus(tr("setting up ..."));
