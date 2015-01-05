@@ -20,7 +20,38 @@
    <iconset resource="qfrdrtable.qrc">
     <normaloff>:/table/table_import_large.png</normaloff>:/table/table_import_large.png</iconset>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,1,0,0">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnPasteAgain">
+       <property name="text">
+        <string>&amp;Paste Again</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfrdrtable.qrc">
+         <normaloff>:/table/paste.png</normaloff>:/table/paste.png</iconset>
+       </property>
+       <property name="shortcut">
+        <string>Ctrl+V</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
    <item>
     <widget class="QTableView" name="tableView"/>
    </item>
@@ -50,7 +81,7 @@
        </item>
        <item>
         <property name="text">
-         <string>append at cursor position</string>
+         <string>insert at cursor position</string>
         </property>
        </item>
       </widget>
@@ -73,6 +104,16 @@
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>import what:</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="1">
+      <widget class="QCheckBox" name="chkImportExressions">
+       <property name="text">
+        <string>import cell/column expressions (if unchecked, all expressions will be deleted before importing the dataset)</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

@@ -92,6 +92,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slSaveTable();
         void slLoadTable();
         void slImportFile();
+        void slImportFromClipboard();
         void slEditColumnProperties(int col=-1);
         void slResize();
         void slCopy();
@@ -193,6 +194,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actCopy;
         QAction* actCut;
         QAction* actPaste;
+        QAction* actImportFromClipboard;
         QAction* actHistogram;
         QAction * actHistogram2D;
 

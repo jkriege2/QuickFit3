@@ -15,9 +15,11 @@ class DlgIMportTable : public QDialog
 
     public:
         explicit DlgIMportTable(QWidget *parent = 0);
+        explicit DlgIMportTable(bool pastAgainEnabled, QWidget *parent = 0);
         ~DlgIMportTable();
 
         bool importAll() const;
+        bool importExpressions() const;
         void setModel(QAbstractItemModel* model);
         QItemSelectionModel* getSelection() const;
         int importMode() const;
@@ -25,6 +27,7 @@ class DlgIMportTable : public QDialog
     protected slots:
         void on_radImportAll_toggled(bool checked);
         void selectionCHanged();
+        void on_btnPasteAgain_clicked();
 
     private:
         Ui::DlgIMportTable *ui;

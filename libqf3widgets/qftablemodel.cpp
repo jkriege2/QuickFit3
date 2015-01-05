@@ -829,7 +829,7 @@ QList<quint64> QFTableModel::getColumnHeaderDataRoles() const
     return state.headerDataMap.keys();
 }
 
-void QFTableModel::copyColumnFromModel(QAbstractTableModel *model, int column, int column_here, int row_here, int row_model_start, int row_model_end, QFTableModel::copyColumnHeaderMode *copyHeader)
+void QFTableModel::copyColumnFromModel(QAbstractTableModel *model, int column, int column_here, int row_here, int row_model_start, int row_model_end, QFTableModel::copyColumnHeaderMode *copyHeader, QSet<int> excludedRoles, QSet<int> excludedHeaderRoles)
 {
     if (readonly) return;
     QList<int> idx;
@@ -857,22 +857,21 @@ void QFTableModel::copyColumnFromModel(QAbstractTableModel *model, int column, i
      }
     bool oldemit=doEmitSignals;
     doEmitSignals=false;
-    copyColumnFromModel(model, column, column_here, idx, row_here, copyHeader);
+    copyColumnFromModel(model, column, column_here, idx, row_here, copyHeader, excludedRoles, excludedHeaderRoles);
     doEmitSignals=oldemit;
     if (doEmitSignals) {
         emit dataChanged(index(row_here, column_here), index(row_end, column_here));
     }
 }
 
-void QFTableModel::copyColumnFromModel(QAbstractTableModel *model, int column, int column_here, const QList<int> &rows_model, int row_here, copyColumnHeaderMode *copyHeader)
-{
+void QFTableModel::copyColumnFromModel(QAbstractTableModel *model, int column, int column_here, const QList<int> &rows_model, int row_here, QFTableModel::copyColumnHeaderMode *copyHeader, QSet<int> excludedRoles, QSet<int> excludedHeaderRoles) {
     if (readonly) return;
     startMultiUndo();
     bool oldemit=doEmitSignals;
     doEmitSignals=false;
     int rh=row_here;
     for (int r=0; r<rows_model.size(); r++) {
-        copyCellFromModelCreate(model, column, r, column_here, rh, copyHeader);
+        copyCellFromModelCreate(model, column, r, column_here, rh, copyHeader, excludedRoles, excludedHeaderRoles);
 
         rh++;
     }
@@ -885,7 +884,7 @@ void QFTableModel::copyColumnFromModel(QAbstractTableModel *model, int column, i
     }
 }
 
-void QFTableModel::copyCellFromModelCreate(QAbstractTableModel *model, int column, int row, int column_here, int row_here, copyColumnHeaderMode *copyHeader)
+void QFTableModel::copyCellFromModelCreate(QAbstractTableModel *model, int column, int row, int column_here, int row_here, copyColumnHeaderMode *copyHeader, QSet<int> excludedRoles, QSet<int> excludedHeaderRoles)
 {
     if (readonly) return;
     QFTableModel* tm=qobject_cast<QFTableModel*>(model);
@@ -930,7 +929,7 @@ void QFTableModel::copyCellFromModelCreate(QAbstractTableModel *model, int colum
             setColumnTitleCreate(column_here, tm->columnTitle(column));
             const QHash<int, QVariant>& hd=tm->state.headerDataMap[column];
             for (int i=0; i<hd.keys().size(); i++) {
-                setColumnHeaderData(column_here, hd.keys().at(i), hd[hd.keys().at(i)]);
+                if (!excludedHeaderRoles.contains(hd.keys().at(i))) setColumnHeaderData(column_here, hd.keys().at(i), hd[hd.keys().at(i)]);
             }
         }
         //qDebug()<<"copy ("<<row<<column<<") => ("<<row_here<<column_here<<")";
@@ -944,6 +943,12 @@ void QFTableModel::copyCellFromModelCreate(QAbstractTableModel *model, int colum
         state.dataBackgroundMap[idx_here]=tm->state.dataBackgroundMap[idx];
         state.dataCheckedMap[idx_here]=tm->state.dataCheckedMap[idx];
         state.moreDataMap[idx_here]=tm->state.moreDataMap[idx];
+        QList<int> keys=state.moreDataMap[idx_here].keys();
+        for (int i=0; i<keys.size(); i++) {
+            if (excludedRoles.contains(keys[i])) {
+                state.moreDataMap.remove(keys[i]);
+            }
+        }
 
     } else {
         bool doCopyHeader=(headerData(column_here, Qt::Horizontal)!=model->headerData(column, Qt::Horizontal));
@@ -974,7 +979,7 @@ void QFTableModel::copyCellFromModelCreate(QAbstractTableModel *model, int colum
     if (doEmitSignals) emit dataChanged(index(row_here, column_here), index(row_here, column_here));
 }
 
-void QFTableModel::copyCellsFromModelCreate(QAbstractTableModel *model, const QList<QFTableModel::cellToCopy> &cells, QFTableModel::copyColumnHeaderMode *copyHeader)
+void QFTableModel::copyCellsFromModelCreate(QAbstractTableModel *model, const QList<QFTableModel::cellToCopy> &cells, QFTableModel::copyColumnHeaderMode *copyHeader, QSet<int> excludedRoles, QSet<int> excludedHeaderRoles)
 {
     if (readonly || !model) return;
     startMultiUndo();
@@ -982,7 +987,7 @@ void QFTableModel::copyCellsFromModelCreate(QAbstractTableModel *model, const QL
     doEmitSignals=false;
 
     for (int i=0; i<cells.size(); i++) {
-        copyCellFromModelCreate(model, cells[i].c, cells[i].r, cells[i].c_here, cells[i].r_here, copyHeader);
+        copyCellFromModelCreate(model, cells[i].c, cells[i].r, cells[i].c_here, cells[i].r_here, copyHeader, excludedRoles, excludedHeaderRoles);
     }
 
     doEmitSignals=oldemit;

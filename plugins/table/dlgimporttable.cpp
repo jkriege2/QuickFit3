@@ -3,15 +3,30 @@
 #include "programoptions.h"
 #include "qfrdrtabledelegate.h"
 #include<QItemSelectionModel>
+#include "qftablepluginmodel.h"
 
 DlgIMportTable::DlgIMportTable(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::DlgIMportTable)
 {
     ui->setupUi(this);
+    ui->btnPasteAgain->setVisible(false);
     ui->tableView->setItemDelegate(new QFRDRTableDelegate(ui->tableView));
     ui->tableView->selectAll();
     ProgramOptions::getConfigWindowGeometry(this, "DlgIMportTable");
+}
+
+DlgIMportTable::DlgIMportTable(bool pastAgainEnabled, QWidget *parent) :
+    QDialog(parent),
+    ui(new Ui::DlgIMportTable)
+{
+    ui->setupUi(this);
+    ui->btnPasteAgain->setVisible(pastAgainEnabled);
+    ui->tableView->setItemDelegate(new QFRDRTableDelegate(ui->tableView));
+    ui->tableView->selectAll();
+    ui->cmbImportWhere->setCurrentIndex(2);
+    ProgramOptions::getConfigWindowGeometry(this, "DlgIMportTable");
+
 }
 
 DlgIMportTable::~DlgIMportTable()
@@ -23,6 +38,11 @@ DlgIMportTable::~DlgIMportTable()
 bool DlgIMportTable::importAll() const
 {
     return ui->radImportAll->isChecked();
+}
+
+bool DlgIMportTable::importExpressions() const
+{
+    return ui->chkImportExressions->isChecked();
 }
 
 void DlgIMportTable::setModel(QAbstractItemModel *model)
@@ -66,4 +86,16 @@ void DlgIMportTable::selectionCHanged()
     }
     ui->radImportAll->setChecked(all);
     ui->radImportSelected->setChecked(!all);
+}
+
+void DlgIMportTable::on_btnPasteAgain_clicked()
+{
+    QFTablePluginModel* tab=qobject_cast<QFTablePluginModel*>(ui->tableView->model());
+    if (tab) {
+        bool ro=tab->isReadonly();
+        tab->setReadonly(false);
+        tab->clear();
+        tab->paste();
+        tab->setReadonly(ro);
+    }
 }

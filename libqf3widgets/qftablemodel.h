@@ -338,9 +338,9 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
          *
          *  The data ends up, starting at (row_here, column_here) and only the rows between row_model_start and row_model_end from the model are copied (unless these are -1 and -1, then the complete column is copied)
          */
-        void copyColumnFromModel(QAbstractTableModel* model, int column, int column_here, int row_here=0, int row_model_start=-1, int row_model_end=-1, copyColumnHeaderMode* copyHeader=NULL);
-        void copyColumnFromModel(QAbstractTableModel* model, int column, int column_here, const QList<int>& rows_model, int row_here=0, copyColumnHeaderMode* copyHeader=NULL);
-        void copyCellFromModelCreate(QAbstractTableModel* model, int column, int row, int column_here, int row_here, copyColumnHeaderMode* copyHeader=NULL);
+        void copyColumnFromModel(QAbstractTableModel* model, int column, int column_here, int row_here=0, int row_model_start=-1, int row_model_end=-1, copyColumnHeaderMode* copyHeader=NULL, QSet<int> excludedRoles=QSet<int>(), QSet<int> excludedHeaderRoles=QSet<int>());
+        void copyColumnFromModel(QAbstractTableModel* model, int column, int column_here, const QList<int>& rows_model, int row_here=0, copyColumnHeaderMode* copyHeader=NULL, QSet<int> excludedRoles=QSet<int>(), QSet<int> excludedHeaderRoles=QSet<int>());
+        void copyCellFromModelCreate(QAbstractTableModel* model, int column, int row, int column_here, int row_here, copyColumnHeaderMode* copyHeader=NULL, QSet<int> excludedRoles=QSet<int>(), QSet<int> excludedHeaderRoles=QSet<int>());
         struct QFWIDLIB_EXPORT cellToCopy {
             int r;
             int c;
@@ -354,7 +354,7 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
             }
         };
 
-        void copyCellsFromModelCreate(QAbstractTableModel* model, const QList<cellToCopy>& cells, copyColumnHeaderMode* copyHeader=NULL);
+        void copyCellsFromModelCreate(QAbstractTableModel* model, const QList<cellToCopy>& cells, copyColumnHeaderMode* copyHeader=NULL, QSet<int> excludedRoles=QSet<int>(), QSet<int> excludedHeaderRoles=QSet<int>());
 
         /** \brief set the default QVariant value displayed in an editor, if the value does not yet exist */
         void setDefaultEditValue(QVariant defaultEditValue);

@@ -27,6 +27,7 @@
 
 class QFTablePluginModel : public QFTableModel
 {
+        Q_OBJECT
     public:
         explicit QFTablePluginModel(QObject *parent=NULL);
         virtual QVariant data(const QModelIndex &index, int role=Qt::DisplayRole) const;

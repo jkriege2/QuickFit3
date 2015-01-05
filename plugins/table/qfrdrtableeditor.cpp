@@ -205,6 +205,9 @@ void QFRDRTableEditor::createWidgets() {
     connect(this, SIGNAL(enableActions(bool)), actPaste, SLOT(setEnabled(bool)));
     connect(actPaste, SIGNAL(triggered()), this, SLOT(slPaste()));
 
+    actImportFromClipboard=new QAction(tr("Import from Clipboard (extended Paste)"), this);
+    connect(this, SIGNAL(enableActions(bool)), actImportFromClipboard, SLOT(setEnabled(bool)));
+    connect(actImportFromClipboard, SIGNAL(triggered()), this, SLOT(slImportFromClipboard()));
 
     actSaveTableTemplate=new QAction(tr("save table template"), this);
     connect(actSaveTableTemplate, SIGNAL(triggered()), this, SLOT(slSaveTableTemplate()));
@@ -423,7 +426,7 @@ void QFRDRTableEditor::createWidgets() {
 
     tvMain->addAction(actUndo);
     tvMain->addAction(actRedo);
-    tvMain->addAction(actPaste);
+    tvMain->addAction(getSeparatorAction(this));
     tvMain->addAction(actCopy);
     tvMain->addAction(actCopyResults);
     tvMain->addAction(actCopyResultsNoHead);
@@ -473,6 +476,7 @@ void QFRDRTableEditor::createWidgets() {
     menuEdit->addAction(actCopy);
     menuEdit->addAction(actCut);
     menuEdit->addAction(actPaste);
+    menuEdit->addAction(actImportFromClipboard);
     menuEdit->addSeparator();
     menuEdit->addAction(actCopyResults);
     menuEdit->addAction(actCopyResultsNoHead);
@@ -832,6 +836,106 @@ void QFRDRTableEditor::slImportFile()
 
                 delete datamodel;
             }
+        }
+    }
+}
+
+void QFRDRTableEditor::slImportFromClipboard()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+
+                QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+                QFTablePluginModel* datamodel=new QFTablePluginModel(this);
+                datamodel->setUndoEnabled(false);
+                datamodel->setVerticalHeaderShowRowNumbers(true);
+                datamodel->setReadonly(false);
+                datamodel->clear();
+                datamodel->paste();
+                datamodel->setReadonly(true);
+                bool ok=true;
+
+
+
+
+                QApplication::restoreOverrideCursor();
+                if (ok) {
+                    DlgIMportTable* dlg=new DlgIMportTable(true, this);
+                    dlg->setModel(datamodel);
+
+                    if (dlg->exec()) {
+                        QSet<int> excludedRoles, excludedHeaderRoles;
+                        if (!dlg->importExpressions()) {
+                            excludedRoles<<QFRDRTable::TableExpressionRole;
+                            excludedHeaderRoles<<QFRDRTable::ColumnExpressionRole;
+                        }
+                        QList<int> coll;
+                        QList<int> rowl;
+                        if (!dlg->importAll()) {
+                            QSet<int> cols;
+                            QSet<int> rows;
+                            QModelIndexList idxs=dlg->getSelection()->selectedIndexes();
+                            for (int i=0; i<idxs.size(); i++) {
+                                if (!cols.contains(idxs[i].column())) {
+                                    cols.insert(idxs[i].column());
+                                }
+                                if (!rows.contains(idxs[i].row())) {
+                                    rows.insert(idxs[i].row());
+                                }
+                            }
+                            coll=cols.toList();
+                            rowl=rows.toList();
+                            qSort(coll);
+                            qSort(rowl);
+                        } else {
+                            for (int i=0; i<datamodel->columnCount(); i++) {
+                                coll.append(i);
+                            }
+                            for (int i=0; i<datamodel->rowCount(); i++) {
+                                rowl.append(i);
+                            }
+                        }
+                        int startR=0;
+                        int startC=-1;
+                        if (dlg->importMode()==0) {
+                            startC=m->model()->columnCount();
+                        } else if (dlg->importMode()==1) {
+                            startC=0;
+                        } else if (dlg->importMode()==2) {
+                            startR=tvMain->currentIndex().row();
+                            startC=tvMain->currentIndex().column();
+                        }
+                        //qDebug()<<startR<<startC<<coll<<rowl;
+                        if (startR>=0 && startC>=0) {
+                            QFTableModel::copyColumnHeaderMode copyHeader=QFTableModel::copyHeaderAskUser;
+                            if (dlg->importAll()) {
+                                m->model()->startMultiUndo();
+                                for (int c=0; c<datamodel->columnCount(); c++) {
+                                    m->model()->copyColumnFromModel(datamodel, c, startC+c, startR, -1, -1, &copyHeader, excludedRoles, excludedHeaderRoles);
+                                }
+                                m->model()->endMultiUndoAndReset();
+                            } else {
+                                QModelIndexList idxs=dlg->getSelection()->selectedIndexes();
+                                QList<QFTableModel::cellToCopy> cells;
+                                for (int id=0; id<idxs.size(); id++) {
+                                    int c=idxs[id].column();
+                                    int r=idxs[id].row();
+                                    int ch=startC+coll.indexOf(c);
+                                    int rh=startR+rowl.indexOf(r);
+                                    if (c>=0 && r>=0 && ch>=0 && rh>=0) {
+                                        cells.append(QFTableModel::cellToCopy(r,c,rh,ch));
+                                    }
+                                }
+                                m->model()->copyCellsFromModelCreate(datamodel, cells, &copyHeader, excludedRoles, excludedHeaderRoles);
+                            }
+                        }
+                    }
+                    delete dlg;
+                }
+
+                delete datamodel;
         }
     }
 }
@@ -1470,6 +1574,8 @@ void QFRDRTableEditor::slClearExpression()
         if (m->model()) {
             QItemSelectionModel* smod=tvMain->selectionModel();
             if (smod && smod->hasSelection()) {
+                m->model()->disableSignals();
+                m->model()->startMultiUndo();
                 int answer = QMessageBox::question(this, tr("Clear Table Expressions"), tr("Are you sure that you want to clear all expressions from the selected table cells?"), QMessageBox::Yes | QMessageBox::No);
                 if (answer == QMessageBox::Yes) {
                     QModelIndexList idxs=smod->selectedIndexes();
@@ -1495,6 +1601,11 @@ void QFRDRTableEditor::slClearExpression()
                             }
                         }
                     }
+                }
+                m->model()->enableSignals(true);
+                m->model()->endMultiUndo();
+                if (QMessageBox::question(this, tr("Clear Expressions"), tr("You removed expressions from the table.\n  Do you want to recalculate All expressions?"), QMessageBox::Yes | QMessageBox::No)==QMessageBox::Yes) {
+                    slRecalcAll();
                 }
             }
         }
