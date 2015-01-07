@@ -26,16 +26,16 @@
 #include <QAction>
 #include <QToolButton>
 #include <QSettings>
-#include "libwid_imexport.h"
+#include "lib_imexport.h"
 
-class QFWIDLIB_EXPORT QConfigComboboxWidgetSaveable {
+class QFLIB_EXPORT QConfigComboboxWidgetSaveable {
     public:
         virtual bool widgetChanged(QSettings* settings, const QString& prefix)=0;
         virtual bool saveWidget(QSettings* settings, const QString& prefix)=0;
         virtual bool loadWidget(QSettings* settings, const QString& prefix)=0;
 };
 
-class QFWIDLIB_EXPORT QConfigComboboxWidget : public QWidget
+class QFLIB_EXPORT QConfigComboboxWidget : public QWidget
 {
         Q_OBJECT
     public:

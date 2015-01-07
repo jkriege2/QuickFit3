@@ -110,4 +110,9 @@ QFLIB_EXPORT QString toCSV(const QList<QVector<double> >& data, const QStringLis
 */
 QFLIB_EXPORT QString toCSV(const QList<QList<QVariant> >& data, const QStringList& columnsNames, const QStringList& rowNames, QChar decimalSep='.', const QString colSep=QString(", "), bool withHeaders=true, QChar stringDelimiter=QLatin1Char('\"'), const QString& headerSep=QString("#! "), int precision=15);
 
+/*! \brief true to guess the CSV parameters in a given string data
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT bool guessCSVParameters( QString data, char* out_sep, char* out_dec=NULL, char* out_comment=NULL, QString* out_headercomment=NULL);
 #endif // CSVTOOLS_H

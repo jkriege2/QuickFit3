@@ -45,7 +45,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QMimeData>
 #include <QClipboard>
 #include <QModelIndex>
-#include "libwid_imexport.h"
+#include "lib_imexport.h"
 #include <QLinkedList>
 
 /*! \brief this class is used to manage a table of values (QVariant)
@@ -146,7 +146,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
    hierarchy immediately and create an undo-step.
 
  */
-class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
+class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
         Q_OBJECT
     protected:
         /** \brief converts a (row, column) adress into a QHash index: (row<<16) | column */
@@ -341,7 +341,7 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
         void copyColumnFromModel(QAbstractTableModel* model, int column, int column_here, int row_here=0, int row_model_start=-1, int row_model_end=-1, copyColumnHeaderMode* copyHeader=NULL, QSet<int> excludedRoles=QSet<int>(), QSet<int> excludedHeaderRoles=QSet<int>());
         void copyColumnFromModel(QAbstractTableModel* model, int column, int column_here, const QList<int>& rows_model, int row_here=0, copyColumnHeaderMode* copyHeader=NULL, QSet<int> excludedRoles=QSet<int>(), QSet<int> excludedHeaderRoles=QSet<int>());
         void copyCellFromModelCreate(QAbstractTableModel* model, int column, int row, int column_here, int row_here, copyColumnHeaderMode* copyHeader=NULL, QSet<int> excludedRoles=QSet<int>(), QSet<int> excludedHeaderRoles=QSet<int>());
-        struct QFWIDLIB_EXPORT cellToCopy {
+        struct QFLIB_EXPORT cellToCopy {
             int r;
             int c;
             int r_here;
@@ -513,7 +513,7 @@ class QFWIDLIB_EXPORT QFTableModel : public QAbstractTableModel {
 };
 
 
-class QFWIDLIB_EXPORT QFTableModelColumnHeaderModel : public QAbstractListModel {
+class QFLIB_EXPORT QFTableModelColumnHeaderModel : public QAbstractListModel {
         Q_OBJECT
     public:
         /** Default constructor */

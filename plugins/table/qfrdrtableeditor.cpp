@@ -711,6 +711,8 @@ void QFRDRTableEditor::slImportFile()
             filter<<tr("Comma Separated Values, Decimal Dot (*.txt *.csv *.dat)")
                   <<tr("Semicolon Separated Values, Decimal Dot (*.txt *.csv *.dat)")
                   <<tr("Semicolon Separated Values, Decimal Comma (*.txt *.csv *.dat)")
+                  <<tr("Tab Separated Values, Decimal Dot (*.txt *.tsv *.dat *.csv)")
+                  <<tr("Tab Separated Values, Decimal Comma (*.txt *.tsv *.dat *.csv)")
                   <<tr("Table XML file (*.qftxml)");
             QString fileName = qfGetOpenFileNameSet("table/slImportTable/", this, tr("Load Table ..."), currentTableDir, filter.join(";;"), &selectedFilter);
             //std::cout<<"selectedFilter: "<<selectedFilter.toStdString()<<std::endl;
@@ -747,6 +749,16 @@ void QFRDRTableEditor::slImportFile()
                         csvDlg->set_decimal_separator(',');
                         csvDlg->set_comment_start('#');
                         csvDlg->set_header_start("#!");
+                    } else if (f==3) {
+                        csvDlg->set_column_separator('\t');
+                        csvDlg->set_decimal_separator('.');
+                        csvDlg->set_comment_start('#');
+                        csvDlg->set_header_start("#!");
+                    } else if (f==4) {
+                        csvDlg->set_column_separator('\t');
+                        csvDlg->set_decimal_separator(',');
+                        csvDlg->set_comment_start('#');
+                        csvDlg->set_header_start("#!");
                     }
                     csvDlg->setFileContents(fileName);
                     if (csvDlg->exec()==QDialog::Accepted) {
@@ -770,66 +782,7 @@ void QFRDRTableEditor::slImportFile()
                     dlg->setModel(datamodel);
 
                     if (dlg->exec()) {
-                        QList<int> coll;
-                        QList<int> rowl;
-                        if (!dlg->importAll()) {
-                            QSet<int> cols;
-                            QSet<int> rows;
-                            QModelIndexList idxs=dlg->getSelection()->selectedIndexes();
-                            for (int i=0; i<idxs.size(); i++) {
-                                if (!cols.contains(idxs[i].column())) {
-                                    cols.insert(idxs[i].column());
-                                }
-                                if (!rows.contains(idxs[i].row())) {
-                                    rows.insert(idxs[i].row());
-                                }
-                            }
-                            coll=cols.toList();
-                            rowl=rows.toList();
-                            qSort(coll);
-                            qSort(rowl);
-                        } else {
-                            for (int i=0; i<datamodel->columnCount(); i++) {
-                                coll.append(i);
-                            }
-                            for (int i=0; i<datamodel->rowCount(); i++) {
-                                rowl.append(i);
-                            }
-                        }
-                        int startR=0;
-                        int startC=-1;
-                        if (dlg->importMode()==0) {
-                            startC=m->model()->columnCount();
-                        } else if (dlg->importMode()==1) {
-                            startC=0;
-                        } else if (dlg->importMode()==2) {
-                            startR=tvMain->currentIndex().row();
-                            startC=tvMain->currentIndex().column();
-                        }
-                        //qDebug()<<startR<<startC<<coll<<rowl;
-                        if (startR>=0 && startC>=0) {
-                            QFTableModel::copyColumnHeaderMode copyHeader=QFTableModel::copyHeaderAskUser;
-                            if (dlg->importAll()) {
-                                m->model()->startMultiUndo();
-                                for (int c=0; c<datamodel->columnCount(); c++) {
-                                    m->model()->copyColumnFromModel(datamodel, c, startC+c, startR, -1, -1, &copyHeader);
-                                }
-                                m->model()->endMultiUndoAndReset();
-                            } else {
-                                QModelIndexList idxs=dlg->getSelection()->selectedIndexes();
-                                QList<QFTableModel::cellToCopy> cells;
-                                for (int id=0; id<idxs.size(); id++) {
-                                    int c=idxs[id].column();
-                                    int r=idxs[id].row();
-                                    int ch=startC+coll.indexOf(c);
-                                    int rh=startR+rowl.indexOf(r);
-                                    if (c>=0 && r>=0 && ch>=0 && rh>=0) {
-                                        cells.append(QFTableModel::cellToCopy(r,c,rh,ch));
-                                    }
-                                }
-                                m->model()->copyCellsFromModelCreate(datamodel, cells, &copyHeader);
-                            }
-                        }
+                        dlg->doImport(m->model(), tvMain->currentIndex().row(), tvMain->currentIndex().column());
                     }
                     delete dlg;
                 }
@@ -866,71 +819,7 @@ void QFRDRTableEditor::slImportFromClipboard()
                     dlg->setModel(datamodel);
 
                     if (dlg->exec()) {
-                        QSet<int> excludedRoles, excludedHeaderRoles;
-                        if (!dlg->importExpressions()) {
-                            excludedRoles<<QFRDRTable::TableExpressionRole;
-                            excludedHeaderRoles<<QFRDRTable::ColumnExpressionRole;
-                        }
-                        QList<int> coll;
-                        QList<int> rowl;
-                        if (!dlg->importAll()) {
-                            QSet<int> cols;
-                            QSet<int> rows;
-                            QModelIndexList idxs=dlg->getSelection()->selectedIndexes();
-                            for (int i=0; i<idxs.size(); i++) {
-                                if (!cols.contains(idxs[i].column())) {
-                                    cols.insert(idxs[i].column());
-                                }
-                                if (!rows.contains(idxs[i].row())) {
-                                    rows.insert(idxs[i].row());
-                                }
-                            }
-                            coll=cols.toList();
-                            rowl=rows.toList();
-                            qSort(coll);
-                            qSort(rowl);
-                        } else {
-                            for (int i=0; i<datamodel->columnCount(); i++) {
-                                coll.append(i);
-                            }
-                            for (int i=0; i<datamodel->rowCount(); i++) {
-                                rowl.append(i);
-                            }
-                        }
-                        int startR=0;
-                        int startC=-1;
-                        if (dlg->importMode()==0) {
-                            startC=m->model()->columnCount();
-                        } else if (dlg->importMode()==1) {
-                            startC=0;
-                        } else if (dlg->importMode()==2) {
-                            startR=tvMain->currentIndex().row();
-                            startC=tvMain->currentIndex().column();
-                        }
-                        //qDebug()<<startR<<startC<<coll<<rowl;
-                        if (startR>=0 && startC>=0) {
-                            QFTableModel::copyColumnHeaderMode copyHeader=QFTableModel::copyHeaderAskUser;
-                            if (dlg->importAll()) {
-                                m->model()->startMultiUndo();
-                                for (int c=0; c<datamodel->columnCount(); c++) {
-                                    m->model()->copyColumnFromModel(datamodel, c, startC+c, startR, -1, -1, &copyHeader, excludedRoles, excludedHeaderRoles);
-                                }
-                                m->model()->endMultiUndoAndReset();
-                            } else {
-                                QModelIndexList idxs=dlg->getSelection()->selectedIndexes();
-                                QList<QFTableModel::cellToCopy> cells;
-                                for (int id=0; id<idxs.size(); id++) {
-                                    int c=idxs[id].column();
-                                    int r=idxs[id].row();
-                                    int ch=startC+coll.indexOf(c);
-                                    int rh=startR+rowl.indexOf(r);
-                                    if (c>=0 && r>=0 && ch>=0 && rh>=0) {
-                                        cells.append(QFTableModel::cellToCopy(r,c,rh,ch));
-                                    }
-                                }
-                                m->model()->copyCellsFromModelCreate(datamodel, cells, &copyHeader, excludedRoles, excludedHeaderRoles);
-                            }
-                        }
+                        dlg->doImport(m->model(), tvMain->currentIndex().row(), tvMain->currentIndex().column());
                     }
                     delete dlg;
                 }

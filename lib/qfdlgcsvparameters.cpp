@@ -22,12 +22,20 @@
 #include "qfdlgcsvparameters.h"
 #include <QtGui>
 #include "ui_qfdlg_csvparameters.h"
-
+#include "programoptions.h"
+#include "qftablemodel.h"
+#include "csvtools.h"
 
 QFDlgCSVParameters::QFDlgCSVParameters(QWidget* parent, QString columnSeparator, QString decimalSeparator, QString commentStart, QString headerStart):
     QDialog(parent), ui(new Ui::QFDlgCSVParameters)
 {
+    tabmodel=new QFTableModel(this);
     ui->setupUi(this);
+    ui->widConfig->registerWidget("column_separator", ui->edtColumn);
+    ui->widConfig->registerWidget("comment_start", ui->edtComment);
+    ui->widConfig->registerWidget("decimal_separator", ui->edtDecimal);
+    ui->widConfig->registerWidget("header_start", ui->edtHeader);
+    ui->widConfig->setFilename(QFPluginServices::getInstance()->getConfigFileDirectory()+QString("/csvdlg_csvconfig.ini"));
     ui->edtColumn->setText(QString(columnSeparator));
     if (QString(columnSeparator).isEmpty()) ui->edtColumn->setEnabled(false);
     ui->edtDecimal->setText(QString(decimalSeparator));
@@ -37,10 +45,19 @@ QFDlgCSVParameters::QFDlgCSVParameters(QWidget* parent, QString columnSeparator,
     ui->edtHeader->setText(headerStart);
     if (headerStart.isEmpty()) ui->edtHeader->setEnabled(false);
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(checkValues()));
+    ui->tableView->setModel(tabmodel);
+
+    ProgramOptions::getConfigWindowGeometry(this, "QFDlgCSVParameters/window/");
+    ProgramOptions::getConfigQSplitter(ui->splitter, "QFDlgCSVParameters/splitter/");
+    ui->widConfig->setCurrentConfig(ProgramOptions::getConfigValue("QFDlgCSVParameters/config/", "").toString());
+    guessParameters();
 }
 
 QFDlgCSVParameters::~QFDlgCSVParameters()
 {
+    ProgramOptions::setConfigWindowGeometry(this, "QFDlgCSVParameters/window/");
+    ProgramOptions::setConfigQSplitter(ui->splitter, "QFDlgCSVParameters/splitter/");
+    ProgramOptions::setConfigValue("QFDlgCSVParameters/config/", ui->widConfig->currentConfigName());
     //dtor
 }
 
@@ -55,10 +72,16 @@ void QFDlgCSVParameters::setFileContents(const QString& filename) {
         }
         file.close();
     }
+    file_contents=preview;
+    this->filename=filename;
     ui->txtContents->setPlainText(preview);
+
+    guessParameters();
+
+    reloadCSV();
 }
 
-void QFDlgCSVParameters::checkValues() {
+void QFDlgCSVParameters::checkValues(bool doAccept) {
     bool ok1=(!ui->edtColumn->isEnabled()) || ( (ui->edtColumn->text().size()>0) && (ui->edtColumn->text()!=ui->edtComment->text()) && (ui->edtColumn->text()!=ui->edtDecimal->text()) );
     bool ok2=(!ui->edtDecimal->isEnabled()) || ( (ui->edtDecimal->text().size()>0) && (ui->edtDecimal->text()!=ui->edtColumn->text()) && (ui->edtDecimal->text()!=ui->edtComment->text()) );
     bool ok3=(!ui->edtComment->isEnabled()) || ( (ui->edtComment->text().size()>0) && (ui->edtComment->text()!=ui->edtColumn->text()) && (ui->edtComment->text()!=ui->edtDecimal->text()) );
@@ -94,17 +117,53 @@ void QFDlgCSVParameters::checkValues() {
         comment_start=(s.size()>0)?s[0].toAscii():'#';
         header_start=ui->edtHeader->text();
 
-        accept();
+        if (doAccept) accept();
     }
 }
 
 void QFDlgCSVParameters::on_btnTab_clicked()
 {
     ui->edtColumn->setText("\n");
+}
 
+void QFDlgCSVParameters::reloadCSV()
+{
+    checkValues(false);
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    tabmodel->setReadonly(false);
+    tabmodel->clear();
+    bool ex=false;
+    if ((ex=QFile::exists(filename))) {
+        tabmodel->readCSV(filename, get_column_separator(), get_decimal_separator(), get_header_start(), get_comment_start());
+    }
+    ui->tableView->setVisible(ex);
+    tabmodel->setReadonly(true);
+    QApplication::restoreOverrideCursor();
 }
 
 void QFDlgCSVParameters::guessParameters()
 {
+    char sep, dec, comment;
+    QString headercomment;
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    if (guessCSVParameters(file_contents, &sep, &dec, &comment, &headercomment)) {
 
+        disconnect(ui->edtColumn, SIGNAL(textChanged(QString)), this, SLOT(reloadCSV()));
+        disconnect(ui->edtDecimal, SIGNAL(textChanged(QString)), this, SLOT(reloadCSV()));
+        disconnect(ui->edtComment, SIGNAL(textChanged(QString)), this, SLOT(reloadCSV()));
+        disconnect(ui->edtHeader, SIGNAL(textChanged(QString)), this, SLOT(reloadCSV()));
+
+        ui->edtColumn->setText(QString(QChar(sep)));
+        ui->edtComment->setText(QString(QChar(comment)));
+        ui->edtDecimal->setText(QString(QChar(dec)));
+        ui->edtHeader->setText(headercomment);
+
+        connect(ui->edtColumn, SIGNAL(textChanged(QString)), this, SLOT(reloadCSV()));
+        connect(ui->edtDecimal, SIGNAL(textChanged(QString)), this, SLOT(reloadCSV()));
+        connect(ui->edtComment, SIGNAL(textChanged(QString)), this, SLOT(reloadCSV()));
+        connect(ui->edtHeader, SIGNAL(textChanged(QString)), this, SLOT(reloadCSV()));
+
+    }
+    reloadCSV();
+    QApplication::restoreOverrideCursor();
 }

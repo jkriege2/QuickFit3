@@ -163,6 +163,8 @@ HEADERS += dlgnewproperty.h \
     qfthreadingtools.h \
     qfenhancedplaintextedit.h \
     qffitfunctionbase.h \
+    qconfigcomboboxwidget.h \
+    qftablemodel.h \
     qfevalpropertycopyparsertabledlg.h
 
 SOURCES += dlgnewproperty.cpp \
@@ -264,6 +266,8 @@ SOURCES += dlgnewproperty.cpp \
     qfthreadingtools.cpp \
     qfenhancedplaintextedit.cpp \
     qffitfunctionbase.cpp \
+    qconfigcomboboxwidget.cpp \
+    qftablemodel.cpp \
     qfevalpropertycopyparsertabledlg.cpp
 
 FORMS +=   dlg_newproperty.ui \

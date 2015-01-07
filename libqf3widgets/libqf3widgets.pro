@@ -113,7 +113,6 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qffitfunctioncombobox.h \
     qffitalgorithmcombobox.h \
     qffitfunctionplottools.h \
-    qftablemodel.h \
     qfhistogramview.h \
     qfselectionlistdialog.h \
     qfcompletertextedit.h \
@@ -148,7 +147,6 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     ../../../../LIB/trunk/ticktock.h \
     ../../../../LIB/trunk/qt/qfvisualize3dglwidget.h \
     ../../../../LIB/trunk/qt/qfvisualize3dgleditor.h \
-    qconfigcomboboxwidget.h \
     qffitfunctionselectdialog.h \
     qfoverlayplotdialog.h \
     ../plugins/interfaces/qfgetplotdatainterface.h \
@@ -218,7 +216,6 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qffitfunctioncombobox.cpp \
     qffitalgorithmcombobox.cpp \
     qffitfunctionplottools.cpp \
-    qftablemodel.cpp \
     qfhistogramview.cpp \
     qfselectionlistdialog.cpp \
     qfqtscripthighlighter.cpp \
@@ -251,7 +248,6 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     ../../../../LIB/trunk/highrestimer.cpp \
     ../../../../LIB/trunk/qt/qfvisualize3dglwidget.cpp \
     ../../../../LIB/trunk/qt/qfvisualize3dgleditor.cpp \
-    qconfigcomboboxwidget.cpp \
     qffitfunctionselectdialog.cpp \
     qfoverlayplotdialog.cpp \
     qfselectfileslistwidget.cpp \

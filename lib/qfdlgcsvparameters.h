@@ -25,7 +25,7 @@
 #include <QDialog>
 #include <QMessageBox>
 #include "lib_imexport.h"
-
+#include "qftablemodel.h"
 namespace Ui {
     class QFDlgCSVParameters; // forward
 }
@@ -62,14 +62,18 @@ class QFLIB_EXPORT QFDlgCSVParameters : public QDialog
     public slots:
         void guessParameters();
     protected slots:
-        void checkValues();
+        void checkValues(bool doAccept=true);
         void on_btnTab_clicked();
+        void reloadCSV();
     private:
         char column_separator;
         char decimal_separator;
         char comment_start;
         QString header_start;
+        QString file_contents;
+        QString filename;
         Ui::QFDlgCSVParameters* ui;
+        QFTableModel* tabmodel;
 };
 
 #endif // QFQFDlgCSVParameters_H

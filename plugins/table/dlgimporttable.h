@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QItemSelectionModel>
 #include <QAbstractItemModel>
+#include "qftablepluginmodel.h"
 
 namespace Ui {
     class DlgIMportTable;
@@ -23,6 +24,8 @@ class DlgIMportTable : public QDialog
         void setModel(QAbstractItemModel* model);
         QItemSelectionModel* getSelection() const;
         int importMode() const;
+
+        void doImport(QFTablePluginModel* model_out, int currentRow, int currentCol);
 
     protected slots:
         void on_radImportAll_toggled(bool checked);

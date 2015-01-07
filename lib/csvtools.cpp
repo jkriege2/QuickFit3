@@ -563,3 +563,125 @@ QString toCSV(const QList<QList<QVariant> >& data, const QStringList& columnName
     }
     return res;
 }
+
+
+
+
+
+
+
+
+
+bool guessCSVParameters(QString data, char* out_sep, char* out_dec, char* out_comment, QString* out_headercomment) {
+    QLocale loc;
+    loc.setNumberOptions(QLocale::OmitGroupSeparator);
+    //QTextStream in(&data);
+    QStringList sl=data.split("\n");
+    char sep='\t';
+    char dec=loc.decimalPoint().toLatin1();
+    char comment='#';
+    QString headercomment="";
+    if (sl.size()>0) {
+        QString d;
+        int i=0;
+        int cntl=0;
+        QStringList lines;
+        while (i<sl.size() && cntl<20) {
+            QString line=sl[i].trimmed();
+            if (line.size()>0) {
+                lines.append(line);
+                QChar c0=line.at(0);
+                QChar c1='\0';
+                if (line.size()>1) c1=line.at(1);
+                if (c0.isDigit() || c0.isLetter() || QString("!§$&?°#~*+-\\/<>\"\'").contains(c0)) {
+                    d=d+sl[i]+"\n";
+                    cntl++;
+                }
+                if (c0=='#') { comment='#'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='%') { comment='%'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='&') { comment='&'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0==';') { comment=';'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='§') { comment='§'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='!') { comment='!'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='/') { comment='/'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='\\') { comment='\\'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='*') { comment='*'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='~') { comment='~'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='\'' && !line.contains('\'')) { comment='\''; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='\"' && !line.contains('\"')) { comment='\"'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='?') { comment='?'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='!') { comment='!'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='°') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='<') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='>') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='=') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+            }
+            i++;
+        }
+
+        // remove all quotes from the string
+        QString dd=d;
+        d="";
+        QChar quot='\0';
+        for (int i=0; i<dd.size(); i++) {
+            bool read=true;
+            if (dd[i]=='"' || dd[i]=='\'') {
+                if (quot!='\0' && quot==dd[i]) {
+                    quot='\0';
+                    read=false;
+                } else if (quot!='\0' && quot!=dd[i]) {
+                    read=false;
+                } else if (quot=='\0') {
+                    read=false;
+                    quot=dd[i];
+                }
+            } else {
+                read=(quot=='\0');
+            }
+            if (read) d.append(dd[i]);
+        }
+        //qDebug()<<data<<"\n\n"<<dd<<"\n\n"<<d;
+
+        QRegExp rxNumbers("\\d([,.])\\d");
+        if (rxNumbers.indexIn(d)>=0) {
+            if (rxNumbers.cap(1).size()>0) dec=rxNumbers.cap(1).at(0).toLatin1();
+        }
+
+        double icntDot=d.count('.');
+        double icntCom=d.count(',');
+        d=d.remove(dec);
+        int cnt=d.count('\n');
+        int cntSem=d.count(';');
+        int cntCom=d.count(',');
+        int cntTab=d.count('\t');
+        //qDebug()<<"icntDot="<<icntDot<<"  icntCom="<<icntCom<<"  cnt="<<cnt<<"  cntSem="<<cntSem<<"  cntCom="<<cntCom<<"  cntTab="<<cntTab;
+        if (cntSem>=cnt && ';'!=dec) sep=';';
+        if (cntCom>=cnt && ','!=dec) sep=',';
+        if (cntTab>=cnt && cntSem<=0) sep='\t';
+        if (cntTab>=cnt && cntSem<=0 && (cntCom<=0 || (cntCom>0 && icntDot>0))) sep='\t';
+        if (dec==',' && sep==',') dec='.';
+        if (sep!=',' && dec==',' && icntCom==0 && icntDot>0) dec='.';
+        if (sep!=',' && dec=='.' && icntCom>0 && icntDot==0) dec=',';
+        if (dec==',' && icntCom<=0 && icntDot>0 ) dec='.';
+        if (icntDot>0 && icntCom>0) { dec='.'; sep=',';}
+        if (sep==';' && comment==';') { comment='#'; headercomment=""; }
+        if (headercomment.size()<=0) { headercomment=comment; headercomment+="!"; }
+        //qDebug()<<"out_comment="<<QChar(comment);
+        //qDebug()<<"out_dec="<<QChar(dec);
+        //qDebug()<<"out_sep="<<QChar(sep);
+        //qDebug()<<"out_headercomment="<<headercomment;
+        //qDebug()<<"icntDot="<<icntDot;
+        //qDebug()<<"icntCom="<<icntCom;
+        //qDebug()<<"cnt="<<cnt;
+        //qDebug()<<"cntSem="<<cntSem;
+        //qDebug()<<"cntCom="<<cntCom;
+        //qDebug()<<"cntTab="<<cntTab;
+        if (out_comment) *out_comment=comment;
+        if (out_dec) *out_dec=dec;
+        if (out_sep) *out_sep=sep;
+        if (out_headercomment) *out_headercomment=headercomment;
+        return true;
+
+    }
+    return false;
+}

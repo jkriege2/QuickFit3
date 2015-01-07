@@ -23,6 +23,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qftablemodel.h"
 #include <QDebug>
 #include <QMessageBox>
+#include "csvtools.h"
 
 QFTableModel::QFTableModel(QObject * parent):
     QAbstractTableModel(parent)
@@ -1722,74 +1723,16 @@ void QFTableModel::paste(int row_start, int column_start) {
         //qDebug()<<"pasting text: \n"<<data;
         QLocale loc;
         loc.setNumberOptions(QLocale::OmitGroupSeparator);
-        QTextStream in(&data);
-        QStringList sl=data.split("\n");
         char sep='\t';
         char dec=loc.decimalPoint().toLatin1();
         char comment='#';
         QString headercomment="";
-        if (sl.size()>0) {
-            QString d;
-            int i=0;
-            int cntl=0;
-            while (i<sl.size() && cntl<20) {
-                QString line=sl[i].trimmed();
-                if (line.size()>0) {
-                    QChar c0=line.at(0);
-                    QChar c1='\0';
-                    if (line.size()>1) c1=line.at(1);
-                    if (c0.isDigit() || c0=='-' || c0=='+' || c0=='#') {
-                        d=d+sl[i]+"\n";
-                        cntl++;
-                    }
-                    if (c0=='#') { comment='#'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='%') { comment='%'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='&') { comment='&'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0==';') { comment=';'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='§') { comment='§'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='!') { comment='!'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='/') { comment='/'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='\\') { comment='\\'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='*') { comment='*'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='~') { comment='~'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='\'' && !line.contains('\'')) { comment='\''; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='\"' && !line.contains('\"')) { comment='\"'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='?') { comment='?'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='!') { comment='!'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='°') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='<') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='>') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                    else if (c0=='=') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                }
-                i++;
-            }
-            double icntDot=d.count('.');
-            double icntCom=d.count(',');
-            d=d.remove(dec);
-            int cnt=d.count('\n');
-            int cntSem=d.count(';');
-            int cntCom=d.count(',');
-            int cntTab=d.count('\t');
-            if (cntSem>=cnt && ';'!=dec) sep=';';
-            if (cntCom>=cnt && ','!=dec) sep=',';
-            if (cntTab>=cnt && cntSem<=0) sep='\t';
-            if (cntTab>=cnt && cntSem<=0 && (cntCom<=0 || (cntCom>0 && icntDot>0))) sep='\t';
-            if (dec==',' && sep==',') dec='.';
-            if (sep!=',' && dec==',' && icntCom==0 && icntDot>0) dec='.';
-            if (sep!=',' && dec=='.' && icntCom>0 && icntDot==0) dec=',';
-            if (dec==',' && icntCom<=0 && icntDot>0 ) dec='.';
-            if (icntDot>0 && icntCom>0) { dec='.'; sep=',';}
-            if (sep==';' && comment==';') { comment='#'; headercomment=""; }
-            if (headercomment.size()<=0) { headercomment=comment; headercomment+="!"; }
-            //qDebug()<<"icntDot="<<icntDot;
-            //qDebug()<<"icntCom="<<icntCom;
-            //qDebug()<<"cnt="<<cnt;
-            //qDebug()<<"cntSem="<<cntSem;
-            //qDebug()<<"cntCom="<<cntCom;
-            //qDebug()<<"cntTab="<<cntTab;
-        }
 
-        //qDebug()<<"sep='"<<sep<<"'    dec='"<<dec<<"'";
+
+        guessCSVParameters(data, &sep, &dec, &comment, &headercomment);
+        loc.setNumberOptions(QLocale::OmitGroupSeparator);
+        QTextStream in(&data);
+
         readCSV(in, sep, dec, headercomment, comment, row, column);
     }
     doEmitSignals=oldEmit;
