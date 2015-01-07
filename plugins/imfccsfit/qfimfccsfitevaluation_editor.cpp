@@ -657,6 +657,23 @@ void QFImFCCSFitEvaluationEditor::configureFitFromGlobal(const QFFitFunctionConf
             }
         }
     }
+
+    if (loadParams && config.singleFixes.size()>0) {
+        for (int i=0; i<config.singleFixes.size(); i++) {
+            QFRawDataRecord* rdr=data->getFitFile(i);
+            QFFitFunction* ff=data->getFitFunction(i);
+            if (ff && rdr && config.singleFixes[i].size()>0) {
+                QMapIterator<QString, bool> it(config.singleFixes[i]);
+                while (it.hasNext()) {
+                    it.next();
+                    if (ff->hasParameter(it.key())) {
+                        data->setInitFitFix(it.key(), it.value(), rdr);
+                        data->setFitFix(rdr, data->getCurrentIndex(), it.key(), it.value());
+                    }
+                }
+            }
+        }
+    }
     if (loadParams && config.paramValues.size()>0) {
         for (int i=0; i<config.paramValues.size(); i++) {
             QFRawDataRecord* rdr=data->getFitFile(i);
@@ -669,8 +686,10 @@ void QFImFCCSFitEvaluationEditor::configureFitFromGlobal(const QFFitFunctionConf
                         data->setInitFitValue(it.key(), it.value().value, it.value().error, rdr);
                         data->setFitValue(rdr, data->getCurrentIndex(), it.key(), it.value().value);
                         data->setFitError(rdr, data->getCurrentIndex(), it.key(), it.value().error);
-                        data->setFitMin(it.key(), it.value().rangeMin, rdr);
-                        data->setFitMax(it.key(), it.value().rangeMax, rdr);
+                        if (it.value().setRange) {
+                            data->setFitMin(it.key(), it.value().rangeMin, rdr);
+                            data->setFitMax(it.key(), it.value().rangeMax, rdr);
+                        }
                     }
                 }
             }

@@ -58,6 +58,27 @@ class QFFitFunctionConfigForGlobalFitInterface
             double error;
             double rangeMin;
             double rangeMax;
+            bool setRange;
+            GlobalFitParameter() {
+                value=0;
+                error=0;
+                rangeMin=-DBL_MIN;
+                rangeMax=DBL_MAX;
+                setRange=true;
+            }
+
+            GlobalFitParameter(double val, double err, double rangeMin, double rangeMax) {
+                value=val;
+                error=err;
+                this->rangeMax=rangeMax;
+                this->rangeMin=rangeMin;
+                setRange=true;
+            }
+            GlobalFitParameter(double val, double err) {
+                value=val;
+                error=err;
+                setRange=false;
+            }
         };
 
         struct GlobalFitConfig {
@@ -67,6 +88,7 @@ class QFFitFunctionConfigForGlobalFitInterface
             QStringList roles;
             QList<QStringList> fixes;
             QList<QMap<QString, GlobalFitParameter> > paramValues;
+            QList<QMap<QString, bool> > singleFixes;
             QList<QList<QStringList> > globalParams;
         };
 

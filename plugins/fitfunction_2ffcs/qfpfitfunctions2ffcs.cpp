@@ -57,7 +57,7 @@ QFFitFunction* QFPFitFunctions2FFCS::get(QString id, QObject* parent) const  {
 
 int QFPFitFunctions2FFCS::getGlobalFitConfigCount() const
 {
-    return 2;
+    return 3;
 }
 
 QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::getGlobalFitConfig(int i) const
@@ -89,6 +89,21 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::
         res.globalParams << constructQListWithMultipleItems(QStringList("vflowy"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("focus_height"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("focus_width"), 5);
+    } else if (i==c++) {
+        res.groupLabel=menulabel;
+        res.menuEntryLabel=tr("... 3D diffusion ACF + 4 neighbors, afterpulsing, wxy/wz un-fixed");
+        res.models<<"fcs_diff_d_wz_afterpulse"<<"fccs_2f_diff3d_wz"<<"fccs_2f_diff3d_wz"<<"fccs_2f_diff3d_wz"<<"fccs_2f_diff3d_wz";
+        res.roles<<"acf"<<"dccf"<<"dccf"<<"dccf"<<"dccf";
+        res.globalParams << constructQListWithMultipleItems(QStringList("n_particle"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("diff_coeff1"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_height"), 5);
+        res.globalParams << constructQListWithMultipleItems(QStringList("focus_width"), 5);
+        res.paramValues << constructQListWithMultipleItems(QMap<QString, QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter>(), res.models.size());
+        res.singleFixes << constructQListWithMultipleItems(QMap<QString,bool>(), res.models.size());
+        res.paramValues[0].insert("n_nonfluorescent", QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter(0,0));
+        for (int j=0; j<res.singleFixes.size(); j++) { res.singleFixes[j].insert("focus_width", false); };
+        for (int j=0; j<res.singleFixes.size(); j++) { res.singleFixes[j].insert("focus_height", false); };
+
     }
     return res;
 }
