@@ -25,7 +25,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QStringList>
 #include <QString>
 #include <QtPlugin>
-
+#include <cfloat>
+#include <stdint.h>
 /*! \brief interface that allows to automatically config for a global fit
     \ingroup qf3rdrdp_fcs
 
