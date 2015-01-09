@@ -168,23 +168,23 @@ namespace QFMathParser_DefaultLib {
     void fJoin(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fRemoveEmpty(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
-    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fMean, mean, qfstatisticsAverage)
+    QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fMean, mean, qfstatisticsAverage)
 
-    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fSkewness, skewness, qfstatisticsSkewness)
+    QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fSkewness, skewness, qfstatisticsSkewness)
     QFMATHPARSER_DEFINE_2PARAM1VEC_VECTONUM_FUNC(fCentralMoment, moment, qfstatisticsCentralMoment)
     QFMATHPARSER_DEFINE_2PARAM1VEC_VECTONUM_FUNC(fNonCentralMoment, ncmoment, qfstatisticsMoment)
     QFMATHPARSER_DEFINE_2PARAM2VEC_VECTONUM_FUNC(fCorrcoeff, corrcoeff, qfstatisticsCorrCoeff)
 
     QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(fDiff, diff, qfstatisticsDiff)
-    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fSum, sum, qfstatisticsSum)
-    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fCount, count, qfstatisticsCount)
-    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fProd, prod, qfstatisticsProd)
-    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fSum2, sum2, qfstatisticsSum2)
-    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fVar, var, qfstatisticsVariance)
-    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fStd, std, qfstatisticsStd)
-    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fMedian, median, qfstatisticsMedian)
-    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fMAD, mad, qfstatisticsMADS)
-    QFMATHPARSER_DEFINE_1PARAM_VECTONUM_FUNC(fNMAD, nmad, qfstatisticsNMADS)
+    QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fSum, sum, qfstatisticsSum)
+    QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fCount, count, qfstatisticsCount)
+    QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fProd, prod, qfstatisticsProd)
+    QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fSum2, sum2, qfstatisticsSum2)
+    QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fVar, var, qfstatisticsVariance)
+    QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fStd, std, qfstatisticsStd)
+    QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fMedian, median, qfstatisticsMedian)
+    QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fMAD, mad, qfstatisticsMADS)
+    QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fNMAD, nmad, qfstatisticsNMADS)
     QFMATHPARSER_DEFINE_2PARAM1VEC_VECTONUM_FUNC(fQuantile, quantile, qfstatisticsQuantile)
 
     QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(fCumSum, cumsum, qfstatisticsCumSum)

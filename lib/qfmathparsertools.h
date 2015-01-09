@@ -449,6 +449,86 @@ static inline void FName(qfmpResult& r, const qfmpResult* params, unsigned int  
     return; \
 }
 
+
+
+/*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
+           is numeric_vector->numeric (QVector<double> -> double), e.g. qfstatisticsMedian()
+
+    This variant also accepts a single double-number and converts it to a QVector<double> before evaluating the function.
+
+    The resulting function will:
+      - check the number of arguments and their type
+      - apply the C-function to the argument
+    .
+
+    \param FName name of the function to declare
+    \param NAME_IN_PARSER name the function should have in the parser (used for error messages only)
+    \param CFUNC name of the C function to call
+*/
+#define QFMATHPARSER_DEFINE_1PARAM_VECORNUMTONUM_FUNC(FName, NAME_IN_PARSER, CFUNC) \
+static inline void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    if (n!=1) {\
+        p->qfmpError(QObject::tr("%1(x) needs exacptly 1 argument").arg(#NAME_IN_PARSER));\
+        r.setInvalid();\
+        return; \
+    }\
+    if(params[0].type==qfmpDoubleVector) {\
+        r.setDouble(CFUNC(params[0].numVec));\
+    } if(params[0].type==qfmpDouble) {\
+        r.setDouble(CFUNC(constructQVectorFromItems<double>(params[0].num)));\
+    } else {\
+        p->qfmpError(QObject::tr("%1(x) argument has to be a vector of numbers or a number").arg(#NAME_IN_PARSER));\
+        r.setInvalid();\
+    }\
+    return; \
+}
+
+
+
+/*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
+           is numeric_vector->numeric (QVector<double> -> double), e.g. qfstatisticsMedian()
+
+    This variant also accepts a single double-number, or a list of numbers and converts it to a QVector<double> before evaluating the function.
+
+    The resulting function will:
+      - check the number of arguments and their type
+      - apply the C-function to the argument
+    .
+
+    \param FName name of the function to declare
+    \param NAME_IN_PARSER name the function should have in the parser (used for error messages only)
+    \param CFUNC name of the C function to call
+*/
+#define QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(FName, NAME_IN_PARSER, CFUNC) \
+static inline void FName(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){\
+    if (n<1) {\
+        p->qfmpError(QObject::tr("%1(x1, x2, ...) needs at least 1 argument").arg(#NAME_IN_PARSER));\
+        r.setInvalid();\
+        return; \
+    }\
+    if(n==1 && params[0].type==qfmpDoubleVector) {\
+        r.setDouble(CFUNC(params[0].numVec));\
+    } if( n>=1) {\
+        QVector<double> d; \
+        for (unsigned int i=0; i<n; i++) {\
+            if (params[i].type==qfmpDouble) { \
+                d<<params[i].num;     \
+            } else if (params[i].type==qfmpDoubleVector) {\
+                d<<params[i].numVec;     \
+            } else {\
+                p->qfmpError(QObject::tr("%1(x1, x2, ...) argument %2 has to be a vector of numbers or a number").arg(#NAME_IN_PARSER).arg(i+1));\
+                r.setInvalid();\
+                return; \
+            }\
+        } \
+        r.setDouble(CFUNC(d));\
+    } else {\
+        p->qfmpError(QObject::tr("%1(x1, x2, ...) argument 1 has to be a vector of numbers or a number").arg(#NAME_IN_PARSER));\
+        r.setInvalid();\
+    }\
+    return; \
+}
+
 /*! \brief This macro allows to easily define functions for QFMathParser from a C-function that
            is (numeric_vector, numeric)->number , e.g. qfstatisticsQuantile()
 
