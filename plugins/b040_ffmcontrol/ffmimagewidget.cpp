@@ -1,4 +1,5 @@
 #include "ffmimagewidget.h"
+#include "qftools.h"
 
 #define LOG_PREFIX "[ffmimagewidget]: "
 

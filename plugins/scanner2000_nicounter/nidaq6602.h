@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QFile>
 //#include <QtGui>
+#include "stdint.h"
 
 #define DAQmxErrWarChk(instruction) \
 { signed long errorcode = (instruction); \

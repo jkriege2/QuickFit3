@@ -1,6 +1,6 @@
 #include "nidaq6602.h"
 #define LOG_PREFIX "[Scanner2000NICounter/NIDAQ6602]: "
-
+#include "qftools.h"
 
 NIDAQ6602::NIDAQ6602(QObject *parent) :
     QObject(parent)

@@ -11,6 +11,8 @@
 <h2>Overview</h2>
 <p>You can start an FCCS evaluation, by adding an FCCS evaluation item to your project (menu entry <tt>|Insert Evaluations|FCCS Fit</tt> in the main window of QuickFit).</p>
 <p><center><img src="./pic/ui_overview.png"></center>
+
+
 The FCCS plugin screen is separated into different parts:
 <ul>
   <li>At the top of the window, you can select the <b>fit algorithm</b> and the <a href="$$mainhelpdir$$/fcsfit_weighting.html"><b>data weighting</b></a> to be used. You can also choose, how the plugin estimates the errors of the fit parameter with the <a href="$$mainhelpdir$$/fit_errorestimation.html"><strong>error estimation</strong></a> widgets. $$note:The context-menu of the fit algorithm combo-box allows you to change the fit algorithm parameters and open the onine-help page for the selected fit algorithm.$$</li>
@@ -26,7 +28,17 @@ The FCCS plugin screen is separated into different parts:
 
 
 <h2>Workflow</h2>
-<p></p>
+<p>$$see:See <a href="tutorial.html">the FCCS fit tutorial</a> for a detailed walk-through of this plugin.$$</p>
+<p>The basic workflow of this plugin is as follows:
+<ol>
+    <li>Ensure, that the three (or more) correlation curves from each measurement are grouped correctly (e.g. the ACF0, ACF1 and FCCS curve for a single measurement should be in the same RDR group). You can use the <a href="$$mainhelpdir$$/dlgeditgroupandrole.html">edit group, role and folder tool</a> of QuickFit to set these groups.</li>
+    <li>Set up the fit to the correct number of files/RDRs and choose the right fit models. Link the parameters as fit for you problem. For many common cases, there are shortcuts in the <b>Tools</b> menu. Also choose the type of fit weighting, fit algorithm and fit error estimation options.</li>
+    <li>Fit the first of you datasets until the fit is good. </li>
+    <li>The parameters you gain by the fit in the last step are usually also good starting values for your other measurements. So you can use these as initial parameters, by clicking <b>"Copy to Initial".</b> Also the plugin should have identified your other measurements (filesets) and should show them as grayed entries in the filesets list on the right. If not, ensure, that you properly grouped the files in step. You can always ask QuickFit to recognize possible filesets, by clicking on <b>Tools | Guess file sets ...</b>.</li>
+    <li>Now go to your next measuremnt (click one in the filesets list on the rhs) and fit it. Possibly you'll have to change the initial values slightly.</li>
+    <li>Repeat the fitting for all available filesets.</li>
+    <li>Now you can read the fit results from every single curve, or you go to the <b>"Evaluation Results"</b> tab of the plugin, which summarizes all results. $$note: In this tab, you can also filter the rows and columns by names! This usually helps to clear up the data display!$$</li>
+</ol></p>
 
 
 <h2>Detailed description of the different functions</h2>

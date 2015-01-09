@@ -474,6 +474,19 @@ void MulticontrolStage::move(unsigned int axis, double newPosition)
     stagecontroller->config_joystick(true);
 }
 
+QString MulticontrolStage::getStageName(unsigned int axis) const
+{
+    QString n=tr("MC2000, axis %1").arg(axis);
+    return n;
+}
+
+QFExtensionLinearStage::StageInfo MulticontrolStage::getStageInfo(unsigned int axis) const
+{
+    QFExtensionLinearStage::StageInfo info;
+    info.maxSpeed=maxVelocity;
+    return info;
+}
+
 double MulticontrolStage::getPosition(unsigned int axis) {
     return stagecontroller->get_currentPosition((uint8_t) axis);
 }

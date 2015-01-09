@@ -26,7 +26,19 @@ The imFCCS plugin screen is separated into different parts:
 
 
 <h2>Workflow</h2>
-<p></p>
+<p>$$see:See <a href="tutorial.html">the imFCCS fit tutorials</a> for a detailed walk-through of this plugin.$$</p>
+<p>The basic workflow of this plugin is as follows:
+<ol>
+    <li>Ensure, that the three (or more) correlation curves from each measurement are grouped correctly (e.g. the ACF0, ACF1 and FCCS curve for a single measurement should be in the same RDR group). You can use the <a href="$$mainhelpdir$$/dlgeditgroupandrole.html">edit group, role and folder tool</a> of QuickFit to set these groups.<br><i>This is usually not necessary, when you used th QuickFit correlator, as it already sets the groups properly!</i></li>
+    <li>Especially for cell data: Ensure, that the overview images are masked correctly!</li>
+    <li>Set up the fit to the correct number of files/RDRs and choose the right fit models. Link the parameters as fit for you problem. For many common cases, there are shortcuts in the <b>Tools</b> menu. Also choose the type of fit weighting, fit algorithm and fit error estimation options.</li>
+    <li>Fit the average run of the first of your datasets until the fit is good. </li>
+    <li>The parameters you gain by the fit in the last step are usually also good starting values for your other measurements. So you can use these as initial parameters, by clicking <b>"Copy to Initial".</b> Also the plugin should have identified your other measurements (filesets) and should show them as grayed entries in the filesets list on the right. If not, ensure, that you properly grouped the files in step. You can always ask QuickFit to recognize possible filesets, by clicking on <b>Tools | Guess file sets ...</b>.</li>
+    <li>With the new starting values, you can now try and fit all pixels in the current fileset. Use the button <b>Fit all Pixels</b> to do so and check the fits by randomly selecting a few pixels in the overview image. If the fits in these pixels are good, you can rpoceed. Otherwise you may have to set the starting values differently, or also change e.g. the parameter ranges of the fit parameters. Before doing these changes, you should <b>reset all pixels</b> and after setrings <b>fit all pixels</b> again.</li>
+    <li>When you're sattisfied with the fit results of the first fileset, you can proceed to the others: Go to your next measurement (click one in the filesets list on the rhs) and fit that also. Possibly you'll have to change the initial values slightly.</li>
+    <li>Repeat the fitting for all available filesets. (You can ue <b>"Fit all pixels &amp; filesets"</b> for that)</li>
+    <li>The best way to get an overview of the fit results of an imFCCS fit is to open the RDRs by double-clicking them in the project. The <a href="$$plugin_info:helpdir:imaging_fcs$$/imfcs_ui.html">imFCS RDR editor</a> allows you to view the parameter images and also the parameter distirbutions and correlations. The <b>copy result stats.</b> option in that dialog also allows to summarize the fit results of several measurements/samples into a single table with averages/std.dev./... for each file.</li>
+</ol></p>
 
 
 <h2>Detailed description of the different functions</h2>

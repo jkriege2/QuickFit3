@@ -125,6 +125,11 @@ class MulticontrolStage : public QObject, public QFExtensionBase, public QFExten
         /** \copydoc QFExtensionLinearStage::move() */
         virtual void move(unsigned int axis, double newPosition);
 
+        /*! \brief returns the human readable name of the given stage axis */
+        virtual QString getStageName(unsigned int axis) const;
+
+        /*! \brief returns some information of the given stage axis */
+        virtual StageInfo getStageInfo(unsigned int axis) const;
 
 
 
