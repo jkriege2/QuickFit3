@@ -464,12 +464,6 @@ void QFRDRTablePlotSettingsWidget::on_btnSaveSystem_clicked() {
     ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRTablePlotSettingsWidget/lasttemplatedir", dir);
 }
 
-void QFRDRTablePlotSettingsWidget::on_btnAutoscaleXY_clicked()
-{
-    doAutoscaleX();
-    doAutoscaleY();
-}
-
 
 
 
@@ -549,3 +543,49 @@ void QFRDRTablePlotSettingsWidget::on_btnLoadSystem_clicked() {
     ProgramOptions::getInstance()->getQSettings()->setValue("QFRDRTablePlotSettingsWidget/lasttemplatedir", dir);
 }
 
+
+void QFRDRTablePlotSettingsWidget::on_btnCopySystem_clicked()
+{
+    QString s;
+    {
+        QXmlStreamWriter stream(&s);
+        stream.setAutoFormatting(true);
+        stream.writeStartDocument();
+        stream.writeStartElement("graph_templates");
+        bool saveGraphs=false;
+        current->writePlotInfo(stream, current->getPlot(plot), saveGraphs);
+        stream.writeEndElement();
+        stream.writeEndDocument();
+    }
+    QClipboard *clipboard = QApplication::clipboard();
+    QMimeData* mime=new QMimeData();
+    mime->setData("quickfit3/qfrdrtable/graph_system", s.toUtf8());
+    clipboard->setMimeData(mime);
+}
+
+void QFRDRTablePlotSettingsWidget::on_btnPasteSystem_clicked()
+{
+    QClipboard *clipboard = QApplication::clipboard();
+    const QMimeData* mime=clipboard->mimeData();
+    if (mime && mime->hasFormat("quickfit3/qfrdrtable/graph_system")) {
+        QString s=QString::fromUtf8(mime->data("quickfit3/qfrdrtable/graph_system"));
+        QDomDocument doc("mydocument");
+        doc.setContent(s);
+        QDomElement docElem = doc.documentElement();
+        if (docElem.tagName().toLower()=="graph_templates") {
+            QDomElement te=docElem.firstChildElement("plot");
+            if(!te.isNull()) {
+                QFRDRTable::PlotInfo pi=current->getPlot(plot);
+                current->readPlotInfo(pi, te);
+                current->setPlot(plot, pi);
+                te = te.nextSiblingElement("plot");
+            }
+        }
+    }
+}
+
+void QFRDRTablePlotSettingsWidget::on_btnAutoscaleXY_clicked()
+{
+    doAutoscaleX();
+    doAutoscaleY();
+}

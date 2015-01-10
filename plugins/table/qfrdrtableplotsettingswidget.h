@@ -73,6 +73,8 @@ class QFRDRTablePlotSettingsWidget : public QWidget
     protected slots:
         void on_btnLoadSystem_clicked();
         void on_btnSaveSystem_clicked();
+        void on_btnCopySystem_clicked();
+        void on_btnPasteSystem_clicked();
         void on_btnAutoscaleXY_clicked();
         void doAutoscaleX();
         void doAutoscaleY();

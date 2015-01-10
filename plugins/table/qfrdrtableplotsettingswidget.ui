@@ -76,6 +76,35 @@
         </property>
        </widget>
       </item>
+      <item>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Vertical</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnCopySystem">
+        <property name="text">
+         <string>copy the system settings to the clipboard</string>
+        </property>
+        <property name="icon">
+         <iconset resource="qfrdrtable.qrc">
+          <normaloff>:/table/copy.png</normaloff>:/table/copy.png</iconset>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="btnPasteSystem">
+        <property name="text">
+         <string>paste the system settings from the clipboard</string>
+        </property>
+        <property name="icon">
+         <iconset resource="qfrdrtable.qrc">
+          <normaloff>:/table/paste.png</normaloff>:/table/paste.png</iconset>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
