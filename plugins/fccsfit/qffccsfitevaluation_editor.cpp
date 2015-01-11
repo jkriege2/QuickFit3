@@ -551,6 +551,8 @@ void QFFCCSFitEvaluationEditor::configureFitFromGlobal(const QFFitFunctionConfig
     QFFCCSFitEvaluationItem* data=qobject_cast<QFFCCSFitEvaluationItem*>(current);
     if (!data) return;
 
+    if (!data) return;
+
     if (data->getFitFileCount()<config.models.size()) {
         while (data->getFitFileCount()<config.models.size()) {
             data->addFitFile();
@@ -564,6 +566,7 @@ void QFFCCSFitEvaluationEditor::configureFitFromGlobal(const QFFitFunctionConfig
     for (int i=0; i<config.models.size(); i++) {
         data->setFitFunction(i, config.models[i]);
     }
+
 
     if (config.roles.size()>0) {
         QFRawDataRecord* rdr=data->getFitFile(0);
@@ -618,6 +621,23 @@ void QFFCCSFitEvaluationEditor::configureFitFromGlobal(const QFFitFunctionConfig
             }
         }
     }
+
+    if (loadParams && config.singleFixes.size()>0) {
+        for (int i=0; i<config.singleFixes.size(); i++) {
+            QFRawDataRecord* rdr=data->getFitFile(i);
+            QFFitFunction* ff=data->getFitFunction(i);
+            if (ff && rdr && config.singleFixes[i].size()>0) {
+                QMapIterator<QString, bool> it(config.singleFixes[i]);
+                while (it.hasNext()) {
+                    it.next();
+                    if (ff->hasParameter(it.key())) {
+                        data->setInitFitFix(it.key(), it.value(), rdr);
+                        data->setFitFix(rdr, data->getCurrentIndex(), it.key(), it.value());
+                    }
+                }
+            }
+        }
+    }
     if (loadParams && config.paramValues.size()>0) {
         for (int i=0; i<config.paramValues.size(); i++) {
             QFRawDataRecord* rdr=data->getFitFile(i);
@@ -630,8 +650,10 @@ void QFFCCSFitEvaluationEditor::configureFitFromGlobal(const QFFitFunctionConfig
                         data->setInitFitValue(it.key(), it.value().value, it.value().error, rdr);
                         data->setFitValue(rdr, data->getCurrentIndex(), it.key(), it.value().value);
                         data->setFitError(rdr, data->getCurrentIndex(), it.key(), it.value().error);
-                        data->setFitMin(it.key(), it.value().rangeMin, rdr);
-                        data->setFitMax(it.key(), it.value().rangeMax, rdr);
+                        if (it.value().setRange) {
+                            data->setFitMin(it.key(), it.value().rangeMin, rdr);
+                            data->setFitMax(it.key(), it.value().rangeMax, rdr);
+                        }
                     }
                 }
             }

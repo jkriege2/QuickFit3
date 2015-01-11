@@ -7,7 +7,7 @@
   <body>
     $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
     
-    
+    $$warning:You should use a 64-bit version of QF3 for this tutorial, since the image series are relatively large and require accordingly a lot of memory, especially during the processing steps!!!$$
     
     <h2>Tutorial</h2>
     
@@ -18,7 +18,7 @@ $$startbox_note$$
 The data for this tutorial is available from <a href="http://www.dkfz.de/Macromol/quickfit/examples.html">http://www.dkfz.de/Macromol/quickfit/examples.html</a> as <tt>beads_flow_2013_08_15.zip</tt>.
 $$endbox$$  
 
-In this tutorial, we will evaluate a measurement of TetraSpec multi-colored fluorescent beads diluted in water. Due to a temperature gradient over the sample, a directed flow field formed withing the field-of-view of a SPIM lightsheet microscope (pixel-size: a=400nm, lateral PSF-size w<sub>xy</sub>=600nm, longitudinal PSF-size w<sub>z</sub>=1240nm). An image-series with a temporal resolution of $(\Delta t_{frame}=530\;\mathrm{{\mu}s})$ and 100000 frames was acquired of this sample and is available in the ZIP-file, referenced above. A second image series was acquired on the same beads, but without flow. We will use a global imFCCS fit to determine the speed and direction of the particle flow. Here is a first long-time exposure of the sample, in which the flowing particles appear as horizontal stripes. Especially prominent is a bright aggregate, which appears in white:
+In this tutorial, we will evaluate a measurement of TetraSpec multi-colored fluorescent beads diluted in water. Due to a temperature gradient over the sample, a directed flow field formed withing the field-of-view of a SPIM lightsheet microscope (pixel-size: a=400nm, lateral PSF-size w<sub>xy</sub>=600nm, longitudinal PSF-size w<sub>z</sub>=1240nm). An image-series with a temporal resolution of $(\Delta t_{frame}=530\;\mathrm{{\mu}s})$ and 150000 frames was acquired of this sample and is available in the ZIP-file, referenced above. A second image series was acquired on the same beads, but without flow. We will use a global imFCCS fit to determine the speed and direction of the particle flow. Here is a first long-time exposure of the sample, in which the flowing particles appear as horizontal stripes. Especially prominent is a bright aggregate, which appears in white:
 <center><a name="tutorial_flow_pic000"><img src="./pic/tutorial_flow_pic000.png" border="1">
 </center>
 </p>
@@ -56,7 +56,7 @@ Then we fit five model functions to these five curves and in these link the comp
 <li>In this dialog, click on <img src=":imaging_fcs/fileopen.png">, select the import filer <b>TinyTIFF</b> and select the file <tt>beads_flow__s01_c08_000.tif</tt> from the directory, in which you extracted the ZIP file. 
 <center><a name="tutorial_flow_pic004"><img src="./pic/tutorial_flow_pic004.png" border="1">
 </center>
-After a click on OK, the correlator dialog will be enabled and some meta-data of the image is already displayed (frames, image size, ...) $$note:Make sure to select the filename-filter <b>TinyTIFF</b>, since only this importer can read the full set of 100000 frames from teh file. the importer libTIFF would only read around 60000 frames!$$</li>
+After a click on OK, the correlator dialog will be enabled and some meta-data of the image is already displayed (frames, image size, ...) $$note:Make sure to select the filename-filter <b>TinyTIFF</b>, since only this importer can read the full set of 150000 frames from teh file. the importer libTIFF would only read around 60000 frames!$$</li>
 <li>Add the remaining meta-data, which is NOT YET supplied in the correlator window:
 <ul>
     <li>camera description/<b>pixel-size</b>: 400*400 nm²</li>
@@ -70,14 +70,14 @@ After a click on OK, the correlator dialog will be enabled and some meta-data of
     <li>select the file <tt>beads_flow__s01_c08_000_background.tif</tt> as <b>background file</b></li>
     <li><b>no bleach correction</b>: This measurement was taken on fluorescent microspheres, which do not show any bleaching in the given imaging conditions.</li>
     <li><b>no DualView mode</b></li>
-    <li><b>cut up into 5 segments</b>, which will create 5 segments from the input dataset (20000 frames each). Each segment is correlated independently and finally we get an average and standard deviation over these five segments as a result. This allows for a proper weighting of the fits, using this standard deviation as an estimation of the error, that we make, when calculating correlation functions.</li>
+    <li><b>cut up into 5 segments</b>, which will create 5 segments from the input dataset (30000 frames each). Each segment is correlated independently and finally we get an average and standard deviation over these five segments as a result. This allows for a proper weighting of the fits, using this standard deviation as an estimation of the error, that we make, when calculating correlation functions.</li>
     <li><b>correlator</b>: Direct correlation with averaging, <b>P=16, m=2</b> and choose a value for <b>S</b>, so the maximum lag-time &tau;<sub>max</sub> is a little bit larger than the segment length in seconds</li>
     <li><b>no N&amp;B records</b></li>
 </ul></li>
 <li>Finally we have to choose the correlation functions, that should be calculated. Enable:
 <ul>
     <li><b>ACF for each pixel</b></li>
-    <li><b>CCF to distant pixels</b> and enter the sequence <tt>-1,0;1,0;0,-1;0,1</tt>. In this sequence each pair of integers (separated by ',') specifies one shift vector $(\delta_x,\delta_y)$ for a cross-correlation function. E.g. <tt>-1,0</tt> cross-correlates each pixel with its left direct neighbor. You can specify several different CCFs, that will all be calculated for the datset, by separating the shift vectors by ';'. Therefore the given sequence will cross-correlate each pixel to its left;right;lower;upper neighbor.</li>
+    <li><b>CCF to distant pixels</b> and enter the sequence $$example:<tt>-1,0;1,0;0,-1;0,1</tt>$$. In this sequence each pair of integers (separated by ',') specifies one shift vector $(\delta_x,\delta_y)$ for a cross-correlation function. E.g. <tt>-1,0</tt> cross-correlates each pixel with its left direct neighbor. You can specify several different CCFs, that will all be calculated for the datset, by separating the shift vectors by ';'. Therefore the given sequence will cross-correlate each pixel to its left;right;lower;upper neighbor.</li>
 </ul></li>
 <li>Finally the dialog should look like this:
 <center><a name="tutorial_flow_pic005"><img src="./pic/tutorial_flow_pic005.png" border="1">
@@ -86,8 +86,90 @@ After a click on OK, the correlator dialog will be enabled and some meta-data of
 <li>Now you can start the correlation job, by clicking <b>Add Job</b>.</li>
 <li>While the correlation is running, you should also correlate the second datafile <tt>TetraSpec__s01_c08_000.tif</tt> (background: <tt>TetraSpec__s01_c08_000_background.tif</tt>), which contains a measurement of the same beads, but without flow. So click on <img src=":imaging_fcs/fileopen.png"> and select teh file <tt>TetraSpec__s01_c08_000.tif</tt>. Then you set all other fields as above. Finally you can also add this job by clicking <b>Add Job</b>.</li>
 <li>When all two jobs are finished (<img src=":imaging_fcs/job_done.png">), the you can <b>Close</b> the dialog. QuickFit will now load the datasets into the project:
+<center><a name="tutorial_flow_pic006"><img src="./pic/tutorial_flow_pic006.png" border="1">
+</center>
+$$note:All RDRs (one ACF and the four CCFs, here called <i>DCCF(&Delta;x,&Delta;y)</i> ), that were created from one input dataset are grouped together (same background color/same folder)! This is necessary for QuickFit to recognize RDRs/files, that belong together. The roles (after the dash in the RDR name) specify, what type of correlation is in the record.<br><br>If this grouping should not be done automatically yet, you can edit the groups, best using the tool <a href="$$mainhelpdir$$/dlgeditgroupandrole.html">Tools | Project Tools | edit groups, roles and folders</a>.$$
 </li>
 </ol>
+
+<h3>Inspecting the data</h3>
+<p>You can inspect the single correlation curves, by double-clicking a record.
+<ol>
+    <li>First double-click the <b>beads_flow... - ACF</b> record and change over to the tab <b>Parameter Image</b>:
+<center><a name="tutorial_flow_pic007"><img src="./pic/tutorial_flow_pic007.png" border="1">
+</center>
+</li>
+    <li>In the <b>settings pane</b> on the rhs of the dialog, you can scroll down, until you see the <b>correlation plot styles</b>. Select the <b>selection display: DCCF display</b>, which will cause QuickFit to not only display the ACF in the plot at the lower left, but all five correlation curves from the RDRs in the group of the current RDR (i.e. the ACF + the four CCFs). After clicking on any bright pixel in the overview image, the plot should then look comparable to the following screenshot:
+<center><a name="tutorial_flow_pic008"><img src="./pic/tutorial_flow_pic008.png" border="1">
+</center>
+As expected for a sample with a directed flow, some CCFs show a distinct peak. It is at approximately $(\tau_f=0.003\;\mathrm{s})$. Together with the known pixel size of a=400nm, we can then already estimate a flow velocity of $[ v=\frac{a}{\tau_f} \approx 133\;\mathrm{\frac{{\mu}m}{s}} ]$
+The fact, that this peak only appears in one of the four CCFs and that the two CCFs with shifts in y-direction, indicates, that the flow is mainly in x-direction.
+</li>
+    <li>If you change over to the record <b>TetraSpec... - ACF</b>, which was taken of a sample without directed flow, you see the peak disappearing:
+<center><a name="tutorial_flow_pic010"><img src="./pic/tutorial_flow_pic010.png" border="1">
+</center>
+
+
+    To change over to that record, you can use the <b>select RDR</b> button at the top of the window. After a click, a list will pop up, in which to select the file, that you want to display now:
+<center><a name="tutorial_flow_pic009"><img src="./pic/tutorial_flow_pic009.png" border="1">
+</center>
+</li>
+</ol></p>
+
+
+
+
+<h3>Masking the data</h3>
+<p>As you maybe noted during the last step, the overview image shows two distinct dark regions at its borders. These are caused by some optical elements in the beampath of the microscope. If you select a pixel in these regions, you woin't get any meaningful correlation data, since no fluorescence was detected there:
+<center><a name="tutorial_flow_pic011"><img src="./pic/tutorial_flow_pic011.png" border="1">
+</center>
+So we will have to mask these regions. This is possible in the imagingFCS RDR editor, that we already opened in the last step:
+<ol>
+    <li>Select the rectangle selection tool <img src=":imaging_fcs/draw_rectangle.png"> above the image plots and draw a rectangle over the left strip: Drawing starts, when you press down the left mouse button. Then you can draw the rectangle by keeping the left mouse button pressed and moving the mouse. When you release the button, the rectangle will be drawn.
+<center><a name="tutorial_flow_pic012"><img src="./pic/tutorial_flow_pic012.png" border="1">
+</center>
+$$note:We now selected a few pixels on the left of the overview image, which are marked with a red overlay. the correlation plot will display the averaged ACFs/CCFs over all selected pixels.<br><b>These pixels are not masked yet!!!</b>$$
+ </li>
+ <li>Now do the same for the rhs strip of dark pixels, but <b>keep the key CTRL pressed</b>, while drawing the second rectangle. This will add the new rectangle to the already existing mask.
+<center><a name="tutorial_flow_pic013"><img src="./pic/tutorial_flow_pic013.png" border="1">
+</center>
+</li>
+  <li>Now scroll the settings pane on the rhs of the dialog up and press the button <b>mask sel.</b>, which will mask the selected pixels. The mask will be shown as a blue overlay and the colobar-scalig will change to only include the pixels, that are non-masked:
+<center><a name="tutorial_flow_pic014"><img src="./pic/tutorial_flow_pic014.png" border="1">
+</center>
+</li>
+<li>This mask is now set for the ACF record only, but we also need this very same mask to be set for the four CCF records within the group. This can be achieved by the button <b>copy mask to group</b> on the rhs.</li>
+<li>Now repeat the steps above for the second ACF record.</li>
+</ol>
+$$startbox_note$$
+Instead of drawing a mask by hand, you can also create the mask by <a href="https://en.wikipedia.org/wiki/Image_segmentation">segmenting the overview image</a>. This is done by pressing the button <a href="$$plugin_info:helpdir:imaging_fcs$$/tutorial_cell.html"><b>m. by overview</b></a>. This tool is especially helpful, if the shape of the imaged object (e.g. a cell) is irregular.
+$$endbox$$
+<li>Finally we can also use the masked-out pixels to estimate the background intensity during the acquisition. This intensity is often a bit higher, than the one measured without illumination, which is already corrected for during the correlation step. <br>To estimate this background intensity, you will have to click on <b>background from mask</b> for one record in every group in your project. QuickFit will then ask you, whether you want to apply this operation to the other records in the group. Answer this with Yes.</li>
+Finally you can close the imagingFCS RDR editor window.
+</p>
+
+
+<h3>Adding &amp; Setting up the fit</h3>
+<p>Now we have prepared the records for fitting. So we have to add a fitting object to the project and set it up for fitting the ACf and the four CCFs with linked parameters:
+<ol>
+    <li>In the main window, click on <b>Data Items | Insert Evaluation | imFCCS Curve fitting</b>. One evaluation object will appear in the project.
+<center><a name="tutorial_flow_pic015"><img src="./pic/tutorial_flow_pic015.png" border="1">
+</center>
+</li>
+    <li>Double-click the evaluation item to open the fit evaluation editor dialog:<center><img src="pic/tutorial_pic016.png"></center>
+As you can see in this dialog, only a single correlation curve is displayed (it should be the first RDR in the project, most probably <tt>beads_flow... - ACF</tt>. Next to the correlation curve, you see the overview image with the mask, that we defined before. In this overview image, you can click on any pixel to inspect the curves/fit results there. For now click on the button <b>avg.</b> avoe the overview image, which will switch to an average correlation curve over all non-masked pixels in the image.</li>
+    <li>Now we have to set up the fit. This can either be done by hand, or with a short-cut in the Tools menu. Here we will choose the short-cut. So click on <b>Tools | configure for SPIM-FCCS ... | 3D diffusion+flow, ACF, 4 neighbors</b>.<br>the dialog will change its appearance: The correlation curves plot will display the full five curves and the table at the bottom will contain a large set of columns:
+<center>
+</center>
+The table contains a group of 5 columns (value/error/unit/fix/global) for every file/RDR in the fit. The first row of the table contains the RDRs, that are currently selected. These should all be <tt>beads_flow...</tt> records, and all fie different roles. In the second row, you can see the selected fit model, which is <a href="$$fitfunction:help:fccs_spim_diffflowce2$$">$$fitfunction:name:fccs_spim_diffflowce2$$</a> in our case. This model described the cross-correlation between two separated volumes (distance vector $((d_x, d_y)^\mathrm{T})$, taking flow (vector:  $(\vec{v}=(v_x, v_y)^\mathrm{T})$) and diffusion (coefficient: $(D)$) into account. With $((d_x, d_y)^\mathrm{T}=(0,0))$ This model also incorporates the autocorrelation, so we can use the same model for all five roles!<br>
+The remaining rows show the different parameters of the chosen model: The <b>value column</b> contains the current parameter value, the <b>error column</b> the fit error associated with it (currently: all 0). The <b>unit column</b> displays the unit of the parameter (e.g. nm for the shift vector components) and in the <b>fix column</b>, you can fix a parameter to a specific value (so it's no longer a fit parameter). SOme parameters have a light grey background. these cannot be edited and are parameters, that are calculated form other parameters.<br>
+Also observe, that some parameters are already preset, such as the shift vectors $(d_x, d_y)$, which are set to the correct pixel-separation. The same is true for the pixel size $(a)$. The values are taken from the meta-data, that you provided, when correlating the record. <small><i>If the pixel size is wrong, you can set a new pixel-size in the "properties" tab of the RDR editor of each record. The property is called "PIXEL_WIDTH" and "PIXEL_HEIGHT".</i></small><br>
+The last <b>column global</b>, specifies, which parameters are linked over the different RDRs/models: Initially each parameter is specific to each RDR, e.g. there is one separate $(G_\infty)$ for every RDR/correlation curve.
+</li>
+    <li></li>
+    <li></li>
+    <li></li>
+</ol></p>
 
 
 <h2>References</h2>
