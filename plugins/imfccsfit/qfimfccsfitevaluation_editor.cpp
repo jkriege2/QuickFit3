@@ -535,42 +535,7 @@ void QFImFCCSFitEvaluationEditor::setCurrentRun(int run)
 
 void QFImFCCSFitEvaluationEditor::onConfigureGlobalItemClicked()
 {
-    /*QAction* act=qobject_cast<QAction*>(sender());
-    int idx=actsGlobalConfig.indexOf(act);
-    //qDebug()<<"sender()="<<sender()<<" type="<<sender()->metaObject()->className()<<"   act="<<act<<"   idx="<<idx;
-    if (act&&idx>=0&&idx<globalConfig.size()) {
-        QFImFCCSFitEvaluationItem* data=qobject_cast<QFImFCCSFitEvaluationItem*>(current);
-        if (!data) return;
 
-        if (data->getFitFileCount()<globalConfig[idx].models.size()) {
-            while (data->getFitFileCount()<globalConfig[idx].models.size()) {
-                data->addFitFile();
-            }
-        } else if (data->getFitFileCount()>globalConfig[idx].models.size()) {
-            while (data->getFitFileCount()>globalConfig[idx].models.size()) {
-                data->removeFitFile();
-            }
-        }
-
-        for (int i=0; i<globalConfig[idx].models.size(); i++) {
-            data->setFitFunction(i, globalConfig[idx].models[i]);
-        }
-        data->clearLinkParameters();
-
-        for (int i=0; i<globalConfig[idx].globalParams.size(); i++) {
-            QList<QStringList> g=globalConfig[idx].globalParams[i];
-            for (int j=0; j<g.size(); j++) {
-                QStringList sl=g[j];
-                if (sl.size()>0) {
-                    for (int s=0; s<sl.size(); s++) {
-                        if (!sl[s].isEmpty()) {
-                            data->setLinkParameter(j, sl[s], i);
-                        }
-                    }
-                }
-            }
-        }
-    }*/
     QAction* act=qobject_cast<QAction*>(sender());
     int idx=actsGlobalConfig.indexOf(act);
     //qDebug()<<"sender()="<<sender()<<" type="<<sender()->metaObject()->className()<<"   act="<<act<<"   idx="<<idx;
@@ -629,10 +594,13 @@ void QFImFCCSFitEvaluationEditor::configureFitFromGlobal(const QFFitFunctionConf
     }
     data->clearLinkParameters();
 
+    //qDebug()<<config.menuEntryLabel;
     for (int i=0; i<config.globalParams.size(); i++) {
         QList<QStringList> g=config.globalParams[i];
+        //qDebug()<<i<<":"<<g.size()<<"/"<<config.globalParams.size();
         for (int j=0; j<g.size(); j++) {
             QStringList sl=g[j];
+            //qDebug()<<i<<":    "<<j<<"/"<<g.size()<<":"<<sl;
             if (sl.size()>0) {
                 for (int s=0; s<sl.size(); s++) {
                     if (!sl[s].isEmpty()) {
