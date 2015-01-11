@@ -159,17 +159,125 @@ Finally you can close the imagingFCS RDR editor window.
     <li>Double-click the evaluation item to open the fit evaluation editor dialog:<center><img src="pic/tutorial_pic016.png"></center>
 As you can see in this dialog, only a single correlation curve is displayed (it should be the first RDR in the project, most probably <tt>beads_flow... - ACF</tt>. Next to the correlation curve, you see the overview image with the mask, that we defined before. In this overview image, you can click on any pixel to inspect the curves/fit results there. For now click on the button <b>avg.</b> avoe the overview image, which will switch to an average correlation curve over all non-masked pixels in the image.</li>
     <li>Now we have to set up the fit. This can either be done by hand, or with a short-cut in the Tools menu. Here we will choose the short-cut. So click on <b>Tools | configure for SPIM-FCCS ... | 3D diffusion+flow, ACF, 4 neighbors</b>.<br>the dialog will change its appearance: The correlation curves plot will display the full five curves and the table at the bottom will contain a large set of columns:
-<center>
+<center><a name="tutorial_flow_pic016"><img src="./pic/tutorial_flow_pic016.png" border="1">
 </center>
-The table contains a group of 5 columns (value/error/unit/fix/global) for every file/RDR in the fit. The first row of the table contains the RDRs, that are currently selected. These should all be <tt>beads_flow...</tt> records, and all fie different roles. In the second row, you can see the selected fit model, which is <a href="$$fitfunction:help:fccs_spim_diffflowce2$$">$$fitfunction:name:fccs_spim_diffflowce2$$</a> in our case. This model described the cross-correlation between two separated volumes (distance vector $((d_x, d_y)^\mathrm{T})$, taking flow (vector:  $(\vec{v}=(v_x, v_y)^\mathrm{T})$) and diffusion (coefficient: $(D)$) into account. With $((d_x, d_y)^\mathrm{T}=(0,0))$ This model also incorporates the autocorrelation, so we can use the same model for all five roles!<br>
-The remaining rows show the different parameters of the chosen model: The <b>value column</b> contains the current parameter value, the <b>error column</b> the fit error associated with it (currently: all 0). The <b>unit column</b> displays the unit of the parameter (e.g. nm for the shift vector components) and in the <b>fix column</b>, you can fix a parameter to a specific value (so it's no longer a fit parameter). SOme parameters have a light grey background. these cannot be edited and are parameters, that are calculated form other parameters.<br>
-Also observe, that some parameters are already preset, such as the shift vectors $(d_x, d_y)$, which are set to the correct pixel-separation. The same is true for the pixel size $(a)$. The values are taken from the meta-data, that you provided, when correlating the record. <small><i>If the pixel size is wrong, you can set a new pixel-size in the "properties" tab of the RDR editor of each record. The property is called "PIXEL_WIDTH" and "PIXEL_HEIGHT".</i></small><br>
+
+The table contains a group of 5 columns (value/error/unit/fix/global) for every file/RDR in the fit. The first row of the table contains the RDRs, that are currently selected. These should all be <tt>beads_flow...</tt> records, and all fie different roles. In the second row, you can see the selected fit model, which is <a href="$$fitfunction:help:fccs_spim_diffflowce2$$">$$fitfunction:name:fccs_spim_diffflowce2$$</a> in our case. This model described the cross-correlation between two separated volumes (distance vector $((d_x, d_y)^\mathrm{T})$, taking flow (vector:  $(\vec{v}=(v_x, v_y)^\mathrm{T})$) and diffusion (coefficient: $(D)$) into account. With $( \left(d_x, d_y\right)^\mathrm{T}=\left(0,0\right)^\mathrm{T} )$ This model also incorporates the autocorrelation, so we can use the same model for all five roles!<br>
+The remaining rows show the different parameters of the chosen model: The <b>value column</b> contains the current parameter value, the <b>error column</b> the fit error associated with it (currently: all 0). The <b>unit column</b> displays the unit of the parameter (e.g. nm for the shift vector components) and in the <b>fix column</b>, you can fix a parameter to a specific value (so it's no longer a fit parameter). Some parameters have a light grey background. these cannot be edited and are parameters, that are calculated form other parameters.<br>
+Also observe, that some parameters are already preset, such as the shift vectors $(d_x, d_y)$, which are set to the correct pixel-separation. The same is true for the pixel size $(a)$. The values are taken from the meta-data, that you provided, when correlating the record. <br><small><i>If the pixel size is wrong, you can set a new pixel-size in the "properties" tab of the RDR editor of each record. The property is called "PIXEL_WIDTH" and "PIXEL_HEIGHT".</i></small><br>
 The last <b>column global</b>, specifies, which parameters are linked over the different RDRs/models: Initially each parameter is specific to each RDR, e.g. there is one separate $(G_\infty)$ for every RDR/correlation curve.
+$$note:All the presets, that have been set by the Tools-menu entry can also be entered manually in this table. There you can edit the values in the five columns. You can use the <b>add file</b> and <b>remove file</b> buttons to add/delete additional RDRs/files to/from the table.$$
+Also note, that the background intensities are also already preset in the table.
 </li>
-    <li></li>
-    <li></li>
-    <li></li>
+    <li>As a next step you have to set the initial values. The diffusion coefficient is preset to 10µm²/s and the flow speeds to 100µm/s in x-direction, which is in good agreement with the value, we estimated above. In addition, the following parameters have to be set:
+<ul>
+    <li>lateral PSF radius (determined by a PSF calibration): $(w_{xy}=600\;\mathrm{nm})$</li>
+    <li>longitudinal PSF radius (determined by a PSF beadscan): $(w_{z}=1240\;\mathrm{nm})$</li>
+    <li>pixel size: $(a=400\;\mathrm{nm})$</li>
+</ul>
+</li>
+    <li>In some cases, changing the allowed ranges of the fit parameters can improve the fit results. You can edit them, by clicking on the button <b>edit P ranges</b>. If it is pressed down, two additional columns appear for each file/RDR in the table, in which you can change the parameter ranges. Here it can be advisable to e.g. set the range of the diffusion coefficient $(D_1\in\left[10^{-5},\ 100\right]\;\mathrm{{\mu}m^2/s})$:
+<center><a name="tutorial_flow_pic018"><img src="./pic/tutorial_flow_pic018.png" border="1">
+</center>
+</li>
+    <li>Finally, it is advisable to cut a few channels from the back of the correlation curves, since these are mostly 0 and that could negatively influence the fits (due to the high statistical weights, that these lag times receive). So set the upper cut-off to 110:
+<center><a name="tutorial_flow_pic017"><img src="./pic/tutorial_flow_pic017.png" border="1">
+</center>
+</li>
 </ol></p>
+
+
+<h3>Fits</h3>
+<p>After the presets from the last step, we are now in a position to perform the fits:
+<ol>
+    <li>You can perform a fit to the currently displayed pixel (currently the average over all pixels, see above) by clicking on the button <b>Fit Current</b>. The fit result should look as follows:
+<center><a name="tutorial_flow_pic019"><img src="./pic/tutorial_flow_pic019.png" border="1">
+<br><br><a name="tutorial_flow_pic020"><img src="./pic/tutorial_flow_pic020.png" border="1">
+</center>
+</li>
+    <li>If the fit didn't work out, you can reset the fit result, by clicking <b>Reset Current</b>. then you can change the initial values slightly and try to refit by clicking <b>Fit Current</b> again.<br>You can also use the set of good fit results, that you got above as initial parameters. To do so, fit until the data is fit well and then click on the button <b>Copy to Initial</b>. This will take the current fit results as initial values for the remaining pixels.</li>
+    <li>As soon as you have worked out a good set of starting values, you can fit all pixels in the measurement, by clicking on the button <b>Fit all Pixels</b>. $$note:You can click on the downward arrow at the rhs of the "Fit..." buttons to select a multi-threaded fit (contains "MT" in the drop-down menu entry), which is usually faster, than the default option.$$</li>
+    <li>Note, that after the fit, two entries appear in the <b>fitted file-sets list</b>:
+    <center><a name="tutorial_flow_pic021"><img src="./pic/tutorial_flow_pic021.png" border="1">
+    </center>
+    This list contains one entry for every combination of input RDRs. In this case, there is one for the <tt>beads_flow_...</tt> files/RDRs and one for the <tt>TetraSpec_...</tt> files/RDRs. Since there are already fits existing for the <tt>beads_flow_...</tt>, this entry is shown in blue. The second entry for <tt>TetraSpec_...</tt> is shown in grey. It was guessed by QuickFit, based on the fact, that all RDRs in the current fit are in the same RDR group.<br>If you click on that greyed image, the display in the widnow changes and shows the measurement without flow. Repeat the fit now, by clicking <b>Fit All Pixels</b> for this fileset.
+    </li>
+    <li>After the fits are complete, you can close the fit editor dialog.</li>
+</ol></p>
+
+
+
+<h3>Inspecting the Fit Results</h3>
+<p>In a last step, we can now evaluate the fit results. 
+<ol>
+    <li>To do so, double-click the <tt>beads_flow_... - ACF</tt> RDR in the project tree. The imFCS RDR editor will open. In order to inspect the fit results, change to the <b>Parameter Image</b> tab: 
+<center><a name="tutorial_flow_pic022"><img src="./pic/tutorial_flow_pic022.png" border="1">
+</center>
+Now the two parameter image plots at the top display the maps of the fit parameters "diffusion coefficient of species 1" and "particle number N". You can choose the dsplayed parameter with the combo-boxes <b>"parameter"</b> and <b>"parameter 2"</b> at the top of the window. </li>
+    <li>If you observe the image maps more exactly, you see that there are two blue stripes at the top and bottom:
+<center><a name="tutorial_flow_pic023"><img src="./pic/tutorial_flow_pic023.png" border="1">
+</center>
+These stripes are caused by the fact, that at the border some correlation functions are missing, since you cannot cross-correlate to non-existing pixels. The best way to deal with this is to select these stripes with the rectangle tool <img src=":imaging_fcs/draw_rectangle.png"> and to mask them, as described above (also copy the mask to the group!):
+<center><a name="tutorial_flow_pic024"><img src="./pic/tutorial_flow_pic024.png" border="1">
+</center>
+</li>
+    <li>The particle number image looks as follows:
+    <center><a name="tutorial_flow_pic025"><img src="./pic/tutorial_flow_pic025.png" border="1">
+    </center>
+    You can see some blue stripes, which are caused by bright aggregates, that swam through the field of view. This can be seen, if you look at the video of the measureemnt, which is accessible in the tab <b>Images, Videos &amp; Timetraces</b>, if you select the <b>time-binned video</b> in the combo-box at the top. Here is an example frame from the video (frame: 571), which shows the aggregate as streak (the video-frames are averages over several (150) frames from the measurement):
+<center><a name="tutorial_flow_pic026"><img src="./pic/tutorial_flow_pic026.png" border="1">
+</center>
+    </li>
+    <li>If you go back to the tab <b>Parameter Image</b> You can also inspect the flow velocity and flow angle parameters. Select these two parameters in the combo-boxes at the top:
+<center><a name="tutorial_flow_pic027"><img src="./pic/tutorial_flow_pic027.png" border="1">
+</center>
+It is also advisable to select the <b>color palette HSV</b> for parameter 2:
+<center><a name="tutorial_flow_pic028"><img src="./pic/tutorial_flow_pic028.png" border="1">
+</center>
+This color palette has the advantage, that it starts and ends with the color red (see image above). This is necessary, as the angle 0° and 360° are the same, so they should be displayed in the same color. The two images look as follows:
+<center><a name="tutorial_flow_pic029"><img src="./pic/tutorial_flow_pic029.png" border="1">
+<a name="tutorial_flow_pic030"><img src="./pic/tutorial_flow_pic030.png" border="1">
+</center>
+You can also look at the distribution of the fit parameters, if you select the sub-tab <b>Histograms</b>:
+<center><a name="tutorial_flow_pic031"><img src="./pic/tutorial_flow_pic031.png" border="1">
+</center>
+As you can see the angle histogram (bottom) is centered around 0°, but separated into two parts. To improve this situation, you can choose the parameter "vflow_angle_centered: centered angle of the flow speed". then the histogram looks as follows:
+<center><a name="tutorial_flow_pic032"><img src="./pic/tutorial_flow_pic032.png" border="1">
+</center>
+</li>
+    <li>Finally you can extract the mean and standard deviation from the histogram panes for the different parameters and the two samples:<center><table cellspacing="0" cellpadding="1" border="1">
+  <tr>
+    <th bgcolor="#a0a0a4"><b>Parameter</b></th>
+    <th bgcolor="#a0a0a4"><b>sample with flow</b></th>
+    <th bgcolor="#a0a0a4"><b>sample without flow</b></th>
+  </tr>
+  <tr>
+    <td>$$math:D$$</td>
+    <td>$$math:(7.9\pm0.6)\;\mathrm{{\mu}m^2/s}$$</td>
+    <td>$$math:(4.1\pm0.4)\;\mathrm{{\mu}m^2/s}$$</td>
+  </tr>
+  <tr>
+    <td>$$math:|\vec{v}|$$</td>
+    <td>$$math:(73\pm3)\;\mathrm{{\mu}m/s}$$</td>
+    <td>$$math:(5\pm1)\;\mathrm{{\mu}m/s}$$</td>
+  </tr>
+  <tr>
+    <td>$$math:\alpha_{flow}'$$</td>
+    <td>$$math:(4\pm4)°$$</td>
+    <td>$$math:(-5\pm23)°$$</td>
+  </tr>
+</table></center>The difference in flow velocity is very prominent and the difference in the diffusion coefficient can be explained, as the first measurement was acquired at 37°C and the second one at 24°C. the beads had a diameter of around 100nm, so the expected diffusion coefficient s in water at 24°C and 37°C would be 4.3µm²/s and 6.6µm²/s, which is in good agreement with the measured values.</li>
+    <li>One last note: When inspecting the second dataset (no flow), you get parameter images of this form:
+<center><a name="tutorial_flow_pic035"><img src="./pic/tutorial_flow_pic035.png" border="1">
+</center>
+Masking the spots, where aggregates were prominent, removes the disturbances on the histograms:
+<center><a name="tutorial_flow_pic036"><img src="./pic/tutorial_flow_pic036.png" border="1">
+</center>
+
+</li>
+</ol>
+</p>
+
 
 
 <h2>References</h2>
