@@ -60,26 +60,7 @@ class QFFitFunctionConfigForGlobalFitInterface
             double rangeMin;
             double rangeMax;
             bool setRange;
-            GlobalFitParameter() {
-                value=0;
-                error=0;
-                rangeMin=-DBL_MIN;
-                rangeMax=DBL_MAX;
-                setRange=true;
-            }
 
-            GlobalFitParameter(double val, double err, double rangeMin, double rangeMax) {
-                value=val;
-                error=err;
-                this->rangeMax=rangeMax;
-                this->rangeMin=rangeMin;
-                setRange=true;
-            }
-            GlobalFitParameter(double val, double err) {
-                value=val;
-                error=err;
-                setRange=false;
-            }
         };
 
         struct GlobalFitConfig {
@@ -97,6 +78,35 @@ class QFFitFunctionConfigForGlobalFitInterface
         virtual GlobalFitConfig getGlobalFitConfig(int i) const=0;
 
 };
+
+inline QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter QFFitFunctionConfigForGlobalFitInterface_GlobalFitParameter_get() {
+    QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter p;
+    p.value=0;
+    p.error=0;
+    p.rangeMin=-DBL_MIN;
+    p.rangeMax=DBL_MAX;
+    p.setRange=true;
+    return p;
+}
+
+inline QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter QFFitFunctionConfigForGlobalFitInterface_GlobalFitParameter_get(double val, double err, double rangeMin, double rangeMax) {
+    QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter p;
+    p.value=val;
+    p.error=err;
+    p.rangeMax=rangeMax;
+    p.rangeMin=rangeMin;
+    p.setRange=true;
+    return p;
+}
+inline QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter QFFitFunctionConfigForGlobalFitInterface_GlobalFitParameter_get(double val, double err) {
+    QFFitFunctionConfigForGlobalFitInterface::GlobalFitParameter p;
+    p.value=val;
+    p.error=err;
+    p.rangeMin=-DBL_MIN;
+    p.rangeMax=DBL_MAX;
+    p.setRange=false;
+    return p;
+}
 
 Q_DECLARE_INTERFACE( QFFitFunctionConfigForGlobalFitInterface,
                      "www.dkfz.de.b040.quickfit3.plugin.QFFitFunctionConfigForGlobalFitInterface/1.0")
