@@ -46,37 +46,39 @@ QFFitFunctionsSPIMFCCSDiffFlowCENewVeff2Global::QFFitFunctionsSPIMFCCSDiffFlowCE
     #define FCCSDiff_vflow 6
     addParameter(FloatNumber,  "vflow_angle",             "angle of the flow speed",                               "&alpha;<sub>flow</sub>",         "°", "°",                  false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
     #define FCCSDiff_alphaflow 7
+    addParameter(FloatNumber,  "vflow_angle_centered",             "centered angle of the flow speed",                               "&alpha;<sub>flow</sub>'",         "°", "°",                  false,    false,        false,              QFFitFunction::DisplayError, false, 0,          0,        1e50,     1    );
+    #define FCCSDiff_alphaflow_centered 8
 
     addParameter(FloatNumber,  "diff_rho2",               "fraction of second component",                          "&rho;<sub>2</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.2,          0,        0.99999,  0.1, 0,      1  );
-    #define FCSSDiff_diff_rho2 8
+    #define FCSSDiff_diff_rho2 9
     addParameter(FloatNumber,  "diff_coeff2",             "diffusion coefficient of species 2",                    "D<sub>2</sub>",            "micron^2/s", "&mu;m<sup>2</sup>/s",    true,      true,         true,              QFFitFunction::DisplayError, false, 10,           1e-10,    1e50,     1    );
-    #define FCCSDiff_diff_coeff2 9
+    #define FCCSDiff_diff_coeff2 10
 
 
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
-    #define FCCSDiff_offset 10
+    #define FCCSDiff_offset 11
     addParameter(FloatNumber,  "focus_distance_x",         "foci: lateral distance in x-direction",                 "d<sub>x</sub>",            "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1000,           -1e6,     1e6,      10  );
-    #define FCCSDiff_focus_distancex 11
+    #define FCCSDiff_focus_distancex 12
     addParameter(FloatNumber,  "focus_distance_y",         "foci: lateral distance in y-direction",                 "d<sub>y</sub>",            "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 0,              -1e6,     1e6,      10  );
-    #define FCCSDiff_focus_distancey 12
+    #define FCCSDiff_focus_distancey 13
     addParameter(FloatNumber,  "focus_distance",         "foci: lateral distance",                                  "d<sub>xy</sub>",            "nm",         "nm",                     false,      false,         false,              QFFitFunction::DisplayError,    true, 1000,              0,     1e6,      10  );
-    #define FCCSDiff_focus_distance 13
+    #define FCCSDiff_focus_distance 14
     addParameter(FloatNumber,  "focus_height",            "PSF: axial radius (1/e² radius)",                        "w<sub>z</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1240,         0.01,     1e5,      10  );
-    #define FCCSDiff_focus_height 14
+    #define FCCSDiff_focus_height 15
     addParameter(FloatNumber,  "focus_width",             "PSF: lateral radius (1/e² radius)",                      "w<sub>x,y</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 600,          0,        1e4,      10    );
-    #define FCCSDiff_focus_width 15
+    #define FCCSDiff_focus_width 16
     addParameter(FloatNumber,  "pixel_width",             "pixel width",                                           "a",                        "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 400,          0,        1e4,      10    );
-    #define FCCSDiff_pixel_width 16
+    #define FCCSDiff_pixel_width 17
     addParameter(FloatNumber,  "focus_volume",            "focus: effective volume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCCSDiff_focus_volume 17
+    #define FCCSDiff_focus_volume 18
     addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCCSDiff_concentration 18
+    #define FCCSDiff_concentration 19
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_count_rate 19
+    #define FCCSDiff_count_rate 20
     addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_background 20
+    #define FCCSDiff_background 21
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_cpm 21
+    #define FCCSDiff_cpm 22
 
 }
 
@@ -180,10 +182,18 @@ void QFFitFunctionsSPIMFCCSDiffFlowCENewVeff2Global::calcParameter(double* data,
 
 
     // calculate valpha=(atan(vy/vx)+pi)/pi*180
-    data[FCCSDiff_alphaflow]=(atan2(vy,vx)+M_PI)/M_PI*180.0;
+    double an;
+    data[FCCSDiff_alphaflow]=an=(atan2(vy,vx)+M_PI)/M_PI*180.0;
     if (error) {
         error[FCCSDiff_vflow]=0;
         if (!QFFloatIsOK(error[FCCSDiff_vflow])) error[FCCSDiff_vflow]=0;
+    }
+
+    // calculate centered valpha=(atan(vy/vx)+pi)/pi*180
+    data[FCCSDiff_alphaflow_centered]=an;
+    if (an>180.0) data[FCCSDiff_alphaflow_centered]=an-360.0;
+    if (error) {
+        error[FCCSDiff_alphaflow_centered]=error[FCCSDiff_vflow];
     }
 
     // calculate 1/N
