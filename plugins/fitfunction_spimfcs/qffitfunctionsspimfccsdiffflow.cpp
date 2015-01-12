@@ -194,15 +194,15 @@ void QFFitFunctionsSPIMFCCSDiffFlow::calcParameter(double* data, double* error) 
     double an;
     data[FCCSDiff_alphaflow]=an=(atan2(vy,vx)+M_PI)/M_PI*180.0;
     if (error) {
-        error[FCCSDiff_vflow]=0;
-        if (!QFFloatIsOK(error[FCCSDiff_vflow])) error[FCCSDiff_vflow]=0;
+        error[FCCSDiff_alphaflow]=0;
+        if (!QFFloatIsOK(error[FCCSDiff_alphaflow])) error[FCCSDiff_alphaflow]=0;
     }
 
     // calculate centered valpha=(atan(vy/vx)+pi)/pi*180
     data[FCCSDiff_alphaflow_centered]=an;
     if (an>180.0) data[FCCSDiff_alphaflow_centered]=an-360.0;
     if (error) {
-        error[FCCSDiff_alphaflow_centered]=error[FCCSDiff_vflow];
+        error[FCCSDiff_alphaflow_centered]=error[FCCSDiff_alphaflow];
     }
 
 
