@@ -102,7 +102,6 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::
         res.singleFixes << constructQListWithMultipleItems(QMap<QString,bool>(), res.models.size());
         res.paramValues[0].insert("n_nonfluorescent", QFFitFunctionConfigForGlobalFitInterface_GlobalFitParameter_get(0,0));
         for (int j=0; j<res.singleFixes.size(); j++) { res.singleFixes[j].insert("focus_width", false); };
-        for (int j=0; j<res.singleFixes.size(); j++) { res.singleFixes[j].insert("focus_height", false); };
 
     }
     return res;
