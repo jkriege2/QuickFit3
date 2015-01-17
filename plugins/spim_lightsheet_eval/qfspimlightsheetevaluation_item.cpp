@@ -119,7 +119,7 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
         int hi=h;
         //qDebug()<<useMask<<dataM<<maskD;
         if (orientation==QFSPIMLightsheetEvaluationItem::fitColumns) {
-            // rotate image by 90�
+            // rotate image by 90degree
             double* m=data->getImageStack(stack, stack_pos, channel);
             for (int x=0; x<w; x++) {
                 for (int y=0; y<h; y++) {
@@ -158,6 +158,8 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
             avgValues.append(valEmpty);
         }
 
+        double scaleI=1.0;
+
         double* dataX=(double*)qfMalloc(wi*sizeof(double));
         double* dataY=(double*)qfMalloc(wi*sizeof(double));
         for (int f=0; f<hi; f++) {
@@ -170,6 +172,13 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
                 }
             }
             //qDebug()<<data_count<<wi;
+
+             if (data_count>0 && getQFProperty("FIT_SCALE_INTENSITY", true).toBool()) {
+                 scaleI=statisticsMax(dataY, data_count)/double(wi);
+                 for (int i=0; i<data_count; i++) {
+                     dataY[i]=dataY[i]/scaleI;
+                 }
+             }
 
 
             int pcount=model->paramCount();
@@ -194,20 +203,38 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
 
             }
 
-            model->estimateInitial(paramOut, dataX, dataY, data_count);
+            if (getQFProperty("ESTIMATE_INITIAL_FF", true).toBool()) model->estimateInitial(parIn, dataX, dataY, data_count);
 
-
+            /*QString ps;
+            for (int i=0; i<paramIDs.size(); i++) {
+                ps=ps+QString("%1=%2,  ").arg(paramIDs[i]).arg(parIn[i]);
+            }
+            qDebug()<<"=== INIT: "<<ps;*/
             //lmcurve_fit(4, par, wi, dataX, dataY, QFSPIMLightsheetEvaluationItem_fGauss, &control, &status);
 
-            QFFitAlgorithm::FitResult res=algorithm->fit(paramOut, paramErrOut, dataX, dataY, NULL, data_count, model, parIn);
-            fitOK.append(res.fitOK);
 
+            QVector<double> pMin=model->getInitialParamMins();
+            QVector<double> pMax=model->getInitialParamMaxs();
+
+
+            QFFitAlgorithm::FitResult res=algorithm->fit(paramOut, paramErrOut, dataX, dataY, NULL, data_count, model, parIn, NULL,pMin.data(),pMax.data());
+            //res=algorithm->fit(paramOut, paramErrOut, dataX, dataY, NULL, data_count, model, paramOut, NULL,pMin.data(),pMax.data());
+            fitOK.append(res.fitOK);
+            /*ps="";
+            for (int i=0; i<paramIDs.size(); i++) {
+                ps=ps+QString("%1=%2,  ").arg(paramIDs[i]).arg(paramOut[i]);
+            }
+            qDebug()<<"=== FIT: "<<ps<<"\n\n";*/
             //qDebug()<<f<<res.fitOK<<": offset="<<paramOut[0]<<" A="<<paramOut[1]<<" pos="<<paramOut[2]<<" width="<<paramOut[3];
 
             for (int i=0; i<paramIDs.size(); i++) {
+                if (paramIDs[i].toUpper()=="AMPLITUDE") {
+                    paramOut[i]=paramOut[i]*scaleI;
+                    paramErrOut[i]=paramErrOut[i]*scaleI;
+                }
                 values[i].append(paramOut[i]);
                 errors[i].append(paramErrOut[i]);
-                if (res.fitOK) avgValues[i].append(paramOut[i]);
+                if (res.fitOK && data_count>4) avgValues[i].append(paramOut[i]);
             }
             /*offsets.append(par[0]);
             amplitudes.append(par[1]);

@@ -35,13 +35,19 @@ $$endbox$$
         </center>
         
         <p><ol>
-          <li>After loading an image stack and inserting a SPIM Lightsheet Analysis evaluation, open the evaluation and select the lightsheet <img src="pic/tutorial_pic007.png"></li>
-          <li>Now select a fit model and a fit algorithm to use.</li>
-          <li>Enter the shift of the mirror in nanometers as &Delta;z and the pixel size as &Delta;x.</li>
-          <li>select whether to fit to rows (vertical lightsheet) or to columns (horizontal lightsheet)</li>
-          <li>click on "Fit Current" to perform all fits for the current file.</li>
-          <li>In the tab "Preview &amp; Single Fits" you will see some intermediate fit results and may (after the fit completed) explore the fit to each row/column in each frame and color channel.</li>
-          <li>The second tab "Stack Fit Results" summarizes all fit results.</li>
+          <li>After loading an image stack and inserting a SPIM Lightsheet Analysis evaluation, open the evaluation and select the lightsheet 
+<center><img src="pic/tutorial_pic007.png"></center></li>
+          <li>Now select a <b>fit model</b> and a <b>fit algorithm</b> to use.<b>As an algoruthm, you can use <a href="$$fitalgorithm:help:fit_lmfit$$">$$fitalgorithm:name:fit_lmfit$$</a> in most cases, which is reasonably fast and has good convergence properties. You can use one of the following fit models: $$list:fitfunc:lightsheet_$$They differ in the assumes shape for the ligh-sheet and in how the width is defined (e.g. as 1/e²-width or FWHM in a Gaussian)</li>
+          <li>You can also configure how the fit works:
+          <ol>
+              <li><b>scale fit intensit</b>: scales the image intensity to a value, comparable to the image size ($(I\rightarrow I\cdot\frac{\mbox{width}}{\max(I)})$). This improves the fit result in some cases.</li>
+              <li><b>use fit function initial values estimation</b>: Fit functions in QuickFit contain code, that allows to estimate "good" starting values for the fit. This often improves convergence. If this option is not activated, a default estimateion algorithm is used, which assumes, that the fit model has parameters "OFFSET", "AMPLTUDE", "WIDTH", "POSITION", as a Gaussian function (see e.g. <a href="$$fitfunction:help:lightsheet_gaussian$$">$$fitfunction:name:lightsheet_gaussian$$</a>)</li>
+          </ol></li>
+          <li>Enter the <b>shift</b> of the mirror in nanometers as <b>&Delta;z</b> and the <b>pixel size as &Delta;x</b>.</li>
+          <li>select whether to <b>fit to rows</b> (vertical lightsheet) or to <b>columns</b> (horizontal lightsheet)</li>
+          <li>click on <b>"Fit Current"</b> to perform all fits for the current file.</li>
+          <li>In the tab <b>"Preview &amp; Single Fits"</b> you will see some intermediate fit results and may (after the fit completed) explore the fit to each row/column in each frame and color channel.</li>
+          <li>The second tab <b>"Stack Fit Results"</b> summarizes all fit results.</li>
         </ol></p>
         <p></p>
         $$see:There is <b><a href="tutorial.html">a tutorial</a></b>, which explains the usage of this plugin in detail!$$

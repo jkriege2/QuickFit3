@@ -33,11 +33,11 @@ QFFitFunctionLightsheetGaussianFWHM::QFFitFunctionLightsheetGaussianFWHM() {
     //           type,         id,                        name,                                                    label (HTML),                      unit,          unitlabel (HTML),        fit,       userEditable, userRangeEditable, displayError, initialFix,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(FloatNumber,  "offset",                  "offset",                                                "offset",                          "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 0.0,          -1e10,    1e10,  1  );
     #define PARAM_OFFSET 0
-    addParameter(FloatNumber,  "amplitude",               "amplitude",                                             "amplitude",                       "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1000.0,       -1e10,    1e10,  1  );
+    addParameter(FloatNumber,  "amplitude",               "amplitude",                                             "amplitude",                       "",            "",                      true,      true,         true,              QFFitFunction::DisplayError,       false, 1000.0,       0,    1e10,  1  );
     #define PARAM_AMPLITUDE 1
     addParameter(FloatNumber,  "position",                "position",                                              "position",                        "pix",         "pix",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 64,            -1e10,    1e10,  1  );
     #define PARAM_POSITION 2
-    addParameter(FloatNumber,  "width",                   "width (FWHM)",                                          "width (FWHM)",                     "pix",         "pix",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 10,            -1e10,    1e10,  1  );
+    addParameter(FloatNumber,  "width",                   "width (FWHM)",                                          "width (FWHM)",                     "pix",         "pix",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 10,            0,    1e10,  1  );
     #define PARAM_WIDTH 3
 
 }

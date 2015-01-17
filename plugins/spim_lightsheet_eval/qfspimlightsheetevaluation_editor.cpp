@@ -214,6 +214,8 @@ void QFSPIMLightsheetEvaluationEditor::updateStack() {
         ui->spinDeltaX->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_DELTAX", record->getProperty("PIXEL_WIDTH", ui->spinDeltaX->value()).toDouble()).toDouble());
         ui->spinDeltaZ->setValue(record->getProperty(eval->getEvaluationResultID(stack)+"_DELTAZ", record->getProperty("DELTAZ", ui->spinDeltaZ->value()).toDouble()).toDouble());
         ui->chkUseMask->setChecked(record->getProperty(eval->getEvaluationResultID(stack)+"_USEMASK", record->getProperty("USEMASK", ui->chkUseMask->isChecked()).toBool()).toBool());
+        ui->chkEstimateInitial->setChecked(record->getProperty("ESTIMATE_INITIAL_FF", record->getProperty("ESTIMATE_INITIAL_FF", ui->chkEstimateInitial->isChecked()).toBool()).toBool());
+        ui->chkScaleIntensityFit->setChecked(record->getProperty("FIT_SCALE_INTENSITY", record->getProperty("FIT_SCALE_INTENSITY", ui->chkScaleIntensityFit->isChecked()).toBool()).toBool());
         ui->cmbOrientation->setCurrentIndex(record->getProperty(eval->getEvaluationResultID(stack)+"_ORIENTATION", record->getProperty("ORIENTATION", ui->cmbOrientation->currentIndex()).toInt()).toInt());
         ui->cmbModel->setCurrentFitFunction(record->getProperty(eval->getEvaluationResultID(stack)+"_MODEL", record->getProperty("MODEL", ui->cmbModel->currentFitFunctionID()).toString()).toString());
         ui->cmbAlgorithm->setCurrentAlgorithm(record->getProperty(eval->getEvaluationResultID(stack)+"_ALGORITHM", record->getProperty("ALGORITHM", ui->cmbAlgorithm->currentFitAlgorithmID()).toString()).toString());
@@ -294,6 +296,36 @@ void QFSPIMLightsheetEvaluationEditor::on_chkUseMask_toggled(bool checked)
 
     if (data && eval) {
         record->setQFProperty(eval->getEvaluationResultID(stack)+"_USEMASK", checked, false, false);
+    }
+    displayEvaluationResults();
+    displayPreview();
+}
+
+void QFSPIMLightsheetEvaluationEditor::on_chkEstimateInitial_toggled(bool checked)
+{
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    int stack=ui->cmbStack->currentIndex();
+
+    if (data && eval) {
+        record->setQFProperty("ESTIMATE_INITIAL_FF", checked, false, false);
+    }
+    displayEvaluationResults();
+    displayPreview();
+}
+
+void QFSPIMLightsheetEvaluationEditor::on_chkScaleIntensityFit_toggled(bool checked)
+{
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    int stack=ui->cmbStack->currentIndex();
+
+    if (data && eval) {
+        record->setQFProperty("FIT_SCALE_INTENSITY", checked, false, false);
     }
     displayEvaluationResults();
     displayPreview();

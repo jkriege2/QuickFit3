@@ -14,9 +14,9 @@ class QFFitFunctionLightsheetGaussianFWHM: public QFFitFunction {
         QFFitFunctionLightsheetGaussianFWHM();
         virtual ~QFFitFunctionLightsheetGaussianFWHM() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("gaussian SPIM lightsheet, FWHM-halfwidth"); };
+        virtual QString name() const { return QString("SPIM lightsheet: gaussian, FWHM"); };
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("lightsheet: gaussian (FWHM)"); };
+        virtual QString shortName() const { return QObject::tr("SPIM lightsheet: gaussian (FWHM)"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("lightsheet_gaussian_fwhm"); };
 

@@ -35,9 +35,9 @@ class QFFitFunctionLightsheetGaussianVar: public QFFitFunction {
         QFFitFunctionLightsheetGaussianVar();
         virtual ~QFFitFunctionLightsheetGaussianVar() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("gaussian SPIM lightsheet, 1/sqrt(e)-halfwidth"); };
+        virtual QString name() const { return QString("SPIM lightsheet: gaussian, 1/sqrt(e)-halfwidth"); };
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("lightsheet: gaussian (1/sqrt(e))"); };
+        virtual QString shortName() const { return QObject::tr("SPIM lightsheet: gaussian (1/sqrt(e))"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("lightsheet_gaussian_sqrte"); };
 

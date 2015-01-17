@@ -180,7 +180,16 @@
           <enum>QFrame::Raised</enum>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_3">
-          <property name="margin">
+          <property name="leftMargin">
+           <number>0</number>
+          </property>
+          <property name="topMargin">
+           <number>0</number>
+          </property>
+          <property name="rightMargin">
+           <number>0</number>
+          </property>
+          <property name="bottomMargin">
            <number>0</number>
           </property>
           <item>
@@ -473,6 +482,26 @@ p, li { white-space: pre-wrap; }
         </size>
        </property>
       </spacer>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkScaleIntensityFit">
+       <property name="text">
+        <string>scale intensity for fit</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QCheckBox" name="chkEstimateInitial">
+       <property name="text">
+        <string>use fit functions initial values estimation</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QPushButton" name="btnEvaluateCurrent">

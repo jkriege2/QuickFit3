@@ -73,6 +73,8 @@ class QFSPIMLightsheetEvaluationEditor : public QFEvaluationEditor {
         void on_chkErrorsParam_toggled(bool checked);
         void on_chkErrorsBeamPos_toggled(bool checked);
         void on_chkUseMask_toggled(bool checked);
+        void on_chkEstimateInitial_toggled(bool checked);
+        void on_chkScaleIntensityFit_toggled(bool checked);
     protected:
 
         void prepareImagePlotter(JKQtPlotter *pltImage);

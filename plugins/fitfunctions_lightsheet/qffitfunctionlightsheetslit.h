@@ -35,9 +35,9 @@ class QFFitFunctionLightsheetSlit: public QFFitFunction {
         QFFitFunctionLightsheetSlit();
         virtual ~QFFitFunctionLightsheetSlit() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("slit function SPIM lightsheet"); };
+        virtual QString name() const { return QString("SPIM lightsheet: slit function"); };
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("lightsheet: slit funtion"); };
+        virtual QString shortName() const { return QObject::tr("SPIM lightsheet: slit funtion"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("lightsheet_slit"); };
 
