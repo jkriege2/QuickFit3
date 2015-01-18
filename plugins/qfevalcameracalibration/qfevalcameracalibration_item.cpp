@@ -151,7 +151,7 @@ void QFEvalCameraCalibrationItem::doEvaluation(QProgressDialog* dlgEvaluationPro
         }
     }
 
-    QVector<double> res_meanI, res_varI, res_meanIErr, res_varIErr, res_SNR, res_meanIE;
+    QVector<double> res_meanI, res_varI, res_meanIErr, res_varIErr, res_SNR, res_SNRErr, res_meanIE, res_meanIEErr;
 
     if (mode==0) {
         // flat field illumination, so we average over each image stack
@@ -320,12 +320,18 @@ void QFEvalCameraCalibrationItem::doEvaluation(QProgressDialog* dlgEvaluationPro
             recWrite->resultsSetNumber(evalID, rn="startfit_readnoise_electrons", sqrt(cOffset)*cFac, tr("electrons"));
 
             for (int i=0; i<res_meanI.size(); i++) {
-                res_meanIE<<(res_meanI[i]*cFac);
-                res_SNR<<(res_meanI[i]/sqrt(res_varI[i]));
+                res_meanIE<<(res_meanI.value(i, 0)*cFac);
+                res_meanIEErr<<(res_meanIErr.value(i, 0)*cFac);
+                res_SNR<<(res_meanI.value(i, 0)/sqrt(res_varI.value(i, 0)));
+                res_SNRErr<<qfErrorSqrtSumSqr(res_meanIErr.value(i, 0)/sqrt(res_varI.value(i, 0)), res_varIErr.value(i)*res_meanI.value(i, 0)/2.0/pow(res_varI.value(i,0), 3.0/2.0));
             }
 
             recWrite->resultsSetNumberList(evalID, rn="intensity_avg_elec", res_meanIE);
             recWrite->resultsSetNumberList(evalID, rn="snr", res_SNR);
+            if (res_meanIErr.size()>0 && res_varIErr.size()>0) {
+                recWrite->resultsSetNumberList(evalID, rn="intensity_avg_elec_error", res_meanIEErr);
+                recWrite->resultsSetNumberList(evalID, rn="snr_error", res_SNRErr);
+            }
 
         }
 

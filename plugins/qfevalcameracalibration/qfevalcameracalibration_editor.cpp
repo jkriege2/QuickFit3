@@ -224,7 +224,7 @@ void QFEvalCameraCalibrationEditor::displayEvaluation() {
 
         QVector<double> avgI=record->resultsGetAsDoubleList(evalID, "intensity_avg");
         QVector<double> varI=record->resultsGetAsDoubleList(evalID, "intensity_var");
-        QVector<double> avgIE, varIE, avgIElectrons, snr;
+        QVector<double> avgIE, varIE, avgIElectrons, snr, snrErr, avgIElectronsErr;
         bool hasErrors=false;
         if (record->resultsExists(evalID, "intensity_avg_error") && record->resultsExists(evalID, "intensity_var_error")) {
             avgIE=record->resultsGetAsDoubleList(evalID, "intensity_avg_error");
@@ -234,8 +234,14 @@ void QFEvalCameraCalibrationEditor::displayEvaluation() {
         if (record->resultsExists(evalID, "snr")) {
             snr=record->resultsGetAsDoubleList(evalID, "snr");
         }
+        if (record->resultsExists(evalID, "snr_error")) {
+            snrErr=record->resultsGetAsDoubleList(evalID, "snr_error");
+        }
         if (record->resultsExists(evalID, "intensity_avg_elec")) {
             avgIElectrons=record->resultsGetAsDoubleList(evalID, "intensity_avg_elec");
+        }
+        if (record->resultsExists(evalID, "intensity_avg_elec_error")) {
+            avgIElectronsErr=record->resultsGetAsDoubleList(evalID, "intensity_avg_elec_error");
         }
 
         table->disableSignals();
@@ -248,7 +254,7 @@ void QFEvalCameraCalibrationEditor::displayEvaluation() {
         table->setColumnTitleCreate(1, tr("Value"));
         table->setColumnTitleCreate(2, tr("Unit"));
         QStringList excludedRes;
-        excludedRes<<"average_intensity"<<"variance_intensity"<<"average_intensity_error"<<"variance_intensity_error"<<"background_avg_image"<<"background_var_image"<<"intensity_avg_elec"<<"snr";
+        excludedRes<<"average_intensity"<<"variance_intensity"<<"intensity_avg_elec_error"<<"average_intensity_error"<<"variance_intensity_error"<<"background_avg_image"<<"background_var_image"<<"intensity_avg_elec"<<"snr"<<"snr_error";
         for (int i=0; i<evals.size(); i++) {
             if (!excludedRes.contains( evals[i])) {
                 QFRawDataRecord::evaluationResult res=record->resultsGet(evalID, evals[i]);
@@ -321,7 +327,7 @@ void QFEvalCameraCalibrationEditor::displayEvaluation() {
 
 
 
-        JKQTPxyLineGraph* g_snr=new JKQTPxyLineGraph(ui->plotterSNR->get_plotter());
+        JKQTPxyLineErrorGraph* g_snr=new JKQTPxyLineErrorGraph(ui->plotterSNR->get_plotter());
         size_t c_avgIElec=ds->addCopiedColumn(avgIElectrons, tr("intensity_avg_electrons"));
         size_t c_snr=ds->addCopiedColumn(snr, tr("snr"));
         g_snr->set_xColumn(c_avgIElec);
@@ -331,6 +337,15 @@ void QFEvalCameraCalibrationEditor::displayEvaluation() {
         g_snr->set_color(QColor("red"));
         g_snr->set_title("data");
         g_snr->set_symbolSize(6);
+        if (snrErr.size()>0 && avgIElectronsErr.size()>0) {
+            size_t c_avgIElE=ds->addCopiedColumn(avgIElectronsErr, tr("intensity_avg_electrons_err"));
+            size_t c_snrErr=ds->addCopiedColumn(snrErr, tr("SNR_error"));
+            g_snr->set_xErrorColumn(c_avgIElE);
+            g_snr->set_yErrorColumn(c_snrErr);
+            g_snr->set_xErrorStyle(JKQTPerrorSimpleBars);
+            g_snr->set_yErrorStyle(JKQTPerrorSimpleBars);
+            g_snr->set_errorColor(g_snr->get_color().darker());
+        }
         ui->plotterSNR->addGraph(g_snr);
 
         JKQTPxFunctionLineGraph* g_snrideal=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());

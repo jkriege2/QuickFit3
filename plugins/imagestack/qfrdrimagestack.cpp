@@ -178,7 +178,8 @@ QFRawDataRecord* QFRDRImageStackPlugin::addMultiFileImageStack(const QStringList
     for (int i=0; i<files.size(); i++) {
         filenames<<QFileInfo(files[i]).fileName();
     }
-    QFRawDataRecord* e=project->addRawData(getID(), qfGetLargestCommonStart(filenames, tr("new image stack")), files, initParams, paramsReadonly, types);
+    QString name=tr("multifile image stack (%1 ...)").arg(filenames.value(0, ""));
+    QFRawDataRecord* e=project->addRawData(getID(), qfGetLargestCommonStart(filenames, name), files, initParams, paramsReadonly, types);
     if (e&&e->error()) { // when an error occured: remove record and output an error message
         project->deleteRawData(e->getID());
         QMessageBox::critical(parentWidget, tr("QuickFit 3.0"), tr("Error while importing image stack:\n%1").arg(e->errorDescription()));
