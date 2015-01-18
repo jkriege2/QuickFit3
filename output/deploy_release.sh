@@ -179,7 +179,7 @@ if [ "${create_deploy}" != "0" ]; then
 	rm ./globalconfig/*
 	rm -rf ./globalconfig
 	mkdir globalconfig
-	rm ./qtplugins/q*d4.dll
+	rm ./qtplugins/*
 	rm ./Qt*d4.dll
 	rm ./Qt*d.dll
 	rm ./test*.*
