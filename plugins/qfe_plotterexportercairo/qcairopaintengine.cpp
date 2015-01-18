@@ -454,11 +454,11 @@ void QCairoPaintEngine::updateBrush()
         cairo_pattern_t *pat=NULL;
         switch (cbrush.style())
         {
+            case Qt::NoBrush:
+                break;
             default:
             case Qt::SolidPattern:
                 pat = cairo_pattern_create_rgba(cbrush.color().redF(), cbrush.color().greenF(), cbrush.color().blueF(), cbrush.color().alphaF());
-                break;
-            case Qt::NoBrush:
                 break;
         }
 
@@ -703,10 +703,10 @@ void QCairoPaintEngine::drawPolygon(const QPointF *points, int pointCount, QPain
         qDebug()<<"Cairo Error [QCairoPaintEngine::drawPolygon]: no cairo or no surface!";
         return;
     }
-    if (cpen.style()==Qt::NoPen) {
+    /*if (cpen.style()==Qt::NoPen) {
         qDebug()<<"Cairo Error [QCairoPaintEngine::drawPolygon]: no pen set!";
         return;
-    }
+    }*/
     if (mode!=QPaintEngine::PolylineMode && cbrush.style()==Qt::NoBrush && cpen.style()==Qt::NoPen) {
         qDebug()<<"Cairo Error [QCairoPaintEngine::drawPolygon]: no pen and no brush set!";
         return;
