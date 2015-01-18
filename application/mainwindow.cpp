@@ -153,6 +153,26 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
 
     connect(timerAutosave, SIGNAL(timeout()), this, SLOT(autosaveProject()));
 
+    logFileMainWidget->log_header(tr("Qt plugins ... (not complete)"));
+    logFileMainWidget->inc_indent();
+    logFileMainWidget->log_text("- image formats: ");
+    {
+        QList<QByteArray> plgs= QImageReader::supportedImageFormats();
+        for (int i=0; i<plgs.size(); i++) {
+            logFileMainWidget->log_text(plgs[i]+"   ");
+        }
+        logFileMainWidget->log_text("\n");
+    }
+
+    logFileMainWidget->log_text("- styles: ");
+    {
+        QStringList plgs= QStyleFactory::keys();
+        for (int i=0; i<plgs.size(); i++) {
+            logFileMainWidget->log_text(plgs[i]+"   ");
+        }
+        logFileMainWidget->log_text("\n");
+        logFileMainWidget->dec_indent();
+    }
 
     logFileMainWidget->log_header(tr("searching for plugins ..."));
     logFileMainWidget->inc_indent();
