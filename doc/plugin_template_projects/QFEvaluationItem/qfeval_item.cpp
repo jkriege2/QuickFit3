@@ -22,7 +22,7 @@ Copyright (c) 2014
 
 #include "qfeval_item.h"
 #include "qfeval_editor.h"
-
+//#include "qmoretextobject.h"
 
 
 QFEVALItem::QFEVALItem(QFProject* parent):
@@ -49,15 +49,39 @@ QFEvaluationEditor* QFEVALItem::createEditor(QFPluginServices* services,  QFEval
     return new QFEVALEditor(services, propEditor, parent);
 };
 
-bool QFEVALItem::isApplicable(QFRawDataRecord* record) {
+bool QFEVALItem::isApplicable(QFRawDataRecord* record) const {
     /* CHECK WHETHER A GIVEN RECORD MAY BE USED TOGETHER WITH THE EVALUATION */
     return true;
 }
 
 bool QFEVALItem::hasEvaluation(QFRawDataRecord* r1) {
+    // checks, whether any results exist for the given eval ID
     QFRawDataRecord* r=r1;
     QString rsid=getEvaluationResultID();
     return r->resultsExistsFromEvaluation(rsid);
 }
 
+QString QFEVALItem::getEvaluationResultID() {
+    // in the simplest case, the evaluation ID only contains the type-name and the record ID, this way, different
+	// evaluation objects may write results into the same RDR and keep them separate. You may want to extend this ID,
+	// e.g. by the used fit function ...
+	return QString("%1_%2").arg(getType()).arg(getID());
+}
 
+
+void QFEVALItem::doEvaluation(QFRawDataRecord* record,QProgressDialog* dlgEvaluationProgress) {
+    QApplication::processEvents();
+    if (dlgEvaluationProgress&& dlgEvaluationProgress->wasCanceled()) return; // canceled by user ?
+    
+    /*
+        DO YOUR EVALUATION HERE
+    */
+
+    services->log_text(tr("evaluation complete\n"));
+    
+    // write back fit results to record!
+    record->disableEmitResultsChanged();
+    record->resultsSetBoolean(getEvaluationResultID(), "evaluation_completed", true);
+    record->enableEmitResultsChanged();
+    
+}

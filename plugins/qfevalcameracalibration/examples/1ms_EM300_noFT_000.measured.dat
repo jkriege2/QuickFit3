@@ -1,0 +1,2 @@
+#! time [s],	camera1/temperature_degC,	laser1/line1/measured_power,	laser1/line1/set_power,	laser2/line1/measured_power,	laser2/line1/set_power,	stagex/position,	stagex/velocity,	stagey/position,	stagey/velocity,	stagez/position,	stagez/velocity,	transmission/line1/measured_power,	transmission/line1/set_power
+0,	-77.949,	0,	4,	0.1,	1,	-383.702,	0,	0,	0,	0,	0,	0,	2

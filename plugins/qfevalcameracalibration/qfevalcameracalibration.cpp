@@ -1,7 +1,8 @@
 /*
-Copyright (c) 2014
-	
-	last modification: $LastChangedDate: 2014-06-24 16:05:58 +0200 (Di, 24 Jun 2014) $  (revision $Rev: 3289 $)
+    Copyright (c) 2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
+    German Cancer Research Center/University Heidelberg
+
+    last modification: $LastChangedDate: 2014-09-02 17:43:02 +0200 (Di, 02 Sep 2014) $  (revision $Rev: 3433 $)
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 

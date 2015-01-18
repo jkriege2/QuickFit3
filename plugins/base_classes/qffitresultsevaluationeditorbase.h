@@ -161,10 +161,6 @@ class QFFitResultsEvaluationEditorBase : public QFEvaluationEditor {
         /** \brief set current fit function and fit results according to an INI file (see \Ref QFFitResultsEvaluationEditorBase_FitResultIniFiles for details on the format) */
         virtual void loadCurrentFitResults();
 
-        /** \brief emitted when we should save a report */
-        void saveReport();
-        /** \brief emitted when we should print a report */
-        void printReport();
 
         /** \brief set the lower datacut for the current record */
         virtual void setUserMin(int userMin);

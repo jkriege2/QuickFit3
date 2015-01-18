@@ -68,11 +68,7 @@ class QFEVALEditor : public QFEvaluationEditor {
         */
         bool updatingData;
 
-        /*! \brief execute the evaulation
-
-            \param record the record to do the evaluation for
-        */
-        void doEvaluation(QFRawDataRecord* record);
+        
         
         /*! \brief create an evaluation report for the current record */
         void createReportDoc(QTextDocument* document);
@@ -89,10 +85,7 @@ class QFEVALEditor : public QFEvaluationEditor {
         void displayData();
         /** \brief display the current evaluation results */
         void displayEvaluation();
-        /** \brief save a report of the evaluation results */
-        void saveReport();
-        /** \brief print a report of the evaluation results */
-        void printReport();
+        
 
 
 };

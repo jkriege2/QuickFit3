@@ -2,9 +2,100 @@
 <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-  <title>Plugin Tutorial</title>
+  <title>Camera Calibration Tutorial</title>
   </head>
   <body>
-		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+
+
+<h2>Data/Preliminaries</h2>
+<p>
+$$startbox_note$$
+Two sets of example data are distributed together withz QuickFit in the folder <tt><a href="opendir:$$plugin_info:examplesdir:eval_cameracalibration$$">$$plugin_info:examplesdir:eval_cameracalibration$$</a></tt>. These files are available:
+<ul>
+<li><tt>1ms_EM<i>xx</i>_noFT_000.tif</tt> are files with an intensity gradient, acquired on an EMCCD camera (Andor iXon X3 860) with the given EMGain (xx) setting. No background frame is available, but the offset by the camera is approximately 100.</li>
+<li><tt>LED_<i>yy</i>mA___s01_c15__emgain10_exp<i>zzzz</i>_000.tif</tt> are flat-field exposures (please mask the border!!!) at different LED intensities (yy) and exposure times (zzzz). The EM-Gain of the Andor iXon X3 860 EMCCD camera was set to 10. The background intensity has intensity yy=0!</li>
+</ul>
+$$endbox$$
+</p>
+
+
+
+
+
+
+<h2>Tutorial: Gradient acquisitions</h2>
+<h3>Load frames</h3>
+<p>
+<ul>
+    <li>Acquire image stacks (TIFF-files) on your camera, where the sensor is illuminated with a gradient at different camera settings. Also acquire a background frame without illumination (not present in the test data). Acquire >10 frames for each stack:
+<center><img src="pic/eval_cameracalibration_pic005.png"></center></li>
+    <li>Load the image stacks into the project, by clicking <b>Data Items | Insert Raw Data | image stacks | single-file image stacks</b> and selecting the acquired stacks. If you want to use the example data (see above), select the files <tt>1ms_EM<i>xx</i>_noFT_000.tif</tt></li>
+    <li>Add a camera calibration evaluation object for every camera setting, by clicking on <b>Data Items | Insert Evaluation | Camera Calibration</b>. After double-clicking on one of the new evaluation items, the calibration editor will open:
+<center><a name="tutorial_pic000"><img src="./pic/tutorial_pic000.png" border="1">
+</center>
+</li>
+</ul></p>
+
+
+
+
+<h3>Evaluation</h3>
+<p>
+<ol>
+    <li>In the list on the right, check all files, that should be evaluated (they all have to be acquired with the same camera settings).</li>
+    <li>If you have a background file, check <b>background RDR</b> and select the according RDR. If you don't ahve a background file, set camera offset to the offset, that is added by the camera (see e.g. datasheet). For the example files of this plugin, choose the second option and set the camera offset to 100.</li>
+    <li>Choose the <b>evaluation mode: evaluate each pixel</b></li>
+    <li>If you used an EM-gain (or another stochastic gain mechanism), set the <b>excess noise</b> to 2, otherwise to 1</li>
+    <li>make sure, <b>background correction</b> is checked.</li>
+    <li>Click on <b>Evaluate Current</b>, which will evaluate the data and display the results.</li>
+</ol>
+After evaluation, the results are displayed in the window:
+<center><a name="tutorial_pic001"><img src="./pic/tutorial_pic001.png" border="1">
+</center>
+</p>
+
+
+
+
+
+
+
+
+
+
+<h2>Tutorial: Flat-field acquisitions</h2>
+<h3>Load frames</h3>
+<p>
+<ul>
+    <li> <li>Acquire image stacks (TIFF-files) on your camera, where the sensor is illuminated with a constant intensity, that does not change over the sensor (e.g. using an <a href="https://en.wikipedia.org/wiki/Integrating_sphere">integrating sphere</a>). Also acquire a background frame without illumination (not present in the test data). Acquire >10 frames for each stack:
+<center><img src="pic/eval_cameracalibration_pic002.png"><img src="pic/eval_cameracalibration_pic003.png"><img src="pic/eval_cameracalibration_pic004.png"></center></li>
+    <li>Load the image stacks into the project, by clicking <b>Data Items | Insert Raw Data | image stacks | single-file image stacks</b> and selecting the acquired stacks. If you want to use the example data (see above), select the files <tt>LED_<i>yy</i>mA___s01_c15__emgain10_exp<i>zzzz</i>_000.tif</tt></li>
+    <li>Add a camera calibration evaluation object (one for every camera setting), by clicking on <b>Data Items | Insert Evaluation | Camera Calibration</b>. After double-clicking on one of the new evaluation items, the calibration editor will open:
+<center><a name="tutorial_pic002"><img src="./pic/tutorial_pic002.png" border="1">
+</center>
+
+</li>
+</ul></p>
+
+
+
+
+<h3>Evaluation</h3>
+<p>
+<ol>
+    <li>In the list on the right, check all files, that should be evaluated (in the plugin example files you should check all files, except the background frame <tt>LED_0mA___s01_c15__emgain10_exp1000_000.tif</tt>).</li>
+    <li>If you have a background file, check <b>background RDR</b> and select the according RDR (<tt>LED_0mA___s01_c15__emgain10_exp1000_000.tif</tt> for the example data). If you don't have a background file, set camera offset to the offset, that is added by the camera (see e.g. datasheet).</li>
+    <li>Choose the <b>evaluation mode: average over whole frame</b></li>
+    <li>If you used an EM-gain (or another stochastic gain mechanism), set the <b>excess noise</b> to 2, otherwise to 1</li>
+    <li>make sure, <b>background correction</b> is checked.</li>
+    <li>Click on <b>Evaluate Current</b>, which will evaluate the data and display the results.</li>
+</ol>
+After evaluation, the results are displayed in the window:
+<center><a name="tutorial_pic003"><img src="./pic/tutorial_pic003.png" border="1">
+</center>
+
+</p>
+
   </body>
 </html>

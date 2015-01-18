@@ -167,7 +167,8 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
                     }
                 }
                 //qDebug()<<"maskS="<<maskS.size();
-                if (maskS.size()>0) getProject()->getServices()->log_text(tr("    * loading image mask (%1) ...\n").arg(maskS));
+                //if (maskS.size()>0) getProject()->getServices()->log_text(tr("    * loading image mask (%1) ...\n").arg(maskS));
+                if (maskS.size()>0) getProject()->getServices()->log_text(tr("    * loading image mask ...\n"));
                 //qDebug()<<"maskClear;";
                 maskClear();
                 //qDebug()<<"maskLoadFromListString "<<maskS;
@@ -340,7 +341,8 @@ void QFRDRImageStackData::loadImageStacks(const QString &stacktype, const QStrin
 
                     //qDebug()<<"OK";
                 }
-                if (maskS.size()>0) getProject()->getServices()->log_text(tr("    * loading image mask (%1) ...\n").arg(maskS));
+                //if (maskS.size()>0) getProject()->getServices()->log_text(tr("    * loading image mask (%1) ...\n").arg(maskS));
+                if (maskS.size()>0) getProject()->getServices()->log_text(tr("    * loading image mask ...\n"));
                 maskClear();
                 maskLoadFromListString(maskS,',', ';');
             } else {

@@ -408,11 +408,11 @@ void QFRDRTablePlotWidget::setAxisProps(JKQTPcoordinateAxis* axis, const QFRDRTa
     if (axisData.columnNamedTickNames!=-1 && axisData.columnNamedTickValues!=-1 && current && current->model()) {
         QVector<double> nums=current->model()->getColumnDataAsNumbers(axisData.columnNamedTickValues);
         QVariantList labels=current->model()->getColumnData(axisData.columnNamedTickNames);
-        int cnt=qMax(nums.size(), labels.size());
+        int cnt=qMin(nums.size(), labels.size());
         //qDebug()<<nums<<labels<<cnt;
         axis->clearAxisTickLabels();
         for (int i=0; i<cnt; i++) {
-            axis->addAxisTickLabel(nums[i], labels[i].toString());
+            axis->addAxisTickLabel(nums.value(i, i), labels.value(i, QString()).toString());
         }
     }
 
@@ -1210,7 +1210,7 @@ void QFRDRTablePlotWidget::updateGraph() {
                     if (!g.showallsubfunctions) {
                         pgf->set_subfunction(g.subfunction);
                     } else {
-                        for (int i=0; i<ff->getAdditionalPlotCount(ff->getInitialParamValues()); i++) {
+                        for (unsigned int i=0; i<ff->getAdditionalPlotCount(ff->getInitialParamValues()); i++) {
                             JKQTPxQFFitFunctionLineGraph* pgfsub=new JKQTPxQFFitFunctionLineGraph(ui->plotter->get_plotter());
                             QFFitFunction* ff=NULL;
                             pgfsub->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(g.function, NULL), true);

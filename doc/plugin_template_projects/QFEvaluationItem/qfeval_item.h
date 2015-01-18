@@ -68,15 +68,19 @@ class QFEVALItem : public QFEvaluationItem {
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        inline QString getEvaluationResultID() {
-            return QString("%1_%2").arg(getType()).arg(getID());
-        }
+        QString getEvaluationResultID();
 
+		/** \brief perform the evaluation for the given record. The dlgEvaluationProgress can be used to display the evaluation progress and to check whether the user has pressed Cancel
+		 *
+		 *  \param record the record to do the evaluation for
+		 *  \param dlgEvaluationProgress a QProgressDialog
+		 */
+		void doEvaluation(QFRawDataRecord* record, QProgressDialog* dlgEvaluationProgress=NULL)
 
     protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
-        virtual bool isApplicable(QFRawDataRecord* record);
+        virtual bool isApplicable(QFRawDataRecord* record) const;
         
         /** \brief write object contents into XML file
          *

@@ -104,7 +104,7 @@ class QFLIB_EXPORT QFProjectTreeModelNode : public QObject {
     public slots:
 
     private:
-        QList<QFProjectTreeModelNode*> childItems;
+        QList<QPointer<QFProjectTreeModelNode> > childItems;
         QPointer<QFProjectTreeModelNode> parentItem;
         nodeType m_type;
         QPointer<QFEvaluationItem> evalItem;

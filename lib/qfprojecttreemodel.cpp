@@ -388,6 +388,7 @@ QModelIndex QFProjectTreeModel::index ( int row, int column, const QModelIndex &
     else
         parentItem = static_cast<QFProjectTreeModelNode*>(parent.internalPointer());
 
+    if (!parentItem) return QModelIndex();
     QFProjectTreeModelNode *childItem = parentItem->child(row);
     if (childItem)
         return createIndex(row, column, childItem);
@@ -400,6 +401,7 @@ QModelIndex QFProjectTreeModel::parent ( const QModelIndex & index ) const {
         return QModelIndex();
 
     QFProjectTreeModelNode *childItem = static_cast<QFProjectTreeModelNode*>(index.internalPointer());
+    if (!childItem) return QModelIndex();
     QFProjectTreeModelNode *parentItem = childItem->parent();
 
     if (parentItem == rootItem)

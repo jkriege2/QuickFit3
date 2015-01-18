@@ -194,6 +194,10 @@ SUBDIRS += plg_qfe_dataexportbasics
 plg_qfe_dataexportbasics.subdir=./plugins/qfe_dataexportbasics
 plg_qfe_dataexportbasics.depends = lib libqf3widgets
 
+SUBDIRS += plg_qfevalcameracalibration
+plg_qfevalcameracalibration.subdir=./plugins/qfevalcameracalibration
+plg_qfevalcameracalibration.depends = lib libqf3widgets
+
 !contains(QF3CONFIG, nohardwaredrivers) {
 	!macx {
 

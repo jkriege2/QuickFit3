@@ -512,7 +512,7 @@ template <class T>
 double qfstatisticsAverageStd(double& std, const T& value) {
     double var=0;
     double avg=qfstatisticsAverageVariance(var, value);
-    var=sqrt(var);
+    std=sqrt(var);
     return avg;
 }
 

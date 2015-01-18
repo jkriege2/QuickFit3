@@ -1,7 +1,8 @@
 /*
-Copyright (c) 2014
-	
-	last modification: $LastChangedDate: 2014-06-24 16:05:58 +0200 (Di, 24 Jun 2014) $  (revision $Rev: 3289 $)
+    Copyright (c) 2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
+    German Cancer Research Center/University Heidelberg
+
+    last modification: $LastChangedDate: 2014-09-02 17:43:02 +0200 (Di, 02 Sep 2014) $  (revision $Rev: 3433 $)
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -18,6 +19,7 @@ Copyright (c) 2014
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
+
 
 
 #ifndef QFEVALCAMERACALIBRATION_H
@@ -53,19 +55,19 @@ class QFEvalCameraCalibration : public QObject, public QFPluginEvaluationItemBas
         virtual QString getID() const  { return tr("eval_cameracalibration"); };
 
         /** \brief name for the plugin */
-        virtual QString getName() const  { return tr("Evaluation Plugin"); };
+        virtual QString getName() const  { return tr("Camera Calibration"); };
 
         /** \brief short description for the plugin */
-        virtual QString getDescription() const  { return tr("Description"); };
+        virtual QString getDescription() const  { return tr("Camera Calibration (gain, ...)"); };
 
         /** \brief author the plugin */
-        virtual QString getAuthor() const  { return tr(""); };
+        virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c)"); };
+        virtual QString getCopyright() const  { return tr("(c) 2015 by Jan W. Krieger"); };
 
         /** \brief weblink for the plugin */
-        virtual QString getWeblink() const  { return tr(""); };
+        virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };
 
         /** \brief icon file for the plugin (from resource system or a separate file) */
         virtual QString getIconFilename() const  { return QString(":/eval_cameracalibration/eval_cameracalibration.png"); };

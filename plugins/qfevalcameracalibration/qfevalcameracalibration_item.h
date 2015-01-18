@@ -1,7 +1,8 @@
 /*
-Copyright (c) 2014
-	
-	last modification: $LastChangedDate: 2014-06-24 16:05:58 +0200 (Di, 24 Jun 2014) $  (revision $Rev: 3289 $)
+    Copyright (c) 2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
+    German Cancer Research Center/University Heidelberg
+
+    last modification: $LastChangedDate: 2014-09-02 17:43:02 +0200 (Di, 02 Sep 2014) $  (revision $Rev: 3433 $)
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -28,6 +29,7 @@ Copyright (c) 2014
 
 #include "qfevaluationitem.h"
 #include "qfevaluationitemfactory.h"
+#include "qfrdrimagemask.h"
 
 /*! \brief evaluation item class 
     \ingroup qf3rdrdp_GROUPNAME
@@ -48,7 +50,7 @@ class QFEvalCameraCalibrationItem : public QFEvaluationItem {
         /** \brief return type (short type string) */
         virtual QString getType() const { return QString("eval_cameracalibration"); };
         /** \brief return type (longer type string, user readable) */
-        virtual QString getTypeName() const { return tr(""); };
+        virtual QString getTypeName() const { return tr("Camera Calibration"); };
         /** \brief return a small icon (16x16) */
         virtual QIcon getSmallIcon() const { return QIcon(":/eval_cameracalibration/eval_cameracalibration_small.png"); };
         /** \brief return type description */
@@ -68,15 +70,15 @@ class QFEvalCameraCalibrationItem : public QFEvaluationItem {
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        inline QString getEvaluationResultID() {
-            return QString("%1_%2").arg(getType()).arg(getID());
-        }
+        QString getEvaluationResultID();
 
 
+    public slots:
+        void doEvaluation(QProgressDialog *dlgEvaluationProgress);
     protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
-        virtual bool isApplicable(QFRawDataRecord* record);
+        virtual bool isApplicable(QFRawDataRecord* record) const;
         
         /** \brief write object contents into XML file
          *

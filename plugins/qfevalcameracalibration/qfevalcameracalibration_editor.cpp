@@ -1,7 +1,8 @@
 /*
-Copyright (c) 2014
-	
-	last modification: $LastChangedDate: 2014-06-24 16:05:58 +0200 (Di, 24 Jun 2014) $  (revision $Rev: 3289 $)
+    Copyright (c) 2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
+    German Cancer Research Center/University Heidelberg
+
+    last modification: $LastChangedDate: 2014-09-02 17:43:02 +0200 (Di, 02 Sep 2014) $  (revision $Rev: 3433 $)
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -25,10 +26,15 @@ Copyright (c) 2014
 #include "qfevaluationitem.h"
 #include "qfevalcameracalibration_item.h"
 #include "ui_qfevalcameracalibration_editor.h"
-
+#include "qmoretextobject.h"
+#include "qfrdrimagestackinterface.h"
+#include "qfrdrimagemask.h"
+#include "qftools.h"
+#include "statistics_tools.h"
+#include <typeinfo>
+#include "qftabledelegate.h"
 #include <QtGui>
 #include <QtCore>
-
 QFEvalCameraCalibrationEditor::QFEvalCameraCalibrationEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
     QFEvaluationEditor(services, propEditor, parent),
     ui(new Ui::QFEvalCameraCalibrationEditor)
@@ -36,9 +42,12 @@ QFEvalCameraCalibrationEditor::QFEvalCameraCalibrationEditor(QFPluginServices* s
     updatingData=true;
     
     currentSaveDirectory="";
+    table=new QFTableModel(this);
     
     // setup widgets
     ui->setupUi(this);
+    ui->tabResults->setModel(table);
+    ui->tabResults->setItemDelegate(new QFTableDelegate(this));
     
     // create progress dialog for evaluation
     dlgEvaluationProgress=new QProgressDialog(NULL);
@@ -46,9 +55,12 @@ QFEvalCameraCalibrationEditor::QFEvalCameraCalibrationEditor(QFPluginServices* s
     dlgEvaluationProgress->setWindowModality(Qt::WindowModal);
     
     // connect widgets 
-    connect(ui->btnEvaluateAll, SIGNAL(clicked()), this, SLOT(evaluateAll()));
     connect(ui->btnEvaluateCurrent, SIGNAL(clicked()), this, SLOT(evaluateCurrent()));
-    
+    ui->btnPrintReport->setDefaultAction(actPrintReport);
+    ui->btnSaveReport->setDefaultAction(actSaveReport);
+
+    ui->plotterSNR->get_plotter()->useExternalDatastore(ui->plotter->get_plotter()->getDatastore());
+
     updatingData=false;
 }
 
@@ -67,6 +79,16 @@ void QFEvalCameraCalibrationEditor::connectWidgets(QFEvaluationItem* current, QF
     if (old!=NULL) {
         /* disconnect item_old and clear all widgets here */
         disconnect(item_old, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
+        disconnect(ui->cmbBackground, SIGNAL(currentIndexChanged(int)), this, SLOT(saveProperties()));
+        disconnect(ui->chkBackgroundCorrection, SIGNAL(toggled(bool)), this, SLOT(saveProperties()));
+        disconnect(ui->chkLogXPlot, SIGNAL(toggled(bool)), this, SLOT(saveProperties()));
+        disconnect(ui->chkLogYPlot, SIGNAL(toggled(bool)), this, SLOT(saveProperties()));
+        disconnect(ui->chkLogXPlot, SIGNAL(toggled(bool)), this, SLOT(resultsChanged()));
+        disconnect(ui->chkLogYPlot, SIGNAL(toggled(bool)), this, SLOT(resultsChanged()));
+        disconnect(ui->cmbMode, SIGNAL(currentIndexChanged(int)), this, SLOT(saveProperties()));
+        disconnect(ui->spinExcessNoise, SIGNAL(valueChanged(double)), this, SLOT(saveProperties()));
+        disconnect(ui->chkBackgroundRDR, SIGNAL(toggled(bool)), this, SLOT(saveProperties()));
+        disconnect(ui->spinBackground, SIGNAL(valueChanged(double)), this, SLOT(saveProperties()));
     }
 
 
@@ -77,6 +99,28 @@ void QFEvalCameraCalibrationEditor::connectWidgets(QFEvaluationItem* current, QF
         /* connect widgets and fill with data from item here */
         connect(item, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
         
+        ui->cmbBackground->init(current->getProject(), new QFMatchRDRFunctorSelectApplicable(current), true);
+        ui->cmbBackground->setCurrentRDRID(current->getQFProperty("EVAL_BACK_FRAMERDR", -1).toInt());
+        ui->chkBackgroundCorrection->setChecked(current->getQFProperty("EVAL_BACK_CORRECTION", true).toBool());
+        ui->chkLogXPlot->setChecked(current->getQFProperty("PLOT_LOGX", true).toBool());
+        ui->chkLogYPlot->setChecked(current->getQFProperty("PLOT_LOGY", true).toBool());
+        ui->spinExcessNoise->setValue(current->getQFProperty("EVAL_EXCESSNOISE", 1).toDouble());
+        ui->cmbMode->setCurrentIndex(current->getQFProperty("EVAL_MODE", 0).toInt());
+        ui->chkBackgroundRDR->setChecked(current->getQFProperty("EVAL_BACK_FRAMERDR_AVAILABLE", true).toBool());
+        ui->spinBackground->setValue(current->getQFProperty("EVAL_BACKGROUND_OFFSET", 0).toDouble());
+
+
+        connect(ui->cmbBackground, SIGNAL(currentIndexChanged(int)), this, SLOT(saveProperties()));
+        connect(ui->chkBackgroundCorrection, SIGNAL(toggled(bool)), this, SLOT(saveProperties()));
+        connect(ui->cmbMode, SIGNAL(currentIndexChanged(int)), this, SLOT(saveProperties()));
+        connect(ui->chkLogXPlot, SIGNAL(toggled(bool)), this, SLOT(saveProperties()));
+        connect(ui->chkLogYPlot, SIGNAL(toggled(bool)), this, SLOT(saveProperties()));
+        connect(ui->chkLogXPlot, SIGNAL(toggled(bool)), this, SLOT(resultsChanged()));
+        connect(ui->chkLogYPlot, SIGNAL(toggled(bool)), this, SLOT(resultsChanged()));
+        connect(ui->spinExcessNoise, SIGNAL(valueChanged(double)), this, SLOT(saveProperties()));
+        connect(ui->chkBackgroundRDR, SIGNAL(toggled(bool)), this, SLOT(saveProperties()));
+        connect(ui->spinBackground, SIGNAL(valueChanged(double)), this, SLOT(saveProperties()));
+
         updatingData=false;
     }
 
@@ -96,12 +140,26 @@ void QFEvalCameraCalibrationEditor::readSettings() {
     // read widget settings
     if (!settings) return;
     currentSaveDirectory=settings->getQSettings()->value(QString("eval_cameracalibration/editor/lastSaveDirectory"), currentSaveDirectory).toString();
-};
+}
 
 void QFEvalCameraCalibrationEditor::writeSettings() {
     // write widget settings
     if (!settings) return;
     settings->getQSettings()->setValue(QString("eval_cameracalibration/editor/lastSaveDirectory"), currentSaveDirectory);
+}
+
+void QFEvalCameraCalibrationEditor::saveProperties()
+{
+    if (current) {
+        current->setQFProperty("EVAL_BACK_FRAMERDR", ui->cmbBackground->currentRDRID());
+        current->setQFProperty("EVAL_BACK_CORRECTION", ui->chkBackgroundCorrection->isChecked());
+        current->setQFProperty("PLOT_LOGX", ui->chkLogXPlot->isChecked());
+        current->setQFProperty("PLOT_LOGY", ui->chkLogYPlot->isChecked());
+        current->setQFProperty("EVAL_MODE", ui->cmbMode->currentIndex());
+        current->setQFProperty("EVAL_BACK_FRAMERDR_AVAILABLE", ui->chkBackgroundRDR->isChecked());
+        current->setQFProperty("EVAL_BACKGROUND_OFFSET", ui->spinBackground->value());
+        current->setQFProperty("EVAL_EXCESSNOISE", ui->spinExcessNoise->value());
+    }
 }
 
 void QFEvalCameraCalibrationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
@@ -127,19 +185,218 @@ void QFEvalCameraCalibrationEditor::highlightingChanged(QFRawDataRecord* formerR
 
 void QFEvalCameraCalibrationEditor::displayEvaluation() {
     if (!current) return;
-    QFRawDataRecord* record=current->getHighlightedRecord(); 
-    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
     QFEvalCameraCalibrationItem* eval=qobject_cast<QFEvalCameraCalibrationItem*>(current);
-    if ((!record)||(!eval)/*||(!data)*/) return;
+    if ((!eval)/*||(!data)*/) return;
 
-    if (eval->hasEvaluation(record)) {
-        if (record->resultsExists(eval->getEvaluationResultID(), "evaluation_completed")) {
-            ui->labResults->setText(tr("<b>Results:</b><br>evaluation_completed = %1").arg(record->resultsGetAsString(eval->getEvaluationResultID(), "evaluation_completed")));
-        } else {
-            ui->labResults->setText(tr("<b>NO RESULTS STORED</b>"));
+    QFRawDataRecord* record=NULL;
+    QList<QPointer<QFRawDataRecord> > rdrs_in=eval->getSelectedRecords();
+    QList<QFRDRImageStackInterface*> rdrs;
+    QFRDRImageStackInterface* rdr_back=NULL;
+    for (int i=0; i<rdrs_in.size(); i++) {
+        QFRDRImageStackInterface* intf=dynamic_cast<QFRDRImageStackInterface*>(rdrs_in[i].data());
+        if (intf) {
+            rdrs<<intf;
         }
+    }
+    // write back fit results to record!
+    for (int i=0; i<rdrs.size(); i++) {
+        QFRawDataRecord* rec=dynamic_cast<QFRawDataRecord*>(rdrs[i]);
+        if (rec && eval->hasEvaluation(rec)) {
+            record=rec;
+            break;
+        }
+    }
+
+
+
+    if (record && eval->hasEvaluation(record)) {
+        ui->labResults->setText(tr("<b>Results:</b>"));
+
+        JKQTPdatastore* ds=ui->plotter->getDatastore();
+        ui->plotter->set_doDrawing(false);
+        ui->plotter->clearGraphs();
+        ui->plotterSNR->set_doDrawing(false);
+        ui->plotterSNR->clearGraphs();
+
+        ds->clear();
+
+        QString evalID=eval->getEvaluationResultID();
+
+        QVector<double> avgI=record->resultsGetAsDoubleList(evalID, "intensity_avg");
+        QVector<double> varI=record->resultsGetAsDoubleList(evalID, "intensity_var");
+        QVector<double> avgIE, varIE, avgIElectrons, snr;
+        bool hasErrors=false;
+        if (record->resultsExists(evalID, "intensity_avg_error") && record->resultsExists(evalID, "intensity_var_error")) {
+            avgIE=record->resultsGetAsDoubleList(evalID, "intensity_avg_error");
+            varIE=record->resultsGetAsDoubleList(evalID, "intensity_var_error");
+            hasErrors=true;
+        }
+        if (record->resultsExists(evalID, "snr")) {
+            snr=record->resultsGetAsDoubleList(evalID, "snr");
+        }
+        if (record->resultsExists(evalID, "intensity_avg_elec")) {
+            avgIElectrons=record->resultsGetAsDoubleList(evalID, "intensity_avg_elec");
+        }
+
+        table->disableSignals();
+        table->setReadonly(false);
+        table->clear();
+
+        QStringList evals=record->resultsGetResultNames(evalID);
+        int row=0;
+        table->setColumnTitleCreate(0, tr("Property"));
+        table->setColumnTitleCreate(1, tr("Value"));
+        table->setColumnTitleCreate(2, tr("Unit"));
+        QStringList excludedRes;
+        excludedRes<<"average_intensity"<<"variance_intensity"<<"average_intensity_error"<<"variance_intensity_error"<<"background_avg_image"<<"background_var_image"<<"intensity_avg_elec"<<"snr";
+        for (int i=0; i<evals.size(); i++) {
+            if (!excludedRes.contains( evals[i])) {
+                QFRawDataRecord::evaluationResult res=record->resultsGet(evalID, evals[i]);
+                if (res.type==QFRawDataRecord::qfrdreNumber || res.type==QFRawDataRecord::qfrdreBoolean
+                         || res.type==QFRawDataRecord::qfrdreInteger || res.type==QFRawDataRecord::qfrdreString
+                        || res.type==QFRawDataRecord::qfrdreNumberError) {
+                    QString lab=res.label;
+                    if (lab.isEmpty()) lab=evals[i];
+                    table->setCellCreate(row, 0, lab);
+                    table->setCellCreate(row, 1, res.getAsVariant());
+                    table->setCellCreate(row, 2, res.unit);
+                    row++;
+                }
+            }
+        }
+        table->setReadonly(true);
+        table->enableSignals(true);
+        ui->tabResults->resizeColumnsToContents();
+
+
+        JKQTPxyLineErrorGraph* g_dat=new JKQTPxyLineErrorGraph(ui->plotter->get_plotter());
+        size_t c_avgI=ds->addCopiedColumn(avgI, tr("average_intensity"));
+        size_t c_varI=ds->addCopiedColumn(varI, tr("variance_intensity"));
+        g_dat->set_xColumn(c_avgI);
+        g_dat->set_yColumn(c_varI);
+
+        if (hasErrors) {
+            size_t c_avgIE=ds->addCopiedColumn(avgIE, tr("average_intensity_error"));
+            size_t c_varIE=ds->addCopiedColumn(varIE, tr("variance_intensity_error"));
+            g_dat->set_xErrorColumn(c_avgIE);
+            g_dat->set_yErrorColumn(c_varIE);
+            g_dat->set_xErrorStyle(JKQTPerrorBars);
+            g_dat->set_yErrorStyle(JKQTPerrorBars);
+        } else {
+            g_dat->set_xErrorStyle(JKQTPnoError);
+            g_dat->set_yErrorStyle(JKQTPnoError);
+        }
+        g_dat->set_drawLine(false);
+        g_dat->set_symbol(JKQTPcross);
+        g_dat->set_color(QColor("red"));
+        g_dat->set_title("data");
+        g_dat->set_errorColor(g_dat->get_color().darker());
+        g_dat->set_symbolSize(6);
+        ui->plotter->addGraph(g_dat);
+
+        QVector<double> params;
+        JKQTPxFunctionLineGraph* g_fitfull=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
+        g_fitfull->setSpecialFunction(JKQTPxFunctionLineGraph::Polynomial);
+        params.clear();
+        params<<record->resultsGetAsDouble(evalID, "fullfit_offset")<<record->resultsGetAsDouble(evalID, "fullfit_slope");
+        g_fitfull->set_params(params);
+        g_fitfull->set_title(tr("full fit"));
+        g_fitfull->set_color(QColor("darkblue"));
+        g_fitfull->set_lineWidth(1);
+        g_fitfull->set_style(Qt::DashLine);
+        ui->plotter->addGraph(g_fitfull);
+
+        JKQTPxFunctionLineGraph* g_fitstart=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
+        g_fitstart->setSpecialFunction(JKQTPxFunctionLineGraph::Polynomial);
+        params.clear();
+        params<<record->resultsGetAsDouble(evalID, "startfit_offset")<<record->resultsGetAsDouble(evalID, "startfit_slope");
+        g_fitstart->set_params(params);
+        g_fitstart->set_title(tr("fit low-intensity datapoints"));
+        g_fitstart->set_color(QColor("blue"));
+        g_fitstart->set_lineWidth(2);
+        g_fitstart->set_style(Qt::SolidLine);
+        ui->plotter->addGraph(g_fitstart);
+
+
+
+
+
+        JKQTPxyLineGraph* g_snr=new JKQTPxyLineGraph(ui->plotterSNR->get_plotter());
+        size_t c_avgIElec=ds->addCopiedColumn(avgIElectrons, tr("intensity_avg_electrons"));
+        size_t c_snr=ds->addCopiedColumn(snr, tr("snr"));
+        g_snr->set_xColumn(c_avgIElec);
+        g_snr->set_yColumn(c_snr);
+        g_snr->set_drawLine(false);
+        g_snr->set_symbol(JKQTPcross);
+        g_snr->set_color(QColor("red"));
+        g_snr->set_title("data");
+        g_snr->set_symbolSize(6);
+        ui->plotterSNR->addGraph(g_snr);
+
+        JKQTPxFunctionLineGraph* g_snrideal=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
+        g_snrideal->setSpecialFunction(JKQTPxFunctionLineGraph::PowerLaw);
+        params.clear();
+        params<<0<<1<<0.5;
+        g_snrideal->set_params(params);
+        g_snrideal->set_title(tr("ideal sensor, \\eta_{phot}=1, \\mathcal{F}^2=1"));
+        g_snrideal->set_color(QColor("blue"));
+        g_snrideal->set_lineWidth(2);
+        g_snrideal->set_style(Qt::SolidLine);
+        ui->plotterSNR->addGraph(g_snrideal);
+
+        if (ui->spinExcessNoise->value()!=1) {
+            JKQTPxFunctionLineGraph* g_snrideal2=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
+            g_snrideal2->setSpecialFunction(JKQTPxFunctionLineGraph::PowerLaw);
+            params.clear();
+            params<<0<<(1.0/sqrt(ui->spinExcessNoise->value()))<<0.5;
+            g_snrideal2->set_params(params);
+            g_snrideal2->set_title(tr("ideal sensor, \\eta_{phot}=1, \\mathcal{F}^2=%1").arg(ui->spinExcessNoise->value()));
+            g_snrideal2->set_color(QColor("darkblue"));
+            g_snrideal2->set_lineWidth(2);
+            g_snrideal2->set_style(Qt::DashLine);
+            ui->plotterSNR->addGraph(g_snrideal2);
+        }
+
+
+
+
+        ui->plotter->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
+        ui->plotter->getXAxis()->set_axisLabel("image intensity $\\langle I\\rangle-\\langle B\\rangle$");
+        ui->plotter->getYAxis()->set_axisLabel("image variance $\\langle\\sigma_I^2\\rangle$");
+
+        ui->plotter->getXAxis()->set_logAxis(ui->chkLogXPlot->isChecked());
+        ui->plotter->getYAxis()->set_logAxis(ui->chkLogYPlot->isChecked());
+
+        ui->plotter->zoomToFit();
+        ui->plotter->set_doDrawing(true);
+        ui->plotter->update_plot();
+
+
+        ui->plotterSNR->get_plotter()->set_keyPosition(JKQTPkeyInsideTopLeft);
+        ui->plotterSNR->getXAxis()->set_axisLabel("image intensity $\\langle I\\rangle-\\langle B\\rangle$ [electrons]");
+        ui->plotterSNR->getYAxis()->set_axisLabel("signal-to-noise ratio SNR");
+
+        ui->plotterSNR->getXAxis()->set_logAxis(true);
+        ui->plotterSNR->getYAxis()->set_logAxis(true);
+
+        ui->plotterSNR->zoomToFit();
+        ui->plotterSNR->set_doDrawing(true);
+        ui->plotterSNR->update_plot();
+
     } else {
         ui->labResults->setText(tr("<b>NO EVALUATION DONE YET</b>"));    
+        JKQTPdatastore* ds=ui->plotter->getDatastore();
+        ui->plotter->set_doDrawing(false);
+        ui->plotter->clearGraphs();
+        ds->clear();
+
+        ui->plotter->set_doDrawing(true);
+        ui->plotter->update_plot();
+        ui->plotterSNR->set_doDrawing(false);
+        ui->plotterSNR->clearGraphs();
+
+        ui->plotterSNR->set_doDrawing(true);
+        ui->plotterSNR->update_plot();
     }
 }
 
@@ -151,38 +408,9 @@ void QFEvalCameraCalibrationEditor::displayData() {
     if ((!record)||(!eval)/*||(!data)*/) return;
 
 
-    if ((!eval)/*||(!data)*/) {
-        ui->labRecord->setText(tr("no record selected!"));
-        return;
-    }
-
-    ui->labRecord->setText(tr("<b>selected record:</b> %1<br>&nbsp;&nbsp;<i>files: </i><br>&nbsp;&nbsp;&nbsp;&nbsp;%2").arg(record->getName()).arg(record->getFiles().join("<br>&nbsp;&nbsp;&nbsp;&nbsp;")));
 }
 
 
-void QFEvalCameraCalibrationEditor::doEvaluation(QFRawDataRecord* record) {
-    QApplication::processEvents();
-    QApplication::processEvents();
-
-    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record); //if (!data) return;
-    QFEvalCameraCalibrationItem* eval=qobject_cast<QFEvalCameraCalibrationItem*>(current);
-
-    if (!eval) return;
-    
-    if (dlgEvaluationProgress->wasCanceled()) return; // canceled by user ?
-    
-    /*
-        DO YOUR EVALUATION HERE
-    */
-
-    services->log_text(tr("evaluation complete\n"));
-    
-    // write back fit results to record!
-    record->disableEmitResultsChanged();
-    record->resultsSetBoolean(eval->getEvaluationResultID(), "evaluation_completed", true);
-    record->enableEmitResultsChanged();
-    emit resultsChanged();
-}
 
 
 
@@ -190,66 +418,34 @@ void QFEvalCameraCalibrationEditor::doEvaluation(QFRawDataRecord* record) {
 void QFEvalCameraCalibrationEditor::evaluateCurrent() {
     /* EXECUTE AN EVALUATION FOR THE CURRENT RECORD ONLY */
     if (!current) return;
-    QFRawDataRecord* record=current->getHighlightedRecord(); 
     // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
     QFEvalCameraCalibrationItem* eval=qobject_cast<QFEvalCameraCalibrationItem*>(current);
-    if ((!eval)||(!record)/*||(!data)*/) return;
+    if ((!eval)) return;
 
     
-    
-    dlgEvaluationProgress->setLabelText(tr("evaluate '%1' ...").arg(record->getName()));
+    dlgEvaluationProgress->reset();
+    dlgEvaluationProgress->setLabelText(tr("evaluate ..."));
     
     dlgEvaluationProgress->setRange(0,100);
     dlgEvaluationProgress->setValue(50);
-    dlgEvaluationProgress->open();
+    dlgEvaluationProgress->open();    
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
     // here we call doEvaluation to execute our evaluation for the current record only
-    doEvaluation(record);
+    eval->doEvaluation(dlgEvaluationProgress);
 
     displayEvaluation();
     displayData();
-    dlgEvaluationProgress->setValue(100);
+    dlgEvaluationProgress->setValue(dlgEvaluationProgress->maximum());
+    dlgEvaluationProgress->close();
 
     QApplication::restoreOverrideCursor();
+    resultsChanged();
 }
 
 
-void QFEvalCameraCalibrationEditor::evaluateAll() {
-    /* EXECUTE AN EVALUATION FOR ALL RECORDS */
-    if (!current) return;
 
-    QFEvalCameraCalibrationItem* eval=qobject_cast<QFEvalCameraCalibrationItem*>(current);
-    if (!eval) return;
-
-    // get a list of all raw data records this evaluation is applicable to
-    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
-    dlgEvaluationProgress->setRange(0,recs.size());
-    dlgEvaluationProgress->setValue(0);
-    dlgEvaluationProgress->open();
-
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-    // iterate through all records and all runs therein and do the fits
-    for (int i=0; i<recs.size(); i++) {
-        QFRawDataRecord* record=recs[i]; 
-        // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
-        QFEvalCameraCalibrationItem* eval=qobject_cast<QFEvalCameraCalibrationItem*>(current);
-        if ((record)/*&&(data)*/) {
-            dlgEvaluationProgress->setLabelText(tr("evaluate '%1' ...").arg(record->getName()));
-            // here we call doEvaluation to execute our evaluation for the current record only
-            doEvaluation(record);
-        }
-        dlgEvaluationProgress->setValue(i);
-        // check whether the user canceled this evaluation
-        if (dlgEvaluationProgress->wasCanceled()) break;
-    }
-    dlgEvaluationProgress->setValue(recs.size());
-    displayEvaluation();
-    displayData();
-    QApplication::restoreOverrideCursor();
-}
 
 
 
@@ -264,6 +460,7 @@ void QFEvalCameraCalibrationEditor::createReportDoc(QTextDocument* document) {
     // we use this QTextCursor to write the document
     QTextCursor cursor(document);
     
+
     // here we define some generic formats
     QTextCharFormat fText=cursor.charFormat();
     fText.setFontPointSize(8);
@@ -286,73 +483,66 @@ void QFEvalCameraCalibrationEditor::createReportDoc(QTextDocument* document) {
 
     
     // insert heading
-    cursor.insertText(tr("Evaluation Report:\n\n"), fHeading1);
+    cursor.insertText(tr("Camera Calibration Report:\n\n"), fHeading1);
     cursor.movePosition(QTextCursor::End);
+    QApplication::processEvents();
 
     // insert table with some data
     QTextTableFormat tableFormat;
     tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
     tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
-    QTextTable* table = cursor.insertTable(2, 2, tableFormat);
-    table->cellAt(0, 0).firstCursorPosition().insertText(tr("raw data:"), fTextBold);
-    table->cellAt(0, 1).firstCursorPosition().insertText(record->getName(), fText);
-    table->cellAt(1, 0).firstCursorPosition().insertText(tr("ID:"), fTextBold);
-    table->cellAt(1, 1).firstCursorPosition().insertText(QString::number(record->getID()));
     cursor.movePosition(QTextCursor::End);
+    QApplication::processEvents();
 
-}
+    int PicTextFormat=QTextFormat::UserObject + 1;
+    QObject *picInterface = new QPictureTextObject;
+    document->documentLayout()->registerHandler(PicTextFormat, picInterface);
 
-void QFEvalCameraCalibrationEditor::saveReport() {
-    /* it is often a good idea to have a possibility to save or print a report about the fit results.
-       This is implemented in a generic way here.    */
+    QTextTable* table = cursor.insertTable(2,2, tableFormat);
+    {
+        ui->tabWidget->setCurrentIndex(0);
+        QApplication::processEvents();
+        QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
+        QPicture pic, pic2;
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
+        ui->plotter->get_plotter()->draw(*painter, QRect(0,0,ui->plotter->width(),ui->plotter->height()));
+        delete painter;
+        double scale=0.45*document->textWidth()/double(pic.boundingRect().width());
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("variance vs. average intensity plot:\n"), fTextBold);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        QApplication::processEvents();
 
-    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
-                                currentSaveDirectory,
-                                tr("PDF File (*.pdf);;PostScript File (*.ps)"));
+        ui->tabWidget->setCurrentIndex(1);
+        tabCursor=table->cellAt(0,1).firstCursorPosition();
+        QApplication::processEvents();
+        painter=new JKQTPEnhancedPainter(&pic2);
+        ui->plotterSNR->get_plotter()->draw(*painter, QRect(0,0,ui->plotterSNR->width(),ui->plotterSNR->height()));
+        delete painter;
+        scale=0.45*document->textWidth()/double(pic2.boundingRect().width());
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("signal to noise ration (SNR) plot:\n"), fTextBold);
+        insertQPicture(tabCursor, PicTextFormat, pic2, QSizeF(pic2.boundingRect().width(), pic2.boundingRect().height())*scale);
+        QApplication::processEvents();
 
-    if (!fn.isEmpty()) {
-        currentSaveDirectory=QFileInfo(fn).absolutePath();
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-        QFileInfo fi(fn);
-        QPrinter* printer=new QPrinter();
-        printer->setPaperSize(QPrinter::A4);
-        printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-        printer->setOrientation(QPrinter::Portrait);
-        printer->setOutputFormat(QPrinter::PdfFormat);
-        if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
-        printer->setOutputFileName(fn);
-        QTextDocument* doc=new QTextDocument();
-        doc->setTextWidth(printer->pageRect().size().width());
-        createReportDoc(doc);
-        doc->print(printer);
-        delete doc;
-        delete printer;
-        QApplication::restoreOverrideCursor();
+        tabCursor=table->cellAt(1,0).firstCursorPosition();
+        tabCursor.insertText(tr("\n"), fTextBoldSmall);
+        QPicture picT;
+        painter=new JKQTPEnhancedPainter(&picT);
+        ui->tabResults->paint(*painter);
+        delete painter;
+        scale=0.45*document->textWidth()/double(picT.boundingRect().width());
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("fit results table:\n"), fTextBold);
+        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale);
+        QApplication::processEvents();
+        ui->tabWidget->setCurrentIndex(0);
     }
+    cursor.movePosition(QTextCursor::End);
+    QApplication::processEvents();
+
+
 }
 
-void QFEvalCameraCalibrationEditor::printReport() {
-    /* it is often a good idea to have a possibility to save or print a report about the fit results.
-       This is implemented in a generic way here.    */
-    QPrinter* p=new QPrinter();
 
-    p->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-    p->setOrientation(QPrinter::Portrait);
-    QPrintDialog *dialog = new QPrintDialog(p, this);
-    dialog->setWindowTitle(tr("Print Report"));
-    if (dialog->exec() != QDialog::Accepted) {
-        delete p;
-        return;
-    }
-
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QTextDocument* doc=new QTextDocument();
-    doc->setTextWidth(p->pageRect().size().width());
-    createReportDoc(doc);
-    doc->print(p);
-    delete p;
-    delete doc;
-    QApplication::restoreOverrideCursor();
-}
 

@@ -1,7 +1,8 @@
 /*
-Copyright (c) 2014
-	
-	last modification: $LastChangedDate: 2014-06-24 16:05:58 +0200 (Di, 24 Jun 2014) $  (revision $Rev: 3289 $)
+    Copyright (c) 2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
+    German Cancer Research Center/University Heidelberg
+
+    last modification: $LastChangedDate: 2014-09-02 17:43:02 +0200 (Di, 02 Sep 2014) $  (revision $Rev: 3433 $)
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -27,6 +28,7 @@ Copyright (c) 2014
 #include "qfrawdatarecord.h"
 #include <QProgressDialog>
 #include <QTextDocument>
+#include "qftablemodel.h"
 
 namespace Ui {
     class QFEvalCameraCalibrationEditor;
@@ -51,6 +53,8 @@ class QFEvalCameraCalibrationEditor : public QFEvaluationEditor {
         virtual void readSettings();
         /** \brief write the settings */
         virtual void writeSettings();
+
+        void saveProperties();
     protected:
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFEvalCameraCalibrationEditor *ui;
@@ -61,6 +65,8 @@ class QFEvalCameraCalibrationEditor : public QFEvaluationEditor {
         /** \brief where did we save the last report */
         QString currentSaveDirectory;
         
+        QFTableModel* table;
+
         /*! \brief a flag that indicates whether we are currently updating the display data 
         
             This may be used to distinguish between events emitted by the user, changing something (in a widget, ...) or
@@ -72,7 +78,7 @@ class QFEvalCameraCalibrationEditor : public QFEvaluationEditor {
 
             \param record the record to do the evaluation for
         */
-        void doEvaluation(QFRawDataRecord* record);
+        void doEvaluation();
         
         /*! \brief create an evaluation report for the current record */
         void createReportDoc(QTextDocument* document);
@@ -81,18 +87,12 @@ class QFEvalCameraCalibrationEditor : public QFEvaluationEditor {
         /** \brief activated when the highlighted record changed */
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
     
-        /** \brief evaluate all files */
-        void evaluateAll();
         /** \brief evaluate current file */
         void evaluateCurrent();
         /** \brief display the data from the current raw data record */
         void displayData();
         /** \brief display the current evaluation results */
         void displayEvaluation();
-        /** \brief save a report of the evaluation results */
-        void saveReport();
-        /** \brief print a report of the evaluation results */
-        void printReport();
 
 
 };

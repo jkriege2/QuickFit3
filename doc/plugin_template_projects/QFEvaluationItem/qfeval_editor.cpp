@@ -48,7 +48,9 @@ QFEVALEditor::QFEVALEditor(QFPluginServices* services,  QFEvaluationPropertyEdit
     // connect widgets 
     connect(ui->btnEvaluateAll, SIGNAL(clicked()), this, SLOT(evaluateAll()));
     connect(ui->btnEvaluateCurrent, SIGNAL(clicked()), this, SLOT(evaluateCurrent()));
-    
+    ui->btnPrintReport->setDefaultAction(actPrintReport);
+    ui->btnSaveReport->setDefaultAction(actSaveReport);
+
     updatingData=false;
 }
 
@@ -160,29 +162,6 @@ void QFEVALEditor::displayData() {
 }
 
 
-void QFEVALEditor::doEvaluation(QFRawDataRecord* record) {
-    QApplication::processEvents();
-    QApplication::processEvents();
-
-    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record); //if (!data) return;
-    QFEVALItem* eval=qobject_cast<QFEVALItem*>(current);
-
-    if (!eval) return;
-    
-    if (dlgEvaluationProgress->wasCanceled()) return; // canceled by user ?
-    
-    /*
-        DO YOUR EVALUATION HERE
-    */
-
-    services->log_text(tr("evaluation complete\n"));
-    
-    // write back fit results to record!
-    record->disableEmitResultsChanged();
-    record->resultsSetBoolean(eval->getEvaluationResultID(), "evaluation_completed", true);
-    record->enableEmitResultsChanged();
-    emit resultsChanged();
-}
 
 
 
@@ -206,13 +185,14 @@ void QFEVALEditor::evaluateCurrent() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
     // here we call doEvaluation to execute our evaluation for the current record only
-    doEvaluation(record);
+    eval->doEvaluation(record, dlgEvaluationProgress);
 
     displayEvaluation();
     displayData();
     dlgEvaluationProgress->setValue(100);
 
     QApplication::restoreOverrideCursor();
+	resultsChanged();
 }
 
 
@@ -299,60 +279,45 @@ void QFEVALEditor::createReportDoc(QTextDocument* document) {
     table->cellAt(1, 0).firstCursorPosition().insertText(tr("ID:"), fTextBold);
     table->cellAt(1, 1).firstCursorPosition().insertText(QString::number(record->getID()));
     cursor.movePosition(QTextCursor::End);
+	
+	
+	
+	
+	
+	/*
+	int PicTextFormat=QTextFormat::UserObject + 1;
+    QObject *picInterface = new QPictureTextObject;
+    document->documentLayout()->registerHandler(PicTextFormat, picInterface);
+
+	
+	QTextTable* table = cursor.insertTable(2,1, tableFormat);
+    {
+	    // insert a plot from ui->plotter
+        QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
+        QPicture pic;
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
+        ui->plotter->get_plotter()->draw(*painter, QRect(0,0,ui->plotter->width(),ui->plotter->height()));
+        delete painter;
+        double scale=0.9*document->textWidth()/double(pic.boundingRect().width());
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("variance vs. average intensity plot:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        QApplication::processEvents();
+
+		// insert an enhanced table plot from ui->tabResults
+        tabCursor=table->cellAt(1,0).firstCursorPosition();
+        tabCursor.insertText(tr("\n"), fTextBoldSmall);
+        QPicture picT;
+        painter=new JKQTPEnhancedPainter(&picT);
+        ui->tabResults->paint(*painter);
+        delete painter;
+        scale=0.95*document->textWidth()/double(picT.boundingRect().width());
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("fit results table:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale);
+        QApplication::processEvents();
+    }*/
 
 }
 
-void QFEVALEditor::saveReport() {
-    /* it is often a good idea to have a possibility to save or print a report about the fit results.
-       This is implemented in a generic way here.    */
-
-    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
-                                currentSaveDirectory,
-                                tr("PDF File (*.pdf);;PostScript File (*.ps)"));
-
-    if (!fn.isEmpty()) {
-        currentSaveDirectory=QFileInfo(fn).absolutePath();
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-        QFileInfo fi(fn);
-        QPrinter* printer=new QPrinter();
-        printer->setPaperSize(QPrinter::A4);
-        printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-        printer->setOrientation(QPrinter::Portrait);
-        printer->setOutputFormat(QPrinter::PdfFormat);
-        if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
-        printer->setOutputFileName(fn);
-        QTextDocument* doc=new QTextDocument();
-        doc->setTextWidth(printer->pageRect().size().width());
-        createReportDoc(doc);
-        doc->print(printer);
-        delete doc;
-        delete printer;
-        QApplication::restoreOverrideCursor();
-    }
-}
-
-void QFEVALEditor::printReport() {
-    /* it is often a good idea to have a possibility to save or print a report about the fit results.
-       This is implemented in a generic way here.    */
-    QPrinter* p=new QPrinter();
-
-    p->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-    p->setOrientation(QPrinter::Portrait);
-    QPrintDialog *dialog = new QPrintDialog(p, this);
-    dialog->setWindowTitle(tr("Print Report"));
-    if (dialog->exec() != QDialog::Accepted) {
-        delete p;
-        return;
-    }
-
-    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    QTextDocument* doc=new QTextDocument();
-    doc->setTextWidth(p->pageRect().size().width());
-    createReportDoc(doc);
-    doc->print(p);
-    delete p;
-    delete doc;
-    QApplication::restoreOverrideCursor();
-}
 

@@ -347,7 +347,7 @@ void QFTableModel::resize(quint32 rows, quint32 columns) {
             beginRemoveRows(QModelIndex(), rows, oldrows-1);
             endRemoveRows();
         }
-        //reset();
+        //{beginResetModel(); endResetModel();}
     }
     endMultiUndo();
     //std::cout<<"  resize("<<state.rows<<", "<<state.columns<<"): 6\n";
@@ -380,7 +380,7 @@ void QFTableModel::insertRow(quint32 r) {
     if (doEmitSignals) {
         beginInsertRows(QModelIndex(),r,r);
         endInsertRows();
-        //reset();
+        //{beginResetModel(); endResetModel();}
     }
     endMultiUndo();
 }
@@ -417,7 +417,7 @@ void QFTableModel::insertColumn(quint32 c) {
     }
     doEmitSignals=oldEmit;
     if (doEmitSignals) {
-        //reset();
+        //{beginResetModel(); endResetModel();}
         beginInsertColumns(QModelIndex(),c,c);
         endInsertColumns();
         emit columnAdded(c);
@@ -441,7 +441,7 @@ void QFTableModel::deleteRow(quint32 r) {
     if (doEmitSignals) {
         beginRemoveRows(QModelIndex(), r, r);
         endRemoveRows();
-        //reset();
+        //{beginResetModel(); endResetModel();}
     }
     endMultiUndo();
 }
@@ -465,7 +465,7 @@ void QFTableModel::deleteColumn(quint32 c) {
         beginRemoveColumns(QModelIndex(), c, c);
         endRemoveColumns();
         emit columnRemoved(c);
-//        reset();
+//        {beginResetModel(); endResetModel();}
     }
     endMultiUndo();
 }
@@ -526,7 +526,7 @@ void QFTableModel::deleteCells(QModelIndexList selection) {
     }
     doEmitSignals=oldEmit;
     if (doEmitSignals) {
-        //reset();
+        //{beginResetModel(); endResetModel();}
         for (int i=0; i<selection.size(); i++) {
             emit dataChanged(index(r1,c1),index(r2,c2));
         }
@@ -547,7 +547,7 @@ void QFTableModel::clear() {
     state.moreDataMap.clear();
     state.columnNames.clear();
     state.headerDataMap.clear();
-    if (doEmitSignals) reset();
+    if (doEmitSignals) {beginResetModel(); endResetModel();}
 }
 
 bool QFTableModel::changeDatatype(quint32 row, quint32 column, QVariant::Type newType) {
@@ -1487,7 +1487,7 @@ bool QFTableModel::readCSV(QTextStream &in, char column_separator, char decimal_
     //this->state.columns=state.columns;
     readonly=ro;
     doEmitSignals=oldEmit;
-    if (doEmitSignals) reset();
+    if (doEmitSignals) {beginResetModel(); endResetModel();}
     endMultiUndo();
     return true;
 }
@@ -1736,7 +1736,7 @@ void QFTableModel::paste(int row_start, int column_start) {
         readCSV(in, sep, dec, headercomment, comment, row, column);
     }
     doEmitSignals=oldEmit;
-    if (doEmitSignals) reset();
+    if (doEmitSignals) {beginResetModel(); endResetModel();}
     endMultiUndo();
 }
 
@@ -1768,7 +1768,7 @@ void QFTableModel::pasteHeaderTemplate(int row_start, int column_start)
 
     }
     doEmitSignals=oldEmit;
-    if (doEmitSignals) reset();
+    if (doEmitSignals) {beginResetModel(); endResetModel();}
     endMultiUndo();
 }
 
@@ -1782,7 +1782,7 @@ void QFTableModel::enableSignals(bool emitReset)
     doEmitSignals=true;
     if (emitReset) {
         emitUndoRedoSignals(true);
-        reset();
+        {beginResetModel(); endResetModel();}
     }
 }
 
@@ -1905,13 +1905,13 @@ bool QFTableModel::readXML(const QString &data, int start_row, int start_col, bo
                 }
             }
             doEmitSignals=oldEmit;
-            if (doEmitSignals) reset();
+            if (doEmitSignals) {beginResetModel(); endResetModel();}
             endMultiUndo();
             return true;
         }
     }
     doEmitSignals=oldEmit;
-    if (doEmitSignals) reset();
+    if (doEmitSignals) {beginResetModel(); endResetModel();}
     return false;
 }
 
@@ -1998,7 +1998,7 @@ int QFTableModelColumnHeaderModel::rowCount(const QModelIndex &parent) const
 
 void QFTableModelColumnHeaderModel::rebuildModel()
 {
-    reset();
+    {beginResetModel(); endResetModel();}
 }
 
 void QFTableModelColumnHeaderModel::nameChanged(int i)
@@ -2035,7 +2035,7 @@ void QFTableModel::undo()
         undoCurrentPosition++;
 
         //qDebug()<<"undone ... calling reset";
-        reset();
+        {beginResetModel(); endResetModel();}
     }
     if (doEmitSignals) emitUndoRedoSignals();
     //qDebug()<<"undone ... DONE ...      (undoCurrentPosition="<<undoCurrentPosition<<" list.size="<<undoList.size()<<")   l="<<undoListT;
@@ -2049,7 +2049,7 @@ void QFTableModel::redo()
         state=undoList[undoCurrentPosition-1];
         undoCurrentPosition--;
         //qDebug()<<"redone ... calling reset";
-        reset();
+        {beginResetModel(); endResetModel();}
     }
     if (doEmitSignals) emitUndoRedoSignals();
     //qDebug()<<"redone ... DONE ...      (undoCurrentPosition="<<undoCurrentPosition<<" list.size="<<undoList.size()<<")   l="<<undoListT;
@@ -2092,7 +2092,7 @@ void QFTableModel::endMultiUndo()
 void QFTableModel::endMultiUndoAndReset()
 {
     endMultiUndo();
-    if (doEmitSignals) reset();
+    if (doEmitSignals) {beginResetModel(); endResetModel();}
 }
 
 void QFTableModel::clearMultiUndo()

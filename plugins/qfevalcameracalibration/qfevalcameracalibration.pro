@@ -27,7 +27,7 @@ DEFINES += TARGETNAME=$$TARGET
 DEPENDPATH += ./
 
 include(../plugins.pri)
-
+include(../../libquickfitwidgets.pri)
 DESTDIR = $$QFOUTPUT/plugins
 
 # Input

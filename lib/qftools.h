@@ -952,6 +952,65 @@ void qfstatisticsQuicksort(T* a, T* a2, long long l, long long r){
     }
 }
 
+/*! \brief QuickSort (recursive implementation), sorts \a a2 alongside \a a, using \a a as sort criterion
+    \ingroup qf3lib_tools
+
+    implementation from http://www.linux-related.de/index.html?/coding/sort/sort_quick.htm
+*/
+template <class T>
+void qfstatisticsQuicksort(T* a, T* a2,T*a3, long long l, long long r){
+    if(r>l){
+        long long i=l-1;
+        long long j=r;
+
+        for(;;){
+            while(a[++i]<a[r]);
+            while(a[--j]>a[r] && j>i);
+            if(i>=j) break;
+            qfstatisticsSwap(a, i, j);
+            qfstatisticsSwap(a2, i, j);
+            qfstatisticsSwap(a3, i, j);
+        }
+        qfstatisticsSwap(a, i, r);
+        qfstatisticsSwap(a2, i, r);
+        qfstatisticsSwap(a3, i, r);
+
+        qfstatisticsQuicksort(a, a2, a3, l, i-1);
+        qfstatisticsQuicksort(a, a2, a3, i+1, r);
+    }
+}
+
+
+/*! \brief QuickSort (recursive implementation), sorts \a a2 alongside \a a, using \a a as sort criterion
+    \ingroup qf3lib_tools
+
+    implementation from http://www.linux-related.de/index.html?/coding/sort/sort_quick.htm
+*/
+template <class T>
+void qfstatisticsQuicksort(T* a, T* a2, T* a3, T* a4, long long l, long long r){
+    if(r>l){
+        long long i=l-1;
+        long long j=r;
+
+        for(;;){
+            while(a[++i]<a[r]);
+            while(a[--j]>a[r] && j>i);
+            if(i>=j) break;
+            qfstatisticsSwap(a, i, j);
+            qfstatisticsSwap(a2, i, j);
+            qfstatisticsSwap(a3, i, j);
+            qfstatisticsSwap(a4, i, j);
+        }
+        qfstatisticsSwap(a, i, r);
+        qfstatisticsSwap(a2, i, r);
+        qfstatisticsSwap(a3, i, r);
+        qfstatisticsSwap(a4, i, r);
+
+        qfstatisticsQuicksort(a, a2, a3, a4, l, i-1);
+        qfstatisticsQuicksort(a, a2, a3, a4, i+1, r);
+    }
+}
+
 
 
 
@@ -986,6 +1045,94 @@ inline void qfstatisticsSort(T* input, T* input2, long long N, T* output=NULL, T
     }
     qfstatisticsQuicksort(data, data2, 0, N-1);
 }
+
+
+
+
+
+
+/*! \brief sort the given arrays, using \a input as sort criterion
+    \ingroup qf3lib_tools
+
+    \param input array to be sorted
+    \param input2 array to be sorted
+    \param N size of the array input
+    \param output if \c !=NULL data is written here (the memory location pointed at by \a output has to have at least the length \a N !!!),
+                  otherwise the array input is sorted inplace.
+    \param output2 if \c !=NULL data is written here (the memory location pointed at by \a output has to have at least the length \a N !!!),
+                  otherwise the array input is sorted inplace.
+
+ */
+template <class T>
+inline void qfstatisticsSort(T* input, T* input2, T* input3, long long N, T* output=NULL, T* output2=NULL, T* output3=NULL) {
+    if ((!input)) return ;
+    if (N<=0) return;
+    T* data=input;
+    if (output!=NULL) {
+        data=output;
+        memcpy(output, input, N*sizeof(T));
+    }
+    T* data2=input2;
+    if (output2!=NULL && input2!=NULL) {
+        data2=output2;
+        memcpy(output2, input2, N*sizeof(T));
+    }
+    T* data3=input3;
+    if (output3!=NULL && input3!=NULL) {
+        data3=output3;
+        memcpy(output3, input3, N*sizeof(T));
+    }
+     qfstatisticsQuicksort(data, data2, data3, 0, N-1);
+}
+
+
+
+
+
+
+/*! \brief sort the given arrays, using \a input as sort criterion
+    \ingroup qf3lib_tools
+
+    \param input array to be sorted
+    \param input2 array to be sorted
+    \param N size of the array input
+    \param output if \c !=NULL data is written here (the memory location pointed at by \a output has to have at least the length \a N !!!),
+                  otherwise the array input is sorted inplace.
+    \param output2 if \c !=NULL data is written here (the memory location pointed at by \a output has to have at least the length \a N !!!),
+                  otherwise the array input is sorted inplace.
+
+ */
+template <class T>
+inline void qfstatisticsSort(T* input, T* input2, T* input3, T*input4, long long N, T* output=NULL, T* output2=NULL, T* output3=NULL, T*output4=NULL) {
+    if ((!input)) return ;
+    if (N<=0) return;
+    T* data=input;
+    if (output!=NULL) {
+        data=output;
+        memcpy(output, input, N*sizeof(T));
+    }
+    T* data2=input2;
+    if (output2!=NULL && input2!=NULL) {
+        data2=output2;
+        memcpy(output2, input2, N*sizeof(T));
+    }
+    T* data3=input3;
+    if (output3!=NULL && input3!=NULL) {
+        data3=output3;
+        memcpy(output3, input3, N*sizeof(T));
+    }
+    T* data4=input4;
+    if (output4!=NULL && input4!=NULL) {
+        data4=output4;
+        memcpy(output4, input4, N*sizeof(T));
+    }
+     qfstatisticsQuicksort(data, data2, data3, data4, 0, N-1);
+}
+
+
+
+
+
 
 
 
