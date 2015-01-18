@@ -179,7 +179,6 @@ if [ "${create_deploy}" != "0" ]; then
 	rm ./globalconfig/*
 	rm -rf ./globalconfig
 	mkdir globalconfig
-	rm ./qtplugins/*
 	rm ./Qt*d4.dll
 	rm ./Qt*d.dll
 	rm ./test*.*
@@ -212,6 +211,15 @@ if [ "${create_deploy}" != "0" ]; then
 	find -name "*.backup" -exec rm -rf {} \;
 	find -name "*.ts" -exec rm -rf {} \;
 	find -name "*.cpt" -exec rm -rf {} \;
+	
+	cd qtplugins
+	PWDD=`pwd`
+	 echo "going to ./qtplugins/  ${PWDD}";
+	find -name "*d4.dll" -exec rm -rf {} \;
+	find -name "*.a" -exec rm -rf {} \;
+	cd ..
+	PWDD=`pwd`
+	echo "returning from ./qtplugins/ ${PWDD}";
 
 	mkdir ../deployspim
 	mkdir ../deployspim/plugins
