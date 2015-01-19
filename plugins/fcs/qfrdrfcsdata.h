@@ -34,6 +34,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QAction>
 #include "qfrawdatarecord.h"
 #include "qfrdrfcscorrelationeditor.h"
+#include "qfrdrfcscrosscorrelationeditor.h"
 #include "qfrdrfcsrateeditor.h"
 #include "datatable2.h"
 #include "tools.h"
@@ -92,12 +93,14 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         virtual QString getEditorName(int i) {
             if (i==0) return tr("Correlation Curve");
             if (i==1) return tr("Photon Counts");
+            if (i==2) return tr("Cross-Correlation Curve");
             return QString("");
         };
         /** \brief create an object for the i-th editor pane */
         virtual QFRawDataEditor* createEditor(QFPluginServices* services,  QFRawDataPropertyEditor *propEditor, int i=0, QWidget* parent=NULL) {
             if (i==0) return new QFRDRFCSCorrelationEditor(services, propEditor, parent);
             if (i==1) return new QFRDRFCSRateEditor(services, propEditor, parent);
+            if (i==2) return new QFRDRFCSCrossCorrelationEditor(services, propEditor, parent);
             return NULL;
         };
         /** \brief export the raw data into the specified format */
