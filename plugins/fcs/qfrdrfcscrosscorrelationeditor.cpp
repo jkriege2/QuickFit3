@@ -24,10 +24,11 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrawdatapropertyeditor.h"
 
 
-QFRDRFCSCrossCorrelationEditorRunsModel::QFRDRFCSCrossCorrelationEditorRunsModel(QObject* parent):
+QFRDRFCSCrossCorrelationEditorRunsModel::QFRDRFCSCrossCorrelationEditorRunsModel(QFRDRFCSCrossCorrelationEditor *editor, QObject* parent):
     QAbstractTableModel(parent)
 {
     current=NULL;
+    this->editor=editor;
 }
 
 void QFRDRFCSCrossCorrelationEditorRunsModel::setCurrent(QFRawDataRecord* current) {
@@ -42,8 +43,19 @@ QVariant QFRDRFCSCrossCorrelationEditorRunsModel::data(const QModelIndex &index,
     if (role==Qt::BackgroundColorRole) {
         QPalette pal;
         if (index.row()>0) {
-            if (m->leaveoutRun(index.row()-1)) return pal.color(QPalette::Window).darker(130);
+            int incl=editor->isIncluded(current, index.row()-1);
+            if (incl==0) return pal.color(QPalette::Window).darker(130);
+            else if (incl==2) return pal.color(QPalette::Window).darker(110);
             return pal.color(QPalette::Base);
+        }
+        return pal.color(QPalette::Base);
+    } else if (role==Qt::ToolTipRole) {
+        QPalette pal;
+        if (index.row()>0) {
+            int incl=editor->isIncluded(current, index.row()-1);
+            if (incl==0) return tr("this run is <u>excluded in <b>all</b> RDRs</u> in the group");
+            else if (incl==2) return tr("this run is <u>excluded in <b>some</b> RDRs</u> in the group");
+            return tr("this run is <u>included in <b>all</b> RDRs</u> in the group");
         }
         return pal.color(QPalette::Base);
     } else if (role==Qt::DisplayRole) {
@@ -52,33 +64,6 @@ QVariant QFRDRFCSCrossCorrelationEditorRunsModel::data(const QModelIndex &index,
     }
     return QVariant();
 }
-
-void QFRDRFCSCrossCorrelationEditor::excludeRuns() {
-    if (!current) return;
-    QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
-    if (m) {
-        QModelIndexList l=lstRunsSelect->selectionModel()->selectedRows();
-        for (int i=0; i<l.size(); i++) {
-            //std::cout<<"adding run "<<l[i].row()-1<<std::endl;
-            m->leaveoutAddRun(l[i].row()-1);
-        }
-        m->recalculateCorrelations();
-    }
-}
-
-void QFRDRFCSCrossCorrelationEditor::includeRuns() {
-    if (!current) return;
-    QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
-    QModelIndexList l=lstRunsSelect->selectionModel()->selectedRows();
-    if (m) {
-        for (int i=0; i<l.size(); i++) {
-            //std::cout<<"removing run "<<l[i].row()-1<<std::endl;
-            m->leaveoutRemoveRun(l[i].row()-1);
-        }
-        m->recalculateCorrelations();
-    }
-}
-
 
 Qt::ItemFlags QFRDRFCSCrossCorrelationEditorRunsModel::flags(const QModelIndex &index) const {
     return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
@@ -100,18 +85,122 @@ int QFRDRFCSCrossCorrelationEditorRunsModel::columnCount(const QModelIndex &pare
 }
 
 
+void QFRDRFCSCrossCorrelationEditor::excludeRuns() {
+    if (!current) return;
+    QFRDRFCSData* mc=qobject_cast<QFRDRFCSData*>(current);
+    if (mc) {
+        QList<QFRDRFCSData *> ms=getRecordsInGroup();
+        for (int j=0; j<ms.size(); j++) {
+            QFRDRFCSData* m=ms[j];
+            if (m) {
+                QModelIndexList l=lstRunsSelect->selectionModel()->selectedRows();
+                for (int i=0; i<l.size(); i++) {
+                    //std::cout<<"adding run "<<l[i].row()-1<<std::endl;
+                    m->leaveoutAddRun(l[i].row()-1);
+                }
+                m->recalculateCorrelations();
+            }
+        }
+    }
+}
+
+void QFRDRFCSCrossCorrelationEditor::includeRuns() {
+    if (!current) return;
+    QFRDRFCSData* mc=qobject_cast<QFRDRFCSData*>(current);
+    if (mc) {
+        QList<QFRDRFCSData *> ms=getRecordsInGroup();
+        for (int j=0; j<ms.size(); j++) {
+            QFRDRFCSData* m=ms[j];
+            if (m) {
+                QModelIndexList l=lstRunsSelect->selectionModel()->selectedRows();
+                for (int i=0; i<l.size(); i++) {
+                    //std::cout<<"adding run "<<l[i].row()-1<<std::endl;
+                    m->leaveoutRemoveRun(l[i].row()-1);
+                }
+                m->recalculateCorrelations();
+            }
+        }
+    }
+}
+
+int QFRDRFCSCrossCorrelationEditor::isIncluded(QFRawDataRecord *current, int index) const
+{
+    int res=0;
+    QList<QFRDRFCSData *> l=getRecordsInGroup(current);
+    for (int i=0; i<l.size(); i++) {
+        if (!l[i]->leaveoutRun(index)) {
+            if (res==0) res=1;
+        } else {
+            if (res==1) res=2;
+        }
+    }
+    return res;
+}
 
 
 
 QFRDRFCSCrossCorrelationEditor::QFRDRFCSCrossCorrelationEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent):
     QFRawDataEditor(services, propEditor, parent)
 {
+    runs=new QFRDRFCSCrossCorrelationEditorRunsModel(this, this);
     createWidgets();
 }
 
 QFRDRFCSCrossCorrelationEditor::~QFRDRFCSCrossCorrelationEditor()
 {
     //dtor
+}
+
+QList<QFRDRFCSData *> QFRDRFCSCrossCorrelationEditor::getRecordsInGroup(QFRawDataRecord* current, QStringList *roles, QList<QColor> *graph_colors) const
+{
+    QList<QFRawDataRecord *> li;
+    QList<QFRDRFCSData*> l;
+    QList<QColor> c;
+    QStringList r;
+    if (current) {
+        QFProject* p=current->getProject();
+        if (p) {
+            li=current->getGroupMembers();
+            for (int i=0; i<li.size(); i++) {
+                QFRDRFCSData* f=qobject_cast<QFRDRFCSData*>(li[i]);
+                if (f) {
+                    l<<f;
+                    r<<f->getRole();
+                }
+            }
+            QString fccs="", acf1="", acf2="";
+            for (int i=0; i<r.size(); i++) {
+                if (r[i].toUpper().startsWith("FCCS")) fccs=r[i];
+                if (r[i].toUpper().startsWith("ACF")) {
+                    if (acf1.isEmpty()) acf1=r[i];
+                    else if (acf2.isEmpty()) acf2=r[i];
+                }
+            }
+            if (qfReadFirstInt(acf1)>qfReadFirstInt(acf2)) {
+                qSwap(acf1, acf2);
+            }
+            bool isFCCS=!fccs.isEmpty() && !acf1.isEmpty() && !acf2.isEmpty();
+
+            for (int i=0; i<l.size(); i++) {
+                QFRDRFCSData* f=l[i];
+                QColor col=getCycleColor(i, 2*li.size()-1, 1,1);
+                if (isFCCS) {
+                    if (f->getRole()==fccs) col=QColor("blue");
+                    else if (f->getRole()==acf1) col=QColor("darkgreen");
+                    else if (f->getRole()==acf2) col=QColor("red");
+                }
+                c<<col;
+            }
+        }
+    }
+    if (roles) *roles=r;
+    if (graph_colors) *graph_colors=c;
+    return l;
+}
+
+QList<QFRDRFCSData *> QFRDRFCSCrossCorrelationEditor::getRecordsInGroup(QStringList *roles, QList<QColor> *graph_colors) const
+{
+    return getRecordsInGroup(current, roles, graph_colors);
 }
 
 void QFRDRFCSCrossCorrelationEditor::createWidgets() {
@@ -141,10 +230,7 @@ void QFRDRFCSCrossCorrelationEditor::createWidgets() {
     cmbRunDisplay=new QComboBox(w);
     gl->addWidget(new QLabel(tr("display runs:")), 1, 0);
     gl->addWidget(cmbRunDisplay, 1, 1);
-    cmbRunDisplay->addItem(tr("no runs"));
-    cmbRunDisplay->addItem(tr("all runs"));
-    cmbRunDisplay->addItem(tr("all runs (highlighted)"));
-    cmbRunDisplay->addItem(tr("used runs"));
+    cmbRunDisplay->addItem(tr("average only"));
     cmbRunDisplay->addItem(tr("selected run"));
     connect(cmbRunDisplay, SIGNAL(currentIndexChanged(int)), this, SLOT(runsModeChanged(int)));
 
@@ -160,7 +246,7 @@ void QFRDRFCSCrossCorrelationEditor::createWidgets() {
     connect(cmbRunErrors, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData(int)));
 
     lstRunsSelect=new QListView(w);
-    lstRunsSelect->setModel(&runs);
+    lstRunsSelect->setModel(runs);
     lstRunsSelect->setSelectionMode(QAbstractItemView::ExtendedSelection);
     connect(lstRunsSelect->selectionModel(), SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)), this, SLOT(selectionChanged(const QItemSelection &, const QItemSelection &)));
     connect(lstRunsSelect->selectionModel(), SIGNAL(currentChanged(const QModelIndex &, const QModelIndex &)), this, SLOT(selectionChanged(const QModelIndex &, const QModelIndex &)));
@@ -224,7 +310,7 @@ void QFRDRFCSCrossCorrelationEditor::createWidgets() {
     menuData->addAction(actCorrectOffset);
 
 
-};
+}
 
 void QFRDRFCSCrossCorrelationEditor::connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old) {
     if (old) {
@@ -237,7 +323,7 @@ void QFRDRFCSCrossCorrelationEditor::connectWidgets(QFRawDataRecord* current, QF
         readSettings();
         cmbRunDisplay->setCurrentIndex(m->getProperty("FCS_RUN_DISPLAY", ProgramOptions::getConfigValue("fcsdataeditor/run_display", 0)).toInt());
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
-        runs.setCurrent(current);
+        runs->setCurrent(current);
         sliders->disableSliderSignals();
         sliders->set_min(0);
         sliders->set_max(m->getCorrelationN());
@@ -251,7 +337,7 @@ void QFRDRFCSCrossCorrelationEditor::connectWidgets(QFRawDataRecord* current, QF
 
     //readSettings();
 
-};
+}
 
 void QFRDRFCSCrossCorrelationEditor::selectionChanged(const QModelIndex & current, const QModelIndex & previous ) {
     replotData();
@@ -262,7 +348,7 @@ void QFRDRFCSCrossCorrelationEditor::selectionChanged(const QItemSelection & cur
 }
 
 void QFRDRFCSCrossCorrelationEditor::runsModeChanged(int c) {
-    if (cmbRunDisplay->currentIndex()<=1) lstRunsSelect->setEnabled(false);
+    if (cmbRunDisplay->currentIndex()==0) lstRunsSelect->setEnabled(false);
     else lstRunsSelect->setEnabled(true);
     replotData();
 }
@@ -277,8 +363,8 @@ void QFRDRFCSCrossCorrelationEditor::rawDataChangedRecalc()
      //qDebug()<<"rawDataChangedRecalc()  m="<<m;
      if (m) m->recalculateCorrelations();
      replotData();
-     runs.setCurrent(current);
-};
+     runs->setCurrent(current);
+}
 
 void QFRDRFCSCrossCorrelationEditor::slidersChanged(int userMin, int userMax, int min, int max) {
     if (!current) return;
@@ -337,191 +423,104 @@ void QFRDRFCSCrossCorrelationEditor::replotData(int dummy) {
         case 5: runstyle=JKQTPerrorBarsPolygons; break;
     }
     //std::cout<<"repainting ... 1\n";
-    if (m->getCorrelationN()>0) {
-        size_t c_tau=ds->addColumn(m->getCorrelationT(), m->getCorrelationN(), "tau");
-    //std::cout<<"repainting ... 2\n";
 
-        QList<JKQTPgraph*> topGraphs;
+    QList<QFRDRFCSData* > ms;
+    QStringList roles;
+    QList<QColor> graph_colors;
 
-        //////////////////////////////////////////////////////////////////////////////////
-        // Plot average + error markers
-        //////////////////////////////////////////////////////////////////////////////////
-        if (cmbAverageErrors->currentIndex()>=1) {
-            size_t c_mean=ds->addColumn(m->getCorrelationMean(), m->getCorrelationN(), "cmean");
-            size_t c_std=ds->addColumn(m->getCorrelationStdDev(), m->getCorrelationN(), "cstddev");
-            JKQTPerrorPlotstyle styl=JKQTPnoError;
-            switch (cmbAverageErrors->currentIndex()) {
-                case 2: styl=JKQTPerrorLines; break;
-                case 3: styl=JKQTPerrorBars; break;
-                case 4: styl=JKQTPerrorBarsLines; break;
-                case 5: styl=JKQTPerrorPolygons; break;
-                case 6: styl=JKQTPerrorBarsPolygons; break;
-            }
+    ms=getRecordsInGroup(current, &roles, &graph_colors);
+
+    QList<JKQTPgraph*> topGraphs;
+    for (int msi=0; msi<ms.size(); msi++){
+        QFRDRFCSData* m=ms[msi];
+        if (m->getCorrelationN()>0) {
+            size_t c_tau=ds->addColumn(m->getCorrelationT(), m->getCorrelationN(), "tau");
+            //std::cout<<"repainting ... 2\n";
 
 
-            JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
-            g->set_color(QColor("darkblue"));
-            QColor errc=g->get_color().lighter();
-            g->set_errorColor(errc);
-            errc.setAlphaF(0.5);
-            g->set_errorFillColor(errc);
-            g->set_lineWidth(2);
-            g->set_xColumn(c_tau);
-            g->set_yColumn(c_mean);
-            g->set_yErrorColumn(c_std);
-            g->set_title(tr("average run"));
-            g->set_yErrorStyle(styl);
-            g->set_xErrorStyle(JKQTPnoError);
-            g->set_datarange_start(sliders->get_userMin());
-            g->set_datarange_end(sliders->get_userMax());
-            plotter->addGraph(g);
-        }
-    //std::cout<<"repainting ... 3\n";
+            //////////////////////////////////////////////////////////////////////////////////
+            // Plot average + error markers
+            //////////////////////////////////////////////////////////////////////////////////
+            if (cmbAverageErrors->currentIndex()>=1) {
+                size_t c_mean=ds->addColumn(m->getCorrelationMean(), m->getCorrelationN(), QString("%1: cmean").arg(roles[msi]));
+                size_t c_std=ds->addColumn(m->getCorrelationStdDev(), m->getCorrelationN(), QString("%1: cstddev").arg(roles[msi]));
+                JKQTPerrorPlotstyle styl=JKQTPnoError;
+                switch (cmbAverageErrors->currentIndex()) {
+                    case 2: styl=JKQTPerrorLines; break;
+                    case 3: styl=JKQTPerrorBars; break;
+                    case 4: styl=JKQTPerrorBarsLines; break;
+                    case 5: styl=JKQTPerrorPolygons; break;
+                    case 6: styl=JKQTPerrorBarsPolygons; break;
+                }
 
-       //////////////////////////////////////////////////////////////////////////////////
-       // Plot ALL RUNS
-       //////////////////////////////////////////////////////////////////////////////////
-       if (cmbRunDisplay->currentIndex()==1) {
-            for (int i=0; i<m->getCorrelationRuns(); i++) {
-                size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("run %1").arg(i));
-                size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("run error %1").arg(i));
-                JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
-                g->set_lineWidth(1);
-                g->set_xColumn(c_tau);
-                g->set_yColumn(c_run);
-                g->set_title(tr("run %1").arg(i));
-                g->set_datarange_start(sliders->get_userMin());
-                g->set_datarange_end(sliders->get_userMax());
 
-                g->set_yErrorColumn(c_rune);
-                g->set_yErrorStyle(runstyle);
-                g->set_xErrorStyle(JKQTPnoError);
+                JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph();
+                g->set_color(graph_colors[msi]);
                 QColor errc=g->get_color().lighter();
                 g->set_errorColor(errc);
                 errc.setAlphaF(0.5);
                 g->set_errorFillColor(errc);
-                g->set_errorWidth(1);
-
+                g->set_lineWidth(2);
+                g->set_xColumn(c_tau);
+                g->set_yColumn(c_mean);
+                g->set_yErrorColumn(c_std);
+                g->set_title(tr("%1: average run").arg(roles[msi]));
+                g->set_yErrorStyle(styl);
+                g->set_xErrorStyle(JKQTPnoError);
+                g->set_datarange_start(sliders->get_userMin());
+                g->set_datarange_end(sliders->get_userMax());
                 plotter->addGraph(g);
             }
-        } else if (cmbRunDisplay->currentIndex()==2) {
-           //////////////////////////////////////////////////////////////////////////////////
-           // Plot ALL RUNS (left out runs in gray, standard runs in black, highlighted run in red)
-           //////////////////////////////////////////////////////////////////////////////////
-            for (int i=0; i<m->getCorrelationRuns(); i++) {
-                size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("run %1").arg(i));
-                size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("run error %1").arg(i));
-                JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
-                g->set_lineWidth(1);
-                g->set_xColumn(c_tau);
-                g->set_yColumn(c_run);
-                g->set_title(tr("run %1").arg(i));
-                g->set_datarange_start(sliders->get_userMin());
-                g->set_datarange_end(sliders->get_userMax());
+            //std::cout<<"repainting ... 3\n";
 
-                g->set_yErrorColumn(c_rune);
-                g->set_yErrorStyle(runstyle);
-                g->set_xErrorStyle(JKQTPnoError);
-                g->set_errorWidth(1);
+            //////////////////////////////////////////////////////////////////////////////////
+            // Plot ALL RUNS
+            //////////////////////////////////////////////////////////////////////////////////
+            if (cmbRunDisplay->currentIndex()==1) {
+                //////////////////////////////////////////////////////////////////////////////////
+                // Plot only highlighted run
+                //////////////////////////////////////////////////////////////////////////////////
+                for (int i=0; i<m->getCorrelationRuns(); i++) {
+                    if (lstRunsSelect->selectionModel()->isSelected(runs->index(i+1, 0))) {
+                        size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("%2: run %1").arg(i).arg(roles[msi]));
+                        size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("%2: run error %1").arg(i).arg(roles[msi]));
+                        JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
+                        g->set_lineWidth(1);
+                        g->set_xColumn(c_tau);
+                        g->set_yColumn(c_run);
+                        g->set_title(tr("%2: run %1").arg(i).arg(roles[msi]));
+                        g->set_color(graph_colors[msi]);
+                        g->set_datarange_start(sliders->get_userMin());
+                        g->set_datarange_end(sliders->get_userMax());
 
-                bool isTop=false;
+                        g->set_yErrorColumn(c_rune);
+                        g->set_yErrorStyle(runstyle);
+                        g->set_xErrorStyle(JKQTPnoError);
+                        QColor errc=g->get_color().lighter();
+                        g->set_errorColor(errc);
+                        errc.setAlphaF(0.5);
+                        g->set_errorFillColor(errc);
+                        g->set_errorWidth(1);
+                        g->set_style(Qt::DashLine);
 
-                if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
-                    g->set_color(QColor("red"));
-                    isTop=true;
-                    topGraphs.append(g);;
-                } else {
-                    if (!m->leaveoutRun(i)) {
-                        g->set_color(QColor("black"));
-                    } else {
-                        g->set_color(QColor("grey"));
+                        //plotter->addGraph(g);
+                        topGraphs<<g;
                     }
                 }
-                QColor errc=g->get_color().lighter();
-                g->set_errorColor(errc);
-                errc.setAlphaF(0.5);
-                g->set_errorFillColor(errc);
-                if (!isTop) plotter->addGraph(g);
             }
-        } else if (cmbRunDisplay->currentIndex()==3) {
-           //////////////////////////////////////////////////////////////////////////////////
-           // Plot only used runs
-           //////////////////////////////////////////////////////////////////////////////////
-            for (int i=0; i<m->getCorrelationRuns(); i++) {
-                if (!m->leaveoutRun(i)) {
-                    size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("run %1").arg(i));
-                    size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("run error %1").arg(i));
-                    JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
-                    g->set_lineWidth(1);
-                    g->set_xColumn(c_tau);
-                    g->set_yColumn(c_run);
-                    g->set_title(tr("run %1").arg(i));
-                    g->set_datarange_start(sliders->get_userMin());
-                    g->set_datarange_end(sliders->get_userMax());
 
-                    g->set_yErrorColumn(c_rune);
-                    g->set_yErrorStyle(runstyle);
-                    g->set_xErrorStyle(JKQTPnoError);
-                    QColor errc=g->get_color().lighter();
-                    g->set_errorColor(errc);
-                    errc.setAlphaF(0.5);
-                    g->set_errorFillColor(errc);
-                    g->set_errorWidth(1);
-
-                    plotter->addGraph(g);
-                }
-            }
-        } else if (cmbRunDisplay->currentIndex()==4) {
-           //////////////////////////////////////////////////////////////////////////////////
-           // Plot only highlighted run
-           //////////////////////////////////////////////////////////////////////////////////
-            for (int i=0; i<m->getCorrelationRuns(); i++) {
-                if (lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0))) {
-                    size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("run %1").arg(i));
-                    size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("run error %1").arg(i));
-                    JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
-                    g->set_lineWidth(1);
-                    g->set_xColumn(c_tau);
-                    g->set_yColumn(c_run);
-                    g->set_title(tr("run %1").arg(i));
-                    //g->set_color(QColor("red"));
-                    g->set_datarange_start(sliders->get_userMin());
-                    g->set_datarange_end(sliders->get_userMax());
-
-                    g->set_yErrorColumn(c_rune);
-                    g->set_yErrorStyle(runstyle);
-                    g->set_xErrorStyle(JKQTPnoError);
-                    QColor errc=g->get_color().lighter();
-                    g->set_errorColor(errc);
-                    errc.setAlphaF(0.5);
-                    g->set_errorFillColor(errc);
-                    g->set_errorWidth(1);
-
-                    plotter->addGraph(g);
-                }
-            }
         }
-
-       plotter->addGraphs(topGraphs);
-    //std::cout<<"repainting ... 4\n";
-
-        //plotter->zoomToFit(true, true, !chkLogTauAxis->isChecked(), false);
-    //std::cout<<"repainting ... 5\n";
-        plotter->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
-    //std::cout<<"repainting ... 6\n";
-        plotter->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
-        plotter->getYAxis()->set_axisLabel(tr("correlation function $g(\\tau)$"));
-    //std::cout<<"repainting ... 7\n";
-        plotter->zoomToFit(true, true, false,false);
-    //std::cout<<"repainting ... 8\n";
     }
+
+    plotter->addGraphs(topGraphs);
+    plotter->getXAxis()->set_logAxis(chkLogTauAxis->isChecked());
+    plotter->getXAxis()->set_axisLabel(tr("lag time $\\tau$ [seconds]"));
+    plotter->getYAxis()->set_axisLabel(tr("correlation function $g(\\tau)$"));
+    plotter->zoomToFit(true, true, false,false);
     plotter->set_doDrawing(true);
-    //std::cout<<"repainting ... 9\n";
     plotter->set_emitSignals(true);
-    //std::cout<<"repainting ... 10\n";
     plotter->update_plot();
-    //std::cout<<" done!\n";
-};
+}
 
 
 void QFRDRFCSCrossCorrelationEditor::readSettings() {
@@ -534,7 +533,7 @@ void QFRDRFCSCrossCorrelationEditor::readSettings() {
     cmbRunErrors->setCurrentIndex(settings->getQSettings()->value(QString("fcsdataeditor/run_error_display"), 0).toInt());
     cmbRunDisplay->setCurrentIndex(settings->getQSettings()->value(QString("fcsdataeditor/run_display"), 0).toInt());
     loadSplitter(*(settings->getQSettings()), splitter, "fcsdataeditor/corrsplitterSizes");
-};
+}
 
 
 void QFRDRFCSCrossCorrelationEditor::writeSettings() {
@@ -547,7 +546,7 @@ void QFRDRFCSCrossCorrelationEditor::writeSettings() {
     settings->getQSettings()->setValue(QString("fcsdataeditor/run_error_display"), cmbRunErrors->currentIndex());
     settings->getQSettings()->setValue(QString("fcsdataeditor/run_display"), cmbRunDisplay->currentIndex());
     saveSplitter(*(settings->getQSettings()), splitter, "fcsdataeditor/corrsplitterSizes");
-};
+}
 
 
 

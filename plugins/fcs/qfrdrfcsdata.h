@@ -88,7 +88,7 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         /** \brief return a large icon (32x32) */
         virtual QIcon getLargeIcon() const { return QIcon(":/fcs_rawdata_large.png"); };
         /** \brief returns the number of additional editor panes for this record */
-        virtual int getEditorCount() { return 2; };
+        virtual int getEditorCount() { return 3; };
         /** \brief returns the name for the i-th editor pane */
         virtual QString getEditorName(int i) {
             if (i==0) return tr("Correlation Curve");

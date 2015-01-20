@@ -312,7 +312,7 @@ void QFPRDRFCS::insertALV7000File(const QStringList& filename, const QMap<QStrin
             if (runCount==1) {
                 d.columns.append(i+1);
             } else {
-                for (int r=0; r<runCount; r++) {
+                for (unsigned int r=0; r<runCount; r++) {
                     d.columns.append(1+i*(runCount+1)+r);
                 }
             }
@@ -340,7 +340,7 @@ void QFPRDRFCS::insertALV7000File(const QStringList& filename, const QMap<QStrin
                     d.columns.append(i+1);
                 }
             } else {
-                for (int r=0; r<runCount; r++) {
+                for (unsigned int r=0; r<runCount; r++) {
                     d.columns.append(1+channelCount*(runCount+1)+i*(runCount+1)+r);
                 }
             }

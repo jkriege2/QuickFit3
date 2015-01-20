@@ -35,13 +35,17 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "datacutslider.h"
 #include "qvisiblehandlesplitter.h"
 #include "qfcorrelationmasktools.h"
+
+class QFRDRFCSData; // forward
+class QFRDRFCSCrossCorrelationEditor; // forward
+
 /*! \brief model for runs in QFRDRFCSCrossCorrelationEditor
     \ingroup qf3rdrdp_fcs
 */
 class QFRDRFCSCrossCorrelationEditorRunsModel: public QAbstractTableModel {
         Q_OBJECT
     public:
-        QFRDRFCSCrossCorrelationEditorRunsModel(QObject* parent=NULL);
+        QFRDRFCSCrossCorrelationEditorRunsModel(QFRDRFCSCrossCorrelationEditor* editor, QObject* parent=NULL);
         void setCurrent(QFRawDataRecord* current);
         virtual QVariant data(const QModelIndex &index, int role) const;
         virtual Qt::ItemFlags flags(const QModelIndex &index) const;
@@ -50,6 +54,7 @@ class QFRDRFCSCrossCorrelationEditorRunsModel: public QAbstractTableModel {
         virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     protected:
         QFRawDataRecord* current;
+        QFRDRFCSCrossCorrelationEditor* editor;
 };
 
 
@@ -61,12 +66,20 @@ class QFRDRFCSCrossCorrelationEditor : public QFRawDataEditor {
     protected:
 
 
-        QFRDRFCSCrossCorrelationEditorRunsModel runs;
+        QFRDRFCSCrossCorrelationEditorRunsModel* runs;
     public:
         /** Default constructor */
-        QFRDRFCSCrossCorrelationEditor(QFPluginServices* services, QFRawDataPropertyEditor* propEditor, QWidget* parent);
+        explicit QFRDRFCSCrossCorrelationEditor(QFPluginServices* services, QFRawDataPropertyEditor* propEditor, QWidget* parent);
         /** Default destructor */
         virtual ~QFRDRFCSCrossCorrelationEditor();
+
+        /** \brief return a list (also of the roles) of all records in the current record's group */
+        QList<QFRDRFCSData *> getRecordsInGroup(QFRawDataRecord *current, QStringList* roles=NULL, QList<QColor>* graph_colors=NULL) const;
+        QList<QFRDRFCSData *> getRecordsInGroup(QStringList* roles=NULL, QList<QColor>* graph_colors=NULL) const;
+
+        /** \brief returns 0, if the run is excluded in all RDRs in the group, 1 if the files is included in all RDRs in the group and 2, if the index is included in some RDRs in the group */
+        int isIncluded(QFRawDataRecord* current, int index) const;
+
     protected slots:
         /** \brief connected to the rawDataChanged() signal of the current record */
         virtual void rawDataChanged();
@@ -82,6 +95,7 @@ class QFRDRFCSCrossCorrelationEditor : public QFRawDataEditor {
         void excludeRuns();
         /** \brief includes the currently selected items from the evaluation and recalculates the average */
         void includeRuns();
+
         void selectionChanged(const QModelIndex & current, const QModelIndex & previous );
         void selectionChanged(const QItemSelection & current, const QItemSelection & previous );
         void runsModeChanged(int c);
