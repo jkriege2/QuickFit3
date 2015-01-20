@@ -22,7 +22,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrdrfcscrosscorrelationeditor.h"
 #include "qfrdrfcsdata.h"
 #include "qfrawdatapropertyeditor.h"
-
+#include "qffcstools.h"
 
 QFRDRFCSCrossCorrelationEditorRunsModel::QFRDRFCSCrossCorrelationEditorRunsModel(QFRDRFCSCrossCorrelationEditor *editor, QObject* parent):
     QAbstractTableModel(parent)
@@ -137,6 +137,99 @@ int QFRDRFCSCrossCorrelationEditor::isIncluded(QFRawDataRecord *current, int ind
     return res;
 }
 
+QFRDRFCSCrossCorrelationEditor::RelFCCSResult QFRDRFCSCrossCorrelationEditor::getRelFCCS(QFRawDataRecord *current, int index) const
+{
+    // see Bacia, Petrasek, Schwille, "Correcting Spectral Cross-Talk in Dual-Color FCCS", DOI: 10.1002/cphc.201100801
+    RelFCCSResult res;
+
+    double taumin=spinCCFAmplitudeRangeMin->value()*1e-6;
+    double taumax=spinCCFAmplitudeRangeMax->value()*1e-6;
+    double crosstalk=spinCrosstalk->value()/100.0;
+    bool isFCCS=false;
+    QFRDRFCSData * ACF0=NULL;
+    QFRDRFCSData * ACF1=NULL;
+    QFRDRFCSData * FCCS=NULL;
+    QList<QFRDRFCSData *> rdrs;
+    QStringList roles;
+    rdrs=getRecordsInGroup(current, &roles, NULL, &isFCCS, &ACF0, &ACF1, &FCCS);
+    if (isFCCS && ACF0 && ACF1 && FCCS) {
+        double I0=0, I1=0, B0=0, B1=0, A0=0, A1=0, AC=0;
+        I0=FCCS->getSimpleCountrateAverage(index, 0)*1000.0;
+        I1=FCCS->getSimpleCountrateAverage(index, 1)*1000.0;
+        if (I0==0 && I1==0) {
+            I0=FCCS->getSimpleCountrateAverage(-1, 0)*1000.0;
+            I1=FCCS->getSimpleCountrateAverage(-1, 1)*1000.0;
+        }
+        B0=FCCS->getProperty("BACKGROUND_INTENSITY1", FCCS->getProperty("BACKGROUND1",
+                                                           FCCS->getProperty("BACKGROUND_INTENSITY",
+                                                           FCCS->getProperty("BACKGROUND",
+                                                                          FCCS->getProperty("BACKGROUND_KHZ1",
+                                                                          FCCS->getProperty("BACKGROUND_KHZ", 0).toDouble()).toDouble()*1000.0).toDouble()).toDouble()).toDouble()).toDouble();
+        B1=FCCS->getProperty("BACKGROUND_INTENSITY2", FCCS->getProperty("BACKGROUND2", FCCS->getProperty("BACKGROUND_INTENSITY", FCCS->getProperty("BACKGROUND",
+                                                                                                                                       FCCS->getProperty("BACKGROUND_KHZ2", FCCS->getProperty("BACKGROUND_KHZ", 0).toDouble()).toDouble()*1000.0
+                                                                                                                                       ).toDouble()).toDouble()).toDouble()).toDouble();
+
+        double* tau;
+        double* corr;
+        QVector<double> corrd;
+
+        corrd.clear();
+        tau=ACF0->getCorrelationT();
+        corr=ACF0->getCorrelationRun(index);
+        if (tau&&corr){
+            for (int i=0; i<ACF0->getCorrelationN(); i++) {
+                if (tau[i]>=taumin && tau[i]<=taumax) {
+                    corrd<<corr[i];
+                }
+            }
+        }
+        //qDebug()<<index;
+        //qDebug()<<corrd;
+        A0=qfstatisticsAverage(corrd);
+
+        corrd.clear();
+        tau=ACF1->getCorrelationT();
+        corr=ACF1->getCorrelationRun(index);
+        if (tau&&corr){
+            for (int i=0; i<ACF1->getCorrelationN(); i++) {
+                if (tau[i]>=taumin && tau[i]<=taumax) {
+                    corrd<<corr[i];
+                }
+            }
+        }
+        A1=qfstatisticsAverage(corrd);
+
+        corrd.clear();
+        tau=FCCS->getCorrelationT();
+        corr=FCCS->getCorrelationRun(index);
+        if (tau&&corr){
+            for (int i=0; i<FCCS->getCorrelationN(); i++) {
+                if (tau[i]>=taumin && tau[i]<=taumax) {
+                    corrd<<corr[i];
+                }
+            }
+        }
+        AC=qfstatisticsAverage(corrd);
+
+        res.ok=true;
+        res.ACF0Amplitude=A0;
+        res.ACF1Amplitude=A1;
+        res.CCFAmplitude=AC;
+        //qDebug()<<I0<<B0<<I1<<B1;
+        //qDebug()<<A0<<A1<<AC;
+
+        qfFCCSCrosstalkCorrection(A0, A1, AC, I0-B0, I1-B1, crosstalk);
+        //qDebug()<<A1<<AC;
+
+        res.CCFCorrectedAmplitude=AC;
+        res.CCFCrosstalkExplainedAmplitude=fabs(res.CCFAmplitude-AC);
+        res.ACF1CorrectedAmplitude=A1;
+        res.CCF_div_ACF0=AC/A0;
+        res.CCF_div_ACF1=AC/A1;
+    }
+    return res;
+}
+
 
 
 QFRDRFCSCrossCorrelationEditor::QFRDRFCSCrossCorrelationEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent):
@@ -151,12 +244,13 @@ QFRDRFCSCrossCorrelationEditor::~QFRDRFCSCrossCorrelationEditor()
     //dtor
 }
 
-QList<QFRDRFCSData *> QFRDRFCSCrossCorrelationEditor::getRecordsInGroup(QFRawDataRecord* current, QStringList *roles, QList<QColor> *graph_colors) const
+QList<QFRDRFCSData *> QFRDRFCSCrossCorrelationEditor::getRecordsInGroup(QFRawDataRecord* current, QStringList *roles, QList<QColor> *graph_colors, bool *isFCCS_out, QFRDRFCSData **racf0, QFRDRFCSData **racf1, QFRDRFCSData **rfccs) const
 {
     QList<QFRawDataRecord *> li;
     QList<QFRDRFCSData*> l;
     QList<QColor> c;
     QStringList r;
+    if (isFCCS_out) *isFCCS_out=false;
     if (current) {
         QFProject* p=current->getProject();
         if (p) {
@@ -180,14 +274,22 @@ QList<QFRDRFCSData *> QFRDRFCSCrossCorrelationEditor::getRecordsInGroup(QFRawDat
                 qSwap(acf1, acf2);
             }
             bool isFCCS=!fccs.isEmpty() && !acf1.isEmpty() && !acf2.isEmpty();
+            if (isFCCS_out) *isFCCS_out=isFCCS;
 
             for (int i=0; i<l.size(); i++) {
                 QFRDRFCSData* f=l[i];
                 QColor col=getCycleColor(i, 2*li.size()-1, 1,1);
                 if (isFCCS) {
-                    if (f->getRole()==fccs) col=QColor("blue");
-                    else if (f->getRole()==acf1) col=QColor("darkgreen");
-                    else if (f->getRole()==acf2) col=QColor("red");
+                    if (f->getRole()==fccs) {
+                        col=QColor("blue");
+                        if (rfccs) *rfccs=f;
+                    } else if (f->getRole()==acf1) {
+                        col=QColor("darkgreen");
+                        if (racf0) *racf0=f;
+                    } else if (f->getRole()==acf2) {
+                        col=QColor("red");
+                        if (racf1) *racf1=f;
+                    }
                 }
                 c<<col;
             }
@@ -198,9 +300,9 @@ QList<QFRDRFCSData *> QFRDRFCSCrossCorrelationEditor::getRecordsInGroup(QFRawDat
     return l;
 }
 
-QList<QFRDRFCSData *> QFRDRFCSCrossCorrelationEditor::getRecordsInGroup(QStringList *roles, QList<QColor> *graph_colors) const
+QList<QFRDRFCSData *> QFRDRFCSCrossCorrelationEditor::getRecordsInGroup(QStringList *roles, QList<QColor> *graph_colors, bool *isFCCS_out) const
 {
-    return getRecordsInGroup(current, roles, graph_colors);
+    return getRecordsInGroup(current, roles, graph_colors, isFCCS_out);
 }
 
 void QFRDRFCSCrossCorrelationEditor::createWidgets() {
@@ -278,6 +380,45 @@ void QFRDRFCSCrossCorrelationEditor::createWidgets() {
     ggl->addWidget(labCorrelationPoints, 1,1);
     gl->addWidget(grpInfo, 10,0,1,2);
 
+
+
+    grpRelCCF=new QGroupBox(tr("rel. CCF"), w);
+    QFormLayout* ggrcl=new QFormLayout();
+    grpRelCCF->setLayout(ggrcl);
+
+    cmbFCCSCorrected=new QComboBox(this);
+    cmbFCCSCorrected->addItem(tr("corrected amplitudes"));
+    cmbFCCSCorrected->addItem(tr("explained amplitudes"));
+    ggrcl->addRow(tr("rel. CCF display mode: "), cmbFCCSCorrected);
+
+    spinCCFAmplitudeRangeMin=new QDoubleSpinBox(this);
+    spinCCFAmplitudeRangeMin->setRange(0,1000000);
+    spinCCFAmplitudeRangeMin->setValue(5);
+    spinCCFAmplitudeRangeMin->setDecimals(1);
+    spinCCFAmplitudeRangeMin->setSuffix(" micron");
+    ggrcl->addRow(tr("amplitude range, min: "), spinCCFAmplitudeRangeMin);
+    spinCCFAmplitudeRangeMax=new QDoubleSpinBox(this);
+    spinCCFAmplitudeRangeMax->setRange(0,1000000);
+    spinCCFAmplitudeRangeMax->setValue(30);
+    spinCCFAmplitudeRangeMax->setDecimals(1);
+    spinCCFAmplitudeRangeMax->setSuffix(" micron");
+    ggrcl->addRow(tr("amplitude range, max: "), spinCCFAmplitudeRangeMax);
+
+    spinCrosstalk=new QDoubleSpinBox(this);
+    spinCrosstalk->setRange(0,1000);
+    spinCrosstalk->setValue(0);
+    spinCrosstalk->setDecimals(2);
+    spinCrosstalk->setSuffix(" %");
+    ggrcl->addRow(tr("G->R crosstalk: "), spinCrosstalk);
+
+    labRelCCF=new QLabel(grpRelCCF);
+    ggrcl->addRow(tr("Results, average: "), labRelCCF);
+    labRelCCFSel=new QLabel(grpRelCCF);
+    ggrcl->addRow(labRelCCFSelLab=new QLabel(tr("Results, run ?: ")), labRelCCFSel);
+
+
+    gl->addWidget(grpRelCCF, 11,0,1,2);
+
     QWidget* wp=new QWidget(this);
     QVBoxLayout* lp=new QVBoxLayout();
     wp->setLayout(lp);
@@ -316,12 +457,22 @@ void QFRDRFCSCrossCorrelationEditor::connectWidgets(QFRawDataRecord* current, QF
     if (old) {
         writeSettings();
         disconnect(old, 0, this, 0);
+        disconnect(cmbFCCSCorrected, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        disconnect(spinCCFAmplitudeRangeMin, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        disconnect(spinCCFAmplitudeRangeMax, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        disconnect(spinCrosstalk, SIGNAL(valueChanged(double)), this, SLOT(replotData()));
     }
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);
     correlationMaskTools->setRDR(current);
     if (m) {
         readSettings();
-        cmbRunDisplay->setCurrentIndex(m->getProperty("FCS_RUN_DISPLAY", ProgramOptions::getConfigValue("fcsdataeditor/run_display", 0)).toInt());
+        cmbRunDisplay->setCurrentIndex(m->getProperty("FCS_RUN_DISPLAY", ProgramOptions::getConfigValue("fcscrossdataeditor/run_display", 0)).toInt());
+
+        cmbFCCSCorrected->setCurrentIndex(m->getProperty("fcscrossdataeditor/fccs_mode", ProgramOptions::getConfigValue("fcscrossdataeditor/fccs_mode", 0)).toInt());
+        spinCrosstalk->setValue(m->getProperty("fcscrossdataeditor/crosstalk", ProgramOptions::getConfigValue("fcscrossdataeditor/crosstalk", 0)).toDouble());
+        spinCCFAmplitudeRangeMin->setValue(m->getProperty("fcscrossdataeditor/range_min", ProgramOptions::getConfigValue("fcscrossdataeditor/range_min", 10)).toDouble());
+        spinCCFAmplitudeRangeMax->setValue(m->getProperty("fcscrossdataeditor/range_max", ProgramOptions::getConfigValue("fcscrossdataeditor/range_max", 15)).toDouble());
+
         connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
         runs->setCurrent(current);
         sliders->disableSliderSignals();
@@ -330,6 +481,10 @@ void QFRDRFCSCrossCorrelationEditor::connectWidgets(QFRawDataRecord* current, QF
         sliders->set_userMin(current->getProperty("fcscorreditor_datacut_min", 0).toInt());
         sliders->set_userMax(current->getProperty("fcscorreditor_datacut_max", m->getCorrelationN()).toInt());
         sliders->enableSliderSignals();
+        connect(cmbFCCSCorrected, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        connect(spinCCFAmplitudeRangeMin, SIGNAL(valueChanged(double)), this, SLOT(replotData()));
+        connect(spinCCFAmplitudeRangeMax, SIGNAL(valueChanged(double)), this, SLOT(replotData()));
+        connect(spinCrosstalk, SIGNAL(valueChanged(double)), this, SLOT(replotData()));
 
     } else {
 //        runs.setCurrent(current);
@@ -404,6 +559,13 @@ void QFRDRFCSCrossCorrelationEditor::replotData(int dummy) {
         ds->clear();
         return;
     }
+
+    current->setQFProperty(QString("fcscrossdataeditor/fccs_mode"), cmbFCCSCorrected->currentIndex(), false, false);
+    current->setQFProperty(QString("fcscrossdataeditor/crosstalk"), spinCrosstalk->value(), false, false);
+    current->setQFProperty(QString("fcscrossdataeditor/range_min"), spinCCFAmplitudeRangeMin->value(), false, false);
+    current->setQFProperty(QString("fcscrossdataeditor/range_max"), spinCCFAmplitudeRangeMax->value(), false, false);
+
+
     //writeSettings();
     plotter->set_doDrawing(false);
     sliders->set_min(0);
@@ -430,7 +592,20 @@ void QFRDRFCSCrossCorrelationEditor::replotData(int dummy) {
 
     ms=getRecordsInGroup(current, &roles, &graph_colors);
 
+    JKQTPverticalRange* range_avg=NULL;
+    range_avg=new JKQTPverticalRange(plotter->get_plotter());
+    range_avg->set_plotCenterLine(false);
+    range_avg->set_plotRange(true);
+    QColor crange=QColor("grey");
+    crange.setAlphaF(0.3);
+    range_avg->set_fillColor(crange);
+    range_avg->set_title(tr("range for rel. CCF calculation"));
+    range_avg->set_rangeMin(spinCCFAmplitudeRangeMin->value()*1e-6);
+    range_avg->set_rangeMax(spinCCFAmplitudeRangeMax->value()*1e-6);
+    plotter->addGraph(range_avg);
+
     QList<JKQTPgraph*> topGraphs;
+    int currentRun=-1;
     for (int msi=0; msi<ms.size(); msi++){
         QFRDRFCSData* m=ms[msi];
         if (m->getCorrelationN()>0) {
@@ -470,11 +645,13 @@ void QFRDRFCSCrossCorrelationEditor::replotData(int dummy) {
                 g->set_datarange_start(sliders->get_userMin());
                 g->set_datarange_end(sliders->get_userMax());
                 plotter->addGraph(g);
+
+
             }
             //std::cout<<"repainting ... 3\n";
 
             //////////////////////////////////////////////////////////////////////////////////
-            // Plot ALL RUNS
+            // Plot RUNS
             //////////////////////////////////////////////////////////////////////////////////
             if (cmbRunDisplay->currentIndex()==1) {
                 //////////////////////////////////////////////////////////////////////////////////
@@ -482,6 +659,7 @@ void QFRDRFCSCrossCorrelationEditor::replotData(int dummy) {
                 //////////////////////////////////////////////////////////////////////////////////
                 for (int i=0; i<m->getCorrelationRuns(); i++) {
                     if (lstRunsSelect->selectionModel()->isSelected(runs->index(i+1, 0))) {
+                        currentRun=i;
                         size_t c_run=ds->addColumn(m->getCorrelationRun(i), m->getCorrelationN(), QString("%2: run %1").arg(i).arg(roles[msi]));
                         size_t c_rune=ds->addColumn(m->getCorrelationRunError(i), m->getCorrelationN(), QString("%2: run error %1").arg(i).arg(roles[msi]));
                         JKQTPxyLineErrorGraph* g=new JKQTPxyLineErrorGraph(plotter->get_plotter());
@@ -505,10 +683,73 @@ void QFRDRFCSCrossCorrelationEditor::replotData(int dummy) {
 
                         //plotter->addGraph(g);
                         topGraphs<<g;
+
                     }
                 }
             }
 
+        }
+
+        labRelCCF->clear();
+        QFRDRFCSCrossCorrelationEditor::RelFCCSResult relCCF=getRelFCCS(m, -1);
+        if (relCCF.ok) {
+            QString txt;
+            txt+=tr("ct-corrected: <b>CCF/ACF0=%1 %3</b>, <b>CCF/ACF1=%2 %3</b>").arg(relCCF.CCF_div_ACF0*100.0).arg(relCCF.CCF_div_ACF1*100.0).arg("%");
+            txt+=tr("<br>uncorrected:  CCF/ACF0=%1 %3, CCF/ACF1=%2 %3").arg(relCCF.CCFAmplitude/relCCF.ACF0Amplitude*100.0).arg(relCCF.CCFAmplitude/relCCF.ACF1Amplitude*100.0).arg("%");
+            labRelCCF->setText(txt);
+
+            JKQTPhorizontalRange* p_r=NULL;
+            p_r=new JKQTPhorizontalRange(plotter->get_plotter());
+            p_r->setDrawCenterLineOnly();
+            p_r->set_centerColor(QColor("darkblue"));
+            p_r->set_centerLineWidth(2);
+            p_r->set_centerStyle(Qt::DashLine);
+            if (cmbFCCSCorrected->currentIndex()==0) p_r->set_rangeCenter(relCCF.CCFCorrectedAmplitude);
+            else if (cmbFCCSCorrected->currentIndex()==1) p_r->set_rangeCenter(relCCF.CCFCrosstalkExplainedAmplitude);
+            topGraphs<<p_r;
+            p_r=new JKQTPhorizontalRange(plotter->get_plotter());
+            p_r->setDrawCenterLineOnly();
+            p_r->set_centerColor(QColor("darkred"));
+            p_r->set_centerLineWidth(2);
+            p_r->set_centerStyle(Qt::DotLine);
+            p_r->set_rangeCenter(relCCF.ACF1CorrectedAmplitude);
+            topGraphs<<p_r;
+
+        }
+
+        labRelCCFSelLab->setVisible(false);
+        labRelCCFSel->setVisible(false);
+        labRelCCFSelLab->clear();
+        labRelCCFSel->clear();
+        if (cmbRunDisplay->currentIndex()==1 && currentRun>=0) {
+            relCCF=getRelFCCS(m, currentRun);
+            if (relCCF.ok) {
+                labRelCCFSelLab->setVisible(true);
+                labRelCCFSel->setVisible(true);
+                labRelCCFSelLab->setText(tr("Results, run %1:").arg(currentRun));
+                QString txt;
+                txt+=tr("ct-corrected: <b>CCF/ACF0=%1 %3</b>, <b>CCF/ACF1=%2 %3</b>").arg(relCCF.CCF_div_ACF0*100.0).arg(relCCF.CCF_div_ACF1*100.0).arg("%");
+                txt+=tr("<br>uncorrected:  CCF/ACF0=%1 %3, CCF/ACF1=%2 %3").arg(relCCF.CCFAmplitude/relCCF.ACF0Amplitude*100.0).arg(relCCF.CCFAmplitude/relCCF.ACF1Amplitude*100.0).arg("%");
+                labRelCCFSel->setText(txt);
+
+
+                JKQTPhorizontalRange* p_r=NULL;
+                p_r=new JKQTPhorizontalRange(plotter->get_plotter());
+                p_r->setDrawCenterLineOnly();
+                p_r->set_centerColor(QColor("darkblue"));
+                p_r->set_centerLineWidth(1);
+                p_r->set_centerStyle(Qt::DashLine);
+                if (cmbFCCSCorrected->currentIndex()==0) p_r->set_rangeCenter(relCCF.CCFCorrectedAmplitude);
+                else if (cmbFCCSCorrected->currentIndex()==1) p_r->set_rangeCenter(relCCF.CCFCrosstalkExplainedAmplitude);
+                plotter->addGraph(p_r);
+                p_r=new JKQTPhorizontalRange(plotter->get_plotter());
+                p_r->setDrawCenterLineOnly();
+                p_r->set_centerColor(QColor("darkred"));
+                p_r->set_centerLineWidth(1);
+                p_r->set_centerStyle(Qt::DotLine);
+                p_r->set_rangeCenter(relCCF.ACF1CorrectedAmplitude);
+                plotter->addGraph(p_r);
+            }
         }
     }
 
@@ -526,26 +767,37 @@ void QFRDRFCSCrossCorrelationEditor::replotData(int dummy) {
 void QFRDRFCSCrossCorrelationEditor::readSettings() {
     if (!settings) return;
     //std::cout<<"--QFRDRFCSCrossCorrelationEditor::readSettings()\n";
-    plotter->loadSettings(*(settings->getQSettings()), QString("fcsdataeditor/corrplot"));
-    //splitter->restoreState(settings->getQSettings()->value(QString("fcsdataeditor/corrsplitterSizes")).toByteArray());
-    chkLogTauAxis->setChecked(settings->getQSettings()->value(QString("fcsdataeditor/log_tau_axis"), true).toBool());
-    cmbAverageErrors->setCurrentIndex(settings->getQSettings()->value(QString("fcsdataeditor/error_display"), 2).toInt());
-    cmbRunErrors->setCurrentIndex(settings->getQSettings()->value(QString("fcsdataeditor/run_error_display"), 0).toInt());
-    cmbRunDisplay->setCurrentIndex(settings->getQSettings()->value(QString("fcsdataeditor/run_display"), 0).toInt());
-    loadSplitter(*(settings->getQSettings()), splitter, "fcsdataeditor/corrsplitterSizes");
+    plotter->loadSettings(*(settings->getQSettings()), QString("fcscrossdataeditor/corrplot"));
+    //splitter->restoreState(settings->getQSettings()->value(QString("fcscrossdataeditor/corrsplitterSizes")).toByteArray());
+    chkLogTauAxis->setChecked(settings->getQSettings()->value(QString("fcscrossdataeditor/log_tau_axis"), true).toBool());
+    cmbAverageErrors->setCurrentIndex(settings->getQSettings()->value(QString("fcscrossdataeditor/error_display"), 2).toInt());
+    cmbRunErrors->setCurrentIndex(settings->getQSettings()->value(QString("fcscrossdataeditor/run_error_display"), 0).toInt());
+    cmbRunDisplay->setCurrentIndex(settings->getQSettings()->value(QString("fcscrossdataeditor/run_display"), 0).toInt());
+    cmbFCCSCorrected->setCurrentIndex(settings->getQSettings()->value(QString("fcscrossdataeditor/fccs_mode"), 0).toInt());
+    spinCrosstalk->setValue(settings->getQSettings()->value(QString("fcscrossdataeditor/crosstalk"), 0).toDouble());
+    spinCCFAmplitudeRangeMin->setValue(settings->getQSettings()->value("fcscrossdataeditor/range_min", 5).toDouble());
+    spinCCFAmplitudeRangeMax->setValue(settings->getQSettings()->value("fcscrossdataeditor/range_max", 30).toDouble());
+    loadSplitter(*(settings->getQSettings()), splitter, "fcscrossdataeditor/corrsplitterSizes");
 }
 
 
 void QFRDRFCSCrossCorrelationEditor::writeSettings() {
     if (!settings) return;
     //std::cout<<"--QFRDRFCSCrossCorrelationEditor::writeSettings()\n";
-    //plotter->saveSettings(*(settings->getQSettings()), QString("fcsdataeditor/corrplot"));
-    //settings->getQSettings()->setValue(QString("fcsdataeditor/corrsplitterSizes"), splitter->saveState());
-    settings->getQSettings()->setValue(QString("fcsdataeditor/log_tau_axis"), chkLogTauAxis->isChecked());
-    settings->getQSettings()->setValue(QString("fcsdataeditor/error_display"), cmbAverageErrors->currentIndex());
-    settings->getQSettings()->setValue(QString("fcsdataeditor/run_error_display"), cmbRunErrors->currentIndex());
-    settings->getQSettings()->setValue(QString("fcsdataeditor/run_display"), cmbRunDisplay->currentIndex());
-    saveSplitter(*(settings->getQSettings()), splitter, "fcsdataeditor/corrsplitterSizes");
+    //plotter->saveSettings(*(settings->getQSettings()), QString("fcscrossdataeditor/corrplot"));
+    //settings->getQSettings()->setValue(QString("fcscrossdataeditor/corrsplitterSizes"), splitter->saveState());
+    settings->getQSettings()->setValue(QString("fcscrossdataeditor/log_tau_axis"), chkLogTauAxis->isChecked());
+    settings->getQSettings()->setValue(QString("fcscrossdataeditor/error_display"), cmbAverageErrors->currentIndex());
+    settings->getQSettings()->setValue(QString("fcscrossdataeditor/run_error_display"), cmbRunErrors->currentIndex());
+    settings->getQSettings()->setValue(QString("fcscrossdataeditor/run_display"), cmbRunDisplay->currentIndex());
+
+    settings->getQSettings()->setValue(QString("fcscrossdataeditor/fccs_mode"), cmbFCCSCorrected->currentIndex());
+    settings->getQSettings()->setValue(QString("fcscrossdataeditor/crosstalk"), spinCrosstalk->value());
+
+    settings->getQSettings()->setValue(QString("fcscrossdataeditor/range_min"), spinCCFAmplitudeRangeMin->value());
+    settings->getQSettings()->setValue(QString("fcscrossdataeditor/range_max"), spinCCFAmplitudeRangeMax->value());
+
+    saveSplitter(*(settings->getQSettings()), splitter, "fcscrossdataeditor/corrsplitterSizes");
 }
 
 

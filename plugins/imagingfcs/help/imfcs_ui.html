@@ -14,7 +14,7 @@
   
   
     <h2>Parameter Image</h2>  
-    <h3>Overview of Parameter Image Tab</h3>	
+    <h3>Overview of Parameter Image Tab</h3>    
      <center><a name="imfcs_ui_pic004"><img src="./pic/imfcs_ui_pic004.png" border="1">
     </center>    
     <p>This editor is used to display the result of fits as an image. It collects the fit results from a given set for each pixel. these fit results are displayed as a color-coded image (top left). In addition a second parameter may be selected that serves as measure for the goodnes of fit (top center plot). In the top right plot the overview image of the measurement is displayed. By clicking on one of the images, you may select the corresponding ACF/CCF to be displayed below. If you keep Ctrl pressed, while clicking, multiple pixels may be selected. The currently selected pixels may optionally be shown as overlays in the three top-row plots. In addition to the ACFs/CCFs, also the fits is displayed. The fitparameters are shown in the table on the right of the correlation function plot. </p>
@@ -28,18 +28,25 @@
       <li><b>Correlation plot styles/Selection Display mode:</b> here you can select what the correlation display should contain if several pixels are selected: Either the curves of all selected pixels are shown (which is possibly slow if you selected many pixels, or an average over these correlation curves is displayed. In that case the parameters table also contains the statistics of all selected fit results. Note that in DualView mode (see above) one average/statistics for every image channel will be displayed!</li>
     </ul>
     </p>
-	$$note:In many settings widgets in this tab, a right-click will open a context-menu, in which you can copy the settings in the clicked widget to all othe rrecords. So e.g. if you copy the "overview image settings" to all records, the same display settings (color bar, ranges, ...) will be used if you select a different record in this window!$$
+    $$note:In many settings widgets in this tab, a right-click will open a context-menu, in which you can copy the settings in the clicked widget to all othe rrecords. So e.g. if you copy the "overview image settings" to all records, the same display settings (color bar, ranges, ...) will be used if you select a different record in this window!$$
 
     <h3>Correlation Curve display options</h3>
     <p>QuickFit display the correlation curve for the currently selected pixel(s) in the bottom-left corner of the Parameter Image tab. On the rhs of the window, you can choos between different <b>selection display</b> modes, that control, exactly which correlation curves should be displayed:
-	<ul>	
-	  <li><b>display average:</b> Displays the average (and standard deviation) over the correlation curves from all selected pixels.</li>
-	  <li><b>display average:</b> Displays all the correlation curves from all selected pixels.</li>
-      <li><b>FCCS Mode:</b> In this mode, QuickFit finds two ACFs and the FCCS correlation curve from the current group and displays them together. This is useful for fluorescnece cross-correlation data, as you can view the classic ACFs+FCCS plot. If more than one pixel is selected, this displays the average and standard deviation.</li>
+    <ul>    
+      <li><b>display average:</b> Displays the average (and standard deviation) over the correlation curves from all selected pixels.</li>
+      <li><b>display all:</b> Displays all the correlation curves from all selected pixels.</li>
+      <li><b>FCCS Mode:</b> In this mode, QuickFit finds two ACFs and the FCCS correlation curve from the current group and displays them together. This is useful for fluorescnece cross-correlation data, as you can view the classic ACFs+FCCS plot. If more than one pixel is selected, this displays the average and standard deviation. This tool also calculates the cross-talk corrected relative CCF amplitudes, according to the method, described in $$ref:BACIA2012:K. Bacia, Z. Petrášek, and P. Schwille <b>Correcting for spectral cross-talk in dual-color fluorescence cross-correlation spectroscopy.</b>, <i>Chemphyschem.</i> <b>13</b>(5):1221-31. , doi: 10.1002/cphc.201100801, <a href="http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3495304/">http://www.ncbi.nlm.nih.gov/pmc/articles/PMC3495304/</a>$$:
+      $[ \mbox{relCCF}_{red}=\frac{\hat{G}_{CCF}}{\hat{G}_{ACF1}},\ \ \ \ \ \mbox{relCCF}_{green}=\frac{\hat{G}_{CCF}}{\hat{G}_{ACF0}} ]$
+      where $(G_{CCF})$ and $(G_{ACF...})$ are the cross-talk-corrected amplitudes of the cross- and auto-correlation function, given in the index. These amplitudes are estimated by an average over the first few lages of the correlation curves (<b>correlation plot styles | crosstalk | avg.</b> at the lower-right, grey range in the plot). The cross-talk is assumed to happen from the green into the red channel only (the reversed direction can be chosen in the combobox <b>crosstalk | dir.</b>. Then the corrected correlation amplitudes are:
+  $[ \hat{G}_{ACF0}=G_{ACF0} ]$
+  $[ \hat{G}_{ACF1}=\frac{\kappa^2 F_0^2G_{ACF0}+F_{1}^2G_{ACF1}-2\kappa F_{0}F_{1}G_{CCF}}{(F_{1}-\kappa F_{0})^2} ]$
+  $[ \hat{G}_{CCF}=\frac{-\kappa F_{0}G_{ACF0}+F_{1} G_{CCF}}{F_{1}-\kappa F_{0}} ]$
+  In these equations $(F_{0/1})$ are the background-corrected intensities in the green (0) and red (1) color channel and $(\kappa)$ is the cross-talk coefficient between the green and the red channel (which you can estimate from the background-corrected intensities in the two channels for a green-only sample).<br>
+Finally  the red dashed line is the cross-talk-corrected amplitude of the red ACF (ACF1) and the blue dashed line is either the cross-talk-corrected CCF-amplitude, or the level of CCF, which can be explained by crosstalk only (depending on what you choose in the field <b>selection display</b>).</li>
       <li><b>DCCF Mode:</b> In this mode QuickFit displays the correlation curves from all imFCS records in the current group. This is useful for distance cross-correlation data, as then the plot contains the ACF and all DCCFs, that you calculated. If more than one pixel is selected, this displays the average and standard deviation.</li>
     </ul>
     </p>
-	
+    
     
     
     <h3>Histograms</h3>
@@ -52,7 +59,7 @@
     </p>
 
     <p>If you selected more than one pixel in the parameter image, a second histogram shows the statistics of the selected pixels only.</p>
-	<p>The button <b>"use settings for all RDRs"</b> allows to use the currently set histogram configuretion/settings for all other imFCS records. Note that this is still specific to each parameter, so copying all settings for a diffusion coefficient will not change the histogram, if e.g. the particle number is selected as parameter!</p>
+    <p>The button <b>"use settings for all RDRs"</b> allows to use the currently set histogram configuretion/settings for all other imFCS records. Note that this is still specific to each parameter, so copying all settings for a diffusion coefficient will not change the histogram, if e.g. the particle number is selected as parameter!</p>
 
     <h3>Correlation Plots</h3>
     <center><a name="imfcs_ui_pic006"><img src="./pic/imfcs_ui_pic006.png" border="1">
@@ -63,7 +70,7 @@
     </center>    
     <p>At the top of the tab, you can select, which parameters should be correlated (<b>correlation plot mode</b>). The default is "parameter 1 vs. parameter 2", but it is also possible to plot one of the parameters vs. the pixel intensity, or pixel-coordinates. If you plot versusthe image intensity, the spin-box <b>channel</b> allows to select the color-channel, from which to take the intensity.</p>
     <p>In addition, if a scatter plot exists, each datapoint can be colored according to a third parameter, which can be selected from <b>color mode</b>.</p>
-	<p>The button <b>"use settings for all RDRs"</b> allows to use the currently set histogram configuretion/settings for all other imFCS records. Note that this is still specific to each parameter, so copying all settings for a diffusion coefficient will not change the histogram, if e.g. the particle number is selected as parameter!</p>
+    <p>The button <b>"use settings for all RDRs"</b> allows to use the currently set histogram configuretion/settings for all other imFCS records. Note that this is still specific to each parameter, so copying all settings for a diffusion coefficient will not change the histogram, if e.g. the particle number is selected as parameter!</p>
 
     
     
@@ -166,6 +173,11 @@
         <li><b>background from mask in all RDRs</b>: calculates the background intensity from the mask in all RDRs in the current project.</li>
         <!--<li><b></b>:</li>-->
       </ul>
+
+
+<h2>References</h2>
+<p>$$references$$</p>
+
 
     </body>
 </html>

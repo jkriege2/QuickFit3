@@ -1206,6 +1206,27 @@ QString doubleToLatexQString(double data, int precision, bool remove_trail0, dou
   return QString("10^{")+intToQString(exp)+"}";
 }
 
+
+QString doubleToHTMLQString(double data, int precision, bool remove_trail0, double belowIsZero, double minNoExponent, double maxNoExponent){
+  if ((belowIsZero>0) && (fabs(data)<belowIsZero)) return "0";
+  if (data==0) return "0";
+  double adata=fabs(data);
+  QString res;
+  if (remove_trail0) res=doubleToQStringNoTrail(data, precision);
+  else res=doubleToQString(data, precision, 'f');
+
+  long exp=(long)floor(log(adata)/log(10.0));
+  if ((minNoExponent<=fabs(data)) && (fabs(data)<=maxNoExponent)) return res;
+
+  QString v;
+  if (remove_trail0) v=doubleToQStringNoTrail(data/pow(10.0, (double)exp), precision);
+  else v=doubleToQString(data/pow(10.0, (double)exp), precision, 'f');
+
+  if (v!="1" && v!="10")  return v+QString("&times;10<sup>")+intToQString(exp)+"</sup>";
+  if (v=="10") exp=exp+1;
+  return QString("10<sup>")+intToQString(exp)+"</sup>";
+}
+
 QString qfShortenString(const QString& input, int maxLen, int keepend, const QString& ellipsis) {
     if (input.size()<=maxLen) return input;
     QString res;

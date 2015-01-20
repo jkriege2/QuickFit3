@@ -5017,7 +5017,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
                 ++count;
-                pos += rxDOI.matchedLength();
+                pos += rep.size()-rxDOI.matchedLength();
             }
 
 

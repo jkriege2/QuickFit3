@@ -351,6 +351,12 @@ QFLIB_EXPORT QString doubleToQStringNoTrail(double value, int prec = 10, QChar d
 */
 QFLIB_EXPORT QString doubleToLatexQString(double data, int precision=10, bool remove_trail0=true, double belowIsZero=1e-16, double minNoExponent=1e-3, double maxNoExponent=1e4);
 
+/*! \brief convert a number to a QString in exponential form using HTML markup
+    \ingroup qf3lib_tools
+
+*/
+QFLIB_EXPORT QString doubleToHTMLQString(double data, int precision=10, bool remove_trail0=true, double belowIsZero=1e-16, double minNoExponent=1e-3, double maxNoExponent=1e4);
+
 /*! \brief convert an integer to a QString in decimal representation
     \ingroup qf3lib_tools
 

@@ -74,11 +74,38 @@ class QFRDRFCSCrossCorrelationEditor : public QFRawDataEditor {
         virtual ~QFRDRFCSCrossCorrelationEditor();
 
         /** \brief return a list (also of the roles) of all records in the current record's group */
-        QList<QFRDRFCSData *> getRecordsInGroup(QFRawDataRecord *current, QStringList* roles=NULL, QList<QColor>* graph_colors=NULL) const;
-        QList<QFRDRFCSData *> getRecordsInGroup(QStringList* roles=NULL, QList<QColor>* graph_colors=NULL) const;
+        QList<QFRDRFCSData *> getRecordsInGroup(QFRawDataRecord *current, QStringList* roles=NULL, QList<QColor>* graph_colors=NULL, bool* isFCCS_out=NULL, QFRDRFCSData ** acf0=NULL, QFRDRFCSData **acf1=NULL, QFRDRFCSData **fccs=NULL) const;
+        QList<QFRDRFCSData *> getRecordsInGroup(QStringList* roles=NULL, QList<QColor>* graph_colors=NULL, bool* isFCCS_out=NULL) const;
 
         /** \brief returns 0, if the run is excluded in all RDRs in the group, 1 if the files is included in all RDRs in the group and 2, if the index is included in some RDRs in the group */
         int isIncluded(QFRawDataRecord* current, int index) const;
+
+        struct RelFCCSResult {
+            inline RelFCCSResult() {
+                CCF_div_ACF0=0;
+                CCF_div_ACF1=0;
+                ACF1CorrectedAmplitude=0;
+                ACF0Amplitude=0;
+                ACF1Amplitude=0;
+                CCFCorrectedAmplitude=0;
+                CCFCrosstalkExplainedAmplitude=0;
+                CCFAmplitude=0;
+                ok=false;
+            }
+
+            bool ok;
+            double CCF_div_ACF0;
+            double CCF_div_ACF1;
+            double ACF1CorrectedAmplitude;
+            double ACF0Amplitude;
+            double ACF1Amplitude;
+            double CCFAmplitude;
+            double CCFCorrectedAmplitude;
+            double CCFCrosstalkExplainedAmplitude;
+        };
+
+        RelFCCSResult getRelFCCS(QFRawDataRecord* current, int index=-1) const;
+
 
     protected slots:
         /** \brief connected to the rawDataChanged() signal of the current record */
@@ -144,6 +171,16 @@ class QFRDRFCSCrossCorrelationEditor : public QFRawDataEditor {
         QMenu* menuMask;
         QMenu* menuData;
         QFCorrelationMaskTools* correlationMaskTools;
+
+        QGroupBox* grpRelCCF;
+        QComboBox* cmbFCCSCorrected;
+        QDoubleSpinBox* spinCrosstalk;
+        QDoubleSpinBox* spinCCFAmplitudeRangeMin;
+        QDoubleSpinBox* spinCCFAmplitudeRangeMax;
+        QLabel* labRelCCF;
+        QLabel* labRelCCFSel;
+        QLabel* labRelCCFSelLab;
+
 
         QAction* actCopyNormalizedACF;
         QAction* actCorrectOffset;
