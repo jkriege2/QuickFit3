@@ -34,13 +34,17 @@ QVariant QFTablePluginModel::data(const QModelIndex &index, int role) const
 {
     if (role==Qt::ToolTipRole) {
         QString tt=QFTableModel::data(index, role).toString();
+        QString cexp=headerData(index.column(), QFRDRTable::ColumnExpressionRole).toString();
         QString exp=index.data(QFRDRTable::TableExpressionRole).toString();
         QString comment=index.data(QFRDRTable::TableCommentRole).toString();
         if (!exp.isEmpty()) {
-            tt+=tr("<font color=\"darkblue\"><br>expression: <i>%1</i></font>").arg(exp);
+            tt+=tr("<font color=\"darkblue\"><br>expression: <i>%1</i></font>").arg(exp.toHtmlEscaped());
+        }
+        if (!cexp.isEmpty()) {
+            tt+=tr("<font color=\"darkblue\"><br>column expression: <i>%1</i></font>").arg(cexp.toHtmlEscaped());
         }
         if (!comment.isEmpty()) {
-            tt+=tr("<font color=\"black\"><br>comment: <i>%1</i></font>").arg(comment);
+            tt+=tr("<font color=\"black\"><br>comment: <i>%1</i></font>").arg(comment.toHtmlEscaped());
         }
         return tt;
     }
@@ -68,10 +72,106 @@ QVariant QFTablePluginModel::headerData(int section, Qt::Orientation orientation
         if (this->hasColumnHeaderData(section, QFRDRTable::ColumnExpressionRole)) {
             QString exp=this->getColumnHeaderData(section, QFRDRTable::ColumnExpressionRole).toString();
             if (!exp.isEmpty()) {
-                return h.toString()+tr("<font color=\"darkblue\"><br>column expression: <i>%1</i></font>").arg(exp);
+                return h.toString()+tr("<font color=\"darkblue\"><br>column expression: <i>%1</i></font>").arg(exp.toHtmlEscaped());
             }
         }
     }
 
      return h;
+}
+
+
+QFTablePluginExpressionsModel::QFTablePluginExpressionsModel(QFTablePluginModel *model, QObject *parent):
+    QAbstractTableModel(parent)
+{
+    this->model=model;
+    reset();
+}
+
+Qt::ItemFlags QFTablePluginExpressionsModel::flags(const QModelIndex &index) const
+{
+    int col=index.column();
+    int row=index.row();
+    /*if (project) {
+        QFRawDataRecord* rdr=project->getRawDataByNum(row);
+        if (rdr) {
+            if (col==0) { // name
+                if (nameEditable) return Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsEditable;
+                else return Qt::ItemIsSelectable|Qt::ItemIsEnabled;
+
+            } else if (col==1) { // group
+                return Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsEditable;
+
+            } else if (col==2) { // role
+                if (rdr->isRoleUserEditable() || roleAlwaysEditable) return Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsEditable;
+                else return Qt::ItemIsSelectable|Qt::ItemIsEnabled;
+            } else if (col==3) { // folder
+                return Qt::ItemIsSelectable|Qt::ItemIsEnabled|Qt::ItemIsEditable;
+            }
+        }
+    }*/
+    return Qt::ItemIsSelectable|Qt::ItemIsEnabled;
+}
+
+QVariant QFTablePluginExpressionsModel::data(const QModelIndex &index, int role) const
+{
+    int col=index.column();
+    int row=index.row();
+    if (model) {
+
+    }
+    return QVariant();
+}
+
+QVariant QFTablePluginExpressionsModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (model) {
+
+    }
+    return QVariant();
+}
+
+int QFTablePluginExpressionsModel::rowCount(const QModelIndex &parent) const
+{
+    return 0;
+}
+
+int QFTablePluginExpressionsModel::columnCount(const QModelIndex &parent) const
+{
+    return 0;
+}
+
+bool QFTablePluginExpressionsModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    return false;
+}
+
+
+QFTablePluginExpressionsModelDelegate::QFTablePluginExpressionsModelDelegate(QObject *parent):
+    QStyledItemDelegate(parent)
+{
+
+}
+
+QWidget *QFTablePluginExpressionsModelDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    int col=index.column();
+    int row=index.row();
+
+    return NULL;
+}
+
+void QFTablePluginExpressionsModelDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+{
+
+}
+
+void QFTablePluginExpressionsModelDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+
+}
+
+void QFTablePluginExpressionsModelDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+    QStyledItemDelegate::updateEditorGeometry(editor, option, index);
 }

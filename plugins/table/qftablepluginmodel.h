@@ -24,6 +24,8 @@
 #define QFTABLEPLUGINMODEL_H
 
 #include "qftablemodel.h"
+#include <QStyledItemDelegate>
+#include <QAbstractTableModel>
 
 class QFTablePluginModel : public QFTableModel
 {
@@ -35,4 +37,46 @@ class QFTablePluginModel : public QFTableModel
         virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 };
 
+
+
+
+class QFTablePluginExpressionsModel : public QAbstractTableModel
+{
+        Q_OBJECT
+    public:
+        explicit QFTablePluginExpressionsModel(QFTablePluginModel* model, QObject *parent = 0);
+
+        virtual Qt::ItemFlags flags ( const QModelIndex & index ) const;
+        virtual QVariant data ( const QModelIndex & index, int role = Qt::DisplayRole ) const;
+        virtual QVariant headerData ( int section, Qt::Orientation orientation, int role = Qt::DisplayRole ) const;
+        virtual int rowCount ( const QModelIndex & parent = QModelIndex() ) const;
+        virtual int columnCount ( const QModelIndex & parent = QModelIndex() ) const;
+        virtual bool setData ( const QModelIndex & index, const QVariant & value, int role = Qt::EditRole );
+    signals:
+
+    public slots:
+
+    protected slots:
+
+    protected:
+        QFTablePluginModel* model;
+
+};
+
+
+
+class QFTablePluginExpressionsModelDelegate : public QStyledItemDelegate {
+        Q_OBJECT
+    public:
+        QFTablePluginExpressionsModelDelegate(QObject* parent=NULL);
+
+        QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+        void setEditorData(QWidget *editor, const QModelIndex &index) const;
+        void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
+        void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    private:
+    protected slots:
+    protected:
+
+};
 #endif // QFTABLEPLUGINMODEL_H
