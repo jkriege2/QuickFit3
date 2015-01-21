@@ -79,8 +79,7 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
-QT += gui xml core opengl
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqtwidgets.pri)
 
 
 ASSETS_TESTDATA_FILES.files = ./examples/test_data/*.*

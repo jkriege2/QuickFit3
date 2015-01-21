@@ -52,8 +52,7 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/qt/
 
 
-QT += core
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqt.pri)
 
 
 SRC_DISTRIBUTED.files = $$HEADERS \

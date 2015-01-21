@@ -6,7 +6,7 @@
 #include "qfpluginservices.h"
 #include <QDebug>
 #include <QFile>
-//#include <QtGui>
+
 #include "stdint.h"
 
 #define DAQmxErrWarChk(instruction) \

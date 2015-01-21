@@ -22,7 +22,14 @@
 
 #include "pimercury863calibrationdialog.h"
 #include "stage_pi.h"
+#include<QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets>
+#else
 #include <QtGui>
+#endif
+
+
 
 PIMercury863CalibrationDialog::PIMercury863CalibrationDialog(QWidget* parent, QFExtensionLinearStagePI* stage, int axis):
     QDialog(parent)

@@ -63,6 +63,7 @@ INSTALLS += HELP_FILES HELPPIC_FILES ASSETS_FILES ASSETS_TRANSLATIONS EXAMPLES_F
 
 OTHER_FILES +=
 
-QT += network opengl xml
+include(quickfit3_configqtwidgets.pri)
+
 
 #QF3CONFIG += ffmdrivers

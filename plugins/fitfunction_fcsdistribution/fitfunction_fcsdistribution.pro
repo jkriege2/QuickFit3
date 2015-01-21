@@ -55,8 +55,7 @@ TRANSLATIONS= ./translations/de.fitfunctions_fcsdistribution.ts
 INCLUDEPATH += ../../lib/
 
 
-QT += core
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqt.pri)
 
 SRC_DISTRIBUTED.files = $$HEADERS \
                         $$SOURCES \

@@ -660,7 +660,7 @@ void MainWindow::about() {
                             "<b>QuickFit bit-depth:</b><blockquote>%14-bit</blockquote>"
                             "<b>libraries, used by QuickFit:</b><ul><li>QuickFit library v%4.%5</li><li>Qt %1 (<a href=\"http://qt.nokia.com/\">http://qt.nokia.com/</a>)</li></ul>"
                             "<b>compiler used for this version:</b><blockquote>%7</blockquote>"
-                            "<b>operating system:</b><blockquote>%15</blockquote><br><br>").arg(QT_VERSION_STR).arg(qfInfoThanksTo()).arg(qfInfoCopyright()).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(qfInfoEmail()).arg(Qt::escape(qfInfoCompiler())).arg(qfInfoMaillist()).arg(qfInfoMaillistRequest()).arg(qfInfoVersion()).arg(qfInfoVersionStatus()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()).arg(getApplicationBitDepth()).arg(getOSName()));
+                            "<b>operating system:</b><blockquote>%15</blockquote><br><br>").arg(QT_VERSION_STR).arg(qfInfoThanksTo()).arg(qfInfoCopyright()).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR).arg(qfInfoEmail()).arg(qfHTMLExcape(qfInfoCompiler())).arg(qfInfoMaillist()).arg(qfInfoMaillistRequest()).arg(qfInfoVersion()).arg(qfInfoVersionStatus()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()).arg(getApplicationBitDepth()).arg(getOSName()));
     ui_labelLic->setText(qfInfoLicense());
     ui_citing->setText(tr("If you used QuickFit for your data evaluation, please cite it in your publication. You can use a citation like this:"
                           "<blockquote>%1</blockquote>"
@@ -4863,9 +4863,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 if (command=="math" || command=="bmath" || command=="mathb") {
                     if (dontCreatePics)  {
                         if (command=="bmath" || command=="mathb") {
-                            result=result.replace(rxLaTeX.cap(0), QString("<blockquote><font size=\"+2\"><tt><i>%1</i></tt></font></blockquote>").arg(Qt::escape(latex)));
+                            result=result.replace(rxLaTeX.cap(0), QString("<blockquote><font size=\"+2\"><tt><i>%1</i></tt></font></blockquote>").arg(qfHTMLExcape(latex)));
                         } else {
-                            result=result.replace(rxLaTeX.cap(0), QString("<tt><i>%1</i></tt>").arg(Qt::escape(latex)));
+                            result=result.replace(rxLaTeX.cap(0), QString("<tt><i>%1</i></tt>").arg(qfHTMLExcape(latex)));
                         }
 
                     } else {

@@ -22,7 +22,14 @@
 #include "qfrdrimagingfcscorrelationdialog.h"
 #include "ui_qfrdrimagingfcscorrelationdialog.h"
 #include "qfrdrimagingfcscorrelationjobthread.h"
+#include<QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets>
+#else
 #include <QtGui>
+#endif
+
+
 #include <QDebug>
 #include "qmodernprogresswidget.h"
 #include "qfrdrimagingfcsdataexplorer.h"

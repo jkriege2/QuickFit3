@@ -53,7 +53,14 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtGlobal>
+#include <QtWidgets>
+#else
 #include <QtGui>
+#endif
+
+
 #include <QtCore>
 
 QFFCSMSDEvaluationEditor::QFFCSMSDEvaluationEditor(QFPluginServices *services, QFEvaluationPropertyEditor *propEditor, QWidget *parent):
@@ -1714,7 +1721,7 @@ void QFFCSMSDEvaluationEditor::getNFromFits()
         progress.setMode(true, true);
         progress.setRange(0, applyTo.size());
         bool esigen=eval->get_doEmitResultsChanged();
-        bool sigen;
+        bool sigen=true;
         eval->set_doEmitResultsChanged(false);
 
         for (int i=0; i<applyTo.size(); i++) {

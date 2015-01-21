@@ -40,7 +40,7 @@ INCLUDEPATH += ../../../../LIB/trunk/ \
 include(../libquickfit.pri)
 include(../../../../LIB/trunk/qt/qfvisualize3dshaders.pri)
 
-QT += gui xml svg opengl
+include(../quickfit3_configqtwidgets.pri)
 
 #DEFINES += JKQTBP_AUTOTIMER JKQTBP_DEBUGTIMING
 

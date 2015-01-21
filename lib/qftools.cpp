@@ -38,6 +38,7 @@
 #include "qfpluginservices.h"
 #include "qfhtmlhelptools.h"
 #include <QMutex>
+
 #ifndef __LINUX__
 # if defined(linux)
 #  define __LINUX__
@@ -1687,4 +1688,13 @@ QString qfCanonicalOrAbsoluteFilePath(const QString& file) {
     QString fn=QFileInfo(file).canonicalFilePath();
     if (fn.isEmpty()) return QFileInfo(file).absoluteFilePath();
     return fn;
+}
+
+QString qfHTMLExcape(const QString& input) {
+#include<QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    return input.toHtmlEscaped();
+#else
+    return Qt::escape(input);
+#endif
 }

@@ -24,6 +24,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QDebug>
 #include <QMessageBox>
 #include "csvtools.h"
+#include "qftools.h"
 
 QFTableModel::QFTableModel(QObject * parent):
     QAbstractTableModel(parent)
@@ -81,7 +82,7 @@ QVariant QFTableModel::data(const QModelIndex &index, int role) const {
         } else if (role == Qt::BackgroundRole) {
             if (state.dataBackgroundMap.contains(a)) return state.dataBackgroundMap[a];
         } else if (role == Qt::ToolTipRole) {
-            if (state.dataMap.contains(a)) return tr("row: <i>%2</i><br>column: <i>%3 (\"%4\")</i><br>datatype: <i>%1</i><br>data: <b>%5</b>").arg(getQVariantType(state.dataMap[a]).toHtmlEscaped()).arg(index.row()).arg(index.column()).arg(state.columnNames.value(index.column(), "").toHtmlEscaped()).arg(getQVariantData(index.data()).toHtmlEscaped());
+            if (state.dataMap.contains(a)) return tr("row: <i>%2</i><br>column: <i>%3 (\"%4\")</i><br>datatype: <i>%1</i><br>data: <b>%5</b>").arg(qfHTMLExcape(getQVariantType(state.dataMap[a]))).arg(index.row()).arg(index.column()).arg(qfHTMLExcape(state.columnNames.value(index.column(), ""))).arg(qfHTMLExcape(getQVariantData(index.data())));
         } else if (role >= Qt::UserRole) {
             if (state.moreDataMap.contains(a)) {
                 return state.moreDataMap[a].value(role, QVariant());

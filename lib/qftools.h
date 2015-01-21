@@ -1974,6 +1974,8 @@ QFLIB_EXPORT QImage cropTopBottom(const QImage& pix);
 
 QFLIB_EXPORT QString qfCanonicalOrAbsoluteFilePath(const QString& file);
 
+QFLIB_EXPORT QString qfHTMLExcape(const QString& input);
+
 #endif // QFTOOLS_H
 
 

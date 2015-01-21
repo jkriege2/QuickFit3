@@ -55,5 +55,4 @@ TRANSLATIONS= ./translations/de.importers_picoquant.ts
 INCLUDEPATH += ../../lib/
 
 
-QT += core
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqt.pri)

@@ -23,7 +23,14 @@
 #include "qfetcspcimporterdialog.h"
 #include "ui_qfetcspcimporterdialog.h"
 #include "qfetcspcimporterjobthread.h"
+#include<QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets>
+#else
 #include <QtGui>
+#endif
+
+
 #include <QDebug>
 #include "qmodernprogresswidget.h"
 

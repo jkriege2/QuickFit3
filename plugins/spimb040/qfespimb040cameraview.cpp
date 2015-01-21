@@ -30,7 +30,14 @@
 #include <typeinfo>
 #include "qfmathtools.h"
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtGlobal>
+#include <QtWidgets>
+#else
 #include <QtGui>
+#endif
+
+
 #include <QtCore>
 
 double fGauss( double t, const double *p )

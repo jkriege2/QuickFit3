@@ -57,13 +57,13 @@ void DlgComponentInfo::setComponent(int component) {
 
     int row=0;
     model->setCellCreate(row,0,tr("<b>name:</b>"));
-    model->setCellCreate(row,1,QString("<b>%1</b>").arg(Qt::escape(plugin->getComponentName(component))));
+    model->setCellCreate(row,1,QString("<b>%1</b>").arg(qfHTMLExcape(plugin->getComponentName(component))));
     row++;
     model->setCellCreate(row,0,tr("<b>molar mass:</b>"));
     model->setCellCreate(row,1,tr("%1 g/mol").arg(plugin->getComponentMolarMass(component)));
     row++;
     QString comment=plugin->getComponentComment(component, true);
-    QString c1=Qt::escape(plugin->getComponentComment(component, false));
+    QString c1=qfHTMLExcape(plugin->getComponentComment(component, false));
     if (!comment.isEmpty() && !c1.isEmpty()) comment=comment+"<br><br>"+c1;
 
     if (!comment.isEmpty()) {
@@ -78,14 +78,14 @@ void DlgComponentInfo::setComponent(int component) {
     model->setCellCreate(row,1,tr("c = 0 ... %1 M").arg(plugin->getComponentCMax(component)));
     row++;
     model->setCellCreate(row,0,tr("<b>reference:</b>"));
-    model->setCellCreate(row,1,Qt::escape(plugin->getComponentReference(component)));
+    model->setCellCreate(row,1,qfHTMLExcape(plugin->getComponentReference(component)));
     row++;
     model->setCellCreate(row,0,tr("<b>data file:</b>"));
-    model->setCellCreate(row,1,tr("<i>%1</i>").arg(Qt::escape(plugin->getComponentDatafile(component))));
+    model->setCellCreate(row,1,tr("<i>%1</i>").arg(qfHTMLExcape(plugin->getComponentDatafile(component))));
     row++;
 
     model->setCellCreate(row,0,tr("<b>unit:</b>"));
-    model->setCellCreate(row,1,tr("<i>%1</i>").arg(Qt::escape(plugin->getComponentUnit(component))));
+    model->setCellCreate(row,1,tr("<i>%1</i>").arg(qfHTMLExcape(plugin->getComponentUnit(component))));
     row++;
 
     model->setReadonly(true);

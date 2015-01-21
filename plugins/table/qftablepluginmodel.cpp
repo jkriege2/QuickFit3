@@ -34,17 +34,17 @@ QVariant QFTablePluginModel::data(const QModelIndex &index, int role) const
 {
     if (role==Qt::ToolTipRole) {
         QString tt=QFTableModel::data(index, role).toString();
-        QString cexp=headerData(index.column(), QFRDRTable::ColumnExpressionRole).toString();
+        QString cexp=headerData(index.column(), Qt::Horizontal, QFRDRTable::ColumnExpressionRole).toString();
         QString exp=index.data(QFRDRTable::TableExpressionRole).toString();
         QString comment=index.data(QFRDRTable::TableCommentRole).toString();
         if (!exp.isEmpty()) {
-            tt+=tr("<font color=\"darkblue\"><br>expression: <i>%1</i></font>").arg(exp.toHtmlEscaped());
+            tt+=tr("<font color=\"darkblue\"><br>expression: <i>%1</i></font>").arg(qfHTMLExcape(exp));
         }
         if (!cexp.isEmpty()) {
-            tt+=tr("<font color=\"darkblue\"><br>column expression: <i>%1</i></font>").arg(cexp.toHtmlEscaped());
+            tt+=tr("<font color=\"darkblue\"><br>column expression: <i>%1</i></font>").arg(qfHTMLExcape(cexp));
         }
         if (!comment.isEmpty()) {
-            tt+=tr("<font color=\"black\"><br>comment: <i>%1</i></font>").arg(comment.toHtmlEscaped());
+            tt+=tr("<font color=\"black\"><br>comment: <i>%1</i></font>").arg(qfHTMLExcape(comment));
         }
         return tt;
     }
@@ -72,7 +72,7 @@ QVariant QFTablePluginModel::headerData(int section, Qt::Orientation orientation
         if (this->hasColumnHeaderData(section, QFRDRTable::ColumnExpressionRole)) {
             QString exp=this->getColumnHeaderData(section, QFRDRTable::ColumnExpressionRole).toString();
             if (!exp.isEmpty()) {
-                return h.toString()+tr("<font color=\"darkblue\"><br>column expression: <i>%1</i></font>").arg(exp.toHtmlEscaped());
+                return h.toString()+tr("<font color=\"darkblue\"><br>column expression: <i>%1</i></font>").arg(qfHTMLExcape(exp));
             }
         }
     }

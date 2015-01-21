@@ -71,8 +71,7 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
-QT += gui xml svg
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqtwidgets.pri)
 
 OTHER_FILES += \
     cam_rh2v2.cor.ini \

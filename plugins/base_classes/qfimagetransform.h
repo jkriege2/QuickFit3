@@ -22,7 +22,14 @@
 #ifndef QFIMAGETRANSFORM_H
 #define QFIMAGETRANSFORM_H
 #include <QtCore>
+#include<QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets>
+#else
 #include <QtGui>
+#endif
+
+
 #include <QTextStream>
 #include <QObject>
 #include <QVector>

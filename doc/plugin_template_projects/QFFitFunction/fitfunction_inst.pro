@@ -45,5 +45,4 @@ TRANSLATIONS= ./translations/de.target_id.ts
 INCLUDEPATH += ../../lib/
 
 
-QT += core
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqt.pri)

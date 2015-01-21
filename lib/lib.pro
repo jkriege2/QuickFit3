@@ -24,6 +24,7 @@ TARGET = quickfit3lib
 DEPENDPATH += .
 
 include(../quickfit3.pri)
+include(../quickfit3_configqtwidgets.pri)
 include(../extlibs/quazip.pri)
 
 release {
@@ -37,7 +38,7 @@ INCLUDEPATH += .
 INCLUDEPATH += ../../../../LIB/trunk/
 
 
-QT += gui xml svg network
+
 
 DESTDIR = $$QFOUTPUT
 

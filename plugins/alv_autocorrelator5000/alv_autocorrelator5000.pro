@@ -60,8 +60,6 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
-QT += gui xml svg
-
-
+Qinclude(../quickfit3_configqtwidgets.pri)
 
 

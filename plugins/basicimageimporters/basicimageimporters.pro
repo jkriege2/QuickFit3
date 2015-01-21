@@ -83,6 +83,3 @@ INSTALLS += TINYTIFF_FILES \
             tinytiffwriter_test_FILES
 
 
-
-QT += core
-CONFIG += exceptions rtti stl

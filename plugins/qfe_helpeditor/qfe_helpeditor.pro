@@ -86,8 +86,7 @@ ASSETSt_FILES.path = $${QFOUTPUT}/assets/plugins/$${TARGET}/templates
 
 INSTALLS += ASSETSe_FILES ASSETSt_FILES
 
-QT += gui xml svg
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqtwidgets.pri)
 
 
 

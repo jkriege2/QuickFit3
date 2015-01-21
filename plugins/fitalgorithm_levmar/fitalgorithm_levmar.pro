@@ -58,7 +58,6 @@ SRC_DISTRIBUTED.files = $$HEADERS \
                         $$TRANSLATIONS \
                         $$GPL3LICENSE
 
-QT += core
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqt.pri)
 
 

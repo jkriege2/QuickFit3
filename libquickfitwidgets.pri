@@ -36,5 +36,4 @@ INCLUDEPATH += $$QFOUTPUT/../libqf3widgets/
 
 RESOURCES +=
 
-QT += opengl
-
+include(quickfit3_configqtwidgets.pri)

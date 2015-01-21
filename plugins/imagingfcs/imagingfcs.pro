@@ -146,8 +146,7 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
-QT += gui xml svg opengl
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqtwidgets.pri)
 
 #DEFINES += DEBUG_TIMIMNG JKQTBP_DEBUGTIMING
 

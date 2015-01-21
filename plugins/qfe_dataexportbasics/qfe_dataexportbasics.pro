@@ -53,8 +53,7 @@ INCLUDEPATH += ../../lib/ \
 
 include(xlslib.pri)
 
-QT += gui xml svg
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqtwidgets.pri)
 
 
 

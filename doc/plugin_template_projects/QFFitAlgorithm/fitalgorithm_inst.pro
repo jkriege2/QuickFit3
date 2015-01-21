@@ -51,5 +51,4 @@ INCLUDEPATH += ../../lib/ \
                ../../../../../LIB/trunk/qt/
 
 
-QT += gui xml svg
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqtwidgets.pri)

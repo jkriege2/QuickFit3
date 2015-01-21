@@ -44,7 +44,6 @@ HEADERS += spimb040.h \
            ../../../../../LIB/trunk/tinytiffwriter.h \
            ../../../../../LIB/trunk/libtiff_tools.h \
            ../interfaces/qfextensionlinearstage.h \
-           ../interfaces/qfextensionparameterdevice.h \
     qfespimb040opticssetup.h \
     qfespimb040simplecameraconfig.h \
     qfespimb00histogrammaskdialog.h \
@@ -139,10 +138,8 @@ INCLUDEPATH += . \
                ../../../../../LIB/trunk/ \
                ../../../../../LIB/trunk/qt/
 
-QT += gui xml svg opengl script
-
-CONFIG += exceptions rtti stl
-
+QT +=  script
+include(../../quickfit3_configqtwidgets.pri)
 
 
 ASSETSScriptTemplates_FILES.files = ./assets/acquisitionScriptTemplates/*.*

@@ -132,7 +132,8 @@ release {
 
 DEFINES += QTLIB_IN_DLL LIB_IN_DLL IS_QUICKFIT3 IS_QUICKFIT3_PLUGIN
 
-QT += xml
+include(../quickfit3_configqt.pri)
+
 
 CONFIG += link_prl
 

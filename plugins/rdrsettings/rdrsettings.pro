@@ -57,8 +57,7 @@ ASSETS_TESTDATA.files = ./assets/examples/testdata/*.*
 ASSETS_TESTDATA.path = $${QFOUTPUT}/examples/$${TARGET}/testdata/
 INSTALLS += ASSETS_TESTDATA
 
-QT += gui xml core
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqtwidgets.pri)
 
 
 

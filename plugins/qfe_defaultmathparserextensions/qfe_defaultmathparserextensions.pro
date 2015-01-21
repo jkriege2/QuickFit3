@@ -58,8 +58,7 @@ HELPREFPIC_FILES.path = $${QFOUTPUT}/assets/plugins/help/$${TARGET}/parserrefere
 INSTALLS +=  HELPREF_FILES HELPREFPIC_FILES
 
 
-QT += gui xml svg
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqtwidgets.pri)
 
 
 

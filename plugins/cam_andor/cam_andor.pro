@@ -75,5 +75,4 @@ INCLUDEPATH += ../../lib/ \
 
 
 
-QT += gui xml svg opengl
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqtwidgets.pri)

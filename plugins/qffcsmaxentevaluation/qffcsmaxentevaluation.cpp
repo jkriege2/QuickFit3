@@ -24,7 +24,14 @@
 
 
 #include "qffcsmaxentevaluation.h"
+#include<QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets>
+#else
 #include <QtGui>
+#endif
+
+
 #include "qffcsmaxentevaluation_item.h"
 
 QFFCSMaxEntEvaluation::QFFCSMaxEntEvaluation(QObject* parent):

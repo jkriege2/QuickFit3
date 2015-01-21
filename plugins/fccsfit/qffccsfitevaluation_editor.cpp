@@ -27,7 +27,14 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitalgorithm.h"
 #include "qffitalgorithmmanager.h"
 #include "qffccsparameterinputdelegate.h"
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtGlobal>
+#include <QtWidgets>
+#else
 #include <QtGui>
+#endif
+
+
 #include <QtCore>
 #include "tools.h"
 #include "qmoretextobject.h"

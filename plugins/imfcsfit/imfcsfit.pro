@@ -129,5 +129,4 @@ SRC_DISTRIBUTED.files = $$HEADERS \
                         $$TRANSLATIONS \
                         $$GPL3LICENSE
 
-QT += gui xml svg core opengl
-CONFIG += exceptions rtti stl
+include(../../quickfit3_configqtwidgets.pri)

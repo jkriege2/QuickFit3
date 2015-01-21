@@ -7,7 +7,7 @@
 #include <qfpluginservices.h>
 #include <QTime>
 #include <QDebug>
-//#include <QtGui>
+
 #include <QApplication>
 #include <cmath>
 
