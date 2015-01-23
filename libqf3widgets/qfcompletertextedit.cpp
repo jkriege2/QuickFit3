@@ -289,16 +289,16 @@ void QFCompleterTextEditWidget::setCompleter(QCompleter *completer) {
      QTextCursor t1=tc;
      t1.select(QTextCursor::WordUnderCursor);
      QString w=t1.selectedText().trimmed();
-     //std::cout<<"sel "<<w.toAscii().data()<<std::endl;
+     //std::cout<<"sel "<<w.toLatin1().data()<<std::endl;
      QString cutl("1234567890*+!-?&!§$%&/()=?}][{\\~#'.:,;<>^");
      QString cutlb("*+!-?&!§$%&/()=?}][{\\~#'.:,;<>^");
      while (w.size()>0 && cutl.contains(w[0])) {
          w=w.remove(0,1);
-         //std::cout<<"rf  "<<w.toAscii().data()<<std::endl;
+         //std::cout<<"rf  "<<w.toLatin1().data()<<std::endl;
      }
      while (w.size()>0 && cutlb.contains(w[w.size()-1])) {
          w=w.remove(w.size()-1,1);
-         //std::cout<<"rb  "<<w.toAscii().data()<<std::endl;
+         //std::cout<<"rb  "<<w.toLatin1().data()<<std::endl;
      }
      int bn=tc.blockNumber();
      while (tc.blockNumber()==bn && !validwords.contains(w) &&  tc.position()>0) {
@@ -306,14 +306,14 @@ void QFCompleterTextEditWidget::setCompleter(QCompleter *completer) {
         t1=tc;
         t1.select(QTextCursor::WordUnderCursor);
         w=t1.selectedText().trimmed();
-        //std::cout<<w.toAscii().data()<<std::endl;
+        //std::cout<<w.toLatin1().data()<<std::endl;
          while (w.size()>0 && cutl.contains(w[0])) {
              w=w.remove(0,1);
-             //std::cout<<"rf  "<<w.toAscii().data()<<std::endl;
+             //std::cout<<"rf  "<<w.toLatin1().data()<<std::endl;
          }
          while (w.size()>0 && cutlb.contains(w[w.size()-1])) {
              w=w.remove(w.size()-1,1);
-             //std::cout<<"rb  "<<w.toAscii().data()<<std::endl;
+             //std::cout<<"rb  "<<w.toLatin1().data()<<std::endl;
          }
      }
      if (validwords.contains(w)) return w;
@@ -341,7 +341,7 @@ void QFCompleterTextEditWidget::setCompleter(QCompleter *completer) {
 void QFCompleterTextEditWidget::cursorChanged() {
     emit cursorMoved(getLineNumber(), getColumnNumber());
     QString s=validTextUnderCursor().trimmed();
-    //std::cout<<s.toAscii().data()<<std::endl;
+    //std::cout<<s.toLatin1().data()<<std::endl;
     if (currentTextUnderCursor!=s) {
         currentTextUnderCursor=s;
         emit wordUnderCursorChanged(s);
@@ -438,7 +438,7 @@ void QFCompleterTextEditWidget::processTab(QKeyEvent *e) {
                         QString curChar=cc.selectedText();
                         if (curChar=="{") cnt--;
                         if (curChar=="}") cnt++;
-                        //std::cout<<"'"<<(char*)curChar.toAscii().data()<<"'  cnt="<<cnt<<"  pos="<<pos<<std::endl;
+                        //std::cout<<"'"<<(char*)curChar.toLatin1().data()<<"'  cnt="<<cnt<<"  pos="<<pos<<std::endl;
                         pos--;
                     }
                     // here we found the matching '{' and count its leading spaces
@@ -599,7 +599,7 @@ QString QFCompleterTextEditWidget::removeComments(QString t) {
     int pos1=0;
     int i=0;
     while (i<t.size() && t[i].isSpace()) {
-        //std::cout<<i<<"/"<<t.size()<<":  '"<<t[i].toAscii()<<"'"<<std::endl;
+        //std::cout<<i<<"/"<<t.size()<<":  '"<<t[i].toLatin1()<<"'"<<std::endl;
         i++;
     }
     QString t1=t.right(t.size()-i);
@@ -627,7 +627,7 @@ void QFCompleterTextEditWidget::uncomment(){
         c1.beginEditBlock();
         while (c1.blockNumber() <= c2.blockNumber()) {
             c1.select(QTextCursor::BlockUnderCursor);
-            //std::cout<<"'"<<c1.selectedText().toAscii().data()<<"'  =>  '"<<removeComments(c1.selectedText()).toAscii().data()<<"'"<<std::endl;
+            //std::cout<<"'"<<c1.selectedText().toLatin1().data()<<"'  =>  '"<<removeComments(c1.selectedText()).toLatin1().data()<<"'"<<std::endl;
             c1.insertText(removeComments(c1.selectedText()));
             if (!c1.movePosition(QTextCursor::NextBlock))
                 break;

@@ -30,8 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 
-// USB functions
-#include <usb.h>
+
 
 
 

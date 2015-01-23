@@ -57,7 +57,12 @@ void UserFitFunctionModel::loadSettings(QSettings &settings)
         itm.inc=settings.value(grp+"inc", 1.0).toDouble(&ok);
         items.append(itm);
     }
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 void UserFitFunctionModel::storeSettings(QSettings &settings) const
@@ -96,7 +101,12 @@ QVector<double> UserFitFunctionModel::getInitParams() const
 void UserFitFunctionModel::deleteParameter(int idx)
 {
     if (idx>=0 && idx<items.size()) items.removeAt(idx);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 void UserFitFunctionModel::addParameter()
@@ -119,25 +129,45 @@ void UserFitFunctionModel::addParameter()
     itm.inc=1;
     itm.type="float";
     items.append(itm);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 void UserFitFunctionModel::clear()
 {
     items.clear();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 void UserFitFunctionModel::moveUp(int idx)
 {
     if (idx>0) items.swap(idx, idx-1);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 void UserFitFunctionModel::moveDown(int idx)
 {
     if (idx<items.size()-1) items.swap(idx, idx+1);
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 QStringList UserFitFunctionModel::getIDs() const

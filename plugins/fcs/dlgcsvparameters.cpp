@@ -104,9 +104,9 @@ void dlgCSVParameters::checkValues() {
         } else edtComment->setPalette(QPalette());
     } else {
         QString s=edtColumn->text();
-        column_separator=(s.size()>0)?s[0].toAscii():',';
+        column_separator=(s.size()>0)?s[0].toLatin1():',';
         s=edtComment->text();
-        comment_start=(s.size()>0)?s[0].toAscii():'#';
+        comment_start=(s.size()>0)?s[0].toLatin1():'#';
         startswith=edtStartswith->text();
         endswith=edtEndsWith->text();
         timefactor=edtTimefactor->text().toDouble();

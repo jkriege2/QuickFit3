@@ -38,6 +38,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 class QFEPlotterExporterCairo : public QObject, public QFExtensionBase {
         Q_OBJECT
         Q_INTERFACES(QFExtension)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFEPlotterExporterCairo")
+#endif
+
     public:
         /** Default constructor */
         QFEPlotterExporterCairo(QObject* parent=NULL);

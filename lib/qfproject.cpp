@@ -1588,7 +1588,9 @@ bool QFProject::rdrResultsSaveToCSV(const QString& evalFilter, const QString &fi
     if (of.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream out(&of);
         QTextCodec* c=QTextCodec::codecForName("ISO-8859-1");
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
         if (c==NULL) c=QTextCodec::codecForCStrings();
+#endif
         if (c==NULL) c=QTextCodec::codecForLocale();
         out.setCodec(c);
         out<<dat;
@@ -1827,7 +1829,9 @@ bool QFProject::rdrResultsSaveToSYLK(const QString &evalFilter, const QString &f
     if (of.open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream out(&of);
         QTextCodec* c=QTextCodec::codecForName("ISO-8859-1");
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
         if (c==NULL) c=QTextCodec::codecForCStrings();
+#endif
         if (c==NULL) c=QTextCodec::codecForLocale();
         out.setCodec(c);
         out<<dat;

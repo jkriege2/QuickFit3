@@ -29,8 +29,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
  * methods and functions, that are not part of a class
  **************************************************************************************************************************/
 void FLEX_analyze(QString filename, QString& mode, unsigned int& channelCount, unsigned int& runCount, bool& crossCorrelation, bool& autoCorrelation) {
-    FILE* FLEX_file=fopen(filename.toAscii().data(), "r");
-    if (ferror(FLEX_file)) throw FLEX_exception(format("error while opening file '%s':\n  %s", filename.toAscii().data(), strerror(errno)));
+    FILE* FLEX_file=fopen(filename.toLatin1().data(), "r");
+    if (ferror(FLEX_file)) throw FLEX_exception(format("error while opening file '%s':\n  %s", filename.toLatin1().data(), strerror(errno)));
     bool readingHeader=true;
     runCount=1;
     crossCorrelation=false;
@@ -295,8 +295,8 @@ void FLEX_readFile(QString filename, FLEX_DATA &data)
     FLEX_analyze(filename, data.mode, data.channelCount, data.runCount, data.crossCorrelation, data.autoCorrelation);
 
 
-    FILE* FLEX_file=fopen(filename.toAscii().data(), "r");
-    if (ferror(FLEX_file)) throw FLEX_exception(format("error while opening file '%s':\n  %s", filename.toAscii().data(), strerror(errno)));
+    FILE* FLEX_file=fopen(filename.toLatin1().data(), "r");
+    if (ferror(FLEX_file)) throw FLEX_exception(format("error while opening file '%s':\n  %s", filename.toLatin1().data(), strerror(errno)));
     FLEX_TOKEN token=FLEX_getToken(FLEX_file);
 
     QString currentGroup="";

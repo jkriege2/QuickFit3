@@ -117,11 +117,11 @@ void QFDlgCSVParameters::checkValues(bool doAccept) {
         } else ui->edtHeader->setPalette(QPalette());
     } else {
         QString s=ui->edtColumn->text();
-        column_separator=(s.size()>0)?s[0].toAscii():',';
+        column_separator=(s.size()>0)?s[0].toLatin1():',';
         s=ui->edtDecimal->text();
-        decimal_separator=(s.size()>0)?s[0].toAscii():'.';
+        decimal_separator=(s.size()>0)?s[0].toLatin1():'.';
         s=ui->edtComment->text();
-        comment_start=(s.size()>0)?s[0].toAscii():'#';
+        comment_start=(s.size()>0)?s[0].toLatin1():'#';
         header_start=ui->edtHeader->text();
 
         if (doAccept) accept();

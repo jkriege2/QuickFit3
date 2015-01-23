@@ -39,6 +39,10 @@ class QFPFitFunctions2FFCS : public QObject, public QFPluginFitFunction, public 
         Q_OBJECT
         Q_INTERFACES(QFPluginFitFunction QFFitFunctionConfigForGlobalFitInterface)
         Q_INTERFACES(QFPlugin)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFPFitFunctions2FFCS")
+#endif
+
     public:
 
         /** Default constructor */

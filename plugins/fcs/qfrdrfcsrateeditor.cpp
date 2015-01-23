@@ -32,7 +32,12 @@ QFRDRFCSRateEditor::runsModel::runsModel(QObject* parent):
 
 void QFRDRFCSRateEditor::runsModel::setCurrent(QFRawDataRecord* current) {
     this->current=current;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 };
 QVariant QFRDRFCSRateEditor::runsModel::data(const QModelIndex &index, int role) const {
     if (!current || !index.isValid()) return QVariant();

@@ -406,8 +406,8 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
                     getAdditionalCameraSettings(ecamera, camera, acquisitionDescriptionPrefix, (*acquisitionDescription), getMeasurements);
 
                 }
-                QDir().mkpath(QFileInfo(TIFFFIlename.toAscii().data()).absolutePath());
-                tiff=TIFFOpen(TIFFFIlename.toAscii().data(), "w");
+                QDir().mkpath(QFileInfo(TIFFFIlename.toLatin1().data()).absolutePath());
+                tiff=TIFFOpen(TIFFFIlename.toLatin1().data(), "w");
                 if (!tiff) {
                     ok=false;
                 } else {
@@ -422,7 +422,7 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
                     }
                 }
                 if (ok && is32bit) {
-                    tiff=TIFFOpen(TIFFFIlename32.toAscii().data(), "w");
+                    tiff=TIFFOpen(TIFFFIlename32.toLatin1().data(), "w");
                     if (!tiff) {
                         ok=false;
                     } else {
@@ -438,8 +438,8 @@ bool QFESPIMB040MainWindow2::savePreview(QFExtension* extension, QFExtensionCame
             }
         } else if (frames>=2) {
 
-            QDir().mkpath(QFileInfo(TIFFFIlename.toAscii().data()).absolutePath());
-            tiff=TIFFOpen(TIFFFIlename.toAscii().data(), "w");
+            QDir().mkpath(QFileInfo(TIFFFIlename.toLatin1().data()).absolutePath());
+            tiff=TIFFOpen(TIFFFIlename.toLatin1().data(), "w");
             if (tiff) {
                 ok=true;
                 bool is32bit=false;
@@ -870,9 +870,9 @@ void QFESPIMB040MainWindow2::savePreviewMovie(int camera, int frames, const QStr
 
         QFileInfo fi(fileName);
         QString fn=fi.absolutePath()+"/"+fi.completeBaseName();
-        TIFF* tiff1=TIFFOpen(QString(fn+".tif").toAscii().data(), "w");
-        TIFF* tiff2=TIFFOpen(QString(fn+"_uint32.tif").toAscii().data(), "w");
-        TIFF* tiff3=TIFFOpen(QString(fn+"_float.tif").toAscii().data(), "w");
+        TIFF* tiff1=TIFFOpen(QString(fn+".tif").toLatin1().data(), "w");
+        TIFF* tiff2=TIFFOpen(QString(fn+"_uint32.tif").toLatin1().data(), "w");
+        TIFF* tiff3=TIFFOpen(QString(fn+"_float.tif").toLatin1().data(), "w");
         uint64_t timestamp=0;
         QMap<QString, QVariant> camConfig;
         QList<double> times;

@@ -589,7 +589,9 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     tvResults->setItemDelegate(new QFHTMLDelegate(tvResults));
     QFontMetrics fm(d->font());
     tvResults->verticalHeader()->setDefaultSectionSize((int)round((double)fm.height()*1.5));
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
     tvResults->verticalHeader()->setResizeMode(QHeaderView::Interactive);
+#endif
     tvResults->verticalHeader()->setTextElideMode(Qt::ElideMiddle);
     tvResults->verticalHeader()->setMaximumWidth(QApplication::desktop()->screenGeometry(QApplication::desktop()->primaryScreen()).width()*0.75);
 

@@ -42,6 +42,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionCamera, public QFExtensionMeasurementAndControlDevice {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionCamera QFExtensionMeasurementAndControlDevice)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFECamServer")
+#endif
+
     public:
         /** Default constructor */
         QFECamServer(QObject* parent=NULL);

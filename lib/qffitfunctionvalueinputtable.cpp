@@ -60,9 +60,9 @@ QFFitFunctionValueInputTable::~QFFitFunctionValueInputTable()
     if (this->ownsFitFunction && this->fitfunction) delete this->fitfunction;
 }
 
-void QFFitFunctionValueInputTable::setWriteToFitParamBasic(QFFitParameterBasicInterface *interface)
+void QFFitFunctionValueInputTable::setWriteToFitParamBasic(QFFitParameterBasicInterface *interface_)
 {
-    item=interface;
+    item=interface_;
     datavector=NULL;
     rownames.clear();
     if (this->ownsFitFunction && this->fitfunction) delete this->fitfunction;
@@ -605,7 +605,12 @@ bool QFFitFunctionValueInputTable::checkRebuildModel(bool alwaysreset)
     }
     if (ok || alwaysreset) {
         recalculateFitParameters(false, false);
+    #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        beginResetModel();
+        endResetModel();
+    #else
         reset();
+    #endif
     } else {
         recalculateFitParameters(true, true);
     }

@@ -74,7 +74,14 @@ void QFRDRPropertyModel::updateModel(bool doReset)
 {
     props=record->getVisibleProperties();
     qSort(props.begin(), props.end(), QFRDRPropertyModel_caseInsensitiveLessThan);
-    if (doReset) reset();
+    if (doReset) {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
+    reset();
+#endif
+    }
 }
 
 void QFRDRPropertyModel::init(QFRawDataRecord* record) {
@@ -131,7 +138,12 @@ bool QFRDRPropertyModel::setData(const QModelIndex &idx, const QVariant &value, 
                     if (ok) {
                         record->setQFProperty(newname, val);
                         record->deleteProperty(oldname);
+                    #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+                        beginResetModel();
+                        endResetModel();
+                    #else
                         reset();
+                    #endif
                     }
                 }
             }

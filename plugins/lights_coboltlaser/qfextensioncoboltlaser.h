@@ -46,6 +46,10 @@
 class QFExtensionCoboltLaser : public QObject, public QFExtensionBase, public QFExtensionLightSource, public QFExtensionMeasurementAndControlDevice {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionLightSource QFExtensionMeasurementAndControlDevice)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFExtensionCoboltLaser")
+#endif
+
     public:
         /** Default constructor */
         QFExtensionCoboltLaser(QObject* parent=NULL);

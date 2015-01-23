@@ -85,7 +85,12 @@ QFTablePluginExpressionsModel::QFTablePluginExpressionsModel(QFTablePluginModel 
     QAbstractTableModel(parent)
 {
     this->model=model;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 Qt::ItemFlags QFTablePluginExpressionsModel::flags(const QModelIndex &index) const

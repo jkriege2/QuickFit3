@@ -29,8 +29,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
  * methods and functions, that are not part of a class
  **************************************************************************************************************************/
 void ALV7_analyze(QString filename, QString& mode, unsigned int& channelCount, unsigned int& runCount, bool& crossCorrelation, bool& autoCorrelation, int& inputchannels, int& firstchannel, int *corrColumns) {
-    FILE* alv_file=fopen(filename.toAscii().data(), "r");
-    if (ferror(alv_file)) throw ALV7_exception(format("error while opening file '%s':\n  %s", filename.toAscii().data(), strerror(errno)));
+    FILE* alv_file=fopen(filename.toLatin1().data(), "r");
+    if (ferror(alv_file)) throw ALV7_exception(format("error while opening file '%s':\n  %s", filename.toLatin1().data(), strerror(errno)));
     bool readingHeader=true;
     //bool isCorrelation=false;
     //bool isCounRate=false;
@@ -58,7 +58,7 @@ void ALV7_analyze(QString filename, QString& mode, unsigned int& channelCount, u
                 QString value="";
                 // get next token which has to be a colon':'
                 token=ALV7_getToken(alv_file, readingHeader);
-                //if (token.type!=ALV_COLON) throw ALV7_exception(format("colon ':' expected, but found '%s'", token.value.toAscii().data()));
+                //if (token.type!=ALV_COLON) throw ALV7_exception(format("colon ':' expected, but found '%s'", token.value.toLatin1().data()));
                 if (token.type==ALV7_COLON) {
                     // get next token which has to be a value or a quoted string or a linebreak
                     token=ALV7_getToken(alv_file, readingHeader);

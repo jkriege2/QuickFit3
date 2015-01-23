@@ -867,7 +867,12 @@ void QFHistogramView::saveReport()
 
     QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
                                 currentSaveDirectory,
-                                tr("PDF File (*.pdf);;PostScript File (*.ps);;Open Document file (*.odf);;HTML file (*.html)"));
+                                          #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+                                              tr("PDF File (*.pdf);;PostScript File (*.ps);;Open Document file (*.odf);;HTML file (*.html)"));
+                                          #else
+                                              tr("PDF File (*.pdf);;Open Document file (*.odf);;HTML file (*.html)"));
+                                          #endif
+
 
 
     if (!fn.isEmpty()) {
@@ -893,7 +898,9 @@ void QFHistogramView::saveReport()
         QTextCursor cur(doc);
         writeReport(cur, doc);
         if (fi.suffix().toLower()=="ps" || fi.suffix().toLower()=="pdf") {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
             if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
+#endif
             printer->setColorMode(QPrinter::Color);
             printer->setOutputFileName(fn);
             doc->print(printer);

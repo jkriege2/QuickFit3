@@ -104,7 +104,7 @@ QVector<double> csvReadline(QTextStream& f, QChar separator_char, QChar comment_
     //for (int i=0; i<line.size(); i++) {
     for (QString::const_iterator i=line.begin(); i!=line.end(); ++i) {
         const QChar ch=*i;//line[i];
-        const char cc=ch.toAscii();
+        const char cc=ch.toLatin1();
         if (!isComment) {
             switch(cc) {
 

@@ -25,6 +25,10 @@ class MulticontrolStage : public QObject, public QFExtensionBase, public QFExten
 {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionLinearStage)// QFExtensionLinearStage)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.MulticontrolStage")
+#endif
+
     public:
         /** Default constructor */
         MulticontrolStage(QObject* parent=NULL);

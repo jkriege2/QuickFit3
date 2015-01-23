@@ -97,27 +97,27 @@ bool CamAndorAcquisitionThread::init(int camera, QString filenamePrefix, int fil
         // set spooling for those formats with spooling ... depending on the value of the member spooling
         // the methid run() will execute different code!
         if (fileformat==1) { // TIFF (spooling)
-            CHECK(SetSpool(1, 7, filenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
+            CHECK(SetSpool(1, 7, filenamePrefix.toLatin1().data(), 100), tr("error while enabling spooling mode"));
             outputFilenameTypes.append("TIFF16");
             outputFilenames.append(filenamePrefix+".tif");
             spooling = true;
         } else if (fileformat==2) { // Andor SIF (spooling)
-            CHECK(SetSpool(1, 6, filenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
+            CHECK(SetSpool(1, 6, filenamePrefix.toLatin1().data(), 100), tr("error while enabling spooling mode"));
             outputFilenameTypes.append("AndorSIF");
             outputFilenames.append(filenamePrefix+".sif");
             spooling = true;
         } else if (fileformat==3) { // FITS (spooling)
-            CHECK(SetSpool(1, 5, filenamePrefix.toAscii().data(), 100), tr("error while enabling spooling mode"));
+            CHECK(SetSpool(1, 5, filenamePrefix.toLatin1().data(), 100), tr("error while enabling spooling mode"));
             outputFilenameTypes.append("FITS");
             outputFilenames.append(filenamePrefix+".fits");
             spooling = true;
         } else { // make sure spooling is switched off
-            CHECK(SetSpool(0, 7, filenamePrefix.toAscii().data(), 100), tr("error while disabling spooling mode"));
+            CHECK(SetSpool(0, 7, filenamePrefix.toLatin1().data(), 100), tr("error while disabling spooling mode"));
             if (fileformat==0) { // TIFF
                 outputFilenameTypes.append("TIFF16");
                 QString filename=filenamePrefix+".tif";
                 outputFilenames.append(filename);
-                tiff=TinyTIFFWriter_open(filename.toAscii().data(), 16, m_width, m_height);
+                tiff=TinyTIFFWriter_open(filename.toLatin1().data(), 16, m_width, m_height);
                 if (!tiff) {
                     emit log_error(tr("\n%1    could not open TIFF file '%2'").arg(m_log_prefix).arg(filename));
                     return false;

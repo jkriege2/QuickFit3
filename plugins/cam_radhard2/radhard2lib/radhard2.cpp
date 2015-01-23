@@ -1,7 +1,10 @@
 // RADHARD2.CPP
 // The main system abstractor.
-
+#ifdef interface
+#  undef interface
+#endif
 #include "radhard2.h"
+#include <usb.h>         // Main header file of the libusb library.
 
 using namespace std;
 

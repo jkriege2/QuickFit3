@@ -78,7 +78,7 @@ bool QFFitFunctionGeneralDblExp::estimateInitial(double *params, const double *d
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {
 
-        StatisticsScopedPointer<double> dY=statisticsDuplicateAndApply(dataY, N, log);
+        StatisticsScopedPointer<double> dY(statisticsDuplicateAndApply(dataY, N, log));
 
 
         double a=log(params[PARAM_AMPLITUDE]);

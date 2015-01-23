@@ -13,6 +13,7 @@
 #include <QObject>
 #include <QVector>
 #include<QtGlobal>
+#include <QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets>
 #else
@@ -47,6 +48,9 @@ class AlvAutocorrelator : public QObject, public QFExtensionBase, public QFExten
 {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionAcquisition)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.AlvAutocorrelator")
+#endif
 
     public:
         /** Default constructor */

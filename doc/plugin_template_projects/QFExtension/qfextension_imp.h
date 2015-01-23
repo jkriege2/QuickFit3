@@ -38,6 +38,9 @@ Copyright (c) 2014
 class QFExtensionImplementation : public QObject, public QFExtensionBase {
         Q_OBJECT
         Q_INTERFACES(QFExtension)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFExtensionImplementation")
+#endif	
     public:
         /** Default constructor */
         QFExtensionImplementation(QObject* parent=NULL);

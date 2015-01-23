@@ -45,7 +45,6 @@
 #include "qftools.h"
 #include <cmath>
 #include <QtCore>
-#include <QTextIStream>
 #include <QTextStream>
 
 #include <QList>

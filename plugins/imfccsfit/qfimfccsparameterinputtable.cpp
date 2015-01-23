@@ -532,7 +532,14 @@ bool QFImFCCSParameterInputTable::checkRebuildModel(bool alwaysreset)
         emit modelRebuilt();
         ok=true;
     }
-    if (ok || alwaysreset) reset();
+    if (ok || alwaysreset) {
+    #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        beginResetModel();
+        endResetModel();
+    #else
+        reset();
+    #endif
+    }
     //qDebug()<<"QFImFCCSParameterInputTable::checkRebuildModel() "<<rebuildCount<<": done "<<t.elapsed()<<"ms    =>"<<ok;
 
     return ok;

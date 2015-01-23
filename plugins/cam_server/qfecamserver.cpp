@@ -181,7 +181,7 @@ QVariant QFECamServer::getMeasurementDeviceValue(unsigned int measurementDevice,
 
             if (sources[measurementDevice].hasInstSingleParameterGet) {
                 bool ok=false;
-                QList<QByteArray> bal=queryData(sources[measurementDevice], QByteArray("PARAMETER_GET\n")+sources[measurementDevice].params[value].id.toAscii()+QByteArray("\n\n"), 1, "\n\n", &ok, true);
+                QList<QByteArray> bal=queryData(sources[measurementDevice], QByteArray("PARAMETER_GET\n")+sources[measurementDevice].params[value].id.toLatin1()+QByteArray("\n\n"), 1, "\n\n", &ok, true);
                 if (ok && bal.size()>0) {
                     bal=bal[0].split('\n');
                     for (int i=0; i<bal.size(); i++) {
@@ -276,7 +276,7 @@ void QFECamServer::setMeasurementDeviceValue(unsigned int measurementDevice, uns
             QMutex* mutex=sources[measurementDevice].mutex;
             QMutexLocker locker(mutex);
 
-            bool ok=sendCommand(sources[measurementDevice], QByteArray("PARAMETERS_SET\n")+sources[measurementDevice].params[value].id.toAscii()+QByteArray(";")+getQVariantData(data).toAscii()+QByteArray("\n\n"));
+            bool ok=sendCommand(sources[measurementDevice], QByteArray("PARAMETERS_SET\n")+sources[measurementDevice].params[value].id.toLatin1()+QByteArray(";")+getQVariantData(data).toLatin1()+QByteArray("\n\n"));
             if (!ok) {
                 log_error(tr("error setting parameter '%4' (timeout: %3s):\n%1     new value:         '%5'!\n%1     error description: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id).arg(getQVariantData(data)));
             }

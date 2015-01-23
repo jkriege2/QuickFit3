@@ -796,7 +796,7 @@ bool QFRDRImagingFCSData::loadOverview(double* overviewF, double* overviewF2, co
 
     //qDebug()<<getID()<<"loadedOverview "<<filename;
     if (QFile::exists(filename)) {
-        TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
+        TIFF* tif=TIFFOpen(filename.toLatin1().data(), "r");
         if (tif) {
             uint32 nx,ny;
             TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
@@ -855,7 +855,7 @@ bool QFRDRImagingFCSData::loadImage(const QString& filename, double** data, int*
     *height=0;
 
     if (QFile::exists(filename)) {
-        TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
+        TIFF* tif=TIFFOpen(filename.toLatin1().data(), "r");
         if (tif) {
             uint32 nx,ny;
             TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
@@ -895,7 +895,7 @@ bool QFRDRImagingFCSData::loadVideo(const QString& filename, double** data, int*
     *frames=0;
 
     if (QFile::exists(filename)) {
-        TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
+        TIFF* tif=TIFFOpen(filename.toLatin1().data(), "r");
         if (tif) {
             *frames=TIFFCountDirectories(tif);
             uint32 nx,ny;

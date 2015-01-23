@@ -43,6 +43,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase, public QFExtensionTool, public QFExtensionReportingTool, public QFPluginOptionsDialogInterface {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionTool QFExtensionReportingTool QFPluginOptionsDialogInterface)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFEDiffusionCoefficientCalculator")
+#endif
+
     public:
         /** Default constructor */
         QFEDiffusionCoefficientCalculator(QObject* parent=NULL);

@@ -40,6 +40,10 @@ class QFETCSPCImporterDialog; // forward
 class QFETCSPCImporter : public QObject, public QFExtensionBase {
         Q_OBJECT
         Q_INTERFACES(QFExtension)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFETCSPCImporter")
+#endif
+
     public:
         /** Default constructor */
         QFETCSPCImporter(QObject* parent=NULL);

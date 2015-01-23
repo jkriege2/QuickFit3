@@ -75,7 +75,7 @@ inline bool operator>=(const QTriple<T1, T2, T3> &p1, const QTriple<T1, T2, T3> 
 }
 
 template <class T1, class T2, class T3>
-QTriple<T1, T2, T3> qMakeTriple(const T1 &x, const T2 &y, const T3 &z)
+inline QTriple<T1, T2, T3> qMakeTriple(const T1 &x, const T2 &y, const T3 &z)
 {
     return QTriple<T1, T2, T3>(x, y, z);
 }

@@ -29,8 +29,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
  * methods and functions, that are not part of a class
  **************************************************************************************************************************/
 void ALV_analyze(QString filename, QString& mode, unsigned int& channelCount, unsigned int& runCount, bool& crossCorrelation) {
-    FILE* alv_file=fopen(filename.toAscii().data(), "r");
-    if (ferror(alv_file)) throw alv_exception(format("error while opening file '%s':\n  %s", filename.toAscii().data(), strerror(errno)));
+    FILE* alv_file=fopen(filename.toLatin1().data(), "r");
+    if (ferror(alv_file)) throw alv_exception(format("error while opening file '%s':\n  %s", filename.toLatin1().data(), strerror(errno)));
     bool readingHeader=true;
     //bool isCorrelation=false;
     //bool isCounRate=false;
@@ -54,7 +54,7 @@ void ALV_analyze(QString filename, QString& mode, unsigned int& channelCount, un
                 QString value="";
                 // get next token which has to be a colon':'
                 token=ALV_getToken(alv_file, readingHeader);
-                //if (token.type!=ALV_COLON) throw alv_exception(format("colon ':' expected, but found '%s'", token.value.toAscii().data()));
+                //if (token.type!=ALV_COLON) throw alv_exception(format("colon ':' expected, but found '%s'", token.value.toLatin1().data()));
                 if (token.type==ALV_COLON) {
                     // get next token which has to be a value or a quoted string or a linebreak
                     token=ALV_getToken(alv_file, readingHeader);

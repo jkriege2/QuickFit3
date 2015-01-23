@@ -21,7 +21,7 @@
 
 
 
-#include <QtCore/QtGlobal>
+#include <QtGlobal>
 
 #ifndef QFLIB_TEST
 #  if defined(QFLIB_LIBRARY)

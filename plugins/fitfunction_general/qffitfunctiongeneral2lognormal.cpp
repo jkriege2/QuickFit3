@@ -89,7 +89,7 @@ void QFFitFunctionGeneral2LogNormal::evaluateDerivatives(double* derivatives, do
 bool QFFitFunctionGeneral2LogNormal::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
 {
     if (params && dataX && dataY) {
-        StatisticsScopedPointer<double> dX=statisticsDuplicateAndApply(dataX, N, log);
+        StatisticsScopedPointer<double> dX(statisticsDuplicateAndApply(dataX, N, log));
         double pW=0;
         double pB=0;
         double pH=0;

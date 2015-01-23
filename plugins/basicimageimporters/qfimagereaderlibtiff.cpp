@@ -89,7 +89,7 @@ bool QFImageReaderLIBTIFF::open(QString filename) {
     fileinfo.init(filename);
     //TIFFSetWarningHandler(0);
     //qDebug()<<"QFImageReaderLIBTIFF::open("<<filename<<")     tif="<<tif;
-    tif = TIFFOpen(filename.toAscii().data(),"r");
+    tif = TIFFOpen(filename.toLatin1().data(),"r");
     if (tif) {
         uint32 nx,ny;
         TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);

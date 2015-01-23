@@ -27,6 +27,9 @@
 #include <QTextDocument>
 #include <QMenu>
 #include <QToolBar>
+#include <QPrinter>
+#include <QPrintDialog>
+#include <QPrinterInfo>
 
 /*! \brief this class extends the QTableView
     \ingroup qf3lib_widgets

@@ -29,9 +29,12 @@
 #include "qfespimb040opticssetup.h"
 #include <typeinfo>
 #include "qfmathtools.h"
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QPrinter>
+#include <QPrinterInfo>
+#include <QPrintDialog>
+#include <QPrintPreviewDialog>
 #include <QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets>
 #else
 #include <QtGui>
@@ -2257,7 +2260,11 @@ void QFESPIMB040CameraView::saveReport() {
 
     QString fn = qfGetSaveFileName(this, tr("Save Report"),
                                 lastImagepath,
-                                tr("PDF File (*.pdf);;PostScript File (*.ps)"));
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+                                   tr("PDF File (*.pdf);;PostScript File (*.ps)"));
+#else
+                                    tr("PDF File (*.pdf)"));
+#endif
 
     if (!fn.isEmpty()) {
         lastImagepath=QFileInfo(fn).absolutePath();
@@ -2270,7 +2277,9 @@ void QFESPIMB040CameraView::saveReport() {
         printer->setOrientation(QPrinter::Portrait);
         printer->setOutputFormat(QPrinter::PdfFormat);
         printer->setColorMode(QPrinter::Color);
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
         if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
+#endif
         printer->setColorMode(QPrinter::Color);
         printer->setOutputFileName(fn);
         QTextDocument* doc=new QTextDocument();

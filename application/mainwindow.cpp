@@ -50,13 +50,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
 
-#if defined(Q_OS_WIN)
-extern Q_CORE_EXPORT void qWinMsgHandler(QtMsgType t, const char* str);
-#endif
 
-
-void myMessageOutput(QtMsgType type, const char *msg)
- {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+void myMessageOutputQt5(QtMsgType type, const QMessageLogContext &context, const QString &msg){
     QString m=msg;
     while (m.startsWith('\n') && m.size()>0) {
         m=m.remove(0,1);
@@ -80,12 +76,51 @@ void myMessageOutput(QtMsgType type, const char *msg)
     }
 
     #if defined(Q_OS_WIN)
-     qWinMsgHandler(type, msg);
+     //qWinMsgHandler(type, m.toLocal8Bit().data());
     #else
      //qt_message_output(type, msg);
     #endif
     if (type==QtFatalMsg) abort();
  }
+#else
+#if defined(Q_OS_WIN)
+extern Q_CORE_EXPORT void qWinMsgHandler(QtMsgType t, const char* str);
+#endif
+
+void myMessageOutput(QtMsgType type, const char *msg)
+{
+   QString m=msg;
+   while (m.startsWith('\n') && m.size()>0) {
+       m=m.remove(0,1);
+   }
+   if (appLogFileQDebugWidget) {
+        switch (type) {
+        case QtDebugMsg:
+            appLogFileQDebugWidget->log_text_linebreak_queue(m);
+            break;
+        case QtWarningMsg:
+            appLogFileQDebugWidget->log_warning_linebreak_queue(m);
+            break;
+        case QtCriticalMsg:
+            appLogFileQDebugWidget->log_error_linebreak_queue(m);
+            break;
+        case QtFatalMsg:
+            appLogFileQDebugWidget->log_error_linebreak_queue(QObject::tr("FATAL ERROR: %1\n   APPLICATION WILL BE CLOSED/ABORTED!").arg(m));
+            //abort();
+            break;
+        }
+   }
+
+   #if defined(Q_OS_WIN)
+    qWinMsgHandler(type, m.toLocal8Bit().data());
+   #else
+    //qt_message_output(type, msg);
+   #endif
+   if (type==QtFatalMsg) abort();
+}
+
+#endif
+
 
 MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     QMainWindow(NULL)
@@ -645,12 +680,12 @@ void MainWindow::about() {
     QDialog *widget = new QDialog(this);
     Ui::About ui;
     ui.setupUi(widget);
-    QTextBrowser* ui_textEdit = qFindChild<QTextBrowser*>(widget, "edtInfo");
-    QTextBrowser* ui_releasenotes = qFindChild<QTextBrowser*>(widget, "edtReleaseNotes");
-    QTextBrowser* ui_license = qFindChild<QTextBrowser*>(widget, "edtLicense");
-    QTextBrowser* ui_citing = qFindChild<QTextBrowser*>(widget, "edtCiting");
-    QLabel* ui_label = qFindChild<QLabel*>(widget, "labSplash");
-    QLabel* ui_labelLic = qFindChild<QLabel*>(widget, "labLicense");
+    QTextBrowser* ui_textEdit = widget->findChild<QTextBrowser*>( "edtInfo");
+    QTextBrowser* ui_releasenotes =  widget->findChild<QTextBrowser*>( "edtReleaseNotes");
+    QTextBrowser* ui_license =  widget->findChild<QTextBrowser*>( "edtLicense");
+    QTextBrowser* ui_citing =  widget->findChild<QTextBrowser*>( "edtCiting");
+    QLabel* ui_label =  widget->findChild<QLabel*>( "labSplash");
+    QLabel* ui_labelLic =  widget->findChild<QLabel*>( "labLicense");
     ui_label->setPixmap(splashPix);
     ui_textEdit->setText(tr("<b>Copyright:</b><blockquote>%3</blockquote>"
                             "<b>many thanks to:</b><blockquote>%2</blockquote>"
@@ -1291,7 +1326,7 @@ void MainWindow::aboutPlugins() {
     QDialog *widget = new QDialog(this);
     Ui::AboutPlugins ui;
     ui.setupUi(widget);
-    QTextEdit* ui_textEdit = qFindChild<QTextEdit*>(widget, "edtInfo");
+    QTextEdit* ui_textEdit = widget->findChild<QTextEdit*>( "edtInfo");
 
     QString text=createPluginDoc(false);
 
@@ -1869,8 +1904,14 @@ void MainWindow::readSettings() {
     }
     logFileQDebugWidget->setVisible(settings->debugLogVisible());
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    if (settings->debugLogVisible()) qInstallMessageHandler(myMessageOutputQt5);
+    else qInstallMessageHandler(0);
+#else
     if (settings->debugLogVisible()) qInstallMsgHandler(myMessageOutput);
     else qInstallMsgHandler(0);
+#endif
+
 
     extensionManager->readPluginSettings(settings);
 
@@ -4692,7 +4733,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                             QString dir=QFPluginServices::getInstance()->getExtensionManager()->getPluginHelp(id);
                             QString name=QFPluginServices::getInstance()->getExtensionManager()->getName(id);
                             QString icon=QFPluginServices::getInstance()->getExtensionManager()->getIconFilename(id);
-                            if (filter.isEmpty() || ((!filter.isEmpty()) && (QFPluginServices::getInstance()->getExtensionManager()->getQObjectInstance(id)->inherits(filter.toAscii().data())))) {
+                            if (filter.isEmpty() || ((!filter.isEmpty()) && (QFPluginServices::getInstance()->getExtensionManager()->getQObjectInstance(id)->inherits(filter.toLatin1().data())))) {
                                 if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
                                 else text+=item_template_nolink.arg(icon).arg(name);
                             }

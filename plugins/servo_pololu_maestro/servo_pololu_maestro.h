@@ -45,6 +45,10 @@
 class QFExtensionServoPololuMaestro : public QObject, public QFExtensionBase, public QFExtensionShutter, public QFPluginLogService, public QFExtensionFilterChanger {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionShutter QFPluginLogService QFExtensionFilterChanger)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFExtensionServoPololuMaestro")
+#endif
+
     public:
         /** Default constructor */
         QFExtensionServoPololuMaestro(QObject* parent=NULL);

@@ -24,6 +24,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include <QWidget>
 #include <QPointer>
+#include <QPrinter>
+#include <QPrintDialog>
 
 class QFRDRImageStackData; // forward
 

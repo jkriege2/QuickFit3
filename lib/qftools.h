@@ -28,7 +28,12 @@
 #include <cfloat>
 #include <stdint.h>
 #include <QSettings>
-#include <QWidget>
+#include <QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets>
+#else
+#include <QtGui>
+#endif
 #include <QDomDocument>
 #include <QSplitter>
 #include <QFile>
@@ -643,7 +648,7 @@ QFLIB_EXPORT QColor getCycleColor(int value, unsigned int max, double S=1.0, dou
     This copies the input list to the return argument omitting all duplicates. This should have complexity \f$ \mathcal{O}(N^2) \f$ but preserves the sorting order!
 */
 template <class T>
-QList<T> removeQListDouplicates(const QList<T>& list) {
+inline QList<T> removeQListDouplicates(const QList<T>& list) {
     QList<T> out;
     for (int i=0; i<list.size(); i++) {
         if (out.indexOf(list[i])<0) out<<list[i];
@@ -656,7 +661,7 @@ QList<T> removeQListDouplicates(const QList<T>& list) {
     \ingroup qf3lib_tools
 */
 template <class T>
-QList<T> constructQListWithMultipleItems(const T& item, int N=1) {
+inline QList<T> constructQListWithMultipleItems(const T& item, int N=1) {
     QList<T> out;
     for (int i=0; i<N; i++) {
         out<<item;
@@ -668,7 +673,7 @@ QList<T> constructQListWithMultipleItems(const T& item, int N=1) {
     \ingroup qf3lib_tools
 */
 template <class T>
-QList<T> constructQListFromItems(const T& item1) {
+inline QList<T> constructQListFromItems(const T& item1) {
     QList<T> out;
     out<<item1;
     return out;
@@ -678,7 +683,7 @@ QList<T> constructQListFromItems(const T& item1) {
     \ingroup qf3lib_tools
 */
 template <class T>
-QList<T> constructQListFromItems(const T& item1, const T& item2) {
+inline QList<T> constructQListFromItems(const T& item1, const T& item2) {
     QList<T> out;
     out<<item1<<item2;
     return out;
@@ -687,7 +692,7 @@ QList<T> constructQListFromItems(const T& item1, const T& item2) {
     \ingroup qf3lib_tools
 */
 template <class T>
-QList<T> constructQListFromItems(const T& item1, const T& item2, const T& item3) {
+inline QList<T> constructQListFromItems(const T& item1, const T& item2, const T& item3) {
     QList<T> out;
     out<<item1<<item2<<item3;
     return out;
@@ -697,7 +702,7 @@ QList<T> constructQListFromItems(const T& item1, const T& item2, const T& item3)
     \ingroup qf3lib_tools
 */
 template <class T>
-QList<T> constructQListFromItems(const T& item1, const T& item2, const T& item3, const T& item4) {
+inline QList<T> constructQListFromItems(const T& item1, const T& item2, const T& item3, const T& item4) {
     QList<T> out;
     out<<item1<<item2<<item3<<item4;
     return out;
@@ -707,7 +712,7 @@ QList<T> constructQListFromItems(const T& item1, const T& item2, const T& item3,
     \ingroup qf3lib_tools
 */
 template <class T>
-QList<T> constructQListFromItems(const T& item1, const T& item2, const T& item3, const T& item4, const T& item5) {
+inline QList<T> constructQListFromItems(const T& item1, const T& item2, const T& item3, const T& item4, const T& item5) {
     QList<T> out;
     out<<item1<<item2<<item3<<item4<<item5;
     return out;
@@ -730,7 +735,7 @@ QList<T> constructQListFromItems(const T& item1, const T& item2, const T& item3,
     This copies the input list to the return argument omitting all duplicates. This should have complexity \f$ \mathcal{O}(N^2) \f$ but preserves the sorting order!
 */
 template <class T>
-QVector<T> removeQVectorDouplicates(const QVector<T>& list) {
+inline QVector<T> removeQVectorDouplicates(const QVector<T>& list) {
     QVector<T> out;
     for (int i=0; i<list.size(); i++) {
         if (out.indexOf(list[i])<0) out<<list[i];
@@ -743,7 +748,7 @@ QVector<T> removeQVectorDouplicates(const QVector<T>& list) {
     \ingroup qf3lib_tools
 */
 template <class T>
-QVector<T> constructQVectorWithMultipleItems(const T& item, int N=1) {
+inline QVector<T> constructQVectorWithMultipleItems(const T& item, int N=1) {
     QVector<T> out;
     for (int i=0; i<N; i++) {
         out<<item;
@@ -755,7 +760,7 @@ QVector<T> constructQVectorWithMultipleItems(const T& item, int N=1) {
     \ingroup qf3lib_tools
 */
 template <class T>
-QVector<T> constructQVectorFromItems(const T& item1) {
+inline QVector<T> constructQVectorFromItems(const T& item1) {
     QVector<T> out;
     out<<item1;
     return out;
@@ -765,7 +770,7 @@ QVector<T> constructQVectorFromItems(const T& item1) {
     \ingroup qf3lib_tools
 */
 template <class T>
-QVector<T> constructQVectorFromItems(const T& item1, const T& item2) {
+inline QVector<T> constructQVectorFromItems(const T& item1, const T& item2) {
     QVector<T> out;
     out<<item1<<item2;
     return out;
@@ -774,7 +779,7 @@ QVector<T> constructQVectorFromItems(const T& item1, const T& item2) {
     \ingroup qf3lib_tools
 */
 template <class T>
-QVector<T> constructQVectorFromItems(const T& item1, const T& item2, const T& item3) {
+inline QVector<T> constructQVectorFromItems(const T& item1, const T& item2, const T& item3) {
     QVector<T> out;
     out<<item1<<item2<<item3;
     return out;
@@ -784,7 +789,7 @@ QVector<T> constructQVectorFromItems(const T& item1, const T& item2, const T& it
     \ingroup qf3lib_tools
 */
 template <class T>
-QVector<T> constructQVectorFromItems(const T& item1, const T& item2, const T& item3, const T& item4) {
+inline QVector<T> constructQVectorFromItems(const T& item1, const T& item2, const T& item3, const T& item4) {
     QVector<T> out;
     out<<item1<<item2<<item3<<item4;
     return out;
@@ -794,7 +799,7 @@ QVector<T> constructQVectorFromItems(const T& item1, const T& item2, const T& it
     \ingroup qf3lib_tools
 */
 template <class T>
-QVector<T> constructQVectorFromItems(const T& item1, const T& item2, const T& item3, const T& item4, const T& item5) {
+inline QVector<T> constructQVectorFromItems(const T& item1, const T& item2, const T& item3, const T& item4, const T& item5) {
     QVector<T> out;
     out<<item1<<item2<<item3<<item4<<item5;
     return out;
@@ -863,7 +868,7 @@ inline QStringList constructQStringListFromItems(const QString& item1, const QSt
     \ingroup qf3lib_tools
 */
 template <class T, class TFilter>
-QList<TFilter*> filterListForClass(const QList<T*>& list_in) {
+inline QList<TFilter*> filterListForClass(const QList<T*>& list_in) {
     QList<TFilter*> list;
     for (int i=0; i<list_in.size(); i++) {
         if (dynamic_cast<TFilter*>(list_in[i])) {
@@ -883,7 +888,7 @@ QList<TFilter*> filterListForClass(const QList<T*>& list_in) {
     This copies the input list to the return argument omitting all duplicates. This should have complexity \f$ \mathcal{O}(N^2) \f$ but preserves the sorting order!
 */
 template <class T>
-QVector<T> removeQListDouplicates(const QVector<T>& list) {
+inline QVector<T> removeQListDouplicates(const QVector<T>& list) {
     QVector<T> out;
     for (int i=0; i<list.size(); i++) {
         if (out.indexOf(list[i])<0) out<<list[i];
@@ -913,7 +918,7 @@ inline void qfstatisticsSwap(T* a, long long l, long long r){
     implementation from http://www.linux-related.de/index.html?/coding/sort/sort_quick.htm
 */
 template <class T>
-void qfstatisticsQuicksort(T* a, long long l, long long r){
+inline void qfstatisticsQuicksort(T* a, long long l, long long r){
     if(r>l){
         long long i=l-1;
         long long j=r;
@@ -937,8 +942,8 @@ void qfstatisticsQuicksort(T* a, long long l, long long r){
 
     implementation from http://www.linux-related.de/index.html?/coding/sort/sort_quick.htm
 */
-template <class T>
-void qfstatisticsQuicksort(T* a, T* a2, long long l, long long r){
+template <class T, class T2>
+inline void qfstatisticsQuicksort(T* a, T2* a2, long long l, long long r){
     if(r>l){
         long long i=l-1;
         long long j=r;
@@ -963,8 +968,8 @@ void qfstatisticsQuicksort(T* a, T* a2, long long l, long long r){
 
     implementation from http://www.linux-related.de/index.html?/coding/sort/sort_quick.htm
 */
-template <class T>
-void qfstatisticsQuicksort(T* a, T* a2,T*a3, long long l, long long r){
+template <class T,class T2,class T3>
+inline void qfstatisticsQuicksort(T* a, T2* a2,T3*a3, long long l, long long r){
     if(r>l){
         long long i=l-1;
         long long j=r;
@@ -992,8 +997,8 @@ void qfstatisticsQuicksort(T* a, T* a2,T*a3, long long l, long long r){
 
     implementation from http://www.linux-related.de/index.html?/coding/sort/sort_quick.htm
 */
-template <class T>
-void qfstatisticsQuicksort(T* a, T* a2, T* a3, T* a4, long long l, long long r){
+template <class T,class T2,class T3,class T4>
+inline void qfstatisticsQuicksort(T* a, T2* a2, T3* a3, T4* a4, long long l, long long r){
     if(r>l){
         long long i=l-1;
         long long j=r;
@@ -1035,8 +1040,8 @@ void qfstatisticsQuicksort(T* a, T* a2, T* a3, T* a4, long long l, long long r){
                   otherwise the array input is sorted inplace.
 
  */
-template <class T>
-inline void qfstatisticsSort(T* input, T* input2, long long N, T* output=NULL, T* output2=NULL) {
+template <class T,class T2>
+inline void qfstatisticsSort(T* input, T2* input2, long long N, T* output=NULL, T2* output2=NULL) {
     if ((!input)) return ;
     if (N<=0) return;
     T* data=input;
@@ -1044,10 +1049,10 @@ inline void qfstatisticsSort(T* input, T* input2, long long N, T* output=NULL, T
         data=output;
         memcpy(output, input, N*sizeof(T));
     }
-    T* data2=input2;
+    T2* data2=input2;
     if (output2!=NULL && input2!=NULL) {
         data2=output2;
-        memcpy(output2, input2, N*sizeof(T));
+        memcpy(output2, input2, N*sizeof(T2));
     }
     qfstatisticsQuicksort(data, data2, 0, N-1);
 }
@@ -1069,8 +1074,8 @@ inline void qfstatisticsSort(T* input, T* input2, long long N, T* output=NULL, T
                   otherwise the array input is sorted inplace.
 
  */
-template <class T>
-inline void qfstatisticsSort(T* input, T* input2, T* input3, long long N, T* output=NULL, T* output2=NULL, T* output3=NULL) {
+template <class T,class T2,class T3>
+inline void qfstatisticsSort(T* input, T2* input2, T3* input3, long long N, T* output=NULL, T2* output2=NULL, T3* output3=NULL) {
     if ((!input)) return ;
     if (N<=0) return;
     T* data=input;
@@ -1078,15 +1083,15 @@ inline void qfstatisticsSort(T* input, T* input2, T* input3, long long N, T* out
         data=output;
         memcpy(output, input, N*sizeof(T));
     }
-    T* data2=input2;
+    T2* data2=input2;
     if (output2!=NULL && input2!=NULL) {
         data2=output2;
-        memcpy(output2, input2, N*sizeof(T));
+        memcpy(output2, input2, N*sizeof(T2));
     }
-    T* data3=input3;
+    T3* data3=input3;
     if (output3!=NULL && input3!=NULL) {
         data3=output3;
-        memcpy(output3, input3, N*sizeof(T));
+        memcpy(output3, input3, N*sizeof(T3));
     }
      qfstatisticsQuicksort(data, data2, data3, 0, N-1);
 }
@@ -1108,8 +1113,8 @@ inline void qfstatisticsSort(T* input, T* input2, T* input3, long long N, T* out
                   otherwise the array input is sorted inplace.
 
  */
-template <class T>
-inline void qfstatisticsSort(T* input, T* input2, T* input3, T*input4, long long N, T* output=NULL, T* output2=NULL, T* output3=NULL, T*output4=NULL) {
+template <class T,class T2,class T3, class T4>
+inline void qfstatisticsSort(T* input, T2* input2, T3* input3, T4*input4, long long N, T* output=NULL, T2* output2=NULL, T3* output3=NULL, T4*output4=NULL) {
     if ((!input)) return ;
     if (N<=0) return;
     T* data=input;
@@ -1117,20 +1122,20 @@ inline void qfstatisticsSort(T* input, T* input2, T* input3, T*input4, long long
         data=output;
         memcpy(output, input, N*sizeof(T));
     }
-    T* data2=input2;
+    T2* data2=input2;
     if (output2!=NULL && input2!=NULL) {
         data2=output2;
-        memcpy(output2, input2, N*sizeof(T));
+        memcpy(output2, input2, N*sizeof(T2));
     }
-    T* data3=input3;
+    T3* data3=input3;
     if (output3!=NULL && input3!=NULL) {
         data3=output3;
-        memcpy(output3, input3, N*sizeof(T));
+        memcpy(output3, input3, N*sizeof(T3));
     }
-    T* data4=input4;
+    T4* data4=input4;
     if (output4!=NULL && input4!=NULL) {
         data4=output4;
-        memcpy(output4, input4, N*sizeof(T));
+        memcpy(output4, input4, N*sizeof(T4));
     }
      qfstatisticsQuicksort(data, data2, data3, data4, 0, N-1);
 }
@@ -1180,7 +1185,7 @@ inline void qfstatisticsSort(T* input, long long N, T* output=NULL) {
 
 */
 template <class T>
-QVector<T> duplicateArrayV(const T* input, long long N) {
+inline QVector<T> duplicateArrayV(const T* input, long long N) {
     if (!input||N<=0) return QVector<T>();
     QVector<T> out(N);
     for (long long i=0; i<N; i++) {
@@ -1194,7 +1199,7 @@ QVector<T> duplicateArrayV(const T* input, long long N) {
 
 */
 template <class T>
-T* duplicateArray(const T* input, long long N) {
+inline T* duplicateArray(const T* input, long long N) {
     if (!input||N<=0) return NULL;
     T* out=(T*)qfMalloc(N*sizeof(T));
     if (out && input && N>=0) memcpy(out, input, N*sizeof(T));
@@ -1206,7 +1211,7 @@ T* duplicateArray(const T* input, long long N) {
 
 */
 template <class T>
-T* duplicateArray(const QVector<T>& input) {
+inline T* duplicateArray(const QVector<T>& input) {
     long long N=input.size();
     if (!input||N<=0) return NULL;
     T* out=(T*)qfMalloc(N*sizeof(T));
@@ -1218,7 +1223,7 @@ T* duplicateArray(const QVector<T>& input) {
 
 */
 template <class T>
-T* qfDuplicateArray(const T* input, long long N) {
+inline T* qfDuplicateArray(const T* input, long long N) {
     if (!input||N<=0) return NULL;
     T* out=(T*)qfMalloc(N*sizeof(T));
     if (out && input && N>=0) memcpy(out, input, N*sizeof(T));
@@ -1229,7 +1234,7 @@ T* qfDuplicateArray(const T* input, long long N) {
 
 */
 template <class T>
-T* duplicateArraySort(const T* input, long long N) {
+inline T* duplicateArraySort(const T* input, long long N) {
     T* out=duplicateArray(input, N);
     if (out && N>0) qfstatisticsSort(out, N);
     return out;
@@ -1240,7 +1245,7 @@ T* duplicateArraySort(const T* input, long long N) {
 
 */
 template <class T>
-QVector<T> arrayToVector(const T* input, long long N) {
+inline QVector<T> arrayToVector(const T* input, long long N) {
     T dummy;
     QVector<T> out(N, dummy);
     if (input && N>0) memcpy(out.data(), input, N*sizeof(T));
@@ -1252,7 +1257,7 @@ QVector<T> arrayToVector(const T* input, long long N) {
 
 */
 template <class T>
-T* copyArray(T* out, const T* input, long long N) {
+inline T* copyArray(T* out, const T* input, long long N) {
     if (out && input && N>0) memcpy(out, input, N*sizeof(T));
     return out;
 }
@@ -1262,7 +1267,7 @@ T* copyArray(T* out, const T* input, long long N) {
 
 */
 template <class T>
-T* copyArrayOrDefault(T* out, const T* input, long long N, T defaultValue) {
+inline T* copyArrayOrDefault(T* out, const T* input, long long N, T defaultValue) {
     if (input) {
         if (out!=input) memcpy(out, input, N*sizeof(T));
     } else {
@@ -1279,7 +1284,7 @@ T* copyArrayOrDefault(T* out, const T* input, long long N, T defaultValue) {
 
 */
 template <class T>
-QString arrayToString(const T* input, long long N, bool withBrackets=true) {
+inline QString arrayToString(const T* input, long long N, bool withBrackets=true) {
     QString res;
     {
         QTextStream txt(&res, QIODevice::WriteOnly);
@@ -1309,7 +1314,7 @@ QFLIB_EXPORT QList<int> stringToIntList(const QString& data);
 
 */
 template <class T>
-QString listToString(const T& input, bool withIDs=false, bool withBrackets=true) {
+inline QString listToString(const T& input, bool withIDs=false, bool withBrackets=true) {
     QString res;
     {
         QTextStream txt(&res, QIODevice::WriteOnly);
@@ -1334,7 +1339,7 @@ QString listToString(const T& input, bool withIDs=false, bool withBrackets=true)
 
 */
 template <class T>
-QString numlistToString(const T& input, bool withIDs=false, int precision=10) {
+inline QString numlistToString(const T& input, bool withIDs=false, int precision=10) {
     QString res;
     {
         QTextStream txt(&res, QIODevice::WriteOnly);
@@ -1357,7 +1362,7 @@ QString numlistToString(const T& input, bool withIDs=false, int precision=10) {
 
 */
 template <class T>
-QList<int> valueIndizesFromArray(const T* input, int N, T value) {
+inline QList<int> valueIndizesFromArray(const T* input, int N, T value) {
     QList<int> l;
     if (N>0 && input) {
         for (int i=0; i<N; i++) {
@@ -1371,7 +1376,7 @@ QList<int> valueIndizesFromArray(const T* input, int N, T value) {
     \ingroup qf3lib_tools
 */
 template <class T1, class T2>
-bool qfQPairCompareFirst(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
+inline bool qfQPairCompareFirst(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
     return s1.first < s2.first;
 }
 
@@ -1379,7 +1384,7 @@ bool qfQPairCompareFirst(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
     \ingroup qf3lib_tools
 */
 template <class T1, class T2>
-bool qfQPairCompareSecond(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
+inline bool qfQPairCompareSecond(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
     return s1.second < s2.second;
 }
 
@@ -1387,7 +1392,7 @@ bool qfQPairCompareSecond(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
     \ingroup qf3lib_tools
 */
 template <class T1, class T2, class T3>
-bool qfQTripleCompareFirst(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
+inline bool qfQTripleCompareFirst(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
     return s1.first < s2.first;
 }
 
@@ -1395,7 +1400,7 @@ bool qfQTripleCompareFirst(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, 
     \ingroup qf3lib_tools
 */
 template <class T1, class T2, class T3>
-bool qfQTripleCompareSecond(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
+inline bool qfQTripleCompareSecond(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
     return s1.second < s2.second;
 }
 
@@ -1403,7 +1408,7 @@ bool qfQTripleCompareSecond(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2,
     \ingroup qf3lib_tools
 */
 template <class T1, class T2, class T3>
-bool qfQTripleCompareThird(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
+inline bool qfQTripleCompareThird(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
     return s1.third < s2.third;
 }
 
@@ -1426,7 +1431,7 @@ QFLIB_EXPORT bool qfQStringCompareLengthIncreasing(const QString &s1, const QStr
     \ingroup qf3lib_tools
 */
 template <class T1, class T2>
-bool qfQPairCompareFirstDec(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
+inline bool qfQPairCompareFirstDec(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
     return s1.first >= s2.first;
 }
 
@@ -1434,7 +1439,7 @@ bool qfQPairCompareFirstDec(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
     \ingroup qf3lib_tools
 */
 template <class T1, class T2>
-bool qfQPairCompareSecondDec(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
+inline bool qfQPairCompareSecondDec(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
     return s1.second >= s2.second;
 }
 
@@ -1442,7 +1447,7 @@ bool qfQPairCompareSecondDec(const QPair<T1, T2> &s1, const QPair<T1, T2> &s2) {
     \ingroup qf3lib_tools
 */
 template <class T1, class T2, class T3>
-bool qfQTripleCompareFirstDec(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
+inline bool qfQTripleCompareFirstDec(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
     return s1.first >= s2.first;
 }
 
@@ -1450,7 +1455,7 @@ bool qfQTripleCompareFirstDec(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T
     \ingroup qf3lib_tools
 */
 template <class T1, class T2, class T3>
-bool qfQTripleCompareSecondDec(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
+inline bool qfQTripleCompareSecondDec(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
     return s1.second >= s2.second;
 }
 
@@ -1458,7 +1463,7 @@ bool qfQTripleCompareSecondDec(const QTriple<T1, T2, T3> &s1, const QTriple<T1, 
     \ingroup qf3lib_tools
 */
 template <class T1, class T2, class T3>
-bool qfQTripleCompareThirdDec(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
+inline bool qfQTripleCompareThirdDec(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T2, T3> &s2) {
     return s1.third >= s2.third;
 }
 
@@ -1475,7 +1480,7 @@ bool qfQTripleCompareThirdDec(const QTriple<T1, T2, T3> &s1, const QTriple<T1, T
           would be with argument of type \c QList<int> or \c QVector<int>.
 */
 template <class T1, class T2>
-QList<T2> qfSelectFromVector(const T1& selection, T2* data) {
+inline QList<T2> qfSelectFromVector(const T1& selection, T2* data) {
     QList<T2> res;
     for (int i=0; i<selection.size(); i++) {
         res<<data[selection[i]];
@@ -1488,7 +1493,7 @@ QList<T2> qfSelectFromVector(const T1& selection, T2* data) {
 
 */
 template <class T>
-void qfClearContainer(T first, T last) {
+inline void qfClearContainer(T first, T last) {
     for (T it=first; it!=last; it++) {
         if (*it) delete *it;
     }
@@ -1499,7 +1504,7 @@ void qfClearContainer(T first, T last) {
 
 */
 template <class T>
-void qfClearContainer(T& container, bool clear=true) {
+inline void qfClearContainer(T& container, bool clear=true) {
     qfClearContainer(container.begin(), container.end());
     if (clear) container.clear();
 }
@@ -1519,7 +1524,7 @@ void qfClearContainer(T& container, bool clear=true) {
 
 */
 template <class T1, class T2>
-void qfSortVectorByPermutation(const T1 &initialOrder, const T1 &newOrder, T2* data) {
+inline void qfSortVectorByPermutation(const T1 &initialOrder, const T1 &newOrder, T2* data) {
     T2* c=duplicateArray(data, qfstatisticsMax(initialOrder)+1);
 
     int N=qMin(initialOrder.size(), newOrder.size());
@@ -1531,7 +1536,7 @@ void qfSortVectorByPermutation(const T1 &initialOrder, const T1 &newOrder, T2* d
 }
 
 template <typename T1, typename T2>
-QList<T1> qfQPairListToFirstList(const QList<QPair<T1, T2> > &input) {
+inline QList<T1> qfQPairListToFirstList(const QList<QPair<T1, T2> > &input) {
     QList<T1> res;
     for (int i=0; i<input.size(); i++) {
         res.append(input[i].first);
@@ -1540,7 +1545,7 @@ QList<T1> qfQPairListToFirstList(const QList<QPair<T1, T2> > &input) {
 }
 
 template <class T1, class T2>
-QList<T2> qfQPairListToSecondList(const QList<QPair<T1, T2> > &input) {
+inline QList<T2> qfQPairListToSecondList(const QList<QPair<T1, T2> > &input) {
     QList<T2> res;
     for (int i=0; i<input.size(); i++) {
         res.append(input[i].second);
@@ -1549,7 +1554,7 @@ QList<T2> qfQPairListToSecondList(const QList<QPair<T1, T2> > &input) {
 }
 
 template <class T1, class T2, class T3>
-QList<T1> qfQTripleListToFirstList(const QList<QTriple<T1, T2, T3> > &input) {
+inline QList<T1> qfQTripleListToFirstList(const QList<QTriple<T1, T2, T3> > &input) {
     QList<T1> res;
     for (int i=0; i<input.size(); i++) {
         res.append(input[i].first);
@@ -1558,7 +1563,7 @@ QList<T1> qfQTripleListToFirstList(const QList<QTriple<T1, T2, T3> > &input) {
 }
 
 template <class T1, class T2, class T3>
-QList<T2> qfQTripleListToSecondList(const QList<QTriple<T1, T2, T3> > &input) {
+inline QList<T2> qfQTripleListToSecondList(const QList<QTriple<T1, T2, T3> > &input) {
     QList<T2> res;
     for (int i=0; i<input.size(); i++) {
         res.append(input[i].second);
@@ -1567,7 +1572,7 @@ QList<T2> qfQTripleListToSecondList(const QList<QTriple<T1, T2, T3> > &input) {
 }
 
 template <class T1, class T2, class T3>
-QList<T3> qfQTripleListToThirdList(const QList<QTriple<T1, T2, T3> > &input) {
+inline QList<T3> qfQTripleListToThirdList(const QList<QTriple<T1, T2, T3> > &input) {
     QList<T3> res;
     for (int i=0; i<input.size(); i++) {
         res.append(input[i].third);
@@ -1606,7 +1611,7 @@ typedef double (*qfDoubleVectorToDoubleFunc)(const QVector<double>&);
 
  */
 template <typename T, typename TIDX, typename TFUNC>
-QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QVector<TIDX>& index, TFUNC func) {
+inline QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QVector<TIDX>& index, TFUNC func) {
     QVector<T> res;
     QMap<TIDX, QVector<T> > dataset;
     QList<TIDX> idxl;
@@ -1623,8 +1628,9 @@ QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QVector<TIDX>& i
 /*! \brief group the data in \a input according to the labels given in \a index. Then return a vector where the function \a func is applied to every vector of values from \input, which all have the same index in \a index.
     \ingroup qf3lib_tools
 
- */template <typename T, typename TIDX, typename TFUNC>
-QList<T> qfUniqueApplyFunction(const QList<T>& input, const QList<TIDX>& index, TFUNC func) {
+ */
+template <typename T, typename TIDX, typename TFUNC>
+inline QList<T> qfUniqueApplyFunction(const QList<T>& input, const QList<TIDX>& index, TFUNC func) {
     QList<T> res;
     QMap<TIDX, QList<T> > dataset;
     QList<TIDX> idxl;
@@ -1641,8 +1647,9 @@ QList<T> qfUniqueApplyFunction(const QList<T>& input, const QList<TIDX>& index, 
 /*! \brief group the data in \a input according to the labels given in \a index. Then return a vector where the function \a func is applied to every vector of values from \input, which all have the same index in \a index.
     \ingroup qf3lib_tools
 
- */template <typename T, typename TIDX, typename TFUNC>
-QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QList<TIDX>& index, TFUNC func) {
+ */
+template <typename T, typename TIDX, typename TFUNC>
+inline QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QList<TIDX>& index, TFUNC func) {
     QVector<T> res;
     QMap<TIDX, QVector<T> > dataset;
     QList<TIDX> idxl;
@@ -1662,7 +1669,7 @@ QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QList<TIDX>& ind
 
  */
 template <typename T, typename TIDX, typename TFUNC, typename TFUNCPARAM>
-QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QVector<TIDX>& index, TFUNC func, TFUNCPARAM funcParam) {
+inline QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QVector<TIDX>& index, TFUNC func, TFUNCPARAM funcParam) {
     QVector<T> res;
     QMap<TIDX, QVector<T> > dataset;
     QList<TIDX> idxl;
@@ -1681,7 +1688,7 @@ QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QVector<TIDX>& i
 
  */
 template <typename T, typename TIDX, typename TFUNC, typename TFUNCPARAM>
-QList<T> qfUniqueApplyFunction(const QList<T>& input, const QList<TIDX>& index, TFUNC func, TFUNCPARAM funcParam) {
+inline QList<T> qfUniqueApplyFunction(const QList<T>& input, const QList<TIDX>& index, TFUNC func, TFUNCPARAM funcParam) {
     QList<T> res;
     QMap<TIDX, QList<T> > dataset;
     QList<TIDX> idxl;
@@ -1700,7 +1707,7 @@ QList<T> qfUniqueApplyFunction(const QList<T>& input, const QList<TIDX>& index, 
 
  */
 template <typename T, typename TIDX, typename TFUNC, typename TFUNCPARAM>
-QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QList<TIDX>& index, TFUNC func, TFUNCPARAM funcParam) {
+inline QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QList<TIDX>& index, TFUNC func, TFUNCPARAM funcParam) {
     QVector<T> res;
     QMap<TIDX, QVector<T> > dataset;
     QList<TIDX> idxl;
@@ -1736,7 +1743,7 @@ QVector<T> qfUniqueApplyFunction(const QVector<T>& input, const QList<TIDX>& ind
 
  */
 template <typename T, typename TIDX, typename TFUNC>
-QVector<T> qfUniqueApplyFunction2I(const QVector<T>& input, const QVector<T>& inputY, const QVector<TIDX>& index, TFUNC func) {
+inline QVector<T> qfUniqueApplyFunction2I(const QVector<T>& input, const QVector<T>& inputY, const QVector<TIDX>& index, TFUNC func) {
     QVector<T> res;
     QMap<TIDX, QPair<QVector<T> , QVector<T> > > dataset;
     QList<TIDX> idxl;
@@ -1754,8 +1761,9 @@ QVector<T> qfUniqueApplyFunction2I(const QVector<T>& input, const QVector<T>& in
 /*! \brief group the data in \a input and \a inputY according to the labels given in \a index. Then return a vector where the function \a func is applied to every vector of values from \a input and \a inputY, which all have the same index in \a index.
     \ingroup qf3lib_tools
 
- */template <typename T, typename TIDX, typename TFUNC>
-QList<T> qfUniqueApplyFunction2I(const QList<T>& input, const QVector<T>& inputY, const QList<TIDX>& index, TFUNC func) {
+ */
+template <typename T, typename TIDX, typename TFUNC>
+inline QList<T> qfUniqueApplyFunction2I(const QList<T>& input, const QVector<T>& inputY, const QList<TIDX>& index, TFUNC func) {
     QList<T> res;
     QMap<TIDX, QPair<QVector<T> , QVector<T> > > dataset;
     QList<TIDX> idxl;
@@ -1775,7 +1783,7 @@ QList<T> qfUniqueApplyFunction2I(const QList<T>& input, const QVector<T>& inputY
 
  */
 template <typename T, typename TIDX, typename TFUNC>
-QVector<T> qfUniqueApplyFunction2I(const QVector<T>& input, const QVector<T>& inputY, const QList<TIDX>& index, TFUNC func) {
+inline QVector<T> qfUniqueApplyFunction2I(const QVector<T>& input, const QVector<T>& inputY, const QList<TIDX>& index, TFUNC func) {
     QVector<T> res;
     QMap<TIDX, QPair<QVector<T> , QVector<T> > > dataset;
     QList<TIDX> idxl;
@@ -1880,7 +1888,7 @@ QFLIB_EXPORT QString qfCEscaped(const QString& data);
 
 */
 template <typename T>
-QVector<T> qfShuffledVector(const QVector<T>& value) {
+inline QVector<T> qfShuffledVector(const QVector<T>& value) {
     std::vector<T> mm=value.toStdVector();
     std::random_shuffle( mm.begin(), mm.end() );
     return QVector<T>::fromStdVector(mm);
@@ -1891,7 +1899,7 @@ QVector<T> qfShuffledVector(const QVector<T>& value) {
 
 */
 template <typename T>
-QList<T> qfShuffledVector(const QList<T>& value) {
+inline QList<T> qfShuffledVector(const QList<T>& value) {
    std::vector<T> mm;
    mm.resize(value.size());
    for (int i=0; i<value.size(); i++) {
@@ -1912,7 +1920,7 @@ QList<T> qfShuffledVector(const QList<T>& value) {
 
 */
 template <typename T>
-void qfShuffleInplace(QList<T>& value) {
+inline void qfShuffleInplace(QList<T>& value) {
    std::vector<T> mm;
    mm.resize(value.size());
    for (int i=0; i<value.size(); i++) {
@@ -1930,7 +1938,7 @@ void qfShuffleInplace(QList<T>& value) {
 
 */
 template <typename T>
-void qfShuffleInplace(QVector<T>& value) {
+inline void qfShuffleInplace(QVector<T>& value) {
    std::vector<T> mm;
    mm.resize(value.size());
    for (int i=0; i<value.size(); i++) {

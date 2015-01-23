@@ -46,6 +46,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfhtmlhelptools.h"
 #include <QRegExp>
 #include <QtGlobal>
+#include <QPrintDialog>
+#include <QPrinter>
+#include <QPrinterInfo>
 
 
 QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
@@ -356,7 +359,7 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
             //qDebug()<<scheme<<link<<filenamen<<QUrl("file:"+filenamen)<<filename<<cl<<spd;
             QUrl url=link;
             url.setScheme("file");
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
             //qDebug()<<url.toString();
             QRegExp rx("file://([a-zA-Z])/");
             if (rx.indexIn(url.toString())>=0) {

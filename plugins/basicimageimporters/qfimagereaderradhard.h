@@ -85,7 +85,7 @@ class QFImageReaderRadhard : public QFImporterImageSeries
         unsigned int calculateFrameSize();
 
         template < typename T >
-        bool readFrame_(T* data) {
+        inline bool readFrame_(T* data) {
           if (!file) return false;
           bool result=false;
           frame<T> *f = new frame<T>(data,width,height);

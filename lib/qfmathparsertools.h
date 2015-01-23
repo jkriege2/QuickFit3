@@ -25,7 +25,6 @@
 #include "lib_imexport.h"
 #include "qftools.h"
 #include <cmath>
-#include <QTextIStream>
 #include <QTextStream>
 
 #include <QList>

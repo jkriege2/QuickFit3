@@ -39,7 +39,10 @@ Copyright (c) 2014
 class QFExtensionCameraImplementation : public QObject, public QFExtensionBase, public QFExtensionCamera {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionCamera)
-    public:
+ #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFExtensionCameraImplementation")
+#endif	
+   public:
         /** Default constructor */
         QFExtensionCameraImplementation(QObject* parent=NULL);
         /** Default destructor */

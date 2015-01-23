@@ -458,7 +458,7 @@ void QFECamTestCamera::stepParticles(int camera) {
 
 bool QFECamTestCamera::startCameraAcquisition(unsigned int camera) {
     seriesRunning[camera]=false;
-    tif[camera]=TIFFOpen(seriesFilenamePrefix[camera].toAscii().data(), "w");
+    tif[camera]=TIFFOpen(seriesFilenamePrefix[camera].toLatin1().data(), "w");
     if (tif[camera]==NULL) return false;
 
     seriesRunning[camera]=true;

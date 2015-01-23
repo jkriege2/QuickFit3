@@ -3,6 +3,8 @@
 #ifndef __RADHARD2LIBH__
 #define __RADHARD2LIBH__
 
+#include <stdint.h>
+
 /*! \file radhard2lib.h
 \brief Container of useful definitions.
 \ingroup radhard2

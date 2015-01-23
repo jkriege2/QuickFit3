@@ -143,7 +143,9 @@ class QFPlugin {
 
 };
 
-#define QF_PLUGIN  virtual void getQFLibVersion(int& major, int& minor) const { \
+#define QF_PLUGIN  \
+    public: \
+        virtual void getQFLibVersion(int& major, int& minor) const { \
             major=QF3LIB_APIVERSION_MAJOR; \
             minor=QF3LIB_APIVERSION_MINOR;\
         }
@@ -152,5 +154,10 @@ class QFPlugin {
 Q_DECLARE_INTERFACE(QFPlugin,
                      "www.dkfz.de.b040.quickfit3.QFPlugin/1.0")
 
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#  undef Q_EXPORT_PLUGIN2
+#  define Q_EXPORT_PLUGIN2(a, b)
+#endif
 
 #endif // QFPLUGIN_H

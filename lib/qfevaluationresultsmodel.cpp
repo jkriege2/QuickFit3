@@ -148,7 +148,12 @@ void QFEvaluationResultsModel::resultsChanged(QFRawDataRecord* record, const QSt
             }
         }
 
-        reset();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
+    reset();
+#endif
         //qDebug()()<<"--- QFEvaluationResultsModel::resultsChanged() DONE: "<<t.elapsed();
     }
 
@@ -242,7 +247,12 @@ QVariant QFEvaluationResultsModel::headerData(int section, Qt::Orientation orien
 void QFEvaluationResultsModel::setShowVectorMatrixAvg(bool show)
 {
     showVectorMatrixAvg=show;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 void QFEvaluationResultsModel::setExtractIndexes(bool enabled)

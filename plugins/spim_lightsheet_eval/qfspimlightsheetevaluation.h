@@ -34,6 +34,10 @@
 class QFSPIMLightsheetEvaluation : public QObject, public QFPluginEvaluationItemBase {
         Q_OBJECT
         Q_INTERFACES(QFPluginEvaluationItem)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFSPIMLightsheetEvaluation")
+#endif
+
     public:
         /** Default constructor */
         QFSPIMLightsheetEvaluation(QObject* parent=NULL);

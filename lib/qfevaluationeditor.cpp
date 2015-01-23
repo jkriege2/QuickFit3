@@ -88,7 +88,12 @@ void QFEvaluationEditor::saveReport() {
 
     QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
                                 currentSaveDirectory,
-                                tr("PDF File (*.pdf);;PostScript File (*.ps)"));
+                                          #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+                                              tr("PDF File (*.pdf)")
+                                          #else
+                                              tr("PDF File (*.pdf);;PostScript File (*.ps)")
+                                          #endif
+                                              );
 
 
     if (!fn.isEmpty()) {
@@ -113,7 +118,9 @@ void QFEvaluationEditor::saveReport() {
         doc->setTextWidth(printer->pageRect().size().width());
         createReportDoc(doc);
         if (fi.suffix().toLower()=="ps" || fi.suffix().toLower()=="pdf") {
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
             if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
+#endif
             printer->setColorMode(QPrinter::Color);
             printer->setOutputFileName(fn);
             doc->print(printer);

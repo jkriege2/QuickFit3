@@ -78,8 +78,8 @@ bool QFFitFunctionGeneralGaussianDistVar::estimateInitial(double *params, const 
 
     if (params && dataX && dataY) {
 
-        StatisticsScopedPointer<double> dX=statisticsDuplicateArray(dataX, N);
-        StatisticsScopedPointer<double> dY=statisticsDuplicateArray(dataY, N);
+        StatisticsScopedPointer<double> dX(statisticsDuplicateArray(dataX, N));
+        StatisticsScopedPointer<double> dY(statisticsDuplicateArray(dataY, N));
 
         statisticsSort2(dX.data(), dY.data(), N);
 

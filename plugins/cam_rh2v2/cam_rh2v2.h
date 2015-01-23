@@ -49,6 +49,10 @@ Copyright (c) 2008-2014 Jan Buchholz, German Cancer Research Center
 class QFExtensionCameraRh2v2 : public QObject, public QFExtensionBase, public QFExtensionCamera {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionCamera)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFExtensionCameraRh2v2")
+#endif
+
     public:
         /** Default constructor */
         QFExtensionCameraRh2v2(QObject* parent=NULL);

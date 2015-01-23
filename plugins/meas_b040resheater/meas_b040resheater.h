@@ -44,6 +44,10 @@
 class QFExtensionB040ResistorHeater : public QObject, public QFExtensionBase, public QFExtensionMeasurementAndControlDevice, public QFPluginLogService {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionMeasurementAndControlDevice QFPluginLogService)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFExtensionB040ResistorHeater")
+#endif
+
     public:
         /** Default constructor */
         QFExtensionB040ResistorHeater(QObject* parent=NULL);

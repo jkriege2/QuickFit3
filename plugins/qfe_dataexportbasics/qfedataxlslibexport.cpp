@@ -106,7 +106,7 @@ void QFEDataXlsLibExport::save(const QList<QList<QVariant> > &data_in, const QSt
                         sh->number(roffset+r, coffset+c, v.value<QVector4D>().x());
                         break;
                     case QVariant::QVariant::Matrix4x4: {
-                            qreal* dd=v.value<QMatrix4x4>().data();
+                            float* dd=v.value<QMatrix4x4>().data();
                             sh->number(roffset+r, coffset+c,dd[0]);
                         } break;
                     case QVariant::Int:

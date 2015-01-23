@@ -9,6 +9,7 @@
 #include "qtlogfile.h"
 #include "qfextensionmanager.h"
 //#include "../plugins/multicontrol_stage/mcstagecontroller.h"
+#include <QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtGlobal>
 #include <QtWidgets>
@@ -30,6 +31,9 @@
 class QFEB040FFMControl : public QObject, public QFExtensionBase {
         Q_OBJECT
         Q_INTERFACES(QFExtension)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFEB040FFMControl")
+#endif
 public:
         /** Default constructor */
     QFEB040FFMControl(QObject* parent=NULL);

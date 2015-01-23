@@ -33,9 +33,13 @@
 /*! \brief Evaluation Item Plugin class
     \ingroup qf3rdrdp_GROUPNAME
 */
-class QFEvalCameraCalibration : public QObject, public QFPluginEvaluationItemBase {
+class  QFEvalCameraCalibration: public QObject, public QFPluginEvaluationItemBase {
         Q_OBJECT
         Q_INTERFACES(QFPluginEvaluationItem)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFEvalCameraCalibration")
+#endif
+
     public:
         /** Default constructor */
         QFEvalCameraCalibration(QObject* parent=NULL);

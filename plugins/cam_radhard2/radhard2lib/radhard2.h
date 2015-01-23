@@ -15,9 +15,11 @@
 
 #undef FDEBUG
 #undef FVERBOSE
-
+#include <stdint.h>
 #include "radhard2lib.h" // General RADHARD2 definitions.
-#include <usb.h>         // Main header file of the libusb library.
+
+struct usb_device; // forward
+struct usb_dev_handle; // forward
 
 //! The RADHARD2 main class.
 /*!

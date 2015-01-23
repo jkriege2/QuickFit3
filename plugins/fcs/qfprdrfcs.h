@@ -37,6 +37,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         Q_OBJECT
         Q_INTERFACES(QFPluginRawDataRecord)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFPRDRFCS")
+#endif
+
     public:
         /** Default constructor */
         QFPRDRFCS(QObject* parent=NULL);

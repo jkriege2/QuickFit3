@@ -34,6 +34,9 @@
 #include "replacedialog.h"
 #include <QStringListModel>
 #include "qfhtmlhighlighter.h"
+#include <QPrintDialog>
+#include <QPrinter>
+#include <QPrinterInfo>
 namespace Ui {
     class QFEHelpEditorWidget;
 }

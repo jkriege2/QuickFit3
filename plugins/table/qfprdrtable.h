@@ -36,6 +36,10 @@
 class QFPRDRTable : public QObject, public QFPluginRawDataRecordBase {
         Q_OBJECT
         Q_INTERFACES(QFPluginRawDataRecord)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFPRDRTable")
+#endif
+
     public:
         /** Default constructor */
         QFPRDRTable(QObject* parent=NULL);

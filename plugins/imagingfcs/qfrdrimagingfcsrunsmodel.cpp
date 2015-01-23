@@ -36,7 +36,12 @@ void QFRDRImagingFCSRunsModel::setCurrent(QFRawDataRecord* current) {
     t.start();
     //qDebug()<<" QFRDRImagingFCSRunsModel::setCurrent()";
     this->current=current;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
     //qDebug()<<" QFRDRImagingFCSRunsModel::setCurrent() ... done "<<t.elapsed();
 }
 

@@ -45,6 +45,10 @@
 class QFExtensionB040LaserBox : public QObject, public QFExtensionBase, public QFExtensionLightSource {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionLightSource)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFExtensionB040LaserBox")
+#endif
+
     public:
         /** Default constructor */
         QFExtensionB040LaserBox(QObject* parent=NULL);

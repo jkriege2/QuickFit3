@@ -246,7 +246,15 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
         inline void resetChanged() { hasDataChanged=false; }
         inline bool hasChanged() const { return hasDataChanged; }
 
-        inline void setVerticalHeaderShowRowNumbers(bool enabled) { verticalHeaderShowRowNumbers=enabled; reset(); }
+        inline void setVerticalHeaderShowRowNumbers(bool enabled) {
+            verticalHeaderShowRowNumbers=enabled;
+        #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+            beginResetModel();
+            endResetModel();
+        #else
+            reset();
+        #endif
+        };
         inline bool getVerticalHeaderShowRowNumbers() const { return verticalHeaderShowRowNumbers; }
 
         QVariantList getColumnData(int column, int role = Qt::DisplayRole) const;

@@ -2078,13 +2078,13 @@ void QFRDRTable::intReadData(QDomElement* e) {
     if (files.size()>0 && !getQFProperty("DONT_READWRITE_FILE", false).toBool() ) {
         //qDebug()<<"    reading CSV\n";
         QString s=getProperty("column_separator", ",").toString();
-        char column_separator=(s.size()>0)?s[0].toAscii():',';
+        char column_separator=(s.size()>0)?s[0].toLatin1():',';
         s=getProperty("decimal_separator", ".").toString();
-        char decimal_separator=(s.size()>0)?s[0].toAscii():'.';
+        char decimal_separator=(s.size()>0)?s[0].toLatin1():'.';
         s=getProperty("header_start", "#!").toString();
         QString header_start=s;
         s=getProperty("coment_start", "#").toString();
-        char comment_start=(s.size()>0)?s[0].toAscii():'#';
+        char comment_start=(s.size()>0)?s[0].toLatin1():'#';
 
         //qDebug()<<"column_separator="<<column_separator<<"  decimal_separator="<<decimal_separator<<"   header_start="<<header_start.toStdString()<<"   comment_start="<<comment_start<<std::endl;
 

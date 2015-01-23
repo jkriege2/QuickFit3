@@ -29,7 +29,7 @@
 QVector<double> stringToDoubleArray_base64(const QString& data) {
     QVector<double> result;
 
-    QByteArray a=QByteArray::fromBase64(data.toAscii());
+    QByteArray a=QByteArray::fromBase64(data.toLatin1());
     long long count=a.size()/sizeof(double);
     result.fill(0.0, count);
     const double* d=(double*)a.constData();
@@ -46,7 +46,7 @@ QVector<double> stringToDoubleArray_base64(const QString& data) {
 QVector<double> stringToDoubleArray_hex(const QString& data) {
     QVector<double> result;
 
-    QByteArray a=QByteArray::fromHex(data.toAscii());
+    QByteArray a=QByteArray::fromHex(data.toLatin1());
     long long count=a.size()/sizeof(double);
     result.fill(0.0, count);
     const double* d=(double*)a.constData();
@@ -109,7 +109,7 @@ QByteArray doubleArrayToString_hex(const QVector<double>& data) {
 QVector<qlonglong> stringToQlonglongArray_base64(const QString& data) {
     QVector<qlonglong> result;
 
-    QByteArray a=QByteArray::fromBase64(data.toAscii());
+    QByteArray a=QByteArray::fromBase64(data.toLatin1());
     long long count=a.size()/sizeof(qlonglong);
     result.fill(0.0, count);
     const qlonglong* d=(qlonglong*)a.constData();
@@ -126,7 +126,7 @@ QVector<qlonglong> stringToQlonglongArray_base64(const QString& data) {
 QVector<qlonglong> stringToQlonglongArray_hex(const QString& data) {
     QVector<qlonglong> result;
 
-    QByteArray a=QByteArray::fromHex(data.toAscii());
+    QByteArray a=QByteArray::fromHex(data.toLatin1());
     long long count=a.size()/sizeof(qlonglong);
     result.fill(0.0, count);
     const qlonglong* d=(qlonglong*)a.constData();

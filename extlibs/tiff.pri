@@ -19,7 +19,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-include(zlib.pri)
 INCLUDEPATH += $$PWD/libtiff/include/
 LIBS += -L$$PWD/libtiff/lib/ -ltiff
 DEFINES += QF_HAS_LIBTIFF cimg_use_tiff
+include(zlib.pri)

@@ -880,7 +880,7 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
         for (int i=0; i<filenames.size(); i++) {
             data.append(init);
             data[i].filename=filenames[i];
-            data[i].alv_file=fopen(data[i].filename.toAscii().data(), "r");
+            data[i].alv_file=fopen(data[i].filename.toLatin1().data(), "r");
 
             if (!data[i].alv_file) {
                 setError(tr("could not open file '%1'").arg(data[i].filename));
@@ -1315,7 +1315,7 @@ bool QFRDRFCSData::loadFromALV6000Files(QStringList filenames) {
         for (int i=0; i<filenames.size(); i++) {
             data.append(init);
             data[i].filename=filenames[i];
-            data[i].alv_file=fopen(data[i].filename.toAscii().data(), "r");
+            data[i].alv_file=fopen(data[i].filename.toLatin1().data(), "r");
 
             if (!data[i].alv_file) {
                 setError(tr("could not open file '%1'").arg(data[i].filename));
@@ -1728,7 +1728,7 @@ bool QFRDRFCSData::loadFromALV7000File(QString &filename)
         int channel=0;
         bool gotCorr=false, gotRate=false;
         data.filename=filename;
-        data.alv_file=fopen(data.filename.toAscii().data(), "r");
+        data.alv_file=fopen(data.filename.toLatin1().data(), "r");
 
         if (!data.alv_file) {
             setError(tr("could not open file '%1'").arg(data.filename));

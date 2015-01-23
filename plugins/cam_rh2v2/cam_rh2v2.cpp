@@ -200,7 +200,7 @@ bool QFExtensionCameraRh2v2::flashFPGA(QString bitfile, char fpga, QString& mess
     if (fpga=='S' || fpga=='s') name="slave";
     while ((i<retries) && (res==0)) {
         char message[8192];
-        res=flash_bitfile(bitfile.toAscii().data(), message, fpga);
+        res=flash_bitfile(bitfile.toLatin1().data(), message, fpga);
         if (i>0) messageOut+="\n\n";
         messageOut += tr("try %4 %1/%2:\n%3").arg(i+1).arg(retries).arg(message).arg(name);
         i++;

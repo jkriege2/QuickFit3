@@ -21,7 +21,7 @@ bool QF3CorrelationDataFormatTool::loadFile(const QString &filename, bool proper
         QRegExp rxPC("preferred_channel(\\d+)");
         QRegExp rxCHName("(channel_name|channelname)(\\d+)");
         rxCHName.setCaseSensitivity(Qt::CaseInsensitive);
-        QTextCodec* codec=QTextCodec::codecForCStrings();
+        QTextCodec* codec=QTextCodec::codecForName("ISO-8859-1");
         while (ok && !f.atEnd()) {
             QString line;
             if (codec) {
@@ -202,7 +202,7 @@ bool QF3CorrelationDataFormatTool::loadFile(const QString &filename, bool proper
 
 void QF3CorrelationDataFormatTool::saveFile(const QString &filename) const
 {
-    QTextCodec* codec=QTextCodec::codecForCStrings();
+    QTextCodec* codec=QTextCodec::codecForName("ISO-8859-1");
     QFile f(filename);
     if (f.open(QFile::WriteOnly|QFile::Text)) {
         QTextStream str(&f);

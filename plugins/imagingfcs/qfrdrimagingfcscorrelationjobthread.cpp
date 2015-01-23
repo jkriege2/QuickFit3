@@ -516,14 +516,14 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 bool error=false;
 
                                 localFilename=bleachAmplitudeFilename=outputFilenameBase+".bleachamplitude.tif";
-                                tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                tif = TIFFOpen(localFilename.toLatin1().data(),"w");
                                 if (tif) {
                                     TIFFTWriteFloat(tif, bleachAmplitude, frame_width, frame_height);
                                     TIFFClose(tif);
                                 } else error=true;
 
                                 localFilename=bleachTimeFilename=outputFilenameBase+".bleachtime.tif";
-                                tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                tif = TIFFOpen(localFilename.toLatin1().data(),"w");
                                 if (tif) {
                                     TIFFTWriteFloat(tif, bleachTime, frame_width, frame_height);
                                     TIFFClose(tif);
@@ -531,14 +531,14 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
 
                                 if (job.bleach==BLEACH_DBL_EXP) {
                                     localFilename=bleachAmplitude2Filename=outputFilenameBase+".bleachamplitude2.tif";
-                                    tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                    tif = TIFFOpen(localFilename.toLatin1().data(),"w");
                                     if (tif) {
                                         TIFFTWriteFloat(tif, bleachAmplitude2, frame_width, frame_height);
                                         TIFFClose(tif);
                                     } else error=true;
 
                                     localFilename=bleachTime2Filename=outputFilenameBase+".bleachtime2.tif";
-                                    tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                    tif = TIFFOpen(localFilename.toLatin1().data(),"w");
                                     if (tif) {
                                         TIFFTWriteFloat(tif, bleachTime2, frame_width, frame_height);
                                         TIFFClose(tif);
@@ -548,7 +548,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
 
                                 if (job.bleach==BLEACH_EXP_POLY2||job.bleach==BLEACH_EXP_POLY3||job.bleach==BLEACH_EXP_POLY4||job.bleach==BLEACH_EXP_POLY5 ) {
                                     localFilename=bleachPoly2Filename=outputFilenameBase+".bleachpoly2.tif";
-                                    tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                    tif = TIFFOpen(localFilename.toLatin1().data(),"w");
                                     if (tif) {
                                         TIFFTWriteFloat(tif, bleachPoly2, frame_width, frame_height);
                                         TIFFClose(tif);
@@ -557,7 +557,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 }
                                 if (job.bleach==BLEACH_EXP_POLY3||job.bleach==BLEACH_EXP_POLY4||job.bleach==BLEACH_EXP_POLY5 ) {
                                     localFilename=bleachPoly3Filename=outputFilenameBase+".bleachpoly3.tif";
-                                    tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                    tif = TIFFOpen(localFilename.toLatin1().data(),"w");
                                     if (tif) {
                                         TIFFTWriteFloat(tif, bleachPoly3, frame_width, frame_height);
                                         TIFFClose(tif);
@@ -565,7 +565,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 }
                                 if (job.bleach==BLEACH_EXP_POLY4||job.bleach==BLEACH_EXP_POLY5 ) {
                                     localFilename=bleachPoly4Filename=outputFilenameBase+".bleachpoly4.tif";
-                                    tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                    tif = TIFFOpen(localFilename.toLatin1().data(),"w");
                                     if (tif) {
                                         TIFFTWriteFloat(tif, bleachPoly4, frame_width, frame_height);
                                         TIFFClose(tif);
@@ -573,28 +573,28 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                 }
                                 if (job.bleach==BLEACH_EXP_POLY5 ) {
                                     localFilename=bleachPoly5Filename=outputFilenameBase+".bleachpoly5.tif";
-                                    tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                    tif = TIFFOpen(localFilename.toLatin1().data(),"w");
                                     if (tif) {
                                         TIFFTWriteFloat(tif, bleachPoly5, frame_width, frame_height);
                                         TIFFClose(tif);
                                     } else error=true;
                                 }
                                 localFilename=bleachFitSuccessFilename=outputFilenameBase+".bleachfitok.tif";
-                                tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                tif = TIFFOpen(localFilename.toLatin1().data(),"w");
                                 if (tif) {
                                     TIFFTWriteUint8(tif, bleachFitOK, frame_width, frame_height);
                                     TIFFClose(tif);
                                 } else error=true;
 
                                 localFilename=firstFramesFilename=outputFilenameBase+".firstframes.tif";
-                                tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                tif = TIFFOpen(localFilename.toLatin1().data(),"w");
                                 if (tif) {
                                     TIFFTWriteFloat(tif, firstFrames, frame_width, frame_height);
                                     TIFFClose(tif);
                                 } else error=true;
 
                                 localFilename=lastFramesFilename=outputFilenameBase+".lastframes.tif";
-                                tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                tif = TIFFOpen(localFilename.toLatin1().data(),"w");
                                 if (tif) {
                                     TIFFTWriteFloat(tif, lastFrames, frame_width, frame_height);
                                     TIFFClose(tif);
@@ -619,7 +619,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
 
                                 if (NFitFrames>0 && fit_frames) {
                                     localFilename=bleachframesFilename=outputFilenameBase+".bleachfitframes.tif";
-                                    tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                                    tif = TIFFOpen(localFilename.toLatin1().data(),"w");
                                     if (tif) {
                                         for (int i=0; i<NFitFrames; i++) {
                                             TIFFTWriteFloat(tif, &(fit_frames[i*frame_width*frame_height]), frame_width, frame_height);
@@ -645,8 +645,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         if ((m_status==1) && !was_canceled && video && real_video_count>0 ) {
                             emit messageChanged(tr("saving video ..."));
                             QString localFilename=videoFilename=outputFilenameBase+".video.tif";
-                            TinyTIFFFile* tif=TinyTIFFWriter_open(localFilename.toAscii().data(), 16, frame_width, frame_height);
-                            //TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                            TinyTIFFFile* tif=TinyTIFFWriter_open(localFilename.toLatin1().data(), 16, frame_width, frame_height);
+                            //TIFF* tif = TIFFOpen(localFilename.toLatin1().data(),"w");
                             if (tif) {
                                 float avgMin=video[0];
                                 float avgMax=video[0];
@@ -685,8 +685,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         if ((m_status==1) && !was_canceled && video_uncorrected && real_video_count>0 ) {
                             emit messageChanged(tr("saving uncorrected video ..."));
                             QString localFilename=videoUncorrectedFilename=outputFilenameBase+".videouncorr.tif";
-                            TinyTIFFFile* tif=TinyTIFFWriter_open(localFilename.toAscii().data(), 16, frame_width, frame_height);
-                            //TIFF* tif = TIFFOpen(localFilename.toAscii().data(),"w");
+                            TinyTIFFFile* tif=TinyTIFFWriter_open(localFilename.toLatin1().data(), 16, frame_width, frame_height);
+                            //TIFF* tif = TIFFOpen(localFilename.toLatin1().data(),"w");
                             if (tif) {
                                 float avgMin=video_uncorrected[0];
                                 float avgMax=video_uncorrected[0];
@@ -2070,7 +2070,7 @@ bool QFRDRImagingFCSCorrelationJobThread::saveStatistics(const QString &filename
 
 bool QFRDRImagingFCSCorrelationJobThread::SaveSDTIFF(const QString &filename, float *average_frame, float *sqrsum_frame, int frame_width, int frame_height, int frames, const QString &title, QString *error)
 {
-    TIFF* tif = TIFFOpen(filename.toAscii().data(),"w");
+    TIFF* tif = TIFFOpen(filename.toLatin1().data(),"w");
     if (tif) {
         float* sd=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
 
@@ -2097,7 +2097,7 @@ bool QFRDRImagingFCSCorrelationJobThread::SaveSDTIFF(const QString &filename, fl
 
 bool QFRDRImagingFCSCorrelationJobThread::SaveTIFFFloat(const QString &filename, float *average_frame, int frame_width, int frame_height, const QString &title, QString *error)
 {
-    TIFF* tif = TIFFOpen(filename.toAscii().data(),"w");
+    TIFF* tif = TIFFOpen(filename.toLatin1().data(),"w");
     if (tif) {
 
         TIFFTWriteFloat(tif, average_frame, frame_width, frame_height);
@@ -2111,7 +2111,7 @@ bool QFRDRImagingFCSCorrelationJobThread::SaveTIFFFloat(const QString &filename,
 
 bool QFRDRImagingFCSCorrelationJobThread::SaveTIFFUInt16_scaled(const QString &filename, float *average_frame, int frame_width, int frame_height, const QString &title, QString *error)
 {
-    TIFF* tif = TIFFOpen(filename.toAscii().data(),"w");
+    TIFF* tif = TIFFOpen(filename.toLatin1().data(),"w");
     if (tif) {
         float avgMin=average_frame[0];
         float avgMax=average_frame[0];

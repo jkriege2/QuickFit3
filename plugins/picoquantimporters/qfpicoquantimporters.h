@@ -39,6 +39,10 @@ class QFPicoQuantImporters : public QObject, public QFPluginImporters {
         Q_OBJECT
         Q_INTERFACES(QFPluginImporters)
         Q_INTERFACES(QFPlugin)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFPicoQuantImporters")
+#endif
+
     public:
 
         /** Default constructor */

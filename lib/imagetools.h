@@ -143,7 +143,7 @@ enum QFImageHalf {
     input has to be of size inWidth*inHeight, ahereas output is expected to be of size inWidth*inHeight/2!
 */
 template <typename T1, typename T2>
-void qfCopyImageHalf(T1* output, const T2* input, int inWidth, int inHeight, QFImageHalf imageHalf) {
+inline void qfCopyImageHalf(T1* output, const T2* input, int inWidth, int inHeight, QFImageHalf imageHalf) {
     int width=inWidth;
     int height=inHeight;
     int shiftx=0;
@@ -189,7 +189,7 @@ void qfCopyImageHalf(T1* output, const T2* input, int inWidth, int inHeight, QFI
     input has to be of size inWidth*inHeight, ahereas output is expected to be of size inWidth*inHeight/2!
 */
 template <typename T1, typename T2>
-void qfAllocCopyImageHalf(T1*& output, const T2* input, int inWidth, int inHeight, QFImageHalf imageHalf) {
+inline void qfAllocCopyImageHalf(T1*& output, const T2* input, int inWidth, int inHeight, QFImageHalf imageHalf) {
     int width=inWidth;
     int height=inHeight;
     int shiftx=0;

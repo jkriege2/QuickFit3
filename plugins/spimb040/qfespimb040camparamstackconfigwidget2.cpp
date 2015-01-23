@@ -562,16 +562,16 @@ void QFESPIMB040CamParamStackConfigWidget2::performStack()
             progress.setLabelText(tr("opening output files ..."));
             QApplication::processEvents();
             if (ok && useCam1) {
-                QDir().mkpath(QFileInfo(TIFFFIlename1.toAscii().data()).absolutePath());
-                tiff1=TIFFOpen(TIFFFIlename1.toAscii().data(), "w");
+                QDir().mkpath(QFileInfo(TIFFFIlename1.toLatin1().data()).absolutePath());
+                tiff1=TIFFOpen(TIFFFIlename1.toLatin1().data(), "w");
                 if (!tiff1) {
                     ok=false;
                     CAMPARAMSTACK_ERROR(tr("error opening TIFF file (camera 1) '%1'!").arg(TIFFFIlename1));
                 }
             }
             if (ok && useCam2) {
-                QDir().mkpath(QFileInfo(TIFFFIlename2.toAscii().data()).absolutePath());
-                tiff2=TIFFOpen(TIFFFIlename2.toAscii().data(), "w");
+                QDir().mkpath(QFileInfo(TIFFFIlename2.toLatin1().data()).absolutePath());
+                tiff2=TIFFOpen(TIFFFIlename2.toLatin1().data(), "w");
                 if (!tiff2) {
                     ok=false;
                     CAMPARAMSTACK_ERROR(tr("error opening TIFF file (camera 2) '%1'!").arg(TIFFFIlename2));
@@ -927,7 +927,7 @@ void QFESPIMB040CamParamStackConfigWidget2::performStack()
             QString ParamValuesFilename=acquisitionPrefix1+".param.dat";
             QFile posFile(ParamValuesFilename);
             if (posFile.open(QIODevice::WriteOnly)) {
-                posFile.write(scanCSV.toAscii().data());
+                posFile.write(scanCSV.toLatin1().data());
                 posFile.close();
                 d.name=ParamValuesFilename;
                 d.description="parameter values";
@@ -963,7 +963,7 @@ void QFESPIMB040CamParamStackConfigWidget2::performStack()
             QString ParamValuesFilename=acquisitionPrefix2+".param.dat";
             QFile posFile(ParamValuesFilename);
             if (posFile.open(QIODevice::WriteOnly)) {
-                posFile.write(scanCSV.toAscii().data());
+                posFile.write(scanCSV.toLatin1().data());
                 posFile.close();
                 d.name=ParamValuesFilename;
                 d.description="parameter values";

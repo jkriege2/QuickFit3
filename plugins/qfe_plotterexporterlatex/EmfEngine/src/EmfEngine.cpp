@@ -158,7 +158,7 @@ void EmfPaintEngine::drawTextItem ( const QPointF & p, const QTextItem & textIte
 	HFONT wfont = CreateFontA(fm.height() - 1, fm.averageCharWidth(), 0, 0,
 				10*f.weight(), f.italic(), f.underline (), f.strikeOut(),
 				DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-				DEFAULT_QUALITY, DEFAULT_PITCH, f.family().toAscii().data());
+				DEFAULT_QUALITY, DEFAULT_PITCH, f.family().toLatin1().data());
 	SelectObject( metaDC, wfont);
 
 	QColor colour = painter()->pen().color();
@@ -178,7 +178,7 @@ void EmfPaintEngine::drawTextItem ( const QPointF & p, const QTextItem & textIte
 	xf.eDy = m.dy();
 	SetWorldTransform(metaDC, &xf);
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
 	wchar_t *wtext = (wchar_t *)malloc(size*sizeof(wchar_t));
 	if (!wtext){
 		qWarning("EmfEngine: Not enough memory in drawTextItem().");
@@ -266,21 +266,21 @@ void EmfPaintEngine::drawPath ( const QPainterPath & path )
 		switch(el.type){
 			case QPainterPath::MoveToElement:
 				types[i] = PT_MOVETO;
-			#ifndef Q_WS_WIN
+            #ifndef Q_OS_WIN32
 				MoveToEx (metaDC, x, y, 0);
 			#endif
 			break;
 
 			case QPainterPath::LineToElement:
 				types[i] = PT_LINETO;
-			#ifndef Q_WS_WIN
+            #ifndef Q_OS_WIN32
 				LineTo(metaDC, x, y);
 			#endif
 			break;
 
 			case QPainterPath::CurveToElement:
 				types[i] = PT_BEZIERTO;
-			#ifndef Q_WS_WIN
+            #ifndef Q_OS_WIN32
 				bzs[bez] = pts[i];
 				bez++;
 			#endif
@@ -288,7 +288,7 @@ void EmfPaintEngine::drawPath ( const QPainterPath & path )
 
 			case QPainterPath::CurveToDataElement:
 				types[i] = PT_BEZIERTO;
-			#ifndef Q_WS_WIN
+            #ifndef Q_OS_WIN32
 				bzs[bez] = pts[i];
 				if (bez == 2){
 					PolyBezierTo(metaDC, bzs, 3);
@@ -302,7 +302,7 @@ void EmfPaintEngine::drawPath ( const QPainterPath & path )
 
 	HPEN wpen = convertPen(painter()->pen());
 	SelectObject(metaDC, wpen);
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
 	PolyDraw(metaDC, pts, types, points);
 #else
 	StrokePath(metaDC);
@@ -317,7 +317,7 @@ void EmfPaintEngine::drawPath ( const QPainterPath & path )
 		StrokeAndFillPath(metaDC);
 	else {
 		FillPath(metaDC);
-	#ifdef Q_WS_WIN
+    #ifdef Q_OS_WIN32
 		PolyDraw(metaDC, pts, types, points);
 	#else
 		StrokePath(metaDC);
@@ -342,7 +342,7 @@ void EmfPaintEngine::drawPixmap(const QRectF &r, const QPixmap &pm, const QRectF
 	int width = qRound(r.width());
 	int height = qRound(r.height());
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
 	HBITMAP hbtmp = NULL;
 	DWORD op = SRCCOPY;
 	if (pm.hasAlpha()){
@@ -376,7 +376,7 @@ void EmfPaintEngine::drawTiledPixmap(const QRectF &r, const QPixmap & pix, const
 {
 	setClipping();
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
 	HBITMAP hBmp = pix.toWinHBITMAP();
 	HBRUSH wbrush = CreatePatternBrush(hBmp);
 
@@ -417,7 +417,7 @@ void EmfPaintEngine::drawImage(const QRectF & r, const QImage & image, const QRe
 	int width = qRound(r.width());
 	int height = qRound(r.height());
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
 	setClipping();
 	QPixmap pix = QPixmap::fromImage (image.scaled(width, height), flags);
 
@@ -443,7 +443,7 @@ void EmfPaintEngine::drawImage(const QRectF & r, const QImage & image, const QRe
 
 void EmfPaintEngine::setClipping()
 {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
 	if (painter()->hasClipping()) {
 		QRect rect = painter()->clipRegion().boundingRect();
 		HRGN hrgn = CreateRectRgn(rect.left(), rect.top(), rect.right(), rect.bottom());
@@ -455,7 +455,7 @@ void EmfPaintEngine::setClipping()
 
 void EmfPaintEngine::resetClipping()
 {
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
 	if (painter()->hasClipping())
 		SelectClipRgn(metaDC, NULL);
 #endif
@@ -541,7 +541,7 @@ HBRUSH EmfPaintEngine::convertBrush(const QBrush& brush)
 	if (brush.color().alpha() < 255){//semi-transparent brush color
 		qWarning ("Semi-transparent brushes are not supported by EmfEngine.");
 
-		#ifdef Q_WS_WIN
+        #ifdef Q_OS_WIN32
 		QPixmap pix(4, 4);
 		pix.fill(Qt::white);
 		QPainter p;
@@ -577,7 +577,7 @@ HBRUSH EmfPaintEngine::convertBrush(const QBrush& brush)
 		case Qt::Dense6Pattern:
 		case Qt::Dense7Pattern:
 		{
-		#ifdef Q_WS_WIN
+        #ifdef Q_OS_WIN32
 			QPixmap pix(4, 4);
 			pix.fill(Qt::white);
 			QPainter p;
@@ -639,7 +639,7 @@ HBRUSH EmfPaintEngine::convertBrush(const QBrush& brush)
 		}
 
 		case Qt::TexturePattern:
-		#ifdef Q_WS_WIN
+        #ifdef Q_OS_WIN32
 		{
 			HBITMAP hbm = brush.texture().toWinHBITMAP();
 			HBRUSH wbrush = CreatePatternBrush(hbm);

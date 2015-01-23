@@ -1,5 +1,11 @@
 #include "radhard2flash.h"
 #include "qftools.h"
+// USB functions
+#ifdef interface
+#  undef interface
+#endif
+#include <stdint.h>
+#include <usb.h>
 //-----------------------------------------------------------------------------
 //
 //  Defines

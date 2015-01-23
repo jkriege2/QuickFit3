@@ -25,13 +25,9 @@
 
 #include <cmath>
 #include <cfloat>
-#include <QSettings>
-#include <QWidget>
-#include <QSplitter>
-#include <QFile>
 #include "lib_imexport.h"
-#include <QFileDialog>
 #include <cstdlib>
+#include <QVector>
 
 /*! \brief Avogadro's number \f$ N_A=6.02214179\cdot10^{23} \f$
     \ingroup qf3lib_mathtools
@@ -425,7 +421,7 @@ inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, doub
 
 */
 template <typename T>
-typename T::value_type qfDotProduct(const T& v1, const T& v2) {
+inline typename T::value_type qfDotProduct(const T& v1, const T& v2) {
     if (v1.size()!=v2.size()) return 0;
     typename T::value_type r=0;
     for (int i=0; i<v1.size(); i++) {
@@ -445,7 +441,7 @@ typename T::value_type qfDotProduct(const T& v1, const T& v2) {
 
 */
 template <class T>
-double qfstatisticsAverageVariance(double& var, const T& value) {
+inline double qfstatisticsAverageVariance(double& var, const T& value) {
     long long N=value.size();
     if (N<=1) return 0;
     register double sum=0;
@@ -476,7 +472,7 @@ double qfstatisticsAverageVariance(double& var, const T& value) {
 
 */
 template <class T>
-double qfstatisticsMaskedAverageVariance(double& var, const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+inline double qfstatisticsMaskedAverageVariance(double& var, const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
     if (mask.size()<value.size()) return qfstatisticsAverageVariance(var, value);
     long long N=value.size();
     if (N<=1) return 0;
@@ -509,7 +505,7 @@ double qfstatisticsMaskedAverageVariance(double& var, const QVector<bool>& mask,
 
 */
 template <class T>
-double qfstatisticsAverageStd(double& std, const T& value) {
+inline double qfstatisticsAverageStd(double& std, const T& value) {
     double var=0;
     double avg=qfstatisticsAverageVariance(var, value);
     std=sqrt(var);
@@ -525,7 +521,7 @@ double qfstatisticsAverageStd(double& std, const T& value) {
 
 */
 template <class T>
-double qfstatisticsMaskedverageStd(double& std, const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+inline double qfstatisticsMaskedverageStd(double& std, const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
     if (mask.size()<value.size()) return qfstatisticsAverageStd(std, value);
     double var=0;
     double avg=qfstatisticsMaskedAverageVariance(var, mask, value, maskUseValue);
@@ -539,7 +535,7 @@ double qfstatisticsMaskedverageStd(double& std, const QVector<bool>& mask, const
     \f[ \overline{v}=\frac{1}{N}\cdot\sum\limits_{i=0}^{N-1} v_i \f]
 */
 template <class T>
-double qfstatisticsAverage(const T& value) {
+inline double qfstatisticsAverage(const T& value) {
     long long N=value.size();
     if (N==1) return value[0];
     if (N<=0) return 0;
@@ -560,7 +556,7 @@ double qfstatisticsAverage(const T& value) {
     \f[ \overline{v}=\frac{1}{N}\cdot\sum\limits_{i=0}^{N-1} v_i \f]
 */
 template <class T>
-double qfstatisticsMaskedAverage(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+inline double qfstatisticsMaskedAverage(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
     if (mask.size()<value.size()) return qfstatisticsAverage(value);
     long long N=value.size();
     if (N==1) return value[0];
@@ -585,7 +581,7 @@ double qfstatisticsMaskedAverage(const QVector<bool>& mask, const T& value, bool
 
 */
 template <class T>
-double qfstatisticsCorrCoeff(const T& X, const T& Y) {
+inline double qfstatisticsCorrCoeff(const T& X, const T& Y) {
     long long N=qMin(X.size(), Y.size());
     if (N<=1) return 0;
     register double xbar=0;
@@ -625,7 +621,7 @@ double qfstatisticsCorrCoeff(const T& X, const T& Y) {
     the input dataset \f$ x_i\f$.
 */
 template <class T>
-double qfstatisticsSkewness(const T& value) {
+inline double qfstatisticsSkewness(const T& value) {
     long long N=value.size();
     if (N<=0) return 0;
     register double avg=qfstatisticsAverage(value);
@@ -653,7 +649,7 @@ double qfstatisticsSkewness(const T& value) {
     the input dataset \f$ x_i\f$.
 */
 template <class T>
-double qfstatisticsCentralMoment(const T& value, int order) {
+inline double qfstatisticsCentralMoment(const T& value, int order) {
     int N=value.size();
     if (N<=0) return 0;
     register double avg=qfstatisticsAverage(value);
@@ -678,7 +674,7 @@ double qfstatisticsCentralMoment(const T& value, int order) {
     the input dataset \f$ x_i\f$.
 */
 template <class T>
-double qfstatisticsMoment(const T& value, int order) {
+inline double qfstatisticsMoment(const T& value, int order) {
     int N=value.size();
     if (N<=0) return 0;
     register double sum=0;
@@ -697,7 +693,7 @@ double qfstatisticsMoment(const T& value, int order) {
     \ingroup qf3lib_mathtools
 */
 template <class T>
-long long qfstatisticsCount(const T& value) {
+inline long long qfstatisticsCount(const T& value) {
     long long N=value.size();
     if (N<=0) return 0;
     register long long NN=0;
@@ -715,7 +711,7 @@ long long qfstatisticsCount(const T& value) {
 
 */
 template <class T>
-double qfstatisticsMaskedCount(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+inline double qfstatisticsMaskedCount(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
     if (mask.size()<value.size()) return qfstatisticsCount(value);
     long long N=value.size();
     if (N<1) return 0;
@@ -733,7 +729,7 @@ double qfstatisticsMaskedCount(const QVector<bool>& mask, const T& value, bool m
 
 */
 template <typename T>
-typename T::value_type qfstatisticsMin(const T& value) {
+inline typename T::value_type qfstatisticsMin(const T& value) {
     long long N=value.size();
     if (N<=0) return 0;
     if (N==1) return value[0];
@@ -757,7 +753,7 @@ typename T::value_type qfstatisticsMin(const T& value) {
 
 */
 template <typename T>
-typename T::value_type qfstatisticsMax(const T& value) {
+inline typename T::value_type qfstatisticsMax(const T& value) {
     long long N=value.size();
     if (N<=0) return 0;
     if (N==1) return value[0];
@@ -782,7 +778,7 @@ typename T::value_type qfstatisticsMax(const T& value) {
 
 */
 template <class T>
-T qfstatisticsFilter(const T& value) {
+inline T qfstatisticsFilter(const T& value) {
     long long N=value.size();
     if (N<1) return T();
     T res;
@@ -800,7 +796,7 @@ T qfstatisticsFilter(const T& value) {
     \f[ \overline{v}=\sum\limits_{i=0}^{N-1} v_i \f]
 */
 template <class T>
-double qfstatisticsSum(const T& value) {
+inline double qfstatisticsSum(const T& value) {
     long long N=value.size();
     if (N<1) return 0;
     register double sum=0;
@@ -818,7 +814,7 @@ double qfstatisticsSum(const T& value) {
     \f[ \overline{v}=\sum\limits_{i=0}^{N-1} v_i \f]
 */
 template <class T>
-double qfstatisticsMaskedSum(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+inline double qfstatisticsMaskedSum(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
     if (mask.size()<value.size()) return qfstatisticsSum(value);
     long long N=value.size();
     if (N<1) return 0;
@@ -837,7 +833,7 @@ double qfstatisticsMaskedSum(const QVector<bool>& mask, const T& value, bool mas
     \f[ X_n=\sum\limits_{i=0}^{n-1} v_i \f]
 */
 template <class T>
-T qfstatisticsCumSum(const T& value) {
+inline T qfstatisticsCumSum(const T& value) {
     long long N=value.size();
     if (N<1) return T();
     double sum=0;
@@ -860,7 +856,7 @@ T qfstatisticsCumSum(const T& value) {
     The returned vector has one item less than the input vector
 */
 template <class T>
-T qfstatisticsDiff(const T& value) {
+inline T qfstatisticsDiff(const T& value) {
     long long N=value.size();
     if (N<=1) return T();
     T res;
@@ -889,7 +885,7 @@ T qfstatisticsDiff(const T& value) {
 
 */
 template <class T>
-double qfstatisticsTrapz(const T& value_in) {
+inline double qfstatisticsTrapz(const T& value_in) {
     T value=qfstatisticsFilter(value_in);
     long long N=value.size();
     if (N<=1) return 0;
@@ -910,7 +906,7 @@ double qfstatisticsTrapz(const T& value_in) {
 
 */
 template <class T>
-double qfstatisticsTrapzXY(const T& valueX, const T& valueY) {
+inline double qfstatisticsTrapzXY(const T& valueX, const T& valueY) {
     T X,Y;
 
     long long N=qMin(valueX.size(), valueY.size());
@@ -941,7 +937,7 @@ double qfstatisticsTrapzXY(const T& valueX, const T& valueY) {
     \f[ X_n=\prod\limits_{i=0}^{n-1} v_i \f]
 */
 template <class T>
-T qfstatisticsCumProd(const T& value) {
+inline T qfstatisticsCumProd(const T& value) {
     long long N=value.size();
     if (N<1) return T();
     double prod=1;
@@ -962,7 +958,7 @@ T qfstatisticsCumProd(const T& value) {
     \f[ \overline{v}=\prod\limits_{i=0}^{N-1} v_i \f]
 */
 template <class T>
-double qfstatisticsProd(const T& value) {
+inline double qfstatisticsProd(const T& value) {
     long long N=value.size();
     if (N<1) return 0;
     register double prod=1;
@@ -979,7 +975,7 @@ double qfstatisticsProd(const T& value) {
     \f[ \overline{v}=\cdot\sum\limits_{i=0}^{N-1} v_i^2 \f]
 */
 template <class T>
-double qfstatisticsSum2(const T& value) {
+inline double qfstatisticsSum2(const T& value) {
     long long N=value.size();
     if (N<1) return 0;
     register double sum=0;
@@ -998,7 +994,7 @@ double qfstatisticsSum2(const T& value) {
     \f[ \overline{v}=\sum\limits_{i=0}^{N-1} v_i^2 \f]
 */
 template <class T>
-double qfstatisticsMaskedSum2(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+inline double qfstatisticsMaskedSum2(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
     if (mask.size()<value.size()) return qfstatisticsSum2(value);
     long long N=value.size();
     if (N<1) return 0;
@@ -1019,7 +1015,7 @@ double qfstatisticsMaskedSum2(const QVector<bool>& mask, const T& value, bool ma
 
 */
 template <class T>
-double qfstatisticsVariance(const T& value) {
+inline double qfstatisticsVariance(const T& value) {
     long long N=value.size();
     if (N<=1) return 0;
     register double sum=0;
@@ -1040,7 +1036,7 @@ double qfstatisticsVariance(const T& value) {
 }
 
 template <class T>
-double qfstatisticsStd(const T& value) {
+inline double qfstatisticsStd(const T& value) {
     return sqrt(qfstatisticsVariance(value));
 }
 
@@ -1055,7 +1051,7 @@ double qfstatisticsStd(const T& value) {
 
 */
 template <class T>
-double qfstatisticsMaskedVariance(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+inline double qfstatisticsMaskedVariance(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
     if (mask.size()<value.size()) return qfstatisticsVariance(value);
     long long N=value.size();
     if (N<=1) return 0;
@@ -1077,7 +1073,7 @@ double qfstatisticsMaskedVariance(const QVector<bool>& mask, const T& value, boo
 }
 
 template <class T>
-double qfstatisticsStd(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
+inline double qfstatisticsStd(const QVector<bool>& mask, const T& value, bool maskUseValue=true) {
     return sqrt(qfstatisticsMaskedVariance(mask, value, maskUseValue));
 }
 
@@ -1086,7 +1082,7 @@ double qfstatisticsStd(const QVector<bool>& mask, const T& value, bool maskUseVa
     \ingroup tools_math_stat
 */
 template <typename T>
-typename T::value_type qfstatisticsSortedMin(const T& input) {
+inline typename T::value_type qfstatisticsSortedMin(const T& input) {
     if (input.size()<=0) return 0;
     return input[0];
 }
@@ -1096,7 +1092,7 @@ typename T::value_type qfstatisticsSortedMin(const T& input) {
     \ingroup tools_math_stat
 */
 template <typename T>
-typename T::value_type qfstatisticsSortedMax(const T& input) {
+inline typename T::value_type qfstatisticsSortedMax(const T& input) {
     if (input.size()<=0) return 0;
     return input[input.size()-1];
 }
@@ -1108,7 +1104,7 @@ typename T::value_type qfstatisticsSortedMax(const T& input) {
     if \a N is odd, then the center element is returned, otherwise the function returns the average of the two centering elements
 */
 template <typename T>
-typename T::value_type qfstatisticsSortedMedian(const T& input) {
+inline typename T::value_type qfstatisticsSortedMedian(const T& input) {
     long long N=input.size();
     if (N<=0) return 0;
     if (N==1) return input[0];
@@ -1126,7 +1122,7 @@ typename T::value_type qfstatisticsSortedMedian(const T& input) {
     if \a N is odd, then the center element is returned, otherwise the function returns the average of the two centering elements
 */
 template <typename T>
-typename T::value_type qfstatisticsMedian(const T& input_in) {
+inline typename T::value_type qfstatisticsMedian(const T& input_in) {
     T input=qfstatisticsFilter(input_in);
     qSort(input);
     return qfstatisticsSortedMedian(input);
@@ -1140,7 +1136,7 @@ typename T::value_type qfstatisticsMedian(const T& input_in) {
     if \a N is odd, then the center element is returned, otherwise the function returns the average of the two centering elements
 */
 template <typename T>
-typename T::value_type qfstatisticsMaskedMedian(const QVector<bool>& mask, const T& input_in, bool maskUseValue=true) {
+inline typename T::value_type qfstatisticsMaskedMedian(const QVector<bool>& mask, const T& input_in, bool maskUseValue=true) {
     if (mask.size()<input_in.size()) return qfstatisticsMedian(input_in);
     T input;
     for (int i=0; i<input_in.size(); i++) {
@@ -1162,7 +1158,7 @@ typename T::value_type qfstatisticsMaskedMedian(const QVector<bool>& mask, const
 
 */
 template <typename T>
-typename T::value_type qfstatisticsSortedMAD(const T& value, typename T::value_type* median=NULL) {
+inline typename T::value_type qfstatisticsSortedMAD(const T& value, typename T::value_type* median=NULL) {
     long long N=value.size();
     if (N<=1) return 0;
     register typename T::value_type med=qfstatisticsSortedMedian(value);
@@ -1186,7 +1182,7 @@ typename T::value_type qfstatisticsSortedMAD(const T& value, typename T::value_t
 
 */
 template <typename T>
-typename T::value_type qfstatisticsSortedNMAD(const T& value, typename T::value_type* median=NULL) {
+inline typename T::value_type qfstatisticsSortedNMAD(const T& value, typename T::value_type* median=NULL) {
     return qfstatisticsSortedMAD(value, median)/0.6745;
 }
 
@@ -1201,7 +1197,7 @@ typename T::value_type qfstatisticsSortedNMAD(const T& value, typename T::value_
 
 */
 template <typename T>
-typename T::value_type qfstatisticsMAD(const T& value, typename T::value_type* median) {
+inline typename T::value_type qfstatisticsMAD(const T& value, typename T::value_type* median) {
     long long N=value.size();
     if (N<=1) return 0;
     T sorted=qfstatisticsFilter(value);
@@ -1211,7 +1207,7 @@ typename T::value_type qfstatisticsMAD(const T& value, typename T::value_type* m
 }
 
 template <typename T>
-typename T::value_type qfstatisticsMADS(const T& value) {
+inline typename T::value_type qfstatisticsMADS(const T& value) {
     typename T::value_type median;
     return  qfstatisticsMAD(value, &median);
 }
@@ -1226,12 +1222,12 @@ typename T::value_type qfstatisticsMADS(const T& value) {
 
 */
 template <typename T>
-double qfstatisticsNMAD(const T& value, typename T::value_type* median) {
+inline double qfstatisticsNMAD(const T& value, typename T::value_type* median) {
     return double(qfstatisticsMAD(value, median))/0.6745;
 }
 
 template <typename T>
-double qfstatisticsNMADS(const T& value) {
+inline double qfstatisticsNMADS(const T& value) {
     typename T::value_type median;
     return  qfstatisticsNMAD(value, &median);
 }
@@ -1242,7 +1238,7 @@ double qfstatisticsNMADS(const T& value) {
 
 */
 template <typename T>
-typename T::value_type qfstatisticsSortedQuantile(const T& input, double quantile) {
+inline typename T::value_type qfstatisticsSortedQuantile(const T& input, double quantile) {
     long long N=input.size();
     if (N<=0) return 0;
     if (N==1) return input[0];
@@ -1260,7 +1256,7 @@ typename T::value_type qfstatisticsSortedQuantile(const T& input, double quantil
 
 */
 template <typename T>
-typename T::value_type qfstatisticsQuantile(const T& input_in, double quantile) {
+inline typename T::value_type qfstatisticsQuantile(const T& input_in, double quantile) {
     T input=qfstatisticsFilter(input_in);
     qSort(input);
     return qfstatisticsSortedQuantile(input, quantile);
@@ -1278,7 +1274,7 @@ typename T::value_type qfstatisticsQuantile(const T& input_in, double quantile) 
     if \a N is odd, then the center element is returned, otherwise the function returns the average of the two centering elements
 */
 template <typename T>
-typename T::value_type qfstatisticsMaskedQuantile(const QVector<bool>& mask, const T& input_in, double quantile, bool maskUseValue=true) {
+inline typename T::value_type qfstatisticsMaskedQuantile(const QVector<bool>& mask, const T& input_in, double quantile, bool maskUseValue=true) {
     if (mask.size()<input_in.size()) return qfstatisticsQuantile(input_in, quantile);
     T input;
     for (int i=0; i<input_in.size(); i++) {

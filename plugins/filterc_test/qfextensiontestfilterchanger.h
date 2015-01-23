@@ -38,6 +38,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 class QFExtensionTestFilterChanger : public QObject, public QFExtensionBase, public QFExtensionFilterChanger {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionFilterChanger)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFExtensionTestFilterChanger")
+#endif
+
     public:
         /** Default constructor */
         QFExtensionTestFilterChanger(QObject* parent=NULL);

@@ -33,6 +33,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 class QFFCSMSDEvaluation : public QObject, public QFPluginEvaluationItemBase {
         Q_OBJECT
         Q_INTERFACES(QFPluginEvaluationItem)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFFCSMSDEvaluation")
+#endif
+
     public:
         /** Default constructor */
         QFFCSMSDEvaluation(QObject* parent=NULL);

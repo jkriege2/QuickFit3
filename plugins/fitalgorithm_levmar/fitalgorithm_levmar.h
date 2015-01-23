@@ -117,6 +117,10 @@ class QFFitAlgorithmLevmar: public QFFitAlgorithm {
 class QFPFitAlgorithmLevmar : public QObject, public QFPluginFitAlgorithm {
         Q_OBJECT
         Q_INTERFACES(QFPluginFitAlgorithm)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFPFitAlgorithmLevmar")
+#endif
+
     public:
         QF_PLUGIN
 

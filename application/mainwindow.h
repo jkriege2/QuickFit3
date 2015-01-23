@@ -24,6 +24,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #define MAINWINDOW_H
 
 #include<QtGlobal>
+#include <QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets>
 #else
@@ -67,6 +68,12 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "jkqtpimagetools.h"
 #include "qftableservice.h"
 #include "qftableview.h"
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+void myMessageOutputQt5(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+#else
+void myMessageOutput(QtMsgType type, const char *msg);
+#endif
 
 /*! \brief main widget for QuickFit
     \ingroup qf3app

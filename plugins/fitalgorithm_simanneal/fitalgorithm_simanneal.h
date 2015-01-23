@@ -192,6 +192,10 @@ class QFFitAlgorithmSimAnneal: public QFFitAlgorithm {
 class QFPFitAlgorithmSimAnneal : public QObject, public QFPluginFitAlgorithm {
         Q_OBJECT
         Q_INTERFACES(QFPluginFitAlgorithm)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFPFitAlgorithmSimAnneal")
+#endif
+
     public:
         QF_PLUGIN
 

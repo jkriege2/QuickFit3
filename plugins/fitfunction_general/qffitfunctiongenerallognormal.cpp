@@ -74,7 +74,7 @@ bool QFFitFunctionGeneralLogNormal::estimateInitial(double *params, const double
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {
-        StatisticsScopedPointer<double> dX=statisticsDuplicateAndApply(dataX, N, log);
+        StatisticsScopedPointer<double> dX(statisticsDuplicateAndApply(dataX, N, log));
         double pW=0;
         double pB=0;
         double pH=0;

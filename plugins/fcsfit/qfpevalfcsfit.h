@@ -36,6 +36,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 class QFPEvalFCSFit : public QObject, public QFPluginEvaluationItemBase, public QFPluginOptionsDialogInterface {
         Q_OBJECT
         Q_INTERFACES(QFPluginEvaluationItem QFPluginOptionsDialogInterface)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFPEvalFCSFit")
+#endif
+
     public:
         /** Default constructor */
         QFPEvalFCSFit(QObject* parent=NULL);

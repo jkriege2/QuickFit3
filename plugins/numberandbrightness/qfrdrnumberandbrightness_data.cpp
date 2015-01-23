@@ -541,7 +541,7 @@ bool QFRDRNumberAndBrightnessData::loadFile(double *target, const QString &filen
     QFImageHalf ihalf=getSelectedImageHalf();
 
     if (QFile::exists(filename)) {
-        TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
+        TIFF* tif=TIFFOpen(filename.toLatin1().data(), "r");
         if (tif) {
             uint32 nx,ny;
             TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
@@ -829,7 +829,7 @@ bool QFRDRNumberAndBrightnessData::loadImage(const QString& filename, double** d
     *height=0;
 
     if (QFile::exists(filename)) {
-        TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
+        TIFF* tif=TIFFOpen(filename.toLatin1().data(), "r");
         if (tif) {
             uint32 nx,ny;
             TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
@@ -854,7 +854,7 @@ bool QFRDRNumberAndBrightnessData::loadVideo(const QString& filename, double** d
     *frames=0;
 
     if (QFile::exists(filename)) {
-        TIFF* tif=TIFFOpen(filename.toAscii().data(), "r");
+        TIFF* tif=TIFFOpen(filename.toLatin1().data(), "r");
         if (tif) {
             *frames=TIFFCountDirectories(tif);
             uint32 nx,ny;

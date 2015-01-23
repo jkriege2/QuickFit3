@@ -78,7 +78,12 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
      QFSimpleTreeModelItem *oldrootItem=rootItem;
      rootItem = new QFSimpleTreeModelItem("");
      delete oldrootItem;
-     reset();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
+    reset();
+#endif
  }
 
  QVariant QFSimpleTreeModel::data(const QModelIndex &index, int role) const

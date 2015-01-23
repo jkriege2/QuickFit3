@@ -43,14 +43,16 @@ SOURCES += qfeplotterexporterlatex.cpp \
     QTeXEngine/src/QTeXPaintEngine.cpp \
     QTeXEngine/src/QTeXPaintDevice.cpp
 
-win32 {
-  DEFINES += HAS_EMF_ENGINE
-  SOURCES += EmfEngine/src/EmfEngine.cpp \
-             EmfEngine/src/EmfPaintDevice.cpp \
-             jkqtpemfengineadapter.cpp
+!greaterThan(QT_MAJOR_VERSION, 4) {
+    win32 {
+      DEFINES += HAS_EMF_ENGINE
+      SOURCES += EmfEngine/src/EmfEngine.cpp \
+                 EmfEngine/src/EmfPaintDevice.cpp \
+                 jkqtpemfengineadapter.cpp
 
-  HEADERS += EmfEngine/src/EmfEngine.h \
-             jkqtpemfengineadapter.h
+      HEADERS += EmfEngine/src/EmfEngine.h \
+                 jkqtpemfengineadapter.h
+    }
 }
 
 FORMS =

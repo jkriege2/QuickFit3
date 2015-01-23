@@ -39,6 +39,10 @@
 class QFECalculator : public QObject, public QFExtensionBase {
         Q_OBJECT
         Q_INTERFACES(QFExtension)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFECalculator")
+#endif
+
     public:
         /** Default constructor */
         QFECalculator(QObject* parent=NULL);

@@ -539,18 +539,18 @@ bool MCStageController::move_To(float xpos, float ypos, float zpos)
     QTime t;
     QString message;
     qstr_xpos = QString::number(xpos, 'f', 5);          // float xscale to std::string   |
-    ba_scale = qstr_xpos.toAscii();                     //                               |
+    ba_scale = qstr_xpos.toLatin1();                     //                               |
     instruction.append(ba_scale.data());  // const char* QByteArray::data() const        V   (result is '\0'-terminated and can be appended)
     instruction.append(" ");
     if ((dims == 2) || (dims == 3)){
         qstr_ypos = QString::number(ypos, 'f', 5);  // float yscale to std::string   |
-        ba_scale = qstr_ypos.toAscii();            //                                |
+        ba_scale = qstr_ypos.toLatin1();            //                                |
         instruction.append(ba_scale.data());        //                               V
         instruction.append(" ");
     }
     if (dims == 3){
         qstr_zpos = QString::number(zpos, 'f', 5);  // float zscale to std::string   |
-        ba_scale = qstr_zpos.toAscii();            //                                |
+        ba_scale = qstr_zpos.toLatin1();            //                                |
         instruction.append(ba_scale.data());        //                               V
         instruction.append(" ");
     }
@@ -588,7 +588,7 @@ bool MCStageController::set_max_accel(float accel)
     //std::string instruction = "";
     QString qstr_accel = QString::number(accel, 'f', 5);  // float to std::string
     QString qinstr = qstr_accel;
-    //QByteArray ba_accel = qstr_accel.toAscii();
+    //QByteArray ba_accel = qstr_accel.toLatin1();
     //qinstr.append(qstr_accel); // const char* QByteArray::data() const (result is '\0'-terminated and can be appended)
     qinstr.append(" setaccel ");
     // send instruction to serial connection
@@ -609,7 +609,7 @@ bool MCStageController::set_max_accel(float accel)
     // check the value and return;
     float check = get_max_accel();
     QString qstr_check = QString::number(check, 'f', 5);  // float to std::string
-    QByteArray ba_check = qstr_check.toAscii();
+    QByteArray ba_check = qstr_check.toLatin1();
     if (!(check < 0)){
         log_text(tr("Maximal acceleration set to %1").arg(ba_check.data()));
         return true;
@@ -798,7 +798,7 @@ bool MCStageController::set_max_joyspeed(float speed, bool silent)
     // check the value and return;
     float check = get_max_joyspeed();
     QString qstr_check = QString::number(check, 'f', 5);  // float to std::string
-    //QByteArray ba_check = qstr_check.toAscii();
+    //QByteArray ba_check = qstr_check.toLatin1();
     if (!(check < 0)){
         if (!silent) log_text(tr("Maximal joyspeed set to %1").arg(qstr_check));
         return true;

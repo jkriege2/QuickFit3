@@ -32,8 +32,8 @@
 
 #include <QPaintDevice>
 #include <QPaintEngine>
-
-#ifdef Q_WS_WIN
+#include <QtGlobal>
+#ifdef Q_OS_WIN32
 	#include <windows.h>
 #endif
 

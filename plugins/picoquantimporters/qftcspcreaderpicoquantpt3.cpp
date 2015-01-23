@@ -46,7 +46,7 @@ QString QFTCSPCReaderPicoquantPT3::formatName() const {
 bool QFTCSPCReaderPicoquantPT3::open(const QString &filename, const QString &parameters) {
     close();
     fileinfo.init(filename);
-    tttrfile=fopen(filename.toAscii().data(), "rb");
+    tttrfile=fopen(filename.toLatin1().data(), "rb");
     if (tttrfile) {
         QString error="";
         bool ok=PT3ReadConfiguration(tttrfile, &txtHeader, &binHeader, &boardHeader, &TTTRHeader, error);

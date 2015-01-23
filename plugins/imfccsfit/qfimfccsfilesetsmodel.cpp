@@ -112,6 +112,11 @@ void QFImFCCSFileSetsModel::rebuildModel()
         fittedSets=0;
         guessedSets=0;
     }
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 

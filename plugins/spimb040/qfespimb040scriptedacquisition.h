@@ -37,6 +37,10 @@
 #include "qrecentfilesmenu.h"
 #include "qfqtscripthighlighter.h"
 #include "finddialog.h"
+#include <QPrinter>
+#include <QPrinterInfo>
+#include <QPrintDialog>
+#include <QPrintPreviewDialog>
 #include "replacedialog.h"
 
 class QFESPIMB040ScriptedAcquisitionDocSearchThread: public QThread {

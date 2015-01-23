@@ -7,6 +7,7 @@
 #include <QPointer>
 #include "qtlogfile.h"
 #include "qfextensionmanager.h"
+#include <QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtGlobal>
 #include <QtWidgets>
@@ -31,6 +32,10 @@
 class Scanner2000NICounter : public QObject, public QFExtensionBase {
         Q_OBJECT
         Q_INTERFACES(QFExtension)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.Scanner2000NICounter")
+#endif
+
 public:
         /** Default constructor */
     Scanner2000NICounter(QObject* parent=NULL);

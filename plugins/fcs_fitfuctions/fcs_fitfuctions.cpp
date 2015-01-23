@@ -18,7 +18,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     You should have received a copy of the GNU General Public License
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+#include <QtGlobal>
 #include "fcs_fitfuctions.h"
 
 
@@ -117,3 +117,4 @@ QFFitFunction* QFPFitFunctionFCS::get(QString id, QObject* parent) const  {
 }
 
 Q_EXPORT_PLUGIN2(qffcsfitfuncs, QFPFitFunctionFCS)
+

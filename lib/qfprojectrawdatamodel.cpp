@@ -43,14 +43,24 @@ void QFProjectRawDataModel::setProject(QFProject* parent) {
 
     item = parent;
     if (item) connect(item, SIGNAL(structureChanged()), this , SLOT(projectChanged()));
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 void QFProjectRawDataModel::projectChanged(bool data) {
     QTime t;
     t.start();
     //qDebug()<<"QFProjectRawDataModel::projectChanged()";
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
     //qDebug()<<"QFProjectRawDataModel::projectChanged() end: "<<t.elapsed()<<" ms";
 }
 

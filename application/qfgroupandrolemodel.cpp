@@ -5,7 +5,12 @@ QFGroupAndRoleModel::QFGroupAndRoleModel(QFProject *project, QObject *parent) :
     QAbstractTableModel(parent)
 {
     this->project=project;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
     roleAlwaysEditable=false;
     nameEditable=false;
     connect(project, SIGNAL(structureChanged()), this, SLOT(projectDataChanged()));
@@ -155,7 +160,12 @@ void QFGroupAndRoleModel::setNameEditable(bool enabled)
 
 void QFGroupAndRoleModel::projectDataChanged()
 {
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 

@@ -58,6 +58,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QFExtensionCamera, public QFExtensionShutter, public QFExtensionMeasurementAndControlDevice {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionCamera QFExtensionShutter QFExtensionMeasurementAndControlDevice)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFExtensionCameraAndor")
+#endif
+
     public:
         /** Default constructor */
         QFExtensionCameraAndor(QObject* parent=NULL);

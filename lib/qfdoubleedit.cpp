@@ -127,7 +127,7 @@ void QFDoubleEdit::setValue(double valueIn) {
     }
 
     QString txt;
-    txt=txt.sprintf(QString("%."+QString::number(m_decimals)+"g").toAscii().data(), value);
+    txt=txt.sprintf(QString("%."+QString::number(m_decimals)+"g").toLatin1().data(), value);
     txt.replace('.', QLocale::system().decimalPoint());
     txt.replace(',', QLocale::system().decimalPoint());
     if (txt!=text()) {

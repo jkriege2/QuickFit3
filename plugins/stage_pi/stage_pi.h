@@ -41,6 +41,10 @@
 class QFExtensionLinearStagePI : public QObject, public QFExtensionBase, public QFExtensionLinearStage {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionLinearStage)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFExtensionLinearStagePI")
+#endif
+
     public:
         /** Default constructor */
         QFExtensionLinearStagePI(QObject* parent=NULL);

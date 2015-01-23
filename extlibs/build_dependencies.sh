@@ -64,10 +64,13 @@ QT_INFO_INSTALLDIR=`qmake -query QT_INSTALL_PREFIX`
 QT_INFO_VERSION=`qmake -query QT_VERSION`
 echo -e "\n\nbuilding for\n    Qt version ${QT_INFO_VERSION}\n       in ${QT_INFO_INSTALLDIR}\n\n"
 
+LINK_WITH_PIC=-fPIC
+
 ISMSYS=`uname -o`
 echo $ISMSYS
 if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 	echo -e "building in MSys environment on Windows!\n\n"
+	LINK_WITH_PIC=
 fi
 
 qtOK=-5
@@ -97,8 +100,8 @@ if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 		done
 		for f in $USEDQTPLUGINS
 		do
-			cp -rf "${QT_INFO_PLUGINS}/${f}"  "../output/qtplugins/"
-			cp -rf "${QT_INFO_PLUGINS}/${f}"  "../output/qtplugins/"
+			cp -rf "${f}"  "../output/qtplugins/"
+			cp -rf "${f}"  "../output/qtplugins/"
 		done
 		qtOK=0
 	fi
@@ -237,7 +240,7 @@ if [ $INSTALL_ANSWER == "y" ] ; then
         export LDFLAGS="${LDFLAGS} -fPIC "
         export CFLAGS="${CFLAGS} -fPIC "
         export CPPFLAGS="${CPPFLAGS} -fPIC"
-        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS="-fPIC ${MORECFLAGS}" CPPFLAGS="-fPIC ${MORECFLAGS}"	LDFLAGS="-fPIC"
+        ./configure --enable-static --disable-shared --prefix=${CURRENTDIR}/lmfit5  CFLAGS="${LINK_WITH_PIC} ${MORECFLAGS}" CPPFLAGS="${LINK_WITH_PIC} ${MORECFLAGS}"	LDFLAGS="${LINK_WITH_PIC}"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make -j${MAKE_PARALLEL_BUILDS}

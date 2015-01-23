@@ -39,6 +39,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 class QFECamSystemcamera : public QObject, public QFExtensionBase, public QFExtensionCamera {
         Q_OBJECT
         Q_INTERFACES(QFExtension QFExtensionCamera)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFECamSystemcamera")
+#endif
+
     public:
         /** Default constructor */
         QFECamSystemcamera(QObject* parent=NULL);
@@ -51,7 +55,7 @@ class QFECamSystemcamera : public QObject, public QFExtensionBase, public QFExte
     /////////////////////////////////////////////////////////////////////////////
         /** \copydoc QFExtension::getID() */
         virtual QString getID() const  { return QString("cam_systemcam"); };
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
         /** \copydoc QFExtension::getName() */
         virtual QString getName() const  { return QObject::tr("vfw camera"); }
         /** \copydoc QFExtension::getDescription() */

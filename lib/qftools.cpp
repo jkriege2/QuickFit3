@@ -856,7 +856,7 @@ QString getOSShortName() {
     result="linux";
 #endif
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
     result="win";
 #endif
 
@@ -884,7 +884,7 @@ QString getOSName() {
     }
 #endif
 
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN32
     switch (QSysInfo::windowsVersion()) {
         case QSysInfo::WV_32s: result=QObject::tr("Windows 3.1 with Win 32s"); break;
         case QSysInfo::WV_95: result=QObject::tr("Windows 95"); break;
@@ -936,7 +936,7 @@ QString cleanStringForFilename(const QString& text, int maxLen, bool removeDot, 
         if (t1[i]>='0' && t1[i]<='9') t=t+t1[i];
         else if (t1[i]>='A' && t1[i]<='z') t=t+t1[i];
         else {
-            switch(t1[i].toAscii()) {
+            switch(t1[i].toLatin1()) {
                 case 'ä': t=t+"ae"; break;
                 case 'Ä': t=t+"Ae"; break;
                 case 'ö': t=t+"oe"; break;
@@ -957,7 +957,7 @@ QString cleanStringForFilename(const QString& text, int maxLen, bool removeDot, 
                 case ')':
                 case '[':
                 case ']':
-                    t=t+t1[i].toAscii(); break;
+                    t=t+t1[i].toLatin1(); break;
             }
         }
     }
@@ -1241,9 +1241,10 @@ void saveStringToFile(const QString& filename, const QString& text, const QStrin
     QFile data(filename);
     if (data.open(QFile::WriteOnly | QFile::Text | QIODevice::Truncate)) {
         QTextStream out(&data);
-        QTextCodec* c=QTextCodec::codecForName(codec.toAscii());
+        QTextCodec* c=QTextCodec::codecForName(codec.toLatin1());
+#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
         if (c==NULL) c=QTextCodec::codecForCStrings();
-        if (c==NULL) c=QTextCodec::codecForLocale();
+#endif         if (c==NULL) c=QTextCodec::codecForLocale();
         out.setCodec(c);
         out << text;
     }

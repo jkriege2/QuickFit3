@@ -61,7 +61,12 @@ void QFProjectTreeModel::init(QFProject* p, bool displayRDR, bool displayEval) {
         connect(current, SIGNAL(structureChanged()), this , SLOT(projectStructureChanged()));
         connect(current, SIGNAL(propertiesChanged()), this , SLOT(projectDataChanged()));
     }
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 QSet<int> QFProjectTreeModel::getSelectedRDR() const
@@ -558,7 +563,12 @@ void QFProjectTreeModel::setDisplayRole(bool enabled)
         }
     }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 void QFProjectTreeModel::setDisplayGroup(bool enabled)
@@ -575,34 +585,59 @@ void QFProjectTreeModel::setDisplayGroup(bool enabled)
         }
     }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 void QFProjectTreeModel::setDisplayGroupAsColor(bool enabled)
 {
     displayGroupAsColor=enabled;
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 void QFProjectTreeModel::setRDRTypeFilter(const QString &type)
 {
     rdrTypeFiler=type;
     createModelTree();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 void QFProjectTreeModel::setRDRApplicableFilter(QFEvaluationItem *eval)
 {
     evalRDRApplicable=eval;
     createModelTree();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 
 
 void QFProjectTreeModel::projectStructureChanged() {
     createModelTree();
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    beginResetModel();
+    endResetModel();
+#else
     reset();
+#endif
 }
 
 

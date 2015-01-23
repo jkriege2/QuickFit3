@@ -1176,16 +1176,16 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
         progress.setLabelText(tr("opening output files ..."));
         QApplication::processEvents();
         if (ok && useCam1) {
-            QDir().mkpath(QFileInfo(TIFFFIlenameBackground1.toAscii().data()).absolutePath());
-            tiff1_background=TIFFOpen(TIFFFIlenameBackground1.toAscii().data(), "w");;
+            QDir().mkpath(QFileInfo(TIFFFIlenameBackground1.toLatin1().data()).absolutePath());
+            tiff1_background=TIFFOpen(TIFFFIlenameBackground1.toLatin1().data(), "w");;
             if (!tiff1_background) {
                 ok=false;
                 IMAGESTACK_ERROR(tr("error opening TIFF file (camera 1) '%1'!").arg(TIFFFIlenameBackground1));
             }
 
             for (int i=0; i<TIFFFIlename1.size(); i++) {
-                QDir().mkpath(QFileInfo(TIFFFIlename1[i].toAscii().data()).absolutePath());
-                tiff1[i]=TIFFOpen(TIFFFIlename1[i].toAscii().data(), "w");
+                QDir().mkpath(QFileInfo(TIFFFIlename1[i].toLatin1().data()).absolutePath());
+                tiff1[i]=TIFFOpen(TIFFFIlename1[i].toLatin1().data(), "w");
                 if (!tiff1[i]) {
                     ok=false;
                     IMAGESTACK_ERROR(tr("error opening TIFF file (camera 1) '%1'!").arg(TIFFFIlename1[i]));
@@ -1194,15 +1194,15 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
             }
         }
         if (ok && useCam2) {
-            QDir().mkpath(QFileInfo(TIFFFIlenameBackground2.toAscii().data()).absolutePath());
-            tiff2_background=TIFFOpen(TIFFFIlenameBackground2.toAscii().data(), "w");;
+            QDir().mkpath(QFileInfo(TIFFFIlenameBackground2.toLatin1().data()).absolutePath());
+            tiff2_background=TIFFOpen(TIFFFIlenameBackground2.toLatin1().data(), "w");;
             if (!tiff2_background) {
                 ok=false;
                 IMAGESTACK_ERROR(tr("error opening TIFF file (camera 2) '%1'!").arg(TIFFFIlenameBackground2));
             }
             for (int i=0; i<TIFFFIlename2.size(); i++) {
-                QDir().mkpath(QFileInfo(TIFFFIlename2[i].toAscii().data()).absolutePath());
-                tiff2[i]=TIFFOpen(TIFFFIlename2[i].toAscii().data(), "w");
+                QDir().mkpath(QFileInfo(TIFFFIlename2[i].toLatin1().data()).absolutePath());
+                tiff2[i]=TIFFOpen(TIFFFIlename2[i].toLatin1().data(), "w");
                 if (!tiff2[i]) {
                     ok=false;
                     IMAGESTACK_ERROR(tr("error opening TIFF file (camera 2) '%1'!").arg(TIFFFIlename2[i]));
@@ -1680,7 +1680,7 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
             QString PositionsFilename=acquisitionPrefix1+".positions.dat";
             QFile posFile(PositionsFilename);
             if (posFile.open(QIODevice::WriteOnly)) {
-                posFile.write(positionsCSV.toAscii().data());
+                posFile.write(positionsCSV.toLatin1().data());
                 posFile.close();
                 QFExtensionCamera::CameraAcquititonFileDescription d;
                 d.name=PositionsFilename;
@@ -1734,7 +1734,7 @@ void QFESPIMB040ImageStackConfigWidget2::performStack()
             QString PositionsFilename=acquisitionPrefix2+".positions.dat";
             QFile posFile(PositionsFilename);
             if (posFile.open(QIODevice::WriteOnly)) {
-                posFile.write(positionsCSV.toAscii().data());
+                posFile.write(positionsCSV.toLatin1().data());
                 posFile.close();
                 QFExtensionCamera::CameraAcquititonFileDescription d;
                 d.name=PositionsFilename;

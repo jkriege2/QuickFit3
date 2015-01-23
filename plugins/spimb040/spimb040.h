@@ -39,6 +39,10 @@
 class QFESPIMB040 : public QObject, public QFExtensionBase {
         Q_OBJECT
         Q_INTERFACES(QFExtension)
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFESPIMB040")
+#endif
+
     public:
         /** Default constructor */
         QFESPIMB040(QObject* parent=NULL);

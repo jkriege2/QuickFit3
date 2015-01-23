@@ -45,7 +45,10 @@
 #include "functionreferencedialog.h"
 #include "qfhtmlhelptools.h"
 #include "newtabledialog.h"
-
+#include <QPrintPreviewDialog>
+#include <QPrintDialog>
+#include <QPrinter>
+#include <QPrinterInfo>
 
 #define AUTOSAVE_INTERVAL_MSEC 20000
 
@@ -1116,7 +1119,7 @@ void QFEHelpEditorWidget::gotoLine()
 {
     int maxLine=ui->edtScript->getEditor()->document()->blockCount();
     bool ok;
-    unsigned long line = QInputDialog::getInteger(this, tr("Goto Line ..."),
+    unsigned long line = QInputDialog::getInt(this, tr("Goto Line ..."),
                               tr("Enter a line number (1 - %2):").arg(maxLine), 1, 1, maxLine, 1, &ok);
     if (ok) {
         ui->edtScript->getEditor()->gotoLine(line);

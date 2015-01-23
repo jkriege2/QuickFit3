@@ -313,8 +313,6 @@ void QFExtensionPCCSLED::showLightSourceSettingsDialog(unsigned int lightSource,
 }
 
 
-Q_EXPORT_PLUGIN2(lights_pccsled, QFExtensionPCCSLED)
-
 unsigned int QFExtensionPCCSLED::getShutterCount()
 {
     return getLightSourceCount();
@@ -359,3 +357,14 @@ QString QFExtensionPCCSLED::getShutterShortName(unsigned int shutter) {
 void QFExtensionPCCSLED::showShutterSettingsDialog(unsigned int shutter, QWidget *parent) {
     showLightSourceSettingsDialog(shutter, parent);
 }
+
+
+
+
+
+
+
+
+
+
+Q_EXPORT_PLUGIN2(lights_pccsled, QFExtensionPCCSLED)

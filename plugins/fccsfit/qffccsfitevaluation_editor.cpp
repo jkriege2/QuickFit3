@@ -813,7 +813,11 @@ void QFFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
     ui->tableView->setSelectionMode(QAbstractItemView::ExtendedSelection);
     QHeaderView* h=ui->tableView->verticalHeader();
     if (h) {
+        #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        h->setSectionResizeMode(QHeaderView::Fixed);
+        #else
         h->setResizeMode(QHeaderView::Fixed);
+        #endif
         QFontMetrics fm(h->font());
         int height=qMax(16, (int)ceil(double(fm.height())*1.5));
         //qDebug()<<"resizing verticals to "<<height;
@@ -830,7 +834,12 @@ void QFFCCSFitEvaluationEditor::ensureCorrectParamaterModelDisplay()
            if (i==0) {
                //qDebug()<<"  resizing h"<<i<<" to contents "<<t.elapsed()<<"ms";
                ui->tableView->resizeColumnToContents(i);
-               h->setResizeMode(i, QHeaderView::Interactive);
+                #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+                h->setSectionResizeMode(i, QHeaderView::Interactive);
+                #else
+                h->setResizeMode(i, QHeaderView::Interactive);
+                #endif
+
                //qDebug()<<"  resizing h"<<i<<" to contents done "<<t.elapsed()<<"ms";
            }
            //h->setResizeMode(i, QHeaderView::Interactive);
