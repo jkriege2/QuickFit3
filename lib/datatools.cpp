@@ -172,8 +172,12 @@ void dataExpand(QList<QList<QVariant> >& data, QStringList* columnsNames) {
                         else if (i==2) vo=v.value<QVector4D>().z();
                         else if (i==3) vo=v.value<QVector4D>().w();
                         break;
-                    case QVariant::QVariant::Matrix4x4: {
+                    case QVariant::QVariant::Matrix4x4: {                            
+                            #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
                             float* dd=v.value<QMatrix4x4>().data();
+                            #else
+                            qreal* dd=v.value<QMatrix4x4>().data();
+                            #endif
                             if (i<16 && i>=0) vo=dd[i];
                         } break;
                     case QVariant::List: {
@@ -256,7 +260,11 @@ void dataReduce(QList<QList<QVariant> >& data, QStringList* columnsNames) {
                         else if (i==3) vo=v.value<QVector4D>().w();
                         break;
                     case QVariant::QVariant::Matrix4x4: {
+                            #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
                             float* dd=v.value<QMatrix4x4>().data();
+                            #else
+                            qreal* dd=v.value<QMatrix4x4>().data();
+                            #endif
                             if (i<16 && i>=0) vo=dd[i];
                         } break;
                     case QVariant::List: {
