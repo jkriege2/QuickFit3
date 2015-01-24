@@ -414,6 +414,52 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 fi
 
 
+libJPEGOK=-1
+read -p "Do you want to build 'libJPEG' (y/n)? " -n 1 INSTALL_ANSWER
+echo -e  "\n"
+if [ $INSTALL_ANSWER == "y" ] ; then
+	echo -e  "\n------------------------------------------------------------------------\n"\
+	"-- BUILDING: libJPEG                                                  --\n"\
+	"------------------------------------------------------------------------\n\n"\
+
+	cd libjpeg
+	mkdir build
+	tar xvf jpegsrc.v9a.tar.gz -C ./build/
+	cd build/jpeg-9a
+	if [ -e ../../../zlib/lib/libz.a ] ; then
+		./configure --enable-static --disable-shared --disable-dependency-tracking --prefix=${CURRENTDIR}/libjpeg LDFLAGS=-L${CURRENTDIR}/zlib/lib CFLAGS=-I${CURRENTDIR}/zlib/include CXXFLAGS=-I${CURRENTDIR}/zlib/include/
+	else
+		./configure --enable-static --disable-shared --disable-dependency-tracking --prefix=${CURRENTDIR}/libjpeg
+	fi
+	libOK=$?
+	if [ $libOK -eq 0 ] ; then
+		make -j${MAKE_PARALLEL_BUILDS}
+		
+		libOK=$?
+		if [ $libOK -eq 0 ] ; then		
+			make -j${MAKE_PARALLEL_BUILDS} install
+			libOK=$?
+			if [ $libOK -ne 0 ] ; then		
+				libOK=-4
+			fi
+		else
+			libOK=-3
+		fi
+	else
+	    libOK=-2
+	fi
+	
+
+	cd ../../
+	if [ $KEEP_BUILD_DIR == "n" ] ; then
+		rm -rf build
+	fi
+	cd ${CURRENTDIR}
+	
+	libJPEGOK=$libOK
+
+fi
+
 
 libtiffOK=-1
 read -p "Do you want to build 'libtiff' (y/n)? " -n 1 INSTALL_ANSWER
@@ -428,9 +474,17 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	tar xvf tiff-4.0.3.tar.gz -C ./build/
 	cd build/tiff-4.0.3
 	if [ -e ../../../zlib/lib/libz.a ] ; then
-		./configure --enable-static --disable-shared --disable-jpeg --disable-jpeg --disable-old-jpeg --disable-jbig --with-zlib-include-dir=${CURRENTDIR}/zlib/include --with-zlib-lib-dir=${CURRENTDIR}/zlib/lib --prefix=${CURRENTDIR}/libtiff
+	    if [ -e ../../../libjpeg/lib/libjpeg.a ] ; then
+			./configure --enable-static --disable-shared  --enable-jpeg --enable-old-jpeg --disable-jbig --with-zlib-include-dir=${CURRENTDIR}/zlib/include --with-zlib-lib-dir=${CURRENTDIR}/zlib/lib  --with-jpeg-include-dir=${CURRENTDIR}/libjpeg/include --with-jpeg-lib-dir=${CURRENTDIR}/libjpeg/lib --prefix=${CURRENTDIR}/libtiff
+		else
+			./configure --enable-static --disable-shared  --disable-jpeg --disable-old-jpeg --disable-jbig --with-zlib-include-dir=${CURRENTDIR}/zlib/include --with-zlib-lib-dir=${CURRENTDIR}/zlib/lib --prefix=${CURRENTDIR}/libtiff
+		fi
 	else
-		./configure --enable-static --disable-shared --disable-jpeg --disable-jpeg --disable-old-jpeg --disable-jbig --prefix=${CURRENTDIR}/libtiff
+	    if [ -e ../../../libjpeg/lib/libjpeg.a ] ; then
+			./configure --enable-static --disable-shared  --enable-jpeg --enable-old-jpeg --disable-jbig --with-jpeg-include-dir=${CURRENTDIR}/libjpeg/include --with-jpeg-lib-dir=${CURRENTDIR}/libjpeg/lib --prefix=${CURRENTDIR}/libtiff
+		else
+			./configure --enable-static --disable-shared  --disable-jpeg --disable-old-jpeg --disable-jbig --prefix=${CURRENTDIR}/libtiff
+		fi
 	fi
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
@@ -781,8 +835,8 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 	cd pixman
 	mkdir build
-	tar xvf pixman-0.32.4.tar.gz -C ./build/
-	cd build/pixman-0.32.4
+	tar xvf pixman-0.32.6.tar.gz -C ./build/
+	cd build/pixman-0.32.6
 	./configure --enable-static --disable-shared --enable-libpng --disable-gtk --prefix=${CURRENTDIR}/pixman   CFLAGS="-fPIC ${MORECFLAGS} ${zlib_CFLAGS}" CPPFLAGS="-fPIC ${MORECFLAGS} ${zlib_CFLAGS}" LDFLAGS=" ${zlib_LDFLAGS}" PNG_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib" PNG_CFLAGS=" -I${CURRENTDIR}/libpng -I${CURRENTDIR}/libpng/include"
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
@@ -834,13 +888,13 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	fi" > ./build/pkgconfigfake
 	chmod +x ./build/pkgconfigfake
 	
-	tar xvf cairo-1.12.16.tar.gz -C ./build/
-	cd build/cairo-1.12.16
+	tar xvf cairo-1.14.0.tar.gz -C ./build/
+	cd build/cairo-1.14.0
 	if [ "$ISMSYS" != "${string/Msys/}" ] ; then
 	    cp ../../Makefile.in_hack ./Makefile.in
-		./configure --verbose --enable-static --disable-shared --disable-dependency-tracking --enable-gobject=no --enable-trace=no --enable-xcb-shm=no --enable-xlib=no --enable-xlib-xrender=no --enable-xcb=no --enable-egl=no --enable-glx=no --enable-wgl=no --enable-ft=no  --enable-fc=no --disable-xlib --without-x --disable-quartz-font --disable-quartz --disable-valgrind --prefix=${CURRENTDIR}/cairo   CFLAGS="-fPIC ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}/pixman/include/pixman-1 " CPPFLAGS="-fPIC ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}pixman/include/pixman-1 " LDFLAGS=" ${zlib_LDFLAGS} -L${CURRENTDIR}/pixman/lib -lpixman-1 " png_REQUIRES=libpng png_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib " png_CFLAGS=" -I${CURRENTDIR}/libpng/include " pixman_CFLAGS=" -I${CURRENTDIR}pixman/include/pixman-1" pixman_LIBS=" -L${CURRENTDIR}/pixman/lib -lpixman-1" PKG_CONFIG="${CURRENTDIR}/cairo/build/pkgconfigfake"
+		./configure --verbose --enable-static --disable-shared --disable-dependency-tracking --enable-gobject=no --enable-trace=no --enable-xcb-shm=no --enable-xlib=no --enable-xlib-xrender=no --enable-xcb=no --enable-egl=no --enable-glx=no --enable-wgl=no --enable-ft=no  --enable-fc=no --disable-xlib --without-x --disable-quartz-font --disable-quartz --disable-valgrind --prefix=${CURRENTDIR}/cairo   CFLAGS="-fPIC ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}/pixman/include/pixman-1 " CPPFLAGS="-fPIC ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}pixman/include/pixman-1 " LDFLAGS=" ${zlib_LDFLAGS} -L${CURRENTDIR}/pixman/lib -lpixman-1 " png_REQUIRES=libpng png_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib " png_CFLAGS=" -I${CURRENTDIR}/libpng/include " pixman_CFLAGS=" -I${CURRENTDIR}pixman/include/pixman-1" pixman_LIBS=" -L${CURRENTDIR}/pixman/lib -lpixman-1" PKG_CONFIG="${CURRENTDIR}/cairo/build/pkgconfigfake" ax_cv_c_float_words_bigendian=no
 	else 
-        ./configure --verbose --enable-static --disable-shared --disable-dependency-tracking  --prefix=${CURRENTDIR}/cairo   CFLAGS="-fPIC ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}/pixman/include/pixman-1 " CPPFLAGS="-fPIC ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}pixman/include/pixman-1 " LDFLAGS=" ${zlib_LDFLAGS} -L${CURRENTDIR}/pixman/lib -lpixman-1 " png_REQUIRES=libpng png_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib " png_CFLAGS=" -I${CURRENTDIR}/libpng/include " pixman_CFLAGS=" -I${CURRENTDIR}pixman/include/pixman-1" pixman_LIBS=" -L${CURRENTDIR}/pixman/lib -lpixman-1"	
+        ./configure --verbose --enable-static --disable-shared --disable-dependency-tracking  --prefix=${CURRENTDIR}/cairo   CFLAGS="-fPIC ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}/pixman/include/pixman-1 " CPPFLAGS="-fPIC ${MORECFLAGS} ${zlib_CFLAGS} -I${CURRENTDIR}/pixman/include/ -I${CURRENTDIR}/pixman/include/pixman -I${CURRENTDIR}pixman/include/pixman-1 " LDFLAGS=" ${zlib_LDFLAGS} -L${CURRENTDIR}/pixman/lib -lpixman-1 " png_REQUIRES=libpng png_LIBS="-lpng -L${CURRENTDIR}/libpng -L${CURRENTDIR}/libpng/lib " png_CFLAGS=" -I${CURRENTDIR}/libpng/include " pixman_CFLAGS=" -I${CURRENTDIR}pixman/include/pixman-1" pixman_LIBS=" -L${CURRENTDIR}/pixman/lib -lpixman-1"	ax_cv_c_float_words_bigendian=no
 	fi
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
@@ -881,6 +935,7 @@ print_result "lmfit" $lmfitOK
 print_result "lmfit v5" $lmfit5OK
 print_result "levmar" $levmarOK
 print_result "libpng" $libpngOK
+print_result "libjpeg" $libJPEGOK
 print_result "libtiff" $libtiffOK
 print_result "gsl" $libgslOK
 print_result "libusb" $libusbOK

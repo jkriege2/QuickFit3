@@ -23,3 +23,4 @@ INCLUDEPATH += $$PWD/libtiff/include/
 LIBS += -L$$PWD/libtiff/lib/ -ltiff
 DEFINES += QF_HAS_LIBTIFF cimg_use_tiff
 include(zlib.pri)
+include(jpeg.pri)
