@@ -154,7 +154,7 @@ if [ "${create_deploy}" != "0" ]; then
 	cp -rf ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./cairo4qtv2
 	cd cairo4qtv2
 	zip -rv9 ../../${CAIRO4QTZIPFILE} *
-	cd DEPLOY_RETURN_DIR
+	cd ${DEPLOY_RETURN_DIR}
 	rm -rf cairo4qtv2
 	
 	echo -e "\n\nCREATING ${TINYTIFFZIPFILE}:\n"
@@ -162,6 +162,9 @@ if [ "${create_deploy}" != "0" ]; then
 	mkdir tinytiff/test
 	mkdir tinytiff/test/tinytiff_reader_test
 	mkdir tinytiff/test/tinytiffwriter_test
+	mkdir tinytiff/tinytiff_doc
+	mkdir tinytiff/tinytiff_doc/latex
+	mkdir tinytiff/tinytiff_doc/html
 	cp -f ./LIB/trunk/tinytiff.readme ./tinytiff/readme.txt
 	cp -f ./LIB/trunk/tinytiff.Doxyfile ./tinytiff
 	cp -f ./LIB/trunk/tinytiff.dox ./tinytiff
@@ -185,19 +188,23 @@ if [ "${create_deploy}" != "0" ]; then
 	cp refman.pdf ../tinytiff.pdf
 	cd ../../
 	zip -rv9 ../../${TINYTIFFZIPFILE} *
-	cd DEPLOY_RETURN_DIR
+	cd ${DEPLOY_RETURN_DIR}
 	rm -rf tinytiff
 	
 	echo -e "\n\nCREATING ${JKQTPLOTTERZIPFILE}:\n"
 	mkdir jkqtplotter
+	mkdir jkqtplotter/qt
 	mkdir jkqtplotter/qt/test
 	mkdir jkqtplotter/qt/test/jkqtfastplotter_test
 	mkdir jkqtplotter/qt/test/jkqtmathtext_test
 	mkdir jkqtplotter/qt/test/jkqtplot_test
 	mkdir jkqtplotter/qt/images
-	cp -f ./LIB/trunk/qt/jkqtplotter.readme ./jkqtplotter/qt
-	cp -f ./LIB/trunk/qt/jkqtfastplotter.readme ./jkqtplotter/qt
-	cp -f ./LIB/trunk/qt/jkqtmathtext.readme ./jkqtplotter/qt
+	mkdir jkqtplotter/qt/jkqtplotter_doc
+	mkdir jkqtplotter/qt/jkqtplotter_doc/html
+	mkdir jkqtplotter/qt/jkqtplotter_doc/latex
+	cp -f ./LIB/trunk/qt/jkqtplotter.readme ./jkqtplotter/
+	cp -f ./LIB/trunk/qt/jkqtfastplotter.readme ./jkqtplotter/
+	cp -f ./LIB/trunk/qt/jkqtmathtext.readme ./jkqtplotter/
 	cp -rf ./jkqtplotter/qt/images/* ./jkqtplotter/qt/images
 	cp -rf ./LIB/trunk/lib_imexport.h ./jkqtplotter
 	cp -rf ./LIB/trunk/highrestimer.* ./jkqtplotter
@@ -211,7 +218,8 @@ if [ "${create_deploy}" != "0" ]; then
 	cp -rf ./LIB/trunk/qt/test/jkqtmathtext_test/* ./jkqtplotter/qt/test/jkqtmathtext_test/
 	cp -rf ./LIB/trunk/qt/test/jkqtplot_test/* ./jkqtplotter/qt/test/jkqtplot_test/
 	cp -rf ./FCSTOOLS/trunk/QuickFit3/gpl-3.0.txt ./jkqtplotter
-	cd jkqtplotter
+	cp -rf ./jkqtplotter/qt/*.readme ./jkqtplotter
+	cd jkqtplotter/qt
 	
 	doxygen jkqtplotter.Doxyfile
 	cd jkqtplotter_doc/latex
@@ -221,11 +229,11 @@ if [ "${create_deploy}" != "0" ]; then
 	pdflatex -interaction=nonstopmode  refman.tex
 	pdflatex -interaction=nonstopmode  refman.tex
 	rm *.aux *.idx *.log *.out *.toc
-	cp refman.pdf ../jkqtplotter.pdf
-	cd ../../
+	cp refman.pdf ../../../jkqtplotter.pdf
+	cd ../../../
 	
 	zip -rv9 ../../${JKQTPLOTTERZIPFILE} *
-	cd DEPLOY_RETURN_DIR
+	cd ${DEPLOY_RETURN_DIR}
 	rm -rf jkqtplotter
 	
 	echo -e "\n\nDELETING .svn:\n"

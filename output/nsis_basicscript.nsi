@@ -20,6 +20,7 @@ BrandingText "Copyright (c) 2013 by Jan W. Krieger (German Cancer research Cente
 ShowInstDetails show
 ShowUninstDetails show
 SetCompressor /FINAL  LZMA 
+SetRebootFlag false
 
 # Set Version Information
 #VIProductVersion ${PRODUCT_VERSION}
@@ -239,6 +240,7 @@ function .onInit
 	;Run the uninstaller
 	uninst:
 	  ClearErrors
+	  SetRebootFlag false
 	  ExecWait '$R0 _?=$INSTDIR' ;Do not copy the uninstaller to a temp file
 	 
 	  IfErrors no_remove_uninstaller done
@@ -269,6 +271,7 @@ functionEnd
 #Uninstaller
 function un.onInit
 	SetShellVarContext all
+	SetRebootFlag false
  
 	#Verify the uninstaller - last chance to back out
 	MessageBox MB_OKCANCEL "Permanantly remove ${PRODUCT_NAME}?" IDOK next
