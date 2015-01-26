@@ -239,6 +239,10 @@ void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int s
                     paramOut[i]=paramOut[i]*scaleI;
                     paramErrOut[i]=paramErrOut[i]*scaleI;
                 }
+                if (paramIDs[i].toUpper()=="OFFSET") {
+                    paramOut[i]=paramOut[i]*scaleI;
+                    paramErrOut[i]=paramErrOut[i]*scaleI;
+                }
                 values[i].append(paramOut[i]);
                 errors[i].append(paramErrOut[i]);
                 if (res.fitOK && data_count>4) avgValues[i].append(paramOut[i]);
