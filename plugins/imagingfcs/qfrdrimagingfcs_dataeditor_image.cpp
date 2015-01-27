@@ -2063,6 +2063,7 @@ void QFRDRImagingFCSImageEditor::excludeByImage(double* imageIn) {
         }
         qfFree(mask);
         qfFree(image);
+        delete dialog;
     }
 }
 
@@ -2102,6 +2103,7 @@ void QFRDRImagingFCSImageEditor::selectByImage(double* imageIn) {
         }
         qfFree(mask);
         qfFree(image);
+        delete dialog;
     }
 }
 
