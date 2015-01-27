@@ -80,8 +80,8 @@ bool QTeXPaintEngine::begin(QPaintDevice* p)
 
 		QString u = unit();
 		t << pictureEnv + u + "}{0" + u + "}{";
-		t << QString::number(p->width()) + u + "}{";
-		t << QString::number(p->height()) + u + "}\n";
+        t << QLocale::c().toString(p->width()) + u + "}{";
+        t << QLocale::c().toString(p->height()) + u + "}\n";
 
 		if (!d_pgf_mode){
 			QPainterPath path;
@@ -224,13 +224,13 @@ void QTeXPaintEngine::drawTextItem ( const QPointF & p, const QTextItem & textIt
 		double angle = 180.0/M_PI*acos(m.m11());
 		if (m.m11() != 0.0 && m.m12() > 0)
 			angle = -angle;
-		s += ",rotate=" + QString::number(angle);
+        s += ",rotate=" + QLocale::c().toString(angle);
 	}
 	s += "]{";
 
 	QFont f = textItem.font();
 	if (d_font_size)
-		s += "\\fontsize{" + QString::number(int(f.pointSizeF())) + "}{0}\\selectfont{";
+        s += "\\fontsize{" + QLocale::c().toString(int(f.pointSizeF())) + "}{0}\\selectfont{";
 
 	if (f.underline())
 		s += "\\underline{";
@@ -303,8 +303,8 @@ void QTeXPaintEngine::drawEllipse ( const QRectF & rect )
 		path = tikzPoint(convertPoint(QPointF(p.x() + 0.5*rect.width(), p.y() - 0.5*rect.height())));
 		path += " ellipse (";
 		QString u = unit();
-		path += QString::number(0.5*rect.width()*resFactorX()) + u + " and ";
-		path += QString::number(0.5*rect.height()*resFactorY()) + u + ");\n";
+        path += QLocale::c().toString(0.5*rect.width()*resFactorX()) + u + " and ";
+        path += QLocale::c().toString(0.5*rect.height()*resFactorY()) + u + ");\n";
 	}
 
 	writeToFile(drawShape(Ellipse, path));
@@ -404,7 +404,7 @@ void QTeXPaintEngine::drawPixmap(const QPixmap &pix, const QRectF &r)
 	}
 
 	QString name = fi.dir().absolutePath();
-	name += "/" + base + "/image" + QString::number(d_pixmap_index);
+    name += "/" + base + "/image" + QLocale::c().toString(d_pixmap_index);
 	name = QDir::cleanPath(name);
 	if (!pix.save(name + ".png", "PNG"))
 		return;
@@ -419,8 +419,8 @@ void QTeXPaintEngine::drawPixmap(const QPixmap &pix, const QRectF &r)
 	t << "{\\pgfimage[interpolate=false,width=";
 
 	QString u = unit();
-	t << QString::number(r.width()*resFactorX()) + u + ",height=";
-	t << QString::number(r.height()*resFactorY()) + u + "]{";
+    t << QLocale::c().toString(r.width()*resFactorX()) + u + ",height=";
+    t << QLocale::c().toString(r.height()*resFactorY()) + u + "]{";
 	t << name;
 	t << "}}\n";
 }
@@ -446,12 +446,12 @@ QString QTeXPaintEngine::defineColor(const QColor& c, const QString& name)
 	if (d_gray_scale){
 		col += "gray}{";
 		double gray = qGray(c.rgb())/255.0;
-		col += QString::number(gray) + "}\n";
+        col += QLocale::c().toString(gray) + "}\n";
 	} else {
 		col += "rgb}{";
-		col += QString::number(c.redF()) + ",";
-		col += QString::number(c.greenF()) + ",";
-		col += QString::number(c.blueF()) + "}\n";
+        col += QLocale::c().toString(c.redF()) + ",";
+        col += QLocale::c().toString(c.greenF()) + ",";
+        col += QLocale::c().toString(c.blueF()) + "}\n";
 	}
 	return col;
 }
@@ -483,7 +483,7 @@ QString QTeXPaintEngine::tikzBrush(const QBrush& brush)
 
 			double alpha = painter()->brush().color().alphaF();
 			if(alpha > 0.0 && alpha < 1.0)
-				s += "[opacity=" + QString::number(alpha) + "]";
+                s += "[opacity=" + QLocale::c().toString(alpha) + "]";
 
 			return s;
 		}
@@ -536,7 +536,7 @@ QString QTeXPaintEngine::tikzBrush(const QBrush& brush)
 			options = lc + rc + "\\fill [";
 			options += "left color=lc, ";
 			options += "right color=rc, ";
-			options += "shading angle=" + QString::number(-QLineF(sp, ep).angle());
+            options += "shading angle=" + QLocale::c().toString(-QLineF(sp, ep).angle());
 		}
 		break;
 
@@ -552,7 +552,7 @@ QString QTeXPaintEngine::tikzBrush(const QBrush& brush)
 
 			/*for (int i = 0; i < count; i++){
 				QGradientStop stop = stops[i];
-				colors += defineColor(stop.second, "c" + QString::number(i + 1));
+                colors += defineColor(stop.second, "c" + QLocale::c().toString(i + 1));
 			}*/
 
 			options = colors + "\\fill [";
@@ -755,16 +755,16 @@ double QTeXPaintEngine::resFactorY()
 QString QTeXPaintEngine::pgfPoint( const QPointF& p)
 {
 	QString u = unit();
-	QString s = "{\\pgfpoint{" + QString::number(p.x());
-	s += u + "}{" + QString::number(p.y()) + u + "}}";
+    QString s = "{\\pgfpoint{" + QLocale::c().toString(p.x());
+    s += u + "}{" + QLocale::c().toString(p.y()) + u + "}}";
 	return s;
 }
 
 QString QTeXPaintEngine::tikzPoint(const QPointF & p)
 {
 	QString u = unit();
-	QString s = "(" + QString::number(p.x());
-	s += u + "," + QString::number(p.y()) + u + ")";
+    QString s = "(" + QLocale::c().toString(p.x());
+    s += u + "," + QLocale::c().toString(p.y()) + u + ")";
 	return s;
 }
 
@@ -774,12 +774,12 @@ QString QTeXPaintEngine::color( const QColor& col)
 	if (d_gray_scale){
 		s += "gray]{";
 		double gray = qGray(col.rgb())/255.0;
-		s += QString::number(gray) + "}\n";
+        s += QLocale::c().toString(gray) + "}\n";
 	} else {
 		s += "rgb]{";
-		s += QString::number(col.redF()) + ",";
-		s += QString::number(col.greenF()) + ",";
-		s += QString::number(col.blueF()) + "}\n";
+        s += QLocale::c().toString(col.redF()) + ",";
+        s += QLocale::c().toString(col.greenF()) + ",";
+        s += QLocale::c().toString(col.blueF()) + "}\n";
 	}
 
 	return s;
@@ -792,7 +792,7 @@ QString QTeXPaintEngine::pgfPen(const QPen& pen)
 		return s;
 
 	s += color(pen.color());
-	s += "\\pgfsetlinewidth{" + QString::number(painter()->pen().widthF()) + "pt}\n";
+    s += "\\pgfsetlinewidth{" + QLocale::c().toString(painter()->pen().widthF()) + "pt}\n";
 
 	QString aux = "\\pgfsetdash{";
 	QString term = "}{0cm}\n";
@@ -801,9 +801,9 @@ QString QTeXPaintEngine::pgfPen(const QPen& pen)
 	double dot_length = 0.3*space_length;
 	double dash_length = 1.5*space_length;
 
-	QString dash = "{" + QString::number(dash_length) + "cm}";
-	QString dot = "{" + QString::number(dot_length) + "cm}";
-	QString space = "{" + QString::number(space_length) + "cm}";
+    QString dash = "{" + QLocale::c().toString(dash_length) + "cm}";
+    QString dot = "{" + QLocale::c().toString(dot_length) + "cm}";
+    QString space = "{" + QLocale::c().toString(space_length) + "cm}";
 
 	switch (pen.style()){
 		case Qt::SolidLine:
@@ -828,7 +828,7 @@ QString QTeXPaintEngine::pgfPen(const QPen& pen)
 			int count = pattern.count();
 			QString u = unit();
 			for (int i = 0; i < count; i++)
-				s += "{" + QString::number(pattern[i]) + u + "}";
+                s += "{" + QLocale::c().toString(pattern[i]) + u + "}";
 
 			s += term;
 			break;
@@ -841,7 +841,7 @@ QString QTeXPaintEngine::pgfPen(const QPen& pen)
 	switch (pen.joinStyle()){
 		case Qt::MiterJoin:
 			s += "\\pgfsetmiterjoin\n";
-			//s += "\\pgfsetmiterlimit{" + QString::number(pen.miterLimit()) + "pt}\n";
+            //s += "\\pgfsetmiterlimit{" + QLocale::c().toString(pen.miterLimit()) + "pt}\n";
 		break;
 		case Qt::BevelJoin:
 			s += "\\pgfsetbeveljoin\n";
@@ -885,15 +885,15 @@ QString QTeXPaintEngine::tikzPen(const QPen& pen)
 	}
 
 	QString options = "[line width=";
-	options += QString::number(painter()->pen().widthF()) + "pt, ";
+    options += QLocale::c().toString(painter()->pen().widthF()) + "pt, ";
 
 	double space_length = 0.08*pen.widthF();
 	double dot_length = 0.3*space_length;
 	double dash_length = 1.5*space_length;
 
-	QString dash = "on " + QString::number(dash_length) + "cm";
-	QString dot = "on " + QString::number(dot_length) + "cm";
-	QString space = " off " + QString::number(space_length) + "cm";
+    QString dash = "on " + QLocale::c().toString(dash_length) + "cm";
+    QString dot = "on " + QLocale::c().toString(dot_length) + "cm";
+    QString space = " off " + QLocale::c().toString(space_length) + "cm";
 
 	QString aux = "dash pattern=";
 	QString term = ", dash phase=0pt, ";
@@ -923,7 +923,7 @@ QString QTeXPaintEngine::tikzPen(const QPen& pen)
 				QString s = "on ";
 				if (i%2)
 					s = " off ";
-				options += s + QString::number(pattern[i]) + u;
+                options += s + QLocale::c().toString(pattern[i]) + u;
 			}
 
 			options += term;

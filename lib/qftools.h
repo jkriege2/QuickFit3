@@ -1351,7 +1351,7 @@ inline QString numlistToString(const T& input, bool withIDs=false, int precision
             if (withIDs) {
                 txt<<i<<":";
             }
-            txt<<QString::number(input[i], 'g', precision);
+            txt<<QLocale::c().toString(input[i], 'g', precision);
             first=false;
         }
     }

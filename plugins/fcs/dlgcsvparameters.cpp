@@ -43,7 +43,7 @@ dlgCSVParameters::dlgCSVParameters(QWidget* parent, int mode, QString startswith
     validator->setNotation(QDoubleValidator::ScientificNotation);
     //validator->setDecimals(9);
     edtTimefactor->setValidator(validator);
-    edtTimefactor->setText(QString::number(timefactor));
+    edtTimefactor->setText(QLocale::system().toString(timefactor));
     edtColumn->setText(QString(columnSeparator));
     edtComment->setText(QString(commentStart));
     cmbMode->setCurrentIndex(mode);

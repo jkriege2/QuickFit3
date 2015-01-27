@@ -538,18 +538,18 @@ bool MCStageController::move_To(float xpos, float ypos, float zpos)
     bool ok;
     QTime t;
     QString message;
-    qstr_xpos = QString::number(xpos, 'f', 5);          // float xscale to std::string   |
+    qstr_xpos = QLocale::system().toString(xpos, 'f', 5);          // float xscale to std::string   |
     ba_scale = qstr_xpos.toLatin1();                     //                               |
     instruction.append(ba_scale.data());  // const char* QByteArray::data() const        V   (result is '\0'-terminated and can be appended)
     instruction.append(" ");
     if ((dims == 2) || (dims == 3)){
-        qstr_ypos = QString::number(ypos, 'f', 5);  // float yscale to std::string   |
+        qstr_ypos = QLocale::system().toString(ypos, 'f', 5);  // float yscale to std::string   |
         ba_scale = qstr_ypos.toLatin1();            //                                |
         instruction.append(ba_scale.data());        //                               V
         instruction.append(" ");
     }
     if (dims == 3){
-        qstr_zpos = QString::number(zpos, 'f', 5);  // float zscale to std::string   |
+        qstr_zpos = QLocale::system().toString(zpos, 'f', 5);  // float zscale to std::string   |
         ba_scale = qstr_zpos.toLatin1();            //                                |
         instruction.append(ba_scale.data());        //                               V
         instruction.append(" ");
@@ -586,7 +586,7 @@ bool MCStageController::set_max_accel(float accel)
     }
     // convert float accel to std::string and build instruction
     //std::string instruction = "";
-    QString qstr_accel = QString::number(accel, 'f', 5);  // float to std::string
+    QString qstr_accel = QLocale::system().toString(accel, 'f', 5);  // float to std::string
     QString qinstr = qstr_accel;
     //QByteArray ba_accel = qstr_accel.toLatin1();
     //qinstr.append(qstr_accel); // const char* QByteArray::data() const (result is '\0'-terminated and can be appended)
@@ -608,7 +608,7 @@ bool MCStageController::set_max_accel(float accel)
     }
     // check the value and return;
     float check = get_max_accel();
-    QString qstr_check = QString::number(check, 'f', 5);  // float to std::string
+    QString qstr_check = QLocale::system().toString(check, 'f', 5);  // float to std::string
     QByteArray ba_check = qstr_check.toLatin1();
     if (!(check < 0)){
         log_text(tr("Maximal acceleration set to %1").arg(ba_check.data()));
@@ -777,7 +777,7 @@ bool MCStageController::set_max_joyspeed(float speed, bool silent)
         return false;
     }
     // build instruction string
-    QString qstr_speed = QString::number(speed, 'f', 5);  // float to std::string
+    QString qstr_speed = QLocale::system().toString(speed, 'f', 5);  // float to std::string
     QString qinstr = qstr_speed;
     qinstr.append(" joyspeed ");
     // send instruction to serial connection
@@ -797,7 +797,7 @@ bool MCStageController::set_max_joyspeed(float speed, bool silent)
     }
     // check the value and return;
     float check = get_max_joyspeed();
-    QString qstr_check = QString::number(check, 'f', 5);  // float to std::string
+    QString qstr_check = QLocale::system().toString(check, 'f', 5);  // float to std::string
     //QByteArray ba_check = qstr_check.toLatin1();
     if (!(check < 0)){
         if (!silent) log_text(tr("Maximal joyspeed set to %1").arg(qstr_check));
@@ -921,7 +921,7 @@ bool MCStageController::set_pitch(uint8_t axis, float pitch)
         return false;
     }
     // build instruction:
-    QString qstr_pitch = QString::number(pitch, 'f', 5);  // float to std::string
+    QString qstr_pitch = QLocale::system().toString(pitch, 'f', 5);  // float to std::string
     QString qstr_axis = QString:: number(axis,10);
     QString qinstr = qstr_pitch;
     qinstr.append(" ");
@@ -1000,16 +1000,16 @@ bool MCStageController::set_scales(float xscale, float yscale, float zscale)
     QString qstr_yscale;
     QString qstr_zscale;
     //std::string instruction = "";
-    qstr_xscale = QString::number(xscale, 'f', 5);
+    qstr_xscale = QLocale::system().toString(xscale, 'f', 5);
     QString qinstr = qstr_xscale;
 
     if ((dims == 2) || (dims == 3)){
-        qstr_yscale = QString::number(yscale, 'f', 5);
+        qstr_yscale = QLocale::system().toString(yscale, 'f', 5);
         qinstr.append(" ");
         qinstr.append(qstr_yscale);
     }
     if (dims == 3){
-        QString qstr_zscale = QString::number(zscale, 'f', 5);
+        QString qstr_zscale = QLocale::system().toString(zscale, 'f', 5);
         qinstr.append(" ");
         qinstr.append(qstr_zscale);
 
@@ -1063,16 +1063,16 @@ bool MCStageController::set_origin(float xpos, float ypos, float zpos)
     QString qstr_xpos;
     QString qstr_ypos;
     QString qstr_zpos;
-    qstr_xpos = QString::number(xpos, 'f', 5);          // float xscale to std::string   |
+    qstr_xpos = QLocale::system().toString(xpos, 'f', 5);          // float xscale to std::string   |
     QString  qinstr = qstr_xpos;
     if ((dims == 2) || (dims == 3)){
 
-        qstr_ypos = QString::number(ypos, 'f', 5);  // float yscale to std::string   |
+        qstr_ypos = QLocale::system().toString(ypos, 'f', 5);  // float yscale to std::string   |
         qinstr.append(" ");
         qinstr.append(qstr_ypos);
     }
     if (dims == 3){
-        qstr_zpos = QString::number(zpos, 'f', 5);  // float zscale to std::string   |
+        qstr_zpos = QLocale::system().toString(zpos, 'f', 5);  // float zscale to std::string   |
         qinstr.append(" ");
         qinstr.append(qstr_zpos);
     }
@@ -1110,7 +1110,7 @@ bool MCStageController::set_max_vel(float vel)
         return false;
     }
     //build instruction string
-    QString qstr_vel = QString::number(vel, 'f', 5);  // float to std::string
+    QString qstr_vel = QLocale::system().toString(vel, 'f', 5);  // float to std::string
     QString qinstr = qstr_vel;
     qinstr.append(" setvel ");
     // send instruction to serial connection
@@ -1130,7 +1130,7 @@ bool MCStageController::set_max_vel(float vel)
     }
     // check the value and return;
     float check = get_max_vel();
-    QString qstr_check = QString::number(check, 'f', 5);
+    QString qstr_check = QLocale::system().toString(check, 'f', 5);
 
     if (!(check < 0)){
         log_text(tr("Maximal velocity set to %1").arg(qstr_check));

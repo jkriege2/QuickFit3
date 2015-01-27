@@ -410,19 +410,19 @@ void AlvAutocorrelator::call_show_settings_dialog()
 ///////////
 void AlvAutocorrelator::test_action()
 {
-    log_text("Status: " + QString::number(sm_data_out->getStatus()));
-    log_text("RunNumber: " + QString::number(sm_data_out->getRunNumber()));
-    log_text("RunTime: " + QString::number(sm_data_out->getRunTime()));
-    log_text("OverFlow0: " + QString::number(sm_data_out->getOverFlow0()));
-    log_text("OverFlow1: " + QString::number(sm_data_out->getOverFlow1()));
-    log_text("ActCh: " + QString::number(sm_data_out->getActCh()));
-    log_text("ActChCRCh: " + QString::number(sm_data_out->getActCRCh()));
-    log_text("GetCR0: " + QString::number(sm_data_out->getCR0()));
-    log_text("GetCR1: " + QString::number(sm_data_out->getCR1()));
-    log_text("GetMeanCR0: " + QString::number(sm_data_out->getMeanCR0()));
-    log_text("GetMeanCR1: " + QString::number(sm_data_out->getMeanCR1()));
-    log_text("Estimated Run Number: " + QString::number(AcquisitionRunCounter));
-    //log_text("GetMeanCR0: " + QString::number(sm_data_out->getMeanCR0()));
+    log_text("Status: " + QLocale::system().toString(sm_data_out->getStatus()));
+    log_text("RunNumber: " + QLocale::system().toString(sm_data_out->getRunNumber()));
+    log_text("RunTime: " + QLocale::system().toString(sm_data_out->getRunTime()));
+    log_text("OverFlow0: " + QLocale::system().toString(sm_data_out->getOverFlow0()));
+    log_text("OverFlow1: " + QLocale::system().toString(sm_data_out->getOverFlow1()));
+    log_text("ActCh: " + QLocale::system().toString(sm_data_out->getActCh()));
+    log_text("ActChCRCh: " + QLocale::system().toString(sm_data_out->getActCRCh()));
+    log_text("GetCR0: " + QLocale::system().toString(sm_data_out->getCR0()));
+    log_text("GetCR1: " + QLocale::system().toString(sm_data_out->getCR1()));
+    log_text("GetMeanCR0: " + QLocale::system().toString(sm_data_out->getMeanCR0()));
+    log_text("GetMeanCR1: " + QLocale::system().toString(sm_data_out->getMeanCR1()));
+    log_text("Estimated Run Number: " + QLocale::system().toString(AcquisitionRunCounter));
+    //log_text("GetMeanCR0: " + QLocale::system().toString(sm_data_out->getMeanCR0()));
 }
 
 
@@ -811,7 +811,7 @@ void AlvAutocorrelator::writeALVOutputFile()  //// <---- BEGIN LONG function :-)
     float timespace = (sm_data_in->getDuration()) / ((float) crlengths_min);
     for (int i = 1; i <= crlengths_min; i++){
         realTimes.append(timespace * (i));
-        //log_warning(QString("times: ") + QString::number(realTimes.last(),'f', 5));
+        //log_warning(QString("times: ") + QLocale::system().toString(realTimes.last(),'f', 5));
     }
    // qDebug() << "TEST 9";
     ///////////////////
@@ -893,8 +893,8 @@ void AlvAutocorrelator::setLogging(QFPluginLogService* logService) {
 // TEST SLOT
 void AlvAutocorrelator::refresh_monitor()
 {
-    crshow0->setText(QString::number(sm_data_out->getCR0(), 'f', 5));
-    crshow1->setText(QString::number(sm_data_out->getCR0(), 'f', 5));
+    crshow0->setText(QLocale::system().toString(sm_data_out->getCR0(), 'f', 5));
+    crshow1->setText(QLocale::system().toString(sm_data_out->getCR0(), 'f', 5));
     progress->setValue(getAcquisitionProgress(0));
     //monitor->start(100);
 }

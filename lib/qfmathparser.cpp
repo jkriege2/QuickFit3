@@ -1117,7 +1117,7 @@ double QFMathParser::readDec()
   }
 
     if (num.length()<=0) num="0";
-    current_double = num.toDouble();
+    current_double = QLocale::c().toDouble(num);
     current_double=(current_double)*dfactor;
     return current_double;
 }

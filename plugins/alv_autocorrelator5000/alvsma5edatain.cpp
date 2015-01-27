@@ -58,7 +58,7 @@ void AlvSmA5EDataIn::setDuration(int32_t newDuration)
 {
     if (newDuration > 0){
         *duration = newDuration;
-        log_text(tr("Duration set to %1").arg(QString::number(*duration)));
+        log_text(tr("Duration set to %1").arg(QLocale::system().toString(*duration)));
 
     } else
         log_error(tr("In AlvSmA5EDataIn::setDuration(...) : Parameter out of range: newDuration == %1").arg(newDuration));

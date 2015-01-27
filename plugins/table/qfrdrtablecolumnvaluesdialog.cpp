@@ -59,7 +59,7 @@ void QFRDRTableColumnValuesDialog::updatePreview()
     QList<double> l=getValues();
     for (int i=0; i<qMin(10, l.size()); i++) {
         if (!p.isEmpty()) p.append("; ");
-        p.append(QString::number(l[i]));
+        p.append(QLocale::system().toString(l[i]));
     }
     if (l.size()>10) {
         p.append(" ... ");
@@ -67,7 +67,7 @@ void QFRDRTableColumnValuesDialog::updatePreview()
         for (int i=qMax(l.size()-5, qMin(10, l.size())); i<l.size(); i++) {
             if (ok) p.append("; ");
             ok=true;
-            p.append(QString::number(l[i]));
+            p.append(QLocale::system().toString(l[i]));
         }
     }
 

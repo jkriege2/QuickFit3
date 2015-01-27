@@ -883,8 +883,8 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
                 case QFExtensionLinearStage::Error : labState->setPixmap(iconError); break;
                 default: labState->setText(tr("?")); break;
             }
-            labSpeed->setText(QString::number(speed, 'f', 2));
-            labPos->setText(QString::number(position, 'f', 2));
+            labSpeed->setText(QLocale::system().toString(speed, 'f', 2));
+            labPos->setText(QLocale::system().toString(position, 'f', 2));
         }
 
         stage=getYStage();
@@ -908,8 +908,8 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
                 case QFExtensionLinearStage::Error : labState->setPixmap(iconError); break;
                 default: labState->setText(tr("?")); break;
             }
-            labSpeed->setText(QString::number(speed, 'f', 2));
-            labPos->setText(QString::number(position, 'f', 2));
+            labSpeed->setText(QLocale::system().toString(speed, 'f', 2));
+            labPos->setText(QLocale::system().toString(position, 'f', 2));
         }
 
         stage=getZStage();
@@ -932,8 +932,8 @@ void QFESPIMB040SampleStageConfig::displayAxisStates(/*bool automatic*/) {
                 case QFExtensionLinearStage::Error : labState->setPixmap(iconError); break;
                 default: labState->setText(tr("?")); break;
             }
-            labSpeed->setText(QString::number(speed, 'f', 2));
-            labPos->setText(QString::number(position, 'f', 2));
+            labSpeed->setText(QLocale::system().toString(speed, 'f', 2));
+            labPos->setText(QLocale::system().toString(position, 'f', 2));
         }
 
 
@@ -1142,9 +1142,9 @@ void QFESPIMB040SampleStageConfig::updateStageStateWidgets(QLabel* labPos, QLabe
                 if (labState->text()!=tr("?")) labState->setText(tr("?"));
                 break;
         }
-        QString txt=QString::number(speed, 'f', 2);
+        QString txt=QLocale::system().toString(speed, 'f', 2);
         if (labSpeed->text()!=txt) labSpeed->setText(txt);
-        txt=QString::number(position, 'f', 2);
+        txt=QLocale::system().toString(position, 'f', 2);
         if (labPos->text()!=txt) labPos->setText(txt);
         //setUpdatesEnabled(updt);
     } else {

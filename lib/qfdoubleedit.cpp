@@ -100,7 +100,7 @@ QFDoubleEdit::~QFDoubleEdit()
 
 double QFDoubleEdit::value() const {
     bool ok=true;
-    double val=text().toDouble(&ok);
+    double val=QLocale::system().toDouble(text(), &ok);
     if (!ok) return 0;
     if (m_checkMaximum && (val>m_maximum)) { val=m_maximum; }
     if (m_checkMaximum && (val<m_minimum)) { val=m_minimum; }
@@ -206,7 +206,7 @@ void QFDoubleEdit::updateWidget(const QString & text) {
         if (text[text.size()-1]==QChar('0') && text.contains(QLocale::system().decimalPoint()) && (!(text.contains('e') || text.contains('E')))) return;
     }
     bool ok=true;
-    double val=text.toDouble(&ok);
+    double val=QLocale::system().toDouble(text, &ok);
     if (!ok) return;
     double newVal=val;
     //palette().setColor(QPalette::Base, m_background);

@@ -131,10 +131,10 @@ void QFEB040FFMControl::storeSettings(ProgramOptions* settingspo) {
         int width = mw->width();
         int posx = mw->pos().x();
         int posy = mw->pos().y();
-        settings.setValue("/qfeb040ffm/window/height", QString::number(height));
-        settings.setValue("/qfeb040ffm/window/width", QString::number(width));
-        settings.setValue("/qfeb040ffm/window/posx", QString::number(posx));
-        settings.setValue("/qfeb040ffm/window/posy", QString::number(posy));
+        settings.setValue("/qfeb040ffm/window/height", QLocale::system().toString(height));
+        settings.setValue("/qfeb040ffm/window/width", QLocale::system().toString(width));
+        settings.setValue("/qfeb040ffm/window/posx", QLocale::system().toString(posx));
+        settings.setValue("/qfeb040ffm/window/posy", QLocale::system().toString(posy));
     }
 
     // ALTERNATIVE: read/write Information to/from plugins/extensions/<ID>/<ID>.ini file

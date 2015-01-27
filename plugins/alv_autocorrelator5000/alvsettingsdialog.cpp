@@ -134,29 +134,29 @@ ALVSettingsDialog::ALVSettingsDialog(QSettings& settings, AlvSmA5EDataIn *new_sm
     layout->addWidget(new QLabel("Scattering Angle:"), 9, 0, Qt::AlignRight);
     scattangle = new QLineEdit(this);
     scattangle->setValidator(floatvalid);
-    scattangle->setText(QString::number(settings.value("ALV_AUTOCORRELATOR5000_SCATTANGLE").toFloat()));
+    scattangle->setText(QLocale::system().toString(settings.value("ALV_AUTOCORRELATOR5000_SCATTANGLE").toFloat()));
     layout->addWidget(scattangle);
     layout->addWidget(new QLabel("Wavelength:"), 9, 2, Qt::AlignRight);
     wavel = new QLineEdit(this);
     wavel->setValidator(floatvalid);
-    wavel->setText(QString::number(settings.value("ALV_AUTOCORRELATOR5000_WAVELENGTH").toFloat()));
+    wavel->setText(QLocale::system().toString(settings.value("ALV_AUTOCORRELATOR5000_WAVELENGTH").toFloat()));
     layout->addWidget(wavel);
 
     layout->addWidget(new QLabel("RI of solvent:"), 10, 0, Qt::AlignRight);
     ri = new QLineEdit(this);
     ri->setValidator(floatvalid);
-    ri->setText(QString::number(settings.value("ALV_AUTOCORRELATOR5000_RI").toFloat()));
+    ri->setText(QLocale::system().toString(settings.value("ALV_AUTOCORRELATOR5000_RI").toFloat()));
     layout->addWidget(ri);
     layout->addWidget(new QLabel("Viscosity:"), 10, 2, Qt::AlignRight);
     visc = new QLineEdit(this);
     visc->setValidator(floatvalid);
-    visc->setText(QString::number(settings.value("ALV_AUTOCORRELATOR5000_VISCOSITY").toFloat()));
+    visc->setText(QLocale::system().toString(settings.value("ALV_AUTOCORRELATOR5000_VISCOSITY").toFloat()));
     layout->addWidget(visc);
 
     layout->addWidget(new QLabel("Temperature:"), 11,0, Qt::AlignRight);
     temp = new QLineEdit(this);
     temp->setValidator(floatvalid);
-    temp->setText(QString::number(settings.value("ALV_AUTOCORRELATOR5000_TEMPERATURE").toFloat()));
+    temp->setText(QLocale::system().toString(settings.value("ALV_AUTOCORRELATOR5000_TEMPERATURE").toFloat()));
     layout->addWidget(temp);
     //end block floats
 

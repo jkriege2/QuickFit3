@@ -3214,7 +3214,7 @@ QString QFRawDataRecord::resultsGetAsString(const QString& evalName, const QStri
             QString s="(";
             for (int i=0; i<r.dvec.size(); i++) {
                 if (i>0) s=s+"; ";
-                s=s+QString::number(r.dvec[i]);
+                s=s+QLocale::system().toString(r.dvec[i]);
             }
             return s+") "+r.unit;
         }
@@ -3225,7 +3225,7 @@ QString QFRawDataRecord::resultsGetAsString(const QString& evalName, const QStri
                     if (i%r.columns==0) s=s+";; ";
                     else s=s+"; ";
                 }
-                s=s+QString::number(r.dvec[i]);
+                s=s+QLocale::system().toString(r.dvec[i]);
             }
             return s+") "+r.unit;
         }
@@ -3271,7 +3271,7 @@ QString QFRawDataRecord::resultsGetAsString(const QString& evalName, const QStri
             QString s="(";
             for (int i=0; i<r.ivec.size(); i++) {
                 if (i>0) s=s+"; ";
-                s=s+QString::number(r.ivec[i]);
+                s=s+QLocale::system().toString(r.ivec[i]);
             }
             return s+") "+r.unit;
         }
@@ -3282,7 +3282,7 @@ QString QFRawDataRecord::resultsGetAsString(const QString& evalName, const QStri
                     if (i%r.columns==0) s=s+";; ";
                     else s=s+"; ";
                 }
-                s=s+QString::number(r.ivec[i]);
+                s=s+QLocale::system().toString(r.ivec[i]);
             }
             return s+") "+r.unit;
         }
@@ -3484,10 +3484,10 @@ QString QFRawDataRecord::resultsGetAsString(const QString &evalName, const QStri
         case qfrdreNumberMatrix:
         case qfrdreNumberVector: {
             if (position>= r.dvec.size()) return "0 "+r.unit;
-            return QString::number(r.dvec[position])+" "+r.unit;
+            return QLocale::system().toString(r.dvec[position])+" "+r.unit;
         }
         case qfrdreNumber: {
-            if (alsoGetNonVec) return QString::number(r.dvalue)+" "+r.unit;
+            if (alsoGetNonVec) return QLocale::system().toString(r.dvalue)+" "+r.unit;
             else return "";
         }
         case qfrdreNumberErrorMatrix:
@@ -3498,7 +3498,7 @@ QString QFRawDataRecord::resultsGetAsString(const QString &evalName, const QStri
         }
 
         case qfrdreNumberError: {
-            if (alsoGetNonVec) return "("+QString::number(r.dvalue)+" +/- "+QString::number(r.derror)+") "+r.unit;
+            if (alsoGetNonVec) return "("+QLocale::system().toString(r.dvalue)+" +/- "+QLocale::system().toString(r.derror)+") "+r.unit;
             else return "";
         }
         case qfrdreStringVector:
@@ -3515,10 +3515,10 @@ QString QFRawDataRecord::resultsGetAsString(const QString &evalName, const QStri
         case qfrdreIntegerVector:
         case qfrdreIntegerMatrix: {
                 if (position>= r.ivec.size()) return "0 "+r.unit;
-                return QString::number(r.ivec[position])+" "+r.unit;
+                return QLocale::system().toString(r.ivec[position])+" "+r.unit;
         }
         case qfrdreInteger: {
-            if (alsoGetNonVec) return QString::number(r.ivalue)+" "+r.unit;
+            if (alsoGetNonVec) return QLocale::system().toString(r.ivalue)+" "+r.unit;
             else return "";
         }
         case qfrdreBooleanVector:

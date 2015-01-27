@@ -43,9 +43,9 @@ void MulticontrolStage::deinit() {
     //QSettings stageSettings(services->getGlobalConfigFileDirectory()+"/stage_pi863.ini", QSettings::IniFormat);
     if (stageSettings->isWritable()) {
         stageSettings->setValue("driver/port", COMPort);
-        stageSettings->setValue("driver/maxacceleration", QString::number(maxAcceleration, 'f'));
-        stageSettings->setValue("driver/maxvelocity", QString::number(maxVelocity, 'f'));
-        stageSettings->setValue("driver/maxjoyspeed", QString::number(maxJoySpeed, 'f'));
+        stageSettings->setValue("driver/maxacceleration", QLocale::system().toString(maxAcceleration, 'f'));
+        stageSettings->setValue("driver/maxvelocity", QLocale::system().toString(maxVelocity, 'f'));
+        stageSettings->setValue("driver/maxjoyspeed", QLocale::system().toString(maxJoySpeed, 'f'));
 /*
         for (int i=0; i<axes.size(); i++) {
             QString axisname=axes[i].name;

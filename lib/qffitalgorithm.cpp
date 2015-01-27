@@ -145,7 +145,7 @@ QString  QFFitAlgorithm::FitResult::getAsString(QString resultName) {
             QString s="(";
             for (int i=0; i<r.dvec.size(); i++) {
                 if (i>0) s=s+"; ";
-                s=s+QString::number(r.dvec[i]);
+                s=s+QLocale::system().toString(r.dvec[i]);
             }
             return s+") "+r.unit;
         }
@@ -156,7 +156,7 @@ QString  QFFitAlgorithm::FitResult::getAsString(QString resultName) {
                     if (i%r.columns==0) s=s+";; ";
                     else s=s+"; ";
                 }
-                s=s+QString::number(r.dvec[i]);
+                s=s+QLocale::system().toString(r.dvec[i]);
             }
             return s+") "+r.unit;
         }

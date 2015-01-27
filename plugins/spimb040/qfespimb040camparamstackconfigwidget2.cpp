@@ -274,7 +274,7 @@ void QFESPIMB040CamParamStackConfigWidget2::updateLabel() {
         s=s+" (";
         for (int i=0; i<qMin(12, l.size()); i++) {
             if (i>0) s=s+"; ";
-            s=s+QString::number(l[i]);
+            s=s+QLocale::system().toString(l[i]);
         }
         if (l.size()>12) s=s+" ...";
         s=s+")";

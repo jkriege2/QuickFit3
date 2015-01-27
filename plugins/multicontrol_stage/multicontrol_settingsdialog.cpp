@@ -100,9 +100,9 @@ void MulticontrolSettingsDialog::confirm()
 {
 
     if(settings->isWritable()){
-        settings->setValue("driver/maxacceleration", QString::number(maxAccelBox->value(), 'f'));
-        settings->setValue("driver/maxvelocity", QString::number(maxVelBox->value(), 'f'));
-        settings->setValue("driver/maxjoyspeed", QString::number(maxJoyspeedBox->value(), 'f'));
+        settings->setValue("driver/maxacceleration", QLocale::system().toString(maxAccelBox->value(), 'f'));
+        settings->setValue("driver/maxvelocity", QLocale::system().toString(maxVelBox->value(), 'f'));
+        settings->setValue("driver/maxjoyspeed", QLocale::system().toString(maxJoyspeedBox->value(), 'f'));
         QString newComPort(tr("COM%1").arg(comCombo->currentIndex()+1));
         //qDebug() << newComPort;
         settings->setValue("driver/port", newComPort);
