@@ -155,41 +155,55 @@ void QFDoubleEdit::stepDown()
     stepDown(1);
 }
 
-void QFDoubleEdit::stepUp(int steps)
+void QFDoubleEdit::stepUp(int steps, bool faster, bool slower)
 {
     double newVal=value();
+    double incr=m_increment;
+    if (faster) {
+        incr=incr*10.0;
+    }
+    if (slower) {
+        incr=incr/10.0;
+    }
     if (m_logscale) {
 
         for (int j=0; j<steps; j++) {
             double decade=qMin(ceil(log(newVal)/log(m_logbase)), floor(log(newVal)/log(m_logbase)));
-            double inc=pow(m_logbase, decade)/m_increment;
+            double inc=pow(m_logbase, decade)/incr;
             //qDebug()<<newVal<<decade<<inc;
             newVal+=inc;
         }
     } else {
-        double i=m_increment*double(steps);
-        if (m_Integer) i=round(m_increment);
+        double i=incr*double(steps);
+        if (m_Integer) i=round(incr);
         newVal+=i;
     }
     setValue(newVal);
     emit valueChanged(value());
 }
 
-void QFDoubleEdit::stepDown(int steps)
+void QFDoubleEdit::stepDown(int steps, bool faster, bool slower)
 {
     double newVal=value();
+    double incr=m_increment;
+    if (faster) {
+        incr=incr*10.0;
+    }
+    if (slower) {
+        incr=incr/10.0;
+    }
     if (m_logscale) {
 
         for (int j=0; j<steps; j++) {
             double decade=qMin(ceil(log(newVal)/log(m_logbase)), floor(log(newVal)/log(m_logbase)));
-            double inc=pow(m_logbase, decade)/m_increment;
+            double inc=pow(m_logbase, decade)/incr;
             if (newVal-inc<=0.0 || newVal-inc<=m_minimum) inc=inc/m_logbase;
             //qDebug()<<newVal<<decade<<inc;
             newVal-=inc;
         }
     } else {
-        double i=m_increment*double(steps);
-        if (m_Integer) i=round(m_increment);
+        double i=incr*double(steps);
+        if (m_Integer) i=round(incr);
         newVal-=i;
     }
     setValue(newVal);
@@ -294,9 +308,16 @@ void QFDoubleEdit::wheelEvent(QWheelEvent *event)
     int numSteps = numDegrees / 15;
     //qDebug()<<event->delta()<<event->orientation();
 
+    bool faster=false, slower=false;
+    if (event->modifiers()==Qt::ShiftModifier) {
+        faster=true;
+    } else if (event->modifiers()==Qt::ControlModifier) {
+        slower=true;
+    }
+
     if (event->orientation() == Qt::Vertical) {
-        if (numSteps<0) stepDown(-numSteps);
-            else stepUp(numSteps);
+        if (numSteps<0) stepDown(-numSteps, faster, slower);
+            else stepUp(numSteps, faster, slower);
     }
     event->accept();
 }

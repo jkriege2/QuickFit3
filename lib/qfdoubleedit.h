@@ -74,11 +74,11 @@ class QFLIB_EXPORT QFDoubleEdit : public QLineEdit {
 
         void setErrorColor(const QColor& color) { m_errorColor=color; updateWidget(text()); }
         void setBackgroundColor(const QColor& color) { m_background=color; updateWidget(text()); }
-        double maximum() const { return m_maximum; };
-        double minimum() const { return m_minimum; };
-        double checkMaximum() const { return m_checkMaximum; };
-        double checkMinimum() const { return m_checkMinimum; };
-        double decimals() const { return m_decimals; };
+        double maximum() const { return m_maximum; }
+        double minimum() const { return m_minimum; }
+        double checkMaximum() const { return m_checkMaximum; }
+        double checkMinimum() const { return m_checkMinimum; }
+        double decimals() const { return m_decimals; }
         QColor errorColor() const { return m_errorColor; }
         QColor backgroundColor() const { return m_background; }
         double increment() const { return m_increment; }
@@ -98,8 +98,8 @@ class QFLIB_EXPORT QFDoubleEdit : public QLineEdit {
         void setDecimals(int decimals) { m_decimals=decimals; setValue(value()); }
         void stepUp();
         void stepDown();
-        void stepUp(int steps);
-        void stepDown(int steps);
+        void stepUp(int steps, bool faster=false, bool slower=false);
+        void stepDown(int steps, bool faster=false, bool slower=false);
         void setIncrement(double inc) { m_increment=inc; }
         void setSingleStep(double inc) { setIncrement(inc); }
         void setShowUpDown(bool showUpDown);

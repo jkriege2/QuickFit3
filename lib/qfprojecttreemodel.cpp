@@ -128,7 +128,10 @@ void QFProjectTreeModel::createModelTree() {
     if (displayEval) {
         evalFolderItem=projectItem->addChildFolder(tr("Evaluation Items"));
         for (int i=0; i<current->getEvaluationCount(); i++) {
-            evalFolderItem->addChild(current->getEvaluationByNum(i));
+            QFEvaluationItem* eval=current->getEvaluationByNum(i);
+            if (eval) {
+                evalFolderItem->addChild(eval);
+            }
         }
     }
 
@@ -265,7 +268,7 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
     QFProjectTreeModelNode::nodeType nt=classifyIndex(index);
     if (col==0 && nt==QFProjectTreeModelNode::qfpntProject && role==Qt::EditRole) {
         current->setName(value.toString());
-        emit dataChanged(index, index);
+        emit dataChanged(createIndex(index.row(), index.column(), index.internalPointer()), createIndex(index.row(), index.column(), index.internalPointer()));
         return true;
     }
     if (nt==QFProjectTreeModelNode::qfpntRawDataRecord) {
@@ -274,7 +277,7 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
             if (rec) {
                 if (col==0) {
                     rec->setName(value.toString());
-                    emit dataChanged(index, index);
+                    emit dataChanged(this->index(rec), this->index(rec));
                     return true;
                 }
             }
@@ -286,7 +289,7 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
                 } else {
                     rdrUnchecked.insert(rec->getID());
                 }
-                emit dataChanged(index, index);
+                emit dataChanged(this->index(rec), this->index(rec));
                 return true;
             }
         }
@@ -296,7 +299,7 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
             QFEvaluationItem* rec=getEvaluationByIndex(index);
             if (rec) {
                 rec->setName(value.toString());
-                emit dataChanged(index, index);
+                emit dataChanged(this->index(rec), this->index(rec));
                 return true;
             }
         } else if (col==0 && role==Qt::CheckStateRole) {
@@ -307,7 +310,7 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
                 } else {
                     evaluationUnchecked.insert(rec->getID());
                 }
-                emit dataChanged(index, index);
+                emit dataChanged(this->index(rec), this->index(rec));
                 return true;
             }
 
@@ -334,7 +337,7 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
                 emit dataChanged(this->index(mIt.key()), this->index(mIt.key()));
                 //qDebug()<<mIt.key()->getName()<<": set folder: "<<mIt.value();
             }
-            emit dataChanged(index, index);
+            emit dataChanged(createIndex(index.row(), index.column(), index.internalPointer()), createIndex(index.row(), index.column(), index.internalPointer()));
             current->setSignalsEnabled(sigEn, true);
             return true;
         } else if (col==0 && role==Qt::CheckStateRole) {
@@ -350,7 +353,7 @@ bool QFProjectTreeModel::setData (const QModelIndex &index, const QVariant &valu
                 }
                 emit dataChanged(this->index(l[i]), this->index(l[i]));
             }
-            emit dataChanged(index, index);
+            emit dataChanged(createIndex(index.row(), index.column(), index.internalPointer()), createIndex(index.row(), index.column(), index.internalPointer()));
             QModelIndex idx=index;
             while (idx.parent().isValid()) {
                 emit dataChanged(idx.parent(), idx.parent());
@@ -442,7 +445,7 @@ QModelIndex QFProjectTreeModel::index ( QFRawDataRecord* record, QFProjectTreeMo
             if (idx.isValid()) return idx;
         }
     }
-    return idx;
+    return QModelIndex();
 }
 
 QModelIndex QFProjectTreeModel::index ( QFEvaluationItem* record, QFProjectTreeModelNode* folder) const {
@@ -454,7 +457,7 @@ QModelIndex QFProjectTreeModel::index ( QFEvaluationItem* record, QFProjectTreeM
             if (idx.isValid()) break;
         }
     }
-    return idx;
+    return QModelIndex();
 }
 
 QModelIndex QFProjectTreeModel::index ( QFRawDataRecord* record ) const {

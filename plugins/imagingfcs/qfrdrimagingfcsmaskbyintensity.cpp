@@ -23,6 +23,8 @@
 #include "ui_qfrdrimagingfcsmaskbyintensity.h"
 #include "programoptions.h"
 #include "qftools.h"
+#include "statistics_tools.h"
+
 QFRDRImagingFCSMaskByIntensity::QFRDRImagingFCSMaskByIntensity(QWidget *parent, bool selection) :
     QDialog(parent),
     ui(new Ui::QFRDRImagingFCSMaskByIntensity)
@@ -45,17 +47,22 @@ QFRDRImagingFCSMaskByIntensity::QFRDRImagingFCSMaskByIntensity(QWidget *parent, 
 
     ui->cmbMaskingMode->setCurrentIndex(ProgramOptions::getConfigValue(iniName+"/maskingmode",2).toInt());
     ui->cmbMaskMode->setCurrentIndex(ProgramOptions::getConfigValue(iniName+"/maskmode", 0).toInt());
-    ui->chkEqualChannels->setChecked(ProgramOptions::getConfigValue(iniName+"/channelsequal", true).toBool());
-    loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, iniName+"/pos");
+    ui->chkColorScaling->setChecked(ProgramOptions::getConfigValue(iniName+"/chkColorScaling", false).toBool());
+    ui->edtImgRangeMin->setValue(ProgramOptions::getConfigValue(iniName+"/edtImgRangeMin", 5).toDouble());
+    ui->edtImgRangeMax->setValue(ProgramOptions::getConfigValue(iniName+"/edtImgRangeMax", 5).toDouble());
+    loadWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, iniName+"/geo/");
     updateDualView();
     updateEnabledWidgets();
 }
 
 QFRDRImagingFCSMaskByIntensity::~QFRDRImagingFCSMaskByIntensity() {
-    saveWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, iniName+"/pos");
+    saveWidgetGeometry(*(ProgramOptions::getInstance()->getQSettings()), this, iniName+"/geo/");
     ProgramOptions::setConfigValue(iniName+"/maskingmode",ui->cmbMaskingMode->currentIndex());
     ProgramOptions::setConfigValue(iniName+"/maskmode", ui->cmbMaskMode->currentIndex());
     ProgramOptions::setConfigValue(iniName+"/channelsequal", ui->chkEqualChannels->isChecked());
+    ProgramOptions::setConfigValue(iniName+"/chkColorScaling", ui->chkColorScaling->isChecked());
+    ProgramOptions::setConfigValue(iniName+"/edtImgRangeMin", ui->edtImgRangeMin->value());
+    ProgramOptions::setConfigValue(iniName+"/edtImgRangeMax", ui->edtImgRangeMax->value());
     delete ui;
 }
 
@@ -228,6 +235,40 @@ void QFRDRImagingFCSMaskByIntensity::updateEnabledWidgets()
     ui->sldLevel2->setEnabled(ui->edtLevel2->isEnabled());
     ui->sldLevel2_2->setEnabled(ui->edtLevel2_2->isEnabled());
 
+}
+
+void QFRDRImagingFCSMaskByIntensity::on_edtImgRangeMin_valueChanged(double val)
+{
+    updateImage();
+}
+
+void QFRDRImagingFCSMaskByIntensity::on_edtImgRangeMax_valueChanged(double val)
+{
+    updateImage();
+}
+
+void QFRDRImagingFCSMaskByIntensity::on_chkColorScaling_toggled(bool checked)
+{
+    updateImage();
+}
+
+void QFRDRImagingFCSMaskByIntensity::updateImage()
+{
+    ui->pltMain->set_doDrawing(false);
+    if (ui->chkColorScaling->isChecked()) {
+        plteImage->set_autoImageRange(false);
+        plteImage->set_imageMin(statisticsQuantile(m_image, m_width*m_height, ui->edtImgRangeMin->value()/100.0));
+        plteImage->set_imageMax(statisticsQuantile(m_image, m_width*m_height, 1.0-ui->edtImgRangeMax->value()/100.0));
+    } else {
+        plteImage->set_autoImageRange(true);
+    }
+    ui->pltMain->set_doDrawing(true);
+    ui->pltMain->update_plot();
+}
+
+void QFRDRImagingFCSMaskByIntensity::on_btnHelp_clicked()
+{
+    QFPluginServices::getInstance()->displayPluginHelpWindow("imaging_fcs", "imfcs_maskbyintensity.html");
 }
 
 

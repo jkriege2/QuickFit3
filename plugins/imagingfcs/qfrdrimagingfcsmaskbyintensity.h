@@ -40,7 +40,7 @@ class QFRDRImagingFCSMaskByIntensity : public QDialog
         
     public:
         explicit QFRDRImagingFCSMaskByIntensity(QWidget *parent = 0, bool selection=false);
-        ~QFRDRImagingFCSMaskByIntensity();
+        virtual ~QFRDRImagingFCSMaskByIntensity();
 
         void init(bool* mask, double* image, uint32_t width, uint32_t height, int dualView);
 
@@ -50,6 +50,11 @@ class QFRDRImagingFCSMaskByIntensity : public QDialog
         void updateMask();
         void updateDualView();
         void updateEnabledWidgets();
+        void on_edtImgRangeMin_valueChanged(double val);
+        void on_edtImgRangeMax_valueChanged(double val);
+        void on_chkColorScaling_toggled(bool checked);
+        void updateImage();
+        void on_btnHelp_clicked();
         
     private:
         Ui::QFRDRImagingFCSMaskByIntensity *ui;

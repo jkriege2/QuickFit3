@@ -2,22 +2,111 @@
 <ui version="4.0">
  <class>QFRDRImagingFCSMaskByIntensity</class>
  <widget class="QDialog" name="QFRDRImagingFCSMaskByIntensity">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>954</width>
-    <height>564</height>
+    <width>750</width>
+    <height>500</height>
    </rect>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>750</width>
+    <height>500</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Mask from Image ...</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="1,0">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
      <item>
-      <widget class="QFPlotter" name="pltMain" native="true"/>
+      <widget class="QWidget" name="widget" native="true">
+       <property name="minimumSize">
+        <size>
+         <width>450</width>
+         <height>0</height>
+        </size>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,1">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item>
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <item>
+           <widget class="QCheckBox" name="chkColorScaling">
+            <property name="text">
+             <string>relaxed color scaling:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="edtImgRangeMin">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="suffix">
+             <string> %</string>
+            </property>
+            <property name="maximum">
+             <double>100.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>5.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="edtImgRangeMax">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="suffix">
+             <string> %</string>
+            </property>
+            <property name="maximum">
+             <double>100.000000000000000</double>
+            </property>
+            <property name="value">
+             <double>5.000000000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="QFPlotter" name="pltMain" native="true"/>
+        </item>
+       </layout>
+      </widget>
      </item>
      <item>
       <layout class="QFormLayout" name="formLayout_2">
@@ -25,20 +114,51 @@
         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
        </property>
        <item row="0" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="text">
+          <string>Mode:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QComboBox" name="cmbMaskingMode">
+         <item>
+          <property name="text">
+           <string>mask in-range pixels</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>mask out-of-range pixels</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>mask smaller threshold</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>mask larger threshold</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="1" column="0">
         <widget class="QLabel" name="label_3">
          <property name="text">
           <string>Data Range:</string>
          </property>
         </widget>
        </item>
-       <item row="0" column="1">
+       <item row="1" column="1">
         <widget class="QLabel" name="labRange">
          <property name="text">
           <string/>
          </property>
         </widget>
        </item>
-       <item row="1" column="0">
+       <item row="2" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
           <string>Threshold:</string>
@@ -48,7 +168,7 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="2" column="1">
         <layout class="QGridLayout" name="gridLayout">
          <item row="0" column="1">
           <widget class="QFDoubleEdit" name="edtLevel"/>
@@ -79,7 +199,7 @@
          </item>
         </layout>
        </item>
-       <item row="2" column="0">
+       <item row="3" column="0">
         <widget class="QLabel" name="label_5">
          <property name="text">
           <string>Threshold 2:</string>
@@ -89,7 +209,7 @@
          </property>
         </widget>
        </item>
-       <item row="2" column="1">
+       <item row="3" column="1">
         <layout class="QGridLayout" name="gridLayout_2">
          <item row="0" column="0">
           <widget class="QFDoubleEdit" name="edtLevel2"/>
@@ -116,41 +236,6 @@
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>Mode:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <item>
-          <widget class="QComboBox" name="cmbMaskingMode">
-           <item>
-            <property name="text">
-             <string>mask in-range pixels</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>mask out-of-range pixels</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>mask smaller threshold</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>mask larger threshold</string>
-            </property>
-           </item>
           </widget>
          </item>
         </layout>
@@ -267,14 +352,29 @@
     </layout>
    </item>
    <item>
-    <widget class="QDialogButtonBox" name="buttonBox">
-     <property name="orientation">
-      <enum>Qt::Horizontal</enum>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
-     </property>
-    </widget>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QPushButton" name="btnHelp">
+       <property name="text">
+        <string>&amp;Help</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/help/help.png</normaloff>:/lib/help/help.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDialogButtonBox" name="buttonBox">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="standardButtons">
+        <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
@@ -305,7 +405,14 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrimagingfcs.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>
@@ -315,8 +422,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>266</x>
-     <y>554</y>
+     <x>275</x>
+     <y>490</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -331,8 +438,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>334</x>
-     <y>554</y>
+     <x>343</x>
+     <y>490</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
@@ -347,7 +454,7 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>784</x>
+     <x>623</x>
      <y>50</y>
     </hint>
     <hint type="destinationlabel">
@@ -363,7 +470,7 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>784</x>
+     <x>623</x>
      <y>50</y>
     </hint>
     <hint type="destinationlabel">
@@ -379,7 +486,7 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>942</x>
+     <x>738</x>
      <y>283</y>
     </hint>
     <hint type="destinationlabel">
@@ -395,7 +502,7 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>784</x>
+     <x>623</x>
      <y>50</y>
     </hint>
     <hint type="destinationlabel">
@@ -411,7 +518,7 @@
    <slot>updateDualView()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>942</x>
+     <x>738</x>
      <y>185</y>
     </hint>
     <hint type="destinationlabel">
@@ -427,7 +534,7 @@
    <slot>updateDualView()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>942</x>
+     <x>738</x>
      <y>208</y>
     </hint>
     <hint type="destinationlabel">
@@ -443,7 +550,7 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>784</x>
+     <x>623</x>
      <y>103</y>
     </hint>
     <hint type="destinationlabel">
@@ -459,7 +566,7 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>784</x>
+     <x>623</x>
      <y>103</y>
     </hint>
     <hint type="destinationlabel">
@@ -475,7 +582,7 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>941</x>
+     <x>737</x>
      <y>156</y>
     </hint>
     <hint type="destinationlabel">
@@ -491,7 +598,7 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>941</x>
+     <x>737</x>
      <y>103</y>
     </hint>
     <hint type="destinationlabel">
@@ -507,8 +614,8 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>829</x>
-     <y>46</y>
+     <x>737</x>
+     <y>50</y>
     </hint>
     <hint type="destinationlabel">
      <x>579</x>
@@ -523,12 +630,12 @@
    <slot>setDValue(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>702</x>
-     <y>42</y>
+     <x>623</x>
+     <y>50</y>
     </hint>
     <hint type="destinationlabel">
-     <x>700</x>
-     <y>69</y>
+     <x>623</x>
+     <y>75</y>
     </hint>
    </hints>
   </connection>
@@ -539,12 +646,12 @@
    <slot>setValue(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>737</x>
-     <y>67</y>
+     <x>623</x>
+     <y>75</y>
     </hint>
     <hint type="destinationlabel">
-     <x>737</x>
-     <y>37</y>
+     <x>623</x>
+     <y>50</y>
     </hint>
    </hints>
   </connection>
@@ -555,12 +662,12 @@
    <slot>setDValue(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>938</x>
-     <y>36</y>
+     <x>737</x>
+     <y>50</y>
     </hint>
     <hint type="destinationlabel">
-     <x>935</x>
-     <y>58</y>
+     <x>737</x>
+     <y>75</y>
     </hint>
    </hints>
   </connection>
@@ -571,12 +678,12 @@
    <slot>setValue(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>914</x>
-     <y>60</y>
+     <x>737</x>
+     <y>75</y>
     </hint>
     <hint type="destinationlabel">
-     <x>916</x>
-     <y>34</y>
+     <x>737</x>
+     <y>50</y>
     </hint>
    </hints>
   </connection>
@@ -587,12 +694,12 @@
    <slot>setDValue(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>762</x>
-     <y>88</y>
+     <x>623</x>
+     <y>103</y>
     </hint>
     <hint type="destinationlabel">
-     <x>762</x>
-     <y>120</y>
+     <x>623</x>
+     <y>128</y>
     </hint>
    </hints>
   </connection>
@@ -603,12 +710,12 @@
    <slot>setValue(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>749</x>
-     <y>114</y>
+     <x>623</x>
+     <y>128</y>
     </hint>
     <hint type="destinationlabel">
-     <x>748</x>
-     <y>87</y>
+     <x>623</x>
+     <y>103</y>
     </hint>
    </hints>
   </connection>
@@ -619,12 +726,12 @@
    <slot>setDValue(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>863</x>
-     <y>98</y>
+     <x>737</x>
+     <y>103</y>
     </hint>
     <hint type="destinationlabel">
-     <x>864</x>
-     <y>117</y>
+     <x>737</x>
+     <y>128</y>
     </hint>
    </hints>
   </connection>
@@ -635,12 +742,12 @@
    <slot>setValue(double)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>834</x>
-     <y>119</y>
+     <x>737</x>
+     <y>128</y>
     </hint>
     <hint type="destinationlabel">
-     <x>834</x>
-     <y>92</y>
+     <x>737</x>
+     <y>103</y>
     </hint>
    </hints>
   </connection>
@@ -651,8 +758,8 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>673</x>
-     <y>70</y>
+     <x>623</x>
+     <y>75</y>
     </hint>
     <hint type="destinationlabel">
      <x>633</x>
@@ -667,8 +774,8 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>821</x>
-     <y>60</y>
+     <x>737</x>
+     <y>75</y>
     </hint>
     <hint type="destinationlabel">
      <x>639</x>
@@ -683,8 +790,8 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>675</x>
-     <y>118</y>
+     <x>623</x>
+     <y>128</y>
     </hint>
     <hint type="destinationlabel">
      <x>599</x>
@@ -699,12 +806,44 @@
    <slot>updateMask()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>867</x>
-     <y>125</y>
+     <x>737</x>
+     <y>128</y>
     </hint>
     <hint type="destinationlabel">
      <x>617</x>
      <y>144</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkColorScaling</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtImgRangeMin</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>107</x>
+     <y>19</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>156</x>
+     <y>24</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkColorScaling</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtImgRangeMax</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>35</x>
+     <y>21</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>284</x>
+     <y>31</y>
     </hint>
    </hints>
   </connection>
