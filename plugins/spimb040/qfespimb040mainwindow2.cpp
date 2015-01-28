@@ -41,7 +41,7 @@
     QMessageBox::critical(this, title, (message));
 
 
-QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(QFPluginServices* pluginServices, QWidget* parent):
+QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(QFPluginServices* pluginServices, QWidget* parent, bool newOpticsSetup):
     QWidget(parent, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint)
 {
     widImageStack=NULL;
@@ -52,11 +52,12 @@ QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(QFPluginServices* pluginServices,
     widAcquisition=NULL;
     widOverview=NULL;
     widConfig=NULL;
-    optSetup=NULL;
+    optSetup1=NULL;
     optSetup2=NULL;
+    optSetup=NULL;
     m_pluginServices=pluginServices;
     // create widgets and actions
-    createWidgets(pluginServices->getExtensionManager());
+    createWidgets(pluginServices->getExtensionManager(), newOpticsSetup);
     setWindowTitle("B040 SPIM Control");
     setWindowIcon(QIcon(":/spimb040_logo.png"));
 }
@@ -69,7 +70,8 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     setUpdatesEnabled(false);
     jkloadWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
     jkloadSplitter((*settings->getQSettings()), splitter, "plugin_spim_b040/");
-    if (optSetup) optSetup->loadSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
+    if (optSetup1) optSetup1->loadSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
+    if (optSetup2) optSetup2->loadSettings((settings->getQSettings()->fileName()), "plugin_spim_b040/instrument_new/");
 
     if (widExperimentDescription) widExperimentDescription->loadSettings((*settings->getQSettings()), "plugin_spim_b040/expdescription/");
     if (widAcquisitionDescription) widAcquisitionDescription->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acqdescription/");
@@ -81,7 +83,7 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     if (widDeviceParamScan) widDeviceParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/deviceparamscan/");
     if (widConfig) widConfig->loadSettings((*settings->getQSettings()), "plugin_spim_b040/config/");
     setUpdatesEnabled(true);
-    if (optSetup) optSetup->setUpdatesEnabled(true);
+    if (optSetup1) optSetup1->setUpdatesEnabled(true);
     if (optSetup2) optSetup2->setUpdatesEnabled(true);
     if (widExperimentDescription) widExperimentDescription->setUpdatesEnabled(true);
     if (widAcquisitionDescription) widAcquisitionDescription->setUpdatesEnabled(true);
@@ -96,7 +98,8 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
 void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
     jksaveWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
     jksaveSplitter((*settings->getQSettings()), splitter, "plugin_spim_b040/");
-    if (optSetup) optSetup->storeSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
+    if (optSetup1) optSetup1->storeSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
+    if (optSetup2) optSetup2->storeSettings((settings->getQSettings()->fileName()), "plugin_spim_b040/instrument_new/");
 
     if (optSetup2) {
         QString optSetupFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup").toString();
@@ -133,7 +136,7 @@ QFESPIMB040AcquisitionConfigWidget2 *QFESPIMB040MainWindow2::getWidAcquisition()
 }
 
 void QFESPIMB040MainWindow2::closeEvent ( QCloseEvent * event ) {
-    optSetup->close();
+    if (optSetup) optSetup->close();
     QFPluginServices::getInstance()->log_global_text("\n\n=========================================================\n");
     QFPluginServices::getInstance()->log_global_text("== CLOSING SPIM CONTROL PLUGIN!                        ==\n");
     QFPluginServices::getInstance()->log_global_text("=========================================================\n\n\n");
@@ -143,14 +146,14 @@ void QFESPIMB040MainWindow2::closeEvent ( QCloseEvent * event ) {
 }
 
 void QFESPIMB040MainWindow2::showEvent( QShowEvent * event )  {
-    optSetup->show();
+    if (optSetup) optSetup->show();
 }
 
 void QFESPIMB040MainWindow2::displayHelp() {
     m_pluginServices->displayHelpWindow(m_pluginServices->getExtensionManager()->getPluginHelp("ext_spimb040"));
 }
 
-void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
+void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager, bool newOpticsSetup) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create main tab and help button as corner widget of the QTabWidget
     ////////////////////////////////////////////////////////////////////////////////////////////////
@@ -193,10 +196,33 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // optics setup tab
     ////////////////////////////////////////////////////////////////////////////////////////////////
-    optSetup=new QFESPIMB040OpticsSetup(this, this, this, m_pluginServices);
-    optSetup->setAcquisitionTools(this);
-    tabMain->addTab(optSetup, tr("Instrument Setup"));
-    topl->insertWidget(0, optSetup->takeLightpathWidget());
+    if (newOpticsSetup) {
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        // optics setup tab
+        ////////////////////////////////////////////////////////////////////////////////////////////////
+        optSetup2=new QFESPIMB040OpticsSetup2(this, this, this, m_pluginServices);
+        optSetup2->setAcquisitionTools(this);
+        QString optSetupFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup").toString();
+        QString optSetupGlobalConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename_readonly", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
+        QString optSetupUserConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename", m_pluginServices->getConfigFileDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
+        optSetup2->loadOptSetup(optSetupFile);
+        //optSetup2->loadSettings(ProgramOptions::getConfigValue("spimb040/optsetup_config_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString());
+        QStringList optSetupFiles;
+        QDir().mkpath(QFileInfo(optSetupUserConfigFile).absolutePath());
+        QDir().mkpath(QFileInfo(optSetupGlobalConfigFile).absolutePath());
+        optSetupFiles<<optSetupGlobalConfigFile;
+        optSetupFiles<<optSetupUserConfigFile;
+        optSetup2->loadSettings(optSetupFiles, "", true);
+
+        tabMain->addTab(optSetup2, tr("TESTING: Instrument Setup 2"));
+        optSetup=optSetup2;
+    } else {
+        optSetup1=new QFESPIMB040OpticsSetup(this, this, this, m_pluginServices);
+        optSetup1->setAcquisitionTools(this);
+        tabMain->addTab(optSetup1, tr("Instrument Setup"));
+        topl->insertWidget(0, optSetup1->takeLightpathWidget());
+        optSetup=optSetup1;
+    }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////
     // create tab for experiment description input
@@ -273,24 +299,7 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager) {
         tabMain->addTab(widConfig, tr("&Configuration"));
         connect(widConfig, SIGNAL(styleChanged(QString,QString)), this, SLOT(styleChanged(QString,QString)));
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-        // optics setup tab
-        ////////////////////////////////////////////////////////////////////////////////////////////////
-        optSetup2=new QFESPIMB040OpticsSetup2(this, this, this, m_pluginServices);
-        optSetup2->setAcquisitionTools(this);
-        QString optSetupFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup").toString();
-        QString optSetupGlobalConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename_readonly", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
-        QString optSetupUserConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename", m_pluginServices->getConfigFileDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
-        optSetup2->loadOptSetup(optSetupFile);
-        //optSetup2->loadSettings(ProgramOptions::getConfigValue("spimb040/optsetup_config_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString());
-        QStringList optSetupFiles;
-        QDir().mkpath(QFileInfo(optSetupUserConfigFile).absolutePath());
-        QDir().mkpath(QFileInfo(optSetupGlobalConfigFile).absolutePath());
-        optSetupFiles<<optSetupGlobalConfigFile;
-        optSetupFiles<<optSetupUserConfigFile;
-        optSetup2->loadSettings(optSetupFiles, "", true);
 
-        tabMain->addTab(optSetup2, tr("TESTING: Instrument Setup 2"));
 
         optSetup->emitLighpathesChanged();
 }
@@ -844,7 +853,9 @@ void QFESPIMB040MainWindow2::savePreviewMovie(int camera, int frames, const QStr
         JKImage<uint32_t> rawImage;
         int w=camExt->getCameraImageWidth(camID);
         int h=camExt->getCameraImageHeight(camID);
-        QFESPIMB040AcquisitionTools* acqTools=optSetup->getAcquisitionTools();
+        QFESPIMB040AcquisitionTools* acqTools;
+        if (optSetup==optSetup1) acqTools=optSetup1->getAcquisitionTools();
+        if (optSetup==optSetup2) acqTools=optSetup2->getAcquisitionTools();
         rawImage.resize(w, h);
 
 

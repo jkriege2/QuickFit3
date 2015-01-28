@@ -111,13 +111,13 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         virtual int getSpecialShutterID(Shutters shutter) const;
 
         /** \brief returns the ID (int) of the given special shutter */
-        virtual int getSpecialStageID(specialStages shutter) const;
+        virtual int getSpecialStageID(specialStages stage) const;
 
         /** \brief returns the ID (int) of the given special shutter */
-        virtual int getSpecialBrightfieldID(specialBrightfieldSources shutter) const;
+        virtual int getSpecialBrightfieldID(specialBrightfieldSources lightsource) const;
 
         /** \brief returns the ID (int) of the given special shutter */
-        virtual int getSpecialFilterChangerID(specialFilterChangers shutter) const;
+        virtual int getSpecialFilterChangerID(specialFilterChangers filterchanger) const;
 
 
         /*! \brief lock access to stages: stop the thread used for stage access by this widget
@@ -267,6 +267,10 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         void loadLightpathConfig(const QString& filename, bool waiting=false, QString *name=NULL);
         void saveLightpathConfig(const QString& filename, const QString &name, QList<bool> saveProp=QList<bool>(), bool saveMeasured=false);
         void saveLightpathConfig(QMap<QString, QVariant>& data, const QString &name, const QString &prefix=QString(""), QList<bool> saveProp=QList<bool>(), bool saveMeasured=false);
+        /** \brief internal implementation of saveLightpathConfig() ... in addition, this function can output the lists idlist and activeList, which
+         *         contain the IDs/names of the lightpath elements and whether they should be saved (by default) ... this is used in saveCurrentLightpatConfig()
+         */
+        void saveLightpathConfigEx(QMap<QString, QVariant>& data, const QString &name, const QString &prefix=QString(""), QList<bool> saveProp=QList<bool>(), bool saveMeasured=false, QStringList *idlist=NULL, QList<bool> *activeList=NULL);
         void saveCurrentLightpatConfig();
         void deleteCurrentLightpatConfig();
         void emitLighpathesChanged();
@@ -408,11 +412,8 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         QList<MainShutterMember> shutterMain;
         QSet<int> waitForMainShutter;
 
-        //QFShutterConfigWidget* shutterTransmission;
         QString shutterTransmissionID;
-        //QFShutterConfigWidget* shutterLaser2;
         QString shutterLaser2ID;
-        //QFShutterConfigWidget* shutterLaser1;
         QString shutterLaser1ID;
 
         struct LightsourceWidgets {
@@ -429,6 +430,8 @@ class QFESPIMB040OpticsSetup2 : public QFESPIMB040OpticsSetupBase {
         QStringList lightsourceIndex;
         QStringList laserIndex;
         QStringList brightfieldIndex;
+        QString brightfieldTransmissionID;
+        QString brightfieldEpiID;
         QMap<QString, QTabWidget*> ui_tabs;
 
 

@@ -81,6 +81,7 @@ class QFESPIMB040 : public QObject, public QFExtensionBase {
 
     protected:
         QAction* actStartPlugin;
+        QAction* actStartPluginNew;
         QAction* actStartPluginOld;
 
         QPointer<QFESPIMB040MainWindow2> main;
@@ -98,6 +99,7 @@ class QFESPIMB040 : public QObject, public QFExtensionBase {
         virtual void storeSettings(ProgramOptions* settings);
     protected slots:
         void startPlugin();
+        void startPluginNew();
 };
 
 #endif // SPIMB040_H

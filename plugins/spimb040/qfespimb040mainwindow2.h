@@ -84,7 +84,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
         Q_OBJECT
         Q_INTERFACES(QFPluginLogService QFESPIMB040AcquisitionTools)
     public:
-        QFESPIMB040MainWindow2(QFPluginServices* pluginServices, QWidget* parent=NULL);
+        QFESPIMB040MainWindow2(QFPluginServices* pluginServices, QWidget* parent=NULL, bool newOpticsSetup=false);
         virtual ~QFESPIMB040MainWindow2();
 
         /** \brief load settings */
@@ -104,7 +104,8 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
         /** \brief main splitter */
         QVisibleHandleSplitter* splitter;
 
-        QFESPIMB040OpticsSetup* optSetup;
+        QFESPIMB040OpticsSetupBase* optSetup;
+        QFESPIMB040OpticsSetup* optSetup1;
         QFESPIMB040OpticsSetup2* optSetup2;
         QFESPIMB040ExperimentDescription* widExperimentDescription;
         QFPluginServices* m_pluginServices;
@@ -135,7 +136,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
 
 
         /** \brief Create all widgets on this window, called in the constructor before createActions() */
-        void createWidgets(QFExtensionManager* extManager);
+        void createWidgets(QFExtensionManager* extManager, bool newOpticsSetup);
 
     public slots:
         /*! \brief runs an image acquisition

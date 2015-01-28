@@ -418,6 +418,14 @@ QF3DualViewWidget::Orientation QF3DualViewWidget::orientation() const
     return QF3DualViewWidget::Orientation(cmbDirection->currentIndex());
 }
 
+void QF3DualViewWidget::setReadOnly(bool ro)
+{
+    cmbDirection->setEnabled(ro);
+    fltSplitter->setEnabled(ro);
+    fltShort->setEnabled(ro);
+    fltLong->setEnabled(ro);
+}
+
 void QF3DualViewWidget::setFilterINI(QString globalfilters, QString localfilters)
 {
     fltSplitter->setFilterINI(globalfilters, localfilters);

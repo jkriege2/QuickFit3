@@ -178,6 +178,8 @@ class QFWIDLIB_EXPORT QF3DualViewWidget : public QWidget {
         FilterDescription filterShort() const;
         FilterDescription filterLong() const;
         Orientation orientation() const;
+    public slots:
+        void setReadOnly(bool ro);
     protected:
         QComboBox* cmbDirection;
         QF3FilterCombobox* fltSplitter;

@@ -49,6 +49,7 @@ void QFESPIMB040::deinit() {
     if (main) {
         main->close();
         delete main;
+        main=NULL;
     }
 }
 
@@ -58,12 +59,14 @@ void QFESPIMB040::projectChanged(QFProject* oldProject, QFProject* project) {
 void QFESPIMB040::initExtension() {
     services->log_global_text(tr("initializing extension '%1' ...\n").arg(getName()));
     actStartPlugin=new QAction(QIcon(":/spimb040_logo.png"), tr("Start B040 SPIM Control"), this);
+    actStartPluginNew=new QAction(QIcon(":/spimb040_logo.png"), tr("Start B040 SPIM Control, new optics setup"), this);
 
     QDir d(services->getConfigFileDirectory());
     // make sure the directory for the config files of this extension exists
     d.mkpath(services->getConfigFileDirectory()+"/plugins/"+getID());
 
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
+    connect(actStartPluginNew, SIGNAL(triggered()), this, SLOT(startPluginNew()));
 
     QToolBar* exttb=services->getToolbar("extensions");
     //std::cout<<"extensions toolbars: "<<exttb<<std::endl;
@@ -74,6 +77,7 @@ void QFESPIMB040::initExtension() {
     //std::cout<<"extensions menu: "<<extm<<std::endl;
     if (extm) {
         extm->addAction(actStartPlugin);
+        extm->addAction(actStartPluginNew);
     }
 
     QFPluginServices::getInstance()->appendOrAddHTMLReplacement("FILEFORMATS_LIST", QString("<li><b>%2:</b><ul>\n"
@@ -112,6 +116,25 @@ void QFESPIMB040::startPlugin() {
 }
 
 
+
+void QFESPIMB040::startPluginNew() {
+    deinit();
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    //QMessageBox::information(parentWidget, getName(), getDescription());
+    if (!main) {
+        main=new QFESPIMB040MainWindow2(services, NULL, true);
+        QFPluginServices::getInstance()->log_global_text("\n\n=========================================================\n");
+        QFPluginServices::getInstance()->log_global_text("== STARTING SPIM CONTROL PLUGIN!                       ==\n");
+        QFPluginServices::getInstance()->log_global_text("=========================================================\n\n\n");
+
+        QFPluginServices::getInstance()->setProjectMode(false, tr("!!!SPIM CONTROL MODE!!!"));
+    }
+    if (main) {
+        if (settings) main->loadSettings(settings);
+        main->show();
+    }
+    QApplication::restoreOverrideCursor();
+}
 
 
 

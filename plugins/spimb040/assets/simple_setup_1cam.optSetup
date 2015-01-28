@@ -1,0 +1,59 @@
+
+[group_detection]
+type=group
+x=2
+y=0
+title=Detection
+
+
+
+[detection_objective]
+type=objective
+title="detection<br>objective:"
+ingroup=group_detection
+special_role=detection_objective
+
+[detection_filter1]
+type=filter
+title="filter 1:"
+ingroup=group_detection
+
+[detection_filter2]
+type=filter
+title="filter 2:"
+ingroup=group_detection
+
+
+
+
+[stretch_detection]
+type=vertical_stretch
+ingroup=group_detection
+
+[camera1]
+type=camera
+title="Camera 1:"
+checkable=true
+ingroup=group_detection
+x=0
+colspan=2
+
+[camera1_filter]
+type=filter
+ingroup=group_detection
+used_by=camera1
+title="detection filter:"
+
+[camera1_dualview]
+type=dualview
+ingroup=group_detection
+used_by=camera1
+title="DualView:"
+
+[camera1_tubelens]
+type=objective
+subtype=tubelens
+ingroup=group_detection
+used_by=camera1
+title="tube lens:"
+

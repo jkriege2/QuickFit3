@@ -58,9 +58,9 @@ void QFESPIMB040ConfigTabWidget::loadSettings(QSettings& settings, QString prefi
     ui->cmbStyle->setCurrentIndex(ui->cmbStyle->findText(settings.value(prefix+"style", ProgramOptions::getInstance()->getStyle()).toString(), Qt::MatchExactly ));
     ui->cmbStylesheet->setCurrentIndex(ui->cmbStylesheet->findText(settings.value(prefix+"stylesheet", ProgramOptions::getInstance()->getStylesheet()).toString(), Qt::MatchExactly ));
     emit styleChanged(getStyle(), getStylesheet());
-    ui->edtOptSetupGlobalConfig->setText(settings.value(prefix+"optsetup_config_filename_readonly", QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/spim_at_b040.optSetup.ini").toString());
-    ui->edtOptSetupUserConfig->setText(settings.value(prefix+"optsetup_config_filename", QFPluginServices::getInstance()->getConfigFileDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString());
-    ui->edtOptSetup->setText(settings.value(prefix+"optsetup_filename",QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/spim_at_b040.optSetup").toString());
+    ui->edtOptSetupGlobalConfig->setText(QFileInfo(settings.value(prefix+"optsetup_config_filename_readonly", QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/spim_at_b040.optSetup.ini").toString()).absoluteFilePath());
+    ui->edtOptSetupUserConfig->setText(QFileInfo(settings.value(prefix+"optsetup_config_filename", QFPluginServices::getInstance()->getConfigFileDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString()).absoluteFilePath());
+    ui->edtOptSetup->setText(QFileInfo(settings.value(prefix+"optsetup_filename",QFPluginServices::getInstance()->getGlobalConfigFileDirectory()+"/spim_at_b040.optSetup").toString()).absoluteFilePath());
 }
 
 QString QFESPIMB040ConfigTabWidget::getStylesheet()
@@ -155,7 +155,7 @@ void QFESPIMB040ConfigTabWidget::on_btnAutosetConfigs_clicked()
     QString optset=ui->edtOptSetup->text();
     QFileInfo fi(optset);
     ui->edtOptSetupGlobalConfig->setText(optset+".ini");
-    ui->edtOptSetupUserConfig->setText(QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/spimb040/"+fi.fileName()+".ini");
+    ui->edtOptSetupUserConfig->setText(QFileInfo(QFPluginServices::getInstance()->getConfigFileDirectory()+"/plugins/spimb040/"+fi.fileName()+".ini").absoluteFilePath());
 
     QDir().mkpath(QFileInfo(ui->edtOptSetupGlobalConfig->text()).absolutePath());
     QDir().mkpath(QFileInfo(ui->edtOptSetupUserConfig->text()).absolutePath());

@@ -424,8 +424,8 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            if (!used_by.isEmpty()) {
                                if (ui_cameras.contains(used_by)) {
                                    ui_cameras[used_by].filters.append(id);
-                                   connect(ui_cameras[used_by].config, SIGNAL(clicked(bool)), w, SLOT(setEnabled(bool)));
-                                   if (l) connect(ui_cameras[used_by].config, SIGNAL(clicked(bool)), l, SLOT(setEnabled(bool)));
+                                   connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), w, SLOT(setEnabled(bool)));
+                                   if (l) connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), l, SLOT(setEnabled(bool)));
                                    w->setEnabled(ui_cameras[used_by].config->isChecked());
                                }
                                if (ui_lightsource.contains(used_by)) ui_lightsource[used_by].filters.append(id);
@@ -437,12 +437,14 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            w->init(ui_cameras.size(), m_pluginServices, m_pluginServices->getGlobalConfigFileDirectory(), this);
                            w->setLog(m_log);
                            ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
-                           connect(w, SIGNAL(clicked(bool)), this, SLOT(changeDVenabledState()));
+                           connect(w, SIGNAL(toggled(bool)), this, SLOT(changeDVenabledState()));
 
                            connect(addShortCut(QString("cam%1_acquire_single").arg(ui_cameras.size()), QString("camera %1: acquire single frame").arg(ui_cameras.size())), SIGNAL(activated()), w, SLOT(previewSingle()));
                            connect(addShortCut(QString("cam%1_acquire_continuous_toggle").arg(ui_cameras.size()), QString("camera %1: toggle preview acquisition").arg(ui_cameras.size())), SIGNAL(activated()), w, SLOT(startStopPreview()));
                            connect(addShortCut(QString("cam%1_acquire_continuous_stop").arg(ui_cameras.size()), QString("camera %1: stop preview").arg(ui_cameras.size())), SIGNAL(activated()), w, SLOT(stopPreview()));
 
+                           connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
+                           w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
 
                            cameraIndex<<id;
                            ui_cameras[id].config=w;
@@ -456,6 +458,8 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            l->setBuddy(w);
                            ingroupLayout->addWidget(l, y,x, rowSpan, 1, Qt::AlignTop|Qt::AlignLeft);
                            ingroupLayout->addWidget(w, y,x+1, rowSpan, qMax(1,colSpan-1));
+                           connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
+                           w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
 
                            measurementdeviceIndex<<id;
                            ui_measurementdevices[id]=w;
@@ -469,6 +473,8 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            l->setBuddy(w);
                            ingroupLayout->addWidget(l, y,x, rowSpan, 1, Qt::AlignTop|Qt::AlignLeft);
                            ingroupLayout->addWidget(w, y,x+1, rowSpan, qMax(1,colSpan-1));
+                           connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
+                           w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
 
                            connect(addShortCut(QString("stage%1_x2").arg(ui_stages.size()), QString("stage %1: joystick speed x2").arg(ui_stages.size())), SIGNAL(activated()), w, SLOT(speedX2()));
                            connect(addShortCut(QString("stage%1_x10").arg(ui_stages.size()), QString("stage %1: joystick speed x10").arg(ui_stages.size())), SIGNAL(activated()), w, SLOT(speedX10()));
@@ -510,8 +516,8 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            if (!used_by.isEmpty()) {
                                if (ui_cameras.contains(used_by)) {
                                    ui_cameras[used_by].filters.append(id);
-                                   connect(ui_cameras[used_by].config, SIGNAL(clicked(bool)), w, SLOT(setEnabled(bool)));
-                                   if (l) connect(ui_cameras[used_by].config, SIGNAL(clicked(bool)), l, SLOT(setEnabled(bool)));
+                                   connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), w, SLOT(setEnabled(bool)));
+                                   if (l) connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), l, SLOT(setEnabled(bool)));
                                    w->setEnabled(ui_cameras[used_by].config->isChecked());
                                }
                                if (ui_lightsource.contains(used_by)) ui_lightsource[used_by].filters.append(id);
@@ -520,6 +526,8 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            if (special_role=="detection_filterchanger" || special_role=="detection" || special_role=="detection_filterwheel" || special_role=="detection_filter") {
                                filtercDetection=id;
                            }
+                           connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
+                           w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
 
 
                            connect(addShortCut(QString("filterchanger_%1_filter1").arg(ui_filterchangers.size()), QString("filter changer %1: set filter #1").arg(ui_filterchangers.size())), SIGNAL(activated()), w, SLOT(setFilter0()));
@@ -542,6 +550,8 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            w->setLog(m_log);
                            if (!title.isEmpty()) w->setTitle(title);
                            ingroupLayout->addWidget(w, y,x, rowSpan, colSpan);
+                           connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
+                           w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
 
                            connect(addShortCut(QString("xyzstage%1_x2").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick speed x2").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(speedX2()));
                            connect(addShortCut(QString("xyzstage%1_x10").arg(ui_stageconfigs.size()), QString("XYZ translation stage %1: joystick speed x10").arg(ui_stageconfigs.size())), SIGNAL(activated()), w, SLOT(speedX10()));
@@ -623,12 +633,15 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            if (!used_by.isEmpty()) {
                                if (ui_cameras.contains(used_by)) {
                                    ui_cameras[used_by].shutter=id;
-                                   connect(ui_cameras[used_by].config, SIGNAL(clicked(bool)), w, SLOT(setEnabled(bool)));
-                                   if (l) connect(ui_cameras[used_by].config, SIGNAL(clicked(bool)), l, SLOT(setEnabled(bool)));
+                                   connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), w, SLOT(setEnabled(bool)));
+                                   if (l) connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), l, SLOT(setEnabled(bool)));
                                    w->setEnabled(ui_cameras[used_by].config->isChecked());
                                }
                                if (ui_lightsource.contains(used_by)) ui_lightsource[used_by].shutter=id;
                            }
+                           connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
+                           w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
+
                            connect(addShortCut(id+"_toggle", id+" toggle"), SIGNAL(activated()), w, SLOT(toggleShutter()));
                            connect(addShortCut(id+"_on",     id+" on"), SIGNAL(activated()), w, SLOT(shutterOn()));
                            connect(addShortCut(id+"_off",    id+" off"), SIGNAL(activated()), w, SLOT(shutterOff()));
@@ -647,6 +660,17 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            lightsourceIndex<<id;
                            if (subtype=="laser") laserIndex<<id;
                            if (subtype=="brightfield") brightfieldIndex<<id;
+                           if (subtype=="brightfield_transmission" || subtype=="brightfield_trans") {
+                               brightfieldIndex<<id;
+                               brightfieldTransmissionID=id;
+                           }
+                           if (subtype=="brightfield_epi") {
+                               brightfieldIndex<<id;
+                               brightfieldEpiID=id;
+                           }
+                           connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
+                           w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
+
                        } else if (type=="dualview") {
                            QF3DualViewWidget* w=new QF3DualViewWidget(this);
                            widNew=w;
@@ -672,12 +696,15 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                                if (ui_cameras.contains(used_by)) {
                                    ui_cameras[used_by].dualview.append(id);
                                    //connect(ui_cameras[used_by].config, SIGNAL(clicked(bool)), w, SLOT(setEnabled(bool)));
-                                   if (l) connect(ui_cameras[used_by].config, SIGNAL(clicked(bool)), l, SLOT(setEnabled(bool)));
-                                   if (cb) connect(ui_cameras[used_by].config, SIGNAL(clicked(bool)), cb, SLOT(setEnabled(bool)));
+                                   if (l) connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), l, SLOT(setEnabled(bool)));
+                                   if (cb) connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), cb, SLOT(setEnabled(bool)));
                                    w->setEnabled(ui_cameras[used_by].config->isChecked());
                                }
                            }
                            ui_dualviews[id]=qMakePair(cb,w);
+                           connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
+                           w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
+
                        } else if (type=="objective") {
                            QF3ObjectiveCombobox* w=new QF3ObjectiveCombobox(this);
                            widNew=w;
@@ -699,12 +726,16 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                                if (ui_cameras.contains(used_by))  {
                                    if (subtype=="tubelens") {
                                        ui_cameras[used_by].tubelens=id;
-                                       connect(ui_cameras[used_by].config, SIGNAL(clicked(bool)), w, SLOT(setEnabled(bool)));
-                                       if (l) connect(ui_cameras[used_by].config, SIGNAL(clicked(bool)), l, SLOT(setEnabled(bool)));
+                                       connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), w, SLOT(setEnabled(bool)));
+                                       if (l) connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), l, SLOT(setEnabled(bool)));
                                        w->setEnabled(ui_cameras[used_by].config->isChecked());
+                                       if (l) l->setEnabled(ui_cameras[used_by].config->isChecked());
                                    }
                                }
                            }
+                           connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
+                           w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
+
                        } else if (type=="horizontal_stretch") {
                            QSpacerItem* w=new QSpacerItem(width,height,QSizePolicy::Expanding,QSizePolicy::Minimum);
                            //w->setObjectName(id);
@@ -938,31 +969,83 @@ int QFESPIMB040OpticsSetup2::getSpecialShutterID(QFESPIMB040OpticsSetupBase::Shu
     return -1;
 }
 
+
+
 int QFESPIMB040OpticsSetup2::getSpecialStageID(QFESPIMB040OpticsSetupBase::specialStages stage) const
 {
-    /*switch(stage) {
+    switch(stage) {
         case StageX: {
-                if (specialStageX.stage) {
+                if (specialStageX.stage!=NULL) {
+                    QString id=ui_stages.key(specialStageX.stage);
+                    //QString id=mapFindKey(specialStageX.stageconfig, ui_stages);
                     for (int i=0; i<stageIndex.size(); i++) {
-                        if ()
+                        if (stageIndex[i].first==id) return i;
+                    }
+                } else if (specialStageX.stageconfig!=NULL) {
+                    QString id=ui_stageconfigs.key(specialStageX.stageconfig);
+                    for (int i=0; i<stageIndex.size(); i++) {
+                        if (stageIndex[i].first==id) return i;
                     }
                 }
-
             } break;
-        case StageY: if (!shutterLaser1ID.isEmpty()) { return shutterIndex.indexOf(shutterLaser1ID); } break;
-        case StageZ: if (!shutterLaser2ID.isEmpty()) { return shutterIndex.indexOf(shutterLaser2ID); } break;
-        case StageR: if (!shutterTransmissionID.isEmpty()) { return shutterIndex.indexOf(shutterTransmissionID); } break;
-    }*/
+        case StageY:{
+                if (specialStageY.stage!=NULL) {
+                    QString id=ui_stages.key(specialStageY.stage);
+                    for (int i=0; i<stageIndex.size(); i++) {
+                        if (stageIndex[i].first==id) return i;
+                    }
+                } else if (specialStageY.stageconfig!=NULL) {
+                    QString id=ui_stageconfigs.key(specialStageY.stageconfig);
+                    for (int i=0; i<stageIndex.size(); i++) {
+                        if (stageIndex[i].first==id) return i;
+                    }
+                }
+            } break;
+        case StageZ:{
+                if (specialStageZ.stage!=NULL) {
+                    QString id=ui_stages.key(specialStageZ.stage);
+                    for (int i=0; i<stageIndex.size(); i++) {
+                        if (stageIndex[i].first==id) return i;
+                    }
+                } else if (specialStageZ.stageconfig!=NULL) {
+                    QString id=ui_stageconfigs.key(specialStageZ.stageconfig);
+                    for (int i=0; i<stageIndex.size(); i++) {
+                        if (stageIndex[i].first==id) return i;
+                    }
+                }
+            } break;
+        case StageR:{
+                if (specialStageR.stage!=NULL) {
+                    QString id=ui_stages.key(specialStageR.stage);
+                    for (int i=0; i<stageIndex.size(); i++) {
+                        if (stageIndex[i].first==id) return i;
+                    }
+                } else if (specialStageR.stageconfig!=NULL) {
+                    QString id=ui_stageconfigs.key(specialStageR.stageconfig);
+                    for (int i=0; i<stageIndex.size(); i++) {
+                        if (stageIndex[i].first==id) return i;
+                    }
+                }
+            } break;
+    }
     return -1;
 }
 
-int QFESPIMB040OpticsSetup2::getSpecialBrightfieldID(QFESPIMB040OpticsSetupBase::specialBrightfieldSources shutter) const
+int QFESPIMB040OpticsSetup2::getSpecialBrightfieldID(QFESPIMB040OpticsSetupBase::specialBrightfieldSources lightsource) const
 {
+    switch(lightsource) {
+        case BrightfieldTransmission: if (!brightfieldTransmissionID.isEmpty()) { return lightsourceIndex.indexOf(brightfieldTransmissionID); } break;
+        case BrightfieldEpi: if (!brightfieldEpiID.isEmpty()) { return lightsourceIndex.indexOf(brightfieldEpiID); } break;
+    }
+
     return -1;
 }
 
-int QFESPIMB040OpticsSetup2::getSpecialFilterChangerID(QFESPIMB040OpticsSetupBase::specialFilterChangers shutter) const
+int QFESPIMB040OpticsSetup2::getSpecialFilterChangerID(QFESPIMB040OpticsSetupBase::specialFilterChangers filterchanger) const
 {
+    switch(filterchanger) {
+        case FilterChangerDetection: if (!filtercDetection.isEmpty()) { return filterChangerIndex.indexOf(filtercDetection); } break;
+    }
     return -1;
 }
 
@@ -1475,18 +1558,19 @@ bool QFESPIMB040OpticsSetup2::isStageConnected(QFExtensionLinearStage* stage, in
         QMapIterator<QString, QFESPIMB040SampleStageConfig*> it(ui_stageconfigs);
         while (it.hasNext())  {
             it.next();
-            if (it.value() && stage==it.value()->getXStage()) return it.value()->isXStageConnected();
-            if (it.value() && stage==it.value()->getYStage()) return it.value()->isYStageConnected();
-            if (it.value() && stage==it.value()->getZStage()) return it.value()->isZStageConnected();
+            if (it.value() && stage==it.value()->getXStage()) { found=true; return it.value()->isXStageConnected(); }
+            if (it.value() && stage==it.value()->getYStage()) { found=true; return it.value()->isYStageConnected(); }
+            if (it.value() && stage==it.value()->getZStage()) { found=true; return it.value()->isZStageConnected(); }
         }
     }
     {
         QMapIterator<QString, QFStageConfigWidget*> it2(ui_stages);
         while (it2.hasNext())  {
             it2.next();
-            if (it2.value() && stage==it2.value()->getXStage()) return it2.value()->isXStageConnected();
+            if (it2.value() && stage==it2.value()->getXStage()) { found=true; return it2.value()->isXStageConnected(); }
         }
     }
+    found=false;
     return false;
 
 }
@@ -1497,80 +1581,106 @@ int QFESPIMB040OpticsSetup2::getStageAxis(int stage)
         if (ui_stages.contains(stageIndex[stage].first) && ui_stages[stageIndex[stage].first]) return ui_stages[stageIndex[stage].first]->getXStageAxis();
         if (ui_stageconfigs.contains(stageIndex[stage].first) && ui_stageconfigs[stageIndex[stage].first]) {
             if (stageIndex[stage].second==0) return ui_stageconfigs[stageIndex[stage].first]->getXStageAxis();
-            if (stageIndex[stage].second==1) return ui_stageconfigs[stageIndex[stage].first]->getXStageAxis();
-            if (stageIndex[stage].second==2) return ui_stageconfigs[stageIndex[stage].first]->getXStageAxis();
+            if (stageIndex[stage].second==1) return ui_stageconfigs[stageIndex[stage].first]->getYStageAxis();
+            if (stageIndex[stage].second==2) return ui_stageconfigs[stageIndex[stage].first]->getZStageAxis();
         }
     }
 
-
-    // ========================================================================================================================================================================================
-    // TODO: IMPLEMENT FROM HERE!!!
-    // ========================================================================================================================================================================================
-    /*if (stage==QFESPIMB040OpticsSetupBase::StageX) return ui->stageSetup->getXStageAxis();
-    if (stage==QFESPIMB040OpticsSetupBase::StageY) return ui->stageSetup->getYStageAxis();
-    if (stage==QFESPIMB040OpticsSetupBase::StageZ) return ui->stageSetup->getZStageAxis();*/
     return -1;
 
 }
 
-QString QFESPIMB040OpticsSetup2::getStageName(int stage) const
-{
-    /*if (stage==QFESPIMB040OpticsSetupBase::StageX) return "x";
-    if (stage==QFESPIMB040OpticsSetupBase::StageY) return "y";
-    if (stage==QFESPIMB040OpticsSetupBase::StageZ) return "z";*/
-    return "";
+QString QFESPIMB040OpticsSetup2::getStageName(int stage) const {
+    if (stage>=0 && stage<stageIndex.size()) {
+        if (stage==getSpecialStageID(StageX)) return tr("x");
+        if (stage==getSpecialStageID(StageY)) return tr("y");
+        if (stage==getSpecialStageID(StageZ)) return tr("z");
+        if (stage==getSpecialStageID(StageR)) return tr("r");
+        return stageIndex[stage].first;
+    }
+
+    return QString("stage%1").arg(stage);
 
 }
 
 int QFESPIMB040OpticsSetup2::getStageCount() const
 {
-    return 3;
+    return stageIndex.size();
 }
 
 
 bool QFESPIMB040OpticsSetup2::isStageConnected(int stage) const
 {
-    /*if (stage==QFESPIMB040OpticsSetupBase::StageX) return ui->stageSetup->isXStageConnected();
-    if (stage==QFESPIMB040OpticsSetupBase::StageY) return ui->stageSetup->isYStageConnected();
-    if (stage==QFESPIMB040OpticsSetupBase::StageZ) return ui->stageSetup->isZStageConnected();*/
+    if (stage>=0 && stage<stageIndex.size()) {
+        QString id=stageIndex[stage].first;
+        int num=stageIndex[stage].second;
+        if (ui_stageconfigs.contains(id)) {
+            if (num==0) return ui_stageconfigs[id]->isXStageConnected();
+            if (num==1) return ui_stageconfigs[id]->isYStageConnected();
+            if (num==2) return ui_stageconfigs[id]->isZStageConnected();
+        } else if (ui_stages.contains(id)) {
+            return ui_stages[id]->isXStageConnected();
+        }
+    }
     return false;
 }
 
 
 QFExtension *QFESPIMB040OpticsSetup2::getStageExtension(int stage)
 {
-    /*if (stage==QFESPIMB040OpticsSetupBase::StageX) return ui->stageSetup->getXStageExtension();
-    if (stage==QFESPIMB040OpticsSetupBase::StageY) return ui->stageSetup->getYStageExtension();
-    if (stage==QFESPIMB040OpticsSetupBase::StageZ) return ui->stageSetup->getZStageExtension();*/
+    if (stage>=0 && stage<stageIndex.size()) {
+        QString id=stageIndex[stage].first;
+        int num=stageIndex[stage].second;
+        if (ui_stageconfigs.contains(id)) {
+            if (num==0) return ui_stageconfigs[id]->getXStageExtension();
+            if (num==1) return ui_stageconfigs[id]->getYStageExtension();
+            if (num==2) return ui_stageconfigs[id]->getZStageExtension();
+        } else if (ui_stages.contains(id)) {
+            return ui_stages[id]->getXStageExtension();
+        }
+    }
     return NULL;
 }
 
 QFExtensionLinearStage *QFESPIMB040OpticsSetup2::getStage(int stage)
 {
-    /*if (stage==QFESPIMB040OpticsSetupBase::StageX) return ui->stageSetup->getXStage();
-    if (stage==QFESPIMB040OpticsSetupBase::StageY) return ui->stageSetup->getYStage();
-    if (stage==QFESPIMB040OpticsSetupBase::StageZ) return ui->stageSetup->getZStage();*/
+    if (stage>=0 && stage<stageIndex.size()) {
+        QString id=stageIndex[stage].first;
+        int num=stageIndex[stage].second;
+        if (ui_stageconfigs.contains(id)) {
+            if (num==0) return ui_stageconfigs[id]->getXStage();
+            if (num==1) return ui_stageconfigs[id]->getYStage();
+            if (num==2) return ui_stageconfigs[id]->getZStage();
+        } else if (ui_stages.contains(id)) {
+            return ui_stages[id]->getXStage();
+        }
+    }
     return NULL;
 }
 
 
 QFCameraComboBox* QFESPIMB040OpticsSetup2::cameraComboBox(int camera) const {
-    /*if (camera==0) return ui->camConfig1->cameraComboBox();
-    if (camera==1) return ui->camConfig2->cameraComboBox();*/
+    if (camera>=0 && camera<cameraIndex.size()) {
+        QString id=cameraIndex[camera];
+        if (ui_cameras.contains(id) && ui_cameras[id].config)
+            return ui_cameras[id].config->cameraComboBox();
+    }
 
     return NULL;
 }
 
 QFESPIMB040SimpleCameraConfig *QFESPIMB040OpticsSetup2::cameraConfig(int camera) const
 {
+    if (camera>=0 && camera<cameraIndex.size()) {
+        QString id=cameraIndex[camera];
+        if (ui_cameras.contains(id)) return ui_cameras[id].config;
+    }
+
     return NULL;
 }
 
-QFCameraConfigComboBoxStartResume* QFESPIMB040OpticsSetup2::getStopRelease(int camera) const {
-    /*if (camera==0) return ui->camConfig1;
-    if (camera==1) return ui->camConfig2;*/
-
-    return NULL;
+QFCameraConfigComboBoxStartResume* QFESPIMB040OpticsSetup2::getStopRelease(int camera) const {    
+    return cameraConfig(camera);
 }
 
 bool QFESPIMB040OpticsSetup2::setMainIlluminationShutter(bool opened, bool blocking) {
@@ -1826,62 +1936,111 @@ void QFESPIMB040OpticsSetup2::ensureLightpath() {
 
 
 
+#define saveLightpathConfig_SAVESUBFILTER(BASE, FID, fi) \
+    if (ui_filters.contains(FID) && ui_filters[FID]) { \
+        FilterDescription fd=ui_filters[FID]->filter(); \
+        if (fd.isValid) { \
+            data[prefix+QString("%1/filter%2/id").arg(BASE).arg(fi)]=FID; \
+            data[prefix+QString("%1/filter%2/name").arg(BASE).arg(fi)]=fd.name; \
+            data[prefix+QString("%1/filter%2/manufacturer").arg(BASE).arg(fi)]=fd.manufacturer; \
+            data[prefix+QString("%1/filter%2/type").arg(BASE).arg(fi)]=fd.type; \
+        } \
+    } else if (ui_filterchangers.containt(FID) && ui_filterchangers[FID]) { \
+        FilterDescription fd=ui_filterchangers[FID]->getCurrentFilterDescription(); \
+        if (fd.isValid) { \
+            data[prefix+QString("%1/filter%2/id").arg(BASE).arg(fi)]=FID; \
+            data[prefix+QString("%1/filter%2/name").arg(BASE).arg(fi)]=fd.name; \
+            data[prefix+QString("%1/filter%2/manufacturer").arg(BASE).arg(fi)]=fd.manufacturer; \
+            data[prefix+QString("%1/filter%2/type").arg(BASE).arg(fi)]=fd.type; \
+        } \
+    }
+
+
+#define saveLightpathConfig_SAVESUBSHUTER(BASE, SID) \
+    if (ui_shutter.contains(SID) && ui_shutter[SID]) { \
+        data[prefix+QString("%1/shutter/name").arg(BASE)]=SID; \
+        data[prefix+QString("%1/shutter/state").arg(BASE)]=ui_shutter[SID]->getShutterState(); \
+    }
+
+#define saveLightpathConfig_SAVESHUTER(SID) \
+    if (ui_shutter.contains(SID) && ui_shutter[SID]) { \
+        data[prefix+QString("%1/state").arg(SID)]=ui_shutter[SID]->getShutterState(); \
+    }
+
+
+#define saveLightpathConfig_SAVEFILTER(FID) \
+    if (ui_filters.contains(FID) && ui_filters[FID]) { \
+        FilterDescription fd=ui_filters[FID]->filter(); \
+        if (fd.isValid) { \
+            data[prefix+QString("%1/name").arg(FID)]=fd.name; \
+            data[prefix+QString("%1/manufacturer").arg(FID)]=fd.manufacturer; \
+            data[prefix+QString("%1/type").arg(FID)]=fd.type; \
+        } \
+    } else if (ui_filterchangers.containt(FID) && ui_filterchangers[FID]) { \
+        FilterDescription fd=ui_filterchangers[FID]->getCurrentFilterDescription(); \
+        if (fd.isValid) { \
+            data[prefix+QString("%1/name").arg(FID)]=fd.name; \
+            data[prefix+QString("%1/manufacturer").arg(FID)]=fd.manufacturer; \
+            data[prefix+QString("%1/type").arg(FID)]=fd.type; \
+        } \
+    }
 
 
 
+void QFESPIMB040OpticsSetup2::saveLightpathConfigEx(QMap<QString, QVariant> &data, const QString &name, const QString& prefix,  QList<bool> saveProp, bool saveMeasured, QStringList* idlist, QList<bool>* activeList) {
 
-
-
-void QFESPIMB040OpticsSetup2::saveLightpathConfig(QMap<QString, QVariant> &data, const QString &name, const QString& prefix,  QList<bool> saveProp, bool saveMeasured) {
     data[prefix+"name"]=name;
 
-    //qDebug()<<saveProp;
+    int saveIdx=0;
 
-    // SAVE RELEVANT WIDGETS HERE
-    /*if (saveProp.value(0, true) && ui->lsTransmission->getLightSource() && ui->lsTransmission->isLightSourceConnected()) {
-        for (int i=0; i<ui->lsTransmission->getLineCount(); i++) {
-            data[prefix+QString("transmission/line%1/enabled").arg(i+1)]=ui->lsTransmission->isLineEnabled(i);
-            data[prefix+QString("transmission/line%1/power").arg(i+1)]=ui->lsTransmission->getSetPower(i);
-            if (saveMeasured) {
-                data[prefix+QString("transmission/line%1/measured_power").arg(i+1)]=ui->lsTransmission->getMeasuredPower(i);
+    {
+        QMapIterator<QString, LightsourceWidgets> it(ui_lightsource);
+        while (it.hasNext()) {
+            it.next();
+            if (it.value().config && saveProp.value(saveIdx, true)) {
+                if (idlist) *idlist<<it.key();
+                if (activeList) *activeList<<it.value().config->isLightSourceConnected();
+                for (int i=0; i<it.value().config->getLineCount(); i++) {
+                    data[prefix+QString("%2/line%1/enabled").arg(i+1).arg(it.key())]=it.value().config->isLineEnabled(i);
+                    data[prefix+QString("%2/line%1/power").arg(i+1).arg(it.key())]=it.value().config->getSetPower(i);
+                    if (saveMeasured) {
+                        data[prefix+QString("%2/line%1/measured_power").arg(i+1).arg(it.key())]=it.value().config->getMeasuredPower(i);
+                    }
+                }
             }
+            saveIdx++;
         }
     }
-    if (saveProp.value(1, true) && ui->shutterTransmission->getShutter() && ui->shutterTransmission->getShutter()->isShutterConnected(ui->shutterTransmission->getShutterID())) {
-        data[prefix+"transmission/shutter/state"]=ui->shutterTransmission->getShutterState();
-    }
-    if (saveProp.value(2, true) && ui->lsLaser1->getLightSource() && ui->lsLaser1->isLightSourceConnected()) {
-        for (int i=0; i<ui->lsLaser1->getLineCount(); i++) {
-            data[prefix+QString("laser1/line%1/enabled").arg(i+1)]=ui->lsLaser1->isLineEnabled(i);
-            data[prefix+QString("laser1/line%1/power").arg(i+1)]=ui->lsLaser1->getSetPower(i);
-            if (saveMeasured) {
-                data[prefix+QString("laser1/line%1/measured_power").arg(i+1)]=ui->lsLaser1->getMeasuredPower(i);
+    {
+        QMapIterator<QString, QFShutterConfigWidget*> it(ui_shutter);
+        while (it.hasNext()) {
+            it.next();
+            if (saveProp.value(saveIdx, true)) {
+                if (idlist) *idlist<<it.key();
+                if (activeList) *activeList<<it.value()->isShutterConnected();
+                if (ui_shutter.contains(it.key()) && ui_shutter[it.key()]) { \
+                    data[prefix+QString("%1/state").arg(it.key())]=ui_shutter[it.key()]->getShutterState(); \
+                }
             }
+            saveIdx++;
         }
     }
-    if (saveProp.value(3, true) && ui->shutterLaser1->getShutter() && ui->shutterLaser1->getShutter()->isShutterConnected(ui->shutterLaser1->getShutterID())) {
-        data[prefix+"laser1/shutter/state"]=ui->shutterLaser1->getShutterState();
-    }
-    if (saveProp.value(4, true) && ui->lsLaser2->getLightSource() && ui->lsLaser2->isLightSourceConnected()) {
-        for (int i=0; i<ui->lsLaser2->getLineCount(); i++) {
-            data[prefix+QString("laser2/line%1/enabled").arg(i+1)]=ui->lsLaser2->isLineEnabled(i);
-            data[prefix+QString("laser2/line%1/power").arg(i+1)]=ui->lsLaser2->getSetPower(i);
-            if (saveMeasured) {
-                data[prefix+QString("laser2/line%1/measured_power").arg(i+1)]=ui->lsLaser2->getMeasuredPower(i);
+
+    {
+        QMapIterator<QString, QFFilterChangerConfigWidget*> it(ui_filterchangers);
+        while (it.hasNext()) {
+            it.next();
+            if (saveProp.value(saveIdx, true)) {
+                if (idlist) *idlist<<it.key();
+                if (activeList) *activeList<<it.value()->isFilterChangerConnected();
+                if (ui_filterchangers.contains(it.key()) && ui_filterchangers[it.key()]) { \
+                    data[prefix+QString("%1/state").arg(it.key())]=ui_filterchangers[it.key()]->getFilterChangerState(); \
+                }
             }
+            saveIdx++;
         }
     }
-    if (saveProp.value(5, true) && ui->shutterLaser2->getShutter() && ui->shutterLaser2->getShutter()->isShutterConnected(ui->shutterLaser2->getShutterID())) {
-        data[prefix+"laser2/shutter/state"]=ui->shutterLaser2->getShutterState();
-    }
-    if (saveProp.value(6, true) && ui->chkDetectionFilterWheel->isChecked() && ui->filtcDetection->getFilterChanger() && ui->filtcDetection->isFilterChangerConnected()) {
-        data[prefix+"detection/filterchanger/filter"]=ui->filtcDetection->getFilterChangerState();
-        if (saveMeasured) {
-            data[prefix+"detection/filterchanger/filter_name"]=ui->filtcDetection->getCurrentFilter();
-            data[prefix+"detection/filterchanger/filter_manufacturer"]=ui->filtcDetection->getCurrentFilterDescription().manufacturer;
-            data[prefix+"detection/filterchanger/filter_type"]=ui->filtcDetection->getCurrentFilterDescription().type;
-        }
-    }*/
+
 
     if (saveMeasured) {
         QFESPIMB040OpticsSetup2::measuredValues m=getMeasuredValues();
@@ -1896,36 +2055,30 @@ void QFESPIMB040OpticsSetup2::saveLightpathConfig(QMap<QString, QVariant> &data,
     }
 }
 
+void QFESPIMB040OpticsSetup2::saveLightpathConfig(QMap<QString, QVariant> &data, const QString &name, const QString& prefix,  QList<bool> saveProp, bool saveMeasured) {
+    saveLightpathConfigEx(data, name, prefix, saveProp, false);
+}
+
 void QFESPIMB040OpticsSetup2::saveCurrentLightpatConfig() {
     bool dlgOK=true;
     QString name=ui->cmbLightpathConfig->currentText();
 
     QStringList lightpathlist;
-    lightpathlist<<tr("transmission illumintaion: source");
-    lightpathlist<<tr("transmission illumintaion: shutter");
-    lightpathlist<<tr("laser 1: source");
-    lightpathlist<<tr("laser 1: shutter");
-    lightpathlist<<tr("laser 2: source");
-    lightpathlist<<tr("laser 2: shutter");
-    lightpathlist<<tr("detection: filter changer");
+    QList<bool> lightpathDefaultActive;
+    {
+        QMap<QString, QVariant> dat;
+        saveLightpathConfigEx(dat, "name", "prefix", QList<bool>(), false, &lightpathlist, &lightpathDefaultActive);
+    }
 
     lightpathConfigModel->setReadonly(false);
     lightpathConfigModel->resize(lightpathlist.size(), 2);
     lightpathConfigModel->setColumnTitle(1, tr("item"));
     for (int i=0; i<lightpathlist.size(); i++) {
-        lightpathConfigModel->setCellCheckedRole(i, 0, Qt::Checked);
+        lightpathConfigModel->setCellCheckedRole(i, 0, lightpathDefaultActive.value(i, true)?Qt::Checked:Qt::Unchecked);
         lightpathConfigModel->setCell(i, 1, lightpathlist[i]);
     }
-
-    /*lightpathConfigModel->setCellCheckedRole(0, 0, (ui->lsTransmission->isLightSourceConnected())?Qt::Checked:Qt::Unchecked);
-    lightpathConfigModel->setCellCheckedRole(1, 0, (ui->shutterTransmission->isShutterConnected())?Qt::Checked:Qt::Unchecked);
-    lightpathConfigModel->setCellCheckedRole(2, 0, Qt::Unchecked);
-    lightpathConfigModel->setCellCheckedRole(3, 0, (ui->shutterLaser1->isShutterConnected())?Qt::Checked:Qt::Unchecked);
-    lightpathConfigModel->setCellCheckedRole(4, 0, Qt::Unchecked);
-    lightpathConfigModel->setCellCheckedRole(5, 0, (ui->shutterLaser2->isShutterConnected())?Qt::Checked:Qt::Unchecked);
-    lightpathConfigModel->setCellCheckedRole(6, 0, (ui->chkDetectionFilterWheel->isChecked()&&ui->filtcDetection->isFilterChangerConnected())?Qt::Checked:Qt::Unchecked);
     lightpathConfigModel->setReadonlyButStillCheckable(true);
-*/
+
 
     while (true) {
         QStringList l=ui->cmbLightpathConfig->getConfigs();
@@ -1949,7 +2102,7 @@ void QFESPIMB040OpticsSetup2::saveCurrentLightpatConfig() {
                         //qDebug()<<dlg->getCheckedItems();
                         QFile::remove(filename);
                         //qDebug()<<dlg->getCheckedItems();
-                        saveLightpathConfig(filename, name, dlg->getCheckedItems());
+                        saveLightpathConfig(filename, name, dlg->getCheckedItems(), false);
                         ui->cmbLightpathConfig->setCurrentConfig(name);
                         return;
                     } else if (res==QMessageBox::Cancel) {
@@ -1974,31 +2127,54 @@ void QFESPIMB040OpticsSetup2::saveCurrentLightpatConfig() {
 bool QFESPIMB040OpticsSetup2::lightpathLoaded(const QString &filename) {
     if (setting_lightpath) {
         bool ok=true;
-        /*QSettings set(filename, QSettings::IniFormat);
-        if (ok && set.contains("laser1/shutter/state")) ok=ok&&ui->shutterLaser1->isShutterDone()&&(ui->shutterLaser1->getShutterState()==set.value("laser1/shutter/state").toBool());
-        if (ok && set.contains("laser2/shutter/state")) ok=ok&&ui->shutterLaser2->isShutterDone()&&(ui->shutterLaser2->getShutterState()==set.value("laser2/shutter/state").toBool());
-        if (ok && set.contains("transmission/shutter/state")) ok=ok&&ui->shutterTransmission->isShutterDone()&&(ui->shutterTransmission->getShutterState()==set.value("transmission/shutter/state").toBool());
-        if (ui->lsTransmission->isLightSourceConnected()) {
-            for (int i=0; i<ui->lsTransmission->getLineCount(); i++) {
-                if (ok && set.contains(QString("transmission/line%1/enabled").arg(i+1))) ok=ok&&ui->lsTransmission->isLastActionComplete()&&(ui->lsTransmission->isLineEnabled(i)==set.value(QString("transmission/line%1/enabled").arg(i+1)).toBool());
-                if (ok && set.contains(QString("transmission/line%1/power").arg(i+1))) ok=ok&&ui->lsTransmission->isLastActionComplete();
+        QSettings set(filename, QSettings::IniFormat);
+
+        QString iid;
+
+        {
+            QMapIterator<QString, LightsourceWidgets> it(ui_lightsource);
+            while (it.hasNext()) {
+                it.next();
+                if (it.value().config && it.value().config->isLightSourceConnected()) {
+                    for (int i=0; i<it.value().config->getLineCount(); i++) {
+                        if (ok && set.contains(iid=QString("%2/line%1/enabled").arg(i+1).arg(it.key()))) {
+                            ok=ok && (it.value().config->isLineEnabled(i)==set.value(iid).toBool()) && it.value().config->isLastActionComplete();
+                        }
+                        if (ok && set.contains(iid=QString("%2/line%1/power").arg(i+1).arg(it.key()))) {
+                            ok=ok && (it.value().config->isLastActionComplete());
+                        }
+                    }
+                }
+                if(!ok) break;
             }
         }
-        if (ui->lsLaser1->isLightSourceConnected()) {
-            for (int i=0; i<ui->lsLaser1->getLineCount(); i++) {
-                if (ok && set.contains(QString("laser1/line%1/enabled").arg(i+1))) ok=ok&&ui->lsLaser1->isLastActionComplete()&&(ui->lsLaser1->isLineEnabled(i)==set.value(QString("laser1/line%1/enabled").arg(i+1)).toBool());
-                if (ok && set.contains(QString("laser1/line%1/power").arg(i+1))) ok=ok&&ui->lsLaser1->isLastActionComplete();
+        {
+            QMapIterator<QString, QFShutterConfigWidget*> it(ui_shutter);
+            while (it.hasNext()) {
+                it.next();
+                if (it.value() && it.value()->isShutterConnected()) {
+                    if (ok && set.contains(iid=QString("%1/state").arg(it.key()))) {
+                        ok=ok && (it.value()->getShutterState()==set.value(iid).toBool());
+                    }
+                }
+                if(!ok) break;
             }
         }
-        if (ui->lsLaser2->isLightSourceConnected()) {
-            for (int i=0; i<ui->lsLaser2->getLineCount(); i++) {
-                if (ok && set.contains(QString("laser2/line%1/enabled").arg(i+1))) ok=ok&&ui->lsLaser2->isLastActionComplete()&&(ui->lsLaser2->isLineEnabled(i)==set.value(QString("laser2/line%1/enabled").arg(i+1)).toBool());
-                if (ok && set.contains(QString("laser2/line%1/power").arg(i+1))) ok=ok&&ui->lsLaser2->isLastActionComplete();
+
+        {
+            QMapIterator<QString, QFFilterChangerConfigWidget*> it(ui_filterchangers);
+            while (it.hasNext()) {
+                it.next();
+                if (it.value() && it.value()->isFilterChangerConnected()) {
+                    if (ok && set.contains(iid=QString("%1/state").arg(it.key()))) {
+                        ok=ok && (it.value()->getFilterChangerState()==set.value(iid).toInt());
+                    }
+                }
+                if(!ok) break;
+
             }
         }
-        if (ok && set.contains("detection/filterchanger/filter") && ui->chkDetectionFilterWheel->isChecked())
-            ok=ok&&ui->filtcDetection->isLastActionComplete()&&(ui->filtcDetection->getFilterChangerState()==set.value("detection/filterchanger/filter").toInt());
-            */
+
         return ok;
     }
     return true;
@@ -2013,28 +2189,52 @@ void QFESPIMB040OpticsSetup2::loadLightpathConfig(const QString &filename, bool 
     if (name) *name=set.value("name", *name).toString();
 
     // LOAD RELEVANT WIDGETS HERE
-    /*if (set.contains("laser1/shutter/state")) ui->shutterLaser1->setShutter(set.value("laser1/shutter/state").toBool());
-    if (set.contains("laser2/shutter/state")) ui->shutterLaser2->setShutter(set.value("laser2/shutter/state").toBool());
-    if (set.contains("transmission/shutter/state")) ui->shutterTransmission->setShutter(set.value("transmission/shutter/state").toBool());
-    if (set.contains("detection/filterchanger/filter") && ui->chkDetectionFilterWheel->isChecked()) ui->filtcDetection->setFilterChanger(set.value("detection/filterchanger/filter").toInt());
-    if (ui->lsTransmission->isLightSourceConnected()) {
-        for (int i=0; i<ui->lsTransmission->getLineCount(); i++) {
-            if (set.contains(QString("transmission/line%1/enabled").arg(i+1))) ui->lsTransmission->setLineEnabled(i, set.value(QString("transmission/line%1/enabled").arg(i+1)).toBool());
-            if (set.contains(QString("transmission/line%1/power").arg(i+1))) ui->lsTransmission->setLinePower(i, set.value(QString("transmission/line%1/power").arg(i+1)).toDouble());
+    bool ok=true;
+
+    QString iid;
+
+    {
+        QMapIterator<QString, LightsourceWidgets> it(ui_lightsource);
+        while (it.hasNext()) {
+            it.next();
+            if (it.value().config && it.value().config->isLightSourceConnected()) {
+                for (int i=0; i<it.value().config->getLineCount(); i++) {
+                    if (ok && set.contains(iid=QString("%2/line%1/enabled").arg(i+1).arg(it.key()))) {
+                        it.value().config->setLineEnabled(i, set.value(iid).toBool());
+                    }
+                    if (ok && set.contains(iid=QString("%2/line%1/power").arg(i+1).arg(it.key()))) {
+                        it.value().config->setLinePower(i, set.value(iid).toDouble());
+                    }
+                }
+            }
         }
     }
-    if (ui->lsLaser1->isLightSourceConnected()) {
-        for (int i=0; i<ui->lsLaser1->getLineCount(); i++) {
-            if (set.contains(QString("laser1/line%1/enabled").arg(i+1))) ui->lsLaser1->setLineEnabled(i, set.value(QString("laser1/line%1/enabled").arg(i+1)).toBool());
-            if (set.contains(QString("laser1/line%1/power").arg(i+1))) ui->lsLaser1->setLinePower(i, set.value(QString("laser1/line%1/power").arg(i+1)).toDouble());
+    {
+        QMapIterator<QString, QFShutterConfigWidget*> it(ui_shutter);
+        while (it.hasNext()) {
+            it.next();
+            if (it.value() && it.value()->isShutterConnected()) {
+                if (ok && set.contains(iid=QString("%1/state").arg(it.key()))) {
+                    it.value()->setShutter(set.value(iid).toBool());
+                }
+            }
         }
     }
-    if (ui->lsLaser2->isLightSourceConnected()) {
-        for (int i=0; i<ui->lsLaser2->getLineCount(); i++) {
-            if (set.contains(QString("laser2/line%1/enabled").arg(i+1))) ui->lsLaser2->setLineEnabled(i, set.value(QString("laser2/line%1/enabled").arg(i+1)).toBool());
-            if (set.contains(QString("laser2/line%1/power").arg(i+1))) ui->lsLaser2->setLinePower(i, set.value(QString("laser2/line%1/power").arg(i+1)).toDouble());
+
+    {
+        QMapIterator<QString, QFFilterChangerConfigWidget*> it(ui_filterchangers);
+        while (it.hasNext()) {
+            it.next();
+            if (it.value() && it.value()->isFilterChangerConnected()) {
+                if (ok && set.contains(iid=QString("%1/state").arg(it.key()))) {
+                    it.value()->setFilter(set.value(iid).toInt());
+                }
+            }
+
         }
-    }*/
+    }
+
+
     if (waiting) {
         setting_lightpath=true;
         QTime t1;
@@ -2055,81 +2255,127 @@ void QFESPIMB040OpticsSetup2::loadLightpathConfig(const QString &filename, bool 
 
 void QFESPIMB040OpticsSetup2::lockLightpath() {
     lockLighpathCombobox();
-   //qDebug()<<"locking lighpath 1";
-    /*ui->shutterLaser1->lockShutters();
-   //qDebug()<<"locking lighpath 2";
-    ui->shutterLaser2->lockShutters();
-   //qDebug()<<"locking lighpath 3";
-    ui->shutterTransmission->lockShutters();
-   //qDebug()<<"locking lighpath 4";
-    ui->lsLaser1->lockLightSource();
-   //qDebug()<<"locking lighpath 5";
-    ui->lsLaser2->lockLightSource();
-   //qDebug()<<"locking lighpath 6";
-    ui->lsTransmission->lockLightSource();
-   //qDebug()<<"locking lighpath 7";
-    ui->filtcDetection->lockFilterChangers();
-   //qDebug()<<"locking lighpath done";
-   */
+
+    {
+        QMapIterator<QString, LightsourceWidgets> it(ui_lightsource);
+        while (it.hasNext()) {
+            it.next();
+            it.value().config->lockLightSource();
+        }
+    }
+    {
+        QMapIterator<QString, QFShutterConfigWidget*> it(ui_shutter);
+        while (it.hasNext()) {
+            it.next();
+            it.value()->lockShutters();
+        }
+    }
+
+    {
+        QMapIterator<QString, QFFilterChangerConfigWidget*> it(ui_filterchangers);
+        while (it.hasNext()) {
+            it.next();
+            it.value()->lockFilterChangers();
+        }
+    }
+
 }
 
 void QFESPIMB040OpticsSetup2::unlockLightpath() {
-   //qDebug()<<"unlocking lightpath";
-    /*ui->shutterLaser1->unlockShutters();
-    ui->shutterLaser2->unlockShutters();
-    ui->shutterTransmission->unlockShutters();
-    ui->lsLaser1->unlockLightSource();
-    ui->lsLaser2->unlockLightSource();
-    ui->lsTransmission->unlockLightSource();
-    ui->filtcDetection->unlockFilterChangers();*/
+    {
+        QMapIterator<QString, QFFilterChangerConfigWidget*> it(ui_filterchangers);
+        while (it.hasNext()) {
+            it.next();
+            it.value()->unlockFilterChangers();
+        }
+    }
+    {
+        QMapIterator<QString, QFShutterConfigWidget*> it(ui_shutter);
+        while (it.hasNext()) {
+            it.next();
+            it.value()->unlockShutters();
+        }
+    }
+    {
+        QMapIterator<QString, LightsourceWidgets> it(ui_lightsource);
+        while (it.hasNext()) {
+            it.next();
+            it.value().config->unlockLightSource();
+        }
+    }
     unlockLighpathCombobox();
-   //qDebug()<<"unlocking lightpath done";
 }
 
 
 QFESPIMB040OpticsSetup2::measuredValues QFESPIMB040OpticsSetup2::getMeasuredValues() {
     QFESPIMB040OpticsSetup2::measuredValues m;
-    /*for (int i=0; i<ui->lsTransmission->getLineCount(); i++) {
-        m.data[QString("transmission/line%1/set_power").arg(i+1)]=ui->lsTransmission->getSetPower(i);
-        m.data[QString("transmission/line%1/measured_power").arg(i+1)]=ui->lsTransmission->getMeasuredPower(i);
+
+    {
+        QMapIterator<QString, LightsourceWidgets> it(ui_lightsource);
+        while (it.hasNext()) {
+            it.next();
+            if (it.value().config && it.value().config->isLightSourceConnected()) {
+                for (int i=0; i<it.value().config->getLineCount(); i++) {
+                    m.data[QString("%2/line%1/set_power").arg(i+1).arg(it.key())]=it.value().config->getSetPower(i);
+                    m.data[QString("%2/line%1/measured_power").arg(i+1).arg(it.key())]=it.value().config->getMeasuredPower(i);
+                }
+            }
+        }
+    }
+    {
+        QMapIterator<QString, QFStageConfigWidget*> it(ui_stages);
+        while (it.hasNext()) {
+            it.next();
+            if (it.value() && it.value()->isXStageConnected()) {
+                m.data[QString("%1/position").arg(it.key())]=it.value()->getXStage()->getPosition(it.value()->getXStageAxis());
+                m.data[QString("%1/velocity").arg(it.key())]=it.value()->getXStage()->getSpeed(it.value()->getXStageAxis());
+            }
+        }
+    }
+    {
+        QMapIterator<QString, QFESPIMB040SampleStageConfig*> it(ui_stageconfigs);
+        while (it.hasNext()) {
+            it.next();
+            if (it.value() && it.value()->isXStageConnected()) {
+                m.data[QString("%1/xstage/position").arg(it.key())]=it.value()->getXStage()->getPosition(it.value()->getXStageAxis());
+                m.data[QString("%1/xstage/velocity").arg(it.key())]=it.value()->getXStage()->getSpeed(it.value()->getXStageAxis());
+            }
+            if (it.value() && it.value()->isYStageConnected()) {
+                m.data[QString("%1/ystage/position").arg(it.key())]=it.value()->getYStage()->getPosition(it.value()->getYStageAxis());
+                m.data[QString("%1/ystage/velocity").arg(it.key())]=it.value()->getYStage()->getSpeed(it.value()->getYStageAxis());
+            }
+            if (it.value() && it.value()->isZStageConnected()) {
+                m.data[QString("%1/zstage/position").arg(it.key())]=it.value()->getZStage()->getPosition(it.value()->getZStageAxis());
+                m.data[QString("%1/zstage/velocity").arg(it.key())]=it.value()->getZStage()->getSpeed(it.value()->getZStageAxis());
+            }
+        }
+    }
+    {
+        QMapIterator<QString, CameraWidgets> it(ui_cameras);
+        while (it.hasNext()) {
+            it.next();
+            if (it.value().config && it.value().config->isChecked() && it.value().config->isCameraConnected()) {
+                it.value().config->storeMeasurements(m.data, it.key()+"/");
+            }
+        }
     }
 
-    for (int i=0; i<ui->lsLaser1->getLineCount(); i++) {
-        m.data[QString("laser1/line%1/set_power").arg(i+1)]=ui->lsLaser1->getSetPower(i);
-        m.data[QString("laser1/line%1/measured_power").arg(i+1)]=ui->lsLaser1->getMeasuredPower(i);
-    }
-
-    for (int i=0; i<ui->lsLaser2->getLineCount(); i++) {
-        m.data[QString("laser2/line%1/set_power").arg(i+1)]=ui->lsLaser2->getSetPower(i);
-        m.data[QString("laser2/line%1/measured_power").arg(i+1)]=ui->lsLaser2->getMeasuredPower(i);
-    }
-
-    m.data["stagex/position"]=ui->stageSetup->getXStage()->getPosition(ui->stageSetup->getXStageAxis());
-    m.data["stagex/velocity"]=ui->stageSetup->getXStage()->getSpeed(ui->stageSetup->getXStageAxis());
-    m.data["stagey/position"]=ui->stageSetup->getYStage()->getPosition(ui->stageSetup->getYStageAxis());
-    m.data["stagey/velocity"]=ui->stageSetup->getYStage()->getSpeed(ui->stageSetup->getYStageAxis());
-    m.data["stagez/position"]=ui->stageSetup->getZStage()->getPosition(ui->stageSetup->getZStageAxis());
-    m.data["stagez/velocity"]=ui->stageSetup->getZStage()->getSpeed(ui->stageSetup->getZStageAxis());
-
-    ui->camConfig1->storeMeasurements(m.data, "camera1/");
-    ui->camConfig2->storeMeasurements(m.data, "camera2/");*/
-
-    //qDebug()<<"measuredValues(): "<<m.data;
 
     return m;
 }
 
 QString QFESPIMB040OpticsSetup2::dualViewMode(int camera) const {
     QString dv="none";
-    /*if (camera==0 &&  ui->chkDualView1->isChecked()) {
-        if (ui->cmbDualViewOrientation->currentIndex()==0) dv="horicontal";
-        else if (ui->cmbDualViewOrientation->currentIndex()==1) dv="vertical";
-        else dv="unknown";
-    } else if (camera==1 && ui->chkDualView2->isChecked()) {
-        if (ui->cmbDualView2Orientation->currentIndex()==0) dv="horicontal";
-        else if (ui->cmbDualView2Orientation->currentIndex()==1) dv="vertical";
-        else dv="unknown";
-    }*/
+    if (camera>=0 && camera<cameraIndex.size()) {
+        QString dvid=ui_cameras[cameraIndex[camera]].dualview;
+        if (ui_dualviews.contains(dvid)) {
+            if (ui_dualviews[dvid].first->isChecked()) {
+                if (ui_dualviews[dvid].second->orientation()==QF3DualViewWidget::Horizontal) dv="horizontal";
+                if (ui_dualviews[dvid].second->orientation()==QF3DualViewWidget::Vertical) dv="vertical";
+            }
+        }
+    }
+
     return dv;
 }
 
@@ -2140,36 +2386,107 @@ QString QFESPIMB040OpticsSetup2::dualViewMode(QFExtensionCamera *ecam, int camer
 
 int QFESPIMB040OpticsSetup2::camNumFromExtension(QFExtensionCamera *ecam, int camera) const
 {
-    /*if (ui->camConfig1->cameraComboBox()->currentExtensionCamera()==ecam && ui->camConfig1->cameraComboBox()->currentCameraID()==camera) return 0;
-    if (ui->camConfig2->cameraComboBox()->currentExtensionCamera()==ecam && ui->camConfig2->cameraComboBox()->currentCameraID()==camera) return 1;*/
+    QMapIterator<QString, CameraWidgets> it(ui_cameras);
+    while (it.hasNext()) {
+        it.next();
+        if (it.value().config && it.value().config->cameraComboBox()->currentExtensionCamera()==ecam && it.value().config->cameraComboBox()->currentCameraID()==camera) {
+            return cameraIndex.indexOf(it.key());
+        }
+    }
     return -1;
 }
 
 QString QFESPIMB040OpticsSetup2::getAxisNameForStage(QFExtensionLinearStage *stage, int axis)
 {
-    /*if (ui->stageSetup->getXStage()==stage && ui->stageSetup->getXStageAxis()==axis) return "x";
-    if (ui->stageSetup->getYStage()==stage && ui->stageSetup->getYStageAxis()==axis) return "y";
-    if (ui->stageSetup->getZStage()==stage && ui->stageSetup->getZStageAxis()==axis) return "z";*/
-    return "";
+
+    if (specialStageX.stage && specialStageX.stage->getXStage()==stage && specialStageX.device==axis) {
+        return "x";
+    }
+    if (specialStageY.stage && specialStageY.stage->getXStage()==stage && specialStageY.device==axis) {
+        return "y";
+    }
+    if (specialStageZ.stage && specialStageZ.stage->getXStage()==stage && specialStageZ.device==axis) {
+        return "z";
+    }
+    if (specialStageR.stage && specialStageR.stage->getXStage()==stage && specialStageR.device==axis) {
+        return "r";
+    }
+
+    if (specialStageX.stageconfig && (specialStageX.stageconfig->getXStage()==stage || specialStageX.stageconfig->getYStage()==stage || specialStageZ.stageconfig->getYStage()==stage) && specialStageX.device==axis) {
+        return "x";
+    }
+    if (specialStageY.stageconfig && (specialStageY.stageconfig->getXStage()==stage || specialStageY.stageconfig->getYStage()==stage || specialStageY.stageconfig->getYStage()==stage) && specialStageY.device==axis) {
+        return "y";
+    }
+    if (specialStageZ.stageconfig && (specialStageZ.stageconfig->getXStage()==stage || specialStageZ.stageconfig->getYStage()==stage || specialStageZ.stageconfig->getYStage()==stage) && specialStageZ.device==axis) {
+        return "z";
+    }
+    if (specialStageR.stageconfig && (specialStageR.stageconfig->getXStage()==stage || specialStageR.stageconfig->getYStage()==stage || specialStageR.stageconfig->getYStage()==stage) && specialStageR.device==axis) {
+        return "r";
+    }
+
+
+
+    QString id="";
+    int dev=0;
+    {
+        QMapIterator<QString, QFStageConfigWidget*> it(ui_stages);
+        while (it.hasNext()) {
+            it.next();
+            if (it.value() && it.value()->getXStage()==stage && it.value()->getXStageAxis()==axis) {
+                id=it.key();
+                break;
+            }
+        }
+    }
+    {
+        QMapIterator<QString, QFESPIMB040SampleStageConfig*> it(ui_stageconfigs);
+        while (it.hasNext()) {
+            it.next();
+            if (it.value() && it.value()->getXStage()==stage && it.value()->getXStageAxis()==axis) {
+                id=it.key();
+                dev=0;
+                break;
+            }
+            if (it.value() && it.value()->getYStage()==stage && it.value()->getYStageAxis()==axis) {
+                id=it.key();
+                dev=1;
+                break;
+            }
+            if (it.value() && it.value()->getZStage()==stage && it.value()->getZStageAxis()==axis) {
+                id=it.key();
+                dev=2;
+                break;
+            }
+        }
+    }
+
+    return id;
 }
 
 QString QFESPIMB040OpticsSetup2::getLaserConfig()
 {
     QString r="";
-    /*if (ui->lsLaser1->isLightSourceConnected() && ui->shutterLaser1->isShutterConnected() && ui->shutterLaser1->getShutterState())   {
-        QString l=ui->lsLaser1->getLightsoureConfigForFilename();
-        if (!l.isEmpty()) {
-            if (!r.isEmpty()) r+="_";
-            r+="laser1_"+cleanStringForFilename(l);
+    {
+
+        for (int i=0; i<laserIndex.size(); i++) {
+            QString id=laserIndex[i];
+            if (ui_lightsource.contains(id)) {
+                LightsourceWidgets wid=ui_lightsource[id];
+                if (wid.config && wid.config->isLightSourceConnected()) {
+                    QFShutterConfigWidget* shut=ui_shutter.value(wid.shutter, NULL);
+                    if (!shut || (shut && shut->isShutterConnected() && shut->getShutterState())) {
+                        QString l=wid.config->getLightsoureConfigForFilename();
+                        if (!l.isEmpty()) {
+                            if (!r.isEmpty()) r+="_";
+                            r+=QString("%1_").arg(id)+cleanStringForFilename(l);
+                        }
+                    }
+                }
+            }
         }
     }
-    if (ui->lsLaser2->isLightSourceConnected() && ui->shutterLaser2->isShutterConnected() && ui->shutterLaser2->getShutterState())   {
-        QString l=ui->lsLaser2->getLightsoureConfigForFilename();
-        if (!l.isEmpty()) {
-            if (!r.isEmpty()) r+="_";
-            r+="laser2_"+cleanStringForFilename(l);
-        }
-    }*/
+
     return r;
 }
 
@@ -2215,16 +2532,16 @@ void QFESPIMB040OpticsSetup2::on_btnSaveSetup_clicked()  {
 
 int QFESPIMB040OpticsSetup2::getBrightfieldLightSourceCount() const
 {
-    return 1;
+    return lightsourceIndex.size();
 }
 
 QString QFESPIMB040OpticsSetup2::getLaserName(int laser) const
 {
-    return tr("Laser %1").arg(laser);
+    return laserIndex.value(laser, tr("laser %1").arg(laser));
 }
 
 QString QFESPIMB040OpticsSetup2::getBrightfieldLightSourceName(int lightsource) const
 {
-    if (lightsource==QFESPIMB040OpticsSetupBase::BrightfieldTransmission) return tr("transmission illumination");
-    return QString();
+    QString id=brightfieldIndex.value(lightsource, tr("brightfield %1").arg(lightsource));
+    return id;
 }
