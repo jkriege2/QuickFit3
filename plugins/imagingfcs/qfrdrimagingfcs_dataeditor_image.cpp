@@ -7087,7 +7087,7 @@ void QFRDRImagingFCSImageEditor::setBackgroundFromMaskedInAll()
     progress.setValue(0);
 }
 
-void QFRDRImagingFCSImageEditor::setBackground(bool *msk, bool alsoSetOtherACF)
+void QFRDRImagingFCSImageEditor::setBackground(bool *msk_in, bool alsoSetOtherACF)
 {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
@@ -7100,17 +7100,18 @@ void QFRDRImagingFCSImageEditor::setBackground(bool *msk, bool alsoSetOtherACF)
 
         double ovrAvg=0;
         double ovrVar=0;
-        //bool *msk=(bool*)qfCalloc(w*h, sizeof(bool));
+        bool *msk=(bool*)qfCalloc(w*h, sizeof(bool));
         int cnt=0;
         for (int i=0; i<w*h; i++) {
+            msk[i]=msk_in[i];
             if (msk[i]) cnt++;
         }
         m->addImageSelection(msk, tr("automatic background"));
         for (int i=0; i<m->getImageFromRunsChannels(); i++) {
             if (cnt>1){
-                ovrAvg=statisticsAverageVarianceMasked(ovrVar, msk, m->getImageFromRunsPreview(i), w*h);
+                ovrAvg=statisticsAverageVarianceMaskedExcludeQuantiles(ovrVar, msk, m->getImageFromRunsPreview(i), w*h, true, 0.05, 0.95);
             } else {
-                ovrAvg=statisticsAverageVarianceMasked(ovrVar, plteOverviewExcludedData, m->getImageFromRunsPreview(i), w*h, false);
+                ovrAvg=statisticsAverageVarianceMaskedExcludeQuantiles(ovrVar, plteOverviewExcludedData, m->getImageFromRunsPreview(i), w*h, false, 0.05, 0.95);
             }
             m->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
             m->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
@@ -7130,94 +7131,9 @@ void QFRDRImagingFCSImageEditor::setBackground(bool *msk, bool alsoSetOtherACF)
                         setBackground(l[j], msk);
                     }
                 }
-                /*if (m->isFCCS()) {
-                    QList<QFRawDataRecord*> l=m->getRecordsWithRoleFromGroup("acf0");
-                    for (int j=0; j<l.size(); j++) {
-                        QFRDRImagingFCSData* mj=qobject_cast<QFRDRImagingFCSData*>(l[j]);
-                        if (mj && mj->getImageFromRunsWidth()==w && mj->getImageFromRunsHeight()==h && l[j]!=m) {
-                            if (i==0) mj->addImageSelection(msk, tr("automatic background"));
-                            l[j]->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
-                            l[j]->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
-                            l[j]->setQFProperty(QString("BACKGROUND%1_DIRECT").arg(i+1), ovrAvg);
-                            l[j]->setQFProperty(QString("BACKGROUND_STD%1_DIRECT").arg(i+1), sqrt(ovrVar));
-                            if (i==0) {
-                                l[j]->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
-                                l[j]->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
-                                l[j]->setQFProperty(QString("BACKGROUND_DIRECT"), ovrAvg);
-                                l[j]->setQFProperty(QString("BACKGROUND_STD_DIRECT"), sqrt(ovrVar));
-                            }
-                        }
-                    }
-                    l=m->getRecordsWithRoleFromGroup("acf1");
-                    for (int j=0; j<l.size(); j++) {
-                        QFRDRImagingFCSData* mj=qobject_cast<QFRDRImagingFCSData*>(l[j]);
-                        if (mj && mj->getImageFromRunsWidth()==w && mj->getImageFromRunsHeight()==h && l[j]!=m) {
-                            if (i==0) mj->addImageSelection(msk, tr("automatic background"));
-                            l[j]->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
-                            l[j]->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
-                            l[j]->setQFProperty(QString("BACKGROUND%1_DIRECT").arg(i+1), ovrAvg);
-                            l[j]->setQFProperty(QString("BACKGROUND_STD%1_DIRECT").arg(i+1), sqrt(ovrVar));
-                            if (i==1) {
-                                l[j]->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
-                                l[j]->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
-                                l[j]->setQFProperty(QString("BACKGROUND_DIRECT"), ovrAvg);
-                                l[j]->setQFProperty(QString("BACKGROUND_STD_DIRECT"), sqrt(ovrVar));
-                            }
-                        }
-                    }
-                } else if (m->isACF()) {
-                    if (m->getRole().toLower()!="acf0") {
-                        QList<QFRawDataRecord*> l=m->getRecordsWithRoleFromGroup("acf0");
-                        for (int j=0; j<l.size(); j++) {
-                            QFRDRImagingFCSData* mj=qobject_cast<QFRDRImagingFCSData*>(l[j]);
-                            if (mj && mj->getImageFromRunsWidth()==w && mj->getImageFromRunsHeight()==h && l[j]!=m) {
-                                if (i==0) mj->addImageSelection(msk, tr("automatic background"));
-                                l[j]->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
-                                l[j]->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
-                                l[j]->setQFProperty(QString("BACKGROUND%1_DIRECT").arg(i+1), ovrAvg);
-                                l[j]->setQFProperty(QString("BACKGROUND_STD%1_DIRECT").arg(i+1), sqrt(ovrVar));
-                                if (i==0) {
-                                    l[j]->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
-                                    l[j]->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
-                                    l[j]->setQFProperty(QString("BACKGROUND_DIRECT"), ovrAvg);
-                                    l[j]->setQFProperty(QString("BACKGROUND_STD_DIRECT"), sqrt(ovrVar));
-                                }
-                            }
-                        }
-                    }
-                    if (m->getRole().toLower()!="acf1") {
-                        QList<QFRawDataRecord*> l=m->getRecordsWithRoleFromGroup("acf1");
-                        for (int j=0; j<l.size(); j++) {
-                            QFRDRImagingFCSData* mj=qobject_cast<QFRDRImagingFCSData*>(l[j]);
-                            if (mj && mj->getImageFromRunsWidth()==w && mj->getImageFromRunsHeight()==h && l[j]!=m) {
-                                if (i==0) mj->addImageSelection(msk, tr("automatic background"));
-                                l[j]->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
-                                l[j]->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
-                                l[j]->setQFProperty(QString("BACKGROUND%1_DIRECT").arg(i+1), ovrAvg);
-                                l[j]->setQFProperty(QString("BACKGROUND_STD%1_DIRECT").arg(i+1), sqrt(ovrVar));
-                                if (i==1) {
-                                    l[j]->setQFProperty(QString("BACKGROUND"), ovrAvg/m->getFrameTime());
-                                    l[j]->setQFProperty(QString("BACKGROUND_STD"), sqrt(ovrVar)/m->getFrameTime());
-                                    l[j]->setQFProperty(QString("BACKGROUND_DIRECT"), ovrAvg);
-                                    l[j]->setQFProperty(QString("BACKGROUND_STD_DIRECT"), sqrt(ovrVar));
-                                }
-                            }
-                        }
-                    }
-                    QList<QFRawDataRecord*> l=m->getRecordsWithRoleFromGroup("fccs");
-                    for (int j=0; j<l.size(); j++) {
-                        QFRDRImagingFCSData* mj=qobject_cast<QFRDRImagingFCSData*>(l[j]);
-                        if (mj && mj->getImageFromRunsWidth()==w && mj->getImageFromRunsHeight()==h && l[j]!=m) {
-                            if (i==0) mj->addImageSelection(msk, tr("automatic background"));
-                            l[j]->setQFProperty(QString("BACKGROUND%1").arg(i+1), ovrAvg/m->getFrameTime());
-                            l[j]->setQFProperty(QString("BACKGROUND_STD%1").arg(i+1), sqrt(ovrVar)/m->getFrameTime());
-                            l[j]->setQFProperty(QString("BACKGROUND%1_DIRECT").arg(i+1), ovrAvg);
-                            l[j]->setQFProperty(QString("BACKGROUND_STD%1_DIRECT").arg(i+1), sqrt(ovrVar));
-                        }
-                    }
-                }*/
             }
         }
+        qfFree(msk);
     }
 }
 
@@ -7252,9 +7168,9 @@ void QFRDRImagingFCSImageEditor::setBackground(QFRawDataRecord *current, bool *m
 
         for (int i=0; i<channels; i++) {
             if (cnt>1){
-                ovrAvg=statisticsAverageVarianceMasked(ovrVar, msk, m->getImageFromRunsPreview(i), w*h);
+                ovrAvg=statisticsAverageVarianceMaskedExcludeQuantiles(ovrVar, msk, m->getImageFromRunsPreview(i), w*h, true, 0.05, 0.95);
             } else {
-                ovrAvg=statisticsAverageVarianceMasked(ovrVar, m->maskGet(), m->getImageFromRunsPreview(i), w*h, false);
+                ovrAvg=statisticsAverageVarianceMaskedExcludeQuantiles(ovrVar, m->maskGet(), m->getImageFromRunsPreview(i), w*h, false, 0.05, 0.95);
             }
 
             int seti=i;

@@ -97,6 +97,7 @@ void QFRDRImagingFCSMaskByIntensity::init(bool *mask, double *image, uint32_t wi
     ui->chkEqualChannels->setChecked(false);
 
     updateDualView();
+    updateImage();
 }
 
 int QFRDRImagingFCSMaskByIntensity::getMaskMode() const {

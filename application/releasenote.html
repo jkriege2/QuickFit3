@@ -301,6 +301,8 @@
             <li>selection builder/mask builder can now be applied to a selectable list of records and can optionally save the selection to a named selection</li>
             <li>mask by intensity supports relaxed color-scaling for overview image</li>
             <li>bugfix: "mask/selection by ..." dialogs do no longer loose settings, when closed</li>
+            <li>overview images (correltion functions/countrates tab) now scales colors only for the displayed pixels.</li>
+            <li>set background from mask/selection now excludes the upper/lower 5% of the pixels (by quatiles), before calculating Avg/Var. This improves on the robustnes of the statistics!</li>
           </ul></li>
         <li><b>table</b><ul>
             <li>added "QuickStatistics" and "QuickHistogram" tools, which show the statistics and histograms of the current selection (column-wise)</li>

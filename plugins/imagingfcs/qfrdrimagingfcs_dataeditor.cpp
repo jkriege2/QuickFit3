@@ -23,7 +23,7 @@
 #include "qfrdrimagingfcs_data.h"
 #include <QDebug>
 #include "qfrawdatapropertyeditor.h"
-
+#include "statistics_tools.h"
 
 void QFRDRImagingFCSDataEditor::excludeRuns() {
     if (!current) return;
@@ -462,6 +462,7 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
             plteOverview->set_image(ov, JKQTFP_double, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
             plteOverviewRGB->setVisible(false);
             plteOverview->setVisible(true);
+
         } else if (channels>1) {
             plteOverviewRGB->set_image(ov2, JKQTFP_double, ov, JKQTFP_double, m->getImageFromRunsWidth(), m->getImageFromRunsHeight());
             plteOverview->setVisible(false);
@@ -481,6 +482,8 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
                     plteOverviewSelectedData[idx]=false;
                     plteOverviewExcludedData[idx]=m->leaveoutRun(i);
                 }
+
+
             } else {
                 for (int i=0; i<m->getCorrelationRuns(); i++) {
                     int x=m->runToX(i);
@@ -490,6 +493,27 @@ void QFRDRImagingFCSDataEditor::replotOverview() {
                     plteOverviewExcludedData[idx]=m->leaveoutRun(i);
                 }
             }
+
+            double mi=-1, ma=-1, mi2=-1, ma2=-1;
+            statisticsMaskedMinMax(ov, plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), mi, ma, false);
+            if (channels>1) {
+                statisticsMaskedMinMax(ov2, plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), mi2, ma2, false);
+                plteOverviewRGB->set_colorMinRed(mi2);
+                plteOverviewRGB->set_colorMaxRed(ma2);
+                plteOverviewRGB->set_colorMinGreen(mi);
+                plteOverviewRGB->set_colorMaxGreen(ma);
+            }
+            plteOverview->set_colorMin(mi);
+            plteOverview->set_colorMax(ma);
+        } else {
+            plteOverview->set_colorMin(-1);
+            plteOverview->set_colorMax(-1);
+            plteOverviewRGB->set_colorMinRed(-1);
+            plteOverviewRGB->set_colorMaxRed(-1);
+            plteOverviewRGB->set_colorMinGreen(-1);
+            plteOverviewRGB->set_colorMaxGreen(-1);
+            plteOverviewRGB->set_colorMinBlue(-1);
+            plteOverviewRGB->set_colorMaxBlue(-1);
         }
     }
 

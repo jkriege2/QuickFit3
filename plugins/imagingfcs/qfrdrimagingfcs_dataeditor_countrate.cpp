@@ -23,6 +23,7 @@
 #include "qfrdrimagingfcs_data.h"
 #include <QDebug>
 #include "qfrawdatapropertyeditor.h"
+#include "statistics_tools.h"
 
 void QFRDRImagingFCSDataEditorCountrate::excludeRuns() {
     if (!current) return;
@@ -367,6 +368,26 @@ void QFRDRImagingFCSDataEditorCountrate::replotOverview() {
                 plteOverviewSelectedData[idx]=lstRunsSelect->selectionModel()->isSelected(runs.index(i+1, 0));
                 plteOverviewExcludedData[idx]=m->leaveoutRun(i);
             }
+            double mi=-1, ma=-1, mi2=-1, ma2=-1;
+            statisticsMaskedMinMax(ov, plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), mi, ma, false);
+            if (channels>1) {
+                statisticsMaskedMinMax(ov2, plteOverviewExcludedData, m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), mi2, ma2, false);
+                plteOverviewRGB->set_colorMinRed(mi2);
+                plteOverviewRGB->set_colorMaxRed(ma2);
+                plteOverviewRGB->set_colorMinGreen(mi);
+                plteOverviewRGB->set_colorMaxGreen(ma);
+            }
+            plteOverview->set_colorMin(mi);
+            plteOverview->set_colorMax(ma);
+        } else {
+            plteOverview->set_colorMin(-1);
+            plteOverview->set_colorMax(-1);
+            plteOverviewRGB->set_colorMinRed(-1);
+            plteOverviewRGB->set_colorMaxRed(-1);
+            plteOverviewRGB->set_colorMinGreen(-1);
+            plteOverviewRGB->set_colorMaxGreen(-1);
+            plteOverviewRGB->set_colorMinBlue(-1);
+            plteOverviewRGB->set_colorMaxBlue(-1);
         }
     }
 

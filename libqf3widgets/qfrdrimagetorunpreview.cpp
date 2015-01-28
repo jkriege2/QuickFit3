@@ -22,6 +22,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include "qfrdrimagetorunpreview.h"
 #include "qfrdrimagemaskbyintensity.h"
+#include "statistics_tools.h"
 
 QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
     QWidget(parent)
@@ -380,6 +381,28 @@ void QFRDRImageToRunPreview::replotOverview()
                 plteCurrentPixel->set_yColumn(rcy);
             }
 
+            plteOverview->set_autoImageRange(false);
+            double mi=0, ma=1;
+            statisticsMaskedMinMax(ov, plteOverviewExcludedData, rrRecord->getImageFromRunsWidth()*rrRecord->getImageFromRunsHeight(), mi, ma, false);
+            double mi2=0, ma2=1;
+            statisticsMaskedMinMax(ov2, plteOverviewExcludedData, rrRecord->getImageFromRunsWidth()*rrRecord->getImageFromRunsHeight(), mi2, ma2, false);
+            plteOverview->set_imageMin(mi);
+            plteOverview->set_imageMax(ma);
+
+            if (channels>1) {
+                plteOverviewRGB->set_autoImageRange(false);
+                plteOverviewRGB->set_imageMin(mi2);
+                plteOverviewRGB->set_imageMax(ma2);
+                plteOverviewRGB->set_imageMinG(mi);
+                plteOverviewRGB->set_imageMaxG(ma);
+                qDebug()<<mi<<ma<<mi2<<ma2;
+            } else {
+                qDebug()<<mi<<ma;
+            }
+
+        } else {
+            plteOverview->set_autoImageRange(true);
+            plteOverviewRGB->set_autoImageRange(true);
         }
         labInfo->setText(tr("size: %1&times;%2, %3 masked").arg(rrRecord->getImageFromRunsWidth()).arg(rrRecord->getImageFromRunsHeight()).arg(exclCnt));
         if (rfcs) {
