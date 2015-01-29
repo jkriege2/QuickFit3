@@ -2577,7 +2577,6 @@ static double QFRDRImagingFCSCorrelationJobThread_fExpPoly5Lin( double t, const 
 
 
 void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames, double* fit_t, int NFitFrames) {
-    int NFitFramesInt=0;
     if (job.bleach==BLEACH_EXP) {
         if (fit_frames && fit_t && NFitFrames>2) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
@@ -2585,10 +2584,11 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                 control.maxcall=500;
                 lm_status_struct status;
 
+                int NFitFramesInt=0;
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     const double v=fit_frames[jj*frame_width*frame_height+i];
-                    if (v>0 && QFFloatIsOK(v)) {
+                    if (v>0.0 && QFFloatIsOK(v)) {
                         fit_I[NFitFramesInt]=log(v);
                         NFitFramesInt++;
                     }
@@ -2643,6 +2643,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                 control.maxcall=500;
                 lm_status_struct status;
 
+                int NFitFramesInt=0;
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     const double v=fit_frames[jj*frame_width*frame_height+i];
@@ -2713,6 +2714,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                 control.maxcall=500;
                 lm_status_struct status;
 
+                int NFitFramesInt=0;
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     const double v=fit_frames[jj*frame_width*frame_height+i];
@@ -2805,6 +2807,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                 control.maxcall=500;
                 lm_status_struct status;
 
+                int NFitFramesInt=0;
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     const double v=fit_frames[jj*frame_width*frame_height+i];
@@ -2894,6 +2897,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                 control.maxcall=500;
                 lm_status_struct status;
 
+                int NFitFramesInt=0;
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     const double v=fit_frames[jj*frame_width*frame_height+i];
@@ -2990,6 +2994,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
 
 
+                int NFitFramesInt=0;
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
                 double* fit_Il=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
@@ -3072,6 +3077,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
         if (fit_frames && fit_t && NFitFrames>2) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
 
+                int NFitFramesInt=0;
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     const double v=fit_frames[jj*frame_width*frame_height+i];
