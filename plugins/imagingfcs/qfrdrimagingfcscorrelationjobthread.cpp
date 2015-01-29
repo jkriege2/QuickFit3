@@ -2577,6 +2577,7 @@ static double QFRDRImagingFCSCorrelationJobThread_fExpPoly5Lin( double t, const 
 
 
 void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames, double* fit_t, int NFitFrames) {
+    int NFitFramesInt=0;
     if (job.bleach==BLEACH_EXP) {
         if (fit_frames && fit_t && NFitFrames>2) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
@@ -2586,36 +2587,42 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
-                    fit_I[jj]=log(fit_frames[jj*frame_width*frame_height+i]);
+                    const double v=fit_frames[jj*frame_width*frame_height+i];
+                    if (v>0 && QFFloatIsOK(v)) {
+                        fit_I[NFitFramesInt]=log(v);
+                        NFitFramesInt++;
+                    }
                 }
+                bleachFitOK[i]=0;
+                if (NFitFramesInt>2) {
+                    double pA=0, pB=0;
+                    if (!statisticsLinearRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
+                        pA=fit_I[0];
+                        pB=-1.0/(fit_t[NFitFramesInt-2]/(fit_I[0]-fit_I[NFitFramesInt-2]));
+                    }
 
-                double pA=0, pB=0;
-                if (!statisticsLinearRegression(fit_t, fit_I, NFitFrames, pA, pB)) {
-                    pA=fit_I[0];
-                    pB=-1.0/(fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2]));
-                }
 
+                    //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
+                    double par[2]={pA, -1.0/pB};
+                    //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
+                    lmcurve_fit(2, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpLin, &control, &status);
+                    //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
-                //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
-                double par[2]={pA, -1.0/pB};
-                //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
-                lmcurve_fit(2, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpLin, &control, &status);
-                //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
-
-                bleachAmplitude[i]=exp(par[0]);
-                bleachTime[i]=par[1];
-                bleachFitOK[i]=1;
-                double t1=fit_t[NFitFrames/2];
-                double t2=fit_t[2*NFitFrames/3];
-                if ( (!QFFloatIsOK(bleachAmplitude[i]))
-                     || (!QFFloatIsOK(bleachTime[i]))
-                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
-                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t2/(bleachTime[i]))))
-                     || (bleachTime[i]==0)
-                     || (std::isinf(bleachTime[i]))
-                     || (std::isinf(bleachAmplitude[i]))
-                     || (bleachAmplitude[i]==0) ) {
-                    bleachFitOK[i]=0;
+                    bleachAmplitude[i]=exp(par[0]);
+                    bleachTime[i]=par[1];
+                    bleachFitOK[i]=1;
+                    double t1=fit_t[NFitFramesInt/2];
+                    double t2=fit_t[2*NFitFramesInt/3];
+                    if ( (!QFFloatIsOK(bleachAmplitude[i]))
+                         || (!QFFloatIsOK(bleachTime[i]))
+                         || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
+                         || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t2/(bleachTime[i]))))
+                         || (bleachTime[i]==0)
+                         || (std::isinf(bleachTime[i]))
+                         || (std::isinf(bleachAmplitude[i]))
+                         || (bleachAmplitude[i]==0) ) {
+                        bleachFitOK[i]=0;
+                    }
                 }
                 qfFree(fit_I);
                 if (i>5 && i%(frame_width*frame_height/20)==0) {
@@ -2630,52 +2637,57 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
             }
         }
     } else if (job.bleach==BLEACH_EXP_POLY2) {
-        if (fit_frames && fit_t && NFitFrames>2) {
+        if (fit_frames && fit_t && NFitFrames>3) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
                 control.maxcall=500;
                 lm_status_struct status;
 
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
-                //double* fit_Inl=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
-                    fit_I[jj]=log(fit_frames[jj*frame_width*frame_height+i]);
-                    //fit_Inl[jj]=fit_frames[jj*frame_width*frame_height+i];
+                    const double v=fit_frames[jj*frame_width*frame_height+i];
+                    if (v>0 && QFFloatIsOK(v)) {
+                        fit_I[NFitFramesInt]=log(v);
+                        NFitFramesInt++;
+                    }
                 }
+                bleachFitOK[i]=0;
+                if (NFitFramesInt>3) {
 
-                double pA=0, pB=0;
-                if (!statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFrames, pA, pB)) {
-                    pA=fit_I[0];
-                    pB=-1.0/(fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2]));
-                }
+                    double pA=0, pB=0;
+                    if (!statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
+                        pA=fit_I[0];
+                        pB=-1.0/(fit_t[NFitFramesInt-2]/(fit_I[0]-fit_I[NFitFramesInt-2]));
+                    }
 
 
-                //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
-                double par[4]={pA, -1.0/pB,0};
-                //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
-                int npar=3;
-                lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
-                //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
+                    //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
+                    double par[4]={pA, -1.0/pB,0};
+                    //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
+                    int npar=3;
+                    lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
+                    //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
-                bleachAmplitude[i]=exp(par[0]);
-                bleachTime[i]=par[1];
-                bleachPoly2[i]=par[2];
-                bleachPoly3[i]=0;
-                bleachPoly4[i]=0;
-                bleachPoly5[i]=0;
-                bleachFitOK[i]=1;
-                double t1=fit_t[NFitFrames/2];
-                double t2=fit_t[2*NFitFrames/3];
-                if ( (!QFFloatIsOK(bleachAmplitude[i]))
-                     || (!QFFloatIsOK(bleachTime[i]))
-                     || (!QFFloatIsOK(bleachPoly2[i]))
-                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
-                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t2/(bleachTime[i]))))
-                     || (bleachTime[i]==0)
-                     || (std::isinf(bleachTime[i]))
-                     || (std::isinf(bleachAmplitude[i]))
-                     || (bleachAmplitude[i]==0) ) {
-                    bleachFitOK[i]=0;
+                    bleachAmplitude[i]=exp(par[0]);
+                    bleachTime[i]=par[1];
+                    bleachPoly2[i]=par[2];
+                    bleachPoly3[i]=0;
+                    bleachPoly4[i]=0;
+                    bleachPoly5[i]=0;
+                    bleachFitOK[i]=1;
+                    double t1=fit_t[NFitFramesInt/2];
+                    double t2=fit_t[2*NFitFramesInt/3];
+                    if ( (!QFFloatIsOK(bleachAmplitude[i]))
+                         || (!QFFloatIsOK(bleachTime[i]))
+                         || (!QFFloatIsOK(bleachPoly2[i]))
+                         || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
+                         || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t2/(bleachTime[i]))))
+                         || (bleachTime[i]==0)
+                         || (std::isinf(bleachTime[i]))
+                         || (std::isinf(bleachAmplitude[i]))
+                         || (bleachAmplitude[i]==0) ) {
+                        bleachFitOK[i]=0;
+                    }
                 }
                 qfFree(fit_I);
                 //qfFree(fit_Inl);
@@ -2695,71 +2707,76 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
             }
         }
     } else if (job.bleach==BLEACH_EXP_POLY3) {
-        if (fit_frames && fit_t && NFitFrames>2) {
+        if (fit_frames && fit_t && NFitFrames>4) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
                 control.maxcall=500;
                 lm_status_struct status;
 
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
-                //double* fit_Inl=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
-                    fit_I[jj]=log(fit_frames[jj*frame_width*frame_height+i]);
-                    //fit_Inl[jj]=fit_frames[jj*frame_width*frame_height+i];
-                }
-
-                double pA=0, pB=0;
-
-
-
-                double par[4]={pA, -1.0/pB,0,0};
-                int npar=3;
-
-                QVector<double> pFit(4,0.0);
-                if (statisticsPolyFit(fit_t, fit_I, NFitFrames, 3, pFit.data())) {
-                    par[0]=pFit[0];
-                    par[1]=-1.0/pFit[1];
-                    par[2]=-pFit[2]/pFit[1];
-                    par[3]=-pFit[3]/pFit[1];
-                    npar=4;
-                    lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
-
-                } else {
-                    if (statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFrames, pA, pB)) {
-                        par[0]=pA;
-                        par[1]=-1.0/pB;
+                    const double v=fit_frames[jj*frame_width*frame_height+i];
+                    if (v>0 && QFFloatIsOK(v)) {
+                        fit_I[NFitFramesInt]=log(v);
+                        NFitFramesInt++;
                     }
-                    npar=3;
-                    lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
-                    npar++;
-                    lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
-
                 }
+                bleachFitOK[i]=0;
+                if (NFitFramesInt>4) {
+
+                    double pA=0, pB=0;
 
 
-                //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
 
-                //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
-                //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
+                    double par[4]={pA, -1.0/pB,0,0};
+                    int npar=3;
 
-                bleachAmplitude[i]=exp(par[0]);
-                bleachTime[i]=par[1];
-                bleachPoly2[i]=par[2];
-                bleachPoly3[i]=par[3];
-                bleachFitOK[i]=1;
-                double t1=fit_t[NFitFrames/2];
-                double t2=fit_t[2*NFitFrames/3];
-                if ( (!QFFloatIsOK(bleachAmplitude[i]))
-                     || (!QFFloatIsOK(bleachTime[i]))
-                     || (!QFFloatIsOK(bleachPoly2[i]))
-                     || (!QFFloatIsOK(bleachPoly3[i]))
-                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
-                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t2/(bleachTime[i]))))
-                     || (bleachTime[i]==0)
-                     || (std::isinf(bleachTime[i]))
-                     || (std::isinf(bleachAmplitude[i]))
-                     || (bleachAmplitude[i]==0) ) {
-                    bleachFitOK[i]=0;
+                    QVector<double> pFit(4,0.0);
+                    if (statisticsPolyFit(fit_t, fit_I, NFitFramesInt, 3, pFit.data())) {
+                        par[0]=pFit[0];
+                        par[1]=-1.0/pFit[1];
+                        par[2]=-pFit[2]/pFit[1];
+                        par[3]=-pFit[3]/pFit[1];
+                        npar=4;
+                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
+
+                    } else {
+                        if (statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
+                            par[0]=pA;
+                            par[1]=-1.0/pB;
+                        }
+                        npar=3;
+                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
+                        npar++;
+                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
+
+                    }
+
+
+                    //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
+
+                    //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
+                    //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
+
+                    bleachAmplitude[i]=exp(par[0]);
+                    bleachTime[i]=par[1];
+                    bleachPoly2[i]=par[2];
+                    bleachPoly3[i]=par[3];
+                    bleachFitOK[i]=1;
+                    double t1=fit_t[NFitFramesInt/2];
+                    double t2=fit_t[2*NFitFramesInt/3];
+                    if ( (!QFFloatIsOK(bleachAmplitude[i]))
+                         || (!QFFloatIsOK(bleachTime[i]))
+                         || (!QFFloatIsOK(bleachPoly2[i]))
+                         || (!QFFloatIsOK(bleachPoly3[i]))
+                         || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
+                         || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t2/(bleachTime[i]))))
+                         || (bleachTime[i]==0)
+                         || (std::isinf(bleachTime[i]))
+                         || (std::isinf(bleachAmplitude[i]))
+                         || (bleachAmplitude[i]==0) ) {
+                        bleachFitOK[i]=0;
+                    }
                 }
                 qfFree(fit_I);
                 //qfFree(fit_Inl);
@@ -2782,69 +2799,74 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
 
     } else if (job.bleach==BLEACH_EXP_POLY4) {
-        if (fit_frames && fit_t && NFitFrames>2) {
+        if (fit_frames && fit_t && NFitFrames>5) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
                 control.maxcall=500;
                 lm_status_struct status;
 
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
-                //double* fit_Inl=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
-                    fit_I[jj]=log(fit_frames[jj*frame_width*frame_height+i]);
-                    //fit_Inl[jj]=fit_frames[jj*frame_width*frame_height+i];
-                }
-
-                double pA=0, pB=0;
-
-                double par[5]={pA, -1.0/pB,0,0,0};
-                int npar=4;
-
-                QVector<double> pFit(5,0.0);
-                if (statisticsPolyFit(fit_t, fit_I, NFitFrames, 4, pFit.data())) {
-                    par[0]=pFit[0];
-                    par[1]=-1.0/pFit[1];
-                    par[2]=-pFit[2]/pFit[1];
-                    par[3]=-pFit[3]/pFit[1];
-                    par[4]=-pFit[4]/pFit[1];
-                    npar=5;
-                    lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
-
-                } else {
-                    if (statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFrames, pA, pB)) {
-                        par[0]=pA;
-                        par[1]=-1.0/pB;
+                    const double v=fit_frames[jj*frame_width*frame_height+i];
+                    if (v>0 && QFFloatIsOK(v)) {
+                        fit_I[NFitFramesInt]=log(v);
+                        NFitFramesInt++;
                     }
-                    npar=3;
-                    lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
-                    npar++;
-                    lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
-                    npar++;
-                    lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
-
                 }
-                //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
+                bleachFitOK[i]=0;
+                if (NFitFramesInt>5) {
 
-                bleachAmplitude[i]=exp(par[0]);
-                bleachTime[i]=par[1];
-                bleachPoly2[i]=par[2];
-                bleachPoly3[i]=par[3];
-                bleachPoly4[i]=par[4];
-                bleachFitOK[i]=1;
-                double t1=fit_t[NFitFrames/2];
-                double t2=fit_t[2*NFitFrames/3];
-                if ( (!QFFloatIsOK(bleachAmplitude[i]))
-                     || (!QFFloatIsOK(bleachTime[i]))
-                     || (!QFFloatIsOK(bleachPoly2[i]))
-                     || (!QFFloatIsOK(bleachPoly3[i]))
-                     || (!QFFloatIsOK(bleachPoly4[i]))
-                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
-                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t2/(bleachTime[i]))))
-                     || (bleachTime[i]==0)
-                     || (std::isinf(bleachTime[i]))
-                     || (std::isinf(bleachAmplitude[i]))
-                     || (bleachAmplitude[i]==0) ) {
-                    bleachFitOK[i]=0;
+                    double pA=0, pB=0;
+
+                    double par[5]={pA, -1.0/pB,0,0,0};
+                    int npar=4;
+
+                    QVector<double> pFit(5,0.0);
+                    if (statisticsPolyFit(fit_t, fit_I, NFitFramesInt, 4, pFit.data())) {
+                        par[0]=pFit[0];
+                        par[1]=-1.0/pFit[1];
+                        par[2]=-pFit[2]/pFit[1];
+                        par[3]=-pFit[3]/pFit[1];
+                        par[4]=-pFit[4]/pFit[1];
+                        npar=5;
+                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
+
+                    } else {
+                        if (statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
+                            par[0]=pA;
+                            par[1]=-1.0/pB;
+                        }
+                        npar=3;
+                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
+                        npar++;
+                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
+                        npar++;
+                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
+
+                    }
+                    //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
+
+                    bleachAmplitude[i]=exp(par[0]);
+                    bleachTime[i]=par[1];
+                    bleachPoly2[i]=par[2];
+                    bleachPoly3[i]=par[3];
+                    bleachPoly4[i]=par[4];
+                    bleachFitOK[i]=1;
+                    double t1=fit_t[NFitFramesInt/2];
+                    double t2=fit_t[2*NFitFramesInt/3];
+                    if ( (!QFFloatIsOK(bleachAmplitude[i]))
+                         || (!QFFloatIsOK(bleachTime[i]))
+                         || (!QFFloatIsOK(bleachPoly2[i]))
+                         || (!QFFloatIsOK(bleachPoly3[i]))
+                         || (!QFFloatIsOK(bleachPoly4[i]))
+                         || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
+                         || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t2/(bleachTime[i]))))
+                         || (bleachTime[i]==0)
+                         || (std::isinf(bleachTime[i]))
+                         || (std::isinf(bleachAmplitude[i]))
+                         || (bleachAmplitude[i]==0) ) {
+                        bleachFitOK[i]=0;
+                    }
                 }
                 qfFree(fit_I);
                 //qfFree(fit_Inl);
@@ -2866,73 +2888,78 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
         }
 
     } else if (job.bleach==BLEACH_EXP_POLY5) {
-        if (fit_frames && fit_t && NFitFrames>2) {
+        if (fit_frames && fit_t && NFitFrames>6) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
                 control.maxcall=500;
                 lm_status_struct status;
 
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
-                //double* fit_Inl=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
-                    fit_I[jj]=log(fit_frames[jj*frame_width*frame_height+i]);
-                    //fit_Inl[jj]=fit_frames[jj*frame_width*frame_height+i];
-                }
-
-                double pA=0, pB=0;
-                double par[6]={pA, -1.0/pB,0,0,0,0};
-                int npar=5;
-
-                QVector<double> pFit(6,0.0);
-                if (statisticsPolyFit(fit_t, fit_I, NFitFrames, 5, pFit.data())) {
-                    par[0]=pFit[0];
-                    par[1]=-1.0/pFit[1];
-                    par[2]=-pFit[2]/pFit[1];
-                    par[3]=-pFit[3]/pFit[1];
-                    par[4]=-pFit[4]/pFit[1];
-                    par[5]=-pFit[5]/pFit[1];
-                    npar=6;
-                    lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly5Lin, &control, &status);
-
-                } else {
-                    if (statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFrames, pA, pB)) {
-                        par[0]=pA;
-                        par[1]=-1.0/pB;
+                    const double v=fit_frames[jj*frame_width*frame_height+i];
+                    if (v>0 && QFFloatIsOK(v)) {
+                        fit_I[NFitFramesInt]=log(v);
+                        NFitFramesInt++;
                     }
-                    npar=3;
-                    lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
-                    npar++;
-                    lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
-                    npar++;
-                    lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
-                    npar++;
-                    lmcurve_fit(npar, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly5Lin, &control, &status);
-
                 }
-                //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
+                bleachFitOK[i]=0;
+                if (NFitFramesInt>6) {
 
-                bleachAmplitude[i]=exp(par[0]);
-                bleachTime[i]=par[1];
-                bleachPoly2[i]=par[2];
-                bleachPoly3[i]=par[3];
-                bleachPoly4[i]=par[4];
-                bleachPoly5[i]=par[5];
-                bleachFitOK[i]=1;
-                double t1=fit_t[NFitFrames/2];
-                double t2=fit_t[2*NFitFrames/3];
-                if ( (!QFFloatIsOK(bleachAmplitude[i]))
-                     || (!QFFloatIsOK(bleachTime[i]))
-                     || (!QFFloatIsOK(bleachPoly2[i]))
-                     || (!QFFloatIsOK(bleachPoly3[i]))
-                     || (!QFFloatIsOK(bleachPoly4[i]))
-                     || (!QFFloatIsOK(bleachPoly5[i]))
-                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
-                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t2/(bleachTime[i]))))
-                     || (bleachTime[i]==0)
-                     || (std::isinf(bleachTime[i]))
-                     || (std::isinf(bleachAmplitude[i]))
-                     || (bleachAmplitude[i]==0) ) {
-                    bleachFitOK[i]=0;
+                    double pA=0, pB=0;
+                    double par[6]={pA, -1.0/pB,0,0,0,0};
+                    int npar=5;
+
+                    QVector<double> pFit(6,0.0);
+                    if (statisticsPolyFit(fit_t, fit_I, NFitFramesInt, 5, pFit.data())) {
+                        par[0]=pFit[0];
+                        par[1]=-1.0/pFit[1];
+                        par[2]=-pFit[2]/pFit[1];
+                        par[3]=-pFit[3]/pFit[1];
+                        par[4]=-pFit[4]/pFit[1];
+                        par[5]=-pFit[5]/pFit[1];
+                        npar=6;
+                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly5Lin, &control, &status);
+
+                    } else {
+                        if (statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
+                            par[0]=pA;
+                            par[1]=-1.0/pB;
+                        }
+                        npar=3;
+                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly2Lin, &control, &status);
+                        npar++;
+                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly3Lin, &control, &status);
+                        npar++;
+                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly4Lin, &control, &status);
+                        npar++;
+                        lmcurve_fit(npar, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExpPoly5Lin, &control, &status);
+
+                    }
+                    //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
+
+                    bleachAmplitude[i]=exp(par[0]);
+                    bleachTime[i]=par[1];
+                    bleachPoly2[i]=par[2];
+                    bleachPoly3[i]=par[3];
+                    bleachPoly4[i]=par[4];
+                    bleachPoly5[i]=par[5];
+                    bleachFitOK[i]=1;
+                    double t1=fit_t[NFitFramesInt/2];
+                    double t2=fit_t[2*NFitFramesInt/3];
+                    if ( (!QFFloatIsOK(bleachAmplitude[i]))
+                         || (!QFFloatIsOK(bleachTime[i]))
+                         || (!QFFloatIsOK(bleachPoly2[i]))
+                         || (!QFFloatIsOK(bleachPoly3[i]))
+                         || (!QFFloatIsOK(bleachPoly4[i]))
+                         || (!QFFloatIsOK(bleachPoly5[i]))
+                         || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
+                         || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t2/(bleachTime[i]))))
+                         || (bleachTime[i]==0)
+                         || (std::isinf(bleachTime[i]))
+                         || (std::isinf(bleachAmplitude[i]))
+                         || (bleachAmplitude[i]==0) ) {
+                        bleachFitOK[i]=0;
+                    }
                 }
                 qfFree(fit_I);
                 //qfFree(fit_Inl);
@@ -2954,66 +2981,74 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
         }
 
     } else if (job.bleach==BLEACH_DBL_EXP) {
-        if (fit_frames && fit_t && NFitFrames>2) {
+        if (fit_frames && fit_t && NFitFrames>4) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
                 lm_control_struct control=lm_control_double;
                 control.maxcall=500;
                 lm_status_struct status;
 
+
+
+
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
                 double* fit_Il=(double*)qfMalloc(NFitFrames*sizeof(double));
-                //double* fit_Inl=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
-                    fit_I[jj]=fit_frames[jj*frame_width*frame_height+i];
-                    fit_Il[jj]=log(fit_I[jj]);
-                    //fit_Inl[jj]=fit_frames[jj*frame_width*frame_height+i];
+                    const double v=fit_frames[jj*frame_width*frame_height+i];
+                    if (v>0 && QFFloatIsOK(v)) {
+                        fit_II[NFitFramesInt]=v;
+                        fit_II[NFitFramesInt]=log(v);
+                        NFitFramesInt++;
+                    }
                 }
+                bleachFitOK[i]=0;
+                if (NFitFramesInt>4) {
 
-                double pA=0, pB=0;
-                if (!statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_Il, NFitFrames, pA, pB)) {
-                    pA=fit_Il[0];
-                    pB=-1.0/(fit_t[NFitFrames-2]/(fit_Il[0]-fit_Il[NFitFrames-2]));
-                }
+                    double pA=0, pB=0;
+                    if (!statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_Il, NFitFramesInt, pA, pB)) {
+                        pA=fit_Il[0];
+                        pB=-1.0/(fit_t[NFitFramesInt-2]/(fit_Il[0]-fit_Il[NFitFramesInt-2]));
+                    }
 
 
-                //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
-                double par[4]={exp(par[0]), -1.0/pB,0,0};
-                //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
-                lmcurve_fit(2, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExp, &control, &status);
-                par[2]=par[0]/2.0;
-                par[0]=par[0]/2.0;
-                par[3]=par[1];
-                lmcurve_fit(4, par, NFitFrames, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fDblExp, &control, &status);
-                //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
+                    //double par[2]={fit_I[0], fit_t[NFitFrames-2]/(fit_I[0]-fit_I[NFitFrames-2])};
+                    double par[4]={exp(par[0]), -1.0/pB,0,0};
+                    //qDebug()<<i<<": initA="<<par[0]<<" initTau="<<par[1];
+                    lmcurve_fit(2, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fExp, &control, &status);
+                    par[2]=par[0]/2.0;
+                    par[0]=par[0]/2.0;
+                    par[3]=par[1];
+                    lmcurve_fit(4, par, NFitFramesInt, fit_t, fit_I, QFRDRImagingFCSCorrelationJobThread_fDblExp, &control, &status);
+                    //qDebug()<<i<<": A="<<par[0]<<" tau="<<par[1]<<"     norm="<<status.fnorm<<" feval="<<status.nfev<<" message="<<lm_shortmsg[status.info];
 
-                bleachAmplitude[i]=par[0];
-                bleachTime[i]=par[1];
-                bleachAmplitude2[i]=par[2];
-                bleachTime2[i]=par[3];
-                bleachPoly2[i]=0;
-                bleachPoly3[i]=0;
-                bleachPoly4[i]=0;
-                bleachPoly5[i]=0;
-                bleachFitOK[i]=1;
-                double t1=fit_t[NFitFrames/2];
-                double t2=fit_t[2*NFitFrames/3];
-                if ( (!QFFloatIsOK(bleachAmplitude[i]))
-                     || (!QFFloatIsOK(bleachTime[i]))
-                     || (!QFFloatIsOK(bleachTime2[i]))
-                     || (!QFFloatIsOK(bleachAmplitude2[i]))
-                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
-                     || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t2/(bleachTime[i]))))
-                     || (!QFFloatIsOK(bleachAmplitude2[i]*exp(-t1/(bleachTime2[i]))))
-                     || (!QFFloatIsOK(bleachAmplitude2[i]*exp(-t2/(bleachTime2[i]))))
-                     || (bleachTime[i]==0)
-                     || (bleachTime2[i]==0)
-                     || (std::isinf(bleachTime[i]))
-                     || (std::isinf(bleachAmplitude[i]))
-                     || (std::isinf(bleachTime2[i]))
-                     || (std::isinf(bleachAmplitude2[i]))
-                     || (bleachAmplitude[i]==0)
-                     || (bleachAmplitude2[i]==0) ) {
-                    bleachFitOK[i]=0;
+                    bleachAmplitude[i]=par[0];
+                    bleachTime[i]=par[1];
+                    bleachAmplitude2[i]=par[2];
+                    bleachTime2[i]=par[3];
+                    bleachPoly2[i]=0;
+                    bleachPoly3[i]=0;
+                    bleachPoly4[i]=0;
+                    bleachPoly5[i]=0;
+                    bleachFitOK[i]=1;
+                    double t1=fit_t[NFitFramesInt/2];
+                    double t2=fit_t[2*NFitFramesInt/3];
+                    if ( (!QFFloatIsOK(bleachAmplitude[i]))
+                         || (!QFFloatIsOK(bleachTime[i]))
+                         || (!QFFloatIsOK(bleachTime2[i]))
+                         || (!QFFloatIsOK(bleachAmplitude2[i]))
+                         || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
+                         || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t2/(bleachTime[i]))))
+                         || (!QFFloatIsOK(bleachAmplitude2[i]*exp(-t1/(bleachTime2[i]))))
+                         || (!QFFloatIsOK(bleachAmplitude2[i]*exp(-t2/(bleachTime2[i]))))
+                         || (bleachTime[i]==0)
+                         || (bleachTime2[i]==0)
+                         || (std::isinf(bleachTime[i]))
+                         || (std::isinf(bleachAmplitude[i]))
+                         || (std::isinf(bleachTime2[i]))
+                         || (std::isinf(bleachAmplitude2[i]))
+                         || (bleachAmplitude[i]==0)
+                         || (bleachAmplitude2[i]==0) ) {
+                        bleachFitOK[i]=0;
+                    }
                 }
                 qfFree(fit_I);
                 qfFree(fit_Il);
@@ -3042,13 +3077,13 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                 }
 
                 double pA=0, pB=0;
-                statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFrames, pA, pB);
+                statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB);
 
                 bleachAmplitude[i]=exp(pA);
                 bleachTime[i]=-1.0/pB;
                 bleachFitOK[i]=1;
-                double t1=fit_t[NFitFrames/2];
-                double t2=fit_t[2*NFitFrames/3];
+                double t1=fit_t[NFitFramesInt/2];
+                double t2=fit_t[2*NFitFramesInt/3];
                 if ( (!QFFloatIsOK(bleachAmplitude[i]))
                      || (!QFFloatIsOK(bleachTime[i]))
                      || (!QFFloatIsOK(bleachAmplitude[i]*exp(-t1/(bleachTime[i]))))
