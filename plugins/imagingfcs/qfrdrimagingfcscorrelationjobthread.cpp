@@ -2576,7 +2576,7 @@ static double QFRDRImagingFCSCorrelationJobThread_fExpPoly5Lin( double t, const 
 }
 
 
-void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames, double* fit_t, int NFitFrames) {
+void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames, double* fit_tin, int NFitFrames) {
     if (job.bleach==BLEACH_EXP) {
         if (fit_frames && fit_t && NFitFrames>2) {
             for (uint32_t i=0; i<frame_width*frame_height; i++) {
@@ -2586,9 +2586,11 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
                 int NFitFramesInt=0;
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
+                double* fit_t=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     const double v=fit_frames[jj*frame_width*frame_height+i];
                     if (v>0.0 && QFFloatIsOK(v)) {
+                        fit_t[NFitFramesInt]=fit_tin[jj];
                         fit_I[NFitFramesInt]=log(v);
                         NFitFramesInt++;
                     }
@@ -2625,6 +2627,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 qfFree(fit_I);
+                qfFree(fit_t);
                 if (i>5 && i%(frame_width*frame_height/20)==0) {
                     emit messageChanged(tr("calculating bleach correction parameters (%1/%2) ...").arg(i+1).arg(frame_width*frame_height));
                 }
@@ -2645,10 +2648,12 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
                 int NFitFramesInt=0;
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
+                double* fit_t=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     const double v=fit_frames[jj*frame_width*frame_height+i];
                     if (v>0 && QFFloatIsOK(v)) {
                         fit_I[NFitFramesInt]=log(v);
+                        fit_t[NFitFramesInt]=fit_tin[jj];
                         NFitFramesInt++;
                     }
                 }
@@ -2691,6 +2696,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 qfFree(fit_I);
+                qfFree(fit_t);
                 //qfFree(fit_Inl);
                 if (i%(frame_width*frame_height/20)==0) {
                     emit messageChanged(tr("calculating bleach correction parameters (%1/%2) ...").arg(i+1).arg(frame_width*frame_height));
@@ -2716,10 +2722,12 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
                 int NFitFramesInt=0;
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
+                double* fit_t=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     const double v=fit_frames[jj*frame_width*frame_height+i];
                     if (v>0 && QFFloatIsOK(v)) {
                         fit_I[NFitFramesInt]=log(v);
+                        fit_t[NFitFramesInt]=fit_tin[jj];
                         NFitFramesInt++;
                     }
                 }
@@ -2781,6 +2789,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 qfFree(fit_I);
+                qfFree(fit_t);
                 //qfFree(fit_Inl);
                 if (i%(frame_width*frame_height/20)==0) {
                     emit messageChanged(tr("calculating bleach correction parameters (%1/%2) ...").arg(i+1).arg(frame_width*frame_height));
@@ -2809,10 +2818,12 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
                 int NFitFramesInt=0;
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
+                double* fit_t=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     const double v=fit_frames[jj*frame_width*frame_height+i];
                     if (v>0 && QFFloatIsOK(v)) {
                         fit_I[NFitFramesInt]=log(v);
+                        fit_t[NFitFramesInt]=fit_tin[jj];
                         NFitFramesInt++;
                     }
                 }
@@ -2872,6 +2883,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 qfFree(fit_I);
+                qfFree(fit_t);
                 //qfFree(fit_Inl);
                 if (i%(frame_width*frame_height/20)==0) {
                     emit messageChanged(tr("calculating bleach correction parameters (%1/%2) ...").arg(i+1).arg(frame_width*frame_height));
@@ -2899,10 +2911,12 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
                 int NFitFramesInt=0;
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
+                double* fit_t=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     const double v=fit_frames[jj*frame_width*frame_height+i];
                     if (v>0 && QFFloatIsOK(v)) {
                         fit_I[NFitFramesInt]=log(v);
+                        fit_t[NFitFramesInt]=fit_tin[jj];
                         NFitFramesInt++;
                     }
                 }
@@ -2966,6 +2980,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 qfFree(fit_I);
+                qfFree(fit_t);
                 //qfFree(fit_Inl);
                 if (i%(frame_width*frame_height/20)==0) {
                     emit messageChanged(tr("calculating bleach correction parameters (%1/%2) ...").arg(i+1).arg(frame_width*frame_height));
@@ -2996,11 +3011,13 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
                 int NFitFramesInt=0;
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
+                double* fit_t=(double*)qfMalloc(NFitFrames*sizeof(double));
                 double* fit_Il=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     const double v=fit_frames[jj*frame_width*frame_height+i];
                     if (v>0 && QFFloatIsOK(v)) {
                         fit_I[NFitFramesInt]=v;
+                        fit_t[NFitFramesInt]=fit_tin[jj];
                         fit_Il[NFitFramesInt]=log(v);
                         NFitFramesInt++;
                     }
@@ -3056,6 +3073,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 qfFree(fit_I);
+                qfFree(fit_t);
                 qfFree(fit_Il);
                 //qfFree(fit_Inl);
                 if (i%(frame_width*frame_height/20)==0) {
@@ -3079,10 +3097,12 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
 
                 int NFitFramesInt=0;
                 double* fit_I=(double*)qfMalloc(NFitFrames*sizeof(double));
+                double* fit_t=(double*)qfMalloc(NFitFrames*sizeof(double));
                 for (int jj=0; jj<NFitFrames; jj++) {
                     const double v=fit_frames[jj*frame_width*frame_height+i];
                     if (v>0 && QFFloatIsOK(v)) {
                         fit_I[NFitFramesInt]=log(v);
+                        fit_t[NFitFramesInt]=fit_tin[jj];
                         NFitFramesInt++;
                     }
                 }
@@ -3108,6 +3128,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 qfFree(fit_I);
+                qfFree(fit_t);
                 if (i%(frame_width*frame_height/20)==0) {
                     emit messageChanged(tr("calculating bleach correction parameters (%1/%2) ...").arg(i+1).arg(frame_width*frame_height));
                 }
