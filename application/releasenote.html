@@ -160,7 +160,6 @@
             <li>improved CSV import dialog with table preview, parameter guessing and pre-saved configs</li>
             <li>QuickFit source code is compatible to Qt 5.x now!</li>
             <li>added libjpeg and updated cairo/pixman to newer versions</li>
-            <li>you can use the SHIFT/CTRL kexs now in a float editing widget to increase/decrease the mouse-wheel stepping increment.</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -300,9 +299,7 @@
             <li>after correlation: N and B records are now split by color channel (when newly inserted into the project!)</li>
             <li>selection builder/mask builder can now be applied to a selectable list of records and can optionally save the selection to a named selection</li>
             <li>mask by intensity supports relaxed color-scaling for overview image</li>
-            <li>bugfix: "mask/selection by ..." dialogs do no longer loose settings, when closed</li>
-            <li>overview images (correltion functions/countrates tab) now scales colors only for the displayed pixels.</li>
-            <li>set background from mask/selection now excludes the upper/lower 5% of the pixels (by quatiles), before calculating Avg/Var. This improves on the robustnes of the statistics!</li>
+            <li>improved bleach correction in correlator: In some cases, the background correction could lead to negative values in the intensity traces, which could lead to bad bleach correction. These values are filtered now!</li>
           </ul></li>
         <li><b>table</b><ul>
             <li>added "QuickStatistics" and "QuickHistogram" tools, which show the statistics and histograms of the current selection (column-wise)</li>
