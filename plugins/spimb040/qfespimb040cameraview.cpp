@@ -1001,7 +1001,7 @@ void QFESPIMB040CameraView::imageMouseMoved(double x, double y) {
 
     if (actMeasure->isChecked()) {
         if ((xx>=0) && (xx<image.width()) && (yy>=0) && (yy<image.height())) {
-            QString s=QLocale::system().toString(image(xx,yy));
+            QString s=QLocale::system().toString((qlonglong)image(xx,yy));
             if (mask(xx, yy)) {
                 s=s+tr(" <font color=\"red\">[broken pixel]</font>");
             }
@@ -1016,7 +1016,7 @@ void QFESPIMB040CameraView::imageMouseMoved(double x, double y) {
         }
     } else {
         if ((xx>=0) && (xx<image.width()) && (yy>=0) && (yy<image.height())) {
-            QString s=QLocale::system().toString(image(xx,yy));
+            QString s=QLocale::system().toString((qlonglong)image(xx,yy));
             if (mask(xx, yy)) {
                 s=s+tr(" <font color=\"red\">[broken pixel]</font>");
             }
