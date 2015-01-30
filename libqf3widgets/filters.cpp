@@ -420,10 +420,10 @@ QF3DualViewWidget::Orientation QF3DualViewWidget::orientation() const
 
 void QF3DualViewWidget::setReadOnly(bool ro)
 {
-    cmbDirection->setEnabled(ro);
-    fltSplitter->setEnabled(ro);
-    fltShort->setEnabled(ro);
-    fltLong->setEnabled(ro);
+    cmbDirection->setReadOnly(!ro);
+    fltSplitter->setReadOnly(ro);
+    fltShort->setReadOnly(ro);
+    fltLong->setReadOnly(ro);
 }
 
 void QF3DualViewWidget::setFilterINI(QString globalfilters, QString localfilters)
@@ -471,7 +471,7 @@ QF3DualViewWidget::QF3DualViewWidget(QWidget *parent):
     lay=new QGridLayout();
     setLayout(lay);
     QLabel* l=NULL;
-    cmbDirection=new QComboBox(this);
+    cmbDirection=new QEnhancedComboBox(this);
     cmbDirection->addItem(QIcon(":/libqf3widgets/dvhor.png"), tr("horizontal"));
     cmbDirection->addItem(QIcon(":/libqf3widgets/dvver.png"), tr("vertical"));
     lay->addWidget(new QLabel(tr("<small>&orientation:</small>")),0,0);

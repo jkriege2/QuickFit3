@@ -431,6 +431,81 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                                if (ui_lightsource.contains(used_by)) ui_lightsource[used_by].filters.append(id);
                            }
                            ui_filters[id]=w;
+
+
+                       } else if (type=="dualview") {
+                           QF3DualViewWidget* w=new QF3DualViewWidget(this);
+                           widNew=w;
+                           QString gf=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("global_filters", global_filters.toStdString()).c_str()));
+                           QString lf=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("local_filters", QString(m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini").toStdString()).c_str()));
+                           w->setFilterINI(gf, lf);
+                           QLabel* l=NULL;
+                           QCheckBox* cb=NULL;
+                           if (settings.getAsBool("checkable", true)) {
+                               cb=new QCheckBox(title, this);
+                               cb->setChecked(settings.getAsBool("checked", true));
+                               ingroupLayout->addWidget(cb, y,x, rowSpan, 1, Qt::AlignTop|Qt::AlignLeft);
+                               //connect(cb, SIGNAL(clicked(bool)), w, SLOT(setEnabled(bool)));
+                               connect(cb, SIGNAL(toggled(bool)), this, SLOT(changeDVenabledState()));
+                           } else {
+                               l=new QLabel(title, this);
+                               l->setTextFormat(Qt::AutoText);
+                               l->setBuddy(w);
+                               ingroupLayout->addWidget(l, y,x, rowSpan, 1, Qt::AlignTop|Qt::AlignLeft);
+                           }
+                           ingroupLayout->addWidget(w, y,x+1, rowSpan, qMax(1,colSpan-1));
+                           if (!used_by.isEmpty()) {
+                               if (ui_cameras.contains(used_by)) {
+                                   ui_cameras[used_by].dualview.append(id);
+                                   //connect(ui_cameras[used_by].config, SIGNAL(clicked(bool)), w, SLOT(setEnabled(bool)));
+                                   if (l) connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), l, SLOT(setEnabled(bool)));
+                                   if (cb) connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), cb, SLOT(setEnabled(bool)));
+                                   w->setEnabled(ui_cameras[used_by].config->isChecked());
+                               }
+                           }
+                           ui_dualviews[id]=qMakePair(cb,w);
+                           connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
+                           w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
+
+                       } else if (type=="objective") {
+                           QF3ObjectiveCombobox* w=new QF3ObjectiveCombobox(this);
+                           widNew=w;
+                           QString gf=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("global_objectives", global_objectives.toStdString()).c_str()));
+                           QString lf=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("local_objectives", QString(m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini").toStdString()).c_str()));
+                           w->setObjectivesINI(gf, lf);
+                           QLabel* l=new QLabel(title, this);
+                           l->setBuddy(w);
+                           l->setTextFormat(Qt::AutoText);
+                           ingroupLayout->addWidget(l, y,x, rowSpan, 1, Qt::AlignTop|Qt::AlignLeft);
+                           ingroupLayout->addWidget(w, y,x+1, rowSpan, qMax(1,colSpan-1));
+                           ui_objectives[id]=w;
+                           if (special_role=="detection_objective") {
+                               objDetection=id;
+                           } else if (special_role=="projection_objective") {
+                               objProjection=id;
+                           }
+                           if (!used_by.isEmpty()) {
+                               if (ui_cameras.contains(used_by))  {
+                                   //if (subtype=="tubelens" || special_role=="tubelens" || special_role=="detection_objective") {
+                                       ui_cameras[used_by].tubelens=id;
+                                       connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), w, SLOT(setEnabled(bool)));
+                                       if (l) connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), l, SLOT(setEnabled(bool)));
+                                       w->setEnabled(ui_cameras[used_by].config->isChecked());
+                                       if (l) l->setEnabled(ui_cameras[used_by].config->isChecked());
+                                   //}
+                               }
+                           }
+                           connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
+                           w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
+
+                       } else if (type=="horizontal_stretch") {
+                           QSpacerItem* w=new QSpacerItem(width,height,QSizePolicy::Expanding,QSizePolicy::Minimum);
+                           //w->setObjectName(id);
+                           ingroupLayout->addItem(w, y,x, rowSpan, colSpan);
+                       } else if (type=="vertical_stretch") {
+                           QSpacerItem* w=new QSpacerItem(width,height,QSizePolicy::Minimum,QSizePolicy::Expanding);
+                           //w->setObjectName(id);
+                           ingroupLayout->addItem(w, y,x, rowSpan, colSpan);
                        } else if (type=="camera") {
                            QFESPIMB040SimpleCameraConfig* w=new QFESPIMB040SimpleCameraConfig(this);
                            widNew=w;
@@ -671,79 +746,6 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                            connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
                            w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
 
-                       } else if (type=="dualview") {
-                           QF3DualViewWidget* w=new QF3DualViewWidget(this);
-                           widNew=w;
-                           QString gf=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("global_filters", global_filters.toStdString()).c_str()));
-                           QString lf=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("local_filters", QString(m_pluginServices->getConfigFileDirectory()+"/spimb040_filters.ini").toStdString()).c_str()));
-                           w->setFilterINI(gf, lf);
-                           QLabel* l=NULL;
-                           QCheckBox* cb=NULL;
-                           if (settings.getAsBool("checkable", true)) {
-                               cb=new QCheckBox(title, this);
-                               cb->setChecked(settings.getAsBool("checked", true));
-                               ingroupLayout->addWidget(cb, y,x, rowSpan, 1, Qt::AlignTop|Qt::AlignLeft);
-                               //connect(cb, SIGNAL(clicked(bool)), w, SLOT(setEnabled(bool)));
-                               connect(cb, SIGNAL(toggled(bool)), this, SLOT(changeDVenabledState()));
-                           } else {
-                               l=new QLabel(title, this);
-                               l->setTextFormat(Qt::AutoText);
-                               l->setBuddy(w);
-                               ingroupLayout->addWidget(l, y,x, rowSpan, 1, Qt::AlignTop|Qt::AlignLeft);
-                           }
-                           ingroupLayout->addWidget(w, y,x+1, rowSpan, qMax(1,colSpan-1));
-                           if (!used_by.isEmpty()) {
-                               if (ui_cameras.contains(used_by)) {
-                                   ui_cameras[used_by].dualview.append(id);
-                                   //connect(ui_cameras[used_by].config, SIGNAL(clicked(bool)), w, SLOT(setEnabled(bool)));
-                                   if (l) connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), l, SLOT(setEnabled(bool)));
-                                   if (cb) connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), cb, SLOT(setEnabled(bool)));
-                                   w->setEnabled(ui_cameras[used_by].config->isChecked());
-                               }
-                           }
-                           ui_dualviews[id]=qMakePair(cb,w);
-                           connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
-                           w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
-
-                       } else if (type=="objective") {
-                           QF3ObjectiveCombobox* w=new QF3ObjectiveCombobox(this);
-                           widNew=w;
-                           QString gf=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("global_objectives", global_objectives.toStdString()).c_str()));
-                           QString lf=QFileInfo(filename).absoluteDir().absoluteFilePath(QString(settings.getAsString("local_objectives", QString(m_pluginServices->getConfigFileDirectory()+"/spimb040_objectives.ini").toStdString()).c_str()));
-                           w->setObjectivesINI(gf, lf);
-                           QLabel* l=new QLabel(title, this);
-                           l->setBuddy(w);
-                           l->setTextFormat(Qt::AutoText);
-                           ingroupLayout->addWidget(l, y,x, rowSpan, 1, Qt::AlignTop|Qt::AlignLeft);
-                           ingroupLayout->addWidget(w, y,x+1, rowSpan, qMax(1,colSpan-1));
-                           ui_objectives[id]=w;
-                           if (special_role=="detection_objective") {
-                               objDetection=id;
-                           } else if (special_role=="projection_objective") {
-                               objProjection=id;
-                           }
-                           if (!used_by.isEmpty()) {
-                               if (ui_cameras.contains(used_by))  {
-                                   if (subtype=="tubelens") {
-                                       ui_cameras[used_by].tubelens=id;
-                                       connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), w, SLOT(setEnabled(bool)));
-                                       if (l) connect(ui_cameras[used_by].config, SIGNAL(toggled(bool)), l, SLOT(setEnabled(bool)));
-                                       w->setEnabled(ui_cameras[used_by].config->isChecked());
-                                       if (l) l->setEnabled(ui_cameras[used_by].config->isChecked());
-                                   }
-                               }
-                           }
-                           connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
-                           w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
-
-                       } else if (type=="horizontal_stretch") {
-                           QSpacerItem* w=new QSpacerItem(width,height,QSizePolicy::Expanding,QSizePolicy::Minimum);
-                           //w->setObjectName(id);
-                           ingroupLayout->addItem(w, y,x, rowSpan, colSpan);
-                       } else if (type=="vertical_stretch") {
-                           QSpacerItem* w=new QSpacerItem(width,height,QSizePolicy::Minimum,QSizePolicy::Expanding);
-                           //w->setObjectName(id);
-                           ingroupLayout->addItem(w, y,x, rowSpan, colSpan);
                        } else {
                            m_log->log_error(tr("\nERROR reading optSetup-file '%1':\n    item '%2' has unknown type '%3'. Ignoring element!\n").arg(filename).arg(id).arg(type));
                            ok=false;

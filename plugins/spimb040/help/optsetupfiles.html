@@ -38,7 +38,7 @@
           <li><tt>colstretch</tt> specifies how the columns with sub-widgets are stretched (see <a href="#stretch">above</a>)</li>
           <li><tt>rowstretch</tt> specifies how the rows with sub-widgets are stretched (see <a href="#stretch">above</a>)</li>
         </ul>
-        Here is an example of a group (group_transmission) widget inside the first tab (page_illumination) of a tab widget (tab_left):
+        Here is an example of a group (<code>group_transmission</code>) widget inside the first tab (<code>page_illumination</code>) of a tab widget (tab_left):
 <pre>
 [tab_left]
 type=tabwidget
@@ -57,66 +57,236 @@ title="transmission illumination"
 colstretch="0,1"
 </pre>
         </li>
-        <li>The widgets listed below are available. Only the non-standard properties are listed (so, x, y, ... are available for all widgets, see <a href="#defprops">above</a>)
-        <ul>
-          <li><tt><b>group box</b></tt> (type = <tt>group</tt>): This can carry subwidgets!
+        <li>Cameras (see below) are special widgets, that can have several other widgets assigned to it (e.g. a dualview, filters, tube lenses ...). To make this ordering, you have to set the property <tt>used_by</tt> of the other widget to the ID of the camera. Here is an example of a camera with a detection objective, a detection filter and a tube-lens (the objective is independent of the camera, but the filter and the tube lens are <tt>used_by</tt> the camera!!!:
+<blockquote>
+<pre>
+[<b>detection_objective</b>]
+type=objective
+title="detection objective:"
+special_role=detection_objective    
+
+[<b>camera1</b>]
+type=camera
+title="Camera:"
+checkable=true
+
+[<b>camera1_tubelens</b>]
+type=objective
+subtype=tubelens
+<b>used_by=camera1</b>
+title="tube lens:"
+
+[<b>camera1_filter</b>]
+type=filter
+<b>used_by=camera1</b>
+title="detection filter:"
+</pre>    
+</blockquote>
+ If the camera is deactivated, also the widgets, used by it will be deactivated. 
+</li>
+        <li>
+          </li>
+
+          </ul>
+        </li>
+    </ul>
+    </p>
+
+
+
+<h3>Available Widgets</h3>
+<p>The widgets listed below are available. Only the non-standard properties are listed (so, x, y, ... are available for all widgets, see <a href="#defprops">above</a>):</p>
+
+
+
+<h4>Group Box</h4>
+<p><b>group box</b> (type = <tt>group</tt>): This can carry subwidgets!
             <ul>
               <li><tt>title</tt>: title of the groupbox, displayed in its header</li>
               <li><tt>checkable</tt>: group box has a checkbox in the title</li>
               <li><tt>checked</tt>: initial check state</li>
               <li><tt>flat</tt>: flat style of the group box</li>
-            </ul>
-          </li>
-          <li><tt><b>framed box</b></tt> (type = <tt>frame</tt>): This can carry subwidgets!
+            </ul></p>
+
+<h4>Framed Box</h4>
+<p><b>framed box</b> (type = <tt>frame</tt>): This can carry subwidgets!
             <ul>
               <li><tt>shadow</tt> (raised|plain|sunken): style of the shadow</li>
               <li><tt>shape</tt> (panel|none|box|styledpanel|hline|vline|winpanel): shape of the box</li>
               <li><tt>linewidth</tt>: width of the frame's' line (in pixels))</li>
               <li><tt>midlinewidth</tt>: width of the frame's mid' line (in pixels))</li>
-            </ul>
-          </li>
-          <li><tt><b>Tab Widget</b></tt> (type = <tt>tabwidget</tt>): This widget can carry "tabpage widgets as subwidgets only"
-          </li>
-          <li><tt><b>Tab Page inside a tab widget</b></tt> (type = <tt>tabpage</tt>): This can carry subwidgets! 
+            </ul></p>
+
+<h4>Tab Widget</h4>
+<p><b>Tab Widget</b> (type = <tt>tabwidget</tt>): This widget can carry "tabpage widgets as subwidgets only"
+          </p>
+
+<h4>Tab Page in Tab Widget</h4>
+<p><b>Tab Page inside a tab widget</b> (type = <tt>tabpage</tt>): This can carry subwidgets! 
               <ul>
                 <li><tt>title</tt>: title of the page</li>
-              </ul>
-          </li>
-          <li><tt><b>Label</b></tt> (type = <tt>label</tt>):
+                <li><tt>inwidget</tt>: ID of the tabwidget, in which this tab resides</li>
+              </ul></p>
+
+<h4>Label</h4>
+<p><b>Label</b> (type = <tt>label</tt>):
             <ul>
               <li><tt>title</tt>: text displayed in the widget</li>
               <li><tt>image</tt>: if this points to a valid image file (.png, .svg ...) the image will be displayed instead of the title</li>
-            </ul>
-          </li>
-          <li><tt><b></b></tt> (type = <tt></tt>):
-            <ul>
-              <li><tt></tt>: </li>
-            </ul>
-          </li>
-          <li><tt><b></b></tt> (type = <tt></tt>):
-            <ul>
-              <li><tt></tt>: </li>
-            </ul>
-          </li>
-          <li><tt><b></b></tt> (type = <tt></tt>):
-            <ul>
-              <li><tt></tt>: </li>
-            </ul>
-          </li>
+            </ul></p>
 
-<!--
-          <li><tt><b></b></tt> (type = <tt></tt>):
-            <ul>
-              <li><tt></tt>: </li>
-            </ul>
-          </li>
 
--->
-          </ul>
-        </li>
-        
-    </ul>
-    </p>
+<h4>Horizontal Stretch</h4>
+<p>
+<b>Horizontal Stretch</b> (type = <tt>horizontal_stretch</tt>): A stretch expands, as much as possible, but leaves enough space for the other widgets. SO of you add three widgets at the lhs and then a stretch at the rhs, the widgets will take a default size and will be compressed by the stretch to the left.
+  
+</p>
+
+<h4>Vertical Stretch</h4>
+<p>
+<b>Vertical Stretch</b> (type = <tt>vertical_stretch</tt>): A stretch expands, as much as possible, but leaves enough space for the other widgets. So of you add three widgets at the top and then a stretch at the bottom, the widgets will take a default size and will be compressed by the stretch to the top.
+  
+</p>
+
+<h4>Filter</h4>
+<p><b>Filter</b> (type = <tt>filter</tt>): A widget, which allows the user to select a filter from a list (drop-down widget)
+<ul>
+    <li><tt>title</tt>: text displayed in the widget</li>
+    <li><tt>global_filters</tt> <i>(optional)</i>: points to a global INI file which contains the available filters. By default, this points to QuickFit's global filter file. You can set this, if you supply a filters.ini with yout optSetup</li>
+    <li><tt>local_filters</tt> <i>(optional)</i>: points to a local INI file which contains the available filters (this overrides the contents of the global filters.ini!!!). By default, this points to QuickFit's global filter file. You can set this, if you supply a filters.ini with yout optSetup</li>
+    <li><tt>used_by</tt>: a camera (i.e. a camera widget's ID), this widget is assigned to (see above)</li>
+</ul></p>
+
+
+
+<h4>Dual View</h4>
+<p>
+<b>Dual View</b> (type = <tt>dualview</tt>): This widgets allows to select the filterset inside a DualView optics, i.e. it contains a combobox to select, whether the DV is splitting horizontally or vertically and three filter combobox, which allow to select the beam-splitter and the filters in the two detection beam paths.
+  <ul>
+    <li><tt>title</tt>: text displayed in the widget</li>
+    <li><tt>checkable</tt>: widgets can be checked/unchecked, to switch it off (e.g. to indicate, that the DV was in transmission mode)</li>
+    <li><tt>checked</tt>: initial check state</li>
+    <li><tt>global_filters</tt> <i>(optional)</i>: points to a global INI file which contains the available filters. By default, this points to QuickFit's global filter file. You can set this, if you supply a filters.ini with yout optSetup</li>
+    <li><tt>local_filters</tt> <i>(optional)</i>: points to a local INI file which contains the available filters (this overrides the contents of the global filters.ini!!!). By default, this points to QuickFit's global filter file. You can set this, if you supply a filters.ini with yout optSetup</li>
+    <li><tt>used_by</tt>: a camera (i.e. a camera widget's ID), this widget is assigned to (see above)</li>
+
+  </ul>
+</p>
+
+
+<h4>Filter Changer/Wheel</h4>
+<p>
+<b>filter cahnger/wheel</b> (type = <tt>filterchanger</tt>):
+  <ul>
+    <li><tt>title</tt>: text displayed in the widget</li>
+    <li><tt>special_role = detection </tt>: if this filter changer/wheel is the main detection filter wheel</li>
+    <li><tt>global_filters</tt> <i>(optional)</i>: points to a global INI file which contains the available filters. By default, this points to QuickFit's global filter file. You can set this, if you supply a filters.ini with yout optSetup</li>
+    <li><tt>local_filters</tt> <i>(optional)</i>: points to a local INI file which contains the available filters (this overrides the contents of the global filters.ini!!!). By default, this points to QuickFit's global filter file. You can set this, if you supply a filters.ini with yout optSetup</li>
+    <li><tt>used_by
+  </ul>
+</p>
+
+
+<h4>Objective</h4>
+<p><b>Objective/Lens</b> (type = <tt>objective</tt>): A widget, which allows the user to select an (objective) lens from a list (drop-down widget)
+<ul>
+    <li><tt>title</tt>: text displayed in the widget</li>
+    <li><tt>global_objectives</tt> <i>(optional)</i>: points to a global INI file which contains the available objectives/lenses. By default, this points to QuickFit's global objectives/lenses file. You can set this, if you supply a objectives.ini with yout optSetup</li>
+    <li><tt>local_objectives</tt> <i>(optional)</i>: points to a local INI file which contains the available objectives/lenses (this overrides the contents of the global filters.ini!!!). By default, this points to QuickFit's global objectives/lenses file. You can set this, if you supply a objectives.ini with yout optSetup</li>
+    <li><tt>used_by</tt>: a camera (i.e. a camera widget's ID), this widget is assigned to (see above)</li>
+    <li><tt>special_role = detection_objective | projection_objective | tubelens | ...</tt>: the special role of an objective in your setup. </li>
+</ul></p>
+
+
+<h4>Camera</h4>
+<p>
+<b>Camera</b> (type = <tt>camera</tt>): This is a widget, that allows to control a camera (via a QuickFit camera plugin). You can select the camera to use, start a preview (and change its config), ...
+  <ul>
+    <li><tt>title</tt>: text displayed in the widget</li>
+  </ul>
+</p>
+
+
+
+<h4>Measurement Device</h4>
+<p>
+<b>Measurement Device</b> (type = <tt>measurement_device</tt>): controls a general QuickFit measurement device
+  <ul>
+    <li><tt>title</tt>: text displayed in the widget</li>
+  </ul>
+</p>
+
+
+<h4>Single stage axis</h4>
+<p>
+<b>Single stage axis</b> (type = <tt>stage</tt>): controls a single axis of a translation/rotation stage
+  <ul>
+    <li><tt>title</tt>: text displayed in the widget</li>
+    <li><tt>special_role = x | y | z | r </tt>: if this axis is the x, y, z, rotation-axis of your setup, you can assign this special role</li>
+ </ul>
+</p>
+
+
+
+
+
+<h4>XYZ stage</h4>
+<p>
+<b>XYZ translation stage</b> (type = <tt>stages_xyz</tt>): A widget, which controls three stages to represent the x-, y- and z-axis
+  <ul>
+    <li><tt>title</tt>: text displayed in the widget</li>
+    <li><tt>special_role = xyz | xzy | yxz | yzx | zxy | zyx </tt>: which stage is which axis.</li>
+  </ul>
+</p>
+
+
+
+<h4>Shutter</h4>
+<p>
+<b>Shutter</b> (type = <tt>shutter</tt>):
+  <ul>
+    <li><tt>title</tt>: text displayed in the widget</li>
+    <li><tt>special_role = main_shutter</tt>: this is a main shutter</li>
+    <li><tt>special_role = main_shutter_open_only </tt>: this shutter should be opened, when the main shutter is opened, but not automatically closed</li>
+    <li><tt>special_role = main_shutter_close_only</tt>: this shutter should be closed, when the main shutter is closed, but not automatically opened</li>
+    <li><tt>special_role = laser1_shutter</tt>: this shutter switches the first illumination laser on/off</li>
+    <li><tt>special_role = laser2_shutter</tt>: this shutter switches the second illumination laser on/off</li>
+    <li><tt>special_role = transmission_shutter</tt>: this shutter switches the transmission illumination on/off</li>
+    <li><tt>used_by</tt>: a camera (i.e. a camera widget's ID), this widget is assigned to (see above)</li>
+    <li><tt></tt>: </li>
+  </ul>
+  $$note:The <tt>special_role</tt> can also contain a comma-separated list of entries!!!$$
+</p>
+
+
+
+<h4>Light Source</h4>
+<p>
+<b>Light SOurce</b> (type = <tt>lightsource</tt>):
+  <ul>
+    <li><tt>title</tt>: text displayed in the widget</li>
+    <li><tt>sub_type = laser</tt>: this is a laser</li>
+    <li><tt>sub_type = brightfield </tt>: this is a brightfield illumination source</li>
+    <li><tt>sub_type = brightfield_transmission </tt>: this is a brightfield transmission illumination source</li>
+    <li><tt>sub_type = brightfield_epi </tt>: this is a brightfield epi-illumination source</li>
+  </ul>
+</p>
+
+
+<!--<h4></h4>
+<p>
+<b></b> (type = <tt></tt>):
+  <ul>
+    <li><tt></tt>: </li>
+    <li><tt></tt>: </li>
+    <li><tt></tt>: </li>
+  </ul>-->
+  
+  
+</p>
+
+
+
 
   </body>
 </html>

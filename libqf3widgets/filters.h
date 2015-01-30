@@ -181,7 +181,7 @@ class QFWIDLIB_EXPORT QF3DualViewWidget : public QWidget {
     public slots:
         void setReadOnly(bool ro);
     protected:
-        QComboBox* cmbDirection;
+        QEnhancedComboBox* cmbDirection;
         QF3FilterCombobox* fltSplitter;
         QF3FilterCombobox* fltShort;
         QF3FilterCombobox* fltLong;
