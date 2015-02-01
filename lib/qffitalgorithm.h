@@ -30,6 +30,7 @@
 #include <stdint.h>
 #include "qfrawdatarecord.h"
 #include "qfproperties.h"
+#include "qffitfunctionnd.h"
 
 /*! \brief reporter interface for fitting algorithms
     \ingroup qf3lib_fitting
@@ -212,14 +213,135 @@ class QFLIB_EXPORT QFFitAlgorithm {
                     \param dataWeights the weight vector \f$ \sigma_m \f$
                     \param M number of datapoints
                 */
-                explicit FitFunctionFunctor(const double* dataX, const double* dataY, const double* dataWeight, uint64_t M) ;
+                explicit FitFunctionFunctor(const double* dataX, const double* dataF, const double* dataWeight, uint64_t M) ;
 
                 virtual ~FitFunctionFunctor();
 
                 /** \brief returns a pointer to the current x-data \f$ x_m \f$ */
                 const double* getDataX() const;
                 /** \brief returns a pointer to the current y-data \f$ y_m \f$ */
+                const double* getDataF() const;
+                /** \brief returns a pointer to the current weights-data \f$ \sigma_m \f$ */
+                const double* getDataWeight() const;
+                /** \brief returns the current number of datapoints in the \f$(x_m,y_m,\sigma_m)\f$ dataset. */
+                uint64_t getDataPoints() const;
+
+                /** \brief sets a new input data vector for x-data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
+                void setDataX(const double* data);
+                /** \brief sets a new input data vector for y-data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
+                void setDataF(const double* data);
+                /** \brief sets a new input data vector for weights-data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
+                void setDataWeight(const double* data);
+                /** \brief sets a new count of input data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
+                void setDataPoints(uint64_t data);
+
+                /** \brief prepares a new selection of data for bootstrapping
+                 *
+                 * \note if you only want to reapply the current selection and not select new data, call reapplyBootstrapselection() instead.
+                 */
+                virtual void prepareBootstrapSelection();
+                /** \brief this function reapplies the current bootstrappig selection, i.e. if the input-data changed, but not its number and also the selection should not be recreated.
+                 *
+                 * \note to create a new subset from the input data, call prepareBootstrapSelection()
+                 */
+                virtual void reapplyBootstrapselection();
+                /** \brief switches bootstrapping on and off, if \c enabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
+                virtual void setBootstrappingEnabled(bool enabled, bool prepBootstrapping=true);
+                virtual bool getBootstrappingEnabled() const;
+                /** \brief sets the fraction of the datapoints, that are selected by prepareBootstrapSelection(), if \c bootstrappingEnabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
+                virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true);
+                virtual double getBootstrappingFraction() const;
+
+            protected:
+
+                /** \brief the x-values data vector \f$ x_m \f$, possibly with a bootstrapping selection */
+                const double* m_dataX;
+                /** \brief the y-values data vector \f$ y_m \f$, possibly with a bootstrapping selection */
+                const double* m_dataF;
+                /** \brief the weight vector \f$ \sigma_m \f$, possibly with a bootstrapping selection */
+                const double* m_dataWeight;
+                /** \brief number of datapoints, possibly with a bootstrapping selection      */
+                uint64_t m_M;
+
+
+                /** \brief fraction [0..1] of data points, selected by  prepareBootstrapSelection(). The default value is 0.7. */
+                double m_bootstrapFraction;
+                /** \brief indicates, whether bootstrapping is enabled */
+                bool m_bootstrapEnabled;
+
+            private:
+                /** \brief the x-values data vector \f$ x_m \f$ before bootstrapping selection */
+                const double* i_dataX;
+                /** \brief the y-values data vector \f$ y_m \f$ before bootstrapping selection */
+                const double* i_dataF;
+                /** \brief the weight vector \f$ \sigma_m \f$ before bootstrapping selection */
+                const double* i_dataWeight;
+                /** \brief number of datapoints before bootstrapping selection      */
+                uint64_t i_M;
+
+                /** \brief helper-vector, used for bootstrapping */
+                QVector<double> bootstrappedX;
+                /** \brief helper-vector, used for bootstrapping */
+                QVector<double> bootstrappedF;
+                /** \brief helper-vector, used for bootstrapping */
+                QVector<double> bootstrappedW;
+                /** \brief shuffled list of indexes into the input data, used to select the bootstrap data */
+                QList<uint64_t> bootstrapIDs;
+        };
+
+
+
+        /*! \brief base class for QFFitAlgorthm::Functor classes that let the user fit a dataset \f$(x_m,y_m,f_m,\sigma_m)\f$ to a 1D-function
+
+                \f[ g_m(\vec{p})=\frac{f_m-f(x_m,y_m; m(\vec{p}))}{\sigma_m} \f]
+
+            This class does not assume anything about the function \f$f(\cdot)\f$. it's implementatoin
+            is left to child classes of this virtual class (see e.g. QFFitAlgorithm::FitQFFitFunctionFunctor ).
+
+            This function implements a mode for bootstrapping during the fit. In this mode, not all \f$ N \f$ data in  \f$(x_m,y_m,f_m,\sigma_m)\f$ are used for the fit,
+            but only a subset of \f$ \mbox{bootstrapFraction}\cdot N \f$ datapoints, which are chosen randomly from the provided input data on every call of
+            prepareBootstrapSelection(). This feature can be used to implement e.g. error estimates by bootstrapping of the fit input data vector, i.e.
+            repeat the fit \f$ M \f$ times with each time a new subset of data and the calculate the standard deviation of the fit values.
+
+            This class manages the data internally and the protected members m_dataX, m_dataY and m_dataWeight are redirected, as required.
+            they are also returned by getDatX(), getDataY(), getDataWeight(). The same is done for m_M and getDataPoints().
+            These arrays either point to the arrays, provided in the constructor or by the \c setData...() methods, if bootstrapping is
+            disabled, or they point to internal vectors, which contain the currently selected subset of the dataset.
+
+            \note The default bootstrapFraction is 0.7!
+        */
+        class QFLIB_EXPORT FitFunctionFunctor2D: public Functor, public FunctorBootstrapInterface {
+            public:
+                /*! \brief constructor, initializes the functor
+                    \param dataX the x-values data vector \f$ x_m \f$
+                    \param dataY the y-values data vector \f$ y_m \f$
+                    \param dataF the f-values data vector \f$ f_m \f$
+                    \param dataWeights the weight vector \f$ \sigma_m \f$
+                    \param M number of datapoints
+                */
+                explicit FitFunctionFunctor2D(const double* dataX, const double* dataY, const double* dataF, const double* dataWeight, uint64_t M) ;
+
+                virtual ~FitFunctionFunctor2D();
+
+                /** \brief returns a pointer to the current x-data \f$ x_m \f$ */
+                const double* getDataX() const;
+                /** \brief returns a pointer to the current y-data \f$ y_m \f$ */
                 const double* getDataY() const;
+
+                /** \brief returns a pointer to the current f-data \f$ f_m \f$ */
+                const double* getDataF() const;
                 /** \brief returns a pointer to the current weights-data \f$ \sigma_m \f$ */
                 const double* getDataWeight() const;
                 /** \brief returns the current number of datapoints in the \f$(x_m,y_m,\sigma_m)\f$ dataset. */
@@ -235,6 +357,12 @@ class QFLIB_EXPORT QFFitAlgorithm {
                  * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
                  */
                 void setDataY(const double* data);
+
+                /** \brief sets a new input data vector for f-data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
+                void setDataF(const double* data);
                 /** \brief sets a new input data vector for weights-data
                  *
                  * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
@@ -269,6 +397,9 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 const double* m_dataX;
                 /** \brief the y-values data vector \f$ y_m \f$, possibly with a bootstrapping selection */
                 const double* m_dataY;
+
+                /** \brief the y-values data vector \f$ f_m \f$, possibly with a bootstrapping selection */
+                const double* m_dataF;
                 /** \brief the weight vector \f$ \sigma_m \f$, possibly with a bootstrapping selection */
                 const double* m_dataWeight;
                 /** \brief number of datapoints, possibly with a bootstrapping selection      */
@@ -285,6 +416,9 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 const double* i_dataX;
                 /** \brief the y-values data vector \f$ y_m \f$ before bootstrapping selection */
                 const double* i_dataY;
+
+                /** \brief the y-values data vector \f$ f_m \f$ before bootstrapping selection */
+                const double* i_dataF;
                 /** \brief the weight vector \f$ \sigma_m \f$ before bootstrapping selection */
                 const double* i_dataWeight;
                 /** \brief number of datapoints before bootstrapping selection      */
@@ -294,6 +428,152 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 QVector<double> bootstrappedX;
                 /** \brief helper-vector, used for bootstrapping */
                 QVector<double> bootstrappedY;
+                /** \brief helper-vector, used for bootstrapping */
+                QVector<double> bootstrappedF;
+                /** \brief helper-vector, used for bootstrapping */
+                QVector<double> bootstrappedW;
+                /** \brief shuffled list of indexes into the input data, used to select the bootstrap data */
+                QList<uint64_t> bootstrapIDs;
+        };
+
+
+        /*! \brief base class for QFFitAlgorthm::Functor classes that let the user fit a dataset \f$(x_m,y_m,z_m,f_m,\sigma_m)\f$ to a 1D-function
+
+                \f[ g_m(\vec{p})=\frac{f_m-f(x_m,y_m,z_m; m(\vec{p}))}{\sigma_m} \f]
+
+            This class does not assume anything about the function \f$f(\cdot)\f$. it's implementatoin
+            is left to child classes of this virtual class (see e.g. QFFitAlgorithm::FitQFFitFunctionFunctor ).
+
+            This function implements a mode for bootstrapping during the fit. In this mode, not all \f$ N \f$ data in  \f$(x_m,y_m,z_m,f_m,\sigma_m)\f$ are used for the fit,
+            but only a subset of \f$ \mbox{bootstrapFraction}\cdot N \f$ datapoints, which are chosen randomly from the provided input data on every call of
+            prepareBootstrapSelection(). This feature can be used to implement e.g. error estimates by bootstrapping of the fit input data vector, i.e.
+            repeat the fit \f$ M \f$ times with each time a new subset of data and the calculate the standard deviation of the fit values.
+
+            This class manages the data internally and the protected members m_dataX, m_dataY and m_dataWeight are redirected, as required.
+            they are also returned by getDatX(), getDataY(), getDataWeight(). The same is done for m_M and getDataPoints().
+            These arrays either point to the arrays, provided in the constructor or by the \c setData...() methods, if bootstrapping is
+            disabled, or they point to internal vectors, which contain the currently selected subset of the dataset.
+
+            \note The default bootstrapFraction is 0.7!
+        */
+        class QFLIB_EXPORT FitFunctionFunctor3D: public Functor, public FunctorBootstrapInterface {
+            public:
+                /*! \brief constructor, initializes the functor
+                    \param dataX the x-values data vector \f$ x_m \f$
+                    \param dataY the y-values data vector \f$ y_m \f$
+                    \param dataZ the z-values data vector \f$ z_m \f$
+                    \param dataF the f-values data vector \f$ f_m \f$
+                    \param dataWeights the weight vector \f$ \sigma_m \f$
+                    \param M number of datapoints
+                */
+                explicit FitFunctionFunctor3D(const double* dataX, const double* dataY, const double* dataZ, const double* dataF, const double* dataWeight, uint64_t M) ;
+
+                virtual ~FitFunctionFunctor3D();
+
+                /** \brief returns a pointer to the current x-data \f$ x_m \f$ */
+                const double* getDataX() const;
+                /** \brief returns a pointer to the current y-data \f$ y_m \f$ */
+                const double* getDataY() const;
+                /** \brief returns a pointer to the current z-data \f$ z_m \f$ */
+                const double* getDataZ() const;
+                /** \brief returns a pointer to the current f-data \f$ f_m \f$ */
+                const double* getDataF() const;
+                /** \brief returns a pointer to the current weights-data \f$ \sigma_m \f$ */
+                const double* getDataWeight() const;
+                /** \brief returns the current number of datapoints in the \f$(x_m,y_m,\sigma_m)\f$ dataset. */
+                uint64_t getDataPoints() const;
+
+                /** \brief sets a new input data vector for x-data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
+                void setDataX(const double* data);
+                /** \brief sets a new input data vector for y-data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
+                void setDataY(const double* data);
+                /** \brief sets a new input data vector for z-data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
+                void setDataZ(const double* data);
+                /** \brief sets a new input data vector for f-data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
+                void setDataF(const double* data);
+                /** \brief sets a new input data vector for weights-data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
+                void setDataWeight(const double* data);
+                /** \brief sets a new count of input data
+                 *
+                 * \note You will have to call prepareBootstrapSelection() after using this function for the changes to take effect in boot strapping mode
+                 */
+                void setDataPoints(uint64_t data);
+
+                /** \brief prepares a new selection of data for bootstrapping
+                 *
+                 * \note if you only want to reapply the current selection and not select new data, call reapplyBootstrapselection() instead.
+                 */
+                virtual void prepareBootstrapSelection();
+                /** \brief this function reapplies the current bootstrappig selection, i.e. if the input-data changed, but not its number and also the selection should not be recreated.
+                 *
+                 * \note to create a new subset from the input data, call prepareBootstrapSelection()
+                 */
+                virtual void reapplyBootstrapselection();
+                /** \brief switches bootstrapping on and off, if \c enabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
+                virtual void setBootstrappingEnabled(bool enabled, bool prepBootstrapping=true);
+                virtual bool getBootstrappingEnabled() const;
+                /** \brief sets the fraction of the datapoints, that are selected by prepareBootstrapSelection(), if \c bootstrappingEnabled=true and \c prepBootstrapping=true, the function prepareBootstrapSelection() is called */
+                virtual void setBootstrappingFraction(double fraction, bool prepBootstrapping=true);
+                virtual double getBootstrappingFraction() const;
+
+            protected:
+
+                /** \brief the x-values data vector \f$ x_m \f$, possibly with a bootstrapping selection */
+                const double* m_dataX;
+                /** \brief the y-values data vector \f$ y_m \f$, possibly with a bootstrapping selection */
+                const double* m_dataY;
+                /** \brief the y-values data vector \f$ z_m \f$, possibly with a bootstrapping selection */
+                const double* m_dataZ;
+                /** \brief the y-values data vector \f$ f_m \f$, possibly with a bootstrapping selection */
+                const double* m_dataF;
+                /** \brief the weight vector \f$ \sigma_m \f$, possibly with a bootstrapping selection */
+                const double* m_dataWeight;
+                /** \brief number of datapoints, possibly with a bootstrapping selection      */
+                uint64_t m_M;
+
+
+                /** \brief fraction [0..1] of data points, selected by  prepareBootstrapSelection(). The default value is 0.7. */
+                double m_bootstrapFraction;
+                /** \brief indicates, whether bootstrapping is enabled */
+                bool m_bootstrapEnabled;
+
+            private:
+                /** \brief the x-values data vector \f$ x_m \f$ before bootstrapping selection */
+                const double* i_dataX;
+                /** \brief the y-values data vector \f$ y_m \f$ before bootstrapping selection */
+                const double* i_dataY;
+                /** \brief the y-values data vector \f$ z_m \f$ before bootstrapping selection */
+                const double* i_dataZ;
+                /** \brief the y-values data vector \f$ f_m \f$ before bootstrapping selection */
+                const double* i_dataF;
+                /** \brief the weight vector \f$ \sigma_m \f$ before bootstrapping selection */
+                const double* i_dataWeight;
+                /** \brief number of datapoints before bootstrapping selection      */
+                uint64_t i_M;
+
+                /** \brief helper-vector, used for bootstrapping */
+                QVector<double> bootstrappedX;
+                /** \brief helper-vector, used for bootstrapping */
+                QVector<double> bootstrappedY;
+                /** \brief helper-vector, used for bootstrapping */
+                QVector<double> bootstrappedZ;
+                /** \brief helper-vector, used for bootstrapping */
+                QVector<double> bootstrappedF;
                 /** \brief helper-vector, used for bootstrapping */
                 QVector<double> bootstrappedW;
                 /** \brief shuffled list of indexes into the input data, used to select the bootstrap data */
@@ -499,10 +779,256 @@ class QFLIB_EXPORT QFFitAlgorithm {
                 /** \brief enable or disable parameter transforms */
                 bool enableParameterTransforms;
                 /** \brief parameter transform mode for the functor parameters (calculated in the constructor from the model parameters/properties)*/
-                QVector<QFFitFunction::ParameterType> paramTransforms;
+                QVector<QFFitFunctionBase::ParameterType> paramTransforms;
                 /** \brief if set \c true, the functor calculates log(dataY) and log(model(x,p)), which can improve the fit in some cases  */
                 bool fitLogY;
         };
+
+
+
+
+
+
+        /*! \brief this is a special functor which is used for data fitting to objective functions declared by QFFitFunction
+
+            The QFFitFunction declares a 1D function \f$ f(x,y,z; \vec{p}), \vec{p}\in\mathbb{R}^N \f$ . This functor is provided with a set of data \f$ (x_m, y_m, z_m, f_m, \sigma_m), m=1..M \f$
+            where \f$ \sigma_m \f$ are weights for the data. Then This Functor implementation maps the 1D Function \f$ f(x,y,z; \vec{p}) \f$ to a \f$ M \f$ dimensional
+            function \f$ \vec{g}(\vec{p}) \f$ with:
+                \f[ g_m(\vec{p})=\frac{f_m-f(x_m,y_m,z_m; m(\vec{p}))}{\sigma_m} \f]
+            As QFFitFunction may contain parameters \f$ p_n, n=1..N \f$ that are no fitting parameters (either because they are defined as such, or because they were fixed
+            by the user, or they are currently hidden) we have to do parameter reordering. So the fitting algorithm is presented with a modified parameter vector
+            \f$ \vec{q}\in\mathbb{R}^Q \f$ with \f$ Q<N \f$ . The mapping is done using a function \f$ m(\cdot) \f$ with \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ and
+            \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ which is defined below, so this Functor finally calculates:
+                \f[ g_m(\vec{q})=\frac{f_m-f(x_m,y_m,z_m; m(\vec{q}))}{\sigma_m} \f]
+            The data, the weights and the fix-vector is given to this functor in the constructor. Afterwards you may call evaluate() to calculate \f$ \vec{g}(\vec{q}) \f$ .
+
+
+        */
+        class QFLIB_EXPORT FitQFFitFunction3DFunctor: public FitFunctionFunctor3D {
+            public:
+                /*! \brief constructor, initializes the functor
+                    \param model QFFitFunction object used to evaluate \f$ f(x; \vec{p}) \f$
+                    \param currentParams the initial parameters. You will have to give the values of ALL non-fit parameters in this vector!
+                    \param fixParams \c true if a parameter is fixed by the user
+                    \param dataX the x-values data vector \f$ x_m \f$
+                    \param dataY the y-values data vector \f$ y_m \f$
+                    \param dataWeights the weight vector \f$ \sigma_m \f$
+                    \param M number of datapoints
+                */
+                explicit FitQFFitFunction3DFunctor(QFFitFunction3D* model, const double* currentParams, const bool* fixParams, const double* dataX, const double* dataY, const double* dataZ, const double* dataF, const double* dataWeight, uint64_t M) ;
+
+                virtual ~FitQFFitFunction3DFunctor();
+
+                /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
+                           The result is a NEW array created by calling \c calloc()
+                */
+                double* createMappedArrayForFunctor(const double* modelData);
+
+                /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
+                           This function only copies those entries that are present in \a functorData.
+                */
+                void mapArrayFromModelToFunctor(double* functorData, const double* modelData);
+
+                /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ where \f$ \vec{q} \f$ is given by \a functorData.
+                           and \f$ \vec{p} \f$ is returned in \a modelData. This function only overwrites the entries that are present in \a functorData.
+                */
+                void mapArrayFromFunctorToModel(double* modelData, const double* functorData);
+
+                /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$
+                */
+                inline int mapFromFunctorToModel(int functorIndex){
+                    return modelFromFunctor[functorIndex];
+                }
+
+                /** \brief evaluate the function \f$ \vec{g}(\vec{q}) \f$ */
+                virtual void evaluate(double* evalout, const double* params);
+
+                /** \brief evaluate the functions jacobian \f$ J_{n,m}(\vec{q})=\frac{\partial g_m(\vec{q})}{\partial q_n}=-\frac{1}{\sigma_m}\cdot\frac{\partial f(x_m, m(\vec{q}))}{\partial m(q_n)} \f$ */
+                virtual void evaluateJacobian(double* evalout, const double* params);
+
+                /** \brief returns \c true if the model implements its jacobian analytically and therefore evaluateJacobian() may be used */
+                inline virtual bool get_implementsJacobian() const { return false; }
+
+                /** \brief return the number of parameters \f$ Q \f$ in \f$ \vec{q}=m(\vec{p}) \f$ */
+                inline virtual int get_paramcount() const { return m_paramCount; }
+
+                /** \brief return the used QFFitFunction */
+                inline QFFitFunction3D* getModel() const { return m_model; }
+
+                /** \brief return a pointer to the stored initial fit parameters */
+                inline double* getModelParams() const { return m_modelParams; }
+                /** \brief return a pointer to an array indicating which parameters are fixed */
+                inline bool* getModelParamsFix() const { return m_modelparamsFix; }
+                /** \brief return the number of to the stored initial fit parameters */
+                inline int getModelParamsCount() const { return m_model->paramCount(); }
+
+                inline bool isParameterTransformsEnabled() const { return enableParameterTransforms; }
+                inline void setParameterTransformsEnabled(bool enabled) {
+                    enableParameterTransforms=enabled;
+                }
+                inline bool isFitLogY() const { return fitLogY; }
+                inline void setFitLogY(bool enabled) {
+                    fitLogY=enabled;
+                }
+
+                /** \brief transform fit parameters */
+                void transfromParameters(double* params);
+                /** \brief backtransform fit parameters */
+                void backtransfromParameters(double* params);
+                /** \brief transform fit parameters */
+                QVector<double> transfromParametersCopy(const double* params);
+                /** \brief backtransform fit parameters */
+                QVector<double> backtransfromParametersCopy(const double* params);
+            protected:
+
+
+                /** \brief  QFFitFunction3D object used to evaluate \f$ f(x,y,z; \vec{p}) \f$ */
+                QFFitFunction3D* m_model;
+                /** \brief number of parameters in m_model */
+                int m_N;
+                /** \brief number of real (non-fixed) parameters, \c m_paramCount<=m_N */
+                int m_paramCount;
+                /** \brief maps from function parameter index to model parameter index (size m_N) */
+                int* functorFromModel;
+                /** \brief maps from functor parameter index to model parameter index (size m_paramCount) */
+                int* modelFromFunctor;
+                /** \brief copy of the current model parameter vector (size m_N) */
+                double* m_modelParams;
+                /** \brief vector containing which parameters are fixed */
+                bool* m_modelparamsFix;
+                /** \brief does the model contain parameter transforms? */
+                bool hasParameterTransforms;
+                /** \brief enable or disable parameter transforms */
+                bool enableParameterTransforms;
+                /** \brief parameter transform mode for the functor parameters (calculated in the constructor from the model parameters/properties)*/
+                QVector<QFFitFunctionBase::ParameterType> paramTransforms;
+                /** \brief if set \c true, the functor calculates log(dataY) and log(model(x,p)), which can improve the fit in some cases  */
+                bool fitLogY;
+        };
+
+
+
+
+
+
+
+        /*! \brief this is a special functor which is used for data fitting to objective functions declared by QFFitFunction
+
+            The QFFitFunction declares a 1D function \f$ f(x,y,z; \vec{p}), \vec{p}\in\mathbb{R}^N \f$ . This functor is provided with a set of data \f$ (x_m, y_m, z_m, f_m, \sigma_m), m=1..M \f$
+            where \f$ \sigma_m \f$ are weights for the data. Then This Functor implementation maps the 1D Function \f$ f(x,y,z; \vec{p}) \f$ to a \f$ M \f$ dimensional
+            function \f$ \vec{g}(\vec{p}) \f$ with:
+                \f[ g_m(\vec{p})=\frac{f_m-f(x_m,y_m,z_m; m(\vec{p}))}{\sigma_m} \f]
+            As QFFitFunction may contain parameters \f$ p_n, n=1..N \f$ that are no fitting parameters (either because they are defined as such, or because they were fixed
+            by the user, or they are currently hidden) we have to do parameter reordering. So the fitting algorithm is presented with a modified parameter vector
+            \f$ \vec{q}\in\mathbb{R}^Q \f$ with \f$ Q<N \f$ . The mapping is done using a function \f$ m(\cdot) \f$ with \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ and
+            \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ which is defined below, so this Functor finally calculates:
+                \f[ g_m(\vec{q})=\frac{f_m-f(x_m,y_m,z_m; m(\vec{q}))}{\sigma_m} \f]
+            The data, the weights and the fix-vector is given to this functor in the constructor. Afterwards you may call evaluate() to calculate \f$ \vec{g}(\vec{q}) \f$ .
+
+
+        */
+        class QFLIB_EXPORT FitQFFitFunction2DFunctor: public FitFunctionFunctor2D {
+            public:
+                /*! \brief constructor, initializes the functor
+                    \param model QFFitFunction object used to evaluate \f$ f(x; \vec{p}) \f$
+                    \param currentParams the initial parameters. You will have to give the values of ALL non-fit parameters in this vector!
+                    \param fixParams \c true if a parameter is fixed by the user
+                    \param dataX the x-values data vector \f$ x_m \f$
+                    \param dataY the y-values data vector \f$ y_m \f$
+                    \param dataWeights the weight vector \f$ \sigma_m \f$
+                    \param M number of datapoints
+                */
+                explicit FitQFFitFunction2DFunctor(QFFitFunction2D* model, const double* currentParams, const bool* fixParams, const double* dataX, const double* dataY, const double* dataF, const double* dataWeight, uint64_t M) ;
+
+                virtual ~FitQFFitFunction2DFunctor();
+
+                /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
+                           The result is a NEW array created by calling \c calloc()
+                */
+                double* createMappedArrayForFunctor(const double* modelData);
+
+                /*! \brief Implements the inverse mapping function \f$ \vec{q}=m^{-1}(\vec{p})\in\mathbb{R}^Q \f$ where \f$ \vec{p} \f$ is given by \a modelData.
+                           This function only copies those entries that are present in \a functorData.
+                */
+                void mapArrayFromModelToFunctor(double* functorData, const double* modelData);
+
+                /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$ where \f$ \vec{q} \f$ is given by \a functorData.
+                           and \f$ \vec{p} \f$ is returned in \a modelData. This function only overwrites the entries that are present in \a functorData.
+                */
+                void mapArrayFromFunctorToModel(double* modelData, const double* functorData);
+
+                /*! \brief Implements the mapping function \f$ \vec{p}=m(\vec{q})\in\mathbb{R}^N \f$
+                */
+                inline int mapFromFunctorToModel(int functorIndex){
+                    return modelFromFunctor[functorIndex];
+                }
+
+                /** \brief evaluate the function \f$ \vec{g}(\vec{q}) \f$ */
+                virtual void evaluate(double* evalout, const double* params);
+
+                /** \brief evaluate the functions jacobian \f$ J_{n,m}(\vec{q})=\frac{\partial g_m(\vec{q})}{\partial q_n}=-\frac{1}{\sigma_m}\cdot\frac{\partial f(x_m, m(\vec{q}))}{\partial m(q_n)} \f$ */
+                virtual void evaluateJacobian(double* evalout, const double* params);
+
+                /** \brief returns \c true if the model implements its jacobian analytically and therefore evaluateJacobian() may be used */
+                inline virtual bool get_implementsJacobian() const { return false; }
+
+                /** \brief return the number of parameters \f$ Q \f$ in \f$ \vec{q}=m(\vec{p}) \f$ */
+                inline virtual int get_paramcount() const { return m_paramCount; }
+
+                /** \brief return the used QFFitFunction */
+                inline QFFitFunction2D* getModel() const { return m_model; }
+
+                /** \brief return a pointer to the stored initial fit parameters */
+                inline double* getModelParams() const { return m_modelParams; }
+                /** \brief return a pointer to an array indicating which parameters are fixed */
+                inline bool* getModelParamsFix() const { return m_modelparamsFix; }
+                /** \brief return the number of to the stored initial fit parameters */
+                inline int getModelParamsCount() const { return m_model->paramCount(); }
+
+                inline bool isParameterTransformsEnabled() const { return enableParameterTransforms; }
+                inline void setParameterTransformsEnabled(bool enabled) {
+                    enableParameterTransforms=enabled;
+                }
+                inline bool isFitLogY() const { return fitLogY; }
+                inline void setFitLogY(bool enabled) {
+                    fitLogY=enabled;
+                }
+
+                /** \brief transform fit parameters */
+                void transfromParameters(double* params);
+                /** \brief backtransform fit parameters */
+                void backtransfromParameters(double* params);
+                /** \brief transform fit parameters */
+                QVector<double> transfromParametersCopy(const double* params);
+                /** \brief backtransform fit parameters */
+                QVector<double> backtransfromParametersCopy(const double* params);
+            protected:
+
+
+                /** \brief  QFFitFunction2D object used to evaluate \f$ f(x,y,z; \vec{p}) \f$ */
+                QFFitFunction2D* m_model;
+                /** \brief number of parameters in m_model */
+                int m_N;
+                /** \brief number of real (non-fixed) parameters, \c m_paramCount<=m_N */
+                int m_paramCount;
+                /** \brief maps from function parameter index to model parameter index (size m_N) */
+                int* functorFromModel;
+                /** \brief maps from functor parameter index to model parameter index (size m_paramCount) */
+                int* modelFromFunctor;
+                /** \brief copy of the current model parameter vector (size m_N) */
+                double* m_modelParams;
+                /** \brief vector containing which parameters are fixed */
+                bool* m_modelparamsFix;
+                /** \brief does the model contain parameter transforms? */
+                bool hasParameterTransforms;
+                /** \brief enable or disable parameter transforms */
+                bool enableParameterTransforms;
+                /** \brief parameter transform mode for the functor parameters (calculated in the constructor from the model parameters/properties)*/
+                QVector<QFFitFunctionBase::ParameterType> paramTransforms;
+                /** \brief if set \c true, the functor calculates log(dataY) and log(model(x,p)), which can improve the fit in some cases  */
+                bool fitLogY;
+        };
+
 
 
 
@@ -715,6 +1241,34 @@ class QFLIB_EXPORT QFFitAlgorithm {
                   deviation for each parameter is calculated and returned as error estimate. <b>Note, that this routine will require significantly more time, than a simple fit!</b>
         */
         FitResult fit(double* paramsOut, double* paramErrorsOut, const double* dataX, const double* dataY, const double* dataWeight, uint64_t N, QFFitFunction* model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL, bool fitLogY=false);
+
+
+        /*! \brief this wrapper routine allows to use the fitting algorithm for 3D data fitting with a given model function \f$ f(x,y,z; \vec{p}) \f$ encoded in \a model
+                   and a set of measurements \f$ (x_i, y_i, z_i, f_i \sigma_i) \f$ where \f$ \sigma_i \f$ are the weights for the measurements. Then this routine solves the problem:
+                   \f$ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{i=1}^M\left\|\frac{f_i-f(x_i,y_i,z_i; \vec{p})}{\sigma_i}\right\| \f$
+
+            \param[out] paramsOut The optimal parameter vector is written into this array
+            \param[out] paramErrorsOut The optimal parameter error vector is written into this array
+            \param dataX \f$ x_i\f$ -value of the data
+            \param dataY \f$ y_i\f$ -values of the data
+            \param dataZ \f$ y_i\f$ -values of the data
+            \param dataF \f$ y_i\f$ -values of the data
+            \param dataWeight weights \f$ w_i\f$
+            \param N number of datapoints (i.e. size of the arrays dataX, dataY and dataWeights
+            \param model the model function to use
+            \param initialParams initial values for the parameters
+            \param fixParams which parameters to fix (if \c NULL, no parameters are fixed)
+            \param paramsMin lower parameter bound
+            \param paramsMax upper parameter bound
+            \param fitLogY if this is \c true, this function solves the logarithmized problem \f$ \vec{p}^\ast=\min\limits_{\vec{p}}\sum\limits_{i=1}^M\left\|\frac{\log(y_i)-\log(f(x_i; \vec{p}))}{\log(\sigma_i)}\right\| \f$
+            \return a FitResult object describing the fit result
+
+            \note If the bootstrapping mode is activated (see setErrorEstimateModeFit() ) then this function will first do the actual fit with the full input data vector
+                  (of which the parameters are returned). Then it will perform a given number of bootstrapping repeats, where the fit is repeated with the result of the
+                  first fit as initial parameters (distorted by a small fraction), but only for a subset of the input data. Then, from the results of these fits, a standard
+                  deviation for each parameter is calculated and returned as error estimate. <b>Note, that this routine will require significantly more time, than a simple fit!</b>
+        */
+        FitResult fit3D(double* paramsOut, double* paramErrorsOut, const double* dataX, const double* dataY, const double* dataZ, const double* dataF, const double* dataWeight, uint64_t N, QFFitFunction3D *model, const double* initialParams, const bool* fixParams=NULL, const double* paramsMin=NULL, const double* paramsMax=NULL, bool fitLogY=false);
 
 
         /*! \brief this wrapper routine allows to use the fitting algorithm for a general optimization problem with a given model function \f$ f(\vec{p}) \f$ encoded in \a model.

@@ -82,7 +82,7 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         /** \brief write the settings */
         void writeSettings(QSettings& settings, const QString& prefix=QString("histogram/"));
 
-        /** NOTE: qgroup is mainly ignored by this write function!!! */
+        /** NOTE: egroup is mainly ignored by this write function!!! */
         void writeQFProperties(QFProperties* current, const QString& prefix, const QString& egroup, const QString& param);
         void readQFProperties(QFProperties* current, const QString& prefix, const QString& egroup, const QString& param);
 
@@ -118,6 +118,10 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
 
         double getMax() const;
         void setMax(double max);
+
+        inline void setDefaultColor(int i, QColor col) {
+            defaultColors[i]=col;
+        }
 
         void clear();
         /** \brief add a histogram for the given dataset, copies the data to this widget, if \c external=false */
@@ -155,6 +159,8 @@ class QFWIDLIB_EXPORT QFHistogramView : public QWidget {
         void createWidgets();
 
         int connectParameterWidgetsCounter;
+
+        QMap<int,QColor> defaultColors;
 
         /** \brief plotter widget for the parameter histogram */
         QFPlotter* pltParamHistogram;

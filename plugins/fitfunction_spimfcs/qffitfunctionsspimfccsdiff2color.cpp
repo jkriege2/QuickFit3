@@ -98,7 +98,6 @@ double QFFitFunctionsSPIMFCCSDiff2Color::evaluate(double t, const double* data) 
     const double cr1=data[FCCSDiff_count_rate1];
     const double background2=data[FCCSDiff_background2];
     const double cr2=data[FCCSDiff_count_rate2];
-    //TODO backfactor!!!
     double backfactor=(cr1-background1)/(cr1) * (cr2-background2)/(cr2);
     if (fabs(cr1)<1e-15 || fabs(cr2)<1e-15 || (fabs(background1)<1e-15 && fabs(background2)<1e-15)) backfactor=1;
 

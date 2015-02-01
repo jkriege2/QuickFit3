@@ -1,0 +1,12 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="eval_beadscanpsf.png">./images/eval_beadscanpsf.png</file>
+    <file alias="eval_beadscanpsf/eval_beadscanpsf.png">./images/eval_beadscanpsf.png</file>
+    <file alias="eval_beadscanpsf/eval_beadscanpsf_small.png">./images/eval_beadscanpsf_small.png</file>
+    <file alias="eval_beadscanpsf/qfevalbeadscanpsf_savereport.png">./images/qfevalbeadscanpsf_save.png</file>
+    <file alias="eval_beadscanpsf/qfevalbeadscanpsf_printreport.png">./images/qfevalbeadscanpsf_print.png</file>
+    <file alias="eval_beadscanpsf/qfevalbeadscanpsf_save.png">./images/qfevalbeadscanpsf_save.png</file>
+    <file alias="eval_beadscanpsf/qfevalbeadscanpsf_print.png">./images/qfevalbeadscanpsf_print.png</file>
+    <file alias="eval_beadscanpsf/qfevalbeadscanpsf_evaluate.png">./images/qfevalbeadscanpsf_evaluate.png</file>
+</qresource>
+</RCC>

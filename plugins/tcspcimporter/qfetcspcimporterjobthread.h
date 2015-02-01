@@ -41,7 +41,6 @@
 #include <QSet>
 #include <QPair>
 
-// TODO: reimplement this properly, so ACF0 and ACF1 in FCCS evals see both count rates ... possibly use an internal binary dataformat?
 // TODO: add bleach correction
 
 class QFETCSPCImporterThreadProgress; // forward

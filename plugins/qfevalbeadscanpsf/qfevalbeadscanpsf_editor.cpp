@@ -1,0 +1,910 @@
+/*
+Copyright (c) 2014
+	
+	last modification: $LastChangedDate: 2015-01-21 11:37:05 +0100 (Mi, 21 Jan 2015) $  (revision $Rev: 3738 $)
+
+    This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
+
+    This software is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+
+#include "qfevalbeadscanpsf_editor.h"
+#include "qfrawdatarecord.h"
+#include "qfevaluationitem.h"
+#include "qfevalbeadscanpsf_item.h"
+#include "ui_qfevalbeadscanpsf_editor.h"
+#include "qmoretextobject.h"
+#include "cimg.h"
+#include "qffitfunctionplottools.h"
+#include <QtGlobal>
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets>
+#else
+#include <QtGui>
+#endif
+#include <QtCore>
+
+QFEvalBeadScanPSFEditor::QFEvalBeadScanPSFEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
+    QFEvaluationEditor(services, propEditor, parent),
+    ui(new Ui::QFEvalBeadScanPSFEditor)
+{
+    updatingData=true;
+    
+    currentSaveDirectory="";
+    
+    // setup widgets
+    ui->setupUi(this);
+
+
+    ui->histogram1->setSpaceSavingMode(true);
+    ui->histogram2->setSpaceSavingMode(true);
+
+    // create progress dialog for evaluation
+    dlgEvaluationProgress=new QProgressDialog(NULL);
+    dlgEvaluationProgress->hide();
+    dlgEvaluationProgress->setWindowModality(Qt::WindowModal);
+    
+    // connect widgets 
+    connect(ui->btnEvaluateCurrent, SIGNAL(clicked()), this, SLOT(evaluateCurrent()));
+    connect(ui->btnResetCurrent, SIGNAL(clicked()), this, SLOT(resetCurrent()));
+    ui->btnPrintReport->setDefaultAction(actPrintReport);
+    ui->btnSaveReport->setDefaultAction(actSaveReport);
+
+    updatingData=false;
+}
+
+QFEvalBeadScanPSFEditor::~QFEvalBeadScanPSFEditor()
+{
+    delete ui;
+    delete dlgEvaluationProgress;
+}
+
+void QFEvalBeadScanPSFEditor::connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old) {
+    // called when this widget should be connected to a new QFEvaluationItem
+
+    QFEvalBeadScanPSFItem* item=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    QFEvalBeadScanPSFItem* item_old=qobject_cast<QFEvalBeadScanPSFItem*>(old);
+
+    if (old!=NULL) {
+        /* disconnect item_old and clear all widgets here */
+        disconnect(item_old, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
+    }
+
+
+
+    if (item) {
+        updatingData=true;
+
+        /* connect widgets and fill with data from item here */
+        connect(item, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
+        
+        updatingData=false;
+    }
+
+
+    displayResults();
+}
+
+void QFEvalBeadScanPSFEditor::resultsChanged() {
+    /* some other evaluation or the user changed the results stored in the current raw data record,
+       so redisplay */
+    displayResults();
+}
+
+void QFEvalBeadScanPSFEditor::readSettings() {
+    // read widget settings
+    if (!settings) return;
+    currentSaveDirectory=settings->getQSettings()->value(QString("eval_beadscanpsf/editor/lastSaveDirectory"), currentSaveDirectory).toString();
+};
+
+void QFEvalBeadScanPSFEditor::writeSettings() {
+    // write widget settings
+    if (!settings) return;
+    settings->getQSettings()->setValue(QString("eval_beadscanpsf/editor/lastSaveDirectory"), currentSaveDirectory);
+}
+
+void QFEvalBeadScanPSFEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
+    // this slot is called when the user selects a new record in the raw data record list on the RHS of this widget in the evaluation dialog
+    
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
+    QFRawDataRecord* record=currentRecord; // possibly to a qobject_cast<> to the data type/interface you are working with here:
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(currentRecord);
+    //disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(displayData()));
+
+    if (record && data && eval) { // if we have a valid object, update
+        //connect(currentRecord, SIGNAL(rawDataChanged()), this, SLOT(displayData())); // redisplay data, if data changed
+
+        updatingData=true;
+
+        ui->spinA->setValue(record->getProperty(eval->getEvaluationResultID()+"_DELTAX", record->getProperty("PIXEL_WIDTH", ui->spinA->value()).toDouble()).toDouble());
+        ui->spinZ->setValue(record->getProperty(eval->getEvaluationResultID()+"_DELTAZ", record->getProperty("DELTAZ", ui->spinZ->value()).toDouble()).toDouble());
+        ui->spinROIXY->setValue(record->getProperty(eval->getEvaluationResultID()+"_ROI_XY", record->getProperty("PSF_ROI_XY", ui->spinROIXY->value()).toDouble()).toDouble());
+        ui->spinROIZ->setValue(record->getProperty(eval->getEvaluationResultID()+"_ROI_Z", record->getProperty("PSF_ROI_Z", ui->spinROIZ->value()).toDouble()).toDouble());
+        ui->spinPixPerFrame->setValue(record->getProperty(eval->getEvaluationResultID()+"_PIX_PER_FRAME", record->getProperty("BEADSEARCH_PIX_PER_FRAME", ui->spinPixPerFrame->value()).toDouble()).toDouble());
+        ui->spinPSFWidth->setValue(record->getProperty(eval->getEvaluationResultID()+"_EST_PSF_WIDTH", record->getProperty("EST_PSF_WIDTH", ui->spinPSFWidth->value()).toDouble()).toDouble());
+        ui->spinPSFHeight->setValue(record->getProperty(eval->getEvaluationResultID()+"_EST_PSF_HEIGHT", record->getProperty("EST_PSF_HEIGHT", ui->spinPSFHeight->value()).toDouble()).toDouble());
+
+        updatingData=false;
+    }
+    
+    // ensure that data of new highlighted record is displayed
+    displayResults();
+}
+
+void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    if ((!record)||(!eval)||(!data)) return;
+
+    int stack=0;
+
+    if (eval->hasEvaluation(record)) {
+        QString evalID=eval->getEvaluationResultID();
+        int channel=ui->cmbChannel->currentIndex();
+        int bead=ui->cmbBead->currentIndex();
+
+        int ROIxy=ui->spinROIXY->value();
+        int ROIz=ui->spinROIZ->value();
+        int width=data->getImageStackWidth(stack);
+        int height=data->getImageStackHeight(stack);
+        int size_z=data->getImageStackFrames(stack);
+        double deltaXY=ui->spinA->value();
+        double deltaZ=ui->spinZ->value();
+
+        int initPosX=record->resultsGetInNumberList(evalID, "beadsearch_initial_positions_x", bead, -1);
+        int initPosY=record->resultsGetInNumberList(evalID, "beadsearch_initial_positions_y", bead, -1);
+        int initPosZ=record->resultsGetInNumberList(evalID, "beadsearch_initial_positions_z", bead, -1);
+
+        //qDebug()<<channel<<bead<<initPosX<<initPosY<<initPosZ;
+
+        if (initPosX>=0 && initPosY>=0 && initPosZ>=0) {
+
+            cimg_library::CImg<double> image(data->getImageStack(stack, 0, channel), width, height, size_z, true);
+            cimg_library::CImg<double> roi=image.get_crop(initPosX-ROIxy/2, initPosY-ROIxy/2, initPosZ-ROIz/2, initPosX+ROIxy/2, initPosY+ROIxy/2, initPosZ+ROIz/2);
+
+            QVector<double> roiXY(roi.width()*roi.height());
+            QVector<double> roiXZ(roi.width()*roi.depth());
+            QVector<double> roiYZ(roi.height()*roi.depth());
+            QVector<double> cutX(roi.width()), cutXX(roi.width());
+            QVector<double> cutY(roi.height()), cutYX(roi.height());
+            QVector<double> cutZ(roi.depth()), cutZX(roi.depth());
+
+            QVector<double> fitresCutX=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutx_fitresult").arg(channel).arg(bead));
+            QString ffIDX=record->resultsGetAsString(evalID, QString("cutx_fitfunction"));
+            QVector<double> fitresCutZ=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutz_fitresult").arg(channel).arg(bead));
+            QString ffIDZ=record->resultsGetAsString(evalID, QString("cutz_fitfunction"));
+            QVector<double> fitresCutY=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cuty_fitresult").arg(channel).arg(bead));
+            QString ffIDY=record->resultsGetAsString(evalID, QString("cuty_fitfunction"));
+
+            QVector<double> fitresCutZ_Z=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutxz_zpos").arg(channel).arg(bead));
+            QVector<double> fitresCutZX=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutxz_width").arg(channel).arg(bead));
+            QVector<double> fitresCutZXGB=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutxz_gaussianbeam_results").arg(channel).arg(bead));
+            QString ffIDCutZX=record->resultsGetAsString(evalID, QString("cutxz_gaussianbeam_fitfunc"));
+
+            QVector<double> fitresCutZY=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutyz_width").arg(channel).arg(bead));
+            QVector<double> fitresCutZYGB=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutyz_gaussianbeam_results").arg(channel).arg(bead));
+            QString ffIDCutZY=record->resultsGetAsString(evalID, QString("cutyz_gaussianbeam_fitfunc"));
+
+            if (ui->chkLogscale->isChecked()) {
+                for (int y=0; y<roi.height(); y++) {
+                    for (int x=0; x<roi.width(); x++) {
+                        roiXY[y*roi.width()+x]=log10(roi(x,y, ROIz/2));
+                    }
+                }
+                for (int y=0; y<roi.height(); y++) {
+                    for (int z=0; z<roi.depth(); z++) {
+                        roiXZ[y*roi.depth()+z]=log10(roi(ROIxy/2,y,z));
+                    }
+                }
+                for (int x=0; x<roi.width(); x++) {
+                    for (int z=0; z<roi.depth(); z++) {
+                        roiYZ[x*roi.depth()+z]=log10(roi(x,ROIxy/2,z));
+                    }
+                }
+            } else {
+                for (int y=0; y<roi.height(); y++) {
+                    for (int x=0; x<roi.width(); x++) {
+                        roiXY[y*roi.width()+x]=roi(x,y, ROIz/2);
+                    }
+                }
+                for (int y=0; y<roi.height(); y++) {
+                    for (int z=0; z<roi.depth(); z++) {
+                        roiXZ[y*roi.depth()+z]=roi(ROIxy/2,y,z);
+                    }
+                }
+                for (int x=0; x<roi.width(); x++) {
+                    for (int z=0; z<roi.depth(); z++) {
+                        roiYZ[x*roi.depth()+z]=roi(x,ROIxy/2,z);
+                    }
+                }
+            }
+            for (int x=0; x<roi.width(); x++) {
+                cutX[x]=roi(x, ROIxy/2, ROIz/2);
+                cutXX[x]=double(x-ROIxy/2)*deltaXY;
+            }
+            for (int y=0; y<roi.height(); y++) {
+                cutY[y]=roi(ROIxy/2, y, ROIz/2);
+                cutYX[y]=double(y-ROIxy/2)*deltaXY;
+            }
+            for (int z=0; z<roi.depth(); z++) {
+                cutZ[z]=roi(ROIxy/2, ROIxy/2, z);
+                cutZX[z]=double(z-ROIz/2)*deltaZ;
+            }
+            {
+                ui->pltXY->set_doDrawing(false);
+                JKQTPdatastore* ds=ui->pltXY->getDatastore();
+                ui->pltXY->clearGraphs(true);
+                ds->clear();
+                ui->pltXY->setAbsoluteXY(cutXX.first(), cutXX.last(), cutYX.first(), cutYX.last());
+                //ui->pltXY->setXY(cutX.first(), cutX.last(), cutY.first(), cutY.last());
+                ui->pltXY->getXAxis()->set_axisLabel(tr("x [nm]"));
+                ui->pltXY->getYAxis()->set_axisLabel(tr("y [nm]"));
+                ui->pltXY->get_plotter()->set_axisAspectRatio(double(roi.width())/double(roi.height()));
+                ui->pltXY->get_plotter()->set_aspectRatio(1);
+                ui->pltXY->get_plotter()->set_maintainAspectRatio(true);
+                ui->pltXY->get_plotter()->set_maintainAxisAspectRatio(true);
+                int col=ds->addCopiedColumn(roiXY.data(), roiXY.size(), QString("ROI_c%1_b%2_cut_XY").arg(channel).arg(bead));
+                JKQTPColumnMathImage* image=new JKQTPColumnMathImage(cutXX.first(), cutYX.first(), cutXX.last()-cutXX.first(), cutYX.last()-cutYX.first(), col, roi.width(), roi.height(), JKQTPMathImageMATLAB, ui->pltXY->get_plotter());
+                ui->pltXY->addGraph(image);
+                ui->pltXY->zoomToFit();
+                ui->pltXY->set_doDrawing(true);
+                ui->pltXY->update_plot();
+            }
+            {
+                ui->pltXZ->set_doDrawing(false);
+                JKQTPdatastore* ds=ui->pltXZ->getDatastore();
+                ui->pltXZ->clearGraphs(true);
+                ds->clear();
+                ui->pltXZ->setAbsoluteXY(cutZX.first(), cutZX.last(), cutXX.first(), cutXX.last());
+                ui->pltXZ->getXAxis()->set_axisLabel(tr("z [nm]"));
+                ui->pltXZ->get_plotter()->set_axisAspectRatio(double(roi.depth())/double(roi.width()));
+                ui->pltXZ->get_plotter()->set_aspectRatio(deltaXY/deltaZ);
+                ui->pltXZ->get_plotter()->set_maintainAspectRatio(true);
+                ui->pltXZ->get_plotter()->set_maintainAxisAspectRatio(true);
+                ui->pltXZ->getYAxis()->set_axisLabel(tr("x [nm]"));
+                int col=ds->addCopiedColumn(roiXZ.data(), roiXZ.size(), QString("ROI_c%1_b%2_cut_XZ").arg(channel).arg(bead));
+                JKQTPColumnMathImage* image=new JKQTPColumnMathImage(cutZX.first(), cutXX.first(), cutZX.last()-cutZX.first(), cutXX.last()-cutXX.first(), col, roi.depth(), roi.width(), JKQTPMathImageMATLAB, ui->pltXZ->get_plotter());
+                ui->pltXZ->addGraph(image);
+                ui->pltXZ->zoomToFit();
+                ui->pltXZ->set_doDrawing(true);
+                ui->pltXZ->update_plot();
+            }
+            {
+                ui->pltYZ->set_doDrawing(false);
+                JKQTPdatastore* ds=ui->pltYZ->getDatastore();
+                ui->pltYZ->clearGraphs(true);
+                ds->clear();
+                ui->pltYZ->setAbsoluteXY(cutZX.first(), cutZX.last(), cutYX.first(), cutYX.last());
+                ui->pltYZ->getXAxis()->set_axisLabel(tr("z [nm]"));
+                ui->pltYZ->get_plotter()->set_axisAspectRatio(double(roi.depth())/double(roi.height()));
+                ui->pltYZ->get_plotter()->set_aspectRatio(deltaXY/deltaZ);
+                ui->pltYZ->get_plotter()->set_maintainAspectRatio(true);
+                ui->pltYZ->get_plotter()->set_maintainAxisAspectRatio(true);
+                ui->pltYZ->getYAxis()->set_axisLabel(tr("y [nm]"));
+                int col=ds->addCopiedColumn(roiYZ.data(), roiYZ.size(), QString("ROI_c%1_b%2_cut_YZ").arg(channel).arg(bead));
+                JKQTPColumnMathImage* image=new JKQTPColumnMathImage(cutZX.first(), cutYX.first(), cutZX.last()-cutZX.first(), cutYX.last()-cutYX.first(), col, roi.depth(), roi.height(), JKQTPMathImageMATLAB, ui->pltYZ->get_plotter());
+                ui->pltYZ->addGraph(image);
+                ui->pltYZ->zoomToFit();
+                ui->pltYZ->set_doDrawing(true);
+                ui->pltYZ->update_plot();
+            }
+
+            {
+                ui->pltFitX->set_doDrawing(false);
+                JKQTPdatastore* ds=ui->pltFitX->getDatastore();
+                ui->pltFitX->clearGraphs(true);
+                ds->clear();
+                ui->pltFitX->getXAxis()->set_axisLabel(tr("x [nm]"));
+                ui->pltFitX->getYAxis()->set_axisLabel(tr("intensity [ADU]"));
+                int colX=ds->addCopiedColumn(cutXX.data(), cutXX.size(), QString("X_c%1_b%2").arg(channel).arg(bead));
+                int colY=ds->addCopiedColumn(cutX.data(), cutX.size(), QString("cutX_c%1_b%2").arg(channel).arg(bead));
+                JKQTPxyLineGraph* plt=new JKQTPxyLineGraph(ui->pltFitX->get_plotter());
+                plt->set_drawLine(false);
+                plt->set_symbol(JKQTPplus);
+                plt->set_xColumn(colX);
+                plt->set_yColumn(colY);
+                ui->pltFitX->addGraph(plt);
+
+
+                JKQTPxQFFitFunctionLineGraph* fit=new JKQTPxQFFitFunctionLineGraph(ui->pltFitX->get_plotter());
+                QFFitFunction* ff=NULL;
+                fit->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDX));
+                for (int i=0; i<fitresCutX.size(); i++) {
+                    if (ff && ff->getParameterID(i)=="position") fitresCutX[i]=fitresCutX[i]-double(initPosX)*deltaXY;
+                }
+                fit->set_params(fitresCutX);
+                fit->set_color(plt->get_color().darker());
+                ui->pltFitX->addGraph(fit);
+
+                ui->pltFitX->zoomToFit();
+                ui->pltFitX->set_doDrawing(true);
+                ui->pltFitX->update_plot();
+            }
+
+
+            {
+                ui->pltFitY->set_doDrawing(false);
+                JKQTPdatastore* ds=ui->pltFitY->getDatastore();
+                ui->pltFitY->clearGraphs(true);
+                ds->clear();
+                ui->pltFitY->getXAxis()->set_axisLabel(tr("y [nm]"));
+                ui->pltFitY->getYAxis()->set_axisLabel(tr("intensity [ADU]"));
+                int colX=ds->addCopiedColumn(cutYX.data(), cutYX.size(), QString("Y_c%1_b%2").arg(channel).arg(bead));
+                int colY=ds->addCopiedColumn(cutY.data(), cutY.size(), QString("cutY_c%1_b%2").arg(channel).arg(bead));
+                JKQTPxyLineGraph* plt=new JKQTPxyLineGraph(ui->pltFitY->get_plotter());
+                plt->set_drawLine(false);
+                plt->set_symbol(JKQTPplus);
+                plt->set_xColumn(colX);
+                plt->set_yColumn(colY);
+                ui->pltFitY->addGraph(plt);
+
+
+                JKQTPxQFFitFunctionLineGraph* fit=new JKQTPxQFFitFunctionLineGraph(ui->pltFitY->get_plotter());
+                QFFitFunction* ff=NULL;
+                fit->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDY));
+                for (int i=0; i<fitresCutY.size(); i++) {
+                    if (ff && ff->getParameterID(i)=="position") fitresCutY[i]=fitresCutY[i]-double(initPosY)*deltaXY;
+                }
+                fit->set_params(fitresCutY);
+                fit->set_color(plt->get_color().darker());
+                ui->pltFitY->addGraph(fit);
+
+                ui->pltFitY->zoomToFit();
+                ui->pltFitY->set_doDrawing(true);
+                ui->pltFitY->update_plot();
+            }
+
+
+            {
+                ui->pltFitZ->set_doDrawing(false);
+                JKQTPdatastore* ds=ui->pltFitZ->getDatastore();
+                ui->pltFitZ->clearGraphs(true);
+                ds->clear();
+                ui->pltFitZ->getXAxis()->set_axisLabel(tr("z [nm]"));
+                ui->pltFitZ->getYAxis()->set_axisLabel(tr("intensity [ADU]"));
+                int colX=ds->addCopiedColumn(cutZX.data(), cutZX.size(), QString("Z_c%1_b%2").arg(channel).arg(bead));
+                int colY=ds->addCopiedColumn(cutZ.data(), cutZ.size(), QString("cutZ_c%1_b%2").arg(channel).arg(bead));
+                JKQTPxyLineGraph* plt=new JKQTPxyLineGraph(ui->pltFitZ->get_plotter());
+                plt->set_drawLine(false);
+                plt->set_symbol(JKQTPplus);
+                plt->set_xColumn(colX);
+                plt->set_yColumn(colY);
+                ui->pltFitZ->addGraph(plt);
+
+
+                JKQTPxQFFitFunctionLineGraph* fit=new JKQTPxQFFitFunctionLineGraph(ui->pltFitZ->get_plotter());
+                QFFitFunction* ff=NULL;
+                fit->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDZ));
+                for (int i=0; i<fitresCutZ.size(); i++) {
+                    if (ff && ff->getParameterID(i)=="position") fitresCutZ[i]=fitresCutZ[i]-double(initPosZ)*deltaZ;
+                }
+                fit->set_params(fitresCutZ);
+                fit->set_color(plt->get_color().darker());
+                ui->pltFitZ->addGraph(fit);
+
+                ui->pltFitZ->zoomToFit();
+                ui->pltFitZ->set_doDrawing(true);
+                ui->pltFitZ->update_plot();
+            }
+
+
+            {
+                ui->pltFitWofZ->set_doDrawing(false);
+                JKQTPdatastore* ds=ui->pltFitWofZ->getDatastore();
+                ui->pltFitWofZ->clearGraphs(true);
+                ds->clear();
+                ui->pltFitWofZ->getXAxis()->set_axisLabel(tr("z [nm]"));
+                ui->pltFitWofZ->getYAxis()->set_axisLabel(tr("PSF-width [nm]"));
+                int colX=ds->addCopiedColumn(fitresCutZ_Z.data(), fitresCutZ_Z.size(), QString("Z_c%1_b%2").arg(channel).arg(bead));
+                int colYX=ds->addCopiedColumn(fitresCutZX.data(), fitresCutZX.size(), QString("cutZX_c%1_b%2_width").arg(channel).arg(bead));
+                int colYY=ds->addCopiedColumn(fitresCutZY.data(), fitresCutZY.size(), QString("cutZY_c%1_b%2_width").arg(channel).arg(bead));
+                JKQTPxyLineGraph* plt=new JKQTPxyLineGraph(ui->pltFitWofZ->get_plotter());
+                plt->set_drawLine(false);
+                plt->set_symbol(JKQTPplus);
+                plt->set_xColumn(colX);
+                plt->set_yColumn(colYX);
+                plt->set_title(tr("w_x(z)"));
+                ui->pltFitWofZ->addGraph(plt);
+
+
+                JKQTPxQFFitFunctionLineGraph* fit=new JKQTPxQFFitFunctionLineGraph(ui->pltFitWofZ->get_plotter());
+                QFFitFunction* ff=NULL;
+                fit->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDCutZX));
+                fit->set_params(fitresCutZXGB);
+                fit->set_color(plt->get_color().darker());
+                ui->pltFitWofZ->addGraph(fit);
+
+                plt=new JKQTPxyLineGraph(ui->pltFitWofZ->get_plotter());
+                plt->set_drawLine(false);
+                plt->set_symbol(JKQTPplus);
+                plt->set_xColumn(colX);
+                plt->set_yColumn(colYY);
+                plt->set_title(tr("w_y(z)"));
+
+                ui->pltFitWofZ->addGraph(plt);
+
+
+                fit=new JKQTPxQFFitFunctionLineGraph(ui->pltFitWofZ->get_plotter());
+                ff=NULL;
+                fit->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDCutZY));
+                fit->set_params(fitresCutZYGB);
+                fit->set_color(plt->get_color().darker());
+                ui->pltFitWofZ->addGraph(fit);
+
+
+
+                ui->pltFitWofZ->zoomToFit();
+                ui->pltFitWofZ->set_doDrawing(true);
+                ui->pltFitWofZ->update_plot();
+            }
+        }
+    }
+}
+
+void QFEvalBeadScanPSFEditor::displayEvaluationHistograms() {
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord(); 
+    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    if ((!record)||(!eval)/*||(!data)*/) return;
+
+    if (eval->hasEvaluation(record)) {
+        QString evalID=eval->getEvaluationResultID();
+        QStringList sl1=ui->cmbParam1->itemData(ui->cmbParam1->currentIndex()).toStringList();
+        QStringList sl2=ui->cmbParam2->itemData(ui->cmbParam2->currentIndex()).toStringList();
+        int channels=record->resultsGetAsInteger(evalID, "channels");
+        int beads=record->resultsGetAsInteger(evalID, "channel0_beads");
+        if (sl1.size()>=2) {
+            ui->histogram1->clear();
+            ui->histogram1->setDefaultColor(0, QColor("darkgreen"));
+            ui->histogram1->setDefaultColor(1, QColor("red"));
+            ui->histogram1->setDefaultColor(2, QColor("blue"));
+            for (int c=0; c<channels; c++) {
+                QVector<double> dat;
+                for (int b=0; b<beads; b++) {
+                    QString param=QString("channel%1_bead%2").arg(c).arg(b);
+                    QString p1=param+sl1.value(0);
+                    int p1i=sl1.value(1).toInt();
+                    //qDebug()<<p1<<p1i;
+                    bool ok=true;
+                    QVector<double> p=record->resultsGetAsDoubleList(evalID, p1, &ok);
+                    if (ok && p1i<p.size()) {
+                        dat<<p[p1i];
+                    }
+                }
+                if (dat.size()>0) ui->histogram1->addCopiedHistogram(tr("ch %1: %2").arg(c).arg(ui->cmbParam1->currentText()), dat.data(), dat.size());
+            }
+            ui->histogram1->updateHistogram(true);
+        }
+        if (sl2.size()>=2) {
+            ui->histogram2->clear();
+            ui->histogram2->setDefaultColor(0, QColor("darkgreen"));
+            ui->histogram2->setDefaultColor(1, QColor("red"));
+            ui->histogram2->setDefaultColor(2, QColor("blue"));
+            for (int c=0; c<channels; c++) {
+                QVector<double> dat;
+                for (int b=0; b<beads; b++) {
+                    QString param=QString("channel%1_bead%2").arg(c).arg(b);
+                    QString p1=param+sl2.value(0);
+                    int p1i=sl2.value(1).toInt();
+                    bool ok=true;
+                    QVector<double> p=record->resultsGetAsDoubleList(evalID, p1, &ok);
+                    if (ok && p1i<p.size()) {
+                        dat<<p[p1i];
+                    }
+                }
+                if (dat.size()>0) ui->histogram2->addCopiedHistogram(tr("ch %1: %2").arg(c).arg(ui->cmbParam2->currentText()), dat.data(), dat.size());
+            }
+            ui->histogram2->updateHistogram(true);
+        }
+    }
+}
+
+void QFEvalBeadScanPSFEditor::displayEvaluationCorrPlot()
+{
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    if ((!record)||(!eval)/*||(!data)*/) return;
+
+    if (eval->hasEvaluation(record)) {
+        QString evalID=eval->getEvaluationResultID();
+        QStringList sl1=ui->cmbParamC1->itemData(ui->cmbParamC1->currentIndex()).toStringList();
+        QStringList sl2=ui->cmbParamC2->itemData(ui->cmbParamC2->currentIndex()).toStringList();
+        //int channels=record->resultsGetAsInteger(evalID, "channels");
+        int beads=record->resultsGetAsInteger(evalID, "channel0_beads");
+        if (sl1.size()>=3 && sl2.size()>=3) {
+            ui->corrPlot->clear();
+
+            int c=sl1.value(2).toInt();
+
+            QVector<double> dat;
+            for (int b=0; b<beads; b++) {
+                QString param=QString("channel%1_bead%2").arg(c).arg(b);
+                QString p1=param+sl1.value(0);
+                int p1i=sl1.value(1).toInt();
+                //qDebug()<<p1<<p1i;
+                bool ok=true;
+                QVector<double> p=record->resultsGetAsDoubleList(evalID, p1, &ok);
+                if (ok && p1i<p.size()) {
+                    dat<<p[p1i];
+                }
+            }
+
+            c=sl2.value(2).toInt();
+            QVector<double> dat2;
+            for (int b=0; b<beads; b++) {
+                QString param=QString("channel%1_bead%2").arg(c).arg(b);
+                QString p1=param+sl2.value(0);
+                int p1i=sl2.value(1).toInt();
+                bool ok=true;
+                QVector<double> p=record->resultsGetAsDoubleList(evalID, p1, &ok);
+                if (ok && p1i<p.size()) {
+                    dat2<<p[p1i];
+                }
+            }
+
+
+            if (dat.size()>0 && dat2.size()>0) ui->corrPlot->addCopiedCorrelation(tr("%1 -- %2").arg(ui->cmbParamC1->currentText()).arg(ui->cmbParamC2->currentText()), dat.data(), dat2.data(), dat.size());
+
+            ui->corrPlot->updateCorrelation(true);
+        }
+
+    }
+}
+
+void QFEvalBeadScanPSFEditor::displayResults()
+{
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    //disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(displayData()));
+    bool hasRes=false;
+
+    disconnect(ui->cmbChannel, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationBead()));
+    disconnect(ui->cmbBead, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationBead()));
+    disconnect(ui->cmbParam1, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationHistograms()));
+    disconnect(ui->cmbParam2, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationHistograms()));
+    disconnect(ui->cmbParamC1, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationCorrPlot()));
+    disconnect(ui->cmbParamC2, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationCorrPlot()));
+    ui->cmbChannel->clear();
+    if (data && record && eval) {
+        hasRes=eval->hasEvaluation(record);
+        QString evalID=eval->getEvaluationResultID();
+        bool ok=true;
+        int ch=record->resultsGetAsInteger(evalID, "channels", &ok);
+        if (!ok) ch=0;
+        for (int i=0; i<ch; i++) {
+            ui->cmbChannel->addItem(tr("channel %1").arg(i+1));
+        }
+
+        int beads=record->resultsGetAsInteger(evalID, "channel0_beads", &ok);
+        if (!ok) beads=0;
+        for (int i=0; i<beads; i++) {
+            ui->cmbBead->addItem(tr("bead %1").arg(i+1));
+        }
+
+        QString s1;
+        QStringList sl1;
+        ui->cmbParam1->clear();
+        ui->cmbParam2->clear();
+        ui->cmbParamC2->clear();
+        ui->cmbParamC1->clear();
+        ui->cmbParam1->addItem(s1=tr("cut X: offset"), sl1=constructQStringListFromItems("_cutx_fitresult", "0")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut X: amplitude"), sl1=constructQStringListFromItems("_cutx_fitresult", "1")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut X: position"), sl1=constructQStringListFromItems("_cutx_fitresult", "2")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut X: width"), sl1=constructQStringListFromItems("_cutx_fitresult", "3")); ui->cmbParam2->addItem(s1, sl1);
+
+        ui->cmbParam1->addItem(s1=tr("cut Y: offset"), sl1=constructQStringListFromItems("_cuty_fitresult", "0")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Y: amplitude"), sl1=constructQStringListFromItems("_cuty_fitresult", "1")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Y: position"), sl1=constructQStringListFromItems("_cuty_fitresult", "2")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Y: width"), sl1=constructQStringListFromItems("_cuty_fitresult", "3")); ui->cmbParam2->addItem(s1, sl1);
+
+        ui->cmbParam1->addItem(s1=tr("cut Z: offset"), sl1=constructQStringListFromItems("_cutz_fitresult", "0")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Z: amplitude"), sl1=constructQStringListFromItems("_cutz_fitresult", "1")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Z: position"), sl1=constructQStringListFromItems("_cutz_fitresult", "2")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Z: width"), sl1=constructQStringListFromItems("_cutz_fitresult", "3")); ui->cmbParam2->addItem(s1, sl1);
+
+        ui->cmbParam1->addItem(s1=tr("cut XZ: rayleigh length"), sl1=constructQStringListFromItems("_cutxz_gaussianbeam_results", "0")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut XZ: beam width"), sl1=constructQStringListFromItems("_cutxz_gaussianbeam_results", "1")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut XZ: position"), sl1=constructQStringListFromItems("_cutxz_gaussianbeam_results", "2")); ui->cmbParam2->addItem(s1, sl1);
+
+        ui->cmbParam1->addItem(s1=tr("cut YZ: rayleigh length"), sl1=constructQStringListFromItems("_cutyz_gaussianbeam_results", "0")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut YZ: beam width"), sl1=constructQStringListFromItems("_cutyz_gaussianbeam_results", "1")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut YZ: position"), sl1=constructQStringListFromItems("_cutyz_gaussianbeam_results", "2")); ui->cmbParam2->addItem(s1, sl1);
+
+        ui->cmbParam1->addItem(s1=tr("3D fit: offset"), sl1=constructQStringListFromItems("_fit3d_results", "0")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: amplitude"), sl1=constructQStringListFromItems("_fit3d_results", "1")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: position x"), sl1=constructQStringListFromItems("_fit3d_results", "2")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: position y"), sl1=constructQStringListFromItems("_fit3d_results", "3")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: position z"), sl1=constructQStringListFromItems("_fit3d_results", "4")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: width 1"), sl1=constructQStringListFromItems("_fit3d_results", "5")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: width 2"), sl1=constructQStringListFromItems("_fit3d_results", "6")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: width 3"), sl1=constructQStringListFromItems("_fit3d_results", "7")); ui->cmbParam2->addItem(s1, sl1);
+
+        if (ch>0) {
+            ui->cmbParam1->addItem(s1=tr("3D fit: distance x"), sl1=constructQStringListFromItems("_fit3d_distc0", "0")); ui->cmbParam2->addItem(s1, sl1);
+            ui->cmbParam1->addItem(s1=tr("3D fit: distance y"), sl1=constructQStringListFromItems("_fit3d_distc0", "1")); ui->cmbParam2->addItem(s1, sl1);
+            ui->cmbParam1->addItem(s1=tr("3D fit: distance z"), sl1=constructQStringListFromItems("_fit3d_distc0", "2")); ui->cmbParam2->addItem(s1, sl1);
+            ui->cmbParam1->addItem(s1=tr("3D fit: distance"), sl1=constructQStringListFromItems("_fit3d_distc0", "3")); ui->cmbParam2->addItem(s1, sl1);
+        }
+
+        for (int c=0; c<ch; c++) {
+            for (int i=0; i<ui->cmbParam1->count(); i++) {
+                QString n=ui->cmbParam1->itemText(i);
+                QStringList sl=ui->cmbParam1->itemData(i).toStringList();
+                sl<<QLocale::c().toString(c);
+                ui->cmbParamC1->addItem(tr("ch %1: %2").arg(c).arg(n), sl);
+                ui->cmbParamC2->addItem(tr("ch %1: %2").arg(c).arg(n), sl);
+            }
+        }
+    }
+    ui->cmbParam1->setCurrentIndex(ui->cmbParam1->findText(tr("3D fit: width 1")));
+    ui->cmbParam2->setCurrentIndex(ui->cmbParam2->findText(tr("3D fit: width 3")));
+    ui->cmbParamC1->setCurrentIndex(ui->cmbParam1->findText(tr("ch 0: 3D fit: position z")));
+    ui->cmbParamC2->setCurrentIndex(ui->cmbParam2->findText(tr("ch 0: 3D fit: width 3")));
+
+    ui->spinA->setEnabled(!hasRes);
+    ui->spinZ->setEnabled(!hasRes);
+    ui->spinPixPerFrame->setEnabled(!hasRes);
+    ui->spinROIXY->setEnabled(!hasRes);
+    ui->spinROIZ->setEnabled(!hasRes);
+    ui->spinPSFWidth->setEnabled(!hasRes);
+    ui->spinPSFHeight->setEnabled(!hasRes);
+
+    connect(ui->cmbChannel, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationBead()));
+    connect(ui->cmbBead, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationBead()));
+    connect(ui->cmbParam1, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationHistograms()));
+    connect(ui->cmbParam2, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationHistograms()));
+    connect(ui->cmbParamC1, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationCorrPlot()));
+    connect(ui->cmbParamC2, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationCorrPlot()));
+
+    displayEvaluationHistograms();
+    displayEvaluationCorrPlot();
+    displayEvaluationBead();
+}
+
+
+
+void QFEvalBeadScanPSFEditor::on_spinA_valueChanged(double value) {
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID()+"_DELTAX", value, false, false);
+    }
+}
+
+void QFEvalBeadScanPSFEditor::on_spinPSFHeight_valueChanged(double value)
+{
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID()+"_EST_PSF_WIDTH", value, false, false);
+    }
+}
+
+void QFEvalBeadScanPSFEditor::on_spinPSFWidth_valueChanged(double value)
+{
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID()+"_EST_PSF_HEIGHT", value, false, false);
+    }
+}
+
+void QFEvalBeadScanPSFEditor::on_spinROIZ_valueChanged(int value)
+{
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID()+"_ROI_XY", value, false, false);
+    }
+}
+
+void QFEvalBeadScanPSFEditor::on_spinPixPerFrame_valueChanged(int value)
+{
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID()+"_PIX_PER_FRAME", value, false, false);
+    }
+}
+
+void QFEvalBeadScanPSFEditor::on_spinROIXY_valueChanged(int value)
+{
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID()+"_ROI_Z", value, false, false);
+    }
+}
+
+void QFEvalBeadScanPSFEditor::on_spinZ_valueChanged(double value) {
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID()+"_DELTAZ", value, false, false);
+    }
+}
+
+
+
+void QFEvalBeadScanPSFEditor::evaluateCurrent() {
+    /* EXECUTE AN EVALUATION FOR THE CURRENT RECORD ONLY */
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord(); 
+    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    if ((!eval)||(!record)/*||(!data)*/) return;
+
+    
+    
+    dlgEvaluationProgress->setLabelText(tr("evaluate '%1' ...").arg(record->getName()));
+    
+    dlgEvaluationProgress->setRange(0,100);
+    dlgEvaluationProgress->setValue(50);
+    dlgEvaluationProgress->open();
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+    // here we call doEvaluation to execute our evaluation for the current record only
+    eval->doEvaluation(record, ui->spinA->value(), ui->spinZ->value(), ui->spinROIXY->value(), ui->spinROIZ->value(), ui->spinPixPerFrame->value(), ui->spinPSFWidth->value(), ui->spinPSFHeight->value(), dlgEvaluationProgress);
+
+    displayResults();
+    dlgEvaluationProgress->setValue(100);
+    dlgEvaluationProgress->close();
+
+    QApplication::restoreOverrideCursor();
+    resultsChanged();
+}
+
+void QFEvalBeadScanPSFEditor::resetCurrent()
+{
+    /* EXECUTE AN EVALUATION FOR THE CURRENT RECORD ONLY */
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    if ((!eval)||(!record)/*||(!data)*/) return;
+
+    record->resultsClear(eval->getEvaluationResultID());
+
+    displayResults();
+}
+
+
+
+
+
+void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord(); 
+    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    if ((!eval)||(!record)/*||(!data)*/) return;
+
+    
+    // we use this QTextCursor to write the document
+    QTextCursor cursor(document);
+    
+    // here we define some generic formats
+    QTextCharFormat fText=cursor.charFormat();
+    fText.setFontPointSize(8);
+    QTextCharFormat fTextSmall=fText;
+    fTextSmall.setFontPointSize(0.85*fText.fontPointSize());
+    QTextCharFormat fTextBold=fText;
+    fTextBold.setFontWeight(QFont::Bold);
+    QTextCharFormat fTextBoldSmall=fTextBold;
+    fTextBoldSmall.setFontPointSize(0.85*fText.fontPointSize());
+    QTextCharFormat fHeading1=fText;
+    QTextBlockFormat bfLeft;
+    bfLeft.setAlignment(Qt::AlignLeft);
+    QTextBlockFormat bfRight;
+    bfRight.setAlignment(Qt::AlignRight);
+    QTextBlockFormat bfCenter;
+    bfCenter.setAlignment(Qt::AlignHCenter);
+
+    fHeading1.setFontPointSize(2*fText.fontPointSize());
+    fHeading1.setFontWeight(QFont::Bold);
+
+    
+    // insert heading
+    cursor.insertText(tr("Evaluation Report:\n\n"), fHeading1);
+    cursor.movePosition(QTextCursor::End);
+
+    // insert table with some data
+    QTextTableFormat tableFormat;
+    tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
+    tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
+    QTextTable* table = cursor.insertTable(2, 2, tableFormat);
+    table->cellAt(0, 0).firstCursorPosition().insertText(tr("raw data:"), fTextBold);
+    table->cellAt(0, 1).firstCursorPosition().insertText(record->getName(), fText);
+    table->cellAt(1, 0).firstCursorPosition().insertText(tr("ID:"), fTextBold);
+    table->cellAt(1, 1).firstCursorPosition().insertText(QString::number(record->getID()));
+    cursor.movePosition(QTextCursor::End);
+	
+	
+	
+	
+	
+	/*
+	int PicTextFormat=QTextFormat::UserObject + 1;
+    QObject *picInterface = new QPictureTextObject;
+    document->documentLayout()->registerHandler(PicTextFormat, picInterface);
+
+	
+	QTextTable* table = cursor.insertTable(2,1, tableFormat);
+    {
+	    // insert a plot from ui->plotter
+        QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
+        QPicture pic;
+        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
+        ui->plotter->get_plotter()->draw(*painter, QRect(0,0,ui->plotter->width(),ui->plotter->height()));
+        delete painter;
+        double scale=0.9*document->textWidth()/double(pic.boundingRect().width());
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("variance vs. average intensity plot:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        QApplication::processEvents();
+
+		// insert an enhanced table plot from ui->tabResults
+        tabCursor=table->cellAt(1,0).firstCursorPosition();
+        tabCursor.insertText(tr("\n"), fTextBoldSmall);
+        QPicture picT;
+        painter=new JKQTPEnhancedPainter(&picT);
+        ui->tabResults->paint(*painter);
+        delete painter;
+        scale=0.95*document->textWidth()/double(picT.boundingRect().width());
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("fit results table:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale);
+        QApplication::processEvents();
+    }*/
+
+}
+
+

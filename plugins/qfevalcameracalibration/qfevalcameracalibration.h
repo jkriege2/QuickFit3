@@ -56,25 +56,25 @@ class  QFEvalCameraCalibration: public QObject, public QFPluginEvaluationItemBas
         virtual void registerToMenu(QMenu* menu);
 
         /** \brief short ID for the plugin */
-        virtual QString getID() const  { return tr("eval_cameracalibration"); };
+        virtual QString getID() const  { return tr("eval_cameracalibration"); }
 
         /** \brief name for the plugin */
-        virtual QString getName() const  { return tr("Camera Calibration"); };
+        virtual QString getName() const  { return tr("Camera Calibration"); }
 
         /** \brief short description for the plugin */
-        virtual QString getDescription() const  { return tr("Camera Calibration (gain, ...)"); };
+        virtual QString getDescription() const  { return tr("Camera Calibration (gain, ...)"); }
 
         /** \brief author the plugin */
-        virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
+        virtual QString getAuthor() const  { return tr("Jan W. Krieger"); }
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2015 by Jan W. Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2015 by Jan W. Krieger"); }
 
         /** \brief weblink for the plugin */
-        virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };
+        virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); }
 
         /** \brief icon file for the plugin (from resource system or a separate file) */
-        virtual QString getIconFilename() const  { return QString(":/eval_cameracalibration/eval_cameracalibration.png"); };
+        virtual QString getIconFilename() const  { return QString(":/eval_cameracalibration/eval_cameracalibration.png"); }
 
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {

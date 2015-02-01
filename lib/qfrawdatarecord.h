@@ -798,6 +798,28 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         void resultsSetNumber(const QString& evaluationName, const QString& resultName, double value, const QString& unit=QString(""));
 
         /** \brief set a result of type number vector */
+        inline void resultsSetNumberList(const QString& evaluationName, const QString& resultName, const QVector<int>& value, const QString& unit=QString("")) {
+            QVector<double> dat;
+            dat.resize(value.size());
+            for (int i=0; i<value.size(); i++) dat[i]=value[i];
+            resultsSetNumberList(evaluationName, resultName, dat, unit);
+        }
+        /** \brief set a result of type number vector */
+        inline void resultsSetNumberList(const QString& evaluationName, const QString& resultName, const QList<int>& value, const QString& unit=QString("")) {
+            QVector<double> dat;
+            dat.resize(value.size());
+            for (int i=0; i<value.size(); i++) dat[i]=value[i];
+            resultsSetNumberList(evaluationName, resultName, dat, unit);
+        }
+        /** \brief set a result of type number vector */
+        inline void resultsSetNumberList(const QString& evaluationName, const QString& resultName, const QList<double>& value, const QString& unit=QString("")) {
+            QVector<double> dat;
+            dat.resize(value.size());
+            for (int i=0; i<value.size(); i++) dat[i]=value[i];
+            resultsSetNumberList(evaluationName, resultName, dat, unit);
+        }
+
+        /** \brief set a result of type number vector */
         void resultsSetNumberList(const QString& evaluationName, const QString& resultName, const QVector<double>& value, const QString& unit=QString(""));
         /** \brief set a result of type number matrix */
         void resultsSetNumberMatrix(const QString& evaluationName, const QString& resultName, const QVector<double>& value, int columns, const QString& unit=QString(""));
@@ -905,6 +927,14 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
         /** \brief set a result of type string vector */
         void resultsSetStringList(const QString& evaluationName, const QString& resultName, const QVector<QString>& value, const QString& unit=QString(""));
+        /** \brief set a result of type string vector */
+        inline void resultsSetStringList(const QString& evaluationName, const QString& resultName, const QStringList& value, const QString& unit=QString("")) {
+            QVector<QString> s;
+            s.resize(value.size());
+            for (int i=0; i<value.size(); i++) s[i]=value[i];
+            resultsSetStringList(evaluationName, resultName, s, unit);
+        }
+
         /** \brief set a result of type string matrix */
         void resultsSetStringMatrix(const QString& evaluationName, const QString& resultName, const QVector<QString>& value, int columns, const QString& unit=QString(""));
 

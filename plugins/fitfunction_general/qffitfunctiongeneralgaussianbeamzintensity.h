@@ -30,10 +30,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \ingroup qf3fitfunp_fitfunctions_general
 
 */
-class QFFitFunctionGeneralGaussianBeamZIntensity: public QFFitFunction {
+class QFFitFunctionPSFGaussianBeamZIntensity: public QFFitFunction {
     public:
-        QFFitFunctionGeneralGaussianBeamZIntensity();
-        virtual ~QFFitFunctionGeneralGaussianBeamZIntensity() {}
+        QFFitFunctionPSFGaussianBeamZIntensity();
+        virtual ~QFFitFunctionPSFGaussianBeamZIntensity() {}
         /*! \copydoc QFFitFunction::name()   */
         virtual QString name() const { return QObject::tr("Gaussian Beam: Intensity(z)"); };
         /** \copydoc QFFitFunction::shortName() */

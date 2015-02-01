@@ -24,7 +24,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <cmath>
 #include "statistics_tools.h"
 
-QFFitFunctionGeneralGaussianBeamZIntensity::QFFitFunctionGeneralGaussianBeamZIntensity() {
+QFFitFunctionPSFGaussianBeamZIntensity::QFFitFunctionPSFGaussianBeamZIntensity() {
     //           type,         id,                        name,                                                    label (HTML),                      unit,          unitlabel (HTML),        fit,       userEditable, userRangeEditable, displayError, initialFix,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(FloatNumber,  "zR",                "rayleigh range zR",                                              "z<sub>R</sub>",                        "nm",         "",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 500,            -1e10,    1e10,  1  );
     #define PARAM_Z0 0
@@ -35,7 +35,7 @@ QFFitFunctionGeneralGaussianBeamZIntensity::QFFitFunctionGeneralGaussianBeamZInt
 
 }
 
-double QFFitFunctionGeneralGaussianBeamZIntensity::evaluate(double t, const double* data) const {
+double QFFitFunctionPSFGaussianBeamZIntensity::evaluate(double t, const double* data) const {
     const double z0=data[PARAM_Z0];
     const double pos=data[PARAM_POSITION];
     const double I0=data[PARAM_AMPLITUDE];
@@ -45,25 +45,25 @@ double QFFitFunctionGeneralGaussianBeamZIntensity::evaluate(double t, const doub
 
 
 
-void QFFitFunctionGeneralGaussianBeamZIntensity::calcParameter(double* data, double* error) const {
+void QFFitFunctionPSFGaussianBeamZIntensity::calcParameter(double* data, double* error) const {
 }
 
-bool QFFitFunctionGeneralGaussianBeamZIntensity::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionPSFGaussianBeamZIntensity::isParameterVisible(int parameter, const double* data) const {
     return true;
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionGeneralGaussianBeamZIntensity::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionPSFGaussianBeamZIntensity::getAdditionalPlotCount(const double* params) {
     return 0;
     // we have one additional plot
 }
 
-QString QFFitFunctionGeneralGaussianBeamZIntensity::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionPSFGaussianBeamZIntensity::transformParametersForAdditionalPlot(int plot, double* params) {
     return "";
 }
 
 
-bool QFFitFunctionGeneralGaussianBeamZIntensity::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionPSFGaussianBeamZIntensity::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
 {
 
 

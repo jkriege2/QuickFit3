@@ -198,6 +198,10 @@ SUBDIRS += plg_qfevalcameracalibration
 plg_qfevalcameracalibration.subdir=./plugins/qfevalcameracalibration
 plg_qfevalcameracalibration.depends = lib libqf3widgets
 
+SUBDIRS += plg_qfevalbeadscanpsf
+plg_qfevalbeadscanpsf.subdir=./plugins/qfevalbeadscanpsf
+plg_qfevalbeadscanpsf.depends = lib libqf3widgets
+
 !contains(QF3CONFIG, nohardwaredrivers) {
 	!macx {
 

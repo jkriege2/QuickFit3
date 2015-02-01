@@ -30,6 +30,25 @@
 #include "qffitfunction.h"
 #include "qfplugin.h"
 
+
+class QFLIB_EXPORT QFFitFunctionFactory {
+    public:
+        /** Default destructor */
+        virtual ~QFFitFunctionFactory() {}
+
+        /** \brief return list of plugin IDs */
+        virtual QStringList fitFunctionFactoryGetIDs() const =0;
+
+        /** \brief return a QFFitFunction instance for the given ID, created with the given parent object */
+        virtual QFFitFunction* fitFunctionFactoryGet(QString id, QObject* parent) const =0;
+
+        virtual QString fitFunctionFactoryGetHelpFile(const QString& id) const =0;
+
+};
+
+Q_DECLARE_INTERFACE(QFFitFunctionFactory,
+                     "www.dkfz.de.b040.quickfit3.QFFitFunctionFactory/1.0")
+
 /** \brief virtual interface class for all QuickFit 3 fit function plugins
     \ingroup qf3fitfunplugins
 
@@ -55,7 +74,7 @@ class QFLIB_EXPORT QFPluginFitFunction: public QFPlugin {
 };
 
 Q_DECLARE_INTERFACE(QFPluginFitFunction,
-                     "www.dkfz.de.b040.quickfit3.QFPluginFitFunction/1.0")
+                     "www.dkfz.de.b040.quickfit3.QFPluginFitFunction/2.0")
 
 
 #endif // QFPLUGINFITFUNCTION_H

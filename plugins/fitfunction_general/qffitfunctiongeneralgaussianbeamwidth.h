@@ -30,10 +30,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     \ingroup qf3fitfunp_fitfunctions_general
 
 */
-class QFFitFunctionGeneralGaussianBeamWidth: public QFFitFunction {
+class QFFitFunctionPSFGaussianBeamWidth: public QFFitFunction {
     public:
-        QFFitFunctionGeneralGaussianBeamWidth();
-        virtual ~QFFitFunctionGeneralGaussianBeamWidth() {}
+        QFFitFunctionPSFGaussianBeamWidth();
+        virtual ~QFFitFunctionPSFGaussianBeamWidth() {}
         /*! \copydoc QFFitFunction::name()   */
         virtual QString name() const { return QObject::tr("Gaussian Beam: Width(z)"); };
         /** \copydoc QFFitFunction::shortName() */

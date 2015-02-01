@@ -77,7 +77,7 @@ void QFEVALItem::doEvaluation(QFRawDataRecord* record,QProgressDialog* dlgEvalua
         DO YOUR EVALUATION HERE
     */
 
-    services->log_text(tr("evaluation complete\n"));
+    QFPluginServices::getInstance()->log_text(tr("evaluation complete\n"));
     
     // write back fit results to record!
     record->disableEmitResultsChanged();

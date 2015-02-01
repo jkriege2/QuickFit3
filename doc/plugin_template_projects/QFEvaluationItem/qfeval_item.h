@@ -75,7 +75,7 @@ class QFEVALItem : public QFEvaluationItem {
 		 *  \param record the record to do the evaluation for
 		 *  \param dlgEvaluationProgress a QProgressDialog
 		 */
-		void doEvaluation(QFRawDataRecord* record, QProgressDialog* dlgEvaluationProgress=NULL)
+		void doEvaluation(QFRawDataRecord* record, QProgressDialog* dlgEvaluationProgress=NULL);
 
     protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the

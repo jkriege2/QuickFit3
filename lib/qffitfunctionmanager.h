@@ -148,6 +148,9 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         QStringList getLibraryFitFunctionIDs() const;
         QLibrary* getLibraryFitFunctionLibrary(const QString& id) const;
 
+        void registerFitFactory(QFFitFunctionFactory* factory);
+        void unregisterFitFactory(QFFitFunctionFactory* factory);
+
         void deinit();
         void init();
     public slots:
@@ -168,6 +171,7 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         QMap<QString, QLibrary*> libraryFitFunctions;
         QMap<QString, QString> userFitFunctions;
         QList<QFPluginFitFunction*> fitPlugins;
+        QList<QFFitFunctionFactory*> fitFactories;
         QList<QObject*> fitPluginObjects;
         QStringList filenames;
         ProgramOptions* m_options;

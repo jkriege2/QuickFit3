@@ -1041,7 +1041,6 @@ void QFRDRNumberAndBrightnessDataEditor::updateHistograms()
             }
         }
 
-        // TODO: implement usage of chkApparentProps
 
         histNumber->clear();
         histBrightness->clear();

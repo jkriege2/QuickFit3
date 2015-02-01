@@ -48,18 +48,18 @@ class QFEvalCameraCalibrationItem : public QFEvaluationItem {
         virtual ~QFEvalCameraCalibrationItem();
 
         /** \brief return type (short type string) */
-        virtual QString getType() const { return QString("eval_cameracalibration"); };
+        virtual QString getType() const { return QString("eval_cameracalibration"); }
         /** \brief return type (longer type string, user readable) */
-        virtual QString getTypeName() const { return tr("Camera Calibration"); };
+        virtual QString getTypeName() const { return tr("Camera Calibration"); }
         /** \brief return a small icon (16x16) */
-        virtual QIcon getSmallIcon() const { return QIcon(":/eval_cameracalibration/eval_cameracalibration_small.png"); };
+        virtual QIcon getSmallIcon() const { return QIcon(":/eval_cameracalibration/eval_cameracalibration_small.png"); }
         /** \brief return type description */
-        virtual QString getTypeDescription() const { return tr(""); };
+        virtual QString getTypeDescription() const { return getTypeName(); }
         /** \brief return a large icon (32x32) */
-        virtual QIcon getLargeIcon() const { return QIcon(":/eval_cameracalibration/eval_cameracalibration.png"); };
+        virtual QIcon getLargeIcon() const { return QIcon(":/eval_cameracalibration/eval_cameracalibration.png"); }
         /** \brief returns the number of additional editor panes for this record */
         /** \brief returns the name for the i-th editor pane */
-        virtual QString getEditorName() { return QString("Evaluation"); };
+        virtual QString getEditorName() { return QString("Evaluation"); }
         /** \brief create an object for the i-th editor pane */
         virtual QFEvaluationEditor* createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL);
 

@@ -23,6 +23,15 @@ Copyright (c) 2014
 #include "qfrdr_dataeditor.h"
 #include "qfrdr_data.h"
 
+#include <QtGlobal>
+
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+#include <QtWidgets>
+#else
+#include <QtGui>
+#endif
+#include <QtCore>
+
 QFRDRDataEditor::QFRDRDataEditor(QFPluginServices* services,  QFRawDataPropertyEditor* QWidget* parent):
     QFRawDataEditor(services, propEditor, parent)
 {

@@ -55,6 +55,7 @@ QFHistogramView::QFHistogramView(QWidget *parent) :
 {
     connectParameterWidgetsCounter=0;
     histLabel="";
+
     createWidgets();
 }
 
@@ -133,6 +134,7 @@ void QFHistogramView::createWidgets() {
     flHistSet->addRow(tr(""), layHistogram);
 
     chkHistogramRangeAuto=new QRadioButton("auto", grpHistogramSettings);
+    chkHistogramRangeAuto->setChecked(true);
     chkHistogramRangeRelaxAuto=new QRadioButton("relaxed auto: ", grpHistogramSettings);
     chkHistogramRangeManual=new QRadioButton("manual", grpHistogramSettings);
     QHBoxLayout* layradAuto=new QHBoxLayout();
@@ -747,12 +749,14 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
                 //plteParamHistogramBoxplot->set_color(QColor("blue"));
                 plteParamHistogramBoxplot->set_title(tr("boxplot (%1)").arg(hist.name));
                 plteParamHistogramBoxplot->set_lineWidth(1);
+                plteParamHistogramBoxplot->set_color(defaultColors.value(hh, plteParamHistogramBoxplot->get_color()));
                 pltParamHistogram->addGraph(plteParamHistogramBoxplot);
 
                 JKQTPbarHorizontalGraph* plteParamHistogram=new JKQTPbarHorizontalGraph(pltParamHistogram->get_plotter());
                 QColor fill=plteParamHistogramBoxplot->get_color();
                 fill.setAlphaF(0.7);
                 plteParamHistogram->set_fillColor(fill);
+                plteParamHistogram->set_color(plteParamHistogramBoxplot->get_color());
                 plteParamHistogram->set_xColumn(pltcPHHistogramX);
                 plteParamHistogram->set_yColumn(pltcPHHistogramY);
                 plteParamHistogram->set_width(1);

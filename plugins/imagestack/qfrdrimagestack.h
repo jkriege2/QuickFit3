@@ -98,6 +98,8 @@ class QFRDRImageStackPlugin : public QObject, public QFPluginRawDataRecordBase {
         void addSingleFileDualViewImageStack(char dvMode='h');
         void startProjectWizardLightsheetAnalysis(bool insertEval=true);
         void startProjectWizardLightsheetAnalysisData();
+        void startProjectWizardPSFAnalysis(bool insertEval=true);
+        void startProjectWizardPSFAnalysisData();
         void startImagestackWizard();
 
     private:

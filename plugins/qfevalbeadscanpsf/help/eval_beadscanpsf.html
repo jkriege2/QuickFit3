@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <title>Beadscan Evaluation: PSF</title>
+  </head>
+  <body>
+		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        $$see:Also see the <a href="tutorial.html">Tutorials</a> for this plugin.$$
+		
+		<h2>Introduction</h2>
+        <h3>Basics</h3>
+		<p>
+		</p>
+        <h3>Algorithm</h3>
+		<p>The basic steps of this algorithm are:<ol>
+		  <li>determine initial estimates of the bead positions in the first color channel</li>		  
+		  <li>For each color channel:<ol>
+		    <li><li>For each initial bead:<ol>
+			  <li>extract a ROI around the position</li>
+		      <li>check, whether the bead can be evaluated (distance to border, distance to other beads, ...)</li>			  
+		      <li>fit a 1D Gaussian function along the x-, y- and z-cut through the brightest pixel in the ROI</li>
+			  <li>fit a 1D Gaussian functions along the x-, y-cut for every z-position in the stack (cuts through the brightest pixel in the ROI)</li>
+			  <li>fit a 3D Gaussian function to the ROI</li>
+			</ol></li>
+		  </ol></li>
+		</ol>
+		</p>
+		<h4>Find Initial Bead Position</h4>
+		<p>First the initial bead positions are searched in the first (!!!) color channel:<ul>
+		  <li>The algorithm steps through the stack wicth a stepsize of <tt>ROI_size_z/4</tt>. For each step:<ul>
+		    <li><tt>frameQ = quantile(frame, 1-pixels_per_frame/(width*height))</tt></li>
+		    <li>The image is segmented into pixels, larger and smaller than <tt>frameQ</tt>. The larger pixels are initial possibilities for beads.</li>
+		    <li><tt>min_distance = ROIS_size_xy/3</tt></li>
+		    <li>calculate the distance matrix $( d_{i,j}=\sqrt{\left(x_i-x_j\right)^2 + \left(y_i-y_j\right)^2} )$ between all initial bead positions</li>
+		    <li>Go through the found beads:<ul>
+			  <li>Determine the number of beads in the vicinity (<tt>&lt; min_distance</tt>) of the bead</li>
+			  <li>If there is only one pixel, then we will use this position as possible bead (center of the ROI). Ignore this bead for the next steps.</li>
+			  <li>If there are more beads, use the brightest pixel as position as possible bead (center of the ROI). Ignore all beads for the next steps.</li>
+			</ul></li>
+		  </ul></li>
+		</ul>
+		</p>
+		<h3>Recipe for gel with beads for lightsheet microscopy (LSFM/SPIM)</h3>
+		<p>
+		<p>Pepare a gel containing a low concentration of sub-diffractive beads. We use:
+	  </p><ol>
+	  <li>Prepare a few 1ml syringes by cutting off the top, where the syringe gets thinner (see image (A) below).</li>
+	  <li>0.5% PhytaGel (<a href="http://www.sigmaaldrich.com/catalog/product/sigma/p8169?lang=de&amp;region=DE">P8169, Sigma-Aldrich</a>) mixed with deionized water (shake thoroughly). Then heat in the microwave until the gellant dissolves completely. <br><small><i>We use 40ml water and 200µg PhytaGel.</i></small></li>
+	  <li>Add MgSO<sub>4</sub> to an end concentration of 0.1%<br><small><i>We use 400µl of a 10% MgSO<sub>4</sub> stock solution.</i></small></li>
+	  <li>While still &gt;40°C, fill 1 ml of the solution into an Epi and add 5-10µl of 100nm TetraSpec beads (<a href="https://products.invitrogen.com/ivgn/product/T7279?ICID=search-product">T-7279 from Invitrogen</a>)
+ directly from stock. Vortex shortly. You can also use any other type of
+ bead, as long as the concentration is so low, that the beads are well 
+separated in the gel!</li>
+	  <li>pull up ~300-400µl from one Epi into a syringe (see image (C-D)) and refrigerate for 5min. at 4°C until the gel solidifies</li>
+	  <li>Measure a beadscan with 1000-2000 frames, displaced by ~200nm. 
+Take care to measure in the front part of the gel, so it does not alter 
+the optical properties of the microscope too much!</li>
+	  </ol><p></p>
+	  <center>
+	  <img src="./pic/gel_for_beadscan.png" alt="preparation of gel for beadscan"><br><i>preparation of gel for beadscan</i>
+	  </center>
+		</p>
+
+		
+		<h2>User Interface</h2>
+		<p>
+          $$see:Also see the <a href="tutorial.html">Tutorials</a> for this plugin.$$
+		  <ol>
+		    <li>Select an RDR to evaluate on the list on the right</li>
+		    <li>Set all parameters for the evaluation on the rhs between the results plots and the RDR list:<ul>
+				<li><b>pixel size</b>: the pixel size of your camera in nanometers</li>
+				<li><b>step size</b>: step size of the image stack in nanometers</li>
+				<li><b>ROI lateral (xy)</b>: size of the ROI in x/y-direction, cut around each pixel in pixels. This should be at least 2-3 times larger than the expected PSF size in pixels and at least 5 pixels.</li>
+				<li><b>ROI longitudinal (z)</b>: size of the ROI in z-direction, cut around each pixel in pixels. This should be at least 2-3 times larger than the expected PSF size in pixels and at least 5 pixels.</li>
+				<li><b>bead search: pix/frame</b>: This is the number of pixels <tt>pixels_per_frame</tt>, that is assumed to be a pixel in each frame. Increasing this number might lead to the recognition of more beads, but also to more false recognitions. You can estimate this number by estimating the number of beads in each frame and multiplying it by 2-3.</li>
+				<li><b>est. PSF width (1/e2 halfwidth):</b>: estimates 1/e2-width of the PSF in nanometers (e.g. <tt>2*wavelength/NA</tt>)</li>
+				<li><b>est. PSF height (1/e2 halfwidth):</b>: estimates 1/e2-height of the PSF in nanometers (e.g. <tt>2*wavelength/NA<sup>2</sup></tt>)</li>
+			</ul></li>
+		    <li>Click on <b>Fit Current</b> to run the evaluation (described above). After the evaluation has finished, you can look at the different results in the tabs on the left.</li>
+		    <li></li>
+		  </ol>
+        </p>
+  </body>
+</html>

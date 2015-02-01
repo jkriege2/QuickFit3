@@ -366,7 +366,7 @@ void QFGlobalFitTool::createLocalFitFunctors()
     for (int i=0; i<functor->getSubFunctorCount(); i++) {
         QFFitFunction* ff=functor->getSubFunctor(i)->getModel();
         const double* dataX=functor->getSubFunctor(i)->getDataX();
-        const double* dataY=functor->getSubFunctor(i)->getDataY();
+        const double* dataY=functor->getSubFunctor(i)->getDataF();
         const double* dataW=functor->getSubFunctor(i)->getDataWeight();
         uint64_t dataN=functor->getSubFunctor(i)->getDataPoints();
         const double* param=functor->getSubFunctor(i)->getModelParams();

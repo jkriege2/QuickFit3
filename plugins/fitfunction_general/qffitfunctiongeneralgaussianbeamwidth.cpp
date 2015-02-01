@@ -24,7 +24,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <cmath>
 #include "statistics_tools.h"
 
-QFFitFunctionGeneralGaussianBeamWidth::QFFitFunctionGeneralGaussianBeamWidth() {
+QFFitFunctionPSFGaussianBeamWidth::QFFitFunctionPSFGaussianBeamWidth() {
     //           type,         id,                        name,                                                    label (HTML),                      unit,          unitlabel (HTML),        fit,       userEditable, userRangeEditable, displayError, initialFix,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(FloatNumber,  "zR",                "rayleigh range zR",                                              "z<sub>R</sub>",                        "nm",         "",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 500,            -1e10,    1e10,  1  );
     #define PARAM_Z0 0
@@ -35,7 +35,7 @@ QFFitFunctionGeneralGaussianBeamWidth::QFFitFunctionGeneralGaussianBeamWidth() {
 
 }
 
-double QFFitFunctionGeneralGaussianBeamWidth::evaluate(double t, const double* data) const {
+double QFFitFunctionPSFGaussianBeamWidth::evaluate(double t, const double* data) const {
     const double w0=data[PARAM_W0];
     const double z0=data[PARAM_Z0];
     const double pos=data[PARAM_POSITION];
@@ -44,25 +44,25 @@ double QFFitFunctionGeneralGaussianBeamWidth::evaluate(double t, const double* d
 
 
 
-void QFFitFunctionGeneralGaussianBeamWidth::calcParameter(double* data, double* error) const {
+void QFFitFunctionPSFGaussianBeamWidth::calcParameter(double* data, double* error) const {
 }
 
-bool QFFitFunctionGeneralGaussianBeamWidth::isParameterVisible(int parameter, const double* data) const {
+bool QFFitFunctionPSFGaussianBeamWidth::isParameterVisible(int parameter, const double* data) const {
     return true;
     // all parameters are visible at all times
 }
 
-unsigned int QFFitFunctionGeneralGaussianBeamWidth::getAdditionalPlotCount(const double* params) {
+unsigned int QFFitFunctionPSFGaussianBeamWidth::getAdditionalPlotCount(const double* params) {
     return 0;
     // we have one additional plot
 }
 
-QString QFFitFunctionGeneralGaussianBeamWidth::transformParametersForAdditionalPlot(int plot, double* params) {
+QString QFFitFunctionPSFGaussianBeamWidth::transformParametersForAdditionalPlot(int plot, double* params) {
     return "";
 }
 
 
-bool QFFitFunctionGeneralGaussianBeamWidth::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
+bool QFFitFunctionPSFGaussianBeamWidth::estimateInitial(double *params, const double *dataX, const double *dataY, long N, const bool* fix)
 {
     //statisticsMinMax(dataY, N, params[PARAM_BASE], params[PARAM_MAX]);
     if (params && dataX && dataY) {

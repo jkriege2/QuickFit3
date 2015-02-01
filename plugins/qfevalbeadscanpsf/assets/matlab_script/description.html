@@ -1,0 +1,91 @@
+<!--?xml version="1.0" ?-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252">
+		<title>B040 - Biophysics of Macromolecules (DKFZ): Matlab-Script for DualView beadscans</title>
+		<!-- insert file="../template_header.txt" -->
+
+	</head>
+	<body>
+		<!-- insert file="../template_top.txt" -->
+	  <h1>Matlab-Script for DualView beadscans</h1>
+	  <p>This script allows to evalue a beadscan, as typically done in a 
+SPIM microscope to characterize the PSF (and possibly the alignment of a
+ DualView optics). 
+	  </p>
+	  <h2>Measurement</h2>
+	  <p>Pepare a gel containing a low concentration of sub-diffractive beads. We use:
+	  </p><ol>
+	  <li>Prepare a few 1ml syringes by cutting off the top, where the syringe gets thinner (see image (A) below).</li>
+	  <li>0.5% PhytaGel (<a href="http://www.sigmaaldrich.com/catalog/product/sigma/p8169?lang=de&amp;region=DE">P8169, Sigma-Aldrich</a>) mixed with deionized water (shake thoroughly). Then heat in the microwave until the gellant dissolves completely. <br><small><i>We use 40ml water and 200µg PhytaGel.</i></small></li>
+	  <li>Add MgSO<sub>4</sub> to an end concentration of 0.1%<br><small><i>We use 400µl of a 10% MgSO<sub>4</sub> stock solution.</i></small></li>
+	  <li>While still &gt;40°C, fill 1 ml of the solution into an Epi and add 5-10µl of 100nm TetraSpec beads (<a href="https://products.invitrogen.com/ivgn/product/T7279?ICID=search-product">T-7279 from Invitrogen</a>)
+ directly from stock. Vortex shortly. You can also use any other type of
+ bead, as long as the concentration is so low, that the beads are well 
+separated in the gel!</li>
+	  <li>pull up ~300-400µl from one Epi into a syringe (see image (C-D)) and refrigerate for 5min. at 4°C until the gel solidifies</li>
+	  <li>Measure a beadscan with 1000-2000 frames, displaced by ~200nm. 
+Take care to measure in the front part of the gel, so it does not alter 
+the optical properties of the microscope too much!</li>
+	  </ol><p></p>
+	  <center>
+	  <img src="gel_for_beadscan.png" alt="preparation of gel for beadscan"><br><i>preparation of gel for beadscan</i>
+	  </center>
+	  <h2>Evaluation</h2>
+	  <p>The matlab script that can be downloaded below, will do the 
+following (all Gaussian widths are measured as 1/e² half width, i.e. 
+exp(-2*x²/w²), a new subdirectory is created that stores all the 
+results!):
+	  </p><ol>
+	    <li>it runs through the stack and finds separated beads (in the left color channel on a DualView).</li>
+		<li>around each bead it cuts a certain Rregion of interest (ROI)</li>
+		<li>to 1D-cuts along the x-, y- and z-axis through the brightest pixel in the ROI, it fits 1D-Gaussian functions.</li>
+		<li>along the z-axis it fits to several x- and y-cuts a separate 1D-Gaussian, to see how they extend away from the focal point</li>
+		<li>a 3D-Gaussian fit is performed</li>
+		<li>An image of the fits of every <tt>showeveryNthSinglebeadPlot</tt>-th bead is saved as .fig and .pdf file</li>
+		<li>Histograms of all fit results (histogrammed over all fitted beads) are saved as .fig and .pdf files:<ul>
+            <li><tt>*_sub1_.psfhistogram.pdf/fig</tt> for 1D-fit histograms</li>
+            <li>(<tt>*_sub2_.psfhistogram.pdf/fig</tt> for 1D-fit histograms from DualView rhs)</li>
+            <li><tt>*_sub1_.psfhistogram3D.pdf/fig</tt> for 3D-fit histograms</li>
+            <li>(<tt>*_sub2_.psfhistogram3D.pdf/fig</tt> for 3D-fit histograms from DualView rhs)</li>
+            <li><tt>*_sub1_.psfhistogram_xzcol.pdf/fig</tt> for 1D-fits along z-axis histograms</li>
+            <li>(<tt>*_sub2_.psfhistogram_xzcol.pdf/fig</tt> for 1D-fit along z-axis histograms from DualView rhs)</li>
+		</ul></li>
+		<li>Histograms, comparing the two color channels are created, if the DualView mode was selected:<ul>
+            <li><tt>*_dualcolor_comparewidpos.pdf/fig</tt> compares the 1D fit results</li>
+            <li>(<tt>*_ldualcolor_pos.pdf/fig</tt> shows correlations on the 1D-fit data</li>
+		</ul></li>
+	  </ol>
+		In order to run the data evaluation, follow these steps:
+	  <ol>
+	    <li>Download <a href="http://www.dkfz.de/Macromol/quickfit/b040_beadscan.zip">the script package</a> and unzip it somewhere on your harddisk, e.g. <tt>D:\Matlab\spim</tt>.</li>
+		<li>copy the <a href="http://www.dkfz.de/Macromol/quickfit/dv2_template.m">DualView template</a> or <a href="http://www.dkfz.de/Macromol/quickfit/single_template.m">single template</a> to the directory of the image stack and open it in the MatLab editor.</li>
+		<li>at the top, set in <tt>addpath('D:\Matlab\spim');</tt> the path (here <tt>D:\Matlab\spim</tt>) to the path where you saved the scripts (see step 1)</li>
+		<li>set the variable <tt>datafile</tt> to the filesname of your stack, e.g. <tt>datafile = 'stack.tif';</tt></li>
+		<li>set the variable <tt>deltaz</tt> to the step-size of your beadscan in nanometers, e.g. <tt>deltaz=200;</tt> for 200nm steps.</li>
+		<li>set the variable <tt>deltaxy</tt> to the pixel-size of your beadscan in nanometers, e.g. <tt>deltaxy=400;</tt> for 400nm pixelsize (=24µm camera pixels @ 60x magnification).</li>
+		<li>set the variable <tt>datarange=[]</tt> to evaluate all z-setps or e.g. <tt>datarange=1:500</tt> to evaluate only the first 500 frames.</li>
+		<li>set the variable <tt>datarangeX=[]</tt> and <tt>datarangeY=[]</tt> to evaluate all pixels, or e.g. <tt>datarangeX=32:96; datarangeY=32:96;</tt> to evaluate only the central 64x64 pixels of a 128x128 camera.</li>
+		<li>set any of the other variables, if you want to.</li>
+		<li>run the script</li>
+	  </ol>
+	  You can also download an <a href="http://www.dkfz.de/Macromol/quickfit/beadscan_testdataset.zip">example bead stack</a> farther down, which comes with example output data!
+	  <p></p>
+	  
+	  
+	  <h2>Download &amp; License</h2>
+	  <ul>
+	    <li><a href="http://www.dkfz.de/Macromol/quickfit/b040_beadscan.zip">the script package</a></li>
+	    <li><a href="http://www.dkfz.de/Macromol/quickfit/dv2_template.m">DualView template</a> to evaluate a DualView image</li>
+	    <li><a href="http://www.dkfz.de/Macromol/quickfit/single_template.m">single template</a> to evaluate a simple scan without DualView optics</li>
+	    <li><a href="http://www.dkfz.de/Macromol/quickfit/beadscan_testdataset.zip">example bead stack</a>, 38MB ZIP file</li>
+	  </ul>
+	  
+	  <h2>See also</h2>
+	  <ul>
+	    <li><a href="http://www.dkfz.de/Macromol/quickfit/index.html">QuickFit - a data evaluation package for FCS, SPIM-FCS, ...</a></li>
+	  </ul>
+	  <!-- insert file="../template_bot.txt" -->	
+  
+
+</body></html>

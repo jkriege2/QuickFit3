@@ -262,6 +262,18 @@ QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start, 
         }
     }
 
+    {
+        for (int it=0; it<fitFactories.size(); ++it) {
+            QStringList ids=fitFactories[it]->fitFunctionFactoryGetIDs();
+            for (int i=0; i<ids.size(); i++) {
+                if (id_start.isEmpty() || ids[i].startsWith(id_start)) {
+                    QFFitFunction* f=fitFactories[it]->fitFunctionFactoryGet(ids[i], parent);
+                    if ( f && !res.contains(ids[i])) res[ids[i]]=f;
+                    else if (f) delete f;
+                }
+            }
+        }
+    }
     return res;
 }
 
@@ -302,6 +314,17 @@ QStringList QFFitFunctionManager::getModelIDs(QString id_start) const
         }
     }
 
+    {
+        for (int it=0; it<fitFactories.size(); ++it) {
+            QStringList ids=fitFactories[it]->fitFunctionFactoryGetIDs();
+            for (int i=0; i<ids.size(); i++) {
+                if (id_start.isEmpty() || ids[i].startsWith(id_start)) {
+                    res<<fitFactories[it]->fitFunctionFactoryGetIDs();
+                }
+            }
+        }
+    }
+
     return res;
 }
 
@@ -326,6 +349,16 @@ QFFitFunction *QFFitFunctionManager::createFunction(QString ID, QObject *parent)
         if (f&&f->isValid()) return f;
         if (f) delete f;
         return NULL;
+    }
+
+    {
+        for (int it=0; it<fitFactories.size(); ++it) {
+            QStringList ids=fitFactories[it]->fitFunctionFactoryGetIDs();
+            if (ids.contains(ID)) {
+                QFFitFunction* f=fitFactories[it]->fitFunctionFactoryGet(ID, parent);
+                if (f) return f;
+            }
+        }
     }
     return NULL;
 }
@@ -379,7 +412,16 @@ bool QFFitFunctionManager::contains(const QString &ID) const
 {
     for (int i=0; i<fitPlugins.size(); i++)
         if (fitPlugins[i]->getID()==ID) return true;
-    return userFitFunctions.contains(ID) || libraryFitFunctions.contains(ID);
+    bool found= userFitFunctions.contains(ID) || libraryFitFunctions.contains(ID);
+    if (!found) {
+        for (int it=0; it<fitFactories.size(); ++it) {
+            QStringList ids=fitFactories[it]->fitFunctionFactoryGetIDs();
+            if (ids.contains(ID)) {
+                return true;
+            }
+        }
+    }
+    return found;
 }
 
 QObject *QFFitFunctionManager::getPluginObject(int i) const
@@ -583,6 +625,15 @@ QString QFFitFunctionManager::getPluginHelp(int ID, QString faID) const {
         if (ff) delete ff;
         return h;
     }
+    if (ID<0) {
+        for (int i=0; i<fitFactories.size(); i++) {
+            QStringList ids=fitFactories[i]->fitFunctionFactoryGetIDs();
+            if (ids.contains(faID)) {
+                return fitFactories[i]->fitFunctionFactoryGetHelpFile(faID);
+            }
+        }
+
+    }
     return "";
 }
 
@@ -601,3 +652,14 @@ void QFFitFunctionManager::init()
     }
 }
 
+
+
+void QFFitFunctionManager::registerFitFactory(QFFitFunctionFactory *factory)
+{
+    if (!fitFactories.contains(factory)) fitFactories.append(factory);
+}
+
+void QFFitFunctionManager::unregisterFitFactory(QFFitFunctionFactory *factory)
+{
+    fitFactories.removeAll(factory);
+}

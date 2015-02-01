@@ -132,9 +132,9 @@ QFFitFunction* QFGeneralFitFunctionsPlugin::get(QString id, QObject* parent) con
     } else if (id=="gen_segline") {
         return new QFFitFunctionGeneralSegmentedLine();
     } else if (id=="gen_gaussianbeam_width") {
-        return new QFFitFunctionGeneralGaussianBeamWidth();
+        return new QFFitFunctionPSFGaussianBeamWidth();
     } else if (id=="gen_gaussianbeam_zintensity") {
-        return new QFFitFunctionGeneralGaussianBeamZIntensity();
+        return new QFFitFunctionPSFGaussianBeamZIntensity();
     } else if (id=="gen_pdf_gaussian") {
         return new QFFitFunctionGeneralPDFGaussianVar();
     } else if (id=="gen_cdf_gaussian") {

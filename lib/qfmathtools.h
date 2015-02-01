@@ -1287,6 +1287,86 @@ inline typename T::value_type qfstatisticsMaskedQuantile(const QVector<bool>& ma
 
 
 
+
+
+/*! \brief fill the given vector with linear coordinates
+    \ingroup tools_math_stat
+
+*/
+template <typename T>
+inline void qfGridX(T& X, typename T::value_type x0, long long Nx, typename T::value_type dx) {
+    typename T::value_type x;
+    X.resize(Nx);
+    x=x0;
+    for (long long xi=0; xi<Nx; xi++) {
+        X[xi]=x;
+        x=x+dx;
+    }
+}
+
+
+
+
+
+/*! \brief fill the given vector with (row-major) X,Y coordinates
+    \ingroup tools_math_stat
+
+*/
+template <typename T>
+inline void qfGridXY(T& X, T& Y, typename T::value_type x0, typename T::value_type y0, long long Nx, long long Ny, typename T::value_type dx, typename T::value_type dy) {
+    typename T::value_type x;
+    typename T::value_type y;
+    X.resize(Nx*Ny);
+    Y.resize(Nx*Ny);
+    y=y0;
+    for (long long yi=0; yi<Ny; yi++) {
+        x=x0;
+        for (long long xi=0; xi<Nx; xi++) {
+            X[yi*Nx+xi]=x;
+            Y[yi*Nx+xi]=y;
+            x=x+dx;
+        }
+        y=y+dy;
+    }
+}
+
+
+
+
+/*! \brief fill the given vector with (row-major) X,Y,Z coordinates
+    \ingroup tools_math_stat
+
+*/
+template <typename T>
+inline void qfGridXYZ(T& X, T& Y, T& Z, typename T::value_type x0, typename T::value_type y0, typename T::value_type z0, long long Nx, long long Ny, long long Nz, typename T::value_type dx, typename T::value_type dy, typename T::value_type dz) {
+    typename T::value_type x;
+    typename T::value_type y;
+    typename T::value_type z;
+    X.resize(Nx*Ny*Nz);
+    Y.resize(Nx*Ny*Nz);
+    Z.resize(Nx*Ny*Nz);
+    z=z0;
+    for (long long zi=0; zi<Nz; zi++) {
+        y=y0;
+        for (long long yi=0; yi<Ny; yi++) {
+            x=x0;
+            for (long long xi=0; xi<Nx; xi++) {
+                X[zi*Nx*Ny+yi*Nx+xi]=x;
+                Y[zi*Nx*Ny+yi*Nx+xi]=y;
+                Z[zi*Nx*Ny+yi*Nx+xi]=z;
+                x=x+dx;
+            }
+            y=y+dy;
+        }
+        z=z+dz;
+    }
+}
+
+
+
+
+
+
 /*! \brief round a value according to the error
     \ingroup qf3lib_mathtools
 
