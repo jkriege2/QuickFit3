@@ -488,11 +488,11 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	fi
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
-		make -j${MAKE_PARALLEL_BUILDS}
+		make 
 		
 		libOK=$?
 		if [ $libOK -eq 0 ] ; then		
-			make -j${MAKE_PARALLEL_BUILDS} install
+			make  install
 			libOK=$?
 			if [ $libOK -ne 0 ] ; then		
 				libOK=-4
