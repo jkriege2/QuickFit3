@@ -25,11 +25,11 @@ Copyright (c) 2014
 
 #include "qfpluginevaluation.h"
 /*!
-    \defgroup qf3rdrdp_GROUPNAME Evaluation Item Plugin
+    \defgroup qf3evalp_GROUPNAME Evaluation Item Plugin
     \ingroup qf3evaluationplugins
 */
 /*! \brief Evaluation Item Plugin class
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3evalp_GROUPNAME
 */
 class QFEVAL : public QObject, public QFPluginEvaluationItemBase {
         Q_OBJECT

@@ -128,7 +128,7 @@ if [ "${deployspecials}" == "1" ]; then
 	SPECIALPLUGINS=
 fi
 REMOVEPLUGINS=" ${SPECIALPLUGINS} ${SPIMPLUGINS} cam_radhard2 cam_rh2v2  b040_ffmcontrol alv_autocorrelator5000 multicontrol_stage qfe_acquisitiontest scanner2000_nicounter"
-SPIMONLYQTMODULES=" QtScript4.dll QtScriptTools4.dll"
+SPIMONLYQTMODULES=" QtScript4.dll QtScriptTools4.dll Qt5Script.dll Qt5ScriptTools.dll"
 SPECIALONLYQTMODULES=""
 
 
@@ -180,6 +180,7 @@ if [ "${create_deploy}" != "0" ]; then
 	rm -rf ./globalconfig
 	mkdir globalconfig
 	rm ./Qt*d4.dll
+	rm ./Qt5*d.dll
 	rm ./Qt*d.dll
 	rm ./test*.*
 	rm ./temp*.*
@@ -216,6 +217,7 @@ if [ "${create_deploy}" != "0" ]; then
 	PWDD=`pwd`
 	 echo "going to ./qtplugins/  ${PWDD}";
 	find -name "*d4.dll" -exec rm -rf {} \;
+	find -name "q*d.dll" -exec rm -rf {} \;
 	find -name "*.a" -exec rm -rf {} \;
 	cd ..
 	PWDD=`pwd`

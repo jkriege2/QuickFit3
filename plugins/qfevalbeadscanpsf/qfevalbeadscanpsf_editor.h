@@ -43,7 +43,7 @@ namespace Ui {
 }
 
 /*! \brief editor for QFEvalBeadScanPSFItem
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3rdrdp_eval_beadscanpsf
 */
 class QFEvalBeadScanPSFEditor : public QFEvaluationEditor {
         Q_OBJECT

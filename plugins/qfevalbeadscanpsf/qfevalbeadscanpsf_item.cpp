@@ -77,7 +77,7 @@ QString QFEvalBeadScanPSFItem::getEvaluationResultID() {
 }
 
 
-void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY, double deltaZ, int ROIxy, int ROIz, int pixels_per_frame, double est_psf_width, double est_psf_height, QProgressDialog* dlgEvaluationProgress) {
+void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY, double deltaZ, int ROIxy, int ROIz, int pixels_per_frame, double est_psf_width, double est_psf_height, double fitXY_Z_fraction, QProgressDialog* dlgEvaluationProgress) {
     QApplication::processEvents();
     if (dlgEvaluationProgress&& dlgEvaluationProgress->wasCanceled()) return; // canceled by user ?
 
@@ -237,7 +237,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
         for (int i=initial_beads_x.size()-1; i>=0; i--) {
             for (int j=0; j<i; j++) {
                 double d=sqrt(qfSqr(deltaXY*(initial_beads_x[i]-initial_beads_x[j]))+qfSqr(deltaXY*(initial_beads_y[i]-initial_beads_y[j]))+qfSqr(deltaZ*(initial_beads_z[i]-initial_beads_z[j])));
-                if (d<min_distance*deltaXY) {
+                if (d<min_distance*deltaXY || d<double(zsteps)*deltaZ) {
                     initial_beads_x.removeAt(i);
                     initial_beads_y.removeAt(i);
                     initial_beads_z.removeAt(i);
@@ -368,12 +368,13 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                     else if (ff1D->getParameterID(i)=="position") cutZP[i]=z0;
                     else if (ff1D->getParameterID(i)=="width") cutZP[i]=init_w3;
                 }
+                alg->fit(cutZP.data(), NULL, cutZX.data(), cutZ.data(), NULL, cutZ.size(), ff1D, cutZP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
 
 
                 // fit X/Y-cuts along Z-axis
                 QVector<double> zpos, fitZX_width, fitZY_width;
-                for (int z=z0i-ROIz/4; z<=z0i+ROIz/4; z++) {
-                    zpos<<z;
+                for (int z=z0i-ceil(double(ROIz)*fitXY_Z_fraction/2.0); z<=z0i+ceil(double(ROIz)*fitXY_Z_fraction/2.0); z++) {
+                    zpos<<(z0+double(z)*deltaZ);
 
                     // fit X-cut
                     for (int i=0; i<cutX.size(); i++) {
@@ -388,12 +389,12 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                         else if (ff1D->getParameterID(i)=="width") { wid=i; cutZXP[i]=init_w12; }
                     }
                     alg->fit(cutZXP.data(), NULL, cutXX.data(), cutX.data(), NULL, cutX.size(), ff1D, cutZXP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
-                    if (wid>=0) fitZX_width<<cutZXP[wid];
+                    fitZX_width<<cutZXP[wid];
 
 
                     // fit Y-cut
-                    for (int i=0; i<cutX.size(); i++) {
-                        cutX[i]=roi(x0i, i, z);
+                    for (int i=0; i<cutY.size(); i++) {
+                        cutY[i]=roi(x0i, i, z);
                     }
                     QVector<double> cutZYP=ff1D->getInitialParamValues();
                     wid=-1;
@@ -404,13 +405,15 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                         else if (ff1D->getParameterID(i)=="width") {wid=i; cutZYP[i]=init_w12; }
                     }
                     alg->fit(cutZYP.data(), NULL, cutYX.data(), cutY.data(), NULL, cutY.size(), ff1D, cutZYP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
-                    if (wid>=0) fitZY_width<<cutZYP[wid];
+                    fitZY_width<<cutZYP[wid];
                 }
 
                 // fit gaussian beam width to X/Y cut results
                 QVector<double> fitXZCutResults=ffGBwidth->getInitialParamValues();
                 QVector<double> fitYZCutResults=ffGBwidth->getInitialParamValues();
 
+                ffGBwidth->estimateInitial(fitXZCutResults.data(), zpos.data(), fitZX_width.data(), zpos.size(), NULL);
+                ffGBwidth->estimateInitial(fitYZCutResults.data(), zpos.data(), fitZY_width.data(), zpos.size(), NULL);
                 for (int i=0; i<fitXZCutResults.size(); i++) {
                     if (ffGBwidth->getParameterID(i)=="zR") { fitXZCutResults[i]=init_w3; fitYZCutResults[i]=init_w3; }
                     else if (ffGBwidth->getParameterID(i)=="position") {  fitXZCutResults[i]=z0; fitYZCutResults[i]=z0;  }
@@ -455,17 +458,17 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                 record->disableEmitResultsChanged();
                 record->resultsSetNumber(evalID, QString("channel%1_beads").arg(c), b+1);
                 record->resultsSetString(evalID, QString("cutx_fitfunction"), ff1D->id());
-                record->resultsSetStringList(evalID, QString("cutx_fitfunction_params"), ff1D->getParameterIDs());
+                record->resultsSetStringList(evalID, QString("cutx_fitfunction_parameternames"), ff1D->getParameterIDs());
                 record->resultsSetString(evalID, QString("cuty_fitfunction"), ff1D->id());
-                record->resultsSetStringList(evalID, QString("cuty_fitfunction_params"), ff1D->getParameterIDs());
+                record->resultsSetStringList(evalID, QString("cuty_fitfunction_parameternames"), ff1D->getParameterIDs());
                 record->resultsSetString(evalID, QString("cutz_fitfunction"), ff1D->id());
-                record->resultsSetStringList(evalID, QString("cutz_fitfunction_params"), ff1D->getParameterIDs());
+                record->resultsSetStringList(evalID, QString("cutz_fitfunction_parameternames"), ff1D->getParameterIDs());
                 record->resultsSetString(evalID, QString("fit3d_fitfunction"), ff3D->id());
-                record->resultsSetStringList(evalID, QString("fit3d_fitfunction_params"), ff3D->getParameterIDs());
+                record->resultsSetStringList(evalID, QString("fit3d_fitfunction_parameternames"), ff3D->getParameterIDs());
                 record->resultsSetString(evalID, QString("cutxz_gaussianbeam_fitfunc"), ffGBwidth->id());
-                record->resultsSetStringList(evalID, QString("cutxz_gaussianbeam_fitfunc"), ffGBwidth->getParameterIDs());
+                record->resultsSetStringList(evalID, QString("cutxz_gaussianbeam_parameternames"), ffGBwidth->getParameterIDs());
                 record->resultsSetString(evalID, QString("cutyz_gaussianbeam_fitfunc"), ffGBwidth->id());
-                record->resultsSetStringList(evalID, QString("cutyz_gaussianbeam_fitfunc"), ffGBwidth->getParameterIDs());
+                record->resultsSetStringList(evalID, QString("cutyz_gaussianbeam_parameternames"), ffGBwidth->getParameterIDs());
 
                 record->resultsSetNumberList(evalID, QString("channel%1_bead%2_cutx_fitresult").arg(c).arg(b), cutXP);
                 record->resultsSetNumberList(evalID, QString("channel%1_bead%2_cuty_fitresult").arg(c).arg(b), cutYP);

@@ -64,7 +64,7 @@ function result = Gaussian3Drmg(X,Y,Z, offset, amplitude, x0, sigma, varargin)
         alpha=varargin{2};
     end
     
-    % calculate the three principal axes o the gaussian
+    % calculate the three principal axes of the gaussian
     [ er, etheta, ephi ] = sphericalCoordinatesUnitVectors(theta, phi);
     M=directionAngleRotationMatrix(er, alpha);
     e1=er;

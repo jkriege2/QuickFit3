@@ -109,10 +109,10 @@ void QFEvaluationEditor::saveReport() {
 
         QFileInfo fi(fn);
         QPrinter* printer=new QPrinter();//QPrinter::HighResolution);
-        printer->setPaperSize(QPrinter::A4);
-        printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-        printer->setOrientation(QPrinter::Portrait);
         printer->setOutputFormat(QPrinter::PdfFormat);
+        printer->setPaperSize(QPrinter::A4);
+        printer->setPageMargins(10,10,10,10,QPrinter::Millimeter);
+        printer->setOrientation(QPrinter::Portrait);
         printer->setColorMode(QPrinter::Color);
         QTextDocument* doc=new QTextDocument();
         doc->setTextWidth(printer->pageRect().size().width());
@@ -144,7 +144,7 @@ void QFEvaluationEditor::printReport() {
        This is implemented in a generic way here.    */
     QPrinter* p=new QPrinter();
 
-    p->setPageMargins(15,15,15,15,QPrinter::Millimeter);
+    p->setPageMargins(10,10,10,10,QPrinter::Millimeter);
     p->setOrientation(QPrinter::Portrait);
     QPrintDialog *dialog = new QPrintDialog(p, this);
     dialog->setWindowTitle(tr("Print Report"));

@@ -26,9 +26,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 QFFitFunctionPSFGaussianBeamWidth::QFFitFunctionPSFGaussianBeamWidth() {
     //           type,         id,                        name,                                                    label (HTML),                      unit,          unitlabel (HTML),        fit,       userEditable, userRangeEditable, displayError, initialFix,                initialValue, minValue, maxValue, inc, absMin, absMax
-    addParameter(FloatNumber,  "zR",                "rayleigh range zR",                                              "z<sub>R</sub>",                        "nm",         "",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 500,            -1e10,    1e10,  1  );
+    addParameter(FloatNumber,  "zR",                "rayleigh range zR",                                              "z<sub>R</sub>",                        "nm",         "",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 1200,            100,    1e10,  1  );
     #define PARAM_Z0 0
-    addParameter(FloatNumber,  "w0",                   "beam diameter w0",                                        "w<sub>0</sub>",                           "nm",         "",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 1200,            1e-10,    1e10,  1  );
+    addParameter(FloatNumber,  "w0",                   "beam diameter w0",                                        "w<sub>0</sub>",                           "nm",         "",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 500,            50,    1e10,  1  );
     #define PARAM_W0 1
     addParameter(FloatNumber,  "position",                "position",                                              "Z<sub>0</sub>",                        "nm",         "",                   true,      true,         true,              QFFitFunction::DisplayError,       false, 0,            -1e10,    1e10,  1  );
     #define PARAM_POSITION 2

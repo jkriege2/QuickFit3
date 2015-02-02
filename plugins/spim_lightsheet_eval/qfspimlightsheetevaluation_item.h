@@ -31,7 +31,7 @@
 #include "qfrdrimagemask.h"
 
 /*! \brief evaluation item class 
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3evaldp_spim_lightsheet_eval
 
 
     

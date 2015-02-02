@@ -36,7 +36,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 /*! \brief evaluation item class 
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3evaldp_fcs_msd
 
 
     

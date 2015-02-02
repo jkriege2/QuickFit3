@@ -36,7 +36,7 @@
 #include "../base_classes/qfusesresultsbyindexandmodelevaluation.h"
 
 /*! \brief evaluation item class 
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3evaldp_fcs_maxent
 
 
     

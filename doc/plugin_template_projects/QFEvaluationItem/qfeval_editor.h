@@ -33,7 +33,7 @@ namespace Ui {
 }
 
 /*! \brief editor for QFEVALItem
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3evalp_GROUPNAME
 */
 class QFEVALEditor : public QFEvaluationEditor {
         Q_OBJECT

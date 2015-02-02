@@ -212,6 +212,8 @@ void QFHistogramView::createWidgets() {
     splitterHistogram->setChildrenCollapsible(false);
     splitterHistogram->addWidget(pltParamHistogram);
     splitterHistogram->addWidget(widHTab);
+    splitterHistogram->setStretchFactor(0,1);
+    splitterHistogram->setStretchFactor(1,0);
     layHist->addWidget(splitterHistogram, 0, 0);
     layHist->addWidget(grpHistogramSettings, 0, 1);
     layHist->setColumnStretch(0,5);
@@ -223,6 +225,7 @@ void QFHistogramView::createWidgets() {
     cmbFitFunction->updateFitFunctions("gen_pdf_,gen_,gendist_,dist_");
     cmbFitFunction->setCurrentFitFunction("gen_gaussian_sqrte");
     cmbFitFunction->setUpdatesEnabled(true);
+    chkKey->setChecked(false);
 
 }
 

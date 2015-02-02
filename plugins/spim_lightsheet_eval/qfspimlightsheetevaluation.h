@@ -25,11 +25,11 @@
 
 #include "qfpluginevaluation.h"
 /*!
-    \defgroup qf3rdrdp_GROUPNAME Evaluation Item Plugin
+    \defgroup qf3evaldp_spim_lightsheet_eval Evaluation Item Plugin
     \ingroup qf3evaluationplugins
 */
 /*! \brief Evaluation Item Plugin class
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3evaldp_spim_lightsheet_eval
 */
 class QFSPIMLightsheetEvaluation : public QObject, public QFPluginEvaluationItemBase {
         Q_OBJECT

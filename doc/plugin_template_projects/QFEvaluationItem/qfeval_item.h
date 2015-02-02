@@ -30,7 +30,7 @@ Copyright (c) 2014
 #include "qfevaluationitemfactory.h"
 
 /*! \brief evaluation item class 
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3evalp_GROUPNAME
 
 
     

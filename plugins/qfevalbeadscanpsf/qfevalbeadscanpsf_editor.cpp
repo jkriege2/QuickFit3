@@ -52,7 +52,7 @@ QFEvalBeadScanPSFEditor::QFEvalBeadScanPSFEditor(QFPluginServices* services,  QF
     ui->histogram2->setSpaceSavingMode(true);
 
     // create progress dialog for evaluation
-    dlgEvaluationProgress=new QProgressDialog(NULL);
+    dlgEvaluationProgress=new QProgressDialog(this);
     dlgEvaluationProgress->hide();
     dlgEvaluationProgress->setWindowModality(Qt::WindowModal);
     
@@ -324,14 +324,22 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
                 JKQTPxQFFitFunctionLineGraph* fit=new JKQTPxQFFitFunctionLineGraph(ui->pltFitX->get_plotter());
                 QFFitFunction* ff=NULL;
                 fit->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDX));
+                double amp=1;
+                double width=0;
                 for (int i=0; i<fitresCutX.size(); i++) {
                     if (ff && ff->getParameterID(i)=="position") fitresCutX[i]=fitresCutX[i]-double(initPosX)*deltaXY;
+                    if (ff && ff->getParameterID(i)=="amplitude") amp=fitresCutX[i];
+                    if (ff && ff->getParameterID(i)=="width") width=fitresCutX[i];
                 }
                 fit->set_params(fitresCutX);
                 fit->set_color(plt->get_color().darker());
+                fit->set_title(tr("fit: w_0=%1nm").arg(width));
                 ui->pltFitX->addGraph(fit);
 
                 ui->pltFitX->zoomToFit();
+                double maxy=1.2*amp;
+                if (ui->pltFitX->getYMax()<maxy) ui->pltFitX->setY(ui->pltFitX->getYMin(), maxy);
+
                 ui->pltFitX->set_doDrawing(true);
                 ui->pltFitX->update_plot();
             }
@@ -357,14 +365,21 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
                 JKQTPxQFFitFunctionLineGraph* fit=new JKQTPxQFFitFunctionLineGraph(ui->pltFitY->get_plotter());
                 QFFitFunction* ff=NULL;
                 fit->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDY));
+                double amp=1, width=0;
                 for (int i=0; i<fitresCutY.size(); i++) {
                     if (ff && ff->getParameterID(i)=="position") fitresCutY[i]=fitresCutY[i]-double(initPosY)*deltaXY;
+                    if (ff && ff->getParameterID(i)=="amplitude") amp=fitresCutY[i];
+                    if (ff && ff->getParameterID(i)=="width") width=fitresCutY[i];
                 }
                 fit->set_params(fitresCutY);
                 fit->set_color(plt->get_color().darker());
+                fit->set_title(tr("fit: w_0=%1nm").arg(width));
                 ui->pltFitY->addGraph(fit);
 
                 ui->pltFitY->zoomToFit();
+                double maxy=1.2*amp;
+                if (ui->pltFitY->getYMax()<maxy) ui->pltFitY->setY(ui->pltFitY->getYMin(), maxy);
+
                 ui->pltFitY->set_doDrawing(true);
                 ui->pltFitY->update_plot();
             }
@@ -390,14 +405,20 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
                 JKQTPxQFFitFunctionLineGraph* fit=new JKQTPxQFFitFunctionLineGraph(ui->pltFitZ->get_plotter());
                 QFFitFunction* ff=NULL;
                 fit->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDZ));
+                double amp=1, width=0;
                 for (int i=0; i<fitresCutZ.size(); i++) {
                     if (ff && ff->getParameterID(i)=="position") fitresCutZ[i]=fitresCutZ[i]-double(initPosZ)*deltaZ;
+                    if (ff && ff->getParameterID(i)=="amplitude") amp=fitresCutZ[i];
+                    if (ff && ff->getParameterID(i)=="width") width=fitresCutZ[i];
                 }
                 fit->set_params(fitresCutZ);
                 fit->set_color(plt->get_color().darker());
+                fit->set_title(tr("fit: w_0=%1nm").arg(width));
                 ui->pltFitZ->addGraph(fit);
 
                 ui->pltFitZ->zoomToFit();
+                double maxy=1.2*amp;
+                if (ui->pltFitZ->getYMax()<maxy) ui->pltFitZ->setY(ui->pltFitZ->getYMin(), maxy);
                 ui->pltFitZ->set_doDrawing(true);
                 ui->pltFitZ->update_plot();
             }
@@ -418,13 +439,14 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
                 plt->set_symbol(JKQTPplus);
                 plt->set_xColumn(colX);
                 plt->set_yColumn(colYX);
-                plt->set_title(tr("w_x(z)"));
+                plt->set_title(tr("w_x(z): w_0=%1nm, z_R=%2nm, z_0=%3{\\mu}m").arg(fitresCutZXGB.value(1)).arg(fitresCutZXGB.value(0)).arg(fitresCutZXGB.value(2)/1000.0));
                 ui->pltFitWofZ->addGraph(plt);
 
 
                 JKQTPxQFFitFunctionLineGraph* fit=new JKQTPxQFFitFunctionLineGraph(ui->pltFitWofZ->get_plotter());
                 QFFitFunction* ff=NULL;
                 fit->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDCutZX));
+                //qDebug()<<ffIDCutZX<<ff;
                 fit->set_params(fitresCutZXGB);
                 fit->set_color(plt->get_color().darker());
                 ui->pltFitWofZ->addGraph(fit);
@@ -434,7 +456,7 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
                 plt->set_symbol(JKQTPplus);
                 plt->set_xColumn(colX);
                 plt->set_yColumn(colYY);
-                plt->set_title(tr("w_y(z)"));
+                plt->set_title(tr("w_y(z): w_0=%1nm, z_R=%2nm, z_0=%3{\\mu}m").arg(fitresCutZYGB.value(1)).arg(fitresCutZYGB.value(0)).arg(fitresCutZYGB.value(2)/1000.0));
 
                 ui->pltFitWofZ->addGraph(plt);
 
@@ -442,6 +464,7 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
                 fit=new JKQTPxQFFitFunctionLineGraph(ui->pltFitWofZ->get_plotter());
                 ff=NULL;
                 fit->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDCutZY));
+                //qDebug()<<ffIDCutZY<<ff;
                 fit->set_params(fitresCutZYGB);
                 fit->set_color(plt->get_color().darker());
                 ui->pltFitWofZ->addGraph(fit);
@@ -449,6 +472,9 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
 
 
                 ui->pltFitWofZ->zoomToFit();
+                double maxy=3.0*qMax(fitresCutZYGB.value(1),fitresCutZXGB.value(1));
+                if (ui->pltFitWofZ->getYMax()>maxy && maxy>=qMax(fitresCutZY.value(fitresCutZY.size()/2, 500), fitresCutZX.value(fitresCutZY.size()/2, 500))) ui->pltFitWofZ->setY(0, maxy);
+                else ui->pltFitWofZ->setY(0, ui->pltFitWofZ->getYMax());
                 ui->pltFitWofZ->set_doDrawing(true);
                 ui->pltFitWofZ->update_plot();
             }
@@ -512,6 +538,41 @@ void QFEvalBeadScanPSFEditor::displayEvaluationHistograms() {
             }
             ui->histogram2->updateHistogram(true);
         }
+        ui->histogramD1->clear();
+        ui->histogramD2->clear();
+        if (channels>0) {
+            QString evalID=eval->getEvaluationResultID();
+            QVector<double> datDX, datDY, datDZ, datD;
+            for (int b=0; b<beads; b++) {
+                QString param=QString("channel%1_bead%2").arg(1).arg(b);
+                bool ok=true;
+                QVector<double> d=record->resultsGetAsDoubleList(evalID, param+"_fit3d_distc0", &ok);
+                if (ok) {
+                    datDX<<d[0];
+                    datDY<<d[1];
+                    datDZ<<d[2];
+                    datD<<d[3];
+                }
+            }
+            if (datDX.size()>0) {
+                ui->histogramD1->addCopiedHistogram(tr("distance: x"), datDX.data(), datDX.size());
+                if (ui->cmbParamD2->currentIndex()==0) ui->histogramD2->addCopiedHistogram(tr("distance: x"), datDX.data(), datDX.size());
+            }
+            if (datDY.size()>0) {
+                ui->histogramD1->addCopiedHistogram(tr("distance: y"), datDY.data(), datDY.size());
+                if (ui->cmbParamD2->currentIndex()==1) ui->histogramD2->addCopiedHistogram(tr("distance: y"), datDY.data(), datDY.size());
+            }
+            if (datDZ.size()>0) {
+                ui->histogramD1->addCopiedHistogram(tr("distance: z"), datDZ.data(), datDZ.size());
+                if (ui->cmbParamD2->currentIndex()==2) ui->histogramD2->addCopiedHistogram(tr("distance: z"), datDZ.data(), datDZ.size());
+            }
+            if (datD.size()>0) {
+                if (ui->cmbParamD2->currentIndex()==2) ui->histogramD2->addCopiedHistogram(tr("abs. distance"), datD.data(), datD.size());
+            }
+
+        }
+        ui->histogramD1->updateHistogram(true);
+        ui->histogramD2->updateHistogram(true);
     }
 }
 
@@ -638,13 +699,18 @@ void QFEvalBeadScanPSFEditor::displayResults()
         ui->cmbParam1->addItem(s1=tr("3D fit: width 1"), sl1=constructQStringListFromItems("_fit3d_results", "5")); ui->cmbParam2->addItem(s1, sl1);
         ui->cmbParam1->addItem(s1=tr("3D fit: width 2"), sl1=constructQStringListFromItems("_fit3d_results", "6")); ui->cmbParam2->addItem(s1, sl1);
         ui->cmbParam1->addItem(s1=tr("3D fit: width 3"), sl1=constructQStringListFromItems("_fit3d_results", "7")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: theta"), sl1=constructQStringListFromItems("_fit3d_results", "8")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: phi"), sl1=constructQStringListFromItems("_fit3d_results", "9")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: alpha"), sl1=constructQStringListFromItems("_fit3d_results", "10")); ui->cmbParam2->addItem(s1, sl1);
 
-        if (ch>0) {
+        if (ch>1) {
             ui->cmbParam1->addItem(s1=tr("3D fit: distance x"), sl1=constructQStringListFromItems("_fit3d_distc0", "0")); ui->cmbParam2->addItem(s1, sl1);
             ui->cmbParam1->addItem(s1=tr("3D fit: distance y"), sl1=constructQStringListFromItems("_fit3d_distc0", "1")); ui->cmbParam2->addItem(s1, sl1);
             ui->cmbParam1->addItem(s1=tr("3D fit: distance z"), sl1=constructQStringListFromItems("_fit3d_distc0", "2")); ui->cmbParam2->addItem(s1, sl1);
-            ui->cmbParam1->addItem(s1=tr("3D fit: distance"), sl1=constructQStringListFromItems("_fit3d_distc0", "3")); ui->cmbParam2->addItem(s1, sl1);
+            ui->cmbParam1->addItem(s1=tr("3D fit: abs. distance"), sl1=constructQStringListFromItems("_fit3d_distc0", "3")); ui->cmbParam2->addItem(s1, sl1);
         }
+
+        ui->tabWidget->setTabEnabled(ui->tabWidget->indexOf(ui->tabHistD), ch>1);
 
         for (int c=0; c<ch; c++) {
             for (int i=0; i<ui->cmbParam1->count(); i++) {
@@ -658,8 +724,8 @@ void QFEvalBeadScanPSFEditor::displayResults()
     }
     ui->cmbParam1->setCurrentIndex(ui->cmbParam1->findText(tr("3D fit: width 1")));
     ui->cmbParam2->setCurrentIndex(ui->cmbParam2->findText(tr("3D fit: width 3")));
-    ui->cmbParamC1->setCurrentIndex(ui->cmbParam1->findText(tr("ch 0: 3D fit: position z")));
-    ui->cmbParamC2->setCurrentIndex(ui->cmbParam2->findText(tr("ch 0: 3D fit: width 3")));
+    ui->cmbParamC1->setCurrentIndex(ui->cmbParamC1->findText(tr("ch 0: 3D fit: position z")));
+    ui->cmbParamC2->setCurrentIndex(ui->cmbParamC2->findText(tr("ch 0: 3D fit: width 3")));
 
     ui->spinA->setEnabled(!hasRes);
     ui->spinZ->setEnabled(!hasRes);
@@ -668,6 +734,7 @@ void QFEvalBeadScanPSFEditor::displayResults()
     ui->spinROIZ->setEnabled(!hasRes);
     ui->spinPSFWidth->setEnabled(!hasRes);
     ui->spinPSFHeight->setEnabled(!hasRes);
+    ui->spinWZFraction->setEnabled(!hasRes);
 
     connect(ui->cmbChannel, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationBead()));
     connect(ui->cmbBead, SIGNAL(currentIndexChanged(int)), this, SLOT(displayEvaluationBead()));
@@ -792,7 +859,7 @@ void QFEvalBeadScanPSFEditor::evaluateCurrent() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
     // here we call doEvaluation to execute our evaluation for the current record only
-    eval->doEvaluation(record, ui->spinA->value(), ui->spinZ->value(), ui->spinROIXY->value(), ui->spinROIZ->value(), ui->spinPixPerFrame->value(), ui->spinPSFWidth->value(), ui->spinPSFHeight->value(), dlgEvaluationProgress);
+    eval->doEvaluation(record, ui->spinA->value(), ui->spinZ->value(), ui->spinROIXY->value(), ui->spinROIZ->value(), ui->spinPixPerFrame->value(), ui->spinPSFWidth->value(), ui->spinPSFHeight->value(), ui->spinWZFraction->value()/100.0, dlgEvaluationProgress);
 
     displayResults();
     dlgEvaluationProgress->setValue(100);
@@ -821,11 +888,21 @@ void QFEvalBeadScanPSFEditor::resetCurrent()
 
 
 void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
-    if (!current) return;
+    if (!current) return;    
     QFRawDataRecord* record=current->getHighlightedRecord(); 
     // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
     if ((!eval)||(!record)/*||(!data)*/) return;
+
+    int lastIds=ui->tabWidget->currentIndex();
+    for (int i=0; i<ui->tabWidget->count(); i++ ){
+        ui->tabWidget->setCurrentIndex(i);
+        QApplication::processEvents();
+    }
+    ui->tabWidget->setCurrentIndex(lastIds);
+
+    QString evalID=eval->getEvaluationResultID();
+    int channels=record->resultsGetAsInteger(evalID, "channels");
 
     
     // we use this QTextCursor to write the document
@@ -841,6 +918,7 @@ void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
     QTextCharFormat fTextBoldSmall=fTextBold;
     fTextBoldSmall.setFontPointSize(0.85*fText.fontPointSize());
     QTextCharFormat fHeading1=fText;
+    QTextCharFormat fHeading2=fText;
     QTextBlockFormat bfLeft;
     bfLeft.setAlignment(Qt::AlignLeft);
     QTextBlockFormat bfRight;
@@ -850,60 +928,193 @@ void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
 
     fHeading1.setFontPointSize(2*fText.fontPointSize());
     fHeading1.setFontWeight(QFont::Bold);
+    fHeading2.setFontPointSize(1.5*fText.fontPointSize());
+    fHeading2.setFontWeight(QFont::Bold);
 
     
     // insert heading
-    cursor.insertText(tr("Evaluation Report:\n\n"), fHeading1);
+    cursor.insertText(tr("Evaluation Report: PSF\n\n"), fHeading1);
     cursor.movePosition(QTextCursor::End);
 
     // insert table with some data
     QTextTableFormat tableFormat;
     tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
     tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
-    QTextTable* table = cursor.insertTable(2, 2, tableFormat);
-    table->cellAt(0, 0).firstCursorPosition().insertText(tr("raw data:"), fTextBold);
-    table->cellAt(0, 1).firstCursorPosition().insertText(record->getName(), fText);
-    table->cellAt(1, 0).firstCursorPosition().insertText(tr("ID:"), fTextBold);
-    table->cellAt(1, 1).firstCursorPosition().insertText(QString::number(record->getID()));
+    QTextTable* table = cursor.insertTable(6, 4, tableFormat);
+    table->mergeCells(0,1,1,3);
+    int row=0;
+    int col=0;
+    table->cellAt(row, col+0).firstCursorPosition().insertText(tr("raw data:"), fTextBold);
+    table->cellAt(row, col+1).firstCursorPosition().insertText(record->getName(), fText);
+    row++;
+    table->cellAt(row, col+0).firstCursorPosition().insertText(tr("pixel size:"), fTextBold);
+    table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(ui->spinA->value())+tr(" nm"), fText);
+    row++;
+    table->cellAt(row, col+0).firstCursorPosition().insertText(tr("step size:"), fTextBold);
+    table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(ui->spinZ->value())+tr(" nm"), fText);
+    row++;
+    table->cellAt(row, col+0).firstCursorPosition().insertText(tr("ROI lateral size (xy):"), fTextBold);
+    table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(ui->spinROIXY->value())+tr(" pixel"), fText);
+    row++;
+    table->cellAt(row, col+0).firstCursorPosition().insertText(tr("ROI longitudinal size (z):"), fTextBold);
+    table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(ui->spinROIZ->value())+tr(" pixel"), fText);
+    row++;
+    table->cellAt(row, col+0).firstCursorPosition().insertText(tr("found beads (per channel):"), fTextBold);
+    table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(record->resultsGetAsInteger(evalID, "channel0_beads")), fTextBold);
+    row++;
+    row=1;
+    col=2;
+    table->cellAt(row, col+0).firstCursorPosition().insertText(tr("estimated beads per frame:"), fTextBold);
+    table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(ui->spinPixPerFrame->value())+tr(" pixel"), fText);
+    row++;
+    table->cellAt(row, col+0).firstCursorPosition().insertHtml(tr("<b>w<sub>x</sub>(z)/w<sub>x</sub>(z)-fit z-range fraction:</b>"));
+    table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(ui->spinWZFraction->value())+tr(" %"), fText);
+    row++;
+    table->cellAt(row, col+0).firstCursorPosition().insertText(tr("estimated PSF width:"), fTextBold);
+    table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(ui->spinPSFWidth->value())+tr(" nm"), fText);
+    row++;
+    table->cellAt(row, col+0).firstCursorPosition().insertText(tr("estimated PSF height:"), fTextBold);
+    table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(ui->spinPSFHeight->value())+tr(" nm"), fText);
+    row++;
+    table->cellAt(row, col+0).firstCursorPosition().insertText(tr("channels:"), fTextBold);
+    table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(channels), fText);
+    row++;
     cursor.movePosition(QTextCursor::End);
 	
 	
 	
-	
-	
-	/*
 	int PicTextFormat=QTextFormat::UserObject + 1;
     QObject *picInterface = new QPictureTextObject;
     document->documentLayout()->registerHandler(PicTextFormat, picInterface);
 
 	
-	QTextTable* table = cursor.insertTable(2,1, tableFormat);
-    {
-	    // insert a plot from ui->plotter
-        QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
-        QPicture pic;
-        JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
-        ui->plotter->get_plotter()->draw(*painter, QRect(0,0,ui->plotter->width(),ui->plotter->height()));
-        delete painter;
-        double scale=0.9*document->textWidth()/double(pic.boundingRect().width());
-        if (scale<=0) scale=1;
-        tabCursor.insertText(tr("variance vs. average intensity plot:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
-        QApplication::processEvents();
 
-		// insert an enhanced table plot from ui->tabResults
-        tabCursor=table->cellAt(1,0).firstCursorPosition();
-        tabCursor.insertText(tr("\n"), fTextBoldSmall);
-        QPicture picT;
-        painter=new JKQTPEnhancedPainter(&picT);
-        ui->tabResults->paint(*painter);
-        delete painter;
-        scale=0.95*document->textWidth()/double(picT.boundingRect().width());
-        if (scale<=0) scale=1;
-        tabCursor.insertText(tr("fit results table:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale);
-        QApplication::processEvents();
-    }*/
+    cursor.movePosition(QTextCursor::End);
+    ui->histogram1->writeReport(cursor, document);
+    ui->histogram2->writeReport(cursor, document);
+    if (channels>1) {
+        ui->histogramD1->writeReport(cursor, document);
+        ui->histogramD2->writeReport(cursor, document);
+    }
+    ui->corrPlot->writeReport(cursor, document);
+
+    QList<int> beadsl;
+    beadsl<<ui->cmbBead->currentIndex();
+    if (!beadsl.contains(0)) beadsl<<0;
+    if (!beadsl.contains(1)) beadsl<<1;
+    if (!beadsl.contains(2)) beadsl<<2;
+    for (int b=0; b<beadsl.size(); b++){
+        ui->cmbBead->setCurrentIndex(beadsl[b]);
+        for (int c=0; c<channels; c++) {
+            ui->cmbChannel->setCurrentIndex(c);
+            QApplication::processEvents();
+            displayEvaluationBead();
+            cursor.insertText(tr("Example PSF, bead %1, channel %2\n\n").arg(ui->cmbBead->currentIndex()+1).arg(ui->cmbChannel->currentIndex()), fHeading1);
+            cursor.movePosition(QTextCursor::End);
+
+            QTextTable* tablePic = cursor.insertTable(3,3, tableFormat);
+            tablePic->mergeCells(2,0,1,2);
+            {
+                // insert a plot from ui->plotter
+                QTextCursor tabCursor=tablePic->cellAt(0, 0).firstCursorPosition();
+                QPicture pic;
+                JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
+                ui->pltXZ->get_plotter()->draw(*painter, QRect(0,0,ui->pltXZ->width(),ui->pltXZ->height()));
+                delete painter;
+                double scale=0.3*document->textWidth()/double(pic.boundingRect().width());
+                if (scale<=0) scale=1;
+                tabCursor.insertText(tr("XZ-cut:\n"), fTextBoldSmall);
+                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+                QApplication::processEvents();
+
+            }
+            {
+                // insert a plot from ui->plotter
+                QTextCursor tabCursor=tablePic->cellAt(0, 1).firstCursorPosition();
+                QPicture pic;
+                JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
+                ui->pltYZ->get_plotter()->draw(*painter, QRect(0,0,ui->pltYZ->width(),ui->pltYZ->height()));
+                delete painter;
+                double scale=0.3*document->textWidth()/double(pic.boundingRect().width());
+                if (scale<=0) scale=1;
+                tabCursor.insertText(tr("YZ-cut:\n"), fTextBoldSmall);
+                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+                QApplication::processEvents();
+
+            }
+            {
+                // insert a plot from ui->plotter
+                QTextCursor tabCursor=tablePic->cellAt(0, 2).firstCursorPosition();
+                QPicture pic;
+                JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
+                ui->pltXY->get_plotter()->draw(*painter, QRect(0,0,ui->pltXY->width(),ui->pltXY->height()));
+                delete painter;
+                double scale=0.3*document->textWidth()/double(pic.boundingRect().width());
+                if (scale<=0) scale=1;
+                tabCursor.insertText(tr("XY-cut:\n"), fTextBoldSmall);
+                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+                QApplication::processEvents();
+
+            }
+            {
+                // insert a plot from ui->plotter
+                QTextCursor tabCursor=tablePic->cellAt(1, 0).firstCursorPosition();
+                QPicture pic;
+                JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
+                ui->pltFitX->get_plotter()->draw(*painter, QRect(0,0,ui->pltFitX->width(),ui->pltFitX->height()));
+                delete painter;
+                double scale=0.3*document->textWidth()/double(pic.boundingRect().width());
+                if (scale<=0) scale=1;
+                tabCursor.insertText(tr("X-cut:\n"), fTextBoldSmall);
+                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+                QApplication::processEvents();
+
+            }
+            {
+                // insert a plot from ui->plotter
+                QTextCursor tabCursor=tablePic->cellAt(1, 1).firstCursorPosition();
+                QPicture pic;
+                JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
+                ui->pltFitY->get_plotter()->draw(*painter, QRect(0,0,ui->pltFitY->width(),ui->pltFitY->height()));
+                delete painter;
+                double scale=0.3*document->textWidth()/double(pic.boundingRect().width());
+                if (scale<=0) scale=1;
+                tabCursor.insertText(tr("Y-cut:\n"), fTextBoldSmall);
+                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+                QApplication::processEvents();
+
+            }
+            {
+                // insert a plot from ui->plotter
+                QTextCursor tabCursor=tablePic->cellAt(1, 2).firstCursorPosition();
+                QPicture pic;
+                JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
+                ui->pltFitZ->get_plotter()->draw(*painter, QRect(0,0,ui->pltFitZ->width(),ui->pltFitZ->height()));
+                delete painter;
+                double scale=0.3*document->textWidth()/double(pic.boundingRect().width());
+                if (scale<=0) scale=1;
+                tabCursor.insertText(tr("Z-cut:\n"), fTextBoldSmall);
+                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+                QApplication::processEvents();
+
+            }
+            {
+                // insert a plot from ui->plotter
+                QTextCursor tabCursor=tablePic->cellAt(2, 0).firstCursorPosition();
+                QPicture pic;
+                JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
+                ui->pltFitWofZ->get_plotter()->draw(*painter, QRect(0,0,ui->pltFitWofZ->width(),ui->pltFitWofZ->height()));
+                delete painter;
+                double scale=0.63*document->textWidth()/double(pic.boundingRect().width());
+                if (scale<=0) scale=1;
+                tabCursor.insertText(tr("X/Y(Z)-cuts:\n"), fTextBoldSmall);
+                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+                QApplication::processEvents();
+
+            }
+        }
+    }
+
 
 }
 

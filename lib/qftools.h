@@ -899,7 +899,7 @@ inline QVector<T> removeQListDouplicates(const QVector<T>& list) {
 
 
 /*! \brief swap two elements \a l and \a r in an array \a a
-    \ingroup tools_math_stat
+    \ingroup qf3lib_tools
 
 */
 template <class T>

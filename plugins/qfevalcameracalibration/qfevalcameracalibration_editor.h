@@ -35,7 +35,7 @@ namespace Ui {
 }
 
 /*! \brief editor for QFEvalCameraCalibrationItem
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3evaldp_eval_cameracalibration
 */
 class QFEvalCameraCalibrationEditor : public QFEvaluationEditor {
         Q_OBJECT

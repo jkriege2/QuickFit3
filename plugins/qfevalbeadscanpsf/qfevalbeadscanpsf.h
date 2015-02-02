@@ -27,11 +27,11 @@ Copyright (c) 2014
 #include "qfpluginfitfunction.h"
 
 /*!
-    \defgroup qf3rdrdp_GROUPNAME Evaluation Item Plugin
+    \defgroup qf3rdrdp_eval_beadscanpsf PSF Evaluation Item Plugin
     \ingroup qf3evaluationplugins
 */
 /*! \brief Evaluation Item Plugin class
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3rdrdp_eval_beadscanpsf
 */
 class QFEvalBeadScanPSF : public QObject, public QFPluginEvaluationItemBase, public QFFitFunctionFactory {
         Q_OBJECT

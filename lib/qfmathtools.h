@@ -29,51 +29,56 @@
 #include <cstdlib>
 #include <QVector>
 
-/*! \brief Avogadro's number \f$ N_A=6.02214179\cdot10^{23} \f$
+/*!
+    \defgroup tools_math_stat QuickFit Statistics tools
     \ingroup qf3lib_mathtools
+  */
+
+/*! \brief Avogadro's number \f$ N_A=6.02214179\cdot10^{23} \f$
+    \ingroup tools_math_stat
  */
 #define QF_NAVOGADRO (6.02214179e23)
 
 /*! \brief Boltzman's constant number \f$ k_B=1.380648813\cdot10^{-23}J/K \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 #define QF_K_BOLTZ 1.380648813e-23
 
 /*! \brief square root of pi \f$ \sqrt{\pi}=1.77245385091 \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 #define QF_SQRTPI (1.77245385091)
 
 /*! \brief square root of pi \f$ \sqrt{2\pi}=2.50662827463 \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 #define QF_SQRT2PI (2.50662827463)
 
 /*! \brief check whether the dlotaing point number is OK (i.e. non-inf, non-NAN)
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 #define QFFloatIsOK(v) (std::isfinite(v) && (!std::isinf(v)) && (!std::isnan(v)))
 
 /*! \brief squares the argument
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfSqr(double x) { return x*x; }
 inline float qfSqr(float x) { return x*x; }
 
 /*! \brief takes the argument to the third power
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfCube(double x) { return x*x*x; }
 inline float qfCube(float x) { return x*x*x; }
 
 /*! \brief takes the argument to the fourth power
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfPow4(double x) { double x2=x*x; return x2*x2; }
 inline float qfPow4(float x) { float x2=x*x; return x2*x2; }
 
 /*! \brief takes the argument to the fifth power
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfPow5(double x) { double x2=x*x; return x2*x2*x; }
 inline float qfPow5(float x) { float x2=x*x; return x2*x2*x; }
@@ -84,59 +89,59 @@ QFLIB_EXPORT double qfSinc(double x);
 QFLIB_EXPORT double qfTanc(double x);
 
 /** \brief 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma)=\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfGaussSqrtE(double x, double sigma) {
     return exp(-0.5*x*x/(sigma*sigma));
 }
 /** \brief 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma=1)=\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfGaussSqrtE(double x) {
     return qfGaussSqrtE(x, 1);
 }
 /** \brief normalized 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma)=\frac{1}{w\cdot\sqrt{2\pi}}\cdot\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfGaussNormSqrtE(double x, double sigma){
     return exp(-0.5*x*x/(sigma*sigma))/(sigma*sqrt(2.0*M_PI));
 }
 /** \brief normalized 1/sqrt(e)-width gaussian function \f$ \mbox{g}(x, \sigma=1)=\frac{1}{w\cdot\sqrt{2\pi}}\cdot\exp\left(-\frac{1}{2}\cdot\frac{x^2}{\sigma^2}\right) \f$ with \f$ g(\sigma,\sigma)=1/\sqrt{e} \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfGaussNormSqrtE(double x){
     return qfGaussNormSqrtE(x,1);
 }
 /** \brief 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$ with \f$ g(w,w)=1/e^2 \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfGaussE2(double x, double w) { return qfGaussSqrtE(x, w/2.0); }
 /** \brief 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$ with \f$ g(w,w)=1/e^2 \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfGaussE2(double x) { return qfGaussSqrtE(x, 1.0/2.0); }
 /** \brief normalized 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\frac{\sqrt{2}}{w\cdot\sqrt{\pi}}\cdot\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfGaussNormE2(double x, double w) { return qfGaussNormSqrtE(x, w/2.0); }
 /** \brief normalized 1/e²-width gaussian function \f$ \mbox{g}(x, w)=\frac{\sqrt{2}}{w\cdot\sqrt{\pi}}\cdot\exp\left(-2\cdot\frac{x^2}{w^2}\right) \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfGaussNormE2(double x) { return qfGaussNormSqrtE(x, 1.0/2.0); }
 /** \brief Theta step function \f$ \Theta(x)=\begin{cases}0&x<0\\1&\text{else}\end{cases} \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfTheta(double x) { return (x>=0)?1.0:0.0; }
 /** \brief sigmoidal function \f$ \mbox{sigmoid}(x)=\frac{1}{1+\exp(-x)} \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfSigmoid(double x) { return 1.0/(1+exp(-1.0*x)); }
 /** \brief sigmoidal function \f$ \mbox{sigmoid}(x)=\frac{1}{1+\exp(-x)} \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfSigmoid(double x, double width, double x0=0) { return 1.0/(1+exp(-1.0*(x-x0)/width)); }
 /** \brief sign function \f$ \mbox{signa}(x)=\begin{cases}-1&x<0\\0&x=0\\1&x>0\end{cases} \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfSign(double x) {
     if (x<0) return -1;
@@ -145,7 +150,7 @@ inline double qfSign(double x) {
 }
 
 /** \brief range/slit function \f$ \mbox{slit}(x)=\begin{cases}1&-a/2\leq x\leq a/2\\0&\text{else}\end{cases} \f$
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfSlit(double x, double a) {
     if (x>=-a/2.0 && x<=a/2.0) return 1;
@@ -153,7 +158,7 @@ inline double qfSlit(double x, double a) {
 }
 
 /** \brief evaluate the polynomial defined by coefficients at the position x
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfEvalPolynomial(double x, const double* coefficients, int NC) {
     register double r=0;
@@ -166,7 +171,7 @@ inline double qfEvalPolynomial(double x, const double* coefficients, int NC) {
 }
 
 /** \brief evaluate the polynomial defined by coefficients at the position x
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfEvalPolynomial(double x, const QVector<double>& coefficients) {
     return qfEvalPolynomial(x, coefficients.data(), coefficients.size());
@@ -174,7 +179,7 @@ inline double qfEvalPolynomial(double x, const QVector<double>& coefficients) {
 
 
 /** \brief derive the polynomial defined by coefficients at the position x
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline QVector<double> qfDerivePolynomial(const QVector<double>& coefficients) {
     QVector<double> r;
@@ -190,35 +195,35 @@ inline QVector<double> qfDerivePolynomial(const QVector<double>& coefficients) {
 
 
 /** \brief convert degrees (0..360) ro radians (0..2pi)
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfDegToRad(double x) {
     return x/180.0*M_PI;
 }
 
 /** \brief convert degrees (0..360) ro radians (0..2pi)
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfRadToDeg(double x) {
     return x/M_PI*180.0;
 }
 
 /** \brief normalized cauchy distribution
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfCauchy(double x, double fwhm, double center=0.0) {
     return 1.0/(qfSqr((x-center)/fwhm)+1.0)/M_PI/fwhm;
 }
 
 /** \brief cauchy distribution with given amplitude
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
  */
 inline double qfCauchy(double x, double A, double fwhm, double center) {
     return A/(qfSqr((x-center)/fwhm)+1.0);
 }
 
 /** \brief calculate the error propagation for <code>factorA*a+factorB*b</code> or <code>factorA*a-factorB*b</code> with errors \a ea and \a eb
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ f=\alpha a\pm\beta b \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\right)^2+\left(\Delta b\cdot\beta\right)^2} \f]
@@ -228,7 +233,7 @@ inline double qfErrorSumMinus(double a, double ea, double b, double eb, double f
 }
 
 /** \brief calculate the error propagation for <code>factorA*a+factorB*b</code> or <code>factorA*a-factorB*b</code> with errors \a ea and \a eb
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ f=\alpha a+\beta b \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\right)^2+\left(\Delta b\cdot\beta\right)^2} \f]
@@ -238,7 +243,7 @@ inline double qfErrorAdd(double a, double ea, double b, double eb) {
 }
 
 /** \brief calculate the error propagation for <code>factorA*a+factorB*b</code> or <code>factorA*a-factorB*b</code> with errors \a ea and \a eb
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ f=\alpha a-\beta b \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\right)^2+\left(\Delta b\cdot\beta\right)^2} \f]
@@ -248,7 +253,7 @@ inline double qfErrorSub(double a, double ea, double b, double eb) {
 }
 
 /** \brief calculate the error propagation for <code>a*b</code> with errors \a ea and \a eb
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ f=a\cdot b \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot b\right)^2+\left(\Delta b\cdot a\right)^2} \f]
@@ -258,7 +263,7 @@ inline double qfErrorMul(double a, double ea, double b, double eb) {
 }
 
 /** \brief calculate the error propagation for <code>a*b</code> with errors \a ea and \a eb
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ f=a\cdot b\bcdot c \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot b\right)^2+\left(\Delta b\cdot a\right)^2} \f]
@@ -268,7 +273,7 @@ inline double qfErrorMul(double a, double ea, double b, double eb, double c, dou
 }
 
 /** \brief calculate the error propagation for <code>a*b</code> with errors \a ea and \a eb
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ f=a\cdot b\bcdot c+d\Cdot e\cdot f \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot b\right)^2+\left(\Delta b\cdot a\right)^2} \f]
@@ -278,7 +283,7 @@ inline double qfErrorMulAdd(double a, double ea, double b, double eb, double c, 
 }
 
 /** \brief calculate the error propagation for <code>a/b</code> with errors \a ea and \a eb
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\frac{a}{b} \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot b\right)^2+\left(\Delta b\cdot\frac{1}{b^2}\right)^2} \f]
  */
@@ -287,7 +292,7 @@ inline double qfErrorDiv(double a, double ea, double b, double eb) {
 }
 
 /** \brief calculate the error propagation for <code>a^(factorB*b)</code> with errors \a ea and \a eb
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=a^{\beta b} \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot a^{\beta b-1}\right)^2+\left(\Delta b\cdot a^{\beta b}\beta\cdot\log(a)\right)^2} \f]
  */
@@ -296,7 +301,7 @@ inline double qfErrorPow(double a, double ea, double b, double eb, double factor
 }
 
 /** \brief calculate the error propagation for <code>sqrt(factorA*a+offsetA)</code> with errors \a ea
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\sqrt{\alpha a+o} \f]
     \f[ \Delta f=\left|\left(\frac{\Delta a\cdot\alpha}{2\sqrt{\alpha a+o}}\right)\right| \f]
  */
@@ -305,7 +310,7 @@ inline double qfErrorSqrt(double a, double ea, double factorA=1.0, double offset
 }
 
 /** \brief calculate the error propagation for <code>sqrt(factorA*a+factorB*b+offset)</code> with errors \a ea
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\sqrt{\alpha a+\beta b+o} \f]
     \f[ \Delta f=\sqrt{\left(\frac{\Delta a\cdot\alpha}{2\sqrt{\alpha a+\beta b+o}}\right)^2+\left(\frac{\Delta b\cdot\beta}{2\sqrt{\alpha a+\beta b+o}}\right)^2} \f]
  */
@@ -315,7 +320,7 @@ inline double qfErrorSqrt(double a, double ea, double b, double eb, double facto
 }
 
 /** \brief calculate the error propagation for <code>sin(factorA*a+factorB*b+offset)</code> with errors \a ea
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\sin(\alpha a+\beta b+o) \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\cdot\cos(\alpha a+\beta b+o)\right)^2+\left(\Delta b\cdot\beta\cdot\cos(\alpha a+\beta b+o)\right)^2} \f]
  */
@@ -325,7 +330,7 @@ inline double qfErrorSin(double a, double ea, double b, double eb, double factor
 }
 
 /** \brief calculate the error propagation for <code>cos(factorA*a+factorB*b+offset)</code> with errors \a ea
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\cos(\alpha a+\beta b+o) \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\cdot\sin(\alpha a+\beta b+o)\right)^2+\left(\Delta b\cdot\beta\cdot\sin(\alpha a+\beta b+o)\right)^2} \f]
  */
@@ -335,7 +340,7 @@ inline double qfErrorCos(double a, double ea, double b, double eb, double factor
 }
 
 /** \brief calculate the error propagation for <code>tan(factorA*a+factorB*b+offset)</code> with errors \a ea
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\tan(\alpha a+\beta b+o) \f]
     \f[ \Delta f=\sqrt{\left(\Delta a\cdot\alpha\cdot\left[\cos(\alpha a+\beta b+o)\right]^{-2}\right)^2+\left(\Delta b\cdot\beta\cdot\left[\sin(\alpha a+\beta b+o)\right]^{-2}\right)^2} \f]
  */
@@ -346,7 +351,7 @@ inline double qfErrorTan(double a, double ea, double b, double eb, double factor
 
 
 /** \brief calculate the sqrt of a sum of squares
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
  */
 inline double qfErrorSqrtSumSqr(double a1, double a2) {
@@ -354,14 +359,14 @@ inline double qfErrorSqrtSumSqr(double a1, double a2) {
 }
 
 /** \brief calculate the sqrt of a sum of squares
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
  */
 inline double qfErrorSqrtSumSqr(double a1, double a2, double a3) {
     return sqrt(qfSqr(a1)+qfSqr(a2)+qfSqr(a3));
 }
 /** \brief calculate the sqrt of a sum of squares
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
  */
 inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4) {
@@ -369,7 +374,7 @@ inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4) {
 }
 
 /** \brief calculate the sqrt of a sum of squares
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
  */
 inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, double a5) {
@@ -378,28 +383,28 @@ inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, doub
 
 
 /** \brief calculate the sqrt of a sum of squares
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
  */
 inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, double a5, double a6) {
     return sqrt(qfSqr(a1)+qfSqr(a2)+qfSqr(a3)+qfSqr(a4)+qfSqr(a5)+qfSqr(a6));
 }
 /** \brief calculate the sqrt of a sum of squares
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
  */
 inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, double a5, double a6, double a7) {
     return sqrt(qfSqr(a1)+qfSqr(a2)+qfSqr(a3)+qfSqr(a4)+qfSqr(a5)+qfSqr(a6)+qfSqr(a7));
 }
 /** \brief calculate the sqrt of a sum of squares
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
  */
 inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8) {
     return sqrt(qfSqr(a1)+qfSqr(a2)+qfSqr(a3)+qfSqr(a4)+qfSqr(a5)+qfSqr(a6)+qfSqr(a7)+qfSqr(a8));
 }
 /** \brief calculate the sqrt of a sum of squares
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
  */
 inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9) {
@@ -407,7 +412,7 @@ inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, doub
 }
 
 /** \brief calculate the sqrt of a sum of squares
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
     \f[ f=\sqrt{\sum\limits_ia_i^2} \f]
  */
 inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, double a5, double a6, double a7, double a8, double a9, double a10) {
@@ -417,7 +422,7 @@ inline double qfErrorSqrtSumSqr(double a1, double a2, double a3, double a4, doub
 
 
 /*! \brief calculate the dot product of two vectors
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
 */
 template <typename T>
@@ -434,7 +439,7 @@ inline typename T::value_type qfDotProduct(const T& v1, const T& v2) {
 
 
 /*! \brief calculate the average and variance of a given array
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
     \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot (v_i-\overline{v})^2}{\sum\limits_{i=0}^{N-1}w_i} \f]
@@ -465,7 +470,7 @@ inline double qfstatisticsAverageVariance(double& var, const T& value) {
 
 
 /*! \brief calculate the average and variance of a given array, limited to where mask==maskUseValue
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
     \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot (v_i-\overline{v})^2}{\sum\limits_{i=0}^{N-1}w_i} \f]
@@ -498,7 +503,7 @@ inline double qfstatisticsMaskedAverageVariance(double& var, const QVector<bool>
 
 
 /*! \brief calculate the average and variance of a given array
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
     \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot (v_i-\overline{v})^2}{\sum\limits_{i=0}^{N-1}w_i} \f]
@@ -514,7 +519,7 @@ inline double qfstatisticsAverageStd(double& std, const T& value) {
 
 
 /*! \brief calculate the average and variance of a given array
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
     \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot (v_i-\overline{v})^2}{\sum\limits_{i=0}^{N-1}w_i} \f]
@@ -530,7 +535,7 @@ inline double qfstatisticsMaskedverageStd(double& std, const QVector<bool>& mask
 }
 
 /*! \brief calculate the average and variance of a given array
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \overline{v}=\frac{1}{N}\cdot\sum\limits_{i=0}^{N-1} v_i \f]
 */
@@ -551,7 +556,7 @@ inline double qfstatisticsAverage(const T& value) {
 }
 
 /*! \brief calculate the average and variance of a given array, limited to where mask==maskUseValue
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \overline{v}=\frac{1}{N}\cdot\sum\limits_{i=0}^{N-1} v_i \f]
 */
@@ -575,7 +580,7 @@ inline double qfstatisticsMaskedAverage(const QVector<bool>& mask, const T& valu
 
 
 /*! \brief calculate the correlation coefficient
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \text{Kor}(x,y)=\frac{\sum\limits_{i=0}^{N-1}(x_i-\overline{x})(y_i-\overline{y})}{\sqrt{\sum\limits_{i=0}^{N-1}(x_i-\overline{x})^2\cdot\sum\limits_{i=0}^{N-1}(y_i-\overline{y})^2}} \f]
 
@@ -614,7 +619,7 @@ inline double qfstatisticsCorrCoeff(const T& X, const T& Y) {
 }
 
 /*! \brief calculate the skewness of a dataset
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \gamma_1=\mathbb{E}\left[\left(\frac{X-\mu}{\sigma}\right)^3\right]= \frac{m_3}{m_2^{3/2}}  = \frac{\frac{1}{n} \sum_{i=1}^n (x_i-\overline{x})^3}{\left(\frac{1}{n} \sum_{i=1}^n (x_i-\overline{x})^2\right)^{3/2}} \f]
     where \f$\mu\f$ is the mean and \f$\sigma\f$ the standard deviation of a random variable \f$X\f$ and \f$\overline{x}\f$ is the average (calculated using statisticsAverage() ) of
@@ -642,7 +647,7 @@ inline double qfstatisticsSkewness(const T& value) {
 
 
 /*! \brief calculate the given central  moment
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \langle X^n\rangle= \mathbb{E}\left[\left(X-\mu\right)^n\right] \f]
     where \f$\mu\f$ is the mean of a random variable \f$X\f$ and \f$\overline{x}\f$ is the average (calculated using statisticsAverage() ) of
@@ -667,7 +672,7 @@ inline double qfstatisticsCentralMoment(const T& value, int order) {
 
 
 /*! \brief calculate the given non-central  moment
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \langle X^n\rangle= \mathbb{E}\left[X^n\right] \f]
     where \f$\mu\f$ is the mean of a random variable \f$X\f$ and \f$\overline{x}\f$ is the average (calculated using statisticsAverage() ) of
@@ -690,7 +695,7 @@ inline double qfstatisticsMoment(const T& value, int order) {
 }
 
 /*! \brief calculate the number of elements in \a value that contain a valid float
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 */
 template <class T>
 inline long long qfstatisticsCount(const T& value) {
@@ -707,7 +712,7 @@ inline long long qfstatisticsCount(const T& value) {
 
 
 /*! \brief calculate the number of elements in \a value that contain a valid float, limited to where mask==maskUseValue
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
 */
 template <class T>
@@ -725,7 +730,7 @@ inline double qfstatisticsMaskedCount(const QVector<bool>& mask, const T& value,
 }
 
 /*! \brief calculate the minimum of the data in \a value
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
 */
 template <typename T>
@@ -749,7 +754,7 @@ inline typename T::value_type qfstatisticsMin(const T& value) {
 }
 
 /*! \brief calculate the maximum of the data in \a value
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
 */
 template <typename T>
@@ -774,7 +779,7 @@ inline typename T::value_type qfstatisticsMax(const T& value) {
 
 
 /*! \brief filter the vecor for NAN ....
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
 */
 template <class T>
@@ -791,7 +796,7 @@ inline T qfstatisticsFilter(const T& value) {
 }
 
 /*! \brief calculate the sum of data
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \overline{v}=\sum\limits_{i=0}^{N-1} v_i \f]
 */
@@ -809,7 +814,7 @@ inline double qfstatisticsSum(const T& value) {
 }
 
 /*! \brief calculate the sum of data, limited to where mask==maskUseValue
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \overline{v}=\sum\limits_{i=0}^{N-1} v_i \f]
 */
@@ -828,7 +833,7 @@ inline double qfstatisticsMaskedSum(const QVector<bool>& mask, const T& value, b
 }
 
 /*! \brief calculate the cumulative sum of data
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ X_n=\sum\limits_{i=0}^{n-1} v_i \f]
 */
@@ -850,7 +855,7 @@ inline T qfstatisticsCumSum(const T& value) {
 
 
 /*! \brief calculate the differences o the vector of numbers
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ X_n=v_n-v_{n-1} \f]
     The returned vector has one item less than the input vector
@@ -879,7 +884,7 @@ inline T qfstatisticsDiff(const T& value) {
 
 
 /*! \brief calculate the trapezoidal numerical integration
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \int f(x)\mathrm{d}x=\frac{1}{2}\cdot\sum\limits_{n=1}^{N-1}\left(f(x_n)+f(x_n+1)\right) \f]
 
@@ -900,7 +905,7 @@ inline double qfstatisticsTrapz(const T& value_in) {
 
 
 /*! \brief calculate the trapezoidal numerical integration
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \int f(x)\mathrm{d}x=\frac{1}{2}\cdot\sum\limits_{n=1}^{N-1}(x_{n+1}-x_n)\cdot\left[f(x_n)+f(x_n+1)\right] \f]
 
@@ -932,7 +937,7 @@ inline double qfstatisticsTrapzXY(const T& valueX, const T& valueY) {
 
 
 /*! \brief calculate the cumulative sum of data
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ X_n=\prod\limits_{i=0}^{n-1} v_i \f]
 */
@@ -953,7 +958,7 @@ inline T qfstatisticsCumProd(const T& value) {
 }
 
 /*! \brief calculate the product of data
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \overline{v}=\prod\limits_{i=0}^{N-1} v_i \f]
 */
@@ -970,7 +975,7 @@ inline double qfstatisticsProd(const T& value) {
     return prod;
 }
 /*! \brief calculate the sum of data squares
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \overline{v}=\cdot\sum\limits_{i=0}^{N-1} v_i^2 \f]
 */
@@ -989,7 +994,7 @@ inline double qfstatisticsSum2(const T& value) {
 
 
 /*! \brief calculate the sum of squared data, limited to where mask==maskUseValue
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \overline{v}=\sum\limits_{i=0}^{N-1} v_i^2 \f]
 */
@@ -1008,7 +1013,7 @@ inline double qfstatisticsMaskedSum2(const QVector<bool>& mask, const T& value, 
 }
 
 /*! \brief calculate the average and variance of a given array
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
     \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot (v_i-\overline{v})^2}{\sum\limits_{i=0}^{N-1}w_i} \f]
@@ -1044,7 +1049,7 @@ inline double qfstatisticsStd(const T& value) {
 
 
 /*! \brief calculate the average and variance of a given array, limited to where mask==maskUseValue
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     \f[ \overline{v}=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot v_i}{\sum\limits_{i=0}^{N-1}w_i} \f]
     \f[ \text{Var}(v)=\frac{\sum\limits_{i=0}^{N-1}w_i\cdot (v_i-\overline{v})^2}{\sum\limits_{i=0}^{N-1}w_i} \f]
@@ -1368,7 +1373,7 @@ inline void qfGridXYZ(T& X, T& Y, T& Z, typename T::value_type x0, typename T::v
 
 
 /*! \brief round a value according to the error
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
     this returns a rounded value that equals the input value with \a addSignifcant mor
     significant digits than the error
@@ -1379,7 +1384,7 @@ inline void qfGridXYZ(T& X, T& Y, T& Z, typename T::value_type x0, typename T::v
 QFLIB_EXPORT double roundWithError(double value, double error, int addSignifcant=1) ;
 
 /*! \brief round a value to its first 1+\a addSignifcant significant digits
-    \ingroup qf3lib_mathtools
+    \ingroup tools_math_stat
 
 */
 QFLIB_EXPORT double roundError(double error, int addSignifcant) ;
@@ -1391,7 +1396,7 @@ inline double roundError(double error, double addSignifcant) {
 }
 
 /** \brief used as result type for the function calcFitStatistics()
- *  \ingroup qf3lib_mathtools
+ *  \ingroup tools_math_stat
  */
 struct QFLIB_EXPORT QFFitStatistics {
     public:

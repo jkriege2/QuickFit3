@@ -104,7 +104,7 @@ void QFFitFunction::evaluateNumericalParameterErrors(double *errors, double x, c
             cov[i*pcount+j]=g[i]*g[j];
         }
     }
-    statisticsMatrixInversion(cov.data(), pcount);
+    linalgMatrixInversion(cov.data(), pcount);
 
     for (int i=0; i<pcount; i++) {
         errors[i]=sqrt(cov[i*pcount+i]*residualSigma2);

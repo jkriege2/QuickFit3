@@ -57,7 +57,7 @@ QFEvalCameraCalibrationEditor::QFEvalCameraCalibrationEditor(QFPluginServices* s
     ui->tabResults->setItemDelegate(new QFTableDelegate(this));
     
     // create progress dialog for evaluation
-    dlgEvaluationProgress=new QProgressDialog(NULL);
+    dlgEvaluationProgress=new QProgressDialog(this);
     dlgEvaluationProgress->hide();
     dlgEvaluationProgress->setWindowModality(Qt::WindowModal);
     

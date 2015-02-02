@@ -880,8 +880,9 @@ void QFParameterCorrelationView::writeReport(QTextCursor &cursor, QTextDocument 
     double allwidth=qMax(1.0,w1+w2);
     cursor.insertBlock();
     cursor.insertText(tr("Parameter Correlations:\n"), fHeading2);
-    QTextTable* table = cursor.insertTable(2,3, tableFormat1);
-    table->mergeCells(0,2,2,1);
+    QTextTable* table = cursor.insertTable(3,3, tableFormat1);
+    //table->mergeCells(0,2,2,1);
+    table->mergeCells(2,0,1,3);
     {
         double scale=1.0;
         QTextCursor tabCursor=table->cellAt(0,1).firstCursorPosition();
@@ -890,7 +891,7 @@ void QFParameterCorrelationView::writeReport(QTextCursor &cursor, QTextDocument 
             JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
             pltParamCorrelation->get_plotter()->draw(*painter, QRect(0,0,pltParamCorrelation->width(),pltParamCorrelation->height()));
             delete painter;
-            scale=0.5*document->textWidth()/double(pic.boundingRect().width());
+            scale=0.7*document->textWidth()/double(pic.boundingRect().width());
             if (scale<=0) scale=1;
             insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
         }
@@ -912,8 +913,8 @@ void QFParameterCorrelationView::writeReport(QTextCursor &cursor, QTextDocument 
             insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
         }
 
-        tabCursor=table->cellAt(0, 2).firstCursorPosition();
-        tabCursor.insertText(tr("\n"), fTextBoldSmall);
+        tabCursor=table->cellAt(2,0).firstCursorPosition();
+        //tabCursor.insertText(tr("\n"), fTextBoldSmall);
         //tabCursor.insertFragment(QTextDocumentFragment::fromHtml(QString("<center><nobr><span style=\"font-size: 7pt;\">%1</span></nobr></center>").arg(tvHistogramParameters->toHtml(1,true))));
         QPicture picT;
         QPainter* painter=new QPainter(&picT);
@@ -1146,6 +1147,7 @@ void QFParameterCorrelationView::createWidgets()
 
 
     cmbSymbol=new JKQTPSymbolComboBox(this);
+    cmbSymbol->setCurrentSymbol(JKQTPfilledCircle);
 
     chkScatterPlot=new QCheckBox("", this);
     chkScatterPlot->setChecked(true);
@@ -1185,13 +1187,13 @@ void QFParameterCorrelationView::createWidgets()
     flHistSet->addRow(tr("<b>symbol:</b>"), cmbSymbol);
     spinSymbolSize=new QSpinBox(this);
     spinSymbolSize->setRange(1,30);
-    spinSymbolSize->setValue(5);
+    spinSymbolSize->setValue(4);
     flHistSet->addRow(tr("<b>symbol size:</b>"), spinSymbolSize);
     connect(chkScatterPlot, SIGNAL(toggled(bool)), cmbSymbol, SLOT(setEnabled(bool)));
     connect(chkScatterPlot, SIGNAL(toggled(bool)), spinSymbolSize, SLOT(setEnabled(bool)));
 
     chkKey=new QCheckBox(this);
-    chkKey->setChecked(true);
+    chkKey->setChecked(false);
     flHistSet->addRow(tr("<b>keys visible:</b>"), chkKey);
 
 
@@ -1209,6 +1211,7 @@ void QFParameterCorrelationView::createWidgets()
     chkHistogramRangeManual1=new QRadioButton("manual", grpHistogramSettings);
     chkHistogramRangeAuto1=new QRadioButton("auto", grpHistogramSettings);
     chkHistogramRangeRelaxAuto1=new QRadioButton("relaxed auto:", grpHistogramSettings);
+    chkHistogramRangeAuto1->setChecked(true);
     QButtonGroup* bg=new QButtonGroup(this);
     bg->addButton(chkHistogramRangeManual1);
     bg->addButton(chkHistogramRangeAuto1);
@@ -1257,6 +1260,7 @@ void QFParameterCorrelationView::createWidgets()
     chkHistogramRangeManual2=new QRadioButton("manual", grpHistogramSettings);
     chkHistogramRangeAuto2=new QRadioButton("auto", grpHistogramSettings);
     chkHistogramRangeRelaxAuto2=new QRadioButton("relaxed auto:", grpHistogramSettings);
+    chkHistogramRangeAuto2->setChecked(true);
     bg=new QButtonGroup(this);
     bg->addButton(chkHistogramRangeManual2);
     bg->addButton(chkHistogramRangeAuto2);
@@ -1458,6 +1462,8 @@ void QFParameterCorrelationView::createWidgets()
     splitterHistogram->addWidget(widHTab);
     layHist->addWidget(splitterHistogram, 0, 0);
     layHist->addWidget(grpHistogramSettings, 0, 1);
+    splitterHistogram->setStretchFactor(0,1);
+    splitterHistogram->setStretchFactor(1,0);
     layHist->setColumnStretch(0,5);
     layHist->setContentsMargins(0,0,0,0);
 

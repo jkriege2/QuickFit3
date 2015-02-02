@@ -1272,6 +1272,32 @@ QString QFMathParser::readDelim(QChar delimiter){
             } else {
                 break;
             }
+        } else if (ch=='\\')  {
+            QChar ch1=peekStream(program);
+            if (ch1=='\"') {
+                getFromStream(program, ch);
+                res=res+"\"";
+            } else if (ch1=='\'') {
+                getFromStream(program, ch);
+                res=res+"\'";
+            } else if (ch1=='\t') {
+                getFromStream(program, ch);
+                res=res+"\t";
+            } else if (ch1=='\n') {
+                getFromStream(program, ch);
+                res=res+"\n";
+            } else if (ch1=='\r') {
+                getFromStream(program, ch);
+                res=res+"\r";
+            } else if (ch1=='\\') {
+                getFromStream(program, ch);
+                res=res+"\\";
+            } else if (ch1=='\/') {
+                getFromStream(program, ch);
+                res=res+"\/";
+            } else {
+                break;
+            }
         } else if ((program) && (ch!=delimiter)) res=res+ch;
 	}
 

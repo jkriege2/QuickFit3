@@ -1,10 +1,84 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-  <title>Plugin Tutorial</title>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>PSF Beadscan Tutorial</title>
   </head>
   <body>
-		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        
+            
+$$startbox_note$$
+The data for this tutorial is available:
+as raw data from <a href="http://www.dkfz.de/Macromol/quickfit/examples.html">http://www.dkfz.de/Macromol/quickfit/examples.html</a> as <tt>beadscan_1color_2015_01_30.zip</tt> and <tt>beadscan_2color_2014_12_08.zip</tt>.
+$$endbox$$  
+
+
+
+<h2>Introduction</h2>
+<p>This help file shows, how the <a href="$$plugin_info:help:eval_beadscanpsf$$">PSF Evaluation Plugin</a> can be sued to determine the PSF of a microscope. First you will have to prepare such a beadscan, i.e. a z-stack of a sample of fixed beads (typically, one should use sub-diffractive fluorescent beads embedded in a stiff, but clear gel, see the <a href="$$plugin_info:help:eval_beadscanpsf$$">main help page</a> for details on how to prepare such a gel). Here we will demonstrate this on the example of a lightsheet microscope with a DualView optics for dual-color detection (data, see above). The microscope uses an 60x/NA1 detection objective and a lightsheet with a 1/e˛-halfwidth of $(w_{LS}\approx 1.3{\mu}m)$. The pixel size was 400nm and the step-size of the stacks was 200nm. Illumination is done at 488nm and 561nm and detection is done in the windows 500...550nm and 600...700nm. </p>
+<p>The methods, described in this tutorial can also be applied to beadstacks, acquired on other microscopes (e.g. confocal). The data should be supplied in the form of TIFF stacks.</p>
+
+
+
+<h2>Tutorial</h2>
+
+
+<h3>Download Example Data</h3>
+<p>Download the example datasets from: <a href="http://www.dkfz.de/Macromol/quickfit/examples.html">http://www.dkfz.de/Macromol/quickfit/examples.html</a> as <tt>beadscan_1color_2015_01_30.zip</tt> and <tt>beadscan_2color_2014_12_08.zip</tt>.</p>
+
+
+
+
+<h3>Load Data</h3>
+<p>
+<ol>
+    <li>Start QuickFit and start the "PSF Analysis"  project wizard from <b>"File | Project Wizards | PSF Analysis"</b>.</li>
+    <li>Click through the wizard and select one of the <tt>XXX.lighpath1.tiff</tt> files from the example projects.</li>
+    <li>For the DualView stack, make sure to select the <b>horizontal DualView mode</b>. For the 1-color beadstack, select the <b>single-file stack</b>. </li>
+    <li>Set the pixel size to 400nm and the step size to 200nm.</li>
+</ol></p>
+<p>Here is a sample frame from the 1-color stack and a 3D rendering (maximum intensity projection):
+<center><a name="tutorial_pic000"><img src="./pic/tutorial_pic000.png" border="1">
+</center>
+<center><a name="tutorial_pic001"><img src="./pic/tutorial_pic001.png" border="1">
+</center>
+
+</p>
+
+
+
+<h3>Set Evaluation Parameters</h3>
+<p>
+<ol>
+    <li>Now double-click the <b>"PSF Analysis"</b> in the project:
+<center><a name="tutorial_pic002"><img src="./pic/tutorial_pic002.png" border="1">
+</center>
+<center><a name="tutorial_pic003"><img src="./pic/tutorial_pic003.png" border="1">
+</center>
+</li>
+    <li>On the rhs, you can select an image stack from the project (obviously there is only one in this project).</li>
+    <li>On the left of this list, you can set the parameters of the evaluation:
+    <center><a name="tutorial_pic004"><img src="./pic/tutorial_pic004.png" border="1">
+    </center>
+    Make sure, that the same parameters, as above are given:
+    <ul>
+        <li><b>pixel size</b> and <b>step size</b> are given, as stated above.</li>
+        <li><b>ROI lateral</b> and <b>ROI longitudinal</b> are the size of the ROI around each pixel, which is used for fits. From an initial analysis of the image stack, the given values are reasonable choices, since the beads have a lateral size of 3-5 pixels ( = 1-2 &mu;m) and a longitudinal size of 20-30 pixels ( = 4-6&mu;m) (until the decay to the background)</li>
+        <li><b>beads per frame</b> can be set to 20, which is the approximate number of pixels inside beads, as can be seen in the overview image above.</li>
+        <li>Finally the estimated PSF width/height are given, which can be calculated/estimated from experience or from the NA of the objective (width: $(\approx\lambda/\mbox{NA}\approx500\mathrm{nm})$, height: $(\approx 2\cdot\lambda/\mbox{NA}^2\approx1000\mathrm{nm})$)</li>
+    </ul>
+    </li>
+</ol>
+$$note:These steps are the same, for 1-color and 2-color stacks. If the plugin finds too few or too many beads, you should try to modify <b>beads per frame</b>.$$
+</p>
+
+
+
+<h3>Evaluate Beadstack</h3>
+<p>Now you can click on <b>Evaluate Current</b>, which will start the evaluation. When the process has finished, you can observe the different parameters on the left of th window.</p>
+
+
+  
   </body>
 </html>

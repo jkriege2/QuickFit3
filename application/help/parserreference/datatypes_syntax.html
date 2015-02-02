@@ -37,7 +37,7 @@
 	  </li>
 	  <li><i>number vectors</i>: <code>[1, 2, 3]</code>.<br> There is a special construct <code>FIRST:LAST</code> or <code>FIRST:DELTA:LAST</code> that allows to set up linear vectors. It will evaluate to a vector containing all numbers between <code>FIRST</code> and <code>LAST</code> (inclusive) with a step-size of 1 or <code>DELTA</code> (examples: <code>1:3</code> evaluates to <code>[1, 2, 3]</code> and <code>1:0.5:3</code> to <code>[1, 1.5, 2, 2.5, 3]</code>)  </li>
 	  <li><i>boolean</i>: <code>true, false</code></li>
-	  <li><i>string</i>: <code>'text'</code> or <code>"text"</code></li>
+	  <li><i>string</i>: <code>'text'</code> or <code>"text"</code>. You can use C-style escapes (<tt>\" \' \n \r \t \\ \/</tt>) to add the delimiting characters to the string</li>
 	</ul>
 	
 	<a name="constvar"><h3>Named Constants/Variables</h3>

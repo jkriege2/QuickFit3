@@ -26,8 +26,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 
-/*! \brief QFFitFunction class for fit function
-    \ingroup qf3fitfunp_fitfunctions_general
+/*! \brief QFFitFunction class for fit function: PSF: Gaussian Beam: Intensity(z)
+    \ingroup qf3rdrdp_eval_beadscanpsf
 
 */
 class QFFitFunctionPSFGaussianBeamZIntensity: public QFFitFunction {

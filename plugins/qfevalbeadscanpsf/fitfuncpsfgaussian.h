@@ -5,8 +5,8 @@
 
 
 
-/*! \brief QFFitFunction class for fit function
-    \ingroup qf3fitfunp_fitfunctions_lightsheet
+/*! \brief QFFitFunction class for fit function: PSF: gaussian, 1/e^2-halfwidth
+    \ingroup qf3rdrdp_eval_beadscanpsf
 
 */
 class QFFitFunctionPSFGaussian: public QFFitFunction {

@@ -1,4 +1,4 @@
-/*
+﻿/*
     Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     German Cancer Research Center/University Heidelberg
 
@@ -446,33 +446,33 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
 
     menu=new QMenu(tr("LaTeX"), this);
     ui->edtScript->getEditor()->addAction(menu->menuAction());
-    addInsertAction(menu, "\\left(%1�\\right)");
-    addInsertAction(menu, "\\left[%1�\\right]");
-    addInsertAction(menu, "\\left\\{%1�\\right\\}");
-    addInsertAction(menu, "\\left\\langle%1�\\right\\rangle");
+    addInsertAction(menu, "\\left(%1°\\right)");
+    addInsertAction(menu, "\\left[%1°\\right]");
+    addInsertAction(menu, "\\left\\{%1°\\right\\}");
+    addInsertAction(menu, "\\left\\langle%1°\\right\\rangle");
     menu->addSeparator();
-    addInsertAction(menu, "\\sqrt{%1�}");
+    addInsertAction(menu, "\\sqrt{%1°}");
     menu->addSeparator();
-    addInsertAction(menu, "\\sum_{�}^{}%1");
-    addInsertAction(menu, "\\prod_{�}^{}%1");
-    addInsertAction(menu, "\\int_{�}^{}%1\\;\\mathrm{d}x");
-    addInsertAction(menu, "\\iint_{�}^{}%1\\;\\mathrm{d}^2x");
-    addInsertAction(menu, "\\iiint_{�}^{}%1\\;\\mathrm{d}^3x");
-    addInsertAction(menu, "\\oint_{�}^{}%1\\;\\mathrm{d}x");
-    addInsertAction(menu, "\\lim_{%1�}");
-    addInsertAction(menu, "\\argmin_{%1�}");
-    addInsertAction(menu, "\\argmax_{%1�}");
+    addInsertAction(menu, "\\sum_{°}^{}%1");
+    addInsertAction(menu, "\\prod_{°}^{}%1");
+    addInsertAction(menu, "\\int_{°}^{}%1\\;\\mathrm{d}x");
+    addInsertAction(menu, "\\iint_{°}^{}%1\\;\\mathrm{d}^2x");
+    addInsertAction(menu, "\\iiint_{°}^{}%1\\;\\mathrm{d}^3x");
+    addInsertAction(menu, "\\oint_{°}^{}%1\\;\\mathrm{d}x");
+    addInsertAction(menu, "\\lim_{%1°}");
+    addInsertAction(menu, "\\argmin_{%1°}");
+    addInsertAction(menu, "\\argmax_{%1°}");
     menu->addSeparator();
-    addInsertAction(menu, "\\vec{%1�}");
-    addInsertAction(menu, "\\hat{%1�}");
-    addInsertAction(menu, "\\tilde{%1�}");
-    addInsertAction(menu, "\\mathbf{%1�}");
-    addInsertAction(menu, "\\mathrm{%1�}");
-    addInsertAction(menu, "\\mathit{%1�}");
-    addInsertAction(menu, "\\mathsf{%1�}");
-    addInsertAction(menu, "\\mathbb{%1�}");
-    addInsertAction(menu, "\\mathscript{%1�}");
-    addInsertAction(menu, "\\underline{%1�}");
+    addInsertAction(menu, "\\vec{%1°}");
+    addInsertAction(menu, "\\hat{%1°}");
+    addInsertAction(menu, "\\tilde{%1°}");
+    addInsertAction(menu, "\\mathbf{%1°}");
+    addInsertAction(menu, "\\mathrm{%1°}");
+    addInsertAction(menu, "\\mathit{%1°}");
+    addInsertAction(menu, "\\mathsf{%1°}");
+    addInsertAction(menu, "\\mathbb{%1°}");
+    addInsertAction(menu, "\\mathscript{%1°}");
+    addInsertAction(menu, "\\underline{%1°}");
     //addInsertAction(menu, "$$$$");
 
     menu=new QMenu(tr("Special Characters"), this);
@@ -824,22 +824,22 @@ void QFEHelpEditorWidget::openScriptNoAsk(QString filename)
 
 void QFEHelpEditorWidget::on_btnBold_clicked()
 {
-    insertAroundOld("<b>%1�</b>");
+    insertAroundOld("<b>%1°</b>");
 }
 
 void QFEHelpEditorWidget::on_btnItalic_clicked()
 {
-    insertAroundOld("<i>%1�</i>");
+    insertAroundOld("<i>%1°</i>");
 }
 
 void QFEHelpEditorWidget::on_btnUnderline_clicked()
 {
-    insertAroundOld("<u>%1�</u>");
+    insertAroundOld("<u>%1°</u>");
 }
 
 void QFEHelpEditorWidget::on_btnImage_clicked()
 {
-    insertAroundOld("<img src=\"image.png\">%1�");
+    insertAroundOld("<img src=\"image.png\">%1°");
 
 }
 
@@ -890,44 +890,44 @@ void QFEHelpEditorWidget::on_btnLink_clicked()
 
     QString link=QInputDialog::getItem(this, tr("insert link"), tr("link target:"), links, 0, true,&ok);
     if (ok) {
-        insertAroundOld(QString("<a href=\"%1\">").arg(link)+QString("%1�</a>"));
+        insertAroundOld(QString("<a href=\"%1\">").arg(link)+QString("%1°</a>"));
     }
 }
 
 void QFEHelpEditorWidget::on_btnBlockquote_clicked()
 {
-    insertAroundOld("\n<blockquote>\n    %1�\n</blockquote>\n");
+    insertAroundOld("\n<blockquote>\n    %1°\n</blockquote>\n");
 }
 
 void QFEHelpEditorWidget::on_btnNumberedList_clicked()
 {
-    insertAroundOld("\n<ol>\n    <li>%1�</li>\n</ol>");
+    insertAroundOld("\n<ol>\n    <li>%1°</li>\n</ol>");
 
 }
 
 void QFEHelpEditorWidget::on_btnBulletList_clicked()
 {
-    insertAroundOld("\n<ul>\n    <li>%1�</li>\n</ul>");
+    insertAroundOld("\n<ul>\n    <li>%1°</li>\n</ul>");
 }
 
 void QFEHelpEditorWidget::on_btnInsertH1_clicked()
 {
-    insertAroundOld("\n\n<h1>%1�</h1>\n<p></p>\n", true);
+    insertAroundOld("\n\n<h1>%1°</h1>\n<p></p>\n", true);
 }
 
 void QFEHelpEditorWidget::on_btnInsertH2_clicked()
 {
-    insertAroundOld("\n\n<h2>%1�</h2>\n<p></p>\n", true);
+    insertAroundOld("\n\n<h2>%1°</h2>\n<p></p>\n", true);
 }
 
 void QFEHelpEditorWidget::on_btnInsertH3_clicked()
 {
-    insertAroundOld("\n\n<h3>%1�</h3>\n<p></p>\n", true);
+    insertAroundOld("\n\n<h3>%1°</h3>\n<p></p>\n", true);
 }
 
 void QFEHelpEditorWidget::on_btnInsertH4_clicked()
 {
-    insertAroundOld("\n\n<h4>%1�</h4>\n<p></p>\n", true);
+    insertAroundOld("\n\n<h4>%1°</h4>\n<p></p>\n", true);
 }
 
 void QFEHelpEditorWidget::on_btnInsertParagraph_clicked()
@@ -937,7 +937,7 @@ void QFEHelpEditorWidget::on_btnInsertParagraph_clicked()
 
 void QFEHelpEditorWidget::on_btnInsertListItem_clicked()
 {
-    insertAroundOld("\n<li>%1�</li>");
+    insertAroundOld("\n<li>%1°</li>");
 }
 
 void QFEHelpEditorWidget::on_btnPasteImage_clicked()
@@ -966,24 +966,24 @@ void QFEHelpEditorWidget::on_btnInsertAndCopyImage_clicked()
 
 void QFEHelpEditorWidget::on_btnInsertCode_clicked()
 {
-    insertAroundOld("<code>%1�</code>");
+    insertAroundOld("<code>%1°</code>");
 }
 
 void QFEHelpEditorWidget::on_btnInsertMath_clicked()
 {
-    insertAroundOld("$$math:�$$%1");
+    insertAroundOld("$$math:°$$%1");
 }
 
 void QFEHelpEditorWidget::on_btnInsertBMath_clicked()
 {
-    insertAroundOld("$$bmath:�$$%1");
+    insertAroundOld("$$bmath:°$$%1");
 }
 
 void QFEHelpEditorWidget::on_btnInsertPluginLink_clicked()
 {
     PluginLinkDialog* dlg=new PluginLinkDialog(this);
     if (dlg->exec()) {
-        insertAroundOld(dlg->insertText()+"%1�");
+        insertAroundOld(dlg->insertText()+"%1°");
     }
     delete dlg;
 
@@ -993,21 +993,21 @@ void QFEHelpEditorWidget::on_btnInsertSubPluginLink_clicked()
 {
     SubPluginLinkDialog* dlg=new SubPluginLinkDialog(this);
     if (dlg->exec()) {
-        insertAroundOld(dlg->insertText()+"%1�");
+        insertAroundOld(dlg->insertText()+"%1°");
     }
     delete dlg;
 
 }
 void QFEHelpEditorWidget::on_btnCenter_clicked()
 {
-    insertAroundOld("\n<center>%1�</center>");
+    insertAroundOld("\n<center>%1°</center>");
 }
 
 void QFEHelpEditorWidget::on_btnInsertFAQ_clicked()
 {
     FAQEntryDialog* dlg=new FAQEntryDialog(this);
     if (dlg->exec()) {
-        insertAroundOld(QString("%1�")+dlg->insertText());
+        insertAroundOld(QString("%1°")+dlg->insertText());
     }
     delete dlg;
 }
@@ -1016,7 +1016,7 @@ void QFEHelpEditorWidget::on_btnFunctionReference_clicked()
 {
     FunctionReferenceDialog* dlg=new FunctionReferenceDialog(this);
     if (dlg->exec()) {
-        insertAroundOld(QString("%1�")+dlg->insertText());
+        insertAroundOld(QString("%1°")+dlg->insertText());
     }
     delete dlg;
 }
@@ -1025,7 +1025,7 @@ void QFEHelpEditorWidget::on_btnTable_clicked()
 {
     NewTableDialog* dlg=new NewTableDialog(this);
     if (dlg->exec()) {
-        insertAroundOld(QString("%1�")+dlg->insertText());
+        insertAroundOld(QString("%1°")+dlg->insertText());
     }
     delete dlg;
 }
@@ -1040,7 +1040,7 @@ void QFEHelpEditorWidget::on_btnSelectImage_clicked()
 
     SelectResourceImage* dlg=new SelectResourceImage(dirs, this, prefixes, baseNodeNames);
     if (dlg->exec()) {
-        insertAroundOld(QString("<img src=\"%1\">�").arg(QDir(dir).relativeFilePath(dlg->getSelectFile())));
+        insertAroundOld(QString("<img src=\"%1\">°").arg(QDir(dir).relativeFilePath(dlg->getSelectFile())));
     }
     delete dlg;
 
@@ -1184,7 +1184,7 @@ void QFEHelpEditorWidget::insertIcon()
 {
     SelectResourceImage* dlg=new SelectResourceImage(":/", this);
     if (dlg->exec()) {
-        insertAroundOld(QString("<img src=\"%1\">�").arg(dlg->getSelectFile()));
+        insertAroundOld(QString("<img src=\"%1\">°").arg(dlg->getSelectFile()));
     }
 }
 
@@ -1241,8 +1241,8 @@ void QFEHelpEditorWidget::insertAroundOld(const QString &newText, bool ensureNew
         }
         txt=txt.replace('\n', "\n"+QString(wsc, QChar(' ')));
 
-        int pos=txt.indexOf('�');
-        if (pos>=0) txt=txt.remove('�');
+        int pos=txt.indexOf('°');
+        if (pos>=0) txt=txt.remove('°');
         int textpos=ui->edtScript->getEditor()->textCursor().position();
 
         ui->edtScript->getEditor()->insertPlainText(txt);

@@ -43,7 +43,7 @@ namespace Ui {
 }
 
 /*! \brief editor for QFSPIMLightsheetEvaluationItem
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3evaldp_spim_lightsheet_eval
 */
 class QFSPIMLightsheetEvaluationEditor : public QFEvaluationEditor {
         Q_OBJECT

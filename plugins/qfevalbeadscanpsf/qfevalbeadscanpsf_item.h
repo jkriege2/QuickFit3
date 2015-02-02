@@ -45,7 +45,7 @@ Copyright (c) 2014
 #include <QtCore>
 
 /*! \brief evaluation item class 
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3rdrdp_eval_beadscanpsf
 
 
     
@@ -90,7 +90,7 @@ class QFEvalBeadScanPSFItem : public QFEvaluationItem {
 		 *  \param record the record to do the evaluation for
 		 *  \param dlgEvaluationProgress a QProgressDialog
 		 */
-        void doEvaluation(QFRawDataRecord* record, double a, double deltaZ, int ROIxy, int ROIz, int pixels_per_frame, double est_psf_width, double est_psf_height, QProgressDialog* dlgEvaluationProgress=NULL);
+        void doEvaluation(QFRawDataRecord* record, double a, double deltaZ, int ROIxy, int ROIz, int pixels_per_frame, double est_psf_width, double est_psf_height, double fitXY_Z_fraction, QProgressDialog* dlgEvaluationProgress=NULL);
 
     protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the

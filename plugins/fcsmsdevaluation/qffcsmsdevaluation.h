@@ -24,11 +24,11 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include "qfpluginevaluation.h"
 /*!
-    \defgroup qf3rdrdp_GROUPNAME Evaluation Item Plugin
+    \defgroup qf3evaldp_fcs_msd Evaluation Item Plugin
     \ingroup qf3evaluationplugins
 */
 /*! \brief Evaluation Item Plugin class
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3evaldp_fcs_msd
 */
 class QFFCSMSDEvaluation : public QObject, public QFPluginEvaluationItemBase {
         Q_OBJECT

@@ -95,7 +95,7 @@ QFSPIMLightsheetEvaluationEditor::QFSPIMLightsheetEvaluationEditor(QFPluginServi
 
     
     // create progress dialog for evaluation
-    dlgEvaluationProgress=new QProgressDialog(NULL);
+    dlgEvaluationProgress=new QProgressDialog(this);
     dlgEvaluationProgress->hide();
     dlgEvaluationProgress->setWindowModality(Qt::WindowModal);
     

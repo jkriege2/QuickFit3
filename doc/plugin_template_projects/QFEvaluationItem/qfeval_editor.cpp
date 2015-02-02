@@ -47,7 +47,7 @@ QFEVALEditor::QFEVALEditor(QFPluginServices* services,  QFEvaluationPropertyEdit
     ui->setupUi(this);
     
     // create progress dialog for evaluation
-    dlgEvaluationProgress=new QProgressDialog(NULL);
+    dlgEvaluationProgress=new QProgressDialog(this);
     dlgEvaluationProgress->hide();
     dlgEvaluationProgress->setWindowModality(Qt::WindowModal);
     
@@ -281,11 +281,23 @@ void QFEVALEditor::createReportDoc(QTextDocument* document) {
     QTextTableFormat tableFormat;
     tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
     tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
-    QTextTable* table = cursor.insertTable(2, 2, tableFormat);
-    table->cellAt(0, 0).firstCursorPosition().insertText(tr("raw data:"), fTextBold);
-    table->cellAt(0, 1).firstCursorPosition().insertText(record->getName(), fText);
-    table->cellAt(1, 0).firstCursorPosition().insertText(tr("ID:"), fTextBold);
-    table->cellAt(1, 1).firstCursorPosition().insertText(QString::number(record->getID()));
+	QTextTable* table = cursor.insertTable(2, 4, tableFormat);
+    table->mergeCells(0,1,1,3);
+    int row=0;
+    int col=0;
+    table->cellAt(row, col+0).firstCursorPosition().insertText(tr("raw data:"), fTextBold);
+    table->cellAt(row, col+1).firstCursorPosition().insertText(record->getName(), fText);
+    row++;
+    table->cellAt(row, col+0).firstCursorPosition().insertText(tr("ID:"), fTextBold);
+    table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(record->getID()), fText);
+    row++;
+    
+	row=1;
+    col=2;
+    table->cellAt(row, col+0).firstCursorPosition().insertText(tr("pi:"), fTextBold);
+    table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(M_PI), fText);
+    row++;
+    	
     cursor.movePosition(QTextCursor::End);
 	
 	
@@ -298,10 +310,10 @@ void QFEVALEditor::createReportDoc(QTextDocument* document) {
     document->documentLayout()->registerHandler(PicTextFormat, picInterface);
 
 	
-	QTextTable* table = cursor.insertTable(2,1, tableFormat);
+	QTexttablePic* tablePic = cursor.inserttablePic(2,1, tablePicFormat);
     {
 	    // insert a plot from ui->plotter
-        QTextCursor tabCursor=table->cellAt(0, 0).firstCursorPosition();
+        QTextCursor tabCursor=tablePic->cellAt(0, 0).firstCursorPosition();
         QPicture pic;
         JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
         ui->plotter->get_plotter()->draw(*painter, QRect(0,0,ui->plotter->width(),ui->plotter->height()));
@@ -312,8 +324,8 @@ void QFEVALEditor::createReportDoc(QTextDocument* document) {
         insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
         QApplication::processEvents();
 
-		// insert an enhanced table plot from ui->tabResults
-        tabCursor=table->cellAt(1,0).firstCursorPosition();
+		// insert an enhanced tablePic plot from ui->tabResults
+        tabCursor=tablePic->cellAt(1,0).firstCursorPosition();
         tabCursor.insertText(tr("\n"), fTextBoldSmall);
         QPicture picT;
         painter=new JKQTPEnhancedPainter(&picT);
@@ -321,7 +333,7 @@ void QFEVALEditor::createReportDoc(QTextDocument* document) {
         delete painter;
         scale=0.95*document->textWidth()/double(picT.boundingRect().width());
         if (scale<=0) scale=1;
-        tabCursor.insertText(tr("fit results table:\n"), fTextBoldSmall);
+        tabCursor.insertText(tr("fit results tablePic:\n"), fTextBoldSmall);
         insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale);
         QApplication::processEvents();
     }*/

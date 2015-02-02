@@ -4100,7 +4100,90 @@ MainWindow::updateInfo MainWindow::readUpdateInfo(QIODevice *io)
 
 
 
+static void getQFFitFunctionDescription(QFFitFunctionBase* ff, QString& autoplugin_startdescription, QString &autoplugin_description, QString&faname, QString& fa_shortname) {
+    faname=ff->name();
+    fa_shortname=ff->shortName();
+    QStringList ffeat;
+    QString fffeatures="";
+    QString params="";
+    if (ff->paramCount()>0) {
+        params=QObject::tr("The parameters of this fit function are:<table width=\"95%\" border=\"1\" cellpadding=\"2\" cellspacing=\"0\">"
+                  "<tr bgcolor=\"lightblue\"><th rowspan=\"2\">LABEL [UNIT]</th>"
+                      "<th rowspan=\"2\">ID</th>"
+                      "<th colspan=\"8\">DESCRIPTION</th>"
+                      "</tr><tr bgcolor=\"lightblue\">"
+                      "<th>TYPE</th>"
+                      "<th>FIT</th>"
+                      "<th>EDITABLE</th>"
+                      "<th>ERROR</th>"
+                      "<th>INIT. VALUE</th>"
+                      "<th>INIT. FIX</th>"
+                      "<th>RANGE</th>"
+                      "<th>ABS. RANGE</th>"
+                      "</tr>");
+    }
+    for (int i=0; i<ff->paramCount(); i++) {
+        QFFitFunction::ParameterDescription d=ff->getDescription(i);
+        QString col="";
+        QString type=QObject::tr("fit");
+        QString err=QObject::tr("editable");
+        if (!d.fit && !d.userEditable) {
+            col=" bgcolor=\"silver\"";
+            type=QObject::tr("calculated");
+        } else if (!d.fit && d.userEditable) {
+            type=QObject::tr("parmeter");
+        }
+        if (d.displayError==QFFitFunction::DisplayError) {
+            err=QObject::tr("displayed");
+        } else if (d.displayError==QFFitFunction::NoError) {
+            err=QObject::tr("---");
+        }
 
+
+        params+=QObject::tr("<tr %1><td rowspan=\"2\"><b>%2</b> [%5]</td>"
+                   "<td rowspan=\"2\"><tt><b>%3</b></tt></td>"
+                   "<td colspan=\"8\"><i>%4</i></td>"
+                   "</tr><tr %1>"
+                   "<td>&nbsp;&nbsp;%8</td>"
+                   "<td>%6</td>"
+                   "<td>%7</td>"
+                   "<td>&nbsp;&nbsp;%9</td>"
+                   "<td>&nbsp;&nbsp;%10</td>"
+                   "<td>%11</td>"
+                   "<td>%12 ... %13</td>"
+                   "<td>%14 ... %15%16</td>"
+                   "</tr>").arg(col).arg(d.label).arg(ff->getParameterID(i)).arg(d.name).arg(d.unitLabel)
+                           .arg(d.fit?QString("<img src=\":/lib/checked.png\">"):QString("<img src=\":/lib/unchecked.png\">"))
+                           .arg(d.userEditable?QString("<img src=\":/lib/checked.png\">"):QString("<img src=\":/lib/unchecked.png\">"))
+                           .arg(type).arg(err).arg((d.fit || d.userEditable)?QString::number(d.initialValue):QString(""))
+                           .arg(d.fit?QString(d.initialFix?QString("<img src=\":/lib/checked.png\">"):QString("<img src=\":/lib/unchecked.png\">")):QString(""))
+                           .arg(d.minValue).arg(d.maxValue).arg(d.absMinValue).arg(d.absMaxValue).arg((d.comboItems.size()>0)?QString(QString(" (%1)").arg(d.comboItems.join(", "))):QString(""));
+    }
+    if (!params.isEmpty()) {
+        params+=QString("</table><br><br>");
+    }
+    if (ff->get_implementsDerivatives()) {
+        ffeat.append(QObject::tr("analytical derivaties"));
+    }
+    QFFitFunction* ff1d=dynamic_cast<QFFitFunction*>(ff);
+    if (ff1d && ff1d->estimateInitial(NULL, NULL, NULL, 0)) {
+        ffeat.append(QObject::tr("estimates initial values"));
+    }
+    if (ff->isDeprecated()) {
+        autoplugin_startdescription+=QObject::tr("$$note:This fit function is marked as deprecated by the author and may be removed from QuickFit in one of the future versions! Please use an alternative where possible.$$");
+    }
+    if (!ffeat.isEmpty()) fffeatures=QObject::tr("  <li>features: <b>%1</b></li>").arg(ffeat.join(", "));
+    autoplugin_description+=QObject::tr("<h2>Fit Function Metadata</h2>"
+                               "<p>This page describes a QFFitFunction, i.e. a fit function for QuickFit $$version$$:<ul>"
+                               "  <li>id: <b>%1</b></li>"
+                               "  <li>name: <b>%2</b></li>"
+                               "  <li>shortened name: <b>%3</b></li>"
+                               "%4"
+                               "</ul>"
+                               "%5"
+                               "</p>").arg(ff->id()).arg(ff->name()).arg(ff->shortName()).arg(fffeatures).arg(params);
+    delete ff;
+}
 
 
 
@@ -4269,87 +4352,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         pid_sub_deocrated=tr("&nbsp;&nbsp;&nbsp;fitFunctionID: <b><tt>%1</tt></b>").arg(fn);
                         QFFitFunction* ff=QFFitFunctionManager::getInstance()->createFunction(fn);
                         if (ff) {
-                            faname=ff->name();
-                            fa_shortname=ff->shortName();
-                            QStringList ffeat;
-                            QString fffeatures="";
-                            QString params="";
-                            if (ff->paramCount()>0) {
-                                params=tr("The parameters of this fit function are:<table width=\"95%\" border=\"1\" cellpadding=\"2\" cellspacing=\"0\">"
-                                          "<tr bgcolor=\"lightblue\"><th rowspan=\"2\">LABEL [UNIT]</th>"
-                                              "<th rowspan=\"2\">ID</th>"
-                                              "<th colspan=\"8\">DESCRIPTION</th>"
-                                              "</tr><tr bgcolor=\"lightblue\">"
-                                              "<th>TYPE</th>"
-                                              "<th>FIT</th>"
-                                              "<th>EDITABLE</th>"
-                                              "<th>ERROR</th>"
-                                              "<th>INIT. VALUE</th>"
-                                              "<th>INIT. FIX</th>"
-                                              "<th>RANGE</th>"
-                                              "<th>ABS. RANGE</th>"
-                                              "</tr>");
-                            }
-                            for (int i=0; i<ff->paramCount(); i++) {
-                                QFFitFunction::ParameterDescription d=ff->getDescription(i);
-                                QString col="";
-                                QString type=tr("fit");
-                                QString err=tr("editable");
-                                if (!d.fit && !d.userEditable) {
-                                    col=" bgcolor=\"silver\"";
-                                    type=tr("calculated");
-                                } else if (!d.fit && d.userEditable) {
-                                    type=tr("parmeter");
-                                }
-                                if (d.displayError==QFFitFunction::DisplayError) {
-                                    err=tr("displayed");
-                                } else if (d.displayError==QFFitFunction::NoError) {
-                                    err=tr("---");
-                                }
-
-
-                                params+=tr("<tr %1><td rowspan=\"2\"><b>%2</b> [%5]</td>"
-                                           "<td rowspan=\"2\"><tt><b>%3</b></tt></td>"
-                                           "<td colspan=\"8\"><i>%4</i></td>"
-                                           "</tr><tr %1>"
-                                           "<td>&nbsp;&nbsp;%8</td>"
-                                           "<td>%6</td>"
-                                           "<td>%7</td>"
-                                           "<td>&nbsp;&nbsp;%9</td>"
-                                           "<td>&nbsp;&nbsp;%10</td>"
-                                           "<td>%11</td>"
-                                           "<td>%12 ... %13</td>"
-                                           "<td>%14 ... %15%16</td>"
-                                           "</tr>").arg(col).arg(d.label).arg(ff->getParameterID(i)).arg(d.name).arg(d.unitLabel)
-                                                   .arg(d.fit?QString("<img src=\":/lib/checked.png\">"):QString("<img src=\":/lib/unchecked.png\">"))
-                                                   .arg(d.userEditable?QString("<img src=\":/lib/checked.png\">"):QString("<img src=\":/lib/unchecked.png\">"))
-                                                   .arg(type).arg(err).arg((d.fit || d.userEditable)?QString::number(d.initialValue):QString(""))
-                                                   .arg(d.fit?QString(d.initialFix?QString("<img src=\":/lib/checked.png\">"):QString("<img src=\":/lib/unchecked.png\">")):QString(""))
-                                                   .arg(d.minValue).arg(d.maxValue).arg(d.absMinValue).arg(d.absMaxValue).arg((d.comboItems.size()>0)?QString(QString(" (%1)").arg(d.comboItems.join(", "))):QString(""));
-                            }
-                            if (!params.isEmpty()) {
-                                params+=QString("</table><br><br>");
-                            }
-                            if (ff->get_implementsDerivatives()) {
-                                ffeat.append(tr("analytical derivaties"));
-                            }
-                            if (ff->estimateInitial(NULL, NULL, NULL, 0)) {
-                                ffeat.append(tr("estimates initial values"));
-                            }
-                            if (ff->isDeprecated()) {
-                                autoplugin_startdescription+=tr("$$note:This fit function is marked as deprecated by the author and may be removed from QuickFit in one of the future versions! Please use an alternative where possible.$$");
-                            }
-                            if (!ffeat.isEmpty()) fffeatures=tr("  <li>features: <b>%1</b></li>").arg(ffeat.join(", "));
-                            autoplugin_description+=tr("<h2>Fit Function Metadata</h2>"
-                                                       "<p>This page describes a QFFitFunction, i.e. a fit function for QuickFit $$version$$:<ul>"
-                                                       "  <li>id: <b>%1</b></li>"
-                                                       "  <li>name: <b>%2</b></li>"
-                                                       "  <li>shortened name: <b>%3</b></li>"
-                                                       "%4"
-                                                       "</ul>"
-                                                       "%5"
-                                                       "</p>").arg(ff->id()).arg(ff->name()).arg(ff->shortName()).arg(fffeatures).arg(params);
-                            delete ff;
+                            getQFFitFunctionDescription(ff, autoplugin_startdescription, autoplugin_description, faname, fa_shortname);
                         }
                     }
                 }
@@ -4594,6 +4597,19 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                        }
+                    } else if (list=="fitfunc_params") {
+                        QString text="";
+
+                        QFFitFunction* ff=QFFitFunctionManager::getInstance()->createFunction(filter);
+                        if (ff) {
+                            QString autoplugin_startdescription, autoplugin_description, faname, fa_shortname;
+                            getQFFitFunctionDescription(ff, autoplugin_startdescription, autoplugin_description, faname, fa_shortname);
+                            text=autoplugin_description+"\n"+autoplugin_startdescription;
+                        }
+
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), text);
                         }
                     } else if (list=="fitfunc_inplugin") {
                         QString text="";
@@ -4892,11 +4908,11 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 QString command=rxLaTeX.cap(1).toLower().trimmed();
                 QString latex="$"+rxLaTeX.cap(2).trimmed()+"$";
                 //qDebug()<<command<<latex<<rxLaTeX.cap(3)<<rxLaTeX.cap(4)<<rxLaTeX.cap(5);
-                if (command.size()==0) {
+                if (command.size()==0 && rxLaTeX.cap(3).trimmed().size()>0) {
                     latex="$"+rxLaTeX.cap(3).trimmed()+"$";
                     if (latex.size()>2) command="math";
                 }
-                if (command.size()==0) {
+                if (command.size()==0 && rxLaTeX.cap(4).trimmed().size()>0) {
                     latex="$"+rxLaTeX.cap(4).trimmed()+"$";
                     if (latex.size()>2) command="bmath";
                 }
@@ -4940,6 +4956,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                             pix=cropTopBottom(cropLeftRight(pix));
                             pix.save(texfilename);
 
+                            latex=latex.remove('\"');
+                            latex=latex.remove('\'');
                             if (command=="bmath" || command=="mathb") {
                                 result=result.replace(rxLaTeX.cap(0), QString("<blockquote><img style=\"vertical-align: middle;\" alt=\"%1\" src=\"%2\"></blockquote>").arg(latex).arg(texfilename));
                             } else {

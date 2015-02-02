@@ -90,7 +90,7 @@
 
 
 /*! \brief editor for QFFCSMaxEntEvaluationItem
-    \ingroup qf3rdrdp_GROUPNAME
+    \ingroup qf3evaldp_fcs_maxent
 */
 class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         Q_OBJECT
