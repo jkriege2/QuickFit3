@@ -16,7 +16,7 @@ $$endbox$$
 
 
 <h2>Introduction</h2>
-<p>This help file shows, how the <a href="$$plugin_info:help:eval_beadscanpsf$$">PSF Evaluation Plugin</a> can be sued to determine the PSF of a microscope. First you will have to prepare such a beadscan, i.e. a z-stack of a sample of fixed beads (typically, one should use sub-diffractive fluorescent beads embedded in a stiff, but clear gel, see the <a href="$$plugin_info:help:eval_beadscanpsf$$">main help page</a> for details on how to prepare such a gel). Here we will demonstrate this on the example of a lightsheet microscope with a DualView optics for dual-color detection (data, see above). The microscope uses an 60x/NA1 detection objective and a lightsheet with a 1/e²-halfwidth of $(w_{LS}\approx 1.3{\mu}m)$. The pixel size was 400nm and the step-size of the stacks was 200nm. Illumination is done at 488nm and 561nm and detection is done in the windows 500...550nm and 600...700nm. </p>
+<p>This help file shows, how the <a href="$$plugin_info:help:eval_beadscanpsf$$">PSF Evaluation Plugin</a> can be sued to determine the PSF of a microscope. First you will have to prepare such a beadscan, i.e. a z-stack of a sample of fixed beads (typically, one should use sub-diffractive fluorescent beads embedded in a stiff, but clear gel, see the <a href="$$plugin_info:help:eval_beadscanpsf$$">main help page</a> for details on how to prepare such a gel). Here we will demonstrate this on the example of a lightsheet microscope with a DualView optics for dual-color detection (data, see above). The microscope uses an 60x/NA1 detection objective and a lightsheet with a 1/e?-halfwidth of $(w_{LS}\approx 1.3{\mu}m)$. The pixel size was 400nm and the step-size of the stacks was 200nm. Illumination is done at 488nm and 561nm and detection is done in the windows 500...550nm and 600...700nm. </p>
 <p>The methods, described in this tutorial can also be applied to beadstacks, acquired on other microscopes (e.g. confocal). The data should be supplied in the form of TIFF stacks.</p>
 
 
@@ -76,7 +76,47 @@ $$note:These steps are the same, for 1-color and 2-color stacks. If the plugin f
 
 
 <h3>Evaluate Beadstack</h3>
-<p>Now you can click on <b>Evaluate Current</b>, which will start the evaluation. When the process has finished, you can observe the different parameters on the left of th window.</p>
+<p>Now you can click on <b>Evaluate Current</b>, which will start the evaluation. When the process has finished, you can observe the different parameters on the left of th window:
+<center><a name="tutorial_pic012"><img src="./pic/tutorial_pic012.png" border="1">
+</center>
+</p>
+<p>
+    Here are some example results from the 1-color stack:
+    <center><table cellspacing="0" cellpadding="1" border="1">
+      <tr>
+        <th bgcolor="#a0a0a4"><b>3D-Gaussian width 1:</b></th>
+        <th bgcolor="#a0a0a4"><b>3D-Gaussian width 2:</b></th>
+        <th bgcolor="#a0a0a4"><b>3D-Gaussian width 3:</b></th>
+      </tr>
+      <tr>
+        <td><img src="./pic/tutorial_pic005.png" border="1"></td>
+        <td><img src="./pic/tutorial_pic006.png" border="1"></td>
+        <td><img src="./pic/tutorial_pic007.png" border="1"></td>
+      </tr>
+    </table></center>
+</p>
+<p>
+    Here are some example results from the 2-color stack:
+    <center><table cellspacing="0" cellpadding="1" border="1">
+      <tr>
+        <th bgcolor="#a0a0a4"><b>3D-Gaussian width 1:</b></th>
+        <th bgcolor="#a0a0a4"><b>3D-Gaussian width 2:</b></th>
+        <th bgcolor="#a0a0a4"><b>3D-Gaussian width 3:</b></th>
+      </tr>
+      <tr>
+        <td><img src="./pic/tutorial_pic009.png" border="1"></td>
+        <td><img src="./pic/tutorial_pic010.png" border="1"></td>
+        <td><img src="./pic/tutorial_pic011.png" border="1"></td>
+      </tr>
+    </table><br><br>
+    
+      
+
+$$note:For the DualColor stack, the tab <b>results: "-Channel Distance Histograms</b> will be active and contain a histogram of the displacement between beads in the first and second color channel. This can be used to check for a good alignemnt of the DualView optics.<br><br>
+<b>Distance between bead positions in the two channels (x: red, y: magenta, z: brown):</b><br>
+    <a name="tutorial_pic008"><img src="./pic/tutorial_pic008.png" border="1">
+    </center>$$
+</p>
 
 
   

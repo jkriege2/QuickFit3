@@ -25,9 +25,9 @@ QFFitFunctionPSF3DGaussian::QFFitFunctionPSF3DGaussian()
 
     addParameter(FloatNumber,  "theta",                   "theta",                                                 "&theta;",                         "°",            "°",                   true,      true,         true,              QFFitFunctionBase::DisplayError,       false, 0,            -45,    45,  1  );
     #define PARAM_THETA 8
-    addParameter(FloatNumber,  "phi",                     "phi",                                                   "&phi;",                           "°",            "°",                   true,      true,         true,              QFFitFunctionBase::DisplayError,       false, 0,            -20,    20,  1  );
+    addParameter(FloatNumber,  "phi",                     "phi",                                                   "&phi;",                           "°",            "°",                   true,      true,         true,              QFFitFunctionBase::DisplayError,       false, 0,            -45,    45,  1  );
     #define PARAM_PHI 9
-    addParameter(FloatNumber,  "alpha",                   "alpha",                                                 "&alpha;",                         "°",            "°",                   true,      true,         true,              QFFitFunctionBase::DisplayError,       false, 0,            -20,    20,  1  );
+    addParameter(FloatNumber,  "alpha",                   "alpha",                                                 "&alpha;",                         "°",            "°",                   true,      true,         true,              QFFitFunctionBase::DisplayError,       false, 0,            0,    45,  1  );
     #define PARAM_ALPHA 10
 
 }

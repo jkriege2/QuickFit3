@@ -67,13 +67,15 @@ QString PasteImageDlg::saveImage() const
         QDir dd;
         dd.mkpath(d.absolutePath());
     }
-    ui->labImage->pixmap()->save(d.absoluteFilePath(ui->edtFilename->text()));
     QString result;
-    result=QString("<img src=\"%1\" border=\"1\">").arg(ui->edtFilename->text());
-    if (!ui->edtAnchor->text().isEmpty()) result=QString("<a name=\"%2\">%1").arg(result).arg(ui->edtAnchor->text());
-    if (!ui->edtCaption->text().isEmpty()) result=QString("%1<br/>\n<i>%2</i>").arg(result).arg(ui->edtCaption->text());
-    if (ui->chkCentered->isChecked()) {
-        return QString("\n<center>%1\n</center>\n").arg(result);
+    if (ui->labImage->pixmap()){
+        ui->labImage->pixmap()->save(d.absoluteFilePath(ui->edtFilename->text()));
+        result=QString("<img src=\"%1\" border=\"1\">").arg(ui->edtFilename->text());
+        if (!ui->edtAnchor->text().isEmpty()) result=QString("<a name=\"%2\">%1").arg(result).arg(ui->edtAnchor->text());
+        if (!ui->edtCaption->text().isEmpty()) result=QString("%1<br/>\n<i>%2</i>").arg(result).arg(ui->edtCaption->text());
+        if (ui->chkCentered->isChecked()) {
+            return QString("\n<center>%1\n</center>\n").arg(result);
+        }
     }
     return result;
 }
