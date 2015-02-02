@@ -146,7 +146,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
         dlgEvaluationProgress->setLabelText(tr("finding beads in 3D stack ... "));
         dlgEvaluationProgress->setRange(ROIz/2, (size_z-ROIz/2)*2);
     }
-    for (int z=ROIz/2; z<size_z-ROIz/2; z=z+zsteps) {
+    for (int z=ROIz/2+2; z<size_z-ROIz/2-2; z=z+zsteps) {
         if (dlgEvaluationProgress) dlgEvaluationProgress->setValue(z);
         double* frame=data->getImageStack(stack, z, 0);
         // DETERMINE level for SEGMENTATION
