@@ -1292,9 +1292,9 @@ QString QFMathParser::readDelim(QChar delimiter){
             } else if (ch1=='\\') {
                 getFromStream(program, ch);
                 res=res+"\\";
-            } else if (ch1=='\/') {
+            } else if (ch1=='/') {
                 getFromStream(program, ch);
-                res=res+"\/";
+                res=res+"/";
             } else {
                 break;
             }

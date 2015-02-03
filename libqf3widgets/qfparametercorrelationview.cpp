@@ -343,7 +343,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
             CorrelationItem hist=histograms[hh];
             if (hist.data1 && hist.data2 && (hist.size>0)) {
 
-                double dmean, dstd, dmin, dmax, dmedian, dq25, dq75, dskew, dql, dqu;
+                double dmean, dstd=0, dmin, dmax, dmedian, dq25, dq75, dskew, dql, dqu;
                 double* d1=duplicateArray(hist.data1, hist.size);
                 double* d2=duplicateArray(hist.data2, hist.size);
                 double* d3=NULL;

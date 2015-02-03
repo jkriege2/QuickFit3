@@ -1244,7 +1244,8 @@ void saveStringToFile(const QString& filename, const QString& text, const QStrin
         QTextCodec* c=QTextCodec::codecForName(codec.toLatin1());
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
         if (c==NULL) c=QTextCodec::codecForCStrings();
-#endif         if (c==NULL) c=QTextCodec::codecForLocale();
+#endif
+        if (c==NULL) c=QTextCodec::codecForLocale();
         out.setCodec(c);
         out << text;
     }

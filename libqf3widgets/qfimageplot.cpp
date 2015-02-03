@@ -113,7 +113,7 @@ void QFImagePlot::update_plot()
     if (!plteImage || !image_data || image_width<=0 || image_height<=0) return;
     plteImage->set_palette(ui->cmbCOlorbar->currentColorPalette());
     if (ui->chkRangeFull->isChecked()) {
-        double imin, imax;
+        double imin=0, imax=0;
         statisticsMinMax(image_data, image_width*image_height, imin, imax);
         ui->edtRangeMin->setValue(imin);
         ui->edtRangeMax->setValue(imax);

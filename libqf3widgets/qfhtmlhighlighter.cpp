@@ -240,7 +240,7 @@ void QFHTMLHighlighter::highlightBlock(const QString &text)
     int len = text.length();
     int start = 0;
     int pos = 0;
-    bool atEnd;
+    bool atEnd=false;
     QString tagName="";
     while (pos < len) {
         if ((state & 0x0F)==InComment) {

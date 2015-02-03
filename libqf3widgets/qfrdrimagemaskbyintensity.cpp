@@ -165,7 +165,7 @@ void QFRDRImageMaskByIntensity::updateWidgets()
     double l1=ui->edtLevel->value();
 
     if (m_image) {
-        double min, max, min2, max2;
+        double min=0, max=0, min2, max2;
 
         bool first=true;
         for (uint16_t i=1; i<m_width*m_height; i++) {

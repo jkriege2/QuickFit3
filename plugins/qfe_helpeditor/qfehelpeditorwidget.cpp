@@ -600,6 +600,7 @@ bool QFEHelpEditorWidget::saveFile(const QString &filename, bool setFilename)
     //qDebug()<<"saving to "<<filename;
     if (f.open(QIODevice::WriteOnly|QIODevice::Text)) {
         QTextStream s(&f);
+        s.setCodec(QTextCodec::codecForName("UTF-8"));
         s<<ui->edtScript->getEditor()->toPlainText().toUtf8();
         if (setFilename) lastScript=ui->edtScript->getEditor()->toPlainText();
         f.close();

@@ -56,6 +56,7 @@ QString transformQF3HelpHTMLFile(const QString& filename, const QString& default
     QFile f(filename);
     if (f.open(QIODevice::ReadOnly|QIODevice::Text)) {
         QTextStream in(&f);
+        in.setCodec(QTextCodec::codecForName("UTF-8"));
         return transformQF3HelpHTML(in.readAll(), filename, removeNonReplaced, more_replaces, insertTooltips, dontCreatePics, isMainHelp);
     } else {
         return transformQF3HelpHTML(defaultText, filename, removeNonReplaced, more_replaces, insertTooltips, dontCreatePics, isMainHelp);

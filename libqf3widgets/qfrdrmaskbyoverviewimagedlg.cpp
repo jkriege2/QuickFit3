@@ -222,7 +222,7 @@ void QFRDRMaskByOverviewImage::updateWidgets()
 
 
     if (m_image) {
-        double min, max;
+        double min=0, max=0;
 
 
         bool first=true;

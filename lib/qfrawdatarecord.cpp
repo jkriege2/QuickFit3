@@ -3867,7 +3867,8 @@ bool QFRawDataRecord::resultsSaveToCSV(const QString& filename, bool vectorsToAv
         QTextCodec* c=QTextCodec::codecForName("ISO-8859-1");
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
         if (c==NULL) c=QTextCodec::codecForCStrings();
-#endif         if (c==NULL) c=QTextCodec::codecForLocale();
+#endif
+        if (c==NULL) c=QTextCodec::codecForLocale();
         out.setCodec(c);
         out<<dat;
         of.close();
@@ -4076,7 +4077,8 @@ bool QFRawDataRecord::resultsSaveToSYLK(const QString& filename, bool vectorsToA
         QTextCodec* c=QTextCodec::codecForName("ISO-8859-1");
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
         if (c==NULL) c=QTextCodec::codecForCStrings();
-#endif         if (c==NULL) c=QTextCodec::codecForLocale();
+#endif
+        if (c==NULL) c=QTextCodec::codecForLocale();
         out.setCodec(c);
         out<<dat;
         of.close();
