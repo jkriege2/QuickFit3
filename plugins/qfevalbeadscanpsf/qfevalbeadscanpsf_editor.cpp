@@ -984,7 +984,7 @@ void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
     
     // here we define some generic formats
     QTextCharFormat fText=cursor.charFormat();
-    fText.setFontPointSize(8);
+    fText.setFontPointSize(7);
     QTextCharFormat fTextSmall=fText;
     fTextSmall.setFontPointSize(0.85*fText.fontPointSize());
     QTextCharFormat fTextBold=fText;
@@ -1014,7 +1014,7 @@ void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
     QTextTableFormat tableFormat;
     tableFormat.setBorderStyle(QTextFrameFormat::BorderStyle_None);
     tableFormat.setWidth(QTextLength(QTextLength::PercentageLength, 98));
-    QTextTable* table = cursor.insertTable(6, 4, tableFormat);
+    QTextTable* table = cursor.insertTable(7, 4, tableFormat);
     table->mergeCells(0,1,1,3);
     int row=0;
     int col=0;
@@ -1033,6 +1033,12 @@ void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
     table->cellAt(row, col+0).firstCursorPosition().insertText(tr("ROI longitudinal size (z):"), fTextBold);
     table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(ui->spinROIZ->value())+tr(" pixel"), fText);
     row++;
+    if (ui->grpFilterBeads->isChecked()) {
+        table->cellAt(row, col+0).firstCursorPosition().insertText(tr("axial ratio filter:"), fTextBold);
+        table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(ui->spinAxRatioMin->value())+QString(" ... ")+QString::number(ui->spinAxRatioMax->value()), fTextBold);
+        row++;
+    }
+
     table->cellAt(row, col+0).firstCursorPosition().insertText(tr("found beads (per channel):"), fTextBold);
     table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(record->resultsGetAsInteger(evalID, "channel0_beads")), fTextBold);
     row++;
