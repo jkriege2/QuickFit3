@@ -7,14 +7,14 @@
 	<body>
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
 		<h2>Description &amp; Usage</h2>
-		<p>This plugin allows to calculate the diffusion coefficient of a sample in a given solution. Simply select the sample on the left and the solution on the right. The table and graph will show the solution properties and the diffusion coefficient over the specified temperature range (0°C...100°C max).</p>
+		<p>This plugin allows to calculate the diffusion coefficient of a sample in a given solution. Simply select the sample on the left and the solution on the right. The table and graph will show the solution properties and the diffusion coefficient over the specified temperature range (0&deg;C...100&deg;C max).</p>
 		<p>Using the plugin is simple: <ul>
 		  <li>To open the plugin window, click on "Tools|Diffusion Coefficient Calculator". The plugin main window looks like this:
 		  <center><img src="./pic/screenshot.png"></center>
 		  </li>
 		  
 		  <li>It may also be possible that other plugins have buttons to show this window (e.g. in the focal volumne calibration of the default FCS plugin). If you started this tool from one of the later, you may usually take over a value (e.g. the diffusion coefficient) from the tool into your plugin, by double-clicking the value in the table or by clicking <img src=":/lib/edit_copy.png"> .</li>
-		  <li>Now you can select the reference data for the diffusion coefficient you want to calculate in the tabs at the top-left corner. You may estimate the diffusion coefficient $$math:D$$ for a sphere, or if $$math:D_{\eta,T}$$ at a certain temperature $$math:T$$ and viscosity $$math:\eta$$ is known. In the <b>"given D"</b> tab you may enter the parameters $$math:D_{\eta,T}$$, $$math:\eta$$ and $$math:T$$ or select them from a database issued together with QuickFit. It is also possible to extend this database, by clicking <img src=":/lib/file_save.png"> after you entered all data <u>and</u> a name for your molecule. Note that the additional data will be saved in your local configuration directory, so if you feel that you have some D-data that should be part of QuickFit, please send it to the authors. In the tab <b>"Sphere"</b> you may enter the hydrodynamic radius of a sphere and in the tab <b>"given D[20,W]"</b> you may enter the $$math:D_{20,W}$$ value, i.e. the diffusion coefficient at 20°C in water of you sample.</li>
+		  <li>Now you can select the reference data for the diffusion coefficient you want to calculate in the tabs at the top-left corner. You may estimate the diffusion coefficient $$math:D$$ for a sphere, or if $$math:D_{\eta,T}$$ at a certain temperature $$math:T$$ and viscosity $$math:\eta$$ is known. In the <b>"given D"</b> tab you may enter the parameters $$math:D_{\eta,T}$$, $$math:\eta$$ and $$math:T$$ or select them from a database issued together with QuickFit. It is also possible to extend this database, by clicking <img src=":/lib/file_save.png"> after you entered all data <u>and</u> a name for your molecule. Note that the additional data will be saved in your local configuration directory, so if you feel that you have some D-data that should be part of QuickFit, please send it to the authors. In the tab <b>"Sphere"</b> you may enter the hydrodynamic radius of a sphere and in the tab <b>"given D[20,W]"</b> you may enter the $$math:D_{20,W}$$ value, i.e. the diffusion coefficient at 20&deg;C in water of you sample.</li>
 		  <li>In the next step you will have to define your buffer/solution. This can be done in the top right. First choose a solvent (currently only water) and the add several solutes to your buffer (component 1, component2, ...). Solutes may be NaCl, glucose etc. For each solute you also have to specify the molar concentration. By clicking on the help-button next to the component drop-down list, a new window will open where you can view the solute's properties used to estimate the solution/buffer viscosity.</li>
 		  <li>Finally you can specify the range of temperature values to show in the table and plot below.</li>
 		  <li>Now the plugin will calculate the solution viscosity and the diffusion coefficient of your sample according to the method described below. The results will be shown in the table at the bottom left and in the graph at the bottom right. In the graph you may select several different plots from the drop-down list above it. If your experiment has specific temperature conditions, you may enter them above the table and read the viscosity and diffusion coefficient for your experiment below that.</li>
@@ -27,7 +27,7 @@
 		    $$bmath:D=\frac{k_B T}{6\pi\eta R_0}$$
 			where $$math:k_B=1.3806488\cdot 10^{-23}\rm{J/K}$$ is the Boltzman constant, $$math:T$$ is the absolute temperature in Kelvin, $$math:\eta$$ is the viscosity of the solution at the temperatur $$math:T$$ and $$math:R_0=d/2$$ is the hydrodynamic radius of the sphere.
 		  </li>
-		  <li><b>from given $$math:D_{20,W}$$:</b> If the diffusion coefficient in water at the temperature of 20°C=293.15K (viscosity of water at 20°C is $$math:\eta_{20,W}=1.002 \rm{mPa\cdot s}$$) is known ($$math:D_{20,W}$$), this value can be used to calculate $$math:D$$ at any (absolute) tenmperature $$math:T$$:
+		  <li><b>from given $$math:D_{20,W}$$:</b> If the diffusion coefficient in water at the temperature of 20&deg;C=293.15K (viscosity of water at 20&deg;C is $$math:\eta_{20,W}=1.002 \rm{mPa\cdot s}$$) is known ($$math:D_{20,W}$$), this value can be used to calculate $$math:D$$ at any (absolute) tenmperature $$math:T$$:
 		  $$bmath:D=D_{20,W}\cdot\frac{T}{293.15 \rm{K}}\cdot\frac{\eta_{20,W}}{\eta}$$
 		  The same definitions as above apply and this formula may be easily derived using aboves equation for the diffusion coefficient of a sphere.
 		  </li>
@@ -54,15 +54,15 @@
 		<h2>Solutin Models</h2>
 		<p>The plugin uses several approximations to calculate the properties (especially the dynamic viscosity $$math:\eta$$) of a solution:
 		<ul>
-		  <li><b>water:</b> The dynamic viscosity of water between 0°C and 100°C can be estimated using the empirical formula:
+		  <li><b>water:</b> The dynamic viscosity of water between 0&deg;C and 100&deg;C can be estimated using the empirical formula:
 		    $$bmath:\eta(T)=A\cdot10^{B/(T-C)}$$
 			where $$math:T$$ is the absolute temperature in Kelvin and $$math:A=2.41\cdot10^{-5} \rm{Pa\cdot s}$$, $$math:B=247.8 \rm{K}$$ and $$math:C=140 \rm{K}$$.
 			<center><img src="./pic/viscosity_water.png"></center>
-                        In addition a number of dissolved components can be taken into account when calculating the viscosity of an aqueous solution. To estimate the viscosity of the solution, this plugin uses the same method as the program Sednterp (see <a href="http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity">http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity</a> and chapters 1 and 2 in [1], as well as [6]): First a viscosity increment is calculated for each component of the solution at 20°C (where measured data for several solutes is available):
+                        In addition a number of dissolved components can be taken into account when calculating the viscosity of an aqueous solution. To estimate the viscosity of the solution, this plugin uses the same method as the program Sednterp (see <a href="http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity">http://bitcwiki.sr.unh.edu/index.php/Calculating_Viscosity</a> and chapters 1 and 2 in [1], as well as [6]): First a viscosity increment is calculated for each component of the solution at 20&deg;C (where measured data for several solutes is available):
 			$$bmath: \Delta\eta_i(c_i)=m(c_i; \vec{p})-\eta_{Water, 20}$$
-			Here the function $$math:m(c_i; \vec{p})$$ is a model function fitted to experimental viscosity data of the respective solution. It models the viscosity of the solut in water at a molar concentration $$math:c_i$$ and a temperature of 20°C. Finally the solution viscosity at the target temperature $$math:T$$ is estimated as:
+			Here the function $$math:m(c_i; \vec{p})$$ is a model function fitted to experimental viscosity data of the respective solution. It models the viscosity of the solut in water at a molar concentration $$math:c_i$$ and a temperature of 20&deg;C. Finally the solution viscosity at the target temperature $$math:T$$ is estimated as:
 			$$bmath:\eta(T, c_1,...,c_n)=\left(\eta_{20,water}+\sum_{i=1}^n\Delta\eta_i(c_i)\right)\cdot\frac{\eta_{T,water}}{\eta_{20,water}}$$
-			Here $$math:\eta_{T,water}$$ and $$math:\eta_{20,water}$$ are the viscosity of water at an arbitrary temperature T and at 20°C respectively.<br>
+			Here $$math:\eta_{T,water}$$ and $$math:\eta_{20,water}$$ are the viscosity of water at an arbitrary temperature T and at 20&deg;C respectively.<br>
 			<b>Note:</b> This method assumes a low concentration of the solute, so that the solution basically behaves like water. Therefore the temperature scaling is the same as in water and hence the simple factor $$math:\eta_{T,water}/\eta_{20,water}$$.<br><br>
 			
 			Model functions implemented in this plugin are:
@@ -72,7 +72,7 @@
 			   <li>An extended empirical fit function (e.g. used for glucose data): 
 			   $$bmath:m_1(c; p_1,p_2,p_3,p_4,p_5,p_6,p_7,p_8,p_9) = p_1 + p_2\cdot10^{-3}\cdot\sqrt{c} + p_3\cdot10^{-2}\cdot c + p_4\cdot10^{-3}\cdot c^2 + p_5\cdot10^{-3}\cdot c^3 + p_6\cdot10^{-3}\cdot c^4 + p_7\cdot10^{-3}\cdot c^5 + p_8\cdot10^{-3}\cdot c^6 + p_9\cdot10^{-3}\cdot c^7$$</li>
 			</ol>
-			The parameters for these functions were obtained by the author from fits to model data taken from respected sources (e.g. CRC handbook of chemistry). The reference for each fit and the parameter values can be found in the file <tt>$$local_plugin_assets$$solutioncomponents.ini</tt>. In the same directory there are data files with the solution data at 20°C and a GnuPlot script to perform the fit.
+			The parameters for these functions were obtained by the author from fits to model data taken from respected sources (e.g. CRC handbook of chemistry). The reference for each fit and the parameter values can be found in the file <tt>$$local_plugin_assets$$solutioncomponents.ini</tt>. In the same directory there are data files with the solution data at 20&deg;C and a GnuPlot script to perform the fit.
 			<br><b>Note:</b> The calculation of solution viscosities is currently only available for acqeous solutions!
 		  </li>
 		</ul>
@@ -96,10 +96,10 @@
 			p2=<font color="blue"><i>second model parameter</i></font><br>
 			<font color="blue"><i>...</i></font>
 			</tt></blockquote></li>
-		  <li>Now you will have to determine the model parameters. To do so, you will need a dataset containing the viscosity of your solute in water at 20°C for different concentrations. Store this dataset in a new comma-separated values file, which you wil have to enter as "datafile". Here is an example of data taken from the CRC handbook for NaCl:<br><blockquote><tt>
+		  <li>Now you will have to determine the model parameters. To do so, you will need a dataset containing the viscosity of your solute in water at 20&deg;C for different concentrations. Store this dataset in a new comma-separated values file, which you wil have to enter as "datafile". Here is an example of data taken from the CRC handbook for NaCl:<br><blockquote><tt>
 		    # name: sodium chloride (NaCl)<br>
 			# molar mass: 58.44<br>
-			# temperature: 20°C<br>
+			# temperature: 20&deg;C<br>
 			# reference: CRC handbook, p. 8-71<br>
 			#! concentration [M], density [g/cm^3], refractive index, viscosity [mPa*s]<br>
 			0,   	0.9982,	1.3339,	1.0016<br>

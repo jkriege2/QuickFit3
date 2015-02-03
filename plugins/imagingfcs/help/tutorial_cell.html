@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-      <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
       <title>Imaging FCS Tutorial: Imaging FCS in a cell</title>
       <link rel="contents" href="imaging_fcs.html">   
   </head>
@@ -21,7 +21,7 @@ $$note:The data in this tutorial is available in <tt>EGFP4x_2013_08_01.zip</tt> 
     <li>In addition, we assume that you have also acquired a short time-series of the background signal (usually 500-2000 rames are enough) of the image sensor. Typically this can be acquired shortly before the actual measurment by simply switching off the illumination source. The background series has to be acquired with the same camera/mictoscope settings as the actual measurement. If you don't have such a background series, you should at least determine the offset, that your camera adds to the signals (usually 100 counts) and subtract that from the data during correlation.</li>
     <li>In addition you need some knowledge about the pixel-sze of your microscope and the size of the PSF. The latter can be determined in various ways:
     <ol>
-        <li>you can perform a z-stack with sub-difractive fluorescent beads and from that determine the longitudinal size $$math:w_z$$ and the lateral size $$math:w_{xy}$$. Typiccaly both sizes are given as 1/e² half widths in nanometers to the models, but to be sure, check the help/definition of the fit model that you use. The logitudinal size is only required for SPIM-FCS measurements. For TIRF measurements, the lateral PSF size is sufficient.</li>
+        <li>you can perform a z-stack with sub-difractive fluorescent beads and from that determine the longitudinal size $$math:w_z$$ and the lateral size $$math:w_{xy}$$. Typiccaly both sizes are given as 1/e half widths in nanometers to the models, but to be sure, check the help/definition of the fit model that you use. The logitudinal size is only required for SPIM-FCS measurements. For TIRF measurements, the lateral PSF size is sufficient.</li>
         <li>A more accurate option is to perform an <a href="$$plugin_info:helpdir:imfcs_fit$$/calibration.html">imFCS focus calibration</a> to determine the laterals PSF size $$math:w_{xy}$$. For SPIM measurements, the longitudinal PSF size $$math:w_z$$ can either be estimated from a beadscan (see above), or from the light-sheet width $$math:w_{LS}$$ and the expected depth of field of the detection objective $$math:w_{Obj}$$ as$$REF_SPIMFCS_CAM$$ $$bmath:\frac{1}{w_{z}^2}=\frac{1}{w_{LS}^2}+\frac{1}{w_{Obj}^2}.$$</li>
     </ol>
 </ul></p>
@@ -43,7 +43,7 @@ $$note:The data in this tutorial is available in <tt>EGFP4x_2013_08_01.zip</tt> 
 <center><a name="tutorial_cell_pic000"><img src="./pic/tutorial_cell_pic000.png" border="1"></center></li>
         <li>If you don't have a background series, select "remove offset" and enter the camera offset, or select "remove minimum counts & offset" and set the offset to 0. In the latter case, the correlator will remove the smalles pixel value it can find in the measurement. This is useful, if you acquisition e.g. contains some darkened pixels at the borders.</li>
     </ul></li>
-    <li>You can crop the image series both in space (using the cropping options) and in time (using the "frame range" widgets). Also yo can perform a binning. For the sake of this example, we set binning to 1 and do not use any cropping. If you used a camera with very small pixels (basically significantly sub-diffractive), e.g. in acquisition with an sCMOS-camera (6µm pixel size) at high magnification (e.g. 60x), it may make sence to increase the binning, until you have pixels of the same size as the PSF.</li>
+    <li>You can crop the image series both in space (using the cropping options) and in time (using the "frame range" widgets). Also yo can perform a binning. For the sake of this example, we set binning to 1 and do not use any cropping. If you used a camera with very small pixels (basically significantly sub-diffractive), e.g. in acquisition with an sCMOS-camera (6&mu;m pixel size) at high magnification (e.g. 60x), it may make sence to increase the binning, until you have pixels of the same size as the PSF.</li>
     <li>Now you will have to choose a <a href="imfcs_bleach.html">bleach correction method</a>. For cell data, usually "1-exponential(poly4)" is a good choice. For very low bleaching, a simple single-exponential (1-exponential, lmfit) might also be enough. The "number of frames to average over" should be in the range of $$math:N_{frames}/25$$ and is usually already set, when the file is read. </li>
     <li>If your Acquisition was performed in DualView mode (which we do NOT cover here), you can set that under "DualView mode". For a single-channel FCS measurement, select "none".</li>
     <li>In the <b>correlation functions</b>, only select the <b>ACF for each pixel</b>, which will calculate only an autocorrelation fucntion. Spatial and two-color cross-correlation fucntions are covered in other tutorials.</li>
@@ -151,7 +151,7 @@ In that tab: select the "uncorrected time-binned video" and play it back and for
     </li>
     <li>For this tutorial, you should use the fit model 
     <center><a name="tutorial_cell_pic019"><img src="./pic/tutorial_cell_pic018.png" border="1">
-    </center>This is a simple (multi-component) fit for SPIM-FCS data. The PSF-parameters are given as 1/e²-halfwidths. 
+    </center>This is a simple (multi-component) fit for SPIM-FCS data. The PSF-parameters are given as 1/e-halfwidths. 
     </li>
     <li>Now you should select a representative pixel for the cell, by clicking on it in the overview image. If you applied a proper mask and do not expext to much variation over the cell, also the average over all pixels is a good choice (click on the avg. button: <a name="tutorial_cell_pic020"><img src="./pic/tutorial_cell_pic020.png" border="1">)</li>
     <li>After selecting the model and a representative pixel, you should first provide the focus parameters to the model. To do so, enter the values ($$math_w_{z}=1126nm$$ and $$math:w_{xy}=620nm$$ in the case of the example, shown in this tutorial) into the fields 
@@ -172,7 +172,7 @@ The remaining wavy shape of the residuals is caused by the fact, that we fit the
     <li>In order to allow for reliable fits for all pixels, it is often useful to adapt the parameter ranges (especially for the diffusion coefficients) to the dataset. Therefore, change the parameter ranges as follows:
 <center><a name="tutorial_cell_pic026"><img src="./pic/tutorial_cell_pic026.png" border="1">
 </center>
-Now the first (fast) diffusion coefficient may only scale between 1 and 100µm²/s, which can be estimated form teh known size of the EGFP tetramer. The slow component, which represents the anomality of the motion and the complexity of the medium, may be 2µm²/s at the most, which has turned out to be a good range for most cases of free diffusion in a cell.
+Now the first (fast) diffusion coefficient may only scale between 1 and 100&mu;m/s, which can be estimated form teh known size of the EGFP tetramer. The slow component, which represents the anomality of the motion and the complexity of the medium, may be 2&mu;m/s at the most, which has turned out to be a good range for most cases of free diffusion in a cell.
 </li>
     <li>Now you want to use the current fit parameters as preset for all other pixels. This is achieved by clicking on <img src="./pic/tutorial_cell_pic027.png" border="1">. Then you can perform a fit for all pixels in all raw data records, by clicking <img src="./pic/tutorial_cell_pic028.png" border="1">, or for all pixels in the current raw data record, by clicking <img src="./pic/tutorial_cell_pic029.png" border="1">. While the fit is arunning, a progress dialog is displayed, which will disappear, when the fit of all pixels is finished.</li>
     <li>The fitting stage is now complete and you can close the fit evaluation editor.</li>

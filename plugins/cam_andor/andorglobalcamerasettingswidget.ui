@@ -145,7 +145,10 @@
      <item>
       <widget class="QLabel" name="labTemperature">
        <property name="text">
-        <string>0 °C</string>
+        <string>0 &amp;deg;C</string>
+       </property>
+       <property name="textFormat">
+        <enum>Qt::RichText</enum>
        </property>
       </widget>
      </item>

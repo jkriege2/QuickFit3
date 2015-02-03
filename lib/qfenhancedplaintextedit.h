@@ -111,9 +111,9 @@ class QFLIB_EXPORT QFEnhancedPlainTextEdit : public QPlainTextEdit {
     private slots:
         /** \brief called to insert the selected completion
          *
-         * In the selction database file you can use the special character \c ° to specify a
-         * position in the inserted text. if there is one \c ° the cursor will be set to this
-         * position after insert. If there are two \c ° the text between them will be selected
+         * In the selction database file you can use the special character \c \xB0 to specify a
+         * position in the inserted text. if there is one \c \xB0 the cursor will be set to this
+         * position after insert. If there are two \c \xB0 the text between them will be selected
          * after insert.
          */
         void insertCompletion(const QString &completion);

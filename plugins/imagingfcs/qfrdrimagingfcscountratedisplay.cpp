@@ -223,34 +223,34 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
         int ucolMin=ds->addColumn(m->getUncorrectedStatisticsMin(), m->getUncorrectedStatisticsN(), "uncorrected min");
         int ucolMax=ds->addColumn(m->getUncorrectedStatisticsMax(), m->getUncorrectedStatisticsN(), "uncorrected max");
 
-        double varAvg;
+        double varAvg=0;
         double meanAvg=statisticsAverageVariance(varAvg, m->getStatisticsMean(), m->getStatisticsN());
-        double varStddev;
+        double varStddev=0;
         double meanStddev=statisticsAverageVariance(varStddev, m->getStatisticsStdDev(), m->getStatisticsN());
-        double varMin;
+        double varMin=0;
         double meanMin=statisticsAverageVariance(varMin, m->getStatisticsMin(), m->getStatisticsN());
-        double varMax;
+        double varMax=0;
         double meanMax=statisticsAverageVariance(varMax, m->getStatisticsMax(), m->getStatisticsN());
 
-        double bvarAvg;
+        double bvarAvg=0;
         double bmeanAvg=statisticsAverageVariance(bvarAvg, m->getBackgroundStatisticsMean(), m->getBackgroundStatisticsN());
-        double bvarStddev;
+        double bvarStddev=0;
         double bmeanStddev=statisticsAverageVariance(bvarStddev, m->getBackgroundStatisticsStdDev(), m->getBackgroundStatisticsN());
-        double bvarMin;
+        double bvarMin=0;
         double bmeanMin=statisticsAverageVariance(bvarMin, m->getBackgroundStatisticsMin(), m->getBackgroundStatisticsN());
-        double bvarMax;
+        double bvarMax=0;
         double bmeanMax=statisticsAverageVariance(bvarMax, m->getBackgroundStatisticsMax(), m->getBackgroundStatisticsN());
 
-        double uvarAvg;
+        double uvarAvg=0;
         double umeanAvg=statisticsAverageVariance(uvarAvg, m->getUncorrectedStatisticsMean(), m->getUncorrectedStatisticsN());
-        double uvarStddev;
+        double uvarStddev=0;
         double umeanStddev=statisticsAverageVariance(uvarStddev, m->getUncorrectedStatisticsStdDev(), m->getUncorrectedStatisticsN());
-        double uvarMin;
+        double uvarMin=0;
         double umeanMin=statisticsAverageVariance(uvarMin, m->getUncorrectedStatisticsMin(), m->getUncorrectedStatisticsN());
-        double uvarMax;
+        double uvarMax=0;
         double umeanMax=statisticsAverageVariance(uvarMax, m->getUncorrectedStatisticsMax(), m->getUncorrectedStatisticsN());
 
-        double dispMean, dispStddev;
+        double dispMean=0, dispStddev=0;
 
         if (ui->cmbGraph->currentIndex()<=5) {
             dataT=m->getStatisticsT();

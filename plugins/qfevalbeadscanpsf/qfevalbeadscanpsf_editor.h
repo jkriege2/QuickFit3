@@ -83,6 +83,7 @@ class QFEvalBeadScanPSFEditor : public QFEvaluationEditor {
         /*! \brief create an evaluation report for the current record */
         void createReportDoc(QTextDocument* document);
 
+        QVector<double> getBeadsData(const QString &paramName, int paramIdx, int channel);
     protected slots:
         /** \brief activated when the highlighted record changed */
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);

@@ -17,13 +17,13 @@ SPIM microscope to characterize the PSF (and possibly the alignment of a
 	  <p>Pepare a gel containing a low concentration of sub-diffractive beads. We use:
 	  </p><ol>
 	  <li>Prepare a few 1ml syringes by cutting off the top, where the syringe gets thinner (see image (A) below).</li>
-	  <li>0.5% PhytaGel (<a href="http://www.sigmaaldrich.com/catalog/product/sigma/p8169?lang=de&amp;region=DE">P8169, Sigma-Aldrich</a>) mixed with deionized water (shake thoroughly). Then heat in the microwave until the gellant dissolves completely. <br><small><i>We use 40ml water and 200µg PhytaGel.</i></small></li>
-	  <li>Add MgSO<sub>4</sub> to an end concentration of 0.1%<br><small><i>We use 400µl of a 10% MgSO<sub>4</sub> stock solution.</i></small></li>
-	  <li>While still &gt;40°C, fill 1 ml of the solution into an Epi and add 5-10µl of 100nm TetraSpec beads (<a href="https://products.invitrogen.com/ivgn/product/T7279?ICID=search-product">T-7279 from Invitrogen</a>)
+	  <li>0.5% PhytaGel (<a href="http://www.sigmaaldrich.com/catalog/product/sigma/p8169?lang=de&amp;region=DE">P8169, Sigma-Aldrich</a>) mixed with deionized water (shake thoroughly). Then heat in the microwave until the gellant dissolves completely. <br><small><i>We use 40ml water and 200&mu;g PhytaGel.</i></small></li>
+	  <li>Add MgSO<sub>4</sub> to an end concentration of 0.1%<br><small><i>We use 400&mu;l of a 10% MgSO<sub>4</sub> stock solution.</i></small></li>
+	  <li>While still &gt;40&deg;C, fill 1 ml of the solution into an Epi and add 5-10&mu;l of 100nm TetraSpec beads (<a href="https://products.invitrogen.com/ivgn/product/T7279?ICID=search-product">T-7279 from Invitrogen</a>)
  directly from stock. Vortex shortly. You can also use any other type of
  bead, as long as the concentration is so low, that the beads are well 
 separated in the gel!</li>
-	  <li>pull up ~300-400µl from one Epi into a syringe (see image (C-D)) and refrigerate for 5min. at 4°C until the gel solidifies</li>
+	  <li>pull up ~300-400&mu;l from one Epi into a syringe (see image (C-D)) and refrigerate for 5min. at 4&deg;C until the gel solidifies</li>
 	  <li>Measure a beadscan with 1000-2000 frames, displaced by ~200nm. 
 Take care to measure in the front part of the gel, so it does not alter 
 the optical properties of the microscope too much!</li>
@@ -33,8 +33,8 @@ the optical properties of the microscope too much!</li>
 	  </center>
 	  <h2>Evaluation</h2>
 	  <p>The matlab script that can be downloaded below, will do the 
-following (all Gaussian widths are measured as 1/e² half width, i.e. 
-exp(-2*x²/w²), a new subdirectory is created that stores all the 
+following (all Gaussian widths are measured as 1/e<sup>2</sup> half width, i.e. 
+exp(-2*x<sup>2</sup>/w<sup>2</sup>), a new subdirectory is created that stores all the 
 results!):
 	  </p><ol>
 	    <li>it runs through the stack and finds separated beads (in the left color channel on a DualView).</li>
@@ -63,7 +63,7 @@ results!):
 		<li>at the top, set in <tt>addpath('D:\Matlab\spim');</tt> the path (here <tt>D:\Matlab\spim</tt>) to the path where you saved the scripts (see step 1)</li>
 		<li>set the variable <tt>datafile</tt> to the filesname of your stack, e.g. <tt>datafile = 'stack.tif';</tt></li>
 		<li>set the variable <tt>deltaz</tt> to the step-size of your beadscan in nanometers, e.g. <tt>deltaz=200;</tt> for 200nm steps.</li>
-		<li>set the variable <tt>deltaxy</tt> to the pixel-size of your beadscan in nanometers, e.g. <tt>deltaxy=400;</tt> for 400nm pixelsize (=24µm camera pixels @ 60x magnification).</li>
+		<li>set the variable <tt>deltaxy</tt> to the pixel-size of your beadscan in nanometers, e.g. <tt>deltaxy=400;</tt> for 400nm pixelsize (=24&mu;m camera pixels @ 60x magnification).</li>
 		<li>set the variable <tt>datarange=[]</tt> to evaluate all z-setps or e.g. <tt>datarange=1:500</tt> to evaluate only the first 500 frames.</li>
 		<li>set the variable <tt>datarangeX=[]</tt> and <tt>datarangeY=[]</tt> to evaluate all pixels, or e.g. <tt>datarangeX=32:96; datarangeY=32:96;</tt> to evaluate only the central 64x64 pixels of a 128x128 camera.</li>
 		<li>set any of the other variables, if you want to.</li>

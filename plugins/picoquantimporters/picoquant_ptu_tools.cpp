@@ -109,11 +109,11 @@ bool PTUReadConfiguration(FILE* fpin, PTUInfo &info, QString &error) {
               tagData=PTUTagHead.TagValue;
               break;
           case tyFloat8:
-              tagData=*(double*)&(PTUTagHead.TagValue);
+              tagData=*((double*)&(PTUTagHead.TagValue));
               if (strcmp(PTUTagHead.Ident, TTTRTagRes)==0) // Resolution for TCSPC-Decay
-                      Resolution = *(double*)&(PTUTagHead.TagValue);
+                      Resolution = *((double*)&(PTUTagHead.TagValue));
               if (strcmp(PTUTagHead.Ident, TTTRTagGlobRes)==0) // Global resolution for timetag
-                      GlobRes = *(double*)&(PTUTagHead.TagValue); // in ns
+                      GlobRes = *((double*)&(PTUTagHead.TagValue)); // in ns
               break;
           case tyFloat8Array: {
               double* buf=(double*)qfMalloc(PTUTagHead.TagValue);

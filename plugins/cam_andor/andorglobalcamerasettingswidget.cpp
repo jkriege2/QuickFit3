@@ -62,7 +62,7 @@ void AndorGlobalCameraSettingsWidget::showCurrentTemperature(int progress, float
     if (progress==3) drift=tr("<small>(drift!)</small>");
 
     if (progress==-1) ui->labTemperature->setText(tr("<b>---</b> <small>(error!)</small>"));
-    else ui->labTemperature->setText(tr("<b>%1 °C</b> %2").arg(temperature).arg(drift));
+    else ui->labTemperature->setText(tr("<b>%1 &deg;C</b> %2").arg(temperature).arg(drift));
 
     int direction=0;
     if (ui->spinTemperature->value()>(int)round(temperature)) direction=1;

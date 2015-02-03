@@ -2,7 +2,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <title>FCS Fit: Tutorial</title>
   </head>
   <body>
@@ -63,7 +63,7 @@
 	 </ol>
 	 <p></p>
 	 <h3>Calibration of the Focal Volume</h3>
-	 <p>In the last section we showed how to perform FCS curve fits. We did however not calibrate the focal volume so far. As confocal FCS does NOT have an intrinsic ruler other than this volume, which depends on the type of sample chamber, day-to-day abberations, temperature, thicknes of cover glass, alignment of the instrument, ..., we will have to calibrate it. This is usually done by measuring a clean dye solution (usually 5-20 nM) with a well established diffusion coefficient (see the table and references in "<a href="estimate_focus.html">FCS Fit: Estime focus parameter <i>w</i><sub>xy</sub> from fit results</a>"). In above's example we can take the first measurement which was done for a 20nM Alexa-488 solution at 20°C. Therefore the diffusion coefficient should be 435&mu;<sup>2</sup>/s. </p>
+	 <p>In the last section we showed how to perform FCS curve fits. We did however not calibrate the focal volume so far. As confocal FCS does NOT have an intrinsic ruler other than this volume, which depends on the type of sample chamber, day-to-day abberations, temperature, thicknes of cover glass, alignment of the instrument, ..., we will have to calibrate it. This is usually done by measuring a clean dye solution (usually 5-20 nM) with a well established diffusion coefficient (see the table and references in "<a href="estimate_focus.html">FCS Fit: Estime focus parameter <i>w</i><sub>xy</sub> from fit results</a>"). In above's example we can take the first measurement which was done for a 20nM Alexa-488 solution at 20&deg;C. Therefore the diffusion coefficient should be 435&mu;<sup>2</sup>/s. </p>
 	 <p>For the example here, we assume that &gamma;=6 is a good setting (which can be established by a separate determination of the focal volume, by scanning a fluorescent bead through the fcous and which will not change that much with changes of the setup) and are left with the problem of determining <i>w<sub>x,y</sub></i>. If you do not have an independent value for &gamma;, you can leave it also as a free paramater in the calibration measurement and take the fitted values for the rest of the evaluation.</p>
 	 <p>Now you will have to take the &tau;<sub>D</sub> = (30 &plusmn; 2) &mu;s value from the fit above and plug it into the next equation together with the given diffusion coefficient:
 	 <center><img src="./pic/form_29.png"></center>

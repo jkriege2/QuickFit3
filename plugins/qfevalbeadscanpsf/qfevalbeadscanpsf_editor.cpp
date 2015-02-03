@@ -137,6 +137,10 @@ void QFEvalBeadScanPSFEditor::highlightingChanged(QFRawDataRecord* formerRecord,
         ui->spinPSFWidth->setValue(record->getProperty(eval->getEvaluationResultID()+"_EST_PSF_WIDTH", record->getProperty("EST_PSF_WIDTH", ui->spinPSFWidth->value()).toDouble()).toDouble());
         ui->spinPSFHeight->setValue(record->getProperty(eval->getEvaluationResultID()+"_EST_PSF_HEIGHT", record->getProperty("EST_PSF_HEIGHT", ui->spinPSFHeight->value()).toDouble()).toDouble());
 
+        ui->grpFilterBeads->setChecked(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads", record->getProperty("FilterBeads", ui->grpFilterBeads->isChecked()).toBool()).toBool());
+        ui->spinAxRatioMin->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMin", record->getProperty("FilterBeads_AxRatMin", ui->spinAxRatioMin->value()).toDouble()).toDouble());
+        ui->spinAxRatioMax->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMax", record->getProperty("FilterBeads_AxRatMax", ui->spinAxRatioMax->value()).toDouble()).toDouble());
+
         updatingData=false;
     }
     
@@ -482,12 +486,70 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
     }
 }
 
+
+QVector<double> QFEvalBeadScanPSFEditor::getBeadsData(const QString& paramName, int paramIdx,  int channel)
+{
+    QVector<double> dat;
+
+    if (!current) return dat;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    if ((!record)||(!eval)/*||(!data)*/) return dat;
+
+    QString evalID=eval->getEvaluationResultID();
+    int beads=record->resultsGetAsInteger(evalID, "channel0_beads");
+
+
+
+    for (int b=0; b<beads; b++) {
+        QString param=QString("channel%1_bead%2").arg(channel).arg(b);
+        QString p1=param+paramName;
+
+        bool useBead=true;
+        if (ui->grpFilterBeads->isChecked()) {
+            bool ok=true;
+            QVector<double> ar=record->resultsGetAsDoubleList(evalID, param+"_fits_axialratios_3d", &ok);
+            if (ok && ar.size()>=2) {
+                if (ar[0]<ui->spinAxRatioMin->value() || ar[0]> ui->spinAxRatioMax->value() ||
+                    ar[1]<ui->spinAxRatioMin->value() || ar[1]> ui->spinAxRatioMax->value()) {
+                    useBead=false;
+                }
+            }
+            if (useBead) {
+                ar=record->resultsGetAsDoubleList(evalID, param+"_fits_axialratios", &ok);
+                if (ok && ar.size()>=2) {
+                    if (ar[0]<ui->spinAxRatioMin->value() || ar[0]> ui->spinAxRatioMax->value() ||
+                        ar[1]<ui->spinAxRatioMin->value() || ar[1]> ui->spinAxRatioMax->value()) {
+                        useBead=false;
+                    }
+                }
+            }
+        }
+        if (useBead) {
+            bool ok=true;
+            QVector<double> p=record->resultsGetAsDoubleList(evalID, p1, &ok);
+            if (ok && paramIdx<p.size()) {
+                dat<<p[paramIdx];
+            }
+        }
+    }
+
+    return dat;
+}
+
+
 void QFEvalBeadScanPSFEditor::displayEvaluationHistograms() {
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord(); 
     // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
     if ((!record)||(!eval)/*||(!data)*/) return;
+
+    if (!updatingData) {
+        record->setQFProperty(eval->getEvaluationResultID()+"_FilterBeads", ui->grpFilterBeads->isChecked(), false, false);
+        record->setQFProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMin", ui->spinAxRatioMin->value(), false, false);
+        record->setQFProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMax", ui->spinAxRatioMax->value(), false, false);
+    }
 
     if (eval->hasEvaluation(record)) {
         QString evalID=eval->getEvaluationResultID();
@@ -501,8 +563,8 @@ void QFEvalBeadScanPSFEditor::displayEvaluationHistograms() {
             ui->histogram1->setDefaultColor(1, QColor("red"));
             ui->histogram1->setDefaultColor(2, QColor("blue"));
             for (int c=0; c<channels; c++) {
-                QVector<double> dat;
-                for (int b=0; b<beads; b++) {
+                QVector<double> dat=getBeadsData(sl1.value(0), sl1.value(1).toInt(), c);
+                /*for (int b=0; b<beads; b++) {
                     QString param=QString("channel%1_bead%2").arg(c).arg(b);
                     QString p1=param+sl1.value(0);
                     int p1i=sl1.value(1).toInt();
@@ -512,7 +574,7 @@ void QFEvalBeadScanPSFEditor::displayEvaluationHistograms() {
                     if (ok && p1i<p.size()) {
                         dat<<p[p1i];
                     }
-                }
+                }*/
                 if (dat.size()>0) ui->histogram1->addCopiedHistogram(tr("ch %1: %2").arg(c).arg(ui->cmbParam1->currentText()), dat.data(), dat.size());
             }
             ui->histogram1->updateHistogram(true);
@@ -523,8 +585,8 @@ void QFEvalBeadScanPSFEditor::displayEvaluationHistograms() {
             ui->histogram2->setDefaultColor(1, QColor("red"));
             ui->histogram2->setDefaultColor(2, QColor("blue"));
             for (int c=0; c<channels; c++) {
-                QVector<double> dat;
-                for (int b=0; b<beads; b++) {
+                QVector<double> dat=getBeadsData(sl2.value(0), sl2.value(1).toInt(), c);
+                /*for (int b=0; b<beads; b++) {
                     QString param=QString("channel%1_bead%2").arg(c).arg(b);
                     QString p1=param+sl2.value(0);
                     int p1i=sl2.value(1).toInt();
@@ -533,7 +595,7 @@ void QFEvalBeadScanPSFEditor::displayEvaluationHistograms() {
                     if (ok && p1i<p.size()) {
                         dat<<p[p1i];
                     }
-                }
+                }*/
                 if (dat.size()>0) ui->histogram2->addCopiedHistogram(tr("ch %1: %2").arg(c).arg(ui->cmbParam2->currentText()), dat.data(), dat.size());
             }
             ui->histogram2->updateHistogram(true);
@@ -542,7 +604,12 @@ void QFEvalBeadScanPSFEditor::displayEvaluationHistograms() {
         ui->histogramD2->clear();
         if (channels>0) {
             QString evalID=eval->getEvaluationResultID();
-            QVector<double> datDX, datDY, datDZ, datD;
+            QVector<double> datDX=getBeadsData("_fit3d_distc0", 0, 1);
+            QVector<double> datDY=getBeadsData("_fit3d_distc0", 1, 1);
+            QVector<double> datDZ=getBeadsData("_fit3d_distc0", 2, 1);
+            QVector<double> datD=getBeadsData("_fit3d_distc0", 3, 1);
+
+            /*QVector<double> datDX, datDY, datDZ, datD;
             for (int b=0; b<beads; b++) {
                 QString param=QString("channel%1_bead%2").arg(1).arg(b);
                 bool ok=true;
@@ -553,7 +620,7 @@ void QFEvalBeadScanPSFEditor::displayEvaluationHistograms() {
                     datDZ<<d[2];
                     datD<<d[3];
                 }
-            }
+            }*/
             if (datDX.size()>0) {
                 ui->histogramD1->addCopiedHistogram(tr("distance: x"), datDX.data(), datDX.size());
                 if (ui->cmbParamD2->currentIndex()==0) ui->histogramD2->addCopiedHistogram(tr("distance: x"), datDX.data(), datDX.size());
@@ -595,7 +662,9 @@ void QFEvalBeadScanPSFEditor::displayEvaluationCorrPlot()
 
             int c=sl1.value(2).toInt();
 
-            QVector<double> dat;
+            QVector<double> dat=getBeadsData(sl1.value(0), sl1.value(1).toInt(), c);
+            QVector<double> dat2=getBeadsData(sl2.value(0), sl2.value(1).toInt(), c);
+            /*QVector<double> dat;
             for (int b=0; b<beads; b++) {
                 QString param=QString("channel%1_bead%2").arg(c).arg(b);
                 QString p1=param+sl1.value(0);
@@ -619,7 +688,7 @@ void QFEvalBeadScanPSFEditor::displayEvaluationCorrPlot()
                 if (ok && p1i<p.size()) {
                     dat2<<p[p1i];
                 }
-            }
+            }*/
 
 
             if (dat.size()>0 && dat2.size()>0) ui->corrPlot->addCopiedCorrelation(tr("%1 -- %2").arg(ui->cmbParamC1->currentText()).arg(ui->cmbParamC2->currentText()), dat.data(), dat2.data(), dat.size());
@@ -683,6 +752,9 @@ void QFEvalBeadScanPSFEditor::displayResults()
         ui->cmbParam1->addItem(s1=tr("cut Z: position"), sl1=constructQStringListFromItems("_cutz_fitresult", "2")); ui->cmbParam2->addItem(s1, sl1);
         ui->cmbParam1->addItem(s1=tr("cut Z: width"), sl1=constructQStringListFromItems("_cutz_fitresult", "3")); ui->cmbParam2->addItem(s1, sl1);
 
+        ui->cmbParam1->addItem(s1=tr("cut X+Z: axial ratio wz/wx"), sl1=constructQStringListFromItems("_fits_axialratios", "0")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Y+Z: axial ratio wz/wy"), sl1=constructQStringListFromItems("_fits_axialratios", "1")); ui->cmbParam2->addItem(s1, sl1);
+
         ui->cmbParam1->addItem(s1=tr("cut XZ: rayleigh length"), sl1=constructQStringListFromItems("_cutxz_gaussianbeam_results", "0")); ui->cmbParam2->addItem(s1, sl1);
         ui->cmbParam1->addItem(s1=tr("cut XZ: beam width"), sl1=constructQStringListFromItems("_cutxz_gaussianbeam_results", "1")); ui->cmbParam2->addItem(s1, sl1);
         ui->cmbParam1->addItem(s1=tr("cut XZ: position"), sl1=constructQStringListFromItems("_cutxz_gaussianbeam_results", "2")); ui->cmbParam2->addItem(s1, sl1);
@@ -702,6 +774,8 @@ void QFEvalBeadScanPSFEditor::displayResults()
         ui->cmbParam1->addItem(s1=tr("3D fit: theta"), sl1=constructQStringListFromItems("_fit3d_results", "8")); ui->cmbParam2->addItem(s1, sl1);
         ui->cmbParam1->addItem(s1=tr("3D fit: phi"), sl1=constructQStringListFromItems("_fit3d_results", "9")); ui->cmbParam2->addItem(s1, sl1);
         ui->cmbParam1->addItem(s1=tr("3D fit: alpha"), sl1=constructQStringListFromItems("_fit3d_results", "10")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: axial ratio w3/w1"), sl1=constructQStringListFromItems("_fits_axialratios_3d", "0")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: axial ratio w3/w2"), sl1=constructQStringListFromItems("_fits_axialratios_3d", "1")); ui->cmbParam2->addItem(s1, sl1);
 
         if (ch>1) {
             ui->cmbParam1->addItem(s1=tr("3D fit: distance x"), sl1=constructQStringListFromItems("_fit3d_distc0", "0")); ui->cmbParam2->addItem(s1, sl1);

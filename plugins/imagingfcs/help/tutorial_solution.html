@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-      <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
       <title>Imaging FCS Tutorial</title>
 	  <link rel="prev" href="tutorial.html"> 
 	  <link rel="next" href="tutorial_cells.html"> 
@@ -25,10 +25,10 @@
 	 <ol>
 	   <li>Perform an imagingFCS measurements (e.g. SPIM-FCS) of some sample of interest in solution. Store the acquired image series as TIFF file and note these acquisition parameters (this will be saved and automatically read from the image metadata if you use the QuickFit SPIM- or a compatible plugin!): <i>pixel size in nanometers, framerate or frametime</i><br>Also perform a background measurement, i.e. a measurement with the same settings (but fewer frames) with the excitation lasers switched off. Usually one such measurement per settings and day is enough, but better perform one right before each measurement to ensure compensation for changing lab illumination and camera drift over the whole day.<br><br>If you don't have an imagingFCS setup (yet), you may also use the testdata provided under <tt>$$assetsdir$$/plugins/imaging_fcs/imfcs_testdata/beads_no9_0.86nM_5mW_000.tif</tt> for this tutorial. The acquisition data of this dataset was:
 	   <ul>
-         <li>acquired on a SPIM. The lightsheet had an 1/e2-halfwidth of 1.2µm. </li>
-         <li>pixelsize: 400nm (in the object plane, i.e. using a 60x/NA1 detection objective and an Andor iXon X3 860 camera with 24µm pixels)</li>
-         <li>framerate of 1785.7fps (i.e. a frametaime of 560µs)</li>
-		 <li>The sample were 100nm diameter FluoSpheres YG (green fluorescent microspheres) in water @25°C</li>
+         <li>acquired on a SPIM. The lightsheet had an 1/e2-halfwidth of 1.2&mu;m. </li>
+         <li>pixelsize: 400nm (in the object plane, i.e. using a 60x/NA1 detection objective and an Andor iXon X3 860 camera with 24&mu;m pixels)</li>
+         <li>framerate of 1785.7fps (i.e. a frametaime of 560&mu;s)</li>
+		 <li>The sample were 100nm diameter FluoSpheres YG (green fluorescent microspheres) in water @25&deg;C</li>
 	   </ul><br>
 	   <i>For this tutorial we will assume that you use this dataset and all the images shown are from this dataset</i>.</li>
 	   <li>start a new QuickFit project (e.g. by starting a new instance of QuickFit).</li>
@@ -56,7 +56,7 @@
 	     <li><b>bleach correction:</b> For this measurement we do not need bleach correction, so choose <b>none</b></li>
 	     <li><b>DualView:</b> Also we didn't use a DualView, so select <b>none</b> here.</li>
 	     <li><b>correlation functions:</b> Here we have to select, which correlations the correlator should calculate: Fot his tutorial we only select <b>ACF</b>, which calculates an autocorrelation function for each pixel. The other options will calculate pixel-pixel crosscorrelations: To the neighboring 4 pixels or over a given distance &Delta;x, &Delta;y. Here you can also choose into how many runs/segments the correlator should split the input data. For this tutorial, select 3, which will cut the 20000 input frames into three segment with 6666 frames each. The correlator will calculate one ACF per segment and then average over all three ACFs. So for every pixel we will use this average and the according standard deviation as measured data.</li>
-	     <li><b>correlator:</b> Now you will have to choose the appropriate correlator. For nearly all cases, the <b>Direct Correlation, with Averaging</b> is the right choice. It resembles a standard multi-&tau; correlator with intrinsic triangular smoothing. The parameters P should be set to 16 and the parameter m to 2. Then you can choose the parameter S to get a still meaningful maximum lag time. In this example, settings S=8 will result in a lag time range of 560µs...2.2848s, which well covers the segment length of 3.73s. Lag times longer than the segment length will be cut automatically and a rule of thumb says that if your desired maximum lang time is $$math:\tau_{max}$$, your measurement should be at least $$math:10\cdot\tau_{max}$$ long.</li>
+	     <li><b>correlator:</b> Now you will have to choose the appropriate correlator. For nearly all cases, the <b>Direct Correlation, with Averaging</b> is the right choice. It resembles a standard multi-&tau; correlator with intrinsic triangular smoothing. The parameters P should be set to 16 and the parameter m to 2. Then you can choose the parameter S to get a still meaningful maximum lag time. In this example, settings S=8 will result in a lag time range of 560&mu;s...2.2848s, which well covers the segment length of 3.73s. Lag times longer than the segment length will be cut automatically and a rule of thumb says that if your desired maximum lang time is $$math:\tau_{max}$$, your measurement should be at least $$math:10\cdot\tau_{max}$$ long.</li>
 	     <li><b>statistics/background statistics:</b> Enter 10 frames in both cases for this tutorial, so the plugin will average over 50 frames to create some additional overview statistics (average frame intensity, ...)</li>
 	     <li><b>video:</b> activate this function and enter 20 frames. This wilöl cause the plugin to create a video in which every frame is an average over 20 input frames.</li>
 	     <li><b>finally make sure that "add to project" is checked</b>, if not you will have to load the correlation result into QuickFit manually later.</li>
@@ -117,7 +117,7 @@
 	   <li>Now we have to select the <b>weight model</b> <i>per run errors</i>, which takes the errors from the standard deviation calculated from the segements we cut the image series into in step 1.5.10. The other options are: <i>equal weights</i> uses no weighting for the fit and <i>standard deviation</i> uses the standard deviation calculated from all pixels as weight (so the weights are the same for all pixels!).</li>
 	   <li>The next step is to find good <b>estimates for the parameters of the fit model</b>. This can be done in the fit parameters list on the rhs of the correlation function plot. The model we choose has six free parameters (particle number N, diffusion coefficient D<sub>1</sub>, the offset G<sub>&infin;</sub>, the lateral and logitudinal PSF half-widths (1/&radic;e width) &sigma;<sub>x,y</sub>, &sigma;<sub>z</sub> and the pixel size a). Each parameter can be fixed with the check box in its row. For the purpose of this tutorial we fix all parameters except N and D<sub>1</sub>. The values of the other parameters has to be estimated by a <a href="tutorial_calibration.html">calibration</a>. Here we use these paramaters:
 	   <ul>
-		   <li>a=400nm is obtained from <i>pixel_size/magnification = 24µm/60 = 400nm</i>. Note that this value is read from the PIXEL_WIDTH or PIXEL_HEIGHT properties of the selected raw data record.</li>
+		   <li>a=400nm is obtained from <i>pixel_size/magnification = 24&mu;m/60 = 400nm</i>. Note that this value is read from the PIXEL_WIDTH or PIXEL_HEIGHT properties of the selected raw data record.</li>
 		   <li>The values <i>&sigma;<sub>x,y</sub>=340nm, &sigma;<sub>z</sub>=600nm</i> were obtained from a calibration for this microscope.</li>
 	   </ul>
 	   The initial parameters for N and D<sub>1</sub> can einther be entered by hand, or be estimated by a fit to the current (average) run. We choose the second option, so we:

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <title>SPIM Control: Scripted Acquisition: Instrument Control Function Reference</title>
   </head>
   <body> 
@@ -9,13 +9,13 @@
 	<h2>Illumination Control</h2>
 	<ul>
 		<li><a name="instrument.setLaserIntensity"/><!-- func:instrument.setLaserIntensity -->
-		<b><tt><!-- template -->instrument.setLaserIntensity(<!--°-->laser<!--°-->, line, intensity)<!-- /template --></tt> - <i>sets the laser intensity </i>:</b><br>
+		<b><tt><!-- template -->instrument.setLaserIntensity(<!--&deg;-->laser<!--&deg;-->, line, intensity)<!-- /template --></tt> - <i>sets the laser intensity </i>:</b><br>
 		This function sets the intensity of the specified laser (either 1 or 2). Each laser may have several lines (the first one is 0) and you may set the power in device units (usually milliwats) as a floating point value.
 		<!-- /func:instrument.setLaserIntensity -->
 		</li>
 
 		<li><a name="instrument.setBrightfieldIntensity"/><!-- func:instrument.setBrightfieldIntensity -->
-		<b><tt><!-- template -->instrument.setBrightfieldIntensity(<!--°-->lightsource<!--°-->, line, intensity)<!-- /template --></tt> - <i>sets the transmission illumination intensity </i>:</b><br>
+		<b><tt><!-- template -->instrument.setBrightfieldIntensity(<!--&deg;-->lightsource<!--&deg;-->, line, intensity)<!-- /template --></tt> - <i>sets the transmission illumination intensity </i>:</b><br>
 		This function sets the intensity of the transmission illumination. The illumination device may have several lines (the first one is 0) and you may set the power in device units as a floating point value.<br>
 		Currently this function does NOT block, so use sleepMS() to wait a sufficient time until the new intensity is settled.
 		<!-- /func:instrument.setBrightfieldIntensity -->
@@ -24,7 +24,7 @@
 	<h2>Shutter Control</h2>
 	<ul>
 		<li><a name="instrument.setShutter"/><!-- func:instrument.setShutter -->
-		<b><tt><!-- template -->instrument.setShutter("<!--°-->shutter<!--°-->", state)<!-- /template --></tt> - <i>sets the state (boolean) of the specified shutter </i>:</b><br>
+		<b><tt><!-- template -->instrument.setShutter("<!--&deg;-->shutter<!--&deg;-->", state)<!-- /template --></tt> - <i>sets the state (boolean) of the specified shutter </i>:</b><br>
 		These shutters are defined:
 		  <ul>
                     <li>"main": the main shutter</li>
@@ -41,7 +41,7 @@
 	<h2>Filter Changer Control</h2>
 	<ul>
 		<li><a name="instrument.setFilterWheel"/><!-- func:instrument.setFilterWheel -->
-		<b><tt><!-- template -->instrument.setFilterWheel("<!--°-->wheel<!--°-->", filter)<!-- /template --></tt> - <i>sets the filter (integer) of the specified wheel </i>:</b><br>
+		<b><tt><!-- template -->instrument.setFilterWheel("<!--&deg;-->wheel<!--&deg;-->", filter)<!-- /template --></tt> - <i>sets the filter (integer) of the specified wheel </i>:</b><br>
 		These wheels are defined:
 		  <ul>
                     <li>"detection": the detection arm filter wheel</li>
@@ -55,7 +55,7 @@
 	<h2>Stage Control</h2>
 	<ul>
 		<li><a name="instrument.moveStageRel"/><!-- func:instrument.moveStageRel -->
-		<b><tt><!-- template -->instrument.moveStageRel("<!--°-->stage<!--°-->", delta)<!-- /template --></tt> - <i>move the specified stage by a given distance <tt>delta</tt> </i>:</b><br>
+		<b><tt><!-- template -->instrument.moveStageRel("<!--&deg;-->stage<!--&deg;-->", delta)<!-- /template --></tt> - <i>move the specified stage by a given distance <tt>delta</tt> </i>:</b><br>
 		These stages are defined:
 		  <ul>
                     <li>"x": sample translation stage: x-direction</li>
@@ -66,7 +66,7 @@
 		<!-- /func:instrument.moveStageRel -->
 		</li>
                 <li><a name="instrument.moveStageAbs"/><!-- func:instrument.moveStageAbs -->
-                <b><tt><!-- template -->instrument.moveStageAbs("<!--°-->stage<!--°-->", new_position)<!-- /template --></tt> - <i>move the specified stage to the given position </i>:</b><br>
+                <b><tt><!-- template -->instrument.moveStageAbs("<!--&deg;-->stage<!--&deg;-->", new_position)<!-- /template --></tt> - <i>move the specified stage to the given position </i>:</b><br>
                 These stages are defined:
                   <ul>
                     <li>"x": sample translation stage: x-direction</li>
@@ -77,7 +77,7 @@
                 <!-- /func:instrument.moveStageAbs -->
                 </li>
                 <li><a name="instrument.getStagePos"/><!-- func:instrument.getStagePos -->
-                <b><tt><!-- template -->instrument.getStagePos("<!--°-->stage<!--°-->")<!-- /template --></tt> - <i>returns the current position of the given stage </i>:</b><br>
+                <b><tt><!-- template -->instrument.getStagePos("<!--&deg;-->stage<!--&deg;-->")<!-- /template --></tt> - <i>returns the current position of the given stage </i>:</b><br>
                 These stages are defined:
                   <ul>
                     <li>"x": sample translation stage: x-direction</li>
@@ -100,18 +100,18 @@
                 </li>
 
                 <li><a name="acquisition.acquirePreviewFrames"/><!-- func:acquisition.acquirePreviewFrames -->
-                <b><tt><!-- template -->acquisition.acquirePreviewFrames(<!--°-->camera<!--°-->, N, "filename")<!-- /template --></tt> - <i>acquire <i>N</i> frames on the given camera (0 or 1) and store them as TIFF files under the given <i>filename</i>. </i>:</b><br>
+                <b><tt><!-- template -->acquisition.acquirePreviewFrames(<!--&deg;-->camera<!--&deg;-->, N, "filename")<!-- /template --></tt> - <i>acquire <i>N</i> frames on the given camera (0 or 1) and store them as TIFF files under the given <i>filename</i>. </i>:</b><br>
                 <!-- /func:acquisition.acquirePreviewFrames -->
                 </li>
 
                 <li><a name="acquisition.setAcquisitionCamera1Setting"/><!-- func:acquisition.setAcquisitionCamera1Setting -->
-                <b><tt><!-- template -->acquisition.setAcquisitionCamera1Setting("<!--°-->which<!--°-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 1 to the given value.
+                <b><tt><!-- template -->acquisition.setAcquisitionCamera1Setting("<!--&deg;-->which<!--&deg;-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 1 to the given value.
                 </i>:</b><br> Possible values for which are:$$include:acqwhich.inc$$
                 This function will not have an immediate effect. It rather tells QuickFit to use the given value instead of the predefined value (as given in the selected camera settings) at the next acquisition. A small set of predefined parameters is possible for which (exposuretime, frames, gain, frametime, emgain, hbinning, vbinning, tbinning)!
                 <!-- /func:acquisition.setAcquisitionCamera1Setting -->
                 </li>
                 <li><a name="acquisition.setAcquisitionCamera2Setting"/><!-- func:acquisition.setAcquisitionCamera2Setting -->
-                <b><tt><!-- template -->acquisition.setAcquisitionCamera2Setting("<!--°-->which<!--°-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 2 to the given value</i>:</b> <br>
+                <b><tt><!-- template -->acquisition.setAcquisitionCamera2Setting("<!--&deg;-->which<!--&deg;-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 2 to the given value</i>:</b> <br>
                 Possible values for which are:$$include:acqwhich.inc$$
                 This function will not have an immediate effect. It rather tells QuickFit to use the given value instead of the predefined value (as given in the selected camera settings) at the next acquisition. A small set of predefined parameters is possible for which (exposuretime, frames, gain, frametime, emgain, hbinning, vbinning, tbinning)!
                 <!-- /func:acquisition.setAcquisitionCamera2Setting -->
@@ -130,60 +130,60 @@
 
 
                 <li><a name="acquisition.setAcquisitionCamera1SettingN"/><!-- func:acquisition.setAcquisitionCamera1SettingN -->
-                <b><tt><!-- template -->acquisition.setAcquisitionCamera1SettingN("<!--°-->which<!--°-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 1 to the given value.
+                <b><tt><!-- template -->acquisition.setAcquisitionCamera1SettingN("<!--&deg;-->which<!--&deg;-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 1 to the given value.
                 </i>:</b><br> Possible values for which are:$$include:acqwhich.inc$$
                 This function will not have an immediate effect. It rather tells QuickFit to use the given value instead of the predefined value (as given in the selected camera settings) at the next acquisition. The parameter which needs to be known to the camera driver in the exact form as given!
                 <!-- /func:acquisition.setAcquisitionCamera1SettingN -->
                 </li>
                 <li><a name="acquisition.setAcquisitionCamera2SettingN"/><!-- func:acquisition.setAcquisitionCamera2SettingN -->
-                <b><tt><!-- template -->acquisition.setAcquisitionCamera2SettingN("<!--°-->which<!--°-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 2 to the given value</i>:</b> <br>
+                <b><tt><!-- template -->acquisition.setAcquisitionCamera2SettingN("<!--&deg;-->which<!--&deg;-->", value)<!-- /template --></tt> - <i>sets the given setting of camera 2 to the given value</i>:</b> <br>
                 Possible values for which are:$$include:acqwhich.inc$$
                 This function will not have an immediate effect. It rather tells QuickFit to use the given value instead of the predefined value (as given in the selected camera settings) at the next acquisition. The parameter which needs to be known to the camera driver in the exact form as given!
                 <!-- /func:acquisition.setAcquisitionCamera2SettingN -->
                 </li>
 
                <li><a name="acquisition.setPreviewConfigIndex"/><!-- func:acquisition.setPreviewConfigIndex -->
-                <b><tt><!-- template -->acquisition.setPreviewConfigIndex(<!--°-->camera<!--°-->, id)<!-- /template --></tt> - <i>activate id-th preview config setting</i>:</b> <br>
+                <b><tt><!-- template -->acquisition.setPreviewConfigIndex(<!--&deg;-->camera<!--&deg;-->, id)<!-- /template --></tt> - <i>activate id-th preview config setting</i>:</b> <br>
                 <!-- /func:acquisition.setPreviewConfigIndex -->
                 </li>
 
                <li><a name="acquisition.setPreviewConfig"/><!-- func:acquisition.setPreviewConfig -->
-                <b><tt><!-- template -->acquisition.setPreviewConfig(<!--°-->camera<!--°-->, "id")<!-- /template --></tt> - <i>activate preview config setting id</i>:</b> <br>
+                <b><tt><!-- template -->acquisition.setPreviewConfig(<!--&deg;-->camera<!--&deg;-->, "id")<!-- /template --></tt> - <i>activate preview config setting id</i>:</b> <br>
                 <!-- /func:acquisition.setPreviewConfig -->
                 </li>
 
                <li><a name="acquisition.setAcquisitionConfigIndex"/><!-- func:acquisition.setAcquisitionConfigIndex -->
-                <b><tt><!-- template -->acquisition.setAcquisitionConfigIndex(<!--°-->camera<!--°-->, id)<!-- /template --></tt> - <i>activate id-th camera config setting in the acquisition tab</i>:</b> <br>
+                <b><tt><!-- template -->acquisition.setAcquisitionConfigIndex(<!--&deg;-->camera<!--&deg;-->, id)<!-- /template --></tt> - <i>activate id-th camera config setting in the acquisition tab</i>:</b> <br>
                 <!-- /func:acquisition.setAcquisitionConfigIndex -->
                 </li>
 
                <li><a name="acquisition.setAcquisitionConfig"/><!-- func:acquisition.setAcquisitionConfig -->
-                <b><tt><!-- template -->acquisition.setAcquisitionConfig(<!--°-->camera<!--°-->, "id")<!-- /template --></tt> - <i>activate camera config setting id in the acquisition tab</i>:</b> <br>
+                <b><tt><!-- template -->acquisition.setAcquisitionConfig(<!--&deg;-->camera<!--&deg;-->, "id")<!-- /template --></tt> - <i>activate camera config setting id in the acquisition tab</i>:</b> <br>
                 <!-- /func:acquisition.setAcquisitionConfig -->
                 </li>
 
                <li><a name="acquisition.setAcquisitionOverviewConfigIndex"/><!-- func:acquisition.setAcquisitionOverviewConfigIndex -->
-                <b><tt><!-- template -->acquisition.setAcquisitionOverviewConfigIndex(<!--°-->camera<!--°-->, overview, id)<!-- /template --></tt> - <i>activate id-th overview config setting in the acquisition tab</i>:</b> <br>
+                <b><tt><!-- template -->acquisition.setAcquisitionOverviewConfigIndex(<!--&deg;-->camera<!--&deg;-->, overview, id)<!-- /template --></tt> - <i>activate id-th overview config setting in the acquisition tab</i>:</b> <br>
                 <!-- /func:acquisition.setAcquisitionOverviewConfigIndex -->
                 </li>
 
                <li><a name="acquisition.setAcquisitionOverviewConfig"/><!-- func:acquisition.setAcquisitionOverviewConfig -->
-                <b><tt><!-- template -->acquisition.setAcquisitionOverviewConfig(<!--°-->camera<!--°-->, overview, "id")<!-- /template --></tt> - <i>activate overview config setting id in the acquisition tab</i>:</b> <br>
+                <b><tt><!-- template -->acquisition.setAcquisitionOverviewConfig(<!--&deg;-->camera<!--&deg;-->, overview, "id")<!-- /template --></tt> - <i>activate overview config setting id in the acquisition tab</i>:</b> <br>
                 <!-- /func:acquisition.setAcquisitionOverviewConfig -->
                 </li>
 
                <li><a name="acquisition.getPreviewConfigs"/><!-- func:acquisition.getPreviewConfigs -->
-                <b><tt><!-- template -->acquisition.getPreviewConfigs(<!--°-->camera<!--°-->)<!-- /template --></tt> - <i>returns list of available preview config settings</i>:</b> <br>
+                <b><tt><!-- template -->acquisition.getPreviewConfigs(<!--&deg;-->camera<!--&deg;-->)<!-- /template --></tt> - <i>returns list of available preview config settings</i>:</b> <br>
                 <!-- /func:acquisition.getPreviewConfigs -->
                 </li>
 
                <li><a name="acquisition.getPreviewConfigsCount"/><!-- func:acquisition.getPreviewConfigsCount -->
-                <b><tt><!-- template -->acquisition.getPreviewConfigsCount(<!--°-->camera<!--°-->)<!-- /template --></tt> - <i>returns number of available preview config settings</i>:</b> <br>
+                <b><tt><!-- template -->acquisition.getPreviewConfigsCount(<!--&deg;-->camera<!--&deg;-->)<!-- /template --></tt> - <i>returns number of available preview config settings</i>:</b> <br>
                 <!-- /func:acquisition.getPreviewConfigsCount -->
                 </li>
 
                <li><a name="acquisition.getPreviewConfig"/><!-- func:acquisition.getPreviewConfig -->
-                <b><tt><!-- template -->acquisition.getPreviewConfig(<!--°-->camera<!--°-->, id)<!-- /template --></tt> - <i>return id-th preview config setting name</i>:</b> <br>
+                <b><tt><!-- template -->acquisition.getPreviewConfig(<!--&deg;-->camera<!--&deg;-->, id)<!-- /template --></tt> - <i>return id-th preview config setting name</i>:</b> <br>
                 <!-- /func:acquisition.getPreviewConfig -->
                 </li>
 
@@ -193,40 +193,40 @@
         <h2>Measurement Devices</h2>
         <ul>
                 <li><a name="instrument.MDConnect"/><!-- func:instrument.MDConnect -->
-                <b><tt><!-- template -->instrument.MDConnect("<!--°-->device_plugin_name<!--°-->", device)<!-- /template --></tt> - <i>connect to the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <b><tt><!-- template -->instrument.MDConnect("<!--&deg;-->device_plugin_name<!--&deg;-->", device)<!-- /template --></tt> - <i>connect to the device-th measurement device managed by the plugin with given ID</i>:</b><br>
                 <!-- /func:instrument.MDConnect -->
                 </li>
                 <li><a name="instrument.MDDisconnect"/><!-- func:instrument.MDDisconnect -->
-                <b><tt><!-- template -->instrument.MDDisconnect("<!--°-->device_plugin_name<!--°-->", device)<!-- /template --></tt> - <i>disconnect from the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <b><tt><!-- template -->instrument.MDDisconnect("<!--&deg;-->device_plugin_name<!--&deg;-->", device)<!-- /template --></tt> - <i>disconnect from the device-th measurement device managed by the plugin with given ID</i>:</b><br>
                 <!-- /func:instrument.MDDisconnect -->
                 </li>
                 <li><a name="instrument.mMDGetParamCount"/><!-- func:instrument.mMDGetParamCount -->
-                <b><tt><!-- template -->instrument.mMDGetParamCount("<!--°-->device_plugin_name<!--°-->", device)<!-- /template --></tt> - <i>returns the number of accessible parameters in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <b><tt><!-- template -->instrument.mMDGetParamCount("<!--&deg;-->device_plugin_name<!--&deg;-->", device)<!-- /template --></tt> - <i>returns the number of accessible parameters in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
                 <!-- /func:instrument.mMDGetParamCount -->
                 </li>
                 
                 <li><a name="instrument.mMDGetParamName"/><!-- func:instrument.mMDGetParamName -->
-                <b><tt><!-- template -->instrument.mMDGetParamName("<!--°-->device_plugin_name<!--°-->", device, parameter)<!-- /template --></tt> - <i>returns the short name of the parameter-th parameter in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <b><tt><!-- template -->instrument.mMDGetParamName("<!--&deg;-->device_plugin_name<!--&deg;-->", device, parameter)<!-- /template --></tt> - <i>returns the short name of the parameter-th parameter in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
                 <!-- /func:instrument.mMDGetParamName -->
                 </li>
                 
                 <li><a name="instrument.MDGet"/><!-- func:instrument.MDGet -->
-                <b><tt><!-- template -->instrument.MDGet("<!--°-->device_plugin_name<!--°-->", device, parameter)<!-- /template --></tt> - <i>returns the current value of the parameter-th parameter in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <b><tt><!-- template -->instrument.MDGet("<!--&deg;-->device_plugin_name<!--&deg;-->", device, parameter)<!-- /template --></tt> - <i>returns the current value of the parameter-th parameter in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
                 <!-- /func:instrument.MDGet -->
                 </li>
 
                 <li><a name="instrument.MDSet"/><!-- func:instrument.MDSet -->
-                <b><tt><!-- template -->instrument.MDSet("<!--°-->device_plugin_name<!--°-->", device, parameter, value)<!-- /template --></tt> - <i>sets (if possible) the current value of the parameter-th parameter in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <b><tt><!-- template -->instrument.MDSet("<!--&deg;-->device_plugin_name<!--&deg;-->", device, parameter, value)<!-- /template --></tt> - <i>sets (if possible) the current value of the parameter-th parameter in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
                 <!-- /func:instrument.MDSet -->
                 </li>
                                 
                 <li><a name="instrument.MDGetN"/><!-- func:instrument.MDGetN -->
-                <b><tt><!-- template -->instrument.MDGetN("<!--°-->device_plugin_name<!--°-->", device, parameter_name)<!-- /template --></tt> - <i>returns the current value of the parameter named parameter_name in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <b><tt><!-- template -->instrument.MDGetN("<!--&deg;-->device_plugin_name<!--&deg;-->", device, parameter_name)<!-- /template --></tt> - <i>returns the current value of the parameter named parameter_name in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
                 <!-- /func:instrument.MDGetN -->
                 </li>
 
                 <li><a name="instrument.MDSetN"/><!-- func:instrument.MDSetN -->
-                <b><tt><!-- template -->instrument.MDSetN("<!--°-->device_plugin_name<!--°-->", device, parameter_name, value)<!-- /template --></tt> - <i>sets (if possible) the current value of the parameter named parameter_name in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
+                <b><tt><!-- template -->instrument.MDSetN("<!--&deg;-->device_plugin_name<!--&deg;-->", device, parameter_name, value)<!-- /template --></tt> - <i>sets (if possible) the current value of the parameter named parameter_name in the device-th measurement device managed by the plugin with given ID</i>:</b><br>
                 <!-- /func:instrument.MDSetN -->
                 </li>
 
@@ -236,7 +236,7 @@
         <ul>
                                 
                 <li><a name="instrument.setAcqDescCurrentSample"/><!-- func:instrument.setAcqDescCurrentSample -->
-                <b><tt><!-- template -->instrument.setAcqDescCurrentSample("<!--°-->string<!--°-->")<!-- /template --></tt> - <i>sets the current sample in the acquisition description</i>:</b><br>
+                <b><tt><!-- template -->instrument.setAcqDescCurrentSample("<!--&deg;-->string<!--&deg;-->")<!-- /template --></tt> - <i>sets the current sample in the acquisition description</i>:</b><br>
                 <!-- /func:instrument.setAcqDescCurrentSample -->
                 </li>
 
@@ -248,7 +248,7 @@
 
 
                 <li><a name="instrument.setAcqDescPrefix"/><!-- func:instrument.setAcqDescPrefix -->
-                <b><tt><!-- template -->instrument.setAcqDescPrefix("<!--°-->string<!--°-->")<!-- /template --></tt> - <i>sets the prefix in the acquisition description</i>:</b><br>
+                <b><tt><!-- template -->instrument.setAcqDescPrefix("<!--&deg;-->string<!--&deg;-->")<!-- /template --></tt> - <i>sets the prefix in the acquisition description</i>:</b><br>
                 <!-- /func:instrument.setAcqDescPrefix -->
                 </li>
 
@@ -260,7 +260,7 @@
 
 
                 <li><a name="instrument.setAcqDescComment"/><!-- func:instrument.setAcqDescComment -->
-                <b><tt><!-- template -->instrument.setAcqDescComment("<!--°-->string<!--°-->")<!-- /template --></tt> - <i>sets the comment in the acquisition description</i>:</b><br>
+                <b><tt><!-- template -->instrument.setAcqDescComment("<!--&deg;-->string<!--&deg;-->")<!-- /template --></tt> - <i>sets the comment in the acquisition description</i>:</b><br>
                 <!-- /func:instrument.setAcqDescComment -->
                 </li>
 
@@ -272,7 +272,7 @@
 
 
                 <li><a name="instrument.setAcqDescPlate"/><!-- func:instrument.setAcqDescPlate -->
-                <b><tt><!-- template -->instrument.setAcqDescPlate("<!--°-->int<!--°-->")<!-- /template --></tt> - <i>sets the plate number in the acquisition description</i>:</b><br>
+                <b><tt><!-- template -->instrument.setAcqDescPlate("<!--&deg;-->int<!--&deg;-->")<!-- /template --></tt> - <i>sets the plate number in the acquisition description</i>:</b><br>
                 <!-- /func:instrument.setAcqDescPlate -->
                 </li>
 
@@ -284,7 +284,7 @@
 
 
                 <li><a name="instrument.setAcqDescWell"/><!-- func:instrument.setAcqDescWell -->
-                <b><tt><!-- template -->instrument.setAcqDescWell("<!--°-->int<!--°-->")<!-- /template --></tt> - <i>sets the well number in the acquisition description</i>:</b><br>
+                <b><tt><!-- template -->instrument.setAcqDescWell("<!--&deg;-->int<!--&deg;-->")<!-- /template --></tt> - <i>sets the well number in the acquisition description</i>:</b><br>
                 <!-- /func:instrument.setAcqDescWell -->
                 </li>
 
@@ -296,7 +296,7 @@
 
 
                 <li><a name="instrument.setAcqDescCell"/><!-- func:instrument.setAcqDescCell -->
-                <b><tt><!-- template -->instrument.setAcqDescCell("<!--°-->int<!--°-->")<!-- /template --></tt> - <i>sets the cell number in the acquisition description</i>:</b><br>
+                <b><tt><!-- template -->instrument.setAcqDescCell("<!--&deg;-->int<!--&deg;-->")<!-- /template --></tt> - <i>sets the cell number in the acquisition description</i>:</b><br>
                 <!-- /func:instrument.setAcqDescCell -->
                 </li>
 

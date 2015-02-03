@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <title>Plugin: SPIM Lightsheet Analysis</title>
   </head>
   <body>
@@ -11,7 +11,7 @@
         <center><a name="spim_lightsheet_eval_pic000"><img src="./pic/spim_lightsheet_eval_pic000.png" border="1">
         </center>
         
-        <p>This plugin performs an analysis for a set of lightsheet x-scans with a 45° mirror. I.e. it expects image stacks where each frame contains an image of the lightsheet. Usually a 45° mirror is inserted into the SPIM microscope to directly reflect the lightsheet onto the camera. Then the mirror is moved by a distance &Delta;z and another image is taken. It is also possible to evaluate an image stack with several color channels. Then the plugin allows to compare the parameters of each of the color channels.</p>
+        <p>This plugin performs an analysis for a set of lightsheet x-scans with a 45&deg; mirror. I.e. it expects image stacks where each frame contains an image of the lightsheet. Usually a 45&deg; mirror is inserted into the SPIM microscope to directly reflect the lightsheet onto the camera. Then the mirror is moved by a distance &Delta;z and another image is taken. It is also possible to evaluate an image stack with several color channels. Then the plugin allows to compare the parameters of each of the color channels.</p>
         <p>The plugin fits a model function (usually a gaussian or a slit function) to each row (or column) of each frame. The fit results are averaged for each frame. The resultant mean and standard deviation is then displayed versus the position of the mirror.</p>
 
 
@@ -37,7 +37,7 @@ $$endbox$$
         <p><ol>
           <li>After loading an image stack and inserting a SPIM Lightsheet Analysis evaluation, open the evaluation and select the lightsheet 
 <center><img src="pic/tutorial_pic007.png"></center></li>
-          <li>Now select a <b>fit model</b> and a <b>fit algorithm</b> to use.<b>As an algoruthm, you can use <a href="$$fitalgorithm:help:fit_lmfit$$">$$fitalgorithm:name:fit_lmfit$$</a> in most cases, which is reasonably fast and has good convergence properties. You can use one of the following fit models: $$list:fitfunc:lightsheet_$$They differ in the assumes shape for the ligh-sheet and in how the width is defined (e.g. as 1/e²-width or FWHM in a Gaussian)</li>
+          <li>Now select a <b>fit model</b> and a <b>fit algorithm</b> to use.<b>As an algoruthm, you can use <a href="$$fitalgorithm:help:fit_lmfit$$">$$fitalgorithm:name:fit_lmfit$$</a> in most cases, which is reasonably fast and has good convergence properties. You can use one of the following fit models: $$list:fitfunc:lightsheet_$$They differ in the assumes shape for the ligh-sheet and in how the width is defined (e.g. as 1/e<sup>2</sup>-width or FWHM in a Gaussian)</li>
           <li>You can also configure how the fit works:
           <ol>
               <li><b>scale fit intensit</b>: scales the image intensity to a value, comparable to the image size ($(I\rightarrow I\cdot\frac{\mbox{width}}{\max(I)})$). This improves the fit result in some cases.</li>

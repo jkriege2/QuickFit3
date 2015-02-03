@@ -735,7 +735,7 @@ void QFRDRNumberAndBrightnessDataEditor::replotData()
         plteOverview->set_height(m->getHeight());
         plteOverview->set_autoImageRange(false);
 
-        double mi,ma;
+        double mi=0,ma=0;
         statisticsMaskedMinMax(plteOverviewData,m->maskGet(), m->getWidth()*m->getHeight(), mi, ma);
         if (!chkAutoOvr->isChecked()) {
             /*edtOvrMin->setValue(m->getQFProperty("QFRDRNumberAndBrightnessDataEditor/edtOvrMin", mi).toDouble());

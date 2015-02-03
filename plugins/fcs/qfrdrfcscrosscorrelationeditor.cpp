@@ -400,13 +400,13 @@ void QFRDRFCSCrossCorrelationEditor::createWidgets() {
     spinCCFAmplitudeRangeMin->setRange(0,1000000);
     spinCCFAmplitudeRangeMin->setValue(5);
     spinCCFAmplitudeRangeMin->setDecimals(1);
-    spinCCFAmplitudeRangeMin->setSuffix(" micron");
+    spinCCFAmplitudeRangeMin->setSuffix(" microseconds");
     ggrcl->addRow(tr("amplitude range, min: "), spinCCFAmplitudeRangeMin);
     spinCCFAmplitudeRangeMax=new QDoubleSpinBox(this);
     spinCCFAmplitudeRangeMax->setRange(0,1000000);
     spinCCFAmplitudeRangeMax->setValue(30);
     spinCCFAmplitudeRangeMax->setDecimals(1);
-    spinCCFAmplitudeRangeMax->setSuffix(" micron");
+    spinCCFAmplitudeRangeMax->setSuffix(" microseconds");
     ggrcl->addRow(tr("amplitude range, max: "), spinCCFAmplitudeRangeMax);
 
     spinCrosstalk=new QDoubleSpinBox(this);

@@ -2207,7 +2207,7 @@ void QFRDRImagingFCSImageEditor::buildSelection(bool select_notmask)
                         } else {
                             readParameterImage(m, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), param, QFRDRImagingFCSImageEditor::itNone);
                         }
-                        double imMin, imMax;
+                        double imMin=0, imMax=0;
                         statisticsMaskedMinMax(image, m->maskGet(), m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), imMin, imMax, false);
                         if (mode==0) { // in range
                             for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
@@ -2243,7 +2243,7 @@ void QFRDRImagingFCSImageEditor::buildSelection(bool select_notmask)
                         } else {
                             readParameterImage(m, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), param, QFRDRImagingFCSImageEditor::itNone);
                         }
-                        double imMin, imMax;
+                        double imMin=0, imMax=0;
                         statisticsMaskedMinMax(image, m->maskGet(), m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), imMin, imMax, false);
                         if (mode==0) { // in range
                             for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
@@ -2279,7 +2279,7 @@ void QFRDRImagingFCSImageEditor::buildSelection(bool select_notmask)
                         } else {
                             readParameterImage(m, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), param, QFRDRImagingFCSImageEditor::itNone);
                         }
-                        double imMin, imMax;
+                        double imMin=0, imMax=0;
                         statisticsMaskedMinMax(image, m->maskGet(), m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), imMin, imMax, false);
                         if (mode==0) { // in range
                             for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
@@ -2316,7 +2316,7 @@ void QFRDRImagingFCSImageEditor::buildSelection(bool select_notmask)
                         } else {
                             readParameterImage(m, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), param, QFRDRImagingFCSImageEditor::itNone);
                         }
-                        double imMin, imMax;
+                        double imMin=0, imMax=0;
                         statisticsMaskedMinMax(image, m->maskGet(), m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), imMin, imMax, false);
                         if (mode==0) { // in range
                             for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {
@@ -2353,7 +2353,7 @@ void QFRDRImagingFCSImageEditor::buildSelection(bool select_notmask)
                         } else {
                             readParameterImage(m, image, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), currentEvalGroup(), param, QFRDRImagingFCSImageEditor::itNone);
                         }
-                        double imMin, imMax;
+                        double imMin=0, imMax=0;
                         statisticsMaskedMinMax(image, m->maskGet(), m->getImageFromRunsWidth()*m->getImageFromRunsHeight(), imMin, imMax, false);
                         if (mode==0) { // in range
                             for (int i=0; i<m->getImageFromRunsWidth()*m->getImageFromRunsHeight(); i++) {

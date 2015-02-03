@@ -316,7 +316,7 @@ void QFRDRPhotonCountsDataEditor::replotDetail() {
     plotterDetail->getYAxis()->set_logAxis(false);
     plotterDetail->getXAxis()->set_axisLabel(tr("time [s]"));
     plotterDetail->getYAxis()->set_axisLabel(tr("photons"));
-    double mmin, mmax;
+    double mmin=0, mmax=0;
     for (int c=0; c<m->getPhotonCountsBinnedChannels(); c++) {
         double mi, ma;
         m->getPhotonCountsMinMax(c, mi, ma, QFRDRPhotonCountsData::Counts);

@@ -1,7 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 <html>
   <head>
-  <meta http-equiv="content-type" content="text/html; charset=windows-1250">
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <title>2-focus imFCCS Plugin: Tutorial (imFCCS to measure flows, SPIM)</title>
   </head>
   <body>
@@ -59,8 +59,8 @@ Then we fit five model functions to these five curves and in these link the comp
 After a click on OK, the correlator dialog will be enabled and some meta-data of the image is already displayed (frames, image size, ...) $$note:Make sure to select the filename-filter <b>TinyTIFF</b>, since only this importer can read the full set of 150000 frames from teh file. the importer libTIFF would only read around 60000 frames!$$</li>
 <li>Add the remaining meta-data, which is NOT YET supplied in the correlator window:
 <ul>
-    <li>camera description/<b>pixel-size</b>: 400*400 nm²</li>
-    <li>frame timing/<b>frame-time</b>: 530µs</li>
+    <li>camera description/<b>pixel-size</b>: 400*400 nm</li>
+    <li>frame timing/<b>frame-time</b>: 530&mu;s</li>
 </ul></li>
 <li>The other settings in this dialog should be:
 <ul>
@@ -169,7 +169,7 @@ The last <b>column global</b>, specifies, which parameters are linked over the d
 $$note:All the presets, that have been set by the Tools-menu entry can also be entered manually in this table. There you can edit the values in the five columns. You can use the <b>add file</b> and <b>remove file</b> buttons to add/delete additional RDRs/files to/from the table.$$
 Also note, that the background intensities are also already preset in the table.
 </li>
-    <li>As a next step you have to set the initial values. The diffusion coefficient is preset to 10µm²/s and the flow speeds to 100µm/s in x-direction, which is in good agreement with the value, we estimated above. In addition, the following parameters have to be set:
+    <li>As a next step you have to set the initial values. The diffusion coefficient is preset to 10&mu;m/s and the flow speeds to 100&mu;m/s in x-direction, which is in good agreement with the value, we estimated above. In addition, the following parameters have to be set:
 <ul>
     <li>lateral PSF radius (determined by a PSF calibration): $(w_{xy}=600\;\mathrm{nm})$</li>
     <li>longitudinal PSF radius (determined by a PSF beadscan): $(w_{z}=1240\;\mathrm{nm})$</li>
@@ -234,14 +234,14 @@ These stripes are caused by the fact, that at the border some correlation functi
 It is also advisable to select the <b>color palette HSV</b> for parameter 2:
 <center><a name="tutorial_flow_pic028"><img src="./pic/tutorial_flow_pic028.png" border="1">
 </center>
-This color palette has the advantage, that it starts and ends with the color red (see image above). This is necessary, as the angle 0° and 360° are the same, so they should be displayed in the same color. The two images look as follows:
+This color palette has the advantage, that it starts and ends with the color red (see image above). This is necessary, as the angle 0&deg; and 360&deg; are the same, so they should be displayed in the same color. The two images look as follows:
 <center><a name="tutorial_flow_pic029"><img src="./pic/tutorial_flow_pic029.png" border="1">
 <a name="tutorial_flow_pic030"><img src="./pic/tutorial_flow_pic030.png" border="1">
 </center>
 You can also look at the distribution of the fit parameters, if you select the sub-tab <b>Histograms</b>:
 <center><a name="tutorial_flow_pic031"><img src="./pic/tutorial_flow_pic031.png" border="1">
 </center>
-As you can see the angle histogram (bottom) is centered around 0°, but separated into two parts. To improve this situation, you can choose the parameter "vflow_angle_centered: centered angle of the flow speed". then the histogram looks as follows:
+As you can see the angle histogram (bottom) is centered around 0&deg;, but separated into two parts. To improve this situation, you can choose the parameter "vflow_angle_centered: centered angle of the flow speed". then the histogram looks as follows:
 <center><a name="tutorial_flow_pic032"><img src="./pic/tutorial_flow_pic032.png" border="1">
 </center>
 </li>
@@ -263,10 +263,10 @@ As you can see the angle histogram (bottom) is centered around 0°, but separate
   </tr>
   <tr>
     <td>$$math:\alpha_{flow}'$$</td>
-    <td>$$math:(4\pm4)°$$</td>
-    <td>$$math:(-5\pm23)°$$</td>
+    <td>$$math:(4\pm4)&deg;$$</td>
+    <td>$$math:(-5\pm23)&deg;$$</td>
   </tr>
-</table></center>The difference in flow velocity is very prominent and the difference in the diffusion coefficient can be explained, as the first measurement was acquired at 37°C and the second one at 24°C. the beads had a diameter of around 100nm, so the expected diffusion coefficient s in water at 24°C and 37°C would be 4.3µm²/s and 6.6µm²/s, which is in good agreement with the measured values.</li>
+</table></center>The difference in flow velocity is very prominent and the difference in the diffusion coefficient can be explained, as the first measurement was acquired at 37&deg;C and the second one at 24&deg;C. the beads had a diameter of around 100nm, so the expected diffusion coefficient s in water at 24&deg;C and 37&deg;C would be 4.3&mu;m/s and 6.6&mu;m/s, which is in good agreement with the measured values.</li>
     <li>One last note: When inspecting the second dataset (no flow), you get parameter images of this form:
 <center><a name="tutorial_flow_pic035"><img src="./pic/tutorial_flow_pic035.png" border="1">
 </center>

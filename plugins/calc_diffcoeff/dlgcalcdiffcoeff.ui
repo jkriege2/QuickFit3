@@ -189,7 +189,10 @@
          <item row="5" column="0">
           <widget class="QLabel" name="label_9">
            <property name="text">
-            <string>temperature [°C]:</string>
+            <string>temperature [&amp;deg;C]:</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
            </property>
           </widget>
          </item>

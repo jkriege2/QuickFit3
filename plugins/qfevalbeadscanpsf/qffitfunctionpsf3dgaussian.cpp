@@ -23,12 +23,13 @@ QFFitFunctionPSF3DGaussian::QFFitFunctionPSF3DGaussian()
     addParameter(FloatNumber,  "width3",                  "width3",                                                "width3",                          "pix",         "pix",                   true,      true,         true,              QFFitFunctionBase::DisplayError,       false, 5,            0,    1e10,  1  );
     #define PARAM_WIDTH3 7
 
-    addParameter(FloatNumber,  "theta",                   "theta",                                                 "&theta;",                         "°",            "°",                   true,      true,         true,              QFFitFunctionBase::DisplayError,       false, 0,            -45,    45,  1  );
+    addParameter(FloatNumber,  "theta",                   "theta",                                                 "&theta;",                         "\xB0",            "&deg;",                   true,      true,         true,              QFFitFunctionBase::DisplayError,       false, 0,            -45,    45,  1  );
     #define PARAM_THETA 8
-    addParameter(FloatNumber,  "phi",                     "phi",                                                   "&phi;",                           "°",            "°",                   true,      true,         true,              QFFitFunctionBase::DisplayError,       false, 0,            -45,    45,  1  );
+    addParameter(FloatNumber,  "phi",                     "phi",                                                   "&phi;",                           "\xB0",            "&deg;",                   true,      true,         true,              QFFitFunctionBase::DisplayError,       false, 0,            -45,    45,  1  );
     #define PARAM_PHI 9
-    addParameter(FloatNumber,  "alpha",                   "alpha",                                                 "&alpha;",                         "°",            "°",                   true,      true,         true,              QFFitFunctionBase::DisplayError,       false, 0,            0,    45,  1  );
+    addParameter(FloatNumber,  "alpha",                   "alpha",                                                 "&alpha;",                         "\xB0",            "&deg;",                   true,      true,         true,              QFFitFunctionBase::DisplayError,       false, 0,            0,    45,  1  );
     #define PARAM_ALPHA 10
+
 
 }
 

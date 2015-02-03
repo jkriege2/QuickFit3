@@ -168,7 +168,7 @@ qfmpResult fIRLS(const qfmpResult* params, unsigned int  n, QFMathParser* p){
         return p->getInvalidResult();
     }
 
-    double a, b;
+    double a=0, b=0;
     bool fixA=false;
     bool fixB=false;
     double Lp=1.1;

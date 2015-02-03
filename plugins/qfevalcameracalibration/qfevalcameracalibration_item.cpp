@@ -192,7 +192,7 @@ void QFEvalCameraCalibrationItem::doEvaluation(QProgressDialog* dlgEvaluationPro
                             const double* timg=rdrs[r]->getImageStack(stack, ti, channel);
                             d<<(timg[i]-backC);
                         }
-                        double s;
+                        double s=0;
                         avgv<<qfstatisticsAverageVariance(s, d);
                         varv<<s;
                     }
@@ -241,7 +241,7 @@ void QFEvalCameraCalibrationItem::doEvaluation(QProgressDialog* dlgEvaluationPro
                             const double* timg=rdrs[r]->getImageStack(stack, ti, channel);
                             d<<(timg[i]-backC);
                         }
-                        double s;
+                        double s=0;
                         res_meanI<<qfstatisticsAverageVariance(s, d);
                         res_varI<<s;
                     }

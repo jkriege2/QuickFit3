@@ -382,7 +382,7 @@ void QCairoPaintEngine::updatePen()
         cairo_set_line_width (cr, penwidth);
 
 
-        cairo_line_cap_t cap;
+        cairo_line_cap_t cap = CAIRO_LINE_CAP_ROUND;
         switch (cpen.capStyle())
         {
           case Qt::FlatCap:
@@ -402,7 +402,7 @@ void QCairoPaintEngine::updatePen()
         }
         cairo_set_line_cap(cr, cap);
 
-        cairo_line_join_t join;
+        cairo_line_join_t join = CAIRO_LINE_JOIN_ROUND;
         switch (cpen.joinStyle())
         {
           case Qt::MiterJoin:

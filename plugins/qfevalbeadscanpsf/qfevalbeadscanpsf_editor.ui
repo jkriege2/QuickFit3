@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>2</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tab">
       <attribute name="title">
@@ -368,88 +368,53 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="4" column="0" colspan="2">
-      <widget class="QPushButton" name="btnResetCurrent">
-       <property name="text">
-        <string>Reset &amp;Current</string>
-       </property>
-      </widget>
-     </item>
-     <item row="5" column="0" colspan="2">
-      <widget class="Line" name="line_2">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0" colspan="2">
-      <spacer name="verticalSpacer">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="6" column="0">
-      <widget class="QToolButton" name="btnPrintReport">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>&amp;Print Report</string>
-       </property>
-       <property name="icon">
-        <iconset resource="qfevalbeadscanpsf.qrc">
-         <normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_printreport.png</normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_printreport.png</iconset>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextBesideIcon</enum>
-       </property>
-      </widget>
-     </item>
      <item row="3" column="0" colspan="2">
-      <widget class="QPushButton" name="btnEvaluateCurrent">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>32</height>
-        </size>
+      <widget class="QGroupBox" name="grpFilterBeads">
+       <property name="title">
+        <string> filter beads for display </string>
        </property>
-       <property name="text">
-        <string>Evaluate &amp;Current</string>
+       <property name="checkable">
+        <bool>true</bool>
        </property>
-       <property name="icon">
-        <iconset resource="qfevalbeadscanpsf.qrc">
-         <normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_evaluate.png</normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_evaluate.png</iconset>
+       <property name="checked">
+        <bool>false</bool>
        </property>
-      </widget>
-     </item>
-     <item row="6" column="1">
-      <widget class="QToolButton" name="btnSaveReport">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="text">
-        <string>Save &amp;Report</string>
-       </property>
-       <property name="icon">
-        <iconset resource="qfevalbeadscanpsf.qrc">
-         <normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_save.png</normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_save.png</iconset>
-       </property>
-       <property name="toolButtonStyle">
-        <enum>Qt::ToolButtonTextBesideIcon</enum>
-       </property>
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>axial ratio min:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QDoubleSpinBox" name="spinAxRatioMin">
+          <property name="minimum">
+           <double>0.500000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>10000.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_17">
+          <property name="text">
+           <string>axial ratio max:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QDoubleSpinBox" name="spinAxRatioMax">
+          <property name="maximum">
+           <double>1000.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>5.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
      <item row="0" column="0" colspan="2">
@@ -622,21 +587,118 @@
        </item>
       </layout>
      </item>
+     <item row="4" column="0" colspan="2">
+      <spacer name="verticalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="6" column="0" colspan="2">
+      <widget class="QPushButton" name="btnResetCurrent">
+       <property name="text">
+        <string>Reset &amp;Current</string>
+       </property>
+      </widget>
+     </item>
+     <item row="7" column="0" colspan="2">
+      <widget class="Line" name="line_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0" colspan="2">
+      <spacer name="verticalSpacer">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="8" column="0">
+      <widget class="QToolButton" name="btnPrintReport">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>&amp;Print Report</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfevalbeadscanpsf.qrc">
+         <normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_printreport.png</normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_printreport.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0" colspan="2">
+      <widget class="QPushButton" name="btnEvaluateCurrent">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Evaluate &amp;Current</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfevalbeadscanpsf.qrc">
+         <normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_evaluate.png</normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_evaluate.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="8" column="1">
+      <widget class="QToolButton" name="btnSaveReport">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>Save &amp;Report</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfevalbeadscanpsf.qrc">
+         <normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_save.png</normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_save.png</iconset>
+       </property>
+       <property name="toolButtonStyle">
+        <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
   </layout>
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFHistogramView</class>
-   <extends>QWidget</extends>
-   <header>qfhistogramview.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QFPlotter</class>
    <extends>QWidget</extends>
    <header>qfplotter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFHistogramView</class>
+   <extends>QWidget</extends>
+   <header>qfhistogramview.h</header>
    <container>1</container>
   </customwidget>
   <customwidget>
@@ -759,6 +821,102 @@
     <hint type="destinationlabel">
      <x>42</x>
      <y>2</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>grpFilterBeads</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFEvalBeadScanPSFEditor</receiver>
+   <slot>displayEvaluationHistograms()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>761</x>
+     <y>331</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>692</x>
+     <y>3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>grpFilterBeads</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFEvalBeadScanPSFEditor</receiver>
+   <slot>displayEvaluationCorrPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>743</x>
+     <y>330</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>511</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinAxRatioMin</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFEvalBeadScanPSFEditor</receiver>
+   <slot>displayEvaluationCorrPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>860</x>
+     <y>356</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>754</x>
+     <y>-3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinAxRatioMin</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFEvalBeadScanPSFEditor</receiver>
+   <slot>displayEvaluationHistograms()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>903</x>
+     <y>357</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>889</x>
+     <y>1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinAxRatioMax</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFEvalBeadScanPSFEditor</receiver>
+   <slot>displayEvaluationCorrPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>948</x>
+     <y>378</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>933</x>
+     <y>7</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>spinAxRatioMax</sender>
+   <signal>editingFinished()</signal>
+   <receiver>QFEvalBeadScanPSFEditor</receiver>
+   <slot>displayEvaluationHistograms()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>929</x>
+     <y>384</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>964</x>
+     <y>6</y>
     </hint>
    </hints>
   </connection>

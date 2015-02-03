@@ -133,7 +133,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
     qDebug()<<"min_distance="<<min_distance;*/
     bool useMask=true;
     bool* mask=NULL;
-    if (maskI && maskI->maskGetHeight()==height && maskI->maskGetWidth()==width) {
+    if (maskI && (int64_t)maskI->maskGetHeight()==height && (int64_t)maskI->maskGetWidth()==width) {
         mask=maskI->maskGet();
     }
     int updateCounter=0;
@@ -286,6 +286,19 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
 
                 // CUT ROI AROUND PIXEL
                 cimg_library::CImg<double> roi=image.get_crop(initial_beads_x[b]-ROIxy/2, initial_beads_y[b]-ROIxy/2, initial_beads_z[b]-ROIz/2, initial_beads_x[b]+ROIxy/2, initial_beads_y[b]+ROIxy/2, initial_beads_z[b]+ROIz/2);
+                QVector<bool> msk(roi.width()*roi.height(), false);
+                if (mask) {
+                    int iy=0;
+                    for (int y=initial_beads_y[b]-ROIxy/2; y<=initial_beads_y[b]+ROIxy/2; y++) {
+                        int ix=0;
+                        for (int x=initial_beads_x[b]-ROIxy/2; x<=initial_beads_x[b]+ROIxy/2; x++) {
+                            msk[iy*roi.width()+ix]=mask[y*image.width()+x];
+                            ix++;
+                        }
+                        iy++;
+                    }
+                }
+
                 //roi.save_tiff(QString("c:\\temp\\roi_c%1_b%2.tif").arg(c).arg(b).toLatin1().data());
                 // COORDINATES OF TOP-LEFT CORNER OF ROI
                 const double x0tl=double(initial_beads_x[b]-ROIxy/2)*deltaXY;
@@ -339,22 +352,24 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
 
                 // fit X-cut
                 QVector<double> cutXP=ff1D->getInitialParamValues();
+                int cutXi=-1;
                 for (int i=0; i<cutXP.size(); i++) {
                     if (ff1D->getParameterID(i)=="offset") cutXP[i]=init_background;
                     else if (ff1D->getParameterID(i)=="amplitude") cutXP[i]=init_amplitude;
                     else if (ff1D->getParameterID(i)=="position") cutXP[i]=x0;
-                    else if (ff1D->getParameterID(i)=="width") cutXP[i]=init_w12;
+                    else if (ff1D->getParameterID(i)=="width") { cutXi=i; cutXP[i]=init_w12; }
                 }
                 alg->fit(cutXP.data(), NULL, cutXX.data(), cutX.data(), NULL, cutX.size(), ff1D, cutXP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
 
 
                 // fit Y-cut
                 QVector<double> cutYP=ff1D->getInitialParamValues();
+                int cutYi=-1;
                 for (int i=0; i<cutYP.size(); i++) {
                     if (ff1D->getParameterID(i)=="offset") cutYP[i]=init_background;
                     else if (ff1D->getParameterID(i)=="amplitude") cutYP[i]=init_amplitude;
                     else if (ff1D->getParameterID(i)=="position") cutYP[i]=y0;
-                    else if (ff1D->getParameterID(i)=="width") cutYP[i]=init_w12;
+                    else if (ff1D->getParameterID(i)=="width")  {cutYi=i; cutYP[i]=init_w12; }
                 }
                 alg->fit(cutYP.data(), NULL, cutYX.data(), cutY.data(), NULL, cutY.size(), ff1D, cutYP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
 
@@ -362,11 +377,12 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
 
                 // fit Z-cut
                 QVector<double> cutZP=ff1D->getInitialParamValues();
+                int cutZi=-1;
                 for (int i=0; i<cutZP.size(); i++) {
                     if (ff1D->getParameterID(i)=="offset") cutZP[i]=init_background;
                     else if (ff1D->getParameterID(i)=="amplitude") cutZP[i]=init_amplitude;
                     else if (ff1D->getParameterID(i)=="position") cutZP[i]=z0;
-                    else if (ff1D->getParameterID(i)=="width") cutZP[i]=init_w3;
+                    else if (ff1D->getParameterID(i)=="width") { cutZi=i; cutZP[i]=init_w3; }
                 }
                 alg->fit(cutZP.data(), NULL, cutZX.data(), cutZ.data(), NULL, cutZ.size(), ff1D, cutZP.data(), NULL, ff1Dmin.data(), ff1Dmax.data());
 
@@ -427,21 +443,35 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                 // fit XYZ-stack to 3D model
                 QVector<double> fit3DP=ff3D->getInitialParamValues();
                 int xposi=-1, yposi=-1, zposi=-1;
+                int widi1=-1, widi2=-1, widi3=-1;
                 for (int i=0; i<fit3DP.size(); i++) {
                     if (ff3D->getParameterID(i)=="offset") fit3DP[i]=init_background;
                     else if (ff3D->getParameterID(i)=="amplitude") fit3DP[i]=init_amplitude;
                     else if (ff3D->getParameterID(i)=="position_x") {xposi=i; fit3DP[i]=x0;}
                     else if (ff3D->getParameterID(i)=="position_y") {yposi=i; fit3DP[i]=y0;}
                     else if (ff3D->getParameterID(i)=="position_z") {zposi=i; fit3DP[i]=z0;}
-                    else if (ff3D->getParameterID(i)=="width1") fit3DP[i]=init_w12;
-                    else if (ff3D->getParameterID(i)=="width2") fit3DP[i]=init_w12;
-                    else if (ff3D->getParameterID(i)=="width3") fit3DP[i]=init_w3;
+                    else if (ff3D->getParameterID(i)=="width1") { widi1=i; fit3DP[i]=init_w12; }
+                    else if (ff3D->getParameterID(i)=="width2") { widi2=i; fit3DP[i]=init_w12; }
+                    else if (ff3D->getParameterID(i)=="width3") { widi3=i; fit3DP[i]=init_w3; }
                 }
                 //qDebug()<<"c="<<c<<"  b="<<b;
                 //qDebug()<<"init: "<<fit3DP;
                 alg->fit3D(fit3DP.data(), NULL, X.data(), Y.data(), Z.data(), roi.data(), NULL, roi.size(), ff3D, fit3DP.data(), NULL, ff3Dmin.data(), ff3Dmax.data());
                 //qDebug()<<"fit:  "<<fit3DP<<"\n\n";
 
+                QVector<double> axialRatios, axialRatios3D;
+                if (cutXi>=0 && cutZi>=0) {
+                    axialRatios<<cutZP[cutZi]/cutXP[cutXi];
+                }
+                if (cutYi>=0 && cutZi>=0) {
+                    axialRatios<<cutZP[cutZi]/cutYP[cutYi];
+                }
+                if (widi1>=0 && widi3>=0) {
+                    axialRatios3D<<fit3DP[widi3]/fit3DP[widi1];
+                }
+                if (widi2>=0 && widi3>=0) {
+                    axialRatios3D<<fit3DP[widi3]/fit3DP[widi2];
+                }
 
 
 
@@ -479,6 +509,8 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                 record->resultsSetNumberList(evalID, QString("channel%1_bead%2_cutyz_zpos").arg(c).arg(b), zpos);
                 record->resultsSetNumberList(evalID, QString("channel%1_bead%2_cutyz_width").arg(c).arg(b), fitZY_width);
                 record->resultsSetNumberList(evalID, QString("channel%1_bead%2_cutyz_gaussianbeam_results").arg(c).arg(b), fitYZCutResults);
+                record->resultsSetNumberList(evalID, QString("channel%1_bead%2_fits_axialratios").arg(c).arg(b), axialRatios);
+                record->resultsSetNumberList(evalID, QString("channel%1_bead%2_fits_axialratios_3d").arg(c).arg(b), axialRatios3D);
 
                 record->resultsSetNumberList(evalID, QString("channel%1_bead%2_fit3d_results").arg(c).arg(b), fit3DP);
                 if (c>0 && xposi>=0 && yposi>=0 && zposi>=0) {

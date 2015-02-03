@@ -586,7 +586,7 @@ void QFRDRImageStackPlugin::startProjectWizardLightsheetAnalysis(bool insertEval
     QFWizard* wiz=new QFWizard(parentWidget);
     wiz->setWindowTitle(tr("SPIM Lightsheet Analysis Project Wizard"));
     wiz->addPage(new QFTextWizardPage(tr("Introduction"),
-                                      tr("This wizard will help you to perform a SPIM lightsheet analysis, i.e. it will help you to load an image stack, which contains a lightsheet scan taken with a 45° mirror and then set all properties accordingly.<br><center><img src=\":/image_stack/spim_lightsheet_scan.png\"></center>"),
+                                      tr("This wizard will help you to perform a SPIM lightsheet analysis, i.e. it will help you to load an image stack, which contains a lightsheet scan taken with a 45\xB0 mirror and then set all properties accordingly.<br><center><img src=\":/image_stack/spim_lightsheet_scan.png\"></center>"),
                                       wiz));
 
 

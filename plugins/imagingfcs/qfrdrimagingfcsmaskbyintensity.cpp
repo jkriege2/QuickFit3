@@ -282,7 +282,7 @@ void QFRDRImagingFCSMaskByIntensity::updateDualView()
     double l2=ui->edtLevel2->value();
 
     if (m_image) {
-        double min, max, min2, max2;
+        double min=0, max=0, min2=0, max2=0;
 
         if (ui->cmbDualView->currentIndex()==0) {
             bool first=true;

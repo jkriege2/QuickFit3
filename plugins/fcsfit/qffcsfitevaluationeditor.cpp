@@ -284,7 +284,7 @@ void QFFCSFitEvaluationEditor::updateFitFunctions() {
                 bool hasN=false;
                 bool has1N=false;
                 double pN=0, peN=0;
-                double p1N, pe1N=0;
+                double p1N=0, pe1N=0;
                 for (int i=0;i<ffunc->paramCount(); i++) {
                     QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
                     if (ffunc->isParameterVisible(i, fullParams)) {
@@ -715,7 +715,7 @@ void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QLis
                 bool hasN=false;
                 bool has1N=false;
                 double pN=0, peN=0;
-                double p1N, pe1N=0;
+                double p1N=0, pe1N=0;
                 for (int i=0;i<ffunc->paramCount(); i++) {
                     QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
                     if (ffunc->isParameterVisible(i, fullParams)) {
@@ -1130,7 +1130,7 @@ void QFFCSFitEvaluationEditor::calibrateFocalVolume() {
 
                         double factor=1;
                         if (d.unit=="micron") { factor=1000; }
-                        if (d.unit=="�m") { factor=1000; }
+                        //if (d.unit=="�m") { factor=1000; }
                         if (d.unit=="um") { factor=1000; }
                         if (d.unit=="microns") { factor=1000; }
                         if (d.unit=="m") { factor=1000000; }
@@ -1163,7 +1163,7 @@ void QFFCSFitEvaluationEditor::calibrateFocalVolume() {
 
                     double factor=1;
                     if (d.unit=="micron") { factor=1000; }
-                    if (d.unit=="�m") { factor=1000; }
+                    //if (d.unit=="�m") { factor=1000; }
                     if (d.unit=="um") { factor=1000; }
                     if (d.unit=="microns") { factor=1000; }
                     if (d.unit=="m") { factor=1000000; }
