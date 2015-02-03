@@ -20,7 +20,6 @@ BrandingText "Copyright (c) 2013 by Jan W. Krieger (German Cancer research Cente
 ShowInstDetails show
 ShowUninstDetails show
 SetCompressor /FINAL  LZMA 
-SetRebootFlag false
 
 # Set Version Information
 #VIProductVersion ${PRODUCT_VERSION}
