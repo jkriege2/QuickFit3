@@ -90,7 +90,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
     int width=data->getImageStackWidth(stack);
     int height=data->getImageStackHeight(stack);
     int zsteps=qMax(4, ROIz/4);
-    double min_distance=double(ROIxy)/3.0;
+    double min_distance=double(ROIxy)/2.0;
     QString fitalgID="fit_lmfit";
     QString fitalgIRLSID="fit_irls_lmfit";
     QFFitAlgorithm* alg=QFPluginServices::getInstance()->getFitAlgorithmManager()->createAlgorithm(fitalgID);
@@ -237,7 +237,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
         for (int i=initial_beads_x.size()-1; i>=0; i--) {
             for (int j=0; j<i; j++) {
                 double d=sqrt(qfSqr(deltaXY*(initial_beads_x[i]-initial_beads_x[j]))+qfSqr(deltaXY*(initial_beads_y[i]-initial_beads_y[j]))+qfSqr(deltaZ*(initial_beads_z[i]-initial_beads_z[j])));
-                if (d<min_distance*deltaXY || d<double(zsteps)*deltaZ) {
+                if (d<min_distance*deltaXY || d<double(ROIz)/2.0*deltaZ) {
                     initial_beads_x.removeAt(i);
                     initial_beads_y.removeAt(i);
                     initial_beads_z.removeAt(i);
