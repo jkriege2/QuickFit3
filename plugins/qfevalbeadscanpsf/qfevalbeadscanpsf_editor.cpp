@@ -136,6 +136,7 @@ void QFEvalBeadScanPSFEditor::highlightingChanged(QFRawDataRecord* formerRecord,
         ui->spinPixPerFrame->setValue(record->getProperty(eval->getEvaluationResultID()+"_PIX_PER_FRAME", record->getProperty("BEADSEARCH_PIX_PER_FRAME", ui->spinPixPerFrame->value()).toDouble()).toDouble());
         ui->spinPSFWidth->setValue(record->getProperty(eval->getEvaluationResultID()+"_EST_PSF_WIDTH", record->getProperty("EST_PSF_WIDTH", ui->spinPSFWidth->value()).toDouble()).toDouble());
         ui->spinPSFHeight->setValue(record->getProperty(eval->getEvaluationResultID()+"_EST_PSF_HEIGHT", record->getProperty("EST_PSF_HEIGHT", ui->spinPSFHeight->value()).toDouble()).toDouble());
+        ui->spinWZFraction->setValue(record->getProperty(eval->getEvaluationResultID()+"_WZ_FRACTION", record->getProperty("WZ_FRACTION", ui->spinWZFraction->value()).toDouble()).toDouble());
 
         ui->grpFilterBeads->setChecked(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads", record->getProperty("FilterBeads", ui->grpFilterBeads->isChecked()).toBool()).toBool());
         ui->spinAxRatioMin->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMin", record->getProperty("FilterBeads_AxRatMin", ui->spinAxRatioMin->value()).toDouble()).toDouble());
@@ -871,7 +872,7 @@ void QFEvalBeadScanPSFEditor::on_spinROIZ_valueChanged(int value)
 
 
     if (data && eval) {
-        record->setQFProperty(eval->getEvaluationResultID()+"_ROI_XY", value, false, false);
+        record->setQFProperty(eval->getEvaluationResultID()+"_ROI_Z", value, false, false);
     }
 }
 
@@ -888,6 +889,19 @@ void QFEvalBeadScanPSFEditor::on_spinPixPerFrame_valueChanged(int value)
     }
 }
 
+void QFEvalBeadScanPSFEditor::on_spinWZFraction_valueChanged(double value)
+{
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID()+"_WZ_FRACTION", value, false, false);
+    }
+}
+
 void QFEvalBeadScanPSFEditor::on_spinROIXY_valueChanged(int value)
 {
     if (updatingData) return;
@@ -897,7 +911,7 @@ void QFEvalBeadScanPSFEditor::on_spinROIXY_valueChanged(int value)
 
 
     if (data && eval) {
-        record->setQFProperty(eval->getEvaluationResultID()+"_ROI_Z", value, false, false);
+        record->setQFProperty(eval->getEvaluationResultID()+"_ROI_XY", value, false, false);
     }
 }
 

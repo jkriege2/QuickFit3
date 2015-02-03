@@ -109,6 +109,7 @@ class QFEvalBeadScanPSFEditor : public QFEvaluationEditor {
         void on_spinROIXY_valueChanged(int value);
         void on_spinROIZ_valueChanged(int value);
         void on_spinPixPerFrame_valueChanged(int value);
+        void on_spinWZFraction_valueChanged(double value);
 };
 
 #endif // QFEVALBEADSCANPSFEDITOR_H
