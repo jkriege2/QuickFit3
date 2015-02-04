@@ -19,7 +19,6 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
-include(zlib.pri)
 
 # This one handles dllimport/dllexport directives.
 DEFINES += QUAZIP_BUILD QUAZIP_STATIC

@@ -1039,7 +1039,7 @@ void QFRDRNumberAndBrightnessPlugin::wizSubimagesChanged(int index)
 
 void QFRDRNumberAndBrightnessPlugin::wizDVChanged(int index)
 {
-    int newwidth, newheight;
+    int newwidth=0, newheight=0;
     if (index==0) {
         newwidth=wizFileImageWidth;
         newheight=wizFileImageHeight;
