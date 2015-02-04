@@ -65,21 +65,21 @@ QT_INFO_INSTALLDIR=`qmake -query QT_INSTALL_PREFIX`
 QT_INFO_VERSION=`qmake -query QT_VERSION`
 echo -e "\n\nbuilding for\n    Qt version ${QT_INFO_VERSION}\n       in ${QT_INFO_INSTALLDIR}\n\n"
 
-LINK_WITH_PIC="-fPIC"
+PICFLAGS="-fPIC"
 
 ISMSYS=`uname -o`
 echo $ISMSYS
 if [ "$ISMSYS" != "${string/Msys/}" ] ; then
-	echo -e "building in MSys environment on Windows!\n\n"
-	PICFLAGS=
-else
-    read -p "Do you need the -fPIC flags? (y/n)? " -n 1  MAKE_PICFLAGS
-	echo -e  "\n"
+read -p "Do you need the -fPIC flags? (y/n)? " -n 1  MAKE_PICFLAGS
+    echo -e  "\n"
 
-	PICFLAGS="-fPIC"
-	if [ $MAKE_PICFLAGS == "n" ] ; then
-		PICFLAGS=""
-	fi
+    PICFLAGS="-fPIC"
+    if [ $MAKE_PICFLAGS == "n" ] ; then
+            PICFLAGS=""
+    fi
+else
+    echo -e "building in MSys environment on Windows!\n\n"
+    PICFLAGS=
 fi
 
 qtOK=-5
