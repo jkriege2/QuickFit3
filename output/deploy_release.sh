@@ -360,7 +360,7 @@ do
     fn=${f//\//\\\\}
 	fn=${fn//.\\/}
     INSTALLER_DIRS="${INSTALLER_DIRS}\\
-CreateDirectory  \"\$INSTDIR\\\\$fn\""
+CreateDirectory  \"\$INSTDIR\\$fn\""
    
 done
 cd ..
@@ -383,7 +383,7 @@ do
     fn=${f//\//\\\\}
 	fn=${fn//.\\/}
     SPIMINSTALLER_DIRS="${SPIMINSTALLER_DIRS}\\
-CreateDirectory  \"\$INSTDIR\\\\$fn\""
+CreateDirectory  \"\$INSTDIR\\$fn\""
     
 done
 cd ..
@@ -403,6 +403,12 @@ ls -l *.~*
 sed "s/%%SPIMUNINSTALLER_FILES%%/$SPIMUNINSTALLER_FILES/" nsis_basicscript.~si > nsis_basicscript.~~s
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
+sed "s/%%SPIMINSTALLER_DIRS%%/$SPIMINSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
+sed "s/%%INSTALLER_INSTDIR%%/$INSTALLER_INSTDIR/" nsis_basicscript.~si > nsis_basicscript.~~s
+cp -f nsis_basicscript.~~s nsis_basicscript.~si
+ls -l *.~*
 sed "s/%%INSTALLER_BASENAME%%/$INSTALLER_BASENAME/" nsis_basicscript.~si > nsis_basicscript.~~s 
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
@@ -418,12 +424,7 @@ ls -l *.~*
 sed "s/%%INSTALLER_DIRS%%/$INSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s
 cp -f nsis_basicscript.~~s nsis_basicscript.~si
 ls -l *.~*
-sed "s/%%SPIMINSTALLER_DIRS%%/$SPIMINSTALLER_DIRS/" nsis_basicscript.~si > nsis_basicscript.~~s
-cp -f nsis_basicscript.~~s nsis_basicscript.~si
-ls -l *.~*
-sed "s/%%INSTALLER_INSTDIR%%/$INSTALLER_INSTDIR/" nsis_basicscript.~si > nsis_basicscript.~~s
-cp -f nsis_basicscript.~~s nsis_basicscript.~si
-ls -l *.~*
+
 
 if [ "${deployspecials}" == "1" ]; then
 	sed "s/%%STORESPECIALVERSION%%/special/" nsis_basicscript.~si > nsis_basicscript.~~s
