@@ -187,6 +187,8 @@ if [ "${create_deploy}" != "0" ]; then
 	rm ./*temp*.*
 	rm ./untitled*.*
 	rm ./*.a
+	rm ./libEGLd.dll
+	rm ./libGLESv2d.dll
 	rm ./*.zip
 	rm ./qf3infotool.exe
 	rm ./qf3infotool*.*
@@ -218,6 +220,9 @@ if [ "${create_deploy}" != "0" ]; then
 	 echo "going to ./qtplugins/  ${PWDD}";
 	find -name "*d4.dll" -exec rm -rf {} \;
 	find -name "q*d.dll" -exec rm -rf {} \;
+	find -name "dsengined.dll" -exec rm -rf {} \;
+	find -name "eglvideonoded.dll" -exec rm -rf {} \;
+	find -name "windowsprintersupportd.dll" -exec rm -rf {} \;
 	find -name "*.a" -exec rm -rf {} \;
 	cd ..
 	PWDD=`pwd`
@@ -347,7 +352,7 @@ do
     INSTALLER_FILES="${INSTALLER_FILES}\\
 File \"\\/oname=$fn\" \"$fn\""
     UNINSTALLER_FILES="${UNINSTALLER_FILES}\\
-Delete \\/REBOOTOK \"\$INSTDIR\\$fn\""
+Delete \\/REBOOTOK \"\$INSTDIR\\\\$fn\""
 done
 INSTALLER_DIRS=
 for f in `find . -type d`
@@ -355,7 +360,7 @@ do
     fn=${f//\//\\\\}
 	fn=${fn//.\\/}
     INSTALLER_DIRS="${INSTALLER_DIRS}\\
-CreateDirectory  \"\$INSTDIR\\$fn\""
+CreateDirectory  \"\$INSTDIR\\\\$fn\""
    
 done
 cd ..
@@ -370,7 +375,7 @@ do
     SPIMINSTALLER_FILES="${SPIMINSTALLER_FILES}\\
 File \"\\/oname=$fn\" \"$fn\""
     SPIMUNINSTALLER_FILES="${SPIMUNINSTALLER_FILES}\\
-Delete \\/REBOOTOK \"\$INSTDIR\\$fn\""
+Delete \\/REBOOTOK \"\$INSTDIR\\\\$fn\""
 done
 SPIMINSTALLER_DIRS=
 for f in `find . -type d`
@@ -378,7 +383,7 @@ do
     fn=${f//\//\\\\}
 	fn=${fn//.\\/}
     SPIMINSTALLER_DIRS="${SPIMINSTALLER_DIRS}\\
-CreateDirectory  \"\$INSTDIR\\$fn\""
+CreateDirectory  \"\$INSTDIR\\\\$fn\""
     
 done
 cd ..

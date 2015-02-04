@@ -120,14 +120,14 @@ ${EndIf}
 
 #function to create desktop shortcut when the  user selects it
 Function finishpageaction
-	CreateShortCut "$desktop\${PRODUCT_NAME}.lnk" "$instdir\quickfit3.exe"
+	CreateShortCut "$desktop\${PRODUCT_NAME}.lnk" "$INSTDIR\quickfit3.exe"
 FunctionEnd
 
 
 # This installs the main application
 Section "${PRODUCT_NAME} ${PRODUCT_VERSION}" sec_main
 	Push $OUTDIR ; Store previous output directory
-	SetOutPath "$INSTDIR" ; Set output directory
+	SetOutPath "$INSTDIR\" ; Set output directory
 
 	#CreateShortCut "$SMPROGRAMS${COMPANY_NAME}${PRODUCT_NAME}.lnk" "$OUTDIRquickfit3.exe"
 	
@@ -194,7 +194,7 @@ SectionEnd
 # This section does the file extension association
 Section "associate file extensions (*.qfp/qfpz)" sec_assoc
 	Push $OUTDIR ; Store previous output directory
-	SetOutPath "$INSTDIR" ; Set output directory
+	SetOutPath "$INSTDIR\" ; Set output directory
 	
 	${registerExtension} "$INSTDIR\quickfit3.exe" ".qfp" "QFP_File"
 	${registerExtension} "$INSTDIR\quickfit3.exe" ".qfpz" "QFPZ_File"
@@ -208,7 +208,7 @@ SectionEnd
 # This installs the SPIM plugins
 Section "SPIM Plugins" sec_spim
 	Push $OUTDIR ; Store previous output directory
-	SetOutPath "$INSTDIR" ; Set output directory
+	SetOutPath "$INSTDIR\" ; Set output directory
 	
 	# automatically created list of install files
 	%%SPIMINSTALLER_DIRS%%
@@ -301,7 +301,7 @@ Section "un.${PRODUCT_NAME} ${PRODUCT_VERSION}" sec_un_main
 	RMDir /REBOOTOK "$SMPROGRAMS${COMPANY_NAME}"
 	
 	# Remove the uninstaller and Add/Remove programs information
-	Delete /REBOOTOK "$INSTDIRUninstall.exe"
+	Delete /REBOOTOK "$INSTDIR\Uninstall.exe"
 	DeleteRegKey HKLM  "${UNINSTALL_KEY}"
 	
 	# Remove the installation directory if empty
