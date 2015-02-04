@@ -152,6 +152,40 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
         // DETERMINE level for SEGMENTATION
         double level=statisticsQuantile(frame, width*height, 1.0-double(pixels_per_frame)/double(width*height));
         //qDebug()<<"step "<<z<<"  level="<<level;
+        const unsigned int lx=3;
+        const unsigned int ly=3;
+
+        double *median=new double[width*height];
+        double *locals=new double[(2*lx+1)*(2*ly+1)];
+        for (int y=0; y<height; y++) {
+            for (int x=0; x<width; x++) {
+                const int i=y*width+x;
+                unsigned int count=0;
+                for (int dy=0-ly;dy<ly; dy++) {
+                    for (int dx=0-lx; dx<lx; dx++) {
+                        const int nx=x+dx;
+                        const int ny=y+dy;
+                        const int ni=ny*width+nx;
+                        if((nx>=0)&&(nx<width)&&(ny>0)&&(ny<height)){
+                            locals[count]=frame[ni];
+                            count++;
+                        }
+                    }
+                }
+                median[i]=statisticsMedian(locals,count);
+            }
+        }
+        delete [] locals;
+        double *frame2=new double[width*height];
+        for (int y=0; y<height; y++) {
+            for (int x=0; x<width; x++) {
+                const int i=y*width+x;
+                frame2[i]=frame[i]-median[i];
+            }
+        }
+        delete [] median;
+        double level2=statisticsQuantile(frame2, width*height, 1.0-double(pixels_per_frame)/double(width*height));
+
 
         // FIND INITIAL BEADS by SEGMENTATION with level
         QVector<int> pixs_x, pixs_y;
@@ -159,14 +193,18 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
         for (int y=0; y<height; y++) {
             for (int x=0; x<width; x++) {
                 const int i=y*width+x;
-                if ((!useMask || !mask || !mask[i]) && frame[i]>=level && x>ROIxy/2 && x<width-ROIxy/2 && y>ROIxy/2 && y<height-ROIxy/2) {
-                    pixs_x<<x;
-                    pixs_y<<y;
-                    ignored<<false;
-                    //qDebug()<<"    possible: "<<x<<y;
+                if ((!useMask || !mask || !mask[i]) && x>ROIxy/2 && x<width-ROIxy/2 && y>ROIxy/2 && y<height-ROIxy/2) {
+                    if(frame2[i]>=level2){
+                        pixs_x<<x;
+                        pixs_y<<y;
+                        ignored<<false;
+                        qDebug()<<"    possible: "<<x<<y<<", level="<<level2;
+                    }
                 }
             }
         }
+        delete [] frame2;
+
         // SETUP DISTANCE MATRIX OF INITIAL BEADS
         double* distance_matrix=qfCallocT<double>(pixs_x.size()*pixs_x.size());
         for (int i=0; i<pixs_x.size(); i++) {

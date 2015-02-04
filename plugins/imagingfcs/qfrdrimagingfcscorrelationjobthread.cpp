@@ -31,6 +31,7 @@
 #include "qftools.h"
 #include "lmcurve.h"
 #include <typeinfo>
+#include <QLibrary>
 
 QMutex* QFRDRImagingFCSCorrelationJobThread::mutexFilename=NULL;
 
@@ -1291,6 +1292,68 @@ bool QFRDRImagingFCSCorrelationJobThread::saveCorrelationBIN(const QString &file
 
 
 void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, uint32_t frame_width, uint32_t frame_height, uint32_t shiftX, uint32_t shiftY, uint64_t frames, double **ccf_tau_io, double **ccf_io, double **ccf_std_io, uint32_t &ccf_N, const QString& message, uint32_t increment_progress, double **ccf_segments_io) {
+    if (job.correlator==CORRELATOR_CORRELATORFROMSHAREDLIB){
+        unsigned int ret=0;
+        QLibrary libCorrelator("./libcorrelator_vc_avx.so");
+        //correlate data
+        typedef uint32_t (*correlate_f)(float*,uint32_t,uint32_t);
+        correlate_f correlate = (correlate_f) libCorrelator.resolve("correlate");
+        qDebug() << "correlate" << correlate;
+        if(correlate)ret = correlate(image_series,frame_width * frame_height,frames);
+        //log_text(tr("reloading %2\n").arg();
+        //normalize data
+        typedef uint32_t (*normalize_f)();
+        normalize_f normalize = (normalize_f) libCorrelator.resolve("normalize");
+        qDebug() << "normalize" << normalize;
+        if(normalize)ret = normalize();
+        //lag count
+        typedef uint32_t (*getLagCount_f)();
+        getLagCount_f getLagCount = (getLagCount_f) libCorrelator.resolve("getLagCount");
+        qDebug() << "getLagCount" << getLagCount;
+        if(getLagCount)ccf_N = getLagCount();
+        qDebug() << ccf_N;
+        //taus
+        typedef double* (*getTausPD_f)(double);
+        getTausPD_f getTausPD = (getTausPD_f) libCorrelator.resolve("getTausPD");
+        qDebug() << "getTausPD" << getTausPD;
+        if(getTausPD)*ccf_tau_io = getTausPD(job.frameTime);
+        //results
+        typedef double* (*getResultsPD_f)();
+        getResultsPD_f getResultsPD = (getResultsPD_f) libCorrelator.resolve("getResultsPD");
+        qDebug() << "getResultsPD" << getResultsPD;
+        if(getResultsPD)*ccf_io = getResultsPD();
+        //raw results
+        typedef float* (*getRawsPS_f)();
+        getRawsPS_f getRawsPS = (getRawsPS_f) libCorrelator.resolve("getRawsPS");
+        qDebug() << "getRawsPS" << getRawsPS;
+        float *raw;
+        if(getRawsPS)raw = getRawsPS();
+        //raw taus
+        double *tausRaw;
+        if(getTausPD)tausRaw = getTausPD(1.0);
+        //errors
+        *ccf_std_io = NULL;
+        //segments
+        *ccf_segments_io = NULL;
+        qDebug() << "*ccf_io" << *ccf_io;
+        qDebug() << "*ccf_tau_io" << *ccf_tau_io;
+        unsigned int i=0;
+        int callCount=frames;
+        for(unsigned int b=0; b < 14; b++){
+            for(unsigned int l=0;l<8;l++){
+                qDebug() << frames << callCount*(1<<b) << frames - tausRaw[i] << tausRaw[i] << raw[i] << (*ccf_io)[i]-1.0;
+                callCount--;
+                i++;
+            }
+            callCount--;
+            callCount/=2;
+        }
+        qDebug() << "Segments=" << job.segments;
+
+        return;
+    }
+
+    //else//
     ccf_N=job.S*job.P;
     double* ccf=(double*)qfCalloc(ccf_N*frame_width*frame_height,sizeof(double));
     double* ccf_std=NULL;
@@ -1306,6 +1369,8 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_series(float* image_series, 
     if (job.segments>1) {
         ccf_std=(double*)qfCalloc(ccf_N*frame_width*frame_height,sizeof(double));
     }
+
+
 
     for (int32_t y=0; y<(int32_t)frame_height; y++) {
         for (int32_t x=0; x<(int32_t)frame_width; x++) {

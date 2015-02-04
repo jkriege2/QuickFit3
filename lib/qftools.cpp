@@ -68,9 +68,9 @@ void* qfMalloc(size_t size) {
 #endif
 #ifdef __LINUX__
     #if  !defined(QF_DONT_USE_ALIGNED_MALLOC)
-    return _aligned_malloc(size, QF_ALIGNMENT_BYTES);
+    return aligned_alloc(QF_ALIGNMENT_BYTES, size);
     #else
-        return valloc(size);
+    return malloc(size);
     #endif
 #else
     #if  !defined(QF_DONT_USE_ALIGNED_MALLOC)
@@ -100,7 +100,7 @@ void* qfRealloc (void* ptr, size_t size) {
 #endif
 #ifdef __LINUX__
     #if !defined(QF_DONT_USE_ALIGNED_MALLOC)
-    return _aligned_realloc(ptr, size, QF_ALIGNMENT_BYTES);
+    return realloc(ptr, size);
     #else
     return realloc(ptr, size);
     #endif
@@ -120,7 +120,7 @@ void qfFree(void* data) {
 #endif
 #ifdef __LINUX__
     #if !defined(QF_DONT_USE_ALIGNED_MALLOC)
-    _aligned_free(data);
+    free(data);
     #else
     free(data);
     #endif
