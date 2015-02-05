@@ -1859,7 +1859,12 @@ class QFLIB_EXPORT QFProgressMinorProgress {
         virtual void setMinorProgress(int value)=0;
         virtual void setMinorProgressRange(int min=0, int max=100)=0;
         virtual bool wasMinorProgressCanceled() const=0;
+        virtual void setMajorProgress(int value)=0;
+        virtual void setMajorProgressRange(int min=0, int max=100)=0;
+        virtual bool wasMajorProgressCanceled() const=0;
 };
+
+
 
 /*! \brief copies data (in chunks) from one file to another
     \ingroup qf3lib_tools

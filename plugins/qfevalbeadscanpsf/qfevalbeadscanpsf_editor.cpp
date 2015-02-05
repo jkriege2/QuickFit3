@@ -52,12 +52,13 @@ QFEvalBeadScanPSFEditor::QFEvalBeadScanPSFEditor(QFPluginServices* services,  QF
     ui->histogram2->setSpaceSavingMode(true);
 
     // create progress dialog for evaluation
-    dlgEvaluationProgress=new QProgressDialog(this);
+    dlgEvaluationProgress=new QFListProgressDialog(this);
     dlgEvaluationProgress->hide();
     dlgEvaluationProgress->setWindowModality(Qt::WindowModal);
     
     // connect widgets 
     connect(ui->btnEvaluateCurrent, SIGNAL(clicked()), this, SLOT(evaluateCurrent()));
+    connect(ui->btnEvaluateAll, SIGNAL(clicked()), this, SLOT(evaluateAll()));
     connect(ui->btnResetCurrent, SIGNAL(clicked()), this, SLOT(resetCurrent()));
     ui->btnPrintReport->setDefaultAction(actPrintReport);
     ui->btnSaveReport->setDefaultAction(actSaveReport);
@@ -68,7 +69,7 @@ QFEvalBeadScanPSFEditor::QFEvalBeadScanPSFEditor(QFPluginServices* services,  QF
 QFEvalBeadScanPSFEditor::~QFEvalBeadScanPSFEditor()
 {
     delete ui;
-    delete dlgEvaluationProgress;
+    //delete dlgEvaluationProgress;
 }
 
 void QFEvalBeadScanPSFEditor::connectWidgets(QFEvaluationItem* current, QFEvaluationItem* old) {
@@ -115,6 +116,56 @@ void QFEvalBeadScanPSFEditor::writeSettings() {
     settings->getQSettings()->setValue(QString("eval_beadscanpsf/editor/lastSaveDirectory"), currentSaveDirectory);
 }
 
+QStringList QFEvalBeadScanPSFEditor::getImageWriterFilterList(QFPluginServices *pluginservices)
+{
+    QStringList l;
+    int i=0;
+    QFExporterImageSeries* r=NULL;
+    while ((r=getImageWriter(i, pluginservices))!=NULL) {
+        l.append(r->filter());
+        delete r;
+        i++;
+    }
+    return l;
+}
+
+QStringList QFEvalBeadScanPSFEditor::getImageWriterFormatNameList(QFPluginServices *pluginservices)
+{
+    QStringList l;
+    int i=0;
+    QFExporterImageSeries* r=NULL;
+    while ((r=getImageWriter(i, pluginservices))!=NULL) {
+        l.append(r->formatName());
+        delete r;
+        i++;
+    }
+    return l;
+}
+
+QFExporterImageSeries *QFEvalBeadScanPSFEditor::getImageWriter(int idx, QFPluginServices *pluginservices)
+{
+    QFExporterImageSeries* r=NULL;
+
+    QStringList imp=pluginservices->getExporterManager()->getExporters<QFExporterImageSeries*>();
+
+    if (idx>=0 && idx<imp.size()) {
+        r=dynamic_cast<QFExporterImageSeries*>(pluginservices->getExporterManager()->createExporter(imp[idx]));
+    }
+
+    return r;
+}
+
+int QFEvalBeadScanPSFEditor::getImageWriterCount(QFPluginServices *pluginservices)
+{
+    QStringList imp=pluginservices->getExporterManager()->getExporters<QFExporterImageSeries*>();
+    return imp.size();
+}
+
+QStringList QFEvalBeadScanPSFEditor::getImageWriterIDList(QFPluginServices *pluginservices)
+{
+    return pluginservices->getExporterManager()->getExporters<QFExporterImageSeries*>();
+}
+
 void QFEvalBeadScanPSFEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
     // this slot is called when the user selects a new record in the raw data record list on the RHS of this widget in the evaluation dialog
     
@@ -141,6 +192,7 @@ void QFEvalBeadScanPSFEditor::highlightingChanged(QFRawDataRecord* formerRecord,
         ui->grpFilterBeads->setChecked(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads", record->getProperty("FilterBeads", ui->grpFilterBeads->isChecked()).toBool()).toBool());
         ui->spinAxRatioMin->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMin", record->getProperty("FilterBeads_AxRatMin", ui->spinAxRatioMin->value()).toDouble()).toDouble());
         ui->spinAxRatioMax->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMax", record->getProperty("FilterBeads_AxRatMax", ui->spinAxRatioMax->value()).toDouble()).toDouble());
+        ui->chkMedianFIlter->setChecked(record->getProperty(eval->getEvaluationResultID()+"_MEDIAN", record->getProperty("USE_MEDIAN_FILTER", ui->chkMedianFIlter->isChecked()).toBool()).toBool());
 
         updatingData=false;
     }
@@ -158,7 +210,12 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
 
     int stack=0;
 
+    ui->btnSaveAllROI->setEnabled(false);
+    ui->btnSaveROI->setEnabled(false);
+
     if (eval->hasEvaluation(record)) {
+        ui->btnSaveAllROI->setEnabled(true);
+        ui->btnSaveROI->setEnabled(true);
         QString evalID=eval->getEvaluationResultID();
         int channel=ui->cmbChannel->currentIndex();
         int bead=ui->cmbBead->currentIndex();
@@ -197,6 +254,7 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
             QString ffIDY=record->resultsGetAsString(evalID, QString("cuty_fitfunction"));
 
             QVector<double> fitresCutZ_Z=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutxz_zpos").arg(channel).arg(bead));
+            for (int i=0; i<fitresCutZ_Z.size(); i++) fitresCutZ_Z[i]=fitresCutZ_Z[i]/1000.0;
             QVector<double> fitresCutZX=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutxz_width").arg(channel).arg(bead));
             QVector<double> fitresCutZXGB=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutxz_gaussianbeam_results").arg(channel).arg(bead));
             QString ffIDCutZX=record->resultsGetAsString(evalID, QString("cutxz_gaussianbeam_fitfunc"));
@@ -434,7 +492,7 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
                 JKQTPdatastore* ds=ui->pltFitWofZ->getDatastore();
                 ui->pltFitWofZ->clearGraphs(true);
                 ds->clear();
-                ui->pltFitWofZ->getXAxis()->set_axisLabel(tr("z [nm]"));
+                ui->pltFitWofZ->getXAxis()->set_axisLabel(tr("z [{\\mu}m]"));
                 ui->pltFitWofZ->getYAxis()->set_axisLabel(tr("PSF-width [nm]"));
                 int colX=ds->addCopiedColumn(fitresCutZ_Z.data(), fitresCutZ_Z.size(), QString("Z_c%1_b%2").arg(channel).arg(bead));
                 int colYX=ds->addCopiedColumn(fitresCutZX.data(), fitresCutZX.size(), QString("cutZX_c%1_b%2_width").arg(channel).arg(bead));
@@ -452,6 +510,9 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
                 QFFitFunction* ff=NULL;
                 fit->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDCutZX));
                 //qDebug()<<ffIDCutZX<<ff;
+                for (int i=0; i<fitresCutZXGB.size(); i++) {
+                    if (ff && ff->getParameterID(i)=="position") fitresCutZXGB[i]=fitresCutZXGB[i]/1000.0;
+                }
                 fit->set_params(fitresCutZXGB);
                 fit->set_color(plt->get_color().darker());
                 ui->pltFitWofZ->addGraph(fit);
@@ -470,6 +531,10 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
                 ff=NULL;
                 fit->set_fitFunction(ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDCutZY));
                 //qDebug()<<ffIDCutZY<<ff;
+                for (int i=0; i<fitresCutZYGB.size(); i++) {
+                    if (ff && ff->getParameterID(i)=="position") fitresCutZYGB[i]=fitresCutZYGB[i]/1000.0;
+                }
+
                 fit->set_params(fitresCutZYGB);
                 fit->set_color(plt->get_color().darker());
                 ui->pltFitWofZ->addGraph(fit);
@@ -823,6 +888,19 @@ void QFEvalBeadScanPSFEditor::displayResults()
     displayEvaluationBead();
 }
 
+void QFEvalBeadScanPSFEditor::on_chkMedianFIlter_valueChanged(bool value)
+{
+    if (updatingData) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+
+
+    if (data && eval) {
+        record->setQFProperty(eval->getEvaluationResultID()+"_MEDIAN", value, false, false);
+    }
+}
+
 
 
 void QFEvalBeadScanPSFEditor::on_spinA_valueChanged(double value) {
@@ -902,6 +980,129 @@ void QFEvalBeadScanPSFEditor::on_spinWZFraction_valueChanged(double value)
     }
 }
 
+
+
+void QFEvalBeadScanPSFEditor::saveROI(const QString &filename, const QString& format, QFRawDataRecord *rdr, int bead, int channel)
+{
+    if (!current) return;
+    QFRawDataRecord* record=rdr;
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    if ((!record)||(!eval)||(!data)) return;
+
+    if (eval->hasEvaluation(record)) {
+        QString evalID=eval->getEvaluationResultID();
+
+        int ROIxy=ui->spinROIXY->value();
+        int ROIz=ui->spinROIZ->value();
+        int stack=0;
+        int width=data->getImageStackWidth(stack);
+        int height=data->getImageStackHeight(stack);
+        int size_z=data->getImageStackFrames(stack);
+
+        int initPosX=record->resultsGetInNumberList(evalID, "beadsearch_initial_positions_x", bead, -1);
+        int initPosY=record->resultsGetInNumberList(evalID, "beadsearch_initial_positions_y", bead, -1);
+        int initPosZ=record->resultsGetInNumberList(evalID, "beadsearch_initial_positions_z", bead, -1);
+
+        //qDebug()<<channel<<bead<<initPosX<<initPosY<<initPosZ;
+
+        if (initPosX>=0 && initPosY>=0 && initPosZ>=0) {
+            cimg_library::CImg<double> image(data->getImageStack(stack, 0, channel), width, height, size_z, true);
+            cimg_library::CImg<double> roi=image.get_crop(initPosX-ROIxy/2, initPosY-ROIxy/2, initPosZ-ROIz/2, initPosX+ROIxy/2, initPosY+ROIxy/2, initPosZ+ROIz/2);
+            if (getImageWriterIDList(QFPluginServices::getInstance()).contains(format) && !filename.isEmpty()) {
+                QFExporterImageSeries* exp=dynamic_cast<QFExporterImageSeries*>(QFPluginServices::getInstance()->getExporterManager()->createExporter(format));
+                if (exp) {
+                    exp->setFileComment(record->getName());
+                    uint32_t w=roi.width();
+                    uint32_t h=roi.height();
+                    uint32_t f=roi.depth();
+                    uint32_t ch=roi.spectrum();
+                    exp->setFrameSize(w,h,ch);
+                    const double* ro=roi.data();
+                    if (exp->open(filename)){
+                        for (uint32_t i=0; i<f; i++) {
+                            exp->writeFrameDouble(&(ro[i*w*h]));
+                        }
+                    }
+                    exp->close();
+                    delete exp;
+                    exp=NULL;
+                }
+            }
+        }
+    }
+}
+void QFEvalBeadScanPSFEditor::on_btnSaveAllROI_clicked()
+{
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    if ((!record)||(!eval)/*||(!data)*/) return;
+
+    if (eval->hasEvaluation(record)) {
+        int channel=ui->cmbChannel->currentIndex();
+        int bead=ui->cmbBead->currentIndex();
+
+        QStringList ids=getImageWriterIDList(QFPluginServices::getInstance());
+        QStringList filters=getImageWriterFilterList(QFPluginServices::getInstance());
+        if (ids.size()>0 && filters.size()>0) {
+            QString filter=filters[0];
+            QString filename=qfGetSaveFileNameSet("QFEvalBeadScanPSFEditor/saveroi/", this, tr("Save all ROIs"), QString(), filters.join(";;"), &filter);
+            QString format=ids.value(filters.indexOf(filter), "");
+            if (filename.size()>0) {
+                QProgressDialog dialog;
+                dialog.setLabelText("exporting ROIs ...");
+                dialog.setRange(0,ui->cmbChannel->count()*ui->cmbBead->count());
+                dialog.show();
+                int i=0;
+                for (channel=0; channel<ui->cmbChannel->count(); channel++) {
+                    for (bead=0; bead<ui->cmbBead->count(); bead++) {
+                        dialog.setLabelText(tr("exporting ROI %1, channel %2 ...").arg(bead+1).arg(channel+1));
+                        dialog.setValue(i);
+                        i++;
+                        if (dialog.wasCanceled()) break;
+                        QApplication::processEvents();
+
+                        saveROI(QString("%1_ch%2_ch%3.%4").arg(QFileInfo(filename).dir().absolutePath()+"/"+QFileInfo(filename).baseName()).arg(channel,2,10,QLatin1Char('0')).arg(bead,5,10,QLatin1Char('0')).arg(QFileInfo(filename).completeSuffix()), format, record, bead, channel);
+
+                    }
+                    if (dialog.wasCanceled()) break;
+                }
+
+            }
+
+        }
+    }
+}
+
+void QFEvalBeadScanPSFEditor::on_btnSaveROI_clicked()
+{
+
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    if ((!record)||(!eval)/*||(!data)*/) return;
+
+    if (eval->hasEvaluation(record)) {
+        int channel=ui->cmbChannel->currentIndex();
+        int bead=ui->cmbBead->currentIndex();
+
+        QStringList ids=getImageWriterIDList(QFPluginServices::getInstance());
+        QStringList filters=getImageWriterFilterList(QFPluginServices::getInstance());
+        if (ids.size()>0 && filters.size()>0) {
+            QString filter=filters[0];
+            QString filename=qfGetSaveFileNameSet("QFEvalBeadScanPSFEditor/saveroi/", this, tr("Save current ROI"), QString(), filters.join(";;"), &filter);
+            QString format=ids.value(filters.indexOf(filter), "");
+            if (filename.size()>0) {
+                saveROI(filename, format, record, bead, channel);
+            }
+
+        }
+    }
+}
+
 void QFEvalBeadScanPSFEditor::on_spinROIXY_valueChanged(int value)
 {
     if (updatingData) return;
@@ -926,6 +1127,49 @@ void QFEvalBeadScanPSFEditor::on_spinZ_valueChanged(double value) {
     }
 }
 
+void QFEvalBeadScanPSFEditor::evaluateAll() {
+    /* EXECUTE AN EVALUATION FOR THE CURRENT RECORD ONLY */
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    if ((!eval)||(!record)/*||(!data)*/) return;
+
+    // get a list of all raw data records this evaluation is applicable to
+    QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+    dlgEvaluationProgress->reset();
+    dlgEvaluationProgress->setMinorProgressRange(0,100);
+    dlgEvaluationProgress->setMinorProgress(50);
+    dlgEvaluationProgress->setRange(0,recs.size());
+    dlgEvaluationProgress->setValue(0);
+    dlgEvaluationProgress->setMajorProgressEnabled(true);
+    dlgEvaluationProgress->setMinorProgressEnabled(true);
+    dlgEvaluationProgress->setUserClose(false);
+    dlgEvaluationProgress->open();
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
+    // iterate through all records and all runs therein and do the fits
+    for (int i=0; i<recs.size(); i++) {
+        QFRawDataRecord* record=recs[i];
+        // possibly to a qobject_cast<> to the data type/interface you are working with here: QFRDRMyInterface* data=qobject_cast<QFRDRMyInterface*>(record);
+        if ((record)/*&&(data)*/) {
+            dlgEvaluationProgress->setLabelText(tr("evaluate '%1' ...").arg(record->getName()));
+            // here we call doEvaluation to execute our evaluation for the current record only
+            eval->doEvaluation(record, ui->spinA->value(), ui->spinZ->value(), ui->spinROIXY->value(), ui->spinROIZ->value(), ui->spinPixPerFrame->value(), ui->spinPSFWidth->value(), ui->spinPSFHeight->value(), ui->spinWZFraction->value()/100.0, ui->chkMedianFIlter->isChecked(), dlgEvaluationProgress);
+        }
+        dlgEvaluationProgress->setValue(i);
+        // check whether the user canceled this evaluation
+        if (dlgEvaluationProgress->wasCanceled()) break;
+    }
+    dlgEvaluationProgress->setValue(recs.size());
+    dlgEvaluationProgress->close();
+    displayResults();
+    dlgEvaluationProgress->close();
+
+    QApplication::restoreOverrideCursor();
+    resultsChanged();
+}
 
 
 void QFEvalBeadScanPSFEditor::evaluateCurrent() {
@@ -938,19 +1182,21 @@ void QFEvalBeadScanPSFEditor::evaluateCurrent() {
 
     
     
+    dlgEvaluationProgress->reset();
     dlgEvaluationProgress->setLabelText(tr("evaluate '%1' ...").arg(record->getName()));
-    
-    dlgEvaluationProgress->setRange(0,100);
-    dlgEvaluationProgress->setValue(50);
+    dlgEvaluationProgress->setMinorProgressRange(0,100);
+    dlgEvaluationProgress->setMinorProgress(50);
+    dlgEvaluationProgress->setMajorProgressEnabled(false);
+    dlgEvaluationProgress->setMinorProgressEnabled(true);
+    dlgEvaluationProgress->setUserClose(false);
     dlgEvaluationProgress->open();
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
     // here we call doEvaluation to execute our evaluation for the current record only
-    eval->doEvaluation(record, ui->spinA->value(), ui->spinZ->value(), ui->spinROIXY->value(), ui->spinROIZ->value(), ui->spinPixPerFrame->value(), ui->spinPSFWidth->value(), ui->spinPSFHeight->value(), ui->spinWZFraction->value()/100.0, dlgEvaluationProgress);
+    eval->doEvaluation(record, ui->spinA->value(), ui->spinZ->value(), ui->spinROIXY->value(), ui->spinROIZ->value(), ui->spinPixPerFrame->value(), ui->spinPSFWidth->value(), ui->spinPSFHeight->value(), ui->spinWZFraction->value()/100.0, ui->chkMedianFIlter->isChecked(), dlgEvaluationProgress);
 
     displayResults();
-    dlgEvaluationProgress->setValue(100);
     dlgEvaluationProgress->close();
 
     QApplication::restoreOverrideCursor();
@@ -1069,6 +1315,9 @@ void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
     row++;
     table->cellAt(row, col+0).firstCursorPosition().insertText(tr("estimated PSF height:"), fTextBold);
     table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(ui->spinPSFHeight->value())+tr(" nm"), fText);
+    row++;
+    table->cellAt(row, col+0).firstCursorPosition().insertText(tr("median-filtering:"), fTextBold);
+    table->cellAt(row, col+1).firstCursorPosition().insertText(boolToQString(ui->chkMedianFIlter->isChecked()), fText);
     row++;
     table->cellAt(row, col+0).firstCursorPosition().insertText(tr("channels:"), fTextBold);
     table->cellAt(row, col+1).firstCursorPosition().insertText(QString::number(channels), fText);

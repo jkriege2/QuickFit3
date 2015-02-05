@@ -37,6 +37,9 @@ Copyright (c) 2014
 #include "qftablemodel.h"
 #include "datatools.h"
 #include "qfrdrimagestackinterface.h"
+#include "qflistprogressdialog.h"
+#include "qfexporterimageseries.h"
+#include "qfexportermanager.h"
 
 namespace Ui {
     class QFEvalBeadScanPSFEditor;
@@ -62,11 +65,19 @@ class QFEvalBeadScanPSFEditor : public QFEvaluationEditor {
         /** \brief write the settings */
         virtual void writeSettings();
     protected:
+
+        static QStringList getImageWriterFilterList(QFPluginServices *pluginservices) ;
+        static QStringList getImageWriterFormatNameList(QFPluginServices *pluginservices) ;
+        static QFExporterImageSeries *getImageWriter(int idx, QFPluginServices *pluginservices) ;
+        static int getImageWriterCount(QFPluginServices *pluginservices);
+        static QStringList getImageWriterIDList(QFPluginServices *pluginservices);
+
+
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFEvalBeadScanPSFEditor *ui;
         
         /** \brief progress dialog used by the fits */
-        QProgressDialog* dlgEvaluationProgress;
+        QFListProgressDialog* dlgEvaluationProgress;
         
         /** \brief where did we save the last report */
         QString currentSaveDirectory;
@@ -102,6 +113,7 @@ class QFEvalBeadScanPSFEditor : public QFEvaluationEditor {
         
 
 
+        void on_chkMedianFIlter_valueChanged(bool value);
         void on_spinZ_valueChanged(double value);
         void on_spinA_valueChanged(double value);
         void on_spinPSFHeight_valueChanged(double value);
@@ -110,6 +122,11 @@ class QFEvalBeadScanPSFEditor : public QFEvaluationEditor {
         void on_spinROIZ_valueChanged(int value);
         void on_spinPixPerFrame_valueChanged(int value);
         void on_spinWZFraction_valueChanged(double value);
+
+        void on_btnSaveAllROI_clicked();
+        void on_btnSaveROI_clicked();
+        void evaluateAll();
+        void saveROI(const QString& filename, const QString &exportID, QFRawDataRecord* rdr, int bead=0, int channel=0);
 };
 
 #endif // QFEVALBEADSCANPSFEDITOR_H

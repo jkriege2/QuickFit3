@@ -21,6 +21,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include "qfrdrimagestack_data.h"
 #include <QtXml>
+#include "qfexporterimageseries.h"
+#include "qfexportermanager.h"
 
 QFRDRImageStackData::QFRDRImageStackData(QFProject* parent):
     QFRawDataRecord(parent)
@@ -597,6 +599,56 @@ QStringList QFRDRImageStackData::getImageReaderIDList(QFPluginServices* pluginse
     return pluginservices->getImporterManager()->getImporters<QFImporterImageSeries*>();
 }
 
+QStringList QFRDRImageStackData::getImageWriterFilterList(QFPluginServices *pluginservices)
+{
+    QStringList l;
+    int i=0;
+    QFExporterImageSeries* r=NULL;
+    while ((r=getImageWriter(i, pluginservices))!=NULL) {
+        l.append(r->filter());
+        delete r;
+        i++;
+    }
+    return l;
+}
+
+QStringList QFRDRImageStackData::getImageWriterFormatNameList(QFPluginServices *pluginservices)
+{
+    QStringList l;
+    int i=0;
+    QFExporterImageSeries* r=NULL;
+    while ((r=getImageWriter(i, pluginservices))!=NULL) {
+        l.append(r->formatName());
+        delete r;
+        i++;
+    }
+    return l;
+}
+
+QFExporterImageSeries *QFRDRImageStackData::getImageWriter(int idx, QFPluginServices *pluginservices)
+{
+    QFExporterImageSeries* r=NULL;
+
+    QStringList imp=pluginservices->getExporterManager()->getExporters<QFExporterImageSeries*>();
+
+    if (idx>=0 && idx<imp.size()) {
+        r=dynamic_cast<QFExporterImageSeries*>(pluginservices->getExporterManager()->createExporter(imp[idx]));
+    }
+
+    return r;
+}
+
+int QFRDRImageStackData::getImageWriterCount(QFPluginServices *pluginservices)
+{
+    QStringList imp=pluginservices->getExporterManager()->getExporters<QFExporterImageSeries*>();
+    return imp.size();
+}
+
+QStringList QFRDRImageStackData::getImageWriterIDList(QFPluginServices *pluginservices)
+{
+    return pluginservices->getExporterManager()->getExporters<QFExporterImageSeries*>();
+}
+
 QStringList QFRDRImageStackData::getImageFormatNameList(QFPluginServices* pluginservices)   {
      QStringList l;
      int i=0;
@@ -637,11 +689,49 @@ QFRDRImageStackData::ImageStack::ImageStack() {
 
 
 
-void QFRDRImageStackData::exportData(const QString &format, const QString &filename) const
+void QFRDRImageStackData::exportData(const QString &format_in, const QString &filename) const
 {
-    if (format.toUpper()=="TIFF") {
-
+    /*QStringList sl=format_in.split(";;;;");
+    bool ok=true;
+    int ch=sl.value(1, "0").toInt(&ok);
+    if (!ok) ch=0;
+    QString format=sl.value(0, "");*/
+    QString format=format_in;
+    if (getExportFiletypes().contains(format)) {
+        QFExporterImageSeries* exp=dynamic_cast<QFExporterImageSeries*>(QFPluginServices::getInstance()->getExporterManager()->createExporter(format));
+        if (exp) {
+            exp->setFileComment(getName());
+            exp->setFrameSize(getImageStackWidth(0), getImageStackHeight(0), getImageStackChannels(0));
+            uint32_t w=getImageStackWidth(0);
+            uint32_t h=getImageStackHeight(0);
+            uint32_t f=getImageStackFrames(0);
+            uint32_t ch=getImageStackChannels(0);
+            if (exp->open(filename)){
+                for (uint32_t i=0; i<f; i++) {
+                    QVector<double> d(w*h*ch);
+                    for (uint32_t c=0; c<ch; c++) {
+                        double* dat=getImageStack(0, i, c);
+                        for (uint32_t j=0; j<w*h; j++) {
+                            d[c*w*h+j]=dat[j];
+                        }
+                    }
+                    exp->writeFrameDouble(d.data());
+                }
+            }
+            exp->close();
+            delete exp;
+        }
     }
+}
+
+QStringList QFRDRImageStackData::getExportFiletypes() const
+{
+    return getImageWriterIDList(QFPluginServices::getInstance());
+}
+
+QString QFRDRImageStackData::getExportDialogFiletypes() const
+{
+    return getImageWriterFilterList(QFPluginServices::getInstance()).join(";;");
 }
 
 bool QFRDRImageStackData::showNextPreviousOfSameRoleButton() const

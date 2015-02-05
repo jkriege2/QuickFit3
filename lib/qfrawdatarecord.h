@@ -1324,11 +1324,11 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
 
 
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportDialogFiletypes() */
-        virtual QStringList getExportFiletypes();
+        virtual QStringList getExportFiletypes() const;
         /** \brief returns the title of the Export file dialog */
-        virtual QString getExportDialogTitle();
+        virtual QString getExportDialogTitle() const;
         /** \brief returns the filetype of the Export file dialog */
-        virtual QString getExportDialogFiletypes();
+        virtual QString getExportDialogFiletypes() const;
         /** \brief export the raw data into the specified format */
         virtual void exportData(const QString& format, const QString& filename)const ;
 

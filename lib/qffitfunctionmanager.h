@@ -100,8 +100,6 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
         QString getPluginCopyrightFile(int ID) const;
         /** \brief returns a fit algorthms \a faID main help file (html) for a specified plugin \a ID. */
         QString getPluginHelp(int ID, QString faID) const;
-        /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory, QFPluginHelpData& helpdata);
 
         /** \brief return a list of the models which start with the specified string
          *         all instance are newly created with the given parent in every call!
@@ -153,6 +151,8 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
 
         void deinit();
         void init();
+        bool registerPlugin(const QString &filename_in, QObject *plugin, QFPluginHelpData &helpdata);
+        void finalizePluginSearch();
     public slots:
         void reloadUserFitFunctions();
 

@@ -73,14 +73,14 @@ class QFRDRPhotonCountsData : public QFRawDataRecord, public QFRDRPhotonCountsIn
         /** \brief export the raw data into the specified format */
         virtual void exportData(const QString& format, const QString& filename)const ;
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportFiletypes() */
-        QStringList getExportFiletypes() {
+        QStringList getExportFiletypes()  const{
             QStringList sl;
             return sl;
         };
         /** \brief returns the title of the Export file dialog */
-        QString getExportDialogTitle() { return tr(""); }
+        QString getExportDialogTitle() const { return tr(""); }
         /** \brief returns the filetype of the Export file dialog */
-        QString getExportDialogFiletypes() { return tr(""); }
+        QString getExportDialogFiletypes() const { return tr(""); }
 
         /** \brief name for a channel */
         virtual QString getPhotonCountsChannelName(int channel);

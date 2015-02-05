@@ -88,8 +88,6 @@ class QFLIB_EXPORT QFImporterManager : public QObject {
         QString getPluginCopyrightFile(int ID);
         /** \brief returns a fit algorthms \a faID main help file (html) for a specified plugin \a ID. */
         QString getPluginHelp(int ID, QString faID);
-        /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory, QFPluginHelpData& helpdata);
 
         QFImporter* createImporter(const QString& id) const;
 
@@ -148,6 +146,11 @@ class QFLIB_EXPORT QFImporterManager : public QObject {
 
         void deinit();
         void init();
+
+        void finalizePluginSearch();
+
+        bool registerPlugin(const QString &filename_in, QObject *plugin, QFPluginHelpData &helpdata);
+
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

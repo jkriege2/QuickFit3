@@ -126,6 +126,10 @@ SUBDIRS += plg_basicimageimporters
 plg_basicimageimporters.subdir=./plugins/basicimageimporters
 plg_basicimageimporters.depends = lib
 
+SUBDIRS += plg_basicimageexporters
+plg_basicimageexporters.subdir=./plugins/basicimageexporters
+plg_basicimageexporters.depends = lib
+
 SUBDIRS += plg_picoquantimporters
 plg_picoquantimporters.subdir=./plugins/picoquantimporters
 plg_picoquantimporters.depends = lib

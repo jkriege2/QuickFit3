@@ -175,9 +175,11 @@ fi
 
 zlib_CFLAGS=
 zlib_LDFLAGS="-lz"
+zlib_CONFIG=
 if [ -e ${CURRENTDIR}/zlib/lib/libz.a ] ; then
 	zlib_CFLAGS="-I${CURRENTDIR}/zlib/include"
 	zlib_LDFLAGS="-L${CURRENTDIR}/zlib/lib -lz"
+	zlib_CONFIG="--with-zlib-include-dir=${CURRENTDIR}/zlib/include  --with-zlib-lib-dir=${CURRENTDIR}/zlib/lib"
 fi
 echo -e "\n\n\n USING THESE zlib compiler commands:\nCFLAGS="
 echo $zlib_CFLAGS
@@ -234,7 +236,8 @@ lzmaOK=-1
 
 
 lzma_CFLAGS=
-lzma_LDFLAGS="-llzma"
+#lzma_LDFLAGS="-llzma"
+lzma_LDFLAGS=
 if [ -e ${CURRENTDIR}/lzma/lib/liblzma.a ] ; then
 	lzma_CFLAGS="-I${CURRENTDIR}/lzma/include"
 	lzma_LDFLAGS="-L${CURRENTDIR}/lzma/lib -llzma"
@@ -531,6 +534,11 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 
 fi
 
+LIBJPEG_CONFIGFLAGS=
+if [ -e ${CURRENTDIR}/libjpeg/lib/libjpeg.a ] ; then
+	LIBJPEG_CONFIGFLAGS="--with-jpeg-include-dir=${CURRENTDIR}/libjpeg/include --with-jpeg-lib-dir=${CURRENTDIR}/libjpeg/lib"
+fi
+
 
 libtiffOK=-1
 read -p "Do you want to build 'libtiff' (y/n)? " -n 1 INSTALL_ANSWER
@@ -544,19 +552,12 @@ if [ $INSTALL_ANSWER == "y" ] ; then
 	mkdir build
 	tar xvf tiff-4.0.3.tar.gz -C ./build/
 	cd build/tiff-4.0.3
-	if [ -e ../../../zlib/lib/libz.a ] ; then
-	    if [ -e ../../../libjpeg/lib/libjpeg.a ] ; then
-			./configure --enable-static --disable-shared  --enable-jpeg --enable-old-jpeg --disable-jbig --with-zlib-include-dir=${CURRENTDIR}/zlib/include --with-zlib-lib-dir=${CURRENTDIR}/zlib/lib  --with-lzma-include-dir=${CURRENTDIR}/lzma/include --with-lzma-lib-dir=${CURRENTDIR}/lzma/lib  --with-jpeg-include-dir=${CURRENTDIR}/libjpeg/include --with-jpeg-lib-dir=${CURRENTDIR}/libjpeg/lib --prefix=${CURRENTDIR}/libtiff
-		else
-			./configure --enable-static --disable-shared  --disable-jpeg --disable-old-jpeg --disable-jbig --with-lzma-include-dir=${CURRENTDIR}/lzma/include --with-lzma-lib-dir=${CURRENTDIR}/lzma/lib --with-zlib-include-dir=${CURRENTDIR}/zlib/include --with-zlib-lib-dir=${CURRENTDIR}/zlib/lib --prefix=${CURRENTDIR}/libtiff
-		fi
+	if [ -e ${CURRENTDIR}/libjpeg/lib/libjpeg.a ] ; then
+		./configure --enable-static --disable-shared  --enable-jpeg --enable-old-jpeg --disable-jbig ${zlib_CONFIG}  ${LIBJPEG_CONFIGFLAGS} --prefix=${CURRENTDIR}/libtiff
 	else
-	    if [ -e ../../../libjpeg/lib/libjpeg.a ] ; then
-			./configure --enable-static --disable-shared  --enable-jpeg --enable-old-jpeg --disable-jbig --with-lzma-include-dir=${CURRENTDIR}/lzma/include --with-lzma-lib-dir=${CURRENTDIR}/lzma/lib --with-jpeg-include-dir=${CURRENTDIR}/libjpeg/include --with-jpeg-lib-dir=${CURRENTDIR}/libjpeg/lib --prefix=${CURRENTDIR}/libtiff
-		else
-			./configure --enable-static --disable-shared  --disable-jpeg --disable-old-jpeg --disable-jbig --with-lzma-include-dir=${CURRENTDIR}/lzma/include --with-lzma-lib-dir=${CURRENTDIR}/lzma/lib --prefix=${CURRENTDIR}/libtiff
-		fi
+		./configure --enable-static --disable-shared  --disable-jbig ${zlib_CONFIG}  ${LIBJPEG_CONFIGFLAGS} --prefix=${CURRENTDIR}/libtiff
 	fi
+	
 	libOK=$?
 	if [ $libOK -eq 0 ] ; then
 		make 
@@ -1002,7 +1003,7 @@ echo -e  "\n--------------------------------------------------------------------
 
 print_result "Qt DLLs copy" $qtOK
 print_result "zlib" $zlibOK
-print_result "lzma" $lzmaOK
+#print_result "lzma" $lzmaOK
 print_result "lmfit" $lmfitOK
 print_result "lmfit v5" $lmfit5OK
 print_result "levmar" $levmarOK

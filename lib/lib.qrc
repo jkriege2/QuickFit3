@@ -75,6 +75,7 @@
         <file alias="printreport.png">icons/fcs_printreport.png</file>
         <file alias="savereport.png">icons/fcs_savereport.png</file>
         <file alias="importer_icon.png">icons/importer_icon.png</file>
+        <file alias="exporter_icon.png">icons/exporter_icon.png</file>
         <file alias="copy16valerr.png">icons/copy16valerr.png</file>
         <file alias="copy16valerr_nohead.png">icons/copy16valerr_nohead.png</file>
         <file alias="copy16.png">icons/copy16.png</file>

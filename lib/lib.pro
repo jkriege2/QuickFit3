@@ -168,7 +168,11 @@ HEADERS += dlgnewproperty.h \
     qconfigcomboboxwidget.h \
     qftablemodel.h \
     qfevalpropertycopyparsertabledlg.h \
-    qffitfunctionnd.h
+    qffitfunctionnd.h \
+    qfexporter.h \
+    qfexporterimageseries.h \
+    qfexportermanager.h \
+    qfpluginexporters.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -272,7 +276,9 @@ SOURCES += dlgnewproperty.cpp \
     qconfigcomboboxwidget.cpp \
     qftablemodel.cpp \
     qfevalpropertycopyparsertabledlg.cpp \
-    qffitfunctionnd.cpp
+    qffitfunctionnd.cpp \
+    qfexporterimageseries.cpp \
+    qfexportermanager.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \

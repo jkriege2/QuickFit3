@@ -36,6 +36,7 @@ class ProgramOptions;
 class QFPlugin;
 class QFPluginOptionsDialogInterface;
 class QFImporterManager;
+class QFExporterManager;
 class QFEvaluationItem;
 class QFEvaluationPropertyEditor;
 class QFRawDataRecord;
@@ -170,6 +171,8 @@ class QFLIB_EXPORT QFPluginServices {
         virtual QFExtensionManager* getExtensionManager() const=0;
         /** \brief returns a QFImporterManager object that allows access to all currently loaded QFImporter s */
         virtual QFImporterManager* getImporterManager() const=0;
+        /** \brief returns a QFExporterManager object that allows access to all currently loaded QFExporter s */
+        virtual QFExporterManager* getExporterManager() const=0;
         /** \brief returns the QFEvaluationItemFactory of the current QF3 instance */
         virtual QFEvaluationItemFactory* getEvaluationItemFactory() const=0;
         /** \brief returns the QFRawDataRecordFactory of the current QF3 instance */
@@ -253,6 +256,9 @@ class QFLIB_EXPORT QFPluginServices {
 
         /** \brief return the help file for the given ft function ID */
         virtual QString getImporterHelp(const QString& pluginID)=0;
+
+        /** \brief return the help file for the given ft function ID */
+        virtual QString getExporterHelp(const QString& pluginID)=0;
 
 
         /** \brief return the tutorial for the given plugin ID */

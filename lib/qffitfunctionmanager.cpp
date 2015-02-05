@@ -163,67 +163,64 @@ void QFFitFunctionManager::freeLibraryFitFunctions(bool emitSignals)
     if (emitSignals) emit fitFunctionsChanged();
 }
 
-void QFFitFunctionManager::searchPlugins(QString directory, QFPluginHelpData &helpdata) {
-    QDir pluginsDir = QDir(directory);
-    foreach (QString fileName, qfDirListFilesRecursive(pluginsDir)) {//pluginsDir.entryList(QDir::Files)) {
-        QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
-        QObject *plugin = loader.instance();
+bool QFFitFunctionManager::registerPlugin(const QString& filename_in, QObject *plugin, QFPluginHelpData &helpdata)
+{
+    QString fileName=QFileInfo(filename_in).fileName();
+    QFPluginFitFunction* iRecord = qobject_cast<QFPluginFitFunction*>(plugin);
+    if (iRecord) {
+        int pmajor, pminor;
+        iRecord->getQFLibVersion(pmajor, pminor);
         if (QApplication::arguments().contains("--verboseplugin")) {
-            QFPluginServices::getInstance()->log_global_text("fit function plugin manager:\n  trying "+fileName+"\n");
-            if (!plugin) QFPluginServices::getInstance()->log_global_text("    error: "+loader.errorString()+"\n");
+            QFPluginLogTools::log_global_text("    QFPluginFitFunction OK\n");
+            QFPluginLogTools::log_global_text(tr("    plugin built agains QFLib v%1.%2, this QFLib %3.%4\n").arg(pmajor).arg(pminor).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR));
         }
-        if (plugin) {
-            if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
-            QFPluginFitFunction* iRecord = qobject_cast<QFPluginFitFunction*>(plugin);
-            if (iRecord) {
-                int pmajor, pminor;
-                iRecord->getQFLibVersion(pmajor, pminor);
-                if (QApplication::arguments().contains("--verboseplugin")) {
-                    QFPluginLogTools::log_global_text("    QFPluginFitFunction OK\n");
-                    QFPluginLogTools::log_global_text(tr("    plugin built agains QFLib v%1.%2, this QFLib %3.%4\n").arg(pmajor).arg(pminor).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR));
-                }
-                fitPlugins.append(iRecord);
-                fitPluginObjects.append(plugin);
-                filenames.append(pluginsDir.absoluteFilePath(fileName));
-                emit showMessage(tr("loaded fit function plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
-                emit showLongMessage(tr("loaded fit function plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(pluginsDir.absoluteFilePath(fileName)).arg(iRecord->getName()).arg(iRecord->getAuthor()).arg(iRecord->getCopyright()));
-                // , QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList
-                QFHelpDirectoryInfo info;
-                info.plugin=iRecord;
-                QString libbasename=QFileInfo(fileName).baseName();
-                if (fileName.contains(".so")) {
-                    if (libbasename.startsWith("lib")) libbasename=libbasename.right(libbasename.size()-3);
-                }
-                info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+libbasename+QString("/");
-                info.mainhelp=info.directory+iRecord->getID()+QString(".html");
-                info.tutorial=info.directory+QString("tutorial.html");
-                info.settings=info.directory+QString("settings.html");
-                info.faq=info.directory+QString("faq.html");
-                info.faq_parser=info.directory+QString("faq_parser.html");
-                if (!QFile::exists(info.mainhelp)) info.mainhelp="";
-                if (!QFile::exists(info.tutorial)) info.tutorial="";
-                if (!QFile::exists(info.settings)) info.settings="";
-                if (!QFile::exists(info.faq)) info.faq="";
-                if (!QFile::exists(info.faq_parser)) info.faq_parser="";
-                if (!info.faq.isEmpty()) parseFAQ(info.faq, iRecord->getID(), helpdata.faqs);
-                if (!info.faq_parser.isEmpty()) parseFAQ(info.faq_parser, QString("parser/")+iRecord->getID(), helpdata.faqs);
-                info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_fitfunc.html");
-                info.plugintypename=tr("Fit Function Plugins");
-                info.pluginDLLbasename=libbasename;
-                info.pluginDLLSuffix=QFileInfo(fileName).suffix();
-                helpdata.pluginHelpList.append(info);
+        fitPlugins.append(iRecord);
+        fitPluginObjects.append(plugin);
+        filenames.append(QFileInfo(filename_in).absoluteFilePath());
+        emit showMessage(tr("loaded fit function plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
+        emit showLongMessage(tr("loaded fit function plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(QFileInfo(filename_in).absoluteFilePath()).arg(iRecord->getName()).arg(iRecord->getAuthor()).arg(iRecord->getCopyright()));
+        // , QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList
+        QFHelpDirectoryInfo info;
+        info.plugin=iRecord;
+        QString libbasename=QFileInfo(fileName).baseName();
+        if (fileName.contains(".so")) {
+            if (libbasename.startsWith("lib")) libbasename=libbasename.right(libbasename.size()-3);
+        }
+        info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+libbasename+QString("/");
+        info.mainhelp=info.directory+iRecord->getID()+QString(".html");
+        info.tutorial=info.directory+QString("tutorial.html");
+        info.settings=info.directory+QString("settings.html");
+        info.faq=info.directory+QString("faq.html");
+        info.faq_parser=info.directory+QString("faq_parser.html");
+        if (!QFile::exists(info.mainhelp)) info.mainhelp="";
+        if (!QFile::exists(info.tutorial)) info.tutorial="";
+        if (!QFile::exists(info.settings)) info.settings="";
+        if (!QFile::exists(info.faq)) info.faq="";
+        if (!QFile::exists(info.faq_parser)) info.faq_parser="";
+        if (!info.faq.isEmpty()) parseFAQ(info.faq, iRecord->getID(), helpdata.faqs);
+        if (!info.faq_parser.isEmpty()) parseFAQ(info.faq_parser, QString("parser/")+iRecord->getID(), helpdata.faqs);
+        info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_fitfunc.html");
+        info.plugintypename=tr("Fit Function Plugins");
+        info.pluginDLLbasename=libbasename;
+        info.pluginDLLSuffix=QFileInfo(fileName).suffix();
+        helpdata.pluginHelpList.append(info);
 
-                parseTooltips(info.directory, helpdata.tooltips);
-                parseAutolinks(info.directory, helpdata.autolinks);
-                parseGlobalreplaces(info.directory);
-            }
-        }
+        parseTooltips(info.directory, helpdata.tooltips);
+        parseAutolinks(info.directory, helpdata.autolinks);
+        parseGlobalreplaces(info.directory);
+        return true;
     }
+    return false;
+}
 
+void QFFitFunctionManager::finalizePluginSearch()
+{
     reloadUserFitFunctions();
     reloadLibraryFitFunctions();
-
 }
+
+
+
 
 
 QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start, QObject* parent) const {

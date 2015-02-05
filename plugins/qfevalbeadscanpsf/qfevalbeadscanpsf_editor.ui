@@ -45,29 +45,6 @@
           <property name="bottomMargin">
            <number>2</number>
           </property>
-          <item row="0" column="5">
-           <spacer name="horizontalSpacer_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="0" column="6">
-           <widget class="QCheckBox" name="chkLogscale">
-            <property name="text">
-             <string>log-scale for images</string>
-            </property>
-           </widget>
-          </item>
           <item row="0" column="0">
            <widget class="QLabel" name="label_5">
             <property name="text">
@@ -88,11 +65,24 @@
             </property>
            </spacer>
           </item>
-          <item row="0" column="1">
-           <widget class="QComboBox" name="cmbBead"/>
-          </item>
           <item row="0" column="2">
            <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Fixed</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item row="0" column="5">
+           <spacer name="horizontalSpacer_4">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>
@@ -116,6 +106,38 @@
           </item>
           <item row="0" column="4">
            <widget class="QComboBox" name="cmbChannel"/>
+          </item>
+          <item row="0" column="6">
+           <widget class="QCheckBox" name="chkLogscale">
+            <property name="text">
+             <string>log-scale for images</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="1">
+           <widget class="QComboBox" name="cmbBead"/>
+          </item>
+          <item row="0" column="8">
+           <widget class="QPushButton" name="btnSaveROI">
+            <property name="text">
+             <string>Save ROI</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../lib/lib.qrc">
+              <normaloff>:/lib/save16.png</normaloff>:/lib/save16.png</iconset>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="9">
+           <widget class="QPushButton" name="btnSaveAllROI">
+            <property name="text">
+             <string>Save all ROIs</string>
+            </property>
+            <property name="icon">
+             <iconset resource="../../lib/lib.qrc">
+              <normaloff>:/lib/save16.png</normaloff>:/lib/save16.png</iconset>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
@@ -368,55 +390,6 @@
    </item>
    <item>
     <layout class="QGridLayout" name="gridLayout">
-     <item row="3" column="0" colspan="2">
-      <widget class="QGroupBox" name="grpFilterBeads">
-       <property name="title">
-        <string> filter beads for display </string>
-       </property>
-       <property name="checkable">
-        <bool>true</bool>
-       </property>
-       <property name="checked">
-        <bool>false</bool>
-       </property>
-       <layout class="QFormLayout" name="formLayout_2">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_16">
-          <property name="text">
-           <string>axial ratio min:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QDoubleSpinBox" name="spinAxRatioMin">
-          <property name="minimum">
-           <double>0.500000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>10000.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="label_17">
-          <property name="text">
-           <string>axial ratio max:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QDoubleSpinBox" name="spinAxRatioMax">
-          <property name="maximum">
-           <double>1000.000000000000000</double>
-          </property>
-          <property name="value">
-           <double>5.000000000000000</double>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
      <item row="0" column="0" colspan="2">
       <layout class="QFormLayout" name="formLayout">
        <property name="fieldGrowthPolicy">
@@ -585,6 +558,20 @@
          </property>
         </widget>
        </item>
+       <item row="8" column="1">
+        <widget class="QCheckBox" name="chkMedianFIlter">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_18">
+         <property name="text">
+          <string>median-filter image befor&lt;br&gt;bead search:</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </item>
      <item row="4" column="0" colspan="2">
@@ -600,18 +587,67 @@
        </property>
       </spacer>
      </item>
-     <item row="6" column="0" colspan="2">
+     <item row="7" column="0" colspan="2">
       <widget class="QPushButton" name="btnResetCurrent">
        <property name="text">
         <string>Reset &amp;Current</string>
        </property>
       </widget>
      </item>
-     <item row="7" column="0" colspan="2">
+     <item row="8" column="0" colspan="2">
       <widget class="Line" name="line_2">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>
+      </widget>
+     </item>
+     <item row="3" column="0" colspan="2">
+      <widget class="QGroupBox" name="grpFilterBeads">
+       <property name="title">
+        <string> filter beads for display </string>
+       </property>
+       <property name="checkable">
+        <bool>true</bool>
+       </property>
+       <property name="checked">
+        <bool>false</bool>
+       </property>
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label_16">
+          <property name="text">
+           <string>axial ratio min:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QDoubleSpinBox" name="spinAxRatioMin">
+          <property name="minimum">
+           <double>0.500000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>10000.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label_17">
+          <property name="text">
+           <string>axial ratio max:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QDoubleSpinBox" name="spinAxRatioMax">
+          <property name="maximum">
+           <double>1000.000000000000000</double>
+          </property>
+          <property name="value">
+           <double>5.000000000000000</double>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </widget>
      </item>
      <item row="2" column="0" colspan="2">
@@ -627,7 +663,7 @@
        </property>
       </spacer>
      </item>
-     <item row="8" column="0">
+     <item row="9" column="0">
       <widget class="QToolButton" name="btnPrintReport">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -647,24 +683,7 @@
        </property>
       </widget>
      </item>
-     <item row="5" column="0" colspan="2">
-      <widget class="QPushButton" name="btnEvaluateCurrent">
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>32</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>Evaluate &amp;Current</string>
-       </property>
-       <property name="icon">
-        <iconset resource="qfevalbeadscanpsf.qrc">
-         <normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_evaluate.png</normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_evaluate.png</iconset>
-       </property>
-      </widget>
-     </item>
-     <item row="8" column="1">
+     <item row="9" column="1">
       <widget class="QToolButton" name="btnSaveReport">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -681,6 +700,40 @@
        </property>
        <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextBesideIcon</enum>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QPushButton" name="btnEvaluateCurrent">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Evaluate &amp;Current</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfevalbeadscanpsf.qrc">
+         <normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_evaluate.png</normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_evaluate.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <widget class="QPushButton" name="btnEvaluateAll">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>32</height>
+        </size>
+       </property>
+       <property name="text">
+        <string>Evaluate &amp;All</string>
+       </property>
+       <property name="icon">
+        <iconset resource="qfevalbeadscanpsf.qrc">
+         <normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_evaluate.png</normaloff>:/eval_beadscanpsf/qfevalbeadscanpsf_evaluate.png</iconset>
        </property>
       </widget>
      </item>
@@ -709,7 +762,14 @@
   </customwidget>
  </customwidgets>
  <resources>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfevalbeadscanpsf.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
  <connections>
   <connection>

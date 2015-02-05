@@ -303,6 +303,13 @@ void binfileWriteDoubleArray(QFile& file, const double* data, uint32_t dataN) {
     }
 }
 
+void binfileWriteFloatArray(QFile& file, const float* data, uint32_t dataN) {
+    for (uint32_t i=0; i<dataN; i++)  {
+        const float w=qToLittleEndian(data[i]);
+        file.write((char*)(&w), sizeof(w));
+    }
+}
+
 void binfileWriteDoubleArrayMinus1(QFile& file, const double* data, uint32_t dataN) {
     for (uint32_t i=0; i<dataN; i++)  {
         const double w=qToLittleEndian(data[i]-1.0);

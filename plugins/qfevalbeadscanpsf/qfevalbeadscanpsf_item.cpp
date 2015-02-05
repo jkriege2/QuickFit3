@@ -77,7 +77,7 @@ QString QFEvalBeadScanPSFItem::getEvaluationResultID() {
 }
 
 
-void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY, double deltaZ, int ROIxy, int ROIz, int pixels_per_frame, double est_psf_width, double est_psf_height, double fitXY_Z_fraction, QProgressDialog* dlgEvaluationProgress) {
+void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY, double deltaZ, int ROIxy, int ROIz, int pixels_per_frame, double est_psf_width, double est_psf_height, double fitXY_Z_fraction, bool medianFilterBeforeFindBeads, QFListProgressDialog *dlgEvaluationProgress) {
     QApplication::processEvents();
     if (dlgEvaluationProgress&& dlgEvaluationProgress->wasCanceled()) return; // canceled by user ?
 
@@ -143,48 +143,54 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
     // FIND INITIAL BEAD POSITIONS
     updateCounter=0;
     if (dlgEvaluationProgress) {
-        dlgEvaluationProgress->setLabelText(tr("finding beads in 3D stack ... "));
-        dlgEvaluationProgress->setRange(ROIz/2, (size_z-ROIz/2)*2);
+        dlgEvaluationProgress->setMinorPrgressLabel(tr("finding beads in 3D stack ... "));
+        dlgEvaluationProgress->setMinorProgressRange(ROIz/2, (size_z-ROIz/2)*2);
+        dlgEvaluationProgress->addMessage(tr("evaluating stacke '%1'").arg(record->getName()));
+        dlgEvaluationProgress->addMessage(tr("   * searching for beads ..."));
     }
     for (int z=ROIz/2+2; z<size_z-ROIz/2-2; z=z+zsteps) {
-        if (dlgEvaluationProgress) dlgEvaluationProgress->setValue(z);
+        if (dlgEvaluationProgress) dlgEvaluationProgress->setMinorProgress(z);
         double* frame=data->getImageStack(stack, z, 0);
         // DETERMINE level for SEGMENTATION
         double level=statisticsQuantile(frame, width*height, 1.0-double(pixels_per_frame)/double(width*height));
         //qDebug()<<"step "<<z<<"  level="<<level;
-        const unsigned int lx=3;
-        const unsigned int ly=3;
+        const int lx=ceil(double(ROIxy)/2.0);
+        const int ly=lx;
 
-        double *median=new double[width*height];
-        double *locals=new double[(2*lx+1)*(2*ly+1)];
-        for (int y=0; y<height; y++) {
-            for (int x=0; x<width; x++) {
-                const int i=y*width+x;
-                unsigned int count=0;
-                for (int dy=0-ly;dy<ly; dy++) {
-                    for (int dx=0-lx; dx<lx; dx++) {
-                        const int nx=x+dx;
-                        const int ny=y+dy;
-                        const int ni=ny*width+nx;
-                        if((nx>=0)&&(nx<width)&&(ny>0)&&(ny<height)){
-                            locals[count]=frame[ni];
-                            count++;
+        double* frame2=frame;
+
+        if (medianFilterBeforeFindBeads) {
+            double *median=qfMallocT<double>(width*height);
+            double *locals=qfMallocT<double>((2*lx+1)*(2*ly+1));
+            for (int y=0; y<height; y++) {
+                for (int x=0; x<width; x++) {
+                    const int i=y*width+x;
+                    unsigned int count=0;
+                    for (int dy=0-ly;dy<ly; dy++) {
+                        for (int dx=0-lx; dx<lx; dx++) {
+                            const int nx=x+dx;
+                            const int ny=y+dy;
+                            const int ni=ny*width+nx;
+                            if((nx>=0)&&(nx<width)&&(ny>=0)&&(ny<height)){
+                                locals[count]=frame[ni];
+                                count++;
+                            }
                         }
                     }
+                    median[i]=statisticsMedian(locals,count);
                 }
-                median[i]=statisticsMedian(locals,count);
             }
-        }
-        delete [] locals;
-        double *frame2=new double[width*height];
-        for (int y=0; y<height; y++) {
-            for (int x=0; x<width; x++) {
-                const int i=y*width+x;
-                frame2[i]=frame[i]-median[i];
+            qfFree(locals);
+            frame2=qfMallocT<double>(width*height);
+            for (int y=0; y<height; y++) {
+                for (int x=0; x<width; x++) {
+                    const int i=y*width+x;
+                    frame2[i]=frame[i]/(0.1+median[i]);
+                }
             }
+            qfFree( median);
+            level=statisticsQuantile(frame2, width*height, 1.0-double(pixels_per_frame)/double(width*height));
         }
-        delete [] median;
-        double level2=statisticsQuantile(frame2, width*height, 1.0-double(pixels_per_frame)/double(width*height));
 
 
         // FIND INITIAL BEADS by SEGMENTATION with level
@@ -194,16 +200,16 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
             for (int x=0; x<width; x++) {
                 const int i=y*width+x;
                 if ((!useMask || !mask || !mask[i]) && x>ROIxy/2 && x<width-ROIxy/2 && y>ROIxy/2 && y<height-ROIxy/2) {
-                    if(frame2[i]>=level2){
+                    if(frame2[i]>=level){
                         pixs_x<<x;
                         pixs_y<<y;
                         ignored<<false;
-                        qDebug()<<"    possible: "<<x<<y<<", level="<<level2;
+                        //qDebug()<<"    possible: "<<x<<y<<", level="<<level;
                     }
                 }
             }
         }
-        delete [] frame2;
+        if (frame2!=frame && frame2) qfFree( frame2);
 
         // SETUP DISTANCE MATRIX OF INITIAL BEADS
         double* distance_matrix=qfCallocT<double>(pixs_x.size()*pixs_x.size());
@@ -287,7 +293,9 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
         qfFree(distance_matrix);
 
         if (updateCounter%5==0) {
-            if (dlgEvaluationProgress) dlgEvaluationProgress->setLabelText(tr("finding beads in 3D stack ... found %1").arg(initial_beads_x.size()));
+            if (dlgEvaluationProgress) {
+                dlgEvaluationProgress->setMinorPrgressLabel(tr("finding beads in 3D stack ... found %1").arg(initial_beads_x.size()));                
+            }
             QApplication::processEvents();
         }
         if (dlgEvaluationProgress&& dlgEvaluationProgress->wasCanceled()) break;
@@ -296,6 +304,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
     //qDebug()<<"beads: "<<initial_beads_x.size();
 
     if (!dlgEvaluationProgress || !dlgEvaluationProgress->wasCanceled()) {
+        if (dlgEvaluationProgress) dlgEvaluationProgress->addMessage(tr("   * found %1 beads.").arg(initial_beads_x.size()));
         // write back fit results to record!
         record->disableEmitResultsChanged();
         record->resultsSetNumber(evalID, "pixel_size", deltaXY);
@@ -312,15 +321,19 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
 
 
 
-        if (dlgEvaluationProgress) dlgEvaluationProgress->setRange(0, channels*initial_beads_x.size());
-        if (dlgEvaluationProgress) dlgEvaluationProgress->setLabelText(tr("evaluating beads ..."));
+        if (dlgEvaluationProgress) {
+            dlgEvaluationProgress->setMinorProgressRange(0, channels*initial_beads_x.size());
+            dlgEvaluationProgress->setMinorPrgressLabel(tr("evaluating %1 beads ...").arg(initial_beads_x.size()));
+        }
+        QApplication::processEvents();
         // EVALUATE BEADS IN STACK
         updateCounter=0;
         for (int c=0; c<channels; c++) {
             cimg_library::CImg<double> image(data->getImageStack(stack, 0, c), width, height, size_z, true);
+            if (dlgEvaluationProgress) dlgEvaluationProgress->addMessage(tr("   * evaluating beads in channel %1 ...").arg(c+1));
 
             for (int b=0; b<initial_beads_x.size(); b++) {
-                if (dlgEvaluationProgress) dlgEvaluationProgress->setValue(c*initial_beads_x.size()+b);
+                if (dlgEvaluationProgress) dlgEvaluationProgress->setMinorProgress(c*initial_beads_x.size()+b);
 
                 // CUT ROI AROUND PIXEL
                 cimg_library::CImg<double> roi=image.get_crop(initial_beads_x[b]-ROIxy/2, initial_beads_y[b]-ROIxy/2, initial_beads_z[b]-ROIz/2, initial_beads_x[b]+ROIxy/2, initial_beads_y[b]+ROIxy/2, initial_beads_z[b]+ROIz/2);
@@ -516,7 +529,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
 
 
                 if (updateCounter%1==0) {
-                    if (dlgEvaluationProgress) dlgEvaluationProgress->setLabelText(tr("evaluating beads ... (c=%1, b=%2)").arg(c).arg(b));
+                    if (dlgEvaluationProgress) dlgEvaluationProgress->setMinorPrgressLabel(tr("evaluating beads ... (channel: %1/%4, bead: %2/%3)").arg(c+1).arg(b+1).arg(initial_beads_x.size()+1).arg(channels));
                     QApplication::processEvents();
                 }
                 if (dlgEvaluationProgress&& dlgEvaluationProgress->wasCanceled()) break;
@@ -577,6 +590,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
             record->enableEmitResultsChanged();
 
         }
+        if (dlgEvaluationProgress) dlgEvaluationProgress->addMessage(tr("   * evaluation finished!"));
     }
 
     

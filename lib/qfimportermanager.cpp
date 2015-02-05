@@ -28,58 +28,51 @@ QFImporterManager::QFImporterManager(ProgramOptions* options, QObject *parent) :
     m_options=options;
 }
 
-
-void QFImporterManager::searchPlugins(QString directory, QFPluginHelpData &helpdata) {
-    QDir pluginsDir = QDir(directory);
-    foreach (QString fileName, qfDirListFilesRecursive(pluginsDir)) {//pluginsDir.entryList(QDir::Files)) {
-        QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
-        QObject *plugin = loader.instance();
-        if (QApplication::arguments().contains("--verboseplugin")) {
-            QFPluginServices::getInstance()->log_global_text("importer plugin manager:\n  trying "+fileName+"\n");
-            if (!plugin) QFPluginServices::getInstance()->log_global_text("    error: "+loader.errorString()+"\n");
+bool QFImporterManager::registerPlugin(const QString& filename_in, QObject *plugin, QFPluginHelpData &helpdata)
+{
+    QString fileName=QFileInfo(filename_in).fileName();
+    QFPluginImporters* iRecord = qobject_cast<QFPluginImporters*>(plugin);
+    if (iRecord) {
+        if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    QFPluginImporters OK\n");
+        plugins.append(iRecord);
+        filenames.append(QFileInfo(filename_in).absoluteFilePath());
+        emit showMessage(tr("loaded importer plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
+        emit showLongMessage(tr("loaded importern plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(QFileInfo(filename_in).absoluteFilePath()).arg(iRecord->getName()).arg(iRecord->getAuthor()).arg(iRecord->getCopyright()));
+        // , QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList
+        QFHelpDirectoryInfo info;
+        info.plugin=iRecord;
+        QString libbasename=QFileInfo(fileName).baseName();
+        if (fileName.contains(".so")) {
+            if (libbasename.startsWith("lib")) libbasename=libbasename.right(libbasename.size()-3);
         }
-        if (plugin) {
-            if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
-            QFPluginImporters* iRecord = qobject_cast<QFPluginImporters*>(plugin);
-            if (iRecord) {
-                if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    QFPluginImporters OK\n");
-                plugins.append(iRecord);
-                filenames.append(pluginsDir.absoluteFilePath(fileName));
-                emit showMessage(tr("loaded importer plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
-                emit showLongMessage(tr("loaded importern plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(pluginsDir.absoluteFilePath(fileName)).arg(iRecord->getName()).arg(iRecord->getAuthor()).arg(iRecord->getCopyright()));
-                // , QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList
-                QFHelpDirectoryInfo info;
-                info.plugin=iRecord;
-                QString libbasename=QFileInfo(fileName).baseName();
-                if (fileName.contains(".so")) {
-                    if (libbasename.startsWith("lib")) libbasename=libbasename.right(libbasename.size()-3);
-                }
-                info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+libbasename+QString("/");
-                info.mainhelp=info.directory+iRecord->getID()+QString(".html");
-                info.tutorial=info.directory+QString("tutorial.html");
-                info.settings=info.directory+QString("settings.html");
-                info.faq=info.directory+QString("faq.html");
-                info.faq_parser=info.directory+QString("faq_parser.html");
-                if (!QFile::exists(info.mainhelp)) info.mainhelp="";
-                if (!QFile::exists(info.tutorial)) info.tutorial="";
-                if (!QFile::exists(info.settings)) info.settings="";
-                if (!QFile::exists(info.faq)) info.faq="";
-                if (!QFile::exists(info.faq_parser)) info.faq_parser="";
-                if (!info.faq.isEmpty()) parseFAQ(info.faq, iRecord->getID(), helpdata.faqs);
-                if (!info.faq_parser.isEmpty()) parseFAQ(info.faq_parser, QString("parser/")+iRecord->getID(), helpdata.faqs);
-                info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_importer.html");
-                info.plugintypename=tr("Importer Plugins");
-                info.pluginDLLbasename=libbasename;
-                info.pluginDLLSuffix=QFileInfo(fileName).suffix();
-                helpdata.pluginHelpList.append(info);
+        info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+libbasename+QString("/");
+        info.mainhelp=info.directory+iRecord->getID()+QString(".html");
+        info.tutorial=info.directory+QString("tutorial.html");
+        info.settings=info.directory+QString("settings.html");
+        info.faq=info.directory+QString("faq.html");
+        info.faq_parser=info.directory+QString("faq_parser.html");
+        if (!QFile::exists(info.mainhelp)) info.mainhelp="";
+        if (!QFile::exists(info.tutorial)) info.tutorial="";
+        if (!QFile::exists(info.settings)) info.settings="";
+        if (!QFile::exists(info.faq)) info.faq="";
+        if (!QFile::exists(info.faq_parser)) info.faq_parser="";
+        if (!info.faq.isEmpty()) parseFAQ(info.faq, iRecord->getID(), helpdata.faqs);
+        if (!info.faq_parser.isEmpty()) parseFAQ(info.faq_parser, QString("parser/")+iRecord->getID(), helpdata.faqs);
+        info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_importer.html");
+        info.plugintypename=tr("Importer Plugins");
+        info.pluginDLLbasename=libbasename;
+        info.pluginDLLSuffix=QFileInfo(fileName).suffix();
+        helpdata.pluginHelpList.append(info);
 
-                parseTooltips(info.directory, helpdata.tooltips);
-                parseAutolinks(info.directory, helpdata.autolinks);
-                parseGlobalreplaces(info.directory);
-            }
-        }
+        parseTooltips(info.directory, helpdata.tooltips);
+        parseAutolinks(info.directory, helpdata.autolinks);
+        parseGlobalreplaces(info.directory);
+        return true;
     }
+    return false;
 }
+
+
 
 QFImporter *QFImporterManager::createImporter(const QString &id) const {
     for (int i=0; i<plugins.size(); i++) {
@@ -320,4 +313,9 @@ void QFImporterManager::init()
     for (int i=0; i<pluginCount(); i++) {
         if (plugins.value(i, NULL)) plugins.value(i, NULL)->init();
     }
+}
+
+void QFImporterManager::finalizePluginSearch()
+{
+
 }

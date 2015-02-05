@@ -1294,15 +1294,15 @@ QFRawDataEditor* QFRawDataRecord::createEditor(QFPluginServices* services,  QFRa
     return NULL;
 }
 
-QStringList QFRawDataRecord::getExportFiletypes() {
+QStringList QFRawDataRecord::getExportFiletypes() const {
     return QStringList();
 }
 
-QString QFRawDataRecord::getExportDialogTitle() {
+QString QFRawDataRecord::getExportDialogTitle() const {
     return QString("");
 }
 
-QString QFRawDataRecord::getExportDialogFiletypes() {
+QString QFRawDataRecord::getExportDialogFiletypes() const {
     return QString("");
 }
 

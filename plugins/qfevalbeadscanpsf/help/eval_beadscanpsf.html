@@ -74,9 +74,12 @@ the optical properties of the microscope too much!</li>
 			    <li><b>w<sub>x</sub>(z)/w<sub>x</sub>(z)-fit z-range fraction:</b>: fraction of the points on the z-axis, which are used for the w<sub>x</sub>(z)/w<sub>x</sub>(z)-fits.</li>
                 <li><b>est. PSF width (1/e halfwidth):</b>: estimates 1/e2-width of the PSF in nanometers (e.g. $(\lambda/\mbox{NA})$)</li>
                 <li><b>est. PSF height (1/e halfwidth):</b>: estimates 1/e2-height of the PSF in nanometers (e.g. $(2\cdot\lambda/\mbox{NA}^2)$)</li>
+				<li><b>use median filter</b>: If this is activated, each frame will be offset-corrected with a median filter, before searching for beads. This allows to find beads, even if there is a global intensity gradient present in the images.</li>
             </ul></li>
             <li>Click on <b>Fit Current</b> to run the evaluation (described above). After the evaluation has finished, you can look at the different results in the tabs on the left.</li>
-            <li></li>
+            <li>In the <b>filter beads for display</b> group, you can filter out beads based on several properties. $$note:This is done fo display only!$$. A typical filter is to limit the range of the axial ratio to 1..3, if you expect an axial ration of 2 for your microscope. This way you can get rid of beads, where two beads were present in the image and the 3D-fit tried to cover both by the Gaussian (which often results in enlarged Gaussian functions/axial rations). With the checkbox in the group-header, you can switch this feature on and off.</li>
+			<li><b>Save Current ROI</b> will save the current ROI as an image stack (e.g. in TIFF format)</li>
+			<li><b>Save All ROIs</b> will save all ROIs in the current file as image stacks (e.g. in TIFF format). This function will add the channel and bead number to the filename.</li>
           </ol>
         </p>
   </body>

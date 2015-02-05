@@ -46,6 +46,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "dlgwelcomescreen.h"
 #include "qfhelpaction.h"
 #include "dlgeditgroupandrole.h"
+#include "qfexporterimageseries.h"
 
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
@@ -153,6 +154,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     fitAlgorithmManager=new QFFitAlgorithmManager(settings, QApplication::instance());
     extensionManager=new QFExtensionManager(settings, QApplication::instance());
     importerManager=new QFImporterManager(settings, QApplication::instance());
+    exporterManager=new QFExporterManager(settings, QApplication::instance());
 
     //settings=NULL;
     project=NULL;
@@ -177,6 +179,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     connect(fitAlgorithmManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
     connect(fitFunctionManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
     connect(extensionManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
+    connect(exporterManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
     connect(importerManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
 
     connect(rawDataFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
@@ -185,6 +188,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     connect(fitAlgorithmManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(extensionManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(importerManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
+    connect(exporterManager, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
 
     connect(timerAutosave, SIGNAL(timeout()), this, SLOT(autosaveProject()));
 
@@ -214,7 +218,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     searchAndRegisterPlugins();
     logFileMainWidget->dec_indent();
 
-    splash->showMessage(tr("%1 Plugins loaded successfully ... prepring online-help ... ").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()+importerManager->pluginCount()));
+    splash->showMessage(tr("%1 Plugins loaded successfully ... prepring online-help ... ").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()+importerManager->pluginCount()+exporterManager->pluginCount()));
 
     logFileMainWidget->log_header(tr("preparing online-help ..."));
     logFileMainWidget->inc_indent();
@@ -366,12 +370,33 @@ void MainWindow::reloadCurrentProject()
 
 void MainWindow::searchAndRegisterPlugins() {
     // find plugins
-    rawDataFactory->searchPlugins(settings->getPluginDirectory(), helpdata);//&pluginHelpList, tooltips, faqs);
-    evaluationFactory->searchPlugins(settings->getPluginDirectory(), helpdata);//&pluginHelpList, tooltips, faqs);
-    fitFunctionManager->searchPlugins(settings->getPluginDirectory(), helpdata);//&pluginHelpList, tooltips, faqs);
-    fitAlgorithmManager->searchPlugins(settings->getPluginDirectory(), helpdata);//&pluginHelpList, tooltips, faqs);
-    importerManager->searchPlugins(settings->getPluginDirectory(), helpdata);//&pluginHelpList, tooltips, faqs);
-    extensionManager->searchPlugins(settings->getPluginDirectory(), helpdata);//&pluginHelpList, tooltips, faqs);
+
+    QDir pluginsDir = QDir(settings->getPluginDirectory());
+    foreach (QString fileName, qfDirListFilesRecursive(pluginsDir)) {//pluginsDir.entryList(QDir::Files)) {
+        QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
+        QObject *plugin = loader.instance();
+        if (QApplication::arguments().contains("--verboseplugin")) {
+            QFPluginServices::getInstance()->log_global_text("plugin manager:\n  trying "+fileName+"\n");
+            if (!plugin) QFPluginServices::getInstance()->log_global_text("    error: "+loader.errorString()+"\n");
+        }
+        if (plugin) {
+            if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
+            rawDataFactory->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+            evaluationFactory->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+            fitFunctionManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+            fitAlgorithmManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+            importerManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+            extensionManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+            exporterManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+        }
+    }
+    rawDataFactory->finalizePluginSearch();
+    evaluationFactory->finalizePluginSearch();
+    fitFunctionManager->finalizePluginSearch();
+    fitAlgorithmManager->finalizePluginSearch();
+    importerManager->finalizePluginSearch();
+    exporterManager->finalizePluginSearch();
+    extensionManager->finalizePluginSearch();
 
 
     // distribute application hooks
@@ -383,6 +408,7 @@ void MainWindow::searchAndRegisterPlugins() {
     evaluationFactory->init();
     rawDataFactory->init();
     importerManager->init();
+    exporterManager->init();
     fitFunctionManager->init();
     fitAlgorithmManager->init();
 
@@ -418,6 +444,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
         extensionManager->distribute(NULL);
         extensionManager->deinit();
         importerManager->deinit();
+        exporterManager->deinit();
         fitFunctionManager->deinit();
         fitAlgorithmManager->deinit();
 
@@ -767,6 +794,16 @@ QString MainWindow::createPluginDoc(bool docLinks) {
     }
     text+="</table></center>";
 
+    text+=tr("<br><br><h2><a href=\"$$mainhelpdir$$qf3_fitfunc.html\">Exporter Plugins</a>:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
+    // gather information about plugins
+    for (int i=0; i<exporterManager->pluginCount(); i++) {
+        int id=i;
+        QStringList additional;
+        additional<<tr("implemented ids:")<<exporterManager->getIDList(id).join(", ");
+        text+=createPluginDocItem(docLinks, exporterManager->getID(id), exporterManager->getName(id), exporterManager->getDescription(id), exporterManager->getIconFilename(id), exporterManager->getAuthor(id), exporterManager->getCopyright(id), exporterManager->getWeblink(id), exporterManager->getPluginFilename(id), exporterManager->getMajorVersion(id), exporterManager->getMinorVersion(id), additional);
+    }
+    text+="</table></center>";
+
     text+=tr("<br><br><h2><a href=\"$$mainhelpdir$$qf3_extension.html\">Extension Plugins</a>:</h2><center><table border=\"0\" bgcolor=\"darkgray\" width=\"90%\">");
     // gather information about plugins
     for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
@@ -893,6 +930,16 @@ QString MainWindow::createPluginDocCopyrights(QString mainitem_before, QString m
     }
     text+=mainitem_after;
 
+
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_exporter.html\">Exporters</a>"));
+    // gather information about plugins
+    for (int i=0; i<exporterManager->pluginCount(); i++) {
+        int id=i;
+        QString dir=exporterManager->getPluginCopyrightFile(id);
+        if (QFile::exists(dir)) text+=item_template.arg(exporterManager->getIconFilename(id)).arg(exporterManager->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
     text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_extension.html\">Extension</a>"));
     // gather information about plugins
     for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
@@ -1002,6 +1049,26 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
             if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
         }
         if (QFile::exists(dir)) text+=mainitem_template.arg(importerManager->getIconFilename(id)).arg(importerManager->getName(id)).arg(dir).arg(subTxt);
+    }
+    text+=mainitem_after;
+
+
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_exporter.html\">Exporters</a>"));
+    // gather information about plugins
+    for (int i=0; i<exporterManager->pluginCount(); i++) {
+        int id=i;
+        QString dir=exporterManager->getPluginTutorialMain(id);
+        QStringList names, links;
+        exporterManager->getPluginTutorials(id, names, links);
+        int subCnt=qMax(names.size(), links.size());
+        QString subTxt="";
+        if (subCnt>0) {
+            for (int i=0; i<subCnt; i++) {
+                if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(exporterManager->getName(id)))).arg(links.value(i, ""));
+            }
+            if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
+        }
+        if (QFile::exists(dir)) text+=mainitem_template.arg(exporterManager->getIconFilename(id)).arg(exporterManager->getName(id)).arg(dir).arg(subTxt);
     }
     text+=mainitem_after;
 
@@ -1201,6 +1268,32 @@ QList<QAction *> MainWindow::getPluginTutorials()
     }
 
 
+    for (int id=0; id<exporterManager->pluginCount(); id++) {
+        QString dir=exporterManager->getPluginTutorialMain(id);
+        QStringList names, links;
+        exporterManager->getPluginTutorials(id, names, links);
+        int subCnt=qMax(names.size(), links.size());
+        if (subCnt>0) {
+            if (QFile::exists(dir)) {
+                QFHelpAction* act=new QFHelpAction(this);
+                act->setHelp(dir);
+                act->setText(tr("Tutorial(s) for %1").arg(exporterManager->getName(id)));
+                act->setIcon(QIcon(exporterManager->getIconFilename(id)));
+                res.append(act);
+
+
+                for (int i=0; i<subCnt; i++) {
+                    if (!links.value(i, "").isEmpty()) {
+                        act=new QFHelpAction(this);
+                        act->setHelp(links.value(i, ""));
+                        act->setText(QString("    ")+names.value(i, tr("Tutorial for %1").arg(exporterManager->getName(id))));
+                        res.append(act);
+                    }
+                }
+            }
+        }
+    }
+
     return res;
 }
 
@@ -1247,6 +1340,16 @@ QString MainWindow::createPluginDocSettings(QString mainitem_before, QString mai
         int id=i;
         QString dir=importerManager->getPluginSettings(id);
         if (QFile::exists(dir)) text+=item_template.arg(importerManager->getIconFilename(id)).arg(importerManager->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
+
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_exporter.html\">Exporters</a>"));
+    // gather information about plugins
+    for (int i=0; i<exporterManager->pluginCount(); i++) {
+        int id=i;
+        QString dir=exporterManager->getPluginSettings(id);
+        if (QFile::exists(dir)) text+=item_template.arg(exporterManager->getIconFilename(id)).arg(exporterManager->getName(id)).arg(dir);
     }
     text+=mainitem_after;
 
@@ -1305,6 +1408,16 @@ QString MainWindow::createPluginDocHelp(QString mainitem_before, QString mainite
         int id=i;
         QString dir=importerManager->getPluginHelp(id);
         if (QFile::exists(dir)) text+=item_template.arg(importerManager->getIconFilename(id)).arg(importerManager->getName(id)).arg(dir);
+    }
+    text+=mainitem_after;
+
+
+    text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_exporter.html\">Exporters</a>"));
+    // gather information about plugins
+    for (int i=0; i<exporterManager->pluginCount(); i++) {
+        int id=i;
+        QString dir=exporterManager->getPluginHelp(id);
+        if (QFile::exists(dir)) text+=item_template.arg(exporterManager->getIconFilename(id)).arg(exporterManager->getName(id)).arg(dir);
     }
     text+=mainitem_after;
 
@@ -2964,6 +3077,7 @@ QString MainWindow::getPluginHelp(const QString& pluginID) {
     if (fitFunctionManager->contains(pluginID)) return fitFunctionManager->getPluginHelp( fitFunctionManager->getPluginForID(pluginID));
     if (fitAlgorithmManager->contains(pluginID)) return fitAlgorithmManager->getPluginHelp(fitAlgorithmManager->getPluginForID(pluginID));
     if (importerManager->contains(pluginID)) return importerManager->getPluginHelp(importerManager->getPluginForID(pluginID));
+    if (exporterManager->contains(pluginID)) return exporterManager->getPluginHelp(exporterManager->getPluginForID(pluginID));
     return "";
 }
 
@@ -3002,6 +3116,13 @@ QString MainWindow::getImporterHelp(const QString &pluginID) {
     return "";
 }
 
+QString MainWindow::getExporterHelp(const QString &pluginID)
+{
+    if (exporterManager->hasPluginForID(pluginID)) return exporterManager->getPluginHelp(exporterManager->getPluginForID(pluginID), pluginID);
+    return "";
+
+}
+
 QString MainWindow::getPluginTutorial(const QString& pluginID) {
     if (evaluationFactory->contains(pluginID)) return evaluationFactory->getPluginTutorialMain(pluginID);
     if (rawDataFactory->contains(pluginID)) return rawDataFactory->getPluginTutorialMain(pluginID);
@@ -3009,6 +3130,7 @@ QString MainWindow::getPluginTutorial(const QString& pluginID) {
     if (fitFunctionManager->contains(pluginID)) return fitFunctionManager->getPluginTutorialMain( fitFunctionManager->getPluginForID(pluginID));
     if (fitAlgorithmManager->contains(pluginID)) return fitAlgorithmManager->getPluginTutorialMain(fitAlgorithmManager->getPluginForID(pluginID));
     if (importerManager->contains(pluginID)) return importerManager->getPluginTutorialMain(importerManager->getPluginForID(pluginID));
+    if (exporterManager->contains(pluginID)) return exporterManager->getPluginTutorialMain(exporterManager->getPluginForID(pluginID));
     return "";
 }
 
@@ -3020,6 +3142,7 @@ QString MainWindow::getPluginFAQ(const QString &pluginID)
     if (fitFunctionManager->contains(pluginID)) return fitFunctionManager->getPluginFAQ( fitFunctionManager->getPluginForID(pluginID));
     if (fitAlgorithmManager->contains(pluginID)) return fitAlgorithmManager->getPluginFAQ(fitAlgorithmManager->getPluginForID(pluginID));
     if (importerManager->contains(pluginID)) return importerManager->getPluginFAQ(importerManager->getPluginForID(pluginID));
+    if (exporterManager->contains(pluginID)) return exporterManager->getPluginFAQ(exporterManager->getPluginForID(pluginID));
     return "";
 }
 
@@ -3031,6 +3154,7 @@ QString MainWindow::getPluginName(const QString &pluginID)
     if (fitFunctionManager->contains(pluginID)) return fitFunctionManager->getName(fitFunctionManager->getPluginForID(pluginID));
     if (fitAlgorithmManager->contains(pluginID)) return fitAlgorithmManager->getName(fitAlgorithmManager->getPluginForID(pluginID));
     if (importerManager->contains(pluginID)) return importerManager->getName(importerManager->getPluginForID(pluginID));
+    if (exporterManager->contains(pluginID)) return exporterManager->getName(exporterManager->getPluginForID(pluginID));
     return "";
 }
 
@@ -3041,6 +3165,7 @@ QString MainWindow::getPluginHelpSettings(const QString& pluginID) {
     if (fitFunctionManager->contains(pluginID)) return fitFunctionManager->getPluginSettings(fitFunctionManager->getPluginForID(pluginID));
     if (fitAlgorithmManager->contains(pluginID)) return fitFunctionManager->getPluginSettings(fitFunctionManager->getPluginForID(pluginID));
     if (importerManager->contains(pluginID)) return importerManager->getPluginSettings(importerManager->getPluginForID(pluginID));
+    if (exporterManager->contains(pluginID)) return exporterManager->getPluginSettings(exporterManager->getPluginForID(pluginID));
     return "";
 }
 
@@ -3217,6 +3342,9 @@ QFImporterManager *MainWindow::getImporterManager() const {
     return importerManager;
 }
 
+QFExporterManager *MainWindow::getExporterManager() const {
+    return exporterManager;
+}
 QFEvaluationItemFactory *MainWindow::getEvaluationItemFactory() const
 {
     return evaluationFactory;
@@ -4686,6 +4814,32 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
                         }
+                    } else if (list=="exporters") {
+                        QString text="";
+                        QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+                        QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
+                        // gather information about plugins
+                            QMap<QString, QFExporter*> models= QFPluginServices::getInstance()->getExporterManager()->createExporters<QFExporter*>(filter);
+                            QMapIterator<QString, QFExporter*> j(models);
+                            while (j.hasNext()) {
+                                j.next();
+                                int id=QFPluginServices::getInstance()->getExporterManager()->getPluginForID(j.key());
+                                QString dir=QFPluginServices::getInstance()->getExporterManager()->getPluginHelp(id);
+                                QString name=QFPluginServices::getInstance()->getExporterManager()->getName(id);
+                                QString icon=QFPluginServices::getInstance()->getExporterManager()->getIconFilename(id);
+                                QFExporter* a=j.value();
+                                if (a) {
+                                    name=a->formatName();
+                                    dir=dir=QFPluginServices::getInstance()->getExporterManager()->getPluginHelp(id, j.key());
+                                    delete a;
+                                    if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
+                                    else text+=item_template_nolink.arg(icon).arg(name);
+                                }
+                            }
+
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                        }
                     } else if (list=="imageseriesimporters") {
                         QString text="";
                         QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
@@ -4703,6 +4857,32 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                 if (a && dynamic_cast<QFImporterImageSeries*>(a)) {
                                     name=a->formatName();
                                     dir=dir=QFPluginServices::getInstance()->getImporterManager()->getPluginHelp(id, j.key());
+                                    delete a;
+                                    if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
+                                    else text+=item_template_nolink.arg(icon).arg(name);
+                                }
+                            }
+
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                        }
+                    } else if (list=="imageseriesexporters") {
+                        QString text="";
+                        QString item_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a></li>");
+                        QString item_template_nolink=QString("<li><img width=\"16\" height=\"16\" src=\"%1\">&nbsp;%2</li>");
+                        // gather information about plugins
+                            QMap<QString, QFExporter*> models= QFPluginServices::getInstance()->getExporterManager()->createExporters<QFExporter*>(filter);
+                            QMapIterator<QString, QFExporter*> j(models);
+                            while (j.hasNext()) {
+                                j.next();
+                                int id=QFPluginServices::getInstance()->getExporterManager()->getPluginForID(j.key());
+                                QString dir=QFPluginServices::getInstance()->getExporterManager()->getPluginHelp(id);
+                                QString name=QFPluginServices::getInstance()->getExporterManager()->getName(id);
+                                QString icon=QFPluginServices::getInstance()->getExporterManager()->getIconFilename(id);
+                                QFExporter* a=j.value();
+                                if (a && dynamic_cast<QFExporterImageSeries*>(a)) {
+                                    name=a->formatName();
+                                    dir=dir=QFPluginServices::getInstance()->getExporterManager()->getPluginHelp(id, j.key());
                                     delete a;
                                     if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
                                     else text+=item_template_nolink.arg(icon).arg(name);
@@ -5036,6 +5216,17 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     if (param1=="help") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getImporterHelp(param2));
                     else if (param1=="name" || param1=="short_name") {
                         QFImporter* f=QFPluginServices::getInstance()->getImporterManager()->createImporter(param2);
+                        QString name="";
+                        if (f) {
+                            name=f->formatName();
+                            delete f;
+                        }
+                        result=result.replace(rxPluginInfo.cap(0), name);
+                    }
+                } else if (QFPluginServices::getInstance() && command=="exporter") {
+                    if (param1=="help") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getImporterHelp(param2));
+                    else if (param1=="name" || param1=="short_name") {
+                        QFExporter* f=QFPluginServices::getInstance()->getExporterManager()->createExporter(param2);
                         QString name="";
                         if (f) {
                             name=f->formatName();

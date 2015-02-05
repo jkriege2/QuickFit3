@@ -33,6 +33,7 @@
             <li><b>qfe_plotterexportercairo</b>:  additional export filters to PDF/EPS/PS/SVG, using the cairo graphics library</li>
             <li><b>eval_cameracalibration</b>:  new evaluation plugin for camera gain calibration</li>
             <li><b>eval_beadscanpsf</b>:  new evaluation plugin for the evaluation of beadscans (z-stacks), determines the PSF</li>
+            <li><b>basicimageexporters</b>:  new plugin, which allows to store image series in different standard formats (TIFF, RAW, ...)</li>
       </ul></li>
       <li><b>QuickFit</b><ul>
         <li>plotter widgets:<ul>
@@ -163,6 +164,8 @@
             <li>QuickFit source code is compatible to Qt 5.x now!</li>
             <li>added libjpeg and updated cairo/pixman to newer versions</li>
             <li>added functions to libquickfcit, which allow to define 2D and 3D fit functions and to fit with these (implemented in QFFitAlgorithm)</li>
+            <li>improved startup speed by improved search for plugins</li>
+            <li>added possibility to write exporter plugins (QFExporter) and image series exporter plugins</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -370,6 +373,7 @@
             <li>added option to normalize data before plotting</li>
             <li>added copy/paste buttons for plot system settings</li>
             <li>bugfix: possible crash, when selecting incomplete axis label columns</li>
+            <li>image stacks may be exported from the RDR</li>
       </ul></li>
       <li><b>B040SPIM</b><ul>
             <li>added JavaScript functions to set preview acquisition camera parameters</li>

@@ -41,69 +41,59 @@ QFExtensionManager::~QFExtensionManager()
 }
 
 
-
-void QFExtensionManager::searchPlugins(QString directory, QFPluginHelpData &helpdata) {
-    QDir pluginsDir = QDir(directory);
-    foreach (QString fileName, qfDirListFilesRecursive(pluginsDir)) {//pluginsDir.entryList(QDir::Files)) {
-        QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
-        QObject *plugin = loader.instance();
+bool QFExtensionManager::registerPlugin(const QString& filename_in, QObject *plugin, QFPluginHelpData &helpdata)
+{
+    QString fileName=QFileInfo(filename_in).fileName();
+    QFExtension* iRecord = qobject_cast<QFExtension*>(plugin);
+    if (iRecord) {
+        int pmajor, pminor;
+        iRecord->getQFLibVersion(pmajor, pminor);
         if (QApplication::arguments().contains("--verboseplugin")) {
-            QFPluginServices::getInstance()->log_global_text("extension plugin manager:\n  trying "+fileName+"\n");
-            if (!plugin) QFPluginServices::getInstance()->log_global_text("    error: "+loader.errorString()+"\n");
+            QFPluginLogTools::log_global_text("    QFExtension OK\n");
+            QFPluginLogTools::log_global_text(tr("    plugin built agains QFLib v%1.%2, this QFLib %3.%4\n").arg(pmajor).arg(pminor).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR));
         }
-        if (plugin) {
-            if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
-            QFExtension* iRecord = qobject_cast<QFExtension*>(plugin);
-            if (iRecord) {
-                int pmajor, pminor;
-                iRecord->getQFLibVersion(pmajor, pminor);
-                if (QApplication::arguments().contains("--verboseplugin")) {
-                    QFPluginLogTools::log_global_text("    QFExtension OK\n");
-                    QFPluginLogTools::log_global_text(tr("    plugin built agains QFLib v%1.%2, this QFLib %3.%4\n").arg(pmajor).arg(pminor).arg(QF3LIB_APIVERSION_MAJOR).arg(QF3LIB_APIVERSION_MINOR));
-                }
-                items[iRecord->getID()]=iRecord;
-                itemobjects[iRecord->getID()]=plugin;
-                filenames[iRecord->getID()]=pluginsDir.absoluteFilePath(fileName);
-                emit showMessage(tr("loaded extension plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
-                emit showLongMessage(tr("loaded extension plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(filenames[iRecord->getID()]).arg(iRecord->getName()).arg(iRecord->getAuthor()).arg(iRecord->getCopyright()));
-                // , QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList
-                QFHelpDirectoryInfo info;
-                info.plugin=iRecord;
-                QString libbasename=QFileInfo(fileName).baseName();
-                if (fileName.contains(".so")) {
-                    if (libbasename.startsWith("lib")) libbasename=libbasename.right(libbasename.size()-3);
-                }
-                info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+libbasename+QString("/");
-                info.mainhelp=info.directory+iRecord->getID()+QString(".html");
-                info.tutorial=info.directory+QString("tutorial.html");
-                info.settings=info.directory+QString("settings.html");
-                info.faq=info.directory+QString("faq.html");
-                info.faq_parser=info.directory+QString("faq_parser.html");
-                if (!QFile::exists(info.mainhelp)) info.mainhelp="";
-                if (!QFile::exists(info.tutorial)) info.tutorial="";
-                if (!QFile::exists(info.settings)) info.settings="";
-                if (!QFile::exists(info.faq)) info.faq="";
-                if (!QFile::exists(info.faq_parser)) info.faq_parser="";
-                if (!info.faq.isEmpty()) parseFAQ(info.faq, iRecord->getID(), helpdata.faqs);
-                if (!info.faq_parser.isEmpty()) parseFAQ(info.faq_parser, QString("parser/")+iRecord->getID(), helpdata.faqs);
-                info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_extension.html");
-                info.plugintypename=tr("Extension Plugins");
-                info.pluginDLLbasename=libbasename;
-                info.pluginDLLSuffix=QFileInfo(fileName).suffix();
-                helpdata.pluginHelpList.append(info);
-
-                parseTooltips(info.directory, helpdata.tooltips);
-                parseAutolinks(info.directory, helpdata.autolinks);
-                parseGlobalreplaces(info.directory);
-
-
-                addExtensionPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalExtensionPlugins());
-                QFPluginServices::getInstance()->getEvaluationItemFactory()->addEvalPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalEvaluationPlugins());
-                QFPluginServices::getInstance()->getRawDataRecordFactory()->addRDRPlugins(pluginsDir.absoluteFilePath(fileName), iRecord->getAdditionalRDRPlugins());
-
-            }
+        items[iRecord->getID()]=iRecord;
+        itemobjects[iRecord->getID()]=plugin;
+        filenames[iRecord->getID()]=QFileInfo(filename_in).absoluteFilePath();
+        emit showMessage(tr("loaded extension plugin '%2' (%1) ...").arg(fileName).arg(iRecord->getName()));
+        emit showLongMessage(tr("loaded extension plugin '%2':\n   author: %3\n   copyright: %4\n   file: %1").arg(filenames[iRecord->getID()]).arg(iRecord->getName()).arg(iRecord->getAuthor()).arg(iRecord->getCopyright()));
+        // , QList<QFPluginServices::HelpDirectoryInfo>* pluginHelpList
+        QFHelpDirectoryInfo info;
+        info.plugin=iRecord;
+        QString libbasename=QFileInfo(fileName).baseName();
+        if (fileName.contains(".so")) {
+            if (libbasename.startsWith("lib")) libbasename=libbasename.right(libbasename.size()-3);
         }
+        info.directory=m_options->getAssetsDirectory()+QString("/plugins/help/")+libbasename+QString("/");
+        info.mainhelp=info.directory+iRecord->getID()+QString(".html");
+        info.tutorial=info.directory+QString("tutorial.html");
+        info.settings=info.directory+QString("settings.html");
+        info.faq=info.directory+QString("faq.html");
+        info.faq_parser=info.directory+QString("faq_parser.html");
+        if (!QFile::exists(info.mainhelp)) info.mainhelp="";
+        if (!QFile::exists(info.tutorial)) info.tutorial="";
+        if (!QFile::exists(info.settings)) info.settings="";
+        if (!QFile::exists(info.faq)) info.faq="";
+        if (!QFile::exists(info.faq_parser)) info.faq_parser="";
+        if (!info.faq.isEmpty()) parseFAQ(info.faq, iRecord->getID(), helpdata.faqs);
+        if (!info.faq_parser.isEmpty()) parseFAQ(info.faq_parser, QString("parser/")+iRecord->getID(), helpdata.faqs);
+        info.plugintypehelp=m_options->getAssetsDirectory()+QString("/help/qf3_extension.html");
+        info.plugintypename=tr("Extension Plugins");
+        info.pluginDLLbasename=libbasename;
+        info.pluginDLLSuffix=QFileInfo(fileName).suffix();
+        helpdata.pluginHelpList.append(info);
+
+        parseTooltips(info.directory, helpdata.tooltips);
+        parseAutolinks(info.directory, helpdata.autolinks);
+        parseGlobalreplaces(info.directory);
+
+
+        addExtensionPlugins(QFileInfo(filename_in).absoluteFilePath(), iRecord->getAdditionalExtensionPlugins());
+        QFPluginServices::getInstance()->getEvaluationItemFactory()->addEvalPlugins(QFileInfo(filename_in).absoluteFilePath(), iRecord->getAdditionalEvaluationPlugins());
+        QFPluginServices::getInstance()->getRawDataRecordFactory()->addRDRPlugins(QFileInfo(filename_in).absoluteFilePath(), iRecord->getAdditionalRDRPlugins());
+        return true;
     }
+    return false;
 }
 
 void QFExtensionManager::distribute(QFProject* project) {
@@ -329,6 +319,11 @@ QString QFExtensionManager::getPluginCopyrightFile(QString ID) {
         return m_options->getAssetsDirectory()+QString("/plugins/help/%1/copyright.html").arg(basename);
     }
     return "";
+}
+
+void QFExtensionManager::finalizePluginSearch()
+{
+
 }
 
 void QFExtensionManager::addExtensionPlugin(const QString &filename, QFExtension *record)

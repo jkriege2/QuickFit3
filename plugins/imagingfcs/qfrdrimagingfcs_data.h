@@ -91,11 +91,11 @@ class QFRDRImagingFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface
         /** \brief export the raw data into the specified format */
         virtual void exportData(const QString& format, const QString& filename)const ;
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportFiletypes() */
-        QStringList getExportFiletypes();
+        QStringList getExportFiletypes() const;
         /** \brief returns the title of the Export file dialog */
-        QString getExportDialogTitle();
+        QString getExportDialogTitle() const;
         /** \brief returns the filetype of the Export file dialog */
-        QString getExportDialogFiletypes();
+        QString getExportDialogFiletypes() const;
 
         /** \brief returns the number of segments contained in the correlation data */
         int getSegmentCount() const;

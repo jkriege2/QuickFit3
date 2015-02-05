@@ -80,8 +80,6 @@ class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
         /** \brief weblink for the plugin */
         virtual QString getWeblink(int i) const;
 
-        /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory, QFPluginHelpData& helpdata);
 
         /** \brief return the plugin index for a given fit function id */
         int getPluginForID(QString id) const;
@@ -114,6 +112,9 @@ class QFLIB_EXPORT QFFitAlgorithmManager : public QObject {
         QString getPluginHelp(int ID, QString faID);
 
 
+        void finalizePluginSearch();
+
+        bool registerPlugin(const QString &filename_in, QObject *plugin, QFPluginHelpData &helpdata);
 
         /** \brief create a new fit algorithm object instance
          *

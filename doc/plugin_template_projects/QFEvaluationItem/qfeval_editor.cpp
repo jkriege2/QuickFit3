@@ -181,9 +181,8 @@ void QFEVALEditor::evaluateCurrent() {
     if ((!eval)||(!record)/*||(!data)*/) return;
 
     
-    
-    dlgEvaluationProgress->setLabelText(tr("evaluate '%1' ...").arg(record->getName()));
-    
+    dlgEvaluationProgress->reset();
+    dlgEvaluationProgress->setLabelText(tr("evaluate '%1' ...").arg(record->getName()));    
     dlgEvaluationProgress->setRange(0,100);
     dlgEvaluationProgress->setValue(50);
     dlgEvaluationProgress->open();
@@ -212,6 +211,7 @@ void QFEVALEditor::evaluateAll() {
 
     // get a list of all raw data records this evaluation is applicable to
     QList<QPointer<QFRawDataRecord> > recs=eval->getApplicableRecords();
+	dlgEvaluationProgress->reset();
     dlgEvaluationProgress->setRange(0,recs.size());
     dlgEvaluationProgress->setValue(0);
     dlgEvaluationProgress->open();

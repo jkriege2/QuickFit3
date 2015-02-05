@@ -46,8 +46,6 @@ class QFLIB_EXPORT QFExtensionManager : public QObject {
         virtual ~QFExtensionManager();
 
 
-        /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory, QFPluginHelpData& helpdata);
 
         /** \brief distribute objects to plugins that allow interaction with the main application */
         void distribute(QFProject* project);
@@ -117,6 +115,9 @@ class QFLIB_EXPORT QFExtensionManager : public QObject {
             }
             return NULL;
         }
+        void finalizePluginSearch();
+
+        bool registerPlugin(const QString &filename_in, QObject *plugin, QFPluginHelpData &helpdata);
 
         /** \brief add a plugin from an external source */
         void addExtensionPlugin(const QString& filename, QFExtension* record );

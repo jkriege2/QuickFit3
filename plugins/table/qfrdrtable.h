@@ -637,7 +637,7 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         /** \brief export the raw data into the specified format */
         virtual void exportData(const QString& format, const QString& filename)const ;
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportFiletypes() */
-        QStringList getExportFiletypes() {
+        QStringList getExportFiletypes() const {
             QStringList sl;
             sl << "QFTABLEXML";
             QStringList f=QFDataExportHandler::getFormats();
@@ -646,9 +646,9 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
 
         }
         /** \brief returns the title of the Export file dialog */
-        QString getExportDialogTitle() { return tr("Export Data Table ..."); }
+        QString getExportDialogTitle() const { return tr("Export Data Table ..."); }
         /** \brief returns the filetype of the Export file dialog */
-        QString getExportDialogFiletypes() { return tr("Table XML file (*.qftxml)")+";;"+QFDataExportHandler::getFormats().join(";;"); }
+        QString getExportDialogFiletypes() const { return tr("Table XML file (*.qftxml)")+";;"+QFDataExportHandler::getFormats().join(";;"); }
 
         QVariant evaluateExpression(QFMathParser &mp, QFMathParser::qfmpNode *n, QModelIndex cell, bool *ok, const QString &expression, QString *error, bool columnMode=false);
         void readAxisInfo(AxisInfo &plot, const QString &axisName, QDomElement te);

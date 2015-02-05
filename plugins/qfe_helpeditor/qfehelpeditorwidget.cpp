@@ -347,6 +347,8 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     menu->addSeparator();
     addInsertAction(menu, "$$importer:help:PLUGINID$$");
     addInsertAction(menu, "$$importer:name:PLUGINID$$");
+    addInsertAction(menu, "$$exporter:help:PLUGINID$$");
+    addInsertAction(menu, "$$exporter:name:PLUGINID$$");
 
 
 
@@ -360,6 +362,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$list:fitalg:$$");
     addInsertAction(menu, "$$list:fitalg:STARTSWITH$$");
     addInsertAction(menu, "$$list:importers:STARTSWITH$$");
+    addInsertAction(menu, "$$list:exporters:STARTSWITH$$");
 
 
     menu=new QMenu(tr("help lists"), this);

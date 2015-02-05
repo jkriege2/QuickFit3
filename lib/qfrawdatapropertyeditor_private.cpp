@@ -1654,7 +1654,7 @@ void QFRawDataPropertyEditor_private::exportData()
         if (ids.size()>0 && filters.size()>0) {
             QString filter=filters[0];
             QString filename=qfGetSaveFileNameSet("rdr/export-data/", d, current->getExportDialogTitle(), QString(), filters.join(";;"), &filter);
-            current->exportData(ids.value(filters.indexOf(filter), ""), filename);
+            if (!filename.isEmpty()) current->exportData(ids.value(filters.indexOf(filter), ""), filename);
         }
     }
 }

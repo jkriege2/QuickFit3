@@ -39,7 +39,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrdrimagestackinterface.h"
 #include "qfimporter.h"
 #include "qfimporterimageseries.h"
+#include "qfexporterimageseries.h"
 #include "qfimportermanager.h"
+#include "qfexportermanager.h"
 #include "tools.h"
 #include "qfrdrimagemasktools.h"
 #include "imagetools.h"
@@ -84,15 +86,11 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
         /** \brief export the raw data into the specified format */
         virtual void exportData(const QString& format, const QString& filename)const ;
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportFiletypes() */
-        QStringList getExportFiletypes() {
-            QStringList sl;
-            //sl<<"TIFF";
-            return sl;
-        };
+        QStringList getExportFiletypes() const;
         /** \brief returns the title of the Export file dialog */
-        QString getExportDialogTitle() { return tr("export image stacks"); }
+        QString getExportDialogTitle() const { return tr("export image stacks"); }
         /** \brief returns the filetype of the Export file dialog */
-        QString getExportDialogFiletypes() { return tr("TIFF file [one file per channel,stack] (*.tif)"); }
+        QString getExportDialogFiletypes() const;
 
 
 
@@ -158,6 +156,12 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
         static QFImporterImageSeries *getImageReader(int idx, QFPluginServices *pluginservices) ;
         static int getImageReaderCount(QFPluginServices *pluginservices);
         static QStringList getImageReaderIDList(QFPluginServices *pluginservices);
+
+        static QStringList getImageWriterFilterList(QFPluginServices *pluginservices) ;
+        static QStringList getImageWriterFormatNameList(QFPluginServices *pluginservices) ;
+        static QFExporterImageSeries *getImageWriter(int idx, QFPluginServices *pluginservices) ;
+        static int getImageWriterCount(QFPluginServices *pluginservices);
+        static QStringList getImageWriterIDList(QFPluginServices *pluginservices);
 
         /*! \brief returns the property \a prop with an optionally added number \a stack
 

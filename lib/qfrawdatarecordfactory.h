@@ -126,6 +126,8 @@ class QFLIB_EXPORT QFRawDataRecordFactory : public QObject {
 
 
 
+        bool registerPlugin(const QString &filename_in, QObject *plugin, QFPluginHelpData &helpdata);
+
         /** \brief returns a new object (created by new) for a specified QFRawDataRecord ID. */
         QFRawDataRecord* createRecord(QString ID, QFProject* parent);
 
@@ -138,6 +140,7 @@ class QFLIB_EXPORT QFRawDataRecordFactory : public QObject {
         /** \brief add a plugin from an external source */
         void addRDRPlugins(const QString& filename, QList<QFPluginRawDataRecord*> records );
 
+        void finalizePluginSearch();
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

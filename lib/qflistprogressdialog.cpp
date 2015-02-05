@@ -29,6 +29,11 @@ void QFListProgressDialog::setMessage(const QString &message)
     QApplication::processEvents();
 }
 
+void QFListProgressDialog::setLabelText(const QString &message)
+{
+    setMessage(message);
+}
+
 void QFListProgressDialog::setMainMessage(const QString &message)
 {
     ui->labMain->setText(message);
@@ -53,12 +58,30 @@ void QFListProgressDialog::incProgress(int inc)
 
 void QFListProgressDialog::setMinorProgressEnabled(bool en)
 {
-    ui->minorProgress->setEnabled(en);
+    ui->minorProgress->setVisible(en);
+    ui->labMinor->setVisible(en);
 }
 
 void QFListProgressDialog::setMinorPrgressLabel(const QString &label)
 {
     ui->labMinor->setText(label);
+}
+
+void QFListProgressDialog::setMajorProgressEnabled(bool en)
+{
+    ui->progress->setVisible(en);
+    ui->labMain->setVisible(en);
+}
+
+void QFListProgressDialog::setMajorPrgressLabel(const QString &label)
+{
+    setLabelText(label);
+}
+
+void QFListProgressDialog::reset()
+{
+    close();
+    m_canceled=false;
 }
 
 void QFListProgressDialog::setUserClose(bool enabled)
@@ -87,6 +110,21 @@ bool QFListProgressDialog::wasMinorProgressCanceled() const
     return m_canceled;
 }
 
+void QFListProgressDialog::setMajorProgress(int value)
+{
+    setProgress(value);
+}
+
+void QFListProgressDialog::setMajorProgressRange(int min, int max)
+{
+    setRange(min, max);
+}
+
+bool QFListProgressDialog::wasMajorProgressCanceled() const
+{
+    return m_canceled;
+}
+
 void QFListProgressDialog::on_btnCancel_clicked()
 {
     this->m_canceled=true;
@@ -111,4 +149,9 @@ void QFListProgressDialog::setProgress(int value)
     ui->progress->setValue(value);
     QApplication::processEvents();
     QApplication::processEvents();
+}
+
+void QFListProgressDialog::setValue(int value)
+{
+    setProgress(value);
 }

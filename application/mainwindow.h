@@ -68,6 +68,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "jkqtpimagetools.h"
 #include "qftableservice.h"
 #include "qftableview.h"
+#include "qfexportermanager.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 void myMessageOutputQt5(QtMsgType type, const QMessageLogContext &context, const QString &msg);
@@ -184,6 +185,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         /** \copydoc QFPluginServices::getImporterManager() */
         virtual QFImporterManager* getImporterManager() const;
 
+        /** \copydoc QFPluginServices::getExporterManager() */
+        virtual QFExporterManager* getExporterManager() const;
+
         /** \copydoc QFPluginServices::getEvaluationItemFactory() */
         virtual QFEvaluationItemFactory* getEvaluationItemFactory() const;
         /** \copydoc QFPluginServices::getRawDataRecordFactory() */
@@ -222,6 +226,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
 
         /** \brief QFPluginServices::getImporterHelp() */
         virtual QString getImporterHelp(const QString& pluginID);
+
+        /** \brief QFPluginServices::getImporterHelp() */
+        virtual QString getExporterHelp(const QString& pluginID);
         /** \brief register a configuration pane for a plugin in the main options dialog */
         virtual void registerSettingsPane(QFPluginOptionsDialogInterface* plugin);
         /** \copydoc QFPluginServices::openEvaluationEditor() */
@@ -608,6 +615,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         QFExtensionManager* extensionManager;
         /** \brief QFImporter manager */
         QFImporterManager* importerManager;
+        /** \brief QFExporter manager */
+        QFExporterManager* exporterManager;
 
         QStringList mathParserRefDirs;
 

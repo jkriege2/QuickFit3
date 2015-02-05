@@ -1,0 +1,38 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>RAW image series exporter, 32-bit floats</title>
+	</head>
+	<body>
+		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		<p>This exporter saves an image series <tt>I(x, y, z)</tt> into a RAW file, which contains only the data as a 3-dimensional array in row-major order. Each entry is a 32-bit single-precision floating-point number, written in little-endian (PC standard) form. The channels are written separately for each frame:
+<pre>
+ // frame 0, channel 0
+ I(0,0,0,0), I(1,0,0,0), I(2,0,0,0), ..., I(width-1,0,0,0)
+ I(0,1,0,0), I(1,1,0,0), I(2,1,0,0), ..., I(width-1,1,0,0)
+ ......
+ I(0,height-1,0,0), I(1,height-1,0,0), I(2,height-1,0,0), ..., I(width-1,height-1,0,0)
+
+ // frame 0, channel 1
+ I(0,0,0,1), I(1,0,0,1), I(2,0,0,1), ..., I(width-1,0,0,1)
+ I(0,1,0,1), I(1,1,0,1), I(2,1,0,1), ..., I(width-1,1,0,1)
+ ......
+ I(0,height-1,0,1), I(1,height-1,0,1), I(2,height-1,0,1), ..., I(width-1,height-1,0,1)
+ ......
+ I(0,height-1,0,channels-1), I(1,height-1,0,channels-1), I(2,height-1,0,channels-1), ..., I(width-1,height-1,0,channels-1)
+ 
+ // frame 1, channel 0
+ I(0,0,1,0), I(1,0,1,0), I(2,0,1,0), ..., I(width-1,0,1,0)
+ I(0,1,1,0), I(1,1,1,0), I(2,1,1,0), ..., I(width-1,1,1,0)
+ ......
+ I(0,height-1,1,0), I(1,height-1,1,0), I(2,height-1,1,0), ..., I(width-1,height-1,1,0)
+ 
+ // frame 1, channel 1
+ ......
+ 
+ // last frame, last channel ...
+ I(0,height-1,depth-1,channels-1), I(1,height-1,depth-1,channels-1), I(2,height-1,depth-1,channels-1), ..., I(width-1,height-1,depth-1,channels-1) 
+</pre></p>
+	</body>
+</html>

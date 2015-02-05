@@ -65,10 +65,6 @@ class QFLIB_EXPORT QFEvaluationItemFactory : public QObject {
         /** Default destructor */
         virtual ~QFEvaluationItemFactory();
 
-
-        /** \brief search for raw data record plugins in the given directory */
-        void searchPlugins(QString directory, QFPluginHelpData& helpdata);
-
         /** \brief distribute objects to plugins that allow interaction with the main application */
         void distribute(QFProject* project, ProgramOptions* settings, QFPluginServices* services, QWidget* parent);
 
@@ -135,7 +131,9 @@ class QFLIB_EXPORT QFEvaluationItemFactory : public QObject {
         /** \brief add a plugin from an external source */
         void addEvalPlugins(const QString& filename, QList<QFPluginEvaluationItem*> records );
 
+        void finalizePluginSearch();
 
+        bool registerPlugin(const QString &filename_in, QObject *plugin, QFPluginHelpData &helpdata);
     signals:
         /** \brief short one-line message "loaded plugin XXX ...", emitted during searchPlugins() */
         void showMessage(const QString& message);

@@ -446,8 +446,7 @@ void QFEvalCameraCalibrationEditor::evaluateCurrent() {
 
     
     dlgEvaluationProgress->reset();
-    dlgEvaluationProgress->setLabelText(tr("evaluate ..."));
-    
+    dlgEvaluationProgress->setLabelText(tr("evaluate ..."));    
     dlgEvaluationProgress->setRange(0,100);
     dlgEvaluationProgress->setValue(50);
     dlgEvaluationProgress->open();    

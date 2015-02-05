@@ -160,16 +160,16 @@ QFRawDataEditor* QFRDRImagingFCSData::createEditor(QFPluginServices* services,  
 }
 
 
-QStringList QFRDRImagingFCSData::getExportFiletypes() {
+QStringList QFRDRImagingFCSData::getExportFiletypes() const {
     QStringList sl;
     return sl;
 }
 
-QString QFRDRImagingFCSData::getExportDialogTitle() {
+QString QFRDRImagingFCSData::getExportDialogTitle() const {
     return tr("");
 }
 
-QString QFRDRImagingFCSData::getExportDialogFiletypes() {
+QString QFRDRImagingFCSData::getExportDialogFiletypes() const {
     return tr("");
 }
 

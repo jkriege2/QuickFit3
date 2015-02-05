@@ -189,6 +189,11 @@ QFLIB_EXPORT void binfileWriteDouble(QFile& file, double data);
  */
 QFLIB_EXPORT void binfileWriteDoubleArray(QFile& file, const double* data, uint32_t dataN);
 
+/** \brief write an array of dataN floatss to a binary file
+ *  \ingroup qf3lib_mathtools
+ */
+QFLIB_EXPORT void binfileWriteFloatArray(QFile& file, const float* data, uint32_t dataN);
+
 /** \brief write an array of dataN doubles to a binary file and subtract 1.0 from every entry
  *  \ingroup qf3lib_mathtools
  */
