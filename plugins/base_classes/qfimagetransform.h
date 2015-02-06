@@ -49,7 +49,7 @@
 #include <QTextStream>
 #include <QDir>
 #include <QFileDialog>
-#include "CImg.h"
+#include "cimg.h"
 #include <QHBoxLayout>
 #include "qftools.h"
 #include <QToolButton>

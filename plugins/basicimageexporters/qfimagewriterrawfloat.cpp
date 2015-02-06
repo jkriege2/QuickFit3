@@ -70,6 +70,13 @@ bool QFImageWriterRAWFloat::intWriteFrameDouble(const double *data)
     return intWriteFrameFloat(d.data());
 }
 
+bool QFImageWriterRAWFloat::intWriteFrameUINT32(const uint32_t *data)
+{
+    QVector<float> d(width*height*channels);
+    for (int i=0; i<d.size(); i++) d[i]=data[i];
+    return intWriteFrameFloat(d.data());
+}
+
 bool QFImageWriterRAWFloat::intWriteFrameUINT16(const uint16_t *data)
 {
     QVector<float> d(width*height*channels);

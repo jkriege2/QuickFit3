@@ -1704,6 +1704,11 @@ void MainWindow::createActions() {
     tvMain->addAction(pastItemAct);
 
 
+    actExportRDR = new QAction(QIcon(":/lib/export_data.png"), tr("&Export Data from RDR"), this);
+    actExportRDR->setStatusTip(tr("export the raw data represented by the current RDR element"));
+    connect(actExportRDR, SIGNAL(triggered()), this, SLOT(exportRDR()));
+    tvMain->addAction(actExportRDR);
+
 
     actRDRReplace=new QAction(tr("find/replace in raw data record names/folders"), this);
     connect(actRDRReplace, SIGNAL(triggered()), this, SLOT(rdrReplace()));
@@ -1782,6 +1787,8 @@ void MainWindow::createMenus() {
     dataMenu->addAction(copyItemAct);
     dataMenu->addAction(cutItemAct);
     dataMenu->addAction(pastItemAct);
+    dataMenu->addSeparator();
+    dataMenu->addAction(actExportRDR);
 
 
     extensionMenu=menuBar()->addMenu(tr("&Extensions"));
@@ -2534,6 +2541,43 @@ void MainWindow::pasteItem()
     }
 }
 
+void MainWindow::exportRDR()
+{
+    if (project) {
+        QFProjectTreeModelNode::nodeType nt=project->getTreeModel()->classifyIndex(tvMain->selectionModel()->currentIndex());
+        if (nt==QFProjectTreeModelNode::qfpntRawDataRecord) {
+            QFRawDataRecord* rec=project->getTreeModel()->getRawDataByIndex(tvMain->selectionModel()->currentIndex());
+            if (rec) {
+                QStringList ids=rec->getExportFiletypes();
+                QStringList filters=rec->getExportDialogFiletypes().split(";;");
+                if (ids.size()>0 && filters.size()>0) {
+                    QString filter=filters[0];
+                    QString filename=qfGetSaveFileNameSet("rdr/export-data/", this, rec->getExportDialogTitle(), QString(), filters.join(";;"), &filter);
+                    if (!filename.isEmpty()) rec->exportData(ids.value(filters.indexOf(filter), ""), filename);
+                }
+            }
+        } else if (nt==QFProjectTreeModelNode::qfpntDirectory) {
+            QFProjectTreeModelNode* dir=project->getTreeModel()->getTreeNodeByIndex(tvMain->selectionModel()->currentIndex());
+            if (dir) {
+                QList<QFProjectTreeModelNode*> children=dir->getAllChildrenRDRandEval();
+                // build lists of the IDs to delete
+                for (int i=0; i<children.size(); i++) {
+                    if (children[i]->type()==QFProjectTreeModelNode::qfpntRawDataRecord && children[i]->rawDataRecord()){
+                        QFRawDataRecord* rec=children[i]->rawDataRecord();
+                        QStringList ids=rec->getExportFiletypes();
+                        QStringList filters=rec->getExportDialogFiletypes().split(";;");
+                        if (ids.size()>0 && filters.size()>0) {
+                            QString filter=filters[0];
+                            QString filename=qfGetSaveFileNameSet("rdr/export-data/", this, rec->getExportDialogTitle(), QString(), filters.join(";;"), &filter);
+                            if (!filename.isEmpty()) rec->exportData(ids.value(filters.indexOf(filter), ""), filename);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 void MainWindow::modelReset() {
     tvMain->expandToDepth(2);
 }
@@ -2857,6 +2901,7 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     delItemAct->setEnabled(projectModeEnabled);
     dupItemAct->setEnabled(projectModeEnabled);
     copyItemAct->setEnabled(projectModeEnabled);
+    actExportRDR->setEnabled(projectModeEnabled);
     cutItemAct->setEnabled(projectModeEnabled);
     pastItemAct->setEnabled(clipboardContainsProjectXML() && projectModeEnabled);
     recentMenu->setMenuEnabled(projectModeEnabled);

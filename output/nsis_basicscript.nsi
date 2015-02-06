@@ -206,7 +206,7 @@ SectionEnd
 
 
 # This installs the SPIM plugins
-Section "SPIM Plugins" sec_spim
+Section "Microscope Control Plugins (SPIM...)" sec_spim
 	Push $OUTDIR ; Store previous output directory
 	SetOutPath "$INSTDIR\" ; Set output directory
 	

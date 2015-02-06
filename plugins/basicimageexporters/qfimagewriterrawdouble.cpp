@@ -70,6 +70,13 @@ bool QFImageWriterRAWDouble::intWriteFrameDouble(const double *data)
     return true;
 }
 
+bool QFImageWriterRAWDouble::intWriteFrameUINT32(const uint32_t *data)
+{
+    QVector<double> d(width*height*channels);
+    for (int i=0; i<d.size(); i++) d[i]=data[i];
+    return intWriteFrameDouble(d.data());
+}
+
 bool QFImageWriterRAWDouble::intWriteFrameUINT16(const uint16_t *data)
 {
     QVector<double> d(width*height*channels);

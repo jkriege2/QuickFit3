@@ -289,7 +289,8 @@ FORMS +=   dlg_newproperty.ui \
     qflistprogressdialog.ui \
     qfevalpropertycopyparsertabledlg.ui
 
-RESOURCES += lib.qrc
+RESOURCES += \
+    lib.qrc
 
 TRANSLATIONS= ./translations/de.lib.ts
 

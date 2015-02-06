@@ -50,6 +50,9 @@ class QFImageWriterRAWDouble: public QFExporterImageSeries {
         /** \brief read a new frame into the given array of floating point numbers */
         virtual bool intWriteFrameDouble(const double* data);
         /** \brief read a new frame into the given array of integers */
+        virtual bool intWriteFrameUINT32(const uint32_t* image);
+
+        /** \brief read a new frame into the given array of integers */
         virtual bool intWriteFrameUINT16(const uint16_t* data);
         /** \brief read a new frame into the given array of integers */
         virtual bool intWriteFrameUINT8(const uint8_t* data);

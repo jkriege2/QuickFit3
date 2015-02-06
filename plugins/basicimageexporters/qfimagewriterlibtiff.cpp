@@ -27,6 +27,7 @@ Copyright (c) 2014
 #include <QtGlobal>
 #include <QDebug>
 #include "programoptions.h"
+#include "qfimagemetadatatool.h"
 
 FILE* QFImageWriterLibTIFF::fLibTIFFLog=NULL;
 QString QFImageWriterLibTIFF::fLibTIFFLogFilename=QString("");
@@ -134,7 +135,13 @@ bool QFImageWriterLibTIFF::intWriteFrameFloat(const float *image)
     TIFFSetField(tif,TIFFTAG_SAMPLEFORMAT,SAMPLEFORMAT_IEEEFP);
     TIFFSetField(tif,TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
 
-    if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
+    //if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
+
+    if (frames==1) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,qfimdtBuildImageJMetaData(0, deltaX, deltaY, deltaZ, unitname,comment).data());
+    TIFFSetField(tif,TIFFTAG_XRESOLUTION,1.0/deltaX);
+    TIFFSetField(tif,TIFFTAG_YRESOLUTION,1.0/deltaY);
+    TIFFSetField(tif,TIFFTAG_RESOLUTIONUNIT,RESUNIT_NONE);
+    TIFFSetField(tif,TIFFTAG_SOFTWARE,"www.dkfz.de.QuickFit3.Plugins.QFPBasicImageExporters");
 
     // write frame data
     // data is broken up into strips where each strip contains rowsperstrip complete rows of data
@@ -202,7 +209,13 @@ bool QFImageWriterLibTIFF::intWriteFrameDouble(const double *image)
         TIFFSetField(tif,TIFFTAG_SAMPLEFORMAT,SAMPLEFORMAT_IEEEFP);
         TIFFSetField(tif,TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
 
-        if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
+        //if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
+
+        if (frames==1) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,qfimdtBuildImageJMetaData(0, deltaX, deltaY, deltaZ, unitname,comment).data());
+        TIFFSetField(tif,TIFFTAG_XRESOLUTION,1.0/deltaX);
+        TIFFSetField(tif,TIFFTAG_YRESOLUTION,1.0/deltaY);
+        TIFFSetField(tif,TIFFTAG_RESOLUTIONUNIT,RESUNIT_NONE);
+        TIFFSetField(tif,TIFFTAG_SOFTWARE,"www.dkfz.de.QuickFit3.Plugins.QFPBasicImageExporters");
 
         // write frame data
         // data is broken up into strips where each strip contains rowsperstrip complete rows of data
@@ -232,6 +245,69 @@ bool QFImageWriterLibTIFF::intWriteFrameDouble(const double *image)
         _TIFFfree(buf);
         return true;
     }
+}
+
+bool QFImageWriterLibTIFF::intWriteFrameUINT32(const uint32_t *image)
+{
+    if (!tif) return false;
+    if (frames>0) TIFFWriteDirectory(tif);
+    frames++;
+
+    uint16 frame_width=width;
+    uint16 frame_height=height;
+    uint16 frame_channels=channels;
+    uint32 rowsperstrip = (uint32)-1;
+
+    TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, frame_width);
+    TIFFSetField(tif, TIFFTAG_IMAGELENGTH, frame_height);
+    TIFFSetField(tif, TIFFTAG_COMPRESSION, compression);
+
+    TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+    TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
+    TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, sizeof(uint32_t)*8);
+    TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, frame_channels);
+    rowsperstrip = TIFFDefaultStripSize(tif, rowsperstrip);
+    TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
+    TIFFSetField(tif, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
+    TIFFSetField(tif,TIFFTAG_SAMPLEFORMAT,SAMPLEFORMAT_UINT);
+    TIFFSetField(tif,TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
+
+    //if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
+
+    if (frames==1) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,qfimdtBuildImageJMetaData(0, deltaX, deltaY, deltaZ, unitname,comment).data());
+    TIFFSetField(tif,TIFFTAG_XRESOLUTION,1.0/deltaX);
+    TIFFSetField(tif,TIFFTAG_YRESOLUTION,1.0/deltaY);
+    TIFFSetField(tif,TIFFTAG_RESOLUTIONUNIT,RESUNIT_NONE);
+    TIFFSetField(tif,TIFFTAG_SOFTWARE,"www.dkfz.de.QuickFit3.Plugins.QFPBasicImageExporters");
+
+
+    // write frame data
+    // data is broken up into strips where each strip contains rowsperstrip complete rows of data
+    // each stript then has a size of rowsperstrip*frame_width pixels. the last strip is possibly
+    // smaller, so it is NOT padded with dummy data.
+    uint32_t* const buf = (uint32_t*)_TIFFmalloc(TIFFStripSize(tif)); // data buffer for a strip of the image
+    for (unsigned int row = 0; (row<frame_height); row+=rowsperstrip) {
+        // compute rows in this strip:
+        uint32 nrow = rowsperstrip;
+        if ((row + rowsperstrip)>frame_height) {
+            nrow=frame_height-row; // this is the last strip ... and it is a bit smaller! ... it only contains the last rows of the image
+        }
+        tstrip_t strip = TIFFComputeStrip(tif,row,0);
+        tsize_t bi = 0;
+        // go through the fraem row-wise
+        for (unsigned int rr = 0; rr<nrow; ++rr) {
+            for (unsigned int cc = 0; cc<frame_width; ++cc) { // go through all pixels in the current row
+                for (unsigned int co=0; co<frame_channels; co++ ) { // go through all channels, so we have order RGBRGBRGB ...
+                    buf[bi++] = (uint32_t)image[co*frame_width*frame_height+(row + rr)*frame_width+ cc];
+                }
+            }
+        }
+        if (TIFFWriteEncodedStrip(tif,strip,buf,bi*sizeof(uint32_t))<0) {
+            return false;
+        }
+    }
+    _TIFFfree(buf);
+    return true;
 }
 
 bool QFImageWriterLibTIFF::intWriteFrameUINT16(const uint16_t *image)
@@ -266,7 +342,14 @@ bool QFImageWriterLibTIFF::intWriteFrameUINT16(const uint16_t *image)
     TIFFSetField(tif,TIFFTAG_SAMPLEFORMAT,SAMPLEFORMAT_UINT);
     TIFFSetField(tif,TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
 
-    if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
+    //if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
+
+    if (frames==1) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,qfimdtBuildImageJMetaData(0, deltaX, deltaY, deltaZ, unitname,comment).data());
+    TIFFSetField(tif,TIFFTAG_XRESOLUTION,1.0/deltaX);
+    TIFFSetField(tif,TIFFTAG_YRESOLUTION,1.0/deltaY);
+    TIFFSetField(tif,TIFFTAG_RESOLUTIONUNIT,RESUNIT_NONE);
+    TIFFSetField(tif,TIFFTAG_SOFTWARE,"www.dkfz.de.QuickFit3.Plugins.QFPBasicImageExporters");
+
 
     // write frame data
     // data is broken up into strips where each strip contains rowsperstrip complete rows of data
@@ -329,7 +412,14 @@ bool QFImageWriterLibTIFF::intWriteFrameUINT8(const uint8_t *image)
     TIFFSetField(tif,TIFFTAG_SAMPLEFORMAT,SAMPLEFORMAT_UINT);
     TIFFSetField(tif,TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
 
-    if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
+    //if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
+
+    if (frames==1) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,qfimdtBuildImageJMetaData(0, deltaX, deltaY, deltaZ, unitname,comment).data());
+    TIFFSetField(tif,TIFFTAG_XRESOLUTION,1.0/deltaX);
+    TIFFSetField(tif,TIFFTAG_YRESOLUTION,1.0/deltaY);
+    TIFFSetField(tif,TIFFTAG_RESOLUTIONUNIT,RESUNIT_NONE);
+    TIFFSetField(tif,TIFFTAG_SOFTWARE,"www.dkfz.de.QuickFit3.Plugins.QFPBasicImageExporters");
+
 
     // write frame data
     // data is broken up into strips where each strip contains rowsperstrip complete rows of data

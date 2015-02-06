@@ -370,6 +370,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         void copyItem();
         void cutItem();
         void pasteItem();
+        void exportRDR();
 
         void modelReset();
 
@@ -524,6 +525,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         QAction *aboutPluginsAct;
         QAction* helpAct;
         QAction* helpCitingAct;
+        QAction* actExportRDR;
         QList<QAction*> helpActList;
 
         QMenu* menuProjectSort;

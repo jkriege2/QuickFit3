@@ -27,6 +27,7 @@ Copyright (c) 2014
 #include "ui_qfevalbeadscanpsf_editor.h"
 #include "qmoretextobject.h"
 #include "cimg.h"
+#include "qfrawdatarecordfactory.h"
 #include "qffitfunctionplottools.h"
 #include <QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
@@ -189,11 +190,19 @@ void QFEvalBeadScanPSFEditor::highlightingChanged(QFRawDataRecord* formerRecord,
         ui->spinPSFHeight->setValue(record->getProperty(eval->getEvaluationResultID()+"_EST_PSF_HEIGHT", record->getProperty("EST_PSF_HEIGHT", ui->spinPSFHeight->value()).toDouble()).toDouble());
         ui->spinWZFraction->setValue(record->getProperty(eval->getEvaluationResultID()+"_WZ_FRACTION", record->getProperty("WZ_FRACTION", ui->spinWZFraction->value()).toDouble()).toDouble());
 
-        ui->grpFilterBeads->setChecked(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads", record->getProperty("FilterBeads", ui->grpFilterBeads->isChecked()).toBool()).toBool());
-        ui->spinAxRatioMin->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMin", record->getProperty("FilterBeads_AxRatMin", ui->spinAxRatioMin->value()).toDouble()).toDouble());
-        ui->spinAxRatioMax->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMax", record->getProperty("FilterBeads_AxRatMax", ui->spinAxRatioMax->value()).toDouble()).toDouble());
-        ui->chkMedianFIlter->setChecked(record->getProperty(eval->getEvaluationResultID()+"_MEDIAN", record->getProperty("USE_MEDIAN_FILTER", ui->chkMedianFIlter->isChecked()).toBool()).toBool());
+        ui->grpFilterBeads->setChecked(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads", eval->getProperty("FilterBeads", ui->grpFilterBeads->isChecked()).toBool()).toBool());
+        ui->spinAxRatioMin->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMin", eval->getProperty("FilterBeads_AxRatMin", ui->spinAxRatioMin->value()).toDouble()).toDouble());
+        ui->spinAxRatioMax->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMax", eval->getProperty("FilterBeads_AxRatMax", ui->spinAxRatioMax->value()).toDouble()).toDouble());
+        ui->chkMedianFIlter->setChecked(record->getProperty(eval->getEvaluationResultID()+"_MEDIAN", eval->getProperty("USE_MEDIAN_FILTER", ui->chkMedianFIlter->isChecked()).toBool()).toBool());
 
+        ui->spinXYWidthMin->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_WxyMin", eval->getProperty("FilterBeads_WxyMin", ui->spinXYWidthMin->value()).toDouble()).toDouble());
+        ui->spinXYWidthMax->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_WxyMax", eval->getProperty("FilterBeads_WxyMax", ui->spinXYWidthMax->value()).toDouble()).toDouble());
+        ui->spinZWidthMin->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_WzMin", eval->getProperty("FilterBeads_WzMin", ui->spinZWidthMin->value()).toDouble()).toDouble());
+        ui->spinZWidthMax->setValue(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_WzMax", eval->getProperty("FilterBeads_WzMax", ui->spinZWidthMax->value()).toDouble()).toDouble());
+
+        ui->chkFilterAxRation->setChecked(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_Ax", eval->getProperty("FilterBeads_Ax", ui->chkFilterAxRation->isChecked()).toBool()).toBool());
+        ui->chkFilterXYWidth->setChecked(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_Wxy", eval->getProperty("FilterBeads_Wxy", ui->chkFilterXYWidth->isChecked()).toBool()).toBool());
+        ui->chkFilterZYWidth->setChecked(record->getProperty(eval->getEvaluationResultID()+"_FilterBeads_Wz", eval->getProperty("FilterBeads_Wz", ui->chkFilterZYWidth->isChecked()).toBool()).toBool());
         updatingData=false;
     }
     
@@ -563,25 +572,56 @@ QVector<double> QFEvalBeadScanPSFEditor::getBeadsData(const QString& paramName, 
     if ((!record)||(!eval)/*||(!data)*/) return dat;
 
     QString evalID=eval->getEvaluationResultID();
+
+    QVector<int> beadIDs=getFilteresBeadsID(channel);
+
+
+    for (int bid=0; bid<beadIDs.size(); bid++) {
+        int b=beadIDs[bid];
+        QString param=QString("channel%1_bead%2").arg(channel).arg(b);
+        QString p1=param+paramName;
+
+        bool ok=true;
+        QVector<double> p=record->resultsGetAsDoubleList(evalID, p1, &ok);
+        if (ok && paramIdx<p.size()) {
+            dat<<p[paramIdx];
+        }
+    }
+
+    return dat;
+}
+
+QVector<int> QFEvalBeadScanPSFEditor::getFilteresBeadsID(int channel)
+{
+    QVector<int> dat;
+
+    if (!current) return dat;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    if ((!record)||(!eval)/*||(!data)*/) return dat;
+
+    QString evalID=eval->getEvaluationResultID();
     int beads=record->resultsGetAsInteger(evalID, "channel0_beads");
 
-
+    QStringList params3D=record->resultsGetAsStringList(evalID, "fit3d_fitfunction_parameternames");
+    int wid1ID3D=params3D.indexOf("width1");
+    int wid2ID3D=params3D.indexOf("width2");
+    int wid3ID3D=params3D.indexOf("width3");
 
     for (int b=0; b<beads; b++) {
         QString param=QString("channel%1_bead%2").arg(channel).arg(b);
-        QString p1=param+paramName;
 
         bool useBead=true;
         if (ui->grpFilterBeads->isChecked()) {
             bool ok=true;
             QVector<double> ar=record->resultsGetAsDoubleList(evalID, param+"_fits_axialratios_3d", &ok);
-            if (ok && ar.size()>=2) {
+            if (ok && ar.size()>=2 && ui->chkFilterAxRation->isChecked()) {
                 if (ar[0]<ui->spinAxRatioMin->value() || ar[0]> ui->spinAxRatioMax->value() ||
                     ar[1]<ui->spinAxRatioMin->value() || ar[1]> ui->spinAxRatioMax->value()) {
                     useBead=false;
                 }
             }
-            if (useBead) {
+            if (useBead && ui->chkFilterAxRation->isChecked()) {
                 ar=record->resultsGetAsDoubleList(evalID, param+"_fits_axialratios", &ok);
                 if (ok && ar.size()>=2) {
                     if (ar[0]<ui->spinAxRatioMin->value() || ar[0]> ui->spinAxRatioMax->value() ||
@@ -590,13 +630,29 @@ QVector<double> QFEvalBeadScanPSFEditor::getBeadsData(const QString& paramName, 
                     }
                 }
             }
+            if (useBead && (ui->chkFilterXYWidth->isChecked() || ui->chkFilterZYWidth->isChecked())) {
+                ar=record->resultsGetAsDoubleList(evalID, param+"_fit3d_results", &ok);
+                if (useBead && ok && ui->chkFilterXYWidth->isChecked() && wid1ID3D<ar.size()) {
+                    if (ar[wid1ID3D]<ui->spinXYWidthMin->value() || ar[wid1ID3D]> ui->spinXYWidthMax->value()) {
+                        useBead=false;
+                    }
+                }
+                if (useBead && ok && ui->chkFilterXYWidth->isChecked() && wid2ID3D<ar.size()) {
+                    if (ar[wid2ID3D]<ui->spinXYWidthMin->value() || ar[wid2ID3D]> ui->spinXYWidthMax->value()) {
+                        useBead=false;
+                    }
+                }
+                if (useBead && ok && ui->chkFilterZYWidth->isChecked() && wid3ID3D<ar.size()) {
+                    if (ar[wid3ID3D]<ui->spinZWidthMin->value() || ar[wid3ID3D]> ui->spinZWidthMax->value()) {
+                        useBead=false;
+                    }
+                }
+
+            }
+            // GO ON HERE!!!
         }
         if (useBead) {
-            bool ok=true;
-            QVector<double> p=record->resultsGetAsDoubleList(evalID, p1, &ok);
-            if (ok && paramIdx<p.size()) {
-                dat<<p[paramIdx];
-            }
+            dat<<b;
         }
     }
 
@@ -615,6 +671,24 @@ void QFEvalBeadScanPSFEditor::displayEvaluationHistograms() {
         record->setQFProperty(eval->getEvaluationResultID()+"_FilterBeads", ui->grpFilterBeads->isChecked(), false, false);
         record->setQFProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMin", ui->spinAxRatioMin->value(), false, false);
         record->setQFProperty(eval->getEvaluationResultID()+"_FilterBeads_AxRatMax", ui->spinAxRatioMax->value(), false, false);
+        record->setQFProperty(eval->getEvaluationResultID()+"_FilterBeads_WxyMin", ui->spinXYWidthMin->value(), false, false);
+        record->setQFProperty(eval->getEvaluationResultID()+"_FilterBeads_WxyMax", ui->spinXYWidthMax->value(), false, false);
+        record->setQFProperty(eval->getEvaluationResultID()+"_FilterBeads_WzMin", ui->spinZWidthMin->value(), false, false);
+        record->setQFProperty(eval->getEvaluationResultID()+"_FilterBeads_WzMax", ui->spinZWidthMax->value(), false, false);
+        record->setQFProperty(eval->getEvaluationResultID()+"_FilterBeads_Ax", ui->chkFilterAxRation->isChecked(), false, false);
+        record->setQFProperty(eval->getEvaluationResultID()+"_FilterBeads_Wxy", ui->chkFilterXYWidth->isChecked(), false, false);
+        record->setQFProperty(eval->getEvaluationResultID()+"_FilterBeads_Wz", ui->chkFilterZYWidth->isChecked(), false, false);
+
+        eval->setQFProperty("FilterBeads", ui->grpFilterBeads->isChecked(), false, false);
+        eval->setQFProperty("FilterBeads_AxRatMin", ui->spinAxRatioMin->value(), false, false);
+        eval->setQFProperty("FilterBeads_AxRatMax", ui->spinAxRatioMax->value(), false, false);
+        eval->setQFProperty("FilterBeads_WxyMin", ui->spinXYWidthMin->value(), false, false);
+        eval->setQFProperty("FilterBeads_WxyMax", ui->spinXYWidthMax->value(), false, false);
+        eval->setQFProperty("FilterBeads_WzMin", ui->spinZWidthMin->value(), false, false);
+        eval->setQFProperty("FilterBeads_WzMax", ui->spinZWidthMax->value(), false, false);
+        eval->setQFProperty("FilterBeads_Ax", ui->chkFilterAxRation->isChecked(), false, false);
+        eval->setQFProperty("FilterBeads_Wxy", ui->chkFilterXYWidth->isChecked(), false, false);
+        eval->setQFProperty("FilterBeads_Wz", ui->chkFilterZYWidth->isChecked(), false, false);
     }
 
     if (eval->hasEvaluation(record)) {
@@ -1099,6 +1173,154 @@ void QFEvalBeadScanPSFEditor::on_btnSaveROI_clicked()
                 saveROI(filename, format, record, bead, channel);
             }
 
+        }
+    }
+}
+
+void QFEvalBeadScanPSFEditor::on_btnSaveAvgROI_clicked()
+{
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
+    if ((!record)||(!eval)||(!data)) return;
+
+
+    if (eval->hasEvaluation(record)) {
+
+        QStringList ids=getImageWriterIDList(QFPluginServices::getInstance());
+        QStringList filters=getImageWriterFilterList(QFPluginServices::getInstance());
+        QStringList files;
+        if (ids.size()>0 && filters.size()>0) {
+            QString filter=filters[0];
+            QString filename=qfGetSaveFileNameSet("QFEvalBeadScanPSFEditor/saveroi/", this, tr("Save averaged ROI"), QFileInfo(record->getFileName(0)).absolutePath(), filters.join(";;"), &filter);
+            QString format=ids.value(filters.indexOf(filter), "");
+            if (filename.size()>0) {
+                bool ok=true;
+                int supersampling=QInputDialog::getInt(this, tr("Save averaged ROI"), tr("supersamlping factor:"), 4, 2, 20,1,&ok);
+                int channels=ui->cmbChannel->count();
+                QString evalID=eval->getEvaluationResultID();
+                int ROIxy=ui->spinROIXY->value();
+                int ROIz=ui->spinROIZ->value();
+                double deltaXY=ui->spinA->value();
+                double deltaZ=ui->spinZ->value();
+                int stack=0;
+                int width=data->getImageStackWidth(stack);
+                int height=data->getImageStackHeight(stack);
+                int size_z=data->getImageStackFrames(stack);
+
+                if (ok) {
+                    QVector<int> beads=getFilteresBeadsID(0);
+                    QProgressDialog dialog;
+                    dialog.setLabelText("exporting ROIs ...");
+                    dialog.setRange(0,channels*beads.size());
+                    dialog.show();
+                    int pcnt=0;
+                    for (int c=0; c<channels; c++) {
+                        cimg_library::CImg<double> image(data->getImageStack(stack, 0, c), width, height, size_z, true);
+                        cimg_library::CImg<float> roi_out((ROIxy/2+ROIxy/2+1)*supersampling, (ROIxy/2+ROIxy/2+1)*supersampling, (ROIz/2+ROIz/2+1)*supersampling);
+
+                        QStringList params3D=record->resultsGetAsStringList(evalID, "fit3d_fitfunction_parameternames");
+                        int posxID=params3D.indexOf("position_x");
+                        int posyID=params3D.indexOf("position_y");
+                        int poszID=params3D.indexOf("position_z");
+
+                        float normSum=0;
+
+                        for (int bi=0; bi<beads.size(); bi++) {
+                            int bead=beads[bi];
+                            dialog.setValue(pcnt);
+                            pcnt++;
+                            QApplication::processEvents();
+                            if (dialog.wasCanceled()) break;
+
+                            int initPosX=record->resultsGetInNumberList(evalID, "beadsearch_initial_positions_x", bead, -1);
+                            int initPosY=record->resultsGetInNumberList(evalID, "beadsearch_initial_positions_y", bead, -1);
+                            int initPosZ=record->resultsGetInNumberList(evalID, "beadsearch_initial_positions_z", bead, -1);
+                            float posX=record->resultsGetInNumberList(evalID, QString("channel%1_bead%2_fit3d_results").arg(c).arg(bead), posxID, -1)/deltaXY-float(initPosX)+float(ROIxy/2);
+                            float posY=record->resultsGetInNumberList(evalID, QString("channel%1_bead%2_fit3d_results").arg(c).arg(bead), posyID, -1)/deltaXY-float(initPosY)+float(ROIxy/2);
+                            float posZ=record->resultsGetInNumberList(evalID, QString("channel%1_bead%2_fit3d_results").arg(c).arg(bead), poszID, -1)/deltaZ-float(initPosZ)+float(ROIz/2);
+
+
+                            if (initPosX>=0 && initPosY>=0 && initPosZ>=0 && posxID>=0 && posyID>=0 && poszID>=0) {
+                                cimg_library::CImg<double> roi=image.get_crop(initPosX-ROIxy/2, initPosY-ROIxy/2, initPosZ-ROIz/2, initPosX+ROIxy/2, initPosY+ROIxy/2, initPosZ+ROIz/2);
+                                qDebug()<<initPosX<<initPosY<<initPosZ<<": "<<posX<<"/"<<roi.width()<<posY<<"/"<<roi.height()<<posZ<<"/"<<roi.depth();
+
+                                for (int z=0; z<roi_out.depth(); z++) {
+                                    for (int y=0; y<roi_out.height(); y++) {
+                                        for (int x=0; x<roi_out.width(); x++) {
+                                            float xx=posX+(float(x)-float(roi_out.width()/2))/float(supersampling);
+                                            float yy=posY+(float(y)-float(roi_out.height()/2))/float(supersampling);
+                                            float zz=posZ+(float(z)-float(roi_out.depth()/2))/float(supersampling);
+                                            roi_out(x,y,z)=roi_out(x,y,z)+roi.linear_atXYZ(xx,yy,zz);
+                                        }
+                                    }
+                                }
+                                normSum++;
+
+                            }
+                        }
+                        roi_out/=normSum;
+                        if (getImageWriterIDList(QFPluginServices::getInstance()).contains(format) && !filename.isEmpty()) {
+                            QFExporterImageSeries* exp=dynamic_cast<QFExporterImageSeries*>(QFPluginServices::getInstance()->getExporterManager()->createExporter(format));
+                            if (exp) {
+                                exp->setFileComment(tr("averaged PSF: %1, channel=%2").arg(record->getName()).arg(c));
+                                uint32_t w=roi_out.width();
+                                uint32_t h=roi_out.height();
+                                uint32_t f=roi_out.depth();
+                                uint32_t ch=roi_out.spectrum();
+                                exp->setFrameSize(w,h,ch);
+                                exp->setResolution(deltaXY/float(supersampling), deltaXY/float(supersampling), deltaZ/float(supersampling), tr("nm"));
+                                files<<(QFileInfo(filename).absoluteDir().absoluteFilePath(QFileInfo(filename).baseName()+QString("_ch%1").arg(c)+"."+QFileInfo(filename).completeSuffix()));
+                                qDebug()<<files.last();
+                                if (exp->open(files.last())) {
+                                    exp->writeFramesFloat(roi_out.data(), f);
+                                }
+                                exp->close();
+                                delete exp;
+                                exp=NULL;
+                            }
+                        }
+
+                        QApplication::processEvents();
+                        if (dialog.wasCanceled()) break;
+                    }
+                    qDebug()<<files<<format<<QFPluginServices::getInstance()->getRawDataRecordFactory()->contains("image_stack");
+                    if (!dialog.wasCanceled() && files.size()>0 && format.toLower().contains("tiff") && QFPluginServices::getInstance()->getRawDataRecordFactory()->contains("image_stack")) {
+                        if (QMessageBox::question(this, tr("Save averaged ROI"), tr("Do you want to load the result as an image stack into the current project?"), QMessageBox::Yes|QMessageBox::No,QMessageBox::Yes)==QMessageBox::Yes) {
+                            QFProject* project=eval->getProject();
+                            if (project) {
+                                // here we store some initial parameters
+                                QMap<QString, QVariant> initParams;
+                                // set whatever you want (FILETYPE is just an example)!
+                                initParams["FILETYPE"]="imageimporter_libtiff";
+                                initParams["STACKTYPE"]="ONEFILEPERCHANNEL";
+
+                                // add all properties in initParams that will be readonly
+                                QStringList paramsReadonly;
+                                paramsReadonly<<"FILETYPE"<<"STACKTYPE";
+                                QStringList types;
+                                for (int i=0; i<files.size(); i++) {
+                                    types.append("image");
+                                }
+
+                                QStringList filenames;
+                                for (int i=0; i<files.size(); i++) {
+                                    filenames<<QFileInfo(files[i]).fileName();
+                                }
+                                QString name=filenames.value(0, "");
+                                name=tr("averaged PSF stack (%1 ...)").arg(qfGetLargestCommonStart(filenames, name));
+                                QFRawDataRecord* e=project->addRawData("image_stack", name, files, initParams, paramsReadonly, types);
+                                if (e&&e->error()) { // when an error occured: remove record and output an error message
+                                    project->deleteRawData(e->getID());
+                                    QMessageBox::critical(this, tr("PSF Analysis"), tr("Error while importing image stack:\n%1").arg(e->errorDescription()));
+                                    services->log_error(tr("Error while importing image stack:\n    %1\n").arg(e->errorDescription()));
+                                }
+                            }
+                        }
+                    }
+                }                
+            }
         }
     }
 }

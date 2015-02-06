@@ -147,9 +147,23 @@ bool qfimdtGetOMEMetaData(QMap<QString, QVariant> &data, const QByteArray &OME)
 bool qfimdtGetImageJMetaData(QMap<QString, QVariant> &data, const QByteArray &meta)
 {
     if(meta.contains("ImageJ=") || meta.contains("ImageJ =")) {
-        QRegExp rxImages("images\\s*\\=\\s*(\\d+)");
-        if (rxImages.indexIn(meta)>=0) {
-            data["FRAMES"]=rxImages.cap(1).toInt();
+        {
+            QRegExp rxImages("images\\s*\\=\\s*(\\d+)");
+            if (rxImages.indexIn(meta)>=0) {
+                data["FRAMES"]=rxImages.cap(1).toInt();
+            }
+        }
+        {
+            QRegExp rxImages("spacing\\s*\\=\\s*([\\d.eE\\+\\-]+)");
+            if (rxImages.indexIn(meta)>=0) {
+                data["DELTAZ"]=data["STEPSIZE"]=rxImages.cap(1).toDouble();
+            }
+        }
+        {
+            QRegExp rxImages("finterval\\s*\\=\\s*([\\d.eE\\+\\-]+)");
+            if (rxImages.indexIn(meta)>=0) {
+                data["FRAMETIME"]=rxImages.cap(1).toDouble();
+            }
         }
         return true;
     }
@@ -179,4 +193,15 @@ bool qfimdtGetTinyTIFFMetaData(QMap<QString, QVariant> &data, const QByteArray &
         return true;
     }
     return false;
+}
+
+
+QByteArray qfimdtBuildImageJMetaData(int frames, double deltaX, double deltaY, double deltaZ, const QString &axisunit, const QString &comment)
+{
+    QByteArray res="ImageJ=1.48v";
+    if (frames>0) res+=QString("\nimages=%1").arg(frames).toLatin1();
+    if (deltaZ>0) res+=QString("\nspacing=%1").arg(deltaZ).toLatin1();
+    if (!axisunit.isEmpty()) res+=QString("\nunit=%1").arg(axisunit).toLatin1();
+    //if (frames>0) res+=QString("\nimages=%1").arg(frames).toLatin1();
+    return res;
 }

@@ -60,14 +60,30 @@ class QFLIB_EXPORT QFExporterImageSeries: public QFExporter {
         /** \brief close the currently opened image file */
         virtual void close()=0;
 
-        /** \brief read a new frame into the given array of floating point numbers */
+        /** \brief write a new frame into the file */
         bool writeFrameFloat(const float* data);
-        /** \brief read a new frame into the given array of double-precision floating point numbers */
+        /** \brief write a new frame into the file */
         bool writeFrameDouble(const double *data);
-        /** \brief read a new frame into the given array of integers */
+        /** \brief write a new frame into the file */
         bool writeFrameUINT16(const uint16_t* data);
-        /** \brief read a new frame into the given array of integers */
+        /** \brief write a new frame into the file */
+        bool writeFrameUINT32(const uint32_t* data);
+        /** \brief write a new frame into the file */
         bool writeFrameUINT8(const uint8_t* data);
+
+
+
+        /** \brief write the given frames into the file */
+        bool writeFramesFloat(const float* data, uint32_t frames);
+        /** \brief write the given frames into the file */
+        bool writeFramesDouble(const double *data, uint32_t frames);
+        /** \brief write the given frames into the file */
+        bool writeFramesUINT16(const uint16_t* data, uint32_t frames);
+        /** \brief write the given frames into the file */
+        bool writeFramesUINT32(const uint32_t* data, uint32_t frames);
+        /** \brief write the given frames into the file */
+        bool writeFramesUINT8(const uint8_t* data, uint32_t frames);
+
 
         inline uint32_t getFrameWidth()  const {
             return width;
@@ -79,6 +95,20 @@ class QFLIB_EXPORT QFExporterImageSeries: public QFExporter {
         inline uint32_t getFrameChannels()  const {
             return channels;
         }
+        inline double getPixelsizeX()  const {
+            return deltaX;
+        }
+        inline double getPixelsizeY()  const {
+            return deltaY;
+        }
+        inline double getPixelsizeZ()  const {
+            return deltaZ;
+        }
+        inline QString getXYZUnitName()  const {
+            return unitname;
+        }
+
+        void setResolution(double deltaX=1, double deltaY=1, double deltaZ=1, const QString& unitname=QString("pixel"));
 
     protected:
         /** \brief read a new frame into the given array of floating point numbers.
@@ -100,6 +130,11 @@ class QFLIB_EXPORT QFExporterImageSeries: public QFExporter {
          *
          *  \note multi-channel data has to be given in non-interleaved mode (i.e. the frame in ch0, the frame in ch1, ... as one big array!
          */
+        virtual bool intWriteFrameUINT32(const uint32_t* data)=0;
+        /** \brief read a new frame into the given array of integers
+         *
+         *  \note multi-channel data has to be given in non-interleaved mode (i.e. the frame in ch0, the frame in ch1, ... as one big array!
+         */
         virtual bool intWriteFrameUINT8(const uint8_t* data)=0;
 
 
@@ -108,6 +143,11 @@ class QFLIB_EXPORT QFExporterImageSeries: public QFExporter {
         uint32_t width;
         uint32_t height;
         uint32_t channels;
+
+        float deltaX;
+        float deltaY;
+        float deltaZ;
+        QString unitname;
 };
 
 

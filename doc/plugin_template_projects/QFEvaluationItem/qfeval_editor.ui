@@ -80,8 +80,8 @@
         <string>Evaluate &amp;Current</string>
        </property>
        <property name="icon">
-        <iconset resource="qfeval.qrc">
-         <normaloff>:/target_id/qfeval_evaluate.png</normaloff>:/target_id/qfeval_evaluate.png</iconset>
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/fit_fitcurrent.png</normaloff>:/lib/fit_fitcurrent.png</iconset>
        </property>
       </widget>
      </item>
@@ -91,8 +91,8 @@
         <string>Evaluate &amp;All</string>
        </property>
        <property name="icon">
-        <iconset resource="qfeval.qrc">
-         <normaloff>:/target_id/qfeval_evaluate.png</normaloff>:/target_id/qfeval_evaluate.png</iconset>
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/fit_fitallfiles.png.png</normaloff>:/lib/fit_fitallfiles.png.png</iconset>
        </property>
       </widget>
      </item>
@@ -109,8 +109,8 @@
         <string>Save &amp;Report</string>
        </property>
        <property name="icon">
-        <iconset resource="qfeval.qrc">
-         <normaloff>:/target_id/qfeval_savereport.png</normaloff>:/target_id/qfeval_savereport.png</iconset>
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/savereport.png</normaloff>:/lib/savereport.png</iconset>
        </property>
 	   <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -129,8 +129,8 @@
         <string>&amp;Print Report</string>
        </property>
        <property name="icon">
-        <iconset resource="qfeval.qrc">
-         <normaloff>:/target_id/qfeval_printreport.png</normaloff>:/target_id/qfeval_printreport.png</iconset>
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/printreport.png</normaloff>:/lib/printreport.png</iconset>
        </property>
 	   <property name="toolButtonStyle">
         <enum>Qt::ToolButtonTextBesideIcon</enum>
@@ -161,7 +161,7 @@
   </layout>
  </widget>
  <resources>
-  <include location="qfeval.qrc"/>
+  <include location="../../lib/lib.qrc"/>
  </resources>
  <connections/>
 </ui>

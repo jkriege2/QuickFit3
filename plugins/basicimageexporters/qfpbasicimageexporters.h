@@ -25,6 +25,7 @@ Copyright (c) 2014
 
 #include "qfpluginexporters.h"
 #include "qfpluginoptionsdialog.h"
+#include "cimg.h"
 /*!
     \defgroup qf3exporterplugins_exporters_basicimage Exporter Plugin
     \ingroup qf3exporterplugins

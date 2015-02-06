@@ -81,4 +81,14 @@ frametime=300
 */
 bool QFLIB_EXPORT qfimdtGetTinyTIFFMetaData(QMap<QString, QVariant>& data, const QByteArray &input);
 
+/*! \brief returns an ImageJ metadata-block
+    \ingroup qf3lib_tools_imagemetadata
+
+\verbatim
+ImageJ=0.46b
+images=1000
+\endverbatim
+*/
+QByteArray QFLIB_EXPORT qfimdtBuildImageJMetaData(int frames=0, double deltaX=1, double deltaY=1, double deltaZ=1, const QString& axisunit=QString("pixel"), const QString &comment=QString());
+
 #endif // QFIMAGEMETADATATOOL_H

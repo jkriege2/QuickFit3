@@ -26,7 +26,7 @@ Copyright (c) 2014
 #include "qfrdrimagemask.h"
 #include "qftools.h"
 #include "statistics_tools.h"
-#include "CImg.h"
+#include "cimg.h"
 #include "qffitfunction.h"
 #include "qffitfunctionnd.h"
 #include "qffitalgorithm.h"

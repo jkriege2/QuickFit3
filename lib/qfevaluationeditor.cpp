@@ -34,7 +34,7 @@ QFEvaluationEditor::QFEvaluationEditor(QFPluginServices* services, QFEvaluationP
     peID=0;
     this->services=services;
     actSaveReport=new QAction(QIcon(":/lib/savereport.png"), tr("Save &Report"), this);
-    actSaveReport->setToolTip(tr("save the evaluation results as a report in PDF or PostScript format"));
+    actSaveReport->setToolTip(tr("save the evaluation results as a report in PDF, HTML, ... format"));
     connect(actSaveReport, SIGNAL(triggered()), this, SLOT(saveReport()));
     actPrintReport=new QAction(QIcon(":/lib/printreport.png"), tr("&Print Report"), this);
     actPrintReport->setToolTip(tr("print the evaluation results as a report"));
@@ -89,9 +89,9 @@ void QFEvaluationEditor::saveReport() {
     QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
                                 currentSaveDirectory,
                                           #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-                                              tr("PDF File (*.pdf)")
+                                              tr("PDF File (*.pdf);;HTML file (*.html);;OpenDocument File (*.odf)")
                                           #else
-                                              tr("PDF File (*.pdf);;PostScript File (*.ps)")
+                                              tr("PDF File (*.pdf);;PostScript File (*.ps);;HTML file (*.html);;OpenDocument File (*.odf)")
                                           #endif
                                               );
 
@@ -125,10 +125,10 @@ void QFEvaluationEditor::saveReport() {
             printer->setOutputFileName(fn);
             doc->print(printer);
         } else if (fi.suffix().toLower()=="odf") {
-            QTextDocumentWriter writer(fn, "odf");
+            QTextDocumentWriter writer(fn, "ODF");
             writer.write(doc);
         } else if ((fi.suffix().toLower()=="html")||(fi.suffix().toLower()=="htm")) {
-            QTextDocumentWriter writer(fn, "html");
+            QTextDocumentWriter writer(fn, "HTML");
             writer.write(doc);
         }
         //qDebug()<<doc->toHtml();

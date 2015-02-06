@@ -36,26 +36,36 @@ QFPBasicImageExporters::QFPBasicImageExporters(QObject *parent)
 
 QStringList QFPBasicImageExporters::getIDs() const {
     QStringList res;
-    res<<"exporter_image_raw_double";
-    res<<"exporter_image_raw_float";
     res<<"exporter_image_libtiff";
     res<<"exporter_image_libtiff_64";
 #ifdef ZIP_SUPPORT
     res<<"exporter_image_libtiff_deflate";
-    res<<"exporter_image_libtiff_deflate_64";
 #endif
 #ifdef LZW_SUPPORT
     res<<"exporter_image_libtiff_lzw";
-    res<<"exporter_image_libtiff_lzw_64";
 #endif
 #ifdef JPEG_SUPPORT
     res<<"exporter_image_libtiff_jpeg";
-    res<<"exporter_image_libtiff_jpeg_64";
 #endif
 #ifdef LZMA_SUPPORT
     res<<"exporter_image_libtiff_lzma";
+#endif
+    res<<"exporter_image_libtiff_64";
+#ifdef ZIP_SUPPORT
+    res<<"exporter_image_libtiff_deflate_64";
+#endif
+#ifdef LZW_SUPPORT
+    res<<"exporter_image_libtiff_lzw_64";
+#endif
+#ifdef JPEG_SUPPORT
+    res<<"exporter_image_libtiff_jpeg_64";
+#endif
+#ifdef LZMA_SUPPORT
     res<<"exporter_image_libtiff_lzma_64";
 #endif
+    res<<"exporter_image_raw_double";
+    res<<"exporter_image_raw_float";
+
     return res;
 }
 

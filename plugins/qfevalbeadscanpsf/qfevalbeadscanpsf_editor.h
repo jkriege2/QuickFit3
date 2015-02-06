@@ -95,6 +95,7 @@ class QFEvalBeadScanPSFEditor : public QFEvaluationEditor {
         void createReportDoc(QTextDocument* document);
 
         QVector<double> getBeadsData(const QString &paramName, int paramIdx, int channel);
+        QVector<int> getFilteresBeadsID(int channel);
     protected slots:
         /** \brief activated when the highlighted record changed */
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
@@ -125,6 +126,7 @@ class QFEvalBeadScanPSFEditor : public QFEvaluationEditor {
 
         void on_btnSaveAllROI_clicked();
         void on_btnSaveROI_clicked();
+        void on_btnSaveAvgROI_clicked();
         void evaluateAll();
         void saveROI(const QString& filename, const QString &exportID, QFRawDataRecord* rdr, int bead=0, int channel=0);
 };

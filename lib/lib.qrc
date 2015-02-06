@@ -164,6 +164,8 @@
         <file alias="player_start.png">icons/player_start.png</file>
         <file alias="player_stop.png">icons/player_stop.png</file>
         <file alias="preview_savedata.png">icons/preview_savedata.png</file>
+        <file alias="saveimgdata.png">icons/preview_savedata.png</file>
+        <file alias="saveallimgdata.png">icons/preview_savealldata.png</file>
         <file alias="reci.png">icons/reci.png</file>
         <file alias="report_print.png">icons/report_print.png</file>
         <file alias="report_save.png">icons/report_save.png</file>
@@ -247,6 +249,11 @@
         <file alias="zoom_original.png">icons/zoom_original.png</file>
         <file alias="zoom_out.png">icons/zoom_out.png</file>
         <file alias="ruler.png">icons/ruler.png</file>
+        <file alias="fit_fitall.png">icons/fit_fitall.png</file>
+        <file alias="fit_fitallfiles.png">icons/fit_fitallfiles.png</file>
+        <file alias="fit_fitallruns.png">icons/fit_fitallruns.png</file>
+        <file alias="fit_fitcurrent.png">icons/fit_fitcurrent.png</file>
+        <file alias="fit_fitcurrentrunallfiles.png">icons/fit_fitcurrentrunallfiles.png</file>
     </qresource>
     <qresource prefix="/lib/qfstyledbutton">
         <file alias="network.png">icons/network.png</file>
