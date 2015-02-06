@@ -37,7 +37,6 @@ QFPBasicImageExporters::QFPBasicImageExporters(QObject *parent)
 QStringList QFPBasicImageExporters::getIDs() const {
     QStringList res;
     res<<"exporter_image_libtiff";
-    res<<"exporter_image_libtiff_64";
 #ifdef ZIP_SUPPORT
     res<<"exporter_image_libtiff_deflate";
 #endif
