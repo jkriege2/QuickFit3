@@ -701,12 +701,13 @@ void QFRDRImageStackData::exportData(const QString &format_in, const QString &fi
         QFExporterImageSeries* exp=dynamic_cast<QFExporterImageSeries*>(QFPluginServices::getInstance()->getExporterManager()->createExporter(format));
         if (exp) {
             exp->setFileComment(getName());
-            exp->setFrameSize(getImageStackWidth(0), getImageStackHeight(0), getImageStackChannels(0));
+            exp->setFrameSize(getImageStackWidth(0), getImageStackHeight(0), 1);//getImageStackChannels(0));
+            exp->setResolution(getImageStackXUnitFactor(0), getImageStackYUnitFactor(0), getImageStackZUnitFactor(0), getImageStackXUnitName(0));
             uint32_t w=getImageStackWidth(0);
             uint32_t h=getImageStackHeight(0);
             uint32_t f=getImageStackFrames(0);
             uint32_t ch=getImageStackChannels(0);
-            if (exp->open(filename)){
+            /*if (exp->open(filename)){
                 for (uint32_t i=0; i<f; i++) {
                     QVector<double> d(w*h*ch);
                     for (uint32_t c=0; c<ch; c++) {
@@ -717,8 +718,20 @@ void QFRDRImageStackData::exportData(const QString &format_in, const QString &fi
                     }
                     exp->writeFrameDouble(d.data());
                 }
+            }*/
+            for (uint32_t c=0; c<ch; c++) {
+                if (exp->open(QFileInfo(filename).absoluteDir(QFileInfo(filename).baseName()+QString("_ch%1.").arg(c)+QFileInfo(filename).completeSuffix()))){
+                    for (uint32_t i=0; i<f; i++) {
+                        QVector<double> d(w*h);
+                        double* dat=getImageStack(0, i, c);
+                        for (uint32_t j=0; j<w*h; j++) {
+                            d[j]=dat[j];
+                        }
+                    }
+                    exp->writeFrameDouble(d.data());
+                    exp->close();
+                }
             }
-            exp->close();
             delete exp;
         }
     }
