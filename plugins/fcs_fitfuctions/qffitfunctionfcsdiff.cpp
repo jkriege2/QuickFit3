@@ -85,8 +85,8 @@ QFFitFunctionFCSDiff::QFFitFunctionFCSDiff() {
 
 double QFFitFunctionFCSDiff::evaluate(double t, const double* data) const {
     const int comp=data[FCSDiff_n_components];
-    const int nonfl_comp=data[FCSDiff_n_nonfluorescent];
     const double N=data[FCSDiff_n_particle];
+    const int nonfl_comp=data[FCSDiff_n_nonfluorescent];
     const double nf_tau1=data[FCSDiff_nonfl_tau1]/1.0e6;
     const double nf_theta1=data[FCSDiff_nonfl_theta1];
     const double nf_tau2=data[FCSDiff_nonfl_tau2]/1.0e6;

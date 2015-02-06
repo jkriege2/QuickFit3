@@ -297,6 +297,13 @@ void QFImFCSFitEvaluationEditor::createWidgets() {
     connect(actSetParameterFromFile, SIGNAL(triggered()), this, SLOT(setFitParameterFromFile()));
     menuTools->addAction(actSetParameterFromFile);
     menuTools->addAction(actOverlayPlot);
+
+    splitPlot->setStretchFactor(0,9);
+    splitPlot->setStretchFactor(1,3);
+    splitPlot->setStretchFactor(2,4);
+    splitModel->setStretchFactor(0,1);
+    splitModel->setStretchFactor(1,0);
+
 }
 
 

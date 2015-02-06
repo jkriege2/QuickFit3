@@ -56,9 +56,9 @@ QFFitFunctionsSPIMFCSDiffE2NewVeffDiffBright::QFFitFunctionsSPIMFCSDiffE2NewVeff
 
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
     #define FCSSDiff_offset 11
-    addParameter(FloatNumber,  "focus_hieght",            "PSF: axial radius (1/e² radius)",                                     "w<sub>z</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1240,         0.01,     1e5,      10  );
+    addParameter(FloatNumber,  "focus_hieght",            "PSF: axial radius (1/e^2 radius)",                                     "w<sub>z</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1240,         0.01,     1e5,      10  );
     #define FCSSDiff_focus_height 12
-    addParameter(FloatNumber,  "focus_width",             "PSF: lateral radius (1/e² radius)",                                   "w<sub>x,y</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 600,          0,        1e4,      10    );
+    addParameter(FloatNumber,  "focus_width",             "PSF: lateral radius (1/e^2 radius)",                                   "w<sub>x,y</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 600,          0,        1e4,      10    );
     #define FCSSDiff_focus_width 13
     addParameter(FloatNumber,  "pixel_width",             "pixel width",                                           "a",                        "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 400,          0,        1e4,      10    );
     #define FCSSDiff_pixel_width 14

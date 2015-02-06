@@ -150,7 +150,7 @@ void QFFCSMSDEvaluationFitMSDDialog::replotGraph()
     JKQTPdatastore* ds=ui->pltDistribution->get_plotter()->getDatastore();
     ds->clear();
     size_t c_disttau=ds->addCopiedColumn(distTau.data(), distTau.size(), tr("tau [s]"));
-    size_t c_dist=ds->addCopiedColumn(dist.data(), dist.size(), tr("MSD [µm²]"));
+    size_t c_dist=ds->addCopiedColumn(dist.data(), dist.size(), tr("MSD [µm^2]"));
 
 
     JKQTPxyLineGraph* g_dist=new JKQTPxyLineGraph(ui->pltDistribution->get_plotter());

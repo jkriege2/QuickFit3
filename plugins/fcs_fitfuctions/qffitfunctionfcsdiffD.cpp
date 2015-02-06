@@ -103,8 +103,8 @@ QString QFFitFunctionFCSDiffD::id() const {
 }
 
 QString QFFitFunctionFCSDiffD::name() const {
-    if (hasGamma) return  QString("FCS: Normal Diffusion 3D, D and gamma as parameter");
-    return QString("FCS: Normal Diffusion 3D, D and wz as parameter");
+    if (hasGamma) return  QString("FCS: 3D Normal Diffusion, D and gamma as parameter");
+    return QString("FCS: 3D Normal Diffusion, D and wz as parameter");
 }
 double QFFitFunctionFCSDiffD::evaluate(double t, const double* data) const {
     const int comp=data[FCSDiff_n_components];
@@ -114,7 +114,7 @@ double QFFitFunctionFCSDiffD::evaluate(double t, const double* data) const {
     const double nf_theta1=data[FCSDiff_nonfl_theta1];
     const double nf_tau2=data[FCSDiff_nonfl_tau2]/1.0e6;
     const double nf_theta2=data[FCSDiff_nonfl_theta2];
-    const double D1=data[FCSDiff_diff_coeff1]*1.0e6; // in nm²/s
+    const double D1=data[FCSDiff_diff_coeff1]*1.0e6; // in nm^2/s
     const double rho2=data[FCSDiff_diff_rho2];
     const double D2=data[FCSDiff_diff_coeff2]*1.0e6;
     const double rho3=data[FCSDiff_diff_rho3];
@@ -180,7 +180,7 @@ void QFFitFunctionFCSDiffD::calcParameter(double* data, double* error) const {
     double enf_theta2=0;
     double rho1=1.0;
     double erho1=0;
-    double D1=data[FCSDiff_diff_coeff1]; // in µm²/s
+    double D1=data[FCSDiff_diff_coeff1]; // in µm^2/s
     double eD1=0;
     double rho2=data[FCSDiff_diff_rho2];
     double erho2=0;

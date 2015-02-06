@@ -61,9 +61,9 @@ QFFitFunctionsSPIMFCSADiffCE2::QFFitFunctionsSPIMFCSADiffCE2() {
 
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
     #define SPIMFCSADIFF_offset QFPPM_INC(SPIMFCSADIFF_diff_alpha3)
-    addParameter(FloatNumber,  "focus_hieght",            "PSF: axial radius (1/e²)",                              "w<sub>z</sub>",            "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 620,         0.01,     1e5,      10  );
+    addParameter(FloatNumber,  "focus_hieght",            "PSF: axial radius (1/e^2)",                              "w<sub>z</sub>",            "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 620,         0.01,     1e5,      10  );
     #define SPIMFCSADIFF_focus_height QFPPM_INC(SPIMFCSADIFF_offset)
-    addParameter(FloatNumber,  "focus_width",             "PSF: lateral radius (1/e²)",                            "w<sub>x,y</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 300,          0,        1e4,      10    );
+    addParameter(FloatNumber,  "focus_width",             "PSF: lateral radius (1/e^2)",                            "w<sub>x,y</sub>",          "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 300,          0,        1e4,      10    );
     #define SPIMFCSADIFF_focus_width QFPPM_INC(SPIMFCSADIFF_focus_height)
     addParameter(FloatNumber,  "pixel_width",             "pixel width",                                           "a",                        "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 400,          0,        1e4,      10    );
     #define SPIMFCSADIFF_pixel_width QFPPM_INC(SPIMFCSADIFF_focus_width)

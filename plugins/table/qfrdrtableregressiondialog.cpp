@@ -510,7 +510,7 @@ void QFRDRTableRegressionDialog::fillFitParams(int method)
         parameterLabels<<"IRLS iterations: ";
     }
     parameterNames<<"R2";
-    parameterLabels<<"R² = ";
+    parameterLabels<<"R^2 = ";
     parameterTable->setWriteTo(&paramMap, parameterNames, parameterLabels);
     parameterTable->setDoRebuildModel(true);
 }

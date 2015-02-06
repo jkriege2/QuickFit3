@@ -63,12 +63,18 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 */
 class QFFitFunctionFCSADiff2D: public QFFitFunction {
     public:
-        QFFitFunctionFCSADiff2D();
+        QFFitFunctionFCSADiff2D(bool isTIRF=false);
         virtual ~QFFitFunctionFCSADiff2D() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: Anomalous Diffusion 2D"); }
+        virtual QString name() const {
+            if (!isTIRF) return QObject::tr("FCS: 2D Anomalous Diffusion");
+            else return QObject::tr("TIR-FCS: 2D Anomalous Diffusion (Gaussian, 1/e^2 radii)");
+        }
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("fcs_adiff2d"); }
+        virtual QString id() const {
+            if (!isTIRF) return QString("fcs_adiff2d");
+            else return QString("fcs_tir_adiff2d");
+        }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
@@ -83,7 +89,8 @@ class QFFitFunctionFCSADiff2D: public QFFitFunction {
 
         /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
         virtual QString transformParametersForAdditionalPlot(int plot, double* params);
-
+    private:
+        bool isTIRF;
 };
 
 

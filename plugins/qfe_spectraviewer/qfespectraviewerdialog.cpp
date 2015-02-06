@@ -614,7 +614,7 @@ void QFESpectraViewerDialog::updateItemPropertiesModel()
                 modItemProperties.setCellCreate(row,0, tr("extinction coefficient [1/(cm M)]"));
                 modItemProperties.setCellCreate(row,1, tr("%1 @ %2nm").arg(fl.extiction_coefficient).arg(fl.extiction_coefficient_wavelength));
                 row++;
-                modItemProperties.setCellCreate(row,0, tr("abs. crosssection [cm²]"));
+                modItemProperties.setCellCreate(row,0, tr("abs. crosssection [cm^2]"));
                 modItemProperties.setCellCreate(row,1, tr("%1 @ %2nm").arg(fl.extiction_coefficient*3.82e-21).arg(fl.extiction_coefficient_wavelength));
                 row++;
                 loadMoredata(fl.moreData, row);

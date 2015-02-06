@@ -34,7 +34,7 @@ class QFFitFunctionFCSSimpleExp: public QFFitFunction {
         QFFitFunctionFCSSimpleExp();
         virtual ~QFFitFunctionFCSSimpleExp() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: Sum of Exponential Functions"); };
+        virtual QString name() const { return QObject::tr("FCS: Sum of Exponential Functions"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_simpleexp"); };
 

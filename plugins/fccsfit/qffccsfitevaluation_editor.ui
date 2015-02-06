@@ -404,17 +404,26 @@ p, li { white-space: pre-wrap; }
     </layout>
    </item>
    <item row="3" column="0">
-    <widget class="QVisibleHandleSplitter" name="splitter_3">
+    <widget class="QVisibleHandleSplitter" name="splitterPlotTable">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
+     </property>
+     <property name="childrenCollapsible">
+      <bool>false</bool>
      </property>
      <widget class="QVisibleHandleSplitter" name="splitter_2">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
-      <widget class="QVisibleHandleSplitter" name="splitter">
+      <property name="childrenCollapsible">
+       <bool>false</bool>
+      </property>
+      <widget class="QVisibleHandleSplitter" name="splitterPlots">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
+       </property>
+       <property name="childrenCollapsible">
+        <bool>false</bool>
        </property>
        <widget class="QWidget" name="verticalLayoutWidget">
         <layout class="QVBoxLayout" name="verticalLayout_4" stretch="0,1">
@@ -581,6 +590,12 @@ p, li { white-space: pre-wrap; }
  </widget>
  <customwidgets>
   <customwidget>
+   <class>QFPlotter</class>
+   <extends>QWidget</extends>
+   <header>qfplotter.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>JKQTPerrorPlotstyleComboBox</class>
    <extends>QComboBox</extends>
    <header>jkqtptools.h</header>
@@ -589,12 +604,6 @@ p, li { white-space: pre-wrap; }
    <class>QEnhancedTableView</class>
    <extends>QTableView</extends>
    <header>qenhancedtableview.h</header>
-  </customwidget>
-  <customwidget>
-   <class>QFPlotter</class>
-   <extends>QWidget</extends>
-   <header>qfplotter.h</header>
-   <container>1</container>
   </customwidget>
   <customwidget>
    <class>QVisibleHandleSplitter</class>

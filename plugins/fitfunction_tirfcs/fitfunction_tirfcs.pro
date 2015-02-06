@@ -45,7 +45,14 @@ HEADERS += qfpfitfunctionstirfcs.h \
 qffitfunctionstirfcsdiffe2_relbright.h \
     qffitfunctionstirffccsfw2dadiffxy2coloracfg.h \
     qffitfunctionstirffccsfw2dadiffxy2coloracfr.h \
-    qffitfunctionstirffccsfw2dadiffxy2colorccf.h
+    qffitfunctionstirffccsfw2dadiffxy2colorccf.h \
+    qffitfunctionstirfcsadiff3de2.h
+#\
+#    qffitfunctionstirfcsdiff3de2.h \
+#    qffitfunctionstirfcsdiff3de2_relbright.h \
+#    qffitfunctionstirfcsadiff3dpixele2.h \
+#    qffitfunctionstirfcsdiff3dpixele2.h \
+#    qffitfunctionstirfcsdiff3dpixele2_relbright.h
 
 
 SOURCES += qfpfitfunctionstirfcs.cpp\
@@ -62,7 +69,14 @@ SOURCES += qfpfitfunctionstirfcs.cpp\
 qffitfunctionstirfcsdiffe2_relbright.cpp \
     qffitfunctionstirffccsfw2dadiffxy2coloracfg.cpp \
     qffitfunctionstirffccsfw2dadiffxy2coloracfr.cpp \
-    qffitfunctionstirffccsfw2dadiffxy2colorccf.cpp
+    qffitfunctionstirffccsfw2dadiffxy2colorccf.cpp \
+    qffitfunctionstirfcsadiff3de2.cpp
+# \
+#    qffitfunctionstirfcsdiff3de2.cpp \
+#    qffitfunctionstirfcsdiff3de2_relbright.cpp \
+#    qffitfunctionstirfcsadiff3dpixele2.cpp \
+#    qffitfunctionstirfcsdiff3dpixele2.cpp \
+#    qffitfunctionstirfcsdiff3dpixele2_relbright.cpp
 
 FORMS =
 

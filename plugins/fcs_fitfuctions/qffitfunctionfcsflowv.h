@@ -64,7 +64,7 @@ class QFFitFunctionFCSFlowV: public QFFitFunction {
         virtual ~QFFitFunctionFCSFlowV() {}
 
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: Normal Diffusion 3D with flow term (D,v,wxy as fit params)"); }
+        virtual QString name() const { return QObject::tr("FCS: Normal Diffusion 3D with flow term (D,v,wxy as fit params)"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_diffflowv"); }
 

@@ -23,6 +23,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctionstirfcsdiffe2_relbright.h"
 #include "qffitfunctionstirfcsdiffe2.h"
 #include "qffitfunctionstirfcsadiffe2.h"
+#include "qffitfunctionstirfcsadiff3de2.h"
 #include "qffitfunctionstirfccsdiffflowe2.h"
 #include "qffitfunctionstirffccsfw2csep2ddiffxy2colorccf.h"
 #include "qffitfunctionstirffccsfw2csep2ddiffxy2coloracfg.h"
@@ -40,6 +41,7 @@ QStringList QFPFitFunctionsTIRFCS::getIDs() const {
      res<<"fcs_tir_diffe2";
      res<<"fcs_tir_adiffe2";
      res<<"fcs_tir_diffe2_diffbright";
+     res<<"fcs_tir_adiff3de2";
      res<<"fccs_tir_diff_flowe2";
      res<<"fccs_tir_fw_2csep2ddiffxy2coloracfg";
      res<<"fccs_tir_fw_2csep2ddiffxy2coloracfr";
@@ -58,6 +60,8 @@ QFFitFunction* QFPFitFunctionsTIRFCS::get(QString id, QObject* parent) const  {
         return new QFFitFunctionsTIRFCSDiffE2();
     } else if (id=="fcs_tir_adiffe2") {
         return new QFFitFunctionsTIRFCSADiffE2();
+    } else if (id=="fcs_tir_adiff3de2") {
+        return new QFFitFunctionsTIRFCSADiff3DE2();
     } else if (id=="fcs_tir_diffe2_diffbright") {
         return new QFFitFunctionsTIRFCSDiffE2Diffbright();
     } else if (id=="fccs_tir_diff_flowe2") {

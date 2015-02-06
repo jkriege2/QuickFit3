@@ -53,7 +53,19 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 QStringList QFPFitFunctionFCS::getIDs() const {
     QStringList res;
-    res<<"fcs_diff"<<"fcs_diff2d"<<"fcs_adiff_diffbright"<<"fcs_diff_diffbright"<<"fcs_diff2d_diffbright"<<"fcs_diff_d"<<"fcs_diff_d_afterpulse"<<"fcs_diff_d_c_afterpulse"<<"fcs_diff_d_wz"<<"fcs_diff_d_wz_afterpulse"<<"fcs_diff_d_wz_c_afterpulse"<<"fcs_diff1"<<"fcs_adiff"<<"fcs_multidiff"<<"fcs_diffflow"<<"fcs_diffflowv"<<"fcs_diffrot"<<"fcs_oscillation"<<"fcs_cs_diff_d"<<"fcs_diff_cs_d_wz"<<"fcs_simpleexp"<<"fcs_exp"<<"fcs_powerlaw"<<"fcs_diff_stretchpp"<<"fcs_diff2d_stretchpp"<<"fcs_adiff2d"<<"fcs_adiff2d_diffbright";
+    res<<"fcs_diff"<<"fcs_diff2d"<<"fcs_tir_diff2d"
+       <<"fcs_adiff_diffbright"<<"fcs_diff_diffbright"
+      <<"fcs_diff2d_diffbright"<<"fcs_tir_diff2d_diffbright"
+     <<"fcs_diff_d"<<"fcs_diff_d_afterpulse"
+    <<"fcs_diff_d_c_afterpulse"<<"fcs_diff_d_wz"
+    <<"fcs_diff_d_wz_afterpulse"<<"fcs_diff_d_wz_c_afterpulse"
+    <<"fcs_diff1"<<"fcs_adiff"
+    <<"fcs_multidiff"<<"fcs_diffflow"
+    <<"fcs_diffflowv"<<"fcs_diffrot"
+    <<"fcs_oscillation"<<"fcs_cs_diff_d"<<"fcs_diff_cs_d_wz"
+    <<"fcs_simpleexp"<<"fcs_exp"<<"fcs_powerlaw"<<"fcs_diff_stretchpp"
+    <<"fcs_diff2d_stretchpp"<<"fcs_adiff2d"<<"fcs_adiff2d_diffbright"
+    <<"fcs_tir_diff2d_stretchpp"<<"fcs_tir_adiff2d"<<"fcs_tir_adiff2d_diffbright";
     return res;
 }
 
@@ -63,11 +75,17 @@ QFFitFunction* QFPFitFunctionFCS::get(QString id, QObject* parent) const  {
     } else if (id=="fcs_diff_stretchpp") {
         return new QFFitFunctionFCSDiffStretchPP();
     } else if (id=="fcs_diff2d_stretchpp") {
-        return new QFFitFunctionFCSDiff2DStretchPP();
+        return new QFFitFunctionFCSDiff2DStretchPP(false);
     } else if (id=="fcs_diff2d") {
-        return new QFFitFunctionFCSDiff2D();
+        return new QFFitFunctionFCSDiff2D(false);
     } else if (id=="fcs_adiff2d") {
-        return new QFFitFunctionFCSADiff2D();
+        return new QFFitFunctionFCSADiff2D(false);
+    } else if (id=="fcs_tir_diff2d_stretchpp") {
+        return new QFFitFunctionFCSDiff2DStretchPP(true);
+    } else if (id=="fcs_tir_diff2d") {
+        return new QFFitFunctionFCSDiff2D(true);
+    } else if (id=="fcs_tir_adiff2d") {
+        return new QFFitFunctionFCSADiff2D(true);
     } else if (id=="fcs_diff_d") {
         return new QFFitFunctionFCSDiffD(true);
     } else if (id=="fcs_exp") {
@@ -107,11 +125,15 @@ QFFitFunction* QFPFitFunctionFCS::get(QString id, QObject* parent) const  {
     } else if (id=="fcs_diff_diffbright") {
         return new QFFitFunctionFCSDiffDifferentBrightness();
     } else if (id=="fcs_diff2d_diffbright") {
-        return new QFFitFunctionFCSDiff2DDifferentBrightness();
+        return new QFFitFunctionFCSDiff2DDifferentBrightness(false);
+    } else if (id=="fcs_tir_diff2d_diffbright") {
+        return new QFFitFunctionFCSDiff2DDifferentBrightness(true);
     } else if (id=="fcs_adiff_diffbright") {
         return new QFFitFunctionFCSADiffDifferentBrightness();
     } else if (id=="fcs_adiff2d_diffbright") {
-        return new QFFitFunctionFCSADiff2DDifferentBrightness();
+        return new QFFitFunctionFCSADiff2DDifferentBrightness(false);
+    } else if (id=="fcs_tir_adiff2d_diffbright") {
+        return new QFFitFunctionFCSADiff2DDifferentBrightness(true);
     }
     return NULL;
 }

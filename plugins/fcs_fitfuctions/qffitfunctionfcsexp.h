@@ -34,7 +34,7 @@ class QFFitFunctionFCSExp: public QFFitFunction {
         QFFitFunctionFCSExp();
         virtual ~QFFitFunctionFCSExp() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: Reaction Dynamics, No Diffusion"); };
+        virtual QString name() const { return QObject::tr("FCS: Reaction Dynamics, No Diffusion"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_exp"); };
 

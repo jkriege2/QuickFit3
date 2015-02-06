@@ -34,7 +34,7 @@ class QFFitFunctionFCSPowerLaw: public QFFitFunction {
         QFFitFunctionFCSPowerLaw();
         virtual ~QFFitFunctionFCSPowerLaw() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: Power Law Decay Function"); };
+        virtual QString name() const { return QObject::tr("FCS: Power Law Decay Function"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_powerlaw"); };
 

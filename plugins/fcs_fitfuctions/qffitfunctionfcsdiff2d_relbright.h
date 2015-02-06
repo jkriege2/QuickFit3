@@ -66,12 +66,18 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 */
 class QFFitFunctionFCSDiff2DDifferentBrightness: public QFFitFunction {
     public:
-        QFFitFunctionFCSDiff2DDifferentBrightness();
+        QFFitFunctionFCSDiff2DDifferentBrightness(bool isTIRF=false);
         virtual ~QFFitFunctionFCSDiff2DDifferentBrightness() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: Normal Diffusion 2D, different molecular brightnesses"); };
+        virtual QString name() const {
+            if (!isTIRF) return QObject::tr("FCS: 2D Normal Diffusion, different molecular brightnesses");
+            else return QObject::tr("TIR-FCS: 2D Normal Diffusion, different molecular brightnesses (Gaussian, 1/e^2 radii)");
+        }
         /*! \copydoc QFFitFunction::id()   */
-        virtual QString id() const { return QString("fcs_diff2d_diffbright"); };
+        virtual QString id() const {
+            if(!isTIRF) return QString("fcs_diff2d_diffbright");
+            else return QString("fcs_tir_diff2d_diffbright");
+        }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
@@ -87,6 +93,8 @@ class QFFitFunctionFCSDiff2DDifferentBrightness: public QFFitFunction {
         /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()   */
         virtual QString transformParametersForAdditionalPlot(int plot, double* params);
 
+    private:
+        bool isTIRF;
 
 
 };

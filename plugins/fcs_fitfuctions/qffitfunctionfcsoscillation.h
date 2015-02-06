@@ -45,7 +45,7 @@ class QFFitFunctionFCSOscillation : public QFFitFunction
         ~QFFitFunctionFCSOscillation();
 
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: Oscillation"); }
+        virtual QString name() const { return QObject::tr("FCS: Oscillation"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_oscillation"); }
 

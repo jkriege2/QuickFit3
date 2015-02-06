@@ -8,35 +8,52 @@
         $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$        
         <h2>Fit Functions for TIR-FCS/FCCS</h2>
         $$see:There is also a <a href="faq.html">frequently asked questions (FAQ) page</a>, which explains which TIR-FCS/FCCS fit function to choose for which case$$
-        <ul>
+<ol>
+    <li><b>camera-based TIR-FCS (square pixels):</b><ul>
           <li><b>FCS, i.e. single-pixel autocorrelation</b>:<ul>
-            <li><a href="fcs_tir_diffe2.html">diffusion (1/e<sup>2</sup> width)</a></li>
-            <li><a href="fcs_tir_diffe2_diffbright.html">diffusion, different molecular brightnesses (1/e<sup>2</sup> width)</a></li>
-            <li><a href="fcs_tir_adiffe2.html">anomalous diffusion (1/e<sup>2</sup> width)</a></li>
+            <li><a href="fcs_tir_diffe2.html">2D diffusion (square pixel, 1/e<sup>2</sup> width)</a></li>
+            <li><a href="fcs_tir_diffe2_diffbright.html">2D diffusion, different molecular brightnesses (square pixel, 1/e<sup>2</sup> width)</a></li>
+            <li><a href="fcs_tir_adiffe2.html">2D anomalous diffusion (square pixel, 1/e<sup>2</sup> width)</a></li>
+            <li><a href="fcs_tir_pixel_diff3de2.html">3D diffusion (square pixel, 1/e<sup>2</sup> width)</a></li>
+            <li><a href="fcs_tir_pixel_diff3de2_diffbright.html">3D diffusion, different molecular brightnesses (square pixel, 1/e<sup>2</sup> width)</a></li>
+            <li><a href="fcs_tir_pixel_adiff3de2.html">3D anomalous diffusion (square pixel, 1/e<sup>2</sup> width)</a></li>
           </li>
           <li><b>two-pixel FCCS</b>:<ul>
-            <li><a href="fccs_tir_diff_flowe2.html">diffusion+flow (1/e<sup>2</sup> width)</a></li>
+            <li><a href="fccs_tir_diff_flowe2.html">2D diffusion+flow (square pixel, 1/e<sup>2</sup> width)</a></li>
           </ul></li>  
           <li><b>two-color FCCS</b>:<ul>
-		    <li><b>1-component normal diffusion:</b><ul>
-            <li><a href="fccs_tir_fw_2ddiffxy2coloracfg.html">TIR-FCCS: 1-comp. 2D diffusion (xy), species A+B+AB, c/D per species, ACF green (1/e² radii)</a></li>
-            <li><a href="fccs_tir_fw_2ddiffxy2coloracfr.html">TIR-FCCS: 1-comp. 2D diffusion (xy), species A+B+AB, c/D per species, ACF red (1/e² radii)</a></li>
-            <li><a href="fccs_tir_fw_2ddiffxy2colorccf.html">TIR-FCCS: 1-comp. 2D diffusion (xy), species A+B+AB, c/D per species, CCF (1/e² radii)</a></li>
-			</ul></li>
+            <li><b>1-component normal diffusion:</b><ul>
+            <li><a href="fccs_tir_fw_2ddiffxy2coloracfg.html">TIR-FCCS: 1-comp. 2D diffusion (xy), species A+B+AB, c/D per species, ACF green (1/e<sup>2</sup> radii)</a></li>
+            <li><a href="fccs_tir_fw_2ddiffxy2coloracfr.html">TIR-FCCS: 1-comp. 2D diffusion (xy), species A+B+AB, c/D per species, ACF red (1/e<sup>2</sup> radii)</a></li>
+            <li><a href="fccs_tir_fw_2ddiffxy2colorccf.html">TIR-FCCS: 1-comp. 2D diffusion (xy), species A+B+AB, c/D per species, CCF (1/e<sup>2</sup> radii)</a></li>
+            </ul></li>
 
-		    <li><b>2-component normal diffusion:</b><ul>
-            <li><a href="fccs_tir_fw_2csep2ddiffxy2coloracfg.html">TIR-FCCS: 2-comp. 2D diffusion (xy), species A+B+AB, c per species, D1/D2 per channel, ACF green (1/e² radii)</a></li>
-            <li><a href="fccs_tir_fw_2csep2ddiffxy2coloracfr.html">TIR-FCCS: 2-comp. 2D diffusion (xy), species A+B+AB, c per species, D1/D2 per channel, ACF red (1/e² radii)</a></li>
-            <li><a href="fccs_tir_fw_2csep2ddiffxy2colorccf.html">TIR-FCCS: 2-comp. 2D diffusion (xy), species A+B+AB, c per species, D1/D2 per channel, CCF (1/e² radii)</a></li>
-			</ul></li>
+            <li><b>2-component normal diffusion:</b><ul>
+            <li><a href="fccs_tir_fw_2csep2ddiffxy2coloracfg.html">TIR-FCCS: 2-comp. 2D diffusion (xy), species A+B+AB, c per species, D1/D2 per channel, ACF green (1/e<sup>2</sup> radii)</a></li>
+            <li><a href="fccs_tir_fw_2csep2ddiffxy2coloracfr.html">TIR-FCCS: 2-comp. 2D diffusion (xy), species A+B+AB, c per species, D1/D2 per channel, ACF red (1/e<sup>2</sup> radii)</a></li>
+            <li><a href="fccs_tir_fw_2csep2ddiffxy2colorccf.html">TIR-FCCS: 2-comp. 2D diffusion (xy), species A+B+AB, c per species, D1/D2 per channel, CCF (1/e<sup>2</sup> radii)</a></li>
+            </ul></li>
             
-		    <li><b>1-component anomalous diffusion:</b><ul>
-            <li><a href="fccs_tir_fw_2dadiffxy2coloracfg.html">TIR-FCCS: 1-comp. 2D anomalous diffusion (xy), species A+B+AB, c/D per species, ACF green (1/e² radii)</a></li>
-            <li><a href="fccs_tir_fw_2dadiffxy2coloracfr.html">TIR-FCCS: 1-comp. 2D anomalous diffusion (xy), species A+B+AB, c/D per species, ACF red (1/e² radii)</a></li>
-            <li><a href="fccs_tir_fw_2dadiffxy2colorccf.html">TIR-FCCS: 1-comp. 2D anomalous diffusion (xy), species A+B+AB, c/D per species, CCF (1/e² radii)</a></li>
-			</ul></li>
+            <li><b>1-component anomalous diffusion:</b><ul>
+            <li><a href="fccs_tir_fw_2dadiffxy2coloracfg.html">TIR-FCCS: 1-comp. 2D anomalous diffusion (xy), species A+B+AB, c/D per species, ACF green (1/e<sup>2</sup> radii)</a></li>
+            <li><a href="fccs_tir_fw_2dadiffxy2coloracfr.html">TIR-FCCS: 1-comp. 2D anomalous diffusion (xy), species A+B+AB, c/D per species, ACF red (1/e<sup>2</sup> radii)</a></li>
+            <li><a href="fccs_tir_fw_2dadiffxy2colorccf.html">TIR-FCCS: 1-comp. 2D anomalous diffusion (xy), species A+B+AB, c/D per species, CCF (1/e<sup>2</sup> radii)</a></li>
+            </ul></li>
 
         </ul>
+    </li>
+    <li><b>confocal TIR-FCS (Gaussian pixels):</b><ul>
+          <li><b>FCS, i.e. autocorrelation</b>:<ul>
+            <li><a href="fcs_tir_adiff3de2.html">3D diffusion (Gaussian, 1/e<sup>2</sup> width)</a></li>
+            <li><a href="fcs_tir_diff3de2_diffbright.html">3D diffusion, different molecular brightnesses (Gaussian, 1/e<sup>2</sup> width)</a></li>
+            <li><a href="fcs_tir_adiff3de2.html">3D anomalous diffusion (Gaussian, 1/e<sup>2</sup> width)</a></li>
+          </li>
+
+
+        </ul>
+    </li>
+</ol>
+        
 
     </body>
 </html>

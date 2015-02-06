@@ -33,7 +33,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 
 
-QFFitFunctionFCSADiff2D::QFFitFunctionFCSADiff2D() {
+QFFitFunctionFCSADiff2D::QFFitFunctionFCSADiff2D(bool isTIRF) {
+    this->isTIRF=isTIRF;
     //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(IntCombo,     "n_nonfluorescent",        "number of nonfluorescent components (triplet ...)",     "# non-fluorescent",        "",            "",                      false,     true,         false,             QFFitFunction::NoError,      false, 1,            0,        2,        1,   0,      2);
     #define FCSADiff_n_nonfluorescent 0

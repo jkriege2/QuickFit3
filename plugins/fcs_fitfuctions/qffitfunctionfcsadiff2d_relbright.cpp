@@ -30,7 +30,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #define NAVOGADRO (6.02214179e23)
 
-QFFitFunctionFCSADiff2DDifferentBrightness::QFFitFunctionFCSADiff2DDifferentBrightness() {
+QFFitFunctionFCSADiff2DDifferentBrightness::QFFitFunctionFCSADiff2DDifferentBrightness(bool isTIRF) {
+    this->isTIRF=isTIRF;
     //           type,         id,                        name,                                                    label,                      unit,          unitlabel,               fit,       userEditable, userRangeEditable, displayError,                initialValue, minValue, maxValue, inc, absMin, absMax
     addParameter(IntCombo,     "n_nonfluorescent",        "number of nonfluorescent components (triplet ...)",     "# non-fluorescent",        "",            "",                      false,     true,         false,             QFFitFunction::NoError,      false, 1,            0,        4,        1,   0,      4);
     #define FCSDiff_n_nonfluorescent 0

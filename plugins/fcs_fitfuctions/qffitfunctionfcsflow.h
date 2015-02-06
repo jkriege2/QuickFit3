@@ -77,7 +77,7 @@ class QFFitFunctionFCSFlow: public QFFitFunction {
         QFFitFunctionFCSFlow();
         virtual ~QFFitFunctionFCSFlow() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: Normal Diffusion 3D with flow term"); };
+        virtual QString name() const { return QObject::tr("FCS: 3D Normal Diffusion with flow term"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_diffflow"); };
 

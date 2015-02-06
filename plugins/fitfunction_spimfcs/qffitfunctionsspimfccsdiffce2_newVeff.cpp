@@ -58,9 +58,9 @@ QFFitFunctionsSPIMFCCSDiffCENewVeff2::QFFitFunctionsSPIMFCCSDiffCENewVeff2() {
     #define FCCSDiff_focus_distancey 5
     addParameter(FloatNumber,  "focus_distance",         "foci: lateral distance",                                  "d<sub>xy</sub>",            "nm",         "nm",                     false,      false,         false,              QFFitFunction::DisplayError,    true, 1000,              0,     1e6,      10  );
     #define FCCSDiff_focus_distance 6
-    addParameter(FloatNumber,  "focus_height",            "PSF: axial radius (1/e² radius)",                        "w<sub>z</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1240,         0.01,     1e5,      10  );
+    addParameter(FloatNumber,  "focus_height",            "PSF: axial radius (1/e^2 radius)",                        "w<sub>z</sub>",      "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 1240,         0.01,     1e5,      10  );
     #define FCCSDiff_focus_height 7
-    addParameter(FloatNumber,  "focus_width",             "PSF: lateral radius (1/e² radius)",                      "w<sub>x,y</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 600,          0,        1e4,      10    );
+    addParameter(FloatNumber,  "focus_width",             "PSF: lateral radius (1/e^2 radius)",                      "w<sub>x,y</sub>",    "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 600,          0,        1e4,      10    );
     #define FCCSDiff_focus_width 8
     addParameter(FloatNumber,  "pixel_width",             "pixel width",                                           "a",                        "nm",         "nm",                     true,      true,         true,              QFFitFunction::EditError,    true, 400,          0,        1e4,      10    );
     #define FCCSDiff_pixel_width 9

@@ -78,7 +78,7 @@ class QFFitFunctionFCSRot: public QFFitFunction {
         QFFitFunctionFCSRot();
         virtual ~QFFitFunctionFCSRot() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: Normal Diffusion 3D with rotation term"); }
+        virtual QString name() const { return QObject::tr("FCS: 3D Normal Diffusion with rotation term"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_diffrot"); }
 

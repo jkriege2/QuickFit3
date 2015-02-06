@@ -60,13 +60,6 @@ QFFCCSFitEvaluationEditor::QFFCCSFitEvaluationEditor(QFPluginServices* services,
     // setup widgets
     ui->setupUi(this);
     connect(ui->pltOverview, SIGNAL(currentRunChanged(int)), this, SLOT(setCurrentRun(int)));
-    ui->splitter->setChildrenCollapsible(false);
-    ui->splitter->setStretchFactor(0,3);
-    ui->splitter->setStretchFactor(1,1);
-    QList<int> l;
-    l<<3*ui->splitter->height()/4;
-    l<<ui->splitter->height()/4;
-    ui->splitter->setSizes(l);
     ui->datacut->set_allowCopyToAll(true);
     ui->datacut->set_copyToFilesEnabled(true);
     ui->datacut->set_copyToRunsEnabled(false);
@@ -257,6 +250,10 @@ QFFCCSFitEvaluationEditor::QFFCCSFitEvaluationEditor(QFPluginServices* services,
     connect(ui->datacut, SIGNAL(copyUserMinMaxToAllRuns(int,int)), this, SLOT(copyUserMinMaxToAllRuns(int,int)));*/
 
     updatingData=false;
+    ui->splitterPlotTable->setStretchFactor(0,1);
+    ui->splitterPlotTable->setStretchFactor(1,1);
+    ui->splitterPlots->setStretchFactor(0,3);
+    ui->splitterPlots->setStretchFactor(1,1);
 }
 
 QFFCCSFitEvaluationEditor::~QFFCCSFitEvaluationEditor()
@@ -403,9 +400,9 @@ void QFFCCSFitEvaluationEditor::readSettings() {
     if (!settings) return;
     currentSaveDirectory=settings->getQSettings()->value(QString("FCCS_fit/editor/lastSaveDirectory"), currentSaveDirectory).toString();
     if (current) {
-        loadSplitter(*(settings->getQSettings()), ui->splitter, QString("QFFCCSFitEvaluationEditor%1/splitter_1").arg(current->getID()));
+        loadSplitter(*(settings->getQSettings()), ui->splitterPlots, QString("QFFCCSFitEvaluationEditor%1/splitterPlots").arg(current->getID()));
         loadSplitter(*(settings->getQSettings()), ui->splitter_2, QString("QFFCCSFitEvaluationEditor%1/splitter_2").arg(current->getID()));
-        loadSplitter(*(settings->getQSettings()), ui->splitter_3, QString("QFFCCSFitEvaluationEditor%1/splitter_3").arg(current->getID()));
+        loadSplitter(*(settings->getQSettings()), ui->splitterPlotTable, QString("QFFCCSFitEvaluationEditor%1/splitterPlotTable").arg(current->getID()));
     }
 }
 
@@ -414,9 +411,9 @@ void QFFCCSFitEvaluationEditor::writeSettings() {
     if (!settings) return;
     settings->getQSettings()->setValue(QString("FCCS_fit/editor/lastSaveDirectory"), currentSaveDirectory);
     if (current) {
-        saveSplitter(*(settings->getQSettings()), ui->splitter, QString("QFFCCSFitEvaluationEditor%1/splitter_1").arg(current->getID()));
+        saveSplitter(*(settings->getQSettings()), ui->splitterPlots, QString("QFFCCSFitEvaluationEditor%1/splitterPlots").arg(current->getID()));
         saveSplitter(*(settings->getQSettings()), ui->splitter_2, QString("QFFCCSFitEvaluationEditor%1/splitter_2").arg(current->getID()));
-        saveSplitter(*(settings->getQSettings()), ui->splitter_3, QString("QFFCCSFitEvaluationEditor%1/splitter_3").arg(current->getID()));
+        saveSplitter(*(settings->getQSettings()), ui->splitterPlotTable, QString("QFFCCSFitEvaluationEditor%1/splitterPlotTable").arg(current->getID()));
     }
 }
 

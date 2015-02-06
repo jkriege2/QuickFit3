@@ -115,7 +115,7 @@ QString QFFitFunctionFCCSNormalDiff3D2Focus_c::name() const {
 double QFFitFunctionFCCSNormalDiff3D2Focus_c::evaluate(double t, const double* data) const {
     const int comp=data[FCSDiff_n_components];
     const double c=data[FCSDiff_concentration];
-    const double D1=data[FCSDiff_diff_coeff1]; // in µm²/s
+    const double D1=data[FCSDiff_diff_coeff1]; // in µm�^2/s
     const double rho2=data[FCSDiff_diff_rho2];
     const double D2=data[FCSDiff_diff_coeff2];
     const double rho3=data[FCSDiff_diff_rho3];
@@ -175,7 +175,7 @@ void QFFitFunctionFCCSNormalDiff3D2Focus_c::calcParameter(double* data, double* 
     double eC=0;
     double rho1=1.0;
     double erho1=0;
-    double D1=data[FCSDiff_diff_coeff1]; // in µm²/s
+    double D1=data[FCSDiff_diff_coeff1]; // in µm�^2/s
     double eD1=0;
     double rho2=data[FCSDiff_diff_rho2];
     double erho2=0;

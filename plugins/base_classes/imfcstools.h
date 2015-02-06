@@ -112,6 +112,35 @@ inline double TIRFCS_newAeffError(double a, double ea, double wxy, double ewxy){
 }
 
 
+inline double TIRFCS_newVeff(double a, double wxy, double d) {
+    return TIRFCS_newAeff(a, wxy)*d;
+}
+
+
+inline double TIRFCS_newVeffError(double a, double ea, double wxy, double ewxy, double d, double ed){
+    return 0;
+}
+
+inline double TIRFCS_confocalVeff(double wxy, double d) {
+    return 2.0*M_PI*wxy*wxy*d;
+}
+
+
+inline double TIRFCS_confocalVeffError(double wxy, double ewxy, double d, double ed){
+    return 0;
+}
+
+
+inline double TIRFCS_confocalAeff(double wxy) {
+    return M_PI*wxy*wxy;
+}
+
+
+inline double TIRFCS_confocalAeffError(double wxy, double ewxy, double d, double ed){
+    return 0;
+}
+
+
 inline double QFFitFunctionsTIRFCCSFWDiff2ColorCCF_pixelcorrfactor(double a, double dx, double D, double t, double wg, double wr) {
     const double dt_sigma=sqrt(8.0*D*t+wg*wg+wr*wr);
     const double dt_sigma2=qfSqr(dt_sigma);
@@ -141,5 +170,79 @@ inline double QFFitFunctionsTIRFCCSFWADiff2ColorCCF_corrfactor_2Dxy(double a, do
     return QFFitFunctionsTIRFCCSFWADiff2ColorCCF_pixelcorrfactor(a, dx, Gamma, alpha, t, wg, wr)*
            QFFitFunctionsTIRFCCSFWADiff2ColorCCF_pixelcorrfactor(a, dy, Gamma, alpha, t, wg, wr);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+inline double QFFitFunctionsTIRFCSADiff3D_pixelcorrfactor(double a, double D, double t, double wg, double dg) {
+    return qfSqr(QFFitFunctionsTIRFCCSFWDiff2ColorCCF_pixelcorrfactor(a, 0, D, t, wg, wg))*TIRFCS_newAeff(a,wg)*(sqrt(4.0*D*t/M_PI)/dg+(1.0-2.0*D*t/dg/dg)*exp(D*t/dg/dg)*erfc(sqrt(D*t)/dg));
+}
+
+
+
+inline double QFFitFunctionsTIRFCSADiff3D_pixelcorrfactor(double a, double Gamma, double alpha, double t, double wg, double dg) {
+    const double dtau=Gamma*pow(t, alpha);
+    return qfSqr(QFFitFunctionsTIRFCCSFWADiff2ColorCCF_pixelcorrfactor(a, 0, Gamma, alpha, t, wg, wg))*TIRFCS_newAeff(a,wg)*(sqrt(4.0*dtau/M_PI)/dg+(1.0-2.0*dtau/dg/dg)*exp(dtau/dg/dg)*erfc(sqrt(dtau)/dg));
+}
+
+
+inline double QFFitFunctionsTIRFCSADiff2D_pixelcorrfactor(double a, double D, double t, double wg) {
+    return qfSqr(QFFitFunctionsTIRFCCSFWDiff2ColorCCF_pixelcorrfactor(a, 0, D, t, wg, wg))*TIRFCS_newAeff(a,wg);
+}
+
+
+
+inline double QFFitFunctionsTIRFCSADiff2D_pixelcorrfactor(double a, double Gamma, double alpha, double t, double wg) {
+    return qfSqr(QFFitFunctionsTIRFCCSFWADiff2ColorCCF_pixelcorrfactor(a, 0, Gamma, alpha, t, wg, wg))*TIRFCS_newAeff(a,wg);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+inline double QFFitFunctionsTIRFCSDiff3D_gausscorrfactor(double D, double t, double wg, double dg) {
+    return qfSqr(QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(0, D, t, wg, wg))*(M_PI*wg*wg)*(sqrt(4.0*D*t/M_PI)/dg+(1.0-2.0*D*t/dg/dg)*exp(D*t/dg/dg)*erfc(sqrt(D*t)/dg));
+}
+
+
+
+inline double QFFitFunctionsTIRFCSADiff3D_gausscorrfactor(double Gamma, double alpha, double t, double wg, double dg) {
+    const double dtau=Gamma*pow(t, alpha);
+    return qfSqr(QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(0, Gamma, alpha, t, wg, wg))*(M_PI*wg*wg)*(sqrt(4.0*dtau/M_PI)/dg+(1.0-2.0*dtau/dg/dg)*exp(dtau/dg/dg)*erfc(sqrt(dtau)/dg));
+}
+
+
+inline double QFFitFunctionsTIRFCSDiff2D_gausscorrfactor(double D, double t, double wg) {
+    return qfSqr(QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(0, D, t, wg, wg))*(M_PI*wg*wg);
+}
+
+
+
+inline double QFFitFunctionsTIRFCSADiff2D_gausscorrfactor(double Gamma, double alpha, double t, double wg) {
+    return qfSqr(QFFitFunctionsSPIMFCCSFWADiff2ColorCCF_corrfactor(0, Gamma, alpha, t, wg, wg))*(M_PI*wg*wg);
+}
+
 
 #endif // IMFCSTOOLS_H

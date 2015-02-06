@@ -68,7 +68,7 @@ class QFFitFunctionFCSDiff: public QFFitFunction {
         QFFitFunctionFCSDiff();
         virtual ~QFFitFunctionFCSDiff() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: Normal Diffusion 3D"); };
+        virtual QString name() const { return QObject::tr("FCS: 3D Normal Diffusion"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_diff"); };
 

@@ -74,7 +74,7 @@ class QFFitFunctionFCSSimpleDiff: public QFFitFunction {
         QFFitFunctionFCSSimpleDiff();
         virtual ~QFFitFunctionFCSSimpleDiff() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: 1-component Normal Diffusion 3D, analytical derivatives"); };
+        virtual QString name() const { return QObject::tr("FCS: 3D 1-component Normal Diffusion, analytical derivatives"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_diff1"); };
 

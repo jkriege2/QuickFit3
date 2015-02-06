@@ -93,8 +93,8 @@ QString QFFitFunctionCSFCSDiffD::id() const {
 }
 
 QString QFFitFunctionCSFCSDiffD::name() const {
-    if (hasGamma) return  QString("csFCS: Normal Diffusion 3D, D and gamma as parameter, circle-scanning");
-    return QString("csFCS: Normal Diffusion 3D, D and wz as parameter, circle-scanning");
+    if (hasGamma) return  QString("csFCS: 3D Normal Diffusion, D and gamma as parameter, circle-scanning");
+    return QString("csFCS: 3D Normal Diffusion, D and wz as parameter, circle-scanning");
 }
 double QFFitFunctionCSFCSDiffD::evaluate(double t, const double* data) const {
     const int comp=1;//data[FCSDiff_n_components];
@@ -104,7 +104,7 @@ double QFFitFunctionCSFCSDiffD::evaluate(double t, const double* data) const {
     const double nf_theta1=data[FCSDiff_nonfl_theta1];
     const double nf_tau2=data[FCSDiff_nonfl_tau2]/1.0e6;
     const double nf_theta2=data[FCSDiff_nonfl_theta2];
-    const double D1=data[FCSDiff_diff_coeff1]*1.0e6; // in nm²/s
+    const double D1=data[FCSDiff_diff_coeff1]*1.0e6; // in nm^2/s
     //const double rho2=data[FCSDiff_diff_rho2];
     //const double D2=data[FCSDiff_diff_coeff2]*1.0e6;
     //const double rho3=data[FCSDiff_diff_rho3];
@@ -178,7 +178,7 @@ void QFFitFunctionCSFCSDiffD::calcParameter(double* data, double* error) const {
     double nf_theta2=data[FCSDiff_nonfl_theta2];
     double enf_theta2=0;
 
-    const double D1=data[FCSDiff_diff_coeff1]*1.0e6; // in nm²/s
+    const double D1=data[FCSDiff_diff_coeff1]*1.0e6; // in nm^2/s
     double eD1=0;
 
     double gamma=data[FCSDiff_focus_struct_fac];
@@ -203,7 +203,7 @@ void QFFitFunctionCSFCSDiffD::calcParameter(double* data, double* error) const {
         enf_theta1=error[FCSDiff_nonfl_theta1];
         enf_tau2=error[FCSDiff_nonfl_tau2];
         enf_theta2=error[FCSDiff_nonfl_theta2];
-        eD1=error[FCSDiff_diff_coeff1]*1.0e6; // in nm²/s
+        eD1=error[FCSDiff_diff_coeff1]*1.0e6; // in nm^2/s
 
         egamma=error[FCSDiff_focus_struct_fac];
         ewxy=error[FCSDiff_focus_width]/1.0e3;

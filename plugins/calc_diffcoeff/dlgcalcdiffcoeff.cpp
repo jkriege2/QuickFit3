@@ -92,7 +92,7 @@ void DlgCalcDiffCoeff::updateD() {
     tab->appendColumn();
     tab->appendColumn();
     tab->setColumnTitle(0, tr("temperature [°C]"));
-    tab->setColumnTitle(1, tr("D [µm²/s]"));
+    tab->setColumnTitle(1, tr("D [µm^2/s]"));
     tab->setColumnTitle(2, tr("viscosity [mPa s]"));
     tab->setColumnTitle(3, tr("density [kg/l]"));
 
@@ -417,12 +417,12 @@ void DlgCalcDiffCoeff::redoPlot()
     ui->plotter->clearGraphs();
     ui->plotter->getDatastore()->clear();
     c_temp=ui->plotter->getDatastore()->addColumn(temp.data(), temp.size(), "temperature [°C]");
-    c_D=ui->plotter->getDatastore()->addColumn(D.data(), D.size(), "D [µm²/s]");
+    c_D=ui->plotter->getDatastore()->addColumn(D.data(), D.size(), "D [µm^2/s]");
     c_visc=ui->plotter->getDatastore()->addColumn(visc.data(), visc.size(), "viscosity [mPa s]");
     c_density=ui->plotter->getDatastore()->addColumn(density.data(), density.size(), "density [kg/l]");
-    c_Dwater=ui->plotter->getDatastore()->addColumn(Dwater.data(), Dwater.size(), "D_water [µm²/s]");
-    c_Dsolution=ui->plotter->getDatastore()->addColumn(Dsolution.data(), Dsolution.size(), "D_{solution} [µm²/s]");
-    c_Dsphere=ui->plotter->getDatastore()->addColumn(Dsphere.data(), Dsphere.size(), "D of sphere [µm²/s]");
+    c_Dwater=ui->plotter->getDatastore()->addColumn(Dwater.data(), Dwater.size(), "D_water [µm^2/s]");
+    c_Dsolution=ui->plotter->getDatastore()->addColumn(Dsolution.data(), Dsolution.size(), "D_{solution} [µm^2/s]");
+    c_Dsphere=ui->plotter->getDatastore()->addColumn(Dsphere.data(), Dsphere.size(), "D of sphere [µm^2/s]");
     ui->plotter->get_plotter()->getYAxis()->set_axisLabel(tr(""));
     ui->plotter->get_plotter()->set_showKey(true);
 
@@ -463,7 +463,7 @@ void DlgCalcDiffCoeff::redoPlot()
         g->set_title(tr("D in solution"));
         ui->plotter->addGraph(g);
 
-        ui->plotter->get_plotter()->getYAxis()->set_axisLabel(tr("diffusion coefficient [µm²/s]"));
+        ui->plotter->get_plotter()->getYAxis()->set_axisLabel(tr("diffusion coefficient [µm^2/s]"));
     } else if (ui->cmbPlot->currentIndex()==1) {
         JKQTPxyLineGraph* g=new JKQTPxyLineGraph(ui->plotter->get_plotter());
         g->set_drawLine(true);

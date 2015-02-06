@@ -69,7 +69,7 @@ class QFFitFunctionFCSADiffDifferentBrightness: public QFFitFunction {
         QFFitFunctionFCSADiffDifferentBrightness();
         virtual ~QFFitFunctionFCSADiffDifferentBrightness() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCS: Anomalous Diffusion 3D, different molecular brightnesses"); };
+        virtual QString name() const { return QObject::tr("FCS: 3D Anomalous Diffusion, different molecular brightnesses"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_adiff_diffbright"); };
 
