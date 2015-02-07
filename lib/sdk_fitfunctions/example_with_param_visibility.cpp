@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
+Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center
     
     last modification: $LastChangedDate$  (revision $Rev$)
 
@@ -37,6 +37,7 @@ char QF3SFF_SHORTNAME[]="EXAMPLE: shared lib FitFunc, with visibility";
 char QF3SFF_HELP[]="example_with_param_visibility.html";
 
 // a category for the fit functions
+#undef QF3SFF_CATEGORY
 #define QF3SFF_CATEGORY "example fit functions"
 
 // number of parameters of the fit model
