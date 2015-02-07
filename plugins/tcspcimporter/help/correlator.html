@@ -45,7 +45,9 @@ Here the input photon stream is binned into bins of width &tau;<sub>min</sub> th
      <img src="./pic/symm_normalization.png">
   </blockquote>
                           this corresponds to the continuum definition:
-                          $$bmath:g(\tau)=\frac{\langle I(t)\cdot J(t+\tau)\rangle}{\langle I\rangle\cdot\langle J\rangle}       \text{with}  \langle I(t)\rangle=\limi_{T\rightarrow\infty}\frac{1}{T}\int_0^T I(t)\;\mathrm{d}t$$
+                          $$bmath:g(\tau)=\frac{\langle I(t)\cdot J(t+\tau)\rangle}{\langle I\rangle\cdot\langle J\rangle}$$
+		  with
+		  $$bmath:\langle I(t)\rangle=\limi_{T\rightarrow\infty}\frac{1}{T}\int_0^T I(t)\;\mathrm{d}t$$
   The correlation scheme used in this function was introduced by K. Schätzel [1,2] for hardware correlators. It allows to estimate the ACF/CCF without keeping the whole time series in memory. It is based on the above semi-logarithmically spaced values of <i>&tau;<sub>s,p</sub></i>. For each of the <i>P</i> linear blocks an averaged set of input signals is created:
      <blockquote>
        <img src="./pic/multitau_signals.png">

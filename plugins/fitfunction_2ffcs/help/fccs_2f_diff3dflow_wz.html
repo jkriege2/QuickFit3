@@ -13,7 +13,9 @@
 		</ul>
 		
 		The model function is:
-		  $$bmath:g(\tau)= \frac{1}{N}\cdot\left(\frac{I_1-B_1}{I_1}\right)\cdot\left(\frac{I_2-B_2}{I_2}\right)\cdot\left[(1-\rho_2-\rho_3)\cdot g_1(\tau)+\rho_2\cdot g_2(\tau)+\rho_3\cdot g_3(\tau)\right]+G_\infty     \text{with}     g_i(\tau)=\left(1+\frac{4D_i\tau}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{4D_i\tau}{w_{z}^2}\right)^{-1/2}\cdot\exp\left(-\frac{(v_x\tau-d_x)^2+(v_y\tau-d_y)^2}{w_{xy}^2+4D\tau}\right)$$
+		  $$bmath:g(\tau)= \frac{1}{N}\cdot\left(\frac{I_1-B_1}{I_1}\right)\cdot\left(\frac{I_2-B_2}{I_2}\right)\cdot\left[(1-\rho_2-\rho_3)\cdot g_1(\tau)+\rho_2\cdot g_2(\tau)+\rho_3\cdot g_3(\tau)\right]+G_\$$
+		  with
+		  $$bmath:g_i(\tau)=\left(1+\frac{4D_i\tau}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{4D_i\tau}{w_{z}^2}\right)^{-1/2}\cdot\exp\left(-\frac{(v_x\tau-d_x)^2+(v_y\tau-d_y)^2}{w_{xy}^2+4D\tau}\right)$$
 		  
 		  
 		Here the parameters are defined as follows:
@@ -32,7 +34,7 @@
 			<li>$$G_\infty$$: offset of correlation function (usually fixed to 0 or 1)</li>
 			<li>$$math:\rho_i$$ fraction of particles of species <i>i</i>. Note that the $$math:\sum_i\rho_i=1$$</li>
 		</ul>
-		<center><table border="1"><tr><td><b>Note: This model neglects the overlap between the foci, so make sure this crosstalk is neglectable in your measurement!!!</b></td></tr></table><center>
+		
 		</p>
 		
 This model also calculates the diffusion time (retention time in the focus), if the width $$math:w_{y}$$ of the laser focus (xy plane) is known, as: 
