@@ -36,6 +36,9 @@ char QF3SFF_SHORTNAME[]="EXAMPLE: shared lib FitFunc, evaluate only";
 // link to a help file, relative to the library
 char QF3SFF_HELP[]="example_evaluate_only.html";
 
+// a category for the fit functions
+#define QF3SFF_CATEGORY "example fit functions"
+
 // number of parameters of the fit model
 #define QF3SFF_PARAMETER_COUNT 3
 

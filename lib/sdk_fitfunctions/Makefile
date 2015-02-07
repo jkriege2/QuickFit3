@@ -44,7 +44,7 @@ endif
 
 
 ifeq ($(findstring Msys,$(OS)),Msys)
-SHARED_OPTS=-static -lstdc++ -lgcc -shared  -fPIC
+SHARED_OPTS=-static -lstdc++ -lgcc -shared  
 else
 SHARED_OPTS=-shared  -fPIC
 endif
