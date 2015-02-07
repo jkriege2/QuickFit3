@@ -37,7 +37,10 @@ class QFFitFunctionFCSExp: public QFFitFunction {
         virtual QString name() const { return QObject::tr("FCS: Reaction Dynamics, No Diffusion"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_exp"); };
-
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const {
+            return QObject::tr("Confocal FCS");
+        }
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
 

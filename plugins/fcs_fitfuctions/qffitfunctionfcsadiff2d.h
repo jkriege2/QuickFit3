@@ -76,6 +76,13 @@ class QFFitFunctionFCSADiff2D: public QFFitFunction {
             else return QString("fcs_tir_adiff2d");
         }
 
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const {
+            if (!isTIRF) return QObject::tr("Confocal FCS");
+            else return QObject::tr("TIR-FCS");
+        }
+
+
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
 

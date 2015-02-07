@@ -48,7 +48,10 @@ class QFFitFunctionFCSOscillation : public QFFitFunction
         virtual QString name() const { return QObject::tr("FCS: Oscillation"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_oscillation"); }
-
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const {
+            return QObject::tr("Confocal FCS");
+        }
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
 

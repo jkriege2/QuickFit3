@@ -81,7 +81,10 @@ class QFFitFunctionFCSRot: public QFFitFunction {
         virtual QString name() const { return QObject::tr("FCS: 3D Normal Diffusion with rotation term"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_diffrot"); }
-
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const {
+            return QObject::tr("Confocal FCS");
+        }
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
 

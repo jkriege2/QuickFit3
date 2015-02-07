@@ -190,7 +190,7 @@ void QFRDRTableCurveFitDialog::intInit(QFRDRTable *table, int colX, int colY, in
         }
     }
 
-    methodChanged(ui->cmbFitFunction->currentIndex());
+    methodChanged(0);//ui->cmbFitFunction->currentIndex());
 
     updateFitStatistics();
 

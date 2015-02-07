@@ -38,8 +38,12 @@ QFFitFunctionSelectDialog::QFFitFunctionSelectDialog(QWidget *parent) :
     ui->setupUi(this);
     filterModel.setDynamicSortFilter(true);
     filterModel.setFilterCaseSensitivity(Qt::CaseInsensitive);
+    filterModel.setFilterRole(Qt::UserRole+10);
     ui->lstModels->setModel(&filterModel);
+    ui->lstModels->expandAll();
     connect(ui->lstModels->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)), this, SLOT(currentRowChanged(QModelIndex,QModelIndex)));
+    ui->splitter->setStretchFactor(0,1);
+    ui->splitter->setStretchFactor(0,2);
 
     QSettings* set=ProgramOptions::getInstance()->getQSettings();
     if (set) {
@@ -71,13 +75,14 @@ void QFFitFunctionSelectDialog::init(const QString &filter, const QString &curre
 {
     QFFitFunctionManager* manager=QFFitFunctionManager::getInstance();
     bool upd=updatesEnabled();
-    int idx=ui->lstModels->currentIndex().row();
-    if (idx<0) idx=0;
+    /*int idx=ui->lstModels->currentIndex().row();
+    if (idx<0) idx=0;*/
+    QModelIndex idx=ui->lstModels->currentIndex();
     bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
 
     filterModel.setSourceModel(NULL);
     if (model) delete model;
-    model=new QStandardItemModel(this);
+    model=new QFSimpleTreeModel(this);
     //QMap<QString, QFFitFunction*> m_fitFunctions=manager->getModels(filter, this);
 
     QMap<QString, QFFitFunction*> m_fitFunctions;
@@ -96,7 +101,7 @@ void QFFitFunctionSelectDialog::init(const QString &filter, const QString &curre
         m_fitFunctions=manager->getModels(filter, this);
     }
 
-    QStandardItemModel *m = model;
+    QFSimpleTreeModel *m = model;
 
     QMapIterator<QString, QFFitFunction*> it(m_fitFunctions);
     int i=0;
@@ -104,24 +109,41 @@ void QFFitFunctionSelectDialog::init(const QString &filter, const QString &curre
     while (it.hasNext())  {
         it.next();
         if (it.value()) {
-            QStandardItem* item=new QStandardItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->name());
+            /*QStandardItem* item;
+            if (it.value()->category().isEmpty() || it.value()->shortName().toLower().trimmed().simplified().startsWith(it.value()->category().toLower().trimmed().simplified())) {
+                item=new QStandardItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->name());
+            } else {
+                item=new QStandardItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->category()+QString(": ")+it.value()->name());
+            }
             item->setData(it.key(), Qt::UserRole+1);
             model->appendRow(item);
             if (it.value()->isDeprecated() && m) {
                 item->setForeground(QColor("darkgrey"));
                 item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
 
+            }*/
+            QFSimpleTreeModelItem* item=model->addFolderedItem(it.value()->category(), it.value()->shortName(), it.key());
+            item->setData(it.key(), Qt::UserRole+1);
+            item->setIcon(QIcon(":/lib/fitfunc_icon.png"));
+            item->setData(it.value()->category()+QString("/")+it.value()->shortName()+QString("/")+it.key(), Qt::UserRole+10);
+            if (it.value()->isDeprecated() && m) {
+                item->setForeground(QColor("darkgrey"));
+                item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
+
             }
 
-            if (it.key()==current) idx=i;
+            if (it.key()==current) idx=model->index(item);//idx=i;
             i++;
         }
     }
     filterModel.setSourceModel(model);
     ui->lstModels->setModel(&filterModel);
-    model->sort(0);
+    ui->lstModels->expandAll();
+    //model->sort(0);
+    model->sort();
     if (widVisible) setUpdatesEnabled(upd);
-    ui->lstModels->setCurrentIndex(model->index(idx, 0));
+    ui->lstModels->expandAll();
+    ui->lstModels->setCurrentIndex(idx);//model->index(idx, 0));
     ui->edtFilter->clear();
 }
 
@@ -131,19 +153,19 @@ void QFFitFunctionSelectDialog::init(const QStringList &availableFF, const QStri
     else {
         QFFitFunctionManager* manager=QFFitFunctionManager::getInstance();
         bool upd=updatesEnabled();
-        int idx=ui->lstModels->currentIndex().row();
-        if (idx<0) idx=0;
+        QModelIndex idx=ui->lstModels->currentIndex();//.row();
+        //if (idx<0) idx=0;
         bool widVisible=isVisible(); if (widVisible) setUpdatesEnabled(false);
 
         filterModel.setSourceModel(NULL);
         if (model) delete model;
-        model=new QStandardItemModel(this);
+        model=new QFSimpleTreeModel(this);
         QMap<QString, QFFitFunction*> m_fitFunctions;
         for (int i=0; i<availableFF.size(); i++) {
             m_fitFunctions[availableFF[i]]=manager->createFunction(availableFF[i], this);
         }
 
-        QStandardItemModel *m = model;
+        QFSimpleTreeModel *m = model;
 
         QMapIterator<QString, QFFitFunction*> it(m_fitFunctions);
         int i=0;
@@ -151,7 +173,7 @@ void QFFitFunctionSelectDialog::init(const QStringList &availableFF, const QStri
         while (it.hasNext())  {
             it.next();
             if (it.value()) {
-                QStandardItem* item=new QStandardItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->name());
+                /*QStandardItem* item=new QStandardItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->name());
                 item->setData(it.key(), Qt::UserRole+1);
                 model->appendRow(item);
 
@@ -159,18 +181,30 @@ void QFFitFunctionSelectDialog::init(const QStringList &availableFF, const QStri
                     item->setForeground(QColor("darkgrey"));
                     item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
 
+                }*/
+                QFSimpleTreeModelItem* item=model->addFolderedItem(it.value()->category(), it.value()->shortName(), it.key());
+                item->setData(it.key(), Qt::UserRole+1);
+                item->setIcon(QIcon(":/lib/fitfunc_icon.png"));
+                item->setData(it.value()->category()+QString("/")+it.value()->shortName()+QString("/")+it.key(), Qt::UserRole+10);
+                if (it.value()->isDeprecated() && m) {
+                    item->setForeground(QColor("darkgrey"));
+                    item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
+
                 }
 
-                if (it.key()==current) idx=i;
+                if (it.key()==current) idx=model->index(item);
                 i++;
                 delete it.value();
             }
         }
         filterModel.setSourceModel(model);
         ui->lstModels->setModel(&filterModel);
-        model->sort(0);
+        ui->lstModels->expandAll();
+        //model->sort(0);
+        model->sort();
         if (widVisible) setUpdatesEnabled(upd);
-        ui->lstModels->setCurrentIndex(model->index(idx, 0));
+        ui->lstModels->expandAll();
+        ui->lstModels->setCurrentIndex(idx);//model->index(idx, 0));
         ui->edtFilter->clear();
     }
 }
@@ -188,4 +222,5 @@ void QFFitFunctionSelectDialog::currentRowChanged(const QModelIndex & current, c
 void QFFitFunctionSelectDialog::on_edtFilter_textChanged(const QString &text)
 {
     filterModel.setFilterRegExp(QRegExp(QString("*")+text+QString("*"), Qt::CaseInsensitive, QRegExp::Wildcard));
+    ui->lstModels->expandAll();
 }

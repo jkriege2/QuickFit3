@@ -40,6 +40,8 @@ class QFFitFunctionGeneralCDFCauchy: public QFFitFunction {
         virtual QString shortName() const { return QObject::tr("CDF: Cauchy"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("gen_cdf_cauchy"); }
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("General Fit Functions/Cummulative Distributions (CDF)"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

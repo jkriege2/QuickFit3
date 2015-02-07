@@ -40,6 +40,8 @@ class QFFitFunctionGeneralParabula: public QFFitFunction {
         virtual QString shortName() const { return QObject::tr("General: Parabula"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("gen_parabula"); }
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("General Fit Functions"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

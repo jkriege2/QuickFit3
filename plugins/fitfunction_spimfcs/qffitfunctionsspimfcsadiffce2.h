@@ -38,10 +38,12 @@ class QFFitFunctionsSPIMFCSADiffCE2: public QFFitFunction {
         QFFitFunctionsSPIMFCSADiffCE2();
         virtual ~QFFitFunctionsSPIMFCSADiffCE2() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCS: Anomalous Diffusion, c as parameter (rect. pixel, 1/e^2 radii, new Veff)"); }
+        virtual QString name() const { return QString("SPIM-FCS: 3D Anomalous Diffusion, c as parameter (rect. pixel, 1/e^2 radii, new Veff)"); }
 
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_spim_adiffce2"); }
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("SPIM-FCS"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

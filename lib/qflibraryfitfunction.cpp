@@ -49,6 +49,7 @@ class QFLibraryFitFunction_private {
         QString m_name;
         QString m_shortName;
         QString m_help;
+        QString m_category;
         QString m_features;
         bool libOK;
         QString last_error;
@@ -118,20 +119,24 @@ QFLibraryFitFunction::QFLibraryFitFunction(QLibrary *library)
 
         }
     } else {
-        d->last_error="NO LIBRARY GIVEN";
+        d->last_error=QObject::tr("NO LIBRARY GIVEN");
     }
     // read fit function  properties
     if (d->libOK) {
-        d->m_id=d->lib_getName(1);
-        d->m_name=d->lib_getName(0);
-        d->m_shortName=d->lib_getName(2);
-        d->m_help=d->lib_getName(3);
+        d->m_id=d->lib_getName(FFNAME_ID);
+        d->m_name=d->lib_getName(FFNAME_LONGNAME);
+        d->m_shortName=d->lib_getName(FFNAME_SHORTNAME);
+        d->m_help=d->lib_getName(FFNAME_HELPFILE);
+        d->m_category=d->lib_getName(FFNAME_CATEGORY);
         if (!d->m_help.isEmpty()) {
             d->m_help=QFileInfo(d->library->fileName()).absoluteDir().absoluteFilePath(d->m_help);
         }
+        if (!d->m_category.isEmpty()) {
+            d->m_category=QObject::tr("User Fit Functions (library)");
+        }
         if (d->m_id.isEmpty()) {
             d->libOK=false;
-            d->last_error="NO ID GIVEN";
+            d->last_error=QObject::tr("NO ID GIVEN");
         }
         if (d->m_name.isEmpty()) d->m_name=d->m_id;
         if (d->m_shortName.isEmpty()) d->m_shortName=d->m_name;
@@ -185,6 +190,11 @@ QString QFLibraryFitFunction::lastError() const
 QString QFLibraryFitFunction::features() const
 {
     return d->m_features;
+}
+
+QString QFLibraryFitFunction::category() const
+{
+    return d->m_category;
 }
 
 QString QFLibraryFitFunction::name() const

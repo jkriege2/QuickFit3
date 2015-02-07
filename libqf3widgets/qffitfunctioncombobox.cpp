@@ -26,9 +26,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunctionselectdialog.h"
 
 QFFitFunctionComboBox::QFFitFunctionComboBox(QWidget *parent) :
-    QComboBox(parent)
+    QFTreeViewComboBox(parent)
 {
     setContextMenuPolicy(Qt::ActionsContextMenu);
+    m_model=new QFSimpleTreeModel(this);
     updateFitFunctions("");
     connect(QFFitFunctionManager::getInstance(), SIGNAL(fitFunctionsChanged()), this, SLOT(reloadFitFunctions()));
     actHelp=new QAction(QIcon(":/lib/help/help.png"), tr("Fit model help ..."), this);
@@ -37,11 +38,12 @@ QFFitFunctionComboBox::QFFitFunctionComboBox(QWidget *parent) :
     actSelectModel=new QAction(QIcon(":/lib/select_fitfunction.png"), tr("select fit model ..."), this);
     connect(actSelectModel, SIGNAL(triggered()), this, SLOT(selectModelDialog()));
     addAction(actSelectModel);
+    setModel(m_model);
 }
 
 QString QFFitFunctionComboBox::currentFitFunctionID() const
 {
-    return itemData(currentIndex()).toString();
+    return getCurrentIndexData(Qt::UserRole).toString();// itemData(currentIndex()).toString();
 }
 
 QFFitFunction *QFFitFunctionComboBox::createCurrentInstance(QObject* parent) const
@@ -53,9 +55,13 @@ QFFitFunction *QFFitFunctionComboBox::createCurrentInstance(QObject* parent) con
 
 void QFFitFunctionComboBox::setCurrentFitFunction(const QString &id)
 {
-    int idx=findData(id);
-    if (idx>=0) setCurrentIndex(idx);
-    else setCurrentIndex(0);
+    //int idx=findData(id);
+    //if (idx>=0) setCurrentIndex(idx);
+    //else setCurrentIndex(0);
+    //qDebug()<<"setCurrentFitFunction("<<id;
+    QModelIndex idx=m_model->index(id, Qt::UserRole);
+    //qDebug()<<"setCurrentFitFunction("<<id<<"): "<<idx;
+    selectIndex(idx);
 }
 
 void QFFitFunctionComboBox::showHelpCurrent()
@@ -88,6 +94,16 @@ void QFFitFunctionComboBox::reloadFitFunctions()
     setCurrentFitFunction(id);
 }
 
+int QFFitFunctionComboBox::currentIndex() const
+{
+    return QFTreeViewComboBox::currentIndex();
+}
+
+void QFFitFunctionComboBox::setCurrentIndex(int idx)
+{
+    QFTreeViewComboBox::setCurrentIndex(idx);
+}
+
 void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
 {
     m_filter=filter;
@@ -95,7 +111,7 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
     QFFitFunctionManager* manager=QFFitFunctionManager::getInstance();
     bool upd=updatesEnabled();
     //setUpdatesEnabled(false);
-    clear();
+    m_model->clear();
     QMap<QString, QFFitFunction*> m_fitFunctions;
     if (filter.contains(",")) {
         QStringList fl=filter.split(",");
@@ -119,7 +135,18 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
     while (it.hasNext())  {
         it.next();
         if (it.value()) {
-            addItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->shortName(), it.key());
+            QFSimpleTreeModelItem* item=m_model->addFolderedItem(it.value()->category(), it.value()->shortName(), it.key());
+            item->setIcon(QIcon(":/lib/fitfunc_icon.png"));
+            if (it.value()->isDeprecated() && m) {
+                item->setForeground(QColor("darkgrey"));
+                item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
+
+            }
+            /*if (it.value()->category().isEmpty() || it.value()->shortName().toLower().trimmed().simplified().startsWith(it.value()->category().toLower().trimmed().simplified())) {
+                addItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->shortName(), it.key());
+            } else {
+                addItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->category()+QString(": ")+it.value()->shortName(), it.key());
+            }
             if (it.value()->isDeprecated() && m) {
                 int i=count()-1;
                 //qDebug()<<"deprecated: "<<i<<it.value()->name();
@@ -127,12 +154,13 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
                 item->setForeground(QColor("darkgrey"));
                 item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
 
-            }
+            }*/
 
             delete it.value();
         }
     }
-    model()->sort(0);
+    m_model->sort();
+    //model()->sort(0);
     //setUpdatesEnabled(upd);
 }
 
@@ -148,22 +176,31 @@ void QFFitFunctionComboBox::updateFitFunctions(const QStringList &availableFF)
         QStandardItemModel *m = qobject_cast<QStandardItemModel *>(model());
 
 
-        clear();
+        m_model->clear();
         for (int i=0; i<m_availableFuncs.size(); i++)  {
             QFFitFunction* ff=manager->createFunction(m_availableFuncs[i], this);
             if (ff) {
-                addItem(QIcon(":/lib/fitfunc_icon.png"), ff->shortName(), m_availableFuncs[i]);
+                QFSimpleTreeModelItem* item=m_model->addFolderedItem(ff->category(), ff->shortName(), ff->id());
+                item->setIcon(QIcon(":/lib/fitfunc_icon.png"));
+                if (ff->isDeprecated() && m) {
+                    item->setForeground(QColor("darkgrey"));
+                    item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
+
+                }
+
+                /*addItem(QIcon(":/lib/fitfunc_icon.png"), ff->shortName(), m_availableFuncs[i]);
                 if (ff->isDeprecated()) {
                     int i=count()-1;
                     //qDebug()<<"deprecated: "<<i<<ff->name();
                     QStandardItem *item = m->item(i,0);
                     item->setForeground(QColor("darkgrey"));
                     item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
-                }
+                }*/
                 delete ff;
             }
         }
-        model()->sort(0);
+        //model()->sort(0);
+        m_model->sort();
         //setUpdatesEnabled(upd);
     }
 }

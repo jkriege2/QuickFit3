@@ -62,7 +62,7 @@ int QFPFitFunctions2FFCS::getGlobalFitConfigCount() const
 
 QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::getGlobalFitConfig(int i) const
 {
-    QString menulabel=tr("configure for confocal FCCS ...");
+    QString menulabel=tr("configure for confocal 2focus-FCCS ...");
     QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig res;
     int c=0;
     if (i==c++) {
@@ -89,6 +89,8 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::
         res.globalParams << constructQListWithMultipleItems(QStringList("vflowy"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("focus_height"), 5);
         res.globalParams << constructQListWithMultipleItems(QStringList("focus_width"), 5);
+
+
     } else if (i==c++) {
         res.groupLabel=menulabel;
         res.menuEntryLabel=tr("... 3D diffusion ACF + 4 neighbors, afterpulsing, wxy/wz un-fixed");
@@ -102,7 +104,6 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctions2FFCS::
         res.singleFixes << constructQListWithMultipleItems(QMap<QString,bool>(), res.models.size());
         res.paramValues[0].insert("n_nonfluorescent", QFFitFunctionConfigForGlobalFitInterface_GlobalFitParameter_get(0,0));
         for (int j=0; j<res.singleFixes.size(); j++) { res.singleFixes[j].insert("focus_width", false); };
-
     }
     return res;
 }

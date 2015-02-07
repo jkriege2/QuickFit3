@@ -41,6 +41,11 @@ class QFFitFunctionDLSG2: public QFFitFunction {
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("dls_g2"); }
 
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const {
+            return QObject::tr("Dynamic Light Scattering (DLS)");
+        }
+
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
 

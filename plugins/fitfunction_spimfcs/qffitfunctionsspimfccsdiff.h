@@ -34,11 +34,13 @@ class QFFitFunctionsSPIMFCCSDiff: public QFFitFunction {
         QFFitFunctionsSPIMFCCSDiff();
         virtual ~QFFitFunctionsSPIMFCCSDiff() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCCS: Diffusion, 2-pixel crosscorrelation (rect. pixel, 1/sqrt(e) radii)"); };
+        virtual QString name() const { return QString("2-pixel SPIM-FCCS: 3D Diffusion, crosscorrelation (rect. pixel, 1/sqrt(e) radii)"); };
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const { return name(); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_spim_diff"); };
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("2-pixel SPIM-FCCS"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

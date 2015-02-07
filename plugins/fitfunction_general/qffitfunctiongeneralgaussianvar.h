@@ -40,6 +40,8 @@ class QFFitFunctionGeneralGaussianVar: public QFFitFunction {
         virtual QString shortName() const { return name(); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("gen_gaussian_sqrte"); };
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("General Fit Functions/Peaks"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

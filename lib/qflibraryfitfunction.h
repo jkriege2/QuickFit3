@@ -40,49 +40,55 @@ class QFLIB_EXPORT QFLibraryFitFunction : public QFFitFunction
         explicit QFLibraryFitFunction(QLibrary* library);
         virtual ~QFLibraryFitFunction();
 
+        /*! \brief help file for the fit fuction (HTML) */
         QString helpFile() const ;
 
+        /*! \brief \c true, if the fit functions is good for use */
         bool isValid() const;
 
+        /*! \brief return a string, describing the last error */
         QString lastError() const;
 
+        /*! \brief return a string, describing the available features of this fit functions */
         QString features() const;
 
-        /*! \copydoc QFFitFunction::()  */
+        /*! \copydoc QFFitFunction::category()  */
+        virtual QString category() const;
+        /*! \copydoc QFFitFunction::name()  */
         virtual QString name() const;
-        /*! \copydoc QFFitFunction::()  */
+        /*! \copydoc QFFitFunction::shortName()  */
         virtual QString shortName() const ;
-        /*! \copydoc QFFitFunction::()  */
+        /*! \copydoc QFFitFunction::id()  */
         virtual QString id() const;
 
-        /*! \copydoc QFFitFunction::()  */
+        /*! \copydoc QFFitFunction::evaluate()  */
         virtual double evaluate(double x, const double* parameters) const ;
 
-        /*! \copydoc QFFitFunction::()  */
+        /*! \copydoc QFFitFunction::multiEvaluate()  */
         virtual void multiEvaluate(double* y, const double* x, uint64_t N, const double* parameters) const;
 
-        /*! \copydoc QFFitFunction::()  */
+        /*! \copydoc QFFitFunction::evaluateDerivatives()  */
         virtual void evaluateDerivatives(double* derivatives, double x, const double* parameters) const ;
 
-        /*! \copydoc QFFitFunction::()  */
+        /*! \copydoc QFFitFunction::get_implementsDerivatives()  */
         virtual bool get_implementsDerivatives()const ;
 
-        /*! \copydoc QFFitFunction::()  */
+        /*! \copydoc QFFitFunction::calcParameter()  */
         virtual void calcParameter(double* parameterValues, double* error=NULL) const ;
 
-        /*! \copydoc QFFitFunction::()  */
+        /*! \copydoc QFFitFunction::sortParameter()  */
         virtual void sortParameter(double* parameterValues, double* error=NULL, bool* fix=NULL) const ;
 
-        /*! \copydoc QFFitFunction::()  */
+        /*! \copydoc QFFitFunction::isParameterVisible()  */
         virtual bool isParameterVisible(int parameter, const double* parameterValues) const ;
 
-        /*! \copydoc QFFitFunction::()  */
+        /*! \copydoc QFFitFunction::getAdditionalPlotCount()  */
         virtual unsigned int getAdditionalPlotCount(const double* params);
 
-        /*! \copydoc QFFitFunction::()  */
+        /*! \copydoc QFFitFunction::transformParametersForAdditionalPlot()  */
         virtual QString transformParametersForAdditionalPlot(int plot, double* params) ;
 
-        /*! \copydoc QFFitFunction::()  */
+        /*! \copydoc QFFitFunction::estimateInitial()  */
         virtual bool estimateInitial(double* params, const double* dataX, const double* dataY, long N, const bool *fix=NULL);
 
 

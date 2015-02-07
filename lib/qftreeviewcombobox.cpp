@@ -24,7 +24,7 @@
 #include <QDebug>
 
 QFTreeViewComboBox::QFTreeViewComboBox(QWidget *parent) :
-    QComboBox(parent), _treeView(NULL)
+    QFEnhancedComboBox(parent), _treeView(NULL)
 {
     _treeView = new QTreeView(this);
     _treeView->setFrameShape(QFrame::NoFrame);

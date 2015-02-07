@@ -39,6 +39,8 @@ class QFFitFunctionsTIRFCSDiffE2Diffbright: public QFFitFunction {
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_tir_diffe2_diffbright"); }
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("TIR-FCS"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

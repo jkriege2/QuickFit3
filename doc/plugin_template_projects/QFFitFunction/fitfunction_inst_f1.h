@@ -41,7 +41,8 @@ class QFFitAlgorithmInst_F1: public QFFitFunction {
         virtual QString shortName() const { return /*name();*/QObject::tr("short name"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("ff_id"); };
-
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const {  return QString::tr("General Fit Functions"); }
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
 

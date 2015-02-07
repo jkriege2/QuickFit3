@@ -5200,7 +5200,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$plugin_info:<name>:<id>$$, $$fig:file:caption$$,  $$figure:file:caption$$ items, etc.
-            QRegExp rxPluginInfo("\\$\\$(plugin_info|fig|figure|startbox|fitfunction|fitalgorithm|importer)\\:([^\\$]*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxPluginInfo("\\$\\$(plugin_info|fig|figure|startbox|fitfunction|fitalgorithm|importer|exporter)\\:([^\\$]*)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxPluginInfo.setMinimal(true);
             count = 0;
             pos = 0;
@@ -5233,6 +5233,15 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         QString name="";
                         if (f) {
                             name=f->shortName();
+                            delete f;
+                        }
+                        result=result.replace(rxPluginInfo.cap(0), name);
+                    }
+                    else if (param1=="category") {
+                        QFFitFunction* f=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(param2);
+                        QString name="";
+                        if (f) {
+                            name=f->category();
                             delete f;
                         }
                         result=result.replace(rxPluginInfo.cap(0), name);
@@ -5302,8 +5311,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // try and find DOIs in the text
-            QRegExp rxDOI("(doi)?[\\:]?\\s?(10\\.\\d{4}[\\d\\:\\.\\-\\_\\/a-z]+)[\\,\\;\\:\\.\\s\\n\\r\\t\\v\\)\\]\\}]+[\\s\\n\\r\\t\\v]", Qt::CaseInsensitive);
+            QRegExp rxDOI("(doi)?[\\:]?\\s*(10\\.\\d{4}[\\d\\:\\.\\-\\_\\/a-z]+)[\\,\\;\\:\\.\\s\\n\\r\\t\\v\\)\\]\\}]+[\\s\\n\\r\\t\\v]", Qt::CaseInsensitive);
             rxDOI.setMinimal(true);
+
             count = 0;
             pos = 0;
             while ((pos = rxDOI.indexIn(result, pos)) != -1) {

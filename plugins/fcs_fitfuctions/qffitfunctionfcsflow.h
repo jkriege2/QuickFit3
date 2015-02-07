@@ -77,10 +77,13 @@ class QFFitFunctionFCSFlow: public QFFitFunction {
         QFFitFunctionFCSFlow();
         virtual ~QFFitFunctionFCSFlow() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QObject::tr("FCS: 3D Normal Diffusion with flow term"); };
+        virtual QString name() const { return QObject::tr("FCS: 3D Normal Diffusion + Flow"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_diffflow"); };
-
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const {
+            return QObject::tr("Confocal FCS");
+        }
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
 

@@ -88,7 +88,7 @@ QString QFFitFunctionFCCSNormalDiff2D2Focus::id() const {
 }
 
 QString QFFitFunctionFCCSNormalDiff2D2Focus::name() const {
-    return  QString("2focus-FCS: 2D Normal Diffusion, D,N as parameter");
+    return  QString("2focus-FCCS: 2D Normal Diffusion, D,N as parameter");
 }
 
 double QFFitFunctionFCCSNormalDiff2D2Focus::evaluate(double t, const double* data) const {

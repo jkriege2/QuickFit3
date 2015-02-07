@@ -134,7 +134,9 @@ class QFLIB_EXPORT QFFitFunctionBase
         /** \brief return a name for the model */
         virtual QString name() const=0;
         /** \brief return a short name for the model (max. around 10-20 characters) */
-        virtual QString shortName() const { return name(); }
+        virtual QString shortName() const;
+        /** \brief this returns the category of the fit function, which allows to group fit functions by groups */
+        virtual QString category() const;
         /** \brief return a short unique model ID string */
         virtual QString id() const=0;
 

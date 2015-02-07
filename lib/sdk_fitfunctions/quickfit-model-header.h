@@ -50,6 +50,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #endif
 
 
+#define QF3SFF_CATEGORY ""
+
 
 inline static const char* QF3SFF_getStringDefault(const char* str, const char* strdef) {
     if (strlen(str)>0) return str;
@@ -57,20 +59,20 @@ inline static const char* QF3SFF_getStringDefault(const char* str, const char* s
 }
 
 
-
-
 #define QF3SFF_FINALIZE_NOMULTI    \
     QF3SFF_EXTERN_START\
      const char* QF3SFF_DLL_EXPORT getModelName(int16_t type) {\
         switch(type) {\
-            case 1:  \
+            case FFNAME_ID:  \
                 return QF3SFF_ID;\
-            case 2:  \
+            case FFNAME_SHORTNAME:  \
                 return QF3SFF_getStringDefault(QF3SFF_SHORTNAME, QF3SFF_NAME); \
-            case 3:  \
+            case FFNAME_HELPFILE:  \
                 return QF3SFF_HELP;  \
-            case 0:  \
+            case FFNAME_LONGNAME:  \
                 return QF3SFF_NAME;\
+            case FFNAME_CATEGORY:  \
+                return QF3SFF_CATEGORY_STR;\
             default:\
                 return NULL;\
         }\
@@ -89,6 +91,7 @@ inline static const char* QF3SFF_getStringDefault(const char* str, const char* s
     QF3SFF_EXTERN_END
 
 #define QF3SFF_FINALIZE\
+    char QF3SFF_CATEGORY_STR[]=QF3SFF_CATEGORY;\
     QF3SFF_FINALIZE_NOMULTI\
     QF3SFF_EXTERN_START\
      void QF3SFF_DLL_EXPORT multiEvaluate(double* c, const double* t, uint64_t NN, const double* parameters) {\

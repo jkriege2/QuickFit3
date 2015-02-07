@@ -666,7 +666,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEva
         if (fcs->getFitFunction()!=NULL) {
             cmbModel->setCurrentFitFunction(fcs->getFitFunction()->id());
         } else {
-            cmbModel->setCurrentIndex(-1);
+            cmbModel->setCurrentFitFunction("");
         }
         if (fcs->getFitAlgorithm()!=NULL) {
             cmbAlgorithm->setCurrentIndex(cmbAlgorithm->findData(fcs->getFitAlgorithm()->id()));
@@ -700,7 +700,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::connectDefaultWidgets(QFEva
 void QFFitResultsByIndexEvaluationEditorWithWidgets::writeSettings() {
     if (cmbModel && current) {
         settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/algorithm").arg(current->getType()).arg(current->getID()), cmbAlgorithm->currentIndex());
-        settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/model").arg(current->getType()).arg(current->getID()), cmbModel->currentIndex());
+        settings->getQSettings()->setValue(QString("fitevaleditor_%1%2/model").arg(current->getType()).arg(current->getID()), cmbModel->currentFitFunctionID());
         //hlpAlgorithm->writeSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/algorithm_").arg(current->getType()).arg(current->getID()));
         //hlpFunction->writeSettings(*settings->getQSettings(), QString("fitevaleditor_%1%2/function_").arg(current->getType()).arg(current->getID()));
         saveSplitter(*(settings->getQSettings()), splitPlot, QString("fitevaleditor_%1%2/splitter_plot").arg(current->getType()).arg(current->getID()));

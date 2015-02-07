@@ -50,6 +50,10 @@ UserFitFunctionsEditor::UserFitFunctionsEditor(QWidget *parent) :
     //connect(ui->chkPrevLogX, SIGNAL(toggled(bool)), ui->spinPrevRangeMax, SLOT(setCheckMinimum(bool)));
     connect(ui->chkPrevLogX, SIGNAL(toggled(bool)), ui->spinPrevRangeMin, SLOT(setLogScale(bool)));
     connect(ui->chkPrevLogX, SIGNAL(toggled(bool)), ui->spinPrevRangeMax, SLOT(setLogScale(bool)));
+    ui->splitter->setStretchFactor(0,1);
+    ui->splitter->setStretchFactor(1,2);
+    ui->splitter_3->setStretchFactor(0,1);
+    ui->splitter_3->setStretchFactor(1,1);
 
     ProgramOptions::getConfigWindowGeometry(this, "UserFitFunctionsEditor/geometry/");
     ProgramOptions::getConfigQSplitter(ui->splitter, "UserFitFunctionsEditor/splitter/");
@@ -76,6 +80,7 @@ void UserFitFunctionsEditor::clearFF()
     ui->edtExpression->clear();
     ui->edtID->clear();
     ui->edtName->clear();
+    ui->edtCategory->clear();
     ui->edtShortName->clear();
     ui->widList->setEnabled(true);
     ui->buttonBox->setEnabled(true);
@@ -89,7 +94,7 @@ void UserFitFunctionsEditor::showFF(const QString &idd)
     model.clear();
 
     QString fn=manager->getUserFitFunctionFile(id);
-    QString name=tr("new name"), expression="x^2+2", shortname="";
+    QString name=tr("new name"), expression="x^2+2", shortname="", category=tr("User Fit Functions (parsed)");
     bool logX=false;
     bool logY=false;
     double rangemin=0;
@@ -100,6 +105,7 @@ void UserFitFunctionsEditor::showFF(const QString &idd)
         id=settings.value("function/id", id).toString();
         name=settings.value("function/name", name).toString();
         shortname=settings.value("function/short_name", shortname).toString();
+        category=settings.value("function/category", category).toString();
         model.loadSettings(settings);
         if (id.startsWith("fcs_") << id.startsWith("dls_")|| id.startsWith("fccs_")) {
             logX=true;
@@ -122,6 +128,7 @@ void UserFitFunctionsEditor::showFF(const QString &idd)
     ui->edtExpression->setText(expression);
     ui->edtID->setText(id);
     ui->edtName->setText(name);
+    ui->edtCategory->setText(category);
     ui->edtShortName->setText(shortname);
     ui->labFilename->setText(fn);
     currentID=id;
@@ -145,6 +152,7 @@ bool UserFitFunctionsEditor::storeCurrentFF(const QString& filename)
         QSettings settings(fn, QSettings::IniFormat);
         settings.setValue("function/id", ui->edtID->text());
         settings.setValue("function/name", ui->edtName->text());
+        settings.setValue("function/category", ui->edtCategory->text());
         settings.setValue("function/short_name", ui->edtShortName->text());
         settings.setValue("function/expression", ui->edtExpression->text());
         settings.setValue("test/log_x", ui->chkPrevLogX->isChecked());

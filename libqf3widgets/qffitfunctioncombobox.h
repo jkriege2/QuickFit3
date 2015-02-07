@@ -24,8 +24,15 @@
 #include <QComboBox>
 #include "qffitfunction.h"
 #include "libwid_imexport.h"
+#include "qfsimpletreemodel.h"
+#include "qftreeviewcombobox.h"
 
-class QFWIDLIB_EXPORT QFFitFunctionComboBox : public QComboBox
+/*! \brief a QComboBox which contains a list of (all, or all filtered) QFFitFunctions, available in QuickFit
+    \ingroup qf3lib_widgets
+
+  This is usefull, if you want to trigger actions by a keypress ...
+*/
+class QFWIDLIB_EXPORT QFFitFunctionComboBox : public QFTreeViewComboBox
 {
         Q_OBJECT
     public:
@@ -46,10 +53,13 @@ class QFWIDLIB_EXPORT QFFitFunctionComboBox : public QComboBox
     protected slots:
         void reloadFitFunctions();
     protected:
+        virtual int currentIndex() const;
+        virtual void setCurrentIndex(int idx);
         QString m_filter;
         QStringList m_availableFuncs;
         QAction* actHelp;
         QAction* actSelectModel;
+        QFSimpleTreeModel* m_model;
 
 };
 

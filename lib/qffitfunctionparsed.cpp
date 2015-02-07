@@ -32,6 +32,7 @@ QFFitFunctionParsed::QFFitFunctionParsed(const QString &configfile) :
     if (!m_id.isEmpty()) {
         m_name=set.value("function/name", m_id).toString();
         m_shortName=set.value("function/short_name", m_name).toString();
+        m_category=set.value("function/category", QObject::tr("user fit functions (parsed)")).toString();
         m_expression=set.value("function/expression", "").toString();
 
         int paramCount=set.value("function/param_count", 0).toInt();
@@ -122,6 +123,11 @@ bool QFFitFunctionParsed::usesBytecode() const
 QString QFFitFunctionParsed::name() const
 {
     return m_name;
+}
+
+QString QFFitFunctionParsed::category() const
+{
+    return m_category;
 }
 
 QString QFFitFunctionParsed::shortName() const

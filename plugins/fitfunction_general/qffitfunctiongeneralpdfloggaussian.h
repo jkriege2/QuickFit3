@@ -40,6 +40,8 @@ class QFFitFunctionGeneralPDFLogGaussian: public QFFitFunction {
         virtual QString shortName() const { return QObject::tr("PDF: Log-Normal"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("gen_pdf_loggaussian"); };
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("General Fit Functions/Probability Density (PDF)"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

@@ -27,6 +27,7 @@
 #include <QWidget>
 #include <QModelIndex>
 #include "lib_imexport.h"
+#include "qfenhancedcombobox.h"
 
 /*! \brief a QComboBox with a treeview as dropdown widget
     \ingroup tools_qt
@@ -34,7 +35,7 @@
     see <a href="http://www.qtcentre.org/threads/46078-Snippet-QComboBox-showing-tree-models">http://www.qtcentre.org/threads/46078-Snippet-QComboBox-showing-tree-models</a>
 
  */
-class QFLIB_EXPORT QFTreeViewComboBox : public QComboBox {
+class QFLIB_EXPORT QFTreeViewComboBox : public QFEnhancedComboBox {
         Q_OBJECT
     public:
         explicit QFTreeViewComboBox(QWidget *parent = 0);

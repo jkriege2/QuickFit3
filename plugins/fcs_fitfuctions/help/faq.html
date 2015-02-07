@@ -1,0 +1,66 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>$$local_plugin_name$$: Frequently asked questions (FAQs)</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+
+$$faq_start$$
+  <a name="FAQ_PYCORRFIT"><b>Which QuickFit Confocal FCS models correspond to which models in <a href="http://paulmueller.github.io/PyCorrFit/">PyCorrFit</a>?</b>
+$$faq_answer$$
+  If you started FCS evaluation, using <a href="http://paulmueller.github.io/PyCorrFit/">PyCorrFit</a>, the following table gives a list of corresponding QuickFit models:<br><br>
+  <center><table cellspacing="0" cellpadding="1" border="1">
+  <tr>
+    <th bgcolor="#a0a0a4"><b><a href="http://paulmueller.github.io/PyCorrFit/">PyCorrFit</a> Model</b></th>
+    <th bgcolor="#a0a0a4"><b>QuickFit $$version$$ model</b></th>
+  </tr>
+  <tr>
+    <td><b>Confocal (Gaussian) T+3D</b></td>
+    <td><a href="$$fitfunction:help:fcs_diff$$">$$fitfunction:name:fcs_diff$$</a></td>
+  </tr>
+  <tr>
+    <td><b>Confocal (Gaussian) T+3D+3D</b></td>
+    <td><a href="$$fitfunction:help:fcs_diff$$">$$fitfunction:name:fcs_diff$$</a> <small><i>(if species have equal molecular brightnesses)</i></small><br><a href="$$fitfunction:help:fcs_diff_diffbright$$">$$fitfunction:name:fcs_diff_diffbright$$</a></td>
+  </tr>
+  <tr>
+    <td><b>Confocal (Gaussian) T+2D</b></td>
+    <td><a href="$$fitfunction:help:fcs_diff2d$$">$$fitfunction:name:fcs_diff2d$$</a></td>
+  </tr>
+  <tr>
+    <td><b>Confocal (Gaussian) T+2D+2D</b></td>
+    <td><a href="$$fitfunction:help:fcs_diff2d$$">$$fitfunction:name:fcs_diff2d$$</a> <small><i>(if species have equal molecular brightnesses)</i></small><br><a href="$$fitfunction:help:fcs_diff2d_diffbright$$">$$fitfunction:name:fcs_diff2d_diffbright$$</a></td>
+  </tr>
+  <tr>
+    <td><b>Confocal (Gaussian) T+3D+2D</b></td>
+    <td><a href="$$fitfunction:help:fcs_multidiff$$">$$fitfunction:name:fcs_multidiff$$</a></td>
+  </tr>
+  <tr>
+    <td><b>CS-FCS 3D+S+T (Confocal)</b></td>
+    <td><a href="$$fitfunction:help:fcs_cs_diff_d$$">$$fitfunction:name:fcs_cs_diff_d$$</a><br><a href="$$fitfunction:help:fcs_diff_cs_d_wz$$">$$fitfunction:name:fcs_diff_cs_d_wz$$</a></td>
+  </tr>
+  <tr>
+    <td><b>Exponentially correlated noise</b></td>
+    <td><a href="$$fitfunction:help:fcs_simpleexp$$">$$fitfunction:name:fcs_simpleexp$$</a></td>
+  </tr>
+  <tr>
+    <td><b>AC flow 3D (gauss)</b></td>
+    <td><a href="$$fitfunction:help:fcs_diffflow$$">$$fitfunction:name:fcs_diffflow$$</a><br><a href="$$fitfunction:help:fcs_diffflowv$$">$$fitfunction:name:fcs_diffflowv$$</a></td>
+  </tr>
+  <tr>
+    <td><b>CC bw flow 3D (gauss)</b><br><b>CC fw flow 3D (gauss)</b></td>
+    <td><a href="$$fitfunction:help:fccs_2f_diff3dflow$$">$$fitfunction:name:fccs_2f_diff3dflow$$</a><br><a href="$$fitfunction:help:fccs_2f_diff3dflow_wz$$">$$fitfunction:name:fccs_2f_diff3dflow_wz$$</a></td>
+  </tr>
+<!--
+  <tr>
+    <td><b></b></td>
+    <td></td>
+  </tr>
+-->
+</table></center><br><br>
+$$faq_end$$
+
+        
+    </body>
+</html>

@@ -74,10 +74,13 @@ class QFFitFunctionFCSMultiDiffusion: public QFFitFunction {
         QFFitFunctionFCSMultiDiffusion();
         virtual ~QFFitFunctionFCSMultiDiffusion() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QObject::tr("FCS: 2D/3D Multi-Diffusion normal/anomalous"); };
+        virtual QString name() const { return QObject::tr("FCS: 2D/3D normal/anomalous Multi-Diffusion"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_multidiff"); };
-
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const {
+            return QObject::tr("Confocal FCS");
+        }
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
 

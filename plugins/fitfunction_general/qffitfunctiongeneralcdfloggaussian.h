@@ -40,6 +40,8 @@ class QFFitFunctionGeneralCDFLogGaussian: public QFFitFunction {
         virtual QString shortName() const { return QObject::tr("CDF: Log-Normal"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("gen_cdf_loggaussian"); }
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("General Fit Functions/Cummulative Distributions (CDF)"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

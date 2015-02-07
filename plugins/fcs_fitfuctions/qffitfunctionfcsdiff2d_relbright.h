@@ -79,6 +79,12 @@ class QFFitFunctionFCSDiff2DDifferentBrightness: public QFFitFunction {
             else return QString("fcs_tir_diff2d_diffbright");
         }
 
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const {
+            if (!isTIRF) return QObject::tr("Confocal FCS");
+            else return QObject::tr("TIR-FCS");
+        }
+
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
 

@@ -37,7 +37,10 @@ class QFFitFunctionFCSSimpleExp: public QFFitFunction {
         virtual QString name() const { return QObject::tr("FCS: Sum of Exponential Functions"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_simpleexp"); };
-
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const {
+            return QObject::tr("Confocal FCS");
+        }
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
 

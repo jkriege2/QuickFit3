@@ -102,6 +102,7 @@ In order to encode such parameters, additional properties are available, that ex
     <li><b>ID</b> (<code>QF3SFF_ID</code> <i>[string]</i>) an ID for the fit function. This ID is used internally by QuickFit and HAS to be unique. Therefor you should add the name of yourself or your organization to this name. Also you should use letters <code>a-z</code>, digits <code>0-9</code> and underscores <code>_</code> only for this ID. $$note:The prefix (begin) of this parameter defines the use of the model, e.g. <code>fcs_</code> for FCS fit models, <code>dls_</code> for DLS fit models, <code>gen_</code> for general fit models etc. The best is to check the naming-conventions of the models implemented in other plugins, supplied with QuickFit. These are listed as "implemented ids:" for each fit function pligin, when you click on the menu entry  "Help | About Plugins" in the main window.$$</li>
     <li><b>name</b> (<code>QF3SFF_NAME</code> <i>[string]</i>) a name of the fit function</li>
     <li><b>short name</b> (<code>QF3SFF_SHORTNAME</code> <i>[string]</i>) a shortened name of the fit function (1-5 words)</li>
+    <li><b>category</b> (<code>QF3SFF_CATEGORY</code> <i>[string]</i>) a category for the fit function (e.g. <tt>"General Fit Functions"</tt> or <tt>"Confocal FCS"</tt>)</li>
     <li><b>help file</b> (<code>QF3SFF_HELP</code> <i>[string]</i>) is the path/name of a HTML-help file, describing the fit function. The path needs to be relative to the position of the fit function shared library. Usually you would create a library <code>example.dll</code> or <code>example.so</code> and in addition a help file <code>example.html</code> in the same directory. the this parameter is simply <code>"example.html"</code>. This help-file will be displaye din QuickFit's internal help system. So you can sue simple HTML to format the help file. In addition some special markup (e.g. for equations) is possible and you should use the <a href="$$plugin_info:help:qfe_helpeditor$$">help file editor</a> (QuickFit main window, menu-entry: "Tools | Online-help Editor").</li>
 </ul></p>
 
@@ -138,6 +139,11 @@ char QF3SFF_SHORTNAME[]="EXAMPLE: shared lib FitFunc";
 
 // link to a help file, relative to the library
 char QF3SFF_HELP[]="example.html";
+
+// a category for the fit functions
+#undef QF3SFF_CATEGORY
+#define QF3SFF_CATEGORY "example fit functions"
+
 </pre>$$
 Now the parameter properties are defined (dirst their number as <code>QF3SFF_PARAMETER_COUNT</code> and then their properties in the array <code>QF3SimpleFFParameter</code>.
 $$example:<pre>

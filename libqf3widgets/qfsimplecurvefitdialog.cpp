@@ -83,7 +83,7 @@ QFSimpleCurveFitDialog::QFSimpleCurveFitDialog(const QVector<double>& dataXin, c
 
 
     ui->cmbFitAlgorithm->setCurrentAlgorithm("fit_lmfit");
-    ui->cmbFitFunction->setCurrentIndex(0);
+    ui->cmbFitFunction->setCurrentFitFunction("gen_line");
 
 
 
@@ -137,7 +137,7 @@ QFSimpleCurveFitDialog::QFSimpleCurveFitDialog(const QVector<double>& dataXin, c
         ui->cmbFitFunction->setCurrentFitFunction(set->value("QFSimpleCurveFitDialog/model", ui->cmbFitFunction->currentFitFunctionID()).toString());
     }
 
-    methodChanged(ui->cmbFitFunction->currentIndex());
+    methodChanged(0);//ui->cmbFitFunction->currentIndex());
     connectSignals(true);
     on_btnFit_clicked();
 }

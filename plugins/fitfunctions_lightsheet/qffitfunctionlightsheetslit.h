@@ -40,6 +40,8 @@ class QFFitFunctionLightsheetSlit: public QFFitFunction {
         virtual QString shortName() const { return QObject::tr("SPIM lightsheet: slit funtion"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("lightsheet_slit"); };
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("SPIM lightsheet"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

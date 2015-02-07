@@ -25,6 +25,7 @@
 #include "libwid_imexport.h"
 #include <QStandardItemModel>
 #include <QSortFilterProxyModel>
+#include "qfsimpletreemodel.h"
 
 namespace Ui {
     class QFFitFunctionSelectDialog;
@@ -47,8 +48,8 @@ class QFWIDLIB_EXPORT QFFitFunctionSelectDialog : public QDialog
         void on_edtFilter_textChanged( const QString & text );
     private:
         Ui::QFFitFunctionSelectDialog *ui;
-        QStandardItemModel* model;
-        QSortFilterProxyModel filterModel;
+        QFSimpleTreeModel* model;
+        QFSimpleTreeModelSortFilterProxyModel filterModel;
 };
 
 #endif // QFFITFUNCTIONSELECTDIALOG_H

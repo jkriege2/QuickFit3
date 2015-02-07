@@ -19,6 +19,8 @@ class QFFitFunctionPSFGaussian: public QFFitFunction {
         virtual QString shortName() const { return QObject::tr("PSF: gaussian (1/e^2)"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("beadscan_psf_gaussian"); };
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QString("Point Spread Function (PSF)"); };
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

@@ -41,10 +41,12 @@ class QFFitFunctionsSPIMFCSADiff: public QFFitFunction {
         QFFitFunctionsSPIMFCSADiff();
         virtual ~QFFitFunctionsSPIMFCSADiff() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("SPIM-FCS: Anomalous Diffusion (rect. pixel, 1/sqrt(e) radii)"); }
+        virtual QString name() const { return QString("SPIM-FCS: 3D Anomalous Diffusion (rect. pixel, 1/sqrt(e) radii)"); }
 
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_spim_adiff"); }
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("SPIM-FCS"); }
 
         virtual bool isDeprecated() const { return true; }
 

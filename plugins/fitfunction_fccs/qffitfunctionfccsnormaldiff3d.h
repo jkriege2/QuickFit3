@@ -35,11 +35,15 @@ class QFFitFunctionFCCSNormalDiff3D: public QFFitFunction {
         QFFitFunctionFCCSNormalDiff3D();
         virtual ~QFFitFunctionFCCSNormalDiff3D() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCCS: 3D Normal Diffusion"); }
+        virtual QString name() const { return QString("2-color FCCS: 3D Normal Diffusion"); }
         /** \copydoc QFFitFunction::shortName() */
-        virtual QString shortName() const { return QObject::tr("FCCS: 3D Normal Diffusion"); }
+        virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_diff3d"); }
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const {
+            return QObject::tr("2-color Confocal FCCS");
+        }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

@@ -40,6 +40,8 @@ class QFFitFunctionGeneralLine: public QFFitFunction {
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("gen_line"); }
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("General Fit Functions"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

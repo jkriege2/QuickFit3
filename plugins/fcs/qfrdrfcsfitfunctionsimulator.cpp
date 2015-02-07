@@ -95,7 +95,7 @@ QFRDRFCSFitFunctionSimulator::QFRDRFCSFitFunctionSimulator(QFPluginServices* ser
     ui->btnModelHelp->setDefaultAction(ui->cmbFunction->getHelpAction());
     ui->btnModelSelector->setDefaultAction(ui->cmbFunction->getSelectAction());
 
-    modelChanged(ui->cmbFunction->currentIndex());
+    modelChanged(0);//ui->cmbFunction->currentIndex());
     updateFitFunction();
 
     connect(ui->cmbFunction, SIGNAL(currentIndexChanged(int)), this, SLOT(modelChanged(int)));

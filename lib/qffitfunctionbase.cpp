@@ -23,6 +23,16 @@
 
 
 
+QString QFFitFunctionBase::shortName() const
+{
+    return name();
+}
+
+QString QFFitFunctionBase::category() const
+{
+    return QString();
+}
+
 bool QFFitFunctionBase::isDeprecated() const
 {
     return false;

@@ -43,7 +43,11 @@ This editor allows to create user-defined fitting functions:
               <ul>
                 <li><tt>gen_<i>XXX</i></tt>: General fit functions</li>
                 <li><tt>fcs_<i>XXX</i></tt>: Fluorescence correlation spectroscopy fit functions</li>
+                <li><tt>fcs_tir_<i>XXX</i></tt>: TIR Fluorescence correlation spectroscopy fit functions</li>
+                <li><tt>fcs_spim_<i>XXX</i></tt>: SPIM Fluorescence correlation spectroscopy fit functions</li>
                 <li><tt>fccs_<i>XXX</i></tt>: Fluorescence crosscorrelation spectroscopy fit functions</li>
+                <li><tt>fccs_tir_<i>XXX</i></tt>: TIR Fluorescence crosscorrelation spectroscopy fit functions</li>
+                <li><tt>fccs_spim_<i>XXX</i></tt>: SPIM Fluorescence crosscorrelation spectroscopy fit functions</li>
                 <li><tt>dls_<i>XXX</i></tt>: Dynamic light scattering fit functions</li>
                 <li><tt>lightsheet_<i>XXX</i></tt>: Fit functions for cuts through a light sheet</li>
               </ul>
@@ -52,6 +56,7 @@ This editor allows to create user-defined fitting functions:
               In the example above, this is a general fit function with the name <tt>general_parabola</tt></li>
             <li><b>Name/Description:</b> A human readable description for the fit function. This name will be displayed in QuickFit's user interface. In the example above, the name is <code>General: Parabola</code></li>
             <li><b>short name:</b> A shortened version of <b>Name/Description</b> for the fit function. This is strictly optional and is used instead of the long form at some places in QuickFit.</li>
+            <li><b>category:</b> A category for the fit function. This is strictly optional and is used to group fit functions by theor use-case.</li>
             <li><b>expression:</b> Here you can enter the mathematical expression describing the desired fit model, as a function of the variable <tt>x</tt> (i.e. $$math:f(x, \vec{p})$$). QuickFit's internal <a href="$$qf_mathparser_helpfile$$">expression parser</a> is used to evaluate the expression and all functions and tools of this parser may be used. the only condition is, that the expression evaluates to a single number. 
               In the example above, the equation is a simple parabola:
               <center><code>offset+amplitude*(x-center)^2</code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; or in mathematcial notation $$math:f(x;\underbrace{o,a,c}{=\vec{p}})=o+a\cdot (x-c)^2$$</center>

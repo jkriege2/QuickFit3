@@ -42,6 +42,8 @@ class QFFitFunctionFCSDistributionGaussian: public QFFitFunction {
         virtual QString shortName() const { return QObject::tr("FCS SD: gaussian"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_dist_norm"); }
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("Confocal FCS"); }
 
         /** \copydoc QFFitFunction::isDeprecated() */
         virtual bool isDeprecated() const { return true; }

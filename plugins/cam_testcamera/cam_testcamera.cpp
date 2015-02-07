@@ -431,12 +431,15 @@ void QFECamTestCamera::initParticles(int camera, int n) {
     this->particleN[camera]=n;
     if (particleX[camera]) qfFree(particleX[camera]);
     if (particleY[camera]) qfFree(particleY[camera]);
-    particleX[camera]=(int*)qfMalloc(particleN[camera]*sizeof(int));
-    particleY[camera]=(int*)qfMalloc(particleN[camera]*sizeof(int));
+    particleX[camera]=particleY[camera]=NULL;
+    if (n>0) {
+        particleX[camera]=(int*)qfMalloc(particleN[camera]*sizeof(int));
+        particleY[camera]=(int*)qfMalloc(particleN[camera]*sizeof(int));
 
-    for (int i=0; i<n; i++) {
-        particleX[camera][i]=(int)round((double)rand()/(double)RAND_MAX*(double)width[camera]*1.25)-width[camera]/8;
-        particleY[camera][i]=(int)round((double)rand()/(double)RAND_MAX*(double)height[camera]*1.25)-height[camera]/8;
+        for (int i=0; i<n; i++) {
+            particleX[camera][i]=(int)round((double)rand()/(double)RAND_MAX*(double)width[camera]*1.25)-width[camera]/8;
+            particleY[camera][i]=(int)round((double)rand()/(double)RAND_MAX*(double)height[camera]*1.25)-height[camera]/8;
+        }
     }
 }
 

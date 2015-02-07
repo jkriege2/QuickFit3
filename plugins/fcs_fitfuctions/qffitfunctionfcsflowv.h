@@ -64,10 +64,13 @@ class QFFitFunctionFCSFlowV: public QFFitFunction {
         virtual ~QFFitFunctionFCSFlowV() {}
 
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QObject::tr("FCS: Normal Diffusion 3D with flow term (D,v,wxy as fit params)"); }
+        virtual QString name() const { return QObject::tr("FCS: 3D Normal Diffusion + Flow (D,v,wxy as fit params)"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_diffflowv"); }
-
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const {
+            return QObject::tr("Confocal FCS");
+        }
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;
 

@@ -110,12 +110,12 @@ int QFPFitFunctionsFCCS::getGlobalFitConfigCount() const
 
 QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsFCCS::getGlobalFitConfig(int i) const
 {
-    QString menulabel=tr("configure for confocal FCCS ...");
+    QString menulabel=tr("configure for 2-color Confocal FCCS ...");
     QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig res;
     int c=0;
     if (i==c++) { // fccs_fw_diff2coloracfg, fccs_fw_diff2coloracfr, fccs_fw_diff2colorccf
         res.groupLabel=menulabel;
-        res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c/D per species");
+        res.menuEntryLabel=tr("... 3D normal diffusion, species A+B+AB, c/D per species");
         res.models<<"fccs_fw_diff2coloracfg"<<"fccs_fw_diff2coloracfr"<<"fccs_fw_diff2colorccf";
         res.roles<<"acf0"<<"acf1"<<"fccs";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
@@ -149,7 +149,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsFCCS::g
 
     } else if (i==c++) { // fccs_spim_fw_diff2coloracfg, fccs_spim_fw_diff2coloracfr, fccs_spim_fw_diff2colorccf
         res.groupLabel=menulabel;
-        res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c/D per species, Da=Db=Dab");
+        res.menuEntryLabel=tr("... 3D normal diffusion, species A+B+AB, c/D per species, Da=Db=Dab");
         res.models<<"fccs_fw_diff2coloracfg"<<"fccs_fw_diff2coloracfr"<<"fccs_fw_diff2colorccf";
         res.roles<<"acf0"<<"acf1"<<"fccs";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
@@ -182,7 +182,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsFCCS::g
 
     } else if (i==c++) { // fccs_spim_fw_diff2coloracfg, fccs_spim_fw_diff2coloracfr, fccs_spim_fw_diff2colorccf
         res.groupLabel=menulabel;
-        res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c/D per species, Da=Db, Dab");
+        res.menuEntryLabel=tr("... 3D normal diffusion, species A+B+AB, c/D per species, Da=Db, Dab");
         res.models<<"fccs_fw_diff2coloracfg"<<"fccs_fw_diff2coloracfr"<<"fccs_fw_diff2colorccf";
         res.roles<<"acf0"<<"acf1"<<"fccs";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);
@@ -216,7 +216,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsFCCS::g
 
     } else    if (i==c++) { // fccs_fw_diff2colorsepacfg, fccs_fw_diff2colorsepacfr, fccs_fw_diff2colorsepccf
        res.groupLabel=menulabel;
-       res.menuEntryLabel=tr("... normal diffusion, species A+B+AB, c per species, D per channel");
+       res.menuEntryLabel=tr("... 3D normal diffusion, species A+B+AB, c per species, D per channel");
        res.models<<"fccs_fw_diff2colorsepacfg"<<"fccs_fw_diff2colorsepacfr"<<"fccs_fw_diff2colorsepccf";
        res.roles<<"acf0"<<"acf1"<<"fccs";
 
@@ -244,7 +244,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsFCCS::g
 
     } else    if (i==c++) { // fccs_fw_diff2colortcacfg, fccs_fw_diff2colortcacfr, fccs_fw_diff2colortcccf
        res.groupLabel=menulabel;
-       res.menuEntryLabel=tr("... 2-comp. normal diffusion, species A+B+AB, c/D1/D2 per species");
+       res.menuEntryLabel=tr("... 3D 2-comp. normal diffusion, species A+B+AB, c/D1/D2 per species");
        res.models<<"fccs_fw_diff2colortcacfg"<<"fccs_fw_diff2colortcacfr"<<"fccs_fw_diff2colortcccf";
        res.roles<<"acf0"<<"acf1"<<"fccs";
 
@@ -287,7 +287,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsFCCS::g
 
     } else    if (i==c++) { // fccs_fw_diff2colortcsepacfg, fccs_fw_diff2colortcsepacfr, fccs_fw_diff2colortcsepccf
        res.groupLabel=menulabel;
-       res.menuEntryLabel=tr("... 2-comp. normal diffusion, species A+B+AB, c per species, D1/D2 per channel");
+       res.menuEntryLabel=tr("... 3D 2-comp. normal diffusion, species A+B+AB, c per species, D1/D2 per channel");
        res.models<<"fccs_fw_diff2colortcsepacfg"<<"fccs_fw_diff2colortcsepacfr"<<"fccs_fw_diff2colortcsepccf";
        res.roles<<"acf0"<<"acf1"<<"fccs";
 
@@ -311,7 +311,7 @@ QFFitFunctionConfigForGlobalFitInterface::GlobalFitConfig QFPFitFunctionsFCCS::g
        res.globalParams << constructQListWithMultipleItems(QStringList("background1"), 3);
     } else if (i==c++) { // fccs_fw_adiff2coloracfg, fccs_fw_adiff2coloracfr, fccs_fw_adiff2colorccf
         res.groupLabel=menulabel;
-        res.menuEntryLabel=tr("... anomalous diffusion, species A+B+AB, c/Gamma/alpha per species");
+        res.menuEntryLabel=tr("... 3D anomalous diffusion, species A+B+AB, c/Gamma/alpha per species");
         res.models<<"fccs_fw_adiff2coloracfg"<<"fccs_fw_adiff2coloracfr"<<"fccs_fw_adiff2colorccf";
         res.roles<<"acf0"<<"acf1"<<"fccs";
         res.globalParams << constructQListWithMultipleItems(QStringList("concentration_a"), 3);

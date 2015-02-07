@@ -24,8 +24,9 @@
 #include <QComboBox>
 #include "qffitalgorithm.h"
 #include "libwid_imexport.h"
+#include "qfenhancedcombobox.h"
 
-class QFWIDLIB_EXPORT QFFitAlgorithmComboBox : public QComboBox
+class QFWIDLIB_EXPORT QFFitAlgorithmComboBox : public QFEnhancedComboBox
 {
         Q_OBJECT
     public:

@@ -40,6 +40,9 @@ class QFFitFunctionFCCSNormalDiff3DFlow2Focus: public QFFitFunction {
 
         /*! \copydoc QFFitFunction::name()   */
         virtual QString name() const;
+        virtual QString category() const {
+            return QObject::tr("Confocal 2-focus FCCS");
+        }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

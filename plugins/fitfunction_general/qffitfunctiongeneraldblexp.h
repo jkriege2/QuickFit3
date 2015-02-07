@@ -40,6 +40,8 @@ class QFFitFunctionGeneralDblExp: public QFFitFunction {
         virtual QString shortName() const { return name(); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("gen_dblexp"); }
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("General Fit Functions/Decays"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

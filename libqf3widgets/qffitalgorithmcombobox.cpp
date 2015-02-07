@@ -24,7 +24,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitalgorithmmanager.h"
 
 QFFitAlgorithmComboBox::QFFitAlgorithmComboBox(QWidget *parent) :
-    QComboBox(parent)
+    QFEnhancedComboBox(parent)
 {
     updateFitAlgorithms();
     actHelp=new QAction(QIcon(":/lib/help/help.png"), tr("Fit algorithm help ..."), this);

@@ -34,9 +34,13 @@ class QFFitFunctionsFCCSFWADiff2ColorACFG: public QFFitFunction {
         QFFitFunctionsFCCSFWADiff2ColorACFG();
         virtual ~QFFitFunctionsFCCSFWADiff2ColorACFG() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("FCCS: anomalous diffusion, species A+B+AB, c/D per species, ACF green"); }
+        virtual QString name() const { return QString("2-color FCCS: 3D anomalous diffusion, species A+B+AB, c/D per species, ACF green"); }
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fccs_fw_adiff2coloracfg"); }
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const {
+            return QObject::tr("2-color Confocal FCCS");
+        }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;

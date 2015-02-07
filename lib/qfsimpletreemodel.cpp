@@ -44,9 +44,30 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
          return rootItem->columnCount();
  }
 
- QFSimpleTreeModelItem *QFSimpleTreeModel::addFolderedItem(const QString &name, const QVariant &userData, QChar separator)
+ QFSimpleTreeModelItem *QFSimpleTreeModel::itemForIndex(const QModelIndex &index) const
  {
-     QStringList folders=name.split(separator);
+     if (!index.isValid()) return NULL;
+     return static_cast<QFSimpleTreeModelItem*>(index.internalPointer());
+ }
+
+ QFSimpleTreeModelItem *QFSimpleTreeModel::addFolderedItem(const QString &name_in, const QVariant &userData, QChar separator)
+ {
+     QStringList folders=name_in.split(separator);
+     QString name=folders.value(folders.size()-1);
+     if (folders.size()>0) folders.removeLast();
+     return addFolderedItem(folders, name, userData);
+
+ }
+
+ QFSimpleTreeModelItem *QFSimpleTreeModel::addFolderedItem(const QString &folder, const QString &name, const QVariant &userData)
+ {
+     return addFolderedItem(QStringList(folder), name, userData);
+ }
+
+ QFSimpleTreeModelItem *QFSimpleTreeModel::addFolderedItem(const QStringList &folders_in, const QString &name, const QVariant &userData)
+ {
+     QStringList folders=folders_in;
+     folders<<name;
      if (folders.size()<=0) return NULL;
      QFSimpleTreeModelItem* root=rootItem;
 
@@ -70,7 +91,6 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
      if (userData.isValid()) item->setData(userData);
      root->appendChild(item);
      return item;
-
  }
 
  void QFSimpleTreeModel::clear()
@@ -86,6 +106,13 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
 #endif
  }
 
+ void QFSimpleTreeModel::sort()
+ {
+     beginResetModel();
+     if (rootItem) rootItem->sort();
+     endResetModel();
+ }
+
  QVariant QFSimpleTreeModel::data(const QModelIndex &index, int role) const
  {
      if (!index.isValid())
@@ -96,7 +123,7 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
      if (!item) return QVariant();
 
      if (role==Qt::DecorationRole) {
-         if (item->isFolder()) return QIcon("lib/projecttree_folder.png");
+         if (item->isFolder()) return QIcon(":/lib/projecttree_folder.png");
          else return item->data(role);
      }
 
@@ -126,8 +153,7 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
      return QVariant();
  }
 
- QModelIndex QFSimpleTreeModel::index(int row, int column, const QModelIndex &parent)
-             const
+ QModelIndex QFSimpleTreeModel::index(int row, int column, const QModelIndex &parent) const
  {
      if (!hasIndex(row, column, parent))
          return QModelIndex();
@@ -144,6 +170,23 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
          return createIndex(row, column, childItem);
      else
          return QModelIndex();
+ }
+
+ QModelIndex QFSimpleTreeModel::index(const QFSimpleTreeModelItem *item) const
+ {
+     if (!item) return QModelIndex();
+     QFSimpleTreeModelItem *parentItem=item->parent();
+     if (!parentItem) parentItem=rootItem;
+
+     int row=0;
+     if (rootItem && item) row=parentItem->childRow(item);
+     return createIndex(row, 0, (void*)item);
+ }
+
+ QModelIndex QFSimpleTreeModel::index(QVariant data, int role) const
+ {
+     if (!rootItem) return QModelIndex();
+     return index(rootItem->findChild(data, role));
  }
 
  QModelIndex QFSimpleTreeModel::parent(const QModelIndex &index) const
@@ -246,9 +289,28 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
      childItems.append(item);
  }
 
- QFSimpleTreeModelItem *QFSimpleTreeModelItem::child(int row)
+ QFSimpleTreeModelItem *QFSimpleTreeModelItem::child(int row) const
  {
      return childItems.value(row);
+ }
+
+ QFSimpleTreeModelItem *QFSimpleTreeModelItem::findChild(const QVariant &data, int role)
+ {
+     QFSimpleTreeModelItem * res=NULL;
+     if (userData.value(role, QVariant())==data) return this;
+     for (int i=0; i<childItems.size(); i++) {
+         res=childItems[i]->findChild(data, role);
+         if (res) return res;
+     }
+     return res;
+ }
+
+ int QFSimpleTreeModelItem::childRow(const QFSimpleTreeModelItem *child) const
+ {
+     for (int i=0; i<childItems.size(); i++) {
+         if (childItems[i]==child) return i;
+     }
+     return -1;
  }
 
  int QFSimpleTreeModelItem::childCount() const
@@ -271,12 +333,37 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
      return userData.value(role, QVariant());
  }
 
+ QString QFSimpleTreeModelItem::text() const
+ {
+     return userData.value(Qt::DisplayRole, QVariant()).toString();
+ }
+
  void QFSimpleTreeModelItem::setData(QVariant data, int role)
  {
      userData[role]=data;
  }
 
- QFSimpleTreeModelItem *QFSimpleTreeModelItem::parent()
+ void QFSimpleTreeModelItem::setIcon(const QIcon &icon)
+ {
+     setData(icon, Qt::DecorationRole);
+ }
+
+ void QFSimpleTreeModelItem::setForeground(QColor color)
+ {
+     setData(color, Qt::ForegroundRole);
+ }
+
+ void QFSimpleTreeModelItem::setBackground(QColor color)
+ {
+     setData(color, Qt::BackgroundColorRole);
+ }
+
+ void QFSimpleTreeModelItem::setText(const QString &text)
+ {
+     userData[Qt::DisplayRole] = text;
+ }
+
+ QFSimpleTreeModelItem *QFSimpleTreeModelItem::parent() const
  {
      return parentItem;
  }
@@ -291,10 +378,58 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
      this->folder=folder;
  }
 
+ static bool QFSimpleTreeModelItem_lessthan(const QFSimpleTreeModelItem*s1, const QFSimpleTreeModelItem*s2)
+ {
+     if (s1 && s2) {
+         if (s1->isFolder() && s2->isFolder()) return s1->text()<s2->text();
+         if (!s1->isFolder() && s2->isFolder()) return false;
+         if (s1->isFolder() && !s2->isFolder()) return true;
+         if (!s1->isFolder() && !s2->isFolder()) return s1->text()<s2->text();
+     }
+     return false;
+ }
+
+ void QFSimpleTreeModelItem::sort()
+ {
+     qSort(childItems.begin(), childItems.end(), QFSimpleTreeModelItem_lessthan);
+ }
+
  int QFSimpleTreeModelItem::row() const
  {
      if (parentItem)
          return parentItem->childItems.indexOf(const_cast<QFSimpleTreeModelItem*>(this));
 
      return 0;
+ }
+
+
+ QFSimpleTreeModelSortFilterProxyModel::QFSimpleTreeModelSortFilterProxyModel(QObject *parent):
+     QSortFilterProxyModel(parent)
+ {
+
+ }
+
+ bool QFSimpleTreeModelSortFilterProxyModel::filterAcceptsRow(int sourceRow, const QModelIndex &sourceParent) const
+ {
+     QFSimpleTreeModel* tree=qobject_cast<QFSimpleTreeModel*>(sourceModel());
+     if (tree) {
+        QFSimpleTreeModelItem* item=tree->itemForIndex(tree->index(sourceRow, 0, sourceParent));
+        if (item) {
+            if (item->isFolder()) {
+                bool acceptC=false;
+                for (int i=0; i<item->childCount(); i++) {
+                    acceptC=acceptC|filterAcceptsRow(i, tree->index(item));
+                    if (acceptC) return true;
+                }
+                return false;
+            } else {
+                //QFSimpleTreeModelItem* parentItem=item->parent();
+                return QSortFilterProxyModel::filterAcceptsRow(sourceRow, sourceParent);
+            }
+
+        }
+     } else {
+         return QSortFilterProxyModel::filterAcceptsRow(sourceRow, sourceParent);
+     }
+     return true;
  }

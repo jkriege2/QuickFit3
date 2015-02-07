@@ -209,6 +209,12 @@ typedef const QF3SimpleFFParameter* (*QF3SimpleFFGetParameterDescriptionFunc)();
   */
 typedef void (*QF3SimpleFFGetVersionFunc)(uint16_t* major, uint16_t*minor);
 
+#define FFNAME_LONGNAME 0
+#define FFNAME_ID 1
+#define FFNAME_SHORTNAME 2
+#define FFNAME_HELPFILE 3
+#define FFNAME_CATEGORY 4
+
 /** \brief type of the getModelName() function of a model (in the DLL)
   * \ingroup quickfit3_models
   *
@@ -222,6 +228,7 @@ typedef void (*QF3SimpleFFGetVersionFunc)(uint16_t* major, uint16_t*minor);
  *                    be used as part of filenames, INI sections ...
  *   - <b>type=2</b>: getModelName() will return short name of the fit function
  *   - <b>type=3</b>: getModelName() will return the filename of the description HTML file reltive to the model's library location!
+ *   - <b>type=4</b>: getModelName() will return the category of the fit function!
  * .
  *
   */

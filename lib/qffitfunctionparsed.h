@@ -39,6 +39,8 @@ class QFLIB_EXPORT QFFitFunctionParsed : public QFFitFunction{
 
         /*! \copydoc QFFitFunction::name()   */
         virtual QString name() const;
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const;
         /** \copydoc QFFitFunction::shortName() */
         virtual QString shortName() const;
         /*! \copydoc QFFitFunction::id()   */
@@ -67,6 +69,7 @@ class QFLIB_EXPORT QFFitFunctionParsed : public QFFitFunction{
         QString m_errors;
         QString m_id;
         QString m_name;
+        QString m_category;
         QString m_shortName;
         QString m_expression;
         mutable QFMathParser parser;

@@ -30,6 +30,8 @@
 #include "qfevaluationitemfactory.h"
 #include "qfimporter.h"
 #include "qfimportermanager.h"
+#include "qfexportermanager.h"
+#include "qfexporter.h"
 
 SubPluginLinkDialog::SubPluginLinkDialog(QWidget *parent) :
     QDialog(parent),
@@ -69,6 +71,18 @@ SubPluginLinkDialog::SubPluginLinkDialog(QWidget *parent) :
                 QStringList e;
                 e<<lst[j]<<"importer";
                 ui->cmbPlugin->addItem(QIcon(QFPluginServices::getInstance()->getImporterManager()->getIconFilename(i)), f->formatName(), e);
+                delete f;
+            }
+        }
+    }
+    for (int i=0; i<QFPluginServices::getInstance()->getExporterManager()->pluginCount(); i++) {
+        QStringList lst=QFPluginServices::getInstance()->getExporterManager()->getIDList(i);
+        for (int j=0; j<lst.size(); j++) {
+            QFExporter* f=QFPluginServices::getInstance()->getExporterManager()->createExporter(lst[j]);
+            if (f) {
+                QStringList e;
+                e<<lst[j]<<"exporter";
+                ui->cmbPlugin->addItem(QIcon(QFPluginServices::getInstance()->getExporterManager()->getIconFilename(i)), f->formatName(), e);
                 delete f;
             }
         }

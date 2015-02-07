@@ -72,6 +72,8 @@ class QFFitFunctionFCSADiffDifferentBrightness: public QFFitFunction {
         virtual QString name() const { return QObject::tr("FCS: 3D Anomalous Diffusion, different molecular brightnesses"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("fcs_adiff_diffbright"); };
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const { return QObject::tr("Confocal FCS"); }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double x, const double* parameters) const;

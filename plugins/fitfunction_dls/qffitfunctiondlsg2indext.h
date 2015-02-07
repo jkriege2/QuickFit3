@@ -38,6 +38,10 @@ class QFFitFunctionDLSG2inDExt: public QFFitFunction {
         virtual QString shortName() const { return QObject::tr("DLS: G2 autocorrelation (D) Extended"); };
         /*! \copydoc QFFitFunction::id()   */
         virtual QString id() const { return QString("dls_g2_ind_ext"); };
+        /*! \copydoc QFFitFunction::category()   */
+        virtual QString category() const {
+            return QObject::tr("Dynamic Light Scattering (DLS)");
+        }
 
         /*! \copydoc QFFitFunction::evaluate()   */
         virtual double evaluate(double t, const double* parameters) const;
