@@ -72,14 +72,14 @@ class QFRDRImageStackPlugin : public QObject, public QFPluginRawDataRecordBase {
         virtual QString getAuthor() const  { return tr("Jan W. Krieger"); }
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2012-2014 by Jan W. Krieger"); }
+        virtual QString getCopyright() const  { return tr("(c) 2012-2015 by Jan W. Krieger"); }
 
         /** \brief weblink for the plugin */
         virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); }
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=1;
+            minor=2;
         }
 
         /** \brief icon for the plugin */

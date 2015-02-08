@@ -1,0 +1,74 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>Image Stack Online-Help: Expression parser: Imaeg Stack data access</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+  
+  <h2>Check for image stack RDR</h2>
+  $$funcref_start$$<a name="rdr_isimagestack"/><!-- func:rdr_isimagestack -->
+    <b><tt><!-- template -->rdr_isimagestack(rdrid)<!-- /template --></tt> - <i> returns <tt>true</tt> is the given raw data record (RDR) in the current project is an image stack record</i>:</b>
+  $$funcref_description$$
+        <!-- /func:rdr_isimagestack -->
+  $$funcref_end$$
+  
+  <h2>Image Stack data access</h2>
+  
+   $$funcref_start$$<a name="imagestack_getstacks"/><!-- func:imagestack_getstacks -->
+   <b><tt><!-- template -->imagestack_getstacks(rdr_id)<!-- /template --></tt> - <i> returns the number of image stacks in the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+		$$IMAGESTACK_PARSER_INFO$$
+        <!-- /func:imagestack_getstacks -->
+   $$funcref_end$$
+  
+   $$funcref_start$$<a name="imagestack_getwidth"/><!-- func:imagestack_getwidth -->
+   <b><tt><!-- template -->imagestack_getwidth(rdr_id, stack)<!-- /template --></tt> - <i> returns the frame width in the specified stack within the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        $$IMAGESTACK_PARSER_INFO$$
+        <!-- /func:imagestack_getwidth -->
+   $$funcref_end$$
+  
+  
+   $$funcref_start$$<a name="imagestack_getheight"/><!-- func:imagestack_getheight -->
+   <b><tt><!-- template -->imagestack_getheight(rdr_id, stack)<!-- /template --></tt> - <i> returns the frame height in the specified stack within the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        $$IMAGESTACK_PARSER_INFO$$
+        <!-- /func:imagestack_getheight -->
+   $$funcref_end$$
+   
+   
+   $$funcref_start$$<a name="imagestack_getframes"/><!-- func:imagestack_getframes -->
+   <b><tt><!-- template -->imagestack_getframes(rdr_id, stack)<!-- /template --></tt> - <i> returns the number of frames in the specified stack within the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        $$IMAGESTACK_PARSER_INFO$$
+        <!-- /func:imagestack_getframes -->
+   $$funcref_end$$
+  
+   $$funcref_start$$<a name="imagestack_getchannels"/><!-- func:imagestack_getchannels -->
+   <b><tt><!-- template -->imagestack_getchannels(rdr_id, stack)<!-- /template --></tt> - <i> returns the number of color channels in the specified stack within the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        $$IMAGESTACK_PARSER_INFO$$
+        <!-- /func:imagestack_getchannels -->
+   $$funcref_end$$
+   
+   $$funcref_start$$<a name="imagestack_getframe"/><!-- func:imagestack_getframe -->
+   <b><tt><!-- template -->imagestack_getframe(rdr_id, stack=0, frame=0, channel=0)<!-- /template --></tt> - <i> returns the given frame of the specified channel in the specified stack within the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        This function returns an number vector of size <tt>imagestack_getwidth(stack)*imagestack_getheight(stack)</tt>. the data is sorted in row-major order, i.e. <tt>I(x=0,y=0), I(1,0),...,I(width,0),I(0,1),I(1,1),...</tt>
+        $$IMAGESTACK_PARSER_INFO$$
+        <!-- /func:imagestack_getframe -->
+   $$funcref_end$$
+   
+   $$funcref_start$$<a name="imagestack_getstack"/><!-- func:imagestack_getstack -->
+   <b><tt><!-- template -->imagestack_getstack(rdr_id, stack=0, channel=0)<!-- /template --></tt> - <i> returns the full image stack of the specified channel in the specified stack within the specified raw data record (RDRs) in the current project </i>:</b>
+  $$funcref_description$$
+        This function returns an number vector of size <tt>imagestack_getwidth(stack)*imagestack_getheight(stack)*imagestack_getframes(stack)</tt>. the data is sorted in row-major order, i.e. <tt>I(x=0,y=0,f=0), I(1,0,0),...,I(width,0,0),I(0,1,0),I(1,1,0),...,I(0,0,1),I(1,0,1),...</tt>
+        $$IMAGESTACK_PARSER_INFO$$
+        <!-- /func:imagestack_getstack -->
+   $$funcref_end$$
+   
+  </body>
+  </html>
+  

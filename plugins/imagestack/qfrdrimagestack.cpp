@@ -28,6 +28,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfevaluationitemfactory.h"
 #include "qfimageplot.h"
 #include "imagetools.h"
+#include "qfrdrimagestack_parserfunctions.h"
 
 
 QFRDRImageStackPlugin::QFRDRImageStackPlugin(QObject* parent):
@@ -71,13 +72,34 @@ void QFRDRImageStackPlugin::registerToMenu(QMenu* menuMain) {
 
 void QFRDRImageStackPlugin::init()
 {
+    services->registerWizard("rdr_wizards", tr("Insert Image Stacks"), QIcon(getIconFilename()), this, SLOT(startImagestackWizard()));
     if (QFPluginServices::getInstance()->getEvaluationItemFactory()->contains("spim_lightsheet_eval")) {
         services->registerWizard("project_wizards", tr("SPIM Lightsheet Analysis"), QIcon(QFPluginServices::getInstance()->getEvaluationItemFactory()->getIconFilename("spim_lightsheet_eval")), this, SLOT(startProjectWizardLightsheetAnalysis()));
-        services->registerWizard("project_wizards", tr("PSF Analysis"), QIcon(QFPluginServices::getInstance()->getEvaluationItemFactory()->getIconFilename("eval_beadscanpsf")), this, SLOT(startProjectWizardPSFAnalysis()));
-        services->registerWizard("rdr_wizards", tr("Insert Image Stacks"), QIcon(getIconFilename()), this, SLOT(startImagestackWizard()));
         services->registerWizard("rdr_wizards", tr("Image Stacks for SPIM Lightsheet Analysis"), QIcon(QFPluginServices::getInstance()->getEvaluationItemFactory()->getIconFilename("spim_lightsheet_eval")), this, SLOT(startProjectWizardLightsheetAnalysisData()));
+    }
+    if (QFPluginServices::getInstance()->getEvaluationItemFactory()->contains("eval_beadscanpsf")) {
+        services->registerWizard("project_wizards", tr("PSF Analysis"), QIcon(QFPluginServices::getInstance()->getEvaluationItemFactory()->getIconFilename("eval_beadscanpsf")), this, SLOT(startProjectWizardPSFAnalysis()));
         services->registerWizard("rdr_wizards", tr("Image Stacks for PSF Analysis"), QIcon(QFPluginServices::getInstance()->getEvaluationItemFactory()->getIconFilename("eval_beadscanpsf")), this, SLOT(startProjectWizardPSFAnalysisData()));
     }
+
+
+
+    QFPluginServices::getInstance()->appendOrAddHTMLReplacement("qfmathparser_ref", QString("$$insert:%1/parserref.inc$$").arg(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())));
+    QStringList sl=QFPluginServices::getInstance()->getGlobalConfigValue("QFMathParser_ref").toStringList();
+    sl.append(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
+    QFPluginServices::getInstance()->setGlobalConfigValue("QFMathParser_ref", sl);
+    QFPluginServices::getInstance()->addQFMathParserRefernceDir(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
+
+
+    QFMathParser::addGlobalFunction("rdr_isimagestack", fStack_isstack);
+    QFMathParser::addGlobalFunction("imagestack_getstacks", fStack_getstacks);
+    QFMathParser::addGlobalFunction("imagestack_getchannels", fStack_getchannels);
+    QFMathParser::addGlobalFunction("imagestack_getwidth", fStack_getwidth);
+    QFMathParser::addGlobalFunction("imagestack_getheight", fStack_getheight);
+    QFMathParser::addGlobalFunction("imagestack_getframes", fStack_getframes);
+    QFMathParser::addGlobalFunction("imagestack_getframe", fStack_getframe);
+    QFMathParser::addGlobalFunction("imagestack_getstack", fStack_getstack);
+
 }
 
 

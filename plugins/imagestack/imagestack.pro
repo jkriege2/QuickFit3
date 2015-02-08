@@ -39,13 +39,15 @@ HEADERS += qfrdrimagestack.h \
 		   qfrdrimagestack_dataeditor.h \
     ../interfaces/qfrdrimagestackinterface.h \
     ../base_classes/qfrdrimagemasktools.h \
-    qfrdrimagestack3dviewer.h
+    qfrdrimagestack3dviewer.h \
+    qfrdrimagestack_parserfunctions.h
 
 SOURCES += qfrdrimagestack.cpp \
            qfrdrimagestack_data.cpp \
 		   qfrdrimagestack_dataeditor.cpp \
     ../base_classes/qfrdrimagemasktools.cpp \
-    qfrdrimagestack3dviewer.cpp
+    qfrdrimagestack3dviewer.cpp \
+    qfrdrimagestack_parserfunctions.cpp
 
 FORMS = \ 
     qfrdrimagestack3dviewer.ui
