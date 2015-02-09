@@ -122,7 +122,7 @@ void QFMathParserXFunctionLineGraph::createPlotData(bool collectParams)
     QFMathParser::ByteCodeEnvironment environment(fdata.parser);
     environment.init(fdata.parser);
     fdata.byteCode.clear();
-    fdata.useByteCode=fdata.useByteCode=fdata.node->createByteCode(fdata.byteCode, &environment);
+    fdata.useByteCode=fdata.node->createByteCode(fdata.byteCode, &environment);
     //qDebug()<<"createPlotData():   parsing: "<<timer.elapsed()-t<<"ms";
 
 
