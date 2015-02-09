@@ -59,7 +59,7 @@
 #include "qfimageparametergroupbox.h"
 #include "qfoverlaystylecombobox.h"
 #include "qfparametercorrelationview.h"
-#include "frawdataimageeditor.h"
+
 
 class FRawDataImageEditor : public QFRawDataEditor {
         Q_OBJECT

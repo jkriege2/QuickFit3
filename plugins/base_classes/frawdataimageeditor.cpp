@@ -699,14 +699,14 @@ void FRawDataImageEditor::updateHistogram(QFHistogramView *histogram, QFRDRRunSe
         histogram->clear();
         if (plteImageData && (plteImageSize>=0)) {
             if (excludeExcluded) {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for ( int32_t i=0; i<plteImageSize; i++) {
                     if ((!selHistogram || selected.contains(i)) && !m->leaveoutRun(i) && indexIsDualView2(i)) {
                         datahist[datasize]=plteImageData[i];
                         datasize++;
                     }
                 }
             } else  {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for ( int32_t i=0; i<plteImageSize; i++) {
                     if ((!selHistogram || selected.contains(i)) && indexIsDualView2(i)) {
                         datahist[datasize]=plteImageData[i];
                         datasize++;
@@ -717,14 +717,14 @@ void FRawDataImageEditor::updateHistogram(QFHistogramView *histogram, QFRDRRunSe
     } else {
         if (plteImageData && (plteImageSize>=0)) {
             if (excludeExcluded) {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for ( int32_t i=0; i<plteImageSize; i++) {
                     if ((!selHistogram || selected.contains(i)) && !m->leaveoutRun(i) && (!dv || (dv && !indexIsDualView2(i)))) {
                         datahist[datasize]=plteImageData[i];
                         datasize++;
                     }
                 }
             } else  {
-                for (register int32_t i=0; i<plteImageSize; i++) {
+                for ( int32_t i=0; i<plteImageSize; i++) {
                     if ((!selHistogram || selected.contains(i)) && (!dv || (dv && !indexIsDualView2(i)))) {
                         datahist[datasize]=plteImageData[i];
                         datasize++;
