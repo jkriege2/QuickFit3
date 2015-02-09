@@ -49,6 +49,13 @@ QFEDataExportBasics::~QFEDataExportBasics() {
 
 void QFEDataExportBasics::deinit() {
 	/* add code for cleanup here */
+    for (int i=0; i<exporters.size(); i++) {
+        if (exporters[i])  {
+            QFDataExportHandler::deregisterDataWriter(exporters[i]);
+            delete exporters[i];
+        }
+    }
+    exporters.clear();
 }
 
 void QFEDataExportBasics::projectChanged(QFProject* oldProject, QFProject* project) {
@@ -59,9 +66,10 @@ void QFEDataExportBasics::projectChanged(QFProject* oldProject, QFProject* proje
 
 void QFEDataExportBasics::initExtension() {
     /* do initializations here but do not yet connect to the camera! */
-    
-    QFDataExportHandler::registerDataWriter(new QFEDataXlsLibExport(true));
-    QFDataExportHandler::registerDataWriter(new QFEDataXlsLibExport(false));
+    exporters.append(NULL);
+    exporters.append(NULL);
+    QFDataExportHandler::registerDataWriter(exporters[0]=new QFEDataXlsLibExport(true));
+    QFDataExportHandler::registerDataWriter(exporters[1]=new QFEDataXlsLibExport(false));
 }
 
 

@@ -504,6 +504,11 @@ void QFDataExportHandler::registerDataWriter(QFDataExportHandler::DataWriter *wr
     writers.append(writer);
 }
 
+void QFDataExportHandler::deregisterDataWriter(QFDataExportHandler::DataWriter *writer)
+{
+    if (writers.contains(writer)) writers.removeAll(writer);
+}
+
 void QFDataExportHandler::save(const QList<QVector<double> >& data, int format, const QString& filename, const QStringList& columnHeaders, const QStringList& rowHeaders) {
 
     int f=0;

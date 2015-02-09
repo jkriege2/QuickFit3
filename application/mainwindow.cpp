@@ -373,21 +373,24 @@ void MainWindow::searchAndRegisterPlugins() {
 
     QDir pluginsDir = QDir(settings->getPluginDirectory());
     foreach (QString fileName, qfDirListFilesRecursive(pluginsDir)) {//pluginsDir.entryList(QDir::Files)) {
-        QPluginLoader loader(pluginsDir.absoluteFilePath(fileName));
-        QObject *plugin = loader.instance();
-        if (QApplication::arguments().contains("--verboseplugin")) {
-            QFPluginServices::getInstance()->log_global_text("plugin manager:\n  trying "+fileName+"\n");
-            if (!plugin) QFPluginServices::getInstance()->log_global_text("    error: "+loader.errorString()+"\n");
-        }
-        if (plugin) {
-            if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
-            rawDataFactory->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
-            evaluationFactory->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
-            fitFunctionManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
-            fitAlgorithmManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
-            importerManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
-            extensionManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
-            exporterManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+        QPluginLoader* loader=new QPluginLoader(pluginsDir.absoluteFilePath(fileName));
+        if (loader) {
+            QObject *plugin = loader->instance();
+            if (QApplication::arguments().contains("--verboseplugin")) {
+                QFPluginServices::getInstance()->log_global_text(QString("plugin manager:\n  trying %1\n").arg(fileName));
+                if (!plugin) QFPluginServices::getInstance()->log_global_text(QString("    error: ")+loader->errorString()+QString("\n"));
+            }
+            if (plugin) {
+                if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
+                rawDataFactory->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+                evaluationFactory->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+                fitFunctionManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+                fitAlgorithmManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+                importerManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+                extensionManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+                exporterManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+            }
+            delete loader;
         }
     }
     rawDataFactory->finalizePluginSearch();
@@ -4762,10 +4765,10 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                 if (a) {
                                     name=a->name();
                                     dir=dir=QFPluginServices::getInstance()->getFitFunctionManager()->getPluginHelp(id, j.key());
-                                    delete a;
                                     if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
                                     else text+=item_template_nolink.arg(icon).arg(name);
                                 }
+                                if (a) delete a;
                             }
 
                         if (!text.isEmpty()) {
@@ -4824,10 +4827,11 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                 if ((filter1.isEmpty() || (pid==filter1) ) && (filter3.isEmpty() || (fname.contains(filter3) || j.key().toLower().simplified().contains(filter3)) ) && a) {
                                     name=a->name();
                                     dir=dir=QFPluginServices::getInstance()->getFitFunctionManager()->getPluginHelp(id, j.key());
-                                    delete a;
+
                                     if (QFile::exists(dir)) text+=item_template.arg(icon).arg(name).arg(dir);
                                     else text+=item_template_nolink.arg(icon).arg(name);
                                 }
+                                if (a) delete a;
                             }
 
                         if (!text.isEmpty()) {

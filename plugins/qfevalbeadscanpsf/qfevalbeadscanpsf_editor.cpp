@@ -522,6 +522,7 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
                 for (int i=0; i<fitresCutZXGB.size(); i++) {
                     if (ff && ff->getParameterID(i)=="position") fitresCutZXGB[i]=fitresCutZXGB[i]/1000.0;
                 }
+                if (ff) delete ff;
                 fit->set_params(fitresCutZXGB);
                 fit->set_color(plt->get_color().darker());
                 ui->pltFitWofZ->addGraph(fit);
@@ -543,6 +544,7 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
                 for (int i=0; i<fitresCutZYGB.size(); i++) {
                     if (ff && ff->getParameterID(i)=="position") fitresCutZYGB[i]=fitresCutZYGB[i]/1000.0;
                 }
+                if (ff) delete ff;
 
                 fit->set_params(fitresCutZYGB);
                 fit->set_color(plt->get_color().darker());
@@ -962,7 +964,7 @@ void QFEvalBeadScanPSFEditor::displayResults()
     displayEvaluationBead();
 }
 
-void QFEvalBeadScanPSFEditor::on_chkMedianFIlter_valueChanged(bool value)
+void QFEvalBeadScanPSFEditor::on_chkMedianFIlter_toggled(bool value)
 {
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();

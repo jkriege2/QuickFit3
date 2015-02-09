@@ -52,6 +52,13 @@ QFEPlotterExporterLatex::~QFEPlotterExporterLatex() {
 
 void QFEPlotterExporterLatex::deinit() {
 	/* add code for cleanup here */
+    for (int i=0; i<adapters.size(); i++) {
+        if (adapters[i]) {
+            JKQtBasePlotter::deregisterPaintDeviceAdapter(adapters[i]);
+            delete adapters[i];
+        }
+    }
+    adapters.clear();
 }
 
 void QFEPlotterExporterLatex::projectChanged(QFProject* oldProject, QFProject* project) {
@@ -62,22 +69,47 @@ void QFEPlotterExporterLatex::projectChanged(QFProject* oldProject, QFProject* p
 
 void QFEPlotterExporterLatex::initExtension() {
     /* do initializations here but do not yet connect to the camera! */
-    
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(true, true, QTeXPaintDevice::Tikz));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(true, false, QTeXPaintDevice::Tikz));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, true, QTeXPaintDevice::Tikz));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, false, QTeXPaintDevice::Tikz));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, true, QTeXPaintDevice::Tikz, false));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, false, QTeXPaintDevice::Tikz, false));
+    int i=0;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPLatexEngineAdapter(true, true, QTeXPaintDevice::Tikz));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPLatexEngineAdapter(true, false, QTeXPaintDevice::Tikz));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPLatexEngineAdapter(false, true, QTeXPaintDevice::Tikz));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPLatexEngineAdapter(false, false, QTeXPaintDevice::Tikz));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPLatexEngineAdapter(false, true, QTeXPaintDevice::Tikz, false));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPLatexEngineAdapter(false, false, QTeXPaintDevice::Tikz, false));
+    i++;
+    adapters<<NULL;
 
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(true, true, QTeXPaintDevice::Pgf));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(true, false, QTeXPaintDevice::Pgf));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, true, QTeXPaintDevice::Pgf));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, false, QTeXPaintDevice::Pgf));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, true, QTeXPaintDevice::Pgf, false));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPLatexEngineAdapter(false, false, QTeXPaintDevice::Pgf, false));
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPLatexEngineAdapter(true, true, QTeXPaintDevice::Pgf));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPLatexEngineAdapter(true, false, QTeXPaintDevice::Pgf));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPLatexEngineAdapter(false, true, QTeXPaintDevice::Pgf));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPLatexEngineAdapter(false, false, QTeXPaintDevice::Pgf));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPLatexEngineAdapter(false, true, QTeXPaintDevice::Pgf, false));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPLatexEngineAdapter(false, false, QTeXPaintDevice::Pgf, false));
 #ifdef HAS_EMF_ENGINE
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPEMFEngineAdapter());
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPEMFEngineAdapter());
 #endif
 }
 

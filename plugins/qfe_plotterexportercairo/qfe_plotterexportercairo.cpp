@@ -50,6 +50,13 @@ QFEPlotterExporterCairo::~QFEPlotterExporterCairo() {
 
 void QFEPlotterExporterCairo::deinit() {
 	/* add code for cleanup here */
+    for (int i=0; i<adapters.size(); i++) {
+        if (adapters[i]) {
+            JKQtBasePlotter::deregisterPaintDeviceAdapter(adapters[i]);
+            delete adapters[i];
+        }
+    }
+    adapters.clear();
 }
 
 void QFEPlotterExporterCairo::projectChanged(QFProject* oldProject, QFProject* project) {
@@ -60,15 +67,30 @@ void QFEPlotterExporterCairo::projectChanged(QFProject* oldProject, QFProject* p
 
 void QFEPlotterExporterCairo::initExtension() {
     /* do initializations here but do not yet connect to the camera! */
-    
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPDF, true));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPDF, false));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPS, true));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPS, false));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatEPS, true));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatEPS, false));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatSVG, true));
-    JKQtBasePlotter::registerPaintDeviceAdapter(new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatSVG, false));
+    int i=0;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPDF, true));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPDF, false));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPS, true));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatPS, false));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatEPS, true));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatEPS, false));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatSVG, true));
+    i++;
+    adapters<<NULL;
+    JKQtBasePlotter::registerPaintDeviceAdapter(adapters[i]=new JKQTPCairoEngineAdapter(JKQTPCairoEngineAdapter::formatSVG, false));
 
 }
 

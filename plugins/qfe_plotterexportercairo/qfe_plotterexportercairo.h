@@ -26,6 +26,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <time.h>
 #include <QObject>
 #include "qfextension.h"
+#include "jkqtplotter.h"
 
 /*!
     \defgroup qf3ext_qfe_plotterexporterCairo QFExtension implementation
@@ -101,7 +102,7 @@ class QFEPlotterExporterCairo : public QObject, public QFExtensionBase {
 
 	protected:
         QFPluginLogService* logService;
-		
+        QList<JKQtBasePlotter::JKQTPPaintDeviceAdapter*> adapters;
 	protected slots:
 
 };

@@ -49,6 +49,7 @@ JKQTPxQFFitFunctionLineGraph::JKQTPxQFFitFunctionLineGraph(JKQtBasePlotter* pare
 JKQTPxQFFitFunctionLineGraph::~JKQTPxQFFitFunctionLineGraph()
 {
     delete intParam;
+    if (this->ownsFunction && this->fitFunction) delete this->fitFunction;
 }
 
 void JKQTPxQFFitFunctionLineGraph::set_fitFunction(QFFitFunction *fitFunction, bool ownsFunction)

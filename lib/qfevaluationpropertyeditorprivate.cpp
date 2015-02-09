@@ -521,7 +521,7 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     lFilterRecords->addWidget(new QLabel("filter: "));
     edtFilterRecords=new QFEnhancedLineEdit(d);
     edtFilterRecords->addButton(new QFStyledButton(QFStyledButton::ClearLineEdit, edtFilterRecords, edtFilterRecords));
-    edtFilterRecords->setCompleter(new QFCompleterFromFile());
+    edtFilterRecords->setCompleter(new QFCompleterFromFile(edtFilterRecords));
     compFilterRecords=new QFCompleterFromFile(d);
     edtFilterRecords->setCompleter(compFilterRecords);
     lFilterRecords->addWidget(edtFilterRecords);

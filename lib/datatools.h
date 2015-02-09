@@ -164,6 +164,8 @@ class QFLIB_EXPORT QFDataExportHandler {
         };
         /** \brief used to register a new data format */
         static void registerDataWriter(DataWriter* writer);
+        /** \brief used to un-register a data format */
+        static void deregisterDataWriter(DataWriter* writer);
 
         /*! \brief save the given \a data in the given \A format (index into the list, as returned by dataGetFormats() )
          */

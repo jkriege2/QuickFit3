@@ -113,6 +113,8 @@ QFRDRImagingFCSImageEditor::~QFRDRImagingFCSImageEditor()
     plteOverviewSelectedData=NULL;
     if (plteOverviewExcludedData) qfFree(plteOverviewExcludedData);
     plteOverviewExcludedData=NULL;
+    QFFitFunctionManager::freeModels(m_fitFunctions);
+
 }
 
 
@@ -3222,6 +3224,7 @@ void QFRDRImagingFCSImageEditor::replotImage() {
         pltParamImage2->updateImage(plteImage2ImageData, plteOverviewSelectedData, plteOverviewExcludedData, m->getImageFromRunsWidth(), m->getImageFromRunsHeight(), formatTransformAndParameter(cmbParameter2, cmbParameter2Transform), false, true);
 
         if (plteImageData) qfFree(plteImageData);
+        if (plteImage2ImageData) qfFree(plteImage2ImageData);
 
 
 
@@ -3420,7 +3423,7 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
             labImageAvg->setText(tr("avg&plusmn;SD(param 1) = %1 &plusmn; %2&nbsp;&nbsp;avg&plusmn;SD(param 2) = %3 &plusmn; %4&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;avg&plusmn;SD(overview) = %5 &plusmn; %6").arg(imgAvg).arg(imgVar).arg(imgAvg2).arg(imgVar2).arg(ovrAvg).arg(sqrt(ovrVar)));
         }
 
-
+        if (msk)  qfFree(msk);
     }
 #ifdef DEBUG_TIMIMNG
     qDebug()<<"replotSelection ... -5 = " <<time.nsecsElapsed()/1000<<" usecs = "<<(double)time.nsecsElapsed()/1000000.0<<" msecs";;

@@ -213,7 +213,7 @@ void fStack_getframe(qfmpResult &res, const qfmpResult *params, unsigned int n, 
 
         if (n>=3 && params[2].type==qfmpDouble) {
             frame=params[2].toInteger();
-            if (stack<0 || stack>=rdr->getImageStackFrames(stack)) {
+            if (frame<0 || frame>=rdr->getImageStackFrames(stack)) {
                 parser->qfmpError(QObject::tr("imagestack_getframe(rdrid,stack,frame,...): the specified frame is not available in this RDR"));
                 res.setInvalid();
                 return;
@@ -226,7 +226,7 @@ void fStack_getframe(qfmpResult &res, const qfmpResult *params, unsigned int n, 
 
         if (n==4 && params[3].type==qfmpDouble) {
             channel=params[3].toInteger();
-            if (stack<0 || stack>=rdr->getImageStackChannels(stack)) {
+            if (channel<0 || channel>=rdr->getImageStackChannels(stack)) {
                 parser->qfmpError(QObject::tr("imagestack_getframe(rdrid,stack,frame,channel): the specified channel is not available in this RDR"));
                 res.setInvalid();
                 return;
@@ -287,9 +287,9 @@ void fStack_getstack(qfmpResult &res, const qfmpResult *params, unsigned int n, 
         }
 
 
-        if (n==3 && params[3].type==qfmpDouble) {
-            channel=params[3].toInteger();
-            if (stack<0 || stack>=rdr->getImageStackChannels(stack)) {
+        if (n==3 && params[2].type==qfmpDouble) {
+            channel=params[2].toInteger();
+            if (channel<0 || channel>=rdr->getImageStackChannels(stack)) {
                 parser->qfmpError(QObject::tr("imagestack_getstack(rdrid,stack,channel): the specified channel is not available in this RDR"));
                 res.setInvalid();
                 return;

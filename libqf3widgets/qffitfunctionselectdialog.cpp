@@ -109,19 +109,7 @@ void QFFitFunctionSelectDialog::init(const QString &filter, const QString &curre
     while (it.hasNext())  {
         it.next();
         if (it.value()) {
-            /*QStandardItem* item;
-            if (it.value()->category().isEmpty() || it.value()->shortName().toLower().trimmed().simplified().startsWith(it.value()->category().toLower().trimmed().simplified())) {
-                item=new QStandardItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->name());
-            } else {
-                item=new QStandardItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->category()+QString(": ")+it.value()->name());
-            }
-            item->setData(it.key(), Qt::UserRole+1);
-            model->appendRow(item);
-            if (it.value()->isDeprecated() && m) {
-                item->setForeground(QColor("darkgrey"));
-                item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
 
-            }*/
             QFSimpleTreeModelItem* item=model->addFolderedItem(it.value()->category(), it.value()->shortName(), it.key());
             item->setData(it.key(), Qt::UserRole+1);
             item->setIcon(QIcon(":/lib/fitfunc_icon.png"));
@@ -134,6 +122,7 @@ void QFFitFunctionSelectDialog::init(const QString &filter, const QString &curre
 
             if (it.key()==current) idx=model->index(item);//idx=i;
             i++;
+            delete it.value();
         }
     }
     filterModel.setSourceModel(model);

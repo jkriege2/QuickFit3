@@ -49,7 +49,7 @@ class QFLIB_EXPORT QFProjectRawDataModel : public QAbstractListModel {
         Q_OBJECT
     public:
         /** Default constructor */
-        QFProjectRawDataModel(QFProject* parent);
+        QFProjectRawDataModel(QObject *parentObj, QFProject* parent);
         /** Default destructor */
         virtual ~QFProjectRawDataModel();
 

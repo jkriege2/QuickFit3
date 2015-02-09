@@ -76,6 +76,7 @@ FRawDataImageEditor::~FRawDataImageEditor()
     plteOverviewSelectedData=NULL;
     if (plteOverviewExcludedData) qfFree(plteOverviewExcludedData);
     plteOverviewExcludedData=NULL;
+    QFFitFunctionManager::freeModels(m_fitFunctions);
 }
 
 void FRawDataImageEditor::readSettings()

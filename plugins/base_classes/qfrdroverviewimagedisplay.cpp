@@ -583,6 +583,8 @@ void QFRDROverviewImageDisplay::imageLineFinished(double x1, double y1, double x
 
 QFRDROverviewImageDisplay::~QFRDROverviewImageDisplay() {
     clearOverlays();
+    if (plteOverviewSelectedData) qfFree(plteOverviewSelectedData);
+    plteOverviewSelectedData=NULL;
 }
 
 void QFRDROverviewImageDisplay::connectWidgets(QFRawDataRecord *current, QFRawDataRecord *old) {

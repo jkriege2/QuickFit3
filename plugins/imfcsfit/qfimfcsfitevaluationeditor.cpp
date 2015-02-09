@@ -513,7 +513,9 @@ void QFImFCSFitEvaluationEditor::replotData() {
                 errorName=wdata->dataWeightToName(eval->getFitDataWeighting(), m_runName);
                 c_std=ds->addCopiedColumn(weigm, data->getCorrelationN(), QString("cerr_")+wdata->dataWeightToString(eval->getFitDataWeighting()));
                 qfFree(weigm);
+                weigm=NULL;
             }
+            if (weigm) qfFree(weigm);
         }
         JKQTPerrorPlotstyle styl=cmbErrorStyle->getErrorStyle();
 

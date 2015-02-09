@@ -114,7 +114,7 @@ class QFEvalBeadScanPSFEditor : public QFEvaluationEditor {
         
 
 
-        void on_chkMedianFIlter_valueChanged(bool value);
+        void on_chkMedianFIlter_toggled(bool value);
         void on_spinZ_valueChanged(double value);
         void on_spinA_valueChanged(double value);
         void on_spinPSFHeight_valueChanged(double value);

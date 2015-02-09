@@ -129,7 +129,7 @@ void QFProject::setSignalsEnabled(bool enabled, bool emitChange)
 QFProjectRawDataModel* QFProject::getRawDataModel() {
     QFProjectWriteLocker locker(p->lock);
     if (rdModel==NULL) {
-        rdModel=new QFProjectRawDataModel(this);
+        rdModel=new QFProjectRawDataModel(this, this);
         rdModel->setParent(this);
     }
     return rdModel;

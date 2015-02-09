@@ -588,7 +588,7 @@ class QFLIB_EXPORT QFMathParser
             explicit qfmpBinaryArithmeticNode(char op, qfmpNode* l, qfmpNode* r, QFMathParser* p, qfmpNode* par);
 
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpBinaryArithmeticNode();
+            virtual ~qfmpBinaryArithmeticNode();
 
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
@@ -617,7 +617,7 @@ class QFLIB_EXPORT QFMathParser
             explicit qfmpBinaryBoolNode(char op, qfmpNode* l, qfmpNode* r, QFMathParser* p, qfmpNode* par);
 
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpBinaryBoolNode();
+            virtual ~qfmpBinaryBoolNode();
 
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
@@ -647,7 +647,7 @@ class QFLIB_EXPORT QFMathParser
             explicit qfmpCompareNode(char op, qfmpNode* l, qfmpNode* r, QFMathParser* p, qfmpNode* par);
 
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpCompareNode ();
+            virtual ~qfmpCompareNode ();
 
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
@@ -676,7 +676,7 @@ class QFLIB_EXPORT QFMathParser
             explicit qfmpUnaryNode(char op, qfmpNode* c, QFMathParser* p, qfmpNode* par);
 
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpUnaryNode();
+            virtual ~qfmpUnaryNode();
 
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
@@ -697,7 +697,7 @@ class QFLIB_EXPORT QFMathParser
             QString variable;
           public:
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpVectorAccessNode() ;
+            virtual ~qfmpVectorAccessNode() ;
 
             /** \brief constructor for a qfmpVariableAssignNode
              *  \param var name of the variable to assign to
@@ -724,7 +724,7 @@ class QFLIB_EXPORT QFMathParser
             QString variable;
           public:
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpVariableAssignNode() ;
+            virtual ~qfmpVariableAssignNode() ;
 
             /** \brief constructor for a qfmpVariableAssignNode
              *  \param var name of the variable to assign to
@@ -753,7 +753,7 @@ class QFLIB_EXPORT QFMathParser
             qfmpNode* index;
           public:
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpVectorElementAssignNode() ;
+            virtual ~qfmpVectorElementAssignNode() ;
 
             /** \brief constructor for a qfmpVectorElementAssignNode
              *  \param var name of the variable to assign to
@@ -783,7 +783,7 @@ class QFLIB_EXPORT QFMathParser
             QStringList parameterNames;
           public:
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpFunctionAssignNode() ;
+            virtual ~qfmpFunctionAssignNode() ;
 
             /** \brief constructor for a qfmpVariableAssignNode
              *  \param function name of the function to assign to
@@ -936,7 +936,7 @@ class QFLIB_EXPORT QFMathParser
         /** \brief description of a user registered function */
         struct QFLIB_EXPORT qfmpFunctionDescriptor {
             explicit qfmpFunctionDescriptor();
-            //~qfmpFunctionDescriptor();
+            //virtual ~qfmpFunctionDescriptor();
             QFLIB_EXPORT void clearMemory();
             qfmpEvaluateFunc function;    /*!< \brief a pointer to the function implementation */
             qfmpEvaluateFuncRefReturn functionRR;    /*!< \brief a pointer to the function implementation */
@@ -977,7 +977,7 @@ class QFLIB_EXPORT QFMathParser
             explicit qfmpFunctionNode(QString name, QVector<QFMathParser::qfmpNode*> params, QFMathParser* p, qfmpNode* par);
 
             /** \brief standard destructor, also destroy the children (recursively) */
-            ~qfmpFunctionNode();
+            virtual ~qfmpFunctionNode();
 
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
@@ -1042,7 +1042,7 @@ class QFLIB_EXPORT QFMathParser
             explicit qfmpVectorList(QFMathParser* p, qfmpNode* par=NULL): qfmpNodeList(p, par) { setParser(p); setParent(par); };
 
             /** \brief standard destructor, also destroy the children (recursively) */
-            ~qfmpVectorList() {};
+            virtual ~qfmpVectorList() {};
 
 
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
@@ -1073,7 +1073,7 @@ class QFLIB_EXPORT QFMathParser
             explicit qfmpVectorConstructionNode(qfmpNode* start, qfmpNode* end, qfmpNode* step, QFMathParser* p, qfmpNode* par);
 
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpVectorConstructionNode ();
+            virtual ~qfmpVectorConstructionNode ();
 
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
@@ -1101,7 +1101,7 @@ class QFLIB_EXPORT QFMathParser
             explicit qfmpCasesNode(QFMathParser* p, qfmpNode* par);
 
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpCasesNode ();
+            virtual ~qfmpCasesNode ();
 
             void setElse(qfmpNode* elseNode);
             void addCase(qfmpNode* decision, qfmpNode* value);
@@ -1137,7 +1137,7 @@ class QFLIB_EXPORT QFMathParser
             explicit qfmpVectorOperationNode(const QString& operationName, const QString& variableName, qfmpNode* start, qfmpNode* end, qfmpNode* delta, qfmpNode* expression, QFMathParser* p, qfmpNode* par);
 
             /** \brief standard destructor, also destroy the children (recursively)  */
-            ~qfmpVectorOperationNode ();
+            virtual ~qfmpVectorOperationNode ();
 
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
@@ -1331,7 +1331,9 @@ class QFLIB_EXPORT QFMathParser
                     if (add) {
                         QFMathParser::qfmpVariable v;
                         v.set(result);
-                        variables[name].append(qMakePair(currentLevel, v));
+                        QList<QPair<int, qfmpVariable> > l;
+                        l.append(qMakePair(currentLevel, v));
+                        variables.insert(name, l);
                     }
                 }
 

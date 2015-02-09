@@ -676,23 +676,25 @@ QFMathParser::qfmpNode* QFMathParser::mathExpression(bool get){
 QFMathParser::qfmpNode* QFMathParser::mathTerm(bool get){
     QFMathParser::qfmpNode* left=vectorPrimary(get);
 
-	for(;;) // forever, do until you find anything else than a term
-		switch(CurrentToken) {
-			case MUL:
-                left= (QFMathParser::qfmpNode*)new qfmpBinaryArithmeticNode('*', left, vectorPrimary(true), this, NULL);
-				break;
-			case DIV:
-                left= (QFMathParser::qfmpNode*)new qfmpBinaryArithmeticNode('/', left, vectorPrimary(true), this, NULL);
-				break;
-			case MODULO:
-                left= (QFMathParser::qfmpNode*)new qfmpBinaryArithmeticNode('%', left, vectorPrimary(true), this, NULL);
-				break;
-            case BINARY_AND:
-                left= (QFMathParser::qfmpNode*)new qfmpBinaryArithmeticNode('&', left, vectorPrimary(true), this, NULL);
-                break;
-            default:
-				return left;
-		}
+    for(;;) {
+        // forever, do until you find anything else than a term
+        switch(CurrentToken) {
+        case MUL:
+            left= (QFMathParser::qfmpNode*)new qfmpBinaryArithmeticNode('*', left, vectorPrimary(true), this, NULL);
+            break;
+        case DIV:
+            left= (QFMathParser::qfmpNode*)new qfmpBinaryArithmeticNode('/', left, vectorPrimary(true), this, NULL);
+            break;
+        case MODULO:
+            left= (QFMathParser::qfmpNode*)new qfmpBinaryArithmeticNode('%', left, vectorPrimary(true), this, NULL);
+            break;
+        case BINARY_AND:
+            left= (QFMathParser::qfmpNode*)new qfmpBinaryArithmeticNode('&', left, vectorPrimary(true), this, NULL);
+            break;
+        default:
+            return left;
+        }
+    }
 }
 
 
@@ -961,6 +963,7 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
 
 		default:
             qfmpError(QObject::tr("primary expected, but '%1' found").arg(currenttokentostring()));
+            if (res) delete res;
             return new qfmpInvalidNode(this, NULL);
 
 	}
@@ -2637,7 +2640,7 @@ void QFMathParser::executionEnvironment::setFunction(const QString &name, const 
     } else {
         QList<QPair<int, qfmpFunctionDescriptor> > l;
         l.append(qMakePair(currentLevel, function));
-        functions[name]=l;
+        functions.insert(name, l);
     }
 }
 

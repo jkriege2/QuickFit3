@@ -26,7 +26,7 @@
 #include <time.h>
 #include <QObject>
 #include "qfextension.h"
-
+#include "datatools.h"
 /*!
     \defgroup qf3ext_qfe_dataexportbasics QFExtension implementation
     \ingroup qf3extensionplugins
@@ -101,6 +101,7 @@ class QFEDataExportBasics : public QObject, public QFExtensionBase {
 
 	protected:
         QFPluginLogService* logService;
+        QList<QFDataExportHandler::DataWriter*> exporters;
 		
 	protected slots:
 	    /** \brief target, used in example code in initExtension() */

@@ -23,8 +23,8 @@
 
 #include "qfrawdatarecord.h"
 
-QFProjectRawDataModel::QFProjectRawDataModel(QFProject* parent):
-    QAbstractListModel(parent)
+QFProjectRawDataModel::QFProjectRawDataModel(QObject* parentObj, QFProject* parent):
+    QAbstractListModel(parentObj)
 {
     item = parent;
     defaultMimeType="application/qf2.ids.int.list";

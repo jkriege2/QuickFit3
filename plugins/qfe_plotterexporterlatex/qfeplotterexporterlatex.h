@@ -26,7 +26,7 @@
 #include <time.h>
 #include <QObject>
 #include "qfextension.h"
-
+#include "jkqtplotter.h"
 /*!
     \defgroup qf3ext_qfe_plotterexporterlatex QFExtension implementation
     \ingroup qf3extensionplugins
@@ -101,6 +101,7 @@ class QFEPlotterExporterLatex : public QObject, public QFExtensionBase {
 
 	protected:
         QFPluginLogService* logService;
+        QList<JKQtBasePlotter::JKQTPPaintDeviceAdapter*> adapters;
 		
 	protected slots:
 

@@ -591,10 +591,10 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit(double *paramsOut, double *paramEr
     qfFree(tparamsOut);
     qfFree(tinitialParams);
 
-    if (ppparamsMin==NULL) qfFree(ppparamsMin);
-    if (ppparamsMax==NULL) qfFree(ppparamsMax);
-    if (ppparamsFix==NULL) qfFree(ppparamsFix);
-    if (dddataWeight==NULL) qfFree(dddataWeight);
+    if (ppparamsMin!=NULL) qfFree(ppparamsMin);
+    if (ppparamsMax!=NULL) qfFree(ppparamsMax);
+    if (ppparamsFix!=NULL) qfFree(ppparamsFix);
+    if (dddataWeight!=NULL) qfFree(dddataWeight);
     return result;
 }
 
@@ -763,10 +763,10 @@ QFFitAlgorithm::FitResult QFFitAlgorithm::fit3D(double *paramsOut, double *param
     qfFree(tparamsOut);
     qfFree(tinitialParams);
 
-    if (ppparamsMin==NULL) qfFree(ppparamsMin);
-    if (ppparamsMax==NULL) qfFree(ppparamsMax);
-    if (ppparamsFix==NULL) qfFree(ppparamsFix);
-    if (dddataWeight==NULL) qfFree(dddataWeight);
+    if (ppparamsMin!=NULL) qfFree(ppparamsMin);
+    if (ppparamsMax!=NULL) qfFree(ppparamsMax);
+    if (ppparamsFix!=NULL) qfFree(ppparamsFix);
+    if (dddataWeight!=NULL) qfFree(dddataWeight);
     return result;
 }
 

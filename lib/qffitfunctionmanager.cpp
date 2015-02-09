@@ -66,20 +66,23 @@ void QFFitFunctionManager::reloadUserFitFunctions()
                 if (!id.isEmpty()) {
                     QString isOK=tr("OK");
                     QFFitFunctionParsed* f=new QFFitFunctionParsed(fn);
-                    if (!f->isValid()) {
-                        isOK=tr("INVALID\n         ")+f->getErrors();
-                    } else {
-                        if(f->usesBytecode()) {
-                            isOK=isOK+tr(" [BYTECODE, FAST!]");
+                    if (f) {
+                        if (!f->isValid()) {
+                            isOK=tr("INVALID\n         ")+f->getErrors();
                         } else {
-                            isOK=isOK+tr(" [TREE-EVALUATION, SLOW!]");
+                            if(f->usesBytecode()) {
+                                isOK=isOK+tr(" [BYTECODE, FAST!]");
+                            } else {
+                                isOK=isOK+tr(" [TREE-EVALUATION, SLOW!]");
+                            }
+                        }
+
+                        emit showLongMessage(tr("    * adding function %1 from '%2' ... %3").arg(id).arg(fn).arg(isOK));
+                        if (f->isValid()) {
+                            userFF[id]=fn;
                         }
                     }
-
-                    emit showLongMessage(tr("    * adding function %1 from '%2' ... %3").arg(id).arg(fn).arg(isOK));
-                    if (f->isValid()) {
-                        userFF[id]=fn;
-                    }
+                    if (f) delete f;
                 } else {
                     emit showLongMessage(tr("    * no ID found in '%1'").arg(fn));
                 }
@@ -272,6 +275,18 @@ QMap<QString, QFFitFunction*> QFFitFunctionManager::getModels(QString id_start, 
         }
     }
     return res;
+}
+
+void QFFitFunctionManager::freeModels( QMap<QString, QFFitFunction *> &models)
+{
+    QMapIterator<QString, QFFitFunction *>  it(models);
+    while (it.hasNext()) {
+        it.next();
+        if (it.value()) {
+            delete it.value();
+        }
+    }
+    models.clear();
 }
 
 QStringList QFFitFunctionManager::getModelIDs(QString id_start) const

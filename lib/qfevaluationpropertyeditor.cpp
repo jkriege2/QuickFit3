@@ -131,7 +131,7 @@ QFEvaluationPropertyEditor::QFEvaluationPropertyEditor(QFPluginServices* service
     resultsModel=new QFEvaluationResultsModel(this);
     resultsModel->init(NULL, "*");
 
-    rdrModel=new QFProjectRawDataModel(NULL);
+    rdrModel=new QFProjectRawDataModel(this, NULL);
     rdrProxy=new QFEvaluationRawDataModelProxy(rdrModel);
     rdrProxy->setSourceModel(rdrModel);
     p->lstRawData=NULL;

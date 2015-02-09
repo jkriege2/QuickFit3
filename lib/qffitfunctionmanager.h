@@ -107,6 +107,8 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
          *  \note This function is thread-safe
          */
         QMap<QString, QFFitFunction*> getModels(QString id_start=QString(""), QObject* parent=NULL) const;
+
+        static void freeModels(QMap<QString, QFFitFunction *> &models);
         /** \brief return a list of the models which start with the specified string
          *
          *  \note This function is thread-safe
