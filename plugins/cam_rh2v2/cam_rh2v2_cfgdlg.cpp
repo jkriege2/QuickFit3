@@ -133,7 +133,7 @@ void cam_rh2v2_cfgdlg::updateRuntime()
     double runtime=double(ui->sbFrameCnt->value())*ui->dsbFrameTime->value()/1000.0;
     double lag=ui->dsbFrameTime->value();
     if (ui->cbBinning->currentIndex()==1) { runtime=runtime*3.0; lag=lag*3.0; }
-    ui->labRuntime->setText(tr("runtime = %1 s = %2 ms<br>correlator min. lagtime = %3 µs").arg(runtime/1000.0).arg(runtime).arg(lag));
+    ui->labRuntime->setText(tr("runtime = %1 s = %2 ms<br>correlator min. lagtime = %3 %4s").arg(runtime/1000.0).arg(runtime).arg(lag).arg(QLatin1String("\xB5")));
 }
 
 int cam_rh2v2_cfgdlg::getAccumulationCount()

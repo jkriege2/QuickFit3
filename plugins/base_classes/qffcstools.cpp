@@ -175,8 +175,8 @@ bool qfFCSHasSpecial(const QFRawDataRecord *r, int index, const QString &paramid
         }
     } else if (paramid=="dls_angle") {
         if (!r) return false;
-        if (!(r->propertyExists("ANGLE [°]") || r->propertyExists("ANGLE"))) return false;
-        double angle_deg=r->getProperty("ANGLE [°]", r->getProperty("ANGLE", 90.0).toDouble()).toDouble();
+        if (!(r->propertyExists(QLatin1String("ANGLE [\xB0]")) || r->propertyExists("ANGLE"))) return false;
+        double angle_deg=r->getProperty(QLatin1String("ANGLE [\xB0]"), r->getProperty("ANGLE", 90.0).toDouble()).toDouble();
         value=angle_deg;
         error=0;
         return true;

@@ -265,7 +265,7 @@ void QFStageConfigWidget::createWidgets() {
     spinMoveX->setRange(-1e6,1e6);
     spinMoveX->setSingleStep(1);
     spinMoveX->setDecimals(2);
-    spinMoveX->setSuffix(" µm");
+    spinMoveX->setSuffix(QLatin1String(" \xB5m"));
     spinMoveX->setButtonSymbols(QAbstractSpinBox::UpDownArrows);
     btnMoveAbsolute=new QPushButton(QIcon(":/spimb040/move_abs.png"), "", this);
     btnMoveRelative=new QPushButton(QIcon(":/spimb040/move_rel.png"), "", this);

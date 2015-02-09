@@ -42,9 +42,9 @@ QFFitFunctionsSPIMFCCSDiffFlow::QFFitFunctionsSPIMFCCSDiffFlow() {
     #define FCCSDiff_vflowy 4
     addParameter(FloatNumber,  "vflow",                   "flow speed",                               "v<sub>flow</sub>",         "micron/s", "&mu;m/s",                  false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
     #define FCCSDiff_vflow 5
-    addParameter(FloatNumber,  "vflow_angle",             "angle of the flow speed",                               "&alpha;<sub>flow</sub>",         "°", "°",                  false,    false,        false,              QFFitFunction::DisplayError, false, 0,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "vflow_angle",             "angle of the flow speed",                               "&alpha;<sub>flow</sub>",         QLatin1String("\xB0"), QLatin1String("\xB0"),                  false,    false,        false,              QFFitFunction::DisplayError, false, 0,          0,        1e50,     1    );
     #define FCCSDiff_alphaflow 6
-    addParameter(FloatNumber,  "vflow_angle_centered",             "centered angle of the flow speed",                               "&alpha;<sub>flow</sub>'",         "°", "°",                  false,    false,        false,              QFFitFunction::DisplayError, false, 0,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "vflow_angle_centered",             "centered angle of the flow speed",                               "&alpha;<sub>flow</sub>'",         QLatin1String("\xB0"), QLatin1String("\xB0"),                  false,    false,        false,              QFFitFunction::DisplayError, false, 0,          0,        1e50,     1    );
     #define FCCSDiff_alphaflow_centered 7
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 0,            -10,      10,       0.1  );
     #define FCCSDiff_offset 8

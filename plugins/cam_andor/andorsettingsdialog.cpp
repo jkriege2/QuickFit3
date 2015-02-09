@@ -177,8 +177,8 @@ void AndorSettingsDialog::setupWidgets() {
     GetFastestRecommendedVSSpeed(&fastestVSS, &fastestVSSF);
     for (int vsspeed=0; vsspeed<NumVSSpeeds; vsspeed++) {
         GetVSSpeed(vsspeed, &VSSpeed);
-        if (vsspeed<fastestVSS) ui->cmbVerticalShiftSpeed->addItem(QString("[%1 µs/pixel]").arg(VSSpeed), VSSpeed);
-        else ui->cmbVerticalShiftSpeed->addItem(QString("%1 µs/pixel").arg(VSSpeed), VSSpeed);
+        if (vsspeed<fastestVSS) ui->cmbVerticalShiftSpeed->addItem(QString::fromLatin1("[%1 \xB5s/pixel]").arg(VSSpeed), VSSpeed);
+        else ui->cmbVerticalShiftSpeed->addItem(QString::fromLatin1("%1 \xB5s/pixel").arg(VSSpeed), VSSpeed);
     }
 
 

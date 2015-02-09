@@ -38,7 +38,7 @@ QFFitFunctionDLSG2NormTauDist::QFFitFunctionDLSG2NormTauDist() {
     addParameter(FloatNumber,  "amplitude",               "amplitude",                                             "A",                        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, true, 1,            -1e50,    1e50,     0.01);
     #define DLSG2_A 1
 
-    addParameter(FloatNumber,  "tau1",                    "correlation time 1",                                    "&tau;<sub>1</sub>",        "µs",         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 1000,         1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "tau1",                    "correlation time 1",                                    "&tau;<sub>1</sub>",        QLatin1String("\xB5s"),         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 1000,         1e-10,    1e50,     1    );
     #define DLSG2_tau1 2
     addParameter(FloatNumber,  "tau_sigma",               "width of tau distribution",                             "&sigma;(&tau;<sub>D</sub>)", "usec",        "&mu;s",               true,      true,         true,              QFFitFunction::DisplayError, false, 100,          1e-10,    1e50,     1    );
     #define DLSG2_tau1_sigma 3
@@ -46,7 +46,7 @@ QFFitFunctionDLSG2NormTauDist::QFFitFunctionDLSG2NormTauDist() {
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 1,            -10,      10,       0.1  );
     #define DLSG2_offset 4
 
-    addParameter(FloatNumber,  "dls_angle",               "scattering angle",                                      "&Theta;<sub>scatter</sub>", "°",         "°",                      false,     true,        false,              QFFitFunction::EditError,    false, 90,          0,        1e4,      1    );
+    addParameter(FloatNumber,  "dls_angle",               "scattering angle",                                      "&Theta;<sub>scatter</sub>", QLatin1String("\xB0"),         QLatin1String("\xB0"),                      false,     true,        false,              QFFitFunction::EditError,    false, 90,          0,        1e4,      1    );
     #define DLSG2_angle 5
     addParameter(FloatNumber,  "refractive_index",        "refractive index",                                      "n",                        "",           "",                       false,     true,        false,              QFFitFunction::EditError,    false, 1.33,        0,        1e4,      1    );
     #define DLSG2_refractive 6

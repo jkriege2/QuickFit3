@@ -44,9 +44,9 @@ QFFitFunctionsSPIMFCCSDiffFlowCENewVeff2Global::QFFitFunctionsSPIMFCCSDiffFlowCE
     #define FCCSDiff_vflowy 5
     addParameter(FloatNumber,  "vflow",                   "flow speed",                               "v<sub>flow</sub>",         "micron/s", "&mu;m/s",                  false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
     #define FCCSDiff_vflow 6
-    addParameter(FloatNumber,  "vflow_angle",             "angle of the flow speed",                               "&alpha;<sub>flow</sub>",         "°", "°",                  false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "vflow_angle",             "angle of the flow speed",                               "&alpha;<sub>flow</sub>",         QLatin1String("\xB0"), QLatin1String("\xB0"),                  false,    false,        false,              QFFitFunction::DisplayError, false, 500,          0,        1e50,     1    );
     #define FCCSDiff_alphaflow 7
-    addParameter(FloatNumber,  "vflow_angle_centered",             "centered angle of the flow speed",                               "&alpha;<sub>flow</sub>'",         "°", "°",                  false,    false,        false,              QFFitFunction::DisplayError, false, 0,          0,        1e50,     1    );
+    addParameter(FloatNumber,  "vflow_angle_centered",             "centered angle of the flow speed",                               "&alpha;<sub>flow</sub>'",         QLatin1String("\xB0"), QLatin1String("\xB0"),                  false,    false,        false,              QFFitFunction::DisplayError, false, 0,          0,        1e50,     1    );
     #define FCCSDiff_alphaflow_centered 8
 
     addParameter(FloatNumber,  "diff_rho2",               "fraction of second component",                          "&rho;<sub>2</sub>",        "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 0.2,          0,        0.99999,  0.1, 0,      1  );

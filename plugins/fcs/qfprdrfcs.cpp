@@ -873,7 +873,7 @@ void QFPRDRFCS::startFCSProjectWizard()
     evsetData.spinA->setDecimals(1);
     evalprops->addRow("<i>pixel size a = ", evsetData.spinA);
     evsetData.spinDLSAngle=new QDoubleSpinBox(evalprops);
-    evsetData.spinDLSAngle->setSuffix(" °");
+    evsetData.spinDLSAngle->setSuffix(QLatin1String(" \xB0"));
     evsetData.spinDLSAngle->setRange(0,100000);
     evsetData.spinDLSAngle->setValue(90);
     evsetData.spinDLSAngle->setDecimals(1);

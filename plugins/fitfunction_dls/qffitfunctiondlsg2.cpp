@@ -38,25 +38,25 @@ QFFitFunctionDLSG2::QFFitFunctionDLSG2() {
 
     addParameter(FloatNumber,  "frac1",                   "fraction of component 1",                               "&alpha;<sub>1</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0,        1e10,     0.1, 0 );
     #define DLSG2_frac1 2
-    addParameter(FloatNumber,  "tau1",                    "correlation time 1",                                    "&tau;<sub>1</sub>",        "탎",         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 100,          1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "tau1",                    "correlation time 1",                                    "&tau;<sub>1</sub>",        QLatin1String("\xB5s"),         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 100,          1e-10,    1e50,     1    );
     #define DLSG2_tau1 3
     addParameter(FloatNumber,  "frac2",                   "fraction of component 2",                               "&alpha;<sub>2</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0,        1e10,     0.1, 0);
     #define DLSG2_frac2 4
-    addParameter(FloatNumber,  "tau2",                    "correlation time 2",                                    "&tau;<sub>2</sub>",        "탎",         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 1000,         1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "tau2",                    "correlation time 2",                                    "&tau;<sub>2</sub>",        QLatin1String("\xB5s"),         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 1000,         1e-10,    1e50,     1    );
     #define DLSG2_tau2 5
     addParameter(FloatNumber,  "frac3",                   "fraction of component 3",                               "&alpha;<sub>3</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0,        1e10,     0.1, 0);
     #define DLSG2_frac3 6
-    addParameter(FloatNumber,  "tau3",                    "correlation time 3",                                    "&tau;<sub>3</sub>",        "탎",         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 10000,        1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "tau3",                    "correlation time 3",                                    "&tau;<sub>3</sub>",        QLatin1String("\xB5s"),         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 10000,        1e-10,    1e50,     1    );
     #define DLSG2_tau3 7
     addParameter(FloatNumber,  "frac4",                   "fraction of component 4",                               "&alpha;<sub>4</sub>",      "",            "",                      true,      true,         true,              QFFitFunction::DisplayError, false, 1,            0,        1e10,     0.1, 0);
     #define DLSG2_frac4 8
-    addParameter(FloatNumber,  "tau4",                    "correlation time 4",                                    "&tau;<sub>4</sub>",        "탎",         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 100000,       1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "tau4",                    "correlation time 4",                                    "&tau;<sub>4</sub>",        QLatin1String("\xB5s"),         "&mu;s",                  true,      true,         true,              QFFitFunction::DisplayError, false, 100000,       1e-10,    1e50,     1    );
     #define DLSG2_tau4 9
 
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 1,            -10,      10,       0.1  );
     #define DLSG2_offset 10
 
-    addParameter(FloatNumber,  "dls_angle",               "scattering angle",                                      "&Theta;<sub>scatter</sub>", "�",         "�",                      false,     true,        false,              QFFitFunction::EditError,    false, 90,          0,        1e4,      1    );
+    addParameter(FloatNumber,  "dls_angle",               "scattering angle",                                      "&Theta;<sub>scatter</sub>", QLatin1String("\xB0"),         QLatin1String("\xB0"),                      false,     true,        false,              QFFitFunction::EditError,    false, 90,          0,        1e4,      1    );
     #define DLSG2_angle 11
     addParameter(FloatNumber,  "refractive_index",        "refractive index",                                      "n",                        "",           "",                       false,     true,        false,              QFFitFunction::EditError,    false, 1.33,        0,        1e4,      1    );
     #define DLSG2_refractive 12

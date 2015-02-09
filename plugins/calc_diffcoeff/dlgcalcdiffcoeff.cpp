@@ -41,7 +41,7 @@ DlgCalcDiffCoeff::DlgCalcDiffCoeff(QFEDiffusionCoefficientCalculator *plg, QWidg
     c_visc=-1;
     c_density=-1;
     ui->tableView->setModel(tab);
-    ui->plotter->get_plotter()->getXAxis()->set_axisLabel(tr("temperature [°C]"));
+    ui->plotter->get_plotter()->getXAxis()->set_axisLabel(tr("temperature [{\\degree}C]"));
     ui->edtGivenD->setValue(20);
     ui->edtGivenD->setRange(0,1e10);
     ui->spinGivenDInSolution->setValue(20);
@@ -91,8 +91,8 @@ void DlgCalcDiffCoeff::updateD() {
     tab->appendColumn();
     tab->appendColumn();
     tab->appendColumn();
-    tab->setColumnTitle(0, tr("temperature [°C]"));
-    tab->setColumnTitle(1, tr("D [µm^2/s]"));
+    tab->setColumnTitle(0, tr("temperature [%1C]").arg(QLatin1String("\xB0")));
+    tab->setColumnTitle(1, QLatin1String("D [\xB5m^2/s]"));
     tab->setColumnTitle(2, tr("viscosity [mPa s]"));
     tab->setColumnTitle(3, tr("density [kg/l]"));
 
@@ -416,13 +416,13 @@ void DlgCalcDiffCoeff::redoPlot()
     ui->plotter->set_doDrawing(false);
     ui->plotter->clearGraphs();
     ui->plotter->getDatastore()->clear();
-    c_temp=ui->plotter->getDatastore()->addColumn(temp.data(), temp.size(), "temperature [°C]");
-    c_D=ui->plotter->getDatastore()->addColumn(D.data(), D.size(), "D [µm^2/s]");
+    c_temp=ui->plotter->getDatastore()->addColumn(temp.data(), temp.size(), QLatin1String("temperature [\xB0 C]"));
+    c_D=ui->plotter->getDatastore()->addColumn(D.data(), D.size(), QLatin1String("D [\xB5m^2/s]"));
     c_visc=ui->plotter->getDatastore()->addColumn(visc.data(), visc.size(), "viscosity [mPa s]");
     c_density=ui->plotter->getDatastore()->addColumn(density.data(), density.size(), "density [kg/l]");
-    c_Dwater=ui->plotter->getDatastore()->addColumn(Dwater.data(), Dwater.size(), "D_water [µm^2/s]");
-    c_Dsolution=ui->plotter->getDatastore()->addColumn(Dsolution.data(), Dsolution.size(), "D_{solution} [µm^2/s]");
-    c_Dsphere=ui->plotter->getDatastore()->addColumn(Dsphere.data(), Dsphere.size(), "D of sphere [µm^2/s]");
+    c_Dwater=ui->plotter->getDatastore()->addColumn(Dwater.data(), Dwater.size(), QLatin1String("D_water [\xB5m^2/s]"));
+    c_Dsolution=ui->plotter->getDatastore()->addColumn(Dsolution.data(), Dsolution.size(), QLatin1String("D_{solution} [\xB5m^2/s]"));
+    c_Dsphere=ui->plotter->getDatastore()->addColumn(Dsphere.data(), Dsphere.size(), QLatin1String("D of sphere [\xB5m^2/s]"));
     ui->plotter->get_plotter()->getYAxis()->set_axisLabel(tr(""));
     ui->plotter->get_plotter()->set_showKey(true);
 
@@ -463,7 +463,7 @@ void DlgCalcDiffCoeff::redoPlot()
         g->set_title(tr("D in solution"));
         ui->plotter->addGraph(g);
 
-        ui->plotter->get_plotter()->getYAxis()->set_axisLabel(tr("diffusion coefficient [µm^2/s]"));
+        ui->plotter->get_plotter()->getYAxis()->set_axisLabel(tr("diffusion coefficient [{\\mu}m^2/s]"));
     } else if (ui->cmbPlot->currentIndex()==1) {
         JKQTPxyLineGraph* g=new JKQTPxyLineGraph(ui->plotter->get_plotter());
         g->set_drawLine(true);

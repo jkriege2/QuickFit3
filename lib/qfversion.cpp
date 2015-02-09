@@ -27,51 +27,51 @@
 #include <QDate>
 
 QString qfInfoVersion() {
-    return QString(QF_VERSION);
+    return QLatin1String(QF_VERSION);
 }
 
 QString qfInfoVersionFull() {
-    return QString(QF_VERSION);
+    return QLatin1String(QF_VERSION);
 }
 
 QString qfInfoVersionStatus() {
-    return QString(VERSION_STATUS);
+    return QLatin1String(VERSION_STATUS);
 }
 
 QString qfInfoThanksTo() {
-    return QString(QF_THANKS_TO);
+    return QLatin1String(QF_THANKS_TO);
 }
 
 QString qfInfoCopyright() {
-    return QString(QF_COPYRIGHT);
+    return QF_COPYRIGHT;
 }
 
 QString qfInfoAuthor() {
-    return QString(QF_AUTHOR);
+    return QLatin1String(QF_AUTHOR);
 }
 
 QString qfInfoEmail() {
-    return QString(QF_EMAIL);
+    return QLatin1String(QF_EMAIL);
 }
 
 QString qfInfoMaillist() {
-    return QString(QF_MAILLIST);
+    return QLatin1String(QF_MAILLIST);
 }
 
 QString qfInfoMaillistRequest() {
-    return QString(QF_MAILLIST_REQUEST);
+    return QLatin1String(QF_MAILLIST_REQUEST);
 }
 
 QString qfInfoWeblink() {
-    return QString(QF_WEBLINK);
+    return QLatin1String(QF_WEBLINK);
 }
 
 QString qfInfoLicense() {
-    return QString(QF_LICENSE);
+    return QLatin1String(QF_LICENSE);
 }
 
 QString qfInfoSVNVersion() {
-    QString s= QString(SVNVERSION);
+    QString s= QLatin1String(SVNVERSION);
     if (s.contains("exportiert", Qt::CaseInsensitive) || s.contains("exported", Qt::CaseInsensitive)) {
         s="???";
     } else if (s.endsWith("M")) {
@@ -87,7 +87,7 @@ QString qfInfoSVNVersion() {
 }
 
 QString qfInfoCompiler() {
-    QString s=QString(COMPILER);
+    QString s=QLatin1String(COMPILER);
     QRegExp rxc("(g\\+\\+\\s\\([^\\)]*\\).*)Copyright.*(\\(MACHINE.*\\))");
     rxc.setCaseSensitivity(Qt::CaseInsensitive);
     if (rxc.indexIn(s)>=0) {
@@ -97,7 +97,7 @@ QString qfInfoCompiler() {
 }
 
 QString qfInfoCompileDate() {
-    QString s=QString(COMPILEDATE);
+    QString s=QLatin1String(COMPILEDATE);
     QRegExp rx("\\s*(\\d\\d)\\.(\\d\\d)\\.(\\d\\d\\d\\d)\\s*");
     rx.setCaseSensitivity(Qt::CaseInsensitive);
     if (rx.indexIn(s)==0 && rx.matchedLength()==s.length()) {
@@ -118,11 +118,11 @@ bool qfIsSpecialVersion() {
 }
 
 QString qfInfoCitationHTML() {
-    return QString(QF_CITATION_HTML);
+    return QF_CITATION_HTML;
 }
 
 QString qfInfoCitationBiBTeX() {
-    return QString(QF_CITATION_BIBTEX);
+    return QF_CITATION_BIBTEX;
 }
 
 

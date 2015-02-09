@@ -193,7 +193,7 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
 
     edtTheta=new QFDoubleEdit(this);
     edtTheta->setRange(0,180);
-    flAlgorithmParams->addRow(labTheta=new QLabel(tr("<i>&Theta;</i> [°] <i>= </i>")), edtTheta);
+    flAlgorithmParams->addRow(labTheta=new QLabel(QLatin1String("<i>&Theta;</i> [\xB0] <i>= </i>")), edtTheta);
     edtTheta->setVisible(false);
     labTheta->setVisible(false);
 

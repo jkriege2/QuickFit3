@@ -56,7 +56,7 @@ QFFitFunctionDLSG2inD::QFFitFunctionDLSG2inD() {
     addParameter(FloatNumber,  "offset",                  "correlation offset",                                    "G<sub>&infin;</sub>",      "",           "",                       true,      true,         true,              QFFitFunction::DisplayError, true, 1,            -10,      10,       0.1  );
     #define DLSG2_offset 10
 
-    addParameter(FloatNumber,  "dls_angle",               "scattering angle",                                      "&Theta;<sub>scatter</sub>", "�",         "�",                      false,     true,        false,              QFFitFunction::EditError,    false, 90,          0,        1e4,      1    );
+    addParameter(FloatNumber,  "dls_angle",               "scattering angle",                                      "&Theta;<sub>scatter</sub>", QLatin1String("\xB0"),         QLatin1String("\xB0"),                      false,     true,        false,              QFFitFunction::EditError,    false, 90,          0,        1e4,      1    );
     #define DLSG2_angle 11
     addParameter(FloatNumber,  "refractive_index",        "refractive index",                                      "n",                        "",           "",                       false,     true,        false,              QFFitFunction::EditError,    false, 1.33,        0,        1e4,      1    );
     #define DLSG2_refractive 12
@@ -65,13 +65,13 @@ QFFitFunctionDLSG2inD::QFFitFunctionDLSG2inD() {
     addParameter(FloatNumber,  "q_square",                "q square",                                              "q<sup>2</sup>",            "1/nm^2",       "nm<sup>-2</sup>",        false,    false,        false,              QFFitFunction::DisplayError, false, 500,          -1e50,    1e50,     1    );
     #define DLSG2_diff_qsquare 14
 
-    addParameter(FloatNumber,  "tau1",                    "correlation time 1",                                    "&tau;<sub>1</sub>",        "탎",         "&mu;s",                  false,    false,        false,              QFFitFunction::DisplayError, false, 100,          1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "tau1",                    "correlation time 1",                                    "&tau;<sub>1</sub>",        QLatin1String("\xB5s"),         "&mu;s",                  false,    false,        false,              QFFitFunction::DisplayError, false, 100,          1e-10,    1e50,     1    );
     #define DLSG2_tau1 15
-    addParameter(FloatNumber,  "tau2",                    "correlation time 2",                                    "&tau;<sub>2</sub>",        "탎",         "&mu;s",                  false,    false,        false,              QFFitFunction::DisplayError, false, 1000,         1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "tau2",                    "correlation time 2",                                    "&tau;<sub>2</sub>",        QLatin1String("\xB5s"),         "&mu;s",                  false,    false,        false,              QFFitFunction::DisplayError, false, 1000,         1e-10,    1e50,     1    );
     #define DLSG2_tau2 16
-    addParameter(FloatNumber,  "tau3",                    "correlation time 3",                                    "&tau;<sub>3</sub>",        "탎",         "&mu;s",                  false,    false,        false,              QFFitFunction::DisplayError, false, 10000,        1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "tau3",                    "correlation time 3",                                    "&tau;<sub>3</sub>",        QLatin1String("\xB5s"),         "&mu;s",                  false,    false,        false,              QFFitFunction::DisplayError, false, 10000,        1e-10,    1e50,     1    );
     #define DLSG2_tau3 17
-    addParameter(FloatNumber,  "tau4",                    "correlation time 4",                                    "&tau;<sub>4</sub>",        "탎",         "&mu;s",                  false,    false,        false,              QFFitFunction::DisplayError, false, 100000,       1e-10,    1e50,     1    );
+    addParameter(FloatNumber,  "tau4",                    "correlation time 4",                                    "&tau;<sub>4</sub>",        QLatin1String("\xB5s"),         "&mu;s",                  false,    false,        false,              QFFitFunction::DisplayError, false, 100000,       1e-10,    1e50,     1    );
     #define DLSG2_tau4 18
 
 }

@@ -70,7 +70,7 @@ QFFitFunctionFCSDistributionGaussian::QFFitFunctionFCSDistributionGaussian() {
     #define FCSDLG_diff_coeff1 17
     addParameter(FloatNumber,  "viscosity",               "sample viscosity",                                      "&eta;",                    "mPa*s",      "mPa&middot;s",           false,    true,        false,              QFFitFunction::NoError, false, 1.002,        0,        1e50,     0.02    );
     #define FCSDLG_viscosity 18
-    addParameter(FloatNumber,  "temperature",             "sample temperature",                                      "&thetasym;",                 "°C",      "°C",                       false,    true,        false,              QFFitFunction::NoError, false, 20,        0,        1e50,     1    );
+    addParameter(FloatNumber,  "temperature",             "sample temperature",                                      "&thetasym;",                 QLatin1String("\xB0 C"),      QLatin1String("\xB0 C"),                       false,    true,        false,              QFFitFunction::NoError, false, 20,        0,        1e50,     1    );
     #define FCSDLG_temperature 19
     addParameter(FloatNumber,  "hydrodyn_radius1",        "center hydrodynamic radius",                            "R<sub>H,c</sub>",          "nm",        "nm",                      false,    false,        false,              QFFitFunction::DisplayError, false, 1,           1,        1e10,     1,   0        );
     #define FCSDLG_RH 20

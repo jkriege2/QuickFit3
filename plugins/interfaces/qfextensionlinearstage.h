@@ -64,8 +64,8 @@ class QFExtensionLinearStage {
         /** \brief stage informations */
         struct StageInfo {
                 StageInfo() {
-                    positionUnit=QString("µm");
-                    speedUnit=QString("µm/s");
+                    positionUnit=QLatin1String("\xB5m");
+                    speedUnit=QLatin1String("\xB5m/s");
                     minPos=-1e37;
                     maxPos=1e37;
                     minSpeed=0;

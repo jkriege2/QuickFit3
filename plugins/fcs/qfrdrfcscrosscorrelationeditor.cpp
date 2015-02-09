@@ -463,8 +463,8 @@ void QFRDRFCSCrossCorrelationEditor::connectWidgets(QFRawDataRecord* current, QF
         writeSettings();
         disconnect(old, 0, this, 0);
         disconnect(cmbFCCSCorrected, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
-        disconnect(spinCCFAmplitudeRangeMin, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
-        disconnect(spinCCFAmplitudeRangeMax, SIGNAL(currentIndexChanged(int)), this, SLOT(replotData()));
+        disconnect(spinCCFAmplitudeRangeMin, SIGNAL(valueChanged(double)), this, SLOT(replotData()));
+        disconnect(spinCCFAmplitudeRangeMax, SIGNAL(valueChanged(double)), this, SLOT(replotData()));
         disconnect(spinCrosstalk, SIGNAL(valueChanged(double)), this, SLOT(replotData()));
     }
     QFRDRFCSData* m=qobject_cast<QFRDRFCSData*>(current);

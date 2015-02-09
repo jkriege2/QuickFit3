@@ -947,7 +947,7 @@ QString cleanStringForFilename(const QString& text, int maxLen, bool removeDot, 
                 case 'Ü': t=t+"Ue"; break;
                 case 'ß': t=t+"ss"; break;
                 case '@': t=t+"_at_"; break;
-                case 'µ': t=t+"mu"; break;
+                case '\xB5': t=t+"mu"; break;
                 case ';':
                 case ',':
                 case '?':

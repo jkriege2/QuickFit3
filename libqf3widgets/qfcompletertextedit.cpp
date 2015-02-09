@@ -255,7 +255,7 @@ void QFCompleterTextEditWidget::setCompleter(QCompleter *completer) {
      if (c->widget() != this)
          return;
      QString completion=completion1;
-     completion=completion.remove(QChar('°'),  Qt::CaseInsensitive);
+     completion=completion.remove(QLatin1Char('\xB0'),  Qt::CaseInsensitive);
      QTextCursor tc = textCursor();
      int extra = completion.length() - c->completionPrefix().length();
      tc.movePosition(QTextCursor::Left);
@@ -263,9 +263,9 @@ void QFCompleterTextEditWidget::setCompleter(QCompleter *completer) {
      tc.insertText(completion.right(extra));
 
      // handle special character '°' in insertted text completion1
-     unsigned char mcount=completion1.count(QChar('°'), Qt::CaseInsensitive);
-     int p1=completion1.indexOf(QChar('°'), Qt::CaseInsensitive);
-     int p2=completion1.indexOf(QChar('°'), p1+1, Qt::CaseInsensitive);
+     unsigned char mcount=completion1.count(QLatin1Char('\xB0'), Qt::CaseInsensitive);
+     int p1=completion1.indexOf(QLatin1Char('\xB0'), Qt::CaseInsensitive);
+     int p2=completion1.indexOf(QLatin1Char('\xB0'), p1+1, Qt::CaseInsensitive);
      if (mcount==1) {
          tc.movePosition(QTextCursor::Left, QTextCursor::MoveAnchor, completion.size()-p1);
      } else if (mcount>1) {

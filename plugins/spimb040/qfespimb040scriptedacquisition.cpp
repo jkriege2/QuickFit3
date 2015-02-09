@@ -692,17 +692,17 @@ void QFESPIMB040ScriptedAcquisition::delayedStartSearchThreads()
 void QFESPIMB040ScriptedAcquisition::addFunction(QString name, QString templ, QString help)
 {
     QString templ1=templ;
-    templ1=templ1.replace("<!--°-->", "");
+    templ1=templ1.replace(QLatin1String("<!--\xB0-->"), "");
     functionhelp[name.toLower()]=qMakePair(templ1, help);
     specialFunctions<<name;
     QStringList csl=completermodel->stringList();
 
     if (templ.size()>0) {
         QString t=templ;
-        t=t.replace("<!--°-->", "°");
+        t=t.replace(QLatin1String("<!--\xB0-->"), QLatin1String("\xB0"));
         csl<<t;
     } else {
-        csl<<QString(name+"(°)");
+        csl<<QString(name+QLatin1String("(\xB0)"));
     }
 
     QStringList sl;

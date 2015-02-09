@@ -136,13 +136,13 @@ void DlgComponentInfo::on_cmbPlot_currentIndexChanged(int index)
 
             if (index==0) {
                 ui->plotter->get_plotter()->addGraph(c_c, c_eta, tr("reference data"), JKQTPpoints, QColor("blue"), JKQTPcross);
-                ui->plotter->getYAxis()->set_axisLabel(tr("viscosity $\\eta_{20}$ @ 20°C [mPa\\cdot s]"));
+                ui->plotter->getYAxis()->set_axisLabel(tr("viscosity $\\eta_{20}$ @ 20{\\degree}C [mPa\\cdot s]"));
             } else if (index==1) {
                 ui->plotter->get_plotter()->addGraph(c_c, c_rho, tr("reference data"), JKQTPpoints, QColor("blue"), JKQTPcross);
-                ui->plotter->getYAxis()->set_axisLabel(tr("density $\\rho_{20}$ @ 20°C [g/cm^3]"));
+                ui->plotter->getYAxis()->set_axisLabel(tr("density $\\rho_{20}$ @ 20{\\degree}C [g/cm^3]"));
             } else if (index==2) {
                 ui->plotter->get_plotter()->addGraph(c_c, c_n, tr("reference data"), JKQTPpoints, QColor("blue"), JKQTPcross);
-                ui->plotter->getYAxis()->set_axisLabel(tr("refractive index $n_{20}$ @ 20°C"));
+                ui->plotter->getYAxis()->set_axisLabel(tr("refractive index $n_{20}$ @ 20{\\degree}C"));
             }
         }
     }

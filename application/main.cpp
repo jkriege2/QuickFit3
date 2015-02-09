@@ -83,16 +83,15 @@ int main(int argc, char * argv[])
         app.setWindowIcon(QIcon(":/icon_large.png"));
 
         QSplashScreen* splash=new QSplashScreen();
-        {
-            QPixmap pixmap(":/splash->png");
-            QPainter* painter=new QPainter(&pixmap);
-            painter->setFont(QFont("Arial", 9));
-            painter->drawText(QPoint(5,290), QString("version %1 (%2 SVN %3 DATE %4), %5-bit").arg(qfInfoVersionFull()).arg(qfInfoVersionStatus()).arg(QString(qfInfoSVNVersion()).trimmed()).arg(QString(qfInfoCompileDate()).trimmed()).arg(getApplicationBitDepth()));
-            painter->end();
-            delete painter;
-            painter=NULL;
-            splash->setPixmap(pixmap);//,Qt::WindowStaysOnTopHint);
-        }
+
+        QPixmap pixmap(":/splash.png");
+        QPainter* painter=new QPainter(&pixmap);
+        painter->setFont(QFont("Arial", 9));
+        painter->drawText(QPoint(5,290), QString("version %1 (%2 SVN %3 DATE %4), %5-bit").arg(qfInfoVersionFull()).arg(qfInfoVersionStatus()).arg(QString(qfInfoSVNVersion()).trimmed()).arg(QString(qfInfoCompileDate()).trimmed()).arg(getApplicationBitDepth()));
+        painter->end();
+        delete painter;
+        painter=NULL;
+        splash->setPixmap(pixmap);//,Qt::WindowStaysOnTopHint);
 
 
         splash->showMessage("initializing ...");
