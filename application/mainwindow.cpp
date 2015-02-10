@@ -47,6 +47,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfhelpaction.h"
 #include "dlgeditgroupandrole.h"
 #include "qfexporterimageseries.h"
+#include <QLibraryInfo>
 
 static QPointer<QtLogFile> appLogFileQDebugWidget=NULL;
 
@@ -192,9 +193,35 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
 
     connect(timerAutosave, SIGNAL(timeout()), this, SLOT(autosaveProject()));
 
+    logFileMainWidget->log_header(tr("Qt info:"));
+    logFileMainWidget->inc_indent();
+    logFileMainWidget->log_text(tr("- version: %1\n").arg(QT_VERSION_STR));
+    logFileMainWidget->log_text(tr("- build date: %1\n").arg(QLibraryInfo::buildDate().toString()));
+    logFileMainWidget->log_text(tr("- build key: %1\n").arg(QLibraryInfo::buildKey()));
+    logFileMainWidget->log_text(tr("- licensed products: %1\n").arg(QLibraryInfo::licensedProducts()));
+    logFileMainWidget->log_text(tr("- licensee: %1\n").arg(QLibraryInfo::licensee()));
+    logFileMainWidget->log_text(tr("- locations:\n"));
+    logFileMainWidget->log_text(tr("    * PrefixPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::PrefixPath)));
+    logFileMainWidget->log_text(tr("    * DocumentationPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::DocumentationPath)));
+    logFileMainWidget->log_text(tr("    * HeadersPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::HeadersPath)));
+    logFileMainWidget->log_text(tr("    * LibrariesPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::LibrariesPath)));
+    logFileMainWidget->log_text(tr("    * BinariesPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::BinariesPath)));
+    logFileMainWidget->log_text(tr("    * PluginsPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::PluginsPath)));
+    logFileMainWidget->log_text(tr("    * ImportsPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::ImportsPath)));
+    logFileMainWidget->log_text(tr("    * DataPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::DataPath)));
+    logFileMainWidget->log_text(tr("    * TranslationsPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::TranslationsPath)));
+    logFileMainWidget->log_text(tr("    * SettingsPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::SettingsPath)));
+    logFileMainWidget->log_text(tr("    * ExamplesPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::ExamplesPath)));
+    logFileMainWidget->log_text(tr("    * DemosPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::DemosPath)));
+    logFileMainWidget->dec_indent();
+
     logFileMainWidget->log_header(tr("Qt plugins ... (not complete)"));
     logFileMainWidget->inc_indent();
-    logFileMainWidget->log_text("- image formats: ");
+    logFileMainWidget->log_text(tr("- searchpaths:\n"));
+    for (int i=0; i<QApplication::libraryPaths().size(); i++) {
+        logFileMainWidget->log_text(QString::fromLatin1("    * %1\n").arg(QApplication::libraryPaths().value(i)));
+    }
+    logFileMainWidget->log_text(tr("- image formats: "));
     {
         QList<QByteArray> plgs= QImageReader::supportedImageFormats();
         for (int i=0; i<plgs.size(); i++) {
@@ -203,7 +230,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
         logFileMainWidget->log_text("\n");
     }
 
-    logFileMainWidget->log_text("- styles: ");
+    logFileMainWidget->log_text(tr("- styles: "));
     {
         QStringList plgs= QStyleFactory::keys();
         for (int i=0; i<plgs.size(); i++) {

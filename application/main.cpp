@@ -64,6 +64,12 @@ int main(int argc, char * argv[])
             return 0;
         }
     }
+
+#ifdef __WINDOWS__
+    QCoreApplication::addLibraryPath(Q"./qtplugins");
+    QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+"/qtplugins");
+#endif
+
     Q_INIT_RESOURCE(quickfit3);
     int res=0;
     {
@@ -100,9 +106,7 @@ int main(int argc, char * argv[])
         app.processEvents();
         app.processEvents();
 
-#ifdef __WINDOWS__
-        app.addLibraryPath(QCoreApplication::applicationDirPath()+"/qtplugins");
-#endif
+
         app.processEvents();
 
         ProgramOptions* settings=new ProgramOptions("", &app, &app);
