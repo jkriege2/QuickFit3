@@ -149,7 +149,7 @@ int main(int argc, char * argv[])
             QFontDatabase::removeApplicationFont(appFonts[i]);
         }
         appFonts.clear();
-        QFontDatabase::removeAllApplicationFonts();
+        //QFontDatabase::removeAllApplicationFonts();
     }
 
     // clean up some internal stores ...
