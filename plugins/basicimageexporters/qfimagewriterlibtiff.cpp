@@ -21,13 +21,6 @@ Copyright (c) 2014
 
 
 #include "qfimagewriterlibtiff.h"
-#include <QObject>
-#include "libtiff_tools.h"
-#include <QObject>
-#include <QtGlobal>
-#include <QDebug>
-#include "programoptions.h"
-#include "qfimagemetadatatool.h"
 
 FILE* QFImageWriterLibTIFF::fLibTIFFLog=NULL;
 QString QFImageWriterLibTIFF::fLibTIFFLogFilename=QString("");
@@ -37,7 +30,7 @@ QMutex* QFImageWriterLibTIFF::mutex=NULL;
 QFImageWriterLibTIFF::QFImageWriterLibTIFF(uint32_t compression, const QString& compression_name, bool noDouble, bool onefileperchannel):
     QFExporterImageSeries()
 {
-    tif=NULL;
+    tif.clear();
     frames=0;
     this->compression=compression;
     this->compression_name=compression_name;
@@ -74,116 +67,83 @@ QFImageWriterLibTIFF::QFImageWriterLibTIFF(uint32_t compression, const QString& 
 
 QFImageWriterLibTIFF::~QFImageWriterLibTIFF()
 {
-    if (tif) close();
+    if (tif.size()>0) close();
 }
 
 QString QFImageWriterLibTIFF::filter() const {
-    if (onefileperchannel) {
-        if (noDouble) return QObject::tr("TIFF Image Series, one file per channel, 8-32-bit%1 [libTIFF] (*.tif *.tiff)").arg(compression_name);
-        else return QObject::tr("TIFF Image Series, one file per channel, 8-64bit%1 [libTIFF] (*.tif *.tiff)").arg(compression_name);
-    } else {
-        if (noDouble) return QObject::tr("TIFF Image Series, all channels in one file, 8-32-bit%1 [libTIFF] (*.tif *.tiff)").arg(compression_name);
-        else return QObject::tr("TIFF Image Series, all channels in one file, 8-64bit%1 [libTIFF] (*.tif *.tiff)").arg(compression_name);
-    }
+    return QString("%1 (*.tif *.tiff)").arg(formatName());
 }
 
 QString QFImageWriterLibTIFF::formatName() const {
     if (onefileperchannel) {
-        if (noDouble) return QObject::tr("TIFF Image Series, one file per channel, 8-32-bit%1").arg(compression_name);
-        else return QObject::tr("TIFF Image Series, one file per channel, 8-64bit%1").arg(compression_name);
+        if (noDouble) return QObject::tr("TIFF File%1, single-channel, 8-32bit").arg(compression_name);
+        else return QObject::tr("TIFF Image Series%1, single-channel, 8-64bit").arg(compression_name);
 
     } else {
-        if (noDouble) return QObject::tr("TIFF Image Series, all channels in one file, 8-32-bit%1").arg(compression_name);
-        else return QObject::tr("TIFF Image Series, all channels in one file, 8-64bit%1").arg(compression_name);
+        if (noDouble) return QObject::tr("TIFF File%1, multi-channel, 8-32bit").arg(compression_name);
+        else return QObject::tr("TIFF File%1, multi-channel, 8-64bit").arg(compression_name);
     }
 }
 
 bool QFImageWriterLibTIFF::open(const QString& filename)
 {
     close();
-    tif = TIFFOpen(filename.toLatin1().data(),"w");
-    frames=0;
-    if (tif) {
-        return true;
+    QStringList fns;
+    if (onefileperchannel) {
+        QFileInfo fi(filename);
+        const QString base=fi.absolutePath()+"/"+fi.baseName();
+        const QString ext=fi.completeSuffix();
+        int fw=1;
+        if (channels>=10) fw=2;
+        if (channels>=100) fw=3;
+        for (uint32_t i=0; i<channels; i++) {
+            QString fn=base+QString("_%1.").arg(i,fw,10,QLatin1Char('0'))+ext;
+            fns<<fn;
+            tif << TIFFOpen(fn.toLatin1().data(),"w");
+        }
+    } else {
+        tif << TIFFOpen(filename.toLatin1().data(),"w");
+        fns<<filename;
     }
-    return false;
+    frames=0;
+    bool ok=true;
+    for (int i=0; i<tif.size(); i++) {
+        ok=ok&&tif[i];
+        if (!tif[i]) {
+            setLastError(QObject::tr("could not open file '%1' for writing!").arg(fns.value(i)));
+        }
+    }
+    if (!ok) {
+        close();
+    }
+    return ok;
 }
 
 void QFImageWriterLibTIFF::close()
 {
-    if (tif) TIFFClose(tif);
-    tif=NULL;
+    for (int i=0; i<tif.size(); i++) {
+        if (tif[i]) TIFFClose(tif[i]);
+    }
+    tif.clear();
     frames=0;
 }
 
 bool QFImageWriterLibTIFF::intWriteFrameFloat(const float *image)
 {
-    /*if (!tif) return false;
-    if (frames>0) TIFFWriteDirectory(tif);
-    frames++;
-    TIFFTWriteFloat(tif, data, width, height, 0,0,0,0,compression);
-    if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLocal8Bit().data());
-    return true;*/
-
-
-    if (!tif) return false;
-    if (frames>0) TIFFWriteDirectory(tif);
-    frames++;
-
-    uint16 frame_width=width;
-    uint16 frame_height=height;
-    uint16 frame_channels=channels;
-    uint32 rowsperstrip = (uint32)-1;
-
-    TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, frame_width);
-    TIFFSetField(tif, TIFFTAG_IMAGELENGTH, frame_height);
-    TIFFSetField(tif, TIFFTAG_COMPRESSION, compression);
-
-    TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-    TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
-    TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, sizeof(float)*8);
-    TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, frame_channels);
-    rowsperstrip = TIFFDefaultStripSize(tif, rowsperstrip);
-    TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
-    TIFFSetField(tif, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
-    TIFFSetField(tif,TIFFTAG_SAMPLEFORMAT,SAMPLEFORMAT_IEEEFP);
-    TIFFSetField(tif,TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
-
-    //if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
-
-    if (frames==1) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,qfimdtBuildImageJMetaData(0, deltaX, deltaY, deltaZ, unitname,comment).data());
-    TIFFSetField(tif,TIFFTAG_XRESOLUTION,1.0/deltaX);
-    TIFFSetField(tif,TIFFTAG_YRESOLUTION,1.0/deltaY);
-    TIFFSetField(tif,TIFFTAG_RESOLUTIONUNIT,RESUNIT_NONE);
-    TIFFSetField(tif,TIFFTAG_SOFTWARE,"www.dkfz.de.QuickFit3.Plugins.QFPBasicImageExporters");
-
-    // write frame data
-    // data is broken up into strips where each strip contains rowsperstrip complete rows of data
-    // each stript then has a size of rowsperstrip*frame_width pixels. the last strip is possibly
-    // smaller, so it is NOT padded with dummy data.
-    float* const buf = (float*)_TIFFmalloc(TIFFStripSize(tif)); // data buffer for a strip of the image
-    for (unsigned int row = 0; (row<frame_height); row+=rowsperstrip) {
-        // compute rows in this strip:
-        uint32 nrow = rowsperstrip;
-        if ((row + rowsperstrip)>frame_height) {
-            nrow=frame_height-row; // this is the last strip ... and it is a bit smaller! ... it only contains the last rows of the image
-        }
-        tstrip_t strip = TIFFComputeStrip(tif,row,0);
-        tsize_t bi = 0;
-        // go through the fraem row-wise
-        for (unsigned int rr = 0; rr<nrow; ++rr) {
-            for (unsigned int cc = 0; cc<frame_width; ++cc) { // go through all pixels in the current row
-                for (unsigned int co=0; co<frame_channels; co++ ) { // go through all channels, so we have order RGBRGBRGB ...
-                    buf[bi++] = (float)image[co*frame_width*frame_height+(row + rr)*frame_width+ cc];
-                }
+    if (onefileperchannel) {
+        bool ok=true;
+        for (int i=0; i<tif.size(); i++) {
+            if (tif[i]) {
+                ok=ok&&TIFFWriteSingleFrame(tif[i], &(image[i*width*height]), 1, SAMPLEFORMAT_IEEEFP);
             }
         }
-        if (TIFFWriteEncodedStrip(tif,strip,buf,bi*sizeof(float))<0) {
-            return false;
+        return ok;
+    } else {
+        if (tif.value(0, NULL)) {
+            return TIFFWriteSingleFrame(tif.value(0, NULL), image, channels, SAMPLEFORMAT_IEEEFP);
         }
     }
-    _TIFFfree(buf);
-    return true;
+    return false;
 }
 
 bool QFImageWriterLibTIFF::intWriteFrameDouble(const double *image)
@@ -193,274 +153,76 @@ bool QFImageWriterLibTIFF::intWriteFrameDouble(const double *image)
         for (int i=0; i<d.size(); i++) d[i]=image[i];
         return intWriteFrameFloat(d.data());
     } else {
-       /* if (!tif) return false;
-        if (frames>0) TIFFWriteDirectory(tif);
-        frames++;
-        TIFFTWriteDouble(tif, data, width, height, 0,0,0,0,compression);
-        if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLocal8Bit().data());
-        return true;*/
-
-        if (!tif) return false;
-        if (frames>0) TIFFWriteDirectory(tif);
-        frames++;
-
-        uint16 frame_width=width;
-        uint16 frame_height=height;
-        uint16 frame_channels=channels;
-        uint32 rowsperstrip = (uint32)-1;
-
-        TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, frame_width);
-        TIFFSetField(tif, TIFFTAG_IMAGELENGTH, frame_height);
-        TIFFSetField(tif, TIFFTAG_COMPRESSION, compression);
-
-        TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-        TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
-        TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, sizeof(double)*8);
-        TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, frame_channels);
-        rowsperstrip = TIFFDefaultStripSize(tif, rowsperstrip);
-        TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
-        TIFFSetField(tif, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
-        TIFFSetField(tif,TIFFTAG_SAMPLEFORMAT,SAMPLEFORMAT_IEEEFP);
-        TIFFSetField(tif,TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
-
-        //if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
-
-        if (frames==1) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,qfimdtBuildImageJMetaData(0, deltaX, deltaY, deltaZ, unitname,comment).data());
-        TIFFSetField(tif,TIFFTAG_XRESOLUTION,1.0/deltaX);
-        TIFFSetField(tif,TIFFTAG_YRESOLUTION,1.0/deltaY);
-        TIFFSetField(tif,TIFFTAG_RESOLUTIONUNIT,RESUNIT_NONE);
-        TIFFSetField(tif,TIFFTAG_SOFTWARE,"www.dkfz.de.QuickFit3.Plugins.QFPBasicImageExporters");
-
-        // write frame data
-        // data is broken up into strips where each strip contains rowsperstrip complete rows of data
-        // each stript then has a size of rowsperstrip*frame_width pixels. the last strip is possibly
-        // smaller, so it is NOT padded with dummy data.
-        double* const buf = (double*)_TIFFmalloc(TIFFStripSize(tif)); // data buffer for a strip of the image
-        for (unsigned int row = 0; (row<frame_height); row+=rowsperstrip) {
-            // compute rows in this strip:
-            uint32 nrow = rowsperstrip;
-            if ((row + rowsperstrip)>frame_height) {
-                nrow=frame_height-row; // this is the last strip ... and it is a bit smaller! ... it only contains the last rows of the image
-            }
-            tstrip_t strip = TIFFComputeStrip(tif,row,0);
-            tsize_t bi = 0;
-            // go through the fraem row-wise
-            for (unsigned int rr = 0; rr<nrow; ++rr) {
-                for (unsigned int cc = 0; cc<frame_width; ++cc) { // go through all pixels in the current row
-                    for (unsigned int co=0; co<frame_channels; co++ ) { // go through all channels, so we have order RGBRGBRGB ...
-                        buf[bi++] = (double)image[co*frame_width*frame_height+(row + rr)*frame_width+ cc];
-                    }
+        if (onefileperchannel) {
+            bool ok=true;
+            for (int i=0; i<tif.size(); i++) {
+                if (tif[i]) {
+                    ok=ok&&TIFFWriteSingleFrame(tif[i], &(image[i*width*height]), 1, SAMPLEFORMAT_IEEEFP);
                 }
             }
-            if (TIFFWriteEncodedStrip(tif,strip,buf,bi*sizeof(double))<0) {
-                return false;
+            return ok;
+        } else {
+            if (tif.value(0, NULL)) {
+                return TIFFWriteSingleFrame(tif.value(0, NULL), image, channels, SAMPLEFORMAT_IEEEFP);
             }
         }
-        _TIFFfree(buf);
-        return true;
     }
+    return false;
 }
 
 bool QFImageWriterLibTIFF::intWriteFrameUINT32(const uint32_t *image)
 {
-    if (!tif) return false;
-    if (frames>0) TIFFWriteDirectory(tif);
-    frames++;
-
-    uint16 frame_width=width;
-    uint16 frame_height=height;
-    uint16 frame_channels=channels;
-    uint32 rowsperstrip = (uint32)-1;
-
-    TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, frame_width);
-    TIFFSetField(tif, TIFFTAG_IMAGELENGTH, frame_height);
-    TIFFSetField(tif, TIFFTAG_COMPRESSION, compression);
-
-    TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-    TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
-    TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, sizeof(uint32_t)*8);
-    TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, frame_channels);
-    rowsperstrip = TIFFDefaultStripSize(tif, rowsperstrip);
-    TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
-    TIFFSetField(tif, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
-    TIFFSetField(tif,TIFFTAG_SAMPLEFORMAT,SAMPLEFORMAT_UINT);
-    TIFFSetField(tif,TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
-
-    //if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
-
-    if (frames==1) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,qfimdtBuildImageJMetaData(0, deltaX, deltaY, deltaZ, unitname,comment).data());
-    TIFFSetField(tif,TIFFTAG_XRESOLUTION,1.0/deltaX);
-    TIFFSetField(tif,TIFFTAG_YRESOLUTION,1.0/deltaY);
-    TIFFSetField(tif,TIFFTAG_RESOLUTIONUNIT,RESUNIT_NONE);
-    TIFFSetField(tif,TIFFTAG_SOFTWARE,"www.dkfz.de.QuickFit3.Plugins.QFPBasicImageExporters");
-
-
-    // write frame data
-    // data is broken up into strips where each strip contains rowsperstrip complete rows of data
-    // each stript then has a size of rowsperstrip*frame_width pixels. the last strip is possibly
-    // smaller, so it is NOT padded with dummy data.
-    uint32_t* const buf = (uint32_t*)_TIFFmalloc(TIFFStripSize(tif)); // data buffer for a strip of the image
-    for (unsigned int row = 0; (row<frame_height); row+=rowsperstrip) {
-        // compute rows in this strip:
-        uint32 nrow = rowsperstrip;
-        if ((row + rowsperstrip)>frame_height) {
-            nrow=frame_height-row; // this is the last strip ... and it is a bit smaller! ... it only contains the last rows of the image
-        }
-        tstrip_t strip = TIFFComputeStrip(tif,row,0);
-        tsize_t bi = 0;
-        // go through the fraem row-wise
-        for (unsigned int rr = 0; rr<nrow; ++rr) {
-            for (unsigned int cc = 0; cc<frame_width; ++cc) { // go through all pixels in the current row
-                for (unsigned int co=0; co<frame_channels; co++ ) { // go through all channels, so we have order RGBRGBRGB ...
-                    buf[bi++] = (uint32_t)image[co*frame_width*frame_height+(row + rr)*frame_width+ cc];
-                }
+    if (onefileperchannel) {
+        bool ok=true;
+        for (int i=0; i<tif.size(); i++) {
+            if (tif[i]) {
+                ok=ok&&TIFFWriteSingleFrame(tif[i], &(image[i*width*height]), 1, SAMPLEFORMAT_UINT);
             }
         }
-        if (TIFFWriteEncodedStrip(tif,strip,buf,bi*sizeof(uint32_t))<0) {
-            return false;
+        return ok;
+    } else {
+        if (tif.value(0, NULL)) {
+            return TIFFWriteSingleFrame(tif.value(0, NULL), image, channels, SAMPLEFORMAT_UINT);
         }
     }
-    _TIFFfree(buf);
-    return true;
+    return false;
 }
 
 bool QFImageWriterLibTIFF::intWriteFrameUINT16(const uint16_t *image)
 {
-    /*if (!tif) return false;
-    if (frames>0) TIFFWriteDirectory(tif);
-    frames++;
-    TIFFTWriteUint16(tif, data, width, height, 0,0,0,0,compression);
-    if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLocal8Bit().data());
-    return true;*/
-
-    if (!tif) return false;
-    if (frames>0) TIFFWriteDirectory(tif);
-    frames++;
-
-    uint16 frame_width=width;
-    uint16 frame_height=height;
-    uint16 frame_channels=channels;
-    uint32 rowsperstrip = (uint32)-1;
-
-    TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, frame_width);
-    TIFFSetField(tif, TIFFTAG_IMAGELENGTH, frame_height);
-    TIFFSetField(tif, TIFFTAG_COMPRESSION, compression);
-
-    TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-    TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
-    TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, sizeof(uint16_t)*8);
-    TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, frame_channels);
-    rowsperstrip = TIFFDefaultStripSize(tif, rowsperstrip);
-    TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
-    TIFFSetField(tif, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
-    TIFFSetField(tif,TIFFTAG_SAMPLEFORMAT,SAMPLEFORMAT_UINT);
-    TIFFSetField(tif,TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
-
-    //if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
-
-    if (frames==1) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,qfimdtBuildImageJMetaData(0, deltaX, deltaY, deltaZ, unitname,comment).data());
-    TIFFSetField(tif,TIFFTAG_XRESOLUTION,1.0/deltaX);
-    TIFFSetField(tif,TIFFTAG_YRESOLUTION,1.0/deltaY);
-    TIFFSetField(tif,TIFFTAG_RESOLUTIONUNIT,RESUNIT_NONE);
-    TIFFSetField(tif,TIFFTAG_SOFTWARE,"www.dkfz.de.QuickFit3.Plugins.QFPBasicImageExporters");
-
-
-    // write frame data
-    // data is broken up into strips where each strip contains rowsperstrip complete rows of data
-    // each stript then has a size of rowsperstrip*frame_width pixels. the last strip is possibly
-    // smaller, so it is NOT padded with dummy data.
-    uint16_t* const buf = (uint16_t*)_TIFFmalloc(TIFFStripSize(tif)); // data buffer for a strip of the image
-    for (unsigned int row = 0; (row<frame_height); row+=rowsperstrip) {
-        // compute rows in this strip:
-        uint32 nrow = rowsperstrip;
-        if ((row + rowsperstrip)>frame_height) {
-            nrow=frame_height-row; // this is the last strip ... and it is a bit smaller! ... it only contains the last rows of the image
-        }
-        tstrip_t strip = TIFFComputeStrip(tif,row,0);
-        tsize_t bi = 0;
-        // go through the fraem row-wise
-        for (unsigned int rr = 0; rr<nrow; ++rr) {
-            for (unsigned int cc = 0; cc<frame_width; ++cc) { // go through all pixels in the current row
-                for (unsigned int co=0; co<frame_channels; co++ ) { // go through all channels, so we have order RGBRGBRGB ...
-                    buf[bi++] = (uint16_t)image[co*frame_width*frame_height+(row + rr)*frame_width+ cc];
-                }
+    if (onefileperchannel) {
+        bool ok=true;
+        for (int i=0; i<tif.size(); i++) {
+            if (tif[i]) {
+                ok=ok&&TIFFWriteSingleFrame(tif[i], &(image[i*width*height]), 1, SAMPLEFORMAT_UINT);
             }
         }
-        if (TIFFWriteEncodedStrip(tif,strip,buf,bi*sizeof(uint16_t))<0) {
-            return false;
+        return ok;
+    } else {
+        if (tif.value(0, NULL)) {
+            return TIFFWriteSingleFrame(tif.value(0, NULL), image, channels, SAMPLEFORMAT_UINT);
         }
     }
-    _TIFFfree(buf);
-    return true;
+    return false;
+
 }
 
 bool QFImageWriterLibTIFF::intWriteFrameUINT8(const uint8_t *image)
 {
-    /*if (!tif) return false;
-    if (frames>0) TIFFWriteDirectory(tif);
-    frames++;
-    TIFFTWriteUint8(tif, data, width, height, 0,0,0,0,compression);
-    if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLocal8Bit().data());
-    return true;*/
-
-    if (!tif) return false;
-    if (frames>0) TIFFWriteDirectory(tif);
-    frames++;
-
-    uint16 frame_width=width;
-    uint16 frame_height=height;
-    uint16 frame_channels=channels;
-    uint32 rowsperstrip = (uint32)-1;
-
-    TIFFSetField(tif, TIFFTAG_IMAGEWIDTH, frame_width);
-    TIFFSetField(tif, TIFFTAG_IMAGELENGTH, frame_height);
-    TIFFSetField(tif, TIFFTAG_COMPRESSION, compression);
-
-    TIFFSetField(tif, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
-    TIFFSetField(tif, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
-    TIFFSetField(tif, TIFFTAG_BITSPERSAMPLE, sizeof(uint8_t)*8);
-    TIFFSetField(tif, TIFFTAG_SAMPLESPERPIXEL, frame_channels);
-    rowsperstrip = TIFFDefaultStripSize(tif, rowsperstrip);
-    TIFFSetField(tif, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
-    TIFFSetField(tif, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
-    TIFFSetField(tif,TIFFTAG_SAMPLEFORMAT,SAMPLEFORMAT_UINT);
-    TIFFSetField(tif,TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
-
-    //if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
-
-    if (frames==1) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,qfimdtBuildImageJMetaData(0, deltaX, deltaY, deltaZ, unitname,comment).data());
-    TIFFSetField(tif,TIFFTAG_XRESOLUTION,1.0/deltaX);
-    TIFFSetField(tif,TIFFTAG_YRESOLUTION,1.0/deltaY);
-    TIFFSetField(tif,TIFFTAG_RESOLUTIONUNIT,RESUNIT_NONE);
-    TIFFSetField(tif,TIFFTAG_SOFTWARE,"www.dkfz.de.QuickFit3.Plugins.QFPBasicImageExporters");
-
-
-    // write frame data
-    // data is broken up into strips where each strip contains rowsperstrip complete rows of data
-    // each stript then has a size of rowsperstrip*frame_width pixels. the last strip is possibly
-    // smaller, so it is NOT padded with dummy data.
-    uint8_t* const buf = (uint8_t*)_TIFFmalloc(TIFFStripSize(tif)); // data buffer for a strip of the image
-    for (unsigned int row = 0; (row<frame_height); row+=rowsperstrip) {
-        // compute rows in this strip:
-        uint32 nrow = rowsperstrip;
-        if ((row + rowsperstrip)>frame_height) {
-            nrow=frame_height-row; // this is the last strip ... and it is a bit smaller! ... it only contains the last rows of the image
-        }
-        tstrip_t strip = TIFFComputeStrip(tif,row,0);
-        tsize_t bi = 0;
-        // go through the fraem row-wise
-        for (unsigned int rr = 0; rr<nrow; ++rr) {
-            for (unsigned int cc = 0; cc<frame_width; ++cc) { // go through all pixels in the current row
-                for (unsigned int co=0; co<frame_channels; co++ ) { // go through all channels, so we have order RGBRGBRGB ...
-                    buf[bi++] = (uint8_t)image[co*frame_width*frame_height+(row + rr)*frame_width+ cc];
-                }
+    if (onefileperchannel) {
+        bool ok=true;
+        for (int i=0; i<tif.size(); i++) {
+            if (tif[i]) {
+                ok=ok&&TIFFWriteSingleFrame(tif[i], &(image[i*width*height]), 1, SAMPLEFORMAT_UINT);
             }
         }
-        if (TIFFWriteEncodedStrip(tif,strip,buf,bi*sizeof(uint8_t))<0) {
-            return false;
+        return ok;
+    } else {
+        if (tif.value(0, NULL)) {
+            return TIFFWriteSingleFrame(tif.value(0, NULL), image, channels, SAMPLEFORMAT_UINT);
         }
     }
-    _TIFFfree(buf);
-    return true;
+    return false;
+
 }
 

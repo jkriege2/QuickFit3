@@ -150,12 +150,16 @@ void QFRDRImageStack3DViewer::saveImage(const QString& filename)
 {
     QString fn=filename;
     QStringList filt;
-    filt<<tr("PNG Image (*.png)");
+    QList<QByteArray> writerformats=QImageWriter::supportedImageFormats();
+    for (int i=0; i<writerformats.size(); i++) {
+        filt<<QString("%1 Image (*.%2)").arg(QString(writerformats[i])).arg(QString(writerformats[i].toLower()));
+    }
+    /*filt<<tr("PNG Image (*.png)");
     filt<<tr("BMP Image (*.bmp)");
     filt<<tr("TIFF Image (*.tif *.tiff)");
     filt<<tr("JPEG Image (*.jpg *.jpeg)");
     filt<<tr("X11 Bitmap (*.xbm)");
-    filt<<tr("X11 Pixmap (*.xpm)");
+    filt<<tr("X11 Pixmap (*.xpm)");*/
     QString selFormat="";
     if (fn.isEmpty()) {
         QString currentSaveDirectory=ProgramOptions::getConfigValue("QFRDRImageStack3DViewer/lastSaveDirectory", "").toString();
@@ -173,7 +177,12 @@ void QFRDRImageStack3DViewer::saveImage(const QString& filename)
     if (!fn.isEmpty()) {
         QImage img=ui->widget->getImage();
         int filtID=filt.indexOf(selFormat);
-        if (filtID==0 || (filtID<0 && QFileInfo(fn).suffix().toLower()=="png")) {
+        if (filtID>=0 && filtID<writerformats.size()) {
+            img.save(fn, writerformats[filtID].data());
+        } else {
+            img.save(fn);
+        }
+        /*if (filtID==0 || (filtID<0 && QFileInfo(fn).suffix().toLower()=="png")) {
             img.save(fn, "PNG");
         } else if (filtID==1 || (filtID<0 && QFileInfo(fn).suffix().toLower()=="bmp")) {
             img.save(fn, "BMP");
@@ -187,7 +196,7 @@ void QFRDRImageStack3DViewer::saveImage(const QString& filename)
             img.save(fn, "XPM");
         } else {
             img.save(fn);
-        }
+        }*/
 
     }
 }

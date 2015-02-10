@@ -193,11 +193,29 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
 
     connect(timerAutosave, SIGNAL(timeout()), this, SLOT(autosaveProject()));
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    logFileMainWidget->log_header(tr("System info:"));
+    logFileMainWidget->inc_indent();
+    logFileMainWidget->log_text(tr("- currentCpuArchitecture: %1\n").arg(QSysInfo::currentCpuArchitecture()));
+    logFileMainWidget->log_text(tr("- kernelType: %1\n").arg(QSysInfo::kernelType()));
+    logFileMainWidget->log_text(tr("- kernelVersion: %1\n").arg(QSysInfo::kernelVersion()));
+    logFileMainWidget->log_text(tr("- prettyProductName: %1\n").arg(QSysInfo::prettyProductName()));
+    logFileMainWidget->log_text(tr("- productType: %1\n").arg(QSysInfo::productType()));
+    logFileMainWidget->log_text(tr("- productVersion: %1\n").arg(QSysInfo::productVersion()));
+    logFileMainWidget->dec_indent();
+#endif
+
     logFileMainWidget->log_header(tr("Qt info:"));
     logFileMainWidget->inc_indent();
     logFileMainWidget->log_text(tr("- version: %1\n").arg(QT_VERSION_STR));
     logFileMainWidget->log_text(tr("- build date: %1\n").arg(QLibraryInfo::buildDate().toString()));
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    logFileMainWidget->log_text(tr("- is debug build : %1\n").arg(QLibraryInfo::isDebugBuild()));
+    logFileMainWidget->log_text(tr("- buildAbi: %1\n").arg(QSysInfo::buildAbi()));
+    logFileMainWidget->log_text(tr("- buildCpuArchitecture: %1\n").arg(QSysInfo::buildCpuArchitecture()));
+#else
     logFileMainWidget->log_text(tr("- build key: %1\n").arg(QLibraryInfo::buildKey()));
+#endif
     logFileMainWidget->log_text(tr("- licensed products: %1\n").arg(QLibraryInfo::licensedProducts()));
     logFileMainWidget->log_text(tr("- licensee: %1\n").arg(QLibraryInfo::licensee()));
     logFileMainWidget->log_text(tr("- locations:\n"));
@@ -212,7 +230,16 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     logFileMainWidget->log_text(tr("    * TranslationsPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::TranslationsPath)));
     logFileMainWidget->log_text(tr("    * SettingsPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::SettingsPath)));
     logFileMainWidget->log_text(tr("    * ExamplesPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::ExamplesPath)));
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+    logFileMainWidget->log_text(tr("    * LibraryExecutablesPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::LibraryExecutablesPath)));
+    logFileMainWidget->log_text(tr("    * Qml2ImportsPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::Qml2ImportsPath)));
+    logFileMainWidget->log_text(tr("    * ArchDataPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::ArchDataPath)));
+    logFileMainWidget->log_text(tr("    * TestsPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::TestsPath)));
+    logFileMainWidget->log_text(tr("    * Qml2ImportsPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::Qml2ImportsPath)));
+    logFileMainWidget->log_text(tr("    * Qml2ImportsPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::Qml2ImportsPath)));
+#else
     logFileMainWidget->log_text(tr("    * DemosPath: %1\n").arg(QLibraryInfo::location(QLibraryInfo::DemosPath)));
+#endif
     logFileMainWidget->dec_indent();
 
     logFileMainWidget->log_header(tr("Qt plugins ... (not complete)"));

@@ -30,6 +30,13 @@ Copyright (c) 2014
 #include <stdlib.h>
 #include <QMutex>
 #include <QMutexLocker>
+#include <QObject>
+#include "libtiff_tools.h"
+#include <QObject>
+#include <QtGlobal>
+#include <QDebug>
+#include "programoptions.h"
+#include "qfimagemetadatatool.h"
 
 /*! \brief QFExporter class for fit function
     \ingroup qf3exporterplugins_exporters_basicimage
@@ -91,8 +98,70 @@ class QFImageWriterLibTIFF: public QFExporterImageSeries {
         virtual bool intWriteFrameUINT16(const uint16_t* image);
         /** \brief read a new frame into the given array of integers */
         virtual bool intWriteFrameUINT8(const uint8_t* data);
+
+        template <typename T>
+        bool TIFFWriteSingleFrame(TIFF* tiflocal, const T* image, uint16 frame_channels, uint32 sampleformat) {
+
+            if (!tiflocal) return false;
+            if (frames>0) TIFFWriteDirectory(tiflocal);
+            frames++;
+
+            uint16 frame_width=width;
+            uint16 frame_height=height;
+            uint32 rowsperstrip = (uint32)-1;
+
+            TIFFSetField(tiflocal, TIFFTAG_IMAGEWIDTH, frame_width);
+            TIFFSetField(tiflocal, TIFFTAG_IMAGELENGTH, frame_height);
+            TIFFSetField(tiflocal, TIFFTAG_COMPRESSION, compression);
+
+            TIFFSetField(tiflocal, TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG);
+            TIFFSetField(tiflocal, TIFFTAG_PHOTOMETRIC, PHOTOMETRIC_MINISBLACK);
+            TIFFSetField(tiflocal, TIFFTAG_BITSPERSAMPLE, sizeof(T)*8);
+            TIFFSetField(tiflocal, TIFFTAG_SAMPLESPERPIXEL, frame_channels);
+            rowsperstrip = TIFFDefaultStripSize(tiflocal, rowsperstrip);
+            TIFFSetField(tiflocal, TIFFTAG_ROWSPERSTRIP, rowsperstrip);
+            TIFFSetField(tiflocal, TIFFTAG_FILLORDER, FILLORDER_MSB2LSB);
+            TIFFSetField(tiflocal,TIFFTAG_SAMPLEFORMAT,sampleformat);
+            TIFFSetField(tiflocal,TIFFTAG_ORIENTATION,ORIENTATION_TOPLEFT);
+
+            //if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
+
+            if (frames==1) TIFFSetField(tiflocal,TIFFTAG_IMAGEDESCRIPTION,qfimdtBuildImageJMetaData(0, deltaX, deltaY, deltaZ, unitname,comment).data());
+            TIFFSetField(tiflocal,TIFFTAG_XRESOLUTION,1.0/deltaX);
+            TIFFSetField(tiflocal,TIFFTAG_YRESOLUTION,1.0/deltaY);
+            TIFFSetField(tiflocal,TIFFTAG_RESOLUTIONUNIT,RESUNIT_NONE);
+            TIFFSetField(tiflocal,TIFFTAG_SOFTWARE,"www.dkfz.de.QuickFit3.Plugins.QFPBasicImageExporters");
+
+            // write frame data
+            // data is broken up into strips where each strip contains rowsperstrip complete rows of data
+            // each stript then has a size of rowsperstrip*frame_width pixels. the last strip is possibly
+            // smaller, so it is NOT padded with dummy data.
+            T* const buf = (T*)_TIFFmalloc(TIFFStripSize(tiflocal)); // data buffer for a strip of the image
+            for (unsigned int row = 0; (row<frame_height); row+=rowsperstrip) {
+                // compute rows in this strip:
+                uint32 nrow = rowsperstrip;
+                if ((row + rowsperstrip)>frame_height) {
+                    nrow=frame_height-row; // this is the last strip ... and it is a bit smaller! ... it only contains the last rows of the image
+                }
+                tstrip_t strip = TIFFComputeStrip(tiflocal,row,0);
+                tsize_t bi = 0;
+                // go through the fraem row-wise
+                for (unsigned int rr = 0; rr<nrow; ++rr) {
+                    for (unsigned int cc = 0; cc<frame_width; ++cc) { // go through all pixels in the current row
+                        for (unsigned int co=0; co<frame_channels; co++ ) { // go through all channels, so we have order RGBRGBRGB ...
+                            buf[bi++] = (T)image[co*frame_width*frame_height+(row + rr)*frame_width+ cc];
+                        }
+                    }
+                }
+                if (TIFFWriteEncodedStrip(tiflocal,strip,buf,bi*sizeof(T))<0) {
+                    return false;
+                }
+            }
+            _TIFFfree(buf);
+            return true;
+        }
     private:
-        TIFF* tif;
+        QList<TIFF*> tif;
         uint64_t frames;
         uint32_t compression;
         QString compression_name;

@@ -66,8 +66,8 @@ int main(int argc, char * argv[])
     }
 
 #ifdef __WINDOWS__
-    QCoreApplication::addLibraryPath(Q"./qtplugins");
-    QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath()+"/qtplugins");
+    QCoreApplication::addLibraryPath("./qtplugins");
+    QCoreApplication::addLibraryPath(QFileInfo(argv[0]).absolutePath()+"/qtplugins");
 #endif
 
     Q_INIT_RESOURCE(quickfit3);
