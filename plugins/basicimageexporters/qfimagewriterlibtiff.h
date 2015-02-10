@@ -37,7 +37,7 @@ Copyright (c) 2014
 */
 class QFImageWriterLibTIFF: public QFExporterImageSeries {
     public:
-        QFImageWriterLibTIFF(uint32_t compression, const QString& compression_name, bool noDouble);
+        QFImageWriterLibTIFF(uint32_t compression, const QString& compression_name, bool noDouble, bool onefileperchannel);
         virtual ~QFImageWriterLibTIFF();
         /*! \copydoc QFFitFunction::filter()   */
         virtual QString filter() const ;
@@ -97,6 +97,7 @@ class QFImageWriterLibTIFF: public QFExporterImageSeries {
         uint32_t compression;
         QString compression_name;
         bool noDouble;
+        bool onefileperchannel;
 
 };
 

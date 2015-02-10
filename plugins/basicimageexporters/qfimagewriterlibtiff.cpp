@@ -34,12 +34,15 @@ QString QFImageWriterLibTIFF::fLibTIFFLogFilename=QString("");
 QMutex* QFImageWriterLibTIFF::mutex=NULL;
 
 
-QFImageWriterLibTIFF::QFImageWriterLibTIFF(uint32_t compression, const QString& compression_name, bool noDouble) {
+QFImageWriterLibTIFF::QFImageWriterLibTIFF(uint32_t compression, const QString& compression_name, bool noDouble, bool onefileperchannel):
+    QFExporterImageSeries()
+{
     tif=NULL;
     frames=0;
     this->compression=compression;
     this->compression_name=compression_name;
     this->noDouble=noDouble;
+    this->onefileperchannel=onefileperchannel;
 
     QString lf=ProgramOptions::getConfigValue("exporters_basicimages/libtiff/logfile", ProgramOptions::getInstance()->getConfigFileDirectory()+"/exporters_basicimages_libtiff.log").toString();
     if (ProgramOptions::getConfigValue("exporters_basicimages/libtiff/log", false).toBool()) {
@@ -75,13 +78,24 @@ QFImageWriterLibTIFF::~QFImageWriterLibTIFF()
 }
 
 QString QFImageWriterLibTIFF::filter() const {
-    if (noDouble) return QObject::tr("TIFF Image Series, no 64-bit%1 [libTIFF] (*.tif *.tiff)").arg(compression_name);
-    else return QObject::tr("TIFF Image Series%1 [libTIFF] (*.tif *.tiff)").arg(compression_name);
+    if (onefileperchannel) {
+        if (noDouble) return QObject::tr("TIFF Image Series, one file per channel, 8-32-bit%1 [libTIFF] (*.tif *.tiff)").arg(compression_name);
+        else return QObject::tr("TIFF Image Series, one file per channel, 8-64bit%1 [libTIFF] (*.tif *.tiff)").arg(compression_name);
+    } else {
+        if (noDouble) return QObject::tr("TIFF Image Series, all channels in one file, 8-32-bit%1 [libTIFF] (*.tif *.tiff)").arg(compression_name);
+        else return QObject::tr("TIFF Image Series, all channels in one file, 8-64bit%1 [libTIFF] (*.tif *.tiff)").arg(compression_name);
+    }
 }
 
 QString QFImageWriterLibTIFF::formatName() const {
-    if (noDouble) return QObject::tr("TIFF Image Series, no 64-bit%1").arg(compression_name);
-    else return QObject::tr("TIFF Image Series%1").arg(compression_name);
+    if (onefileperchannel) {
+        if (noDouble) return QObject::tr("TIFF Image Series, one file per channel, 8-32-bit%1").arg(compression_name);
+        else return QObject::tr("TIFF Image Series, one file per channel, 8-64bit%1").arg(compression_name);
+
+    } else {
+        if (noDouble) return QObject::tr("TIFF Image Series, all channels in one file, 8-32-bit%1").arg(compression_name);
+        else return QObject::tr("TIFF Image Series, all channels in one file, 8-64bit%1").arg(compression_name);
+    }
 }
 
 bool QFImageWriterLibTIFF::open(const QString& filename)

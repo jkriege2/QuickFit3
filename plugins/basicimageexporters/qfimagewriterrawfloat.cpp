@@ -24,7 +24,9 @@ Copyright (c) 2014
 #include <QObject>
 #include "binarydatatools.h"
 
-QFImageWriterRAWFloat::QFImageWriterRAWFloat() {
+QFImageWriterRAWFloat::QFImageWriterRAWFloat():
+    QFExporterImageSeries()
+{
 
 }
 
