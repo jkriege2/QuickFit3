@@ -1298,7 +1298,7 @@ bool QFESPIMB040MainWindow2::acquireSeries(const QString &lightpathName, const Q
 
              QString estimation;
              if (qMin(prog1,prog2)>0) {
-                 // so lange läuft die Aufnahme schon in Sekunden
+                 // so lange lauuft die Aufnahme schon in Sekunden
                  double duration=double(timA.elapsed())/1000.0;
                  // zeit pro 1% Fortschritt
                  double eta=duration/double(qMin(prog1,prog2));

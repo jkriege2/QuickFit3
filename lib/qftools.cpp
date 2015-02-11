@@ -757,7 +757,7 @@ QString	qfGetExistingDirectory ( QWidget * parent, const QString & caption, cons
 
 QString qfGetOpenFileNameSet (const QString& setPrefix,  QWidget * parent , const QString & caption , const QString & dir , const QString & filter , QString * selectedFilter , QFileDialog::Options options  ) {
     QString d=ProgramOptions::getConfigValue(setPrefix+"lastDir",  dir).toString();
-    QString f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  f).toString();;
+    QString f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  filter.split(";;").value(0)).toString();;
     if (selectedFilter) {
         f=*selectedFilter;
     }
@@ -773,7 +773,7 @@ QString qfGetOpenFileNameSet (const QString& setPrefix,  QWidget * parent , cons
 
 QStringList qfGetOpenFileNamesSet (const QString& setPrefix,  QWidget * parent , const QString & caption , const QString & dir , const QString & filter , QString * selectedFilter , QFileDialog::Options options  ) {
     QString d=ProgramOptions::getConfigValue(setPrefix+"lastDir",  dir).toString();
-    QString f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  f).toString();;
+    QString f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  filter.split(";;").value(0)).toString();;
     if (selectedFilter) {
         f=*selectedFilter;
     }
@@ -789,7 +789,7 @@ QStringList qfGetOpenFileNamesSet (const QString& setPrefix,  QWidget * parent ,
 
 QString qfGetSaveFileNameSet (const QString& setPrefix,  QWidget * parent , const QString & caption , const QString & dir , const QString & filter , QString * selectedFilter , QFileDialog::Options options  ) {
     QString d=ProgramOptions::getConfigValue(setPrefix+"lastDir",  dir).toString();
-    QString f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  f).toString();;
+    QString f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  filter.split(";;").value(0)).toString();;
     if (selectedFilter) {
         f=*selectedFilter;
     }
@@ -939,13 +939,13 @@ QString cleanStringForFilename(const QString& text, int maxLen, bool removeDot, 
         else if (t1[i]>='A' && t1[i]<='z') t=t+t1[i];
         else {
             switch(t1[i].toLatin1()) {
-                case 'ä': t=t+"ae"; break;
-                case 'Ä': t=t+"Ae"; break;
-                case 'ö': t=t+"oe"; break;
-                case 'Ö': t=t+"Oe"; break;
-                case 'ü': t=t+"ue"; break;
-                case 'Ü': t=t+"Ue"; break;
-                case 'ß': t=t+"ss"; break;
+                case '\xE4': t=t+"ae"; break;
+                case '\xC4': t=t+"Ae"; break;
+                case '\xF6': t=t+"oe"; break;
+                case '\xD4': t=t+"Oe"; break;
+                case '\xFC': t=t+"ue"; break;
+                case '\xDC': t=t+"Ue"; break;
+                case '\xDF': t=t+"ss"; break;
                 case '@': t=t+"_at_"; break;
                 case '\xB5': t=t+"mu"; break;
                 case ';':

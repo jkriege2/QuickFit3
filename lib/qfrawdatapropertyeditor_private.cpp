@@ -1651,10 +1651,14 @@ void QFRawDataPropertyEditor_private::exportData()
     if (current) {
         QStringList ids=current->getExportFiletypes();
         QStringList filters=current->getExportDialogFiletypes().split(";;");
+        //qDebug()<<"exportData "<<ids<<filters;
         if (ids.size()>0 && filters.size()>0) {
             QString filter=filters[0];
+            //qDebug()<<"exportData "<<filter;
             QString filename=qfGetSaveFileNameSet("rdr/export-data/", d, current->getExportDialogTitle(), QString(), filters.join(";;"), &filter);
+            //qDebug()<<"exportData "<<filename;
             if (!filename.isEmpty()) current->exportData(ids.value(filters.indexOf(filter), ""), filename);
+            //qDebug()<<"exportData DONE";
         }
     }
 }

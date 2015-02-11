@@ -601,6 +601,7 @@ QStringList QFRDRImageStackData::getImageReaderIDList(QFPluginServices* pluginse
 
 QStringList QFRDRImageStackData::getImageWriterFilterList(QFPluginServices *pluginservices)
 {
+    //qDebug()<<"getImageWriterFilterList";
     QStringList l;
     int i=0;
     QFExporterImageSeries* r=NULL;
@@ -609,11 +610,13 @@ QStringList QFRDRImageStackData::getImageWriterFilterList(QFPluginServices *plug
         delete r;
         i++;
     }
+    //qDebug()<<"getImageWriterFilterList "<<l;
     return l;
 }
 
 QStringList QFRDRImageStackData::getImageWriterFormatNameList(QFPluginServices *pluginservices)
 {
+    //qDebug()<<"getImageWriterFormatNameList";
     QStringList l;
     int i=0;
     QFExporterImageSeries* r=NULL;
@@ -622,6 +625,7 @@ QStringList QFRDRImageStackData::getImageWriterFormatNameList(QFPluginServices *
         delete r;
         i++;
     }
+    //qDebug()<<"getImageWriterFormatNameList "<<l;
     return l;
 }
 
@@ -646,6 +650,8 @@ int QFRDRImageStackData::getImageWriterCount(QFPluginServices *pluginservices)
 
 QStringList QFRDRImageStackData::getImageWriterIDList(QFPluginServices *pluginservices)
 {
+    //qDebug()<<"getImageWriterIDList";
+    //qDebug()<<"getImageWriterIDList"<< pluginservices->getExporterManager()->getExporters<QFExporterImageSeries*>();
     return pluginservices->getExporterManager()->getExporters<QFExporterImageSeries*>();
 }
 
@@ -691,6 +697,7 @@ QFRDRImageStackData::ImageStack::ImageStack() {
 
 void QFRDRImageStackData::exportData(const QString &format_in, const QString &filename) const
 {
+    //qDebug()<<"exportData "<<format_in<<filename;
     /*QStringList sl=format_in.split(";;;;");
     bool ok=true;
     int ch=sl.value(1, "0").toInt(&ok);
@@ -739,11 +746,13 @@ void QFRDRImageStackData::exportData(const QString &format_in, const QString &fi
 
 QStringList QFRDRImageStackData::getExportFiletypes() const
 {
+    //qDebug()<<"getExportFiletypes";
     return getImageWriterIDList(QFPluginServices::getInstance());
 }
 
 QString QFRDRImageStackData::getExportDialogFiletypes() const
 {
+    //qDebug()<<"getExportDialogFiletypes";
     return getImageWriterFilterList(QFPluginServices::getInstance()).join(";;");
 }
 

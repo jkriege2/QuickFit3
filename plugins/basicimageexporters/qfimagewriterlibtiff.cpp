@@ -76,12 +76,12 @@ QString QFImageWriterLibTIFF::filter() const {
 
 QString QFImageWriterLibTIFF::formatName() const {
     if (onefileperchannel) {
-        if (noDouble) return QObject::tr("TIFF File%1, single-channel, 8-32bit").arg(compression_name);
-        else return QObject::tr("TIFF Image Series%1, single-channel, 8-64bit").arg(compression_name);
+        if (noDouble) return QObject::tr("TIFF File, single-channel, 8-32bit%1").arg(compression_name);
+        else return QObject::tr("TIFF File, single-channel, 8-64bit%1").arg(compression_name);
 
     } else {
-        if (noDouble) return QObject::tr("TIFF File%1, multi-channel, 8-32bit").arg(compression_name);
-        else return QObject::tr("TIFF File%1, multi-channel, 8-64bit").arg(compression_name);
+        if (noDouble) return QObject::tr("TIFF File, multi-channel, 8-32bit%1").arg(compression_name);
+        else return QObject::tr("TIFF File, multi-channel, 8-64bit%1").arg(compression_name);
     }
 }
 
