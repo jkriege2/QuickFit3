@@ -103,7 +103,7 @@ class QFLIB_EXPORT QFImporterManager : public QObject {
                         if (dynamic_cast<T>(imp)!=NULL) {
                             result[ids[j]]=imp;
                         } else {
-                            delete imp;
+                            if (imp) delete imp;
                         }
                     }
                 }
@@ -124,7 +124,7 @@ class QFLIB_EXPORT QFImporterManager : public QObject {
                         if (dynamic_cast<T>(imp)!=NULL) {
                             result.append(ids[j]);
                         }
-                        delete imp;
+                        if (imp) delete imp;
                     }
                 }
 

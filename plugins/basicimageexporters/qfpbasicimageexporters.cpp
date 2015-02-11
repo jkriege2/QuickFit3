@@ -62,6 +62,39 @@ QStringList QFPBasicImageExporters::getIDs() const {
 #ifdef LZMA_SUPPORT
     res<<"exporter_image_libtiff_lzma_64";
 #endif
+
+
+
+
+    res<<"exporter_image_libtiff_splitchannels";
+#ifdef ZIP_SUPPORT
+    res<<"exporter_image_libtiff_splitchannels_deflate";
+#endif
+#ifdef LZW_SUPPORT
+    res<<"exporter_image_libtiff_splitchannels_lzw";
+#endif
+#ifdef JPEG_SUPPORT
+    res<<"exporter_image_libtiff_splitchannels_splitchannels_jpeg";
+#endif
+#ifdef LZMA_SUPPORT
+    res<<"exporter_image_libtiff_splitchannels_lzma";
+#endif
+    res<<"exporter_image_libtiff_splitchannels_64";
+#ifdef ZIP_SUPPORT
+    res<<"exporter_image_libtiff_splitchannels_deflate_64";
+#endif
+#ifdef LZW_SUPPORT
+    res<<"exporter_image_libtiff_splitchannels_lzw_64";
+#endif
+#ifdef JPEG_SUPPORT
+    res<<"exporter_image_libtiff_splitchannels_jpeg_64";
+#endif
+#ifdef LZMA_SUPPORT
+    res<<"exporter_image_libtiff_splitchannels_lzma_64";
+#endif
+
+
+
     res<<"exporter_image_raw_double";
     res<<"exporter_image_raw_float";
 
@@ -89,6 +122,26 @@ QFExporter* QFPBasicImageExporters::createExporter(QString id) const  {
         return new QFImageWriterLibTIFF(COMPRESSION_LZMA, tr(", LZMA compression"), false, false);
     } else if (id=="exporter_image_libtiff_deflate_64") {
         return new QFImageWriterLibTIFF(COMPRESSION_DEFLATE, tr(", ZIP/Deflate compression"), false, false);
+    } else if (id=="exporter_image_libtiff_splitchannels") {
+        return new QFImageWriterLibTIFF(COMPRESSION_NONE, tr(", no compression"), true, true);
+    } else if (id=="exporter_image_libtiff_splitchannels_lzw") {
+        return new QFImageWriterLibTIFF(COMPRESSION_LZW, tr(", LZW compression"), true, true);
+    } else if (id=="exporter_image_libtiff_splitchannels_jpeg") {
+        return new QFImageWriterLibTIFF(COMPRESSION_JPEG, tr(", JPEG compression"), true, true);
+    } else if (id=="exporter_image_libtiff_splitchannels_lzma") {
+        return new QFImageWriterLibTIFF(COMPRESSION_LZMA, tr(", LZMA compression"), true, true);
+    } else if (id=="exporter_image_libtiff_splitchannels_deflate") {
+        return new QFImageWriterLibTIFF(COMPRESSION_DEFLATE, tr(", ZIP/Deflate compression"), true, true);
+    } else if (id=="exporter_image_libtiff_splitchannels_64") {
+        return new QFImageWriterLibTIFF(COMPRESSION_NONE, tr(", no compression"), false, true);
+    } else if (id=="exporter_image_libtiff_splitchannels_lzw_64") {
+        return new QFImageWriterLibTIFF(COMPRESSION_LZW, tr(", LZW compression"), false, true);
+    } else if (id=="exporter_image_libtiff_splitchannels_jpeg_64") {
+        return new QFImageWriterLibTIFF(COMPRESSION_JPEG, tr(", JPEG compression"), false, true);
+    } else if (id=="exporter_image_libtiff_splitchannels_lzma_64") {
+        return new QFImageWriterLibTIFF(COMPRESSION_LZMA, tr(", LZMA compression"), false, true);
+    } else if (id=="exporter_image_libtiff_splitchannels_deflate_64") {
+        return new QFImageWriterLibTIFF(COMPRESSION_DEFLATE, tr(", ZIP/Deflate compression"), false, true);
     } else if (id=="exporter_image_raw_double") {
         return new QFImageWriterRAWDouble();
     } else if (id=="exporter_image_raw_float") {
