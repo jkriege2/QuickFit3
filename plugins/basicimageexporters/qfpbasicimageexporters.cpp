@@ -157,7 +157,7 @@ QString QFPBasicImageExporters::pluginOptionsName() const
 
 QIcon QFPBasicImageExporters::pluginOptionsIcon() const
 {
-    return QIcon(QIcon(":/importers_basicimages/icon_large.png"));
+    return QIcon(QIcon(":/exporters_basicimages/icon_large.png"));
 }
 
 QFPluginOptionsWidget *QFPBasicImageExporters::createOptionsWidget(QWidget *parent)
