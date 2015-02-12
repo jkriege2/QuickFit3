@@ -44,7 +44,9 @@ mkdir -p $FNAME
 for i in ${BASENAME}*.*; do 
   cp -v "$i" "./$FNAME/${FNAME}${i/$BASENAME}"; 
 done
-
+for i in target_id*.*; do 
+  cp -v "$i" "./$FNAME/${TARGETNAME}${i/target_id}"; 
+done
 mkdir -p $FNAME/translations
 mkdir -p $FNAME/examples
 mkdir -p $FNAME/assets

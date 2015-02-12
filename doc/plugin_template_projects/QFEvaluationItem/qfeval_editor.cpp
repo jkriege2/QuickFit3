@@ -310,7 +310,7 @@ void QFEVALEditor::createReportDoc(QTextDocument* document) {
     document->documentLayout()->registerHandler(PicTextFormat, picInterface);
 
 	
-	QTexttablePic* tablePic = cursor.inserttablePic(2,1, tablePicFormat);
+	QTextTable* tablePic = cursor.insertTable(2,1, tableFormat);
     {
 	    // insert a plot from ui->plotter
         QTextCursor tabCursor=tablePic->cellAt(0, 0).firstCursorPosition();

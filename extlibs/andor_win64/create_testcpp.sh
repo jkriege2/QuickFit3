@@ -39,7 +39,7 @@ sed '/CALLS_HERE/ {
 }' test.~cpp > test.cpp
 
 
-echo 'LIBRARY atmcd32d.dll
+echo 'LIBRARY atmcd64d.dll
 EXPORTS' > atmcd64d.def
 
 dlltool -d atmcd64d.def --dllname atmcd64d.dll --output-lib libandor.a
@@ -91,24 +91,30 @@ cp test1.~cp test1.cpp
 
 
 g++ test1.cpp -o test1.exe -L. -landor 2> err.txt
-cp err.txt  err_out.txt
-sed -n '/.*__imp.*/p' err.txt > err.~tx
+cp err.txt err_out.txt
+sed -n '/.*_imp_.*/p' err.txt > err.~tx
+cp err.~tx err1.txt
 cp err.~tx err.txt
-sed 's/.*__imp_//g' err.txt > err.~tx
+sed 's/.*_*_imp__*//g' err.txt > err.~tx
+cp err.~tx err2.txt
 cp err.~tx err.txt
 sed 's/.*exit status.*//g' err.txt > err.~tx
+cp err.~tx err3.txt
 cp err.~tx err.txt
 sed 's/'\''//g' err.txt > err.~tx
+cp err.~tx err4.txt
 cp err.~tx err.txt
 sed 's/.*undefined reference.*//g' err.txt > err.~tx
+cp err.~tx err5.txt
 cp err.~tx err.txt
 sed 's/.*undefined reference.*//g' err.txt > err.~tx
+cp err.~tx err6.txt
 cp err.~tx err.txt
 
 sed '$r err.txt' <atmcd64d.def >atmcd64d.~def
 cp atmcd64d.~def atmcd64d.def
 dlltool -d atmcd64d.def --dllname atmcd64d.dll --output-lib libandor.a -k
-rm -f test.~cpp test1.cpp err.~tx  err.txt test1.exe atmcd32d.~h atmcd32d.~hh
+#rm -f test.~cpp test1.cpp err.~tx  err.txt test1.exe atmcd32d.~h atmcd32d.~hh
 
 
 

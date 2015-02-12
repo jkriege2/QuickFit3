@@ -173,7 +173,7 @@ void QFEvalBeadScanPSFEditor::highlightingChanged(QFRawDataRecord* formerRecord,
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
     QString resultID=QString(current->getType()+QString::number(current->getID())).toLower();
     QFRawDataRecord* record=currentRecord; // possibly to a qobject_cast<> to the data type/interface you are working with here:
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(currentRecord);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(currentRecord);
     //disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(displayData()));
 
     if (record && data && eval) { // if we have a valid object, update
@@ -213,7 +213,7 @@ void QFEvalBeadScanPSFEditor::highlightingChanged(QFRawDataRecord* formerRecord,
 void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
     if ((!record)||(!eval)||(!data)) return;
 
@@ -846,7 +846,7 @@ void QFEvalBeadScanPSFEditor::displayResults()
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     //disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(displayData()));
     bool hasRes=false;
 
@@ -969,7 +969,7 @@ void QFEvalBeadScanPSFEditor::on_chkMedianFIlter_toggled(bool value)
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
 
 
     if (data && eval) {
@@ -983,7 +983,7 @@ void QFEvalBeadScanPSFEditor::on_spinA_valueChanged(double value) {
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
 
 
     if (data && eval) {
@@ -996,7 +996,7 @@ void QFEvalBeadScanPSFEditor::on_spinPSFHeight_valueChanged(double value)
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
 
 
     if (data && eval) {
@@ -1009,7 +1009,7 @@ void QFEvalBeadScanPSFEditor::on_spinPSFWidth_valueChanged(double value)
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
 
 
     if (data && eval) {
@@ -1022,7 +1022,7 @@ void QFEvalBeadScanPSFEditor::on_spinROIZ_valueChanged(int value)
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
 
 
     if (data && eval) {
@@ -1035,7 +1035,7 @@ void QFEvalBeadScanPSFEditor::on_spinPixPerFrame_valueChanged(int value)
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
 
 
     if (data && eval) {
@@ -1048,7 +1048,7 @@ void QFEvalBeadScanPSFEditor::on_spinWZFraction_valueChanged(double value)
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
 
 
     if (data && eval) {
@@ -1062,7 +1062,7 @@ void QFEvalBeadScanPSFEditor::saveROI(const QString &filename, const QString& fo
 {
     if (!current) return;
     QFRawDataRecord* record=rdr;
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
     if ((!record)||(!eval)||(!data)) return;
 
@@ -1183,7 +1183,7 @@ void QFEvalBeadScanPSFEditor::on_btnSaveAvgROI_clicked()
 {
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
     if ((!record)||(!eval)||(!data)) return;
 
@@ -1332,7 +1332,7 @@ void QFEvalBeadScanPSFEditor::on_spinROIXY_valueChanged(int value)
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
 
 
     if (data && eval) {
@@ -1344,7 +1344,7 @@ void QFEvalBeadScanPSFEditor::on_spinZ_valueChanged(double value) {
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFEvalBeadScanPSFItem* eval=qobject_cast<QFEvalBeadScanPSFItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
 
     if (data && eval) {
         record->setQFProperty(eval->getEvaluationResultID()+"_DELTAZ", value, false, false);

@@ -58,8 +58,8 @@ QFEvaluationEditor* QFEvalBeadScanPSFItem::createEditor(QFPluginServices* servic
     return new QFEvalBeadScanPSFEditor(services, propEditor, parent);
 };
 
-bool QFEvalBeadScanPSFItem::isApplicable(QFRawDataRecord* record) const {
-     return qobject_cast<QFRDRImageStackInterface*>(record);
+bool QFEvalBeadScanPSFItem::isApplicable(const QFRawDataRecord* record) const {
+     return record->inherits("QFRDRImageStackInterface"); //dynamic_cast<const QFRDRImageStackInterface*>(record);
 }
 
 bool QFEvalBeadScanPSFItem::hasEvaluation(QFRawDataRecord* r1) {
@@ -82,7 +82,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
     if (dlgEvaluationProgress&& dlgEvaluationProgress->wasCanceled()) return; // canceled by user ?
 
     QString evalID=getEvaluationResultID();
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     QFRDRImageMaskInterface* maskI=qobject_cast<QFRDRImageMaskInterface*>(record);
     int stack=0;
     int channels=qMin(2,data->getImageStackChannels(stack));

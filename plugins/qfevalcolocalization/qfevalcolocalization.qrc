@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+<qresource>
+    <file alias="eval_colocalization/eval_colocalization.png">./images/qfevalcolocalization.png</file>
+    <file alias="eval_colocalization/eval_colocalization_small.png">./images/qfevalcolocalization_small.png</file>
+</qresource>
+</RCC>

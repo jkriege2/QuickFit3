@@ -81,6 +81,14 @@ void QFRDRImageStackPlugin::init()
         services->registerWizard("project_wizards", tr("PSF Analysis"), QIcon(QFPluginServices::getInstance()->getEvaluationItemFactory()->getIconFilename("eval_beadscanpsf")), this, SLOT(startProjectWizardPSFAnalysis()));
         services->registerWizard("rdr_wizards", tr("Image Stacks for PSF Analysis"), QIcon(QFPluginServices::getInstance()->getEvaluationItemFactory()->getIconFilename("eval_beadscanpsf")), this, SLOT(startProjectWizardPSFAnalysisData()));
     }
+    if (QFPluginServices::getInstance()->getEvaluationItemFactory()->contains("eval_cameracalibration")) {
+        services->registerWizard("project_wizards", tr("Camera Calibration"), QIcon(QFPluginServices::getInstance()->getEvaluationItemFactory()->getIconFilename("eval_cameracalibration")), this, SLOT(startProjectWizardCamCalibAnalysis()));
+        services->registerWizard("rdr_wizards", tr("Image Stacks for Camera Calibration Analysis"), QIcon(QFPluginServices::getInstance()->getEvaluationItemFactory()->getIconFilename("eval_cameracalibration")), this, SLOT(startProjectWizardCamCalibAnalysisData()));
+    }
+    if (QFPluginServices::getInstance()->getEvaluationItemFactory()->contains("eval_colocalization")) {
+        services->registerWizard("project_wizards", tr("Colocalization Analysis"), QIcon(QFPluginServices::getInstance()->getEvaluationItemFactory()->getIconFilename("eval_colocalization")), this, SLOT(startProjectWizardColocAnalysis()));
+        services->registerWizard("rdr_wizards", tr("Image Stacks for Colocalization Analysis"), QIcon(QFPluginServices::getInstance()->getEvaluationItemFactory()->getIconFilename("eval_colocalization")), this, SLOT(startProjectWizardColocAnalysisData()));
+    }
 
 
 
@@ -346,7 +354,7 @@ void QFRDRImageStackPlugin::startProjectWizardPSFAnalysis(bool insertEval)
 
 
     wiz->addPage(wizSelfiles=new QFSelectFilesListWizardPage(tr("Image stack files ...")));
-    wizSelfiles->setSubTitle(tr("Select one or more image stack files, that contain your lightsheet scan. Each file will be treated as one color channel in the final image stack.<br>You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
+    wizSelfiles->setSubTitle(tr("Select one or more image stack files, that contain your bedscan. If you use a DualView, each file will be imported as a separate stack. If each file contains a separate color channel, all files may be imported as a single multi-channel stack, or as separate single-channel stacks.<br>You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
     wizSelfiles->setFilters(QFRDRImageStackData::getImageFilterList(services), QFRDRImageStackData::getImageReaderIDList(services));
     wizSelfiles->setSettingsIDs("image_stack/last_imagestackwizard_dir", "image_stack/last_imagestackwizard_filter");
     wizSelfiles->setAddOnStartup(false);
@@ -460,6 +468,228 @@ void QFRDRImageStackPlugin::startProjectWizardPSFAnalysisData()
     startProjectWizardPSFAnalysis(false);
 }
 
+void QFRDRImageStackPlugin::startProjectWizardCamCalibAnalysis(bool insertEval)
+{
+    QFWizard* wiz=new QFWizard(parentWidget);
+    wiz->setWindowTitle(tr("Camera Calibration Project Wizard"));
+    wiz->addPage(new QFTextWizardPage(tr("Introduction"),
+                                      tr("This wizard will help you to perform a camera calibration from images with an intensity gradient, or different image stacks with different illumination intensities. I.e. it will help you to load the image stacks and then set all properties accordingly."),//<br><center><img src=\":/image_stack/spim_lightsheet_scan.png\"></center>"),
+                                      wiz));
+
+
+
+
+
+    wiz->addPage(wizSelfiles=new QFSelectFilesListWizardPage(tr("Image stack files ...")));
+    wizSelfiles->setSubTitle(tr("Select one or more image stack files, that contain the intensity gradients, or image stacks. <br>You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
+    wizSelfiles->setFilters(QFRDRImageStackData::getImageFilterList(services), QFRDRImageStackData::getImageReaderIDList(services));
+    wizSelfiles->setSettingsIDs("image_stack/last_imagestackwizard_dir", "image_stack/last_imagestackwizard_filter");
+    wizSelfiles->setAddOnStartup(false);
+    wizSelfiles->setOnlyOneFormatAllowed(true);
+
+    wiz->addPage(wizLSAnalysisImgPreview=new QFImagePlotWizardPage(tr("Image stack preview ...")));
+    wizLSAnalysisImgPreview->setSubTitle(tr("Please set the image properties below the overview plot!\nThe plot displays the central frame from the first file"));
+    wizSelfiles->setUserOnValidatePage(wizLSAnalysisImgPreview);
+    connect(wizSelfiles, SIGNAL(onValidate(QWizardPage*,QWizardPage*)), this, SLOT(wizLSAnalysisImgPreviewOnValidate(QWizardPage*,QWizardPage*)));
+    wizLSAnalysisImgPreview->clear();
+
+    wizLSAnalysiscmbStackMode=new QComboBox(wizLSAnalysisImgPreview);
+    wizLSAnalysiscmbStackMode->addItem(QIcon(":/image_stack/multifile_stack_large.png"), tr("multi-file image stack"));
+    wizLSAnalysiscmbStackMode->addItem(QIcon(":/image_stack/singlefile_stack_large.png"), tr("single-file image stack)"));
+    wizLSAnalysiscmbStackMode->addItem(QIcon(":/image_stack/singlefile_dvh_stack_large.png"), tr("horizontal dual-view"));
+    wizLSAnalysiscmbStackMode->addItem(QIcon(":/image_stack/singlefile_dvv_stack_large.png"), tr("vertical dual-view"));
+    wizLSAnalysiscmbStackMode->setCurrentIndex(1);
+    wizLSAnalysiscmbStackMode->setMinimumHeight(36);
+    wizLSAnalysiscmbStackMode->setIconSize(QSize(32,32));
+
+
+
+
+    if (wizLSAnalysiscmbStackMode) {
+        ProgramOptions::getConfigQComboBox(wizLSAnalysiscmbStackMode, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysiscmbStackMode");
+        wizLSAnalysisImgPreview->addRow(tr("stack mode"), wizLSAnalysiscmbStackMode);
+    }
+
+    QFTextWizardPage* last;
+    wiz->addPage(last=new QFTextWizardPage(tr("Finalize"),tr("You completed this wizard. The selected files will now be inserted as an image stack raw data records (RDR) into the project. All metadata are preset for a camera calibration."), wiz));
+    last->setFinalPage(true);
+
+
+    if (wiz->exec()) {
+        if (wizLSAnalysiscmbStackMode) {
+            ProgramOptions::setConfigQComboBox(wizLSAnalysiscmbStackMode, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysiscmbStackMode");
+        }
+        QStringList files=wizSelfiles->files();
+        QString filterid=wizSelfiles->fileFilterIDs().value(0);
+        //qDebug()<<"OK"<<files<<filters;
+        if (files.size()>0 && !filterid.isEmpty()) {
+
+            qDebug()<<filterid<<files;
+            QList<QFRawDataRecord*> ee;
+            if (wizLSAnalysiscmbStackMode->currentIndex()==0) {
+                ee<<addMultiFileImageStack(files,filterid);
+            } else if (wizLSAnalysiscmbStackMode->currentIndex()==1) {
+                for (int i=0; i<files.size(); i++) {
+                    ee<<addSingleFileDualViewImageStack('n', files[i],filterid);
+                }
+            } else if (wizLSAnalysiscmbStackMode->currentIndex()==2) {
+                for (int i=0; i<files.size(); i++) {
+                    ee<<addSingleFileDualViewImageStack('h', files[i],filterid);
+                }
+            } else if (wizLSAnalysiscmbStackMode->currentIndex()==3) {
+                for (int i=0; i<files.size(); i++) {
+                    ee<<addSingleFileDualViewImageStack('v', files[i],filterid);
+                }
+            }
+            for (int i=0; i<ee.size(); i++) {
+                QFRawDataRecord* e=ee[i];
+                QFRDRImageStackData* is=qobject_cast<QFRDRImageStackData*>(e);
+
+
+                if (e)  {
+                }
+            }
+
+            QFEvaluationItem* ev=NULL;
+            if (insertEval) {
+                ev=project->addEvaluation("eval_cameracalibration", "Camera Calibration");
+                if (ev) {
+                }
+            }
+        }
+    }
+
+
+    delete wiz;
+}
+
+void QFRDRImageStackPlugin::startProjectWizardColocAnalysisData()
+{
+    startProjectWizardColocAnalysis(false);
+}
+
+void QFRDRImageStackPlugin::startProjectWizardColocAnalysis(bool insertEval)
+{
+    QFWizard* wiz=new QFWizard(parentWidget);
+    wiz->setWindowTitle(tr("Colocalization Analysis Project Wizard"));
+    wiz->addPage(new QFTextWizardPage(tr("Introduction"),
+                                      tr("This wizard will help you to perform a colocalization analysis. I.e. it will help you to load the dual-color image stacks and then set all properties accordingly."),//<br><center><img src=\":/image_stack/spim_lightsheet_scan.png\"></center>"),
+                                      wiz));
+
+
+
+
+
+    wiz->addPage(wizSelfiles=new QFSelectFilesListWizardPage(tr("Image stack files ...")));
+    wizSelfiles->setSubTitle(tr("Select one or more image files. If you use a DualView, each file will be imported as a separate stack. If each file contains a separate color channel, all files may be imported as a single multi-channel stack, or as separate single-channel stacks.  <br>You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
+    wizSelfiles->setFilters(QFRDRImageStackData::getImageFilterList(services), QFRDRImageStackData::getImageReaderIDList(services));
+    wizSelfiles->setSettingsIDs("image_stack/last_imagestackwizard_dir", "image_stack/last_imagestackwizard_filter");
+    wizSelfiles->setAddOnStartup(false);
+    wizSelfiles->setOnlyOneFormatAllowed(true);
+
+    wiz->addPage(wizLSAnalysisImgPreview=new QFImagePlotWizardPage(tr("Image stack preview ...")));
+    wizLSAnalysisImgPreview->setSubTitle(tr("Please set the image properties below the overview plot!\nThe plot displays the central frame from the first file"));
+    wizSelfiles->setUserOnValidatePage(wizLSAnalysisImgPreview);
+    connect(wizSelfiles, SIGNAL(onValidate(QWizardPage*,QWizardPage*)), this, SLOT(wizLSAnalysisImgPreviewOnValidate(QWizardPage*,QWizardPage*)));
+    wizLSAnalysisImgPreview->clear();
+
+    wizLSAnalysiscmbStackMode=new QComboBox(wizLSAnalysisImgPreview);
+    wizLSAnalysiscmbStackMode->addItem(QIcon(":/image_stack/multifile_stack_large.png"), tr("multi-file image stack"));
+    wizLSAnalysiscmbStackMode->addItem(QIcon(":/image_stack/singlefile_stack_large.png"), tr("single-file image stack)"));
+    wizLSAnalysiscmbStackMode->addItem(QIcon(":/image_stack/singlefile_dvh_stack_large.png"), tr("horizontal dual-view"));
+    wizLSAnalysiscmbStackMode->addItem(QIcon(":/image_stack/singlefile_dvv_stack_large.png"), tr("vertical dual-view"));
+    wizLSAnalysiscmbStackMode->setCurrentIndex(1);
+    wizLSAnalysiscmbStackMode->setMinimumHeight(36);
+    wizLSAnalysiscmbStackMode->setIconSize(QSize(32,32));
+
+    if (wizLSAnalysiscmbStackMode) {
+        ProgramOptions::getConfigQComboBox(wizLSAnalysiscmbStackMode, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysiscmbStackMode");
+        wizLSAnalysisImgPreview->addRow(tr("stack mode"), wizLSAnalysiscmbStackMode);
+    }
+    if (wizLSAnalysisedtPixelSize) {
+        ProgramOptions::getConfigQDoubleSpinBox(wizLSAnalysisedtPixelSize, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysisedtPixelSize");
+        wizLSAnalysisImgPreview->addRow(tr("pixel size"), wizLSAnalysisedtPixelSize);
+    }
+    if (wizLSAnalysisedtStepSize) {
+        ProgramOptions::getConfigQDoubleSpinBox(wizLSAnalysisedtStepSize, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysisedtStepSize");
+        wizLSAnalysisImgPreview->addRow(tr("step size"), wizLSAnalysisedtStepSize);
+    }
+
+
+
+    if (wizLSAnalysiscmbStackMode) {
+        ProgramOptions::getConfigQComboBox(wizLSAnalysiscmbStackMode, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysiscmbStackMode");
+        wizLSAnalysisImgPreview->addRow(tr("stack mode"), wizLSAnalysiscmbStackMode);
+    }
+
+    QFTextWizardPage* last;
+    wiz->addPage(last=new QFTextWizardPage(tr("Finalize"),tr("You completed this wizard. The selected files will now be inserted as an image stack raw data records (RDR) into the project. All metadata are preset for a camera calibration."), wiz));
+    last->setFinalPage(true);
+
+
+    if (wiz->exec()) {
+        if (wizLSAnalysiscmbStackMode) {
+            ProgramOptions::setConfigQComboBox(wizLSAnalysiscmbStackMode, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysiscmbStackMode");
+        }
+        if (wizLSAnalysisedtPixelSize) {
+            ProgramOptions::setConfigQDoubleSpinBox(wizLSAnalysisedtPixelSize, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysisedtPixelSize");
+        }
+        if (wizLSAnalysisedtStepSize) {
+            ProgramOptions::setConfigQDoubleSpinBox(wizLSAnalysisedtStepSize, "image_stack/startProjectWizardLightsheetAnalysis/wizLSAnalysisedtStepSize");
+        }
+
+        QStringList files=wizSelfiles->files();
+        QString filterid=wizSelfiles->fileFilterIDs().value(0);
+        //qDebug()<<"OK"<<files<<filters;
+        if (files.size()>0 && !filterid.isEmpty()) {
+
+            qDebug()<<filterid<<files;
+            QList<QFRawDataRecord*> ee;
+            if (wizLSAnalysiscmbStackMode->currentIndex()==0) {
+                ee<<addMultiFileImageStack(files,filterid);
+            } else if (wizLSAnalysiscmbStackMode->currentIndex()==1) {
+                for (int i=0; i<files.size(); i++) {
+                    ee<<addSingleFileDualViewImageStack('n', files[i],filterid);
+                }
+            } else if (wizLSAnalysiscmbStackMode->currentIndex()==2) {
+                for (int i=0; i<files.size(); i++) {
+                    ee<<addSingleFileDualViewImageStack('h', files[i],filterid);
+                }
+            } else if (wizLSAnalysiscmbStackMode->currentIndex()==3) {
+                for (int i=0; i<files.size(); i++) {
+                    ee<<addSingleFileDualViewImageStack('v', files[i],filterid);
+                }
+            }
+            for (int i=0; i<ee.size(); i++) {
+                QFRawDataRecord* e=ee[i];
+                QFRDRImageStackData* is=qobject_cast<QFRDRImageStackData*>(e);
+
+
+                if (e)  {
+                    if (wizLSAnalysisedtPixelSize) e->setQFProperty("PIXEL_WIDTH", wizLSAnalysisedtPixelSize->value(), false, true);
+                    if (wizLSAnalysisedtPixelSize) e->setQFProperty("PIXEL_HEIGHT", wizLSAnalysisedtPixelSize->value(), false, true);
+                    if (wizLSAnalysisedtStepSize) e->setQFProperty("DELTAZ", wizLSAnalysisedtStepSize->value(), false, true);
+                }
+            }
+
+            QFEvaluationItem* ev=NULL;
+            if (insertEval) {
+                ev=project->addEvaluation("eval_colocalization", "Colocalization Analysis");
+                if (ev) {
+                }
+            }
+        }
+    }
+
+
+    delete wiz;
+}
+
+void QFRDRImageStackPlugin::startProjectWizardCamCalibAnalysisData()
+{
+    startProjectWizardCamCalibAnalysis(false);
+}
+
 void QFRDRImageStackPlugin::startImagestackWizard()
 {
     QFWizard* wiz=new QFWizard(parentWidget);
@@ -480,7 +710,7 @@ void QFRDRImageStackPlugin::startImagestackWizard()
 
 
     wiz->addPage(wizSelfiles=new QFSelectFilesListWizardPage(tr("Image stack files ...")));
-    wizSelfiles->setSubTitle(tr("Select one or more image stack files, that contain your lightsheet scan. Each file will be treated as one color channel in the final image stack.<br>You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
+    wizSelfiles->setSubTitle(tr("Select one or more image stack files. If you use a DualView, each file will be imported as a separate stack. If each file contains a separate color channel, all files may be imported as a single multi-channel stack, or as separate single-channel stacks.<br>You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
     wizSelfiles->setFilters(QFRDRImageStackData::getImageFilterList(services), QFRDRImageStackData::getImageReaderIDList(services));
     wizSelfiles->setSettingsIDs("image_stack/last_imagestackwizard_dir", "image_stack/last_imagestackwizard_filter");
     wizSelfiles->setAddOnStartup(false);
@@ -617,7 +847,7 @@ void QFRDRImageStackPlugin::startProjectWizardLightsheetAnalysis(bool insertEval
 
 
     wiz->addPage(wizSelfiles=new QFSelectFilesListWizardPage(tr("Image stack files ...")));
-    wizSelfiles->setSubTitle(tr("Select one or more image stack files, that contain your lightsheet scan. Each file will be treated as one color channel in the final image stack.<br>You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
+    wizSelfiles->setSubTitle(tr("Select one or more image stack files, that contain your lightsheet scan. Each file will be treated as one color channel in the final image stack. <br>You can click on '+' to add files, '-' to remove files and use the arrow buttons to change the order of the files in the list."));
     wizSelfiles->setFilters(QFRDRImageStackData::getImageFilterList(services), QFRDRImageStackData::getImageReaderIDList(services));
     wizSelfiles->setSettingsIDs("image_stack/last_lightsheetwizard_dir", "image_stack/last_lightsheetwizard_filter");
     wizSelfiles->setAddOnStartup(false);

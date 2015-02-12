@@ -65,9 +65,9 @@ QFEvaluationEditor* QFEvalCameraCalibrationItem::createEditor(QFPluginServices* 
     return new QFEvalCameraCalibrationEditor(services, propEditor, parent);
 }
 
-bool QFEvalCameraCalibrationItem::isApplicable(QFRawDataRecord* record) const {
+bool QFEvalCameraCalibrationItem::isApplicable(const QFRawDataRecord* record) const {
     /* CHECK WHETHER A GIVEN RECORD MAY BE USED TOGETHER WITH THE EVALUATION */
-    return qobject_cast<QFRDRImageStackInterface*>(record);
+    return record->inherits("QFRDRImageStackInterface"); //dynamic_cast<const QFRDRImageStackInterface*>(record);
 }
 
 bool QFEvalCameraCalibrationItem::hasEvaluation(QFRawDataRecord* r1) {

@@ -49,7 +49,7 @@ QFEvaluationEditor* QFEVALItem::createEditor(QFPluginServices* services,  QFEval
     return new QFEVALEditor(services, propEditor, parent);
 };
 
-bool QFEVALItem::isApplicable(QFRawDataRecord* record) const {
+bool QFEVALItem::isApplicable(const QFRawDataRecord* record) const {
     /* CHECK WHETHER A GIVEN RECORD MAY BE USED TOGETHER WITH THE EVALUATION */
     return true;
 }

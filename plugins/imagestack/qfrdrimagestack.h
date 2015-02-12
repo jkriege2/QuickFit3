@@ -100,6 +100,10 @@ class QFRDRImageStackPlugin : public QObject, public QFPluginRawDataRecordBase {
         void startProjectWizardLightsheetAnalysisData();
         void startProjectWizardPSFAnalysis(bool insertEval=true);
         void startProjectWizardPSFAnalysisData();
+        void startProjectWizardCamCalibAnalysis(bool insertEval=true);
+        void startProjectWizardColocAnalysisData();
+        void startProjectWizardColocAnalysis(bool insertEval=true);
+        void startProjectWizardCamCalibAnalysisData();
         void startImagestackWizard();
 
     private:

@@ -80,7 +80,7 @@ class QFEVALItem : public QFEvaluationItem {
     protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
          *         list of raw data records presented to the user */
-        virtual bool isApplicable(QFRawDataRecord* record) const;
+        virtual bool isApplicable(const QFRawDataRecord* record) const;
         
         /** \brief write object contents into XML file
          *

@@ -91,18 +91,24 @@ cp test1.~cp test1.cpp
 
 
 g++ test1.cpp -o test1.exe -L. -landor 2> err.txt
-cp err.txt  err_out.txt
-sed -n '/.*__imp.*/p' err.txt > err.~tx
+cp err.txt err_out.txt
+sed -n '/.*_imp_.*/p' err.txt > err.~tx
+cp err.~tx err1.txt
 cp err.~tx err.txt
-sed 's/.*__imp_//g' err.txt > err.~tx
+sed 's/.*_*_imp__*//g' err.txt > err.~tx
+cp err.~tx err2.txt
 cp err.~tx err.txt
 sed 's/.*exit status.*//g' err.txt > err.~tx
+cp err.~tx err3.txt
 cp err.~tx err.txt
 sed 's/'\''//g' err.txt > err.~tx
+cp err.~tx err4.txt
 cp err.~tx err.txt
 sed 's/.*undefined reference.*//g' err.txt > err.~tx
+cp err.~tx err5.txt
 cp err.~tx err.txt
 sed 's/.*undefined reference.*//g' err.txt > err.~tx
+cp err.~tx err6.txt
 cp err.~tx err.txt
 
 sed '$r err.txt' <atmcd32d.def >atmcd32d.~def

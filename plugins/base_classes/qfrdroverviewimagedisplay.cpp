@@ -606,7 +606,7 @@ void QFRDROverviewImageDisplay::connectWidgets(QFRawDataRecord *current, QFRawDa
             }
         }
 
-        QFRDRImageStackInterface* mv=qobject_cast<QFRDRImageStackInterface*>(current);
+        QFRDRImageStackInterface* mv=dynamic_cast<QFRDRImageStackInterface*>(current);
         if (mv) {
             for (int i=0; i<mv->getImageStackCount(); i++) {
                 cmbImage->addItem(QIcon(":/imaging_fcs/video.png"), mv->getImageStackDescription(i));
@@ -633,7 +633,7 @@ void QFRDROverviewImageDisplay::showFrame(int frame) {
     pltImage->getDatastore()->clear();
 
     QFRDRAdditionalImagesInterface* m=qobject_cast<QFRDRAdditionalImagesInterface*>(current);
-    QFRDRImageStackInterface* mv=qobject_cast<QFRDRImageStackInterface*>(current);
+    QFRDRImageStackInterface* mv=dynamic_cast<QFRDRImageStackInterface*>(current);
     if (m && mv && cmbImage->currentIndex()-m->getAdditionalImagesCount()>=0 && cmbImage->currentIndex()-m->getAdditionalImagesCount()<mv->getImageStackCount()) {
         int idx=cmbImage->currentIndex()-m->getAdditionalImagesCount();
         int width=mv->getImageStackWidth(idx);
@@ -733,7 +733,7 @@ void QFRDROverviewImageDisplay::displayImage() {
     player->pause();
     current->setQFProperty("imfcs_invrimgdisp_image", cmbImage->currentIndex(), false, false);
     QFRDRAdditionalImagesInterface* m=qobject_cast<QFRDRAdditionalImagesInterface*>(current);
-    QFRDRImageStackInterface* mv=qobject_cast<QFRDRImageStackInterface*>(current);
+    QFRDRImageStackInterface* mv=dynamic_cast<QFRDRImageStackInterface*>(current);
     player->setVisible(false);
     chkHistVideo->setVisible(false);
     player->pause();
@@ -928,7 +928,7 @@ void QFRDROverviewImageDisplay::updateSelectionArrays() {
 void QFRDROverviewImageDisplay::replotSelection(bool replot) {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     QFRDRAdditionalImagesInterface* m=qobject_cast<QFRDRAdditionalImagesInterface*>(current);
-    QFRDRImageStackInterface* mv=qobject_cast<QFRDRImageStackInterface*>(current);
+    QFRDRImageStackInterface* mv=dynamic_cast<QFRDRImageStackInterface*>(current);
 
     updateSelectionArrays();
 

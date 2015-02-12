@@ -206,6 +206,10 @@ SUBDIRS += plg_qfevalbeadscanpsf
 plg_qfevalbeadscanpsf.subdir=./plugins/qfevalbeadscanpsf
 plg_qfevalbeadscanpsf.depends = lib libqf3widgets
 
+SUBDIRS += plg_qfevalcolocalization
+plg_qfevalcolocalization.subdir=./plugins/qfevalcolocalization
+plg_qfevalcolocalization.depends = lib libqf3widgets
+
 !contains(QF3CONFIG, nohardwaredrivers) {
 	!macx {
 

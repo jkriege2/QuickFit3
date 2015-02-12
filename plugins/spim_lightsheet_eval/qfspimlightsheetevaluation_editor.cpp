@@ -199,7 +199,7 @@ void QFSPIMLightsheetEvaluationEditor::writeSettings() {
 
 void QFSPIMLightsheetEvaluationEditor::updateStack() {
     QFRawDataRecord* record=current->getHighlightedRecord();
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
     int stack=ui->cmbStack->currentIndex();
 
@@ -250,7 +250,7 @@ void QFSPIMLightsheetEvaluationEditor::paramChanged(int i)
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if (data && eval) {
@@ -268,7 +268,7 @@ void QFSPIMLightsheetEvaluationEditor::on_chkErrorsParam_toggled(bool checked)
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if (data && eval) {
@@ -283,7 +283,7 @@ void QFSPIMLightsheetEvaluationEditor::on_chkErrorsBeamPos_toggled(bool checked)
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if (data && eval) {
@@ -298,7 +298,7 @@ void QFSPIMLightsheetEvaluationEditor::on_chkUseMask_toggled(bool checked)
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if (data && eval) {
@@ -313,7 +313,7 @@ void QFSPIMLightsheetEvaluationEditor::on_chkEstimateInitial_toggled(bool checke
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if (data && eval) {
@@ -328,7 +328,7 @@ void QFSPIMLightsheetEvaluationEditor::on_chkScaleIntensityFit_toggled(bool chec
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if (data && eval) {
@@ -344,7 +344,7 @@ void QFSPIMLightsheetEvaluationEditor::on_cmbOrientation_currentIndexChanged(int
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if (data && eval) {
@@ -359,7 +359,7 @@ void QFSPIMLightsheetEvaluationEditor::on_cmbModel_currentIndexChanged(int index
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if (data && eval) {
@@ -374,7 +374,7 @@ void QFSPIMLightsheetEvaluationEditor::on_cmbAlgorithm_currentIndexChanged(int i
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if (data && eval) {
@@ -385,7 +385,7 @@ void QFSPIMLightsheetEvaluationEditor::on_spinDeltaX_valueChanged(double value) 
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if (data && eval) {
@@ -399,7 +399,7 @@ void QFSPIMLightsheetEvaluationEditor::on_spinDeltaZ_valueChanged(double value) 
     if (updatingData) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if (data && eval) {
@@ -590,7 +590,7 @@ void QFSPIMLightsheetEvaluationEditor::on_pltImage_plotMouseClicked(double x, do
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
     int channel=ui->cmbChannel->currentIndex();
     int stack_pos=ui->spinStackPos->value();
@@ -638,7 +638,7 @@ void QFSPIMLightsheetEvaluationEditor::highlightingChanged(QFRawDataRecord* form
     // this slot is called when the user selects a new record in the raw data record list on the RHS of this widget in the evaluation dialog
     
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(currentRecord);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(currentRecord);
     disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(displayPreview()));
 
     if (data) { // if we have a valid object, update
@@ -670,7 +670,7 @@ void QFSPIMLightsheetEvaluationEditor::displayEvaluationResults() {
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if ((!record)||(!eval)||(!data)) return;
@@ -911,7 +911,7 @@ void QFSPIMLightsheetEvaluationEditor::updateFitResultRanges()
 
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if (data && eval) {
@@ -925,7 +925,7 @@ void QFSPIMLightsheetEvaluationEditor::saveImageCutSeries()
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if ((!record)||(!eval)||(!data)) return;
@@ -1038,7 +1038,7 @@ void QFSPIMLightsheetEvaluationEditor::displayPreview() {
     if (!current) return;
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if ((!record)||(!eval)||(!data)) return;
@@ -1232,7 +1232,7 @@ bool *QFSPIMLightsheetEvaluationEditor::getCurrentMask()
 void QFSPIMLightsheetEvaluationEditor::doEvaluation(QFRawDataRecord *record) {
     if (!current) return;
     QFSPIMLightsheetEvaluationItem* eval=qobject_cast<QFSPIMLightsheetEvaluationItem*>(current);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     int stack=ui->cmbStack->currentIndex();
 
     if ((!record)||(!eval)||(!data)) return;

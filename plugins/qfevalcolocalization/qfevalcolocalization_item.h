@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2014
 	
-	last modification: $LastChangedDate: 2015-01-18 16:06:14 +0100 (So, 18 Jan 2015) $  (revision $Rev: 3726 $)
+	last modification: $LastChangedDate: 2015-02-02 16:43:09 +0100 (Mo, 02 Feb 2015) $  (revision $Rev: 3775 $)
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -20,60 +20,44 @@ Copyright (c) 2014
 */
 
 
-#ifndef QFEVALBEADSCANPSFITEM_H
-#define QFEVALBEADSCANPSFITEM_H
+#ifndef QFEVALCOLOCALIZATIONITEM_H
+#define QFEVALCOLOCALIZATIONITEM_H
 
 #include <QMap>
 #include <QSettings>
 
 #include "qfevaluationitem.h"
 #include "qfevaluationitemfactory.h"
-#include "qfrdrimagemask.h"
-#include "qfrdrimagestackinterface.h"
-#include "qftools.h"
-#include "statistics_tools.h"
-#include <typeinfo>
-#include "qflistprogressdialog.h"
-
-#include <QtGlobal>
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include <QtWidgets>
-#else
-#include <QtGui>
-#endif
-
-
-#include <QtCore>
 
 /*! \brief evaluation item class 
-    \ingroup qf3rdrdp_eval_beadscanpsf
+    \ingroup qf3evalp_eval_colocalization
 
 
     
     
 */
-class QFEvalBeadScanPSFItem : public QFEvaluationItem {
+class QFEValColocalizationItem : public QFEvaluationItem {
         Q_OBJECT
     public:
         /** \brief which data weighting should be applied */
         /** Default constructor */
-        QFEvalBeadScanPSFItem(QFProject* parent);
+        QFEValColocalizationItem(QFProject* parent);
         /** Default destructor */
-        virtual ~QFEvalBeadScanPSFItem();
+        virtual ~QFEValColocalizationItem();
 
         /** \brief return type (short type string) */
-        virtual QString getType() const { return QString("eval_beadscanpsf"); }
+        virtual QString getType() const { return QString("eval_colocalization"); };
         /** \brief return type (longer type string, user readable) */
-        virtual QString getTypeName() const { return tr("Beadscan: PSF"); }
+        virtual QString getTypeName() const { return tr("Colocalization Analysis"); };
         /** \brief return a small icon (16x16) */
-        virtual QIcon getSmallIcon() const { return QIcon(":/eval_beadscanpsf/eval_beadscanpsf_small.png"); }
+        virtual QIcon getSmallIcon() const { return QIcon(":/eval_colocalization/eval_colocalization_small.png"); };
         /** \brief return type description */
-        virtual QString getTypeDescription() const { return getTypeName(); }
+        virtual QString getTypeDescription() const { return getTypeName(); };
         /** \brief return a large icon (32x32) */
-        virtual QIcon getLargeIcon() const { return QIcon(":/eval_beadscanpsf/eval_beadscanpsf.png"); }
+        virtual QIcon getLargeIcon() const { return QIcon(":/eval_colocalization/eval_colocalization.png"); };
         /** \brief returns the number of additional editor panes for this record */
         /** \brief returns the name for the i-th editor pane */
-        virtual QString getEditorName() { return QString("Evaluation"); }
+        virtual QString getEditorName() { return QString("Evaluation"); };
         /** \brief create an object for the i-th editor pane */
         virtual QFEvaluationEditor* createEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL);
 
@@ -91,7 +75,7 @@ class QFEvalBeadScanPSFItem : public QFEvaluationItem {
 		 *  \param record the record to do the evaluation for
 		 *  \param dlgEvaluationProgress a QProgressDialog
 		 */
-        void doEvaluation(QFRawDataRecord* record, double a, double deltaZ, int ROIxy, int ROIz, int pixels_per_frame, double est_psf_width, double est_psf_height, double fitXY_Z_fraction, bool medianFilterBeforeFindBeads, QFListProgressDialog* dlgEvaluationProgress=NULL);
+        void doEvaluation(QFRawDataRecord* record, int frame=-1, int channel1=0, int channel2=1,  QProgressDialog* dlgEvaluationProgress=NULL);
 
     protected:
         /** \brief determines whether this evaluation is applicable to a given raw data record. This method is used to generate the
@@ -109,4 +93,4 @@ class QFEvalBeadScanPSFItem : public QFEvaluationItem {
 
 };
 
-#endif // QFEVALBEADSCANPSFITEM_H
+#endif // QFEVALCOLOCALIZATIONITEM_H

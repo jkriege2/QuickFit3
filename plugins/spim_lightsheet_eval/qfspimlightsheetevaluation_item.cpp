@@ -67,7 +67,7 @@ QFEvaluationEditor* QFSPIMLightsheetEvaluationItem::createEditor(QFPluginService
 
 bool QFSPIMLightsheetEvaluationItem::isApplicable(const QFRawDataRecord *record) const {
     /* CHECK WHETHER A GIVEN RECORD MAY BE USED TOGETHER WITH THE EVALUATION */
-    return qobject_cast<QFRDRImageStackInterface*>(record);
+    return (dynamic_cast<const QFRDRImageStackInterface*>(record)!=NULL);
 }
 
 bool QFSPIMLightsheetEvaluationItem::hasEvaluation(QFRawDataRecord* r1, int stack, int channel) const {
@@ -110,7 +110,7 @@ QString QFSPIMLightsheetEvaluationItem::getEvaluationResultID(int stack, int cha
 
 void QFSPIMLightsheetEvaluationItem::doEvaluation(QFRawDataRecord *record, int stack, int stack_pos, int channel, double deltaX, double deltaZ, QFFitFunction* model, QFFitAlgorithm* algorithm, Orientation orientation, bool useMask) const {
     QString resultID=getEvaluationResultID(stack, channel);
-    QFRDRImageStackInterface* data=qobject_cast<QFRDRImageStackInterface*>(record);
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     QFRDRImageMaskInterface* dataM=qobject_cast<QFRDRImageMaskInterface*>(record);
     if (data) {
         int w=data->getImageStackWidth(stack);
