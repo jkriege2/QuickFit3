@@ -176,13 +176,13 @@ void QFRDRImageStackPlugin::insertMultiFileImageStack() {
         // store the format we just used
         settings->getQSettings()->setValue("image_stack/current_format_filter", current_format_name);
 
-        addMultiFileImageStack(files, reader_id.value(format_names.indexOf(current_format_name), ""));
+        if (files.size()>0) addMultiFileImageStack(files, reader_id.value(format_names.indexOf(current_format_name), ""));
     }
 }
 
 QFRawDataRecord* QFRDRImageStackPlugin::addMultiFileImageStack(const QStringList &files, const QString& format_id)
 {
-
+    if (files.size()<=0) return NULL;
 
     // here we store some initial parameters
     QMap<QString, QVariant> initParams;
@@ -290,6 +290,7 @@ void QFRDRImageStackPlugin::addSingleFileDualViewImageStack(char dvMode)
 
 QFRawDataRecord *QFRDRImageStackPlugin::addSingleFileDualViewImageStack(char dvMode, const QString &filename, const QString &format_id)
 {
+    if (filename.isEmpty()) return NULL;
     if (project) {
         QString imType="image";
         if (dvMode=='h') imType="image_hdualview";

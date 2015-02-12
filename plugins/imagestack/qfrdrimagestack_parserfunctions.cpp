@@ -205,7 +205,7 @@ void fStack_getframe(qfmpResult &res, const qfmpResult *params, unsigned int n, 
                 res.setInvalid();
                 return;
             }
-        }  else {
+        }  else if (n>=2) {
             parser->qfmpError(QObject::tr("imagestack_getframe(rdrid,stack,...): the specified stack is no valid integer number"));
             res.setInvalid();
             return;
@@ -218,7 +218,7 @@ void fStack_getframe(qfmpResult &res, const qfmpResult *params, unsigned int n, 
                 res.setInvalid();
                 return;
             }
-        }  else {
+        }  else if (n>=3) {
             parser->qfmpError(QObject::tr("imagestack_getframe(rdrid,stack,frame,...): the specified frame is no valid integer number"));
             res.setInvalid();
             return;
@@ -234,11 +234,13 @@ void fStack_getframe(qfmpResult &res, const qfmpResult *params, unsigned int n, 
         }  else {
             if (n==4){
                 parser->qfmpError(QObject::tr("imagestack_getframe(rdrid,stack,frame,channel): the specified channel is no valid integer number"));
-            } else {
-                parser->qfmpError(QObject::tr("imagestack_getframe(rdrid,stack,frame,channel): only accepts upt to 4 parameters"));
+                res.setInvalid();
+                return;
+            } else if (n>4) {
+                parser->qfmpError(QObject::tr("imagestack_getframe(rdrid,stack,frame,channel): only accepts up to 4 parameters"));
+                res.setInvalid();
+                return;
             }
-            res.setInvalid();
-            return;
         }
 
         res.setDoubleVec(rdr->getImageStack(stack, frame, channel), rdr->getImageStackWidth(stack)*rdr->getImageStackHeight(stack));
@@ -280,7 +282,7 @@ void fStack_getstack(qfmpResult &res, const qfmpResult *params, unsigned int n, 
                 res.setInvalid();
                 return;
             }
-        }  else {
+        }  else if (n>=2 ){
             parser->qfmpError(QObject::tr("imagestack_getstack(rdrid,stack,...): the specified stack is no valid integer number"));
             res.setInvalid();
             return;
@@ -297,7 +299,7 @@ void fStack_getstack(qfmpResult &res, const qfmpResult *params, unsigned int n, 
         }  else {
             if (n==3){
                 parser->qfmpError(QObject::tr("imagestack_getstack(rdrid,stack,channel): the specified channel is no valid integer number"));
-            } else {
+            } else if (n>=3) {
                 parser->qfmpError(QObject::tr("imagestack_getstack(rdrid,stack,channel): only accepts upt to 4 parameters"));
             }
             res.setInvalid();
