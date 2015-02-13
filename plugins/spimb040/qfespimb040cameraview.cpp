@@ -34,6 +34,7 @@
 #include <QPrintDialog>
 #include <QPrintPreviewDialog>
 #include <QtGlobal>
+#include <qfversion.h>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 #include <QtWidgets>
 #else
@@ -2201,7 +2202,7 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
         QPicture& pic=picMain;
         //double scale=document->textWidth()*0.78/pic.boundingRect().width();
         //if (scale<=0) scale=1;
-        insertQPicture(tabCursor, PicTextFormat, pic, pic.boundingRect().topLeft(), QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, pic.boundingRect().topLeft(), QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.78);
     }
     {
         QTextCursor tabCursor=table->cellAt(1, 0).firstCursorPosition();
@@ -2209,7 +2210,7 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
         QPicture& pic=picMarginLeft;
         //double scale=document->textWidth()*0.18/pic.boundingRect().width();
         //if (scale<=0) scale=1;
-        insertQPicture(tabCursor, PicTextFormat, pic, pic.boundingRect().topLeft(), QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, pic.boundingRect().topLeft(), QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.18);
     }
     {
         QTextCursor tabCursor=table->cellAt(2, 1).firstCursorPosition();
@@ -2217,7 +2218,7 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
         QPicture& pic=picMarginBottom;
         //double scale=document->textWidth()*0.78/pic.boundingRect().width();
         //if (scale<=0) scale=1;
-        insertQPicture(tabCursor, PicTextFormat, pic, pic.boundingRect().topLeft(), QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, pic.boundingRect().topLeft(), QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.78);
     }
     {
         QTextCursor tabCursor=table->cellAt(2, 0).firstCursorPosition();
@@ -2254,42 +2255,14 @@ void QFESPIMB040CameraView::createReportDoc(QTextDocument* document) {
 }
 
 void QFESPIMB040CameraView::saveReport() {
+
+
     if (m_stopresume) m_stopresume->stop();
-    /* it is often a good idea to have a possibility to save or print a report about the fit results.
-       This is implemented in a generic way here.    */
+    QTextDocument* doc=new QTextDocument();
+    createReportDoc(doc);
+    qfSaveReport(doc, QString("QuickFit %1 CameraView Report").arg(qfInfoVersionFull()), QString("QFESPIMB040CameraView"), this);
+    delete doc;
 
-    QString fn = qfGetSaveFileName(this, tr("Save Report"),
-                                lastImagepath,
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-                                   tr("PDF File (*.pdf);;PostScript File (*.ps)"));
-#else
-                                    tr("PDF File (*.pdf)"));
-#endif
-
-    if (!fn.isEmpty()) {
-        lastImagepath=QFileInfo(fn).absolutePath();
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-
-        QFileInfo fi(fn);
-        QPrinter* printer=new QPrinter();
-        printer->setPaperSize(QPrinter::A4);
-        printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-        printer->setOrientation(QPrinter::Portrait);
-        printer->setOutputFormat(QPrinter::PdfFormat);
-        printer->setColorMode(QPrinter::Color);
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-        if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
-#endif
-        printer->setColorMode(QPrinter::Color);
-        printer->setOutputFileName(fn);
-        QTextDocument* doc=new QTextDocument();
-        doc->setTextWidth(printer->pageRect().size().width());
-        createReportDoc(doc);
-        doc->print(printer);
-        delete doc;
-        delete printer;
-        QApplication::restoreOverrideCursor();
-    }
     if (m_stopresume) m_stopresume->resume();
 }
 

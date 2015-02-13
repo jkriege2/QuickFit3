@@ -1769,7 +1769,7 @@ void QFFCSMaxEntEvaluationEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*0.45/pic.boundingRect().width(); //0.62
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("correlation data, model and residuals:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.45);
     }
     QApplication::processEvents();
 
@@ -1782,7 +1782,7 @@ void QFFCSMaxEntEvaluationEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*0.45/pic.boundingRect().width(); //0.62
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("Maximum Entropy Distribution:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.45);
     }
     QApplication::processEvents();
 
@@ -1796,7 +1796,7 @@ void QFFCSMaxEntEvaluationEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*0.45/pic.boundingRect().width();//0.3
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("residual histogram:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.45);
     }
     QApplication::processEvents();
     {
@@ -1808,7 +1808,7 @@ void QFFCSMaxEntEvaluationEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*0.45/pic.boundingRect().width();//0.3
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("residual correlations:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.45);
     }
 
 

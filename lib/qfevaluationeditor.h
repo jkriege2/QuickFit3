@@ -30,6 +30,7 @@
 #include <QTextDocument>
 #include "qfrawdatarecord.h"
 #include <QVariant>
+#include "qfversion.h"
 
 // forward declaration
 class QFEvaluationItem;

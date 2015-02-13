@@ -23,7 +23,10 @@
 #include "qfrawdatarecord.h"
 #include "qfrawdatapropertyeditor.h"
 #include <QCloseEvent>
-
+#include "qfversion.h"
+#if (QT_VERSION > QT_VERSION_CHECK(5, 2, 0))
+#include <QPdfWriter>
+#endif
 QFRawDataEditor::QFRawDataEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):
     QWidget(parent)
 {
@@ -83,64 +86,18 @@ void QFRawDataEditor::sendEditorCommand(const QString &command, const QVariant &
 
 void QFRawDataEditor::saveReport()
 {
+    QTextDocument* doc=new QTextDocument();
+    /*QPrinter* printer=new QPrinter();//QPrinter::HighResolution);
+    printer->setOutputFormat(QPrinter::PdfFormat);
+    printer->setPaperSize(QPrinter::A4);
+    printer->setPageMargins(10,10,10,10,QPrinter::Millimeter);
+    printer->setOrientation(QPrinter::Portrait);
+    printer->setColorMode(QPrinter::Color);
+    doc->setTextWidth(printer->pageRect().size().width());*/
+    createReportDoc(doc);
+    qfSaveReport(doc, QString("QuickFit %1 Help: %2 Report").arg(qfInfoVersionFull()).arg(current->getName()), QString("%2/rdreditor%1/").arg(peID).arg(current->getType()), this);
+    delete doc;
 
-    /* it is often a good idea to have a possibility to save or print a report about the fit results.
-       This is implemented in a generic way here.    */
-
-    QString currentSaveDirectory="";
-    if (settings && current) currentSaveDirectory=settings->getQSettings()->value(QString("%2/evaluationeditor%1/last_report_directory").arg(peID).arg(current->getType()), currentSaveDirectory).toString();
-
-    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
-                                currentSaveDirectory,
-                            #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-                                tr("PDF File (*.pdf);;PostScript File (*.ps)")
-                            #else
-                                tr("PDF File (*.pdf)")
-                            #endif
-                            );
-
-
-    if (!fn.isEmpty()) {
-        settings->getQSettings()->setValue(QString("%2/evaluationeditor%1/last_report_directory").arg(peID).arg(current->getType()), currentSaveDirectory);
-        currentSaveDirectory=QFileInfo(fn).absolutePath();
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        QProgressDialog progress(tr("Exporting ..."), "", 0, 100, NULL);
-        progress.setWindowModality(Qt::WindowModal);
-        //progress.setHasCancel(false);
-        progress.setLabelText(tr("saving report <br> to '%1' ...").arg(fn));
-        progress.setValue(50);
-        progress.show();
-
-        QFileInfo fi(fn);
-        QPrinter* printer=new QPrinter();//QPrinter::HighResolution);
-        printer->setPaperSize(QPrinter::A4);
-        printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-        printer->setOrientation(QPrinter::Portrait);
-        printer->setOutputFormat(QPrinter::PdfFormat);
-        printer->setColorMode(QPrinter::Color);
-        QTextDocument* doc=new QTextDocument();
-        doc->setTextWidth(printer->pageRect().size().width());
-        createReportDoc(doc);
-        if (fi.suffix().toLower()=="ps" || fi.suffix().toLower()=="pdf") {
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-            if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
-#endif
-            printer->setColorMode(QPrinter::Color);
-            printer->setOutputFileName(fn);
-            doc->print(printer);
-        } else if (fi.suffix().toLower()=="odf") {
-            QTextDocumentWriter writer(fn, "odf");
-            writer.write(doc);
-        } else if ((fi.suffix().toLower()=="html")||(fi.suffix().toLower()=="htm")) {
-            QTextDocumentWriter writer(fn, "html");
-            writer.write(doc);
-        }
-        //qDebug()<<doc->toHtml();
-        delete doc;
-        delete printer;
-        progress.accept();
-        QApplication::restoreOverrideCursor();
-    }
 }
 
 void QFRawDataEditor::printReport()

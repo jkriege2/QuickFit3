@@ -48,7 +48,10 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qffitfunction.h"
 #include "qffitfunctionmanager.h"
 #include "qffitfunctionplottools.h"
-
+#include "qfversion.h"
+#if (QT_VERSION > QT_VERSION_CHECK(5, 2, 0))
+#include <QPdfWriter>
+#endif
 
 QFHistogramView::QFHistogramView(QWidget *parent) :
     QWidget(parent)
@@ -866,64 +869,13 @@ void QFHistogramView::printReport()
 
 void QFHistogramView::saveReport()
 {
-    /* it is often a good idea to have a possibility to save or print a report about the fit results.
-       This is implemented in a generic way here.    */
-
-    QString currentSaveDirectory="";
-    currentSaveDirectory=ProgramOptions::getConfigValue(QString("QFHistogramView/last_report_directory"), currentSaveDirectory).toString();
-
-    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
-                                currentSaveDirectory,
-                                          #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-                                              tr("PDF File (*.pdf);;PostScript File (*.ps);;Open Document file (*.odf);;HTML file (*.html)"));
-                                          #else
-                                              tr("PDF File (*.pdf);;Open Document file (*.odf);;HTML file (*.html)"));
-                                          #endif
+    QTextDocument* doc=new QTextDocument();
+    QTextCursor cur(doc);
+    writeReport(cur, doc);
+    qfSaveReport(doc, QString("QuickFit %1 Histogram Report").arg(qfInfoVersionFull()), QString("QFHistogramView"), this);
+    delete doc;
 
 
-
-    if (!fn.isEmpty()) {
-        currentSaveDirectory=QFileInfo(fn).absolutePath();
-        ProgramOptions::setConfigValue(QString("QFHistogramView/last_report_directory"), currentSaveDirectory);
-        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-        QProgressDialog progress(tr("Exporting ..."), "", 0,100,NULL);
-        progress.setWindowModality(Qt::WindowModal);
-        //progress.setHasCancel(false);
-        progress.setLabelText(tr("saving report <br> to '%1' ...").arg(fn));
-        progress.show();
-        progress.setValue(50);
-
-        QFileInfo fi(fn);
-        QPrinter* printer=new QPrinter();//QPrinter::HighResolution);
-        printer->setPaperSize(QPrinter::A4);
-        printer->setPageMargins(15,15,15,15,QPrinter::Millimeter);
-        printer->setOrientation(QPrinter::Portrait);
-        printer->setOutputFormat(QPrinter::PdfFormat);
-        printer->setColorMode(QPrinter::Color);
-        QTextDocument* doc=new QTextDocument();
-        doc->setTextWidth(printer->pageRect().size().width());
-        QTextCursor cur(doc);
-        writeReport(cur, doc);
-        if (fi.suffix().toLower()=="ps" || fi.suffix().toLower()=="pdf") {
-#if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-            if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
-#endif
-            printer->setColorMode(QPrinter::Color);
-            printer->setOutputFileName(fn);
-            doc->print(printer);
-        } else if (fi.suffix().toLower()=="odf") {
-            QTextDocumentWriter writer(fn, "odf");
-            writer.write(doc);
-        } else if ((fi.suffix().toLower()=="html")||(fi.suffix().toLower()=="htm")) {
-            QTextDocumentWriter writer(fn, "html");
-            writer.write(doc);
-        }
-        //qDebug()<<doc->toHtml();
-        delete doc;
-        delete printer;
-        progress.accept();
-        QApplication::restoreOverrideCursor();
-    }
 }
 
 void QFHistogramView::copyData()
@@ -1026,7 +978,7 @@ void QFHistogramView::writeReport(QTextCursor& cursor, QTextDocument* document) 
         delete painter;
         double scale=0.5*document->textWidth()/double(pic.boundingRect().width());
         if (scale<=0) scale=1;
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.5);
 
         tabCursor=table->cellAt(0, 1).firstCursorPosition();
         tabCursor.insertText(tr("\n"), fTextBoldSmall);
@@ -1038,7 +990,7 @@ void QFHistogramView::writeReport(QTextCursor& cursor, QTextDocument* document) 
         scale=0.4*document->textWidth()/double(picT.boundingRect().width());
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("statistics table:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale, 0.4);
 
     }
     cursor.movePosition(QTextCursor::End);

@@ -6416,7 +6416,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*w1/allwidth*0.9/pic.boundingRect().width();
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("parameter image:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, w1/allwidth*0.9);
     }
     QApplication::processEvents();
     if (chkParamImage2Visible->isChecked()) {
@@ -6428,7 +6428,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*w2/allwidth*0.9/pic.boundingRect().width();
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("parameter image 2:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, w2/allwidth*0.9);
     }
     QApplication::processEvents();
     if (chkMaskVisible->isChecked()){
@@ -6440,7 +6440,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*w4/allwidth*0.9/pic.boundingRect().width();
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("mask:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, w4/allwidth*0.9);
     }
     QApplication::processEvents();
     if (chkOverviewVisible->isChecked()){
@@ -6452,7 +6452,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*w3/allwidth*0.9/pic.boundingRect().width();
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("overview image:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, w3/allwidth*0.9);
     }
     cursor.movePosition(QTextCursor::End);
     QApplication::processEvents();
@@ -6467,7 +6467,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         double scale=0.65*document->textWidth()/double(pic.boundingRect().width());
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("correlation curves:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.65);
 
         tabCursor=table->cellAt(0,1).firstCursorPosition();
         tabCursor.insertText(tr("\n"), fTextBoldSmall);
@@ -6490,7 +6490,7 @@ void QFRDRImagingFCSImageEditor::createReportDoc(QTextDocument* document) {
         scale=0.3*document->textWidth()/double(picT.boundingRect().width());
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("fit results table:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale, 0.3);
     }
     QApplication::processEvents();
     cursor.movePosition(QTextCursor::End);

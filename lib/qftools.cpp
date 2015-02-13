@@ -38,6 +38,12 @@
 #include "qfpluginservices.h"
 #include "qfhtmlhelptools.h"
 #include <QMutex>
+#include <QPrinter>
+#include <QPrinterInfo>
+#include "qfversion.h"
+#if (QT_VERSION > QT_VERSION_CHECK(5, 2, 0))
+#include <QPdfWriter>
+#endif
 
 #ifndef __LINUX__
 # if defined(linux)
@@ -1701,4 +1707,85 @@ QString qfHTMLExcape(const QString& input) {
 #else
     return Qt::escape(input);
 #endif
+}
+
+
+void qfSaveReport(QTextDocument* doc, const QString& title, const QString& prefix, QWidget* parent){
+    QString currentSaveDirectory="";
+
+    qreal oldMargin=doc->documentMargin();
+    doc->setDocumentMargin(0);
+
+    QStringList filters;
+    #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        filters<<QObject::tr("PDF File (*.pdf)");
+    #else
+        filters<<QObject::tr("PDF File (*.pdf)");
+        filters<<QObject::tr("PostScript File (*.ps)");
+    #endif
+    int firstDForm=filters.size();
+    QList<QByteArray> dforms=QTextDocumentWriter::supportedDocumentFormats();
+    for (int i=0; i<dforms.size(); i++) {
+        filters<<QString("%1 File (*.%2)").arg(QString::fromLatin1(dforms[i])).arg(QString::fromLatin1(dforms[i].toLower()));
+    }
+    QString selFilter="";
+    QString fn = qfGetSaveFileNameSet(prefix, parent, QObject::tr("Save Report"),
+                                currentSaveDirectory,
+                                filters.join(";;"), &selFilter);
+    int filterID=filters.indexOf(selFilter);
+
+    if (!fn.isEmpty()) {
+        currentSaveDirectory=QFileInfo(fn).absolutePath();
+        QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+        QProgressDialog progress(QObject::tr("Saving Report ..."), "", 0, 100, NULL);
+        progress.setWindowModality(Qt::WindowModal);
+        //progress.setHasCancel(false);
+        progress.setLabelText(QObject::tr("saving report <br> to '%1' ...").arg(fn));
+        progress.setValue(50);
+        progress.show();
+
+        QFileInfo fi(fn);
+
+        QPrinter* printer=new QPrinter();//QPrinter::HighResolution);
+        printer->setOutputFormat(QPrinter::PdfFormat);
+        printer->setPaperSize(QPrinter::A4);
+        printer->setPageMargins(10,10,10,10,QPrinter::Millimeter);
+        printer->setOrientation(QPrinter::Portrait);
+        printer->setColorMode(QPrinter::Color);
+
+
+        if (filterID==0
+        #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+            ||filterID==1
+        #endif
+            ) {
+    #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+            if (filterID==1) printer->setOutputFormat(QPrinter::PostScriptFormat);
+    #endif
+    #if (QT_VERSION > QT_VERSION_CHECK(5, 2, 0))
+            QPdfWriter pdf(fn);
+            pdf.setPageMargins(QMarginsF(10,10,10,10),QPageLayout::Millimeter);
+            pdf.setPageOrientation(QPageLayout::Portrait);
+            pdf.setCreator(QString("QuickFit %1").arg(qfInfoVersionFull()));
+            pdf.setPageSize(QPageSize(QPageSize::A4));
+            pdf.setTitle(title);
+            pdf.setResolution(300);
+            doc->setTextWidth(pdf.pageLayout().paintRect().width());
+            doc->print(&pdf);
+    #else
+            printer->setColorMode(QPrinter::Color);
+            printer->setOutputFileName(fn);
+            doc->setTextWidth(printer->pageSize().width());
+            doc->print(printer);
+    #endif
+        } else if (filterID>firstDForm) {
+            QTextDocumentWriter writer(fn, dforms.value(filterID-firstDForm, "HTML"));
+            writer.write(doc);
+        }
+        //qDebug()<<doc->toHtml();
+        delete printer;
+        progress.accept();
+        QApplication::restoreOverrideCursor();
+    }
+    doc->setDocumentMargin(oldMargin);
 }

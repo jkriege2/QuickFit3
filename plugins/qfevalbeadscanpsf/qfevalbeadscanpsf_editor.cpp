@@ -1591,7 +1591,7 @@ void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
                 double scale=0.3*document->textWidth()/double(pic.boundingRect().width());
                 if (scale<=0) scale=1;
                 tabCursor.insertText(tr("XZ-cut:\n"), fTextBoldSmall);
-                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.3);
                 QApplication::processEvents();
 
             }
@@ -1605,7 +1605,7 @@ void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
                 double scale=0.3*document->textWidth()/double(pic.boundingRect().width());
                 if (scale<=0) scale=1;
                 tabCursor.insertText(tr("YZ-cut:\n"), fTextBoldSmall);
-                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.3);
                 QApplication::processEvents();
 
             }
@@ -1619,7 +1619,7 @@ void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
                 double scale=0.3*document->textWidth()/double(pic.boundingRect().width());
                 if (scale<=0) scale=1;
                 tabCursor.insertText(tr("XY-cut:\n"), fTextBoldSmall);
-                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.3);
                 QApplication::processEvents();
 
             }
@@ -1633,7 +1633,7 @@ void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
                 double scale=0.3*document->textWidth()/double(pic.boundingRect().width());
                 if (scale<=0) scale=1;
                 tabCursor.insertText(tr("X-cut:\n"), fTextBoldSmall);
-                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.3);
                 QApplication::processEvents();
 
             }
@@ -1647,7 +1647,7 @@ void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
                 double scale=0.3*document->textWidth()/double(pic.boundingRect().width());
                 if (scale<=0) scale=1;
                 tabCursor.insertText(tr("Y-cut:\n"), fTextBoldSmall);
-                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.3);
                 QApplication::processEvents();
 
             }
@@ -1661,7 +1661,7 @@ void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
                 double scale=0.3*document->textWidth()/double(pic.boundingRect().width());
                 if (scale<=0) scale=1;
                 tabCursor.insertText(tr("Z-cut:\n"), fTextBoldSmall);
-                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.3);
                 QApplication::processEvents();
 
             }
@@ -1675,7 +1675,7 @@ void QFEvalBeadScanPSFEditor::createReportDoc(QTextDocument* document) {
                 double scale=0.63*document->textWidth()/double(pic.boundingRect().width());
                 if (scale<=0) scale=1;
                 tabCursor.insertText(tr("X/Y(Z)-cuts:\n"), fTextBoldSmall);
-                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+                insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.63);
                 QApplication::processEvents();
 
             }

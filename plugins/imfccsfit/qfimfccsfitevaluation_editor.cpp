@@ -2220,7 +2220,7 @@ void QFImFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
         double scale=0.65*document->textWidth()/double(pic.boundingRect().width());
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("correlation curves:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.65);
 
         tabCursor=table->cellAt(0, 1).firstCursorPosition();
         QPicture picO;
@@ -2230,7 +2230,7 @@ void QFImFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
         scale=0.3*document->textWidth()/double(picO.boundingRect().width());
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("overview:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, picO, QSizeF(picO.boundingRect().width(), picO.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, picO, QSizeF(picO.boundingRect().width(), picO.boundingRect().height())*scale, 0.3);
 
         tabCursor=table->cellAt(1,0).firstCursorPosition();
         tabCursor.insertText(tr("\n"), fTextBoldSmall);
@@ -2241,7 +2241,7 @@ void QFImFCCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
         scale=0.95*document->textWidth()/double(picT.boundingRect().width());
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("fit results table:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale, 0.95);
     }
     QApplication::processEvents();
     cursor.movePosition(QTextCursor::End);

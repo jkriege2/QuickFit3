@@ -51,6 +51,7 @@
 #include <QBitArray>
 
 
+
 #define DEFINE_READWRITE_LOCKERS(CLASS, readLockF, writeLockF, readUnlockF, writeUnlockF) \
     class QFLIB_EXPORT CLASS##ReadLocker {\
         private:\
@@ -559,6 +560,10 @@ QFLIB_EXPORT QStringList deescapifyList(const QString& text, char stringDelim, c
  */
 QFLIB_EXPORT QStringList deescapifyList(const QString& text);
 
+/*! \brief saves the contents of the QTextDocument doc into a file (user is asked for filename) in one of different suitable formats (PDF, PS, ODF, HTM, ...)
+    \ingroup qf3lib_tools
+ */
+QFLIB_EXPORT void qfSaveReport(QTextDocument* doc, const QString& title=QString("Report"), const QString& prefix="qf3_reports/", QWidget* parent=NULL);
 
 
 

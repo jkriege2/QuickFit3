@@ -7,20 +7,20 @@
     <body>
         $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
         
-        <p>This 3D fit function describes a Gaussian function with three different widths $( w_1,w_2,w_3)$ along its three major axes $( \vec{e}_r, \vec{e}_\phi, \vec{e}_\theta )$: $$bmath:f(\vec{r})=A_0+A\cdot\exp\left[-2\cdot\frac{\left((\vec{r}-\vec{x}_0)\cdot(\mathrm{\mathbf{M}}(\alpha)\vec{e}_\theta)\right)^2}{w_1^2}-2\cdot\frac{\left((\vec{r}-\vec{x}_0)\cdot(\mathrm{\mathbf{M}}(\alpha)\vec{e}_\phi)\right)^2}{w_2^2}-2\cdot\frac{\left((\vec{r}-\vec{x}_0)\cdot\vec{e}_r\right)^2}{w_3^2}\right]$$
+        <p>This 3D fit function describes a Gaussian function with three different widths $( w_1,w_2,w_3 )$ along its three major axes $( \vec{e}_r, \vec{e}_\phi, \vec{e}_\theta )$: $$bmath:f(\vec{r})=A_0+A\cdot \exp \left[ -2\cdot\frac{\left((\vec{r}-\vec{x}_0)\cdot(\mathrm{\mathbf{M}}(\alpha)\vec{e}_\theta)\right)^2}{w_1^2}-2\cdot\frac{\left((\vec{r}-\vec{x}_0)\cdot(\mathrm{\mathbf{M}}(\alpha)\vec{e}_\phi)\right)^2}{w_2^2}-2\cdot\frac{\left((\vec{r}-\vec{x}_0)\cdot\vec{e}_r\right)^2}{w_3^2} \right]$$
         The axes are defined as the three unit vectors of spherical coordinates $( (r,\theta,\phi)^T )$:
 <table cellspacing="0" cellpadding="1" border="0">
   <tr>
     <td><a name="beadscan_psf3d_gaussian_pic000"><img src="./pic/beadscan_psf3d_gaussian_pic000.png" border="1"></td>
-    <td>$[ \vec{e}_r=\left(\begin{matrix}\sin(\theta)\cdot\cos(\phi)\\\sin(\theta)\cdot\sin(\phi)\\\cos(\theta)\end{matrix}\right) ]$
+    <td>$$bmath: \vec{e}_r=\left(\begin{matrix}\sin(\theta)\cdot\cos(\phi)\\\sin(\theta)\cdot\sin(\phi)\\\cos(\theta)\end{matrix}\right) $$
         $[ \vec{e}_\theta=\left(\begin{matrix}\cos(\theta)\cdot\cos(\phi)\\\cos(\theta)\cdot\sin(\phi)\\-\sin(\theta)\end{matrix}\right) ]$
         $[ \vec{e}_\phi=\left(\begin{matrix}-\sin(\phi)\\\cos(\phi)\\0\end{matrix}\right) ]$</td>
   </tr>
 </table>
-In addition the vector $( \vec{e}_\theta, \vec{e}_\phi )$ are rotated around $(\vec{e}_r)$ by an angle $(\alpha)$ with a rotation matrix around the direction $(\vec{n}=(n_x,n_y,n_z)^T\equiv\vec{e}_r)$:
-  $[\mathrm{\mathbf{M}}(\alpha) = \left(\begin{matrix}\cos(\alpha)+n_x^2\cdot (1-\cos(\alpha))  &  n_x\cdot n_y\cdot (1-\cos(\alpha))-n_z\cdot \sin(\alpha) &  n_x\cdot n_z\cdot (1-\cos(\alpha))+n_y\cdot \sin(\alpha)\\
+In addition the vector $( \vec{e}_\theta, \vec{e}_\phi )$ are rotated around $(\vec{e}_r)$ by an angle $(\alpha)$ with a rotation matrix around the direction $$math:{\vec{n}=(n_x,n_y,n_z)^T\equiv\vec{e}_r}$$:
+$$bmath:\mathrm{\mathbf{M}}(\alpha) = \left(\begin{matrix}\cos(\alpha)+n_x^2\cdot (1-\cos(\alpha))  &  n_x\cdot n_y\cdot (1-\cos(\alpha))-n_z\cdot \sin(\alpha) &  n_x\cdot n_z\cdot (1-\cos(\alpha))+n_y\cdot \sin(\alpha)\\
    n_x\cdot n_y\cdot (1-\cos(\alpha))+n_z\cdot \sin(\alpha) & \cos(\alpha)+n_y^2\cdot (1-\cos(\alpha))  &   n_y\cdot n_z\cdot (1-\cos(\alpha))-n_x\cdot \sin(\alpha)\\
-   n_z\cdot n_x\cdot (1-\cos(\alpha))-n_y\cdot \sin(\alpha) & n_z\cdot n_y\cdot (1-\cos(\alpha))+n_x\cdot \sin(\alpha)  & \cos(\alpha)+n_z^2\cdot (1-\cos(\alpha))\end{matrix}\right)]$
+   n_z\cdot n_x\cdot (1-\cos(\alpha))-n_y\cdot \sin(\alpha) & n_z\cdot n_y\cdot (1-\cos(\alpha))+n_x\cdot \sin(\alpha)  & \cos(\alpha)+n_z^2\cdot (1-\cos(\alpha))\end{matrix}\right)$$
 </p>
 
 <p>In the fit function, given above, each summand in the exponential is the projection of the coordinate $(\vec{r})$ onto one of these three perpendicular unit vectors. So one size of the gaussian is associated with one of these three major axes. The orientation of the 3D Gaussian in space is then given by the three vectors $( \theta,\phi,\alpha )$.</p>

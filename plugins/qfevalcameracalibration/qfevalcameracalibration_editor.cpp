@@ -531,7 +531,7 @@ void QFEvalCameraCalibrationEditor::createReportDoc(QTextDocument* document) {
         double scale=0.45*document->textWidth()/double(pic.boundingRect().width());
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("variance vs. average intensity plot:\n"), fTextBold);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.45);
         QApplication::processEvents();
 
         ui->tabWidget->setCurrentIndex(1);
@@ -543,7 +543,7 @@ void QFEvalCameraCalibrationEditor::createReportDoc(QTextDocument* document) {
         scale=0.45*document->textWidth()/double(pic2.boundingRect().width());
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("signal to noise ration (SNR) plot:\n"), fTextBold);
-        insertQPicture(tabCursor, PicTextFormat, pic2, QSizeF(pic2.boundingRect().width(), pic2.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic2, QSizeF(pic2.boundingRect().width(), pic2.boundingRect().height())*scale, 0.45);
         QApplication::processEvents();
 
         tabCursor=table->cellAt(1,0).firstCursorPosition();
@@ -555,7 +555,7 @@ void QFEvalCameraCalibrationEditor::createReportDoc(QTextDocument* document) {
         scale=0.45*document->textWidth()/double(picT.boundingRect().width());
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("fit results table:\n"), fTextBold);
-        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, picT, QSizeF(picT.boundingRect().width(), picT.boundingRect().height())*scale, 0.45);
         QApplication::processEvents();
         ui->tabWidget->setCurrentIndex(0);
     }

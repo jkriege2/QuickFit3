@@ -161,7 +161,7 @@ void UserFitFunctionModel::moveUp(int idx)
 
 void UserFitFunctionModel::moveDown(int idx)
 {
-    if (idx<items.size()-1) items.swap(idx, idx+1);
+    if (idx>=0 && idx<items.size()-1) items.swap(idx, idx+1);
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     beginResetModel();
     endResetModel();

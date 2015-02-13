@@ -129,19 +129,3 @@ class QFFitResultsByIndexAsVectorEvaluation : public QFFitResultsByIndexEvaluati
 #endif // QFFITRESULTSBYINDEXASVECTOREVALUATION_H
 
 
-
-/*
-  TODO: overwrite function implementations in QFFitResultsByIndexEvaluation that use ->results... from QFRawDataRecord
-        ... reenable the imfcsfit plugin!
-
- */
-
-
-
-/*
-
-    bool doEmit=r->isEmitResultsChangedEnabled();
-    r->disableEmitResultsChanged();
-    if (doEmit) r->enableEmitResultsChanged(true);
-
-  */

@@ -155,6 +155,7 @@ class QFHTMLHelpWindow : public QWidget {
         QAction* actNext;
         QAction* actPrevious;
         QAction* actPrint;
+        QAction* actSave;
         QAction* actClose;
         QAction* actFindInAll;
         QAction* actHelpHelp;
@@ -213,6 +214,7 @@ class QFHTMLHelpWindow : public QWidget {
         void home();
         void showFile(QString filename);
         void print();
+        void save();
         void updateButtons();
         void find(bool checked=true);
         void findInAll(bool checked=true);

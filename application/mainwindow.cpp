@@ -248,9 +248,25 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     for (int i=0; i<QApplication::libraryPaths().size(); i++) {
         logFileMainWidget->log_text(QString::fromLatin1("    * %1\n").arg(QApplication::libraryPaths().value(i)));
     }
-    logFileMainWidget->log_text(tr("- image formats: "));
+    logFileMainWidget->log_text(tr("- image formats [in]: "));
     {
         QList<QByteArray> plgs= QImageReader::supportedImageFormats();
+        for (int i=0; i<plgs.size(); i++) {
+            logFileMainWidget->log_text(plgs[i]+"   ");
+        }
+        logFileMainWidget->log_text("\n");
+    }
+    logFileMainWidget->log_text(tr("- image formats [out]: "));
+    {
+        QList<QByteArray> plgs= QImageWriter::supportedImageFormats();
+        for (int i=0; i<plgs.size(); i++) {
+            logFileMainWidget->log_text(plgs[i]+"   ");
+        }
+        logFileMainWidget->log_text("\n");
+    }
+    logFileMainWidget->log_text(tr("- text file formats [out]: "));
+    {
+        QList<QByteArray> plgs=QTextDocumentWriter::supportedDocumentFormats();
         for (int i=0; i<plgs.size(); i++) {
             logFileMainWidget->log_text(plgs[i]+"   ");
         }
@@ -415,6 +431,15 @@ MainWindow::~MainWindow() {
     if (project) delete project;
     project=NULL;
     //std::cout<<"deleting MainWindow ... OK\n";
+
+    QMapIterator<QString, QString> it(mathParserHelpCache);
+    while (it.hasNext()) {
+        it.next();
+        if (QFile::exists(it.value())) {
+            QFile::remove(it.value());
+        }
+    }
+    mathParserHelpCache.clear();
 }
 
 void MainWindow::reloadCurrentProject()
@@ -4418,10 +4443,7 @@ static void getQFFitFunctionDescription(QFFitFunctionBase* ff, QString& autoplug
 
 
 QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QString& filename, bool removeNonReplaced, const QF3HelpReplacesList& more_replaces, bool insertTooltips, bool dontCreatePics, bool isMainHelp) {
-    JKQTmathText mathParser(this);
-    mathParser.set_fontSize(ProgramOptions::getConfigValue("quickfit/math_pointsize", 14).toInt());
-    mathParser.useXITS();
-    mathParser.set_fontSize(ProgramOptions::getConfigValue("quickfit/math_pointsize", 14).toInt());
+
 
     QString result=removeHTMLComments(input_html);
     QString fileDir=QFileInfo(filename).absolutePath();
@@ -5182,7 +5204,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$math:<latex>$$ items
-            QRegExp rxLaTeX("\\$\\$(math|bmath|mathb)\\:([^\\$]*)\\$\\$|\\$\\(([^\\$]*)\\)\\$|\\$\\[([^\\$]*)\\]\\$", Qt::CaseInsensitive);
+            QRegExp rxLaTeX("\\$\\$(math|bmath|mathb)\\:(.*)\\$\\$|\\$\\((.*)\\)\\$|\\$\\[(.*)\\]\\$", Qt::CaseInsensitive);
             rxLaTeX.setMinimal(true);
             count = 0;
             pos = 0;
@@ -5190,7 +5212,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             while ((pos = rxLaTeX.indexIn(result, pos)) != -1) {
                 QString command=rxLaTeX.cap(1).toLower().trimmed();
                 QString latex="$"+rxLaTeX.cap(2).trimmed()+"$";
-                //qDebug()<<command<<latex<<rxLaTeX.cap(3)<<rxLaTeX.cap(4)<<rxLaTeX.cap(5);
+
                 if (command.size()==0 && rxLaTeX.cap(3).trimmed().size()>0) {
                     latex="$"+rxLaTeX.cap(3).trimmed()+"$";
                     if (latex.size()>2) command="math";
@@ -5199,7 +5221,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     latex="$"+rxLaTeX.cap(4).trimmed()+"$";
                     if (latex.size()>2) command="bmath";
                 }
-
+                //qDebug()()<<"\n\n\n"<<rxLaTeX.cap(0)<<"\n"<<command<<latex<<rxLaTeX.cap(3)<<rxLaTeX.cap(4)<<rxLaTeX.cap(5);
                 if (command=="math" || command=="bmath" || command=="mathb") {
                     if (dontCreatePics)  {
                         if (command=="bmath" || command=="mathb") {
@@ -5207,44 +5229,89 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         } else {
                             result=result.replace(rxLaTeX.cap(0), QString("<tt><i>%1</i></tt>").arg(qfHTMLExcape(latex)));
                         }
-
                     } else {
-                        QImage pix(300,100,QImage::Format_ARGB32_Premultiplied);
-                        QPainter p(&pix);
-                        p.setRenderHint(QPainter::Antialiasing);
-                        p.setRenderHint(QPainter::HighQualityAntialiasing);
-                        p.setRenderHint(QPainter::TextAntialiasing);
-                        mathParser.parse(latex);
-                        bool ok=false;
-                        QString ht=mathParser.toHtml(&ok);
-                        if (ok) {
-                            if (command=="bmath" || command=="mathb") {
-                                result=result.replace(rxLaTeX.cap(0), QString("<blockquote><font size=\"+2\" face=\"%2\"><i>%1</i></font></blockquote>").arg(ht).arg(mathParser.get_fontRoman()));
-                            } else {
-                                result=result.replace(rxLaTeX.cap(0), QString("<font face=\"%2\"><i>%1</i></font>").arg(ht).arg(mathParser.get_fontRoman()));
-                            }
-                        } else {
-                            QSizeF size=mathParser.getSize(p);
-                            p.end();
-                            pix=QImage(size.width()*1.2, size.height()*1.2, QImage::Format_ARGB32_Premultiplied);
-                            pix.fill(Qt::transparent);
-                            p.begin(&pix);
-                            p.setRenderHint(QPainter::Antialiasing);
-                            p.setRenderHint(QPainter::HighQualityAntialiasing);
-                            p.setRenderHint(QPainter::TextAntialiasing);
-                            mathParser.draw(p,Qt::AlignTop | Qt::AlignLeft, QRectF(QPointF(0,0.1*size.height()), size));
-                            p.end();
-                            QString texfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+"_tex"+QString::number(count)+".png";
-                            //qDebug()<<"latex-render: "<<latex<<"\n    size = "<<size<<"  output = "<<texfilename;
-                            pix=cropTopBottom(cropLeftRight(pix));
-                            pix.save(texfilename);
+                        QString latexCacheID=QString("%1pt,%2,%3").arg(ProgramOptions::getConfigValue("quickfit/math_pointsize", 14).toInt()).arg(command).arg(latex);
+                        if (mathParserHelpCache.contains(latexCacheID) && QFile::exists(mathParserHelpCache[latexCacheID])) {
+                            QString texfilename=mathParserHelpCache[latexCacheID];
+                            //qDebug()()<<"FOUND IN CACHE!!! "<<texfilename;
 
-                            latex=latex.remove('\"');
-                            latex=latex.remove('\'');
+                            QString rep="";
                             if (command=="bmath" || command=="mathb") {
-                                result=result.replace(rxLaTeX.cap(0), QString("<blockquote><img style=\"vertical-align: middle;\" alt=\"%1\" src=\"%2\"></blockquote>").arg(latex).arg(texfilename));
+                                rep= QString("<blockquote><img style=\"vertical-align: middle;\" src=\"%1\"></blockquote>").arg(texfilename);
                             } else {
-                                result=result.replace(rxLaTeX.cap(0), QString("<img style=\"vertical-align: middle;\" alt=\"%1\" src=\"%2\">").arg(latex).arg(texfilename));
+                                rep= QString("<img style=\"vertical-align: middle;\" src=\"%1\">").arg(texfilename);
+                            }
+                            result=result.replace(rxLaTeX.cap(0), rep);
+                        } else {
+                            JKQTmathText mathParser(this);
+                            mathParser.set_fontSize(ProgramOptions::getConfigValue("quickfit/math_pointsize", 14).toInt());
+                            mathParser.useXITS();
+                            mathParser.set_fontSize(ProgramOptions::getConfigValue("quickfit/math_pointsize", 14).toInt());
+                            mathParser.parse(latex);
+                            //if (mathParser.get_error_list().size()>0) qDebug()()<<latex<<mathParser.get_error_list();
+                            bool ok=false;
+                            QString ht=mathParser.toHtml(&ok);
+                            if (ok) {
+                                if (command=="bmath" || command=="mathb") {
+                                    result=result.replace(rxLaTeX.cap(0), QString("<blockquote><font size=\"+2\" face=\"%2\"><i>%1</i></font></blockquote>").arg(ht).arg(mathParser.get_fontRoman()));
+                                } else {
+                                    result=result.replace(rxLaTeX.cap(0), QString("<font face=\"%2\"><i>%1</i></font>").arg(ht).arg(mathParser.get_fontRoman()));
+                                }
+                            } else {
+                                QImage* pix=new QImage(500,100, QImage::Format_ARGB32_Premultiplied);
+                                pix->fill(Qt::transparent);
+                                QPainter* p=new QPainter();//(&pix);
+                                p->begin(pix);
+                                if (!p->isActive()) p->begin(pix);
+                                if (!p->isActive()) p->begin(pix);
+                                if (!p->isActive()) p->begin(pix);
+                                //qDebug()<<p->begin(pix)<<p->paintEngine();
+                                if (!p->isActive()) //qDebug()<<p->begin(pix);
+                                    if (!p->isActive()) //qDebug()<<p->begin(pix);
+                                        if (!p->isActive()) //qDebug()<<p->begin(pix);
+                                            p->setRenderHint(QPainter::Antialiasing);
+                                p->setRenderHint(QPainter::HighQualityAntialiasing);
+                                p->setRenderHint(QPainter::TextAntialiasing);
+                                QSizeF size=mathParser.getSize(*p);
+                                if (size.width()<=2) size.setWidth(500);
+                                if (size.width()>=5000) size.setWidth(5000);
+                                if (size.height()<=2) size.setHeight(500);
+                                if (size.height()>=5000) size.setHeight(5000);
+                                p->end();
+                                delete p;
+                                delete pix;
+                                p=new QPainter();
+                                pix=new QImage(size.width()*1.2, size.height()*1.2, QImage::Format_ARGB32_Premultiplied);
+                                pix->fill(Qt::transparent);
+                                p->begin(pix);
+                                //qDebug()<<p->begin(pix)<<p->paintEngine();
+                                //qDebug()()<<size<<pix->size();
+                                p->setRenderHint(QPainter::Antialiasing);
+                                p->setRenderHint(QPainter::HighQualityAntialiasing);
+                                p->setRenderHint(QPainter::TextAntialiasing);
+                                mathParser.draw(*p,Qt::AlignTop | Qt::AlignLeft, QRectF(QPointF(0,0.1*size.height()), size), false);
+                                p->end();
+                                delete p;
+                                QString texfilename=QDir::tempPath()+"/qf3help_"+QFileInfo(filename).baseName()+"_tex"+QString::number(count)+".png";
+                                //qDebug()()<<"latex-render: "<<latex<<"\n    size = "<<pix->size()<<"  output = "<<texfilename;
+                                *pix=cropTopBottom(cropLeftRight(*pix));
+                                //qDebug()()<<"latex-render:   => "<<pix->size();
+                                pix->save(texfilename, "PNG");
+                                if (pix) delete pix;
+
+                                latex=latex.remove('\"');
+                                latex=latex.remove('\'');
+                                QString rep="";
+                                if (QFile::exists(texfilename)) {
+                                    mathParserHelpCache.insert(latexCacheID, texfilename);
+                                    if (command=="bmath" || command=="mathb") {
+                                        rep= QString("<blockquote><img style=\"vertical-align: middle;\" src=\"%1\"></blockquote>").arg(texfilename);
+                                    } else {
+                                        rep= QString("<img style=\"vertical-align: middle;\" src=\"%1\">").arg(texfilename);
+                                    }
+                                }
+                                result=result.replace(rxLaTeX.cap(0), rep);
+
                             }
                         }
                     }
@@ -5252,7 +5319,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 }
 
                 ++count;
-                pos += rxLaTeX.matchedLength();
+                pos += 1;//rxLaTeX.matchedLength();
             }
 
 

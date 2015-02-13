@@ -2956,7 +2956,7 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*0.4/pic.boundingRect().width(); //0.62
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("correlation data, model and residuals:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.4);
     }
     QApplication::processEvents();
 
@@ -2969,7 +2969,7 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*0.4/pic.boundingRect().width(); //0.62
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("Mean Squared Displacement (MSD):\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.4);
     }
     QApplication::processEvents();
     int old_mode=cmbDistResultsMode->currentIndex();
@@ -2985,7 +2985,7 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*0.4/pic.boundingRect().width(); //0.62
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("local anomality:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.4);
     }
     QApplication::processEvents();
 
@@ -3001,7 +3001,7 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*0.4/pic.boundingRect().width(); //0.62
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("local diffusion coefficient:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.4);
     }
     cmbDistResultsMode->setCurrentIndex(old_mode);
     QApplication::processEvents();
@@ -3016,7 +3016,7 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*0.4/pic.boundingRect().width();//0.3
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("residual histogram:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.4);
     }
     QApplication::processEvents();
     {
@@ -3028,7 +3028,7 @@ void QFFCSMSDEvaluationEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*0.4/pic.boundingRect().width();//0.3
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("residual correlations:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.4);
     }
 
 

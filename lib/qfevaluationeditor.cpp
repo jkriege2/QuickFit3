@@ -25,6 +25,9 @@
 #include <QCloseEvent>
 #include <QDebug>
 #include <QProgressDialog>
+#if (QT_VERSION > QT_VERSION_CHECK(5, 2, 0))
+#  include <QPdfWriter>
+#endif
 
 QFEvaluationEditor::QFEvaluationEditor(QFPluginServices* services, QFEvaluationPropertyEditor *propEditor, QWidget *parent):
     QWidget(parent)
@@ -80,21 +83,41 @@ bool QFEvaluationEditor::event(QEvent * ev) {
 
 void QFEvaluationEditor::saveReport() {
 
+    QTextDocument* doc=new QTextDocument();
+    /*QPrinter* printer=new QPrinter();//QPrinter::HighResolution);
+    printer->setOutputFormat(QPrinter::PdfFormat);
+    printer->setPaperSize(QPrinter::A4);
+    printer->setPageMargins(10,10,10,10,QPrinter::Millimeter);
+    printer->setOrientation(QPrinter::Portrait);
+    printer->setColorMode(QPrinter::Color);
+    doc->setTextWidth(printer->pageRect().size().width());*/
+    createReportDoc(doc);
+    qfSaveReport(doc, QString("QuickFit %1 Help: %2 Report").arg(qfInfoVersionFull()).arg(current->getName()), QString("%2/evaluationeditor%1/").arg(peID).arg(current->getType()), this);
+    delete doc;
+
     /* it is often a good idea to have a possibility to save or print a report about the fit results.
        This is implemented in a generic way here.    */
-
+    /*
     QString currentSaveDirectory="";
     if (settings && current) currentSaveDirectory=settings->getQSettings()->value(QString("%2/evaluationeditor%1/last_report_directory").arg(peID).arg(current->getType()), currentSaveDirectory).toString();
 
-    QString fn = QFileDialog::getSaveFileName(this, tr("Save Report"),
+    QStringList filters;
+    #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
+        filters<<tr("PDF File (*.pdf)");
+    #else
+        filters<<tr("PDF File (*.pdf)");
+        filters<<tr("PostScript File (*.ps)");
+    #endif
+    int firstDForm=filters.size();
+    QList<QByteArray> dforms=QTextDocumentWriter::supportedDocumentFormats();
+    for (int i=0; i<dforms.size(); i++) {
+        filters<<QString("%1 File (*.%2)").arg(QString::fromLatin1(dforms[i])).arg(QString::fromLatin1(dforms[i].toLower()));
+    }
+    QString selFilter="";
+    QString fn = qfGetSaveFileNameSet(QString("%2/evaluationeditor%1/").arg(peID).arg(current->getType()), this, tr("Save Report"),
                                 currentSaveDirectory,
-                                          #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-                                              tr("PDF File (*.pdf);;HTML file (*.html);;OpenDocument File (*.odf)")
-                                          #else
-                                              tr("PDF File (*.pdf);;PostScript File (*.ps);;HTML file (*.html);;OpenDocument File (*.odf)")
-                                          #endif
-                                              );
-
+                                filters.join(";;"), &selFilter);
+    int filterID=filters.indexOf(selFilter);
 
     if (!fn.isEmpty()) {
         settings->getQSettings()->setValue(QString("%2/evaluationeditor%1/last_report_directory").arg(peID).arg(current->getType()), currentSaveDirectory);
@@ -107,28 +130,40 @@ void QFEvaluationEditor::saveReport() {
         progress.setValue(50);
         progress.show();
 
-        QFileInfo fi(fn);
+        QFileInfo fi(fn);        
+        QTextDocument* doc=new QTextDocument();
         QPrinter* printer=new QPrinter();//QPrinter::HighResolution);
         printer->setOutputFormat(QPrinter::PdfFormat);
         printer->setPaperSize(QPrinter::A4);
         printer->setPageMargins(10,10,10,10,QPrinter::Millimeter);
         printer->setOrientation(QPrinter::Portrait);
         printer->setColorMode(QPrinter::Color);
-        QTextDocument* doc=new QTextDocument();
         doc->setTextWidth(printer->pageRect().size().width());
         createReportDoc(doc);
-        if (fi.suffix().toLower()=="ps" || fi.suffix().toLower()=="pdf") {
+        if (filterID==0
+        #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
+            ||filterID==1
+        #endif
+            ) {
 #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-            if (fi.suffix().toLower()=="ps") printer->setOutputFormat(QPrinter::PostScriptFormat);
+            if (filterID==1) printer->setOutputFormat(QPrinter::PostScriptFormat);
 #endif
+#if (QT_VERSION > QT_VERSION_CHECK(5, 2, 0))
+            QPdfWriter pdf(fn);
+            pdf.setPageMargins(QMarginsF(10,10,10,10),QPageLayout::Millimeter);
+            pdf.setPageOrientation(QPageLayout::Portrait);
+            pdf.setCreator(QString("QuickFit %1").arg(qfInfoVersionFull()));
+            pdf.setPageSize(QPageSize(QPageSize::A4));
+            pdf.setTitle(QString("QuickFit %1 Help: %2 Report").arg(qfInfoVersionFull()).arg(current->getName()));
+            pdf.setResolution(300);
+            doc->print(&pdf);
+#else
             printer->setColorMode(QPrinter::Color);
             printer->setOutputFileName(fn);
             doc->print(printer);
-        } else if (fi.suffix().toLower()=="odf") {
-            QTextDocumentWriter writer(fn, "ODF");
-            writer.write(doc);
-        } else if ((fi.suffix().toLower()=="html")||(fi.suffix().toLower()=="htm")) {
-            QTextDocumentWriter writer(fn, "HTML");
+#endif
+        } else if (filterID>firstDForm) {
+            QTextDocumentWriter writer(fn, dforms.value(filterID-firstDForm, "HTML"));
             writer.write(doc);
         }
         //qDebug()<<doc->toHtml();
@@ -137,6 +172,7 @@ void QFEvaluationEditor::saveReport() {
         progress.accept();
         QApplication::restoreOverrideCursor();
     }
+    */
 }
 
 void QFEvaluationEditor::printReport() {

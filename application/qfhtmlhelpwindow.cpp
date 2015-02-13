@@ -110,6 +110,11 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     btnHome->setDefaultAction(actHome);
     menuPage->addSeparator();
 
+    actSave=menuPage->addAction(tr("&Save Page"), this, SLOT(save()));
+    actSave->setIcon(QIcon(":/lib/save16.png"));
+    actSave->setShortcut(QKeySequence::Save);
+    actSave->setToolTip(tr("Save this help page as HTML, PDF, ..."));
+
     actPrint=menuPage->addAction(tr("&Print"), this, SLOT(print()));
     actPrint->setIcon(QIcon(":/lib/help_print.png"));
     actPrint->setShortcut(QKeySequence::Print);
@@ -464,6 +469,11 @@ void QFHTMLHelpWindow::print() {
     descriptionBrowser->print(p);
     delete p;
     QApplication::restoreOverrideCursor();
+}
+
+void QFHTMLHelpWindow::save()
+{
+    qfSaveReport(descriptionBrowser->document(), tr("Help Page: %1").arg(labelTitle->text()), QString("qf3_help/"), this);
 }
 
 

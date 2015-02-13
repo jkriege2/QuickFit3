@@ -1301,7 +1301,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*0.62/pic.boundingRect().width();
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("correlation data, model and residuals:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.62);
     }
     QApplication::processEvents();
 
@@ -1314,7 +1314,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*0.3/pic.boundingRect().width();
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("residual histogram:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.3);
     }
     QApplication::processEvents();
     {
@@ -1326,7 +1326,7 @@ void QFFCSFitEvaluationEditor::createReportDoc(QTextDocument* document) {
         double scale=document->textWidth()*0.3/pic.boundingRect().width();
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("residual correlations:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.3);
     }
     cursor.movePosition(QTextCursor::End);
     QApplication::processEvents();

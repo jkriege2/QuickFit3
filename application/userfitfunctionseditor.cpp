@@ -50,8 +50,8 @@ UserFitFunctionsEditor::UserFitFunctionsEditor(QWidget *parent) :
     //connect(ui->chkPrevLogX, SIGNAL(toggled(bool)), ui->spinPrevRangeMax, SLOT(setCheckMinimum(bool)));
     connect(ui->chkPrevLogX, SIGNAL(toggled(bool)), ui->spinPrevRangeMin, SLOT(setLogScale(bool)));
     connect(ui->chkPrevLogX, SIGNAL(toggled(bool)), ui->spinPrevRangeMax, SLOT(setLogScale(bool)));
-    ui->splitter->setStretchFactor(0,1);
-    ui->splitter->setStretchFactor(1,2);
+    ui->splitter->setStretchFactor(0,0);
+    ui->splitter->setStretchFactor(1,1);
     ui->splitter_3->setStretchFactor(0,1);
     ui->splitter_3->setStretchFactor(1,1);
 

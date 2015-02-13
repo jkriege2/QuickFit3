@@ -33,6 +33,7 @@ INCLUDEPATH += . \
 include(../quickfit3.pri)
 include(../libquickfitwidgets.pri)
 
+
 release {
     message("building $$TARGET $$TEMPLATE in RELEASE mode, output is in $$QFOUTPUT ")
 } else {
@@ -112,7 +113,8 @@ FORMS =    optionsdialog.ui \
     dlgwelcomescreen.ui \
     dlgeditgroupandrole.ui
 
-RESOURCES += quickfit3.qrc
+RESOURCES += quickfit3.qrc \
+             ../extlibs/xits.qrc
 
 
 TRANSLATIONS= ./translations/de.ts

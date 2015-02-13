@@ -200,11 +200,14 @@ void ProgramOptions::readSettings() {
         QString fn=QString(appDir+"/stylesheets/%1.qss").arg(stylesheet);
         //std::cout<<"loading stylesheet '"<<fn.toStdString()<<"' ... ";
         QFile f(fn);
-        f.open(QFile::ReadOnly);
-        QTextStream s(&f);
-        QString qss=s.readAll();
-        //std::cout<<qss.toStdString()<<std::endl;
-        app->setStyleSheet(qss);
+        if (f.open(QFile::ReadOnly)) {
+            QTextStream s(&f);
+            QString qss=s.readAll();
+            //std::cout<<qss.toStdString()<<std::endl;
+            app->setStyleSheet(qss);
+        } else {
+            app->setStyleSheet("");
+        }
         //std::cout<<"OK\n";
     }
     emit stylesheetChanged(stylesheet);
