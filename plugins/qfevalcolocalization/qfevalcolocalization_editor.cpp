@@ -52,9 +52,17 @@ QFEValColocalizationEditor::QFEValColocalizationEditor(QFPluginServices* service
     // setup widgets
     ui->setupUi(this);
 
+    ui->plotterCorrelation->setRangeSelectionMode(true);
+    connect(ui->plotterCorrelation, SIGNAL(rangeSelected(double,double,double,double)), this, SLOT(userRangeChanged(double,double,double,double)));
+
+
     ui->splitter->setStretchFactor(0,1);
     ui->splitter->setStretchFactor(1,1);
-    
+    ui->splitter2->setStretchFactor(0,2);
+    ui->splitter2->setStretchFactor(1,1);
+
+    ui->tableView->setModel(&modelresults);
+
     // create progress dialog for evaluation
     dlgEvaluationProgress=new QProgressDialog(this);
     dlgEvaluationProgress->hide();
@@ -66,6 +74,8 @@ QFEValColocalizationEditor::QFEValColocalizationEditor(QFPluginServices* service
     ui->btnPrintReport->setDefaultAction(actPrintReport);
     ui->btnSaveReport->setDefaultAction(actSaveReport);
 
+    ui->btnEvaluateAll->setVisible(false);
+    ui->btnEvaluateCurrent->setVisible(false);
     updatingData=false;
 }
 
@@ -120,6 +130,11 @@ void QFEValColocalizationEditor::writeSettings() {
     if (!settings) return;
 }
 
+void QFEValColocalizationEditor::userRangeChanged(double xmin, double xmax, double ymin, double ymax)
+{
+    displayData();
+}
+
 void QFEValColocalizationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
     // this slot is called when the user selects a new record in the raw data record list on the RHS of this widget in the evaluation dialog
     
@@ -134,7 +149,10 @@ void QFEValColocalizationEditor::highlightingChanged(QFRawDataRecord* formerReco
         disconnect(ui->spinChannel1, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
         disconnect(ui->spinChannel2, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
         disconnect(ui->spinDisplayFrame, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
-
+        formerRecord->setQFProperty(resultID+"_RANGE1_MIN", ui->plotterCorrelation->getCurrentRangeSelectionXMin(), false, false);
+        formerRecord->setQFProperty(resultID+"_RANGE1_MAX", ui->plotterCorrelation->getCurrentRangeSelectionXMax(), false, false);
+        formerRecord->setQFProperty(resultID+"_RANGE2_MIN", ui->plotterCorrelation->getCurrentRangeSelectionYMin(), false, false);
+        formerRecord->setQFProperty(resultID+"_RANGE2_MAX", ui->plotterCorrelation->getCurrentRangeSelectionYMax(), false, false);
     }
 
     if (data) { // if we have a valid object, update
@@ -154,6 +172,8 @@ void QFEValColocalizationEditor::highlightingChanged(QFRawDataRecord* formerReco
         ui->spinChannel2->setValue(currentRecord->getQFProperty(resultID+"_channel2", 1).toInt());
         ui->spinDisplayFrame->setValue(currentRecord->getQFProperty(resultID+"_displayframe", data->getImageStackFrames(stack)/2).toInt());
         ui->spinBackgroundThreshold->setValue(currentRecord->getQFProperty(resultID+"_backthreshold", 0).toDouble()); //statisticsQuantile(data->getImageStack(stack, ui->spinFrame->value(), ui->spinChannel1->value()), data->getImageStackWidth(stack)*data->getImageStackHeight(stack), 0.05)*1.5).toDouble());
+        ui->plotterCorrelation->setrangeSelection(currentRecord->getQFProperty(resultID+"_RANGE1_MIN", 0).toDouble(), currentRecord->getQFProperty(resultID+"_RANGE1_MAX", 0).toDouble(),
+                                                  currentRecord->getQFProperty(resultID+"_RANGE2_MIN", 0).toDouble(), currentRecord->getQFProperty(resultID+"_RANGE2_MAX", 0).toDouble());
 
         connect(ui->spinBackgroundThreshold, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
         connect(ui->spinFrame, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
@@ -189,11 +209,23 @@ void QFEValColocalizationEditor::displayEvaluation() {
 
 void QFEValColocalizationEditor::displayData() {
     if (!current) return;
+
     QFRawDataRecord* record=current->getHighlightedRecord();
     QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     QFEValColocalizationItem* eval=qobject_cast<QFEValColocalizationItem*>(current);
-    qDebug()<<"displayData "<<record<<data<<eval;
+    //qDebug()<<"displayData "<<record<<data<<eval;
     if ((!record)||(!eval)||(!data)) return;
+
+
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    record->disableEmitResultsChanged();
+    QString resultID=eval->getEvaluationResultID();
+    record->resultsClear(resultID);
+    modelresults.setReadonly(false);
+    modelresults.clear();
+    modelresults.setColumnTitleCreate(0, tr("Parameter"));
+    modelresults.setColumnTitleCreate(1, tr("value"));
+    int trow=0;
 
     ui->plotterCorrelation->clear();
     int stack=0;
@@ -212,6 +244,8 @@ void QFEValColocalizationEditor::displayData() {
     double thresh=ui->spinBackgroundThreshold->value();
     double* data_ch1=data->getImageStack(stack, frame, ch1);
     double* data_ch2=data->getImageStack(stack, frame, ch2);
+    double* datar_ch1=data->getImageStack(stack, dframe, ch1);
+    double* datar_ch2=data->getImageStack(stack, dframe, ch2);
     QVector<double> dch1, dch2;
     for (long long int  i=0; i<frames*width*height; i++) {
         if (data_ch1[i]>thresh && data_ch2[i]>thresh) {
@@ -242,6 +276,77 @@ void QFEValColocalizationEditor::displayData() {
     img->set_Nx(width);
     img->set_Ny(height);
     ui->plotter->addGraph(img);
+
+
+    QVector<bool> overlayImage;
+    overlayImage.resize(width*height);
+    double ch1min=ui->plotterCorrelation->getCurrentRangeSelectionXMin();
+    double ch2min=ui->plotterCorrelation->getCurrentRangeSelectionYMin();
+    double ch1max=ui->plotterCorrelation->getCurrentRangeSelectionXMax();
+    double ch2max=ui->plotterCorrelation->getCurrentRangeSelectionYMax();
+    record->setQFProperty(resultID+"_RANGE1_MIN", ui->plotterCorrelation->getCurrentRangeSelectionXMin(), false, false);
+    record->setQFProperty(resultID+"_RANGE1_MAX", ui->plotterCorrelation->getCurrentRangeSelectionXMax(), false, false);
+    record->setQFProperty(resultID+"_RANGE2_MIN", ui->plotterCorrelation->getCurrentRangeSelectionYMin(), false, false);
+    record->setQFProperty(resultID+"_RANGE2_MAX", ui->plotterCorrelation->getCurrentRangeSelectionYMax(), false, false);
+    //qDebug()<<"plot: "<<ch1min<<ch1max<<ch2min<<ch2max;
+    if (ch1min!=ch1max && ch2min!=ch2max) {
+        QVector<double> ch1_ranged, ch2_ranged;
+        for (long long i=0; i<width*height; i++) {
+            overlayImage[i]=(ch1min<=datar_ch1[i])&&(datar_ch1[i]<=ch1max) && (ch2min<=datar_ch2[i])&&(datar_ch2[i]<=ch2max);
+        }
+
+        long f=frame;
+        for (long j=0; j<frames; j++) {
+            double* datarr_ch1=data->getImageStack(stack, f, ch1);
+            double* datarr_ch2=data->getImageStack(stack, f, ch2);
+            for (long long i=0; i<width*height; i++) {
+                if ((datarr_ch1[i]>thresh)&&(datarr_ch2[i]>thresh)&&(ch1min<=datarr_ch1[i])&&(datarr_ch1[i]<=ch1max) && (ch2min<=datarr_ch2[i])&&(datarr_ch2[i]<=ch2max)) {
+                    ch1_ranged<<datarr_ch1[i];
+                    ch2_ranged<<datarr_ch2[i];
+                }
+            }
+            f++;
+        }
+
+        record->resultsSetNumber(resultID, "range_ch1_min", ch1min);
+        record->resultsSetNumber(resultID, "range_ch1_max", ch1max);
+        record->resultsSetNumber(resultID, "range_ch2_min", ch2min);
+        record->resultsSetNumber(resultID, "range_ch2_max", ch2max);
+        record->resultsSetInteger(resultID, "range_pixels", ch1_ranged.size());
+        double p;
+        record->resultsSetNumber(resultID, "range_pearson", p=statisticsCorrelationCoefficient(ch1_ranged.data(), ch2_ranged.data(), ch1_ranged.size()));
+        modelresults.setCellCreate(trow, 0, tr("Selection: Pearson"));
+        modelresults.setCellCreate(trow, 1, p);
+        trow++;
+
+    }
+    int rmask=ds->addCopiedColumn(overlayImage.data(), overlayImage.size(), tr("range selection mask "));
+
+    record->resultsSetInteger(resultID, "ch1", ch1);
+    record->resultsSetInteger(resultID, "ch2", ch2);
+    record->resultsSetInteger(resultID, "pixels", dch2.size());
+    record->resultsSetInteger(resultID, "allframes", ui->chkAllFrames->isChecked());
+    if (ui->chkAllFrames->isChecked()) record->resultsSetInteger(resultID, "frame", ui->spinFrame->value());
+    record->resultsSetInteger(resultID, "intensity_threshold", thresh);
+    double p;
+    record->resultsSetNumber(resultID, "pearson", p=statisticsCorrelationCoefficient(dch1.data(), dch2.data(), dch1.size()));
+    modelresults.setCellCreate(trow, 0, tr("All: Pearson"));
+    modelresults.setCellCreate(trow, 1, p);
+    trow++;
+
+    JKQTPColumnOverlayImageEnhanced* plteOverlay=new JKQTPColumnOverlayImageEnhanced(ui->plotter->get_plotter());
+    plteOverlay->set_drawAsRectangles(false);
+    QColor col("blue");
+    col.setAlphaF(0.5);
+    plteOverlay->set_width(width);
+    plteOverlay->set_height(height);
+    plteOverlay->set_Nx(width);
+    plteOverlay->set_Ny(height);
+    plteOverlay->set_trueColor(col);
+    plteOverlay->set_falseColor(Qt::transparent);
+    plteOverlay->set_imageColumn(rmask);
+    ui->plotter->addGraph(plteOverlay);
+
     ui->plotter->getXAxis()->set_axisLabel(tr("x [pixel]"));
     ui->plotter->getYAxis()->set_axisLabel(tr("y [pixel]"));
     ui->plotter->setAbsoluteXY(0,width,0,height);
@@ -253,6 +358,10 @@ void QFEValColocalizationEditor::displayData() {
     ui->plotter->zoomToFit();
     ui->plotter->set_doDrawing(true);
     ui->plotter->update_plot();
+    modelresults.setReadonly(true);
+    ui->tableView->resizeColumnsToContents();
+    record->enableEmitResultsChanged(true);
+    QApplication::restoreOverrideCursor();
 }
 
 
@@ -412,18 +521,36 @@ void QFEValColocalizationEditor::createReportDoc(QTextDocument* document) {
     document->documentLayout()->registerHandler(PicTextFormat, picInterface);
 
 	
-    QTextTable* tablePic = cursor.insertTable(2,1, tableFormat);
+    QTextTable* tablePic = cursor.insertTable(1,2, tableFormat);
     {
-	    // insert a plot from ui->plotter
-        QTextCursor tabCursor=tablePic->cellAt(1, 0).firstCursorPosition();
+        // insert a plot from ui->plotter
+        QTextCursor tabCursor=tablePic->cellAt(0, 0).firstCursorPosition();
         QPicture pic;
         JKQTPEnhancedPainter* painter=new JKQTPEnhancedPainter(&pic);
         ui->plotter->get_plotter()->draw(*painter, QRect(0,0,ui->plotter->width(),ui->plotter->height()));
         delete painter;
-        double scale=0.9*document->textWidth()/double(pic.boundingRect().width());
+        double scale=0.7*document->textWidth()/double(pic.boundingRect().width());
         if (scale<=0) scale=1;
         tabCursor.insertText(tr("Overview image:\n"), fTextBoldSmall);
-        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.9);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.7);
+        QApplication::processEvents();
+
+
+        QApplication::processEvents();
+    }
+    {
+        // insert a plot from ui->plotter
+        QTextCursor tabCursor=tablePic->cellAt(0, 1).firstCursorPosition();
+        QPicture pic;
+        {
+            QPainter painter(&pic);
+            ui->tableView->paint(painter, QRect(0,0,0.28*document->textWidth(), 5.0*0.28*document->textWidth()));
+        }
+
+        double scale=0.28*document->textWidth()/double(pic.boundingRect().width());
+        if (scale<=0) scale=1;
+        tabCursor.insertText(tr("Results:\n"), fTextBoldSmall);
+        insertQPicture(tabCursor, PicTextFormat, pic, QSizeF(pic.boundingRect().width(), pic.boundingRect().height())*scale, 0.28);
         QApplication::processEvents();
 
 

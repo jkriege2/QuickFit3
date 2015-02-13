@@ -136,9 +136,19 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
 
         void setCorrelationHistogramStretch(int corrStretch=3, int histStretch=1);
 
+        double getCurrentRangeSelectionXMin() const;
+        double getCurrentRangeSelectionXMax() const;
+        double getCurrentRangeSelectionYMin() const;
+        double getCurrentRangeSelectionYMax() const;
+
+        void setRangeSelectionMode(bool enabled=true);
+        void setrangeSelection(double xmin, double xmax, double ymin, double ymax);
+
     signals:
         void settingsChanged();
+        void rangeSelected(double xmin, double xmax, double ymin, double ymax);
     public slots:
+        void clearRangeSelection();
         void dataSettingsChanged(bool update=true);
         void showPlotPosition(double x, double y);
 
@@ -149,88 +159,95 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
         void copyDataMatlab();
         void showHelp();
         void fillDataArray(QList<QVector<double> >& data, QStringList &headers);
-
-protected:
-
-    QList<CorrelationItem> histograms;
-
-    void createWidgets();
-
-    int connectParameterWidgetsCounter;
-
-    QGridLayout* layPlots;
-
-    /** \brief plotter widget for the parameter histogram */
-    QFPlotter* pltParamCorrelation;
-
-    QFPlotter* pltParamHistogramX;
-    QFPlotter* pltParamHistogramY;
-
-    QSpinBox* spinHistogramBins1;
-    QSpinBox* spinHistogramBins2;
-
-    QGroupBox* grpHistogramSettings;
-    QCheckBox* chkScatterPlot;
-    QComboBox* cmb2DHistogram;
-    QSpinBox* spin2DHistogramBins1;
-    QSpinBox* spin2DHistogramBins2;
-    QCheckBox* chkKey;
-
-
-
-    QEnhancedTableView* tvHistogramParameters;
-    QFTableModel* tabHistogramParameters;
-    QVisibleHandleSplitter* splitterHistogram;
-
-    double mainHistogramMax;
-
-    QRadioButton* chkHistogramRangeAuto1;
-    QRadioButton* chkHistogramRangeRelaxAuto1;
-    QRadioButton* chkHistogramRangeManual1;
-    QFDoubleEdit* edtHistogramMin1;
-    QFDoubleEdit* edtHistogramMax1;
-    QDoubleSpinBox* spinHistogramQL1;
-    QDoubleSpinBox* spinHistogramQU1;
-
-    QRadioButton* chkHistogramRangeAuto2;
-    QRadioButton* chkHistogramRangeRelaxAuto2;
-    QRadioButton* chkHistogramRangeManual2;
-    QFDoubleEdit* edtHistogramMin2;
-    QFDoubleEdit* edtHistogramMax2;
-    QDoubleSpinBox* spinHistogramQL2;
-    QDoubleSpinBox* spinHistogramQU2;
-
-    JKQTPSymbolComboBox* cmbSymbol;
-    QSpinBox* spinSymbolSize;
-
-    JKQTPMathImageColorPaletteComboBox* cmbColorScale;
-    QRadioButton* chkColorRangeAuto;
-    QRadioButton* chkColorRangeRelaxAuto;
-    QRadioButton* chkColorRangeManual;
-    QFDoubleEdit* edtColorMin;
-    QFDoubleEdit* edtColorMax;
-    QDoubleSpinBox* spinColQL;
-    QDoubleSpinBox* spinColQU;
-
-
-
-
-    QFormLayout* flHistSet;
-    QString histLabelX;
-    QString histLabelY;
-    QString histLabelColor;
-    QVBoxLayout* laySplitterTable;
-    QGridLayout* layHist;
-
-    QLabel* labPlotPos;
-    QAction* actHelp;
-    QAction* actPrintReport;
-    QAction* actSaveReport;
-    QAction* actCopyData;
-    QAction* actCopyDataMatlab;
-    QAction* actSaveData;
     protected slots:
-    void histTypeChanged(int index);
+        void rangeSelectionRectangleFinished(double x, double y, double width, double height, Qt::KeyboardModifiers modifiers);
+        void UpdateSelectionRangeSelected();
+    protected:
+        double currentRangeSelection_xmin;
+        double currentRangeSelection_xmax;
+        double currentRangeSelection_ymin;
+        double currentRangeSelection_ymax;
+        JKQTPoverlayRectangle* plteRangeSelection;
+
+        QList<CorrelationItem> histograms;
+
+        void createWidgets();
+
+        int connectParameterWidgetsCounter;
+
+        QGridLayout* layPlots;
+
+        /** \brief plotter widget for the parameter histogram */
+        QFPlotter* pltParamCorrelation;
+
+        QFPlotter* pltParamHistogramX;
+        QFPlotter* pltParamHistogramY;
+
+        QSpinBox* spinHistogramBins1;
+        QSpinBox* spinHistogramBins2;
+
+        QGroupBox* grpHistogramSettings;
+        QCheckBox* chkScatterPlot;
+        QComboBox* cmb2DHistogram;
+        QSpinBox* spin2DHistogramBins1;
+        QSpinBox* spin2DHistogramBins2;
+        QCheckBox* chkKey;
+
+
+
+        QEnhancedTableView* tvHistogramParameters;
+        QFTableModel* tabHistogramParameters;
+        QVisibleHandleSplitter* splitterHistogram;
+
+        double mainHistogramMax;
+
+        QRadioButton* chkHistogramRangeAuto1;
+        QRadioButton* chkHistogramRangeRelaxAuto1;
+        QRadioButton* chkHistogramRangeManual1;
+        QFDoubleEdit* edtHistogramMin1;
+        QFDoubleEdit* edtHistogramMax1;
+        QDoubleSpinBox* spinHistogramQL1;
+        QDoubleSpinBox* spinHistogramQU1;
+
+        QRadioButton* chkHistogramRangeAuto2;
+        QRadioButton* chkHistogramRangeRelaxAuto2;
+        QRadioButton* chkHistogramRangeManual2;
+        QFDoubleEdit* edtHistogramMin2;
+        QFDoubleEdit* edtHistogramMax2;
+        QDoubleSpinBox* spinHistogramQL2;
+        QDoubleSpinBox* spinHistogramQU2;
+
+        JKQTPSymbolComboBox* cmbSymbol;
+        QSpinBox* spinSymbolSize;
+
+        JKQTPMathImageColorPaletteComboBox* cmbColorScale;
+        QRadioButton* chkColorRangeAuto;
+        QRadioButton* chkColorRangeRelaxAuto;
+        QRadioButton* chkColorRangeManual;
+        QFDoubleEdit* edtColorMin;
+        QFDoubleEdit* edtColorMax;
+        QDoubleSpinBox* spinColQL;
+        QDoubleSpinBox* spinColQU;
+
+
+
+
+        QFormLayout* flHistSet;
+        QString histLabelX;
+        QString histLabelY;
+        QString histLabelColor;
+        QVBoxLayout* laySplitterTable;
+        QGridLayout* layHist;
+
+        QLabel* labPlotPos;
+        QAction* actHelp;
+        QAction* actPrintReport;
+        QAction* actSaveReport;
+        QAction* actCopyData;
+        QAction* actCopyDataMatlab;
+        QAction* actSaveData;
+        protected slots:
+        void histTypeChanged(int index);
 };
 
 #endif // QFPARAMETERCORRELATIONVIEW_H

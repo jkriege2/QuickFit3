@@ -689,6 +689,7 @@ void QCairoPaintEngine::drawPoints(const QPointF *points, int pointCount)
     for (int i=0; i<pointCount; i++) {
         cairo_new_path(cr);
         cairo_move_to (cr, points[i].x(), points[i].y());
+
         cairo_close_path (cr);
     }
     //cairo_close_path(cr);

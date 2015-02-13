@@ -52,6 +52,11 @@ QFParameterCorrelationView::QFParameterCorrelationView(QWidget *parent) :
     histLabelX="";
     histLabelY="";
     histLabelColor="";
+    currentRangeSelection_xmin=0;
+    currentRangeSelection_xmax=0;
+    currentRangeSelection_ymin=0;
+    currentRangeSelection_ymax=0;
+
     createWidgets();
 }
 
@@ -984,6 +989,61 @@ void QFParameterCorrelationView::setCorrelationHistogramStretch(int corrStretch,
     layPlots->setRowStretch(2,histStretch);
 }
 
+double QFParameterCorrelationView::getCurrentRangeSelectionXMin() const
+{
+    return currentRangeSelection_xmin;
+}
+double QFParameterCorrelationView::getCurrentRangeSelectionXMax() const
+{
+    return currentRangeSelection_xmax;
+}
+double QFParameterCorrelationView::getCurrentRangeSelectionYMin() const
+{
+    return currentRangeSelection_ymin;
+}
+double QFParameterCorrelationView::getCurrentRangeSelectionYMax() const
+{
+    return currentRangeSelection_ymax;
+}
+
+
+void QFParameterCorrelationView::setRangeSelectionMode(bool enabled)
+{
+    currentRangeSelection_xmin=0;
+    currentRangeSelection_xmax=0;
+    currentRangeSelection_ymin=0;
+    currentRangeSelection_ymax=0;
+    plteRangeSelection->set_visible(enabled);
+
+    if (enabled) {
+        pltParamCorrelation->set_mouseActionMode(QFPlotter::RectangleEvents);
+        connect(pltParamCorrelation, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(rangeSelectionRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
+    } else {
+        pltParamCorrelation->set_mouseActionMode(QFPlotter::ZoomRectangle);
+        disconnect(pltParamCorrelation, SIGNAL(userRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)), this, SLOT(rangeSelectionRectangleFinished(double,double,double,double,Qt::KeyboardModifiers)));
+    }
+
+    UpdateSelectionRangeSelected();
+}
+
+void QFParameterCorrelationView::setrangeSelection(double xmin, double xmax, double ymin, double ymax)
+{
+    currentRangeSelection_xmin=xmin;
+    currentRangeSelection_xmax=xmax;
+    currentRangeSelection_ymin=ymin;
+    currentRangeSelection_ymax=ymax;
+    UpdateSelectionRangeSelected();
+}
+
+void QFParameterCorrelationView::clearRangeSelection()
+{
+    currentRangeSelection_xmin=0;
+    currentRangeSelection_xmax=0;
+    currentRangeSelection_ymin=0;
+    currentRangeSelection_ymax=0;
+    UpdateSelectionRangeSelected();
+}
+
 
 void QFParameterCorrelationView::dataSettingsChanged(bool update)
 {
@@ -1319,6 +1379,14 @@ void QFParameterCorrelationView::createWidgets()
     pltParamCorrelation->set_displayMousePosition(false);
     connect(pltParamCorrelation, SIGNAL(plotMouseMove(double,double)), this, SLOT(showPlotPosition(double,double)));
 
+    plteRangeSelection=new JKQTPoverlayRectangle(0,0,0,0, pltParamCorrelation->get_plotter());
+    plteRangeSelection->set_color(QColor("black"));
+    plteRangeSelection->set_lineWidth(1);
+    plteRangeSelection->set_lineStyle(Qt::DashLine);
+    plteRangeSelection->set_visible(false);
+    plteRangeSelection->set_fillColor(Qt::transparent);
+    pltParamCorrelation->get_plotter()->addOverlayElement(plteRangeSelection);
+
     pltParamHistogramX=new QFPlotter(false, this, pltParamCorrelation->getDatastore());
     pltParamHistogramX->setMinimumWidth(100);
     pltParamHistogramX->get_plotter()->synchronizeToMaster(pltParamCorrelation->get_plotter(), true, false);
@@ -1498,4 +1566,24 @@ void QFParameterCorrelationView::fillDataArray(QList<QVector<double> > &data, QS
             headers.append(histLabelColor+" ("+histograms[i].name+")");
         }
     }
+}
+
+void QFParameterCorrelationView::rangeSelectionRectangleFinished(double x, double y, double width, double height, Qt::KeyboardModifiers modifiers)
+{
+    currentRangeSelection_xmin=qMin(x, x+width);
+    currentRangeSelection_xmax=qMax(x, x+width);
+    currentRangeSelection_ymin=qMin(y, y+height);
+    currentRangeSelection_ymax=qMax(y, y+height);
+    UpdateSelectionRangeSelected();
+}
+
+void QFParameterCorrelationView::UpdateSelectionRangeSelected()
+{
+    plteRangeSelection->set_x1(currentRangeSelection_xmin);
+    plteRangeSelection->set_y1(currentRangeSelection_ymin);
+    plteRangeSelection->set_x2(currentRangeSelection_xmax);
+    plteRangeSelection->set_y2(currentRangeSelection_ymax);
+    pltParamCorrelation->update_overlays();
+    //qDebug()<<currentRangeSelection_xmin<<currentRangeSelection_xmax<<currentRangeSelection_ymin<<currentRangeSelection_ymax;
+    emit rangeSelected(currentRangeSelection_xmin, currentRangeSelection_xmax, currentRangeSelection_ymin, currentRangeSelection_ymax);
 }

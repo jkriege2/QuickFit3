@@ -20,7 +20,26 @@
       <enum>Qt::Vertical</enum>
      </property>
      <widget class="QFParameterCorrelationView" name="plotterCorrelation" native="true"/>
-     <widget class="QFPlotter" name="plotter" native="true"/>
+     <widget class="QSplitter" name="splitter2">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <widget class="QFPlotter" name="plotter" native="true"/>
+      <widget class="QWidget" name="layoutWidget">
+       <layout class="QVBoxLayout" name="verticalLayout_2">
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>Results:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QEnhancedTableView" name="tableView"/>
+        </item>
+       </layout>
+      </widget>
+     </widget>
     </widget>
    </item>
    <item>
@@ -225,6 +244,11 @@
    <extends>QWidget</extends>
    <header>qfparametercorrelationview.h</header>
    <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QEnhancedTableView</class>
+   <extends>QTableView</extends>
+   <header>qenhancedtableview.h</header>
   </customwidget>
  </customwidgets>
  <resources>

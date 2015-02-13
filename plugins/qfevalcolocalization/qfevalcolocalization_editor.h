@@ -28,6 +28,8 @@ Copyright (c) 2014
 #include <QProgressDialog>
 #include <QTextDocument>
 #include <stdint.h>
+#include <qfplotter.h>
+#include "qftablemodel.h"
 namespace Ui {
     class QFEValColocalizationEditor;
 }
@@ -51,12 +53,15 @@ class QFEValColocalizationEditor : public QFEvaluationEditor {
         virtual void readSettings();
         /** \brief write the settings */
         virtual void writeSettings();
+        void userRangeChanged(double xmin, double xmax,  double ymin, double ymax);
     protected:
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFEValColocalizationEditor *ui;
+
         
         /** \brief progress dialog used by the fits */
         QProgressDialog* dlgEvaluationProgress;
+        QFTableModel modelresults;
         
         
         /*! \brief a flag that indicates whether we are currently updating the display data 
