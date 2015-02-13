@@ -145,7 +145,8 @@ int main(int argc, char * argv[])
         // run application
         res=app.exec();
 
-        for (int i=0; i<appFonts.size(); i++)         {
+        for (int i=0; i<appFonts.size(); i++) {
+            //qDebug()<<appFonts[i];
             QFontDatabase::removeApplicationFont(appFonts[i]);
         }
         appFonts.clear();
@@ -153,8 +154,10 @@ int main(int argc, char * argv[])
     }
 
     // clean up some internal stores ...
+    //qDebug()<<"free LUTs";
     JKQTPimagePlot_freeLUTs(global_jkqtpimagetools_lutstore);
     // clean up some internal stores ...
+    //qDebug()<<"cleanup resource";
     Q_CLEANUP_RESOURCE(quickfit3);
 
     // return app result

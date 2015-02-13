@@ -305,6 +305,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         virtual void addPlotToView(const QString& name, const PlotData& data);
 
         virtual QMap<QString, QFToolTipsData> getTooltips() const;
+    signals:
+        void showSplashMessage(const QString& message);
     protected:
         void closeEvent(QCloseEvent *event);
         virtual void showEvent(QShowEvent* event);

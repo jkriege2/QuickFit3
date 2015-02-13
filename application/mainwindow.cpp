@@ -165,7 +165,8 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     timerAutosave=new QTimer(this);
     timerAutosave->setInterval(5*60*1000);
 
-
+    splash->showMessage(tr("initializing UI ... "));
+    QApplication::processEvents();
     createWidgets();
     createActions();
     createMenus();
@@ -182,6 +183,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     connect(extensionManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
     connect(exporterManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
     connect(importerManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
+    connect(this, SIGNAL(showSplashMessage(QString)), splash, SLOT(showMessage(const QString&)));
 
     connect(rawDataFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(evaluationFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
@@ -289,6 +291,7 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     logFileMainWidget->dec_indent();
 
     splash->showMessage(tr("%1 Plugins loaded successfully ... prepring online-help ... ").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()+importerManager->pluginCount()+exporterManager->pluginCount()));
+    QApplication::processEvents();
 
     logFileMainWidget->log_header(tr("preparing online-help ..."));
     logFileMainWidget->inc_indent();
@@ -395,7 +398,8 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     logFileMainWidget->dec_indent();
 
     logFileMainWidget->log_text(tr("QuickFit started succesfully!\n"));
-
+    splash->showMessage(tr("QuickFit started successfully ..."));
+    QApplication::processEvents();
 
     newProject();
 
@@ -435,6 +439,7 @@ MainWindow::~MainWindow() {
     QMapIterator<QString, QString> it(mathParserHelpCache);
     while (it.hasNext()) {
         it.next();
+        //qDebug()<<it.value();
         if (QFile::exists(it.value())) {
             QFile::remove(it.value());
         }
@@ -482,11 +487,17 @@ void MainWindow::searchAndRegisterPlugins() {
 
 
     // distribute application hooks
+    emit showSplashMessage("plugins: distributing application hooks ...");
+    QApplication::processEvents();
+    QApplication::processEvents();
     rawDataFactory->distribute(project, settings, this, this);
     evaluationFactory->distribute(project, settings, this, this);
     extensionManager->distribute(project);
 
     // init other plugins
+    emit showSplashMessage("plugins: initializing plugins ...");
+    QApplication::processEvents();
+    QApplication::processEvents();
     evaluationFactory->init();
     rawDataFactory->init();
     importerManager->init();
@@ -498,6 +509,9 @@ void MainWindow::searchAndRegisterPlugins() {
     extensionManager->init(this, this);
 
     // register plugins to menus
+    emit showSplashMessage("plugins: registering plugins ...");
+    QApplication::processEvents();
+    QApplication::processEvents();
     QStringList sl=getRawDataRecordFactory()->getIDList();
     for (int i=0; i<sl.size(); i++) {
         getRawDataRecordFactory()->registerMenu(sl[i], insertItemMenu);
@@ -517,21 +531,31 @@ void MainWindow::showLogMessage(const QString& message) {
 void MainWindow::closeEvent(QCloseEvent *event) {
     //qDebug()<<"main: closeEvent";
     if (maybeSave()) {
+        //qDebug()<<"writeSettings";
         writeSettings();
+        //qDebug()<<"closeProject";
         closeProject();
+        //qDebug()<<"deinit RDR";
         rawDataFactory->distribute(NULL, settings, this, this);
         rawDataFactory->deinit();
+        //qDebug()<<"deinit Eval";
         evaluationFactory->distribute(NULL, settings, this, this);
         evaluationFactory->deinit();
+        //qDebug()<<"deinit Ext";
         extensionManager->distribute(NULL);
         extensionManager->deinit();
+        //qDebug()<<"deinit Import";
         importerManager->deinit();
+        //qDebug()<<"deinit Export";
         exporterManager->deinit();
+        //qDebug()<<"deinit FitFunc";
         fitFunctionManager->deinit();
+        //qDebug()<<"deinit FitAlg";
         fitAlgorithmManager->deinit();
 
         newProjectTimer.stop();
         helpWindow->close();
+        //qDebug()<<"remove histograms";
         {
             QMapIterator<QString, QFHistogramView*> ii(histograms);
             while (ii.hasNext()) {
@@ -543,6 +567,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
             }
             histograms.clear();
         }
+        //qDebug()<<"remove correlations";
         {
             QMapIterator<QString, QFParameterCorrelationView*> ii(correlationViews);
             while (ii.hasNext()) {
@@ -554,6 +579,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
             }
             correlationViews.clear();
         }
+        //qDebug()<<"remove plots";
         {
             QMapIterator<QString, QFSimplePlotView*> ii(plotViews);
             while (ii.hasNext()) {
@@ -1588,7 +1614,7 @@ void MainWindow::createWidgets() {
     logFileQDebugWidget=new QtLogFile(tabLogs);
     logFileQDebugWidget->set_log_file_append(true);
     logFileQDebugWidget->set_log_date_time(true);
-    qDebug()<<"opening log: "<<QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+"_qdebug.log");
+    //qDebug()<<"opening log: "<<QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+"_qdebug.log");
     logFileQDebugWidget->open_logfile(QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+"_qdebug.log"), false);
     appLogFileQDebugWidget=logFileQDebugWidget;
 
@@ -1597,7 +1623,7 @@ void MainWindow::createWidgets() {
     logFileMainWidget->set_log_date_time(true);
     logFileProjectWidget->set_log_file_append(true);
     tabLogs->addTab(logFileMainWidget, tr("QuickFit Log"));
-    qDebug()<<"opening log: "<<QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log");
+    //qDebug()<<"opening log: "<<QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log");
     logFileMainWidget->open_logfile(QString(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log"), false);
     logFileMainWidget->log_text(tr("starting up QuickFit %1 (SVN: %2 COMILEDATE: %3), %4-bit ...\n").arg(qfInfoVersionFull()).arg(qfInfoSVNVersion()).arg(qfInfoCompileDate()).arg(getApplicationBitDepth()));
     logFileMainWidget->log_text(tr("logging to '%1' ...\n").arg(settings->getConfigFileDirectory()+"/"+fi.completeBaseName()+".log"));
@@ -5248,7 +5274,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                             mathParser.useXITS();
                             mathParser.set_fontSize(ProgramOptions::getConfigValue("quickfit/math_pointsize", 14).toInt());
                             mathParser.parse(latex);
-                            //if (mathParser.get_error_list().size()>0) qDebug()()<<latex<<mathParser.get_error_list();
+                            //if (mathParser.get_error_list().size()>0) //qDebug()()<<latex<<mathParser.get_error_list();
                             bool ok=false;
                             QString ht=mathParser.toHtml(&ok);
                             if (ok) {

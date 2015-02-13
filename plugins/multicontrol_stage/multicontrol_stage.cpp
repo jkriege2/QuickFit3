@@ -33,7 +33,6 @@ MulticontrolStage::MulticontrolStage(QObject* parent):
 }
 
 MulticontrolStage::~MulticontrolStage() {
-    deinit();
     delete stagecontroller;
 }
 

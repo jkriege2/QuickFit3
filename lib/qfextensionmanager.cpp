@@ -100,6 +100,7 @@ void QFExtensionManager::distribute(QFProject* project) {
     QMapIterator<QString, QFExtension*> i(items);
     while (i.hasNext()) {
         i.next();
+        //qDebug()<<"  QFExtensionManager::distribute"<<i.key();
         i.value()->setProject(project);
     }
 }
@@ -117,6 +118,7 @@ void QFExtensionManager::deinit() {
     QMapIterator<QString, QFExtension*> i(items);
     while (i.hasNext()) {
         i.next();
+        //qDebug()<<"  QFExtensionManager::deinit"<<i.key();
         i.value()->deinit();
     }
 }
