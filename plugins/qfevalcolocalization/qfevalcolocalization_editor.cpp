@@ -135,24 +135,79 @@ void QFEValColocalizationEditor::userRangeChanged(double xmin, double xmax, doub
     displayData();
 }
 
+void QFEValColocalizationEditor::on_btnEstimateBackground_clicked()
+{
+    if (!current) return;
+
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
+    QFEValColocalizationItem* eval=qobject_cast<QFEValColocalizationItem*>(current);
+    //qDebug()<<"displayData "<<record<<data<<eval;
+    if ((!record)||(!eval)||(!data)) return;
+
+    int stack=0;
+
+    int ch1=ui->spinChannel1->value();
+    int ch2=ui->spinChannel2->value();
+    int dframe=ui->spinDisplayFrame->value();
+    int64_t width=data->getImageStackWidth(stack);
+    int64_t height=data->getImageStackHeight(stack);
+    double* datar_ch1=data->getImageStack(stack, dframe, ch1);
+    double* datar_ch2=data->getImageStack(stack, dframe, ch2);
+    double back1=statisticsQuantile(datar_ch1, width*height, 0.05);
+    double back2=statisticsQuantile(datar_ch2, width*height, 0.05);
+    disconnect(ui->spinBackground, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
+    disconnect(ui->spinBackground2, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
+
+    ui->spinBackground->setValue(back1);
+    ui->spinBackground2->setValue(back2);
+
+    connect(ui->spinBackground, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
+    connect(ui->spinBackground2, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
+
+    displayData();
+}
+
+void QFEValColocalizationEditor::writeWidgetValues(QFRawDataRecord *formerRecord)
+{
+    QFEValColocalizationItem* eval=qobject_cast<QFEValColocalizationItem*>(current);
+    if (!eval) return;
+    QString resultID=eval->getEvaluationResultID(ui->cmbStack->currentIndex(), ui->spinChannel1->value(), ui->spinChannel2->value());
+    ui->plotterCorrelation->writeQFProperties(formerRecord, resultID+"_CORRPLOT/", "", "");
+    formerRecord->setQFProperty(resultID+"_RANGE1_MIN", ui->plotterCorrelation->getCurrentRangeSelectionXMin(), false, false);
+    formerRecord->setQFProperty(resultID+"_RANGE1_MAX", ui->plotterCorrelation->getCurrentRangeSelectionXMax(), false, false);
+    formerRecord->setQFProperty(resultID+"_RANGE2_MIN", ui->plotterCorrelation->getCurrentRangeSelectionYMin(), false, false);
+    formerRecord->setQFProperty(resultID+"_RANGE2_MAX", ui->plotterCorrelation->getCurrentRangeSelectionYMax(), false, false);
+    formerRecord->setQFProperty(resultID+"_evalframe", ui->spinFrame->value(), false, false);
+    formerRecord->setQFProperty(resultID+"_displayframe", ui->spinDisplayFrame->value(), false, false);
+    formerRecord->setQFProperty(resultID+"_backthreshold", ui->spinBackgroundThreshold->value(), false, false);
+    formerRecord->setQFProperty(resultID+"_back1", ui->spinBackground->value(), false, false);
+    formerRecord->setQFProperty(resultID+"_back2", ui->spinBackground2->value(), false, false);
+    resultID=eval->getEvaluationResultID(-1,-1,-1);
+    formerRecord->setQFProperty(resultID+"_channel1", ui->spinChannel1->value(), false, false);
+    formerRecord->setQFProperty(resultID+"_channel2", ui->spinChannel2->value(), false, false);
+    formerRecord->setQFProperty(resultID+"_stack", ui->cmbStack->currentIndex(), false, false);
+}
+
 void QFEValColocalizationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
     // this slot is called when the user selects a new record in the raw data record list on the RHS of this widget in the evaluation dialog
     
     QFEValColocalizationItem* eval=qobject_cast<QFEValColocalizationItem*>(current);
-    QString resultID=eval->getEvaluationResultID();
+
     QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(currentRecord);
     disconnect(formerRecord, SIGNAL(rawDataChanged()), this, SLOT(displayData()));
     if (formerRecord) {
+        disconnect(ui->cmbStack, SIGNAL(currentIndexChanged(int)), this, SLOT(resultsChanged()));
         disconnect(ui->chkAllFrames, SIGNAL(toggled(bool)), this, SLOT(resultsChanged()));
         disconnect(ui->spinBackgroundThreshold, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
+        disconnect(ui->spinBackground, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
+        disconnect(ui->spinBackground2, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
         disconnect(ui->spinFrame, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
         disconnect(ui->spinChannel1, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
         disconnect(ui->spinChannel2, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
         disconnect(ui->spinDisplayFrame, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
-        formerRecord->setQFProperty(resultID+"_RANGE1_MIN", ui->plotterCorrelation->getCurrentRangeSelectionXMin(), false, false);
-        formerRecord->setQFProperty(resultID+"_RANGE1_MAX", ui->plotterCorrelation->getCurrentRangeSelectionXMax(), false, false);
-        formerRecord->setQFProperty(resultID+"_RANGE2_MIN", ui->plotterCorrelation->getCurrentRangeSelectionYMin(), false, false);
-        formerRecord->setQFProperty(resultID+"_RANGE2_MAX", ui->plotterCorrelation->getCurrentRangeSelectionYMax(), false, false);
+        writeWidgetValues(formerRecord);
+
     }
 
     if (data) { // if we have a valid object, update
@@ -162,19 +217,32 @@ void QFEValColocalizationEditor::highlightingChanged(QFRawDataRecord* formerReco
         updatingData=true;
         // assign values to widgets here 
 
+        QString resultID=eval->getEvaluationResultID(-1,-1,-1);
+        ui->cmbStack->clear();
+        for (int i=0; i<data->getImageStackCount(); i++) {
+            ui->cmbStack->addItem(tr("stack %1: %2").arg(i).arg(data->getImageStackDescription(i)));
+        }
+        ui->cmbStack->setCurrentIndex(qBound(0, currentRecord->getQFProperty(resultID+"_stack", 0).toInt(), ui->cmbStack->count()-1));
         ui->spinChannel1->setRange(0, data->getImageStackChannels(stack));
-        ui->spinChannel2->setRange(0, data->getImageStackChannels(stack));
+        ui->spinChannel2->setRange(0, data->getImageStackChannels(stack));                
+        ui->spinChannel1->setValue(currentRecord->getQFProperty(resultID+"_channel1", 0).toInt());
+        ui->spinChannel2->setValue(currentRecord->getQFProperty(resultID+"_channel2", 1).toInt());
+        resultID=eval->getEvaluationResultID(ui->cmbStack->currentIndex(), ui->spinChannel1->value(), ui->spinChannel2->value());
         ui->spinDisplayFrame->setRange(0, data->getImageStackFrames(stack));
         ui->spinFrame->setRange(0, data->getImageStackFrames(stack));
         ui->chkAllFrames->setChecked(currentRecord->getQFProperty(resultID+"_allframes", true).toBool());
         ui->spinFrame->setValue(currentRecord->getQFProperty(resultID+"_evalframe", data->getImageStackFrames(stack)/2).toInt());
-        ui->spinChannel1->setValue(currentRecord->getQFProperty(resultID+"_channel1", 0).toInt());
-        ui->spinChannel2->setValue(currentRecord->getQFProperty(resultID+"_channel2", 1).toInt());
         ui->spinDisplayFrame->setValue(currentRecord->getQFProperty(resultID+"_displayframe", data->getImageStackFrames(stack)/2).toInt());
         ui->spinBackgroundThreshold->setValue(currentRecord->getQFProperty(resultID+"_backthreshold", 0).toDouble()); //statisticsQuantile(data->getImageStack(stack, ui->spinFrame->value(), ui->spinChannel1->value()), data->getImageStackWidth(stack)*data->getImageStackHeight(stack), 0.05)*1.5).toDouble());
+        ui->spinBackground->setValue(currentRecord->getQFProperty(resultID+"_back1", 0).toDouble()); //statisticsQuantile(data->getImageStack(stack, ui->spinFrame->value(), ui->spinChannel1->value()), data->getImageStackWidth(stack)*data->getImageStackHeight(stack), 0.05)*1.5).toDouble());
+        ui->spinBackground2->setValue(currentRecord->getQFProperty(resultID+"_back2", 0).toDouble()); //statisticsQuantile(data->getImageStack(stack, ui->spinFrame->value(), ui->spinChannel1->value()), data->getImageStackWidth(stack)*data->getImageStackHeight(stack), 0.05)*1.5).toDouble());
+        ui->plotterCorrelation->readQFProperties(currentRecord, resultID+"_CORRPLOT/", "", "");
         ui->plotterCorrelation->setrangeSelection(currentRecord->getQFProperty(resultID+"_RANGE1_MIN", 0).toDouble(), currentRecord->getQFProperty(resultID+"_RANGE1_MAX", 0).toDouble(),
                                                   currentRecord->getQFProperty(resultID+"_RANGE2_MIN", 0).toDouble(), currentRecord->getQFProperty(resultID+"_RANGE2_MAX", 0).toDouble());
 
+        connect(ui->cmbStack, SIGNAL(currentIndexChanged(int)), this, SLOT(resultsChanged()));
+        connect(ui->spinBackground2, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
+        connect(ui->spinBackground, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
         connect(ui->spinBackgroundThreshold, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
         connect(ui->spinFrame, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
         connect(ui->spinChannel1, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
@@ -214,12 +282,13 @@ void QFEValColocalizationEditor::displayData() {
     QFRDRImageStackInterface* data=dynamic_cast<QFRDRImageStackInterface*>(record);
     QFEValColocalizationItem* eval=qobject_cast<QFEValColocalizationItem*>(current);
     //qDebug()<<"displayData "<<record<<data<<eval;
-    if ((!record)||(!eval)||(!data)) return;
+    if ((!record)||(!eval)||(!data)||(ui->cmbStack->currentIndex()<0)) return;
 
 
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+    writeWidgetValues(record);
     record->disableEmitResultsChanged();
-    QString resultID=eval->getEvaluationResultID();
+    QString resultID=eval->getEvaluationResultID(ui->cmbStack->currentIndex(), ui->spinChannel1->value(), ui->spinChannel2->value());
     record->resultsClear(resultID);
     modelresults.setReadonly(false);
     modelresults.clear();
@@ -228,7 +297,7 @@ void QFEValColocalizationEditor::displayData() {
     int trow=0;
 
     ui->plotterCorrelation->clear();
-    int stack=0;
+    int stack=ui->cmbStack->currentIndex();
     int frame=ui->spinFrame->value();
     int frames=1;
     if (ui->chkAllFrames->isChecked()) {
@@ -242,15 +311,17 @@ void QFEValColocalizationEditor::displayData() {
     int height=data->getImageStackHeight(stack);
     int pixel_count=frames*width*height;
     double thresh=ui->spinBackgroundThreshold->value();
+    double back=ui->spinBackground->value();
+    double back2=ui->spinBackground2->value();
     double* data_ch1=data->getImageStack(stack, frame, ch1);
     double* data_ch2=data->getImageStack(stack, frame, ch2);
     double* datar_ch1=data->getImageStack(stack, dframe, ch1);
     double* datar_ch2=data->getImageStack(stack, dframe, ch2);
     QVector<double> dch1, dch2;
     for (long long int  i=0; i<frames*width*height; i++) {
-        if (data_ch1[i]>thresh && data_ch2[i]>thresh) {
-            dch1<<data_ch1[i];
-            dch2<<data_ch2[i];
+        if (data_ch1[i]-back>=thresh && data_ch2[i]-back2>=thresh) {
+            dch1<<data_ch1[i]-back;
+            dch2<<data_ch2[i]-back2;
         }
     }
     if (dch1.size()>0) {
@@ -268,6 +339,8 @@ void QFEValColocalizationEditor::displayData() {
     JKQTPColumnRGBMathImage* img=new JKQTPColumnRGBMathImage(ui->plotter->get_plotter());
     int rch1=ds->addCopiedColumn(data->getImageStack(stack, dframe, ch1), width*height, tr("channel %1").arg(ch1));
     int rch2=ds->addCopiedColumn(data->getImageStack(stack, dframe, ch2), width*height, tr("channel %1").arg(ch2));
+    ds->getColumn(rch1).subtract(back);
+    ds->getColumn(rch2).subtract(back2);
     img->set_imageGColumn(rch1);
     img->set_imageRColumn(rch2);
     img->set_autoImageRange(true);
@@ -292,7 +365,7 @@ void QFEValColocalizationEditor::displayData() {
     if (ch1min!=ch1max && ch2min!=ch2max) {
         QVector<double> ch1_ranged, ch2_ranged;
         for (long long i=0; i<width*height; i++) {
-            overlayImage[i]=(ch1min<=datar_ch1[i])&&(datar_ch1[i]<=ch1max) && (ch2min<=datar_ch2[i])&&(datar_ch2[i]<=ch2max);
+            overlayImage[i]=(ch1min<=datar_ch1[i]-back)&&(datar_ch1[i]-back<=ch1max) && (ch2min<=datar_ch2[i]-back2)&&(datar_ch2[i]-back2<=ch2max);
         }
 
         long f=frame;
@@ -300,9 +373,9 @@ void QFEValColocalizationEditor::displayData() {
             double* datarr_ch1=data->getImageStack(stack, f, ch1);
             double* datarr_ch2=data->getImageStack(stack, f, ch2);
             for (long long i=0; i<width*height; i++) {
-                if ((datarr_ch1[i]>thresh)&&(datarr_ch2[i]>thresh)&&(ch1min<=datarr_ch1[i])&&(datarr_ch1[i]<=ch1max) && (ch2min<=datarr_ch2[i])&&(datarr_ch2[i]<=ch2max)) {
-                    ch1_ranged<<datarr_ch1[i];
-                    ch2_ranged<<datarr_ch2[i];
+                if ((datarr_ch1[i]-back>=thresh)&&(datarr_ch2[i]-back2>=thresh)&&(ch1min<=datarr_ch1[i]-back)&&(datarr_ch1[i]-back<=ch1max) && (ch2min<=datarr_ch2[i]-back2)&&(datarr_ch2[i]-back2<=ch2max)) {
+                    ch1_ranged<<(datarr_ch1[i]-back);
+                    ch2_ranged<<(datarr_ch2[i]-back2);
                 }
             }
             f++;
@@ -315,29 +388,39 @@ void QFEValColocalizationEditor::displayData() {
         record->resultsSetInteger(resultID, "range_pixels", ch1_ranged.size());
         double p;
         record->resultsSetNumber(resultID, "range_pearson", p=statisticsCorrelationCoefficient(ch1_ranged.data(), ch2_ranged.data(), ch1_ranged.size()));
-        modelresults.setCellCreate(trow, 0, tr("Selection: Pearson"));
+        modelresults.setCellCreate(trow, 0, tr("Selection: Pearson Correlation Coefficient"));
         modelresults.setCellCreate(trow, 1, p);
         trow++;
-
+        record->resultsSetNumber(resultID, "range_mandersoverlap", p=statisticsMandersOverlapCoefficient(ch1_ranged.data(), ch2_ranged.data(), ch1_ranged.size()));
+        modelresults.setCellCreate(trow, 0, tr("Selection: Manders Overlap Coefficient"));
+        modelresults.setCellCreate(trow, 1, p);
+        trow++;
     }
     int rmask=ds->addCopiedColumn(overlayImage.data(), overlayImage.size(), tr("range selection mask "));
 
+    record->resultsSetNumber(resultID, "background_intensity_ch1", back);
+    record->resultsSetNumber(resultID, "background_intensity_ch2", back2);
+    record->resultsSetInteger(resultID, "stack", stack);
     record->resultsSetInteger(resultID, "ch1", ch1);
     record->resultsSetInteger(resultID, "ch2", ch2);
     record->resultsSetInteger(resultID, "pixels", dch2.size());
     record->resultsSetInteger(resultID, "allframes", ui->chkAllFrames->isChecked());
     if (ui->chkAllFrames->isChecked()) record->resultsSetInteger(resultID, "frame", ui->spinFrame->value());
-    record->resultsSetInteger(resultID, "intensity_threshold", thresh);
+    record->resultsSetNumber(resultID, "intensity_threshold", thresh);
     double p;
     record->resultsSetNumber(resultID, "pearson", p=statisticsCorrelationCoefficient(dch1.data(), dch2.data(), dch1.size()));
-    modelresults.setCellCreate(trow, 0, tr("All: Pearson"));
+    modelresults.setCellCreate(trow, 0, tr("All: Pearson Correlation Coefficient"));
+    modelresults.setCellCreate(trow, 1, p);
+    trow++;
+    record->resultsSetNumber(resultID, "mandersoverlap", p=statisticsMandersOverlapCoefficient(dch1.data(), dch2.data(), dch1.size()));
+    modelresults.setCellCreate(trow, 0, tr("All: Manders Overlap Coefficient"));
     modelresults.setCellCreate(trow, 1, p);
     trow++;
 
     JKQTPColumnOverlayImageEnhanced* plteOverlay=new JKQTPColumnOverlayImageEnhanced(ui->plotter->get_plotter());
     plteOverlay->set_drawAsRectangles(false);
     QColor col("blue");
-    col.setAlphaF(0.5);
+    col.setAlphaF(0.3);
     plteOverlay->set_width(width);
     plteOverlay->set_height(height);
     plteOverlay->set_Nx(width);
@@ -361,6 +444,7 @@ void QFEValColocalizationEditor::displayData() {
     modelresults.setReadonly(true);
     ui->tableView->resizeColumnsToContents();
     record->enableEmitResultsChanged(true);
+
     QApplication::restoreOverrideCursor();
 }
 

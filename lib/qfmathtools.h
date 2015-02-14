@@ -618,6 +618,33 @@ inline double qfstatisticsCorrCoeff(const T& X, const T& Y) {
     return sumxy/sqrt(sumx*sumy);
 }
 
+
+/*! \brief calculate the manders Overlap Coefficient coefficient
+    \ingroup tools_math_stat
+
+    \f[ \mbox{MOC}(x,y)=\frac{\sum\limits_{i=0}^{N-1}x_i\cdot y_i}{\sqrt{\sum\limits_{i=0}^{N-1}x_i^2\cdot\sum\limits_{i=0}^{N-1}y_i^2}} \f]
+
+*/
+template <class T>
+inline double qfstatisticsMandersOverlapCoeff(const T& X, const T& Y) {
+    long long N=qMin(X.size(), Y.size());
+    if (N<=1) return 0;
+
+    register double sumxy=0;
+    register double sumx=0;
+    register double sumy=0;
+    for (long long i=0; i<N; i++) {
+        const double xm=X[i];
+        const double ym=Y[i];
+        if (QFFloatIsOK(xm) && QFFloatIsOK(ym)) {
+            sumxy=sumxy+xm*ym;
+            sumx=sumx+xm*xm;
+            sumy=sumy+ym*ym;
+        }
+    }
+    return sumxy/sqrt(sumx*sumy);
+}
+
 /*! \brief calculate the skewness of a dataset
     \ingroup tools_math_stat
 

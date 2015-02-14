@@ -169,6 +169,7 @@ class QFLIB_EXPORT QFFitFunctionManager : public QObject {
 
         void fitFunctionsChanged();
 
+        void incProgress();
     private:
         QMap<QString, QLibrary*> libraryFitFunctions;
         QMap<QString, QString> userFitFunctions;

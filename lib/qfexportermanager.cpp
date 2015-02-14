@@ -319,5 +319,7 @@ void QFExporterManager::init()
 {
     for (int i=0; i<pluginCount(); i++) {
         if (plugins.value(i, NULL)) plugins.value(i, NULL)->init();
+        emit incProgress();
+        if (i%3==0) QApplication::processEvents();
     }
 }

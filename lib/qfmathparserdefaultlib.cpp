@@ -187,6 +187,7 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("sum2", QFMathParser_DefaultLib::fSum2);
     p->addFunction("mean", QFMathParser_DefaultLib::fMean);
     p->addFunction("corrcoeff", QFMathParser_DefaultLib::fCorrcoeff);
+    p->addFunction("mandersoverlap", QFMathParser_DefaultLib::fMandersOverlapCoeff);
     p->addFunction("skewness", QFMathParser_DefaultLib::fSkewness);
     p->addFunction("moment", QFMathParser_DefaultLib::fCentralMoment);
     p->addFunction("ncmoment", QFMathParser_DefaultLib::fNonCentralMoment);
@@ -3567,29 +3568,33 @@ namespace QFMathParser_DefaultLib {
     {
         const QString iname="rangedhistogrambins";
         int bins=11;
-        if ((n==3 || n==4 || n==5) && params[0].type==qfmpDoubleVector && params[1].type==qfmpDouble && params[2].type==qfmpDouble) {
+        int paramoffset=0;
+        if (n>0 && params[0].type==qfmpDoubleVector) paramoffset=1;
+        if ((n==2+paramoffset || n==3+paramoffset || n==4+paramoffset) && params[paramoffset+0].type==qfmpDouble && params[paramoffset+1].type==qfmpDouble) {
             bool norm=false;
-            double rmin=params[1].num;
-            double rmax=params[2].num;
-            if (n==4 && params[3].isUInt())  {
-                bins=qMax((uint32_t)2,params[3].toUInt());
-            } else if (n==4 && params[3].type==qfmpBool)  {
-                norm=params[3].boolean;
-            } else if (n==5 && params[3].isUInt() && params[4].type==qfmpBool)  {
-                bins=qMax((uint32_t)2,params[3].toUInt());
-                norm=params[4].boolean;
+            double rmin=params[paramoffset].num;
+            double rmax=params[paramoffset+1].num;
+            if (n==paramoffset+3 && params[paramoffset+2].isUInt())  {
+                bins=qMax((uint32_t)2,params[paramoffset+2].toUInt());
+            } else if (n==paramoffset+3 && params[paramoffset+2].type==qfmpBool)  {
+                norm=params[paramoffset+2].boolean;
+            } else if (n==paramoffset+4 && params[paramoffset+2].isUInt() && params[paramoffset+3].type==qfmpBool)  {
+                bins=qMax((uint32_t)2,params[paramoffset+2].toUInt());
+                norm=params[paramoffset+3].boolean;
             } else {
                 res.setInvalid();
-                p->qfmpError(QObject::tr("%1(data,min,max[,bins][,normalize]) needs an unsigned integer for bins and a boolean for normalize (both optional)").arg(iname));
+                p->qfmpError(QObject::tr("%1([data,]min,max[,bins][,normalize]) needs an unsigned integer for bins and a boolean for normalize (both optional)").arg(iname));
                 return;
             }
             QVector<double> temp;
             temp.resize(bins);
             res.setDoubleVec(bins);
-            statisticsHistogramRanged(params[0].numVec.constData(), params[0].numVec.size(), rmin, rmax, res.numVec.data(), temp.data(), bins, norm);
+            QVector<double> dummy;
+            dummy<<0<<1;
+            statisticsHistogramRanged(dummy.constData(), dummy.size(), rmin, rmax, res.numVec.data(), temp.data(), bins, norm);
         } else {
             res.setInvalid();
-            p->qfmpError(QObject::tr("%1(data,min,max[,bins][,normalize]) needs at least one number vector argument").arg(iname));
+            p->qfmpError(QObject::tr("%1([data,]min,max[,bins][,normalize]) needs at least two number arguments").arg(iname));
             return;
         }
 
@@ -3600,6 +3605,419 @@ namespace QFMathParser_DefaultLib {
 
 
 
+
+
+
+
+
+
+
+
+
+
+    void fPolyFit(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        r.setDoubleVec();
+        if (n!=3) {
+            p->qfmpError("polyfit(X,Y,n) needs 3 arguments");
+            r.setInvalid();
+            return;
+
+        }
+        if (!(params[0].convertsToVector() && params[1].convertsToVector())) {
+            p->qfmpError("polyfit(X,Y,n) arguments X and Y have to be of type number vector");
+            r.setInvalid();
+            return;
+
+        }
+        if (params[0].length()!= params[1].length()) {
+            p->qfmpError("polyfit(X,Y,n) arguments X and Y have to have the same length");
+            r.setInvalid();
+            return;
+
+        }
+        if (!(params[2].isInteger())) {
+            p->qfmpError("polyfit(X,Y,n) argument n has to be a positive integer number");
+            r.setInvalid();
+            return;
+
+        }
+
+        QVector<double> X=params[0].asVector();
+        QVector<double> Y=params[1].asVector();
+        int32_t np=params[2].toInteger();
+
+        if (np<=0) {
+            p->qfmpError("polyfit(X,Y,n) argument n has to be a positive integer number");
+            r.setInvalid();
+            return;
+
+        }
+
+        r.numVec.clear();
+        r.numVec.resize(np+1);
+        for (int i=0; i<np+1; i++) r.numVec[i]=0.0;
+        bool ok=statisticsPolyFit(X.data(), Y.data(), qMin(X.size(), Y.size()), np, r.numVec.data());
+
+    }
+
+
+    void fRegression(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        r.setDoubleVec();
+        if (n!=2 && n!=4) {
+            p->qfmpError("regression(X,Y) needs 2 or 4 arguments");
+            r.setInvalid();
+            return;
+
+        }
+        if (!(params[0].convertsToVector() && params[1].convertsToVector())) {
+            p->qfmpError("regression(X,Y) arguments X and Y have to be of type number vector");
+            r.setInvalid();
+            return;
+
+        }
+        if (params[0].length()!= params[1].length()) {
+            p->qfmpError("regression(X,Y) arguments X and Y have to have the same length");
+            r.setInvalid();
+            return;
+
+        }
+
+        double a, b;
+        bool fixA=false;
+        bool fixB=false;
+        if (n==4) {
+            if (!(params[2].type==qfmpString && params[3].type==qfmpDouble)) {
+                p->qfmpError(QObject::tr("regression(X,Y,'fixParameter',fixValue) argument fixParameter has to be a string and fixValue a number, but parameters are %1 and %2").arg(params[2].toTypeString()).arg(params[3].toTypeString()));
+                r.setInvalid();
+                return;
+
+            }
+            if (params[2].str.toLower()=="a") {
+                fixA=true;
+                a=params[3].num;
+            } else if (params[2].str.toLower()=="b") {
+                fixB=true;
+                b=params[3].num;
+            } else {
+                p->qfmpError(QObject::tr("regression(X,Y,'fixParameter',fixValue) argument fixParameter has to be a string and fixValue a number 'a' or 'b', but was %1").arg(params[2].toTypeString()));
+                r.setInvalid();
+                return;
+
+            }
+        }
+        QVector<double> X=params[0].asVector();
+        QVector<double> Y=params[1].asVector();
+        statisticsLinearRegression(X.data(), Y.data(), qMin(X.size(), Y.size()), a, b, fixA, fixB);
+
+        r.numVec.clear();
+        r.numVec<<a;
+        r.numVec<<b;
+
+    }
+
+    void fWeightedRegression(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        r.setDoubleVec();
+        if (n!=3 && n!=5) {
+            p->qfmpError("weighted_regression(X,Y,W) needs 3 or 5 arguments");
+            r.setInvalid();
+            return;
+
+        }
+        if (!(params[0].convertsToVector() && params[1].convertsToVector() && params[2].convertsToVector())) {
+            p->qfmpError("weighted_regression(X,Y,W) arguments X, Y and W have to be of type number vector");
+            r.setInvalid();
+            return;
+
+        }
+        if (params[0].length()!= params[1].length() || params[0].length()!= params[2].length() || params[2].length()!= params[2].length()) {
+            p->qfmpError("weighted_regression(X,Y,W) arguments X, Y and W have to have the same length");
+            r.setInvalid();
+            return;
+
+        }
+
+        double a, b;
+        bool fixA=false;
+        bool fixB=false;
+        if (n==5) {
+            if (!(params[3].type==qfmpString && params[4].type==qfmpDouble)) {
+                p->qfmpError("weighted_regression(X,Y,W,'fixParameter',fixValue) argument fixParameter has to be a string and fixValue a number");
+                r.setInvalid();
+                return;
+
+            }
+            if (params[3].str.toLower()=="a") {
+                fixA=true;
+                a=params[4].num;
+            } else if (params[3].str.toLower()=="b") {
+                fixB=true;
+                b=params[4].num;
+            } else {
+                p->qfmpError(QObject::tr("weighted_regression(X,Y,W,'fixParameter',fixValue) argument fixParameter has to be a string and fixValue a number 'a' or 'b', but was %1").arg(params[3].toTypeString()));
+                r.setInvalid();
+                return;
+
+            }
+        }
+        QVector<double> X=params[0].asVector();
+        QVector<double> Y=params[1].asVector();
+        QVector<double> W=params[2].asVector();
+        statisticsLinearWeightedRegression(X.data(), Y.data(), W.data(), qMin(X.size(), Y.size()), a, b, fixA, fixB);
+
+        r.numVec.clear();
+        r.numVec<<a;
+        r.numVec<<b;
+
+    }
+
+    void fIRLS(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        r.setDoubleVec();
+        if (n<2 && n>6) {
+            p->qfmpError("irls(X,Y) needs between 2 and 6 arguments");
+            r.setInvalid();
+            return;
+
+        }
+        if (!(params[0].convertsToVector() && params[1].convertsToVector())) {
+            p->qfmpError("irls(X,Y) arguments X and Y have to be of type number vector");
+            r.setInvalid();
+            return;
+
+        }
+        if (params[0].length()!= params[1].length()) {
+            p->qfmpError("irls(X,Y) arguments X and Y have to have the same length");
+            r.setInvalid();
+            return;
+
+        }
+
+        double a=0, b=0;
+        bool fixA=false;
+        bool fixB=false;
+        double Lp=1.1;
+        int iterations=100;
+        int fixOffset=2;
+        if (n>=3) {
+            if (params[2].type==qfmpDouble) {
+                fixOffset=3;
+                Lp=params[2].asNumber();
+                if (n>=4) {
+                    if (params[3].type==qfmpDouble) {
+                        fixOffset=4;
+                        iterations=params[3].asNumber();
+                    }
+                }
+            }
+        }
+
+        if ((int64_t)n==fixOffset+2) {
+            if (!(params[fixOffset+0].type==qfmpString && params[fixOffset+1].type==qfmpDouble)) {
+                p->qfmpError("irls(X,Y,...,'fixParameter',fixValue) argument fixParameter has to be a string and fixValue a number");
+                r.setInvalid();
+                return;
+
+            }
+            if (params[fixOffset+0].str.toLower()=="a") {
+                fixA=true;
+                a=params[fixOffset+1].num;
+            } else if (params[fixOffset+0].str.toLower()=="b") {
+                fixB=true;
+                b=params[fixOffset+1].num;
+            } else {
+                p->qfmpError(QObject::tr("irls(X,Y,...,'fixParameter',fixValue) argument fixParameter has to be a string and fixValue a number 'a' or 'b', but was %1").arg(params[fixOffset+0].toTypeString()));
+                r.setInvalid();
+                return;
+
+            }
+        }
+        QVector<double> X=params[0].asVector();
+        QVector<double> Y=params[1].asVector();
+        statisticsIterativelyReweightedLeastSquaresRegression(X.data(), Y.data(), qMin(X.size(), Y.size()), a, b, Lp, iterations, fixA, fixB);
+
+        r.numVec.clear();
+        r.numVec<<a;
+        r.numVec<<b;
+
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    void fErrorAdd(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        r.setDoubleVec();
+        if (n!=2) {
+            p->qfmpError("erroradd(X,Y) needs 2 arguments");
+            r.setInvalid();
+            return;
+
+        }
+        if (!(params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector)) {
+            p->qfmpError("erroradd(X,Y) arguments X and Y have to be of type number vector");
+            r.setInvalid();
+            return;
+
+        }
+        if (params[0].length()!=2 || params[1].length()!=2) {
+            p->qfmpError("erroradd(X,Y) arguments X and Y have to have length 2");
+            r.setInvalid();
+            return;
+
+        }
+
+        double X=params[0].numVec[0];
+        double Xe=params[0].numVec[1];
+        double Y=params[1].numVec[0];
+        double Ye=params[1].numVec[1];
+
+        r.numVec.clear();
+        r.numVec<<X+Y;
+        r.numVec<<sqrt(Xe*Xe+Ye*Ye);
+
+    }
+
+    void fErrorSub(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        r.setDoubleVec();
+        if (n!=2) {
+            p->qfmpError("errorsub(X,Y) needs 2 arguments");
+            r.setInvalid();
+            return;
+
+        }
+        if (!(params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector)) {
+            p->qfmpError("errorsub(X,Y) arguments X and Y have to be of type number vector");
+            r.setInvalid();
+            return;
+
+        }
+        if (params[0].length()!=2 || params[1].length()!=2) {
+            p->qfmpError("errorsub(X,Y) arguments X and Y have to have length 2");
+            r.setInvalid();
+            return;
+
+        }
+
+        double X=params[0].numVec[0];
+        double Xe=params[0].numVec[1];
+        double Y=params[1].numVec[0];
+        double Ye=params[1].numVec[1];
+
+        r.numVec.clear();
+        r.numVec<<X-Y;
+        r.numVec<<sqrt(Xe*Xe+Ye*Ye);
+
+    }
+
+
+
+
+    void fErrorMul(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        r.setDoubleVec();
+        if (n!=2) {
+            p->qfmpError("errormul(X,Y) needs 2 arguments");
+            r.setInvalid();
+            return;
+
+        }
+        if (!(params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector)) {
+            p->qfmpError("errormul(X,Y) arguments X and Y have to be of type number vector");
+            r.setInvalid();
+            return;
+
+        }
+        if (params[0].length()!=2 || params[1].length()!=2) {
+            p->qfmpError("errormul(X,Y) arguments X and Y have to have length 2");
+            r.setInvalid();
+            return;
+
+        }
+
+        double X=params[0].numVec[0];
+        double Xe=params[0].numVec[1];
+        double Y=params[1].numVec[0];
+        double Ye=params[1].numVec[1];
+
+        r.numVec.clear();
+        r.numVec<<X*Y;
+        r.numVec<<sqrt(qfSqr(Y*Xe)+qfSqr(X*Ye));
+
+    }
+
+    void fErrorDiv(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        r.setDoubleVec();
+        if (n!=2) {
+            p->qfmpError("errordiv(X,Y) needs 2 arguments");
+            r.setInvalid();
+            return;
+
+        }
+        if (!(params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector)) {
+            p->qfmpError("errordiv(X,Y) arguments X and Y have to be of type number vector");
+            r.setInvalid();
+            return;
+
+        }
+        if (params[0].length()!=2 || params[1].length()!=2) {
+            p->qfmpError("errordiv(X,Y) arguments X and Y have to have length 2");
+            r.setInvalid();
+            return;
+
+        }
+
+        double X=params[0].numVec[0];
+        double Xe=params[0].numVec[1];
+        double Y=params[1].numVec[0];
+        double Ye=params[1].numVec[1];
+
+        r.numVec.clear();
+        r.numVec<<X/Y;
+        r.numVec<<sqrt(qfSqr(Xe/Y)+qfSqr(X*Ye/Y/Y));
+
+    }
+    void fErrorPow(qfmpResult &r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
+        r.setDoubleVec();
+        if (n!=2) {
+            p->qfmpError("errorpow(X,Y) needs 2 arguments");
+            r.setInvalid();
+            return;
+        }
+        if (!(params[0].type==qfmpDoubleVector && params[1].type==qfmpDoubleVector)) {
+            p->qfmpError("errorpow(X,Y) arguments X and Y have to be of type number vector");
+            r.setInvalid();
+            return;
+        }
+        if (params[0].length()!=2 || params[1].length()!=2) {
+            p->qfmpError("errorpow(X,Y) arguments X and Y have to have length 2");
+            r.setInvalid();
+            return;
+        }
+
+        double X=params[0].numVec[0];
+        double Xe=params[0].numVec[1];
+        double Y=params[1].numVec[0];
+        double Ye=params[1].numVec[1];
+
+        r.numVec.clear();
+        r.numVec<<pow(X,Y);
+        r.numVec<<sqrt(qfSqr(Xe*Y*pow(X,Y-1.0))+qfSqr(Ye*pow(X,Y)*log(Y)));
+    }
 
 
 

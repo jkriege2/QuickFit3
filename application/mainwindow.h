@@ -69,6 +69,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qftableservice.h"
 #include "qftableview.h"
 #include "qfexportermanager.h"
+#include "qfsplashscreen.h"
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
 void myMessageOutputQt5(QtMsgType type, const QMessageLogContext &context, const QString &msg);
@@ -86,7 +87,7 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         /** \brief class constructor
          *  \param splash a splash screen to use for status output during startup/construction
          */
-        explicit MainWindow(ProgramOptions* s, QSplashScreen* splash);
+        explicit MainWindow(ProgramOptions* s, QFSplashScreen* splash);
         virtual ~MainWindow();
 
 
@@ -307,6 +308,9 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         virtual QMap<QString, QFToolTipsData> getTooltips() const;
     signals:
         void showSplashMessage(const QString& message);
+        void incSplashProgress();
+        void setSplashProgressRange(int min,int max);
+        void setSplashProgress(int value);
     protected:
         void closeEvent(QCloseEvent *event);
         virtual void showEvent(QShowEvent* event);

@@ -36,6 +36,9 @@
             <li><b>eval_colocalization</b>:  new evaluation plugin for a colocalization analysis</li>
             <li><b>basicimageexporters</b>:  new plugin, which allows to store image series in different standard formats (TIFF, RAW, ...)</li>
       </ul></li>
+      <li><b>removed plugins:</b><ul>
+            <li><b>qfe_defaultmathparserextensions</b>:  functionality was incorporated into the QFMathParser standard library</li>
+      </ul></li>
       <li><b>QuickFit</b><ul>
         <li>plotter widgets:<ul>
                     <li>data table in plotter now has context menu entry to copy data as CSV</li>
@@ -83,6 +86,8 @@
                     <li>bugfix: all median()/quantile()/min()/max() parser functions now should properly ignore NAN values.</li>
                     <li>added functions to access run-selections <tt>runex_...()</tt> in FCS,... records</li>
                     <li>You can use C-style escapes (<tt>\" \' \n \r \t \\ \/</tt>) to add the delimiting characters to a string constant</li>
+                    <li>added functions to the default lib, which were in the plugin qfe_defaultmathparserextensions before</li>
+                    <li>rangedhistogrambins() functions can now also be called without the data vector x as first argument.</li>
             </ul></li>
             <li>added context menu entry to tables, that allows to explicitly copy the table as "CSV", or to copy the table in a format suitable for "Excel", which depends on the current locale (e.g. for decimal separators)</li>
             <li>bugfixed "copy to Excel/CSV" in table view, which did not copy any data (regression?)</li>
@@ -172,6 +177,7 @@
             <li>added more status info outputs to the system log, when starting QuickFit</li>
             <li>improved rendering speed of online-help, using a caching strategy</li>
             <li>added save menu entry to the online-help window </li>
+            <li>splash screen gives a better indication of loading progress/status now (with a progress bar)</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>

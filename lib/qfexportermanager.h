@@ -154,7 +154,7 @@ class QFLIB_EXPORT QFExporterManager : public QObject {
         void showMessage(const QString& message);
         /** \brief long message reporting the loaded plugins, emitted during searchPlugins() */
         void showLongMessage(const QString& message);
-
+        void incProgress();
     private:
         QList<QFPluginExporters*> plugins;
         QStringList filenames;

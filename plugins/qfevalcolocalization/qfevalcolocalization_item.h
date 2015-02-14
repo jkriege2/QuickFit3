@@ -63,12 +63,12 @@ class QFEValColocalizationItem : public QFEvaluationItem {
 
         
         /** \breif return \c true if an evaluation has been performed for the given record \a r1 */
-        bool hasEvaluation(QFRawDataRecord* r1);
+        bool hasEvaluation(QFRawDataRecord* r1, int stack, int ch1, int ch2);
 
 
         /** \brief create an ID to reference results that belong to this evaluation \b object (includes the evaluation id) and the
          *         current fit function for a given fitFunction ID */
-        QString getEvaluationResultID();
+        QString getEvaluationResultID(int stack, int ch1, int ch2);
 
 		/** \brief perform the evaluation for the given record. The dlgEvaluationProgress can be used to display the evaluation progress and to check whether the user has pressed Cancel
 		 *

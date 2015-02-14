@@ -2,7 +2,7 @@
   <html>
   <head>
   <meta http-equiv="content-type" content="text/html; charset=windows-1250">
-  <title>Data Table Online-Help: Expression parser: Statistics Functions</title>
+  <title>Expression parser: Statistics Functions</title>
   </head>
   <body> 
   $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
@@ -12,98 +12,127 @@
   $$funcref_start$$<a name="mean"/><!-- func:mean -->
   <b><tt><!-- template -->mean(x)<!-- /template --></tt> - <i>returns the mean of vector <tt>x</tt> </i>:</b>
 $$funcref_description$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
+  
+  $[  \overline{x}=\frac{1}{N}\cdot\sum_{i=0}^{N-1} x_i  ]$
   <!-- /func:mean -->  
 $$funcref_end$$
   
   $$funcref_start$$<a name="sum"/><!-- func:vsum -->
   <b><tt><!-- template -->sum(x)<!-- /template --></tt> - <i>returns the sum of  all elements in vector <tt>x</tt> </i>:</b>
 $$funcref_description$$
-  This function ignores all NAN or INF values in <tt>x</tt>! See also <a href="specials.html#sum">the extended sum function</a>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$ See also <a href="specials.html#sum">the extended sum function</a>!
+  $[  \overline{x}=\sum_{i=0}^{N-1} x_i  ]$
   <!-- /func:vsum -->  
 $$funcref_end$$
   
   $$funcref_start$$<a name="sum2"/><!-- func:sum2 -->
   <b><tt><!-- template -->sum2(x)<!-- /template --></tt> - <i>returns the sum of the squares of all elements in vector <tt>x</tt> </i>:</b>
 $$funcref_description$$
-  This function ignores all NAN or INF values in <tt>x</tt>! See also <a href="specials.html#sum">the extended sum function</a>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$ See also <a href="specials.html#sum">the extended sum function</a>!
+  $[  \overline{x^2}=\sum_{i=0}^{N-1} x_i^2  ]$
   <!-- /func:sum2 -->  
 $$funcref_end$$
   
   $$funcref_start$$<a name="prod"/><!-- func:vprod -->
   <b><tt><!-- template -->prod(x)<!-- /template --></tt> - <i>returns the product of all elements in vector <tt>x</tt> </i>:</b>
 $$funcref_description$$
-  This function ignores all NAN or INF values in <tt>x</tt>! See also <a href="specials.html#sum">the extended sum function</a>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$ See also <a href="specials.html#sum">the extended sum function</a>!
+  $[  f(x)=\prod\_{i=0}^{N-1} x_i  ]$
   <!-- /func:vprod -->  
 $$funcref_end$$
   
   $$funcref_start$$<a name="std"/><!-- func:std -->
   <b><tt><!-- template -->std(x)<!-- /template --></tt> - <i>returns the standard deviation of vector <tt>x</tt> </i>:</b>
 $$funcref_description$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
+  $[  \overline{x}=\frac{1}{N}\cdot\sum_{i=0}^{N-1}x_i  ]$
+    $[  \text{Std}(x)=\sqrt{\frac{1}{N-1}\cdot\sum_{i=0}^{N-1}(x_i-\overline{x})^2}  ]$
   <!-- /func:std -->  
 $$funcref_end$$
   
   $$funcref_start$$<a name="var"/><!-- func:var -->
   <b><tt><!-- template -->var(x)<!-- /template --></tt> - <i>returns the variance of vector <tt>x</tt> </i>:</b>
 $$funcref_description$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
+    $[  \overline{x}=\frac{1}{N}\cdot\sum_{i=0}^{N-1}x_i  ]$
+    $[  \text{Var}(x)=\frac{1}{N-1}\cdot\sum_{i=0}^{N-1}(x_i-\overline{x})^2  ]$
+
   <!-- /func:var -->  
 $$funcref_end$$
   
   $$funcref_start$$<a name="skewness"/><!-- func:skewness -->
   <b><tt><!-- template -->skewness(x)<!-- /template --></tt> - <i>returns the skewness of vector <tt>x</tt> </i>:</b>
 $$funcref_description$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
+ $[ \gamma_1=\mathbb{E}\left[\left(\frac{X-\mu}{\sigma}\right)^3\right]= \frac{m_3}{m_2^{3/2}}  = \frac{\frac{1}{n} \sum_{i=1}^n (x_i-\overline{x})^3}{\left(\frac{1}{n} \sum_{i=1}^n (x_i-\overline{x})^2\right)^{3/2}} ]$
+    where $(\mu)$ is the mean and $(\sigma)$ the standard deviation of a random variable $(X)$ and $(\overline{x})$ is the average  of  the input dataset $( x_i)$.
   <!-- /func:skewness -->  
 $$funcref_end$$
 
   $$funcref_start$$<a name="moment"/><!-- func:moment -->
   <b><tt><!-- template -->moment(x, p)<!-- /template --></tt> - <i>returns the central moment of order <tt>p</tt> of vector <tt>x</tt></i>:</b>
 $$funcref_description$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
+  
+  $[\langle X^n\rangle= \mathbb{E}\left[\left(X-\mu\right)^n\right] ]$
+    where $(\mu)$ is the mean of a random variable $(X)$ and $(\overline{x})$ is the average of
+    the input dataset $( x_i)$.
   <!-- /func:moment -->  
 $$funcref_end$$
   
   $$funcref_start$$<a name="ncmoment"/><!-- func:ncmoment -->
   <b><tt><!-- template -->ncmoment(x, p)<!-- /template --></tt> - <i>returns the non-central moment of order <tt>p</tt> of vector <tt>x</tt></i>:</b>
 $$funcref_description$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
+  
+   $[  \langle X^n\rangle= \mathbb{E}\left[X^n\right]  ]$
+    where $(\mu)$ is the mean of a random variable $(X)$ and $(\overline{x})$ is the average (calculated using statisticsAverage() ) of
+    the input dataset $( x_i)$.
   <!-- /func:ncmoment -->  
 $$funcref_end$$
   
   $$funcref_start$$<a name="corrcoeff"/><!-- func:corrcoeff -->
   <b><tt><!-- template -->corrcoeff(x, y)<!-- /template --></tt> - <i>returns the correlation coefficient (Pearson) of vectors <tt>x</tt> and <tt>y</tt></i>:</b>
 $$funcref_description$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
+  $[ \rho_{x,y}=\frac{\sum_{i=0}^{N-1}(x_i-\overline{x})(y_i-\overline{y})}{\sqrt{\sum_{i=0}^{N-1}(x_i-\overline{x})^2\cdot\sum_{i=0}^{N-1}(y_i-\overline{y})^2}} ]$
   <!-- /func:corrcoeff -->  
 $$funcref_end$$
   
+  $$funcref_start$$<a name="mandersoverlap"/><!-- func:mandersoverlap -->
+  <b><tt><!-- template -->mandersoverlap(x, y)<!-- /template --></tt> - <i>returns Manders overlap coefficient (MOC) of vectors <tt>x</tt> and <tt>y</tt></i>:</b>
+$$funcref_description$$
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
+  $[ \mbox{MOC}(x,y)=\frac{\sum_{i=0}^{N-1}x_i\cdot y_i}{\sqrt{\sum_{i=0}^{N-1}x_i^2\cdot\sum_{i=0}^{N-1}y_i^2}} ]$
+  <!-- /func:mandersoverlap -->  
+$$funcref_end$$
+ 
   $$funcref_start$$<a name="min"/><!-- func:min -->
   <b><tt><!-- template -->min(x)<!-- /template --></tt> - <i>returns the minimum of vector <tt>x</tt> </i>:</b>
 $$funcref_description$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
   <!-- /func:min -->  
 $$funcref_end$$
   
   $$funcref_start$$<a name="max"/><!-- func:max -->
   <b><tt><!-- template -->max(x)<!-- /template --></tt> - <i>returns the maximum of vector <tt>x</tt> </i>:</b>
 $$funcref_description$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
   <!-- /func:max -->  
 $$funcref_end$$
   
   $$funcref_start$$<a name="median"/><!-- func:median -->
   <b><tt><!-- template -->median(x)<!-- /template --></tt> - <i>returns the median of vector <tt>x</tt> </i>:</b>
 $$funcref_description$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
   <!-- /func:median -->  
 $$funcref_end$$
  
   $$funcref_start$$<a name="quantile"/><!-- func:quantile -->
   <b><tt><!-- template -->quantile(x, p)<!-- /template --></tt> - <i>returns the <tt>p</tt>-quantile of vector <tt>x</tt>, $$math:0\leq p\leq1$$ </i>:</b>
 $$funcref_description$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
   <!-- /func:quantile -->  
 $$funcref_end$$
   
@@ -111,7 +140,7 @@ $$funcref_end$$
   <b><tt><!-- template -->mad(x)<!-- /template --></tt> - <i>returns the median absolute deviation about the median (MAD), a robust measure of sample deviation of vector <tt>x</tt> </i>:</b>
 $$funcref_description$$
   $$bmath:\mbox{MAD}(\vec{x})=\mbox{Med}\left\{|\vec{x}-\mbox{Med}(\vec{x})|\right\}$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
   $$see:Ricardo A. Maronna, R. Douglas Martin, Victor J. Yohai: "Robust Statistics: Theory and Methods", Wiley, 2006, ISBN: 978-0-470-01092-1$$
   <!-- /func:mad -->  
 $$funcref_end$$
@@ -120,7 +149,7 @@ $$funcref_end$$
   <b><tt><!-- template -->nmad(x)<!-- /template --></tt> - <i>returns the normalized median absolute deviation about the median (NMAD), a robust measure of sample deviation of vector <tt>x</tt> </i>:</b>
 $$funcref_description$$
   $$bmath:\mbox{NMAD}(\vec{x})=\frac{\mbox{MAD}(\vec{x})}{0.6745}=\frac{\mbox{Med}\left\{|\vec{x}-\mbox{Med}(\vec{x})|\right\}}{0.6745}$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
   $$see:Ricardo A. Maronna, R. Douglas Martin, Victor J. Yohai: "Robust Statistics: Theory and Methods", Wiley, 2006, ISBN: 978-0-470-01092-1$$
   <!-- /func:nmad -->  
 $$funcref_end$$
@@ -337,7 +366,7 @@ $$funcref_end$$
   <b><tt><!-- template -->indexedmad(x, idx)<!-- /template --></tt> - <i>returns  the median absolute deviation about the median (MAD), a robust measure of sample deviation of vector <tt>x</tt>,  of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b>
 $$funcref_description$$
   $$bmath:\mbox{MAD}(\vec{x})=\mbox{Med}\left\{|\vec{x}-\mbox{Med}(\vec{x})|\right\}$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
   $$see:Ricardo A. Maronna, R. Douglas Martin, Victor J. Yohai: "Robust Statistics: Theory and Methods", Wiley, 2006, ISBN: 978-0-470-01092-1$$
   
   <!-- /func:indexedmad -->  
@@ -346,7 +375,7 @@ $$funcref_end$$
   <b><tt><!-- template -->indexednmad(x, idx)<!-- /template --></tt> - <i>returns  the  normalized median absolute deviation about the median (NMAD), a robust measure of sample deviation of vector <tt>x</tt>,  of values in <tt>x</tt>, that have the same index in <tt>idx</tt>:</b>
 $$funcref_description$$
   $$bmath:\mbox{NMAD}(\vec{x})=\frac{\mbox{MAD}(\vec{x})}{0.6745}=\frac{\mbox{Med}\left\{|\vec{x}-\mbox{Med}(\vec{x})|\right\}}{0.6745}$$
-  This function ignores all NAN or INF values in <tt>x</tt>!
+  $$note:This function ignores all NAN or INF values in <tt>x</tt>!$$
   $$see:Ricardo A. Maronna, R. Douglas Martin, Victor J. Yohai: "Robust Statistics: Theory and Methods", Wiley, 2006, ISBN: 978-0-470-01092-1$$
   
   <!-- /func:indexednmad -->  

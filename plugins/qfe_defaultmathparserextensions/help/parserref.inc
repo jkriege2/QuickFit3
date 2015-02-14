@@ -1,3 +1,0 @@
-<li><b><a href="$$plugin_info:helpdir:qfe_defaultmathparserextensions$$/parserreference/fit.html">fits: function parameter optimization</a></b></li>
-<li><b><a href="$$plugin_info:helpdir:qfe_defaultmathparserextensions$$/parserreference/errors.html">simple functions for propagation of uncertainty</a></b></li>
-<!--<li><b><a href="$$plugin_info:helpdir:qfe_defaultmathparserextensions$$/parserreference/.html"></a></b></li>-->

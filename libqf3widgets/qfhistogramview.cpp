@@ -478,6 +478,7 @@ void QFHistogramView::setHistogramXLabel(const QString label, bool update)
 
 /** \brief replot histogram */
 void QFHistogramView::replotHistogram() {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     pltParamHistogram->set_doDrawing(false);
     pltParamHistogram->getYAxis()->set_logAxis(chkLogHistogram->isChecked());
     if (chkLogHistogram->isChecked()) {
@@ -489,10 +490,12 @@ void QFHistogramView::replotHistogram() {
     pltParamHistogram->zoomToFit(true, true, false, !chkLogHistogram->isChecked());
     pltParamHistogram->set_doDrawing(true);
     pltParamHistogram->update_plot();
+    QApplication::restoreOverrideCursor();
 }
 
 /** \brief recalculate histogram over all pixels */
 void QFHistogramView::updateHistogram(bool replot, int which) {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
     edtHistogramMin->setEnabled(chkHistogramRangeManual->isChecked());
     edtHistogramMax->setEnabled(chkHistogramRangeManual->isChecked());
@@ -832,6 +835,7 @@ void QFHistogramView::updateHistogram(bool replot, int which) {
         replotHistogram();
     }
     //qDebug()<<"updateHistogram ... end";
+    QApplication::restoreOverrideCursor();
 }
 
 void QFHistogramView::histogramSettingsChanged(bool update) {

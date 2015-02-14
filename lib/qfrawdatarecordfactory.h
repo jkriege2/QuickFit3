@@ -146,6 +146,7 @@ class QFLIB_EXPORT QFRawDataRecordFactory : public QObject {
         void showMessage(const QString& message);
         /** \brief long message reporting the loaded plugins, emitted during searchPlugins() */
         void showLongMessage(const QString& message);
+        void incProgress();
     private:
 };
 

@@ -124,7 +124,7 @@ void myMessageOutput(QtMsgType type, const char *msg)
 #endif
 
 
-MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
+MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     QMainWindow(NULL)
 {
 
@@ -183,7 +183,19 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
     connect(extensionManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
     connect(exporterManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
     connect(importerManager, SIGNAL(showMessage(const QString&)), splash, SLOT(showMessage(const QString&)));
+
+    connect(rawDataFactory, SIGNAL(incProgress()), splash, SLOT(incProgress()));
+    connect(evaluationFactory, SIGNAL(incProgress()), splash, SLOT(incProgress()));
+    connect(fitAlgorithmManager, SIGNAL(incProgress()), splash, SLOT(incProgress()));
+    connect(fitFunctionManager, SIGNAL(incProgress()), splash, SLOT(incProgress()));
+    connect(extensionManager, SIGNAL(incProgress()), splash, SLOT(incProgress()));
+    connect(exporterManager, SIGNAL(incProgress()), splash, SLOT(incProgress()));
+    connect(importerManager, SIGNAL(incProgress()), splash, SLOT(incProgress()));
+
     connect(this, SIGNAL(showSplashMessage(QString)), splash, SLOT(showMessage(const QString&)));
+    connect(this, SIGNAL(incSplashProgress()), splash, SLOT(incProgress()));
+    connect(this, SIGNAL(setSplashProgressRange(int,int)), splash, SLOT(setProgressRange(int,int)));
+    connect(this, SIGNAL(setSplashProgress(int)), splash, SLOT(setProgressValue(int)));
 
     connect(rawDataFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
     connect(evaluationFactory, SIGNAL(showLongMessage(const QString&)), logFileMainWidget, SLOT(log_text_linebreak(QString)));
@@ -287,17 +299,24 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
 
     logFileMainWidget->log_header(tr("searching for plugins ..."));
     logFileMainWidget->inc_indent();
+    splash->activateProgress(true);
     searchAndRegisterPlugins();
     logFileMainWidget->dec_indent();
 
     splash->showMessage(tr("%1 Plugins loaded successfully ... prepring online-help ... ").arg(rawDataFactory->getIDList().size()+evaluationFactory->getIDList().size()+fitFunctionManager->pluginCount()+fitAlgorithmManager->pluginCount()+extensionManager->getIDList().size()+importerManager->pluginCount()+exporterManager->pluginCount()));
+    splash->activateProgress(true);
+    splash->setProgressRange(0,10);
+    splash->setProgressValue(0);
     QApplication::processEvents();
 
     logFileMainWidget->log_header(tr("preparing online-help ..."));
     logFileMainWidget->inc_indent();
     parseFAQ(settings->getMainHelpDirectory()+"/faq.html", "quickfit", helpdata.faqs);
+    splash->setProgressValue(1);
+    QApplication::processEvents();
     parseFAQ(settings->getMainHelpDirectory()+"/faq_parser.html", "parser/quickfit", helpdata.faqs);
-
+    splash->setProgressValue(2);
+    QApplication::processEvents();
 
     htmlReplaceList.append(qMakePair(QString("version.svnrevision"), QString(qfInfoSVNVersion()).trimmed()));
     htmlReplaceList.append(qMakePair(QString("version.status"), QString(qfInfoVersionStatus())));
@@ -377,25 +396,33 @@ MainWindow::MainWindow(ProgramOptions* s, QSplashScreen* splash):
             "<table width=\"100%\">"
             "<tr><td align=\"center\" ><a href=\"#top_page\" font-size: $$main_fontsize:-2$$;\"><img src=\":/lib/help/help_top.png\"></a>&nbsp;&nbsp;&nbsp;</td><td align=\"left\" style=\" font-size: $$main_fontsize:-2$$;\">$$local_plugin_icon$$&nbsp;&nbsp;&nbsp;</td><td align=\"right\" width=\"90%\" font-size: $$main_fontsize:-2$$;\">  <b>$$local_plugin_name$$</b> <i>$$local_plugin_copyright$$</i><br>$$local_plugin_weblink$$<br>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.end"), QString("</td></tr></table></td></tr></table>")));// </div>")));
-
+    splash->setProgressValue(4);
+    QApplication::processEvents();
 
     parseGlobalreplaces(settings->getMainHelpDirectory());
+    splash->setProgressValue(5);
+    QApplication::processEvents();
     parseAutolinks(settings->getMainHelpDirectory(), helpdata.autolinks);
+    splash->setProgressValue(6);
+    QApplication::processEvents();
     parseTooltips(settings->getMainHelpDirectory(), helpdata.tooltips);
 
     mathParserRefDirs<<QString(settings->getMainHelpDirectory()+"/parserreference/");
-
+    splash->setProgressValue(7);
+    QApplication::processEvents();
 
 
     //qDebug()<<tooltips;
     helpWindow->setTooltips(helpdata.tooltips);
-
+    splash->setProgressValue(10);
+    QApplication::processEvents();
 
 
 
 
 
     logFileMainWidget->dec_indent();
+    splash->activateProgress(false);
 
     logFileMainWidget->log_text(tr("QuickFit started succesfully!\n"));
     splash->showMessage(tr("QuickFit started successfully ..."));
@@ -456,7 +483,10 @@ void MainWindow::searchAndRegisterPlugins() {
     // find plugins
 
     QDir pluginsDir = QDir(settings->getPluginDirectory());
-    foreach (QString fileName, qfDirListFilesRecursive(pluginsDir)) {//pluginsDir.entryList(QDir::Files)) {
+    QStringList filenames=qfDirListFilesRecursive(pluginsDir);
+    emit setSplashProgressRange(0, filenames.size());
+    int plgCnt=0;
+    foreach (QString fileName, filenames) {//pluginsDir.entryList(QDir::Files)) {
         QPluginLoader* loader=new QPluginLoader(pluginsDir.absoluteFilePath(fileName));
         if (loader) {
             QObject *plugin = loader->instance();
@@ -466,16 +496,20 @@ void MainWindow::searchAndRegisterPlugins() {
             }
             if (plugin) {
                 if (QApplication::arguments().contains("--verboseplugin")) QFPluginServices::getInstance()->log_global_text("    instance OK\n");
-                rawDataFactory->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
-                evaluationFactory->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
-                fitFunctionManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
-                fitAlgorithmManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
-                importerManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
-                extensionManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
-                exporterManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata);
+
+                if (rawDataFactory->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata)) plgCnt++;
+                if (evaluationFactory->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata)) plgCnt++;
+                if (fitFunctionManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata)) plgCnt++;
+                if (fitAlgorithmManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata)) plgCnt++;
+                if (importerManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata)) plgCnt++;
+                if (extensionManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata)) plgCnt++;
+                if (exporterManager->registerPlugin(pluginsDir.absoluteFilePath(fileName), plugin, helpdata)) plgCnt++;
+
             }
             delete loader;
         }
+        emit incSplashProgress();
+        QApplication::processEvents();
     }
     rawDataFactory->finalizePluginSearch();
     evaluationFactory->finalizePluginSearch();
@@ -485,9 +519,15 @@ void MainWindow::searchAndRegisterPlugins() {
     exporterManager->finalizePluginSearch();
     extensionManager->finalizePluginSearch();
 
+    emit setSplashProgressRange(0, plgCnt);
+    emit setSplashProgress(0);
+    QApplication::processEvents();
+    QApplication::processEvents();
+
 
     // distribute application hooks
     emit showSplashMessage("plugins: distributing application hooks ...");
+    emit setSplashProgress(0);
     QApplication::processEvents();
     QApplication::processEvents();
     rawDataFactory->distribute(project, settings, this, this);
@@ -496,6 +536,7 @@ void MainWindow::searchAndRegisterPlugins() {
 
     // init other plugins
     emit showSplashMessage("plugins: initializing plugins ...");
+    emit setSplashProgress(0);
     QApplication::processEvents();
     QApplication::processEvents();
     evaluationFactory->init();
@@ -504,22 +545,21 @@ void MainWindow::searchAndRegisterPlugins() {
     exporterManager->init();
     fitFunctionManager->init();
     fitAlgorithmManager->init();
-
     // init extensions
     extensionManager->init(this, this);
 
     // register plugins to menus
     emit showSplashMessage("plugins: registering plugins ...");
+    emit setSplashProgress(plgCnt/2);
     QApplication::processEvents();
     QApplication::processEvents();
     QStringList sl=getRawDataRecordFactory()->getIDList();
+    QStringList sl1=sl1=getEvaluationItemFactory()->getIDList();
     for (int i=0; i<sl.size(); i++) {
         getRawDataRecordFactory()->registerMenu(sl[i], insertItemMenu);
     }
-
-    sl=getEvaluationItemFactory()->getIDList();
-    for (int i=0; i<sl.size(); i++) {
-        getEvaluationItemFactory()->registerMenu(sl[i], evaluationMenu);
+    for (int i=0; i<sl1.size(); i++) {
+        getEvaluationItemFactory()->registerMenu(sl1[i], evaluationMenu);
     }
 
 }
@@ -5140,7 +5180,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
             // interpret $$insert:<filename>$$ and $$insertglobal:<filename>$$ items
-            QRegExp rxInsert("\\$\\$(insert|insertglobal|tooltip|see|note|info|warning|example|codeexample|cexample|tt|code|bqtt|bqcode|startbox|main_fontsize)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
+            QRegExp rxInsert("\\$\\$(insert|include|insertglobal|includeglobal|tooltip|see|note|info|warning|example|codeexample|cexample|tt|code|bqtt|bqcode|startbox|main_fontsize)\\:([^\\$]*)\\$\\$", Qt::CaseInsensitive);
             rxInsert.setMinimal(true);
             count = 0;
             pos = 0;
@@ -5149,7 +5189,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 QString file=rxInsert.cap(2).trimmed();
                 //qDebug()<<pos<<list<<filter;
 
-                if (command=="insert") {
+                if (command=="insert" || command=="include") {
                     //qDebug()<<QFileInfo(filename).absoluteDir().absoluteFilePath(file);
                     QFile f(QFileInfo(filename).absoluteDir().absoluteFilePath(file));
                     QString rep="";
@@ -5157,7 +5197,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         rep=f.readAll();
                     }
                     result=result.replace(rxInsert.cap(0), rep);
-                } else if (QFPluginServices::getInstance()&&(command=="insertglobal")) {
+                } else if (QFPluginServices::getInstance()&&(command=="insertglobal" || command=="includeglobal")) {
                     //qDebug()<<QDir(QFPluginServices::getInstance()->getAssetsDirectory()+"/help/").absoluteFilePath(file);
                     QFile f(QDir(QFPluginServices::getInstance()->getAssetsDirectory()+"/help/").absoluteFilePath(file));
                     QString rep="";

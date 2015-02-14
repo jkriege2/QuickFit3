@@ -129,6 +129,7 @@ class QFLIB_EXPORT QFExtensionManager : public QObject {
         void showMessage(const QString& message);
         /** \brief long message reporting the loaded plugins, emitted during searchPlugins() */
         void showLongMessage(const QString& message);
+        void incProgress();
     protected:
         /** \brief this map is used to internally manage the available QFExtension s.
          *         It maps from  the ID to the internal description.

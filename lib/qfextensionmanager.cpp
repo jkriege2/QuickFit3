@@ -111,6 +111,8 @@ void QFExtensionManager::init(QFPluginServices* services, QWidget* parentWidget)
     while (i.hasNext()) {
         i.next();
         i.value()->init(services, parentWidget);
+        emit incProgress();
+        QApplication::processEvents();
     }
 }
 

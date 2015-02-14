@@ -68,18 +68,19 @@ bool QFEValColocalizationItem::isApplicable(const QFRawDataRecord* record) const
     return record->inherits("QFRDRImageStackInterface"); //dynamic_cast<const QFRDRImageStackInterface*>(record)!=NULL);
 }
 
-bool QFEValColocalizationItem::hasEvaluation(QFRawDataRecord* r1) {
+bool QFEValColocalizationItem::hasEvaluation(QFRawDataRecord* r1, int stack, int ch1, int ch2) {
     // checks, whether any results exist for the given eval ID
     QFRawDataRecord* r=r1;
-    QString rsid=getEvaluationResultID();
+    QString rsid=getEvaluationResultID(stack, ch1, ch2);
     return r->resultsExistsFromEvaluation(rsid);
 }
 
-QString QFEValColocalizationItem::getEvaluationResultID() {
+QString QFEValColocalizationItem::getEvaluationResultID(int stack, int ch1, int ch2) {
     // in the simplest case, the evaluation ID only contains the type-name and the record ID, this way, different
 	// evaluation objects may write results into the same RDR and keep them separate. You may want to extend this ID,
 	// e.g. by the used fit function ...
-    return QString("%1_%2").arg(getType()).arg(getID());
+    if (stack<0 && ch1<0 && ch2<0) return QString("%1_%2").arg(getType()).arg(getID());
+    else return QString("%1_%2_stack%3_ch%4_ch%5").arg(getType()).arg(getID()).arg(stack).arg(ch1).arg(ch2);
 }
 
 void QFEValColocalizationItem::doEvaluation(QFRawDataRecord *record, int frame, int channel1, int channel2, QProgressDialog *dlgEvaluationProgress) {
@@ -94,7 +95,7 @@ void QFEValColocalizationItem::doEvaluation(QFRawDataRecord *record, int frame, 
     
     // write back fit results to record!
     record->disableEmitResultsChanged();
-    record->resultsSetBoolean(getEvaluationResultID(), "evaluation_completed", true);
+    //record->resultsSetBoolean(getEvaluationResultID(-1,-1,-1), "evaluation_completed", true);
     record->enableEmitResultsChanged();
     
 }

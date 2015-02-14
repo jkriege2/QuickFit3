@@ -258,6 +258,8 @@ void QFParameterCorrelationView::connectParameterWidgets(bool connectTo)
 
 void QFParameterCorrelationView::replotCorrelation()
 {
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+
     pltParamCorrelation->set_doDrawing(false);
     pltParamHistogramX->set_doDrawing(false);
     pltParamHistogramY->set_doDrawing(false);
@@ -273,11 +275,13 @@ void QFParameterCorrelationView::replotCorrelation()
     pltParamCorrelation->update_plot();
     pltParamHistogramX->update_plot();
     pltParamHistogramY->update_plot();
+    QApplication::restoreOverrideCursor();
 }
 
 void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
 {
 
+    QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 
 
     edtHistogramMin1->setEnabled(chkHistogramRangeManual1->isChecked());
@@ -698,7 +702,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
         replotCorrelation();
     }
 
-
+    QApplication::restoreOverrideCursor();
 }
 
 void QFParameterCorrelationView::addSettingsWidget(const QString &label, QWidget *widget)

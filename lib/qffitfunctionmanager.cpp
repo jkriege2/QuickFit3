@@ -661,6 +661,8 @@ void QFFitFunctionManager::init()
 {
     for (int i=0; i<pluginCount(); i++) {
         if (fitPlugins.value(i, NULL)) fitPlugins.value(i, NULL)->init();
+        emit incProgress();
+        if (i%3==0) QApplication::processEvents();
     }
 }
 

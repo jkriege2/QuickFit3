@@ -115,6 +115,8 @@ void QFEvaluationItemFactory::init()
 {
     for (int i=0; i<getIDList().size(); i++) {
         items[getIDList().at(i)]->init();
+        emit incProgress();
+        if (i%3==0) QApplication::processEvents();
     }
 }
 

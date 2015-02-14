@@ -174,6 +174,7 @@ namespace QFMathParser_DefaultLib {
     QFMATHPARSER_DEFINE_2PARAM1VEC_VECTONUM_FUNC(fCentralMoment, moment, qfstatisticsCentralMoment)
     QFMATHPARSER_DEFINE_2PARAM1VEC_VECTONUM_FUNC(fNonCentralMoment, ncmoment, qfstatisticsMoment)
     QFMATHPARSER_DEFINE_2PARAM2VEC_VECTONUM_FUNC(fCorrcoeff, corrcoeff, qfstatisticsCorrCoeff)
+    QFMATHPARSER_DEFINE_2PARAM2VEC_VECTONUM_FUNC(fMandersOverlapCoeff, mandersoverlap, qfstatisticsMandersOverlapCoeff)
 
     QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(fDiff, diff, qfstatisticsDiff)
     QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fSum, sum, qfstatisticsSum)
@@ -466,6 +467,20 @@ namespace QFMathParser_DefaultLib {
     void addDefaultVariables(QFMathParser *p);
     bool hasDefaultVariables(QFMathParser* p);
 
+    void fRegression(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fPolyFit(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fWeightedRegression(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fIRLS(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+
+
+
+    void fErrorAdd(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fErrorSub(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fErrorMul(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fErrorDiv(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fErrorPow(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+
+
 
 
 #ifdef QFLIB_LIBRARY
@@ -548,6 +563,7 @@ namespace QFMathParser_DefaultLib {
 
 
     void fFitAlgorithmsIDs(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser);
+
 #endif
 
 }

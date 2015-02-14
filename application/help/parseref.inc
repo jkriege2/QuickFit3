@@ -33,8 +33,13 @@
     <li><b><a href="$$mainhelpdir$$/parserreference/statistics.html">statistics functions</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/statisticshistograms.html">histogram functions</a></b></li>
 </ul></li>
+<li><b>Error Propagation</b>:<ul>
+    <li><b><a href="$$mainhelpdir$$/parserreference/errors.html">simple functions for propagation of uncertainty/errors</a></b></li>
+</ul></li>
 <li><b>Data Fitting/Optimization Functions</b>:<ul>
-    <li><b><a href="$$mainhelpdir$$/parserreference/datafit.html">data fitting functions</a></b></li>
+    <li><b><a href="$$mainhelpdir$$/parserreference/regression.html">linear regression analysis</a></b></li>
+    <li><b><a href="$$mainhelpdir$$/parserreference/polyfit.html">polynomial fits</a></b></li>
+    <li><b><a href="$$mainhelpdir$$/parserreference/datafit.html">non-linear (least-squares) data fitting functions</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/fitalgorithms.html">QuickFit fit algorithms</a></b></li>
 </ul></li>
 <li><b>String Functions</b>:<ul>

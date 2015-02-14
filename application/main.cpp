@@ -33,7 +33,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #else
 #include <QtGui>
 #endif
-#include <QSplashScreen>
+#include "qfsplashscreen.h"
 #include <QPainter>
 
 #ifndef __WINDOWS__
@@ -88,7 +88,7 @@ int main(int argc, char * argv[])
         app.setApplicationVersion(QString("%1 (%2 SVN %3 DATE %4)").arg(qfInfoVersionFull()).arg(qfInfoVersionStatus()).arg(QString(qfInfoSVNVersion()).trimmed()).arg(QString(qfInfoCompileDate()).trimmed()));
         app.setWindowIcon(QIcon(":/icon_large.png"));
 
-        QSplashScreen* splash=new QSplashScreen();
+        QFSplashScreen* splash=new QFSplashScreen();
 
         QPixmap pixmap(":/splash.png");
         QPainter* painter=new QPainter(&pixmap);

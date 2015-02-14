@@ -1718,9 +1718,11 @@ void qfSaveReport(QTextDocument* doc, const QString& title, const QString& prefi
 
     QStringList filters;
     #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-        filters<<QObject::tr("PDF File (*.pdf)");
+        filters<<QObject::tr("A4 PDF File (*.pdf)");
+        filters<<QObject::tr("A3 PDF File (*.pdf)");
     #else
-        filters<<QObject::tr("PDF File (*.pdf)");
+        filters<<QObject::tr("A4 PDF File (*.pdf)");
+        filters<<QObject::tr("A3 PDF File (*.pdf)");
         filters<<QObject::tr("PostScript File (*.ps)");
     #endif
     int firstDForm=filters.size();
@@ -1754,13 +1756,14 @@ void qfSaveReport(QTextDocument* doc, const QString& title, const QString& prefi
         printer->setColorMode(QPrinter::Color);
 
 
-        if (filterID==0
+        if (filterID==0||filterID==1
         #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-            ||filterID==1
+            ||filterID==2
         #endif
             ) {
     #if (QT_VERSION < QT_VERSION_CHECK(5, 0, 0))
-            if (filterID==1) printer->setOutputFormat(QPrinter::PostScriptFormat);
+            if (filterID==1) printer->setPaperSize(QPrinter::A3);
+            if (filterID==2) printer->setOutputFormat(QPrinter::PostScriptFormat);
     #endif
     #if (QT_VERSION > QT_VERSION_CHECK(5, 2, 0))
             QPdfWriter pdf(fn);
@@ -1768,6 +1771,7 @@ void qfSaveReport(QTextDocument* doc, const QString& title, const QString& prefi
             pdf.setPageOrientation(QPageLayout::Portrait);
             pdf.setCreator(QString("QuickFit %1").arg(qfInfoVersionFull()));
             pdf.setPageSize(QPageSize(QPageSize::A4));
+            if (filterID==1) pdf.setPageSize(QPageSize(QPageSize::A3));
             pdf.setTitle(title);
             pdf.setResolution(300);
             doc->setTextWidth(pdf.pageLayout().paintRect().width());

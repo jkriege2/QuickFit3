@@ -54,6 +54,8 @@ class QFEValColocalizationEditor : public QFEvaluationEditor {
         /** \brief write the settings */
         virtual void writeSettings();
         void userRangeChanged(double xmin, double xmax,  double ymin, double ymax);
+        void on_btnEstimateBackground_clicked();
+        void writeWidgetValues(QFRawDataRecord* formerRecord);
     protected:
         /** \brief the user interface object (using QtDesigner) */
         Ui::QFEValColocalizationEditor *ui;

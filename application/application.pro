@@ -73,7 +73,8 @@ HEADERS += mainwindow.h \
     dlgsetrdrpropertybyexpressioneditor.h \
     dlgwelcomescreen.h \
     qfgroupandrolemodel.h \
-    dlgeditgroupandrole.h
+    dlgeditgroupandrole.h \
+    qfsplashscreen.h
 
 SOURCES += main.cpp \
            mainwindow.cpp \
@@ -94,7 +95,8 @@ SOURCES += main.cpp \
     dlgsetrdrpropertybyexpressioneditor.cpp \
     dlgwelcomescreen.cpp \
     qfgroupandrolemodel.cpp \
-    dlgeditgroupandrole.cpp
+    dlgeditgroupandrole.cpp \
+    qfsplashscreen.cpp
 
 FORMS =    optionsdialog.ui \
            about.ui \
