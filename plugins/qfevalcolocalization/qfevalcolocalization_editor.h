@@ -40,6 +40,7 @@ namespace Ui {
 class QFEValColocalizationEditor : public QFEvaluationEditor {
         Q_OBJECT
     public:
+        typedef const double constDouble;
         /** Default constructor */
         QFEValColocalizationEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent=NULL);
         /** Default destructor */

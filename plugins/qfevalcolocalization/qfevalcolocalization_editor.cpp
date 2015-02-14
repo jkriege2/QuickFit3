@@ -38,7 +38,7 @@ Copyright (c) 2014
 #else
 #include <QtGui>
 #endif
-
+#include "qfevaluationpropertyeditor.h"
 
 #include <QtCore>
 
@@ -77,10 +77,19 @@ QFEValColocalizationEditor::QFEValColocalizationEditor(QFPluginServices* service
     ui->btnEvaluateAll->setVisible(false);
     ui->btnEvaluateCurrent->setVisible(false);
     updatingData=false;
+    loadSplitter(*ProgramOptions::getInstance()->getQSettings(), ui->splitter, QString("QFEValColocalizationEditor/splitter"));
+    loadSplitter(*ProgramOptions::getInstance()->getQSettings(), ui->splitter2, QString("QFEValColocalizationEditor/splitter2"));
+
+    QMenu* menuResults= propEditor->addOrFindMenu(tr("Results"));
+    menuResults->addAction(actSaveReport);
+    menuResults->addAction(actPrintReport);
+
 }
 
 QFEValColocalizationEditor::~QFEValColocalizationEditor()
 {
+    saveSplitter(*ProgramOptions::getInstance()->getQSettings(), ui->splitter, QString("QFEValColocalizationEditor/splitter"));
+    saveSplitter(*ProgramOptions::getInstance()->getQSettings(), ui->splitter2, QString("QFEValColocalizationEditor/splitter2"));
     delete ui;
     delete dlgEvaluationProgress;
 }
@@ -94,12 +103,16 @@ void QFEValColocalizationEditor::connectWidgets(QFEvaluationItem* current, QFEva
     if (old!=NULL) {
         /* disconnect item_old and clear all widgets here */
         disconnect(item_old, SIGNAL(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)), this, SLOT(highlightingChanged(QFRawDataRecord*, QFRawDataRecord*)));
+        saveSplitter(*ProgramOptions::getInstance()->getQSettings(), ui->splitter, QString("QFEValColocalizationEditor/splitter"));
+        saveSplitter(*ProgramOptions::getInstance()->getQSettings(), ui->splitter2, QString("QFEValColocalizationEditor/splitter2"));
     }
 
 
 
     if (item) {
         updatingData=true;
+        loadSplitter(*ProgramOptions::getInstance()->getQSettings(), ui->splitter, QString("QFEValColocalizationEditor/splitter"));
+        loadSplitter(*ProgramOptions::getInstance()->getQSettings(), ui->splitter2, QString("QFEValColocalizationEditor/splitter2"));
 
 
         /* connect widgets and fill with data from item here */
@@ -156,14 +169,14 @@ void QFEValColocalizationEditor::on_btnEstimateBackground_clicked()
     double* datar_ch2=data->getImageStack(stack, dframe, ch2);
     double back1=statisticsQuantile(datar_ch1, width*height, 0.05);
     double back2=statisticsQuantile(datar_ch2, width*height, 0.05);
-    disconnect(ui->spinBackground, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
-    disconnect(ui->spinBackground2, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
+    disconnect(ui->spinBackground, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
+    disconnect(ui->spinBackground2, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
 
     ui->spinBackground->setValue(back1);
     ui->spinBackground2->setValue(back2);
 
-    connect(ui->spinBackground, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
-    connect(ui->spinBackground2, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
+    connect(ui->spinBackground, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
+    connect(ui->spinBackground2, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
 
     displayData();
 }
@@ -199,13 +212,13 @@ void QFEValColocalizationEditor::highlightingChanged(QFRawDataRecord* formerReco
     if (formerRecord) {
         disconnect(ui->cmbStack, SIGNAL(currentIndexChanged(int)), this, SLOT(resultsChanged()));
         disconnect(ui->chkAllFrames, SIGNAL(toggled(bool)), this, SLOT(resultsChanged()));
-        disconnect(ui->spinBackgroundThreshold, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
-        disconnect(ui->spinBackground, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
-        disconnect(ui->spinBackground2, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
-        disconnect(ui->spinFrame, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
-        disconnect(ui->spinChannel1, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
-        disconnect(ui->spinChannel2, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
-        disconnect(ui->spinDisplayFrame, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
+        disconnect(ui->spinBackgroundThreshold, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
+        disconnect(ui->spinBackground, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
+        disconnect(ui->spinBackground2, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
+        disconnect(ui->spinFrame, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
+        disconnect(ui->spinChannel1, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
+        disconnect(ui->spinChannel2, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
+        disconnect(ui->spinDisplayFrame, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
         writeWidgetValues(formerRecord);
 
     }
@@ -220,7 +233,7 @@ void QFEValColocalizationEditor::highlightingChanged(QFRawDataRecord* formerReco
         QString resultID=eval->getEvaluationResultID(-1,-1,-1);
         ui->cmbStack->clear();
         for (int i=0; i<data->getImageStackCount(); i++) {
-            ui->cmbStack->addItem(tr("stack %1: %2").arg(i).arg(data->getImageStackDescription(i)));
+            ui->cmbStack->addItem(data->getImageStackDescription(i));
         }
         ui->cmbStack->setCurrentIndex(qBound(0, currentRecord->getQFProperty(resultID+"_stack", 0).toInt(), ui->cmbStack->count()-1));
         ui->spinChannel1->setRange(0, data->getImageStackChannels(stack));
@@ -233,7 +246,7 @@ void QFEValColocalizationEditor::highlightingChanged(QFRawDataRecord* formerReco
         ui->chkAllFrames->setChecked(currentRecord->getQFProperty(resultID+"_allframes", true).toBool());
         ui->spinFrame->setValue(currentRecord->getQFProperty(resultID+"_evalframe", data->getImageStackFrames(stack)/2).toInt());
         ui->spinDisplayFrame->setValue(currentRecord->getQFProperty(resultID+"_displayframe", data->getImageStackFrames(stack)/2).toInt());
-        ui->spinBackgroundThreshold->setValue(currentRecord->getQFProperty(resultID+"_backthreshold", 0).toDouble()); //statisticsQuantile(data->getImageStack(stack, ui->spinFrame->value(), ui->spinChannel1->value()), data->getImageStackWidth(stack)*data->getImageStackHeight(stack), 0.05)*1.5).toDouble());
+        ui->spinBackgroundThreshold->setValue(currentRecord->getQFProperty(resultID+"_backthreshold", -1000).toDouble()); //statisticsQuantile(data->getImageStack(stack, ui->spinFrame->value(), ui->spinChannel1->value()), data->getImageStackWidth(stack)*data->getImageStackHeight(stack), 0.05)*1.5).toDouble());
         ui->spinBackground->setValue(currentRecord->getQFProperty(resultID+"_back1", 0).toDouble()); //statisticsQuantile(data->getImageStack(stack, ui->spinFrame->value(), ui->spinChannel1->value()), data->getImageStackWidth(stack)*data->getImageStackHeight(stack), 0.05)*1.5).toDouble());
         ui->spinBackground2->setValue(currentRecord->getQFProperty(resultID+"_back2", 0).toDouble()); //statisticsQuantile(data->getImageStack(stack, ui->spinFrame->value(), ui->spinChannel1->value()), data->getImageStackWidth(stack)*data->getImageStackHeight(stack), 0.05)*1.5).toDouble());
         ui->plotterCorrelation->readQFProperties(currentRecord, resultID+"_CORRPLOT/", "", "");
@@ -241,13 +254,13 @@ void QFEValColocalizationEditor::highlightingChanged(QFRawDataRecord* formerReco
                                                   currentRecord->getQFProperty(resultID+"_RANGE2_MIN", 0).toDouble(), currentRecord->getQFProperty(resultID+"_RANGE2_MAX", 0).toDouble());
 
         connect(ui->cmbStack, SIGNAL(currentIndexChanged(int)), this, SLOT(resultsChanged()));
-        connect(ui->spinBackground2, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
-        connect(ui->spinBackground, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
-        connect(ui->spinBackgroundThreshold, SIGNAL(valueChanged(double)), this, SLOT(resultsChanged()));
-        connect(ui->spinFrame, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
-        connect(ui->spinChannel1, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
-        connect(ui->spinChannel2, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
-        connect(ui->spinDisplayFrame, SIGNAL(valueChanged(int)), this, SLOT(resultsChanged()));
+        connect(ui->spinBackground2, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
+        connect(ui->spinBackground, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
+        connect(ui->spinBackgroundThreshold, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
+        connect(ui->spinFrame, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
+        connect(ui->spinChannel1, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
+        connect(ui->spinChannel2, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
+        connect(ui->spinDisplayFrame, SIGNAL(editingFinished()), this, SLOT(resultsChanged()));
         connect(ui->chkAllFrames, SIGNAL(toggled(bool)), this, SLOT(resultsChanged()));
         updatingData=false;
     }
@@ -313,20 +326,21 @@ void QFEValColocalizationEditor::displayData() {
     double thresh=ui->spinBackgroundThreshold->value();
     double back=ui->spinBackground->value();
     double back2=ui->spinBackground2->value();
-    double* data_ch1=data->getImageStack(stack, frame, ch1);
-    double* data_ch2=data->getImageStack(stack, frame, ch2);
-    double* datar_ch1=data->getImageStack(stack, dframe, ch1);
-    double* datar_ch2=data->getImageStack(stack, dframe, ch2);
+    constDouble* data_ch1=data->getImageStack(stack, frame, ch1);
+    constDouble* data_ch2=data->getImageStack(stack, frame, ch2);
+    constDouble* datar_ch1=data->getImageStack(stack, dframe, ch1);
+    constDouble* datar_ch2=data->getImageStack(stack, dframe, ch2);
     QVector<double> dch1, dch2;
     for (long long int  i=0; i<frames*width*height; i++) {
         if (data_ch1[i]-back>=thresh && data_ch2[i]-back2>=thresh) {
-            dch1<<data_ch1[i]-back;
-            dch2<<data_ch2[i]-back2;
+            dch1<<(data_ch1[i]-back);
+            dch2<<(data_ch2[i]-back2);
         }
     }
     if (dch1.size()>0) {
         data_ch1=dch1.data();
         data_ch2=dch2.data();
+        pixel_count=dch1.data();
     }
 
     ui->plotterCorrelation->addCopiedCorrelation(QString("channels %1--%2").arg(ch1).arg(ch2), data_ch1, data_ch2, pixel_count);
@@ -365,7 +379,7 @@ void QFEValColocalizationEditor::displayData() {
     if (ch1min!=ch1max && ch2min!=ch2max) {
         QVector<double> ch1_ranged, ch2_ranged;
         for (long long i=0; i<width*height; i++) {
-            overlayImage[i]=(ch1min<=datar_ch1[i]-back)&&(datar_ch1[i]-back<=ch1max) && (ch2min<=datar_ch2[i]-back2)&&(datar_ch2[i]-back2<=ch2max);
+            overlayImage[i]=(datar_ch1[i]-back>thresh) && (datar_ch2[i]-back>thresh) && (ch1min<=datar_ch1[i]-back)&&(datar_ch1[i]-back<=ch1max) && (ch2min<=datar_ch2[i]-back2)&&(datar_ch2[i]-back2<=ch2max);
         }
 
         long f=frame;
@@ -418,7 +432,8 @@ void QFEValColocalizationEditor::displayData() {
     trow++;
 
     JKQTPColumnOverlayImageEnhanced* plteOverlay=new JKQTPColumnOverlayImageEnhanced(ui->plotter->get_plotter());
-    plteOverlay->set_drawAsRectangles(false);
+    plteOverlay->set_drawAsRectangles(true);
+    plteOverlay->set_rectanglesAsImageOverlay(true);
     QColor col("blue");
     col.setAlphaF(0.3);
     plteOverlay->set_width(width);

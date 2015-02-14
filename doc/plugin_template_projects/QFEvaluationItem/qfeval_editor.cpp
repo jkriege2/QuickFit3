@@ -25,7 +25,7 @@ Copyright (c) 2014
 #include "qfevaluationitem.h"
 #include "qfeval_item.h"
 #include "ui_qfeval_editor.h"
-
+#include "qfevaluationpropertyeditor.h"
 #include <QtGlobal>
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
@@ -57,6 +57,10 @@ QFEVALEditor::QFEVALEditor(QFPluginServices* services,  QFEvaluationPropertyEdit
     ui->btnPrintReport->setDefaultAction(actPrintReport);
     ui->btnSaveReport->setDefaultAction(actSaveReport);
 
+	QMenu* menuResults= propEditor->addOrFindMenu(tr("Results"));
+    menuResults->addAction(actSaveReport);
+    menuResults->addAction(actPrintReport);
+	
     updatingData=false;
 }
 

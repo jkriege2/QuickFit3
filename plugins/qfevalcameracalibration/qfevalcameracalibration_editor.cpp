@@ -39,7 +39,7 @@
 #else
 #include <QtGui>
 #endif
-
+#include "qfevaluationpropertyeditor.h"
 
 #include <QtCore>
 QFEvalCameraCalibrationEditor::QFEvalCameraCalibrationEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
@@ -67,6 +67,9 @@ QFEvalCameraCalibrationEditor::QFEvalCameraCalibrationEditor(QFPluginServices* s
     ui->btnSaveReport->setDefaultAction(actSaveReport);
 
     ui->plotterSNR->get_plotter()->useExternalDatastore(ui->plotter->get_plotter()->getDatastore());
+    QMenu* menuResults= propEditor->addOrFindMenu(tr("Results"));
+    menuResults->addAction(actSaveReport);
+    menuResults->addAction(actPrintReport);
 
     updatingData=false;
 }

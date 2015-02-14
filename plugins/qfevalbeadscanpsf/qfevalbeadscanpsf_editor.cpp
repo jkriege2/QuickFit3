@@ -36,6 +36,7 @@ Copyright (c) 2014
 #include <QtGui>
 #endif
 #include <QtCore>
+#include "qfevaluationpropertyeditor.h"
 
 QFEvalBeadScanPSFEditor::QFEvalBeadScanPSFEditor(QFPluginServices* services,  QFEvaluationPropertyEditor *propEditor, QWidget* parent):
     QFEvaluationEditor(services, propEditor, parent),
@@ -63,6 +64,10 @@ QFEvalBeadScanPSFEditor::QFEvalBeadScanPSFEditor(QFPluginServices* services,  QF
     connect(ui->btnResetCurrent, SIGNAL(clicked()), this, SLOT(resetCurrent()));
     ui->btnPrintReport->setDefaultAction(actPrintReport);
     ui->btnSaveReport->setDefaultAction(actSaveReport);
+
+    QMenu* menuResults= propEditor->addOrFindMenu(tr("Results"));
+    menuResults->addAction(actSaveReport);
+    menuResults->addAction(actPrintReport);
 
     updatingData=false;
 }
