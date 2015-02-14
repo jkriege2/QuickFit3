@@ -340,7 +340,7 @@ void QFEValColocalizationEditor::displayData() {
     if (dch1.size()>0) {
         data_ch1=dch1.data();
         data_ch2=dch2.data();
-        pixel_count=dch1.data();
+        pixel_count=dch1.size();
     }
 
     ui->plotterCorrelation->addCopiedCorrelation(QString("channels %1--%2").arg(ch1).arg(ch2), data_ch1, data_ch2, pixel_count);
