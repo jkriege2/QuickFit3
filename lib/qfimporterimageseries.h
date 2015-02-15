@@ -70,12 +70,14 @@ class QFLIB_EXPORT QFImporterImageSeries: public QFImporter {
         uint32_t frameWidth();
         /** \brief return the height of the frames (valid after open() returned \c true */
         uint32_t frameHeight();
+        /** \brief return the number of color channels of the frames (valid after open() returned \c true */
+        uint32_t frameChannels();
         /** \brief read a new frame into the given array of floating point numbers */
-        bool readFrameFloat(float* data);
+        bool readFrameFloat(float* data, int channel=0);
         /** \brief read a new frame into the given array of double-precision floating point numbers */
-        bool readFrameDouble(double* data);
+        bool readFrameDouble(double* data, int channel=0);
         /** \brief read a new frame into the given array of integers */
-        bool readFrameUINT16(uint16_t* data);
+        bool readFrameUINT16(uint16_t* data, int channel=0);
         /** \brief get named properties stored in the file
          *
          *  standardized property names are:
@@ -107,12 +109,17 @@ class QFLIB_EXPORT QFImporterImageSeries: public QFImporter {
         virtual uint32_t intFrameWidth()=0;
         /** \brief return the height of the frames (valid after open() returned \c true */
         virtual uint32_t intFrameHeight()=0;
+        /** \brief return the number of channels in a frame (valid after open() returned \c true
+         *
+         *  \note The dfeault implementation of this function returns 1!
+         */
+        virtual uint32_t intFrameChannels();
         /** \brief read a new frame into the given array of floating point numbers */
-        virtual bool intReadFrameFloat(float* data)=0;
+        virtual bool intReadFrameFloat(float* data, int channel=0)=0;
         /** \brief read a new frame into the given array of floating point numbers */
-        virtual bool intReadFrameDouble(double* data)=0;
+        virtual bool intReadFrameDouble(double* data, int channel=0)=0;
         /** \brief read a new frame into the given array of integers */
-        virtual bool intReadFrameUINT16(uint16_t* data)=0;
+        virtual bool intReadFrameUINT16(uint16_t* data, int channel=0)=0;
 
 
     private:

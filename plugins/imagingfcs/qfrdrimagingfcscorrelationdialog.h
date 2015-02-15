@@ -96,7 +96,7 @@ class QFRDRImagingFCSCorrelationDialog : public QDialog {
         void frameTimeChanged(double value);
         void frameRateChanged(double value);
         void updateProgress();
-        void updateFromFile(bool readFiles=true, bool countFrames=true);
+        void updateFromFile(bool readFiles=true, bool countFrames=true, int* channels=NULL);
         void updateCorrelator(bool setS=false);
         void updateFrameCount();
         void updateImageSize();

@@ -645,11 +645,14 @@ void QFRDRImagingFCSCorrelationDialog::on_btnLoad_clicked() {
     QString oldFilename=filenameDisplayed;
     QString filename=ui->edtImageFile->text();
     if (QFile::exists(filename)) {
-        if (oldFilename!=filename) updateFromFile(true, true);
+        int channels=1;
+        if (oldFilename!=filename) updateFromFile(true, true, &channels);
         setEditControlsEnabled(true);
         ui->btnLoadNoCount->setEnabled(true);
         ui->btnSelectImageFileNoCount->setEnabled(true);
+        if (channels>1) {
 
+        }
     } else {
         setEditControlsEnabled(false);
         QMessageBox::critical(this, tr("imFCS Correlator"), tr("The file '%1' does not exist.\nPlease select an existing file!").arg(filename));
@@ -1216,7 +1219,7 @@ void QFRDRImagingFCSCorrelationDialog::updateCorrelator(bool setS) {
 
 
 
-void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool countFrames) {
+void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool countFrames, int *channels) {
 
     QModernProgressDialog prg(this);
     prg.setWindowTitle(tr("imFCS: Correlator"));
@@ -1368,6 +1371,10 @@ void QFRDRImagingFCSCorrelationDialog::updateFromFile(bool readFiles, bool count
                 QApplication::processEvents();
                 image_width=reader->frameWidth();
                 image_height=reader->frameHeight();
+                if (channels) *channels=reader->frameChannels();
+                if (reader->frameChannels()>1) {
+                    ui->labWarning->setText(ui->labWarning->text()+tr("<br><table border=\"0\"><tr><td><img src=\":/lib/help/helpboxlogo_warning.png\"></td><td><b><font color=\"red\">WARNING! The file you are about to correlate contains %1 color channels. Only the first channel will be correlated!!!</font></b></td></tr></table>").arg(reader->frameChannels()));
+                }
                 if (frame_data) qfFree(frame_data);
                 frame_data=NULL;
                 frame_data=qfMallocT<double>(image_width*image_height);

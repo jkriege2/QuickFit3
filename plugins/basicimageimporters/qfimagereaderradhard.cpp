@@ -24,6 +24,7 @@ Copyright (c) 2008-2014 Jan Buchholz & Jan W. Krieger, German Cancer Research Ce
 #include <QObject>
 #include <QtGlobal>
 #include "qftools.h"
+#include "qfimagemetadatatool.h"
 
 QFImageReaderRadhard::QFImageReaderRadhard():
     QFImporterImageSeries()
@@ -87,6 +88,7 @@ bool QFImageReaderRadhard::open(QString filename) {
   this->filename=filename;
   frameSize=calculateFrameSize();
   fprintf(stderr,"FRAMESIZE: %i",frameSize);
+  qfimdtGetQuickFitMetaData(fileinfo.properties, filename);
   if (frameSize<=134) {
       height=(frameSize-6)/4;
       width=32;
@@ -154,17 +156,17 @@ uint32_t QFImageReaderRadhard::intFrameHeight() {
     return height;
 }
 
-bool QFImageReaderRadhard::intReadFrameUINT16(uint16_t* data) {
+bool QFImageReaderRadhard::intReadFrameUINT16(uint16_t* data, int channel) {
   if (!file) return false;
   return readFrame_<uint16_t>(data);
 }
 
-bool QFImageReaderRadhard::intReadFrameDouble(double *data) {
+bool QFImageReaderRadhard::intReadFrameDouble(double *data, int channel) {
     if (!file) return false;
     return readFrame_<double>(data);
 }
 
-bool QFImageReaderRadhard::intReadFrameFloat(float* data) {
+bool QFImageReaderRadhard::intReadFrameFloat(float* data, int channel) {
     if (!file) return false;
   return readFrame_<float>(data);
 }

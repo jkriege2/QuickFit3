@@ -63,6 +63,7 @@ class QFWIDLIB_EXPORT QFPLayerControls : public QWidget {
         int getPosition() const;
         bool getReplay() const;
         double getFPS() const;
+        bool isPlaying() const;
 
     signals:
         void showFrame(int frame);
@@ -75,6 +76,7 @@ class QFWIDLIB_EXPORT QFPLayerControls : public QWidget {
         void setRange(int min, int max);
         void setFPS(double FPS);
         void singleShotTimerStart();
+
 
     protected slots:
         void updateWidgets();

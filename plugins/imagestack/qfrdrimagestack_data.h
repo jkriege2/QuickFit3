@@ -104,7 +104,11 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
         virtual bool showNextPreviousOfSameRoleButton() const;
 
 
-
+        void recalcStackMinMax();
+        /** \copydoc QFRDRImageStackInterface::getImageStackFrames() */
+        double getImageStackMin(int stack, int channel) const;
+        /** \copydoc QFRDRImageStackInterface::getImageStackFrames() */
+        double getImageStackMax(int stack, int channel) const;
 
 
 
@@ -198,6 +202,7 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
 
         double memsize;
 
+
         enum loadMode {
             lmGetSize,
             lmReadData
@@ -215,6 +220,8 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
             int height;
             int channels;
             int file;
+            QList<double> min;
+            QList<double> max;
             DualViewMode dvMode;
 
             QMap<QString,QVariant> props;
@@ -226,7 +233,7 @@ class QFRDRImageStackData : public QFRawDataRecord, public QFRDRImageStackInterf
             The data is stored in the given ImageStack \a stack. If \a mode is lmGetSize, only the image stack sizes are stored in
             stack, if \a mode is lmReadData the image stack is read from the file.
          */
-        bool loadImageFile(ImageStack &stack, QString filename, loadMode mode, int channel=0, QFImageHalf whichHalfToLoad=qfihAny);
+        bool loadImageFile(ImageStack &stack, QString filename, loadMode mode, int channel=0, QFImageHalf whichHalfToLoad=qfihAny, int filechannel=0);
         QList<ImageStack> stacks;
         /** \brief allocate memory for all entries in stacks */
         bool allocateMemory();

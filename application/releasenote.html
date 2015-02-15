@@ -88,6 +88,7 @@
                     <li>You can use C-style escapes (<tt>\" \' \n \r \t \\ \/</tt>) to add the delimiting characters to a string constant</li>
                     <li>added functions to the default lib, which were in the plugin qfe_defaultmathparserextensions before</li>
                     <li>rangedhistogrambins() functions can now also be called without the data vector x as first argument.</li>
+                    <li>added function polyfit(), which obtains the least-squares coefficients of a polynomial from given data</li>
             </ul></li>
             <li>added context menu entry to tables, that allows to explicitly copy the table as "CSV", or to copy the table in a format suitable for "Excel", which depends on the current locale (e.g. for decimal separators)</li>
             <li>bugfixed "copy to Excel/CSV" in table view, which did not copy any data (regression?)</li>
@@ -178,6 +179,7 @@
             <li>improved rendering speed of online-help, using a caching strategy</li>
             <li>added save menu entry to the online-help window </li>
             <li>splash screen gives a better indication of loading progress/status now (with a progress bar)</li>
+            <li>image reader plugins now support multiple channels</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -505,20 +507,21 @@
         <li>improvements: now group+role of the output records are set properly (according to input file!)</li>
         <li>the tcspcimporter now create the new QF3 ASCII correlation data files and imports those into the project. This fixes different inconsistencies with groups, roles and count-rates, when creating FCCS datasets from TCSPC data.</li>
       </ul></li>
-      <li><b>qfe_defaultmathparserextensions</b><ul>
-            <li>added function polyfit(), which obtains the least-squares coefficients of a polynomial from given data</li>
-      </ul></li>
       <li><b>qfe_calculator</b><ul>
             <li>a new set of plot-commands allows to generate graphs (somewhat working like the respective Matlab functions): <tt>plot(), bar(), scatter(), semilogx(), semilogy(), colorscatter(), errorbar(), xerrorbar(), yerrorbar(), ...</tt></li>
       </ul></li>
       <li><b>basicimageimporters</b><ul>
             <li>added initial support for image file meta-data for TIFF images, such as OME or from ImageJ</li>
+            <li>added support for metadata from QuickFit B040SPIM .configuration.ini files</li>
+            <li>added multi-channel support for libTIFF importer</li>
       </ul></li>
       <li><b>image_stack</b><ul>
             <li>now tries to read metadat (pixel size, deltaZ/T, ...) from file properties (e.g. OME)</li>
             <li>added wizards for SPIM lightsheet analysis</li>
             <li>added wizard for image stacks</li>
             <li>added functions to internal math parser, that allow to access image stacks.</li>
+            <li>single-file image stacks may now load images with multiple frames</li>
+            <li>added additional widgets to configure display in RDR editor</li>
       </ul></li>
       <li><b>fitfunctions_lightsheet:</b><ul>
         <li>added Gaussian function with width specified as FWHM</li>

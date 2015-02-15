@@ -35,6 +35,7 @@ QMutex* QFImageReaderLIBTIFF::mutex=NULL;
 QFImageReaderLIBTIFF::QFImageReaderLIBTIFF() {
     if (!mutex) mutex=new QMutex(QMutex::Recursive);
     width=0;
+    channels=1;
     height=0;
     filename="";
     imageDescription="";
@@ -92,8 +93,13 @@ bool QFImageReaderLIBTIFF::open(QString filename) {
     tif = TIFFOpen(filename.toLatin1().data(),"r");
     if (tif) {
         uint32 nx,ny;
+        uint16 nc;
+        uint16 photo;
         TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
         TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
+        TIFFGetField(tif,TIFFTAG_PHOTOMETRIC,&photo);
+        bool hasSPP=(bool)TIFFGetField(tif,TIFFTAG_SAMPLESPERPIXEL,&nc);
+
         char* val=NULL;
         TIFFGetField(tif,TIFFTAG_IMAGEDESCRIPTION,&val);
         if (val) {
@@ -101,12 +107,19 @@ bool QFImageReaderLIBTIFF::open(QString filename) {
         }
         width=nx;
         height=ny;
+        channels = nc;
+        if (!hasSPP) {
+            if (photo==3) channels=3;
+            else channels=1;
+        }
         this->filename=filename;
         char* desc=NULL;
         if (!TIFFGetField(tif, TIFFTAG_DOCUMENTNAME, &desc)) {
             TIFFGetField(tif, TIFFTAG_IMAGEDESCRIPTION, &desc);
         }
         if (desc) fileinfo.comment=desc;
+
+        qfimdtGetQuickFitMetaData(fileinfo.properties, filename);
 
         bool metaOK=false;
         int cnt=0;
@@ -140,6 +153,7 @@ bool QFImageReaderLIBTIFF::open(QString filename) {
         return true;
     } else {
         width=0;
+        channels=1;
         height=0;
         setLastError(QObject::tr("libtiff: error opening file '%1'").arg(filename));
         this->filename="";
@@ -205,8 +219,20 @@ uint32_t QFImageReaderLIBTIFF::intFrameHeight() {
     return height;
 }
 
+uint32_t QFImageReaderLIBTIFF::intFrameChannels()
+{
+    return channels;
+}
 
-bool QFImageReaderLIBTIFF::intReadFrameUINT16(uint16_t* data) {
+
+
+
+
+
+
+
+
+bool QFImageReaderLIBTIFF::intReadFrameUINT16(uint16_t* data, int channel) {
     if (!tif) return false;
     bool ok=true;
     uint16 samplesperpixel, bitspersample;
@@ -214,64 +240,70 @@ bool QFImageReaderLIBTIFF::intReadFrameUINT16(uint16_t* data) {
     uint32 nx,ny;
     TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
     TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
-    TIFFGetField(tif,TIFFTAG_SAMPLESPERPIXEL,&samplesperpixel);
+    bool hasSPP=(bool)TIFFGetField(tif,TIFFTAG_SAMPLESPERPIXEL,&samplesperpixel);
     TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &sampleformat);
     TIFFGetFieldDefaulted(tif,TIFFTAG_BITSPERSAMPLE,&bitspersample);
-    if (samplesperpixel>1 && samplesperpixel<500) {
+    //if (samplesperpixel>1 && samplesperpixel<500) {
+    //    // if there are more than 500 samples, we assume this is an error in the file and read only one sample!
+    //    setLastError(QObject::tr("can not load frames with more than one sample/pixel (RGB, RGBA, ...)   (from file '%1' with %2 samples/pixel)").arg(filename).arg(samplesperpixel));
+    //    return false;
+    if (samplesperpixel>500) {
         // if there are more than 500 samples, we assume this is an error in the file and read only one sample!
-        setLastError(QObject::tr("can not load frames with more than one sample/pixel (RGB, RGBA, ...)   (from file '%1' with %2 samples/pixel)").arg(filename).arg(samplesperpixel));
+        setLastError(QObject::tr("can not load files with more than 500 samples/pixel   (from file '%1' with %2 samples/pixel)").arg(filename).arg(samplesperpixel));
         return false;
     } else {
-        uint16 photo, config;
-        TIFFGetField(tif,TIFFTAG_PLANARCONFIG,&config);
-        TIFFGetField(tif,TIFFTAG_PHOTOMETRIC,&photo);
+        uint16  planarconfig;
+        TIFFGetField(tif,TIFFTAG_PLANARCONFIG,&planarconfig);
+
         // we only read image with one sample per pixel, so we do nothave to care for TIFFTAG_PLANARCONFIG
-        if (TIFFIsTiled(tif)) { // load a tiled frame
-            uint32 tw, th;
-            TIFFGetField(tif,TIFFTAG_TILEWIDTH,&tw);
-            TIFFGetField(tif,TIFFTAG_TILELENGTH,&th);
-            switch (bitspersample) {
-                case 8 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint8_t,  uint16_t>(data,  tif, nx, ny, tw, th);
-                    else {
-                        setLastError(QObject::tr("can not load 8-bit tiled image in format different from UINT   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                case 16 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint16_t,  uint16_t>(data,  tif, nx, ny, tw, th);
-                    else {
-                        setLastError(QObject::tr("can not load 16-bit tiled image in format different from UINT   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                default: {
-                        setLastError(QObject::tr("can not load tiled frame sample format in TIFF file   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-            }
-        } else { // load a non-tiled frame
-            switch (bitspersample) {
-                case 8 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint8_t,  uint16_t>(data,  tif, nx, ny);
-                    else {
-                        setLastError(QObject::tr("can not load 8-bit image in format different from UINT   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                case 16 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint16_t,  uint16_t>(data,  tif, nx, ny);
-                    else {
-                        setLastError(QObject::tr("can not load 16-bit image in format different from UINT   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                default: {
-                        setLastError(QObject::tr("can not load frame sample format in TIFF file   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
+        if (!TIFFReadRGB(tif, data, nx, ny, channel)) {
+            if (TIFFIsTiled(tif)) { // load a tiled frame
+                uint32 tw, th;
+                TIFFGetField(tif,TIFFTAG_TILEWIDTH,&tw);
+                TIFFGetField(tif,TIFFTAG_TILELENGTH,&th);
+                switch (bitspersample) {
+                    case 8 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint8_t,  uint16_t>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 8-bit tiled image in format different from UINT   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    case 16 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint16_t,  uint16_t>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 16-bit tiled image in format different from UINT   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    default: {
+                            setLastError(QObject::tr("can not load tiled frame sample format in TIFF file   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                }
+            } else { // load a non-tiled frame
+                switch (bitspersample) {
+                    case 8 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint8_t,  uint16_t>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 8-bit image in format different from UINT   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    case 16 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint16_t,  uint16_t>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 16-bit image in format different from UINT   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    default: {
+                            setLastError(QObject::tr("can not load frame sample format in TIFF file   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                }
             }
         }
     }
@@ -281,7 +313,7 @@ bool QFImageReaderLIBTIFF::intReadFrameUINT16(uint16_t* data) {
     return ok;
 }
 
-bool QFImageReaderLIBTIFF::intReadFrameDouble(double *data) {
+bool QFImageReaderLIBTIFF::intReadFrameDouble(double *data, int channel) {
     if (!tif) return false;
 
     bool ok=true;
@@ -291,104 +323,109 @@ bool QFImageReaderLIBTIFF::intReadFrameDouble(double *data) {
     uint32 nx,ny;
     TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
     TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
-    TIFFGetField(tif,TIFFTAG_SAMPLESPERPIXEL,&samplesperpixel);
+   bool hasSPP=(bool)TIFFGetField(tif,TIFFTAG_SAMPLESPERPIXEL,&samplesperpixel);
     TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &sampleformat);
     TIFFGetFieldDefaulted(tif,TIFFTAG_BITSPERSAMPLE,&bitspersample);
-    if (samplesperpixel>1 && samplesperpixel<500) {
+    //if (samplesperpixel>1 && samplesperpixel<500) {
+    //    // if there are more than 500 samples, we assume this is an error in the file and read only one sample!
+    //    setLastError(QObject::tr("can not load frames with more than one sample/pixel (RGB, RGBA, ...)   (from file '%1' with %2 samples/pixel)").arg(filename).arg(samplesperpixel));
+    //    return false;
+    if (samplesperpixel>500) {
         // if there are more than 500 samples, we assume this is an error in the file and read only one sample!
-        setLastError(QObject::tr("can not load frames with more than one sample/pixel (RGB, RGBA, ...)   (from file '%1' with %2 samples/pixel)").arg(filename).arg(samplesperpixel));
+        setLastError(QObject::tr("can not load files with more than 500 samples/pixel   (from file '%1' with %2 samples/pixel)").arg(filename).arg(samplesperpixel));
         return false;
     } else {
-        uint16 photo, config;
-        TIFFGetField(tif,TIFFTAG_PLANARCONFIG,&config);
-        TIFFGetField(tif,TIFFTAG_PHOTOMETRIC,&photo);
+        uint16  planarconfig;
+        TIFFGetField(tif,TIFFTAG_PLANARCONFIG,&planarconfig);
         // we only read image with one sample per pixel, so we do nothave to care for TIFFTAG_PLANARCONFIG
-        if (TIFFIsTiled(tif)) { // load a tiled frame
-            uint32 tw, th;
-            TIFFGetField(tif,TIFFTAG_TILEWIDTH,&tw);
-            TIFFGetField(tif,TIFFTAG_TILELENGTH,&th);
-            switch (bitspersample) {
-                case 8 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint8_t,  double>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int8_t,  double>(data,  tif, nx, ny, tw, th);
-                    else {
-                        setLastError(QObject::tr("can not load 8-bit tiled image in format different from INT or UINT   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                case 16 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint16_t,  double>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int16_t,  double>(data,  tif, nx, ny, tw, th);
-                    else {
-                        setLastError(QObject::tr("can not load 16-bit tiled image in format different from INT or UINT   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                case 32 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint32_t,  double>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int32_t,  double>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadTiled<float,  double>(data,  tif, nx, ny, tw, th);
-                    else {
-                        setLastError(QObject::tr("can not load 32-bit tiled image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                case 64 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint64_t,  double>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int64_t,  double>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadTiled<double,  double>(data,  tif, nx, ny, tw, th);
-                    else {
-                        setLastError(QObject::tr("can not load 64-bit tiled image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                default: {
-                        setLastError(QObject::tr("can not load tiled frame sample format in TIFF file   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-            }
-        } else { // load a non-tiled frame
-            switch (bitspersample) {
-                case 8 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint8_t,  double>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int8_t,  double>(data,  tif, nx, ny);
-                    else {
-                        setLastError(QObject::tr("can not load 8-bit image in format different from INT or UINT   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                case 16 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint16_t,  double>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int16_t,  double>(data,  tif, nx, ny);
-                    else {
-                        setLastError(QObject::tr("can not load 16-bit image in format different from INT or UINT   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                case 32 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint32_t,  double>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int32_t,  double>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadNontiled<float,  double>(data,  tif, nx, ny);
-                    else {
-                        setLastError(QObject::tr("can not load 32-bit image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                case 64 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint64_t,  double>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int64_t,  double>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadNontiled<double,  double>(data,  tif, nx, ny);
-                    else {
-                        setLastError(QObject::tr("can not load 64-bit image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                default: {
-                        setLastError(QObject::tr("can not load frame sample format in TIFF file   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
+        if (!TIFFReadRGB(tif, data, nx, ny, channel)) {
+            if (TIFFIsTiled(tif)) { // load a tiled frame
+                uint32 tw, th;
+                TIFFGetField(tif,TIFFTAG_TILEWIDTH,&tw);
+                TIFFGetField(tif,TIFFTAG_TILELENGTH,&th);
+                switch (bitspersample) {
+                    case 8 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint8_t,  double>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int8_t,  double>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 8-bit tiled image in format different from INT or UINT   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    case 16 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint16_t,  double>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int16_t,  double>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 16-bit tiled image in format different from INT or UINT   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    case 32 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint32_t,  double>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int32_t,  double>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadTiled<float,  double>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 32-bit tiled image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    case 64 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint64_t,  double>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int64_t,  double>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadTiled<double,  double>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 64-bit tiled image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    default: {
+                            setLastError(QObject::tr("can not load tiled frame sample format in TIFF file   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                }
+            } else { // load a non-tiled frame
+                switch (bitspersample) {
+                    case 8 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint8_t,  double>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int8_t,  double>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 8-bit image in format different from INT or UINT   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    case 16 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint16_t,  double>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int16_t,  double>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 16-bit image in format different from INT or UINT   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    case 32 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint32_t,  double>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int32_t,  double>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadNontiled<float,  double>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 32-bit image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    case 64 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint64_t,  double>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int64_t,  double>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadNontiled<double,  double>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 64-bit image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    default: {
+                            setLastError(QObject::tr("can not load frame sample format in TIFF file   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                }
             }
         }
     }
@@ -398,7 +435,7 @@ bool QFImageReaderLIBTIFF::intReadFrameDouble(double *data) {
     return ok;
 }
 
-bool QFImageReaderLIBTIFF::intReadFrameFloat(float* data) {
+bool QFImageReaderLIBTIFF::intReadFrameFloat(float* data, int channel) {
     if (!tif) return false;
 
     bool ok=true;
@@ -408,104 +445,115 @@ bool QFImageReaderLIBTIFF::intReadFrameFloat(float* data) {
     uint32 nx,ny;
     TIFFGetField(tif,TIFFTAG_IMAGEWIDTH,&nx);
     TIFFGetField(tif,TIFFTAG_IMAGELENGTH,&ny);
+    if (nx!=width || ny!=height) {
+        setLastError(QObject::tr("ERROR reading TIFF: frame has a size, unequal to the previous frames (file '%1')").arg(filename));
+        return false;
+    }
     TIFFGetField(tif,TIFFTAG_SAMPLESPERPIXEL,&samplesperpixel);
     TIFFGetField(tif, TIFFTAG_SAMPLEFORMAT, &sampleformat);
     TIFFGetFieldDefaulted(tif,TIFFTAG_BITSPERSAMPLE,&bitspersample);
-    if (samplesperpixel>1 && samplesperpixel<500) {
+    //if (samplesperpixel>1 && samplesperpixel<500) {
+    //    // if there are more than 500 samples, we assume this is an error in the file and read only one sample!
+    //    setLastError(QObject::tr("can not load frames with more than one sample/pixel (RGB, RGBA, ...)   (from file '%1' with %2 samples/pixel)").arg(filename).arg(samplesperpixel));
+    //    return false;
+    if (samplesperpixel>500) {
         // if there are more than 500 samples, we assume this is an error in the file and read only one sample!
-        setLastError(QObject::tr("can not load frames with more than one sample/pixel (RGB, RGBA, ...)   (from file '%1' with %2 samples/pixel)").arg(filename).arg(samplesperpixel));
+        setLastError(QObject::tr("can not load files with more than 500 samples/pixel   (from file '%1' with %2 samples/pixel)").arg(filename).arg(samplesperpixel));
         return false;
     } else {
-        uint16 photo, config;
-        TIFFGetField(tif,TIFFTAG_PLANARCONFIG,&config);
-        TIFFGetField(tif,TIFFTAG_PHOTOMETRIC,&photo);
+        uint16 planarconfig;
+        TIFFGetField(tif,TIFFTAG_PLANARCONFIG,&planarconfig);
+
+
         // we only read image with one sample per pixel, so we do nothave to care for TIFFTAG_PLANARCONFIG
-        if (TIFFIsTiled(tif)) { // load a tiled frame
-            uint32 tw, th;
-            TIFFGetField(tif,TIFFTAG_TILEWIDTH,&tw);
-            TIFFGetField(tif,TIFFTAG_TILELENGTH,&th);
-            switch (bitspersample) {
-                case 8 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint8_t,  float>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int8_t,  float>(data,  tif, nx, ny, tw, th);
-                    else {
-                        setLastError(QObject::tr("can not load 8-bit tiled image in format different from INT or UINT   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                case 16 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint16_t,  float>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int16_t,  float>(data,  tif, nx, ny, tw, th);
-                    else {
-                        setLastError(QObject::tr("can not load 16-bit tiled image in format different from INT or UINT   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                case 32 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint32_t,  float>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int32_t,  float>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadTiled<float,  float>(data,  tif, nx, ny, tw, th);
-                    else {
-                        setLastError(QObject::tr("can not load 32-bit tiled image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                case 64 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint64_t,  float>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int64_t,  float>(data,  tif, nx, ny, tw, th);
-                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadTiled<double,  float>(data,  tif, nx, ny, tw, th);
-                    else {
-                        setLastError(QObject::tr("can not load 64-bit tiled image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                default: {
-                        setLastError(QObject::tr("can not load tiled frame sample format in TIFF file   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-            }
-        } else { // load a non-tiled frame
-            switch (bitspersample) {
-                case 8 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint8_t,  float>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int8_t,  float>(data,  tif, nx, ny);
-                    else {
-                        setLastError(QObject::tr("can not load 8-bit image in format different from INT or UINT   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                case 16 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint16_t,  float>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int16_t,  float>(data,  tif, nx, ny);
-                    else {
-                        setLastError(QObject::tr("can not load 16-bit image in format different from INT or UINT   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                case 32 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint32_t,  float>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int32_t,  float>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadNontiled<float,  float>(data,  tif, nx, ny);
-                    else {
-                        setLastError(QObject::tr("can not load 32-bit image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                case 64 :
-                    if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint64_t,  float>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int64_t,  float>(data,  tif, nx, ny);
-                    else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadNontiled<double,  float>(data,  tif, nx, ny);
-                    else {
-                        setLastError(QObject::tr("can not load 64-bit image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
-                default: {
-                        setLastError(QObject::tr("can not load frame sample format in TIFF file   (from file '%1')").arg(filename));
-                        return false;
-                    }
-                    break;
+        if (!TIFFReadRGB(tif, data, nx, ny, channel)) {
+            if (TIFFIsTiled(tif)) { // load a tiled frame
+                uint32 tw, th;
+                TIFFGetField(tif,TIFFTAG_TILEWIDTH,&tw);
+                TIFFGetField(tif,TIFFTAG_TILELENGTH,&th);
+                switch (bitspersample) {
+                    case 8 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint8_t,  float>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int8_t,  float>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 8-bit tiled image in format different from INT or UINT   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    case 16 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint16_t,  float>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int16_t,  float>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 16-bit tiled image in format different from INT or UINT   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    case 32 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint32_t,  float>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int32_t,  float>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadTiled<float,  float>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 32-bit tiled image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    case 64 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadTiled<uint64_t,  float>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadTiled<int64_t,  float>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadTiled<double,  float>(data,  tif, nx, ny, tw, th, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 64-bit tiled image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    default: {
+                            setLastError(QObject::tr("can not load tiled frame sample format in TIFF file   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                }
+            } else { // load a non-tiled frame
+                switch (bitspersample) {
+                    case 8 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint8_t,  float>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int8_t,  float>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 8-bit image in format different from INT or UINT   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    case 16 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint16_t,  float>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int16_t,  float>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 16-bit image in format different from INT or UINT   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    case 32 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint32_t,  float>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int32_t,  float>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadNontiled<float,  float>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 32-bit image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    case 64 :
+                        if (sampleformat==SAMPLEFORMAT_UINT) ok=TIFFLoadNontiled<uint64_t,  float>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_INT) ok=TIFFLoadNontiled<int64_t,  float>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else if (sampleformat==SAMPLEFORMAT_IEEEFP) ok=TIFFLoadNontiled<double,  float>(data,  tif, nx, ny, channel, samplesperpixel, planarconfig);
+                        else {
+                            setLastError(QObject::tr("can not load 64-bit image in format different from INT, UINT, IEEE   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                    default: {
+                            setLastError(QObject::tr("can not load frame sample format in TIFF file   (from file '%1')").arg(filename));
+                            return false;
+                        }
+                        break;
+                }
             }
         }
     }

@@ -37,6 +37,7 @@ void QFExporterImageSeries::setFrameSize(uint32_t width, uint32_t height, uint32
     this->deltaX=1;
     this->deltaY=1;
     this->deltaZ=1;
+    frame=0;
     this->unitname=QObject::tr("pixel");
 }
 
@@ -71,6 +72,7 @@ bool QFExporterImageSeries::writeFramesFloat(const float *data, uint32_t frames)
     for (uint32_t i=0; i<frames; i++) {
         ok=writeFrameFloat(&(data[i*width*height*channels]));
         if (!ok) return false;
+        else frame++;
     }
     return ok;
 }
@@ -81,6 +83,7 @@ bool QFExporterImageSeries::writeFramesDouble(const double *data, uint32_t frame
     for (uint32_t i=0; i<frames; i++) {
         ok=writeFrameDouble(&(data[i*width*height*channels]));
         if (!ok) return false;
+        else frame++;
     }
     return ok;
 }
@@ -91,6 +94,7 @@ bool QFExporterImageSeries::writeFramesUINT16(const uint16_t *data, uint32_t fra
     for (uint32_t i=0; i<frames; i++) {
         ok=writeFrameUINT16(&(data[i*width*height*channels]));
         if (!ok) return false;
+        else frame++;
     }
     return ok;
 }
@@ -101,6 +105,7 @@ bool QFExporterImageSeries::writeFramesUINT32(const uint32_t *data, uint32_t fra
     for (uint32_t i=0; i<frames; i++) {
         ok=writeFrameUINT32(&(data[i*width*height*channels]));
         if (!ok) return false;
+        else frame++;
     }
     return ok;
 }
@@ -111,6 +116,7 @@ bool QFExporterImageSeries::writeFramesUINT8(const uint8_t *data, uint32_t frame
     for (uint32_t i=0; i<frames; i++) {
         ok=writeFrameUINT8(&(data[i*width*height*channels]));
         if (!ok) return false;
+        else frame++;
     }
     return ok;
 }

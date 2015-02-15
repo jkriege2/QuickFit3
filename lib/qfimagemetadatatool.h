@@ -81,6 +81,94 @@ frametime=300
 */
 bool QFLIB_EXPORT qfimdtGetTinyTIFFMetaData(QMap<QString, QVariant>& data, const QByteArray &input);
 
+/*! \brief tries to extract QuickFit 3.0 metadata for the given \a input and writes it to \a data. This extracts metadat from e.g. <tt>.configuration.ini</tt> files, which link to this image
+    \ingroup qf3lib_tools_imagemetadata
+
+*/
+bool QFLIB_EXPORT qfimdtGetQuickFitMetaData(QMap<QString, QVariant>& data, const QString &filename, QString* configfile=NULL, QString* filedescription=NULL, bool filenameIsINI=false);
+
+/*! \brief tries to find a metadata file (e.g. <tt>XXX.configuration.ini</tt>), which contains data for the given image file
+    \ingroup qf3lib_tools_imagemetadata
+
+    These files are created e.g. by the B040SPIM plugin. It has to contain a section [files], which has to contain an entry for the
+    given filename. This function also returns the assigned file description (from the file) in \a description.
+
+    Here is an example for such a configuration file:
+\verbatim
+[acquisition]
+accumulation_time=0.00056
+binning_horizontal=1
+binning_vertical=1
+bit_depth=14
+camera_manufacturer=Andor
+camera_sensor=DU860_BV
+camera_serial_number=5322
+cooler_enabled=true
+duration_milliseconds=11200
+emgain=5
+emgain_enabled=true
+exposure_time=0.0005
+image_height=4
+image_width=20
+images=50000
+pixel_height=0.4
+pixel_units=arbitrary
+pixel_width=0.4
+preamplifier_gain=4.5
+roi_xend=74
+roi_xstart=55
+roi_yend=58
+roi_ystart=55
+camera_pixel_width=24
+camera_pixel_height=24
+camera_model=DU860_BV
+sensor_model=DU860_BV
+magnification=60
+
+[setup]
+filterchangers\\detection\\filter=1
+filters\\detection_filterchanger\\manufacturer=Semrock
+filters\\detection_filterchanger\\name=BrightLine 525/50 (F37-516)
+filters\\detection_filterchanger\\type=band pass
+laser1\\line1\\enabled=true
+laser1\\line1\\measured_power=5
+laser1\\line1\\name=line #1: 491 nm
+laser1\\line1\\set_power=5
+laser1\\line1\\unit=mW
+laser1\\shutter=true
+main_illumination\\shutter=true
+objectives\\detection\\NA=1
+objectives\\detection\\magnification=60
+objectives\\detection\\manufacturer=Nikon
+objectives\\detection\\name=Nikon Apo 60x/1.0W
+objectives\\tube_lens1\\NA=0.07
+objectives\\tube_lens1\\magnification=1
+objectives\\tube_lens1\\manufacturer=Nikon
+objectives\\tube_lens1\\name="1x tubelens, f=200mm"
+
+[experiment]
+experimenter=JanK
+labbook=54
+sample="sample description"
+start_time=2012-06-19T21:29:23
+title=test with 100nm YG beads
+
+[files]
+count=3
+name0=beads_no9_0.86nM_5mW_000_overview.tif
+type0=TIFF16
+description0=overview before acquisition  with preview settings
+name1=beads_no9_0.86nM_5mW_000.tif
+type1=TIFF16
+description1=Andor camera acquisition image series
+name2=beads_no9_0.86nM_5mW_000.measured.dat
+type2=CSV
+description2=measureable properties of setup
+\endverbatim
+
+*/
+QString QFLIB_EXPORT findB040ExperimentDescriptionForData(const QString& filename, QString* description=NULL);
+
 /*! \brief returns an ImageJ metadata-block
     \ingroup qf3lib_tools_imagemetadata
 

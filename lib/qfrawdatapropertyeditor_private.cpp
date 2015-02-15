@@ -1655,9 +1655,13 @@ void QFRawDataPropertyEditor_private::exportData()
         if (ids.size()>0 && filters.size()>0) {
             QString filter=filters[0];
             //qDebug()<<"exportData "<<filter;
-            QString filename=qfGetSaveFileNameSet("rdr/export-data/", d, current->getExportDialogTitle(), QString(), filters.join(";;"), &filter);
+            QString filename=qfGetSaveFileNameSet(QString("rdr_%1/export-data/").arg(current->getType()), d, current->getExportDialogTitle(), QString(), filters.join(";;"), &filter);
             //qDebug()<<"exportData "<<filename;
-            if (!filename.isEmpty()) current->exportData(ids.value(filters.indexOf(filter), ""), filename);
+            if (!filename.isEmpty()) {
+                QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+                current->exportData(ids.value(filters.indexOf(filter), ""), filename);
+                QApplication::restoreOverrideCursor();
+            }
             //qDebug()<<"exportData DONE";
         }
     }

@@ -33,6 +33,7 @@
 #include <QMenu>
 #include <QAction>
 #include "binarydatatools.h"
+#include "qfimagemetadatatool.h"
 
 
 int stringToDualViewMode(const QString& dv);
@@ -56,7 +57,7 @@ void readB040SPIMExperimentConfigFileAssociatedFiles(QSettings& set, QStringList
  */
 void appendCategorizedFilesFromB040SPIMConfig(QSettings& settings, QStringList& files, QStringList& files_types, QStringList &files_descriptions);
 
-QString findB040ExperimentDescriptionForData(const QString& filename);
+
 
 QString findEvalsettingsFileForVideoCorrelatorFile(const QString& vidCorrFile);
 QString findOverviewFileForVideoCorrelatorFile(const QString& vidCorrFile);

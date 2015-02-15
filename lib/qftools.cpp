@@ -764,7 +764,7 @@ QString	qfGetExistingDirectory ( QWidget * parent, const QString & caption, cons
 QString qfGetOpenFileNameSet (const QString& setPrefix,  QWidget * parent , const QString & caption , const QString & dir , const QString & filter , QString * selectedFilter , QFileDialog::Options options  ) {
     QString d=ProgramOptions::getConfigValue(setPrefix+"lastDir",  dir).toString();
     QString f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  filter.split(";;").value(0)).toString();;
-    if (selectedFilter) {
+    if (selectedFilter && (!(*selectedFilter).isEmpty())) {
         f=*selectedFilter;
     }
 
@@ -780,7 +780,7 @@ QString qfGetOpenFileNameSet (const QString& setPrefix,  QWidget * parent , cons
 QStringList qfGetOpenFileNamesSet (const QString& setPrefix,  QWidget * parent , const QString & caption , const QString & dir , const QString & filter , QString * selectedFilter , QFileDialog::Options options  ) {
     QString d=ProgramOptions::getConfigValue(setPrefix+"lastDir",  dir).toString();
     QString f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  filter.split(";;").value(0)).toString();;
-    if (selectedFilter) {
+    if (selectedFilter && (!(*selectedFilter).isEmpty())) {
         f=*selectedFilter;
     }
 
@@ -796,7 +796,7 @@ QStringList qfGetOpenFileNamesSet (const QString& setPrefix,  QWidget * parent ,
 QString qfGetSaveFileNameSet (const QString& setPrefix,  QWidget * parent , const QString & caption , const QString & dir , const QString & filter , QString * selectedFilter , QFileDialog::Options options  ) {
     QString d=ProgramOptions::getConfigValue(setPrefix+"lastDir",  dir).toString();
     QString f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  filter.split(";;").value(0)).toString();;
-    if (selectedFilter) {
+    if (selectedFilter && (!(*selectedFilter).isEmpty())) {
         f=*selectedFilter;
     }
     QString fn=qfGetSaveFileName(parent, caption, d, filter, &f, options);

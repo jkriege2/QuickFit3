@@ -61,8 +61,10 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         virtual void connectWidgets(QFRawDataRecord* current, QFRawDataRecord* old);
 
         void showFrame(int frame, bool startPlayer=true);
-
+        void replotFrame();
+        void maskChanged();
         void displayImage();
+
         void stackChanged();
         void channelModeChanged();
 
@@ -96,6 +98,8 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         QMenu* menuMask;
         QMenu* menuTools;
         QLabel* labSelectiondata;
+        QCheckBox* chkHistogramLog;
+        QComboBox* cmbHitogramMode;
 
         QAction* act3DViewer;
 
@@ -117,6 +121,7 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
 
 
         QFPLayerControls* player;
+        QComboBox* cmbColorScaleMode;
 
         JKQTPMathImage* image;
         JKQTPRGBMathImage* imageRGB;
@@ -139,7 +144,7 @@ class QFRDRImageStackDataEditor : public QFRawDataEditor {
         /** \brief write the settings */
         virtual void writeSettings();
 
-        void addDataHistogram(double* data, bool *mask, int size, const QString& title, const QString& colX, const QString& colY, QColor col=QColor("darkblue"), double shift=0, double width=0.9);
+        void addDataHistogram(double* data, bool *mask, int size, int maskSize, const QString& title, const QString& colX, const QString& colY, QColor col=QColor("darkblue"), double shift=0, double width=0.9);
 
         void connectWidgets();
         void disconnectWidgets();

@@ -107,6 +107,9 @@ class QFLIB_EXPORT QFExporterImageSeries: public QFExporter {
         inline QString getXYZUnitName()  const {
             return unitname;
         }
+        inline QString getFrame()  const {
+            return frame;
+        }
 
         void setResolution(double deltaX=1, double deltaY=1, double deltaZ=1, const QString& unitname=QString("pixel"));
 
@@ -143,6 +146,7 @@ class QFLIB_EXPORT QFExporterImageSeries: public QFExporter {
         uint32_t width;
         uint32_t height;
         uint32_t channels;
+        uint32_t frame;
 
         float deltaX;
         float deltaY;

@@ -261,3 +261,8 @@ double QFPLayerControls::getFPS() const {
     return spinFPS->value();
 }
 
+bool QFPLayerControls::isPlaying() const
+{
+    return actPlayPause->isChecked();
+}
+

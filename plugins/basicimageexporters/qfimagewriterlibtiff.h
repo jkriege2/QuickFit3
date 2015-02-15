@@ -127,8 +127,10 @@ class QFImageWriterLibTIFF: public QFExporterImageSeries {
             //if (frames==1 && comment.size()>0) TIFFSetField(tif,TIFFTAG_IMAGEDESCRIPTION,comment.toLatin1().data());
 
             if (frames==1) TIFFSetField(tiflocal,TIFFTAG_IMAGEDESCRIPTION,qfimdtBuildImageJMetaData(0, deltaX, deltaY, deltaZ, unitname,comment).data());
-            TIFFSetField(tiflocal,TIFFTAG_XRESOLUTION,1.0/deltaX);
-            TIFFSetField(tiflocal,TIFFTAG_YRESOLUTION,1.0/deltaY);
+            float res=1.0/deltaX;
+            TIFFSetField(tiflocal,TIFFTAG_XRESOLUTION,res);
+            res=1.0/deltaY;
+            TIFFSetField(tiflocal,TIFFTAG_YRESOLUTION,res);
             TIFFSetField(tiflocal,TIFFTAG_RESOLUTIONUNIT,RESUNIT_NONE);
             TIFFSetField(tiflocal,TIFFTAG_SOFTWARE,"www.dkfz.de.QuickFit3.Plugins.QFPBasicImageExporters");
 

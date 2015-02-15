@@ -73,10 +73,10 @@ class QFImageReaderTinyTIFF: public QFImporterImageSeries
         /** \brief return the height of the frames (valid after open() returned \c true */
         virtual uint32_t intFrameHeight();
         /** \brief read a new frame into the given array of floating point numbers */
-        virtual bool intReadFrameFloat(float* data);
+        virtual bool intReadFrameFloat(float* data, int channel=0);
         /** \brief read a new frame into the given array of integers */
-        virtual bool intReadFrameUINT16(uint16_t* data);
-        virtual bool intReadFrameDouble(double* data);
+        virtual bool intReadFrameUINT16(uint16_t* data, int channel=0);
+        virtual bool intReadFrameDouble(double* data, int channel=0);
         TinyTIFFReaderFile* tif;
         QString filename;
         uint32_t width;

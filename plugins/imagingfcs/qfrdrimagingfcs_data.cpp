@@ -1776,6 +1776,16 @@ double *QFRDRImagingFCSData::getUncorrectedStatisticsMax(int channel) const {
 
 
 void QFRDRImagingFCSData::loadQFPropertiesFromB040SPIMSettingsFile(QSettings &settings) {
+
+    QMap<QString, QVariant> data;
+    if (qfimdtGetQuickFitMetaData(data, settings.fileName(), NULL, NULL, true)) {
+        QMapIterator<QString, QVariant> it(data);
+        while (it.hasNext()) {
+            it.next();
+            if (!propertyExists(it.key())) setQFProperty(it.key(), it.value(), true, true);
+        }
+    }
+
     if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/duration_milliseconds")) setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/duration_milliseconds").toDouble(), true, true);
     if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/acquisition/duration_milliseconds")) setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/acquisition/duration_milliseconds").toDouble(), true, true);
     if (!propertyExists("MEASUREMENT_DURATION_MS") && settings.contains("acquisition/camera/duration_milliseconds")) setQFProperty("MEASUREMENT_DURATION_MS", settings.value("acquisition/camera/duration_milliseconds").toDouble(), true, true);

@@ -486,7 +486,7 @@ void MainWindow::searchAndRegisterPlugins() {
     QStringList filenames=qfDirListFilesRecursive(pluginsDir);
     emit setSplashProgressRange(0, filenames.size());
     int plgCnt=0;
-    foreach (QString fileName, filenames) {//pluginsDir.entryList(QDir::Files)) {
+    foreach (QString  fileName, filenames) {//pluginsDir.entryList(QDir::Files)) {
         QPluginLoader* loader=new QPluginLoader(pluginsDir.absoluteFilePath(fileName));
         if (loader) {
             QObject *plugin = loader->instance();
@@ -538,14 +538,27 @@ void MainWindow::searchAndRegisterPlugins() {
     emit showSplashMessage("plugins: initializing plugins ...");
     emit setSplashProgress(0);
     QApplication::processEvents();
+    emit showSplashMessage("plugins: initializing evaluation plugins ...");
     QApplication::processEvents();
     evaluationFactory->init();
+    emit showSplashMessage("plugins: initializing RDR plugins ...");
+    QApplication::processEvents();
     rawDataFactory->init();
+    emit showSplashMessage("plugins: initializing importer plugins ...");
+    QApplication::processEvents();
     importerManager->init();
+    emit showSplashMessage("plugins: initializing exporter plugins ...");
+    QApplication::processEvents();
     exporterManager->init();
+    emit showSplashMessage("plugins: initializing fit function plugins ...");
+    QApplication::processEvents();
     fitFunctionManager->init();
+    emit showSplashMessage("plugins: initializing fit algorithm plugins ...");
+    QApplication::processEvents();
     fitAlgorithmManager->init();
     // init extensions
+    emit showSplashMessage("plugins: initializing extension plugins ...");
+    QApplication::processEvents();
     extensionManager->init(this, this);
 
     // register plugins to menus
@@ -554,7 +567,7 @@ void MainWindow::searchAndRegisterPlugins() {
     QApplication::processEvents();
     QApplication::processEvents();
     QStringList sl=getRawDataRecordFactory()->getIDList();
-    QStringList sl1=sl1=getEvaluationItemFactory()->getIDList();
+    QStringList sl1=getEvaluationItemFactory()->getIDList();
     for (int i=0; i<sl.size(); i++) {
         getRawDataRecordFactory()->registerMenu(sl[i], insertItemMenu);
     }

@@ -90,6 +90,7 @@ bool QFImageReaderTinyTIFF::open(QString filename) {
         imageDescription=TinyTIFFReader_getImageDescription(tif).c_str();
         tinyTIFFMessageHandler("QFImageReaderTinyTIFF", QObject::tr("opened file '%1', size: %2x%3\n").arg(filename).arg(width).arg(height));
 
+        qfimdtGetQuickFitMetaData(fileinfo.properties, filename);
 
         bool metaOK=false;
         int cnt=0;
@@ -195,7 +196,7 @@ void readTinyTIFFFrame(TinyTIFFReaderFile* tif, Tout* buffer) {
 }
 
 
-bool QFImageReaderTinyTIFF::intReadFrameFloat(float *data) {
+bool QFImageReaderTinyTIFF::intReadFrameFloat(float *data, int channel) {
     if (!tif) return false;
 
     uint32_t wwidth=TinyTIFFReader_getWidth(tif);
@@ -240,7 +241,7 @@ bool QFImageReaderTinyTIFF::intReadFrameFloat(float *data) {
     return true;
 }
 
-bool QFImageReaderTinyTIFF::intReadFrameUINT16(uint16_t *data) {
+bool QFImageReaderTinyTIFF::intReadFrameUINT16(uint16_t *data, int channel) {
     if (!tif) return false;
 
     uint32_t wwidth=TinyTIFFReader_getWidth(tif);
@@ -280,7 +281,7 @@ bool QFImageReaderTinyTIFF::intReadFrameUINT16(uint16_t *data) {
     return true;
 }
 
-bool QFImageReaderTinyTIFF::intReadFrameDouble(double *data) {
+bool QFImageReaderTinyTIFF::intReadFrameDouble(double *data, int channel) {
     if (!tif) return false;
 
     uint32_t wwidth=TinyTIFFReader_getWidth(tif);

@@ -26,7 +26,9 @@ Copyright (c) 2014
 #include "qfexporter.h"
 #include "qfexporterimageseries.h"
 #include <QFile>
-
+#include <QFileInfo>
+#include<QDir>
+#include <QTextStream>
 /*! \brief QFExporter class for fit function
     \ingroup qf3exporterplugins_exporters_basicimage
 

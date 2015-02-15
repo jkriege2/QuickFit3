@@ -79,13 +79,18 @@ uint32_t QFImporterImageSeries::frameHeight() {
     return h;
 }
 
-bool QFImporterImageSeries::readFrameFloat(float* data) {
-    if (!crop && binning==1) return intReadFrameFloat(data);
+uint32_t QFImporterImageSeries::frameChannels()
+{
+    return intFrameChannels();
+}
+
+bool QFImporterImageSeries::readFrameFloat(float* data, int channel) {
+    if (!crop && binning==1) return intReadFrameFloat(data, channel);
     int fw=intFrameWidth();
     int fh=intFrameHeight();
     QVector<float> d(fw*fh);
     QVector<float> d1(fw*fh);
-    bool OK=intReadFrameFloat(d.data());
+    bool OK=intReadFrameFloat(d.data(), channel);
     if (!OK) {
         return false;
     }
@@ -152,15 +157,15 @@ bool QFImporterImageSeries::readFrameFloat(float* data) {
     return true;
 }
 
-bool QFImporterImageSeries::readFrameDouble(double *data) {
-    if (!crop && binning==1) return intReadFrameDouble(data);
+bool QFImporterImageSeries::readFrameDouble(double *data, int channel) {
+    if (!crop && binning==1) return intReadFrameDouble(data, channel);
     int fw=intFrameWidth();
     int fh=intFrameHeight();
     QVector<double> d(fw*fh);
     QVector<double> d1(fw*fh);
     //double* d=(double*)qfMalloc(fw*fh*sizeof(double));
     //double* d1=(double*)qfMalloc(fw*fh*sizeof(double));
-    bool OK=intReadFrameDouble(d.data());
+    bool OK=intReadFrameDouble(d.data(), channel);
     if (!OK) {
         return false;
     }
@@ -227,13 +232,13 @@ bool QFImporterImageSeries::readFrameDouble(double *data) {
    return true;
 }
 
-bool QFImporterImageSeries::readFrameUINT16(uint16_t* data) {
-    if (!crop && binning==1) return intReadFrameUINT16(data);
+bool QFImporterImageSeries::readFrameUINT16(uint16_t* data, int channel) {
+    if (!crop && binning==1) return intReadFrameUINT16(data, channel);
     int fw=intFrameWidth();
     int fh=intFrameHeight();
     QVector<uint16_t> d(fw*fh);
     QVector<uint16_t> d1(fw*fh);
-    bool OK=intReadFrameUINT16(d.data());
+    bool OK=intReadFrameUINT16(d.data(), channel);
     if (!OK) {
         return false;
     }
@@ -314,4 +319,9 @@ void QFImporterImageSeries::setCropping(int x0, int x1, int y0, int y1) {
     this->y1=y1;
     crop=true;
     //qDebug()<<"enabled cropping   x = "<<x0<<"..."<<x1<<"   y = "<<y0<<"..."<<y1;
+}
+
+uint32_t QFImporterImageSeries::intFrameChannels()
+{
+    return 1;
 }

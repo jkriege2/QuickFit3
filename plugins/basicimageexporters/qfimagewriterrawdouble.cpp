@@ -48,6 +48,22 @@ bool QFImageWriterRAWDouble::open(const QString& filename)
     close();
     file.setFileName(filename);
     if (file.open(QIODevice::WriteOnly)) {
+        QFileInfo fi(filename);
+        QDir d=fi.absoluteDir();
+        QFile description(d.absoluteFilePath(fi.baseName()+".description.txt"));
+        if (description.open(QIODevice::WriteOnly|QIODevice::Text)) {
+            QTextStream str(&description);
+            str<<"data_format=double\n";
+            str<<"bitspersample=64\n";
+            str<<"width="<<width<<"\n";
+            str<<"height="<<height<<"\n";
+            str<<"channels="<<channels<<"\n";
+            str<<"deltaX="<<deltaX<<"\n";
+            str<<"deltaY="<<deltaY<<"\n";
+            str<<"deltaZ="<<deltaZ<<"\n";
+            str<<"unit="<<unitname<<"\n";
+            description.close();
+        }
         return true;
     }
     return false;
@@ -55,7 +71,17 @@ bool QFImageWriterRAWDouble::open(const QString& filename)
 
 void QFImageWriterRAWDouble::close()
 {
-    if (file.isOpen()) file.close();
+    if (file.isOpen()) {
+        QFileInfo fi(filename);
+        QDir d=fi.absoluteDir();
+        QFile description(d.absoluteFilePath(fi.baseName()+".description.txt"));
+        if (description.open(QIODevice::Append|QIODevice::Text)) {
+            QTextStream str(&description);
+            str<<"frames="<<frames<<"\n";
+            description.close();
+        }
+        file.close();
+    }
 }
 
 bool QFImageWriterRAWDouble::intWriteFrameFloat(const float *data)
