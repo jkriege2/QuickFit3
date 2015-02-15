@@ -335,6 +335,15 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("rangedhistogram", QFMathParser_DefaultLib::fRangedHistogram);
     p->addFunction("rangedhistogrambins", QFMathParser_DefaultLib::fRangedHistogramBins);
 
+    p->addFunction("regression", QFMathParser_DefaultLib::fRegression);
+    p->addFunction("polyfit", QFMathParser_DefaultLib::fPolyFit);
+    p->addFunction("weighted_regression", QFMathParser_DefaultLib::fWeightedRegression);
+    p->addFunction("irls", QFMathParser_DefaultLib::fIRLS);
+    p->addFunction("erroradd", QFMathParser_DefaultLib::fErrorAdd);
+    p->addFunction("errorasub", QFMathParser_DefaultLib::fErrorSub);
+    p->addFunction("errormul", QFMathParser_DefaultLib::fErrorMul);
+    p->addFunction("errordiv", QFMathParser_DefaultLib::fErrorDiv);
+    p->addFunction("errorpow", QFMathParser_DefaultLib::fErrorPow);
 
 #ifdef QFLIB_LIBRARY
     p->addFunction("rdr_ids", QFMathParser_DefaultLib::fRDRIDs);
