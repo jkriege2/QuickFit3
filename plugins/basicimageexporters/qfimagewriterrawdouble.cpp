@@ -23,6 +23,10 @@ Copyright (c) 2014
 #include "qfimagewriterrawdouble.h"
 #include <QObject>
 #include "binarydatatools.h"
+#include <QFile>
+#include <QDir>
+#include <QFileInfo>
+#include <QTextStream>
 
 QFImageWriterRAWDouble::QFImageWriterRAWDouble():
     QFExporterImageSeries()
