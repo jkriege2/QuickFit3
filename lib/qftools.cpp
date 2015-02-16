@@ -299,7 +299,7 @@ void loadSplitter(QSettings& settings, QSplitter* splitter, QString prefix) {
     for (int i=0; i<s1.count(); i++) {
         if (i<sizes.size()) s1[i]=sizes[i];
     }*/
-    splitter->restoreState(settings.value(prefix+"splitter_sizes", splitter->saveState()).toByteArray());
+    if (settings.contains(prefix+"splitter_sizes"))  splitter->restoreState(settings.value(prefix+"splitter_sizes", splitter->saveState()).toByteArray());
 }
 
 

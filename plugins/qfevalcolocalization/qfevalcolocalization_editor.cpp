@@ -77,8 +77,8 @@ QFEValColocalizationEditor::QFEValColocalizationEditor(QFPluginServices* service
     ui->btnEvaluateAll->setVisible(false);
     ui->btnEvaluateCurrent->setVisible(false);
     updatingData=false;
-    loadSplitter(*ProgramOptions::getInstance()->getQSettings(), ui->splitter, QString("QFEValColocalizationEditor/splitter"));
-    loadSplitter(*ProgramOptions::getInstance()->getQSettings(), ui->splitter2, QString("QFEValColocalizationEditor/splitter2"));
+    loadSplitter(*ProgramOptions::getInstance()->getQSettings(), ui->splitter, QString("QFEValColocalizationEditor/splitter/"));
+    loadSplitter(*ProgramOptions::getInstance()->getQSettings(), ui->splitter2, QString("QFEValColocalizationEditor/splitter2/"));
 
     QMenu* menuResults= propEditor->addOrFindMenu(tr("Results"));
     menuResults->addAction(actSaveReport);
@@ -435,7 +435,7 @@ void QFEValColocalizationEditor::displayData() {
     plteOverlay->set_drawAsRectangles(true);
     plteOverlay->set_rectanglesAsImageOverlay(true);
     QColor col("blue");
-    col.setAlphaF(0.3);
+    col.setAlphaF(0.5);
     plteOverlay->set_width(width);
     plteOverlay->set_height(height);
     plteOverlay->set_Nx(width);
