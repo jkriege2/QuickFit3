@@ -41,6 +41,7 @@
 #include <QPrinter>
 #include <QPrinterInfo>
 #include "qfversion.h"
+#include <QPrinter>
 #if (QT_VERSION > QT_VERSION_CHECK(5, 2, 0))
 #include <QPdfWriter>
 #endif
@@ -1779,7 +1780,7 @@ void qfSaveReport(QTextDocument* doc, const QString& title, const QString& prefi
     #else
             printer->setColorMode(QPrinter::Color);
             printer->setOutputFileName(fn);
-            doc->setTextWidth(printer->pageSize().width());
+            doc->setTextWidth(printer->pageRect().width());
             doc->print(printer);
     #endif
         } else if (filterID>firstDForm) {

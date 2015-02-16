@@ -875,7 +875,7 @@ void QEnhancedTableView::copyAsImage()
     }
 
     QPixmap pix(totalWidth, totalHeight);
-    pix.fill(Qt::white);
+    pix.fill(Qt::transparent);
 
     {
         QPainter painter(&pix);
@@ -945,21 +945,27 @@ void QEnhancedTableView::saveAsImage()
 
 
     QStringList filters;
-    filters<<tr("PNG Image (*.png)")<<tr("SVG (*.svg)")<<tr("TIFF Image (*.tif)");
+    //filters<<tr("PNG Image (*.png)")<<tr("SVG (*.svg)")<<tr("TIFF Image (*.tif)");
+    filters<<tr("SVG Image (*.svg)");
+    QList<QByteArray> writerformats=QImageWriter::supportedImageFormats();
+    for (int i=0; i<writerformats.size(); i++) {
+        filters<<QString("%1 Image (*.%2)").arg(QString(writerformats[i])).arg(QString(writerformats[i].toLower()));
+    }
     QString selFilter=filters[0];
     QString filename=qfGetSaveFileNameSet("QEnhancedTableView/saveImage/", this, tr("save table as image ..."), QString(), filters.join(";;"), &selFilter);
     if (filename.size()>0) {
-        if (selFilter==filters[0] || selFilter==filters[2]) {
+        if (selFilter!=filters[0]) {
+            int idx=filters.indexOf(selFilter);
             QPixmap pix(totalWidth, totalHeight);
-            pix.fill(Qt::white);
+            pix.fill(Qt::transparent);
 
             {
                 QPainter painter(&pix);
                 paint(painter);
                 painter.end();
             }
-            pix.save(filename);
-        } else if (selFilter==filters[1]) {
+            pix.save(filename, writerformats.value(idx, "PNG").data());
+        } else if (selFilter==filters[0]) {
             QSvgGenerator generator;
             generator.setFileName(filename);
             QPainter painter(&generator);
