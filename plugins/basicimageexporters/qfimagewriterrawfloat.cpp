@@ -72,12 +72,12 @@ bool QFImageWriterRAWFloat::open(const QString& filename)
 void QFImageWriterRAWFloat::close()
 {
     if (file.isOpen()) {
-        QFileInfo fi(filename);
+        QFileInfo fi(file.fileName());
         QDir d=fi.absoluteDir();
         QFile description(d.absoluteFilePath(fi.baseName()+".description.txt"));
         if (description.open(QIODevice::Append|QIODevice::Text)) {
             QTextStream str(&description);
-            str<<"frames="<<frames<<"\n";
+            str<<"frames="<<frame<<"\n";
             description.close();
         }
         file.close();

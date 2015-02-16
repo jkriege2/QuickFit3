@@ -59,6 +59,7 @@ class QFImageWriterRAWDouble: public QFExporterImageSeries {
     private:
         QFile file;
 
+
 };
 
 #endif // QFIMAGEWRITERRAWDOUBLE_H
