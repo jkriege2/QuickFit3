@@ -101,7 +101,7 @@ void QFESPIMB040::startPlugin() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QMessageBox::information(parentWidget, getName(), getDescription());
     if (!main) {
-        main=new QFESPIMB040MainWindow2(services, NULL);
+        main=new QFESPIMB040MainWindow2(services, NULL, false, this);
         QFPluginServices::getInstance()->log_global_text("\n\n=========================================================\n");
         QFPluginServices::getInstance()->log_global_text("== STARTING SPIM CONTROL PLUGIN!                       ==\n");
         QFPluginServices::getInstance()->log_global_text("=========================================================\n\n\n");
@@ -122,7 +122,7 @@ void QFESPIMB040::startPluginNew() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QMessageBox::information(parentWidget, getName(), getDescription());
     if (!main) {
-        main=new QFESPIMB040MainWindow2(services, NULL, true);
+        main=new QFESPIMB040MainWindow2(services, NULL, true, this);
         QFPluginServices::getInstance()->log_global_text("\n\n=========================================================\n");
         QFPluginServices::getInstance()->log_global_text("== STARTING SPIM CONTROL PLUGIN!                       ==\n");
         QFPluginServices::getInstance()->log_global_text("=========================================================\n\n\n");

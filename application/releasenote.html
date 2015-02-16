@@ -322,6 +322,7 @@
             <li>selection builder/mask builder can now be applied to a selectable list of records and can optionally save the selection to a named selection</li>
             <li>mask by intensity supports relaxed color-scaling for overview image</li>
             <li>improved bleach correction in correlator: In some cases, the background correction could lead to negative values in the intensity traces, which could lead to bad bleach correction. These values are filtered now!</li>
+            <li>the plugin now exposes the time-averaged image as image stack No. 2, so we can e.g. use the colocalization plugin on this data</li>
           </ul></li>
         <li><b>table</b><ul>
             <li>added "QuickStatistics" and "QuickHistogram" tools, which show the statistics and histograms of the current selection (column-wise)</li>
@@ -436,6 +437,7 @@
             <li>CSV fileformat parameter dialog now have a button, which inserts a tab into the column separator field.</li>
             <li>added functions to the internal expression parser, which allow for access to the FCS raw data (correlation curves and count-rate traces/averages)</li>
             <li>added cross-correlation (2-color FCCS) overlay plot with cross-talk-corrected correlation amplitudes</li>
+            <li>added data export to arbitrary table-oriented data format</li>
       </ul></li>
       <li><b>imFCS Fit</b><ul>
             <li>fit parameter names are more expressive now</li>

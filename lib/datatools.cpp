@@ -768,3 +768,92 @@ int dataGetRows(const QList<QList<QVariant> >& data) {
     }
     return r;
 }
+
+
+void QFDataExportTool::save(const QString &filename, int format) const
+{
+    QFDataExportHandler::save(data, format, filename, colHeaders, rowHeaders);
+}
+
+void QFDataExportTool::clear()
+{
+    data.clear();
+    colHeaders.clear();
+    rowHeaders.clear();
+}
+
+void QFDataExportTool::set(int col, int row, const QVariant &value)
+{
+    if (col<0 || row<0) return;
+    QList<QVariant> dempty;
+    int rows=qMax(row+1,getRowCount());
+    for (int r=0; r<rows; r++) {
+        dempty<<QVariant();
+    }
+
+    while (col>=data.size()) {
+        data.append(dempty);
+    }
+    int cols=getColCount();
+    for (int c=0; c<cols; c++) {
+        while (data[c].size()<rows) {
+            data[c].append(QVariant());
+        }
+    }
+    data[col].operator [](row)=value;
+}
+
+void QFDataExportTool::setLastColumn(int row, const QVariant &value)
+{
+    set(getColCount()-1, row, value);
+}
+
+void QFDataExportTool::setRowTitle(int row, const QString &title)
+{
+    if (row<0) return;
+    while (row>=rowHeaders.size()) {
+        rowHeaders.append(QString());
+    }
+    rowHeaders[row]=title;
+    int rows=getRowCount();
+    int cols=getColCount();
+    for (int c=0; c<cols; c++) {
+        while (data[c].size()<rows) {
+            data[c].append(QVariant());
+        }
+    }
+}
+
+void QFDataExportTool::setColTitle(int col, const QString &title)
+{
+    if (col<0) return;
+    while (col>=colHeaders.size()) {
+        colHeaders.append(QString());
+    }
+    colHeaders[col]=title;
+    QList<QVariant> dempty;
+    int rows=getRowCount();
+    for (int r=0; r<rows; r++) {
+        dempty<<QVariant();
+    }
+
+    while (col>=data.size()) {
+        data.append(dempty);
+    }
+    int cols=getColCount();
+    for (int c=0; c<cols; c++) {
+        while (data[c].size()<rows) {
+            data[c].append(QVariant());
+        }
+    }
+}
+
+int QFDataExportTool::getRowCount() const
+{
+    return dataGetRows(data);
+}
+
+int QFDataExportTool::getColCount() const
+{
+    return data.size();
+}

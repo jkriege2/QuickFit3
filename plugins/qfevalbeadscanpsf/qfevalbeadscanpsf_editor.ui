@@ -892,12 +892,6 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QFHistogramView</class>
-   <extends>QWidget</extends>
-   <header>qfhistogramview.h</header>
-   <container>1</container>
-  </customwidget>
-  <customwidget>
    <class>QFPlotter</class>
    <extends>QWidget</extends>
    <header>qfplotter.h</header>
@@ -907,6 +901,12 @@
    <class>QFParameterCorrelationView</class>
    <extends>QWidget</extends>
    <header>qfparametercorrelationview.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>QFHistogramView</class>
+   <extends>QWidget</extends>
+   <header>qfhistogramview.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
@@ -1254,6 +1254,22 @@
     <hint type="destinationlabel">
      <x>1243</x>
      <y>124</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>cmbParamD2</sender>
+   <signal>currentIndexChanged(int)</signal>
+   <receiver>QFEvalBeadScanPSFEditor</receiver>
+   <slot>displayEvaluationHistograms()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>174</x>
+     <y>326</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-2</x>
+     <y>278</y>
     </hint>
    </hints>
   </connection>

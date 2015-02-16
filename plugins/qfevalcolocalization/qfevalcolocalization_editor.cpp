@@ -200,6 +200,14 @@ void QFEValColocalizationEditor::writeWidgetValues(QFRawDataRecord *formerRecord
     formerRecord->setQFProperty(resultID+"_channel1", ui->spinChannel1->value(), false, false);
     formerRecord->setQFProperty(resultID+"_channel2", ui->spinChannel2->value(), false, false);
     formerRecord->setQFProperty(resultID+"_stack", ui->cmbStack->currentIndex(), false, false);
+
+    eval->setQFProperty(resultID+"_stack", ui->cmbStack->currentIndex(), false, false);
+    eval->setQFProperty(resultID+"_channel1", ui->spinChannel1->value(), false, false);
+    eval->setQFProperty(resultID+"_channel2", ui->spinChannel2->value(), false, false);
+    eval->setQFProperty(resultID+"_evalframe", ui->spinFrame->value(), false, false);
+    eval->setQFProperty(resultID+"_displayframe", ui->spinDisplayFrame->value(), false, false);
+    eval->setQFProperty(resultID+"_backthreshold", ui->spinBackgroundThreshold->value(), false, false);
+
 }
 
 void QFEValColocalizationEditor::highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord) {
@@ -235,18 +243,18 @@ void QFEValColocalizationEditor::highlightingChanged(QFRawDataRecord* formerReco
         for (int i=0; i<data->getImageStackCount(); i++) {
             ui->cmbStack->addItem(data->getImageStackDescription(i));
         }
-        ui->cmbStack->setCurrentIndex(qBound(0, currentRecord->getQFProperty(resultID+"_stack", 0).toInt(), ui->cmbStack->count()-1));
+        ui->cmbStack->setCurrentIndex(qBound(0, currentRecord->getQFProperty(resultID+"_stack", eval->getQFProperty(resultID+"_stack", 0).toInt()).toInt(), ui->cmbStack->count()-1));
         ui->spinChannel1->setRange(0, data->getImageStackChannels(stack));
         ui->spinChannel2->setRange(0, data->getImageStackChannels(stack));                
-        ui->spinChannel1->setValue(currentRecord->getQFProperty(resultID+"_channel1", 0).toInt());
-        ui->spinChannel2->setValue(currentRecord->getQFProperty(resultID+"_channel2", 1).toInt());
+        ui->spinChannel1->setValue(currentRecord->getQFProperty(resultID+"_channel1", eval->getQFProperty(resultID+"_channel1", 0).toInt()).toInt());
+        ui->spinChannel2->setValue(currentRecord->getQFProperty(resultID+"_channel2", eval->getQFProperty(resultID+"_channel2", 1).toInt()).toInt());
         resultID=eval->getEvaluationResultID(ui->cmbStack->currentIndex(), ui->spinChannel1->value(), ui->spinChannel2->value());
         ui->spinDisplayFrame->setRange(0, data->getImageStackFrames(stack));
         ui->spinFrame->setRange(0, data->getImageStackFrames(stack));
-        ui->chkAllFrames->setChecked(currentRecord->getQFProperty(resultID+"_allframes", true).toBool());
+        ui->chkAllFrames->setChecked(currentRecord->getQFProperty(resultID+"_allframes", eval->getQFProperty(resultID+"_allframes", true).toBool()).toBool());
         ui->spinFrame->setValue(currentRecord->getQFProperty(resultID+"_evalframe", data->getImageStackFrames(stack)/2).toInt());
-        ui->spinDisplayFrame->setValue(currentRecord->getQFProperty(resultID+"_displayframe", data->getImageStackFrames(stack)/2).toInt());
-        ui->spinBackgroundThreshold->setValue(currentRecord->getQFProperty(resultID+"_backthreshold", -1000).toDouble()); //statisticsQuantile(data->getImageStack(stack, ui->spinFrame->value(), ui->spinChannel1->value()), data->getImageStackWidth(stack)*data->getImageStackHeight(stack), 0.05)*1.5).toDouble());
+        ui->spinDisplayFrame->setValue(currentRecord->getQFProperty(resultID+"_displayframe", eval->getQFProperty(resultID+"_displayframe", data->getImageStackFrames(stack)/2).toInt()).toInt());
+        ui->spinBackgroundThreshold->setValue(currentRecord->getQFProperty(resultID+"_backthreshold", eval->getQFProperty(resultID+"_backthreshold", -1000).toDouble()).toDouble()); //statisticsQuantile(data->getImageStack(stack, ui->spinFrame->value(), ui->spinChannel1->value()), data->getImageStackWidth(stack)*data->getImageStackHeight(stack), 0.05)*1.5).toDouble());
         ui->spinBackground->setValue(currentRecord->getQFProperty(resultID+"_back1", 0).toDouble()); //statisticsQuantile(data->getImageStack(stack, ui->spinFrame->value(), ui->spinChannel1->value()), data->getImageStackWidth(stack)*data->getImageStackHeight(stack), 0.05)*1.5).toDouble());
         ui->spinBackground2->setValue(currentRecord->getQFProperty(resultID+"_back2", 0).toDouble()); //statisticsQuantile(data->getImageStack(stack, ui->spinFrame->value(), ui->spinChannel1->value()), data->getImageStackWidth(stack)*data->getImageStackHeight(stack), 0.05)*1.5).toDouble());
         ui->plotterCorrelation->readQFProperties(currentRecord, resultID+"_CORRPLOT/", "", "");
@@ -343,6 +351,7 @@ void QFEValColocalizationEditor::displayData() {
         pixel_count=dch1.size();
     }
 
+    ui->plotterCorrelation->setColorCodingMode(QFParameterCorrelationView::ccmXYGR);
     ui->plotterCorrelation->addCopiedCorrelation(QString("channels %1--%2").arg(ch1).arg(ch2), data_ch1, data_ch2, pixel_count);
     ui->plotterCorrelation->updateCorrelation(true);
 

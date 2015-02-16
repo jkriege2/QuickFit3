@@ -41,9 +41,10 @@
     QMessageBox::critical(this, title, (message));
 
 
-QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(QFPluginServices* pluginServices, QWidget* parent, bool newOpticsSetup):
+QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(QFPluginServices* pluginServices, QWidget* parent, bool newOpticsSetup, QFExtension *plugin):
     QWidget(parent, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint)
 {
+    this->plugin=plugin;
     widImageStack=NULL;
     widScriptedAcquisition=NULL;
     widCamParamScan=NULL;
@@ -150,7 +151,7 @@ void QFESPIMB040MainWindow2::showEvent( QShowEvent * event )  {
 }
 
 void QFESPIMB040MainWindow2::displayHelp() {
-    m_pluginServices->displayHelpWindow(m_pluginServices->getExtensionManager()->getPluginHelp("ext_spimb040"));
+    m_pluginServices->displayHelpWindow(m_pluginServices->getExtensionManager()->getPluginHelp(plugin->getID()));
 }
 
 void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager, bool newOpticsSetup) {
@@ -643,6 +644,16 @@ QString QFESPIMB040MainWindow2::saveAcquisitionDescription(int use_cam, QFExtens
 QString QFESPIMB040MainWindow2::savePreviewDescription(int use_cam, QFExtension* extension, QFExtensionCamera* ecamera, int camera, const QString& filenamePrefix, const QMap<QString, QVariant>& acquisitionDescription, const QList<QFExtensionCamera::CameraAcquititonFileDescription>& files, QDateTime startDateTime, const QString& lightpathPrefix, const QString& prefix) {
     QString iniFilename=filenamePrefix+".configuration.ini";
     QSettings settings(iniFilename, QSettings::IniFormat);
+
+    settings.setValue("software/QuickFit/version", qfInfoVersion());
+    settings.setValue("software/QuickFit/SVNVersion", qfInfoSVNVersion());
+    settings.setValue("software/QuickFit/CompileDate", qfInfoCompileDate());
+    settings.setValue(QString("software/ControlPlugin/ID"), plugin->getID());
+    int min=1, maj=0;
+    plugin->getVersion(min, maj);
+    settings.setValue(QString("software/ControlPlugin/Version"), QString("%1.%2").arg(min).arg(maj));
+    plugin->getQFLibVersion(min, maj);
+    settings.setValue(QString("software/ControlPlugin/QFLibVersion"), QString("%1.%2").arg(min).arg(maj));
 
     settings.beginGroup(prefix);
 

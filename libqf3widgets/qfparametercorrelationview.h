@@ -61,6 +61,13 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
         Q_OBJECT
     public:
 
+        enum ColorCodingMode {
+            ccmNone=0,
+            ccmBy3rdColumn=1,
+            ccmXYGR=2,
+            ccmXYRB=3
+        };
+
         struct CorrelationItem {
             CorrelationItem() {
                 data1=NULL;
@@ -112,10 +119,13 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
         int addCorrelation(QString name, double* data1, double* data2, double* data3, int32_t size, bool external);
         /** \brief add a histogram for the given dataset, copies the data to this widget */
         int addCopiedCorrelation(QString name, const double* data1, const double* data2, int32_t size);
+        /** \brief add a histogram for the given dataset, copies the data to this widget */
+        int addCopiedCorrelation(QString name, const double* data1, const double* data2, const double* data3, int32_t size);
         /** \brief set the given dataset in the given histogram \a i, copies the data to this widget, if \c external=false */
         void setCorrelation(int i, QString name, double* data1, double* data2, int32_t size, bool external);
         void setCorrelation(int i, QString name, double* data1, double* data2, double* data3, int32_t size, bool external);
         void setCopiedCorrelation(int i, QString name, const double* data1, const double* data2, int32_t size);
+        void setCopiedCorrelation(int i, QString name, const double* data1, const double* data2, const double* data3, int32_t size);
         void removeCorrelation(int i);
         int CorrelationCount() const;
 
@@ -151,6 +161,7 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
         void clearRangeSelection();
         void dataSettingsChanged(bool update=true);
         void showPlotPosition(double x, double y);
+        void setColorCodingMode(ColorCodingMode colorcoding);
 
         void printReport();
         void saveReport();
@@ -170,6 +181,8 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
         JKQTPoverlayRectangle* plteRangeSelection;
 
         QList<CorrelationItem> histograms;
+
+        ColorCodingMode colorcoding;
 
         void createWidgets();
 
@@ -228,6 +241,13 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
         QFDoubleEdit* edtColorMax;
         QDoubleSpinBox* spinColQL;
         QDoubleSpinBox* spinColQU;
+        QLabel* labColorCodingHeader;
+        QLabel* labColorCodingHeader1;
+        QLabel* labColorCodingHeader2;
+        QLabel* labColorCodingHeader3;
+        QWidget* widColorCodingHeader;
+        QWidget* widColorCodingHeader2;
+
 
 
 
@@ -251,3 +271,4 @@ class QFWIDLIB_EXPORT QFParameterCorrelationView : public QWidget {
 };
 
 #endif // QFPARAMETERCORRELATIONVIEW_H
+

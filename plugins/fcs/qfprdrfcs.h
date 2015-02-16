@@ -59,30 +59,30 @@ class QFPRDRFCS : public QObject, public QFPluginRawDataRecordBase {
         virtual void init();
 
         /** \brief short ID for the plugin */
-        virtual QString getID() const  { return tr("fcs"); };
+        virtual QString getID() const  { return tr("fcs"); }
 
         /** \brief name for the plugin */
-        virtual QString getName() const  { return tr("FCS/DLS Correlation Curve Plugin"); };
+        virtual QString getName() const  { return tr("FCS/DLS Correlation Curve Plugin"); }
 
         /** \brief short description for the plugin */
-        virtual QString getDescription() const  { return tr("manages Fluorescence Correlations Spectroscopy (FCS) and Dynamic Light Scattering (DLS) correlation curve data."); };
+        virtual QString getDescription() const  { return tr("manages Fluorescence Correlations Spectroscopy (FCS) and Dynamic Light Scattering (DLS) correlation curve data."); }
 
         /** \brief author the plugin */
-        virtual QString getAuthor() const  { return tr("Jan Krieger, Benedikt Haeusele (ALV6000 import)"); };
+        virtual QString getAuthor() const  { return tr("Jan W. Krieger, Benedikt Haeusele (ALV6000 import)"); }
 
         /** \brief copyright information the plugin */
-        virtual QString getCopyright() const  { return tr("(c) 2010-2014 by Jan Krieger, portions: Benedikt Haeusele (ALV6000 import)"); };
+        virtual QString getCopyright() const  { return tr("(c) 2010-2015 by Jan W. Krieger, portions: Benedikt Haeusele (ALV6000 import)"); }
 
         /** \brief weblink for the plugin */
-        virtual QString getWeblink() const  { return tr(""); };
+        virtual QString getWeblink() const  { return QString("http://www.dkfz.de/Macromol/quickfit/"); }
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
             minor=5;
-        };
+        }
 
         /** \brief icon for the plugin */
-        virtual QString getIconFilename() const  { return QString(":/fcs_logo.png"); };
+        virtual QString getIconFilename() const  { return QString(":/fcs_logo.png"); }
 
     public slots:
         /** \brief start a dialog, which allows to set the background intensity for records

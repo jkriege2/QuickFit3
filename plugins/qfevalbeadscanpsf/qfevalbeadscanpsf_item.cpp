@@ -307,6 +307,7 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
         if (dlgEvaluationProgress) dlgEvaluationProgress->addMessage(tr("   * found %1 beads.").arg(initial_beads_x.size()));
         // write back fit results to record!
         record->disableEmitResultsChanged();
+        record->resultsSetString(evalID, "dataorder", "beadslists");
         record->resultsSetNumber(evalID, "pixel_size", deltaXY);
         record->resultsSetNumber(evalID, "step_size", deltaZ);
         record->resultsSetInteger(evalID, "initial_beads_found", initial_beads_x.size());
@@ -551,31 +552,49 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                 record->resultsSetString(evalID, QString("cutyz_gaussianbeam_fitfunc"), ffGBwidth->id());
                 record->resultsSetStringList(evalID, QString("cutyz_gaussianbeam_parameternames"), ffGBwidth->getParameterIDs());
 
-                record->resultsSetNumberList(evalID, QString("channel%1_bead%2_cutx_fitresult").arg(c).arg(b), cutXP);
-                record->resultsSetNumberList(evalID, QString("channel%1_bead%2_cuty_fitresult").arg(c).arg(b), cutYP);
-                record->resultsSetNumberList(evalID, QString("channel%1_bead%2_cutz_fitresult").arg(c).arg(b), cutZP);
+                for (int pi=0; pi<cutXP.size(); pi++) {
+                    record->resultsSetInNumberList(evalID, QString("channel%1_cutx_fitresult_%2").arg(c).arg(ff1D->getParameterID(pi)), b, cutXP[pi]);
+                    record->resultsSetInNumberList(evalID, QString("channel%1_cuty_fitresult_%2").arg(c).arg(ff1D->getParameterID(pi)), b, cutYP[pi]);
+                    record->resultsSetInNumberList(evalID, QString("channel%1_cutz_fitresult_%2").arg(c).arg(ff1D->getParameterID(pi)), b, cutZP[pi]);
+                }
+                for (int pi=0; pi<fitXZCutResults.size(); pi++) {
+                    record->resultsSetInNumberList(evalID, QString("channel%1_cutxz_gaussianbeam_results_%2").arg(c).arg(ffGBwidth->getParameterID(pi)), b, fitXZCutResults[pi]);
+                    record->resultsSetInNumberList(evalID, QString("channel%1_cutyz_gaussianbeam_results_%2").arg(c).arg(ffGBwidth->getParameterID(pi)), b, fitYZCutResults[pi]);
+                }
+                for (int pi=0; pi<axialRatios.size(); pi++) {
+                    record->resultsSetInNumberList(evalID, QString("channel%1_fits_axialratios_%2").arg(c).arg(pi), b, axialRatios[pi]);
+                }
+                for (int pi=0; pi<axialRatios3D.size(); pi++) {
+                    record->resultsSetInNumberList(evalID, QString("channel%1_fits_axialratios_3d_%2").arg(c).arg(pi), b, axialRatios3D[pi]);
+                }
+                for (int pi=0; pi<fit3DP.size(); pi++) {
+                    record->resultsSetInNumberList(evalID, QString("channel%1_fit3d_results_%2").arg(c).arg(ff3D->getParameterID(pi)), b, fit3DP[pi]);
+                }
                 record->resultsSetNumberList(evalID, QString("channel%1_bead%2_cutxz_zpos").arg(c).arg(b), zpos);
                 record->resultsSetNumberList(evalID, QString("channel%1_bead%2_cutxz_width").arg(c).arg(b), fitZX_width);
-                record->resultsSetNumberList(evalID, QString("channel%1_bead%2_cutxz_gaussianbeam_results").arg(c).arg(b), fitXZCutResults);
                 record->resultsSetNumberList(evalID, QString("channel%1_bead%2_cutyz_zpos").arg(c).arg(b), zpos);
                 record->resultsSetNumberList(evalID, QString("channel%1_bead%2_cutyz_width").arg(c).arg(b), fitZY_width);
-                record->resultsSetNumberList(evalID, QString("channel%1_bead%2_cutyz_gaussianbeam_results").arg(c).arg(b), fitYZCutResults);
-                record->resultsSetNumberList(evalID, QString("channel%1_bead%2_fits_axialratios").arg(c).arg(b), axialRatios);
-                record->resultsSetNumberList(evalID, QString("channel%1_bead%2_fits_axialratios_3d").arg(c).arg(b), axialRatios3D);
 
-                record->resultsSetNumberList(evalID, QString("channel%1_bead%2_fit3d_results").arg(c).arg(b), fit3DP);
                 if (c>0 && xposi>=0 && yposi>=0 && zposi>=0) {
                     bool ok=true;
-                    QVector<double> fitres0=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_fit3d_results").arg(0).arg(b), &ok);
+                    QVector<double> fitres0;
+                    for (int pi=0; pi<ff3D->paramCount(); pi++) {
+                        fitres0<<record->resultsGetInNumberList(evalID, QString("channel0_fit3d_results_%1").arg(ff3D->getParameterID(pi)), b, ff3D->getDescription(pi).initialValue);
+                    }
+
+
                     if (ok && xposi<fitres0.size() && yposi<fitres0.size() && zposi<fitres0.size()) {
-                        QVector<double> d;
+                        record->resultsSetInNumberList(evalID, QString("channel%1_fit3d_distc0_x").arg(c), b, (fitres0[xposi]-fit3DP[xposi]));
+                        record->resultsSetInNumberList(evalID, QString("channel%1_fit3d_distc0_y").arg(c), b, (fitres0[yposi]-fit3DP[yposi]));
+                        record->resultsSetInNumberList(evalID, QString("channel%1_fit3d_distc0_z").arg(c), b, (fitres0[zposi]-fit3DP[zposi]));
+                        record->resultsSetInNumberList(evalID, QString("channel%1_fit3d_distc0_abs").arg(c), b, sqrt(qfSqr(fitres0[xposi]-fit3DP[xposi])+qfSqr(fitres0[yposi]-fit3DP[yposi])+qfSqr(fitres0[zposi]-fit3DP[zposi])));
+                        /*QVector<double> d;
                         d<<(fitres0[xposi]-fit3DP[xposi]);
                         d<<(fitres0[yposi]-fit3DP[yposi]);
                         d<<(fitres0[zposi]-fit3DP[zposi]);
                         d<<sqrt(qfSqr(fitres0[xposi]-fit3DP[xposi])+qfSqr(fitres0[yposi]-fit3DP[yposi])+qfSqr(fitres0[zposi]-fit3DP[zposi]));
-                        record->resultsSetNumberList(evalID, QString("channel%1_bead%2_fit3d_distc0").arg(0).arg(b), d);
-                        record->resultsSetNumberList(evalID, QString("channel%1_bead%2_fit3d_distc0").arg(c).arg(b), d);
-                        //qDebug()<<d;
+                        record->resultsSetNumberList(evalID, QString("channel%1_bead%2_fit3d_distc0").arg(0).arg(b), d);*/
+
                     }
                 }
 

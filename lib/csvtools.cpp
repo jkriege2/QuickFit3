@@ -593,28 +593,28 @@ bool guessCSVParameters(QString data, char* out_sep, char* out_dec, char* out_co
                 QChar c0=line.at(0);
                 QChar c1='\0';
                 if (line.size()>1) c1=line.at(1);
-                if (c0.isDigit() || c0.isLetter() || QString("!§$&?°#~*+-\\/<>\"\'").contains(c0)) {
+                if (c0.isDigit() || c0.isLetter() || QString::fromLatin1("!\xA7$&?\xB0#~*+-\\/<>\"\'").contains(c0)) {
                     d=d+sl[i]+"\n";
                     cntl++;
                 }
-                if (c0=='#') { comment='#'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='%') { comment='%'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='&') { comment='&'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0==';') { comment=';'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='§') { comment='§'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='!') { comment='!'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='/') { comment='/'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='\\') { comment='\\'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='*') { comment='*'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='~') { comment='~'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='\'' && !line.contains('\'')) { comment='\''; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='\"' && !line.contains('\"')) { comment='\"'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='?') { comment='?'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='!') { comment='!'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='°') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='<') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='>') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
-                else if (c0=='=') { comment='°'; if (QString("!§$&?°#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                if (c0=='#') { comment='#'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='%') { comment='%'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='&') { comment='&'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0==';') { comment=';'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0==QChar::fromLatin1('\xA7')) { comment='\xA7'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='!') { comment='!'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='/') { comment='/'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='\\') { comment='\\'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='*') { comment='*'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='~') { comment='~'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='\'' && !line.contains('\'')) { comment='\''; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='\"' && !line.contains('\"')) { comment='\"'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='?') { comment='?'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='!') { comment='!'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0==QChar::fromLatin1('\xB0')) { comment='\xB0'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='<') { comment='\xB0'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='>') { comment='\xB0'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
+                else if (c0=='=') { comment='\xB0'; if (QString::fromLatin1("!\xA7$&?\xB0#~*+\\/<>").contains(c1)) headercomment=QString(comment)+QString(c1); }
             }
             i++;
         }

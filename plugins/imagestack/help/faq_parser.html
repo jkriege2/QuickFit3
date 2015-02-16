@@ -1,0 +1,19 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>FCS/DLS raw data record frequently asked questions: Expression parser</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+	 
+$$faq_start$$
+  <a name="FAQ_PARSER_IMAGESTACK"><b>How can I access the image stack data from the internal expression parser, or the table plugin?</b>
+$$faq_answer$$
+  <p>The image stack plugin provides math parser functions, that allow to access the <a href="./parserreference/stack.html">image stack properties and data</a> of any image stack record in the project. Eachs such record, provides a set of image stacks (numbered <tt>0, 1, ..., <a href="./parserreference/stack.html#imagestack_getstacks">imagestack_getstacks(rdr_id)</a>-1</tt>). Each stack has its own number of frames (<tt><a href="./parserreference/stack.html#imagestack_getframes">imagestack_getframes(rdr_id, stack)</a></tt>), which all have the same size (<tt><a href="./parserreference/stack.html#imagestack_getwidth">imagestack_getwidth(rdr_id, stack)</a></tt>, <tt><a href="./parserreference/stack.html#imagestack_getheight">imagestack_getheight(rdr_id, stack)</a></tt>) and number of color-channels (<tt><a href="./parserreference/stack.html#imagestack_getchannels">imagestack_getchannels(rdr_id, stack)</a></tt>).</p>
+  <p>You can access the data of any frame in row-major form with the function <tt><a href="./parserreference/stack.html#imagestack_getframe">imagestack_getframe(rdr_id, stack=0, frame=0, channel=0)</a></tt>, or <tt><a href="./parserreference/stack.html#imagestack_getstack">imagestack_getstack(rdr_id, stack=0, channel=0)</a></tt>. Both functions retunr the data as a vector in row-major form, i.e. the image data <i>I(x,y,f,ch)</i> is returned as <tt>I(x=0,y=0,f=0), I(1,0,0),...,I(width-1,0,0),I(0,1,0),I(1,1,0),...,I(width-1,height-1,1)</tt>.</p>
+  $$note:These functions may also be applicable to other RDRs, which expose the image stack interface (e.g. imagingFCS records)!$$
+$$faq_end$$
+	 
+  </body>
+</html>

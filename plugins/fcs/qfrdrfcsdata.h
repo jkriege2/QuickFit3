@@ -43,6 +43,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrdrcountratesinterface.h"
 #include "qftools.h"
 #include "csvtools.h"
+#include "datatools.h"
 #include "qfrdrfcsfitfunctionsimulator.h"
 #include "qfrdrsimplecountrateinterface.h"
 #include "qfrdrrunselection.h"
@@ -106,16 +107,11 @@ class QFRDRFCSData : public QFRawDataRecord, public QFRDRFCSDataInterface, publi
         /** \brief export the raw data into the specified format */
         virtual void exportData(const QString& format, const QString& filename)const ;
         /** \brief returns a list of filetypes which correspond to the filetypes returned by getExportFiletypes() */
-        QStringList getExportFiletypes() const {
-            QStringList sl;
-            //sl << "CSV" << "SYLK";
-            sl<<"QF3ASCIICORR";
-            return sl;
-        }
+        QStringList getExportFiletypes() const;
         /** \brief returns the title of the Export file dialog */
         QString getExportDialogTitle() const { return tr("Export FCS Data  ..."); }
         /** \brief returns the filetype of the Export file dialog */
-        QString getExportDialogFiletypes() const { return tr("QuickFit 3.0 ASCII Correlation Data (*.qf3acorr)"); }
+        QString getExportDialogFiletypes() const ;
 
 
         /** \brief channel represented by this object (a file e.g. from ALV may contain several channels,

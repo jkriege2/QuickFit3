@@ -52,14 +52,27 @@ $$faq_end$$
      $$faq_answer$$
        This might be due to a bad background signal correction, as explained <a href="nah_background_correction.html">here</a> and in <a href="tutorial_cell.html">this tutorial</a>.
      $$faq_end$$
-	 
+     
      $$faq_start$$
        <a name="FAQ_UI_COPYTOALLRDR"><b>How can I reuse the display settings in the imagingFCS "parameter image" tab of the RDR editor for all RDRs?</b>
      $$faq_answer$$
        <p>In many settings widgets in this tab, a right-click will open a context-menu, in which you can copy the settings in the clicked widget to all othe rrecords. So e.g. if you copy the "overview image settings" to all records, the same display settings (color bar, ranges, ...) will be used if you select a different record in this window!</p>
-	   <p>In the histogram and correlation plot tabs, a button serves the same purpose.</p>
-	   $$note:Some settings are specific to the chosen parameter (e.g. the parameter image ranges/colorbars/... or the histograms), so if you select another RDR, the settings will only be used for the same fit paramter!$$
+       <p>In the histogram and correlation plot tabs, a button serves the same purpose.</p>
+       $$note:Some settings are specific to the chosen parameter (e.g. the parameter image ranges/colorbars/... or the histograms), so if you select another RDR, the settings will only be used for the same fit paramter!$$
+     $$faq_end$$
+     
+     
+     $$faq_start$$
+       <a name="FAQ_COLOCALIZATION"><b>Can I also perform a colocalization-analysis for my imagingFCCS data?</b>
+     $$faq_answer$$
+       <p>Yes, this is possible using the plugin <a href="$$plugin_info:help:eval_colocalization$$">Colocalization Analysis</a>. The imFCS RDRs expose an image stack for the overview image with both color channels. This can be used for the colocalization analysis:<ol>
+  <li>add a <a href="$$plugin_info:help:eval_colocalization$$">Colocalization Analysis</a> evaluation to your project (in the main screen: <b>Data Items | Insert Evaluation | Colocalization Analysis</b>)</li>
+  <li>Start the plugin by double-clicking it in the project tree</li>
+  <li>Choose a record on the RHS and the choose the <b>stack: "time-averaged image"</b></li>
+  <li>On the lhs of the dialog, you'll now see the colocalization analysis for this record.</li>
+</ol></p>
      $$faq_end$$
 
   </body>
 </html>
+

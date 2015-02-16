@@ -260,22 +260,67 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
             QVector<double> cutY(roi.height()), cutYX(roi.height());
             QVector<double> cutZ(roi.depth()), cutZX(roi.depth());
 
-            QVector<double> fitresCutX=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutx_fitresult").arg(channel).arg(bead));
+            QVector<double> fitresCutX;
             QString ffIDX=record->resultsGetAsString(evalID, QString("cutx_fitfunction"));
-            QVector<double> fitresCutZ=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutz_fitresult").arg(channel).arg(bead));
+            QVector<double> fitresCutZ;
             QString ffIDZ=record->resultsGetAsString(evalID, QString("cutz_fitfunction"));
-            QVector<double> fitresCutY=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cuty_fitresult").arg(channel).arg(bead));
+            QVector<double> fitresCutY;
             QString ffIDY=record->resultsGetAsString(evalID, QString("cuty_fitfunction"));
 
             QVector<double> fitresCutZ_Z=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutxz_zpos").arg(channel).arg(bead));
             for (int i=0; i<fitresCutZ_Z.size(); i++) fitresCutZ_Z[i]=fitresCutZ_Z[i]/1000.0;
             QVector<double> fitresCutZX=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutxz_width").arg(channel).arg(bead));
-            QVector<double> fitresCutZXGB=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutxz_gaussianbeam_results").arg(channel).arg(bead));
+            QVector<double> fitresCutZXGB;
             QString ffIDCutZX=record->resultsGetAsString(evalID, QString("cutxz_gaussianbeam_fitfunc"));
 
             QVector<double> fitresCutZY=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutyz_width").arg(channel).arg(bead));
-            QVector<double> fitresCutZYGB=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutyz_gaussianbeam_results").arg(channel).arg(bead));
+            QVector<double> fitresCutZYGB;
             QString ffIDCutZY=record->resultsGetAsString(evalID, QString("cutyz_gaussianbeam_fitfunc"));
+
+            if (record->resultsGetAsString(evalID, "dataorder").toLower()=="beadslists") {
+                QFFitFunction* ff=NULL;
+                ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDX);
+                if (ff) {
+                    for (int i=0; i<ff->paramCount(); i++) {
+                        fitresCutX<<record->resultsGetInNumberList(evalID, QString("channel%1_cutx_fitresult_%2").arg(channel).arg(ff->getParameterID(i)), bead, ff->getDescription(i).initialValue);
+                    }
+                    delete ff;
+                }
+                ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDY);
+                if (ff) {
+                    for (int i=0; i<ff->paramCount(); i++) {
+                        fitresCutY<<record->resultsGetInNumberList(evalID, QString("channel%1_cuty_fitresult_%2").arg(channel).arg(ff->getParameterID(i)), bead, ff->getDescription(i).initialValue);
+                    }
+                    delete ff;
+                }
+                ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDZ);
+                if (ff) {
+                    for (int i=0; i<ff->paramCount(); i++) {
+                        fitresCutZ<<record->resultsGetInNumberList(evalID, QString("channel%1_cutz_fitresult_%2").arg(channel).arg(ff->getParameterID(i)), bead, ff->getDescription(i).initialValue);
+                    }
+                    delete ff;
+                }
+                ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDCutZX);
+                if (ff) {
+                    for (int i=0; i<ff->paramCount(); i++) {
+                        fitresCutZXGB<<record->resultsGetInNumberList(evalID, QString("channel%1_cutxz_gaussianbeam_results_%2").arg(channel).arg(ff->getParameterID(i)), bead, ff->getDescription(i).initialValue);
+                    }
+                    delete ff;
+                }
+                ff=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(ffIDCutZY);
+                if (ff) {
+                    for (int i=0; i<ff->paramCount(); i++) {
+                        fitresCutZYGB<<record->resultsGetInNumberList(evalID, QString("channel%1_cutyz_gaussianbeam_results_%2").arg(channel).arg(ff->getParameterID(i)), bead, ff->getDescription(i).initialValue);
+                    }
+                    delete ff;
+                }
+            } else {
+                fitresCutX=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutx_fitresult").arg(channel).arg(bead));
+                fitresCutZ=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutz_fitresult").arg(channel).arg(bead));
+                fitresCutY=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cuty_fitresult").arg(channel).arg(bead));
+                fitresCutZXGB=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutxz_gaussianbeam_results").arg(channel).arg(bead));
+                fitresCutZYGB=record->resultsGetAsDoubleList(evalID, QString("channel%1_bead%2_cutyz_gaussianbeam_results").arg(channel).arg(bead));
+            }
 
             if (ui->chkLogscale->isChecked()) {
                 for (int y=0; y<roi.height(); y++) {
@@ -569,7 +614,7 @@ void QFEvalBeadScanPSFEditor::displayEvaluationBead() {
 }
 
 
-QVector<double> QFEvalBeadScanPSFEditor::getBeadsData(const QString& paramName, int paramIdx,  int channel)
+QVector<double> QFEvalBeadScanPSFEditor::getBeadsData(const QString& paramName, int paramIdx, const QString& subParamName,  int channel)
 {
     QVector<double> dat;
 
@@ -580,25 +625,40 @@ QVector<double> QFEvalBeadScanPSFEditor::getBeadsData(const QString& paramName, 
 
     QString evalID=eval->getEvaluationResultID();
 
-    QVector<int> beadIDs=getFilteresBeadsID(channel);
+    QVector<int> beadIDs=getFilteredBeadsID(channel);
 
+    if (record->resultsGetAsString(evalID, "dataorder").toLower()=="beadslists") {
+        for (int bid=0; bid<beadIDs.size(); bid++) {
+            int b=beadIDs[bid];
+            QString param=QString("channel%1").arg(channel);
+            QString p1=param+paramName+"_"+subParamName;
 
-    for (int bid=0; bid<beadIDs.size(); bid++) {
-        int b=beadIDs[bid];
-        QString param=QString("channel%1_bead%2").arg(channel).arg(b);
-        QString p1=param+paramName;
+            bool ok=true;
+            double p=record->resultsGetInNumberList(evalID, p1, b);
+            //qDebug()<<p1<<b<<p<<dat.size();
+            if (ok) {
+                dat<<p;
+            }
+        }
+    } else {
+        for (int bid=0; bid<beadIDs.size(); bid++) {
+            int b=beadIDs[bid];
+            QString param=QString("channel%1_bead%2").arg(channel).arg(b);
+            QString p1=param+paramName;
 
-        bool ok=true;
-        QVector<double> p=record->resultsGetAsDoubleList(evalID, p1, &ok);
-        if (ok && paramIdx<p.size()) {
-            dat<<p[paramIdx];
+            bool ok=true;
+            QVector<double> p=record->resultsGetAsDoubleList(evalID, p1, &ok);
+            if (ok && paramIdx<p.size()) {
+                dat<<p[paramIdx];
+            }
         }
     }
+
 
     return dat;
 }
 
-QVector<int> QFEvalBeadScanPSFEditor::getFilteresBeadsID(int channel)
+QVector<int> QFEvalBeadScanPSFEditor::getFilteredBeadsID(int channel)
 {
     QVector<int> dat;
 
@@ -610,60 +670,124 @@ QVector<int> QFEvalBeadScanPSFEditor::getFilteresBeadsID(int channel)
     QString evalID=eval->getEvaluationResultID();
     int beads=record->resultsGetAsInteger(evalID, "channel0_beads");
 
-    QStringList params3D=record->resultsGetAsStringList(evalID, "fit3d_fitfunction_parameternames");
-    int wid1ID3D=params3D.indexOf("width1");
-    int wid2ID3D=params3D.indexOf("width2");
-    int wid3ID3D=params3D.indexOf("width3");
 
-    for (int b=0; b<beads; b++) {
-        QString param=QString("channel%1_bead%2").arg(channel).arg(b);
+    if (record->resultsGetAsString(evalID, "dataorder").toLower()=="beadslists") {
+        QStringList params3D=record->resultsGetAsStringList(evalID, "fit3d_fitfunction_parameternames");
+        int wid1ID3D=params3D.indexOf("width1");
+        int wid2ID3D=params3D.indexOf("width2");
+        int wid3ID3D=params3D.indexOf("width3");
 
-        bool useBead=true;
-        if (ui->grpFilterBeads->isChecked()) {
-            bool ok=true;
-            QVector<double> ar=record->resultsGetAsDoubleList(evalID, param+"_fits_axialratios_3d", &ok);
-            if (ok && ar.size()>=2 && ui->chkFilterAxRation->isChecked()) {
-                if (ar[0]<ui->spinAxRatioMin->value() || ar[0]> ui->spinAxRatioMax->value() ||
-                    ar[1]<ui->spinAxRatioMin->value() || ar[1]> ui->spinAxRatioMax->value()) {
-                    useBead=false;
+        for (int b=0; b<beads; b++) {
+            QString param=QString("channel%1").arg(channel);
+
+            bool useBead=true;
+            if (ui->grpFilterBeads->isChecked()) {
+                bool ok=true;
+                double ar1=record->resultsGetInNumberList(evalID, param+"_fits_axialratios_3d_0", b);
+                double ar2=record->resultsGetInNumberList(evalID, param+"_fits_axialratios_3d_1", b);
+                if (ok && ui->chkFilterAxRation->isChecked()) {
+                    if (ar1<ui->spinAxRatioMin->value() || ar1> ui->spinAxRatioMax->value() ||
+                        ar2<ui->spinAxRatioMin->value() || ar2> ui->spinAxRatioMax->value()) {
+                        useBead=false;
+                    }
                 }
+                if (useBead && ui->chkFilterAxRation->isChecked()) {
+                    ar1=record->resultsGetInNumberList(evalID, param+"_fits_axialratios_0", b);
+                    ar2=record->resultsGetInNumberList(evalID, param+"_fits_axialratios_1", b);
+                    if (ok ) {
+                        if (ar1<ui->spinAxRatioMin->value() || ar1> ui->spinAxRatioMax->value() ||
+                            ar2<ui->spinAxRatioMin->value() || ar2> ui->spinAxRatioMax->value()) {
+                            useBead=false;
+                        }
+                    }
+                }
+                if (useBead && (ui->chkFilterXYWidth->isChecked() || ui->chkFilterZYWidth->isChecked())) {
+                    ar1=record->resultsGetInNumberList(evalID, param+"_fit3d_results_width1", b);
+                    ar2=record->resultsGetInNumberList(evalID, param+"_fit3d_results_width2", b);
+                    double ar3=record->resultsGetInNumberList(evalID, param+"_fit3d_results_width3", b);
+                    if (useBead && ok && ui->chkFilterXYWidth->isChecked()) {
+                        if (ar1<ui->spinXYWidthMin->value() || ar1> ui->spinXYWidthMax->value()) {
+                            useBead=false;
+                        }
+                    }
+                    if (useBead && ok && ui->chkFilterXYWidth->isChecked()) {
+                        if (ar2<ui->spinXYWidthMin->value() || ar2> ui->spinXYWidthMax->value()) {
+                            useBead=false;
+                        }
+                    }
+                    if (useBead && ok && ui->chkFilterZYWidth->isChecked()) {
+                        if (ar3<ui->spinZWidthMin->value() || ar3> ui->spinZWidthMax->value()) {
+                            useBead=false;
+                        }
+                    }
+
+                }
+                // GO ON HERE!!!
             }
-            if (useBead && ui->chkFilterAxRation->isChecked()) {
-                ar=record->resultsGetAsDoubleList(evalID, param+"_fits_axialratios", &ok);
-                if (ok && ar.size()>=2) {
+            if (useBead) {
+                dat<<b;
+            }
+        }
+
+        return dat;
+    } else {
+        QStringList params3D=record->resultsGetAsStringList(evalID, "fit3d_fitfunction_parameternames");
+        int wid1ID3D=params3D.indexOf("width1");
+        int wid2ID3D=params3D.indexOf("width2");
+        int wid3ID3D=params3D.indexOf("width3");
+
+        for (int b=0; b<beads; b++) {
+            QString param=QString("channel%1_bead%2").arg(channel).arg(b);
+
+            bool useBead=true;
+            if (ui->grpFilterBeads->isChecked()) {
+                bool ok=true;
+                QVector<double> ar=record->resultsGetAsDoubleList(evalID, param+"_fits_axialratios_3d", &ok);
+                if (ok && ar.size()>=2 && ui->chkFilterAxRation->isChecked()) {
                     if (ar[0]<ui->spinAxRatioMin->value() || ar[0]> ui->spinAxRatioMax->value() ||
                         ar[1]<ui->spinAxRatioMin->value() || ar[1]> ui->spinAxRatioMax->value()) {
                         useBead=false;
                     }
                 }
-            }
-            if (useBead && (ui->chkFilterXYWidth->isChecked() || ui->chkFilterZYWidth->isChecked())) {
-                ar=record->resultsGetAsDoubleList(evalID, param+"_fit3d_results", &ok);
-                if (useBead && ok && ui->chkFilterXYWidth->isChecked() && wid1ID3D<ar.size()) {
-                    if (ar[wid1ID3D]<ui->spinXYWidthMin->value() || ar[wid1ID3D]> ui->spinXYWidthMax->value()) {
-                        useBead=false;
+                if (useBead && ui->chkFilterAxRation->isChecked()) {
+                    ar=record->resultsGetAsDoubleList(evalID, param+"_fits_axialratios", &ok);
+                    if (ok && ar.size()>=2) {
+                        if (ar[0]<ui->spinAxRatioMin->value() || ar[0]> ui->spinAxRatioMax->value() ||
+                            ar[1]<ui->spinAxRatioMin->value() || ar[1]> ui->spinAxRatioMax->value()) {
+                            useBead=false;
+                        }
                     }
                 }
-                if (useBead && ok && ui->chkFilterXYWidth->isChecked() && wid2ID3D<ar.size()) {
-                    if (ar[wid2ID3D]<ui->spinXYWidthMin->value() || ar[wid2ID3D]> ui->spinXYWidthMax->value()) {
-                        useBead=false;
+                if (useBead && (ui->chkFilterXYWidth->isChecked() || ui->chkFilterZYWidth->isChecked())) {
+                    ar=record->resultsGetAsDoubleList(evalID, param+"_fit3d_results", &ok);
+                    if (useBead && ok && ui->chkFilterXYWidth->isChecked() && wid1ID3D<ar.size()) {
+                        if (ar[wid1ID3D]<ui->spinXYWidthMin->value() || ar[wid1ID3D]> ui->spinXYWidthMax->value()) {
+                            useBead=false;
+                        }
                     }
-                }
-                if (useBead && ok && ui->chkFilterZYWidth->isChecked() && wid3ID3D<ar.size()) {
-                    if (ar[wid3ID3D]<ui->spinZWidthMin->value() || ar[wid3ID3D]> ui->spinZWidthMax->value()) {
-                        useBead=false;
+                    if (useBead && ok && ui->chkFilterXYWidth->isChecked() && wid2ID3D<ar.size()) {
+                        if (ar[wid2ID3D]<ui->spinXYWidthMin->value() || ar[wid2ID3D]> ui->spinXYWidthMax->value()) {
+                            useBead=false;
+                        }
                     }
-                }
+                    if (useBead && ok && ui->chkFilterZYWidth->isChecked() && wid3ID3D<ar.size()) {
+                        if (ar[wid3ID3D]<ui->spinZWidthMin->value() || ar[wid3ID3D]> ui->spinZWidthMax->value()) {
+                            useBead=false;
+                        }
+                    }
 
+                }
+                // GO ON HERE!!!
             }
-            // GO ON HERE!!!
+            if (useBead) {
+                dat<<b;
+            }
         }
-        if (useBead) {
-            dat<<b;
-        }
+
+        return dat;
     }
 
-    return dat;
+
 }
 
 
@@ -710,18 +834,8 @@ void QFEvalBeadScanPSFEditor::displayEvaluationHistograms() {
             ui->histogram1->setDefaultColor(1, QColor("red"));
             ui->histogram1->setDefaultColor(2, QColor("blue"));
             for (int c=0; c<channels; c++) {
-                QVector<double> dat=getBeadsData(sl1.value(0), sl1.value(1).toInt(), c);
-                /*for (int b=0; b<beads; b++) {
-                    QString param=QString("channel%1_bead%2").arg(c).arg(b);
-                    QString p1=param+sl1.value(0);
-                    int p1i=sl1.value(1).toInt();
-                    //qDebug()<<p1<<p1i;
-                    bool ok=true;
-                    QVector<double> p=record->resultsGetAsDoubleList(evalID, p1, &ok);
-                    if (ok && p1i<p.size()) {
-                        dat<<p[p1i];
-                    }
-                }*/
+                QVector<double> dat=getBeadsData(sl1.value(0), sl1.value(1).toInt(),sl1.value(2), c);
+
                 if (dat.size()>0) ui->histogram1->addCopiedHistogram(tr("ch %1: %2").arg(c).arg(ui->cmbParam1->currentText()), dat.data(), dat.size());
             }
             ui->histogram1->updateHistogram(true);
@@ -732,17 +846,8 @@ void QFEvalBeadScanPSFEditor::displayEvaluationHistograms() {
             ui->histogram2->setDefaultColor(1, QColor("red"));
             ui->histogram2->setDefaultColor(2, QColor("blue"));
             for (int c=0; c<channels; c++) {
-                QVector<double> dat=getBeadsData(sl2.value(0), sl2.value(1).toInt(), c);
-                /*for (int b=0; b<beads; b++) {
-                    QString param=QString("channel%1_bead%2").arg(c).arg(b);
-                    QString p1=param+sl2.value(0);
-                    int p1i=sl2.value(1).toInt();
-                    bool ok=true;
-                    QVector<double> p=record->resultsGetAsDoubleList(evalID, p1, &ok);
-                    if (ok && p1i<p.size()) {
-                        dat<<p[p1i];
-                    }
-                }*/
+                QVector<double> dat=getBeadsData(sl2.value(0), sl2.value(1).toInt(),sl2.value(2), c);
+
                 if (dat.size()>0) ui->histogram2->addCopiedHistogram(tr("ch %1: %2").arg(c).arg(ui->cmbParam2->currentText()), dat.data(), dat.size());
             }
             ui->histogram2->updateHistogram(true);
@@ -751,23 +856,12 @@ void QFEvalBeadScanPSFEditor::displayEvaluationHistograms() {
         ui->histogramD2->clear();
         if (channels>0) {
             QString evalID=eval->getEvaluationResultID();
-            QVector<double> datDX=getBeadsData("_fit3d_distc0", 0, 1);
-            QVector<double> datDY=getBeadsData("_fit3d_distc0", 1, 1);
-            QVector<double> datDZ=getBeadsData("_fit3d_distc0", 2, 1);
-            QVector<double> datD=getBeadsData("_fit3d_distc0", 3, 1);
+            QVector<double> datDX=getBeadsData("_fit3d_distc0", 0,"x", 1);
+            QVector<double> datDY=getBeadsData("_fit3d_distc0", 1, "y", 1);
+            QVector<double> datDZ=getBeadsData("_fit3d_distc0", 2, "z", 1);
+            QVector<double> datD=getBeadsData("_fit3d_distc0", 3, "abs", 1);
 
-            /*QVector<double> datDX, datDY, datDZ, datD;
-            for (int b=0; b<beads; b++) {
-                QString param=QString("channel%1_bead%2").arg(1).arg(b);
-                bool ok=true;
-                QVector<double> d=record->resultsGetAsDoubleList(evalID, param+"_fit3d_distc0", &ok);
-                if (ok) {
-                    datDX<<d[0];
-                    datDY<<d[1];
-                    datDZ<<d[2];
-                    datD<<d[3];
-                }
-            }*/
+
             if (datDX.size()>0) {
                 ui->histogramD1->addCopiedHistogram(tr("distance: x"), datDX.data(), datDX.size());
                 if (ui->cmbParamD2->currentIndex()==0) ui->histogramD2->addCopiedHistogram(tr("distance: x"), datDX.data(), datDX.size());
@@ -781,7 +875,7 @@ void QFEvalBeadScanPSFEditor::displayEvaluationHistograms() {
                 if (ui->cmbParamD2->currentIndex()==2) ui->histogramD2->addCopiedHistogram(tr("distance: z"), datDZ.data(), datDZ.size());
             }
             if (datD.size()>0) {
-                if (ui->cmbParamD2->currentIndex()==2) ui->histogramD2->addCopiedHistogram(tr("abs. distance"), datD.data(), datD.size());
+                if (ui->cmbParamD2->currentIndex()==3) ui->histogramD2->addCopiedHistogram(tr("abs. distance"), datD.data(), datD.size());
             }
 
         }
@@ -809,33 +903,8 @@ void QFEvalBeadScanPSFEditor::displayEvaluationCorrPlot()
 
             int c=sl1.value(2).toInt();
 
-            QVector<double> dat=getBeadsData(sl1.value(0), sl1.value(1).toInt(), c);
-            QVector<double> dat2=getBeadsData(sl2.value(0), sl2.value(1).toInt(), c);
-            /*QVector<double> dat;
-            for (int b=0; b<beads; b++) {
-                QString param=QString("channel%1_bead%2").arg(c).arg(b);
-                QString p1=param+sl1.value(0);
-                int p1i=sl1.value(1).toInt();
-                //qDebug()<<p1<<p1i;
-                bool ok=true;
-                QVector<double> p=record->resultsGetAsDoubleList(evalID, p1, &ok);
-                if (ok && p1i<p.size()) {
-                    dat<<p[p1i];
-                }
-            }
-
-            c=sl2.value(2).toInt();
-            QVector<double> dat2;
-            for (int b=0; b<beads; b++) {
-                QString param=QString("channel%1_bead%2").arg(c).arg(b);
-                QString p1=param+sl2.value(0);
-                int p1i=sl2.value(1).toInt();
-                bool ok=true;
-                QVector<double> p=record->resultsGetAsDoubleList(evalID, p1, &ok);
-                if (ok && p1i<p.size()) {
-                    dat2<<p[p1i];
-                }
-            }*/
+            QVector<double> dat=getBeadsData(sl1.value(0), sl1.value(1).toInt(), sl1.value(2), c);
+            QVector<double> dat2=getBeadsData(sl2.value(0), sl2.value(1).toInt(), sl2.value(2), c);
 
 
             if (dat.size()>0 && dat2.size()>0) ui->corrPlot->addCopiedCorrelation(tr("%1 -- %2").arg(ui->cmbParamC1->currentText()).arg(ui->cmbParamC2->currentText()), dat.data(), dat2.data(), dat.size());
@@ -884,51 +953,51 @@ void QFEvalBeadScanPSFEditor::displayResults()
         ui->cmbParam2->clear();
         ui->cmbParamC2->clear();
         ui->cmbParamC1->clear();
-        ui->cmbParam1->addItem(s1=tr("cut X: offset"), sl1=constructQStringListFromItems("_cutx_fitresult", "0")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("cut X: amplitude"), sl1=constructQStringListFromItems("_cutx_fitresult", "1")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("cut X: position"), sl1=constructQStringListFromItems("_cutx_fitresult", "2")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("cut X: width"), sl1=constructQStringListFromItems("_cutx_fitresult", "3")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut X: offset"), sl1=constructQStringListFromItems("_cutx_fitresult", "0", "offset")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut X: amplitude"), sl1=constructQStringListFromItems("_cutx_fitresult", "1", "amplitude")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut X: position"), sl1=constructQStringListFromItems("_cutx_fitresult", "2", "position")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut X: width"), sl1=constructQStringListFromItems("_cutx_fitresult", "3", "width")); ui->cmbParam2->addItem(s1, sl1);
 
-        ui->cmbParam1->addItem(s1=tr("cut Y: offset"), sl1=constructQStringListFromItems("_cuty_fitresult", "0")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("cut Y: amplitude"), sl1=constructQStringListFromItems("_cuty_fitresult", "1")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("cut Y: position"), sl1=constructQStringListFromItems("_cuty_fitresult", "2")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("cut Y: width"), sl1=constructQStringListFromItems("_cuty_fitresult", "3")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Y: offset"), sl1=constructQStringListFromItems("_cuty_fitresult", "0", "offset")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Y: amplitude"), sl1=constructQStringListFromItems("_cuty_fitresult", "1", "amplitude")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Y: position"), sl1=constructQStringListFromItems("_cuty_fitresult", "2", "position")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Y: width"), sl1=constructQStringListFromItems("_cuty_fitresult", "3", "width")); ui->cmbParam2->addItem(s1, sl1);
 
-        ui->cmbParam1->addItem(s1=tr("cut Z: offset"), sl1=constructQStringListFromItems("_cutz_fitresult", "0")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("cut Z: amplitude"), sl1=constructQStringListFromItems("_cutz_fitresult", "1")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("cut Z: position"), sl1=constructQStringListFromItems("_cutz_fitresult", "2")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("cut Z: width"), sl1=constructQStringListFromItems("_cutz_fitresult", "3")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Z: offset"), sl1=constructQStringListFromItems("_cutz_fitresult", "0", "offset")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Z: amplitude"), sl1=constructQStringListFromItems("_cutz_fitresult", "1", "amplitude")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Z: position"), sl1=constructQStringListFromItems("_cutz_fitresult", "2", "position")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Z: width"), sl1=constructQStringListFromItems("_cutz_fitresult", "3", "width")); ui->cmbParam2->addItem(s1, sl1);
 
-        ui->cmbParam1->addItem(s1=tr("cut X+Z: axial ratio wz/wx"), sl1=constructQStringListFromItems("_fits_axialratios", "0")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("cut Y+Z: axial ratio wz/wy"), sl1=constructQStringListFromItems("_fits_axialratios", "1")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut X+Z: axial ratio wz/wx"), sl1=constructQStringListFromItems("_fits_axialratios", "0", "0")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut Y+Z: axial ratio wz/wy"), sl1=constructQStringListFromItems("_fits_axialratios", "1", "1")); ui->cmbParam2->addItem(s1, sl1);
 
-        ui->cmbParam1->addItem(s1=tr("cut XZ: rayleigh length"), sl1=constructQStringListFromItems("_cutxz_gaussianbeam_results", "0")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("cut XZ: beam width"), sl1=constructQStringListFromItems("_cutxz_gaussianbeam_results", "1")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("cut XZ: position"), sl1=constructQStringListFromItems("_cutxz_gaussianbeam_results", "2")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut XZ: rayleigh length"), sl1=constructQStringListFromItems("_cutxz_gaussianbeam_results", "0", "zR")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut XZ: beam width"), sl1=constructQStringListFromItems("_cutxz_gaussianbeam_results", "1", "w0")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut XZ: position"), sl1=constructQStringListFromItems("_cutxz_gaussianbeam_results", "2", "position")); ui->cmbParam2->addItem(s1, sl1);
 
-        ui->cmbParam1->addItem(s1=tr("cut YZ: rayleigh length"), sl1=constructQStringListFromItems("_cutyz_gaussianbeam_results", "0")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("cut YZ: beam width"), sl1=constructQStringListFromItems("_cutyz_gaussianbeam_results", "1")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("cut YZ: position"), sl1=constructQStringListFromItems("_cutyz_gaussianbeam_results", "2")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut YZ: rayleigh length"), sl1=constructQStringListFromItems("_cutyz_gaussianbeam_results", "0", "zR")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut YZ: beam width"), sl1=constructQStringListFromItems("_cutyz_gaussianbeam_results", "1", "w0")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("cut YZ: position"), sl1=constructQStringListFromItems("_cutyz_gaussianbeam_results", "2", "position")); ui->cmbParam2->addItem(s1, sl1);
 
-        ui->cmbParam1->addItem(s1=tr("3D fit: offset"), sl1=constructQStringListFromItems("_fit3d_results", "0")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("3D fit: amplitude"), sl1=constructQStringListFromItems("_fit3d_results", "1")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("3D fit: position x"), sl1=constructQStringListFromItems("_fit3d_results", "2")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("3D fit: position y"), sl1=constructQStringListFromItems("_fit3d_results", "3")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("3D fit: position z"), sl1=constructQStringListFromItems("_fit3d_results", "4")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("3D fit: width 1"), sl1=constructQStringListFromItems("_fit3d_results", "5")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("3D fit: width 2"), sl1=constructQStringListFromItems("_fit3d_results", "6")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("3D fit: width 3"), sl1=constructQStringListFromItems("_fit3d_results", "7")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("3D fit: theta"), sl1=constructQStringListFromItems("_fit3d_results", "8")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("3D fit: phi"), sl1=constructQStringListFromItems("_fit3d_results", "9")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("3D fit: alpha"), sl1=constructQStringListFromItems("_fit3d_results", "10")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("3D fit: axial ratio w3/w1"), sl1=constructQStringListFromItems("_fits_axialratios_3d", "0")); ui->cmbParam2->addItem(s1, sl1);
-        ui->cmbParam1->addItem(s1=tr("3D fit: axial ratio w3/w2"), sl1=constructQStringListFromItems("_fits_axialratios_3d", "1")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: offset"), sl1=constructQStringListFromItems("_fit3d_results", "0", "offset")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: amplitude"), sl1=constructQStringListFromItems("_fit3d_results", "1", "amplitude")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: position x"), sl1=constructQStringListFromItems("_fit3d_results", "2", "position_x")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: position y"), sl1=constructQStringListFromItems("_fit3d_results", "3", "position_y")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: position z"), sl1=constructQStringListFromItems("_fit3d_results", "4", "position_z")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: width 1"), sl1=constructQStringListFromItems("_fit3d_results", "5", "width1")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: width 2"), sl1=constructQStringListFromItems("_fit3d_results", "6", "width2")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: width 3"), sl1=constructQStringListFromItems("_fit3d_results", "7", "width3")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: theta"), sl1=constructQStringListFromItems("_fit3d_results", "8", "theta")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: phi"), sl1=constructQStringListFromItems("_fit3d_results", "9", "phi")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: alpha"), sl1=constructQStringListFromItems("_fit3d_results", "10", "alpha")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: axial ratio w3/w1"), sl1=constructQStringListFromItems("_fits_axialratios_3d", "0", "0")); ui->cmbParam2->addItem(s1, sl1);
+        ui->cmbParam1->addItem(s1=tr("3D fit: axial ratio w3/w2"), sl1=constructQStringListFromItems("_fits_axialratios_3d", "1", "1")); ui->cmbParam2->addItem(s1, sl1);
 
         if (ch>1) {
-            ui->cmbParam1->addItem(s1=tr("3D fit: distance x"), sl1=constructQStringListFromItems("_fit3d_distc0", "0")); ui->cmbParam2->addItem(s1, sl1);
-            ui->cmbParam1->addItem(s1=tr("3D fit: distance y"), sl1=constructQStringListFromItems("_fit3d_distc0", "1")); ui->cmbParam2->addItem(s1, sl1);
-            ui->cmbParam1->addItem(s1=tr("3D fit: distance z"), sl1=constructQStringListFromItems("_fit3d_distc0", "2")); ui->cmbParam2->addItem(s1, sl1);
-            ui->cmbParam1->addItem(s1=tr("3D fit: abs. distance"), sl1=constructQStringListFromItems("_fit3d_distc0", "3")); ui->cmbParam2->addItem(s1, sl1);
+            ui->cmbParam1->addItem(s1=tr("3D fit: distance x"), sl1=constructQStringListFromItems("_fit3d_distc0", "0", "x")); ui->cmbParam2->addItem(s1, sl1);
+            ui->cmbParam1->addItem(s1=tr("3D fit: distance y"), sl1=constructQStringListFromItems("_fit3d_distc0", "1", "y")); ui->cmbParam2->addItem(s1, sl1);
+            ui->cmbParam1->addItem(s1=tr("3D fit: distance z"), sl1=constructQStringListFromItems("_fit3d_distc0", "2", "z")); ui->cmbParam2->addItem(s1, sl1);
+            ui->cmbParam1->addItem(s1=tr("3D fit: abs. distance"), sl1=constructQStringListFromItems("_fit3d_distc0", "3", "abs")); ui->cmbParam2->addItem(s1, sl1);
         }
 
         ui->tabWidget->setTabEnabled(ui->tabWidget->indexOf(ui->tabHistD), ch>1);
@@ -1217,7 +1286,7 @@ void QFEvalBeadScanPSFEditor::on_btnSaveAvgROI_clicked()
                 int size_z=data->getImageStackFrames(stack);
 
                 if (ok) {
-                    QVector<int> beads=getFilteresBeadsID(0);
+                    QVector<int> beads=getFilteredBeadsID(0);
                     QProgressDialog dialog;
                     dialog.setLabelText("exporting ROIs ...");
                     dialog.setRange(0,channels*beads.size());
@@ -1244,10 +1313,17 @@ void QFEvalBeadScanPSFEditor::on_btnSaveAvgROI_clicked()
                             int initPosX=record->resultsGetInNumberList(evalID, "beadsearch_initial_positions_x", bead, -1);
                             int initPosY=record->resultsGetInNumberList(evalID, "beadsearch_initial_positions_y", bead, -1);
                             int initPosZ=record->resultsGetInNumberList(evalID, "beadsearch_initial_positions_z", bead, -1);
-                            float posX=record->resultsGetInNumberList(evalID, QString("channel%1_bead%2_fit3d_results").arg(c).arg(bead), posxID, -1)/deltaXY-float(initPosX)+float(ROIxy/2);
-                            float posY=record->resultsGetInNumberList(evalID, QString("channel%1_bead%2_fit3d_results").arg(c).arg(bead), posyID, -1)/deltaXY-float(initPosY)+float(ROIxy/2);
-                            float posZ=record->resultsGetInNumberList(evalID, QString("channel%1_bead%2_fit3d_results").arg(c).arg(bead), poszID, -1)/deltaZ-float(initPosZ)+float(ROIz/2);
+                            float posX, posY, posZ;
 
+                            if (record->resultsGetAsString(evalID, "dataorder").toLower()=="beadslists") {
+                                posX=record->resultsGetInNumberList(evalID, QString("channel%1_fit3d_results_position_x").arg(c), bead, -1)/deltaXY-float(initPosX)+float(ROIxy/2);
+                                posY=record->resultsGetInNumberList(evalID, QString("channel%1_fit3d_results_position_y").arg(c), bead, -1)/deltaXY-float(initPosY)+float(ROIxy/2);
+                                posZ=record->resultsGetInNumberList(evalID, QString("channel%1_fit3d_results_position_z").arg(c), bead, -1)/deltaZ-float(initPosZ)+float(ROIz/2);
+                            } else {
+                                posX=record->resultsGetInNumberList(evalID, QString("channel%1_bead%2_fit3d_results").arg(c).arg(bead), posxID, -1)/deltaXY-float(initPosX)+float(ROIxy/2);
+                                posY=record->resultsGetInNumberList(evalID, QString("channel%1_bead%2_fit3d_results").arg(c).arg(bead), posyID, -1)/deltaXY-float(initPosY)+float(ROIxy/2);
+                                posZ=record->resultsGetInNumberList(evalID, QString("channel%1_bead%2_fit3d_results").arg(c).arg(bead), poszID, -1)/deltaZ-float(initPosZ)+float(ROIz/2);
+                            }
 
                             if (initPosX>=0 && initPosY>=0 && initPosZ>=0 && posxID>=0 && posyID>=0 && poszID>=0) {
                                 cimg_library::CImg<double> roi=image.get_crop(initPosX-ROIxy/2, initPosY-ROIxy/2, initPosZ-ROIz/2, initPosX+ROIxy/2, initPosY+ROIxy/2, initPosZ+ROIz/2);

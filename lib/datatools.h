@@ -142,7 +142,30 @@ QFLIB_EXPORT QString toQFTableModelXML(const QList<QVector<double> >& data, cons
 */
 QFLIB_EXPORT QString toQFTableModelXML(const QList<QList<QVariant> >& data, const QStringList& columnsNames=QStringList(), const QStringList& rowNames=QStringList());
 
+/*! \brief This tool simplifies the creation of data tables for QFDataExportHandler
+    \ingroup qf3lib_tools
+*/
+class QFLIB_EXPORT QFDataExportTool {
+    public:
+        QList<QList<QVariant> > data;
+        QStringList colHeaders;
+        QStringList rowHeaders;
 
+        void save(const QString& filename, int format) const;
+
+        void clear();
+
+        void set(int col, int row, const QVariant& value);
+        void setLastColumn(int row, const QVariant& value);
+        void setRowTitle(int row, const QString& title);
+        void setColTitle(int col, const QString& title);
+        int getRowCount() const;
+        int getColCount() const;
+        QVariant get(int col, int row) const;
+
+
+
+};
 
 
 /*! \brief this class groups static methods to export to different data formats
@@ -214,3 +237,4 @@ class QFLIB_EXPORT QFDataExportHandler {
 };
 
 #endif // DATATOOLS_H
+

@@ -58,6 +58,7 @@ QFParameterCorrelationView::QFParameterCorrelationView(QWidget *parent) :
     currentRangeSelection_ymax=0;
 
     createWidgets();
+    setColorCodingMode(ccmNone);
 }
 
 QFParameterCorrelationView::~QFParameterCorrelationView()
@@ -578,7 +579,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                     g->set_color(scatterColor);
                     g->set_fillColor(scatterColor.lighter());
 
-                    if (hist.data3) {
+                    if (hist.data3 && colorcoding==ccmBy3rdColumn) {
                         int g_c=pltParamCorrelation->getDatastore()->addCopiedColumn(d3r, datasize, tr("corr%1_C").arg(hh));
                         g->set_colorColumnContainsRGB(false);
                         g->set_colorColumn(g_c);
@@ -589,7 +590,42 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                         g->get_colorBarRightAxis()->set_axisLabel(histLabelColor);
                         g->get_colorBarTopAxis()->set_axisLabel(histLabelColor);
 
+                    } else if (colorcoding==ccmXYGR) {
+                        QVector<double> d3rc(datasize,0);
+                        double xmin=0, xmax=0;
+                        double ymin=0, ymax=0;
+                        statisticsMinMax(d1r, datasize, xmin, xmax);
+                        statisticsMinMax(d2r, datasize, ymin, ymax);
+
+                        for (int i=0; i<d3rc.size(); i++) {
+                            double x=d1r[i];
+                            double y=d2r[i];
+                            d3rc[i]=qRgb(floor(255.0*(y-ymin)/(ymax-ymin)),floor(255.0*(x-xmin)/(xmax-xmin)),0);
+                        }
+                        int g_c=pltParamCorrelation->getDatastore()->addCopiedColumn(d3rc.data(), d3rc.size(), tr("corr%1_Col_RGB").arg(hh));
+                        g->set_colorColumnContainsRGB(true);
+                        g->set_colorColumn(g_c);
+                        g->get_colorBarRightAxis()->set_axisLabel(histLabelColor);
+                        g->get_colorBarTopAxis()->set_axisLabel(histLabelColor);
+                    } else if (colorcoding==ccmXYRB) {
+                        QVector<double> d3rc(datasize,0);
+                        double xmin=0, xmax=0;
+                        double ymin=0, ymax=0;
+                        statisticsMinMax(d1r, datasize, xmin, xmax);
+                        statisticsMinMax(d2r, datasize, ymin, ymax);
+
+                        for (int i=0; i<d3rc.size(); i++) {
+                            double x=d1r[i];
+                            double y=d2r[i];
+                            d3rc[i]=qRgb(floor(255.0*(x-xmin)/(xmax-xmin)),0,floor(255.0*(y-ymin)/(ymax-ymin)));
+                        }
+                        int g_c=pltParamCorrelation->getDatastore()->addCopiedColumn(d3rc.data(), d3rc.size(), tr("corr%1_Col_RGB").arg(hh));
+                        g->set_colorColumnContainsRGB(true);
+                        g->set_colorColumn(g_c);
+                        g->get_colorBarRightAxis()->set_axisLabel(histLabelColor);
+                        g->get_colorBarTopAxis()->set_axisLabel(histLabelColor);
                     }
+
 
                     pltParamCorrelation->addGraph(g);
                     graphs_scatter<<g;
@@ -753,6 +789,8 @@ int QFParameterCorrelationView::addCorrelation(QString name, double *data1, doub
     h.external=external;
     histograms.append(h);
 
+    if (data3) setColorCodingMode(ccmBy3rdColumn);
+
     return histograms.size()-1;
 }
 
@@ -767,7 +805,22 @@ int QFParameterCorrelationView::addCopiedCorrelation(QString name, const double 
     h.external=false;
     histograms.append(h);
 
-    return histograms.size()-1;}
+    return histograms.size()-1;
+}
+
+int QFParameterCorrelationView::addCopiedCorrelation(QString name, const double *data1, const double *data2, const double *data3, int32_t size)
+{
+    QFParameterCorrelationView::CorrelationItem h;
+    h.data1=duplicateArray(data1, size);
+    h.data2=duplicateArray(data2, size);
+    h.data3=duplicateArray(data3, size);
+    h.name=name;
+    h.size=size;
+    h.external=false;
+    histograms.append(h);
+
+    return histograms.size()-1;
+}
 
 void QFParameterCorrelationView::setCorrelation(int i, QString name, double *data1, double *data2, int32_t size, bool external)
 {
@@ -806,6 +859,7 @@ void QFParameterCorrelationView::setCorrelation(int i, QString name, double *dat
     h.size=size;
     h.external=external;
     histograms[i]=h;
+    if (data3) setColorCodingMode(ccmBy3rdColumn);
 }
 
 void QFParameterCorrelationView::setCopiedCorrelation(int i, QString name, const double *data1, const double *data2, int32_t size)
@@ -820,6 +874,23 @@ void QFParameterCorrelationView::setCopiedCorrelation(int i, QString name, const
     h.size=size;
     h.external=false;
     histograms[i]=h;
+}
+
+void QFParameterCorrelationView::setCopiedCorrelation(int i, QString name, const double *data1, const double *data2, const double *data3, int32_t size)
+{
+    if (i<0 || i>=histograms.size()) return;
+    QFParameterCorrelationView::CorrelationItem h=histograms[i];
+    if (h.data1 && !h.external) qfFree(h.data1);
+    if (h.data2 && !h.external) qfFree(h.data2);
+    if (h.data3 && !h.external) qfFree(h.data3);
+    h.data1=duplicateArray(data1, size);
+    h.data2=duplicateArray(data2, size);
+    h.data3=duplicateArray(data3, size);
+    h.name=name;
+    h.size=size;
+    h.external=false;
+    histograms[i]=h;
+    if (data3) setColorCodingMode(ccmBy3rdColumn);
 }
 
 void QFParameterCorrelationView::removeCorrelation(int i)
@@ -1072,6 +1143,21 @@ void QFParameterCorrelationView::showPlotPosition(double x, double y)
     labPlotPos->setText(tr("(%1, %2").arg(x).arg(y));
 }
 
+void QFParameterCorrelationView::setColorCodingMode(QFParameterCorrelationView::ColorCodingMode colorcoding)
+{
+    bool changed=(this->colorcoding!=colorcoding);
+    this->colorcoding=colorcoding;
+
+    labColorCodingHeader->setVisible(colorcoding==ccmBy3rdColumn);
+    labColorCodingHeader1->setVisible(colorcoding==ccmBy3rdColumn);
+    labColorCodingHeader2->setVisible(colorcoding==ccmBy3rdColumn);
+    labColorCodingHeader3->setVisible(colorcoding==ccmBy3rdColumn);
+    cmbColorScale->setVisible(colorcoding==ccmBy3rdColumn);
+    widColorCodingHeader->setVisible(colorcoding==ccmBy3rdColumn);
+    widColorCodingHeader2->setVisible(colorcoding==ccmBy3rdColumn);
+    if (changed) updateCorrelation(true);
+}
+
 
 
 
@@ -1228,7 +1314,7 @@ void QFParameterCorrelationView::createWidgets()
 
     chkHistogramRangeManual1=new QRadioButton("manual", grpHistogramSettings);
     chkHistogramRangeAuto1=new QRadioButton("auto", grpHistogramSettings);
-    chkHistogramRangeRelaxAuto1=new QRadioButton("relaxed auto:", grpHistogramSettings);
+    chkHistogramRangeRelaxAuto1=new QRadioButton("relaxed:", grpHistogramSettings);
     chkHistogramRangeAuto1->setChecked(true);
     QButtonGroup* bg=new QButtonGroup(this);
     bg->addButton(chkHistogramRangeManual1);
@@ -1277,7 +1363,7 @@ void QFParameterCorrelationView::createWidgets()
 
     chkHistogramRangeManual2=new QRadioButton("manual", grpHistogramSettings);
     chkHistogramRangeAuto2=new QRadioButton("auto", grpHistogramSettings);
-    chkHistogramRangeRelaxAuto2=new QRadioButton("relaxed auto:", grpHistogramSettings);
+    chkHistogramRangeRelaxAuto2=new QRadioButton("relaxed:", grpHistogramSettings);
     chkHistogramRangeAuto2->setChecked(true);
     bg=new QButtonGroup(this);
     bg->addButton(chkHistogramRangeManual2);
@@ -1320,16 +1406,13 @@ void QFParameterCorrelationView::createWidgets()
 
 
 
-    flHistSet->addRow(tr("<b>Data Color:</b>"), new QWidget(this));
+    flHistSet->addRow(labColorCodingHeader=new QLabel(tr("<b>Data Color:</b>")), new QWidget(this));
     cmbColorScale=new JKQTPMathImageColorPaletteComboBox(this);
     cmbColorScale->setCurrentIndex(JKQTPMathImageMATLAB);
-    coll=new QHBoxLayout();
-    coll->addWidget(cmbColorScale);
-    coll->addStretch();
-    flHistSet->addRow(tr("  color palette:"), coll);
-    chkColorRangeManual=new QRadioButton("manual", grpHistogramSettings);
-    chkColorRangeAuto=new QRadioButton("auto", grpHistogramSettings);
-    chkColorRangeRelaxAuto=new QRadioButton("relaxed auto:", grpHistogramSettings);
+    flHistSet->addRow(labColorCodingHeader1=new QLabel(tr("  color palette:")), cmbColorScale);
+    chkColorRangeManual=new QRadioButton(tr("manual"), grpHistogramSettings);
+    chkColorRangeAuto=new QRadioButton(tr("auto"), grpHistogramSettings);
+    chkColorRangeRelaxAuto=new QRadioButton(tr("relaxed:"), grpHistogramSettings);
     bg=new QButtonGroup(this);
     bg->addButton(chkColorRangeManual);
     bg->addButton(chkColorRangeAuto);
@@ -1343,7 +1426,9 @@ void QFParameterCorrelationView::createWidgets()
     spinColQU->setRange(0,100);
     spinColQU->setSuffix("%");
     spinColQU->setValue(5);
+    widColorCodingHeader=new QWidget(this);
     hbrange=new QHBoxLayout();
+    hbrange->setContentsMargins(0,0,0,0);
     hbrange->addWidget(chkColorRangeManual);
     hbrange->addWidget(chkColorRangeAuto);
     hbrange->addWidget(chkColorRangeRelaxAuto);
@@ -1351,20 +1436,23 @@ void QFParameterCorrelationView::createWidgets()
     hbrange->addWidget(new QLabel("..."));
     hbrange->addWidget(spinColQU);
     hbrange->addStretch();
-    flHistSet->addRow(tr("  range:"), hbrange);
+    widColorCodingHeader->setLayout(hbrange);
+    flHistSet->addRow(labColorCodingHeader2=new QLabel(tr("  range:")), widColorCodingHeader);
     edtColorMin=new QFDoubleEdit(this);
     edtColorMin->setCheckBounds(false, false);
     edtColorMin->setValue(0);
     edtColorMax=new QFDoubleEdit(this);
     edtColorMax->setCheckBounds(false, false);
     edtColorMax->setValue(10);
+    widColorCodingHeader2=new QWidget(this);
     coll=new QHBoxLayout();
     coll->addWidget(edtColorMin,1);
     coll->addWidget(new QLabel(" ... "));
     coll->addWidget(edtColorMax,1);
     coll->addStretch();
     coll->setContentsMargins(0,0,0,0);
-    flHistSet->addRow(QString(""), coll);
+    widColorCodingHeader2->setLayout(coll);
+    flHistSet->addRow(labColorCodingHeader3=new QLabel(""), widColorCodingHeader2);
 
 
 

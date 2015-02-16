@@ -94,8 +94,8 @@ class QFEvalBeadScanPSFEditor : public QFEvaluationEditor {
         /*! \brief create an evaluation report for the current record */
         void createReportDoc(QTextDocument* document);
 
-        QVector<double> getBeadsData(const QString &paramName, int paramIdx, int channel);
-        QVector<int> getFilteresBeadsID(int channel);
+        QVector<double> getBeadsData(const QString &paramName, int paramIdx, const QString& subParamName,  int channel);
+        QVector<int> getFilteredBeadsID(int channel);
     protected slots:
         /** \brief activated when the highlighted record changed */
         void highlightingChanged(QFRawDataRecord* formerRecord, QFRawDataRecord* currentRecord);
@@ -132,3 +132,11 @@ class QFEvalBeadScanPSFEditor : public QFEvaluationEditor {
 };
 
 #endif // QFEVALBEADSCANPSFEDITOR_H
+
+
+
+/*
+if (record->resultsGetAsString(evalID, "dataorder").toLower()=="beadslists") {
+} else {
+}
+ */

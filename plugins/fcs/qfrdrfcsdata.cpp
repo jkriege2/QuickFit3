@@ -510,14 +510,110 @@ void QFRDRFCSData::exportData(const QString& format, const QString& filename)con
         }
 
         tool.saveFile(filename);
+    } else {
+        QFDataExportTool data;
+        bool corr=false;
+        bool count=false;
+        QString formatout="";
+        QStringList formats=QFDataExportHandler::getFormats();
+        if (format.toUpper().startsWith("CORRCOUNTS_")) {
+            corr=true;
+            count=true;
+            formatout=format.right(format.size()-QString("CORRCOUNTS_").size());
+        } else if (format.toUpper().startsWith("CORR_")) {
+            corr=true;
+            count=false;
+            formatout=format.right(format.size()-QString("CORR_").size());
+        } else if (format.toUpper().startsWith("COUNTS_")) {
+            corr=false;
+            count=true;
+            formatout=format.right(format.size()-QString("COUNTS_").size());
+        }
+        int formatIdx=formats.indexOf(formatout);
+        if (formatIdx>=0) {
+            int col=0;
+            if (corr) {
+                data.setColTitle(col,tr("lag time tau [s]"));
+                for (int i=0; i<correlationN; i++) {
+                    data.set(col, i, correlationT[i]);
+                }
+                col++;
+                for (int r=0; r<correlationRuns; r++) {
+                    data.setColTitle(col,tr("correlation, run %1").arg(r));
+                    double* rd=getCorrelationRun(r);
+                    for (int i=0; i<correlationN; i++) {
+                        data.set(col, i, rd[i]);
+                    }
+                    col++;
+                }
+                if (correlationRuns>1 || correlationRuns<=0) {
+                    data.setColTitle(col,tr("correlation, average"));
+                    data.setColTitle(col+1,tr("correlation, stddev"));
+                    double* rd=getCorrelationMean();
+                    double* re=getCorrelationStdDev();
+                    for (int i=0; i<correlationN; i++) {
+                        data.set(col, i, rd[i]);
+                        data.set(col+1, i, re[i]);
+                    }
+                    col+=2;
+                }
+            }
+            if (count) {
+                data.setColTitle(col,tr("time [s]"));
+                for (int i=0; i<rateN; i++) {
+                    data.set(col, i, rateT[i]);
+                }
+                col++;
+                for (int ch=0; ch<rateChannels; ch++) {
+                    for (int r=0; r<rateRuns; r++) {
+                        data.setColTitle(col,tr("countrate, channel %2 run %1").arg(r).arg(ch));
+                        double* rd=getRateRun(r, ch);
+                        for (int i=0; i<rateN; i++) {
+                            data.set(col, i, rd[i]);
+                        }
+                        col++;
+                    }
+                }
+            }
+
+            data.save(filename, formatIdx);
+        }
     }
-/*    if (!datamodel) return;
-    QString f=format.toUpper();
-    if (f=="CSV") {
-        datamodel->saveCSV(filename);
-    } else if (f=="SLK" || f=="SYLK") {
-        datamodel->saveSYLK(filename);
-    }*/
+}
+
+QStringList QFRDRFCSData::getExportFiletypes() const
+{
+    QStringList sl;
+    sl<<"QF3ASCIICORR";
+    QStringList formats=QFDataExportHandler::getFormats();
+    for (int i=0; i<formats.size(); i++) {
+        sl<<QString("CORRCOUNTS_%1").arg(formats[i]);
+    }
+    for (int i=0; i<formats.size(); i++) {
+        sl<<QString("CORR_%1").arg(formats[i]);
+    }
+    for (int i=0; i<formats.size(); i++) {
+        sl<<QString("COUNTS_%1").arg(formats[i]);
+    }
+    return sl;
+}
+
+QString QFRDRFCSData::getExportDialogFiletypes() const
+{
+    QStringList sl;
+    sl<<tr("QuickFit 3.0 ASCII Correlation Data (*.qf3acorr)");
+    QStringList formats=QFDataExportHandler::getFormats();
+    for (int i=0; i<formats.size(); i++) {
+        sl<<QString("correlations+countrate: %1").arg(formats[i]);
+    }
+    for (int i=0; i<formats.size(); i++) {
+        sl<<QString("correlations: %1").arg(formats[i]);
+    }
+    for (int i=0; i<formats.size(); i++) {
+        sl<<QString("countrates: COUNTS_%1").arg(formats[i]);
+    }
+    return sl.join(";;");
+
 }
 
 double *QFRDRFCSData::getCorrelationRun(int run) const

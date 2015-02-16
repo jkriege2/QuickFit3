@@ -22,7 +22,7 @@
 
 #ifndef QFESPIMB040MAINWINDOW2_H
 #define QFESPIMB040MAINWINDOW2_H
-
+#include "qfversion.h"
 #include <QWidget>
 #include "qvisiblehandlesplitter.h"
 #include <QSplitter>
@@ -84,7 +84,7 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
         Q_OBJECT
         Q_INTERFACES(QFPluginLogService QFESPIMB040AcquisitionTools)
     public:
-        QFESPIMB040MainWindow2(QFPluginServices* pluginServices, QWidget* parent=NULL, bool newOpticsSetup=false);
+        QFESPIMB040MainWindow2(QFPluginServices* pluginServices, QWidget* parent=NULL, bool newOpticsSetup=false, QFExtension* plugin=NULL);
         virtual ~QFESPIMB040MainWindow2();
 
         /** \brief load settings */
@@ -123,6 +123,8 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
 
         QFEnhancedTabWidget* tabMain;
         QPushButton* btnHelp;
+
+        QFExtension* plugin;
 
 
 
