@@ -107,7 +107,7 @@ class QFLIB_EXPORT QFExporterImageSeries: public QFExporter {
         inline QString getXYZUnitName()  const {
             return unitname;
         }
-        inline QString getFrame()  const {
+        inline uint32_t getFrame()  const {
             return frame;
         }
 
