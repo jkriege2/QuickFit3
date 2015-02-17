@@ -151,8 +151,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>996</width>
-           <height>533</height>
+           <width>1135</width>
+           <height>589</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -162,16 +162,7 @@
           </sizepolicy>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
-          <property name="leftMargin">
-           <number>0</number>
-          </property>
-          <property name="topMargin">
-           <number>0</number>
-          </property>
-          <property name="rightMargin">
-           <number>0</number>
-          </property>
-          <property name="bottomMargin">
+          <property name="margin">
            <number>0</number>
           </property>
           <item>
@@ -204,16 +195,7 @@
              <property name="verticalSpacing">
               <number>2</number>
              </property>
-             <property name="leftMargin">
-              <number>0</number>
-             </property>
-             <property name="topMargin">
-              <number>0</number>
-             </property>
-             <property name="rightMargin">
-              <number>0</number>
-             </property>
-             <property name="bottomMargin">
+             <property name="margin">
               <number>0</number>
              </property>
              <item row="1" column="0">
@@ -476,16 +458,7 @@ p, li { white-space: pre-wrap; }
                 <bool>false</bool>
                </property>
                <layout class="QHBoxLayout" name="horizontalLayout_17">
-                <property name="leftMargin">
-                 <number>0</number>
-                </property>
-                <property name="topMargin">
-                 <number>0</number>
-                </property>
-                <property name="rightMargin">
-                 <number>0</number>
-                </property>
-                <property name="bottomMargin">
+                <property name="margin">
                  <number>0</number>
                 </property>
                 <item>
@@ -845,16 +818,7 @@ p, li { white-space: pre-wrap; }
                   <property name="spacing">
                    <number>3</number>
                   </property>
-                  <property name="leftMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="topMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="rightMargin">
-                   <number>0</number>
-                  </property>
-                  <property name="bottomMargin">
+                  <property name="margin">
                    <number>0</number>
                   </property>
                   <item>
@@ -866,6 +830,9 @@ p, li { white-space: pre-wrap; }
                   </item>
                   <item>
                    <widget class="QSpinBox" name="spinXFirst">
+                    <property name="suffix">
+                     <string> pix</string>
+                    </property>
                     <property name="maximum">
                      <number>10000</number>
                     </property>
@@ -880,6 +847,9 @@ p, li { white-space: pre-wrap; }
                   </item>
                   <item>
                    <widget class="QSpinBox" name="spinXLast">
+                    <property name="suffix">
+                     <string> pix</string>
+                    </property>
                     <property name="maximum">
                      <number>10000</number>
                     </property>
@@ -913,6 +883,9 @@ p, li { white-space: pre-wrap; }
                   </item>
                   <item>
                    <widget class="QSpinBox" name="spinYFirst">
+                    <property name="suffix">
+                     <string> pix</string>
+                    </property>
                     <property name="maximum">
                      <number>10000</number>
                     </property>
@@ -927,6 +900,9 @@ p, li { white-space: pre-wrap; }
                   </item>
                   <item>
                    <widget class="QSpinBox" name="spinYLast">
+                    <property name="suffix">
+                     <string> pix</string>
+                    </property>
                     <property name="maximum">
                      <number>10000</number>
                     </property>
@@ -980,7 +956,7 @@ p, li { white-space: pre-wrap; }
                <item>
                 <widget class="QSpinBox" name="spinBinning">
                  <property name="suffix">
-                  <string> pixels</string>
+                  <string> pix</string>
                  </property>
                  <property name="minimum">
                   <number>1</number>
@@ -1303,6 +1279,16 @@ p, li { white-space: pre-wrap; }
              </item>
              <item row="12" column="1">
               <layout class="QGridLayout" name="gridLayout">
+               <item row="0" column="3">
+                <widget class="QCheckBox" name="chkNondefaultShift">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="text">
+                  <string>non-default shift:</string>
+                 </property>
+                </widget>
+               </item>
                <item row="0" column="0">
                 <widget class="QComboBox" name="cmbDualView">
                  <item>
@@ -1363,7 +1349,7 @@ p, li { white-space: pre-wrap; }
                  </property>
                 </widget>
                </item>
-               <item row="0" column="3">
+               <item row="0" column="5">
                 <widget class="QCheckBox" name="chkSeparateColorChannels">
                  <property name="enabled">
                   <bool>false</bool>
@@ -1379,7 +1365,7 @@ p, li { white-space: pre-wrap; }
                  </property>
                 </widget>
                </item>
-               <item row="0" column="4">
+               <item row="0" column="6">
                 <spacer name="horizontalSpacer_34">
                  <property name="orientation">
                   <enum>Qt::Horizontal</enum>
@@ -1392,7 +1378,7 @@ p, li { white-space: pre-wrap; }
                  </property>
                 </spacer>
                </item>
-               <item row="1" column="0" colspan="5">
+               <item row="1" column="0" colspan="7">
                 <widget class="QLabel" name="labDualView">
                  <property name="text">
                   <string/>
@@ -1403,6 +1389,50 @@ p, li { white-space: pre-wrap; }
                  <property name="wordWrap">
                   <bool>true</bool>
                  </property>
+                </widget>
+               </item>
+               <item row="0" column="4">
+                <widget class="QWidget" name="widNondefaultShift" native="true">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>10</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <layout class="QHBoxLayout" name="horizontalLayout_22">
+                  <property name="margin">
+                   <number>0</number>
+                  </property>
+                  <item>
+                   <widget class="QSpinBox" name="spinFCCSShiftX">
+                    <property name="suffix">
+                     <string> pix</string>
+                    </property>
+                    <property name="maximum">
+                     <number>10000</number>
+                    </property>
+                    <property name="value">
+                     <number>64</number>
+                    </property>
+                   </widget>
+                  </item>
+                  <item>
+                   <widget class="QSpinBox" name="spinFCCSShiftY">
+                    <property name="suffix">
+                     <string> pix</string>
+                    </property>
+                    <property name="maximum">
+                     <number>10000</number>
+                    </property>
+                    <property name="value">
+                     <number>0</number>
+                    </property>
+                   </widget>
+                  </item>
+                 </layout>
                 </widget>
                </item>
               </layout>
@@ -2293,8 +2323,8 @@ p, li { white-space: pre-wrap; }
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>1062</width>
-           <height>98</height>
+           <width>1058</width>
+           <height>96</height>
           </rect>
          </property>
          <property name="sizePolicy">
@@ -2307,16 +2337,7 @@ p, li { white-space: pre-wrap; }
           <property name="spacing">
            <number>2</number>
           </property>
-          <property name="leftMargin">
-           <number>2</number>
-          </property>
-          <property name="topMargin">
-           <number>2</number>
-          </property>
-          <property name="rightMargin">
-           <number>2</number>
-          </property>
-          <property name="bottomMargin">
+          <property name="margin">
            <number>2</number>
           </property>
           <item>
@@ -2459,12 +2480,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>498</y>
+     <x>310</x>
+     <y>635</y>
     </hint>
     <hint type="destinationlabel">
-     <x>443</x>
-     <y>500</y>
+     <x>507</x>
+     <y>638</y>
     </hint>
    </hints>
   </connection>
@@ -2475,12 +2496,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>271</x>
-     <y>498</y>
+     <x>310</x>
+     <y>635</y>
     </hint>
     <hint type="destinationlabel">
-     <x>512</x>
-     <y>500</y>
+     <x>589</x>
+     <y>638</y>
     </hint>
    </hints>
   </connection>
@@ -2491,12 +2512,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>150</x>
-     <y>215</y>
+     <x>169</x>
+     <y>255</y>
     </hint>
     <hint type="destinationlabel">
-     <x>627</x>
-     <y>219</y>
+     <x>833</x>
+     <y>261</y>
     </hint>
    </hints>
   </connection>
@@ -2507,8 +2528,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>736</x>
-     <y>219</y>
+     <x>964</x>
+     <y>261</y>
     </hint>
     <hint type="destinationlabel">
      <x>202</x>
@@ -2523,8 +2544,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>284</x>
-     <y>219</y>
+     <x>329</x>
+     <y>261</y>
     </hint>
     <hint type="destinationlabel">
      <x>229</x>
@@ -2539,8 +2560,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>359</x>
-     <y>219</y>
+     <x>417</x>
+     <y>261</y>
     </hint>
     <hint type="destinationlabel">
      <x>275</x>
@@ -2555,8 +2576,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>449</x>
-     <y>219</y>
+     <x>521</x>
+     <y>261</y>
     </hint>
     <hint type="destinationlabel">
      <x>365</x>
@@ -2571,8 +2592,8 @@ p, li { white-space: pre-wrap; }
    <slot>updateImageSize()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>524</x>
-     <y>219</y>
+     <x>609</x>
+     <y>261</y>
     </hint>
     <hint type="destinationlabel">
      <x>507</x>
@@ -2587,12 +2608,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>327</x>
-     <y>381</y>
+     <x>375</x>
+     <y>468</y>
     </hint>
     <hint type="destinationlabel">
-     <x>473</x>
-     <y>383</y>
+     <x>527</x>
+     <y>471</y>
     </hint>
    </hints>
   </connection>
@@ -2603,8 +2624,8 @@ p, li { white-space: pre-wrap; }
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>1035</x>
-     <y>782</y>
+     <x>1091</x>
+     <y>852</y>
     </hint>
     <hint type="destinationlabel">
      <x>725</x>
@@ -2619,12 +2640,12 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>133</x>
-     <y>139</y>
+     <x>228</x>
+     <y>173</y>
     </hint>
     <hint type="destinationlabel">
-     <x>558</x>
-     <y>138</y>
+     <x>797</x>
+     <y>178</y>
     </hint>
    </hints>
   </connection>
@@ -2635,12 +2656,28 @@ p, li { white-space: pre-wrap; }
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>327</x>
-     <y>381</y>
+     <x>375</x>
+     <y>468</y>
     </hint>
     <hint type="destinationlabel">
-     <x>1009</x>
-     <y>383</y>
+     <x>1167</x>
+     <y>471</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkNondefaultShift</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>widNondefaultShift</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>586</x>
+     <y>384</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>705</x>
+     <y>392</y>
     </hint>
    </hints>
   </connection>

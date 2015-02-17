@@ -472,6 +472,8 @@ MainWindow::~MainWindow() {
         }
     }
     mathParserHelpCache.clear();
+
+
 }
 
 void MainWindow::reloadCurrentProject()

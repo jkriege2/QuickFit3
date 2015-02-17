@@ -178,6 +178,7 @@ $$see:<a href="imfcs_bleach.html">This help-page</a> for theoretic/mathematical 
 </center>
 <p>The imFCS correlator is written to directly support imagingFCCS measurements, that were acquired on a DualView optics. The image series then contains two color channels (e.g. green and red) side-by-side in each frame. The correlator will split the image in two halves (the mode of splitting and the ordering of the color-channels can be selected in the combobox "<b>Dual-view mode</b>"). Then for each half-image, an autocorrelation function is calculated (ACF1: left/top &amp; ACF2: right/bottom). In addition the two-color cross-correlation function can be calculated (FCCS), if the check-box "<b>2-color FCCS is activated</b>".</p>
 <p>The three correlation functions (ACF1+ACF2+FCCS) will be imported as three separate records into the project!</p>
+<p>By default, the shift between the two color-channels is (width/2, 0) or (0, height/2), depending on the setting of the DualView mode, but you can also select a different shift vector by activating the option <b>non-default shift</b> and then entering the desired shift vector (in pixels)</p>
 
 
 

@@ -600,7 +600,7 @@ void QFParameterCorrelationView::updateCorrelation(bool replot, int which)
                         for (int i=0; i<d3rc.size(); i++) {
                             double x=d1r[i];
                             double y=d2r[i];
-                            d3rc[i]=qRgb(floor(255.0*(y-ymin)/(ymax-ymin)),floor(255.0*(x-xmin)/(xmax-xmin)),0);
+                            d3rc[i]=qRgb(floor(127.0+128.0*(y-ymin)/(ymax-ymin)),floor(127.0+128*(x-xmin)/(xmax-xmin)),0);
                         }
                         int g_c=pltParamCorrelation->getDatastore()->addCopiedColumn(d3rc.data(), d3rc.size(), tr("corr%1_Col_RGB").arg(hh));
                         g->set_colorColumnContainsRGB(true);

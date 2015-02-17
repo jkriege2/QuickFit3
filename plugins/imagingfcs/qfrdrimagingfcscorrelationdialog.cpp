@@ -530,6 +530,8 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbDualView_currentIndexChanged(int in
         ui->labDualView->setVisible(false);
         //ui->chkCrop->setEnabled(true);
         ui->chk2cFCCS->setEnabled(false);
+        ui->chkNondefaultShift->setEnabled(false);
+        ui->widNondefaultShift->setEnabled(false);
         ui->chkSeparateColorChannels->setEnabled(false);
         //ui->lab2cFCCS->setText("");
         //ui->lab2cFCCS->setVisible(false);
@@ -541,6 +543,9 @@ void QFRDRImagingFCSCorrelationDialog::on_cmbDualView_currentIndexChanged(int in
         //ui->chkCrop->setChecked(false);
         //ui->chkCrop->setEnabled(false);
         ui->chk2cFCCS->setEnabled(true);
+        ui->chkNondefaultShift->setEnabled(true);
+        ui->widNondefaultShift->setEnabled(ui->chkNondefaultShift->isChecked());
+
         ui->chkSeparateColorChannels->setEnabled(true);
         //ui->lab2cFCCS->setText(tr("<b>Distance CCFs will be calculated for the full DualView image!</b>"));
         //ui->lab2cFCCS->setVisible(true);
@@ -570,6 +575,11 @@ void QFRDRImagingFCSCorrelationDialog::on_btnPreview_clicked()
         image->show();
         image->raise();
         image->setImage(frame_data, image_width,image_height);
+        if (ui->chkCrop->isChecked()) {
+            image->setROI(ui->spinXFirst->value()-0.5,ui->spinYFirst->value()-0.5, ui->spinXLast->value()-ui->spinXFirst->value()+1, ui->spinYLast->value()-ui->spinYFirst->value()+1 );
+        } else {
+            image->resetROI();
+        }
         disconnect(ui->btnPreview, SIGNAL(toggled(bool)), this, SLOT(on_btnPreview_clicked()));
         ui->btnPreview->setChecked(true);
         connect(ui->btnPreview, SIGNAL(toggled(bool)), this, SLOT(on_btnPreview_clicked()));
@@ -717,6 +727,9 @@ void QFRDRImagingFCSCorrelationDialog::writeSettings() {
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/pixel_height", ui->spinPixelHeight->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/camera", ui->chkCamera->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/FCCS_2color", ui->chk2cFCCS->isChecked());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/chkNondefaultShift", ui->chkNondefaultShift->isChecked());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/spinFCCSShiftX", ui->spinFCCSShiftX->value());
+    options->getQSettings()->setValue("imaging_fcs/dlg_correlate/spinFCCSShiftY", ui->spinFCCSShiftY->value());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/chkSeparateColorChannels", ui->chkSeparateColorChannels->isChecked());
     options->getQSettings()->setValue("imaging_fcs/dlg_correlate/chkAddNB", ui->chkAddNB->isChecked());
 }
@@ -766,6 +779,11 @@ void QFRDRImagingFCSCorrelationDialog::readSettings() {
     ui->chkCamera->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/camera", ui->chkCamera->isChecked()).toBool());
     ui->chk2cFCCS->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/FCCS_2color", ui->chk2cFCCS->isChecked()).toBool());
     ui->chkSeparateColorChannels->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/chkSeparateColorChannels", ui->chkSeparateColorChannels->isChecked()).toBool());
+
+
+    ui->spinFCCSShiftX->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/spinFCCSShiftX", ui->spinFCCSShiftX->value()).toInt());
+    ui->spinPixelHeight->setValue(options->getQSettings()->value("imaging_fcs/dlg_correlate/spinFCCSShiftY", ui->spinFCCSShiftY->value()).toInt());
+    ui->chkNondefaultShift->setChecked(options->getQSettings()->value("imaging_fcs/dlg_correlate/chkNondefaultShift", ui->chkNondefaultShift->isChecked()).toBool());
 
     ui->chkSeparateColorChannels->setChecked(true);
     ui->chkSeparateColorChannels->setVisible(false);
@@ -875,18 +893,25 @@ IMFCSJob QFRDRImagingFCSCorrelationDialog::initJob(int biningForFCCS) {
     job.DCCFrole.clear();
 
     if (ui->chk2cFCCS->isChecked()) {
-        if (ui->cmbDualView->currentIndex()==1) {
-            job.DCCFDeltaX << image_width/2/biningForFCCS;
-            job.DCCFDeltaY << 0;
+        if (ui->chkNondefaultShift->isChecked()) {
+            job.DCCFDeltaX << ui->spinFCCSShiftX->value();
+            job.DCCFDeltaY << ui->spinFCCSShiftY->value();
             job.DCCFrole<<QString("FCCS");
             job.distanceCCF=true;
-            //qDebug()<<"added DV_H FCCS";
-        } else if (ui->cmbDualView->currentIndex()==2) {
-            job.DCCFDeltaX << 0;
-            job.DCCFDeltaY << image_height/2/biningForFCCS;
-            job.DCCFrole<<QString("FCCS");
-            job.distanceCCF=true;
-            //qDebug()<<"added DV_V FCCS";
+        } else {
+            if (ui->cmbDualView->currentIndex()==1) {
+                job.DCCFDeltaX << image_width/2/biningForFCCS;
+                job.DCCFDeltaY << 0;
+                job.DCCFrole<<QString("FCCS");
+                job.distanceCCF=true;
+                //qDebug()<<"added DV_H FCCS";
+            } else if (ui->cmbDualView->currentIndex()==2) {
+                job.DCCFDeltaX << 0;
+                job.DCCFDeltaY << image_height/2/biningForFCCS;
+                job.DCCFrole<<QString("FCCS");
+                job.distanceCCF=true;
+                //qDebug()<<"added DV_V FCCS";
+            }
         }
     }
 
@@ -1112,6 +1137,8 @@ void QFRDRImagingFCSCorrelationDialog::updateImageSize() {
     if (image_width-1>0) ui->spinXLast->setMaximum(image_width-1);
     if (image_height-1>0) ui->spinYFirst->setMaximum(image_height-1);
     if (image_height-1>0) ui->spinYLast->setMaximum(image_height-1);
+    if (image_width-1>0) ui->spinFCCSShiftX->setMaximum(image_width-1);
+    if (image_height-1>0) ui->spinFCCSShiftY->setMaximum(image_height-1);
     //if (image_width>0) ui->spinDistanceCCFDeltaX->setRange(-1*image_width, image_width);
     //if (image_height>0) ui->spinDistanceCCFDeltaY->setRange(-1*image_height, image_height);
 
@@ -1128,6 +1155,14 @@ void QFRDRImagingFCSCorrelationDialog::updateImageSize() {
         h=h/ui->spinBinning->value();
     }
     ui->labSize->setText(tr("input: %1&times;%2   output: %3&times;%4").arg(image_width).arg(image_height).arg(w).arg(h));
+
+    if (image) {
+        if (ui->chkCrop->isChecked()) {
+            image->setROI(ui->spinXFirst->value()-0.5,ui->spinYFirst->value()-0.5, ui->spinXLast->value()-ui->spinXFirst->value()+1, ui->spinYLast->value()-ui->spinYFirst->value()+1 );
+        } else {
+            image->resetROI();
+        }
+    }
 }
 
 void QFRDRImagingFCSCorrelationDialog::updateFrameCount() {
