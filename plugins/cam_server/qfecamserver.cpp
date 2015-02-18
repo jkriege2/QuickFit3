@@ -631,8 +631,13 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
                     if (ok) {
                         sources[camera].width=newW;
                         sources[camera].height=newH;
+                        int answ_bits=sources[camera].answer_bits;
+                        if (answer.startsWith("IMAGE8")) answ_bits=8;
+                        if (answer.startsWith("IMAGE16")) answ_bits=16;
+                        if (answer.startsWith("IMAGE32")) answ_bits=32;
+                        if (answer.startsWith("IMAGE64")) answ_bits=64;
                         memset(data, 0, oldW*oldH*sizeof(uint32_t));
-                        if (sources[camera].answer_bits==8) {
+                        if (answ_bits==8) {
                             QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint8_t), &ok);
                             //qDebug()<<"READ_8BIT:  "<<ok;
                             if (ok) {
@@ -641,7 +646,7 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
                                     data[i]=d[i];
                                 }
                             }
-                        } else if (sources[camera].answer_bits==16) {
+                        } else if (answ_bits==16) {
                             QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint16_t), &ok);
                             //qDebug()<<"READ_16BIT:  "<<ok;
                             if (ok) {
@@ -650,7 +655,7 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
                                     data[i]=d[i];
                                 }
                             }
-                        } else if (sources[camera].answer_bits==32) {
+                        } else if (answ_bits==32) {
                             QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint32_t), &ok);
                             //qDebug()<<"READ_16BIT:  "<<ok;
                             if (ok) {
@@ -659,7 +664,7 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
                                     data[i]=d[i];
                                 }
                             }
-                        } else if (sources[camera].answer_bits==64) {
+                        } else if (answ_bits==64) {
                             QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint64_t), &ok);
                             //qDebug()<<"READ_16BIT:  "<<ok;
                             if (ok) {

@@ -1,7 +1,8 @@
 /*
   Name: tcpipserver.cpp
-  Copyright: (c) 2007-2014
+  Copyright: (c) 2007-2015
   Author: Jan krieger <jan@jkrieger.de>, http://www.jkrieger.de/
+  License: GPL 3.0
 */
 
 #include "tcpipserver.h" // class's header file
@@ -252,8 +253,73 @@ std::string TCPIPserver::read_str_until(int conn, char endchar){
   if (timeout==0) {
     do {
       count = recv(connections[conn].fd, &d, 1, 0);
+      if ((count>0)&&(d!=endchar)) answer+=d;
+    } while ((count > 0)&&(d!=endchar));
+    return answer;
+  }
+
+  start = clock();
+  cpu_time_used=0;
+  do {
+    FD_ZERO(&readfds);
+    FD_SET(connections[conn].fd, &readfds);
+    n=connections[conn].fd+1;
+    tv.tv_sec=timeout;
+    rv=select(n, &readfds, NULL, NULL, &tv);
+    //std::cout<<rv<<std::endl;
+    if (rv==-1) {
+      SEQUENCER_ERROR(SEQUENCER_NETERROR_SELECTFAIL_NUM, __format(get_errormessage(SEQUENCER_NETERROR_SELECTFAIL_NUM), strerror(errno)), "TCPIPserver::read_char()");
+	  return "";
+    } else if (rv==0) {
+      SEQUENCER_ERROR(SEQUENCER_NETERROR_TIMEOUT_NUM, __format(get_errormessage(SEQUENCER_NETERROR_TIMEOUT_NUM), strerror(errno)), "TCPIPserver::read_char()");
+	  return "";
+    } else {
+      if (FD_ISSET(connections[conn].fd, &readfds)) {
+        count=recv(connections[conn].fd, &d, 1, 0);
+      } else {
+	    SEQUENCER_ERROR(SEQUENCER_NETERROR_SELECTFAIL_NUM, __format(get_errormessage(SEQUENCER_NETERROR_SELECTFAIL_NUM), strerror(errno)), "TCPIPserver::read_char()");
+	    return "";
+	  }
+    }
+    if ((count>0)&&(d!=endchar)) answer+=d;
+    cpu_time_used = ((double) (clock() - start)) / CLOCKS_PER_SEC;
+  } while ((count > 0)&&(d!=endchar)&&(cpu_time_used<(double)timeout));
+  if (cpu_time_used<(double)timeout) return answer;
+  SEQUENCER_ERROR(SEQUENCER_NETERROR_TIMEOUT_NUM, __format(get_errormessage(SEQUENCER_NETERROR_TIMEOUT_NUM), strerror(errno)), "TCPIPserver::read_str_until()");
+  return "";
+
+}
+
+std::string TCPIPserver::read_str_until(int conn, const std::string& endstring){
+  if (!connection_exists(conn)) {
+    SEQUENCER_ERRORN(SEQUENCER_NETERROR_CRANGE_NUM, "TCPIPserver::read_str_until()");
+	return "";
+  }
+  clock_t start;//, end;
+  double cpu_time_used;
+  char d;
+  int count=0;
+  std::string answer="";
+  int n, rv;
+  fd_set readfds;
+  struct timeval tv;
+  bool done=false;
+
+  if (timeout==0) {    
+    do {
+      count = recv(connections[conn].fd, &d, 1, 0);
       if ((count>0)&&(d>=32)) answer+=d;
-    } while ((count > 0)&&(d!='\n'));
+	  done=false;
+	  if (answer.size()>=endstring.size()) {
+	    done=true;
+	    for (size_t i=0; i<endstring.size(); i++) {
+		  if (answer[answer.size()-endstring.size()+i]!=endstring[i]) {
+		    done=false;
+			break;
+		  }
+	    }
+      }
+    } while ((count > 0)&&(!done));
     return answer;
   }
 
@@ -281,8 +347,18 @@ std::string TCPIPserver::read_str_until(int conn, char endchar){
 	  }
     }
     if ((count>0)&&(d!='\n')) answer+=d;
+	done=false;
+    if (answer.size()>=endstring.size()) {
+	  done=true;
+	  for (size_t i=0; i<endstring.size(); i++) {
+	    if (answer[answer.size()-endstring.size()+i]!=endstring[i]) {
+  		  done=false;
+		  break;
+	    }
+	  }
+    }
     cpu_time_used = ((double) (clock() - start)) / CLOCKS_PER_SEC;
-  } while ((count > 0)&&(d!='\n')&&(cpu_time_used<(double)timeout));
+  } while ((count > 0)&&(!done)&&(cpu_time_used<(double)timeout));
   if (cpu_time_used<(double)timeout) return answer;
   SEQUENCER_ERROR(SEQUENCER_NETERROR_TIMEOUT_NUM, __format(get_errormessage(SEQUENCER_NETERROR_TIMEOUT_NUM), strerror(errno)), "TCPIPserver::read_str_until()");
   return "";

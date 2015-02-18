@@ -49,6 +49,7 @@
 
 #include "tcpipserver.h"
 
+
 inline double sqr(const double& a) { return a*a; }
 
 /** \brief like sprintf/wrapper around sprintf */
@@ -67,6 +68,85 @@ std::string inttostr(int i) {
     return format("%d", i);
 }
 
+/** \brief convert an bool to a string */
+std::string booltostr(bool i) {
+    if (i) return "true";
+	else return "false";
+}
+
+
+
+
+// global parameters, describing the camera: 
+// 1. non-editable parameters
+const int img_width=128;                            // width of a frame in pixels
+const int img_height=64;                            // height of a frame in pixels
+const float pixelsize=24;                           // pixel size in micrometers
+const char cam_name[]="example_image_server.cpp";   // name of the camera device
+
+// 2. editable parameters:
+float exposure=0.1;                                 // exposure time in seconds
+float image_amplitude=1000.0;                       // amplitude of the artificial rung pattern
+float image_wavelength=5.0;                         // spatial wavelength of the artificial rung pattern
+bool image_decay=false;                             // is there a decay component in the pattern?
+
+/** \brief send the contents and description of all camera parameters to the client */
+void writeParameters(TCPIPserver* server, int connection) {
+		// RETURNS A LIST OF THE AVAILABLE CAMERA PARAMETERS
+		// SEND ANSWER TO CLIENT/QF3
+		//        { (PARAM_FLOAT | PARAM_INT | PARAM_BOOL | PARAM_STRING);<parameter_name>;<parameter_value_as_string>;<parameter_description_as_string>;[<param_range_min>];[<param_range_max>];[(RW|RO)}\n }* \n
+		server->write(connection, format("PARAM_FLOAT;pixel_width;%f;pixel width time in microns;;;RO", pixelsize)); // pixel width is read-only float, unlimited range
+		server->write(connection, format("\nPARAM_FLOAT;pixel_height;%f;pixel height time in microns;;;RO", pixelsize)); // pixel height is read-only float, unlimited range
+		server->write(connection, format("\nPARAM_STRING;camera_name;%s;camera server name;;;RO", cam_name)); // camera server name is read-only string
+		server->write(connection, format("\nPARAM_FLOAT;exposure;%f;exposure time;0;1;RW", exposure)); // camera exposure time is read/write float with range [0..1]
+		server->write(connection, format("\nPARAM_FLOAT;image_amplitude;%f;pattern amplitude;0;10000;RW", exposure)); // pattern amplitude is read/write float with range [0..10000]
+		server->write(connection, format("\nPARAM_FLOAT;image_wavelength;%f;pattern wavelength;0;100;RW", exposure)); // pattern wavelength is read/write float with range [0..100]
+		server->write(connection, format("\nPARAM_BOOL;image_decay;%2;pattern decay;;;RW", booltostr(image_decay).c_str())); // pattern decay component is read/write boolean property
+		server->write(connection, "\nPARAM_BOOL;dummy_device;true;camera is dummy;;;RO"); // a boolean property
+}
+
+/** \brief set an editable parameter to the specified value */
+void setParameter(const std::string& param_name, const std::string& param_value) {
+    if (param_name==std::string("exposure")) {
+	    exposure=atof(param_value.c_str());
+	} else if (param_name==std::string("image_amplitude")) {
+	    image_amplitude=atof(param_value.c_str());
+	} else if (param_name==std::string("image_wavelength")) {
+	    image_wavelength=atof(param_value.c_str());
+	} else if (param_name==std::string("image_decay")) {
+	    image_decay=false;
+		if (param_value==std::string("true")) image_decay=true;
+		else if (param_value==std::string("1")) image_decay=true;
+		else if (param_value==std::string("t")) image_decay=true;
+		else if (param_value==std::string("y")) image_decay=true;
+		else if (param_value==std::string("yes")) image_decay=true;
+	}
+}
+
+/** \brief fill the filed \a frame with data for the time index \a t 
+ *
+ * This function simply generates some test frames with a sinusoidal intensity pattern.
+ */
+void getNextFrame(double time, uint16_t* frame, int img_width, int img_height) {
+	if (image_decay) {
+		for (int y=0; y<img_height; y++) {
+			for (int x=0; x<img_width; x++) {
+			double r=sqrt(sqr(double(x)-double(img_width)/2.0)+sqr(double(y)-double(img_height)/2.0));
+				frame[y*img_width+x]=(1.0+sin(r/image_wavelength*M_PI+time/20.0*M_PI))*image_amplitude;
+			}
+		}
+	} else {
+		for (int y=0; y<img_height; y++) {
+			for (int x=0; x<img_width; x++) {
+			double r=sqrt(sqr(double(x)-double(img_width)/2.0)+sqr(double(y)-double(img_height)/2.0));
+				frame[y*img_width+x]=(1.0+sin(r/image_wavelength*M_PI+time/20.0*M_PI))*image_amplitude*exp(-r/64.0);
+			}
+		}
+	}
+}
+
+
+
 /** \brief wrapper around printf, which also outputs the current date/time (useful for LOG outputs) */
 void printfMessage(std::string templ, ...){
     va_list ap;
@@ -84,18 +164,6 @@ void printfMessage(std::string templ, ...){
     printf("   %s: %s", buffert, buffer);
 };
 
-/** \brief fill the filed \a frame with data for the time index \a t 
- *
- * This function simply generates some test frames with a sinusoidal intensity pattern.
- */
-void getNextFrame(double time, uint16_t* frame, int img_width, int img_height) {
-    for (int y=0; y<img_height; y++) {
-        for (int x=0; x<img_width; x++) {
-        double r=sqrt(sqr(double(x)-double(img_width)/2.0)+sqr(double(y)-double(img_height)/2.0));
-            frame[y*img_width+x]=(1.0+sin(r/5.0*M_PI+time/20.0*M_PI))*1000.0;
-        }
-    }
-}
 
 int main (void) {
     // HELLO HERE I AM
@@ -116,12 +184,8 @@ int main (void) {
     /////////////////////////////////////////////////////////////////////////////
     bool cam_connected=false;
     bool cam_liveview=false;
-    int img_width=128;
-    int img_height=64;
-    float exposure=0.1;
     uint16_t* frame=(uint16_t*)malloc(img_width*img_height*sizeof(uint16_t));
     int img_byte_size=img_width*img_height*sizeof(uint16_t);
-    int img_size=img_width*img_height;
     double t=0;
     getNextFrame(t, frame, img_width, img_height);
     
@@ -210,14 +274,42 @@ int main (void) {
 					
 					
                     printfMessage("GET EXPOSURE TIME!\n");
+                } else if (instruction=="PARAMETERS_GET") {
+				
+				    // RETURNS A LIST OF THE AVAILABLE CAMERA PARAMETERS
+                    // SEND ANSWER TO CLIENT/QF3
+					//        { (PARAM_FLOAT | PARAM_INT | PARAM_BOOL | PARAM_STRING);<parameter_name>;<parameter_value_as_string>;<parameter_description_as_string>;[<param_range_min>];[<param_range_max>];[(RW|RO)}\n }* \n
+					writeParameters(server, connection);
+                    server->write(connection, "\n\n");
+					
+					
+                    printfMessage("GET CAMERA PARAMETERS!\n");
+                } else if (instruction=="PARAMETERS_SET") {
+				
+				    // SET A SINGLE IMAGE PARAMETER
+                    //   instruction has the form PARAMETERS_SET\n<name>;<value>\n\n
+					std::string param_name=server->read_str_until(connection, ';');
+					std::string param_value=server->read_str_until(connection, "\n\n");
+					setParameter(param_name, param_value);
+					
+					
+                    printfMessage("SET CAMERA PARAMETERS (%s = %s)!\n", param_name.c_str(), param_value.c_str());
                 } else if (instruction=="IMAGE_NEXT_GET") {
 				
 				    // GET A NEW FRAME AND SEND IT TO THE CLIENT
                     t++;
                     getNextFrame(t, frame, img_width, img_height);
-                    // SEND ANSWER (METADATA+FRAME) TO CLIENT/QF3
-                    server->write(connection, format("IMAGE\n%d\n%d\n%f\n", img_width, img_height, exposure));
+                    // SEND ANSWER TO CLIENT/QF3:
+					//   1. (IMAGE8 | IMAGE16 | IMAGE32 | IMAGE64) \n
+					//   2. <image_width_in_pixels>\n
+					//   3. <image_height_in_pixels>\n
+					//   4. <exposure_time_in_seconds>\n
+					//   5. <image raw data of size image_width_in_pixels*image_height_in_pixels*pixel_data_size>
+					//   6. METADATA RECORDS, DESCRIBING THE IMAGE: (from writeParameters())
+					//        { (PARAM_FLOAT | PARAM_INT | PARAM_BOOL | PARAM_STRING);<parameter_name>;<parameter_value_as_string>[;<parameter_description_as_string>]\n }* \n
+                    server->write(connection, format("IMAGE%d\n%d\n%d\n%f\n", int(sizeof(frame[0])*8), img_width, img_height, exposure));
                     server->write(connection, (char*)frame, img_byte_size);
+					writeParameters(server, connection);
                     server->write(connection, "\n\n");
 					
 					

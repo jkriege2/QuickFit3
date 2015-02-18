@@ -1,7 +1,8 @@
 /*
   Name: tcpipserver.h
-  Copyright: (c) 2007
+  Copyright: (c) 2007-2015
   Author: Jan krieger <jan@jkrieger.de>, http://www.jkrieger.de/
+  License: GPL 3.0
 */
 /**
  * \ingroup network
@@ -173,63 +174,69 @@ class TCPIPserver {
      * <a href="http://www.developerweb.net/forum/showthread.php?t=2935">forum post</a> .
      */
     int get_socket_status(int sock, int to_secs, int to_msecs) ;
-	public:
-		/** \brief class constructor this also starts WinSock in Windows systems (see class description for details). */
-		TCPIPserver();
-		/** \brief class destructor */
-		~TCPIPserver();
-		
-		/** set the TCP/IP port number this component is listening to. Standard port is \c 48888. */
-		SetMacro(int, port);
-		/** \brief return the TCP/IP port number this component is listening to */
-		GetMacro(int, port);
+    public:
+        /** \brief class constructor this also starts WinSock in Windows systems (see class description for details). */
+        TCPIPserver();
+        /** \brief class destructor */
+        virtual ~TCPIPserver();
+        
+        /** set the TCP/IP port number this component is listening to. Standard port is \c 48888. */
+        SetMacro(int, port);
+        /** \brief return the TCP/IP port number this component is listening to */
+        GetMacro(int, port);
 
-		/** set the size of one chunk of data that should be sent. Default is \c 256 Bytes. */
-		SetMacro(int, chunksize);
-		/** \brief get the size of one chunk of data that should be sent */
-		GetMacro(int, chunksize);
+        /** set the size of one chunk of data that should be sent. Default is \c 256 Bytes. */
+        SetMacro(int, chunksize);
+        /** \brief get the size of one chunk of data that should be sent */
+        GetMacro(int, chunksize);
 
-		/** \brief return the backlog property.*/
-		SetMacro(int, backlog);
-		/** \brief set the backlog property, which sepcifies the number of pending connections allowed.*/
-	 	GetMacro(int, backlog);
+        /** \brief return the backlog property.*/
+        SetMacro(int, backlog);
+        /** \brief set the backlog property, which sepcifies the number of pending connections allowed.*/
+         GetMacro(int, backlog);
 
-		/** \brief start the socket and bind to it. */
-		void open_socket();
+        /** \brief start the socket and bind to it. */
+        void open_socket();
 
-		/** \brief close the socket and clean up */
-		void close_socket();
+        /** \brief close the socket and clean up */
+        void close_socket();
 
-		/** \brief accept the current connection. This method waits/blocks until there is an acceptable connection. 
+        /** \brief accept the current connection. This method waits/blocks until there is an acceptable connection. 
      * Returns an integer that represents the connection and is needed for subsequent calls of read and write. 
      */
-		virtual int accept_connection();
-		
+        virtual int accept_connection();
+        
     /** \brief check whether there is an entry in \c connections for the given integer */
     virtual bool connection_exists(int conn);
     
     /** \brief check whether the client is still online and data can be sent */
     virtual bool is_online(int conn);
 
-		/** \brief close the current connection */
-		virtual void close_connection(int conn);
+        /** \brief close the current connection */
+        virtual void close_connection(int conn);
 
-		/** \brief read some data. returns the number of bytes read*/
-		virtual int read(int conn, char* buffer, size_t len);
-		
+        /** \brief read some data. returns the number of bytes read*/
+        virtual int read(int conn, char* buffer, size_t len);
+        
     /** \brief read one character from the connection. waits for \c timeout seconds until it returns 
      * with an error if it could not receive a char. If \c timeout=0 then it waits for an indefinite time. 
      */
-		virtual char read_char(int conn);
+        virtual char read_char(int conn);
 
     /** \brief read characters from the connection until the character \c endchar was received. Waits for 
      * timeout seconds until it returns with an error if it could not receive the \c endchar. If \c timeout=0 
      * then it waits for an indefinite time. 
      */
-		virtual std::string read_str_until(int conn, char endchar);
+        virtual std::string read_str_until(int conn, char endchar);
+        
+    /** \brief read characters from the connection until the characters \c endstring were received. Waits for 
+     * timeout seconds until it returns with an error if it could not receive the \c endstring. If \c timeout=0 
+     * then it waits for an indefinite time. 
+     */
+        virtual std::string read_str_until(int conn, const std::string& endstring);
 
-		/** \brief write some data. 
-		 *
+        /** \brief write some data. 
+         *
      * This method makes sure that all data is really sent and may therefore break up the data into smaller peaces. 
      * See <a href="http://www.beej.us/guide/bgnet/">Beej's Guide to Network Programming</a> (chapter 6.3, method 
      * \c sendall() ) for details. This method breaks up the data in buffer into packet with the size chunksize
@@ -244,20 +251,20 @@ class TCPIPserver {
      * SEQUENCER_NETERROR_TIMEOUT_NUM exception. If \c timeout=0 This method will not use any timeout behaviour
      * and simply send the data or exit with an exception if any error occured (client not ready or so).
      */
-		virtual void write(int conn, char* buffer, size_t len);
+        virtual void write(int conn, char* buffer, size_t len);
 
-		/** \brief write a string */
-		virtual void write(int conn, std::string data);
+        /** \brief write a string */
+        virtual void write(int conn, std::string data);
 
-		/** \brief returns the client adress/name */
-		std::string get_client_name(int conn);
-		
-		/** \brief return version information about winsock32 on windows systems 
+        /** \brief returns the client adress/name */
+        std::string get_client_name(int conn);
+        
+        /** \brief return version information about winsock32 on windows systems 
      *
      * On windows systems this returns some etries of the WSADATA record written by WSAStartup(). You can find
      * more information about this in <a href="http://msdn2.microsoft.com/en-us/library/ms742213.aspx">MSDN</a>.
      */
-		virtual std::string get_version();
+        virtual std::string get_version();
 };
 
 
