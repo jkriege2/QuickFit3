@@ -12,7 +12,8 @@ Debug: CC += -DDEBUG -g
 
 EXECUTABLE=example_image_server
 SRC_FILE= tcpipserver.cpp \
-          example_image_server.cpp
+          example_image_server.cpp \
+		  tinytiffwriter.cpp
 
 
 SRC_FILE_O = $(subst .cpp,.o,$(SRC_FILE))
