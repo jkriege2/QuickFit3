@@ -9,6 +9,16 @@
 	
     This program will send frames with an artificial sinusoideal pattern, but you 
 	can	use it as a starting point for implementing your own camera server.
+	
+	It implements the LIVE-VIEW mode and teh ACQUISITION mode:
+	  - LIVE_VIEW: After starting the live-view mode, the client may poll single 
+	    frames with the instruction IMAGE_NEXT_GET. Typically you should initialize
+		the camera in the instruction LIVE_START. On every call of IMAGE_NEXT_GET
+		you should then read a NEW frame and send it back to the client.
+	  - ACQUISITION: Here the client tells the server to acquire a given number
+	    of frames and save them to harddisk. The server the only returns a path
+		to the created file. This can be used for the fast streaming modes of
+		your camera.
 
 
     based on examples from the libc documentation:
@@ -20,7 +30,7 @@
 #define PORT    51234
 
 
-
+#include <stdint.h>
 #include <stdio.h>
 #include <errno.h>
 #include <stdlib.h>
@@ -140,7 +150,7 @@ int main (void) {
                     // CONNCET TO CAMERA
                     cam_connected=true;
                     // SEND ANSWER TO CLIENT/QF3
-                    server->write(connection, std::string("DONE_CONNECT\n"));
+                    server->write(connection, std::string("ACK_CONNECT\n\n"));
                     // DONE CONNCETING TO CAMERA
                     
                     
@@ -151,7 +161,7 @@ int main (void) {
                     // DISCONNCET FROM CAMERA
                     cam_connected=false;
                     // SEND ANSWER TO CLIENT/QF3
-                    server->write(connection, std::string("DONE_DISCONNECT\n"));
+                    server->write(connection, std::string("ACK_DISCONNECT\n\n"));
                     // DONE DISCONNCETING FROM CAMERA
 
 
@@ -159,43 +169,62 @@ int main (void) {
                 } else if (instruction=="LIVE_START") {
 				
 				    // START THE LIVE_VIEW MODE
+					// INIT/CONFIG CAMERA for LIVE-VIEW
                     cam_liveview=false;
                     // SEND ANSWER TO CLIENT/QF3
-                    server->write(connection, std::string("DONE_LIVE_START\n"));
+                    server->write(connection, std::string("ACK_LIVE_START\n\n"));
 				    // DONE STARTING THE LIVE_VIEW MODE
 
 
                     printfMessage("LIVE VIEW STARTED!\n");
                 } else if (instruction=="LIVE_STOP") {
+				
+				    // STOP THE LIVE-VIEW MODE
                     cam_liveview=false;
                     // SEND ANSWER TO CLIENT/QF3
-                    server->write(connection, std::string("DONE_LIVE_STOP\n"));
+                    server->write(connection, std::string("ACK_LIVE_STOP\n\n"));
+					
+					
                     printfMessage("LIVE VIEW STOPED!\n");
                 } else if (instruction=="SIZE_X_GET") {
-                    cam_liveview=false;
+				
+				    // RETURNS THE width OF A FRAME IN LIVE_VIEW MODE
                     // SEND ANSWER TO CLIENT/QF3
-                    server->write(connection, format("%d\n", img_width));
+                    server->write(connection, format("%d\n\n", img_width));
+					
+					
                     printfMessage("GET FRAME WIDTH!\n");
                 } else if (instruction=="SIZE_Y_GET") {
-                    cam_liveview=false;
+				
+				    // RETURNS THE height OF A FRAME IN LIVE_VIEW MODE
                     // SEND ANSWER TO CLIENT/QF3
-                    server->write(connection, format("%d\n", img_height));
+                    server->write(connection, format("%d\n\n", img_height));
+					
+					
                     printfMessage("GET FRAME HEIGHT!\n");
                 } else if (instruction=="GET_EXPOSURE") {
-                    cam_liveview=false;
+				
+				    // RETURNS THE exposure time [seconds] OF A FRAME IN LIVE_VIEW MODE
                     // SEND ANSWER TO CLIENT/QF3
-                    server->write(connection, format("%f\n", exposure));
+                    server->write(connection, format("%f\n\n", exposure));
+					
+					
                     printfMessage("GET EXPOSURE TIME!\n");
                 } else if (instruction=="IMAGE_NEXT_GET") {
-                    cam_liveview=false;
+				
+				    // GET A NEW FRAME AND SEND IT TO THE CLIENT
                     t++;
                     getNextFrame(t, frame, img_width, img_height);
                     // SEND ANSWER (METADATA+FRAME) TO CLIENT/QF3
                     server->write(connection, format("IMAGE\n%d\n%d\n%f\n", img_width, img_height, exposure));
                     server->write(connection, (char*)frame, img_byte_size);
                     server->write(connection, "\n\n");
+					
+					
                     printfMessage("GET FRAME! t=%lf\n", t);
                 } else if (instruction=="RECORD") {
+				
+				    // START AN ACQUISITION AND SAVE DATA TO A FILE WITH THE BASENAME filename
                     std::string filename=server->read_str_until(connection, '\n');
                     // SEND ANSWER TO CLIENT/QF3
                     server->write(connection, "ACK_RECORD\n");
@@ -215,7 +244,7 @@ int main (void) {
                     printf("\n");
 
                     // SEND ANSWER TO CLIENT/QF3
-                    server->write(connection, "DONE_RECORD\n\n");
+                    server->write(connection, "ACK_RECORD\n\n");
                     printfMessage("RECORD FRAME DONE!");
                 } else {
                     // PRINT ERROR MESSAGE AND IGNORE UNKNOWN INSTRUCTION

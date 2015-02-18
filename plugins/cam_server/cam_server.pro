@@ -53,4 +53,10 @@ INCLUDEPATH += ../../lib/ \
 include(../../quickfit3_configqtwidgets.pri)
 
 
+EXAMPLESTINYTIFF_FILES.files = ../../../../../LIB/trunk/tinytiff*.*
+EXAMPLESTINYTIFF_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/
+
+
+INSTALLS += EXAMPLESTINYTIFF_FILES
+
 
