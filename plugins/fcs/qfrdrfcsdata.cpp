@@ -1073,7 +1073,7 @@ bool QFRDRFCSData::loadFromALV5000Files(QStringList filenames) {
                                 if (i==0) setQFPropertyIfNotUserEditable(propN, propV, false, true);
                                 else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
                             } else if (name.contains("Angle",  Qt::CaseInsensitive)) {
-                                QString propN="ANGLE [�]";
+                                QString propN=QLatin1String("ANGLE [\xB0]");
                                 double propV=data[i].token.doubleValue;
                                 if (i==0) setQFPropertyIfNotUserEditable(propN, propV, false, true);
                                 else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
@@ -1508,7 +1508,7 @@ bool QFRDRFCSData::loadFromALV6000Files(QStringList filenames) {
                                 if (i==0) setQFPropertyIfNotUserEditable(propN, propV, false, true);
                                 else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
                             } else if (name.contains("Angle",  Qt::CaseInsensitive)) {
-                                QString propN="ANGLE [�]";
+                                QString propN=QLatin1String("ANGLE [\xB0]");
                                 double propV=data[i].token.doubleValue;
                                 if (i==0) setQFPropertyIfNotUserEditable(propN, propV, false, true);
                                 else if (propV!=getProperty(propN).toDouble()) log_warning(tr("warning in file '%1': value of property '%4' in file (%2) does not match property value of other files (%3).\n").arg(filenames[i]).arg(getProperty(propN).toString()).arg(propV).arg(propN));
@@ -1916,7 +1916,7 @@ bool QFRDRFCSData::loadFromALV7000File(QString &filename)
                             double propV=data.token.doubleValue;
                             setQFPropertyIfNotUserEditable(propN, propV, false, true);
                         } else if (name.contains("Angle",  Qt::CaseInsensitive)) {
-                            QString propN="ANGLE [�]";
+                            QString propN=QLatin1String("ANGLE [\xB0]");
                             double propV=data.token.doubleValue;
                             setQFPropertyIfNotUserEditable(propN, propV, false, true);
                         } else if (name.contains("MeanCR",  Qt::CaseInsensitive)) {
@@ -2024,9 +2024,11 @@ bool QFRDRFCSData::loadFromALV7000File(QString &filename)
                 QVector<double> d=data.dat_rate.value(i, QVector<double>());
                 rateT[i]=d.value(0, 0.0);
                 for (int r=0; r<rateRuns; r++) {
-                    for (int cha=0; cha<rateChannels; cha++) {
-                        rate[cha*rateN*rateRuns+r*rateN+i]=d[1+cha];
-                        // TODO: CHECK how the layout is for several runs in one file!!!
+                    if (r==rateRuns-1) {
+                        for (int cha=0; cha<rateChannels; cha++) {
+                            rate[cha*rateN*rateRuns+r*rateN+i]=d.value(1+cha, 0.0);
+                            // TODO: CHECK how the layout is for several runs in one file!!!
+                        }
                     }
                 }
             }

@@ -64,6 +64,8 @@ class QFRDRTablePlotSettingsWidget : public QWidget
         void connectWidgets();
         void disconnectWidgets();
 
+        void rereadCurrentData();
+
     signals:
         void plotTitleChanged(int plot, QString title);
         void updateGraph();

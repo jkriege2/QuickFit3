@@ -438,6 +438,9 @@
             <li>added functions to the internal expression parser, which allow for access to the FCS raw data (correlation curves and count-rate traces/averages)</li>
             <li>added cross-correlation (2-color FCCS) overlay plot with cross-talk-corrected correlation amplitudes</li>
             <li>added data export to arbitrary table-oriented data format</li>
+            <li>count rate statistics in the countrate RDR editor is now displayed in a real table widget</li>
+            <li>the countrate RDR editor omits all runs with countrate all 0 now (this often happens for ALV-data, since ALV only saves the countrate from the last run)</li>
+            <li>the "filter CFs for outliers" function now accepts a lag-time range in seconds</li>
       </ul></li>
       <li><b>imFCS Fit</b><ul>
             <li>fit parameter names are more expressive now</li>

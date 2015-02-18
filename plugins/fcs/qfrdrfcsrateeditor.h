@@ -34,7 +34,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QAbstractTableModel>
 #include "qvisiblehandlesplitter.h"
 #include "qfcorrelationmasktools.h"
-
+#include "qftablemodel.h"
+#include "qenhancedtableview.h"
+#include "qfhtmldelegate.h"
 // forward declaration
 class QFRDRFCSData;
 
@@ -99,7 +101,7 @@ class QFRDRFCSRateEditor : public QFRawDataEditor {
          * \return the contribution of this to the statistics label (i.e. a string containing
          *         HTML formatted rows for this table.
          */
-        QString plotItem(QFRDRFCSData* m);
+        QString plotItem(QFRDRFCSData* m, QList<QVariant> *statData);
 
         /** \brief plotter widget for the count rate curve */
         QFPlotter* plotter;
@@ -133,6 +135,9 @@ class QFRDRFCSRateEditor : public QFRawDataEditor {
         QCheckBox* chkIncludeRate0;
         /** \brief acivate overlay of other raw data records data */
         QCheckBox* chkOverlay;
+
+        QEnhancedTableView* tabStatistics;
+        QFTableModel statisticsModel;
 
     private:
 };

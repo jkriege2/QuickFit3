@@ -481,7 +481,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_8">
+       <widget class="QSpinBox" name="spinPlotTransparent">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -703,7 +703,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QSpinBox" name="spinBox_7">
+       <widget class="QSpinBox" name="spinFillTransparent">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -964,7 +964,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QSpinBox" name="spinBox_4">
+         <widget class="QSpinBox" name="spinErrorTransparent">
           <property name="enabled">
            <bool>true</bool>
           </property>
@@ -1237,7 +1237,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_9">
+          <widget class="QSpinBox" name="spinImageFalseColor">
            <property name="enabled">
             <bool>true</bool>
            </property>
@@ -1313,7 +1313,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QSpinBox" name="spinBox_10">
+          <widget class="QSpinBox" name="spinImageTrueColor">
            <property name="enabled">
             <bool>true</bool>
            </property>
@@ -2234,7 +2234,7 @@
        </widget>
       </item>
       <item row="1" column="5">
-       <widget class="QSpinBox" name="spinBox_5">
+       <widget class="QSpinBox" name="spinRangeCenterTransparency">
         <property name="enabled">
          <bool>true</bool>
         </property>
@@ -3409,14 +3409,14 @@
   <tabstop>edtRangeCenter</tabstop>
   <tabstop>cmbLineColor</tabstop>
   <tabstop>sliderPlotTransparent</tabstop>
-  <tabstop>spinBox_8</tabstop>
+  <tabstop>spinPlotTransparent</tabstop>
   <tabstop>chkDrawLine</tabstop>
   <tabstop>spinLineWidth</tabstop>
   <tabstop>cmbLineStyle</tabstop>
   <tabstop>cmbFillColor</tabstop>
   <tabstop>chkFillColAuto</tabstop>
   <tabstop>sliderFillTransparent</tabstop>
-  <tabstop>spinBox_7</tabstop>
+  <tabstop>spinFillTransparent</tabstop>
   <tabstop>cmbFillStyle</tabstop>
   <tabstop>cmbSymbol</tabstop>
   <tabstop>spinSymbolSize</tabstop>
@@ -3429,7 +3429,7 @@
   <tabstop>cmbErrorColor</tabstop>
   <tabstop>chkErrorColAuto</tabstop>
   <tabstop>sliderErrorTransparent</tabstop>
-  <tabstop>spinBox_4</tabstop>
+  <tabstop>spinErrorTransparent</tabstop>
   <tabstop>spinErrorLineWidth</tabstop>
   <tabstop>spinErrorBarWidth</tabstop>
   <tabstop>cmbErrorLineStyle</tabstop>
@@ -3442,10 +3442,10 @@
   <tabstop>edtColorbarLabelMod</tabstop>
   <tabstop>cmbImageTrueColor</tabstop>
   <tabstop>sliderImageTrueColor</tabstop>
-  <tabstop>spinBox_10</tabstop>
+  <tabstop>spinImageTrueColor</tabstop>
   <tabstop>cmbImageFalseColor</tabstop>
   <tabstop>sliderImageFalseColor</tabstop>
-  <tabstop>spinBox_9</tabstop>
+  <tabstop>spinImageFalseColor</tabstop>
   <tabstop>edtImageWidth</tabstop>
   <tabstop>edtImageHeight</tabstop>
   <tabstop>edtImageX</tabstop>
@@ -3470,7 +3470,7 @@
   <tabstop>cmbRangeCenterColor</tabstop>
   <tabstop>chkCenterColAuto</tabstop>
   <tabstop>sliderRangeCenterTransparency</tabstop>
-  <tabstop>spinBox_5</tabstop>
+  <tabstop>spinRangeCenterTransparency</tabstop>
   <tabstop>cmbRangeCenterStyle</tabstop>
   <tabstop>spinRangeCenterWidth</tabstop>
   <tabstop>btnRefit</tabstop>
@@ -3478,11 +3478,11 @@
  </tabstops>
  <resources>
   <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
+  <include location="../../lib/lib.qrc"/>
   <include location="qfrdrtable.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
-  <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
   <include location="../../lib/lib.qrc"/>
  </resources>
@@ -3490,7 +3490,7 @@
   <connection>
    <sender>sliderPlotTransparent</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>spinBox_8</receiver>
+   <receiver>spinPlotTransparent</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -3506,7 +3506,7 @@
   <connection>
    <sender>sliderFillTransparent</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>spinBox_7</receiver>
+   <receiver>spinFillTransparent</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -3522,7 +3522,7 @@
   <connection>
    <sender>sliderErrorTransparent</sender>
    <signal>sliderMoved(int)</signal>
-   <receiver>spinBox_4</receiver>
+   <receiver>spinErrorTransparent</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -3600,7 +3600,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_8</sender>
+   <sender>spinPlotTransparent</sender>
    <signal>valueChanged(int)</signal>
    <receiver>sliderPlotTransparent</receiver>
    <slot>setValue(int)</slot>
@@ -3616,7 +3616,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_7</sender>
+   <sender>spinFillTransparent</sender>
    <signal>valueChanged(int)</signal>
    <receiver>sliderFillTransparent</receiver>
    <slot>setValue(int)</slot>
@@ -3632,7 +3632,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_4</sender>
+   <sender>spinErrorTransparent</sender>
    <signal>valueChanged(int)</signal>
    <receiver>sliderErrorTransparent</receiver>
    <slot>setValue(int)</slot>
@@ -3650,7 +3650,7 @@
   <connection>
    <sender>sliderImageTrueColor</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>spinBox_10</receiver>
+   <receiver>spinImageTrueColor</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -3666,7 +3666,7 @@
   <connection>
    <sender>sliderImageFalseColor</sender>
    <signal>valueChanged(int)</signal>
-   <receiver>spinBox_9</receiver>
+   <receiver>spinImageFalseColor</receiver>
    <slot>setValue(int)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -3680,7 +3680,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_10</sender>
+   <sender>spinImageTrueColor</sender>
    <signal>valueChanged(int)</signal>
    <receiver>sliderImageTrueColor</receiver>
    <slot>setValue(int)</slot>
@@ -3696,7 +3696,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>spinBox_9</sender>
+   <sender>spinImageFalseColor</sender>
    <signal>valueChanged(int)</signal>
    <receiver>sliderImageFalseColor</receiver>
    <slot>setValue(int)</slot>

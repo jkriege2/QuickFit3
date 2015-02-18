@@ -428,12 +428,18 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->spinSymbolLineWidth->setValue(graph.symbolLineWidth);
     ui->chkDrawLine->setChecked(graph.drawLine);
     ui->sliderPlotTransparent->setValue(graph.colorTransparent*255.0);
+    ui->spinPlotTransparent->setValue(ui->sliderPlotTransparent->value());
+
     ui->sliderErrorTransparent->setValue(graph.errorColorTransparent*255.0);
+    ui->spinErrorTransparent->setValue(ui->sliderErrorTransparent->value());
     ui->sliderFillTransparent->setValue(graph.fillColorTransparent*255.0);
+    ui->spinFillTransparent->setValue(ui->sliderFillTransparent->value());
     ui->cmbImageFalseColor->setCurrentColor(graph.imageFalseColor);
     ui->sliderImageFalseColor->setValue(graph.imageFalseTransparent*255.0);
+    ui->spinImageFalseColor->setValue(ui->sliderImageFalseColor->value());
     ui->cmbImageTrueColor->setCurrentColor(graph.imageTrueColor);
     ui->sliderImageTrueColor->setValue(graph.imageTrueTransparent*255.0);
+    ui->spinImageTrueColor->setValue(ui->sliderImageTrueColor->value());
     ui->edtImageHeight->setValue(graph.imageHeight);
     ui->edtImageWidth->setValue(graph.imageWidth);
     ui->edtImageMax->setValue(graph.imageMax);
@@ -525,6 +531,7 @@ void QFTableGraphSettings::loadGraphData(const QFRDRTable::GraphInfo &graph)
     ui->spinRangeCenterWidth->setValue(graph.rangeCenterWidth);
     ui->cmbRangeCenterColor->setCurrentColor(graph.rangeCenterColor);
     ui->sliderRangeCenterTransparency->setValue(graph.rangeCenterColorTransparent*255.0);
+    ui->spinRangeCenterTransparency->setValue(ui->sliderRangeCenterTransparency->value());
     ui->cmbRangeCenterStyle->setCurrentLineStyle(graph.rangeCenterStyle);
     ui->chkRangeFillRange->setChecked(graph.rangeFill);
     ui->chkRangeInverted->setChecked(graph.rangeInverted);

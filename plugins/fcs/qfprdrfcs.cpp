@@ -320,7 +320,7 @@ void QFPRDRFCS::insertALV7000File(const QStringList& filename, const QMap<QStrin
                 d.columns.append(i+1);
             } else {
                 for (unsigned int r=0; r<runCount; r++) {
-                    d.columns.append(1+i*(runCount+1)+r);
+                    d.columns.append(1+i*(runCount+1)+r+1);
                 }
             }
             for (int i=d.columns.size()-1; i>=0; i--) {
@@ -340,6 +340,7 @@ void QFPRDRFCS::insertALV7000File(const QStringList& filename, const QMap<QStrin
             d.role=(QString("FCCS"));
             if (d.channel>0) d.role=(QString("FCCS%10").arg(d.channel));
             d.columns.clear();
+
             if (runCount==1) {
                 if (autocorrelation) {
                     d.columns.append(i+channelCount+1);
@@ -348,7 +349,7 @@ void QFPRDRFCS::insertALV7000File(const QStringList& filename, const QMap<QStrin
                 }
             } else {
                 for (unsigned int r=0; r<runCount; r++) {
-                    d.columns.append(1+channelCount*(runCount+1)+i*(runCount+1)+r);
+                    d.columns.append(1+channelCount*(runCount+1)+i*(runCount+1)+r+1);
                 }
             }
             for (int i=d.columns.size()-1; i>=0; i--) {

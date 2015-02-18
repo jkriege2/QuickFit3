@@ -53,16 +53,16 @@ void QFFindErroneousCorrelationDlg::init(QFRDRRunSelectionsInterface *runselecti
         }
     }
 
-    ui->spinLagMin->setRange(0, fcs->getCorrelationN());
+    /*ui->spinLagMin->setRange(0, fcs->getCorrelationN());
     ui->spinLagMax->setRange(0, fcs->getCorrelationN());
     ui->spinLagMin->setValue(5);
-    ui->spinLagMax->setValue(10);
+    ui->spinLagMax->setValue(10);*/
 
     ui->chkClearMask->setChecked(ProgramOptions::getConfigValue("QFFindErroneousCorrelationDlg/chkClearMask", false).toBool());
     ui->spinHighQuantile->setValue(100-ProgramOptions::getConfigValue("QFFindErroneousCorrelationDlg/spinHighQuantile", 95).toDouble());
     ui->spinLowQuantile->setValue(ProgramOptions::getConfigValue("QFFindErroneousCorrelationDlg/spinLowQuantile", 5).toDouble());
-    ui->spinLagMax->setValue(ProgramOptions::getConfigValue("QFFindErroneousCorrelationDlg/spinLagMax", 10).toInt());
-    ui->spinLagMin->setValue(ProgramOptions::getConfigValue("QFFindErroneousCorrelationDlg/spinLagMin", 5).toInt());
+    ui->spinLagMax->setValue(ProgramOptions::getConfigValue("QFFindErroneousCorrelationDlg/spinLagMax", 15).toDouble());
+    ui->spinLagMin->setValue(ProgramOptions::getConfigValue("QFFindErroneousCorrelationDlg/spinLagMin", 5).toDouble());
 
 }
 
@@ -86,24 +86,24 @@ bool QFFindErroneousCorrelationDlg::doClearOldMask() const
     return ui->chkClearMask->isChecked();
 }
 
-void QFFindErroneousCorrelationDlg::on_spinLagMin_valueChanged(int value)
+void QFFindErroneousCorrelationDlg::on_spinLagMin_editingFinished()
 {
     performCalc();
-    ui->spinLagMax->setMinimum(value);
+    //ui->spinLagMax->setMinimum(value);
 }
 
-void QFFindErroneousCorrelationDlg::on_spinLagMax_valueChanged(int value)
+void QFFindErroneousCorrelationDlg::on_spinLagMax_editingFinished()
 {
     performCalc();
-    ui->spinLagMin->setMaximum(value);
+    //ui->spinLagMin->setMaximum(value);
 }
 
-void QFFindErroneousCorrelationDlg::on_spinHighQuantile_valueChanged(double value)
+void QFFindErroneousCorrelationDlg::on_spinHighQuantile_editingFinished()
 {
     performCalc();
 }
 
-void QFFindErroneousCorrelationDlg::on_spinLowQuantile_valueChanged(double value)
+void QFFindErroneousCorrelationDlg::on_spinLowQuantile_editingFinished()
 {
     performCalc();
 }
@@ -116,16 +116,21 @@ void QFFindErroneousCorrelationDlg::performCalc()
         int l1=ui->spinLagMax->value();
         double* T=fcs->getCorrelationT();
 
-        ui->labLagTimes->setText(tr("&tau;<sub>min</sub> ... &tau;<sub>max</sub> = %1s ... %2s").arg(doubleToUnitString(T[l0],5,true,'.',true)).arg(doubleToUnitString(T[l1],5,true,'.',true)));
+        ui->labLagTimes->clear();
+        //ui->labLagTimes->setText(tr("&tau;<sub>min</sub> ... &tau;<sub>max</sub> = %1s ... %2s").arg(doubleToUnitString(T[l0],5,true,'.',true)).arg(doubleToUnitString(T[l1],5,true,'.',true)));
 
         QVector<double> data;
         for (int i=0; i<fcs->getCorrelationRuns(); i++) {
             double value=0;
             double* ccf=fcs->getCorrelationRun(i);
-            for (int l=l0; l<=l1; l++) {
-                value+=ccf[l];
+            double cnt=0;
+            for (int l=0; l<=fcs->getCorrelationN(); l++) {
+                if (T[l]>=ui->spinLagMin->value()*1e-6 && T[l]<=ui->spinLagMax->value()*1e-6) {
+                    value+=ccf[l];
+                    cnt++;
+                }
             }
-            data<<value/double(l1-l1+1);
+            data<<value/cnt;
         }
         double ql=qfstatisticsQuantile(data, ui->spinLowQuantile->value()/100.0);
         double qh=qfstatisticsQuantile(data, (100.0-ui->spinHighQuantile->value())/100.0);

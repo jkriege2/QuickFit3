@@ -58,10 +58,10 @@ class QFFindErroneousCorrelationDlg : public QDialog
 
     protected slots:
         void performCalc();
-        void on_spinLagMin_valueChanged(int value);
-        void on_spinLagMax_valueChanged(int value);
-        void on_spinHighQuantile_valueChanged(double value);
-        void on_spinLowQuantile_valueChanged(double value);
+        void on_spinLagMin_editingFinished();
+        void on_spinLagMax_editingFinished();
+        void on_spinHighQuantile_editingFinished();
+        void on_spinLowQuantile_editingFinished();
 };
 
 #endif // QFFINDERRONEOUSCORRELATIONDLG_H

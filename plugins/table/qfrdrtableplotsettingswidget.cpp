@@ -429,6 +429,11 @@ void QFRDRTablePlotSettingsWidget::disconnectWidgets()
 
 }
 
+void QFRDRTablePlotSettingsWidget::rereadCurrentData()
+{
+    setRecord(current, plot);
+}
+
 
 void QFRDRTablePlotSettingsWidget::on_btnSaveSystem_clicked() {
     if (!current) return;
@@ -536,6 +541,7 @@ void QFRDRTablePlotSettingsWidget::on_btnLoadSystem_clicked() {
                      te = te.nextSiblingElement("plot");
                  }
              }
+             rereadCurrentData();
              emit plotSettingsChanged();
         }
 
@@ -582,6 +588,8 @@ void QFRDRTablePlotSettingsWidget::on_btnPasteSystem_clicked()
             }
         }
     }
+    rereadCurrentData();
+    emit plotSettingsChanged();
 }
 
 void QFRDRTablePlotSettingsWidget::on_btnAutoscaleXY_clicked()

@@ -27,7 +27,20 @@
    <item row="2" column="1">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QSpinBox" name="spinLagMin"/>
+      <widget class="QDoubleSpinBox" name="spinLagMin">
+       <property name="suffix">
+        <string> µs</string>
+       </property>
+       <property name="decimals">
+        <number>3</number>
+       </property>
+       <property name="maximum">
+        <double>10000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>5.000000000000000</double>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QLabel" name="label">
@@ -37,7 +50,20 @@
       </widget>
      </item>
      <item>
-      <widget class="QSpinBox" name="spinLagMax"/>
+      <widget class="QDoubleSpinBox" name="spinLagMax">
+       <property name="suffix">
+        <string> µs</string>
+       </property>
+       <property name="decimals">
+        <number>3</number>
+       </property>
+       <property name="maximum">
+        <double>10000.000000000000000</double>
+       </property>
+       <property name="value">
+        <double>20.000000000000000</double>
+       </property>
+      </widget>
      </item>
      <item>
       <spacer name="horizontalSpacer">
