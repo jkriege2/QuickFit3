@@ -1,13 +1,59 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
 <html>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<title>Extension cam_server Help</title>
-	</head>
-	<body>
-		$$qf_commondoc_header.start$$ $$qf_commondoc_header.separator$$ <a href="$$mainhelpdir$$ext_cams.html">Camera Server Plugins</a> $$qf_commondoc_header.end$$ 
-		<p>
-		This plugin communicates with a TCP/IP server, which interacts with the camera. A small set of commands are used to control the camera. An example server, documenting this is contained in the examples directory of this plugin.
-		</p>
-	</body>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <title>Camera Extension Plugin: $$local_plugin_name$$ help</title>
+    </head>
+    <body>
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.separator$$ <a href="$$mainhelpdir$$ext_cams.html">Camera Plugins</a> $$qf_commondoc_header.end$$ 
+<h2>Overview</h2>
+        <p>
+        This plugin communicates with a TCP/IP server, which interacts with the camera. A small set of commands are used to control the camera. An example server, documenting this is contained in the examples directory (<tt><a href="opendir://$$plugin_info:examplesdir:cam_server$$">$$plugin_info:examplesdir:cam_server$$</a></tt>) of this plugin.
+        </p>
+
+
+
+<h2>Configuration File</h2>
+<p>The camera servers are configured by a global configuration file <tt>cam_server.ini</tt>. It is stored in the global configuration directory. You may change some of the configuration options in the associated config directory which will show up, if - and only if - you have write access to this file. If the file does not exist, the plugin will load (but not write) to the file <tt>cam_server.ini</tt> either in the user config directory, or in the assets directory (<tt>$$plugin_info:assetsdir:cam_server$$</tt>) for the plugin.
+     </p>
+     <p>In the <tt>cam_server.ini</tt> you will have to tell the plugin which camera servers are available. This is done inside a <tt>[<b>camera</b><i>N</i>]</tt> block for each server <i>N</i> (default values are <u>underlined</u>):
+     <blockquote><tt>
+[<b>camera</b><i>N</i>]<br>
+<b>host</b> = <i>IP adress of the server (e.g. 127.0.0.1)</i><br>
+<b>port</b> = <i>TCP/IP port, used by the server (e.g 51234)</i><br>
+<b>camera_name</b> = <i>a name for the camera</i><br>
+<b>sensor_name</b> = <i>a name for the xensor of the camera</i><br>
+<b>answer_bits</b> = <i>bits per sample of the images transfered by the server</i><br>
+<b>timeout_connection</b> = <i>timeout, when connecting to the server (in milliseconds)</i><br>
+<b>timeout_instruction</b> = <i>timeout, when sending an instruction to the server (in milliseconds)</i><br>
+<br>
+     </tt></blockquote> 
+     The number of camera servers is stored in the variable <tt>camera_count</tt>.
+     </p>
+     <p>Here is an example configuration file for the example server from the examples directory, running on the same computer as Quickfit (loopback IP adress: 127.0.0.1):
+     <blockquote><tt>
+[General]<br>
+camera_count=1<br>
+<br>
+[camera1]<br>
+port=51234<br>
+host="127.0.0.1"<br>
+camera_name="test_server"<br>
+sensor_name="test_sensor"<br>
+answer_bits=16<br>
+timeout_connection=10000<br>
+timeout_instruction=2000<br>
+</tt></blockquote></p>
+
+
+
+
+<h2>Communication Protocol</h2>
+<p>
+$$startbox_see$$
+There are example C++ projects for camera servers available in <tt><a href="opendir://$$plugin_info:examplesdir:cam_server$$">$$plugin_info:examplesdir:cam_server$$</a></tt>. 
+$$endbox$$
+</p>
+
+    </body>
 </html>
