@@ -70,7 +70,7 @@ private:
 public:
     /** \brief class constructor */
     ReplaceDialog(QWidget *parent = 0);
-
+    virtual ~ReplaceDialog();
     /** \brief set the phrase to search for */
     void setPhrase(QString phr);
     /** \brief return the phrase to match */

@@ -64,6 +64,7 @@ private:
 public:
     /** \brief class constructor */
     FindDialog(QWidget *parent = 0);
+    virtual ~FindDialog();
 
     /** \brief set the phrase to search for */
     void setPhrase(QString phr);

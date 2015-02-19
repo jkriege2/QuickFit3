@@ -37,6 +37,7 @@
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QPrinterInfo>
+#include <QPointer>
 namespace Ui {
     class QFEHelpEditorWidget;
 }
@@ -211,9 +212,9 @@ class QFEHelpEditorWidget : public QWidget {
 
 
         /** \brief the "Find ..." dialog object */
-        FindDialog* findDlg;
+        QPointer<FindDialog> findDlg;
         /** \brief the "Find & Replace..." dialog object */
-        ReplaceDialog* replaceDlg;
+        QPointer<ReplaceDialog> replaceDlg;
         QStringListModel* completermodel;
 
         /** \brief load a completer model from a file */

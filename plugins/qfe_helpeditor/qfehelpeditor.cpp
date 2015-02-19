@@ -42,7 +42,7 @@ QFEHelpEditor::QFEHelpEditor(QObject* parent):
 }
 
 QFEHelpEditor::~QFEHelpEditor() {
-    if (dlg) delete dlg;
+    //if (dlg) delete dlg;
     dlg=NULL;
     for (int i=0; i<dlgs.size(); i++) {
         if (dlgs[i]) delete dlgs[i];

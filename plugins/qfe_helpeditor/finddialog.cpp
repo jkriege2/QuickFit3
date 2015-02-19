@@ -26,6 +26,11 @@ FindDialog::FindDialog(QWidget *parent)
     setupUi(this);
 }
 
+FindDialog::~FindDialog()
+{
+
+}
+
 void FindDialog::setPhrase(QString phr){
     phrase=phr;
     edt_what->setText(phr);

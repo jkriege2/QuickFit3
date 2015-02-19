@@ -27,7 +27,12 @@ ReplaceDialog::ReplaceDialog(QWidget *parent)
     replaceAll=false;
     askBeforeReplace=true;
     setupUi(this);
- }
+}
+
+ReplaceDialog::~ReplaceDialog()
+{
+
+}
 
 void ReplaceDialog::setPhrase(QString phr){
     phrase=phr;
