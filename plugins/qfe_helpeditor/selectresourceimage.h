@@ -38,7 +38,7 @@ class SelectResourceImage : public QDialog
     public:
         explicit SelectResourceImage(const QString& directory=QString(":/"), QWidget *parent = 0, const QString& pathPrefix=QString(""));
         explicit SelectResourceImage(const QStringList& directories, QWidget *parent = 0, const QStringList& pathPrefixes=QStringList(), const QStringList& baseNodeNames=QStringList());
-        ~SelectResourceImage();
+        virtual ~SelectResourceImage();
 
         QString getSelectFile() const;
     private:

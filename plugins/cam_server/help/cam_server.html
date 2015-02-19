@@ -7,9 +7,15 @@
     <body>
         $$qf_commondoc_header.start$$ $$qf_commondoc_header.separator$$ <a href="$$mainhelpdir$$ext_cams.html">Camera Plugins</a> $$qf_commondoc_header.end$$ 
 <h2>Overview</h2>
-        <p>
-        This plugin communicates with a TCP/IP server, which interacts with the camera. A small set of commands are used to control the camera. An example server, documenting this is contained in the examples directory (<tt><a href="opendir://$$plugin_info:examplesdir:cam_server$$">$$plugin_info:examplesdir:cam_server$$</a></tt>) of this plugin.
-        </p>
+<p>
+This plugin communicates with a TCP/IP server, which interacts with the camera. A small set of commands are used to control the camera. An example server, documenting this is contained in the examples directory (<tt><a href="opendir://$$plugin_info:examplesdir:cam_server$$">$$plugin_info:examplesdir:cam_server$$</a></tt>) of this plugin.</p>
+<p>Each camera should implement two modes of operations (although the "live-view" mode may be sufficient):
+<ol>
+    <li><b>live-view mode</b> ("polling mode"): In this mode, Quickfit polls single frames from the camera. It does not impose any constraints on the timing of the acquisition. the only condition is, that as soon, as a request for a new frame arrives, the camera should acquire a frame and send it back to QuickFit. This is a mode, usually used for previews (e.g. in the <a href="$$plugin_info:help:ext_spimb040$$">B040 SPIM plugin</a>) and to acquire image stacks. In the latter case QuickFit will move the stages to the new position and then acquire a single (or multiple) frames.</li>
+    <li><b>acquisition mode:</b> In this "free running" mode, QuickFit simply tells the camera to perform an acquisition according to a specified configuration of the camera. During the acquisition, QuickFit may ask the camera, whether the acquisition is already complete, or cancel the acquisition. No other interactions are necessary. in this mode, the camera (server) is also responsible fro writing the resulting image or images to harddisk into one or more files, based in a filename-prefix, provided by QuickFit. After the acquisition, QuickFit may ask for a list of created files. This mode is usually used for camera-timed acqusitions, such as fast image stacks with a well-defined framerate for imaging FCS. It could also be used for other hardware-triggered acquisitions (such as image stacks, where the stages trigger the camera, often called "spooling mode" in the camera driver), provided the camera server also controls the triggering hardware (e.g. stages). Typically in this mode you should write the data in a well-known data format, such as TIFF to harddisk. Then e.g. the <a href="$$plugin_info:help:imaging_fcs$$">imaging FCS plugin</a> or <a href="$$plugin_info:help:image_stack$$">image stack plugin</a> may read the data into a QuickFit project. You can find a simple and fast TIFF writer library (TinyTIFF) also in the mentioned examples directory.</li>
+</ol>
+In addition top these two acquisition modes, QuickFit provides a possibility to configure the camera. For this the camera server defines a set of camera parameters (of type, int/float/bool/string), which may be writeable or read-only. QuickFit then provides dialog to edit these parameters and sends them to the camera server before any acquisition. So you can use these parameters to configure your camera (e.g. gain, exposure times, file-formats, ...). 
+</p>
 
 
 
@@ -26,6 +32,7 @@
 <b>answer_bits</b> = <i>bits per sample of the images transfered by the server</i><br>
 <b>timeout_connection</b> = <i>timeout, when connecting to the server (in milliseconds)</i><br>
 <b>timeout_instruction</b> = <i>timeout, when sending an instruction to the server (in milliseconds)</i><br>
+<b>has_single_parameter_get</b> = ( <u>true</u> | false ) <i>indicates, whether the instruction PARAMETER_GET is implemented or only PARAMETERS_GET</i><br>
 <br>
      </tt></blockquote> 
      The number of camera servers is stored in the variable <tt>camera_count</tt>.
@@ -53,6 +60,30 @@ timeout_instruction=2000<br>
 $$startbox_see$$
 There are example C++ projects for camera servers available in <tt><a href="opendir://$$plugin_info:examplesdir:cam_server$$">$$plugin_info:examplesdir:cam_server$$</a></tt>. 
 $$endbox$$
+The basic communication protocol is mostly text-based and rather simple: 
+<ul>
+    <li>The server listens to a TCP/IP port, until it recognizes a (single) incoming connection. The connection is accepted.</li>
+    <li>The server now awaits instructions (see below) as text. Each instruction ends with a double-linebreak <tt>"\n\n"</tt>. If parameters are required, they follow the instruction name after a single linebreak "\n" character.</li>
+    <li>The server answers on most instructions (see below) by sending text data back. Each message ends by a double-linebreak <tt>"\n\n"</tt>. If several parameters are returned, they are typically separated by single line-breaks <tt>"\n"</tt>. The only exception is the commend <tt>IMAGE_NEXT_GET</tt>, which contains a field of binary data (of known size) in its result.</li>
+    <li></li>
+</ul>
+These instructions are defined:
+<ul>
+    <li><b><tt>CONNECT\n\n</tt>:</b> connect the server to the camera and initialize the camera. This is usually the first command after opening the connection (socket).<br><i>parameters:</i> none<br><i>answer:</i> <tt>"ACK_CONNECT\n\n"</tt></li>
+    <li><b><tt>DISCONNECT\n\n</tt>:</b> disconnect from camera and deinitialize the device. After calling this command, the connection (socket) is typically closed.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"ACK_DISCONNECT\n\n"</tt> </li>
+    <li><b><tt>LIVE_START\n\n</tt>:</b> start and initialize the live-view mode. This has to be called before calling <tt>IMAGE_NEXT_GET</tt>. Right before calling this command, Quickfit will send all camera parameters with the configuration to use for the live-view, using several calls of <tt>PARAMETER_SET</tt>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"ACK_LIVE_START\n\n"</tt> </li>
+    <li><b><tt>LIVE_STOP\n\n</tt>:</b> stops the live-view mode.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"ACK_LIVE_STOP\n\n"</tt> </li>
+    <li><b><tt>SIZE_X_GET\n\n</tt>:</b> returns the current frame-width (<i>frame_width_in_pixels</i>) in pixels.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"<i>frame_width_in_pixels</i>\n\n"</tt> </li>
+    <li><b><tt>SIZE_Y_GET\n\n</tt>:</b> returns the current frame-height (<i>frame_height_in_pixels</i>) in pixels.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"<i>frame_height_in_pixels</i>\n\n"</tt> </li>
+    <li><b><tt>GET_EXPOSURE\n\n</tt>:</b> returns the current exposure time (<i>exposure_time_seconds</i>) in seconds.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"<i>exposure_time_seconds</i>\n\n"</tt> </li>
+    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li>
+    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li>
+    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li>
+    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li>
+    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li>
+    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li>
+    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li>
+</ul>
 </p>
 
     </body>

@@ -13,7 +13,7 @@ class NewTableDialog : public QDialog
 
     public:
         explicit NewTableDialog(QWidget *parent = 0);
-        ~NewTableDialog();
+        virtual ~NewTableDialog();
         QString insertText() const;
     protected slots:
         void preview();

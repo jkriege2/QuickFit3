@@ -35,7 +35,7 @@ class SubPluginLinkDialog : public QDialog
 
     public:
         explicit SubPluginLinkDialog(QWidget *parent = 0);
-        ~SubPluginLinkDialog();
+        virtual ~SubPluginLinkDialog();
 
         QString insertText() const;
 

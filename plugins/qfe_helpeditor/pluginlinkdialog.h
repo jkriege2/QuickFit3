@@ -35,7 +35,7 @@ class PluginLinkDialog : public QDialog
 
     public:
         explicit PluginLinkDialog(QWidget *parent = 0);
-        ~PluginLinkDialog();
+        virtual ~PluginLinkDialog();
 
         QString insertText() const;
 

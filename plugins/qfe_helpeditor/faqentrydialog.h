@@ -35,7 +35,7 @@ class FAQEntryDialog : public QDialog
 
     public:
         explicit FAQEntryDialog(QWidget *parent = 0);
-        ~FAQEntryDialog();
+        virtual ~FAQEntryDialog();
 
         QString insertText() const;
 

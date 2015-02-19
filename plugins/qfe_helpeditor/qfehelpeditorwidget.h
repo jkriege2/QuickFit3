@@ -49,7 +49,7 @@ class QFEHelpEditorWidget : public QWidget {
 
     public:
         explicit QFEHelpEditorWidget(QWidget* parent=NULL);
-        ~QFEHelpEditorWidget();
+        virtual ~QFEHelpEditorWidget();
 
         QString getScript() const;
 

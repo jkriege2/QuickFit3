@@ -57,24 +57,24 @@ class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionC
     // QFExtension routines
     /////////////////////////////////////////////////////////////////////////////
         /** \copydoc QFExtension::getID() */
-        virtual QString getID() const  { return QString("cam_server"); };
+        virtual QString getID() const  { return QString("cam_server"); }
         /** \copydoc QFExtension::getName() */
-        virtual QString getName() const  { return tr("camera TCPIP server plugin"); };
+        virtual QString getName() const  { return tr("camera TCPIP server plugin"); }
         /** \copydoc QFExtension::getDescription() */
-        virtual QString getDescription() const  { return tr("camera driver that polls a TCPIP server for frames"); };
+        virtual QString getDescription() const  { return tr("camera driver that polls a TCPIP server for frames"); }
         /** \copydoc QFExtension::getAuthor() */
-        virtual QString getAuthor() const  { return tr("Jan W. Krieger"); };
+        virtual QString getAuthor() const  { return tr("Jan W. Krieger"); }
         /** \copydoc QFExtension::getCopyright() */
-        virtual QString getCopyright() const  { return tr("(c) 2014 by Jan W. Krieger"); };
+        virtual QString getCopyright() const  { return tr("(c) 2014-2015 by Jan W. Krieger"); }
         /** \copydoc QFExtension::getWeblink() */
-        virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); };
+        virtual QString getWeblink() const  { return tr("http://www.dkfz.de/Macromol/quickfit/"); }
         /** \copydoc QFExtension::getIconFilename() */
-        virtual QString getIconFilename() const  { return QString(":/cam_server/qfecamserver.png"); };
+        virtual QString getIconFilename() const  { return QString(":/cam_server/qfecamserver.png"); }
         /** \brief plugin version  */
         virtual void getVersion(int& major, int& minor) const {
             major=1;
-            minor=0;
-        };
+            minor=1;
+        }
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
 

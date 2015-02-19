@@ -43,17 +43,21 @@ QFEHelpEditor::QFEHelpEditor(QObject* parent):
 
 QFEHelpEditor::~QFEHelpEditor() {
     //if (dlg) delete dlg;
-    dlg=NULL;
-    for (int i=0; i<dlgs.size(); i++) {
-        if (dlgs[i]) delete dlgs[i];
-    }
-    dlgs.clear();
+
 }
 
 
 void QFEHelpEditor::deinit() {
 	/* add code for cleanup here */
     if (dlg) dlg->storeSettings(*(ProgramOptions::getInstance()->getQSettings()), getID());
+    dlg=NULL;
+    for (int i=0; i<dlgs.size(); i++) {
+        if (dlgs[i]) {
+            dlgs[i]->close();
+            dlgs[i]->deleteLater();
+        }
+    }
+    dlgs.clear();
 }
 
 void QFEHelpEditor::projectChanged(QFProject* oldProject, QFProject* project) {

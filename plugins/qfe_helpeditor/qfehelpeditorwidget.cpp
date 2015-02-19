@@ -65,8 +65,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     ui->edtScript->getEditor()->setLineWrapMode(QTextEdit::WidgetWidth);
     connect(ui->edtScript->getEditor()->document(), SIGNAL(contentsChanged()), this, SLOT(documentWasModified()));
 
-    findDlg=new FindDialog(this);
-    replaceDlg=new ReplaceDialog(this);
+
 
     highlighter=new QFHTMLHighlighter("", ui->edtScript->getEditor()->document());
     highlighter->setUseSpecial2("$(", ")$");
@@ -491,7 +490,6 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
 QFEHelpEditorWidget::~QFEHelpEditorWidget()
 {
     delete ui;
-
 }
 
 QString QFEHelpEditorWidget::getScript() const
@@ -1061,6 +1059,8 @@ void QFEHelpEditorWidget::on_btnSelectImage_clicked()
 
 void QFEHelpEditorWidget::findFirst()
 {
+    if (!findDlg) findDlg=new FindDialog(this);
+
     if (ui->edtScript->getEditor()->hasSelection()) findDlg->setPhrase(ui->edtScript->getEditor()->getSelection());
     if (findDlg->exec()==QDialog::Accepted) {
         // enable "Find next" action
@@ -1091,6 +1091,7 @@ void QFEHelpEditorWidget::findNext()
 
 void QFEHelpEditorWidget::replaceFirst()
 {
+    if (!replaceDlg) replaceDlg=new ReplaceDialog(this);
     if (ui->edtScript->getEditor()->hasSelection()) replaceDlg->setPhrase(ui->edtScript->getEditor()->getSelection());
     if (replaceDlg->exec()==QDialog::Accepted) {
         // enable "Find next" action

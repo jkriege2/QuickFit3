@@ -91,18 +91,41 @@ float image_wavelength=5.0;                         // spatial wavelength of the
 bool image_decay=false;                             // is there a decay component in the pattern?
 
 /** \brief send the contents and description of all camera parameters to the client */
-void writeParameters(TCPIPserver* server, int connection) {
+void writeParameters(TCPIPserver* server, int connection, const std::string& singleparam=std::string("")) {
 		// RETURNS A LIST OF THE AVAILABLE CAMERA PARAMETERS
 		// SEND ANSWER TO CLIENT/QF3
 		//        { (PARAM_FLOAT | PARAM_INT | PARAM_BOOL | PARAM_STRING);<parameter_name>;<parameter_value_as_string>;<parameter_description_as_string>;[<param_range_min>];[<param_range_max>];[(RW|RO)}\n }* \n
-		server->write(connection, format("PARAM_FLOAT;pixel_width;%f;pixel width time in microns;;;RO", pixelsize)); // pixel width is read-only float, unlimited range
-		server->write(connection, format("\nPARAM_FLOAT;pixel_height;%f;pixel height time in microns;;;RO", pixelsize)); // pixel height is read-only float, unlimited range
-		server->write(connection, format("\nPARAM_STRING;camera_name;%s;camera server name;;;RO", cam_name)); // camera server name is read-only string
-		server->write(connection, format("\nPARAM_FLOAT;exposure;%f;exposure time;0;1;RW", exposure)); // camera exposure time is read/write float with range [0..1]
-		server->write(connection, format("\nPARAM_FLOAT;image_amplitude;%f;pattern amplitude;0;10000;RW", exposure)); // pattern amplitude is read/write float with range [0..10000]
-		server->write(connection, format("\nPARAM_FLOAT;image_wavelength;%f;pattern wavelength;0;100;RW", exposure)); // pattern wavelength is read/write float with range [0..100]
-		server->write(connection, format("\nPARAM_BOOL;image_decay;%2;pattern decay;;;RW", booltostr(image_decay).c_str())); // pattern decay component is read/write boolean property
-		server->write(connection, "\nPARAM_BOOL;dummy_device;true;camera is dummy;;;RO"); // a boolean property
+		std::string p;
+		p="pixel_width";
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;pixel width time in microns;;;RO", p.c_str(), pixelsize)); // pixel width is read-only float, unlimited range
+
+		if (singleparam.size()==0) server->write("\n");
+		p="pixel_height";
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;pixel height time in microns;;;RO", p.c_str(), pixelsize)); // pixel height is read-only float, unlimited range
+
+		if (singleparam.size()==0) server->write("\n");
+		p="camera_name";
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_STRING;%s;%s;camera server name;;;RO", p.c_str(), cam_name)); // camera server name is read-only string
+
+		if (singleparam.size()==0) server->write("\n");
+		p="exposure";
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;exposure time;0;1;RW", p.c_str(), exposure)); // camera exposure time is read/write float with range [0..1]
+
+		if (singleparam.size()==0) server->write("\n");
+		p="image_amplitude";
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;pattern amplitude;0;10000;RW", p.c_str(), exposure)); // pattern amplitude is read/write float with range [0..10000]
+
+		if (singleparam.size()==0) server->write("\n");
+		p="image_wavelength";
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;pattern wavelength;0;100;RW", p.c_str(), exposure)); // pattern wavelength is read/write float with range [0..100]
+
+		if (singleparam.size()==0) server->write("\n");
+		p="image_decay";
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_BOOL;%s;%2;pattern decay;;;RW", p.c_str(), booltostr(image_decay).c_str())); // pattern decay component is read/write boolean property
+
+		if (singleparam.size()==0) server->write("\n");
+		p="is_dummy_device";
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, "PARAM_BOOL;%s;true;camera is dummy;;;RO", p.c_str()); // a boolean property
 }
 
 /** \brief set an editable parameter to the specified value */
@@ -234,7 +257,7 @@ int main (void) {
 				
 				    // START THE LIVE_VIEW MODE
 					// INIT/CONFIG CAMERA for LIVE-VIEW
-                    cam_liveview=false;
+                    cam_liveview=true;
                     // SEND ANSWER TO CLIENT/QF3
                     server->write(connection, std::string("ACK_LIVE_START\n\n"));
 				    // DONE STARTING THE LIVE_VIEW MODE
@@ -280,6 +303,17 @@ int main (void) {
                     // SEND ANSWER TO CLIENT/QF3
 					//        { (PARAM_FLOAT | PARAM_INT | PARAM_BOOL | PARAM_STRING);<parameter_name>;<parameter_value_as_string>;<parameter_description_as_string>;[<param_range_min>];[<param_range_max>];[(RW|RO)}\n }* \n
 					writeParameters(server, connection);
+                    server->write(connection, "\n\n");
+					
+					
+                    printfMessage("GET CAMERA PARAMETERS!\n");
+               } else if (instruction=="PARAMETER_GET") {
+				
+				    // RETURNS A SINGLE PARAMETER
+                    // SEND ANSWER TO CLIENT/QF3
+					//        { (PARAM_FLOAT | PARAM_INT | PARAM_BOOL | PARAM_STRING);<parameter_name>;<parameter_value_as_string>;<parameter_description_as_string>;[<param_range_min>];[<param_range_max>];[(RW|RO)}\n }{1} \n
+					std::string param_name=server->read_str_until(connection, "\n\n");
+					writeParameters(server, connection, param_name);
                     server->write(connection, "\n\n");
 					
 					
@@ -338,7 +372,7 @@ int main (void) {
                     // SEND ANSWER TO CLIENT/QF3
                     server->write(connection, "ACK_RECORD\n\n");
                     printfMessage("RECORD FRAME DONE!");
-                } else {
+                } else if (instruction!="\n" || instruction!="\n\n") {
                     // PRINT ERROR MESSAGE AND IGNORE UNKNOWN INSTRUCTION
                     printfMessage("read(%d) unknown instruction %s\n", connection, instruction.c_str());
                 }

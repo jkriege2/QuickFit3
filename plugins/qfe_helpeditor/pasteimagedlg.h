@@ -35,7 +35,7 @@ class PasteImageDlg : public QDialog
         
     public:
         explicit PasteImageDlg(const QString& directory, QWidget *parent = 0, const QString& inputImageFile=QString(), const QString& filenameTemplate=QString("./pic/pix%1.png"));
-        ~PasteImageDlg();
+        virtual ~PasteImageDlg();
 
         QString saveImage() const;
 

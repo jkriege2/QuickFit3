@@ -35,7 +35,7 @@ class FunctionReferenceDialog : public QDialog
 
     public:
         explicit FunctionReferenceDialog(QWidget *parent = 0);
-        ~FunctionReferenceDialog();
+        virtual ~FunctionReferenceDialog();
 
         QString insertText() const;
     protected slots:

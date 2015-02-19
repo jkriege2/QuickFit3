@@ -14,8 +14,8 @@
    <string>Online-Help Editor</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="../../lib/lib.qrc">
-    <normaloff>:/lib/help.png</normaloff>:/lib/help.png</iconset>
+   <iconset resource="qfehelpeditor.qrc">
+    <normaloff>:/qfe_helpeditor/qfehelpeditor.png</normaloff>:/qfe_helpeditor/qfehelpeditor.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
