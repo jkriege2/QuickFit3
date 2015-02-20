@@ -236,29 +236,35 @@ double QFEDiffusionCoefficientCalculator::getSphereDCoeff(int solution, double d
     return K_BOLTZ*at_temperature_K/(6.0*M_PI*eta*diameter_meter/2.0);
 }
 
-double QFEDiffusionCoefficientCalculator::getShapeDCoeff(int solution, double rotation_axis_or_length_meter, double second_axis_or_diameter_meter, QFEDiffusionCoefficientCalculator::SpheroidType type, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components, double viscosity_factor, double* Dsphere, double* volume) {
+double QFEDiffusionCoefficientCalculator::getSphereDRotCoeff(int solution, double diameter_meter, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components, double viscosity_factor)
+{
+    double eta=getSolutionViscosity(solution, at_temperature_K, components)*viscosity_factor;
+    return K_BOLTZ*at_temperature_K/(8.0*M_PI*eta*qfCube(diameter_meter/2.0));
+}
+
+double QFEDiffusionCoefficientCalculator::getShapeDCoeff(int solution, double rotation_axis_or_length_meter_ormolmassDa, double second_axis_or_diameter_meter, QFEDiffusionCoefficientCalculator::SpheroidType type, double at_temperature_K, QList<QFEDiffusionCoefficientCalculator::Component> components, double viscosity_factor, double* Dsphere, double* volume) {
     double eta=getSolutionViscosity(solution, at_temperature_K, components)*viscosity_factor;
 
     double Re=0;
     double Ft=1;
-    double p=rotation_axis_or_length_meter/second_axis_or_diameter_meter;
+    double p=rotation_axis_or_length_meter_ormolmassDa/second_axis_or_diameter_meter;
     double q=1.0/p;
     if (type==QFEDiffusionCoefficientCalculator::Ellipsoid) {
-        Re=pow(second_axis_or_diameter_meter/2.0*second_axis_or_diameter_meter/2.0*rotation_axis_or_length_meter/2.0, 1.0/3.0);
+        Re=pow(second_axis_or_diameter_meter/2.0*second_axis_or_diameter_meter/2.0*rotation_axis_or_length_meter_ormolmassDa/2.0, 1.0/3.0);
         if (p<1) { // oblate, p<1 => q>1
             Ft=sqrt(q*q-1.0)/(pow(q, 2.0/3.0)*atan(sqrt(q*q-1.0)));
         } else if (p>1) { // prolate, p>1 => q<1
             Ft=sqrt(1.0-q*q)/(pow(q, 2.0/3.0)*log((1.0+sqrt(1.0-q*q))/q));
         } else if (p==1) { // sphere
-            if (volume) *volume=4.0/3.0*M_PI*rotation_axis_or_length_meter*rotation_axis_or_length_meter*rotation_axis_or_length_meter/8.0;
-            double DDD=getSphereDCoeff(solution, rotation_axis_or_length_meter, at_temperature_K, components);
+            if (volume) *volume=4.0/3.0*M_PI*rotation_axis_or_length_meter_ormolmassDa*rotation_axis_or_length_meter_ormolmassDa*rotation_axis_or_length_meter_ormolmassDa/8.0;
+            double DDD=getSphereDCoeff(solution, rotation_axis_or_length_meter_ormolmassDa, at_temperature_K, components);
             if (Dsphere) *Dsphere=DDD;
             return DDD;
         }
     } else if (type==QFEDiffusionCoefficientCalculator::Cylinder){
-        Re=pow(3.0/(2.0*p*p), 1.0/3.0)*rotation_axis_or_length_meter/2.0;
+        Re=pow(3.0/(2.0*p*p), 1.0/3.0)*rotation_axis_or_length_meter_ormolmassDa/2.0;
 
-        /*// Tirado and Garcý´a de la Torre for d/L\in [2:20]
+        /*// Tirado and Garcia de la Torre for d/L\in [2:20]
         double gamma=0.312+0.565/p+0.100/p/p;
         Ft=pow(2.0*p*p/3.0, 1.0/3.0)/(log(p)+gamma);*/
 
@@ -267,7 +273,11 @@ double QFEDiffusionCoefficientCalculator::getShapeDCoeff(int solution, double ro
         Ft=1.0304+0.0193*pow(lnp,1)+0.06229*pow(lnp,2)+0.00476*pow(lnp,3)+0.00166*pow(lnp,4)+2.66e-6*pow(lnp,7);
     } else if (type==QFEDiffusionCoefficientCalculator::Sphere){
         Ft=1;
-        Re=rotation_axis_or_length_meter/2.0;
+        Re=rotation_axis_or_length_meter_ormolmassDa/2.0;
+    } else if (type==QFEDiffusionCoefficientCalculator::GlobularProtein){
+        Ft=1;
+        double vol=1.212e-3*rotation_axis_or_length_meter_ormolmassDa; //[in nm^3]
+        Re=pow(3.0*vol/4.0/M_PI, 1.0/3.0)*1e-9;
     }
     if (volume) *volume=4.0/3.0*M_PI*Re*Re*Re;
 

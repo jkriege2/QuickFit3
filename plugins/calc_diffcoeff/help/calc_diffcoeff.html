@@ -47,8 +47,16 @@
                         <!--$$bmath:F_t=\frac{(2p^2/3)^{1/3}}{\ln(p)+\gamma},   \gamma=0.312+\frac{0.565}{p}+\frac{0.100}{p^2}$$-->
 						$$bmath:F_t=1.0304+0.0193x+0.06229x^2+0.00476x^3+0.00166x^4+2.66\cdot10^{-6}x^7,   x=\ln(p)$$
 			Here the parameter $$math:p$$ is defined as: $$math:p=L/d$$. This approximation is valid for the range $$math:L/d\in[0.01:100]$</li>
+		  <li><b>A globular protein</b> of molecular mass $(M)$ (in daltons) with partial specific volume $(0.73cm^3/g)$ has a volume of $[V(nm^3)=1.212\dot10^{-3}(nm^3/Da)\cdot M(Da)]$ THen the hydrodynamic radius can be estimated as $[ R_H=\sqrt[3]{\frac{3V}{4\pi}} ]$</li>	
 		</ul>
 		
+		</p>
+		
+		
+		<h2>Calculating the Diffusion Coefficient</h2>
+		<p>This plugin also calculates <a href="https://en.wikipedia.org/wiki/Rotational_diffusion">rotational diffusion coefficients</a> $(D_{rot})$ and rotational relaxation times $(\tau_{rot})$ for spheres with a hydrodynamic radius of $(R_H)$:
+		  $[D_{rot}(R_H)=\frac{k_B T}{8\pi\eta R_H^3}]$
+		  $[\tau_{rot}(R_H)=\frac{1}{6D_{rot}}=\frac{4\pi\eta R_H^3}{3k_B T}]$
 		</p>
 
 		<h2>Solutin Models</h2>

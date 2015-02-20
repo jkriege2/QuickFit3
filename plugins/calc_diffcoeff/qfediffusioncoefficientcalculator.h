@@ -102,7 +102,8 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         enum SpheroidType {
             Ellipsoid=0,
             Cylinder=1,
-            Sphere=2
+            Sphere=2,
+            GlobularProtein=3
         };
 
 
@@ -112,12 +113,14 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
         double getSolutionViscosity(int solution, double temperature_K, QList<Component> components=QList<Component>());
         /** \brief returns the diffusion coefficient in m^2/s */
         double getSphereDCoeff(int solution, double diameter_meter, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0);
+        /** \brief returns the rotational diffusion coefficient in rad^2/s */
+        double getSphereDRotCoeff(int solution, double diameter_meter, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0);
         /** \brief returns the diffusion coefficient in m^2/s */
         double getDCoeff_from_D20W(int solution, double D20W, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0);
         /** \brief returns the diffusion coefficient in m^2/s */
         double getDCoeff_from_D(int solution, double D, double viscosity, double temp_K, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0);
         /** \brief returns the diffusion coefficient in m^2/s */
-        double getShapeDCoeff(int solution, double rotation_axis_or_length_meter, double second_axis_or_diameter_meter, SpheroidType type, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0, double* Dsphere=NULL, double* volume=NULL);
+        double getShapeDCoeff(int solution, double rotation_axis_or_length_meter_orMolMassDa, double second_axis_or_diameter_meter, SpheroidType type, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0, double* Dsphere=NULL, double* volume=NULL);
         /** \brief returns the hydrodynamic radius in m^2 */
         double getHydrodynRadius_from_D(double D, int solution, double at_temperature_K, QList<Component> components=QList<Component>(), double viscosity_factor=1.0);
         /** \brief returns the hydrodynamic radius in m^2 */

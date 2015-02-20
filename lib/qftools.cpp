@@ -1002,7 +1002,9 @@ QString doubleToUnitString(double value, int past_comma, bool remove_trail0, QCh
   if (fabs(value)<1) res=doubleToQString(value/1e-3, past_comma, 'f', decimalSeparator)+"m";
   if (fabs(value)<1e-3) res=doubleToQString(value/1e-6, past_comma, 'f', decimalSeparator)+QString((HTMLout)?QString("&mu;"):QString("u"));
   if (fabs(value)<1e-6) res=doubleToQString(value/1e-9, past_comma, 'f', decimalSeparator)+"n";
-  if (fabs(value)<1e-9) res=doubleToQString(value/1e-12, past_comma, 'f', decimalSeparator)+"f";
+  if (fabs(value)<1e-9) res=doubleToQString(value/1e-12, past_comma, 'f', decimalSeparator)+"p";
+  if (fabs(value)<1e-12) res=doubleToQString(value/1e-15, past_comma, 'f', decimalSeparator)+"f";
+  if (fabs(value)<1e-15) res=doubleToQString(value/1e-18, past_comma, 'f', decimalSeparator)+"a";
   if (fabs(value)==0) res=doubleToQString(value, past_comma, 'f', decimalSeparator);
   if (remove_trail0) {
       if (value==0) return "0";
