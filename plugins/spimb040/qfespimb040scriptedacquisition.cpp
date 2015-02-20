@@ -119,8 +119,8 @@ QFESPIMB040ScriptedAcquisition::QFESPIMB040ScriptedAcquisition(QFESPIMB040MainWi
 
 
     ui->setupUi(this);
-    findDlg=new FindDialog(this);
-    replaceDlg=new ReplaceDialog(this);
+    findDlg=new QFESPIMB040FindDialog(this);
+    replaceDlg=new QFESPIMB040ReplaceDialog(this);
 
     highlighter=new QFQtScriptHighlighter("", ui->edtScript->getEditor()->document());
 

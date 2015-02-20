@@ -1782,7 +1782,7 @@ void QFRDRImagingFCSData::loadQFPropertiesFromB040SPIMSettingsFile(QSettings &se
         QMapIterator<QString, QVariant> it(data);
         while (it.hasNext()) {
             it.next();
-            if (!propertyExists(it.key())) setQFProperty(it.key(), it.value(), true, true);
+            if (!propertyExists(it.key())) setQFProperty(it.key(), it.value(), false, true);
         }
     }
 

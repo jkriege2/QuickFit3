@@ -48,7 +48,7 @@
  *
  *  \image html editor_findreplace.png
  */
-class ReplaceDialog : public QDialog, private Ui::ReplaceDialog
+class QFEHelpEditorReplaceDialog : public QDialog, private Ui::ReplaceDialog
 {
     Q_OBJECT
 private:
@@ -69,8 +69,8 @@ private:
 
 public:
     /** \brief class constructor */
-    ReplaceDialog(QWidget *parent = 0);
-    virtual ~ReplaceDialog();
+    QFEHelpEditorReplaceDialog(QWidget *parent = 0);
+    virtual ~QFEHelpEditorReplaceDialog();
     /** \brief set the phrase to search for */
     void setPhrase(QString phr);
     /** \brief return the phrase to match */

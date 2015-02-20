@@ -323,6 +323,7 @@
             <li>mask by intensity supports relaxed color-scaling for overview image</li>
             <li>improved bleach correction in correlator: In some cases, the background correction could lead to negative values in the intensity traces, which could lead to bad bleach correction. These values are filtered now!</li>
             <li>the plugin now exposes the time-averaged image as image stack No. 2, so we can e.g. use the colocalization plugin on this data</li>
+            <li>improved resistance of bleach-correction to intensities, which are below the background intensity</li>
           </ul></li>
         <li><b>table</b><ul>
             <li>added "QuickStatistics" and "QuickHistogram" tools, which show the statistics and histograms of the current selection (column-wise)</li>

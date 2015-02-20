@@ -588,13 +588,11 @@ void QFRDRFCSRateEditor::replotData(int dummy) {
         if (dat1[i].isValid()) {
             statisticsModel.setCellCreate(trow, tc, dat1[i]);
             tc++;
-        } else if (i>0) {
+        } else if (tc>0) {
             trow++;
             tc=0;
         }
     }
-    trow++;
-    tc=0;
 
     if (chkOverlay->isChecked()) {
         if (chkDisplayStatistics->isChecked()) {
@@ -610,7 +608,7 @@ void QFRDRFCSRateEditor::replotData(int dummy) {
                     if (dat[i].isValid()) {
                         statisticsModel.setCellCreate(trow, tc, dat[i]);
                         tc++;
-                    } else if (i>0) {
+                    } else if (tc>0) {
                         trow++;
                         tc=0;
                     }
@@ -628,7 +626,7 @@ void QFRDRFCSRateEditor::replotData(int dummy) {
                     if (dat[i].isValid()) {
                         statisticsModel.setCellCreate(trow, tc, dat[i]);
                         tc++;
-                    } else if (i>0) {
+                    } else if (tc>0) {
                         trow++;
                         tc=0;
                     }
@@ -640,11 +638,11 @@ void QFRDRFCSRateEditor::replotData(int dummy) {
 
     statisticsModel.setColumnTitleCreate(0, tr("dataset"));
     statisticsModel.setColumnTitleCreate(1, tr("chan."));
-    statisticsModel.setColumnTitleCreate(1, tr("run"));
-    statisticsModel.setColumnTitleCreate(2, tr("mean [kHz]"));
-    statisticsModel.setColumnTitleCreate(3, tr("std. dev. [kHz]"));
-    statisticsModel.setColumnTitleCreate(4, tr("minimum [kHz]"));
-    statisticsModel.setColumnTitleCreate(5, tr("maximum [kHz]"));
+    statisticsModel.setColumnTitleCreate(2, tr("run"));
+    statisticsModel.setColumnTitleCreate(3, tr("mean [kHz]"));
+    statisticsModel.setColumnTitleCreate(4, tr("std. dev. [kHz]"));
+    statisticsModel.setColumnTitleCreate(5, tr("minimum [kHz]"));
+    statisticsModel.setColumnTitleCreate(6, tr("maximum [kHz]"));
     statisticsModel.enableSignals(true);
     tabStatistics->resizeColumnsToContents();
     statisticsModel.setReadonly(true);

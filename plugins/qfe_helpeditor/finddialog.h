@@ -48,7 +48,7 @@
  *
  *  \image html editor_find.png
  */
-class FindDialog : public QDialog, private Ui::FindDialog
+class QFEHelpEditorFindDialog : public QDialog, private Ui::FindDialog
 {
     Q_OBJECT
 private:
@@ -63,8 +63,8 @@ private:
 
 public:
     /** \brief class constructor */
-    FindDialog(QWidget *parent = 0);
-    virtual ~FindDialog();
+    QFEHelpEditorFindDialog(QWidget *parent = 0);
+    virtual ~QFEHelpEditorFindDialog();
 
     /** \brief set the phrase to search for */
     void setPhrase(QString phr);

@@ -37,7 +37,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
         res=true; \
         QList<dataArr> otherdata; \
         for (int i=0; i<filenames.size(); i++) { \
-            res=res&&loadFunction(filenames[i]); \
+            res=res&&loadFunction(filenames[i]);\
+            /*qDebug() << "loaded file "<<filenames[i]<<"\n    correlationRuns="<<correlationRuns<<" rateRuns="<<rateRuns<<"  ==> RES="<<res;*/\
             dataArr t_; \
             t_.correlationRuns=correlationRuns; \
             t_.correlationN=correlationN; \
@@ -52,21 +53,29 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
             otherdata<<t_; \
         } \
         if (res && otherdata.size()>1) { \
-            int cruns=0; \
-            int rruns=0; \
-            for (int i=0; res && i<otherdata.size(); i++) { \
-                res=res&&(rateN==otherdata[i].rateN)&&(rateChannels==otherdata[i].rateChannels)&&(correlationN==otherdata[i].correlationN); \
+            int cruns=otherdata[0].correlationRuns; \
+            int rruns=otherdata[0].correlationRuns; \
+            long long int ritems=otherdata[0].rateN; \
+            for (int i=1; i<otherdata.size(); i++) { \
+                bool ok=    (abs(otherdata[0].rateN-otherdata[i].rateN)<qMax((long long int)2,otherdata[0].rateN/50)) \
+                         && (otherdata[0].rateChannels==otherdata[i].rateChannels) \
+                         && (otherdata[0].correlationN==otherdata[i].correlationN); \
+                if (!ok) {\
+                    setError(tr("error loading file '%1': number of data points in rates/correlations, or number of channels was different than in first file (FIRST/THIS FILE: rateN=%2/%3, corrN=%4%5, chan=%6/%7)").arg(filenames.value(i)).arg(otherdata[0].rateN).arg(otherdata[i].rateN).arg(otherdata[0].correlationN).arg(otherdata[i].correlationN).arg(otherdata[0].rateChannels).arg(otherdata[i].rateChannels)); \
+                }\
+                res=res&&ok;\
+                ritems=qMin(ritems, otherdata[i].rateN);\
                 if (res) { \
                     for (int t=0; t<correlationN; t++) { \
-                        if (correlationT[t]!=otherdata[i].correlationT[t]) { \
+                        if (otherdata[0].correlationT[t]!=otherdata[i].correlationT[t]) { \
                             res=false; \
-                            setError(tr("error loading file '%1': lag-time axis does not equal the previous files").arg(filenames.size())); \
+                            setError(tr("error loading file '%1': lag-time axis does not equal the previous files").arg(filenames.value(i))); \
                         } \
                     } \
                     for (int t=0; t<rateN; t++) { \
-                        if (rateT[t]!=otherdata[i].rateT[t]) { \
+                        if (otherdata[0].rateT[t]!=otherdata[i].rateT[t]) { \
                             res=false; \
-                            setError(tr("error loading file '%1': rate time-axis does not equal the previous files").arg(filenames.size())); \
+                            setError(tr("error loading file '%1': rate time-axis does not equal the previous files").arg(filenames.value(i))); \
                         } \
                     } \
                 } \
@@ -74,10 +83,12 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
                     cruns=cruns+otherdata[i].correlationRuns; \
                     rruns=rruns+otherdata[i].rateRuns; \
                 } \
+                /*qDebug() << "checked file "<<filenames.value(i)<<"  OK="<<ok<<"  RES="<<res<<"\n    correlationRuns="<<otherdata[i].correlationRuns<<"/"<<otherdata[0].correlationRuns<<" rateRuns="<<otherdata[i].rateRuns<<"/"<<otherdata[0].rateRuns<<" rateChannels="<<otherdata[i].rateChannels<<"/"<<otherdata[0].rateChannels<<" rateN="<<otherdata[i].rateN<<"/"<<otherdata[0].rateN<<" correlationN="<<otherdata[i].correlationN<<"/"<<otherdata[0].correlationN<<"  ==>   cruns="<<cruns<<" rruns="<<rruns;*/\
+                if (!res) break;\
             } \
             if (res) { \
                 resizeCorrelations(correlationN, cruns); \
-                resizeRates(rateN, rruns, rateChannels); \
+                resizeRates(ritems, rruns, otherdata.first().rateChannels); \
                 copyArray(correlationT, otherdata.first().correlationT, correlationN); \
                 copyArray(rateT, otherdata.first().rateT, rateN); \
                 long long rstart=0; \
@@ -87,12 +98,13 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
                     copyArray(&(correlation[cstart]), t_.correlation, t_.correlationRuns* t_.correlationN); \
                     copyArray(&(correlationErrors[cstart]), t_.correlationErrors, t_.correlationRuns* t_.correlationN); \
                     for (int c=0; c<t_.rateChannels; c++) { \
-                        copyArray(&(rate[c*rateRuns*rateN+ rstart]), &(t_.rate[c*t_.rateRuns* t_.rateN]), t_.rateRuns* t_.rateN); \
+                        copyArray(&(rate[c*rateRuns*rateN+ rstart]), &(t_.rate[c*t_.rateRuns*rateN]), t_.rateRuns* rateN); \
                     } \
                     cstart=cstart+t_.correlationRuns* t_.correlationN; \
-                    rstart=rstart+t_.rateN*t_.rateRuns; \
+                    rstart=rstart+rateN*t_.rateRuns; \
                 } \
                 recalculateCorrelations();\
+                calcBinnedRate();\
             } \
             for (int i=0; res && i<otherdata.size(); i++) { \
                 dataArr t_=otherdata[i]; \
@@ -3039,6 +3051,7 @@ bool QFRDRFCSData::loadQF3ASCII(QString filename)
     emitRawDataChanged();
     return ok;
 }
+
 
 
 

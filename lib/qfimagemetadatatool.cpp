@@ -554,8 +554,8 @@ bool qfimdtGetQuickFitMetaData(QMap<QString, QVariant>& data, const QString &fil
         if (!data.contains("EXP_LASER1_SET")) data["EXP_LASER2_SET"]=0.0;
         qfimdtGetQuickFitMetaData_FINDPROP("setup/laser3/line1/set_power", "EXP_LASER3_SET", toDouble)
         if (!data.contains("EXP_LASER1_SET")) data["EXP_LASER3_SET"]=0.0;
-        qfimdtGetQuickFitMetaData_FINDPROP("emgain_enabled", "EXP_CAMERA_EMGAIN_ENABLED", toDouble)
-        if (data.contains("EXP_CAMERA_EMGAIN_ENABLED") && data["EXP_CAMERA_EMGAIN_ENABLED"].toBool()) {
+        qfimdtGetQuickFitMetaData_FINDPROP("emgain_enabled", "EXP_CAMERA_EMGAIN_ENABLED", toBool)
+        if ((data.contains("EXP_CAMERA_EMGAIN_ENABLED") && data["EXP_CAMERA_EMGAIN_ENABLED"].toBool()) || (!data.contains("EXP_CAMERA_EMGAIN_ENABLED"))) {
             qfimdtGetQuickFitMetaData_FINDPROP("emgain", "EXP_CAMERA_EMGAIN", toDouble)
         } else {
             if (!data.contains("EXP_CAMERA_EMGAIN")) data["EXP_CAMERA_EMGAIN"]=0;

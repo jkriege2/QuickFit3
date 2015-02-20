@@ -212,9 +212,9 @@ class QFEHelpEditorWidget : public QWidget {
 
 
         /** \brief the "Find ..." dialog object */
-        QPointer<FindDialog> findDlg;
+        QPointer<QFEHelpEditorFindDialog> findDlg;
         /** \brief the "Find & Replace..." dialog object */
-        QPointer<ReplaceDialog> replaceDlg;
+        QPointer<QFEHelpEditorReplaceDialog> replaceDlg;
         QStringListModel* completermodel;
 
         /** \brief load a completer model from a file */

@@ -35,6 +35,12 @@ $$faq_start$$
 $$faq_answer$$
   You can use the general export tool of the FCS plugin, either by right-clicking an FCS RDR in the project tree (in the main window) and choosing <b>Export Data from RDR</b>, or by clicking on the menu entry <b>Record | Export Data</b> in the FCS RDR editor window. In both cases, you will be asked to select a new filename and an export dataformat. FOr formats, you can choose any of the data export formats, registered in QuickFit (e.g. CSV, Matlab, Excel, ...). For each Format you have to the choice to export the correlation functions only, the countrate traces only, or both together into one file. You can also export to <i>QuickFit 3.0 ASCII Correlation Data (*.qf3acorr)</i>, which is an ASCII-export format, which combines all data in the record YOu can find a <a href="$$mainhelpdir$$/fcs_qf3format.html">detailed description of this format here</a>.
 $$faq_end$$
+   
+$$faq_start$$
+  <a name="FAQ_MULTIFILES"><b>I acquired several runs, but my instrument saved them in separate files. Can I load them into a single RDR?</b>
+$$faq_answer$$
+  Yes, there are "multi-file RDRs", which take data from several single files and combine them into one record. The different curves are then loaded as different runs. This also works with FCCS data, i.e. if ACFs+FCCS-curves are present in each file (e.g. for ALV-7000 FCCS data in mode <tt>A-CH0+1  C-CH0/1+1/0</tt>). Then one RDR for each role is inserted.
+$$faq_end$$
 	 
   </body>
 </html>

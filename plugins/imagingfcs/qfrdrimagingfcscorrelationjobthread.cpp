@@ -2596,7 +2596,8 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 bleachFitOK[i]=0;
-                if (NFitFramesInt>2) {
+
+                if (NFitFramesInt>2*4 && (NFitFramesInt>NFitFrames/5) && (fit_t[NFitFramesInt-1]>fit_tin[(NFitFrames-1)/2])) {
                     double pA=0, pB=0;
                     if (!statisticsLinearRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
                         pA=fit_I[0];
@@ -2658,7 +2659,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 bleachFitOK[i]=0;
-                if (NFitFramesInt>3) {
+                if (NFitFramesInt>3*4 && (NFitFramesInt>NFitFrames/5) && (fit_t[NFitFramesInt-1]>fit_tin[(NFitFrames-1)/2])) {
 
                     double pA=0, pB=0;
                     if (!statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB)) {
@@ -2732,7 +2733,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 bleachFitOK[i]=0;
-                if (NFitFramesInt>4) {
+                if (NFitFramesInt>4*4 && (NFitFramesInt>NFitFrames/5) && (fit_t[NFitFramesInt-1]>fit_tin[(NFitFrames-1)/2])) {
 
                     double pA=0, pB=0;
 
@@ -2828,7 +2829,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 bleachFitOK[i]=0;
-                if (NFitFramesInt>5) {
+                if (NFitFramesInt>5*4 && (NFitFramesInt>NFitFrames/5) && (fit_t[NFitFramesInt-1]>fit_tin[(NFitFrames-1)/2])) {
 
                     double pA=0, pB=0;
 
@@ -2921,7 +2922,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 bleachFitOK[i]=0;
-                if (NFitFramesInt>6) {
+                if (NFitFramesInt>6*4 && (NFitFramesInt>NFitFrames/5) && (fit_t[NFitFramesInt-1]>fit_tin[(NFitFrames-1)/2])) {
 
                     double pA=0, pB=0;
                     double par[6]={pA, -1.0/pB,0,0,0,0};
@@ -3023,7 +3024,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 bleachFitOK[i]=0;
-                if (NFitFramesInt>4) {
+                if (NFitFramesInt>4*4 && (NFitFramesInt>NFitFrames/5) && (fit_t[NFitFramesInt-1]>fit_tin[(NFitFrames-1)/2])) {
 
                     double pA=0, pB=0;
                     if (!statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_Il, NFitFramesInt, pA, pB)) {
@@ -3107,7 +3108,7 @@ void QFRDRImagingFCSCorrelationJobThread::calcBleachCorrection(float* fit_frames
                     }
                 }
                 bleachFitOK[i]=0;
-                if (NFitFramesInt>2) {
+                if (NFitFramesInt>2*4 && (NFitFramesInt>NFitFrames/5) && (fit_t[NFitFramesInt-1]>fit_tin[(NFitFrames-1)/2])) {
                     double pA=0, pB=0;
                     statisticsIterativelyReweightedLeastSquaresRegression(fit_t, fit_I, NFitFramesInt, pA, pB);
 

@@ -1059,7 +1059,7 @@ void QFEHelpEditorWidget::on_btnSelectImage_clicked()
 
 void QFEHelpEditorWidget::findFirst()
 {
-    if (!findDlg) findDlg=new FindDialog(this);
+    if (!findDlg) findDlg=new QFEHelpEditorFindDialog(this);
 
     if (ui->edtScript->getEditor()->hasSelection()) findDlg->setPhrase(ui->edtScript->getEditor()->getSelection());
     if (findDlg->exec()==QDialog::Accepted) {
@@ -1091,7 +1091,7 @@ void QFEHelpEditorWidget::findNext()
 
 void QFEHelpEditorWidget::replaceFirst()
 {
-    if (!replaceDlg) replaceDlg=new ReplaceDialog(this);
+    if (!replaceDlg) replaceDlg=new QFEHelpEditorReplaceDialog(this);
     if (ui->edtScript->getEditor()->hasSelection()) replaceDlg->setPhrase(ui->edtScript->getEditor()->getSelection());
     if (replaceDlg->exec()==QDialog::Accepted) {
         // enable "Find next" action

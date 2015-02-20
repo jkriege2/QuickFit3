@@ -36,10 +36,10 @@
 
 #include <QCheckBox>
 
-#include "finddialog.h"
+#include "qfespimb040finddialog.h"
 
 
-FindDialog::FindDialog(QWidget *parent)
+QFESPIMB040FindDialog::QFESPIMB040FindDialog(QWidget *parent)
      : QDialog(parent)
 {
     matchCase=false;
@@ -48,24 +48,29 @@ FindDialog::FindDialog(QWidget *parent)
     setupUi(this);
 }
 
-void FindDialog::setPhrase(QString phr){
+QFESPIMB040FindDialog::~QFESPIMB040FindDialog()
+{
+
+}
+
+void QFESPIMB040FindDialog::setPhrase(QString phr){
     phrase=phr;
     edt_what->setText(phr);
     edt_what->selectAll();
 }
 
-void FindDialog::on_chk_matchCase_stateChanged(int state){
+void QFESPIMB040FindDialog::on_chk_matchCase_stateChanged(int state){
     matchCase = (state==Qt::Checked);
 };
 
-void FindDialog::on_chk_searchFromStart_stateChanged(int state){
+void QFESPIMB040FindDialog::on_chk_searchFromStart_stateChanged(int state){
     searchFromStart = (state==Qt::Checked);
 };
 
-void FindDialog::on_chk_wholeWords_stateChanged(int state){
+void QFESPIMB040FindDialog::on_chk_wholeWords_stateChanged(int state){
     wholeWords = (state==Qt::Checked);
 };
 
-void FindDialog::on_edt_what_textChanged ( const QString & text ){
+void QFESPIMB040FindDialog::on_edt_what_textChanged ( const QString & text ){
     phrase=text;
 };

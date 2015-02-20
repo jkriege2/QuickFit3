@@ -36,7 +36,7 @@
 #include "qfespimb040acquisitiontools.h"
 #include "qrecentfilesmenu.h"
 #include "qfqtscripthighlighter.h"
-#include "finddialog.h"
+#include "qfespimb040finddialog.h"
 #include <QPrinter>
 #include <QPrinterInfo>
 #include <QPrintDialog>
@@ -229,9 +229,9 @@ class QFESPIMB040ScriptedAcquisition : public QWidget, public QFESPIMB040Filenam
 
 
         /** \brief the "Find ..." dialog object */
-        FindDialog* findDlg;
+        QFESPIMB040FindDialog* findDlg;
         /** \brief the "Find & Replace..." dialog object */
-        ReplaceDialog* replaceDlg;
+        QFESPIMB040ReplaceDialog* replaceDlg;
         QStringListModel* completermodel;
 
         /** \brief load a completer model from a file */
