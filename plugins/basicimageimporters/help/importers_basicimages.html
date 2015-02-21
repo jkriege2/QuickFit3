@@ -8,8 +8,16 @@
 		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
 		<ul>
 		  <li>multi-frame TIFF file format:<ul>
-			<li><a href="imageimporter_libtiff.html">using libTIFF</a>:<br>supports more types of TIFF files (including several compression schemes), but is limited to 65000 frames in each file.</li>
+			<li><a href="imageimporter_libtiff.html">using libTIFF</a>:<br>supports more types of TIFF files (including several compression schemes and multiple color-channels), but is limited to 65000 frames in each file.</li>
 			<li><a href="imageimporter_tinytiff.html">Importer tinyTIFF reader</a>:<br>faster than the libTIFF importer, but can only read uncompressed TIFF files</li>
+		  </ul></li>
+		  <li>RAW images:<ul>
+			<li><a href="imageimporter_rawunit8.html">uint8</a></li>
+			<li><a href="imageimporter_rawunit16.html">uint16</a></li>
+			<li><a href="imageimporter_rawunit32.html">uint32</a></li>
+			<li><a href="imageimporter_rawunit64.html">uint64</a></li>
+			<li><a href="imageimporter_rawfloat.html">32-bit float</a></li>
+			<li><a href="imageimporter_rawdouble.html">64-bit float/double</a></li>
 		  </ul></li>
 		  <li><a href="imageimporter_radhard.html">Importer for data from the <i>Radhard2</i> SPAD array</a></li>
 		  <li><a href="imageimporter_diffusion4btsbinary.html">Importer for the binary dataformat of the <i>diffusion4</i></a> FCS/FCCS simulation software</li>

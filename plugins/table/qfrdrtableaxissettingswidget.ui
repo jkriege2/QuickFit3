@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>539</width>
-    <height>392</height>
+    <width>660</width>
+    <height>493</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -28,6 +28,12 @@
    </property>
    <item row="0" column="0">
     <widget class="QLabel" name="label_7">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
       <string>label:</string>
      </property>
@@ -55,6 +61,12 @@
    </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label_10">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
       <string>range:</string>
      </property>
@@ -94,121 +106,157 @@
      </item>
     </layout>
    </item>
-   <item row="2" column="0">
+   <item row="4" column="0">
     <widget class="QLabel" name="label_12">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
-      <string>ticks:</string>
+      <string>ticks/labels:</string>
      </property>
      <property name="buddy">
       <cstring>cmbXMode1</cstring>
      </property>
     </widget>
    </item>
-   <item row="2" column="1">
-    <layout class="QGridLayout" name="gridLayout_5" columnstretch="1,0,0,0,0">
-     <item row="0" column="2">
-      <widget class="JKQTPCAlabelTypeComboBox" name="cmbXLabel"/>
-     </item>
-     <item row="0" column="3">
-      <widget class="QLabel" name="label_3">
-       <property name="text">
-        <string>digits:</string>
+   <item row="4" column="1">
+    <layout class="QGridLayout" name="gridLayout_5" columnstretch="0,0">
+     <item row="1" column="1">
+      <spacer name="horizontalSpacer_3">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="JKQTPCAdrawModeComboBox" name="cmbXMode1"/>
-     </item>
-     <item row="0" column="4">
-      <widget class="QSpinBox" name="spinXAxisDigits">
-       <property name="value">
-        <number>3</number>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
        </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="JKQTPCAdrawModeComboBox" name="cmbXMode2"/>
-     </item>
-     <item row="2" column="0">
-      <widget class="QLabel" name="label_4">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-       <property name="text">
-        <string>tick spacing:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
+      </spacer>
      </item>
      <item row="1" column="0">
-      <widget class="QCheckBox" name="chkXAutoTicks">
-       <property name="text">
-        <string>min. #ticks / #minor ticks:</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="1" colspan="4">
-      <layout class="QHBoxLayout" name="horizontalLayout_9">
-       <item>
-        <widget class="QSpinBox" name="spinXAxisMinTicks">
-         <property name="value">
-          <number>10</number>
+      <layout class="QGridLayout" name="gridLayout_2">
+       <item row="0" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>labels:</string>
          </property>
         </widget>
        </item>
-       <item>
-        <widget class="QSpinBox" name="spinXAxisMinorTicks">
+       <item row="2" column="0">
+        <widget class="QCheckBox" name="chkXAutoTicks">
+         <property name="text">
+          <string>min. #ticks / #minor ticks:</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_9">
+         <item>
+          <widget class="QSpinBox" name="spinXAxisMinTicks">
+           <property name="value">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSpinBox" name="spinXAxisMinorTicks">
+           <property name="value">
+            <number>10</number>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+         <property name="text">
+          <string>tick spacing:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="0">
+        <widget class="QLabel" name="label_5">
+         <property name="text">
+          <string>label rotation:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="4" column="1">
+        <widget class="QDoubleSpinBox" name="spinLabelAngel">
+         <property name="suffix">
+          <string> °</string>
+         </property>
+         <property name="decimals">
+          <number>1</number>
+         </property>
+         <property name="minimum">
+          <double>-90.000000000000000</double>
+         </property>
+         <property name="maximum">
+          <double>90.000000000000000</double>
+         </property>
+         <property name="singleStep">
+          <double>15.000000000000000</double>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QFDoubleEdit" name="edtXTickSpacing">
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="JKQTPCAlabelTypeComboBox" name="cmbXLabel"/>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>label digits:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QSpinBox" name="spinXAxisDigits">
          <property name="value">
-          <number>10</number>
+          <number>3</number>
          </property>
         </widget>
        </item>
       </layout>
      </item>
-     <item row="2" column="1" colspan="4">
-      <widget class="QFDoubleEdit" name="edtXTickSpacing">
-       <property name="enabled">
-        <bool>false</bool>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_5">
-       <property name="text">
-        <string>label rotation:</string>
-       </property>
-       <property name="alignment">
-        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-       </property>
-      </widget>
-     </item>
-     <item row="3" column="1" colspan="2">
-      <widget class="QDoubleSpinBox" name="spinLabelAngel">
-       <property name="suffix">
-        <string> °</string>
-       </property>
-       <property name="decimals">
-        <number>1</number>
-       </property>
-       <property name="minimum">
-        <double>-90.000000000000000</double>
-       </property>
-       <property name="maximum">
-        <double>90.000000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>15.000000000000000</double>
-       </property>
-      </widget>
-     </item>
     </layout>
    </item>
-   <item row="4" column="1">
+   <item row="6" column="1">
     <layout class="QGridLayout" name="gridLayout_7">
      <item row="0" column="1">
       <widget class="QLabel" name="label_50">
@@ -297,19 +345,6 @@
        </property>
       </widget>
      </item>
-     <item row="1" column="1">
-      <widget class="QDoubleSpinBox" name="spinXTickWidth">
-       <property name="suffix">
-        <string> pt</string>
-       </property>
-       <property name="maximum">
-        <double>1000.000000000000000</double>
-       </property>
-       <property name="singleStep">
-        <double>0.500000000000000</double>
-       </property>
-      </widget>
-     </item>
      <item row="3" column="2">
       <widget class="QDoubleSpinBox" name="spinXMinOLength">
        <property name="suffix">
@@ -323,17 +358,59 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="3">
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="1" column="1">
+      <widget class="QDoubleSpinBox" name="spinXTickWidth">
+       <property name="suffix">
+        <string> pt</string>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.500000000000000</double>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
-   <item row="5" column="0">
+   <item row="7" column="0">
     <widget class="QLabel" name="label_31">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
       <string>properties:</string>
      </property>
     </widget>
    </item>
-   <item row="5" column="1">
+   <item row="7" column="1">
     <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="1">
+      <widget class="QLabel" name="label_6">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="text">
+        <string>width:</string>
+       </property>
+      </widget>
+     </item>
      <item row="0" column="0">
       <widget class="QCheckBox" name="chkX0Axis">
        <property name="text">
@@ -348,10 +425,45 @@
        </property>
       </widget>
      </item>
+     <item row="0" column="3">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="2">
+      <widget class="QDoubleSpinBox" name="spin0AxisWidth">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
+       <property name="suffix">
+        <string> pt</string>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.500000000000000</double>
+       </property>
+      </widget>
+     </item>
     </layout>
    </item>
-   <item row="4" column="0">
+   <item row="6" column="0">
     <widget class="QLabel" name="label_14">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
       <string>ticks sizes:</string>
      </property>
@@ -360,8 +472,14 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
+   <item row="5" column="0">
     <widget class="QLabel" name="label_15">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
      <property name="text">
       <string>named ticks:</string>
      </property>
@@ -370,7 +488,7 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="1">
+   <item row="5" column="1">
     <layout class="QFormLayout" name="formLayout_2">
      <item row="0" column="0">
       <widget class="QLabel" name="label">
@@ -391,6 +509,104 @@
      </item>
      <item row="1" column="1">
       <widget class="QFEnhancedComboBox" name="cmbNamedTicksNames"/>
+     </item>
+    </layout>
+   </item>
+   <item row="2" column="0">
+    <widget class="QLabel" name="label_16">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>modes:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbXMode1</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,2,0,1">
+     <item>
+      <widget class="QLabel" name="label_11">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>axis 1:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="JKQTPCAdrawModeComboBox" name="cmbXMode1"/>
+     </item>
+     <item>
+      <widget class="QLabel" name="label_9">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="text">
+        <string>axis 2:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="JKQTPCAdrawModeComboBox" name="cmbXMode2"/>
+     </item>
+    </layout>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_17">
+     <property name="font">
+      <font>
+       <weight>75</weight>
+       <bold>true</bold>
+      </font>
+     </property>
+     <property name="text">
+      <string>axis line widths:</string>
+     </property>
+     <property name="buddy">
+      <cstring>cmbXMode1</cstring>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <layout class="QHBoxLayout" name="horizontalLayout_4" stretch="0,0">
+     <item>
+      <widget class="QDoubleSpinBox" name="spinAxis1Width">
+       <property name="suffix">
+        <string> pt</string>
+       </property>
+       <property name="maximum">
+        <double>1000.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.500000000000000</double>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer_4">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -424,17 +640,7 @@
    </slots>
   </customwidget>
   <customwidget>
-   <class>JKQTPCAdrawModeComboBox</class>
-   <extends>QComboBox</extends>
-   <header>jkqtptools.h</header>
-  </customwidget>
-  <customwidget>
    <class>JKQTPCAlabelTypeComboBox</class>
-   <extends>QComboBox</extends>
-   <header>jkqtptools.h</header>
-  </customwidget>
-  <customwidget>
-   <class>JKQTPlabelPositionComboBox</class>
    <extends>QComboBox</extends>
    <header>jkqtptools.h</header>
   </customwidget>
@@ -442,6 +648,16 @@
    <class>QFEnhancedComboBox</class>
    <extends>QComboBox</extends>
    <header>qfenhancedcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPCAdrawModeComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
+  </customwidget>
+  <customwidget>
+   <class>JKQTPlabelPositionComboBox</class>
+   <extends>QComboBox</extends>
+   <header>jkqtptools.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>
@@ -451,10 +667,6 @@
   <tabstop>edtXMin</tabstop>
   <tabstop>edtXMax</tabstop>
   <tabstop>btnAutoscaleX</tabstop>
-  <tabstop>cmbXMode1</tabstop>
-  <tabstop>cmbXMode2</tabstop>
-  <tabstop>cmbXLabel</tabstop>
-  <tabstop>spinXAxisDigits</tabstop>
  </tabstops>
  <resources>
   <include location="qfrdrtable.qrc"/>
@@ -467,12 +679,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>151</x>
-     <y>155</y>
+     <x>218</x>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
-     <x>366</x>
-     <y>164</y>
+     <x>423</x>
+     <y>106</y>
     </hint>
    </hints>
   </connection>
@@ -483,12 +695,12 @@
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>138</x>
-     <y>154</y>
+     <x>205</x>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
-     <x>441</x>
-     <y>164</y>
+     <x>536</x>
+     <y>106</y>
     </hint>
    </hints>
   </connection>
@@ -499,12 +711,12 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>132</x>
-     <y>153</y>
+     <x>199</x>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
-     <x>201</x>
-     <y>186</y>
+     <x>268</x>
+     <y>133</y>
     </hint>
    </hints>
   </connection>
@@ -515,12 +727,44 @@
    <slot>setDisabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>115</x>
-     <y>155</y>
+     <x>182</x>
+     <y>104</y>
     </hint>
     <hint type="destinationlabel">
-     <x>441</x>
-     <y>190</y>
+     <x>537</x>
+     <y>133</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkX0Axis</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>label_6</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>118</x>
+     <y>336</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>175</x>
+     <y>336</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkX0Axis</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>spin0AxisWidth</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>75</x>
+     <y>336</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>249</x>
+     <y>338</y>
     </hint>
    </hints>
   </connection>

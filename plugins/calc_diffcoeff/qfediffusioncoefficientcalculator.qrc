@@ -6,5 +6,6 @@
         <file alias="prolate.png">images/prolate.png</file>
         <file alias="cylinder.png">images/cylinder.png</file>
         <file alias="sphere.png">images/sphere.png</file>
+        <file alias="globprot.png">images/globprot.png</file>
     </qresource>
 </RCC>

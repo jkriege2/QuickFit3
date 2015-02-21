@@ -185,6 +185,9 @@ QFRDRTable::AxisInfo::AxisInfo()
      TickOutsideLength=3;
      MinorTickInsideLength=1;
      MinorTickOutsideLength=1;
+
+     axis1LineWidth=1.5;
+     zeroAxisLineWidth=1.5;
 }
 
 QFRDRTable::PlotInfo::PlotInfo()
@@ -1732,6 +1735,9 @@ void QFRDRTable::writeAxisInfo(QXmlStreamWriter &w, const QFRDRTable::AxisInfo &
     w.writeAttribute(axisName+"namedticks_namecol", QString::number(plot.columnNamedTickNames));
     w.writeAttribute(axisName+"namedticks_valcol", QString::number(plot.columnNamedTickValues));
 
+    w.writeAttribute(axisName+"axis0_linewidth", CDoubleToQString(plot.zeroAxisLineWidth));
+    w.writeAttribute(axisName+"axis1_linewidth", CDoubleToQString(plot.axis1LineWidth));
+
 
 }
 
@@ -1958,8 +1964,8 @@ void QFRDRTable::writeGraphInfo(QXmlStreamWriter &w, const QFRDRTable::GraphInfo
     w.writeEndElement();
 }
 
-void QFRDRTable::readPlotInfo(PlotInfo& plot, QDomElement te) {
-    plot.title=te.attribute("title", tr("graph title"));
+void QFRDRTable::readPlotInfo(PlotInfo& plot, QDomElement te, bool readLabels) {
+    if (readLabels) plot.title=te.attribute("title", tr("graph title"));
     plot.graphAutosize=QStringToBool(te.attribute("autosize", "true"));
     plot.graphWidth=te.attribute("gwidth", "150").toInt();
     plot.graphHeight=te.attribute("gheight", "150").toInt();
@@ -2012,8 +2018,8 @@ void QFRDRTable::readPlotInfo(PlotInfo& plot, QDomElement te) {
     plot.keyYSeparation=CQStringToDouble(te.attribute("keyyseparation", "0.2"));
     plot.key_line_length=CQStringToDouble(te.attribute("key_line_length", "3"));
 
-    readAxisInfo(plot.xAxis, "x", te);
-    readAxisInfo(plot.yAxis, "y", te);
+    readAxisInfo(plot.xAxis, "x", te, readLabels);
+    readAxisInfo(plot.yAxis, "y", te, readLabels);
 
 
 
@@ -2026,10 +2032,10 @@ void QFRDRTable::readPlotInfo(PlotInfo& plot, QDomElement te) {
     }
 }
 
-void QFRDRTable::readAxisInfo(AxisInfo& plot, const QString& axisName, QDomElement te) {
+void QFRDRTable::readAxisInfo(AxisInfo& plot, const QString& axisName, QDomElement te, bool readLabels) {
     plot.min=CQStringToDouble(te.attribute(axisName+"min", "0"));
     plot.max=CQStringToDouble(te.attribute(axisName+"max", "10"));
-    plot.label=te.attribute(axisName+"label", "x");
+    if (readLabels) plot.label=te.attribute(axisName+"label", "x");
     plot.log=QStringToBool( te.attribute(axisName+"log", "false"));
     plot.axis0=QStringToBool( te.attribute(axisName+"0axis", "true"));
     plot.digits=te.attribute(axisName+"digits", "3").toInt();
@@ -2055,6 +2061,8 @@ void QFRDRTable::readAxisInfo(AxisInfo& plot, const QString& axisName, QDomEleme
     plot.MinorTickInsideLength=CQStringToDouble(te.attribute(axisName+"mintickilength", "2"));
     plot.MinorTickOutsideLength=CQStringToDouble(te.attribute(axisName+"mintickolength", "2"));
     plot.labelAngel=CQStringToDouble(te.attribute(axisName+"labelangel", "0"));
+    plot.zeroAxisLineWidth=CQStringToDouble(te.attribute(axisName+"axis0_linewidth", "1.5"));
+    plot.axis1LineWidth=CQStringToDouble(te.attribute(axisName+"axis1_linewidth", "1.5"));
 
     plot.columnNamedTickNames=te.attribute(axisName+"namedticks_namecol", "-1").toInt();
     plot.columnNamedTickValues=te.attribute(axisName+"namedticks_valcol", "-2").toInt();

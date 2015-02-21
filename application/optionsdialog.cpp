@@ -34,6 +34,8 @@ OptionsDialog::OptionsDialog(QWidget* parent):
     edtUserFitFunctions->addButton(btn);
     btn=new QFStyledButton(QFStyledButton::SelectDirectory, edtUserSettings, edtUserSettings);
     edtUserSettings->addButton(btn);
+    btn=new QFStyledButton(QFStyledButton::SelectDirectory, edtGlobalSettings, edtGlobalSettings);
+    edtGlobalSettings->addButton(btn);
 }
 
 OptionsDialog::~OptionsDialog()
@@ -42,11 +44,15 @@ OptionsDialog::~OptionsDialog()
 }
 
 void OptionsDialog::on_cmbStylesheet_currentIndexChanged( const QString & text ) {
+    //qDebug()<<"setTyleSheet("<<text<<")";
     QString fn=QString(m_options->getAssetsDirectory()+"/stylesheets/%1.qss").arg(text);
     QFile f(fn);
-    f.open(QFile::ReadOnly);
-    QTextStream s(&f);
-    QString qss=s.readAll();
+    QString qss="";
+    if (f.open(QFile::ReadOnly)) {
+        QTextStream s(&f);
+        qss=s.readAll();
+    }
+
     //std::cout<<qss.toStdString()<<std::endl;
     this->setStyleSheet(qss);
 }
@@ -103,6 +109,7 @@ void OptionsDialog::open(ProgramOptions* options) {
     dir.cd("translations");
     QStringList filters;
     filters << "*.qm";
+
     cmbLanguage->clear();
     cmbLanguage->addItem("en");
     QStringList sl=qfDirListFilesRecursive(dir, filters);//dir.entryList(filters, QDir::Files);
@@ -132,6 +139,7 @@ void OptionsDialog::open(ProgramOptions* options) {
     if (!QDir(dhome.absolutePath()+"/userfitfunctions").exists()) dhome.mkdir("userfitfunctions");
     edtUserFitFunctions->setText(options->getConfigValue("quickfit/user_fitfunctions", options->getHomeQFDirectory()+"/userfitfunctions/").toString());
     edtUserSettings->setText(options->getHomeQFDirectory());
+    edtGlobalSettings->setText(options->getGlobalConfigFileDirectory());
     spinHelpFontsize->setValue(options->getConfigValue("quickfit/help_pointsize", 11).toInt());
     spinMath->setValue(options->getConfigValue("quickfit/math_pointsize", 14).toInt());
     cmbHelpFont->setCurrentFont(QFont(options->getConfigValue("quickfit/help_font", font().family()).toString()));
@@ -143,12 +151,16 @@ void OptionsDialog::open(ProgramOptions* options) {
     dir.cd("../stylesheets");
     filters.clear();
     filters << "*.qss";
+
+    disconnect(cmbStylesheet, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_cmbStylesheet_currentIndexChanged(QString)));
     cmbStylesheet->clear();
     sl=qfDirListFilesRecursive(dir, filters);//dir.entryList(filters, QDir::Files);
     for (int i=0; i<sl.size(); i++) {
         cmbStylesheet->addItem(sl[i].remove(".qss", Qt::CaseInsensitive));
     }
     cmbStylesheet->setCurrentIndex( cmbStylesheet->findText(options->getStylesheet()));
+    on_cmbStylesheet_currentIndexChanged( cmbStylesheet->currentText() );
+    connect(cmbStylesheet, SIGNAL(currentIndexChanged(QString)), this, SLOT(on_cmbStylesheet_currentIndexChanged(QString)));
 
     for (int i=0; i<m_plugins.size(); i++) {
         m_plugins[i]->readSettings(options);
@@ -172,6 +184,7 @@ void OptionsDialog::open(ProgramOptions* options) {
         options->setConfigValue("quickfit/welcomescreen", chkStartupScreen->isChecked());
         options->setConfigValue("quickfit/user_fitfunctions", edtUserFitFunctions->text());
         options->setHomeQFDirectory(edtUserSettings->text());
+        options->setGlobalConfigFileDirectory(edtGlobalSettings->text());
         options->setConfigValue("quickfit/math_pointsize", spinMath->value());
         options->setConfigValue("quickfit/help_pointsize", spinHelpFontsize->value());
         options->setConfigValue("quickfit/help_font", cmbHelpFont->currentFont().family());
@@ -182,6 +195,10 @@ void OptionsDialog::open(ProgramOptions* options) {
         }
         {
             QDir dir(edtUserSettings->text());
+            if (!dir.exists()) dir.mkpath(dir.absolutePath());
+        }
+        {
+            QDir dir(edtGlobalSettings->text());
             if (!dir.exists()) dir.mkpath(dir.absolutePath());
         }
 

@@ -24,7 +24,7 @@
 #define SPIMB040_H
 
 #include "qfextension.h"
-
+#include "qfpluginoptionsdialog.h"
 #include "qfespimb040mainwindow2.h"
 #include <QAction>
 
@@ -36,8 +36,9 @@
 /*! \brief SPIM Control Extension (B040, DKFZ Heidelberg) plugin class
     \ingroup qf3ext_spimb040
  */
-class QFESPIMB040 : public QObject, public QFExtensionBase {
+class QFESPIMB040 : public QObject, public QFExtensionBase, public QFPluginOptionsDialogInterface {
         Q_OBJECT
+        Q_INTERFACES(QFPluginOptionsDialogInterface)
         Q_INTERFACES(QFExtension)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
         Q_PLUGIN_METADATA(IID "www.dkfz.de.QuickFit3.Plugins.QFESPIMB040")
@@ -79,10 +80,27 @@ class QFESPIMB040 : public QObject, public QFExtensionBase {
         /** \copydoc QFExtension::deinit() */
         virtual void deinit();
 
+
+
+        /** \brief return the display name for the options pane */
+        QString pluginOptionsName() const;
+        /** \brief return the display icon for the options pane */
+        QIcon pluginOptionsIcon() const;
+        /** \brief create a widget to display in the options dialog */
+        QFPluginOptionsWidget* createOptionsWidget(QWidget* parent) ;
+
+    protected slots:
+        void emitStyleChanged(const QString& style, const QString& stylesheet);
+    public slots:
+        void updateFromConfig();
+    signals:
+        void styleChanged(const QString& style, const QString& stylesheet);
     protected:
         QAction* actStartPlugin;
-        QAction* actStartPluginNew;
+        //QAction* actStartPluginNew;
         QAction* actStartPluginOld;
+        QMenu* menuOptSetups;
+        QList<QAction*> actsOptSetups;
 
         QPointer<QFESPIMB040MainWindow2> main;
 

@@ -27,7 +27,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QtGui>
 #endif
 
-
+#include "qfediffusioncoefficientcalculator_parserfunctions.h"
 #include <QtPlugin>
 #include <iostream>
 #include "dlgcalcdiffcoeff.h"
@@ -38,6 +38,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #define K_BOLTZ QF_K_BOLTZ
 
+QPointer<QFEDiffusionCoefficientCalculator> QFEDiffusionCoefficientCalculator::inst=NULL;
+
 QFEDiffusionCoefficientCalculator::QFEDiffusionCoefficientCalculator(QObject* parent):
     QObject(parent)
 {
@@ -45,10 +47,11 @@ QFEDiffusionCoefficientCalculator::QFEDiffusionCoefficientCalculator(QObject* pa
     dlg=NULL;
     actStartPlugin=NULL;
      QFPluginServices::getInstance()->registerSettingsPane(this);
+     if (!inst) inst=this;
 }
 
 QFEDiffusionCoefficientCalculator::~QFEDiffusionCoefficientCalculator() {
-
+    if (inst==this) inst=NULL;
 }
 
 
@@ -276,8 +279,11 @@ double QFEDiffusionCoefficientCalculator::getShapeDCoeff(int solution, double ro
         Re=rotation_axis_or_length_meter_ormolmassDa/2.0;
     } else if (type==QFEDiffusionCoefficientCalculator::GlobularProtein){
         Ft=1;
-        double vol=1.212e-3*rotation_axis_or_length_meter_ormolmassDa; //[in nm^3]
+        const double partspecvol=0.73; //[cm^3/g]
+        // 1e21/6.022e23= 1.0/6.022*1e-2
+        double vol=partspecvol/6.022*1e-2*rotation_axis_or_length_meter_ormolmassDa; //[in nm^3]
         Re=pow(3.0*vol/4.0/M_PI, 1.0/3.0)*1e-9;
+        Ft=1;
     }
     if (volume) *volume=4.0/3.0*M_PI*Re*Re*Re;
 
@@ -331,7 +337,17 @@ void QFEDiffusionCoefficientCalculator::initExtension() {
         tb->addAction(actStartPlugin);
     }
 
+    QFPluginServices::getInstance()->appendOrAddHTMLReplacement("qfmathparser_ref", QString("$$insert:%1/parserref.inc$$").arg(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())));
+    QStringList sl=QFPluginServices::getInstance()->getGlobalConfigValue("QFMathParser_ref").toStringList();
+    sl.append(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
+    QFPluginServices::getInstance()->setGlobalConfigValue("QFMathParser_ref", sl);
+    QFPluginServices::getInstance()->addQFMathParserRefernceDir(QFPluginServices::getInstance()->getPluginHelpDirectory(getID())+QString("/parserreference/"));
 
+
+    QFMathParser::addGlobalFunction("calcd_getviscositywater", fCalcD_getViscosityWater);
+    QFMathParser::addGlobalFunction("calcd_getdiffcoeffsphere", fCalcD_getDSphere);
+    QFMathParser::addGlobalFunction("calcd_getdiffcoeffrotsphere", fCalcD_getDRotSphere);
+    QFMathParser::addGlobalFunction("calcd_gettaudiffrotsphere", fCalcD_getTauDRotSphere);
 }
 
 void QFEDiffusionCoefficientCalculator::startPlugin() {

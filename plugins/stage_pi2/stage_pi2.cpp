@@ -50,6 +50,7 @@ void QFExtensionLinearStagePI2::initExtension() {
     QString ini=services->getGlobalConfigFileDirectory()+QString("/stage_pi863_2.ini");
     if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+QString("/stage_pi863_2.ini");
     if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/stage_pi863_2.ini");
+    QFPluginServices::getInstance()->log_global_text(tr("%1loading INI-file %2\n").arg(QString(LOG_PREFIX)).arg(ini));
     QSettings inifile(ini, QSettings::IniFormat);
 
 

@@ -73,6 +73,7 @@ void QFExtensionShutterShuterArduino::initExtension() {
     QString ini=services->getGlobalConfigFileDirectory()+QString("/shutter_relais_arduino.ini");
     if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+QString("/shutter_relais_arduino.ini");
     if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/shutter_relais_arduino.ini");
+    QFPluginServices::getInstance()->log_global_text(tr("%1loading INI-file %2\n").arg(QString(LOG_PREFIX)).arg(ini));
     QSettings inifile(ini, QSettings::IniFormat);
     int shutter_count=inifile.value("shutter_count", 0).toUInt();
     for (int i=0; i<shutter_count; i++) {

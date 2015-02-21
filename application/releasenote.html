@@ -180,6 +180,7 @@
             <li>added save menu entry to the online-help window </li>
             <li>splash screen gives a better indication of loading progress/status now (with a progress bar)</li>
             <li>image reader plugins now support multiple channels</li>
+            <li>added widget to configuration dialog, which allows to set the global config directory</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -391,7 +392,7 @@
             <li>added option to normalize data before plotting</li>
             <li>added copy/paste buttons for plot system settings</li>
             <li>bugfix: possible crash, when selecting incomplete axis label columns</li>
-            <li>image stacks may be exported from the RDR</li>
+            <li>added widgets to set axis widths in points</li>
       </ul></li>
       <li><b>B040SPIM</b><ul>
             <li>added JavaScript functions to set preview acquisition camera parameters</li>
@@ -407,6 +408,7 @@
             <li>added marginal position as plot parameters to graph</li>
             <li>added camera preview modes that equalize the intenisty in the left/right half images.</li>
             <li>added spinbox to camera preview, which allows to set the font size of the parameter table.</li>
+            <li>added configuration dialog pane and removed config-tab from control window (now incorporated into config dialog pane!)</li>
       </ul></li>
       <li><b>FCS Fit</b><ul>
             <li>fit parameter names are more expressive now</li>
@@ -490,7 +492,9 @@
       </ul></li>
       <li><b>Diffusion coefficient calculator</b><ul>
             <li>now also calculates the hydrodynamic radius of the particle from the diffusion coefficient at the experiment conditions.</li>
-            <li> now calculates rotational diffusion oefficients and relaxation times</li>
+            <li>now calculates rotational diffusion oefficients and relaxation times</li>
+            <li>added more diffusion coefficients to internal database (mostly different standard proteins)</li>
+            <li>added images for some of the standard diffusion coefficients</li>
       </ul></li>
       <li><b>qfe_plotterexporterlatex</b><ul>
             <li>added export filter option, which does not parse the LaTeX strings.</li>
@@ -521,6 +525,7 @@
             <li>added initial support for image file meta-data for TIFF images, such as OME or from ImageJ</li>
             <li>added support for metadata from QuickFit B040SPIM .configuration.ini files</li>
             <li>added multi-channel support for libTIFF importer</li>
+            <li>added readers for RAW files</li>
       </ul></li>
       <li><b>image_stack</b><ul>
             <li>now tries to read metadat (pixel size, deltaZ/T, ...) from file properties (e.g. OME)</li>
@@ -529,6 +534,7 @@
             <li>added functions to internal math parser, that allow to access image stacks.</li>
             <li>single-file image stacks may now load images with multiple frames</li>
             <li>added additional widgets to configure display in RDR editor</li>
+            <li>image stacks may be exported from the RDR</li>
       </ul></li>
       <li><b>fitfunctions_lightsheet:</b><ul>
         <li>added Gaussian function with width specified as FWHM</li>
@@ -549,7 +555,11 @@
         <li>added tab, which allows to change the settings of the N&amp;B calculation</li>
         <li>added wizard, which allows to calculate N&amp;B raw images (averages/StdDev.) from image stacks</li>
       </ul></li>
-
+      <li><b>cam_andor:</b><ul>
+        <li>camera also writes <tt>.description.txt</tt> files for RAW data output</li>
+        <li>camera also writes file with QE from driver</li>
+        <li>camera alsoreads sensitivity now</li>
+      </ul></li>
     </ul></li>
 
 		

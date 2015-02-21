@@ -123,9 +123,26 @@ bool CamAndorAcquisitionThread::init(int camera, QString filenamePrefix, int fil
                     return false;
                 }
             } else if (fileformat==4) { // RAW
-                QString filename=filenamePrefix+".raw";
+                QString filename=filenamePrefix+"_uint16.raw";
                 outputFilenameTypes.append("RAW");
                 outputFilenames.append(filename);
+
+                {
+                    QFileInfo fi(filename);
+                    QDir d=fi.absoluteDir();
+                    QFile description(d.absoluteFilePath(fi.baseName()+".description.txt"));
+                    if (description.open(QIODevice::WriteOnly|QIODevice::Text)) {
+                        QTextStream str(&description);
+                        str<<"data_format=uint\n";
+                        str<<"bitspersample=16\n";
+                        str<<"width="<<m_width<<"\n";
+                        str<<"height="<<m_height<<"\n";
+                        str<<"channels=1\n";
+                        str<<"unit=micrometers\n";
+                        description.close();
+                    }
+                }
+
                 raw=new QFile(filename);
                 if (!raw->open(QIODevice::WriteOnly)) {
                     emit log_error(tr("\n%1    could not open raw file '%2', \n%1       reason: %3").arg(m_log_prefix).arg(filename).arg(raw->errorString()));

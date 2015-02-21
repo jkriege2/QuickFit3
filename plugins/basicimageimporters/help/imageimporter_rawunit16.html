@@ -1,0 +1,17 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+		<title>Basic Image readers: RAW, unit16 </title>
+	</head>
+	<body>
+		$$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+		<p>This plugin allows to read image series in the RAW format (16-bit unsigned integers), which simply contains the frames as binary data in row-major format and with separate channels, i.e. (<tt>frame1.ch1,rame1.ch2,...,frame2.ch1,frame2.ch2,...</tt>). An additional text file <tt>filename.description.txt</tt> has to be present, which is read to get the frame width/height and number of channels [default:1]. here is an example:
+		<pre>
+width=<i>width</i><br>
+height=<i>height</i><br>
+channels=<i>channels</i><br>
+bitspersample=16<br>
+		</pre></p>
+	</body>
+</html>

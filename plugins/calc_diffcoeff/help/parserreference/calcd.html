@@ -1,0 +1,33 @@
+  <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+  <html>
+  <head>
+  <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+  <title>calc_diffcoeff: Expression parser: Diffusion Coefficients</title>
+  </head>
+  <body> 
+  $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+  $$funcref_start$$<a name="calcd_getdiffcoeffsphere"/><!-- func:calcd_getdiffcoeffsphere -->
+    <b><tt><!-- template -->calcd_getdiffcoeffsphere(diameter)<!-- /template --></tt> / <tt><!-- template -->calcd_getdiffcoeffsphere(diameter, temperatureK)<!-- /template --></tt> - <i> returns the translational diffusion coefficient of a sphere (diameter <tt>diameter</tt> in meters) at temperature <tt>temperatureK</tt> in Kelvin.</i>:</b>
+  $$funcref_description$$
+        The diffusion coefficient $[D=\frac{k_BT}{6\pi\eta R_H}]$ is returned in meter<sup>2</sup>/s. The default temperature is 20°C or 293.15K.
+        <!-- /func:calcd_getdiffcoeffsphere -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="calcd_getdiffcoeffrotsphere"/><!-- func:calcd_getdiffcoeffrotsphere -->
+    <b><tt><!-- template -->calcd_getdiffcoeffrotsphere(diameter)<!-- /template --></tt> / <tt><!-- template -->calcd_getdiffcoeffrotsphere(diameter, temperatureK)<!-- /template --></tt> - <i> returns the rotational diffusion coefficient of a sphere (diameter <tt>diameter</tt> in meters) at temperature <tt>temperatureK</tt> in Kelvin.</i>:</b>
+  $$funcref_description$$
+        The diffusion coefficient $[D_{rot}=\frac{k_BT}{8\pi\eta R_H^3}]$ is returned in radian<sup>2</sup>/s. The default temperature is 20°C or 293.15K.
+        <!-- /func:calcd_getdiffcoeffrotsphere -->
+  $$funcref_end$$
+  
+  $$funcref_start$$<a name="calcd_gettaudiffrotsphere"/><!-- func:calcd_gettaudiffrotsphere -->
+    <b><tt><!-- template -->calcd_gettaudiffrotsphere(diameter)<!-- /template --></tt> / <tt><!-- template -->calcd_gettaudiffrotsphere(diameter, temperatureK)<!-- /template --></tt> - <i> returns the rotational diffusion decorrelation time $(\tau_{rot}=1/(6D_{rot}))$ of a sphere (diameter <tt>diameter</tt> in meters) at temperature <tt>temperatureK</tt> in Kelvin.</i>:</b>
+  $$funcref_description$$
+        From the diffusion coefficient $[D_{rot}=\frac{k_BT}{8\pi\eta R_H^3}]$ the time $[\tau_{rot}=\frac{1}{6D_{rot}}]$ is calculated and returned in seconds. The default temperature is 20°C or 293.15K.
+        <!-- /func:calcd_gettaudiffrotsphere -->
+  $$funcref_end$$
+  
+  </body>
+  </html>
+  

@@ -71,6 +71,7 @@ void QFExtensionB040SPADMeasurement::initExtension() {
     QString ini=services->getGlobalConfigFileDirectory()+QString("/meas_spadmeasurement.ini");
     if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+QString("/meas_spadmeasurement.ini");
     if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/meas_spadmeasurement.ini");
+    QFPluginServices::getInstance()->log_global_text(tr("%1loading INI-file %2\n").arg(QString(LOG_PREFIX)).arg(ini));
     QSettings inifile(ini, QSettings::IniFormat);
     int device_count=inifile.value("device_count", 0).toUInt();
     for (int i=0; i<device_count; i++) {

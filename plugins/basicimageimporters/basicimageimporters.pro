@@ -43,7 +43,8 @@ HEADERS += qfbasicimageimporters.h \
     ../../../../../LIB/trunk/tinytiffwriter.h \
     ../../../../../LIB/trunk/tinytiffreader.h \
     qfimagereaderdiffusion4binary.h \
-    ../../../../../LIB/trunk/helper.h
+    ../../../../../LIB/trunk/helper.h \
+    qfimagereaderraw.h
 
 SOURCES += qfbasicimageimporters.cpp\
            qfimagereaderlibtiff.cpp \
@@ -53,7 +54,8 @@ SOURCES += qfbasicimageimporters.cpp\
     qfimagereadertinytiff.cpp \
     ../../../../../LIB/trunk/tinytiffwriter.cpp \
     ../../../../../LIB/trunk/tinytiffreader.cpp \
-    qfimagereaderdiffusion4binary.cpp
+    qfimagereaderdiffusion4binary.cpp \
+    qfimagereaderraw.cpp
 
 FORMS = \
     qfbasicimageimportersoptionswidget.ui

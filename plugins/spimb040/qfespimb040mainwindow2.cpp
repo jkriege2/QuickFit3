@@ -27,8 +27,7 @@
 #else
 #include <QtGui>
 #endif
-
-
+#include "spimb040.h"
 #include <tiffio.h>
 #include "libtiff_tools.h"
 
@@ -41,10 +40,11 @@
     QMessageBox::critical(this, title, (message));
 
 
-QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(QFPluginServices* pluginServices, QWidget* parent, bool newOpticsSetup, QFExtension *plugin):
+QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(const QString &optSetupFile, QFPluginServices* pluginServices, QWidget* parent, bool newOpticsSetup, QFESPIMB040 *plugin):
     QWidget(parent, Qt::Dialog|Qt::WindowMaximizeButtonHint|Qt::WindowCloseButtonHint|Qt::WindowSystemMenuHint)
 {
     this->plugin=plugin;
+    this->optSetupFile=optSetupFile;
     widImageStack=NULL;
     widScriptedAcquisition=NULL;
     widCamParamScan=NULL;
@@ -52,7 +52,7 @@ QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(QFPluginServices* pluginServices,
     widExperimentDescription=NULL;
     widAcquisition=NULL;
     widOverview=NULL;
-    widConfig=NULL;
+    //widConfig=NULL;
     optSetup1=NULL;
     optSetup2=NULL;
     optSetup=NULL;
@@ -61,6 +61,8 @@ QFESPIMB040MainWindow2::QFESPIMB040MainWindow2(QFPluginServices* pluginServices,
     createWidgets(pluginServices->getExtensionManager(), newOpticsSetup);
     setWindowTitle("B040 SPIM Control");
     setWindowIcon(QIcon(":/spimb040_logo.png"));
+    connect(plugin, SIGNAL(styleChanged(QString,QString)), this, SLOT(styleChanged(QString,QString)));
+    plugin->updateFromConfig();
 }
 
 QFESPIMB040MainWindow2::~QFESPIMB040MainWindow2()
@@ -82,7 +84,7 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     if (widOverview) widOverview->loadSettings((*settings->getQSettings()), "plugin_spim_b040/overviewacquisition/");
     if (widCamParamScan) widCamParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
     if (widDeviceParamScan) widDeviceParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/deviceparamscan/");
-    if (widConfig) widConfig->loadSettings((*settings->getQSettings()), "plugin_spim_b040/config/");
+    //if (widConfig) widConfig->loadSettings((*settings->getQSettings()), "plugin_spim_b040/config/");
     setUpdatesEnabled(true);
     if (optSetup1) optSetup1->setUpdatesEnabled(true);
     if (optSetup2) optSetup2->setUpdatesEnabled(true);
@@ -93,7 +95,7 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     if (widAcquisition) widAcquisition->setUpdatesEnabled(true);
     if (widCamParamScan) widCamParamScan->setUpdatesEnabled(true);
     if (widDeviceParamScan) widDeviceParamScan->setUpdatesEnabled(true);
-    if (widConfig) widConfig->setUpdatesEnabled(true);
+    //if (widConfig) widConfig->setUpdatesEnabled(true);
 }
 
 void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
@@ -103,12 +105,18 @@ void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
     if (optSetup2) optSetup2->storeSettings((settings->getQSettings()->fileName()), "plugin_spim_b040/instrument_new/");
 
     if (optSetup2) {
-        QString optSetupFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup").toString();
+        //QString optSetupFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup").toString();
 
         if (QFile::exists(optSetup2->getLastOptSetup()) && QFileInfo(optSetupFile)==QFileInfo(optSetup2->getLastOptSetup())) {
+            QFileInfo fi(optSetupFile);
+            QDir dir;
+            dir=QDir(ProgramOptions::getConfigValue("spimb040/optsetup_config_directory_readonly", ProgramOptions::getInstance()->getGlobalConfigFileDirectory()).toString());
+            QString optSetupGlobalConfigFile=dir.absoluteFilePath(fi.fileName()+".ini");
+            dir=QDir(ProgramOptions::getConfigValue("spimb040/optsetup_config_directory", ProgramOptions::getInstance()->getConfigFileDirectory()).toString());
+            QString optSetupUserConfigFile=dir.absoluteFilePath(fi.fileName()+".ini");
 
-            QString optSetupGlobalConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename_readonly", m_pluginServices->getGlobalConfigFileDirectory()+"/spim_at_b040.optSetup.ini").toString();
-            QString optSetupUserConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename", m_pluginServices->getConfigFileDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
+            //QString optSetupGlobalConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename_readonly", m_pluginServices->getGlobalConfigFileDirectory()+"/spim_at_b040.optSetup.ini").toString();
+            //QString optSetupUserConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename", m_pluginServices->getConfigFileDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
             QStringList optSetupFiles;
             QDir().mkpath(QFileInfo(optSetupUserConfigFile).absolutePath());
             QDir().mkpath(QFileInfo(optSetupGlobalConfigFile).absolutePath());
@@ -127,8 +135,13 @@ void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
     if (widOverview) widOverview->storeSettings((*settings->getQSettings()), "plugin_spim_b040/overviewacquisition/");
     if (widCamParamScan) widCamParamScan->storeSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
     if (widDeviceParamScan) widDeviceParamScan->storeSettings((*settings->getQSettings()), "plugin_spim_b040/deviceparamscan/");
-    if (widConfig) widConfig->storeSettings((*settings->getQSettings()), "plugin_spim_b040/config/");
+    //if (widConfig) widConfig->storeSettings((*settings->getQSettings()), "plugin_spim_b040/config/");
 
+}
+
+void QFESPIMB040MainWindow2::setOptSetup(const QString &optSetupFile)
+{
+    this->optSetupFile=optSetupFile;
 }
 
 QFESPIMB040AcquisitionConfigWidget2 *QFESPIMB040MainWindow2::getWidAcquisition() const
@@ -203,9 +216,14 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager, bool 
         ////////////////////////////////////////////////////////////////////////////////////////////////
         optSetup2=new QFESPIMB040OpticsSetup2(this, this, this, m_pluginServices);
         optSetup2->setAcquisitionTools(this);
-        QString optSetupFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup").toString();
-        QString optSetupGlobalConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename_readonly", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
-        QString optSetupUserConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename", m_pluginServices->getConfigFileDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
+        //QString optSetupFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup").toString();
+        QFileInfo fi(optSetupFile);
+        QDir dir;
+        dir=QDir(ProgramOptions::getConfigValue("spimb040/optsetup_config_directory_readonly", ProgramOptions::getInstance()->getGlobalConfigFileDirectory()).toString());
+        QString optSetupGlobalConfigFile=dir.absoluteFilePath(fi.fileName()+".ini");
+        dir=QDir(ProgramOptions::getConfigValue("spimb040/optsetup_config_directory", ProgramOptions::getInstance()->getConfigFileDirectory()).toString());
+        QString optSetupUserConfigFile=dir.absoluteFilePath(fi.fileName()+".ini");
+        //QString optSetupUserConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename", m_pluginServices->getConfigFileDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
         optSetup2->loadOptSetup(optSetupFile);
         //optSetup2->loadSettings(ProgramOptions::getConfigValue("spimb040/optsetup_config_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString());
         QStringList optSetupFiles;
@@ -296,9 +314,9 @@ void QFESPIMB040MainWindow2::createWidgets(QFExtensionManager* extManager, bool 
         //------------------------------------------------------------------------------------------
         // create configuration tab
         //------------------------------------------------------------------------------------------
-        widConfig=new QFESPIMB040ConfigTabWidget(this);
+        /*widConfig=new QFESPIMB040ConfigTabWidget(this);
         tabMain->addTab(widConfig, tr("&Configuration"));
-        connect(widConfig, SIGNAL(styleChanged(QString,QString)), this, SLOT(styleChanged(QString,QString)));
+        connect(widConfig, SIGNAL(styleChanged(QString,QString)), this, SLOT(styleChanged(QString,QString)));*/
 
 
 

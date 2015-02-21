@@ -391,6 +391,8 @@ void QFRDRTablePlotWidget::setAxisProps(JKQTPcoordinateAxis* axis, const QFRDRTa
     axis->set_drawMode1(axisData.labelMode1);
     axis->set_drawMode2(axisData.labelMode2);
     axis->set_tickLabelAngle(axisData.labelAngel);
+    axis->set_lineWidth(axisData.axis1LineWidth);
+    axis->set_lineWidthZeroAxis(axisData.zeroAxisLineWidth);
 
 
     axis->set_userTickSpacing(axisData.TickSpacing);

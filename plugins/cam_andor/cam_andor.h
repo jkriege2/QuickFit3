@@ -24,6 +24,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 
 #include <time.h>
 #include <QObject>
+#include "datatools.h"
 #include "qfextension.h"
 #include "qfextensioncamera.h"
 #include "highrestimer.h"
@@ -380,8 +381,8 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             /** \brief output amplifier mode: 0: EMCCD (default) 1: CCD (switch EM gain off) */
             int outputAmplifier;
 
-            /** \brief preamplifier gain */
-            float preamp_gain;
+            /** \brief preamplifier gain index */
+            int preamp_gain;
 
             /** \brief vertical shift amplitude (0, +1..+4)*/
             int vsAmplitude;
@@ -425,6 +426,8 @@ class QFExtensionCameraAndor : public QObject, public QFExtensionBase, public QF
             int verticalSpeed;
             /** \brief speed of horizontal shift in MHz (read by readCameraProperties() from camera, so not change) */
             float horizontalSpeed;
+            /** \brief speed of horizontal shift in MHz (read by readCameraProperties() from camera, so not change) */
+            float sensitivity;
 
             /** \brief readout time of sensor */
             float readoutTime;

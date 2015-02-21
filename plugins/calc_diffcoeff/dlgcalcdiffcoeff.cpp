@@ -240,8 +240,8 @@ void DlgCalcDiffCoeff::updateD() {
         double tauRot=1.0/6.0/Drot;
         double Drot20W=plugin->getSphereDRotCoeff(0, 2.0*RH, 273.15+20, QList<QFEDiffusionCoefficientCalculator::Component>(), 1);
         double tauRot20W=1.0/6.0/Drot20W;
-        ui->labGivenDDrot->setText(tr("D<sub>rot</sub>(R<sub>H</sub>) = %1 rad<sup>2</sup>/s&nbsp;&nbsp;&nbsp;&nbsp;&tau;<sub>rot</sub>(R<sub>H</sub>) = %2s").arg(Drot).arg(doubleToUnitString(tauRot, 5, true, QLatin1Char('.'), true)));
-        ui->labGivenDTauRot->setText(tr("D<sub>rot,20,W</sub>(R<sub>H</sub>) = %1 rad<sup>2</sup>/s&nbsp;&nbsp;&nbsp;&nbsp;&tau;<sub>rot,20,W</sub>(R<sub>H</sub>) = %2s").arg(Drot20W).arg(doubleToUnitString(tauRot20W, 5, true, QLatin1Char('.'), true)));
+        ui->labGivenDDrot->setText(tr("D<sub>rot</sub>(R<sub>H</sub>) = %1 rad<sup>2</sup>/s&nbsp;&nbsp;&nbsp;&nbsp;&tau;<sub>rot</sub>(R<sub>H</sub>) = %2s").arg(doubleToHTMLQString(Drot,3,true)).arg(doubleToUnitString(tauRot, 3, true, QLatin1Char('.'), true)));
+        ui->labGivenDTauRot->setText(tr("D<sub>rot,20,W</sub>(R<sub>H</sub>) = %1 rad<sup>2</sup>/s&nbsp;&nbsp;&nbsp;&nbsp;&tau;<sub>rot,20,W</sub>(R<sub>H</sub>) = %2s").arg(doubleToHTMLQString(Drot20W,3,true)).arg(doubleToUnitString(tauRot20W, 3, true, QLatin1Char('.'), true)));
 
     } else if (ui->tabWidget->currentWidget()==ui->givenD) {
         double lvisc=plugin->getSolutionViscosity(ui->cmbSolutionName->currentIndex(), 273.15+ui->spinGivenDInSolutionT->value(), comps)*ui->spinViscosityFactor->value();
@@ -258,8 +258,8 @@ void DlgCalcDiffCoeff::updateD() {
         double tauRot=1.0/6.0/Drot;
         double Drot20W=plugin->getSphereDRotCoeff(0, 2.0*RH, 273.15+20, QList<QFEDiffusionCoefficientCalculator::Component>(), 1);
         double tauRot20W=1.0/6.0/Drot20W;
-        ui->labGivenDInSolutionDrot->setText(tr(" %1 &nbsp;&nbsp;/&nbsp;&nbsp; %2").arg(Drot).arg(Drot20W));
-        ui->labGivenDInSolutionTauRot->setText(tr(" %1s &nbsp;&nbsp;/&nbsp;&nbsp; %2s").arg(doubleToUnitString(tauRot, 5, true, QLatin1Char('.'), true)).arg(doubleToUnitString(tauRot20W, 5, true, QLatin1Char('.'), true)));
+        ui->labGivenDInSolutionDrot->setText(tr(" %1 &nbsp;&nbsp;/&nbsp;&nbsp; %2").arg(doubleToHTMLQString(Drot,3,true)).arg(doubleToHTMLQString(Drot20W,3,true)));
+        ui->labGivenDInSolutionTauRot->setText(tr(" %1s &nbsp;&nbsp;/&nbsp;&nbsp; %2s").arg(doubleToUnitString(tauRot, 3, true, QLatin1Char('.'), true)).arg(doubleToUnitString(tauRot20W, 3, true, QLatin1Char('.'), true)));
 
     } else if (ui->tabWidget->currentWidget()==ui->givenD20W) {
         DD=plugin->getDCoeff_from_D20W(ui->cmbSolutionName->currentIndex(), ui->spinGivenD20W->value()/1e12, 273.15+T, comps, ui->spinViscosityFactor->value())*1e12;
@@ -270,13 +270,19 @@ void DlgCalcDiffCoeff::updateD() {
         double tauRot=1.0/6.0/Drot;
         double Drot20W=plugin->getSphereDRotCoeff(0, 2.0*RH, 273.15+20, QList<QFEDiffusionCoefficientCalculator::Component>(), 1);
         double tauRot20W=1.0/6.0/Drot20W;
-        ui->labGivenD20WDrot->setText(tr(" %1 &nbsp;&nbsp;/&nbsp;&nbsp; %2").arg(Drot).arg(Drot20W));
-        ui->labGivenD20WTauRot->setText(tr(" %1s &nbsp;&nbsp;/&nbsp;&nbsp; %2s").arg(doubleToUnitString(tauRot, 5, true, QLatin1Char('.'), true)).arg(doubleToUnitString(tauRot20W, 5, true, QLatin1Char('.'), true)));
+        ui->labGivenD20WDrot->setText(tr(" %1 &nbsp;&nbsp;/&nbsp;&nbsp; %2").arg(doubleToHTMLQString(Drot,3,true)).arg(doubleToHTMLQString(Drot20W,3,true)));
+        ui->labGivenD20WTauRot->setText(tr(" %1s &nbsp;&nbsp;/&nbsp;&nbsp; %2s").arg(doubleToUnitString(tauRot, 3, true, QLatin1Char('.'), true)).arg(doubleToUnitString(tauRot20W, 3, true, QLatin1Char('.'), true)));
     } else if (ui->tabWidget->currentWidget()==ui->tabGeometry) {
-        DD=plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, comps, ui->spinViscosityFactor->value())*1e12;
+        double length_rot=ui->spinRotationAxis->value()*1e-9;
+        double length_other=ui->spinOtherAxis->value()*1e-9;
+        if (ui->cmbShapeType->currentIndex()==QFEDiffusionCoefficientCalculator::GlobularProtein) {
+            length_rot=ui->spinRotationAxis->value()*1e3;
+            length_other=ui->spinOtherAxis->value()*1e3;
+        }
+        DD=plugin->getShapeDCoeff(ui->cmbSolutionName->currentIndex(), length_rot, length_other, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+T, comps, ui->spinViscosityFactor->value())*1e12;
         double D20Wsphere=0;
         double volume=0;
-        double D20W=plugin->getShapeDCoeff(0, ui->spinRotationAxis->value()*1e-9, ui->spinOtherAxis->value()*1e-9, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+20.0, QList<QFEDiffusionCoefficientCalculator::Component>(), 1, &D20Wsphere, &volume)*1e12;
+        double D20W=plugin->getShapeDCoeff(0, length_rot, length_other, QFEDiffusionCoefficientCalculator::SpheroidType(ui->cmbShapeType->currentIndex()), 273.15+20.0, QList<QFEDiffusionCoefficientCalculator::Component>(), 1, &D20Wsphere, &volume)*1e12;
         double etaW20=plugin->getSolutionViscosity(0, 293.15);
         D20Wsphere*=1e12;
         volume=volume*1e27;
@@ -286,10 +292,10 @@ void DlgCalcDiffCoeff::updateD() {
 
         double Drot=plugin->getSphereDRotCoeff(0, 2.0*RH, 273.15+T, comps, ui->spinViscosityFactor->value());
         double tauRot=1.0/6.0/Drot;
-        QString txt=tr("<br>D<sub>rot</sub>(R<sub>H</sub>) = %1 rad<sup>2</sup>/s&nbsp;&nbsp;&nbsp;&nbsp;&tau;<sub>rot</sub>(R<sub>H</sub>) = %2s").arg(Drot).arg(doubleToUnitString(tauRot, 5, true, QLatin1Char('.'), true));
-        double Drot20W=plugin->getSphereDRotCoeff(0, 2.0*RH, 273.15+20, QList<QFEDiffusionCoefficientCalculator::Component>(), 1);
+        QString txt=tr("<br>D<sub>rot</sub>(R<sub>H</sub>) = %1 rad<sup>2</sup>/s&nbsp;&nbsp;&nbsp;&nbsp;&tau;<sub>rot</sub>(R<sub>H</sub>) = %2s").arg(doubleToHTMLQString(Drot,3,true)).arg(doubleToUnitString(tauRot, 3, true, QLatin1Char('.'), true));
+        double Drot20W=plugin->getSphereDRotCoeff(0, 2.0*RH, 273.15+20.0, QList<QFEDiffusionCoefficientCalculator::Component>(), 1);
         double tauRot20W=1.0/6.0/Drot20W;
-        txt=txt+tr("<br>D<sub>rot,20,W</sub>(R<sub>H</sub>) = %1 rad<sup>2</sup>/s&nbsp;&nbsp;&nbsp;&nbsp;&tau;<sub>rot,20,W</sub>(R<sub>H</sub>) = %2s").arg(Drot20W).arg(doubleToUnitString(tauRot20W, 5, true, QLatin1Char('.'), true));
+        txt=txt+tr("<br>D<sub>rot,20,W</sub>(R<sub>H</sub>) = %1 rad<sup>2</sup>/s&nbsp;&nbsp;&nbsp;&nbsp;&tau;<sub>rot,20,W</sub>(R<sub>H</sub>) = %2s").arg(doubleToHTMLQString(Drot20W,3,true)).arg(doubleToUnitString(tauRot20W, 3, true, QLatin1Char('.'), true));
         ui->labShapeD->setText(ui->labShapeD->text()+txt);
 
     } else  {
@@ -314,6 +320,8 @@ void DlgCalcDiffCoeff::updateGivenD() {
 
     updating=true;
 
+    ui->labStdSamplePic->clear();
+
     QString name=ui->cmbGivenDName->currentText();
     if (name.endsWith(userDDescriptor)) name=name.left(name.size()-userDDescriptor.size());
     //ui->cmbGivenDName->clear();
@@ -332,6 +340,10 @@ void DlgCalcDiffCoeff::updateGivenD() {
             ui->edtGivenDError->setValue(set.value(groups[i]+"/D_error", 0).toDouble());
             ui->edtBuffer->setText(set.value(groups[i]+"/solvent", set.value(groups[i]+"/buffer", "").toString()).toString());
             ui->edtMethod->setText(set.value(groups[i]+"/method", "").toString());
+            QString fn=QFileInfo(set.fileName()).absoluteDir().absoluteFilePath(set.value(groups[i]+"/image", "").toString());
+            if (QFile::exists(fn)) {
+                ui->labStdSamplePic->setPixmap(QPixmap(fn));
+            }
             break;
         }
     }
@@ -346,9 +358,13 @@ void DlgCalcDiffCoeff::updateGivenD() {
             QVariant ref=setC.value(groups[i]+"/reference", "");
             if (ref.type()==QVariant::StringList) ref=ref.toStringList().join(", ");
             ui->edtReference->setText(ref.toString());
-            ui->edtGivenDError->setValue(set.value(groups[i]+"/D_error", 0).toDouble());
-            ui->edtBuffer->setText(set.value(groups[i]+"/solvent", set.value(groups[i]+"/buffer", "").toString()).toString());
-            ui->edtMethod->setText(set.value(groups[i]+"/method", "").toString());
+            ui->edtGivenDError->setValue(setC.value(groups[i]+"/D_error", 0).toDouble());
+            ui->edtBuffer->setText(setC.value(groups[i]+"/solvent", setC.value(groups[i]+"/buffer", "").toString()).toString());
+            ui->edtMethod->setText(setC.value(groups[i]+"/method", "").toString());
+            QString fn=QFileInfo(setC.fileName()).absoluteDir().absoluteFilePath(setC.value(groups[i]+"/image", "").toString());
+            if (QFile::exists(fn)) {
+                ui->labStdSamplePic->setPixmap(QPixmap(fn));
+            }
             break;
         }
     }
@@ -784,7 +800,7 @@ void DlgCalcDiffCoeff::on_cmbShapeType_currentIndexChanged(int index) {
         ui->labOtherAxis->setText(tr("---"));
         ui->labOtherAxis->setVisible(false);
         ui->spinOtherAxis->setVisible(false);
-        ui->spinRotationAxis->setSuffix(tr(" Da"));
+        ui->spinRotationAxis->setSuffix(tr(" kDa"));
     } else {
         ui->labShapePic->setPixmap(QPixmap(":/calc_diffcoeff/sphere.png"));
         ui->labRotAxis->setText(tr("diameter d:"));

@@ -187,6 +187,7 @@ QFExtensionCameraAndor::CameraInfo::CameraInfo() {
     pixelHeight=0;
     verticalSpeed=0;
     horizontalSpeed=0;
+    sensitivity=0;
     readoutTime=0;
     fileformat=0;
 
@@ -247,6 +248,9 @@ void QFExtensionCameraAndor::initExtension() {
     GetVersionInfo(AT_DeviceDriverVersion, version, 1023);
     deviceDriverVersion=version;
     services->log_global_text(tr("%2    device driver version: %1\n").arg(QString(version)).arg(LOG_PREFIX));
+    at_32 lNumCameras;
+    GetAvailableCameras(&lNumCameras);
+    services->log_global_text(tr("%2    available cameras: %1\n").arg(lNumCameras).arg(LOG_PREFIX));
 
 
     // try to load global settings for all available cameras (more may be added by connectDevice() function
@@ -279,33 +283,6 @@ void QFExtensionCameraAndor::initExtension() {
         extm->addAction(actShowGlobal);
     }
 
-/*
-    #ifdef __LINUX__
-    { services->log_global_text(tr("%2  loading Andor driver module into Linux kernel (running andordrvlx_load) ...").arg(getName()).arg(LOG_PREFIX));
-
-      QProcess *myProcess = new QProcess(this);
-      myProcess->start(QString("andordrvlx_load"));
-      bool ok=myProcess->waitForFinished(10000);
-      if (!ok) {
-          services->log_global_error(tr("\n%2  ERROR loading Andor driver module into Linux kernel ... process timed out after 10 seconds\n").arg(getName()).arg(LOG_PREFIX));
-          myProcess->kill();
-      } else {
-          QProcess::ExitStatus status=myProcess->exitStatus();
-          int code=myProcess->exitCode();
-          if (status!=QProcess::NormalExit) {
-              services->log_global_error(tr("\n%2  ERROR loading Andor driver module into Linux kernel ... process crashed\n").arg(getName()).arg(LOG_PREFIX));
-          } else if (code!=0)  {
-              services->log_global_error(tr("\n%2  ERROR loading Andor driver module into Linux kernel ... errorcode non-zero, was %1\n").arg(code).arg(LOG_PREFIX));
-          } else {
-              services->log_global_text(tr("OK\n"));
-          }
-      }
-
-      delete myProcess;
-    }
-
-    #endif
-*/
 
     // load settings
     loadSettings(NULL);
@@ -933,11 +910,13 @@ void QFExtensionCameraAndor::internalGetAcquisitionDescription(unsigned int came
     GetAmpDesc(info.outputAmplifier, text, 512);
     (*parameters)["output_amplifier"]=QString(text);
 
+
     (*parameters)["sequence_length"]=info.numAccs;
     (*parameters)["frame_time"]=(double)info.kinTime;
     (*parameters)["accumulation_time"]=(double)info.accTime;
     (*parameters)["spooling"]=info.spooling;
     (*parameters)["readout_time"]=(double)info.readoutTime;
+    (*parameters)["camera_sensitivity"]=(double)info.sensitivity;
     (*parameters)["horizontal_shift_speed"]=(double)info.horizontalSpeed;
     (*parameters)["vertical_shift_speed"]=info.verticalSpeed;
     (*parameters)["pixel_width"]=(double)info.pixelWidth*(double)info.hbin;
@@ -994,6 +973,33 @@ void QFExtensionCameraAndor::getCameraAcquisitionDescription(unsigned int camera
     }
 
     internalGetAcquisitionDescription(camera, parameters);
+    selectCamera(camera);
+    QString qefilename=thread->getPrefix()+"_cameraqe.dat";
+    QFDataExportTool qedata;
+    int i=0;
+    char headModel[MAX_PATH];
+    if (GetHeadModel(headModel)==DRV_SUCCESS){
+        qedata.setColTitle(0, tr("wavelength [nm]"));
+        qedata.setColTitle(1, tr("QE"));
+        for (float l=100; l<2000; l++) {
+            float qe=0;
+            if (GetQE(headModel,l,&qe)==DRV_SUCCESS){
+                qedata.set(0, i, l);
+                qedata.set(1, i, qe);
+            }
+            i++;
+        }
+        if (qedata.getRowCount()>0) {
+            qedata.save(qefilename, 0);
+            QFExtensionCamera::CameraAcquititonFileDescription d;
+            d.name=qefilename;
+            d.type="CSV";
+            d.description=tr("Andor Camera Quantum Efficiency");
+            files->append(d);
+        }
+
+    }
+
     (*parameters)["duration_milliseconds"]=duration;
 
 }
@@ -1082,7 +1088,9 @@ void QFExtensionCameraAndor::readCameraProperties(int camera, QFExtensionCameraA
     CHECK_NO_RETURN(GetPreAmpGain(info.preamp_gain, &(info.preampGainF)), tr("error while reading preamplifier gain"));
     CHECK_NO_RETURN(GetVerticalSpeed(info.vsSpeed, &(info.verticalSpeed)), tr("error while reading preamplifier gain"));
     CHECK_NO_RETURN(GetHSSpeed(info.ADchannel, info.outputAmplifier, info.hsSpeed, &(info.horizontalSpeed)), tr("error while reading horicontal shift speed"));
-
+    if (GetSensitivity(info.ADchannel, info.outputAmplifier, info.hsSpeed, info.preamp_gain, &(info.sensitivity))!=DRV_SUCCESS) {
+        info.sensitivity=0;
+    }
 }
 
 bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndor::CameraInfo& info) {
@@ -1147,6 +1155,8 @@ bool QFExtensionCameraAndor::setCameraSettings(int camera, QFExtensionCameraAndo
         info.expoTime=exposure;
         info.accTime=accumulate;
         info.kinTime=kinetic;
+
+
 
         return true;
     }

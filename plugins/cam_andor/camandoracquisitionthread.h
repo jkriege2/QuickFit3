@@ -50,8 +50,9 @@ class CamAndorAcquisitionThread : public QThread {
 
         double getTemperature() const;
 
-        QStringList getOutputFilenames() { return outputFilenames; }
-        QStringList getOutputFilenameTypes() { return outputFilenameTypes; }
+        inline QStringList getOutputFilenames() const { return outputFilenames; }
+        inline QStringList getOutputFilenameTypes() const { return outputFilenameTypes; }
+        inline QString getPrefix() const { return m_filenamePrefix; }
     public slots:
         /** \brief cancel the acquisition */
         void cancelAcquisition() { canceled=true; }

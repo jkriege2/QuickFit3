@@ -23,7 +23,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfimagereaderradhard.h"
 #include "qfbasicimageimportersoptionswidget.h"
 #include "qfimagereaderdiffusion4binary.h"
-
+#include "qfimagereaderraw.h"
 
 QStringList QFBasicImageImporters::getIDs() const {
     QStringList res;
@@ -31,6 +31,12 @@ QStringList QFBasicImageImporters::getIDs() const {
     res<<"imageimporter_tinytiff";
     res<<"imageimporter_radhard";
     res<<"imageimporter_diffusion4btsbinary";
+    res<<"imageimporter_rawunit8";
+    res<<"imageimporter_rawunit16";
+    res<<"imageimporter_rawunit32";
+    res<<"imageimporter_rawunit64";
+    res<<"imageimporter_rawfloat";
+    res<<"imageimporter_rawdouble";
     return res;
 }
 
@@ -46,6 +52,24 @@ QFImporter* QFBasicImageImporters::createImporter(QString id) const  {
     }
     if (id=="imageimporter_diffusion4btsbinary") {
         return new QFImageReaderDiffusion4Binary();
+    }
+    if (id=="imageimporter_rawunit8") {
+        return new QFImageReaderRAW<uint8>("uint 8-bit");
+    }
+    if (id=="imageimporter_rawunit16") {
+        return new QFImageReaderRAW<uint8>("uint 16-bit");
+    }
+    if (id=="imageimporter_rawunit32") {
+        return new QFImageReaderRAW<uint8>("uint 32-bit");
+    }
+    if (id=="imageimporter_rawunit64") {
+        return new QFImageReaderRAW<uint8>("uint 64-bit");
+    }
+    if (id=="imageimporter_rawfloat") {
+        return new QFImageReaderRAW<uint8>("float 32-bit");
+    }
+    if (id=="imageimporter_rawdouble") {
+        return new QFImageReaderRAW<uint8>("double 64-bit");
     }
     return NULL;
 }

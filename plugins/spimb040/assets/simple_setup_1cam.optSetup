@@ -1,3 +1,6 @@
+[General]
+name="Simple Microscope with 1 camera"
+
 
 [group_detection]
 type=group

@@ -81,6 +81,7 @@ void QFExtensionServoPololuMaestro::initExtension() {
     QString ini=services->getGlobalConfigFileDirectory()+QString("/servo_pololu_maestro.ini");
     if (!QFile::exists(ini)) ini=services->getConfigFileDirectory()+QString("/servo_pololu_maestro.ini");
     if (!QFile::exists(ini)) ini=services->getAssetsDirectory()+QString("/plugins/")+getID()+QString("/servo_pololu_maestro.ini");
+    QFPluginServices::getInstance()->log_global_text(tr("%1loading INI-file %2\n").arg(QString(LOG_PREFIX)).arg(ini));
     QSettings inifile(ini, QSettings::IniFormat);
     int shutter_count=inifile.value("device_count", 0).toUInt();
     deviceIndex.clear();

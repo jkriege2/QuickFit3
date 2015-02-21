@@ -534,9 +534,10 @@ void QFRDRTablePlotSettingsWidget::on_btnLoadSystem_clicked() {
              QDomElement docElem = doc.documentElement();
              if (docElem.tagName().toLower()=="graph_templates") {
                  QDomElement te=docElem.firstChildElement("plot");
+                 bool readLabels=QMessageBox::question(this, tr("paste system config"), tr("Dou you want to overwrite axis/plot labels?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
                  while(!te.isNull()) {
                      QFRDRTable::PlotInfo pi=current->getPlot(plot);
-                     current->readPlotInfo(pi, te);
+                     current->readPlotInfo(pi, te, readLabels);
                      current->setPlot(plot, pi);
                      te = te.nextSiblingElement("plot");
                  }
@@ -579,12 +580,13 @@ void QFRDRTablePlotSettingsWidget::on_btnPasteSystem_clicked()
         doc.setContent(s);
         QDomElement docElem = doc.documentElement();
         if (docElem.tagName().toLower()=="graph_templates") {
+            bool readLabels=QMessageBox::question(this, tr("paste system config"), tr("Dou you want to overwrite axis/plot labels?"), QMessageBox::Yes|QMessageBox::No, QMessageBox::Yes)==QMessageBox::Yes;
             QDomElement te=docElem.firstChildElement("plot");
             if(!te.isNull()) {
                 QFRDRTable::PlotInfo pi=current->getPlot(plot);
-                current->readPlotInfo(pi, te);
+                current->readPlotInfo(pi, te, readLabels);
                 current->setPlot(plot, pi);
-                te = te.nextSiblingElement("plot");
+                //te = te.nextSiblingElement("plot");
             }
         }
     }

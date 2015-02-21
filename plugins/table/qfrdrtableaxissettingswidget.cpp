@@ -69,13 +69,13 @@ QFRDRTableAxisSettingsWidget::~QFRDRTableAxisSettingsWidget()
     delete ui;
 }
 
-void QFRDRTableAxisSettingsWidget::loadPlotData(const QFRDRTable::AxisInfo& g)
+void QFRDRTableAxisSettingsWidget::loadPlotData(const QFRDRTable::AxisInfo& g, bool overwriteLabels)
 {
     updating=true;
 
     setEnabled(true);
 
-    ui->edtXLabel->setText(g.label);
+    if (overwriteLabels) ui->edtXLabel->setText(g.label);
     ui->chkLogX->setChecked(g.log);
     ui->chkX0Axis->setChecked(g.axis0);
     ui->edtXMin->setValue(g.min);
@@ -106,6 +106,11 @@ void QFRDRTableAxisSettingsWidget::loadPlotData(const QFRDRTable::AxisInfo& g)
     ui->cmbNamedTicksValues->setCurrentData(g.columnNamedTickValues);
 
     ui->spinLabelAngel->setValue(g.labelAngel);
+
+
+    ui->spin0AxisWidth->setValue(g.zeroAxisLineWidth);
+    ui->spinAxis1Width->setValue(g.axis1LineWidth);
+
 
     updating=false;
     connectWidgets();
@@ -141,6 +146,9 @@ void QFRDRTableAxisSettingsWidget::storePlotData(QFRDRTable::AxisInfo &g)
 
     g.columnNamedTickNames=qMax(-2, ui->cmbNamedTicksNames->currentData().toInt());
     g.columnNamedTickValues=qMax(-2, ui->cmbNamedTicksValues->currentData().toInt());
+
+    g.zeroAxisLineWidth=ui->spin0AxisWidth->value();
+    g.axis1LineWidth=ui->spinAxis1Width->value();
 
 }
 
@@ -184,6 +192,9 @@ void QFRDRTableAxisSettingsWidget::saveToSettings(QSettings &set, const QString 
     set.setValue(axis+"minortickolength", ui->spinXMinOLength->value());
     set.setValue(axis+"tickwidth", ui->spinXTickWidth->value());
     set.setValue(axis+"minortickwidth", ui->spinXTickMinWidth->value());
+
+    set.setValue(axis+"axis0_linewidth", ui->spin0AxisWidth->value());
+    set.setValue(axis+"axis1_linewidth", ui->spinAxis1Width->value());
 }
 
 void QFRDRTableAxisSettingsWidget::loadFromSettings(QSettings &set, const QString &axis)
@@ -214,6 +225,10 @@ void QFRDRTableAxisSettingsWidget::loadFromSettings(QSettings &set, const QStrin
 
     ui->chkXInverted->setChecked(set.value(axis+"inverted", ui->chkXInverted->isChecked()).toBool());
     ui->chkXAutoTicks->setChecked(set.value(axis+"autoticks", ui->chkXAutoTicks->isChecked()).toBool());
+
+    ui->spin0AxisWidth->setValue(set.value(axis+"axis0_linewidth", ui->spin0AxisWidth->value()).toDouble());
+    ui->spinAxis1Width->setValue(set.value(axis+"axis1_linewidth", ui->spinAxis1Width->value()).toDouble());
+
 
     updating=false;
     connectWidgets();
@@ -340,6 +355,9 @@ void QFRDRTableAxisSettingsWidget::connectWidgets()
     connect(ui->spinXTickMinWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     connect(ui->spinLabelAngel, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
 
+    connect(ui->spin0AxisWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    connect(ui->spinAxis1Width, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+
 
 }
 
@@ -370,6 +388,9 @@ void QFRDRTableAxisSettingsWidget::disconnectWidgets()
     disconnect(ui->spinXTickWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinXTickMinWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
     disconnect(ui->spinLabelAngel, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+
+    disconnect(ui->spin0AxisWidth, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
+    disconnect(ui->spinAxis1Width, SIGNAL(valueChanged(double)), this, SLOT(plotDataChanged()));
 
 }
 

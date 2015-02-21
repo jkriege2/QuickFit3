@@ -39,12 +39,14 @@ HEADERS += qfediffusioncoefficientcalculator.h \
     ../interfaces/qfextensiontool.h \
     ../interfaces/qfextensionreportingtool.h \
     dlgcomponentinfo.h \
-    optionswidget.h
+    optionswidget.h \
+    qfediffusioncoefficientcalculator_parserfunctions.h
 
 SOURCES += qfediffusioncoefficientcalculator.cpp \
     dlgcalcdiffcoeff.cpp \
     dlgcomponentinfo.cpp \
-    optionswidget.cpp
+    optionswidget.cpp \
+    qfediffusioncoefficientcalculator_parserfunctions.cpp
 
 FORMS = \
     dlgcalcdiffcoeff.ui \

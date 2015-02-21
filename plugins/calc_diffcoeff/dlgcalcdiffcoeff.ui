@@ -29,17 +29,132 @@
      <item row="0" column="0" rowspan="2">
       <widget class="QTabWidget" name="tabWidget">
        <property name="currentIndex">
-        <number>3</number>
+        <number>0</number>
        </property>
        <widget class="QWidget" name="tabStdSample">
         <attribute name="title">
          <string>std. samples</string>
         </attribute>
-        <layout class="QFormLayout" name="formLayout">
-         <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-         </property>
-         <item row="1" column="0">
+        <layout class="QGridLayout" name="gridLayout_5">
+         <item row="3" column="1">
+          <widget class="QFDoubleEdit" name="edtGivenDVisc">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="readOnly">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QLabel" name="label_9">
+           <property name="text">
+            <string>temperature [&amp;deg;C]:</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QLabel" name="labGivenDD20W">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="1">
+          <widget class="QLabel" name="labGivenDRH">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QDoubleSpinBox" name="spinGivenDT">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="suffix">
+            <string> °C</string>
+           </property>
+           <property name="decimals">
+            <number>3</number>
+           </property>
+           <property name="minimum">
+            <double>-274.000000000000000</double>
+           </property>
+           <property name="maximum">
+            <double>1000.000000000000000</double>
+           </property>
+           <property name="value">
+            <double>20.000000000000000</double>
+           </property>
+          </widget>
+         </item>
+         <item row="7" column="1">
+          <widget class="QLabel" name="labGivenDDrot">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item row="8" column="1">
+          <widget class="QLabel" name="labGivenDTauRot">
+           <property name="text">
+            <string>TextLabel</string>
+           </property>
+           <property name="textFormat">
+            <enum>Qt::RichText</enum>
+           </property>
+           <property name="textInteractionFlags">
+            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+           </property>
+          </widget>
+         </item>
+         <item row="9" column="0">
+          <widget class="QLabel" name="label_32">
+           <property name="text">
+            <string>method:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="10" column="0">
+          <widget class="QLabel" name="label_13">
+           <property name="text">
+            <string>reference:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="edtBuffer">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+           <property name="readOnly">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
           <widget class="QLabel" name="label_12">
            <property name="text">
             <string>name:</string>
@@ -47,6 +162,61 @@
           </widget>
          </item>
          <item row="1" column="1">
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <item>
+            <widget class="QFDoubleEdit" name="edtGivenD">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="readOnly">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_33">
+             <property name="text">
+              <string>&amp;plusmn;</string>
+             </property>
+             <property name="textFormat">
+              <enum>Qt::RichText</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QFDoubleEdit" name="edtGivenDError">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="readOnly">
+              <bool>false</bool>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_7">
+           <property name="text">
+            <string>D [µm²/s] = </string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_31">
+           <property name="text">
+            <string>buffer:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QLabel" name="label_8">
+           <property name="text">
+            <string>viscosity [mPa s]:</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1" colspan="2">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
             <widget class="QComboBox" name="cmbGivenDName">
@@ -111,134 +281,7 @@
            </item>
           </layout>
          </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_7">
-           <property name="text">
-            <string>D [µm²/s] = </string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
-           <item>
-            <widget class="QFDoubleEdit" name="edtGivenD">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="readOnly">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_33">
-             <property name="text">
-              <string>&amp;plusmn;</string>
-             </property>
-             <property name="textFormat">
-              <enum>Qt::RichText</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QFDoubleEdit" name="edtGivenDError">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="readOnly">
-              <bool>false</bool>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="3" column="0">
-          <widget class="QLabel" name="label_31">
-           <property name="text">
-            <string>buffer:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QLineEdit" name="edtBuffer">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="readOnly">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="label_8">
-           <property name="text">
-            <string>viscosity [mPa s]:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QFDoubleEdit" name="edtGivenDVisc">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="readOnly">
-            <bool>false</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QLabel" name="label_9">
-           <property name="text">
-            <string>temperature [&amp;deg;C]:</string>
-           </property>
-           <property name="textFormat">
-            <enum>Qt::RichText</enum>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QDoubleSpinBox" name="spinGivenDT">
-           <property name="enabled">
-            <bool>false</bool>
-           </property>
-           <property name="suffix">
-            <string> °C</string>
-           </property>
-           <property name="decimals">
-            <number>3</number>
-           </property>
-           <property name="minimum">
-            <double>-274.000000000000000</double>
-           </property>
-           <property name="maximum">
-            <double>1000.000000000000000</double>
-           </property>
-           <property name="value">
-            <double>20.000000000000000</double>
-           </property>
-          </widget>
-         </item>
-         <item row="6" column="1">
-          <widget class="QLabel" name="labGivenDD20W">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="textFormat">
-            <enum>Qt::RichText</enum>
-           </property>
-           <property name="textInteractionFlags">
-            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="0">
-          <widget class="QLabel" name="label_32">
-           <property name="text">
-            <string>method:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="10" column="1">
+         <item row="9" column="1" colspan="2">
           <widget class="QLineEdit" name="edtMethod">
            <property name="enabled">
             <bool>false</bool>
@@ -248,14 +291,7 @@
            </property>
           </widget>
          </item>
-         <item row="11" column="0">
-          <widget class="QLabel" name="label_13">
-           <property name="text">
-            <string>reference:</string>
-           </property>
-          </widget>
-         </item>
-         <item row="11" column="1">
+         <item row="10" column="1" colspan="2">
           <widget class="QLineEdit" name="edtReference">
            <property name="enabled">
             <bool>false</bool>
@@ -265,7 +301,7 @@
            </property>
           </widget>
          </item>
-         <item row="12" column="1">
+         <item row="11" column="1" colspan="2">
           <widget class="QPushButton" name="btnSendEmailGivenD">
            <property name="text">
             <string>send my &quot;given D&quot; data to QuickFit authors</string>
@@ -276,42 +312,10 @@
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
-          <widget class="QLabel" name="labGivenDRH">
+         <item row="1" column="2" rowspan="8">
+          <widget class="QLabel" name="labStdSamplePic">
            <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="textFormat">
-            <enum>Qt::RichText</enum>
-           </property>
-           <property name="textInteractionFlags">
-            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-           </property>
-          </widget>
-         </item>
-         <item row="8" column="1">
-          <widget class="QLabel" name="labGivenDDrot">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="textFormat">
-            <enum>Qt::RichText</enum>
-           </property>
-           <property name="textInteractionFlags">
-            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
-           </property>
-          </widget>
-         </item>
-         <item row="9" column="1">
-          <widget class="QLabel" name="labGivenDTauRot">
-           <property name="text">
-            <string>TextLabel</string>
-           </property>
-           <property name="textFormat">
-            <enum>Qt::RichText</enum>
-           </property>
-           <property name="textInteractionFlags">
-            <set>Qt::LinksAccessibleByMouse|Qt::TextSelectableByMouse</set>
+            <string/>
            </property>
           </widget>
          </item>
@@ -443,6 +447,9 @@
            <property name="suffix">
             <string> nm</string>
            </property>
+           <property name="decimals">
+            <number>3</number>
+           </property>
            <property name="minimum">
             <double>0.000000000000000</double>
            </property>
@@ -465,6 +472,9 @@
           <widget class="QDoubleSpinBox" name="spinOtherAxis">
            <property name="suffix">
             <string> nm</string>
+           </property>
+           <property name="decimals">
+            <number>3</number>
            </property>
            <property name="minimum">
             <double>0.000000000000000</double>

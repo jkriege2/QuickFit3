@@ -73,6 +73,8 @@
 #include "qfespimb040configtabwidget.h"
 #include "qfespimb040overviewacquisitionconfigwidget.h"
 
+class QFESPIMB040; // forward
+
 /*! \brief new SPIM Control Extension (B040, DKFZ Heidelberg) main window
     \ingroup qf3ext_spimb040
 
@@ -84,13 +86,15 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
         Q_OBJECT
         Q_INTERFACES(QFPluginLogService QFESPIMB040AcquisitionTools)
     public:
-        QFESPIMB040MainWindow2(QFPluginServices* pluginServices, QWidget* parent=NULL, bool newOpticsSetup=false, QFExtension* plugin=NULL);
+        QFESPIMB040MainWindow2(const QString& optSetupFile, QFPluginServices* pluginServices, QWidget* parent=NULL, bool newOpticsSetup=false, QFESPIMB040* plugin=NULL);
         virtual ~QFESPIMB040MainWindow2();
 
         /** \brief load settings */
         void loadSettings(ProgramOptions* settings);
         /** \brief save settings */
         void storeSettings(ProgramOptions* settings);
+
+        void setOptSetup(const QString& optSetupFile);
 
         QFESPIMB040AcquisitionConfigWidget2* getWidAcquisition() const;
 
@@ -100,6 +104,8 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
 
         /** \brief main log widget */
         QtLogFile* logMain;
+
+        QString optSetupFile;
 
         /** \brief main splitter */
         QVisibleHandleSplitter* splitter;
@@ -117,14 +123,14 @@ class QFESPIMB040MainWindow2 : public QWidget, public QFPluginLogService, public
         QFESPIMB040DeviceParamStackConfigWidget* widDeviceParamScan;
         QFESPIMB040AcquisitionDescription* widAcquisitionDescription;
         QFESPIMB040ScriptedAcquisition* widScriptedAcquisition;
-        QFESPIMB040ConfigTabWidget* widConfig;
+        //QFESPIMB040ConfigTabWidget* widConfig;
         QFESPIMB040OverviewAcquisitionConfigWidget* widOverview;
 
 
         QFEnhancedTabWidget* tabMain;
         QPushButton* btnHelp;
 
-        QFExtension* plugin;
+        QFESPIMB040* plugin;
 
 
 

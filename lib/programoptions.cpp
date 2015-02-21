@@ -89,7 +89,6 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
 
     QDir d(appDir);
     d.mkpath(configDir);
-    d.mkpath(globalConfigDir);
 
     this->app=app;
     iniFilename=ini;
@@ -108,6 +107,7 @@ ProgramOptions::ProgramOptions( QString ini, QObject * parent, QApplication* app
     autosave=5;
 
     readSettings();
+    d.mkpath(globalConfigDir);
     if (inst==NULL) inst=this;
 }
 
@@ -139,6 +139,7 @@ void ProgramOptions::writeSettings() {
     settings->setValue("quickfit/proxy/host", proxyHost);
     settings->setValue("quickfit/proxy/port", proxyPort);
     settings->setValue("quickfit/proxy/type", proxyType);
+    settings->setValue("quickfit/global_config_dir", globalConfigDir);
 }
 
 
@@ -161,6 +162,7 @@ void ProgramOptions::readSettings() {
     helpWindowsStayOnTop=settings->value("quickfit/helpWindowsStayOnTop", helpWindowsStayOnTop).toBool();
     projectWindowStayOnTop=settings->value("quickfit/projectWindowStayOnTop", projectWindowStayOnTop).toBool();
     m_debugLogVisible=settings->value("quickfit/debugLogVisible", m_debugLogVisible).toBool();
+    globalConfigDir=settings->value("quickfit/global_config_dir", globalConfigDir).toString();
 
     proxyHost=(settings->value("quickfit/proxy/host", proxyHost).toString());
     proxyPort=(settings->value("quickfit/proxy/port", proxyPort).toUInt());
@@ -220,6 +222,11 @@ QString ProgramOptions::getConfigFileDirectory() const {
 
 QString ProgramOptions::getGlobalConfigFileDirectory() const {
     return globalConfigDir;
+}
+
+void ProgramOptions::setGlobalConfigFileDirectory(const QString &dir)
+{
+    globalConfigDir=dir;
 }
 
 QString ProgramOptions::getPluginDirectory() const {

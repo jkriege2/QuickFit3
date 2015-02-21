@@ -244,7 +244,8 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
            settings.readFile(filename.toStdString()); // read in an INI file
            QStringList sgroups;
            for (int i=0; i<settings.getGroupCount(); i++) {
-               sgroups<<settings.getGroupName(i).c_str();
+               QString g=settings.getGroupName(i).c_str();
+               if (g.toLower().trimmed()!="general") sgroups<<g;
            }
 
            QString global_objectives=m_pluginServices->getGlobalConfigFileDirectory()+"/spimb040_objectives.ini";
@@ -252,7 +253,7 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
            QString stylesheet="";
 
 
-           qDebug()<<sgroups;
+           //qDebug()<<sgroups;
            for (int i=0; i<sgroups.size(); i++) {
                //settings.beginGroup(sgroups[i]);
                settings.enterGroup(sgroups[i].toStdString());
@@ -313,7 +314,7 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                    int spacing=settings.getAsInt("spacing", 3);//settings.value("colspan", 1).toInt();
                    QWidget* widNew=NULL;
                    if (ok) {
-                       qDebug()<<"create "<<type<<"-element '"<<id<<"' in "<<ingroupLayout->parent()->objectName()<<"   (x,y)="<<x<<y<<"   (ingroupW, ingroupH)="<<ingroupLayout->columnCount()<<ingroupLayout->rowCount();
+                       //qDebug()<<"create "<<type<<"-element '"<<id<<"' in "<<ingroupLayout->parent()->objectName()<<"   (x,y)="<<x<<y<<"   (ingroupW, ingroupH)="<<ingroupLayout->columnCount()<<ingroupLayout->rowCount();
                        if (type=="group") {
                            QGroupBox* w=new QGroupBox(this);
                            QGridLayout* wgl=new QGridLayout();
@@ -430,6 +431,8 @@ void QFESPIMB040OpticsSetup2::loadOptSetup(const QString &filename)
                                }
                                if (ui_lightsource.contains(used_by)) ui_lightsource[used_by].filters.append(id);
                            }
+                           connect(ui->btnLockFiltersEtc, SIGNAL(toggled(bool)), w, SLOT(setReadOnly(bool)));
+                           w->setReadOnly(ui->btnLockFiltersEtc->isChecked());
                            ui_filters[id]=w;
 
 

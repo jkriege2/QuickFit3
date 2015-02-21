@@ -140,6 +140,8 @@ class QFLIB_EXPORT ProgramOptions: public QObject {
 
         void setHomeQFDirectory(const QString& dir);
 
+        /** \brief set the directory from which to read global configuration data (do not expect to necessarily have write access to this directory!), see \ref qf3whereiswhat */
+        void setGlobalConfigFileDirectory(const QString& dir);
 
         void setProxyHost(const QString& host);
         void setProxyPort(quint16 port);

@@ -44,7 +44,7 @@ class QFRDRTableAxisSettingsWidget : public QWidget
         explicit QFRDRTableAxisSettingsWidget(QWidget *parent);
         ~QFRDRTableAxisSettingsWidget();
 
-        void loadPlotData(const QFRDRTable::AxisInfo &g);
+        void loadPlotData(const QFRDRTable::AxisInfo &g, bool overwriteLabels=true);
         void storePlotData(QFRDRTable::AxisInfo &g);
 
         bool getLogX() const;

@@ -437,6 +437,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
             double MinorTickInsideLength;
             double MinorTickOutsideLength;
             double labelAngel;
+            double zeroAxisLineWidth;
+            double axis1LineWidth;
 
             int columnNamedTickNames;
             int columnNamedTickValues;
@@ -651,8 +653,8 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         QString getExportDialogFiletypes() const { return tr("Table XML file (*.qftxml)")+";;"+QFDataExportHandler::getFormats().join(";;"); }
 
         QVariant evaluateExpression(QFMathParser &mp, QFMathParser::qfmpNode *n, QModelIndex cell, bool *ok, const QString &expression, QString *error, bool columnMode=false);
-        void readAxisInfo(AxisInfo &plot, const QString &axisName, QDomElement te);
-        void readPlotInfo(PlotInfo &plot, QDomElement te);
+        void readAxisInfo(AxisInfo &plot, const QString &axisName, QDomElement te, bool readLabels=true);
+        void readPlotInfo(PlotInfo &plot, QDomElement te, bool readLabels=true);
         void readGraphInfo(GraphInfo &graph, QDomElement te);
         void writeAxisInfo(QXmlStreamWriter& w, const AxisInfo &plot, const QString &axisName) const;
         void writePlotInfo(QXmlStreamWriter& w, const PlotInfo &plot, bool writeGraphs=true) const;

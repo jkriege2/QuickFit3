@@ -27,13 +27,14 @@
 #else
 #include <QtGui>
 #endif
-
+#include "spimb040optionswidget.h"
 
 
 QFESPIMB040::QFESPIMB040(QObject* parent):
     QObject(parent)
 {
     main=NULL;
+
 }
 
 QFESPIMB040::~QFESPIMB040()
@@ -53,31 +54,99 @@ void QFESPIMB040::deinit() {
     }
 }
 
+QString QFESPIMB040::pluginOptionsName() const
+{
+    return getName();
+}
+
+QIcon QFESPIMB040::pluginOptionsIcon() const
+{
+    return QIcon(QIcon(":/spimb040_logo.png"));
+}
+
+QFPluginOptionsWidget *QFESPIMB040::createOptionsWidget(QWidget *parent)
+{
+    SPIMB040OptionsWidget* wid= new SPIMB040OptionsWidget(this, parent);
+    connect(wid, SIGNAL(styleChanged(QString,QString)), this, SLOT(emitStyleChanged(QString,QString)));
+    connect(wid, SIGNAL(destroyed()), this, SLOT(updateFromConfig()));
+    return wid;
+
+}
+
+void QFESPIMB040::emitStyleChanged(const QString &style, const QString &stylesheet)
+{
+    emit styleChanged(style, stylesheet);
+}
+
+void QFESPIMB040::updateFromConfig()
+{
+    emitStyleChanged(ProgramOptions::getConfigValue("spimb040/style", ProgramOptions::getInstance()->getStyle()).toString(), ProgramOptions::getConfigValue("spimb040/stylesheet", ProgramOptions::getInstance()->getStylesheet()).toString());
+
+    for (int i=0; i<actsOptSetups.size(); i++) {
+        menuOptSetups->removeAction(actsOptSetups[i]);
+        actsOptSetups[i]->deleteLater();
+    }
+    menuOptSetups->clear();
+
+    QStringList dirs;
+    QString d;
+    d=ProgramOptions::getInstance()->getAssetsDirectory()+QString("/plugins/spimb040/");
+    if (!dirs.contains(d)) dirs<<d;
+    d=ProgramOptions::getInstance()->getGlobalConfigFileDirectory();
+    if (!dirs.contains(d)) dirs<<d;
+    d=ProgramOptions::getConfigValue("spimb040/optsetup_directory", ProgramOptions::getInstance()->getGlobalConfigFileDirectory()).toString();
+    if (!dirs.contains(d)) dirs<<d;
+
+
+    for (int j=0; j<dirs.size(); j++) {
+
+        QDir globalDir;
+        QStringList filters;
+        filters<<"*.optSetup";
+        QStringList files;
+
+
+        globalDir=dirs[j];
+        files=globalDir.entryList(filters, QDir::Files);
+
+
+        for (int i=0; i<files.size(); i++) {
+            QSettings set(globalDir.absoluteFilePath(files[i]), QSettings::IniFormat);
+            QString name=set.value("General/name", "").toString();
+            if (name.isEmpty()) name=files[i];
+            else name=QString("%1 [%2]").arg(name).arg(files[i]);
+            QAction* act=new QAction(name, this);
+            act->setData(globalDir.absoluteFilePath(files[i]));
+            connect(act, SIGNAL(triggered()), this, SLOT(startPluginNew()));
+            actsOptSetups.append(act);
+            menuOptSetups->addAction(act);
+        }
+        menuOptSetups->addSeparator();
+    }
+}
+
 void QFESPIMB040::projectChanged(QFProject* oldProject, QFProject* project) {
 }
 
 void QFESPIMB040::initExtension() {
+    QFPluginServices::getInstance()->registerSettingsPane(this);
+
     services->log_global_text(tr("initializing extension '%1' ...\n").arg(getName()));
     actStartPlugin=new QAction(QIcon(":/spimb040_logo.png"), tr("Start B040 SPIM Control"), this);
-    actStartPluginNew=new QAction(QIcon(":/spimb040_logo.png"), tr("Start B040 SPIM Control, new optics setup"), this);
+    //actStartPluginNew=new QAction(QIcon(":/spimb040_logo.png"), tr("Start B040 SPIM Control, new optics setup"), this);
 
     QDir d(services->getConfigFileDirectory());
     // make sure the directory for the config files of this extension exists
     d.mkpath(services->getConfigFileDirectory()+"/plugins/"+getID());
 
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(startPlugin()));
-    connect(actStartPluginNew, SIGNAL(triggered()), this, SLOT(startPluginNew()));
+    //connect(actStartPluginNew, SIGNAL(triggered()), this, SLOT(startPluginNew()));
 
-    QToolBar* exttb=services->getToolbar("extensions");
-    //std::cout<<"extensions toolbars: "<<exttb<<std::endl;
-    if (exttb) {
-        exttb->addAction(actStartPlugin);
-    }
     QMenu* extm=services->getMenu("extensions");
     //std::cout<<"extensions menu: "<<extm<<std::endl;
     if (extm) {
         extm->addAction(actStartPlugin);
-        extm->addAction(actStartPluginNew);
+        //extm->addAction(actStartPluginNew);
     }
 
     QFPluginServices::getInstance()->appendOrAddHTMLReplacement("FILEFORMATS_LIST", QString("<li><b>%2:</b><ul>\n"
@@ -86,6 +155,15 @@ void QFESPIMB040::initExtension() {
                                                                                             "<li><a href=\"$$plugin_info:helpdir:%1$$/optsetupfiles.html\">Optics Setup Configuration Files</a></li>\n"
                                                                                             "</ul></li>\n").arg(getID()).arg(getName()));
 
+
+    menuOptSetups=extm->addMenu(QIcon(":/spimb040_logo.png"), tr("B040 SPIM Control, v.2"));
+    updateFromConfig();
+    QToolBar* exttb=services->getToolbar("extensions");
+    //std::cout<<"extensions toolbars: "<<exttb<<std::endl;
+    if (exttb) {
+        exttb->addAction(actStartPlugin);
+        //exttb->addAction(menuOptSetups->menuAction());
+    }
     services->log_global_text(tr("initializing extension '%1' ... DONE\n").arg(getName()));
 }
 
@@ -101,7 +179,7 @@ void QFESPIMB040::startPlugin() {
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QMessageBox::information(parentWidget, getName(), getDescription());
     if (!main) {
-        main=new QFESPIMB040MainWindow2(services, NULL, false, this);
+        main=new QFESPIMB040MainWindow2("", services, NULL, false, this);
         QFPluginServices::getInstance()->log_global_text("\n\n=========================================================\n");
         QFPluginServices::getInstance()->log_global_text("== STARTING SPIM CONTROL PLUGIN!                       ==\n");
         QFPluginServices::getInstance()->log_global_text("=========================================================\n\n\n");
@@ -121,18 +199,32 @@ void QFESPIMB040::startPluginNew() {
     deinit();
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
     //QMessageBox::information(parentWidget, getName(), getDescription());
-    if (!main) {
-        main=new QFESPIMB040MainWindow2(services, NULL, true, this);
-        QFPluginServices::getInstance()->log_global_text("\n\n=========================================================\n");
-        QFPluginServices::getInstance()->log_global_text("== STARTING SPIM CONTROL PLUGIN!                       ==\n");
-        QFPluginServices::getInstance()->log_global_text("=========================================================\n\n\n");
+    QAction* act=qobject_cast<QAction*>(sender());
+    if (act) {
+        if (!main) {
 
-        QFPluginServices::getInstance()->setProjectMode(false, tr("!!!SPIM CONTROL MODE!!!"));
+            main=new QFESPIMB040MainWindow2(act->data().toString(), services, NULL, true, this);
+            QFPluginServices::getInstance()->log_global_text("\n\n=========================================================\n");
+            QFPluginServices::getInstance()->log_global_text("== STARTING SPIM CONTROL PLUGIN!                       ==\n");
+            QFPluginServices::getInstance()->log_global_text("=========================================================\n");
+            QFPluginServices::getInstance()->log_global_text(tr("optSetup file: %1\n").arg(act->data().toString()));
+            QFPluginServices::getInstance()->log_global_text("=========================================================\n\n\n");
+            QFPluginServices::getInstance()->setProjectMode(false, tr("!!!SPIM CONTROL MODE!!!"));
+        }
+        if (main) {
+            if (settings) main->storeSettings(settings);
+            main->setOptSetup(act->data().toString());
+            if (settings) main->loadSettings(settings);
+            QFPluginServices::getInstance()->log_global_text("\n\n=========================================================\n");
+            QFPluginServices::getInstance()->log_global_text(tr("new optSetup file: %1\n").arg(act->data().toString()));
+            QFPluginServices::getInstance()->log_global_text("=========================================================\n\n\n");
+            QFPluginServices::getInstance()->setProjectMode(false, tr("!!!SPIM CONTROL MODE!!!"));
+            main->show();
+            main->raise();
+        }
     }
-    if (main) {
-        if (settings) main->loadSettings(settings);
-        main->show();
-    }
+
+
     QApplication::restoreOverrideCursor();
 }
 

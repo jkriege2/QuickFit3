@@ -183,7 +183,10 @@ class QFEDiffusionCoefficientCalculator : public QObject, public QFExtensionBase
             QVector<double> parameters;
         };
         QList<ComponentData> components;
-		
+
+        static QPointer<QFEDiffusionCoefficientCalculator> inst;
+    public:
+        static QFEDiffusionCoefficientCalculator* getInstance() { return inst; }
 	protected slots:
 	    /** \brief target, used in example code in initExtension() */
         void startPlugin();
