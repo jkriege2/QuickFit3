@@ -146,7 +146,7 @@ int main(int argc, char * argv[])
             // run application
             res=app.exec();
 
-            QFontDatabase::removeAllApplicationFonts();
+            //QFontDatabase::removeAllApplicationFonts();
         }
 
         /*for (int i=0; i<appFonts.size(); i++) {
