@@ -56,7 +56,7 @@ class QFImageReaderRAW: public QFImporterImageSeries
                 width=set.value("width", 0).toInt();
                 height=set.value("height", 0).toInt();
                 channels=set.value("channels", 1).toInt();
-                int bps=set.value("bitspersample", sizeof(T)*8).toInt();
+                int bps=set.value("bitspersample", int(sizeof(T)*8)).toInt();
                 ok=((bps==sizeof(T)*8)&&(width>0)&&(height>0)&&(channels>0));
             } else if (QFile::exists(filename)) {
                 ok=true;
