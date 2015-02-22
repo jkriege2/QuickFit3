@@ -308,7 +308,7 @@ std::string TCPIPserver::read_str_until(int conn, const std::string& endstring){
   if (timeout==0) {    
     do {
       count = recv(connections[conn].fd, &d, 1, 0);
-      if ((count>0)&&(d>=32)) answer+=d;
+      if ((count>0)) answer+=d;
 	  done=false;
 	  if (answer.size()>=endstring.size()) {
 	    done=true;
@@ -320,7 +320,11 @@ std::string TCPIPserver::read_str_until(int conn, const std::string& endstring){
 	    }
       }
     } while ((count > 0)&&(!done));
-    return answer;
+    std::string a;
+	  for (size_t i=0; i<answer.size()-endstring.size(); i++) {
+	      a=a+answer[i];
+	  }
+	  return a;
   }
 
   start = clock();
@@ -346,7 +350,7 @@ std::string TCPIPserver::read_str_until(int conn, const std::string& endstring){
 	    return "";
 	  }
     }
-    if ((count>0)&&(d!='\n')) answer+=d;
+    if ((count>0)) answer+=d;
 	done=false;
     if (answer.size()>=endstring.size()) {
 	  done=true;
@@ -359,7 +363,13 @@ std::string TCPIPserver::read_str_until(int conn, const std::string& endstring){
     }
     cpu_time_used = ((double) (clock() - start)) / CLOCKS_PER_SEC;
   } while ((count > 0)&&(!done)&&(cpu_time_used<(double)timeout));
-  if (cpu_time_used<(double)timeout) return answer;
+  if (cpu_time_used<(double)timeout) {
+	  std::string a;
+	  for (size_t i=0; i<answer.size()-endstring.size(); i++) {
+	      a=a+answer[i];
+	  }
+	  return a;
+  }
   SEQUENCER_ERROR(SEQUENCER_NETERROR_TIMEOUT_NUM, __format(get_errormessage(SEQUENCER_NETERROR_TIMEOUT_NUM), strerror(errno)), "TCPIPserver::read_str_until()");
   return "";
 

@@ -26,6 +26,7 @@ class QFImageReaderRAW: public QFImporterImageSeries
             height=0;
             rawFile=NULL;
             frame=-1;
+            currentFrame=NULL;
         }
 
         inline virtual ~QFImageReaderRAW() {
@@ -85,15 +86,15 @@ class QFImageReaderRAW: public QFImporterImageSeries
         /** \brief close the currently opened image file */
         inline virtual void close() {
             if (currentFrame) qfFree(currentFrame);
-            currentFrame=NULL;
             if (rawFile) {
-                width=0;
-                height=0;
-                channels=0;
-                delete rawFile;
-                rawFile=NULL;
-                frame=-1;
+               delete rawFile;
             }
+            currentFrame=NULL;
+            rawFile=NULL;
+            frame=-1;
+            width=0;
+            height=0;
+            channels=0;
         }
 
         /** \brief move the reading pointer back to the first frame */

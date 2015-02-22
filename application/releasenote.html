@@ -89,6 +89,12 @@
                     <li>added functions to the default lib, which were in the plugin qfe_defaultmathparserextensions before</li>
                     <li>rangedhistogrambins() functions can now also be called without the data vector x as first argument.</li>
                     <li>added function polyfit(), which obtains the least-squares coefficients of a polynomial from given data</li>
+                    <li>bugfixed crash of function shuffle() ... this function now also shuffles strings</li>
+                    <li>added functions: printexpression(), printexpressiontree()</li>
+                    <li>change in syntax: parser now also allows index-access to expressions (e.g. <tt>(1:10)[2,3] = [3,4]</tt>) <b>note:</b> This change made expressions, like <tt>3:-1:1</tt> wrong now, they have to be reformulated with parantheses: <tt>3:(-1):1</tt> !!!</li>
+                    <li>index access with [] now also works with boolean-indices</li>
+                    <li>added support for structs and functions: struct(), structget(), structsaveget(), structkexs()</li>
+
             </ul></li>
             <li>added context menu entry to tables, that allows to explicitly copy the table as "CSV", or to copy the table in a format suitable for "Excel", which depends on the current locale (e.g. for decimal separators)</li>
             <li>bugfixed "copy to Excel/CSV" in table view, which did not copy any data (regression?)</li>

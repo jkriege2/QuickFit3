@@ -37,6 +37,8 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <cmath>
+#include <pthread.h>
+#include "tinytiffwriter.h"
 
 /* now first we will have to check the operating system and from this decide
    which libraries (H files) to include */
@@ -79,16 +81,29 @@ std::string booltostr(bool i) {
 
 // global parameters, describing the camera: 
 // 1. non-editable parameters
-const int img_width=128;                            // width of a frame in pixels
-const int img_height=64;                            // height of a frame in pixels
+const int img_width=32;                            // width of a frame in pixels
+const int img_height=32;                            // height of a frame in pixels
 const float pixelsize=24;                           // pixel size in micrometers
 const char cam_name[]="example_image_server.cpp";   // name of the camera device
+float acquisition_duration=10.0;                    // duration of an acquisition
 
 // 2. editable parameters:
 float exposure=0.1;                                 // exposure time in seconds
 float image_amplitude=1000.0;                       // amplitude of the artificial rung pattern
 float image_wavelength=5.0;                         // spatial wavelength of the artificial rung pattern
 bool image_decay=false;                             // is there a decay component in the pattern?
+int frames=100;                                     // number of frames to acquire
+
+// 3. internal state variables
+bool cam_connected=false;
+bool cam_liveview=false;
+bool cam_acquisition_running=false;
+int maxWriteFrames=0;
+int framesCompleted=0; 
+pthread_mutex_t mutexframesCompleted; 
+
+
+
 
 /** \brief send the contents and description of all camera parameters to the client */
 void writeParameters(TCPIPserver* server, int connection, const std::string& singleparam=std::string("")) {
@@ -99,43 +114,70 @@ void writeParameters(TCPIPserver* server, int connection, const std::string& sin
 		p="pixel_width";
 		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;pixel width time in microns;;;RO", p.c_str(), pixelsize)); // pixel width is read-only float, unlimited range
 
-		if (singleparam.size()==0) server->write("\n");
+		if (singleparam.size()==0) server->write(connection, std::string("\n"));
 		p="pixel_height";
 		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;pixel height time in microns;;;RO", p.c_str(), pixelsize)); // pixel height is read-only float, unlimited range
 
-		if (singleparam.size()==0) server->write("\n");
+		if (singleparam.size()==0) server->write(connection, std::string("\n"));
 		p="camera_name";
 		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_STRING;%s;%s;camera server name;;;RO", p.c_str(), cam_name)); // camera server name is read-only string
 
-		if (singleparam.size()==0) server->write("\n");
+		if (singleparam.size()==0) server->write(connection, std::string("\n"));
 		p="exposure";
 		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;exposure time;0;1;RW", p.c_str(), exposure)); // camera exposure time is read/write float with range [0..1]
 
-		if (singleparam.size()==0) server->write("\n");
+		if (singleparam.size()==0) server->write(connection, std::string("\n"));
 		p="image_amplitude";
-		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;pattern amplitude;0;10000;RW", p.c_str(), exposure)); // pattern amplitude is read/write float with range [0..10000]
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;pattern amplitude;0;10000;RW", p.c_str(), image_amplitude)); // pattern amplitude is read/write float with range [0..10000]
 
-		if (singleparam.size()==0) server->write("\n");
+		if (singleparam.size()==0) server->write(connection, std::string("\n"));
 		p="image_wavelength";
-		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;pattern wavelength;0;100;RW", p.c_str(), exposure)); // pattern wavelength is read/write float with range [0..100]
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;pattern wavelength;0;100;RW", p.c_str(), image_wavelength)); // pattern wavelength is read/write float with range [0..100]
 
-		if (singleparam.size()==0) server->write("\n");
+		if (singleparam.size()==0) server->write(connection, std::string("\n"));
+		p="acquisition_duration";
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;acquisition duration;0;100;RO", p.c_str(), acquisition_duration)); // acquisition duraction is read-only float with range [0..100]
+
+		if (singleparam.size()==0) server->write(connection, std::string("\n"));
+		p="FRAMES";
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_INT;%s;%d;number of frames to aquire;0;100000;RW", p.c_str(), frames)); // number of frames to acquire is read/write int with range [0..1000000]
+
+		if (singleparam.size()==0) server->write(connection, std::string("\n"));
 		p="image_decay";
-		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_BOOL;%s;%2;pattern decay;;;RW", p.c_str(), booltostr(image_decay).c_str())); // pattern decay component is read/write boolean property
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_BOOL;%s;%s;pattern decay;;;RW", p.c_str(), booltostr(image_decay).c_str())); // pattern decay component is read/write boolean property
 
-		if (singleparam.size()==0) server->write("\n");
+		if (singleparam.size()==0) server->write(connection, std::string("\n"));
 		p="is_dummy_device";
-		if (singleparam.size()==0 || singleparam==p) server->write(connection, "PARAM_BOOL;%s;true;camera is dummy;;;RO", p.c_str()); // a boolean property
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_BOOL;%s;true;camera is dummy;;;RO", p.c_str())); // a boolean property
+		
+		if (singleparam.size()!=0) {
+		    // special parameters, which indicate the progress of an acquisition ... may only be queried with PARAMETER_GET
+			if (singleparam.size()==0) server->write(connection, std::string("\n"));
+			p="ACQ_RUNNING";
+			if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_BOOL;%s;%s;;;;RO", p.c_str(), booltostr(cam_acquisition_running).c_str())); // a boolean property
+
+			if (singleparam.size()==0) server->write(connection, std::string("\n"));
+			p="PROGRESS";
+			if (singleparam.size()==0 || singleparam==p) {
+			    pthread_mutex_lock(&mutexframesCompleted);
+			    server->write(connection, format("PARAM_BOOL;%s;%d;;;;RO", p.c_str(), (int)floor(framesCompleted/maxWriteFrames))); // a boolean property
+				pthread_mutex_unlock(&mutexframesCompleted);
+			}
+		}
 }
 
 /** \brief set an editable parameter to the specified value */
 void setParameter(const std::string& param_name, const std::string& param_value) {
     if (param_name==std::string("exposure")) {
 	    exposure=atof(param_value.c_str());
+		acquisition_duration=float(frames)*exposure;
 	} else if (param_name==std::string("image_amplitude")) {
 	    image_amplitude=atof(param_value.c_str());
 	} else if (param_name==std::string("image_wavelength")) {
 	    image_wavelength=atof(param_value.c_str());
+	} else if (param_name==std::string("FRAMES")) {
+	    frames=atoi(param_value.c_str());
+		acquisition_duration=float(frames)*exposure;
 	} else if (param_name==std::string("image_decay")) {
 	    image_decay=false;
 		if (param_value==std::string("true")) image_decay=true;
@@ -154,15 +196,15 @@ void getNextFrame(double time, uint16_t* frame, int img_width, int img_height) {
 	if (image_decay) {
 		for (int y=0; y<img_height; y++) {
 			for (int x=0; x<img_width; x++) {
-			double r=sqrt(sqr(double(x)-double(img_width)/2.0)+sqr(double(y)-double(img_height)/2.0));
-				frame[y*img_width+x]=(1.0+sin(r/image_wavelength*M_PI+time/20.0*M_PI))*image_amplitude;
+				double r=sqrt(sqr(double(x)-double(img_width)/2.0)+sqr(double(y)-double(img_height)/2.0));
+				frame[y*img_width+x]=round(fabs(sin(r/image_wavelength*M_PI)*sin(time/20.0*M_PI))*image_amplitude);
 			}
 		}
 	} else {
 		for (int y=0; y<img_height; y++) {
 			for (int x=0; x<img_width; x++) {
 			double r=sqrt(sqr(double(x)-double(img_width)/2.0)+sqr(double(y)-double(img_height)/2.0));
-				frame[y*img_width+x]=(1.0+sin(r/image_wavelength*M_PI+time/20.0*M_PI))*image_amplitude*exp(-r/64.0);
+				frame[y*img_width+x]=fabs(r);//(1.0+sin(r/image_wavelength*M_PI)*sin(time/20.0*M_PI))*image_amplitude*exp(-r/64.0);
 			}
 		}
 	}
@@ -188,9 +230,51 @@ void printfMessage(std::string templ, ...){
 };
 
 
+/** \brief this function implements the acquisition thread */
+static void *acquisitionThreadFunc(void* val) {
+    std::string basename=*(static_cast<std::string*>(val));
+	// write basename.txt file
+	FILE* ftxt=fopen(std::string(basename+".txt").c_str(), "w");
+	if (ftxt) {
+	    fprintf(ftxt, "example_image_server.cpp demo acquisition");
+		fclose(ftxt);
+	}
+	// start basename.tif file for acquired frames
+	uint16_t* frame=(uint16_t*)malloc(img_width*img_height*sizeof(uint16_t));
+	TinyTIFFFile* tif=TinyTIFFWriter_open(std::string(basename+".tif").c_str(), 16, img_width, img_height);	
+	maxWriteFrames=floor(acquisition_duration/exposure);
+    framesCompleted=0;
+    if (tif) {
+		double seconds=0;
+		time_t start;
+		time(&start);
+		double lastt=seconds;
+		// perform acquisition
+		while (seconds<acquisition_duration) {
+			time_t now;
+			time(&now);
+			seconds = fabs(difftime(now, start));
+			if (fabs(lastt-seconds)>=exposure) {
+				getNextFrame(seconds, frame, img_width, img_height);
+				TinyTIFFWriter_writeImage(tif, frame);
+				pthread_mutex_lock(&mutexframesCompleted);
+				framesCompleted++;
+				pthread_mutex_unlock(&mutexframesCompleted);
+			}
+			lastt=seconds;
+	    }     
+	    TinyTIFFWriter_close(tif);
+    }
+    free(frame);
+    cam_acquisition_running=false;
+    return NULL;
+}
+
+
+
 int main (void) {
     // HELLO HERE I AM
-    printf("example CAM_SERVER TCP/IP camera server ...\n\n\n");
+    printf("example CAM_SERVER TCP/IP camera server ...\n\nfloat-format=%f\n\n", float(M_PI));
     
     /////////////////////////////////////////////////////////////////////////////
     // INITIALIZING the TCPIP SERVER CLASS
@@ -205,12 +289,18 @@ int main (void) {
     /////////////////////////////////////////////////////////////////////////////
     // initializing basic variabls
     /////////////////////////////////////////////////////////////////////////////
-    bool cam_connected=false;
-    bool cam_liveview=false;
     uint16_t* frame=(uint16_t*)malloc(img_width*img_height*sizeof(uint16_t));
     int img_byte_size=img_width*img_height*sizeof(uint16_t);
     double t=0;
     getNextFrame(t, frame, img_width, img_height);
+	std::string basename="example_image_server_output";
+    
+    /////////////////////////////////////////////////////////////////////////////
+    // initializing the acquisition thread structures + mutex
+    /////////////////////////////////////////////////////////////////////////////
+	pthread_t thread1;
+	pthread_mutex_init(&mutexframesCompleted, NULL);
+	
     
     /////////////////////////////////////////////////////////////////////////////
     // MAIN LOOP
@@ -233,7 +323,10 @@ int main (void) {
             if (instruction.size()>0) {
                 
                 if (instruction=="CONNECT") {
-                    
+				    // read remaining \n from "INSTRUCTION\n\n"
+                    server->read_str_until(connection, '\n');
+					
+					
                     // CONNCET TO CAMERA
                     cam_connected=true;
                     // SEND ANSWER TO CLIENT/QF3
@@ -243,7 +336,8 @@ int main (void) {
                     
                     printfMessage("CAMERA CONNECTED!\n");
                 } else if (instruction=="DISCONNECT") {
-
+				    // read remaining \n from "INSTRUCTION\n\n"
+                    server->read_str_until(connection, '\n');
 
                     // DISCONNCET FROM CAMERA
                     cam_connected=false;
@@ -254,6 +348,8 @@ int main (void) {
 
                     printfMessage("CAMERA DISCONNECTED!\n");
                 } else if (instruction=="LIVE_START") {
+				    // read remaining \n from "INSTRUCTION\n\n"
+                    server->read_str_until(connection, '\n');
 				
 				    // START THE LIVE_VIEW MODE
 					// INIT/CONFIG CAMERA for LIVE-VIEW
@@ -265,6 +361,8 @@ int main (void) {
 
                     printfMessage("LIVE VIEW STARTED!\n");
                 } else if (instruction=="LIVE_STOP") {
+				    // read remaining \n from "INSTRUCTION\n\n"
+                    server->read_str_until(connection, '\n');
 				
 				    // STOP THE LIVE-VIEW MODE
                     cam_liveview=false;
@@ -274,7 +372,9 @@ int main (void) {
 					
                     printfMessage("LIVE VIEW STOPED!\n");
                 } else if (instruction=="SIZE_X_GET") {
-				
+				    // read remaining \n from "INSTRUCTION\n\n"
+                    server->read_str_until(connection, '\n');
+
 				    // RETURNS THE width OF A FRAME IN LIVE_VIEW MODE
                     // SEND ANSWER TO CLIENT/QF3
                     server->write(connection, format("%d\n\n", img_width));
@@ -282,7 +382,9 @@ int main (void) {
 					
                     printfMessage("GET FRAME WIDTH!\n");
                 } else if (instruction=="SIZE_Y_GET") {
-				
+					// read remaining \n from "INSTRUCTION\n\n"
+                    server->read_str_until(connection, '\n');
+
 				    // RETURNS THE height OF A FRAME IN LIVE_VIEW MODE
                     // SEND ANSWER TO CLIENT/QF3
                     server->write(connection, format("%d\n\n", img_height));
@@ -290,6 +392,8 @@ int main (void) {
 					
                     printfMessage("GET FRAME HEIGHT!\n");
                 } else if (instruction=="GET_EXPOSURE") {
+					// read remaining \n from "INSTRUCTION\n\n"
+                    server->read_str_until(connection, '\n');
 				
 				    // RETURNS THE exposure time [seconds] OF A FRAME IN LIVE_VIEW MODE
                     // SEND ANSWER TO CLIENT/QF3
@@ -298,6 +402,8 @@ int main (void) {
 					
                     printfMessage("GET EXPOSURE TIME!\n");
                 } else if (instruction=="PARAMETERS_GET") {
+					// read remaining \n from "INSTRUCTION\n\n"
+                    server->read_str_until(connection, '\n');
 				
 				    // RETURNS A LIST OF THE AVAILABLE CAMERA PARAMETERS
                     // SEND ANSWER TO CLIENT/QF3
@@ -317,7 +423,7 @@ int main (void) {
                     server->write(connection, "\n\n");
 					
 					
-                    printfMessage("GET CAMERA PARAMETERS!\n");
+                    printfMessage("GET CAMERA PARAMETER '%s'!\n", param_name.c_str());
                 } else if (instruction=="PARAMETERS_SET") {
 				
 				    // SET A SINGLE IMAGE PARAMETER
@@ -327,8 +433,10 @@ int main (void) {
 					setParameter(param_name, param_value);
 					
 					
-                    printfMessage("SET CAMERA PARAMETERS (%s = %s)!\n", param_name.c_str(), param_value.c_str());
+                    printfMessage("SET CAMERA PARAMETERS ('%s' = '%s')!\n", param_name.c_str(), param_value.c_str());
                 } else if (instruction=="IMAGE_NEXT_GET") {
+					// read remaining \n from "INSTRUCTION\n\n"
+                    server->read_str_until(connection, '\n');
 				
 				    // GET A NEW FRAME AND SEND IT TO THE CLIENT
                     t++;
@@ -351,27 +459,28 @@ int main (void) {
                 } else if (instruction=="RECORD") {
 				
 				    // START AN ACQUISITION AND SAVE DATA TO A FILE WITH THE BASENAME filename
-                    std::string filename=server->read_str_until(connection, '\n');
-                    // SEND ANSWER TO CLIENT/QF3
-                    server->write(connection, "ACK_RECORD\n");
-                    printfMessage("RECORD FRAME START! filename=%s\n", filename.c_str());
-                    double seconds=0;
-                    time_t start;
-                    time(&start);
-
-                    double lastt=seconds;
-                    while (seconds<10) {
-                        time_t now;
-                        time(&now);
-                        seconds = fabs(difftime(now, start));
-                        if (fabs(lastt-seconds)>=1) printf(".");
-                        lastt=seconds;
-                    }
-                    printf("\n");
-
-                    // SEND ANSWER TO CLIENT/QF3
-                    server->write(connection, "ACK_RECORD\n\n");
-                    printfMessage("RECORD FRAME DONE!");
+                    basename=server->read_str_until(connection, "\n\n");
+					
+					if (!cam_acquisition_running) {
+						printfMessage("RECORD FRAME START! basename=%s\n", basename.c_str());
+						// SEND ANSWER TO CLIENT/QF3
+						//   1. the written filenames (format FILE;<TYPE>;<FILENAME>;<DESCRIPTION>\n
+						server->write(connection, format("FILE;TIFF;%s.tif;acquired frames\n", basename.c_str()));
+						server->write(connection, format("FILE;CSV;%s.txt;additional text output\n", basename.c_str()));
+						//   2. the used camera config parameters
+						writeParameters(server, connection);
+                        server->write(connection, "\n\n");
+						cam_acquisition_running=true;
+						int rc = pthread_create( &thread1, NULL, &acquisitionThreadFunc, (void*)(&basename) );
+						if( rc != 0 ) {
+							cam_acquisition_running=false;
+							printfMessage("COULD NOT START RECORD FRAME!\n");
+						} else {
+						
+						}
+						
+					}
+                    printfMessage("RECORD FRAME STARTED!");
                 } else if (instruction!="\n" || instruction!="\n\n") {
                     // PRINT ERROR MESSAGE AND IGNORE UNKNOWN INSTRUCTION
                     printfMessage("read(%d) unknown instruction %s\n", connection, instruction.c_str());
@@ -384,4 +493,6 @@ int main (void) {
     printf("stopping/freeing TCP/IP server ...\n");
     free(frame);
     delete server;
+	pthread_mutex_destroy(&mutexframesCompleted);
+    pthread_exit(NULL);
 }

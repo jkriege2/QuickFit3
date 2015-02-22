@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
+    Copyright (c) 2008-2015 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 
     last modification: $LastChangedDate$  (revision $Rev$)
 
@@ -101,6 +101,10 @@ bool QFMathParser_DefaultLib::hasDefaultFunctions(QFMathParser* p)
 
 void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
 {
+    p->addFunction("struct", QFMathParser_DefaultLib::fStruct);
+    p->addFunction("structkeys", QFMathParser_DefaultLib::fStructKeys);
+    p->addFunction("structget", QFMathParser_DefaultLib::fStructGet);
+    p->addFunction("structsaveget", QFMathParser_DefaultLib::fStructGetSave);
     p->addFunction("sinc", QFMathParser_DefaultLib::fSinc, NULL, qfSinc);
     p->addFunction("asin", QFMathParser_DefaultLib::fASin, NULL, asin);
     p->addFunction("acos", QFMathParser_DefaultLib::fACos, NULL, acos);
@@ -175,6 +179,7 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("removeemtystrings", QFMathParser_DefaultLib::fRemoveEmpty);
 
     p->addFunction("toupper", QFMathParser_DefaultLib::fToUpper);
+    p->addFunction("tolower", QFMathParser_DefaultLib::fToLower);
     p->addFunction("length", QFMathParser_DefaultLib::fLength);
     p->addFunction("size", QFMathParser_DefaultLib::fLength);
     p->addFunction("sort", QFMathParser_DefaultLib::fSort);
@@ -320,6 +325,9 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("datesec", QFMathParser_DefaultLib::fDateSec);
 
     p->addFunction("varname", QFMathParser_DefaultLib::fVarname);
+    p->addFunction("printexpression", QFMathParser_DefaultLib::fPrintExpression);
+    p->addFunction("printexpressiontree", QFMathParser_DefaultLib::fPrintExpressionTree);
+
     p->addFunction("int", QFMathParser_DefaultLib::fInt);
     p->addFunction("num", QFMathParser_DefaultLib::fNum);
     p->addFunction("double", QFMathParser_DefaultLib::fNum);
@@ -488,28 +496,35 @@ namespace QFMathParser_DefaultLib {
 
 
 
-    /*QVector<double> QFMathParser_shuffleD(const QVector<double>& value) {
-        std::vector<double> mm=value.toStdVector();
-        std::random_shuffle( mm.begin(), mm.end() );
-        return QVector<double>::fromStdVector(mm);
-    }
-    QVector<bool> QFMathParser_shuffleB(const QVector<bool>& value) {
-        std::vector<bool> mm=value.toStdVector();
-        std::random_shuffle( mm.begin(), mm.end() );
-        return QVector<bool>::fromStdVector(mm);
-    }
-    QStringList QFMathParser_shuffleS(const QStringList& value) {
-        std::vector<QString> mm;
-        for (int i=0; i<value.size(); i++) {
-            mm.push_back(value[i]);
+    void fPrintExpression(qfmpResult& r,  QFMathParser::qfmpNode** params, unsigned int n, QFMathParser* p){
+        if (n==1) {
+            r.setString(params[0]->print());
+        } else if (n>1) {
+            r.setStringVec();
+            for (unsigned int i=0; i<n; i++) {
+                r.strVec<<params[i]->print();
+            }
+        } else {
+            p->qfmpError(QObject::tr("printexpression(x[,...]) needs at least 1 argument"));
+            r.setInvalid();
+            return;
         }
-        std::random_shuffle( mm.begin(), mm.end() );
-        QStringList res;
-        for (size_t i=0; i<mm.size(); i++) {
-            res<<mm[i];
+    }
+    void fPrintExpressionTree(qfmpResult& r,  QFMathParser::qfmpNode** params, unsigned int n, QFMathParser* p){
+        if (n==1) {
+            r.setString(params[0]->printTree());
+        } else if (n>1) {
+            r.setStringVec();
+            for (unsigned int i=0; i<n; i++) {
+                r.strVec<<params[i]->printTree();
+            }
+        } else {
+            p->qfmpError(QObject::tr("printexpressiontree(x[,...]) needs at least 1 argument"));
+            r.setInvalid();
+            return;
         }
-        return res;
-    }*/
+    }
+
 
     void fShuffle(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p){
         if (n!=1) {
@@ -520,21 +535,30 @@ namespace QFMathParser_DefaultLib {
         if(params[0].type==qfmpDoubleVector) {
             //r.setDoubleVec(QFMathParser_shuffleD(params[0].numVec));
             r.setDoubleVec(params[0].numVec);
-            for (int i=r.numVec.size(); i>=1; i--) {
+            for (int i=r.numVec.size()-1; i>=1; i--) {
                 int j=p->get_rng()->randInt(i);
                 qSwap(r.numVec[i], r.numVec[j]);
             }
         } else if(params[0].type==qfmpStringVector) {
             //r.setStringVec(QFMathParser_shuffleS(params[0].strVec));
             r.setStringVec(params[0].strVec);
-            for (int i=r.strVec.size(); i>=1; i--) {
+            for (int i=r.strVec.size()-1; i>=1; i--) {
                 int j=p->get_rng()->randInt(i);
                 qSwap(r.strVec[i], r.strVec[j]);
+            }
+        } else if(params[0].type==qfmpString) {
+            //r.setStringVec(QFMathParser_shuffleS(params[0].strVec));
+            r.setString(params[0].str);
+            for (int i=r.str.size()-1; i>=1; i--) {
+                int j=p->get_rng()->randInt(i);
+                QChar h=r.str[i];
+                r.str[i]=r.str[j];
+                r.str[j]=h;
             }
         } else if(params[0].type==qfmpBoolVector) {
             //r.setBoolVec(QFMathParser_shuffleB(params[0].boolVec));
             r.setBoolVec(params[0].boolVec);
-            for (int i=r.boolVec.size(); i>=1; i--) {
+            for (int i=r.boolVec.size()-1; i>=1; i--) {
                 int j=p->get_rng()->randInt(i);
                 qSwap(r.boolVec[i], r.boolVec[j]);
             }
@@ -4026,6 +4050,69 @@ namespace QFMathParser_DefaultLib {
         r.numVec.clear();
         r.numVec<<pow(X,Y);
         r.numVec<<sqrt(qfSqr(Xe*Y*pow(X,Y-1.0))+qfSqr(Ye*pow(X,Y)*log(Y)));
+    }
+
+    void fStruct(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        int NN=0;
+        if (n>0 && params[0].type==qfmpStruct) {
+            r=params[0];
+            NN=1;
+        } else {
+            r.setStruct();
+        }
+        if (n>NN && (n-NN)%2==0) {
+            for (int i=NN; i<n; i=i+2) {
+                if (params[i].type==qfmpString) {
+                    r.structData[params[i].str]=params[i+1];
+                } else {
+                    p->qfmpError(QObject::tr("struct([struct_in,] name1, value1, ...) requires a string as parameter %2").arg(i+1));
+                    r.setInvalid();
+                    return;
+                }
+            }
+        } else {
+            p->qfmpError("struct([struct_in,] name1, value1, ...) requires an optinal struct as first argument and an even number of name/value pairs");
+            r.setInvalid();
+            return;
+        }
+    }
+
+    void fStructKeys(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==1 && params[0].type==qfmpStruct) {
+            r.setStringVec(params[0].structData.keys());
+        } else {
+            p->qfmpError("structkeys(struct_in) requires one struct argument");
+            r.setInvalid();
+            return;
+        }
+    }
+    void fStructGet(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==2 && params[0].type==qfmpStruct && params[1].type==qfmpString) {
+            if (params[0].structData.contains(params[1].str)) {
+                r=params[0].structData.value(params[1].str, qfmpResult::invalidResult());
+            } else {
+                p->qfmpError(QObject::tr("structget(struct_in, item): the given element '%1' does not exist in struct_in").arg(params[1].str));
+                r.setInvalid();
+                return;
+            }
+        } else {
+            p->qfmpError("structget(struct_in, item) requires one struct and one string argument");
+            r.setInvalid();
+            return;
+        }
+    }
+    void fStructGetSave(qfmpResult &r, const qfmpResult *params, unsigned int n, QFMathParser *p)
+    {
+        if (n==2 && params[0].type==qfmpStruct && params[1].type==qfmpString) {
+            r=params[0].structData.value(params[1].str, qfmpResult::invalidResult());
+        } else {
+            p->qfmpError("structsaveget(struct_in, item) requires one struct and one string argument");
+            r.setInvalid();
+            return;
+        }
     }
 
 

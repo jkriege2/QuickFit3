@@ -35,6 +35,7 @@ qfmpResult::qfmpResult()
     boolean=false;
     numVec.clear();
     boolVec.clear();
+    structData.clear();
     strVec.clear();
     m_custom=NULL;    
 }
@@ -54,6 +55,7 @@ qfmpResult::qfmpResult(double value)
     boolean=false;
     numVec.clear();
     boolVec.clear();
+    structData.clear();
     strVec.clear();
     m_custom=NULL;
 }
@@ -67,6 +69,7 @@ qfmpResult::qfmpResult(int value)
     boolean=false;
     numVec.clear();
     boolVec.clear();
+    structData.clear();
     strVec.clear();
     m_custom=NULL;
 }
@@ -80,6 +83,7 @@ qfmpResult::qfmpResult(QString value)
     boolean=false;
     numVec.clear();
     boolVec.clear();
+    structData.clear();
     strVec.clear();
     m_custom=NULL;
 }
@@ -93,6 +97,7 @@ qfmpResult::qfmpResult(bool value)
     boolean=value;
     numVec.clear();
     boolVec.clear();
+    structData.clear();
     strVec.clear();
     m_custom=NULL;
 }
@@ -106,6 +111,7 @@ qfmpResult::qfmpResult(const QVector<double>& value)
     boolean=false;
     numVec=value;
     boolVec.clear();
+    structData.clear();
     strVec.clear();
     m_custom=NULL;
 }
@@ -119,6 +125,7 @@ qfmpResult::qfmpResult(const QVector<bool> &value)
     boolean=false;
     numVec.clear();
     boolVec=value;
+    structData.clear();
     strVec.clear();
     m_custom=NULL;
 }
@@ -132,6 +139,7 @@ qfmpResult::qfmpResult(const QStringList &value)
     boolean=false;
     numVec.clear();
     boolVec.clear();
+    structData.clear();
     strVec=value;
     m_custom=NULL;
 }
@@ -147,6 +155,7 @@ qfmpResult::qfmpResult(const qfmpResult &value):
     else if (type==qfmpDoubleVector) this->numVec=value.numVec;
     else if (type==qfmpStringVector) this->strVec=value.strVec;
     else if (type==qfmpBoolVector) this->boolVec=value.boolVec;
+    else if (type==qfmpStruct) this->structData=value.structData;
     else if (type==qfmpCustom) this->setCustomCopy(value.custom());
 }
 
@@ -168,6 +177,7 @@ void qfmpResult::set(const qfmpResult &value)
     else if (type==qfmpDoubleVector) this->numVec=value.numVec;
     else if (type==qfmpStringVector) this->strVec=value.strVec;
     else if (type==qfmpBoolVector) this->boolVec=value.boolVec;
+    else if (type==qfmpStruct) this->structData=value.structData;
     else if (type==qfmpCustom) this->setCustomCopy(value.custom());
 }
 
@@ -176,6 +186,7 @@ void qfmpResult::setInvalid()
     isValid=false;
     numVec.clear();
     boolVec.clear();
+    structData.clear();
     strVec.clear();
     str.clear();
     clearCustom();
@@ -187,6 +198,7 @@ void qfmpResult::setVoid()
     isValid=true;
     numVec.clear();
     boolVec.clear();
+    structData.clear();
     strVec.clear();
     str.clear();
     clearCustom();
@@ -203,6 +215,15 @@ QString qfmpResult::toString(int precision) const
         case qfmpString: return str;
         case qfmpBool: return boolToQString(boolean);
         case qfmpCustom: if (m_custom) return m_custom->toString(precision);
+        case qfmpStruct: {
+                QStringList sl;
+                QMapIterator<QString,qfmpResult> it(structData);
+                while (it.hasNext()) {
+                    it.next();
+                    sl<<QString("%1: %2").arg(it.key()).arg(it.value().toString(precision));
+                }
+                return QObject::tr("{ %1 }").arg(sl.join(", "));
+            }
         case qfmpVoid: break;
     }
     return "";
@@ -220,6 +241,15 @@ QString qfmpResult::toTypeString(int precision) const
         case qfmpString: return str+QObject::tr(" [string]");
         case qfmpBool: return boolToQString(boolean)+QObject::tr(" [bool]");
         case qfmpVoid: return QObject::tr(" [void]");
+        case qfmpStruct: {
+                QStringList sl;
+                QMapIterator<QString,qfmpResult> it(structData);
+                while (it.hasNext()) {
+                    it.next();
+                    sl<<QString("%1: %2").arg(it.key()).arg(it.value().toTypeString(precision));
+                }
+                return QObject::tr("{ %1 } [struct]").arg(sl.join(", "));
+            }
         case qfmpCustom: if (m_custom) return m_custom->toTypeString(precision);
     }
     return QFMathParser::resultTypeToString(type);
@@ -261,6 +291,7 @@ int qfmpResult::length() const
         case qfmpString: return str.size();
         case qfmpBool: return 1;
         case qfmpVoid: return 0;
+        case qfmpStruct: return structData.size();
         case qfmpCustom: if (m_custom) return m_custom->length();
     }
     return 0;
@@ -277,6 +308,7 @@ void qfmpResult::setCustomCopy(const qfmpCustomResult *val)
     num=0;
     numVec.clear();
     boolVec.clear();
+    structData.clear();
     strVec.clear();
     str.clear();
     isValid=true;
@@ -290,6 +322,7 @@ void qfmpResult::setCustom(qfmpCustomResult *val)
     num=0;
     numVec.clear();
     boolVec.clear();
+    structData.clear();
     strVec.clear();
     str.clear();
     isValid=true;
@@ -303,6 +336,7 @@ void qfmpResult::setDouble(double val)
     num=val;
     numVec.clear();
     boolVec.clear();
+    structData.clear();
     strVec.clear();
     str.clear();
     isValid=true;
@@ -315,6 +349,7 @@ void qfmpResult::setBoolean(bool val)
     boolean=val;
     numVec.clear();
     boolVec.clear();
+    structData.clear();
     strVec.clear();
     str.clear();
     clearCustom();;
@@ -326,6 +361,19 @@ void qfmpResult::setString(const QString &val)
     type=qfmpString;
     str=val;
     boolVec.clear();
+    structData.clear();
+    strVec.clear();
+    numVec.clear();
+    clearCustom();;
+    isValid=true;
+}
+
+void qfmpResult::setString(int size, QChar defaultChar)
+{
+    type=qfmpString;
+    str=QString(size, defaultChar);
+    boolVec.clear();
+    structData.clear();
     strVec.clear();
     numVec.clear();
     clearCustom();;
@@ -337,6 +385,7 @@ void qfmpResult::setDoubleVec(const QVector<double> &val)
     isValid=true;
     type=qfmpDoubleVector;
     boolVec.clear();
+    structData.clear();
     strVec.clear();
     numVec=val;
     clearCustom();;
@@ -348,6 +397,7 @@ void qfmpResult::setDoubleVec(int size, double defaultVal)
     isValid=true;
     type=qfmpDoubleVector;
     boolVec.clear();
+    structData.clear();
     strVec.clear();
     clearCustom();;
     if (size>0) {
@@ -359,6 +409,21 @@ void qfmpResult::setDoubleVec(int size, double defaultVal)
     str.clear();
 }
 
+void qfmpResult::setStruct(const QStringList &items)
+{
+    isValid=true;
+    type=qfmpStruct;
+    boolVec.clear();
+    strVec.clear();
+    clearCustom();;
+    numVec.clear();
+    str.clear();
+    structData.clear();
+    for (int i=0; i<items.size(); i++) {
+        structData.insert(items[i], qfmpResult::invalidResult());
+    }
+}
+
 void qfmpResult::setBoolVec(const QVector<bool> &val)
 {
     isValid=true;
@@ -367,6 +432,7 @@ void qfmpResult::setBoolVec(const QVector<bool> &val)
     strVec.clear();
     boolVec=val;
     str.clear();
+    structData.clear();
     clearCustom();;
 }
 
@@ -376,6 +442,7 @@ void qfmpResult::setBoolVec(int size, bool defaultVal)
     type=qfmpBoolVector;
     numVec.clear();
     strVec.clear();
+    structData.clear();
     clearCustom();;
     if (size>0) {
         boolVec.resize(size);
@@ -393,6 +460,7 @@ void qfmpResult::setStringVec(const QStringList &val)
     numVec.clear();
     strVec=val;
     boolVec.clear();
+    structData.clear();
     clearCustom();;
     str.clear();
 }
@@ -403,6 +471,7 @@ void qfmpResult::setStringVec(int size, const QString &defaultVal)
     type=qfmpStringVector;
     numVec.clear();
     boolVec.clear();
+    structData.clear();
     if (size>0) {
         strVec.clear();
         for (int i=0; i<size; i++) strVec<<defaultVal;
@@ -646,6 +715,29 @@ qfmpResult qfmpResult::voidResult()
     return r;
 }
 
+qfmpResult qfmpResult::getStructItem(const QString &item)
+{
+    qfmpResult res;
+    if (type==qfmpStruct) {
+        if (structData.contains(item)) res=structData[item];
+    }
+    return res;
+}
+
+void qfmpResult::setStructItem(const QString &item, const qfmpResult &value)
+{
+    if (type==qfmpStruct) {
+        if (structData.contains(item)) structData[item]=value;
+        else structData.insert(item, value);
+    }
+}
+
+void qfmpResult::setStruct(const QMap<QString, qfmpResult> &data)
+{
+    setStruct();
+    structData=data;
+}
+
 
 
 
@@ -679,6 +771,9 @@ bool qfmpResult::operator==(const qfmpResult &r) const
             break;
         case (qfmpStringVector<<16)+qfmpStringVector:
             return(strVec==r.strVec);
+            break;
+        case (qfmpStruct<<16)+qfmpStruct:
+            return(structData==r.structData);
             break;
         case (qfmpCustom<<16)+qfmpCustom: {
                 if (custom() && r.custom()) {
@@ -1893,13 +1988,13 @@ QVector<int> qfmpResult::asIntVector() const
 qfmpCustomResult::qfmpCustomResult()
 {
     counter++;
-    qDebug()<<"qfmpCustomResult::counter="<<counter;
+    //qDebug()<<"qfmpCustomResult::counter="<<counter;
 }
 
 qfmpCustomResult::~qfmpCustomResult()
 {
     counter--;
-    qDebug()<<"qfmpCustomResult::counter="<<counter;
+    //qDebug()<<"qfmpCustomResult::counter="<<counter;
 }
 
 
@@ -2093,3 +2188,20 @@ void qfmpCustomResult::comparesmallerequal(qfmpResult &res, const qfmpResult &l,
 }
 
 int qfmpCustomResult::counter=0;
+
+
+QString qfmpResultTypeToString(qfmpResultType type)
+{
+    switch(type) {
+        case qfmpDouble: return QObject::tr("number");
+        case qfmpString: return QObject::tr("string");
+        case qfmpBool: return QObject::tr("bool");
+        case qfmpDoubleVector: return QObject::tr("number vector");
+        case qfmpStringVector: return QObject::tr("string vector");
+        case qfmpBoolVector: return QObject::tr("bool vector");
+        case qfmpVoid: return QObject::tr("void");
+        case qfmpStruct: return QObject::tr("struct");
+        case qfmpCustom: return QObject::tr("custom");
+    }
+    return QObject::tr("invalid");
+}

@@ -44,6 +44,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #if (QT_VERSION > QT_VERSION_CHECK(5, 2, 0))
 #include <QPdfWriter>
 #endif
+#include "qfpluginservices.h"
 
 QFParameterCorrelationView::QFParameterCorrelationView(QWidget *parent) :
     QWidget(parent)

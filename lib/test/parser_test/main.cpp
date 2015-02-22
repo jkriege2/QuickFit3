@@ -2,6 +2,8 @@
 #include "../../qfmathparser.h"
 #include <QDebug>
 #include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <QElapsedTimer>
 #define TEST(expr) {\
     parser.resetErrors(); \
@@ -222,8 +224,35 @@ class qfmpCustomResultTest2: public qfmpCustomResult {
         virtual qfmpCustomResult* copy() const { return new qfmpCustomResultTest2(); }
 };
 
+
+
+void myMessageOutput(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    QByteArray localMsg = msg.toLocal8Bit();
+    switch (type) {
+    case QtDebugMsg:
+        //printf( "Debug: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        printf("%s\n", localMsg.constData());
+        break;
+    case QtWarningMsg:
+        //printf( "Warning: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        printf("Warning: %s\n", localMsg.constData());
+        break;
+    case QtCriticalMsg:
+        //printf( "Critical: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        printf("Critical: %s\n", localMsg.constData());
+        break;
+    case QtFatalMsg:
+        //printf( "Fatal: %s (%s:%u, %s)\n", localMsg.constData(), context.file, context.line, context.function);
+        printf("Fatal: %s\n", localMsg.constData());
+        abort();
+    }
+}
+
 int main(int argc, char *argv[])
 {
+    qInstallMessageHandler(myMessageOutput);
+    //QCoreApplication app(argc, argv);
     qfmpCustomResultTest ctest;
     qfmpCustomResultTest2 ctest2;
     qfmpResult result, result2, result3;
@@ -364,13 +393,13 @@ int main(int argc, char *argv[])
     TEST("dsort(x)");
     TEST("sort(x)");
     TEST("concat(1:2:4, [18,19,20], 3, [1, pi])");
-    TEST("[1:2:4, [18,19,20], 3, 1, pi, 3:-1:1]");
+    TEST("[1:2:4, [18,19,20], 3, 1, pi, 3:(-1):1]");
     TEST("for(i,1,5,if(i<=3,-i,i^3))");
     TEST("xx=~(1:20)");
     TEST("sum(i,0,length(xx)-1,int2bin(xx[i])+\"   \")");
     TEST("sum(i,~xx,int2hex(i)+\"   \")");
     TEST("sum(i,~xx,int2oct(i)+\"   \")");
-    TEST("x=1:5;y=5:-1:1");
+    TEST("x=1:5;y=5:(-1):1");
     TEST("x+y");
     TEST("x*y");
     TEST("x/y");
@@ -381,10 +410,10 @@ int main(int argc, char *argv[])
     TEST("x^y");
     TEST("x^2");
 
-    TEST("x=1:5;y=5:-1:1");
-    TEST("x=1:5; y=5:-1:1");
-    TEST("1:5;5:-1:1");
-    TEST("1:1:5;5:-1:1");
+    TEST("x=1:5;y=5:(-1):1");
+    TEST("x=1:5; y=5:(-1):1");
+    TEST("1:5;5:(-1):1");
+    TEST("1:1:5;5:(-1):1");
     TEST("[1,2,5];[5,4,3]");
     TEST("x=[1,2,5]; y=[5,4,3]");
     TEST("x=[1,2,5]; [5,4,3]");
@@ -392,9 +421,9 @@ int main(int argc, char *argv[])
     TEST("x=1; 5");
     TEST("1; y=5");
     TEST("x=1; y=5");
-    TEST("5:-1:1;1:5");
-    TEST("5:-1:1;1:1:5");
-    TEST("1:1:5;5:-1:1");
+    TEST("5:(-1):1;1:5");
+    TEST("5:(-1):1;1:1:5");
+    TEST("1:1:5;5:(-1):1");
     TEST("[1,2,5];[5,4,3]");
     TEST("[1,2,5];[5,4,3];[4,3,pi]");
     TEST("[1,2,5];1:5;[4,3,pi]");
@@ -489,8 +518,8 @@ int main(int argc, char *argv[])
     TEST("y[idx]");
     TEST("select(y, x%2==0)");
     TEST("num2str(x)");
-    TEST("tosystempathseparator(\"bla\\bla/bla\")");
-    TEST("tosystempathseparator([\"bla\\bla/bla\", \"bla/bla\\bla\"])");
+    TEST("tosystempathseparator(\"bla\\\\bla/bla\")");
+    TEST("tosystempathseparator([\"bla\\\\bla/bla\", \"bla/bla\\\\bla\"])");
     TEST("shuffle(x)");
     TEST("shuffle([true, true, true, true, false, false, false, false])");
     TEST("shuffle(num2str(x))");
@@ -574,6 +603,57 @@ int main(int argc, char *argv[])
     TEST("res1+res2");
     TEST("res3=res1");
     qDebug()<<"\n\n"<<parser.printVariables()<<"\n\n";
+
+    TEST("x=1:10");
+    TEST("x[2]");
+    TEST("1:10[2]");
+    TEST("(1:10)[2]");
+    TEST("(2*x)[2]");
+    TEST("2*x[2]");
+    TEST("(1:10)[x>5]");
+    TEST("x[x>5]");
+    TEST("\"blablabla\"[[1,2,3]]");
+    TEST("\"blablabla\"[1:3]");
+    TEST("x[0]:x[2]");
+    TEST("1:x[2]");
+    TEST("x[0]:5[2]");
+    TEST("(x[0]:5)[2]");
+    TEST("(x[0]):5[2]");
+    TEST("((x[0]):5)[2]");
+    TEST("printexpression(5+5+3*2*x))");
+    TEST("printexpressiontree(5+5+3*2*x)");
+    TEST("f(x)=if(x<=1, 0, [f(x-1), 1])");
+    TEST("printexpression(f(x)=if(x<=1, 0, [f(x-1), 1]))");
+    TEST("printexpressiontree(f(x)=if(x<=1, 0, [f(x-1), 1]))");
+    TEST("f(5)");
+    TEST("fib(x)=if(x<=1, 1, fib(x-1)+fib(x-2))");
+    TEST("printexpression(fib(x)=if(x<=1, 1, fib(x-1)+fib(x-2)))");
+    TEST("printexpressiontree(fib(x)=if(x<=1, 1, fib(x-1)+fib(x-2)))");
+    TEST("for(i,1,10,fib(i))");
+    TEST("fib(1)");
+    TEST("fib(2)");
+    TEST("fib(3)");
+    TEST("fib(4)");
+    TEST("st=struct(\"a\", 1, \"b\", true)");
+    TEST("st=struct(st, \"c\", 1:3, \"d\", \"blabla\")");
+    TEST("st=struct(st, \"a\", 10, \"b\", 20)");
+    TEST("st");
+    TEST("printexpressiontree(st.a)");
+    TEST("st.a");
+    TEST("printexpressiontree(st.d[1:3])");
+    TEST("st.d[1:3]");
+    TEST("stt=struct(\"a\", struct(\"a\", 1, \"b\", true), \"b\", struct(\"a\", 1, \"b\", true, \"c\", 1:5))");
+    TEST("stt.a");
+    TEST("stt.a.a");
+    TEST("stt.b.c[2:3]");
+    TEST("stt.b[2:3]");
+    TEST("stt[2:3]");
+    TEST("st=struct(\"a\", 1, \"b\", true); st=struct(st, \"c\", 1:3, \"d\", \"blabla\")");
+    TEST("structkeys(struct(\"a\", 1, \"b\", true))");
+    TEST("structget(struct(\"a\", 1, \"b\", true), \"a\")");
+    TEST("structsaveget(struct(\"a\", 1, \"b\", true), \"a\")");
+
+
     return 0;
 }
 

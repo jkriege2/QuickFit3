@@ -21,13 +21,15 @@
 
 
 
-QT       += core gui
+QT       += core gui xml
 
-DEFINES +=QFLIB_TEST QFMATHPARSER_DEBUGFUNCTIONNAMES #QFMATHPARSER_BYTECODESTACK_ERRORCHECKING
+DEFINES +=QFLIB_TEST QFMATHPARSER_DEBUGFUNCTIONNAMES QFMATHPARSER_MATHPARSERTEST #QFMATHPARSER_BYTECODESTACK_ERRORCHECKING
 
 TARGET = parser_test
 CONFIG   += console
 CONFIG   -= app_bundle
+
+INCLUDEPATH += ../../../../../../LIB/trunk/
 
 TEMPLATE = app
 
@@ -37,7 +39,8 @@ SOURCES += main.cpp \
     ../../qfmathtools.cpp \
     ../../qfmathparser.cpp \
     ../../qfmathparserdefaultlib.cpp \
-    ../../qfmathparsertools.cpp
+    ../../qfmathparsertools.cpp \
+    ../../../../../../LIB/trunk/statistics_tools.cpp
 
 HEADERS += \
     ../../qftools.h \
@@ -45,4 +48,14 @@ HEADERS += \
     ../../qfmathparser.h \
     ../../lib_imexport.h \
     ../../qfmathparserdefaultlib.h \
-    ../../qfmathparsertools.h
+    ../../qfmathparsertools.h \
+    ../../../../../../LIB/trunk/statistics_tools.h
+
+
+
+message("Qt Version: $$QT_MAJOR_VERSION . $$QT_MINOR_VERSION")
+greaterThan(QT_MAJOR_VERSION, 4) {
+    QT += widgets printsupport
+    message("Qt Major Version >5, using special Qt5.x include syntax for widgets")
+}
+CONFIG += exceptions rtti stl

@@ -8,9 +8,11 @@
     <li><b><a href="$$mainhelpdir$$/parserreference/type_conversion.html">data type conversion functions</a></b></li></ul></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/floatingpointfunctions.html">floating-point special functions (isnan etc.)</a></b></li>
 <li><b>Special Functions</b>:<ul>
+	<li><b><a href="$$mainhelpdir$$/parserreference/struct.html">struct functions</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/vector.html">vector manipulation functions</a></b></li>
     <li><b><a href="$$mainhelpdir$$/parserreference/special.html">special functions</a></b></li>
-    <li><b><a href="$$mainhelpdir$$/parserreference/special_functionlike.html">function-like constructs (if, cases, for, sum, ...)</a></b></li>
+    <li><b><a href="$$mainhelpdir$$/parserreference/special_functionlike.html">function-like constructs (if, cases, for, sum, ...)</a></b></li>    
+	<li><b><a href="$$mainhelpdir$$/parserreference/parsetree.html">parsetree access/expression print functions</a></b></li>
 </ul></li>
 <li><b>Mathematical Functions</b>:<ul>
     <li><b><a href="$$mainhelpdir$$/parserreference/trig.html">trigonometric functions</a></b></li>

@@ -224,9 +224,9 @@ QVariant QFECamServer::getMeasurementDeviceValue(unsigned int measurementDevice,
                             }
                         }
                     }
-                    log_error(tr("error reading parameter '%2' (timeout: %1s): PARAMETER NOT AVAILABLE IN DEVICE\n\n").arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id));
+                    log_error(tr("error reading parameter from all parameters '%2' (timeout: %1s): PARAMETER NOT AVAILABLE IN DEVICE\n\n").arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id));
                 } else  {
-                    log_error(tr("error reading parameter '%4' (timeout: %3s):\n%1     error description: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id));
+                    log_error(tr("error reading parameter from all parameters '%4' (timeout: %3s):\n%1     error description: %2!\n\n").arg(LOG_PREFIX).arg(server->errorString()).arg(double(sources[measurementDevice].timeout_connection)/1000.0).arg(sources[measurementDevice].params[value].id));
                 }
             }
         } else {
@@ -640,7 +640,7 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
                         memset(data, 0, oldW*oldH*sizeof(uint32_t));
                         if (answ_bits==8) {
                             QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint8_t), &ok);
-                            //qDebug()<<"READ_8BIT:  "<<ok;
+                            qDebug()<<"READ_8BIT:  "<<ok;
                             if (ok) {
                                 const uint8_t* d=(const uint8_t*)temp.constData();
                                 for (int i=0; i<qMin(oldW*oldH, newW*newH); i++) {
@@ -649,7 +649,7 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
                             }
                         } else if (answ_bits==16) {
                             QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint16_t), &ok);
-                            //qDebug()<<"READ_16BIT:  "<<ok;
+                            qDebug()<<"READ_16BIT:  "<<ok;
                             if (ok) {
                                 const uint16_t* d=(const uint16_t*)temp.constData();
                                 for (int i=0; i<qMin(oldW*oldH, newW*newH); i++) {
@@ -658,7 +658,7 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
                             }
                         } else if (answ_bits==32) {
                             QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint32_t), &ok);
-                            //qDebug()<<"READ_16BIT:  "<<ok;
+                            qDebug()<<"READ_16BIT:  "<<ok;
                             if (ok) {
                                 const uint32_t* d=(const uint32_t*)temp.constData();
                                 for (int i=0; i<qMin(oldW*oldH, newW*newH); i++) {
@@ -667,7 +667,7 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
                             }
                         } else if (answ_bits==64) {
                             QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint64_t), &ok);
-                            //qDebug()<<"READ_16BIT:  "<<ok;
+                            qDebug()<<"READ_16BIT:  "<<ok;
                             if (ok) {
                                 const uint64_t* d=(const uint64_t*)temp.constData();
                                 for (int i=0; i<qMin(oldW*oldH, newW*newH); i++) {

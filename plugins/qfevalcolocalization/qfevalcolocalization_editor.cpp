@@ -199,9 +199,15 @@ void QFEValColocalizationEditor::writeWidgetValues(QFRawDataRecord *formerRecord
     resultID=eval->getEvaluationResultID(-1,-1,-1);
     formerRecord->setQFProperty(resultID+"_channel1", ui->spinChannel1->value(), false, false);
     formerRecord->setQFProperty(resultID+"_channel2", ui->spinChannel2->value(), false, false);
-    formerRecord->setQFProperty(resultID+"_stack", ui->cmbStack->currentIndex(), false, false);
+    if (formerRecord->getType()=="imaging_fcs") {
+        formerRecord->setQFProperty(resultID+"_stack_imfcs", ui->cmbStack->currentIndex(), false, false);
+        eval->setQFProperty(resultID+"_stack_imfcs", ui->cmbStack->currentIndex(), false, false);
+    } else {
+        formerRecord->setQFProperty(resultID+"_stack", ui->cmbStack->currentIndex(), false, false);
+        eval->setQFProperty(resultID+"_stack", ui->cmbStack->currentIndex(), false, false);
+    }
 
-    eval->setQFProperty(resultID+"_stack", ui->cmbStack->currentIndex(), false, false);
+
     eval->setQFProperty(resultID+"_channel1", ui->spinChannel1->value(), false, false);
     eval->setQFProperty(resultID+"_channel2", ui->spinChannel2->value(), false, false);
     eval->setQFProperty(resultID+"_evalframe", ui->spinFrame->value(), false, false);
@@ -243,7 +249,12 @@ void QFEValColocalizationEditor::highlightingChanged(QFRawDataRecord* formerReco
         for (int i=0; i<data->getImageStackCount(); i++) {
             ui->cmbStack->addItem(data->getImageStackDescription(i));
         }
-        ui->cmbStack->setCurrentIndex(qBound(0, currentRecord->getQFProperty(resultID+"_stack", eval->getQFProperty(resultID+"_stack", 0).toInt()).toInt(), ui->cmbStack->count()-1));
+        if (currentRecord->getType()=="imaging_fcs") {
+            ui->cmbStack->setCurrentIndex(qBound(0, currentRecord->getQFProperty(resultID+"_stack_imfcs", eval->getQFProperty(resultID+"_stack_imfcs", 2).toInt()).toInt(), ui->cmbStack->count()-1));
+        } else {
+            ui->cmbStack->setCurrentIndex(qBound(0, currentRecord->getQFProperty(resultID+"_stack", eval->getQFProperty(resultID+"_stack", 0).toInt()).toInt(), ui->cmbStack->count()-1));
+        }
+
         ui->spinChannel1->setRange(0, data->getImageStackChannels(stack));
         ui->spinChannel2->setRange(0, data->getImageStackChannels(stack));                
         ui->spinChannel1->setValue(currentRecord->getQFProperty(resultID+"_channel1", eval->getQFProperty(resultID+"_channel1", 0).toInt()).toInt());

@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2008-2014 Jan W. Krieger, German Cancer Research Center
+    Copyright (c) 2008-2015 Jan W. Krieger, German Cancer Research Center
 
     last modification: $LastChangedDate$  (revision $Rev$)
 
@@ -145,6 +145,10 @@ namespace QFMathParser_DefaultLib {
     void fIsDoubleVector(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fIsStringVector(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
+    void fStruct(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fStructKeys(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fStructGet(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    void fStructGetSave(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
     void fShuffle(qfmpResult& r, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 
@@ -219,7 +223,8 @@ namespace QFMathParser_DefaultLib {
     static inline QString QFMathParser_toupper(const QString& value) {
         return value.toUpper();
     }
-
+    void fPrintExpression(qfmpResult& r,  QFMathParser::qfmpNode** params, unsigned int n, QFMathParser* p);
+    void fPrintExpressionTree(qfmpResult& r,  QFMathParser::qfmpNode** params, unsigned int n, QFMathParser* p);
 
     QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fTrimm, trimm, QFMathParser_trimm)
     QFMATHPARSER_DEFINE_1PARAM_STRING_FUNC(fSimplify, simplify, QFMathParser_simplify)

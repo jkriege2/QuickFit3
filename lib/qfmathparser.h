@@ -197,15 +197,20 @@ if (n->createByteCode(bprog, &bcenv)) {
                       | math_expression <b>+</b> math_term
                       | math_expression <b>-</b> math_term
                       | math_expression <b>|</b> math_term</pre>
-<pre>  math_term       ->  vec_primary
-                      | term <b>*</b> vec_primary
-                      | term <b>/</b> vec_primary
-                      | term <b>&amp;</b> vec_primary
-                      | term ( <b>%</b> | <b>mod</b> ) vec_primary</pre>
-<pre>  vec_primary     ->  primary
-                      | primary <b>:</b> primary
-                      | primary <b>:</b> primary <b>:</b> primary
-                      | <b>[</b> vector_list <b>]</b>
+<pre>  math_term       ->  primary_lop
+                      | math_term <b>*</b> primary_lop
+                      | math_term <b>/</b> primary_lop
+                      | math_term <b>&amp;</b> primary_lop
+                      | math_term ( <b>%</b> | <b>mod</b> ) primary_lop</pre>
+<pre>  primary_lop     ->  vec_primary
+                      | <b>+</b> vec_primary | <b>-</b> vec_primary | <b>!</b> vec_primary | <b>not</b> vec_primary | <b>~</b> vec_primary</pre>
+<pre>  vec_primary     ->  primary_op
+                      | primary_op <b>:</b> primary_op
+                      | primary_op <b>:</b> primary_op <b>:</b> primary_op</pre>
+<pre>  primary_op      ->  primary
+                      | primary_op <b>^</b> primary</pre>
+                      | primary_op <b>[</b> logical_expression <b>]</b>
+                      | primary_op <b>.</b> NAME</pre>
 <pre>  primary         ->  <b>true</b> | <b>false</b>
                       | string_constant
                       | NUMBER
@@ -219,9 +224,7 @@ if (n->createByteCode(bprog, &bcenv)) {
                       | NAME<b>[</b> logical_expression <b>]</b>
                       | NAME<b>(</b> parameter_list <b>)</b>
                       | NAME(parametername_list) <b>=</b> logical_expression
-                      | <b>+</b> primary | <b>-</b> primary | <b>!</b> primary | <b>not</b> primary | <b>~</b> primary
-                      | <b>(</b> logical_expression <b>)</b>
-                      | primary <b>^</b> primary</pre>
+                      | <b>(</b> logical_expression <b>)</b></pre>
 
 <pre>  string_constant -> <b>&quot;</b> STRING <b>&quot;</b> | <b>&apos;</b> STRING <b>&apos;</b></pre>
 <pre>  parameter_list  ->  \f$ \lambda \f$ | logical_expression | logical_expression <b>,</b> parameter_list</pre>
@@ -282,6 +285,7 @@ class QFLIB_EXPORT QFMathParser
         enum qfmpTokenType {
             END,                /*!< \brief end token */
             PRINT,              /*!< \brief a semicolon ';' */
+            DOT,                /*!< \brief a dot '.' */
             COMMA,              /*!< \brief a comma ',' between two function parameters */
             STRING_DELIM,       /*!< \brief a string delimiter ' or " */
             NAME,               /*!< \brief a name (consisting of characters) of a variable or function */
@@ -488,6 +492,7 @@ class QFLIB_EXPORT QFMathParser
                 qfmpVariable(QVector<double>* ref);
                 qfmpVariable(QVector<bool>* ref);
                 qfmpVariable(QStringList* ref);
+                qfmpVariable(QMap<QString,qfmpResult>* ref);
                 qfmpVariable(qfmpCustomResult* ref);
                 //~qfmpVariable();
                 QFLIB_EXPORT void clearMemory();
@@ -502,6 +507,7 @@ class QFLIB_EXPORT QFMathParser
                 inline QVector<double>* getNumVec() const { return numVec; }
                 inline QVector<bool>* getBoolVec() const { return boolVec; }
                 inline QStringList* getStrVec() const { return strVec; }
+                inline QMap<QString,qfmpResult>* getStructData() const { return structData; }
 
 
             protected:
@@ -514,6 +520,7 @@ class QFLIB_EXPORT QFMathParser
                 QVector<bool>* boolVec; /*!< \brief this points to the variable data if \c type==qfmpBoolVector */
                 QStringList* strVec; /*!< \brief this points to the variable data if \c type==qfmpStringVector */
                 qfmpCustomResult* custom;
+                QMap<QString,qfmpResult>* structData;
         };
 
 
@@ -565,6 +572,11 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief create bytecode that evaluates the current node */
             virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment) { return false; }
+
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
         };
 
 
@@ -597,6 +609,12 @@ class QFLIB_EXPORT QFMathParser
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
             /** \brief create bytecode that evaluates the current node */
             virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment);
+
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
+
         };
 
         /**
@@ -626,6 +644,11 @@ class QFLIB_EXPORT QFMathParser
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
             /** \brief create bytecode that evaluates the current node */
             virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment);
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
+            QString opAsString() const;
 
         };
 
@@ -656,6 +679,12 @@ class QFLIB_EXPORT QFMathParser
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
             /** \brief create bytecode that evaluates the current node */
             virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment);
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
+
+            QString opAsString() const;
 
         };
 
@@ -685,19 +714,23 @@ class QFLIB_EXPORT QFMathParser
             virtual qfmpNode* copy(qfmpNode* par=NULL);
             /** \brief create bytecode that evaluates the current node */
             virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment);
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
 
         };
 
         /**
-         * \brief This class represents a vector element access
+         * \brief This class represents a vector element access to a variable
          */
-        class QFLIB_EXPORT qfmpVectorAccessNode: public qfmpNode {
+        class QFLIB_EXPORT qfmpVariableVectorAccessNode: public qfmpNode {
           protected:
             qfmpNode* index;
             QString variable;
           public:
             /** \brief standard destructor, also destroy the children (recursively)  */
-            virtual ~qfmpVectorAccessNode() ;
+            virtual ~qfmpVariableVectorAccessNode() ;
 
             /** \brief constructor for a qfmpVariableAssignNode
              *  \param var name of the variable to assign to
@@ -705,13 +738,79 @@ class QFLIB_EXPORT QFMathParser
              *  \param p a pointer to a QFMathParser object
              *  \param par a pointer to the parent node
              */
-            explicit qfmpVectorAccessNode(QString var, qfmpNode* index, QFMathParser* p, qfmpNode* par);
+            explicit qfmpVariableVectorAccessNode(QString var, qfmpNode* index, QFMathParser* p, qfmpNode* par);
 
             /** \brief evaluate this node, return result as call-by-reference (faster!) */
             virtual void evaluate(qfmpResult& result);
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
+
+        };
+
+
+        /**
+         * \brief This class represents a vector element access to an arbitrary expression
+         */
+        class QFLIB_EXPORT qfmpVectorAccessNode: public qfmpNode {
+          protected:
+            qfmpNode* index;
+            qfmpNode* left;
+          public:
+            /** \brief standard destructor, also destroy the children (recursively)  */
+            virtual ~qfmpVectorAccessNode() ;
+
+            /** \brief constructor for a qfmpVariableAssignNode
+             *  \param left left-hand-side expression
+             *  \param index index child node
+             *  \param p a pointer to a QFMathParser object
+             *  \param par a pointer to the parent node
+             */
+            explicit qfmpVectorAccessNode(qfmpNode* left, qfmpNode* index, QFMathParser* p, qfmpNode* par);
+
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
+
+            /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+            virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
+
+        };
+        /**
+         * \brief This class represents a struct element access to an arbitrary expression
+         */
+        class QFLIB_EXPORT qfmpStructAccessNode: public qfmpNode {
+          protected:
+            QString index;
+            qfmpNode* left;
+          public:
+            /** \brief standard destructor, also destroy the children (recursively)  */
+            virtual ~qfmpStructAccessNode() ;
+
+            /** \brief constructor for a qfmpVariableAssignNode
+             *  \param left left-hand-side expression
+             *  \param index index child node
+             *  \param p a pointer to a QFMathParser object
+             *  \param par a pointer to the parent node
+             */
+            explicit qfmpStructAccessNode(qfmpNode* left, const QString& index, QFMathParser* p, qfmpNode* par);
+
+            /** \brief evaluate this node, return result as call-by-reference (faster!) */
+            virtual void evaluate(qfmpResult& result);
+
+            /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
+            virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
 
         };
 
@@ -741,6 +840,10 @@ class QFLIB_EXPORT QFMathParser
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
             /** \brief create bytecode that evaluates the current node */
             virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment);
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
 
 
         };
@@ -769,6 +872,10 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
 
         };
 
@@ -801,6 +908,10 @@ class QFLIB_EXPORT QFMathParser
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
             /** \brief create bytecode that evaluates the current node */
             virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment);
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
 
         };
 
@@ -827,6 +938,10 @@ class QFLIB_EXPORT QFMathParser
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
             /** \brief create bytecode that evaluates the current node */
             virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment);
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
 
         };
 
@@ -855,6 +970,10 @@ class QFLIB_EXPORT QFMathParser
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
             /** \brief create bytecode that evaluates the current node */
             virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment *environment);
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
 
         };
 
@@ -878,6 +997,10 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
+                /** \brief print the expression */
+                virtual QString print() const;
+                /** \brief print the expression tree */
+                virtual QString printTree(int level=0) const;
 
         };
 
@@ -989,7 +1112,10 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief create bytecode that evaluates the current node */
             virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment) ;
-
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
         };
 
         /**
@@ -1026,7 +1152,10 @@ class QFLIB_EXPORT QFMathParser
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
             /** \brief create bytecode that evaluates the current node */
             virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment) ;
-
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
         };
 
         /**
@@ -1052,7 +1181,10 @@ class QFLIB_EXPORT QFMathParser
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
             /** \brief create bytecode that evaluates the current node */
             virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment) ;
-
+                /** \brief print the expression */
+                virtual QString print() const;
+                /** \brief print the expression tree */
+                virtual QString printTree(int level=0) const;
         };
 
 
@@ -1080,7 +1212,10 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
-
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
         };
 
         /**
@@ -1114,7 +1249,10 @@ class QFLIB_EXPORT QFMathParser
             /** \brief create bytecode that evaluates the current node */
             virtual bool createByteCode(ByteCodeProgram& program, ByteCodeEnvironment* environment) ;
 
-
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
         };
 
         /**
@@ -1146,7 +1284,10 @@ class QFLIB_EXPORT QFMathParser
 
             /** \brief returns a copy of the current node (and the subtree). The parent is set to \a par */
             virtual qfmpNode* copy(qfmpNode* par=NULL) ;
-
+            /** \brief print the expression */
+            virtual QString print() const;
+            /** \brief print the expression tree */
+            virtual QString printTree(int level=0) const;
         };
 
         /*@}*/
@@ -1170,6 +1311,9 @@ class QFLIB_EXPORT QFMathParser
 
                 QFLIB_EXPORT void setParent(QFMathParser* parent);
 
+                inline int getBlockLevel() const  {
+                    return currentLevel;
+                }
                 inline void enterBlock() {
                     currentLevel++;
                 }
@@ -1205,6 +1349,7 @@ class QFLIB_EXPORT QFMathParser
                 QFLIB_EXPORT void clear();
 
                 QFLIB_EXPORT void addVariable(const QString& name, const qfmpVariable& variable);
+                QFLIB_EXPORT int getVariableLevels(const QString& name) const;
                 QFLIB_EXPORT void setFunction(const QString& name, const qfmpFunctionDescriptor& function);
                 QFLIB_EXPORT void addFunction(const QString& name, const QStringList& parameterNames, qfmpNode* function);
 
@@ -1321,6 +1466,7 @@ class QFLIB_EXPORT QFMathParser
                     bool add=true;
                     if (variables.contains(name)) {
                         if (variables[name].size()>0) {
+                            //qDebug()<<"addVar("<<name<<") compare level:  level="<<variables[name].last().first<<"  currentLevel="<<currentLevel;
                             if (variables[name].last().first==currentLevel) {
                                 variables[name].last().second.set(result);
                                 add=false;
@@ -1331,10 +1477,19 @@ class QFLIB_EXPORT QFMathParser
                     if (add) {
                         QFMathParser::qfmpVariable v;
                         v.set(result);
-                        QList<QPair<int, qfmpVariable> > l;
-                        l.append(qMakePair(currentLevel, v));
-                        variables.insert(name, l);
+
+                        if (variables.contains(name)) {
+                            variables[name].append(qMakePair(currentLevel, v));
+                        } else {
+                            QList<QPair<int, qfmpVariable> > l;
+                            l.append(qMakePair(currentLevel, v));
+                            variables.insert(name, l);
+                        }
+
+                        //qDebug()<<"addVar("<<name<<") add new:  level="<<currentLevel<<"  val="<<v.toResult().toTypeString();
+
                     }
+
                 }
 
                 inline void setVariable(const QString& name, const qfmpResult& result){
@@ -1348,6 +1503,7 @@ class QFLIB_EXPORT QFMathParser
                         l.append(qMakePair(currentLevel, v));
                         variables[name]=l;
                     }
+                    //qDebug()<<"setVariable("<<name<<", "<<result.toTypeString()<<")  =>  "<<variables[name].last().second.toResult().toTypeString();
                 }
 
                 QFLIB_EXPORT void setVariableDouble(const QString& name, double result);
@@ -1426,6 +1582,10 @@ class QFLIB_EXPORT QFMathParser
         /** \brief recognizes a vector_primary while parsing. If \a get ist \c true, this function first retrieves a new token by calling getToken() */
         qfmpNode* vectorPrimary(bool get);
 
+        /** \brief recognizes a primary_lop while parsing. If \a get ist \c true, this function first retrieves a new token by calling getToken() */
+        qfmpNode* primaryLOp(bool get);
+        /** \brief recognizes a primary_op while parsing. If \a get ist \c true, this function first retrieves a new token by calling getToken() */
+        qfmpNode* primaryOp(bool get);
         /** \brief recognizes a primary while parsing. If \a get ist \c true, this function first retrieves a new token by calling getToken() */
         qfmpNode* primary(bool get);
 
@@ -1522,6 +1682,11 @@ class QFLIB_EXPORT QFMathParser
         /** \brief set the defining struct of the given variable */
         inline void addVariable(const QString& name, const qfmpVariable &value) {
             environment.addVariable(name, value);
+        }
+
+        /** \brief get number of levels, on which this variable exists */
+        inline int getVariableLevels(const QString& name) const {
+            return environment.getVariableLevels(name);
         }
 
 
@@ -1690,6 +1855,9 @@ class QFLIB_EXPORT QFMathParser
         }
         inline void leaveBlock() {
             environment.leaveBlock();
+        }
+        inline int getBlockLevel() const {
+            return environment.getBlockLevel();
         }
 
         /** \brief  deletes all defined variables. the memory of internal variables

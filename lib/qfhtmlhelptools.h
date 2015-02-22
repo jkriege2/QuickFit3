@@ -40,6 +40,7 @@
 #include <QListWidget>
 #include "qtriple.h"
 #include <QTextStream>
+#include "qfpluginservices.h"
 
 /*! \brief remove all HTML comments from a string
     \ingroup qf3lib_tools
@@ -80,5 +81,19 @@ QFLIB_EXPORT QString escapeHTML(const QString& data);
 QFLIB_EXPORT QString deescapeHTML(const QString& data);
 
 
+#ifndef QFMATHPARSER_MATHPARSERTEST
+/*! \brief extract FAQs from a faq.html file
+    \ingroup qf3lib_tools
+
+
+ */
+QFLIB_EXPORT void parseFAQ(const QString& filename, const QString& pluginID, QMap<QString, QFFAQData> &faqs);
+
+QFLIB_EXPORT void parseTooltips(const QString& directory, QMap<QString, QFToolTipsData>& tooltips);
+#endif
+
+QFLIB_EXPORT void parseAutolinks(const QString& directory, QMap<QString, QString>& autolinks);
+
+QFLIB_EXPORT void parseGlobalreplaces(const QString& directory);
 
 #endif // QFHTMLHELPTOOLS_H

@@ -46,11 +46,12 @@
 #include <QIcon>
 #include <QListWidget>
 #include "qtriple.h"
-#include "qfpluginservices.h"
 #include <QXmlStreamWriter>
 #include <QBitArray>
-
-
+#ifndef QFMATHPARSER_MATHPARSERTEST
+#  include "qfpluginservices.h"
+#  include "qfversion.h"
+#endif
 
 #define DEFINE_READWRITE_LOCKERS(CLASS, readLockF, writeLockF, readUnlockF, writeUnlockF) \
     class QFLIB_EXPORT CLASS##ReadLocker {\
@@ -1816,18 +1817,7 @@ QFLIB_EXPORT void saveStringToFile(const QString& filename, const QString& text,
  */
 QFLIB_EXPORT QStringList qfDirListFilesRecursive(QDir& dir, const QStringList& filters=QStringList());
 
-/*! \brief extract FAQs from a faq.html file
-    \ingroup qf3lib_tools
 
-
- */
-QFLIB_EXPORT void parseFAQ(const QString& filename, const QString& pluginID, QMap<QString, QFFAQData> &faqs);
-
-QFLIB_EXPORT void parseTooltips(const QString& directory, QMap<QString, QFToolTipsData>& tooltips);
-
-QFLIB_EXPORT void parseAutolinks(const QString& directory, QMap<QString, QString>& autolinks);
-
-QFLIB_EXPORT void parseGlobalreplaces(const QString& directory);
 /*! \brief returns a filename for a temporary file
     \ingroup qf3lib_tools
 

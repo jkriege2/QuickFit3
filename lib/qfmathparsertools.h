@@ -64,9 +64,10 @@ enum qfmpResultType {qfmpDouble=0x01,  /*!< \brief a floating-point number with 
                      qfmpStringVector=0x10, /*!< \brief a vector of strings */
                      qfmpBoolVector=0x20, /*!< \brief a vector of booleans */
                      qfmpVoid=0x40,  /*!< \brief a void/non-evaluatable result */
-                     qfmpCustom=0x8000  /*!< \brief a custom datatype (qfmpCustomResult) */
+                     qfmpStruct=0x80,  /*!< \brief a struct datatype (qfmpStruct) */
+                     qfmpCustom=0x8000,  /*!< \brief a custom datatype (qfmpCustomResult) */
                      };
-
+QFLIB_EXPORT QString qfmpResultTypeToString(qfmpResultType type);
 struct  qfmpResult; // forward
 
 
@@ -175,6 +176,7 @@ struct QFLIB_EXPORT qfmpResult {
         QFLIB_EXPORT void setDouble(double val);
         QFLIB_EXPORT void setBoolean(bool val);
         QFLIB_EXPORT void setString(const QString& val);
+        QFLIB_EXPORT void setString(int size=0, QChar defaultChar=QLatin1Char(' '));
         QFLIB_EXPORT void setDoubleVec(const QVector<double>& val);
         QFLIB_EXPORT void setDoubleVec(int size=0, double defaultVal=0);
         template <typename T>
@@ -185,6 +187,7 @@ struct QFLIB_EXPORT qfmpResult {
             }
         }
 
+        QFLIB_EXPORT void setStruct(const QStringList& items=QStringList());
 
         QFLIB_EXPORT void setBoolVec(const QVector<bool>& val);
         QFLIB_EXPORT void setBoolVec(int size=0, bool defaultVal=false);
@@ -257,6 +260,13 @@ struct QFLIB_EXPORT qfmpResult {
         /** \brief returns an void result */
         QFLIB_EXPORT static qfmpResult voidResult();
 
+        /** \brief returns an entry from a struct */
+        QFLIB_EXPORT qfmpResult getStructItem(const QString& item);
+
+        /** \brief returns an entry from a struct */
+        QFLIB_EXPORT void setStructItem(const QString& item, const qfmpResult& value);
+        /** \brief returns an entry from a struct */
+        QFLIB_EXPORT void setStruct(const QMap<QString,qfmpResult>& data);
 
 
         QFLIB_EXPORT static void add(qfmpResult& result, const qfmpResult& l, const qfmpResult& r, QFMathParser* p);
@@ -296,6 +306,7 @@ struct QFLIB_EXPORT qfmpResult {
         QVector<double> numVec; /*!< \brief contains result if \c type==qfmpDoubleVector */
         QStringList strVec;
         QVector<bool> boolVec;
+        QMap<QString,qfmpResult> structData;
 
 
         /*!< \brief clear the current qfmpCustomResult object */

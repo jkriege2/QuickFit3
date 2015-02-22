@@ -62,13 +62,14 @@
 	  <tr><td></td><td><code>/</code></td><td>divide</td><td>2</td><td>two numbers</td></tr>
 	  <tr><td></td><td><code>%</code>, <code>mod</code></td><td>modulo</td><td>2</td><td>two numbers</td></tr>
 	  <tr><td></td><td><code>&amp;</code></td><td>bit-wise and</td><td>2</td><td>two integer numbers</td></tr>
-	  <tr><td>5</td><td><code>:</code></td><td>vector construction</td><td>2, 3</td><td>two/three numbers</td></tr>
-	  <tr><td>6</td><td><code>=</code></td><td>variable/function assignment</td><td>2</td><td>any right-hand-side expression</td></tr>
-	  <tr><td></td><td><code>[]</code></td><td>vector element access</td><td>2</td><td>one vector and one number or number vector</td></tr>
-	  <tr><td></td><td><code>[]=</code></td><td>vector element assignment</td><td>3</td><td>one vector and two numbers or number vectors</td></tr>
-	  <tr><td></td><td><code>-</code></td><td>negation</td><td>1</td><td>number</td></tr>
+	  <tr><td>5</td><td><code>-</code></td><td>negation</td><td>1</td><td>number</td></tr>
 	  <tr><td></td><td><code>!</code>, <code>not</code></td><td>logic not</td><td>1</td><td>boolean value</td></tr>
 	  <tr><td></td><td><code>~</code></td><td>bit-wise not</td><td>1</td><td>integer number</td></tr>
+	  <tr><td>6</td><td><code>:</code></td><td>vector construction</td><td>2, 3</td><td>two/three numbers</td></tr>
+	  <tr><td>6</td><td><code>[]</code></td><td>vector element access to expression</td><td>2</td><td>one vector and one number or number vector</td></tr>
+	  <tr><td>7</td><td><code>=</code></td><td>variable/function assignment</td><td>2</td><td>any right-hand-side expression</td></tr>
+	  <tr><td></td><td><code>[]</code></td><td>vector element access to variable</td><td>2</td><td>one vector and one number or number vector</td></tr>
+	  <tr><td></td><td><code>[]=</code></td><td>vector element assignment</td><td>3</td><td>one vector and two numbers or number vectors</td></tr>
 	  <tr><td></td><td><code>^</code></td><td>power</td><td>2</td><td>two numbers</td></tr>
 	  <!--<tr><td></td><td><code></code></td><td></td><td></td></tr>-->
 	</table></blockquote>
@@ -83,7 +84,12 @@
 	  <li><tt>x[[2,5,8]]=y[1,2,3]</tt>: assigns the elements 1, 2, and 3 of vector y to the elements 2, 5 and 8 of vector x </li>
 	  <li><tt>x[[2,5,8]]=0</tt>: assigns 0 to elements 2, 5 and 8 of vector x </li>
 	</ul>
-	<b>Note:</b> All vector indices are 0-based, so the 5 elements of a 5-element vector are accessed with indizes 0,1,2,3,4. It is also possible to give floating-point numbers as vector indices. In that case the index is <u>truncated</u> to an integer! 
+	$$note:All vector indices are 0-based, so the 5 elements of a 5-element vector are accessed with indizes 0,1,2,3,4. It is also possible to give floating-point numbers as vector indices. In that case the index is <u>truncated</u> to an integer! $$
+	
+	<a name="structs"><h3>Structures/structs</h3>
+	<p>You can also create structs, which are a composite of several (named) items of possibly different type. Structs can be created using the function <tt>struct(nam1, value1, name2, value2, ...)</tt> and you can access a single entry using the dot '.' operator, e.g. <tt>st=struct("a", 1, "b", true)</tt> for the creation and <tt>st.a</tt> for the access to element 'a'.</p>
+	<p>In order to set an element in a struct, use <tt>struct(st, 'a', 'newvalue')</tt>.
+	</p>
 
 	<a name="functions"><h3>Functions</h3>
 	<h4>Calling Functions</h4>
@@ -135,14 +141,20 @@ logical_expression ->  logical_term
                  | math_expression <b>+</b> math_term
                  | math_expression <b>-</b> math_term
                  | math_expression <b>|</b> math_term</pre>
-<pre>math_term       ->  primary
-                 | term <b>*</b> primary
-                 | term <b>/</b> primary
-                 | term <b>&</b> primary
-                 | term ( <b>%</b> | <b>mod</b> ) primary</pre>
-<pre>vec_primary     ->  primary
-                 | primary <b>:</b> primary
-                 | primary <b>:</b> primary <b>:</b> primary
+<pre>math_term       ->  primary_lop
+                 | math_term <b>*</b> primary_lop
+                 | math_term <b>/</b> primary_lop
+                 | math_term <b>&amp;</b> primary_lop
+                 | math_term ( <b>%</b> | <b>mod</b> ) primary_lop</pre>
+<pre>primary_lop     ->  vec_primary
+                 | <b>+</b> vec_primary | <b>-</b> vec_primary | <b>!</b> vec_primary | <b>not</b> vec_primary | <b>~</b> vec_primary</pre>
+<pre>vec_primary     ->  primary_op
+                 | primary_op <b>:</b> primary_op
+                 | primary_op <b>:</b> primary_op <b>:</b> primary_op</pre>
+<pre>primary_op      ->  primary
+                 | primary_op <b>^</b> primary</pre>
+                 | primary_op <b>[</b> logical_expression <b>]</b>
+                 | primary_op <b>.</b> NAME</pre>
 <pre>primary         ->  <b>true</b> | <b>false</b>
                  | string_constant
                  | NUMBER
@@ -152,14 +164,12 @@ logical_expression ->  logical_term
                  | vectorops_name <b>(</b> NAME, logical_expression, logical_expression, logical_expression <b>)</b>
                  | vectorops_name <b>(</b> NAME, logical_expression, logical_expression <b>)</b>
                  | NAME <b>=</b> logical_expression
+                 | NAME<b>[</b> logical_expression <b>] =</b> logical_expression
+                 | NAME<b>[</b> logical_expression <b>]</b>
                  | NAME<b>(</b> parameter_list <b>)</b>
                  | NAME(parametername_list) <b>=</b> logical_expression
-                 | NAME<b>[</b> logical_expression <b>] =</b> logical_expression
-                 | <b>+</b> primary | <b>-</b> primary | <b>!</b> primary | <b>not</b> primary | <b>~</b> primary
                  | <b>(</b> logical_expression <b>)</b>
-                 | NAME <b>[</b> logical_expression <b>]</b>
-                 | primary <b>^</b> primary</pre>
-                 | <b>[</b> vector_list <b>]</b></pre>
+					  | <b>[</b> vector_list <b>]</b></pre>
 <pre>string_constant -> <b>&quot;</b> STRING <b>&quot;</b> | <b>&apos;</b> STRING <b>&apos;</b></pre>
 <pre>parameter_list  ->  &lambda; | logical_expression | logical_expression <b>,</b> parameter_list</pre>
 <pre>parametername_list ->  &lambda; | NAME | NAME <b>,</b> parametername_list</pre>

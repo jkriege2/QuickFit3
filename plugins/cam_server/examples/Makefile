@@ -4,7 +4,7 @@ LIB=../../../LIB/trunk
 CC=g++
 
 CFLAGS =  -Wall -DHAVE_INLINE
-LDFLAGS = 
+LDFLAGS = -lpthread
 
 Release: CFLAGS += -O2 
 

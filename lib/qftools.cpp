@@ -34,13 +34,15 @@
 #include <QFile>
 #include <QTextStream>
 #include <QTextCodec>
-#include "programoptions.h"
-#include "qfpluginservices.h"
-#include "qfhtmlhelptools.h"
+#ifndef QFMATHPARSER_MATHPARSERTEST
+#  include "programoptions.h"
+#  include "qfpluginservices.h"
+#  include "qfhtmlhelptools.h"
+#  include "qfversion.h"
+#endif
 #include <QMutex>
 #include <QPrinter>
 #include <QPrinterInfo>
-#include "qfversion.h"
 #include <QPrinter>
 #if (QT_VERSION > QT_VERSION_CHECK(5, 2, 0))
 #include <QPdfWriter>
@@ -263,14 +265,18 @@ void saveWidgetGeometry(QSettings* settings, QWidget* widget, QString prefix) {
     if (settings) saveWidgetGeometry(*settings,widget, prefix);
 }
 void saveWidgetGeometry(ProgramOptions* settings, QWidget* widget, QString prefix) {
+#ifndef QFMATHPARSER_MATHPARSERTEST
     if (settings) saveWidgetGeometry(*settings->getQSettings(),widget, prefix);
+#endif
 }
 
 void loadWidgetGeometry(QSettings* settings, QWidget* widget, QString prefix) {
     if (settings) loadWidgetGeometry(*settings,widget, prefix);
 }
 void loadWidgetGeometry(ProgramOptions* settings, QWidget* widget, QString prefix) {
+#ifndef QFMATHPARSER_MATHPARSERTEST
     if (settings) loadWidgetGeometry(*settings->getQSettings(),widget, prefix);
+#endif
 }
 
 void loadWidgetGeometry(QSettings& settings, QWidget* widget, QString prefix) {
@@ -763,47 +769,65 @@ QString	qfGetExistingDirectory ( QWidget * parent, const QString & caption, cons
 
 
 QString qfGetOpenFileNameSet (const QString& setPrefix,  QWidget * parent , const QString & caption , const QString & dir , const QString & filter , QString * selectedFilter , QFileDialog::Options options  ) {
-    QString d=ProgramOptions::getConfigValue(setPrefix+"lastDir",  dir).toString();
-    QString f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  filter.split(";;").value(0)).toString();;
+    QString d=dir;
+    QString f=filter.split(";;").value(0);
+#ifndef QFMATHPARSER_MATHPARSERTEST
+    d=ProgramOptions::getConfigValue(setPrefix+"lastDir",  dir).toString();
+    f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  filter.split(";;").value(0)).toString();;
+#endif
     if (selectedFilter && (!(*selectedFilter).isEmpty())) {
         f=*selectedFilter;
     }
 
     QString fn=qfGetOpenFileName(parent, caption, d, filter, &f, options);
     if (!fn.isEmpty()) {
+#ifndef QFMATHPARSER_MATHPARSERTEST
         ProgramOptions::setConfigValue(setPrefix+"lastDir",  QFileInfo(fn).absoluteDir().absolutePath());
         ProgramOptions::setConfigValue(setPrefix+"lastFilter",  f);
+#endif
     }
     if (selectedFilter) *selectedFilter=f;
     return fn;
 }
 
 QStringList qfGetOpenFileNamesSet (const QString& setPrefix,  QWidget * parent , const QString & caption , const QString & dir , const QString & filter , QString * selectedFilter , QFileDialog::Options options  ) {
-    QString d=ProgramOptions::getConfigValue(setPrefix+"lastDir",  dir).toString();
-    QString f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  filter.split(";;").value(0)).toString();;
+    QString d=dir;
+    QString f=filter.split(";;").value(0);
+#ifndef QFMATHPARSER_MATHPARSERTEST
+    d=ProgramOptions::getConfigValue(setPrefix+"lastDir",  dir).toString();
+    f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  filter.split(";;").value(0)).toString();;
+#endif
     if (selectedFilter && (!(*selectedFilter).isEmpty())) {
         f=*selectedFilter;
     }
 
     QStringList fn=qfGetOpenFileNames(parent, caption, d, filter, &f, options);
     if (fn.size()>0) {
+#ifndef QFMATHPARSER_MATHPARSERTEST
         ProgramOptions::setConfigValue(setPrefix+"lastDir",  QFileInfo(fn.first()).absoluteDir().absolutePath());
         ProgramOptions::setConfigValue(setPrefix+"lastFilter",  f);
+#endif
     }
     if (selectedFilter) *selectedFilter=f;
     return fn;
 }
 
 QString qfGetSaveFileNameSet (const QString& setPrefix,  QWidget * parent , const QString & caption , const QString & dir , const QString & filter , QString * selectedFilter , QFileDialog::Options options  ) {
-    QString d=ProgramOptions::getConfigValue(setPrefix+"lastDir",  dir).toString();
-    QString f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  filter.split(";;").value(0)).toString();;
+    QString d=dir;
+    QString f=filter.split(";;").value(0);
+#ifndef QFMATHPARSER_MATHPARSERTEST
+    d=ProgramOptions::getConfigValue(setPrefix+"lastDir",  dir).toString();
+    f=ProgramOptions::getConfigValue(setPrefix+"lastFilter",  filter.split(";;").value(0)).toString();;
+#endif
     if (selectedFilter && (!(*selectedFilter).isEmpty())) {
         f=*selectedFilter;
     }
     QString fn=qfGetSaveFileName(parent, caption, d, filter, &f, options);
     if (!fn.isEmpty()) {
+#ifndef QFMATHPARSER_MATHPARSERTEST
         ProgramOptions::setConfigValue(setPrefix+"lastDir",  QFileInfo(fn).absoluteDir().absolutePath());
         ProgramOptions::setConfigValue(setPrefix+"lastFilter",  f);
+#endif
     }
     if (selectedFilter) *selectedFilter=f;
     return fn;
@@ -1301,96 +1325,6 @@ QList<int> stringToIntList(const QString& data) {
     return res;
 }
 
-void parseFAQInt(const QString& filename, const QString& fc, const QString& regexp, int capQ, int capL, const QString& pluginID, QMap<QString, QFFAQData> &faqs) {
-    QRegExp rxFAQ;
-    rxFAQ=QRegExp(regexp);
-    rxFAQ.setMinimal(true);
-    int count = 0;
-    int pos = 0;
-    while ((pos = rxFAQ.indexIn(fc, pos)) != -1) {
-        ++count;
-        FAQEntry e;
-        e.question=removeHTMLComments(rxFAQ.cap(capQ)).simplified().trimmed();
-        if (e.question.startsWith("<b>")) {
-            e.question.remove(0,3);
-            if (e.question.endsWith("</b>")) e.question=e.question.left(e.question.length()-4);
-        }
-        e.link=QFileInfo(filename).absoluteFilePath()+"#"+rxFAQ.cap(capL);
-//        qDebug()<<"   adding "<<e.question<<e.link;
-//        qDebug()<<"          1: "<<rxFAQ.cap(1);
-//        qDebug()<<"          2: "<<rxFAQ.cap(2);
-//        qDebug()<<"          3: "<<rxFAQ.cap(3);
-//        qDebug()<<"          4: "<<rxFAQ.cap(4);
-//        qDebug()<<"          5: "<<rxFAQ.cap(5);
-        faqs[pluginID].append(e);
-        pos += rxFAQ.matchedLength();
-    }
-}
-
-
-void parseFAQ(const QString& filename, const QString& pluginID, QMap<QString, QFFAQData> &faqs) {
-    QFile f(filename);
-    if (f.open(QFile::ReadOnly)) {
-//        qDebug()<<"parse FAQ "<<filename;
-        QString fc=f.readAll();
-        f.close();
-//        qDebug()<<"          "<<fc;
-        parseFAQInt(filename, fc, "<!--\\s*faq\\s*-->\\s*<\\s*a\\s*name\\s*\\=\\s*\\\"\\#?([^#]*)\\\"\\s*/?\\s*>\\s*(.*)\\s*<!--\\s*/\\s*faq\\s*-->", 2, 1, pluginID, faqs);
-        parseFAQInt(filename, fc, "\\$\\$faq_start\\$\\$\\s*<\\s*a\\s*name\\s*\\=\\s*\\\"\\#?([^#]*)\\\"\\s*/?\\s*>\\s*(.*)\\s*\\$\\$faq_answer\\$\\$", 2, 1, pluginID, faqs);
-    }
-}
-
-
-
-void parseTooltips(const QString& directory, QMap<QString, QFToolTipsData>& tooltips) {
-    QDir d(directory);
-    if (QFile::exists(d.absoluteFilePath("tooltips.ini"))) {
-        QSettings setTooltips(d.absoluteFilePath("tooltips.ini"), QSettings::IniFormat);
-
-        QStringList keys=setTooltips.childKeys();
-        for (int i=0; i<keys.size(); i++) {
-            tooltips[keys[i]].tooltip=setTooltips.value(keys[i], QObject::tr("<i>no tooltip available</i>")).toString();
-            tooltips[keys[i]].tooltipfile=d.absoluteFilePath("tooltips.ini");
-            //qDebug()<<keys[i]<<setTooltips.value(keys[i], QObject::tr("<i>no tooltip available</i>")).toString();
-        }
-        QMapIterator<QString, QFToolTipsData> it(tooltips);
-        while (it.hasNext()) {
-            it.next();
-            if (it.value().tooltip.startsWith("%") && tooltips.contains(it.value().tooltip.mid(1))) {
-                //qDebug()<<it.key()<<": "<<it.value().tooltip<<"->"<<tooltips[it.value().tooltip.mid(1)].tooltip<<" ["<<it.value().tooltip.mid(1)<<"]";
-                tooltips[it.key()]=tooltips[it.value().tooltip.mid(1)];
-            }
-        }
-    }
-
-}
-
-
-void parseAutolinks(const QString& directory, QMap<QString, QString>& autolinks) {
-    QDir d(directory);
-    if (QFile::exists(d.absoluteFilePath("autolinks.ini"))) {
-        QSettings setAutolinks(d.absoluteFilePath("autolinks.ini"), QSettings::IniFormat);
-
-        QStringList keys=setAutolinks.childKeys();
-        for (int i=0; i<keys.size(); i++) {
-            QString l=setAutolinks.value(keys[i]).toString();
-            if (!l.startsWith("$$") && !l.startsWith("http://") && !l.startsWith("https://") && !l.startsWith("ftp://") && !l.startsWith("ftps://")) {
-                l=d.absoluteFilePath(l);
-            }
-            if (!l.isEmpty()) {
-                autolinks[keys[i]]=l;
-            }
-        }
-
-        QMapIterator<QString, QString> ita(autolinks);
-        while (ita.hasNext()) {
-            ita.next();
-            if (ita.value().startsWith("%") && autolinks.contains(ita.value().mid(1))) {
-                autolinks[ita.key()]=autolinks[ita.value().mid(1)];
-            }
-        }
-    }
-}
 
 bool qfQStringCompareLengthDecreasing(const QString &s1, const QString &s2) {
     return s1.size() > s2.size();
@@ -1400,17 +1334,6 @@ bool qfQStringCompareLengthIncreasing(const QString &s1, const QString &s2) {
     return s1.size() < s2.size();
 }
 
-void parseGlobalreplaces(const QString& directory) {
-    QDir d(directory);
-    if (QFile::exists(d.absoluteFilePath("globalreplaces.ini"))) {
-        QSettings setLocalReplace(d.absoluteFilePath("globalreplaces.ini"), QSettings::IniFormat);
-
-        QStringList keys=setLocalReplace.childKeys();
-        for (int i=0; i<keys.size(); i++) {
-            QFPluginServices::getInstance()->setOrAddHTMLReplacement(keys[i], setLocalReplace.value(keys[i], "").toString());
-        }
-    }
-}
 
 QString qfCEscaped(const QString& data) {
     QString res;
@@ -1704,7 +1627,6 @@ QString qfCanonicalOrAbsoluteFilePath(const QString& file) {
 }
 
 QString qfHTMLExcape(const QString& input) {
-#include<QtGlobal>
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
     return input.toHtmlEscaped();
 #else
@@ -1772,7 +1694,9 @@ void qfSaveReport(QTextDocument* doc, const QString& title, const QString& prefi
             QPdfWriter pdf(fn);
             pdf.setPageMargins(QMarginsF(10,10,10,10),QPageLayout::Millimeter);
             pdf.setPageOrientation(QPageLayout::Portrait);
+#ifndef QFMATHPARSER_MATHPARSERTEST
             pdf.setCreator(QString("QuickFit %1").arg(qfInfoVersionFull()));
+#endif
             pdf.setPageSize(QPageSize(QPageSize::A4));
             if (filterID==1) pdf.setPageSize(QPageSize(QPageSize::A3));
             pdf.setTitle(title);
