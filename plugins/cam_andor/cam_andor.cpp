@@ -66,7 +66,9 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #  include "atmcdLXd.h"
 #endif
 
-
+#ifndef MAX_PATH
+#  define MAX_PATH 1024
+#endif
 
 #define UPDATE_TEMP_INTERVAL 1131
 
@@ -983,10 +985,17 @@ void QFExtensionCameraAndor::getCameraAcquisitionDescription(unsigned int camera
         qedata.setColTitle(1, tr("QE"));
         for (float l=100; l<2000; l++) {
             float qe=0;
+#ifdef __WINDOWS__
             if (GetQE(headModel,l,&qe)==DRV_SUCCESS){
                 qedata.set(0, i, l);
                 qedata.set(1, i, qe);
             }
+#else
+            if (GetQE(headModel,l,0,&qe)==DRV_SUCCESS){
+                qedata.set(0, i, l);
+                qedata.set(1, i, qe);
+            }
+#endif
             i++;
         }
         if (qedata.getRowCount()>0) {
