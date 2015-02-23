@@ -341,7 +341,7 @@ void QFECamSystemcamera::cancelCameraAcquisition(unsigned int camera) {
 
 }
 
-bool QFECamSystemcamera::isCameraAcquisitionRunning(unsigned int camera, double* percentageDone) {
+bool QFECamSystemcamera::isCameraAcquisitionRunning(unsigned int camera) {
     return false;
 }
 

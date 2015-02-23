@@ -55,8 +55,10 @@ include(../../quickfit3_configqtwidgets.pri)
 
 EXAMPLESTINYTIFF_FILES.files = ../../../../../LIB/trunk/tinytiff*.*
 EXAMPLESTINYTIFF_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/
+EXAMPLESHIGHRESTIMER_FILES.files = ../../../../../LIB/trunk/highrestimer.*
+EXAMPLESHIGHRESTIMER_FILES.path = $${QFOUTPUT}/examples/$${TARGET}/
 
 
-INSTALLS += EXAMPLESTINYTIFF_FILES
+INSTALLS += EXAMPLESTINYTIFF_FILES EXAMPLESHIGHRESTIMER_FILES
 
 

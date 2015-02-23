@@ -33,6 +33,8 @@ In addition top these two acquisition modes, QuickFit provides a possibility to 
 <b>timeout_connection</b> = <i>timeout, when connecting to the server (in milliseconds)</i><br>
 <b>timeout_instruction</b> = <i>timeout, when sending an instruction to the server (in milliseconds)</i><br>
 <b>has_single_parameter_get</b> = ( <u>true</u> | false ) <i>indicates, whether the instruction PARAMETER_GET is implemented or only PARAMETERS_GET</i><br>
+<b>has_progress_instruction</b> = ( <u>true</u> | false ) <i>indicates, whether the instruction PARAMETER_GET can read the parameter PROGRESS</i><br>
+<b>has_cancel_instruction</b> = ( true | <u>false</u> ) <i>indicates, whether the instruction PARAMETER_GET can read the parameter PROGRESS</i><br>
 <br>
      </tt></blockquote> 
      The number of camera servers is stored in the variable <tt>camera_count</tt>.
@@ -73,16 +75,46 @@ These instructions are defined:
     <li><b><tt>DISCONNECT\n\n</tt>:</b> disconnect from camera and deinitialize the device. After calling this command, the connection (socket) is typically closed.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"ACK_DISCONNECT\n\n"</tt> </li>
     <li><b><tt>LIVE_START\n\n</tt>:</b> start and initialize the live-view mode. This has to be called before calling <tt>IMAGE_NEXT_GET</tt>. Right before calling this command, Quickfit will send all camera parameters with the configuration to use for the live-view, using several calls of <tt>PARAMETER_SET</tt>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"ACK_LIVE_START\n\n"</tt> </li>
     <li><b><tt>LIVE_STOP\n\n</tt>:</b> stops the live-view mode.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"ACK_LIVE_STOP\n\n"</tt> </li>
+    <li><b><tt>IMAGE_NEXT_GET\n\n</tt>:</b> requests a new preview frame.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"IMAGE<i>&lt;bits_per_sample&gt;</i>\n<i>&lt;frame_width&gt;</i>\n<i>&lt;frame_height&gt;</i>\n<i>&lt;frame_binary_data&gt;</i><i>&lt;acquisition_parameters&gt;</i>\n\n"</tt> In this result, <i>&lt;frame_binary_data&gt;</i> contains the frame data as binary (unsigned integers of width &lt;bits_per_sample&gt;)and has a length of <i>&lt;frame_width&gt;</i>*<i>&lt;frame_height&gt;</i>*<i>&lt;bits_per_sample&gt;</i>/8 bytes. The field <i>&lt;acquisition_parameters&gt;</i> has the same format, as the output of the command <tt>PARAMETERS_GET</tt> (see below, but the fields after the parameter description may be omitted). Here is an example answer for 16-bit data:$$codeexample:IMAGE16\n<br>128\n<br>64\n<br><i>&lt;frame_binary_data&gt;<br></i>PARAM_FLOAT;exposure_time;0.2;exposure time in seconds\n<br>PARAM_INT;frame_width;128;frame width [pixels]\nPARAM_INT;frame_height;128;frame height [pixels]\n\n$$</li>
     <li><b><tt>SIZE_X_GET\n\n</tt>:</b> returns the current frame-width (<i>frame_width_in_pixels</i>) in pixels.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"<i>frame_width_in_pixels</i>\n\n"</tt> </li>
     <li><b><tt>SIZE_Y_GET\n\n</tt>:</b> returns the current frame-height (<i>frame_height_in_pixels</i>) in pixels.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"<i>frame_height_in_pixels</i>\n\n"</tt> </li>
     <li><b><tt>GET_EXPOSURE\n\n</tt>:</b> returns the current exposure time (<i>exposure_time_seconds</i>) in seconds.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"<i>exposure_time_seconds</i>\n\n"</tt> </li>
-    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li>
-    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li>
-    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li>
-    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li>
-    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li>
-    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li>
-    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li>
+    <li><b><tt>PARAMETER_GETS\n\n</tt>:</b> returns all acqusition parameters as a list, separated by single line-breaks (<tt>\n</tt>).<br><i>parameters:</i> none<br><i>answer:</i> <tt>&quot;{ (PARAM_FLOAT | PARAM_INT | PARAM_BOOL | PARAM_STRING);<i>&lt;parameter_name&gt;</i>;<i>&lt;parameter_value_as_string&gt;</i>;<i>&lt;parameter_description_as_string&gt;</i>;[<i>&lt;param_range_min&gt;</i>];[<i>&lt;param_range_max&gt;</i>];[(RW|RO)}\n }* \n&quot;</tt>. The last parameter tells QuickFit, whether the parameter is editable (RW) or not (RO). 
+$$note:There re two special parameters, which should be returned, but will not be shown to the user: <tt>HAS_INSTRUCTION_PROGRESS</tt> (boolean) and <tt>HAS_INSTRUCTION_CANCEL_ACQUISITION</tt> (boolean): The first one indicates, that <tt>PARAMETER_GET</tt> may be used to ask for the property <tt>PROGRESS</tt>, which is an integer number (0..100), that reports on the current progress of a running image acquisition. the second parameter returns <tt>true</tt>, if the instruction <tt>CANCEL_ACQUISITION</tt> is implemented in the server.$$
+$$note:There are two parameters <tt>PROGRESS</tt> and <tt>ACQ_RUNNING</tt>, which may only be requetsed by the sister instruction <tt>PARAMETER_GET</tt> (see below). These indicate the current progress of an acquisition and qhether an acquisition is running.$$
+Here is an example output of the instruction:
+$$codeexample:PARAM_FLOAT;pixel_height;24.000000;pixel height time in microns;;;RO\n<br>
+PARAM_STRING;camera_name;example_image_server.cpp;camera server name;;;RO\n<br>
+PARAM_FLOAT;exposure;0.100000;exposure time;0;1;RW\n<br>
+PARAM_FLOAT;image_amplitude;1000.000000;pattern amplitude;0;10000;RW\n<br>
+PARAM_FLOAT;image_wavelength;30.000000;pattern wavelength;0;100;RW\n<br>
+PARAM_FLOAT;acquisition_duration;10.000000;acquisition duration;0;100;RO\n<br>
+PARAM_INT;FRAMES;100;number of frames to aquire;0;100000;RW\n<br>
+PARAM_BOOL;image_decay;false;pattern decay;;;RW\n<br>
+PARAM_BOOL;HAS_INSTRUCTION_PROGRESS;true;;;;RO\n<br>
+PARAM_BOOL;HAS_INSTRUCTION_CANCEL_ACQUISITION;true;;;;RO\n\n$$
+From these parameters, QuickFit can derive a dialog, where the user can set the RW parameters:
+<center><a name="cam_server_pic000"><img src="./pic/cam_server_pic000.png" border="1">
+</center>
+ </li>
+    <li><b><tt>PARAMETER_GET\n<i>&lt;parameter_name&gt;</i>\n\n</tt>:</b> sends back the current value (and meta-info) of the given parameter (see also the notes of the instruction <tt>PARAMETERS_GET</tt>.<br><i>parameters:</i> name of the requested parameter<br><i>answer:</i> <tt>"(PARAM_FLOAT | PARAM_INT | PARAM_BOOL | PARAM_STRING);<i>&lt;parameter_name&gt;</i>;<i>&lt;parameter_value_as_string&gt;</i>;<i>&lt;parameter_description_as_string&gt;</i>;[<i>&lt;param_range_min&gt;</i>];[<i>&lt;param_range_max&gt;</i>];[(RW|RO)}\n\n"</tt> </li>
+    <li><b><tt>SET_PARAMETER\n<i>&lt;parameter_name&gt;</i>\n<i>&lt;new_value&gt;</i>\n\n</tt>:</b>.<br><i>parameters:</i> a parameter name and a new value (as text)<br><i>answer:</i>  none </li>
+
+    <li><b><tt>RECORD\n<i>&lt;output_filenames_basename&gt;</i>\n\n</tt>:</b> initializes and starts a free-running image acquisition.<br><i>parameters:</i> a basename, from which the output files are derived, e.g. <tt><i>&lt;output_filenames_basename&gt;</i>.tiff</tt> for the main output file. <br><i>answer:</i> <tt>"( FILE;<i>&lt;file_format&gt;</i>;<i>&lt;filename&gt;</i>;<i>&lt;file_description&gt;</i>\n )* <i>&lt;acquisition_parameters&gt;</i>\n\n"</tt> Here the FILEs-listing returns a list of all files, that the acquisition will create. For each file, the filetype, the filename and a short description is returned. Finally the <i>&lt;file_description&gt;</i> returns all parameters of the acquisition, as they would also be returned by <tt>PARAMETERS_GET</tt>. gere is an example: $$codeexample:FILE;TIFF;c:\temp\test_001_.tif;acquired frames\n<br>
+FILE;TXT;c:\temp\test_001_.txt;additional text output\n<br>
+PARAM_FLOAT;pixel_width;24.000000;pixel width time in microns;;;RO\n<br>
+PARAM_FLOAT;pixel_height;24.000000;pixel height time in microns;;;RO\n<br>
+PARAM_STRING;camera_name;example_image_server.cpp;camera server name;;;RO\n<br>
+PARAM_FLOAT;exposure;0.200000;exposure time;0;1;RW\n<br>
+PARAM_FLOAT;image_amplitude;1000.000000;pattern amplitude;0;10000;RW\n<br>
+PARAM_FLOAT;image_wavelength;30.000000;pattern wavelength;0;100;RW\n<br>
+PARAM_FLOAT;acquisition_duration;20.000000;acquisition duration;0;100;RO\n<br>
+PARAM_INT;FRAMES;100;number of frames to aquire;0;100000;RW\n<br>
+PARAM_BOOL;image_decay;false;pattern decay;;;RW\n<br>
+PARAM_BOOL;HAS_INSTRUCTION_PROGRESS;true;;;;RO\n<br>
+PARAM_BOOL;HAS_INSTRUCTION_CANCEL_ACQUISITION;true;;;;RO\n\n$$ </li>
+    <li><b><tt>CANCEL_ACQUISITION\n\n</tt>:</b> cancels the acquisition.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"ACK_CANCEL_ACQUISITION\n\n"</tt> </li>
+<!--    <li><b><tt>\n\n</tt>:</b>.<br><i>parameters:</i> none<br><i>answer:</i> <tt>"\n\n"</tt> </li> -->
 </ul>
 </p>
 

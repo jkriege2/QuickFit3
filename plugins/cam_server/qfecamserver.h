@@ -172,7 +172,7 @@ class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionC
         /** \copydoc QFExtensionCamera::cancelAcquisition() */
         virtual void cancelCameraAcquisition(unsigned int camera);
         /** \copydoc QFExtensionCamera::isAcquisitionRunning() */
-        virtual bool isCameraAcquisitionRunning(unsigned int camera, double* percentageDone=NULL);
+        virtual bool isCameraAcquisitionRunning(unsigned int camera);
         /** \copydoc QFExtensionCamera::getAcquisitionDescription() */
         virtual void getCameraAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::CameraAcquititonFileDescription>* files, QMap<QString, QVariant>* parameters);
         /** \copydoc QFExtensionCamera::getAcquisitionPreview() */
@@ -248,7 +248,10 @@ class QFECamServer : public QObject, public QFExtensionBase, public QFExtensionC
             double exposure;
             /** \brief if true, the server supports an instruction to read a single parameter, otherwise the instruction to read all parameters is used for the parameter readout. */
             bool hasInstSingleParameterGet;
+            /** \brief if true, the server supports an instruction to read the acquisition progress. */
             bool hasInstProgress;
+            /** \brief if true, the server supports an instruction to cancel the acquisition. */
+            bool hasInstCancel;
 
             QByteArray last_filenameprefix;
             bool acquiring;

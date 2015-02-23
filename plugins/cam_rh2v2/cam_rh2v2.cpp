@@ -656,7 +656,7 @@ bool QFExtensionCameraRh2v2::prepareCameraAcquisition(unsigned int camera, const
     return result;
 }
 
-bool QFExtensionCameraRh2v2::isCameraAcquisitionRunning(unsigned int camera, double* percentageDone) {
+bool QFExtensionCameraRh2v2::isCameraAcquisitionRunning(unsigned int camera) {
     bool result=false;
     result|=cameraSetting[camera].raw.pc->isRunning();
     if(cameraSetting[camera].cor.pc!=NULL){

@@ -110,8 +110,8 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
 
     //initialise image histogram data arrays
     histogram_n=255;
-    histogram_x=(double*)qfMalloc(histogram_n*sizeof(double));
-    histogram_y=(double*)qfMalloc(histogram_n*sizeof(double));
+    histogram_x=(double*)malloc(histogram_n*sizeof(double));
+    histogram_y=(double*)malloc(histogram_n*sizeof(double));
     for (unsigned int i=0; i<histogram_n; i++) {
         histogram_x[i]=i;
         histogram_y[i]=0;
@@ -159,6 +159,9 @@ QFESPIMB040CameraView::QFESPIMB040CameraView(QWidget* parent, int cameraID, QFCa
     // display test images set above
     clearImage();
 
+    histogramUpdateTime.start();
+    labelUpdateTime.start();
+
 }
 
 void QFESPIMB040CameraView::init(int cameraID, QFCameraConfigComboBoxStartResume* stopresume, QFESPIMB040OpticsSetupBase *opticsSetup) {
@@ -170,8 +173,8 @@ void QFESPIMB040CameraView::init(int cameraID, QFCameraConfigComboBoxStartResume
 
 QFESPIMB040CameraView::~QFESPIMB040CameraView()
 {
-    qfFree(histogram_x);
-    qfFree(histogram_y);
+    free(histogram_x);
+    free(histogram_y);
     qfFree(pltDataMarginalLeftX);
     qfFree(pltDataMarginalLeftY);
     qfFree(pltDataMarginalBottomX);
@@ -764,10 +767,10 @@ void QFESPIMB040CameraView::loadSettings(QSettings& settings, QString prefix) {
     histogram_n=settings.value(prefix+"histogram.items", histogram_n).toUInt();
     spinHistogramBins->setValue(histogram_n);
     // reallocate histogram and initialize
-    if (histogram_x) qfFree(histogram_x);
-    if (histogram_y) qfFree(histogram_y);
-    histogram_x=(double*)qfMalloc(histogram_n*sizeof(double));
-    histogram_y=(double*)qfMalloc(histogram_n*sizeof(double));
+    if (histogram_x) free(histogram_x);
+    if (histogram_y) free(histogram_y);
+    histogram_x=(double*)malloc(histogram_n*sizeof(double));
+    histogram_y=(double*)malloc(histogram_n*sizeof(double));
     for (unsigned int i=0; i<histogram_n; i++) {
         histogram_x[i]=i;
         histogram_y[i]=0;
@@ -830,10 +833,10 @@ void QFESPIMB040CameraView::loadSettings(QFManyFilesSettings &settings, QString 
      histogram_n=settings.value(prefix+"histogram.items", histogram_n).toUInt();
      spinHistogramBins->setValue(histogram_n);
      // reallocate histogram and initialize
-     if (histogram_x) qfFree(histogram_x);
-     if (histogram_y) qfFree(histogram_y);
-     histogram_x=(double*)qfMalloc(histogram_n*sizeof(double));
-     histogram_y=(double*)qfMalloc(histogram_n*sizeof(double));
+     if (histogram_x) free(histogram_x);
+     if (histogram_y) free(histogram_y);
+     histogram_x=(double*)malloc(histogram_n*sizeof(double));
+     histogram_y=(double*)malloc(histogram_n*sizeof(double));
      for (unsigned int i=0; i<histogram_n; i++) {
          histogram_x[i]=i;
          histogram_y[i]=0;
@@ -1681,6 +1684,7 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
     }
 
 
+    //qDebug()<<"HIST0: "<<withHistogram << histogramUpdateTime.elapsed()<<HISTOGRAM_UPDATE_INTERVAL_MS<< forceHistogram;
     if (withHistogram && ((histogramUpdateTime.elapsed()>HISTOGRAM_UPDATE_INTERVAL_MS) || forceHistogram )) {
 
         // DISABLE UPDATING OF GRAPHS (we only want to do this once per function call!!!)
@@ -1688,6 +1692,10 @@ void QFESPIMB040CameraView::displayImageStatistics(bool withHistogram, bool forc
 
         histogramUpdateTime.start();
         spinHistogramBins->setValue(histogram_n);
+        //qDebug()<<"HIST: "<<histogram_n;
+        for (int i=0; i<qMin(int(histogram_n), 10); i++) {
+            //qDebug()<<histogram_x[i]<<histogram_y[i];
+        }
         plteHistogram->set_data(histogram_x, histogram_y, histogram_n);
 
         bool logarithmic=false;

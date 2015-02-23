@@ -43,6 +43,7 @@ class QFESpectraViewerLoadThread: public QThread {
         QFESpectraViewerLoadThread(SpectrumManager*manager, QFESpectraViewer* parent=NULL);
     signals:
         void slog_text(const QString& text);
+        void enableAction(bool enabled);
     protected:
         void log_text(const QString& text);
         SpectrumManager* manager;
@@ -134,6 +135,7 @@ class QFESpectraViewer : public QObject, public QFExtensionBase, public QFPlugin
         QFESpectraViewerDialog* dlg;
         SpectrumManager* manager;
         QFESpectraViewerLoadThread* loadThread;
+        QAction* actStartPlugin;
 		
 	protected slots:
 	    /** \brief target, used in example code in initExtension() */

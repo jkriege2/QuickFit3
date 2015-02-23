@@ -41,7 +41,7 @@
 #include <QTabWidget>
 #include <QFormLayout>
 #include <QGroupBox>
-
+#include <QElapsedTimer>
 #include "programoptions.h"
 #include "jkimage.h"
 #include "jkqtfastplotter.h"
@@ -452,8 +452,8 @@ class QFESPIMB040CameraView : public QWidget {
         /** \brief number of entries in the histogram */
         uint32_t histogram_n;
         /** \brief when was the count rate histogram updated the last time */
-        QTime histogramUpdateTime;
-        QTime labelUpdateTime;
+        QElapsedTimer histogramUpdateTime;
+        QElapsedTimer labelUpdateTime;
 
         /** \brief path last used to save/load masks (*.msk) */
         QString lastMaskpath;

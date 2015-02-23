@@ -204,6 +204,7 @@ void QFESPIMB040::startPluginNew() {
         if (!main) {
 
             main=new QFESPIMB040MainWindow2(act->data().toString(), services, NULL, true, this);
+            if (settings) main->loadSettings(settings);
             QFPluginServices::getInstance()->log_global_text("\n\n=========================================================\n");
             QFPluginServices::getInstance()->log_global_text("== STARTING SPIM CONTROL PLUGIN!                       ==\n");
             QFPluginServices::getInstance()->log_global_text("=========================================================\n");

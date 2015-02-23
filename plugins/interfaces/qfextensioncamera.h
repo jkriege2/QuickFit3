@@ -144,7 +144,7 @@ class QFExtensionCamera {
              \param[out] percentageDone may be used (if \c !=NULL ) to return the percentage [0..100] of
                                         acquisition completion
          */
-         virtual bool isCameraAcquisitionRunning(unsigned int camera, double* percentageDone=NULL)=0;
+         virtual bool isCameraAcquisitionRunning(unsigned int camera)=0;
 
 
          /** \brief used by getAcquisitionDescription() to return a description of the output files*/

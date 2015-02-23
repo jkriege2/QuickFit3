@@ -477,7 +477,7 @@ void QFECamTestCamera::cancelCameraAcquisition(unsigned int camera) {
     seriesRunning[camera]=false;
 }
 
-bool QFECamTestCamera::isCameraAcquisitionRunning(unsigned int camera, double* percentageDone) {
+bool QFECamTestCamera::isCameraAcquisitionRunning(unsigned int camera) {
     return seriesRunning[camera];
 }
 

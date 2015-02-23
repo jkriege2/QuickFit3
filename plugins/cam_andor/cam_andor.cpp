@@ -842,7 +842,7 @@ void QFExtensionCameraAndor::cancelCameraAcquisition(unsigned int camera) {
     }
 }
 
-bool QFExtensionCameraAndor::isCameraAcquisitionRunning(unsigned int camera, double* percentageDone) {
+bool QFExtensionCameraAndor::isCameraAcquisitionRunning(unsigned int camera) {
     /*if (selectCamera(camera)) {
         if (percentageDone) *percentageDone=getAcquisitionProgress(camera);
         int status;

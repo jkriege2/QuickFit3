@@ -24,7 +24,7 @@ std::string __inttostr(int i) {
 #define mmin(x,y) (((x)<(y))?(x):(y))
 
 
-#define SEQUENCER_ERROR(n, m, w) { fprintf(stderr, "ERROR %d: %s [%s]", n, std::string(m).c_str(), std::string(w).c_str()); }
+#define SEQUENCER_ERROR(n, m, w) { fprintf(stderr, "\nERROR %d: %s [%s]\n", n, std::string(m).c_str(), std::string(w).c_str()); }
 #define SEQUENCER_ERRORN(n, w) { SEQUENCER_ERROR(n, get_errormessage(n), w) }
 #define SEQUENCER_ERRORV(n, w, args...) { SEQUENCER_ERROR(n, __format(sequencer::get_errormessage(n), args), w); }
 

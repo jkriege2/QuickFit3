@@ -76,6 +76,8 @@ void QFECamServer::initExtension() {
         s.pixel_width=inifile.value("camera"+QString::number(i+1)+"/pixel_width", 24).toDouble();
         s.pixel_height=inifile.value("camera"+QString::number(i+1)+"/pixel_height", 24).toDouble();
         s.hasInstSingleParameterGet=inifile.value("camera"+QString::number(i+1)+"/has_single_parameter_get", true).toBool();
+        s.hasInstProgress=inifile.value("camera"+QString::number(i+1)+"/has_progress_instruction", true).toBool();
+        s.hasInstCancel=inifile.value("camera"+QString::number(i+1)+"/has_cancel_instruction", false).toBool();
         s.exposure=1;
 
         s.server=new QTcpSocket();
@@ -100,6 +102,10 @@ void QFECamServer::deinit() {
             inifile.setValue("camera"+QString::number(i+1)+"/timeout_instruction", sources[i].timeout_instruction);
             inifile.setValue("camera"+QString::number(i+1)+"/pixel_width", sources[i].pixel_width);
             inifile.setValue("camera"+QString::number(i+1)+"/pixel_height", sources[i].pixel_height);
+            inifile.setValue("camera"+QString::number(i+1)+"/has_single_parameter_get", sources[i].hasInstSingleParameterGet);
+            inifile.setValue("camera"+QString::number(i+1)+"/has_progress_instruction", sources[i].hasInstProgress);
+            inifile.setValue("camera"+QString::number(i+1)+"/has_cancel_instruction", sources[i].hasInstCancel);
+
         }
     }
 }
@@ -186,6 +192,7 @@ QVariant QFECamServer::getMeasurementDeviceValue(unsigned int measurementDevice,
                 if (ok && bal.size()>0) {
                     bal=bal[0].split('\n');
                     for (int i=0; i<bal.size(); i++) {
+                        //qDebug()<<bal[i];
                         QList<QByteArray> a=bal[i].split(';');
                         if (a.size()>2) {
                             if (a[1]==sources[measurementDevice].params[value].id) {
@@ -208,6 +215,7 @@ QVariant QFECamServer::getMeasurementDeviceValue(unsigned int measurementDevice,
                 bool ok=false;
                 QList<QByteArray> bal=queryData(sources[measurementDevice], "PARAMETERS_GET\n\n", 1, "\n\n", &ok, true);
                 if (ok && bal.size()>0) {
+                    //qDebug()<<bal;
                     bal=bal[0].split('\n');
                     for (int i=0; i<bal.size(); i++) {
                         QList<QByteArray> a=bal[i].split(';');
@@ -332,7 +340,7 @@ void QFECamServer::useCameraSettingsInt(unsigned int camera, const QSettings& se
     /* set the camera settings to the values specified in settings parameter, called before acquire() */
     //qDebug()<<"useCameraSetings: "<<camera;
     //for (int i=0; i<settings.allKeys().size(); i++) {
-    //    qDebug()<<"   "<<settings.allKeys().value(i, "")<<" = "<<settings.value(settings.allKeys().value(i, ""));
+    //    //qDebug()<<"   "<<settings.allKeys().value(i, "")<<" = "<<settings.value(settings.allKeys().value(i, ""));
     //}
     if (logService) {
         logService->log_text(QString("\n         -- useCameraSetings: %1\n").arg(camera));
@@ -469,6 +477,7 @@ bool QFECamServer::connectCameraDevice(unsigned int camera) {
                     QList<QByteArray> params=res.split('\n');
 
                     for (int i=0; i<params.size(); i++) {
+                        //qDebug()<<params[i];
                         QList<QByteArray> p= params[i].split(';');
                         if (p.size()>=7) {
                             QFECamServer::CAM_PARAM pa;
@@ -506,6 +515,14 @@ bool QFECamServer::connectCameraDevice(unsigned int camera) {
                                 bool iok=false;
                                 pa.range_min=0;
                                 pa.range_max=1;
+                                if (pa.id.toUpper()=="HAS_INSTRUCTION_PROGRESS") {
+                                    sources[camera].hasInstProgress=QStringToBool(p[2]);
+                                    pok=false;
+                                } else if (pa.id.toUpper()=="HAS_INSTRUCTION_CANCEL_ACQUISITION") {
+                                    sources[camera].hasInstCancel=QStringToBool(p[2]);
+                                    pok=false;
+                                }
+
                             } else if (p[0].toUpper()=="PARAM_STRING") {
                                 pa.type=QVariant::String;
                                 pa.widget=QFExtensionMeasurementAndControlDevice::mdLineEdit;
@@ -637,41 +654,54 @@ bool QFECamServer::acquireOnCamera(unsigned int camera, uint32_t* data, uint64_t
                         if (answer.startsWith("IMAGE16")) answ_bits=16;
                         if (answer.startsWith("IMAGE32")) answ_bits=32;
                         if (answer.startsWith("IMAGE64")) answ_bits=64;
+                        //qDebug()<<"READ_IMAGE_ANSWER: "<<answer<<newW<<newH<<answ_bits<<oldW<<oldH;
                         memset(data, 0, oldW*oldH*sizeof(uint32_t));
                         if (answ_bits==8) {
                             QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint8_t), &ok);
-                            qDebug()<<"READ_8BIT:  "<<ok;
+                            //qDebug()<<"READ_8BIT:  "<<ok<<temp.size();
                             if (ok) {
                                 const uint8_t* d=(const uint8_t*)temp.constData();
-                                for (int i=0; i<qMin(oldW*oldH, newW*newH); i++) {
-                                    data[i]=d[i];
+                                for (int y=0; y<oldH; y++) {
+                                    for (int x=0; x<oldW; x++) {
+                                        if (x<newW && y<newH) data[y*oldW+x]=d[y*newW+x];
+                                        else data[y*oldW+x]=0;
+                                    }
                                 }
                             }
                         } else if (answ_bits==16) {
                             QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint16_t), &ok);
-                            qDebug()<<"READ_16BIT:  "<<ok;
+                            //qDebug()<<"READ_16BIT:  "<<ok<<temp.size();
                             if (ok) {
                                 const uint16_t* d=(const uint16_t*)temp.constData();
-                                for (int i=0; i<qMin(oldW*oldH, newW*newH); i++) {
-                                    data[i]=d[i];
+                                for (int y=0; y<oldH; y++) {
+                                    for (int x=0; x<oldW; x++) {
+                                        if (x<newW && y<newH) data[y*oldW+x]=d[y*newW+x];
+                                        else data[y*oldW+x]=0;
+                                    }
                                 }
                             }
                         } else if (answ_bits==32) {
                             QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint32_t), &ok);
-                            qDebug()<<"READ_16BIT:  "<<ok;
+                            //qDebug()<<"READ_32BIT:  "<<ok<<temp.size();
                             if (ok) {
                                 const uint32_t* d=(const uint32_t*)temp.constData();
-                                for (int i=0; i<qMin(oldW*oldH, newW*newH); i++) {
-                                    data[i]=d[i];
+                                for (int y=0; y<oldH; y++) {
+                                    for (int x=0; x<oldW; x++) {
+                                        if (x<newW && y<newH) data[y*oldW+x]=d[y*newW+x];
+                                        else data[y*oldW+x]=0;
+                                    }
                                 }
                             }
                         } else if (answ_bits==64) {
                             QByteArray temp=readData(sources[camera], newW*newH*sizeof(uint64_t), &ok);
-                            qDebug()<<"READ_16BIT:  "<<ok;
+                            //qDebug()<<"READ_64BIT:  "<<ok<<temp.size();
                             if (ok) {
                                 const uint64_t* d=(const uint64_t*)temp.constData();
-                                for (int i=0; i<qMin(oldW*oldH, newW*newH); i++) {
-                                    data[i]=d[i];
+                                for (int y=0; y<oldH; y++) {
+                                    for (int x=0; x<oldW; x++) {
+                                        if (x<newW && y<newH) data[y*oldW+x]=d[y*newW+x];
+                                        else data[y*oldW+x]=0;
+                                    }
                                 }
                             }
                         }
@@ -854,6 +884,7 @@ bool QFECamServer::startCameraAcquisition(unsigned int camera) {
 
         if (ok) {
             sources[camera].lastfiles=answer;
+            //qDebug()<<answer;
             //if (waitForString(sources[camera], "ACK_RECORD\n\n" )) {
             sources[camera].acquiring=true;
             return true;
@@ -871,13 +902,25 @@ bool QFECamServer::startCameraAcquisition(unsigned int camera) {
 }
 
 void QFECamServer::cancelCameraAcquisition(unsigned int camera) {
+    if (camera<0 || camera>=getCameraCount()) return ;
+    QTcpSocket* server=sources[camera].server;
+    if (!server) return ;
+    if (!sources[camera].hasInstCancel) return;
 
+    if (!isCameraAcquisitionRunning(camera)) return;
+
+    QMutex* mutex=sources[camera].mutex;
+    QMutexLocker locker(mutex);
+
+    bool ok=sendCommand(sources[camera], "CANCEL_ACQUISITION\n\n");
+    ok=waitForString(sources[camera], "ACK_CANCEL_ACQUISITION\n\n");
 }
 
-bool QFECamServer::isCameraAcquisitionRunning(unsigned int camera, double* percentageDone) {
+bool QFECamServer::isCameraAcquisitionRunning(unsigned int camera) {
     if (camera<0 || camera>=getCameraCount()) return false;
     QTcpSocket* server=sources[camera].server;
     if (!server) return false;
+
 
     QMutex* mutex=sources[camera].mutex;
     QMutexLocker locker(mutex);
@@ -894,40 +937,10 @@ bool QFECamServer::isCameraAcquisitionRunning(unsigned int camera, double* perce
             }
         }
 
-        /*if (server->bytesAvailable()) {
-            bool ok=true;
-            QByteArray answer=readString(sources[camera], "\n\n", &ok);
-            if (ok && answer.contains("DONE_RECORD")) {
-                sources[camera].acquiring=false;
-                sources[camera].lastfiles=answer;
-            }
-        }*/
     }
 
-/*    if (sources[camera].acquiring) {
-        QList<QByteArray> answerl=queryData(sources[camera], "PARAMETER_GET\nACQ_RUNNING\n\n", 1, "\n\n");
-        QByteArray answer="";
 
 
-
-        if (answerl.size()>0) answer=answerl.first();
-        int idx=answer.indexOf("PARAM_BOOL;ACQ_RUNNING;");
-        if (idx>=0) {
-            QByteArray a=answer.mid(idx+QByteArray("PARAM_BOOL;ACQ_RUNNING;").size(), 5).toLower();
-            sources[camera].acquiring=a.contains("true");
-            if (!sources[camera].acquiring)  {
-
-            }
-        }
-        /if (server->bytesAvailable()) {
-        //    bool ok=true;
-        //    QByteArray answer=readString(sources[camera], "\n\n", &ok);
-        //    if (ok && answer.contains("DONE_RECORD")) {
-        //        sources[camera].acquiring=false;
-        //        sources[camera].lastfiles=answer;
-        //    }
-        }
-    }*/
     return sources[camera].acquiring;
 }
 

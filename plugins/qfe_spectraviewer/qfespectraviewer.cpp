@@ -46,6 +46,7 @@ QFESpectraViewer::QFESpectraViewer(QObject* parent):
     manager=new SpectrumManager();
     loadThread=new QFESpectraViewerLoadThread(manager, this);
     connect(loadThread, SIGNAL(slog_text(QString)), this, SLOT(doLog(QString)));
+
 }
 
 QFESpectraViewer::~QFESpectraViewer() {
@@ -166,8 +167,10 @@ void QFESpectraViewer::initExtension() {
 	// some example code that may be used to register a menu and a tool button:
     log_text(tr("initializing ...\n"));
     log_text(tr("   registering plugin ...\n"));
-    QAction* actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Spectra Viewer"), this);
+    actStartPlugin=new QAction(QIcon(getIconFilename()), tr("Spectra Viewer"), this);
+    actStartPlugin->setEnabled(true);
     connect(actStartPlugin, SIGNAL(triggered()), this, SLOT(showViewer()));
+    connect(loadThread, SIGNAL(enableAction(bool)), actStartPlugin, SLOT(setEnabled(bool)));
     QToolBar* exttb=services->getToolbar("tools");
     if (exttb) {
         exttb->addAction(actStartPlugin);
@@ -244,10 +247,11 @@ void QFESpectraViewerLoadThread::log_text(const QString &text)
 void QFESpectraViewerLoadThread::run()
 {
     try {
-        log_text(QFESpectraViewer::intReloadDatabases(manager, sv->getID()));
+        log_text(QFESpectraViewer::intReloadDatabases(manager, sv->getID()));        
     } catch(std::exception& E) {
         log_text(tr("error loading spectra viewer database: %1\n").arg(E.what()));
     }
+    emit enableAction(true);
 }
 
 

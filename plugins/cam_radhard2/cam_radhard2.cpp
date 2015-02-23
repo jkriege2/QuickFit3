@@ -367,7 +367,7 @@ bool QFExtensionCameraRadhard2::startCameraAcquisition(unsigned int camera) {
 void QFExtensionCameraRadhard2::cancelCameraAcquisition(unsigned int camera) {
 }
 
-bool QFExtensionCameraRadhard2::isCameraAcquisitionRunning(unsigned int camera, double* percentageDone) {
+bool QFExtensionCameraRadhard2::isCameraAcquisitionRunning(unsigned int camera) {
     return false;
 }
 

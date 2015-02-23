@@ -38,6 +38,7 @@
 #include <fcntl.h>
 #include <cmath>
 #include <pthread.h>
+#include "highrestimer.h"
 #include "tinytiffwriter.h"
 
 /* now first we will have to check the operating system and from this decide
@@ -52,7 +53,9 @@
 #include "tcpipserver.h"
 
 
-inline double sqr(const double& a) { return a*a; }
+inline double sqr(double a) { 
+    return a*a; 
+}
 
 /** \brief like sprintf/wrapper around sprintf */
 std::string format(std::string templ, ...){
@@ -81,7 +84,7 @@ std::string booltostr(bool i) {
 
 // global parameters, describing the camera: 
 // 1. non-editable parameters
-const int img_width=32;                            // width of a frame in pixels
+const int img_width=128;                            // width of a frame in pixels
 const int img_height=32;                            // height of a frame in pixels
 const float pixelsize=24;                           // pixel size in micrometers
 const char cam_name[]="example_image_server.cpp";   // name of the camera device
@@ -90,7 +93,7 @@ float acquisition_duration=10.0;                    // duration of an acquisitio
 // 2. editable parameters:
 float exposure=0.1;                                 // exposure time in seconds
 float image_amplitude=1000.0;                       // amplitude of the artificial rung pattern
-float image_wavelength=5.0;                         // spatial wavelength of the artificial rung pattern
+float image_wavelength=30.0;                        // spatial wavelength of the artificial rung pattern
 bool image_decay=false;                             // is there a decay component in the pattern?
 int frames=100;                                     // number of frames to acquire
 
@@ -128,7 +131,7 @@ void writeParameters(TCPIPserver* server, int connection, const std::string& sin
 
 		if (singleparam.size()==0) server->write(connection, std::string("\n"));
 		p="image_amplitude";
-		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;pattern amplitude;0;10000;RW", p.c_str(), image_amplitude)); // pattern amplitude is read/write float with range [0..10000]
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_FLOAT;%s;%f;pattern amplitude;0;4900;RW", p.c_str(), image_amplitude)); // pattern amplitude is read/write float with range [0..4900]
 
 		if (singleparam.size()==0) server->write(connection, std::string("\n"));
 		p="image_wavelength";
@@ -147,20 +150,30 @@ void writeParameters(TCPIPserver* server, int connection, const std::string& sin
 		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_BOOL;%s;%s;pattern decay;;;RW", p.c_str(), booltostr(image_decay).c_str())); // pattern decay component is read/write boolean property
 
 		if (singleparam.size()==0) server->write(connection, std::string("\n"));
-		p="is_dummy_device";
-		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_BOOL;%s;true;camera is dummy;;;RO", p.c_str())); // a boolean property
+		p="HAS_INSTRUCTION_PROGRESS";
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_BOOL;%s;true;;;;RO", p.c_str())); // tells QuickFit, that the parameter PROGRESS is supported by this plugin!
+
+		if (singleparam.size()==0) server->write(connection, std::string("\n"));
+		p="HAS_INSTRUCTION_CANCEL_ACQUISITION";
+		if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_BOOL;%s;true;;;;RO", p.c_str())); // tells QuickFit, that the parameter CANCEL_ACQUISITION is supported by this plugin!
 		
 		if (singleparam.size()!=0) {
 		    // special parameters, which indicate the progress of an acquisition ... may only be queried with PARAMETER_GET
 			if (singleparam.size()==0) server->write(connection, std::string("\n"));
 			p="ACQ_RUNNING";
-			if (singleparam.size()==0 || singleparam==p) server->write(connection, format("PARAM_BOOL;%s;%s;;;;RO", p.c_str(), booltostr(cam_acquisition_running).c_str())); // a boolean property
+			if (singleparam.size()==0 || singleparam==p) {
+			    pthread_mutex_lock(&mutexframesCompleted);
+			    server->write(connection, format("PARAM_BOOL;%s;%s;;;;RO", p.c_str(), booltostr(cam_acquisition_running).c_str())); // send, whether an acquisition is running
+				pthread_mutex_unlock(&mutexframesCompleted);
+			}
 
 			if (singleparam.size()==0) server->write(connection, std::string("\n"));
 			p="PROGRESS";
 			if (singleparam.size()==0 || singleparam==p) {
 			    pthread_mutex_lock(&mutexframesCompleted);
-			    server->write(connection, format("PARAM_BOOL;%s;%d;;;;RO", p.c_str(), (int)floor(framesCompleted/maxWriteFrames))); // a boolean property
+			    int prog=0;
+				if (maxWriteFrames>0) prog=floor(100.0*double(framesCompleted)/double(maxWriteFrames));
+				server->write(connection, format("PARAM_INT;%s;%d;;;;RO", p.c_str(), prog)); // send the progress (0..100) of the acquisition
 				pthread_mutex_unlock(&mutexframesCompleted);
 			}
 		}
@@ -192,19 +205,27 @@ void setParameter(const std::string& param_name, const std::string& param_value)
  *
  * This function simply generates some test frames with a sinusoidal intensity pattern.
  */
-void getNextFrame(double time, uint16_t* frame, int img_width, int img_height) {
+void getNextFrame(float time, uint16_t* frame, int img_width, int img_height) {
 	if (image_decay) {
 		for (int y=0; y<img_height; y++) {
 			for (int x=0; x<img_width; x++) {
-				double r=sqrt(sqr(double(x)-double(img_width)/2.0)+sqr(double(y)-double(img_height)/2.0));
-				frame[y*img_width+x]=round(fabs(sin(r/image_wavelength*M_PI)*sin(time/20.0*M_PI))*image_amplitude);
+				float r=sqrt(sqr(float(x)-float(img_width)/2.0)+sqr(float(y)-float(img_height)/2.0));
+				float val=(100.0+fabs(sin(r/image_wavelength*2.0*M_PI+time/30.0*2.0*M_PI))*image_amplitude);
+				if (val>100.0+image_amplitude) val=100.0+image_amplitude;
+				if (val>5000) val=5000;
+				if (val<100.0) val=100.0;
+				frame[y*img_width+x]=uint16_t(val);
 			}
 		}
 	} else {
 		for (int y=0; y<img_height; y++) {
 			for (int x=0; x<img_width; x++) {
-			double r=sqrt(sqr(double(x)-double(img_width)/2.0)+sqr(double(y)-double(img_height)/2.0));
-				frame[y*img_width+x]=fabs(r);//(1.0+sin(r/image_wavelength*M_PI)*sin(time/20.0*M_PI))*image_amplitude*exp(-r/64.0);
+				float r=sqrt(sqr(float(x)-float(img_width)/2.0)+sqr(float(y)-float(img_height)/2.0));
+				float val=(100.0+fabs(sin(r/image_wavelength*2.0*M_PI+time/30.0*2.0*M_PI))*image_amplitude)*exp(-r/64.0);
+				if (val>100.0+image_amplitude) val=100.0+image_amplitude;
+				if (val>5000) val=5000;
+				if (val<100.0) val=100.0;
+				frame[y*img_width+x]=uint16_t(val);
 			}
 		}
 	}
@@ -245,28 +266,33 @@ static void *acquisitionThreadFunc(void* val) {
 	maxWriteFrames=floor(acquisition_duration/exposure);
     framesCompleted=0;
     if (tif) {
-		double seconds=0;
-		time_t start;
-		time(&start);
+		HighResTimer timer;
+		timer.start();
+		double seconds=timer.get_time()/1e6;
 		double lastt=seconds;
 		// perform acquisition
-		while (seconds<acquisition_duration) {
-			time_t now;
-			time(&now);
-			seconds = fabs(difftime(now, start));
-			if (fabs(lastt-seconds)>=exposure) {
-				getNextFrame(seconds, frame, img_width, img_height);
+		bool canceled=!cam_acquisition_running;
+		while (seconds<acquisition_duration && !canceled) {			
+			seconds = timer.get_time()/1e6;
+			if (fabs(seconds-lastt)>=exposure) {
+				getNextFrame(framesCompleted, frame, img_width, img_height);
 				TinyTIFFWriter_writeImage(tif, frame);
 				pthread_mutex_lock(&mutexframesCompleted);
+				// count acquired frames
 				framesCompleted++;
+				// cancel ancquisition, when cam_acquisition_running is reset
+				if (!cam_acquisition_running) canceled=true;				
 				pthread_mutex_unlock(&mutexframesCompleted);
+				lastt=seconds;
+				printf("*** acquired frame %d/%d @ %fs ***", framesCompleted, maxWriteFrames, float(seconds));
 			}
-			lastt=seconds;
 	    }     
 	    TinyTIFFWriter_close(tif);
     }
     free(frame);
+	pthread_mutex_lock(&mutexframesCompleted);
     cam_acquisition_running=false;
+	pthread_mutex_unlock(&mutexframesCompleted);
     return NULL;
 }
 
@@ -445,11 +471,10 @@ int main (void) {
 					//   1. (IMAGE8 | IMAGE16 | IMAGE32 | IMAGE64) \n
 					//   2. <image_width_in_pixels>\n
 					//   3. <image_height_in_pixels>\n
-					//   4. <exposure_time_in_seconds>\n
 					//   5. <image raw data of size image_width_in_pixels*image_height_in_pixels*pixel_data_size>
 					//   6. METADATA RECORDS, DESCRIBING THE IMAGE: (from writeParameters())
 					//        { (PARAM_FLOAT | PARAM_INT | PARAM_BOOL | PARAM_STRING);<parameter_name>;<parameter_value_as_string>[;<parameter_description_as_string>]\n }* \n
-                    server->write(connection, format("IMAGE%d\n%d\n%d\n%f\n", int(sizeof(frame[0])*8), img_width, img_height, exposure));
+                    server->write(connection, format("IMAGE%d\n%d\n%d\n", int(sizeof(frame[0])*8), img_width, img_height));
                     server->write(connection, (char*)frame, img_byte_size);
 					writeParameters(server, connection);
                     server->write(connection, "\n\n");
@@ -466,7 +491,7 @@ int main (void) {
 						// SEND ANSWER TO CLIENT/QF3
 						//   1. the written filenames (format FILE;<TYPE>;<FILENAME>;<DESCRIPTION>\n
 						server->write(connection, format("FILE;TIFF;%s.tif;acquired frames\n", basename.c_str()));
-						server->write(connection, format("FILE;CSV;%s.txt;additional text output\n", basename.c_str()));
+						server->write(connection, format("FILE;TXT;%s.txt;additional text output\n", basename.c_str()));
 						//   2. the used camera config parameters
 						writeParameters(server, connection);
                         server->write(connection, "\n\n");
@@ -481,6 +506,21 @@ int main (void) {
 						
 					}
                     printfMessage("RECORD FRAME STARTED!");
+                } else if (instruction=="CANCEL_ACQUISITION") {
+				    // read remaining \n from "INSTRUCTION\n\n"
+                    server->read_str_until(connection, '\n');
+				
+				    // STOP THE LIVE-VIEW MODE
+					pthread_mutex_lock(&mutexframesCompleted);
+					cam_acquisition_running=false;
+					pthread_mutex_unlock(&mutexframesCompleted);
+
+                    
+                    // SEND ANSWER TO CLIENT/QF3
+                    server->write(connection, std::string("ACK_CANCEL_ACQUISITION\n\n"));
+					
+					
+                    printfMessage("ACQUISITION CANCELED!\n");
                 } else if (instruction!="\n" || instruction!="\n\n") {
                     // PRINT ERROR MESSAGE AND IGNORE UNKNOWN INSTRUCTION
                     printfMessage("read(%d) unknown instruction %s\n", connection, instruction.c_str());

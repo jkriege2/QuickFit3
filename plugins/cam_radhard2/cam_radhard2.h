@@ -154,7 +154,7 @@ class QFExtensionCameraRadhard2 : public QObject, public QFExtensionBase, public
         /** \copydoc QFExtensionCamera::cancelAcquisition() */
         virtual void cancelCameraAcquisition(unsigned int camera);
         /** \copydoc QFExtensionCamera::isAcquisitionRunning() */
-        virtual bool isCameraAcquisitionRunning(unsigned int camera, double* percentageDone=NULL);
+        virtual bool isCameraAcquisitionRunning(unsigned int camera);
         /** \copydoc QFExtensionCamera::getAcquisitionDescription() */
         virtual void getCameraAcquisitionDescription(unsigned int camera, QList<QFExtensionCamera::CameraAcquititonFileDescription>* files, QMap<QString, QVariant>* parameters);
         /** \copydoc QFExtensionCamera::getAcquisitionPreview() */
