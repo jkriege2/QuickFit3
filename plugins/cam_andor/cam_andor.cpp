@@ -966,13 +966,7 @@ void QFExtensionCameraAndor::getCameraAcquisitionDescription(unsigned int camera
         fileTypes=thread->getOutputFilenameTypes();
         duration=thread->getDurationMilliseconds();
     }
-    for (int i=0; i<fileNames.size(); i++) {
-        QFExtensionCamera::CameraAcquititonFileDescription d;
-        d.name=fileNames[i];
-        d.type=fileTypes[i];
-        d.description=tr("Andor camera acquisition image series");
-        files->append(d);
-    }
+
 
     internalGetAcquisitionDescription(camera, parameters);
     selectCamera(camera);
@@ -987,13 +981,13 @@ void QFExtensionCameraAndor::getCameraAcquisitionDescription(unsigned int camera
             float qe=0;
 #ifdef __WINDOWS__
             if (GetQE(headModel,l,&qe)==DRV_SUCCESS){
-                qedata.set(0, i, l);
-                qedata.set(1, i, qe);
+                qedata.set(0, i, (double)l);
+                qedata.set(1, i, (double)qe);
             }
 #else
             if (GetQE(headModel,l,0,&qe)==DRV_SUCCESS){
-                qedata.set(0, i, l);
-                qedata.set(1, i, qe);
+                qedata.set(0, i, (double)l);
+                qedata.set(1, i, (double)qe);
             }
 #endif
             i++;
@@ -1010,6 +1004,14 @@ void QFExtensionCameraAndor::getCameraAcquisitionDescription(unsigned int camera
     }
 
     (*parameters)["duration_milliseconds"]=duration;
+
+    for (int i=0; i<fileNames.size(); i++) {
+        QFExtensionCamera::CameraAcquititonFileDescription d;
+        d.name=fileNames[i];
+        d.type=fileTypes[i];
+        d.description=tr("Andor camera acquisition image series");
+        files->append(d);
+    }
 
 }
 

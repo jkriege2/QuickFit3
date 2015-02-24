@@ -803,6 +803,7 @@ void QFDataExportTool::set(int col, int row, const QVariant &value)
     data[col].operator [](row)=value;
 }
 
+
 void QFDataExportTool::setLastColumn(int row, const QVariant &value)
 {
     set(getColCount()-1, row, value);

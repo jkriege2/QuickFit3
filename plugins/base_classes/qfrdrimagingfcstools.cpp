@@ -67,9 +67,9 @@ void readB040SPIMExperimentConfigFile(QSettings& set, double& frametime, double&
     int fcnt=set.value("files/count", 0).toInt();
     for (int f=0; f<fcnt; f++) {
         QString fn=QFileInfo(set.fileName()).dir().absoluteFilePath(set.value("files/name"+QString::number(f), "").toString());
-        //QString ft=set.value("files/type"+QString::number(f), "").toString();
+        QString ft=set.value("files/type"+QString::number(f), "").toString();
         QString fd=set.value("files/description"+QString::number(f), "").toString();
-        if (fd.toLower().simplified().contains("background")) {
+        if (!ft.toLower().simplified().contains("CSV") && fd.toLower().simplified().contains("background") && (fd.toLower().simplified().contains("image") && (fd.toLower().simplified().contains("series") || fd.toLower().simplified().contains("acquisition")))) {
             backgroundfile=fn;
         }
     }
