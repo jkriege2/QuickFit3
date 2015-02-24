@@ -57,7 +57,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
             int rruns=otherdata[0].correlationRuns; \
             long long int ritems=otherdata[0].rateN; \
             for (int i=1; i<otherdata.size(); i++) { \
-                bool ok=    (abs(otherdata[0].rateN-otherdata[i].rateN)<qMax((long long int)2,otherdata[0].rateN/50)) \
+                bool ok=    (abs(otherdata[0].rateN-otherdata[i].rateN)<=qMax((long long int)2,otherdata[0].rateN/50)) \
                          && (otherdata[0].rateChannels==otherdata[i].rateChannels) \
                          && (otherdata[0].correlationN==otherdata[i].correlationN); \
                 if (!ok) {\
@@ -72,7 +72,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
                             setError(tr("error loading file '%1': lag-time axis does not equal the previous files").arg(filenames.value(i))); \
                         } \
                     } \
-                    for (int t=0; t<rateN; t++) { \
+                    for (int t=0; t<ritems; t++) { \
                         if (otherdata[0].rateT[t]!=otherdata[i].rateT[t]) { \
                             res=false; \
                             setError(tr("error loading file '%1': rate time-axis does not equal the previous files").arg(filenames.value(i))); \
