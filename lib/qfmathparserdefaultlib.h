@@ -191,6 +191,8 @@ namespace QFMathParser_DefaultLib {
     QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fMAD, mad, qfstatisticsMADS)
     QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fNMAD, nmad, qfstatisticsNMADS)
     QFMATHPARSER_DEFINE_2PARAM1VEC_VECTONUM_FUNC(fQuantile, quantile, qfstatisticsQuantile)
+    QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fQuantile25, quantile25, qfstatisticsQuantile25)
+    QFMATHPARSER_DEFINE_1PARAM_VECORNUMSTONUM_FUNC(fQuantile75, quantile75, qfstatisticsQuantile75)
 
     QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(fCumSum, cumsum, qfstatisticsCumSum)
     QFMATHPARSER_DEFINE_1PARAM_NUMERICVEC_FUNC(fCumProd, cumprod, qfstatisticsCumProd)
@@ -382,7 +384,10 @@ namespace QFMathParser_DefaultLib {
     void fReturnNth(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fLast(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fFirst(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    qfmpResult fLastInVector(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    qfmpResult fFirstInVector(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fItem(const qfmpResult* params, unsigned int  n, QFMathParser* p);
+    qfmpResult fItemOrFirst(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     qfmpResult fRunningAverage(const qfmpResult* params, unsigned int  n, QFMathParser* p);
     void fTrapz(qfmpResult& res, const qfmpResult* params, unsigned int  n, QFMathParser* p);
 

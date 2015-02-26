@@ -79,6 +79,7 @@ HEADERS += dlgnewproperty.h \
            qfplugin.h \
            qflib_version.h \
            csvtools.h \
+           qfrdrcolumngraphsinterface.h \
     ../../../../LIB/trunk/statistics_tools.h \
     ../../../../LIB/trunk/mathtools.h \
     qtriple.h \
@@ -172,7 +173,9 @@ HEADERS += dlgnewproperty.h \
     qfexporter.h \
     qfexporterimageseries.h \
     qfexportermanager.h \
-    qfpluginexporters.h
+    qfpluginexporters.h \
+    qfexporttotabledialog.h \
+    qfrdrtablecombobox.h
 
 SOURCES += dlgnewproperty.cpp \
            dlgqffitalgorithmprogressdialog.cpp \
@@ -278,7 +281,9 @@ SOURCES += dlgnewproperty.cpp \
     qfevalpropertycopyparsertabledlg.cpp \
     qffitfunctionnd.cpp \
     qfexporterimageseries.cpp \
-    qfexportermanager.cpp
+    qfexportermanager.cpp \
+    qfexporttotabledialog.cpp \
+    qfrdrtablecombobox.cpp
 
 FORMS +=   dlg_newproperty.ui \
            dlg_fitalgorithmprogress.ui \
@@ -287,7 +292,8 @@ FORMS +=   dlg_newproperty.ui \
     qfdlg_csvparameters.ui \
     qffitalgorithmerrorestimatemodewidget.ui \
     qflistprogressdialog.ui \
-    qfevalpropertycopyparsertabledlg.ui
+    qfevalpropertycopyparsertabledlg.ui \
+    qfexporttotabledialog.ui
 
 RESOURCES += \
     lib.qrc

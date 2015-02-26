@@ -147,6 +147,8 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         void copyAverageData();
         void fitAllMSD();
 
+        void copyRunAveragedMSD();
+
     protected:       
         /*! \brief create an evaluation report for the current record */
         void createReportDoc(QTextDocument* document);
@@ -194,6 +196,7 @@ class QFFCSMSDEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor {
         QAction* actCopyAverageData;
         QAction* actFitAllMSD;
         QAction* actUpdateCalculated;
+        QAction* actCopyRunAveragedMSD;
         JKQTPoverlayVerticalRange* ovlDistRange;
         JKQTPoverlayLine* ovlModel;
         QFRDRImageToRunPreview* pltOverview;

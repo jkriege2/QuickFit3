@@ -502,7 +502,6 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         QMenu *projectToolsMenu;
         QMenu *debugToolsMenu;
         QMenu *fileMenu;
-        QMenu* projectSpecialMenu;
         QMenu *dataMenu;
         QMenu *viewMenu;
         QMenu *evaluationMenu;

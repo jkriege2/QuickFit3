@@ -70,7 +70,11 @@ class QFRDRTableInterface {
         /** \brief set the comment for the given cell (row, column)  */
         virtual void tableSetComment(quint32 row, quint32 column, const QString& comment=QString(""))=0;
         /** \brief returns, whether setting a table propertie currently causes an immediate update of possibly displayed widgets (slow!!!) */
-        virtual bool tablesGetDoEmitSignals() const=0;
+        virtual bool tableGetDoEmitSignals() const=0;
+        /** \brief set the pre-evaluation expression */
+        virtual void tableSetPreEvaluationExpression(const QString& expression)=0;
+        /** \brief return the pre-evaluation expression */
+        virtual QString tableGetPreEvaluationExpression() const=0;
         /** \brief enable/disable immediate repaints, when chaning graph properties.
          *
          * You can use this function to ensure that a block of tables...() methods are executet, with only an update of the widgets of a possibly open table editor (doEmit=true causes an immediate update!)
@@ -81,7 +85,7 @@ class QFRDRTableInterface {
           tab.tablesSetDoEmitSignals(en);
           \endcode
          */
-        virtual void tablesSetDoEmitSignals(bool doEmit)=0;
+        virtual void tableSetDoEmitSignals(bool doEmit)=0;
 
 };
 

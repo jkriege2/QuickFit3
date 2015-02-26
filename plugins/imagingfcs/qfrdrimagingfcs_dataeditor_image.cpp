@@ -42,6 +42,7 @@
 #include "qfrdrimagingfcsmaskbuilder.h"
 #include "qfrdrimagingfcscopycorrasrdrdialog.h"
 #include "qfrdrimagingfcspostprocessbinningdialog.h"
+#include "qfrdrimagingfcsdiffusionlawdialog.h"
 #define sqr(x) qfSqr(x)
 
 #define CLICK_UPDATE_TIMEOUT 500
@@ -1266,6 +1267,9 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     actCopyPixelAvgCFFromAll=new QAction(tr("copy selected pixels average CF from all files to table"), this);
     connect(actCopyPixelAvgCFFromAll, SIGNAL(triggered()), this, SLOT(copySelAvgCFFromAll()));
 
+    actGetFCSDiffusionLawPlot=new QAction(tr("calculate FCS diffusion law-typed plots"), this);
+    connect(actGetFCSDiffusionLawPlot, SIGNAL(triggered()), this, SLOT(getFCSDiffusionLawPlot()));
+
 
 
     //////////////////////////////////////////////////////////////////////////////////////////
@@ -1520,6 +1524,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     menuImagingFCSTools->addAction(actCopyGroupACFsToTable);
     menuImagingFCSTools->addAction(actCopyMeanCFFromAll);
     menuImagingFCSTools->addAction(actSetBackgroundFromMaskedInAll);
+    menuImagingFCSTools->addAction(actGetFCSDiffusionLawPlot);
 
     setUpdatesEnabled(true);
 }
@@ -6123,6 +6128,47 @@ void QFRDRImagingFCSImageEditor::copyDataAsColumns() {
         delete dlg;
     }
 
+}
+
+void QFRDRImagingFCSImageEditor::getFCSDiffusionLawPlot()
+{
+    QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
+
+    if (m) {
+        QList<QFRawDataRecord*> recs=current->getProject()->getRDRGroupMembers(current->getGroup());
+        QList<QFRDRImagingFCSData*> recsFCS;
+        QString role=current->getRole();
+        bool hasFCCS=false;
+        bool hasDCCF=false;
+        for (int i=0; i<recs.size(); i++) {
+            QFRDRImagingFCSData* m1=qobject_cast<QFRDRImagingFCSData*>(recs[i]);
+            if(!m1) {
+                //recs.removeAt(i);
+            } else {
+                if (m1->isFCCS()) hasFCCS=true;
+                if (m1->isDCCF()) hasDCCF=true;
+                recsFCS<<m1;
+            }
+        }
+        QFRDRImagingFCSDiffusionLawDialog* dlg=new QFRDRImagingFCSDiffusionLawDialog(this);
+
+        dlg->init(recsFCS, currentEvalGroup());
+
+        int w=m->getImageFromRunsWidth();
+        int h=m->getImageFromRunsHeight();
+        QVector<bool> selImg(w*h,false);
+        for (int i=0; i<w*h; i++) {
+            selImg[i]=selected.contains(i);
+        }
+        dlg->setSelection(selImg.constData(), w, h);
+
+
+
+        if (dlg->exec()) {
+
+        }
+        delete dlg;
+    }
 }
 
 

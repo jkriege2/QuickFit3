@@ -47,6 +47,8 @@
 #include "qfhistogramview.h"
 #include "qfenhancedplaintextedit.h"
 
+class QFRDRTableMultiColumnEditor;
+
 /*! \brief editor class for tables
     \ingroup qf3rdrdp_table
 */
@@ -105,6 +107,8 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slPasteTableTemplate();
         void slSaveTableTemplate();
         void slLoadTableTemplate();
+
+        void slShowMultiColumnEditor();
 
         void slSetColumnValues();
         void slCalcCell();
@@ -209,8 +213,11 @@ class QFRDRTableEditor : public QFRawDataEditor {
         QAction* actQuickStat;
         QAction* actQuickHistogram;
         QAction* actPreScript;
+        QAction* actSHowMultiColEditor;
 
         QToolBar* tbMain;
+
+        QPointer<QFRDRTableMultiColumnEditor> multicolEdit;
 
         QVariant evaluateExpression(QFMathParser& mp, QFMathParser::qfmpNode* node, QModelIndex cell, bool* ok, const QString& expression=QString("? ? ?"), bool columnMode=false);
     private:

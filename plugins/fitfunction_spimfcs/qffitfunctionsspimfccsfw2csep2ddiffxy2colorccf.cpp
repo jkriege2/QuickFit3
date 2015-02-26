@@ -240,11 +240,11 @@ void QFFitFunctionsSPIMFCCSFW2CSep2DDiffXY2ColorCCF::calcParameter(double* data,
     data[FCCSDiff_KD]=ca*cb/cab/6.022e-1;
     if (error) error[FCCSDiff_KD]=sqrt(qfSqr(eca*cb/cab)+qfSqr(ecb*ca/cab)+qfSqr(ecab*ca*cb/qfSqr(cab)))/6.022e-1;
 
-    data[FCSSDiff_focus_volume1]=SPIMFCS_newAeff(a, wxyG, 0/*wzG*/);
-    if (error) error[FCSSDiff_focus_volume1]=SPIMFCS_newAeffError(a, ea, wxyG, ewxyG, 0/*wzG*/, 0/*ewzG*/);
+    data[FCSSDiff_focus_volume1]=SPIMFCS_newVeff(a, wxyG, 0/*wzG*/);
+    if (error) error[FCSSDiff_focus_volume1]=SPIMFCS_newVeffError(a, ea, wxyG, ewxyG, 0/*wzG*/, 0/*ewzG*/);
 
-    data[FCSSDiff_focus_volume2]=SPIMFCS_newAeff(a, wxyR, 0/*wzR*/);
-    if (error) error[FCSSDiff_focus_volume2]=SPIMFCS_newAeffError(a, ea, wxyR, ewxyR, 0/*wzR*/, 0/*ewzR*/);
+    data[FCSSDiff_focus_volume2]=SPIMFCS_newVeff(a, wxyR, 0/*wzR*/);
+    if (error) error[FCSSDiff_focus_volume2]=SPIMFCS_newVeffError(a, ea, wxyR, ewxyR, 0/*wzR*/, 0/*ewzR*/);
 
     data[FCCSDiff_molbrightness_a]=data[FCCSDiff_brightness_a]/(QF_NAVOGADRO*1e-19*data[FCSSDiff_focus_volume1]);
     if (error) error[FCCSDiff_molbrightness_a]=0;

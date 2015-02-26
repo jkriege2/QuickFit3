@@ -557,6 +557,7 @@ data                                                   size [bytes]             
 
         float* backgroundImage;
         float* backgroundImageStd;
+        float* bleachPercentage;
         float* bleachAmplitude;
         float* bleachTime;
         float* bleachAmplitude2;

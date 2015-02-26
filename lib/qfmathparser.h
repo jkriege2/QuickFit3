@@ -1267,12 +1267,13 @@ class QFLIB_EXPORT QFMathParser
             qfmpNode* end;
             qfmpNode* delta;
             qfmpNode* expression;
+            qfmpNode* defaultValue;
             QList<QPair<qfmpNode*, qfmpNode*> > casesNodes;
           public:
             /** \brief constructor for a qfmpVectorOperationNode
              */
-            explicit qfmpVectorOperationNode(const QString& operationName, const QString& variableName, qfmpNode* items, qfmpNode* expression, QFMathParser* p, qfmpNode* par);
-            explicit qfmpVectorOperationNode(const QString& operationName, const QString& variableName, qfmpNode* start, qfmpNode* end, qfmpNode* delta, qfmpNode* expression, QFMathParser* p, qfmpNode* par);
+            explicit qfmpVectorOperationNode(const QString& operationName, const QString& variableName, qfmpNode* items, qfmpNode* expression, QFMathParser* p, qfmpNode* par, qfmpNode* defaultValue=NULL);
+            explicit qfmpVectorOperationNode(const QString& operationName, const QString& variableName, qfmpNode* start, qfmpNode* end, qfmpNode* delta, qfmpNode* expression, QFMathParser* p, qfmpNode* par, qfmpNode* defaultValue=NULL);
 
             /** \brief standard destructor, also destroy the children (recursively)  */
             virtual ~qfmpVectorOperationNode ();

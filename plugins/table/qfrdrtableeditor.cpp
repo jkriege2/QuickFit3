@@ -34,6 +34,7 @@
 #include "dlgimporttable.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
+#include "qfrdrtablemulticolumneditor.h"
 
 QFRDRTableEditor::QFRDRTableEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):
     QFRawDataEditor(services, propEditor, parent)
@@ -308,11 +309,14 @@ void QFRDRTableEditor::createWidgets() {
 
 
 
-    actSetColumnTitle=new QAction(QIcon(":/table/column_title.png"), "edit column properties", this);
+    actSetColumnTitle=new QAction(QIcon(":/table/column_title.png"), tr("edit column properties"), this);
     actSetColumnTitle->setToolTip(tr("edit the column title and the clumn expression ..."));
     connect(actSetColumnTitle, SIGNAL(triggered()), this, SLOT(slEditColumnProperties()));
     connect(this, SIGNAL(enableActions(bool)), actSetColumnTitle, SLOT(setEnabled(bool)));
 
+    actSHowMultiColEditor=new QAction(tr("show multi-column properties editor"), this);
+    connect(actSHowMultiColEditor, SIGNAL(triggered()), this, SLOT(slShowMultiColumnEditor()));
+    connect(this, SIGNAL(enableActions(bool)), actSHowMultiColEditor, SLOT(setEnabled(bool)));
 
     actSetColumnValues=new QAction("set column values (linear, ...)", this);
     actSetColumnValues->setToolTip(tr("init the current column with e.g. linearly increasing numbers ..."));
@@ -444,6 +448,7 @@ void QFRDRTableEditor::createWidgets() {
     tvMain->addAction(actDeleteColumn);
     tvMain->addAction(getSeparatorAction(this));
     tvMain->addAction(actSetColumnTitle);
+    tvMain->addAction(actSHowMultiColEditor);
     tvMain->addAction(actSetDatatype);
     tvMain->addAction(getSeparatorAction(this));
     tvMain->addAction(actSetColumnValues);
@@ -494,12 +499,27 @@ void QFRDRTableEditor::createWidgets() {
     menuTab->addAction(actInsertRow);
     menuTab->addAction(actAppendColumn);
     menuTab->addAction(actInsertColumn);
+    menuTab->addAction(actSHowMultiColEditor);
     menuTab->addSeparator();
     menuTab->addAction(actDeleteRow);
     menuTab->addAction(actDeleteColumn);
+    menuTab->addAction(actRecalcAll);
     menuTab->addSeparator();
-    menuTab->addAction(actSetDatatype);
-    menuDatatypes=menuTab->addMenu(QIcon(":/table/cell_types.png"), tr("set datatype to ..."));
+    menuTab->addAction(actSort);
+    menuTab->addAction(actHistogram);
+    menuTab->addAction(actHistogram2D);
+    menuTab->addSeparator();
+    menuTab->addAction(actClear);
+    menuTab->addAction(actResize);
+
+    QMenu* menuColumns=propertyEditor->addMenu("C&olumns", 0);
+    menuColumns->addAction(actSetColumnTitle);
+    menuColumns->addAction(actSHowMultiColEditor);
+    menuColumns->addAction(actSetColumnValues);
+
+    QMenu* menuCells=propertyEditor->addMenu("&Cells", 0);
+    menuCells->addAction(actSetDatatype);
+    menuDatatypes=menuCells->addMenu(QIcon(":/table/cell_types.png"), tr("set datatype to ..."));
     menuDatatypes->addAction(actSetDatatypeString);
     menuDatatypes->addAction(actSetDatatypeDouble);
     menuDatatypes->addAction(actSetDatatypeInteger);
@@ -508,25 +528,22 @@ void QFRDRTableEditor::createWidgets() {
     actMenuDatatypes=menuDatatypes->menuAction();
     tvMain->insertAction(actSetDatatype, actMenuDatatypes);
     tbMain->insertAction(actSetDatatype, actMenuDatatypes);
-    menuTab->addSeparator();
-    menuTab->addAction(actSetColumnTitle);
-    menuTab->addAction(actSetColumnValues);
-    menuTab->addAction(actCalcCell);
-    menuTab->addAction(actClearExpression);
-    menuTab->addAction(actRecalcAll);
-    menuTab->addAction(actHistogram);
-    menuTab->addAction(actHistogram2D);
-    menuTab->addAction(actSort);
-    menuTab->addSeparator();
-    menuTab->addAction(actClear);
-    menuTab->addAction(actResize);
-    menuTab->addSeparator();
-    menuTab->addAction(actAutosetColumnWidth);
+    menuCells->addSeparator();
+    menuEdit->addAction(actDelete);
+    menuCells->addSeparator();
+    menuCells->addAction(actCalcCell);
+    menuCells->addAction(actClearExpression);
 
     QMenu* menuTools=propertyEditor->addMenu("T&ools", 0);
     menuTools->addAction(actPreScript);
     menuTools->addAction(actQuickStat);
     menuTools->addAction(actQuickHistogram);
+    menuTools->addAction(actHistogram);
+    menuTools->addAction(actHistogram2D);
+
+
+    QMenu*menuView =propertyEditor->addMenu("&View", 0);
+    menuView->addAction(actAutosetColumnWidth);
 
     QTimer::singleShot(10, this, SLOT(delayedStartSearch()));
 }
@@ -868,6 +885,18 @@ void QFRDRTableEditor::slLoadTableTemplate()
                 QApplication::restoreOverrideCursor();
             }
         }
+    }
+}
+
+void QFRDRTableEditor::slShowMultiColumnEditor()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (!multicolEdit) {
+            multicolEdit=new QFRDRTableMultiColumnEditor(m->model(), this);
+        }
+        multicolEdit->show();
+        multicolEdit->raise();
     }
 }
 
@@ -1749,7 +1778,9 @@ void QFRDRTableEditor::slRecalcAll()
                                 //qDebug()<<"     reeval4 col("<<i<<ov.size()<<")";
                                 mpColumns.resetErrors();
 
-                                QVariantList nv=evaluateExpression(mpColumns, cnodes[lexp], m->model()->index(0,i), &ok, lexp, true).toList();
+                                QVariant nvv=evaluateExpression(mpColumns, cnodes[lexp], m->model()->index(0,i), &ok, lexp, true);
+                                QVariantList nv=nvv.toList();
+                                if (nv.isEmpty()) nv<<nvv;
                                 //qDebug()<<"     reeval5 col("<<i<<n.size()<<")\n        <= "<<ok<<nv.size();
                                 bool equalWithVariant=true;
                                 //qDebug()<<"nv = "<<nv;

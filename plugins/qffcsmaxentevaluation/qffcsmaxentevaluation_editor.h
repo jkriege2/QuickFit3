@@ -147,6 +147,7 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         virtual void displayParameters();
 
         virtual void sumRangesChanged();
+        void copyAverageData();
 
     protected:       
         /*! \brief create an evaluation report for the current record */
@@ -168,6 +169,7 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         QFPlotter* pltDistribution;
         QToolBar* tbPlot;
         QToolBar* tbPlotDistribution;
+        QAction* actCopyAverageData;
 
 
         QFDoubleEdit* edtTauMin;

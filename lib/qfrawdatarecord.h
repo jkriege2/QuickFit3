@@ -374,6 +374,11 @@ class QFLIB_EXPORT QFRawDataRecord : public QObject, public QFProperties {
         };
 
         static QString evaluationResultType2String(evaluationResultType type);
+        static bool evaluationResultTypeIsNumeric(evaluationResultType type);
+        static bool evaluationResultTypeIsBoolean(evaluationResultType type);
+        static bool evaluationResultTypeIsString(evaluationResultType type);
+        static bool evaluationResultTypeIsVector(evaluationResultType type);
+        static bool evaluationResultTypeHasError(evaluationResultType type);
         /*! \brief this struct is used to store evaluation results associated with this data record
 
             Data is stored in different fields, according to the data type:

@@ -61,12 +61,15 @@ QFFitFunctionsSPIMFCSDiffE2::QFFitFunctionsSPIMFCSDiffE2() {
     #define FCSSDiff_focus_volume 13
     addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
     #define FCSSDiff_concentration 14
+    addParameter(FloatNumber,  "effective_area",            "focus: effective area",                               "A<sub>eff</sub>",          "micron^2",         "&mu;m<sup>2</sup>",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define FCSSDiff_focus_area 15
+
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCSSDiff_count_rate 15
+    #define FCSSDiff_count_rate 16
     addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
-    #define FCSSDiff_background 16
+    #define FCSSDiff_background 17
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
-    #define FCSSDiff_cpm 17
+    #define FCSSDiff_cpm 18
 }
 
 double QFFitFunctionsSPIMFCSDiffE2::evaluate(double t, const double* data) const {
@@ -257,9 +260,14 @@ void QFFitFunctionsSPIMFCSDiffE2::calcParameter(double* data, double* error) con
     if (error) error[FCSSDiff_1n_particle]=fabs(eN/N/N);
 
     const double pi32=pow(M_PI, 3.0/2.0);
-    // calculate Veff = pi^{3/20} * a^2 * sigmaz
+    // calculate Veff = pi^{3/2} * a^2 * sigmaz
     data[FCSSDiff_focus_volume]=pi32*a*a*sigmaz;
     if (error) error[FCSSDiff_focus_volume]=sqrt(sqr(esigmaz*pi32*a*a)+sqr(ea*2.0*pi32*a*sigmaz));
+
+    // calculate Aeff =  pi*a^2
+    data[FCSSDiff_focus_area]=M_PI*a*a;
+    if (error) error[FCSSDiff_focus_area]=sqrt(sqr(ea*2.0*M_PI*a));
+
 
     // calculate C = N / Veff
     if (data[FCSSDiff_focus_volume]!=0) data[FCSSDiff_concentration]=N/data[FCSSDiff_focus_volume]/(NAVOGADRO * 1.0e-24); else data[FCSSDiff_concentration]=0;

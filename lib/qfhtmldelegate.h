@@ -24,6 +24,7 @@
 
 #include "lib_imexport.h"
 #include <QStyledItemDelegate>
+#include <QSet>
 
 /*! \brief subclass of QStyledItemDelegate which is able to display HTML markupped texts.
     \ingroup qf3lib_widgets
@@ -51,10 +52,13 @@ class QFLIB_EXPORT QFHTMLDelegate : public QStyledItemDelegate {
         void setEditorData(QWidget *editor, const QModelIndex &index) const;
         void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
         void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+        void clearMultilineEditColumns();
+        void addMultilineEditColumn(int col);
     private:
         bool m_displayRichTextEditor;
         QRegExp rxHTML;
         bool m_printMode;
+        QSet<int> multiline_edits;
     protected:
         void drawCheck(QPainter *painter,
                        const QStyleOptionViewItem &option,

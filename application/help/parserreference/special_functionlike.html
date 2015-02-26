@@ -30,6 +30,12 @@ $$funcref_end$$
 $$funcref_description$$example: <code>for(i,1,2,5,i^2)</code> will return <code>[1^2, 3^2, 5^2]=[1,9,25]</code>
   <!-- /func:for -->  
 $$funcref_end$$
+   
+  $$funcref_start$$<a name="defaultfor"/><!-- func:defaultfor -->
+  <b><tt><!-- template -->defaultfor(VAR, start, delta, end, expression, default)<!-- /template --></tt>, <tt>defaultfor(VAR, start, end, expression, default)</tt> or <tt>defaultfor(VAR, value_vector, expression, default)</tt> - <i>returns a vector of <tt>expression</tt>, evaluated one time for every value in the vector <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration</i>. If <tt>expression</tt> evaluates to an incompatible type, <tt>, default</tt> is evaluated and the result added to the output vector:</b> 
+$$funcref_description$$example: <code>defaultfor(i,1,5,if(i>3,"bla",i^2), -1)</code> will return <code>[1^2, 2^2, 3^2, -1, -1]=[1,9,25,-1,-1]</code>,<br>whereas <code>for(i,1,5,if(i>3,"bla",i^2))</code> will result in an error.
+  <!-- /func:defaultfor -->  
+$$funcref_end$$
      
   $$funcref_start$$<a name="savefor"/><!-- func:savefor -->
   <b><tt><!-- template -->savefor(VAR, start, delta, end, expression)<!-- /template --></tt>, <tt>savefor(VAR, start, end, expression)</tt> or <tt>savefor(VAR, value_vector, expression)</tt> - <i>returns a vector of <tt>expression</tt>, evaluated one time for every value in the vector <tt>value_vector</tt> or every value between <tt>start</tt> and <tt>end</tt> with step <tt>delta</tt> (default: 1). The variable <tt>VAR</tt> holds the according value in each iteration (save versioN!)</i>:</b> 

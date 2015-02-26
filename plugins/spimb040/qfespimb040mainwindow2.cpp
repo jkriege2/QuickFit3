@@ -71,20 +71,24 @@ QFESPIMB040MainWindow2::~QFESPIMB040MainWindow2()
 
 void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
     setUpdatesEnabled(false);
-    jkloadWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
-    jkloadSplitter((*settings->getQSettings()), splitter, "plugin_spim_b040/");
-    if (optSetup1) optSetup1->loadSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
-    if (optSetup2) optSetup2->loadSettings((settings->getQSettings()->fileName()), "plugin_spim_b040/instrument_new/");
+    QString prefix="plugin_spim_b040/";
+    if (!optSetupFile.isEmpty()) {
+        prefix=prefix+QFileInfo(optSetupFile).fileName()+QString("/");
+    }
+    jkloadWidgetGeometry((*settings->getQSettings()), this, prefix+"");
+    jkloadSplitter((*settings->getQSettings()), splitter, prefix+"");
+    if (optSetup1) optSetup1->loadSettings((*settings->getQSettings()), prefix+"instrument/");
+    if (optSetup2) optSetup2->loadSettings((settings->getQSettings()->fileName()), prefix+"instrument_new/");
 
-    if (widExperimentDescription) widExperimentDescription->loadSettings((*settings->getQSettings()), "plugin_spim_b040/expdescription/");
-    if (widAcquisitionDescription) widAcquisitionDescription->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acqdescription/");
-    if (widScriptedAcquisition) widScriptedAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acqscripted/");
-    if (widImageStack) widImageStack->loadSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
-    if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
-    if (widOverview) widOverview->loadSettings((*settings->getQSettings()), "plugin_spim_b040/overviewacquisition/");
-    if (widCamParamScan) widCamParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
-    if (widDeviceParamScan) widDeviceParamScan->loadSettings((*settings->getQSettings()), "plugin_spim_b040/deviceparamscan/");
-    //if (widConfig) widConfig->loadSettings((*settings->getQSettings()), "plugin_spim_b040/config/");
+    if (widExperimentDescription) widExperimentDescription->loadSettings((*settings->getQSettings()), prefix+"expdescription/");
+    if (widAcquisitionDescription) widAcquisitionDescription->loadSettings((*settings->getQSettings()), prefix+"acqdescription/");
+    if (widScriptedAcquisition) widScriptedAcquisition->loadSettings((*settings->getQSettings()), prefix+"acqscripted/");
+    if (widImageStack) widImageStack->loadSettings((*settings->getQSettings()), prefix+"image_stack/");
+    if (widAcquisition) widAcquisition->loadSettings((*settings->getQSettings()), prefix+"acquisition/");
+    if (widOverview) widOverview->loadSettings((*settings->getQSettings()), prefix+"overviewacquisition/");
+    if (widCamParamScan) widCamParamScan->loadSettings((*settings->getQSettings()), prefix+"camparamscan/");
+    if (widDeviceParamScan) widDeviceParamScan->loadSettings((*settings->getQSettings()), prefix+"deviceparamscan/");
+    //if (widConfig) widConfig->loadSettings((*settings->getQSettings()), prefix+"config/");
     setUpdatesEnabled(true);
     if (optSetup1) optSetup1->setUpdatesEnabled(true);
     if (optSetup2) optSetup2->setUpdatesEnabled(true);
@@ -99,13 +103,17 @@ void QFESPIMB040MainWindow2::loadSettings(ProgramOptions* settings) {
 }
 
 void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
-    jksaveWidgetGeometry((*settings->getQSettings()), this, "plugin_spim_b040/");
-    jksaveSplitter((*settings->getQSettings()), splitter, "plugin_spim_b040/");
-    if (optSetup1) optSetup1->storeSettings((*settings->getQSettings()), "plugin_spim_b040/instrument/");
-    if (optSetup2) optSetup2->storeSettings((settings->getQSettings()->fileName()), "plugin_spim_b040/instrument_new/");
+    QString prefix="plugin_spim_b040/";
+    if (!optSetupFile.isEmpty()) {
+        prefix=prefix+QFileInfo(optSetupFile).fileName()+QString("/");
+    }
+    jksaveWidgetGeometry((*settings->getQSettings()), this, prefix+"");
+    jksaveSplitter((*settings->getQSettings()), splitter, prefix+"");
+    if (optSetup1) optSetup1->storeSettings((*settings->getQSettings()), prefix+"instrument/");
+    if (optSetup2) optSetup2->storeSettings((settings->getQSettings()->fileName()), prefix+"instrument_new/");
 
     if (optSetup2) {
-        //QString optSetupFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup").toString();
+        //QString optSetupFile=ProgramOptions::getConfigValue(prefix+"config/optsetup_filename", m_pluginServices->getAssetsDirectory()+"plugins/spimb040/spim_at_b040.optSetup").toString();
 
         if (QFile::exists(optSetup2->getLastOptSetup()) && QFileInfo(optSetupFile)==QFileInfo(optSetup2->getLastOptSetup())) {
             QFileInfo fi(optSetupFile);
@@ -115,8 +123,8 @@ void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
             dir=QDir(ProgramOptions::getConfigValue("spimb040/optsetup_config_directory", ProgramOptions::getInstance()->getConfigFileDirectory()).toString());
             QString optSetupUserConfigFile=dir.absoluteFilePath(fi.fileName()+".ini");
 
-            //QString optSetupGlobalConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename_readonly", m_pluginServices->getGlobalConfigFileDirectory()+"/spim_at_b040.optSetup.ini").toString();
-            //QString optSetupUserConfigFile=ProgramOptions::getConfigValue("plugin_spim_b040/config/optsetup_config_filename", m_pluginServices->getConfigFileDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
+            //QString optSetupGlobalConfigFile=ProgramOptions::getConfigValue(prefix+"config/optsetup_config_filename_readonly", m_pluginServices->getGlobalConfigFileDirectory()+"/spim_at_b040.optSetup.ini").toString();
+            //QString optSetupUserConfigFile=ProgramOptions::getConfigValue(prefix+"config/optsetup_config_filename", m_pluginServices->getConfigFileDirectory()+"plugins/spimb040/spim_at_b040.optSetup.ini").toString();
             QStringList optSetupFiles;
             QDir().mkpath(QFileInfo(optSetupUserConfigFile).absolutePath());
             QDir().mkpath(QFileInfo(optSetupGlobalConfigFile).absolutePath());
@@ -127,15 +135,15 @@ void QFESPIMB040MainWindow2::storeSettings(ProgramOptions* settings) {
     }
 
 
-    if (widExperimentDescription) widExperimentDescription->storeSettings((*settings->getQSettings()), "plugin_spim_b040/expdescription/");
-    if (widAcquisitionDescription) widAcquisitionDescription->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acqdescription/");
-    if (widScriptedAcquisition) widScriptedAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acqscripted/");
-    if (widImageStack) widImageStack->storeSettings((*settings->getQSettings()), "plugin_spim_b040/image_stack/");
-    if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), "plugin_spim_b040/acquisition/");
-    if (widOverview) widOverview->storeSettings((*settings->getQSettings()), "plugin_spim_b040/overviewacquisition/");
-    if (widCamParamScan) widCamParamScan->storeSettings((*settings->getQSettings()), "plugin_spim_b040/camparamscan/");
-    if (widDeviceParamScan) widDeviceParamScan->storeSettings((*settings->getQSettings()), "plugin_spim_b040/deviceparamscan/");
-    //if (widConfig) widConfig->storeSettings((*settings->getQSettings()), "plugin_spim_b040/config/");
+    if (widExperimentDescription) widExperimentDescription->storeSettings((*settings->getQSettings()), prefix+"expdescription/");
+    if (widAcquisitionDescription) widAcquisitionDescription->storeSettings((*settings->getQSettings()), prefix+"acqdescription/");
+    if (widScriptedAcquisition) widScriptedAcquisition->storeSettings((*settings->getQSettings()), prefix+"acqscripted/");
+    if (widImageStack) widImageStack->storeSettings((*settings->getQSettings()), prefix+"image_stack/");
+    if (widAcquisition) widAcquisition->storeSettings((*settings->getQSettings()), prefix+"acquisition/");
+    if (widOverview) widOverview->storeSettings((*settings->getQSettings()), prefix+"overviewacquisition/");
+    if (widCamParamScan) widCamParamScan->storeSettings((*settings->getQSettings()), prefix+"camparamscan/");
+    if (widDeviceParamScan) widDeviceParamScan->storeSettings((*settings->getQSettings()), prefix+"deviceparamscan/");
+    //if (widConfig) widConfig->storeSettings((*settings->getQSettings()), prefix+"config/");
 
 }
 

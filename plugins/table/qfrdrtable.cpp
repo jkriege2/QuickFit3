@@ -365,7 +365,7 @@ QVector<double> QFRDRTable::tableGetColumnDataAsDouble(int column) const
     return QVector<double>();
 }
 
-bool QFRDRTable::tablesGetDoEmitSignals() const
+bool QFRDRTable::tableGetDoEmitSignals() const
 {
     if (datamodel)  {
         return datamodel->getDoEmitSignals();
@@ -373,12 +373,22 @@ bool QFRDRTable::tablesGetDoEmitSignals() const
     return true;
 }
 
-void QFRDRTable::tablesSetDoEmitSignals(bool doEmit)
+void QFRDRTable::tableSetDoEmitSignals(bool doEmit)
 {
     if (datamodel)  {
         if (doEmit) datamodel->enableSignals(true);
         else datamodel->disableSignals();
     }
+}
+
+void QFRDRTable::tableSetPreEvaluationExpression(const QString &expression)
+{
+    setParserPreScript(expression);
+}
+
+QString QFRDRTable::tableGetPreEvaluationExpression() const
+{
+    return getParserPreScript();
 }
 
 bool QFRDRTable::colgraphGetDoEmitSignals() const

@@ -1294,7 +1294,14 @@ inline typename T::value_type qfstatisticsQuantile(const T& input_in, double qua
     return qfstatisticsSortedQuantile(input, quantile);
 }
 
-
+template <typename T>
+inline typename T::value_type qfstatisticsQuantile25(const T& input_in) {
+    return qfstatisticsQuantile(input_in, 0.25);
+}
+template <typename T>
+inline typename T::value_type qfstatisticsQuantile75(const T& input_in) {
+    return qfstatisticsQuantile(input_in, 0.75);
+}
 
 
 

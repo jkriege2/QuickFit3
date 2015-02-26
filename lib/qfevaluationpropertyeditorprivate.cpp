@@ -27,6 +27,14 @@
 #include "qfproject.h"
 #include "qfenhancedtabwidget.h"
 #include "datatools.h"
+#include "qftablemodel.h"
+#include "qfrdrtableinterface.h"
+#include "qfexporttotabledialog.h"
+#include "qfrawdataeditor.h"
+#include "qfrawdatapropertyeditor.h"
+#include "qfrdrimagemask.h"
+#include "qfrdrrunselection.h"
+
 QFEvaluationPropertyEditorPrivate::QFEvaluationPropertyEditorPrivate(QFEvaluationPropertyEditor *parent) :
     QObject(parent)
 {
@@ -657,8 +665,8 @@ void QFEvaluationPropertyEditorPrivate::createWidgets() {
     actCopyResultAccessParserFunction=new QAction( tr("Copy Result Access Parser Function rdr_getresult(...)"), d);
     menuCopyIDs->addAction(actCopyResultAccessParserFunction);;
 
-    actCopyResultAccessParserFunctionTable=new QAction( tr("Copy selected cells as table RDR with result access parser functions"), d);
-    //menuCopyIDs->addAction(actCopyResultAccessParserFunctionTable);;
+    actCopyResultAccessParserFunctionTable=new QAction(QIcon(":/table/table_insert.png"), tr("Copy selected cells as table RDR with result access parser functions"), d);
+    tvResults->addAction(actCopyResultAccessParserFunctionTable);
 
     actSaveResults=new QAction(QIcon(":/lib/save16.png"), tr("Save all results to file"), d);
     tbResults->addAction(actSaveResults);
@@ -1326,16 +1334,403 @@ void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunction()
 void QFEvaluationPropertyEditorPrivate::copyResultAccessParserFunctionTable()
 {
     if (d->current) {
-        QClipboard* clp=QApplication::clipboard();
-        QModelIndexList l=tvResults->selectionModel()->selectedIndexes();
 
-        QList<QList<QVariant> > parserfuns;
+        QList<QList<QVariant> > RDRIDs_tab, resultnames_tab, evalnames_tab, data_tab, props_tab;
         QStringList colnames, rownames;
-        tvResults->getVariantDataTable(QFEvaluationResultsModel::ParserAccessFunction, parserfuns, colnames, rownames);
+        tvResults->getVariantDataTable(QFEvaluationResultsModel::RDRPropertyRole, props_tab, colnames, rownames);
+        tvResults->getVariantDataTable(QFEvaluationResultsModel::ValueRole, data_tab, colnames, rownames);
+        tvResults->getVariantDataTable(QFEvaluationResultsModel::ResultIDRole, RDRIDs_tab, colnames, rownames);
+        tvResults->getVariantDataTable(QFEvaluationResultsModel::ResultNameRole, resultnames_tab, colnames, rownames);
+        tvResults->getVariantDataTable(QFEvaluationResultsModel::EvalNameRole, evalnames_tab, colnames, rownames);
+        QList<int> rdrids_int;
+        QStringList resultnames, evalnames, propnames;
+        //qDebug()<<rownames;
+        //qDebug()<<colnames;
+        for (int c=0; c<data_tab.size(); c++) {
+            //qDebug()<<"data_tab["<<c<<"] = "<<data_tab[c];
+        }
 
-        dataExpand(parserfuns, &colnames);
-        dataReduce(parserfuns, &colnames);
+        for (int c=0; c<RDRIDs_tab.size(); c++) {
+            //qDebug()<<"RDRIDs_tab["<<c<<"] = "<<RDRIDs_tab[c];
+            for (int r=0; r<RDRIDs_tab[c].size(); r++) {
+                bool oki=false;
+                int id=RDRIDs_tab[c].value(r, -1).toInt(&oki);
+                if (!oki || !RDRIDs_tab[c].value(r).isValid()) id=-1;
+                if (r<rdrids_int.size()) {
+                    if (id>=0 && rdrids_int[r]<0) rdrids_int[r]=id;
+                } else rdrids_int.append(id);
+            }
 
-        //if (c.isValid()) clp->setText(QString("rdr_getresult(%1, \"%2\", \"%3\")").arg(tvResults->model()->data(c, QFEvaluationResultsModel::ResultIDRole).toInt()).arg(tvResults->model()->data(c, QFEvaluationResultsModel::EvalNameRole).toString()).arg(tvResults->model()->data(c, QFEvaluationResultsModel::ResultNameRole).toString()));
+        }
+        for (int c=0; c<evalnames_tab.size(); c++) {
+            //qDebug()<<"evalnames_tab["<<c<<"] = "<<evalnames_tab[c];
+            QString id;
+            for (int r=0; r<evalnames_tab[c].size(); r++) {
+                QString idd=evalnames_tab[c].value(r, QString()).toString();
+                if (r<evalnames.size()) {
+                    if (!idd.isEmpty() && evalnames[r].isEmpty()) evalnames[r]=idd;
+                } else evalnames.append(idd);
+            }
+        }
+        for (int c=0; c<resultnames_tab.size(); c++) {
+            QString id;
+            //qDebug()<<"resultnames_tab["<<c<<"] = "<<resultnames_tab[c];
+            for (int r=0; r<resultnames_tab[c].size(); r++) {
+                QString idd=resultnames_tab[c].value(r, QString()).toString();
+                if (id.isEmpty() && !idd.isEmpty()) id=idd;
+                if (!id.isEmpty()) break;
+            }
+            resultnames.append(id);
+        }
+        for (int c=0; c<props_tab.size(); c++) {
+            QString id;
+            //qDebug()<<"props_tab["<<c<<"] = "<<props_tab[c];
+            for (int r=0; r<props_tab[c].size(); r++) {
+                QString idd=props_tab[c].value(r, QString()).toString();
+                if (id.isEmpty() && !idd.isEmpty()) id=idd;
+                if (!id.isEmpty()) break;
+            }
+            propnames.append(id);
+        }
+        int datarows=0;
+        bool hasMask=false;
+        bool hasSelection=false;
+        bool hasArray=false;
+        for (int c=0; c<RDRIDs_tab.size(); c++) {
+            datarows=qMax(datarows, RDRIDs_tab[c].size());
+            for (int r=0; r<RDRIDs_tab[c].size(); r++) {
+                int id=RDRIDs_tab[c].value(r, -1).toInt();
+                if (d->current->getProject()->rawDataIDExists(id))  {
+                    QFRawDataRecord* rdr=d->current->getProject()->getRawDataByID(id);
+                    QFRDRRunSelectionsInterface* seli=dynamic_cast<QFRDRRunSelectionsInterface*>(rdr);
+                    QFRDRImageMaskInterface* maski=dynamic_cast<QFRDRImageMaskInterface*>(rdr);
+                    //qDebug()<<c<<r<<id<<rdr<<seli<<maski;
+                    if (rdr) {
+                        if (seli) hasSelection=true;
+                        if (maski) hasMask=true;
+                        QFRawDataRecord::evaluationResultType restype=rdr->resultsGetType(evalnames_tab[c].value(r, QString()).toString(), resultnames_tab[c].value(r, QString()).toString());
+                        if (QFRawDataRecord::evaluationResultTypeIsVector(restype) && QFRawDataRecord::evaluationResultTypeIsNumeric(restype)) hasArray=true;
+                    }
+                }
+            }
+        }
+
+        //qDebug()<<"\n\n\n"<<rdrids_int<<"\n\n"<<evalnames<<"\n\n"<<resultnames<<"\n\n"<<datarows<<hasMask<<hasSelection<<hasArray<<"\n\n\n";
+        if (rdrids_int.size()>0) {
+            QFExportToTableDialog* dlg=new QFExportToTableDialog(d);
+            QCheckBox* chkOverwriteTable=new QCheckBox(tr("(unchecked: append)"), dlg);
+            chkOverwriteTable->setEnabled(true);
+            dlg->addWidget(tr("overwrite existing table:"), chkOverwriteTable);
+
+            QCheckBox* chkUseMask=new QCheckBox(QString(""), dlg);
+            dlg->addWidget(tr("mind excluded indexes/mask"), chkUseMask);
+            chkUseMask->setEnabled(hasArray&&(hasMask));//||hasSelection));
+
+            QComboBox* cmbSingleLineMode=new QComboBox(dlg);
+            cmbSingleLineMode->addItem(tr("add statistics to table"));
+            cmbSingleLineMode->addItem(tr("add data as column to table"));
+            cmbSingleLineMode->setEnabled(hasArray && (datarows==1));
+            dlg->addWidget(tr("single row mode:"), cmbSingleLineMode);
+
+            QCheckBox* chkAvg=new QCheckBox(tr("average"), dlg);
+            chkAvg->setEnabled(hasArray);
+            dlg->addWidget(tr("vector statistics:"), chkAvg);
+            QCheckBox* chkMedian=new QCheckBox(tr("median"), dlg);
+            chkMedian->setEnabled(hasArray);
+            dlg->addWidget("", chkMedian);
+            QCheckBox* chkStd=new QCheckBox(tr("standard deviation"), dlg);
+            chkStd->setEnabled(hasArray);
+            dlg->addWidget("", chkStd);
+            QCheckBox* chkMin=new QCheckBox(tr("minimum"), dlg);
+            chkMin->setEnabled(hasArray);
+            dlg->addWidget("", chkMin);
+            QCheckBox* chkMax=new QCheckBox(tr("maximum"), dlg);
+            chkMax->setEnabled(hasArray);
+            dlg->addWidget("", chkMax);
+            QCheckBox* chkQ25=new QCheckBox(tr("25% quartile"), dlg);
+            chkQ25->setEnabled(hasArray);
+            dlg->addWidget("", chkQ25);
+            QCheckBox* chkQ75=new QCheckBox(tr("75% quartile"), dlg);
+            chkQ75->setEnabled(hasArray);
+            dlg->addWidget("", chkQ75);
+
+            ProgramOptions::getConfigQComboBox(cmbSingleLineMode, QString("evaleditor/%1/cmbSingleLineMode").arg(d->current->getType()), 1);
+            ProgramOptions::getConfigQCheckBox(chkOverwriteTable, QString("evaleditor/%1/chkOverwriteTable").arg(d->current->getType()), false);
+            ProgramOptions::getConfigQCheckBox(chkUseMask, QString("evaleditor/%1/chkUseMask").arg(d->current->getType()), true);
+            ProgramOptions::getConfigQCheckBox(chkMedian, QString("evaleditor/%1/chkMedian").arg(d->current->getType()), false);
+            ProgramOptions::getConfigQCheckBox(chkAvg, QString("evaleditor/%1/chkAvg").arg(d->current->getType()), true);
+            ProgramOptions::getConfigQCheckBox(chkStd, QString("evaleditor/%1/chkStd").arg(d->current->getType()), true);
+            ProgramOptions::getConfigQCheckBox(chkMin, QString("evaleditor/%1/chkMin").arg(d->current->getType()), false);
+            ProgramOptions::getConfigQCheckBox(chkMax, QString("evaleditor/%1/chkMax").arg(d->current->getType()), false);
+            ProgramOptions::getConfigQCheckBox(chkQ25, QString("evaleditor/%1/chkQ25").arg(d->current->getType()), false);
+            ProgramOptions::getConfigQCheckBox(chkQ75, QString("evaleditor/%1/chkQ75").arg(d->current->getType()), false);
+            if (dlg->exec()) {
+                ProgramOptions::setConfigQComboBox(cmbSingleLineMode, QString("evaleditor/%1/cmbSingleLineMode").arg(d->current->getType()));
+                ProgramOptions::setConfigQCheckBox(chkOverwriteTable, QString("evaleditor/%1/chkOverwriteTable").arg(d->current->getType()));
+                ProgramOptions::setConfigQCheckBox(chkUseMask, QString("evaleditor/%1/chkUseMask").arg(d->current->getType()));
+                ProgramOptions::setConfigQCheckBox(chkMedian, QString("evaleditor/%1/chkMedian").arg(d->current->getType()));
+                ProgramOptions::setConfigQCheckBox(chkAvg, QString("evaleditor/%1/chkAvg").arg(d->current->getType()));
+                ProgramOptions::setConfigQCheckBox(chkStd, QString("evaleditor/%1/chkStd").arg(d->current->getType()));
+                ProgramOptions::setConfigQCheckBox(chkMin, QString("evaleditor/%1/chkMin").arg(d->current->getType()));
+                ProgramOptions::setConfigQCheckBox(chkMax, QString("evaleditor/%1/chkMax").arg(d->current->getType()));
+                ProgramOptions::setConfigQCheckBox(chkQ25, QString("evaleditor/%1/chkQ25").arg(d->current->getType()));
+                ProgramOptions::setConfigQCheckBox(chkQ75, QString("evaleditor/%1/chkQ75").arg(d->current->getType()));
+
+
+                QString tabname="";
+                QFRDRTableInterface* tab=dlg->getTable();
+                QFRawDataRecord* rdr=dlg->getRDR();
+                if (dlg->getNewTable(tabname)) {
+                    if (tabname.isEmpty()) tabname=tr("NEW_TABLE");
+                    rdr=QFPluginServices::getInstance()->getCurrentProject()->addRawData("table", tabname, "");
+                    tab=dynamic_cast<QFRDRTableInterface*>(rdr);
+                }
+                bool ok=true;
+
+
+                if (tab && tab->tableSupportsExpressions()) {
+                    QString preexpr=tab->tableGetPreEvaluationExpression();
+                    bool emitSigT=tab->tableGetDoEmitSignals();
+                    tab->tableSetDoEmitSignals(false);
+
+                    int col=tab->tableGetColumnCount();
+                    if (chkOverwriteTable->isChecked()) col=0;//
+
+                    int singlerow_rdrid=-1;
+                    for (int i=0; i<rdrids_int.size(); i++) {
+                        singlerow_rdrid=rdrids_int.value(0, -1);
+                        if (singlerow_rdrid>=0) break;
+                    }
+                    QString singlerow_evalid="";
+                    for (int i=0; i<evalnames.size(); i++) {
+                        singlerow_evalid=evalnames.value(0, "");
+                        if (!singlerow_evalid.isEmpty()) break;
+                    }
+                    QString singlerow_evalidvar=QString("EVALID%1").arg(col);
+                    QString singlerow_rdridvar=QString("RDRID%1").arg(col);
+
+
+
+                    /*QString stat_expression=QString("result_id = \"%1\";\nfor(r, 1, collength(col-%3), %4(rdr_getresult(data(r, col-%3), data(r, col-%2), result_id)))");
+                    //QString prop_expression=QString("prop_id = \"%1\";\nfor(r, 1, collength(col-%2), rdr_getproperty(data(r, col-%2), prop_id)))");
+                    QString prop_expression=QString("prop_id = \"%1\";\nrdr_getproperty(data(row, col-%2), prop_id)");
+                    QString data_expression=QString("result_id = \"%1\";\nfor(r, 1, collength(col-%3), firstinvector(rdr_getresult(data(r, col-%3), data(r, col-%2), result_id)))");
+                    QString error_expression=QString("result_id = \"%1\";\nfor(r, 1, collength(col-%3), firstinvector(rdr_getresulterror(data(r, col-%3), data(r, col-%2), result_id)))");
+                    QString simple_data_expression=QString("result_id = \"%1\";\nrdr_getresult(%3, %2, result_id)");
+                    QString simple_error_expression=QString("result_id = \"%1\";\nrdr_getresulterror(%3, %2, result_id)");
+                    if (chkUseMask->isChecked() && (hasMask)) {
+                        stat_expression=QString("result_id = \"%1\";\nfor(r, 1, collength(col-%3), %4(itemorfirst(rdr_getresult(data(r, col-%3), data(r, col-%2), result_id), runex_mask(data(r, col-%3)))))");
+                        data_expression=QString("result_id = \"%1\";\nfor(r, 1, collength(col-%3), itemorfirst(rdr_getresult(data(r, col-%3), data(r, col-%2), result_id), runex_mask(data(r, col-%3))))");
+                        error_expression=QString("result_id = \"%1\";\nfor(r, 1, collength(col-%3), itemorfirst(rdr_getresulterror(data(r, col-%3), data(r, col-%2), result_id), runex_mask(data(r, col-%3))))");
+                        simple_data_expression=QString("result_id = \"%1\";\nitemorfirst(rdr_getresult(%3, %2, result_id), runex_mask(%3))");
+                        simple_error_expression=QString("result_id = \"%1\";\nitemorfirst(rdr_getresulterror(%3, %2, result_id), runex_mask(%3))");
+                    }*/
+
+                    QString stat_expression=QString("result_id = \"%1\";\n%4(rdr_getresult(data(row, col-%3), data(row, col-%2), result_id))");
+                    QString prop_expression=QString("prop_id = \"%1\";\nrdr_getproperty(data(row, col-%2), prop_id)");
+                    QString data_expression=QString("result_id = \"%1\";\nfirstinvector(rdr_getresult(data(row, col-%3), data(row, col-%2), result_id))");
+                    QString error_expression=QString("result_id = \"%1\";\nfirstinvector(rdr_getresulterror(data(row, col-%3), data(row, col-%2), result_id))");
+                    QString simple_data_expression=QString("result_id = \"%1\";\nrdr_getresult(%3, %2, result_id)");
+                    QString simple_error_expression=QString("result_id = \"%1\";\nrdr_getresulterror(%3, %2, result_id)");
+                    if (chkUseMask->isChecked() && (hasMask/* || hasSelection*/)) {
+                        stat_expression=QString("result_id = \"%1\";\ncollength(col-%3), %4(itemorfirst(rdr_getresult(data(row, col-%3), data(row, col-%2), result_id), runex_mask(data(row, col-%3))))");
+                        data_expression=QString("result_id = \"%1\";\ncollength(col-%3), itemorfirst(rdr_getresult(data(row, col-%3), data(row, col-%2), result_id), runex_mask(data(row, col-%3)))");
+                        error_expression=QString("result_id = \"%1\";\ncollength(col-%3), itemorfirst(rdr_getresulterror(data(row, col-%3), data(row, col-%2), result_id), runex_mask(data(row, col-%3)))");
+                        simple_data_expression=QString("result_id = \"%1\";\nitemorfirst(rdr_getresult(%3, %2, result_id), runex_mask(%3))");
+                        simple_error_expression=QString("result_id = \"%1\";\nitemorfirst(rdr_getresulterror(%3, %2, result_id), runex_mask(%3))");
+                    }
+
+
+                    // set list of RDR IDs as first column
+                    int rdrid_col=-1, evalid_col=-1;
+                    if (datarows>1 || cmbSingleLineMode->currentIndex()==0) {
+                        rdrid_col=col;
+                        evalid_col=col+2;
+                        tab->tableSetColumnTitle(col, dlg->getPrefix()+"RDR_ID");
+                        tab->tableSetColumnTitle(col+1, dlg->getPrefix()+"FILE");
+                        tab->tableSetColumnTitle(col+2, dlg->getPrefix()+"EVAL_ID");
+                        for (int r=0; r<rdrids_int.size(); r++) {
+                            tab->tableSetData(r, col, rdrids_int[r]);
+                            tab->tableSetData(r, col+2, evalnames[r]);
+                            tab->tableSetData(r, col+1, QLatin1String("rdr_getname(data(row, col-1))"));
+                        }
+                        //tab->tableSetColumnExpression(col+1, QLatin1String("for(r, column(col-1), rdr_getname(r))"));
+                        col+=3;
+
+                        for (int c=0; c<resultnames.size(); c++) {
+                            bool thisHasVector=false;
+                            bool thisHasError=false;
+                            for (int r=0; r<evalnames.size(); r++) {
+                                QString evalid=evalnames[r];
+                                QString resid=resultnames[c];
+                                QFRawDataRecord* rdr=d->current->getProject()->getRawDataByID(rdrids_int.value(r, -1));
+                                if (rdr) {
+                                    QFRawDataRecord::evaluationResultType restype=rdr->resultsGetType(evalid, resid);
+                                    if (QFRawDataRecord::evaluationResultTypeIsVector(restype) && QFRawDataRecord::evaluationResultTypeIsNumeric(restype)) thisHasVector=true;
+                                    if (QFRawDataRecord::evaluationResultTypeHasError(restype)) thisHasError=true;
+                                }
+                            }
+
+                            if (resultnames[c].isEmpty()) {
+                                tab->tableSetColumnTitle(col, dlg->getPrefix()+colnames.value(c, ""));
+                                if (propnames.value(c, "").isEmpty()) {
+                                    for (int r=0; r<datarows; r++) {
+                                        tab->tableSetData(r, col, data_tab.value(c, QList<QVariant>()).value(r, QVariant()));
+                                    }
+                                } else {
+                                    for (int r=0; r<datarows; r++) {
+                                        tab->tableSetExpression(r, col, prop_expression.arg(propnames[c]).arg(col-rdrid_col));
+                                    }
+                                }
+                                col++;
+                            } else {
+                                QString resname=resultnames[c];
+                                if (!thisHasVector) {
+                                    tab->tableSetColumnTitle(col, dlg->getPrefix()+colnames.value(c, ""));
+                                    //tab->tableSetColumnExpression(col, data_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col));
+                                    for (int r=0; r<datarows; r++) {
+                                        tab->tableSetExpression(r, col, data_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col));
+                                    }
+                                    col++;
+                                } else {
+                                    if (chkAvg->isChecked()) { QString instr="mean";
+                                        tab->tableSetColumnTitle(col, dlg->getPrefix()+QString("%2(%1)").arg(colnames.value(c, "")).arg(instr));
+                                        //tab->tableSetColumnExpression(col, stat_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col).arg(instr));
+                                        for (int r=0; r<datarows; r++) {
+                                            tab->tableSetExpression(r, col, stat_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col).arg(instr));
+                                        }
+                                        col++;
+                                    }
+                                    if (chkStd->isChecked()) { QString instr="std";
+                                        tab->tableSetColumnTitle(col, dlg->getPrefix()+QString("%2(%1)").arg(colnames.value(c, "")).arg(instr));
+                                        //tab->tableSetColumnExpression(col, stat_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col).arg(instr));
+                                        for (int r=0; r<datarows; r++) {
+                                            tab->tableSetExpression(r, col, stat_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col).arg(instr));
+                                        }
+                                        col++;
+                                    }
+                                    if (chkMedian->isChecked()) { QString instr="median";
+                                        tab->tableSetColumnTitle(col, dlg->getPrefix()+QString("%2(%1)").arg(colnames.value(c, "")).arg(instr));
+                                        //tab->tableSetColumnExpression(col, stat_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col).arg(instr));
+                                        for (int r=0; r<datarows; r++) {
+                                            tab->tableSetExpression(r, col, stat_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col).arg(instr));
+                                        }
+
+                                        col++;
+                                    }
+                                    if (chkMin->isChecked()) { QString instr="min";
+                                        tab->tableSetColumnTitle(col, dlg->getPrefix()+QString("%2(%1)").arg(colnames.value(c, "")).arg(instr));
+                                        //tab->tableSetColumnExpression(col, stat_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col).arg(instr));
+                                        for (int r=0; r<datarows; r++) {
+                                            tab->tableSetExpression(r, col, stat_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col).arg(instr));
+                                        }
+
+                                        col++;
+                                    }
+                                    if (chkMax->isChecked()) { QString instr="max";
+                                        tab->tableSetColumnTitle(col, dlg->getPrefix()+QString("%2(%1)").arg(colnames.value(c, "")).arg(instr));
+                                        //tab->tableSetColumnExpression(col, stat_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col).arg(instr));
+                                        for (int r=0; r<datarows; r++) {
+                                            tab->tableSetExpression(r, col, stat_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col).arg(instr));
+                                        }
+
+                                        col++;
+                                    }
+                                    if (chkQ25->isChecked()) { QString instr="quantile25";
+                                        tab->tableSetColumnTitle(col, dlg->getPrefix()+QString("%2(%1)").arg(colnames.value(c, "")).arg(instr));
+                                        //tab->tableSetColumnExpression(col, stat_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col).arg(instr));
+                                        for (int r=0; r<datarows; r++) {
+                                            tab->tableSetExpression(r, col, stat_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col).arg(instr));
+                                        }
+
+                                        col++;
+                                    }
+                                    if (chkQ75->isChecked()) { QString instr="quantile75";
+                                        tab->tableSetColumnTitle(col, dlg->getPrefix()+QString("%2(%1)").arg(colnames.value(c, "")).arg(instr));
+                                        //tab->tableSetColumnExpression(col, stat_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col).arg(instr));
+                                        for (int r=0; r<datarows; r++) {
+                                            tab->tableSetExpression(r, col, stat_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col).arg(instr));
+                                        }
+
+                                        col++;
+                                    }
+                                }
+                                if (thisHasError) {
+                                    if (!thisHasVector) {
+                                        tab->tableSetColumnTitle(col, dlg->getPrefix()+QString("error(%1)").arg(colnames.value(c, "")));
+                                        //tab->tableSetColumnExpression(col, error_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col));
+                                        for (int r=0; r<datarows; r++) {
+                                            tab->tableSetExpression(r, col, error_expression.arg(resname).arg(col-evalid_col).arg(col-rdrid_col));
+                                        }
+
+                                        col++;
+                                    }
+                                }
+                            }
+                        }
+
+                    } else if (datarows==1){
+                        if (!preexpr.isEmpty()) preexpr+=";\n";
+                        preexpr+=QString("%1 = %2;\n%3 = \"%4\";\n").arg(singlerow_rdridvar).arg(singlerow_rdrid).arg(singlerow_evalidvar).arg(singlerow_evalid);
+
+                        for (int c=0; c<resultnames.size(); c++) {
+                            //bool thisHasVector=false;
+                            bool thisHasError=false;
+                            int r=0;
+                            QString evalid=evalnames[r];
+                            QString resid=resultnames[c];
+                            QFRawDataRecord* rdr=d->current->getProject()->getRawDataByID(rdrids_int.value(0, -1));
+                            if (rdr) {
+                                QFRawDataRecord::evaluationResultType restype=rdr->resultsGetType(evalid, resid);
+                                //if (QFRawDataRecord::evaluationResultTypeIsVector(restype) && QFRawDataRecord::evaluationResultTypeIsNumeric(restype)) thisHasVector=true;
+                                if (QFRawDataRecord::evaluationResultTypeHasError(restype)) thisHasError=true;
+                            }
+
+
+                            if (resultnames[c].isEmpty()) {
+                                tab->tableSetColumnTitle(col, dlg->getPrefix()+colnames.value(c, ""));
+                                for (int r=0; r<datarows; r++) {
+                                    tab->tableSetData(r, col, data_tab.value(c, QList<QVariant>()).value(r, QVariant()));
+                                }
+                                col++;
+                            } else {
+                                QString resname=resultnames[c];
+                                tab->tableSetColumnTitle(col, dlg->getPrefix()+colnames.value(c, ""));
+                                //tab->tableSetColumnExpression(col, simple_data_expression.arg(resname).arg(singlerow_evalidvar).arg(singlerow_rdridvar));
+                                for (int r=0; r<datarows; r++) {
+                                    tab->tableSetExpression(r, col, simple_data_expression.arg(resname).arg(singlerow_evalidvar).arg(singlerow_rdridvar));
+                                }
+
+                                col++;
+                                if (thisHasError) {
+                                    tab->tableSetColumnTitle(col, dlg->getPrefix()+colnames.value(c, ""));
+                                   // tab->tableSetColumnExpression(col, simple_error_expression.arg(resname).arg(singlerow_evalidvar).arg(singlerow_rdridvar));
+                                    for (int r=0; r<datarows; r++) {
+                                        tab->tableSetExpression(r, col, simple_error_expression.arg(resname).arg(singlerow_evalidvar).arg(singlerow_rdridvar));
+                                    }
+
+                                    col++;
+                                }
+                            }
+                        }
+                    }
+
+                    tab->tableSetPreEvaluationExpression(preexpr);
+                    tab->tableReevaluateExpressions();
+                    tab->tableSetDoEmitSignals(emitSigT);
+                } else {
+                    QMessageBox::critical(d, tr("Add data to table"), tr("No table selected or could not create table, or table does not support expressions!"));
+                    ok=false;
+                }
+
+                if (ok && rdr && dlg->getShowEditor()) {
+                    QFRawDataPropertyEditor* editor=QFPluginServices::getInstance()->openRawDataEditor(rdr, false);
+                    editor->showTab(1);
+
+                }
+            }
+            delete dlg;
+        }
+
     }
 }

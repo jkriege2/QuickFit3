@@ -83,7 +83,8 @@ HEADERS += qfrdrimagingfcs.h \
     ../../../../../LIB/trunk/crc_ccitt.h \
     ../../../../../LIB/trunk/crc.h \
     ../../../../../LIB/trunk/correlator_multitau.h \
-    qfrdrimagingfcs_parserfunctions.h
+    qfrdrimagingfcs_parserfunctions.h \
+    qfrdrimagingfcsdiffusionlawdialog.h
 
 
 
@@ -121,7 +122,8 @@ SOURCES += qfrdrimagingfcs.cpp \
     qfrdrimagingfcsmaskbuilder.cpp \
     qfrdrimagingfcscopycorrasrdrdialog.cpp \
     qfrdrimagingfcspostprocessbinningdialog.cpp \
-    qfrdrimagingfcs_parserfunctions.cpp
+    qfrdrimagingfcs_parserfunctions.cpp \
+    qfrdrimagingfcsdiffusionlawdialog.cpp
 
 FORMS = \
     qfrdrimagingfcscorrelationdialog.ui \
@@ -135,7 +137,8 @@ FORMS = \
     ../base_classes/qfrdrimagecopydataselectdialog.ui \
     qfrdrimagingfcsmaskbuilder.ui \
     qfrdrimagingfcscopycorrasrdrdialog.ui \
-    qfrdrimagingfcspostprocessbinningdialog.ui
+    qfrdrimagingfcspostprocessbinningdialog.ui \
+    qfrdrimagingfcsdiffusionlawdialog.ui
 
 RESOURCES += qfrdrimagingfcs.qrc
 

@@ -1920,9 +1920,10 @@ void MainWindow::createMenus() {
     connect(recentMenu, SIGNAL(openRecentFile(QString)), this, SLOT(openRecentProject(QString)));
     fileMenu->addMenu(recentMenu);
     fileMenu->addAction(actReloadProject);
-    projectSpecialMenu=fileMenu->addMenu(tr("&Special Project Tools ..."));
-    projectSpecialMenu->addAction(openProjectSubsetAct);
-    projectSpecialMenu->addAction(openExampleAct);
+    fileMenu->addSeparator();
+    //projectSpecialMenu=fileMenu->addMenu(tr("&Special Project Tools ..."));
+    fileMenu->addAction(openProjectSubsetAct);
+    fileMenu->addAction(openExampleAct);
 
     fileMenu->addSeparator();
     fileMenu->addAction(saveProjectAct);
@@ -3036,7 +3037,8 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     else logFileMainWidget->log_header(tr("disabling project mode"));
 
     projectToolsMenu->setEnabled(projectModeEnabled);
-    projectSpecialMenu->setEnabled(projectModeEnabled);
+    openProjectSubsetAct->setEnabled(projectModeEnabled);
+    openExampleAct->setEnabled(projectModeEnabled);
     dataMenu->setEnabled(projectModeEnabled);
     viewMenu->setEnabled(projectModeEnabled);
     evaluationMenu->setEnabled(projectModeEnabled);

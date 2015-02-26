@@ -1018,6 +1018,133 @@ QString QFRawDataRecord::evaluationResultType2String(QFRawDataRecord::evaluation
     return tr("invalid");
 }
 
+bool QFRawDataRecord::evaluationResultTypeIsNumeric(QFRawDataRecord::evaluationResultType type)
+{
+    switch(type) {
+        case qfrdreNumber:
+        case qfrdreNumberError:
+        case qfrdreNumberVector:
+        case qfrdreNumberMatrix:
+        case qfrdreNumberErrorVector:
+        case qfrdreNumberErrorMatrix:
+        case qfrdreInteger:
+        case qfrdreIntegerVector:
+        case qfrdreIntegerMatrix:
+            return true;
+        case qfrdreString:
+        case qfrdreStringVector:
+        case qfrdreStringMatrix:
+        case qfrdreBoolean:
+        case qfrdreBooleanVector:
+        case qfrdreBooleanMatrix:
+        case qfrdreInvalid:
+            return false;
+    }
+    return false;
+}
+
+bool QFRawDataRecord::evaluationResultTypeIsString(QFRawDataRecord::evaluationResultType type)
+{
+    switch(type) {
+        case qfrdreNumber:
+        case qfrdreNumberError:
+        case qfrdreNumberVector:
+        case qfrdreNumberMatrix:
+        case qfrdreNumberErrorVector:
+        case qfrdreNumberErrorMatrix:
+        case qfrdreInteger:
+        case qfrdreIntegerVector:
+        case qfrdreIntegerMatrix:
+            return false;
+        case qfrdreString:
+        case qfrdreStringVector:
+        case qfrdreStringMatrix:
+            return true;
+        case qfrdreBoolean:
+        case qfrdreBooleanVector:
+        case qfrdreBooleanMatrix:
+        case qfrdreInvalid:
+            return false;
+    }
+    return false;
+}
+
+bool QFRawDataRecord::evaluationResultTypeIsBoolean(QFRawDataRecord::evaluationResultType type)
+{
+    switch(type) {
+        case qfrdreNumber:
+        case qfrdreNumberError:
+        case qfrdreNumberVector:
+        case qfrdreNumberMatrix:
+        case qfrdreNumberErrorVector:
+        case qfrdreNumberErrorMatrix:
+        case qfrdreInteger:
+        case qfrdreIntegerVector:
+        case qfrdreIntegerMatrix:
+        case qfrdreString:
+        case qfrdreStringVector:
+        case qfrdreStringMatrix:
+            return false;
+        case qfrdreBoolean:
+        case qfrdreBooleanVector:
+        case qfrdreBooleanMatrix:
+            return true;
+        case qfrdreInvalid:
+            return false;
+    }
+    return false;
+}
+
+bool QFRawDataRecord::evaluationResultTypeIsVector(QFRawDataRecord::evaluationResultType type)
+{
+    switch(type) {
+        case qfrdreNumberVector:
+        case qfrdreNumberMatrix:
+        case qfrdreNumberErrorVector:
+        case qfrdreNumberErrorMatrix:
+        case qfrdreIntegerVector:
+        case qfrdreIntegerMatrix:
+        case qfrdreStringVector:
+        case qfrdreStringMatrix:
+        case qfrdreBooleanVector:
+        case qfrdreBooleanMatrix:
+            return true;
+        case qfrdreNumber:
+        case qfrdreNumberError:
+        case qfrdreInteger:
+        case qfrdreString:
+        case qfrdreBoolean:
+        case qfrdreInvalid:
+            return false;
+    }
+    return false;
+}
+
+bool QFRawDataRecord::evaluationResultTypeHasError(QFRawDataRecord::evaluationResultType type)
+{
+    switch(type) {
+        case qfrdreNumberError:
+        case qfrdreNumberErrorVector:
+        case qfrdreNumberErrorMatrix:
+            return true;
+        case qfrdreNumberVector:
+        case qfrdreNumberMatrix:
+        case qfrdreNumber:
+        case qfrdreIntegerVector:
+        case qfrdreIntegerMatrix:
+        case qfrdreStringVector:
+        case qfrdreStringMatrix:
+        case qfrdreBooleanVector:
+        case qfrdreBooleanMatrix:
+        case qfrdreInteger:
+        case qfrdreString:
+        case qfrdreBoolean:
+        case qfrdreInvalid:
+            return false;
+    }
+    return false;
+}
+
 
 void QFRawDataRecord::writeXML(QXmlStreamWriter& w, const QString &projectfilename, bool copyFilesToSubfolder, const QString& subfoldername, QList<QFProject::FileCopyList >* filecopylist, int writeMode) const {
     

@@ -123,8 +123,7 @@ HEADERS += ../../../../LIB/trunk/qt/jkqtpbaseplotter.h \
     qfplotter.h \
     qfplotterprivate.h \
     qfselectrdrdialog.h \
-    ../plugins/interfaces/qfrdrcolumngraphsinterface.h \
-    qfrdrtablecombobox.h \
+    qfrdrcolumngraphicscombobox.h \
     qfplottercopytotabledialog.h \
     qfmathparserxfunctionlinegraph.h \
     doubledatacutsliders.h \
@@ -226,7 +225,7 @@ SOURCES += ../../../../LIB/trunk/qt/jkqtpbaseplotter.cpp \
     qfplotter.cpp \
     qfplotterprivate.cpp \
     qfselectrdrdialog.cpp \
-    qfrdrtablecombobox.cpp \
+    qfrdrcolumngraphicscombobox.cpp \
     qfplottercopytotabledialog.cpp \
     qfmathparserxfunctionlinegraph.cpp \
     doubledatacutsliders.cpp \

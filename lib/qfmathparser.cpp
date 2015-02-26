@@ -894,9 +894,9 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                         }
                         cn->setElse(params.last());
                         res=cn;
-                    } else if (lvarname=="cumsum" || lvarname=="cumprod" || lvarname=="sum" || lvarname=="prod" || lvarname=="for" || lvarname=="savefor" || lvarname=="filterfor" || lvarname=="savefilterfor") {
+                    } else if (lvarname=="cumsum" || lvarname=="cumprod" || lvarname=="sum" || lvarname=="prod" || lvarname=="for" || lvarname=="defaultfor" || lvarname=="savefor" || lvarname=="filterfor" || lvarname=="savefilterfor") {
                         if (params.size()==1) {
-                            if (lvarname!="for"&&lvarname!="savefor") {
+                            if (lvarname!="for"&&lvarname!="savefor"&&lvarname!="defaultfor") {
                                 res=new qfmpFunctionNode(varname, params, this, NULL);
                             } else {
                                 qfmpError(QObject::tr("parsing primary: '%2(NAME, start[, delta], end, expression)' expects 3-5 arguments, but '%1' found").arg(params.size()).arg(lvarname));
@@ -905,23 +905,42 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                         } else if (params.size()==3){
                             QString iName="";
                             qfmpVariableNode* vn=dynamic_cast<qfmpVariableNode*>(params[0]);
-                            if (vn) {
-                                iName=vn->getName();
+                            if (lvarname!="defaultfor"){
+                                if (vn) {
+                                    iName=vn->getName();
+                                } else {
+                                    qfmpError(QObject::tr("parsing primary: '%1(NAME, ..., expression)' expects a variable name as first argument").arg(lvarname));
+                                    return NULL;
+                                }
+                                res=new qfmpVectorOperationNode(lvarname, iName, params[1], params[2], this, NULL);
                             } else {
-                                qfmpError(QObject::tr("parsing primary: '%1(NAME, ..., expression)' expects a variable name as first argument").arg(lvarname));
+                                qfmpError(QObject::tr("parsing primary: '%1(NAME, ..., expression, defaultValue)' expects at least 4 arguments").arg(lvarname));
                                 return NULL;
                             }
-                            res=new qfmpVectorOperationNode(lvarname, iName, params[1], params[2], this, NULL);
                         } else if (params.size()==4){
                             QString iName="";
                             qfmpVariableNode* vn=dynamic_cast<qfmpVariableNode*>(params[0]);
+                            qfmpNode* defVal=NULL;
+                            qfmpNode* start=params[1];
+                            qfmpNode* delta=params[2];
+                            qfmpNode* end=params[3];
                             if (vn) {
                                 iName=vn->getName();
                             } else {
                                 qfmpError(QObject::tr("parsing primary: '%1(NAME, ..., expression)' expects a variable name as first argument").arg(lvarname));
                                 return NULL;
                             }
-                            res=new qfmpVectorOperationNode(lvarname, iName, params[1], params[2], NULL, params[3], this, NULL);
+                            if (lvarname=="defaultfor"){
+                                //start=params[1];
+                                //end=params[2];
+                                //defVal=params[3];
+                                //delta=NULL;
+                                res=new qfmpVectorOperationNode(lvarname, iName, params[1], params[2], this, NULL, defVal);
+                            } else {
+                                res=new qfmpVectorOperationNode(lvarname, iName, params[1], params[2], NULL, params[3], this, NULL, defVal);
+                            }
+
+
                         } else if (params.size()==5){
                             QString iName="";
                             qfmpVariableNode* vn=dynamic_cast<qfmpVariableNode*>(params[0]);
@@ -931,7 +950,26 @@ QFMathParser::qfmpNode* QFMathParser::primary(bool get){
                                 qfmpError(QObject::tr("parsing primary: '%1(NAME, ..., expression)' expects a variable name as first argument").arg(lvarname));
                                 return NULL;
                             }
-                            res=new qfmpVectorOperationNode(lvarname, iName, params[1], params[3], params[2], params[4], this, NULL);
+                            if (lvarname=="defaultfor"){
+                                res=new qfmpVectorOperationNode(lvarname, iName, params[1], params[2], NULL, params[3], this, NULL, params[4]);
+                            } else {
+                                res=new qfmpVectorOperationNode(lvarname, iName, params[1], params[3], params[2], params[4], this, NULL);
+                            }
+                        } else if (params.size()==6){
+                            QString iName="";
+                            qfmpVariableNode* vn=dynamic_cast<qfmpVariableNode*>(params[0]);
+                            if (vn) {
+                                iName=vn->getName();
+                            } else {
+                                qfmpError(QObject::tr("parsing primary: '%1(NAME, ..., expression)' expects a variable name as first argument").arg(lvarname));
+                                return NULL;
+                            }
+                            if (lvarname=="defaultfor"){
+                                res=new qfmpVectorOperationNode(lvarname, iName, params[1], params[3], params[2], params[4], this, NULL, params[5]);
+                            } else {
+                                qfmpError(QObject::tr("parsing primary: '%1(NAME, ..., expression)' expects at most 5 arguments").arg(lvarname));
+                                return NULL;
+                            }
                         } else {
                             qfmpError(QObject::tr("parsing primary: '%2(NAME, start[, delta], end, expression)' expects 4 or 5 arguments and 'sum|prod|for(NAME, value_list, expression)' expects 3 arguments, but '%1' found").arg(params.size()).arg(lvarname));
                             return NULL;
@@ -3456,7 +3494,7 @@ QString QFMathParser::qfmpCasesNode::printTree(int level) const
 
 }
 
-QFMathParser::qfmpVectorOperationNode::qfmpVectorOperationNode(const QString &operationName, const QString &variableName, QFMathParser::qfmpNode *items, QFMathParser::qfmpNode *expression, QFMathParser *p, QFMathParser::qfmpNode *par):
+QFMathParser::qfmpVectorOperationNode::qfmpVectorOperationNode(const QString &operationName, const QString &variableName, QFMathParser::qfmpNode *items, QFMathParser::qfmpNode *expression, QFMathParser *p, QFMathParser::qfmpNode *par, qfmpNode *defaultValue):
     qfmpNode(p, par)
 
 {
@@ -3467,15 +3505,16 @@ QFMathParser::qfmpVectorOperationNode::qfmpVectorOperationNode(const QString &op
     this->start=NULL;
     this->end=NULL;
     this->delta=NULL;
+    this->defaultValue=defaultValue;
 }
 
-QFMathParser::qfmpVectorOperationNode::qfmpVectorOperationNode(const QString &operationName, const QString &variableName, QFMathParser::qfmpNode *start, QFMathParser::qfmpNode *end, QFMathParser::qfmpNode *delta, QFMathParser::qfmpNode *expression, QFMathParser *p, QFMathParser::qfmpNode *par):
+QFMathParser::qfmpVectorOperationNode::qfmpVectorOperationNode(const QString &operationName, const QString &variableName, QFMathParser::qfmpNode *start, QFMathParser::qfmpNode *end, QFMathParser::qfmpNode *delta, QFMathParser::qfmpNode *expression, QFMathParser *p, QFMathParser::qfmpNode *par, QFMathParser::qfmpNode *defaultValue):
     qfmpNode(p, par)
-
 {
     this->operationName=operationName.toLower();
     this->variableName=variableName;
     this->expression=expression;
+    this->defaultValue=defaultValue;
     this->items=NULL;
     this->start=start;
     this->end=end;
@@ -3484,6 +3523,7 @@ QFMathParser::qfmpVectorOperationNode::qfmpVectorOperationNode(const QString &op
 
 QFMathParser::qfmpVectorOperationNode::~qfmpVectorOperationNode()
 {
+    if (defaultValue) delete defaultValue;
     if (expression) delete expression;
     if (items) delete items;
     if (start) delete start;
@@ -3568,11 +3608,20 @@ void QFMathParser::qfmpVectorOperationNode::evaluate(qfmpResult &r)
              if (operationName=="for"||operationName=="savefor") {
                  r.setDoubleVec(QVector<double>());
                  return;
+             } else if (operationName=="defaultfor") {
+                 if (defaultValue) {
+                     defaultValue->evaluate(r);
+                 } else {
+                     r.setDoubleVec(QVector<double>());
+                 }
+                 return;
              } else {
                  r.setDouble(0.0);
                  return;
              }
          }
+         qfmpResult defr;
+
          getParser()->enterBlock();
          qfmpResult thisr;
          bool isFilterFor=((operationName=="filterfor") || (operationName=="savefilterfor"));
@@ -3626,20 +3675,46 @@ void QFMathParser::qfmpVectorOperationNode::evaluate(qfmpResult &r)
                          case qfmpStringVector:
                              resType=qfmpStringVector;
                              break;
-                         default:
                          case qfmpDouble:
                          case qfmpDoubleVector:
                              resType=qfmpDoubleVector;
+                             break;
+                         default:
+                             resType=qfmpDoubleVector;
+                             if (operationName=="defaultfor") {
+                                 defr.setInvalid();
+                                 if (defaultValue) defaultValue->evaluate(defr);
+                                 resType=defr.type;
+                             }
                              break;
                      }
 
                      //resType=thisr.type;
                  } else if ((resType==qfmpBoolVector && thisr.type!=qfmpBool && thisr.type!=qfmpBoolVector)
                             || (resType==qfmpStringVector && thisr.type!=qfmpString && thisr.type!=qfmpStringVector)
-                            || (resType==qfmpDoubleVector && thisr.type!=qfmpDouble && thisr.type!=qfmpDoubleVector)) { //(resType==qfmpString && resType!=thisr.type) || ((resType==qfmpDouble || resType==qfmpDoubleVector)&&(thisr.type!=qfmpDouble && thisr.type!=qfmpDoubleVector)) ) {
-                     if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to a compatible type in every iteration: expected compaitble with %2 (single/vector), but found %3 in iteration %4").arg(operationName).arg(thisr.toTypeString()).arg(resultTypeToString(resType)).arg(i+1));
-                     r.setInvalid();
-                     return;
+                            || (resType==qfmpDoubleVector && thisr.type!=qfmpDouble && thisr.type!=qfmpDoubleVector)) {
+                     if (operationName=="defaultfor") {
+                         defr.setInvalid();
+                         if (defaultValue) defaultValue->evaluate(defr);
+                         if (!defr.isValid) {
+                             if (getParser()) getParser()->qfmpError(QObject::tr("DEFAULT in %1(NAME, ..., EXPRESSION, DEFAULT)evaluated to invalid!").arg(operationName));
+                             r.setInvalid();
+                             return;
+                         }
+                         if ((resType==qfmpBoolVector && (defr.type==qfmpBool || defr.type==qfmpBoolVector))
+                                                     || (resType==qfmpStringVector && (defr.type==qfmpString || defr.type==qfmpStringVector))
+                                                     || (resType==qfmpDoubleVector && (defr.type==qfmpDouble || defr.type==qfmpDoubleVector))) {
+                             thisr=defr;
+                         } else {
+                             if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION, DEFAULT): DEFAULT has to evaluate to a compatible type in every iteration: expected compaitble with %3 (single/vector), but found %2 in iteration %4").arg(operationName).arg(defr.toTypeString()).arg(resultTypeToString(resType)).arg(i+1));
+                             r.setInvalid();
+                             return;
+                         }
+                     } else {
+                         if (getParser()) getParser()->qfmpError(QObject::tr("EXPRESSION in %1(NAME, ..., EXPRESSION) has to evaluate to a compatible type in every iteration: expected compaitble with %3 (single/vector), but found %2 in iteration %4").arg(operationName).arg(defr.toTypeString()).arg(resultTypeToString(resType)).arg(i+1));
+                         r.setInvalid();
+                         return;
+                     }
                  }
                  switch(resType) {
                      case qfmpDoubleVector:
@@ -3647,7 +3722,7 @@ void QFMathParser::qfmpVectorOperationNode::evaluate(qfmpResult &r)
                          else if (thisr.type==qfmpDoubleVector) numVec<<thisr.numVec;
                          break;
                      case qfmpStringVector:
-                         if (operationName=="sum" || operationName=="for" || operationName=="savefor") {
+                         if (operationName=="sum" || operationName=="for" || operationName=="savefor" || operationName=="defaultfor") {
                              if (thisr.type==qfmpString) strVec<<thisr.str;
                              else if (thisr.type==qfmpStringVector) strVec<<thisr.strVec;
                          } else  if (operationName!="savefor")  {
@@ -3657,7 +3732,7 @@ void QFMathParser::qfmpVectorOperationNode::evaluate(qfmpResult &r)
                          }
                          break;
                      case qfmpBoolVector:
-                         if (operationName=="for" || operationName=="savefor") {
+                         if (operationName=="for" || operationName=="savefor" || operationName=="defaultfor") {
                              if (thisr.type==qfmpBool) boolVec<<thisr.boolean;
                              else if (thisr.type==qfmpBoolVector) boolVec<<thisr.boolVec;
                          } else  if (operationName!="savefor")  {
@@ -3678,7 +3753,7 @@ void QFMathParser::qfmpVectorOperationNode::evaluate(qfmpResult &r)
          getParser()->leaveBlock();
 
          r.isValid=true;
-         if (operationName=="for"||operationName=="savefor"||operationName=="filterfor"||operationName=="savefilterfor") {
+         if (operationName=="for"||operationName=="savefor"||operationName=="filterfor"||operationName=="savefilterfor"||operationName=="defaultfor") {
              if (resType==qfmpDoubleVector) r.setDoubleVec(numVec);
              else if (resType==qfmpStringVector) r.setStringVec(strVec);
              else if (resType==qfmpBoolVector) r.setBoolVec(boolVec);
@@ -3801,14 +3876,17 @@ QFMathParser::qfmpNode *QFMathParser::qfmpVectorOperationNode::copy(QFMathParser
     if (items) {
         return new qfmpVectorOperationNode(operationName, variableName, items->copy(), expression->copy(), getParser(), par);
     } else {
-        if (delta) return new qfmpVectorOperationNode(operationName, variableName, start->copy(), end->copy(), delta->copy(), expression->copy(), getParser(), par);
-        else return new qfmpVectorOperationNode(operationName, variableName, start->copy(), end->copy(), NULL, expression->copy(), getParser(), par);
+        qfmpNode* def=NULL;
+        if (defaultValue) def=defaultValue->copy();
+        if (delta) return new qfmpVectorOperationNode(operationName, variableName, start->copy(), end->copy(), delta->copy(), expression->copy(), getParser(), par, def);
+        else return new qfmpVectorOperationNode(operationName, variableName, start->copy(), end->copy(), NULL, expression->copy(), getParser(), par, def);
     }
 }
 
 QString QFMathParser::qfmpVectorOperationNode::print() const
 {
     QStringList sl;
+    QString def="";
     if (items) sl<<items->print();
     else {
         if (delta) {
@@ -3820,24 +3898,30 @@ QString QFMathParser::qfmpVectorOperationNode::print() const
             sl<<end->print();
         }
     }
-    return QString("%2(%3, %1, %4)").arg(sl.join(", ")).arg(operationName).arg(variableName).arg(expression->print());
+    if (defaultValue) {
+        def=QString(", ")+defaultValue->print();
+    }
+    return QString("%2(%3, %1, %4%5)").arg(sl.join(", ")).arg(operationName).arg(variableName).arg(expression->print()).arg(def);
 }
 
 QString QFMathParser::qfmpVectorOperationNode::printTree(int level) const
 {
     QStringList sl;
-    if (items) sl<<items->print();
+    if (items) sl<<items->printTree(level+1);
     else {
         if (delta) {
-            sl<<start->print();
-            sl<<delta->print();
-            sl<<end->print();
+            sl<<start->printTree(level+1);
+            sl<<delta->printTree(level+1);
+            sl<<end->printTree(level+1);
         } else {
-            sl<<start->print();
-            sl<<end->print();
+            sl<<start->printTree(level+1);
+            sl<<end->printTree(level+1);
+        }
+        if (defaultValue) {
+            sl<<defaultValue->printTree(level+1);
         }
     }
-    return QString(2*level, QLatin1Char(' '))+QString("VectorOperationNode %2, %3\n%1\n%4)").arg(sl.join("\n")).arg(operationName).arg(variableName).arg(expression->print());
+    return QString(2*level, QLatin1Char(' '))+QString("VectorOperationNode %2, %3\n%1\n%4)").arg(sl.join("\n")).arg(operationName).arg(variableName).arg(expression->printTree(level+1));
 
 
 }

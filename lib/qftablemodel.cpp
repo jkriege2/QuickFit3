@@ -1958,6 +1958,7 @@ void QFTableModelColumnHeaderModel::setHasNone(bool hasNone)
 
 QVariant QFTableModelColumnHeaderModel::data(const QModelIndex &index, int role) const
 {
+    if (!model) return QVariant();
     int row=index.row();
     if (role==Qt::DisplayRole || role==Qt::EditRole) {
         if (hasNone) {
@@ -2185,4 +2186,118 @@ void QFTableModel::emitUndoRedoSignals(bool alwaysEmit)
 
     emit undoAvailable(ua);
     emit redoAvailable(ra);
+}
+
+
+QFTableModelEditColumnHeaderDataModel::~QFTableModelEditColumnHeaderDataModel()
+{
+
+}
+
+void QFTableModelEditColumnHeaderDataModel::setModel(QFTableModel *model)
+{
+    if (this->model) {
+        disconnect(this->model, SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(rebuildModel()));
+        disconnect(this->model, SIGNAL(layoutChanged()), this, SLOT(rebuildModel()));
+    }
+    this->model=model;
+    if (model) {
+        connect(model, SIGNAL(headerDataChanged(Qt::Orientation,int,int)), this, SLOT(rebuildModel()));
+        connect(model, SIGNAL(layoutChanged()), this, SLOT(rebuildModel()));
+    }
+    rebuildModel();
+}
+
+QVariant QFTableModelEditColumnHeaderDataModel::data(const QModelIndex &index, int role) const
+{
+    if (!model) return QVariant();
+    int row=index.row();
+    int col=index.column();
+    if (col>=0 && col<m_properties.size()) {
+        if (m_properties[col].second<0) {
+            if (role==Qt::EditRole || role==Qt::DisplayRole) return model->columnTitle(row);
+        } else {
+            if (role==Qt::EditRole || role==Qt::DisplayRole) return model->getColumnHeaderData(row, m_properties[col].second);
+        }
+    }
+    return QVariant();
+}
+
+bool QFTableModelEditColumnHeaderDataModel::setData(const QModelIndex &index, const QVariant &value, int role)
+{
+    if (!model) return false;
+    int row=index.row();
+    int col=index.column();
+    if (col>=0 && col<m_properties.size()) {
+        if (m_properties[col].second<0) {
+            if (role==Qt::EditRole || role==Qt::DisplayRole) {
+                model->setColumnTitle(row, value.toString());
+                return true;
+            }
+        } else {
+            if (role==Qt::EditRole || role==Qt::DisplayRole)  {
+                model->setColumnHeaderData(row, m_properties[col].second, value);
+                //return model->getColumnHeaderData(row, m_properties[col].second);
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+Qt::ItemFlags QFTableModelEditColumnHeaderDataModel::flags(const QModelIndex &index) const
+{
+    return Qt::ItemIsEditable|Qt::ItemIsSelectable|Qt::ItemIsEnabled;
+}
+
+QVariant QFTableModelEditColumnHeaderDataModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if (!model) return QVariant();
+    if (orientation==Qt::Horizontal) {
+        if (role==Qt::DisplayRole) {
+            if (section>=0 && section<m_properties.size()) {
+                return m_properties[section].first;
+            }
+        }
+
+    }
+    return QVariant();
+}
+
+int QFTableModelEditColumnHeaderDataModel::rowCount(const QModelIndex &parent) const
+{
+    if (model) {
+        return model->columnCount();
+    }
+    return 0;
+}
+
+int QFTableModelEditColumnHeaderDataModel::columnCount(const QModelIndex &parent) const
+{
+    return m_properties.size();
+}
+
+QFTableModelEditColumnHeaderDataModel::QFTableModelEditColumnHeaderDataModel(QFTableModel *table, QObject *parent):
+    QAbstractTableModel(parent)
+{
+    m_properties.append(qMakePair(tr("title"), int(-1)));
+    model=NULL;
+    setModel(table);
+}
+
+void QFTableModelEditColumnHeaderDataModel::addProperty(int column, const QString &name)
+{
+    m_properties.append(qMakePair(name, column));
+}
+
+void QFTableModelEditColumnHeaderDataModel::clearProperties()
+{
+    m_properties.clear();
+    rebuildModel();
+}
+
+void QFTableModelEditColumnHeaderDataModel::rebuildModel()
+{
+    beginResetModel();
+    endResetModel();
 }

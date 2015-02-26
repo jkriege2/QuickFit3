@@ -543,8 +543,10 @@ class QFRDRTable : public QFRawDataRecord, public QFRDRTableInterface, public QF
         virtual QList<QVariant> tableGetColumnData(quint32 column) const;
         virtual void tableSetColumnDataAsDouble(quint32 column, const QVector<double>& data);
         virtual QVector<double> tableGetColumnDataAsDouble(int column) const;
-        virtual bool tablesGetDoEmitSignals() const;
-        virtual void tablesSetDoEmitSignals(bool doEmit);
+        virtual bool tableGetDoEmitSignals() const;
+        virtual void tableSetDoEmitSignals(bool doEmit);
+        virtual void tableSetPreEvaluationExpression(const QString& expression);
+        virtual QString tableGetPreEvaluationExpression() const;
 
 
 

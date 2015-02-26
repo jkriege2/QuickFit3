@@ -35,6 +35,7 @@
 #include "qfenhancedtabwidget.h"
 #include "datatools.h"
 #include "qftableservice.h"
+#include "qfexporttotabledialog.h"
 
 QFRawDataPropertyEditor_private::QFRawDataPropertyEditor_private(QFRawDataPropertyEditor *parent) :
     QObject(parent)
@@ -486,6 +487,8 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     actCopyResultAccessParserFunction=new QAction( tr("Copy Result Access Parser Function rdr_getresult(...)"), d);
     menuCopyIDs->addAction(actCopyResultAccessParserFunction);;
 
+    //actCopyResultAccessParserFunctionTable=new QAction(QIcon(":/table/table_insert.png"), tr("Copy selected cells as table RDR with result access parser functions"), d);
+    //tvResults->addAction(actCopyResultAccessParserFunctionTable);
 
     tbResults->addSeparator();
     actDeleteResults=new QAction(QIcon(":/lib/delete16.png"), tr("Delete selected records"), d);
@@ -593,6 +596,7 @@ void QFRawDataPropertyEditor_private::createWidgets() {
     connect(actCopyExpandedFlipped, SIGNAL(triggered()), this, SLOT(copyResultsExpandedFlipped()));
     connect(actCopyExpandedNoHeadFlipped, SIGNAL(triggered()), this, SLOT(copyResultsExpandedNoHeadFlipped()));
     connect(actCopyExpandedNoHeadMatlabFlipped, SIGNAL(triggered()), this, SLOT(copyResultsExpandedNoHeadMatlabFlipped()));
+    //connect(actCopyResultAccessParserFunctionTable, SIGNAL(triggered()), this, SLOT(copyResultAccessParserFunctionTable()));
 
     connect(actCopyRDRID, SIGNAL(triggered()), this, SLOT(copyRDRID()));
     connect(actCopyEvaluationID, SIGNAL(triggered()), this, SLOT(copyEvaluationID()));
@@ -1990,3 +1994,5 @@ void QFRawDataPropertyEditor_private::showData()
         }
     }
 }
+
+

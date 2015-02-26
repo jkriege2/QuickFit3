@@ -47,6 +47,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QModelIndex>
 #include "lib_imexport.h"
 #include <QLinkedList>
+#include <QPointer>
 
 /*! \brief this class is used to manage a table of values (QVariant)
     \ingroup qf3lib_widgets
@@ -520,7 +521,12 @@ class QFLIB_EXPORT QFTableModel : public QAbstractTableModel {
 
 };
 
+/*! \brief helper list-model, which contains a list of the column-titles of a given QFTableModel
+    \ingroup qf3lib_widgets
 
+
+
+ */
 class QFLIB_EXPORT QFTableModelColumnHeaderModel : public QAbstractListModel {
         Q_OBJECT
     public:
@@ -542,8 +548,40 @@ class QFLIB_EXPORT QFTableModelColumnHeaderModel : public QAbstractListModel {
         void nameDeleted(int i);
         void nameAdded(int i);
     protected:
-        QFTableModel * model;
+        QPointer<QFTableModel> model;
         bool hasNone;
 };
 
+/*! \brief helper list-model, which allows to edit the column-titles and other properties of a given QFTableModel
+    \ingroup qf3lib_widgets
+
+ */
+class QFLIB_EXPORT QFTableModelEditColumnHeaderDataModel : public QAbstractTableModel {
+        Q_OBJECT
+    public:
+        /** Default constructor */
+        QFTableModelEditColumnHeaderDataModel(QFTableModel * table=NULL, QObject* parent=NULL);
+        /** Default destructor */
+        virtual ~QFTableModelEditColumnHeaderDataModel();
+
+        void setModel(QFTableModel * model);
+
+        virtual QVariant data(const QModelIndex &index, int role) const;
+        virtual bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+        virtual Qt::ItemFlags flags(const QModelIndex &index) const;
+        virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+        virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+        virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+        void addProperty(int column, const QString& name);
+        void clearProperties();
+    public slots:
+        void rebuildModel();
+
+    protected:
+        QPointer<QFTableModel> model;
+        QList<QPair<QString, int> > m_properties;
+};
+
 #endif // QFTABLEMODEL_H
+
+

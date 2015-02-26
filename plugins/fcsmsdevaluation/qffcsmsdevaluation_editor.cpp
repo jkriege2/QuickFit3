@@ -2011,7 +2011,7 @@ void QFFCSMSDEvaluationEditor::copyAverageData() {
         if (errorMessage.isEmpty() && !progress.wasCanceled()) {
             QList<QList<double> > data;
             QStringList colNames;
-            colNames<<tr("tau [s]")<<tr("avg(msd) [�m�]")<<tr("SD(msd) [�m�]");
+            colNames<<tr("tau [s]")<<tr("avg(msd) [{\\mu}m^2]")<<tr("SD(msd) [{\\mu}m^2]");
             data.append(tau);
             for (int i=0; i<sum.size(); i++) {
                 double s=sum[i];
@@ -2027,7 +2027,7 @@ void QFFCSMSDEvaluationEditor::copyAverageData() {
                 for (int i=0; i<sel.size(); i++) {
                     int run=sel[i].toInt();
                     QVector<double> d=eval->getMSD(record, run, eval->getCurrentModel());
-                    colNames<<tr("msd_run%1 [�m�]").arg(run);
+                    colNames<<tr("msd_run%1 [{\\mu}m^2]").arg(run);
                     data.append(d.toList());
                 }
             }
@@ -2037,7 +2037,7 @@ void QFFCSMSDEvaluationEditor::copyAverageData() {
                 data.append(fitTau);
             }
             if (chkCopyDofTau->isChecked()) {
-                colNames<<tr("avg(D(tauDA)) [�m�/s]")<<tr("SD(D(tauDA)) [�m�/s]");
+                colNames<<tr("avg(D(tauDA)) [{\\mu}m^2/s]")<<tr("SD(D(tauDA)) [{\\mu}m^2/s]");
                 for (int i=0; i<Dsum.size(); i++) {
                     double s=Dsum[i];
                     double s2=Dsum2[i];
@@ -2050,7 +2050,7 @@ void QFFCSMSDEvaluationEditor::copyAverageData() {
                 if (chkCopyRaw->isChecked()) {
                     for (int i=0; i<sel.size(); i++) {
                         int run=sel[i].toInt();
-                        colNames<<tr("D_run%1 [�m�/s]").arg(run);
+                        colNames<<tr("D_run%1 [{\\mu}m^2/s]").arg(run);
                         data.append(DD[i].toList());
                     }
                 }
@@ -2111,6 +2111,11 @@ void QFFCSMSDEvaluationEditor::fitAllMSD()
     delete dlg;
 
     updateDistribution();
+}
+
+void QFFCSMSDEvaluationEditor::copyRunAveragedMSD()
+{
+
 }
 
 

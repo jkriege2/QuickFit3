@@ -29,7 +29,7 @@ inline double SPIMFCS_newVeff(double a, double wxy, double wz) {
     return QF_SQRTPI*qfSqr(a)*wz/qfSqr(erf(a/wxy)+wxy/QF_SQRTPI/a*(exp(-qfSqr(a/wxy))-1.0));
 }
 
-inline double SPIMFCS_newAeff(double a, double wxy, double wz) {
+inline double SPIMFCS_newAeff(double a, double wxy) {
     return qfSqr(a)/qfSqr(erf(a/wxy)+wxy/QF_SQRTPI/a*(exp(-qfSqr(a/wxy))-1.0));
 }
 
@@ -41,7 +41,7 @@ inline double SPIMFCS_newVeffError(double a, double ea, double wxy, double ewxy,
     return 0;
 }
 
-inline double SPIMFCS_newAeffError(double a, double ea, double wxy, double ewxy, double wz, double ewz){
+inline double SPIMFCS_newAeffError(double a, double ea, double wxy, double ewxy){
     return 0;
 }
 

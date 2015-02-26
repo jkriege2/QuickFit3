@@ -30,7 +30,7 @@
 #include <QtGui>
 #endif
 
-
+#include "qfrdrimagemask.h"
 #include <QPointer>
 #include <QMap>
 #include <QSortFilterProxyModel>
@@ -193,6 +193,7 @@ class QFRawDataPropertyEditor_private : public QObject
         QAction* actCopyExpandedFlipped;
         QAction* actCopyExpandedNoHeadFlipped;
         QAction* actCopyExpandedNoHeadMatlabFlipped;
+        //QAction* actCopyResultAccessParserFunctionTable;
         QMenu* menuCopyExpanded;
 
         QMenu* menuCopyIDs;
@@ -343,6 +344,7 @@ class QFRawDataPropertyEditor_private : public QObject
         void exportData();
         void showData();
         void deleteAllVisibleResults();
+        //void copyResultAccessParserFunctionTable();
 };
 
 #endif // QFRAWDATAPROPERTYEDITOR_PRIVATE_H

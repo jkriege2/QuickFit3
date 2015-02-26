@@ -650,7 +650,7 @@ void QFFCSMaxEntEvaluationItem::doFit(QFRawDataRecord* record, int index, int mo
 
     /* IMPLEMENT THIS
 
-      Ergebnisse k�nnen einfach mit einer der setFitResult... Methoden gespeichert werden:
+      Ergebnisse koennen einfach mit einer der setFitResult... Methoden gespeichert werden:
 
         //                                          PARAMETERNAME           WERT
         setFitResultValueBool(record, index, model, "evaluation_completed", true);

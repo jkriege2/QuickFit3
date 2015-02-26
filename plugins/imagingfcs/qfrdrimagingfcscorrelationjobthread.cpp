@@ -45,7 +45,10 @@ QFRDRImagingFCSCorrelationJobThread::QFRDRImagingFCSCorrelationJobThread(QFPlugi
     duration=0;
     backgroundImage=NULL;
     backgroundImageStd=NULL;
+    bleachPercentage=NULL;
     fit_frames=NULL;
+    firstFrames=NULL;
+    lastFrames=NULL;
     fit_t=NULL;
     NFitFrames=0;
     pluginservices=services;
@@ -54,6 +57,7 @@ QFRDRImagingFCSCorrelationJobThread::QFRDRImagingFCSCorrelationJobThread(QFPlugi
 QFRDRImagingFCSCorrelationJobThread::~QFRDRImagingFCSCorrelationJobThread() {
     if (backgroundImage) qfFree(backgroundImage);
     if (backgroundImageStd) qfFree(backgroundImageStd);
+
 }
 
 double QFRDRImagingFCSCorrelationJobThread::durationMS() const {
@@ -311,7 +315,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     bleachPoly3=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
                     bleachPoly4=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
                     bleachPoly5=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
-                    bleachFitOK=(uint8_t*)qfCalloc(frame_width*frame_height, sizeof(uint8_t));
+                    bleachPercentage=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
+                    firstFrames=(float*)qfCalloc(frame_width*frame_height,sizeof(float));
                     //firstFrames=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
                     //lastFrames=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
 
@@ -353,6 +358,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     QString ccfFilenameBin="";
                     QStringList dccfFilenameBin;
                     QString bleachAmplitudeFilename="";
+                    QString bleachPercentageFilename="";
                     QString bleachTimeFilename="";
                     QString bleachAmplitude2Filename="";
                     QString bleachTime2Filename="";
@@ -506,6 +512,18 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                         }
                         emit progressIncrement(10);
 
+                        if ((m_status==1) && !was_canceled && firstFrames && lastFrames) {
+                            QString localFilename=bleachPercentageFilename=outputFilenameBase+".bleachpercentage.tif";
+                            QString error="";
+                            for (uint32_t i=0; i<frame_width*frame_height; i++) {
+                                bleachPercentage[i]=(firstFrames[i]-lastFrames[i])/(firstFrames[i])*100.0;
+                            }
+                            if (!SaveTIFFFloat(localFilename, bleachPercentage, frame_width, frame_height, tr("bleach percentage image"), &error)) {
+                                m_status=-1; emit statusChanged(m_status);
+                                bleachPercentageFilename="";
+                                emit messageChanged(error);
+                            }
+                        }
 
                         //************** SAVE BLEACHING PARAMETERS IMAGE
                         if ((m_status==1) && !was_canceled ) {
@@ -887,6 +905,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                                     }
 
                                 }
+                                text<<"bleach percentage file      : "<<d.relativeFilePath(bleachPercentageFilename) << "\n";
                                 text<<"bleach correction           : ";
                                 if (job.bleach==BLEACH_EXP) {
                                     text<<"remove mono-exponential f(t)=A*exp(-t/tau) using LM-Fit\n";
@@ -1110,6 +1129,10 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     if (bleachPoly4) qfFree(bleachPoly4);
                     if (bleachPoly5) qfFree(bleachPoly5);
                     if (bleachFitOK) qfFree(bleachFitOK);
+                    if (firstFrames) qfFree(firstFrames);
+                    firstFrames=NULL;
+                    if (lastFrames) qfFree(lastFrames);
+                    lastFrames=NULL;
                     if (average_frame) qfFree(average_frame);
                     if (sqrsum_frame) qfFree(sqrsum_frame);
                     if (acf_tau) qfFree(acf_tau);
@@ -1129,6 +1152,8 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     if (ccf2_segments) qfFree(ccf2_segments);
                     if (ccf3_segments) qfFree(ccf3_segments);
                     if (ccf4_segments) qfFree(ccf4_segments);
+                    if (bleachPercentage) qfFree(bleachPercentage);
+                    bleachPercentage=NULL;
                     for (int id=0; id<dccf.size(); id++) {
                         if (dccf[id].dccf_tau) qfFree(dccf[id].dccf_tau);
                         if (dccf[id].dccf) qfFree(dccf[id].dccf);
@@ -1769,8 +1794,6 @@ void QFRDRImagingFCSCorrelationJobThread::correlate_loadall() {
 
 
 
-    if (firstFrames) qfFree(firstFrames);
-    if (lastFrames) qfFree(lastFrames);
     if (image_series) qfFree(image_series);
     image_series=NULL;
 }

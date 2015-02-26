@@ -214,7 +214,7 @@
   <customwidget>
    <class>QFRDRColumnGraphsComboBox</class>
    <extends>QComboBox</extends>
-   <header>qfrdrtablecombobox.h</header>
+   <header>qfrdrcolumngraphicscombobox.h</header>
    <slots>
     <slot>setColumnGraphs(QFRDRColumnGraphsInterface*)</slot>
    </slots>

@@ -18,57 +18,16 @@
 */
 
 
-#ifndef QFRDRTABLECOMBOBOX_H
-#define QFRDRTABLECOMBOBOX_H
+#ifndef QFRDRCOLUMNGRAPHICSCOMBOBOX_H
+#define QFRDRCOLUMNGRAPHICSCOMBOBOX_H
 
 #include "qfrdrcombobox.h"
 #include "qfrdrcolumngraphsinterface.h"
 #include "qfrdrtableinterface.h"
 #include "libwid_imexport.h"
 #include "qfmatchrdrfunctor.h"
+#include "qfrdrtablecombobox.h"
 
-/** \brief a special QFMatchRDRFunctor which only matches records that implement QFRDRTableInterface
-  * \ingroup qf3lib_widgets
-  *
-  */
-class QFWIDLIB_EXPORT QFRDRTableComboBoxMatchFunctor: public QFMatchRDRFunctor {
-    public:
-        QFRDRTableComboBoxMatchFunctor(bool requireColumnGraphics=false, bool requireNotReadonly=false);
-        virtual bool matches(const QFRawDataRecord* record) const ;
-        void setRequireColumnGraphics(bool require);
-        void setRequireNotReadonly(bool require);
-    protected:
-        bool requireColumnGraphics;
-        bool requireNotReadonly;
-};
-
-
-
-/** \brief a special QFRDRComboBox which only displays records that implement QFRDRTableInterface
-  * \ingroup qf3lib_widgets
-  *
-  */
-class QFWIDLIB_EXPORT QFRDRTableComboBox : public QFRDRComboBox
-{
-        Q_OBJECT
-    public:
-        explicit QFRDRTableComboBox(QWidget *parent = 0);
-        virtual ~QFRDRTableComboBox();
-        virtual void init(QFProject* project);
-        QFRDRColumnGraphsInterface* currentColumnGraphics() const;
-        QFRDRTableInterface* currentTable() const;
-    signals:
-        void currentColumnGraphicsChanged(QFRDRColumnGraphsInterface* graphics);
-        void currentTableChanged(QFRDRTableInterface* table);
-
-    public slots:
-        void setRequireColumnGraphics(bool require);
-        void setRequireNotReadonly(bool require);
-    protected slots:
-        virtual void myCurrentIndexChanged(int i);
-    protected:
-        QFRDRTableComboBoxMatchFunctor* tabFunctor;
-};
 
 
 /** \brief a special QComboBox which displays all graphs available in a QFRDRColumnGraphsInterface
@@ -94,4 +53,4 @@ class QFWIDLIB_EXPORT QFRDRColumnGraphsComboBox : public QComboBox
         QFRDRColumnGraphsInterface* cols;
 };
 
-#endif // QFRDRTABLECOMBOBOX_H
+#endif // QFRDRCOLUMNGRAPHICSCOMBOBOX_H

@@ -308,7 +308,7 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
             if (extraID==0 && extractRuns && resI<lastResults.size()) { // return run column data
                 QString en=lastResults[resI].second;
                 int run=evaluation->getIndexFromEvaluationResultID(en);
-                if (role==Qt::DisplayRole || role==Qt::EditRole || role==ValueRole || (role==AvgRole) || (role==SumRole) || (role==MedianRole) || (role==ParserAccessFunction)) {
+                if (role==Qt::DisplayRole || role==Qt::EditRole || role==ValueRole || (role==AvgRole) || (role==SumRole) || (role==MedianRole)) {
                     return run;
                 } else if ((role==Qt::ToolTipRole)||(role==Qt::StatusTipRole)) {
                     return QVariant(tr("the results in this row belong to run %1").arg(run));
@@ -333,6 +333,16 @@ QVariant QFEvaluationResultsModel::data(const QModelIndex &index, int role) cons
                     QString propname=displayProperties.value(propID, "");
                     if (record && !propname.isEmpty()) {
                         return QString("rdr_getproperty(%1, \"%2\")").arg(record->getID()).arg(propname);
+                    }
+                } else if (resI==lastResults.size()) {
+                    return QVariant();
+                }
+            } else if (role==RDRPropertyRole) {
+                if (resI<lastResults.size()) {
+                    QFRawDataRecord* record=lastResults[resI].first;
+                    QString propname=displayProperties.value(propID, "");
+                    if (record && !propname.isEmpty()) {
+                        return propname;
                     }
                 } else if (resI==lastResults.size()) {
                     return QVariant();

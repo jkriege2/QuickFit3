@@ -200,6 +200,8 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
     p->addFunction("var", QFMathParser_DefaultLib::fVar);
     p->addFunction("median", QFMathParser_DefaultLib::fMedian);
     p->addFunction("quantile", QFMathParser_DefaultLib::fQuantile);
+    p->addFunction("quantile25", QFMathParser_DefaultLib::fQuantile25);
+    p->addFunction("quantile75", QFMathParser_DefaultLib::fQuantile75);
     p->addFunction("remove", QFMathParser_DefaultLib::fRemove);
     p->addFunction("removeall", QFMathParser_DefaultLib::fRemoveAll);
     p->addFunction("shuffle", QFMathParser_DefaultLib::fShuffle);
@@ -270,6 +272,9 @@ void QFMathParser_DefaultLib::addDefaultFunctions(QFMathParser* p)
 
     p->addFunction("last", QFMathParser_DefaultLib::fLast);
     p->addFunction("first", QFMathParser_DefaultLib::fFirst);
+    p->addFunction("lastinvector", QFMathParser_DefaultLib::fLastInVector);
+    p->addFunction("firstinvector", QFMathParser_DefaultLib::fFirstInVector);
+    p->addFunction("itemorfirst", QFMathParser_DefaultLib::fItemOrFirst);
     p->addFunction("returnlast", QFMathParser_DefaultLib::fReturnLast);
     p->addFunction("returnnth", QFMathParser_DefaultLib::fReturnNth);
     p->addFunction("returnfirst", QFMathParser_DefaultLib::fReturnFirst);
@@ -2406,6 +2411,81 @@ namespace QFMathParser_DefaultLib {
         return res;
     }
 
+
+    qfmpResult fItemOrFirst(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=2) {
+            p->qfmpError("itemorfirst(x, idx) needs two argument");
+            return res;
+        }
+        QVector<int> idx=params[1].asIntVector();
+        bool isNumber=true;
+        QVector<bool> idxb=params[1].asBoolVector();
+        if (idx.size()<=0 && idxb.size()>0) {
+            isNumber=false;
+            if (idxb.size()!=params[0].length()) {
+                idxb.clear();
+                idx.clear();
+                isNumber=true;
+            }
+        }
+        if (!isNumber) {
+            idx.clear();
+            for (int i=0; i<idxb.size(); i++) {
+                if (idxb[i]) idx<<i;
+            }
+        }
+
+        if (params[0].type==qfmpDouble && (idx.contains(0)||idx.isEmpty())) return qfmpResult(params[0].num);
+        if (params[0].type==qfmpBool && (idx.contains(0)||idx.isEmpty())) return qfmpResult(params[0].boolean);
+        if (params[0].type==qfmpString && (idx.contains(0)||idx.isEmpty())) return qfmpResult(params[0].str);
+
+        if (params[0].type==qfmpStringVector) {
+            QStringList r;
+            for (int i=0; i<idx.size(); i++) {
+                if (i>=0 && i<params[0].strVec.size()) {
+                    r<<params[0].strVec[idx[i]];
+                } else {
+                    if (params[0].strVec.size()<=0) return qfmpResult::invalidResult();
+                    return qfmpResult(params[0].strVec.value(0, ""));
+                }
+            }
+            if (r.size()==1) return qfmpResult(r[0]);
+            return qfmpResult(r);
+        }
+        if (params[0].type==qfmpBoolVector) {
+            QVector<bool> r;
+            for (int i=0; i<idx.size(); i++) {
+                if (i>=0 && i<params[0].boolVec.size()) {
+                    r<<params[0].boolVec[idx[i]];
+                } else {
+                    if (params[0].boolVec.size()<=0) return qfmpResult::invalidResult();
+                    return qfmpResult(params[0].boolVec.value(0, false));
+                }
+            }
+            if (r.size()==1) return qfmpResult(r[0]);
+            return qfmpResult(r);
+        }
+        if (params[0].type==qfmpDoubleVector) {
+            QVector<double> r;
+            for (int i=0; i<idx.size(); i++) {
+                if (i>=0 && i<params[0].numVec.size()) {
+                    r<<params[0].numVec[idx[i]];
+                } else {
+                    if (params[0].numVec.size()<=0) return qfmpResult::invalidResult();
+                    return qfmpResult(params[0].numVec.value(0, 0));
+                }
+            }
+            if (r.size()==1) return qfmpResult(r[0]);
+            return qfmpResult(r);
+        }
+
+
+
+        p->qfmpError("itemorfirst(x, idx): x had no entries or unrecognized type");
+        return res;
+    }
     qfmpResult fRunningAverage(const qfmpResult *params, unsigned int n, QFMathParser *p)
     {
         qfmpResult res=qfmpResult::invalidResult();
@@ -4118,6 +4198,49 @@ namespace QFMathParser_DefaultLib {
 
 
 
+    qfmpResult fLastInVector(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=1) {
+            p->qfmpError("lastinvector(x) needs one argument");
+            return res;
+        }
+        if (params[0].type==qfmpDouble) return qfmpResult(params[0].num);
+        if (params[0].type==qfmpDoubleVector && params[0].length()>0) return qfmpResult(params[0].numVec.last());
+        if (params[0].type==qfmpBool) return qfmpResult(params[0].boolean);
+        if (params[0].type==qfmpBoolVector && params[0].length()>0) return qfmpResult(params[0].boolVec.last());
+        if (params[0].type==qfmpString) return qfmpResult(params[0].str);
+        if (params[0].type==qfmpStringVector && params[0].length()>0) return qfmpResult(params[0].strVec.last());
+
+        p->qfmpError("lastinvector(x): x had no entries or unrecognized type");
+        return res;
+    }
+
+
+    qfmpResult fFirstInVector(const qfmpResult* params, unsigned int  n, QFMathParser* p) {
+        qfmpResult res=qfmpResult::invalidResult();
+
+        if (n!=1) {
+            p->qfmpError("firstinvector(x) needs one argument");
+            return res;
+        }
+        if (params[0].type==qfmpDouble) return qfmpResult(params[0].num);
+        if (params[0].type==qfmpDoubleVector && params[0].length()>0) return qfmpResult(params[0].numVec.first());
+        if (params[0].type==qfmpBool) return qfmpResult(params[0].boolean);
+        if (params[0].type==qfmpBoolVector && params[0].length()>0) return qfmpResult(params[0].boolVec.first());
+        if (params[0].type==qfmpString) return qfmpResult(params[0].str);
+        if (params[0].type==qfmpStringVector && params[0].length()>0) return qfmpResult(params[0].strVec.first());
+
+        p->qfmpError("firstinvector(x): x had no entries or unrecognized type");
+        return res;
+    }
+
+
+
+
+
+
+
 
 
 
@@ -5097,7 +5220,8 @@ namespace QFMathParser_DefaultLib {
             if (n==1 && params[0].type==qfmpDouble) {
                 evalID=params[0].toInteger();
                 QFRDRRunSelectionsInterface* rdr=dynamic_cast<QFRDRRunSelectionsInterface*>(p->getRawDataByID(evalID));
-                res.setBoolean(rdr);
+                QFRDRImageMaskInterface* rdr1=dynamic_cast<QFRDRImageMaskInterface*>(p->getRawDataByID(evalID));
+                res.setBoolean(rdr||rdr1);
             } else {
                 parser->qfmpError(QObject::tr("rdr_isrunexclude(rdrid) needs one integer arguments"));
                 res.setInvalid();
@@ -5117,7 +5241,14 @@ namespace QFMathParser_DefaultLib {
                 if (rdr) {
                     res.setDouble(rdr->leaveoutGetRunCount());
                 } else {
+                    QFRDRImageMaskInterface* rdr=dynamic_cast<QFRDRImageMaskInterface*>(p->getRawDataByID(evalID));
                     res.setDouble(0);
+                    if (rdr) {
+                        const bool* mask=rdr->maskGet();
+                        int w=rdr->maskGetWidth();
+                        int h=rdr->maskGetHeight();
+                        res.setDouble(w*h);
+                    }
                 }
             } else {
                 parser->qfmpError(QObject::tr("runex_runs(rdrid) needs one integer argument"));
@@ -5128,6 +5259,7 @@ namespace QFMathParser_DefaultLib {
     };
     void fRDR_runex_isexcluded(qfmpResult &res, const qfmpResult *params, unsigned int n, QFMathParser *parser) {
         res.setInvalid();
+        res.setBoolean(false);
         QFProject* p=QFPluginServices::getInstance()->getCurrentProject();
         if (p)  {
             int evalID=-1;
@@ -5137,6 +5269,14 @@ namespace QFMathParser_DefaultLib {
                 QFRDRRunSelectionsInterface* rdr=dynamic_cast<QFRDRRunSelectionsInterface*>(p->getRawDataByID(evalID));
                 if (rdr) {
                     res.setBoolean(rdr->leaveoutRun(run));
+                } else {
+                    QFRDRImageMaskInterface* rdr=dynamic_cast<QFRDRImageMaskInterface*>(p->getRawDataByID(evalID));
+                    if (rdr) {
+                        const bool* mask=rdr->maskGet();
+                        int w=rdr->maskGetWidth();
+                        int h=rdr->maskGetHeight();
+                        res.setBoolean(!mask[run]);
+                    }
                 }
             } else {
                 parser->qfmpError(QObject::tr("runex_isexcluded(rdrid, run) needs one integer argument"));
@@ -5159,7 +5299,16 @@ namespace QFMathParser_DefaultLib {
                         if (rdr->leaveoutRun(i)) res.numVec<<i;
                     }
                 } else {
-                    res.setDoubleVec();
+                    QFRDRImageMaskInterface* rdr=dynamic_cast<QFRDRImageMaskInterface*>(p->getRawDataByID(evalID));
+                    if (rdr) {
+                        const bool* mask=rdr->maskGet();
+                        int w=rdr->maskGetWidth();
+                        int h=rdr->maskGetHeight();
+                        res.setDoubleVec();
+                        for (int i=0; i<w*h; i++) {
+                            if (mask[i]) res.numVec<<i;
+                        }
+                    }
                 }
             } else {
                 parser->qfmpError(QObject::tr("runex_included(rdrid) needs one integer argument"));
@@ -5183,6 +5332,16 @@ namespace QFMathParser_DefaultLib {
                     }
                 } else {
                     res.setDoubleVec();
+                    QFRDRImageMaskInterface* rdr=dynamic_cast<QFRDRImageMaskInterface*>(p->getRawDataByID(evalID));
+                    if (rdr) {
+                        const bool* mask=rdr->maskGet();
+                        int w=rdr->maskGetWidth();
+                        int h=rdr->maskGetHeight();
+                        res.setDoubleVec();
+                        for (int i=0; i<w*h; i++) {
+                            if (!mask[i]) res.numVec<<i;
+                        }
+                    }
                 }
             } else {
                 parser->qfmpError(QObject::tr("runex_included(rdrid) needs one integer argument"));
@@ -5205,7 +5364,12 @@ namespace QFMathParser_DefaultLib {
                         res.boolVec[i]=rdr->leaveoutRun(i);
                     }
                 } else {
-                    res.setBoolVec();
+                    QFRDRImageMaskInterface* rdrm=dynamic_cast<QFRDRImageMaskInterface*>(p->getRawDataByID(evalID));
+                    if (rdrm) {
+                        res.setBoolVec(rdrm->maskGet(), rdrm->maskGetWidth()*rdrm->maskGetHeight());
+                    } else {
+                        res.setBoolVec();
+                    }
                 }
             } else {
                 parser->qfmpError(QObject::tr("runex_mask(rdrid) needs one integer argument"));

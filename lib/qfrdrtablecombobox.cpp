@@ -1,7 +1,7 @@
 /*
 Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 
-    last modification: $LastChangedDate$  (revision $Rev$)
+    last modification: $LastChangedDate: 2014-09-26 12:42:55 +0200 (Fr, 26 Sep 2014) $  (revision $Rev: 3509 $)
 
     This file is part of QuickFit 3 (http://www.dkfz.de/Macromol/quickfit).
 
@@ -112,55 +112,3 @@ void QFRDRTableComboBox::myCurrentIndexChanged(int i)
     emit currentTableChanged(currentTable());
 
 }
-
-QFRDRColumnGraphsComboBox::QFRDRColumnGraphsComboBox(QWidget *parent):
-    QComboBox(parent)
-{
-    cols=NULL;
-    connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(myCurrentIndexChanged(int)));
-}
-
-QFRDRColumnGraphsComboBox::~QFRDRColumnGraphsComboBox()
-{
-}
-
-QFRDRColumnGraphsInterface *QFRDRColumnGraphsComboBox::currentColumnGraphics() const
-{
-    return cols;
-}
-
-void QFRDRColumnGraphsComboBox::setColumnGraphs(QFRDRColumnGraphsInterface *cols)
-{
-    this->cols=cols;
-    refill();
-}
-
-void QFRDRColumnGraphsComboBox::refill()
-{
-    QString current=currentText();
-
-    setUpdatesEnabled(false);
-    disconnect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(myCurrentIndexChanged(int)));
-
-    clear();
-    if (cols) {
-        for (int i=0; i<cols->colgraphGetPlotCount(); i++) {
-            addItem(cols->colgraphGetPlotTitle(i));
-        }
-    }
-
-    setUpdatesEnabled(true);
-
-    int idx=findText(current);
-    if (idx>=0) setCurrentIndex(idx);
-    else setCurrentIndex(0);
-    connect(this, SIGNAL(currentIndexChanged(int)), this, SLOT(myCurrentIndexChanged(int)));
-    if (count()<=0) emit refilledEmpty();
-    emit refilled(count()>0);
-}
-
-void QFRDRColumnGraphsComboBox::myCurrentIndexChanged(int i)
-{
-    //qDebug()<<"myCurrentIndexChanged(index="<<i<<")";
-}
-

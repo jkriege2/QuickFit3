@@ -58,10 +58,13 @@ QFFitFunctionsSPIMFCSDiffC::QFFitFunctionsSPIMFCSDiffC() {
     #define FCSSDiff_pixel_width 11
     addParameter(FloatNumber,  "focus_volume",            "focus: effective volume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
     #define FCSSDiff_focus_volume 12
+    addParameter(FloatNumber,  "effective_area",            "focus: effective area",                               "A<sub>eff</sub>",          "micron^2",         "&mu;m<sup>2</sup>",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+     #define FCSSDiff_focus_area 13
+
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCSSDiff_count_rate 13
+    #define FCSSDiff_count_rate 14
     addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
-    #define FCSSDiff_background 14
+    #define FCSSDiff_background 15
 
 }
 
@@ -250,6 +253,11 @@ void QFFitFunctionsSPIMFCSDiffC::calcParameter(double* data, double* error) cons
     // calculate Veff = 2 * a^2 * sigmaz
     data[FCSSDiff_focus_volume]=2.0*a*a*sigmaz;
     if (error) error[FCSSDiff_focus_volume]=sqrt(sqr(esigmaz*2.0*a*a)+sqr(ea*4.0*a*sigmaz));
+
+    // calculate Aeff =  a^2
+    data[FCSSDiff_focus_area]=a*a;
+    if (error) error[FCSSDiff_focus_area]=sqrt(sqr(ea*2.0*a));
+
 
 
 }

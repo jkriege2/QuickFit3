@@ -72,6 +72,7 @@ class QFLIB_EXPORT QFEvaluationResultsModel : public QAbstractTableModel {
             Quantile75Role=Qt::UserRole+12, /**< same as AvgRole, but returns the 75% quantile  */
             MaskModeRole=Qt::UserRole+13, /**< -1: none, 0: QFRDRRunSelectionsInterface, 1: QFRDRImageMaskInterface  */
             ParserAccessFunction=Qt::UserRole+14, /**< returns an expression parser access function  */
+            RDRPropertyRole=Qt::UserRole+15, /**< name of the RDR property displayed in this row  */
         };
 
 

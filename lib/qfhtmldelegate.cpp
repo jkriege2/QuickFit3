@@ -32,7 +32,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QTime>
 #include <QDate>
 #include <QDateTime>
-
+#include <QPlainTextEdit>
 QFHTMLDelegate::QFHTMLDelegate(QObject* parent):
     QStyledItemDelegate(parent)
 {
@@ -266,7 +266,8 @@ void QFHTMLDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option
         QColor textcol=option.palette.text().color();
         if (fc.isValid()) textcol=fc.value<QColor>();
         painter->setPen(textcol);
-        int flags=Qt::AlignLeft|Qt::AlignVCenter|Qt::TextSingleLine;
+        int flags=Qt::AlignLeft|Qt::AlignVCenter;
+        if (multiline_edits.contains(index.column())) flags = flags|Qt::TextSingleLine;
         if (option.textElideMode==Qt::ElideNone) {
             painter->drawText(r, flags, text);
         } else {
@@ -294,6 +295,12 @@ QSize QFHTMLDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelI
         QTextDocument doc;
         doc.setHtml(data.toString());
         return doc.size().toSize();
+    } else if (multiline_edits.contains(index.column()) && !text.isEmpty()){
+        QVariant fv=index.data(Qt::FontRole);
+        QFont f=option.font;
+        if (fv.isValid()) f=fv.value<QFont>();
+        QFontMetrics fm(f);
+        return fm.size(0, text);
     } else if (!text.isEmpty()){
         QVariant fv=index.data(Qt::FontRole);
         QFont f=option.font;
@@ -310,8 +317,11 @@ QSize QFHTMLDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelI
 
 QWidget *QFHTMLDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     QVariant data=index.data(Qt::DisplayRole).toString();
+
     if (m_displayRichTextEditor&&(data.type()==QVariant::String)) {
         return new QTextEdit(parent);
+    } else if (multiline_edits.contains(index.column()) && (data.type()==QVariant::String)) {
+        return new QPlainTextEdit(parent);
     }
     return QStyledItemDelegate::createEditor(parent, option, index);
 }
@@ -322,21 +332,30 @@ void QFHTMLDelegate::setEditorData(QWidget *editor, const QModelIndex &index) co
         QTextEdit *te=static_cast<QTextEdit*>(editor);
         te->setHtml(data.toString());
         return;
+    } else if (multiline_edits.contains(index.column()) && (data.type()==QVariant::String)) {
+        QPlainTextEdit *tp=static_cast<QPlainTextEdit*>(editor);
+        tp->setPlainText(data.toString());
+        return;
     }
     QStyledItemDelegate::setEditorData(editor, index);
 }
 
 void QFHTMLDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const {
     QTextEdit *te=qobject_cast<QTextEdit*>(editor);
+    QPlainTextEdit *tp=static_cast<QPlainTextEdit*>(editor);
     if (m_displayRichTextEditor&&te) {
         model->setData(index, te->toHtml());
         return ;
+    } else if (multiline_edits.contains(index.column()) && tp) {
+        model->setData(index, tp->toPlainText());
+        return;
     }
     QStyledItemDelegate::setModelData(editor, model, index);
 }
 
 void QFHTMLDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const {
     QTextEdit *te=qobject_cast<QTextEdit*>(editor);
+    QPlainTextEdit *tp=static_cast<QPlainTextEdit*>(editor);
     QVariant check=index.data(Qt::CheckStateRole);
     QPoint offset=QPoint(0,0);
     if (check.isValid()) {
@@ -345,6 +364,19 @@ void QFHTMLDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionVie
     if (m_displayRichTextEditor&&te) {
         editor->setGeometry(QRect(offset+option.rect.topLeft(), QSize(option.rect.width()-offset.x(), option.rect.height())));
         return;
+    } else if (multiline_edits.contains(index.column()) && tp) {
+        editor->setGeometry(QRect(offset+option.rect.topLeft(), QSize(option.rect.width()-offset.x(), option.rect.height())));
+        return;
     }
     QStyledItemDelegate::updateEditorGeometry(editor, option, index);
+}
+
+void QFHTMLDelegate::clearMultilineEditColumns()
+{
+    multiline_edits.clear();
+}
+
+void QFHTMLDelegate::addMultilineEditColumn(int col)
+{
+    multiline_edits.insert(col);
 }

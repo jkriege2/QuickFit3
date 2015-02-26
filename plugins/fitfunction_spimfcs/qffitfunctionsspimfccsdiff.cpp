@@ -61,7 +61,9 @@ QFFitFunctionsSPIMFCCSDiff::QFFitFunctionsSPIMFCCSDiff() {
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
     #define FCCSDiff_cpm 14
 
-}
+    addParameter(FloatNumber,  "effective_area",            "focus: effective area",                               "A<sub>eff</sub>",          "micron^2",         "&mu;m<sup>2</sup>",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define FCSSDiff_focus_area 15
+ }
 
 double QFFitFunctionsSPIMFCCSDiff::evaluate(double t, const double* data) const {
     const double N=data[FCCSDiff_n_particle];
@@ -150,6 +152,10 @@ void QFFitFunctionsSPIMFCCSDiff::calcParameter(double* data, double* error) cons
     // calculate Veff = 2 * a^2 * sigmaz
     data[FCCSDiff_focus_volume]=2.0*a*a*sigmaz;
     if (error) error[FCCSDiff_focus_volume]=sqrt(sqr(esigmaz*2.0*a*a)+sqr(ea*4.0*a*sigmaz));
+
+    // calculate Aeff =  a^2
+    data[FCSSDiff_focus_area]=a*a;
+    if (error) error[FCSSDiff_focus_area]=sqrt(sqr(ea*2.0*a));
 
     // calculate C = N / Veff
     if (data[FCCSDiff_focus_volume]!=0) data[FCCSDiff_concentration]=N/data[FCCSDiff_focus_volume]/(NAVOGADRO * 1.0e-24); else data[FCCSDiff_concentration]=0;

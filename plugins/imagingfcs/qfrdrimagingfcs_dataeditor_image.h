@@ -291,6 +291,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         void copyToMatlab();
         /** \brief copy the shown images as columns of values */
         void copyDataAsColumns();
+        /** \brief create FCS diffusion law plots */
+        void getFCSDiffusionLawPlot();
 
         /** \brief copy image data into datastores of the image plots, so they can be copied to other applications. */
         void setCopyableData();
@@ -475,6 +477,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QAction* actSetBackgroundFromMasked;
         QAction* actPostProcessBinning;
         QAction* actSetBackgroundFromMaskedInAll;
+        QAction* actGetFCSDiffusionLawPlot;
 
         /** \brief combobox to select a result group */
         QComboBox* cmbResultGroup;

@@ -71,14 +71,16 @@ QFFitFunctionsSPIMFCCSDiffFlowCENewVeff2Global::QFFitFunctionsSPIMFCCSDiffFlowCE
     #define FCCSDiff_pixel_width 17
     addParameter(FloatNumber,  "focus_volume",            "focus: effective volume",                               "V<sub>eff</sub>",          "fl",         "fl",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
     #define FCCSDiff_focus_volume 18
+    addParameter(FloatNumber,  "effective_area",            "focus: effective area",                               "A<sub>eff</sub>",          "micron^2",         "&mu;m<sup>2</sup>",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
+    #define FCSSDiff_focus_area 19
     addParameter(FloatNumber,  "concentration",           "particle concentration in focus",                       "C<sub>all</sub>",          "nM",         "nM",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0.5,          0,        1e50,     1    );
-    #define FCCSDiff_concentration 19
+    #define FCCSDiff_concentration 20
     addParameter(FloatNumber,  "count_rate",              "count rate during measurement",                         "count rate",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError,    false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_count_rate 20
+    #define FCCSDiff_count_rate 21
     addParameter(FloatNumber,  "background",              "background count rate during measurement",              "background",               "Hz",         "Hz",                     false,    true,         false,              QFFitFunction::EditError  ,  false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_background 21
+    #define FCCSDiff_background 22
     addParameter(FloatNumber,  "cpm",                     "photon counts per molecule",                            "cnt/molec",                "Hz",         "Hz",                     false,    false,        false,              QFFitFunction::DisplayError, false, 0,            0,        1e50,     1    );
-    #define FCCSDiff_cpm 22
+    #define FCCSDiff_cpm 23
 
 }
 
@@ -110,7 +112,7 @@ double QFFitFunctionsSPIMFCCSDiffFlowCENewVeff2Global::evaluate(double t, const 
     double cfac=r1*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, dx-vx*t, dy-vy*t, 0, D1, t, wxy, wxy, wz, wz)+
                 r2*QFFitFunctionsSPIMFCCSFWDiff2ColorCCF_corrfactor(a, 0, 0, 0, D2, t, wxy, wxy, wz, wz);
 
-    const double Veff=SPIMFCS_newAeff(a, wxy, wz);
+    const double Veff=SPIMFCS_newVeff(a, wxy, wz);
     const double pre=1.0/sqr(a);
     return offset+pre/(N/Veff)*cfac*backfactor;
 }
@@ -201,8 +203,13 @@ void QFFitFunctionsSPIMFCCSDiffFlowCENewVeff2Global::calcParameter(double* data,
     if (error) error[FCCSDiff_1n_particle]=fabs(eN/N/N);
 
     // calculate Veff
-    data[FCCSDiff_focus_volume]=SPIMFCS_newAeff(a, wxy, wz);;
-    if (error) error[FCCSDiff_focus_volume]=SPIMFCS_newAeffError(a, ea, wxy, ewxy, wz, ewz);
+    data[FCCSDiff_focus_volume]=SPIMFCS_newVeff(a, wxy, wz);;
+    if (error) error[FCCSDiff_focus_volume]=SPIMFCS_newVeffError(a, ea, wxy, ewxy, wz, ewz);
+
+    // calculate Aeff
+    data[FCSSDiff_focus_area]=SPIMFCS_newAeff(a, wxy);
+    if (error) error[FCSSDiff_focus_area]=SPIMFCS_newAeffError(a, ea, wxy, ewxy);
+
 
     // calculate C = N / Veff
     if (data[FCCSDiff_focus_volume]!=0) {

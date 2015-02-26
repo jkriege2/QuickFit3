@@ -1,5 +1,5 @@
 /*
-    Copyright (c) 2008-2014 Nikolas Schnellbächer &
+    Copyright (c) 2008-2014 Nikolas Schnellbï¿½cher &
                             Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
     German Cancer Research Center/University Heidelberg
 
@@ -44,6 +44,9 @@
 #include "qmodernprogresswidget.h"
 #include "qffitfunctionmanager.h"
 #include "qffitalgorithmmanager.h"
+#include "qfselectionlistdialog.h"
+#include "csvtools.h"
+#include "datatools.h"
 ////////////
 
 
@@ -388,6 +391,12 @@ void QFFCSMaxEntEvaluationEditor::createWidgets() {
     pltOverview->setMaskEditable(true);
     pltOverview->setSelectionEditable(true);
     tabResidulas->addTab(pltOverview, tr("Overview Image"));
+
+    actCopyAverageData=new QAction(QIcon(":/copy.png"), tr("&copy runs-average of MaxEnt distributions"), this);
+    connect(actCopyAverageData, SIGNAL(triggered()), this, SLOT(copyAverageData()));
+    menuResults->addSeparator();
+    menuResults->addAction(actCopyAverageData);
+
 
     menuTools=propertyEditor->addOrFindMenu("&Tools", 0);
     menuTools->addAction(actOverlayPlot);
@@ -1531,6 +1540,132 @@ void QFFCSMaxEntEvaluationEditor::sumRangesChanged()
         if (dataEventsEnabled) displayData();
 
     }
+}
+
+void QFFCSMaxEntEvaluationEditor::copyAverageData()
+{
+    if (!current) return;
+    QFRawDataRecord* record=current->getHighlightedRecord();
+    QFFCSMaxEntEvaluationItem* eval=qobject_cast<QFFCSMaxEntEvaluationItem*>(current);
+    QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+    QFRDRRunSelectionsInterface* rundata=qobject_cast<QFRDRRunSelectionsInterface*>(record);
+    if ((!eval)||(!record)||(!data)) return;
+
+    QStringList resultLabels;
+    QList<QVariant> resultNames;
+    QList<QColor> resultColors;
+    QList<bool> selected;
+
+    int runstart=0;
+    int runend=data->getCorrelationRuns();
+    if (data->getCorrelationRuns()==1) { runstart=-1; runend=0; }
+    for (int run=runstart; run<runend; run++) {
+        QString evalID=eval->getEvaluationResultID(run, eval->getCurrentModel());
+        if (record->resultsExists(evalID, "maxent_distribution") && record->resultsExists(evalID, "maxent_tau")) {
+            resultLabels.append(tr("run %1").arg(run));
+            resultNames.append(run);
+            if (!rundata || (rundata && !rundata->leaveoutRun(run))) {
+                selected<<true;
+                resultColors<<palette().color(QPalette::WindowText);
+            } else {
+                selected<<false;
+                resultColors<<QColor("grey");
+            }
+        }
+    }
+
+    QFSelectionListDialog* dlg=new QFSelectionListDialog(this);
+    dlg->init(resultLabels, resultNames, resultColors, *(ProgramOptions::getInstance()->getQSettings()), "fcsmaxentevaleditor/copysel/");
+    dlg->setLabel(tr("Select the runs you want to average over (gray runs are excluded!)\nand then below the averaging options!"));
+    dlg->selectItems(selected);
+
+    QCheckBox* chkCopyRaw=new QCheckBox("", dlg);
+    chkCopyRaw->setChecked(ProgramOptions::getInstance()->getQSettings()->value("fcsmaxentevaleditor/copysel/copyRaw", false).toBool());
+    chkCopyRaw->setToolTip(tr("if this is activated, all the single run's data, used for the average and standard deviation will also be copied."));
+    dlg->addWidget(tr("copy also single runs' data:"), chkCopyRaw);
+
+    dlg->setWindowTitle(tr("Copy averaged MaxEnt data"));
+
+    if (dlg->exec()) {
+        ProgramOptions::getInstance()->getQSettings()->setValue("fcsmaxentevaleditor/copysel/copyRaw", chkCopyRaw->isChecked());
+        dlg->writeList(*(ProgramOptions::getInstance()->getQSettings()), "fcsmaxentevaleditor/copysel/");
+
+        QProgressDialog progress;
+        progress.show();
+        QList<QVariant> sel=dlg->getSelected();
+        QList<double> tau, sum, sum2, Ds;
+        double Ncnt=0;
+        QString errorMessage="";
+        progress.setRange(0, sel.size());
+        for (int i=0; i<sel.size(); i++) {
+            progress.setLabelText(tr("processing MSD data for copying ... run %1/%2").arg(i+1).arg(sel.size()));
+            progress.setValue(i);
+            QApplication::processEvents();
+            Ncnt++;
+            int run=sel[i].toInt();
+            QString evalID=eval->getEvaluationResultID(run, eval->getCurrentModel());
+            QVector<double> t=eval->getDistributionTaus(record, run, eval->getCurrentModel());
+            QVector<double> d=eval->getDistributionDs(record, run, eval->getCurrentModel());
+            QVector<double> mem=eval->getDistribution(record, run, eval->getCurrentModel());
+
+            if (i==0) {
+                sum=mem.toList();
+                tau=t.toList();
+                Ds=d.toList();
+                for (int c=0; c<mem.size(); c++) {
+                    sum2.append(mem[c]*mem[c]);
+                }
+            } else {
+                if (tau.size()!=mem.size() || sum.size()!=mem.size() || sum2.size()!=mem.size()) {
+                    errorMessage=tr("Can not average over runs: MaxEnt was calculated for run %1 with a different tau-scale!").arg(run);
+                } else {
+                    for (int c=0; c<mem.size(); c++) {
+                        if (tau[c] != t[c]) {
+                            errorMessage=tr("Can not average over runs: MaxEnt was calculated for run %1 with a different tau-scale!").arg(run);
+                        } else {
+                            sum[c]=sum[c]+mem[c];
+                            sum2[c]=sum2[c]+mem[c]*mem[c];
+                        }
+                    }
+                }
+            }
+            if (!errorMessage.isEmpty()) break;
+            if (progress.wasCanceled()) break;
+        }
+        if (errorMessage.isEmpty() && !progress.wasCanceled()) {
+            QList<QList<double> > data;
+            QStringList colNames;
+            colNames<<tr("tau [s]")<<tr("D [{\\mu}m^2/s]")<<tr("avg(MaxEnt)")<<tr("SD(MaxEnt)");
+            data.append(tau);
+            data.append(Ds);
+            for (int i=0; i<sum.size(); i++) {
+                double s=sum[i];
+                double s2=sum2[i];
+                sum[i]=s/Ncnt;
+                if (Ncnt>=2) sum2[i]=sqrt((s2-s*s/Ncnt)/(Ncnt-1.0));
+                else sum2[i]=0;
+            }
+            data.append(sum);
+            data.append(sum2);
+
+            if (chkCopyRaw->isChecked()) {
+                for (int i=0; i<sel.size(); i++) {
+                    int run=sel[i].toInt();
+                    QVector<double> d=eval->getDistribution(record, run, eval->getCurrentModel());
+                    colNames<<tr("maxent_run%1").arg(run);
+                    data.append(d.toList());
+                }
+            }
+
+
+
+            csvCopy(data, colNames);
+        } else {
+            QMessageBox::critical(this, tr("copy averaged MaxEnt data"), tr("ERROR:\n%1").arg(errorMessage), QMessageBox::Ok, QMessageBox::Ok);
+        }
+
+    }
+    delete dlg;
 }
 
 void QFFCSMaxEntEvaluationEditor::chkShowDChanged() {

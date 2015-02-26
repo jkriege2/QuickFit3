@@ -289,6 +289,6 @@ class QFRDRColumnGraphsInterface {
 };
 
 Q_DECLARE_INTERFACE( QFRDRColumnGraphsInterface,
-                     "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRColumnGraphsInterface/1.0")
+                     "www.dkfz.de.b040.quickfit3.QFRDRColumnGraphsInterface/1.0")
 
 #endif // QFRDRCOLUMNGRAPHINTERFACE_H

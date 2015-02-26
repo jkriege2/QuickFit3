@@ -1,7 +1,7 @@
 /*
-    Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
+    Copyright (c) 2008-201f Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>), German Cancer Research Center (DKFZ) & IWR, University of Heidelberg
 
-    last modification: $LastChangedDate$  (revision $Rev$)
+    last modification: $LastChangedDate: 2014-09-26 12:42:55 +0200 (Fr, 26 Sep 2014) $  (revision $Rev: 3509 $)
 
     This software is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,48 +18,39 @@
 */
 
 
-#ifndef QFPLOTTERCOPYTOTABLEDIALOG_H
-#define QFPLOTTERCOPYTOTABLEDIALOG_H
+#ifndef QFExportToTableDialog_H
+#define QFExportToTableDialog_H
 
 #include <QDialog>
 #include "qfrdrtableinterface.h"
-#include "qfrdrcolumngraphsinterface.h"
 #include "qfrawdatarecord.h"
-#include "libwid_imexport.h"
-#include "qfrdrtablecombobox.h"
+#include "lib_imexport.h"
 
 namespace Ui {
-    class QFPlotterCopyToTableDialog;
+    class QFExportToTableDialog;
 }
 
-class QFWIDLIB_EXPORT QFPlotterCopyToTableDialog : public QDialog
+class QFLIB_EXPORT QFExportToTableDialog : public QDialog
 {
         Q_OBJECT
         
     public:
-        explicit QFPlotterCopyToTableDialog(QWidget *parent = 0);
-        ~QFPlotterCopyToTableDialog();
+        explicit QFExportToTableDialog(QWidget *parent = 0);
+        ~QFExportToTableDialog();
 
         QFRDRTableInterface* getTable() const;
         QFRawDataRecord* getRDR() const;
-        QFRDRColumnGraphsInterface* getGraph() const;
-        int getGraphID() const;
-        bool getNewGraph(QString& name) const;
         bool getNewTable(QString& name) const;
-        bool getAddGraphs() const;
         bool getShowEditor() const;
         void setDescription(const QString& text);
-        bool copyOnlyPlotData() const;
         QString getPrefix();
         void addWidget(const QString& label, QWidget* wid);
 
     protected slots:
         void on_cmbRDR_refilled(bool full);
-        void on_cmbGraph_refilled(bool full);
         void on_chkNewTable_toggled(bool checked);
-        void on_chCreateNewGraph_toggled(bool checked);
     private:
-        Ui::QFPlotterCopyToTableDialog *ui;
+        Ui::QFExportToTableDialog *ui;
 };
 
-#endif // QFPLOTTERCOPYTOTABLEDIALOG_H
+#endif // QFExportToTableDialog_H

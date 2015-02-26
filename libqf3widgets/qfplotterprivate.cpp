@@ -99,8 +99,8 @@ void QFPlotterPrivate::copyToTable()
         bool ok=true;
         QMap<int, int> columns;
         if (tab) {
-            bool emitSigT=tab->tablesGetDoEmitSignals();
-            tab->tablesSetDoEmitSignals(false);
+            bool emitSigT=tab->tableGetDoEmitSignals();
+            tab->tableSetDoEmitSignals(false);
 
             JKQTPdatastore* ds=plotter->getDatastore();
             JKQtBasePlotter* p=plotter->get_plotter();
@@ -135,7 +135,7 @@ void QFPlotterPrivate::copyToTable()
                     idx++;
                 }
             }
-            tab->tablesSetDoEmitSignals(emitSigT);
+            tab->tableSetDoEmitSignals(emitSigT);
         } else {
             QMessageBox::critical(plotter, tr("Add data to table"), tr("No table selected or could not create table!\nCould not add data!"));
             ok=false;
