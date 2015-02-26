@@ -315,6 +315,7 @@ void QFRDRImagingFCSCorrelationJobThread::run() {
                     bleachPoly3=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
                     bleachPoly4=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
                     bleachPoly5=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
+                    bleachFitOK=(uint8_t*)qfCalloc(frame_width*frame_height, sizeof(uint8_t));
                     bleachPercentage=(float*)qfCalloc(frame_width*frame_height, sizeof(float));
                     firstFrames=(float*)qfCalloc(frame_width*frame_height,sizeof(float));
                     //firstFrames=(float*)qfCalloc(frame_width*frame_height, sizeof(float));

@@ -52,28 +52,34 @@ void QFRDRImagingFCSDiffusionLawDialog::init(const QList<QFRDRImagingFCSData *> 
         QString lab=fp[j].first;
         QString rn=fp[j].second;
         QString en=fp[j].third;
-        fpProp prop;
-        prop.label=lab;
-        prop.resultname=rn;
-        prop.evalname=en;
+        if (!rn.startsWith("fix_") && !rn.endsWith("_islocal")) {
 
-        if (rn.toLower().endsWith("efective_area")) { p1=j; hasAEff=true; prop.isAeff=true; }
-        if (rn.toLower().endsWith("effective_area")) { p1=j; hasAEff=true; prop.isAeff=true; }
-        if (rn.toLower().endsWith("focus_width") && p1<0 && !hasAEff) { p1=j; prop.isWxy=true; }
-        if (rn.toLower().endsWith("pixel_size") && p1<0) { p1=j; prop.isPixSize=true; }
-        if (rn.toLower().endsWith("pixel_width") && p1<0) { p1=j; prop.isPixSize=true; }
-        if (rn.toLower().endsWith("focus_distance_x") && p1<0) { p1=j; prop.isPixSize=true; }
-        if (rn.toLower().endsWith("focus_distance_y") && p1<0) { p1=j; prop.isPixSize=true; }
-        if (rn.toLower().endsWith("focus_distance") && p1<0) { p1=j; prop.isPixSize=true; }
+            fpProp prop;
+            prop.label=lab;
+            prop.resultname=rn;
+            prop.evalname=en;
 
-        if (rn.toLower().endsWith("diff_coeff1") && p1<0) { p2=j; prop.isD=true; }
-        if (rn.toLower().endsWith("msd_time_aeff1")) { p2=j; prop.isTau=true; }
-        if (rn.toLower().endsWith("msd_time_aeff2")) { p2=j; prop.isTau=true; }
-        if (rn.toLower().endsWith("msd_time_aeff3")) { p2=j; prop.isTau=true; }
-        if (rn.toLower().endsWith("diff_tau1")) { p2=j; prop.isTau=true; }
-        fitparams.append(prop);
-        ui->cmbParameter1->addItem(lab);
-        ui->cmbParameter2->addItem(lab);
+            if (rn.toLower().endsWith("efective_area")) { p1=j; hasAEff=true; prop.isAeff=true; }
+            if (rn.toLower().endsWith("effective_area")) { p1=j; hasAEff=true; prop.isAeff=true; }
+            if (rn.toLower().endsWith("focus_width") && p1<0 && !hasAEff) { p1=j; prop.isWxy=true; }
+            if (rn.toLower().endsWith("pixel_size") && p1<0) { p1=j; prop.isPixSize=true; }
+            if (rn.toLower().endsWith("pixel_width") && p1<0) { p1=j; prop.isPixSize=true; }
+            if (rn.toLower().endsWith("focus_distance_x") && p1<0) { p1=j; prop.isPixSize=true; }
+            if (rn.toLower().endsWith("focus_distance_y") && p1<0) { p1=j; prop.isPixSize=true; }
+            if (rn.toLower().endsWith("focus_distance") && p1<0) { p1=j; prop.isPixSize=true; }
+
+            if (rn.toLower().endsWith("msd_time_aeff1") && p2<0) { p2=j; prop.isTau=true; }
+            if (rn.toLower().endsWith("msd_time_aeff2") && p2<0) { p2=j; prop.isTau=true; }
+            if (rn.toLower().endsWith("msd_time_aeff3") && p2<0) { p2=j; prop.isTau=true; }
+            if (rn.toLower().endsWith("diff_tau1")) { p2=j; prop.isTau=true; }
+            if (rn.toLower().endsWith("diff_tau2") && p2<0) { p2=j; prop.isTau=true; }
+            if (rn.toLower().endsWith("diff_coeff1")) { p2=j; prop.isD=true; }
+            if (rn.toLower().endsWith("diff_coeff2") && p2<0) { p2=j; prop.isD=true; }
+
+            fitparams.append(prop);
+            ui->cmbParameter1->addItem(lab);
+            ui->cmbParameter2->addItem(lab);
+        }
     }
 
     ui->cmbParameter1->setCurrentIndex(p1);
@@ -111,14 +117,11 @@ void QFRDRImagingFCSDiffusionLawDialog::paramChanged()
          */
         if (fitparams[p1].isAeff && fitparams[p2].isTau) {
             ui->cmbMode->setCurrentIndex(0);
-        }
-        if (fitparams[p1].isAeff && fitparams[p2].isD) {
+        } else if (fitparams[p1].isAeff && fitparams[p2].isD) {
             ui->cmbMode->setCurrentIndex(1);
-        }
-        if ((fitparams[p1].isWxy ||fitparams[p1].isPixSize)  && fitparams[p2].isD) {
+        } else if ((fitparams[p1].isWxy || fitparams[p1].isPixSize)  && fitparams[p2].isD) {
             ui->cmbMode->setCurrentIndex(2);
-        }
-        if ((fitparams[p1].isWxy ||fitparams[p1].isPixSize)  && fitparams[p2].isTau) {
+        } else if ((fitparams[p1].isWxy ||fitparams[p1].isPixSize)  && fitparams[p2].isTau) {
             ui->cmbMode->setCurrentIndex(3);
         }
     }
@@ -176,20 +179,31 @@ void QFRDRImagingFCSDiffusionLawDialog::recalcPlot()
                     if (sel.value(i, false) && (!mask2 || !mask2[i]) && i<vp2.size()) {
                         d2<<vp2[i];
                     }
+                }
 
+                if (d1.size()>0 && d2.size()>0) {
                     /*  simple (tau vs. Aeff)</string>
-                        D vs. Aeff
-                        D vs. Wx
-                        tauD vs. Wxy
-                     */
+                    Aeff/D vs. Aeff
+                    Wxy^2/D vs. Wxy^2
+                    tauD vs. Wxy^2
+                 */
                     if (ui->cmbMode->currentIndex()==0) {
 
                     } else if (ui->cmbMode->currentIndex()==1) {
-
+                        for (int i=0; i<d1.size(); i++) {
+                            d1[i]=d1[i]/d2[i];
+                        }
                     } else if (ui->cmbMode->currentIndex()==2) {
-
+                        for (int i=0; i<d1.size(); i++) {
+                            d1[i]=qfSqr(d1[i])/d2[i];
+                        }
+                        for (int i=0; i<d2.size(); i++) {
+                            d1[i]=qfSqr(d1[i]);
+                        }
                     } else if (ui->cmbMode->currentIndex()==3) {
-
+                        for (int i=0; i<d2.size(); i++) {
+                            d1[i]=qfSqr(d1[i]);
+                        }
                     }
                     double stdv=0;
                     X<<qfstatisticsAverageStd(stdv, d1);
@@ -210,8 +224,8 @@ void QFRDRImagingFCSDiffusionLawDialog::recalcPlot()
             int cY=ui->plotter->getDatastore()->addCopiedColumn(Y, QString("mean(%1)").arg(ui->cmbParameter2->currentText()));
             int cYerr=ui->plotter->getDatastore()->addCopiedColumn(Yerr, QString("std(%1)").arg(ui->cmbParameter2->currentText()));
 
-            ui->plotter->getXAxis()->set_logAxis(true);
-            ui->plotter->getYAxis()->set_logAxis(true);
+            ui->plotter->getXAxis()->set_logAxis(false);
+            ui->plotter->getYAxis()->set_logAxis(false);
 
             if (ui->cmbMode->currentIndex()==0) {
                 ui->plotter->getXAxis()->set_axisLabel(QString("\\verb{%1} [%2]").arg(ui->cmbParameter1->currentText()).arg(unit1));
@@ -235,26 +249,39 @@ void QFRDRImagingFCSDiffusionLawDialog::recalcPlot()
             g->set_errorColor(g->get_color().darker());
             g->set_drawLine(false);
             g->set_symbol(JKQTPplus);
-            g->set_xErrorStyle(JKQTPerrorSimpleBarsLines);
-            g->set_yErrorStyle(JKQTPerrorSimpleBarsLines);
+            g->set_xErrorStyle(JKQTPerrorSimpleBars);
+            g->set_yErrorStyle(JKQTPerrorSimpleBars);
             g->set_xColumn(cX);
             g->set_xErrorColumn(cXerr);
             g->set_yColumn(cY);
             g->set_yErrorColumn(cYerr);
             ui->plotter->addGraph(g);
 
-            double a=0, b=0;
-            statisticsLinearWeightedRegression(X.data(), Y.data(), W.data(), X.size(), a, b);
-            JKQTPxFunctionLineGraph* gfit=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
-            gfit->set_title(tr("fit: $f(x) = %1 + %2 \\cdot x$").arg(doubleToLatexQString(a, 4, false)).arg(doubleToLatexQString(b, 4, false)));
-            gfit->set_params(constructQVectorFromItems(a, b));
-            gfit->setSpecialFunction(JKQTPxFunctionLineGraph::Line);
-            gfit->set_color(QColor("blue"));
-            ui->plotter->addGraph(gfit);
+            {
+                double a=0, b=0;
+                statisticsLinearRegression(X.data(), Y.data(), X.size(), a, b);
+                JKQTPxFunctionLineGraph* gfit=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
+                gfit->set_title(tr("fit: $f(x) = %1 + %2 \\cdot x$").arg(doubleToLatexQString(a, 4, false)).arg(doubleToLatexQString(b, 4, false)));
+                gfit->set_params(constructQVectorFromItems(a, b));
+                gfit->setSpecialFunction(JKQTPxFunctionLineGraph::Line);
+                gfit->set_color(QColor("blue"));
+                ui->plotter->addGraph(gfit);
+            }
+            {
+                double a=0, b=0;
+                statisticsLinearWeightedRegression(X.data(), Y.data(), W.data(), X.size(), a, b);
+                JKQTPxFunctionLineGraph* gfit=new JKQTPxFunctionLineGraph(ui->plotter->get_plotter());
+                gfit->set_title(tr("weighted fit: $f(x) = %1 + %2 \\cdot x$").arg(doubleToLatexQString(a, 4, false)).arg(doubleToLatexQString(b, 4, false)));
+                gfit->set_params(constructQVectorFromItems(a, b));
+                gfit->setSpecialFunction(JKQTPxFunctionLineGraph::Line);
+                gfit->set_color(QColor("darkgreen"));
+                ui->plotter->addGraph(gfit);
+            }
 
 
             ui->plotter->zoomToFit();
             ui->plotter->set_doDrawing(draw);
+            ui->plotter->update_plot();
         }
     }
 }

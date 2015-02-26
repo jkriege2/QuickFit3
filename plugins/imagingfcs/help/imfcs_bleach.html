@@ -51,7 +51,11 @@
 	$$qf_commondoc_backtop$$
     <p></p>
     <p></p>
-    <p></p>
+    <h2>Percentage Bleached</h2>
+    <p>The correlator also calcuates the fraction of intensity, that was lost by bleaching. For this it calculates the averages over the first and last few frames $(I_{start}(x,y))$ and $(I_{end}(x,y))$ in each pixel $((x,y))$. Then for each pixel, the bleach percentage is calculated as
+        $[ 100\%\cdot\frac{I_{start}(x,y)-I_{end}(x,y)}{I_{start}(x,y)}}} ]$
+       The image of this quantity is saved as a file <tt>[...].bleachpercentage.tif</tt> with the other results of the correlator and can be displayed in the "Images, Videos" tab of the imagingFCS correlation editor.
+</p>
 	
 	
 	<a name="#references"><h2>References:</h2><blockquote>
