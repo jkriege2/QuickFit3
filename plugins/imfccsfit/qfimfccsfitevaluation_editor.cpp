@@ -161,9 +161,10 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->btnEvaluateCurrentAllRuns->addAction(actFitAllPixelsMT);
     menuEvaluation->addAction(actFitAllPixelsMT);
 
-    actFitAllPixelsMTExp=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels (MT, experimental)"), this);
+    actFitAllPixelsMTExp=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels (new MT)"), this);
     connect(actFitAllPixelsMTExp, SIGNAL(triggered()), this, SLOT(fitAllPixelsThreadedWriter()));
     ui->btnEvaluateCurrentAllRuns->addAction(actFitAllPixelsMTExp);
+    ui->btnEvaluateCurrentAllRuns->setDefaultAction(actFitAllPixelsMTExp);
     menuEvaluation->addAction(actFitAllPixelsMTExp);
 
     actFitAllPixels=new QAction(QIcon(":/imfccsfit/fit_fitallruns.png"), tr("Fit &All Pixels"), this);
@@ -180,9 +181,10 @@ QFImFCCSFitEvaluationEditor::QFImFCCSFitEvaluationEditor(QFPluginServices* servi
     ui->btnFitAllFilesetsAllPixels->setDefaultAction(actFitAllFilesetsAllPixels);
     menuEvaluation->addAction(actFitAllFilesetsAllPixels);
 
-    actFitAllFilesetsAllPixelsMTExp=new QAction(QIcon(":/imfccsfit/fit_fitall.png"), tr("Fit All Filesets + Pixels (MT, experimental)"), this);
+    actFitAllFilesetsAllPixelsMTExp=new QAction(QIcon(":/imfccsfit/fit_fitall.png"), tr("Fit All Filesets + Pixels (new MT)"), this);
     connect(actFitAllFilesetsAllPixelsMTExp, SIGNAL(triggered()), this, SLOT(fitAllFilesetsAllPixelsThreadedWriter()));
     ui->btnFitAllFilesetsAllPixels->addAction(actFitAllFilesetsAllPixelsMTExp);
+    ui->btnFitAllFilesetsAllPixels->setDefaultAction(actFitAllFilesetsAllPixelsMTExp);
     menuEvaluation->addAction(actFitAllFilesetsAllPixelsMTExp);
 
     actResetCurrent=new QAction(tr("&Reset Current"), this);

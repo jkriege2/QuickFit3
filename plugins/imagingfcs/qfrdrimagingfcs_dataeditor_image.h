@@ -65,6 +65,7 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "datatools.h"
 
 class QFRDRImagingFCSData; // forward
+class QFRDRImagingFCSDiffusionLawDialog;//forward
 
 
 /*! \brief editor for FCS fit parameter images, created from QFRDRImagingFCSData
@@ -85,6 +86,9 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         QFRDRImagingFCSImageEditor(QFPluginServices* services, QFRawDataPropertyEditor* propEditor, QWidget* parent);
         /** Default destructor */
         virtual ~QFRDRImagingFCSImageEditor();
+
+    signals:
+        void selectionChanged(QVector<bool> selection, int width, int height);
     protected:
         enum ImageTransforms {
             itNone=0,
@@ -292,7 +296,7 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
         /** \brief copy the shown images as columns of values */
         void copyDataAsColumns();
         /** \brief create FCS diffusion law plots */
-        void getFCSDiffusionLawPlot();
+        void startFCSDiffusionLawPlot();
 
         /** \brief copy image data into datastores of the image plots, so they can be copied to other applications. */
         void setCopyableData();
@@ -724,6 +728,8 @@ class QFRDRImagingFCSImageEditor : public QFRawDataEditor {//FRawDataImageEditor
 
         QStringList param1Default;
         QStringList param2Default;
+
+        QPointer<QFRDRImagingFCSDiffusionLawDialog> dlgFCSDiffLaw;
 };
 
 #endif // QFRDRIMAGINGFCSEDITORIMAGE_H

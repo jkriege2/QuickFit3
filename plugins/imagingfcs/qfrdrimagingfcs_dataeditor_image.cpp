@@ -54,6 +54,7 @@
 QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* services, QFRawDataPropertyEditor *propEditor, QWidget *parent):
     QFRawDataEditor(services, propEditor, parent)
 {
+    qRegisterMetaType<QVector<bool> >("QVector<bool>");
     //lastMaskDir=ProgramOptions::getInstance()->getHomeQFDirectory();
     param1Default<<"fitparam_diff_coeff";
     param1Default<<"fitparam_diff_coeff1";
@@ -105,7 +106,7 @@ QFRDRImagingFCSImageEditor::QFRDRImagingFCSImageEditor(QFPluginServices* service
     createWidgets();
     //QTimer::singleShot(500, this, SLOT(debugInfo()));
     connect(timUpdateAfterClick, SIGNAL(timeout()), this, SLOT(updateAfterClick()));
-    connect(correlationMaskTools, SIGNAL(rawDataChanged()), this, SLOT(maskChanged()));
+    connect(correlationMaskTools, SIGNAL(maskChanged()), this, SLOT(maskChanged()));
 }
 
 QFRDRImagingFCSImageEditor::~QFRDRImagingFCSImageEditor()
@@ -115,6 +116,10 @@ QFRDRImagingFCSImageEditor::~QFRDRImagingFCSImageEditor()
     if (plteOverviewExcludedData) qfFree(plteOverviewExcludedData);
     plteOverviewExcludedData=NULL;
     QFFitFunctionManager::freeModels(m_fitFunctions);
+    if (dlgFCSDiffLaw)  {
+        dlgFCSDiffLaw->close();
+        dlgFCSDiffLaw->deleteLater();
+    }
 
 }
 
@@ -1268,7 +1273,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     connect(actCopyPixelAvgCFFromAll, SIGNAL(triggered()), this, SLOT(copySelAvgCFFromAll()));
 
     actGetFCSDiffusionLawPlot=new QAction(tr("calculate FCS diffusion law-typed plots"), this);
-    connect(actGetFCSDiffusionLawPlot, SIGNAL(triggered()), this, SLOT(getFCSDiffusionLawPlot()));
+    connect(actGetFCSDiffusionLawPlot, SIGNAL(triggered()), this, SLOT(startFCSDiffusionLawPlot()));
 
 
 
@@ -2639,6 +2644,7 @@ void QFRDRImagingFCSImageEditor::connectWidgets(QFRawDataRecord* current, QFRawD
         selected.clear();
     }
     updateSelectionCombobox();
+    if (dlgFCSDiffLaw) startFCSDiffusionLawPlot();
     loadImageSettings();
     fillParameterSet();
     reactOnRedrawCalls=true;
@@ -3365,6 +3371,7 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
         plteMask->set_data(NULL, 1, 1);
         plteMaskSelected->set_data(NULL, 1, 1);
         labImageAvg->clear();
+        emit selectionChanged(QVector<bool>(), 0, 0);
     } else {
         double w=m->getImageFromRunsWidth();
         double h=m->getImageFromRunsHeight();
@@ -3378,10 +3385,14 @@ void QFRDRImagingFCSImageEditor::replotSelection(bool replot) {
         double ovrVar2=0;
         bool *msk=(bool*)qfCalloc(w*h, sizeof(bool));
         int cnt=0;
+        QVector<bool> selVec;
         for (int i=0; i<w*h; i++) {
             msk[i]=plteOverviewSelectedData[i]&&(!plteOverviewExcludedData[i]);
             if (msk[i]) cnt++;
+            selVec<<plteOverviewSelectedData[i];
         }
+
+        emit selectionChanged(selVec, w, h);
 
 
         if (m->isFCCS()) {
@@ -4547,6 +4558,7 @@ void QFRDRImagingFCSImageEditor::parameterSetChanged(bool replot) {
     }
     //qDebug()<<"parameterSetChanged ... done   cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
     parameterChanged(replot);
+    if (dlgFCSDiffLaw) startFCSDiffusionLawPlot();
     if (replot) replotData();
     //updateHistogram();
     //qDebug()<<"parameterSetChanged ... done   cmbResultGroup->isEnabled="<<cmbResultGroup->isEnabled()<<"  cmbResultGroup->currentIndex="<<cmbResultGroup->currentIndex()<<"  cmbResultGroup->count="<<cmbResultGroup->count();
@@ -6130,44 +6142,33 @@ void QFRDRImagingFCSImageEditor::copyDataAsColumns() {
 
 }
 
-void QFRDRImagingFCSImageEditor::getFCSDiffusionLawPlot()
+void QFRDRImagingFCSImageEditor::startFCSDiffusionLawPlot()
 {
     QFRDRImagingFCSData* m=qobject_cast<QFRDRImagingFCSData*>(current);
 
     if (m) {
-        QList<QFRawDataRecord*> recs=current->getProject()->getRDRGroupMembers(current->getGroup());
-        QList<QFRDRImagingFCSData*> recsFCS;
-        QString role=current->getRole();
-        bool hasFCCS=false;
-        bool hasDCCF=false;
-        for (int i=0; i<recs.size(); i++) {
-            QFRDRImagingFCSData* m1=qobject_cast<QFRDRImagingFCSData*>(recs[i]);
-            if(!m1) {
-                //recs.removeAt(i);
-            } else {
-                if (m1->isFCCS()) hasFCCS=true;
-                if (m1->isDCCF()) hasDCCF=true;
-                recsFCS<<m1;
-            }
+
+        if (!dlgFCSDiffLaw) {
+            dlgFCSDiffLaw=new QFRDRImagingFCSDiffusionLawDialog(NULL);
+            connect(this, SIGNAL(selectionChanged(QVector<bool>,int,int)), dlgFCSDiffLaw, SLOT(setSelection(QVector<bool>,int,int)));
+            connect(correlationMaskTools, SIGNAL(maskChanged()), dlgFCSDiffLaw, SLOT(recalcPlot()));
         }
-        QFRDRImagingFCSDiffusionLawDialog* dlg=new QFRDRImagingFCSDiffusionLawDialog(this);
 
-        dlg->init(recsFCS, currentEvalGroup());
 
+        dlgFCSDiffLaw->init(m, currentEvalGroup());
         int w=m->getImageFromRunsWidth();
         int h=m->getImageFromRunsHeight();
         QVector<bool> selImg(w*h,false);
         for (int i=0; i<w*h; i++) {
             selImg[i]=selected.contains(i);
         }
-        dlg->setSelection(selImg.constData(), w, h);
+        dlgFCSDiffLaw->setSelection(selImg.constData(), w, h);
 
 
 
-        if (dlg->exec()) {
+        dlgFCSDiffLaw->show();
+        dlgFCSDiffLaw->raise();
 
-        }
-        delete dlg;
     }
 }
 

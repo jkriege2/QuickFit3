@@ -1204,7 +1204,7 @@ void FRawDataImageEditor::createWidgets()
 
     if (!correlationMaskTools) {
         correlationMaskTools=new QFRDRImageMaskEditTools(this);
-        connect(correlationMaskTools, SIGNAL(rawDataChanged()), this, SLOT(maskChanged()));
+        connect(correlationMaskTools, SIGNAL(maskChanged()), this, SLOT(maskChanged()));
     }
 
     setUpdatesEnabled(false);

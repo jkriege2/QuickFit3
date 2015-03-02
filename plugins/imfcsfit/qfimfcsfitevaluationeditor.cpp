@@ -53,16 +53,16 @@ QFImFCSFitEvaluationEditor::QFImFCSFitEvaluationEditor(QFPluginServices *service
     createWidgets();
     btnFirstRun->setText(tr("avg."));
 
-    actFitAllFilesThreadedWriter=new QAction(QIcon(":/fcsfit/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files (this %1, MT, experimental)").arg(m_runName), this);
-    actFitAllFilesThreadedWriter->setToolTip(tr("multi-threaded: perform a fit for all files, but fit in each file only the currently displayed %1").arg(m_runName));
+    actFitAllFilesThreadedWriter=new QAction(QIcon(":/fcsfit/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files this %1 (newMT)").arg(m_runName), this);
+    actFitAllFilesThreadedWriter->setToolTip(tr("fast multi-threaded: perform a fit for all files, but fit in each file only the currently displayed %1").arg(m_runName));
     connect (actFitAllFilesThreadedWriter, SIGNAL(triggered()), this, SLOT(fitAllFilesThreadedWriter()));
 
-    actFitAllThreadedWriter=new QAction(QIcon(":/imfcsfit/fit_fitall.png"), tr("Fit Everything (MT, experimental)"), this);
-    actFitAllThreadedWriter->setToolTip(tr("multi-threaded: perform a fit for all files, and all %1s therein (everything)").arg(m_runName));
+    actFitAllThreadedWriter=new QAction(QIcon(":/imfcsfit/fit_fitall.png"), tr("Fit Everything (newMT)"), this);
+    actFitAllThreadedWriter->setToolTip(tr("fast multi-threaded: perform a fit for all files, and all %1s therein (everything)").arg(m_runName));
     connect (actFitAllThreadedWriter, SIGNAL(triggered()), this, SLOT(fitEverythingThreadedWriter()));
 
-    actFitAllRunsThreadedWriter=new QAction(QIcon(":/imfcsfit/fit_fitallruns.png"), tr("Fit All %1s (MT, experimental)").arg(m_runName), this);
-    actFitAllRunsThreadedWriter->setToolTip(tr("multi-threaded: perform a fit for all %1s, in the current file").arg(m_runName));
+    actFitAllRunsThreadedWriter=new QAction(QIcon(":/imfcsfit/fit_fitallruns.png"), tr("Fit All %1s, this file (newMT)").arg(m_runName), this);
+    actFitAllRunsThreadedWriter->setToolTip(tr("fast multi-threaded: perform a fit for all %1s, in the current file").arg(m_runName));
     connect (actFitAllRunsThreadedWriter, SIGNAL(triggered()), this, SLOT(fitAllRunsThreadedWriter()));
 
     populateFitButtons();
@@ -991,9 +991,13 @@ void QFImFCSFitEvaluationEditor::populateFitButtons(bool mulThreadEnabledInModel
     btnFitAll->addAction(actFitAllFilesThreadedWriter);
     btnFitRunsAll->addAction(actFitAllThreadedWriter);
     btnFitRunsCurrent->addAction(actFitAllRunsThreadedWriter);
+
+    btnFitAll->setDefaultAction(actFitAllFilesThreadedWriter);
+    btnFitRunsAll->setDefaultAction(actFitAllThreadedWriter);
+    btnFitRunsCurrent->setDefaultAction(actFitAllRunsThreadedWriter);
+
+
 }
-
-
 
 
 

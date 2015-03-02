@@ -121,7 +121,7 @@ QFRDRFCSCorrelationEditor::~QFRDRFCSCorrelationEditor()
 
 void QFRDRFCSCorrelationEditor::createWidgets() {
     correlationMaskTools=new QFCorrelationMaskTools(this);
-    connect(correlationMaskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChangedRecalc()));
+    connect(correlationMaskTools, SIGNAL(maskChanged()), this, SLOT(rawDataChangedRecalc()));
 
     QVBoxLayout* l=new QVBoxLayout();
     setLayout(l);

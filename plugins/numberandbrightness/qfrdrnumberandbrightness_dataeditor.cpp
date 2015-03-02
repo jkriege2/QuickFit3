@@ -483,7 +483,7 @@ void QFRDRNumberAndBrightnessDataEditor::connectAllWidgets(bool enabled) {
         connect(chkApparentProps, SIGNAL(toggled(bool)), this, SLOT(rawDataChanged()));
 
 
-        connect(maskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
+        connect(maskTools, SIGNAL(maskChanged()), this, SLOT(rawDataChanged()));
         connect(chkRangeN, SIGNAL(toggled(bool)), this, SLOT(updateCorrSelection()));
         connect(edtCorrNMin, SIGNAL(valueChanged(double)), this, SLOT(updateCorrSelection()));
         connect(edtCorrNMax, SIGNAL(valueChanged(double)), this, SLOT(updateCorrSelection()));
@@ -510,7 +510,7 @@ void QFRDRNumberAndBrightnessDataEditor::connectAllWidgets(bool enabled) {
         disconnect(chkAutoOvr, SIGNAL(toggled(bool)), this, SLOT(replotData()));
         disconnect(chkApparentProps, SIGNAL(toggled(bool)), this, SLOT(rawDataChanged()));
 
-        disconnect(maskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
+        disconnect(maskTools, SIGNAL(maskChanged()), this, SLOT(rawDataChanged()));
         disconnect(chkRangeN, SIGNAL(toggled(bool)), this, SLOT(updateCorrSelection()));
         disconnect(edtCorrNMin, SIGNAL(valueChanged(double)), this, SLOT(updateCorrSelection()));
         disconnect(edtCorrNMax, SIGNAL(valueChanged(double)), this, SLOT(updateCorrSelection()));
@@ -630,6 +630,7 @@ void QFRDRNumberAndBrightnessDataEditor::connectWidgets(QFRawDataRecord* current
         }
         // if so (and if current!=NULL anyways), connect to the new record and read some data
         connectAllWidgets(true);
+        connect(current, SIGNAL(rawDataChanged()), this, SLOT(rawDataChanged()));
 
         loadPlotSettings();
         replotData();

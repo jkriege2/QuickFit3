@@ -184,7 +184,7 @@ QFRDRImageToRunPreview::QFRDRImageToRunPreview(QWidget *parent) :
     setMaskEditable(false);
 
     setRunSelectWidgetActive(false);
-    connect(maskEditTools, SIGNAL(rawDataChanged()), this, SLOT(replotOverview()));
+    connect(maskEditTools, SIGNAL(maskChanged()), this, SLOT(replotOverview()));
 }
 
 QFRDRImageToRunPreview::~QFRDRImageToRunPreview()

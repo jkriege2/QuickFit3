@@ -75,7 +75,7 @@ QFRDRImagingFCSDataEditor::~QFRDRImagingFCSDataEditor()
 void QFRDRImagingFCSDataEditor::createWidgets() {
 
     correlationMaskTools=new QFCorrelationMaskTools(this);
-    connect(correlationMaskTools, SIGNAL(rawDataChanged()), this, SLOT(rawDataChangedRecalc()));
+    connect(correlationMaskTools, SIGNAL(maskChanged()), this, SLOT(rawDataChangedRecalc()));
 
 
     int row=0;

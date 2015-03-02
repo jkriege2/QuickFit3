@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>QFRDRImagingFCSDiffusionLawDialog</class>
- <widget class="QDialog" name="QFRDRImagingFCSDiffusionLawDialog">
+ <widget class="QWidget" name="QFRDRImagingFCSDiffusionLawDialog">
   <property name="windowModality">
    <enum>Qt::WindowModal</enum>
   </property>
@@ -9,31 +9,150 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>802</width>
-    <height>499</height>
+    <width>1143</width>
+    <height>594</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Calculate FCS Diffusion Law</string>
+   <string>imagingFCS Diffusion Law</string>
   </property>
-  <property name="sizeGripEnabled">
+  <property name="sizeGripEnabled" stdset="0">
    <bool>true</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,1">
-     <item>
-      <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0,0,0,0,0">
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="text">
-          <string>files/RDRs to use:</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-         </property>
-        </widget>
-       </item>
+    <layout class="QGridLayout" name="gridLayout_2" rowstretch="0,6,2" columnstretch="0,1">
+     <item row="0" column="1">
+      <widget class="QFrame" name="frame">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>10</height>
+        </size>
+       </property>
+       <property name="frameShape">
+        <enum>QFrame::Panel</enum>
+       </property>
+       <property name="frameShadow">
+        <enum>QFrame::Raised</enum>
+       </property>
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <property name="leftMargin">
+         <number>2</number>
+        </property>
+        <property name="topMargin">
+         <number>2</number>
+        </property>
+        <property name="rightMargin">
+         <number>2</number>
+        </property>
+        <property name="bottomMargin">
+         <number>2</number>
+        </property>
+        <item>
+         <widget class="QLabel" name="label_6">
+          <property name="text">
+           <string>&lt;b&gt;plot:&lt;/b&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chkLogX">
+          <property name="text">
+           <string>log x</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chkLogY">
+          <property name="text">
+           <string>log y</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chkShowErrors">
+          <property name="text">
+           <string>show Errors</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QLabel" name="label_5">
+          <property name="text">
+           <string>&lt;b&gt;fits:&lt;/b&gt;</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chkFitLin">
+          <property name="text">
+           <string>linear</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chkFitQuadratic">
+          <property name="text">
+           <string>quadratic</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chkFitPowerlaw">
+          <property name="text">
+           <string>powerlaw</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="Line" name="line">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QCheckBox" name="chkFitWeighted">
+          <property name="text">
+           <string>weighted fits</string>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="1" column="1">
+      <widget class="QFPlotter" name="plotter" native="true"/>
+     </item>
+     <item row="2" column="1">
+      <widget class="QPlainTextEdit" name="plainTextEdit">
+       <property name="readOnly">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0" rowspan="3">
+      <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0,0,0,0,0,0,0,0,0,0">
        <item row="0" column="1">
         <widget class="QListWidget" name="lstRDRs">
          <property name="maximumSize">
@@ -42,50 +161,25 @@
            <height>16777215</height>
           </size>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="text">
-          <string>parameter 1 (x):</string>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
          </property>
-        </widget>
-       </item>
-       <item row="1" column="1">
-        <widget class="QComboBox" name="cmbParameter1">
-         <property name="maximumSize">
-          <size>
-           <width>350</width>
-           <height>16777215</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="text">
-          <string>parameter 2 (y):</string>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="1">
-        <widget class="QComboBox" name="cmbParameter2">
-         <property name="maximumSize">
-          <size>
-           <width>350</width>
-           <height>16777215</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="text">
-          <string>mode:</string>
+         <property name="textElideMode">
+          <enum>Qt::ElideMiddle</enum>
          </property>
         </widget>
        </item>
        <item row="3" column="1">
+        <widget class="QFEnhancedComboBox" name="cmbParameter2">
+         <property name="maximumSize">
+          <size>
+           <width>350</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="7" column="1">
         <widget class="QComboBox" name="cmbMode">
          <property name="maximumSize">
           <size>
@@ -113,29 +207,51 @@
            <string>P2 vs. P1² (e.g. tauD vs. Wxy²)</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>(P1/P2) vs. P2 (e.g. Aeff vs. D/Aeff)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>(P1/P2²) vs. P2² (e.g. Wxy² vs. D/Wxy²)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>P1 vs. P2² (e.g. Wxy² vs. tauD)</string>
+          </property>
+         </item>
         </widget>
        </item>
-       <item row="4" column="1">
-        <widget class="QCheckBox" name="chkSelection">
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
-          <string>for selection only</string>
+          <string>parameter 2 (y):</string>
          </property>
         </widget>
        </item>
-       <item row="5" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
+       <item row="7" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
          </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
+         <property name="text">
+          <string>data transform mode:&lt;br&gt;
+&lt;small&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;(y vs. x)&lt;/small&gt;</string>
          </property>
-        </spacer>
+        </widget>
        </item>
-       <item row="6" column="1">
+       <item row="11" column="1">
         <widget class="QToolButton" name="btnRecalc">
          <property name="text">
           <string>recalculate</string>
@@ -149,7 +265,99 @@
          </property>
         </widget>
        </item>
-       <item row="7" column="1">
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>scale:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>parameter 1 (x):</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>which pixels:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <widget class="QCheckBox" name="chkSelection">
+         <property name="text">
+          <string>for selection only</string>
+         </property>
+        </widget>
+       </item>
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>scale:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="1" column="1">
+        <widget class="QFEnhancedComboBox" name="cmbParameter1">
+         <property name="maximumSize">
+          <size>
+           <width>350</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>files/RDRs to use:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="1">
         <widget class="QToolButton" name="btnToTable">
          <property name="text">
           <string>...</string>
@@ -159,10 +367,62 @@
          </property>
         </widget>
        </item>
+       <item row="6" column="1">
+        <widget class="QPushButton" name="btnSwap">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>&amp;swap parameters</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
+         <item>
+          <widget class="QFDoubleEdit" name="edtScale1">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkDefaultScale1">
+           <property name="text">
+            <string>default</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="5" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QFDoubleEdit" name="edtScale2">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkDefaultScale2">
+           <property name="text">
+            <string>default</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
       </layout>
-     </item>
-     <item>
-      <widget class="QFPlotter" name="plotter" native="true"/>
      </item>
     </layout>
    </item>
@@ -217,6 +477,16 @@
    <header>qfplotter.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>QFEnhancedComboBox</class>
+   <extends>QComboBox</extends>
+   <header>qfenhancedcombobox.h</header>
+  </customwidget>
+  <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
   <include location="../../lib/lib.qrc"/>
@@ -235,8 +505,8 @@
    <slot>recalcPlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>127</x>
-     <y>300</y>
+     <x>230</x>
+     <y>442</y>
     </hint>
     <hint type="destinationlabel">
      <x>7</x>
@@ -245,18 +515,178 @@
    </hints>
   </connection>
   <connection>
-   <sender>btnClose</sender>
-   <signal>clicked()</signal>
+   <sender>chkLogX</sender>
+   <signal>toggled(bool)</signal>
    <receiver>QFRDRImagingFCSDiffusionLawDialog</receiver>
-   <slot>accept()</slot>
+   <slot>recalcPlot()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>775</x>
-     <y>471</y>
+     <x>483</x>
+     <y>30</y>
     </hint>
     <hint type="destinationlabel">
-     <x>801</x>
-     <y>444</y>
+     <x>339</x>
+     <y>0</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkLogY</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFRDRImagingFCSDiffusionLawDialog</receiver>
+   <slot>recalcPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>535</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>390</x>
+     <y>6</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkFitLin</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFRDRImagingFCSDiffusionLawDialog</receiver>
+   <slot>recalcPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>880</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>500</x>
+     <y>3</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkFitQuadratic</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFRDRImagingFCSDiffusionLawDialog</receiver>
+   <slot>recalcPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>954</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>596</x>
+     <y>2</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkFitPowerlaw</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFRDRImagingFCSDiffusionLawDialog</receiver>
+   <slot>recalcPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1029</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>685</x>
+     <y>2</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkFitWeighted</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFRDRImagingFCSDiffusionLawDialog</receiver>
+   <slot>recalcPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>1129</x>
+     <y>30</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>755</x>
+     <y>2</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkDefaultScale1</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtScale1</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>345</x>
+     <y>297</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>242</x>
+     <y>298</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkDefaultScale2</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>edtScale2</receiver>
+   <slot>setDisabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>357</x>
+     <y>353</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>288</x>
+     <y>353</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkDefaultScale1</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFRDRImagingFCSDiffusionLawDialog</receiver>
+   <slot>recalcPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>360</x>
+     <y>297</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>5</x>
+     <y>217</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkDefaultScale2</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFRDRImagingFCSDiffusionLawDialog</receiver>
+   <slot>recalcPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>348</x>
+     <y>350</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>4</x>
+     <y>255</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>chkShowErrors</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>QFRDRImagingFCSDiffusionLawDialog</receiver>
+   <slot>recalcPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>582</x>
+     <y>23</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>271</x>
+     <y>1</y>
     </hint>
    </hints>
   </connection>

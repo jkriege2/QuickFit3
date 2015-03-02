@@ -586,7 +586,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
 
 
 
-    actFitAllFilesThreaded=new QAction(QIcon(":/fcsfit/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files (this %1, MT)").arg(m_runName), this);
+    actFitAllFilesThreaded=new QAction(QIcon(":/fcsfit/fit_fitcurrentrunallfiles.png"), tr("Fit All &Files, this %1 (MT)").arg(m_runName), this);
     actFitAllFilesThreaded->setToolTip(tr("multi-threaded: perform a fit for all files, but fit in each file only the currently displayed %1").arg(m_runName));
     connect (actFitAllFilesThreaded, SIGNAL(triggered()), this, SLOT(fitAllFilesThreaded()));
 
@@ -594,7 +594,7 @@ void QFFitResultsByIndexEvaluationEditorWithWidgets::createWidgets(bool hasMulti
     actFitAllThreaded->setToolTip(tr("multi-threaded: perform a fit for all files, and all %1s therein (everything)").arg(m_runName));
     connect (actFitAllThreaded, SIGNAL(triggered()), this, SLOT(fitEverythingThreaded()));
 
-    actFitAllRunsThreaded=new QAction(QIcon(":/imfcsfit/fit_fitallruns.png"), tr("Fit All %1s (MT)").arg(m_runName), this);
+    actFitAllRunsThreaded=new QAction(QIcon(":/imfcsfit/fit_fitallruns.png"), tr("Fit All %1s, this file (MT)").arg(m_runName), this);
     actFitAllRunsThreaded->setToolTip(tr("multi-threaded: perform a fit for all %1s, in the current file").arg(m_runName));
     connect (actFitAllRunsThreaded, SIGNAL(triggered()), this, SLOT(fitAllRunsThreaded()));
 

@@ -3,6 +3,8 @@
 
 #include <QDialog>
 #include <QListWidgetItem>
+#include <QPointer>
+#include <QWidget>
 
 class QFRDRImagingFCSData; // forward
 
@@ -10,7 +12,7 @@ namespace Ui {
     class QFRDRImagingFCSDiffusionLawDialog;
 }
 
-class QFRDRImagingFCSDiffusionLawDialog : public QDialog
+class QFRDRImagingFCSDiffusionLawDialog : public QWidget
 {
         Q_OBJECT
 
@@ -18,20 +20,31 @@ class QFRDRImagingFCSDiffusionLawDialog : public QDialog
         explicit QFRDRImagingFCSDiffusionLawDialog(QWidget *parent = 0);
         ~QFRDRImagingFCSDiffusionLawDialog();
 
-        void init(const QList<QFRDRImagingFCSData*>& recs, const QString &evalgroup);
-        void setSelection(const bool* data, int width, int height);
-
+    public slots:
+        void setSelection(const bool* data, int selImgWidth, int selImgHeight);
+        void setSelection(const QVector<bool>& data, int selImgWidth, int selImgHeight);
+        void init(QFRDRImagingFCSData* currentRecord, const QString &evalgroup);
+        void saveConfig();
+        void loadConfig();
+        void loadParams();
+        void recalcPlot();
     protected slots:
         void on_btnRecalc_clicked();
+        void on_btnClose_clicked();
         void paramChanged();
-        void recalcPlot();
         void on_btnHelp_clicked();
-    private:
+        void on_btnSwap_clicked();
+        void on_edtScale1_editingFinished();
+        void on_edtScale2_editingFinished();
+    protected:
+
+        void init(const QList<QFRDRImagingFCSData*>& recs, const QString &evalgroup, const QList<bool>& proposedRecordSelection);
         Ui::QFRDRImagingFCSDiffusionLawDialog *ui;
         QList<QFRDRImagingFCSData*> recs;
-        const bool* selImg;
-        int width;
-        int height;
+        QPointer<QFRDRImagingFCSData> currentRecord;
+        QVector<bool> selImg;
+        int selImgWidth;
+        int selImgHeight;
         QString evalgroup;
         QList<QListWidgetItem*> rdrItems;
         struct fpProp {

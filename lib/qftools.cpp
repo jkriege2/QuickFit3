@@ -1222,6 +1222,16 @@ QString intToOctQString(int64_t value)
 }
 
 
+QString doubleToLatexQStringAlwaysSign(double data, int precision, bool remove_trail0, double belowIsZero, double minNoExponent, double maxNoExponent, const QString& signSeparator){
+    QString sign="+"+signSeparator;
+    double d=data;
+    if (data<0) {
+        d=-data;
+        sign="-"+signSeparator;
+    }
+    return sign+doubleToLatexQString(data, precision, remove_trail0, belowIsZero, minNoExponent, maxNoExponent);
+}
+
 QString doubleToLatexQString(double data, int precision, bool remove_trail0, double belowIsZero, double minNoExponent, double maxNoExponent){
   if ((belowIsZero>0) && (fabs(data)<belowIsZero)) return "\\rm{0}";
   if (data==0) return "\\rm{0}";
@@ -1242,6 +1252,17 @@ QString doubleToLatexQString(double data, int precision, bool remove_trail0, dou
   return QString("10^{")+intToQString(exp)+"}";
 }
 
+
+QString doubleToHTMLQStringAlwaysSign(double data, int precision, bool remove_trail0, double belowIsZero, double minNoExponent, double maxNoExponent, const QString& signSeparator){
+    QString sign="+"+signSeparator;
+    double d=data;
+    if (data<0) {
+        d=-data;
+        sign="-"+signSeparator;
+    }
+    return sign+doubleToHTMLQString(data, precision, remove_trail0, belowIsZero, minNoExponent, maxNoExponent);
+
+}
 
 QString doubleToHTMLQString(double data, int precision, bool remove_trail0, double belowIsZero, double minNoExponent, double maxNoExponent){
   if ((belowIsZero>0) && (fabs(data)<belowIsZero)) return "0";

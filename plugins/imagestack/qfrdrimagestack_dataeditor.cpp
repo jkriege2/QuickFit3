@@ -384,7 +384,7 @@ void QFRDRImageStackDataEditor::connectWidgets()
     connect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     connect(cmbModifierMode, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     connect(cmbMaskColor, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
-    connect(maskTools, SIGNAL(rawDataChanged()), this, SLOT(maskChanged()));
+    connect(maskTools, SIGNAL(maskChanged()), this, SLOT(maskChanged()));
     connect(cmbHitogramMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotFrame()));
     connect(chkHistogramLog, SIGNAL(toggled(bool)), this, SLOT(replotFrame()));
     connect(cmbColorScaleMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotFrame()));
@@ -400,7 +400,7 @@ void QFRDRImageStackDataEditor::disconnectWidgets()
     disconnect(cmbColorbar, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     disconnect(cmbModifierMode, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
     disconnect(cmbMaskColor, SIGNAL(currentIndexChanged(int)), this, SLOT(displayImage()));
-    disconnect(maskTools, SIGNAL(rawDataChanged()), this, SLOT(maskChanged()));
+    disconnect(maskTools, SIGNAL(maskChanged()), this, SLOT(maskChanged()));
     disconnect(cmbHitogramMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotFrame()));
     disconnect(chkHistogramLog, SIGNAL(toggled(bool)), this, SLOT(replotFrame()));
     disconnect(cmbColorScaleMode, SIGNAL(currentIndexChanged(int)), this, SLOT(replotFrame()));

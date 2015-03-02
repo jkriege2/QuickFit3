@@ -95,7 +95,7 @@ class QFWIDLIB_EXPORT QFRDRImageMaskEditTools: public QObject {
         void clearSelection();
 
     signals:
-        void rawDataChanged();
+        void maskChanged();
 
     protected slots:
         void imageClicked(double x, double y, Qt::KeyboardModifiers modifiers);
