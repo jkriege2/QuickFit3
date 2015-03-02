@@ -332,7 +332,7 @@ void QFRDRImagingFCSDiffusionLawDialog::recalcPlot()
                     for (int i=0; i<selImgWidth*selImgHeight; i++) {
                         sel<<selImg[i];
                     }
-                } else if (w*h>=selImgWidth*selImgHeight) {
+                } else if (w*h>selImgWidth*selImgHeight) {
                     for (int i=0; i<w*h; i++) {
                         int x=i%w;
                         int y=i/w;
