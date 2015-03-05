@@ -9,12 +9,22 @@
      
      $$see:See also the <a href="difflaw.html">FCS Diffusion Law Documentation</a>.$$
      
+     
+     <h2>Introduction</h2>
+     <p>
+     
 $$startbox_note$$
 The data for this tutorial is available as raw data from <a href="http://www.dkfz.de/Macromol/quickfit/examples.html">http://www.dkfz.de/Macromol/quickfit/examples.html</a> as <tt>spimfcs_difflaw.zip</tt>. This data was acquired in HeLa cells expressing EGFP-4x and for TetraSpec beads (100nm) in solution on a SPIM-FCS system with an EMCCD-camera with pixel size $(a = 400nm)$ and focus parameters: $(
 w_{xy} = (310 \pm 21)nm)$ and $(w_z = (1126 \pm 100)nm)$.
 </ol>
-$$endbox$$  
-     
+$$endbox$$ 
+This tutorial explains two options at the same time:
+<ul>
+    <li><b>FCS Diffusion Law plots <i>(DiffLaw)</i></b> from imFCS data with increasing binning, i.e. A<sub>eff</sub> vs. &tau;<sub>D</sub> as proposed by $$ref:BAG2012:Bag, N., J. Sankaran, A. Paul, R.S. Kraut, and T. Wohland. 2012. Calibration and limits of camera-based fluorescence correlation spectroscopy: a supported lipid bilayer study. ChemPhysChem. 13: 2784-2794.$$ $$ref:Wawrezinieck2015:Wawrezinieck, L., H. Rigneault, D. Marguet, and P.-F. Lenne. 2005. Fluorescence Correlation Spectroscopy Diffusion Laws to Probe the Submicron Cell Membrane Organization. Biophys J. 89: 4029-4042.$$</li>
+    <li><b>Mean-squared displacement <i>(MSD)</i></b> like plots from 2-pixel imFCCS data with increasing pixel-distance, i.e. &tau;<sub>D</sub> vs. d<sub>x/y</sub><sup>2</sup> as proposed in $$ref:BAUM2014:Baum, M., Erdel, F., Wachsmuth, M., Rippe, K. (2014). Retrieving the intracellular topology from multi-scale protein mobility mapping in living cells. <i>Nature Communications</i>, 5. doi: 10.1038/ncomms5494$$</li>
+</ul> 
+Both options are explained side-by.side in the remainder of this tutorial and you will have to choose, which direction to follow.
+     </p>
      <h2>Tutorial</h2>
      
      <h3>Correlate Data</h3>
@@ -24,15 +34,111 @@ $$endbox$$
          <li>Start QuickFit and correlate the data, by clicking on the menu entry <b>Data Items | Insert Raw Data | imFCS: Imaging FCS | correlate Images and Insert</b>. Then select the file to correlate and set the properties as follows:<ul>
     <li><b>for binning:</b> choose <b>interleaved</b> binning, select <b>ACF</b>-only and click on <b>add job series</b>, choose <b>binning = 1..10 (step 1)</b> and wait until the data is correlated</li>
     <li><b>for distance CCF:</b> choose <b>binning 1x</b>, de-activate the <b>ACF</b> and activate <b>CCF to distant pixel</b>. Set the distances to <b>1,0;2,0;3,0;4,0;5,0;6,0;7,0;8,0;9,0;10,0</b>, which correlates to the 10 next neighbors to the right.</li>
-</ul>In both cases, also choose an appropriate <b>bleach-correction</b> (e.g. exp(poly4) for cell-data or none for beads). Typically 3-5 <b>segments</b> are a good choice.<br> When all correlations are finished, close the dialog. The data will be added to the project, sorted into one folder per file.</li>
-         <li></li>
-         <li></li>
-         <li></li>
+</ul>In both cases, also choose an appropriate <b>bleach-correction</b> (e.g. exp(poly4) for cell-data or none for beads). Typically 3-5 <b>segments</b> are a good choice. Also make sure, that the correct pixel size (in the focus plane) is entered at the top of the window (activate the checkbox "camera size" and provude the appropriate pixel size, if you camera pixels are e.g. $(24\mathrm{{\mu}m})$ and the magnificazion was 60x, enter $(a=400\mathrm{nm}=2400\mathrm{nm}/60)$).</li> 
+<li>When all correlations are finished, close the dialog. The data will be added to the project, sorted into one folder per file.
+<center><a name="tutorial_difflaw_pic000"><img src="./pic/tutorial_difflaw_pic000.png" border="1">
+</center>
+</li>
+<li>If you use cell data, you may want to define a mask for the data. To do so:
+<ol>
+    <li>double-click the first imFCS record in the project and choose the tab "<b>Parameter Image</b>"</li>
+    <li>create a mask by selecting pixels in the overview image and clicking on "<b>mask sel.</b>", or by using the mask-by-intensity tool in the menu <b>Mask | mask by overview</b>.</li>
+    <li>Move on to the next record by clicking the button <b>Next</b> and repeat the masking, until you defined a mask for every record. Alternatively you can also use the menu entry <b>Mask | copy Mask to other RDRs of the same type</b> to reuse the (rescaled) mask for several other RDRs.</li>
+</ol></li>
+     </ol>
+Here is an overlay plot of the normalized and unnormalized ACFs from the beads-measurement in the example data with increasing binning:
+<center><a name="tutorial_difflaw_pic008"><img src="./pic/tutorial_difflaw_pic008.png" border="1">
+    <a name="tutorial_difflaw_pic009"><img src="./pic/tutorial_difflaw_pic009.png" border="1">
+</center>
+Here is an overlay plot of the DCCFs from the beads sample data:
+<center><a name="tutorial_difflaw_pic010"><img src="./pic/tutorial_difflaw_pic010.png" border="1">
+</center>
+     </p>
+     
+     
+     <h3>Fit Data</h3>
+     <p>
+     <ol>
+         <li>Add an <b>imFCS Fit</b> to the project by clicking <b>Data Items | Insert Evaluation | imFCS Curve Fitting</b>. Open the fit by double-clicking the entry in the project tree.</li>
+         <li>Choose an appropriate fitting model:
+         <ul>
+             <li><b><i>DiffLaw:</i> TIR-FCS with camera, binning:</b> <a href="$$fitfunction:help:fcs_tir_diffe2$$">$$fitfunction:name:fcs_tir_diffe2$$</a></li>
+             <li><b><i>DiffLaw:</i> SPIM-FCS with camera, binning:</b> <a href="$$fitfunction:help:fcs_tir_diff2d$$">$$fitfunction:name:fcs_tir_diff2d$$</a></li>
+             <li><b><i>MSD:</i> TIR-FCS with camera, DCCF:</b> <a href="$$fitfunction:help:fccs_tir_diff_flowe2$$">$$fitfunction:name:fccs_tir_diff_flowe2$$</a> (velocities $(v_x, v_y)$ fixed to 0!)</li>
+             <li><b><i>MSD:</i> SPIM-FCS with camera, DCCF:</b> <a href="$$fitfunction:help:fccs_spim_diffce2$$">$$fitfunction:name:fccs_spim_diffce2$$</a> </li>
+<!--             <li><b>:</b> </li>-->
+         </ul>Also set the focus parameters of the model, as appropriate (e.g. the value given for a, $(w_{xy})$ and $(w_z)$ above, if you use the provided test data, or data obtained from an imFCS calibration). In all cases you should use a single diffusive component.</li>
+         <li>Fit the <b>average run</b> of the first record, until you get a sufficiently good fit (by clicking on <b>Fit Current</b>). then use this fit result as initial value for all further fits by clicking <b>Copy to Initial</b></li>
+         <li>Now you can fit all other files, by choosing the next RDR/file in the list on the rhs and then clicking <b>Fit all Pixels</b>. Note how the pixel size $(a)$ changes with increasing binning, when you change from one file to the next. If it does not, correct it manually to an approprite value for the file. You can also <b>fit all pixels in all files</b>, if you are confident, the binning setting works correctly.</li>
+         <li>Browse randomly through the files and check some fits by clicking random non-masked pixels in the overview image at the bottom. If you are happy with the fits, close the Fit window. Otherwise you may want to rerun the fits, or change some initial parameters (click <b>Reset All</b> to remove all fit results!).</li>
          <li></li>
      </ol></p>
      
+     
+     
+     <h3>Plotting FCS Diffusion Laws</h3>
+     <h4>FCS Diffusion Laws (A<sub>eff</sub> vs. &tau;<sub>D</sub>)</h4>
      <p>
-     </p>
+     <ol>
+         <li>Open the imFCS RDR editor by double-clicking the first record (e.g. bin00, DCCF(0,1), ...) in the project tree. Then choose the tab "Parameter Image". The fit results should be selected as <b>result set</b> and you can observe the fit result maps in the window:
+<center><a name="tutorial_difflaw_pic001"><img src="./pic/tutorial_difflaw_pic001.png" border="1">
+</center>
+</li>
+         <li>Click on the menu entry <b>ImagingFCS Tools | calculate FCS diffusion law-typed plots</b>
+         <center><a name="tutorial_difflaw_pic002"><img src="./pic/tutorial_difflaw_pic002.png" border="1">
+         </center>
+         </li>
+         <li>A new window will open, which shows the FCS diffusion law plot:
+         <center><a name="tutorial_difflaw_pic003"><img src="./pic/tutorial_difflaw_pic003.png" border="1">
+         </center>
+         This window will stay open, alongside the imagingFCS RDR editor and you can re-open it by clicking the menu entry from the last step.<br>It contains two columns: On the rhs you see the plot with some basic fits and on the lhs you can set the options for the plot:
+<ul>
+    <li>At the top you can select the files/RDRs to use for the plot. The plugin already pre-filtered the project files to matching files (from the same raw-data). You can select/deselct a file by checking/unchecking it in the list. then click in <b>Recalculate</b></li>
+    <li>Below this list, you can select the parameters to plot. Ideally this would be the effictve focus area $(A_{eff})$ as parameter 1 and the diffusion time $(\tau_D)$ as parameter 2 for FCS diffusion laws, or the pixel-distance $(d_{x/y})$ for parameter 1 and the diffusion time $(\tau_D)$ for parameter 2 in the case of MSD-typed plots (from DCCF fits). If the diffusion time, or the effective area two are not available, the plugin can also calculate them from other fit parameters, e.g.:
+  $[\tau_D=\frac{A_{eff}}{D},\ \ \ \ \ A_{eff}=w_{xy}^2]$
+For this to happen, select the two parameters, that you want and then choose an appropriate <b>mode</b>. As an example, observe the settings in the following image, which plot $(\tau_D=A_{eff}/D)$ versus $(A_{eff})$:
+<center><a name="tutorial_difflaw_pic004"><img src="./pic/tutorial_difflaw_pic004.png" border="1">
+</center>
+$$note:Make sure that these parameters are set for the example data!$$
+ </li>
+    <li>The plot assumes, that diffusion times are given in seconds and lengths in micrometers (or diffusion coefficients in micrometers<sup>2</sup>/second). If this is not the case for your parameters, you can choose multiplicative scaling factors. In many cases they can be determined automatically by the plugin (checkbox <b>default</b> activated).</li>
+</ul>
+         </li>
+         <li>The plot on the right already contains a linear fit. You can activate more fit functions with the check-boxes above the plot. If you want to save the plot, you can click on 
+<center><a name="tutorial_difflaw_pic005"><img src="./pic/tutorial_difflaw_pic005.png" border="1">
+</center>, which will insert a <a href="$$plugin_info:help:table$$">table RDR</a> into the project tree with the current plot (including the fits). There you can also do more elaborate fits to the data, or format the plot for publication. By ricght-clicking the plot you also have the usual <a href="$$qf_ui_jkqtplotter_helpfile$$">plotter tools</a>, that allow to save the data of the plot, save the plot or print it.
+</li>
+         <li>If you only want to vie the diffusion law of a subset of the pixels in the record, you can do so by selecting a region in the overview image in the imFCS RDR (use e.g. <img src=":lib/draw_rectangle.png"> or <img src=":lib/draw_ellipse.png">):
+<center><a name="tutorial_difflaw_pic006"><img src="./pic/tutorial_difflaw_pic006.png" border="1">
+</center>
+Then you go back to the diffusion law window and check the option <b>which pixels: for selection only.</b>
+</li>
+<li>Finally, if you select a different record in the project, the diffusion law plot will also change to that new record. E.g. for the cell-data from the example dataset:
+<center><a name="tutorial_difflaw_pic007"><img src="./pic/tutorial_difflaw_pic007.png" border="1">
+</center>
+</li>
+     </ol>
+     $$note:For DCCF larger distance often do no longer correlate, so it may help to use only the firt few shifts.$$
+</p>
+     <h4>Mean squared displacements (&tau;<sub>D</sub> vs. d<sub>x/y</sub><sup>2</sup>)</h4>
+     <p>
+     <ol>
+         <li>If you correlated your data for MSD-like plots, i.e. generated 2-pixel cross-correlations (DCCF) with increasing pixel-distance, you can use the same tool as above to plot the MSD-like curves. To do so, follow the same general steps as above, but choose different parameters:
+<center><a name="tutorial_difflaw_pic011"><img src="./pic/tutorial_difflaw_pic011.png" border="1">
+</center>
+This calculates the diffusion time and MAS as:
+$[ \tau_D=\frac{d_{x/y}^2}{D},\ \ \ \ \ \mbox{MSD}=d_{x/y}^2 ]$
+The plot then looks as:
+<center><a name="tutorial_difflaw_pic012"><img src="./pic/tutorial_difflaw_pic012.png" border="1">
+</center>
+
+</li>
+     </ol></p>
+     
+     
+     
+     <h2>References</h2>
+     <p>$$references$$</p>
      
   </body>
 </html>
