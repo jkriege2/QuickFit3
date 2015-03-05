@@ -2,10 +2,37 @@
 <html>
   <head>
       <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-      <title>imagingFCS Diffusion Law Plots</title>
+      <title>Tutorial: imagingFCS Diffusion Law Plots</title>
   </head>
   <body>
      $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
-	 
+     
+     $$see:See also the <a href="difflaw.html">FCS Diffusion Law Documentation</a>.$$
+     
+$$startbox_note$$
+The data for this tutorial is available as raw data from <a href="http://www.dkfz.de/Macromol/quickfit/examples.html">http://www.dkfz.de/Macromol/quickfit/examples.html</a> as <tt>spimfcs_difflaw.zip</tt>. This data was acquired in HeLa cells expressing EGFP-4x and for TetraSpec beads (100nm) in solution on a SPIM-FCS system with an EMCCD-camera with pixel size $(a = 400nm)$ and focus parameters: $(
+w_{xy} = (310 \pm 21)nm)$ and $(w_z = (1126 \pm 100)nm)$.
+</ol>
+$$endbox$$  
+     
+     <h2>Tutorial</h2>
+     
+     <h3>Correlate Data</h3>
+     <p>
+     <ol>
+         <li>Download (see above) the data and unzip them into an empty directory, or acquire your own data.</li>
+         <li>Start QuickFit and correlate the data, by clicking on the menu entry <b>Data Items | Insert Raw Data | imFCS: Imaging FCS | correlate Images and Insert</b>. Then select the file to correlate and set the properties as follows:<ul>
+    <li><b>for binning:</b> choose <b>interleaved</b> binning, select <b>ACF</b>-only and click on <b>add job series</b>, choose <b>binning = 1..10 (step 1)</b> and wait until the data is correlated</li>
+    <li><b>for distance CCF:</b> choose <b>binning 1x</b>, de-activate the <b>ACF</b> and activate <b>CCF to distant pixel</b>. Set the distances to <b>1,0;2,0;3,0;4,0;5,0;6,0;7,0;8,0;9,0;10,0</b>, which correlates to the 10 next neighbors to the right.</li>
+</ul>In both cases, also choose an appropriate <b>bleach-correction</b> (e.g. exp(poly4) for cell-data or none for beads). Typically 3-5 <b>segments</b> are a good choice.<br> When all correlations are finished, close the dialog. The data will be added to the project, sorted into one folder per file.</li>
+         <li></li>
+         <li></li>
+         <li></li>
+         <li></li>
+     </ol></p>
+     
+     <p>
+     </p>
+     
   </body>
 </html>

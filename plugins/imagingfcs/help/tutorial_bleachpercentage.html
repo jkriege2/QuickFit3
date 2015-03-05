@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+      <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+      <title>Tutorial: Bleach Percentage in imagingFCS Record</title>
+  </head>
+  <body>
+     $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
+
+
+
+    <h2>Introduction</h2>
+    <p>It is often interesting to estimate the amount of bleaching of the fluorescnece during a measurement. This tutorial explains how to do that. Typically we propose to set the laser power to a setting with which the bleaching is limited to less than 50-60% during the acquisition (typically ~60s).</p>
+
+               
+     
+     <h2>Tutorial</h2>
+     <p>
+     <ol>
+         <li>Correlate your dataset as usual for your imFCS evaluation, using your typical bleach correction (often exp(poly4) for cell data).</li>
+         <li>Open the imFCS RDR editor by double-clicking the according record in the project tree and choose the tab <b>Countrate/Intensity Trace</b>. Therein select the <b>"uncorrected time-binned video"</b> at the top-right of the window:
+<center><a name="tutorial_bleachpercentage_pic000"><img src="./pic/tutorial_bleachpercentage_pic000.png" border="1">
+</center>
+</li>
+         <li>In this plot you can view the bleaching on any pixel, that you can select in the overview image at the bottom-right. The plot shows the intensity timetrace (green solid curve), the bleach-correction fit (dark-green, dashed, if applicable) and the background-level (dotted horizontal line) extracted from the background image series. From this curve you can extract three numbers (values given for the example above):<ul>
+    <li>background level: $(B=370.5)$</li>
+    <li>initial intensity: $(I_0=2303)$</li>
+    <li>final intensity: $(I_1=1490)$</li>
+</ul>From these you can calculate the percentage of bleaching: $[ p_{bleach}=\frac{I_1-I_0}{I_1-B}\approx42\%.  ]$</li>
+         <li>The correlator in this plugin performs this calculation for every pixel. To view this information, select the tab <b>Images, Videos, Timetraces</b>. and therein choose the <b>image/video</b> = <b>bleach percentage file</b>:
+<center><a name="tutorial_bleachpercentage_pic001"><img src="./pic/tutorial_bleachpercentage_pic001.png" border="1">
+</center>As you can see, the color-scale shows a large range. By choosing the histogram-tab, you can view the distribution of bleaching a bit better. YOu can also set the range to <b>auto</b> and choose the limits 0..100:
+<center><a name="tutorial_bleachpercentage_pic002"><img src="./pic/tutorial_bleachpercentage_pic002.png" border="1">
+</center>
+So the bleaching was ~44% on average (median of the distribution).
+</li>
+         <li>To combine this image with a mask for the image, go back to the <b>Image/Video</b> tab and click the button <b>Image as RDR Result</b> above the image. This saves the image of bleach percentage as a fit result, which can be selected in the tab <b>Parameter Image</b>:
+<center><a name="tutorial_bleachpercentage_pic003"><img src="./pic/tutorial_bleachpercentage_pic003.png" border="1">
+</center>
+Here you can also define a mask for the measurement (e.g. by the menu <b>Mask | mask by overview</b>), which allows to measure bleaching percentage only for those pixels, which actually contain fluorescnece:
+<center><a name="tutorial_bleachpercentage_pic004"><img src="./pic/tutorial_bleachpercentage_pic004.png" border="1">
+</center>
+
+</li>
+
+     </ol></p>
+     
+     <p>
+     </p>
+     
+     
+  </body>
+</html>

@@ -5,12 +5,13 @@
         <title>$$local_plugin_name$$: Why a good background correction is needed</title>
     </head>
     <body>
-        $$qf_commondoc<p>One often wants to measure concentration sin imagingFCS. If the fit is performed in a naive way, without using a proper estimateion of the background signal, the results are often unsatisfactory, since the concentration is not linearly dependent on the image intensity (comapre a,b,d):
+        $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+        <p>One often wants to measure concentration sin imagingFCS. If the fit is performed in a naive way, without using a proper estimateion of the background signal, the results are often unsatisfactory, since the concentration is not linearly dependent on the image intensity (comapre a,b,d):
 <center><a name="nah_background_correction_pic000"><img src="./pic/nah_background_correction_pic000.png" border="1">
 </center>
 If the background intensity is estimated peropely, e.g. as an average of all pixels, that are outside the cell, the result is sgnificantly imporved, as shown in (c,e).
 </p>
-<p>Most of the FCS fit models in QuickFit support this background correction. How to define the background value is explained in <a href="tutorial_cell.html">this tutorial</a>.</p>_header.start$$ $$qf_commondoc_header.end$$ 
+<p>Most of the FCS fit models in QuickFit support this background correction. How to define the background value is explained in <a href="tutorial_cell.html">this tutorial</a>.</p>
         
     </body>
 </html>
