@@ -128,7 +128,6 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
         m_fitFunctions=manager->getModels(filter, this);
     }
 
-    QStandardItemModel *m = qobject_cast<QStandardItemModel *>(model());
 
 
     QMapIterator<QString, QFFitFunction*> it(m_fitFunctions);
@@ -137,7 +136,7 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
         if (it.value()) {
             QFSimpleTreeModelItem* item=m_model->addFolderedItem(it.value()->category(), it.value()->shortName(), it.key());
             item->setIcon(QIcon(":/lib/fitfunc_icon.png"));
-            if (it.value()->isDeprecated() && m) {
+            if (it.value()->isDeprecated()) {
                 item->setForeground(QColor("darkgrey"));
                 item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
 

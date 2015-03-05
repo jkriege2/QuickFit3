@@ -59,13 +59,19 @@ class QFRDRImageMaskInterface {
 
 
 
-inline QVector<bool> QFRDRImageMaskInterface_getMaskAsBoolVec(QFRDRImageMaskInterface* rs) {
+inline QVector<bool> QFRDRImageMaskInterface_getMaskAsBoolVec(QFRDRImageMaskInterface* rs, bool inverted=true) {
     QVector<bool> b;
     if (rs) {
         uint32_t count=rs->maskGetWidth()*rs->maskGetHeight();
         const bool* mask=rs->maskGet();
-        for (uint32_t i=0; i<count; i++) {
-            b.append(!mask[i]);
+        if (inverted) {
+            for (uint32_t i=0; i<count; i++) {
+                b.append(!mask[i]);
+            }
+        } else {
+            for (uint32_t i=0; i<count; i++) {
+                b.append(mask[i]);
+            }
         }
     }
     return b;

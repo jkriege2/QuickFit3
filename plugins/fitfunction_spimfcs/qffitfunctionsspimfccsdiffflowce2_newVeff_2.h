@@ -34,7 +34,7 @@ class QFFitFunctionsSPIMFCCSDiffFlowCENewVeff2Global: public QFFitFunction {
         QFFitFunctionsSPIMFCCSDiffFlowCENewVeff2Global();
         virtual ~QFFitFunctionsSPIMFCCSDiffFlowCENewVeff2Global() {}
         /*! \copydoc QFFitFunction::name()   */
-        virtual QString name() const { return QString("S2-pixel PIM-FCCS: Diffusion+Flow+Global Decay, crosscorrelation (rect. pixel, 1/e^2 radii, new Veff)"); };
+        virtual QString name() const { return QString("2-pixel PIM-FCCS: 3D Diffusion+Flow+Global Decay (rect. pixel, 1/e^2 radii, new Veff)"); };
         /*! \copydoc QFFitFunction::category()   */
         virtual QString category() const { return QObject::tr("2-pixel SPIM-FCCS"); }
 

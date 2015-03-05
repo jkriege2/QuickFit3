@@ -152,93 +152,19 @@
       </widget>
      </item>
      <item row="0" column="0" rowspan="3">
-      <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0,0,0,0,0,0,0,0,0,0">
-       <item row="0" column="1">
-        <widget class="QListWidget" name="lstRDRs">
-         <property name="maximumSize">
-          <size>
-           <width>350</width>
-           <height>16777215</height>
-          </size>
-         </property>
-         <property name="horizontalScrollBarPolicy">
-          <enum>Qt::ScrollBarAlwaysOff</enum>
-         </property>
-         <property name="textElideMode">
-          <enum>Qt::ElideMiddle</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="3" column="1">
-        <widget class="QFEnhancedComboBox" name="cmbParameter2">
-         <property name="maximumSize">
-          <size>
-           <width>350</width>
-           <height>16777215</height>
-          </size>
-         </property>
-        </widget>
-       </item>
+      <layout class="QGridLayout" name="gridLayout" rowstretch="1,0,0,0,0,0,0,0,0,0,0,0,0,0,0">
        <item row="7" column="1">
-        <widget class="QComboBox" name="cmbMode">
+        <widget class="QFEnhancedComboBox" name="cmbParameter3">
          <property name="maximumSize">
           <size>
-           <width>350</width>
+           <width>300</width>
            <height>16777215</height>
           </size>
-         </property>
-         <item>
-          <property name="text">
-           <string>simple P2 vs. P1 (e.g. tau vs. Aeff)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>(P2/P1) vs. P1 (e.g. D/Aeff vs. Aeff)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>(P2/P1²) vs. P1² (e.g. D/Wxy² vs. Wxy²)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>P2 vs. P1² (e.g. tauD vs. Wxy²)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>(P1/P2) vs. P2 (e.g. Aeff vs. D/Aeff)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>(P1/P2²) vs. P2² (e.g. Wxy² vs. D/Wxy²)</string>
-          </property>
-         </item>
-         <item>
-          <property name="text">
-           <string>P1 vs. P2² (e.g. Wxy² vs. tauD)</string>
-          </property>
-         </item>
-        </widget>
-       </item>
-       <item row="3" column="0">
-        <widget class="QLabel" name="label_2">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>parameter 2 (y):</string>
          </property>
         </widget>
        </item>
        <item row="7" column="0">
-        <widget class="QLabel" name="label_7">
+        <widget class="QLabel" name="lab31">
          <property name="font">
           <font>
            <weight>75</weight>
@@ -246,139 +172,30 @@
           </font>
          </property>
          <property name="text">
-          <string>data transform mode:&lt;br&gt;
-&lt;small&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;(y vs. x)&lt;/small&gt;</string>
+          <string>parameter 3 (optional):</string>
          </property>
         </widget>
        </item>
-       <item row="11" column="1">
-        <widget class="QToolButton" name="btnRecalc">
-         <property name="text">
-          <string>recalculate</string>
-         </property>
-         <property name="icon">
-          <iconset resource="../../lib/lib.qrc">
-           <normaloff>:/lib/fit_fitcurrent.png</normaloff>:/lib/fit_fitcurrent.png</iconset>
-         </property>
-         <property name="toolButtonStyle">
-          <enum>Qt::ToolButtonTextBesideIcon</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="2" column="0">
-        <widget class="QLabel" name="label_8">
-         <property name="text">
-          <string>scale:</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="1" column="0">
-        <widget class="QLabel" name="label_3">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>parameter 1 (x):</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="0">
-        <widget class="QLabel" name="label_4">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>which pixels:</string>
-         </property>
-        </widget>
-       </item>
-       <item row="8" column="1">
-        <widget class="QCheckBox" name="chkSelection">
-         <property name="text">
-          <string>for selection only</string>
-         </property>
-        </widget>
-       </item>
-       <item row="5" column="0">
-        <widget class="QLabel" name="label_9">
-         <property name="text">
-          <string>scale:</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-         </property>
-        </widget>
-       </item>
-       <item row="10" column="1">
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item row="1" column="1">
-        <widget class="QFEnhancedComboBox" name="cmbParameter1">
-         <property name="maximumSize">
-          <size>
-           <width>350</width>
-           <height>16777215</height>
-          </size>
-         </property>
-        </widget>
-       </item>
-       <item row="0" column="0">
-        <widget class="QLabel" name="label">
-         <property name="font">
-          <font>
-           <weight>75</weight>
-           <bold>true</bold>
-          </font>
-         </property>
-         <property name="text">
-          <string>files/RDRs to use:</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-         </property>
-        </widget>
-       </item>
-       <item row="12" column="1">
-        <widget class="QToolButton" name="btnToTable">
-         <property name="text">
-          <string>...</string>
-         </property>
-         <property name="toolButtonStyle">
-          <enum>Qt::ToolButtonTextBesideIcon</enum>
-         </property>
-        </widget>
-       </item>
-       <item row="6" column="1">
-        <widget class="QPushButton" name="btnSwap">
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <property name="text">
-          <string>&amp;swap parameters</string>
-         </property>
-        </widget>
+       <item row="5" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <item>
+          <widget class="QFDoubleEdit" name="edtScale2">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="chkDefaultScale2">
+           <property name="text">
+            <string>default</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item row="2" column="1">
         <layout class="QHBoxLayout" name="horizontalLayout_3">
@@ -401,17 +218,259 @@
          </item>
         </layout>
        </item>
-       <item row="5" column="1">
-        <layout class="QHBoxLayout" name="horizontalLayout_4">
+       <item row="5" column="0">
+        <widget class="QLabel" name="label_9">
+         <property name="text">
+          <string>scale:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="1">
+        <widget class="QCheckBox" name="chkSelection">
+         <property name="text">
+          <string>for selection only</string>
+         </property>
+        </widget>
+       </item>
+       <item row="12" column="1">
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item row="0" column="0">
+        <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>files/RDRs to use:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+         </property>
+        </widget>
+       </item>
+       <item row="14" column="1">
+        <widget class="QToolButton" name="btnToTable">
+         <property name="text">
+          <string>...</string>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextBesideIcon</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="6" column="1">
+        <widget class="QPushButton" name="btnSwap">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>&amp;swap parameters</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QFEnhancedComboBox" name="cmbParameter1">
+         <property name="maximumSize">
+          <size>
+           <width>300</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="10" column="0">
+        <widget class="QLabel" name="label_4">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>which pixels:</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="1">
+        <widget class="QFEnhancedComboBox" name="cmbParameter2">
+         <property name="maximumSize">
+          <size>
+           <width>300</width>
+           <height>16777215</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QListWidget" name="lstRDRs">
+         <property name="maximumSize">
+          <size>
+           <width>300</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="horizontalScrollBarPolicy">
+          <enum>Qt::ScrollBarAlwaysOff</enum>
+         </property>
+         <property name="textElideMode">
+          <enum>Qt::ElideMiddle</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="label_3">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>parameter 1 (x):</string>
+         </property>
+        </widget>
+       </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_2">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>parameter 2 (y):</string>
+         </property>
+        </widget>
+       </item>
+       <item row="9" column="1">
+        <widget class="QComboBox" name="cmbMode">
+         <property name="maximumSize">
+          <size>
+           <width>300</width>
+           <height>16777215</height>
+          </size>
+         </property>
          <item>
-          <widget class="QFDoubleEdit" name="edtScale2">
+          <property name="text">
+           <string>DiffLaw: simple P2 vs. P1 (e.g. tauD vs. Aeff)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>DiffLaw: (P1/P2) vs. P1 (e.g. tauD=Aeff/D vs. Aeff)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>DiffLaw: (P1²/P2) vs. P1² (e.g. tauD=Wxy²/D vs. Wxy²)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>DiffLaw: P2 vs. P1² (e.g. tauD vs. Wxy²)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>DiffLaw: P3/P2 vs. P1² (e.g. tauD=Aeff/D vs. dx²)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>DiffLaw: P3²/P2 vs. P1² (e.g. tauD=Wxy²/D vs. dx²)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>MSD: P1² vs. P1²/P2 (e.g. dx² vs. tauD=dx²/D)</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>MSD: P1² vs. P2 (e.g. dx² vs. tauD)</string>
+          </property>
+         </item>
+        </widget>
+       </item>
+       <item row="9" column="0">
+        <widget class="QLabel" name="label_7">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>data transform mode:&lt;br&gt;
+&lt;small&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;(y vs. x)&lt;/small&gt;</string>
+         </property>
+        </widget>
+       </item>
+       <item row="2" column="0">
+        <widget class="QLabel" name="label_8">
+         <property name="text">
+          <string>scale:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="13" column="1">
+        <widget class="QToolButton" name="btnRecalc">
+         <property name="text">
+          <string>recalculate</string>
+         </property>
+         <property name="icon">
+          <iconset resource="../../lib/lib.qrc">
+           <normaloff>:/lib/fit_fitcurrent.png</normaloff>:/lib/fit_fitcurrent.png</iconset>
+         </property>
+         <property name="toolButtonStyle">
+          <enum>Qt::ToolButtonTextBesideIcon</enum>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="0">
+        <widget class="QLabel" name="lab32">
+         <property name="text">
+          <string>scale:</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+         </property>
+        </widget>
+       </item>
+       <item row="8" column="1">
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <widget class="QFDoubleEdit" name="edtScale3">
            <property name="enabled">
             <bool>false</bool>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QCheckBox" name="chkDefaultScale2">
+          <widget class="QCheckBox" name="chkDefaultScale3">
            <property name="text">
             <string>default</string>
            </property>
@@ -439,6 +498,17 @@
        <property name="icon">
         <iconset resource="../../lib/lib.qrc">
          <normaloff>:/lib/help/help.png</normaloff>:/lib/help/help.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnTutorial">
+       <property name="text">
+        <string>&amp;Tutorial</string>
+       </property>
+       <property name="icon">
+        <iconset resource="../../lib/lib.qrc">
+         <normaloff>:/lib/help/help_tutorial.png</normaloff>:/lib/help/help_tutorial.png</iconset>
        </property>
       </widget>
      </item>

@@ -127,6 +127,12 @@ win32 {
     RC_FILE = quickfit3.rc
 }
 
+
+!contains(QF3CONFIG,nowebkit) {
+    QT+=webkit webkitwidgets
+    DEFINES+=QF3_USE_WEBKIT
+}
+
 QT += core gui svg xml network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 

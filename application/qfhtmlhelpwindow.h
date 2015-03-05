@@ -44,6 +44,14 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include <QMenuBar>
 #include "qvisiblehandlesplitter.h"
 #include "qfhtmlhelptools.h"
+#ifdef QF3_USE_WEBKIT
+#  include <QWebView>
+#  include <QtWebkit>
+#  include <QWebPage>
+#  include <QWebFrame>
+#  include <QWebSettings>
+#endif
+#include <QPrintPreviewDialog>
 
 /*! \brief this is a window that displays information from a given HTML file
     \ingroup qf3lib_widgets
@@ -165,7 +173,11 @@ class QFHTMLHelpWindow : public QWidget {
 
 
         /** \brief a text edit for the model information/description */
+#ifdef QF3_USE_WEBKIT
+        QWebView* descriptionBrowser;
+#else
         QTextBrowser* descriptionBrowser;
+#endif
 
         /** \brief current searchPath for assets */
         QString searchPath;

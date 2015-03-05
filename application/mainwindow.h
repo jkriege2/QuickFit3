@@ -563,6 +563,8 @@ class MainWindow : public QMainWindow, public QFPluginServices, public QFTableSe
         QAction* actSetRDRPropertyByExpression;
         QProgressBar* prgMainProgress;
 
+        QToolButton* btnOpen;
+
         /** \brief length of the list of recently opened files */
         QRecentFilesMenu* recentMenu;
         /*enum { MaxRecentFiles = 5 };

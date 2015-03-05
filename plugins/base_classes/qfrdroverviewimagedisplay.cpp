@@ -166,6 +166,7 @@ void QFRDROverviewImageDisplay::createWidgets() {
     toolbar->addAction(pltImage->get_plotter()->get_actZoomAll());
     toolbar->addAction(pltImage->get_plotter()->get_actZoomIn());
     toolbar->addAction(pltImage->get_plotter()->get_actZoomOut());
+    toolbar->addSeparator();
 
     ///////////////////////////////////////////////////////////////
     // TOOLBAR & ACTIONS: edit image plots
@@ -241,6 +242,11 @@ void QFRDROverviewImageDisplay::createWidgets() {
     agImageSelectionActions->addAction(actImagesDrawCircle);
     agImageSelectionActions->addAction(actImagesDrawEllipse);
     connect(agImageSelectionActions, SIGNAL(triggered(QAction*)), this, SLOT(setImageEditMode()));
+
+    actImageAsResult=new QAction(tr("Image as RDR Result"), this);
+    connect(actImageAsResult, SIGNAL(triggered()), this, SLOT(imageAsResult()));
+
+    toolbar->addAction(actImageAsResult);
 
     toolbar->addSeparator();
     toolbar->addAction(actImagesZoom);
@@ -632,6 +638,8 @@ void QFRDROverviewImageDisplay::showFrame(int frame) {
     current->setQFProperty("imfcs_invrimgdisp_playpos", player->getPosition(), false, false);
     pltImage->getDatastore()->clear();
 
+    actImageAsResult->setVisible(false);
+
     QFRDRAdditionalImagesInterface* m=qobject_cast<QFRDRAdditionalImagesInterface*>(current);
     QFRDRImageStackInterface* mv=dynamic_cast<QFRDRImageStackInterface*>(current);
     if (m && mv && cmbImage->currentIndex()-m->getAdditionalImagesCount()>=0 && cmbImage->currentIndex()-m->getAdditionalImagesCount()<mv->getImageStackCount()) {
@@ -715,6 +723,7 @@ void QFRDROverviewImageDisplay::showFrame(int frame) {
 
         if (chkHistVideo->isChecked()) showHistograms(mv->getImageStack(idx, frame), width*height);
         histogram->setEnabled(chkHistVideo->isChecked());
+        tabMain->setTabEnabled(1,chkHistVideo->isChecked());
         histogram->setHistogramXLabel(tr("intensity [A.U. or kHz]"));
 
         labStackPosition->setText(mv->getImageStackTimepointName(idx, frame));
@@ -734,12 +743,14 @@ void QFRDROverviewImageDisplay::displayImage() {
     current->setQFProperty("imfcs_invrimgdisp_image", cmbImage->currentIndex(), false, false);
     QFRDRAdditionalImagesInterface* m=qobject_cast<QFRDRAdditionalImagesInterface*>(current);
     QFRDRImageStackInterface* mv=dynamic_cast<QFRDRImageStackInterface*>(current);
+    QFRDRImageToRunInterface* ov=dynamic_cast<QFRDRImageToRunInterface*>(current);
     player->setVisible(false);
     chkHistVideo->setVisible(false);
     player->pause();
     pltImage->set_doDrawing(false);
     clearOverlays();
     updateSelectionArrays();
+    actImageAsResult->setVisible(false);
     if (m && cmbImage->currentIndex()<m->getAdditionalImagesCount()) {
         QString images="";
         for (int jj=0; jj<cmbImage->currentIndex(); jj++) {
@@ -756,6 +767,7 @@ void QFRDROverviewImageDisplay::displayImage() {
             image->set_width(width);
             image->set_height(height);
             image->set_visible(true);
+            actImageAsResult->setVisible(ov&&(width==ov->getImageFromRunsWidth())&&(height==ov->getImageFromRunsHeight()));
             imageRGB->set_visible(false);
 
             if (selected_width!=width || selected_height!=height) {
@@ -769,6 +781,7 @@ void QFRDROverviewImageDisplay::displayImage() {
             pltImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, selected_width*selected_height, tr("mask"));
 
             histogram->setEnabled(true);
+            tabMain->setTabEnabled(1,true);
             showHistograms(m->getAdditionalImage(cmbImage->currentIndex()), width*height);
 
             //qDebug()<<"4";
@@ -834,6 +847,7 @@ void QFRDROverviewImageDisplay::displayImage() {
         pltImage->getDatastore()->addCopiedColumn(plteOverviewSelectedData, selected_width*selected_height, tr("mask"));
 
         histogram->setEnabled(chkHistVideo->isChecked());
+        tabMain->setTabEnabled(1,chkHistVideo->isChecked());
         if (chkHistVideo->isChecked()) showHistograms(mv->getImageStack(idx, 0), width*height);
 
         pltImage->get_plotter()->setAbsoluteXY(0,rwidth,0,rheight);
@@ -844,11 +858,12 @@ void QFRDROverviewImageDisplay::displayImage() {
         labDescription->setText(tr("<b>image size:</b> %1 &times; %2 pixels = %3 &times; %4 %5&times;%6").arg(width).arg(height).arg(rwidth).arg(rheight).arg(mv->getImageStackXUnitName(idx)).arg(mv->getImageStackYUnitName(idx)));
         //player->play();
     } else  {
-        image->set_data(NULL, 0, 0, JKQTPMathImageBase::UInt16Array);
+        image->set_data(NULL, 0, 0, JKQTPMathImageBase::DoubleArray);
         image->set_visible(true);
         imageRGB->set_visible(false);
         showHistograms(NULL, 0);
         histogram->setEnabled(false);
+        tabMain->setTabEnabled(1,false);
 
         player->setVisible(false);
         chkHistVideo->setVisible(false);
@@ -983,6 +998,34 @@ void QFRDROverviewImageDisplay::writeSettings(QSettings &settings, const QString
     histogram->writeSettings(settings, prefix+"histogram/");
     settings.setValue(prefix+"videohistogram", chkHistVideo->isChecked());
     settings.setValue(prefix+"chkRelaxedColorScale", false);
+}
+
+void QFRDROverviewImageDisplay::imageAsResult()
+{
+    if (current&&image&&image->get_visible()) {
+        double* data=(double*)image->get_data();
+        int w=image->get_Nx();
+        int h=image->get_Ny();
+        QString evalName="overview_images";
+        QString resultName=cmbImage->currentText();
+        current->disableEmitResultsChanged();
+        current->resultsSetNumberList(evalName, resultName, data, w*h, "");
+        current->resultsSetGroupAndLabels(evalName, resultName, evalName, resultName);
+        current->resultsSetEvaluationGroupLabel(evalName,tr("Overview Images"));
+
+
+        current->resultsSetGroup(evalName, resultName, tr("fit results"));
+        current->resultsSetLabel(evalName, resultName, resultName);
+        current->resultsSetSortPriority(evalName, resultName, true);
+
+        current->resultsSetEvaluationGroup(evalName, evalName);
+        current->resultsSetEvaluationGroupLabel(evalName, evalName);
+        current->resultsSetEvaluationGroupIndex(evalName, 0);
+        current->resultsSetEvaluationDescription(evalName, QString(""));
+
+
+        current->enableEmitResultsChanged(true);
+    }
 }
 
 void QFRDROverviewImageDisplay::mouseMoved(double x, double y) {

@@ -34,6 +34,7 @@ include("autoversioning.pri")
 include(quickfit_config.pri)
 QFOUTPUT = ../$${OUTPUTDIR_NAME}
 
+
 #release {
 #    QFOUTPUT = ../output_release
 #} else {

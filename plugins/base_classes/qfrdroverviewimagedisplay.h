@@ -36,6 +36,7 @@
 #include "qfplayercontrols.h"
 #include <QTabWidget>
 #include "qfhistogramview.h"
+#include "qfrdrimagetoruninterface.h"
 
 class QFRDROverviewImageDisplay : public QWidget
 {
@@ -69,6 +70,7 @@ class QFRDROverviewImageDisplay : public QWidget
         virtual void writeSettings(QSettings &settings, const QString &prefix=QString("")) ;
 
     protected slots:
+        void imageAsResult();
         void mouseMoved(double x, double y);
         void imageClicked(double x, double y, Qt::KeyboardModifiers modifiers);
         void imageScribbled(double x, double y, Qt::KeyboardModifiers modifiers, bool first, bool last);
@@ -117,6 +119,8 @@ class QFRDROverviewImageDisplay : public QWidget
         QAction* actImagesDrawLine;
         QAction* actImagesScribble;
         QActionGroup* agImageSelectionActions;
+
+        QAction* actImageAsResult;
 
 
         void createWidgets();

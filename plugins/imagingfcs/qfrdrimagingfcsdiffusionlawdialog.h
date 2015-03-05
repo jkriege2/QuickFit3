@@ -5,6 +5,7 @@
 #include <QListWidgetItem>
 #include <QPointer>
 #include <QWidget>
+#include "imagetools.h"
 
 class QFRDRImagingFCSData; // forward
 
@@ -33,10 +34,13 @@ class QFRDRImagingFCSDiffusionLawDialog : public QWidget
         void on_btnClose_clicked();
         void paramChanged();
         void on_btnHelp_clicked();
+        void on_btnTutorial_clicked();
         void on_btnSwap_clicked();
         void on_edtScale1_editingFinished();
         void on_edtScale2_editingFinished();
+        void on_cmbMode_currentIndexChanged(int index);
     protected:
+        bool dontWriteConfig;
 
         void init(const QList<QFRDRImagingFCSData*>& recs, const QString &evalgroup, const QList<bool>& proposedRecordSelection);
         Ui::QFRDRImagingFCSDiffusionLawDialog *ui;
@@ -56,6 +60,7 @@ class QFRDRImagingFCSDiffusionLawDialog : public QWidget
             bool isWxy;
             bool isAeff;
             bool isPixSize;
+            bool isPixDistance;
         };
 
         QList<fpProp > fitparams;

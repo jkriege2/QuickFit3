@@ -553,7 +553,7 @@ void QFRDRImagingFCSCountrateDisplay::displayData() {
         ui->edtData->setText(current->getProperty("imfcs_crddisplay_fitresults", QString("")).toString());
         ui->labInfo->setText(tr("<table width=\"95%\"><tr><td>average of graph: %2</td><td>data points: %1</td></tr>"
                                 "<tr><td>stddev of graph: %3</td><td>measurement duration: %4 seconds</td></tr>"
-                                "<tr><td></td><td>segments: %5 à %6s</td></tr></table>").arg(m->getStatisticsN()).arg(dispMean).arg(dispStddev).arg(duration).arg(segments).arg(duration/double(segments)));
+                                "<tr><td></td><td>segments: %5 &agrave; %6s</td></tr></table>").arg(m->getStatisticsN()).arg(dispMean).arg(dispStddev).arg(duration).arg(segments).arg(duration/double(segments)));
     }
     updateFitFuncPlot();
     QApplication::restoreOverrideCursor();

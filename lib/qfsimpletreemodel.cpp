@@ -351,6 +351,7 @@ QFSimpleTreeModel::QFSimpleTreeModel(QObject *parent) :
  void QFSimpleTreeModelItem::setForeground(QColor color)
  {
      setData(color, Qt::ForegroundRole);
+     setData(color, Qt::TextColorRole);
  }
 
  void QFSimpleTreeModelItem::setBackground(QColor color)

@@ -126,7 +126,7 @@ QString QFFitFunctionFCCSNormalDiff3DFlow2Focus::name() const {
 double QFFitFunctionFCCSNormalDiff3DFlow2Focus::evaluate(double t, const double* data) const {
     const int comp=data[FCSDiff_n_components];
     const double N=data[FCSDiff_n_particle];
-    const double D1=data[FCSDiff_diff_coeff1]; // in µm^2/s
+    const double D1=data[FCSDiff_diff_coeff1]; // in mum^2/s
     const double rho2=data[FCSDiff_diff_rho2];
     const double D2=data[FCSDiff_diff_coeff2];
     const double rho3=data[FCSDiff_diff_rho3];

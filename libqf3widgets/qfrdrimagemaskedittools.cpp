@@ -28,6 +28,8 @@ Copyright (c) 2008-2014 Jan W. Krieger (<jan@jkrieger.de>, <j.krieger@dkfz.de>),
 #include "qfrdrmaskbyoverviewimagedlg.h"
 #define sqr(x) ((x)*(x))
 #include "qfselectrdrdialog.h"
+#include "imagetools.h"
+#include "qfrdrimagetoruninterface.h"
 
 #define CLICK_UPDATE_TIMEOUT 500
 
@@ -371,37 +373,60 @@ void QFRDRImageMaskEditTools::copyMaskToGroup()
 {
     if ((!runselection&&!imagemask) || !rdr) return;
     int g=rdr->getGroup();
-    QString mask;
-    if (imagemask) mask=imagemask->maskToString();
-    else if (runselection) mask=runselection->leaveoutToString();
+    //QString mask;
+    //if (imagemask) mask=imagemask->maskToString();
+    //else if (runselection) mask=runselection->leaveoutToString();
 
+    QVector<bool> maskI;
+    int w=0;
+    int h=0;
     if (imagemask) {
+        maskI=QFRDRImageMaskInterface_getMaskAsBoolVec(imagemask);
+        w=imagemask->maskGetWidth();
+        h=imagemask->maskGetHeight();
+    } else if (overviewimages && runselection) {
+        maskI=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runselection);
+        w=overviewimages->getOverviewImageWidth();
+        h=overviewimages->getOverviewImageHeight();
+    }
+
+    for (int i=0; i<maskI.size(); i++) {
+        maskI[i]=!maskI[i];
+    }
+
+
+    if (maskI.size()>0) {
+        int resizeMasks=-1;
         for (int r=0; r<rdr->getProject()->getRawDataCount(); r++) {
             QFRawDataRecord* rd=rdr->getProject()->getRawDataByNum(r);
             if (rd && rd->getGroup()==g) {
-                QFRDRImageMaskInterface* rm=qobject_cast<QFRDRImageMaskInterface*>(rd);
-                if (rm) {
-                    rm->maskClear();
-                    rm->maskLoadFromString(mask);
-                    rm->maskMaskChangedEvent();
+                QVector<bool> maskII;
+                {
+                    QFRDRImageMaskInterface* rm=qobject_cast<QFRDRImageMaskInterface*>(rd);
+                    if (rm) {
+                        maskII=resizeBoolVecImage(maskI, w, h, rm->maskGetWidth(), rm->maskGetHeight(), &resizeMasks, tr("mask"), tr("QuickFit is about to copy the mask to a file/RDR with a different image size!"));
+                        if (maskII.size()==rm->maskGetWidth()*rm->maskGetHeight()){
+                            rm->maskClear();
+                            rm->maskSet(maskII.data());
+                            rm->maskMaskChangedEvent();
+                        }
+                    }
+                }
+                {
+                    QFRDRRunSelectionsInterface* rm=qobject_cast<QFRDRRunSelectionsInterface*>(rd);
+                    QFRDRImageToRunInterface* img=qobject_cast<QFRDRImageToRunInterface*>(rd);
+                    if (rm && img) {
+                        maskII=resizeBoolVecImage(maskI, w, h, img->getImageFromRunsWidth(), img->getImageFromRunsHeight(), &resizeMasks, tr("mask"), tr("QuickFit is about to copy the mask to a file/RDR with a different image size!"));
+                        if (maskII.size()==img->getImageFromRunsWidth()*img->getImageFromRunsHeight()){
+                            rm->leaveoutClear();
+                            QFRDRRunSelectionsInterface_setRunSelectionFromBoolVec(rm, maskII.data());
+                            rm->leaveoutChangedEvent();
+                        }
+                    }
                 }
             }
 
         }
-    } else if (runselection) {
-        for (int r=0; r<rdr->getProject()->getRawDataCount(); r++) {
-            QFRawDataRecord* rd=rdr->getProject()->getRawDataByNum(r);
-            if (rd && rd->getGroup()==g) {
-                QFRDRRunSelectionsInterface* rm=qobject_cast<QFRDRRunSelectionsInterface*>(rd);
-                if (rm) {
-                    rm->leaveoutClear();
-                    rm->leaveoutLoadFromString(mask);
-                    rm->leaveoutChangedEvent();
-                }
-            }
-
-        }
-
     }
     signalMaskChanged(false, false);
 
@@ -411,9 +436,26 @@ void QFRDRImageMaskEditTools::copyMaskToFiles()
 {
     if ((!runselection&&!imagemask) || !rdr) return;
     int g=rdr->getGroup();
-    QString mask;
-    if (imagemask) mask=imagemask->maskToString();
-    else if (runselection) mask=runselection->leaveoutToString();
+    //QString mask;
+    //if (imagemask) mask=imagemask->maskToString();
+    //else if (runselection) mask=runselection->leaveoutToString();
+
+    QVector<bool> maskI;
+    int w=0;
+    int h=0;
+    if (imagemask) {
+        maskI=QFRDRImageMaskInterface_getMaskAsBoolVec(imagemask);
+        w=imagemask->maskGetWidth();
+        h=imagemask->maskGetHeight();
+    } else if (overviewimages && runselection) {
+        maskI=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runselection);
+        w=overviewimages->getOverviewImageWidth();
+        h=overviewimages->getOverviewImageHeight();
+    }
+
+    for (int i=0; i<maskI.size(); i++) {
+        maskI[i]=!maskI[i];
+    }
 
     QList<QPointer<QFRawDataRecord> > rdrs;
 
@@ -430,8 +472,40 @@ void QFRDRImageMaskEditTools::copyMaskToFiles()
     delete dlg;
 
 
+    if (maskI.size()>0) {
+        int resizeMasks=-1;
+        for (int r=0; r<rdrs.size(); r++) {
+            QFRawDataRecord* rd=rdrs[r];
+            if (rd) {
+                QVector<bool> maskII;
+                {
+                    QFRDRImageMaskInterface* rm=qobject_cast<QFRDRImageMaskInterface*>(rd);
+                    if (rm) {
+                        maskII=resizeBoolVecImage(maskI, w, h, rm->maskGetWidth(), rm->maskGetHeight(), &resizeMasks, tr("mask"), tr("QuickFit is about to copy the mask to a file/RDR with a different image size!"));
+                        if (maskII.size()==rm->maskGetWidth()*rm->maskGetHeight()){
+                            rm->maskClear();
+                            rm->maskSet(maskII.data());
+                            rm->maskMaskChangedEvent();
+                        }
+                    }
+                }
+                {
+                    QFRDRRunSelectionsInterface* rm=qobject_cast<QFRDRRunSelectionsInterface*>(rd);
+                    QFRDRImageToRunInterface* img=qobject_cast<QFRDRImageToRunInterface*>(rd);
+                    if (rm && img) {
+                        maskII=resizeBoolVecImage(maskI, w, h, img->getImageFromRunsWidth(), img->getImageFromRunsHeight(), &resizeMasks, tr("mask"), tr("QuickFit is about to copy the mask to a file/RDR with a different image size!"));
+                        if (maskII.size()==img->getImageFromRunsWidth()*img->getImageFromRunsHeight()){
+                            rm->leaveoutClear();
+                            QFRDRRunSelectionsInterface_setRunSelectionFromBoolVec(rm, maskII.data());
+                            rm->leaveoutChangedEvent();
+                        }
+                    }
+                }
+            }
 
-    if (imagemask) {
+        }
+    }
+    /*if (imagemask) {
         for (int r=0; r<rdrs.size(); r++) {
             QFRawDataRecord* rd=rdrs[r];
             if (rd) {
@@ -458,7 +532,7 @@ void QFRDRImageMaskEditTools::copyMaskToFiles()
 
         }
 
-    }
+    }*/
     signalMaskChanged(false, false);
 }
 
@@ -466,9 +540,26 @@ void QFRDRImageMaskEditTools::copyMaskToFilesOfSameType()
 {
     if ((!runselection&&!imagemask) || !rdr) return;
     int g=rdr->getGroup();
-    QString mask;
-    if (imagemask) mask=imagemask->maskToString();
-    else if (runselection) mask=runselection->leaveoutToString();
+    //QString mask;
+    //if (imagemask) mask=imagemask->maskToString();
+    //else if (runselection) mask=runselection->leaveoutToString();
+
+    QVector<bool> maskI;
+    int w=0;
+    int h=0;
+    if (imagemask) {
+        maskI=QFRDRImageMaskInterface_getMaskAsBoolVec(imagemask);
+        w=imagemask->maskGetWidth();
+        h=imagemask->maskGetHeight();
+    } else if (overviewimages && runselection) {
+        maskI=QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(runselection);
+        w=overviewimages->getOverviewImageWidth();
+        h=overviewimages->getOverviewImageHeight();
+    }
+
+    for (int i=0; i<maskI.size(); i++) {
+        maskI[i]=!maskI[i];
+    }
 
     QList<QPointer<QFRawDataRecord> > rdrs;
 
@@ -484,9 +575,46 @@ void QFRDRImageMaskEditTools::copyMaskToFilesOfSameType()
     }
     delete dlg;
 
+    //qDebug()<<maskI.size()<<w<<h<<rdrs.size();
 
+    if (maskI.size()>0) {
+        int resizeMasks=-1;
+        for (int r=0; r<rdrs.size(); r++) {
+            QFRawDataRecord* rd=rdrs[r];
+            if (rd ) {
+                QVector<bool> maskII;
+                {
+                    QFRDRImageMaskInterface* rm=qobject_cast<QFRDRImageMaskInterface*>(rd);
+                    //qDebug()<<rm;
+                    if (rm) {
+                        maskII=resizeBoolVecImage(maskI, w, h, rm->maskGetWidth(), rm->maskGetHeight(), &resizeMasks, tr("mask"), tr("QuickFit is about to copy the mask to a file/RDR with a different image size!"));
+                        //qDebug()<<rm<<maskII.size()<<rm->maskGetWidth()*rm->maskGetHeight();
+                        if (maskII.size()==rm->maskGetWidth()*rm->maskGetHeight()){
+                            rm->maskClear();
+                            rm->maskSet(maskII.data());
+                            rm->maskMaskChangedEvent();
+                        }
+                    }
+                }
+                {
+                    QFRDRRunSelectionsInterface* rm=qobject_cast<QFRDRRunSelectionsInterface*>(rd);
+                    QFRDRImageToRunInterface* img=qobject_cast<QFRDRImageToRunInterface*>(rd);
+                    //qDebug()<<rm<<img;
+                    if (rm && img) {
+                        maskII=resizeBoolVecImage(maskI, w, h, img->getImageFromRunsWidth(), img->getImageFromRunsHeight(), &resizeMasks, tr("mask"), tr("QuickFit is about to copy the mask to a file/RDR with a different image size!"));
+                        //qDebug()<<rm<<img<<maskII.size()<<img->getImageFromRunsWidth()*img->getImageFromRunsHeight();;
+                        if (maskII.size()==img->getImageFromRunsWidth()*img->getImageFromRunsHeight()){
+                            rm->leaveoutClear();
+                            QFRDRRunSelectionsInterface_setRunSelectionFromBoolVec(rm, maskII.data());
+                            rm->leaveoutChangedEvent();
+                        }
+                    }
+                }
+            }
 
-    if (imagemask) {
+        }
+    }
+    /*if (imagemask) {
         for (int r=0; r<rdrs.size(); r++) {
             QFRawDataRecord* rd=rdrs[r];
             if (rd) {
@@ -513,7 +641,7 @@ void QFRDRImageMaskEditTools::copyMaskToFilesOfSameType()
 
         }
 
-    }
+    }*/
     signalMaskChanged(false, false);
 }
 

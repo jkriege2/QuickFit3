@@ -355,7 +355,7 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("tutorials_contents"), QString("<ul>")+createPluginDocTutorials("<li>%1 tutorial:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("settings_contents"), QString("<ul>")+createPluginDocSettings("<li>%1 settings:<ul>", "</ul></li>")+QString("/<ul>")));
     htmlReplaceList.append(qMakePair(QString("help_contents"), QString("<ul>")+createPluginDocHelp("<li>%1 help:<ul>", "</ul></li>")+QString("</ul>")));
-    htmlReplaceList.append(qMakePair(QString("qf_commondoc_backtop"), tr("<div style=\"background-color: lightsteelblue;  border-color: midnightblue; border-style: solid; padding-top:5px; padding-left:5px; padding-right:5px; padding-bottom:5px; margin: 5px;\"> <a href=\"#top_page\"><img src=\":/lib/help/help_top.png\"></a></div>")));
+    htmlReplaceList.append(qMakePair(QString("qf_commondoc_backtop"), tr("<div style=\"background-color: lightsteelblue;  border-color: midnightblue; border-style: solid; padding-top:5px; padding-left:5px; padding-right:5px; padding-bottom:5px; margin: 5px;\"> <a href=\"#top_page\"><img src=\"qrc:/lib/help/help_top.png\"></a></div>")));
 
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_header.start"),
          tr("<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue;\" ><tr><td align=\"left\">"
@@ -394,7 +394,7 @@ MainWindow::MainWindow(ProgramOptions* s, QFSplashScreen* splash):
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.start"),
          tr("$$DEFAULTREF$$</font>\n$$local_plugin_autodescription$$\n<a name=\"#footer\"><table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightsteelblue;  border-color: midnightblue\" ><tr><td align=\"left\">"
             "<table width=\"100%\">"
-            "<tr><td align=\"center\" ><a href=\"#top_page\" font-size: $$main_fontsize:-2$$;\"><img src=\":/lib/help/help_top.png\"></a>&nbsp;&nbsp;&nbsp;</td><td align=\"left\" style=\" font-size: $$main_fontsize:-2$$;\">$$local_plugin_icon$$&nbsp;&nbsp;&nbsp;</td><td align=\"right\" width=\"90%\" font-size: $$main_fontsize:-2$$;\">  <b>$$local_plugin_name$$</b> <i>$$local_plugin_copyright$$</i><br>$$local_plugin_weblink$$<br>")));
+            "<tr><td align=\"center\" ><a href=\"#top_page\" font-size: $$main_fontsize:-2$$;\"><img src=\"qrc:/lib/help/help_top.png\"></a>&nbsp;&nbsp;&nbsp;</td><td align=\"left\" style=\" font-size: $$main_fontsize:-2$$;\">$$local_plugin_icon$$&nbsp;&nbsp;&nbsp;</td><td align=\"right\" width=\"90%\" font-size: $$main_fontsize:-2$$;\">  <b>$$local_plugin_name$$</b> <i>$$local_plugin_copyright$$</i><br>$$local_plugin_weblink$$<br>")));
     htmlReplaceList.append(qMakePair(QString("qf_commondoc_footer.end"), QString("</td></tr></table></td></tr></table>")));// </div>")));
     splash->setProgressValue(4);
     QApplication::processEvents();
@@ -2094,7 +2094,13 @@ void MainWindow::createToolBars()
     tb->setPopupMode(QToolButton::InstantPopup);
     fileToolBar->addWidget(tb);
 
-    fileToolBar->addAction(openProjectAct);
+    btnOpen=new QToolButton(this);
+    btnOpen->addAction(openProjectAct);
+    btnOpen->setPopupMode(QToolButton::MenuButtonPopup);
+    btnOpen->setMenu(recentMenu);
+    btnOpen->setDefaultAction(openProjectAct);
+    //fileToolBar->addAction(openProjectAct);
+    fileToolBar->addWidget(btnOpen);
     fileToolBar->addAction(saveProjectAct);
     fileToolBar->addSeparator();
     fileToolBar->addAction(helpAct);
@@ -3047,6 +3053,7 @@ void MainWindow::setProjectMode(bool projectModeEnabled, const QString &nonProje
     dataToolBar->setEnabled(projectModeEnabled);
     newProjectAct->setEnabled(projectModeEnabled);
     openProjectAct->setEnabled(projectModeEnabled);
+    btnOpen->setEnabled(projectModeEnabled);
     openProjectSubsetAct->setEnabled(projectModeEnabled);
     openExampleAct->setEnabled(projectModeEnabled);
     saveProjectAct->setEnabled(projectModeEnabled);
@@ -4491,10 +4498,10 @@ static void getQFFitFunctionDescription(QFFitFunctionBase* ff, QString& autoplug
                    "<td>%12 ... %13</td>"
                    "<td>%14 ... %15%16</td>"
                    "</tr>").arg(col).arg(d.label).arg(ff->getParameterID(i)).arg(d.name).arg(d.unitLabel)
-                           .arg(d.fit?QString("<img src=\":/lib/checked.png\">"):QString("<img src=\":/lib/unchecked.png\">"))
-                           .arg(d.userEditable?QString("<img src=\":/lib/checked.png\">"):QString("<img src=\":/lib/unchecked.png\">"))
+                           .arg(d.fit?QString("<img src=\"qrc:/lib/checked.png\">"):QString("<img src=\"qrc:/lib/unchecked.png\">"))
+                           .arg(d.userEditable?QString("<img src=\"qrc:/lib/checked.png\">"):QString("<img src=\"qrc:/lib/unchecked.png\">"))
                            .arg(type).arg(err).arg((d.fit || d.userEditable)?QString::number(d.initialValue):QString(""))
-                           .arg(d.fit?QString(d.initialFix?QString("<img src=\":/lib/checked.png\">"):QString("<img src=\":/lib/unchecked.png\">")):QString(""))
+                           .arg(d.fit?QString(d.initialFix?QString("<img src=\"qrc:/lib/checked.png\">"):QString("<img src=\"qrc:/lib/unchecked.png\">")):QString(""))
                            .arg(d.minValue).arg(d.maxValue).arg(d.absMinValue).arg(d.absMaxValue).arg((d.comboItems.size()>0)?QString(QString(" (%1)").arg(d.comboItems.join(", "))):QString(""));
     }
     if (!params.isEmpty()) {
@@ -4543,16 +4550,16 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                                "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td align=\"left\">");
     localreplaces<<qMakePair<QString, QString>("startbox_info", "<blockquote>"
                                                "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" ><tr><td>"
-                                               "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\":/lib/help/helpboxlogo_info.png\"></td><td align=\"left\">");
+                                               "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\"qrc:/lib/help/helpboxlogo_info.png\"></td><td align=\"left\">");
     localreplaces<<qMakePair<QString, QString>("startbox_note", "<blockquote>"
                                                "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" ><tr><td>"
-                                               "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\":/lib/help/helpboxlogo_note.png\"></td><td align=\"left\">");
+                                               "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\"qrc:/lib/help/helpboxlogo_note.png\"></td><td align=\"left\">");
     localreplaces<<qMakePair<QString, QString>("startbox_see", "<blockquote>"
                                                "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: cornsilk ;  border-color: darkgreen\" ><tr><td>"
-                                               "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\":/lib/help/helpboxlogo_see.png\"></td><td align=\"left\">");
+                                               "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\"qrc:/lib/help/helpboxlogo_see.png\"></td><td align=\"left\">");
     localreplaces<<qMakePair<QString, QString>("startbox_warning", "<blockquote>"
                                                "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: navajowhite ;  border-color: orangered\" ><tr><td>"
-                                               "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\":/lib/help/helpboxlogo_warning.png\"></td><td align=\"left\">");
+                                               "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\"qrc:/lib/help/helpboxlogo_warning.png\"></td><td align=\"left\">");
     localreplaces<<qMakePair<QString, QString>("startbox_example", "<blockquote>"
                                                "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightgrey ;  border-color: midnightblue\" ><tr><td>"
                                                "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td align=\"left\">");
@@ -4618,14 +4625,14 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         QString rel=rxLink.cap(1).toLower();
         QString href=rxLink.cap(2);
         if (!href.isEmpty()) {
-            if (rel=="contents") fromHTML_replaces.append(qMakePair(QString("rel_contents"), QObject::tr("<a href=\"%1\"><img src=\":/lib/help/help_contents.png\" border=\"0\"><!--Contents--></a> ").arg(href)));
+            if (rel=="contents") fromHTML_replaces.append(qMakePair(QString("rel_contents"), QObject::tr("<a href=\"%1\"><img src=\"qrc:/lib/help/help_contents.png\" border=\"0\"><!--Contents--></a> ").arg(href)));
             if (rel=="index") fromHTML_replaces.append(qMakePair(QString("rel_index"), QObject::tr("<a href=\"%1\">Index</a> ").arg(href)));
             if (rel=="copyright") fromHTML_replaces.append(qMakePair(QString("rel_copyright"), QObject::tr("<a href=\"%1\">Copyright</a> ").arg(href)));
             if (rel=="top") fromHTML_replaces.append(qMakePair(QString("rel_top"), QObject::tr("<a href=\"%1\">Top</a> ").arg(href)));
-            if (rel=="prev") fromHTML_replaces.append(qMakePair(QString("rel_prev"), QObject::tr("<a href=\"%1\"><img src=\":/lib/help/help_prev.png\" border=\"0\"></a><!--&nbsp;<a href=\"%1\">Previous</a>--> ").arg(href)));
-            if (rel=="next") fromHTML_replaces.append(qMakePair(QString("rel_next"), QObject::tr("<a href=\"%1\"><img src=\":/lib/help/help_next.png\" border=\"0\"></a><!--&nbsp;<a href=\"%1\">Next</a>--> ").arg(href)));
-            if (rel=="up") fromHTML_replaces.append(qMakePair(QString("rel_up"), QObject::tr("<a href=\"%1\"><img src=\":/lib/help/help_up.png\" border=\"0\"></a><!--&nbsp;<a href=\"%1\">Up</a>--> ").arg(href)));
-            //if (rel=="prev") fromHTML_replaces.append(qMakePair(QString("rel_prev"), QObject::tr("<a href=\"%1\"><img src=\":/lib/help/help_prev.png\" border=\"0\"></a>&nbsp;<a href=\"%1\">Previous</a> ").arg(href)));
+            if (rel=="prev") fromHTML_replaces.append(qMakePair(QString("rel_prev"), QObject::tr("<a href=\"%1\"><img src=\"qrc:/lib/help/help_prev.png\" border=\"0\"></a><!--&nbsp;<a href=\"%1\">Previous</a>--> ").arg(href)));
+            if (rel=="next") fromHTML_replaces.append(qMakePair(QString("rel_next"), QObject::tr("<a href=\"%1\"><img src=\"qrc:/lib/help/help_next.png\" border=\"0\"></a><!--&nbsp;<a href=\"%1\">Next</a>--> ").arg(href)));
+            if (rel=="up") fromHTML_replaces.append(qMakePair(QString("rel_up"), QObject::tr("<a href=\"%1\"><img src=\"qrc:/lib/help/help_up.png\" border=\"0\"></a><!--&nbsp;<a href=\"%1\">Up</a>--> ").arg(href)));
+            //if (rel=="prev") fromHTML_replaces.append(qMakePair(QString("rel_prev"), QObject::tr("<a href=\"%1\"><img src=\"qrc:/lib/help/help_prev.png\" border=\"0\"></a>&nbsp;<a href=\"%1\">Previous</a> ").arg(href)));
         }
 
         ++count;
@@ -4756,8 +4763,8 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
     }
 
     if (!foundPlugin) {
-        fromHTML_replaces.append(qMakePair(QString("local_plugin_icon"), QString("<img src=\":/icon.png\">")));
-        fromHTML_replaces.append(qMakePair(QString("local_plugin_iconfilename"), QString(":/icon.png")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_icon"), QString("<img src=\"qrc:/icon.png\">")));
+        fromHTML_replaces.append(qMakePair(QString("local_plugin_iconfilename"), QString("qrc:/icon.png")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_name"), QObject::tr("QuickFit $$version$$: Online-Help")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_id_decorated"), QString("")));
         fromHTML_replaces.append(qMakePair(QString("local_plugin_autodescription"), QString("")));
@@ -4814,9 +4821,9 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 //qDebug()<<"-------------------------------- "<<key<<" -------------------------";
                 while ((pos = rxTT.indexIn(result, pos)) != -1) {
                     //qDebug()<<rxTT.cap()<<"\n   "<<rxTT.cap(1)<<rxTT.cap(2)<<rxTT.cap(3)<<rxTT.cap(4);
-                    QString img=":/lib/help/autolink.png";
+                    QString img="qrc:/lib/help/autolink.png";
                     if (val.toLower().startsWith("http://") || val.toLower().startsWith("https://") || val.toLower().startsWith("ftp://") || val.toLower().startsWith("ftps://")) {
-                        img=":/lib/help/autolinkweb.png";
+                        img="qrc:/lib/help/autolinkweb.png";
                     }
                     QString tag=rxTT.cap(1).toLower();
                     //qDebug()<<key<<val<<rep<<tag;
@@ -5228,28 +5235,28 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 } else if (QFPluginServices::getInstance()&&(command=="see")) {
                     QString rep=tr("<blockquote>"
                                    "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: cornsilk ;  border-color: darkgreen; border-style: solid;\" ><tr><td>"
-                                   "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\":/lib/help/helpboxlogo_see.png\"></td><td align=\"left\"><b>See:</b> %1</td></tr>"
+                                   "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\"qrc:/lib/help/helpboxlogo_see.png\"></td><td align=\"left\"><b>See:</b> %1</td></tr>"
                                    "</table></td></tr></table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
                 } else if (QFPluginServices::getInstance()&&(command=="note")) {
                     QString rep=tr("<blockquote>"
                                      "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" ><tr><td>"
-                                   "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\":/lib/help/helpboxlogo_note.png\"></td><td align=\"left\"><b>Note:</b> %1</td></tr>"
+                                   "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\"qrc:/lib/help/helpboxlogo_note.png\"></td><td align=\"left\"><b>Note:</b> %1</td></tr>"
                                    "</table></td></tr></table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
                 } else if (QFPluginServices::getInstance()&&(command=="info")) {
                     QString rep=tr("<blockquote>"
                                      "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" ><tr><td>"
-                                   "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\":/lib/help/helpboxlogo_info.png\"></td><td align=\"left\"><b>Information:</b> %1</td></tr>"
+                                   "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\"qrc:/lib/help/helpboxlogo_info.png\"></td><td align=\"left\"><b>Information:</b> %1</td></tr>"
                                    "</table></td></tr></table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
                  } else if (QFPluginServices::getInstance()&&(command=="warning")) {
                     QString rep=tr("<blockquote>"
                                      "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: navajowhite ;  border-color: orangered\" ><tr><td>"
-                                   "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\":/lib/help/helpboxlogo_warning.png\"></td><td align=\"left\"><b>Warning:</b> %1</td></tr>"
+                                   "<table width=\"100%\" border=\"0\" cellspacing=\"0\" cellpadding=\"2\"><tr><td width=\"35\" align=\"left\"><img src=\"qrc:/lib/help/helpboxlogo_warning.png\"></td><td align=\"left\"><b>Warning:</b> %1</td></tr>"
                                    "</table></td></tr></table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
@@ -5747,12 +5754,15 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         pos = 0;
         while ((pos = rxImages.indexIn(result, pos)) != -1) {
             QString file=rxImages.cap(1).trimmed();
-            QString old=QString("\"%1\"").arg(file);
-            QString news=QString("\"%1%2\"").arg(fileDir).arg(file);
-            if (QFileInfo(file).isRelative()) {
+            if (file.startsWith("qrc:/") || file.startsWith(":/") || file.startsWith("http:/") || file.startsWith("https:/")) {
+                pos=pos+rxImages.matchedLength();
+            } else {
+                QString old=QString("\"%1\"").arg(file);
+                QString news=QString("\"%1\"").arg(QUrl::fromLocalFile(QDir(fileDir).absoluteFilePath(file)).toString());
                 result.replace(old, news);
+
+                pos += rxImages.matchedLength()+(news.size()-old.size());
             }
-            pos += rxImages.matchedLength()+(news.size()-old.size());
         }
 
 
@@ -5772,7 +5782,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 //qDebug()<<"----- "<<key<<" ------";
                 while ((pos = rxTT.indexIn(result, pos)) != -1) {
                     //qDebug()<<rxTT.cap()<<rxTT.cap(1)<<rxTT.cap(2);
-                    QString rep=QString("<a href=\"tooltip:%1\">%2 <img src=\":/lib/help/tooltip.png\" border=\"0\" width=\"12\" height=\"12\" alt=\"get more information about %2\"></a>").arg(key).arg(rxTT.cap(2));
+                    QString rep=QString("<a href=\"tooltip:%1\">%2 <img src=\"qrc:/lib/help/tooltip.png\" border=\"0\" width=\"12\" height=\"12\" alt=\"get more information about %2\"></a>").arg(key).arg(rxTT.cap(2));
                     QString tag=rxTT.cap(1).toLower();
                     if (tag!="h1" && tag!="h2" && tag!="h3" && tag!="h4" && tag!="h5" && tag!="title" && tag!="a" && tag!="tt" && tag!="code") {
                         result=result.replace(rxTT.pos(2), rxTT.cap(2).size(), rep);

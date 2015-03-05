@@ -306,4 +306,6 @@ inline void qfReduceToImageHalf(QFImageHalf imageHalf, const T* data, int width,
 }
 
 
+QVector<bool> QFLIB_EXPORT resizeBoolVecImage(const QVector<bool>& image, int w, int h, int newWidth, int newHeight, int* askUserResizeMasks=NULL, const QString& image_name=QString("image"), const QString &comment=QString()) ;
+
 #endif // IMAGETOOLS_H

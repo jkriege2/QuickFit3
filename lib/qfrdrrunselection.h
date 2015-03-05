@@ -76,6 +76,17 @@ inline QVector<bool> QFRDRRunSelectionsInterface_getRunSelectionAsBoolVec(QFRDRR
     return b;
 }
 
+inline QVector<bool> QFRDRRunSelectionsInterface_setRunSelectionFromBoolVec(QFRDRRunSelectionsInterface* rs, bool* mask) {
+    QVector<bool> b;
+    if (rs) {
+        rs->leaveoutClear();
+        for (int i=0; i<rs->leaveoutGetRunCount(); i++) {
+            if (mask[i]) rs->leaveoutAddRun(i);
+        }
+    }
+    return b;
+}
+
 Q_DECLARE_INTERFACE( QFRDRRunSelectionsInterface,
                      "www.dkfz.de.b040.quickfit3.fcsplugin.QFRDRRunSelectionsInterface/1.1")
 

@@ -69,5 +69,8 @@ void QFRDRImagingFCSOverviewRateEditor::createWidgets() {
     crEditor=new QFRDRImagingFCSCountrateDisplay(this);
     mainSplitter->addWidget(crEditor);
 
+    mainSplitter->setStretchFactor(0,3);
+    mainSplitter->setStretchFactor(1,2);
+
     connect(imEditor1, SIGNAL(displayedFrame(double)), crEditor, SLOT(showFrameIndicator1(double)));
 }

@@ -189,6 +189,8 @@
             <li>image reader plugins now support multiple channels</li>
             <li>added widget to configuration dialog, which allows to set the global config directory</li>
             <li>added context menu entry to evaluation results tab of evaluation editors, which allows to copy fit results to a table, where expressions are used to dynamically access the data (where possible).</li>
+            <li>"open Project" button in Toolbar now has an arrw, which drops down a list of the recent files</li>
+            <li>using WebKit for Online-Help display now (better rendering)</li>
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -335,6 +337,8 @@
             <li>the plugin now exposes the time-averaged image as image stack No. 2, so we can e.g. use the colocalization plugin on this data</li>
             <li>improved resistance of bleach-correction to intensities, which are below the background intensity</li>
             <li>added tool (ImagingFCS Tools menu in RDR editor) to calculate FCS diffusion law</li>
+            <li>overview images in tab "Images, Countrates, Videos" may be viewed as fit results (if they have the same size, as the imFCS acquisition in the same record</li>
+            <li>mask may be copied also to records with different sizes (mask is rescaled then!), when "Mask | copy mask to ..." menu entries are used</li>
           </ul></li>
         <li><b>table</b><ul>
             <li>added "QuickStatistics" and "QuickHistogram" tools, which show the statistics and histograms of the current selection (column-wise)</li>
@@ -549,6 +553,7 @@
             <li>single-file image stacks may now load images with multiple frames</li>
             <li>added additional widgets to configure display in RDR editor</li>
             <li>image stacks may be exported from the RDR</li>
+            <li>mask may be copied also to records with different sizes (mask is rescaled then!), when "Mask | copy mask to ..." menu entries are used</li>
       </ul></li>
       <li><b>fitfunctions_lightsheet:</b><ul>
         <li>added Gaussian function with width specified as FWHM</li>

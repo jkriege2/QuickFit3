@@ -190,7 +190,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
 
     int row=0;
     cmbResultGroup=new QComboBox(this);
-    cmbResultGroup->setMaximumWidth(700);
+    cmbResultGroup->setMaximumWidth(500);
     cmbResultGroup->view()->setTextElideMode(Qt::ElideMiddle);
     cmbResultGroup->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     cmbResultGroup->addAction(actUseResultSetForAll);
@@ -205,6 +205,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbParameter->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     cmbParameter->addAction(actUseParam1SetForAll);
     cmbParameter->addAction(actUseParam1and2SetForAll);
+    cmbParameter->setMaximumWidth(500);
     cmbParameter->setContextMenuPolicy(Qt::ActionsContextMenu);
 
     topgrid->addWidget((labParameter=new QLabel(tr("&parameter:"))), row, 3);
@@ -239,7 +240,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     hblp2->addWidget(cmbOtherFileRole);
     hblp2->addWidget(new QLabel(tr("result set:")));
     cmbOtherFilesResultGroup=new QComboBox(this);
-    cmbOtherFilesResultGroup->setMaximumWidth(700);
+    cmbOtherFilesResultGroup->setMaximumWidth(500);
     cmbOtherFilesResultGroup->view()->setTextElideMode(Qt::ElideMiddle);
     cmbOtherFilesResultGroup->setSizeAdjustPolicy(QComboBox::AdjustToContents);
     cmbOtherFilesResultGroup->setEnabled(false);
@@ -257,6 +258,7 @@ void QFRDRImagingFCSImageEditor::createWidgets() {
     cmbParameter2->addAction(actUseParam2SetForAll);
     cmbParameter2->addAction(actUseParam1and2SetForAll);
     cmbParameter2->setContextMenuPolicy(Qt::ActionsContextMenu);
+    cmbParameter2->setMaximumWidth(500);
     topgrid->addWidget((labParameter2=new QLabel(tr("paramater &2:"))), row, 3);
     labParameter2->setBuddy(cmbParameter2);
     topgrid->addWidget(cmbParameter2, row, 4);

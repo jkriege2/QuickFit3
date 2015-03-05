@@ -65,14 +65,26 @@ QFHTMLHelpWindow::QFHTMLHelpWindow(QWidget* parent, Qt::WindowFlags flags):
     history_idx=-1;
 
     labelTitle=new QLabel(this);
-    descriptionBrowser=new QTextBrowser(this);
+#ifdef QF3_USE_WEBKIT
+        descriptionBrowser=new QWebView(this);
+        descriptionBrowser->setTextSizeMultiplier(1);
+        descriptionBrowser->settings()->setFontFamily(QWebSettings::StandardFont, font().family());
+        descriptionBrowser->settings()->setFontSize(QWebSettings::DefaultFontSize, font().pointSizeF()*1.2);
+        connect(descriptionBrowser, SIGNAL(linkClicked(QUrl)), this, SLOT(anchorClicked(const QUrl&)));
+
+#else
+        descriptionBrowser=new QTextBrowser(this);
+        descriptionBrowser->setOpenLinks(false);
+        descriptionBrowser->setOpenExternalLinks(false);
+        connect(descriptionBrowser, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(anchorClicked(const QUrl&)));
+
+#endif
+
+
     QPalette p=descriptionBrowser->palette();
     p.setColor(QPalette::Inactive, QPalette::Highlight, p.color(QPalette::Active,  QPalette::Highlight));
     p.setColor(QPalette::Inactive, QPalette::HighlightedText, p.color(QPalette::Active,  QPalette::HighlightedText));
     descriptionBrowser->setPalette(p);
-    descriptionBrowser->setOpenLinks(false);
-    descriptionBrowser->setOpenExternalLinks(false);
-    connect(descriptionBrowser, SIGNAL(anchorClicked(const QUrl&)), this, SLOT(anchorClicked(const QUrl&)));
 
 
     menuBar=new QMenuBar(this);
@@ -308,7 +320,12 @@ void QFHTMLHelpWindow::updateHelp(QString filename1) {
 void QFHTMLHelpWindow::clear() {
     labelTitle->setText("");
     actHome->setText(tr("&Home"));
+#ifdef QF3_USE_WEBKIT
+    descriptionBrowser->setHtml("");
+#else
     descriptionBrowser->clear();
+#endif
+
     updateButtons();
 }
 
@@ -325,7 +342,11 @@ void QFHTMLHelpWindow::helpOnHelp()
 }
 
 void QFHTMLHelpWindow::displayTitle() {
+#ifdef QF3_USE_WEBKIT
+    QString title=descriptionBrowser->title();
+#else
     QString title=descriptionBrowser->documentTitle();
+#endif
     labelTitle->setFont(m_titleFont);
     labelTitle->setText(title);
     labelTitle->setVisible(!title.isEmpty());
@@ -340,7 +361,11 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
     QString scheme=link.scheme().toLower();
 
     if (linkstr.startsWith("#")) {
+#ifdef QF3_USE_WEBKIT
+        descriptionBrowser->page()->currentFrame()->scrollToAnchor(linkstr.right(linkstr.size()-1));
+#else
         descriptionBrowser->scrollToAnchor(linkstr.right(linkstr.size()-1));
+#endif
         return;
     }
 
@@ -355,8 +380,8 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
                 tooltipfn=tooltips[tooltip].tooltipfile;
             }
             //qDebug()<<"show tooltip: "<<tooltip<<tooltips.value(tooltip);
-            QToolTip::showText(QCursor::pos(),/*descriptionBrowser->mapFromGlobal(QCursor::pos()),*/ transformQF3HelpHTML(tooltipstr, tooltipfn), descriptionBrowser, QRect());
-        } else if ((scheme=="open") || (scheme=="opendir") || (scheme=="openfile") || (scheme=="file")){
+            QToolTip::showText(QCursor::pos(), transformQF3HelpHTML(tooltipstr, tooltipfn), descriptionBrowser, QRect());
+        } else if ((scheme=="open") || (scheme=="opendir") || (scheme=="openfile")){
             //QDir spd(searchPath);
             //QString filenamen=link.toString(QUrl::RemoveScheme|QUrl::StripTrailingSlash);
             //QString filename=QFileInfo(QUrl("file:"+filenamen).toLocalFile()).absoluteFilePath();
@@ -379,21 +404,43 @@ void QFHTMLHelpWindow::anchorClicked(const QUrl& link) {
         } else {
             QDir spd(searchPath);
             QString filename=link.toString(QUrl::RemoveFragment);
+            if (filename.startsWith("file:///")) filename=filename.remove("file:///");
+            if (filename.startsWith("file://")) filename=filename.remove("file://");
             QString fragment=link.fragment();
+
             QString cl=spd.cleanPath(spd.absoluteFilePath(filename));
             QString s=spd.absoluteFilePath(cl); //absoluteFilePath
-            searchPath=QFileInfo(s).absolutePath();
+            searchPath=(QFileInfo(s).absolutePath()+"/");
+            //qDebug()<<link<<fragment<<filename<<cl<<s<<searchPath;
+#ifdef QF3_USE_WEBKIT
+            //descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
+            //qDebug()<<"### basePath: "<< QUrl::fromLocalFile(searchPath);
+            descriptionBrowser->setHtml(loadHTML(s), QUrl::fromLocalFile(searchPath)); //QString("file:///")+searchPath
+#else
             descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
             descriptionBrowser->setHtml(loadHTML(QFileInfo(s).absoluteFilePath()));
+#endif
             for (int i=history.size()-1; i>=qMax(0,history_idx)+1; i--) {
                 history.pop();
             }
+#ifdef QF3_USE_WEBKIT
+            descriptionBrowser->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+            descriptionBrowser->page()->setContentEditable(false);
+            history.push(HistoryEntry(s, descriptionBrowser->title()));
+#else
             history.push(HistoryEntry(s, descriptionBrowser->documentTitle()));
+#endif
             history_idx=history.size()-1;
             updateButtons();
             if (link.hasFragment()) {
+
+#ifdef QF3_USE_WEBKIT
+                descriptionBrowser->page()->currentFrame()->scrollToAnchor(QString("#")+fragment);
+                descriptionBrowser->page()->currentFrame()->scrollToAnchor(fragment);
+#else
                 descriptionBrowser->scrollToAnchor(QString("#")+fragment);
                 descriptionBrowser->scrollToAnchor(fragment);
+#endif
             }
         }
     } else {
@@ -416,17 +463,31 @@ void QFHTMLHelpWindow::showFile(QString filename1) {
     QDir spd(filename);
     QString cl=spd.cleanPath(spd.absoluteFilePath(filename));
     QString s=spd.absoluteFilePath(cl); //absoluteFilePath
-    searchPath=QFileInfo(s).absolutePath();
+    searchPath=(QFileInfo(s).absolutePath()+"/");
     //qDebug()<<QFileInfo(filename).absoluteFilePath()<<searchPath;
 
     //std::cout<<"showFile("<<filename.toStdString()<<")   spd="<<spd.canonicalPath().toStdString()<<"   cl="<<cl.toStdString()<<"   s="<<s.toStdString()<<"   searchPath="<<searchPath.toStdString()<<"  src="<<QFileInfo(s).fileName().toStdString()<<"\n";
+#ifdef QF3_USE_WEBKIT
+    //descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
+    //qDebug()<<"### basePath: "<< QUrl::fromLocalFile(searchPath);
+    descriptionBrowser->setHtml(loadHTML(s), QUrl::fromLocalFile(searchPath));
+#else
     descriptionBrowser->setSearchPaths(QStringList(searchPath)<<"./");
+    descriptionBrowser->setHtml(loadHTML(QFileInfo(filename).absoluteFilePath()));
+#endif
     //descriptionBrowser->setSource(QFileInfo(s).fileName());
     //descriptionBrowser->reload();
-    descriptionBrowser->setHtml(loadHTML(QFileInfo(filename).absoluteFilePath()));
+
     if (!fragment.isEmpty()) {
+#ifdef QF3_USE_WEBKIT
+        descriptionBrowser->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+        descriptionBrowser->page()->setContentEditable(false);
+        descriptionBrowser->page()->currentFrame()->scrollToAnchor(QString("#")+fragment);
+        descriptionBrowser->page()->currentFrame()->scrollToAnchor(fragment);
+#else
         descriptionBrowser->scrollToAnchor(QString("#")+fragment);
         descriptionBrowser->scrollToAnchor(fragment);
+#endif
     }
     QApplication::restoreOverrideCursor();
 }
@@ -449,13 +510,21 @@ void QFHTMLHelpWindow::next() {
 
 void QFHTMLHelpWindow::home() {
     showFile(m_home);
+#ifdef QF3_USE_WEBKIT
+    history.push(HistoryEntry(m_home, descriptionBrowser->title()));
+#else
     history.push(HistoryEntry(m_home, descriptionBrowser->documentTitle()));
+#endif
     history_idx=history.size()-1;
     updateButtons();
 }
 
 void QFHTMLHelpWindow::print() {
-    QPrinter* p=new QPrinter;
+    QTextDocument doc;
+    //descriptionBrowser->triggerPageAction(QWebPage::SelectAll);
+    doc.setHtml(descriptionBrowser->page()->currentFrame()->toHtml());
+
+    QPrinter* p=new QPrinter();
 
     // select a printer
 
@@ -466,14 +535,29 @@ void QFHTMLHelpWindow::print() {
         return;
     }
     QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-    descriptionBrowser->print(p);
+    //p->setResolution(96);
+    /*QPrintPreviewDialog* pdlg=new QPrintPreviewDialog(p);
+    connect(pdlg, SIGNAL(paintRequested(QPrinter*)), descriptionBrowser, SLOT());
+    if (pdlg->exec()) {
+
+        //descriptionBrowser->print(p);
+    }
+    delete pdlg;*/
+    doc.print(p);
     delete p;
     QApplication::restoreOverrideCursor();
 }
 
 void QFHTMLHelpWindow::save()
 {
+#ifdef QF3_USE_WEBKIT
+    QTextDocument doc;
+    //descriptionBrowser->triggerPageAction(QWebPage::SelectAll);
+    doc.setHtml(descriptionBrowser->page()->currentFrame()->toHtml());
+    qfSaveReport(&doc, tr("Help Page: %1").arg(labelTitle->text()), QString("qf3_help/"), this);
+#else
     qfSaveReport(descriptionBrowser->document(), tr("Help Page: %1").arg(labelTitle->text()), QString("qf3_help/"), this);
+#endif
 }
 
 
@@ -484,8 +568,12 @@ QString QFHTMLHelpWindow::loadHTML(QString filename, bool noPics) {
     const QString defaultTxt=tr("<html><header><title>Error: Help page does not exist</title></header><body>$$qf_commondoc_header.start$$ $$qf_commondoc_header.simplest$$ $$qf_commondoc_header.end$$<center>The Quickfit online-help page you are trying to access does not exist!<br><br>File was: <i>%1</i></center></body></html>").arg(filename);
 
     QString s= transformQF3HelpHTMLFile(filename, defaultTxt, true, QFHelpReplacesList(), true, noPics, true);
+#ifdef QF3_USE_WEBKIT
+    s=s.replace(QRegExp("src\\s*=\\s*\"\\:\\/"), QLatin1String("src=\"qrc:/"));
+#endif
     QApplication::restoreOverrideCursor();
 
+    //qDebug()<<"HTML: "<<filename<<noPics<<"\n\n=======================================\n"<<s<<"\n=======================================\n";
     return s;
 
 }
@@ -694,6 +782,10 @@ void QFHTMLHelpWindow::searchHelpDir(const QDir &dir, QStringList &files) {
 void QFHTMLHelpWindow::findNext()
 {
     QString phrase=edtFind->text();
+
+#ifdef QF3_USE_WEBKIT
+
+#else
     QTextDocument::FindFlags options;
     if (chkCaseSensitive->isChecked()) options=options|QTextDocument::FindCaseSensitively;
     if (chkFindWholeWord->isChecked()) options=options|QTextDocument::FindWholeWords;
@@ -710,11 +802,31 @@ void QFHTMLHelpWindow::findNext()
         else p.setColor(QPalette::Base, palette().color(QPalette::Base));
         edtFind->setPalette(p);
     }
+#endif
+
 }
 
 void QFHTMLHelpWindow::findPrev()
 {
     QString phrase=edtFind->text();
+#ifdef QF3_USE_WEBKIT
+    QWebPage::FindFlags options=QWebPage::FindBackward;
+    if (chkCaseSensitive->isChecked()) options=options|QWebPage::FindCaseSensitively;
+    if (chkFindWholeWord->isChecked()) options=options|QWebPage::FindAtWordBeginningsOnly;
+    if (phrase.isEmpty()) {
+        descriptionBrowser->triggerPageAction(QWebPage::MoveToStartOfDocument);
+    } else {
+        bool found=descriptionBrowser->findText(phrase, options);
+        if (!found) {
+            descriptionBrowser->triggerPageAction(QWebPage::MoveToStartOfDocument);
+            found=descriptionBrowser->findText(phrase, options);
+        }
+        QPalette p=edtFind->palette();
+        if (!found) p.setColor(QPalette::Base, QColor("mistyrose"));
+        else p.setColor(QPalette::Base, palette().color(QPalette::Base));
+        edtFind->setPalette(p);
+    }
+#else
     QTextDocument::FindFlags options=QTextDocument::FindBackward;
     if (chkCaseSensitive->isChecked()) options=options|QTextDocument::FindCaseSensitively;
     if (chkFindWholeWord->isChecked()) options=options|QTextDocument::FindWholeWords;
@@ -731,6 +843,8 @@ void QFHTMLHelpWindow::findPrev()
         else p.setColor(QPalette::Base, palette().color(QPalette::Base));
         edtFind->setPalette(p);
     }
+#endif
+
 }
 
 void QFHTMLHelpWindow::searchAllItemDoubleClicked(QListWidgetItem *item) {
@@ -740,6 +854,9 @@ void QFHTMLHelpWindow::searchAllItemDoubleClicked(QListWidgetItem *item) {
     int flags=item->data(Qt::UserRole+4).toInt();
     QString phrase=item->data(Qt::UserRole+3).toString();
     anchorClicked(QUrl(file));
+#ifdef QF3_USE_WEBKIT
+    descriptionBrowser->findText(phrase);
+#else
     if (selStart>=0 && selEnd>selStart) {
         QTextCursor cur=QTextCursor(descriptionBrowser->document());
         cur.setPosition(selStart);
@@ -748,6 +865,8 @@ void QFHTMLHelpWindow::searchAllItemDoubleClicked(QListWidgetItem *item) {
     } else {
         descriptionBrowser->find(phrase, (QTextDocument::FindFlags)flags);
     }
+#endif
+
 }
 
 QFHTMLHelpWindow::ContentsEntry::ContentsEntry()
