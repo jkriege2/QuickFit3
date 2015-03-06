@@ -75,136 +75,148 @@ QFImFCSFitEvaluationEditor::~QFImFCSFitEvaluationEditor()
 }
 
 
-void QFImFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plots, int option)
+void QFImFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plots, int option, const QString &optionName)
 {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(rec);
     QFImFCSFitEvaluation* eval=qobject_cast<QFImFCSFitEvaluation*>(current);
     if (data&&eval) {
-        double norm=1;
-        QVector<double> acftau, acf;
-        acftau=arrayToVector(data->getCorrelationT(), data->getCorrelationN());;
-        QFFitFunction* ffunc=eval->getFitFunction(rec);
-        int datacut_min=datacut->get_min();
-        int datacut_max=datacut->get_max();
 
-        try {
-            if (data->getCorrelationN()>0) {
+        if (option>3) {
+            if (optionName==tr("FCS Diffusion Law: tauD vs. Aeff")) {
+            } else if (optionName==tr("FCS Diffusion Law: Aeff/D vs. Aeff")) {
+            } else if (optionName==tr("FCS Diffusion Law: tauD vs. w_{xy}^2")) {
+            } else if (optionName==tr("FCS Diffusion Law: Aeff/D vs. w_{xy}^2")) {
+            } else if (optionName==tr("FCS MSD: tauD vs. d^2")) {
+            } else if (optionName==tr("FCS MSD: d^2/D vs. d^2")) {
+            }
+        } else {
 
-                long N=data->getCorrelationN();
-                int runAvgWidth=11;
-                double* tauvals=data->getCorrelationT();
-                double* corrdata=NULL;
+            double norm=1;
+            QVector<double> acftau, acf;
+            acftau=arrayToVector(data->getCorrelationT(), data->getCorrelationN());;
+            QFFitFunction* ffunc=eval->getFitFunction(rec);
+            int datacut_min=datacut->get_min();
+            int datacut_max=datacut->get_max();
 
-                if (eval->getCurrentIndex()<0) {
-                    corrdata=data->getCorrelationMean();
-                } else {
-                    if (eval->getCurrentIndex()<(int)data->getCorrelationRuns()) {
-                        corrdata=data->getCorrelationRun(eval->getCurrentIndex());
-                    } else {
+            try {
+                if (data->getCorrelationN()>0) {
+
+                    long N=data->getCorrelationN();
+                    int runAvgWidth=11;
+                    double* tauvals=data->getCorrelationT();
+                    double* corrdata=NULL;
+
+                    if (eval->getCurrentIndex()<0) {
                         corrdata=data->getCorrelationMean();
-                    }
-                }
-                double* weights=eval->allocWeights(NULL, rec, eval->getCurrentIndex(), datacut_min, datacut_max);
-
-
-                /////////////////////////////////////////////////////////////////////////////////
-                // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
-                // we are working with a complete set of parameters
-                /////////////////////////////////////////////////////////////////////////////////
-                double* fullParams=eval->allocFillParameters(rec, index, ffunc);
-                double* errors=eval->allocFillParameterErrors(rec, index, ffunc);
-                ffunc->calcParameter(fullParams, errors);
-
-                for (int i=0; i<acftau.size(); i++) {
-                    acf<<ffunc->evaluate(acftau[i], fullParams);
-                }
-
-                /////////////////////////////////////////////////////////////////////////////////
-                // try and find particle number for normalized CF
-                /////////////////////////////////////////////////////////////////////////////////
-                bool hasN=false;
-                bool has1N=false;
-                double pN=0, peN=0;
-                double p1N=0, pe1N=0;
-                for (int i=0;i<ffunc->paramCount(); i++) {
-                    QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
-                    if (ffunc->isParameterVisible(i, fullParams)) {
-                        if (d.id=="n_particle") {
-                            hasN=true;
-                            pN=fullParams[i];
-                            if (errors) peN=errors[i];
-                            break;
-                        } else if (d.id=="1n_particle") {
-                            has1N=true;
-                            p1N=fullParams[i];
-                            if (errors) pe1N=errors[i];
+                    } else {
+                        if (eval->getCurrentIndex()<(int)data->getCorrelationRuns()) {
+                            corrdata=data->getCorrelationRun(eval->getCurrentIndex());
+                        } else {
+                            corrdata=data->getCorrelationMean();
                         }
                     }
+                    double* weights=eval->allocWeights(NULL, rec, eval->getCurrentIndex(), datacut_min, datacut_max);
+
+
+                    /////////////////////////////////////////////////////////////////////////////////
+                    // retrieve fit parameters and errors. run calcParameters to fill in calculated parameters and make sure
+                    // we are working with a complete set of parameters
+                    /////////////////////////////////////////////////////////////////////////////////
+                    double* fullParams=eval->allocFillParameters(rec, index, ffunc);
+                    double* errors=eval->allocFillParameterErrors(rec, index, ffunc);
+                    ffunc->calcParameter(fullParams, errors);
+
+                    for (int i=0; i<acftau.size(); i++) {
+                        acf<<ffunc->evaluate(acftau[i], fullParams);
+                    }
+
+                    /////////////////////////////////////////////////////////////////////////////////
+                    // try and find particle number for normalized CF
+                    /////////////////////////////////////////////////////////////////////////////////
+                    bool hasN=false;
+                    bool has1N=false;
+                    double pN=0, peN=0;
+                    double p1N=0, pe1N=0;
+                    for (int i=0;i<ffunc->paramCount(); i++) {
+                        QFFitFunction::ParameterDescription d=ffunc->getDescription(i);
+                        if (ffunc->isParameterVisible(i, fullParams)) {
+                            if (d.id=="n_particle") {
+                                hasN=true;
+                                pN=fullParams[i];
+                                if (errors) peN=errors[i];
+                                break;
+                            } else if (d.id=="1n_particle") {
+                                has1N=true;
+                                p1N=fullParams[i];
+                                if (errors) pe1N=errors[i];
+                            }
+                        }
+                    }
+
+                    if (!hasN && has1N) {
+                        pN=1.0/p1N;
+                        peN=qfErrorDiv(1, 0, p1N, pe1N);
+                        hasN=true;
+                    }
+                    if (hasN && corrdata) {
+                        norm=pN;
+                    }
+
+                    /////////////////////////////////////////////////////////////////////////////////
+                    // clean memory
+                    /////////////////////////////////////////////////////////////////////////////////
+                    qfFree(fullParams);
+                    qfFree(errors);
+                    qfFree(weights);
                 }
-
-                if (!hasN && has1N) {
-                    pN=1.0/p1N;
-                    peN=qfErrorDiv(1, 0, p1N, pe1N);
-                    hasN=true;
-                }
-                if (hasN && corrdata) {
-                    norm=pN;
-                }
-
-                /////////////////////////////////////////////////////////////////////////////////
-                // clean memory
-                /////////////////////////////////////////////////////////////////////////////////
-                qfFree(fullParams);
-                qfFree(errors);
-                qfFree(weights);
-            }
-        } catch(std::exception& E) {
-            services->log_error(tr("error during plotting, error message: %1\n").arg(E.what()));
-        }
-
-
-
-
-        QFGetPlotdataInterface::GetPlotDataItem item;
-        item.x=acftau;
-        item.y=arrayToVector(data->getCorrelationRun(index), data->getCorrelationN());
-        bool ok=true;
-        double* w=eval->allocWeights(&ok, rec, index);
-        if (ok && w) {
-            item.yerrors=arrayToVector(w, data->getCorrelationN());
-        }
-        if (w) qfFree(w);
-        item.name=rec->getName()+": "+data->getCorrelationRunName(index);
-        if (option==2 || option==3) {
-            item.name+=tr(", normalized");
-
-            for (int i=0; i<item.y.size(); i++) {
-                item.y[i]=item.y[i]*norm;
-            }
-            for (int i=0; i<item.yerrors.size(); i++) {
-                item.yerrors[i]=item.yerrors[i]*norm;
+            } catch(std::exception& E) {
+                services->log_error(tr("error during plotting, error message: %1\n").arg(E.what()));
             }
 
-        }
-        item.name=QString("\\verb{%1}").arg(item.name);
-        plots.append(item);
 
-        if (option==1 || option==3) {
-            item.xerrors.clear();
-            item.yerrors.clear();
-            item.y=acf;
-            item.name=rec->getName()+": "+data->getCorrelationRunName(index)+tr(": fit");
-            if (option==3) {
-                item.name=rec->getName()+": "+data->getCorrelationRunName(index)+tr(": normalized fit");
+
+
+            QFGetPlotdataInterface::GetPlotDataItem item;
+            item.x=acftau;
+            item.y=arrayToVector(data->getCorrelationRun(index), data->getCorrelationN());
+            bool ok=true;
+            double* w=eval->allocWeights(&ok, rec, index);
+            if (ok && w) {
+                item.yerrors=arrayToVector(w, data->getCorrelationN());
+            }
+            if (w) qfFree(w);
+            item.name=rec->getName()+": "+data->getCorrelationRunName(index);
+            if (option==2 || option==3) {
+                item.name+=tr(", normalized");
+
                 for (int i=0; i<item.y.size(); i++) {
                     item.y[i]=item.y[i]*norm;
                 }
                 for (int i=0; i<item.yerrors.size(); i++) {
                     item.yerrors[i]=item.yerrors[i]*norm;
                 }
+
             }
             item.name=QString("\\verb{%1}").arg(item.name);
             plots.append(item);
+
+            if (option==1 || option==3) {
+                item.xerrors.clear();
+                item.yerrors.clear();
+                item.y=acf;
+                item.name=rec->getName()+": "+data->getCorrelationRunName(index)+tr(": fit");
+                if (option==3) {
+                    item.name=rec->getName()+": "+data->getCorrelationRunName(index)+tr(": normalized fit");
+                    for (int i=0; i<item.y.size(); i++) {
+                        item.y[i]=item.y[i]*norm;
+                    }
+                    for (int i=0; i<item.yerrors.size(); i++) {
+                        item.yerrors[i]=item.yerrors[i]*norm;
+                    }
+                }
+                item.name=QString("\\verb{%1}").arg(item.name);
+                plots.append(item);
+            }
         }
 
     }
@@ -223,6 +235,88 @@ bool QFImFCSFitEvaluationEditor::getPlotDataSpecs(QStringList *optionNames, QLis
         *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("correlation curve $g(\\tau)$"), true, false);
         *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("norm. correlation curve $N\\cdot g(\\tau)$"), true, false);
         *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("lag time \\tau [s]"), tr("norm. correlation curve $N\\cdot g(\\tau)$"), true, false);
+    }
+    if (false && current) {
+        QFRawDataRecord* record=current->getHighlightedRecord();
+        QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);
+        QFImFCSFitEvaluation* eval=qobject_cast<QFImFCSFitEvaluation*>(current);
+        if (data && eval) {
+            QFFitFunction* ff=eval->getFitFunction();
+            if (ff) {
+                bool hasTauD=ff->hasParameter("diff_tau1");
+                QString unitTauD="";
+                if (hasTauD) unitTauD=ff->getDescription("diff_tau1").unit;
+
+                bool hasMSDTauD=ff->hasParameter("msd_time_aeff1");
+                QString unitMSDTauD="";
+                if (hasMSDTauD) unitMSDTauD=ff->getDescription("msd_time_aeff1").unit;
+
+                bool hasWxy=ff->hasParameter("focus_width");
+                QString unitWxy="";
+                if (hasWxy) unitWxy=ff->getDescription("focus_width").unit;
+
+                bool hasD=ff->hasParameter("diff_coeff1");
+                QString unitD="";
+                if (hasD) unitD=ff->getDescription("diff_coeff1").unit;
+
+                bool hasAeff=ff->hasParameter("effective_area");
+                QString unitAEff="";
+                if (hasAeff) unitAEff=ff->getDescription("effective_area").unit;
+
+                bool hasDist=ff->hasParameter("focus_distance");
+                QString unitDist="";
+                if (hasDist) unitDist=ff->getDescription("focus_distance").unit;
+
+                if (hasTauD && hasAeff) {
+                    if (optionNames) {
+                        *optionNames<<tr("FCS Diffusion Law: tauD vs. Aeff");
+                    }
+                    if (listPlotOptions) {
+                        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("effective focus area A_{eff} [{\\mu}m^2]"), tr("effective diffusion time \\tau_D [s]"), false, false);
+                    }
+                }
+                if (hasD && hasAeff) {
+                    if (optionNames) {
+                        *optionNames<<tr("FCS Diffusion Law: Aeff/D vs. Aeff");
+                    }
+                    if (listPlotOptions) {
+                        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("effective focus area A_{eff} [{\\mu}m^2]"), tr("effective diffusion time \\tau_D=A_{eff}/D [s]"), false, false);
+                    }
+                }
+                if (hasTauD && hasWxy) {
+                    if (optionNames) {
+                        *optionNames<<tr("FCS Diffusion Law: tauD vs. w_{xy}^2");
+                    }
+                    if (listPlotOptions) {
+                        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("effective focus area A_{eff}=w_{xy}^2 [{\\mu}m^2]"), tr("effective diffusion time \\tau_D [s]"), false, false);
+                    }
+                }
+                if (hasD && hasWxy) {
+                    if (optionNames) {
+                        *optionNames<<tr("FCS Diffusion Law: Aeff/D vs. w_{xy}^2");
+                    }
+                    if (listPlotOptions) {
+                        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("effective focus area A_{eff}=w_{xy}^2 [{\\mu}m^2]"), tr("effective diffusion time \\tau_D=w_{xy}^2/D [s]"), false, false);
+                    }
+                }
+                if (hasTauD && hasDist) {
+                    if (optionNames) {
+                        *optionNames<<tr("FCS MSD: tauD vs. d^2");
+                    }
+                    if (listPlotOptions) {
+                        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("diffusion time \\tau_D [s]"), tr("squared focus distance d^2 [{\\mu}m^2]"), false, false);
+                    }
+                }
+                if (hasD && hasDist) {
+                    if (optionNames) {
+                        *optionNames<<tr("FCS MSD: d^2/D vs. d^2");
+                    }
+                    if (listPlotOptions) {
+                        *listPlotOptions<<QFGetPlotdataInterface::GetPlotPlotOptions(tr("diffusion time \\tau_D=d^2/D [s]"), tr("squared focus distance d^2 [{\\mu}m^2]"), false, false);
+                    }
+                }
+            }
+        }
     }
     return true;
 }

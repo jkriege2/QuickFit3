@@ -35,10 +35,10 @@ class QFUsesResultsByIndexEvaluationEditor : public QFEvaluationEditor, public Q
         /** \brief write the settings */
         virtual void writeSettings();
         /** \brief returns plot data (appends to the list \a data ) from the given record and index therein. \a option specifies, which data to return. */
-        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem>& data, int option);
-        virtual void getPlotData(QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option);
-        virtual void getPlotData(int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option);
-        virtual void getPlotData(QFRawDataRecord *rec, QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option);
+        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem>& data, int option, const QString& optionName);
+        virtual void getPlotData(QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option, const QString& optionName);
+        virtual void getPlotData(int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option, const QString& optionName);
+        virtual void getPlotData(QFRawDataRecord *rec, QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option, const QString& optionName);
         /** \brief returns \c true, if the getPlotData Feature is available and (if lists are supplied) a list of optionNames. */
         virtual bool getPlotDataSpecs(QStringList* optionNames=NULL, QList<QFGetPlotdataInterface::GetPlotPlotOptions>* listPlotOptions=NULL);
         virtual int getUserMin(QFRawDataRecord *rec, int index, int defaultMin);

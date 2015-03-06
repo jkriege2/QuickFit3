@@ -520,9 +520,12 @@ void QFHTMLHelpWindow::home() {
 }
 
 void QFHTMLHelpWindow::print() {
-    QTextDocument doc;
     //descriptionBrowser->triggerPageAction(QWebPage::SelectAll);
+#ifdef QF3_USE_WEBKIT
+    QTextDocument doc;
     doc.setHtml(descriptionBrowser->page()->currentFrame()->toHtml());
+#else
+#endif
 
     QPrinter* p=new QPrinter();
 
@@ -543,7 +546,12 @@ void QFHTMLHelpWindow::print() {
         //descriptionBrowser->print(p);
     }
     delete pdlg;*/
+#ifdef QF3_USE_WEBKIT
     doc.print(p);
+#else
+    descriptionBrowser->print(p);
+#endif
+
     delete p;
     QApplication::restoreOverrideCursor();
 }

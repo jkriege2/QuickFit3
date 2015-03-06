@@ -189,8 +189,8 @@
             <li>image reader plugins now support multiple channels</li>
             <li>added widget to configuration dialog, which allows to set the global config directory</li>
             <li>added context menu entry to evaluation results tab of evaluation editors, which allows to copy fit results to a table, where expressions are used to dynamically access the data (where possible).</li>
-            <li>"open Project" button in Toolbar now has an arrw, which drops down a list of the recent files</li>
-            <li>using WebKit for Online-Help display now (better rendering)</li>
+            <li>"open Project" button in Toolbar now has an arrow, which drops down a list of the recent files</li>
+            <!--<li>using WebKit for Online-Help display now (better rendering)</li>-->
           </ul></li>
 	
         <li><b>imFCCSFit</b><ul>
@@ -262,6 +262,7 @@
             <li>added fit function for 3D normal diffusion with stretched exponential photophysics</li>
             <li>added fit function for 3D normal diffusion with afterpulsing and C instead of N as parameter</li>
             <li>added fit function for 2D normal diffusion (xy) in TIRF-FCS ... these are just renamed versions of the 2D diffusion confocal model versions</li>
+            <li>fit function with flow and v as parameter now supports up to three diffusing species and up to two non-fluorescent states</li>
           </ul></li>
           <li><b>DLS fit functions</b><ul>
             <li>added fit functions for normal distribution of correlation times, which calculate the integral with numeric integration (improved accuracy over the old implementation with a sum!)</li>
@@ -286,6 +287,7 @@
             <li>added fit function for 2-pixel FCCS with 1-3 diffusing components (no flow)</li>
             <li>added fit function for 2-pixel FCCS with 1 diffusing+flow component and one diffusing global component (does not mind the shift!!!)</li>
             <li>added flow angle, centered around 0° and 180° as calculated fit parameters to models with flow</li>
+            <li>2-pixel FCCS fit function with flow now also support several diffusing species (with different diffusion coefficients, but a single flow velocity)</li>
           </ul></li>
          <li><b>TIR-FCS fit functions</b><ul>
             <li>flow FCCS fit functions also calculate the angle of the flow now</li>
@@ -295,6 +297,7 @@
             <li>added models for 2-color TIR-FCCS with anomalous diffusion</li>
             <li>added flow angle, centered around 0° and 180° as calculated fit parameters to models with flow</li>
             <li>added fit functions for 3D+2D diffusion</li>
+            <li>2-pixel FCCS fit function with flow now also support several diffusing species (with different diffusion coefficients, but a single flow velocity)</li>
           </ul></li>
           <li><b>imagingFCS</b><ul>
             <li>bugfix: set background from selected pixels function didn't work correctly</li>

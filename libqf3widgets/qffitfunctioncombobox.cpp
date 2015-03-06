@@ -141,19 +141,6 @@ void QFFitFunctionComboBox::updateFitFunctions(const QString &filter)
                 item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
 
             }
-            /*if (it.value()->category().isEmpty() || it.value()->shortName().toLower().trimmed().simplified().startsWith(it.value()->category().toLower().trimmed().simplified())) {
-                addItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->shortName(), it.key());
-            } else {
-                addItem(QIcon(":/lib/fitfunc_icon.png"), it.value()->category()+QString(": ")+it.value()->shortName(), it.key());
-            }
-            if (it.value()->isDeprecated() && m) {
-                int i=count()-1;
-                //qDebug()<<"deprecated: "<<i<<it.value()->name();
-                QStandardItem *item = m->item(i,0);
-                item->setForeground(QColor("darkgrey"));
-                item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
-
-            }*/
 
             delete it.value();
         }
@@ -181,20 +168,12 @@ void QFFitFunctionComboBox::updateFitFunctions(const QStringList &availableFF)
             if (ff) {
                 QFSimpleTreeModelItem* item=m_model->addFolderedItem(ff->category(), ff->shortName(), ff->id());
                 item->setIcon(QIcon(":/lib/fitfunc_icon.png"));
-                if (ff->isDeprecated() && m) {
+                if (ff->isDeprecated()) {
                     item->setForeground(QColor("darkgrey"));
                     item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
 
                 }
 
-                /*addItem(QIcon(":/lib/fitfunc_icon.png"), ff->shortName(), m_availableFuncs[i]);
-                if (ff->isDeprecated()) {
-                    int i=count()-1;
-                    //qDebug()<<"deprecated: "<<i<<ff->name();
-                    QStandardItem *item = m->item(i,0);
-                    item->setForeground(QColor("darkgrey"));
-                    item->setText(tr("[DEPRECATED]: %1").arg(item->text()));
-                }*/
                 delete ff;
             }
         }

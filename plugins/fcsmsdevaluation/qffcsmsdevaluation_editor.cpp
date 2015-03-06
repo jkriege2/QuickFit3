@@ -75,7 +75,7 @@ QFFCSMSDEvaluationEditor::~QFFCSMSDEvaluationEditor()
 {
 }
 
-void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plotdata, int option)
+void QFFCSMSDEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plotdata, int option, const QString &optionName)
 {
     if (!current) return;
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(record);

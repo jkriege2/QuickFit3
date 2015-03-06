@@ -72,7 +72,7 @@ QFFCSMaxEntEvaluationEditor::~QFFCSMaxEntEvaluationEditor()
 {
 }
 
-void QFFCSMaxEntEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plotdata, int option)
+void QFFCSMaxEntEvaluationEditor::getPlotData(QFRawDataRecord *record, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plotdata, int option, const QString &optionName)
 {
     if (!current) return;
     if (!cmbModel) return;

@@ -35,4 +35,4 @@ QF3CONFIG+=nospecials
 #DEFINES += QF_DONT_EXPLICITLY_MUTEXLOC_MALLOC
 
 # activate if webkit is NOT available
-#QF3CONFIG+=nowebkit
+QF3CONFIG+=nowebkit

@@ -30,7 +30,7 @@ QFFitResultsByIndexEvaluationEditorBase::QFFitResultsByIndexEvaluationEditorBase
 
 }
 
-void QFFitResultsByIndexEvaluationEditorBase::getPlotData(QFRawDataRecord *rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option)
+void QFFitResultsByIndexEvaluationEditorBase::getPlotData(QFRawDataRecord *rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option, const QString &optionName)
 {
 
 }
@@ -496,7 +496,7 @@ void QFFitResultsByIndexEvaluationEditorBase::createOverlayPlot()
         QList<QFGetPlotdataInterface::GetPlotDataItem> data;
         for (int i=0; i<rdr.size(); i++) {
             if (rdr[i]) {
-                getPlotData(rdr[i], data, cmbOptions->currentIndex());
+                getPlotData(rdr[i], data, cmbOptions->currentIndex(), cmbOptions->currentText());
             }
         }
         if (data.size()>0) {
@@ -518,23 +518,23 @@ void QFFitResultsByIndexEvaluationEditorBase::createOverlayPlot()
 }
 
 
-void QFFitResultsByIndexEvaluationEditorBase::getPlotData(QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option)
+void QFFitResultsByIndexEvaluationEditorBase::getPlotData(QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option, const QString &optionName)
 {
     QFFitResultsByIndexEvaluation* fcs=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    if (fcs) getPlotData(fcs->getHighlightedRecord(), fcs->getCurrentIndex(), data, option);
+    if (fcs) getPlotData(fcs->getHighlightedRecord(), fcs->getCurrentIndex(), data, option, optionName);
 }
 
 
-void QFFitResultsByIndexEvaluationEditorBase::getPlotData(int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option)
+void QFFitResultsByIndexEvaluationEditorBase::getPlotData(int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option, const QString &optionName)
 {
     QFFitResultsByIndexEvaluation* fcs=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    if (fcs) getPlotData(fcs->getHighlightedRecord(), index, data, option);
+    if (fcs) getPlotData(fcs->getHighlightedRecord(), index, data, option, optionName);
 }
 
-void QFFitResultsByIndexEvaluationEditorBase::getPlotData(QFRawDataRecord *rec, QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option)
+void QFFitResultsByIndexEvaluationEditorBase::getPlotData(QFRawDataRecord *rec, QList<QFGetPlotdataInterface::GetPlotDataItem> &data, int option, const QString &optionName)
 {
     QFFitResultsByIndexEvaluation* fcs=qobject_cast<QFFitResultsByIndexEvaluation*>(current);
-    if (fcs) getPlotData(rec, fcs->getCurrentIndex(), data, option);
+    if (fcs) getPlotData(rec, fcs->getCurrentIndex(), data, option, optionName);
 
 }
 

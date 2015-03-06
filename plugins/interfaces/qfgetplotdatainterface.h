@@ -75,7 +75,7 @@ class QFGetPlotdataInterface
 
         virtual ~QFGetPlotdataInterface() {}
         /** \brief returns plot data (appends to the list \a data ) from the given record and index therein. \a option specifies, which data to return. */
-        virtual void getPlotData(QList<GetPlotDataItem>& data, int option)=0;
+        virtual void getPlotData(QList<GetPlotDataItem>& data, int option, const QString& optionName)=0;
         /** \brief returns \c true, if the getPlotData Feature is available and (if lists are supplied) a list of optionNames. */
         virtual bool getPlotDataSpecs(QStringList* optionNames=NULL, QList<GetPlotPlotOptions>* listPlotOptions=NULL)=0;
 };
@@ -87,7 +87,7 @@ class QFEvaluationGetPlotdataInterface
 
         virtual ~QFEvaluationGetPlotdataInterface() {}
         /** \brief returns plot data (appends to the list \a data ) from the given record and index therein. \a option specifies, which data to return. */
-        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem>& data, int option)=0;
+        virtual void getPlotData(QFRawDataRecord* rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem>& data, int option, const QString& optionName)=0;
         /** \brief returns \c true, if the getPlotData Feature is available and (if lists are supplied) a list of optionNames. */
         virtual bool getPlotDataSpecs(QStringList* optionNames=NULL, QList<QFGetPlotdataInterface::GetPlotPlotOptions>* listPlotOptions=NULL)=0;
 };

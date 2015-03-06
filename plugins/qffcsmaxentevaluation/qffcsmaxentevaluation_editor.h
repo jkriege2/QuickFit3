@@ -101,7 +101,7 @@ class QFFCSMaxEntEvaluationEditor : public QFFCSByIndexAndModelEvaluationEditor 
         virtual ~QFFCSMaxEntEvaluationEditor();
 
 
-        virtual void getPlotData(QFRawDataRecord* record, int index, QList<QFGetPlotdataInterface::GetPlotDataItem>& plotdata, int option);
+        virtual void getPlotData(QFRawDataRecord* record, int index, QList<QFGetPlotdataInterface::GetPlotDataItem>& plotdata, int option, const QString& optionName);
         virtual bool getPlotDataSpecs(QStringList* optionNames=NULL, QList<QFGetPlotdataInterface::GetPlotPlotOptions>* listPlotOptions=NULL);
 
 

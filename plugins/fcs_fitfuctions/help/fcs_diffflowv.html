@@ -2,14 +2,17 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-<title>$local_plugin_subname$</title>
+<title>$$local_plugin_subname$$</title>
 </head>
 <body>
 $$qf_commondoc_header.start$$  $$qf_commondoc_header.end$$ 
 
 
 This file implement a one-component 3D diffusion model which also includes a flow and a triplett term. The model may be denoted as:
-$$bmath:G(\tau)=G_\infty+\frac{1}{N}\cdot X_{back}\cdot\frac{1}{(1+b/\mbox{cps})^2}\cdot\left(\frac{1-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{trip}}\right)\cdot\left(1+\frac{4D\tau}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{4D\tau}{\gamma^2w_{xy}^2}\right)^{-1/2}\cdot\exp\left(-\frac{v\tau}{w_{xy}\cdot\left(1+\frac{4D\tau}{w_{xy}^2}\right)\right)$$
+$$bmath:G(\tau)=G_\infty+\frac{1}{N}\cdot X_{back}\cdot\frac{1}{(1+b/\mbox{cps})^2}\cdot X_{photo}(\tau)\cdot\sum_{i=1}^3\rho_i\left(1+\frac{4D_i\tau}{w_{xy}^2}\right)^{-1}\cdot\left(1+\frac{4D_i\tau}{\gamma^2w_{xy}^2}\right)^{-1/2}\cdot\exp\left(-\frac{v\tau}{w_{xy}\cdot\left(1+\frac{4D_i\tau}{w_{xy}^2}\right)\right)$$
+where
+$$bmath:\sum_{i=1}^3\rho_i=1$$
+$$bmath:X_{photo}(\tau) = \frac{1-\Theta_{non}+\Theta_{non}\mathrm{e}^{-\tau/\tau_{non}}-\Theta_{trip}+\Theta_{trip}\mathrm{e}^{-\tau/\tau_{trip}}}{1-\Theta_{non}-\Theta_{trip}}$$
 The background correction is performed by factor
 $$bmath:X_{back}=\frac{(I-B)^2}{I^2}.$$
 <p> The parameters are: </p>
@@ -18,7 +21,7 @@ $$bmath:X_{back}=\frac{(I-B)^2}{I^2}.$$
 <li>$$math:N$$: overall particle number (including currently dark particles, e.g. in triplet state)</li>
 <li>$$math:\Theta_{trip}, \Theta_{non}$$: fraction of the particles in the triplet/non-fluorescent state</li>
 <li>$$math:\tau_{trip},\tau_{non}$$: decay time of the triplet/non-fluorescent state</li>
-<li>$$math:D$$: diffusion coefficient</li>
+<li>$$math:D_i$$: diffusion coefficient of species i</li>
 <li>$$math:v$$: flow veocity</li>
 <li>$$math: \gamma=\frac{z_0}{w_{xy}} $$: aspect ratio of the gaussian used to approximate the focus</li>
 <li>$$math: w_{xy} $$: lateral half axis of the focus gaussian</li>

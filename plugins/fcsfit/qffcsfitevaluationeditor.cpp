@@ -671,7 +671,7 @@ int QFFCSFitEvaluationEditor::getUserRangeMin(QFRawDataRecord *rec, int index) {
     return 0;
 }
 
-void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plots, int option)
+void QFFCSFitEvaluationEditor::getPlotData(QFRawDataRecord *rec, int index, QList<QFGetPlotdataInterface::GetPlotDataItem> &plots, int option, const QString &optionName)
 {
     QFRDRFCSDataInterface* data=qobject_cast<QFRDRFCSDataInterface*>(rec);
     QFFCSFitEvaluation* eval=qobject_cast<QFFCSFitEvaluation*>(current);

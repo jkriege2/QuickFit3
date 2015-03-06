@@ -4643,6 +4643,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
     bool foundPlugin=false;
     if (pluginList) {
         for (int i=0; i<pluginList->size(); i++) {
+            //qDebug()<<"*** "
             if (QDir(pluginList->at(i).directory)==basepath) { // we found the info for this directory
                 QString pid=pluginList->at(i).plugin->getID();
                 QString pid_sub_deocrated="";
@@ -4699,10 +4700,12 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     }
                 }
 
+                //qDebug()<<"### "<<pid<<faname<<fa_shortname<<fn;
+
                 QString pid_decorated=tr("<small><br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[pluginID: <b><tt>%1</tt></b>%2]</small>").arg(pluginList->at(i).plugin->getID()).arg(pid_sub_deocrated);
 
 
-                fromHTML_replaces.append(qMakePair(QString("local_plugin_icon"), QString("<img src=\"%1\">").arg(pluginList->at(i).plugin->getIconFilename())));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_icon"), QString("<img src=\"qrc%1\">").arg(pluginList->at(i).plugin->getIconFilename())));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_iconfilename"), pluginList->at(i).plugin->getIconFilename()));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_name"), pluginList->at(i).plugin->getName()));
 
@@ -4883,6 +4886,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             int count = 0;
             int pos = 0;
             while ((pos = rxList.indexIn(result, pos)) != -1) {
+                bool replaced=false;
                 QString list=rxList.cap(1).toLower().trimmed();
                 QString filter=rxList.cap(2).trimmed();
                 //qDebug()<<pos<<list<<filter;
@@ -4913,6 +4917,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         }
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                            replaced=true;
                         }
                     } else if (list=="fitfunc") {
                         QString text="";
@@ -4939,6 +4944,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                            replaced=true;
                         }
                     } else if (list=="fitfunc_params") {
                         QString text="";
@@ -4952,6 +4958,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), text);
+                            replaced=true;
                         }
                     } else if (list=="fitfunc_inplugin") {
                         QString text="";
@@ -5002,6 +5009,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                            replaced=true;
                         }
                     } else if (list=="importers") {
                         QString text="";
@@ -5028,6 +5036,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                            replaced=true;
                         }
                     } else if (list=="exporters") {
                         QString text="";
@@ -5054,6 +5063,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                            replaced=true;
                         }
                     } else if (list=="imageseriesimporters") {
                         QString text="";
@@ -5080,6 +5090,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                            replaced=true;
                         }
                     } else if (list=="imageseriesexporters") {
                         QString text="";
@@ -5106,6 +5117,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                            replaced=true;
                         }
                     } else if (list=="tcspcimporters") {
                         QString text="";
@@ -5132,6 +5144,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                            replaced=true;
                         }
                     } else if (list=="extension") {
                         QString text="";
@@ -5151,6 +5164,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         }
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<ul>")+text+QString("</ul>"));
+                            replaced=true;
                         }
                     } else if (list=="colorpalettes") {
                         QString text="";
@@ -5179,6 +5193,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         }
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<table border=\"1\" spacing=\"1\" padding=\"1\">\n")+text+QString("</table>"));
+                            replaced=true;
                         }
                     } else if (list=="autolinks") {
                         QString text="";
@@ -5192,12 +5207,13 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         }
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), QString("<table border=\"1\" spacing=\"1\" padding=\"1\">\n")+text+QString("</table>"));
+                            replaced=true;
                         }
                     }
                 }
 
                 ++count;
-                pos += rxList.matchedLength();
+                if (!replaced) pos += rxList.matchedLength();
             }
 
 
@@ -5209,6 +5225,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             count = 0;
             pos = 0;
             while ((pos = rxInsert.indexIn(result, pos)) != -1) {
+                bool replaced=false;
                 QString command=rxInsert.cap(1).toLower().trimmed();
                 QString file=rxInsert.cap(2).trimmed();
                 //qDebug()<<pos<<list<<filter;
@@ -5221,6 +5238,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         rep=f.readAll();
                     }
                     result=result.replace(rxInsert.cap(0), rep);
+                    replaced=true;
                 } else if (QFPluginServices::getInstance()&&(command=="insertglobal" || command=="includeglobal")) {
                     //qDebug()<<QDir(QFPluginServices::getInstance()->getAssetsDirectory()+"/help/").absoluteFilePath(file);
                     QFile f(QDir(QFPluginServices::getInstance()->getAssetsDirectory()+"/help/").absoluteFilePath(file));
@@ -5229,9 +5247,11 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         rep=f.readAll();
                     }
                     result=result.replace(rxInsert.cap(0), rep);
+                    replaced=true;
                 } else if (QFPluginServices::getInstance()&&(command=="tooltip")) {
                     QString rep=helpdata.tooltips.value(file).tooltip;
                     result=result.replace(rxInsert.cap(0), rep);
+                    replaced=true;
                 } else if (QFPluginServices::getInstance()&&(command=="see")) {
                     QString rep=tr("<blockquote>"
                                    "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: cornsilk ;  border-color: darkgreen; border-style: solid;\" ><tr><td>"
@@ -5239,6 +5259,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                    "</table></td></tr></table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
+                    replaced=true;
                 } else if (QFPluginServices::getInstance()&&(command=="note")) {
                     QString rep=tr("<blockquote>"
                                      "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" ><tr><td>"
@@ -5246,6 +5267,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                    "</table></td></tr></table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
+                    replaced=true;
                 } else if (QFPluginServices::getInstance()&&(command=="info")) {
                     QString rep=tr("<blockquote>"
                                      "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightcyan ;  border-color: midnightblue\" ><tr><td>"
@@ -5253,6 +5275,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                    "</table></td></tr></table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
+                    replaced=true;
                  } else if (QFPluginServices::getInstance()&&(command=="warning")) {
                     QString rep=tr("<blockquote>"
                                      "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: navajowhite ;  border-color: orangered\" ><tr><td>"
@@ -5260,6 +5283,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                    "</table></td></tr></table></blockquote>").arg(file);
 
                     result=result.replace(rxInsert.cap(0), rep);
+                    replaced=true;
                 } else if (QFPluginServices::getInstance()&&(command=="example")) {
                    QString rep=tr("<blockquote>"
                                     "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightgrey ;  border-color: midnightblue\" ><tr><td>"
@@ -5267,6 +5291,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                   "</table></td></tr></table></blockquote>").arg(file);
 
                    result=result.replace(rxInsert.cap(0), rep);
+                   replaced=true;
                 } else if (QFPluginServices::getInstance()&&(command=="cexample"||command=="codeexample")) {
                    QString rep=tr("<blockquote>"
                                     "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: lightgrey ;  border-color: midnightblue\" ><tr><td>"
@@ -5274,20 +5299,27 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                   "</table></td></tr></table></blockquote>").arg(file);
 
                    result=result.replace(rxInsert.cap(0), rep);
+                   replaced=true;
                 } else if (QFPluginServices::getInstance()&&(command=="tt"||command=="code")) {
                    QString rep=tr("<tt>%1</tt>").arg(file);
 
                    result=result.replace(rxInsert.cap(0), rep);
+                   replaced=true;
                 } else if (QFPluginServices::getInstance()&&(command=="bqtt"||command=="bqcode")) {
                    QString rep=tr("<blockquote><tt>%1</tt></blockquote>").arg(file);
 
                    result=result.replace(rxInsert.cap(0), rep);
+                   replaced=true;
                 } else if (QFPluginServices::getInstance()&&(command=="main_fontsize")) {
                    QString rep=QString("%1pt").arg(settings->getConfigValue("quickfit/help_pointsize", 11).toInt()+file.toInt());
                    result=result.replace(rxInsert.cap(0), rep);
+                   replaced=true;
+                }
+                if (!replaced){
+                    pos += rxInsert.matchedLength();
                 }
                 ++count;
-                pos += rxInsert.matchedLength();
+
             }
 
 
@@ -5300,6 +5332,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
             pos = 0;
             //qDebug()<<result.contains("$(")<<result;
             while ((pos = rxLaTeX.indexIn(result, pos)) != -1) {
+                bool replaced=false;
                 QString command=rxLaTeX.cap(1).toLower().trimmed();
                 QString latex="$"+rxLaTeX.cap(2).trimmed()+"$";
 
@@ -5311,13 +5344,15 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     latex="$"+rxLaTeX.cap(4).trimmed()+"$";
                     if (latex.size()>2) command="bmath";
                 }
-                //qDebug()()<<"\n\n\n"<<rxLaTeX.cap(0)<<"\n"<<command<<latex<<rxLaTeX.cap(3)<<rxLaTeX.cap(4)<<rxLaTeX.cap(5);
+               //qDebug()<<"\n\n\n"<<rxLaTeX.cap(0)<<"\n"<<command<<latex<<rxLaTeX.cap(3)<<rxLaTeX.cap(4)<<rxLaTeX.cap(5);
                 if (command=="math" || command=="bmath" || command=="mathb") {
                     if (dontCreatePics)  {
                         if (command=="bmath" || command=="mathb") {
                             result=result.replace(rxLaTeX.cap(0), QString("<blockquote><font size=\"+2\"><tt><i>%1</i></tt></font></blockquote>").arg(qfHTMLExcape(latex)));
+                            replaced=true;
                         } else {
                             result=result.replace(rxLaTeX.cap(0), QString("<tt><i>%1</i></tt>").arg(qfHTMLExcape(latex)));
+                            replaced=true;
                         }
                     } else {
                         QString latexCacheID=QString("%1pt,%2,%3").arg(ProgramOptions::getConfigValue("quickfit/math_pointsize", 14).toInt()).arg(command).arg(latex);
@@ -5332,6 +5367,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                 rep= QString("<img style=\"vertical-align: middle;\" src=\"%1\">").arg(texfilename);
                             }
                             result=result.replace(rxLaTeX.cap(0), rep);
+                            replaced=true;
                         } else {
                             JKQTmathText mathParser(this);
                             mathParser.set_fontSize(ProgramOptions::getConfigValue("quickfit/math_pointsize", 14).toInt());
@@ -5344,8 +5380,10 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                             if (ok) {
                                 if (command=="bmath" || command=="mathb") {
                                     result=result.replace(rxLaTeX.cap(0), QString("<blockquote><font size=\"+2\" face=\"%2\"><i>%1</i></font></blockquote>").arg(ht).arg(mathParser.get_fontRoman()));
+                                    replaced=true;
                                 } else {
                                     result=result.replace(rxLaTeX.cap(0), QString("<font face=\"%2\"><i>%1</i></font>").arg(ht).arg(mathParser.get_fontRoman()));
+                                    replaced=true;
                                 }
                             } else {
                                 QImage* pix=new QImage(500,100, QImage::Format_ARGB32_Premultiplied);
@@ -5401,6 +5439,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                                     }
                                 }
                                 result=result.replace(rxLaTeX.cap(0), rep);
+                                replaced=true;
 
                             }
                         }
@@ -5409,7 +5448,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 }
 
                 ++count;
-                pos += 1;//rxLaTeX.matchedLength();
+                if (!replaced) pos = pos+rxLaTeX.matchedLength();
             }
 
 
@@ -5423,17 +5462,18 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 QString command=rxPluginInfo.cap(1).toLower().trimmed();
                 QString param1=rxPluginInfo.cap(2).toLower().trimmed();
                 QString param2=rxPluginInfo.cap(3).trimmed().toLower();
+                bool replaced=false;
 
                 if (QFPluginServices::getInstance() && command=="plugin_info") {
-                    if (param1=="help") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginHelp(param2));
-                    if (param1=="tutorial") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginTutorial(param2));
-                    if (param1=="faq") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginFAQ(param2));
-                    if (param1=="helpdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginHelpDirectory(param2));
-                    if (param1=="assetsdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginAssetsDirectory(param2));
-                    if (param1=="configdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginConfigDirectory(param2));
-                    if (param1=="examplesdir") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginExamplesDirectory(param2));
+                    if (param1=="help") { result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginHelp(param2)); replaced=true; }
+                    if (param1=="tutorial") { result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginTutorial(param2)); replaced=true; }
+                    if (param1=="faq") { result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginFAQ(param2)); replaced=true; }
+                    if (param1=="helpdir") { result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginHelpDirectory(param2)); replaced=true; }
+                    if (param1=="assetsdir") { result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginAssetsDirectory(param2)); replaced=true; }
+                    if (param1=="configdir") { result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginConfigDirectory(param2)); replaced=true; }
+                    if (param1=="examplesdir") { result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getPluginExamplesDirectory(param2)); replaced=true; }
                 } else if (QFPluginServices::getInstance() && command=="fitfunction") {
-                    if (param1=="help") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getFitFunctionHelp(param2));
+                    if (param1=="help") { result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getFitFunctionHelp(param2)); replaced=true; }
                     else if (param1=="name") {
                         QFFitFunction* f=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(param2);
                         QString name="";
@@ -5442,6 +5482,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                             delete f;
                         }
                         result=result.replace(rxPluginInfo.cap(0), name);
+                        replaced=true;
                     }
                     else if (param1=="short_name") {
                         QFFitFunction* f=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(param2);
@@ -5451,6 +5492,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                             delete f;
                         }
                         result=result.replace(rxPluginInfo.cap(0), name);
+                        replaced=true;
                     }
                     else if (param1=="category") {
                         QFFitFunction* f=QFPluginServices::getInstance()->getFitFunctionManager()->createFunction(param2);
@@ -5460,10 +5502,13 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                             delete f;
                         }
                         result=result.replace(rxPluginInfo.cap(0), name);
+                        replaced=true;
                     }
                 } else if (QFPluginServices::getInstance() && command=="fitalgorithm") {
-                    if (param1=="help") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getFitAlgorithmHelp(param2));
-                    else if (param1=="name") {
+                    if (param1=="help") {
+                        result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getFitAlgorithmHelp(param2));
+                        replaced=true;
+                    } else if (param1=="name") {
                         QFFitAlgorithm* f=QFPluginServices::getInstance()->getFitAlgorithmManager()->createAlgorithm(param2);
                         QString name="";
                         if (f) {
@@ -5471,6 +5516,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                             delete f;
                         }
                         result=result.replace(rxPluginInfo.cap(0), name);
+                        replaced=true;
                     }
                     else if (param1=="short_name") {
                         QFFitAlgorithm* f=QFPluginServices::getInstance()->getFitAlgorithmManager()->createAlgorithm(param2);
@@ -5482,8 +5528,10 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         result=result.replace(rxPluginInfo.cap(0), name);
                     }
                 } else if (QFPluginServices::getInstance() && command=="importer") {
-                    if (param1=="help") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getImporterHelp(param2));
-                    else if (param1=="name" || param1=="short_name") {
+                    if (param1=="help") {
+                        result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getImporterHelp(param2));
+                        replaced=true;
+                    } else if (param1=="name" || param1=="short_name") {
                         QFImporter* f=QFPluginServices::getInstance()->getImporterManager()->createImporter(param2);
                         QString name="";
                         if (f) {
@@ -5493,8 +5541,10 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         result=result.replace(rxPluginInfo.cap(0), name);
                     }
                 } else if (QFPluginServices::getInstance() && command=="exporter") {
-                    if (param1=="help") result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getImporterHelp(param2));
-                    else if (param1=="name" || param1=="short_name") {
+                    if (param1=="help") {
+                        result=result.replace(rxPluginInfo.cap(0), QFPluginServices::getInstance()->getImporterHelp(param2));
+                        replaced=true;
+                    } else if (param1=="name" || param1=="short_name") {
                         QFExporter* f=QFPluginServices::getInstance()->getExporterManager()->createExporter(param2);
                         QString name="";
                         if (f) {
@@ -5502,22 +5552,25 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                             delete f;
                         }
                         result=result.replace(rxPluginInfo.cap(0), name);
+                        replaced=true;
                     }
                } else if (command=="fig" || command=="figure") {
                     QString rep=tr("<center>"
                                      "<img src=\"%1\"><br><i>%2</i><br>"
                                    "</center>").arg(param1).arg(param2);
                     result=result.replace(rxPluginInfo.cap(0), rep);
+                    replaced=true;
                 } else if (command=="startbox") {
                     QString rep=tr("<blockquote>"
                                      "<table width=\"100%\" border=\"1\" cellspacing=\"0\" cellpadding=\"2\" style=\"background-color: %1 ;  border-color: %2\" >"
                                    "<tr><td align=\"left\">").arg(param1).arg(param2);
 
                     result=result.replace(rxPluginInfo.cap(0), rep);
+                    replaced=true;
                 }
 
                 ++count;
-                pos += rxPluginInfo.matchedLength();
+                if (!replaced) pos += rxPluginInfo.matchedLength();
             }
 
 
@@ -5537,7 +5590,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
 
 
                 ++count;
-                pos += rep.size()-rxDOI.matchedLength();
+                //pos += rep.size()-rxDOI.matchedLength();
             }
 
 
@@ -5650,7 +5703,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                         insert=insert.replace(rxHeader1.cap(1), rxHeader1.cap(1)+QString(" style=\"background-color: azure;\" "));
                     }*/
 
-                    result=result.replace(rxHeader.cap(0), insert);
+                    result=result.replace(pos, rxHeader.matchedLength(), insert);
 
                     ++count;
                     pos += insert.size();
@@ -5714,7 +5767,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 result=result.replace(rxRef.cap(0), rep);
 
                 ++count;
-                pos += rep.size();
+                //pos += rep.size();
 
             }
             QString referencesHTML="";
@@ -5754,12 +5807,18 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         pos = 0;
         while ((pos = rxImages.indexIn(result, pos)) != -1) {
             QString file=rxImages.cap(1).trimmed();
-            if (file.startsWith("qrc:/") || file.startsWith(":/") || file.startsWith("http:/") || file.startsWith("https:/")) {
+            if (file.startsWith("qrc:/") || file.startsWith("http:/") || file.startsWith("https:/")) {
                 pos=pos+rxImages.matchedLength();
+            } else if (file.startsWith(":/")){
+                QString old=file;
+                QString news=QString("qrc%1").arg(file);
+                result.replace(rxImages.pos(1), rxImages.cap(1).size(), news);
+
+                pos += rxImages.matchedLength()+(news.size()-old.size());
             } else {
-                QString old=QString("\"%1\"").arg(file);
-                QString news=QString("\"%1\"").arg(QUrl::fromLocalFile(QDir(fileDir).absoluteFilePath(file)).toString());
-                result.replace(old, news);
+                QString old=file;
+                QString news=QString("%1").arg(QUrl::fromLocalFile(QDir(fileDir).absoluteFilePath(file)).toString());
+                result.replace(rxImages.pos(1), rxImages.cap(1).size(), news);
 
                 pos += rxImages.matchedLength()+(news.size()-old.size());
             }
@@ -5769,7 +5828,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
         if (insertTooltips) {
             // insert tooltips: search all occurences of the tooltip keywords that are not inside a tag (i.e. surrounded by a closing tag on
             // the left and an opening tag on the right) and where the tag is not something special (like headers or links).
-            QMapIterator<QString, QFToolTipsData> itTT(helpdata.tooltips);
+            //QMapIterator<QString, QFToolTipsData> itTT(helpdata.tooltips);
             QStringList ttids=helpdata.tooltips.keys();
             qSort(ttids.begin(), ttids.end(), qfQStringCompareLengthDecreasing);
 
@@ -5786,7 +5845,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                     QString tag=rxTT.cap(1).toLower();
                     if (tag!="h1" && tag!="h2" && tag!="h3" && tag!="h4" && tag!="h5" && tag!="title" && tag!="a" && tag!="tt" && tag!="code") {
                         result=result.replace(rxTT.pos(2), rxTT.cap(2).size(), rep);
-                        pos += rep.size();
+                        pos += (rxTT.matchedLength()-rxTT.cap(2).size()+rep.size());
                     } else {
                         pos += rxTT.matchedLength();
                     }
