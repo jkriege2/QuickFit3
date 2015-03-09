@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>PluginLinkDialog</class>
- <widget class="QDialog" name="PluginLinkDialog">
+ <class>QFRDRTableSetCellsDialog</class>
+ <widget class="QDialog" name="QFRDRTableSetCellsDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>157</height>
+    <width>499</width>
+    <height>136</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Insert Plugin link</string>
+   <string>Set Cell(s) Value</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -19,68 +19,65 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
-        <string>plugin:</string>
+        <string>Type:</string>
        </property>
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QComboBox" name="cmbPlugin"/>
+      <widget class="QComboBox" name="cmbType">
+       <item>
+        <property name="text">
+         <string>string</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>number</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>integer</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>boolean</string>
+        </property>
+       </item>
+       <item>
+        <property name="text">
+         <string>date/time</string>
+        </property>
+       </item>
+      </widget>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
-        <string>link type:</string>
+        <string>Value:</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QComboBox" name="cmbType">
+      <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
-        <property name="text">
-         <string>main help link</string>
-        </property>
+        <widget class="QLineEdit" name="edtString"/>
        </item>
        <item>
-        <property name="text">
-         <string>tutorial help link</string>
-        </property>
+        <widget class="QFDoubleEdit" name="edtNumber"/>
        </item>
        <item>
-        <property name="text">
-         <string>help directory</string>
-        </property>
+        <widget class="QDateTimeEdit" name="edtDateTime"/>
        </item>
        <item>
-        <property name="text">
-         <string>assets directory</string>
-        </property>
+        <widget class="QCheckBox" name="chkBoolean">
+         <property name="text">
+          <string/>
+         </property>
+        </widget>
        </item>
-       <item>
-        <property name="text">
-         <string>examples directory</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>config directory</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>FAQ link</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>ID only</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>tutorials list</string>
-        </property>
-       </item>
-      </widget>
+      </layout>
      </item>
     </layout>
    </item>
@@ -96,12 +93,22 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QFDoubleEdit</class>
+   <extends>QLineEdit</extends>
+   <header>qfdoubleedit.h</header>
+   <slots>
+    <signal>valueChanged(double)</signal>
+   </slots>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections>
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>PluginLinkDialog</receiver>
+   <receiver>QFRDRTableSetCellsDialog</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -117,7 +124,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>PluginLinkDialog</receiver>
+   <receiver>QFRDRTableSetCellsDialog</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

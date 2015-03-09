@@ -2260,6 +2260,10 @@ QVariant QFTableModelEditColumnHeaderDataModel::headerData(int section, Qt::Orie
             }
         }
 
+    } else if (orientation==Qt::Vertical) {
+        if (role==Qt::DisplayRole) {
+            return QString("column %1").arg(section+1);
+        }
     }
     return QVariant();
 }

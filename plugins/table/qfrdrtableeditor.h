@@ -102,6 +102,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
         void slCut();
         void slDelete();
         void slMakeEditable();
+        void slSetCells();
 
         void slCopyTableTemplate();
         void slPasteTableTemplate();
@@ -161,6 +162,7 @@ class QFRDRTableEditor : public QFRawDataEditor {
 
 
         QAction* actSaveTable;
+        QAction* actSetCellsValue;
         QAction* actMakeEditable;
         QAction* actLoadTable;
         QAction* actImportTable;

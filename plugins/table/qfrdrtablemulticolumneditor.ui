@@ -3,7 +3,7 @@
  <class>QFRDRTableMultiColumnEditor</class>
  <widget class="QDialog" name="QFRDRTableMultiColumnEditor">
   <property name="windowModality">
-   <enum>Qt::WindowModal</enum>
+   <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -18,6 +18,9 @@
   </property>
   <property name="sizeGripEnabled">
    <bool>true</bool>
+  </property>
+  <property name="modal">
+   <bool>false</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>

@@ -328,6 +328,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$local_plugin_examples$$");
     addInsertAction(menu, "$$local_plugin_help$$");
     addInsertAction(menu, "$$local_plugin_config$$");
+    addInsertAction(menu, "$$local_plugin_tutorials$$");
     menu->addSeparator();
     addInsertAction(menu, "$$plugin_info:help:PLUGINID$$");
     addInsertAction(menu, "$$plugin_info:tutorial:PLUGINID$$");
@@ -362,6 +363,7 @@ QFEHelpEditorWidget::QFEHelpEditorWidget(QWidget* parent) :
     addInsertAction(menu, "$$list:fitalg:STARTSWITH$$");
     addInsertAction(menu, "$$list:importers:STARTSWITH$$");
     addInsertAction(menu, "$$list:exporters:STARTSWITH$$");
+    addInsertAction(menu, "$$list:plugin_tutorials:PLUGIN_ID$$");
 
 
     menu=new QMenu(tr("help lists"), this);

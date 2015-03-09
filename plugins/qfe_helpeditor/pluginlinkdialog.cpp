@@ -80,6 +80,8 @@ QString PluginLinkDialog::insertText() const
             return QString("$$plugin_info:configdir:")+id+QString("$$");
         case 6:
             return QString("$$plugin_info:faq:")+id+QString("$$");
+        case 7:
+            return QString("$$list:plugin_tutorials:")+id+QString("$$");
         default:
             return id;
     }

@@ -57,7 +57,8 @@ HEADERS += qfrdrtable.h \
     qfrdrtableaxissettingswidget.h \
     qfrdrtableindexedstatdialog.h \
     dlgimporttable.h \
-    qfrdrtablemulticolumneditor.h
+    qfrdrtablemulticolumneditor.h \
+    qfrdrtablesetcellsdialog.h
 
 SOURCES += qfrdrtable.cpp \
            qfrdrtableeditor.cpp \
@@ -84,7 +85,8 @@ SOURCES += qfrdrtable.cpp \
     qfrdrtableaxissettingswidget.cpp \
     qfrdrtableindexedstatdialog.cpp \
     dlgimporttable.cpp \
-    qfrdrtablemulticolumneditor.cpp
+    qfrdrtablemulticolumneditor.cpp \
+    qfrdrtablesetcellsdialog.cpp
 
 FORMS = tableresizedialog.ui \
     qfrdrtableplotwidget.ui \
@@ -102,7 +104,8 @@ FORMS = tableresizedialog.ui \
     qfrdrtableaxissettingswidget.ui \
     qfrdrtableindexedstatdialog.ui \
     dlgimporttable.ui \
-    qfrdrtablemulticolumneditor.ui
+    qfrdrtablemulticolumneditor.ui \
+    qfrdrtablesetcellsdialog.ui
 
 RESOURCES += qfrdrtable.qrc \
     ../../lib/lib.qrc

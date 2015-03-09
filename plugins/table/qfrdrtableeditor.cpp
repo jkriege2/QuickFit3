@@ -35,6 +35,7 @@
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include "qfrdrtablemulticolumneditor.h"
+#include "qfrdrtablesetcellsdialog.h"
 
 QFRDRTableEditor::QFRDRTableEditor(QFPluginServices* services,  QFRawDataPropertyEditor* propEditor, QWidget* parent):
     QFRawDataEditor(services, propEditor, parent)
@@ -272,6 +273,11 @@ void QFRDRTableEditor::createWidgets() {
     connect(actDeleteColumn, SIGNAL(triggered()), this, SLOT(slDeleteColumn()));
     connect(this, SIGNAL(enableActions(bool)), actDeleteColumn, SLOT(setEnabled(bool)));
 
+    actSetCellsValue=new QAction(tr("set value in cells"), this);
+    actSetCellsValue->setToolTip(tr("set a new value in all currently selected cells ..."));
+    connect(actSetCellsValue, SIGNAL(triggered()), this, SLOT(slSetCells()));
+    connect(this, SIGNAL(enableActions(bool)), actSetCellsValue, SLOT(setEnabled(bool)));
+
     actDelete=new QAction(QIcon(":/table/cell_clear.png"), "delete contents", this);
     actDelete->setToolTip(tr("Delete contents from selected cells ..."));
     actDelete->setShortcut(QKeySequence::Delete);
@@ -450,6 +456,7 @@ void QFRDRTableEditor::createWidgets() {
     tvMain->addAction(actSetColumnTitle);
     tvMain->addAction(actSHowMultiColEditor);
     tvMain->addAction(actSetDatatype);
+    tvMain->addAction(actSetCellsValue);
     tvMain->addAction(getSeparatorAction(this));
     tvMain->addAction(actSetColumnValues);
     tvMain->addAction(actCalcCell);
@@ -528,6 +535,7 @@ void QFRDRTableEditor::createWidgets() {
     actMenuDatatypes=menuDatatypes->menuAction();
     tvMain->insertAction(actSetDatatype, actMenuDatatypes);
     tbMain->insertAction(actSetDatatype, actMenuDatatypes);
+    menuCells->addAction(actSetCellsValue);
     menuCells->addSeparator();
     menuEdit->addAction(actDelete);
     menuCells->addSeparator();
@@ -1119,6 +1127,34 @@ void QFRDRTableEditor::slSetDatatype() {
     }
 }
 
+
+void QFRDRTableEditor::slSetCells()
+{
+    QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
+    if (m) {
+        if (m->model()) {
+            QItemSelectionModel* sm=tvMain->selectionModel();
+            if (!sm->hasSelection()) {
+            } else {
+                QModelIndexList l=sm->selectedIndexes();
+                QFRDRTableSetCellsDialog* dlg=new QFRDRTableSetCellsDialog(sm->currentIndex().data(Qt::EditRole), this);
+                if (dlg->exec()) {
+                    QVariant v=dlg->getValue();
+                    m->model()->disableSignals();
+                    m->model()->startMultiUndo();
+                    for (int i=0; i<l.size(); i++) {
+                        m->tableSetData(l[i].row(), l[i].column(), v);
+                    }
+                    m->model()->endMultiUndo();
+                    m->model()->enableSignals(true);
+                }
+                delete dlg;
+            }
+        }
+    }
+}
+
+
 void QFRDRTableEditor::setDatatype(QVariant::Type t)
 {
     QFRDRTable* m=qobject_cast<QFRDRTable*>(current);
@@ -1315,6 +1351,7 @@ void QFRDRTableEditor::slMakeEditable()
     }
 
 }
+
 
 
 void QFRDRTableEditor::slSetColumnValues() {

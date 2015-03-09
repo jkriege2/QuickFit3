@@ -9,8 +9,139 @@
     
     
 $$startbox_note$$
-The data for this tutorial is available from <a href="http://www.dkfz.de/Macromol/quickfit/examples.html">http://www.dkfz.de/Macromol/quickfit/examples.html</a> as <tt></tt>.</li>
-</ol>
+The data for this tutorial is available from <a href="http://www.dkfz.de/Macromol/quickfit/examples.html">http://www.dkfz.de/Macromol/quickfit/examples.html</a> as <tt>imFCCS_cells__2013_11_06.zip</tt>. This file contains two imFCCS measurements in a SPIM microscope with pixel size $(a=400nm)$. The PSF parameters were $(w_g=(600\pm80)nm)$, $(w_r=(602\pm80)nm)$, $(z_g=(1140\pm100)nm)$, $(z_r=(1168\pm80)nm)$. The acquisition frame time was $(\tau_{frame}=530\mathrm{{\mu}s})$. The green-red cross-talk is $(\kappa=3.5\%)$.
 $$endbox$$    
+
+
+<h2>Correlate Data</h2>
+<p>
+<ol>
+    <li>Download the example dataset, or acquire your own data.</li>
+    <li>Start QuickFit and click on the menu entry <b>Data Items | Insert Raw Data | imagingFCS | correlate data and insert</b>.</li>
+    <li>Click on <img src=":imaging_fcs/fileopen.png"> and select the acquisition data (e.g. <tt>HeLa_Dimer__s01_c13_000.tif</tt>) and make sure to select the <b>tinyTIFF reader</b>.</li>
+    <li>Ensure, that all acquisition data is set correctly (pixel size, frametime, ...) and choose the appropriate <b>bleach correction</b> (typically <code>exp(poly4)</code> is a good choice for cell data). Also make sure that an appropriate background measurement is selected. Select <b>binning=2</b>.
+    $$note:In most cell data it helps to use 2x2 binning (for EMCCD cameras), or even higher binning for sCMOS cameras! If the data is of very good quality, 1x1 binning also works well. If you are not sure, try both options and compare the results.$$</li>
+    <li>Set the <b>DualView</b> mode to split horizontal, (or as appropriate for your measurement) and check <b>ACF</b> as well as <b>2-color FCCS</b>. The number of segments should be 3-5, Lags/Corr=16, lag-factor=2 and Correlators should be set, so &tau;<sub>max</sub> is a little larger than the length of each segment.
+    <br>
+    Here is a screenshot for the example dataset:
+    <center><a name="tutorial_cells_pic000"><img src="./pic/tutorial_cells_pic000.png" border="1">
+    </center>
+    </li>
+    <li>Now start the correlation by clicking <b>add job</b>.</li>
+    <li>Repeat the setps above for every file, you want to correlate. $$note:If you correlate several files, set the number of <b>max. parallel jobs</b> to a value of 1-3, depending on the amount of CPU cores and memory, that is available on your machine.$$</li>
+    <li>When all correlations are finished, close the dialog by clicking <b>Close</b>. The results will be inserted into the project now:
+    <center><a name="tutorial_cells_pic001"><img src="./pic/tutorial_cells_pic001.png" border="1">
+    </center>
+    </li>
+</ol></p>
+
+
+
+<h2>Prepare data for Fitting</h2>
+<p><i>As a next step the data has to be prepared for fitting. This mostly encompases creating masks and estimating the background intensity from these masked regions:</i>
+<ol>
+    <li>Double-click the first FCCS-record in the project. This opens the imFCS RDR editor. Then select the tab "Parameter image":
+    <center><a name="tutorial_cells_pic002"><img src="./pic/tutorial_cells_pic002.png" border="1">
+    </center>
+    </li>
+    <li>Now we define a mask by segmenting the image by intensity. To do this, click on <b>Mask | mask by overview</b>:
+    <center><a name="tutorial_cells_pic003"><img src="./pic/tutorial_cells_pic003.png" border="1">
+    </center>
+    </li>
+    <li>In this dialog choose <b>Mode = mask smaller threshold</b> and move the threshold-slider, until the cell is masked properly (red pixels are masked). Finally click on <b>OK.</b></li>
+    <li>Now click on the rhs column of the RDR editor dialog on the button <b>copy mask to group</b>, which will reuse this mask for the two ACF-records (ACF0+ACF1).</li>
+    <li>Finally click on the button <b>background from mask</b>, which will estimate the average intensity from the masked pixels. This is usually a good estimate of the true background intensity (including out-of-focus light and buffer scattering). QuickFit will ask you, whether to also estimate the background for the ACF0+ACF1 record. Answer this with "Yes".</li>
+    <li>Now move to the next record (you can sue the button <b>next, same role</b>) and repeat the steps described above.</li>
+    <li>When masks and background are set for all cells in the project, you can close the RDR editor window again.</li>
+</ol></p>
+
+
+
+
+<h2>Fit data</h2>
+<p>
+<ol>
+    <li>Add an imFCCS evaluation to the project: Click on <b>Data Items | Insert Evaluation | imFCCS Curve Fitting</b>.</li>
+    <li>Double-click the new evaluation record in the project:
+    <center><a name="tutorial_cells_pic004"><img src="./pic/tutorial_cells_pic004.png" border="1">
+    </center>
+    </li>
+    <li>First we have to set up the fit by choosing an appropriate fitting model. In principle this can be done by hand, but typically it is easier to use pre-configured models. These are availble in the Tools-menu. For the data at hand, choose <b>Tools | configure for SPIM-FCCS | 2-comp. normal diffusion, species A+B+AB, c per species, D1/D2 per channel</b>. This uses the model functions:
+<ul>
+    <li><a href="$$fitfunction:help:fccs_fw_diff2colortcsepacfg$$">$$fitfunction:name:fccs_fw_diff2colortcsepacfg$$</a></li>
+    <li><a href="$$fitfunction:help:fccs_fw_diff2colortcsepacfr$$">$$fitfunction:name:fccs_fw_diff2colortcsepacfr$$</a></li>
+    <li><a href="$$fitfunction:help:fccs_fw_diff2colortcsepccf$$">$$fitfunction:name:fccs_fw_diff2colortcsepccf$$</a></li>
+</ul>These models assume two species (G-single-labeled, R-single-labeled, GR-double-labeled) and two-component 3D diffusion. The model is slightly relaxed, as it does not assume two diffusion coefficents per species, but only per channel, which in most cases converges better (see $$ref:KRIEGER2014:Krieger J W, Singh A P, Garbe C S, Wohland T, Langowski J  (2014) Dual-Color Fluorescence Cross-Correlation Spectroscopy on a Single Plane Illumination Microscope (SPIM-FCCS). <i>Optics Express</i> <b>22</b><b>:</b> 2358 Available at: <a href="http://www.opticsinfobase.org/abstract.cfm?URI=oe-22-3-2358">http://www.opticsinfobase.org/abstract.cfm?URI=oe-22-3-2358</a>$$ $$jankrieger_phdthesis_ref$$). The dialog the looks as follows:
+<center><a name="tutorial_cells_pic005"><img src="./pic/tutorial_cells_pic005.png" border="1">
+</center>
+As you can observe now three correlation curves are displayed in the window. These are the averages over all non-masked pixels. If you want to see the correlation curves of a single pixel, you can choose any pixel by clicking into the overview image on the right. The bottom of the window shows the current fit parameters in a large table. The column <b>global</b> indicates, which parameters are linked together (equal color/pattern and global-parameter-name means the parameters are linked). The first row indicates, which files are displayed and the row below that shows the fitting model used for that file/RDR. The remaining rows show the fit parameters.
+</li>
+    <li>Now we have to set proper initial parameters for the fit and configure the fit (parameter ranges etc.):
+    <ol>
+        <li>Set the focus parameter $(w_g,w_r,z_g,z_r)$ and the cross-talk, as given above, or appropriate for your microscope.</li>
+        <li>Also set the cross-talk $(\kappa=0.035)$ (for the example data)</li>
+        <li>For many datasets (also the ones form this tutorial), it can also help to use only one component for the FCCS curve. To achieve this, set &rho;<sub>2</sub> of the FCCS RDR to 0. Then  also fix D2 and .</li>
+        <li>Finally also the parameter ranges should be set. To do so, activate the button <b>edit P ranges</b> at the bottom-rioght of the table. Additional column will appear for the parameter ranges. In these you should set:
+            <ol>
+                <li>D1 (fast diffusion coefficient): 1...100&mu;m<sup>2</sup>/s (slower diffusion will be described the D2 and faster diffusion is very uncommon in cells, since eGFP typically has a diffusion coefficient of around 30&mu;m<sup>2</sup>/s.</li>
+                <li>D2 (slow diffusion coefficient): 10<sup>-10</sup>...2&mu;m<sup>2</sup>/s (experience shows that in cells typically a slow component in the range 0.1-1&mu;m<sup>2</sup>/s is found)</li>
+                <li>If you fixed D2 and &rho;<sub>2</sub>, make sure to limit the parameter range of D1 to 10<sup>-10</sup>...100&mu;m<sup>2</sup>/s instead of the values given above.</li>
+                <li>for all concentrations, the minimum should be limited to 10<sup>-10</sup>nM, since the models may crash (division by 0), f, if several components have 0-concentration. On the other hand a value of 10<sup>-10</sup>nM is so low, it can be interpreted as 0 for all practical purposes.</li>
+
+            </ol></li>
+        <li>Set <b>weighting = per run error</b>, since QuickFit estimates an error for the correlation functions in each pixel, by calculating the standard deviation over the different segments during correlation.</li>
+        <li>Set <b>repeats=3</b>. This will cause the plugin to repeat each fit three times consecutively, which often improves convergence.</li>
+    </ol>Here is a screenshot of the completed table:
+    <center><a name="tutorial_cells_pic009"><img src="./pic/tutorial_cells_pic009.png" border="1">
+    </center>
+    
+    </li>
+    <li>Now we have to find good starting values for the fit: Choose a pixel with good correlation data and fit the models to it by clicking <b>Fit Current</b>. 
+<center><a name="tutorial_cells_pic007"><img src="./pic/tutorial_cells_pic007.png" border="1">
+</center>
+When the fit is good, as shown in the image above, set the concentrations (CA, CB, CAB) to about 1/10 of their current value. This hint comes from experience, as it seems that with these starting values, the fits seem to converge better. Now click on <b>Copy to Initial</b>, which will use the current fit results as initial values for all other fits.
+$$note:If the fit does not properly converge for your dataset, it may help to use different starting parameters.$$
+</li>
+    <li>As soon as the first fit is done, the files/RDR list on the rhs of the plugin is updated (before it was empty):
+    <center><a name="tutorial_cells_pic008"><img src="./pic/tutorial_cells_pic008.png" border="1">
+    </center>&rho;<sub>2</sub>
+    Since the project contains two measurements (with 3 files in the same RDR group/folder each), this list also contains three items. Blue entries represent sets of files, for which a fit has already been done. The grey items were guessed by the plugin, based in the current RDRs. In the shown case, the plugin determined, that there is a second group of files ("IRES"), which contain an FCCS records and two ACFs, and which could therefore also be fitted with the same settings.</li>
+    <li>Now you can click on <b>Fit All Filesets + Pixels</b>, which will fit all pixels in all (blue or grey) filesets in the list above.</li>
+    <li>Finally you can check the fit results by clicking on randomly on several pixels in the overview image and choosing different filesets. If you are content with all the fits, you can close the fit fialog. Otherwise, you can reset the fit fo a singel file (<b>Reset all pixel</b>) or for all pixels in all fileset (<b>Reset all</b>), set new starting values and try the fit again. SOmetimes it may also help to change the parameter ranges, from the values proposed above.</li>
+
+</ol></p>
+
+
+
+
+<h2>Inspecting fit results</h2>
+<p>Finally you can inspect the fit results obtained above:
+<ol>
+    <li>Double-click again the FCCS RDR in the project tree and go to the tab "Parameter Image". It now does not only show the overview image, but also maps of the fit parameters. WHich parameters are desiplayed, you can choose with the comboboxes above the images. Choose these for the tutorial:
+<center><a name="tutorial_cells_pic011"><img src="./pic/tutorial_cells_pic011.png" border="1">
+</center>
+</li>
+    <li>If you compare the histograms (tab <b>Histograms</b> of the two files in the example dataset, you will get two distributiosn with averages $((\0.1pm0.06))$ for the dimers and $((0.05\pm0.05))$ for the monomers:
+    <center><a name="tutorial_cells_pic010"><img src="./pic/tutorial_cells_pic010.png" border="1">
+    </center>
+    </li>
+    <li>To also check the fit results for D1,D2,rho2 of the green ACF, choose the ACF1-RDR of your file from the <b>select RDR</b> button:
+    <center><a name="tutorial_cells_pic012"><img src="./pic/tutorial_cells_pic012.png" border="1">
+    </center>
+    Now you have access to the desired parameters:
+    <center><a name="tutorial_cells_pic013"><img src="./pic/tutorial_cells_pic013.png" border="1">
+    </center>
+    If you again change over to thetab <b>Histograms</b> you can also compare the histograms for the fast diffusion coefficient of the two samples:
+    <center><a name="tutorial_cells_pic014"><img src="./pic/tutorial_cells_pic014.png" border="1">
+    </center>
+    As you can see, the smaller monomers show a definite shift of the diffusion coefficients towards higher values. The averages of these distributions are: $((21\pm8)\mathrm{{\mu}m^2/s})$ for the dimers and $((33\pm11)\mathrm{{\mu}m^2/s})$ for the monomers.
+    </li>
+
+</ol></p>
+
+
+<h2>References</h2>
+<p>$$references$$</p>
+
   </body>
 </html>

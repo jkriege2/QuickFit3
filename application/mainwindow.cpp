@@ -1117,7 +1117,7 @@ QString MainWindow::createPluginDocCopyrights(QString mainitem_before, QString m
 
 
 
-QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString mainitem_after) {
+QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString mainitem_after, const QString& pluginID) {
     QString subitem_template=QString("<li><a href=\"%2\">%1</a></li>");
     QString sub_template=QString("<ol>%1</ol>");
     QString mainitem_template=QString("<li><a href=\"%3\"><img width=\"16\" height=\"16\" src=\"%1\"></a>&nbsp;<a href=\"%3\">%2</a>%4</li>");
@@ -1125,18 +1125,20 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<getRawDataRecordFactory()->getIDList().size(); i++) {
         QString id=getRawDataRecordFactory()->getIDList().at(i);
-        QString dir=getRawDataRecordFactory()->getPluginTutorialMain(id);
-        QStringList names, links;
-        getRawDataRecordFactory()->getPluginTutorials(id, names, links);
-        int subCnt=qMax(names.size(), links.size());
-        QString subTxt="";
-        if (subCnt>0) {
-            for (int i=0; i<subCnt; i++) {
-                if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(getRawDataRecordFactory()->getName(id)))).arg(links.value(i, ""));
+        if (pluginID.isEmpty() || pluginID==id) {
+            QString dir=getRawDataRecordFactory()->getPluginTutorialMain(id);
+            QStringList names, links;
+            getRawDataRecordFactory()->getPluginTutorials(id, names, links);
+            int subCnt=qMax(names.size(), links.size());
+            QString subTxt="";
+            if (subCnt>0) {
+                for (int i=0; i<subCnt; i++) {
+                    if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(getRawDataRecordFactory()->getName(id)))).arg(links.value(i, ""));
+                }
+                if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
             }
-            if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
+            if (QFile::exists(dir)) text+=mainitem_template.arg(getRawDataRecordFactory()->getIconFilename(id)).arg(getRawDataRecordFactory()->getName(id)).arg(dir).arg(subTxt);
         }
-        if (QFile::exists(dir)) text+=mainitem_template.arg(getRawDataRecordFactory()->getIconFilename(id)).arg(getRawDataRecordFactory()->getName(id)).arg(dir).arg(subTxt);
     }
     text+=mainitem_after;
 
@@ -1144,18 +1146,20 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<getEvaluationItemFactory()->getIDList().size(); i++) {
         QString id=getEvaluationItemFactory()->getIDList().at(i);
-        QString dir=getEvaluationItemFactory()->getPluginTutorialMain(id);
-        QStringList names, links;
-        getEvaluationItemFactory()->getPluginTutorials(id, names, links);
-        int subCnt=qMax(names.size(), links.size());
-        QString subTxt="";
-        if (subCnt>0) {
-            for (int i=0; i<subCnt; i++) {
-                if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(getEvaluationItemFactory()->getName(id)))).arg(links.value(i, ""));
+        if (pluginID.isEmpty() || pluginID==id) {
+            QString dir=getEvaluationItemFactory()->getPluginTutorialMain(id);
+            QStringList names, links;
+            getEvaluationItemFactory()->getPluginTutorials(id, names, links);
+            int subCnt=qMax(names.size(), links.size());
+            QString subTxt="";
+            if (subCnt>0) {
+                for (int i=0; i<subCnt; i++) {
+                    if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(getEvaluationItemFactory()->getName(id)))).arg(links.value(i, ""));
+                }
+                if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
             }
-            if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
+            if (QFile::exists(dir)) text+=mainitem_template.arg(getEvaluationItemFactory()->getIconFilename(id)).arg(getEvaluationItemFactory()->getName(id)).arg(dir).arg(subTxt);
         }
-        if (QFile::exists(dir)) text+=mainitem_template.arg(getEvaluationItemFactory()->getIconFilename(id)).arg(getEvaluationItemFactory()->getName(id)).arg(dir).arg(subTxt);
     }
     text+=mainitem_after;
 
@@ -1163,36 +1167,40 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<fitAlgorithmManager->pluginCount(); i++) {
         int id=i;
-        QString dir=fitAlgorithmManager->getPluginTutorialMain(id);
-        QStringList names, links;
-        fitAlgorithmManager->getPluginTutorials(id, names, links);
-        int subCnt=qMax(names.size(), links.size());
-        QString subTxt="";
-        if (subCnt>0) {
-            for (int i=0; i<subCnt; i++) {
-                if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(fitAlgorithmManager->getName(id)))).arg(links.value(i, ""));
+        if (pluginID.isEmpty() || fitAlgorithmManager->getID(i)==pluginID) {
+            QString dir=fitAlgorithmManager->getPluginTutorialMain(id);
+            QStringList names, links;
+            fitAlgorithmManager->getPluginTutorials(id, names, links);
+            int subCnt=qMax(names.size(), links.size());
+            QString subTxt="";
+            if (subCnt>0) {
+                for (int i=0; i<subCnt; i++) {
+                    if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(fitAlgorithmManager->getName(id)))).arg(links.value(i, ""));
+                }
+                if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
             }
-            if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
+            if (QFile::exists(dir)) text+=mainitem_template.arg(fitAlgorithmManager->getIconFilename(id)).arg(fitAlgorithmManager->getName(id)).arg(dir).arg(subTxt);
         }
-        if (QFile::exists(dir)) text+=mainitem_template.arg(fitAlgorithmManager->getIconFilename(id)).arg(fitAlgorithmManager->getName(id)).arg(dir).arg(subTxt);
     }
     text+=mainitem_after;
     text+=mainitem_before.arg(tr("<a href=\"$$mainhelpdir$$qf3_fitfunc.html\">Fit Function</a>"));
     // gather information about plugins
     for (int i=0; i<fitFunctionManager->pluginCount(); i++) {
         int id=i;
-        QString dir=fitFunctionManager->getPluginTutorialMain(id);
-        QStringList names, links;
-        fitFunctionManager->getPluginTutorials(id, names, links);
-        int subCnt=qMax(names.size(), links.size());
-        QString subTxt="";
-        if (subCnt>0) {
-            for (int i=0; i<subCnt; i++) {
-                if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(fitFunctionManager->getName(id)))).arg(links.value(i, ""));
+        if (pluginID.isEmpty() || fitFunctionManager->getID(i)==pluginID) {
+            QString dir=fitFunctionManager->getPluginTutorialMain(id);
+            QStringList names, links;
+            fitFunctionManager->getPluginTutorials(id, names, links);
+            int subCnt=qMax(names.size(), links.size());
+            QString subTxt="";
+            if (subCnt>0) {
+                for (int i=0; i<subCnt; i++) {
+                    if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(fitFunctionManager->getName(id)))).arg(links.value(i, ""));
+                }
+                if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
             }
-            if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
+            if (QFile::exists(dir)) text+=mainitem_template.arg(fitFunctionManager->getIconFilename(id)).arg(fitFunctionManager->getName(id)).arg(dir).arg(subTxt);
         }
-        if (QFile::exists(dir)) text+=mainitem_template.arg(fitFunctionManager->getIconFilename(id)).arg(fitFunctionManager->getName(id)).arg(dir).arg(subTxt);
     }
     text+=mainitem_after;
 
@@ -1200,18 +1208,20 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<importerManager->pluginCount(); i++) {
         int id=i;
-        QString dir=importerManager->getPluginTutorialMain(id);
-        QStringList names, links;
-        importerManager->getPluginTutorials(id, names, links);
-        int subCnt=qMax(names.size(), links.size());
-        QString subTxt="";
-        if (subCnt>0) {
-            for (int i=0; i<subCnt; i++) {
-                if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(importerManager->getName(id)))).arg(links.value(i, ""));
+        if (pluginID.isEmpty() || importerManager->getID(i)==pluginID) {
+            QString dir=importerManager->getPluginTutorialMain(id);
+            QStringList names, links;
+            importerManager->getPluginTutorials(id, names, links);
+            int subCnt=qMax(names.size(), links.size());
+            QString subTxt="";
+            if (subCnt>0) {
+                for (int i=0; i<subCnt; i++) {
+                    if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(importerManager->getName(id)))).arg(links.value(i, ""));
+                }
+                if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
             }
-            if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
+            if (QFile::exists(dir)) text+=mainitem_template.arg(importerManager->getIconFilename(id)).arg(importerManager->getName(id)).arg(dir).arg(subTxt);
         }
-        if (QFile::exists(dir)) text+=mainitem_template.arg(importerManager->getIconFilename(id)).arg(importerManager->getName(id)).arg(dir).arg(subTxt);
     }
     text+=mainitem_after;
 
@@ -1220,18 +1230,20 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<exporterManager->pluginCount(); i++) {
         int id=i;
-        QString dir=exporterManager->getPluginTutorialMain(id);
-        QStringList names, links;
-        exporterManager->getPluginTutorials(id, names, links);
-        int subCnt=qMax(names.size(), links.size());
-        QString subTxt="";
-        if (subCnt>0) {
-            for (int i=0; i<subCnt; i++) {
-                if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(exporterManager->getName(id)))).arg(links.value(i, ""));
+        if (pluginID.isEmpty() || exporterManager->getID(i)==pluginID) {
+            QString dir=exporterManager->getPluginTutorialMain(id);
+            QStringList names, links;
+            exporterManager->getPluginTutorials(id, names, links);
+            int subCnt=qMax(names.size(), links.size());
+            QString subTxt="";
+            if (subCnt>0) {
+                for (int i=0; i<subCnt; i++) {
+                    if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(exporterManager->getName(id)))).arg(links.value(i, ""));
+                }
+                if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
             }
-            if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
+            if (QFile::exists(dir)) text+=mainitem_template.arg(exporterManager->getIconFilename(id)).arg(exporterManager->getName(id)).arg(dir).arg(subTxt);
         }
-        if (QFile::exists(dir)) text+=mainitem_template.arg(exporterManager->getIconFilename(id)).arg(exporterManager->getName(id)).arg(dir).arg(subTxt);
     }
     text+=mainitem_after;
 
@@ -1239,18 +1251,20 @@ QString MainWindow::createPluginDocTutorials(QString mainitem_before, QString ma
     // gather information about plugins
     for (int i=0; i<getExtensionManager()->getIDList().size(); i++) {
         QString id=getExtensionManager()->getIDList().at(i);
-        QString dir=getExtensionManager()->getPluginTutorialMain(id);
-        QStringList names, links;
-        getExtensionManager()->getPluginTutorials(id, names, links);
-        int subCnt=qMax(names.size(), links.size());
-        QString subTxt="";
-        if (subCnt>0) {
-            for (int i=0; i<subCnt; i++) {
-                if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(getExtensionManager()->getName(id)))).arg(links.value(i, ""));
+        if (pluginID.isEmpty() || pluginID==id) {
+            QString dir=getExtensionManager()->getPluginTutorialMain(id);
+            QStringList names, links;
+            getExtensionManager()->getPluginTutorials(id, names, links);
+            int subCnt=qMax(names.size(), links.size());
+            QString subTxt="";
+            if (subCnt>0) {
+                for (int i=0; i<subCnt; i++) {
+                    if (!links.value(i, "").isEmpty()) subTxt+=subitem_template.arg(names.value(i, tr("Tutorial for %1").arg(getExtensionManager()->getName(id)))).arg(links.value(i, ""));
+                }
+                if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
             }
-            if (!subTxt.isEmpty()) subTxt=sub_template.arg(subTxt); // embed in <ol>...</ol>
+            if (QFile::exists(dir)) text+=mainitem_template.arg(getExtensionManager()->getIconFilename(id)).arg(getExtensionManager()->getName(id)).arg(dir).arg(subTxt);
         }
-        if (QFile::exists(dir)) text+=mainitem_template.arg(getExtensionManager()->getIconFilename(id)).arg(getExtensionManager()->getName(id)).arg(dir).arg(subTxt);
     }
     text+=mainitem_after;
 
@@ -4723,6 +4737,7 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink_url"), pluginList->at(i).plugin->getWeblink()));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_weblink"), QObject::tr("<a href=\"%1\">Plugin Webpage</a>").arg(pluginList->at(i).plugin->getWeblink())));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_id"), pid));
+                fromHTML_replaces.append(qMakePair(QString("local_plugin_tutorials"), createPluginDocTutorials(QString("<ul>"), QString("</ul>"), pid)));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_autodescription"), autoplugin_description));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_autostartdescription"), autoplugin_startdescription));
                 fromHTML_replaces.append(qMakePair(QString("local_plugin_dllbasename"), pluginList->at(i).pluginDLLbasename));
@@ -4956,6 +4971,12 @@ QString MainWindow::transformQF3HelpHTML(const QString& input_html, const QStrin
                             text=autoplugin_description+"\n"+autoplugin_startdescription;
                         }
 
+                        if (!text.isEmpty()) {
+                            result=result.replace(rxList.cap(0), text);
+                            replaced=true;
+                        }
+                    } else if (list=="plugin_tutorials") {
+                        QString text=createPluginDocTutorials(QString("<ul>"), QString("</ul>"), filter);
                         if (!text.isEmpty()) {
                             result=result.replace(rxList.cap(0), text);
                             replaced=true;

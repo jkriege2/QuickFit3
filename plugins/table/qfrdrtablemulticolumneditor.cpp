@@ -15,12 +15,12 @@ QFRDRTableMultiColumnEditor::QFRDRTableMultiColumnEditor(QFTableModel *model, QW
     hmodel.addProperty(QFRDRTable::ColumnImageWidth, tr("image width"));
     hmodel.addProperty(QFRDRTable::ColumnCommentRole, tr("comment"));
     hmodel.setModel(model);
-    ui->tableView->verticalHeader()->setDefaultSectionSize(32);
+    ui->tableView->verticalHeader()->setDefaultSectionSize(64);
     ui->tableView->setModel(&hmodel);
     ui->tableView->resizeColumnsToContents();
-    ui->tableView->verticalHeader()->setDefaultSectionSize(32);
+    ui->tableView->verticalHeader()->setDefaultSectionSize(64);
     for (int i=0; i<hmodel.rowCount(); i++) {
-        ui->tableView->setRowHeight(i, 32);
+        ui->tableView->setRowHeight(i, 64);
     }
 
 }
