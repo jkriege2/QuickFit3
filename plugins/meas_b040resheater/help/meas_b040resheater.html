@@ -6,7 +6,10 @@
   </head>
   <body>
      $$qf_commondoc_header.start$$ $$qf_commondoc_header.end$$ 
+	 <h2>Introduction</h2>
 	 <p>This plugin controls a resistor heater (PI loop) controller running a custom written C program with a simple protocoll, developed by Jan Krieger (B040, DKFZ).</p>
+	 
+	 <h2>Configuration</h2>
 	 <p>The controllers are configured by a global configuration file <tt>meas_b040resheater.ini</tt>. It is stored in the global configuration directory. You may change some of the configuration options in the associated
 	 config directory which will show up, if - and only if - you have write access to this file. If the file does not exist, the plugin will load (but not write) to the file <tt>meas_b040resheater.ini</tt> either in
 	 the user config directory, or in the assets directory (<tt>[AssetsDir]/plugins/meas_b040resheater/</tt>) for the plugin.
@@ -39,5 +42,8 @@ port_speed=9600<br>
 
 <p>See also the help page on <a href="$$mainhelpdir$$ext_usbdevices_linux.html">Linux hardware enumeration with udev</a> for further information</p>
 
+
+    <h2>Hardware Description</h2>
+	<p></p>
   </body>
 </html>

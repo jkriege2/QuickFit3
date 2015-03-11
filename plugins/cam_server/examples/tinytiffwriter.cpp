@@ -709,7 +709,7 @@ void TinyTIFFWriter_close(TinyTIFFFile* tiff, char* imageDescription) {
 
 void TinyTIFFWriter_close(TinyTIFFFile* tiff, double pixel_width, double pixel_height, double frametime, double deltaz) {
     if (tiff) {
-      char description[TINYTIFFWRITER_DESCRIPTION_SIZE+1];
+      char description[TINYTIFFWRITER_DESCRIPTION_SIZE];
 	  for (int i=0; i<TINYTIFFWRITER_DESCRIPTION_SIZE+1; i++) description[i]='\0';
       char spw[256];
       sprintf(description, "TinyTIFFWriter_version=1.1\nimages=%ld", tiff->frames);
