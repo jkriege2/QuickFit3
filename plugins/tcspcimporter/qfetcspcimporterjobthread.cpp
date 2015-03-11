@@ -669,8 +669,20 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
     double nextcrInterval=job.countrate_binning;
     uint16_t* countrate=(uint16_t*)qfCalloc(channels, sizeof(uint16_t));
     uint16_t* fcs_countrate=NULL;
-    if (job.doFCS) fcs_countrate=(uint16_t*)qfCalloc(channels*FCS_CHANNELBUFFER_ITEMS, sizeof(uint16_t));
-    uint16_t* fcs_storecountrate=(uint16_t*)qfCalloc(channels, sizeof(uint16_t));
+    uint16_t* fcs_storecountrate=NULL;
+    const bool bin_and_correlate=job.fcs_correlator<=CORRELATOR_MTAUONEMON;
+    if (bin_and_correlate) {
+        if (job.doFCS) fcs_countrate=(uint16_t*)qfCalloc(channels*FCS_CHANNELBUFFER_ITEMS, sizeof(uint16_t));
+    }
+    fcs_storecountrate=(uint16_t*)qfCalloc(channels, sizeof(uint16_t));
+
+    QList<QVector<float> > arrivaltimes;
+    arrivaltimes.clear();
+    for (int i=0; i<channels; i++) {
+        QVector<float> dummy;
+        arrivaltimes.append(dummy);
+    }
+
     uint64_t crCounter=0;
     uint32_t fcs_countrate_counter=0;
     double pos=0;
@@ -713,32 +725,69 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
 
             // PROCESS FCS
             if (job.doFCS) {
-                // binning and processing of ccfs
-                if (t<fcsNextInterval) {
-                    fcs_countrate[fcs_countrate_counter+c*FCS_CHANNELBUFFER_ITEMS]++;
-                } else {
-                    const int64_t emptyrecords=(int64_t)floor((t-fcsNextInterval)/job.fcs_taumin)+1;
-                    fcs_countrate_counter=fcs_countrate_counter+emptyrecords;
+                bool isNextSegment=t>=fcsNextSegmentValue;
+                bool isBeforeNextFCSInteral=t<fcsNextInterval;
+                bool isBeforeNextFCSCRInteral=t<fcsNextStoreInterval;
 
-                    if (fcs_countrate_counter>=FCS_CHANNELBUFFER_ITEMS) {
-                        //qDebug()<<"  loop shift @t="<<t<<"   emptyrecords="<<emptyrecords<<"  fcs_countrate_counter="<<fcs_countrate_counter;
-                        shiftIntoCorrelators(fcs_countrate, FCS_CHANNELBUFFER_ITEMS);
+                if (bin_and_correlate) {
+                    // binning photons and correlating data
+                    if (isBeforeNextFCSInteral) {
+                        fcs_countrate[fcs_countrate_counter+c*FCS_CHANNELBUFFER_ITEMS]++;
+                    } else {
+                        const int64_t emptyrecords=(int64_t)floor((t-fcsNextInterval)/job.fcs_taumin)+1;
+                        fcs_countrate_counter=fcs_countrate_counter+emptyrecords;
 
-                        memset(fcs_countrate, 0, channels*FCS_CHANNELBUFFER_ITEMS*sizeof(uint16_t));
-                        fcs_countrate_counter=fcs_countrate_counter-FCS_CHANNELBUFFER_ITEMS;
+                        if (fcs_countrate_counter>=FCS_CHANNELBUFFER_ITEMS) {
+                            //qDebug()<<"  loop shift @t="<<t<<"   emptyrecords="<<emptyrecords<<"  fcs_countrate_counter="<<fcs_countrate_counter;
+                            shiftIntoCorrelators(fcs_countrate, FCS_CHANNELBUFFER_ITEMS);
+
+                            memset(fcs_countrate, 0, channels*FCS_CHANNELBUFFER_ITEMS*sizeof(uint16_t));
+                            fcs_countrate_counter=fcs_countrate_counter-FCS_CHANNELBUFFER_ITEMS;
+                        }
+
+
+                        fcs_countrate[fcs_countrate_counter+c*FCS_CHANNELBUFFER_ITEMS]++;
+                        fcsNextInterval=fcsNextInterval+emptyrecords*job.fcs_taumin;
                     }
 
 
-                    fcs_countrate[fcs_countrate_counter+c*FCS_CHANNELBUFFER_ITEMS]++;
-                    fcsNextInterval=fcsNextInterval+emptyrecords*job.fcs_taumin;
+
+                    // if next segment: shift in remaining data and clear bins.
+                    if (isNextSegment) {
+                        if (fcs_countrate_counter>0) shiftIntoCorrelators(fcs_countrate, fcs_countrate_counter);
+                        copyCorrelatorIntermediateResults(fcs_segment);
+                        //qDebug()<<"-- fcs segment "<<fcs_segment<<" @ t="<<t<<" -----------------------------";
+                        createCorrelators();
+                        memset(fcs_countrate, 0, channels*FCS_CHANNELBUFFER_ITEMS*sizeof(uint16_t));
+                        fcs_countrate_counter=0;
+                        fcs_segment++;
+                        fcsNextSegmentValue=fcsNextSegmentValue+range_duration/double(job.fcs_segments);
+                        //qDebug()<<"-- fcsNextSegmentValue "<<fcsNextSegmentValue;
+                    }
+                } else {
+
+                    if (isNextSegment) {
+                        // correlate arrivaltime data
+
+                        // clear arrivaltimes
+                        arrivaltimes.clear();
+                        for (int i=0; i<channels; i++) {
+                            QVector<float> dummy;
+                            arrivaltimes.append(dummy);
+                        }
+                    } else {
+                        arrivaltimes[c].append(t);
+                    }
                 }
 
-                // binning and processing of countrates, stored with ccfs
-                if (t<fcsNextStoreInterval) {
+
+
+
+                // bin photons and calculate countrates, stored with ccfs
+                if (isBeforeNextFCSCRInteral) {
                     fcs_storecountrate[c]++;
                 } else {
                     int64_t emptyrecords=(int64_t)floor((t-fcsNextStoreInterval)/job.fcs_crbinning)+1;
-                    //qDebug()<<emptyrecords;
                     for (register int64_t i=0; i<(int64_t)channels*emptyrecords; i++) {
                         int cc=i%channels;
                         fcs_crs[xyAdressToUInt32(fcs_segment, cc)].append(fcs_storecountrate[cc]/job.fcs_crbinning/1000.0);
@@ -749,29 +798,15 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
                     crCounter+=emptyrecords;
                     fcsNextStoreInterval=fcsNextStoreInterval+emptyrecords*job.fcs_crbinning;
                 }
-
-                if (t>=fcsNextSegmentValue) {
-                    if (fcs_countrate_counter>0) shiftIntoCorrelators(fcs_countrate, fcs_countrate_counter);
-                    copyCorrelatorIntermediateResults(fcs_segment);
-                    //qDebug()<<"-- fcs segment "<<fcs_segment<<" @ t="<<t<<" -----------------------------";
+                if (isNextSegment) {
                     for (register int cc=0; cc<channels; cc++) {
-                        fcs_countrate[cc]=0;
                         fcs_storecountrate[cc]=0;
                     }
-                    createCorrelators();
-                    memset(fcs_countrate, 0, channels*FCS_CHANNELBUFFER_ITEMS*sizeof(uint16_t));
-                    fcs_countrate_counter=0;
-                    fcs_segment++;
-                    fcsNextSegmentValue=fcsNextSegmentValue+range_duration/double(job.fcs_segments);
-                    //qDebug()<<"-- fcsNextSegmentValue "<<fcsNextSegmentValue;
                 }
             }
         }
-        /*if (reader->percentCompleted()-pos>0.1) {
-            emit progressIncrement(1);
-            pos=reader->percentCompleted();
-        }*/
 
+        // report progress
         if (t>nextReporterStep) {
             emit progressIncrement(1);
             nextReporterStep=nextReporterStep+range_duration/1000.0;
@@ -781,13 +816,15 @@ void QFETCSPCImporterJobThread::runEval(QFTCSPCReader *reader,  QFile* countrate
         done=(t>range_duration);
     } while (reader->nextRecord() && (m_status==1) && (!was_canceled) && !done);
     if (job.doFCS) {
-        if (fcs_countrate_counter>0) shiftIntoCorrelators(fcs_countrate, fcs_countrate_counter);
-        while (fcs_segment<job.fcs_segments) {
-            //qDebug()<<"-- fcs segment "<<fcs_segment<<" -----------------------------";
-            copyCorrelatorIntermediateResults(fcs_segment);
-            fcs_segment++;
+        if (job.fcs_correlator<=CORRELATOR_MTAUONEMON) {
+            if (fcs_countrate_counter>0) shiftIntoCorrelators(fcs_countrate, fcs_countrate_counter);
+            while (fcs_segment<job.fcs_segments) {
+                //qDebug()<<"-- fcs segment "<<fcs_segment<<" -----------------------------";
+                copyCorrelatorIntermediateResults(fcs_segment);
+                fcs_segment++;
+            }
+            qfFree(fcs_storecountrate);
         }
-        qfFree(fcs_storecountrate);
     }
     qfFree(countrate);
     qfFree(fcs_countrate);
