@@ -1332,7 +1332,8 @@ bool QFRDRImagingFCSData::loadRadhard2File(const QString& filename, bool loadOve
         double* tmp=(double*)qfMalloc(width*height*sizeof(double));
         double* tmpStd=(double*)qfMalloc(width*height*sizeof(double));
         for(int i=0; i<width*height; i++) {
-            tmp[i]=cfr->getRaw(i,0)/(double(steps)*tau[0])/1.0e3;
+//            tmp[i]=cfr->getRaw(i,0)/(double(steps)*tau[0])/1.0e3;
+            tmp[i]=cfr->getGlobal(i)/(double(steps)*tau[0])/1.0e3;
             tmpStd[i]=0;
         }
         splitImage(overviewF, overviewF2, tmp, width, height);
