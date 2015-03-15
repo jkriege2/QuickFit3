@@ -367,6 +367,12 @@ void QFEvalBeadScanPSFItem::doEvaluation(QFRawDataRecord* record, double deltaXY
                 // absolute X,Y,Z coordinates (in nanometers) of the ROI
                 QVector<double> X, Y, Z;
                 qfGridXYZ(X, Y, Z, x0tl, y0tl, z0tl, roi.width(), roi.height(), roi.depth(), deltaXY, deltaXY, deltaZ);
+                for (int i=X.size()-1; i>=0; i--) {
+                    int z=i/(roi.width()*roi.height());
+                    int idxxy=i%(roi.width()*roi.height());
+                    int y=idxxy/roi.width();
+                    int x=idxxy%roi.width();
+                }
 
                 // cuts through center pixel with x-coordinate vectors
                 QVector<double> cutX(roi.width()); //=image.get_crop(0, y0i, z0i, roi.width()-1, y0i, z0i).unroll('x');
